@@ -31,7 +31,7 @@
     "@shopify/react-native-skia": "^2.2.12",
     "@tanstack/react-query": "5.60.6",
     "@tracearr/shared": "workspace:*",
-    "axios": "1.7.7",
+    "axios": "1.12.0",
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
