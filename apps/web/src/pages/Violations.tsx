@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { SeverityBadge } from '@/components/violations/SeverityBadge';
+import { ViolationDetailDialog } from '@/components/violations/ViolationDetailDialog';
 import { getAvatarUrl } from '@/components/users/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -52,6 +53,7 @@ export function Violations() {
   const [severityFilter, setSeverityFilter] = useState<ViolationSeverity | 'all'>('all');
   const [acknowledgedFilter, setAcknowledgedFilter] = useState<'all' | 'pending' | 'acknowledged'>('all');
   const [dismissId, setDismissId] = useState<string | null>(null);
+  const [selectedViolation, setSelectedViolation] = useState<ViolationWithDetails | null>(null);
   const pageSize = 10;
   const { selectedServerId } = useServer();
 
@@ -74,10 +76,14 @@ export function Violations() {
     acknowledgeViolation.mutate(id);
   };
 
-  const handleDismiss = () => {
-    if (dismissId) {
-      dismissViolation.mutate(dismissId, {
-        onSuccess: () => { setDismissId(null); },
+  const handleDismiss = (id?: string) => {
+    const violationId = id || dismissId;
+    if (violationId) {
+      dismissViolation.mutate(violationId, {
+        onSuccess: () => {
+          setDismissId(null);
+          setSelectedViolation(null);
+        },
       });
     }
   };
@@ -165,12 +171,15 @@ export function Violations() {
       cell: ({ row }) => {
         const violation = row.original;
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onClick={(e) => { e.stopPropagation(); }}>
             {!violation.acknowledgedAt && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { handleAcknowledge(violation.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAcknowledge(violation.id);
+                }}
                 disabled={acknowledgeViolation.isPending}
               >
                 <Check className="mr-1 h-4 w-4" />
@@ -180,7 +189,10 @@ export function Violations() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setDismissId(violation.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDismissId(violation.id);
+              }}
               className="text-destructive hover:text-destructive"
             >
               <X className="mr-1 h-4 w-4" />
@@ -294,11 +306,27 @@ export function Violations() {
               pageCount={totalPages}
               page={page}
               onPageChange={setPage}
+              onRowClick={(violation) => { setSelectedViolation(violation); }}
               emptyMessage="No violations found."
             />
           )}
         </CardContent>
       </Card>
+
+      {/* Violation Detail Dialog */}
+      <ViolationDetailDialog
+        violation={selectedViolation}
+        open={!!selectedViolation}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedViolation(null);
+          }
+        }}
+        onAcknowledge={handleAcknowledge}
+        onDismiss={handleDismiss}
+        isAcknowledging={acknowledgeViolation.isPending}
+        isDismissing={dismissViolation.isPending}
+      />
 
       {/* Dismiss Confirmation Dialog */}
       <Dialog open={!!dismissId} onOpenChange={() => { setDismissId(null); }}>
