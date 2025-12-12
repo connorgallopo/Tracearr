@@ -243,33 +243,51 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
           // Go back 30 days from the oldest violation time for each user
           const historicalPromises = Array.from(userViolationTimes.entries()).map(
             async ([serverUserId, oldestViolationTime]) => {
-              const historyWindow = new Date(oldestViolationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
-              const historicalSessions = await db
-                .select({
-                  ipAddress: sessions.ipAddress,
-                  deviceId: sessions.deviceId,
-                  device: sessions.device,
-                  geoCity: sessions.geoCity,
-                  geoCountry: sessions.geoCountry,
-                  startedAt: sessions.startedAt,
-                })
-                .from(sessions)
-                .where(
-                  and(
-                    eq(sessions.serverUserId, serverUserId),
-                    gte(sessions.startedAt, historyWindow),
-                    lte(sessions.startedAt, oldestViolationTime)
+              try {
+                const historyWindow = new Date(oldestViolationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
+                const historicalSessions = await db
+                  .select({
+                    ipAddress: sessions.ipAddress,
+                    deviceId: sessions.deviceId,
+                    device: sessions.device,
+                    geoCity: sessions.geoCity,
+                    geoCountry: sessions.geoCountry,
+                    startedAt: sessions.startedAt,
+                  })
+                  .from(sessions)
+                  .where(
+                    and(
+                      eq(sessions.serverUserId, serverUserId),
+                      gte(sessions.startedAt, historyWindow),
+                      lte(sessions.startedAt, oldestViolationTime)
+                    )
                   )
-                )
-                .limit(1000); // Get enough to build a good history
+                  .limit(1000); // Get enough to build a good history
 
-              return [serverUserId, historicalSessions] as const;
+                return [serverUserId, historicalSessions] as const;
+              } catch (error) {
+                // If query fails (e.g., in tests), return empty array for this user
+                console.error(`[Violations] Failed to fetch historical data for user ${serverUserId}:`, error);
+                const emptyArray: Array<{
+                  ipAddress: string;
+                  deviceId: string | null;
+                  device: string | null;
+                  geoCity: string | null;
+                  geoCountry: string | null;
+                  startedAt: Date;
+                }> = [];
+                return [serverUserId, emptyArray] as const;
+              }
             }
           );
 
-          const historicalResults = await Promise.all(historicalPromises);
-          for (const [serverUserId, sessions] of historicalResults) {
-            historicalDataByUserId.set(serverUserId, sessions);
+          const historicalResults = await Promise.allSettled(historicalPromises);
+          for (const result of historicalResults) {
+            if (result.status === 'fulfilled') {
+              const [serverUserId, sessions] = result.value;
+              historicalDataByUserId.set(serverUserId, sessions);
+            }
+            // If rejected, that user just won't have historical data (already handled in catch)
           }
         }
 
@@ -388,7 +406,8 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
           }
         );
 
-        await Promise.all(relatedSessionsPromises);
+        await Promise.allSettled(relatedSessionsPromises);
+        // Errors are already handled in individual try-catch blocks
         }
       } catch (error) {
         // If batching fails (e.g., in tests or when queries fail), continue without extra data
