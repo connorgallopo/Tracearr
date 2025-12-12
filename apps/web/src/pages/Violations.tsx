@@ -344,7 +344,7 @@ export function Violations() {
             </Button>
             <Button
               variant="destructive"
-              onClick={handleDismiss}
+              onClick={() => handleDismiss()}
               disabled={dismissViolation.isPending}
             >
               {dismissViolation.isPending ? 'Dismissing...' : 'Dismiss'}
