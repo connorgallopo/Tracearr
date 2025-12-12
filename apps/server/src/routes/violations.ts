@@ -240,107 +240,113 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
         };
 
         if (['concurrent_streams', 'simultaneous_locations', 'device_velocity'].includes(v.ruleType)) {
-          const violationTime = v.createdAt;
-          const timeWindow = new Date(violationTime.getTime() - 5 * 60 * 1000); // 5 minutes before violation
+          try {
+            const violationTime = v.createdAt;
+            const timeWindow = new Date(violationTime.getTime() - 5 * 60 * 1000); // 5 minutes before violation
 
-          // Fetch user's historical data (last 30 days) for comparison
-          const historyWindow = new Date(violationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
-          const historicalSessions = await db
-            .select({
-              ipAddress: sessions.ipAddress,
-              deviceId: sessions.deviceId,
-              device: sessions.device,
-              geoCity: sessions.geoCity,
-              geoCountry: sessions.geoCountry,
-            })
-            .from(sessions)
-            .where(
-              and(
-                eq(sessions.serverUserId, v.serverUserId),
-                gte(sessions.startedAt, historyWindow),
-                lte(sessions.startedAt, violationTime)
+            // Fetch user's historical data (last 30 days) for comparison
+            const historyWindow = new Date(violationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
+            const historicalSessions = await db
+              .select({
+                ipAddress: sessions.ipAddress,
+                deviceId: sessions.deviceId,
+                device: sessions.device,
+                geoCity: sessions.geoCity,
+                geoCountry: sessions.geoCountry,
+              })
+              .from(sessions)
+              .where(
+                and(
+                  eq(sessions.serverUserId, v.serverUserId),
+                  gte(sessions.startedAt, historyWindow),
+                  lte(sessions.startedAt, violationTime)
+                )
               )
-            )
-            .limit(1000); // Get enough to build a good history
+              .limit(1000); // Get enough to build a good history
 
-          // Build unique sets of previous values
-          const ipSet = new Set<string>();
-          const deviceSet = new Set<string>();
-          const locationMap = new Map<string, { city: string | null; country: string | null; ip: string }>();
+            // Build unique sets of previous values
+            const ipSet = new Set<string>();
+            const deviceSet = new Set<string>();
+            const locationMap = new Map<string, { city: string | null; country: string | null; ip: string }>();
 
-          for (const hist of historicalSessions) {
-            if (hist.ipAddress) ipSet.add(hist.ipAddress);
-            if (hist.deviceId) deviceSet.add(hist.deviceId);
-            if (hist.device) deviceSet.add(hist.device);
-            if (hist.geoCity || hist.geoCountry) {
-              const locKey = `${hist.geoCity ?? ''}-${hist.geoCountry ?? ''}`;
-              if (!locationMap.has(locKey)) {
-                locationMap.set(locKey, {
-                  city: hist.geoCity,
-                  country: hist.geoCountry,
-                  ip: hist.ipAddress,
-                });
+            for (const hist of historicalSessions) {
+              if (hist.ipAddress) ipSet.add(hist.ipAddress);
+              if (hist.deviceId) deviceSet.add(hist.deviceId);
+              if (hist.device) deviceSet.add(hist.device);
+              if (hist.geoCity || hist.geoCountry) {
+                const locKey = `${hist.geoCity ?? ''}-${hist.geoCountry ?? ''}`;
+                if (!locationMap.has(locKey)) {
+                  locationMap.set(locKey, {
+                    city: hist.geoCity,
+                    country: hist.geoCountry,
+                    ip: hist.ipAddress,
+                  });
+                }
               }
             }
+
+            userHistory = {
+              previousIPs: Array.from(ipSet),
+              previousDevices: Array.from(deviceSet),
+              previousLocations: Array.from(locationMap.values()),
+            };
+
+            // Build conditions based on violation type
+            const conditions = [
+              eq(sessions.serverUserId, v.serverUserId),
+              gte(sessions.startedAt, timeWindow),
+              lte(sessions.startedAt, violationTime),
+            ];
+
+            // For concurrent_streams, only get active (playing) sessions
+            if (v.ruleType === 'concurrent_streams') {
+              conditions.push(eq(sessions.state, 'playing'));
+              conditions.push(isNull(sessions.stoppedAt));
+            }
+
+            // For simultaneous_locations, filter by different locations
+            if (v.ruleType === 'simultaneous_locations') {
+              conditions.push(eq(sessions.state, 'playing'));
+              conditions.push(isNull(sessions.stoppedAt));
+              conditions.push(isNotNull(sessions.geoLat));
+              conditions.push(isNotNull(sessions.geoLon));
+            }
+
+            // For device_velocity, get all sessions in the time window
+            const sessionsResult = await db
+              .select({
+                id: sessions.id,
+                mediaTitle: sessions.mediaTitle,
+                mediaType: sessions.mediaType,
+                grandparentTitle: sessions.grandparentTitle,
+                seasonNumber: sessions.seasonNumber,
+                episodeNumber: sessions.episodeNumber,
+                year: sessions.year,
+                ipAddress: sessions.ipAddress,
+                geoCity: sessions.geoCity,
+                geoRegion: sessions.geoRegion,
+                geoCountry: sessions.geoCountry,
+                geoLat: sessions.geoLat,
+                geoLon: sessions.geoLon,
+                playerName: sessions.playerName,
+                device: sessions.device,
+                deviceId: sessions.deviceId,
+                platform: sessions.platform,
+                product: sessions.product,
+                quality: sessions.quality,
+                startedAt: sessions.startedAt,
+              })
+              .from(sessions)
+              .where(and(...conditions))
+              .orderBy(desc(sessions.startedAt))
+              .limit(20); // Limit to prevent huge results
+
+            relatedSessions = sessionsResult;
+          } catch (error) {
+            // If fetching related sessions fails, continue without them
+            // This prevents the entire violation list from failing
+            console.error(`[Violations] Failed to fetch related sessions for violation ${v.id}:`, error);
           }
-
-          userHistory = {
-            previousIPs: Array.from(ipSet),
-            previousDevices: Array.from(deviceSet),
-            previousLocations: Array.from(locationMap.values()),
-          };
-
-          // Build conditions based on violation type
-          const conditions = [
-            eq(sessions.serverUserId, v.serverUserId),
-            gte(sessions.startedAt, timeWindow),
-            lte(sessions.startedAt, violationTime),
-          ];
-
-          // For concurrent_streams, only get active (playing) sessions
-          if (v.ruleType === 'concurrent_streams') {
-            conditions.push(eq(sessions.state, 'playing'));
-            conditions.push(isNull(sessions.stoppedAt));
-          }
-
-          // For simultaneous_locations, filter by different locations
-          if (v.ruleType === 'simultaneous_locations') {
-            conditions.push(eq(sessions.state, 'playing'));
-            conditions.push(isNull(sessions.stoppedAt));
-            conditions.push(isNotNull(sessions.geoLat));
-            conditions.push(isNotNull(sessions.geoLon));
-          }
-
-          // For device_velocity, get all sessions in the time window
-          const sessionsResult = await db
-            .select({
-              id: sessions.id,
-              mediaTitle: sessions.mediaTitle,
-              mediaType: sessions.mediaType,
-              grandparentTitle: sessions.grandparentTitle,
-              seasonNumber: sessions.seasonNumber,
-              episodeNumber: sessions.episodeNumber,
-              year: sessions.year,
-              ipAddress: sessions.ipAddress,
-              geoCity: sessions.geoCity,
-              geoRegion: sessions.geoRegion,
-              geoCountry: sessions.geoCountry,
-              geoLat: sessions.geoLat,
-              geoLon: sessions.geoLon,
-              playerName: sessions.playerName,
-              device: sessions.device,
-              deviceId: sessions.deviceId,
-              platform: sessions.platform,
-              product: sessions.product,
-              quality: sessions.quality,
-              startedAt: sessions.startedAt,
-            })
-            .from(sessions)
-            .where(and(...conditions))
-            .orderBy(desc(sessions.startedAt))
-            .limit(20); // Limit to prevent huge results
-
-          relatedSessions = sessionsResult;
         }
 
         return {
