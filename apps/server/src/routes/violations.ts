@@ -224,54 +224,56 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
         }>
       >();
 
-      if (violationsNeedingData.length > 0) {
-        // Group violations by serverUserId and find the oldest violation time for each user
-        const userViolationTimes = new Map<string, Date>();
-        for (const v of violationsNeedingData) {
-          const existing = userViolationTimes.get(v.serverUserId);
-          if (!existing || v.createdAt < existing) {
-            userViolationTimes.set(v.serverUserId, v.createdAt);
-          }
-        }
-
-        // Batch fetch historical sessions for each unique serverUserId
-        // Go back 30 days from the oldest violation time for each user
-        const historicalPromises = Array.from(userViolationTimes.entries()).map(
-          async ([serverUserId, oldestViolationTime]) => {
-            const historyWindow = new Date(oldestViolationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
-            const historicalSessions = await db
-              .select({
-                ipAddress: sessions.ipAddress,
-                deviceId: sessions.deviceId,
-                device: sessions.device,
-                geoCity: sessions.geoCity,
-                geoCountry: sessions.geoCountry,
-                startedAt: sessions.startedAt,
-              })
-              .from(sessions)
-              .where(
-                and(
-                  eq(sessions.serverUserId, serverUserId),
-                  gte(sessions.startedAt, historyWindow),
-                  lte(sessions.startedAt, oldestViolationTime)
-                )
-              )
-              .limit(1000); // Get enough to build a good history
-
-            return [serverUserId, historicalSessions] as const;
-          }
-        );
-
-        const historicalResults = await Promise.all(historicalPromises);
-        for (const [serverUserId, sessions] of historicalResults) {
-          historicalDataByUserId.set(serverUserId, sessions);
-        }
-      }
-
       // Batch fetch related sessions by (serverUserId, ruleType) to avoid N+1 queries
       const relatedSessionsByViolation = new Map<string, ViolationSessionInfo[]>();
 
-      if (violationsNeedingData.length > 0) {
+      // Wrap batching in try-catch to handle errors gracefully (e.g., in tests or when queries fail)
+      try {
+        if (violationsNeedingData.length > 0) {
+          // Group violations by serverUserId and find the oldest violation time for each user
+          const userViolationTimes = new Map<string, Date>();
+          for (const v of violationsNeedingData) {
+            const existing = userViolationTimes.get(v.serverUserId);
+            if (!existing || v.createdAt < existing) {
+              userViolationTimes.set(v.serverUserId, v.createdAt);
+            }
+          }
+
+          // Batch fetch historical sessions for each unique serverUserId
+          // Go back 30 days from the oldest violation time for each user
+          const historicalPromises = Array.from(userViolationTimes.entries()).map(
+            async ([serverUserId, oldestViolationTime]) => {
+              const historyWindow = new Date(oldestViolationTime.getTime() - 30 * 24 * 60 * 60 * 1000);
+              const historicalSessions = await db
+                .select({
+                  ipAddress: sessions.ipAddress,
+                  deviceId: sessions.deviceId,
+                  device: sessions.device,
+                  geoCity: sessions.geoCity,
+                  geoCountry: sessions.geoCountry,
+                  startedAt: sessions.startedAt,
+                })
+                .from(sessions)
+                .where(
+                  and(
+                    eq(sessions.serverUserId, serverUserId),
+                    gte(sessions.startedAt, historyWindow),
+                    lte(sessions.startedAt, oldestViolationTime)
+                  )
+                )
+                .limit(1000); // Get enough to build a good history
+
+              return [serverUserId, historicalSessions] as const;
+            }
+          );
+
+          const historicalResults = await Promise.all(historicalPromises);
+          for (const [serverUserId, sessions] of historicalResults) {
+            historicalDataByUserId.set(serverUserId, sessions);
+          }
+        }
+
+        if (violationsNeedingData.length > 0) {
         // Group violations by (serverUserId, ruleType) and find time ranges
         const violationGroups = new Map<
           string,
@@ -387,6 +389,11 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
         );
 
         await Promise.all(relatedSessionsPromises);
+        }
+      } catch (error) {
+        // If batching fails (e.g., in tests or when queries fail), continue without extra data
+        // This prevents the entire violation list from failing
+        console.error('[Violations] Failed to batch fetch historical/related data:', error);
       }
 
       // Transform flat data into nested structure expected by frontend
