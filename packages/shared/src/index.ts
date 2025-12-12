@@ -37,6 +37,7 @@ export type {
   ViolationSeverity,
   Violation,
   ViolationWithDetails,
+  ViolationSessionInfo,
   // Stats
   DashboardStats,
   PlayStats,

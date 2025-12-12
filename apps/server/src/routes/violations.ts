@@ -7,6 +7,7 @@ import { eq, and, desc, gte, lte, isNull, isNotNull, sql, inArray } from 'drizzl
 import {
   violationQuerySchema,
   violationIdParamSchema,
+  type ViolationSessionInfo,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { violations, rules, serverUsers, sessions, servers } from '../db/schema.js';
@@ -205,27 +206,7 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       // Transform flat data into nested structure expected by frontend
       const formattedData = await Promise.all(violationData.map(async (v) => {
         // Fetch related sessions for violations that involve multiple streams
-        let relatedSessions: Array<{
-          id: string;
-          mediaTitle: string;
-          mediaType: string;
-          grandparentTitle: string | null;
-          seasonNumber: number | null;
-          episodeNumber: number | null;
-          year: number | null;
-          ipAddress: string;
-          geoCity: string | null;
-          geoRegion: string | null;
-          geoCountry: string | null;
-          geoLat: number | null;
-          geoLon: number | null;
-          playerName: string | null;
-          device: string | null;
-          platform: string | null;
-          product: string | null;
-          quality: string | null;
-          startedAt: Date;
-        }> = [];
+        let relatedSessions: ViolationSessionInfo[] = [];
 
         // For concurrent_streams, simultaneous_locations, and device_velocity, fetch related sessions
         // Also fetch user's historical data for comparison
@@ -341,7 +322,10 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
               .orderBy(desc(sessions.startedAt))
               .limit(20); // Limit to prevent huge results
 
-            relatedSessions = sessionsResult;
+            relatedSessions = sessionsResult.map((s) => ({
+              ...s,
+              deviceId: s.deviceId ?? null,
+            }));
           } catch (error) {
             // If fetching related sessions fails, continue without them
             // This prevents the entire violation list from failing
