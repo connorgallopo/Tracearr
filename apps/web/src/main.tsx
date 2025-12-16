@@ -9,6 +9,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { App } from './App';
 import './styles/globals.css';
 
+// Get base path from Vite's import.meta.env (set via vite.config.ts)
+const BASE_PATH = import.meta.env.BASE_URL || '/';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -33,7 +36,7 @@ createRoot(root).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="tracearr-theme">
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter basename={BASE_PATH}>
           <AuthProvider>
             <ServerProvider>
               <SocketProvider>

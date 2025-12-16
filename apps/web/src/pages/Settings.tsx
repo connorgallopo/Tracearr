@@ -1012,20 +1012,6 @@ function NetworkSettings() {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="basePath">Base Path</Label>
-            <Input
-              id="basePath"
-              placeholder="/tracearr"
-              value={basePath}
-              onChange={(e) => setBasePath(e.target.value)}
-              onBlur={handleSaveBasePath}
-            />
-            <p className="text-xs text-muted-foreground">
-              Only needed if running behind a reverse proxy with a path prefix (e.g., example.com/tracearr).
-              Leave empty for root-level deployments.
-            </p>
-          </div>
         </CardContent>
       </Card>
 

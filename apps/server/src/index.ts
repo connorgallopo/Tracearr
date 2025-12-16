@@ -71,6 +71,7 @@ import { servers } from './db/schema.js';
 
 const PORT = parseInt(process.env.PORT ?? '3000', 10);
 const HOST = process.env.HOST ?? '0.0.0.0';
+const BASE_PATH = (process.env.BASE_PATH ?? '').replace(/\/+$/, ''); // Remove trailing slash
 
 async function buildApp(options: { trustProxy?: boolean } = {}) {
   const app = Fastify({
@@ -298,40 +299,48 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     };
   });
 
-  // API routes
-  await app.register(setupRoutes, { prefix: `${API_BASE_PATH}/setup` });
-  await app.register(authRoutes, { prefix: `${API_BASE_PATH}/auth` });
-  await app.register(serverRoutes, { prefix: `${API_BASE_PATH}/servers` });
-  await app.register(userRoutes, { prefix: `${API_BASE_PATH}/users` });
-  await app.register(sessionRoutes, { prefix: `${API_BASE_PATH}/sessions` });
-  await app.register(ruleRoutes, { prefix: `${API_BASE_PATH}/rules` });
-  await app.register(violationRoutes, { prefix: `${API_BASE_PATH}/violations` });
-  await app.register(statsRoutes, { prefix: `${API_BASE_PATH}/stats` });
-  await app.register(settingsRoutes, { prefix: `${API_BASE_PATH}/settings` });
-  await app.register(channelRoutingRoutes, { prefix: `${API_BASE_PATH}/settings/notifications` });
-  await app.register(importRoutes, { prefix: `${API_BASE_PATH}/import` });
-  await app.register(imageRoutes, { prefix: `${API_BASE_PATH}/images` });
-  await app.register(debugRoutes, { prefix: `${API_BASE_PATH}/debug` });
-  await app.register(mobileRoutes, { prefix: `${API_BASE_PATH}/mobile` });
-  await app.register(notificationPreferencesRoutes, { prefix: `${API_BASE_PATH}/notifications` });
+  // If BASE_PATH is set, redirect root to base path
+  if (BASE_PATH) {
+    app.get('/', async (_request, reply) => {
+      return reply.redirect(BASE_PATH, 301);
+    });
+  }
+
+  // API routes - apply BASE_PATH from environment variable
+  await app.register(setupRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/setup` });
+  await app.register(authRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/auth` });
+  await app.register(serverRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/servers` });
+  await app.register(userRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/users` });
+  await app.register(sessionRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/sessions` });
+  await app.register(ruleRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/rules` });
+  await app.register(violationRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/violations` });
+  await app.register(statsRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/stats` });
+  await app.register(settingsRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/settings` });
+  await app.register(channelRoutingRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/settings/notifications` });
+  await app.register(importRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/import` });
+  await app.register(imageRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/images` });
+  await app.register(debugRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/debug` });
+  await app.register(mobileRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/mobile` });
+  await app.register(notificationPreferencesRoutes, { prefix: `${BASE_PATH}${API_BASE_PATH}/notifications` });
 
   // Serve static frontend in production
   const webDistPath = resolve(PROJECT_ROOT, 'apps/web/dist');
   if (process.env.NODE_ENV === 'production' && existsSync(webDistPath)) {
+    const staticPrefix = BASE_PATH || '/';
     await app.register(fastifyStatic, {
       root: webDistPath,
-      prefix: '/',
+      prefix: staticPrefix,
     });
 
     // SPA fallback - serve index.html for all non-API routes
     app.setNotFoundHandler((request, reply) => {
-      if (request.url.startsWith('/api/') || request.url === '/health') {
+      if (request.url.startsWith(`${BASE_PATH}/api/`) || request.url === '/health') {
         return reply.code(404).send({ error: 'Not Found' });
       }
       return reply.sendFile('index.html');
     });
 
-    app.log.info('Static file serving enabled for production');
+    app.log.info(`Static file serving enabled for production${BASE_PATH ? ` at ${BASE_PATH}` : ''}`);
   }
 
   return app;
@@ -354,7 +363,10 @@ async function start() {
     }
 
     await app.listen({ port: PORT, host: HOST });
-    app.log.info(`Server running at http://${HOST}:${PORT}`);
+    app.log.info(`Server running at http://${HOST}:${PORT}${BASE_PATH}`);
+    if (BASE_PATH) {
+      app.log.info(`Base path: ${BASE_PATH}`);
+    }
 
     // Initialize WebSocket server using Fastify's underlying HTTP server
     const httpServer = app.server;
