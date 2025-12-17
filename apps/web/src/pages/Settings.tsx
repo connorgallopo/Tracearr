@@ -915,12 +915,10 @@ function NetworkSettings() {
   const updateSettings = useUpdateSettings();
 
   const [externalUrl, setExternalUrl] = useState('');
-  const [basePath, setBasePath] = useState('');
 
   useEffect(() => {
     if (settings) {
       setExternalUrl(settings.externalUrl ?? '');
-      setBasePath(settings.basePath ?? '');
     }
   }, [settings]);
 
@@ -930,10 +928,6 @@ function NetworkSettings() {
 
   const handleSaveExternalUrl = () => {
     updateSettings.mutate({ externalUrl: externalUrl || null });
-  };
-
-  const handleSaveBasePath = () => {
-    updateSettings.mutate({ basePath: basePath });
   };
 
   const handleDetectUrl = () => {
