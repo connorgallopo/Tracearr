@@ -10,7 +10,11 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import type { PlexAvailableServersResponse, PlexDiscoveredServer, PlexDiscoveredConnection } from '@tracearr/shared';
+import type {
+  PlexAvailableServersResponse,
+  PlexDiscoveredServer,
+  PlexDiscoveredConnection,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers, users, serverUsers } from '../../db/schema.js';
 import { PlexClient } from '../../services/mediaServer/index.js';
@@ -209,16 +213,15 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
     // Delete temp token (one-time use)
     await app.redis.del(`${PLEX_TEMP_TOKEN_PREFIX}${tempToken}`);
 
-    const { plexAccountId, plexUsername, plexEmail, plexThumb, plexToken, isFirstUser } = JSON.parse(
-      stored
-    ) as {
-      plexAccountId: string;
-      plexUsername: string;
-      plexEmail: string;
-      plexThumb: string;
-      plexToken: string;
-      isFirstUser: boolean;
-    };
+    const { plexAccountId, plexUsername, plexEmail, plexThumb, plexToken, isFirstUser } =
+      JSON.parse(stored) as {
+        plexAccountId: string;
+        plexUsername: string;
+        plexEmail: string;
+        plexThumb: string;
+        plexToken: string;
+        isFirstUser: boolean;
+      };
 
     try {
       // Verify user is admin on the selected server
@@ -302,7 +305,10 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
       // Auto-sync server users and libraries in background
       syncServer(serverId, { syncUsers: true, syncLibraries: true })
         .then((result) => {
-          app.log.info({ serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced }, 'Auto-sync completed for Plex server');
+          app.log.info(
+            { serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced },
+            'Auto-sync completed for Plex server'
+          );
         })
         .catch((error) => {
           app.log.error({ error, serverId }, 'Auto-sync failed for Plex server');
@@ -453,114 +459,112 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
    * Requires authentication and owner role.
    * Uses existing Plex token from another connected server.
    */
-  app.post(
-    '/plex/add-server',
-    { preHandler: [app.authenticate] },
-    async (request, reply) => {
-      const body = plexAddServerSchema.safeParse(request.body);
-      if (!body.success) {
-        return reply.badRequest('serverUri, serverName, and clientIdentifier are required');
-      }
-
-      const { serverUri, serverName, clientIdentifier } = body.data;
-      const authUser = request.user;
-
-      // Only owners can add servers
-      if (authUser.role !== 'owner') {
-        return reply.forbidden('Only server owners can add servers');
-      }
-
-      // Get existing Plex server to retrieve token
-      const existingPlexServer = await db
-        .select({ token: servers.token })
-        .from(servers)
-        .where(eq(servers.type, 'plex'))
-        .limit(1);
-
-      if (existingPlexServer.length === 0) {
-        return reply.badRequest('No Plex servers connected. Please link your Plex account first.');
-      }
-
-      const plexToken = existingPlexServer[0]!.token;
-
-      // Check if server already exists (by machineIdentifier or URL)
-      const existing = await db
-        .select({ id: servers.id })
-        .from(servers)
-        .where(
-          eq(servers.machineIdentifier, clientIdentifier)
-        )
-        .limit(1);
-
-      if (existing.length > 0) {
-        return reply.conflict('This server is already connected');
-      }
-
-      // Also check by URL
-      const existingByUrl = await db
-        .select({ id: servers.id })
-        .from(servers)
-        .where(eq(servers.url, serverUri))
-        .limit(1);
-
-      if (existingByUrl.length > 0) {
-        return reply.conflict('A server with this URL is already connected');
-      }
-
-      try {
-        // Verify admin access on the new server
-        const adminCheck = await PlexClient.verifyServerAdmin(plexToken, serverUri);
-        if (!adminCheck.success) {
-          // Provide specific error based on failure type
-          if (adminCheck.code === PlexClient.AdminVerifyError.CONNECTION_FAILED) {
-            return reply.serviceUnavailable(adminCheck.message);
-          }
-          return reply.forbidden(adminCheck.message);
-        }
-
-        // Create server record
-        const [newServer] = await db
-          .insert(servers)
-          .values({
-            name: serverName,
-            type: 'plex',
-            url: serverUri,
-            token: plexToken,
-            machineIdentifier: clientIdentifier,
-          })
-          .returning();
-
-        if (!newServer) {
-          return reply.internalServerError('Failed to create server');
-        }
-
-        app.log.info({ serverId: newServer.id, serverName }, 'Additional Plex server added');
-
-        // Auto-sync server users and libraries in background
-        syncServer(newServer.id, { syncUsers: true, syncLibraries: true })
-          .then((result) => {
-            app.log.info(
-              { serverId: newServer.id, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced },
-              'Auto-sync completed for new Plex server'
-            );
-          })
-          .catch((error) => {
-            app.log.error({ error, serverId: newServer.id }, 'Auto-sync failed for new Plex server');
-          });
-
-        return {
-          success: true,
-          server: {
-            id: newServer.id,
-            name: newServer.name,
-            type: newServer.type,
-            url: newServer.url,
-          },
-        };
-      } catch (error) {
-        app.log.error({ error }, 'Failed to add Plex server');
-        return reply.internalServerError('Failed to add Plex server');
-      }
+  app.post('/plex/add-server', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const body = plexAddServerSchema.safeParse(request.body);
+    if (!body.success) {
+      return reply.badRequest('serverUri, serverName, and clientIdentifier are required');
     }
-  );
+
+    const { serverUri, serverName, clientIdentifier } = body.data;
+    const authUser = request.user;
+
+    // Only owners can add servers
+    if (authUser.role !== 'owner') {
+      return reply.forbidden('Only server owners can add servers');
+    }
+
+    // Get existing Plex server to retrieve token
+    const existingPlexServer = await db
+      .select({ token: servers.token })
+      .from(servers)
+      .where(eq(servers.type, 'plex'))
+      .limit(1);
+
+    if (existingPlexServer.length === 0) {
+      return reply.badRequest('No Plex servers connected. Please link your Plex account first.');
+    }
+
+    const plexToken = existingPlexServer[0]!.token;
+
+    // Check if server already exists (by machineIdentifier or URL)
+    const existing = await db
+      .select({ id: servers.id })
+      .from(servers)
+      .where(eq(servers.machineIdentifier, clientIdentifier))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return reply.conflict('This server is already connected');
+    }
+
+    // Also check by URL
+    const existingByUrl = await db
+      .select({ id: servers.id })
+      .from(servers)
+      .where(eq(servers.url, serverUri))
+      .limit(1);
+
+    if (existingByUrl.length > 0) {
+      return reply.conflict('A server with this URL is already connected');
+    }
+
+    try {
+      // Verify admin access on the new server
+      const adminCheck = await PlexClient.verifyServerAdmin(plexToken, serverUri);
+      if (!adminCheck.success) {
+        // Provide specific error based on failure type
+        if (adminCheck.code === PlexClient.AdminVerifyError.CONNECTION_FAILED) {
+          return reply.serviceUnavailable(adminCheck.message);
+        }
+        return reply.forbidden(adminCheck.message);
+      }
+
+      // Create server record
+      const [newServer] = await db
+        .insert(servers)
+        .values({
+          name: serverName,
+          type: 'plex',
+          url: serverUri,
+          token: plexToken,
+          machineIdentifier: clientIdentifier,
+        })
+        .returning();
+
+      if (!newServer) {
+        return reply.internalServerError('Failed to create server');
+      }
+
+      app.log.info({ serverId: newServer.id, serverName }, 'Additional Plex server added');
+
+      // Auto-sync server users and libraries in background
+      syncServer(newServer.id, { syncUsers: true, syncLibraries: true })
+        .then((result) => {
+          app.log.info(
+            {
+              serverId: newServer.id,
+              usersAdded: result.usersAdded,
+              librariesSynced: result.librariesSynced,
+            },
+            'Auto-sync completed for new Plex server'
+          );
+        })
+        .catch((error) => {
+          app.log.error({ error, serverId: newServer.id }, 'Auto-sync failed for new Plex server');
+        });
+
+      return {
+        success: true,
+        server: {
+          id: newServer.id,
+          name: newServer.name,
+          type: newServer.type,
+          url: newServer.url,
+        },
+      };
+    } catch (error) {
+      app.log.error({ error }, 'Failed to add Plex server');
+      return reply.internalServerError('Failed to add Plex server');
+    }
+  });
 };

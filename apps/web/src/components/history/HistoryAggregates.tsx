@@ -46,9 +46,9 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, label, value, subValue, isLoading }: StatCardProps) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10">
-        <Icon className="h-4 w-4 text-primary" />
+    <div className="bg-card flex items-center gap-3 rounded-lg border p-3">
+      <div className="bg-primary/10 flex h-9 w-9 items-center justify-center rounded-md">
+        <Icon className="text-primary h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
         {isLoading ? (
@@ -59,7 +59,7 @@ function StatCard({ icon: Icon, label, value, subValue, isLoading }: StatCardPro
         ) : (
           <>
             <div className="text-lg font-semibold tabular-nums">{value}</div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-muted-foreground text-xs">
               {label}
               {subValue && <span className="ml-1">({subValue})</span>}
             </div>

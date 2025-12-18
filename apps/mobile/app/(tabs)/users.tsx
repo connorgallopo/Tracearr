@@ -23,7 +23,7 @@ function TrustScoreBadge({ score }: { score: number }) {
   return (
     <View
       className={cn(
-        'px-2 py-1 rounded-sm min-w-[40px] items-center',
+        'min-w-[40px] items-center rounded-sm px-2 py-1',
         variant === 'destructive' && 'bg-destructive/20',
         variant === 'warning' && 'bg-warning/20',
         variant === 'success' && 'bg-success/20'
@@ -46,12 +46,12 @@ function TrustScoreBadge({ score }: { score: number }) {
 function UserCard({ user, onPress }: { user: ServerUserWithIdentity; onPress: () => void }) {
   return (
     <Pressable onPress={onPress}>
-      <Card className="flex-row items-center justify-between mb-2 p-3">
-        <View className="flex-row items-center gap-3 flex-1">
+      <Card className="mb-2 flex-row items-center justify-between p-3">
+        <View className="flex-1 flex-row items-center gap-3">
           <UserAvatar thumbUrl={user.thumbUrl} username={user.username} size={48} />
           <View className="flex-1">
             <Text className="text-base font-semibold">{user.username}</Text>
-            <Text className="text-sm text-muted-foreground mt-0.5">
+            <Text className="text-muted-foreground mt-0.5 text-sm">
               {user.role === 'owner' ? 'Owner' : 'User'}
             </Text>
           </View>
@@ -66,25 +66,23 @@ export default function UsersScreen() {
   const router = useRouter();
   const { selectedServerId } = useMediaServer();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch,
-    isRefetching,
-  } = useInfiniteQuery({
-    queryKey: ['users', selectedServerId],
-    queryFn: ({ pageParam = 1 }) =>
-      api.users.list({ page: pageParam, pageSize: PAGE_SIZE, serverId: selectedServerId ?? undefined }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching } =
+    useInfiniteQuery({
+      queryKey: ['users', selectedServerId],
+      queryFn: ({ pageParam = 1 }) =>
+        api.users.list({
+          page: pageParam,
+          pageSize: PAGE_SIZE,
+          serverId: selectedServerId ?? undefined,
+        }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return undefined;
+      },
+    });
 
   // Flatten all pages into single array
   const users = data?.pages.flatMap((page) => page.data) || [];
@@ -97,15 +95,15 @@ export default function UsersScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <UserCard
-            user={item}
-            onPress={() => router.push(`/user/${item.id}` as never)}
-          />
+          <UserCard user={item} onPress={() => router.push(`/user/${item.id}` as never)} />
         )}
         contentContainerClassName="p-4 pt-3"
         onEndReached={handleEndReached}
@@ -118,27 +116,27 @@ export default function UsersScreen() {
           />
         }
         ListHeaderComponent={
-          <View className="flex-row justify-between items-center mb-3">
+          <View className="mb-3 flex-row items-center justify-between">
             <Text className="text-lg font-semibold">Users</Text>
-            <Text className="text-sm text-muted-foreground">
+            <Text className="text-muted-foreground text-sm">
               {total} {total === 1 ? 'user' : 'users'}
             </Text>
           </View>
         }
         ListFooterComponent={
           isFetchingNextPage ? (
-            <View className="py-4 items-center">
+            <View className="items-center py-4">
               <ActivityIndicator size="small" color={colors.cyan.core} />
             </View>
           ) : null
         }
         ListEmptyComponent={
           <View className="items-center py-12">
-            <View className="w-16 h-16 rounded-full bg-card border border-border items-center justify-center mb-4">
-              <Text className="text-2xl text-muted-foreground">0</Text>
+            <View className="bg-card border-border mb-4 h-16 w-16 items-center justify-center rounded-full border">
+              <Text className="text-muted-foreground text-2xl">0</Text>
             </View>
-            <Text className="text-lg font-semibold mb-1">No Users</Text>
-            <Text className="text-sm text-muted-foreground text-center px-4">
+            <Text className="mb-1 text-lg font-semibold">No Users</Text>
+            <Text className="text-muted-foreground px-4 text-center text-sm">
               Users will appear here after syncing with your media server
             </Text>
           </View>

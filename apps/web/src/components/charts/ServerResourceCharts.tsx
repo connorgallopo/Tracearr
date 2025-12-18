@@ -276,7 +276,7 @@ function ResourceChart({
         </CardHeader>
         <CardContent>
           <div
-            className="flex items-center justify-center rounded-lg border border-dashed text-muted-foreground text-sm"
+            className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed text-sm"
             style={{ height: 180 }}
           >
             No data available
@@ -303,14 +303,14 @@ function ResourceChart({
           containerProps={{ style: { width: '100%', height: '100%' } }}
         />
         {/* Averages row */}
-        <div className="flex justify-end gap-4 text-xs text-muted-foreground mt-1 pr-2">
+        <div className="text-muted-foreground mt-1 flex justify-end gap-4 pr-2 text-xs">
           <span>
             <span style={{ color: COLORS.process }}>●</span> Avg:{' '}
-            <span className="font-medium text-foreground">{processAvg ?? '—'}%</span>
+            <span className="text-foreground font-medium">{processAvg ?? '—'}%</span>
           </span>
           <span>
             <span style={{ color: COLORS.system }}>●</span> Avg:{' '}
-            <span className="font-medium text-foreground">{hostAvg ?? '—'}%</span>
+            <span className="text-foreground font-medium">{hostAvg ?? '—'}%</span>
           </span>
         </div>
       </CardContent>

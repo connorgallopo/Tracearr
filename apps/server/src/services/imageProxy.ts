@@ -6,7 +6,15 @@
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, unlinkSync, readdirSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  statSync,
+  unlinkSync,
+  readdirSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { eq } from 'drizzle-orm';
@@ -148,7 +156,9 @@ async function cleanupCache(): Promise<void> {
 }
 
 // Run cleanup periodically (every hour)
-setInterval(() => { void cleanupCache(); }, TIME_MS.HOUR);
+setInterval(() => {
+  void cleanupCache();
+}, TIME_MS.HOUR);
 // Also run on startup
 void cleanupCache();
 

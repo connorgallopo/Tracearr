@@ -26,10 +26,7 @@ export default mergeConfig(
         provider: 'v8',
         reporter: ['text', 'json', 'json-summary'],
         reportsDirectory: './coverage/unit',
-        include: [
-          'src/utils/**/*.ts',
-          'src/services/mediaServer/**/*.ts',
-        ],
+        include: ['src/utils/**/*.ts', 'src/services/mediaServer/**/*.ts'],
         exclude: ['**/*.test.ts', '**/test/**'],
       },
     },

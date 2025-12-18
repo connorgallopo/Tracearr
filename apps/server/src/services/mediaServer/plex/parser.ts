@@ -104,7 +104,9 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
 
   // Get bitrate and resolution from Media array (first element)
   const bitrate = parseNumber(parseFirstArrayElement(item.Media, 'bitrate'));
-  const videoResolution = parseOptionalString(parseFirstArrayElement(item.Media, 'videoResolution'));
+  const videoResolution = parseOptionalString(
+    parseFirstArrayElement(item.Media, 'videoResolution')
+  );
   const videoHeight = parseOptionalNumber(parseFirstArrayElement(item.Media, 'height'));
 
   // Determine transcode status - check both video and audio decisions
@@ -296,9 +298,7 @@ export function parseWatchHistoryItem(item: Record<string, unknown>): MediaWatch
 export function parseWatchHistoryResponse(data: unknown): MediaWatchHistoryItem[] {
   const container = data as { MediaContainer?: { Metadata?: unknown[] } };
   const metadata = container?.MediaContainer?.Metadata;
-  return parseArray(metadata, (item) =>
-    parseWatchHistoryItem(item as Record<string, unknown>)
-  );
+  return parseArray(metadata, (item) => parseWatchHistoryItem(item as Record<string, unknown>));
 }
 
 // ============================================================================
@@ -371,9 +371,8 @@ export function parseServerResource(
   const httpsRequired = parseBoolean(resource.httpsRequired);
 
   // Parse all connections
-  const allConnections = parseArray(
-    resource.connections,
-    (conn) => parseServerConnection(conn as Record<string, unknown>)
+  const allConnections = parseArray(resource.connections, (conn) =>
+    parseServerConnection(conn as Record<string, unknown>)
   );
 
   // Filter connections based on what's actually usable

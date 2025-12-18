@@ -30,8 +30,16 @@ const updatePreferencesSchema = z.object({
   maxPerMinute: z.number().int().min(1).max(60).optional(),
   maxPerHour: z.number().int().min(1).max(1000).optional(),
   quietHoursEnabled: z.boolean().optional(),
-  quietHoursStart: z.string().regex(/^\d{2}:\d{2}$/).optional().nullable(),
-  quietHoursEnd: z.string().regex(/^\d{2}:\d{2}$/).optional().nullable(),
+  quietHoursStart: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional()
+    .nullable(),
+  quietHoursEnd: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional()
+    .nullable(),
   quietHoursTimezone: z.string().max(50).optional(),
   quietHoursOverrideCritical: z.boolean().optional(),
 });

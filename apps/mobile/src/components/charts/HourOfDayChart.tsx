@@ -119,9 +119,7 @@ export function HourOfDayChart({ data, height = 180 }: HourOfDayChartProps) {
               roundedCorners={{ topLeft: 2, topRight: 2 }}
               animate={{ type: 'timing', duration: 500 }}
             />
-            {isActive && (
-              <ToolTip x={state.x.position} y={state.y.count.position} />
-            )}
+            {isActive && <ToolTip x={state.x.position} y={state.y.count.position} />}
           </>
         )}
       </CartesianChart>

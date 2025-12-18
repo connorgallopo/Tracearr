@@ -274,7 +274,13 @@ describe('parseFilteredArray', () => {
   });
 
   it('should return empty array for non-array', () => {
-    expect(parseFilteredArray(null, () => true, (x) => x)).toEqual([]);
+    expect(
+      parseFilteredArray(
+        null,
+        () => true,
+        (x) => x
+      )
+    ).toEqual([]);
   });
 
   // Real Jellyfin pattern: filter sessions with NowPlayingItem
@@ -514,9 +520,7 @@ describe('parse convenience object', () => {
             positionTicks: parse.number(
               parse.nestedValue(rawSession, 'PlayState', 'PositionTicks')
             ),
-            isPaused: parse.boolean(
-              parse.nestedValue(rawSession, 'PlayState', 'IsPaused')
-            ),
+            isPaused: parse.boolean(parse.nestedValue(rawSession, 'PlayState', 'IsPaused')),
           }
         : undefined,
     };

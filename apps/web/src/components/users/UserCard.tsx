@@ -41,7 +41,7 @@ export function UserCard({
     <Link
       to={`/users/${userId}`}
       className={cn(
-        'group relative flex flex-col items-center rounded-xl border bg-card p-6 text-center transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10',
+        'group bg-card hover:border-primary/50 hover:shadow-primary/10 relative flex flex-col items-center rounded-xl border p-6 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-lg',
         'animate-fade-in-up',
         className
       )}
@@ -59,17 +59,17 @@ export function UserCard({
       />
 
       {/* Medal */}
-      <div className="relative z-10 absolute -top-3 text-3xl drop-shadow-md">{medal.emoji}</div>
+      <div className="absolute relative -top-3 z-10 text-3xl drop-shadow-md">{medal.emoji}</div>
 
       {/* Avatar */}
       <div
         className={cn(
-          'relative z-10 mt-4 overflow-hidden rounded-full bg-gradient-to-br shadow-lg ring-2 ring-background',
+          'ring-background relative z-10 mt-4 overflow-hidden rounded-full bg-gradient-to-br shadow-lg ring-2',
           medal.color,
           medal.size
         )}
       >
-        <div className="absolute inset-0.5 overflow-hidden rounded-full bg-card">
+        <div className="bg-card absolute inset-0.5 overflow-hidden rounded-full">
           {avatarUrl ? (
             <img
               src={avatarUrl}
@@ -78,21 +78,23 @@ export function UserCard({
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <User className="h-8 w-8 text-muted-foreground" />
+            <div className="bg-muted flex h-full w-full items-center justify-center">
+              <User className="text-muted-foreground h-8 w-8" />
             </div>
           )}
         </div>
       </div>
 
       {/* Name */}
-      <h3 className="relative z-10 mt-4 w-full px-2 text-center text-base font-semibold line-clamp-2 break-words">{displayName}</h3>
+      <h3 className="relative z-10 mt-4 line-clamp-2 w-full px-2 text-center text-base font-semibold break-words">
+        {displayName}
+      </h3>
 
       {/* Stats */}
       <div className="relative z-10 mt-2 flex items-center gap-4 text-sm">
         <div>
-          <span className="font-semibold text-primary">{playCount.toLocaleString()}</span>
-          <span className="ml-1 text-muted-foreground">plays</span>
+          <span className="text-primary font-semibold">{playCount.toLocaleString()}</span>
+          <span className="text-muted-foreground ml-1">plays</span>
         </div>
         <div className="text-muted-foreground">{watchTimeHours.toLocaleString()}h</div>
       </div>
@@ -111,7 +113,7 @@ export function UserCard({
 
       {/* Top Content */}
       {topContent && (
-        <p className="relative z-10 mt-2 w-full px-2 text-center text-xs text-muted-foreground truncate">
+        <p className="text-muted-foreground relative z-10 mt-2 w-full truncate px-2 text-center text-xs">
           Loves: <span className="font-medium">{topContent}</span>
         </p>
       )}

@@ -81,15 +81,12 @@ export function createMockSession(overrides: Partial<Session> = {}): Session {
 /**
  * Create a mock rule with type-specific default params
  */
-export function createMockRule<T extends RuleType>(
-  type: T,
-  overrides: Partial<Rule> = {}
-): Rule {
+export function createMockRule<T extends RuleType>(type: T, overrides: Partial<Rule> = {}): Rule {
   return {
     id: overrides.id ?? randomUUID(),
     name: overrides.name ?? `Test ${type.replace(/_/g, ' ')} Rule`,
     type,
-    params: overrides.params ?? JSON.parse(JSON.stringify(RULE_DEFAULTS[type])) as RuleParams,
+    params: overrides.params ?? (JSON.parse(JSON.stringify(RULE_DEFAULTS[type])) as RuleParams),
     serverUserId: overrides.serverUserId ?? null, // Global rule by default
     isActive: overrides.isActive ?? true,
     createdAt: overrides.createdAt ?? new Date(),
@@ -142,9 +139,7 @@ export function createMockServerUser(overrides: Partial<ServerUser> = {}): Serve
 /**
  * Create a mock violation
  */
-export function createMockViolation(
-  overrides: Partial<Violation> = {}
-): Violation {
+export function createMockViolation(overrides: Partial<Violation> = {}): Violation {
   return {
     id: overrides.id ?? randomUUID(),
     ruleId: overrides.ruleId ?? randomUUID(),
@@ -232,10 +227,22 @@ export function createGeoRestrictionParams(
  */
 export const TEST_LOCATIONS = {
   newYork: { lat: 40.7128, lon: -74.006, city: 'New York', region: 'New York', country: 'US' },
-  losAngeles: { lat: 34.0522, lon: -118.2437, city: 'Los Angeles', region: 'California', country: 'US' },
+  losAngeles: {
+    lat: 34.0522,
+    lon: -118.2437,
+    city: 'Los Angeles',
+    region: 'California',
+    country: 'US',
+  },
   london: { lat: 51.5074, lon: -0.1278, city: 'London', region: 'England', country: 'GB' },
   tokyo: { lat: 35.6762, lon: 139.6503, city: 'Tokyo', region: 'Tokyo', country: 'JP' },
-  sydney: { lat: -33.8688, lon: 151.2093, city: 'Sydney', region: 'New South Wales', country: 'AU' },
+  sydney: {
+    lat: -33.8688,
+    lon: 151.2093,
+    city: 'Sydney',
+    region: 'New South Wales',
+    country: 'AU',
+  },
   paris: { lat: 48.8566, lon: 2.3522, city: 'Paris', region: 'Île-de-France', country: 'FR' },
   berlin: { lat: 52.52, lon: 13.405, city: 'Berlin', region: 'Berlin', country: 'DE' },
   moscow: { lat: 55.7558, lon: 37.6173, city: 'Moscow', region: 'Moscow', country: 'RU' },
@@ -267,10 +274,7 @@ export function calculateDistanceKm(
 /**
  * Create a session that started N hours ago
  */
-export function createSessionHoursAgo(
-  hoursAgo: number,
-  overrides: Partial<Session> = {}
-): Session {
+export function createSessionHoursAgo(hoursAgo: number, overrides: Partial<Session> = {}): Session {
   const startedAt = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
   return createMockSession({ startedAt, ...overrides });
 }

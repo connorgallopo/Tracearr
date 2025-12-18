@@ -17,7 +17,14 @@ import { eq } from 'drizzle-orm';
 import type { Redis } from 'ioredis';
 import type { AuthUser } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
-import { users, servers, serverUsers, settings, mobileTokens, mobileSessions } from '../../src/db/schema.js';
+import {
+  users,
+  servers,
+  serverUsers,
+  settings,
+  mobileTokens,
+  mobileSessions,
+} from '../../src/db/schema.js';
 import { mobileRoutes } from '../../src/routes/mobile.js';
 
 // Constants (matching mobile.ts)
@@ -64,7 +71,7 @@ function createMockRedis() {
     ping: vi.fn(async () => 'PONG'),
     keys: vi.fn(async (pattern: string) => {
       const prefix = pattern.replace('*', '');
-      return Array.from(store.keys()).filter(k => k.startsWith(prefix));
+      return Array.from(store.keys()).filter((k) => k.startsWith(prefix));
     }),
     eval: vi.fn(async () => 1), // Default: first attempt (not rate limited)
     _store: store,

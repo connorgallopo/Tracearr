@@ -57,16 +57,27 @@ export const channelRoutingRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Get all routing configuration
-    const rows = await db.select().from(notificationChannelRouting).orderBy(notificationChannelRouting.eventType);
+    const rows = await db
+      .select()
+      .from(notificationChannelRouting)
+      .orderBy(notificationChannelRouting.eventType);
 
     // If no rows exist (shouldn't happen due to seed), create defaults
     if (rows.length === 0) {
       const defaultRouting = notificationEventTypeEnum.map((eventType) => ({
         eventType,
-        discordEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(eventType),
-        webhookEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(eventType),
-        pushEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(eventType),
-        webToastEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(eventType),
+        discordEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(
+          eventType
+        ),
+        webhookEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(
+          eventType
+        ),
+        pushEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(
+          eventType
+        ),
+        webToastEnabled: !['stream_started', 'stream_stopped', 'trust_score_changed'].includes(
+          eventType
+        ),
       }));
 
       const inserted = await db
@@ -174,10 +185,7 @@ export const channelRoutingRoutes: FastifyPluginAsync = async (app) => {
         return reply.internalServerError('Failed to update routing configuration');
       }
 
-      app.log.info(
-        { userId: authUser.userId, eventType },
-        'Notification channel routing updated'
-      );
+      app.log.info({ userId: authUser.userId, eventType }, 'Notification channel routing updated');
 
       return toApiResponse(row);
     }
@@ -215,7 +223,9 @@ export async function getChannelRouting(
   if (!routing) {
     // Return defaults if no routing exists
     // Most events default to enabled, except stream started/stopped
-    const isLowPriorityEvent = ['stream_started', 'stream_stopped', 'trust_score_changed'].includes(eventType);
+    const isLowPriorityEvent = ['stream_started', 'stream_stopped', 'trust_score_changed'].includes(
+      eventType
+    );
     return {
       discordEnabled: !isLowPriorityEvent,
       webhookEnabled: !isLowPriorityEvent,
@@ -230,7 +240,9 @@ export async function getChannelRouting(
 /**
  * Get all channel routing configuration (internal use for caching)
  */
-export async function getAllChannelRouting(): Promise<Map<NotificationEventType, ChannelRoutingConfig>> {
+export async function getAllChannelRouting(): Promise<
+  Map<NotificationEventType, ChannelRoutingConfig>
+> {
   const rows = await db
     .select({
       eventType: notificationChannelRouting.eventType,

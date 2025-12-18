@@ -17,7 +17,12 @@ interface ConcurrentChartProps {
   period?: 'day' | 'week' | 'month' | 'year' | 'all' | 'custom';
 }
 
-export function ConcurrentChart({ data, isLoading, height = 250, period = 'month' }: ConcurrentChartProps) {
+export function ConcurrentChart({
+  data,
+  isLoading,
+  height = 250,
+  period = 'month',
+}: ConcurrentChartProps) {
   const options = useMemo<Highcharts.Options>(() => {
     if (!data || data.length === 0) {
       return {};
@@ -61,10 +66,11 @@ export function ConcurrentChart({ data, isLoading, height = 250, period = 'month
         // Calculate appropriate number of labels based on period
         // Week: 7 labels (one per day), Month: ~10, Year: 12
         tickPositions: (() => {
-          const numLabels = period === 'week' || period === 'day' ? 7 : period === 'month' ? 10 : 12;
+          const numLabels =
+            period === 'week' || period === 'day' ? 7 : period === 'month' ? 10 : 12;
           const actualLabels = Math.min(numLabels, data.length);
           return Array.from({ length: actualLabels }, (_, i) =>
-            Math.floor(i * (data.length - 1) / (actualLabels - 1 || 1))
+            Math.floor((i * (data.length - 1)) / (actualLabels - 1 || 1))
           );
         })(),
         labels: {
@@ -74,9 +80,8 @@ export function ConcurrentChart({ data, isLoading, height = 250, period = 'month
           formatter: function () {
             // this.value could be index (number) or category string depending on Highcharts version
             const categories = this.axis.categories;
-            const categoryValue = typeof this.value === 'number'
-              ? categories[this.value]
-              : this.value;
+            const categoryValue =
+              typeof this.value === 'number' ? categories[this.value] : this.value;
             if (!categoryValue) return '';
             const date = new Date(categoryValue);
             if (isNaN(date.getTime())) return '';
@@ -145,9 +150,10 @@ export function ConcurrentChart({ data, isLoading, height = 250, period = 'month
           // With categories, this.x is the index. Use the category value from points[0].key
           const categoryValue = points[0]?.key as string | undefined;
           const date = categoryValue ? new Date(categoryValue) : null;
-          const dateStr = date && !isNaN(date.getTime())
-            ? `${date.toLocaleDateString()} ${date.getHours()}:00`
-            : 'Unknown';
+          const dateStr =
+            date && !isNaN(date.getTime())
+              ? `${date.toLocaleDateString()} ${date.getHours()}:00`
+              : 'Unknown';
           let html = `<b>${dateStr}</b>`;
 
           // Calculate total from stacked values
@@ -232,7 +238,7 @@ export function ConcurrentChart({ data, isLoading, height = 250, period = 'month
   if (!data || data.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed text-muted-foreground"
+        className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed"
         style={{ height }}
       >
         No concurrent stream data available

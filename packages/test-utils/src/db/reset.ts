@@ -48,9 +48,7 @@ const TABLES_TO_TRUNCATE = [
 export async function resetTestDb(): Promise<void> {
   try {
     // Use a single TRUNCATE command with CASCADE for efficiency
-    await executeRawSql(
-      `TRUNCATE TABLE ${TABLES_TO_TRUNCATE.join(', ')} RESTART IDENTITY CASCADE`
-    );
+    await executeRawSql(`TRUNCATE TABLE ${TABLES_TO_TRUNCATE.join(', ')} RESTART IDENTITY CASCADE`);
 
     // Reset settings to defaults (it's a single-row table)
     await executeRawSql(`
@@ -82,7 +80,5 @@ export async function teardownTestDb(): Promise<void> {
 export async function truncateTables(tables: string[]): Promise<void> {
   if (tables.length === 0) return;
 
-  await executeRawSql(
-    `TRUNCATE TABLE ${tables.join(', ')} RESTART IDENTITY CASCADE`
-  );
+  await executeRawSql(`TRUNCATE TABLE ${tables.join(', ')} RESTART IDENTITY CASCADE`);
 }

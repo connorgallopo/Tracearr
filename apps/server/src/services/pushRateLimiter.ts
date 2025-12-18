@@ -102,10 +102,7 @@ export class PushRateLimiter {
    * Uses a Lua script for atomic check-and-increment to prevent race conditions.
    * Returns the result including remaining limits and reset times.
    */
-  async checkAndRecord(
-    mobileSessionId: string,
-    prefs: RateLimitPrefs
-  ): Promise<RateLimitResult> {
+  async checkAndRecord(mobileSessionId: string, prefs: RateLimitPrefs): Promise<RateLimitResult> {
     const minuteKey = REDIS_KEYS.PUSH_RATE_MINUTE(mobileSessionId);
     const hourKey = REDIS_KEYS.PUSH_RATE_HOUR(mobileSessionId);
 

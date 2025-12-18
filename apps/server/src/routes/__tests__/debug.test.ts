@@ -238,10 +238,7 @@ describe('Debug Routes', () => {
       app = await buildTestApp(ownerUser);
 
       mockDbSelectCounts([0, 0, 0, 0, 0]);
-      mockDbExecute([
-        { rows: [{ size: '8 KB' }] },
-        { rows: [] },
-      ]);
+      mockDbExecute([{ rows: [{ size: '8 KB' }] }, { rows: [] }]);
 
       const response = await app.inject({
         method: 'GET',
@@ -267,10 +264,7 @@ describe('Debug Routes', () => {
         } as never;
       });
 
-      mockDbExecute([
-        { rows: [{ size: '8 KB' }] },
-        { rows: [] },
-      ]);
+      mockDbExecute([{ rows: [{ size: '8 KB' }] }, { rows: [] }]);
 
       const response = await app.inject({
         method: 'GET',
@@ -407,9 +401,7 @@ describe('Debug Routes', () => {
             ? { where: vi.fn().mockResolvedValue(undefined) }
             : {
                 where: vi.fn().mockReturnValue({
-                  returning: vi
-                    .fn()
-                    .mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]),
+                  returning: vi.fn().mockResolvedValue([{ id: 'user-1' }, { id: 'user-2' }]),
                 }),
               };
         deleteCallIndex++;
@@ -476,9 +468,7 @@ describe('Debug Routes', () => {
         } else {
           // rules - returns deleted items
           return {
-            returning: vi
-              .fn()
-              .mockResolvedValue([{ id: 'rule-1' }, { id: 'rule-2' }]),
+            returning: vi.fn().mockResolvedValue([{ id: 'rule-1' }, { id: 'rule-2' }]),
           } as never;
         }
       });
@@ -548,9 +538,7 @@ describe('Debug Routes', () => {
     it('handles aggregate refresh failure gracefully', async () => {
       app = await buildTestApp(ownerUser);
 
-      vi.mocked(db.execute).mockRejectedValue(
-        new Error('Aggregates not configured')
-      );
+      vi.mocked(db.execute).mockRejectedValue(new Error('Aggregates not configured'));
 
       const response = await app.inject({
         method: 'POST',

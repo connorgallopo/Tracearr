@@ -40,9 +40,7 @@ export function useAcknowledgeViolation() {
           if (!old) return old;
           return {
             ...old,
-            data: old.data.map((v) =>
-              v.id === id ? { ...v, acknowledgedAt: new Date() } : v
-            ),
+            data: old.data.map((v) => (v.id === id ? { ...v, acknowledgedAt: new Date() } : v)),
           };
         }
       );
@@ -56,12 +54,14 @@ export function useAcknowledgeViolation() {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error('Failed to Acknowledge', { description: (err).message });
+      toast.error('Failed to Acknowledge', { description: err.message });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['violations'] });
       void queryClient.invalidateQueries({ queryKey: ['stats', 'dashboard'] });
-      toast.success('Violation Acknowledged', { description: 'The violation has been marked as acknowledged.' });
+      toast.success('Violation Acknowledged', {
+        description: 'The violation has been marked as acknowledged.',
+      });
     },
   });
 }

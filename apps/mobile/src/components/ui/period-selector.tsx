@@ -30,9 +30,7 @@ export function PeriodSelector({ value, onChange }: PeriodSelectorProps) {
             onPress={() => onChange(period.value)}
             style={[styles.button, isSelected && styles.buttonSelected]}
           >
-            <Text
-              style={[styles.buttonText, isSelected && styles.buttonTextSelected]}
-            >
+            <Text style={[styles.buttonText, isSelected && styles.buttonTextSelected]}>
               {period.label}
             </Text>
           </Pressable>

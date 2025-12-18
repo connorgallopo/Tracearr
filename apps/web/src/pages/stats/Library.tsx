@@ -21,9 +21,7 @@ export function StatsLibrary() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Library</h1>
-          <p className="text-sm text-muted-foreground">
-            Top movies and shows on your server
-          </p>
+          <p className="text-muted-foreground text-sm">Top movies and shows on your server</p>
         </div>
         <TimeRangePicker value={timeRange} onChange={setTimeRange} />
       </div>
@@ -31,7 +29,7 @@ export function StatsLibrary() {
       {/* Top Movies Section */}
       <section>
         <div className="mb-4 flex items-center gap-2">
-          <Film className="h-5 w-5 text-primary" />
+          <Film className="text-primary h-5 w-5" />
           <h2 className="text-lg font-semibold">Top Movies</h2>
         </div>
 
@@ -50,8 +48,8 @@ export function StatsLibrary() {
             if (!topMovie) {
               return (
                 <div className="rounded-xl border border-dashed p-8 text-center">
-                  <Film className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                  <p className="mt-2 text-muted-foreground">No movie plays in this period</p>
+                  <Film className="text-muted-foreground/50 mx-auto h-12 w-12" />
+                  <p className="text-muted-foreground mt-2">No movie plays in this period</p>
                 </div>
               );
             }
@@ -96,7 +94,7 @@ export function StatsLibrary() {
       {/* Top Shows Section */}
       <section>
         <div className="mb-4 flex items-center gap-2">
-          <Tv className="h-5 w-5 text-primary" />
+          <Tv className="text-primary h-5 w-5" />
           <h2 className="text-lg font-semibold">Top TV Shows</h2>
         </div>
 
@@ -115,8 +113,8 @@ export function StatsLibrary() {
             if (!topShow) {
               return (
                 <div className="rounded-xl border border-dashed p-8 text-center">
-                  <Tv className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                  <p className="mt-2 text-muted-foreground">No TV show plays in this period</p>
+                  <Tv className="text-muted-foreground/50 mx-auto h-12 w-12" />
+                  <p className="text-muted-foreground mt-2">No TV show plays in this period</p>
                 </div>
               );
             }

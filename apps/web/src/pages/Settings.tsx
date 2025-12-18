@@ -54,7 +54,13 @@ import { toast } from 'sonner';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { NotificationRoutingMatrix } from '@/components/settings/NotificationRoutingMatrix';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
-import type { Server, Settings as SettingsType, TautulliImportProgress, MobileSession, MobileQRPayload } from '@tracearr/shared';
+import type {
+  Server,
+  Settings as SettingsType,
+  TautulliImportProgress,
+  MobileSession,
+  MobileQRPayload,
+} from '@tracearr/shared';
 import {
   useSettings,
   useUpdateSettings,
@@ -145,13 +151,10 @@ function GeneralSettings() {
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Label className="text-base">Unit System</Label>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Choose how distances and speeds are displayed
           </p>
-          <Select
-            value={settings?.unitSystem ?? 'metric'}
-            onValueChange={handleUnitSystemChange}
-          >
+          <Select value={settings?.unitSystem ?? 'metric'} onValueChange={handleUnitSystemChange}>
             <SelectTrigger className="w-48">
               <SelectValue />
             </SelectTrigger>
@@ -165,20 +168,17 @@ function GeneralSettings() {
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-base">Session Sync</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Enable session tracking for your media servers
             </p>
           </div>
-          <Switch
-            checked={settings?.pollerEnabled ?? true}
-            onCheckedChange={handleTogglePoller}
-          />
+          <Switch checked={settings?.pollerEnabled ?? true} onCheckedChange={handleTogglePoller} />
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-base">Sync Interval</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Polling frequency for Jellyfin/Emby (5-300 seconds)
             </p>
           </div>
@@ -189,19 +189,21 @@ function GeneralSettings() {
               max={300}
               className="w-20"
               defaultValue={intervalSeconds}
-              onBlur={(e) => { handleIntervalChange(parseInt(e.target.value, 10) || 15); }}
+              onBlur={(e) => {
+                handleIntervalChange(parseInt(e.target.value, 10) || 15);
+              }}
               disabled={!settings?.pollerEnabled}
             />
-            <span className="text-sm text-muted-foreground">sec</span>
+            <span className="text-muted-foreground text-sm">sec</span>
           </div>
         </div>
 
-        <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-muted/50 space-y-2 rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">
             <strong>Plex:</strong> Uses real-time updates via SSE. Polling is only used as a
             fallback if the connection fails.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             <strong>Jellyfin/Emby:</strong> Uses the sync interval above for session detection.
             Lower values provide faster updates but increase server load.
           </p>
@@ -226,7 +228,9 @@ function ServerSettings() {
   const [connectError, setConnectError] = useState<string | null>(null);
 
   // Plex server discovery state
-  const [plexDialogStep, setPlexDialogStep] = useState<'loading' | 'no-plex' | 'no-servers' | 'select'>('loading');
+  const [plexDialogStep, setPlexDialogStep] = useState<
+    'loading' | 'no-plex' | 'no-servers' | 'select'
+  >('loading');
   const [plexServers, setPlexServers] = useState<PlexDiscoveredServer[]>([]);
   const [connectingPlexServer, setConnectingPlexServer] = useState<string | null>(null);
 
@@ -248,12 +252,14 @@ function ServerSettings() {
   // Handle both array and wrapped response formats
   const servers = Array.isArray(serversData)
     ? serversData
-    : (serversData as unknown as { data?: Server[] })?.data ?? [];
+    : ((serversData as unknown as { data?: Server[] })?.data ?? []);
 
   const handleDelete = () => {
     if (deleteId) {
       deleteServer.mutate(deleteId, {
-        onSuccess: () => { setDeleteId(null); },
+        onSuccess: () => {
+          setDeleteId(null);
+        },
       });
     }
   };
@@ -303,7 +309,11 @@ function ServerSettings() {
   };
 
   // Handle Plex server selection from PlexServerSelector
-  const handlePlexServerSelect = async (serverUri: string, name: string, clientIdentifier: string) => {
+  const handlePlexServerSelect = async (
+    serverUri: string,
+    name: string,
+    clientIdentifier: string
+  ) => {
     setConnectingPlexServer(name);
     setConnectError(null);
 
@@ -340,7 +350,10 @@ function ServerSettings() {
     setConnectError(null);
 
     try {
-      const connectFn = serverType === 'jellyfin' ? api.auth.connectJellyfinWithApiKey : api.auth.connectEmbyWithApiKey;
+      const connectFn =
+        serverType === 'jellyfin'
+          ? api.auth.connectJellyfinWithApiKey
+          : api.auth.connectEmbyWithApiKey;
       const result = await connectFn({
         serverUrl,
         serverName,
@@ -397,7 +410,11 @@ function ServerSettings() {
               Manage your connected Plex, Jellyfin, and Emby servers
             </CardDescription>
           </div>
-          <Button onClick={() => { setShowAddDialog(true); }}>
+          <Button
+            onClick={() => {
+              setShowAddDialog(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Server
           </Button>
@@ -405,9 +422,9 @@ function ServerSettings() {
         <CardContent>
           {!servers || servers.length === 0 ? (
             <div className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
-              <ServerIcon className="h-8 w-8 text-muted-foreground" />
+              <ServerIcon className="text-muted-foreground h-8 w-8" />
               <p className="text-muted-foreground">No servers connected</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Click "Add Server" to connect a Jellyfin or Emby server
               </p>
             </div>
@@ -417,8 +434,12 @@ function ServerSettings() {
                 <ServerCard
                   key={server.id}
                   server={server}
-                  onSync={() => { handleSync(server.id); }}
-                  onDelete={() => { setDeleteId(server.id); }}
+                  onSync={() => {
+                    handleSync(server.id);
+                  }}
+                  onDelete={() => {
+                    setDeleteId(server.id);
+                  }}
                   isSyncing={syncServer.isPending}
                 />
               ))}
@@ -431,7 +452,9 @@ function ServerSettings() {
       <Dialog
         open={showAddDialog}
         onOpenChange={(open) => {
-          if (!open) { resetAddForm(); }
+          if (!open) {
+            resetAddForm();
+          }
           setShowAddDialog(open);
         }}
       >
@@ -465,9 +488,7 @@ function ServerSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {user?.role === 'owner' && (
-                    <SelectItem value="plex">Plex</SelectItem>
-                  )}
+                  {user?.role === 'owner' && <SelectItem value="plex">Plex</SelectItem>}
                   <SelectItem value="jellyfin">Jellyfin</SelectItem>
                   <SelectItem value="emby">Emby</SelectItem>
                 </SelectContent>
@@ -478,35 +499,33 @@ function ServerSettings() {
             {serverType === 'plex' ? (
               <>
                 {plexDialogStep === 'loading' && (
-                  <div className="flex flex-col items-center justify-center py-8 gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex flex-col items-center justify-center gap-3 py-8">
+                    <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+                    <p className="text-muted-foreground text-sm">
                       Discovering available Plex servers...
                     </p>
                   </div>
                 )}
 
                 {plexDialogStep === 'no-plex' && (
-                  <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
                     <AlertTriangle className="h-8 w-8 text-amber-500" />
                     <div>
                       <p className="font-medium">No Plex Account Linked</p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1 text-sm">
                         You need to have at least one Plex server connected to add more.
                       </p>
                     </div>
-                    {connectError && (
-                      <p className="text-sm text-destructive">{connectError}</p>
-                    )}
+                    {connectError && <p className="text-destructive text-sm">{connectError}</p>}
                   </div>
                 )}
 
                 {plexDialogStep === 'no-servers' && (
-                  <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                    <ServerIcon className="h-8 w-8 text-muted-foreground" />
+                  <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+                    <ServerIcon className="text-muted-foreground h-8 w-8" />
                     <div>
                       <p className="font-medium">All Servers Connected</p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-muted-foreground mt-1 text-sm">
                         All your owned Plex servers are already connected to Tracearr.
                       </p>
                     </div>
@@ -524,7 +543,7 @@ function ServerSettings() {
                 )}
 
                 {connectError && plexDialogStep === 'select' && (
-                  <div className="flex items-center gap-2 text-sm text-destructive">
+                  <div className="text-destructive flex items-center gap-2 text-sm">
                     <XCircle className="h-4 w-4" />
                     {connectError}
                   </div>
@@ -539,10 +558,13 @@ function ServerSettings() {
                     id="serverUrl"
                     placeholder="http://192.168.1.100:8096"
                     value={serverUrl}
-                    onChange={(e) => { setServerUrl(e.target.value); }}
+                    onChange={(e) => {
+                      setServerUrl(e.target.value);
+                    }}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    The URL where your {serverType === 'jellyfin' ? 'Jellyfin' : 'Emby'} server is accessible
+                  <p className="text-muted-foreground text-xs">
+                    The URL where your {serverType === 'jellyfin' ? 'Jellyfin' : 'Emby'} server is
+                    accessible
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -551,7 +573,9 @@ function ServerSettings() {
                     id="serverName"
                     placeholder="My Media Server"
                     value={serverName}
-                    onChange={(e) => { setServerName(e.target.value); }}
+                    onChange={(e) => {
+                      setServerName(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -561,16 +585,18 @@ function ServerSettings() {
                     type="password"
                     placeholder="Enter your API key"
                     value={apiKey}
-                    onChange={(e) => { setApiKey(e.target.value); }}
+                    onChange={(e) => {
+                      setApiKey(e.target.value);
+                    }}
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     {serverType === 'jellyfin'
                       ? 'Find this in Jellyfin Dashboard → API Keys'
                       : 'Find this in Emby Server → API Keys'}
                   </p>
                 </div>
                 {connectError && (
-                  <div className="flex items-center gap-2 text-sm text-destructive">
+                  <div className="text-destructive flex items-center gap-2 text-sm">
                     <XCircle className="h-4 w-4" />
                     {connectError}
                   </div>
@@ -580,7 +606,13 @@ function ServerSettings() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setShowAddDialog(false); resetAddForm(); }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAddDialog(false);
+                resetAddForm();
+              }}
+            >
               Cancel
             </Button>
             {serverType !== 'plex' && (
@@ -601,7 +633,9 @@ function ServerSettings() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onOpenChange={() => { setDeleteId(null); }}
+        onOpenChange={() => {
+          setDeleteId(null);
+        }}
         title="Remove Server"
         description="Are you sure you want to remove this server? All associated session data will be retained, but you won't be able to monitor new sessions from this server."
         confirmLabel="Remove"
@@ -626,14 +660,14 @@ function ServerCard({
   return (
     <div className="flex items-center justify-between rounded-lg border p-4">
       <div className="flex items-center gap-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+        <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
           <MediaServerIcon type={server.type} className="h-6 w-6" />
         </div>
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-semibold">{server.name}</h3>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <span>{server.url}</span>
             <a
               href={server.url}
@@ -644,23 +678,18 @@ function ServerCard({
               <ExternalLink className="h-3 w-3" />
             </a>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Added {format(new Date(server.createdAt), 'MMM d, yyyy')}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSync}
-          disabled={isSyncing}
-        >
+        <Button variant="ghost" size="sm" onClick={onSync} disabled={isSyncing}>
           <RefreshCw className={cn('mr-1 h-4 w-4', isSyncing && 'animate-spin')} />
           Sync
         </Button>
         <Button variant="ghost" size="sm" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 text-destructive" />
+          <Trash2 className="text-destructive h-4 w-4" />
         </Button>
       </div>
     </div>
@@ -688,7 +717,10 @@ function NotificationSettings() {
     }
   }, [settings, ntfyAuthToken]);
 
-  const handleUrlChange = (key: 'discordWebhookUrl' | 'customWebhookUrl' | 'ntfyTopic', value: string) => {
+  const handleUrlChange = (
+    key: 'discordWebhookUrl' | 'customWebhookUrl' | 'ntfyTopic',
+    value: string
+  ) => {
     updateSettings.mutate({ [key]: value || null });
   };
 
@@ -713,7 +745,9 @@ function NotificationSettings() {
     setTestingDiscord(true);
     try {
       await api.settings.testWebhook({ type: 'discord' });
-      toast.success('Test Sent', { description: 'Check your Discord channel for the test message.' });
+      toast.success('Test Sent', {
+        description: 'Check your Discord channel for the test message.',
+      });
     } catch (err) {
       toast.error('Test Failed', {
         description: err instanceof Error ? err.message : 'Failed to send test webhook',
@@ -733,7 +767,9 @@ function NotificationSettings() {
         // Pass auth token if user entered a new one (not empty and not the placeholder)
         ntfyAuthToken: ntfyAuthToken && ntfyAuthToken !== '********' ? ntfyAuthToken : undefined,
       });
-      toast.success('Test Sent', { description: 'Check your webhook endpoint for the test message.' });
+      toast.success('Test Sent', {
+        description: 'Check your webhook endpoint for the test message.',
+      });
     } catch (err) {
       toast.error('Test Failed', {
         description: err instanceof Error ? err.message : 'Failed to send test webhook',
@@ -769,9 +805,7 @@ function NotificationSettings() {
             <Bell className="h-5 w-5" />
             Notification Routing
           </CardTitle>
-          <CardDescription>
-            Configure which channels receive each notification type
-          </CardDescription>
+          <CardDescription>Configure which channels receive each notification type</CardDescription>
         </CardHeader>
         <CardContent>
           <NotificationRoutingMatrix
@@ -784,9 +818,7 @@ function NotificationSettings() {
       <Card>
         <CardHeader>
           <CardTitle>Webhook Configuration</CardTitle>
-          <CardDescription>
-            Configure webhook URLs for notifications
-          </CardDescription>
+          <CardDescription>Configure webhook URLs for notifications</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -796,21 +828,19 @@ function NotificationSettings() {
                 id="discordWebhook"
                 placeholder="https://discord.com/api/webhooks/..."
                 defaultValue={settings?.discordWebhookUrl ?? ''}
-                onBlur={(e) => { handleUrlChange('discordWebhookUrl', e.target.value); }}
+                onBlur={(e) => {
+                  handleUrlChange('discordWebhookUrl', e.target.value);
+                }}
               />
               <Button
                 variant="outline"
                 onClick={handleTestDiscord}
                 disabled={!settings?.discordWebhookUrl || testingDiscord}
               >
-                {testingDiscord ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Test'
-                )}
+                {testingDiscord ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Test'}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Paste your Discord webhook URL to receive notifications in a Discord channel
             </p>
           </div>
@@ -828,21 +858,19 @@ function NotificationSettings() {
                       : 'https://your-service.com/webhook'
                 }
                 defaultValue={settings?.customWebhookUrl ?? ''}
-                onBlur={(e) => { handleUrlChange('customWebhookUrl', e.target.value); }}
+                onBlur={(e) => {
+                  handleUrlChange('customWebhookUrl', e.target.value);
+                }}
               />
               <Button
                 variant="outline"
                 onClick={handleTestCustom}
                 disabled={!settings?.customWebhookUrl || testingCustom}
               >
-                {testingCustom ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Test'
-                )}
+                {testingCustom ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Test'}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {webhookFormat === 'ntfy'
                 ? 'Post to your ntfy server root URL (topic is specified separately below)'
                 : webhookFormat === 'apprise'
@@ -863,7 +891,7 @@ function NotificationSettings() {
                 <SelectItem value="apprise">Apprise</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Choose the payload format for your webhook endpoint
             </p>
           </div>
@@ -877,9 +905,11 @@ function NotificationSettings() {
                   placeholder="tracearr"
                   value={ntfyTopic}
                   onChange={(e) => setNtfyTopic(e.target.value)}
-                  onBlur={(e) => { handleUrlChange('ntfyTopic', e.target.value); }}
+                  onBlur={(e) => {
+                    handleUrlChange('ntfyTopic', e.target.value);
+                  }}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   The ntfy topic to publish notifications to
                 </p>
               </div>
@@ -905,7 +935,7 @@ function NotificationSettings() {
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Required for protected ntfy servers. Enter your access token (starts with tk_).
                 </p>
               </div>
@@ -933,7 +963,7 @@ function AccessSettings() {
   // Handle both array and wrapped response formats
   const servers = Array.isArray(serversData)
     ? serversData
-    : (serversData as unknown as { data?: Server[] })?.data ?? [];
+    : ((serversData as unknown as { data?: Server[] })?.data ?? []);
   const hasJellyfinServer = servers.some((s) => s.type === 'jellyfin');
   const showAuthMethodSelector = user?.hasPassword || hasJellyfinServer;
 
@@ -957,28 +987,28 @@ function AccessSettings() {
           <Shield className="h-5 w-5" />
           Access Control
         </CardTitle>
-        <CardDescription>
-          Configure who can access Tracearr
-        </CardDescription>
+        <CardDescription>Configure who can access Tracearr</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-base">Allow Guest Access</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               When disabled, only the server owner can log in to Tracearr
             </p>
           </div>
           <Switch
             checked={settings?.allowGuestAccess ?? false}
-            onCheckedChange={(checked) => { handleToggle('allowGuestAccess', checked); }}
+            onCheckedChange={(checked) => {
+              handleToggle('allowGuestAccess', checked);
+            }}
           />
         </div>
 
         {showAuthMethodSelector && (
           <div className="space-y-2">
             <Label className="text-base">Primary Authentication Method</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Choose which authentication method is shown by default on the login page
             </p>
             <Select
@@ -1008,8 +1038,8 @@ function AccessSettings() {
           </div>
         )}
 
-        <div className="rounded-lg bg-muted/50 p-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="bg-muted/50 rounded-lg p-4">
+          <p className="text-muted-foreground text-sm">
             <strong>Note:</strong> In v1, Tracearr only supports single-owner access. Even with
             guest access enabled, guests can only view their own sessions and violations.
           </p>
@@ -1097,25 +1127,27 @@ function NetworkSettings() {
                 Detect
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              The URL that external devices should use to reach this server. Used for QR codes and mobile app pairing.
+            <p className="text-muted-foreground text-xs">
+              The URL that external devices should use to reach this server. Used for QR codes and
+              mobile app pairing.
             </p>
             {isLocalhost && (
               <div className="flex items-start gap-2 rounded-lg bg-yellow-500/10 p-3 text-sm text-yellow-600">
-                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
-                  Localhost URLs only work when your phone is on the same machine.
-                  Use your local IP (e.g., http://192.168.1.x:3000) for LAN access,
-                  or set up a domain for remote access.
+                  Localhost URLs only work when your phone is on the same machine. Use your local IP
+                  (e.g., http://192.168.1.x:3000) for LAN access, or set up a domain for remote
+                  access.
                 </span>
               </div>
             )}
             {isHttp && (
               <div className="flex items-start gap-2 rounded-lg bg-yellow-500/10 p-3 text-sm text-yellow-600">
-                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
-                  iOS requires HTTPS for non-local connections. HTTP will work on local networks
-                  but may fail for Tailscale or remote access. Consider using HTTPS with a reverse proxy.
+                  iOS requires HTTPS for non-local connections. HTTP will work on local networks but
+                  may fail for Tailscale or remote access. Consider using HTTPS with a reverse
+                  proxy.
                 </span>
               </div>
             )}
@@ -1130,9 +1162,9 @@ function NetworkSettings() {
               onChange={(e) => setBasePath(e.target.value)}
               onBlur={handleSaveBasePath}
             />
-            <p className="text-xs text-muted-foreground">
-              Only needed if running behind a reverse proxy with a path prefix (e.g., example.com/tracearr).
-              Leave empty for root-level deployments.
+            <p className="text-muted-foreground text-xs">
+              Only needed if running behind a reverse proxy with a path prefix (e.g.,
+              example.com/tracearr). Leave empty for root-level deployments.
             </p>
           </div>
         </CardContent>
@@ -1149,7 +1181,7 @@ function NetworkSettings() {
           <div className="flex items-center justify-between">
             <div>
               <Label className="text-base">Trust Proxy Headers</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Trust X-Forwarded-For and X-Forwarded-Proto headers from your reverse proxy
               </p>
             </div>
@@ -1159,11 +1191,11 @@ function NetworkSettings() {
             />
           </div>
 
-          <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-muted/50 space-y-2 rounded-lg p-4">
+            <p className="text-muted-foreground text-sm">
               <strong>When to enable:</strong> If you're running Tracearr behind a reverse proxy
-              (nginx, Caddy, Traefik, Cloudflare Tunnel), enable this so the server knows the
-              real client IP and protocol.
+              (nginx, Caddy, Traefik, Cloudflare Tunnel), enable this so the server knows the real
+              client IP and protocol.
             </p>
             {settings?.trustProxy && (
               <p className="text-sm text-yellow-600">
@@ -1182,38 +1214,48 @@ function NetworkSettings() {
         <CardContent>
           <div className="space-y-3 text-sm">
             <div className="flex gap-3">
-              <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
               <div>
                 <strong>Local network (LAN)</strong>
-                <p className="text-muted-foreground">http://192.168.1.x:3000 - Works on iOS with local network permissions</p>
+                <p className="text-muted-foreground">
+                  http://192.168.1.x:3000 - Works on iOS with local network permissions
+                </p>
               </div>
             </div>
             <div className="flex gap-3">
-              <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
               <div>
                 <strong>Reverse proxy with HTTPS</strong>
-                <p className="text-muted-foreground">https://tracearr.example.com - Full support, recommended for remote access</p>
+                <p className="text-muted-foreground">
+                  https://tracearr.example.com - Full support, recommended for remote access
+                </p>
               </div>
             </div>
             <div className="flex gap-3">
-              <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
               <div>
                 <strong>Cloudflare Tunnel</strong>
-                <p className="text-muted-foreground">https://tracearr.example.com - Full support, no port forwarding needed</p>
+                <p className="text-muted-foreground">
+                  https://tracearr.example.com - Full support, no port forwarding needed
+                </p>
               </div>
             </div>
             <div className="flex gap-3">
-              <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600" />
               <div>
                 <strong>Tailscale (HTTP)</strong>
-                <p className="text-muted-foreground">http://device.tailnet.ts.net - May require HTTPS for iOS</p>
+                <p className="text-muted-foreground">
+                  http://device.tailnet.ts.net - May require HTTPS for iOS
+                </p>
               </div>
             </div>
             <div className="flex gap-3">
-              <XCircle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
               <div>
                 <strong>Self-signed certificates</strong>
-                <p className="text-muted-foreground">https://192.168.1.x - iOS rejects self-signed certs by default</p>
+                <p className="text-muted-foreground">
+                  https://192.168.1.x - iOS rejects self-signed certs by default
+                </p>
               </div>
             </div>
           </div>
@@ -1345,12 +1387,12 @@ function MobileSettings() {
         <CardContent className="space-y-6">
           {!config?.isEnabled ? (
             <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8">
-              <div className="rounded-full bg-muted p-4">
-                <Smartphone className="h-8 w-8 text-muted-foreground" />
+              <div className="bg-muted rounded-full p-4">
+                <Smartphone className="text-muted-foreground h-8 w-8" />
               </div>
               <div className="text-center">
                 <h3 className="font-semibold">Mobile Access Disabled</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm">
                   Enable mobile access to connect the Tracearr app to your server
                 </p>
               </div>
@@ -1369,7 +1411,7 @@ function MobileSettings() {
             <>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     {deviceCount} of {maxDevices} devices connected
                   </p>
                 </div>
@@ -1387,10 +1429,7 @@ function MobileSettings() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDisableConfirm(true)}
-                >
+                <Button variant="outline" onClick={() => setShowDisableConfirm(true)}>
                   Disable Mobile Access
                 </Button>
               </div>
@@ -1409,11 +1448,7 @@ function MobileSettings() {
                   {config.sessions.length} device{config.sessions.length !== 1 ? 's' : ''} connected
                 </CardDescription>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowRevokeConfirm(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowRevokeConfirm(true)}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Revoke All
               </Button>
@@ -1430,10 +1465,13 @@ function MobileSettings() {
       )}
 
       {/* QR Code Dialog */}
-      <Dialog open={showQRDialog} onOpenChange={(open) => {
-        setShowQRDialog(open);
-        if (!open) setPairToken(null);
-      }}>
+      <Dialog
+        open={showQRDialog}
+        onOpenChange={(open) => {
+          setShowQRDialog(open);
+          if (!open) setPairToken(null);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Pair New Device</DialogTitle>
@@ -1446,15 +1484,10 @@ function MobileSettings() {
               <>
                 <div className="flex flex-col items-center gap-4">
                   <div className="rounded-lg border bg-white p-4">
-                    <QRCodeSVG
-                      value={getQRData()}
-                      size={200}
-                      level="M"
-                      marginSize={0}
-                    />
+                    <QRCodeSVG value={getQRData()} size={200} level="M" marginSize={0} />
                   </div>
                   {timeLeft !== null && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
                       <Clock className="h-4 w-4" />
                       <span>Expires in {formatTimeLeft(timeLeft)}</span>
                     </div>
@@ -1464,11 +1497,7 @@ function MobileSettings() {
                 <div className="space-y-2">
                   <Label>One-Time Pair Token</Label>
                   <div className="flex gap-2">
-                    <Input
-                      readOnly
-                      value={pairToken.token}
-                      className="font-mono text-xs"
-                    />
+                    <Input readOnly value={pairToken.token} className="font-mono text-xs" />
                     <Button
                       variant="outline"
                       size="icon"
@@ -1482,7 +1511,7 @@ function MobileSettings() {
                       )}
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     This token expires in 5 minutes and can only be used once.
                   </p>
                 </div>
@@ -1490,10 +1519,12 @@ function MobileSettings() {
             )}
           </div>
           <DialogFooter>
-            <Button onClick={() => {
-              setShowQRDialog(false);
-              setPairToken(null);
-            }}>
+            <Button
+              onClick={() => {
+                setShowQRDialog(false);
+                setPairToken(null);
+              }}
+            >
               Done
             </Button>
           </DialogFooter>
@@ -1538,30 +1569,26 @@ function MobileSessionCard({ session }: { session: MobileSession }) {
     <>
       <div className="flex items-center justify-between rounded-lg border p-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+          <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
             <Smartphone className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold">{session.deviceName}</h3>
-              <span className="rounded bg-muted px-2 py-0.5 text-xs capitalize">
+              <span className="bg-muted rounded px-2 py-0.5 text-xs capitalize">
                 {session.platform}
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Last seen {formatDistanceToNow(new Date(session.lastSeenAt), { addSuffix: true })}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Connected {format(new Date(session.createdAt), 'MMM d, yyyy')}
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowDeleteConfirm(true)}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
+        <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(true)}>
+          <Trash2 className="text-destructive h-4 w-4" />
         </Button>
       </div>
 
@@ -1590,7 +1617,9 @@ function ImportSettings() {
   const [tautulliUrl, setTautulliUrl] = useState('');
   const [tautulliApiKey, setTautulliApiKey] = useState('');
   const [selectedServerId, setSelectedServerId] = useState<string>('');
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [connectionStatus, setConnectionStatus] = useState<
+    'idle' | 'testing' | 'success' | 'error'
+  >('idle');
   const [connectionMessage, setConnectionMessage] = useState('');
   const [importProgress, setImportProgress] = useState<TautulliImportProgress | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -1599,7 +1628,7 @@ function ImportSettings() {
   // Handle both array and wrapped response formats
   const servers = Array.isArray(serversData)
     ? serversData
-    : (serversData as unknown as { data?: Server[] })?.data ?? [];
+    : ((serversData as unknown as { data?: Server[] })?.data ?? []);
 
   // Only show Plex servers (Tautulli is Plex-only)
   const plexServers = servers.filter((s) => s.type === 'plex');
@@ -1646,9 +1675,10 @@ function ImportSettings() {
               errorRecords: 0,
               currentPage: 0,
               totalPages: 0,
-              message: progressPercent > 0
-                ? `Import in progress (${progressPercent}% complete)... Waiting for detailed progress.`
-                : 'Import in progress... Waiting for progress update.',
+              message:
+                progressPercent > 0
+                  ? `Import in progress (${progressPercent}% complete)... Waiting for detailed progress.`
+                  : 'Import in progress... Waiting for progress update.',
             });
             // Mark connection as success since we have an active import
             setConnectionStatus('success');
@@ -1804,9 +1834,11 @@ function ImportSettings() {
                 id="tautulliUrl"
                 placeholder="http://localhost:8181"
                 value={tautulliUrl}
-                onChange={(e) => { setTautulliUrl(e.target.value); }}
+                onChange={(e) => {
+                  setTautulliUrl(e.target.value);
+                }}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 The URL where Tautulli is accessible (include port if needed)
               </p>
             </div>
@@ -1818,9 +1850,11 @@ function ImportSettings() {
                 type="password"
                 placeholder="Your Tautulli API key"
                 value={tautulliApiKey}
-                onChange={(e) => { setTautulliApiKey(e.target.value); }}
+                onChange={(e) => {
+                  setTautulliApiKey(e.target.value);
+                }}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Find this in Tautulli Settings → Web Interface → API Key
               </p>
             </div>
@@ -1848,7 +1882,7 @@ function ImportSettings() {
               )}
 
               {connectionStatus === 'error' && (
-                <div className="flex items-center gap-2 text-sm text-destructive">
+                <div className="text-destructive flex items-center gap-2 text-sm">
                   <XCircle className="h-4 w-4" />
                   {connectionMessage}
                 </div>
@@ -1862,14 +1896,12 @@ function ImportSettings() {
         <Card>
           <CardHeader>
             <CardTitle>Import History</CardTitle>
-            <CardDescription>
-              Select a Plex server to import Tautulli history into
-            </CardDescription>
+            <CardDescription>Select a Plex server to import Tautulli history into</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {plexServers.length === 0 ? (
-              <div className="rounded-lg bg-muted/50 p-4">
-                <p className="text-sm text-muted-foreground">
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-muted-foreground text-sm">
                   No Plex servers connected. Add a Plex server first to import Tautulli data.
                 </p>
               </div>
@@ -1889,16 +1921,13 @@ function ImportSettings() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Sessions will be imported and matched to users from this server
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  <Button
-                    onClick={handleStartImport}
-                    disabled={!selectedServerId || isImporting}
-                  >
+                  <Button onClick={handleStartImport} disabled={!selectedServerId || isImporting}>
                     {isImporting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1916,32 +1945,36 @@ function ImportSettings() {
                     <div className="space-y-3 rounded-lg border p-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">
-                          {importProgress.status === 'complete' ? 'Import Complete' :
-                           importProgress.status === 'error' ? 'Import Failed' :
-                           'Importing...'}
+                          {importProgress.status === 'complete'
+                            ? 'Import Complete'
+                            : importProgress.status === 'error'
+                              ? 'Import Failed'
+                              : 'Importing...'}
                         </span>
                         {importProgress.status === 'complete' && (
                           <CheckCircle2 className="h-5 w-5 text-green-600" />
                         )}
                         {importProgress.status === 'error' && (
-                          <XCircle className="h-5 w-5 text-destructive" />
+                          <XCircle className="text-destructive h-5 w-5" />
                         )}
-                        {(importProgress.status === 'fetching' || importProgress.status === 'processing') && (
-                          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                        {(importProgress.status === 'fetching' ||
+                          importProgress.status === 'processing') && (
+                          <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
                         )}
                       </div>
 
-                      <p className="text-sm text-muted-foreground">{importProgress.message}</p>
+                      <p className="text-muted-foreground text-sm">{importProgress.message}</p>
 
                       {importProgress.totalRecords > 0 && (
                         <>
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                          <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
                             <div
-                              className="h-full bg-primary transition-all"
+                              className="bg-primary h-full transition-all"
                               style={{
-                                width: importProgress.status === 'complete'
-                                  ? '100%'
-                                  : `${Math.min(100, Math.round((importProgress.processedRecords / importProgress.totalRecords) * 100))}%`,
+                                width:
+                                  importProgress.status === 'complete'
+                                    ? '100%'
+                                    : `${Math.min(100, Math.round((importProgress.processedRecords / importProgress.totalRecords) * 100))}%`,
                               }}
                             />
                           </div>
@@ -1974,7 +2007,7 @@ function ImportSettings() {
                             {importProgress.errorRecords > 0 && (
                               <div>
                                 <span className="text-muted-foreground">Errors:</span>{' '}
-                                <span className="font-medium text-destructive">
+                                <span className="text-destructive font-medium">
                                   {importProgress.errorRecords}
                                 </span>
                               </div>
@@ -1986,11 +2019,11 @@ function ImportSettings() {
                   )}
                 </div>
 
-                <div className="rounded-lg bg-muted/50 p-4">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Note:</strong> The import will match Tautulli users to existing Tracearr users
-                    by their Plex user ID. Duplicate sessions are automatically detected and skipped.
-                    This process may take several minutes depending on your history size.
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <p className="text-muted-foreground text-sm">
+                    <strong>Note:</strong> The import will match Tautulli users to existing Tracearr
+                    users by their Plex user ID. Duplicate sessions are automatically detected and
+                    skipped. This process may take several minutes depending on your history size.
                   </p>
                 </div>
               </>

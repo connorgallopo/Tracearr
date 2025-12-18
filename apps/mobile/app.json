@@ -17,10 +17,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.tracearr.app",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification",
-          "fetch"
-        ],
+        "UIBackgroundModes": ["remote-notification", "fetch"],
         "NSCameraUsageDescription": "Tracearr needs camera access to scan QR codes for server pairing.",
         "NSLocationWhenInUseUsageDescription": "Location permission is not required for this app.",
         "ITSAppUsesNonExemptEncryption": false,

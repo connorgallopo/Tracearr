@@ -174,7 +174,7 @@ export function checkWatchCompletion(
   threshold: number = SESSION_LIMITS.WATCH_COMPLETION_THRESHOLD
 ): boolean {
   if (!progressMs || !totalDurationMs) return false;
-  return (progressMs / totalDurationMs) >= threshold;
+  return progressMs / totalDurationMs >= threshold;
 }
 
 // ============================================================================
@@ -207,11 +207,14 @@ export function checkWatchCompletion(
  * // Returns: null
  */
 export function isQualityChangeScenario(
-  existingActiveSession: {
-    id: string;
-    referenceId: string | null;
-    stoppedAt: Date | null;
-  } | null | undefined
+  existingActiveSession:
+    | {
+        id: string;
+        referenceId: string | null;
+        stoppedAt: Date | null;
+      }
+    | null
+    | undefined
 ): string | null {
   // No existing session = not a quality change
   if (!existingActiveSession) return null;

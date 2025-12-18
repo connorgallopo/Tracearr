@@ -89,10 +89,7 @@ export class SSEManager extends EventEmitter {
     }
 
     // Get all Plex servers
-    const allServers = await db
-      .select()
-      .from(servers)
-      .where(eq(servers.type, 'plex'));
+    const allServers = await db.select().from(servers).where(eq(servers.type, 'plex'));
 
     console.log(`[SSEManager] Starting SSE for ${allServers.length} Plex server(s)`);
 
@@ -305,7 +302,9 @@ export class SSEManager extends EventEmitter {
       return;
     }
 
-    console.log(`[SSEManager] Starting reconciliation (every ${POLLING_INTERVALS.SSE_RECONCILIATION / 1000}s)`);
+    console.log(
+      `[SSEManager] Starting reconciliation (every ${POLLING_INTERVALS.SSE_RECONCILIATION / 1000}s)`
+    );
 
     this.reconciliationTimer = setInterval(() => {
       this.emit('reconciliation:needed');
@@ -330,11 +329,9 @@ export class SSEManager extends EventEmitter {
    * Refresh server list (call when servers are added/removed)
    */
   async refresh(): Promise<void> {
-    const allServers = await db
-      .select()
-      .from(servers);
+    const allServers = await db.select().from(servers);
 
-    const currentServerIds = new Set(allServers.map(s => s.id));
+    const currentServerIds = new Set(allServers.map((s) => s.id));
     const connectedServerIds = new Set(this.connections.keys());
 
     // Remove servers that no longer exist

@@ -45,9 +45,8 @@ export function PlaysChart({ data, isLoading, height = 200, period = 'month' }: 
           formatter: function () {
             // this.value could be index (number) or category string depending on Highcharts version
             const categories = this.axis.categories;
-            const categoryValue = typeof this.value === 'number'
-              ? categories[this.value]
-              : this.value;
+            const categoryValue =
+              typeof this.value === 'number' ? categories[this.value] : this.value;
             if (!categoryValue) return '';
             const date = new Date(categoryValue);
             if (isNaN(date.getTime())) return '';
@@ -114,9 +113,14 @@ export function PlaysChart({ data, isLoading, height = 200, period = 'month' }: 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const categoryValue = (this as any).point?.category as string | undefined;
           const date = categoryValue ? new Date(categoryValue) : null;
-          const dateStr = date && !isNaN(date.getTime())
-            ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            : 'Unknown';
+          const dateStr =
+            date && !isNaN(date.getTime())
+              ? date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : 'Unknown';
           return `<b>${dateStr}</b><br/>Plays: ${this.y}`;
         },
       },
@@ -163,7 +167,7 @@ export function PlaysChart({ data, isLoading, height = 200, period = 'month' }: 
   if (!data || data.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed text-muted-foreground"
+        className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed"
         style={{ height }}
       >
         No play data available

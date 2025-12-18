@@ -59,12 +59,12 @@ export function useSyncServer() {
       if (data.librariesSynced > 0) parts.push(`${data.librariesSynced} libraries`);
       if (data.errors.length > 0) parts.push(`${data.errors.length} errors`);
 
-      const description = parts.length > 0
-        ? parts.join(', ')
-        : 'No changes detected';
+      const description = parts.length > 0 ? parts.join(', ') : 'No changes detected';
 
       if (data.errors.length > 0) {
-        toast.warning(data.success ? 'Sync Completed with Errors' : 'Sync Completed with Errors', { description });
+        toast.warning(data.success ? 'Sync Completed with Errors' : 'Sync Completed with Errors', {
+          description,
+        });
         // Log errors to console for debugging
         console.error('Sync errors:', data.errors);
       } else {
@@ -132,28 +132,29 @@ export function useServerStatistics(serverId: string | undefined, enabled: boole
     // Keep previous data while fetching new
     placeholderData: (prev) => prev,
     // Data is fresh until next poll
-    staleTime: (SERVER_STATS_CONFIG.POLL_INTERVAL_SECONDS * 1000) - 500,
+    staleTime: SERVER_STATS_CONFIG.POLL_INTERVAL_SECONDS * 1000 - 500,
   });
 
   // Calculate averages from windowed data
   const dataPoints = query.data?.data as ServerResourceDataPoint[] | undefined;
   const dataLength = dataPoints?.length ?? 0;
-  const averages = dataPoints && dataLength > 0
-    ? {
-        hostCpu: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.hostCpuUtilization, 0) / dataLength
-        ),
-        processCpu: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.processCpuUtilization, 0) / dataLength
-        ),
-        hostMemory: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.hostMemoryUtilization, 0) / dataLength
-        ),
-        processMemory: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.processMemoryUtilization, 0) / dataLength
-        ),
-      }
-    : null;
+  const averages =
+    dataPoints && dataLength > 0
+      ? {
+          hostCpu: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.hostCpuUtilization, 0) / dataLength
+          ),
+          processCpu: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.processCpuUtilization, 0) / dataLength
+          ),
+          hostMemory: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.hostMemoryUtilization, 0) / dataLength
+          ),
+          processMemory: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.processMemoryUtilization, 0) / dataLength
+          ),
+        }
+      : null;
 
   return {
     ...query,

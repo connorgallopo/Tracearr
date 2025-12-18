@@ -14,11 +14,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDecipheriv, pbkdf2Sync } from 'node:crypto';
 import type { EncryptedPushPayload } from '@tracearr/shared';
-import {
-  encryptPushPayload,
-  shouldEncryptPush,
-  pushEncryptionService,
-} from '../pushEncryption.js';
+import { encryptPushPayload, shouldEncryptPush, pushEncryptionService } from '../pushEncryption.js';
 
 // Constants matching the encryption service
 const ALGORITHM = 'aes-256-gcm';

@@ -19,7 +19,9 @@ export interface UserData {
   totalViolations?: number;
 }
 
-export interface CreatedUser extends Required<Omit<UserData, 'passwordHash' | 'plexAccountId' | 'thumbnail'>> {
+export interface CreatedUser extends Required<
+  Omit<UserData, 'passwordHash' | 'plexAccountId' | 'thumbnail'>
+> {
   id: string;
   createdAt: Date;
   updatedAt: Date;

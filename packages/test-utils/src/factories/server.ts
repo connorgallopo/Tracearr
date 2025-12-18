@@ -66,7 +66,9 @@ export async function createTestServer(overrides: ServerData = {}): Promise<Crea
 /**
  * Create a Plex server
  */
-export async function createTestPlexServer(overrides: Omit<ServerData, 'type'> = {}): Promise<CreatedServer> {
+export async function createTestPlexServer(
+  overrides: Omit<ServerData, 'type'> = {}
+): Promise<CreatedServer> {
   return createTestServer({
     type: 'plex',
     url: 'http://localhost:32400',
@@ -77,7 +79,9 @@ export async function createTestPlexServer(overrides: Omit<ServerData, 'type'> =
 /**
  * Create a Jellyfin server
  */
-export async function createTestJellyfinServer(overrides: Omit<ServerData, 'type'> = {}): Promise<CreatedServer> {
+export async function createTestJellyfinServer(
+  overrides: Omit<ServerData, 'type'> = {}
+): Promise<CreatedServer> {
   return createTestServer({
     type: 'jellyfin',
     url: 'http://localhost:8096',
@@ -88,7 +92,9 @@ export async function createTestJellyfinServer(overrides: Omit<ServerData, 'type
 /**
  * Create an Emby server
  */
-export async function createTestEmbyServer(overrides: Omit<ServerData, 'type'> = {}): Promise<CreatedServer> {
+export async function createTestEmbyServer(
+  overrides: Omit<ServerData, 'type'> = {}
+): Promise<CreatedServer> {
   return createTestServer({
     type: 'emby',
     url: 'http://localhost:8920',

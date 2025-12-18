@@ -355,10 +355,7 @@ describe('Integration: Complete Watch Session', () => {
 
     expect(session.pausedDurationMs).toBe(45 * 60 * 1000);
 
-    const result = calculateStopDuration(
-      { startedAt: times.start, ...session },
-      times.stop
-    );
+    const result = calculateStopDuration({ startedAt: times.start, ...session }, times.stop);
 
     // Wall clock: 2h 45m, Paused: 45m, Watch time: 2h
     expect(result.durationMs).toBe(120 * 60 * 1000);

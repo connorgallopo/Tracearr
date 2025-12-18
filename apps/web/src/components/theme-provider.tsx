@@ -12,7 +12,7 @@ export const ACCENT_PRESETS = [
   { name: 'Purple', hue: 270, hex: '#8B5CF6' },
   { name: 'Pink', hue: 330, hex: '#EC4899' },
   { name: 'Red', hue: 0, hex: '#EF4444' },
-  { name: 'Orange', hue: 24, hex: '#EA580C' },  // Matches shadcn orange theme
+  { name: 'Orange', hue: 24, hex: '#EA580C' }, // Matches shadcn orange theme
   { name: 'Green', hue: 150, hex: '#22C55E' },
   { name: 'Teal', hue: 175, hex: '#14B8A6' },
 ] as const;

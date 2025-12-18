@@ -8,11 +8,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
-import {
-  createMediaServerClient,
-  PlexClient,
-  type MediaUser,
-} from './mediaServer/index.js';
+import { createMediaServerClient, PlexClient, type MediaUser } from './mediaServer/index.js';
 import { syncUserFromMediaServer } from './userService.js';
 
 export interface SyncResult {

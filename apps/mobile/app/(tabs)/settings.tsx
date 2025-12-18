@@ -33,24 +33,22 @@ function SettingsRow({
   destructive?: boolean;
 }) {
   const content = (
-    <View className="flex-row justify-between items-center px-4 py-3 min-h-[48px]">
-      <View className="flex-row items-center flex-1">
+    <View className="min-h-[48px] flex-row items-center justify-between px-4 py-3">
+      <View className="flex-1 flex-row items-center">
         {leftIcon && <View className="mr-3">{leftIcon}</View>}
-        <Text className={cn('text-base flex-1', destructive && 'text-destructive')}>{label}</Text>
+        <Text className={cn('flex-1 text-base', destructive && 'text-destructive')}>{label}</Text>
       </View>
       <View className="flex-row items-center">
-        {value && <Text className="text-base text-muted-foreground text-right ml-4">{value}</Text>}
+        {value && <Text className="text-muted-foreground ml-4 text-right text-base">{value}</Text>}
         {rightIcon}
-        {showChevron && (
-          <ChevronRight size={20} color={colors.text.muted.dark} className="ml-2" />
-        )}
+        {showChevron && <ChevronRight size={20} color={colors.text.muted.dark} className="ml-2" />}
       </View>
     </View>
   );
 
   if (onPress) {
     return (
-      <Pressable onPress={onPress} className="active:opacity-70 active:bg-background">
+      <Pressable onPress={onPress} className="active:bg-background active:opacity-70">
         {content}
       </Pressable>
     );
@@ -75,11 +73,11 @@ function SettingsToggle({
   isLoading?: boolean;
 }) {
   return (
-    <View className="flex-row justify-between items-center px-4 py-3 min-h-[48px]">
-      <View className="flex-1 mr-4">
+    <View className="min-h-[48px] flex-row items-center justify-between px-4 py-3">
+      <View className="mr-4 flex-1">
         <Text className={cn('text-base', disabled && 'opacity-50')}>{label}</Text>
         {description && (
-          <Text className={cn('text-xs text-muted-foreground mt-0.5', disabled && 'opacity-50')}>
+          <Text className={cn('text-muted-foreground mt-0.5 text-xs', disabled && 'opacity-50')}>
             {description}
           </Text>
         )}
@@ -99,36 +97,25 @@ function SettingsToggle({
   );
 }
 
-function SettingsSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mb-6 px-4">
-      <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+      <Text className="text-muted-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
         {title}
       </Text>
-      <Card className="p-0 overflow-hidden">{children}</Card>
+      <Card className="overflow-hidden p-0">{children}</Card>
     </View>
   );
 }
 
 function Divider() {
-  return <View className="h-px bg-border ml-4" />;
+  return <View className="bg-border ml-4 h-px" />;
 }
 
 export default function SettingsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const {
-    activeServerId,
-    activeServer,
-    isLoading: isAuthLoading,
-    logout,
-  } = useAuthStore();
+  const { activeServerId, activeServer, isLoading: isAuthLoading, logout } = useAuthStore();
 
   const appVersion = Constants.expoConfig?.version || '1.0.0';
 
@@ -151,22 +138,15 @@ export default function SettingsScreen() {
       await queryClient.cancelQueries({
         queryKey: ['notifications', 'preferences'],
       });
-      const previousData = queryClient.getQueryData([
-        'notifications',
-        'preferences',
-      ]);
-      queryClient.setQueryData(
-        ['notifications', 'preferences'],
-        (old: typeof preferences) => (old ? { ...old, ...newData } : old)
+      const previousData = queryClient.getQueryData(['notifications', 'preferences']);
+      queryClient.setQueryData(['notifications', 'preferences'], (old: typeof preferences) =>
+        old ? { ...old, ...newData } : old
       );
       return { previousData };
     },
     onError: (_err, _newData, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(
-          ['notifications', 'preferences'],
-          context.previousData
-        );
+        queryClient.setQueryData(['notifications', 'preferences'], context.previousData);
       }
     },
     onSettled: () => {
@@ -269,7 +249,7 @@ export default function SettingsScreen() {
                   onPress={navigateToNotificationSettings}
                   showChevron
                 />
-                <Text className="text-xs text-muted-foreground px-4 py-2 leading-4">
+                <Text className="text-muted-foreground px-4 py-2 text-xs leading-4">
                   Configure which events trigger notifications, quiet hours, and filters.
                 </Text>
               </>
@@ -289,7 +269,7 @@ export default function SettingsScreen() {
 
         {/* Loading indicator */}
         {isAuthLoading && (
-          <View className="px-4 py-8 items-center">
+          <View className="items-center px-4 py-8">
             <ActivityIndicator color={colors.cyan.core} />
           </View>
         )}

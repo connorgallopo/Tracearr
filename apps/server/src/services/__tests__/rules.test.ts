@@ -124,11 +124,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -154,11 +150,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.violated).toBe(true);
@@ -194,11 +186,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -220,11 +208,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -249,11 +233,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -333,11 +313,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -362,11 +338,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.violated).toBe(true);
@@ -397,11 +369,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [pausedSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [pausedSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -425,11 +393,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [stoppedSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [stoppedSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -453,11 +417,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -481,11 +441,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [otherUserSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [otherUserSession]);
 
       expect(results).toHaveLength(0);
     });
@@ -514,11 +470,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       // Should not violate - same device can't be in two places
       expect(results).toHaveLength(0);
@@ -545,11 +497,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       // Should violate - different devices in distant locations
       expect(results).toHaveLength(1);
@@ -577,11 +525,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [activeSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [activeSession]);
 
       // Should violate - can't determine if same device when deviceId is null
       expect(results).toHaveLength(1);
@@ -621,11 +565,7 @@ describe('RuleEngine', () => {
         params: { minDistanceKm: 100 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.data.relatedSessionIds).toContain('session-la');
@@ -647,11 +587,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 5, windowHours: 24 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessions);
 
       expect(results).toHaveLength(0);
     });
@@ -667,11 +603,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 5, windowHours: 24 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessions);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.violated).toBe(true);
@@ -693,11 +625,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 5, windowHours: 24 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessions);
 
       expect(results).toHaveLength(0); // Exactly at limit, not over
     });
@@ -726,11 +654,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 2, windowHours: 24 }, // 24-hour window
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        oldSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], oldSessions);
 
       // Old sessions are outside window, only current session IP counts
       expect(results).toHaveLength(0);
@@ -761,11 +685,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 2, windowHours },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessionsInWindow
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessionsInWindow);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.data.uniqueIpCount).toBe(3);
@@ -788,11 +708,7 @@ describe('RuleEngine', () => {
         params: { maxIps: 2, windowHours: 24 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessions);
 
       // Only 2 unique IPs: 192.168.1.1 and 192.168.1.2
       expect(results).toHaveLength(0);
@@ -814,11 +730,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 3 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       // 2 existing + 1 current = 3 (at limit)
       expect(results).toHaveLength(0);
@@ -837,11 +749,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 3 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       // 3 existing + 1 current = 4 (exceeds limit of 3)
       expect(results).toHaveLength(1);
@@ -866,11 +774,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 1 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        sessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], sessions);
 
       // Only 1 playing + 1 current = 2, exceeds limit of 1
       expect(results).toHaveLength(1);
@@ -904,11 +808,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 1 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        otherUserSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], otherUserSessions);
 
       // Only current session counts for this user
       expect(results).toHaveLength(0);
@@ -933,11 +833,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 2 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       // Should only count 2 streams: current session + device-other-456
       // The device-shared-123 session should be excluded (same device as current)
@@ -960,11 +856,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 2 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       // Should count all 3 streams since we can't determine device identity
       expect(results).toHaveLength(1);
@@ -987,11 +879,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 2 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       // Should count all 3 streams since null deviceId can't be matched
       expect(results).toHaveLength(1);
@@ -1000,8 +888,18 @@ describe('RuleEngine', () => {
 
     it('should include relatedSessionIds in violation data', async () => {
       const activeSessions = [
-        createMockSession({ id: 'session-1', serverUserId, state: 'playing', deviceId: 'device-1' }),
-        createMockSession({ id: 'session-2', serverUserId, state: 'playing', deviceId: 'device-2' }),
+        createMockSession({
+          id: 'session-1',
+          serverUserId,
+          state: 'playing',
+          deviceId: 'device-1',
+        }),
+        createMockSession({
+          id: 'session-2',
+          serverUserId,
+          state: 'playing',
+          deviceId: 'device-2',
+        }),
       ];
 
       const currentSession = createMockSession({
@@ -1015,11 +913,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 2 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       expect(results).toHaveLength(1);
       expect(results[0]!.data.relatedSessionIds).toEqual(['session-1', 'session-2']);
@@ -1187,9 +1081,7 @@ describe('RuleEngine', () => {
       const serverUserId = 'user-123';
 
       // Exactly at the maxStreams limit
-      const activeSessions = [
-        createMockSession({ serverUserId, state: 'playing' }),
-      ];
+      const activeSessions = [createMockSession({ serverUserId, state: 'playing' })];
 
       const currentSession = createMockSession({ serverUserId, state: 'playing' });
 
@@ -1197,11 +1089,7 @@ describe('RuleEngine', () => {
         params: { maxStreams: 2 }, // 1 + 1 = 2, exactly at limit
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        activeSessions
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], activeSessions);
 
       expect(results).toHaveLength(0); // At limit, not over
     });
@@ -1227,11 +1115,7 @@ describe('RuleEngine', () => {
         params: { maxSpeedKmh: 500 },
       });
 
-      const results = await ruleEngine.evaluateSession(
-        currentSession,
-        [rule],
-        [previousSession]
-      );
+      const results = await ruleEngine.evaluateSession(currentSession, [rule], [previousSession]);
 
       expect(results).toHaveLength(1);
       // Earth's circumference at equator is ~40,075 km, half is ~20,000 km

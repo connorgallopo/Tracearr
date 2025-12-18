@@ -44,9 +44,10 @@ function formatMediaTitle(session: ActiveSession): { primary: string; secondary:
   const { mediaType, mediaTitle, grandparentTitle, seasonNumber, episodeNumber, year } = session;
 
   if (mediaType === 'episode' && grandparentTitle) {
-    const seasonEp = seasonNumber && episodeNumber
-      ? `S${String(seasonNumber).padStart(2, '0')}E${String(episodeNumber).padStart(2, '0')}`
-      : null;
+    const seasonEp =
+      seasonNumber && episodeNumber
+        ? `S${String(seasonNumber).padStart(2, '0')}E${String(episodeNumber).padStart(2, '0')}`
+        : null;
     return {
       primary: grandparentTitle,
       secondary: seasonEp ? `${seasonEp} · ${mediaTitle}` : mediaTitle,
@@ -162,19 +163,16 @@ const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
 };
 
-export function StreamCard({
-  sessions,
-  locations,
-  className,
-  height = 300,
-}: StreamCardProps) {
+export function StreamCard({ sessions, locations, className, height = 300 }: StreamCardProps) {
   const hasData =
-    (sessions?.some((s) => s.geoLat && s.geoLon)) ||
-    (locations?.some((l) => l.lat && l.lon));
+    sessions?.some((s) => s.geoLat && s.geoLon) || locations?.some((l) => l.lat && l.lon);
   const { theme } = useTheme();
-  const resolvedTheme = theme === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : theme;
+  const resolvedTheme =
+    theme === 'system'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : theme;
   const tileUrl = TILE_URLS[resolvedTheme];
 
   return (
@@ -209,28 +207,34 @@ export function StreamCard({
               icon={activeSessionIcon}
             >
               <Popup>
-                <div className="p-2.5 text-foreground min-w-[180px]">
+                <div className="text-foreground min-w-[180px] p-2.5">
                   {/* Media title */}
-                  <h4 className="font-semibold text-sm leading-snug">{mediaTitle}</h4>
+                  <h4 className="text-sm leading-snug font-semibold">{mediaTitle}</h4>
 
                   {/* Subtitle + status on same line */}
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="mt-0.5 flex items-center gap-2">
                     {mediaSubtitle && (
-                      <span className="text-xs text-muted-foreground truncate">{mediaSubtitle}</span>
+                      <span className="text-muted-foreground truncate text-xs">
+                        {mediaSubtitle}
+                      </span>
                     )}
-                    <ActiveSessionBadge state={session.state} className="text-[10px] px-1.5 py-0" />
+                    <ActiveSessionBadge state={session.state} className="px-1.5 py-0 text-[10px]" />
                   </div>
 
                   {/* User - clickable */}
                   <Link
                     to={`/users/${session.user.id}`}
-                    className="flex items-center gap-2 mt-2 py-1 transition-opacity hover:opacity-80"
+                    className="mt-2 flex items-center gap-2 py-1 transition-opacity hover:opacity-80"
                   >
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted overflow-hidden flex-shrink-0">
+                    <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
                       {avatarUrl ? (
-                        <img src={avatarUrl} alt={session.user.username} className="h-5 w-5 object-cover" />
+                        <img
+                          src={avatarUrl}
+                          alt={session.user.username}
+                          className="h-5 w-5 object-cover"
+                        />
                       ) : (
-                        <User className="h-3 w-3 text-muted-foreground" />
+                        <User className="text-muted-foreground h-3 w-3" />
                       )}
                     </div>
                     <span className="text-xs font-medium">
@@ -239,7 +243,7 @@ export function StreamCard({
                   </Link>
 
                   {/* Meta info */}
-                  <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+                  <div className="text-muted-foreground mt-1 flex items-center gap-2 text-[11px]">
                     {(session.geoCity || session.geoCountry) && (
                       <>
                         <MapPin className="h-3 w-3 flex-shrink-0" />
@@ -270,15 +274,15 @@ export function StreamCard({
               icon={locationIcon}
             >
               <Popup>
-                <div className="p-3 text-foreground">
+                <div className="text-foreground p-3">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-blue-500" />
                     <div>
                       <p className="font-semibold">{location.city || 'Unknown'}</p>
-                      <p className="text-xs text-muted-foreground">{location.country}</p>
+                      <p className="text-muted-foreground text-xs">{location.country}</p>
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center justify-between text-sm border-t border-border pt-2">
+                  <div className="border-border mt-2 flex items-center justify-between border-t pt-2 text-sm">
                     <span className="text-muted-foreground">Total streams</span>
                     <span className="font-medium">{location.count}</span>
                   </div>
@@ -290,8 +294,8 @@ export function StreamCard({
       </MapContainer>
 
       {!hasData && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-          <p className="text-sm text-muted-foreground">No location data available</p>
+        <div className="bg-background/50 absolute inset-0 flex items-center justify-center">
+          <p className="text-muted-foreground text-sm">No location data available</p>
         </div>
       )}
     </div>

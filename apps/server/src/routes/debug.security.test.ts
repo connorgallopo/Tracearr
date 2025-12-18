@@ -1,6 +1,6 @@
 /**
  * Debug Routes Security Tests
- * 
+ *
  * Ensures debug routes are properly protected and only accessible by owners.
  * These routes can cause significant data loss, so security is critical.
  */
@@ -153,7 +153,7 @@ describe('Debug Routes Security', () => {
       const payload = {
         ...createViewerPayload(),
         isOwner: true, // Extra claim that shouldn't work
-        admin: true,   // Another attempt
+        admin: true, // Another attempt
       };
       const token = generateTestToken(app, payload);
 
@@ -201,18 +201,15 @@ describe('Debug Routes Security', () => {
       '{"role":"owner"}',
     ];
 
-    it.each(invalidTokens)(
-      'should reject invalid token format: %s',
-      async (invalidToken) => {
-        const res = await app.inject({
-          method: 'GET',
-          url: '/api/v1/debug/stats',
-          headers: { Authorization: `Bearer ${invalidToken}` },
-        });
+    it.each(invalidTokens)('should reject invalid token format: %s', async (invalidToken) => {
+      const res = await app.inject({
+        method: 'GET',
+        url: '/api/v1/debug/stats',
+        headers: { Authorization: `Bearer ${invalidToken}` },
+      });
 
-        expect(res.statusCode).toBe(401);
-      }
-    );
+      expect(res.statusCode).toBe(401);
+    });
   });
 });
 
@@ -261,11 +258,11 @@ describe('Debug Routes - Destructive Operation Safeguards', () => {
     // Check structure is correct even with mocked data
     if (res.statusCode === 200) {
       const body = res.json();
-      
+
       // Should have expected structure
       expect(body).toHaveProperty('counts');
       expect(body).toHaveProperty('database');
-      
+
       // Should not leak internal paths
       const bodyString = JSON.stringify(body);
       expect(bodyString).not.toContain('/Users/');

@@ -28,9 +28,7 @@ function isEncrypted(data: unknown): data is EncryptedPushPayload {
 /**
  * Process notification payload (decrypt if needed)
  */
-async function processPayload(
-  data: Record<string, unknown>
-): Promise<DecryptedPayload | null> {
+async function processPayload(data: Record<string, unknown>): Promise<DecryptedPayload | null> {
   // Check if payload is encrypted
   if (isEncrypted(data)) {
     try {
@@ -55,16 +53,10 @@ async function handleNotificationType(payload: DecryptedPayload): Promise<void> 
   if (notificationType === 'violation_detected') {
     // Violation notifications are critical - ensure they're displayed
     console.log('[BackgroundTask] Processing violation notification');
-  } else if (
-    notificationType === 'stream_started' ||
-    notificationType === 'stream_stopped'
-  ) {
+  } else if (notificationType === 'stream_started' || notificationType === 'stream_stopped') {
     // Session notifications are informational
     console.log('[BackgroundTask] Processing session notification');
-  } else if (
-    notificationType === 'server_down' ||
-    notificationType === 'server_up'
-  ) {
+  } else if (notificationType === 'server_down' || notificationType === 'server_up') {
     // Server status notifications are important
     console.log('[BackgroundTask] Processing server status notification');
   } else if (notificationType === 'data_sync') {
@@ -122,9 +114,7 @@ TaskManager.defineTask(
       }
 
       // Process the payload (decrypt if encrypted)
-      const payload = await processPayload(
-        notificationData as Record<string, unknown>
-      );
+      const payload = await processPayload(notificationData as Record<string, unknown>);
       if (!payload) {
         console.error('[BackgroundTask] Failed to process payload');
         return;
@@ -144,9 +134,7 @@ TaskManager.defineTask(
  */
 export async function registerBackgroundNotificationTask(): Promise<void> {
   try {
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(
-      BACKGROUND_NOTIFICATION_TASK
-    );
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_NOTIFICATION_TASK);
 
     if (!isRegistered) {
       await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
@@ -165,9 +153,7 @@ export async function registerBackgroundNotificationTask(): Promise<void> {
  */
 export async function unregisterBackgroundNotificationTask(): Promise<void> {
   try {
-    const isRegistered = await TaskManager.isTaskRegisteredAsync(
-      BACKGROUND_NOTIFICATION_TASK
-    );
+    const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_NOTIFICATION_TASK);
 
     if (isRegistered) {
       await Notifications.unregisterTaskAsync(BACKGROUND_NOTIFICATION_TASK);

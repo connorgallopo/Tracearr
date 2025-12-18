@@ -134,9 +134,7 @@ export function MediaServerProvider({ children }: { children: ReactNode }) {
     [servers, selectedServer, selectedServerId, isLoading, selectServer, refetch]
   );
 
-  return (
-    <MediaServerContext.Provider value={value}>{children}</MediaServerContext.Provider>
-  );
+  return <MediaServerContext.Provider value={value}>{children}</MediaServerContext.Provider>;
 }
 
 export function useMediaServer(): MediaServerContextValue {

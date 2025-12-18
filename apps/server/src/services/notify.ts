@@ -2,7 +2,12 @@
  * Notification dispatch service
  */
 
-import type { ViolationWithDetails, ActiveSession, Settings, WebhookFormat } from '@tracearr/shared';
+import type {
+  ViolationWithDetails,
+  ActiveSession,
+  Settings,
+  WebhookFormat,
+} from '@tracearr/shared';
 import { NOTIFICATION_EVENTS, RULE_DISPLAY_NAMES, SEVERITY_LEVELS } from '@tracearr/shared';
 
 export interface NotificationPayload {
@@ -111,10 +116,7 @@ export class NotificationService {
   /**
    * Send violation notification
    */
-  async notifyViolation(
-    violation: ViolationWithDetails,
-    settings: Settings
-  ): Promise<void> {
+  async notifyViolation(violation: ViolationWithDetails, settings: Settings): Promise<void> {
     const promises: Promise<void>[] = [];
 
     if (settings.discordWebhookUrl) {
@@ -123,9 +125,7 @@ export class NotificationService {
 
     if (settings.customWebhookUrl) {
       const payload = this.buildViolationPayload(violation);
-      promises.push(
-        this.sendFormattedWebhook(settings, payload, { violation })
-      );
+      promises.push(this.sendFormattedWebhook(settings, payload, { violation }));
     }
 
     await Promise.allSettled(promises);
@@ -147,14 +147,28 @@ export class NotificationService {
           title: 'Stream Started',
           color: 0x3498db, // Blue
           fields: [
-            { name: 'User', value: session.user.identityName ?? session.user.username, inline: true },
+            {
+              name: 'User',
+              value: session.user.identityName ?? session.user.username,
+              inline: true,
+            },
             { name: 'Media', value: mediaTitle, inline: true },
             ...(subtitle ? [{ name: 'Episode', value: subtitle, inline: true }] : []),
             { name: 'Playback', value: playbackType, inline: true },
             ...(session.geoCity
-              ? [{ name: 'Location', value: `${session.geoCity}, ${session.geoCountry}`, inline: true }]
+              ? [
+                  {
+                    name: 'Location',
+                    value: `${session.geoCity}, ${session.geoCountry}`,
+                    inline: true,
+                  },
+                ]
               : []),
-            { name: 'Player', value: session.product || session.playerName || 'Unknown', inline: true },
+            {
+              name: 'Player',
+              value: session.product || session.playerName || 'Unknown',
+              inline: true,
+            },
           ],
         })
       );
@@ -208,7 +222,11 @@ export class NotificationService {
           title: 'Stream Stopped',
           color: 0x95a5a6, // Gray
           fields: [
-            { name: 'User', value: session.user.identityName ?? session.user.username, inline: true },
+            {
+              name: 'User',
+              value: session.user.identityName ?? session.user.username,
+              inline: true,
+            },
             { name: 'Media', value: mediaTitle, inline: true },
             ...(subtitle ? [{ name: 'Episode', value: subtitle, inline: true }] : []),
             { name: 'Duration', value: durationStr, inline: true },
@@ -540,7 +558,11 @@ export class NotificationService {
     };
   }
 
-  private async sendWebhook(webhookUrl: string, payload: unknown, authToken?: string | null): Promise<void> {
+  private async sendWebhook(
+    webhookUrl: string,
+    payload: unknown,
+    authToken?: string | null
+  ): Promise<void> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 
     // Add authorization header for ntfy servers with token auth

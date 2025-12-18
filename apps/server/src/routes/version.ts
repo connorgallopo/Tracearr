@@ -34,9 +34,7 @@ export const versionRoutes: FastifyPluginAsync = async (app) => {
     const latestData = await getCachedLatestVersion();
 
     // Determine if update is available
-    const updateAvailable = latestData
-      ? isNewerVersion(latestData.version, currentVersion)
-      : false;
+    const updateAvailable = latestData ? isNewerVersion(latestData.version, currentVersion) : false;
 
     return {
       current: {

@@ -46,10 +46,7 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
 
     try {
       // Get all configured Jellyfin servers
-      const jellyfinServers = await db
-        .select()
-        .from(servers)
-        .where(eq(servers.type, 'jellyfin'));
+      const jellyfinServers = await db.select().from(servers).where(eq(servers.type, 'jellyfin'));
 
       if (jellyfinServers.length === 0) {
         return reply.unauthorized('No Jellyfin servers configured. Please add a server first.');
@@ -62,7 +59,10 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
 
           if (authResult?.isAdmin) {
             // User is admin on this server - proceed with login
-            app.log.info({ username, serverId: server.id }, 'Jellyfin admin authentication successful');
+            app.log.info(
+              { username, serverId: server.id },
+              'Jellyfin admin authentication successful'
+            );
 
             // Check if user already exists
             let user = await getUserByUsername(username);
@@ -75,7 +75,10 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
                 email: undefined, // Jellyfin doesn't expose email in auth response
                 thumbnail: undefined, // Can be populated later via sync
               });
-              app.log.info({ userId: user.id, username }, 'Created new user from Jellyfin admin login');
+              app.log.info(
+                { userId: user.id, username },
+                'Created new user from Jellyfin admin login'
+              );
             } else {
               // Update existing user role to admin if not already
               if (user.role !== 'admin' && user.role !== 'owner') {
@@ -84,7 +87,10 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
                   .set({ role: 'admin', updatedAt: new Date() })
                   .where(eq(users.id, user.id));
                 user.role = 'admin';
-                app.log.info({ userId: user.id, username }, 'Updated user role to admin from Jellyfin login');
+                app.log.info(
+                  { userId: user.id, username },
+                  'Updated user role to admin from Jellyfin login'
+                );
               }
             }
 
@@ -93,14 +99,19 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
           }
         } catch (error) {
           // Authentication failed on this server, try next one
-          app.log.debug({ error, serverId: server.id, username }, 'Jellyfin authentication failed on server');
+          app.log.debug(
+            { error, serverId: server.id, username },
+            'Jellyfin authentication failed on server'
+          );
           continue;
         }
       }
 
       // Authentication failed on all servers or user is not admin
       app.log.warn({ username }, 'Jellyfin login failed: invalid credentials or not admin');
-      return reply.unauthorized('Invalid username or password, or user is not an administrator on any configured Jellyfin server');
+      return reply.unauthorized(
+        'Invalid username or password, or user is not an administrator on any configured Jellyfin server'
+      );
     } catch (error) {
       app.log.error({ error, username }, 'Jellyfin login error');
       return reply.internalServerError('Failed to authenticate with Jellyfin servers');
@@ -133,7 +144,9 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
         const isAdmin = await JellyfinClient.verifyServerAdmin(apiKey, serverUrl);
 
         if (!isAdmin) {
-          return reply.forbidden('API key does not have administrator access to this Jellyfin server');
+          return reply.forbidden(
+            'API key does not have administrator access to this Jellyfin server'
+          );
         }
 
         // Create or update server
@@ -168,12 +181,18 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
 
         const serverId = server[0]!.id;
 
-        app.log.info({ userId: authUser.userId, serverId }, 'Jellyfin server connected via API key');
+        app.log.info(
+          { userId: authUser.userId, serverId },
+          'Jellyfin server connected via API key'
+        );
 
         // Auto-sync server users and libraries in background
         syncServer(serverId, { syncUsers: true, syncLibraries: true })
           .then((result) => {
-            app.log.info({ serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced }, 'Auto-sync completed for Jellyfin server');
+            app.log.info(
+              { serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced },
+              'Auto-sync completed for Jellyfin server'
+            );
           })
           .catch((error) => {
             app.log.error({ error, serverId }, 'Auto-sync failed for Jellyfin server');

@@ -6,12 +6,7 @@
 import { Link } from 'react-router';
 import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -36,7 +31,13 @@ import {
 import { cn } from '@/lib/utils';
 import { getAvatarUrl } from '@/components/users/utils';
 import { useTheme } from '@/components/theme-provider';
-import type { SessionWithDetails, ActiveSession, SessionState, MediaType, ServerType } from '@tracearr/shared';
+import type {
+  SessionWithDetails,
+  ActiveSession,
+  SessionState,
+  MediaType,
+  ServerType,
+} from '@tracearr/shared';
 import { format, formatDistanceToNow } from 'date-fns';
 
 // Accept both SessionWithDetails (history) and ActiveSession (now playing)
@@ -104,9 +105,10 @@ function getProgress(session: SessionWithDetails): number {
 // Get media title formatted
 function getMediaTitle(session: SessionWithDetails): { primary: string; secondary?: string } {
   if (session.mediaType === 'episode' && session.grandparentTitle) {
-    const epNum = session.seasonNumber && session.episodeNumber
-      ? `S${session.seasonNumber.toString().padStart(2, '0')}E${session.episodeNumber.toString().padStart(2, '0')}`
-      : '';
+    const epNum =
+      session.seasonNumber && session.episodeNumber
+        ? `S${session.seasonNumber.toString().padStart(2, '0')}E${session.episodeNumber.toString().padStart(2, '0')}`
+        : '';
     return {
       primary: session.grandparentTitle,
       secondary: `${epNum}${epNum ? ' · ' : ''}${session.mediaTitle}`,
@@ -121,9 +123,12 @@ function getMediaTitle(session: SessionWithDetails): { primary: string; secondar
 // Mini map component for session location
 function MiniMap({ lat, lon }: { lat: number; lon: number }) {
   const { theme } = useTheme();
-  const resolvedTheme = theme === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : theme;
+  const resolvedTheme =
+    theme === 'system'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : theme;
   const tileUrl = TILE_URLS[resolvedTheme];
 
   return (
@@ -168,10 +173,10 @@ function Section({
 }) {
   return (
     <div className="rounded-lg border p-3">
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-            <Icon className="h-3.5 w-3.5 text-primary" />
+          <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
+            <Icon className="text-primary h-3.5 w-3.5" />
           </div>
           {title}
         </div>
@@ -206,11 +211,17 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center gap-2 text-base pr-8">
+          <SheetTitle className="flex items-center gap-2 pr-8 text-base">
             <stateConfig.icon className={cn('h-4 w-4', stateConfig.color)} />
             Session Details
             <Badge
-              variant={session.state === 'playing' ? 'success' : session.state === 'paused' ? 'warning' : 'secondary'}
+              variant={
+                session.state === 'playing'
+                  ? 'success'
+                  : session.state === 'paused'
+                    ? 'warning'
+                    : 'secondary'
+              }
               className="ml-auto"
             >
               {stateConfig.label}
@@ -225,31 +236,31 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
               <img
                 src={posterUrl}
                 alt={title.primary}
-                className="h-20 w-14 rounded object-cover flex-shrink-0"
+                className="h-20 w-14 flex-shrink-0 rounded object-cover"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
               />
             )}
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+              <div className="text-muted-foreground mb-1 flex items-center gap-1.5 text-xs">
                 <MediaIcon className="h-3 w-3" />
                 {mediaConfig.label}
                 {session.year && <span>· {session.year}</span>}
               </div>
-              <div className="font-medium leading-tight flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 leading-tight font-medium">
                 <span className="truncate">{title.primary}</span>
-                {session.watched && <Eye className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />}
+                {session.watched && <Eye className="h-3.5 w-3.5 flex-shrink-0 text-green-500" />}
               </div>
               {title.secondary && (
-                <div className="text-sm text-muted-foreground truncate mt-0.5">
+                <div className="text-muted-foreground mt-0.5 truncate text-sm">
                   {title.secondary}
                 </div>
               )}
               {/* Progress inline */}
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <Progress value={progress} className="h-1.5 flex-1" />
-                <span className="text-xs text-muted-foreground w-8">{progress}%</span>
+                <span className="text-muted-foreground w-8 text-xs">{progress}%</span>
               </div>
             </div>
           </div>
@@ -257,24 +268,28 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
           {/* User */}
           <Link
             to={`/users/${session.serverUserId}`}
-            className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+            className="hover:bg-muted/50 flex items-center gap-3 rounded-lg border p-3 transition-colors"
           >
             <Avatar className="h-9 w-9">
-              <AvatarImage src={getAvatarUrl(session.serverId, session.user.thumbUrl, 36) ?? undefined} />
+              <AvatarImage
+                src={getAvatarUrl(session.serverId, session.user.thumbUrl, 36) ?? undefined}
+              />
               <AvatarFallback>
                 {(session.user.identityName ?? session.user.username)?.[0]?.toUpperCase() ?? '?'}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{session.user.identityName ?? session.user.username}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">
+                {session.user.identityName ?? session.user.username}
+              </p>
               {session.user.identityName && session.user.identityName !== session.user.username && (
-                <p className="text-xs text-muted-foreground truncate">@{session.user.username}</p>
+                <p className="text-muted-foreground truncate text-xs">@{session.user.username}</p>
               )}
               {!session.user.identityName && (
-                <p className="text-xs text-muted-foreground">View profile</p>
+                <p className="text-muted-foreground text-xs">View profile</p>
               )}
             </div>
-            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+            <ExternalLink className="text-muted-foreground h-4 w-4" />
           </Link>
 
           {/* Server */}
@@ -306,7 +321,7 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
                 <span className="text-muted-foreground">Started</span>
                 <span>
                   {format(new Date(session.startedAt), 'MMM d, h:mm a')}
-                  <span className="text-xs text-muted-foreground ml-1.5">
+                  <span className="text-muted-foreground ml-1.5 text-xs">
                     ({formatDistanceToNow(new Date(session.startedAt), { addSuffix: true })})
                   </span>
                 </span>
@@ -347,14 +362,12 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Location</span>
                   <span className="flex items-center gap-1">
-                    <Globe className="h-3 w-3 text-muted-foreground" />
+                    <Globe className="text-muted-foreground h-3 w-3" />
                     {locationString}
                   </span>
                 </div>
               )}
-              {hasLocation && (
-                <MiniMap lat={session.geoLat!} lon={session.geoLon!} />
-              )}
+              {hasLocation && <MiniMap lat={session.geoLat!} lon={session.geoLon!} />}
             </div>
           </Section>
 
@@ -388,7 +401,9 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
               {session.deviceId && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Device ID</span>
-                  <span className="font-mono text-xs truncate max-w-[160px]">{session.deviceId}</span>
+                  <span className="max-w-[160px] truncate font-mono text-xs">
+                    {session.deviceId}
+                  </span>
                 </div>
               )}
             </div>
@@ -399,7 +414,10 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
             icon={Gauge}
             title="Quality"
             badge={
-              <Badge variant={session.isTranscode ? 'warning' : 'secondary'} className="gap-1 text-xs">
+              <Badge
+                variant={session.isTranscode ? 'warning' : 'secondary'}
+                className="gap-1 text-xs"
+              >
                 {session.isTranscode ? (
                   <>
                     <Repeat2 className="h-3 w-3" />
@@ -429,13 +447,25 @@ export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
               {session.videoDecision && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Video</span>
-                  <span className="capitalize">{session.videoDecision === 'directplay' ? 'Direct Play' : session.videoDecision === 'copy' ? 'Direct Stream' : 'Transcode'}</span>
+                  <span className="capitalize">
+                    {session.videoDecision === 'directplay'
+                      ? 'Direct Play'
+                      : session.videoDecision === 'copy'
+                        ? 'Direct Stream'
+                        : 'Transcode'}
+                  </span>
                 </div>
               )}
               {session.audioDecision && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Audio</span>
-                  <span className="capitalize">{session.audioDecision === 'directplay' ? 'Direct Play' : session.audioDecision === 'copy' ? 'Direct Stream' : 'Transcode'}</span>
+                  <span className="capitalize">
+                    {session.audioDecision === 'directplay'
+                      ? 'Direct Play'
+                      : session.audioDecision === 'copy'
+                        ? 'Direct Stream'
+                        : 'Transcode'}
+                  </span>
                 </div>
               )}
               {session.bitrate && (

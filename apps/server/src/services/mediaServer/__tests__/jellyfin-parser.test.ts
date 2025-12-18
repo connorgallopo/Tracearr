@@ -755,7 +755,7 @@ describe('Jellyfin Parser - Trailer and Preroll Filtering', () => {
 
     // Should only have movie and episode, trailer filtered out
     expect(parsed).toHaveLength(2);
-    expect(parsed.map(s => s.sessionKey)).toEqual(['1', '3']);
+    expect(parsed.map((s) => s.sessionKey)).toEqual(['1', '3']);
   });
 });
 

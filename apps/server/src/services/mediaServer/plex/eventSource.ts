@@ -91,12 +91,7 @@ export class PlexEventSource extends EventEmitter {
   private connectedAt: Date | null = null;
   private lastError: Error | null = null;
 
-  constructor(config: {
-    serverId: string;
-    serverName: string;
-    url: string;
-    token: string;
-  }) {
+  constructor(config: { serverId: string; serverName: string; url: string; token: string }) {
     super();
     this.serverId = config.serverId;
     this.serverName = config.serverName;
@@ -157,7 +152,9 @@ export class PlexEventSource extends EventEmitter {
       const url = `${this.baseUrl}/:/eventsource/notifications?X-Plex-Token=${encodeURIComponent(this.token)}`;
       const headers = plexHeaders(this.token);
 
-      console.log(`[SSE] Connecting to ${this.serverName} at ${this.baseUrl}/:/eventsource/notifications`);
+      console.log(
+        `[SSE] Connecting to ${this.serverName} at ${this.baseUrl}/:/eventsource/notifications`
+      );
 
       this.eventSource = new EventSourceClass(url, {
         headers,
@@ -328,7 +325,9 @@ export class PlexEventSource extends EventEmitter {
    */
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= SSE_CONFIG.MAX_RETRIES) {
-      console.error(`[SSE] Max retries (${SSE_CONFIG.MAX_RETRIES}) reached for ${this.serverName}, falling back to polling`);
+      console.error(
+        `[SSE] Max retries (${SSE_CONFIG.MAX_RETRIES}) reached for ${this.serverName}, falling back to polling`
+      );
       this.setState('fallback');
       return;
     }
@@ -338,13 +337,16 @@ export class PlexEventSource extends EventEmitter {
 
     // Exponential backoff with jitter
     const baseDelay = Math.min(
-      SSE_CONFIG.INITIAL_RETRY_DELAY_MS * Math.pow(SSE_CONFIG.RETRY_MULTIPLIER, this.reconnectAttempts - 1),
+      SSE_CONFIG.INITIAL_RETRY_DELAY_MS *
+        Math.pow(SSE_CONFIG.RETRY_MULTIPLIER, this.reconnectAttempts - 1),
       SSE_CONFIG.MAX_RETRY_DELAY_MS
     );
     const jitter = Math.random() * 1000; // Add up to 1s jitter
     const delay = baseDelay + jitter;
 
-    console.log(`[SSE] Reconnecting to ${this.serverName} in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${SSE_CONFIG.MAX_RETRIES})`);
+    console.log(
+      `[SSE] Reconnecting to ${this.serverName} in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${SSE_CONFIG.MAX_RETRIES})`
+    );
 
     this.reconnectTimer = setTimeout(() => {
       void this.connect();

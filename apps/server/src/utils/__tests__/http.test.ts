@@ -44,13 +44,7 @@ function createMockResponse(options: {
   body?: unknown;
   headers?: Record<string, string>;
 }): Response {
-  const {
-    ok = true,
-    status = 200,
-    statusText = 'OK',
-    body = {},
-    headers = {},
-  } = options;
+  const { ok = true, status = 200, statusText = 'OK', body = {}, headers = {} } = options;
 
   return {
     ok,
@@ -178,13 +172,13 @@ describe('fetchJson', () => {
     mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
 
     await fetchJson('https://api.example.com/data', {
-      headers: { 'Authorization': 'Bearer token' },
+      headers: { Authorization: 'Bearer token' },
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
       'https://api.example.com/data',
       expect.objectContaining({
-        headers: { 'Authorization': 'Bearer token' },
+        headers: { Authorization: 'Bearer token' },
       })
     );
   });
@@ -198,9 +192,9 @@ describe('fetchJson', () => {
       })
     );
 
-    await expect(
-      fetchJson('https://api.example.com/missing', { service: 'test' })
-    ).rejects.toThrow(HttpClientError);
+    await expect(fetchJson('https://api.example.com/missing', { service: 'test' })).rejects.toThrow(
+      HttpClientError
+    );
 
     try {
       await fetchJson('https://api.example.com/missing', { service: 'test' });
@@ -280,9 +274,7 @@ describe('fetchRaw', () => {
       })
     );
 
-    await expect(fetchRaw('https://api.example.com/missing')).rejects.toThrow(
-      HttpClientError
-    );
+    await expect(fetchRaw('https://api.example.com/missing')).rejects.toThrow(HttpClientError);
   });
 });
 

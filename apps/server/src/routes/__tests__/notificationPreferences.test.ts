@@ -177,11 +177,9 @@ describe('Notification Preferences Routes', () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [{ id: mockMobileSession.id }]
-              : [mockPrefsRow]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(selectCount === 1 ? [{ id: mockMobileSession.id }] : [mockPrefsRow]),
         };
         return chain as never;
       });
@@ -362,13 +360,15 @@ describe('Notification Preferences Routes', () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [{ id: mockMobileSession.id }]
-              : selectCount === 2
-                ? [mockPrefsRow]
-                : [updatedPrefs]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(
+              selectCount === 1
+                ? [{ id: mockMobileSession.id }]
+                : selectCount === 2
+                  ? [mockPrefsRow]
+                  : [updatedPrefs]
+            ),
         };
         return chain as never;
       });
@@ -406,13 +406,15 @@ describe('Notification Preferences Routes', () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [{ id: mockMobileSession.id }]
-              : selectCount === 2
-                ? [mockPrefsRow]
-                : [updatedPrefs]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(
+              selectCount === 1
+                ? [{ id: mockMobileSession.id }]
+                : selectCount === 2
+                  ? [mockPrefsRow]
+                  : [updatedPrefs]
+            ),
         };
         return chain as never;
       });
@@ -452,13 +454,15 @@ describe('Notification Preferences Routes', () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [{ id: mockMobileSession.id }]
-              : selectCount === 2
-                ? [mockPrefsRow]
-                : [updatedPrefs]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(
+              selectCount === 1
+                ? [{ id: mockMobileSession.id }]
+                : selectCount === 2
+                  ? [mockPrefsRow]
+                  : [updatedPrefs]
+            ),
         };
         return chain as never;
       });
@@ -499,13 +503,15 @@ describe('Notification Preferences Routes', () => {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
           orderBy: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [{ id: mockMobileSession.id }]
-              : selectCount === 2
-                ? [mockPrefsRow]
-                : [updatedPrefs]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(
+              selectCount === 1
+                ? [{ id: mockMobileSession.id }]
+                : selectCount === 2
+                  ? [mockPrefsRow]
+                  : [updatedPrefs]
+            ),
         };
         return chain as never;
       });

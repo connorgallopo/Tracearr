@@ -24,23 +24,23 @@ export function isPrivateIP(ip: string): boolean {
 
   // IPv4 private ranges
   const privateIPv4 = [
-    /^10\./,                          // 10.0.0.0/8
-    /^172\.(1[6-9]|2\d|3[01])\./,     // 172.16.0.0/12
-    /^192\.168\./,                     // 192.168.0.0/16
-    /^127\./,                          // Loopback
-    /^169\.254\./,                     // Link-local
-    /^0\./,                            // Current network
+    /^10\./, // 10.0.0.0/8
+    /^172\.(1[6-9]|2\d|3[01])\./, // 172.16.0.0/12
+    /^192\.168\./, // 192.168.0.0/16
+    /^127\./, // Loopback
+    /^169\.254\./, // Link-local
+    /^0\./, // Current network
   ];
 
   // IPv6 private ranges
   const privateIPv6 = [
-    /^::1$/i,                          // Loopback
-    /^fe80:/i,                         // Link-local
-    /^fc/i,                            // Unique local
-    /^fd/i,                            // Unique local
+    /^::1$/i, // Loopback
+    /^fe80:/i, // Link-local
+    /^fc/i, // Unique local
+    /^fd/i, // Unique local
   ];
 
-  return privateIPv4.some(r => r.test(ip)) || privateIPv6.some(r => r.test(ip));
+  return privateIPv4.some((r) => r.test(ip)) || privateIPv6.some((r) => r.test(ip));
 }
 
 // ============================================================================
@@ -105,7 +105,11 @@ export function parseJellyfinClient(
   }
 
   // Apple TV
-  if (clientLower.includes('tvos') || clientLower.includes('apple tv') || clientLower.includes('swiftfin')) {
+  if (
+    clientLower.includes('tvos') ||
+    clientLower.includes('apple tv') ||
+    clientLower.includes('swiftfin')
+  ) {
     return { platform: 'tvOS', device: 'Apple TV' };
   }
 

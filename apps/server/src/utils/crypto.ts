@@ -15,7 +15,7 @@ const AUTH_TAG_LENGTH = 16; // 128 bits
 const KEY_LENGTH = 32; // 256 bits
 
 // Minimum length for an encrypted token: IV (16) + AuthTag (16) + at least 1 byte ciphertext, base64 encoded
-const MIN_ENCRYPTED_LENGTH = Math.ceil((IV_LENGTH + AUTH_TAG_LENGTH + 1) * 4 / 3);
+const MIN_ENCRYPTED_LENGTH = Math.ceil(((IV_LENGTH + AUTH_TAG_LENGTH + 1) * 4) / 3);
 
 let encryptionKey: Buffer | null = null;
 

@@ -16,9 +16,10 @@ export function StatsUsers() {
   const listUsers = users.slice(3);
 
   // Create a stable key for animations based on the time range
-  const rangeKey = timeRange.period === 'custom'
-    ? `custom-${timeRange.startDate?.toISOString()}-${timeRange.endDate?.toISOString()}`
-    : timeRange.period;
+  const rangeKey =
+    timeRange.period === 'custom'
+      ? `custom-${timeRange.startDate?.toISOString()}-${timeRange.endDate?.toISOString()}`
+      : timeRange.period;
 
   return (
     <div className="space-y-8">
@@ -56,18 +57,16 @@ export function StatsUsers() {
         </div>
       ) : users.length === 0 ? (
         <div className="rounded-xl border border-dashed p-12 text-center">
-          <UsersIcon className="mx-auto h-16 w-16 text-muted-foreground/50" />
+          <UsersIcon className="text-muted-foreground/50 mx-auto h-16 w-16" />
           <h3 className="mt-4 text-lg font-semibold">No activity yet</h3>
-          <p className="mt-1 text-muted-foreground">
-            Start streaming to see your top users here
-          </p>
+          <p className="text-muted-foreground mt-1">Start streaming to see your top users here</p>
         </div>
       ) : (
         <>
           {/* Podium Section - Top 3 */}
           <section>
             <div className="mb-4 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
+              <Trophy className="text-primary h-5 w-5" />
               <h2 className="text-lg font-semibold">Top 3</h2>
             </div>
 
@@ -139,7 +138,7 @@ export function StatsUsers() {
           {listUsers.length > 0 && (
             <section>
               <div className="mb-4 flex items-center gap-2">
-                <UsersIcon className="h-5 w-5 text-primary" />
+                <UsersIcon className="text-primary h-5 w-5" />
                 <h2 className="text-lg font-semibold">Runners Up</h2>
               </div>
 

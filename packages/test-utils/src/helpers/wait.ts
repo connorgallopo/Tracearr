@@ -81,7 +81,11 @@ export async function waitForResult<T>(
   getValue: () => T | Promise<T>,
   options: WaitForOptions = {}
 ): Promise<NonNullable<T>> {
-  const { timeout = 5000, interval = 50, message = 'Did not get truthy result within timeout' } = options;
+  const {
+    timeout = 5000,
+    interval = 50,
+    message = 'Did not get truthy result within timeout',
+  } = options;
 
   const startTime = Date.now();
 
@@ -108,10 +112,13 @@ export async function waitForLength<T>(
   const { message = `Array did not reach length ${length} within timeout` } = options;
   let array: T[] = [];
 
-  await waitFor(async () => {
-    array = await getArray();
-    return array.length >= length;
-  }, { ...options, message });
+  await waitFor(
+    async () => {
+      array = await getArray();
+      return array.length >= length;
+    },
+    { ...options, message }
+  );
 
   return array;
 }
@@ -123,7 +130,11 @@ export async function waitForNoThrow(
   fn: () => void | Promise<void>,
   options: WaitForOptions = {}
 ): Promise<void> {
-  const { timeout = 5000, interval = 50, message = 'Function kept throwing within timeout' } = options;
+  const {
+    timeout = 5000,
+    interval = 50,
+    message = 'Function kept throwing within timeout',
+  } = options;
 
   const startTime = Date.now();
 
@@ -149,10 +160,7 @@ export interface RetryOptions {
 /**
  * Retry a function until it succeeds
  */
-export async function retry<T>(
-  fn: () => T | Promise<T>,
-  options: RetryOptions = {}
-): Promise<T> {
+export async function retry<T>(fn: () => T | Promise<T>, options: RetryOptions = {}): Promise<T> {
   const { maxAttempts = 3, delay = 100, backoff = 'none' } = options;
 
   let lastError: Error | undefined;
@@ -188,9 +196,7 @@ export async function withTimeout<T>(
 ): Promise<T> {
   return Promise.race([
     fn(),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(message)), timeout)
-    ),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(message)), timeout)),
   ]);
 }
 
@@ -230,7 +236,9 @@ export async function concurrent<T, R>(
 /**
  * Measure execution time of a function
  */
-export async function measureTime<T>(fn: () => T | Promise<T>): Promise<{ result: T; duration: number }> {
+export async function measureTime<T>(
+  fn: () => T | Promise<T>
+): Promise<{ result: T; duration: number }> {
   const start = performance.now();
   const result = await fn();
   const duration = performance.now() - start;

@@ -48,7 +48,10 @@ function safeFormatDate(date: Date | string | null | undefined, formatStr: strin
 }
 
 // Get state icon, color, and badge variant
-function getStateInfo(state: SessionState, watched?: boolean): {
+function getStateInfo(
+  state: SessionState,
+  watched?: boolean
+): {
   icon: typeof Play;
   color: string;
   label: string;
@@ -64,9 +67,19 @@ function getStateInfo(state: SessionState, watched?: boolean): {
     case 'paused':
       return { icon: Pause, color: colors.warning, label: 'Paused', variant: 'warning' };
     case 'stopped':
-      return { icon: Square, color: colors.text.secondary.dark, label: 'Stopped', variant: 'secondary' };
+      return {
+        icon: Square,
+        color: colors.text.secondary.dark,
+        label: 'Stopped',
+        variant: 'secondary',
+      };
     default:
-      return { icon: Square, color: colors.text.secondary.dark, label: 'Unknown', variant: 'secondary' };
+      return {
+        icon: Square,
+        color: colors.text.secondary.dark,
+        label: 'Unknown',
+        variant: 'secondary',
+      };
   }
 }
 
@@ -111,16 +124,10 @@ function formatBitrate(bitrate: number | null): string {
 }
 
 // Info card component
-function InfoCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View className="bg-card rounded-xl p-4 mb-4">
-      <Text className="text-muted-foreground text-sm font-medium mb-3">{title}</Text>
+    <View className="bg-card mb-4 rounded-xl p-4">
+      <Text className="text-muted-foreground mb-3 text-sm font-medium">{title}</Text>
       {children}
     </View>
   );
@@ -139,9 +146,9 @@ function InfoRow({
   valueColor?: string;
 }) {
   return (
-    <View className="flex-row items-center py-2 border-b border-border last:border-b-0">
+    <View className="border-border flex-row items-center border-b py-2 last:border-b-0">
       <Icon size={18} color={colors.text.secondary.dark} />
-      <Text className="text-muted-foreground text-sm ml-3 flex-1">{label}</Text>
+      <Text className="text-muted-foreground ml-3 flex-1 text-sm">{label}</Text>
       <Text
         className="text-sm font-medium"
         style={{ color: valueColor || colors.text.primary.dark }}
@@ -153,13 +160,7 @@ function InfoRow({
 }
 
 // Progress bar component
-function ProgressBar({
-  progress,
-  total,
-}: {
-  progress: number | null;
-  total: number | null;
-}) {
+function ProgressBar({ progress, total }: { progress: number | null; total: number | null }) {
   if (progress === null || total === null || total === 0) {
     return null;
   }
@@ -169,8 +170,12 @@ function ProgressBar({
   return (
     <View style={{ marginTop: 12 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-        <Text style={{ color: colors.text.secondary.dark, fontSize: 12 }}>{formatDuration(progress)}</Text>
-        <Text style={{ color: colors.text.secondary.dark, fontSize: 12 }}>{formatDuration(total)}</Text>
+        <Text style={{ color: colors.text.secondary.dark, fontSize: 12 }}>
+          {formatDuration(progress)}
+        </Text>
+        <Text style={{ color: colors.text.secondary.dark, fontSize: 12 }}>
+          {formatDuration(total)}
+        </Text>
       </View>
       <View style={{ backgroundColor: '#27272a', height: 8, borderRadius: 4, overflow: 'hidden' }}>
         <View
@@ -178,7 +183,7 @@ function ProgressBar({
             backgroundColor: colors.cyan.core,
             height: '100%',
             borderRadius: 4,
-            width: `${percentage}%`
+            width: `${percentage}%`,
           }}
         />
       </View>
@@ -258,7 +263,12 @@ export default function SessionDetailScreen() {
 
   // Debug logging
   useEffect(() => {
-    console.log('[SessionDetail] State:', { id, isLoading, hasError: !!error, hasSession: !!session });
+    console.log('[SessionDetail] State:', {
+      id,
+      isLoading,
+      hasError: !!error,
+      hasSession: !!session,
+    });
     if (error) {
       console.error('[SessionDetail] Query error:', error);
     }
@@ -275,7 +285,12 @@ export default function SessionDetailScreen() {
   if (isLoading) {
     return (
       <SafeAreaView
-        style={{ flex: 1, backgroundColor: colors.background.dark, justifyContent: 'center', alignItems: 'center' }}
+        style={{
+          flex: 1,
+          backgroundColor: colors.background.dark,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
         edges={['left', 'right', 'bottom']}
       >
         <ActivityIndicator size="large" color={colors.cyan.core} />
@@ -286,7 +301,13 @@ export default function SessionDetailScreen() {
   if (error || !session) {
     return (
       <SafeAreaView
-        style={{ flex: 1, backgroundColor: colors.background.dark, justifyContent: 'center', alignItems: 'center', padding: 16 }}
+        style={{
+          flex: 1,
+          backgroundColor: colors.background.dark,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 16,
+        }}
         edges={['left', 'right', 'bottom']}
       >
         <Text style={{ color: '#f87171', textAlign: 'center' }}>
@@ -302,9 +323,10 @@ export default function SessionDetailScreen() {
   // Format media title with episode info
   const getMediaTitle = (): string => {
     if (session.mediaType === 'episode' && session.grandparentTitle) {
-      const episodeInfo = session.seasonNumber && session.episodeNumber
-        ? `S${session.seasonNumber}E${session.episodeNumber}`
-        : '';
+      const episodeInfo =
+        session.seasonNumber && session.episodeNumber
+          ? `S${session.seasonNumber}E${session.episodeNumber}`
+          : '';
       return `${session.grandparentTitle}${episodeInfo ? ` • ${episodeInfo}` : ''}`;
     }
     return session.mediaTitle;
@@ -327,16 +349,19 @@ export default function SessionDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
         {/* Media Header */}
-        <View className="bg-card rounded-xl p-4 mb-4">
+        <View className="bg-card mb-4 rounded-xl p-4">
           {/* Terminate button - top right */}
           <View className="absolute top-2 right-2 z-10">
             <Pressable
               onPress={handleTerminate}
               disabled={terminateMutation.isPending}
-              className="w-8 h-8 rounded-full bg-destructive/10 items-center justify-center active:opacity-70"
+              className="bg-destructive/10 h-8 w-8 items-center justify-center rounded-full active:opacity-70"
               style={{ opacity: terminateMutation.isPending ? 0.5 : 1 }}
             >
               <X size={18} color="#ef4444" />
@@ -345,15 +370,17 @@ export default function SessionDetailScreen() {
 
           <View className="flex-row items-start">
             {/* Poster/Thumbnail */}
-            <View className="w-20 h-28 bg-surface rounded-lg mr-4 overflow-hidden">
+            <View className="bg-surface mr-4 h-28 w-20 overflow-hidden rounded-lg">
               {session.thumbPath && serverUrl ? (
                 <Image
-                  source={{ uri: `${serverUrl}/api/v1/images/proxy?server=${session.serverId}&url=${encodeURIComponent(session.thumbPath)}&width=160&height=224` }}
+                  source={{
+                    uri: `${serverUrl}/api/v1/images/proxy?server=${session.serverId}&url=${encodeURIComponent(session.thumbPath)}&width=160&height=224`,
+                  }}
                   style={{ width: '100%', height: '100%' }}
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-full h-full justify-center items-center">
+                <View className="h-full w-full items-center justify-center">
                   <MediaIcon size={32} color={colors.text.secondary.dark} />
                 </View>
               )}
@@ -361,25 +388,23 @@ export default function SessionDetailScreen() {
 
             {/* Media Info */}
             <View className="flex-1">
-              <View className="flex-row items-center mb-2">
-                <Badge variant={stateInfo.variant}>
-                  {stateInfo.label}
-                </Badge>
+              <View className="mb-2 flex-row items-center">
+                <Badge variant={stateInfo.variant}>{stateInfo.label}</Badge>
               </View>
 
-              <Text className="text-white text-lg font-semibold" numberOfLines={2}>
+              <Text className="text-lg font-semibold text-white" numberOfLines={2}>
                 {getMediaTitle()}
               </Text>
 
               {getSubtitle() ? (
-                <Text className="text-muted-foreground text-sm mt-1" numberOfLines={1}>
+                <Text className="text-muted-foreground mt-1 text-sm" numberOfLines={1}>
                   {getSubtitle()}
                 </Text>
               ) : null}
 
-              <View className="flex-row items-center mt-2">
+              <View className="mt-2 flex-row items-center">
                 <MediaIcon size={14} color={colors.text.secondary.dark} />
-                <Text className="text-muted-foreground text-xs ml-1 capitalize">
+                <Text className="text-muted-foreground ml-1 text-xs capitalize">
                   {session.mediaType}
                 </Text>
               </View>
@@ -393,24 +418,24 @@ export default function SessionDetailScreen() {
         {/* User Card - Tappable */}
         <Pressable
           onPress={() => router.push(`/user/${session.serverUserId}` as never)}
-          className="bg-card rounded-xl p-4 mb-4 active:opacity-70"
+          className="bg-card mb-4 rounded-xl p-4 active:opacity-70"
         >
-          <Text className="text-muted-foreground text-sm font-medium mb-3">User</Text>
+          <Text className="text-muted-foreground mb-3 text-sm font-medium">User</Text>
           <View className="flex-row items-center">
-            <View className="w-12 h-12 rounded-full bg-surface overflow-hidden">
+            <View className="bg-surface h-12 w-12 overflow-hidden rounded-full">
               {session.user.thumbUrl ? (
                 <Image
                   source={{ uri: session.user.thumbUrl }}
-                  className="w-full h-full"
+                  className="h-full w-full"
                   resizeMode="cover"
                 />
               ) : (
-                <View className="w-full h-full justify-center items-center">
+                <View className="h-full w-full items-center justify-center">
                   <User size={24} color={colors.text.secondary.dark} />
                 </View>
               )}
             </View>
-            <View className="flex-1 ml-3">
+            <View className="ml-3 flex-1">
               <Text className="text-foreground text-base font-semibold">
                 {session.user.identityName ?? session.user.username}
               </Text>
@@ -424,10 +449,8 @@ export default function SessionDetailScreen() {
         <InfoCard title="Server">
           <View className="flex-row items-center">
             <Server size={20} color={colors.text.secondary.dark} />
-            <View className="flex-1 ml-3">
-              <Text className="text-foreground text-base font-medium">
-                {session.server.name}
-              </Text>
+            <View className="ml-3 flex-1">
+              <Text className="text-foreground text-base font-medium">{session.server.name}</Text>
               <Text className="text-muted-foreground text-sm capitalize">
                 {session.server.type}
               </Text>
@@ -449,11 +472,7 @@ export default function SessionDetailScreen() {
               value={safeFormatDate(session.stoppedAt, 'MMM d, yyyy h:mm a')}
             />
           )}
-          <InfoRow
-            icon={Play}
-            label="Watch Time"
-            value={formatDuration(session.durationMs)}
-          />
+          <InfoRow icon={Play} label="Watch Time" value={formatDuration(session.durationMs)} />
           {(session.pausedDurationMs ?? 0) > 0 && (
             <InfoRow
               icon={Pause}
@@ -478,33 +497,15 @@ export default function SessionDetailScreen() {
 
         {/* Device Info */}
         <InfoCard title="Device">
-          <InfoRow
-            icon={Smartphone}
-            label="Player"
-            value={session.playerName || 'Unknown'}
-          />
-          <InfoRow
-            icon={Tv}
-            label="Device"
-            value={session.device || 'Unknown'}
-          />
-          <InfoRow
-            icon={Wifi}
-            label="Platform"
-            value={session.platform || 'Unknown'}
-          />
-          {session.product && (
-            <InfoRow icon={Smartphone} label="Product" value={session.product} />
-          )}
+          <InfoRow icon={Smartphone} label="Player" value={session.playerName || 'Unknown'} />
+          <InfoRow icon={Tv} label="Device" value={session.device || 'Unknown'} />
+          <InfoRow icon={Wifi} label="Platform" value={session.platform || 'Unknown'} />
+          {session.product && <InfoRow icon={Smartphone} label="Product" value={session.product} />}
         </InfoCard>
 
         {/* Quality Info */}
         <InfoCard title="Quality">
-          <InfoRow
-            icon={Gauge}
-            label="Quality"
-            value={session.quality || 'Unknown'}
-          />
+          <InfoRow icon={Gauge} label="Quality" value={session.quality || 'Unknown'} />
           <InfoRow
             icon={Zap}
             label="Stream"
@@ -521,14 +522,26 @@ export default function SessionDetailScreen() {
             <InfoRow
               icon={Film}
               label="Video"
-              value={session.videoDecision === 'directplay' ? 'Direct Play' : session.videoDecision === 'copy' ? 'Direct Stream' : 'Transcode'}
+              value={
+                session.videoDecision === 'directplay'
+                  ? 'Direct Play'
+                  : session.videoDecision === 'copy'
+                    ? 'Direct Stream'
+                    : 'Transcode'
+              }
             />
           )}
           {session.audioDecision && (
             <InfoRow
               icon={Music}
               label="Audio"
-              value={session.audioDecision === 'directplay' ? 'Direct Play' : session.audioDecision === 'copy' ? 'Direct Stream' : 'Transcode'}
+              value={
+                session.audioDecision === 'directplay'
+                  ? 'Direct Play'
+                  : session.audioDecision === 'copy'
+                    ? 'Direct Stream'
+                    : 'Transcode'
+              }
             />
           )}
           {session.bitrate && (

@@ -15,11 +15,11 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 20,                        // Maximum connections
-  idleTimeoutMillis: 20000,       // Close idle connections after 20s
+  max: 20, // Maximum connections
+  idleTimeoutMillis: 20000, // Close idle connections after 20s
   connectionTimeoutMillis: 10000, // Connection timeout (increased for complex queries)
-  maxUses: 7500,                  // Max queries per connection before refresh (prevents memory leaks)
-  allowExitOnIdle: false,         // Keep pool alive during idle periods
+  maxUses: 7500, // Max queries per connection before refresh (prevents memory leaks)
+  allowExitOnIdle: false, // Keep pool alive during idle periods
 });
 
 // Log pool errors for debugging

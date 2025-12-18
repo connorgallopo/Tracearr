@@ -238,11 +238,13 @@ describe('Settings Routes', () => {
         const chain = {
           from: vi.fn().mockReturnThis(),
           where: vi.fn().mockReturnThis(),
-          limit: vi.fn().mockResolvedValue(
-            selectCount === 1
-              ? [mockSettingsRow]
-              : [{ ...mockSettingsRow, allowGuestAccess: true }]
-          ),
+          limit: vi
+            .fn()
+            .mockResolvedValue(
+              selectCount === 1
+                ? [mockSettingsRow]
+                : [{ ...mockSettingsRow, allowGuestAccess: true }]
+            ),
         };
         return chain as never;
       });
@@ -272,11 +274,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  discordWebhookUrl: 'https://new-discord-webhook.com',
-                  customWebhookUrl: 'https://new-custom-webhook.com',
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    discordWebhookUrl: 'https://new-discord-webhook.com',
+                    customWebhookUrl: 'https://new-custom-webhook.com',
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -310,11 +314,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  pollerEnabled: false,
-                  pollerIntervalMs: 30000,
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    pollerEnabled: false,
+                    pollerIntervalMs: 30000,
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -348,11 +354,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  tautulliUrl: 'http://tautulli:8181',
-                  tautulliApiKey: 'new-api-key',
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    tautulliUrl: 'http://tautulli:8181',
+                    tautulliApiKey: 'new-api-key',
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -386,11 +394,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  externalUrl: 'https://new-url.com', // Should strip trailing slash
-                  trustProxy: false,
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    externalUrl: 'https://new-url.com', // Should strip trailing slash
+                    trustProxy: false,
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -424,10 +434,12 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  basePath: '/custom-path', // Should have leading slash
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    basePath: '/custom-path', // Should have leading slash
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -548,11 +560,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  discordWebhookUrl: null,
-                  customWebhookUrl: null,
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    discordWebhookUrl: null,
+                    customWebhookUrl: null,
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -586,11 +600,13 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  webhookFormat: 'ntfy',
-                  ntfyTopic: 'tracearr-alerts',
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    webhookFormat: 'ntfy',
+                    ntfyTopic: 'tracearr-alerts',
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -624,10 +640,12 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  webhookFormat: 'apprise',
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    webhookFormat: 'apprise',
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -673,10 +691,12 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [{ ...mockSettingsRow, ntfyTopic: 'old-topic' }]
-              : [{
-                  ...mockSettingsRow,
-                  ntfyTopic: null,
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    ntfyTopic: null,
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -708,12 +728,14 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [mockSettingsRow]
-              : [{
-                  ...mockSettingsRow,
-                  webhookFormat: 'ntfy',
-                  ntfyTopic: 'tracearr',
-                  ntfyAuthToken: 'tk_secret_token_123',
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    webhookFormat: 'ntfy',
+                    ntfyTopic: 'tracearr',
+                    ntfyAuthToken: 'tk_secret_token_123',
+                  },
+                ]
           ),
         };
         return chain as never;
@@ -741,12 +763,14 @@ describe('Settings Routes', () => {
     it('masks ntfy auth token in GET response', async () => {
       app = await buildTestApp(ownerUser);
 
-      mockDbSelectLimit([{
-        ...mockSettingsRow,
-        webhookFormat: 'ntfy',
-        ntfyTopic: 'my-topic',
-        ntfyAuthToken: 'tk_secret_token_456',
-      }]);
+      mockDbSelectLimit([
+        {
+          ...mockSettingsRow,
+          webhookFormat: 'ntfy',
+          ntfyTopic: 'my-topic',
+          ntfyAuthToken: 'tk_secret_token_456',
+        },
+      ]);
 
       const response = await app.inject({
         method: 'GET',
@@ -761,12 +785,14 @@ describe('Settings Routes', () => {
     it('returns null for ntfy auth token when not set', async () => {
       app = await buildTestApp(ownerUser);
 
-      mockDbSelectLimit([{
-        ...mockSettingsRow,
-        webhookFormat: 'ntfy',
-        ntfyTopic: 'my-topic',
-        ntfyAuthToken: null,
-      }]);
+      mockDbSelectLimit([
+        {
+          ...mockSettingsRow,
+          webhookFormat: 'ntfy',
+          ntfyTopic: 'my-topic',
+          ntfyAuthToken: null,
+        },
+      ]);
 
       const response = await app.inject({
         method: 'GET',
@@ -790,10 +816,12 @@ describe('Settings Routes', () => {
           limit: vi.fn().mockResolvedValue(
             selectCount === 1
               ? [{ ...mockSettingsRow, ntfyAuthToken: 'tk_old_token' }]
-              : [{
-                  ...mockSettingsRow,
-                  ntfyAuthToken: null,
-                }]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    ntfyAuthToken: null,
+                  },
+                ]
           ),
         };
         return chain as never;

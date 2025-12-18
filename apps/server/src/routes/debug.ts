@@ -36,13 +36,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
    * GET /debug/stats - Database statistics
    */
   app.get('/stats', async () => {
-    const [
-      sessionCount,
-      violationCount,
-      userCount,
-      serverCount,
-      ruleCount,
-    ] = await Promise.all([
+    const [sessionCount, violationCount, userCount, serverCount, ruleCount] = await Promise.all([
       db.select({ count: sql<number>`count(*)::int` }).from(sessions),
       db.select({ count: sql<number>`count(*)::int` }).from(violations),
       db.select({ count: sql<number>`count(*)::int` }).from(users),
@@ -125,7 +119,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Build explicit PostgreSQL array literal (Drizzle doesn't auto-convert JS arrays for ANY())
-    const userIdArray = sql.raw(`ARRAY[${userIds.map(id => `'${id}'::uuid`).join(',')}]`);
+    const userIdArray = sql.raw(`ARRAY[${userIds.map((id) => `'${id}'::uuid`).join(',')}]`);
 
     // Delete violations for these users
     await db.delete(violations).where(sql`user_id = ANY(${userIdArray})`);

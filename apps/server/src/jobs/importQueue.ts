@@ -193,7 +193,11 @@ async function processImportJob(job: Job<ImportJobData>): Promise<ImportJobResul
   };
 
   // Run the actual import with progress callback
-  const result = await TautulliService.importHistory(serverId, pubSubService ?? undefined, onProgress);
+  const result = await TautulliService.importHistory(
+    serverId,
+    pubSubService ?? undefined,
+    onProgress
+  );
 
   // Publish final result (note: TautulliService already publishes final progress,
   // but this is a fallback to ensure frontend receives completion notification)

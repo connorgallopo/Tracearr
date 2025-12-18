@@ -15,11 +15,7 @@ import {
 import { HistoryTable, type SortableColumn } from '@/components/history/HistoryTable';
 import { HistoryAggregates } from '@/components/history/HistoryAggregates';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
-import {
-  useHistorySessions,
-  useFilterOptions,
-  type HistoryFilters,
-} from '@/hooks/queries';
+import { useHistorySessions, useFilterOptions, type HistoryFilters } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
 import type { SessionWithDetails } from '@tracearr/shared';
 
@@ -150,13 +146,8 @@ export function History() {
   }, [searchParams, selectedServerId]);
 
   // Query hooks
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useHistorySessions(filters);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useHistorySessions(filters);
 
   const { data: filterOptions, isLoading: filterOptionsLoading } = useFilterOptions(
     filters.serverId
@@ -235,11 +226,7 @@ export function History() {
       </div>
 
       {/* Aggregates Summary */}
-      <HistoryAggregates
-        aggregates={aggregates}
-        total={total}
-        isLoading={isLoading}
-      />
+      <HistoryAggregates aggregates={aggregates} total={total} isLoading={isLoading} />
 
       {/* Filters */}
       <Card>
@@ -273,7 +260,7 @@ export function History() {
           {hasNextPage && (
             <div
               ref={loadMoreRef}
-              className="flex justify-center py-4 text-sm text-muted-foreground"
+              className="text-muted-foreground flex justify-center py-4 text-sm"
             >
               {isFetchingNextPage ? 'Loading more...' : 'Scroll for more'}
             </div>
@@ -281,7 +268,7 @@ export function History() {
 
           {/* End of results indicator */}
           {!hasNextPage && sessions.length > 0 && (
-            <div className="flex justify-center py-4 text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex justify-center py-4 text-sm">
               Showing all {total?.toLocaleString()} results
             </div>
           )}

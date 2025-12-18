@@ -22,16 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Shield,
-  MapPin,
-  Zap,
-  Users,
-  Globe,
-} from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, MapPin, Zap, Users, Globe } from 'lucide-react';
 import type { Rule, RuleType, RuleParams, UnitSystem } from '@tracearr/shared';
 import {
   getSpeedUnit,
@@ -39,40 +30,48 @@ import {
   fromMetricDistance,
   toMetricDistance,
 } from '@tracearr/shared';
-import { useRules, useCreateRule, useUpdateRule, useDeleteRule, useToggleRule, useSettings } from '@/hooks/queries';
+import {
+  useRules,
+  useCreateRule,
+  useUpdateRule,
+  useDeleteRule,
+  useToggleRule,
+  useSettings,
+} from '@/hooks/queries';
 
-const RULE_TYPES: { value: RuleType; label: string; icon: React.ReactNode; description: string }[] = [
-  {
-    value: 'impossible_travel',
-    label: 'Impossible Travel',
-    icon: <MapPin className="h-4 w-4" />,
-    description: 'Detect when a user streams from locations too far apart in a short time',
-  },
-  {
-    value: 'simultaneous_locations',
-    label: 'Simultaneous Locations',
-    icon: <Users className="h-4 w-4" />,
-    description: 'Detect when a user streams from multiple distant locations at once',
-  },
-  {
-    value: 'device_velocity',
-    label: 'Device Velocity',
-    icon: <Zap className="h-4 w-4" />,
-    description: 'Detect when a user connects from too many IPs in a time window',
-  },
-  {
-    value: 'concurrent_streams',
-    label: 'Concurrent Streams',
-    icon: <Shield className="h-4 w-4" />,
-    description: 'Limit the number of simultaneous streams per user',
-  },
-  {
-    value: 'geo_restriction',
-    label: 'Geo Restriction',
-    icon: <Globe className="h-4 w-4" />,
-    description: 'Block streaming from specific countries',
-  },
-];
+const RULE_TYPES: { value: RuleType; label: string; icon: React.ReactNode; description: string }[] =
+  [
+    {
+      value: 'impossible_travel',
+      label: 'Impossible Travel',
+      icon: <MapPin className="h-4 w-4" />,
+      description: 'Detect when a user streams from locations too far apart in a short time',
+    },
+    {
+      value: 'simultaneous_locations',
+      label: 'Simultaneous Locations',
+      icon: <Users className="h-4 w-4" />,
+      description: 'Detect when a user streams from multiple distant locations at once',
+    },
+    {
+      value: 'device_velocity',
+      label: 'Device Velocity',
+      icon: <Zap className="h-4 w-4" />,
+      description: 'Detect when a user connects from too many IPs in a time window',
+    },
+    {
+      value: 'concurrent_streams',
+      label: 'Concurrent Streams',
+      icon: <Shield className="h-4 w-4" />,
+      description: 'Limit the number of simultaneous streams per user',
+    },
+    {
+      value: 'geo_restriction',
+      label: 'Geo Restriction',
+      icon: <Globe className="h-4 w-4" />,
+      description: 'Block streaming from specific countries',
+    },
+  ];
 
 const DEFAULT_PARAMS: Record<RuleType, RuleParams> = {
   impossible_travel: { maxSpeedKmh: 500 },
@@ -118,7 +117,10 @@ function GeoRestrictionInput({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Mode</Label>
-        <Select value={mode} onValueChange={(v) => handleModeChange(v as 'blocklist' | 'allowlist')}>
+        <Select
+          value={mode}
+          onValueChange={(v) => handleModeChange(v as 'blocklist' | 'allowlist')}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -147,7 +149,7 @@ function GeoRestrictionInput({
           }}
           placeholder={mode === 'blocklist' ? 'CN, RU, ...' : 'US, CA, GB, ...'}
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           ISO 3166-1 alpha-2 country codes separated by commas.
           {mode === 'allowlist' && ' Streams from any other country will trigger a violation.'}
         </p>
@@ -173,7 +175,9 @@ function RuleParamsForm({
   switch (type) {
     case 'impossible_travel': {
       // Convert metric value to display value
-      const displayValue = Math.round(fromMetricDistance((params as { maxSpeedKmh: number }).maxSpeedKmh, unitSystem));
+      const displayValue = Math.round(
+        fromMetricDistance((params as { maxSpeedKmh: number }).maxSpeedKmh, unitSystem)
+      );
       const defaultDisplay = Math.round(fromMetricDistance(500, unitSystem));
       return (
         <div className="space-y-2">
@@ -189,7 +193,7 @@ function RuleParamsForm({
               onChange({ ...params, maxSpeedKmh: metricValue });
             }}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Maximum realistic travel speed. Default: {defaultDisplay} {speedUnit} (airplane speed)
           </p>
         </div>
@@ -197,7 +201,9 @@ function RuleParamsForm({
     }
     case 'simultaneous_locations': {
       // Convert metric value to display value
-      const displayValue = Math.round(fromMetricDistance((params as { minDistanceKm: number }).minDistanceKm, unitSystem));
+      const displayValue = Math.round(
+        fromMetricDistance((params as { minDistanceKm: number }).minDistanceKm, unitSystem)
+      );
       const defaultDisplay = Math.round(fromMetricDistance(100, unitSystem));
       return (
         <div className="space-y-2">
@@ -213,7 +219,7 @@ function RuleParamsForm({
               onChange({ ...params, minDistanceKm: metricValue });
             }}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Minimum distance between locations to trigger. Default: {defaultDisplay} {distanceUnit}
           </p>
         </div>
@@ -228,9 +234,9 @@ function RuleParamsForm({
               id="maxIps"
               type="number"
               value={(params as { maxIps: number; windowHours: number }).maxIps}
-              onChange={(e) =>
-                { onChange({ ...params, maxIps: parseInt(e.target.value) || 0 }); }
-              }
+              onChange={(e) => {
+                onChange({ ...params, maxIps: parseInt(e.target.value) || 0 });
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -239,12 +245,12 @@ function RuleParamsForm({
               id="windowHours"
               type="number"
               value={(params as { maxIps: number; windowHours: number }).windowHours}
-              onChange={(e) =>
-                { onChange({ ...params, windowHours: parseInt(e.target.value) || 0 }); }
-              }
+              onChange={(e) => {
+                onChange({ ...params, windowHours: parseInt(e.target.value) || 0 });
+              }}
             />
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours
           </p>
         </div>
@@ -257,11 +263,11 @@ function RuleParamsForm({
             id="maxStreams"
             type="number"
             value={(params as { maxStreams: number }).maxStreams}
-            onChange={(e) =>
-              { onChange({ ...params, maxStreams: parseInt(e.target.value) || 0 }); }
-            }
+            onChange={(e) => {
+              onChange({ ...params, maxStreams: parseInt(e.target.value) || 0 });
+            }}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Maximum simultaneous streams per user. Default: 3
           </p>
         </div>
@@ -269,7 +275,13 @@ function RuleParamsForm({
     case 'geo_restriction':
       return (
         <GeoRestrictionInput
-          params={params as { mode?: 'blocklist' | 'allowlist'; countries?: string[]; blockedCountries?: string[] }}
+          params={
+            params as {
+              mode?: 'blocklist' | 'allowlist';
+              countries?: string[];
+              blockedCountries?: string[];
+            }
+          }
           onChange={onChange}
         />
       );
@@ -319,7 +331,9 @@ function RuleDialog({
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) => { setFormData({ ...formData, name: e.target.value }); }}
+          onChange={(e) => {
+            setFormData({ ...formData, name: e.target.value });
+          }}
           placeholder="e.g., Concurrent Stream Limit"
           required
         />
@@ -329,7 +343,9 @@ function RuleDialog({
         <Label htmlFor="type">Rule Type</Label>
         <Select
           value={formData.type}
-          onValueChange={(value) => { handleTypeChange(value as RuleType); }}
+          onValueChange={(value) => {
+            handleTypeChange(value as RuleType);
+          }}
           disabled={isEditing}
         >
           <SelectTrigger>
@@ -346,7 +362,7 @@ function RuleDialog({
             ))}
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           {RULE_TYPES.find((t) => t.value === formData.type)?.description}
         </p>
       </div>
@@ -354,7 +370,9 @@ function RuleDialog({
       <RuleParamsForm
         type={formData.type}
         params={formData.params}
-        onChange={(params) => { setFormData({ ...formData, params }); }}
+        onChange={(params) => {
+          setFormData({ ...formData, params });
+        }}
         unitSystem={unitSystem}
       />
 
@@ -363,7 +381,9 @@ function RuleDialog({
         <Switch
           id="isActive"
           checked={formData.isActive}
-          onCheckedChange={(checked) => { setFormData({ ...formData, isActive: checked }); }}
+          onCheckedChange={(checked) => {
+            setFormData({ ...formData, isActive: checked });
+          }}
         />
       </div>
 
@@ -401,25 +421,43 @@ function RuleCard({
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
               {ruleType?.icon ?? <Shield className="h-5 w-5" />}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold">{rule.name}</h3>
                 {!rule.isActive && (
-                  <span className="text-xs text-muted-foreground">(Disabled)</span>
+                  <span className="text-muted-foreground text-xs">(Disabled)</span>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground capitalize">
+              <p className="text-muted-foreground text-sm capitalize">
                 {rule.type.replace(/_/g, ' ')}
               </p>
-              <div className="mt-2 text-xs text-muted-foreground">
+              <div className="text-muted-foreground mt-2 text-xs">
                 {rule.type === 'impossible_travel' && (
-                  <span>Max speed: {Math.round(fromMetricDistance((rule.params as { maxSpeedKmh: number }).maxSpeedKmh, unitSystem))} {speedUnit}</span>
+                  <span>
+                    Max speed:{' '}
+                    {Math.round(
+                      fromMetricDistance(
+                        (rule.params as { maxSpeedKmh: number }).maxSpeedKmh,
+                        unitSystem
+                      )
+                    )}{' '}
+                    {speedUnit}
+                  </span>
                 )}
                 {rule.type === 'simultaneous_locations' && (
-                  <span>Min distance: {Math.round(fromMetricDistance((rule.params as { minDistanceKm: number }).minDistanceKm, unitSystem))} {distanceUnit}</span>
+                  <span>
+                    Min distance:{' '}
+                    {Math.round(
+                      fromMetricDistance(
+                        (rule.params as { minDistanceKm: number }).minDistanceKm,
+                        unitSystem
+                      )
+                    )}{' '}
+                    {distanceUnit}
+                  </span>
                 )}
                 {rule.type === 'device_velocity' && (
                   <span>
@@ -430,17 +468,22 @@ function RuleCard({
                 {rule.type === 'concurrent_streams' && (
                   <span>Max streams: {(rule.params as { maxStreams: number }).maxStreams}</span>
                 )}
-                {rule.type === 'geo_restriction' && (() => {
-                  const p = rule.params as { mode?: string; countries?: string[]; blockedCountries?: string[] };
-                  const mode = p.mode ?? 'blocklist';
-                  const countries = p.countries ?? p.blockedCountries ?? [];
-                  return (
-                    <span>
-                      {mode === 'allowlist' ? 'Allowed' : 'Blocked'}:{' '}
-                      {countries.join(', ') || 'None'}
-                    </span>
-                  );
-                })()}
+                {rule.type === 'geo_restriction' &&
+                  (() => {
+                    const p = rule.params as {
+                      mode?: string;
+                      countries?: string[];
+                      blockedCountries?: string[];
+                    };
+                    const mode = p.mode ?? 'blocklist';
+                    const countries = p.countries ?? p.blockedCountries ?? [];
+                    return (
+                      <span>
+                        {mode === 'allowlist' ? 'Allowed' : 'Blocked'}:{' '}
+                        {countries.join(', ') || 'None'}
+                      </span>
+                    );
+                  })()}
               </div>
             </div>
           </div>
@@ -450,7 +493,7 @@ function RuleCard({
               <Pencil className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon" onClick={onDelete}>
-              <Trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="text-destructive h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -513,7 +556,9 @@ export function Rules() {
 
   const handleDelete = (id: string) => {
     deleteRule.mutate(id, {
-      onSuccess: () => { setDeleteConfirmId(null); },
+      onSuccess: () => {
+        setDeleteConfirmId(null);
+      },
     });
   };
 
@@ -559,7 +604,9 @@ export function Rules() {
             <RuleDialog
               rule={editingRule}
               onSave={editingRule ? handleUpdate : handleCreate}
-              onClose={() => { setIsDialogOpen(false); }}
+              onClose={() => {
+                setIsDialogOpen(false);
+              }}
               isLoading={createRule.isPending || updateRule.isPending}
               unitSystem={unitSystem}
             />
@@ -586,10 +633,10 @@ export function Rules() {
       ) : !rules || rules.length === 0 ? (
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center gap-4">
-            <Shield className="h-12 w-12 text-muted-foreground" />
+            <Shield className="text-muted-foreground h-12 w-12" />
             <div className="text-center">
               <h3 className="font-semibold">No rules configured</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Create your first detection rule to start monitoring for account sharing.
               </p>
             </div>
@@ -605,9 +652,15 @@ export function Rules() {
             <RuleCard
               key={rule.id}
               rule={rule}
-              onEdit={() => { openEditDialog(rule); }}
-              onDelete={() => { setDeleteConfirmId(rule.id); }}
-              onToggle={() => { handleToggle(rule); }}
+              onEdit={() => {
+                openEditDialog(rule);
+              }}
+              onDelete={() => {
+                setDeleteConfirmId(rule.id);
+              }}
+              onToggle={() => {
+                handleToggle(rule);
+              }}
               unitSystem={unitSystem}
             />
           ))}
@@ -616,7 +669,9 @@ export function Rules() {
 
       <ConfirmDialog
         open={!!deleteConfirmId}
-        onOpenChange={() => { setDeleteConfirmId(null); }}
+        onOpenChange={() => {
+          setDeleteConfirmId(null);
+        }}
         title="Delete Rule"
         description="Are you sure you want to delete this rule? This action cannot be undone."
         confirmLabel="Delete"

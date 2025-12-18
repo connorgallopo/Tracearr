@@ -43,12 +43,16 @@ export function QualityChart({
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.success }]} />
           <Text style={styles.legendLabel}>Direct Play</Text>
-          <Text style={styles.legendValue}>{directPlay} ({directPlayPercent}%)</Text>
+          <Text style={styles.legendValue}>
+            {directPlay} ({directPlayPercent}%)
+          </Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.warning }]} />
           <Text style={styles.legendLabel}>Transcode</Text>
-          <Text style={styles.legendValue}>{transcode} ({transcodePercent}%)</Text>
+          <Text style={styles.legendValue}>
+            {transcode} ({transcodePercent}%)
+          </Text>
         </View>
       </View>
     </View>

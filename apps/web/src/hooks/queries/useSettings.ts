@@ -36,7 +36,7 @@ export function useUpdateSettings() {
       if (context?.previousSettings) {
         queryClient.setQueryData(['settings'], context.previousSettings);
       }
-      toast.error('Failed to Update Settings', { description: (err).message });
+      toast.error('Failed to Update Settings', { description: err.message });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['settings'] });

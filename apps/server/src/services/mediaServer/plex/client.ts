@@ -218,18 +218,15 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   static async initiateOAuth(forwardUrl?: string): Promise<{ pinId: string; authUrl: string }> {
     const headers = plexHeaders();
 
-    const data = await fetchJson<{ id: number; code: string }>(
-      `${PLEX_TV_BASE}/api/v2/pins`,
-      {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ strong: 'true' }),
-        service: 'plex.tv',
-      }
-    );
+    const data = await fetchJson<{ id: number; code: string }>(`${PLEX_TV_BASE}/api/v2/pins`, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ strong: 'true' }),
+      service: 'plex.tv',
+    });
 
     const params = new URLSearchParams({
       clientID: 'tracearr',
@@ -272,13 +269,10 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     }
 
     // Fetch user info with the token
-    const user = await fetchJson<Record<string, unknown>>(
-      `${PLEX_TV_BASE}/api/v2/user`,
-      {
-        headers: plexHeaders(pin.authToken),
-        service: 'plex.tv',
-      }
-    );
+    const user = await fetchJson<Record<string, unknown>>(`${PLEX_TV_BASE}/api/v2/user`, {
+      headers: plexHeaders(pin.authToken),
+      service: 'plex.tv',
+    });
 
     return {
       id: String(user.id ?? ''),
@@ -319,10 +313,7 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       });
     } catch (error) {
       // Connection failed - server unreachable, timeout, SSL error, etc.
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to connect to server';
+      const message = error instanceof Error ? error.message : 'Unable to connect to server';
 
       return {
         success: false,
@@ -366,13 +357,10 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
    * Get owner account info from plex.tv
    */
   static async getAccountInfo(token: string): Promise<MediaUser> {
-    const user = await fetchJson<Record<string, unknown>>(
-      `${PLEX_TV_BASE}/api/v2/user`,
-      {
-        headers: plexHeaders(token),
-        service: 'plex.tv',
-      }
-    );
+    const user = await fetchJson<Record<string, unknown>>(`${PLEX_TV_BASE}/api/v2/user`, {
+      headers: plexHeaders(token),
+      service: 'plex.tv',
+    });
 
     return parsePlexTvUser(
       {

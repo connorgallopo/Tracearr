@@ -153,20 +153,23 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       void queryClient.invalidateQueries({ queryKey: ['stats', 'dashboard'] });
     });
 
-    newSocket.on(WS_EVENTS.VERSION_UPDATE as 'version:update', (data: { current: string; latest: string; releaseUrl: string }) => {
-      // Invalidate version query to refresh update status
-      void queryClient.invalidateQueries({ queryKey: ['version'] });
+    newSocket.on(
+      WS_EVENTS.VERSION_UPDATE as 'version:update',
+      (data: { current: string; latest: string; releaseUrl: string }) => {
+        // Invalidate version query to refresh update status
+        void queryClient.invalidateQueries({ queryKey: ['version'] });
 
-      // Show toast notification for new version
-      toast.info('Update Available', {
-        description: `Tracearr ${data.latest} is available`,
-        action: {
-          label: 'View',
-          onClick: () => window.open(data.releaseUrl, '_blank'),
-        },
-        duration: 10000,
-      });
-    });
+        // Show toast notification for new version
+        toast.info('Update Available', {
+          description: `Tracearr ${data.latest} is available`,
+          action: {
+            label: 'View',
+            onClick: () => window.open(data.releaseUrl, '_blank'),
+          },
+          duration: 10000,
+        });
+      }
+    );
 
     setSocket(newSocket);
 
@@ -197,9 +200,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     [socket, isConnected, subscribeSessions, unsubscribeSessions]
   );
 
-  return (
-    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;
 }
 
 export function useSocket(): SocketContextValue {

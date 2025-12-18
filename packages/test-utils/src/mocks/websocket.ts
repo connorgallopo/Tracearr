@@ -25,7 +25,7 @@ export interface MockSocketClient {
   disconnect(): void;
 
   _receivedEvents: SocketEvent[];
-  _listeners: Map<string, Set<((...args: unknown[]) => void)>>;
+  _listeners: Map<string, Set<(...args: unknown[]) => void>>;
   _simulateEvent: (event: string, ...args: unknown[]) => void;
   _reset: () => void;
 }

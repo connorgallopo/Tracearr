@@ -39,7 +39,7 @@ export function Dashboard() {
       {/* Today Stats Section */}
       <section>
         <div className="mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
+          <Calendar className="text-primary h-5 w-5" />
           <h2 className="text-lg font-semibold">Today</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -47,14 +47,14 @@ export function Dashboard() {
           <Card>
             <CardContent className="flex items-center justify-between py-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Alerts</p>
+                <p className="text-muted-foreground text-sm font-medium">Alerts</p>
                 {statsLoading ? (
-                  <Skeleton className="h-7 w-12 mt-1" />
+                  <Skeleton className="mt-1 h-7 w-12" />
                 ) : (
                   <div className="text-2xl font-bold">{stats?.alertsLast24h ?? 0}</div>
                 )}
               </div>
-              <AlertTriangle className="h-5 w-5 text-muted-foreground" />
+              <AlertTriangle className="text-muted-foreground h-5 w-5" />
             </CardContent>
           </Card>
 
@@ -62,14 +62,14 @@ export function Dashboard() {
           <Card>
             <CardContent className="flex items-center justify-between py-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Plays</p>
+                <p className="text-muted-foreground text-sm font-medium">Plays</p>
                 {statsLoading ? (
-                  <Skeleton className="h-7 w-12 mt-1" />
+                  <Skeleton className="mt-1 h-7 w-12" />
                 ) : (
                   <div className="text-2xl font-bold">{stats?.todayPlays ?? 0}</div>
                 )}
               </div>
-              <Play className="h-5 w-5 text-muted-foreground" />
+              <Play className="text-muted-foreground h-5 w-5" />
             </CardContent>
           </Card>
 
@@ -77,17 +77,17 @@ export function Dashboard() {
           <Card>
             <CardContent className="flex items-center justify-between py-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Watch Time</p>
+                <p className="text-muted-foreground text-sm font-medium">Watch Time</p>
                 {statsLoading ? (
-                  <Skeleton className="h-7 w-12 mt-1" />
+                  <Skeleton className="mt-1 h-7 w-12" />
                 ) : (
                   <div className="text-2xl font-bold">
                     {stats?.watchTimeHours ?? 0}
-                    <span className="text-lg font-normal text-muted-foreground">h</span>
+                    <span className="text-muted-foreground text-lg font-normal">h</span>
                   </div>
                 )}
               </div>
-              <Clock className="h-5 w-5 text-muted-foreground" />
+              <Clock className="text-muted-foreground h-5 w-5" />
             </CardContent>
           </Card>
 
@@ -95,14 +95,14 @@ export function Dashboard() {
           <Card>
             <CardContent className="flex items-center justify-between py-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Users</p>
+                <p className="text-muted-foreground text-sm font-medium">Active Users</p>
                 {statsLoading ? (
-                  <Skeleton className="h-7 w-12 mt-1" />
+                  <Skeleton className="mt-1 h-7 w-12" />
                 ) : (
                   <div className="text-2xl font-bold">{stats?.activeUsersToday ?? 0}</div>
                 )}
               </div>
-              <Users className="h-5 w-5 text-muted-foreground" />
+              <Users className="text-muted-foreground h-5 w-5" />
             </CardContent>
           </Card>
         </div>
@@ -111,10 +111,10 @@ export function Dashboard() {
       {/* Now Playing Section */}
       <section>
         <div className="mb-4 flex items-center gap-2">
-          <Tv className="h-5 w-5 text-muted-foreground" />
+          <Tv className="text-muted-foreground h-5 w-5" />
           <h2 className="text-lg font-semibold">Now Playing</h2>
           {hasActiveStreams && (
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+            <span className="bg-muted text-foreground rounded-full px-2 py-0.5 text-xs font-medium">
               {activeCount} {activeCount === 1 ? 'stream' : 'streams'}
             </span>
           )}
@@ -123,11 +123,11 @@ export function Dashboard() {
         {!sessions || sessions.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="rounded-full bg-muted p-4">
-                <Tv className="h-8 w-8 text-muted-foreground" />
+              <div className="bg-muted rounded-full p-4">
+                <Tv className="text-muted-foreground h-8 w-8" />
               </div>
               <h3 className="mt-4 font-semibold">No active streams</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-sm">
                 Active streams will appear here when users start watching
               </p>
             </CardContent>
@@ -152,7 +152,7 @@ export function Dashboard() {
       {hasActiveStreams && (
         <section>
           <div className="mb-4 flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
+            <MapPin className="text-primary h-5 w-5" />
             <h2 className="text-lg font-semibold">Stream Locations</h2>
           </div>
           <Card className="overflow-hidden">
@@ -177,11 +177,7 @@ export function Dashboard() {
       )}
 
       {/* Session Detail Sheet */}
-      <SessionDetailSheet
-        session={selectedSession}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
+      <SessionDetailSheet session={selectedSession} open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }

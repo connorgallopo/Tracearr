@@ -160,13 +160,62 @@ describe('GeoIPService', () => {
   describe('calculateDistance', () => {
     // Known distances for validation (approximate due to Earth not being perfect sphere)
     const locations = {
-      newYork: { city: 'New York', region: null, country: 'USA', countryCode: 'US', lat: 40.7128, lon: -74.006 },
-      losAngeles: { city: 'Los Angeles', region: null, country: 'USA', countryCode: 'US', lat: 34.0522, lon: -118.2437 },
-      london: { city: 'London', region: null, country: 'UK', countryCode: 'GB', lat: 51.5074, lon: -0.1278 },
-      tokyo: { city: 'Tokyo', region: null, country: 'Japan', countryCode: 'JP', lat: 35.6762, lon: 139.6503 },
-      sydney: { city: 'Sydney', region: null, country: 'Australia', countryCode: 'AU', lat: -33.8688, lon: 151.2093 },
-      nullLocation: { city: null, region: null, country: null, countryCode: null, lat: null, lon: null },
-      partialNull: { city: 'Test', region: null, country: null, countryCode: null, lat: 40.0, lon: null },
+      newYork: {
+        city: 'New York',
+        region: null,
+        country: 'USA',
+        countryCode: 'US',
+        lat: 40.7128,
+        lon: -74.006,
+      },
+      losAngeles: {
+        city: 'Los Angeles',
+        region: null,
+        country: 'USA',
+        countryCode: 'US',
+        lat: 34.0522,
+        lon: -118.2437,
+      },
+      london: {
+        city: 'London',
+        region: null,
+        country: 'UK',
+        countryCode: 'GB',
+        lat: 51.5074,
+        lon: -0.1278,
+      },
+      tokyo: {
+        city: 'Tokyo',
+        region: null,
+        country: 'Japan',
+        countryCode: 'JP',
+        lat: 35.6762,
+        lon: 139.6503,
+      },
+      sydney: {
+        city: 'Sydney',
+        region: null,
+        country: 'Australia',
+        countryCode: 'AU',
+        lat: -33.8688,
+        lon: 151.2093,
+      },
+      nullLocation: {
+        city: null,
+        region: null,
+        country: null,
+        countryCode: null,
+        lat: null,
+        lon: null,
+      },
+      partialNull: {
+        city: 'Test',
+        region: null,
+        country: null,
+        countryCode: null,
+        lat: 40.0,
+        lon: null,
+      },
     };
 
     it('should calculate NYC to LA distance (~3940 km)', () => {

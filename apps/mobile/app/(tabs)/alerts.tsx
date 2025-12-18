@@ -48,7 +48,10 @@ const ruleLabels: Record<RuleType, string> = {
 };
 
 // Format violation data into readable description based on rule type
-function getViolationDescription(violation: ViolationWithDetails, unitSystem: UnitSystem = 'metric'): string {
+function getViolationDescription(
+  violation: ViolationWithDetails,
+  unitSystem: UnitSystem = 'metric'
+): string {
   const data = violation.data;
   const ruleType = violation.rule?.type;
 
@@ -60,9 +63,10 @@ function getViolationDescription(violation: ViolationWithDetails, unitSystem: Un
     case 'impossible_travel': {
       const from = data.fromCity || data.fromLocation || 'unknown location';
       const to = data.toCity || data.toLocation || 'unknown location';
-      const speed = typeof data.calculatedSpeedKmh === 'number'
-        ? formatSpeed(data.calculatedSpeedKmh, unitSystem)
-        : 'impossible speed';
+      const speed =
+        typeof data.calculatedSpeedKmh === 'number'
+          ? formatSpeed(data.calculatedSpeedKmh, unitSystem)
+          : 'impossible speed';
       return `Traveled from ${from} to ${to} at ${speed}`;
     }
     case 'simultaneous_locations': {
@@ -123,7 +127,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 function RuleIcon({ ruleType }: { ruleType: RuleType | undefined }) {
   const IconComponent = ruleType ? ruleIcons[ruleType] : AlertTriangle;
   return (
-    <View className="w-8 h-8 rounded-lg bg-surface items-center justify-center">
+    <View className="bg-surface h-8 w-8 items-center justify-center rounded-lg">
       <IconComponent size={16} color={colors.cyan.core} />
     </View>
   );
@@ -150,32 +154,26 @@ function ViolationCard({
     <Pressable onPress={onPress} className="active:opacity-80">
       <Card className="mb-3">
         {/* Header: User + Severity */}
-        <View className="flex-row justify-between items-start mb-3">
+        <View className="mb-3 flex-row items-start justify-between">
           <Pressable
-            className="flex-row items-center gap-2.5 flex-1 active:opacity-70"
+            className="flex-1 flex-row items-center gap-2.5 active:opacity-70"
             onPress={onPress}
           >
-            <UserAvatar
-              thumbUrl={violation.user?.thumbUrl}
-              username={username}
-              size={40}
-            />
+            <UserAvatar thumbUrl={violation.user?.thumbUrl} username={username} size={40} />
             <View className="flex-1">
               <Text className="text-base font-semibold">{username}</Text>
-              <Text className="text-xs text-muted-foreground">{timeAgo}</Text>
+              <Text className="text-muted-foreground text-xs">{timeAgo}</Text>
             </View>
           </Pressable>
           <SeverityBadge severity={violation.severity} />
         </View>
 
         {/* Content: Rule Type with Icon + Description */}
-        <View className="flex-row items-start gap-3 mb-3">
+        <View className="mb-3 flex-row items-start gap-3">
           <RuleIcon ruleType={ruleType} />
           <View className="flex-1">
-            <Text className="text-sm font-medium text-cyan-core mb-1">
-              {ruleName}
-            </Text>
-            <Text className="text-sm text-secondary leading-5" numberOfLines={2}>
+            <Text className="text-cyan-core mb-1 text-sm font-medium">{ruleName}</Text>
+            <Text className="text-secondary text-sm leading-5" numberOfLines={2}>
               {description}
             </Text>
           </View>
@@ -184,19 +182,19 @@ function ViolationCard({
         {/* Action Button */}
         {!violation.acknowledgedAt ? (
           <Pressable
-            className="flex-row items-center justify-center gap-2 bg-cyan-core/15 py-2.5 rounded-lg active:opacity-70"
+            className="bg-cyan-core/15 flex-row items-center justify-center gap-2 rounded-lg py-2.5 active:opacity-70"
             onPress={(e) => {
               e.stopPropagation();
               onAcknowledge();
             }}
           >
             <Check size={16} color={colors.cyan.core} />
-            <Text className="text-sm font-semibold text-cyan-core">Acknowledge</Text>
+            <Text className="text-cyan-core text-sm font-semibold">Acknowledge</Text>
           </Pressable>
         ) : (
-          <View className="flex-row items-center justify-center gap-2 bg-success/10 py-2.5 rounded-lg">
+          <View className="bg-success/10 flex-row items-center justify-center gap-2 rounded-lg py-2.5">
             <Check size={16} color={colors.success} />
-            <Text className="text-sm text-success">Acknowledged</Text>
+            <Text className="text-success text-sm">Acknowledged</Text>
           </View>
         )}
       </Card>
@@ -217,25 +215,23 @@ export default function AlertsScreen() {
   });
   const unitSystem = settings?.unitSystem ?? 'metric';
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch,
-    isRefetching,
-  } = useInfiniteQuery({
-    queryKey: ['violations', selectedServerId],
-    queryFn: ({ pageParam = 1 }) =>
-      api.violations.list({ page: pageParam, pageSize: PAGE_SIZE, serverId: selectedServerId ?? undefined }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch, isRefetching } =
+    useInfiniteQuery({
+      queryKey: ['violations', selectedServerId],
+      queryFn: ({ pageParam = 1 }) =>
+        api.violations.list({
+          page: pageParam,
+          pageSize: PAGE_SIZE,
+          serverId: selectedServerId ?? undefined,
+        }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
+        if (lastPage.page < lastPage.totalPages) {
+          return lastPage.page + 1;
+        }
+        return undefined;
+      },
+    });
 
   const acknowledgeMutation = useMutation({
     mutationFn: api.violations.acknowledge,
@@ -263,7 +259,10 @@ export default function AlertsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <FlatList
         data={violations}
         keyExtractor={(item) => item.id}
@@ -286,16 +285,16 @@ export default function AlertsScreen() {
           />
         }
         ListHeaderComponent={
-          <View className="flex-row justify-between items-center mb-3">
+          <View className="mb-3 flex-row items-center justify-between">
             <View>
               <Text className="text-lg font-semibold">Alerts</Text>
-              <Text className="text-sm text-muted-foreground">
+              <Text className="text-muted-foreground text-sm">
                 {total} {total === 1 ? 'violation' : 'violations'} total
               </Text>
             </View>
             {unacknowledgedCount > 0 && (
-              <View className="bg-destructive/20 px-3 py-1.5 rounded-lg">
-                <Text className="text-sm font-medium text-destructive">
+              <View className="bg-destructive/20 rounded-lg px-3 py-1.5">
+                <Text className="text-destructive text-sm font-medium">
                   {unacknowledgedCount} pending
                 </Text>
               </View>
@@ -304,18 +303,18 @@ export default function AlertsScreen() {
         }
         ListFooterComponent={
           isFetchingNextPage ? (
-            <View className="py-4 items-center">
+            <View className="items-center py-4">
               <ActivityIndicator size="small" color={colors.cyan.core} />
             </View>
           ) : null
         }
         ListEmptyComponent={
           <View className="items-center py-16">
-            <View className="w-20 h-20 rounded-full bg-success/10 border border-success/20 items-center justify-center mb-4">
+            <View className="bg-success/10 border-success/20 mb-4 h-20 w-20 items-center justify-center rounded-full border">
               <Check size={32} color={colors.success} />
             </View>
-            <Text className="text-xl font-semibold mb-2">All Clear</Text>
-            <Text className="text-sm text-muted-foreground text-center px-8 leading-5">
+            <Text className="mb-2 text-xl font-semibold">All Clear</Text>
+            <Text className="text-muted-foreground px-8 text-center text-sm leading-5">
               No rule violations have been detected. Your users are behaving nicely!
             </Text>
           </View>

@@ -11,11 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
-  QuietHoursService,
-  quietHoursService,
-  type QuietHoursPrefs,
-} from '../quietHours.js';
+import { QuietHoursService, quietHoursService, type QuietHoursPrefs } from '../quietHours.js';
 
 // Default prefs for testing
 const DEFAULT_PREFS: QuietHoursPrefs = {

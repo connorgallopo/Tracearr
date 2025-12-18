@@ -166,17 +166,19 @@ function createMobileViewerUser(serverId?: string): AuthUser {
 /**
  * Create a mock mobile session
  */
-function createMockSession(overrides?: Partial<{
-  id: string;
-  deviceName: string;
-  deviceId: string;
-  platform: 'ios' | 'android';
-  refreshTokenHash: string;
-  expoPushToken: string | null;
-  deviceSecret: string | null;
-  lastSeenAt: Date;
-  createdAt: Date;
-}>) {
+function createMockSession(
+  overrides?: Partial<{
+    id: string;
+    deviceName: string;
+    deviceId: string;
+    platform: 'ios' | 'android';
+    refreshTokenHash: string;
+    expoPushToken: string | null;
+    deviceSecret: string | null;
+    lastSeenAt: Date;
+    createdAt: Date;
+  }>
+) {
   return {
     id: overrides?.id ?? randomUUID(),
     deviceName: overrides?.deviceName ?? 'iPhone 15',
@@ -193,14 +195,16 @@ function createMockSession(overrides?: Partial<{
 /**
  * Create a mock mobile token
  */
-function createMockToken(overrides?: Partial<{
-  id: string;
-  tokenHash: string;
-  expiresAt: Date;
-  usedAt: Date | null;
-  createdBy: string;
-  createdAt: Date;
-}>) {
+function createMockToken(
+  overrides?: Partial<{
+    id: string;
+    tokenHash: string;
+    expiresAt: Date;
+    usedAt: Date | null;
+    createdBy: string;
+    createdAt: Date;
+  }>
+) {
   return {
     id: overrides?.id ?? randomUUID(),
     tokenHash: overrides?.tokenHash ?? 'tokenhash123',
@@ -548,9 +552,7 @@ describe('Mobile Routes', () => {
         from: vi.fn().mockResolvedValue(mockSessions),
       } as never);
 
-      vi.mocked(db.delete).mockReturnValue(
-        Promise.resolve() as never
-      );
+      vi.mocked(db.delete).mockReturnValue(Promise.resolve() as never);
 
       mockRedis.del.mockResolvedValue(1);
 
@@ -594,9 +596,7 @@ describe('Mobile Routes', () => {
         from: vi.fn().mockResolvedValue(mockSessions),
       } as never);
 
-      vi.mocked(db.delete).mockReturnValue(
-        Promise.resolve() as never
-      );
+      vi.mocked(db.delete).mockReturnValue(Promise.resolve() as never);
 
       mockRedis.del.mockResolvedValue(1);
 
@@ -619,9 +619,7 @@ describe('Mobile Routes', () => {
         from: vi.fn().mockResolvedValue([]),
       } as never);
 
-      vi.mocked(db.delete).mockReturnValue(
-        Promise.resolve() as never
-      );
+      vi.mocked(db.delete).mockReturnValue(Promise.resolve() as never);
 
       const response = await app.inject({
         method: 'DELETE',
@@ -780,7 +778,9 @@ describe('Mobile Routes', () => {
             if (txSelectCallCount === 3) {
               // tx.select({ id, name, type }).from(servers) - awaited directly
               return {
-                from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'MyServer', type: 'plex' }]),
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'MyServer', type: 'plex' }]),
               };
             }
             return {
@@ -921,13 +921,16 @@ describe('Mobile Routes', () => {
 
       mockRedis.eval.mockResolvedValue(1);
 
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }) as never
+      );
 
       // Mock transaction that throws TOKEN_EXPIRED
       vi.mocked(db.transaction).mockImplementation(async (callback) => {
@@ -937,9 +940,11 @@ describe('Mobile Routes', () => {
             from: vi.fn().mockImplementation(() => ({
               where: vi.fn().mockImplementation(() => ({
                 for: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([
-                    createMockToken({ expiresAt: new Date(Date.now() - 1000) }),
-                  ]),
+                  limit: vi
+                    .fn()
+                    .mockResolvedValue([
+                      createMockToken({ expiresAt: new Date(Date.now() - 1000) }),
+                    ]),
                 }),
               })),
             })),
@@ -964,13 +969,16 @@ describe('Mobile Routes', () => {
 
       mockRedis.eval.mockResolvedValue(1);
 
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }) as never
+      );
 
       // Mock transaction that throws TOKEN_ALREADY_USED
       vi.mocked(db.transaction).mockImplementation(async (callback) => {
@@ -980,9 +988,7 @@ describe('Mobile Routes', () => {
             from: vi.fn().mockImplementation(() => ({
               where: vi.fn().mockImplementation(() => ({
                 for: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([
-                    createMockToken({ usedAt: new Date() }),
-                  ]),
+                  limit: vi.fn().mockResolvedValue([createMockToken({ usedAt: new Date() })]),
                 }),
               })),
             })),
@@ -1184,12 +1190,14 @@ describe('Mobile Routes', () => {
         return {
           from: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{
-                id: existingSessionId,
-                refreshTokenHash: oldRefreshHash,
-                deviceName: 'Old Device',
-                platform: 'ios',
-              }]),
+              limit: vi.fn().mockResolvedValue([
+                {
+                  id: existingSessionId,
+                  refreshTokenHash: oldRefreshHash,
+                  deviceName: 'Old Device',
+                  platform: 'ios',
+                },
+              ]),
             }),
           }),
         } as never;
@@ -1204,7 +1212,11 @@ describe('Mobile Routes', () => {
           select: vi.fn().mockImplementation(() => {
             txSelectCallCount++;
             if (txSelectCallCount === 3) {
-              return { from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]) };
+              return {
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]),
+              };
             }
             return {
               from: vi.fn().mockReturnValue({
@@ -1561,13 +1573,16 @@ describe('Mobile Routes', () => {
 
         mockRedis.eval.mockResolvedValue(1);
 
-        vi.mocked(db.select).mockImplementation(() => ({
-          from: vi.fn().mockReturnValue({
-            where: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([]),
-            }),
-          }),
-        }) as never);
+        vi.mocked(db.select).mockImplementation(
+          () =>
+            ({
+              from: vi.fn().mockReturnValue({
+                where: vi.fn().mockReturnValue({
+                  limit: vi.fn().mockResolvedValue([]),
+                }),
+              }),
+            }) as never
+        );
 
         // Token with usedAt set should be rejected in normal mode
         vi.mocked(db.transaction).mockImplementation(async (callback) => {
@@ -1577,9 +1592,7 @@ describe('Mobile Routes', () => {
               from: vi.fn().mockImplementation(() => ({
                 where: vi.fn().mockImplementation(() => ({
                   for: vi.fn().mockReturnValue({
-                    limit: vi.fn().mockResolvedValue([
-                      createMockToken({ usedAt: new Date() }),
-                    ]),
+                    limit: vi.fn().mockResolvedValue([createMockToken({ usedAt: new Date() })]),
                   }),
                 })),
               })),
@@ -1689,7 +1702,9 @@ describe('Mobile Routes', () => {
         const expiryMs = capturedExpiry!.getTime() - beforeRequest;
         const expectedExpiryMs = 15 * 60 * 1000;
         expect(expiryMs).toBeGreaterThanOrEqual(expectedExpiryMs - 1000);
-        expect(expiryMs).toBeLessThanOrEqual(expectedExpiryMs + (afterRequest - beforeRequest) + 1000);
+        expect(expiryMs).toBeLessThanOrEqual(
+          expectedExpiryMs + (afterRequest - beforeRequest) + 1000
+        );
       });
     });
 

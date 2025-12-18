@@ -32,42 +32,39 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
    * - height: Resize height (default 450)
    * - fallback: Placeholder type if image fails (poster, avatar, art)
    */
-  app.get(
-    '/proxy',
-    async (request, reply) => {
-      const parseResult = proxyQuerySchema.safeParse(request.query);
+  app.get('/proxy', async (request, reply) => {
+    const parseResult = proxyQuerySchema.safeParse(request.query);
 
-      if (!parseResult.success) {
-        return reply.status(400).send({
-          error: 'Invalid query parameters',
-          details: z.treeifyError(parseResult.error),
-        });
-      }
-
-      const { server, url, width, height, fallback } = parseResult.data;
-
-      const result = await proxyImage({
-        serverId: server,
-        imagePath: url,
-        width,
-        height,
-        fallback: fallback as FallbackType,
+    if (!parseResult.success) {
+      return reply.status(400).send({
+        error: 'Invalid query parameters',
+        details: z.treeifyError(parseResult.error),
       });
-
-      // Set cache headers
-      if (result.cached) {
-        reply.header('X-Cache', 'HIT');
-      } else {
-        reply.header('X-Cache', 'MISS');
-      }
-
-      // Cache for 1 hour in browser, allow CDN caching
-      reply.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
-      reply.header('Content-Type', result.contentType);
-
-      return reply.send(result.data);
     }
-  );
+
+    const { server, url, width, height, fallback } = parseResult.data;
+
+    const result = await proxyImage({
+      serverId: server,
+      imagePath: url,
+      width,
+      height,
+      fallback: fallback as FallbackType,
+    });
+
+    // Set cache headers
+    if (result.cached) {
+      reply.header('X-Cache', 'HIT');
+    } else {
+      reply.header('X-Cache', 'MISS');
+    }
+
+    // Cache for 1 hour in browser, allow CDN caching
+    reply.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    reply.header('Content-Type', result.contentType);
+
+    return reply.send(result.data);
+  });
 
   /**
    * GET /images/avatar - Get a user avatar (with gravatar fallback)
@@ -80,41 +77,38 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
    * - email: Email for gravatar fallback (optional)
    * - size: Avatar size (default 100)
    */
-  app.get(
-    '/avatar',
-    async (request, reply) => {
-      const query = request.query as Record<string, string | undefined>;
-      const server = query.server;
-      const url = query.url;
-      const size = parseInt(query.size ?? '100', 10);
+  app.get('/avatar', async (request, reply) => {
+    const query = request.query as Record<string, string | undefined>;
+    const server = query.server;
+    const url = query.url;
+    const size = parseInt(query.size ?? '100', 10);
 
-      // If we have server URL, try to fetch from media server
-      if (server && url) {
-        const result = await proxyImage({
-          serverId: server,
-          imagePath: url,
-          width: size,
-          height: size,
-          fallback: 'avatar',
-        });
-
-        reply.header('Cache-Control', 'public, max-age=3600');
-        reply.header('Content-Type', result.contentType);
-        return reply.send(result.data);
-      }
-
-      // Return fallback avatar
+    // If we have server URL, try to fetch from media server
+    if (server && url) {
       const result = await proxyImage({
-        serverId: 'fallback',
-        imagePath: 'fallback',
+        serverId: server,
+        imagePath: url,
         width: size,
         height: size,
         fallback: 'avatar',
       });
 
-      reply.header('Cache-Control', 'public, max-age=86400');
+      reply.header('Cache-Control', 'public, max-age=3600');
       reply.header('Content-Type', result.contentType);
       return reply.send(result.data);
     }
-  );
+
+    // Return fallback avatar
+    const result = await proxyImage({
+      serverId: 'fallback',
+      imagePath: 'fallback',
+      width: size,
+      height: size,
+      fallback: 'avatar',
+    });
+
+    reply.header('Cache-Control', 'public, max-age=86400');
+    reply.header('Content-Type', result.contentType);
+    return reply.send(result.data);
+  });
 };

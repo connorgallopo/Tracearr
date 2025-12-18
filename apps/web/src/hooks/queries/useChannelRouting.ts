@@ -29,7 +29,9 @@ export function useUpdateChannelRouting() {
       await queryClient.cancelQueries({ queryKey: ['channelRouting'] });
 
       // Snapshot the previous value
-      const previousRouting = queryClient.getQueryData<NotificationChannelRouting[]>(['channelRouting']);
+      const previousRouting = queryClient.getQueryData<NotificationChannelRouting[]>([
+        'channelRouting',
+      ]);
 
       // Optimistically update
       queryClient.setQueryData<NotificationChannelRouting[]>(['channelRouting'], (old) => {

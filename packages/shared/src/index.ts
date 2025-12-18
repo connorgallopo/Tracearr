@@ -215,10 +215,4 @@ export {
 } from './constants.js';
 
 // Role helper exports
-export {
-  ROLE_PERMISSIONS,
-  canLogin,
-  hasMinRole,
-  isOwner,
-  isActive,
-} from './types.js';
+export { ROLE_PERMISSIONS, canLogin, hasMinRole, isOwner, isActive } from './types.js';

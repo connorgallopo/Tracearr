@@ -216,7 +216,8 @@ export function createCacheService(redis: Redis): CacheService {
       stoppedSessionIds: string[],
       updatedSessions: ActiveSession[]
     ): Promise<void> {
-      const hasChanges = newSessions.length > 0 || stoppedSessionIds.length > 0 || updatedSessions.length > 0;
+      const hasChanges =
+        newSessions.length > 0 || stoppedSessionIds.length > 0 || updatedSessions.length > 0;
       if (!hasChanges) return;
 
       const pipeline = redis.multi();
@@ -393,10 +394,7 @@ export function getCacheService(): CacheService | null {
   return cacheServiceInstance;
 }
 
-export function createPubSubService(
-  publisher: Redis,
-  subscriber: Redis
-): PubSubService {
+export function createPubSubService(publisher: Redis, subscriber: Redis): PubSubService {
   const callbacks = new Map<string, (message: string) => void>();
 
   subscriber.on('message', (channel: string, message: string) => {
@@ -414,10 +412,7 @@ export function createPubSubService(
       );
     },
 
-    async subscribe(
-      channel: string,
-      callback: (message: string) => void
-    ): Promise<void> {
+    async subscribe(channel: string, callback: (message: string) => void): Promise<void> {
       callbacks.set(channel, callback);
       await subscriber.subscribe(channel);
     },

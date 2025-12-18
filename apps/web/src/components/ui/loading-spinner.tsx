@@ -14,9 +14,7 @@ const sizeClasses = {
 
 export function LoadingSpinner({ className, size = 'md' }: LoadingSpinnerProps) {
   return (
-    <Loader2
-      className={cn('animate-spin text-muted-foreground', sizeClasses[size], className)}
-    />
+    <Loader2 className={cn('text-muted-foreground animate-spin', sizeClasses[size], className)} />
   );
 }
 
@@ -28,7 +26,7 @@ export function LoadingOverlay({ message = 'Loading...' }: LoadingOverlayProps) 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-12">
       <LoadingSpinner size="lg" />
-      <p className="text-sm text-muted-foreground">{message}</p>
+      <p className="text-muted-foreground text-sm">{message}</p>
     </div>
   );
 }

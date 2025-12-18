@@ -8,7 +8,15 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
-import { getDateRange, resolveDateRange, buildDateRangeFilter, resetCachedState, hasAggregates, hasHyperLogLog, getStartOfDayInTimezone } from '../utils.js';
+import {
+  getDateRange,
+  resolveDateRange,
+  buildDateRangeFilter,
+  resetCachedState,
+  hasAggregates,
+  hasHyperLogLog,
+  getStartOfDayInTimezone,
+} from '../utils.js';
 
 // Mock the database module
 vi.mock('../../../db/client.js', () => ({
@@ -68,23 +76,21 @@ describe('resolveDateRange', () => {
 
   describe('custom period', () => {
     it('should use provided start and end dates', () => {
-      const result = resolveDateRange(
-        'custom',
-        '2024-01-01T00:00:00Z',
-        '2024-01-31T23:59:59Z'
-      );
+      const result = resolveDateRange('custom', '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z');
       expect(result.start).toEqual(new Date('2024-01-01T00:00:00Z'));
       expect(result.end).toEqual(new Date('2024-01-31T23:59:59Z'));
     });
 
     it('should throw if custom period missing startDate', () => {
-      expect(() => resolveDateRange('custom', undefined, '2024-01-31T00:00:00Z'))
-        .toThrow('Custom period requires startDate and endDate');
+      expect(() => resolveDateRange('custom', undefined, '2024-01-31T00:00:00Z')).toThrow(
+        'Custom period requires startDate and endDate'
+      );
     });
 
     it('should throw if custom period missing endDate', () => {
-      expect(() => resolveDateRange('custom', '2024-01-01T00:00:00Z', undefined))
-        .toThrow('Custom period requires startDate and endDate');
+      expect(() => resolveDateRange('custom', '2024-01-01T00:00:00Z', undefined)).toThrow(
+        'Custom period requires startDate and endDate'
+      );
     });
   });
 });

@@ -32,7 +32,7 @@ function buildServerFilterSql(
     } else if (authUser.serverIds.length === 1) {
       return sql`AND su.server_id = ${authUser.serverIds[0]}`;
     } else {
-      const serverIdList = authUser.serverIds.map(id => sql`${id}`);
+      const serverIdList = authUser.serverIds.map((id) => sql`${id}`);
       return sql`AND su.server_id IN (${sql.join(serverIdList, sql`, `)})`;
     }
   }
@@ -43,39 +43,36 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
   /**
    * GET /users - User statistics (per ServerUser)
    */
-  app.get(
-    '/users',
-    { preHandler: [app.authenticate] },
-    async (request, reply) => {
-      const query = statsQuerySchema.safeParse(request.query);
-      if (!query.success) {
-        return reply.badRequest('Invalid query parameters');
+  app.get('/users', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const query = statsQuerySchema.safeParse(request.query);
+    if (!query.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
+
+    const { period, startDate, endDate, serverId } = query.data;
+    const authUser = request.user;
+    const dateRange = resolveDateRange(period, startDate, endDate);
+
+    // Validate server access if specific server requested
+    if (serverId) {
+      const error = validateServerAccess(authUser, serverId);
+      if (error) {
+        return reply.forbidden(error);
       }
+    }
 
-      const { period, startDate, endDate, serverId } = query.data;
-      const authUser = request.user;
-      const dateRange = resolveDateRange(period, startDate, endDate);
+    const serverFilter = buildServerFilterSql(serverId, authUser);
 
-      // Validate server access if specific server requested
-      if (serverId) {
-        const error = validateServerAccess(authUser, serverId);
-        if (error) {
-          return reply.forbidden(error);
-        }
-      }
+    // Build date filter for JOIN condition
+    const dateJoinFilter = dateRange.start
+      ? period === 'custom'
+        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
+        : sql`AND s.started_at >= ${dateRange.start}`
+      : sql``; // All-time: no date filter
 
-      const serverFilter = buildServerFilterSql(serverId, authUser);
-
-      // Build date filter for JOIN condition
-      const dateJoinFilter = dateRange.start
-        ? period === 'custom'
-          ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
-          : sql`AND s.started_at >= ${dateRange.start}`
-        : sql``; // All-time: no date filter
-
-      // Query server_users with session stats
-      // Stats are per-server-account (ServerUser), not per-identity (User)
-      const result = await db.execute(sql`
+    // Query server_users with session stats
+    // Stats are per-server-account (ServerUser), not per-identity (User)
+    const result = await db.execute(sql`
         SELECT
           su.id as server_user_id,
           su.username,
@@ -90,62 +87,60 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
         LIMIT 20
       `);
 
-      const userStats: UserStats[] = (result.rows as {
+    const userStats: UserStats[] = (
+      result.rows as {
         server_user_id: string;
         username: string;
         thumb_url: string | null;
         play_count: number;
         watch_time_ms: string;
-      }[]).map((r) => ({
-        serverUserId: r.server_user_id,
-        username: r.username,
-        thumbUrl: r.thumb_url,
-        playCount: r.play_count,
-        watchTimeHours: Math.round((Number(r.watch_time_ms) / (1000 * 60 * 60)) * 10) / 10,
-      }));
+      }[]
+    ).map((r) => ({
+      serverUserId: r.server_user_id,
+      username: r.username,
+      thumbUrl: r.thumb_url,
+      playCount: r.play_count,
+      watchTimeHours: Math.round((Number(r.watch_time_ms) / (1000 * 60 * 60)) * 10) / 10,
+    }));
 
-      return { data: userStats };
-    }
-  );
+    return { data: userStats };
+  });
 
   /**
    * GET /top-users - User leaderboard (per ServerUser)
    */
-  app.get(
-    '/top-users',
-    { preHandler: [app.authenticate] },
-    async (request, reply) => {
-      const query = statsQuerySchema.safeParse(request.query);
-      if (!query.success) {
-        return reply.badRequest('Invalid query parameters');
+  app.get('/top-users', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const query = statsQuerySchema.safeParse(request.query);
+    if (!query.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
+
+    const { period, startDate, endDate, serverId } = query.data;
+    const authUser = request.user;
+    const dateRange = resolveDateRange(period, startDate, endDate);
+
+    // Validate server access if specific server requested
+    if (serverId) {
+      const error = validateServerAccess(authUser, serverId);
+      if (error) {
+        return reply.forbidden(error);
       }
+    }
 
-      const { period, startDate, endDate, serverId } = query.data;
-      const authUser = request.user;
-      const dateRange = resolveDateRange(period, startDate, endDate);
+    const serverFilter = buildServerFilterSql(serverId, authUser);
 
-      // Validate server access if specific server requested
-      if (serverId) {
-        const error = validateServerAccess(authUser, serverId);
-        if (error) {
-          return reply.forbidden(error);
-        }
-      }
+    // Build date filter for JOIN condition
+    const dateJoinFilter = dateRange.start
+      ? period === 'custom'
+        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
+        : sql`AND s.started_at >= ${dateRange.start}`
+      : sql``; // All-time: no date filter
 
-      const serverFilter = buildServerFilterSql(serverId, authUser);
-
-      // Build date filter for JOIN condition
-      const dateJoinFilter = dateRange.start
-        ? period === 'custom'
-          ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
-          : sql`AND s.started_at >= ${dateRange.start}`
-        : sql``; // All-time: no date filter
-
-      // Query server_users with session stats
-      // Stats are per-server-account (ServerUser), not per-identity (User)
-      // Include server_id for avatar proxy and top genre/show
-      // Join with users table to get identity name
-      const topUsersResult = await db.execute(sql`
+    // Query server_users with session stats
+    // Stats are per-server-account (ServerUser), not per-identity (User)
+    // Include server_id for avatar proxy and top genre/show
+    // Join with users table to get identity name
+    const topUsersResult = await db.execute(sql`
         SELECT
           su.id as server_user_id,
           su.username,
@@ -166,7 +161,8 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
         LIMIT 10
       `);
 
-      const topUsers: TopUserStats[] = (topUsersResult.rows as {
+    const topUsers: TopUserStats[] = (
+      topUsersResult.rows as {
         server_user_id: string;
         username: string;
         identity_name: string | null;
@@ -177,20 +173,20 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
         watch_time_ms: string;
         top_media_type: string | null;
         top_content: string | null;
-      }[]).map((r) => ({
-        serverUserId: r.server_user_id,
-        username: r.username,
-        identityName: r.identity_name,
-        thumbUrl: r.thumb_url,
-        serverId: r.server_id,
-        trustScore: r.trust_score,
-        playCount: r.play_count,
-        watchTimeHours: Math.round((Number(r.watch_time_ms) / (1000 * 60 * 60)) * 10) / 10,
-        topMediaType: r.top_media_type,
-        topContent: r.top_content,
-      }));
+      }[]
+    ).map((r) => ({
+      serverUserId: r.server_user_id,
+      username: r.username,
+      identityName: r.identity_name,
+      thumbUrl: r.thumb_url,
+      serverId: r.server_id,
+      trustScore: r.trust_score,
+      playCount: r.play_count,
+      watchTimeHours: Math.round((Number(r.watch_time_ms) / (1000 * 60 * 60)) * 10) / 10,
+      topMediaType: r.top_media_type,
+      topContent: r.top_content,
+    }));
 
-      return { data: topUsers };
-    }
-  );
+    return { data: topUsers };
+  });
 };

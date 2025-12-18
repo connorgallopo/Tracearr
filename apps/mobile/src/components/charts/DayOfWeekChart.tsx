@@ -33,12 +33,9 @@ export function DayOfWeekChart({ data, height = 180 }: DayOfWeekChartProps) {
   } | null>(null);
 
   // Sync SharedValue changes to React state
-  const updateDisplayValue = useCallback(
-    (day: number, count: number) => {
-      setDisplayValue({ day: Math.round(day), count: Math.round(count) });
-    },
-    []
-  );
+  const updateDisplayValue = useCallback((day: number, count: number) => {
+    setDisplayValue({ day: Math.round(day), count: Math.round(count) });
+  }, []);
 
   const clearDisplayValue = useCallback(() => {
     setDisplayValue(null);
@@ -77,9 +74,7 @@ export function DayOfWeekChart({ data, height = 180 }: DayOfWeekChartProps) {
   }
 
   // Find the selected day name from React state
-  const selectedDay = displayValue
-    ? chartData.find((d) => d.x === displayValue.day)
-    : null;
+  const selectedDay = displayValue ? chartData.find((d) => d.x === displayValue.day) : null;
 
   return (
     <View style={[styles.container, { height }]}>
@@ -117,9 +112,7 @@ export function DayOfWeekChart({ data, height = 180 }: DayOfWeekChartProps) {
               roundedCorners={{ topLeft: 4, topRight: 4 }}
               animate={{ type: 'timing', duration: 500 }}
             />
-            {isActive && (
-              <ToolTip x={state.x.position} y={state.y.count.position} />
-            )}
+            {isActive && <ToolTip x={state.x.position} y={state.y.count.position} />}
           </>
         )}
       </CartesianChart>

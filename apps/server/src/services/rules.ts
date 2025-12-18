@@ -268,7 +268,10 @@ export class RuleEngine {
   ): RuleEvaluationResult {
     // Handle backwards compatibility: old rules have blockedCountries, new rules have mode + countries
     const mode = params.mode ?? 'blocklist';
-    const countries = params.countries ?? (params as unknown as { blockedCountries?: string[] }).blockedCountries ?? [];
+    const countries =
+      params.countries ??
+      (params as unknown as { blockedCountries?: string[] }).blockedCountries ??
+      [];
 
     if (!session.geoCountry || countries.length === 0) {
       return { violated: false, severity: 'low', data: {} };

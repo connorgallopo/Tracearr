@@ -22,10 +22,7 @@ import { beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { installMatchers } from '@tracearr/test-utils/matchers';
 import { resetAllFactoryCounters } from '@tracearr/test-utils/factories';
 import { resetAllMocks } from '@tracearr/test-utils/mocks';
-import {
-  setupIntegrationTests,
-  resetDatabaseBeforeEach,
-} from '@tracearr/test-utils/vitest.setup';
+import { setupIntegrationTests, resetDatabaseBeforeEach } from '@tracearr/test-utils/vitest.setup';
 
 // Set test environment variables BEFORE any database imports
 process.env.NODE_ENV = 'test';

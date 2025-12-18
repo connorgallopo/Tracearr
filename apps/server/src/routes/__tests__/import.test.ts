@@ -30,7 +30,8 @@ vi.mock('../../services/tautulli.js', () => {
     this.getHistory = mockTautulliInstance.getHistory;
   });
   // Add static method
-  (MockTautulliService as unknown as { importHistory: ReturnType<typeof vi.fn> }).importHistory = vi.fn();
+  (MockTautulliService as unknown as { importHistory: ReturnType<typeof vi.fn> }).importHistory =
+    vi.fn();
   return { TautulliService: MockTautulliService };
 });
 

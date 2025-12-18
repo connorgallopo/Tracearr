@@ -98,9 +98,7 @@
         "mobile_sessions_refresh_token_hash_unique": {
           "name": "mobile_sessions_refresh_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "refresh_token_hash"
-          ]
+          "columns": ["refresh_token_hash"]
         }
       },
       "policies": {},
@@ -152,9 +150,7 @@
         "mobile_tokens_token_hash_unique": {
           "name": "mobile_tokens_token_hash_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token_hash"
-          ]
+          "columns": ["token_hash"]
         }
       },
       "policies": {},
@@ -339,12 +335,8 @@
           "name": "notification_preferences_mobile_session_id_mobile_sessions_id_fk",
           "tableFrom": "notification_preferences",
           "tableTo": "mobile_sessions",
-          "columnsFrom": [
-            "mobile_session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["mobile_session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -354,9 +346,7 @@
         "notification_preferences_mobile_session_id_unique": {
           "name": "notification_preferences_mobile_session_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "mobile_session_id"
-          ]
+          "columns": ["mobile_session_id"]
         }
       },
       "policies": {},
@@ -457,12 +447,8 @@
           "name": "rules_server_user_id_server_users_id_fk",
           "tableFrom": "rules",
           "tableTo": "server_users",
-          "columnsFrom": [
-            "server_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["server_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -650,12 +636,8 @@
           "name": "server_users_user_id_users_id_fk",
           "tableFrom": "server_users",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -663,12 +645,8 @@
           "name": "server_users_server_id_servers_id_fk",
           "tableFrom": "server_users",
           "tableTo": "servers",
-          "columnsFrom": [
-            "server_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["server_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1252,12 +1230,8 @@
           "name": "sessions_server_id_servers_id_fk",
           "tableFrom": "sessions",
           "tableTo": "servers",
-          "columnsFrom": [
-            "server_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["server_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1265,12 +1239,8 @@
           "name": "sessions_server_user_id_server_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "server_users",
-          "columnsFrom": [
-            "server_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["server_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1660,12 +1630,8 @@
           "name": "violations_rule_id_rules_id_fk",
           "tableFrom": "violations",
           "tableTo": "rules",
-          "columnsFrom": [
-            "rule_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["rule_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1673,12 +1639,8 @@
           "name": "violations_server_user_id_server_users_id_fk",
           "tableFrom": "violations",
           "tableTo": "server_users",
-          "columnsFrom": [
-            "server_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["server_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1686,12 +1648,8 @@
           "name": "violations_session_id_sessions_id_fk",
           "tableFrom": "violations",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

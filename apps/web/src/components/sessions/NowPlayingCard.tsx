@@ -107,7 +107,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   return (
     <div
       className={cn(
-        'group relative animate-fade-in overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/10',
+        'group animate-fade-in bg-card hover:shadow-primary/10 relative overflow-hidden rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg',
         onClick && 'cursor-pointer'
       )}
       onClick={onClick}
@@ -123,7 +123,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
       {/* Content */}
       <div className="relative flex gap-4 p-4">
         {/* Poster */}
-        <div className="relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted shadow-lg">
+        <div className="bg-muted relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg shadow-lg">
           {posterUrl ? (
             <img
               src={posterUrl}
@@ -133,7 +133,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <Server className="h-8 w-8 text-muted-foreground" />
+              <Server className="text-muted-foreground h-8 w-8" />
             </div>
           )}
 
@@ -157,7 +157,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
           {/* Top row: User and badges */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Avatar className="h-7 w-7 border-2 border-background shadow">
+              <Avatar className="border-background h-7 w-7 border-2 shadow">
                 <AvatarImage src={avatarUrl} alt={session.user.username} />
                 <AvatarFallback className="text-xs">
                   {session.user.username.slice(0, 2).toUpperCase()}
@@ -172,10 +172,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
               {/* Quality badge */}
               <Badge
                 variant={session.isTranscode ? 'secondary' : 'default'}
-                className={cn(
-                  'text-xs',
-                  !session.isTranscode && 'bg-green-600 hover:bg-green-700'
-                )}
+                className={cn('text-xs', !session.isTranscode && 'bg-green-600 hover:bg-green-700')}
               >
                 {session.isTranscode ? (
                   <>
@@ -190,8 +187,8 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
               </Badge>
 
               {/* Device icon */}
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted">
-                <DeviceIcon session={session} className="h-3.5 w-3.5 text-muted-foreground" />
+              <div className="bg-muted flex h-6 w-6 items-center justify-center rounded-md">
+                <DeviceIcon session={session} className="text-muted-foreground h-3.5 w-3.5" />
               </div>
 
               {/* Terminate button - admin/owner only */}
@@ -199,7 +196,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowTerminateDialog(true);
@@ -214,16 +211,16 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
 
           {/* Middle: Title */}
           <div className="mt-2">
-            <h3 className="truncate text-sm font-semibold leading-tight">{title}</h3>
+            <h3 className="truncate text-sm leading-tight font-semibold">{title}</h3>
             {subtitle && (
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">{subtitle}</p>
+              <p className="text-muted-foreground mt-0.5 truncate text-xs">{subtitle}</p>
             )}
           </div>
 
           {/* Bottom: Progress */}
           <div className="mt-3 space-y-1">
             <Progress value={progressPercent} className="h-1.5" />
-            <div className="flex justify-between text-[10px] text-muted-foreground">
+            <div className="text-muted-foreground flex justify-between text-[10px]">
               <span>{formatDuration(estimatedProgressMs)}</span>
               <span>
                 {isPaused ? (
@@ -240,11 +237,11 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
       </div>
 
       {/* Location/Quality footer */}
-      <div className="relative flex items-center justify-between border-t bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
+      <div className="bg-muted/50 text-muted-foreground relative flex items-center justify-between border-t px-4 py-2 text-xs">
         <span className="truncate">
           {session.geoCity && session.geoCountry
             ? `${session.geoCity}, ${session.geoCountry}`
-            : session.geoCountry ?? 'Unknown location'}
+            : (session.geoCountry ?? 'Unknown location')}
         </span>
         <span className="flex-shrink-0">{session.quality ?? 'Unknown quality'}</span>
       </div>

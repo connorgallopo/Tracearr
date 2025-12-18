@@ -28,7 +28,7 @@ function buildServerFilterSql(
     } else if (authUser.serverIds.length === 1) {
       return sql`AND server_id = ${authUser.serverIds[0]}`;
     } else {
-      const serverIdList = authUser.serverIds.map(id => sql`${id}`);
+      const serverIdList = authUser.serverIds.map((id) => sql`${id}`);
       return sql`AND server_id IN (${sql.join(serverIdList, sql`, `)})`;
     }
   }
@@ -43,39 +43,34 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
    * - Movies: Grouped by movie title
    * - Shows: Aggregated by series (grandparent_title), counting total episode plays
    */
-  app.get(
-    '/top-content',
-    { preHandler: [app.authenticate] },
-    async (request, reply) => {
-      const query = statsQuerySchema.safeParse(request.query);
-      if (!query.success) {
-        return reply.badRequest('Invalid query parameters');
+  app.get('/top-content', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const query = statsQuerySchema.safeParse(request.query);
+    if (!query.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
+
+    const { period, startDate, endDate, serverId } = query.data;
+    const authUser = request.user;
+    const dateRange = resolveDateRange(period, startDate, endDate);
+
+    // Validate server access if specific server requested
+    if (serverId) {
+      const error = validateServerAccess(authUser, serverId);
+      if (error) {
+        return reply.forbidden(error);
       }
+    }
 
-      const { period, startDate, endDate, serverId } = query.data;
-      const authUser = request.user;
-      const dateRange = resolveDateRange(period, startDate, endDate);
+    const serverFilter = buildServerFilterSql(serverId, authUser);
 
-      // Validate server access if specific server requested
-      if (serverId) {
-        const error = validateServerAccess(authUser, serverId);
-        if (error) {
-          return reply.forbidden(error);
-        }
-      }
+    // For all-time queries, we need a base WHERE clause
+    const startDateFilter = dateRange.start ? sql`started_at >= ${dateRange.start}` : sql`true`;
+    const customEndFilter = period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``;
 
-      const serverFilter = buildServerFilterSql(serverId, authUser);
-
-      // For all-time queries, we need a base WHERE clause
-      const startDateFilter = dateRange.start
-        ? sql`started_at >= ${dateRange.start}`
-        : sql`true`;
-      const customEndFilter = period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``;
-
-      // Run both queries in parallel for better performance
-      const [moviesResult, showsResult] = await Promise.all([
-        // Query top movies (media_type = 'movie')
-        db.execute(sql`
+    // Run both queries in parallel for better performance
+    const [moviesResult, showsResult] = await Promise.all([
+      // Query top movies (media_type = 'movie')
+      db.execute(sql`
           SELECT
             media_title,
             year,
@@ -92,8 +87,8 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
           ORDER BY play_count DESC
           LIMIT 10
         `),
-        // Query top TV shows (aggregate by series using grandparent_title)
-        db.execute(sql`
+      // Query top TV shows (aggregate by series using grandparent_title)
+      db.execute(sql`
           SELECT
             grandparent_title,
             MAX(year) as year,
@@ -111,9 +106,10 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
           ORDER BY play_count DESC
           LIMIT 10
         `),
-      ]);
+    ]);
 
-      const movies = (moviesResult.rows as {
+    const movies = (
+      moviesResult.rows as {
         media_title: string;
         year: number | null;
         play_count: number;
@@ -121,18 +117,20 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         thumb_path: string | null;
         server_id: string | null;
         rating_key: string | null;
-      }[]).map((m) => ({
-        title: m.media_title,
-        type: 'movie' as const,
-        year: m.year,
-        playCount: m.play_count,
-        watchTimeHours: Math.round((Number(m.total_watch_ms) / (1000 * 60 * 60)) * 10) / 10,
-        thumbPath: m.thumb_path,
-        serverId: m.server_id,
-        ratingKey: m.rating_key,
-      }));
+      }[]
+    ).map((m) => ({
+      title: m.media_title,
+      type: 'movie' as const,
+      year: m.year,
+      playCount: m.play_count,
+      watchTimeHours: Math.round((Number(m.total_watch_ms) / (1000 * 60 * 60)) * 10) / 10,
+      thumbPath: m.thumb_path,
+      serverId: m.server_id,
+      ratingKey: m.rating_key,
+    }));
 
-      const shows = (showsResult.rows as {
+    const shows = (
+      showsResult.rows as {
         grandparent_title: string;
         year: number | null;
         play_count: number;
@@ -141,37 +139,33 @@ export const contentRoutes: FastifyPluginAsync = async (app) => {
         thumb_path: string | null;
         server_id: string | null;
         rating_key: string | null;
-      }[]).map((s) => ({
-        title: s.grandparent_title, // Series name
-        type: 'episode' as const,
-        year: s.year,
-        playCount: s.play_count,
-        episodeCount: s.episode_count, // Number of unique episodes watched
-        watchTimeHours: Math.round((Number(s.total_watch_ms) / (1000 * 60 * 60)) * 10) / 10,
-        thumbPath: s.thumb_path,
-        serverId: s.server_id,
-        ratingKey: s.rating_key,
-      }));
+      }[]
+    ).map((s) => ({
+      title: s.grandparent_title, // Series name
+      type: 'episode' as const,
+      year: s.year,
+      playCount: s.play_count,
+      episodeCount: s.episode_count, // Number of unique episodes watched
+      watchTimeHours: Math.round((Number(s.total_watch_ms) / (1000 * 60 * 60)) * 10) / 10,
+      thumbPath: s.thumb_path,
+      serverId: s.server_id,
+      ratingKey: s.rating_key,
+    }));
 
-      return { movies, shows };
-    }
-  );
+    return { movies, shows };
+  });
 
   /**
    * GET /libraries - Library counts (placeholder - would need library sync)
    */
-  app.get(
-    '/libraries',
-    { preHandler: [app.authenticate] },
-    async () => {
-      // In a real implementation, we'd sync library counts from servers
-      // For now, return a placeholder
-      return {
-        movies: 0,
-        shows: 0,
-        episodes: 0,
-        tracks: 0,
-      };
-    }
-  );
+  app.get('/libraries', { preHandler: [app.authenticate] }, async () => {
+    // In a real implementation, we'd sync library counts from servers
+    // For now, return a placeholder
+    return {
+      movies: 0,
+      shows: 0,
+      episodes: 0,
+      tracks: 0,
+    };
+  });
 };

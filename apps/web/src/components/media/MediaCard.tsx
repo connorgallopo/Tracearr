@@ -29,7 +29,12 @@ function MediaIcon({ type, className }: { type: string; className?: string }) {
   }
 }
 
-function getImageUrl(serverId: string | null | undefined, thumbPath: string | null | undefined, width = 300, height = 450) {
+function getImageUrl(
+  serverId: string | null | undefined,
+  thumbPath: string | null | undefined,
+  width = 300,
+  height = 450
+) {
   if (!serverId || !thumbPath) return null;
   return `/api/v1/images/proxy?server=${serverId}&url=${encodeURIComponent(thumbPath)}&width=${width}&height=${height}&fallback=poster`;
 }
@@ -55,15 +60,15 @@ export function MediaCard({
   const subtitle = episodeCount
     ? `${episodeCount} episodes • ${year || ''}`
     : type === 'episode'
-    ? title
-    : year
-    ? `(${year})`
-    : '';
+      ? title
+      : year
+        ? `(${year})`
+        : '';
 
   return (
     <div
       className={cn(
-        'group relative animate-fade-in-up overflow-hidden rounded-xl border bg-card transition-all duration-300 hover:shadow-lg hover:shadow-primary/10',
+        'group animate-fade-in-up bg-card hover:shadow-primary/10 relative overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg',
         className
       )}
     >
@@ -75,12 +80,12 @@ export function MediaCard({
           backgroundColor: bgImageUrl ? undefined : 'hsl(var(--muted))',
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
+      <div className="from-card via-card/80 absolute inset-0 bg-gradient-to-t to-transparent" />
 
       {/* Content */}
       <div className="relative flex gap-4 p-4">
         {/* Poster */}
-        <div className="relative h-36 w-24 shrink-0 overflow-hidden rounded-lg bg-muted shadow-lg transition-transform group-hover:scale-105">
+        <div className="bg-muted relative h-36 w-24 shrink-0 overflow-hidden rounded-lg shadow-lg transition-transform group-hover:scale-105">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -90,11 +95,11 @@ export function MediaCard({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <MediaIcon type={type} className="h-8 w-8 text-muted-foreground" />
+              <MediaIcon type={type} className="text-muted-foreground h-8 w-8" />
             </div>
           )}
           {rank && (
-            <div className="absolute -left-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-md">
+            <div className="bg-primary text-primary-foreground absolute -top-1 -left-1 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shadow-md">
               #{rank}
             </div>
           )}
@@ -103,23 +108,19 @@ export function MediaCard({
         {/* Info */}
         <div className="flex flex-1 flex-col justify-center">
           <div className="flex items-center gap-2">
-            <MediaIcon type={type} className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <MediaIcon type={type} className="text-muted-foreground h-4 w-4" />
+            <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               {type}
             </span>
           </div>
-          <h3 className="mt-1 text-lg font-semibold leading-tight">{displayTitle}</h3>
-          {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
-          )}
+          <h3 className="mt-1 text-lg leading-tight font-semibold">{displayTitle}</h3>
+          {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
           <div className="mt-3 flex items-center gap-4 text-sm">
             <div>
-              <span className="font-semibold text-primary">{playCount.toLocaleString()}</span>
-              <span className="ml-1 text-muted-foreground">plays</span>
+              <span className="text-primary font-semibold">{playCount.toLocaleString()}</span>
+              <span className="text-muted-foreground ml-1">plays</span>
             </div>
-            <div className="text-muted-foreground">
-              {watchTimeHours.toLocaleString()}h watched
-            </div>
+            <div className="text-muted-foreground">{watchTimeHours.toLocaleString()}h watched</div>
           </div>
         </div>
       </div>

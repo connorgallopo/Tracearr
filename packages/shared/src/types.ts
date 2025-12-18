@@ -12,7 +12,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, number> = {
   owner: 4,
   admin: 3,
   viewer: 2,
-  member: 1,  // Synced from media server, no Tracearr login until promoted
+  member: 1, // Synced from media server, no Tracearr login until promoted
   disabled: 0,
   pending: 0,
 } as const;
@@ -21,13 +21,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, number> = {
 const LOGIN_ROLES: UserRole[] = ['owner', 'admin', 'viewer'];
 
 // Role helper functions
-export const canLogin = (role: UserRole): boolean =>
-  LOGIN_ROLES.includes(role);
+export const canLogin = (role: UserRole): boolean => LOGIN_ROLES.includes(role);
 
-export const hasMinRole = (
-  userRole: UserRole,
-  required: 'owner' | 'admin' | 'viewer'
-): boolean => ROLE_PERMISSIONS[userRole] >= ROLE_PERMISSIONS[required];
+export const hasMinRole = (userRole: UserRole, required: 'owner' | 'admin' | 'viewer'): boolean =>
+  ROLE_PERMISSIONS[userRole] >= ROLE_PERMISSIONS[required];
 
 export const isOwner = (role: UserRole): boolean => role === 'owner';
 export const isActive = (role: UserRole): boolean => canLogin(role);
@@ -295,7 +292,9 @@ export interface ViolationSessionInfo {
 
 export interface ViolationWithDetails extends Violation {
   rule: Pick<Rule, 'id' | 'name' | 'type'>;
-  user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl' | 'serverId'> & { identityName: string | null };
+  user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl' | 'serverId'> & {
+    identityName: string | null;
+  };
   server?: Pick<Server, 'id' | 'name' | 'type'>;
   session?: ViolationSessionInfo;
   relatedSessions?: ViolationSessionInfo[];

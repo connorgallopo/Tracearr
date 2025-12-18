@@ -268,10 +268,7 @@ export interface IMediaServerClientWithHistory extends IMediaServerClient {
    * Get watch history
    * @param options - Optional filters for history retrieval
    */
-  getWatchHistory(options?: {
-    userId?: string;
-    limit?: number;
-  }): Promise<MediaWatchHistoryItem[]>;
+  getWatchHistory(options?: { userId?: string; limit?: number }): Promise<MediaWatchHistoryItem[]>;
 }
 
 // ============================================================================

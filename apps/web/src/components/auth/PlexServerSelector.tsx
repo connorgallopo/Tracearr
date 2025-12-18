@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents -- eslint can't resolve @tracearr/shared types but TS compiles fine */
 import { useState } from 'react';
-import { Monitor, Wifi, Globe, Check, X, Loader2, ChevronDown, ChevronRight, Lock, Edit3, AlertTriangle } from 'lucide-react';
+import {
+  Monitor,
+  Wifi,
+  Globe,
+  Check,
+  X,
+  Loader2,
+  ChevronDown,
+  ChevronRight,
+  Lock,
+  Edit3,
+  AlertTriangle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -57,14 +69,18 @@ export interface PlexServerSelectorProps {
 /**
  * Type guard to check if a server has discovery info (tested connections)
  */
-function isDiscoveredServer(server: PlexDiscoveredServer | PlexServerInfo): server is PlexDiscoveredServer {
+function isDiscoveredServer(
+  server: PlexDiscoveredServer | PlexServerInfo
+): server is PlexDiscoveredServer {
   return 'recommendedUri' in server;
 }
 
 /**
  * Type guard to check if a connection has test results
  */
-function isDiscoveredConnection(conn: PlexDiscoveredConnection | PlexServerConnection): conn is PlexDiscoveredConnection {
+function isDiscoveredConnection(
+  conn: PlexDiscoveredConnection | PlexServerConnection
+): conn is PlexDiscoveredConnection {
   return 'reachable' in conn;
 }
 
@@ -102,7 +118,7 @@ export function PlexServerSelector({
   const [customUrl, setCustomUrl] = useState('');
 
   const toggleExpanded = (clientIdentifier: string) => {
-    setExpandedServers(prev => {
+    setExpandedServers((prev) => {
       const next = new Set(prev);
       if (next.has(clientIdentifier)) {
         next.delete(clientIdentifier);
@@ -114,7 +130,7 @@ export function PlexServerSelector({
   };
 
   const toggleShowAll = (clientIdentifier: string) => {
-    setShowAllConnections(prev => {
+    setShowAllConnections((prev) => {
       const next = new Set(prev);
       if (next.has(clientIdentifier)) {
         next.delete(clientIdentifier);
@@ -139,9 +155,7 @@ export function PlexServerSelector({
 
   const handleQuickConnect = (server: PlexDiscoveredServer | PlexServerInfo) => {
     // For discovered servers, use recommended URI; for basic, use first connection
-    const uri = isDiscoveredServer(server)
-      ? server.recommendedUri
-      : server.connections[0]?.uri;
+    const uri = isDiscoveredServer(server) ? server.recommendedUri : server.connections[0]?.uri;
 
     if (!uri) return;
 
@@ -157,10 +171,10 @@ export function PlexServerSelector({
 
   if (servers.length === 0) {
     return (
-      <div className={cn('text-center py-8 text-muted-foreground', className)}>
-        <Monitor className="mx-auto h-12 w-12 mb-3 opacity-50" />
+      <div className={cn('text-muted-foreground py-8 text-center', className)}>
+        <Monitor className="mx-auto mb-3 h-12 w-12 opacity-50" />
         <p>No Plex servers found</p>
-        <p className="text-sm mt-1">Make sure you own at least one Plex server</p>
+        <p className="mt-1 text-sm">Make sure you own at least one Plex server</p>
       </div>
     );
   }
@@ -178,28 +192,25 @@ export function PlexServerSelector({
 
         // For discovered servers, find recommended connection
         const recommendedConn = isDiscovered
-          ? server.connections.find(c => c.uri === server.recommendedUri)
+          ? server.connections.find((c) => c.uri === server.recommendedUri)
           : null;
 
         // Count reachable connections for discovered servers
         const reachableCount = isDiscovered
-          ? server.connections.filter(c => c.reachable).length
+          ? server.connections.filter((c) => c.reachable).length
           : server.connections.length;
 
         return (
-          <div
-            key={clientId}
-            className="rounded-lg border bg-card p-4"
-          >
+          <div key={clientId} className="bg-card rounded-lg border p-4">
             {/* Server Header */}
             <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
                   <Monitor className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-medium truncate">{server.name}</h3>
-                  <p className="text-xs text-muted-foreground">
+                  <h3 className="truncate font-medium">{server.name}</h3>
+                  <p className="text-muted-foreground text-xs">
                     {server.platform} • v{server.version}
                   </p>
                 </div>
@@ -207,14 +218,10 @@ export function PlexServerSelector({
 
               {/* Quick Connect Button */}
               {hasRecommended && (
-                <Button
-                  size="sm"
-                  onClick={() => handleQuickConnect(server)}
-                  disabled={connecting}
-                >
+                <Button size="sm" onClick={() => handleQuickConnect(server)} disabled={connecting}>
                   {isConnecting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                       Connecting...
                     </>
                   ) : (
@@ -225,9 +232,7 @@ export function PlexServerSelector({
 
               {/* No recommended - need to select manually */}
               {isDiscovered && !hasRecommended && (
-                <span className="text-xs text-muted-foreground">
-                  No reachable connections
-                </span>
+                <span className="text-muted-foreground text-xs">No reachable connections</span>
               )}
             </div>
 
@@ -236,10 +241,11 @@ export function PlexServerSelector({
               <div className="mt-3 flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-500" />
                 <span className="text-muted-foreground">
-                  {recommendedConn.local ? 'Local' : 'Remote'}: {recommendedConn.address}:{recommendedConn.port}
+                  {recommendedConn.local ? 'Local' : 'Remote'}: {recommendedConn.address}:
+                  {recommendedConn.port}
                 </span>
                 {recommendedConn.latencyMs !== null && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     ({formatLatency(recommendedConn.latencyMs)})
                   </span>
                 )}
@@ -251,7 +257,7 @@ export function PlexServerSelector({
               <button
                 type="button"
                 onClick={() => toggleExpanded(clientId)}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
               >
                 {isExpanded ? (
                   <ChevronDown className="h-3 w-3" />
@@ -319,7 +325,7 @@ export function PlexServerSelector({
                     }
                   }}
                   disabled={connecting}
-                  className="flex-1 h-8 text-sm"
+                  className="h-8 flex-1 text-sm"
                 />
                 <Button
                   size="sm"
@@ -333,7 +339,7 @@ export function PlexServerSelector({
 
             {/* Expanded Connection List */}
             {isExpanded && (
-              <div className="mt-3 space-y-1.5 pl-2 border-l-2 border-muted">
+              <div className="border-muted mt-3 space-y-1.5 border-l-2 pl-2">
                 {server.connections.map((conn) => {
                   const isDiscoveredConn = isDiscoveredConnection(conn);
                   const isReachable = isDiscoveredConn ? conn.reachable : true;
@@ -348,15 +354,15 @@ export function PlexServerSelector({
                       onClick={() => canClick && handleConnectionSelect(server, conn)}
                       disabled={connecting || !canClick}
                       className={cn(
-                        'w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors',
+                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors',
                         canClick
                           ? 'hover:bg-muted cursor-pointer'
-                          : 'opacity-50 cursor-not-allowed',
+                          : 'cursor-not-allowed opacity-50',
                         !isReachable && canClick && 'opacity-70',
-                        isRecommended && 'bg-muted/50 ring-1 ring-primary/20'
+                        isRecommended && 'bg-muted/50 ring-primary/20 ring-1'
                       )}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex min-w-0 items-center gap-2">
                         {/* Reachability indicator */}
                         {isDiscoveredConn ? (
                           conn.reachable ? (
@@ -377,7 +383,7 @@ export function PlexServerSelector({
 
                         {/* Secure badge for HTTPS */}
                         {conn.uri.startsWith('https://') && (
-                          <span className="flex-shrink-0 inline-flex items-center gap-0.5 text-xs text-green-600 dark:text-green-500 font-medium">
+                          <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
                             <Lock className="h-3 w-3" />
                             Secure
                           </span>
@@ -385,7 +391,7 @@ export function PlexServerSelector({
 
                         {/* Unreachable warning when shown via "Show all" */}
                         {!isReachable && showingAll && (
-                          <span className="flex-shrink-0 inline-flex items-center gap-0.5 text-xs text-amber-600 dark:text-amber-500 font-medium">
+                          <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-amber-600 dark:text-amber-500">
                             <AlertTriangle className="h-3 w-3" />
                             May not connect
                           </span>
@@ -393,7 +399,7 @@ export function PlexServerSelector({
 
                         {/* Recommended badge */}
                         {isRecommended && (
-                          <span className="flex-shrink-0 text-xs text-primary font-medium">
+                          <span className="text-primary flex-shrink-0 text-xs font-medium">
                             Recommended
                           </span>
                         )}
@@ -401,7 +407,7 @@ export function PlexServerSelector({
 
                       {/* Latency */}
                       {isDiscoveredConn && conn.reachable && conn.latencyMs !== null && (
-                        <span className="flex-shrink-0 text-xs text-muted-foreground">
+                        <span className="text-muted-foreground flex-shrink-0 text-xs">
                           {formatLatency(conn.latencyMs)}
                         </span>
                       )}
@@ -433,7 +439,7 @@ export function PlexServerSelector({
                         {conn.local ? 'Local' : 'Remote'}: {conn.address}:{conn.port}
                       </span>
                       {conn.uri.startsWith('https://') && (
-                        <span className="inline-flex items-center gap-0.5 text-xs text-green-600 dark:text-green-500 font-medium">
+                        <span className="inline-flex items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
                           <Lock className="h-3 w-3" />
                           Secure
                         </span>
@@ -446,7 +452,7 @@ export function PlexServerSelector({
                   <button
                     type="button"
                     onClick={() => toggleExpanded(clientId)}
-                    className="w-full text-xs text-muted-foreground hover:text-foreground py-1"
+                    className="text-muted-foreground hover:text-foreground w-full py-1 text-xs"
                   >
                     +{server.connections.length - 2} more connections
                   </button>
@@ -459,7 +465,7 @@ export function PlexServerSelector({
 
       {/* Connecting status */}
       {connectingToServer && (
-        <div className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-center gap-2 py-3 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" />
           Connecting to {connectingToServer}...
         </div>
@@ -467,12 +473,7 @@ export function PlexServerSelector({
 
       {/* Cancel button */}
       {showCancel && onCancel && (
-        <Button
-          variant="ghost"
-          className="w-full"
-          onClick={onCancel}
-          disabled={connecting}
-        >
+        <Button variant="ghost" className="w-full" onClick={onCancel} disabled={connecting}>
           Cancel
         </Button>
       )}

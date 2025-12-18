@@ -60,17 +60,9 @@ interface UUIDMatchers<R = unknown> {
 declare module 'vitest' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Assertion<T>
-    extends HTTPMatchers,
-      ValidationMatchers,
-      DateMatchers,
-      ArrayMatchers,
-      UUIDMatchers {}
+    extends HTTPMatchers, ValidationMatchers, DateMatchers, ArrayMatchers, UUIDMatchers {}
   interface AsymmetricMatchersContaining
-    extends HTTPMatchers,
-      ValidationMatchers,
-      DateMatchers,
-      ArrayMatchers,
-      UUIDMatchers {}
+    extends HTTPMatchers, ValidationMatchers, DateMatchers, ArrayMatchers, UUIDMatchers {}
 }
 
 /**
@@ -221,8 +213,7 @@ export function installMatchers(): void {
       if (!isValidationError) {
         return {
           pass: false,
-          message: () =>
-            `Expected a validation error response (400/422), but got status ${status}`,
+          message: () => `Expected a validation error response (400/422), but got status ${status}`,
         };
       }
 
@@ -398,7 +389,8 @@ export function installMatchers(): void {
 
     // UUID Matcher
     toBeUUID(received: unknown) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       const pass = typeof received === 'string' && uuidRegex.test(received);
 
       return {

@@ -29,11 +29,11 @@ export function Setup() {
 
   // Show loading while checking auth
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="bg-background flex min-h-screen items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <LogoIcon className="h-16 w-16 animate-pulse" />
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Loading...</p>
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        <p className="text-muted-foreground text-sm">Loading...</p>
       </div>
     </div>
   );

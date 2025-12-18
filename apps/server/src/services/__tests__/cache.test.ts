@@ -307,14 +307,20 @@ describe('CacheService', () => {
     it('should invalidate dashboard stats when setting sessions', async () => {
       // Set up timezone-specific dashboard stats (as used in production)
       redis.store.set('tracearr:stats:dashboard:UTC', JSON.stringify({ activeStreams: 1 }));
-      redis.store.set('tracearr:stats:dashboard:America/New_York', JSON.stringify({ activeStreams: 1 }));
+      redis.store.set(
+        'tracearr:stats:dashboard:America/New_York',
+        JSON.stringify({ activeStreams: 1 })
+      );
 
       await cache.setActiveSessions([sampleSession] as never);
 
       // Should have called keys to find timezone-specific stats
       expect(redis.keys).toHaveBeenCalledWith('tracearr:stats:dashboard:*');
       // Should have deleted the matched keys
-      expect(redis.del).toHaveBeenCalledWith('tracearr:stats:dashboard:UTC', 'tracearr:stats:dashboard:America/New_York');
+      expect(redis.del).toHaveBeenCalledWith(
+        'tracearr:stats:dashboard:UTC',
+        'tracearr:stats:dashboard:America/New_York'
+      );
     });
 
     it('should return null on JSON parse error', async () => {
@@ -748,9 +754,7 @@ describe('CacheService', () => {
     });
 
     it('should not fail when no changes', async () => {
-      await expect(
-        cache.incrementalSyncActiveSessions([], [], [])
-      ).resolves.not.toThrow();
+      await expect(cache.incrementalSyncActiveSessions([], [], [])).resolves.not.toThrow();
     });
   });
 

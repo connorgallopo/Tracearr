@@ -8,7 +8,11 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
-import { SERVER_STATS_CONFIG, type ServerResourceDataPoint, type ServerResourceStats } from '@tracearr/shared';
+import {
+  SERVER_STATS_CONFIG,
+  type ServerResourceDataPoint,
+  type ServerResourceStats,
+} from '@tracearr/shared';
 import { api } from '@/lib/api';
 
 /**
@@ -78,28 +82,29 @@ export function useServerStatistics(serverId: string | undefined, enabled: boole
     // Keep previous data while fetching new
     placeholderData: (prev) => prev,
     // Data is fresh until next poll
-    staleTime: (SERVER_STATS_CONFIG.POLL_INTERVAL_SECONDS * 1000) - 500,
+    staleTime: SERVER_STATS_CONFIG.POLL_INTERVAL_SECONDS * 1000 - 500,
   });
 
   // Calculate averages from windowed data
   const dataPoints = query.data?.data;
   const dataLength = dataPoints?.length ?? 0;
-  const averages = dataPoints && dataLength > 0
-    ? {
-        hostCpu: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.hostCpuUtilization, 0) / dataLength
-        ),
-        processCpu: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.processCpuUtilization, 0) / dataLength
-        ),
-        hostMemory: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.hostMemoryUtilization, 0) / dataLength
-        ),
-        processMemory: Math.round(
-          dataPoints.reduce((sum: number, p) => sum + p.processMemoryUtilization, 0) / dataLength
-        ),
-      }
-    : null;
+  const averages =
+    dataPoints && dataLength > 0
+      ? {
+          hostCpu: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.hostCpuUtilization, 0) / dataLength
+          ),
+          processCpu: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.processCpuUtilization, 0) / dataLength
+          ),
+          hostMemory: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.hostMemoryUtilization, 0) / dataLength
+          ),
+          processMemory: Math.round(
+            dataPoints.reduce((sum: number, p) => sum + p.processMemoryUtilization, 0) / dataLength
+          ),
+        }
+      : null;
 
   // Get latest values (most recent data point)
   const lastDataPoint = query.data?.data?.[query.data.data.length - 1];

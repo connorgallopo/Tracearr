@@ -190,7 +190,7 @@ export async function terminateSession(
 export async function getTerminationLogs(
   serverId: string,
   options?: { limit?: number }
-): Promise<typeof terminationLogs.$inferSelect[]> {
+): Promise<(typeof terminationLogs.$inferSelect)[]> {
   return db.query.terminationLogs.findMany({
     where: eq(terminationLogs.serverId, serverId),
     orderBy: [desc(terminationLogs.createdAt)],
@@ -209,7 +209,7 @@ export async function getTerminationLogs(
  */
 export async function getSessionTerminationLogs(
   sessionId: string
-): Promise<typeof terminationLogs.$inferSelect[]> {
+): Promise<(typeof terminationLogs.$inferSelect)[]> {
   return db.query.terminationLogs.findMany({
     where: eq(terminationLogs.sessionId, sessionId),
     orderBy: [desc(terminationLogs.createdAt)],

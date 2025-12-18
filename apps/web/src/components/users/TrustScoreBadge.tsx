@@ -20,11 +20,7 @@ function getTrustLevel(score: number): {
   return { variant: 'danger', label: 'Untrusted' };
 }
 
-export function TrustScoreBadge({
-  score,
-  showLabel = false,
-  className,
-}: TrustScoreBadgeProps) {
+export function TrustScoreBadge({ score, showLabel = false, className }: TrustScoreBadgeProps) {
   const { variant, label } = getTrustLevel(score);
 
   return (

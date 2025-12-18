@@ -3,7 +3,14 @@
  * Shows comprehensive user information with web feature parity
  * Query keys include selectedServerId for proper cache isolation per media server
  */
-import { View, ScrollView, RefreshControl, Pressable, ActivityIndicator, Image } from 'react-native';
+import {
+  View,
+  ScrollView,
+  RefreshControl,
+  Pressable,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -96,7 +103,7 @@ function TrustScoreBadge({ score, showLabel = false }: { score: number; showLabe
     <View className="flex-row items-center gap-2">
       <View
         className={cn(
-          'px-2.5 py-1 rounded-md min-w-[45px] items-center',
+          'min-w-[45px] items-center rounded-md px-2.5 py-1',
           variant === 'destructive' && 'bg-destructive/20',
           variant === 'warning' && 'bg-warning/20',
           variant === 'success' && 'bg-success/20'
@@ -113,27 +120,30 @@ function TrustScoreBadge({ score, showLabel = false }: { score: number; showLabe
           {score}
         </Text>
       </View>
-      {showLabel && (
-        <Text className="text-sm text-muted-foreground">{label} Trust</Text>
-      )}
+      {showLabel && <Text className="text-muted-foreground text-sm">{label} Trust</Text>}
     </View>
   );
 }
 
-function StatCard({ icon: Icon, label, value, subValue }: {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+}: {
   icon: LucideIcon;
   label: string;
   value: string | number;
   subValue?: string;
 }) {
   return (
-    <View className="flex-1 bg-surface rounded-lg p-3 border border-border">
-      <View className="flex-row items-center gap-2 mb-1">
+    <View className="bg-surface border-border flex-1 rounded-lg border p-3">
+      <View className="mb-1 flex-row items-center gap-2">
         <Icon size={14} color={colors.text.muted.dark} />
-        <Text className="text-xs text-muted-foreground">{label}</Text>
+        <Text className="text-muted-foreground text-xs">{label}</Text>
       </View>
       <Text className="text-xl font-bold">{value}</Text>
-      {subValue && <Text className="text-xs text-muted-foreground mt-0.5">{subValue}</Text>}
+      {subValue && <Text className="text-muted-foreground mt-0.5 text-xs">{subValue}</Text>}
     </View>
   );
 }
@@ -166,18 +176,18 @@ function formatDuration(ms: number | null): string {
 }
 
 function LocationCard({ location }: { location: UserLocation }) {
-  const locationText = [location.city, location.region, location.country]
-    .filter(Boolean)
-    .join(', ') || 'Unknown Location';
+  const locationText =
+    [location.city, location.region, location.country].filter(Boolean).join(', ') ||
+    'Unknown Location';
 
   return (
-    <View className="flex-row items-center gap-3 py-3 border-b border-border">
-      <View className="w-8 h-8 rounded-full bg-cyan-core/10 items-center justify-center">
+    <View className="border-border flex-row items-center gap-3 border-b py-3">
+      <View className="bg-cyan-core/10 h-8 w-8 items-center justify-center rounded-full">
         <MapPin size={16} color={colors.cyan.core} />
       </View>
       <View className="flex-1">
         <Text className="text-sm font-medium">{locationText}</Text>
-        <Text className="text-xs text-muted-foreground">
+        <Text className="text-muted-foreground text-xs">
           {location.sessionCount} {location.sessionCount === 1 ? 'session' : 'sessions'}
           {' • '}
           {safeFormatDistanceToNow(location.lastSeenAt)}
@@ -192,16 +202,16 @@ function DeviceCard({ device }: { device: UserDevice }) {
   const platform = device.platform || 'Unknown Platform';
 
   return (
-    <View className="flex-row items-center gap-3 py-3 border-b border-border">
-      <View className="w-8 h-8 rounded-full bg-cyan-core/10 items-center justify-center">
+    <View className="border-border flex-row items-center gap-3 border-b py-3">
+      <View className="bg-cyan-core/10 h-8 w-8 items-center justify-center rounded-full">
         <Smartphone size={16} color={colors.cyan.core} />
       </View>
       <View className="flex-1">
         <Text className="text-sm font-medium">{deviceName}</Text>
-        <Text className="text-xs text-muted-foreground">
+        <Text className="text-muted-foreground text-xs">
           {platform} • {device.sessionCount} {device.sessionCount === 1 ? 'session' : 'sessions'}
         </Text>
-        <Text className="text-xs text-muted-foreground">
+        <Text className="text-muted-foreground text-xs">
           Last seen {safeFormatDistanceToNow(device.lastSeenAt)}
         </Text>
       </View>
@@ -222,7 +232,15 @@ function getMediaIcon(mediaType: string): typeof Film {
   }
 }
 
-function SessionCard({ session, onPress, serverUrl }: { session: Session; onPress?: () => void; serverUrl: string | null }) {
+function SessionCard({
+  session,
+  onPress,
+  serverUrl,
+}: {
+  session: Session;
+  onPress?: () => void;
+  serverUrl: string | null;
+}) {
   const locationText = [session.geoCity, session.geoCountry].filter(Boolean).join(', ');
   const MediaIcon = getMediaIcon(session.mediaType);
 
@@ -243,10 +261,10 @@ function SessionCard({ session, onPress, serverUrl }: { session: Session; onPres
   const displayState = getDisplayState();
 
   return (
-    <Pressable onPress={onPress} className="py-3 border-b border-border active:opacity-70">
+    <Pressable onPress={onPress} className="border-border border-b py-3 active:opacity-70">
       <View className="flex-row">
         {/* Poster */}
-        <View className="w-10 h-14 rounded-md bg-surface overflow-hidden mr-3">
+        <View className="bg-surface mr-3 h-14 w-10 overflow-hidden rounded-md">
           {posterUrl ? (
             <Image
               source={{ uri: posterUrl }}
@@ -254,7 +272,7 @@ function SessionCard({ session, onPress, serverUrl }: { session: Session; onPres
               resizeMode="cover"
             />
           ) : (
-            <View className="w-full h-full items-center justify-center">
+            <View className="h-full w-full items-center justify-center">
               <MediaIcon size={18} color={colors.text.muted.dark} />
             </View>
           )}
@@ -262,30 +280,30 @@ function SessionCard({ session, onPress, serverUrl }: { session: Session; onPres
 
         {/* Content */}
         <View className="flex-1">
-          <View className="flex-row justify-between items-start mb-1">
-            <View className="flex-1 mr-2">
+          <View className="mb-1 flex-row items-start justify-between">
+            <View className="mr-2 flex-1">
               <Text className="text-sm font-medium" numberOfLines={1}>
                 {session.mediaTitle}
               </Text>
-              <Text className="text-xs text-muted-foreground capitalize">{session.mediaType}</Text>
+              <Text className="text-muted-foreground text-xs capitalize">{session.mediaType}</Text>
             </View>
-            <Badge variant={displayState.variant}>
-              {displayState.label}
-            </Badge>
+            <Badge variant={displayState.variant}>{displayState.label}</Badge>
           </View>
-          <View className="flex-row items-center gap-4 mt-1">
+          <View className="mt-1 flex-row items-center gap-4">
             <View className="flex-row items-center gap-1">
               <Clock size={12} color={colors.text.muted.dark} />
-              <Text className="text-xs text-muted-foreground">{formatDuration(session.durationMs)}</Text>
+              <Text className="text-muted-foreground text-xs">
+                {formatDuration(session.durationMs)}
+              </Text>
             </View>
             <View className="flex-row items-center gap-1">
               <Tv size={12} color={colors.text.muted.dark} />
-              <Text className="text-xs text-muted-foreground">{session.platform || 'Unknown'}</Text>
+              <Text className="text-muted-foreground text-xs">{session.platform || 'Unknown'}</Text>
             </View>
             {locationText && (
               <View className="flex-row items-center gap-1">
                 <Globe size={12} color={colors.text.muted.dark} />
-                <Text className="text-xs text-muted-foreground">{locationText}</Text>
+                <Text className="text-muted-foreground text-xs">{locationText}</Text>
               </View>
             )}
           </View>
@@ -308,31 +326,31 @@ function ViolationCard({
   const timeAgo = safeFormatDistanceToNow(violation.createdAt);
 
   return (
-    <View className="py-3 border-b border-border">
-      <View className="flex-row justify-between items-start mb-2">
-        <View className="flex-row items-center gap-2 flex-1">
-          <View className="w-7 h-7 rounded-md bg-surface items-center justify-center">
+    <View className="border-border border-b py-3">
+      <View className="mb-2 flex-row items-start justify-between">
+        <View className="flex-1 flex-row items-center gap-2">
+          <View className="bg-surface h-7 w-7 items-center justify-center rounded-md">
             <IconComponent size={14} color={colors.cyan.core} />
           </View>
           <View className="flex-1">
             <Text className="text-sm font-medium">{ruleName}</Text>
-            <Text className="text-xs text-muted-foreground">{timeAgo}</Text>
+            <Text className="text-muted-foreground text-xs">{timeAgo}</Text>
           </View>
         </View>
         <SeverityBadge severity={violation.severity} />
       </View>
       {!violation.acknowledgedAt ? (
         <Pressable
-          className="flex-row items-center justify-center gap-1.5 bg-cyan-core/15 py-2 rounded-md mt-2 active:opacity-70"
+          className="bg-cyan-core/15 mt-2 flex-row items-center justify-center gap-1.5 rounded-md py-2 active:opacity-70"
           onPress={onAcknowledge}
         >
           <Check size={14} color={colors.cyan.core} />
-          <Text className="text-xs font-semibold text-cyan-core">Acknowledge</Text>
+          <Text className="text-cyan-core text-xs font-semibold">Acknowledge</Text>
         </Pressable>
       ) : (
-        <View className="flex-row items-center gap-1.5 mt-2">
+        <View className="mt-2 flex-row items-center gap-1.5">
           <Check size={14} color={colors.success} />
-          <Text className="text-xs text-success">Acknowledged</Text>
+          <Text className="text-success text-xs">Acknowledged</Text>
         </View>
       )}
     </View>
@@ -344,10 +362,10 @@ function TerminationCard({ termination }: { termination: TerminationLogWithDetai
   const isManual = termination.trigger === 'manual';
 
   return (
-    <View className="py-3 border-b border-border">
-      <View className="flex-row justify-between items-start mb-2">
-        <View className="flex-row items-center gap-2 flex-1">
-          <View className="w-7 h-7 rounded-md bg-surface items-center justify-center">
+    <View className="border-border border-b py-3">
+      <View className="mb-2 flex-row items-start justify-between">
+        <View className="flex-1 flex-row items-center gap-2">
+          <View className="bg-surface h-7 w-7 items-center justify-center rounded-md">
             {isManual ? (
               <User size={14} color={colors.cyan.core} />
             ) : (
@@ -358,36 +376,34 @@ function TerminationCard({ termination }: { termination: TerminationLogWithDetai
             <Text className="text-sm font-medium" numberOfLines={1}>
               {termination.mediaTitle ?? 'Unknown Media'}
             </Text>
-            <Text className="text-xs text-muted-foreground capitalize">
+            <Text className="text-muted-foreground text-xs capitalize">
               {termination.mediaType ?? 'unknown'} • {timeAgo}
             </Text>
           </View>
         </View>
-        <Badge variant={isManual ? 'default' : 'secondary'}>
-          {isManual ? 'Manual' : 'Rule'}
-        </Badge>
+        <Badge variant={isManual ? 'default' : 'secondary'}>{isManual ? 'Manual' : 'Rule'}</Badge>
       </View>
       <View className="ml-9">
-        <Text className="text-xs text-muted-foreground">
+        <Text className="text-muted-foreground text-xs">
           {isManual
             ? `By @${termination.triggeredByUsername ?? 'Unknown'}`
-            : termination.ruleName ?? 'Unknown rule'}
+            : (termination.ruleName ?? 'Unknown rule')}
         </Text>
         {termination.reason && (
-          <Text className="text-xs text-muted-foreground mt-1" numberOfLines={2}>
+          <Text className="text-muted-foreground mt-1 text-xs" numberOfLines={2}>
             Reason: {termination.reason}
           </Text>
         )}
-        <View className="flex-row items-center gap-1 mt-1">
+        <View className="mt-1 flex-row items-center gap-1">
           {termination.success ? (
             <>
               <Check size={12} color={colors.success} />
-              <Text className="text-xs text-success">Success</Text>
+              <Text className="text-success text-xs">Success</Text>
             </>
           ) : (
             <>
               <XCircle size={12} color={colors.error} />
-              <Text className="text-xs text-destructive">Failed</Text>
+              <Text className="text-destructive text-xs">Failed</Text>
             </>
           )}
         </View>
@@ -437,7 +453,8 @@ export default function UserDetailScreen() {
     isFetchingNextPage: fetchingMoreSessions,
   } = useInfiniteQuery({
     queryKey: ['user', id, 'sessions', selectedServerId],
-    queryFn: ({ pageParam = 1 }) => api.users.sessions(id, { page: pageParam, pageSize: PAGE_SIZE }),
+    queryFn: ({ pageParam = 1 }) =>
+      api.users.sessions(id, { page: pageParam, pageSize: PAGE_SIZE }),
     initialPageParam: 1,
     getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
       if (lastPage.page < lastPage.totalPages) {
@@ -457,7 +474,8 @@ export default function UserDetailScreen() {
     isFetchingNextPage: fetchingMoreViolations,
   } = useInfiniteQuery({
     queryKey: ['violations', { userId: id }, selectedServerId],
-    queryFn: ({ pageParam = 1 }) => api.violations.list({ userId: id, page: pageParam, pageSize: PAGE_SIZE }),
+    queryFn: ({ pageParam = 1 }) =>
+      api.violations.list({ userId: id, page: pageParam, pageSize: PAGE_SIZE }),
     initialPageParam: 1,
     getNextPageParam: (lastPage: { page: number; totalPages: number }) => {
       if (lastPage.page < lastPage.totalPages) {
@@ -507,7 +525,9 @@ export default function UserDetailScreen() {
   const acknowledgeMutation = useMutation({
     mutationFn: api.violations.acknowledge,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['violations', { userId: id }, selectedServerId] });
+      void queryClient.invalidateQueries({
+        queryKey: ['violations', { userId: id }, selectedServerId],
+      });
     },
   });
 
@@ -521,10 +541,14 @@ export default function UserDetailScreen() {
   const handleRefresh = () => {
     void refetchUser();
     void queryClient.invalidateQueries({ queryKey: ['user', id, 'sessions', selectedServerId] });
-    void queryClient.invalidateQueries({ queryKey: ['violations', { userId: id }, selectedServerId] });
+    void queryClient.invalidateQueries({
+      queryKey: ['violations', { userId: id }, selectedServerId],
+    });
     void queryClient.invalidateQueries({ queryKey: ['user', id, 'locations', selectedServerId] });
     void queryClient.invalidateQueries({ queryKey: ['user', id, 'devices', selectedServerId] });
-    void queryClient.invalidateQueries({ queryKey: ['user', id, 'terminations', selectedServerId] });
+    void queryClient.invalidateQueries({
+      queryKey: ['user', id, 'terminations', selectedServerId],
+    });
   };
 
   const handleSessionPress = (session: Session) => {
@@ -533,7 +557,10 @@ export default function UserDetailScreen() {
 
   if (userLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.dark }}
+        edges={['left', 'right', 'bottom']}
+      >
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.cyan.core} />
         </View>
@@ -543,17 +570,25 @@ export default function UserDetailScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.dark }}
+        edges={['left', 'right', 'bottom']}
+      >
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-xl font-semibold text-center mb-2">User Not Found</Text>
-          <Text className="text-muted-foreground text-center">This user may have been removed.</Text>
+          <Text className="mb-2 text-center text-xl font-semibold">User Not Found</Text>
+          <Text className="text-muted-foreground text-center">
+            This user may have been removed.
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <ScrollView
         className="flex-1"
         contentContainerClassName="p-4"
@@ -568,20 +603,14 @@ export default function UserDetailScreen() {
         {/* User Info Card */}
         <Card className="mb-4">
           <View className="flex-row items-start gap-4">
-            <UserAvatar
-              thumbUrl={user.thumbUrl}
-              username={user.username}
-              size={64}
-            />
+            <UserAvatar thumbUrl={user.thumbUrl} username={user.username} size={64} />
             <View className="flex-1">
-              <View className="flex-row items-center gap-2 mb-1">
+              <View className="mb-1 flex-row items-center gap-2">
                 <Text className="text-xl font-bold">{user.username}</Text>
-                {user.role === 'owner' && (
-                  <Crown size={18} color={colors.warning} />
-                )}
+                {user.role === 'owner' && <Crown size={18} color={colors.warning} />}
               </View>
               {user.email && (
-                <Text className="text-sm text-muted-foreground mb-2">{user.email}</Text>
+                <Text className="text-muted-foreground mb-2 text-sm">{user.email}</Text>
               )}
               <TrustScoreBadge score={user.trustScore} showLabel />
             </View>
@@ -589,37 +618,25 @@ export default function UserDetailScreen() {
         </Card>
 
         {/* Stats Grid */}
-        <View className="flex-row gap-3 mb-4">
-          <StatCard
-            icon={Play}
-            label="Sessions"
-            value={totalSessions}
-          />
-          <StatCard
-            icon={AlertTriangle}
-            label="Violations"
-            value={totalViolations}
-          />
+        <View className="mb-4 flex-row gap-3">
+          <StatCard icon={Play} label="Sessions" value={totalSessions} />
+          <StatCard icon={AlertTriangle} label="Violations" value={totalViolations} />
         </View>
-        <View className="flex-row gap-3 mb-4">
+        <View className="mb-4 flex-row gap-3">
           <StatCard
             icon={Clock}
             label="Joined"
             value={safeFormatDate(user.createdAt, 'MMM d, yyyy')}
           />
-          <StatCard
-            icon={Globe}
-            label="Locations"
-            value={locations?.length || 0}
-          />
+          <StatCard icon={Globe} label="Locations" value={locations?.length || 0} />
         </View>
 
         {/* Locations */}
         <Card className="mb-4">
           <CardHeader>
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between">
               <CardTitle>Locations</CardTitle>
-              <Text className="text-xs text-muted-foreground">
+              <Text className="text-muted-foreground text-xs">
                 {locations?.length || 0} {locations?.length === 1 ? 'location' : 'locations'}
               </Text>
             </View>
@@ -628,15 +645,22 @@ export default function UserDetailScreen() {
             {locationsLoading ? (
               <ActivityIndicator size="small" color={colors.cyan.core} />
             ) : locations && locations.length > 0 ? (
-              locations.slice(0, 5).map((location, index) => (
-                <LocationCard key={`${location.city}-${location.country}-${index}`} location={location} />
-              ))
+              locations
+                .slice(0, 5)
+                .map((location, index) => (
+                  <LocationCard
+                    key={`${location.city}-${location.country}-${index}`}
+                    location={location}
+                  />
+                ))
             ) : (
-              <Text className="text-sm text-muted-foreground py-4 text-center">No locations recorded</Text>
+              <Text className="text-muted-foreground py-4 text-center text-sm">
+                No locations recorded
+              </Text>
             )}
             {locations && locations.length > 5 && (
-              <View className="pt-3 items-center">
-                <Text className="text-xs text-muted-foreground">
+              <View className="items-center pt-3">
+                <Text className="text-muted-foreground text-xs">
                   +{locations.length - 5} more locations
                 </Text>
               </View>
@@ -647,9 +671,9 @@ export default function UserDetailScreen() {
         {/* Devices */}
         <Card className="mb-4">
           <CardHeader>
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between">
               <CardTitle>Devices</CardTitle>
-              <Text className="text-xs text-muted-foreground">
+              <Text className="text-muted-foreground text-xs">
                 {devices?.length || 0} {devices?.length === 1 ? 'device' : 'devices'}
               </Text>
             </View>
@@ -658,15 +682,19 @@ export default function UserDetailScreen() {
             {devicesLoading ? (
               <ActivityIndicator size="small" color={colors.cyan.core} />
             ) : devices && devices.length > 0 ? (
-              devices.slice(0, 5).map((device, index) => (
-                <DeviceCard key={device.deviceId || index} device={device} />
-              ))
+              devices
+                .slice(0, 5)
+                .map((device, index) => (
+                  <DeviceCard key={device.deviceId || index} device={device} />
+                ))
             ) : (
-              <Text className="text-sm text-muted-foreground py-4 text-center">No devices recorded</Text>
+              <Text className="text-muted-foreground py-4 text-center text-sm">
+                No devices recorded
+              </Text>
             )}
             {devices && devices.length > 5 && (
-              <View className="pt-3 items-center">
-                <Text className="text-xs text-muted-foreground">
+              <View className="items-center pt-3">
+                <Text className="text-muted-foreground text-xs">
                   +{devices.length - 5} more devices
                 </Text>
               </View>
@@ -677,9 +705,9 @@ export default function UserDetailScreen() {
         {/* Recent Sessions */}
         <Card className="mb-4">
           <CardHeader>
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between">
               <CardTitle>Recent Sessions</CardTitle>
-              <Text className="text-xs text-muted-foreground">{totalSessions} total</Text>
+              <Text className="text-muted-foreground text-xs">{totalSessions} total</Text>
             </View>
           </CardHeader>
           <CardContent>
@@ -697,7 +725,7 @@ export default function UserDetailScreen() {
                 ))}
                 {hasMoreSessions && (
                   <Pressable
-                    className="py-3 items-center active:opacity-70"
+                    className="items-center py-3 active:opacity-70"
                     onPress={() => void fetchMoreSessions()}
                     disabled={fetchingMoreSessions}
                   >
@@ -705,7 +733,7 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={colors.cyan.core} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-sm text-cyan-core font-medium">Load More</Text>
+                        <Text className="text-cyan-core text-sm font-medium">Load More</Text>
                         <ChevronRight size={16} color={colors.cyan.core} />
                       </View>
                     )}
@@ -713,7 +741,9 @@ export default function UserDetailScreen() {
                 )}
               </>
             ) : (
-              <Text className="text-sm text-muted-foreground py-4 text-center">No sessions found</Text>
+              <Text className="text-muted-foreground py-4 text-center text-sm">
+                No sessions found
+              </Text>
             )}
           </CardContent>
         </Card>
@@ -721,9 +751,9 @@ export default function UserDetailScreen() {
         {/* Violations */}
         <Card className="mb-8">
           <CardHeader>
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between">
               <CardTitle>Violations</CardTitle>
-              <Text className="text-xs text-muted-foreground">{totalViolations} total</Text>
+              <Text className="text-muted-foreground text-xs">{totalViolations} total</Text>
             </View>
           </CardHeader>
           <CardContent>
@@ -740,7 +770,7 @@ export default function UserDetailScreen() {
                 ))}
                 {hasMoreViolations && (
                   <Pressable
-                    className="py-3 items-center active:opacity-70"
+                    className="items-center py-3 active:opacity-70"
                     onPress={() => void fetchMoreViolations()}
                     disabled={fetchingMoreViolations}
                   >
@@ -748,7 +778,7 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={colors.cyan.core} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-sm text-cyan-core font-medium">Load More</Text>
+                        <Text className="text-cyan-core text-sm font-medium">Load More</Text>
                         <ChevronRight size={16} color={colors.cyan.core} />
                       </View>
                     )}
@@ -756,11 +786,11 @@ export default function UserDetailScreen() {
                 )}
               </>
             ) : (
-              <View className="py-4 items-center">
-                <View className="w-12 h-12 rounded-full bg-success/10 items-center justify-center mb-2">
+              <View className="items-center py-4">
+                <View className="bg-success/10 mb-2 h-12 w-12 items-center justify-center rounded-full">
                   <Check size={24} color={colors.success} />
                 </View>
-                <Text className="text-sm text-muted-foreground">No violations</Text>
+                <Text className="text-muted-foreground text-sm">No violations</Text>
               </View>
             )}
           </CardContent>
@@ -769,12 +799,12 @@ export default function UserDetailScreen() {
         {/* Termination History */}
         <Card className="mb-8">
           <CardHeader>
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <XCircle size={18} color={colors.text.primary.dark} />
                 <CardTitle>Termination History</CardTitle>
               </View>
-              <Text className="text-xs text-muted-foreground">{totalTerminations} total</Text>
+              <Text className="text-muted-foreground text-xs">{totalTerminations} total</Text>
             </View>
           </CardHeader>
           <CardContent>
@@ -787,7 +817,7 @@ export default function UserDetailScreen() {
                 ))}
                 {hasMoreTerminations && (
                   <Pressable
-                    className="py-3 items-center active:opacity-70"
+                    className="items-center py-3 active:opacity-70"
                     onPress={() => void fetchMoreTerminations()}
                     disabled={fetchingMoreTerminations}
                   >
@@ -795,7 +825,7 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={colors.cyan.core} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-sm text-cyan-core font-medium">Load More</Text>
+                        <Text className="text-cyan-core text-sm font-medium">Load More</Text>
                         <ChevronRight size={16} color={colors.cyan.core} />
                       </View>
                     )}
@@ -803,7 +833,7 @@ export default function UserDetailScreen() {
                 )}
               </>
             ) : (
-              <Text className="text-sm text-muted-foreground py-4 text-center">
+              <Text className="text-muted-foreground py-4 text-center text-sm">
                 No stream terminations
               </Text>
             )}

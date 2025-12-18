@@ -6,7 +6,7 @@ import { Text } from './text';
 const Card = React.forwardRef<View, ViewProps>(({ className, ...props }, ref) => (
   <View
     ref={ref}
-    className={cn('rounded-lg border border-border bg-card p-4', className)}
+    className={cn('border-border bg-card rounded-lg border p-4', className)}
     {...props}
   />
 ));
@@ -23,7 +23,7 @@ const CardTitle = React.forwardRef<RNText, TextProps>(({ className, ...props }, 
 CardTitle.displayName = 'CardTitle';
 
 const CardDescription = React.forwardRef<RNText, TextProps>(({ className, ...props }, ref) => (
-  <Text ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+  <Text ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
 ));
 CardDescription.displayName = 'CardDescription';
 

@@ -12,7 +12,7 @@ import type { AuthUser } from '@tracearr/shared';
 // Mock Redis client for testing
 export function createMockRedis() {
   const store = new Map<string, string>();
-  
+
   return {
     get: async (key: string) => store.get(key) ?? null,
     set: async (key: string, value: string) => {
@@ -30,7 +30,7 @@ export function createMockRedis() {
     ping: async () => 'PONG',
     keys: async (pattern: string) => {
       const prefix = pattern.replace('*', '');
-      return Array.from(store.keys()).filter(k => k.startsWith(prefix));
+      return Array.from(store.keys()).filter((k) => k.startsWith(prefix));
     },
     _store: store, // For test inspection
   };
@@ -132,12 +132,12 @@ export function generateExpiredToken(app: FastifyInstance, payload: AuthUser): s
 export function generateTamperedToken(validToken: string): string {
   const parts = validToken.split('.');
   if (parts.length !== 3) throw new Error('Invalid token format');
-  
+
   // Decode payload, modify it, re-encode without valid signature
   const payload = JSON.parse(Buffer.from(parts[1]!, 'base64url').toString());
   payload.role = 'owner'; // Try to escalate privileges
   const tamperedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  
+
   // Return token with tampered payload but original signature (will fail verification)
   return `${parts[0]}.${tamperedPayload}.${parts[2]}`;
 }
@@ -146,12 +146,12 @@ export function generateTamperedToken(validToken: string): string {
 export function generateWrongSecretToken(payload: AuthUser): string {
   const wrongApp = Fastify({ logger: false });
   wrongApp.register(jwt, { secret: 'wrong-secret-key-totally-different' });
-  
+
   // Can't use jwt until registered, so we'll manually create a fake token
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const fakeSignature = 'invalid_signature_here';
-  
+
   return `${header}.${payloadB64}.${fakeSignature}`;
 }
 
@@ -170,15 +170,6 @@ export const INJECTION_PAYLOADS = {
     "javascript:alert('xss')",
     '<svg onload=alert(1)>',
   ],
-  commandInjection: [
-    '; ls -la',
-    '| cat /etc/passwd',
-    '`whoami`',
-    '$(rm -rf /)',
-  ],
-  pathTraversal: [
-    '../../../etc/passwd',
-    '..\\..\\..\\windows\\system32',
-    '%2e%2e%2f%2e%2e%2f',
-  ],
+  commandInjection: ['; ls -la', '| cat /etc/passwd', '`whoami`', '$(rm -rf /)'],
+  pathTraversal: ['../../../etc/passwd', '..\\..\\..\\windows\\system32', '%2e%2e%2f%2e%2e%2f'],
 };

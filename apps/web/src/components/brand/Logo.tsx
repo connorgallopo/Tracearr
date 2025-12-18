@@ -19,9 +19,7 @@ export function Logo({ size = 'md', showText = true, className }: LogoProps) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <LogoIcon className={icon} />
-      {showText && (
-        <span className={cn('font-bold tracking-tight', text)}>Tracearr</span>
-      )}
+      {showText && <span className={cn('font-bold tracking-tight', text)}>Tracearr</span>}
     </div>
   );
 }
@@ -49,10 +47,7 @@ export function LogoIcon({ className }: LogoIconProps) {
         className="fill-blue-steel"
       />
       {/* T-path stylized */}
-      <path
-        d="M22 24h20v4H34v16h-4V28H22v-4z"
-        className="fill-cyan-core"
-      />
+      <path d="M22 24h20v4H34v16h-4V28H22v-4z" className="fill-cyan-core" />
       {/* Radar arcs */}
       <path
         d="M32 20a16 16 0 0 1 11.3 4.7"

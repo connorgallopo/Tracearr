@@ -61,15 +61,13 @@ export function UserLocationsCard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No location data available</p>
+          <p className="text-muted-foreground text-sm">No location data available</p>
         </CardContent>
       </Card>
     );
   }
 
-  const displayedLocations = isExpanded
-    ? locations
-    : locations.slice(0, INITIAL_DISPLAY_COUNT);
+  const displayedLocations = isExpanded ? locations : locations.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMore = locations.length > INITIAL_DISPLAY_COUNT;
 
   return (
@@ -89,18 +87,17 @@ export function UserLocationsCard({
         <div className="space-y-3">
           {displayedLocations.map((location) => {
             const locationKey = `${location.city ?? 'unknown'}-${location.country ?? 'unknown'}-${location.lat}-${location.lon}`;
-            const percentage = totalSessions > 0
-              ? Math.round((location.sessionCount / totalSessions) * 100)
-              : 0;
+            const percentage =
+              totalSessions > 0 ? Math.round((location.sessionCount / totalSessions) * 100) : 0;
 
             return (
               <div
                 key={locationKey}
-                className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                    <Globe className="h-4 w-4 text-primary" />
+                  <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full">
+                    <Globe className="text-primary h-4 w-4" />
                   </div>
                   <div>
                     <p className="font-medium">
@@ -109,7 +106,7 @@ export function UserLocationsCard({
                         <span className="text-muted-foreground">, {location.region}</span>
                       )}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <span>{location.country ?? 'Unknown'}</span>
                       <span>·</span>
                       <span>
@@ -127,7 +124,7 @@ export function UserLocationsCard({
                     {percentage}%
                   </Badge>
                   {location.ipAddresses.length > 1 && (
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-xs">
                       {location.ipAddresses.length} IPs
                     </p>
                   )}
@@ -142,7 +139,9 @@ export function UserLocationsCard({
             variant="ghost"
             size="sm"
             className="mt-3 w-full"
-            onClick={() => { setIsExpanded(!isExpanded); }}
+            onClick={() => {
+              setIsExpanded(!isExpanded);
+            }}
           >
             {isExpanded ? (
               <>

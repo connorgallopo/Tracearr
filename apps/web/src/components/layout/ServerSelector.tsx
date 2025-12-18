@@ -30,7 +30,7 @@ export function ServerSelector() {
   if (servers.length === 1) {
     const server = servers[0]!;
     return (
-      <div className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex items-center gap-2 px-4 py-2 text-sm">
         <MediaServerIcon type={server.type} className="h-4 w-4" />
         <span className="truncate font-medium">{server.name}</span>
       </div>

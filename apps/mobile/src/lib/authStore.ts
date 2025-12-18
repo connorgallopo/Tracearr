@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const servers = await storage.getServers();
       const activeServerId = await storage.getActiveServerId();
       const activeServer = activeServerId
-        ? servers.find((s) => s.id === activeServerId) ?? null
+        ? (servers.find((s) => s.id === activeServerId) ?? null)
         : null;
 
       // If we have servers but no active selection, select first one
@@ -190,7 +190,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error('Adding server failed:', error);
       set({
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to add server. Check URL and token.',
+        error:
+          error instanceof Error ? error.message : 'Failed to add server. Check URL and token.',
       });
       throw error;
     }
@@ -209,7 +210,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const servers = await storage.getServers();
       const activeServerId = await storage.getActiveServerId();
       const activeServer = activeServerId
-        ? servers.find((s) => s.id === activeServerId) ?? null
+        ? (servers.find((s) => s.id === activeServerId) ?? null)
         : null;
 
       // Reset API client

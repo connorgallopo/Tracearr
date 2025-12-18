@@ -137,11 +137,8 @@ function FilterChip({
   onRemove: () => void;
 }) {
   return (
-    <Badge
-      variant="secondary"
-      className="h-7 gap-1.5 pl-2.5 pr-1.5 text-xs font-normal"
-    >
-      {Icon && <Icon className="h-3 w-3 text-muted-foreground" />}
+    <Badge variant="secondary" className="h-7 gap-1.5 pr-1.5 pl-2.5 text-xs font-normal">
+      {Icon && <Icon className="text-muted-foreground h-3 w-3" />}
       <span className="text-muted-foreground">{label}:</span>
       <span className="max-w-[120px] truncate font-medium">{value}</span>
       <button
@@ -149,7 +146,7 @@ function FilterChip({
           e.stopPropagation();
           onRemove();
         }}
-        className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20"
+        className="hover:bg-muted-foreground/20 ml-0.5 rounded-full p-0.5"
       >
         <X className="h-3 w-3" />
       </button>
@@ -213,7 +210,12 @@ export function HistoryFiltersBar({
     }
     if (filters.mediaType) {
       const labels = { movie: 'Movies', episode: 'TV Shows', track: 'Music' };
-      active.push({ key: 'mediaType', label: 'Type', value: labels[filters.mediaType], icon: Film });
+      active.push({
+        key: 'mediaType',
+        label: 'Type',
+        value: labels[filters.mediaType],
+        icon: Film,
+      });
     }
     if (filters.isTranscode !== undefined) {
       active.push({
@@ -284,13 +286,13 @@ export function HistoryFiltersBar({
       <div className="flex flex-wrap items-center gap-3">
         <TimeRangePicker value={timeRange} onChange={handleTimeRangeChange} />
 
-        <div className="relative flex-1 min-w-[200px] max-w-[400px]">
-          <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
+        <div className="relative max-w-[400px] min-w-[200px] flex-1">
+          <Search className="text-muted-foreground absolute top-2 left-2.5 h-4 w-4" />
           <Input
             placeholder="Search titles, users, locations, IPs..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-8 pl-8 pr-8 text-sm"
+            className="h-8 pr-8 pl-8 text-sm"
           />
           {searchInput && (
             <button
@@ -298,7 +300,7 @@ export function HistoryFiltersBar({
                 setSearchInput('');
                 onFiltersChange({ ...filters, search: undefined });
               }}
-              className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground absolute top-2 right-2"
             >
               <X className="h-4 w-4" />
             </button>
@@ -325,9 +327,7 @@ export function HistoryFiltersBar({
               <DropdownMenuSubTrigger>
                 <User className="mr-2 h-4 w-4" />
                 User
-                {filters.serverUserId && (
-                  <Check className="ml-auto h-4 w-4" />
-                )}
+                {filters.serverUserId && <Check className="ml-auto h-4 w-4" />}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="p-0">
                 <ScrollArea className="h-[200px]">
@@ -351,10 +351,10 @@ export function HistoryFiltersBar({
                             {user.username?.[0]?.toUpperCase() ?? '?'}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="flex-1 truncate">{user.identityName || user.username}</span>
-                        {filters.serverUserId === user.id && (
-                          <Check className="ml-2 h-4 w-4" />
-                        )}
+                        <span className="flex-1 truncate">
+                          {user.identityName || user.username}
+                        </span>
+                        {filters.serverUserId === user.id && <Check className="ml-2 h-4 w-4" />}
                       </DropdownMenuItem>
                     ))}
                   </div>
@@ -367,9 +367,7 @@ export function HistoryFiltersBar({
               <DropdownMenuSubTrigger>
                 <Monitor className="mr-2 h-4 w-4" />
                 Platform
-                {filters.platform && (
-                  <Check className="ml-auto h-4 w-4" />
-                )}
+                {filters.platform && <Check className="ml-auto h-4 w-4" />}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="p-0">
                 <ScrollArea className="h-[200px]">
@@ -387,14 +385,12 @@ export function HistoryFiltersBar({
                         key={opt.value}
                         onClick={() => onFiltersChange({ ...filters, platform: opt.value })}
                       >
-                        <Monitor className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <Monitor className="text-muted-foreground mr-2 h-4 w-4" />
                         <span className="flex-1 truncate">{opt.value}</span>
                         <Badge variant="secondary" className="ml-2 text-[10px]">
                           {opt.count}
                         </Badge>
-                        {filters.platform === opt.value && (
-                          <Check className="ml-1 h-4 w-4" />
-                        )}
+                        {filters.platform === opt.value && <Check className="ml-1 h-4 w-4" />}
                       </DropdownMenuItem>
                     ))}
                   </div>
@@ -407,9 +403,7 @@ export function HistoryFiltersBar({
               <DropdownMenuSubTrigger>
                 <Globe className="mr-2 h-4 w-4" />
                 Country
-                {filters.geoCountry && (
-                  <Check className="ml-auto h-4 w-4" />
-                )}
+                {filters.geoCountry && <Check className="ml-auto h-4 w-4" />}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="p-0">
                 <ScrollArea className="h-[200px]">
@@ -427,14 +421,12 @@ export function HistoryFiltersBar({
                         key={opt.value}
                         onClick={() => onFiltersChange({ ...filters, geoCountry: opt.value })}
                       >
-                        <Globe className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <Globe className="text-muted-foreground mr-2 h-4 w-4" />
                         <span className="flex-1 truncate">{opt.value}</span>
                         <Badge variant="secondary" className="ml-2 text-[10px]">
                           {opt.count}
                         </Badge>
-                        {filters.geoCountry === opt.value && (
-                          <Check className="ml-1 h-4 w-4" />
-                        )}
+                        {filters.geoCountry === opt.value && <Check className="ml-1 h-4 w-4" />}
                       </DropdownMenuItem>
                     ))}
                   </div>
@@ -452,7 +444,10 @@ export function HistoryFiltersBar({
                 if (value === '') {
                   removeFilter('mediaType');
                 } else {
-                  onFiltersChange({ ...filters, mediaType: value as 'movie' | 'episode' | 'track' });
+                  onFiltersChange({
+                    ...filters,
+                    mediaType: value as 'movie' | 'episode' | 'track',
+                  });
                 }
               }}
             >
@@ -476,7 +471,13 @@ export function HistoryFiltersBar({
             {/* Quality - radio group */}
             <DropdownMenuLabel>Quality</DropdownMenuLabel>
             <DropdownMenuRadioGroup
-              value={filters.isTranscode === undefined ? '' : filters.isTranscode ? 'transcode' : 'direct'}
+              value={
+                filters.isTranscode === undefined
+                  ? ''
+                  : filters.isTranscode
+                    ? 'transcode'
+                    : 'direct'
+              }
               onValueChange={(value) => {
                 if (value === '') {
                   removeFilter('isTranscode');
@@ -537,8 +538,8 @@ export function HistoryFiltersBar({
         </DropdownMenu>
 
         {isLoading && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
           </div>
         )}
       </div>
@@ -571,7 +572,7 @@ export function HistoryFiltersBar({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-7 gap-1 px-2 text-xs"
             onClick={clearFilters}
           >
             <X className="h-3.5 w-3.5" />

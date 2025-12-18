@@ -102,10 +102,7 @@ export function parseOptionalBoolean(val: unknown): boolean | undefined {
  * @example
  * parseArray(response.Sessions, (s) => ({ id: parseString(s.Id) }))
  */
-export function parseArray<T>(
-  val: unknown,
-  mapper: (item: unknown, index: number) => T
-): T[] {
+export function parseArray<T>(val: unknown, mapper: (item: unknown, index: number) => T): T[] {
   if (!Array.isArray(val)) return [];
   return val.map(mapper);
 }
@@ -136,10 +133,7 @@ export function parseFilteredArray<T>(
  * const policy = getNestedObject(user, 'Policy');
  * const isAdmin = parseBoolean(policy?.IsAdministrator);
  */
-export function getNestedObject(
-  val: unknown,
-  key: string
-): Record<string, unknown> | undefined {
+export function getNestedObject(val: unknown, key: string): Record<string, unknown> | undefined {
   if (val == null || typeof val !== 'object') return undefined;
   const nested = (val as Record<string, unknown>)[key];
   if (nested == null || typeof nested !== 'object') return undefined;
@@ -152,10 +146,7 @@ export function getNestedObject(
  * @example
  * const isAdmin = getNestedValue(user, 'Policy', 'IsAdministrator');
  */
-export function getNestedValue(
-  val: unknown,
-  ...keys: string[]
-): unknown {
+export function getNestedValue(val: unknown, ...keys: string[]): unknown {
   let current: unknown = val;
   for (const key of keys) {
     if (current == null || typeof current !== 'object') return undefined;

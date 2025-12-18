@@ -64,9 +64,7 @@ interface MockTerminationLog {
   mediaType: MediaType | null;
 }
 
-function createTestTermination(
-  overrides: Partial<MockTerminationLog> = {}
-): MockTerminationLog {
+function createTestTermination(overrides: Partial<MockTerminationLog> = {}): MockTerminationLog {
   return {
     id: overrides.id ?? randomUUID(),
     sessionId: overrides.sessionId ?? randomUUID(),
@@ -74,8 +72,10 @@ function createTestTermination(
     serverUserId: overrides.serverUserId ?? randomUUID(),
     trigger: overrides.trigger ?? 'manual',
     // Use 'in' check to allow explicit null values
-    triggeredByUserId: 'triggeredByUserId' in overrides ? overrides.triggeredByUserId! : randomUUID(),
-    triggeredByUsername: 'triggeredByUsername' in overrides ? overrides.triggeredByUsername! : 'admin',
+    triggeredByUserId:
+      'triggeredByUserId' in overrides ? overrides.triggeredByUserId! : randomUUID(),
+    triggeredByUsername:
+      'triggeredByUsername' in overrides ? overrides.triggeredByUsername! : 'admin',
     ruleId: overrides.ruleId ?? null,
     ruleName: overrides.ruleName ?? null,
     violationId: overrides.violationId ?? null,

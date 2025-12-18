@@ -3,12 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Monitor,
   Smartphone,
@@ -50,11 +45,7 @@ function getDeviceIcon(device: UserDevice) {
   }
 
   // Check for tablets
-  if (
-    deviceType.includes('ipad') ||
-    deviceType.includes('tablet') ||
-    platform.includes('ipad')
-  ) {
+  if (deviceType.includes('ipad') || deviceType.includes('tablet') || platform.includes('ipad')) {
     return Tablet;
   }
 
@@ -105,7 +96,7 @@ function getDeviceDisplayName(device: UserDevice): string {
   if (device.product) {
     parts.push(device.product);
   }
-  if (device.device && !parts.some(p => p.toLowerCase().includes(device.device!.toLowerCase()))) {
+  if (device.device && !parts.some((p) => p.toLowerCase().includes(device.device!.toLowerCase()))) {
     parts.push(device.device);
   }
 
@@ -117,7 +108,11 @@ function getDeviceDisplayName(device: UserDevice): string {
   return device.platform ?? 'Unknown Device';
 }
 
-function formatLocationShort(loc: { city: string | null; region: string | null; country: string | null }): string {
+function formatLocationShort(loc: {
+  city: string | null;
+  region: string | null;
+  country: string | null;
+}): string {
   if (loc.city && loc.region) {
     return `${loc.city}, ${loc.region}`;
   }
@@ -127,11 +122,7 @@ function formatLocationShort(loc: { city: string | null; region: string | null; 
   return loc.city ?? loc.country ?? 'Unknown';
 }
 
-export function UserDevicesCard({
-  devices,
-  isLoading,
-  totalSessions = 0,
-}: UserDevicesCardProps) {
+export function UserDevicesCard({ devices, isLoading, totalSessions = 0 }: UserDevicesCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (isLoading) {
@@ -173,15 +164,13 @@ export function UserDevicesCard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No device data available</p>
+          <p className="text-muted-foreground text-sm">No device data available</p>
         </CardContent>
       </Card>
     );
   }
 
-  const displayedDevices = isExpanded
-    ? devices
-    : devices.slice(0, INITIAL_DISPLAY_COUNT);
+  const displayedDevices = isExpanded ? devices : devices.slice(0, INITIAL_DISPLAY_COUNT);
   const hasMore = devices.length > INITIAL_DISPLAY_COUNT;
 
   return (
@@ -202,9 +191,8 @@ export function UserDevicesCard({
           <div className="space-y-2">
             {displayedDevices.map((device, index) => {
               const deviceKey = `${device.deviceId ?? index}-${device.playerName ?? ''}-${device.product ?? ''}`;
-              const percentage = totalSessions > 0
-                ? Math.round((device.sessionCount / totalSessions) * 100)
-                : 0;
+              const percentage =
+                totalSessions > 0 ? Math.round((device.sessionCount / totalSessions) * 100) : 0;
               const DeviceIcon = getDeviceIcon(device);
               const displayName = getDeviceDisplayName(device);
               const locations = device.locations ?? [];
@@ -214,11 +202,11 @@ export function UserDevicesCard({
               return (
                 <div
                   key={deviceKey}
-                  className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                  className="hover:bg-muted/50 flex items-center gap-3 rounded-lg border p-3 transition-colors"
                 >
                   {/* Device Icon */}
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
-                    <DeviceIcon className="h-4 w-4 text-primary" />
+                  <div className="bg-primary/10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
+                    <DeviceIcon className="text-primary h-4 w-4" />
                   </div>
 
                   {/* Device Info */}
@@ -226,12 +214,10 @@ export function UserDevicesCard({
                     <div className="flex items-center gap-2">
                       <p className="truncate font-medium">{displayName}</p>
                       {device.platform && (
-                        <span className="text-xs text-muted-foreground">
-                          {device.platform}
-                        </span>
+                        <span className="text-muted-foreground text-xs">{device.platform}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <span>
                         {device.sessionCount} session{device.sessionCount !== 1 ? 's' : ''}
                       </span>
@@ -258,7 +244,7 @@ export function UserDevicesCard({
                                       className="flex items-center justify-between gap-4 text-xs"
                                     >
                                       <span>{formatLocationShort(loc)}</span>
-                                      <span className="tabular-nums text-muted-foreground">
+                                      <span className="text-muted-foreground tabular-nums">
                                         {loc.sessionCount}
                                       </span>
                                     </div>
@@ -291,7 +277,9 @@ export function UserDevicesCard({
               variant="ghost"
               size="sm"
               className="mt-3 w-full"
-              onClick={() => { setIsExpanded(!isExpanded); }}
+              onClick={() => {
+                setIsExpanded(!isExpanded);
+              }}
             >
               {isExpanded ? (
                 <>

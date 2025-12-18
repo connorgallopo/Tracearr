@@ -14,11 +14,13 @@ export function PlexCallback() {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="bg-background flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <div className="text-2xl mb-2">&#10003;</div>
+        <div className="mb-2 text-2xl">&#10003;</div>
         <p className="text-muted-foreground">Authentication complete</p>
-        <p className="text-sm text-muted-foreground mt-1">This window will close automatically...</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          This window will close automatically...
+        </p>
       </div>
     </div>
   );

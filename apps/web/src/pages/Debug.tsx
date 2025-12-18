@@ -112,12 +112,12 @@ export function Debug() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
-          <AlertTriangle className="h-5 w-5 text-destructive" />
+        <div className="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-lg">
+          <AlertTriangle className="text-destructive h-5 w-5" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Debug Tools</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Administrative utilities for troubleshooting and data management
           </p>
         </div>
@@ -127,46 +127,46 @@ export function Debug() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Film className="h-8 w-8 text-muted-foreground" />
+            <Film className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.sessions ?? '-'}</p>
-              <p className="text-xs text-muted-foreground">Sessions</p>
+              <p className="text-muted-foreground text-xs">Sessions</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Shield className="h-8 w-8 text-muted-foreground" />
+            <Shield className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.violations ?? '-'}</p>
-              <p className="text-xs text-muted-foreground">Violations</p>
+              <p className="text-muted-foreground text-xs">Violations</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Users className="h-8 w-8 text-muted-foreground" />
+            <Users className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.users ?? '-'}</p>
-              <p className="text-xs text-muted-foreground">Users</p>
+              <p className="text-muted-foreground text-xs">Users</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Server className="h-8 w-8 text-muted-foreground" />
+            <Server className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.servers ?? '-'}</p>
-              <p className="text-xs text-muted-foreground">Servers</p>
+              <p className="text-muted-foreground text-xs">Servers</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Database className="h-8 w-8 text-muted-foreground" />
+            <Database className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.database.size ?? '-'}</p>
-              <p className="text-xs text-muted-foreground">DB Size</p>
+              <p className="text-muted-foreground text-xs">DB Size</p>
             </div>
           </CardContent>
         </Card>
@@ -189,7 +189,9 @@ export function Debug() {
                   <div className="text-muted-foreground">Node.js</div>
                   <div className="font-mono">{envInfo.data.nodeVersion}</div>
                   <div className="text-muted-foreground">Platform</div>
-                  <div className="font-mono">{envInfo.data.platform}/{envInfo.data.arch}</div>
+                  <div className="font-mono">
+                    {envInfo.data.platform}/{envInfo.data.arch}
+                  </div>
                   <div className="text-muted-foreground">Uptime</div>
                   <div className="font-mono">{formatUptime(envInfo.data.uptime)}</div>
                   <div className="text-muted-foreground">Heap Used</div>
@@ -202,7 +204,7 @@ export function Debug() {
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     {Object.entries(envInfo.data.env).map(([key, value]) => (
                       <div key={key} className="contents">
-                        <div className="truncate text-muted-foreground">{key}</div>
+                        <div className="text-muted-foreground truncate">{key}</div>
                         <div className="font-mono text-xs">{value}</div>
                       </div>
                     ))}
@@ -226,7 +228,7 @@ export function Debug() {
             <div className="space-y-2">
               {stats.data?.database.tables.map((table) => (
                 <div key={table.table_name} className="flex items-center justify-between text-sm">
-                  <span className="font-mono text-muted-foreground">{table.table_name}</span>
+                  <span className="text-muted-foreground font-mono">{table.table_name}</span>
                   <span className="font-mono">{table.total_size}</span>
                 </div>
               ))}
@@ -249,23 +251,22 @@ export function Debug() {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              onClick={() => handleDelete('refresh-aggregates', 'Refresh TimescaleDB aggregates', true)}
+              onClick={() =>
+                handleDelete('refresh-aggregates', 'Refresh TimescaleDB aggregates', true)
+              }
               disabled={deleteMutation.isPending}
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh Aggregates
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => queryClient.invalidateQueries()}
-            >
+            <Button variant="outline" onClick={() => queryClient.invalidateQueries()}>
               <RotateCcw className="mr-2 h-4 w-4" />
               Clear Query Cache
             </Button>
           </div>
 
           <div className="border-t pt-4">
-            <p className="mb-3 text-sm font-medium text-muted-foreground">Destructive Actions</p>
+            <p className="text-muted-foreground mb-3 text-sm font-medium">Destructive Actions</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
@@ -284,7 +285,9 @@ export function Debug() {
               <Button
                 variant="outline"
                 className="border-destructive/50 text-destructive hover:bg-destructive/10"
-                onClick={() => handleDelete('sessions', 'Delete all session history and violations')}
+                onClick={() =>
+                  handleDelete('sessions', 'Delete all session history and violations')
+                }
                 disabled={deleteMutation.isPending}
               >
                 Clear Sessions
@@ -300,7 +303,12 @@ export function Debug() {
               <Button
                 variant="outline"
                 className="border-destructive/50 text-destructive hover:bg-destructive/10"
-                onClick={() => handleDelete('servers', 'Delete all servers (cascades to users, sessions, violations)')}
+                onClick={() =>
+                  handleDelete(
+                    'servers',
+                    'Delete all servers (cascades to users, sessions, violations)'
+                  )
+                }
                 disabled={deleteMutation.isPending}
               >
                 Clear Servers
@@ -311,7 +319,13 @@ export function Debug() {
           <div className="border-t pt-4">
             <Button
               variant="destructive"
-              onClick={() => handleDelete('reset', 'FACTORY RESET: Delete everything except your owner account. You will need to set up the app again.', true)}
+              onClick={() =>
+                handleDelete(
+                  'reset',
+                  'FACTORY RESET: Delete everything except your owner account. You will need to set up the app again.',
+                  true
+                )
+              }
               disabled={deleteMutation.isPending}
             >
               <AlertTriangle className="mr-2 h-4 w-4" />

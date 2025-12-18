@@ -43,7 +43,9 @@ export const localRoutes: FastifyPluginAsync = async (app) => {
   app.post('/signup', async (request, reply) => {
     const body = signupSchema.safeParse(request.body);
     if (!body.success) {
-      return reply.badRequest('Invalid signup data: email, username (3-50 chars), password (8+ chars) required');
+      return reply.badRequest(
+        'Invalid signup data: email, username (3-50 chars), password (8+ chars) required'
+      );
     }
 
     const { username, password } = body.data;

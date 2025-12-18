@@ -13,11 +13,7 @@
  * - Random IVs for each message prevent replay attacks
  */
 
-import {
-  createCipheriv,
-  randomBytes,
-  pbkdf2Sync,
-} from 'node:crypto';
+import { createCipheriv, randomBytes, pbkdf2Sync } from 'node:crypto';
 import type { EncryptedPushPayload } from '@tracearr/shared';
 
 // AES-256-GCM parameters (must match mobile client)
@@ -117,10 +113,7 @@ export class PushEncryptionService {
    * @returns Encrypted payload
    * @throws Error if encryption fails
    */
-  encrypt(
-    payload: Record<string, unknown>,
-    deviceSecret: string
-  ): EncryptedPushPayload {
+  encrypt(payload: Record<string, unknown>, deviceSecret: string): EncryptedPushPayload {
     return encryptPushPayload(payload, deviceSecret);
   }
 }

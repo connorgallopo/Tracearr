@@ -23,9 +23,7 @@ export function Header() {
     await logout();
   };
 
-  const initials = user?.username
-    ? user.username.slice(0, 2).toUpperCase()
-    : 'U';
+  const initials = user?.username ? user.username.slice(0, 2).toUpperCase() : 'U';
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -40,9 +38,7 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                {user?.thumbUrl && (
-                  <AvatarImage src={user.thumbUrl} alt={user.username} />
-                )}
+                {user?.thumbUrl && <AvatarImage src={user.thumbUrl} alt={user.username} />}
                 <AvatarFallback className="bg-primary/10 text-primary text-xs">
                   {initials}
                 </AvatarFallback>
@@ -53,9 +49,7 @@ export function Header() {
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">{user?.username}</p>
-                {user?.email && (
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                )}
+                {user?.email && <p className="text-muted-foreground text-xs">{user.email}</p>}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -64,7 +58,10 @@ export function Header() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sign out
             </DropdownMenuItem>

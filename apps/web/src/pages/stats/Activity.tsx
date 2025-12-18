@@ -43,7 +43,7 @@ export function StatsActivity() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Activity</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Play trends, patterns, and streaming behavior
           </p>
         </div>
@@ -58,7 +58,12 @@ export function StatsActivity() {
             <CardTitle className="text-base font-medium">Plays Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <PlaysChart data={plays.data} isLoading={plays.isLoading} height={250} period={timeRange.period} />
+            <PlaysChart
+              data={plays.data}
+              isLoading={plays.isLoading}
+              height={250}
+              period={timeRange.period}
+            />
           </CardContent>
         </Card>
 
@@ -68,7 +73,12 @@ export function StatsActivity() {
             <CardTitle className="text-base font-medium">Concurrent Streams</CardTitle>
           </CardHeader>
           <CardContent>
-            <ConcurrentChart data={concurrent.data} isLoading={concurrent.isLoading} height={250} period={timeRange.period} />
+            <ConcurrentChart
+              data={concurrent.data}
+              isLoading={concurrent.isLoading}
+              height={250}
+              period={timeRange.period}
+            />
           </CardContent>
         </Card>
 

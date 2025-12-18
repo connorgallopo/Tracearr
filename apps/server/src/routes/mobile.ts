@@ -22,8 +22,18 @@ import type { FastifyPluginAsync } from 'fastify';
 import { createHash, randomBytes } from 'crypto';
 import { eq, and, gt, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import type { MobileConfig, MobileSession, MobilePairResponse, MobilePairTokenResponse } from '@tracearr/shared';
-import { REDIS_KEYS, CACHE_TTL, sessionIdParamSchema, terminateSessionBodySchema } from '@tracearr/shared';
+import type {
+  MobileConfig,
+  MobileSession,
+  MobilePairResponse,
+  MobilePairTokenResponse,
+} from '@tracearr/shared';
+import {
+  REDIS_KEYS,
+  CACHE_TTL,
+  sessionIdParamSchema,
+  terminateSessionBodySchema,
+} from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { mobileTokens, mobileSessions, servers, users, settings, sessions } from '../db/schema.js';
 import { terminateSession } from '../services/termination.js';
@@ -72,7 +82,10 @@ const mobileRefreshSchema = z.object({
 });
 
 const pushTokenSchema = z.object({
-  expoPushToken: z.string().min(1).regex(/^ExponentPushToken\[.+\]$/, 'Invalid Expo push token format'),
+  expoPushToken: z
+    .string()
+    .min(1)
+    .regex(/^ExponentPushToken\[.+\]$/, 'Invalid Expo push token format'),
   deviceSecret: z.string().min(32).max(64).optional(), // Update device secret for push encryption
 });
 
@@ -101,7 +114,9 @@ function generateRefreshToken(): string {
 export const mobileRoutes: FastifyPluginAsync = async (app) => {
   // Log beta mode status on startup
   if (isBetaMode()) {
-    app.log.warn('MOBILE_BETA_MODE enabled: tokens are reusable, never expire, unlimited devices allowed');
+    app.log.warn(
+      'MOBILE_BETA_MODE enabled: tokens are reusable, never expire, unlimited devices allowed'
+    );
   }
 
   // ============================================
@@ -119,7 +134,10 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Get mobile enabled status from settings
-    const settingsRow = await db.select({ mobileEnabled: settings.mobileEnabled }).from(settings).limit(1);
+    const settingsRow = await db
+      .select({ mobileEnabled: settings.mobileEnabled })
+      .from(settings)
+      .limit(1);
     const isEnabled = settingsRow[0]?.mobileEnabled ?? false;
 
     // Get mobile sessions
@@ -129,12 +147,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     const pendingTokensResult = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(mobileTokens)
-      .where(
-        and(
-          gt(mobileTokens.expiresAt, new Date()),
-          isNull(mobileTokens.usedAt)
-        )
-      );
+      .where(and(gt(mobileTokens.expiresAt, new Date()), isNull(mobileTokens.usedAt)));
     const pendingTokens = pendingTokensResult[0]?.count ?? 0;
 
     // Get server name
@@ -221,7 +234,10 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Check if mobile is enabled
-    const settingsRow = await db.select({ mobileEnabled: settings.mobileEnabled }).from(settings).limit(1);
+    const settingsRow = await db
+      .select({ mobileEnabled: settings.mobileEnabled })
+      .from(settings)
+      .limit(1);
     if (!settingsRow[0]?.mobileEnabled) {
       return reply.badRequest('Mobile access is not enabled');
     }
@@ -236,7 +252,12 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       end
       return current
     `;
-    const currentCount = await app.redis.eval(luaScript, 1, rateLimitKey, TOKEN_GEN_RATE_WINDOW) as number;
+    const currentCount = (await app.redis.eval(
+      luaScript,
+      1,
+      rateLimitKey,
+      TOKEN_GEN_RATE_WINDOW
+    )) as number;
 
     if (currentCount > TOKEN_GEN_RATE_LIMIT) {
       const ttl = await app.redis.ttl(rateLimitKey);
@@ -257,12 +278,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         const pendingTokensResult = await tx
           .select({ count: sql<number>`count(*)::int` })
           .from(mobileTokens)
-          .where(
-            and(
-              gt(mobileTokens.expiresAt, new Date()),
-              isNull(mobileTokens.usedAt)
-            )
-          );
+          .where(and(gt(mobileTokens.expiresAt, new Date()), isNull(mobileTokens.usedAt)));
         const pendingCount = pendingTokensResult[0]?.count ?? 0;
 
         if (pendingCount >= MAX_PENDING_TOKENS) {
@@ -376,7 +392,10 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     }
     await db.delete(mobileSessions);
 
-    app.log.info({ userId: authUser.userId, count: sessionsRows.length }, 'All mobile sessions revoked');
+    app.log.info(
+      { userId: authUser.userId, count: sessionsRows.length },
+      'All mobile sessions revoked'
+    );
 
     return { success: true, revokedCount: sessionsRows.length };
   });
@@ -446,7 +465,12 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       end
       return current
     `;
-    const currentCount = await app.redis.eval(luaScript, 1, rateLimitKey, CACHE_TTL.RATE_LIMIT) as number;
+    const currentCount = (await app.redis.eval(
+      luaScript,
+      1,
+      rateLimitKey,
+      CACHE_TTL.RATE_LIMIT
+    )) as number;
 
     if (currentCount > MOBILE_PAIR_MAX_ATTEMPTS) {
       const ttl = await app.redis.ttl(rateLimitKey);
@@ -530,11 +554,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         }
 
         // Get the owner user
-        const ownerRow = await tx
-          .select()
-          .from(users)
-          .where(eq(users.role, 'owner'))
-          .limit(1);
+        const ownerRow = await tx.select().from(users).where(eq(users.role, 'owner')).limit(1);
 
         if (ownerRow.length === 0) {
           throw new Error('NO_OWNER');
@@ -543,7 +563,9 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         const owner = ownerRow[0]!;
 
         // Get all server IDs for the JWT
-        const allServers = await tx.select({ id: servers.id, name: servers.name, type: servers.type }).from(servers);
+        const allServers = await tx
+          .select({ id: servers.id, name: servers.name, type: servers.type })
+          .from(servers);
         const serverIds = allServers.map((s) => s.id);
 
         // Get primary server info for the response (first server)
@@ -690,7 +712,12 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       end
       return current
     `;
-    const currentCount = await app.redis.eval(luaScript, 1, rateLimitKey, CACHE_TTL.RATE_LIMIT) as number;
+    const currentCount = (await app.redis.eval(
+      luaScript,
+      1,
+      rateLimitKey,
+      CACHE_TTL.RATE_LIMIT
+    )) as number;
 
     if (currentCount > MOBILE_REFRESH_MAX_ATTEMPTS) {
       const ttl = await app.redis.ttl(rateLimitKey);
@@ -814,7 +841,9 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       .returning({ id: mobileSessions.id });
 
     if (updated.length === 0) {
-      return reply.notFound('No mobile session found for this device. Please pair the device first.');
+      return reply.notFound(
+        'No mobile session found for this device. Please pair the device first.'
+      );
     }
 
     app.log.info(

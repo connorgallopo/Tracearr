@@ -72,12 +72,13 @@ export function PlaysChart({ data, height = 200 }: PlaysChartProps) {
   }
 
   // Get date label from React state
-  const dateLabel = displayValue && chartData[displayValue.index]?.label
-    ? new Date(chartData[displayValue.index].label).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      })
-    : '';
+  const dateLabel =
+    displayValue && chartData[displayValue.index]?.label
+      ? new Date(chartData[displayValue.index].label).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        })
+      : '';
 
   return (
     <View style={[styles.container, { height }]}>
@@ -120,9 +121,7 @@ export function PlaysChart({ data, height = 200 }: PlaysChartProps) {
               opacity={0.6}
               animate={{ type: 'timing', duration: 500 }}
             />
-            {isActive && (
-              <ToolTip x={state.x.position} y={state.y.count.position} />
-            )}
+            {isActive && <ToolTip x={state.x.position} y={state.y.count.position} />}
           </>
         )}
       </CartesianChart>

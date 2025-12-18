@@ -312,7 +312,9 @@ export const serverById = db
 export type PlaysCountResult = Awaited<ReturnType<typeof playsCountSince.execute>>;
 export type WatchTimeResult = Awaited<ReturnType<typeof watchTimeSince.execute>>;
 export type ViolationsCountResult = Awaited<ReturnType<typeof violationsCountSince.execute>>;
-export type ServerUserByExternalIdResult = Awaited<ReturnType<typeof serverUserByExternalId.execute>>;
+export type ServerUserByExternalIdResult = Awaited<
+  ReturnType<typeof serverUserByExternalId.execute>
+>;
 export type ServerUserByIdResult = Awaited<ReturnType<typeof serverUserById.execute>>;
 export type UserByIdResult = Awaited<ReturnType<typeof userById.execute>>;
 export type SessionByIdResult = Awaited<ReturnType<typeof sessionById.execute>>;

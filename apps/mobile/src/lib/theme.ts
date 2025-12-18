@@ -159,9 +159,6 @@ export function getThemeColor(
   return colors[colorKey][isDark ? 'dark' : 'light'];
 }
 
-export function getTextColor(
-  variant: 'primary' | 'secondary' | 'muted',
-  isDark: boolean
-): string {
+export function getTextColor(variant: 'primary' | 'secondary' | 'muted', isDark: boolean): string {
   return colors.text[variant][isDark ? 'dark' : 'light'];
 }

@@ -41,10 +41,7 @@ const validationPlugin: FastifyPluginAsync = async (app) => {
    * Create a preHandler that validates request against Zod schemas
    */
   app.decorate('validateRequest', function (schemas: ValidationSchemas): preHandlerHookHandler {
-    return function (
-      request: FastifyRequest,
-      _reply: FastifyReply
-    ): void {
+    return function (request: FastifyRequest, _reply: FastifyReply): void {
       const errors: Array<{ field: string; message: string }> = [];
 
       // Validate body

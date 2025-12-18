@@ -71,7 +71,7 @@ export function TerminateSessionDialog({
             placeholder="e.g., Please don't share your account"
             maxLength={500}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             This message will be shown to them during playback
           </p>
         </div>

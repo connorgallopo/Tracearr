@@ -150,7 +150,10 @@ describe('getServerUserByExternalId', () => {
     const mockServerUser = createMockServerUser();
     mockSelectChain([mockServerUser]);
 
-    const result = await getServerUserByExternalId(mockServerUser.serverId as string, 'external-123');
+    const result = await getServerUserByExternalId(
+      mockServerUser.serverId as string,
+      'external-123'
+    );
 
     expect(result).toEqual(mockServerUser);
   });
@@ -514,7 +517,8 @@ describe('syncUserFromMediaServer', () => {
           where: vi.fn().mockReturnThis(),
           limit: vi.fn().mockResolvedValue([]), // No existing user by email
         }),
-        insert: vi.fn()
+        insert: vi
+          .fn()
           .mockReturnValueOnce({
             values: vi.fn().mockReturnThis(),
             returning: vi.fn().mockResolvedValue([newUser]), // Create user
@@ -591,7 +595,9 @@ describe('updateServerUserTrustScore', () => {
   it('should throw ServerUserNotFoundError when server user not found', async () => {
     mockUpdateChain([]);
 
-    await expect(updateServerUserTrustScore('non-existent', 50)).rejects.toThrow(ServerUserNotFoundError);
+    await expect(updateServerUserTrustScore('non-existent', 50)).rejects.toThrow(
+      ServerUserNotFoundError
+    );
   });
 });
 

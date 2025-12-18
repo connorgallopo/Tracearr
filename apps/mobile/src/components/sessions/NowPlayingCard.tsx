@@ -115,9 +115,7 @@ export function NowPlayingCard({ session, onPress }: NowPlayingCardProps) {
               <Text style={styles.username} numberOfLines={1}>
                 {username}
               </Text>
-              {session.isTranscode && (
-                <Ionicons name="flash" size={10} color={colors.warning} />
-              )}
+              {session.isTranscode && <Ionicons name="flash" size={10} color={colors.warning} />}
             </View>
             <View style={styles.timeSection}>
               <View style={[styles.statusDot, isPaused && styles.statusDotPaused]}>

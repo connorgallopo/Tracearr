@@ -47,17 +47,8 @@ export function PlatformChart({ data }: PlatformChartProps) {
     <View style={styles.container}>
       {/* Pie Chart */}
       <View style={styles.chartContainer}>
-        <PolarChart
-          data={sortedData}
-          labelKey="label"
-          valueKey="value"
-          colorKey="color"
-        >
-          <Pie.Chart
-            innerRadius="50%"
-            circleSweepDegrees={360}
-            startAngle={0}
-          />
+        <PolarChart data={sortedData} labelKey="label" valueKey="value" colorKey="color">
+          <Pie.Chart innerRadius="50%" circleSweepDegrees={360} startAngle={0} />
         </PolarChart>
       </View>
 
@@ -69,9 +60,7 @@ export function PlatformChart({ data }: PlatformChartProps) {
             <Text style={styles.legendText} numberOfLines={1}>
               {item.label}
             </Text>
-            <Text style={styles.legendPercent}>
-              {Math.round((item.value / total) * 100)}%
-            </Text>
+            <Text style={styles.legendPercent}>{Math.round((item.value / total) * 100)}%</Text>
           </View>
         ))}
       </View>

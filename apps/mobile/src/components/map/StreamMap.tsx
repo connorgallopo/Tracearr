@@ -79,19 +79,21 @@ export function StreamMap({ sessions, height = 300 }: StreamMapProps) {
   }
 
   // Calculate center point from all sessions
-  const avgLat = sessionsWithLocation.reduce((sum, s) => sum + s.geoLat, 0) / sessionsWithLocation.length;
-  const avgLon = sessionsWithLocation.reduce((sum, s) => sum + s.geoLon, 0) / sessionsWithLocation.length;
+  const avgLat =
+    sessionsWithLocation.reduce((sum, s) => sum + s.geoLat, 0) / sessionsWithLocation.length;
+  const avgLon =
+    sessionsWithLocation.reduce((sum, s) => sum + s.geoLon, 0) / sessionsWithLocation.length;
 
   // Create markers for each session with enhanced info
   const markers = sessionsWithLocation.map((session) => {
     const username = session.user?.username || 'Unknown';
-    const location = [session.geoCity, session.geoCountry].filter(Boolean).join(', ') || 'Unknown location';
+    const location =
+      [session.geoCity, session.geoCountry].filter(Boolean).join(', ') || 'Unknown location';
     const mediaTitle = session.mediaTitle || 'Unknown';
 
     // Truncate long media titles for snippet
-    const truncatedTitle = mediaTitle.length > 40
-      ? mediaTitle.substring(0, 37) + '...'
-      : mediaTitle;
+    const truncatedTitle =
+      mediaTitle.length > 40 ? mediaTitle.substring(0, 37) + '...' : mediaTitle;
 
     return {
       id: session.sessionKey || session.id,
@@ -117,8 +119,8 @@ export function StreamMap({ sessions, height = 300 }: StreamMapProps) {
     if (sessionsWithLocation.length === 1) return 10;
 
     // Calculate spread of coordinates
-    const lats = sessionsWithLocation.map(s => s.geoLat);
-    const lons = sessionsWithLocation.map(s => s.geoLon);
+    const lats = sessionsWithLocation.map((s) => s.geoLat);
+    const lons = sessionsWithLocation.map((s) => s.geoLon);
     const latSpread = Math.max(...lats) - Math.min(...lats);
     const lonSpread = Math.max(...lons) - Math.min(...lons);
     const maxSpread = Math.max(latSpread, lonSpread);

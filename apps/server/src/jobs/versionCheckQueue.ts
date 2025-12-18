@@ -168,7 +168,11 @@ export async function forceVersionCheck(): Promise<void> {
     return;
   }
 
-  await versionQueue.add('forced-check', { type: 'check', force: true }, { jobId: `forced-${Date.now()}` });
+  await versionQueue.add(
+    'forced-check',
+    { type: 'check', force: true },
+    { jobId: `forced-${Date.now()}` }
+  );
 }
 
 /**
@@ -207,7 +211,7 @@ async function processVersionCheck(job: Job<VersionCheckJobData>): Promise<void>
       throw new Error(`GitHub API returned ${response.status}`);
     }
 
-    const release = await response.json() as {
+    const release = (await response.json()) as {
       tag_name: string;
       html_url: string;
       published_at: string;
@@ -308,7 +312,10 @@ export async function getCachedLatestVersion(): Promise<LatestVersionData | null
  */
 export function isNewerVersion(latest: string, current: string): boolean {
   const parseVersion = (v: string): [number, number, number] => {
-    const parts = v.replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+    const parts = v
+      .replace(/^v/, '')
+      .split('.')
+      .map((n) => parseInt(n, 10) || 0);
     return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0];
   };
 

@@ -157,7 +157,11 @@ export {
 } from './mocks/index.js';
 
 // Custom matchers
-export { installMatchers, type HTTPResponse, type ValidationErrorResponse } from './matchers/index.js';
+export {
+  installMatchers,
+  type HTTPResponse,
+  type ValidationErrorResponse,
+} from './matchers/index.js';
 
 // Helper utilities
 export {

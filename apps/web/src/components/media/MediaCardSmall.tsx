@@ -29,7 +29,12 @@ function MediaIcon({ type, className }: { type: string; className?: string }) {
   }
 }
 
-function getImageUrl(serverId: string | null | undefined, thumbPath: string | null | undefined, width = 150, height = 225) {
+function getImageUrl(
+  serverId: string | null | undefined,
+  thumbPath: string | null | undefined,
+  width = 150,
+  height = 225
+) {
   if (!serverId || !thumbPath) return null;
   return `/api/v1/images/proxy?server=${serverId}&url=${encodeURIComponent(thumbPath)}&width=${width}&height=${height}&fallback=poster`;
 }
@@ -55,13 +60,13 @@ export function MediaCardSmall({
   return (
     <div
       className={cn(
-        'group relative animate-fade-in overflow-hidden rounded-lg border bg-card transition-all duration-300 hover:scale-[1.03] hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10',
+        'group animate-fade-in bg-card hover:border-primary/50 hover:shadow-primary/10 relative overflow-hidden rounded-lg border transition-all duration-300 hover:scale-[1.03] hover:shadow-lg',
         className
       )}
       style={style}
     >
       {/* Poster */}
-      <div className="relative aspect-[2/3] overflow-hidden bg-muted">
+      <div className="bg-muted relative aspect-[2/3] overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -71,13 +76,13 @@ export function MediaCardSmall({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <MediaIcon type={type} className="h-12 w-12 text-muted-foreground/50" />
+            <MediaIcon type={type} className="text-muted-foreground/50 h-12 w-12" />
           </div>
         )}
 
         {/* Rank badge */}
         {rank && (
-          <div className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-xs font-bold text-white">
+          <div className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-xs font-bold text-white">
             {rank}
           </div>
         )}
@@ -96,12 +101,8 @@ export function MediaCardSmall({
         <h4 className="truncate text-sm font-medium" title={displayTitle}>
           {displayTitle}
         </h4>
-        <p className="truncate text-xs text-muted-foreground">
-          {episodeCount
-            ? `${episodeCount} eps`
-            : type === 'episode'
-            ? title
-            : year || type}
+        <p className="text-muted-foreground truncate text-xs">
+          {episodeCount ? `${episodeCount} eps` : type === 'episode' ? title : year || type}
         </p>
       </div>
     </div>

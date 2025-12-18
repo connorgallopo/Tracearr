@@ -444,9 +444,7 @@ describe('registerErrorHandler', () => {
     registerErrorHandler(app);
 
     app.get('/test', () => {
-      throw new ValidationError('Test validation error', [
-        { field: 'name', message: 'Required' },
-      ]);
+      throw new ValidationError('Test validation error', [{ field: 'name', message: 'Required' }]);
     });
 
     const response = await app.inject({ method: 'GET', url: '/test' });

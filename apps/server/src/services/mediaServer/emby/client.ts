@@ -206,9 +206,7 @@ export class EmbyClient implements IMediaServerClient, IMediaServerClientWithHis
   /**
    * Get watch history for all users on the server
    */
-  async getAllUsersWatchHistory(
-    limit = 200
-  ): Promise<Map<string, MediaWatchHistoryItem[]>> {
+  async getAllUsersWatchHistory(limit = 200): Promise<Map<string, MediaWatchHistoryItem[]>> {
     const allUsers = await this.getUsers();
     const historyMap = new Map<string, MediaWatchHistoryItem[]>();
 
@@ -244,13 +242,10 @@ export class EmbyClient implements IMediaServerClient, IMediaServerClientWithHis
     if (options?.minDate) params.append('MinDate', options.minDate.toISOString());
     if (options?.hasUserId !== undefined) params.append('HasUserId', String(options.hasUserId));
 
-    const data = await fetchJson<unknown>(
-      `${this.baseUrl}/System/ActivityLog/Entries?${params}`,
-      {
-        headers: this.buildHeaders(),
-        service: 'emby',
-      }
-    );
+    const data = await fetchJson<unknown>(`${this.baseUrl}/System/ActivityLog/Entries?${params}`, {
+      headers: this.buildHeaders(),
+      service: 'emby',
+    });
 
     return parseActivityLogResponse(data);
   }
@@ -272,22 +267,19 @@ export class EmbyClient implements IMediaServerClient, IMediaServerClientWithHis
     const authHeader = `MediaBrowser Client="${CLIENT_NAME}", Device="${DEVICE_NAME}", DeviceId="${DEVICE_ID}", Version="${CLIENT_VERSION}"`;
 
     try {
-      const data = await fetchJson<Record<string, unknown>>(
-        `${url}/Users/AuthenticateByName`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Emby-Authorization': authHeader,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            Username: username,
-            Password: password, // Emby uses 'Password', not 'Pw'
-          }),
-          service: 'emby',
-        }
-      );
+      const data = await fetchJson<Record<string, unknown>>(`${url}/Users/AuthenticateByName`, {
+        method: 'POST',
+        headers: {
+          'X-Emby-Authorization': authHeader,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          Username: username,
+          Password: password, // Emby uses 'Password', not 'Pw'
+        }),
+        service: 'emby',
+      });
 
       return parseAuthResponse(data);
     } catch (error) {

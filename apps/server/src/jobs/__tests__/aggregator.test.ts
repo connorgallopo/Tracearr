@@ -48,9 +48,7 @@ describe('aggregator', () => {
     it('should log interval time when starting', () => {
       startAggregator({ intervalMs: 30000 });
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        'Starting stats aggregator with 30000ms interval'
-      );
+      expect(consoleLogSpy).toHaveBeenCalledWith('Starting stats aggregator with 30000ms interval');
     });
 
     it('should run refreshStats immediately on start', () => {
@@ -114,18 +112,14 @@ describe('aggregator', () => {
       startAggregator({ intervalMs: 1000 });
 
       // Should start (enabled defaults to true)
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        'Starting stats aggregator with 1000ms interval'
-      );
+      expect(consoleLogSpy).toHaveBeenCalledWith('Starting stats aggregator with 1000ms interval');
     });
 
     it('should use default interval when not specified', () => {
       startAggregator({});
 
       // Default is POLLING_INTERVALS.STATS_REFRESH = 60000
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        'Starting stats aggregator with 60000ms interval'
-      );
+      expect(consoleLogSpy).toHaveBeenCalledWith('Starting stats aggregator with 60000ms interval');
     });
   });
 

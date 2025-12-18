@@ -26,11 +26,7 @@ export function MediaServerIcon({ type, className, alt }: MediaServerIconProps) 
   }
 
   return (
-    <img
-      src={iconPath}
-      alt={alt ?? `${type} server`}
-      className={cn('object-contain', className)}
-    />
+    <img src={iconPath} alt={alt ?? `${type} server`} className={cn('object-contain', className)} />
   );
 }
 

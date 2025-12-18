@@ -40,7 +40,22 @@ export function getTrustScoreBg(score: number): string {
  * Medal configuration for podium ranks
  */
 export const MEDALS = {
-  1: { emoji: '🥇', color: 'from-yellow-400 to-yellow-600', bgColor: 'from-yellow-500/10 to-yellow-600/5', size: 'h-20 w-20' },
-  2: { emoji: '🥈', color: 'from-gray-300 to-gray-500', bgColor: 'from-gray-400/10 to-gray-500/5', size: 'h-16 w-16' },
-  3: { emoji: '🥉', color: 'from-amber-600 to-amber-800', bgColor: 'from-amber-500/10 to-amber-600/5', size: 'h-16 w-16' },
+  1: {
+    emoji: '🥇',
+    color: 'from-yellow-400 to-yellow-600',
+    bgColor: 'from-yellow-500/10 to-yellow-600/5',
+    size: 'h-20 w-20',
+  },
+  2: {
+    emoji: '🥈',
+    color: 'from-gray-300 to-gray-500',
+    bgColor: 'from-gray-400/10 to-gray-500/5',
+    size: 'h-16 w-16',
+  },
+  3: {
+    emoji: '🥉',
+    color: 'from-amber-600 to-amber-800',
+    bgColor: 'from-amber-500/10 to-amber-600/5',
+    size: 'h-16 w-16',
+  },
 } as const;

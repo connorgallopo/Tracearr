@@ -118,7 +118,7 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
   if (!data || data.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed text-muted-foreground"
+        className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed"
         style={{ height }}
       >
         No data available

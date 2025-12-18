@@ -171,9 +171,7 @@ export function usePushNotifications() {
         const rawData = receivedNotification.request.content.data;
         if (rawData && typeof rawData === 'object') {
           void (async () => {
-            const processedData = await processNotificationData(
-              rawData as Record<string, unknown>
-            );
+            const processedData = await processNotificationData(rawData as Record<string, unknown>);
             // Update the notification with processed data
             const processedNotification = {
               ...receivedNotification,
@@ -194,39 +192,37 @@ export function usePushNotifications() {
     );
 
     // Listen for notification taps
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        const rawData = response.notification.request.content.data;
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      const rawData = response.notification.request.content.data;
 
-        void (async () => {
-          let data = rawData;
+      void (async () => {
+        let data = rawData;
 
-          // Decrypt if needed
-          if (rawData && isEncrypted(rawData) && isEncryptionAvailable()) {
-            try {
-              data = await decryptPushPayload(rawData);
-            } catch {
-              // Use raw data if decryption fails
-            }
+        // Decrypt if needed
+        if (rawData && isEncrypted(rawData) && isEncryptionAvailable()) {
+          try {
+            data = await decryptPushPayload(rawData);
+          } catch {
+            // Use raw data if decryption fails
           }
+        }
 
-          // Auto-select the server related to this notification if provided
-          const notificationServerId = data?.serverId as string | undefined;
-          if (notificationServerId && servers.some((s) => s.id === notificationServerId)) {
-            selectServer(notificationServerId);
-          }
+        // Auto-select the server related to this notification if provided
+        const notificationServerId = data?.serverId as string | undefined;
+        if (notificationServerId && servers.some((s) => s.id === notificationServerId)) {
+          selectServer(notificationServerId);
+        }
 
-          // Navigate based on notification type
-          if (data?.type === 'violation_detected') {
-            router.push('/(tabs)/alerts');
-          } else if (data?.type === 'stream_started' || data?.type === 'stream_stopped') {
-            router.push('/(tabs)/activity');
-          } else if (data?.type === 'server_down' || data?.type === 'server_up') {
-            router.push('/(tabs)');
-          }
-        })();
-      }
-    );
+        // Navigate based on notification type
+        if (data?.type === 'violation_detected') {
+          router.push('/(tabs)/alerts');
+        } else if (data?.type === 'stream_started' || data?.type === 'stream_stopped') {
+          router.push('/(tabs)/activity');
+        } else if (data?.type === 'server_down' || data?.type === 'server_up') {
+          router.push('/(tabs)');
+        }
+      })();
+    });
 
     return () => {
       if (notificationListener.current) {

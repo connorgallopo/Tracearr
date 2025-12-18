@@ -140,8 +140,20 @@ const mockPlexServer = {
   publicAddressMatches: true, // Same network, all connections reachable
   httpsRequired: false, // HTTP connections allowed
   connections: [
-    { protocol: 'http', uri: 'http://192.168.1.100:32400', local: true, address: '192.168.1.100', port: 32400 },
-    { protocol: 'https', uri: 'https://plex.example.com:32400', local: false, address: 'plex.example.com', port: 32400 },
+    {
+      protocol: 'http',
+      uri: 'http://192.168.1.100:32400',
+      local: true,
+      address: '192.168.1.100',
+      port: 32400,
+    },
+    {
+      protocol: 'https',
+      uri: 'https://plex.example.com:32400',
+      local: false,
+      address: 'plex.example.com',
+      port: 32400,
+    },
   ],
 };
 
@@ -285,9 +297,10 @@ describe('Plex Auth Routes', () => {
       const selectMock = {
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        limit: vi.fn()
+        limit: vi
+          .fn()
           .mockResolvedValueOnce([{ token: mockExistingServer.token }]) // First - get token
-          .mockResolvedValueOnce([{ id: mockExistingServer.id }]) // Second - duplicate found
+          .mockResolvedValueOnce([{ id: mockExistingServer.id }]), // Second - duplicate found
       };
       vi.mocked(db.select).mockReturnValue(selectMock as never);
 
@@ -328,10 +341,11 @@ describe('Plex Auth Routes', () => {
       const selectMock = {
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        limit: vi.fn()
+        limit: vi
+          .fn()
           .mockResolvedValueOnce([{ token: mockExistingServer.token }]) // First - get token
           .mockResolvedValueOnce([]) // Second - no machineIdentifier duplicate
-          .mockResolvedValueOnce([]) // Third - no URL duplicate
+          .mockResolvedValueOnce([]), // Third - no URL duplicate
       };
       vi.mocked(db.select).mockReturnValue(selectMock as never);
 
@@ -342,7 +356,12 @@ describe('Plex Auth Routes', () => {
       mockDbInsert([newServer]);
 
       // Mock sync
-      vi.mocked(syncServer).mockResolvedValue({ usersAdded: 5, usersUpdated: 0, librariesSynced: 3, errors: [] });
+      vi.mocked(syncServer).mockResolvedValue({
+        usersAdded: 5,
+        usersUpdated: 0,
+        librariesSynced: 3,
+        errors: [],
+      });
 
       const response = await app.inject({
         method: 'POST',
@@ -367,10 +386,11 @@ describe('Plex Auth Routes', () => {
       const selectMock = {
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
-        limit: vi.fn()
+        limit: vi
+          .fn()
           .mockResolvedValueOnce([{ token: mockExistingServer.token }]) // Get token
           .mockResolvedValueOnce([]) // No machineIdentifier duplicate
-          .mockResolvedValueOnce([]) // No URL duplicate
+          .mockResolvedValueOnce([]), // No URL duplicate
       };
       vi.mocked(db.select).mockReturnValue(selectMock as never);
 

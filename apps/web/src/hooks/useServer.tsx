@@ -73,7 +73,8 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     }
 
     // If selected server is not in accessible list, select first available
-    const currentServerValid = selectedServerId && accessibleServers.some((s) => s.id === selectedServerId);
+    const currentServerValid =
+      selectedServerId && accessibleServers.some((s) => s.id === selectedServerId);
     if (!currentServerValid) {
       const firstServer = accessibleServers[0];
       if (firstServer) {
@@ -91,19 +92,22 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated]);
 
-  const selectServer = useCallback((serverId: string) => {
-    setSelectedServerId(serverId);
-    localStorage.setItem(SELECTED_SERVER_KEY, serverId);
-    // Invalidate server-dependent queries to force refetch with new server context
-    // We exclude 'servers' query as that's not server-dependent
-    void queryClient.invalidateQueries({
-      predicate: (query) => {
-        const key = query.queryKey[0];
-        // Keep server list, invalidate everything else that may be server-specific
-        return key !== 'servers';
-      },
-    });
-  }, [queryClient]);
+  const selectServer = useCallback(
+    (serverId: string) => {
+      setSelectedServerId(serverId);
+      localStorage.setItem(SELECTED_SERVER_KEY, serverId);
+      // Invalidate server-dependent queries to force refetch with new server context
+      // We exclude 'servers' query as that's not server-dependent
+      void queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey[0];
+          // Keep server list, invalidate everything else that may be server-specific
+          return key !== 'servers';
+        },
+      });
+    },
+    [queryClient]
+  );
 
   // Get the full server object for the selected ID
   const selectedServer = useMemo(() => {
@@ -121,7 +125,15 @@ export function ServerProvider({ children }: { children: ReactNode }) {
       selectServer,
       refetch,
     }),
-    [accessibleServers, selectedServer, selectedServerId, isLoading, isFetching, selectServer, refetch]
+    [
+      accessibleServers,
+      selectedServer,
+      selectedServerId,
+      isLoading,
+      isFetching,
+      selectServer,
+      refetch,
+    ]
   );
 
   return <ServerContext.Provider value={value}>{children}</ServerContext.Provider>;

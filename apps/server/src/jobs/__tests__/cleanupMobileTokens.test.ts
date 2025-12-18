@@ -56,11 +56,7 @@ describe('cleanupMobileTokens', () => {
 
   describe('expired unused tokens cleanup', () => {
     it('should delete expired unused tokens older than 1 hour', async () => {
-      const expiredTokens = [
-        { id: randomUUID() },
-        { id: randomUUID() },
-        { id: randomUUID() },
-      ];
+      const expiredTokens = [{ id: randomUUID() }, { id: randomUUID() }, { id: randomUUID() }];
       mockDeleteChain(expiredTokens, []);
 
       const result = await cleanupMobileTokens();
@@ -81,10 +77,7 @@ describe('cleanupMobileTokens', () => {
 
   describe('used tokens cleanup', () => {
     it('should delete used tokens older than 30 days', async () => {
-      const usedTokens = [
-        { id: randomUUID() },
-        { id: randomUUID() },
-      ];
+      const usedTokens = [{ id: randomUUID() }, { id: randomUUID() }];
       mockDeleteChain([], usedTokens);
 
       const result = await cleanupMobileTokens();
@@ -156,7 +149,8 @@ describe('cleanupMobileTokens', () => {
     });
 
     it('should return ids from deleted tokens', async () => {
-      const returningMock = vi.fn()
+      const returningMock = vi
+        .fn()
         .mockResolvedValueOnce([{ id: 'expired-1' }])
         .mockResolvedValueOnce([{ id: 'used-1' }, { id: 'used-2' }]);
 
@@ -227,7 +221,8 @@ describe('cleanupMobileTokens', () => {
     });
 
     it('should propagate database errors for used query', async () => {
-      const returningMock = vi.fn()
+      const returningMock = vi
+        .fn()
         .mockResolvedValueOnce([]) // Expired query succeeds
         .mockRejectedValueOnce(new Error('Query timeout')); // Used query fails
 

@@ -6,11 +6,7 @@
  * and per-device notification preferences.
  */
 
-import {
-  Expo,
-  type ExpoPushMessage,
-  type ExpoPushTicket,
-} from 'expo-server-sdk';
+import { Expo, type ExpoPushMessage, type ExpoPushTicket } from 'expo-server-sdk';
 import { eq, isNotNull } from 'drizzle-orm';
 import type { ViolationWithDetails, ActiveSession } from '@tracearr/shared';
 import { RULE_DISPLAY_NAMES, SEVERITY_LEVELS, getSeverityPriority } from '@tracearr/shared';
@@ -280,11 +276,7 @@ async function sendPushNotifications(messages: ExpoPushMessage[]): Promise<void>
 /**
  * Handle push notification error
  */
-function handlePushError(
-  token: string,
-  message?: string,
-  details?: { error?: string }
-): void {
+function handlePushError(token: string, message?: string, details?: { error?: string }): void {
   console.error(`[Push] Error for token ${token.slice(0, 20)}...: ${message}`);
 
   // Mark invalid tokens for removal
@@ -498,7 +490,11 @@ export class PushNotificationService {
     }
 
     // Apply quiet hours filtering (violations use severity for bypass)
-    const activeSessions = applyQuietHours(rateLimitedSessions, severity as NotificationSeverity, 'violation');
+    const activeSessions = applyQuietHours(
+      rateLimitedSessions,
+      severity as NotificationSeverity,
+      'violation'
+    );
     if (activeSessions.length === 0) {
       console.log(`[Push] All sessions in quiet hours for violation notification`);
       return;
@@ -688,11 +684,7 @@ export class PushNotificationService {
     }
 
     // Apply quiet hours filtering (server_down is treated as critical)
-    const activeSessions = applyQuietHoursEvent(
-      rateLimitedSessions,
-      'server_down',
-      'server_down'
-    );
+    const activeSessions = applyQuietHoursEvent(rateLimitedSessions, 'server_down', 'server_down');
     if (activeSessions.length === 0) {
       console.log(`[Push] All sessions in quiet hours for server down notification`);
       return;
@@ -812,11 +804,7 @@ export class PushNotificationService {
     }
 
     // Apply quiet hours filtering
-    const activeSessions = applyQuietHoursEvent(
-      rateLimitedSessions,
-      'server_up',
-      'server_up'
-    );
+    const activeSessions = applyQuietHoursEvent(rateLimitedSessions, 'server_up', 'server_up');
     if (activeSessions.length === 0) {
       console.log(`[Push] All sessions in quiet hours for server up notification`);
       return;

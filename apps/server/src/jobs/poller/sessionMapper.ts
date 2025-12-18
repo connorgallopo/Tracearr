@@ -110,9 +110,10 @@ export function mapMediaSession(
   const isEpisode = session.media.type === 'episode';
 
   // For episodes, prefer show poster; for movies, use media poster
-  const thumbPath = isEpisode && session.episode?.showThumbPath
-    ? session.episode.showThumbPath
-    : session.media.thumbPath ?? '';
+  const thumbPath =
+    isEpisode && session.episode?.showThumbPath
+      ? session.episode.showThumbPath
+      : (session.media.thumbPath ?? '');
 
   // Build quality string from resolution (preferred) or bitrate
   const quality = formatQualityString(session.quality);
@@ -138,9 +139,12 @@ export function mapMediaSession(
     username: session.user.username || 'Unknown',
     userThumb: session.user.thumb ?? '',
     mediaTitle: session.media.title,
-    mediaType: session.media.type === 'movie' ? 'movie'
-      : session.media.type === 'episode' ? 'episode'
-      : 'track',
+    mediaType:
+      session.media.type === 'movie'
+        ? 'movie'
+        : session.media.type === 'episode'
+          ? 'episode'
+          : 'track',
     // Enhanced media metadata
     grandparentTitle: session.episode?.showTitle ?? '',
     seasonNumber: session.episode?.seasonNumber ?? 0,

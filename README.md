@@ -17,7 +17,7 @@
 
 ---
 
-Tracearr is a streaming access manager for **Plex**, **Jellyfin**, and **Emby** that answers one question: *Who's actually using my server, and are they sharing their login?*
+Tracearr is a streaming access manager for **Plex**, **Jellyfin**, and **Emby** that answers one question: _Who's actually using my server, and are they sharing their login?_
 
 Unlike monitoring tools that just show you data, Tracearr is built to detect account abuse. See streams in real-time, flag suspicious activity automatically, and get notified the moment something looks off.
 
@@ -26,6 +26,7 @@ Unlike monitoring tools that just show you data, Tracearr is built to detect acc
 **Session Tracking** — Full history of who watched what, when, from where, on what device. Every stream logged with geolocation data.
 
 **Sharing Detection** — Five rule types catch account sharers:
+
 - 🚀 **Impossible Travel** — NYC then London 30 minutes later? That's not one person.
 - 📍 **Simultaneous Locations** — Same account streaming from two cities at once.
 - 🔀 **Device Velocity** — Too many unique IPs in a short window signals shared credentials.
@@ -50,20 +51,20 @@ Tracearr v1 is focused on **detection and alerting**. Automated enforcement—ki
 
 [Tautulli](https://github.com/Tautulli/Tautulli) and [Jellystat](https://github.com/CyferShepard/Jellystat) are great monitoring tools. We use Highcharts for graphs too. But they show you what happened—they don't tell you when something's wrong.
 
-| | Tautulli | Jellystat | Tracearr |
-|---|---|---|---|
-| Watch history | ✅ | ✅ | ✅ |
-| Statistics & graphs | ✅ | ✅ | ✅ |
-| Session monitoring | ✅ | ✅ | ✅ |
-| Account sharing detection | ❌ | ❌ | ✅ |
-| Impossible travel alerts | ❌ | ❌ | ✅ |
-| Trust scoring | ❌ | ❌ | ✅ |
-| Plex support | ✅ | ❌ | ✅ |
-| Jellyfin support | ❌ | ✅ | ✅ |
-| Emby support | ❌ | ✅ | ✅ |
-| Multi-server dashboard | ❌ | ❌ | ✅ |
-| IP geolocation | ✅ | ✅ | ✅ |
-| Import from Tautulli | — | ❌ | ✅ |
+|                           | Tautulli | Jellystat | Tracearr |
+| ------------------------- | -------- | --------- | -------- |
+| Watch history             | ✅       | ✅        | ✅       |
+| Statistics & graphs       | ✅       | ✅        | ✅       |
+| Session monitoring        | ✅       | ✅        | ✅       |
+| Account sharing detection | ❌       | ❌        | ✅       |
+| Impossible travel alerts  | ❌       | ❌        | ✅       |
+| Trust scoring             | ❌       | ❌        | ✅       |
+| Plex support              | ✅       | ❌        | ✅       |
+| Jellyfin support          | ❌       | ✅        | ✅       |
+| Emby support              | ❌       | ✅        | ✅       |
+| Multi-server dashboard    | ❌       | ❌        | ✅       |
+| IP geolocation            | ✅       | ✅        | ✅       |
+| Import from Tautulli      | —        | ❌        | ✅       |
 
 Tautulli and Jellystat are platform-locked equivalents—Plex-only vs Jellyfin/Emby-only. If you just want stats, they work fine. If you're tired of your brother's roommate's cousin streaming on your dime, that's what Tracearr is for.
 
@@ -93,14 +94,14 @@ docker compose -f docker/docker-compose.yml up -d
 
 ### Docker Tags
 
-| Tag | Description |
-|-----|-------------|
-| `latest` | Stable release (requires external DB/Redis) |
-| `supervised` | All-in-one stable release |
-| `next` | Latest prerelease (requires external DB/Redis) |
-| `supervised-next` | All-in-one prerelease |
-| `nightly` | Bleeding edge nightly (requires external DB/Redis) |
-| `supervised-nightly` | All-in-one nightly build |
+| Tag                  | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `latest`             | Stable release (requires external DB/Redis)        |
+| `supervised`         | All-in-one stable release                          |
+| `next`               | Latest prerelease (requires external DB/Redis)     |
+| `supervised-next`    | All-in-one prerelease                              |
+| `nightly`            | Bleeding edge nightly (requires external DB/Redis) |
+| `supervised-nightly` | All-in-one nightly build                           |
 
 ```bash
 # All-in-one (easiest)
@@ -140,16 +141,16 @@ Frontend runs at `localhost:5173`, API at `localhost:3000`.
 
 ## Stack
 
-| Layer | Tech |
-|---|---|
-| Frontend | React 19, TypeScript, Tailwind, shadcn/ui |
-| Charts | Highcharts |
-| Maps | Leaflet |
-| Backend | Node.js, Fastify |
-| Database | TimescaleDB (PostgreSQL extension) |
-| Cache | Redis |
-| Real-time | Socket.io |
-| Monorepo | pnpm + Turborepo |
+| Layer     | Tech                                      |
+| --------- | ----------------------------------------- |
+| Frontend  | React 19, TypeScript, Tailwind, shadcn/ui |
+| Charts    | Highcharts                                |
+| Maps      | Leaflet                                   |
+| Backend   | Node.js, Fastify                          |
+| Database  | TimescaleDB (PostgreSQL extension)        |
+| Cache     | Redis                                     |
+| Real-time | Socket.io                                 |
+| Monorepo  | pnpm + Turborepo                          |
 
 **TimescaleDB** handles session history. Regular Postgres works fine until you have a year of watch data and your stats queries start taking forever. TimescaleDB is built for exactly this kind of time-series data—dashboard stats stay fast because they're pre-computed, not recalculated every page load.
 
@@ -215,6 +216,7 @@ Check the [issues](https://github.com/connorgallopo/Tracearr/issues) for things 
 ## Roadmap
 
 **Alpha** (current — v0.1.x)
+
 - [x] Multi-server Plex, Jellyfin, and Emby support
 - [x] Session tracking with full history
 - [x] 5 sharing detection rules
@@ -226,13 +228,15 @@ Check the [issues](https://github.com/connorgallopo/Tracearr/issues) for things 
 - [x] Tautulli history import
 
 **v1.5** (next milestone)
-- [ ] Mobile app (iOS & Android) — *in development*
+
+- [ ] Mobile app (iOS & Android) — _in development_
 - [ ] Stream termination (kill suspicious streams)
 - [ ] Account suspension automation
 - [ ] Email notifications
 - [ ] Telegram notifier
 
 **v2.0** (future)
+
 - [ ] Tiered access controls
 - [ ] Arr integration (Radarr/Sonarr)
 - [ ] Multi-admin support

@@ -20,16 +20,10 @@ import {
   QualityChart,
 } from '@/components/charts';
 
-function ChartSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function ChartSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mb-4">
-      <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+      <Text className="text-muted-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
         {title}
       </Text>
       {children}
@@ -87,7 +81,10 @@ export default function ActivityScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <ScrollView
         className="flex-1"
         contentContainerClassName="p-4 pt-3"
@@ -100,10 +97,10 @@ export default function ActivityScreen() {
         }
       >
         {/* Header with Period Selector */}
-        <View className="flex-row items-center justify-between mb-4">
+        <View className="mb-4 flex-row items-center justify-between">
           <View>
             <Text className="text-lg font-semibold">Activity</Text>
-            <Text className="text-sm text-muted-foreground">{periodLabels[period]}</Text>
+            <Text className="text-muted-foreground text-sm">{periodLabels[period]}</Text>
           </View>
           <PeriodSelector value={period} onChange={setPeriod} />
         </View>
@@ -114,9 +111,9 @@ export default function ActivityScreen() {
         </ChartSection>
 
         {/* Day of Week & Hour of Day in a row on larger screens */}
-        <View className="flex-row gap-3 mb-4">
+        <View className="mb-4 flex-row gap-3">
           <View className="flex-1">
-            <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            <Text className="text-muted-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
               By Day
             </Text>
             <DayOfWeekChart data={dayOfWeekData?.data || []} height={160} />
@@ -124,7 +121,7 @@ export default function ActivityScreen() {
         </View>
 
         <View className="mb-4">
-          <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+          <Text className="text-muted-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
             By Hour
           </Text>
           <HourOfDayChart data={hourOfDayData?.data || []} height={160} />

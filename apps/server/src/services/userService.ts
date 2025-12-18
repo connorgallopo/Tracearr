@@ -110,11 +110,7 @@ export async function requireUserById(id: string): Promise<User> {
  * Get user identity by email (for auto-linking during sync)
  */
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email.toLowerCase()))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
   return rows[0] ?? null;
 }
 
@@ -122,11 +118,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
  * Get user identity by username (for local auth lookup)
  */
 export async function getUserByUsername(username: string): Promise<User | null> {
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
   return rows[0] ?? null;
 }
 
@@ -134,11 +126,7 @@ export async function getUserByUsername(username: string): Promise<User | null> 
  * Get user identity by Plex account ID (for Login with Plex)
  */
 export async function getUserByPlexAccountId(plexAccountId: string): Promise<User | null> {
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.plexAccountId, plexAccountId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.plexAccountId, plexAccountId)).limit(1);
   return rows[0] ?? null;
 }
 
@@ -146,11 +134,7 @@ export async function getUserByPlexAccountId(plexAccountId: string): Promise<Use
  * Get the owner user (for auth setup validation)
  */
 export async function getOwnerUser(): Promise<User | null> {
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.role, 'owner'))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.role, 'owner')).limit(1);
   return rows[0] ?? null;
 }
 
@@ -350,10 +334,7 @@ export async function getServerUserWithDetails(id: string): Promise<ServerUserWi
  * Returns a Map keyed by externalId for O(1) lookups
  */
 export async function getServerUsersByServer(serverId: string): Promise<Map<string, ServerUser>> {
-  const rows = await db
-    .select()
-    .from(serverUsers)
-    .where(eq(serverUsers.serverId, serverId));
+  const rows = await db.select().from(serverUsers).where(eq(serverUsers.serverId, serverId));
 
   const userMap = new Map<string, ServerUser>();
   for (const su of rows) {
@@ -366,10 +347,7 @@ export async function getServerUsersByServer(serverId: string): Promise<Map<stri
  * Get all server users for a user identity
  */
 export async function getServerUsersByUserId(userId: string): Promise<ServerUser[]> {
-  return db
-    .select()
-    .from(serverUsers)
-    .where(eq(serverUsers.userId, userId));
+  return db.select().from(serverUsers).where(eq(serverUsers.userId, userId));
 }
 
 /**
@@ -607,7 +585,9 @@ export async function getUserWithStats(userId: string): Promise<UserWithStats | 
 
   if (serverUserIds.length > 0) {
     // Build explicit PostgreSQL array literal (Drizzle doesn't auto-convert JS arrays for ANY())
-    const serverUserIdArray = sql.raw(`ARRAY[${serverUserIds.map(id => `'${id}'::uuid`).join(',')}]`);
+    const serverUserIdArray = sql.raw(
+      `ARRAY[${serverUserIds.map((id) => `'${id}'::uuid`).join(',')}]`
+    );
     const statsResult = await db
       .select({
         totalSessions: sql<number>`count(*)::int`,

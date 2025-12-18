@@ -61,19 +61,10 @@ export async function getDeviceSecret(): Promise<string> {
  *
  * This ensures each device has a unique key.
  */
-export async function deriveKey(
-  deviceSecret: string,
-  salt: Buffer
-): Promise<Buffer> {
+export async function deriveKey(deviceSecret: string, salt: Buffer): Promise<Buffer> {
   // Use PBKDF2 with 100,000 iterations for key derivation
   // Note: react-native-quick-crypto uses uppercase hash names
-  const key = crypto.pbkdf2Sync(
-    deviceSecret,
-    salt,
-    100000,
-    KEY_LENGTH,
-    'SHA-256'
-  );
+  const key = crypto.pbkdf2Sync(deviceSecret, salt, 100000, KEY_LENGTH, 'SHA-256');
 
   return Buffer.from(key);
 }
@@ -114,16 +105,15 @@ export async function decryptPushPayload(
     const key = await deriveKey(deviceSecret, salt);
 
     // Create decipher
-    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv) as ReturnType<typeof crypto.createDecipheriv> & {
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv) as ReturnType<
+      typeof crypto.createDecipheriv
+    > & {
       setAuthTag: (tag: Buffer) => void;
     };
     decipher.setAuthTag(authTag);
 
     // Decrypt
-    const decrypted = Buffer.concat([
-      decipher.update(ciphertext),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
 
     // Parse JSON
     const payload = JSON.parse(decrypted.toString('utf8')) as DecryptedPayload;
@@ -140,9 +130,7 @@ export async function decryptPushPayload(
  * This is primarily used for development/testing.
  * In production, encryption happens on the server.
  */
-export async function encryptData(
-  data: Record<string, unknown>
-): Promise<EncryptedPushPayload> {
+export async function encryptData(data: Record<string, unknown>): Promise<EncryptedPushPayload> {
   try {
     const deviceSecret = await getDeviceSecret();
 
@@ -154,16 +142,15 @@ export async function encryptData(
     const key = await deriveKey(deviceSecret, Buffer.from(salt));
 
     // Create cipher
-    const cipher = crypto.createCipheriv(ALGORITHM, key, iv) as ReturnType<typeof crypto.createCipheriv> & {
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv) as ReturnType<
+      typeof crypto.createCipheriv
+    > & {
       getAuthTag: () => Buffer;
     };
 
     // Encrypt
     const plaintext = Buffer.from(JSON.stringify(data), 'utf8');
-    const encrypted = Buffer.concat([
-      cipher.update(plaintext),
-      cipher.final(),
-    ]);
+    const encrypted = Buffer.concat([cipher.update(plaintext), cipher.final()]);
 
     // Get auth tag
     const authTag = cipher.getAuthTag();

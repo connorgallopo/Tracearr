@@ -736,7 +736,8 @@ describe('Field Mapping', () => {
     });
 
     it('should map direct play to quality string', () => {
-      const quality = REAL_EPISODE_RECORD.transcode_decision === 'transcode' ? 'Transcode' : 'Direct';
+      const quality =
+        REAL_EPISODE_RECORD.transcode_decision === 'transcode' ? 'Transcode' : 'Direct';
       expect(quality).toBe('Direct');
     });
   });
@@ -987,13 +988,13 @@ describe('Deduplication Logic', () => {
     });
 
     it('should skip fallback dedup when ratingKey is null', () => {
-      const ratingKeyStr = typeof REAL_MOVIE_RECORD.rating_key === 'number'
-        ? String(REAL_MOVIE_RECORD.rating_key)
-        : null;
+      const ratingKeyStr =
+        typeof REAL_MOVIE_RECORD.rating_key === 'number'
+          ? String(REAL_MOVIE_RECORD.rating_key)
+          : null;
 
-      const emptyRatingKeyStr = typeof ('' as number | '') === 'number'
-        ? String('' as number | '')
-        : null;
+      const emptyRatingKeyStr =
+        typeof ('' as number | '') === 'number' ? String('' as number | '') : null;
 
       expect(ratingKeyStr).toBe('25314');
       expect(emptyRatingKeyStr).toBeNull();

@@ -64,7 +64,9 @@ export function initializeWebSocket(httpServer: HttpServer): TypedServer {
 
   io.on('connection', (socket: TypedSocket) => {
     const user = (socket.data as SocketData).user;
-    console.log(`[WebSocket] Client connected: ${socket.id} (user: ${user?.username ?? 'unknown'})`);
+    console.log(
+      `[WebSocket] Client connected: ${socket.id} (user: ${user?.username ?? 'unknown'})`
+    );
 
     // Join user-specific room for targeted messages
     if (user?.userId) {
@@ -113,7 +115,10 @@ export function broadcastToSessions<K extends keyof ServerToClientEvents>(
   ...args: Parameters<ServerToClientEvents[K]>
 ): void {
   if (io) {
-    (io.to('sessions').emit as (event: K, ...args: Parameters<ServerToClientEvents[K]>) => void)(event, ...args);
+    (io.to('sessions').emit as (event: K, ...args: Parameters<ServerToClientEvents[K]>) => void)(
+      event,
+      ...args
+    );
   }
 }
 
@@ -123,6 +128,11 @@ export function broadcastToServer<K extends keyof ServerToClientEvents>(
   ...args: Parameters<ServerToClientEvents[K]>
 ): void {
   if (io) {
-    (io.to(`server:${serverId}`).emit as (event: K, ...args: Parameters<ServerToClientEvents[K]>) => void)(event, ...args);
+    (
+      io.to(`server:${serverId}`).emit as (
+        event: K,
+        ...args: Parameters<ServerToClientEvents[K]>
+      ) => void
+    )(event, ...args);
   }
 }

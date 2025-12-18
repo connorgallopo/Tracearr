@@ -180,9 +180,7 @@ export const api = {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Extract server's error message if available
-        const serverMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error;
+        const serverMessage = error.response?.data?.message || error.response?.data?.error;
 
         if (serverMessage) {
           throw new Error(serverMessage);
@@ -284,7 +282,10 @@ export const api = {
       );
       return response.data;
     },
-    quality: async (params?: { period?: string; serverId?: string }): Promise<{
+    quality: async (params?: {
+      period?: string;
+      serverId?: string;
+    }): Promise<{
       directPlay: number;
       transcode: number;
       total: number;

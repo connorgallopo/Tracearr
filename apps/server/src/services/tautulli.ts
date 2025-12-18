@@ -206,7 +206,9 @@ export class TautulliService {
         // Wait before retrying (exponential backoff)
         if (attempt < MAX_RETRIES) {
           const delay = RETRY_DELAY_MS * attempt;
-          console.warn(`Tautulli API request failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms...`);
+          console.warn(
+            `Tautulli API request failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms...`
+          );
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
@@ -281,11 +283,7 @@ export class TautulliService {
     onProgress?: (progress: TautulliImportProgress) => Promise<void>
   ): Promise<TautulliImportResult> {
     // Get Tautulli settings
-    const settingsRow = await db
-      .select()
-      .from(settings)
-      .where(eq(settings.id, 1))
-      .limit(1);
+    const settingsRow = await db.select().from(settings).where(eq(settings.id, 1)).limit(1);
 
     const config = settingsRow[0];
     if (!config?.tautulliUrl || !config?.tautulliApiKey) {
@@ -417,9 +415,7 @@ export class TautulliService {
           watched: sessions.watched,
         })
         .from(sessions)
-        .where(
-          and(eq(sessions.serverId, serverId), inArray(sessions.externalSessionId, refIds))
-        );
+        .where(and(eq(sessions.serverId, serverId), inArray(sessions.externalSessionId, refIds)));
 
       const map = new Map<string, ExistingSession>();
       for (const s of existing) {
@@ -459,10 +455,7 @@ export class TautulliService {
               sessions.ratingKey,
               keys.map((k) => k.ratingKey)
             ),
-            inArray(
-              sessions.serverUserId,
-              [...new Set(keys.map((k) => k.serverUserId))]
-            )
+            inArray(sessions.serverUserId, [...new Set(keys.map((k) => k.serverUserId))])
           )
         );
 
@@ -686,13 +679,20 @@ export class TautulliService {
               const needsExternalId = !existingByTime.externalSessionId;
 
               // Check if other fields changed
-              const stoppedAtChanged = existingByTime.stoppedAt?.getTime() !== newStoppedAt.getTime();
+              const stoppedAtChanged =
+                existingByTime.stoppedAt?.getTime() !== newStoppedAt.getTime();
               const durationChanged = existingByTime.durationMs !== newDurationMs;
               const pausedChanged = existingByTime.pausedDurationMs !== newPausedDurationMs;
               const watchedChanged = existingByTime.watched !== newWatched;
 
               // Only update if externalSessionId is missing OR something actually changed
-              if (needsExternalId || stoppedAtChanged || durationChanged || pausedChanged || watchedChanged) {
+              if (
+                needsExternalId ||
+                stoppedAtChanged ||
+                durationChanged ||
+                pausedChanged ||
+                watchedChanged
+              ) {
                 updateBatch.push({
                   id: existingByTime.id,
                   externalSessionId: referenceIdStr,
@@ -776,8 +776,14 @@ export class TautulliService {
             isTranscode: record.transcode_decision === 'transcode',
             // Tautulli only provides combined decision - use same value for both
             // 'direct play' → 'directplay' to match Plex/Jellyfin format
-            videoDecision: record.transcode_decision === 'direct play' ? 'directplay' : record.transcode_decision,
-            audioDecision: record.transcode_decision === 'direct play' ? 'directplay' : record.transcode_decision,
+            videoDecision:
+              record.transcode_decision === 'direct play'
+                ? 'directplay'
+                : record.transcode_decision,
+            audioDecision:
+              record.transcode_decision === 'direct play'
+                ? 'directplay'
+                : record.transcode_decision,
             bitrate: null,
           });
 

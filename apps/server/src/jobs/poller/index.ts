@@ -51,11 +51,7 @@ export type { PollerConfig } from './types.js';
 // Pure Utility Functions (exported for testing)
 // ============================================================================
 
-export {
-  isPrivateIP,
-  parseJellyfinClient,
-  formatQualityString,
-} from './utils.js';
+export { isPrivateIP, parseJellyfinClient, formatQualityString } from './utils.js';
 
 // ============================================================================
 // State Tracking Functions (exported for testing)
@@ -72,7 +68,4 @@ export {
 // Rule/Violation Functions (exported for testing)
 // ============================================================================
 
-export {
-  getTrustScorePenalty,
-  doesRuleApplyToUser,
-} from './violations.js';
+export { getTrustScorePenalty, doesRuleApplyToUser } from './violations.js';

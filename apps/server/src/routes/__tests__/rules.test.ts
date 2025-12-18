@@ -154,7 +154,12 @@ describe('Rule Routes', () => {
             leftJoin: vi.fn().mockReturnValue({
               orderBy: vi.fn().mockResolvedValue([
                 { ...globalRule, username: null, serverId: null, serverName: null },
-                { ...userRule, username: 'someone', serverId: randomUUID(), serverName: 'Test Server' },
+                {
+                  ...userRule,
+                  username: 'someone',
+                  serverId: randomUUID(),
+                  serverName: 'Test Server',
+                },
               ]),
             }),
           }),
@@ -337,7 +342,11 @@ describe('Rule Routes', () => {
           leftJoin: vi.fn().mockReturnValue({
             leftJoin: vi.fn().mockReturnValue({
               where: vi.fn().mockReturnValue({
-                limit: vi.fn().mockResolvedValue([{ ...testRule, username: null, serverId: null, serverName: null }]),
+                limit: vi
+                  .fn()
+                  .mockResolvedValue([
+                    { ...testRule, username: null, serverId: null, serverName: null },
+                  ]),
               }),
             }),
           }),

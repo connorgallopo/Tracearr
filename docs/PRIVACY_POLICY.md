@@ -7,6 +7,7 @@
 Tracearr is a mobile application designed to help you monitor and manage access to your self-hosted media servers (Plex, Jellyfin, and Emby). We take your privacy seriously and believe in being transparent about how the app works.
 
 **The Short Version:**
+
 - Tracearr connects to YOUR self-hosted backend server
 - We don't collect, store, or sell your data
 - All data flows through infrastructure YOU control
@@ -174,6 +175,7 @@ Because all your data is stored on infrastructure you control, you have complete
 - Terminate your use of the service at any time
 
 To delete data from your device:
+
 - Uninstall the Tracearr app to remove all locally stored data
 - Delete data from your backend server according to its procedures
 
@@ -203,6 +205,7 @@ Data retention on your self-hosted backend is entirely under your control. Consu
 Because Tracearr connects to YOUR infrastructure, data location is determined by where you choose to host your backend server. If you host your backend in a specific country, your data remains in that jurisdiction.
 
 The app itself does not transfer data internationally, except for:
+
 - Push notifications routed through Expo's infrastructure (which may involve international data transfer)
 
 ## Changes to This Privacy Policy
@@ -226,6 +229,7 @@ We encourage you to review this policy periodically.
 Under the California Consumer Privacy Act (CCPA), California residents have specific rights regarding their personal information. However, because Tracearr does not collect, store, or sell personal information, most CCPA provisions do not apply.
 
 For clarity:
+
 - We do not sell personal information
 - We do not collect personal information for business purposes
 - All data is stored on infrastructure you control

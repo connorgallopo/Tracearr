@@ -6,7 +6,13 @@
  */
 
 import { eq, and, desc, gte, inArray } from 'drizzle-orm';
-import { TIME_MS, SESSION_LIMITS, type Session, type Rule, type RuleParams } from '@tracearr/shared';
+import {
+  TIME_MS,
+  SESSION_LIMITS,
+  type Session,
+  type Rule,
+  type RuleParams,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { sessions, rules } from '../../db/schema.js';
 import { mapSessionRow } from './sessionMapper.js';
@@ -47,10 +53,7 @@ export async function batchGetRecentUserSessions(
   const recentSessions = await db
     .select()
     .from(sessions)
-    .where(and(
-      inArray(sessions.serverUserId, serverUserIds),
-      gte(sessions.startedAt, since)
-    ))
+    .where(and(inArray(sessions.serverUserId, serverUserIds), gte(sessions.startedAt, since)))
     .orderBy(desc(sessions.startedAt));
 
   // Group by server user (limit per user to prevent memory issues)

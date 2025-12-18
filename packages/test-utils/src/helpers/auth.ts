@@ -30,7 +30,14 @@ export interface GenerateTokenOptions {
  * Generate a test JWT token
  */
 export function generateTestToken(options: GenerateTokenOptions): string {
-  const { userId, role = 'owner', email, name, expiresIn = '1h', secret = TEST_JWT_SECRET } = options;
+  const {
+    userId,
+    role = 'owner',
+    email,
+    name,
+    expiresIn = '1h',
+    secret = TEST_JWT_SECRET,
+  } = options;
 
   const payload: TestTokenPayload = {
     sub: userId,

@@ -66,13 +66,13 @@ const HEATMAP_CONFIG = {
   // Gradient: dark cyan base → bright cyan → white hotspots
   // Designed for dark map tiles with good contrast
   gradient: {
-    0.0: 'rgba(14, 116, 144, 0)',    // cyan-700 transparent (fade from nothing)
-    0.2: 'rgba(14, 116, 144, 0.8)',  // cyan-700
-    0.4: '#0891b2',                   // cyan-600
-    0.6: '#06b6d4',                   // cyan-500
-    0.8: '#22d3ee',                   // cyan-400
-    0.95: '#67e8f9',                  // cyan-300
-    1.0: '#ffffff',                   // white for hotspots
+    0.0: 'rgba(14, 116, 144, 0)', // cyan-700 transparent (fade from nothing)
+    0.2: 'rgba(14, 116, 144, 0.8)', // cyan-700
+    0.4: '#0891b2', // cyan-600
+    0.6: '#06b6d4', // cyan-500
+    0.8: '#22d3ee', // cyan-400
+    0.95: '#67e8f9', // cyan-300
+    1.0: '#ffffff', // white for hotspots
   },
   // Radius: larger for world view, heatmap auto-adjusts with zoom
   radius: 30,
@@ -138,7 +138,13 @@ function CircleMarkersLayer({ locations }: { locations: LocationStats[] }) {
 }
 
 // Component to fit bounds when data changes
-function MapBoundsUpdater({ locations, isLoading }: { locations: LocationStats[]; isLoading?: boolean }) {
+function MapBoundsUpdater({
+  locations,
+  isLoading,
+}: {
+  locations: LocationStats[];
+  isLoading?: boolean;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -165,12 +171,20 @@ const TILE_URLS = {
   light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
 };
 
-export function StreamMap({ locations, className, isLoading, viewMode = 'heatmap' }: StreamMapProps) {
+export function StreamMap({
+  locations,
+  className,
+  isLoading,
+  viewMode = 'heatmap',
+}: StreamMapProps) {
   const hasData = locations.length > 0;
   const { theme } = useTheme();
-  const resolvedTheme = theme === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : theme;
+  const resolvedTheme =
+    theme === 'system'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : theme;
   const tileUrl = TILE_URLS[resolvedTheme];
 
   return (
@@ -214,9 +228,9 @@ export function StreamMap({ locations, className, isLoading, viewMode = 'heatmap
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="bg-background/50 absolute inset-0 flex items-center justify-center backdrop-blur-sm">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
             Loading map data...
           </div>
         </div>
@@ -224,8 +238,8 @@ export function StreamMap({ locations, className, isLoading, viewMode = 'heatmap
 
       {/* No data message */}
       {!isLoading && !hasData && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-          <p className="text-sm text-muted-foreground">No location data for current filters</p>
+        <div className="bg-background/50 absolute inset-0 flex items-center justify-center">
+          <p className="text-muted-foreground text-sm">No location data for current filters</p>
         </div>
       )}
     </div>

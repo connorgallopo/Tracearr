@@ -74,7 +74,10 @@ export function createMediaServerClient(options: CreateClientOptions): IMediaSer
 export function supportsWatchHistory(
   client: IMediaServerClient
 ): client is IMediaServerClientWithHistory {
-  return 'getWatchHistory' in client && typeof (client as IMediaServerClientWithHistory).getWatchHistory === 'function';
+  return (
+    'getWatchHistory' in client &&
+    typeof (client as IMediaServerClientWithHistory).getWatchHistory === 'function'
+  );
 }
 
 // ============================================================================

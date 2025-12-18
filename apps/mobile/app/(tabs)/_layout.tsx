@@ -67,9 +67,7 @@ export default function TabLayout() {
           title: 'Dashboard',
           headerTitle: () => <ServerSelector />,
           tabBarLabel: 'Dashboard',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon icon={LayoutDashboard} focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={LayoutDashboard} focused={focused} />,
         }}
       />
       <Tabs.Screen
@@ -78,9 +76,7 @@ export default function TabLayout() {
           title: 'Activity',
           headerTitle: () => <ServerSelector />,
           tabBarLabel: 'Activity',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon icon={Activity} focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={Activity} focused={focused} />,
         }}
       />
       <Tabs.Screen
@@ -106,9 +102,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarLabel: 'Settings',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon icon={Settings} focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => <TabIcon icon={Settings} focused={focused} />,
         }}
       />
     </Tabs>

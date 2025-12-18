@@ -468,19 +468,22 @@ describe('Channel Routing Helper Functions', () => {
 
   describe('getChannelRouting', () => {
     it('returns routing for existing event type', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([
-              {
-                discordEnabled: true,
-                webhookEnabled: false,
-                pushEnabled: true,
-              },
-            ]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([
+                  {
+                    discordEnabled: true,
+                    webhookEnabled: false,
+                    pushEnabled: true,
+                  },
+                ]),
+              }),
+            }),
+          }) as never
+      );
 
       const routing = await getChannelRouting('violation_detected');
 
@@ -490,13 +493,16 @@ describe('Channel Routing Helper Functions', () => {
     });
 
     it('returns defaults for high-priority events with no routing', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }) as never
+      );
 
       const routing = await getChannelRouting('violation_detected');
 
@@ -507,13 +513,16 @@ describe('Channel Routing Helper Functions', () => {
     });
 
     it('returns defaults for low-priority events with no routing', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }) as never
+      );
 
       const routing = await getChannelRouting('stream_started');
 
@@ -524,13 +533,16 @@ describe('Channel Routing Helper Functions', () => {
     });
 
     it('returns defaults for trust_score_changed (low-priority)', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]),
-          }),
-        }),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockReturnValue({
+              where: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue([]),
+              }),
+            }),
+          }) as never
+      );
 
       const routing = await getChannelRouting('trust_score_changed');
 
@@ -542,28 +554,31 @@ describe('Channel Routing Helper Functions', () => {
 
   describe('getAllChannelRouting', () => {
     it('returns map of all routing configuration', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockResolvedValue([
-          {
-            eventType: 'violation_detected',
-            discordEnabled: true,
-            webhookEnabled: true,
-            pushEnabled: true,
-          },
-          {
-            eventType: 'stream_started',
-            discordEnabled: false,
-            webhookEnabled: false,
-            pushEnabled: false,
-          },
-          {
-            eventType: 'server_down',
-            discordEnabled: true,
-            webhookEnabled: true,
-            pushEnabled: false,
-          },
-        ]),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockResolvedValue([
+              {
+                eventType: 'violation_detected',
+                discordEnabled: true,
+                webhookEnabled: true,
+                pushEnabled: true,
+              },
+              {
+                eventType: 'stream_started',
+                discordEnabled: false,
+                webhookEnabled: false,
+                pushEnabled: false,
+              },
+              {
+                eventType: 'server_down',
+                discordEnabled: true,
+                webhookEnabled: true,
+                pushEnabled: false,
+              },
+            ]),
+          }) as never
+      );
 
       const routingMap = await getAllChannelRouting();
 
@@ -586,9 +601,12 @@ describe('Channel Routing Helper Functions', () => {
     });
 
     it('returns empty map when no routing exists', async () => {
-      vi.mocked(db.select).mockImplementation(() => ({
-        from: vi.fn().mockResolvedValue([]),
-      }) as never);
+      vi.mocked(db.select).mockImplementation(
+        () =>
+          ({
+            from: vi.fn().mockResolvedValue([]),
+          }) as never
+      );
 
       const routingMap = await getAllChannelRouting();
 

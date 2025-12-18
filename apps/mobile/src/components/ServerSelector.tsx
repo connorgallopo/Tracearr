@@ -3,14 +3,7 @@
  * Tappable button that shows current server, opens modal to switch
  */
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { Server, ChevronDown, Check } from 'lucide-react-native';
 import { useMediaServer } from '../providers/MediaServerProvider';
 import { colors } from '../lib/theme';
@@ -34,7 +27,7 @@ export function ServerSelector() {
       return (
         <View className="flex-row items-center px-3">
           <Server size={16} color={colors.text.primary.dark} />
-          <Text className="ml-2 text-sm text-white font-medium" numberOfLines={1}>
+          <Text className="ml-2 text-sm font-medium text-white" numberOfLines={1}>
             {servers[0]?.name}
           </Text>
         </View>
@@ -69,14 +62,14 @@ export function ServerSelector() {
         onRequestClose={() => setModalVisible(false)}
       >
         <Pressable
-          className="flex-1 justify-center items-center bg-black/60"
+          className="flex-1 items-center justify-center bg-black/60"
           onPress={() => setModalVisible(false)}
         >
           <Pressable
-            className="w-4/5 max-w-sm bg-gray-900 rounded-xl overflow-hidden"
+            className="w-4/5 max-w-sm overflow-hidden rounded-xl bg-gray-900"
             onPress={(e) => e.stopPropagation()}
           >
-            <View className="px-4 py-3 border-b border-gray-800">
+            <View className="border-b border-gray-800 px-4 py-3">
               <Text className="text-lg font-semibold text-white">Select Server</Text>
             </View>
             <View className="py-2">
@@ -87,34 +80,28 @@ export function ServerSelector() {
                   className="flex-row items-center justify-between px-4 py-3"
                   activeOpacity={0.7}
                 >
-                  <View className="flex-row items-center flex-1">
+                  <View className="flex-1 flex-row items-center">
                     <Server
                       size={20}
                       color={
-                        server.id === selectedServerId
-                          ? colors.cyan.core
-                          : colors.text.muted.dark
+                        server.id === selectedServerId ? colors.cyan.core : colors.text.muted.dark
                       }
                     />
                     <View className="ml-3 flex-1">
                       <Text
                         className={`text-base ${
                           server.id === selectedServerId
-                            ? 'text-cyan-400 font-medium'
+                            ? 'font-medium text-cyan-400'
                             : 'text-white'
                         }`}
                         numberOfLines={1}
                       >
                         {server.name}
                       </Text>
-                      <Text className="text-xs text-gray-500 capitalize">
-                        {server.type}
-                      </Text>
+                      <Text className="text-xs text-gray-500 capitalize">{server.type}</Text>
                     </View>
                   </View>
-                  {server.id === selectedServerId && (
-                    <Check size={20} color={colors.cyan.core} />
-                  )}
+                  {server.id === selectedServerId && <Check size={20} color={colors.cyan.core} />}
                 </TouchableOpacity>
               ))}
             </View>

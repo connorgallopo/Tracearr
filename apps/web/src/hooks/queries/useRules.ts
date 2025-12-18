@@ -15,8 +15,7 @@ export function useCreateRule() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Omit<Rule, 'id' | 'createdAt' | 'updatedAt'>) =>
-      api.rules.create(data),
+    mutationFn: (data: Omit<Rule, 'id' | 'createdAt' | 'updatedAt'>) => api.rules.create(data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['rules', 'list'] });
       toast.success('Rule Created', { description: 'The rule has been created successfully.' });
@@ -31,8 +30,7 @@ export function useUpdateRule() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Rule> }) =>
-      api.rules.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Rule> }) => api.rules.update(id, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['rules', 'list'] });
       toast.success('Rule Updated', { description: 'The rule has been updated successfully.' });
@@ -74,9 +72,7 @@ export function useToggleRule() {
       // Optimistically update to the new value
       queryClient.setQueryData<Rule[]>(['rules', 'list'], (old) => {
         if (!old) return [];
-        return old.map((rule) =>
-          rule.id === id ? { ...rule, isActive } : rule
-        );
+        return old.map((rule) => (rule.id === id ? { ...rule, isActive } : rule));
       });
 
       return { previousRules };

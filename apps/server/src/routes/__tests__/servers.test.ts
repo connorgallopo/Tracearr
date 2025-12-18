@@ -163,7 +163,14 @@ describe('Server Routes', () => {
       app = await buildTestApp(ownerUser);
 
       mockDbSelectWhere([
-        { id: mockServer.id, name: mockServer.name, type: mockServer.type, url: mockServer.url, createdAt: mockServer.createdAt, updatedAt: mockServer.updatedAt },
+        {
+          id: mockServer.id,
+          name: mockServer.name,
+          type: mockServer.type,
+          url: mockServer.url,
+          createdAt: mockServer.createdAt,
+          updatedAt: mockServer.updatedAt,
+        },
       ]);
 
       const response = await app.inject({
@@ -188,7 +195,14 @@ describe('Server Routes', () => {
       app = await buildTestApp(guestWithServer);
 
       mockDbSelectWhere([
-        { id: guestServerId, name: 'Guest Server', type: 'jellyfin', url: 'http://localhost:8096', createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: guestServerId,
+          name: 'Guest Server',
+          type: 'jellyfin',
+          url: 'http://localhost:8096',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ]);
 
       const response = await app.inject({
@@ -227,7 +241,12 @@ describe('Server Routes', () => {
       vi.mocked(PlexClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue(true);
       vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue(true);
-      vi.mocked(syncServer).mockResolvedValue({ usersAdded: 5, usersUpdated: 0, librariesSynced: 3, errors: [] });
+      vi.mocked(syncServer).mockResolvedValue({
+        usersAdded: 5,
+        usersUpdated: 0,
+        librariesSynced: 3,
+        errors: [],
+      });
     });
 
     it('creates a new Plex server for owner', async () => {
@@ -258,7 +277,10 @@ describe('Server Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(PlexClient.verifyServerAdmin).toHaveBeenCalledWith('my-plex-token', 'http://plex.local:32400');
+      expect(PlexClient.verifyServerAdmin).toHaveBeenCalledWith(
+        'my-plex-token',
+        'http://plex.local:32400'
+      );
       const body = response.json();
       expect(body.name).toBe('New Plex');
       expect(body.type).toBe('plex');
@@ -291,7 +313,10 @@ describe('Server Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(JellyfinClient.verifyServerAdmin).toHaveBeenCalledWith('my-jellyfin-token', 'http://jellyfin.local:8096');
+      expect(JellyfinClient.verifyServerAdmin).toHaveBeenCalledWith(
+        'my-jellyfin-token',
+        'http://jellyfin.local:8096'
+      );
     });
 
     it('creates a new Emby server for owner', async () => {
@@ -321,7 +346,10 @@ describe('Server Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(EmbyClient.verifyServerAdmin).toHaveBeenCalledWith('my-emby-token', 'http://emby.local:8096');
+      expect(EmbyClient.verifyServerAdmin).toHaveBeenCalledWith(
+        'my-emby-token',
+        'http://emby.local:8096'
+      );
     });
 
     it('rejects guest creating server', async () => {
@@ -506,7 +534,10 @@ describe('Server Routes', () => {
       expect(body.usersUpdated).toBe(2);
       expect(body.librariesSynced).toBe(5);
       expect(body.errors).toEqual([]);
-      expect(syncServer).toHaveBeenCalledWith(mockServer.id, { syncUsers: true, syncLibraries: true });
+      expect(syncServer).toHaveBeenCalledWith(mockServer.id, {
+        syncUsers: true,
+        syncLibraries: true,
+      });
     });
 
     it('returns errors when sync has issues', async () => {
@@ -645,14 +676,17 @@ describe('Server Routes', () => {
         (request as { user: AuthUser }).user = ownerUser;
       });
 
-      customApp.decorateRequest('jwtVerify', async function (this: { user: AuthUser; headers: { authorization?: string } }) {
-        // Simulate JWT verification - if header exists, it's valid
-        if (this.headers.authorization) {
-          this.user = ownerUser;
-        } else {
-          throw new Error('Missing token');
+      customApp.decorateRequest(
+        'jwtVerify',
+        async function (this: { user: AuthUser; headers: { authorization?: string } }) {
+          // Simulate JWT verification - if header exists, it's valid
+          if (this.headers.authorization) {
+            this.user = ownerUser;
+          } else {
+            throw new Error('Missing token');
+          }
         }
-      });
+      );
 
       await customApp.register(serverRoutes, { prefix: '/servers' });
 

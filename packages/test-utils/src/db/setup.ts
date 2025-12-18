@@ -63,10 +63,7 @@ export async function isTestDbReady(): Promise<boolean> {
  *
  * Useful in CI where database container may still be starting.
  */
-export async function waitForTestDb(
-  maxRetries = 30,
-  retryDelayMs = 1000
-): Promise<void> {
+export async function waitForTestDb(maxRetries = 30, retryDelayMs = 1000): Promise<void> {
   for (let i = 0; i < maxRetries; i++) {
     if (await isTestDbReady()) {
       return;

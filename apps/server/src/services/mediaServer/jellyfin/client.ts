@@ -203,9 +203,7 @@ export class JellyfinClient implements IMediaServerClient, IMediaServerClientWit
   /**
    * Get watch history for all users on the server
    */
-  async getAllUsersWatchHistory(
-    limit = 200
-  ): Promise<Map<string, MediaWatchHistoryItem[]>> {
+  async getAllUsersWatchHistory(limit = 200): Promise<Map<string, MediaWatchHistoryItem[]>> {
     const allUsers = await this.getUsers();
     const historyMap = new Map<string, MediaWatchHistoryItem[]>();
 
@@ -241,13 +239,10 @@ export class JellyfinClient implements IMediaServerClient, IMediaServerClientWit
     if (options?.minDate) params.append('minDate', options.minDate.toISOString());
     if (options?.hasUserId !== undefined) params.append('hasUserId', String(options.hasUserId));
 
-    const data = await fetchJson<unknown>(
-      `${this.baseUrl}/System/ActivityLog/Entries?${params}`,
-      {
-        headers: this.buildHeaders(),
-        service: 'jellyfin',
-      }
-    );
+    const data = await fetchJson<unknown>(`${this.baseUrl}/System/ActivityLog/Entries?${params}`, {
+      headers: this.buildHeaders(),
+      service: 'jellyfin',
+    });
 
     return parseActivityLogResponse(data);
   }
@@ -268,22 +263,19 @@ export class JellyfinClient implements IMediaServerClient, IMediaServerClientWit
     const authHeader = `MediaBrowser Client="${CLIENT_NAME}", Device="${DEVICE_NAME}", DeviceId="${DEVICE_ID}", Version="${CLIENT_VERSION}"`;
 
     try {
-      const data = await fetchJson<Record<string, unknown>>(
-        `${url}/Users/AuthenticateByName`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Emby-Authorization': authHeader,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            Username: username,
-            Pw: password,
-          }),
-          service: 'jellyfin',
-        }
-      );
+      const data = await fetchJson<Record<string, unknown>>(`${url}/Users/AuthenticateByName`, {
+        method: 'POST',
+        headers: {
+          'X-Emby-Authorization': authHeader,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          Username: username,
+          Pw: password,
+        }),
+        service: 'jellyfin',
+      });
 
       return parseAuthResponse(data);
     } catch (error) {

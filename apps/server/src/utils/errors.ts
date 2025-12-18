@@ -86,10 +86,7 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   public readonly fields?: Array<{ field: string; message: string }>;
 
-  constructor(
-    message: string,
-    fields?: Array<{ field: string; message: string }>
-  ) {
+  constructor(message: string, fields?: Array<{ field: string; message: string }>) {
     super(message, 400, ErrorCodes.VALIDATION_ERROR, fields ? { fields } : undefined);
     this.name = 'ValidationError';
     this.fields = fields;

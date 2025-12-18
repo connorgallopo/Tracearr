@@ -15,11 +15,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/brand/Logo';
 import { ServerSelector } from './ServerSelector';
@@ -52,9 +48,7 @@ function NavMenuItem({ item }: { item: NavItem }) {
 function NavMenuGroup({ group }: { group: NavGroup }) {
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
-  const isActive = group.children.some((child) =>
-    location.pathname.startsWith(child.href)
-  );
+  const isActive = group.children.some((child) => location.pathname.startsWith(child.href));
 
   return (
     <Collapsible defaultOpen={isActive} className="group/collapsible">
@@ -95,11 +89,7 @@ function VersionDisplay() {
   const { data: version, isLoading } = useVersion();
 
   if (isLoading || !version) {
-    return (
-      <div className="text-xs text-muted-foreground">
-        Loading...
-      </div>
-    );
+    return <div className="text-muted-foreground text-xs">Loading...</div>;
   }
 
   const displayVersion = version.current.tag
@@ -109,13 +99,11 @@ function VersionDisplay() {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">
-          {displayVersion}
-        </span>
+        <span className="text-muted-foreground text-xs">{displayVersion}</span>
         {version.updateAvailable && version.latest && (
           <Badge
             variant="secondary"
-            className="h-5 gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20 dark:text-green-400 cursor-pointer"
+            className="h-5 cursor-pointer gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20 dark:text-green-400"
             onClick={() => window.open(version.latest!.releaseUrl, '_blank')}
           >
             <ArrowUpCircle className="h-3 w-3" />
@@ -128,7 +116,7 @@ function VersionDisplay() {
           href={version.latest.releaseUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-[10px] transition-colors"
         >
           <span>{version.latest.tag} available</span>
           <ExternalLink className="h-2.5 w-2.5" />

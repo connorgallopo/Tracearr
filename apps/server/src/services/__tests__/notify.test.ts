@@ -163,7 +163,7 @@ describe('NotificationService', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer tk_secret_token_123',
+            Authorization: 'Bearer tk_secret_token_123',
           },
         })
       );
@@ -278,7 +278,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer tk_server_token',
+            Authorization: 'Bearer tk_server_token',
           },
         })
       );
@@ -310,7 +310,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer tk_server_token',
+            Authorization: 'Bearer tk_server_token',
           },
         })
       );
@@ -340,7 +340,7 @@ describe('NotificationService', () => {
         expect.objectContaining({
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer tk_session_token',
+            Authorization: 'Bearer tk_session_token',
           },
         })
       );
@@ -366,10 +366,7 @@ describe('sendTestWebhook', () => {
   it('sends discord test webhook', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    const result = await sendTestWebhook(
-      'https://discord.com/api/webhooks/123/abc',
-      'discord'
-    );
+    const result = await sendTestWebhook('https://discord.com/api/webhooks/123/abc', 'discord');
 
     expect(result.success).toBe(true);
     expect(mockFetch).toHaveBeenCalledWith(
@@ -404,7 +401,7 @@ describe('sendTestWebhook', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer tk_test_token_123',
+          Authorization: 'Bearer tk_test_token_123',
         },
       })
     );
@@ -446,11 +443,7 @@ describe('sendTestWebhook', () => {
   it('sends apprise test webhook', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    const result = await sendTestWebhook(
-      'https://apprise.example.com/notify',
-      'custom',
-      'apprise'
-    );
+    const result = await sendTestWebhook('https://apprise.example.com/notify', 'custom', 'apprise');
 
     expect(result.success).toBe(true);
 
@@ -463,11 +456,7 @@ describe('sendTestWebhook', () => {
   it('sends json test webhook', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
-    const result = await sendTestWebhook(
-      'https://example.com/webhook',
-      'custom',
-      'json'
-    );
+    const result = await sendTestWebhook('https://example.com/webhook', 'custom', 'json');
 
     expect(result.success).toBe(true);
 
@@ -501,11 +490,7 @@ describe('sendTestWebhook', () => {
   it('returns error when fetch throws', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-    const result = await sendTestWebhook(
-      'https://unreachable.example.com',
-      'custom',
-      'json'
-    );
+    const result = await sendTestWebhook('https://unreachable.example.com', 'custom', 'json');
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('Network error');

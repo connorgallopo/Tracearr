@@ -1,1 +1,1 @@
-{"onlyBuiltDependencies": ["bcrypt", "esbuild", "sharp"]}
+{ "onlyBuiltDependencies": ["bcrypt", "esbuild", "sharp"] }

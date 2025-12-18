@@ -184,31 +184,19 @@ describe('buildServerFilterCondition', () => {
   });
 
   it('should allow owner to access any server', () => {
-    const result = buildServerFilterCondition(
-      ownerUser,
-      'any-server',
-      mockServerIdColumn
-    );
+    const result = buildServerFilterCondition(ownerUser, 'any-server', mockServerIdColumn);
     expect(result.error).toBeNull();
     expect(result.condition).toBeDefined();
   });
 
   it('should fall back to server access condition when no explicit serverId', () => {
-    const result = buildServerFilterCondition(
-      adminUserSingleServer,
-      undefined,
-      mockServerIdColumn
-    );
+    const result = buildServerFilterCondition(adminUserSingleServer, undefined, mockServerIdColumn);
     expect(result.error).toBeNull();
     // Should return the buildServerAccessCondition result
   });
 
   it('should return undefined condition for owner with no explicit serverId', () => {
-    const result = buildServerFilterCondition(
-      ownerUser,
-      undefined,
-      mockServerIdColumn
-    );
+    const result = buildServerFilterCondition(ownerUser, undefined, mockServerIdColumn);
     expect(result.error).toBeNull();
     expect(result.condition).toBeUndefined(); // Owners see all
   });

@@ -42,16 +42,19 @@ export function Map() {
   }, [searchParams, selectedServerId]);
 
   // Build API params including time range
-  const apiParams = useMemo(() => ({
-    timeRange: {
-      period: timeRange.period,
-      startDate: timeRange.startDate?.toISOString(),
-      endDate: timeRange.endDate?.toISOString(),
-    },
-    serverUserId: filters.serverUserId,
-    serverId: filters.serverId,
-    mediaType: filters.mediaType,
-  }), [timeRange, filters]);
+  const apiParams = useMemo(
+    () => ({
+      timeRange: {
+        period: timeRange.period,
+        startDate: timeRange.startDate?.toISOString(),
+        endDate: timeRange.endDate?.toISOString(),
+      },
+      serverUserId: filters.serverUserId,
+      serverId: filters.serverId,
+      mediaType: filters.mediaType,
+    }),
+    [timeRange, filters]
+  );
 
   // Fetch data - includes available filter options based on current filters
   const { data: locationData, isLoading: locationsLoading } = useLocationStats(apiParams);
@@ -65,11 +68,11 @@ export function Map() {
   const mediaTypes = availableFilters?.mediaTypes ?? [];
 
   // Get selected filter labels for display
-  const selectedUser = users.find(u => u.id === filters.serverUserId);
-  const selectedMediaType = MEDIA_TYPES.find(m => m.value === filters.mediaType);
+  const selectedUser = users.find((u) => u.id === filters.serverUserId);
+  const selectedMediaType = MEDIA_TYPES.find((m) => m.value === filters.mediaType);
 
   // Filter MEDIA_TYPES to only show available options
-  const availableMediaTypeOptions = MEDIA_TYPES.filter(m => mediaTypes.includes(m.value));
+  const availableMediaTypeOptions = MEDIA_TYPES.filter((m) => mediaTypes.includes(m.value));
 
   // Update a single filter
   const setFilter = (key: string, value: string | null) => {
@@ -111,18 +114,18 @@ export function Map() {
   return (
     <div className="-m-6 flex h-[calc(100vh-4rem)] flex-col">
       {/* Filter bar */}
-      <div className="relative z-20 flex items-center gap-3 border-b bg-card/50 px-4 py-2 backdrop-blur">
+      <div className="bg-card/50 relative z-20 flex items-center gap-3 border-b px-4 py-2 backdrop-blur">
         {/* Time range picker */}
         <TimeRangePicker value={timeRange} onChange={setTimeRange} />
 
-        <div className="h-4 w-px bg-border" />
+        <div className="bg-border h-4 w-px" />
 
         {/* User filter */}
         <Select
           value={filters.serverUserId ?? '_all'}
           onValueChange={(v) => setFilter('serverUserId', v === '_all' ? null : v)}
         >
-          <SelectTrigger className="w-[140px] h-8 text-sm">
+          <SelectTrigger className="h-8 w-[140px] text-sm">
             <SelectValue placeholder="All users" />
           </SelectTrigger>
           <SelectContent>
@@ -140,13 +143,15 @@ export function Map() {
           value={filters.mediaType ?? '_all'}
           onValueChange={(v) => setFilter('mediaType', v === '_all' ? null : v)}
         >
-          <SelectTrigger className="w-[100px] h-8 text-sm">
+          <SelectTrigger className="h-8 w-[100px] text-sm">
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="_all">All types</SelectItem>
             {availableMediaTypeOptions.map((m) => (
-              <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+              <SelectItem key={m.value} value={m.value}>
+                {m.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -156,24 +161,24 @@ export function Map() {
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-8 px-2"
           >
             <X className="h-4 w-4" />
           </Button>
         )}
 
-        <div className="h-4 w-px bg-border" />
+        <div className="bg-border h-4 w-px" />
 
         {/* View mode toggle */}
-        <div className="flex h-8 rounded-md border bg-muted/50 p-0.5">
+        <div className="bg-muted/50 flex h-8 rounded-md border p-0.5">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setViewMode('heatmap')}
             className={cn(
-              'h-7 px-2.5 gap-1.5 text-xs rounded-sm',
+              'h-7 gap-1.5 rounded-sm px-2.5 text-xs',
               filters.viewMode === 'heatmap'
-                ? 'bg-background shadow-sm text-foreground'
+                ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
             )}
           >
@@ -185,9 +190,9 @@ export function Map() {
             size="sm"
             onClick={() => setViewMode('circles')}
             className={cn(
-              'h-7 px-2.5 gap-1.5 text-xs rounded-sm',
+              'h-7 gap-1.5 rounded-sm px-2.5 text-xs',
               filters.viewMode === 'circles'
-                ? 'bg-background shadow-sm text-foreground'
+                ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-transparent'
             )}
           >
@@ -198,18 +203,16 @@ export function Map() {
 
         {/* Summary stats - right side */}
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <div className="text-muted-foreground">
-            {summaryContext}
-          </div>
+          <div className="text-muted-foreground">{summaryContext}</div>
           <div className="flex items-center gap-3">
             <div>
               <span className="font-semibold tabular-nums">{summary?.totalStreams ?? 0}</span>
-              <span className="ml-1 text-muted-foreground">streams</span>
+              <span className="text-muted-foreground ml-1">streams</span>
             </div>
-            <div className="h-4 w-px bg-border" />
+            <div className="bg-border h-4 w-px" />
             <div>
               <span className="font-semibold tabular-nums">{summary?.uniqueLocations ?? 0}</span>
-              <span className="ml-1 text-muted-foreground">locations</span>
+              <span className="text-muted-foreground ml-1">locations</span>
             </div>
           </div>
         </div>
@@ -217,11 +220,7 @@ export function Map() {
 
       {/* Map */}
       <div className="relative flex-1">
-        <StreamMap
-          locations={locations}
-          isLoading={locationsLoading}
-          viewMode={filters.viewMode}
-        />
+        <StreamMap locations={locations} isLoading={locationsLoading} viewMode={filters.viewMode} />
       </div>
     </div>
   );

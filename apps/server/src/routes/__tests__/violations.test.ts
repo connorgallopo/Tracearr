@@ -282,9 +282,7 @@ describe('Violation Routes', () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const highSeverityViolations = [
-        createTestViolation({ severity: 'high' }),
-      ];
+      const highSeverityViolations = [createTestViolation({ severity: 'high' })];
 
       mockDb.select.mockReturnValueOnce(createViolationSelectMock(highSeverityViolations));
       mockDb.execute.mockResolvedValueOnce({ rows: [{ count: 1 }] });
@@ -304,9 +302,7 @@ describe('Violation Routes', () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const unacknowledgedViolations = [
-        createTestViolation({ acknowledgedAt: null }),
-      ];
+      const unacknowledgedViolations = [createTestViolation({ acknowledgedAt: null })];
 
       mockDb.select.mockReturnValueOnce(createViolationSelectMock(unacknowledgedViolations));
       mockDb.execute.mockResolvedValueOnce({ rows: [{ count: 1 }] });
@@ -498,7 +494,9 @@ describe('Violation Routes', () => {
       const acknowledgedAt = new Date();
 
       // Violation exists check with serverUsers join
-      mockDb.select.mockReturnValue(createViolationExistsCheckMock([{ id: violationId, serverId }]));
+      mockDb.select.mockReturnValue(
+        createViolationExistsCheckMock([{ id: violationId, serverId }])
+      );
 
       // Update
       mockDb.update.mockReturnValue({
@@ -566,7 +564,9 @@ describe('Violation Routes', () => {
       const serverId = ownerUser.serverIds[0];
 
       // Violation exists check
-      mockDb.select.mockReturnValue(createViolationExistsCheckMock([{ id: violationId, serverId }]));
+      mockDb.select.mockReturnValue(
+        createViolationExistsCheckMock([{ id: violationId, serverId }])
+      );
 
       // Update returns empty (failure)
       mockDb.update.mockReturnValue({
@@ -596,27 +596,33 @@ describe('Violation Routes', () => {
       const serverId = ownerUser.serverIds[0];
 
       // Violation exists check with serverUsers join - now includes severity and serverUserId
-      mockDb.select.mockReturnValue(createViolationExistsCheckMock([{
-        id: violationId,
-        severity: 'warning',
-        serverUserId,
-        serverId,
-      }]));
+      mockDb.select.mockReturnValue(
+        createViolationExistsCheckMock([
+          {
+            id: violationId,
+            severity: 'warning',
+            serverUserId,
+            serverId,
+          },
+        ])
+      );
 
       // Mock transaction for delete + trust score restore
-      mockDb.transaction = vi.fn().mockImplementation(async (callback: (tx: any) => Promise<void>) => {
-        const txMock = {
-          delete: vi.fn().mockReturnValue({
-            where: vi.fn().mockResolvedValue(undefined),
-          }),
-          update: vi.fn().mockReturnValue({
-            set: vi.fn().mockReturnValue({
+      mockDb.transaction = vi
+        .fn()
+        .mockImplementation(async (callback: (tx: any) => Promise<void>) => {
+          const txMock = {
+            delete: vi.fn().mockReturnValue({
               where: vi.fn().mockResolvedValue(undefined),
             }),
-          }),
-        };
-        return callback(txMock);
-      });
+            update: vi.fn().mockReturnValue({
+              set: vi.fn().mockReturnValue({
+                where: vi.fn().mockResolvedValue(undefined),
+              }),
+            }),
+          };
+          return callback(txMock);
+        });
 
       const response = await app.inject({
         method: 'DELETE',
@@ -637,12 +643,16 @@ describe('Violation Routes', () => {
       const serverId = ownerUser.serverIds[0];
 
       // Test with high severity (penalty: 20)
-      mockDb.select.mockReturnValue(createViolationExistsCheckMock([{
-        id: violationId,
-        severity: 'high',
-        serverUserId,
-        serverId,
-      }]));
+      mockDb.select.mockReturnValue(
+        createViolationExistsCheckMock([
+          {
+            id: violationId,
+            severity: 'high',
+            serverUserId,
+            serverId,
+          },
+        ])
+      );
 
       // Track transaction calls
       const deleteMock = vi.fn().mockReturnValue({
@@ -654,13 +664,15 @@ describe('Violation Routes', () => {
         }),
       });
 
-      mockDb.transaction = vi.fn().mockImplementation(async (callback: (tx: any) => Promise<void>) => {
-        const txMock = {
-          delete: deleteMock,
-          update: updateMock,
-        };
-        return callback(txMock);
-      });
+      mockDb.transaction = vi
+        .fn()
+        .mockImplementation(async (callback: (tx: any) => Promise<void>) => {
+          const txMock = {
+            delete: deleteMock,
+            update: updateMock,
+          };
+          return callback(txMock);
+        });
 
       const response = await app.inject({
         method: 'DELETE',
@@ -748,9 +760,7 @@ describe('Violation Routes', () => {
       app = await buildTestApp(viewerUser);
 
       // Return violations from the viewer's accessible server
-      const testViolations = [
-        createTestViolation({ serverId: viewerServerId }),
-      ];
+      const testViolations = [createTestViolation({ serverId: viewerServerId })];
 
       mockDb.select.mockReturnValueOnce(createViolationSelectMock(testViolations));
       mockDb.execute.mockResolvedValueOnce({ rows: [{ count: 1 }] });

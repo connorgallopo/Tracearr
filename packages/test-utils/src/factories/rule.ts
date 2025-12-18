@@ -83,7 +83,9 @@ export function buildRule(overrides: RuleData): Required<RuleData> {
 
   return {
     id: overrides.id ?? crypto.randomUUID(),
-    name: overrides.name ?? `${type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} Rule ${index}`,
+    name:
+      overrides.name ??
+      `${type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())} Rule ${index}`,
     type,
     params: overrides.params ?? DEFAULT_PARAMS[type],
     serverUserId: overrides.serverUserId ?? null,

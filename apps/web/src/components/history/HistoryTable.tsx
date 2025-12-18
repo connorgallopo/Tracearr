@@ -32,11 +32,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { getAvatarUrl } from '@/components/users/utils';
@@ -88,7 +84,7 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <Icon className="text-muted-foreground h-4 w-4" />
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
@@ -118,9 +114,10 @@ function getProgress(session: SessionWithDetails): number {
 // Get formatted content title
 function getContentTitle(session: SessionWithDetails): { primary: string; secondary?: string } {
   if (session.mediaType === 'episode' && session.grandparentTitle) {
-    const epNum = session.seasonNumber && session.episodeNumber
-      ? `S${session.seasonNumber.toString().padStart(2, '0')}E${session.episodeNumber.toString().padStart(2, '0')}`
-      : '';
+    const epNum =
+      session.seasonNumber && session.episodeNumber
+        ? `S${session.seasonNumber.toString().padStart(2, '0')}E${session.episodeNumber.toString().padStart(2, '0')}`
+        : '';
     return {
       primary: session.grandparentTitle,
       secondary: `${epNum}${epNum ? ' · ' : ''}${session.mediaTitle}`,
@@ -155,7 +152,7 @@ export const HistoryTableRow = forwardRef<
               <div className="text-sm font-medium">
                 {format(new Date(session.startedAt), 'MMM d, yyyy')}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-muted-foreground text-xs">
                 {format(new Date(session.startedAt), 'h:mm a')}
               </div>
             </div>
@@ -172,15 +169,21 @@ export const HistoryTableRow = forwardRef<
             className="flex items-center gap-2 hover:underline"
           >
             <Avatar className="h-6 w-6">
-              <AvatarImage src={getAvatarUrl(session.serverId, session.user.thumbUrl, 24) ?? undefined} />
+              <AvatarImage
+                src={getAvatarUrl(session.serverId, session.user.thumbUrl, 24) ?? undefined}
+              />
               <AvatarFallback className="text-xs">
                 {(session.user.identityName ?? session.user.username)?.[0]?.toUpperCase() ?? '?'}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <span className="truncate text-sm block">{session.user.identityName ?? session.user.username}</span>
+              <span className="block truncate text-sm">
+                {session.user.identityName ?? session.user.username}
+              </span>
               {session.user.identityName && session.user.identityName !== session.user.username && (
-                <span className="truncate text-xs text-muted-foreground block">@{session.user.username}</span>
+                <span className="text-muted-foreground block truncate text-xs">
+                  @{session.user.username}
+                </span>
               )}
             </div>
           </Link>
@@ -189,7 +192,7 @@ export const HistoryTableRow = forwardRef<
 
       {/* Content */}
       {columnVisibility.content && (
-        <TableCell className="min-w-[200px] max-w-[300px]">
+        <TableCell className="max-w-[300px] min-w-[200px]">
           <div className="flex items-center gap-2">
             <MediaTypeIcon type={session.mediaType} />
             <div className="min-w-0 flex-1">
@@ -205,9 +208,7 @@ export const HistoryTableRow = forwardRef<
                 )}
               </div>
               {title.secondary && (
-                <div className="truncate text-xs text-muted-foreground">
-                  {title.secondary}
-                </div>
+                <div className="text-muted-foreground truncate text-xs">{title.secondary}</div>
               )}
             </div>
           </div>
@@ -222,9 +223,7 @@ export const HistoryTableRow = forwardRef<
               <div>
                 <div className="truncate text-sm">{session.platform ?? '—'}</div>
                 {session.product && (
-                  <div className="truncate text-xs text-muted-foreground">
-                    {session.product}
-                  </div>
+                  <div className="text-muted-foreground truncate text-xs">{session.product}</div>
                 )}
               </div>
             </TooltipTrigger>
@@ -247,10 +246,8 @@ export const HistoryTableRow = forwardRef<
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-1.5">
-                  <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="truncate text-sm">
-                    {session.geoCity || session.geoCountry}
-                  </span>
+                  <Globe className="text-muted-foreground h-3.5 w-3.5" />
+                  <span className="truncate text-sm">{session.geoCity || session.geoCountry}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -271,10 +268,7 @@ export const HistoryTableRow = forwardRef<
       {/* Quality */}
       {columnVisibility.quality && (
         <TableCell className="w-[110px]">
-          <Badge
-            variant={session.isTranscode ? 'warning' : 'secondary'}
-            className="gap-1 text-xs"
-          >
+          <Badge variant={session.isTranscode ? 'warning' : 'secondary'} className="gap-1 text-xs">
             {session.isTranscode ? (
               <>
                 <Repeat2 className="h-3 w-3" />
@@ -301,7 +295,7 @@ export const HistoryTableRow = forwardRef<
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <Clock className="text-muted-foreground h-3.5 w-3.5" />
                 <span className="text-sm">{formatDuration(session.durationMs)}</span>
               </div>
             </TooltipTrigger>
@@ -330,7 +324,7 @@ export const HistoryTableRow = forwardRef<
             <TooltipTrigger asChild>
               <div className="flex items-center gap-2">
                 <Progress value={progress} className="h-1.5 w-12" />
-                <span className="text-xs text-muted-foreground">{progress}%</span>
+                <span className="text-muted-foreground text-xs">{progress}%</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -431,16 +425,12 @@ function SortableHeader({
   onSortChange?: (column: SortableColumn) => void;
 }) {
   const isActive = currentSortBy === column;
-  const Icon = isActive
-    ? currentSortDir === 'asc'
-      ? ArrowUp
-      : ArrowDown
-    : ArrowUpDown;
+  const Icon = isActive ? (currentSortDir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown;
 
   return (
     <button
       type="button"
-      className="flex items-center gap-1 hover:text-foreground transition-colors"
+      className="hover:text-foreground flex items-center gap-1 transition-colors"
       onClick={() => onSortChange?.(column)}
     >
       {label}
@@ -476,9 +466,7 @@ export function HistoryTable({
               />
             </TableHead>
           )}
-          {columnVisibility.user && (
-            <TableHead className="w-[150px]">User</TableHead>
-          )}
+          {columnVisibility.user && <TableHead className="w-[150px]">User</TableHead>}
           {columnVisibility.content && (
             <TableHead className="min-w-[200px]">
               <SortableHeader
@@ -490,15 +478,9 @@ export function HistoryTable({
               />
             </TableHead>
           )}
-          {columnVisibility.platform && (
-            <TableHead className="w-[120px]">Platform</TableHead>
-          )}
-          {columnVisibility.location && (
-            <TableHead className="w-[130px]">Location</TableHead>
-          )}
-          {columnVisibility.quality && (
-            <TableHead className="w-[110px]">Quality</TableHead>
-          )}
+          {columnVisibility.platform && <TableHead className="w-[120px]">Platform</TableHead>}
+          {columnVisibility.location && <TableHead className="w-[130px]">Location</TableHead>}
+          {columnVisibility.quality && <TableHead className="w-[110px]">Quality</TableHead>}
           {columnVisibility.duration && (
             <TableHead className="w-[100px]">
               <SortableHeader
@@ -510,9 +492,7 @@ export function HistoryTable({
               />
             </TableHead>
           )}
-          {columnVisibility.progress && (
-            <TableHead className="w-[100px]">Progress</TableHead>
-          )}
+          {columnVisibility.progress && <TableHead className="w-[100px]">Progress</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -524,7 +504,7 @@ export function HistoryTable({
         ) : sessions.length === 0 ? (
           <TableRow>
             <TableCell colSpan={visibleColumnCount} className="h-32 text-center">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <div className="text-muted-foreground flex flex-col items-center gap-2">
                 <Clock className="h-8 w-8" />
                 <p>No sessions found</p>
                 <p className="text-sm">Try adjusting your filters</p>

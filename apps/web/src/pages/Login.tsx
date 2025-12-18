@@ -5,13 +5,7 @@ import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { api, tokenStorage, type PlexServerInfo } from '@/lib/api';
@@ -172,7 +166,11 @@ export function Login() {
   };
 
   // Connect to selected Plex server
-  const handlePlexServerSelect = async (serverUri: string, serverName: string, clientIdentifier: string) => {
+  const handlePlexServerSelect = async (
+    serverUri: string,
+    serverName: string,
+    clientIdentifier: string
+  ) => {
     if (!plexTempToken) return;
 
     setConnectingToServer(serverName);
@@ -287,7 +285,10 @@ export function Login() {
       }
     } catch (error) {
       toast.error('Login failed', {
-        description: error instanceof Error ? error.message : 'Invalid username or password, or user is not an administrator',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Invalid username or password, or user is not an administrator',
       });
     } finally {
       setJellyfinLoading(false);
@@ -299,7 +300,7 @@ export function Login() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <LogoIcon className="h-16 w-16 animate-pulse" />
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -307,19 +308,17 @@ export function Login() {
   // Server selection step (only during Plex signup)
   if (authStep === 'server-select' && plexServers.length > 0) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="bg-background flex min-h-screen flex-col items-center justify-center p-4">
         <div className="mb-8 flex flex-col items-center text-center">
-          <LogoIcon className="h-20 w-20 mb-4" />
+          <LogoIcon className="mb-4 h-20 w-20" />
           <h1 className="text-4xl font-bold tracking-tight">Tracearr</h1>
-          <p className="mt-2 text-muted-foreground">Select your Plex server</p>
+          <p className="text-muted-foreground mt-2">Select your Plex server</p>
         </div>
 
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Select Server</CardTitle>
-            <CardDescription>
-              Choose which Plex Media Server to monitor
-            </CardDescription>
+            <CardDescription>Choose which Plex Media Server to monitor</CardDescription>
           </CardHeader>
           <CardContent>
             <PlexServerSelector
@@ -336,14 +335,12 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+    <div className="bg-background flex min-h-screen flex-col items-center justify-center p-4">
       <div className="mb-8 flex flex-col items-center text-center">
-        <LogoIcon className="h-20 w-20 mb-4" />
+        <LogoIcon className="mb-4 h-20 w-20" />
         <h1 className="text-4xl font-bold tracking-tight">Tracearr</h1>
-        <p className="mt-2 text-muted-foreground">
-          {needsSetup
-            ? 'Create your account to get started'
-            : 'Sign in to your account'}
+        <p className="text-muted-foreground mt-2">
+          {needsSetup ? 'Create your account to get started' : 'Sign in to your account'}
         </p>
       </div>
 
@@ -360,10 +357,10 @@ export function Login() {
           {/* Plex OAuth Section */}
           {authStep === 'plex-waiting' ? (
             <div className="space-y-4">
-              <div className="rounded-lg bg-muted/50 p-4 text-center">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#E5A00D] mb-3" />
+              <div className="bg-muted/50 rounded-lg p-4 text-center">
+                <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-[#E5A00D]" />
                 <p className="text-sm font-medium">Waiting for Plex authorization...</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-xs">
                   Complete sign-in in the popup window
                 </p>
                 {plexAuthUrl && (
@@ -372,7 +369,7 @@ export function Login() {
                     variant="link"
                     size="sm"
                     onClick={() => window.open(plexAuthUrl, '_blank')}
-                    className="gap-1 h-auto p-0 mt-2"
+                    className="mt-2 h-auto gap-1 p-0"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Reopen Plex Login
@@ -386,10 +383,7 @@ export function Login() {
           ) : (
             <>
               {/* Plex Login Button - Always Available */}
-              <Button
-                className={`w-full ${PLEX_COLOR} text-white`}
-                onClick={handlePlexLogin}
-              >
+              <Button className={`w-full ${PLEX_COLOR} text-white`} onClick={handlePlexLogin}>
                 <MediaServerIcon type="plex" className="mr-2 h-4 w-4" />
                 {needsSetup ? 'Sign up with Plex' : 'Sign in with Plex'}
               </Button>
@@ -401,182 +395,181 @@ export function Login() {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">or</span>
+                    <span className="bg-card text-muted-foreground px-2">or</span>
                   </div>
                 </div>
               )}
 
               {/* Conditional Auth Forms - Show only one at a time with transition */}
               {(hasJellyfinServers || hasPasswordAuth || needsSetup) && (
-              <div className="relative min-h-[200px]">
-                {/* Jellyfin Admin Login Form */}
-                {showJellyfinForm && hasJellyfinServers && (
-                  <div
-                    key="jellyfin-form"
-                    className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
-                  >
-                    <form onSubmit={handleJellyfinLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="jellyfin-username">Jellyfin Username</Label>
-                        <Input
-                          id="jellyfin-username"
-                          type="text"
-                          placeholder="Your Jellyfin username"
-                          value={jellyfinUsername}
-                          onChange={(e) => setJellyfinUsername(e.target.value)}
-                          required
-                          disabled={jellyfinLoading}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="jellyfin-password">Jellyfin Password</Label>
-                        <Input
-                          id="jellyfin-password"
-                          type="password"
-                          placeholder="Your Jellyfin password"
-                          value={jellyfinPassword}
-                          onChange={(e) => setJellyfinPassword(e.target.value)}
-                          required
-                          disabled={jellyfinLoading}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Must be an administrator on a configured Jellyfin server
-                        </p>
-                      </div>
-                      <Button type="submit" className="w-full" disabled={jellyfinLoading}>
-                        {jellyfinLoading ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <MediaServerIcon type="jellyfin" className="mr-2 h-4 w-4" />
-                        )}
-                        Sign in with Jellyfin
-                      </Button>
-                    </form>
-
-                    {/* Toggle button to switch to local auth */}
-                    {hasPasswordAuth && (
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setShowJellyfinForm(false)}
-                      >
-                        Use local account instead
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {/* Local Auth Form */}
-                {!showJellyfinForm && (hasPasswordAuth || needsSetup) && (
-                  <div
-                    key="local-form"
-                    className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
-                  >
-                    {needsSetup ? (
-                      <form onSubmit={handleLocalSignup} className="space-y-4">
+                <div className="relative min-h-[200px]">
+                  {/* Jellyfin Admin Login Form */}
+                  {showJellyfinForm && hasJellyfinServers && (
+                    <div
+                      key="jellyfin-form"
+                      className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+                    >
+                      <form onSubmit={handleJellyfinLogin} className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="jellyfin-username">Jellyfin Username</Label>
                           <Input
-                            id="email"
-                            type="email"
-                            placeholder="your@email.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="username">Display Name</Label>
-                          <Input
-                            id="username"
+                            id="jellyfin-username"
                             type="text"
-                            placeholder="Choose a display name"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Your Jellyfin username"
+                            value={jellyfinUsername}
+                            onChange={(e) => setJellyfinUsername(e.target.value)}
                             required
-                            minLength={3}
-                            maxLength={50}
+                            disabled={jellyfinLoading}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
+                          <Label htmlFor="jellyfin-password">Jellyfin Password</Label>
                           <Input
-                            id="password"
+                            id="jellyfin-password"
                             type="password"
-                            placeholder="At least 8 characters"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Your Jellyfin password"
+                            value={jellyfinPassword}
+                            onChange={(e) => setJellyfinPassword(e.target.value)}
                             required
-                            minLength={8}
+                            disabled={jellyfinLoading}
                           />
+                          <p className="text-muted-foreground text-xs">
+                            Must be an administrator on a configured Jellyfin server
+                          </p>
                         </div>
-                        <Button type="submit" className="w-full" disabled={localLoading}>
-                          {localLoading ? (
+                        <Button type="submit" className="w-full" disabled={jellyfinLoading}>
+                          {jellyfinLoading ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <User className="mr-2 h-4 w-4" />
+                            <MediaServerIcon type="jellyfin" className="mr-2 h-4 w-4" />
                           )}
-                          Create Account
+                          Sign in with Jellyfin
                         </Button>
                       </form>
-                    ) : (
-                      <form onSubmit={handleLocalLogin} className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="your@email.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            placeholder="Your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={localLoading}>
-                          {localLoading ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <KeyRound className="mr-2 h-4 w-4" />
-                          )}
-                          Sign In
-                        </Button>
-                      </form>
-                    )}
 
-                    {/* Toggle button to switch to Jellyfin auth */}
-                    {hasJellyfinServers && (
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-                        onClick={() => setShowJellyfinForm(true)}
-                      >
-                        Use Jellyfin account instead
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
+                      {/* Toggle button to switch to local auth */}
+                      {hasPasswordAuth && (
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-muted-foreground hover:text-foreground mt-4 w-full text-sm transition-colors"
+                          onClick={() => setShowJellyfinForm(false)}
+                        >
+                          Use local account instead
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Local Auth Form */}
+                  {!showJellyfinForm && (hasPasswordAuth || needsSetup) && (
+                    <div
+                      key="local-form"
+                      className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+                    >
+                      {needsSetup ? (
+                        <form onSubmit={handleLocalSignup} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="your@email.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="username">Display Name</Label>
+                            <Input
+                              id="username"
+                              type="text"
+                              placeholder="Choose a display name"
+                              value={username}
+                              onChange={(e) => setUsername(e.target.value)}
+                              required
+                              minLength={3}
+                              maxLength={50}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              placeholder="At least 8 characters"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                              minLength={8}
+                            />
+                          </div>
+                          <Button type="submit" className="w-full" disabled={localLoading}>
+                            {localLoading ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <User className="mr-2 h-4 w-4" />
+                            )}
+                            Create Account
+                          </Button>
+                        </form>
+                      ) : (
+                        <form onSubmit={handleLocalLogin} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="your@email.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              placeholder="Your password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                            />
+                          </div>
+                          <Button type="submit" className="w-full" disabled={localLoading}>
+                            {localLoading ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <KeyRound className="mr-2 h-4 w-4" />
+                            )}
+                            Sign In
+                          </Button>
+                        </form>
+                      )}
+
+                      {/* Toggle button to switch to Jellyfin auth */}
+                      {hasJellyfinServers && (
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-muted-foreground hover:text-foreground mt-4 w-full text-sm transition-colors"
+                          onClick={() => setShowJellyfinForm(true)}
+                        >
+                          Use Jellyfin account instead
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
-
             </>
           )}
         </CardContent>
       </Card>
 
-      <p className="mt-6 text-center text-xs text-muted-foreground">
+      <p className="text-muted-foreground mt-6 text-center text-xs">
         {needsSetup ? (
           <>
             After creating your account, you'll add your

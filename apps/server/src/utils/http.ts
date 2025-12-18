@@ -47,7 +47,12 @@ export class HttpClientError extends Error {
    * Convert to ExternalServiceError for known services
    */
   toExternalServiceError(): ExternalServiceError | this {
-    if (this.service === 'plex' || this.service === 'jellyfin' || this.service === 'emby' || this.service === 'geoip') {
+    if (
+      this.service === 'plex' ||
+      this.service === 'jellyfin' ||
+      this.service === 'emby' ||
+      this.service === 'geoip'
+    ) {
       return new ExternalServiceError(this.service, this.message);
     }
     return this;
@@ -110,10 +115,7 @@ function createTimeoutSignal(timeoutMs: number): AbortSignal {
  *   headers: { 'Authorization': 'Bearer token' }
  * });
  */
-export async function fetchJson<T>(
-  url: string,
-  options: HttpRequestOptions = {}
-): Promise<T> {
+export async function fetchJson<T>(url: string, options: HttpRequestOptions = {}): Promise<T> {
   const { timeout, ...fetchOptions } = options;
 
   const response = await fetch(url, {
@@ -134,10 +136,7 @@ export async function fetchJson<T>(
  *   service: 'example'
  * });
  */
-export async function fetchText(
-  url: string,
-  options: HttpRequestOptions = {}
-): Promise<string> {
+export async function fetchText(url: string, options: HttpRequestOptions = {}): Promise<string> {
   const { timeout, ...fetchOptions } = options;
 
   const response = await fetch(url, {
@@ -160,10 +159,7 @@ export async function fetchText(
  * });
  * const buffer = await response.arrayBuffer();
  */
-export async function fetchRaw(
-  url: string,
-  options: HttpRequestOptions = {}
-): Promise<Response> {
+export async function fetchRaw(url: string, options: HttpRequestOptions = {}): Promise<Response> {
   const { timeout, ...fetchOptions } = options;
 
   const response = await fetch(url, {
@@ -226,7 +222,7 @@ export async function fetchWithStatus<T>(
  */
 export function jsonHeaders(token?: string): Record<string, string> {
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   };
 
@@ -242,7 +238,7 @@ export function jsonHeaders(token?: string): Record<string, string> {
  */
 export function plexHeaders(token?: string): Record<string, string> {
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'X-Plex-Client-Identifier': 'tracearr',
     'X-Plex-Product': 'Tracearr',
     'X-Plex-Version': '1.0.0',
@@ -262,7 +258,7 @@ export function plexHeaders(token?: string): Record<string, string> {
  */
 export function jellyfinHeaders(apiKey?: string): Record<string, string> {
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
   };
 
   if (apiKey) {
@@ -278,7 +274,7 @@ export function jellyfinHeaders(apiKey?: string): Record<string, string> {
  */
 export function embyHeaders(apiKey?: string): Record<string, string> {
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
   };
 
   if (apiKey) {

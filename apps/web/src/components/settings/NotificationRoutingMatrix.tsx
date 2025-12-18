@@ -10,19 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useChannelRouting, useUpdateChannelRouting } from '@/hooks/queries';
 
 // Display names and descriptions for event types
-const EVENT_CONFIG: Record<
-  NotificationEventType,
-  { name: string; description: string }
-> = {
+const EVENT_CONFIG: Record<NotificationEventType, { name: string; description: string }> = {
   violation_detected: {
     name: 'Rule Violation',
     description: 'A user triggered a rule violation (e.g., concurrent streams, impossible travel)',
@@ -112,17 +104,17 @@ export function NotificationRoutingMatrix({
     <TooltipProvider>
       <div className="space-y-4">
         {/* Table */}
-        <div className="border rounded-lg overflow-hidden">
+        <div className="overflow-hidden rounded-lg border">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="py-3 px-4">Event</TableHead>
-                <TableHead className="text-center py-3 px-4 w-24">Web</TableHead>
+                <TableHead className="px-4 py-3">Event</TableHead>
+                <TableHead className="w-24 px-4 py-3 text-center">Web</TableHead>
                 {discordConfigured && (
-                  <TableHead className="text-center py-3 px-4 w-24">Discord</TableHead>
+                  <TableHead className="w-24 px-4 py-3 text-center">Discord</TableHead>
                 )}
                 {webhookConfigured && (
-                  <TableHead className="text-center py-3 px-4 w-24">Webhook</TableHead>
+                  <TableHead className="w-24 px-4 py-3 text-center">Webhook</TableHead>
                 )}
               </TableRow>
             </TableHeader>
@@ -133,10 +125,10 @@ export function NotificationRoutingMatrix({
 
                 return (
                   <TableRow key={eventType}>
-                    <TableCell className="py-3 px-4">
+                    <TableCell className="px-4 py-3">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-sm cursor-help border-b border-dotted border-muted-foreground/50">
+                          <span className="border-muted-foreground/50 cursor-help border-b border-dotted text-sm">
                             {config.name}
                           </span>
                         </TooltipTrigger>
@@ -145,7 +137,7 @@ export function NotificationRoutingMatrix({
                         </TooltipContent>
                       </Tooltip>
                     </TableCell>
-                    <TableCell className="py-3 px-4 text-center">
+                    <TableCell className="px-4 py-3 text-center">
                       <Checkbox
                         checked={routing?.webToastEnabled ?? true}
                         onCheckedChange={(checked) =>
@@ -155,7 +147,7 @@ export function NotificationRoutingMatrix({
                       />
                     </TableCell>
                     {discordConfigured && (
-                      <TableCell className="py-3 px-4 text-center">
+                      <TableCell className="px-4 py-3 text-center">
                         <Checkbox
                           checked={routing?.discordEnabled ?? false}
                           onCheckedChange={(checked) =>
@@ -166,7 +158,7 @@ export function NotificationRoutingMatrix({
                       </TableCell>
                     )}
                     {webhookConfigured && (
-                      <TableCell className="py-3 px-4 text-center">
+                      <TableCell className="px-4 py-3 text-center">
                         <Checkbox
                           checked={routing?.webhookEnabled ?? false}
                           onCheckedChange={(checked) =>
@@ -184,10 +176,11 @@ export function NotificationRoutingMatrix({
         </div>
 
         {/* Info about notification channels */}
-        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-          <Info className="h-4 w-4 mt-0.5 shrink-0" />
+        <div className="text-muted-foreground flex items-start gap-2 text-sm">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
-            <strong>Web</strong> shows toast notifications in this browser. Push notifications are configured per-device in the mobile app.
+            <strong>Web</strong> shows toast notifications in this browser. Push notifications are
+            configured per-device in the mobile app.
           </span>
         </div>
       </div>

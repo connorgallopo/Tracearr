@@ -1,6 +1,6 @@
 /**
  * Auth Security Tests
- * 
+ *
  * Tests to ensure authentication and authorization cannot be bypassed.
  * Covers: token validation, privilege escalation, injection attacks.
  */
@@ -216,7 +216,7 @@ describe('Auth Security', () => {
     it('should prevent role escalation via token manipulation', async () => {
       // Create a guest token and try to tamper it to become owner
       const guestToken = generateTestToken(app, createViewerPayload());
-      
+
       // Try various tampering techniques
       const tamperedTokens = [
         generateTamperedToken(guestToken), // Modify payload, keep sig
@@ -330,7 +330,7 @@ describe('Auth Security', () => {
       });
 
       const body = res.json();
-      
+
       // Error should not leak stack traces or internal paths
       expect(JSON.stringify(body)).not.toContain('node_modules');
       expect(JSON.stringify(body)).not.toContain('at Object');

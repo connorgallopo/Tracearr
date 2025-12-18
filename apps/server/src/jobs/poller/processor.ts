@@ -8,7 +8,14 @@
  */
 
 import { eq, and, desc, isNull, gte, lte, inArray } from 'drizzle-orm';
-import { POLLING_INTERVALS, TIME_MS, SESSION_LIMITS, type ActiveSession, type SessionState, type Rule } from '@tracearr/shared';
+import {
+  POLLING_INTERVALS,
+  TIME_MS,
+  SESSION_LIMITS,
+  type ActiveSession,
+  type SessionState,
+  type Rule,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers, serverUsers, sessions, users } from '../../db/schema.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
@@ -27,7 +34,13 @@ import {
   shouldForceStopStaleSession,
   shouldRecordSession,
 } from './stateTracker.js';
-import { createViolationInTransaction, broadcastViolations, doesRuleApplyToUser, isDuplicateViolation, type ViolationInsertResult } from './violations.js';
+import {
+  createViolationInTransaction,
+  broadcastViolations,
+  doesRuleApplyToUser,
+  isDuplicateViolation,
+  type ViolationInsertResult,
+} from './violations.js';
 import { enqueueNotification } from '../notificationQueue.js';
 
 // ============================================================================
@@ -116,10 +129,9 @@ async function processServerSessions(
               },
               stoppedAt
             );
-            const watched = stoppedSession.watched || checkWatchCompletion(
-              stoppedSession.progressMs,
-              stoppedSession.totalDurationMs
-            );
+            const watched =
+              stoppedSession.watched ||
+              checkWatchCompletion(stoppedSession.progressMs, stoppedSession.totalDurationMs);
 
             await db
               .update(sessions)
@@ -169,8 +181,8 @@ async function processServerSessions(
       );
 
     // Build server user caches: externalId -> serverUser and id -> serverUser
-    const serverUserByExternalId = new Map<string, typeof serverUsersList[0]>();
-    const serverUserById = new Map<string, typeof serverUsersList[0]>();
+    const serverUserByExternalId = new Map<string, (typeof serverUsersList)[0]>();
+    const serverUserById = new Map<string, (typeof serverUsersList)[0]>();
     for (const serverUser of serverUsersList) {
       if (serverUser.externalId) {
         serverUserByExternalId.set(serverUser.externalId, serverUser);
@@ -179,7 +191,12 @@ async function processServerSessions(
     }
 
     // Track server users that need to be created and their session indices
-    const serverUsersToCreate: { externalId: string; username: string; thumbUrl: string | null; sessionIndex: number }[] = [];
+    const serverUsersToCreate: {
+      externalId: string;
+      username: string;
+      thumbUrl: string | null;
+      sessionIndex: number;
+    }[] = [];
 
     // First pass: identify server users and resolve from cache or mark for creation
     const sessionServerUserIds: (string | null)[] = [];
@@ -227,23 +244,27 @@ async function processServerSessions(
       // First, create identity users for each new server user
       const newIdentityUsers = await db
         .insert(users)
-        .values(serverUsersToCreate.map(u => ({
-          username: u.username, // Login identifier
-          name: u.username, // Use username as initial display name
-          thumbnail: u.thumbUrl,
-        })))
+        .values(
+          serverUsersToCreate.map((u) => ({
+            username: u.username, // Login identifier
+            name: u.username, // Use username as initial display name
+            thumbnail: u.thumbUrl,
+          }))
+        )
         .returning();
 
       // Then create server users linked to the identity users
       const newServerUsers = await db
         .insert(serverUsers)
-        .values(serverUsersToCreate.map((u, idx) => ({
-          userId: newIdentityUsers[idx]!.id,
-          serverId: server.id,
-          externalId: u.externalId,
-          username: u.username,
-          thumbUrl: u.thumbUrl,
-        })))
+        .values(
+          serverUsersToCreate.map((u, idx) => ({
+            userId: newIdentityUsers[idx]!.id,
+            serverId: server.id,
+            externalId: u.externalId,
+            username: u.username,
+            thumbUrl: u.thumbUrl,
+          }))
+        )
         .returning();
 
       // Update sessionServerUserIds with newly created server user IDs
@@ -326,7 +347,9 @@ async function processServerSessions(
           // Session already exists (likely created by SSE), skip insert
           // Add to cache so we don't check again next poll
           cachedSessionKeys.add(sessionKey);
-          console.log(`[Poller] Active session already exists for ${processed.sessionKey}, skipping create`);
+          console.log(
+            `[Poller] Active session already exists for ${processed.sessionKey}, skipping create`
+          );
           continue;
         }
 
@@ -378,7 +401,10 @@ async function processServerSessions(
             // Remove from cache
             if (cacheService) {
               await cacheService.deleteSessionById(existingActiveSession.id);
-              await cacheService.removeUserSession(existingActiveSession.serverUserId, existingActiveSession.id);
+              await cacheService.removeUserSession(
+                existingActiveSession.serverUserId,
+                existingActiveSession.id
+              );
             }
 
             // Publish stop event for the old session
@@ -392,7 +418,9 @@ async function processServerSessions(
             // Link to the original session chain
             referenceId = existingActiveSession.referenceId || existingActiveSession.id;
 
-            console.log(`[Poller] Quality change detected for user ${serverUserId}, content ${processed.ratingKey}. Old session ${existingActiveSession.id} stopped, linking new session.`);
+            console.log(
+              `[Poller] Quality change detected for user ${serverUserId}, content ${processed.ratingKey}. Old session ${existingActiveSession.id} stopped, linking new session.`
+            );
           }
         }
 
@@ -452,7 +480,8 @@ async function processServerSessions(
               totalDurationMs: processed.totalDurationMs || null,
               progressMs: processed.progressMs || null,
               // Pause tracking - use Jellyfin's precise timestamp if available, otherwise infer from state
-              lastPausedAt: processed.lastPausedDate ?? (processed.state === 'paused' ? new Date() : null),
+              lastPausedAt:
+                processed.lastPausedDate ?? (processed.state === 'paused' ? new Date() : null),
               pausedDurationMs: 0,
               // Session grouping
               referenceId,
@@ -525,15 +554,17 @@ async function processServerSessions(
             bitrate: processed.bitrate,
           };
 
-          const ruleResults = await ruleEngine.evaluateSession(session, activeRules, recentSessions);
+          const ruleResults = await ruleEngine.evaluateSession(
+            session,
+            activeRules,
+            recentSessions
+          );
 
           // Create violations within same transaction
           const createdViolations: ViolationInsertResult[] = [];
           for (const result of ruleResults) {
             if (result.violated) {
-              const matchingRule = activeRules.find(
-                (r) => doesRuleApplyToUser(r, serverUserId)
-              );
+              const matchingRule = activeRules.find((r) => doesRuleApplyToUser(r, serverUserId));
               if (matchingRule) {
                 // Check for duplicate violations before creating
                 // This prevents multiple violations when sessions start simultaneously
@@ -669,22 +700,25 @@ async function processServerSessions(
         const pauseResult = calculatePauseAccumulation(
           previousState as SessionState,
           newState,
-          { lastPausedAt: existingSession.lastPausedAt, pausedDurationMs: existingSession.pausedDurationMs || 0 },
+          {
+            lastPausedAt: existingSession.lastPausedAt,
+            pausedDurationMs: existingSession.pausedDurationMs || 0,
+          },
           now
         );
         updatePayload.lastPausedAt = pauseResult.lastPausedAt;
         updatePayload.pausedDurationMs = pauseResult.pausedDurationMs;
 
         // Check for watch completion (80% threshold)
-        if (!existingSession.watched && checkWatchCompletion(processed.progressMs, processed.totalDurationMs)) {
+        if (
+          !existingSession.watched &&
+          checkWatchCompletion(processed.progressMs, processed.totalDurationMs)
+        ) {
           updatePayload.watched = true;
         }
 
         // Update existing session with state changes and pause tracking
-        await db
-          .update(sessions)
-          .set(updatePayload)
-          .where(eq(sessions.id, existingSession.id));
+        await db.update(sessions).set(updatePayload).where(eq(sessions.id, existingSession.id));
 
         // Build active session for cache/broadcast (with updated pause tracking values)
         const activeSession: ActiveSession = {
@@ -772,10 +806,9 @@ async function processServerSessions(
           );
 
           // Check for watch completion
-          const watched = stoppedSession.watched || checkWatchCompletion(
-            stoppedSession.progressMs,
-            stoppedSession.totalDurationMs
-          );
+          const watched =
+            stoppedSession.watched ||
+            checkWatchCompletion(stoppedSession.progressMs, stoppedSession.totalDurationMs);
 
           // Check if session meets minimum play time threshold (default 120s)
           // Short sessions are recorded but can be filtered from stats
@@ -843,9 +876,7 @@ async function pollServers(): Promise<void> {
 
     // Get cached session keys from atomic SET-based cache
     const cachedSessions = cacheService ? await cacheService.getAllActiveSessions() : [];
-    const cachedSessionKeys = new Set(
-      cachedSessions.map((s) => `${s.serverId}:${s.sessionKey}`)
-    );
+    const cachedSessionKeys = new Set(cachedSessions.map((s) => `${s.serverId}:${s.sessionKey}`));
 
     // Get active rules
     const activeRules = await getActiveRules();
@@ -862,11 +893,8 @@ async function pollServers(): Promise<void> {
       // Get previous health state for transition detection
       const wasHealthy = cacheService ? await cacheService.getServerHealth(server.id) : null;
 
-      const { success, newSessions, stoppedSessionKeys, updatedSessions } = await processServerSessions(
-        serverWithToken,
-        activeRules,
-        cachedSessionKeys
-      );
+      const { success, newSessions, stoppedSessionKeys, updatedSessions } =
+        await processServerSessions(serverWithToken, activeRules, cachedSessionKeys);
 
       // Track health state and notify on transitions
       if (cacheService) {
@@ -1133,8 +1161,13 @@ export function startPoller(config: Partial<PollerConfig> = {}): void {
 
   // Start stale session sweep (runs every 60 seconds to detect abandoned sessions)
   if (!staleSweepInterval) {
-    console.log(`Starting stale session sweep with ${SESSION_LIMITS.STALE_SWEEP_INTERVAL_MS}ms interval`);
-    staleSweepInterval = setInterval(() => void sweepStaleSessions(), SESSION_LIMITS.STALE_SWEEP_INTERVAL_MS);
+    console.log(
+      `Starting stale session sweep with ${SESSION_LIMITS.STALE_SWEEP_INTERVAL_MS}ms interval`
+    );
+    staleSweepInterval = setInterval(
+      () => void sweepStaleSessions(),
+      SESSION_LIMITS.STALE_SWEEP_INTERVAL_MS
+    );
   }
 }
 
@@ -1183,13 +1216,13 @@ export async function triggerReconciliationPoll(): Promise<void> {
       return;
     }
 
-    console.log(`[Poller] Running reconciliation poll for ${sseServers.length} SSE-connected server(s)`);
+    console.log(
+      `[Poller] Running reconciliation poll for ${sseServers.length} SSE-connected server(s)`
+    );
 
     // Get cached session keys from atomic SET-based cache
     const cachedSessions = cacheService ? await cacheService.getAllActiveSessions() : [];
-    const cachedSessionKeys = new Set(
-      cachedSessions.map((s) => `${s.serverId}:${s.sessionKey}`)
-    );
+    const cachedSessionKeys = new Set(cachedSessions.map((s) => `${s.serverId}:${s.sessionKey}`));
 
     // Get active rules
     const activeRules = await getActiveRules();
@@ -1213,7 +1246,10 @@ export async function triggerReconciliationPoll(): Promise<void> {
     }
 
     // Update cache incrementally if there were any changes
-    if (cacheService && (allNewSessions.length > 0 || allStoppedKeys.length > 0 || allUpdatedSessions.length > 0)) {
+    if (
+      cacheService &&
+      (allNewSessions.length > 0 || allStoppedKeys.length > 0 || allUpdatedSessions.length > 0)
+    ) {
       // Extract stopped session IDs from the key format "serverId:sessionKey"
       const stoppedSessionIds: string[] = [];
       for (const key of allStoppedKeys) {

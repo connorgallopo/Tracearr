@@ -68,9 +68,7 @@ export async function seedBasicOwner(): Promise<SeedResult> {
  * - 1 Plex server
  * - N+1 server_users
  */
-export async function seedMultipleUsers(
-  memberCount: number = 3
-): Promise<{
+export async function seedMultipleUsers(memberCount: number = 3): Promise<{
   owner: SeedResult;
   members: SeedResult[];
 }> {
@@ -178,9 +176,7 @@ export async function seedViolationScenario(): Promise<
  * - Owner user
  * - Valid mobile pairing token
  */
-export async function seedMobilePairing(): Promise<
-  SeedResult & { tokenHash: string }
-> {
+export async function seedMobilePairing(): Promise<SeedResult & { tokenHash: string }> {
   const base = await seedBasicOwner();
 
   // Enable mobile in settings

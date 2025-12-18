@@ -110,9 +110,7 @@ export function startNotificationWorker(): void {
         await processNotificationJob(job);
 
         const duration = Date.now() - startTime;
-        console.log(
-          `Notification job ${job.id} (${job.data.type}) processed in ${duration}ms`
-        );
+        console.log(`Notification job ${job.id} (${job.data.type}) processed in ${duration}ms`);
       } catch (error) {
         const duration = Date.now() - startTime;
         console.error(
@@ -179,7 +177,7 @@ async function processNotificationJob(job: Job<NotificationJobData>): Promise<vo
     ntfyAuthToken: settings.ntfyAuthToken ?? null,
     // Fill in defaults for other Settings fields
     allowGuestAccess: false,
-    unitSystem: settings.unitSystem ?? 'metric' as const, // Display preference for units
+    unitSystem: settings.unitSystem ?? ('metric' as const), // Display preference for units
     pollerEnabled: true,
     pollerIntervalMs: 15000,
     tautulliUrl: null,

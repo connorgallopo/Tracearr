@@ -359,7 +359,9 @@ export function parseUser(user: Record<string, unknown>): MediaUser {
     isAdmin: parseBoolean(policy?.IsAdministrator),
     isDisabled: parseBoolean(policy?.IsDisabled),
     lastLoginAt: user.LastLoginDate ? new Date(parseString(user.LastLoginDate)) : undefined,
-    lastActivityAt: user.LastActivityDate ? new Date(parseString(user.LastActivityDate)) : undefined,
+    lastActivityAt: user.LastActivityDate
+      ? new Date(parseString(user.LastActivityDate))
+      : undefined,
   };
 }
 

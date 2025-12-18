@@ -12,10 +12,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import {
-  checkWatchCompletion,
-  shouldGroupWithPreviousSession,
-} from '../stateTracker.js';
+import { checkWatchCompletion, shouldGroupWithPreviousSession } from '../stateTracker.js';
 
 // ============================================================================
 // Watch Completion Detection
@@ -60,7 +57,7 @@ describe('Watch Completion Detection', () => {
     it('should accept custom threshold for movies', () => {
       const progressMs = 90000;
       const totalMs = 100000;
-      const customThreshold = 0.90; // 90% for some users
+      const customThreshold = 0.9; // 90% for some users
 
       // checkWatchCompletion should accept optional threshold parameter
       // Currently it doesn't - this test should fail

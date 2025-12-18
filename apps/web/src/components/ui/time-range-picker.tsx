@@ -65,7 +65,7 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
   };
 
   return (
-    <div className={cn('inline-flex items-center gap-1 rounded-lg bg-muted p-1', className)}>
+    <div className={cn('bg-muted inline-flex items-center gap-1 rounded-lg p-1', className)}>
       {/* Preset buttons */}
       {PRESETS.map((preset) => (
         <button
@@ -107,7 +107,7 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
               numberOfMonths={2}
               disabled={{ after: new Date() }}
             />
-            <div className="flex items-center justify-end gap-2 border-t pt-3 mt-3">
+            <div className="mt-3 flex items-center justify-end gap-2 border-t pt-3">
               <Button
                 variant="outline"
                 size="sm"

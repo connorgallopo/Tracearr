@@ -79,9 +79,8 @@ export class GeoIPService {
       // Get the most specific subdivision (state/province)
       // MaxMind returns subdivisions as an array, most specific last
       const subdivisions = result.subdivisions;
-      const region = subdivisions && subdivisions.length > 0
-        ? subdivisions[0]?.names?.en ?? null
-        : null;
+      const region =
+        subdivisions && subdivisions.length > 0 ? (subdivisions[0]?.names?.en ?? null) : null;
 
       return {
         city: result.city?.names?.en ?? null,

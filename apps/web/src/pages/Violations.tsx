@@ -51,7 +51,9 @@ const ruleIcons: Record<string, React.ReactNode> = {
 export function Violations() {
   const [page, setPage] = useState(1);
   const [severityFilter, setSeverityFilter] = useState<ViolationSeverity | 'all'>('all');
-  const [acknowledgedFilter, setAcknowledgedFilter] = useState<'all' | 'pending' | 'acknowledged'>('all');
+  const [acknowledgedFilter, setAcknowledgedFilter] = useState<'all' | 'pending' | 'acknowledged'>(
+    'all'
+  );
   const [dismissId, setDismissId] = useState<string | null>(null);
   const [selectedViolation, setSelectedViolation] = useState<ViolationWithDetails | null>(null);
   const pageSize = 10;
@@ -61,8 +63,7 @@ export function Violations() {
     page,
     pageSize,
     severity: severityFilter === 'all' ? undefined : severityFilter,
-    acknowledged:
-      acknowledgedFilter === 'all' ? undefined : acknowledgedFilter === 'acknowledged',
+    acknowledged: acknowledgedFilter === 'all' ? undefined : acknowledgedFilter === 'acknowledged',
     serverId: selectedServerId ?? undefined,
   });
   const acknowledgeViolation = useAcknowledgeViolation();
@@ -100,7 +101,7 @@ export function Violations() {
             to={`/users/${violation.user.id}`}
             className="flex items-center gap-3 hover:underline"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
@@ -108,7 +109,7 @@ export function Violations() {
                   className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
-                <User className="h-5 w-5 text-muted-foreground" />
+                <User className="text-muted-foreground h-5 w-5" />
               )}
             </div>
             <span className="font-medium">
@@ -125,12 +126,12 @@ export function Violations() {
         const violation = row.original;
         return (
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-muted">
+            <div className="bg-muted flex h-8 w-8 items-center justify-center rounded">
               {ruleIcons[violation.rule.type] ?? <AlertTriangle className="h-4 w-4" />}
             </div>
             <div>
               <p className="font-medium">{violation.rule.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">
+              <p className="text-muted-foreground text-xs capitalize">
                 {violation.rule.type.replace(/_/g, ' ')}
               </p>
             </div>
@@ -147,7 +148,7 @@ export function Violations() {
       accessorKey: 'createdAt',
       header: 'When',
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
+        <span className="text-muted-foreground text-sm">
           {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
         </span>
       ),
@@ -158,9 +159,7 @@ export function Violations() {
       cell: ({ row }) => (
         <span
           className={
-            row.original.acknowledgedAt
-              ? 'text-muted-foreground'
-              : 'text-yellow-500 font-medium'
+            row.original.acknowledgedAt ? 'text-muted-foreground' : 'font-medium text-yellow-500'
           }
         >
           {row.original.acknowledgedAt ? 'Acknowledged' : 'Pending'}
@@ -173,7 +172,12 @@ export function Violations() {
       cell: ({ row }) => {
         const violation = row.original;
         return (
-          <div className="flex items-center gap-2" onClick={(e) => { e.stopPropagation(); }}>
+          <div
+            className="flex items-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             {!violation.acknowledgedAt && (
               <Button
                 variant="ghost"
@@ -228,7 +232,7 @@ export function Violations() {
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Severity</label>
+              <label className="text-muted-foreground text-sm">Severity</label>
               <Select
                 value={severityFilter}
                 onValueChange={(value) => {
@@ -248,7 +252,7 @@ export function Violations() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Status</label>
+              <label className="text-muted-foreground text-sm">Status</label>
               <Select
                 value={acknowledgedFilter}
                 onValueChange={(value) => {
@@ -290,10 +294,10 @@ export function Violations() {
             </div>
           ) : violations.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center gap-4">
-              <AlertTriangle className="h-12 w-12 text-muted-foreground" />
+              <AlertTriangle className="text-muted-foreground h-12 w-12" />
               <div className="text-center">
                 <h3 className="font-semibold">No violations found</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {severityFilter !== 'all' || acknowledgedFilter !== 'all'
                     ? 'Try adjusting your filters.'
                     : 'No violations have been recorded yet.'}
@@ -308,7 +312,9 @@ export function Violations() {
               pageCount={totalPages}
               page={page}
               onPageChange={setPage}
-              onRowClick={(violation) => { setSelectedViolation(violation); }}
+              onRowClick={(violation) => {
+                setSelectedViolation(violation);
+              }}
               emptyMessage="No violations found."
             />
           )}
@@ -331,7 +337,12 @@ export function Violations() {
       />
 
       {/* Dismiss Confirmation Dialog */}
-      <Dialog open={!!dismissId} onOpenChange={() => { setDismissId(null); }}>
+      <Dialog
+        open={!!dismissId}
+        onOpenChange={() => {
+          setDismissId(null);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Dismiss Violation</DialogTitle>
@@ -341,7 +352,12 @@ export function Violations() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setDismissId(null); }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDismissId(null);
+              }}
+            >
               Cancel
             </Button>
             <Button

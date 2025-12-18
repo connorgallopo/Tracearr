@@ -39,16 +39,16 @@ export function UserRow({
     <Link
       to={`/users/${userId}`}
       className={cn(
-        'group flex animate-fade-in-up items-center gap-4 rounded-lg border bg-card p-3 transition-all duration-200 hover:border-primary/50 hover:bg-accent hover:shadow-md',
+        'group animate-fade-in-up bg-card hover:border-primary/50 hover:bg-accent flex items-center gap-4 rounded-lg border p-3 transition-all duration-200 hover:shadow-md',
         className
       )}
       style={style}
     >
       {/* Rank */}
-      <div className="w-8 text-center text-lg font-bold text-muted-foreground">#{rank}</div>
+      <div className="text-muted-foreground w-8 text-center text-lg font-bold">#{rank}</div>
 
       {/* Avatar */}
-      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted ring-2 ring-background">
+      <div className="bg-muted ring-background h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2">
         {avatarUrl ? (
           <img
             src={avatarUrl}
@@ -58,42 +58,46 @@ export function UserRow({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <User className="h-5 w-5 text-muted-foreground" />
+            <User className="text-muted-foreground h-5 w-5" />
           </div>
         )}
       </div>
 
       {/* Name & Top Content */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{displayName}</p>
         {topContent && (
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="text-muted-foreground truncate text-xs">
             Loves: <span className="font-medium">{topContent}</span>
           </p>
         )}
       </div>
 
       {/* Stats */}
-      <div className="hidden sm:flex items-center gap-6 text-sm">
+      <div className="hidden items-center gap-6 text-sm sm:flex">
         <div className="text-right">
           <span className="font-semibold">{playCount.toLocaleString()}</span>
-          <span className="ml-1 text-muted-foreground">plays</span>
+          <span className="text-muted-foreground ml-1">plays</span>
         </div>
-        <div className="w-16 text-right text-muted-foreground">{watchTimeHours.toLocaleString()}h</div>
-        <div className={cn('flex w-20 items-center gap-1 text-right', getTrustScoreColor(trustScore))}>
+        <div className="text-muted-foreground w-16 text-right">
+          {watchTimeHours.toLocaleString()}h
+        </div>
+        <div
+          className={cn('flex w-20 items-center gap-1 text-right', getTrustScoreColor(trustScore))}
+        >
           <Trophy className="h-3.5 w-3.5" />
           <span className="font-medium">{trustScore}%</span>
         </div>
       </div>
 
       {/* Mobile Stats */}
-      <div className="flex sm:hidden items-center gap-3 text-xs">
+      <div className="flex items-center gap-3 text-xs sm:hidden">
         <span className="font-semibold">{playCount}</span>
         <span className={cn('font-medium', getTrustScoreColor(trustScore))}>{trustScore}%</span>
       </div>
 
       {/* Arrow */}
-      <ChevronRight className="h-5 w-5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+      <ChevronRight className="text-muted-foreground h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" />
     </Link>
   );
 }

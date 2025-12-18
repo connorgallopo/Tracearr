@@ -200,9 +200,7 @@ export default function PairScreen() {
                 onPress={handleManualPair}
                 disabled={isLoading}
               >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Connecting...' : 'Connect'}
-                </Text>
+                <Text style={styles.buttonText}>{isLoading ? 'Connecting...' : 'Connect'}</Text>
               </Pressable>
 
               <Pressable
@@ -230,9 +228,7 @@ export default function PairScreen() {
       )}
 
       <View style={styles.header}>
-        <Text style={styles.title}>
-          {isAddingServer ? 'Add Server' : 'Welcome to Tracearr'}
-        </Text>
+        <Text style={styles.title}>{isAddingServer ? 'Add Server' : 'Welcome to Tracearr'}</Text>
         <Text style={styles.subtitle}>
           Open Settings → Mobile App in your Tracearr dashboard and scan the QR code
         </Text>

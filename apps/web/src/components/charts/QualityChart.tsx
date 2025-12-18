@@ -120,7 +120,7 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
   if (!data || data.total === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg border border-dashed text-muted-foreground"
+        className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed"
         style={{ height }}
       >
         No quality data available

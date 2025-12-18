@@ -22,7 +22,7 @@ const userColumns: ColumnDef<ServerUserWithIdentity>[] = [
       const avatarUrl = getAvatarUrl(user.serverId, user.thumbUrl, 40);
       return (
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+          <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -30,7 +30,7 @@ const userColumns: ColumnDef<ServerUserWithIdentity>[] = [
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <UserIcon className="h-5 w-5 text-muted-foreground" />
+              <UserIcon className="text-muted-foreground h-5 w-5" />
             )}
           </div>
           <div>
@@ -42,7 +42,7 @@ const userColumns: ColumnDef<ServerUserWithIdentity>[] = [
                 </span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">@{user.username}</p>
+            <p className="text-muted-foreground text-xs">@{user.username}</p>
           </div>
         </div>
       );
@@ -51,15 +51,13 @@ const userColumns: ColumnDef<ServerUserWithIdentity>[] = [
   {
     accessorKey: 'trustScore',
     header: 'Trust Score',
-    cell: ({ row }) => (
-      <TrustScoreBadge score={row.original.trustScore} showLabel />
-    ),
+    cell: ({ row }) => <TrustScoreBadge score={row.original.trustScore} showLabel />,
   },
   {
     accessorKey: 'createdAt',
     header: 'Joined',
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="text-muted-foreground flex items-center gap-2 text-sm">
         <Clock className="h-4 w-4" />
         {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
       </div>
@@ -86,7 +84,7 @@ export function Users() {
         <h1 className="text-3xl font-bold">Users</h1>
         <div className="flex items-center gap-4">
           <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Search users..."
               value={searchFilter}
@@ -94,7 +92,7 @@ export function Users() {
               className="pl-9"
             />
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {total} user{total !== 1 ? 's' : ''}
           </p>
         </div>
@@ -124,7 +122,9 @@ export function Users() {
               onPageChange={setPage}
               filterColumn="username"
               filterValue={searchFilter}
-              onRowClick={(user) => { void navigate(`/users/${user.id}`); }}
+              onRowClick={(user) => {
+                void navigate(`/users/${user.id}`);
+              }}
               emptyMessage="No users found."
             />
           )}

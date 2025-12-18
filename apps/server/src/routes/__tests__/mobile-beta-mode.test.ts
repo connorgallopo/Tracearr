@@ -90,14 +90,16 @@ function createOwnerUser(): AuthUser {
   };
 }
 
-function createMockToken(overrides?: Partial<{
-  id: string;
-  tokenHash: string;
-  expiresAt: Date;
-  usedAt: Date | null;
-  createdBy: string;
-  createdAt: Date;
-}>) {
+function createMockToken(
+  overrides?: Partial<{
+    id: string;
+    tokenHash: string;
+    expiresAt: Date;
+    usedAt: Date | null;
+    createdBy: string;
+    createdAt: Date;
+  }>
+) {
   return {
     id: overrides?.id ?? randomUUID(),
     tokenHash: overrides?.tokenHash ?? 'tokenhash123',
@@ -173,7 +175,11 @@ describe('Mobile Routes - Beta Mode Enabled', () => {
           select: vi.fn().mockImplementation(() => {
             txSelectCallCount++;
             if (txSelectCallCount === 3) {
-              return { from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]) };
+              return {
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]),
+              };
             }
             return {
               from: vi.fn().mockReturnValue({
@@ -252,7 +258,11 @@ describe('Mobile Routes - Beta Mode Enabled', () => {
           select: vi.fn().mockImplementation(() => {
             txSelectCallCount++;
             if (txSelectCallCount === 3) {
-              return { from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]) };
+              return {
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]),
+              };
             }
             return {
               from: vi.fn().mockReturnValue({
@@ -339,7 +349,11 @@ describe('Mobile Routes - Beta Mode Enabled', () => {
           select: vi.fn().mockImplementation(() => {
             txSelectCallCount++;
             if (txSelectCallCount === 3) {
-              return { from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]) };
+              return {
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]),
+              };
             }
             return {
               from: vi.fn().mockReturnValue({
@@ -416,7 +430,11 @@ describe('Mobile Routes - Beta Mode Enabled', () => {
           select: vi.fn().mockImplementation(() => {
             txSelectCallCount++;
             if (txSelectCallCount === 3) {
-              return { from: vi.fn().mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]) };
+              return {
+                from: vi
+                  .fn()
+                  .mockResolvedValue([{ id: mockServerId, name: 'Server', type: 'plex' }]),
+              };
             }
             return {
               from: vi.fn().mockReturnValue({

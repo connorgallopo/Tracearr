@@ -54,7 +54,7 @@ export function AppearanceSettings() {
         <CardContent className="space-y-4">
           {/* Mode Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <label className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Mode
             </label>
             <div className="flex gap-2">
@@ -65,15 +65,13 @@ export function AppearanceSettings() {
                   size="sm"
                   className={cn(
                     'flex-1 gap-1.5',
-                    theme === value && 'ring-1 ring-primary ring-offset-1 ring-offset-background'
+                    theme === value && 'ring-primary ring-offset-background ring-1 ring-offset-1'
                   )}
                   onClick={() => setTheme(value)}
                 >
                   <Icon className="h-4 w-4" />
                   <span>{label}</span>
-                  {isDefaultMode && (
-                    <span className="text-[10px] opacity-60">(default)</span>
-                  )}
+                  {isDefaultMode && <span className="text-[10px] opacity-60">(default)</span>}
                 </Button>
               ))}
             </div>
@@ -81,10 +79,10 @@ export function AppearanceSettings() {
 
           {/* Accent Color Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <label className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Accent Color
             </label>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+            <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
               {ACCENT_PRESETS.map((preset) => {
                 const isSelected = accentHue === preset.hue;
                 const isDefaultColor = preset.hue === DEFAULT_HUE;
@@ -93,8 +91,8 @@ export function AppearanceSettings() {
                     key={preset.hue}
                     onClick={() => setAccentHue(preset.hue)}
                     className={cn(
-                      'group relative flex flex-col items-center gap-1 p-1.5 rounded-lg transition-all',
-                      'hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background'
+                      'group relative flex flex-col items-center gap-1 rounded-lg p-1.5 transition-all',
+                      'hover:bg-muted/50 focus:ring-primary focus:ring-offset-background focus:ring-2 focus:ring-offset-2 focus:outline-none'
                     )}
                     title={preset.name}
                   >
@@ -102,7 +100,7 @@ export function AppearanceSettings() {
                       className={cn(
                         'relative h-8 w-8 rounded-md transition-transform',
                         'group-hover:scale-105',
-                        isSelected && 'scale-105 ring-2 ring-offset-2 ring-offset-background'
+                        isSelected && 'ring-offset-background scale-105 ring-2 ring-offset-2'
                       )}
                       style={{
                         backgroundColor: preset.hex,
@@ -115,10 +113,12 @@ export function AppearanceSettings() {
                         </div>
                       )}
                     </div>
-                    <span className={cn(
-                      'text-[10px] leading-tight',
-                      isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'
-                    )}>
+                    <span
+                      className={cn(
+                        'text-[10px] leading-tight',
+                        isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'
+                      )}
+                    >
                       {preset.name}
                       {isDefaultColor && !isSelected && <span className="opacity-60">*</span>}
                     </span>
@@ -126,9 +126,7 @@ export function AppearanceSettings() {
                 );
               })}
             </div>
-            <p className="text-[10px] text-muted-foreground">
-              * Cyan is the default accent color
-            </p>
+            <p className="text-muted-foreground text-[10px]">* Cyan is the default accent color</p>
           </div>
         </CardContent>
       </Card>
@@ -144,25 +142,37 @@ export function AppearanceSettings() {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <span className="text-xs text-muted-foreground">Buttons</span>
+              <span className="text-muted-foreground text-xs">Buttons</span>
               <div className="flex flex-wrap gap-1.5">
                 <Button size="sm">Primary</Button>
-                <Button size="sm" variant="secondary">Secondary</Button>
-                <Button size="sm" variant="outline">Outline</Button>
+                <Button size="sm" variant="secondary">
+                  Secondary
+                </Button>
+                <Button size="sm" variant="outline">
+                  Outline
+                </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <span className="text-xs text-muted-foreground">Badges</span>
+              <span className="text-muted-foreground text-xs">Badges</span>
               <div className="flex flex-wrap gap-1.5">
                 <Badge className="text-xs">Default</Badge>
-                <Badge variant="secondary" className="text-xs">Secondary</Badge>
-                <Badge variant="outline" className="text-xs">Outline</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  Secondary
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  Outline
+                </Badge>
               </div>
             </div>
             <div className="space-y-2">
-              <span className="text-xs text-muted-foreground">Text</span>
+              <span className="text-muted-foreground text-xs">Text</span>
               <div className="flex items-center gap-2 text-sm">
-                <a href="#" className="text-primary hover:underline" onClick={(e) => e.preventDefault()}>
+                <a
+                  href="#"
+                  className="text-primary hover:underline"
+                  onClick={(e) => e.preventDefault()}
+                >
                   Link
                 </a>
                 <span className="text-muted-foreground">•</span>
@@ -172,15 +182,15 @@ export function AppearanceSettings() {
               </div>
             </div>
             <div className="space-y-2">
-              <span className="text-xs text-muted-foreground">Progress</span>
+              <span className="text-muted-foreground text-xs">Progress</span>
               <div className="flex items-center gap-2">
-                <div className="h-2 flex-1 max-w-32 rounded-full bg-secondary overflow-hidden">
+                <div className="bg-secondary h-2 max-w-32 flex-1 overflow-hidden rounded-full">
                   <div
-                    className="h-full bg-primary rounded-full transition-all"
+                    className="bg-primary h-full rounded-full transition-all"
                     style={{ width: '65%' }}
                   />
                 </div>
-                <span className="text-xs text-muted-foreground">65%</span>
+                <span className="text-muted-foreground text-xs">65%</span>
               </div>
             </div>
           </div>

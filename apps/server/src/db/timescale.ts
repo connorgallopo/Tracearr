@@ -497,9 +497,7 @@ export async function refreshAggregates(): Promise<void> {
   for (const aggregate of aggregates) {
     try {
       // Refresh the entire aggregate (no time bounds = full refresh)
-      await db.execute(
-        sql.raw(`CALL refresh_continuous_aggregate('${aggregate}', NULL, NULL)`)
-      );
+      await db.execute(sql.raw(`CALL refresh_continuous_aggregate('${aggregate}', NULL, NULL)`));
     } catch (err) {
       // Log but don't fail - aggregate might not have data yet
       console.warn(`Failed to refresh aggregate ${aggregate}:`, err);
@@ -599,9 +597,7 @@ export async function initTimescaleDB(): Promise<{
     'hourly_concurrent_streams',
   ];
 
-  const missingAggregates = expectedAggregates.filter(
-    (agg) => !existingAggregates.includes(agg)
-  );
+  const missingAggregates = expectedAggregates.filter((agg) => !existingAggregates.includes(agg));
 
   if (missingAggregates.length > 0) {
     await createContinuousAggregates();

@@ -47,9 +47,7 @@ function StatPill({
       <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text.primary.dark }}>
         {value}
       </Text>
-      {unit && (
-        <Text style={{ fontSize: 11, color: colors.text.muted.dark }}>{unit}</Text>
-      )}
+      {unit && <Text style={{ fontSize: 11, color: colors.text.muted.dark }}>{unit}</Text>}
     </View>
   );
 }
@@ -85,12 +83,19 @@ export default function DashboardScreen() {
   } = useServerStatistics(selectedServerId ?? undefined, isPlexServer);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <ScrollView
         className="flex-1"
         contentContainerClassName="pb-8"
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.cyan.core} />
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.cyan.core}
+          />
         }
       >
         {/* Today's Stats Bar */}
@@ -103,7 +108,14 @@ export default function DashboardScreen() {
                 gap: 8,
               }}
             >
-              <Text style={{ fontSize: 11, color: colors.text.muted.dark, fontWeight: '600', marginRight: 2 }}>
+              <Text
+                style={{
+                  fontSize: 11,
+                  color: colors.text.muted.dark,
+                  fontWeight: '600',
+                  marginRight: 2,
+                }}
+              >
                 TODAY
               </Text>
               <StatPill icon="play-circle-outline" value={stats.todayPlays} unit="plays" />
@@ -119,11 +131,11 @@ export default function DashboardScreen() {
         )}
 
         {/* Now Playing - Active Streams */}
-        <View className="px-4 mb-4">
-          <View className="flex-row items-center justify-between mb-3">
+        <View className="mb-4 px-4">
+          <View className="mb-3 flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
               <Ionicons name="tv-outline" size={18} color={colors.cyan.core} />
-              <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
                 Now Playing
               </Text>
             </View>
@@ -166,7 +178,9 @@ export default function DashboardScreen() {
                   <Ionicons name="tv-outline" size={32} color={colors.text.muted.dark} />
                 </View>
                 <Text className="text-base font-semibold">No active streams</Text>
-                <Text className="text-sm text-muted-foreground mt-1">Streams will appear here when users start watching</Text>
+                <Text className="text-muted-foreground mt-1 text-sm">
+                  Streams will appear here when users start watching
+                </Text>
               </View>
             </Card>
           )}
@@ -174,10 +188,10 @@ export default function DashboardScreen() {
 
         {/* Stream Map - only show when there are active streams */}
         {activeSessions && activeSessions.length > 0 && (
-          <View className="px-4 mb-4">
-            <View className="flex-row items-center gap-2 mb-3">
+          <View className="mb-4 px-4">
+            <View className="mb-3 flex-row items-center gap-2">
               <Ionicons name="location-outline" size={18} color={colors.cyan.core} />
-              <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
                 Stream Locations
               </Text>
             </View>
@@ -188,9 +202,9 @@ export default function DashboardScreen() {
         {/* Server Resources - only show if Plex server is active */}
         {isPlexServer && (
           <View className="px-4">
-            <View className="flex-row items-center gap-2 mb-3">
+            <View className="mb-3 flex-row items-center gap-2">
               <Ionicons name="server-outline" size={18} color={colors.cyan.core} />
-              <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
                 Server Resources
               </Text>
             </View>
@@ -201,7 +215,6 @@ export default function DashboardScreen() {
             />
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );

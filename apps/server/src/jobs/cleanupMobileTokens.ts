@@ -17,23 +17,13 @@ export async function cleanupMobileTokens(): Promise<{ deleted: number }> {
   // Delete expired unused tokens older than 1 hour
   const expiredResult = await db
     .delete(mobileTokens)
-    .where(
-      and(
-        lt(mobileTokens.expiresAt, oneHourAgo),
-        isNull(mobileTokens.usedAt)
-      )
-    )
+    .where(and(lt(mobileTokens.expiresAt, oneHourAgo), isNull(mobileTokens.usedAt)))
     .returning({ id: mobileTokens.id });
 
   // Delete used tokens older than 30 days
   const usedResult = await db
     .delete(mobileTokens)
-    .where(
-      and(
-        isNotNull(mobileTokens.usedAt),
-        lt(mobileTokens.usedAt, thirtyDaysAgo)
-      )
-    )
+    .where(and(isNotNull(mobileTokens.usedAt), lt(mobileTokens.usedAt, thirtyDaysAgo)))
     .returning({ id: mobileTokens.id });
 
   return { deleted: expiredResult.length + usedResult.length };

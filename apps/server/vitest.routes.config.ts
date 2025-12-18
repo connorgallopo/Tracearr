@@ -27,11 +27,7 @@ export default mergeConfig(
         reporter: ['text', 'json', 'json-summary'],
         reportsDirectory: './coverage/routes',
         include: ['src/routes/**/*.ts'],
-        exclude: [
-          '**/*.test.ts',
-          '**/*.security.test.ts',
-          '**/test/**',
-        ],
+        exclude: ['**/*.test.ts', '**/*.security.test.ts', '**/test/**'],
       },
     },
   })

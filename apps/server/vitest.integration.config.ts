@@ -48,16 +48,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary'],
       reportsDirectory: './coverage/integration',
-      include: [
-        'src/services/**/*.ts',
-        'src/routes/**/*.ts',
-        'src/jobs/**/*.ts',
-      ],
-      exclude: [
-        '**/*.test.ts',
-        '**/test/**',
-        'src/services/mediaServer/**/*.ts',
-      ],
+      include: ['src/services/**/*.ts', 'src/routes/**/*.ts', 'src/jobs/**/*.ts'],
+      exclude: ['**/*.test.ts', '**/test/**', 'src/services/mediaServer/**/*.ts'],
     },
   },
   resolve: {

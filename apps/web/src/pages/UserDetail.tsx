@@ -27,13 +27,13 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { Session, ViolationSummary, ViolationWithDetails, TerminationLogWithDetails } from '@tracearr/shared';
-import {
-  useUserFull,
-  useUserSessions,
-  useViolations,
-  useUserTerminations,
-} from '@/hooks/queries';
+import type {
+  Session,
+  ViolationSummary,
+  ViolationWithDetails,
+  TerminationLogWithDetails,
+} from '@tracearr/shared';
+import { useUserFull, useUserSessions, useViolations, useUserTerminations } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -59,7 +59,7 @@ const sessionColumns: ColumnDef<Session>[] = [
     cell: ({ row }) => (
       <div className="max-w-[200px]">
         <p className="truncate font-medium">{row.original.mediaTitle}</p>
-        <p className="text-xs text-muted-foreground capitalize">{row.original.mediaType}</p>
+        <p className="text-muted-foreground text-xs capitalize">{row.original.mediaType}</p>
       </div>
     ),
   },
@@ -71,16 +71,14 @@ const sessionColumns: ColumnDef<Session>[] = [
   {
     accessorKey: 'durationMs',
     header: 'Duration',
-    cell: ({ row }) => (
-      <span className="text-sm">{formatDuration(row.original.durationMs)}</span>
-    ),
+    cell: ({ row }) => <span className="text-sm">{formatDuration(row.original.durationMs)}</span>,
   },
   {
     accessorKey: 'platform',
     header: 'Platform',
     cell: ({ row }) => (
       <div className="flex items-center gap-2 text-sm">
-        <Tv className="h-4 w-4 text-muted-foreground" />
+        <Tv className="text-muted-foreground h-4 w-4" />
         <span>{row.original.platform ?? 'Unknown'}</span>
       </div>
     ),
@@ -95,7 +93,7 @@ const sessionColumns: ColumnDef<Session>[] = [
       }
       return (
         <div className="flex items-center gap-2 text-sm">
-          <Globe className="h-4 w-4 text-muted-foreground" />
+          <Globe className="text-muted-foreground h-4 w-4" />
           <span>
             {session.geoCity && `${session.geoCity}, `}
             {session.geoCountry ?? ''}
@@ -109,10 +107,8 @@ const sessionColumns: ColumnDef<Session>[] = [
     header: 'Started',
     cell: ({ row }) => (
       <div className="flex items-center gap-2 text-sm">
-        <Clock className="h-4 w-4 text-muted-foreground" />
-        <span>
-          {formatDistanceToNow(new Date(row.original.startedAt), { addSuffix: true })}
-        </span>
+        <Clock className="text-muted-foreground h-4 w-4" />
+        <span>{formatDistanceToNow(new Date(row.original.startedAt), { addSuffix: true })}</span>
       </div>
     ),
   },
@@ -128,7 +124,7 @@ const violationColumns: ColumnDef<ViolationRow>[] = [
     cell: ({ row }) => (
       <div>
         <p className="font-medium">{row.original.rule.name}</p>
-        <p className="text-xs text-muted-foreground capitalize">
+        <p className="text-muted-foreground text-xs capitalize">
           {row.original.rule.type.replace(/_/g, ' ')}
         </p>
       </div>
@@ -137,13 +133,15 @@ const violationColumns: ColumnDef<ViolationRow>[] = [
   {
     accessorKey: 'severity',
     header: 'Severity',
-    cell: ({ row }) => <SeverityBadge severity={row.original.severity as 'low' | 'warning' | 'high'} />,
+    cell: ({ row }) => (
+      <SeverityBadge severity={row.original.severity as 'low' | 'warning' | 'high'} />
+    ),
   },
   {
     accessorKey: 'createdAt',
     header: 'When',
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">
+      <span className="text-muted-foreground text-sm">
         {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
       </span>
     ),
@@ -154,9 +152,7 @@ const violationColumns: ColumnDef<ViolationRow>[] = [
     cell: ({ row }) => (
       <span
         className={
-          row.original.acknowledgedAt
-            ? 'text-muted-foreground'
-            : 'text-yellow-500 font-medium'
+          row.original.acknowledgedAt ? 'text-muted-foreground' : 'font-medium text-yellow-500'
         }
       >
         {row.original.acknowledgedAt ? 'Acknowledged' : 'Pending'}
@@ -191,7 +187,7 @@ const terminationColumns: ColumnDef<TerminationLogWithDetails>[] = [
     cell: ({ row }) => (
       <div className="max-w-[200px]">
         <p className="truncate font-medium">{row.original.mediaTitle ?? '—'}</p>
-        <p className="text-xs text-muted-foreground capitalize">
+        <p className="text-muted-foreground text-xs capitalize">
           {row.original.mediaType ?? 'unknown'}
         </p>
       </div>
@@ -201,7 +197,7 @@ const terminationColumns: ColumnDef<TerminationLogWithDetails>[] = [
     accessorKey: 'createdAt',
     header: 'When',
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">
+      <span className="text-muted-foreground text-sm">
         {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
       </span>
     ),
@@ -212,12 +208,10 @@ const terminationColumns: ColumnDef<TerminationLogWithDetails>[] = [
     cell: ({ row }) => {
       const log = row.original;
       if (log.trigger === 'manual') {
-        return (
-          <span className="text-sm">@{log.triggeredByUsername ?? 'Unknown'}</span>
-        );
+        return <span className="text-sm">@{log.triggeredByUsername ?? 'Unknown'}</span>;
       }
       return (
-        <span className="text-sm text-muted-foreground">{log.ruleName ?? 'Unknown rule'}</span>
+        <span className="text-muted-foreground text-sm">{log.ruleName ?? 'Unknown rule'}</span>
       );
     },
   },
@@ -225,7 +219,7 @@ const terminationColumns: ColumnDef<TerminationLogWithDetails>[] = [
     accessorKey: 'reason',
     header: 'Reason',
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground truncate max-w-[150px] block">
+      <span className="text-muted-foreground block max-w-[150px] truncate text-sm">
         {row.original.reason ?? '—'}
       </span>
     ),
@@ -234,9 +228,7 @@ const terminationColumns: ColumnDef<TerminationLogWithDetails>[] = [
     accessorKey: 'success',
     header: 'Status',
     cell: ({ row }) => (
-      <span
-        className={row.original.success ? 'text-green-500' : 'text-red-500 font-medium'}
-      >
+      <span className={row.original.success ? 'text-green-500' : 'font-medium text-red-500'}>
         {row.original.success ? 'Success' : 'Failed'}
       </span>
     ),
@@ -260,7 +252,7 @@ export function UserDetail() {
   // Only fetch paginated data when user navigates beyond first page
   const { data: paginatedSessions, isLoading: paginatedSessionsLoading } = useUserSessions(
     id!,
-    { page: sessionsPage, pageSize },
+    { page: sessionsPage, pageSize }
     // Only enable when on page > 1 (first page data comes from aggregate)
   );
   const needsPaginatedSessions = sessionsPage > 1;
@@ -273,10 +265,8 @@ export function UserDetail() {
   });
   const needsPaginatedViolations = violationsPage > 1;
 
-  const { data: paginatedTerminations, isLoading: paginatedTerminationsLoading } = useUserTerminations(
-    id!,
-    { page: terminationsPage, pageSize },
-  );
+  const { data: paginatedTerminations, isLoading: paginatedTerminationsLoading } =
+    useUserTerminations(id!, { page: terminationsPage, pageSize });
   const needsPaginatedTerminations = terminationsPage > 1;
 
   // Extract data from aggregate or paginated sources
@@ -382,7 +372,7 @@ export function UserDetail() {
           </CardHeader>
           <CardContent>
             <div className="flex items-start gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+              <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-full">
                 {(() => {
                   const avatarUrl = getAvatarUrl(user.serverId, user.thumbUrl, 64);
                   return avatarUrl ? (
@@ -392,7 +382,7 @@ export function UserDetail() {
                       className="h-16 w-16 rounded-full object-cover"
                     />
                   ) : (
-                    <UserIcon className="h-8 w-8 text-muted-foreground" />
+                    <UserIcon className="text-muted-foreground h-8 w-8" />
                   );
                 })()}
               </div>
@@ -415,10 +405,8 @@ export function UserDetail() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">@{user.username}</p>
-                {user.email && (
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
-                )}
+                <p className="text-muted-foreground text-sm">@{user.username}</p>
+                {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
                 <div className="flex items-center gap-4 pt-2">
                   <TrustScoreBadge score={user.trustScore} showLabel />
                 </div>
@@ -436,22 +424,22 @@ export function UserDetail() {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-2">
-                  <Play className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Sessions</span>
+                  <Play className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-sm">Sessions</span>
                 </div>
                 <p className="mt-1 text-2xl font-bold">{user.stats.totalSessions}</p>
               </div>
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Violations</span>
+                  <AlertTriangle className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-sm">Violations</span>
                 </div>
                 <p className="mt-1 text-2xl font-bold">{violationsTotal}</p>
               </div>
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Joined</span>
+                  <Clock className="text-muted-foreground h-4 w-4" />
+                  <span className="text-muted-foreground text-sm">Joined</span>
                 </div>
                 <p className="mt-1 text-sm font-medium">
                   {format(new Date(user.createdAt), 'MMM d, yyyy')}
@@ -459,11 +447,11 @@ export function UserDetail() {
               </div>
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Trust Score</span>
+                  <span className="text-muted-foreground text-sm">Trust Score</span>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-2xl font-bold">{user.trustScore}</span>
-                  <span className="text-sm text-muted-foreground">/ 100</span>
+                  <span className="text-muted-foreground text-sm">/ 100</span>
                 </div>
               </div>
             </div>
@@ -478,11 +466,7 @@ export function UserDetail() {
           isLoading={isLoading}
           totalSessions={sessionsTotal}
         />
-        <UserDevicesCard
-          devices={devices}
-          isLoading={isLoading}
-          totalSessions={sessionsTotal}
-        />
+        <UserDevicesCard devices={devices} isLoading={isLoading} totalSessions={sessionsTotal} />
       </div>
 
       {/* Recent Sessions */}

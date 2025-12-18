@@ -99,12 +99,8 @@ export function DataTable<TData, TValue>({
 
   const currentPage = isServerPaginated ? page : pagination.pageIndex + 1;
   const totalPages = isServerPaginated ? pageCount : table.getPageCount();
-  const canPreviousPage = isServerPaginated
-    ? (page ?? 1) > 1
-    : table.getCanPreviousPage();
-  const canNextPage = isServerPaginated
-    ? (page ?? 1) < (pageCount ?? 1)
-    : table.getCanNextPage();
+  const canPreviousPage = isServerPaginated ? (page ?? 1) > 1 : table.getCanPreviousPage();
+  const canNextPage = isServerPaginated ? (page ?? 1) < (pageCount ?? 1) : table.getCanNextPage();
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -120,14 +116,11 @@ export function DataTable<TData, TValue>({
                         className={cn(
                           'flex items-center gap-2',
                           header.column.getCanSort() &&
-                            'cursor-pointer select-none hover:text-foreground'
+                            'hover:text-foreground cursor-pointer select-none'
                         )}
                         onClick={header.column.getToggleSortingHandler()}
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
                           <span className="ml-1">
                             {header.column.getIsSorted() === 'asc' ? (
@@ -151,7 +144,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="py-10 text-center text-muted-foreground"
+                  className="text-muted-foreground py-10 text-center"
                 >
                   Loading...
                 </TableCell>
@@ -174,7 +167,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="py-10 text-center text-muted-foreground"
+                  className="text-muted-foreground py-10 text-center"
                 >
                   {emptyMessage}
                 </TableCell>
@@ -186,7 +179,7 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Page {currentPage ?? 1} of {totalPages}
         </p>
         <div className="flex gap-2">

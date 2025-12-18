@@ -21,7 +21,11 @@ import type { CacheService, PubSubService } from '../services/cache.js';
 import { geoipService } from '../services/geoip.js';
 import { ruleEngine } from '../services/rules.js';
 import { mapMediaSession } from './poller/sessionMapper.js';
-import { calculatePauseAccumulation, calculateStopDuration, checkWatchCompletion } from './poller/stateTracker.js';
+import {
+  calculatePauseAccumulation,
+  calculateStopDuration,
+  checkWatchCompletion,
+} from './poller/stateTracker.js';
 import { getActiveRules, batchGetRecentUserSessions } from './poller/database.js';
 import { createViolation, isDuplicateViolation } from './poller/violations.js';
 import { enqueueNotification } from './notificationQueue.js';
@@ -31,7 +35,10 @@ let cacheService: CacheService | null = null;
 let pubSubService: PubSubService | null = null;
 
 // Store wrapped handlers so we can properly remove them
-interface SessionEvent { serverId: string; notification: PlexPlaySessionNotification }
+interface SessionEvent {
+  serverId: string;
+  notification: PlexPlaySessionNotification;
+}
 const wrappedHandlers = {
   playing: (e: SessionEvent) => void handlePlaying(e),
   paused: (e: SessionEvent) => void handlePaused(e),
@@ -216,10 +223,9 @@ async function handleProgress(event: {
     }
 
     // Update progress in database
-    const watched = existingRows[0].watched || checkWatchCompletion(
-      notification.viewOffset,
-      existingRows[0].totalDurationMs
-    );
+    const watched =
+      existingRows[0].watched ||
+      checkWatchCompletion(notification.viewOffset, existingRows[0].totalDurationMs);
 
     await db
       .update(sessions)
@@ -269,11 +275,7 @@ async function fetchFullSession(
   sessionKey: string
 ): Promise<ReturnType<typeof mapMediaSession> | null> {
   try {
-    const serverRows = await db
-      .select()
-      .from(servers)
-      .where(eq(servers.id, serverId))
-      .limit(1);
+    const serverRows = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
 
     const server = serverRows[0];
     if (!server) {
@@ -287,7 +289,7 @@ async function fetchFullSession(
     });
 
     const allSessions = await client.getSessions();
-    const targetSession = allSessions.find(s => s.sessionKey === sessionKey);
+    const targetSession = allSessions.find((s) => s.sessionKey === sessionKey);
 
     if (!targetSession) {
       return null;
@@ -308,11 +310,7 @@ async function createNewSession(
   processed: ReturnType<typeof mapMediaSession>
 ): Promise<void> {
   // Get server info
-  const serverRows = await db
-    .select()
-    .from(servers)
-    .where(eq(servers.id, serverId))
-    .limit(1);
+  const serverRows = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
 
   const server = serverRows[0];
   if (!server) {
@@ -330,10 +328,7 @@ async function createNewSession(
     .from(serverUsers)
     .innerJoin(users, eq(serverUsers.userId, users.id))
     .where(
-      and(
-        eq(serverUsers.serverId, serverId),
-        eq(serverUsers.externalId, processed.externalUserId)
-      )
+      and(eq(serverUsers.serverId, serverId), eq(serverUsers.externalId, processed.externalUserId))
     )
     .limit(1);
 
@@ -365,7 +360,9 @@ async function createNewSession(
   if (existingActiveSession.length > 0) {
     // Session already exists (likely created by poller), skip insert
     // The existing session will be updated by subsequent SSE events
-    console.log(`[SSEProcessor] Active session already exists for ${processed.sessionKey}, skipping create`);
+    console.log(
+      `[SSEProcessor] Active session already exists for ${processed.sessionKey}, skipping create`
+    );
     return;
   }
 
@@ -488,7 +485,11 @@ async function createNewSession(
   // Evaluate rules
   const activeRules = await getActiveRules();
   const recentSessions = await batchGetRecentUserSessions([serverUserId]);
-  const ruleResults = await ruleEngine.evaluateSession(inserted, activeRules, recentSessions.get(serverUserId) ?? []);
+  const ruleResults = await ruleEngine.evaluateSession(
+    inserted,
+    activeRules,
+    recentSessions.get(serverUserId) ?? []
+  );
 
   for (const result of ruleResults) {
     const matchingRule = activeRules.find(
@@ -512,7 +513,14 @@ async function createNewSession(
       // TODO: Refactor to use createViolationInTransaction pattern for atomicity
       // Session is already inserted before rule evaluation, so using standalone function for now
       // eslint-disable-next-line @typescript-eslint/no-deprecated
-      await createViolation(matchingRule.id, serverUserId, inserted.id, result, matchingRule, pubSubService);
+      await createViolation(
+        matchingRule.id,
+        serverUserId,
+        inserted.id,
+        result,
+        matchingRule,
+        pubSubService
+      );
     }
   }
 
@@ -534,15 +542,17 @@ async function updateExistingSession(
   const pauseResult = calculatePauseAccumulation(
     previousState,
     newState,
-    { lastPausedAt: existingSession.lastPausedAt, pausedDurationMs: existingSession.pausedDurationMs || 0 },
+    {
+      lastPausedAt: existingSession.lastPausedAt,
+      pausedDurationMs: existingSession.pausedDurationMs || 0,
+    },
     now
   );
 
   // Check watch completion
-  const watched = existingSession.watched || checkWatchCompletion(
-    processed.progressMs,
-    processed.totalDurationMs
-  );
+  const watched =
+    existingSession.watched ||
+    checkWatchCompletion(processed.progressMs, processed.totalDurationMs);
 
   // Update session in database
   await db
@@ -606,10 +616,9 @@ async function stopSession(existingSession: typeof sessions.$inferSelect): Promi
   );
 
   // Check watch completion
-  const watched = existingSession.watched || checkWatchCompletion(
-    existingSession.progressMs,
-    existingSession.totalDurationMs
-  );
+  const watched =
+    existingSession.watched ||
+    checkWatchCompletion(existingSession.progressMs, existingSession.totalDurationMs);
 
   // Update session
   await db

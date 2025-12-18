@@ -4,7 +4,10 @@ import { formatSpeed, formatDistance } from '@tracearr/shared';
 /**
  * Format violation data into readable description based on rule type
  */
-export function getViolationDescription(violation: ViolationWithDetails, unitSystem: UnitSystem = 'metric'): string {
+export function getViolationDescription(
+  violation: ViolationWithDetails,
+  unitSystem: UnitSystem = 'metric'
+): string {
   const data = violation.data;
   const ruleType = violation.rule?.type;
 
@@ -16,9 +19,10 @@ export function getViolationDescription(violation: ViolationWithDetails, unitSys
     case 'impossible_travel': {
       const from = data.fromCity || data.fromLocation || 'unknown location';
       const to = data.toCity || data.toLocation || 'unknown location';
-      const speed = typeof data.calculatedSpeedKmh === 'number'
-        ? formatSpeed(data.calculatedSpeedKmh, unitSystem)
-        : 'impossible speed';
+      const speed =
+        typeof data.calculatedSpeedKmh === 'number'
+          ? formatSpeed(data.calculatedSpeedKmh, unitSystem)
+          : 'impossible speed';
       return `Traveled from ${from} to ${to} at ${speed}`;
     }
     case 'simultaneous_locations': {
@@ -84,7 +88,10 @@ function formatLocationValue(loc: unknown): string {
 /**
  * Get detailed violation information formatted for display
  */
-export function getViolationDetails(violation: ViolationWithDetails, unitSystem: UnitSystem = 'metric'): Record<string, unknown> {
+export function getViolationDetails(
+  violation: ViolationWithDetails,
+  unitSystem: UnitSystem = 'metric'
+): Record<string, unknown> {
   const data = violation.data;
   const ruleType = violation.rule?.type;
 
@@ -101,8 +108,10 @@ export function getViolationDetails(violation: ViolationWithDetails, unitSystem:
       if (data.toCity) details['To City'] = data.toCity;
       if (data.toLocation) details['To Location'] = formatLocationValue(data.toLocation);
       // Format previousLocation/currentLocation if present (lat/lon objects)
-      if (data.previousLocation) details['Previous Location'] = formatLocationValue(data.previousLocation);
-      if (data.currentLocation) details['Current Location'] = formatLocationValue(data.currentLocation);
+      if (data.previousLocation)
+        details['Previous Location'] = formatLocationValue(data.previousLocation);
+      if (data.currentLocation)
+        details['Current Location'] = formatLocationValue(data.currentLocation);
       if (typeof data.calculatedSpeedKmh === 'number') {
         details['Calculated Speed'] = formatSpeed(data.calculatedSpeedKmh, unitSystem);
       }
@@ -117,7 +126,8 @@ export function getViolationDetails(violation: ViolationWithDetails, unitSystem:
       }
       if (typeof data.timeDiffHours === 'number') {
         const minutes = Math.round(data.timeDiffHours * 60);
-        details['Time Window'] = minutes < 60 ? `${minutes} minutes` : `${data.timeDiffHours.toFixed(1)} hours`;
+        details['Time Window'] =
+          minutes < 60 ? `${minutes} minutes` : `${data.timeDiffHours.toFixed(1)} hours`;
       }
       break;
     }
@@ -136,7 +146,8 @@ export function getViolationDetails(violation: ViolationWithDetails, unitSystem:
     }
     case 'device_velocity': {
       if (typeof data.ipCount === 'number') details['IP Count'] = data.ipCount;
-      if (typeof data.windowHours === 'number') details['Time Window'] = `${data.windowHours} hours`;
+      if (typeof data.windowHours === 'number')
+        details['Time Window'] = `${data.windowHours} hours`;
       if (Array.isArray(data.ipAddresses)) {
         details['IP Addresses'] = data.ipAddresses;
       }
@@ -157,4 +168,3 @@ export function getViolationDetails(violation: ViolationWithDetails, unitSystem:
 
   return details;
 }
-

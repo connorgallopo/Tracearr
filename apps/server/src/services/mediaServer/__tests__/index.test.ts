@@ -360,7 +360,11 @@ describe('Polymorphic Client Usage', () => {
   it('should allow treating all clients as IMediaServerClient', () => {
     const clients: IMediaServerClient[] = [
       createMediaServerClient({ type: 'plex', url: 'http://plex:32400', token: 'plex-token' }),
-      createMediaServerClient({ type: 'jellyfin', url: 'http://jellyfin:8096', token: 'jelly-token' }),
+      createMediaServerClient({
+        type: 'jellyfin',
+        url: 'http://jellyfin:8096',
+        token: 'jelly-token',
+      }),
       createMediaServerClient({ type: 'emby', url: 'http://emby:8096', token: 'emby-token' }),
     ];
 

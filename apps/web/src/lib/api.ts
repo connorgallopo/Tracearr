@@ -112,7 +112,9 @@ export const tokenStorage = {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     // Dispatch event so auth context can react immediately (unless silent)
     if (!silent) {
-      window.dispatchEvent(new CustomEvent(AUTH_STATE_CHANGE_EVENT, { detail: { type: 'logout' } }));
+      window.dispatchEvent(
+        new CustomEvent(AUTH_STATE_CHANGE_EVENT, { detail: { type: 'logout' } })
+      );
     }
   },
 };
@@ -184,11 +186,7 @@ class ApiClient {
     return this.refreshPromise;
   }
 
-  private async request<T>(
-    path: string,
-    options: RequestInit = {},
-    isRetry = false
-  ): Promise<T> {
+  private async request<T>(path: string, options: RequestInit = {}, isRetry = false): Promise<T> {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string>),
     };
@@ -212,8 +210,15 @@ class ApiClient {
 
     // Handle 401 with automatic token refresh (skip for auth endpoints to avoid loops)
     // Note: /auth/me is NOT in this list - it SHOULD trigger token refresh on 401
-    const noRetryPaths = ['/auth/login', '/auth/signup', '/auth/refresh', '/auth/logout', '/auth/plex/check-pin', '/auth/callback'];
-    const shouldRetry = !noRetryPaths.some(p => path.startsWith(p));
+    const noRetryPaths = [
+      '/auth/login',
+      '/auth/signup',
+      '/auth/refresh',
+      '/auth/logout',
+      '/auth/plex/check-pin',
+      '/auth/callback',
+    ];
+    const shouldRetry = !noRetryPaths.some((p) => path.startsWith(p));
     if (response.status === 401 && !isRetry && shouldRetry) {
       const refreshed = await this.handleTokenRefresh();
       if (refreshed) {
@@ -240,33 +245,35 @@ class ApiClient {
 
   // Setup - check if Tracearr needs initial configuration
   setup = {
-    status: () => this.request<{
-      needsSetup: boolean;
-      hasServers: boolean;
-      hasJellyfinServers: boolean;
-      hasPasswordAuth: boolean;
-      primaryAuthMethod: 'jellyfin' | 'local';
-    }>('/setup/status'),
+    status: () =>
+      this.request<{
+        needsSetup: boolean;
+        hasServers: boolean;
+        hasJellyfinServers: boolean;
+        hasPasswordAuth: boolean;
+        primaryAuthMethod: 'jellyfin' | 'local';
+      }>('/setup/status'),
   };
 
   // Auth
   auth = {
-    me: () => this.request<{
-      userId: string;
-      username: string;
-      email: string | null;
-      thumbnail: string | null;
-      role: UserRole;
-      aggregateTrustScore: number;
-      serverIds: string[];
-      hasPassword?: boolean;
-      hasPlexLinked?: boolean;
-      // Fallback fields for backwards compatibility
-      id?: string;
-      serverId?: string;
-      thumbUrl?: string | null;
-      trustScore?: number;
-    }>('/auth/me'),
+    me: () =>
+      this.request<{
+        userId: string;
+        username: string;
+        email: string | null;
+        thumbnail: string | null;
+        role: UserRole;
+        aggregateTrustScore: number;
+        serverIds: string[];
+        hasPassword?: boolean;
+        hasPlexLinked?: boolean;
+        // Fallback fields for backwards compatibility
+        id?: string;
+        serverId?: string;
+        thumbUrl?: string | null;
+        trustScore?: number;
+      }>('/auth/me'),
     logout: () => this.request<void>('/auth/logout', { method: 'POST' }),
 
     // Local account signup (email for login, username for display)
@@ -299,17 +306,28 @@ class ApiClient {
 
     // Jellyfin Admin Login - Authenticate with Jellyfin username/password
     loginJellyfin: (data: { username: string; password: string }) =>
-      this.request<{ accessToken: string; refreshToken: string; user: User }>('/auth/jellyfin/login', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+      this.request<{ accessToken: string; refreshToken: string; user: User }>(
+        '/auth/jellyfin/login',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }
+      ),
 
     // Plex OAuth - Step 3: Connect with selected server (only for setup)
-    connectPlexServer: (data: { tempToken: string; serverUri: string; serverName: string; clientIdentifier?: string }) =>
-      this.request<{ accessToken: string; refreshToken: string; user: User }>('/auth/plex/connect', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+    connectPlexServer: (data: {
+      tempToken: string;
+      serverUri: string;
+      serverName: string;
+      clientIdentifier?: string;
+    }) =>
+      this.request<{ accessToken: string; refreshToken: string; user: User }>(
+        '/auth/plex/connect',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }
+      ),
 
     // Get available Plex servers (authenticated - for adding additional servers)
     getAvailablePlexServers: () =>
@@ -317,17 +335,16 @@ class ApiClient {
 
     // Add an additional Plex server (authenticated - owner only)
     addPlexServer: (data: { serverUri: string; serverName: string; clientIdentifier: string }) =>
-      this.request<{ server: Server; usersAdded: number; librariesSynced: number }>('/auth/plex/add-server', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+      this.request<{ server: Server; usersAdded: number; librariesSynced: number }>(
+        '/auth/plex/add-server',
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }
+      ),
 
     // Jellyfin server connection with API key (requires auth)
-    connectJellyfinWithApiKey: (data: {
-      serverUrl: string;
-      serverName: string;
-      apiKey: string;
-    }) =>
+    connectJellyfinWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
       this.request<{
         accessToken: string;
         refreshToken: string;
@@ -338,11 +355,7 @@ class ApiClient {
       }),
 
     // Emby server connection with API key (requires auth)
-    connectEmbyWithApiKey: (data: {
-      serverUrl: string;
-      serverName: string;
-      apiKey: string;
-    }) =>
+    connectEmbyWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
       this.request<{
         accessToken: string;
         refreshToken: string;
@@ -353,11 +366,7 @@ class ApiClient {
       }),
 
     // Legacy callback (deprecated, kept for compatibility)
-    checkPlexCallback: (data: {
-      pinId: string;
-      serverUrl: string;
-      serverName: string;
-    }) =>
+    checkPlexCallback: (data: { pinId: string; serverUrl: string; serverName: string }) =>
       this.request<{
         authorized: boolean;
         message?: string;
@@ -410,12 +419,17 @@ class ApiClient {
       if (params?.page) searchParams.set('page', String(params.page));
       if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
       if (params?.serverId) searchParams.set('serverId', params.serverId);
-      return this.request<PaginatedResponse<ServerUserWithIdentity>>(`/users?${searchParams.toString()}`);
+      return this.request<PaginatedResponse<ServerUserWithIdentity>>(
+        `/users?${searchParams.toString()}`
+      );
     },
     get: (id: string) => this.request<ServerUserDetail>(`/users/${id}`),
     getFull: (id: string) => this.request<ServerUserFullDetail>(`/users/${id}/full`),
     update: (id: string, data: { trustScore?: number }) =>
-      this.request<ServerUserWithIdentity>(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+      this.request<ServerUserWithIdentity>(`/users/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
     updateIdentity: (id: string, data: { name: string | null }) =>
       this.request<{ success: boolean; name: string | null }>(`/users/${id}/identity`, {
         method: 'PATCH',
@@ -435,7 +449,9 @@ class ApiClient {
     },
     terminations: (id: string, params?: { page?: number; pageSize?: number }) => {
       const query = new URLSearchParams(params as Record<string, string>).toString();
-      return this.request<PaginatedResponse<TerminationLogWithDetails>>(`/users/${id}/terminations?${query}`);
+      return this.request<PaginatedResponse<TerminationLogWithDetails>>(
+        `/users/${id}/terminations?${query}`
+      );
     },
   };
 
@@ -447,7 +463,9 @@ class ApiClient {
       if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
       if (params?.userId) searchParams.set('userId', params.userId);
       if (params?.serverId) searchParams.set('serverId', params.serverId);
-      return this.request<PaginatedResponse<SessionWithDetails>>(`/sessions?${searchParams.toString()}`);
+      return this.request<PaginatedResponse<SessionWithDetails>>(
+        `/sessions?${searchParams.toString()}`
+      );
     },
     /**
      * Query history with cursor-based pagination and advanced filters.
@@ -472,7 +490,8 @@ class ApiClient {
       if (params.geoCountry) searchParams.set('geoCountry', params.geoCountry);
       if (params.geoCity) searchParams.set('geoCity', params.geoCity);
       if (params.geoRegion) searchParams.set('geoRegion', params.geoRegion);
-      if (params.isTranscode !== undefined) searchParams.set('isTranscode', String(params.isTranscode));
+      if (params.isTranscode !== undefined)
+        searchParams.set('isTranscode', String(params.isTranscode));
       if (params.watched !== undefined) searchParams.set('watched', String(params.watched));
       if (params.excludeShortSessions) searchParams.set('excludeShortSessions', 'true');
       if (params.orderBy) searchParams.set('orderBy', params.orderBy);
@@ -485,13 +504,17 @@ class ApiClient {
     filterOptions: (serverId?: string) => {
       const searchParams = new URLSearchParams();
       if (serverId) searchParams.set('serverId', serverId);
-      return this.request<HistoryFilterOptions>(`/sessions/filter-options?${searchParams.toString()}`);
+      return this.request<HistoryFilterOptions>(
+        `/sessions/filter-options?${searchParams.toString()}`
+      );
     },
     getActive: async (serverId?: string) => {
       const params = new URLSearchParams();
       if (serverId) params.set('serverId', serverId);
       const query = params.toString();
-      const response = await this.request<{ data: ActiveSession[] }>(`/sessions/active${query ? `?${query}` : ''}`);
+      const response = await this.request<{ data: ActiveSession[] }>(
+        `/sessions/active${query ? `?${query}` : ''}`
+      );
       return response.data;
     },
     get: (id: string) => this.request<Session>(`/sessions/${id}`),
@@ -530,12 +553,14 @@ class ApiClient {
       if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
       if (params?.userId) searchParams.set('userId', params.userId);
       if (params?.severity) searchParams.set('severity', params.severity);
-      if (params?.acknowledged !== undefined) searchParams.set('acknowledged', String(params.acknowledged));
+      if (params?.acknowledged !== undefined)
+        searchParams.set('acknowledged', String(params.acknowledged));
       if (params?.serverId) searchParams.set('serverId', params.serverId);
-      return this.request<PaginatedResponse<ViolationWithDetails>>(`/violations?${searchParams.toString()}`);
+      return this.request<PaginatedResponse<ViolationWithDetails>>(
+        `/violations?${searchParams.toString()}`
+      );
     },
-    acknowledge: (id: string) =>
-      this.request<Violation>(`/violations/${id}`, { method: 'PATCH' }),
+    acknowledge: (id: string) => this.request<Violation>(`/violations/${id}`, { method: 'PATCH' }),
     dismiss: (id: string) => this.request<void>(`/violations/${id}`, { method: 'DELETE' }),
   };
 
@@ -562,12 +587,16 @@ class ApiClient {
     },
     plays: async (timeRange?: StatsTimeRange, serverId?: string) => {
       const params = this.buildStatsParams(timeRange ?? { period: 'week' }, serverId);
-      const response = await this.request<{ data: PlayStats[] }>(`/stats/plays?${params.toString()}`);
+      const response = await this.request<{ data: PlayStats[] }>(
+        `/stats/plays?${params.toString()}`
+      );
       return response.data;
     },
     users: async (timeRange?: StatsTimeRange, serverId?: string) => {
       const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
-      const response = await this.request<{ data: UserStats[] }>(`/stats/users?${params.toString()}`);
+      const response = await this.request<{ data: UserStats[] }>(
+        `/stats/users?${params.toString()}`
+      );
       return response.data;
     },
     locations: async (params?: {
@@ -619,7 +648,9 @@ class ApiClient {
     },
     topUsers: async (timeRange?: StatsTimeRange, serverId?: string) => {
       const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
-      const response = await this.request<{ data: TopUserStats[] }>(`/stats/top-users?${params.toString()}`);
+      const response = await this.request<{ data: TopUserStats[] }>(
+        `/stats/top-users?${params.toString()}`
+      );
       return response.data;
     },
     topContent: async (timeRange?: StatsTimeRange, serverId?: string) => {
@@ -693,15 +724,17 @@ class ApiClient {
   import = {
     tautulli: {
       test: (url: string, apiKey: string) =>
-        this.request<{ success: boolean; message: string; users?: number; historyRecords?: number }>(
-          '/import/tautulli/test',
-          { method: 'POST', body: JSON.stringify({ url, apiKey }) }
-        ),
+        this.request<{
+          success: boolean;
+          message: string;
+          users?: number;
+          historyRecords?: number;
+        }>('/import/tautulli/test', { method: 'POST', body: JSON.stringify({ url, apiKey }) }),
       start: (serverId: string) =>
-        this.request<{ status: string; jobId?: string; message: string }>(
-          '/import/tautulli',
-          { method: 'POST', body: JSON.stringify({ serverId }) }
-        ),
+        this.request<{ status: string; jobId?: string; message: string }>('/import/tautulli', {
+          method: 'POST',
+          body: JSON.stringify({ serverId }),
+        }),
       getActive: (serverId: string) =>
         this.request<{
           active: boolean;
@@ -715,7 +748,13 @@ class ApiClient {
           jobId: string;
           state: string;
           progress: number | object | null;
-          result?: { success: boolean; imported: number; skipped: number; errors: number; message: string };
+          result?: {
+            success: boolean;
+            imported: number;
+            skipped: number;
+            errors: number;
+            message: string;
+          };
           failedReason?: string;
           createdAt?: number;
           finishedAt?: number;
@@ -727,19 +766,26 @@ class ApiClient {
   mobile = {
     get: () => this.request<MobileConfig>('/mobile'),
     enable: () => this.request<MobileConfig>('/mobile/enable', { method: 'POST', body: '{}' }),
-    disable: () => this.request<{ success: boolean }>('/mobile/disable', { method: 'POST', body: '{}' }),
+    disable: () =>
+      this.request<{ success: boolean }>('/mobile/disable', { method: 'POST', body: '{}' }),
     generatePairToken: () =>
-      this.request<{ token: string; expiresAt: string }>('/mobile/pair-token', { method: 'POST', body: '{}' }),
+      this.request<{ token: string; expiresAt: string }>('/mobile/pair-token', {
+        method: 'POST',
+        body: '{}',
+      }),
     revokeSession: (id: string) =>
       this.request<{ success: boolean }>(`/mobile/sessions/${id}`, { method: 'DELETE' }),
     revokeSessions: () =>
-      this.request<{ success: boolean; revokedCount: number }>('/mobile/sessions', { method: 'DELETE' }),
+      this.request<{ success: boolean; revokedCount: number }>('/mobile/sessions', {
+        method: 'DELETE',
+      }),
   };
 
   // Version info
   version = {
     get: () => this.request<VersionInfo>('/version'),
-    check: () => this.request<{ message: string }>('/version/check', { method: 'POST', body: '{}' }),
+    check: () =>
+      this.request<{ message: string }>('/version/check', { method: 'POST', body: '{}' }),
   };
 }
 

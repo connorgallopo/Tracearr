@@ -25,6 +25,7 @@ Available on [Unraid Community Apps](https://github.com/connorgallopo/tracearr-u
 ### Mobile App
 
 iOS and Android companion app with:
+
 - Real-time session monitoring
 - Push notifications with quiet hours
 - Interactive stream map
@@ -51,6 +52,7 @@ Filter stats and activity by custom date ranges. Pick any start and end date, no
 ## Features
 
 ### Sharing Detection
+
 - **Impossible Travel** — Same account in NYC then London 30 minutes later? Flagged.
 - **Simultaneous Locations** — Streaming from two cities at once? Caught.
 - **Device Velocity** — Too many unique IPs in a short window? Suspicious.
@@ -58,17 +60,20 @@ Filter stats and activity by custom date ranges. Pick any start and end date, no
 - **Geo Restrictions** — Block specific countries entirely.
 
 ### Session Tracking
+
 - Full watch history with geolocation
 - Device and player info
 - Pause duration tracking
 - Progress estimation via Plex SSE
 
 ### Trust Scores
+
 - Users earn (or lose) trust based on behavior
 - Violations automatically drop scores
 - Visual trust indicators in the dashboard
 
 ### Notifications
+
 - Discord webhooks
 - Custom webhook endpoints
 - Push notifications to mobile app
@@ -76,10 +81,12 @@ Filter stats and activity by custom date ranges. Pick any start and end date, no
 - Quiet hours and rate limiting
 
 ### Import & Migration
+
 - Tautulli history import — don't start from scratch
 - Bring your existing watch data
 
 ### Stream Map
+
 - Interactive world map showing stream origins
 - Filter by user, server, or time period
 - Spot geographic anomalies at a glance
@@ -88,12 +95,12 @@ Filter stats and activity by custom date ranges. Pick any start and end date, no
 
 ## Docker Tags
 
-| Tag | Description |
-|-----|-------------|
-| `latest` | Stable release (requires external DB/Redis) |
-| `supervised` | **All-in-one stable** — just works |
-| `1.2.0` | This specific version |
-| `supervised-1.2.0` | This specific version (all-in-one) |
+| Tag                | Description                                 |
+| ------------------ | ------------------------------------------- |
+| `latest`           | Stable release (requires external DB/Redis) |
+| `supervised`       | **All-in-one stable** — just works          |
+| `1.2.0`            | This specific version                       |
+| `supervised-1.2.0` | This specific version (all-in-one)          |
 
 ---
 

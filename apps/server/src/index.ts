@@ -26,7 +26,12 @@ const GEOIP_DB_PATH = resolve(PROJECT_ROOT, 'data/GeoLite2-City.mmdb');
 
 // Migrations path (relative to compiled output in production, source in dev)
 const MIGRATIONS_PATH = resolve(__dirname, '../src/db/migrations');
-import type { ActiveSession, ViolationWithDetails, DashboardStats, TautulliImportProgress } from '@tracearr/shared';
+import type {
+  ActiveSession,
+  ViolationWithDetails,
+  DashboardStats,
+  TautulliImportProgress,
+} from '@tracearr/shared';
 
 import authPlugin from './plugins/auth.js';
 import redisPlugin from './plugins/redis.js';
@@ -52,18 +57,18 @@ import { geoipService } from './services/geoip.js';
 import { createCacheService, createPubSubService } from './services/cache.js';
 import { initializePoller, startPoller, stopPoller } from './jobs/poller/index.js';
 import { sseManager } from './services/sseManager.js';
-import { initializeSSEProcessor, startSSEProcessor, stopSSEProcessor } from './jobs/sseProcessor.js';
+import {
+  initializeSSEProcessor,
+  startSSEProcessor,
+  stopSSEProcessor,
+} from './jobs/sseProcessor.js';
 import { initializeWebSocket, broadcastToSessions } from './websocket/index.js';
 import {
   initNotificationQueue,
   startNotificationWorker,
   shutdownNotificationQueue,
 } from './jobs/notificationQueue.js';
-import {
-  initImportQueue,
-  startImportWorker,
-  shutdownImportQueue,
-} from './jobs/importQueue.js';
+import { initImportQueue, startImportWorker, shutdownImportQueue } from './jobs/importQueue.js';
 import {
   initVersionCheckQueue,
   startVersionCheckWorker,
@@ -117,7 +122,9 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
           `aggregates=${tsResult.status.continuousAggregates.length}`
       );
     } else if (!tsResult.status.extensionInstalled) {
-      app.log.warn('TimescaleDB extension not installed - running without time-series optimization');
+      app.log.warn(
+        'TimescaleDB extension not installed - running without time-series optimization'
+      );
     }
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize TimescaleDB - continuing without optimization');
@@ -140,7 +147,10 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
       if (looksEncrypted(server.token)) {
         const result = migrateToken(server.token);
         if (result.wasEncrypted) {
-          await db.update(servers).set({ token: result.plainText }).where(eq(servers.id, server.id));
+          await db
+            .update(servers)
+            .set({ token: result.plainText })
+            .where(eq(servers.id, server.id));
           migrated++;
         } else {
           // Looks encrypted but couldn't decrypt - always warn regardless of key availability
@@ -305,7 +315,13 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
         chunks: tsStatus.chunkCount,
       };
     } catch {
-      timescale = { installed: false, hypertable: false, compression: false, aggregates: 0, chunks: 0 };
+      timescale = {
+        installed: false,
+        hypertable: false,
+        compression: false,
+        aggregates: 0,
+        chunks: 0,
+      };
     }
 
     return {
@@ -423,7 +439,10 @@ async function start() {
             broadcastToSessions('import:progress', data as TautulliImportProgress);
             break;
           case WS_EVENTS.VERSION_UPDATE:
-            broadcastToSessions('version:update', data as { current: string; latest: string; releaseUrl: string });
+            broadcastToSessions(
+              'version:update',
+              data as { current: string; latest: string; releaseUrl: string }
+            );
             break;
           default:
             // Unknown event, ignore

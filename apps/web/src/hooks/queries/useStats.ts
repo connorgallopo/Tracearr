@@ -50,7 +50,8 @@ export function useLocationStats(filters?: LocationStatsFilters) {
 export function usePlaysByDayOfWeek(timeRange?: StatsTimeRange, serverId?: string | null) {
   return useQuery({
     queryKey: ['stats', 'plays-by-dayofweek', timeRange, serverId],
-    queryFn: () => api.stats.playsByDayOfWeek(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    queryFn: () =>
+      api.stats.playsByDayOfWeek(timeRange ?? { period: 'month' }, serverId ?? undefined),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
@@ -58,7 +59,8 @@ export function usePlaysByDayOfWeek(timeRange?: StatsTimeRange, serverId?: strin
 export function usePlaysByHourOfDay(timeRange?: StatsTimeRange, serverId?: string | null) {
   return useQuery({
     queryKey: ['stats', 'plays-by-hourofday', timeRange, serverId],
-    queryFn: () => api.stats.playsByHourOfDay(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    queryFn: () =>
+      api.stats.playsByHourOfDay(timeRange ?? { period: 'month' }, serverId ?? undefined),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

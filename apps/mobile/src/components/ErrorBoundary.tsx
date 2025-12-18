@@ -63,9 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <View style={styles.content}>
             <AlertTriangle size={48} color={colors.error} strokeWidth={2} />
             <Text style={styles.title}>Something went wrong</Text>
-            <Text style={styles.message}>
-              An unexpected error occurred. Please try again.
-            </Text>
+            <Text style={styles.message}>An unexpected error occurred. Please try again.</Text>
 
             {__DEV__ && this.state.error && (
               <ScrollView style={styles.errorContainer}>
@@ -74,9 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 {this.state.errorInfo?.componentStack && (
                   <>
                     <Text style={styles.errorTitle}>Component Stack:</Text>
-                    <Text style={styles.stackText}>
-                      {this.state.errorInfo.componentStack}
-                    </Text>
+                    <Text style={styles.stackText}>{this.state.errorInfo.componentStack}</Text>
                   </>
                 )}
               </ScrollView>

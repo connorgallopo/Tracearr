@@ -45,22 +45,16 @@ const SEVERITY_LEVELS = [
 ] as const;
 
 function Divider() {
-  return <View className="h-px bg-border ml-4" />;
+  return <View className="bg-border ml-4 h-px" />;
 }
 
-function SettingsSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mb-6">
-      <Text className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+      <Text className="text-muted-foreground mb-2 text-sm font-semibold tracking-wide uppercase">
         {title}
       </Text>
-      <Card className="p-0 overflow-hidden">{children}</Card>
+      <Card className="overflow-hidden p-0">{children}</Card>
     </View>
   );
 }
@@ -81,8 +75,8 @@ function SettingRow({
   disabled?: boolean;
 }) {
   return (
-    <View className="flex-row justify-between items-center px-4 py-3 min-h-[52px]">
-      <View className="flex-1 mr-4">
+    <View className="min-h-[52px] flex-row items-center justify-between px-4 py-3">
+      <View className="mr-4 flex-1">
         <View className="flex-row items-center">
           {Icon && (
             <Icon
@@ -94,7 +88,13 @@ function SettingRow({
           <Text className={cn('text-base', disabled && 'opacity-50')}>{label}</Text>
         </View>
         {description && (
-          <Text className={cn('text-xs text-muted-foreground mt-0.5', Icon && 'ml-7', disabled && 'opacity-50')}>
+          <Text
+            className={cn(
+              'text-muted-foreground mt-0.5 text-xs',
+              Icon && 'ml-7',
+              disabled && 'opacity-50'
+            )}
+          >
             {description}
           </Text>
         )}
@@ -143,9 +143,9 @@ function SelectRow({
     <Pressable
       onPress={handlePress}
       disabled={disabled}
-      className={cn('px-4 py-3 min-h-[52px]', 'active:opacity-70')}
+      className={cn('min-h-[52px] px-4 py-3', 'active:opacity-70')}
     >
-      <Text className={cn('text-sm text-muted-foreground mb-1', disabled && 'opacity-50')}>
+      <Text className={cn('text-muted-foreground mb-1 text-sm', disabled && 'opacity-50')}>
         {label}
       </Text>
       <Text className={cn('text-base', disabled && 'opacity-50')}>
@@ -184,19 +184,12 @@ function MultiSelectRow({
           onPress={() => onChange([])}
           disabled={disabled}
           className={cn(
-            'px-3 py-1.5 rounded-full border',
-            allSelected
-              ? 'bg-cyan-core border-cyan-core'
-              : 'border-border bg-card',
+            'rounded-full border px-3 py-1.5',
+            allSelected ? 'bg-cyan-core border-cyan-core' : 'border-border bg-card',
             disabled && 'opacity-50'
           )}
         >
-          <Text
-            className={cn(
-              'text-sm',
-              allSelected ? 'text-background' : 'text-foreground'
-            )}
-          >
+          <Text className={cn('text-sm', allSelected ? 'text-background' : 'text-foreground')}>
             All Types
           </Text>
         </Pressable>
@@ -208,19 +201,12 @@ function MultiSelectRow({
               onPress={() => toggleValue(option.value)}
               disabled={disabled}
               className={cn(
-                'px-3 py-1.5 rounded-full border',
-                isSelected
-                  ? 'bg-cyan-core border-cyan-core'
-                  : 'border-border bg-card',
+                'rounded-full border px-3 py-1.5',
+                isSelected ? 'bg-cyan-core border-cyan-core' : 'border-border bg-card',
                 disabled && 'opacity-50'
               )}
             >
-              <Text
-                className={cn(
-                  'text-sm',
-                  isSelected ? 'text-background' : 'text-foreground'
-                )}
-              >
+              <Text className={cn('text-sm', isSelected ? 'text-background' : 'text-foreground')}>
                 {option.label}
               </Text>
             </Pressable>
@@ -244,16 +230,16 @@ function RateLimitStatus({
 }) {
   return (
     <View className="px-4 py-3">
-      <Text className="text-sm text-muted-foreground mb-2">Current Rate Limit Status</Text>
+      <Text className="text-muted-foreground mb-2 text-sm">Current Rate Limit Status</Text>
       <View className="flex-row gap-4">
-        <View className="flex-1 p-3 rounded-lg bg-surface">
-          <Text className="text-xs text-muted-foreground mb-1">Per Minute</Text>
+        <View className="bg-surface flex-1 rounded-lg p-3">
+          <Text className="text-muted-foreground mb-1 text-xs">Per Minute</Text>
           <Text className="text-lg font-semibold">
             {remainingMinute ?? maxPerMinute} / {maxPerMinute}
           </Text>
         </View>
-        <View className="flex-1 p-3 rounded-lg bg-surface">
-          <Text className="text-xs text-muted-foreground mb-1">Per Hour</Text>
+        <View className="bg-surface flex-1 rounded-lg p-3">
+          <Text className="text-muted-foreground mb-1 text-xs">Per Hour</Text>
           <Text className="text-lg font-semibold">
             {remainingHour ?? maxPerHour} / {maxPerHour}
           </Text>
@@ -287,8 +273,9 @@ export default function NotificationSettingsScreen() {
         'notifications',
         'preferences',
       ]);
-      queryClient.setQueryData(['notifications', 'preferences'], (old: NotificationPreferences | undefined) =>
-        old ? { ...old, ...newData } : old
+      queryClient.setQueryData(
+        ['notifications', 'preferences'],
+        (old: NotificationPreferences | undefined) => (old ? { ...old, ...newData } : old)
       );
       return { previousData };
     },
@@ -306,10 +293,7 @@ export default function NotificationSettingsScreen() {
   const testMutation = useMutation({
     mutationFn: api.notifications.sendTest,
     onSuccess: (result) => {
-      Alert.alert(
-        result.success ? 'Test Sent' : 'Test Failed',
-        result.message
-      );
+      Alert.alert(result.success ? 'Test Sent' : 'Test Failed', result.message);
     },
     onError: (error: Error) => {
       Alert.alert('Error', error.message || 'Failed to send test notification');
@@ -325,10 +309,13 @@ export default function NotificationSettingsScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.dark }}
+        edges={['left', 'right', 'bottom']}
+      >
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.cyan.core} />
-          <Text className="mt-4 text-muted-foreground">Loading preferences...</Text>
+          <Text className="text-muted-foreground mt-4">Loading preferences...</Text>
         </View>
       </SafeAreaView>
     );
@@ -336,11 +323,12 @@ export default function NotificationSettingsScreen() {
 
   if (error || !preferences) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.dark }}
+        edges={['left', 'right', 'bottom']}
+      >
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-xl font-semibold text-center mb-2">
-            Unable to Load Preferences
-          </Text>
+          <Text className="mb-2 text-center text-xl font-semibold">Unable to Load Preferences</Text>
           <Text className="text-muted-foreground text-center">
             {error instanceof Error ? error.message : 'An error occurred'}
           </Text>
@@ -352,7 +340,10 @@ export default function NotificationSettingsScreen() {
   const pushEnabled = preferences.pushEnabled;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background.dark }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.dark }}
+      edges={['left', 'right', 'bottom']}
+    >
       <ScrollView className="flex-1" contentContainerClassName="p-4">
         {/* Master Toggle */}
         <SettingsSection title="Push Notifications">
@@ -472,18 +463,18 @@ export default function NotificationSettingsScreen() {
             <>
               <Divider />
               <View className="px-4 py-3">
-                <View className="flex-row justify-between items-center">
+                <View className="flex-row items-center justify-between">
                   <View>
-                    <Text className="text-sm text-muted-foreground">Start Time</Text>
+                    <Text className="text-muted-foreground text-sm">Start Time</Text>
                     <Text className="text-base">{preferences.quietHoursStart ?? '23:00'}</Text>
                   </View>
                   <Text className="text-muted-foreground mx-4">to</Text>
                   <View>
-                    <Text className="text-sm text-muted-foreground">End Time</Text>
+                    <Text className="text-muted-foreground text-sm">End Time</Text>
                     <Text className="text-base">{preferences.quietHoursEnd ?? '08:00'}</Text>
                   </View>
                 </View>
-                <Text className="text-xs text-muted-foreground mt-2">
+                <Text className="text-muted-foreground mt-2 text-xs">
                   Timezone: {preferences.quietHoursTimezone || 'UTC'}
                 </Text>
               </View>
@@ -509,8 +500,9 @@ export default function NotificationSettingsScreen() {
           />
           <Divider />
           <View className="px-4 py-2">
-            <Text className="text-xs text-muted-foreground leading-4">
-              Rate limits prevent notification spam. Current limits: {preferences.maxPerMinute}/min, {preferences.maxPerHour}/hour.
+            <Text className="text-muted-foreground text-xs leading-4">
+              Rate limits prevent notification spam. Current limits: {preferences.maxPerMinute}/min,{' '}
+              {preferences.maxPerHour}/hour.
             </Text>
           </View>
         </SettingsSection>
@@ -528,7 +520,7 @@ export default function NotificationSettingsScreen() {
               <Text className="text-background font-semibold">Send Test Notification</Text>
             )}
           </Button>
-          <Text className="text-xs text-muted-foreground text-center mt-2">
+          <Text className="text-muted-foreground mt-2 text-center text-xs">
             Verify that push notifications are working correctly
           </Text>
         </View>
