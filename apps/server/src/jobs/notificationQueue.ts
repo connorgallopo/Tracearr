@@ -176,7 +176,9 @@ async function processNotificationJob(job: Job<NotificationJobData>): Promise<vo
     customWebhookUrl: routing.webhookEnabled ? settings.customWebhookUrl : null,
     webhookFormat: settings.webhookFormat,
     ntfyTopic: settings.ntfyTopic,
-    ntfyAuthToken: settings.ntfyAuthToken ?? null,
+    ntfyAuthToken: settings.ntfyAuthToken,
+    pushoverUserKey: settings.pushoverUserKey,
+    pushoverApiToken: settings.pushoverApiToken,
     // Fill in defaults for other Settings fields
     allowGuestAccess: false,
     unitSystem: settings.unitSystem ?? ('metric' as const), // Display preference for units

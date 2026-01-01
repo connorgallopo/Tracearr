@@ -62,7 +62,7 @@ function severityToAppriseType(severity: string): 'info' | 'success' | 'warning'
  * Map severity to pushover priority (-2 to 2 scale)
  */
 function severityToPushoverPriority(severity: string): string {
-  const map: Record<string, number> = { high: '1', warning: '0', low: '-1' };
+  const map: Record<string, string> = { high: '1', warning: '0', low: '-1' };
   return map[severity] ?? '-1';
 }
 
@@ -627,6 +627,7 @@ export class NotificationService {
         payload = this.buildApprisePayload(rawPayload, context);
         break;
       case 'pushover':
+        if (!settings.pushoverUserKey || !settings.pushoverApiToken) return;
         url = this.buildPushoverUrl(
           rawPayload,
           new URL(settings.customWebhookUrl),
@@ -974,7 +975,7 @@ export async function sendTestWebhook(
         );
         url.searchParams.set('user', pushoverUserKey ?? '');
         url.searchParams.set('token', pushoverApiToken ?? '');
-        url.searchParams.set('priority', '-1');
+        url.searchParams.set('priority', '0');
         webhookUrl = url.toString();
         break;
       }

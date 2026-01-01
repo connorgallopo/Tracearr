@@ -61,14 +61,14 @@ import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { JobsSettings } from '@/components/settings/JobsSettings';
 import { PlexAccountsManager } from '@/components/settings/PlexAccountsManager';
 import { ImportProgressCard, FileDropzone, type ImportProgressData } from '@/components/import';
-import type {
-  Server,
-  Settings as SettingsType,
-  TautulliImportProgress,
-  JellystatImportProgress,
-  MobileSession,
-  MobileQRPayload,
-  WebhookFormat,
+import {
+  type Server,
+  type Settings as SettingsType,
+  type TautulliImportProgress,
+  type JellystatImportProgress,
+  type MobileSession,
+  type MobileQRPayload,
+  type WebhookFormat,
 } from '@tracearr/shared';
 import {
   useSettings,
@@ -926,7 +926,7 @@ function NotificationSettings() {
   };
 
   const handleWebhookFormatChange = (value: string) => {
-    setWebhookFormat(value);
+    setWebhookFormat(value as WebhookFormat);
     updateSettings.mutate({ webhookFormat: value as WebhookFormat });
   };
 
