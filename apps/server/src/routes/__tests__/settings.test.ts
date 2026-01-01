@@ -840,5 +840,219 @@ describe('Settings Routes', () => {
       const body = response.json();
       expect(body.ntfyAuthToken).toBe(null);
     });
+
+    it('updates webhook format to pushover', async () => {
+      app = await buildTestApp(ownerUser);
+
+      let selectCount = 0;
+      vi.mocked(db.select).mockImplementation(() => {
+        selectCount++;
+        const chain = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue(
+            selectCount === 1
+              ? [mockSettingsRow]
+              : [
+                  {
+                    ...mockSettingsRow,
+                    webhookFormat: 'pushover',
+                    pushoverUserKey: 'pushover-user-key',
+                    pushoverApiToken: 'pushover-api-token',
+                  },
+                ]
+          ),
+        };
+        return chain as never;
+      });
+      mockDbUpdate();
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/settings',
+        payload: {
+          webhookFormat: 'pushover',
+          pushoverUserKey: 'pushover-user-key',
+          pushoverApiToken: 'pushover-api-token',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.webhookFormat).toBe('pushover');
+      expect(body.pushoverUserKey).toBe('pushover-user-key');
+      expect(body.pushoverApiToken).toBe('********');
+    });
+  });
+
+  it('clears pushover fields when set to null', async () => {
+    app = await buildTestApp(ownerUser);
+
+    let selectCount = 0;
+    vi.mocked(db.select).mockImplementation(() => {
+      selectCount++;
+      const chain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue(
+          selectCount === 1
+            ? [
+                {
+                  ...mockSettingsRow,
+                  pushoverUserKey: 'pushover-user-key',
+                  pushoverApiToken: 'pushover-api-token',
+                },
+              ]
+            : [
+                {
+                  ...mockSettingsRow,
+                  pushoverUserKey: null,
+                  pushoverApiToken: null,
+                },
+              ]
+        ),
+      };
+      return chain as never;
+    });
+    mockDbUpdate();
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/settings',
+      payload: {
+        pushoverUserKey: null,
+        pushoverApiToken: null,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.pushoverUserKey).toBe(null);
+    expect(body.pushoverApiToken).toBe(null);
+  });
+
+  it('updates pushover api token', async () => {
+    app = await buildTestApp(ownerUser);
+
+    let selectCount = 0;
+    vi.mocked(db.select).mockImplementation(() => {
+      selectCount++;
+      const chain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue(
+          selectCount === 1
+            ? [mockSettingsRow]
+            : [
+                {
+                  ...mockSettingsRow,
+                  webhookFormat: 'pushover',
+                  pushoverUserKey: 'pushover-user-key',
+                  pushoverApiToken: 'pushover-api-token',
+                },
+              ]
+        ),
+      };
+      return chain as never;
+    });
+    mockDbUpdate();
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/settings',
+      payload: {
+        webhookFormat: 'pushover',
+        pushoverUserKey: 'pushover-user-key',
+        pushoverApiToken: 'pushover-api-token',
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.webhookFormat).toBe('pushover');
+    expect(body.pushoverUserKey).toBe('pushover-user-key');
+    // API token should be masked in response
+    expect(body.pushoverApiToken).toBe('********');
+  });
+
+  it('masks pushover api token in GET response', async () => {
+    app = await buildTestApp(ownerUser);
+
+    mockDbSelectLimit([
+      {
+        ...mockSettingsRow,
+        webhookFormat: 'pushover',
+        pushoverUserKey: 'pushover-user-key',
+        pushoverApiToken: 'pushover-api-token',
+      },
+    ]);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/settings',
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.pushoverApiToken).toBe('********');
+  });
+
+  it('returns null for pushover api token when not set', async () => {
+    app = await buildTestApp(ownerUser);
+
+    mockDbSelectLimit([
+      {
+        ...mockSettingsRow,
+        webhookFormat: 'pushover',
+        pushoverUserKey: 'pushover-user-key',
+        pushoverApiToken: null,
+      },
+    ]);
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/settings',
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.pushoverApiToken).toBe(null);
+  });
+
+  it('clears pushover api token when set to null', async () => {
+    app = await buildTestApp(ownerUser);
+
+    let selectCount = 0;
+    vi.mocked(db.select).mockImplementation(() => {
+      selectCount++;
+      const chain = {
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue(
+          selectCount === 1
+            ? [{ ...mockSettingsRow, pushoverApiToken: 'pushover-api-token' }]
+            : [
+                {
+                  ...mockSettingsRow,
+                  pushoverApiToken: null,
+                },
+              ]
+        ),
+      };
+      return chain as never;
+    });
+    mockDbUpdate();
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: '/settings',
+      payload: {
+        pushoverApiToken: null,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.pushoverApiToken).toBe(null);
   });
 });

@@ -977,7 +977,7 @@ export async function sendTestWebhook(
         );
         url.searchParams.set('user', pushoverUserKey ?? '');
         url.searchParams.set('token', pushoverApiToken ?? '');
-        url.searchParams.set('priority', '-1');
+        url.searchParams.set('priority', '0');
         webhookUrl = url.toString();
         break;
       }

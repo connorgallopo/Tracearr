@@ -109,7 +109,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       ntfyTopic: row.ntfyTopic,
       ntfyAuthToken: row.ntfyAuthToken ? '********' : null, // Mask auth token
       pushoverUserKey: row.pushoverUserKey,
-      pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask auth token
+      pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask API Token
       pollerEnabled: row.pollerEnabled,
       pollerIntervalMs: row.pollerIntervalMs,
       tautulliUrl: row.tautulliUrl,
@@ -149,6 +149,8 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       webhookFormat: WebhookFormat | null;
       ntfyTopic: string | null;
       ntfyAuthToken: string | null;
+      pushoverUserKey: string | null;
+      pushoverApiToken: string | null;
       pollerEnabled: boolean;
       pollerIntervalMs: number;
       tautulliUrl: string | null;
@@ -188,6 +190,14 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
 
     if (body.data.ntfyAuthToken !== undefined) {
       updateData.ntfyAuthToken = body.data.ntfyAuthToken;
+    }
+
+    if (body.data.pushoverUserKey !== undefined) {
+      updateData.pushoverUserKey = body.data.pushoverUserKey;
+    }
+
+    if (body.data.pushoverApiToken !== undefined) {
+      updateData.pushoverApiToken = body.data.pushoverApiToken;
     }
 
     if (body.data.pollerEnabled !== undefined) {
@@ -244,6 +254,8 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
         webhookFormat: updateData.webhookFormat ?? null,
         ntfyTopic: updateData.ntfyTopic ?? null,
         ntfyAuthToken: updateData.ntfyAuthToken ?? null,
+        pushoverUserKey: updateData.pushoverUserKey ?? null,
+        pushoverApiToken: updateData.pushoverApiToken ?? null,
         pollerEnabled: updateData.pollerEnabled ?? true,
         pollerIntervalMs: updateData.pollerIntervalMs ?? 15000,
         tautulliUrl: updateData.tautulliUrl ?? null,
@@ -281,7 +293,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       ntfyTopic: row.ntfyTopic,
       ntfyAuthToken: row.ntfyAuthToken ? '********' : null, // Mask auth token
       pushoverUserKey: row.pushoverUserKey,
-      pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask auth token
+      pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask API token
       pollerEnabled: row.pollerEnabled,
       pollerIntervalMs: row.pollerIntervalMs,
       tautulliUrl: row.tautulliUrl,
@@ -440,6 +452,8 @@ export interface NotificationSettings {
   webhookFormat: WebhookFormat | null;
   ntfyTopic: string | null;
   ntfyAuthToken: string | null;
+  pushoverUserKey: string | null;
+  pushoverApiToken: string | null;
   webhookSecret: string | null;
   mobileEnabled: boolean;
   unitSystem: 'metric' | 'imperial';
@@ -456,6 +470,8 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
       webhookFormat: settings.webhookFormat,
       ntfyTopic: settings.ntfyTopic,
       ntfyAuthToken: settings.ntfyAuthToken,
+      pushoverUserKey: settings.pushoverUserKey,
+      pushoverApiToken: settings.pushoverApiToken,
       mobileEnabled: settings.mobileEnabled,
       unitSystem: settings.unitSystem,
     })
@@ -472,6 +488,8 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
       webhookFormat: null,
       ntfyTopic: null,
       ntfyAuthToken: null,
+      pushoverUserKey: null,
+      pushoverApiToken: null,
       webhookSecret: null,
       mobileEnabled: false,
       unitSystem: 'metric',
@@ -484,6 +502,8 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
     webhookFormat: settingsRow.webhookFormat,
     ntfyTopic: settingsRow.ntfyTopic,
     ntfyAuthToken: settingsRow.ntfyAuthToken,
+    pushoverUserKey: settingsRow.pushoverUserKey,
+    pushoverApiToken: settingsRow.pushoverApiToken,
     webhookSecret: null, // TODO: Add webhookSecret column to settings table in Phase 4
     mobileEnabled: settingsRow.mobileEnabled,
     unitSystem: settingsRow.unitSystem,

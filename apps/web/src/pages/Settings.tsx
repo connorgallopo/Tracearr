@@ -62,14 +62,14 @@ import { JobsSettings } from '@/components/settings/JobsSettings';
 import { PlexAccountsManager } from '@/components/settings/PlexAccountsManager';
 import { ImportProgressCard, FileDropzone, type ImportProgressData } from '@/components/import';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
-import type {
-  Server,
-  Settings as SettingsType,
-  TautulliImportProgress,
-  JellystatImportProgress,
-  MobileSession,
-  MobileQRPayload,
-  WebhookFormat,
+import {
+  type Server,
+  type Settings as SettingsType,
+  type TautulliImportProgress,
+  type JellystatImportProgress,
+  type MobileSession,
+  type MobileQRPayload,
+  type WebhookFormat,
 } from '@tracearr/shared';
 import {
   useSettings,
