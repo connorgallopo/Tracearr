@@ -283,7 +283,7 @@ export const locationStatsQuerySchema = z
   );
 
 // Webhook format enum
-export const webhookFormatSchema = z.enum(['json', 'ntfy', 'apprise']);
+export const webhookFormatSchema = z.enum(['json', 'ntfy', 'apprise', 'pushover']);
 
 // Unit system enum for display preferences
 export const unitSystemSchema = z.enum(['metric', 'imperial']);
@@ -293,11 +293,14 @@ export const updateSettingsSchema = z.object({
   allowGuestAccess: z.boolean().optional(),
   // Display preferences
   unitSystem: unitSystemSchema.optional(),
+  // Notification settings
   discordWebhookUrl: z.url().nullable().optional(),
   customWebhookUrl: z.url().nullable().optional(),
   webhookFormat: webhookFormatSchema.nullable().optional(),
   ntfyTopic: z.string().max(200).nullable().optional(),
   ntfyAuthToken: z.string().max(500).nullable().optional(),
+  pushoverUserKey: z.string().max(200).nullable().optional(),
+  pushoverApiToken: z.string().max(200).nullable().optional(),
   // Poller settings
   pollerEnabled: z.boolean().optional(),
   pollerIntervalMs: z.number().int().min(5000).max(300000).optional(),

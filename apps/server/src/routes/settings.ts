@@ -4,7 +4,7 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { eq } from 'drizzle-orm';
-import { updateSettingsSchema, type Settings } from '@tracearr/shared';
+import { updateSettingsSchema, type Settings, type WebhookFormat } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { settings } from '../db/schema.js';
 import { sendTestWebhook } from '../services/notify.js';
@@ -142,7 +142,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       unitSystem: 'metric' | 'imperial';
       discordWebhookUrl: string | null;
       customWebhookUrl: string | null;
-      webhookFormat: 'json' | 'ntfy' | 'apprise' | null;
+      webhookFormat: WebhookFormat | null;
       ntfyTopic: string | null;
       ntfyAuthToken: string | null;
       pollerEnabled: boolean;
@@ -297,9 +297,11 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     Body: {
       type: 'discord' | 'custom';
       url?: string;
-      format?: 'json' | 'ntfy' | 'apprise';
+      format?: WebhookFormat;
       ntfyTopic?: string;
       ntfyAuthToken?: string;
+      pushoverUserKey?: string;
+      pushoverApiToken?: string;
     };
   }>('/test-webhook', { preHandler: [app.authenticate] }, async (request, reply) => {
     const authUser = request.user;
@@ -309,7 +311,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can test webhooks');
     }
 
-    const { type, url, format, ntfyTopic, ntfyAuthToken } = request.body;
+    const { type, url, format } = request.body;
 
     if (!type) {
       return reply.badRequest('Missing webhook type');
@@ -325,24 +327,36 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     const currentSettings = settingsRow[0];
 
     let webhookUrl: string | null = null;
-    let webhookFormat: 'json' | 'ntfy' | 'apprise' = 'json';
-    let topic: string | null = null;
-    let authToken: string | null = null;
+    let webhookFormat: WebhookFormat = 'json';
+    let ntfyTopic: string | null = null;
+    let ntfyAuthToken: string | null = null;
+    let pushoverUserKey: string | null = null;
+    let pushoverApiToken: string | null = null;
 
     if (type === 'discord') {
       webhookUrl = url ?? currentSettings?.discordWebhookUrl ?? null;
     } else {
       webhookUrl = url ?? currentSettings?.customWebhookUrl ?? null;
       webhookFormat = format ?? currentSettings?.webhookFormat ?? 'json';
-      topic = ntfyTopic ?? currentSettings?.ntfyTopic ?? null;
-      authToken = ntfyAuthToken ?? currentSettings?.ntfyAuthToken ?? null;
+      ntfyTopic = request.body.ntfyTopic ?? currentSettings?.ntfyTopic ?? null;
+      ntfyAuthToken = request.body.ntfyAuthToken ?? currentSettings?.ntfyAuthToken ?? null;
+      pushoverUserKey = request.body.pushoverUserKey ?? currentSettings?.pushoverUserKey ?? null;
+      pushoverApiToken = request.body.pushoverApiToken ?? currentSettings?.pushoverApiToken ?? null;
     }
 
     if (!webhookUrl) {
       return reply.badRequest(`No ${type} webhook URL configured`);
     }
 
-    const result = await sendTestWebhook(webhookUrl, type, webhookFormat, topic, authToken);
+    const result = await sendTestWebhook(
+      webhookUrl,
+      type,
+      webhookFormat,
+      ntfyTopic,
+      ntfyAuthToken,
+      pushoverUserKey,
+      pushoverApiToken
+    );
 
     if (!result.success) {
       return reply.code(502).send({
@@ -417,7 +431,7 @@ export async function getNetworkSettings(): Promise<{
 export interface NotificationSettings {
   discordWebhookUrl: string | null;
   customWebhookUrl: string | null;
-  webhookFormat: 'json' | 'ntfy' | 'apprise' | null;
+  webhookFormat: WebhookFormat | null;
   ntfyTopic: string | null;
   ntfyAuthToken: string | null;
   webhookSecret: string | null;

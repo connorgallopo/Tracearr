@@ -68,6 +68,7 @@ import type {
   JellystatImportProgress,
   MobileSession,
   MobileQRPayload,
+  WebhookFormat,
 } from '@tracearr/shared';
 import {
   useSettings,
@@ -850,9 +851,11 @@ function ServerCard({
 function NotificationSettings() {
   const { data: settings, isLoading } = useSettings();
   const updateSettings = useUpdateSettings();
-  const [webhookFormat, setWebhookFormat] = useState<string>('json');
+  const [webhookFormat, setWebhookFormat] = useState<WebhookFormat>('json');
   const [ntfyTopic, setNtfyTopic] = useState<string>('');
   const [ntfyAuthToken, setNtfyAuthToken] = useState<string>('');
+  const [pushoverApiToken, setPushoverApiToken] = useState<string>('');
+  const [pushoverUserKey, setPushoverUserKey] = useState<string>('');
   const [testingDiscord, setTestingDiscord] = useState(false);
   const [testingCustom, setTestingCustom] = useState(false);
 
@@ -861,12 +864,19 @@ function NotificationSettings() {
     if (settings) {
       setWebhookFormat(settings.webhookFormat ?? 'json');
       setNtfyTopic(settings.ntfyTopic ?? '');
-      // Don't sync auth token from server (it's masked with ********)
+      setPushoverUserKey(settings.pushoverUserKey ?? '');
+      // Don't sync auth tokens from server (they're masked with ********)
     }
   }, [settings]);
 
   const handleUrlChange = (
-    key: 'discordWebhookUrl' | 'customWebhookUrl' | 'ntfyTopic' | 'ntfyAuthToken',
+    key:
+      | 'discordWebhookUrl'
+      | 'customWebhookUrl'
+      | 'ntfyTopic'
+      | 'ntfyAuthToken'
+      | 'pushoverUserKey'
+      | 'pushoverApiToken',
     value: string
   ) => {
     updateSettings.mutate({ [key]: value || null });
@@ -895,9 +905,11 @@ function NotificationSettings() {
     try {
       const result = await api.settings.testWebhook({
         type: 'custom',
-        format: webhookFormat as 'json' | 'ntfy' | 'apprise',
+        format: webhookFormat,
         ntfyTopic: ntfyTopic || undefined,
         ntfyAuthToken: ntfyAuthToken || undefined,
+        pushoverUserKey: pushoverUserKey || undefined,
+        pushoverApiToken: pushoverUserKey || undefined,
       });
       if (result.success) {
         toast.success('Test Successful', { description: 'Custom webhook is working correctly' });
@@ -915,7 +927,7 @@ function NotificationSettings() {
 
   const handleWebhookFormatChange = (value: string) => {
     setWebhookFormat(value);
-    updateSettings.mutate({ webhookFormat: value as 'json' | 'ntfy' | 'apprise' });
+    updateSettings.mutate({ webhookFormat: value as WebhookFormat });
   };
 
   if (isLoading) {
@@ -993,7 +1005,9 @@ function NotificationSettings() {
                   ? 'https://ntfy.sh/ (or your self-hosted ntfy server)'
                   : webhookFormat === 'apprise'
                     ? 'http://apprise:8000/notify/myconfig'
-                    : 'https://your-service.com/webhook'
+                    : webhookFormat === 'pushover'
+                      ? 'https://api.pushover.net/1/messages.json'
+                      : 'https://your-service.com/webhook'
               }
               defaultValue={settings?.customWebhookUrl ?? ''}
               onBlur={(e) => {
@@ -1005,7 +1019,9 @@ function NotificationSettings() {
                 ? 'Post to your ntfy server root URL (topic is specified separately below)'
                 : webhookFormat === 'apprise'
                   ? 'Post to your Apprise API endpoint with notification configuration'
-                  : 'Send notifications to a custom endpoint via POST request'}
+                  : webhookFormat === 'pushover'
+                    ? 'Post notifications to Pushover'
+                    : 'Send notifications to a custom endpoint via POST request'}
             </p>
           </div>
 
@@ -1019,6 +1035,7 @@ function NotificationSettings() {
                 <SelectItem value="json">Raw JSON (default)</SelectItem>
                 <SelectItem value="ntfy">Ntfy</SelectItem>
                 <SelectItem value="apprise">Apprise</SelectItem>
+                <SelectItem value="pushover">Pushover</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-muted-foreground text-xs">
@@ -1061,6 +1078,40 @@ function NotificationSettings() {
                 <p className="text-muted-foreground text-xs">
                   Required if your ntfy server uses access control. Leave empty for public topics.
                 </p>
+              </div>
+            </>
+          )}
+          {webhookFormat === 'pushover' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="pushoverUserKey">Pushover user key</Label>
+                <Input
+                  id="pushoverUserKey"
+                  placeholder=""
+                  value={pushoverUserKey}
+                  onChange={(e) => setPushoverUserKey(e.target.value)}
+                  onBlur={(e) => {
+                    handleUrlChange('pushoverUserKey', e.target.value);
+                  }}
+                />
+                <p className="text-muted-foreground text-xs">The Pushover user key</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pushoverApiToken">Pushover Api Token</Label>
+                <Input
+                  id="pushoverApiToken"
+                  type="password"
+                  placeholder={settings?.pushoverApiToken ? '••••••••' : 'Enter auth token'}
+                  value={pushoverApiToken}
+                  onChange={(e) => setPushoverApiToken(e.target.value)}
+                  onBlur={(e) => {
+                    if (e.target.value) {
+                      handleUrlChange('pushoverApiToken', e.target.value);
+                    }
+                  }}
+                />
+                <p className="text-muted-foreground text-xs">Your Pushover Api token</p>
               </div>
             </>
           )}
