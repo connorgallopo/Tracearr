@@ -91,8 +91,14 @@ export const engagementRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const serverFilter = buildServerFilterSql(serverId, authUser);
-    const dailyStartFilter = dateRange.start ? sql`day >= ${dateRange.start}` : sql`true`;
-    const dailyEndFilter = period === 'custom' ? sql`AND day < ${dateRange.end}` : sql``;
+    // Note: The continuous aggregate buckets by UTC day, so we truncate input dates
+    // to UTC day boundaries to ensure correct bucket matching
+    const dailyStartFilter = dateRange.start
+      ? sql`day >= date_trunc('day', ${dateRange.start}::timestamptz)`
+      : sql`true`;
+    const dailyEndFilter = period === 'custom'
+      ? sql`AND day < date_trunc('day', ${dateRange.end}::timestamptz) + interval '1 day'`
+      : sql``;
     const mediaTypeFilter = mediaType ? sql`AND media_type = ${mediaType}` : sql``;
 
     // Run all queries in parallel
@@ -635,10 +641,12 @@ export const engagementRoutes: FastifyPluginAsync = async (app) => {
     // For date filtering, aggregate from daily_content_engagement directly
     if (dateRange.start) {
       // Build date filters for the day column in daily_content_engagement
-      const dailyStartFilter = sql`day >= ${dateRange.start}::timestamptz`;
+      // Note: The continuous aggregate buckets by UTC day, so we truncate input dates
+      // to UTC day boundaries to ensure correct bucket matching
+      const dailyStartFilter = sql`day >= date_trunc('day', ${dateRange.start}::timestamptz)`;
       const dailyEndFilter =
         period === 'custom' && dateRange.end
-          ? sql`AND day <= ${dateRange.end}::timestamptz`
+          ? sql`AND day <= date_trunc('day', ${dateRange.end}::timestamptz)`
           : sql``;
 
       const result = await db.execute(sql`

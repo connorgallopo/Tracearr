@@ -1,0 +1,48 @@
+policy:
+- template: [ "bug-report.yml" ]
+  section:
+  - id: [ "affected_area" ]
+    block-list: [ "Other" ]
+    label:
+    - name: "web"
+      keys: [ "Web Dashboard" ]
+    - name: "iOS"
+      keys: [ "Mobile App (iOS)" ]
+    - name: "android"
+      keys: [ "Mobile App (Android)" ]
+    - name: "server"
+      keys: [ "Server/Backend", "Installation/Startup", "Notifications (Discord, webhooks, etc.)", "Rules/Violations", "Media Server Integration" ]
+    - name: "database"
+      keys: [ "Database/Performance" ]
+
+  - id: [ "media_servers" ]
+    block-list: [ "None configured yet" ]
+    label:
+    - name: "plex"
+      keys: [ "Plex" ]
+    - name: "jellyfin"
+      keys: [ "Jellyfin" ]
+    - name: "emby"
+      keys: [ "Emby" ]
+
+- template: [ "feature-request.yml" ]
+  section:
+  - id: [ "platforms" ]
+    block-list: [ "Not sure" ]
+    label:
+    - name: "web"
+      keys: [ "Web Dashboard" ]
+    - name: "mobile"
+      keys: [ "Mobile App (iOS/Android)" ]
+    - name: "server"
+      keys: [ "Server/Backend", "API", "Notifications" ]
+
+  - id: [ "media_servers" ]
+    block-list: [ "All / Not server-specific" ]
+    label:
+    - name: "plex"
+      keys: [ "Plex" ]
+    - name: "jellyfin"
+      keys: [ "Jellyfin" ]
+    - name: "emby"
+      keys: [ "Emby" ]

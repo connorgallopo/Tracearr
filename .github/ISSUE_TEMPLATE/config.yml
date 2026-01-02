@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+- name: Documentation
+  url: https://github.com/connorgallopo/tracearr#readme
+  about: Check the README for setup guides and common questions
+- name: Discord Community
+  url: https://discord.gg/a7n3sFd2Yw
+  about: Get help from the community or discuss ideas

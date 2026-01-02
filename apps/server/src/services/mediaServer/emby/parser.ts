@@ -157,7 +157,6 @@ function getStreamDecisions(session: Record<string, unknown>): StreamDecisions {
   const playState = getNestedObject(session, 'PlayState');
   const playMethod = parseOptionalString(playState?.PlayMethod);
 
-  // If PlayMethod is available, use it with optional granular flags
   if (playMethod) {
     const transcodingInfo = getNestedObject(session, 'TranscodingInfo');
     const isVideoDirect =
@@ -168,6 +167,14 @@ function getStreamDecisions(session: Record<string, unknown>): StreamDecisions {
       transcodingInfo && typeof getNestedValue(transcodingInfo, 'IsAudioDirect') === 'boolean'
         ? (getNestedValue(transcodingInfo, 'IsAudioDirect') as boolean)
         : undefined;
+
+    // Emby apps report DirectStream even when no remuxing occurs. Treat as DirectPlay
+    // when TranscodingInfo is absent or shows both streams are direct.
+    if (playMethod.toLowerCase() === 'directstream') {
+      if (!transcodingInfo || (isVideoDirect === true && isAudioDirect === true)) {
+        return { videoDecision: 'directplay', audioDecision: 'directplay', isTranscode: false };
+      }
+    }
 
     return normalizePlayMethod(playMethod, isVideoDirect, isAudioDirect);
   }

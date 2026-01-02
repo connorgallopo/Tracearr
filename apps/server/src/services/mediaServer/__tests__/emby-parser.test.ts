@@ -629,7 +629,8 @@ describe('Emby Parser - PlayMethod and Transcode Detection', () => {
     expect(session!.quality.videoDecision).toBe('directplay');
   });
 
-  it('should detect DirectStream from PlayMethod', () => {
+  it('should treat DirectStream as DirectPlay when no TranscodingInfo', () => {
+    // Emby apps report DirectStream even when no remuxing occurs
     const session = parseSession({
       Id: 'session-1',
       NowPlayingItem: { Id: '1', Name: 'Test', Type: 'Movie' },
@@ -640,7 +641,26 @@ describe('Emby Parser - PlayMethod and Transcode Detection', () => {
     });
 
     expect(session!.quality.isTranscode).toBe(false);
-    // DirectStream is normalized to 'copy' (video/audio streams copied, container may change)
+    expect(session!.quality.videoDecision).toBe('directplay');
+  });
+
+  it('should detect actual DirectStream (remux) when TranscodingInfo shows container change', () => {
+    // Actual remuxing: container changes but streams are copied
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: { Id: '1', Name: 'Test', Type: 'Movie' },
+      PlayState: {
+        PlayMethod: 'DirectStream',
+        IsPaused: false,
+      },
+      TranscodingInfo: {
+        Bitrate: 5000000,
+        IsVideoDirect: false, // Video being remuxed
+        IsAudioDirect: true,
+      },
+    });
+
+    expect(session!.quality.isTranscode).toBe(false);
     expect(session!.quality.videoDecision).toBe('copy');
   });
 

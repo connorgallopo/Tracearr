@@ -1,0 +1,128 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Tracearr
+title: "[Feature]: "
+labels: [ "enhancement" ]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Describe what you're looking for.
+
+      **Before submitting:** Search [existing issues](https://github.com/connorgallopo/tracearr/issues) and check the [roadmap](https://github.com/connorgallopo/tracearr#roadmap).
+
+- type: textarea
+  id: problem
+  attributes:
+    label: Problem or Use Case
+    description: What's the problem? What can't you do right now?
+    placeholder: "What doesn't work, or what's missing?"
+  validations:
+    required: true
+
+- type: textarea
+  id: solution
+  attributes:
+    label: Proposed Solution
+    description: How should this feature work? Be as specific as possible.
+    placeholder: |
+      Describe your ideal solution...
+      - What would the UI look like?
+      - How would users interact with it?
+      - What settings or options would it have?
+  validations:
+    required: true
+
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Alternatives Considered
+    description: Any workarounds you've tried? Other approaches you considered?
+
+- type: checkboxes
+  id: platforms
+  attributes:
+    label: Affected Platforms
+    description: Which parts of Tracearr would this feature involve?
+    options:
+    - label: Web Dashboard
+    - label: Mobile App (iOS/Android)
+    - label: Server/Backend
+    - label: Notifications
+    - label: API
+    - label: Not sure
+
+- type: checkboxes
+  id: media_servers
+  attributes:
+    label: Related Media Servers
+    description: Does this feature relate to specific media server integrations?
+    options:
+    - label: Plex
+    - label: Jellyfin
+    - label: Emby
+    - label: All / Not server-specific
+
+- type: dropdown
+  id: category
+  attributes:
+    label: Feature Category
+    description: What type of feature is this?
+    options:
+    - New Rule Type (violation detection)
+    - New Notification Channel
+    - New Integration (external service)
+    - Dashboard / Analytics
+    - User Management
+    - Mobile App Feature
+    - Performance / Optimization
+    - Accessibility / UX
+    - Other
+  validations:
+    required: true
+
+- type: dropdown
+  id: impact
+  attributes:
+    label: Impact
+    description: How important is this feature to your workflow?
+    options:
+    - Nice to have - would improve experience
+    - Important - significantly impacts my use case
+    - Critical - blocking my use of Tracearr
+  validations:
+    required: true
+
+- type: textarea
+  id: examples
+  attributes:
+    label: Examples or References
+    description: |
+      Are there similar features in other apps (Tautulli, Overseerr, etc.) you'd like to reference?
+      Links, screenshots, or descriptions welcome.
+    placeholder: "Similar to how Tautulli does..."
+
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional Context
+    description: "Any other context, mockups, or screenshots that would help explain your request"
+
+- type: checkboxes
+  id: contribution
+  attributes:
+    label: Contribution
+    description: Want to help out?
+    options:
+    - label: I can help test this
+    - label: I can help document this
+    - label: I can help build this
+
+- type: checkboxes
+  id: checklist
+  attributes:
+    label: Checklist
+    options:
+    - label: This isn't a duplicate of an existing issue
+      required: true
+    - label: This fits Tracearr's scope (streaming access management)
+      required: true

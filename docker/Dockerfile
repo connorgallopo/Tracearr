@@ -91,4 +91,15 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/health || exit 1
 
+# OCI image labels for container registries and tools like Renovate
+LABEL org.opencontainers.image.source="https://github.com/connorgallopo/Tracearr" \
+      org.opencontainers.image.url="https://github.com/connorgallopo/Tracearr" \
+      org.opencontainers.image.title="Tracearr" \
+      org.opencontainers.image.description="Streaming access manager for Plex, Jellyfin, and Emby" \
+      org.opencontainers.image.vendor="connorgallopo" \
+      org.opencontainers.image.licenses="AGPL-3.0" \
+      org.opencontainers.image.version="${APP_VERSION}" \
+      org.opencontainers.image.revision="${APP_COMMIT}" \
+      org.opencontainers.image.created="${APP_BUILD_DATE}"
+
 CMD ["node", "apps/server/dist/index.js"]

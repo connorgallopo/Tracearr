@@ -22,3 +22,11 @@ RUN apt-get update \
 # Set unlimited tuple decompression to allow migrations on compressed hypertables
 RUN echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/postgresql.conf.sample \
     && echo "timescaledb.max_tuples_decompressed_per_dml_transaction = 0" >> /usr/share/postgresql/postgresql.conf.sample
+
+# OCI image labels for container registries and tools like Renovate
+LABEL org.opencontainers.image.source="https://github.com/connorgallopo/Tracearr" \
+      org.opencontainers.image.url="https://github.com/connorgallopo/Tracearr" \
+      org.opencontainers.image.title="Tracearr TimescaleDB" \
+      org.opencontainers.image.description="TimescaleDB with Toolkit extension for Tracearr" \
+      org.opencontainers.image.vendor="connorgallopo" \
+      org.opencontainers.image.licenses="AGPL-3.0"

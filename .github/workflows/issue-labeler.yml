@@ -1,0 +1,48 @@
+name: Issue Labeler
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  label-bug-report:
+    if: startsWith(github.event.issue.title, '[Bug]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse bug report form
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/bug-report.yml
+
+      - name: Apply labels
+        uses: redhat-plumbers-in-action/advanced-issue-labeler@v3
+        with:
+          issue-form: ${{ steps.issue-parser.outputs.jsonString }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  label-feature-request:
+    if: startsWith(github.event.issue.title, '[Feature]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse feature request form
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/feature-request.yml
+
+      - name: Apply labels
+        uses: redhat-plumbers-in-action/advanced-issue-labeler@v3
+        with:
+          issue-form: ${{ steps.issue-parser.outputs.jsonString }}
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -108,10 +108,12 @@ export const dashboardRoutes: FastifyPluginAsync = async (app) => {
         violationsCountSince.execute({ since: last24h }),
         uniqueUsersSince.execute({ since: todayStart }),
         // Validated plays from engagement aggregate (sessions >= 2 min)
+        // Note: The continuous aggregate buckets by UTC day, so we need to truncate
+        // todayStart to UTC day boundary to include today's bucket
         db.execute(sql`
             SELECT COALESCE(SUM(valid_session_count), 0)::int as count
             FROM daily_content_engagement
-            WHERE day >= ${todayStart}
+            WHERE day >= date_trunc('day', ${todayStart}::timestamptz)
           `),
       ]);
 
@@ -222,10 +224,12 @@ export const dashboardRoutes: FastifyPluginAsync = async (app) => {
           .where(and(...buildSessionConditions(todayStart))),
 
         // Validated plays from engagement aggregate (sessions >= 2 min)
+        // Note: The continuous aggregate buckets by UTC day, so we need to truncate
+        // todayStart to UTC day boundary to include today's bucket
         db.execute(sql`
             SELECT COALESCE(SUM(valid_session_count), 0)::int as count
             FROM daily_content_engagement
-            WHERE day >= ${todayStart}
+            WHERE day >= date_trunc('day', ${todayStart}::timestamptz)
             ${buildEngagementServerFilter()}
           `),
       ]);

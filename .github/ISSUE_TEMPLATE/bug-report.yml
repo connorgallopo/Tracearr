@@ -1,0 +1,156 @@
+name: Bug Report
+description: Report a bug to help us improve Tracearr
+title: "[Bug]: "
+labels: [ "bug", "needs-triage" ]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Fill out the form below so we can track down and fix this.
+
+      **Before submitting:** Search [existing issues](https://github.com/connorgallopo/tracearr/issues) first.
+
+- type: input
+  id: version
+  attributes:
+    label: Tracearr Version
+    description: "Find this at the bottom of the left-hand navigation or in your docker image tag"
+    placeholder: "e.g., v1.4.0, supervised-v1.4.0"
+  validations:
+    required: true
+
+- type: dropdown
+  id: deployment
+  attributes:
+    label: Deployment Method
+    description: How are you running Tracearr?
+    options:
+    - Docker - Supervised (all-in-one container)
+    - Docker - Standard (separate containers)
+    - TrueNAS Scale (TrueCharts)
+    - Unraid (Community Apps)
+    - Other (specify below)
+  validations:
+    required: true
+
+- type: input
+  id: host_os
+  attributes:
+    label: Host System
+    description: "Operating system and version where Tracearr is running"
+    placeholder: "e.g., Ubuntu 22.04, Unraid 6.12, TrueNAS Scale 24.04"
+  validations:
+    required: true
+
+- type: checkboxes
+  id: media_servers
+  attributes:
+    label: Connected Media Servers
+    description: Which media servers do you have configured?
+    options:
+    - label: Plex
+    - label: Jellyfin
+    - label: Emby
+    - label: None configured yet
+
+- type: input
+  id: media_server_versions
+  attributes:
+    label: Media Server Version(s)
+    description: "Version of each connected media server"
+    placeholder: "e.g., Plex 1.40.5, Jellyfin 10.9.0"
+
+- type: dropdown
+  id: affected_area
+  attributes:
+    label: Affected Area
+    description: Which part of Tracearr is affected?
+    options:
+    - Web Dashboard
+    - Mobile App (iOS)
+    - Mobile App (Android)
+    - Server/Backend
+    - Notifications (Discord, webhooks, etc.)
+    - Rules/Violations
+    - Installation/Startup
+    - Database/Performance
+    - Media Server Integration
+    - Other
+  validations:
+    required: true
+
+- type: textarea
+  id: description
+  attributes:
+    label: Bug Description
+    description: What went wrong? Be as specific as possible.
+    placeholder: "Describe the bug clearly..."
+  validations:
+    required: true
+
+- type: textarea
+  id: reproduction
+  attributes:
+    label: Steps to Reproduce
+    description: How can we reproduce this issue?
+    placeholder: |
+      1. Go to '...'
+      2. Click on '...'
+      3. Scroll down to '...'
+      4. See error
+  validations:
+    required: true
+
+- type: textarea
+  id: compose
+  attributes:
+    label: Docker Compose / Run Command
+    description: |
+      **Skip this if using TrueNAS or Unraid templates.**
+      For Docker users: paste your docker-compose.yml or docker run command.
+      Remove sensitive data (passwords, API keys, domains).
+    render: yaml
+    placeholder: |
+      # Paste your docker-compose.yml here
+      # Or your docker run command
+
+- type: textarea
+  id: logs
+  attributes:
+    label: Relevant Logs
+    description: |
+      Paste any relevant error messages or logs. Set `LOG_LEVEL=debug` for more detail.
+
+      **Standard Docker:** `docker logs tracearr`
+      **Supervised Docker:** `docker exec tracearr cat /var/log/supervisor/tracearr-error.log`
+      (Also available: tracearr.log, postgres.log, postgres-error.log, redis.log, supervisord.log)
+    render: shell
+
+- type: dropdown
+  id: previously_worked
+  attributes:
+    label: Was this working before?
+    description: Did this functionality work previously?
+    options:
+    - "No, this is a new installation"
+    - "Yes, it stopped working after an update"
+    - "Yes, it stopped working without any changes"
+    - "Not sure"
+
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional Context
+    description: "Screenshots, related issues, anything else that might help"
+
+- type: checkboxes
+  id: checklist
+  attributes:
+    label: Checklist
+    options:
+    - label: This isn't a duplicate of an existing issue
+      required: true
+    - label: Version number filled in above
+      required: true
+    - label: Docker compose/run command included (if applicable)
+      required: true

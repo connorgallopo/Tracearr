@@ -54,12 +54,12 @@ const VIOLATION_DEDUP_WINDOW_MS = 5 * TIME_MS.MINUTE;
 // Rules that involve multiple sessions (need session overlap deduplication)
 const MULTI_SESSION_RULES: RuleType[] = ['concurrent_streams', 'simultaneous_locations'];
 
+// Rules that are user-level (any recent violation for same user = duplicate)
+const USER_LEVEL_RULES: RuleType[] = ['device_velocity'];
+
 // Rules that are single-session (need same-session deduplication)
-const SINGLE_SESSION_RULES: RuleType[] = [
-  'impossible_travel',
-  'device_velocity',
-  'geo_restriction',
-];
+// Each session can independently violate these rules
+const SINGLE_SESSION_RULES: RuleType[] = ['impossible_travel', 'geo_restriction'];
 
 // ============================================================================
 // Shared Deduplication Logic
@@ -92,6 +92,17 @@ function checkDuplicateInViolations(
 ): boolean {
   if (recentViolations.length === 0) {
     return false;
+  }
+
+  // User-level rules: any recent violation for same user/ruleType = duplicate
+  if (USER_LEVEL_RULES.includes(ruleType)) {
+    const existing = recentViolations[0];
+    if (existing) {
+      console.log(
+        `[Violations] Skipping duplicate ${ruleType}: user already has recent violation ${existing.id}`
+      );
+      return true;
+    }
   }
 
   // Single-session rules: duplicate if same triggering session already has a violation

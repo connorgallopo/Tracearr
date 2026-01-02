@@ -69,7 +69,7 @@ describe('isDuplicateViolation', () => {
       }
     );
 
-    it.each(['impossible_travel', 'device_velocity', 'geo_restriction'] as const)(
+    it.each(['impossible_travel', 'geo_restriction'] as const)(
       '%s: should return false when different session has violation',
       async (ruleType) => {
         mockDbQuery([
@@ -85,6 +85,26 @@ describe('isDuplicateViolation', () => {
         expect(result).toBe(false);
       }
     );
+
+    it('device_velocity: should return true when different session has violation (user-level dedup)', async () => {
+      // device_velocity is a user-level rule - any recent violation for the same user is a duplicate
+      mockDbQuery([
+        {
+          id: 'violation-1',
+          sessionId: 'session-other', // Different session, but same user
+          data: {},
+        },
+      ]);
+
+      const result = await isDuplicateViolation(
+        serverUserId,
+        'device_velocity',
+        triggeringSessionId,
+        []
+      );
+
+      expect(result).toBe(true);
+    });
 
     it('impossible_travel: should allow multiple violations from different sessions', async () => {
       // Scenario: User triggers impossible_travel from session A, then from session B
