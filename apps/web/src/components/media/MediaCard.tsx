@@ -1,4 +1,4 @@
-import { Film, Tv, Music } from 'lucide-react';
+import { Film, Tv, Music, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -28,6 +28,8 @@ function MediaIcon({ type, className }: { type: string; className?: string }) {
       return <Tv className={className} />;
     case 'track':
       return <Music className={className} />;
+    case 'live':
+      return <Radio className={className} />;
     default:
       return <Film className={className} />;
   }

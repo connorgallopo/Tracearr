@@ -111,6 +111,10 @@ describe('NotificationService', () => {
     bitrate: 10000,
     videoDecision: 'directplay',
     audioDecision: 'directplay',
+    // Live TV specific fields
+    channelTitle: null,
+    channelIdentifier: null,
+    channelThumb: null,
     user: {
       id: 'user-789',
       username: 'testuser',

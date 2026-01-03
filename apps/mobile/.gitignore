@@ -43,3 +43,4 @@ credentials/
 # generated native folders
 /ios
 /android
+credentials.json

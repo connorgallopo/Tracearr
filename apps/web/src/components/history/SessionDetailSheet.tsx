@@ -14,6 +14,7 @@ import {
   Film,
   Tv,
   Music,
+  Radio,
   Play,
   Pause,
   Square,
@@ -67,6 +68,7 @@ const MEDIA_CONFIG: Record<MediaType, { icon: typeof Film; label: string }> = {
   movie: { icon: Film, label: 'Movie' },
   episode: { icon: Tv, label: 'Episode' },
   track: { icon: Music, label: 'Track' },
+  live: { icon: Radio, label: 'Live TV' },
 };
 
 // Map tile URLs

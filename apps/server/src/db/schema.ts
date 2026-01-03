@@ -33,7 +33,7 @@ export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
 export const sessionStateEnum = ['playing', 'paused', 'stopped'] as const;
 
 // Media type enum
-export const mediaTypeEnum = ['movie', 'episode', 'track'] as const;
+export const mediaTypeEnum = ['movie', 'episode', 'track', 'live'] as const;
 
 // Rule type enum
 export const ruleTypeEnum = [
@@ -256,6 +256,10 @@ export const sessions = pgTable(
     videoDecision: varchar('video_decision', { length: 50 }),
     audioDecision: varchar('audio_decision', { length: 50 }),
     bitrate: integer('bitrate'),
+    // Live TV specific fields (null for non-live content)
+    channelTitle: varchar('channel_title', { length: 255 }), // Channel name (e.g., "HBO", "ESPN")
+    channelIdentifier: varchar('channel_identifier', { length: 100 }), // Channel number/ID
+    channelThumb: varchar('channel_thumb', { length: 500 }), // Channel logo path
   },
   (table) => [
     index('sessions_server_user_time_idx').on(table.serverUserId, table.startedAt),

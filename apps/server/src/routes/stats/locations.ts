@@ -16,7 +16,7 @@ import { resolveDateRange } from './utils.js';
 interface LocationFilters {
   users: { id: string; username: string; identityName: string | null }[];
   servers: { id: string; name: string }[];
-  mediaTypes: ('movie' | 'episode' | 'track')[];
+  mediaTypes: ('movie' | 'episode' | 'track' | 'live')[];
 }
 
 export const locationsRoutes: FastifyPluginAsync = async (app) => {

@@ -42,6 +42,9 @@ export interface PlexRawSession {
   Player?: Record<string, unknown>;
   Media?: Array<Record<string, unknown>>;
   TranscodeSession?: Record<string, unknown>;
+  // Live TV fields
+  live?: unknown; // '1' if Live TV
+  sourceTitle?: unknown; // Channel name for Live TV
 }
 
 // ============================================================================
@@ -50,8 +53,15 @@ export interface PlexRawSession {
 
 /**
  * Parse Plex media type to unified type
+ * @param type - The media type string from Plex
+ * @param isLive - Whether this is a Live TV stream (live='1')
  */
-function parseMediaType(type: unknown): MediaSession['media']['type'] {
+function parseMediaType(type: unknown, isLive: boolean = false): MediaSession['media']['type'] {
+  // Live TV takes precedence - can be any type but we track it as 'live'
+  if (isLive) {
+    return 'live';
+  }
+
   const typeStr = parseString(type).toLowerCase();
   switch (typeStr) {
     case 'movie':
@@ -98,10 +108,15 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
   const user = (item.User as Record<string, unknown>) ?? {};
   const sessionInfo = (item.Session as Record<string, unknown>) ?? {};
   const transcodeSession = item.TranscodeSession as Record<string, unknown> | undefined;
+  const mediaArray = item.Media as Array<Record<string, unknown>> | undefined;
+  const firstMedia = mediaArray?.[0];
 
   const durationMs = parseNumber(item.duration);
   const positionMs = parseNumber(item.viewOffset);
-  const mediaType = parseMediaType(item.type);
+
+  // Detect Live TV - Plex sets live='1' on the session
+  const isLive = parseString(item.live) === '1';
+  const mediaType = parseMediaType(item.type, isLive);
 
   // Get bitrate and resolution from the selected Media element
   // When multiple versions exist (e.g., 4K and 1080p), Plex marks the playing one with selected=1
@@ -176,6 +191,20 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
       seasonName: parseOptionalString(item.parentTitle),
       showThumbPath: parseOptionalString(item.grandparentThumb),
     };
+  }
+
+  // Add Live TV metadata if this is a live stream
+  if (mediaType === 'live') {
+    // Channel info can come from sourceTitle (session level) or Media.channelTitle
+    const channelTitle =
+      parseOptionalString(item.sourceTitle) || parseOptionalString(firstMedia?.channelTitle);
+    if (channelTitle) {
+      session.live = {
+        channelTitle,
+        channelIdentifier: parseOptionalString(firstMedia?.channelIdentifier),
+        channelThumb: parseOptionalString(firstMedia?.channelThumb),
+      };
+    }
   }
 
   return session;

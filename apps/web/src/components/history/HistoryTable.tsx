@@ -9,6 +9,7 @@ import {
   Film,
   Tv,
   Music,
+  Radio,
   Play,
   Pause,
   Square,
@@ -162,6 +163,7 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
     movie: { icon: Film, label: 'Movie' },
     episode: { icon: Tv, label: 'TV Episode' },
     track: { icon: Music, label: 'Music' },
+    live: { icon: Radio, label: 'Live TV' },
   };
   const { icon: Icon, label } = config[type];
   return (

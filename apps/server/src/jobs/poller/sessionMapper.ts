@@ -34,10 +34,13 @@ export function mapMediaSession(
   serverType: 'plex' | 'jellyfin' | 'emby'
 ): ProcessedSession {
   const isEpisode = session.media.type === 'episode';
+  const isLive = session.media.type === 'live';
 
   // For episodes, prefer show poster; for movies, use media poster
-  const thumbPath =
-    isEpisode && session.episode?.showThumbPath
+  // For live TV, use channel thumb if available
+  const thumbPath = isLive
+    ? (session.live?.channelThumb ?? session.media.thumbPath ?? '')
+    : isEpisode && session.episode?.showThumbPath
       ? session.episode.showThumbPath
       : (session.media.thumbPath ?? '');
 
@@ -55,6 +58,16 @@ export function mapMediaSession(
   const platform = normalized.platform;
   const device = normalized.device;
 
+  // Map media type - live TV gets its own type
+  const mediaType =
+    session.media.type === 'movie'
+      ? 'movie'
+      : session.media.type === 'episode'
+        ? 'episode'
+        : session.media.type === 'live'
+          ? 'live'
+          : 'track';
+
   return {
     sessionKey: session.sessionKey,
     plexSessionId: session.plexSessionId,
@@ -64,18 +77,17 @@ export function mapMediaSession(
     username: session.user.username || 'Unknown',
     userThumb: session.user.thumb ?? '',
     mediaTitle: session.media.title,
-    mediaType:
-      session.media.type === 'movie'
-        ? 'movie'
-        : session.media.type === 'episode'
-          ? 'episode'
-          : 'track',
+    mediaType,
     // Enhanced media metadata
     grandparentTitle: session.episode?.showTitle ?? '',
     seasonNumber: session.episode?.seasonNumber ?? 0,
     episodeNumber: session.episode?.episodeNumber ?? 0,
     year: session.media.year ?? 0,
     thumbPath,
+    // Live TV specific fields
+    channelTitle: session.live?.channelTitle ?? null,
+    channelIdentifier: session.live?.channelIdentifier ?? null,
+    channelThumb: session.live?.channelThumb ?? null,
     // Connection info
     ipAddress,
     playerName: session.player.name,
@@ -151,5 +163,9 @@ export function mapSessionRow(s: typeof sessions.$inferSelect): Session {
     videoDecision: s.videoDecision,
     audioDecision: s.audioDecision,
     bitrate: s.bitrate,
+    // Live TV fields
+    channelTitle: s.channelTitle,
+    channelIdentifier: s.channelIdentifier,
+    channelThumb: s.channelThumb,
   };
 }

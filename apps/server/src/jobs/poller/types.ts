@@ -69,7 +69,7 @@ export interface ProcessedSession {
   /** Media title */
   mediaTitle: string;
   /** Media type classification */
-  mediaType: 'movie' | 'episode' | 'track';
+  mediaType: 'movie' | 'episode' | 'track' | 'live';
   /** Show name (for episodes) */
   grandparentTitle: string;
   /** Season number (for episodes) */
@@ -80,6 +80,14 @@ export interface ProcessedSession {
   year: number;
   /** Poster path */
   thumbPath: string;
+
+  // Live TV specific fields
+  /** Channel name (e.g., "HBO", "ESPN") */
+  channelTitle: string | null;
+  /** Channel number or identifier */
+  channelIdentifier: string | null;
+  /** Channel logo/thumbnail path */
+  channelThumb: string | null;
 
   // Connection info
   /** Client IP address */
