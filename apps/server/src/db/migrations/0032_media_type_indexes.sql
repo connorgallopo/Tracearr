@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_live_channel
   ON sessions(channel_identifier, channel_title)
   WHERE media_type = 'live';
 
--- Composite index for user + media type queries
+-- Composite index for server_user + media type queries
 -- Covers: user stats filtered by media type
 CREATE INDEX IF NOT EXISTS idx_sessions_user_media_type
-  ON sessions(user_id, media_type, stopped_at DESC);
+  ON sessions(server_user_id, media_type, stopped_at DESC);
