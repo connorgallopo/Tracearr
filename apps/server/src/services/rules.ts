@@ -16,6 +16,7 @@ import { GEOIP_CONFIG, TIME_MS } from '@tracearr/shared';
 import { geoipService } from './geoip.js';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
+import { EXCLUDED_MEDIA_TYPES_SET } from '../constants/index.js';
 
 // Register English locale for country name lookups
 countries.registerLocale(countriesEn);
@@ -116,6 +117,16 @@ export class RuleEngine {
     activeRules: Rule[],
     recentSessions: Session[]
   ): Promise<RuleEvaluationResult[]> {
+    // Skip live TV/music - these don't indicate sharing/abuse patterns
+    if (EXCLUDED_MEDIA_TYPES_SET.has(session.mediaType)) {
+      return [];
+    }
+
+    // Exclude live TV/music from recent sessions (don't count toward violations)
+    const filteredRecentSessions = recentSessions.filter(
+      (s) => !EXCLUDED_MEDIA_TYPES_SET.has(s.mediaType)
+    );
+
     const results: RuleEvaluationResult[] = [];
 
     for (const rule of activeRules) {
@@ -124,7 +135,7 @@ export class RuleEngine {
         continue;
       }
 
-      const result = await this.evaluateRule(rule, session, recentSessions);
+      const result = await this.evaluateRule(rule, session, filteredRecentSessions);
       if (result.violated) {
         // Issue #67: Include the rule that produced this result for correct violation attribution
         results.push({ ...result, rule });
