@@ -98,6 +98,82 @@ describe('RuleEngine', () => {
       const results = await ruleEngine.evaluateSession(session, rules, []);
       expect(results).toHaveLength(2);
     });
+
+    it('should skip rule evaluation for live TV sessions', async () => {
+      const session = createMockSession({
+        mediaType: 'live',
+        state: 'playing',
+        geoCountry: 'CN', // Would violate geo_restriction if evaluated
+      });
+
+      const rules = [
+        createMockRule('concurrent_streams', {
+          params: { maxStreams: 0 }, // Would violate if evaluated
+        }),
+        createMockRule('geo_restriction', {
+          params: { mode: 'blocklist', countries: ['CN'] }, // Would violate if evaluated
+        }),
+      ];
+
+      const results = await ruleEngine.evaluateSession(session, rules, []);
+      expect(results).toEqual([]); // No violations for live TV
+    });
+
+    it('should skip rule evaluation for music track sessions', async () => {
+      const session = createMockSession({
+        mediaType: 'track',
+        state: 'playing',
+        geoCountry: 'CN', // Would violate geo_restriction if evaluated
+      });
+
+      const rules = [
+        createMockRule('concurrent_streams', {
+          params: { maxStreams: 0 }, // Would violate if evaluated
+        }),
+        createMockRule('geo_restriction', {
+          params: { mode: 'blocklist', countries: ['CN'] }, // Would violate if evaluated
+        }),
+      ];
+
+      const results = await ruleEngine.evaluateSession(session, rules, []);
+      expect(results).toEqual([]); // No violations for music tracks
+    });
+
+    it('should exclude live TV and music from recent sessions in calculations', async () => {
+      const serverUserId = 'user-123';
+
+      // A movie session that would trigger concurrent_streams if there are other playing sessions
+      const movieSession = createMockSession({
+        serverUserId,
+        mediaType: 'movie',
+        state: 'playing',
+      });
+
+      // Recent sessions include playing live TV and music tracks
+      const recentSessions = [
+        createMockSession({
+          serverUserId,
+          mediaType: 'live', // Live TV should be excluded
+          state: 'playing',
+          stoppedAt: null,
+        }),
+        createMockSession({
+          serverUserId,
+          mediaType: 'track', // Music track should be excluded
+          state: 'playing',
+          stoppedAt: null,
+        }),
+      ];
+
+      // Rule that allows 1 stream - movie alone would not violate
+      // But if live/track counted, we'd have 3 streams and would violate
+      const rule = createMockRule('concurrent_streams', {
+        params: { maxStreams: 1 },
+      });
+
+      const results = await ruleEngine.evaluateSession(movieSession, [rule], recentSessions);
+      expect(results).toEqual([]); // No violation because live/track are excluded
+    });
   });
 
   describe('impossible_travel', () => {
