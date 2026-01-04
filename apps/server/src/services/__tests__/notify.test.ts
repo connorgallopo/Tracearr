@@ -115,6 +115,11 @@ describe('NotificationService', () => {
     channelTitle: null,
     channelIdentifier: null,
     channelThumb: null,
+    // Music track fields
+    artistName: null,
+    albumName: null,
+    trackNumber: null,
+    discNumber: null,
     user: {
       id: 'user-789',
       username: 'testuser',
