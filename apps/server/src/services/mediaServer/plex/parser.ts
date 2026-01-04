@@ -16,6 +16,8 @@ import {
 } from '../../../utils/parsing.js';
 import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
 import type { MediaSession, MediaUser, MediaLibrary, MediaWatchHistoryItem } from '../types.js';
+import { calculateProgress } from '../shared/parserUtils.js';
+import { extractPlexLiveTvMetadata, extractPlexMusicMetadata } from './plexUtils.js';
 
 // ============================================================================
 // Raw Plex API Response Types (for internal use)
@@ -90,14 +92,6 @@ function parsePlaybackState(state: unknown): MediaSession['playback']['state'] {
     default:
       return 'playing';
   }
-}
-
-/**
- * Calculate progress percentage from position and duration
- */
-function calculateProgress(positionMs: number, durationMs: number): number {
-  if (durationMs <= 0) return 0;
-  return Math.min(100, Math.round((positionMs / durationMs) * 100));
 }
 
 /**
@@ -195,16 +189,15 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
 
   // Add Live TV metadata if this is a live stream
   if (mediaType === 'live') {
-    // Channel info can come from sourceTitle (session level) or Media.channelTitle
-    const channelTitle =
-      parseOptionalString(item.sourceTitle) || parseOptionalString(firstMedia?.channelTitle);
-    if (channelTitle) {
-      session.live = {
-        channelTitle,
-        channelIdentifier: parseOptionalString(firstMedia?.channelIdentifier),
-        channelThumb: parseOptionalString(firstMedia?.channelThumb),
-      };
+    const liveTvMetadata = extractPlexLiveTvMetadata(item, firstMedia);
+    if (liveTvMetadata) {
+      session.live = liveTvMetadata;
     }
+  }
+
+  // Add music track metadata if this is a track
+  if (mediaType === 'track') {
+    session.music = extractPlexMusicMetadata(item);
   }
 
   return session;

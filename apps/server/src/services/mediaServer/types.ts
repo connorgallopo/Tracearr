@@ -63,6 +63,18 @@ export interface MediaSession {
     channelThumb?: string;
   };
 
+  /** Music track metadata (only present for tracks) */
+  music?: {
+    /** Artist name (undefined if unknown) */
+    artistName?: string;
+    /** Album name */
+    albumName?: string;
+    /** Track number in album */
+    trackNumber?: number;
+    /** Disc number for multi-disc albums */
+    discNumber?: number;
+  };
+
   /** Playback state */
   playback: {
     state: 'playing' | 'paused' | 'buffering';
@@ -193,7 +205,7 @@ export interface MediaWatchHistoryItem {
   /** Item title */
   title: string;
   /** Media type */
-  type: 'movie' | 'episode' | 'track' | 'live' | 'unknown';
+  type: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'unknown';
   /** When item was last watched (Unix timestamp or ISO string) */
   watchedAt: number | string;
   /** User ID who watched (if available) */
