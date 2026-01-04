@@ -211,6 +211,27 @@
       "when": 1767225600000,
       "tag": "0029_engagement_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1767312000000,
+      "tag": "0030_live_tv_support",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1767398400000,
+      "tag": "0031_music_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1767484800000,
+      "tag": "0032_media_type_indexes",
+      "breakpoints": true
     }
   ]
 }
