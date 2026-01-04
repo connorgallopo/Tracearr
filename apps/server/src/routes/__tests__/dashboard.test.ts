@@ -143,6 +143,11 @@ function createActiveSession(overrides: Partial<ActiveSession> = {}): ActiveSess
     channelTitle: overrides.channelTitle ?? null,
     channelIdentifier: overrides.channelIdentifier ?? null,
     channelThumb: overrides.channelThumb ?? null,
+    // Music track fields
+    artistName: overrides.artistName ?? null,
+    albumName: overrides.albumName ?? null,
+    trackNumber: overrides.trackNumber ?? null,
+    discNumber: overrides.discNumber ?? null,
     user: overrides.user ?? {
       id: randomUUID(),
       username: 'testuser',
