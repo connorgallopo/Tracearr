@@ -863,6 +863,270 @@ describe('Emby Parser - Trailer and Preroll Filtering', () => {
 });
 
 // ============================================================================
+// Live TV Parsing Tests
+// ============================================================================
+
+describe('Emby Live TV Parser', () => {
+  it('should detect Live TV with Type "LiveTvChannel"', () => {
+    const rawSession = {
+      Id: 'live-session-1',
+      UserId: 'user-1',
+      UserName: 'John',
+      DeviceName: 'TV',
+      DeviceId: 'tv-123',
+      Client: 'Emby Theater',
+      RemoteEndPoint: '192.168.1.100',
+      NowPlayingItem: {
+        Id: 'channel-abc',
+        Name: 'CNN Live',
+        Type: 'LiveTvChannel',
+        ChannelId: 'channel-abc',
+        ChannelName: 'CNN',
+        ChannelNumber: '202',
+      },
+      PlayState: {
+        IsPaused: false,
+      },
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('live');
+    expect(session!.live).toBeDefined();
+    expect(session!.live?.channelTitle).toBe('CNN');
+    expect(session!.live?.channelIdentifier).toBe('202');
+    expect(session!.live?.channelThumb).toBe('/Items/channel-abc/Images/Primary');
+  });
+
+  it('should detect Live TV with Type "TvChannel"', () => {
+    const rawSession = {
+      Id: 'live-session-2',
+      NowPlayingItem: {
+        Id: 'channel-xyz',
+        Name: 'ESPN',
+        Type: 'TvChannel', // Alternative type name
+        ChannelId: 'channel-xyz',
+        ChannelName: 'ESPN',
+        ChannelNumber: '206',
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('live');
+    expect(session!.live).toBeDefined();
+    expect(session!.live?.channelTitle).toBe('ESPN');
+    expect(session!.live?.channelIdentifier).toBe('206');
+  });
+
+  it('should use Name as fallback when ChannelName is missing', () => {
+    const rawSession = {
+      Id: 'live-session-3',
+      NowPlayingItem: {
+        Id: 'channel-123',
+        Name: 'Local News HD', // Falls back to this
+        Type: 'LiveTvChannel',
+        ChannelId: 'channel-123',
+        // No ChannelName
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.live?.channelTitle).toBe('Local News HD');
+  });
+
+  it('should handle Live TV case-insensitively', () => {
+    const rawSession = {
+      Id: 'live-session-4',
+      NowPlayingItem: {
+        Id: 'ch-1',
+        Name: 'Test Channel',
+        Type: 'LIVETVCHANNEL', // Uppercase
+        ChannelName: 'Test',
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('live');
+  });
+
+  it('should include Live TV sessions in parseSessionsResponse', () => {
+    const sessions = [
+      {
+        Id: '1',
+        NowPlayingItem: { Id: 'movie-1', Name: 'Movie', Type: 'Movie' },
+      },
+      {
+        Id: '2',
+        NowPlayingItem: {
+          Id: 'channel-1',
+          Name: 'CNN',
+          Type: 'LiveTvChannel',
+          ChannelName: 'CNN',
+        },
+      },
+      {
+        Id: '3',
+        NowPlayingItem: { Id: 'ep-1', Name: 'Episode', Type: 'Episode' },
+      },
+    ];
+
+    const parsed = parseSessionsResponse(sessions);
+
+    expect(parsed).toHaveLength(3);
+    expect(parsed[1]!.media.type).toBe('live');
+    expect(parsed[1]!.live?.channelTitle).toBe('CNN');
+  });
+});
+
+// ============================================================================
+// Music Track Parsing Tests
+// ============================================================================
+
+describe('Emby Music Track Parser', () => {
+  it('should parse music track with full metadata', () => {
+    const rawSession = {
+      Id: 'music-session-1',
+      UserId: 'user-1',
+      UserName: 'John',
+      DeviceName: 'Phone',
+      DeviceId: 'phone-123',
+      Client: 'Emby Mobile',
+      RemoteEndPoint: '192.168.1.50',
+      NowPlayingItem: {
+        Id: 'track-123',
+        Name: 'Bohemian Rhapsody',
+        Type: 'Audio',
+        RunTimeTicks: 3540000000, // 5:54
+        AlbumArtist: 'Queen',
+        Album: 'A Night at the Opera',
+        IndexNumber: 11, // Track number
+        ParentIndexNumber: 1, // Disc number
+        Artists: ['Queen'],
+      },
+      PlayState: {
+        PositionTicks: 1200000000,
+        IsPaused: false,
+      },
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('track');
+    expect(session!.media.title).toBe('Bohemian Rhapsody');
+    expect(session!.music).toBeDefined();
+    expect(session!.music?.artistName).toBe('Queen');
+    expect(session!.music?.albumName).toBe('A Night at the Opera');
+    expect(session!.music?.trackNumber).toBe(11);
+    expect(session!.music?.discNumber).toBe(1);
+  });
+
+  it('should fall back to Artists array when AlbumArtist is missing', () => {
+    const rawSession = {
+      Id: 'music-session-2',
+      NowPlayingItem: {
+        Id: 'track-456',
+        Name: 'Some Song',
+        Type: 'Audio',
+        // No AlbumArtist
+        Artists: ['Artist A', 'Artist B'], // Should use first artist
+        Album: 'Some Album',
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.music?.artistName).toBe('Artist A');
+    expect(session!.music?.albumName).toBe('Some Album');
+  });
+
+  it('should parse music track with minimal metadata', () => {
+    const rawSession = {
+      Id: 'music-session-3',
+      NowPlayingItem: {
+        Id: 'track-789',
+        Name: 'Unknown Track',
+        Type: 'Audio',
+        // No artist, album, or track info
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('track');
+    expect(session!.music).toBeDefined();
+    expect(session!.music?.artistName).toBeUndefined();
+    expect(session!.music?.albumName).toBeUndefined();
+    expect(session!.music?.trackNumber).toBeUndefined();
+    expect(session!.music?.discNumber).toBeUndefined();
+  });
+
+  it('should not set music metadata for non-track types', () => {
+    const rawSession = {
+      Id: 'movie-session',
+      NowPlayingItem: {
+        Id: 'movie-1',
+        Name: 'A Movie',
+        Type: 'Movie',
+        AlbumArtist: 'Should Be Ignored',
+      },
+      PlayState: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session).not.toBeNull();
+    expect(session!.media.type).toBe('movie');
+    expect(session!.music).toBeUndefined();
+  });
+
+  it('should handle music track from parseSessionsResponse', () => {
+    const sessions = [
+      {
+        Id: '1',
+        NowPlayingItem: {
+          Id: 'track-1',
+          Name: 'Song A',
+          Type: 'Audio',
+          AlbumArtist: 'Artist A',
+          Album: 'Album A',
+          IndexNumber: 5,
+          ParentIndexNumber: 2,
+        },
+      },
+      {
+        Id: '2',
+        NowPlayingItem: { Id: 'movie-1', Name: 'Movie', Type: 'Movie' },
+      },
+    ];
+
+    const parsed = parseSessionsResponse(sessions);
+
+    expect(parsed).toHaveLength(2);
+    expect(parsed[0]!.media.type).toBe('track');
+    expect(parsed[0]!.music?.artistName).toBe('Artist A');
+    expect(parsed[0]!.music?.albumName).toBe('Album A');
+    expect(parsed[0]!.music?.trackNumber).toBe(5);
+    expect(parsed[0]!.music?.discNumber).toBe(2);
+    expect(parsed[1]!.music).toBeUndefined();
+  });
+});
+
+// ============================================================================
 // Edge Cases and Type Handling
 // ============================================================================
 

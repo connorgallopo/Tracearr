@@ -622,6 +622,192 @@ describe('Plex XML Parser', () => {
 // Edge Cases and Error Handling
 // ============================================================================
 
+// ============================================================================
+// Live TV Parsing Tests
+// ============================================================================
+
+describe('Plex Live TV Parser', () => {
+  it('should detect Live TV when live="1" is set', () => {
+    const rawSession = {
+      sessionKey: 'live-session',
+      ratingKey: 'channel-123',
+      title: 'CNN',
+      type: 'movie', // Live TV can have any type
+      live: '1', // This flag indicates Live TV
+      User: { id: '1', title: 'John' },
+      Player: { title: 'TV', machineIdentifier: 'tv-1' },
+      Media: [
+        {
+          channelTitle: 'CNN',
+          channelIdentifier: '202',
+          channelThumb: '/library/metadata/channel-123/thumb',
+        },
+      ],
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('live');
+    expect(session.live).toBeDefined();
+    expect(session.live?.channelTitle).toBe('CNN');
+    expect(session.live?.channelIdentifier).toBe('202');
+    expect(session.live?.channelThumb).toBe('/library/metadata/channel-123/thumb');
+  });
+
+  it('should use sourceTitle for channel name when available', () => {
+    const rawSession = {
+      sessionKey: 'live-session',
+      sourceTitle: 'ESPN',
+      type: 'episode',
+      live: '1',
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('live');
+    expect(session.live?.channelTitle).toBe('ESPN');
+  });
+
+  it('should not set live metadata when live flag is not "1"', () => {
+    const rawSession = {
+      sessionKey: 'not-live',
+      type: 'movie',
+      live: '0',
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('movie');
+    expect(session.live).toBeUndefined();
+  });
+
+  it('should not set live metadata when live flag is missing', () => {
+    const rawSession = {
+      sessionKey: 'regular-movie',
+      type: 'movie',
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('movie');
+    expect(session.live).toBeUndefined();
+  });
+});
+
+// ============================================================================
+// Music Track Parsing Tests
+// ============================================================================
+
+describe('Plex Music Track Parser', () => {
+  it('should parse music track with full metadata', () => {
+    const rawSession = {
+      sessionKey: 'music-session',
+      ratingKey: 'track-123',
+      title: 'Bohemian Rhapsody',
+      type: 'track',
+      duration: 354000, // 5:54 in ms
+      viewOffset: 120000,
+      grandparentTitle: 'Queen', // Artist
+      parentTitle: 'A Night at the Opera', // Album
+      index: 11, // Track number
+      parentIndex: 1, // Disc number
+      User: { id: '1', title: 'John' },
+      Player: { title: 'Phone', machineIdentifier: 'phone-1' },
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('track');
+    expect(session.media.title).toBe('Bohemian Rhapsody');
+    expect(session.music).toBeDefined();
+    expect(session.music?.artistName).toBe('Queen');
+    expect(session.music?.albumName).toBe('A Night at the Opera');
+    expect(session.music?.trackNumber).toBe(11);
+    expect(session.music?.discNumber).toBe(1);
+  });
+
+  it('should parse music track with partial metadata', () => {
+    const rawSession = {
+      sessionKey: 'music-partial',
+      title: 'Unknown Track',
+      type: 'track',
+      grandparentTitle: 'Unknown Artist',
+      // Missing parentTitle, index, parentIndex
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('track');
+    expect(session.music).toBeDefined();
+    expect(session.music?.artistName).toBe('Unknown Artist');
+    expect(session.music?.albumName).toBeUndefined();
+    expect(session.music?.trackNumber).toBeUndefined();
+    expect(session.music?.discNumber).toBeUndefined();
+  });
+
+  it('should not set music metadata for non-track types', () => {
+    const rawSession = {
+      sessionKey: 'movie-not-track',
+      title: 'A Movie',
+      type: 'movie',
+      grandparentTitle: 'Some Title', // Should be ignored
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('movie');
+    expect(session.music).toBeUndefined();
+  });
+
+  it('should handle track from parseSessionsResponse', () => {
+    const response = {
+      MediaContainer: {
+        Metadata: [
+          {
+            sessionKey: '1',
+            title: 'Song A',
+            type: 'track',
+            grandparentTitle: 'Artist A',
+            parentTitle: 'Album A',
+            index: 5,
+            User: { id: '1' },
+            Player: {},
+          },
+          {
+            sessionKey: '2',
+            title: 'Movie B',
+            type: 'movie',
+            User: { id: '1' },
+            Player: {},
+          },
+        ],
+      },
+    };
+
+    const sessions = parseSessionsResponse(response);
+
+    expect(sessions).toHaveLength(2);
+    expect(sessions[0]!.media.type).toBe('track');
+    expect(sessions[0]!.music?.artistName).toBe('Artist A');
+    expect(sessions[1]!.media.type).toBe('movie');
+    expect(sessions[1]!.music).toBeUndefined();
+  });
+});
+
+// ============================================================================
+// Edge Cases and Error Handling
+// ============================================================================
+
 describe('Plex Parser Edge Cases', () => {
   it('should handle null/undefined inputs gracefully', () => {
     expect(parseSessionsResponse(null)).toEqual([]);
