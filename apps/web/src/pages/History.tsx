@@ -76,6 +76,7 @@ function parseFiltersFromUrl(searchParams: URLSearchParams): HistoryFilters {
     'movie',
     'episode',
     'track',
+    'live',
   ] as const);
   if (mediaTypes) filters.mediaTypes = mediaTypes;
 

@@ -212,6 +212,16 @@ function getContentTitle(session: SessionWithDetails): { primary: string; second
       secondary: `${epNum}${epNum ? ' · ' : ''}${session.mediaTitle}`,
     };
   }
+  if (session.mediaType === 'track') {
+    // Music track - show track name, artist/album as secondary
+    const parts: string[] = [];
+    if (session.artistName) parts.push(session.artistName);
+    if (session.albumName) parts.push(session.albumName);
+    return {
+      primary: session.mediaTitle,
+      secondary: parts.length > 0 ? parts.join(' · ') : undefined,
+    };
+  }
   return {
     primary: session.mediaTitle,
     secondary: session.year ? `(${session.year})` : undefined,

@@ -125,7 +125,10 @@ function getProgress(session: SessionWithDetails): number {
 }
 
 // Get media title formatted
-function getMediaTitle(session: SessionWithDetails): { primary: string; secondary?: string } {
+function getMediaTitle(session: SessionWithDetails | ActiveSession): {
+  primary: string;
+  secondary?: string;
+} {
   if (session.mediaType === 'episode' && session.grandparentTitle) {
     const epNum =
       session.seasonNumber && session.episodeNumber
@@ -134,6 +137,16 @@ function getMediaTitle(session: SessionWithDetails): { primary: string; secondar
     return {
       primary: session.grandparentTitle,
       secondary: `${epNum}${epNum ? ' · ' : ''}${session.mediaTitle}`,
+    };
+  }
+  if (session.mediaType === 'track') {
+    // Music track - show track name, artist/album as secondary
+    const parts: string[] = [];
+    if (session.artistName) parts.push(session.artistName);
+    if (session.albumName) parts.push(session.albumName);
+    return {
+      primary: session.mediaTitle,
+      secondary: parts.length > 0 ? parts.join(' · ') : undefined,
     };
   }
   return {
