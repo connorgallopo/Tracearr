@@ -10,6 +10,8 @@ import {
   Tv,
   Music,
   Radio,
+  Image,
+  CircleHelp,
   Play,
   Pause,
   Square,
@@ -164,6 +166,8 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
     episode: { icon: Tv, label: 'TV Episode' },
     track: { icon: Music, label: 'Music' },
     live: { icon: Radio, label: 'Live TV' },
+    photo: { icon: Image, label: 'Photo' },
+    unknown: { icon: CircleHelp, label: 'Unknown' },
   };
   const { icon: Icon, label } = config[type];
   return (
