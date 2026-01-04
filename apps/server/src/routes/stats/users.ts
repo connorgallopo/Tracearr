@@ -15,6 +15,7 @@ import type { UserStats, TopUserStats } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { resolveDateRange } from './utils.js';
 import { validateServerAccess } from '../../utils/serverFiltering.js';
+import { MEDIA_TYPE_SQL_FILTER_S } from '../../constants/index.js';
 
 /**
  * Build SQL server filter fragment for raw queries
@@ -64,11 +65,12 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
     const serverFilter = buildServerFilterSql(serverId, authUser);
 
     // Build date filter for JOIN condition
+    // Also filter to only movies/episodes (exclude live TV and music tracks)
     const dateJoinFilter = dateRange.start
       ? period === 'custom'
-        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
-        : sql`AND s.started_at >= ${dateRange.start}`
-      : sql``; // All-time: no date filter
+        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end} ${MEDIA_TYPE_SQL_FILTER_S}`
+        : sql`AND s.started_at >= ${dateRange.start} ${MEDIA_TYPE_SQL_FILTER_S}`
+      : MEDIA_TYPE_SQL_FILTER_S; // All-time: only media type filter
 
     // Query server_users with session stats
     // Stats are per-server-account (ServerUser), not per-identity (User)
@@ -130,11 +132,12 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
     const serverFilter = buildServerFilterSql(serverId, authUser);
 
     // Build date filter for JOIN condition
-    const dateJoinFilter = dateRange.start
+    // Also filter to only movies/episodes (exclude live TV and music tracks)
+    const topDateJoinFilter = dateRange.start
       ? period === 'custom'
-        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end}`
-        : sql`AND s.started_at >= ${dateRange.start}`
-      : sql``; // All-time: no date filter
+        ? sql`AND s.started_at >= ${dateRange.start} AND s.started_at < ${dateRange.end} ${MEDIA_TYPE_SQL_FILTER_S}`
+        : sql`AND s.started_at >= ${dateRange.start} ${MEDIA_TYPE_SQL_FILTER_S}`
+      : MEDIA_TYPE_SQL_FILTER_S; // All-time: only media type filter
 
     // Query server_users with session stats
     // Stats are per-server-account (ServerUser), not per-identity (User)
@@ -154,7 +157,7 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
           MODE() WITHIN GROUP (ORDER BY COALESCE(s.grandparent_title, s.media_title)) as top_content
         FROM server_users su
         INNER JOIN users u ON su.user_id = u.id
-        LEFT JOIN sessions s ON s.server_user_id = su.id ${dateJoinFilter}
+        LEFT JOIN sessions s ON s.server_user_id = su.id ${topDateJoinFilter}
         WHERE true ${serverFilter}
         GROUP BY su.id, su.username, u.name, su.thumb_url, su.server_id, su.trust_score
         ORDER BY watch_time_ms DESC

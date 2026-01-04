@@ -15,6 +15,7 @@ import { statsQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { resolveDateRange } from './utils.js';
 import { validateServerAccess } from '../../utils/serverFiltering.js';
+import { MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
 
 // UUID validation regex for defensive checks (used by commented buildEngagementServerFilter)
 // const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -115,6 +116,7 @@ export const playsRoutes: FastifyPluginAsync = async (app) => {
           COUNT(DISTINCT COALESCE(reference_id, id))::int as count
         FROM sessions
         ${baseWhere}
+        ${MEDIA_TYPE_SQL_FILTER}
         ${endDateWhere}
         ${serverFilter}
         GROUP BY 1
@@ -164,6 +166,7 @@ export const playsRoutes: FastifyPluginAsync = async (app) => {
           COUNT(DISTINCT COALESCE(reference_id, id))::int as count
         FROM sessions
         ${baseWhere}
+        ${MEDIA_TYPE_SQL_FILTER}
         ${period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``}
         ${serverFilter}
         GROUP BY 1
@@ -225,6 +228,7 @@ export const playsRoutes: FastifyPluginAsync = async (app) => {
           COUNT(DISTINCT COALESCE(reference_id, id))::int as count
         FROM sessions
         ${baseWhere}
+        ${MEDIA_TYPE_SQL_FILTER}
         ${period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``}
         ${serverFilter}
         GROUP BY 1

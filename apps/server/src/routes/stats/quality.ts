@@ -14,6 +14,7 @@ import { db } from '../../db/client.js';
 import '../../db/schema.js';
 import { resolveDateRange } from './utils.js';
 import { validateServerAccess } from '../../utils/serverFiltering.js';
+import { MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
 
 /**
  * Build SQL server filter fragment for raw queries
@@ -73,6 +74,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
           COUNT(DISTINCT COALESCE(reference_id, id))::int as count
         FROM sessions
         ${baseWhere}
+        ${MEDIA_TYPE_SQL_FILTER}
         ${period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``}
         ${serverFilter}
         GROUP BY is_transcode
@@ -127,6 +129,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
           COUNT(DISTINCT COALESCE(reference_id, id))::int as count
         FROM sessions
         ${baseWhere}
+        ${MEDIA_TYPE_SQL_FILTER}
         ${period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``}
         ${serverFilter}
         GROUP BY platform
@@ -138,6 +141,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
 
   /**
    * GET /watch-time - Total watch time breakdown
+   * Note: Total is filtered to movies/episodes, but byType shows breakdown of ALL types
    */
   app.get('/watch-time', { preHandler: [app.authenticate] }, async (request, reply) => {
     const query = statsQuerySchema.safeParse(request.query);
@@ -166,13 +170,16 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
     const customEndFilter = period === 'custom' ? sql`AND started_at < ${dateRange.end}` : sql``;
 
     const [totalResult, byTypeResult] = await Promise.all([
+      // Total filtered to movies/episodes only
       db.execute(sql`
           SELECT COALESCE(SUM(duration_ms), 0)::bigint as total_ms
           FROM sessions
           ${baseWhere}
+          ${MEDIA_TYPE_SQL_FILTER}
           ${customEndFilter}
           ${serverFilter}
         `),
+      // By type shows ALL media types for breakdown comparison
       db.execute(sql`
           SELECT
             media_type,
@@ -240,6 +247,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
     // Event-based calculation with proper boundary handling
     // Uses TimescaleDB-optimized time-based filtering on hypertable
     // Convert to user's timezone before truncating to hour for grouping
+    // Excludes live TV and music tracks from concurrent stream calculations
     const result = await db.execute(sql`
         WITH events AS (
           -- Sessions already running at startDate (started before, not yet stopped)
@@ -252,6 +260,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
           FROM sessions
           WHERE started_at < ${queryStartDate}
             AND (stopped_at IS NULL OR stopped_at >= ${queryStartDate})
+            ${MEDIA_TYPE_SQL_FILTER}
             ${serverFilter}
 
           UNION ALL
@@ -264,6 +273,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
             CASE WHEN is_transcode THEN 1 ELSE 0 END AS transcode_delta
           FROM sessions
           WHERE started_at >= ${queryStartDate}
+            ${MEDIA_TYPE_SQL_FILTER}
             ${customEndFilter}
             ${serverFilter}
 
@@ -278,6 +288,7 @@ export const qualityRoutes: FastifyPluginAsync = async (app) => {
           FROM sessions
           WHERE stopped_at IS NOT NULL
             AND stopped_at >= ${queryStartDate}
+            ${MEDIA_TYPE_SQL_FILTER}
             ${customStopEndFilter}
             ${serverFilter}
         ),
