@@ -11,7 +11,7 @@ import type { MediaSession } from '../../../services/mediaServer/types.js';
 
 // Mock the external dependencies
 vi.mock('../../../utils/platformNormalizer.js', () => ({
-  normalizeClient: vi.fn((clientName, deviceHint, serverType) => ({
+  normalizeClient: vi.fn(() => ({
     platform: 'Mocked Platform',
     device: 'Mocked Device',
   })),
@@ -164,7 +164,7 @@ describe('sessionMapper', () => {
       });
 
       it('should default to unknown for unmapped types and log warning', () => {
-        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
         const session = createBaseMediaSession();
         // Force an unexpected type by casting
         (session.media as { type: string }).type = 'podcast';
