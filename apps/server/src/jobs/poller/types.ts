@@ -69,7 +69,7 @@ export interface ProcessedSession {
   /** Media title */
   mediaTitle: string;
   /** Media type classification */
-  mediaType: 'movie' | 'episode' | 'track' | 'live';
+  mediaType: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'unknown';
   /** Show name (for episodes) */
   grandparentTitle: string;
   /** Season number (for episodes) */
@@ -88,6 +88,16 @@ export interface ProcessedSession {
   channelIdentifier: string | null;
   /** Channel logo/thumbnail path */
   channelThumb: string | null;
+
+  // Music track metadata
+  /** Artist name */
+  artistName: string | null;
+  /** Album name */
+  albumName: string | null;
+  /** Track number in album */
+  trackNumber: number | null;
+  /** Disc number for multi-disc albums */
+  discNumber: number | null;
 
   // Connection info
   /** Client IP address */

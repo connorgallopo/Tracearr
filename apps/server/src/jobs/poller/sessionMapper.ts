@@ -6,12 +6,55 @@
  * - Database row → Session type (for application use)
  */
 
-import type { Session } from '@tracearr/shared';
+import { type Session, MEDIA_TYPES } from '@tracearr/shared';
 import type { MediaSession } from '../../services/mediaServer/types.js';
 import type { ProcessedSession } from './types.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
 import { formatQualityString } from '../../utils/resolutionNormalizer.js';
 import type { sessions } from '../../db/schema.js';
+
+/** Set of valid media types for O(1) validation */
+const VALID_MEDIA_TYPES = new Set<string>(MEDIA_TYPES);
+
+// ============================================================================
+// Thumb Path Resolution
+// ============================================================================
+
+/**
+ * Thumb path resolvers by media type
+ * Using lookup table makes it easy to add new media types
+ */
+const THUMB_PATH_RESOLVERS: Record<string, (session: MediaSession) => string> = {
+  live: (s) => s.live?.channelThumb ?? s.media.thumbPath ?? '',
+  episode: (s) => s.episode?.showThumbPath ?? s.media.thumbPath ?? '',
+  movie: (s) => s.media.thumbPath ?? '',
+  track: (s) => s.media.thumbPath ?? '',
+  photo: (s) => s.media.thumbPath ?? '',
+  unknown: (s) => s.media.thumbPath ?? '',
+};
+
+/**
+ * Resolve the appropriate thumbnail path based on media type
+ */
+function resolveThumbPath(session: MediaSession): string {
+  const resolver = THUMB_PATH_RESOLVERS[session.media.type];
+  return resolver ? resolver(session) : (session.media.thumbPath ?? '');
+}
+
+// ============================================================================
+// Media Type Mapping
+// ============================================================================
+
+/** Map media type, warn and default to 'unknown' if unexpected */
+function mapMediaType(parserType: string): ProcessedSession['mediaType'] {
+  if (VALID_MEDIA_TYPES.has(parserType)) {
+    return parserType as ProcessedSession['mediaType'];
+  }
+  console.warn(
+    `[sessionMapper] Unexpected media type encountered: "${parserType}", defaulting to "unknown"`
+  );
+  return 'unknown';
+}
 
 // ============================================================================
 // MediaSession → ProcessedSession Mapping
@@ -33,16 +76,8 @@ export function mapMediaSession(
   session: MediaSession,
   serverType: 'plex' | 'jellyfin' | 'emby'
 ): ProcessedSession {
-  const isEpisode = session.media.type === 'episode';
-  const isLive = session.media.type === 'live';
-
-  // For episodes, prefer show poster; for movies, use media poster
-  // For live TV, use channel thumb if available
-  const thumbPath = isLive
-    ? (session.live?.channelThumb ?? session.media.thumbPath ?? '')
-    : isEpisode && session.episode?.showThumbPath
-      ? session.episode.showThumbPath
-      : (session.media.thumbPath ?? '');
+  // Resolve thumb path using lookup table
+  const thumbPath = resolveThumbPath(session);
 
   // Build quality string from resolution (preferred) or bitrate
   const quality = formatQualityString(session.quality);
@@ -58,15 +93,8 @@ export function mapMediaSession(
   const platform = normalized.platform;
   const device = normalized.device;
 
-  // Map media type - live TV gets its own type
-  const mediaType =
-    session.media.type === 'movie'
-      ? 'movie'
-      : session.media.type === 'episode'
-        ? 'episode'
-        : session.media.type === 'live'
-          ? 'live'
-          : 'track';
+  // Map media type using lookup table
+  const mediaType = mapMediaType(session.media.type);
 
   return {
     sessionKey: session.sessionKey,
@@ -88,6 +116,11 @@ export function mapMediaSession(
     channelTitle: session.live?.channelTitle ?? null,
     channelIdentifier: session.live?.channelIdentifier ?? null,
     channelThumb: session.live?.channelThumb ?? null,
+    // Music track metadata
+    artistName: session.music?.artistName ?? null,
+    albumName: session.music?.albumName ?? null,
+    trackNumber: session.music?.trackNumber ?? null,
+    discNumber: session.music?.discNumber ?? null,
     // Connection info
     ipAddress,
     playerName: session.player.name,
@@ -167,5 +200,10 @@ export function mapSessionRow(s: typeof sessions.$inferSelect): Session {
     channelTitle: s.channelTitle,
     channelIdentifier: s.channelIdentifier,
     channelThumb: s.channelThumb,
+    // Music track fields
+    artistName: s.artistName,
+    albumName: s.albumName,
+    trackNumber: s.trackNumber,
+    discNumber: s.discNumber,
   };
 }
