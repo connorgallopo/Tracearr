@@ -78,6 +78,11 @@ export function createMockSession(overrides: Partial<Session> = {}): Session {
     channelTitle: null,
     channelIdentifier: null,
     channelThumb: null,
+    // Music track fields
+    artistName: null,
+    albumName: null,
+    trackNumber: null,
+    discNumber: null,
     ...overrides,
   };
 }
