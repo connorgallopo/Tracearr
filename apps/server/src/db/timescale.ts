@@ -7,6 +7,264 @@
 
 import { db } from './client.js';
 import { sql } from 'drizzle-orm';
+import { PRIMARY_MEDIA_TYPES_SQL_LITERAL } from '../constants/mediaTypes.js';
+
+/**
+ * Schema version for continuous aggregate definitions.
+ * INCREMENT THIS when any continuous aggregate WHERE clause or structure changes.
+ * This triggers automatic rebuild of all aggregates on next server startup.
+ *
+ * Version history:
+ * - 1: Initial version (no media_type filtering)
+ * - 2: Added media_type IN ('movie', 'episode') filter to all aggregates
+ */
+const AGGREGATE_SCHEMA_VERSION = 2;
+
+/** Config for a continuous aggregate view */
+interface AggregateDefinition {
+  name: string;
+  toolkitSql: string;
+  fallbackSql: string;
+  refreshPolicy: {
+    startOffset: string;
+    endOffset: string;
+    scheduleInterval: string;
+  };
+}
+
+/** All continuous aggregate definitions with media type filtering */
+function getAggregateDefinitions(): AggregateDefinition[] {
+  const mediaFilter = PRIMARY_MEDIA_TYPES_SQL_LITERAL;
+
+  return [
+    {
+      name: 'daily_plays_by_user',
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_user
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_user_id,
+          hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day, server_user_id
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_user
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_user_id,
+          COUNT(*) AS play_count,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day, server_user_id
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '3 days',
+        endOffset: '1 hour',
+        scheduleInterval: '5 minutes',
+      },
+    },
+    {
+      name: 'daily_plays_by_server',
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_server
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_id,
+          hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day, server_id
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_server
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_id,
+          COUNT(*) AS play_count,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day, server_id
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '3 days',
+        endOffset: '1 hour',
+        scheduleInterval: '5 minutes',
+      },
+    },
+    {
+      name: 'daily_stats_summary',
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_stats_summary
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
+          hyperloglog(32768, server_user_id) AS users_hll,
+          hyperloglog(32768, server_id) AS servers_hll,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms,
+          AVG(COALESCE(duration_ms, 0))::bigint AS avg_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_stats_summary
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          COUNT(DISTINCT COALESCE(reference_id, id)) AS play_count,
+          COUNT(DISTINCT server_user_id) AS user_count,
+          COUNT(DISTINCT server_id) AS server_count,
+          SUM(COALESCE(duration_ms, 0)) AS total_duration_ms,
+          AVG(COALESCE(duration_ms, 0))::bigint AS avg_duration_ms
+        FROM sessions
+        WHERE ${mediaFilter}
+        GROUP BY day
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '3 days',
+        endOffset: '1 hour',
+        scheduleInterval: '5 minutes',
+      },
+    },
+    {
+      name: 'hourly_concurrent_streams',
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_concurrent_streams
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 hour', started_at) AS hour,
+          server_id,
+          COUNT(*) AS stream_count
+        FROM sessions
+        WHERE state IN ('playing', 'paused')
+          AND ${mediaFilter}
+        GROUP BY hour, server_id
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_concurrent_streams
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 hour', started_at) AS hour,
+          server_id,
+          COUNT(*) AS stream_count
+        FROM sessions
+        WHERE state IN ('playing', 'paused')
+          AND ${mediaFilter}
+        GROUP BY hour, server_id
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '1 day',
+        endOffset: '1 hour',
+        scheduleInterval: '5 minutes',
+      },
+    },
+    {
+      name: 'daily_content_engagement',
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_user_id,
+          rating_key,
+          MAX(media_title) AS media_title,
+          MAX(grandparent_title) AS show_title,
+          MAX(media_type) AS media_type,
+          MAX(total_duration_ms) AS content_duration_ms,
+          MAX(thumb_path) AS thumb_path,
+          MAX(server_id::text)::uuid AS server_id,
+          MAX(season_number) AS season_number,
+          MAX(episode_number) AS episode_number,
+          MAX(year) AS year,
+          SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
+          COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
+          COUNT(*) AS total_session_count,
+          BOOL_OR(watched) AS any_marked_watched
+        FROM sessions
+        WHERE rating_key IS NOT NULL
+          AND total_duration_ms > 0
+          AND ${mediaFilter}
+        GROUP BY day, server_user_id, rating_key
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', started_at) AS day,
+          server_user_id,
+          rating_key,
+          MAX(media_title) AS media_title,
+          MAX(grandparent_title) AS show_title,
+          MAX(media_type) AS media_type,
+          MAX(total_duration_ms) AS content_duration_ms,
+          MAX(thumb_path) AS thumb_path,
+          MAX(server_id::text)::uuid AS server_id,
+          MAX(season_number) AS season_number,
+          MAX(episode_number) AS episode_number,
+          MAX(year) AS year,
+          SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
+          COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
+          COUNT(*) AS total_session_count,
+          BOOL_OR(watched) AS any_marked_watched
+        FROM sessions
+        WHERE rating_key IS NOT NULL
+          AND total_duration_ms > 0
+          AND ${mediaFilter}
+        GROUP BY day, server_user_id, rating_key
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '7 days',
+        endOffset: '1 hour',
+        scheduleInterval: '15 minutes',
+      },
+    },
+  ];
+}
+
+/**
+ * Create a single continuous aggregate from its definition
+ */
+async function createAggregate(def: AggregateDefinition, hasToolkit: boolean): Promise<void> {
+  const sqlStatement = hasToolkit ? def.toolkitSql : def.fallbackSql;
+  await db.execute(sql.raw(sqlStatement));
+}
+
+/**
+ * Add refresh policy for a single aggregate
+ */
+async function addRefreshPolicy(def: AggregateDefinition): Promise<void> {
+  await db.execute(
+    sql.raw(`
+    SELECT add_continuous_aggregate_policy('${def.name}',
+      start_offset => INTERVAL '${def.refreshPolicy.startOffset}',
+      end_offset => INTERVAL '${def.refreshPolicy.endOffset}',
+      schedule_interval => INTERVAL '${def.refreshPolicy.scheduleInterval}',
+      if_not_exists => true
+    )
+  `)
+  );
+}
 
 export interface TimescaleStatus {
   extensionInstalled: boolean;
@@ -155,6 +413,48 @@ async function getChunkCount(): Promise<number> {
 }
 
 /**
+ * Ensure the timescale_metadata table exists for storing schema version
+ */
+async function ensureMetadataTable(): Promise<void> {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS timescale_metadata (
+      key VARCHAR(255) PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+}
+
+/**
+ * Get the stored aggregate schema version
+ * Returns 0 if no version is stored (first run or legacy install)
+ */
+async function getStoredSchemaVersion(): Promise<number> {
+  try {
+    await ensureMetadataTable();
+    const result = await db.execute(sql`
+      SELECT value FROM timescale_metadata WHERE key = 'aggregate_schema_version'
+    `);
+    const value = (result.rows[0] as { value: string })?.value;
+    return value ? parseInt(value, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Store the current aggregate schema version
+ */
+async function setStoredSchemaVersion(version: number): Promise<void> {
+  await ensureMetadataTable();
+  await db.execute(sql`
+    INSERT INTO timescale_metadata (key, value, updated_at)
+    VALUES ('aggregate_schema_version', ${version.toString()}, NOW())
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+  `);
+}
+
+/**
  * Convert sessions table to hypertable
  * This is idempotent - if_not_exists ensures it won't fail if already a hypertable
  */
@@ -276,6 +576,20 @@ async function createPartialIndexes(): Promise<void> {
     ON sessions (started_at DESC, quality, bitrate)
     WHERE is_transcode = true
   `);
+
+  // Partial index for music track queries (artist, album lookups)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS idx_sessions_music_partial
+    ON sessions (started_at DESC, artist_name, album_name)
+    WHERE media_type = 'track'
+  `);
+
+  // Partial index for live TV queries (channel lookups)
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS idx_sessions_live_tv_partial
+    ON sessions (started_at DESC, channel_identifier, channel_title)
+    WHERE media_type = 'live'
+  `);
 }
 
 /**
@@ -351,6 +665,7 @@ async function isToolkitAvailableOnSystem(): Promise<boolean> {
  */
 async function createContinuousAggregates(): Promise<void> {
   const hasToolkit = await isToolkitInstalled();
+  const definitions = getAggregateDefinitions();
 
   // Drop old unused aggregates
   // daily_plays_by_platform: platform stats use prepared statement instead
@@ -359,238 +674,22 @@ async function createContinuousAggregates(): Promise<void> {
   await db.execute(sql`DROP MATERIALIZED VIEW IF EXISTS daily_play_patterns CASCADE`);
   await db.execute(sql`DROP MATERIALIZED VIEW IF EXISTS hourly_play_patterns CASCADE`);
 
-  if (hasToolkit) {
-    // Use HyperLogLog for accurate distinct play counting
-    // hyperloglog(32768, ...) gives ~0.4% error rate
-
-    // Daily plays by user with HyperLogLog
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_user
-      WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_user_id,
-        hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
-      FROM sessions
-      GROUP BY day, server_user_id
-      WITH NO DATA
-    `);
-
-    // Daily plays by server with HyperLogLog
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_server
-      WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_id,
-        hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
-      FROM sessions
-      GROUP BY day, server_id
-      WITH NO DATA
-    `);
-
-    // Daily stats summary (main dashboard aggregate) with HyperLogLog
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_stats_summary
-      WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        hyperloglog(32768, COALESCE(reference_id, id)) AS plays_hll,
-        hyperloglog(32768, server_user_id) AS users_hll,
-        hyperloglog(32768, server_id) AS servers_hll,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms,
-        AVG(COALESCE(duration_ms, 0))::bigint AS avg_duration_ms
-      FROM sessions
-      GROUP BY day
-      WITH NO DATA
-    `);
-
-    // Hourly concurrent streams (used by /concurrent endpoint)
-    // Note: This uses COUNT(*) since concurrent streams isn't about unique plays
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_concurrent_streams
-      WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-      SELECT
-        time_bucket('1 hour', started_at) AS hour,
-        server_id,
-        COUNT(*) AS stream_count
-      FROM sessions
-      WHERE state IN ('playing', 'paused')
-      GROUP BY hour, server_id
-      WITH NO DATA
-    `);
-
-    // Daily content engagement (engagement tracking system)
-    // Filters sessions < 2 minutes and aggregates watch time by content
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
-      WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_user_id,
-        rating_key,
-        MAX(media_title) AS media_title,
-        MAX(grandparent_title) AS show_title,
-        MAX(media_type) AS media_type,
-        MAX(total_duration_ms) AS content_duration_ms,
-        MAX(thumb_path) AS thumb_path,
-        MAX(server_id::text)::uuid AS server_id,
-        MAX(season_number) AS season_number,
-        MAX(episode_number) AS episode_number,
-        MAX(year) AS year,
-        SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
-        COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
-        COUNT(*) AS total_session_count,
-        BOOL_OR(watched) AS any_marked_watched
-      FROM sessions
-      WHERE rating_key IS NOT NULL
-        AND total_duration_ms > 0
-      GROUP BY day, server_user_id, rating_key
-      WITH NO DATA
-    `);
-  } else {
-    // Fallback: Standard aggregates without HyperLogLog
-    // Note: These use COUNT(*) which overcounts resumed sessions
+  if (!hasToolkit) {
     console.warn('TimescaleDB Toolkit not available - using COUNT(*) aggregates');
+  }
 
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_user
-      WITH (timescaledb.continuous) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_user_id,
-        COUNT(*) AS play_count,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
-      FROM sessions
-      GROUP BY day, server_user_id
-      WITH NO DATA
-    `);
-
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_plays_by_server
-      WITH (timescaledb.continuous) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_id,
-        COUNT(*) AS play_count,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms
-      FROM sessions
-      GROUP BY day, server_id
-      WITH NO DATA
-    `);
-
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_stats_summary
-      WITH (timescaledb.continuous) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        COUNT(DISTINCT COALESCE(reference_id, id)) AS play_count,
-        COUNT(DISTINCT server_user_id) AS user_count,
-        COUNT(DISTINCT server_id) AS server_count,
-        SUM(COALESCE(duration_ms, 0)) AS total_duration_ms,
-        AVG(COALESCE(duration_ms, 0))::bigint AS avg_duration_ms
-      FROM sessions
-      GROUP BY day
-      WITH NO DATA
-    `);
-
-    // Hourly concurrent streams (used by /concurrent endpoint)
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_concurrent_streams
-      WITH (timescaledb.continuous) AS
-      SELECT
-        time_bucket('1 hour', started_at) AS hour,
-        server_id,
-        COUNT(*) AS stream_count
-      FROM sessions
-      WHERE state IN ('playing', 'paused')
-      GROUP BY hour, server_id
-      WITH NO DATA
-    `);
-
-    // Daily content engagement (engagement tracking system)
-    // Same as toolkit version - no HLL needed for engagement tracking
-    await db.execute(sql`
-      CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
-      WITH (timescaledb.continuous) AS
-      SELECT
-        time_bucket('1 day', started_at) AS day,
-        server_user_id,
-        rating_key,
-        MAX(media_title) AS media_title,
-        MAX(grandparent_title) AS show_title,
-        MAX(media_type) AS media_type,
-        MAX(total_duration_ms) AS content_duration_ms,
-        MAX(thumb_path) AS thumb_path,
-        MAX(server_id::text)::uuid AS server_id,
-        MAX(season_number) AS season_number,
-        MAX(episode_number) AS episode_number,
-        MAX(year) AS year,
-        SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
-        COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
-        COUNT(*) AS total_session_count,
-        BOOL_OR(watched) AS any_marked_watched
-      FROM sessions
-      WHERE rating_key IS NOT NULL
-        AND total_duration_ms > 0
-      GROUP BY day, server_user_id, rating_key
-      WITH NO DATA
-    `);
+  // Create all aggregates from shared definitions
+  for (const def of definitions) {
+    await createAggregate(def, hasToolkit);
   }
 }
 
-/**
- * Set up refresh policies for continuous aggregates
- * Refreshes every 5 minutes with 1 hour lag for real-time dashboard
- */
+/** Set up refresh policies for continuous aggregates */
 async function setupRefreshPolicies(): Promise<void> {
-  await db.execute(sql`
-    SELECT add_continuous_aggregate_policy('daily_plays_by_user',
-      start_offset => INTERVAL '3 days',
-      end_offset => INTERVAL '1 hour',
-      schedule_interval => INTERVAL '5 minutes',
-      if_not_exists => true
-    )
-  `);
-
-  await db.execute(sql`
-    SELECT add_continuous_aggregate_policy('daily_plays_by_server',
-      start_offset => INTERVAL '3 days',
-      end_offset => INTERVAL '1 hour',
-      schedule_interval => INTERVAL '5 minutes',
-      if_not_exists => true
-    )
-  `);
-
-  await db.execute(sql`
-    SELECT add_continuous_aggregate_policy('daily_stats_summary',
-      start_offset => INTERVAL '3 days',
-      end_offset => INTERVAL '1 hour',
-      schedule_interval => INTERVAL '5 minutes',
-      if_not_exists => true
-    )
-  `);
-
-  await db.execute(sql`
-    SELECT add_continuous_aggregate_policy('hourly_concurrent_streams',
-      start_offset => INTERVAL '1 day',
-      end_offset => INTERVAL '1 hour',
-      schedule_interval => INTERVAL '5 minutes',
-      if_not_exists => true
-    )
-  `);
-
-  // Engagement tracking - refreshes every 15 minutes with 7 day lookback
-  await db.execute(sql`
-    SELECT add_continuous_aggregate_policy('daily_content_engagement',
-      start_offset => INTERVAL '7 days',
-      end_offset => INTERVAL '1 hour',
-      schedule_interval => INTERVAL '15 minutes',
-      if_not_exists => true
-    )
-  `);
+  const definitions = getAggregateDefinitions();
+  for (const def of definitions) {
+    await addRefreshPolicy(def);
+  }
 }
 
 /**
@@ -740,12 +839,32 @@ export async function initTimescaleDB(): Promise<{
     }
   }
 
-  if (missingAggregates.length > 0) {
+  // Check schema version - auto-rebuild if definitions have changed
+  const storedVersion = await getStoredSchemaVersion();
+  const needsRebuild = storedVersion !== AGGREGATE_SCHEMA_VERSION && existingAggregates.length > 0;
+
+  if (needsRebuild) {
+    actions.push(
+      `Schema version changed (${storedVersion} → ${AGGREGATE_SCHEMA_VERSION}) - rebuilding all aggregates`
+    );
+    const rebuildResult = await rebuildTimescaleViews();
+    if (rebuildResult.success) {
+      await setStoredSchemaVersion(AGGREGATE_SCHEMA_VERSION);
+      actions.push('Successfully rebuilt all aggregates with updated definitions');
+    } else {
+      actions.push(`Warning: Failed to rebuild aggregates: ${rebuildResult.message}`);
+    }
+  } else if (missingAggregates.length > 0) {
     await createContinuousAggregates();
     await setupRefreshPolicies();
+    await setStoredSchemaVersion(AGGREGATE_SCHEMA_VERSION);
     actions.push(`Created continuous aggregates: ${missingAggregates.join(', ')}`);
   } else {
-    actions.push('All continuous aggregates exist');
+    // Ensure version is stored even if aggregates already exist
+    if (storedVersion === 0) {
+      await setStoredSchemaVersion(AGGREGATE_SCHEMA_VERSION);
+    }
+    actions.push('All continuous aggregates exist and up-to-date');
   }
 
   // Check and enable compression
@@ -788,9 +907,8 @@ export async function initTimescaleDB(): Promise<{
 /**
  * Rebuild TimescaleDB views and continuous aggregates
  *
- * This function drops and recreates the engagement tracking continuous aggregate
- * and all dependent views. Use this to recover from broken views or after
- * upgrading when the view definitions have changed.
+ * Drops and recreates all continuous aggregates.
+ * Called automatically when schema version changes, or manually to recover from broken views.
  *
  * @param progressCallback - Optional callback for progress updates
  */
@@ -805,91 +923,35 @@ export async function rebuildTimescaleViews(
     };
   }
 
-  const totalSteps = 9;
+  const totalSteps = 10;
   const report = (step: number, msg: string) => {
     progressCallback?.(step, totalSteps, msg);
   };
 
   try {
-    // Step 1: Drop existing views (CASCADE will drop dependent views)
-    report(1, 'Dropping existing continuous aggregate and views...');
-    await db.execute(sql`
-      DROP MATERIALIZED VIEW IF EXISTS daily_content_engagement CASCADE
-    `);
+    const definitions = getAggregateDefinitions();
 
-    // Step 2: Check for toolkit and recreate continuous aggregate
-    report(2, 'Checking TimescaleDB Toolkit availability...');
-    const toolkitInstalled = await isToolkitInstalled();
-
-    report(3, 'Creating daily_content_engagement continuous aggregate...');
-    if (toolkitInstalled) {
-      // With toolkit - uses hyperloglog for approximate distinct counts
-      await db.execute(sql`
-        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
-        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
-        SELECT
-          time_bucket('1 day', started_at) AS day,
-          server_user_id,
-          rating_key,
-          MAX(media_title) AS media_title,
-          MAX(grandparent_title) AS show_title,
-          MAX(media_type) AS media_type,
-          MAX(total_duration_ms) AS content_duration_ms,
-          MAX(thumb_path) AS thumb_path,
-          MAX(server_id::text)::uuid AS server_id,
-          MAX(season_number) AS season_number,
-          MAX(episode_number) AS episode_number,
-          MAX(year) AS year,
-          SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
-          COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
-          COUNT(*) AS total_session_count,
-          BOOL_OR(watched) AS any_marked_watched
-        FROM sessions
-        WHERE rating_key IS NOT NULL
-          AND total_duration_ms > 0
-        GROUP BY day, server_user_id, rating_key
-        WITH NO DATA
-      `);
-    } else {
-      // Fallback without toolkit
-      await db.execute(sql`
-        CREATE MATERIALIZED VIEW IF NOT EXISTS daily_content_engagement
-        WITH (timescaledb.continuous) AS
-        SELECT
-          time_bucket('1 day', started_at) AS day,
-          server_user_id,
-          rating_key,
-          MAX(media_title) AS media_title,
-          MAX(grandparent_title) AS show_title,
-          MAX(media_type) AS media_type,
-          MAX(total_duration_ms) AS content_duration_ms,
-          MAX(thumb_path) AS thumb_path,
-          MAX(server_id::text)::uuid AS server_id,
-          MAX(season_number) AS season_number,
-          MAX(episode_number) AS episode_number,
-          MAX(year) AS year,
-          SUM(CASE WHEN duration_ms >= 120000 THEN duration_ms ELSE 0 END) AS watched_ms,
-          COUNT(*) FILTER (WHERE duration_ms >= 120000) AS valid_session_count,
-          COUNT(*) AS total_session_count,
-          BOOL_OR(watched) AS any_marked_watched
-        FROM sessions
-        WHERE rating_key IS NOT NULL
-          AND total_duration_ms > 0
-        GROUP BY day, server_user_id, rating_key
-        WITH NO DATA
-      `);
+    // Step 1: Drop ALL existing continuous aggregates (CASCADE will drop dependent views)
+    report(1, 'Dropping all existing continuous aggregates...');
+    for (const def of definitions) {
+      await db.execute(sql.raw(`DROP MATERIALIZED VIEW IF EXISTS ${def.name} CASCADE`));
     }
 
-    // Step 4: Add refresh policy
-    report(4, 'Setting up refresh policy...');
-    await db.execute(sql`
-      SELECT add_continuous_aggregate_policy('daily_content_engagement',
-        start_offset => INTERVAL '7 days',
-        end_offset => INTERVAL '1 hour',
-        schedule_interval => INTERVAL '15 minutes',
-        if_not_exists => true
-      )
-    `);
+    // Step 2: Check for toolkit
+    report(2, 'Checking TimescaleDB Toolkit availability...');
+    const hasToolkit = await isToolkitInstalled();
+
+    // Step 3: Recreate all continuous aggregates with current definitions
+    report(3, 'Creating continuous aggregates with updated definitions...');
+    for (const def of definitions) {
+      await createAggregate(def, hasToolkit);
+    }
+
+    // Step 4: Add refresh policies for all aggregates
+    report(4, 'Setting up refresh policies...');
+    for (const def of definitions) {
+      await addRefreshPolicy(def);
+    }
 
     // Step 5: Create content_engagement_summary view
     report(5, 'Creating content_engagement_summary view...');
@@ -1111,6 +1173,8 @@ export async function rebuildTimescaleViews(
       GROUP BY ses.show_title
     `);
 
+    // Step 9: Create user_engagement_profile view
+    report(9, 'Creating user_engagement_profile view...');
     await db.execute(sql`
       CREATE OR REPLACE VIEW user_engagement_profile AS
       SELECT
@@ -1140,11 +1204,11 @@ export async function rebuildTimescaleViews(
       GROUP BY server_user_id
     `);
 
-    // Step 9: Refresh the continuous aggregate
-    report(9, 'Refreshing continuous aggregate with historical data...');
-    await db.execute(sql`
-      CALL refresh_continuous_aggregate('daily_content_engagement', NULL, NULL)
-    `);
+    // Step 10: Refresh ALL continuous aggregates with historical data
+    report(10, 'Refreshing all continuous aggregates with historical data...');
+    for (const def of definitions) {
+      await db.execute(sql.raw(`CALL refresh_continuous_aggregate('${def.name}', NULL, NULL)`));
+    }
 
     return {
       success: true,

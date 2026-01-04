@@ -25,6 +25,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
+import { ALL_MEDIA_TYPES } from '../constants/mediaTypes.js';
 
 // Server types enum
 export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
@@ -32,8 +33,8 @@ export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
 // Session state enum
 export const sessionStateEnum = ['playing', 'paused', 'stopped'] as const;
 
-// Media type enum
-export const mediaTypeEnum = ['movie', 'episode', 'track', 'live'] as const;
+// Media type enum - imported from centralized constants
+export const mediaTypeEnum = ALL_MEDIA_TYPES;
 
 // Rule type enum
 export const ruleTypeEnum = [
@@ -260,6 +261,11 @@ export const sessions = pgTable(
     channelTitle: varchar('channel_title', { length: 255 }), // Channel name (e.g., "HBO", "ESPN")
     channelIdentifier: varchar('channel_identifier', { length: 100 }), // Channel number/ID
     channelThumb: varchar('channel_thumb', { length: 500 }), // Channel logo path
+    // Music track metadata (null for non-track content)
+    artistName: varchar('artist_name', { length: 255 }), // Artist name
+    albumName: varchar('album_name', { length: 255 }), // Album name
+    trackNumber: integer('track_number'), // Track number in album
+    discNumber: integer('disc_number'), // Disc number for multi-disc albums
   },
   (table) => [
     index('sessions_server_user_time_idx').on(table.serverUserId, table.startedAt),
