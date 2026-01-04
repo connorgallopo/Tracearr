@@ -137,7 +137,10 @@ export interface AuthUser {
 
 // Session types
 export type SessionState = 'playing' | 'paused' | 'stopped';
-export type MediaType = 'movie' | 'episode' | 'track';
+
+/** Supported media types */
+export const MEDIA_TYPES = ['movie', 'episode', 'track', 'live', 'photo', 'unknown'] as const;
+export type MediaType = (typeof MEDIA_TYPES)[number];
 
 export interface Session {
   id: string;
@@ -183,6 +186,15 @@ export interface Session {
   videoDecision: string | null; // 'directplay' | 'copy' | 'transcode'
   audioDecision: string | null; // 'directplay' | 'copy' | 'transcode'
   bitrate: number | null;
+  // Live TV fields
+  channelTitle: string | null;
+  channelIdentifier: string | null;
+  channelThumb: string | null;
+  // Music track fields
+  artistName: string | null;
+  albumName: string | null;
+  trackNumber: number | null;
+  discNumber: number | null;
 }
 
 export interface ActiveSession extends Session {

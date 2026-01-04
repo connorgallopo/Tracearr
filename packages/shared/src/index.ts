@@ -262,3 +262,6 @@ export {
 
 // Role helper exports
 export { ROLE_PERMISSIONS, canLogin, hasMinRole, isOwner, isActive } from './types.js';
+
+// Session constants
+export { MEDIA_TYPES } from './types.js';
