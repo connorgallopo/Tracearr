@@ -25,6 +25,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
+import type { WebhookFormat } from '@tracearr/shared';
 
 // Server types enum
 export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
@@ -542,11 +543,14 @@ export const settings = pgTable('settings', {
     .notNull()
     .$type<(typeof unitSystemEnum)[number]>()
     .default('metric'),
+  // Notification settings
   discordWebhookUrl: text('discord_webhook_url'),
   customWebhookUrl: text('custom_webhook_url'),
-  webhookFormat: text('webhook_format').$type<'json' | 'ntfy' | 'apprise'>(), // Format for custom webhook payloads
+  webhookFormat: text('webhook_format').$type<WebhookFormat>(), // Format for custom webhook payloads
   ntfyTopic: text('ntfy_topic'), // Topic for ntfy notifications (required when webhookFormat is 'ntfy')
   ntfyAuthToken: text('ntfy_auth_token'), // Auth token for protected ntfy servers (Bearer token)
+  pushoverUserKey: text('pushover_user_key'),
+  pushoverApiToken: text('pushover_api_token'),
   // Poller settings
   pollerEnabled: boolean('poller_enabled').notNull().default(true),
   pollerIntervalMs: integer('poller_interval_ms').notNull().default(15000),

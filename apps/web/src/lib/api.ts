@@ -38,6 +38,7 @@ import type {
   EngagementStats,
   ShowStatsResponse,
   MediaType,
+  WebhookFormat,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -762,9 +763,11 @@ class ApiClient {
     testWebhook: (data: {
       type: 'discord' | 'custom';
       url?: string;
-      format?: 'json' | 'ntfy' | 'apprise';
+      format?: WebhookFormat;
       ntfyTopic?: string;
       ntfyAuthToken?: string;
+      pushoverUserKey?: string;
+      pushoverApiToken?: string;
     }) =>
       this.request<{ success: boolean; error?: string }>('/settings/test-webhook', {
         method: 'POST',

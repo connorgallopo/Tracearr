@@ -59,6 +59,14 @@ function severityToAppriseType(severity: string): 'info' | 'success' | 'warning'
 }
 
 /**
+ * Map severity to pushover priority (-2 to 2 scale)
+ */
+function severityToPushoverPriority(severity: string): string {
+  const map: Record<string, string> = { high: '1', warning: '0', low: '-1' };
+  return map[severity] ?? '-1';
+}
+
+/**
  * Truncate a string to fit Discord's field value limit (1024 chars)
  */
 function truncateForDiscord(text: string, maxLength = 1000): string {
@@ -607,8 +615,9 @@ export class NotificationService {
   ): Promise<void> {
     if (!settings.customWebhookUrl) return;
 
-    const format: WebhookFormat = settings.webhookFormat ?? 'json';
+    let url: string = settings.customWebhookUrl;
     let payload: unknown;
+    const format: WebhookFormat = settings.webhookFormat ?? 'json';
 
     switch (format) {
       case 'ntfy':
@@ -617,6 +626,19 @@ export class NotificationService {
       case 'apprise':
         payload = this.buildApprisePayload(rawPayload, context);
         break;
+      case 'pushover':
+        if (!settings.pushoverUserKey || !settings.pushoverApiToken) {
+          return;
+        }
+        url = this.buildPushoverUrl(
+          rawPayload,
+          new URL(settings.customWebhookUrl),
+          settings.pushoverUserKey,
+          settings.pushoverApiToken,
+          context
+        );
+        payload = undefined; // payload is encoded in the URL
+        break;
       case 'json':
       default:
         payload = rawPayload;
@@ -624,7 +646,7 @@ export class NotificationService {
 
     // Pass ntfy auth token for ntfy format
     const authToken = format === 'ntfy' ? settings.ntfyAuthToken : null;
-    await this.sendWebhook(settings.customWebhookUrl, payload, authToken);
+    await this.sendWebhook(url, payload, authToken);
   }
 
   /**
@@ -781,6 +803,82 @@ export class NotificationService {
     };
   }
 
+  /**
+   * Build Pushover-formatted url
+   */
+  private buildPushoverUrl(
+    rawPayload: NotificationPayload,
+    url: URL,
+    userKey: string,
+    apiToken: string,
+    context: {
+      violation?: ViolationWithDetails;
+      session?: ActiveSession;
+      serverName?: string;
+      eventType?: string;
+    }
+  ): string {
+    const { violation, session, serverName, eventType } = context;
+
+    url.searchParams.set('user', userKey);
+    url.searchParams.set('token', apiToken);
+
+    if (violation) {
+      const ruleType = violation.rule.type as keyof typeof RULE_DISPLAY_NAMES;
+      const severity = violation.severity as keyof typeof SEVERITY_LEVELS;
+
+      url.searchParams.set(
+        'message',
+        `User ${violation.user.identityName ?? violation.user.username} triggered ${RULE_DISPLAY_NAMES[ruleType]} (${SEVERITY_LEVELS[severity].label} severity)`
+      );
+      url.searchParams.set('title', 'Violation Detected');
+      url.searchParams.set('priority', severityToPushoverPriority(severity));
+      return url.toString();
+    }
+
+    if (session) {
+      const { title: mediaTitle, subtitle } = getMediaDisplay(session);
+      const userName = session.user.identityName ?? session.user.username;
+      const mediaDisplay = subtitle ? `${mediaTitle} - ${subtitle}` : mediaTitle;
+
+      if (eventType === 'session_started') {
+        url.searchParams.set('title', 'Stream Started');
+        url.searchParams.set('message', `${userName} started watching ${mediaDisplay}`);
+        url.searchParams.set('priority', '-1');
+        return url.toString();
+      }
+      // session_stopped
+      const durationStr = session.durationMs ? ` (${formatDuration(session.durationMs)})` : '';
+      url.searchParams.set('title', 'Stream Ended');
+      url.searchParams.set(
+        'message',
+        `${userName} finished watching ${mediaDisplay}${durationStr}`
+      );
+      url.searchParams.set('priority', '-1');
+      return url.toString();
+    }
+
+    if (serverName) {
+      if (eventType === 'server_down') {
+        url.searchParams.set('title', 'Server Down');
+        url.searchParams.set('message', `Lost connection to ${serverName}`);
+        url.searchParams.set('priority', '1');
+        return url.toString();
+      }
+      // server_up
+      url.searchParams.set('title', 'Server Online');
+      url.searchParams.set('message', `${serverName} is back online`);
+      url.searchParams.set('priority', '1');
+      return url.toString();
+    }
+
+    // Fallback for unknown event types
+    url.searchParams.set('title', rawPayload.event);
+    url.searchParams.set('message', JSON.stringify(rawPayload.data));
+    url.searchParams.set('priority', '-1');
+    return url.toString();
+  }
+
   private async sendWebhook(
     webhookUrl: string,
     payload: unknown,
@@ -811,9 +909,11 @@ export class NotificationService {
 export async function sendTestWebhook(
   webhookUrl: string,
   type: 'discord' | 'custom',
-  format: 'json' | 'ntfy' | 'apprise' = 'json',
+  format: WebhookFormat = 'json',
   ntfyTopic?: string | null,
-  ntfyAuthToken?: string | null
+  ntfyAuthToken?: string | null,
+  pushoverUserKey?: string | null,
+  pushoverApiToken?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   try {
     if (type === 'discord') {
@@ -867,6 +967,20 @@ export async function sendTestWebhook(
           type: 'success',
         };
         break;
+
+      case 'pushover': {
+        const url = new URL(webhookUrl);
+        url.searchParams.set('title', 'Test Notification');
+        url.searchParams.set(
+          'message',
+          'If you see this message, your Pushover webhook is configured correctly!'
+        );
+        url.searchParams.set('user', pushoverUserKey ?? '');
+        url.searchParams.set('token', pushoverApiToken ?? '');
+        url.searchParams.set('priority', '-1');
+        webhookUrl = url.toString();
+        break;
+      }
 
       case 'json':
       default:

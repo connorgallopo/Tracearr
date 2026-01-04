@@ -36,6 +36,8 @@ describe('NotificationService', () => {
     webhookFormat: null,
     ntfyTopic: null,
     ntfyAuthToken: null,
+    pushoverUserKey: null,
+    pushoverApiToken: null,
     pollerEnabled: true,
     pollerIntervalMs: 15000,
     tautulliUrl: null,
@@ -223,6 +225,31 @@ describe('NotificationService', () => {
       expect(body.title).toBe('Violation Detected');
       expect(body.body).toContain('Test User'); // Uses identityName when available
       expect(body.type).toBe('warning');
+    });
+
+    it('sends custom webhook with pushover format', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true });
+
+      const settings = createMockSettings({
+        customWebhookUrl: 'https://apprise.example.com/notify',
+        webhookFormat: 'pushover',
+        pushoverUserKey: 'pushover-user-key',
+        pushoverApiToken: 'pushover-api-token',
+      });
+
+      await notificationService.notifyViolation(createMockViolation(), settings);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      // Verify pushover url
+      const callArgs = mockFetch.mock.calls[0]!;
+      const url = new URL(callArgs[0]);
+      const searchParams = url.searchParams;
+      expect(searchParams.get('user')).toBe('pushover-user-key');
+      expect(searchParams.get('token')).toBe('pushover-api-token');
+      expect(searchParams.get('title')).toBe('Violation Detected');
+      expect(searchParams.get('message')).toContain('Test User'); // Uses identityName when available
+      expect(searchParams.get('priority')).toBe('0');
     });
 
     it('sends custom webhook with json format', async () => {
