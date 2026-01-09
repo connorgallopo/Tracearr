@@ -72,7 +72,7 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
           key={preset.value}
           onClick={() => handlePresetClick(preset.value)}
           className={cn(
-            'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+            'rounded-md px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors',
             value.period === preset.value
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
