@@ -7,7 +7,7 @@
  * - fetchText: Fetch and return text response
  * - fetchRaw: Fetch and return raw Response
  * - fetchWithStatus: Fetch without throwing on non-2xx
- * - Helper functions: jsonHeaders, plexHeaders, jellyfinHeaders
+ * - Helper functions: jsonHeaders, plexHeaders, jellyfinEmbyHeaders
  *
  * These tests validate:
  * - Successful requests return correct data
@@ -28,8 +28,7 @@ import {
   fetchWithStatus,
   jsonHeaders,
   plexHeaders,
-  jellyfinHeaders,
-  embyHeaders,
+  jellyfinEmbyHeaders,
 } from '../http.js';
 
 // Mock fetch globally
@@ -386,33 +385,18 @@ describe('Header helpers', () => {
     });
   });
 
-  describe('jellyfinHeaders', () => {
-    it('should return Jellyfin headers without API key', () => {
-      const headers = jellyfinHeaders();
+  describe('jellyfinEmbyHeaders', () => {
+    it('should return headers without API key', () => {
+      const headers = jellyfinEmbyHeaders();
 
       expect(headers['Accept']).toBe('application/json');
       expect(headers['X-Emby-Token']).toBeUndefined();
     });
 
     it('should include X-Emby-Token when API key provided', () => {
-      const headers = jellyfinHeaders('jellyfin-api-key');
+      const headers = jellyfinEmbyHeaders('api-key');
 
-      expect(headers['X-Emby-Token']).toBe('jellyfin-api-key');
-    });
-  });
-
-  describe('embyHeaders', () => {
-    it('should return Emby headers without API key', () => {
-      const headers = embyHeaders();
-
-      expect(headers['Accept']).toBe('application/json');
-      expect(headers['X-Emby-Token']).toBeUndefined();
-    });
-
-    it('should include X-Emby-Token when API key provided', () => {
-      const headers = embyHeaders('emby-api-key');
-
-      expect(headers['X-Emby-Token']).toBe('emby-api-key');
+      expect(headers['X-Emby-Token']).toBe('api-key');
     });
   });
 });

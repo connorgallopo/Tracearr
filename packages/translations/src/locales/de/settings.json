@@ -1,0 +1,91 @@
+{
+  "tabs": {
+    "general": "Allgemein",
+    "servers": "Server",
+    "notifications": "Benachrichtigungen",
+    "mobile": "Mobile App",
+    "import": "Importieren",
+    "advanced": "Erweitert"
+  },
+  "general": {
+    "title": "Allgemeine Einstellungen",
+    "unitSystem": "Einheitensystem",
+    "metric": "Metrisch (km, km/h)",
+    "imperial": "Imperial (mi, mph)",
+    "timezone": "Zeitzone",
+    "primaryAuth": "Primäre Authentifizierungsmethode",
+    "localAccount": "Lokales Konto",
+    "plexAccount": "Plex-Konto",
+    "jellyfinAccount": "Jellyfin-Konto"
+  },
+  "servers": {
+    "title": "Verbundene Server",
+    "addServer": "Server hinzufügen",
+    "serverName": "Servername",
+    "serverUrl": "Server-URL",
+    "apiKey": "API Key",
+    "syncInterval": "Synchronisierungsintervall",
+    "testConnection": "Verbindung testen",
+    "connectionSuccess": "Verbindung erfolgreich",
+    "connectionFailed": "Verbindung fehlgeschlagen"
+  },
+  "mobile": {
+    "title": "Mobile App",
+    "pairDevice": "Gerät koppeln",
+    "connectedDevices": "Verbundene Geräte",
+    "generateToken": "Pairing-Token generieren",
+    "scanQrCode": "QR-Code scannen",
+    "tokenExpires": "Token läuft in {{time}} ab",
+    "noDevices": "Keine Geräte verbunden",
+    "revokeAll": "Alle Sitzungen widerrufen"
+  },
+  "webhooks": {
+    "title": "Webhook-Konfiguration",
+    "discordWebhook": "Discord Webhook-URL",
+    "ntfyTopic": "Ntfy Topic",
+    "customWebhook": "Benutzerdefinierte Webhook-URL",
+    "webhookFormat": "Webhook-Format",
+    "testWebhook": "Webhook testen"
+  },
+  "advanced": {
+    "title": "Erweiterte Einstellungen",
+    "basePath": "Basispfad",
+    "externalUrl": "Externe URL",
+    "trustProxy": "Proxy-Header vertrauen",
+    "reverseProxy": "Reverse Proxy",
+    "connectionScenarios": "Verbindungsszenarien"
+  },
+  "import": {
+    "title": "Daten importieren",
+    "jellystat": "Aus Jellystat importieren",
+    "tautulli": "Aus Tautulli importieren",
+    "importProgress": "Importfortschritt",
+    "importComplete": "Import abgeschlossen",
+    "importFailed": "Import fehlgeschlagen"
+  },
+  "plex": {
+    "linkedAccounts": "Verknüpfte Plex-Konten",
+    "unlinkAccount": "Plex-Konto trennen",
+    "signInWithPlex": "Mit Plex anmelden",
+    "signUpWithPlex": "Mit Plex registrieren",
+    "selectServer": "Server auswählen",
+    "chooseServer": "Wähle aus, welcher Plex Media Server überwacht werden soll"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Mit Jellyfin anmelden",
+    "username": "Jellyfin-Benutzername",
+    "password": "Jellyfin-Passwort"
+  },
+  "account": {
+    "createAccount": "Konto erstellen",
+    "signIn": "Anmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "displayName": "Anzeigename",
+    "createYourAccount": "Konto erstellen, um zu beginnen",
+    "signInToAccount": "Bei Konto anmelden",
+    "useLocalAccount": "Stattdessen lokales Konto verwenden",
+    "useJellyfinAccount": "Stattdessen Jellyfin-Konto verwenden",
+    "waitingForPlex": "Auf Plex-Autorisierung warten..."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "states": {
+    "playing": "Läuft",
+    "paused": "Pausiert",
+    "stopped": "Gestoppt"
+  },
+  "quality": {
+    "directPlay": "Direct Play",
+    "directStream": "Direct Stream",
+    "transcode": "Transcode"
+  },
+  "labels": {
+    "nowPlaying": "Läuft gerade",
+    "activeStreams": "Aktive Streams",
+    "recentSessions": "Letzte Sitzungen",
+    "sessionDetails": "Sitzungsdetails",
+    "watchTime": "Wiedergabezeit",
+    "pausedTime": "Pausierte Zeit",
+    "started": "Gestartet",
+    "stopped": "Gestoppt",
+    "duration": "Dauer",
+    "progress": "Fortschritt",
+    "device": "Gerät",
+    "player": "Player",
+    "location": "Standort",
+    "ipAddress": "IP-Adresse",
+    "server": "Server",
+    "media": "Medien",
+    "quality": "Qualität",
+    "bandwidth": "Bandbreite",
+    "resolution": "Auflösung"
+  },
+  "empty": {
+    "noActiveStreams": "Keine aktiven Streams",
+    "streamsWillAppear": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen"
+  },
+  "terminate": {
+    "title": "Stream beenden",
+    "message": "Optionale Nachricht für den Benutzer eingeben (leer lassen zum Überspringen):",
+    "success": "Die Wiedergabesitzung wurde gestoppt",
+    "failed": "Stream konnte nicht beendet werden"
+  }
+}

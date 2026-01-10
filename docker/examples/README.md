@@ -129,9 +129,9 @@ That's it! No environment variables needed.
 
 ### Supervised-Only
 
-| Variable        | Default      | Description                                          |
-| --------------- | ------------ | ---------------------------------------------------- |
-| `PG_MAX_MEMORY` | Auto-detect  | PostgreSQL memory limit (e.g., `2GB`). Set if using `mem_limit` and auto-detection fails. |
+| Variable        | Default     | Description                                                                               |
+| --------------- | ----------- | ----------------------------------------------------------------------------------------- |
+| `PG_MAX_MEMORY` | Auto-detect | PostgreSQL memory limit (e.g., `2GB`). Set if using `mem_limit` and auto-detection fails. |
 
 For all configuration options, see the [main README](../../README.md#configuration).
 

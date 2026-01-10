@@ -11,7 +11,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
-import type { AuthUser, ActiveSession } from '@tracearr/shared';
+import type { AuthUser } from '@tracearr/shared';
+import { createMockActiveSession } from '../../test/fixtures.js';
 
 // Mock the database module before importing routes
 vi.mock('../../db/client.js', () => ({
@@ -73,62 +74,6 @@ function createViewerUser(serverIds?: string[]): AuthUser {
     username: 'viewer',
     role: 'viewer',
     serverIds: serverIds ?? [randomUUID()],
-  };
-}
-
-function createActiveSession(overrides: Partial<ActiveSession> = {}): ActiveSession {
-  const serverId = overrides.serverId ?? randomUUID();
-  return {
-    id: overrides.id ?? randomUUID(),
-    sessionKey: overrides.sessionKey ?? 'session-123',
-    serverId,
-    serverUserId: overrides.serverUserId ?? randomUUID(),
-    state: overrides.state ?? 'playing',
-    mediaType: overrides.mediaType ?? 'movie',
-    mediaTitle: overrides.mediaTitle ?? 'Test Movie',
-    grandparentTitle: overrides.grandparentTitle ?? null,
-    seasonNumber: overrides.seasonNumber ?? null,
-    episodeNumber: overrides.episodeNumber ?? null,
-    year: overrides.year ?? 2024,
-    thumbPath: overrides.thumbPath ?? '/library/metadata/123/thumb',
-    ratingKey: overrides.ratingKey ?? 'media-123',
-    externalSessionId: overrides.externalSessionId ?? null,
-    startedAt: overrides.startedAt ?? new Date(),
-    stoppedAt: overrides.stoppedAt ?? null,
-    durationMs: overrides.durationMs ?? 0,
-    progressMs: overrides.progressMs ?? 0,
-    totalDurationMs: overrides.totalDurationMs ?? 7200000,
-    lastPausedAt: overrides.lastPausedAt ?? null,
-    pausedDurationMs: overrides.pausedDurationMs ?? 0,
-    referenceId: overrides.referenceId ?? null,
-    watched: overrides.watched ?? false,
-    ipAddress: overrides.ipAddress ?? '192.168.1.100',
-    geoCity: overrides.geoCity ?? 'New York',
-    geoRegion: overrides.geoRegion ?? 'NY',
-    geoCountry: overrides.geoCountry ?? 'US',
-    geoLat: overrides.geoLat ?? 40.7128,
-    geoLon: overrides.geoLon ?? -74.006,
-    playerName: overrides.playerName ?? 'Chrome',
-    deviceId: overrides.deviceId ?? 'device-123',
-    product: overrides.product ?? 'Plex Web',
-    device: overrides.device ?? 'Chrome',
-    platform: overrides.platform ?? 'Chrome',
-    quality: overrides.quality ?? '1080p',
-    isTranscode: overrides.isTranscode ?? false,
-    videoDecision: overrides.videoDecision ?? 'directplay',
-    audioDecision: overrides.audioDecision ?? 'directplay',
-    bitrate: overrides.bitrate ?? 20000,
-    user: overrides.user ?? {
-      id: randomUUID(),
-      username: 'testuser',
-      thumbUrl: null,
-      identityName: null,
-    },
-    server: overrides.server ?? {
-      id: serverId,
-      name: 'Test Server',
-      type: 'plex',
-    },
   };
 }
 
@@ -296,7 +241,7 @@ describe('Session Routes', () => {
     it('should return active sessions from cache', async () => {
       const serverId = randomUUID();
       const ownerUser = createOwnerUser([serverId]);
-      const activeSessions = [createActiveSession({ serverId })];
+      const activeSessions = [createMockActiveSession({ serverId })];
 
       // Mock the cache service response
       mockGetAllActiveSessions.mockResolvedValueOnce(activeSessions);
@@ -338,8 +283,8 @@ describe('Session Routes', () => {
       const viewerUser = createViewerUser([serverId1]);
 
       const activeSessions = [
-        createActiveSession({ serverId: serverId1 }),
-        createActiveSession({ serverId: serverId2 }),
+        createMockActiveSession({ serverId: serverId1 }),
+        createMockActiveSession({ serverId: serverId2 }),
       ];
 
       // Mock the cache service response
@@ -383,7 +328,7 @@ describe('Session Routes', () => {
       const sessionId = randomUUID();
       const ownerUser = createOwnerUser([serverId]);
 
-      const activeSession = createActiveSession({ id: sessionId, serverId });
+      const activeSession = createMockActiveSession({ id: sessionId, serverId });
 
       const redisMock = {
         get: vi.fn().mockResolvedValue(JSON.stringify(activeSession)),
@@ -610,7 +555,7 @@ describe('Session Routes', () => {
       const differentServerId = randomUUID();
       const viewerUser = createViewerUser([differentServerId]);
 
-      const activeSession = createActiveSession({ id: sessionId, serverId });
+      const activeSession = createMockActiveSession({ id: sessionId, serverId });
 
       const redisMock = {
         get: vi.fn().mockResolvedValue(JSON.stringify(activeSession)),

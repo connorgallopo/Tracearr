@@ -28,9 +28,6 @@ export function ConcurrentChart({
       return {};
     }
 
-    // Find the peak total for highlighting
-    const maxValue = Math.max(...data.map((d) => d.total));
-
     return {
       chart: {
         type: 'area',
@@ -110,14 +107,6 @@ export function ConcurrentChart({
         gridLineColor: 'hsl(var(--border))',
         min: 0,
         allowDecimals: false,
-        plotLines: [
-          {
-            value: maxValue,
-            color: 'hsl(var(--destructive))',
-            dashStyle: 'Dash',
-            width: 1,
-          },
-        ],
       },
       plotOptions: {
         area: {
@@ -151,9 +140,8 @@ export function ConcurrentChart({
           const points = this.points || [];
           // With categories, this.x is the index. Use the category value from points[0].key
           const categoryValue = points[0]?.key as string | undefined;
-          // Handle date-only strings by appending T00:00:00 for local parsing
           const date = categoryValue
-            ? new Date(categoryValue.includes('T') ? categoryValue : categoryValue + 'T00:00:00')
+            ? new Date(categoryValue.replace(' ', 'T').replace(/\+\d{2}$/, ''))
             : null;
           const dateStr =
             date && !isNaN(date.getTime())

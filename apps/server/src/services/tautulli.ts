@@ -2,11 +2,11 @@
  * Tautulli API integration and import service
  */
 
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull, isNotNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { TautulliImportProgress, TautulliImportResult } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { settings, sessions } from '../db/schema.js';
+import { settings, sessions, serverUsers, users } from '../db/schema.js';
 import { refreshAggregates } from '../db/timescale.js';
 import { geoipService } from './geoip.js';
 import type { PubSubService } from './cache.js';
@@ -137,11 +137,104 @@ export const TautulliUsersResponseSchema = z.object({
   }),
 });
 
+// Stream data schema for detailed quality info (from get_stream_data endpoint)
+const stringOrEmpty = z.union([z.string(), z.literal('')]).transform((v) => (v === '' ? null : v));
+const numberOrEmpty = z
+  .union([z.number(), z.string()])
+  .transform((v) => (v === '' ? null : typeof v === 'string' ? parseInt(v, 10) || null : v));
+// Tautulli returns "" for boolean-like fields when they're not applicable
+const boolOrEmpty = z
+  .union([z.number(), z.boolean(), z.literal('')])
+  .transform((v) => (v === '' ? null : v === 1 || v === true));
+
+export const TautulliStreamDataSchema = z.object({
+  // Source video info
+  video_codec: stringOrEmpty.nullable().optional(),
+  video_width: numberOrEmpty.nullable().optional(),
+  video_height: numberOrEmpty.nullable().optional(),
+  video_bitrate: numberOrEmpty.nullable().optional(),
+  video_bit_depth: numberOrEmpty.nullable().optional(),
+  video_framerate: stringOrEmpty.nullable().optional(),
+  video_dynamic_range: stringOrEmpty.nullable().optional(),
+  video_profile: stringOrEmpty.nullable().optional(),
+  video_codec_level: stringOrEmpty.nullable().optional(),
+  video_color_primaries: stringOrEmpty.nullable().optional(),
+  video_color_space: stringOrEmpty.nullable().optional(),
+  video_color_trc: stringOrEmpty.nullable().optional(),
+
+  // Source audio info
+  audio_codec: stringOrEmpty.nullable().optional(),
+  audio_bitrate: numberOrEmpty.nullable().optional(),
+  audio_channels: numberOrEmpty.nullable().optional(),
+  audio_channel_layout: stringOrEmpty.nullable().optional(),
+  audio_sample_rate: numberOrEmpty.nullable().optional(),
+  audio_language: stringOrEmpty.nullable().optional(),
+  audio_language_code: stringOrEmpty.nullable().optional(),
+
+  // Stream output info (after transcode)
+  stream_video_codec: stringOrEmpty.nullable().optional(),
+  stream_video_bitrate: numberOrEmpty.nullable().optional(),
+  stream_video_width: numberOrEmpty.nullable().optional(),
+  stream_video_height: numberOrEmpty.nullable().optional(),
+  stream_video_framerate: stringOrEmpty.nullable().optional(),
+  stream_video_dynamic_range: stringOrEmpty.nullable().optional(),
+
+  stream_audio_codec: stringOrEmpty.nullable().optional(),
+  stream_audio_bitrate: numberOrEmpty.nullable().optional(),
+  stream_audio_channels: numberOrEmpty.nullable().optional(),
+  stream_audio_channel_layout: stringOrEmpty.nullable().optional(),
+  stream_audio_language: stringOrEmpty.nullable().optional(),
+
+  // Transcode decisions
+  transcode_decision: stringOrEmpty.nullable().optional(),
+  video_decision: stringOrEmpty.nullable().optional(),
+  audio_decision: stringOrEmpty.nullable().optional(),
+  container_decision: stringOrEmpty.nullable().optional(),
+  subtitle_decision: stringOrEmpty.nullable().optional(),
+
+  // Container info
+  container: stringOrEmpty.nullable().optional(),
+  stream_container: stringOrEmpty.nullable().optional(),
+
+  // Bandwidth/bitrate
+  bitrate: numberOrEmpty.nullable().optional(),
+  stream_bitrate: numberOrEmpty.nullable().optional(),
+  bandwidth: numberOrEmpty.nullable().optional(),
+
+  // Hardware transcoding
+  transcode_hw_requested: boolOrEmpty.nullable().optional(),
+  transcode_hw_decoding: boolOrEmpty.nullable().optional(),
+  transcode_hw_encoding: boolOrEmpty.nullable().optional(),
+  transcode_hw_decode: stringOrEmpty.nullable().optional(),
+  transcode_hw_encode: stringOrEmpty.nullable().optional(),
+  transcode_speed: stringOrEmpty.nullable().optional(),
+  transcode_throttled: boolOrEmpty.nullable().optional(),
+
+  // Subtitle info
+  subtitle_codec: stringOrEmpty.nullable().optional(),
+  subtitle_language: stringOrEmpty.nullable().optional(),
+  subtitle_language_code: stringOrEmpty.nullable().optional(),
+  subtitle_forced: boolOrEmpty.nullable().optional(),
+
+  // Quality profile
+  quality_profile: stringOrEmpty.nullable().optional(),
+});
+
+export const TautulliStreamDataResponseSchema = z.object({
+  response: z.object({
+    result: z.string(),
+    message: z.string().nullable(),
+    data: TautulliStreamDataSchema.nullable(),
+  }),
+});
+
 // Infer types from schemas - exported for testing
 export type TautulliHistoryRecord = z.infer<typeof TautulliHistoryRecordSchema>;
 export type TautulliHistoryResponse = z.infer<typeof TautulliHistoryResponseSchema>;
 export type TautulliUserRecord = z.infer<typeof TautulliUserRecordSchema>;
 export type TautulliUsersResponse = z.infer<typeof TautulliUsersResponseSchema>;
+export type TautulliStreamData = z.infer<typeof TautulliStreamDataSchema>;
+export type TautulliStreamDataResponse = z.infer<typeof TautulliStreamDataResponseSchema>;
 
 export class TautulliService {
   private baseUrl: string;
@@ -159,6 +252,75 @@ export class TautulliService {
     }
     this.baseUrl = url.replace(/\/$/, '');
     this.apiKey = apiKey;
+  }
+
+  /**
+   * Sync friendly/custom user names from Tautulli to Tracearr identities
+   */
+  private static async syncFriendlyNamesFromTautulli(
+    serverId: string,
+    tautulli: TautulliService,
+    overwriteAll: boolean
+  ): Promise<number> {
+    const tautulliUsers = await tautulli.getUsers();
+
+    // Build map of externalId -> friendly name (trimmed, non-empty)
+    const friendlyByExternalId = new Map<string, string>();
+    for (const user of tautulliUsers) {
+      const friendlyName = user.friendly_name?.trim();
+      if (friendlyName) {
+        friendlyByExternalId.set(String(user.user_id), friendlyName);
+      }
+    }
+
+    if (friendlyByExternalId.size === 0) {
+      return 0;
+    }
+
+    // Fetch server users for this server with linked identity info
+    const serverUserRows = await db
+      .select({
+        serverUserId: serverUsers.id,
+        externalId: serverUsers.externalId,
+        userId: serverUsers.userId,
+        identityName: users.name,
+      })
+      .from(serverUsers)
+      .innerJoin(users, eq(serverUsers.userId, users.id))
+      .where(eq(serverUsers.serverId, serverId));
+
+    const updates = new Map<string, string>();
+
+    for (const row of serverUserRows) {
+      const friendlyName = friendlyByExternalId.get(row.externalId);
+      if (!friendlyName) continue;
+
+      const currentName = row.identityName?.trim();
+      const hasExistingName = !!currentName && currentName.length > 0;
+      if (hasExistingName && !overwriteAll) continue;
+
+      if (currentName === friendlyName) continue;
+
+      updates.set(row.userId, friendlyName);
+    }
+
+    if (updates.size === 0) {
+      return 0;
+    }
+
+    await db.transaction(async (tx) => {
+      for (const [userId, friendlyName] of updates) {
+        await tx
+          .update(users)
+          .set({
+            name: friendlyName,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, userId));
+      }
+    });
+
+    return updates.size;
   }
 
   /**
@@ -291,6 +453,44 @@ export class TautulliService {
   }
 
   /**
+   * Get detailed stream data for a specific session
+   * This provides codec, bitrate, resolution, and transcode details not available in get_history
+   *
+   * @param rowId - The row_id from get_history (used as the session identifier)
+   * @param sessionKey - Optional session key for additional lookup
+   * @returns Stream data or null if not found/failed
+   */
+  async getStreamData(rowId: number, sessionKey?: string): Promise<TautulliStreamData | null> {
+    try {
+      const params: Record<string, string | number> = { row_id: rowId };
+      if (sessionKey) {
+        params.session_key = sessionKey;
+      }
+
+      const result = await this.request<TautulliStreamDataResponse>(
+        'get_stream_data',
+        params,
+        TautulliStreamDataResponseSchema
+      );
+
+      // Tautulli returns empty object {} for non-existent row_ids
+      if (
+        result.response.result !== 'success' ||
+        !result.response.data ||
+        Object.keys(result.response.data).length === 0
+      ) {
+        return null;
+      }
+
+      return result.response.data;
+    } catch (error) {
+      // Log errors - important for debugging
+      console.warn(`[Tautulli] Failed to get stream data for row ${rowId}:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Import all history from Tautulli into Tracearr (OPTIMIZED)
    *
    * Performance improvements over original:
@@ -304,8 +504,12 @@ export class TautulliService {
   static async importHistory(
     serverId: string,
     pubSubService?: PubSubService,
-    onProgress?: (progress: TautulliImportProgress) => Promise<void>
+    onProgress?: (progress: TautulliImportProgress) => Promise<void>,
+    options?: { overwriteFriendlyNames?: boolean; skipRefresh?: boolean }
   ): Promise<TautulliImportResult> {
+    const overwriteFriendlyNames = options?.overwriteFriendlyNames ?? false;
+    const skipRefresh = options?.skipRefresh ?? false;
+
     // Get Tautulli settings
     const settingsRow = await db.select().from(settings).where(eq(settings.id, 1)).limit(1);
 
@@ -364,6 +568,23 @@ export class TautulliService {
     );
 
     publishProgress(progress);
+
+    // Sync friendly/custom names from Tautulli before importing history
+    progress.message = 'Syncing user display names from Tautulli...';
+    publishProgress(progress);
+
+    try {
+      const updatedNames = await TautulliService.syncFriendlyNamesFromTautulli(
+        serverId,
+        tautulli,
+        overwriteFriendlyNames
+      );
+      if (updatedNames > 0) {
+        console.log(`[Import] Updated ${updatedNames} user display names from Tautulli`);
+      }
+    } catch (err) {
+      console.warn('[Import] Failed to sync Tautulli friendly names:', err);
+    }
 
     // Get user mapping using shared module
     const userMapRaw = await createUserMapping(serverId);
@@ -614,13 +835,26 @@ export class TautulliService {
             geoCache.set(ipForLookup, geo);
           }
 
-          // Map media type
-          let mediaType: 'movie' | 'episode' | 'track' = 'movie';
-          if (record.media_type === 'episode') {
+          // Map media type - check live flag FIRST (live content reports as movie/episode)
+          let mediaType: 'movie' | 'episode' | 'track' | 'live' = 'movie';
+          if (record.live === 1) {
+            mediaType = 'live';
+          } else if (record.media_type === 'episode') {
             mediaType = 'episode';
           } else if (record.media_type === 'track') {
             mediaType = 'track';
           }
+
+          // Music-specific fields (only for tracks)
+          const isMusic = record.media_type === 'track';
+          const artistName = isMusic ? record.grandparent_title || null : null;
+          const albumName = isMusic ? record.parent_title || null : null;
+          const trackNumber =
+            isMusic && typeof record.media_index === 'number' ? record.media_index : null;
+          const discNumber =
+            isMusic && typeof record.parent_media_index === 'number'
+              ? record.parent_media_index
+              : null;
 
           const sessionKey =
             record.session_key != null
@@ -684,6 +918,15 @@ export class TautulliService {
               };
             })(),
             bitrate: null,
+            // Music fields (only populated for tracks)
+            artistName,
+            albumName,
+            trackNumber,
+            discNumber,
+            // Live TV fields (not available in get_history API - would require get_stream_data)
+            channelTitle: null,
+            channelIdentifier: null,
+            channelThumb: null,
           });
 
           // Track session grouping for referenceId linking
@@ -765,12 +1008,15 @@ export class TautulliService {
     }
 
     // Refresh TimescaleDB aggregates so imported data appears in stats immediately
-    progress.message = 'Refreshing aggregates...';
-    publishProgress(progress);
-    try {
-      await refreshAggregates();
-    } catch (err) {
-      console.warn('Failed to refresh aggregates after import:', err);
+    // Skip if enrichment will follow (it will refresh after updating bitrate data)
+    if (!skipRefresh) {
+      progress.message = 'Refreshing aggregates...';
+      publishProgress(progress);
+      try {
+        await refreshAggregates();
+      } catch (err) {
+        console.warn('Failed to refresh aggregates after import:', err);
+      }
     }
 
     // Build final message with detailed breakdown
@@ -818,4 +1064,321 @@ export class TautulliService {
           : undefined,
     };
   }
+
+  /**
+   * Enrich existing sessions with detailed stream quality data (BETA)
+   *
+   * Rate limiting: 50ms delay between requests (no server-side limits)
+   *
+   * @param serverId - Server to enrich sessions for
+   * @param pubSubService - Optional pubsub for progress updates
+   * @param onProgress - Optional callback for progress updates
+   * @param options - Enrichment options
+   */
+  static async enrichStreamDetails(
+    serverId: string,
+    pubSubService?: PubSubService,
+    onProgress?: (progress: TautulliImportProgress) => Promise<void>,
+    options?: { limit?: number }
+  ): Promise<{ enriched: number; failed: number; skipped: number }> {
+    const CHUNK_SIZE = options?.limit ?? 10000; // Process in chunks of 10k, auto-continue until done
+    const BATCH_SIZE = 50; // Process 50 sessions per batch for DB writes
+    const CONCURRENCY = 10; // 10 parallel API calls
+
+    // Get Tautulli settings
+    const settingsRow = await db.select().from(settings).where(eq(settings.id, 1)).limit(1);
+    const config = settingsRow[0];
+    if (!config?.tautulliUrl || !config?.tautulliApiKey) {
+      throw new Error('Tautulli is not configured');
+    }
+
+    const tautulli = new TautulliService(config.tautulliUrl, config.tautulliApiKey);
+
+    // Test connection
+    const connected = await tautulli.testConnection();
+    if (!connected) {
+      throw new Error('Failed to connect to Tautulli');
+    }
+
+    // Initialize progress
+    const progress: TautulliImportProgress = {
+      status: 'processing',
+      totalRecords: 0,
+      fetchedRecords: 0,
+      processedRecords: 0,
+      importedRecords: 0,
+      updatedRecords: 0,
+      skippedRecords: 0,
+      duplicateRecords: 0,
+      unknownUserRecords: 0,
+      activeSessionRecords: 0,
+      errorRecords: 0,
+      currentPage: 0,
+      totalPages: 1,
+      message: 'Starting enrichment...',
+    };
+
+    const publishProgress = createSimpleProgressPublisher(
+      pubSubService,
+      'import:progress',
+      onProgress
+    );
+    publishProgress(progress);
+
+    let totalEnriched = 0;
+    let totalFailed = 0;
+    let totalSkipped = 0;
+    let lastProgressTime = Date.now();
+    let chunkNumber = 0;
+
+    // Process in chunks until no more sessions to enrich
+    while (true) {
+      chunkNumber++;
+
+      // Query sessions missing quality data that have an externalSessionId
+      // Only enrich sessions where sourceVideoCodec is NULL (indicates no stream data)
+      // Order by externalSessionId DESC to process recent sessions first (higher row_id = more recent)
+      // Tautulli may have purged stream data for older sessions
+      const sessionsToEnrich = await db
+        .select({
+          id: sessions.id,
+          externalSessionId: sessions.externalSessionId,
+          sessionKey: sessions.sessionKey,
+        })
+        .from(sessions)
+        .where(
+          and(
+            eq(sessions.serverId, serverId),
+            isNotNull(sessions.externalSessionId),
+            isNull(sessions.sourceVideoCodec)
+          )
+        )
+        .orderBy(sql`CAST(${sessions.externalSessionId} AS INTEGER) DESC`)
+        .limit(CHUNK_SIZE);
+
+      if (sessionsToEnrich.length === 0) {
+        break; // No more sessions to enrich
+      }
+
+      progress.totalRecords += sessionsToEnrich.length;
+      progress.message = `Chunk ${chunkNumber}: Enriching ${sessionsToEnrich.length} sessions...`;
+      publishProgress(progress);
+
+      // Process sessions in batches with parallel API calls
+      for (let batchStart = 0; batchStart < sessionsToEnrich.length; batchStart += BATCH_SIZE) {
+        const batch = sessionsToEnrich.slice(batchStart, batchStart + BATCH_SIZE);
+
+        // Process batch with concurrency limit
+        const pendingUpdates: Array<{
+          id: string;
+          data: ReturnType<typeof mapStreamDataToSession>;
+        }> = [];
+
+        // Process in chunks of CONCURRENCY
+        for (let i = 0; i < batch.length; i += CONCURRENCY) {
+          const chunk = batch.slice(i, i + CONCURRENCY);
+
+          const results = await Promise.allSettled(
+            chunk.map(async (session) => {
+              // Parse the externalSessionId as row_id (Tautulli's reference_id)
+              if (!session.externalSessionId) {
+                return { status: 'skipped' as const, id: session.id };
+              }
+              const rowId = parseInt(session.externalSessionId, 10);
+              if (isNaN(rowId)) {
+                return { status: 'skipped' as const, id: session.id };
+              }
+
+              // Fetch stream data from Tautulli
+              const streamData = await tautulli.getStreamData(
+                rowId,
+                session.sessionKey ?? undefined
+              );
+
+              if (!streamData) {
+                return { status: 'skipped' as const, id: session.id };
+              }
+
+              // Map the data
+              const mappedData = mapStreamDataToSession(streamData);
+
+              // Only return update if we got meaningful data
+              if (
+                mappedData.sourceVideoCodec ||
+                mappedData.sourceAudioCodec ||
+                mappedData.bitrate
+              ) {
+                return { status: 'enriched' as const, id: session.id, data: mappedData };
+              }
+              return { status: 'skipped' as const, id: session.id };
+            })
+          );
+
+          // Process results
+          for (const result of results) {
+            progress.processedRecords++;
+
+            if (result.status === 'fulfilled') {
+              const value = result.value;
+              if (value.status === 'enriched' && value.data) {
+                pendingUpdates.push({ id: value.id, data: value.data });
+              } else {
+                totalSkipped++;
+                progress.skippedRecords++;
+              }
+            } else {
+              console.warn(`[Tautulli] Failed to enrich session:`, result.reason);
+              totalFailed++;
+              progress.errorRecords++;
+            }
+          }
+        }
+
+        // Batch write all updates in a single transaction
+        if (pendingUpdates.length > 0) {
+          await db.transaction(async (tx) => {
+            for (const update of pendingUpdates) {
+              await tx.update(sessions).set(update.data).where(eq(sessions.id, update.id));
+            }
+          });
+          totalEnriched += pendingUpdates.length;
+          progress.updatedRecords += pendingUpdates.length;
+        }
+
+        // Progress update after each batch
+        const now = Date.now();
+        if (now - lastProgressTime > 1000 || batchStart + BATCH_SIZE >= sessionsToEnrich.length) {
+          progress.message = `Chunk ${chunkNumber}: Enriched ${totalEnriched} total (${progress.processedRecords}/${progress.totalRecords} processed)...`;
+          publishProgress(progress);
+          lastProgressTime = now;
+        }
+      }
+
+      // If we got fewer than CHUNK_SIZE, we're done
+      if (sessionsToEnrich.length < CHUNK_SIZE) {
+        break;
+      }
+    }
+
+    // Refresh aggregates so updated bitrate data appears in bandwidth stats
+    if (totalEnriched > 0) {
+      progress.message = 'Refreshing aggregates...';
+      publishProgress(progress);
+      try {
+        await refreshAggregates();
+      } catch (err) {
+        console.warn('[Tautulli] Failed to refresh aggregates after enrichment:', err);
+      }
+    }
+
+    // Final progress
+    progress.status = 'complete';
+    progress.message = `Enrichment complete: ${totalEnriched} enriched, ${totalFailed} failed, ${totalSkipped} skipped`;
+    publishProgress(progress);
+
+    return { enriched: totalEnriched, failed: totalFailed, skipped: totalSkipped };
+  }
+}
+
+/**
+ * Map Tautulli stream data to our session schema fields
+ * This converts the Tautulli API response to our database column format
+ */
+export function mapStreamDataToSession(
+  streamData: TautulliStreamData
+): Partial<typeof sessions.$inferInsert> {
+  // Helper to convert boolean-like values
+  const toBool = (v: number | boolean | null | undefined): boolean => v === 1 || v === true;
+
+  // Build source video details JSONB
+  const sourceVideoDetails: Record<string, unknown> = {};
+  if (streamData.video_bitrate) sourceVideoDetails.bitrate = streamData.video_bitrate;
+  if (streamData.video_framerate) sourceVideoDetails.framerate = streamData.video_framerate;
+  if (streamData.video_dynamic_range)
+    sourceVideoDetails.dynamicRange = streamData.video_dynamic_range;
+  if (streamData.video_profile) sourceVideoDetails.profile = streamData.video_profile;
+  if (streamData.video_codec_level) sourceVideoDetails.level = streamData.video_codec_level;
+  if (streamData.video_color_space) sourceVideoDetails.colorSpace = streamData.video_color_space;
+  if (streamData.video_bit_depth) sourceVideoDetails.colorDepth = streamData.video_bit_depth;
+  if (streamData.video_color_primaries)
+    sourceVideoDetails.colorPrimaries = streamData.video_color_primaries;
+
+  // Build source audio details JSONB
+  const sourceAudioDetails: Record<string, unknown> = {};
+  if (streamData.audio_bitrate) sourceAudioDetails.bitrate = streamData.audio_bitrate;
+  if (streamData.audio_channel_layout)
+    sourceAudioDetails.channelLayout = streamData.audio_channel_layout;
+  if (streamData.audio_language) sourceAudioDetails.language = streamData.audio_language;
+  if (streamData.audio_sample_rate) sourceAudioDetails.sampleRate = streamData.audio_sample_rate;
+
+  // Build stream video details JSONB
+  const streamVideoDetails: Record<string, unknown> = {};
+  if (streamData.stream_video_bitrate) streamVideoDetails.bitrate = streamData.stream_video_bitrate;
+  if (streamData.stream_video_width) streamVideoDetails.width = streamData.stream_video_width;
+  if (streamData.stream_video_height) streamVideoDetails.height = streamData.stream_video_height;
+  if (streamData.stream_video_framerate)
+    streamVideoDetails.framerate = streamData.stream_video_framerate;
+  if (streamData.stream_video_dynamic_range)
+    streamVideoDetails.dynamicRange = streamData.stream_video_dynamic_range;
+
+  // Build stream audio details JSONB
+  const streamAudioDetails: Record<string, unknown> = {};
+  if (streamData.stream_audio_bitrate) streamAudioDetails.bitrate = streamData.stream_audio_bitrate;
+  if (streamData.stream_audio_channels)
+    streamAudioDetails.channels = streamData.stream_audio_channels;
+  if (streamData.stream_audio_language)
+    streamAudioDetails.language = streamData.stream_audio_language;
+
+  // Build transcode info JSONB
+  const transcodeInfo: Record<string, unknown> = {};
+  if (streamData.container_decision)
+    transcodeInfo.containerDecision = streamData.container_decision;
+  if (streamData.container) transcodeInfo.sourceContainer = streamData.container;
+  if (streamData.stream_container) transcodeInfo.streamContainer = streamData.stream_container;
+  if (streamData.transcode_hw_decoding !== undefined) {
+    transcodeInfo.hwDecoding = toBool(streamData.transcode_hw_decoding);
+  }
+  if (streamData.transcode_hw_encoding !== undefined) {
+    transcodeInfo.hwEncoding = toBool(streamData.transcode_hw_encoding);
+  }
+  if (streamData.transcode_hw_decode) transcodeInfo.hwDecodeType = streamData.transcode_hw_decode;
+  if (streamData.transcode_hw_encode) transcodeInfo.hwEncodeType = streamData.transcode_hw_encode;
+  if (streamData.transcode_speed) {
+    const speed = parseFloat(streamData.transcode_speed);
+    if (!isNaN(speed)) transcodeInfo.speed = speed;
+  }
+  if (streamData.transcode_throttled !== undefined) {
+    transcodeInfo.throttled = toBool(streamData.transcode_throttled);
+  }
+
+  // Build subtitle info JSONB
+  const subtitleInfo: Record<string, unknown> = {};
+  if (streamData.subtitle_decision) subtitleInfo.decision = streamData.subtitle_decision;
+  if (streamData.subtitle_codec) subtitleInfo.codec = streamData.subtitle_codec;
+  if (streamData.subtitle_language) subtitleInfo.language = streamData.subtitle_language;
+  if (streamData.subtitle_forced !== undefined) {
+    subtitleInfo.forced = toBool(streamData.subtitle_forced);
+  }
+
+  // Return mapped fields (only include non-empty objects)
+  return {
+    // Scalar fields (uppercase codecs for consistency with other importers)
+    sourceVideoCodec: streamData.video_codec?.toUpperCase() ?? null,
+    sourceVideoWidth: streamData.video_width ?? null,
+    sourceVideoHeight: streamData.video_height ?? null,
+    sourceAudioCodec: streamData.audio_codec?.toUpperCase() ?? null,
+    sourceAudioChannels: streamData.audio_channels ?? null,
+    streamVideoCodec: streamData.stream_video_codec?.toUpperCase() ?? null,
+    streamAudioCodec: streamData.stream_audio_codec?.toUpperCase() ?? null,
+    bitrate: streamData.bandwidth ?? streamData.stream_bitrate ?? streamData.bitrate ?? null,
+    quality: streamData.quality_profile ?? null,
+
+    // JSONB fields (only set if they have content)
+    ...(Object.keys(sourceVideoDetails).length > 0 && { sourceVideoDetails }),
+    ...(Object.keys(sourceAudioDetails).length > 0 && { sourceAudioDetails }),
+    ...(Object.keys(streamVideoDetails).length > 0 && { streamVideoDetails }),
+    ...(Object.keys(streamAudioDetails).length > 0 && { streamAudioDetails }),
+    ...(Object.keys(transcodeInfo).length > 0 && { transcodeInfo }),
+    ...(Object.keys(subtitleInfo).length > 0 && { subtitleInfo }),
+  };
 }

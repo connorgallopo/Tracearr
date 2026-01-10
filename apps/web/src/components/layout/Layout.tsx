@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AppSidebar } from './AppSidebar';
 import { Header } from './Header';
+import { ServerHealthBanner } from './ServerHealthBanner';
 
 export function Layout() {
   return (
@@ -10,6 +11,7 @@ export function Layout() {
       <AppSidebar />
       <SidebarInset>
         <Header />
+        <ServerHealthBanner />
         <ScrollArea className="flex-1">
           <main className="p-6">
             <Outlet />

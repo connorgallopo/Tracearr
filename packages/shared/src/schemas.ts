@@ -304,6 +304,8 @@ export const updateSettingsSchema = z.object({
   // Poller settings
   pollerEnabled: z.boolean().optional(),
   pollerIntervalMs: z.number().int().min(5000).max(300000).optional(),
+  // GeoIP settings
+  usePlexGeoip: z.boolean().optional(),
   // Tautulli integration
   tautulliUrl: z.url().nullable().optional(),
   tautulliApiKey: z.string().nullable().optional(),
@@ -318,6 +320,8 @@ export const updateSettingsSchema = z.object({
 // Tautulli import schemas
 export const tautulliImportSchema = z.object({
   serverId: uuidSchema, // Which Tracearr server to import into
+  overwriteFriendlyNames: z.boolean().optional(), // Whether to overwrite existing identity names
+  includeStreamDetails: z.boolean().optional(), // (BETA) Fetch detailed codec/bitrate info via additional API calls
 });
 
 // ============================================================================
@@ -397,6 +401,7 @@ export const jellystatBackupSchema = z.array(
 export const jellystatImportBodySchema = z.object({
   serverId: uuidSchema, // Which Tracearr server to import into
   enrichMedia: z.coerce.boolean().default(true), // Fetch season/episode from Jellyfin API
+  updateStreamDetails: z.coerce.boolean().default(false), // Update existing records with stream/transcode data
 });
 
 /**

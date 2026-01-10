@@ -10,7 +10,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NotificationService, sendTestWebhook } from '../notify.js';
-import type { ViolationWithDetails, ActiveSession, Settings } from '@tracearr/shared';
+import type { ViolationWithDetails, Settings } from '@tracearr/shared';
+import { createMockActiveSession } from '../../test/fixtures.js';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -47,6 +48,7 @@ describe('NotificationService', () => {
     trustProxy: false,
     mobileEnabled: false,
     primaryAuthMethod: 'local',
+    usePlexGeoip: false,
     ...overrides,
   });
 
@@ -70,59 +72,6 @@ describe('NotificationService', () => {
       id: 'rule-456',
       name: 'Test Rule',
       type: 'concurrent_streams',
-    },
-  });
-
-  const createMockSession = (): ActiveSession => ({
-    id: 'session-123',
-    serverId: 'server-456',
-    serverUserId: 'user-789',
-    sessionKey: 'key-123',
-    state: 'playing',
-    mediaTitle: 'Test Movie',
-    mediaType: 'movie',
-    grandparentTitle: null,
-    seasonNumber: null,
-    episodeNumber: null,
-    year: 2024,
-    thumbPath: null,
-    ratingKey: 'rating-123',
-    externalSessionId: null,
-    startedAt: new Date(),
-    stoppedAt: null,
-    durationMs: 3600000,
-    totalDurationMs: 7200000,
-    progressMs: 3600000,
-    lastPausedAt: null,
-    pausedDurationMs: 0,
-    referenceId: null,
-    watched: false,
-    ipAddress: '192.168.1.1',
-    geoCity: 'New York',
-    geoRegion: 'NY',
-    geoCountry: 'US',
-    geoLat: 40.7128,
-    geoLon: -74.006,
-    playerName: 'Test Device',
-    deviceId: 'device-123',
-    product: 'Test Client',
-    device: 'Desktop',
-    platform: 'Windows',
-    quality: '1080p',
-    isTranscode: false,
-    bitrate: 10000,
-    videoDecision: 'directplay',
-    audioDecision: 'directplay',
-    user: {
-      id: 'user-789',
-      username: 'testuser',
-      thumbUrl: null,
-      identityName: 'Test User',
-    },
-    server: {
-      id: 'server-456',
-      name: 'Test Server',
-      type: 'plex',
     },
   });
 
@@ -423,7 +372,15 @@ describe('NotificationService', () => {
         ntfyAuthToken: 'tk_session_token',
       });
 
-      await notificationService.notifySessionStarted(createMockSession(), settings);
+      const session = createMockActiveSession({
+        user: {
+          id: 'user-789',
+          username: 'testuser',
+          thumbUrl: null,
+          identityName: 'Test User',
+        },
+      });
+      await notificationService.notifySessionStarted(session, settings);
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://ntfy.example.com',

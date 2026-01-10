@@ -52,7 +52,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can import data');
     }
 
-    const { serverId } = body.data;
+    const { serverId, overwriteFriendlyNames = false, includeStreamDetails = false } = body.data;
 
     // Sync server users first to ensure we have all users before importing history
     try {
@@ -66,7 +66,12 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
 
     // Enqueue import job
     try {
-      const jobId = await enqueueImport(serverId, authUser.userId);
+      const jobId = await enqueueImport(
+        serverId,
+        authUser.userId,
+        overwriteFriendlyNames,
+        includeStreamDetails
+      );
 
       return {
         status: 'queued',
@@ -85,9 +90,28 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       const pubSubService = getPubSubService();
 
       // Start import in background (non-blocking)
-      TautulliService.importHistory(serverId, pubSubService ?? undefined)
-        .then((result) => {
+      TautulliService.importHistory(serverId, pubSubService ?? undefined, undefined, {
+        overwriteFriendlyNames,
+        skipRefresh: includeStreamDetails, // Skip refresh if enrichment will follow
+      })
+        .then(async (result) => {
           console.log(`[Import] Tautulli import completed:`, result);
+
+          // (BETA) Enrich with stream details
+          if (includeStreamDetails && result.success) {
+            console.log(`[Import] Starting stream details enrichment for server ${serverId}`);
+            try {
+              const enrichResult = await TautulliService.enrichStreamDetails(
+                serverId,
+                pubSubService ?? undefined
+              );
+              console.log(
+                `[Import] Stream enrichment complete: ${enrichResult.enriched} enriched, ${enrichResult.failed} failed`
+              );
+            } catch (enrichError) {
+              console.error(`[Import] Stream enrichment failed:`, enrichError);
+            }
+          }
         })
         .catch((err: unknown) => {
           console.error(`[Import] Tautulli import failed:`, err);
@@ -266,9 +290,15 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     const serverId = getFieldValue(data.fields.serverId);
     const enrichMediaStr = getFieldValue(data.fields.enrichMedia) ?? 'true';
     const enrichMedia = enrichMediaStr === 'true';
+    const updateStreamDetailsStr = getFieldValue(data.fields.updateStreamDetails) ?? 'false';
+    const updateStreamDetails = updateStreamDetailsStr === 'true';
 
     // Validate server ID
-    const parsed = jellystatImportBodySchema.safeParse({ serverId, enrichMedia });
+    const parsed = jellystatImportBodySchema.safeParse({
+      serverId,
+      enrichMedia,
+      updateStreamDetails,
+    });
     if (!parsed.success) {
       return reply.badRequest('Invalid request: serverId is required');
     }
@@ -309,7 +339,8 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         parsed.data.serverId,
         authUser.userId,
         backupJson,
-        parsed.data.enrichMedia
+        parsed.data.enrichMedia,
+        parsed.data.updateStreamDetails
       );
 
       return {
@@ -333,7 +364,8 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         parsed.data.serverId,
         backupJson,
         enrichMedia,
-        pubSubService ?? undefined
+        pubSubService ?? undefined,
+        { updateStreamDetails: parsed.data.updateStreamDetails }
       )
         .then((result) => {
           console.log(`[Import] Jellystat import completed:`, result);

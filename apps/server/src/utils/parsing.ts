@@ -36,6 +36,36 @@ export function parseOptionalString(val: unknown): string | undefined {
 }
 
 /**
+ * Safely convert unknown value to string with maximum length
+ * Truncates strings that exceed the maxLength limit (for DB varchar columns)
+ *
+ * @param val - Value to convert
+ * @param maxLength - Maximum allowed string length
+ * @param defaultVal - Default if val is null/undefined (default: '')
+ *
+ * @example
+ * parseBoundedString(response.ChannelTitle, 255) // "CNN" (or truncated if > 255)
+ * parseBoundedString(response.Id, 100, 'unknown') // max 100 chars
+ */
+export function parseBoundedString(val: unknown, maxLength: number, defaultVal = ''): string {
+  const str = parseString(val, defaultVal);
+  return str.length > maxLength ? str.slice(0, maxLength) : str;
+}
+
+/**
+ * Safely convert unknown value to bounded string or undefined
+ * Returns undefined if value is null/undefined, otherwise converts and truncates
+ *
+ * @example
+ * parseOptionalBoundedString(response.AlbumName, 255) // string (max 255) or undefined
+ */
+export function parseOptionalBoundedString(val: unknown, maxLength: number): string | undefined {
+  if (val == null) return undefined;
+  const str = String(val);
+  return str.length > maxLength ? str.slice(0, maxLength) : str;
+}
+
+/**
  * Safely convert unknown value to number
  *
  * @param val - Value to convert
@@ -290,6 +320,8 @@ export function parseDateString(val: unknown): string | null {
 export const parse = {
   string: parseString,
   optionalString: parseOptionalString,
+  boundedString: parseBoundedString,
+  optionalBoundedString: parseOptionalBoundedString,
   stringOrNull: parseStringOrNull,
   number: parseNumber,
   optionalNumber: parseOptionalNumber,

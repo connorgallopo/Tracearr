@@ -24,14 +24,22 @@ import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { tokenStorage } from '@/lib/api';
 import { useChannelRouting } from './queries';
+import { api } from '@/lib/api';
 
 type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
+
+interface UnhealthyServer {
+  serverId: string;
+  serverName: string;
+  since: Date;
+}
 
 interface SocketContextValue {
   socket: TypedSocket | null;
   isConnected: boolean;
   subscribeSessions: () => void;
   unsubscribeSessions: () => void;
+  unhealthyServers: UnhealthyServer[];
 }
 
 const SocketContext = createContext<SocketContextValue | null>(null);
@@ -41,6 +49,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [socket, setSocket] = useState<TypedSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [unhealthyServers, setUnhealthyServers] = useState<UnhealthyServer[]>([]);
 
   // Get channel routing for web toast preferences
   const { data: routingData } = useChannelRouting();
@@ -61,6 +70,23 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     // Default to true if routing not yet loaded
     return routing?.webToastEnabled ?? true;
   }, []);
+
+  // Fetch initial server health status on authentication
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUnhealthyServers([]);
+      return;
+    }
+
+    api.servers
+      .health()
+      .then((servers) => {
+        setUnhealthyServers(servers.map((s) => ({ ...s, since: new Date() })));
+      })
+      .catch(() => {
+        // Ignore errors - health check is best-effort
+      });
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -179,6 +205,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     newSocket.on(
       WS_EVENTS.SERVER_DOWN as 'server:down',
       (data: { serverId: string; serverName: string }) => {
+        // Track unhealthy server for persistent banner
+        setUnhealthyServers((prev) => {
+          // Avoid duplicates
+          if (prev.some((s) => s.serverId === data.serverId)) return prev;
+          return [...prev, { ...data, since: new Date() }];
+        });
+
         if (isWebToastEnabled('server_down')) {
           toast.error('Server Offline', {
             description: `${data.serverName} is unreachable`,
@@ -191,6 +224,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     newSocket.on(
       WS_EVENTS.SERVER_UP as 'server:up',
       (data: { serverId: string; serverName: string }) => {
+        // Remove from unhealthy servers
+        setUnhealthyServers((prev) => prev.filter((s) => s.serverId !== data.serverId));
+
         if (isWebToastEnabled('server_up')) {
           toast.success('Server Online', {
             description: `${data.serverName} is back online`,
@@ -224,8 +260,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       isConnected,
       subscribeSessions,
       unsubscribeSessions,
+      unhealthyServers,
     }),
-    [socket, isConnected, subscribeSessions, unsubscribeSessions]
+    [socket, isConnected, subscribeSessions, unsubscribeSessions, unhealthyServers]
   );
 
   return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;

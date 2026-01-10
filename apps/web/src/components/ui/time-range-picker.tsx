@@ -72,7 +72,7 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
           key={preset.value}
           onClick={() => handlePresetClick(preset.value)}
           className={cn(
-            'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+            'cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
             value.period === preset.value
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -87,7 +87,7 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
         <PopoverTrigger asChild>
           <button
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              'inline-flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
               value.period === 'custom'
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'

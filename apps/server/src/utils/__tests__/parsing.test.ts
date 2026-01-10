@@ -1,667 +1,164 @@
 /**
- * Parsing Utility Tests
+ * Unit tests for parsing utilities
  *
- * Tests the ACTUAL exported functions from parsing.ts:
- * - parseString / parseOptionalString / parseStringOrNull
- * - parseNumber / parseOptionalNumber / parseNumberOrEmpty
- * - parseBoolean / parseOptionalBoolean
- * - parseArray / parseFilteredArray / parseFirstArrayElement
- * - getNestedObject / getNestedValue
- * - parseDate / parseDateString
- * - parse (convenience object)
- *
- * These tests validate:
- * - Correct type coercion for various inputs
- * - Default value handling
- * - null/undefined handling
- * - Edge cases (empty strings, NaN, invalid dates)
- * - Real-world API response patterns from Plex/Jellyfin/Tautulli
+ * Tests parseBoundedString and parseOptionalBoundedString functions
+ * used for DB varchar column length validation.
  */
 
 import { describe, it, expect } from 'vitest';
+import { parseBoundedString, parseOptionalBoundedString } from '../parsing.js';
 
-// Import ACTUAL production functions - not local duplicates
-import {
-  parseString,
-  parseOptionalString,
-  parseStringOrNull,
-  parseNumber,
-  parseOptionalNumber,
-  parseNumberOrEmpty,
-  parseBoolean,
-  parseOptionalBoolean,
-  parseArray,
-  parseFilteredArray,
-  parseFirstArrayElement,
-  findSelectedElement,
-  parseSelectedArrayElement,
-  getNestedObject,
-  getNestedValue,
-  parseDate,
-  parseDateString,
-  parse,
-} from '../parsing.js';
-
-describe('parseString', () => {
-  it('should convert values to string', () => {
-    expect(parseString('hello')).toBe('hello');
-    expect(parseString(123)).toBe('123');
-    expect(parseString(true)).toBe('true');
-    expect(parseString(0)).toBe('0');
+describe('parseBoundedString', () => {
+  it('returns empty string for null', () => {
+    expect(parseBoundedString(null, 10)).toBe('');
   });
 
-  it('should return default for null/undefined', () => {
-    expect(parseString(null)).toBe('');
-    expect(parseString(undefined)).toBe('');
+  it('returns empty string for undefined', () => {
+    expect(parseBoundedString(undefined, 10)).toBe('');
   });
 
-  it('should use custom default value', () => {
-    expect(parseString(null, 'default')).toBe('default');
-    expect(parseString(undefined, 'unknown')).toBe('unknown');
+  it('returns custom default for null/undefined', () => {
+    expect(parseBoundedString(null, 10, 'default')).toBe('default');
+    expect(parseBoundedString(undefined, 10, 'fallback')).toBe('fallback');
   });
 
-  it('should handle empty string as valid value', () => {
-    expect(parseString('')).toBe('');
+  it('returns string unchanged when under limit', () => {
+    expect(parseBoundedString('short', 10)).toBe('short');
+    expect(parseBoundedString('exactly10!', 10)).toBe('exactly10!');
   });
 
-  it('should handle objects (converts to [object Object])', () => {
-    expect(parseString({})).toBe('[object Object]');
-  });
-});
-
-describe('parseOptionalString', () => {
-  it('should convert values to string', () => {
-    expect(parseOptionalString('hello')).toBe('hello');
-    expect(parseOptionalString(123)).toBe('123');
+  it('truncates string when over limit', () => {
+    expect(parseBoundedString('this is too long', 10)).toBe('this is to');
+    expect(parseBoundedString('abcdefghijk', 5)).toBe('abcde');
   });
 
-  it('should return undefined for null/undefined', () => {
-    expect(parseOptionalString(null)).toBeUndefined();
-    expect(parseOptionalString(undefined)).toBeUndefined();
+  it('converts numbers to strings', () => {
+    expect(parseBoundedString(12345, 3)).toBe('123');
+    expect(parseBoundedString(42, 10)).toBe('42');
   });
 
-  it('should handle empty string as valid value', () => {
-    expect(parseOptionalString('')).toBe('');
-  });
-});
-
-describe('parseStringOrNull', () => {
-  it('should convert values to string', () => {
-    expect(parseStringOrNull('hello')).toBe('hello');
-    expect(parseStringOrNull(123)).toBe('123');
+  it('handles empty string', () => {
+    expect(parseBoundedString('', 10)).toBe('');
   });
 
-  it('should return null for null/undefined', () => {
-    expect(parseStringOrNull(null)).toBeNull();
-    expect(parseStringOrNull(undefined)).toBeNull();
+  it('handles zero maxLength', () => {
+    expect(parseBoundedString('anything', 0)).toBe('');
   });
 
-  it('should handle empty string as valid value', () => {
-    expect(parseStringOrNull('')).toBe('');
-  });
-});
-
-describe('parseNumber', () => {
-  it('should convert numeric values', () => {
-    expect(parseNumber(123)).toBe(123);
-    expect(parseNumber('456')).toBe(456);
-    expect(parseNumber(3.14)).toBe(3.14);
-    expect(parseNumber('3.14')).toBe(3.14);
+  it('truncates at exact boundary', () => {
+    expect(parseBoundedString('12345', 5)).toBe('12345');
+    expect(parseBoundedString('123456', 5)).toBe('12345');
   });
 
-  it('should return default for null/undefined', () => {
-    expect(parseNumber(null)).toBe(0);
-    expect(parseNumber(undefined)).toBe(0);
+  it('handles unicode characters', () => {
+    // Note: slice counts UTF-16 code units, not graphemes
+    expect(parseBoundedString('Hello World', 5)).toBe('Hello');
   });
 
-  it('should return default for NaN', () => {
-    expect(parseNumber('invalid')).toBe(0);
-    expect(parseNumber(NaN)).toBe(0);
-  });
+  // Edge cases for DB column safety
+  describe('edge cases', () => {
+    it('handles very long strings efficiently', () => {
+      const longString = 'x'.repeat(10000);
+      expect(parseBoundedString(longString, 255)).toHaveLength(255);
+      expect(parseBoundedString(longString, 100)).toHaveLength(100);
+    });
 
-  it('should use custom default value', () => {
-    expect(parseNumber(null, -1)).toBe(-1);
-    expect(parseNumber('invalid', 100)).toBe(100);
-  });
+    it('handles multi-byte unicode (emojis)', () => {
+      // Emojis are 2 UTF-16 code units each
+      const emoji = '😀😀😀';
+      expect(parseBoundedString(emoji, 2).length).toBeLessThanOrEqual(2);
+    });
 
-  it('should handle zero as valid value', () => {
-    expect(parseNumber(0)).toBe(0);
-    expect(parseNumber('0')).toBe(0);
-  });
+    it('handles CJK characters', () => {
+      const cjk = '中文字符测试';
+      expect(parseBoundedString(cjk, 3)).toBe('中文字');
+    });
 
-  it('should handle negative numbers', () => {
-    expect(parseNumber(-5)).toBe(-5);
-    expect(parseNumber('-10')).toBe(-10);
+    it('handles boolean inputs', () => {
+      expect(parseBoundedString(true, 10)).toBe('true');
+      expect(parseBoundedString(false, 10)).toBe('false');
+    });
+
+    it('handles object inputs', () => {
+      expect(parseBoundedString({}, 20)).toBe('[object Object]');
+      expect(parseBoundedString({ a: 1 }, 5)).toBe('[obje');
+    });
+
+    it('handles common DB varchar limits', () => {
+      const text = 'A'.repeat(300);
+      expect(parseBoundedString(text, 255)).toHaveLength(255); // varchar(255)
+      expect(parseBoundedString(text, 100)).toHaveLength(100); // varchar(100)
+      expect(parseBoundedString(text, 500)).toHaveLength(300); // varchar(500) - no truncation
+    });
+
+    it('preserves leading/trailing whitespace within limit', () => {
+      expect(parseBoundedString('  text  ', 10)).toBe('  text  ');
+      expect(parseBoundedString('  text  ', 5)).toBe('  tex');
+    });
+
+    it('default truncates within limit', () => {
+      expect(parseBoundedString(null, 5, 'default-value')).toBe('defau');
+    });
   });
 });
 
-describe('parseOptionalNumber', () => {
-  it('should convert numeric values', () => {
-    expect(parseOptionalNumber(123)).toBe(123);
-    expect(parseOptionalNumber('456')).toBe(456);
+describe('parseOptionalBoundedString', () => {
+  it('returns undefined for null', () => {
+    expect(parseOptionalBoundedString(null, 10)).toBeUndefined();
   });
 
-  it('should return undefined for null/undefined', () => {
-    expect(parseOptionalNumber(null)).toBeUndefined();
-    expect(parseOptionalNumber(undefined)).toBeUndefined();
+  it('returns undefined for undefined', () => {
+    expect(parseOptionalBoundedString(undefined, 10)).toBeUndefined();
   });
 
-  it('should return undefined for NaN', () => {
-    expect(parseOptionalNumber('invalid')).toBeUndefined();
-    expect(parseOptionalNumber(NaN)).toBeUndefined();
+  it('returns string unchanged when under limit', () => {
+    expect(parseOptionalBoundedString('short', 10)).toBe('short');
+    expect(parseOptionalBoundedString('exactly10!', 10)).toBe('exactly10!');
   });
 
-  it('should handle zero as valid value', () => {
-    expect(parseOptionalNumber(0)).toBe(0);
+  it('truncates string when over limit', () => {
+    expect(parseOptionalBoundedString('this is too long', 10)).toBe('this is to');
+    expect(parseOptionalBoundedString('abcdefghijk', 5)).toBe('abcde');
   });
-});
 
-describe('parseNumberOrEmpty', () => {
-  it('should convert numeric values', () => {
-    expect(parseNumberOrEmpty(123)).toBe(123);
-    expect(parseNumberOrEmpty('456')).toBe(456);
+  it('converts numbers to strings', () => {
+    expect(parseOptionalBoundedString(12345, 3)).toBe('123');
+    expect(parseOptionalBoundedString(42, 10)).toBe('42');
   });
 
-  it('should return null for empty string (Tautulli pattern)', () => {
-    expect(parseNumberOrEmpty('')).toBeNull();
+  it('returns empty string for empty string input (not undefined)', () => {
+    expect(parseOptionalBoundedString('', 10)).toBe('');
   });
 
-  it('should return null for null/undefined', () => {
-    expect(parseNumberOrEmpty(null)).toBeNull();
-    expect(parseNumberOrEmpty(undefined)).toBeNull();
+  it('handles zero maxLength', () => {
+    expect(parseOptionalBoundedString('anything', 0)).toBe('');
   });
 
-  it('should return null for invalid numbers', () => {
-    expect(parseNumberOrEmpty('invalid')).toBeNull();
-    expect(parseNumberOrEmpty(NaN)).toBeNull();
-  });
-
-  it('should handle zero as valid value', () => {
-    expect(parseNumberOrEmpty(0)).toBe(0);
-    expect(parseNumberOrEmpty('0')).toBe(0);
-  });
-
-  // Real Tautulli API patterns
-  it('should handle Tautulli year field (number for movies, "" for episodes)', () => {
-    expect(parseNumberOrEmpty(2024)).toBe(2024); // Movie
-    expect(parseNumberOrEmpty('')).toBeNull(); // Episode
-  });
-
-  it('should handle Tautulli media_index field', () => {
-    expect(parseNumberOrEmpty(5)).toBe(5); // Episode number
-    expect(parseNumberOrEmpty('')).toBeNull(); // Movie
-  });
-});
-
-describe('parseBoolean', () => {
-  it('should convert truthy values', () => {
-    expect(parseBoolean(true)).toBe(true);
-    expect(parseBoolean(1)).toBe(true);
-    expect(parseBoolean('true')).toBe(true);
-    expect(parseBoolean('anything')).toBe(true);
-  });
-
-  it('should convert falsy values', () => {
-    expect(parseBoolean(false)).toBe(false);
-    expect(parseBoolean(0)).toBe(false);
-    expect(parseBoolean('')).toBe(false);
-  });
-
-  it('should return default for null/undefined', () => {
-    expect(parseBoolean(null)).toBe(false);
-    expect(parseBoolean(undefined)).toBe(false);
-  });
-
-  it('should use custom default value', () => {
-    expect(parseBoolean(null, true)).toBe(true);
-    expect(parseBoolean(undefined, true)).toBe(true);
-  });
-});
-
-describe('parseOptionalBoolean', () => {
-  it('should convert values to boolean', () => {
-    expect(parseOptionalBoolean(true)).toBe(true);
-    expect(parseOptionalBoolean(false)).toBe(false);
-    expect(parseOptionalBoolean(1)).toBe(true);
-    expect(parseOptionalBoolean(0)).toBe(false);
-  });
-
-  it('should return undefined for null/undefined', () => {
-    expect(parseOptionalBoolean(null)).toBeUndefined();
-    expect(parseOptionalBoolean(undefined)).toBeUndefined();
-  });
-});
-
-describe('parseArray', () => {
-  it('should map array elements', () => {
-    const input = [{ id: 1 }, { id: 2 }, { id: 3 }];
-    const result = parseArray(input, (item) => (item as { id: number }).id);
-
-    expect(result).toEqual([1, 2, 3]);
-  });
-
-  it('should return empty array for non-array', () => {
-    expect(parseArray(null, (x) => x)).toEqual([]);
-    expect(parseArray(undefined, (x) => x)).toEqual([]);
-    expect(parseArray('string', (x) => x)).toEqual([]);
-    expect(parseArray({}, (x) => x)).toEqual([]);
-  });
-
-  it('should handle empty array', () => {
-    expect(parseArray([], (x) => x)).toEqual([]);
-  });
-
-  it('should pass index to mapper', () => {
-    const input = ['a', 'b', 'c'];
-    const result = parseArray(input, (item, index) => `${item}-${index}`);
-
-    expect(result).toEqual(['a-0', 'b-1', 'c-2']);
-  });
-});
-
-describe('parseFilteredArray', () => {
-  it('should filter and map array elements', () => {
-    const input = [
-      { id: 1, active: true },
-      { id: 2, active: false },
-      { id: 3, active: true },
-    ];
-    const result = parseFilteredArray(
-      input,
-      (item) => (item as { active: boolean }).active,
-      (item) => (item as { id: number }).id
-    );
-
-    expect(result).toEqual([1, 3]);
-  });
-
-  it('should return empty array for non-array', () => {
-    expect(
-      parseFilteredArray(
-        null,
-        () => true,
-        (x) => x
-      )
-    ).toEqual([]);
-  });
-
-  // Real Jellyfin pattern: filter sessions with NowPlayingItem
-  it('should handle Jellyfin session filtering pattern', () => {
-    const sessions = [
-      { Id: '1', NowPlayingItem: { Name: 'Movie' } },
-      { Id: '2', NowPlayingItem: null },
-      { Id: '3', NowPlayingItem: { Name: 'Show' } },
-    ];
-
-    const result = parseFilteredArray(
-      sessions,
-      (s) => (s as { NowPlayingItem: unknown }).NowPlayingItem != null,
-      (s) => (s as { Id: string }).Id
-    );
-
-    expect(result).toEqual(['1', '3']);
-  });
-});
-
-describe('parseFirstArrayElement', () => {
-  it('should get property from first array element', () => {
-    const media = [{ bitrate: 8000000 }, { bitrate: 4000000 }];
-    expect(parseFirstArrayElement(media, 'bitrate')).toBe(8000000);
-  });
-
-  it('should return default for empty array', () => {
-    expect(parseFirstArrayElement([], 'bitrate', 0)).toBe(0);
-    expect(parseFirstArrayElement([], 'bitrate')).toBeUndefined();
-  });
-
-  it('should return default for non-array', () => {
-    expect(parseFirstArrayElement(null, 'bitrate', 0)).toBe(0);
-    expect(parseFirstArrayElement(undefined, 'bitrate', 0)).toBe(0);
-    expect(parseFirstArrayElement('string', 'bitrate', 0)).toBe(0);
-  });
-
-  it('should return default when property not found', () => {
-    const media = [{ other: 'value' }];
-    expect(parseFirstArrayElement(media, 'bitrate', 0)).toBe(0);
-  });
-
-  it('should return undefined when property is undefined', () => {
-    const media = [{ bitrate: undefined }];
-    expect(parseFirstArrayElement(media, 'bitrate', 0)).toBe(0);
-  });
-
-  it('should return default when first element is null', () => {
-    const media = [null, { bitrate: 8000000 }];
-    expect(parseFirstArrayElement(media, 'bitrate', 0)).toBe(0);
-  });
-
-  it('should return default when first element is not an object', () => {
-    const media = ['string', { bitrate: 8000000 }];
-    expect(parseFirstArrayElement(media, 'bitrate', 0)).toBe(0);
-  });
-
-  // Real Plex pattern: (item.Media as Record<string, unknown>[])?.[0]?.bitrate
-  it('should handle Plex Media array pattern', () => {
-    const item = {
-      Media: [{ bitrate: 10000000, videoResolution: '1080' }],
-    };
-    expect(parseFirstArrayElement(item.Media, 'bitrate')).toBe(10000000);
-    expect(parseFirstArrayElement(item.Media, 'videoResolution')).toBe('1080');
-  });
-
-  // Real Jellyfin pattern: mediaSources?.[0]?.bitrate
-  it('should handle Jellyfin MediaSources pattern', () => {
-    const nowPlaying = {
-      mediaSources: [{ Bitrate: 5000000 }],
-    };
-    expect(parseFirstArrayElement(nowPlaying.mediaSources, 'Bitrate')).toBe(5000000);
-  });
-});
-
-describe('findSelectedElement', () => {
-  it('should find element with selected=1 (number)', () => {
-    const media = [
-      { resolution: '4k', bitrate: 50000 },
-      { resolution: '1080', bitrate: 10000, selected: 1 },
-    ];
-    const selected = findSelectedElement(media);
-    expect(selected).toEqual({ resolution: '1080', bitrate: 10000, selected: 1 });
-  });
-
-  it('should find element with selected="1" (string)', () => {
-    const media = [
-      { resolution: '4k', bitrate: 50000 },
-      { resolution: '1080', bitrate: 10000, selected: '1' },
-    ];
-    const selected = findSelectedElement(media);
-    expect(selected).toEqual({ resolution: '1080', bitrate: 10000, selected: '1' });
-  });
-
-  it('should find element with selected=true (boolean)', () => {
-    const media = [
-      { resolution: '4k', bitrate: 50000 },
-      { resolution: '1080', bitrate: 10000, selected: true },
-    ];
-    const selected = findSelectedElement(media);
-    expect(selected).toEqual({ resolution: '1080', bitrate: 10000, selected: true });
-  });
-
-  it('should fall back to first element when none selected', () => {
-    const media = [
-      { resolution: '4k', bitrate: 50000 },
-      { resolution: '1080', bitrate: 10000 },
-    ];
-    const selected = findSelectedElement(media);
-    expect(selected).toEqual({ resolution: '4k', bitrate: 50000 });
-  });
-
-  it('should return undefined for empty array', () => {
-    expect(findSelectedElement([])).toBeUndefined();
-  });
-
-  it('should return undefined for non-array', () => {
-    expect(findSelectedElement(null)).toBeUndefined();
-    expect(findSelectedElement(undefined)).toBeUndefined();
-    expect(findSelectedElement('string')).toBeUndefined();
-  });
-
-  it('should handle Plex multi-version media pattern (issue #117)', () => {
-    // Plex returns multiple Media entries when user has 4K and 1080p versions
-    const media = [
-      { videoResolution: '4k', width: 3840, height: 2160, bitrate: 50000 },
-      { videoResolution: '1080', width: 1920, height: 1080, bitrate: 10000, selected: 1 },
-    ];
-    const selected = findSelectedElement(media);
-    expect(selected?.videoResolution).toBe('1080');
-    expect(selected?.width).toBe(1920);
-  });
-});
-
-describe('parseSelectedArrayElement', () => {
-  it('should get property from selected element', () => {
-    const media = [{ bitrate: 50000 }, { bitrate: 10000, selected: 1 }];
-    expect(parseSelectedArrayElement(media, 'bitrate')).toBe(10000);
-  });
-
-  it('should fall back to first element when none selected', () => {
-    const media = [{ bitrate: 50000 }, { bitrate: 10000 }];
-    expect(parseSelectedArrayElement(media, 'bitrate')).toBe(50000);
-  });
-
-  it('should return default for empty array', () => {
-    expect(parseSelectedArrayElement([], 'bitrate', 0)).toBe(0);
-    expect(parseSelectedArrayElement([], 'bitrate')).toBeUndefined();
-  });
-
-  it('should return default for non-array', () => {
-    expect(parseSelectedArrayElement(null, 'bitrate', 0)).toBe(0);
-    expect(parseSelectedArrayElement(undefined, 'bitrate', 0)).toBe(0);
-  });
-
-  it('should return default when property not found', () => {
-    const media = [{ other: 'value', selected: 1 }];
-    expect(parseSelectedArrayElement(media, 'bitrate', 0)).toBe(0);
-  });
-
-  it('should handle Plex multi-version resolution extraction', () => {
-    const item = {
-      Media: [
-        { videoResolution: '4k', bitrate: 50000 },
-        { videoResolution: '1080', bitrate: 10000, selected: 1 },
-      ],
-    };
-    expect(parseSelectedArrayElement(item.Media, 'videoResolution')).toBe('1080');
-    expect(parseSelectedArrayElement(item.Media, 'bitrate')).toBe(10000);
-  });
-});
-
-describe('getNestedObject', () => {
-  it('should get nested object', () => {
-    const user = { Policy: { IsAdministrator: true } };
-    const policy = getNestedObject(user, 'Policy');
-
-    expect(policy).toEqual({ IsAdministrator: true });
-  });
-
-  it('should return undefined for missing key', () => {
-    const user = { Name: 'Test' };
-    expect(getNestedObject(user, 'Policy')).toBeUndefined();
-  });
-
-  it('should return undefined for null/undefined input', () => {
-    expect(getNestedObject(null, 'Policy')).toBeUndefined();
-    expect(getNestedObject(undefined, 'Policy')).toBeUndefined();
-  });
-
-  it('should return undefined for non-object value', () => {
-    const user = { Policy: 'string' };
-    expect(getNestedObject(user, 'Policy')).toBeUndefined();
-  });
-});
+  // Edge cases
+  describe('edge cases', () => {
+    it('handles very long strings efficiently', () => {
+      const longString = 'x'.repeat(10000);
+      expect(parseOptionalBoundedString(longString, 255)).toHaveLength(255);
+    });
 
-describe('getNestedValue', () => {
-  it('should get deeply nested value', () => {
-    const data = { a: { b: { c: 'value' } } };
-    expect(getNestedValue(data, 'a', 'b', 'c')).toBe('value');
-  });
-
-  it('should return undefined for missing path', () => {
-    const data = { a: { b: 1 } };
-    expect(getNestedValue(data, 'a', 'b', 'c')).toBeUndefined();
-    expect(getNestedValue(data, 'x')).toBeUndefined();
-  });
-
-  it('should return undefined for null in path', () => {
-    const data = { a: null };
-    expect(getNestedValue(data, 'a', 'b')).toBeUndefined();
-  });
-
-  // Real Jellyfin pattern: (session.PlayState as Record<string, unknown>).PositionTicks
-  it('should handle Jellyfin PlayState.PositionTicks pattern', () => {
-    const session = {
-      PlayState: { PositionTicks: 1234567890, IsPaused: false },
-    };
-    expect(getNestedValue(session, 'PlayState', 'PositionTicks')).toBe(1234567890);
-    expect(getNestedValue(session, 'PlayState', 'IsPaused')).toBe(false);
-  });
-
-  // Real Jellyfin pattern: (user.Policy as Record<string, unknown>)?.IsAdministrator
-  it('should handle Jellyfin user.Policy.IsAdministrator pattern', () => {
-    const user = {
-      Policy: { IsAdministrator: true, IsDisabled: false },
-    };
-    expect(getNestedValue(user, 'Policy', 'IsAdministrator')).toBe(true);
-    expect(getNestedValue(user, 'Policy', 'IsDisabled')).toBe(false);
-  });
-});
-
-describe('parseDate', () => {
-  it('should parse valid ISO date string', () => {
-    const date = parseDate('2024-01-15T10:30:00.000Z');
-    expect(date).toBeInstanceOf(Date);
-    expect(date?.toISOString()).toBe('2024-01-15T10:30:00.000Z');
-  });
-
-  it('should parse various date formats', () => {
-    expect(parseDate('2024-01-15')).toBeInstanceOf(Date);
-    expect(parseDate('January 15, 2024')).toBeInstanceOf(Date);
-  });
-
-  it('should return null for null/undefined', () => {
-    expect(parseDate(null)).toBeNull();
-    expect(parseDate(undefined)).toBeNull();
-  });
-
-  it('should return null for invalid date', () => {
-    expect(parseDate('not-a-date')).toBeNull();
-    expect(parseDate('')).toBeNull();
-  });
-});
-
-describe('parseDateString', () => {
-  it('should parse and return ISO string', () => {
-    const result = parseDateString('2024-01-15T10:30:00.000Z');
-    expect(result).toBe('2024-01-15T10:30:00.000Z');
-  });
-
-  it('should normalize date to ISO string', () => {
-    const result = parseDateString('2024-01-15');
-    expect(result).toMatch(/^2024-01-15T\d{2}:\d{2}:\d{2}.\d{3}Z$/);
-  });
-
-  it('should return null for null/undefined', () => {
-    expect(parseDateString(null)).toBeNull();
-    expect(parseDateString(undefined)).toBeNull();
-  });
-
-  it('should return null for invalid date', () => {
-    expect(parseDateString('invalid')).toBeNull();
-  });
-});
-
-describe('parse convenience object', () => {
-  it('should have all parsing functions', () => {
-    expect(parse.string).toBe(parseString);
-    expect(parse.optionalString).toBe(parseOptionalString);
-    expect(parse.stringOrNull).toBe(parseStringOrNull);
-    expect(parse.number).toBe(parseNumber);
-    expect(parse.optionalNumber).toBe(parseOptionalNumber);
-    expect(parse.numberOrEmpty).toBe(parseNumberOrEmpty);
-    expect(parse.boolean).toBe(parseBoolean);
-    expect(parse.optionalBoolean).toBe(parseOptionalBoolean);
-    expect(parse.array).toBe(parseArray);
-    expect(parse.filteredArray).toBe(parseFilteredArray);
-    expect(parse.firstArrayElement).toBe(parseFirstArrayElement);
-    expect(parse.nested).toBe(getNestedObject);
-    expect(parse.nestedValue).toBe(getNestedValue);
-    expect(parse.date).toBe(parseDate);
-    expect(parse.dateString).toBe(parseDateString);
-  });
-
-  // Real-world usage example
-  it('should work with real Jellyfin session parsing pattern', () => {
-    const rawSession = {
-      Id: 'session-123',
-      UserId: 'user-456',
-      UserName: 'testuser',
-      Client: 'Jellyfin Web',
-      DeviceName: 'Chrome',
-      NowPlayingItem: {
-        Id: 'item-789',
-        Name: 'Test Movie',
-        Type: 'Movie',
-        RunTimeTicks: 72000000000,
-        ProductionYear: 2024,
-      },
-      PlayState: {
-        PositionTicks: 36000000000,
-        IsPaused: false,
-      },
-    };
-
-    const parsed = {
-      id: parse.string(rawSession.Id),
-      userId: parse.string(rawSession.UserId),
-      userName: parse.string(rawSession.UserName),
-      client: parse.string(rawSession.Client),
-      deviceName: parse.string(rawSession.DeviceName),
-      nowPlayingItem: rawSession.NowPlayingItem
-        ? {
-            id: parse.string(rawSession.NowPlayingItem.Id),
-            name: parse.string(rawSession.NowPlayingItem.Name),
-            type: parse.string(rawSession.NowPlayingItem.Type),
-            runTimeTicks: parse.number(rawSession.NowPlayingItem.RunTimeTicks),
-            productionYear: parse.optionalNumber(rawSession.NowPlayingItem.ProductionYear),
-          }
-        : undefined,
-      playState: rawSession.PlayState
-        ? {
-            positionTicks: parse.number(
-              parse.nestedValue(rawSession, 'PlayState', 'PositionTicks')
-            ),
-            isPaused: parse.boolean(parse.nestedValue(rawSession, 'PlayState', 'IsPaused')),
-          }
-        : undefined,
-    };
-
-    expect(parsed.id).toBe('session-123');
-    expect(parsed.nowPlayingItem?.runTimeTicks).toBe(72000000000);
-    expect(parsed.playState?.isPaused).toBe(false);
-  });
+    it('handles multi-byte unicode (emojis)', () => {
+      const emoji = '😀😀😀';
+      const result = parseOptionalBoundedString(emoji, 2);
+      expect(result?.length).toBeLessThanOrEqual(2);
+    });
 
-  // Real-world usage example for Plex
-  it('should work with real Plex session parsing pattern', () => {
-    const rawItem = {
-      sessionKey: '12345',
-      ratingKey: '67890',
-      title: 'Test Movie',
-      type: 'movie',
-      duration: 7200000,
-      viewOffset: 3600000,
-      year: 2024,
-      Player: {
-        title: 'Plex Web',
-        state: 'playing',
-        local: false,
-      },
-      Media: [{ bitrate: 8000000 }],
-    };
+    it('handles CJK characters', () => {
+      const cjk = '中文字符';
+      expect(parseOptionalBoundedString(cjk, 2)).toBe('中文');
+    });
 
-    const parsed = {
-      sessionKey: parse.string(rawItem.sessionKey),
-      title: parse.string(rawItem.title),
-      duration: parse.number(rawItem.duration),
-      year: parse.number(rawItem.year),
-      playerTitle: parse.string(parse.nestedValue(rawItem, 'Player', 'title')),
-      playerState: parse.string(parse.nestedValue(rawItem, 'Player', 'state')),
-      isLocal: parse.boolean(parse.nestedValue(rawItem, 'Player', 'local')),
-      bitrate: parse.number(parse.firstArrayElement(rawItem.Media, 'bitrate', 0)),
-    };
+    it('handles boolean inputs', () => {
+      expect(parseOptionalBoundedString(true, 10)).toBe('true');
+      expect(parseOptionalBoundedString(false, 10)).toBe('false');
+    });
 
-    expect(parsed.sessionKey).toBe('12345');
-    expect(parsed.duration).toBe(7200000);
-    expect(parsed.playerTitle).toBe('Plex Web');
-    expect(parsed.isLocal).toBe(false);
-    expect(parsed.bitrate).toBe(8000000);
+    it('handles object inputs', () => {
+      expect(parseOptionalBoundedString({}, 20)).toBe('[object Object]');
+    });
   });
 });

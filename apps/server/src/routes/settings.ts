@@ -100,6 +100,12 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       return reply.internalServerError('Failed to load settings');
     }
 
+    // Handle case where usePlexGeoip column might not exist yet (before migration)
+    let usePlexGeoip = false;
+    if ('usePlexGeoip' in row && typeof row.usePlexGeoip === 'boolean') {
+      usePlexGeoip = row.usePlexGeoip;
+    }
+
     const result: Settings = {
       allowGuestAccess: row.allowGuestAccess,
       unitSystem: row.unitSystem,
@@ -112,6 +118,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask API Token
       pollerEnabled: row.pollerEnabled,
       pollerIntervalMs: row.pollerIntervalMs,
+      usePlexGeoip,
       tautulliUrl: row.tautulliUrl,
       tautulliApiKey: row.tautulliApiKey ? '********' : null, // Mask API key
       externalUrl: row.externalUrl,
@@ -153,6 +160,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       pushoverApiToken: string | null;
       pollerEnabled: boolean;
       pollerIntervalMs: number;
+      usePlexGeoip: boolean;
       tautulliUrl: string | null;
       tautulliApiKey: string | null;
       externalUrl: string | null;
@@ -208,6 +216,10 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       updateData.pollerIntervalMs = body.data.pollerIntervalMs;
     }
 
+    if (body.data.usePlexGeoip !== undefined) {
+      updateData.usePlexGeoip = body.data.usePlexGeoip;
+    }
+
     if (body.data.tautulliUrl !== undefined) {
       updateData.tautulliUrl = body.data.tautulliUrl;
     }
@@ -258,6 +270,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
         pushoverApiToken: updateData.pushoverApiToken ?? null,
         pollerEnabled: updateData.pollerEnabled ?? true,
         pollerIntervalMs: updateData.pollerIntervalMs ?? 15000,
+        usePlexGeoip: updateData.usePlexGeoip ?? false,
         tautulliUrl: updateData.tautulliUrl ?? null,
         tautulliApiKey: updateData.tautulliApiKey ?? null,
         externalUrl: updateData.externalUrl ?? null,
@@ -278,10 +291,14 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       return reply.internalServerError('Failed to update settings');
     }
 
-    // Handle case where primaryAuthMethod column might not exist yet (before migration)
+    // Handle case where columns might not exist yet (before migration)
     let primaryAuthMethod: 'jellyfin' | 'local' = 'local';
     if ('primaryAuthMethod' in row && row.primaryAuthMethod) {
       primaryAuthMethod = row.primaryAuthMethod;
+    }
+    let usePlexGeoip = false;
+    if ('usePlexGeoip' in row && typeof row.usePlexGeoip === 'boolean') {
+      usePlexGeoip = row.usePlexGeoip;
     }
 
     const result: Settings = {
@@ -296,6 +313,7 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       pushoverApiToken: row.pushoverApiToken ? '********' : null, // Mask API token
       pollerEnabled: row.pollerEnabled,
       pollerIntervalMs: row.pollerIntervalMs,
+      usePlexGeoip,
       tautulliUrl: row.tautulliUrl,
       tautulliApiKey: row.tautulliApiKey ? '********' : null, // Mask API key
       externalUrl: row.externalUrl,
@@ -410,6 +428,34 @@ export async function getPollerSettings(): Promise<{ enabled: boolean; intervalM
     enabled: settingsRow.pollerEnabled,
     intervalMs: settingsRow.pollerIntervalMs,
   };
+}
+
+/**
+ * Get GeoIP settings from database (for internal use by poller/SSE processor)
+ */
+export async function getGeoIPSettings(): Promise<{ usePlexGeoip: boolean }> {
+  try {
+    const row = await db
+      .select({
+        usePlexGeoip: settings.usePlexGeoip,
+      })
+      .from(settings)
+      .where(eq(settings.id, SETTINGS_ID))
+      .limit(1);
+
+    const settingsRow = row[0];
+    if (!settingsRow) {
+      // Return defaults if settings don't exist yet
+      return { usePlexGeoip: false };
+    }
+
+    return {
+      usePlexGeoip: settingsRow.usePlexGeoip,
+    };
+  } catch {
+    // Column doesn't exist yet (before migration) - use default
+    return { usePlexGeoip: false };
+  }
 }
 
 /**

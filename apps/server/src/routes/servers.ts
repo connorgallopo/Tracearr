@@ -3,13 +3,14 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import { createServerSchema, serverIdParamSchema, SERVER_STATS_CONFIG } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { servers } from '../db/schema.js';
+import { servers, plexAccounts } from '../db/schema.js';
 // Token encryption removed - tokens now stored in plain text (DB is localhost-only)
 import { PlexClient, JellyfinClient, EmbyClient } from '../services/mediaServer/index.js';
 import { syncServer } from '../services/sync.js';
+import { getCacheService } from '../services/cache.js';
 
 export const serverRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -66,6 +67,9 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       return reply.conflict('A server with this URL already exists');
     }
 
+    // For Plex servers, find the owning plex account to set plexAccountId
+    let plexAccountId: string | undefined;
+
     // Verify the server connection
     try {
       if (type === 'plex') {
@@ -76,6 +80,28 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
             return reply.serviceUnavailable(adminCheck.message);
           }
           return reply.forbidden(adminCheck.message);
+        }
+
+        // Get the Plex account ID from the token and link to user's plex_accounts
+        try {
+          const accountInfo = await PlexClient.getAccountInfo(token);
+          const matchingAccount = await db
+            .select({ id: plexAccounts.id })
+            .from(plexAccounts)
+            .where(
+              and(
+                eq(plexAccounts.userId, authUser.userId),
+                eq(plexAccounts.plexAccountId, accountInfo.id)
+              )
+            )
+            .limit(1);
+
+          if (matchingAccount.length > 0) {
+            plexAccountId = matchingAccount[0]!.id;
+          }
+        } catch {
+          // Non-fatal: server will be orphaned but auto-repair can fix it later
+          app.log.debug('Could not link Plex server to account at creation time');
         }
       } else if (type === 'jellyfin') {
         const adminCheck = await JellyfinClient.verifyServerAdmin(token, url);
@@ -105,6 +131,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type,
         url,
         token,
+        plexAccountId, // Links Plex servers to their owning account (undefined for non-Plex)
       })
       .returning({
         id: servers.id,
@@ -137,6 +164,121 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       });
 
     return reply.status(201).send(server);
+  });
+
+  /**
+   * PATCH /servers/:id - Update server URL
+   * Verifies the new URL is reachable with existing token before updating.
+   *
+   * For Plex servers with clientIdentifier:
+   * - Validates that the clientIdentifier matches the server's machineIdentifier
+   * - This prevents accidentally connecting Server A's config to Server B's URL
+   */
+  app.patch('/:id', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const params = serverIdParamSchema.safeParse(request.params);
+    if (!params.success) {
+      return reply.badRequest('Invalid server ID');
+    }
+
+    const body = request.body as { url?: string; clientIdentifier?: string };
+    if (!body.url || typeof body.url !== 'string') {
+      return reply.badRequest('URL is required');
+    }
+
+    const { id } = params.data;
+    const newUrl = body.url.replace(/\/$/, ''); // Remove trailing slash
+    const { clientIdentifier } = body;
+    const authUser = request.user;
+
+    // Only owners can update servers
+    if (authUser.role !== 'owner') {
+      return reply.forbidden('Only server owners can update servers');
+    }
+
+    // Get existing server with token
+    const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
+    const server = serverRows[0];
+
+    if (!server) {
+      return reply.notFound('Server not found');
+    }
+
+    // Don't update if URL is the same
+    if (server.url === newUrl) {
+      return {
+        id: server.id,
+        name: server.name,
+        type: server.type,
+        url: server.url,
+        createdAt: server.createdAt,
+        updatedAt: server.updatedAt,
+      };
+    }
+
+    // For Plex servers: Validate machineIdentifier if provided
+    // This prevents connecting Server A's config to Server B's URL
+    if (server.type === 'plex' && clientIdentifier) {
+      if (server.machineIdentifier && server.machineIdentifier !== clientIdentifier) {
+        return reply.badRequest(
+          'Server mismatch: The selected connection belongs to a different server. ' +
+            'Please select a connection for the correct server.'
+        );
+      }
+    }
+
+    // Verify the new URL works with the existing token
+    try {
+      if (server.type === 'plex') {
+        const adminCheck = await PlexClient.verifyServerAdmin(server.token, newUrl);
+        if (!adminCheck.success) {
+          if (adminCheck.code === PlexClient.AdminVerifyError.CONNECTION_FAILED) {
+            return reply.serviceUnavailable(adminCheck.message);
+          }
+          return reply.forbidden(adminCheck.message);
+        }
+      } else if (server.type === 'jellyfin') {
+        const adminCheck = await JellyfinClient.verifyServerAdmin(server.token, newUrl);
+        if (!adminCheck.success) {
+          if (adminCheck.code === JellyfinClient.AdminVerifyError.CONNECTION_FAILED) {
+            return reply.serviceUnavailable(adminCheck.message);
+          }
+          return reply.forbidden(adminCheck.message);
+        }
+      } else if (server.type === 'emby') {
+        const isAdmin = await EmbyClient.verifyServerAdmin(server.token, newUrl);
+        if (!isAdmin) {
+          return reply.forbidden('Token does not have admin access at this URL');
+        }
+      }
+    } catch (error) {
+      app.log.error({ error, serverId: id, newUrl }, 'Failed to verify new server URL');
+      return reply.badRequest(
+        'Failed to connect to server at new URL. Please verify the URL is correct.'
+      );
+    }
+
+    // Update the server URL
+    const updated = await db
+      .update(servers)
+      .set({ url: newUrl, updatedAt: new Date() })
+      .where(eq(servers.id, id))
+      .returning({
+        id: servers.id,
+        name: servers.name,
+        type: servers.type,
+        url: servers.url,
+        createdAt: servers.createdAt,
+        updatedAt: servers.updatedAt,
+      });
+
+    const result = updated[0];
+    if (!result) {
+      return reply.internalServerError('Failed to update server');
+    }
+
+    app.log.info({ serverId: id, oldUrl: server.url, newUrl }, 'Server URL updated');
+
+    return result;
   });
 
   /**
@@ -343,5 +485,44 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       app.log.error({ error, serverId: id, imagePath }, 'Failed to fetch image from server');
       return reply.internalServerError('Failed to fetch image');
     }
+  });
+
+  /**
+   * GET /servers/health - Get health status for all servers
+   * Returns which servers are currently unreachable based on cached health state
+   */
+  app.get('/health', { preHandler: [app.authenticate] }, async (request) => {
+    const authUser = request.user;
+
+    // Get all servers the user has access to
+    const serverList = await db
+      .select({
+        id: servers.id,
+        name: servers.name,
+      })
+      .from(servers)
+      .where(
+        authUser.role === 'owner'
+          ? undefined
+          : authUser.serverIds.length > 0
+            ? inArray(servers.id, authUser.serverIds)
+            : undefined
+      );
+
+    const cacheService = getCacheService();
+    const unhealthyServers: { serverId: string; serverName: string }[] = [];
+
+    if (cacheService) {
+      for (const server of serverList) {
+        const isHealthy = await cacheService.getServerHealth(server.id);
+        // null means unknown (not yet checked), true means healthy
+        // Only include servers explicitly marked as unhealthy (false)
+        if (isHealthy === false) {
+          unhealthyServers.push({ serverId: server.id, serverName: server.name });
+        }
+      }
+    }
+
+    return { data: unhealthyServers };
   });
 };

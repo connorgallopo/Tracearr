@@ -29,6 +29,7 @@ services:
     environment:
       - TZ=${TZ:-UTC}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      # - DATABASE_POOL_MAX=50  # Database connection pool size (default: 50)
       # Secrets are auto-generated if not provided
       # Uncomment to override:
       # - JWT_SECRET=${JWT_SECRET}

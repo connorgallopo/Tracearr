@@ -223,6 +223,15 @@ body {
   max-width: 1400px;
 }
 
+/* Shared card hover effects */
+@utility card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02];
+}
+
+@utility card-hover-border {
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/50;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

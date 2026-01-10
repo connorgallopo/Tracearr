@@ -254,9 +254,10 @@ export function plexHeaders(token?: string): Record<string, string> {
 }
 
 /**
- * Helper to create Jellyfin-specific headers
+ * Helper to create Jellyfin/Emby-specific headers
+ * Note: Both use identical X-Emby-Token header (Jellyfin forked from Emby)
  */
-export function jellyfinHeaders(apiKey?: string): Record<string, string> {
+export function jellyfinEmbyHeaders(apiKey?: string): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
   };
@@ -268,18 +269,8 @@ export function jellyfinHeaders(apiKey?: string): Record<string, string> {
   return headers;
 }
 
-/**
- * Helper to create Emby-specific headers
- * Note: Emby uses the same X-Emby-Token header as Jellyfin (Jellyfin forked from Emby)
- */
-export function embyHeaders(apiKey?: string): Record<string, string> {
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-  };
+/** @deprecated Use jellyfinEmbyHeaders instead - kept for backward compatibility */
+export const jellyfinHeaders = jellyfinEmbyHeaders;
 
-  if (apiKey) {
-    headers['X-Emby-Token'] = apiKey;
-  }
-
-  return headers;
-}
+/** @deprecated Use jellyfinEmbyHeaders instead - kept for backward compatibility */
+export const embyHeaders = jellyfinEmbyHeaders;

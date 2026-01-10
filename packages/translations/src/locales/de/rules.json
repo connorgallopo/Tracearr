@@ -1,0 +1,47 @@
+{
+  "types": {
+    "impossible_travel": "Unmögliche Reise",
+    "simultaneous_locations": "Gleichzeitige Standorte",
+    "device_velocity": "Geräte-Geschwindigkeit",
+    "concurrent_streams": "Gleichzeitige Streams",
+    "geo_restriction": "Geo-Einschränkung"
+  },
+  "descriptions": {
+    "impossible_travel": "Erkennt Streaming von zu weit entfernten Orten innerhalb kurzer Zeit",
+    "simultaneous_locations": "Erkennt gleichzeitiges Streaming von mehreren entfernten Orten",
+    "device_velocity": "Erkennt zu viele IP-Verbindungen in einem Zeitfenster",
+    "concurrent_streams": "Begrenzt die Anzahl gleichzeitiger Streams pro Benutzer",
+    "geo_restriction": "Blockiert Streaming aus bestimmten Ländern"
+  },
+  "labels": {
+    "ruleName": "Regelname",
+    "ruleType": "Regeltyp",
+    "severity": "Schweregrad",
+    "enabled": "Aktiviert",
+    "maxSpeed": "Max. Geschwindigkeit",
+    "minDistance": "Min. Entfernung",
+    "maxIps": "Max. IPs",
+    "timeWindow": "Zeitfenster (Stunden)",
+    "maxStreams": "Max. Streams",
+    "mode": "Modus",
+    "countries": "Länder",
+    "excludePrivateIps": "Lokales Netzwerk ausschließen",
+    "groupByDevice": "Nach Gerät gruppieren"
+  },
+  "modes": {
+    "blocklist": "Sperrliste (diese Länder blockieren)",
+    "allowlist": "Freigabeliste (nur diese Länder erlauben)"
+  },
+  "messages": {
+    "created": "Regel erfolgreich erstellt",
+    "updated": "Regel erfolgreich aktualisiert",
+    "deleted": "Regel erfolgreich gelöscht",
+    "createFailed": "Regel erstellen fehlgeschlagen",
+    "updateFailed": "Regel aktualisieren fehlgeschlagen",
+    "deleteFailed": "Regel löschen fehlgeschlagen"
+  },
+  "deleteConfirm": {
+    "title": "Regel löschen",
+    "message": "Diese Regel wirklich löschen? Dieser Vorgang ist unwiderruflich."
+  }
+}

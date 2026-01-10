@@ -7,7 +7,13 @@ import { PlexCallback } from '@/pages/PlexCallback';
 import { Setup } from '@/pages/Setup';
 import { Dashboard } from '@/pages/Dashboard';
 import { Map } from '@/pages/Map';
-import { StatsActivity, StatsLibrary, StatsUsers } from '@/pages/stats';
+import {
+  StatsActivity,
+  StatsLibrary,
+  StatsUsers,
+  StatsDevices,
+  StatsBandwidth,
+} from '@/pages/stats';
 import { Users } from '@/pages/Users';
 import { UserDetail } from '@/pages/UserDetail';
 import { Rules } from '@/pages/Rules';
@@ -43,6 +49,10 @@ export function App() {
           <Route path="stats/activity" element={<StatsActivity />} />
           <Route path="stats/library" element={<StatsLibrary />} />
           <Route path="stats/users" element={<StatsUsers />} />
+
+          {/* Performance routes */}
+          <Route path="stats/devices" element={<StatsDevices />} />
+          <Route path="stats/bandwidth" element={<StatsBandwidth />} />
 
           {/* Other routes */}
           <Route path="history" element={<History />} />

@@ -8,6 +8,7 @@ import {
   Film,
   Tv,
   Music,
+  Radio,
   MonitorPlay,
   Repeat2,
   X,
@@ -228,8 +229,13 @@ export function HistoryFiltersBar({
       });
     }
     if (filters.mediaTypes?.length) {
-      const labels = { movie: 'Movies', episode: 'TV Shows', track: 'Music' };
-      const typeLabels = filters.mediaTypes.map((t) => labels[t]);
+      const labels: Record<string, string> = {
+        movie: 'Movies',
+        episode: 'TV Shows',
+        track: 'Music',
+        live: 'Live TV',
+      };
+      const typeLabels = filters.mediaTypes.map((t) => labels[t] || t);
       active.push({
         key: 'mediaTypes',
         label: 'Types',
@@ -530,6 +536,7 @@ export function HistoryFiltersBar({
               { value: 'movie' as const, label: 'Movies', icon: Film },
               { value: 'episode' as const, label: 'TV Shows', icon: Tv },
               { value: 'track' as const, label: 'Music', icon: Music },
+              { value: 'live' as const, label: 'Live TV', icon: Radio },
             ].map(({ value, label, icon: Icon }) => {
               const isSelected = filters.mediaTypes?.includes(value) ?? false;
               return (

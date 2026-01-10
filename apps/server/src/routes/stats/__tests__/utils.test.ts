@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 import {
   getDateRange,
   resolveDateRange,

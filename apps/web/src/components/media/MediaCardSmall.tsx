@@ -1,4 +1,4 @@
-import { Film, Tv, Music } from 'lucide-react';
+import { Film, Tv, Music, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MediaCardSmallProps {
@@ -26,6 +26,8 @@ function MediaIcon({ type, className }: { type: string; className?: string }) {
       return <Tv className={className} />;
     case 'track':
       return <Music className={className} />;
+    case 'live':
+      return <Radio className={className} />;
     default:
       return <Film className={className} />;
   }
@@ -63,7 +65,7 @@ export function MediaCardSmall({
   return (
     <div
       className={cn(
-        'group animate-fade-in bg-card hover:border-primary/50 hover:shadow-primary/10 relative overflow-hidden rounded-lg border transition-all duration-300 hover:scale-[1.03] hover:shadow-lg',
+        'group animate-fade-in bg-card card-hover-border relative overflow-hidden rounded-lg border',
         className
       )}
       style={style}

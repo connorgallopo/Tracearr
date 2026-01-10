@@ -70,7 +70,17 @@ function getMediaDisplay(session: ActiveSession): { title: string; subtitle: str
       subtitle: episodeInfo ? `${episodeInfo} · ${session.mediaTitle}` : session.mediaTitle,
     };
   }
-  // Movie or music
+  if (session.mediaType === 'track') {
+    // Music track - show track name as title, artist/album as subtitle
+    const parts: string[] = [];
+    if (session.artistName) parts.push(session.artistName);
+    if (session.albumName) parts.push(session.albumName);
+    return {
+      title: session.mediaTitle,
+      subtitle: parts.length > 0 ? parts.join(' · ') : null,
+    };
+  }
+  // Movie
   return {
     title: session.mediaTitle,
     subtitle: session.year ? `${session.year}` : null,
@@ -107,7 +117,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   return (
     <div
       className={cn(
-        'group animate-fade-in bg-card hover:shadow-primary/10 relative overflow-hidden rounded-xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg',
+        'group animate-fade-in bg-card card-hover relative overflow-hidden rounded-xl border',
         onClick && 'cursor-pointer'
       )}
       onClick={onClick}

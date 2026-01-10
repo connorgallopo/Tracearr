@@ -1,0 +1,13 @@
+{
+  "dashboard": "Dashboard",
+  "map": "Karte",
+  "history": "Verlauf",
+  "stats": "Statistiken",
+  "activity": "Aktivität",
+  "library": "Mediathek",
+  "users": "Benutzer",
+  "rules": "Regeln",
+  "violations": "Verstöße",
+  "alerts": "Warnungen",
+  "settings": "Einstellungen"
+}

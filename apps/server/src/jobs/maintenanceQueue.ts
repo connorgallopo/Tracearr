@@ -156,6 +156,8 @@ async function processMaintenanceJob(job: Job<MaintenanceJobData>): Promise<Main
       return processFixImportedProgressJob(job);
     case 'rebuild_timescale_views':
       return processRebuildTimescaleViewsJob(job);
+    case 'normalize_codecs':
+      return processNormalizeCodecsJob(job);
     default:
       throw new Error(`Unknown maintenance job type: ${job.data.type}`);
   }
@@ -310,31 +312,23 @@ async function processNormalizePlayersJob(
         }
       }
 
-      // Execute batch updates (one UPDATE per record, but in quick succession)
-      // PostgreSQL doesn't support bulk UPDATE with different values per row easily,
-      // but we can at least batch them without awaiting each one individually
+      // Execute updates sequentially to avoid exhausting the connection pool
+      // Maintenance jobs are not time-critical, so sequential is fine
       if (updates.length > 0) {
-        try {
-          // Process updates in smaller chunks to avoid long transactions
-          const UPDATE_CHUNK_SIZE = 50;
-          for (let i = 0; i < updates.length; i += UPDATE_CHUNK_SIZE) {
-            const chunk = updates.slice(i, i + UPDATE_CHUNK_SIZE);
-            await Promise.all(
-              chunk.map((update) =>
-                db
-                  .update(sessions)
-                  .set({
-                    device: update.device,
-                    platform: update.platform,
-                  })
-                  .where(eq(sessions.id, update.id))
-              )
-            );
+        for (const update of updates) {
+          try {
+            await db
+              .update(sessions)
+              .set({
+                device: update.device,
+                platform: update.platform,
+              })
+              .where(eq(sessions.id, update.id));
+            totalUpdated++;
+          } catch (error) {
+            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
+            totalErrors++;
           }
-          totalUpdated += updates.length;
-        } catch (error) {
-          console.error(`[Maintenance] Error in batch update:`, error);
-          totalErrors += updates.length;
         }
       }
 
@@ -554,25 +548,19 @@ async function processNormalizeCountriesJob(
         }
       }
 
-      // Execute batch updates
+      // Execute updates sequentially to avoid exhausting the connection pool
       if (updates.length > 0) {
-        try {
-          const UPDATE_CHUNK_SIZE = 50;
-          for (let i = 0; i < updates.length; i += UPDATE_CHUNK_SIZE) {
-            const chunk = updates.slice(i, i + UPDATE_CHUNK_SIZE);
-            await Promise.all(
-              chunk.map((update) =>
-                db
-                  .update(sessions)
-                  .set({ geoCity: update.geoCity, geoCountry: update.geoCountry })
-                  .where(eq(sessions.id, update.id))
-              )
-            );
+        for (const update of updates) {
+          try {
+            await db
+              .update(sessions)
+              .set({ geoCity: update.geoCity, geoCountry: update.geoCountry })
+              .where(eq(sessions.id, update.id));
+            totalUpdated++;
+          } catch (error) {
+            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
+            totalErrors++;
           }
-          totalUpdated += updates.length;
-        } catch (error) {
-          console.error(`[Maintenance] Error in batch update:`, error);
-          totalErrors += updates.length;
         }
       }
 
@@ -779,28 +767,22 @@ async function processFixImportedProgressJob(
         }
       }
 
-      // Execute batch updates
+      // Execute updates sequentially to avoid exhausting the connection pool
       if (updates.length > 0) {
-        try {
-          const UPDATE_CHUNK_SIZE = 50;
-          for (let i = 0; i < updates.length; i += UPDATE_CHUNK_SIZE) {
-            const chunk = updates.slice(i, i + UPDATE_CHUNK_SIZE);
-            await Promise.all(
-              chunk.map((update) =>
-                db
-                  .update(sessions)
-                  .set({
-                    progressMs: update.progressMs,
-                    totalDurationMs: update.totalDurationMs,
-                  })
-                  .where(eq(sessions.id, update.id))
-              )
-            );
+        for (const update of updates) {
+          try {
+            await db
+              .update(sessions)
+              .set({
+                progressMs: update.progressMs,
+                totalDurationMs: update.totalDurationMs,
+              })
+              .where(eq(sessions.id, update.id));
+            totalUpdated++;
+          } catch (error) {
+            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
+            totalErrors++;
           }
-          totalUpdated += updates.length;
-        } catch (error) {
-          console.error(`[Maintenance] Error in batch update:`, error);
-          totalErrors += updates.length;
         }
       }
 
@@ -942,6 +924,160 @@ async function processRebuildTimescaleViewsJob(
         message: result.message,
       };
     }
+  } catch (error) {
+    if (activeJobProgress) {
+      activeJobProgress.status = 'error';
+      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
+      await publishProgress();
+      activeJobProgress = null;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Normalize codec names to uppercase in historical sessions
+ *
+ * Converts codec values (source_video_codec, source_audio_codec, stream_video_codec,
+ * stream_audio_codec) to uppercase for consistency. This fixes data imported before
+ * the Tautulli enrichment was updated to uppercase codecs.
+ */
+async function processNormalizeCodecsJob(
+  job: Job<MaintenanceJobData>
+): Promise<MaintenanceJobResult> {
+  const startTime = Date.now();
+  const pubSubService = getPubSubService();
+  const BATCH_SIZE = 1000; // Bulk update batch size
+
+  // Initialize progress
+  activeJobProgress = {
+    type: 'normalize_codecs',
+    status: 'running',
+    totalRecords: 0,
+    processedRecords: 0,
+    updatedRecords: 0,
+    skippedRecords: 0,
+    errorRecords: 0,
+    message: 'Counting sessions with lowercase codecs...',
+    startedAt: new Date().toISOString(),
+  };
+
+  const publishProgress = async () => {
+    if (pubSubService && activeJobProgress) {
+      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
+    }
+  };
+
+  try {
+    // Count sessions that have codec values not already uppercase
+    const [countResult] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(sessions)
+      .where(
+        or(
+          sql`${sessions.sourceVideoCodec} IS DISTINCT FROM UPPER(${sessions.sourceVideoCodec})`,
+          sql`${sessions.sourceAudioCodec} IS DISTINCT FROM UPPER(${sessions.sourceAudioCodec})`,
+          sql`${sessions.streamVideoCodec} IS DISTINCT FROM UPPER(${sessions.streamVideoCodec})`,
+          sql`${sessions.streamAudioCodec} IS DISTINCT FROM UPPER(${sessions.streamAudioCodec})`
+        )
+      );
+
+    const totalRecords = countResult?.count ?? 0;
+    activeJobProgress.totalRecords = totalRecords;
+    activeJobProgress.message = `Processing ${totalRecords.toLocaleString()} sessions...`;
+    await publishProgress();
+
+    if (totalRecords === 0) {
+      activeJobProgress.status = 'complete';
+      activeJobProgress.message = 'All codec names are already normalized';
+      activeJobProgress.completedAt = new Date().toISOString();
+      await publishProgress();
+      return {
+        success: true,
+        type: 'normalize_codecs',
+        processed: 0,
+        updated: 0,
+        skipped: 0,
+        errors: 0,
+        durationMs: Date.now() - startTime,
+        message: 'All codec names are already normalized',
+      };
+    }
+
+    let totalUpdated = 0;
+    let totalErrors = 0;
+
+    // Use bulk UPDATE with LIMIT subquery - much more efficient than individual updates
+    // This avoids exhausting PostgreSQL's lock pool
+    while (totalUpdated < totalRecords) {
+      try {
+        // Single bulk UPDATE that updates up to BATCH_SIZE rows at once
+        const result = await db.execute(sql`
+          UPDATE ${sessions}
+          SET
+            source_video_codec = UPPER(source_video_codec),
+            source_audio_codec = UPPER(source_audio_codec),
+            stream_video_codec = UPPER(stream_video_codec),
+            stream_audio_codec = UPPER(stream_audio_codec)
+          WHERE id IN (
+            SELECT id FROM ${sessions}
+            WHERE source_video_codec IS DISTINCT FROM UPPER(source_video_codec)
+               OR source_audio_codec IS DISTINCT FROM UPPER(source_audio_codec)
+               OR stream_video_codec IS DISTINCT FROM UPPER(stream_video_codec)
+               OR stream_audio_codec IS DISTINCT FROM UPPER(stream_audio_codec)
+            LIMIT ${BATCH_SIZE}
+          )
+        `);
+
+        const updatedCount = Number(result.rowCount ?? 0);
+
+        // No more rows to update
+        if (updatedCount === 0) {
+          break;
+        }
+
+        totalUpdated += updatedCount;
+      } catch (error) {
+        console.error(`[Maintenance] Error in bulk update:`, error);
+        totalErrors++;
+        break;
+      }
+
+      activeJobProgress.processedRecords = totalUpdated;
+      activeJobProgress.updatedRecords = totalUpdated;
+      activeJobProgress.errorRecords = totalErrors;
+      activeJobProgress.message = `Updated ${totalUpdated.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
+
+      const percent = Math.min(100, Math.round((totalUpdated / totalRecords) * 100));
+      await job.updateProgress(percent);
+      await publishProgress();
+
+      try {
+        await job.extendLock(job.token ?? '', 10 * 60 * 1000);
+      } catch {
+        console.warn(`[Maintenance] Failed to extend lock for job ${job.id}`);
+      }
+    }
+
+    const durationMs = Date.now() - startTime;
+    activeJobProgress.status = 'complete';
+    activeJobProgress.processedRecords = totalUpdated;
+    activeJobProgress.message = `Completed! Normalized ${totalUpdated.toLocaleString()} codec values in ${Math.round(durationMs / 1000)}s`;
+    activeJobProgress.completedAt = new Date().toISOString();
+    await publishProgress();
+
+    activeJobProgress = null;
+
+    return {
+      success: true,
+      type: 'normalize_codecs',
+      processed: totalUpdated,
+      updated: totalUpdated,
+      skipped: 0,
+      errors: totalErrors,
+      durationMs,
+      message: `Normalized ${totalUpdated.toLocaleString()} codec values to uppercase`,
+    };
   } catch (error) {
     if (activeJobProgress) {
       activeJobProgress.status = 'error';

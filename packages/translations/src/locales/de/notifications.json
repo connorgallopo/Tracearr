@@ -1,0 +1,100 @@
+{
+  "toast": {
+    "success": {
+      "serverAdded": {
+        "title": "Server hinzugefügt",
+        "message": "{{name}} wurde erfolgreich verbunden"
+      },
+      "serverRemoved": {
+        "title": "Server entfernt",
+        "message": "Der Server wurde erfolgreich entfernt"
+      },
+      "serverSynced": {
+        "title": "Server synchronisiert",
+        "message": "Serverdaten wurden synchronisiert"
+      },
+      "settingsUpdated": {
+        "title": "Einstellungen aktualisiert",
+        "message": "Einstellungen wurden gespeichert"
+      },
+      "tokenCopied": {
+        "title": "Token kopiert",
+        "message": "Pairing-Token wurde in die Zwischenablage kopiert"
+      },
+      "violationAcknowledged": {
+        "title": "Verstoß bestätigt",
+        "message": "Der Verstoß wurde als bestätigt markiert"
+      },
+      "violationDismissed": {
+        "title": "Verstoß verworfen",
+        "message": "Der Verstoß wurde verworfen"
+      },
+      "deviceRemoved": {
+        "title": "Gerät entfernt",
+        "message": "Das Gerät wurde getrennt"
+      },
+      "sessionsRevoked": {
+        "title": "Sitzungen widerrufen",
+        "message": "Alle mobilen Sitzungen wurden widerrufen"
+      },
+      "loggedIn": {
+        "title": "Erfolg",
+        "message": "Erfolgreich angemeldet"
+      },
+      "webhookTest": {
+        "title": "Test erfolgreich",
+        "message": "Webhook funktioniert korrekt"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Server hinzufügen fehlgeschlagen",
+      "serverRemoveFailed": "Server entfernen fehlgeschlagen",
+      "serverSyncFailed": "Server-Synchronisation fehlgeschlagen",
+      "settingsUpdateFailed": "Einstellungen aktualisieren fehlgeschlagen",
+      "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
+      "acknowledgeFailed": "Verstoß bestätigen fehlgeschlagen",
+      "dismissFailed": "Verstoß verwerfen fehlgeschlagen",
+      "authFailed": "Authentifizierung fehlgeschlagen",
+      "webhookTestFailed": "Webhook-Test fehlgeschlagen"
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Neuer Stream gestartet",
+        "message": "{{user}} schaut jetzt {{media}}"
+      },
+      "streamStopped": {
+        "title": "Stream beendet",
+        "message": "{{user}} schaut nicht mehr"
+      },
+      "updateAvailable": {
+        "title": "Update verfügbar",
+        "message": "Eine neue Version ist verfügbar"
+      },
+      "serverOffline": {
+        "title": "Server offline",
+        "message": "{{name}} reagiert nicht"
+      },
+      "serverOnline": {
+        "title": "Server online",
+        "message": "{{name}} ist wieder online"
+      }
+    }
+  },
+  "push": {
+    "violationDetected": "Account-Sharing erkannt",
+    "streamStarted": "Stream gestartet",
+    "streamEnded": "Stream beendet",
+    "serverDown": "Serververbindung verloren",
+    "serverUp": "Server wieder online"
+  },
+  "settings": {
+    "title": "Benachrichtigungseinstellungen",
+    "allSeverity": "Alle (Niedrig, Warnung, Hoch)",
+    "warningAndHigh": "Nur Warnung & Hoch",
+    "highOnly": "Nur hoher Schweregrad",
+    "allTypes": "Alle Typen",
+    "rateLimit": "Aktueller Anfragelimit-Status",
+    "perMinute": "Pro Minute",
+    "perHour": "Pro Stunde"
+  }
+}

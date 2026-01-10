@@ -142,3 +142,102 @@ export function useShowStats(
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
+
+// Device compatibility stats
+export function useDeviceCompatibility(
+  timeRange?: StatsTimeRange,
+  serverId?: string | null,
+  minSessions = 5
+) {
+  return useQuery({
+    queryKey: ['stats', 'device-compatibility', timeRange, serverId, minSessions],
+    queryFn: () =>
+      api.stats.deviceCompatibility(
+        timeRange ?? { period: 'month' },
+        serverId ?? undefined,
+        minSessions
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDeviceCompatibilityMatrix(
+  timeRange?: StatsTimeRange,
+  serverId?: string | null,
+  minSessions = 5
+) {
+  return useQuery({
+    queryKey: ['stats', 'device-compatibility-matrix', timeRange, serverId, minSessions],
+    queryFn: () =>
+      api.stats.deviceCompatibilityMatrix(
+        timeRange ?? { period: 'month' },
+        serverId ?? undefined,
+        minSessions
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDeviceHealth(timeRange?: StatsTimeRange, serverId?: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'device-health', timeRange, serverId],
+    queryFn: () => api.stats.deviceHealth(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useTranscodeHotspots(timeRange?: StatsTimeRange, serverId?: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'transcode-hotspots', timeRange, serverId],
+    queryFn: () =>
+      api.stats.transcodeHotspots(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useTopTranscodingUsers(timeRange?: StatsTimeRange, serverId?: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'top-transcoding-users', timeRange, serverId],
+    queryFn: () =>
+      api.stats.topTranscodingUsers(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+// Bandwidth stats
+export function useBandwidthDaily(
+  timeRange?: StatsTimeRange,
+  serverId?: string | null,
+  serverUserId?: string
+) {
+  // Include timezone in cache key since bandwidth is grouped by local day
+  const timezone = getBrowserTimezone();
+  return useQuery({
+    queryKey: ['stats', 'bandwidth-daily', timeRange, serverId, serverUserId, timezone],
+    queryFn: () =>
+      api.stats.bandwidthDaily(
+        timeRange ?? { period: 'month' },
+        serverId ?? undefined,
+        serverUserId
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useBandwidthTopUsers(timeRange?: StatsTimeRange, serverId?: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'bandwidth-top-users', timeRange, serverId],
+    queryFn: () =>
+      api.stats.bandwidthTopUsers(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useBandwidthSummary(timeRange?: StatsTimeRange, serverId?: string | null) {
+  return useQuery({
+    queryKey: ['stats', 'bandwidth-summary', timeRange, serverId],
+    queryFn: () =>
+      api.stats.bandwidthSummary(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}

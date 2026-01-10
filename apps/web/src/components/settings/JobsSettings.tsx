@@ -62,6 +62,7 @@ const JOB_ICONS: Record<string, typeof Database> = {
   normalize_countries: Globe,
   fix_imported_progress: RefreshCw,
   rebuild_timescale_views: Database,
+  normalize_codecs: ArrowUpDown,
 };
 
 function formatDuration(ms: number): string {
@@ -121,8 +122,12 @@ export function JobsSettings() {
       try {
         const result = await api.maintenance.getProgress();
         if (result.progress) {
-          setProgress(result.progress as MaintenanceJobProgress);
-          setRunningJob(result.progress.type);
+          const progressData = result.progress as MaintenanceJobProgress;
+          setProgress(progressData);
+          // Only set as running if status is actually 'running'
+          if (progressData.status === 'running') {
+            setRunningJob(progressData.type);
+          }
         }
       } catch (err) {
         console.error('Failed to check active job:', err);

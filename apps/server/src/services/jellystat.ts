@@ -16,11 +16,16 @@ import type {
   JellystatPlaybackActivity,
   JellystatImportProgress,
   JellystatImportResult,
+  SourceVideoDetails,
+  SourceAudioDetails,
+  StreamVideoDetails,
+  StreamAudioDetails,
+  TranscodeInfo,
+  SubtitleInfo,
 } from '@tracearr/shared';
 import { jellystatBackupSchema } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { servers } from '../db/schema.js';
-import type { sessions } from '../db/schema.js';
+import { servers, sessions } from '../db/schema.js';
 import { refreshAggregates } from '../db/timescale.js';
 import { geoipService } from './geoip.js';
 import type { PubSubService } from './cache.js';
@@ -53,6 +58,203 @@ interface MediaEnrichment {
   episodeNumber?: number;
   year?: number;
   thumbPath?: string;
+}
+
+/**
+ * JellyStat MediaStream from backup (video, audio, or subtitle stream)
+ */
+interface JellystatMediaStream {
+  Type?: string; // 'Video' | 'Audio' | 'Subtitle' etc.
+  Codec?: string;
+  BitRate?: number;
+  Width?: number;
+  Height?: number;
+  BitDepth?: number;
+  Channels?: number;
+  ChannelLayout?: string;
+  SampleRate?: number;
+  Language?: string;
+  VideoRange?: string; // SDR, HDR10, etc.
+  ColorSpace?: string;
+  ColorTransfer?: string;
+  ColorPrimaries?: string;
+  Profile?: string;
+  Level?: number;
+  AspectRatio?: string;
+  RealFrameRate?: number;
+  AverageFrameRate?: number;
+  IsDefault?: boolean;
+  IsForced?: boolean;
+}
+
+/**
+ * JellyStat TranscodingInfo from backup
+ */
+interface JellystatTranscodingInfoFull {
+  AudioCodec?: string | null;
+  VideoCodec?: string | null;
+  Container?: string | null;
+  IsVideoDirect?: boolean | null;
+  IsAudioDirect?: boolean | null;
+  Bitrate?: number | null;
+  Framerate?: number | null;
+  Width?: number | null;
+  Height?: number | null;
+  AudioChannels?: number | null;
+  HardwareAccelerationType?: string | null;
+  TranscodeReasons?: string[];
+  CompletionPercentage?: number | null;
+}
+
+/**
+ * Stream details extracted from JellyStat backup
+ */
+interface JellystatStreamDetails {
+  // Scalar fields
+  sourceVideoCodec: string | null;
+  sourceVideoWidth: number | null;
+  sourceVideoHeight: number | null;
+  sourceAudioCodec: string | null;
+  sourceAudioChannels: number | null;
+  streamVideoCodec: string | null;
+  streamAudioCodec: string | null;
+  // JSONB fields
+  sourceVideoDetails: SourceVideoDetails | null;
+  sourceAudioDetails: SourceAudioDetails | null;
+  streamVideoDetails: StreamVideoDetails | null;
+  streamAudioDetails: StreamAudioDetails | null;
+  transcodeInfo: TranscodeInfo | null;
+  subtitleInfo: SubtitleInfo | null;
+}
+
+/**
+ * Extract stream details from JellyStat MediaStreams and TranscodingInfo
+ *
+ * Maps JellyStat's backup format to our session schema fields
+ */
+export function extractJellystatStreamDetails(
+  mediaStreams: JellystatMediaStream[] | null | undefined,
+  transcodingInfo: JellystatTranscodingInfoFull | null | undefined
+): JellystatStreamDetails {
+  const result: JellystatStreamDetails = {
+    sourceVideoCodec: null,
+    sourceVideoWidth: null,
+    sourceVideoHeight: null,
+    sourceAudioCodec: null,
+    sourceAudioChannels: null,
+    streamVideoCodec: null,
+    streamAudioCodec: null,
+    sourceVideoDetails: null,
+    sourceAudioDetails: null,
+    streamVideoDetails: null,
+    streamAudioDetails: null,
+    transcodeInfo: null,
+    subtitleInfo: null,
+  };
+
+  // Extract source media info from MediaStreams array
+  if (mediaStreams && Array.isArray(mediaStreams)) {
+    const videoStream = mediaStreams.find((s) => s.Type === 'Video');
+    const audioStream = mediaStreams.find((s) => s.Type === 'Audio' && s.IsDefault !== false);
+    const subtitleStream = mediaStreams.find(
+      (s) => s.Type === 'Subtitle' && (s.IsDefault || s.IsForced)
+    );
+
+    // Source video
+    if (videoStream) {
+      result.sourceVideoCodec = videoStream.Codec?.toUpperCase() ?? null;
+      result.sourceVideoWidth = videoStream.Width ?? null;
+      result.sourceVideoHeight = videoStream.Height ?? null;
+
+      // Build source video details JSONB
+      const videoDetails: SourceVideoDetails = {};
+      if (videoStream.BitRate) videoDetails.bitrate = videoStream.BitRate;
+      if (videoStream.RealFrameRate || videoStream.AverageFrameRate) {
+        videoDetails.framerate = String(videoStream.RealFrameRate ?? videoStream.AverageFrameRate);
+      }
+      if (videoStream.VideoRange) videoDetails.dynamicRange = videoStream.VideoRange;
+      if (videoStream.Profile) videoDetails.profile = videoStream.Profile;
+      if (videoStream.Level) videoDetails.level = String(videoStream.Level);
+      if (videoStream.ColorSpace) videoDetails.colorSpace = videoStream.ColorSpace;
+      if (videoStream.BitDepth) videoDetails.colorDepth = videoStream.BitDepth;
+
+      if (Object.keys(videoDetails).length > 0) {
+        result.sourceVideoDetails = videoDetails;
+      }
+    }
+
+    // Source audio
+    if (audioStream) {
+      result.sourceAudioCodec = audioStream.Codec?.toUpperCase() ?? null;
+      result.sourceAudioChannels = audioStream.Channels ?? null;
+
+      // Build source audio details JSONB
+      const audioDetails: SourceAudioDetails = {};
+      if (audioStream.BitRate) audioDetails.bitrate = audioStream.BitRate;
+      if (audioStream.ChannelLayout) audioDetails.channelLayout = audioStream.ChannelLayout;
+      if (audioStream.Language) audioDetails.language = audioStream.Language;
+      if (audioStream.SampleRate) audioDetails.sampleRate = audioStream.SampleRate;
+
+      if (Object.keys(audioDetails).length > 0) {
+        result.sourceAudioDetails = audioDetails;
+      }
+    }
+
+    // Subtitle info
+    if (subtitleStream) {
+      const subInfo: SubtitleInfo = {};
+      if (subtitleStream.Codec) subInfo.codec = subtitleStream.Codec;
+      if (subtitleStream.Language) subInfo.language = subtitleStream.Language;
+      if (subtitleStream.IsForced !== undefined) subInfo.forced = subtitleStream.IsForced;
+
+      if (Object.keys(subInfo).length > 0) {
+        result.subtitleInfo = subInfo;
+      }
+    }
+  }
+
+  // Extract transcode/stream output info from TranscodingInfo
+  if (transcodingInfo) {
+    // Stream output codecs (after transcode)
+    if (transcodingInfo.VideoCodec) {
+      result.streamVideoCodec = transcodingInfo.VideoCodec.toUpperCase();
+    }
+    if (transcodingInfo.AudioCodec) {
+      result.streamAudioCodec = transcodingInfo.AudioCodec.toUpperCase();
+    }
+
+    // Build stream video details JSONB
+    const streamVideo: StreamVideoDetails = {};
+    if (transcodingInfo.Bitrate) streamVideo.bitrate = transcodingInfo.Bitrate;
+    if (transcodingInfo.Width) streamVideo.width = transcodingInfo.Width;
+    if (transcodingInfo.Height) streamVideo.height = transcodingInfo.Height;
+    if (transcodingInfo.Framerate) streamVideo.framerate = String(transcodingInfo.Framerate);
+
+    if (Object.keys(streamVideo).length > 0) {
+      result.streamVideoDetails = streamVideo;
+    }
+
+    // Build stream audio details JSONB
+    const streamAudio: StreamAudioDetails = {};
+    if (transcodingInfo.AudioChannels) streamAudio.channels = transcodingInfo.AudioChannels;
+
+    if (Object.keys(streamAudio).length > 0) {
+      result.streamAudioDetails = streamAudio;
+    }
+
+    // Build transcode info JSONB
+    const transcodeDetails: TranscodeInfo = {};
+    if (transcodingInfo.Container) transcodeDetails.streamContainer = transcodingInfo.Container;
+    if (transcodingInfo.HardwareAccelerationType) {
+      transcodeDetails.hwEncoding = transcodingInfo.HardwareAccelerationType;
+    }
+
+    if (Object.keys(transcodeDetails).length > 0) {
+      result.transcodeInfo = transcodeDetails;
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -126,9 +328,24 @@ export function transformActivityToSession(
   const { videoDecision, audioDecision, isTranscode } = parseJellystatPlayMethod(
     activity.PlayMethod
   );
-  const bitrate = activity.TranscodingInfo?.Bitrate
-    ? Math.floor(activity.TranscodingInfo.Bitrate / 1000)
-    : null;
+
+  // Extract stream details from MediaStreams and TranscodingInfo
+  // These fields exist in JellyStat backups but aren't typed in the schema (looseObject allows them)
+  const activityAny = activity as Record<string, unknown>;
+  const mediaStreams = activityAny.MediaStreams as JellystatMediaStream[] | null | undefined;
+  const transcodingInfoFull = activityAny.TranscodingInfo as
+    | JellystatTranscodingInfoFull
+    | null
+    | undefined;
+  const streamDetails = extractJellystatStreamDetails(mediaStreams, transcodingInfoFull);
+
+  // Bitrate: prefer TranscodingInfo bitrate (in bps), convert to kbps
+  // Fall back to source video bitrate if no transcode bitrate
+  const bitrate = transcodingInfoFull?.Bitrate
+    ? Math.floor(transcodingInfoFull.Bitrate / 1000)
+    : streamDetails.sourceVideoDetails?.bitrate
+      ? Math.floor(streamDetails.sourceVideoDetails.bitrate / 1000)
+      : null;
 
   return {
     serverId,
@@ -183,6 +400,8 @@ export function transformActivityToSession(
     videoDecision,
     audioDecision,
     bitrate,
+    // Stream details from MediaStreams and TranscodingInfo
+    ...streamDetails,
   };
 }
 
@@ -241,12 +460,14 @@ async function fetchMediaEnrichment(
  * @param backupJson - Raw JSON string from Jellystat backup file
  * @param enrichMedia - Whether to fetch metadata from Jellyfin API
  * @param pubSubService - Optional pub/sub service for progress updates
+ * @param options - Additional import options
  */
 export async function importJellystatBackup(
   serverId: string,
   backupJson: string,
   enrichMedia: boolean = true,
-  pubSubService?: PubSubService
+  pubSubService?: PubSubService,
+  options?: { updateStreamDetails?: boolean }
 ): Promise<JellystatImportResult> {
   const progress: JellystatImportProgress = {
     status: 'idle',
@@ -284,6 +505,7 @@ export async function importJellystatBackup(
       return {
         success: true,
         imported: 0,
+        updated: 0,
         skipped: 0,
         errors: 0,
         enriched: 0,
@@ -343,8 +565,10 @@ export async function importJellystatBackup(
 
     const geoCache = new Map<string, ReturnType<typeof geoipService.lookup>>();
     const insertedInThisImport = new Set<string>();
+    const updateStreamDetails = options?.updateStreamDetails ?? false;
 
     let imported = 0;
+    let updated = 0;
     let skipped = 0;
     let errors = 0;
 
@@ -356,9 +580,9 @@ export async function importJellystatBackup(
       const chunkIds = chunk.map((a) => a.Id).filter(Boolean);
       const existingMap =
         chunkIds.length > 0 ? await queryExistingByExternalIds(serverId, chunkIds) : new Map();
-      const existingInChunk = new Set(existingMap.keys());
 
       const insertBatch: (typeof sessions.$inferInsert)[] = [];
+      const updateBatch: Array<{ id: string; data: Partial<typeof sessions.$inferInsert> }> = [];
 
       for (const activity of chunk) {
         progress.processedRecords++;
@@ -372,7 +596,53 @@ export async function importJellystatBackup(
             continue;
           }
 
-          if (existingInChunk.has(activity.Id) || insertedInThisImport.has(activity.Id)) {
+          // Check if this is a duplicate we've already handled in this import
+          if (insertedInThisImport.has(activity.Id)) {
+            skipped++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          // Check if record exists in database
+          const existingSession = existingMap.get(activity.Id);
+          if (existingSession) {
+            // Record exists - check if we should update stream details
+            if (updateStreamDetails && !existingSession.sourceVideoCodec) {
+              // Extract stream details from this activity
+              const activityAny = activity as Record<string, unknown>;
+              const mediaStreams = activityAny.MediaStreams as JellystatMediaStream[] | null;
+              const transcodingInfoFull =
+                activityAny.TranscodingInfo as JellystatTranscodingInfoFull | null;
+
+              // Only update if backup has stream data
+              if (mediaStreams && mediaStreams.length > 0) {
+                const streamDetails = extractJellystatStreamDetails(
+                  mediaStreams,
+                  transcodingInfoFull
+                );
+
+                // Only queue update if we got meaningful data
+                if (streamDetails.sourceVideoCodec || streamDetails.sourceAudioCodec) {
+                  // Calculate bitrate if available
+                  const bitrate = transcodingInfoFull?.Bitrate
+                    ? Math.floor(transcodingInfoFull.Bitrate / 1000)
+                    : streamDetails.sourceVideoDetails?.bitrate
+                      ? Math.floor(streamDetails.sourceVideoDetails.bitrate / 1000)
+                      : null;
+
+                  updateBatch.push({
+                    id: existingSession.id,
+                    data: {
+                      ...streamDetails,
+                      bitrate,
+                    },
+                  });
+                  updated++;
+                  continue;
+                }
+              }
+            }
+            // No update needed - skip
             skipped++;
             progress.skippedRecords++;
             continue;
@@ -420,6 +690,15 @@ export async function importJellystatBackup(
         await flushInsertBatch(insertBatch, { chunkSize: BATCH_SIZE });
       }
 
+      // Batch update existing records with stream details
+      if (updateBatch.length > 0) {
+        await db.transaction(async (tx) => {
+          for (const update of updateBatch) {
+            await tx.update(sessions).set(update.data).where(eq(sessions.id, update.id));
+          }
+        });
+      }
+
       geoCache.clear();
     }
 
@@ -431,7 +710,7 @@ export async function importJellystatBackup(
       console.warn('[Jellystat] Failed to refresh aggregates after import:', err);
     }
 
-    let message = `Import complete: ${imported} imported, ${skipped} skipped, ${errors} errors`;
+    let message = `Import complete: ${imported} imported, ${updated} updated, ${skipped} skipped, ${errors} errors`;
     if (enrichMedia && enrichmentMap.size > 0) {
       message += `, ${enrichmentMap.size} media items enriched`;
     }
@@ -454,6 +733,7 @@ export async function importJellystatBackup(
     return {
       success: true,
       imported,
+      updated,
       skipped,
       errors,
       enriched: enrichmentMap.size,
@@ -478,6 +758,7 @@ export async function importJellystatBackup(
     return {
       success: false,
       imported: progress.importedRecords,
+      updated: 0,
       skipped: progress.skippedRecords,
       errors: progress.errorRecords,
       enriched: progress.enrichedRecords,

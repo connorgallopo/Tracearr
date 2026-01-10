@@ -6,12 +6,107 @@
  * - Database row → Session type (for application use)
  */
 
-import type { Session } from '@tracearr/shared';
+import { type Session, type StreamDetailFields, MEDIA_TYPES } from '@tracearr/shared';
 import type { MediaSession } from '../../services/mediaServer/types.js';
 import type { ProcessedSession } from './types.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
 import { formatQualityString } from '../../utils/resolutionNormalizer.js';
 import type { sessions } from '../../db/schema.js';
+
+/** Set of valid media types for O(1) validation */
+const VALID_MEDIA_TYPES = new Set<string>(MEDIA_TYPES);
+
+// ============================================================================
+// Thumb Path Resolution
+// ============================================================================
+
+/**
+ * Thumb path resolvers by media type
+ * Using lookup table makes it easy to add new media types
+ */
+const THUMB_PATH_RESOLVERS: Record<string, (session: MediaSession) => string> = {
+  live: (s) => s.live?.channelThumb ?? s.media.thumbPath ?? '',
+  episode: (s) => s.episode?.showThumbPath ?? s.media.thumbPath ?? '',
+  movie: (s) => s.media.thumbPath ?? '',
+  track: (s) => s.media.thumbPath ?? '',
+  photo: (s) => s.media.thumbPath ?? '',
+  unknown: (s) => s.media.thumbPath ?? '',
+};
+
+/**
+ * Resolve the appropriate thumbnail path based on media type
+ */
+function resolveThumbPath(session: MediaSession): string {
+  const resolver = THUMB_PATH_RESOLVERS[session.media.type];
+  return resolver ? resolver(session) : (session.media.thumbPath ?? '');
+}
+
+// ============================================================================
+// Media Type Mapping
+// ============================================================================
+
+/** Map media type, warn and default to 'unknown' if unexpected */
+function mapMediaType(parserType: string): ProcessedSession['mediaType'] {
+  if (VALID_MEDIA_TYPES.has(parserType)) {
+    return parserType as ProcessedSession['mediaType'];
+  }
+  console.warn(
+    `[sessionMapper] Unexpected media type encountered: "${parserType}", defaulting to "unknown"`
+  );
+  return 'unknown';
+}
+
+// ============================================================================
+// Stream Detail Helpers (DRY)
+// ============================================================================
+
+/**
+ * Extract stream detail fields from MediaSession quality data.
+ * Handles the field name mapping (e.g., videoWidth → sourceVideoWidth).
+ */
+export function extractStreamDetailsFromQuality(
+  quality: MediaSession['quality']
+): StreamDetailFields {
+  return {
+    sourceVideoCodec: quality.sourceVideoCodec ?? null,
+    sourceAudioCodec: quality.sourceAudioCodec ?? null,
+    sourceAudioChannels: quality.sourceAudioChannels ?? null,
+    sourceVideoWidth: quality.videoWidth ?? null,
+    sourceVideoHeight: quality.videoHeight ?? null,
+    sourceVideoDetails: quality.sourceVideoDetails ?? null,
+    sourceAudioDetails: quality.sourceAudioDetails ?? null,
+    streamVideoCodec: quality.streamVideoCodec ?? null,
+    streamAudioCodec: quality.streamAudioCodec ?? null,
+    streamVideoDetails: quality.streamVideoDetails ?? null,
+    streamAudioDetails: quality.streamAudioDetails ?? null,
+    transcodeInfo: quality.transcodeInfo ?? null,
+    subtitleInfo: quality.subtitleInfo ?? null,
+  };
+}
+
+/**
+ * Pick stream detail fields from any object that has them.
+ * Useful for DB inserts where we spread ProcessedSession fields.
+ */
+export function pickStreamDetailFields<T extends StreamDetailFields>(
+  source: T
+): StreamDetailFields {
+  return {
+    sourceVideoCodec: source.sourceVideoCodec,
+    sourceAudioCodec: source.sourceAudioCodec,
+    sourceAudioChannels: source.sourceAudioChannels,
+    sourceVideoWidth: source.sourceVideoWidth,
+    sourceVideoHeight: source.sourceVideoHeight,
+    sourceVideoDetails: source.sourceVideoDetails,
+    sourceAudioDetails: source.sourceAudioDetails,
+    streamVideoCodec: source.streamVideoCodec,
+    streamAudioCodec: source.streamAudioCodec,
+    streamVideoDetails: source.streamVideoDetails,
+    streamAudioDetails: source.streamAudioDetails,
+    transcodeInfo: source.transcodeInfo,
+    subtitleInfo: source.subtitleInfo,
+  };
+}
 
 // ============================================================================
 // MediaSession → ProcessedSession Mapping
@@ -33,13 +128,8 @@ export function mapMediaSession(
   session: MediaSession,
   serverType: 'plex' | 'jellyfin' | 'emby'
 ): ProcessedSession {
-  const isEpisode = session.media.type === 'episode';
-
-  // For episodes, prefer show poster; for movies, use media poster
-  const thumbPath =
-    isEpisode && session.episode?.showThumbPath
-      ? session.episode.showThumbPath
-      : (session.media.thumbPath ?? '');
+  // Resolve thumb path using lookup table
+  const thumbPath = resolveThumbPath(session);
 
   // Build quality string from resolution (preferred) or bitrate
   const quality = formatQualityString(session.quality);
@@ -55,6 +145,9 @@ export function mapMediaSession(
   const platform = normalized.platform;
   const device = normalized.device;
 
+  // Map media type using lookup table
+  const mediaType = mapMediaType(session.media.type);
+
   return {
     sessionKey: session.sessionKey,
     plexSessionId: session.plexSessionId,
@@ -64,18 +157,22 @@ export function mapMediaSession(
     username: session.user.username || 'Unknown',
     userThumb: session.user.thumb ?? '',
     mediaTitle: session.media.title,
-    mediaType:
-      session.media.type === 'movie'
-        ? 'movie'
-        : session.media.type === 'episode'
-          ? 'episode'
-          : 'track',
+    mediaType,
     // Enhanced media metadata
     grandparentTitle: session.episode?.showTitle ?? '',
     seasonNumber: session.episode?.seasonNumber ?? 0,
     episodeNumber: session.episode?.episodeNumber ?? 0,
     year: session.media.year ?? 0,
     thumbPath,
+    // Live TV specific fields
+    channelTitle: session.live?.channelTitle ?? null,
+    channelIdentifier: session.live?.channelIdentifier ?? null,
+    channelThumb: session.live?.channelThumb ?? null,
+    // Music track metadata
+    artistName: session.music?.artistName ?? null,
+    albumName: session.music?.albumName ?? null,
+    trackNumber: session.music?.trackNumber ?? null,
+    discNumber: session.music?.discNumber ?? null,
     // Connection info
     ipAddress,
     playerName: session.player.name,
@@ -88,6 +185,8 @@ export function mapMediaSession(
     videoDecision: session.quality.videoDecision,
     audioDecision: session.quality.audioDecision,
     bitrate: session.quality.bitrate,
+    // Stream details (source media, stream output, transcode/subtitle info)
+    ...extractStreamDetailsFromQuality(session.quality),
     state: session.playback.state === 'paused' ? 'paused' : 'playing',
     totalDurationMs: session.media.durationMs,
     progressMs: session.playback.positionMs,
@@ -151,5 +250,16 @@ export function mapSessionRow(s: typeof sessions.$inferSelect): Session {
     videoDecision: s.videoDecision,
     audioDecision: s.audioDecision,
     bitrate: s.bitrate,
+    // Stream details (source media, stream output, transcode/subtitle info)
+    ...pickStreamDetailFields(s),
+    // Live TV fields
+    channelTitle: s.channelTitle,
+    channelIdentifier: s.channelIdentifier,
+    channelThumb: s.channelThumb,
+    // Music track fields
+    artistName: s.artistName,
+    albumName: s.albumName,
+    trackNumber: s.trackNumber,
+    discNumber: s.discNumber,
   };
 }

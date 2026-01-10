@@ -12,6 +12,16 @@ import settingsEn from './locales/en/settings.json' with { type: 'json' };
 import navEn from './locales/en/nav.json' with { type: 'json' };
 
 // ============================================================================
+// German Translations
+// ============================================================================
+import commonDe from './locales/de/common.json' with { type: 'json' };
+import rulesDe from './locales/de/rules.json' with { type: 'json' };
+import sessionsDe from './locales/de/sessions.json' with { type: 'json' };
+import notificationsDe from './locales/de/notifications.json' with { type: 'json' };
+import settingsDe from './locales/de/settings.json' with { type: 'json' };
+import navDe from './locales/de/nav.json' with { type: 'json' };
+
+// ============================================================================
 // Add New Languages Here
 // ============================================================================
 // To add a new language (e.g., Spanish):
@@ -47,6 +57,14 @@ export const resources = {
     notifications: notificationsEn,
     settings: settingsEn,
     nav: navEn,
+  },
+  de: {
+    common: commonDe,
+    rules: rulesDe,
+    sessions: sessionsDe,
+    notifications: notificationsDe,
+    settings: settingsDe,
+    nav: navDe,
   },
   // Add new languages here:
   // es: {

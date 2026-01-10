@@ -41,7 +41,7 @@ export function UserCard({
     <Link
       to={`/users/${userId}`}
       className={cn(
-        'group bg-card hover:border-primary/50 hover:shadow-primary/10 relative flex flex-col items-center rounded-xl border p-6 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-lg',
+        'group bg-card card-hover-border relative flex flex-col items-center rounded-xl border p-6 text-center',
         'animate-fade-in-up',
         className
       )}

@@ -10,9 +10,10 @@
  * @see https://orm.drizzle.team/docs/perf-queries
  */
 
-import { eq, gte, and, isNull, desc, sql } from 'drizzle-orm';
+import { eq, gte, and, isNull, desc, sql, inArray } from 'drizzle-orm';
 import { db } from './client.js';
 import { sessions, violations, users, serverUsers, servers, rules } from './schema.js';
+import { PRIMARY_MEDIA_TYPES } from '../constants/index.js';
 
 // ============================================================================
 // Dashboard Stats Queries
@@ -22,26 +23,38 @@ import { sessions, violations, users, serverUsers, servers, rules } from './sche
  * Count unique plays (grouped by reference_id) since a given date
  * Used for: Dashboard "Today's Plays" metric
  * Called: Every dashboard page load
+ * Note: Excludes live TV and music tracks
  */
 export const playsCountSince = db
   .select({
     count: sql<number>`count(DISTINCT COALESCE(reference_id, id))::int`,
   })
   .from(sessions)
-  .where(gte(sessions.startedAt, sql.placeholder('since')))
+  .where(
+    and(
+      gte(sessions.startedAt, sql.placeholder('since')),
+      inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES)
+    )
+  )
   .prepare('plays_count_since');
 
 /**
  * Sum total watch time since a given date
  * Used for: Dashboard "Watch Time" metric
  * Called: Every dashboard page load
+ * Note: Excludes live TV and music tracks
  */
 export const watchTimeSince = db
   .select({
     totalMs: sql<number>`COALESCE(SUM(duration_ms), 0)::bigint`,
   })
   .from(sessions)
-  .where(gte(sessions.startedAt, sql.placeholder('since')))
+  .where(
+    and(
+      gte(sessions.startedAt, sql.placeholder('since')),
+      inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES)
+    )
+  )
   .prepare('watch_time_since');
 
 /**
@@ -61,13 +74,19 @@ export const violationsCountSince = db
  * Count unique active users since a given date
  * Used for: Dashboard "Active Users Today" metric
  * Called: Every dashboard page load
+ * Note: Excludes live TV and music tracks
  */
 export const uniqueUsersSince = db
   .select({
     count: sql<number>`count(DISTINCT server_user_id)::int`,
   })
   .from(sessions)
-  .where(gte(sessions.startedAt, sql.placeholder('since')))
+  .where(
+    and(
+      gte(sessions.startedAt, sql.placeholder('since')),
+      inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES)
+    )
+  )
   .prepare('unique_users_since');
 
 /**
@@ -186,6 +205,7 @@ export const sessionById = db
  * Plays by platform since a given date
  * Used for: Stats platform breakdown chart
  * Called: Every stats page load
+ * Note: Excludes live TV and music tracks
  */
 export const playsByPlatformSince = db
   .select({
@@ -193,7 +213,12 @@ export const playsByPlatformSince = db
     count: sql<number>`count(DISTINCT COALESCE(reference_id, id))::int`,
   })
   .from(sessions)
-  .where(gte(sessions.startedAt, sql.placeholder('since')))
+  .where(
+    and(
+      gte(sessions.startedAt, sql.placeholder('since')),
+      inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES)
+    )
+  )
   .groupBy(sessions.platform)
   .orderBy(sql`count(DISTINCT COALESCE(reference_id, id)) DESC`)
   .prepare('plays_by_platform_since');
@@ -202,6 +227,7 @@ export const playsByPlatformSince = db
  * Quality breakdown (direct vs transcode) since a given date
  * Used for: Stats quality chart
  * Called: Every stats page load
+ * Note: Excludes live TV and music tracks
  */
 export const qualityStatsSince = db
   .select({
@@ -209,7 +235,12 @@ export const qualityStatsSince = db
     count: sql<number>`count(DISTINCT COALESCE(reference_id, id))::int`,
   })
   .from(sessions)
-  .where(gte(sessions.startedAt, sql.placeholder('since')))
+  .where(
+    and(
+      gte(sessions.startedAt, sql.placeholder('since')),
+      inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES)
+    )
+  )
   .groupBy(sessions.isTranscode)
   .prepare('quality_stats_since');
 

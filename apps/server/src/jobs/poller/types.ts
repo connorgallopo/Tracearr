@@ -5,7 +5,14 @@
  * Separated from implementation for clean imports and testing.
  */
 
-import type { Session, SessionState, Rule, RuleParams, ActiveSession } from '@tracearr/shared';
+import type {
+  Session,
+  SessionState,
+  Rule,
+  RuleParams,
+  ActiveSession,
+  StreamDetailFields,
+} from '@tracearr/shared';
 import type { sessions } from '../../db/schema.js';
 import type { GeoLocation } from '../../services/geoip.js';
 import type { ViolationInsertResult } from './violations.js';
@@ -47,9 +54,10 @@ export interface ServerWithToken {
 
 /**
  * Processed session format after mapping from MediaSession
- * Contains all fields needed for database storage and display
+ * Contains all fields needed for database storage and display.
+ * Extends StreamDetailFields to inherit stream metadata fields.
  */
-export interface ProcessedSession {
+export interface ProcessedSession extends StreamDetailFields {
   /** Unique session key from media server */
   sessionKey: string;
   /** Plex Session.id - required for termination API (different from sessionKey) */
@@ -69,7 +77,7 @@ export interface ProcessedSession {
   /** Media title */
   mediaTitle: string;
   /** Media type classification */
-  mediaType: 'movie' | 'episode' | 'track';
+  mediaType: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'unknown';
   /** Show name (for episodes) */
   grandparentTitle: string;
   /** Season number (for episodes) */
@@ -80,6 +88,24 @@ export interface ProcessedSession {
   year: number;
   /** Poster path */
   thumbPath: string;
+
+  // Live TV specific fields
+  /** Channel name (e.g., "HBO", "ESPN") */
+  channelTitle: string | null;
+  /** Channel number or identifier */
+  channelIdentifier: string | null;
+  /** Channel logo/thumbnail path */
+  channelThumb: string | null;
+
+  // Music track metadata
+  /** Artist name */
+  artistName: string | null;
+  /** Album name */
+  albumName: string | null;
+  /** Track number in album */
+  trackNumber: number | null;
+  /** Disc number for multi-disc albums */
+  discNumber: number | null;
 
   // Connection info
   /** Client IP address */

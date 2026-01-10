@@ -26,6 +26,8 @@ export interface TautulliImportJobData {
   serverId: string;
   userId: string; // Audit trail - who initiated the import
   checkpoint?: number; // Resume from this page (for future use)
+  overwriteFriendlyNames?: boolean; // Whether to overwrite existing friendly names
+  includeStreamDetails?: boolean; // (BETA) Fetch detailed codec/bitrate info via additional API calls
 }
 
 export interface JellystatImportJobData {
@@ -34,6 +36,7 @@ export interface JellystatImportJobData {
   userId: string; // Audit trail - who initiated the import
   backupJson: string; // Jellystat backup file contents
   enrichMedia: boolean; // Whether to enrich with metadata from Jellyfin/Emby
+  updateStreamDetails?: boolean; // Whether to update existing records with stream/transcode data
 }
 
 export type ImportJobData = TautulliImportJobData | JellystatImportJobData;
@@ -191,7 +194,7 @@ async function processImportJob(job: Job<ImportJobData>): Promise<ImportJobResul
 async function processTautulliImportJob(
   job: Job<TautulliImportJobData>
 ): Promise<TautulliImportResult> {
-  const { serverId } = job.data;
+  const { serverId, overwriteFriendlyNames = false, includeStreamDetails = false } = job.data;
   const pubSubService = getPubSubService();
 
   // Progress callback to update job and publish to WebSocket
@@ -225,8 +228,35 @@ async function processTautulliImportJob(
   const result = await TautulliService.importHistory(
     serverId,
     pubSubService ?? undefined,
-    onProgress
+    onProgress,
+    { overwriteFriendlyNames, skipRefresh: includeStreamDetails }
   );
+
+  // (BETA) Enrich sessions with detailed stream data
+  if (includeStreamDetails && result.success) {
+    console.log(`[Import] Starting stream details enrichment for server ${serverId}`);
+    if (pubSubService) {
+      await pubSubService.publish('import:progress', {
+        status: 'enriching',
+        message: '(BETA) Fetching detailed stream data...',
+        jobId: job.id,
+      });
+    }
+
+    try {
+      const enrichResult = await TautulliService.enrichStreamDetails(
+        serverId,
+        pubSubService ?? undefined,
+        onProgress
+      );
+      console.log(
+        `[Import] Stream enrichment complete: ${enrichResult.enriched} enriched, ${enrichResult.failed} failed, ${enrichResult.skipped} skipped`
+      );
+    } catch (error) {
+      // Don't fail the import if enrichment fails - it's a best-effort enhancement
+      console.error(`[Import] Stream enrichment failed:`, error);
+    }
+  }
 
   // Publish final result (note: TautulliService already publishes final progress,
   // but this is a fallback to ensure frontend receives completion notification)
@@ -260,7 +290,7 @@ async function processTautulliImportJob(
 async function processJellystatImportJob(
   job: Job<JellystatImportJobData>
 ): Promise<JellystatImportResult> {
-  const { serverId, backupJson, enrichMedia } = job.data;
+  const { serverId, backupJson, enrichMedia, updateStreamDetails } = job.data;
   const pubSubService = getPubSubService();
 
   // Run the actual import
@@ -268,16 +298,18 @@ async function processJellystatImportJob(
     serverId,
     backupJson,
     enrichMedia,
-    pubSubService ?? undefined
+    pubSubService ?? undefined,
+    { updateStreamDetails }
   );
 
   // Publish final result
   if (pubSubService) {
     await pubSubService.publish('import:jellystat:progress', {
       status: result.success ? 'complete' : 'error',
-      totalRecords: result.imported + result.skipped + result.errors,
-      processedRecords: result.imported + result.skipped + result.errors,
+      totalRecords: result.imported + result.updated + result.skipped + result.errors,
+      processedRecords: result.imported + result.updated + result.skipped + result.errors,
       importedRecords: result.imported,
+      updatedRecords: result.updated,
       skippedRecords: result.skipped,
       errorRecords: result.errors,
       enrichedRecords: result.enriched,
@@ -306,7 +338,12 @@ export async function getActiveImportForServer(serverId: string): Promise<string
 /**
  * Enqueue a new import job
  */
-export async function enqueueImport(serverId: string, userId: string): Promise<string> {
+export async function enqueueImport(
+  serverId: string,
+  userId: string,
+  overwriteFriendlyNames: boolean,
+  includeStreamDetails: boolean = false
+): Promise<string> {
   if (!importQueue) {
     throw new Error('Import queue not initialized');
   }
@@ -322,6 +359,8 @@ export async function enqueueImport(serverId: string, userId: string): Promise<s
     type: 'tautulli',
     serverId,
     userId,
+    overwriteFriendlyNames,
+    includeStreamDetails,
   });
 
   const jobId = job.id ?? `unknown-${Date.now()}`;
@@ -447,7 +486,8 @@ export async function enqueueJellystatImport(
   serverId: string,
   userId: string,
   backupJson: string,
-  enrichMedia: boolean = true
+  enrichMedia: boolean = true,
+  updateStreamDetails: boolean = false
 ): Promise<string> {
   if (!importQueue) {
     throw new Error('Import queue not initialized');
@@ -466,6 +506,7 @@ export async function enqueueJellystatImport(
     userId,
     backupJson,
     enrichMedia,
+    updateStreamDetails,
   });
 
   const jobId = job.id ?? `unknown-${Date.now()}`;

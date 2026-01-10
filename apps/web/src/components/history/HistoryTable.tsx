@@ -9,6 +9,9 @@ import {
   Film,
   Tv,
   Music,
+  Radio,
+  Image,
+  CircleHelp,
   Play,
   Pause,
   Square,
@@ -162,6 +165,9 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
     movie: { icon: Film, label: 'Movie' },
     episode: { icon: Tv, label: 'TV Episode' },
     track: { icon: Music, label: 'Music' },
+    live: { icon: Radio, label: 'Live TV' },
+    photo: { icon: Image, label: 'Photo' },
+    unknown: { icon: CircleHelp, label: 'Unknown' },
   };
   const { icon: Icon, label } = config[type];
   return (
@@ -204,6 +210,16 @@ function getContentTitle(session: SessionWithDetails): { primary: string; second
     return {
       primary: session.grandparentTitle,
       secondary: `${epNum}${epNum ? ' · ' : ''}${session.mediaTitle}`,
+    };
+  }
+  if (session.mediaType === 'track') {
+    // Music track - show track name, artist/album as secondary
+    const parts: string[] = [];
+    if (session.artistName) parts.push(session.artistName);
+    if (session.albumName) parts.push(session.albumName);
+    return {
+      primary: session.mediaTitle,
+      secondary: parts.length > 0 ? parts.join(' · ') : undefined,
     };
   }
   return {

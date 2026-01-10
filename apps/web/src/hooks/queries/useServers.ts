@@ -43,6 +43,48 @@ export function useDeleteServer() {
   });
 }
 
+export function useUpdateServerUrl() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      url,
+      clientIdentifier,
+    }: {
+      id: string;
+      url: string;
+      clientIdentifier?: string;
+    }) => api.servers.updateUrl(id, url, clientIdentifier),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });
+      toast.success('Server URL Updated', {
+        description: 'The server URL has been updated successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to Update URL', { description: error.message });
+    },
+  });
+}
+
+/**
+ * Hook for fetching available connections for an existing Plex server
+ * Used when editing the server URL to show available connection options
+ */
+export function usePlexServerConnections(serverId: string | undefined) {
+  return useQuery({
+    queryKey: ['plex', 'server-connections', serverId],
+    queryFn: async () => {
+      if (!serverId) throw new Error('serverId required');
+      return api.auth.getPlexServerConnections(serverId);
+    },
+    enabled: !!serverId,
+    staleTime: 1000 * 30, // 30 seconds - connections may change
+    retry: 1,
+  });
+}
+
 export function useSyncServer() {
   const queryClient = useQueryClient();
 

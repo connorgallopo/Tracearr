@@ -345,10 +345,13 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
    * Get user's owned Plex servers from plex.tv
    */
   static async getServers(token: string): Promise<PlexServerResource[]> {
-    const data = await fetchJson<unknown>(`${PLEX_TV_BASE}/api/v2/resources?includeHttps=1`, {
-      headers: plexHeaders(token),
-      service: 'plex.tv',
-    });
+    const data = await fetchJson<unknown>(
+      `${PLEX_TV_BASE}/api/v2/resources?includeHttps=1&includeRelay=0`,
+      {
+        headers: plexHeaders(token),
+        service: 'plex.tv',
+      }
+    );
 
     return parseServerResourcesResponse(data, token);
   }

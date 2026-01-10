@@ -4,8 +4,12 @@ import { playsRoutes } from './plays.js';
 import { usersRoutes } from './users.js';
 import { contentRoutes } from './content.js';
 import { locationsRoutes } from './locations.js';
-import { qualityRoutes } from './quality.js';
 import { engagementRoutes } from './engagement.js';
+import { devicesRoutes } from './devices.js';
+import { bandwidthRoutes } from './bandwidth.js';
+import { platformsRoutes } from './platforms.js';
+import { qualityRoutes } from './quality.js';
+import { concurrentRoutes } from './concurrent.js';
 
 export const statsRoutes: FastifyPluginAsync = async (app) => {
   // Register all sub-route plugins
@@ -15,8 +19,12 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
   await app.register(usersRoutes);
   await app.register(contentRoutes);
   await app.register(locationsRoutes);
-  await app.register(qualityRoutes);
   await app.register(engagementRoutes);
+  await app.register(devicesRoutes);
+  await app.register(bandwidthRoutes);
+  await app.register(platformsRoutes);
+  await app.register(qualityRoutes);
+  await app.register(concurrentRoutes);
 };
 
 // Re-export utilities for potential use by other modules

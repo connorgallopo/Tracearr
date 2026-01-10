@@ -39,6 +39,15 @@ import type {
   ShowStatsResponse,
   MediaType,
   WebhookFormat,
+  // New analytics types
+  DeviceCompatibilityResponse,
+  DeviceCompatibilityMatrix,
+  DeviceHealthResponse,
+  TranscodeHotspotsResponse,
+  TopTranscodingUsersResponse,
+  DailyBandwidthResponse,
+  BandwidthTopUsersResponse,
+  BandwidthSummary,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -381,6 +390,12 @@ class ApiClient {
         method: 'DELETE',
       }),
 
+    // Get connections for a specific Plex server (for editing URL)
+    getPlexServerConnections: (serverId: string) =>
+      this.request<{ server: PlexDiscoveredServer | null }>(
+        `/auth/plex/server-connections/${serverId}`
+      ),
+
     // Jellyfin server connection with API key (requires auth)
     connectJellyfinWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
       this.request<{
@@ -425,6 +440,11 @@ class ApiClient {
     },
     create: (data: { name: string; type: string; url: string; token: string }) =>
       this.request<Server>('/servers', { method: 'POST', body: JSON.stringify(data) }),
+    updateUrl: (id: string, url: string, clientIdentifier?: string) =>
+      this.request<Server>(`/servers/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ url, ...(clientIdentifier && { clientIdentifier }) }),
+      }),
     delete: (id: string) => this.request<void>(`/servers/${id}`, { method: 'DELETE' }),
     sync: (id: string) =>
       this.request<{
@@ -448,6 +468,12 @@ class ApiClient {
         }[];
         fetchedAt: string;
       }>(`/servers/${id}/statistics`),
+    health: async () => {
+      const response = await this.request<{
+        data: { serverId: string; serverName: string }[];
+      }>('/servers/health');
+      return response.data;
+    },
   };
 
   // Users
@@ -753,6 +779,65 @@ class ApiClient {
       if (options?.orderBy) params.set('orderBy', options.orderBy);
       return this.request<ShowStatsResponse>(`/stats/shows?${params.toString()}`);
     },
+
+    // Device compatibility stats
+    deviceCompatibility: async (timeRange?: StatsTimeRange, serverId?: string, minSessions = 5) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      params.set('minSessions', String(minSessions));
+      return this.request<DeviceCompatibilityResponse>(
+        `/stats/device-compatibility?${params.toString()}`
+      );
+    },
+    deviceCompatibilityMatrix: async (
+      timeRange?: StatsTimeRange,
+      serverId?: string,
+      minSessions = 5
+    ) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      params.set('minSessions', String(minSessions));
+      return this.request<DeviceCompatibilityMatrix>(
+        `/stats/device-compatibility/matrix?${params.toString()}`
+      );
+    },
+    deviceHealth: async (timeRange?: StatsTimeRange, serverId?: string) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      return this.request<DeviceHealthResponse>(
+        `/stats/device-compatibility/health?${params.toString()}`
+      );
+    },
+    transcodeHotspots: async (timeRange?: StatsTimeRange, serverId?: string) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      return this.request<TranscodeHotspotsResponse>(
+        `/stats/device-compatibility/hotspots?${params.toString()}`
+      );
+    },
+    topTranscodingUsers: async (timeRange?: StatsTimeRange, serverId?: string) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      return this.request<TopTranscodingUsersResponse>(
+        `/stats/device-compatibility/top-transcoding-users?${params.toString()}`
+      );
+    },
+
+    // Bandwidth stats
+    bandwidthDaily: async (
+      timeRange?: StatsTimeRange,
+      serverId?: string,
+      serverUserId?: string
+    ) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      if (serverUserId) params.set('serverUserId', serverUserId);
+      return this.request<DailyBandwidthResponse>(`/stats/bandwidth/daily?${params.toString()}`);
+    },
+    bandwidthTopUsers: async (timeRange?: StatsTimeRange, serverId?: string) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      return this.request<BandwidthTopUsersResponse>(
+        `/stats/bandwidth/top-users?${params.toString()}`
+      );
+    },
+    bandwidthSummary: async (timeRange?: StatsTimeRange, serverId?: string) => {
+      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+      return this.request<BandwidthSummary>(`/stats/bandwidth/summary?${params.toString()}`);
+    },
   };
 
   // Settings
@@ -798,10 +883,14 @@ class ApiClient {
           users?: number;
           historyRecords?: number;
         }>('/import/tautulli/test', { method: 'POST', body: JSON.stringify({ url, apiKey }) }),
-      start: (serverId: string) =>
+      start: (
+        serverId: string,
+        overwriteFriendlyNames: boolean = false,
+        includeStreamDetails: boolean = false
+      ) =>
         this.request<{ status: string; jobId?: string; message: string }>('/import/tautulli', {
           method: 'POST',
-          body: JSON.stringify({ serverId }),
+          body: JSON.stringify({ serverId, overwriteFriendlyNames, includeStreamDetails }),
         }),
       getActive: (serverId: string) =>
         this.request<{
@@ -834,12 +923,19 @@ class ApiClient {
        * @param serverId - Target Jellyfin/Emby server
        * @param file - Jellystat backup JSON file
        * @param enrichMedia - Whether to enrich with metadata (default: true)
+       * @param updateStreamDetails - Whether to update existing records with stream data (default: false)
        */
-      start: async (serverId: string, file: File, enrichMedia: boolean = true) => {
+      start: async (
+        serverId: string,
+        file: File,
+        enrichMedia: boolean = true,
+        updateStreamDetails: boolean = false
+      ) => {
         const formData = new FormData();
         // Fields must come BEFORE file - @fastify/multipart stops parsing after file
         formData.append('serverId', serverId);
         formData.append('enrichMedia', String(enrichMedia));
+        formData.append('updateStreamDetails', String(updateStreamDetails));
         formData.append('file', file);
 
         return this.request<{ status: string; jobId?: string; message: string }>(
@@ -867,6 +963,7 @@ class ApiClient {
           result?: {
             success: boolean;
             imported: number;
+            updated: number;
             skipped: number;
             errors: number;
             enriched: number;

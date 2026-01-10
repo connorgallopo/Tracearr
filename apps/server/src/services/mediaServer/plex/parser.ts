@@ -16,6 +16,16 @@ import {
 } from '../../../utils/parsing.js';
 import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
 import type { MediaSession, MediaUser, MediaLibrary, MediaWatchHistoryItem } from '../types.js';
+import type {
+  SourceVideoDetails,
+  SourceAudioDetails,
+  StreamVideoDetails,
+  StreamAudioDetails,
+  TranscodeInfo,
+  SubtitleInfo,
+} from '@tracearr/shared';
+import { calculateProgress } from '../shared/parserUtils.js';
+import { extractPlexLiveTvMetadata, extractPlexMusicMetadata } from './plexUtils.js';
 
 // ============================================================================
 // Raw Plex API Response Types (for internal use)
@@ -42,6 +52,405 @@ export interface PlexRawSession {
   Player?: Record<string, unknown>;
   Media?: Array<Record<string, unknown>>;
   TranscodeSession?: Record<string, unknown>;
+  // Live TV fields
+  live?: unknown; // '1' if Live TV
+  sourceTitle?: unknown; // Channel name for Live TV
+}
+
+// ============================================================================
+// Stream Detail Extraction
+// ============================================================================
+
+/** Stream type constants from Plex API
+ * @internal Exported for unit testing
+ */
+export const STREAM_TYPE = {
+  VIDEO: 1,
+  AUDIO: 2,
+  SUBTITLE: 3,
+} as const;
+
+/**
+ * Find streams by type from Part[].Stream[] array
+ * Returns the selected stream if available, otherwise the first stream of that type
+ * @internal Exported for unit testing
+ */
+export function findStreamByType(
+  part: Record<string, unknown> | undefined,
+  streamType: number
+): Record<string, unknown> | undefined {
+  if (!part) return undefined;
+  const streams = part.Stream as Array<Record<string, unknown>> | undefined;
+  if (!Array.isArray(streams)) return undefined;
+
+  // Single-pass extraction: track first match and selected stream
+  let firstMatch: Record<string, unknown> | undefined;
+  let selectedMatch: Record<string, unknown> | undefined;
+
+  for (const stream of streams) {
+    if (parseNumber(stream.streamType) !== streamType) continue;
+
+    // Track first matching stream as fallback
+    if (!firstMatch) firstMatch = stream;
+
+    // Prefer selected stream - return immediately if found
+    if (parseString(stream.selected) === '1') {
+      selectedMatch = stream;
+      break; // Selected stream found, no need to continue
+    }
+  }
+
+  return selectedMatch ?? firstMatch;
+}
+
+/**
+ * Derive dynamic range from video stream color attributes
+ * Following Tautulli's approach for HDR detection
+ * @internal Exported for unit testing
+ */
+export function deriveDynamicRange(stream: Record<string, unknown>): string {
+  // Check for Dolby Vision via DOVI fields
+  if (parseString(stream.DOVIPresent) === '1') {
+    const profile = parseOptionalString(stream.DOVIProfile);
+    if (profile) {
+      return `Dolby Vision ${profile}`;
+    }
+    return 'Dolby Vision';
+  }
+
+  const colorSpace = parseOptionalString(stream.colorSpace);
+  const bitDepth = parseOptionalNumber(stream.bitDepth);
+  const colorTrc = parseOptionalString(stream.colorTrc);
+
+  // Check for HDR10/HDR10+/HLG via color attributes
+  if (colorSpace === 'bt2020' || (bitDepth && bitDepth >= 10)) {
+    if (colorTrc === 'smpte2084') return 'HDR10';
+    if (colorTrc === 'arib-std-b67') return 'HLG';
+    if (colorSpace === 'bt2020') return 'HDR';
+  }
+
+  // Fallback: check extendedDisplayTitle for HDR keywords (Tautulli approach)
+  const extendedDisplayTitle = parseOptionalString(stream.extendedDisplayTitle) ?? '';
+  if (extendedDisplayTitle.includes('Dolby Vision') || extendedDisplayTitle.includes('DoVi')) {
+    return 'Dolby Vision';
+  }
+  if (extendedDisplayTitle.includes('HLG')) {
+    return 'HLG';
+  }
+  if (extendedDisplayTitle.includes('HDR10')) {
+    return 'HDR10';
+  }
+  if (extendedDisplayTitle.includes('HDR')) {
+    return 'HDR';
+  }
+
+  return 'SDR';
+}
+
+/**
+ * Extract source video details from stream
+ */
+function extractSourceVideoDetails(
+  stream: Record<string, unknown> | undefined,
+  media: Record<string, unknown> | undefined
+): {
+  codec?: string;
+  width?: number;
+  height?: number;
+  details: SourceVideoDetails;
+} {
+  if (!stream) {
+    return { details: {} };
+  }
+
+  const codec = parseOptionalString(stream.codec)?.toUpperCase();
+  const width = parseOptionalNumber(stream.width);
+  const height = parseOptionalNumber(stream.height);
+
+  const details: SourceVideoDetails = {};
+
+  const bitrate = parseOptionalNumber(stream.bitrate);
+  if (bitrate) details.bitrate = bitrate;
+
+  // Framerate - prefer stream.frameRate, fallback to media.videoFrameRate
+  const frameRate =
+    parseOptionalString(stream.frameRate) ?? parseOptionalString(media?.videoFrameRate);
+  if (frameRate) details.framerate = frameRate;
+
+  // Dynamic range
+  const dynamicRange = deriveDynamicRange(stream);
+  if (dynamicRange !== 'SDR') details.dynamicRange = dynamicRange;
+  else details.dynamicRange = 'SDR';
+
+  // Aspect ratio from media level
+  const aspectRatio = parseOptionalNumber(media?.aspectRatio);
+  if (aspectRatio) details.aspectRatio = aspectRatio;
+
+  // Profile and level
+  const profile = parseOptionalString(stream.profile);
+  if (profile) details.profile = profile;
+
+  const level = parseOptionalString(stream.level);
+  if (level) details.level = level;
+
+  // Color information
+  const colorSpace = parseOptionalString(stream.colorSpace);
+  if (colorSpace) details.colorSpace = colorSpace;
+
+  const colorDepth = parseOptionalNumber(stream.bitDepth);
+  if (colorDepth) details.colorDepth = colorDepth;
+
+  return { codec, width, height, details };
+}
+
+/**
+ * Extract source audio details from stream
+ */
+function extractSourceAudioDetails(stream: Record<string, unknown> | undefined): {
+  codec?: string;
+  channels?: number;
+  details: SourceAudioDetails;
+} {
+  if (!stream) {
+    return { details: {} };
+  }
+
+  const codec = parseOptionalString(stream.codec)?.toUpperCase();
+  const channels = parseOptionalNumber(stream.channels);
+
+  const details: SourceAudioDetails = {};
+
+  const bitrate = parseOptionalNumber(stream.bitrate);
+  if (bitrate) details.bitrate = bitrate;
+
+  const channelLayout = parseOptionalString(stream.audioChannelLayout);
+  if (channelLayout) details.channelLayout = channelLayout;
+
+  const language = parseOptionalString(stream.language);
+  if (language) details.language = language;
+
+  const sampleRate = parseOptionalNumber(stream.samplingRate);
+  if (sampleRate) details.sampleRate = sampleRate;
+
+  return { codec, channels, details };
+}
+
+/**
+ * Extract subtitle info from stream
+ */
+function extractSubtitleInfo(
+  stream: Record<string, unknown> | undefined
+): SubtitleInfo | undefined {
+  if (!stream) return undefined;
+
+  const info: SubtitleInfo = {};
+
+  const codec = parseOptionalString(stream.codec);
+  if (codec) info.codec = codec.toUpperCase();
+
+  const language = parseOptionalString(stream.language);
+  if (language) info.language = language;
+
+  const decision = parseOptionalString(stream.decision);
+  if (decision) info.decision = decision;
+
+  const forced = parseString(stream.forced) === '1';
+  if (forced) info.forced = true;
+
+  // Only return if we have any data
+  return Object.keys(info).length > 0 ? info : undefined;
+}
+
+/**
+ * Extract transcode info from TranscodeSession
+ */
+function extractTranscodeInfo(
+  transcodeSession: Record<string, unknown> | undefined,
+  part: Record<string, unknown> | undefined
+): TranscodeInfo | undefined {
+  const info: TranscodeInfo = {};
+
+  // Container info
+  const sourceContainer = parseOptionalString(part?.container);
+  if (sourceContainer) info.sourceContainer = sourceContainer.toUpperCase();
+
+  if (transcodeSession) {
+    const streamContainer = parseOptionalString(transcodeSession.container);
+    if (streamContainer) info.streamContainer = streamContainer.toUpperCase();
+
+    // Container decision - if containers differ, it's a transcode
+    if (sourceContainer && streamContainer) {
+      info.containerDecision =
+        sourceContainer.toLowerCase() === streamContainer.toLowerCase() ? 'direct' : 'transcode';
+    }
+
+    // Hardware acceleration
+    const hwRequested = parseString(transcodeSession.transcodeHwRequested) === '1';
+    if (hwRequested) info.hwRequested = true;
+
+    const hwDecoding = parseOptionalString(transcodeSession.transcodeHwDecoding);
+    if (hwDecoding) info.hwDecoding = hwDecoding;
+
+    const hwEncoding = parseOptionalString(transcodeSession.transcodeHwEncoding);
+    if (hwEncoding) info.hwEncoding = hwEncoding;
+
+    // Transcode performance
+    const speed = parseOptionalNumber(transcodeSession.speed);
+    if (speed) info.speed = speed;
+
+    const throttled = parseString(transcodeSession.throttled) === '1';
+    if (throttled) info.throttled = true;
+  }
+
+  // Only return if we have any data
+  return Object.keys(info).length > 0 ? info : undefined;
+}
+
+/**
+ * Extract stream video details (output after transcode)
+ */
+function extractStreamVideoDetails(
+  transcodeSession: Record<string, unknown> | undefined,
+  sourceVideoDetails: SourceVideoDetails
+): { codec?: string; details: StreamVideoDetails } {
+  if (!transcodeSession) {
+    // Direct play - stream details match source
+    return { details: {} };
+  }
+
+  const details: StreamVideoDetails = {};
+
+  // Transcode output dimensions
+  const width = parseOptionalNumber(transcodeSession.width);
+  if (width) details.width = width;
+
+  const height = parseOptionalNumber(transcodeSession.height);
+  if (height) details.height = height;
+
+  // If transcoding, framerate may change (rare but possible)
+  // Most transcodes preserve framerate, so we use source if not specified
+  if (sourceVideoDetails.framerate) {
+    details.framerate = sourceVideoDetails.framerate;
+  }
+
+  // Dynamic range may be tone-mapped (HDR → SDR)
+  // TranscodeSession doesn't expose this directly, assume preserved for now
+  if (sourceVideoDetails.dynamicRange) {
+    details.dynamicRange = sourceVideoDetails.dynamicRange;
+  }
+
+  const codec = parseOptionalString(transcodeSession.videoCodec)?.toUpperCase();
+
+  return { codec, details };
+}
+
+/**
+ * Extract stream audio details (output after transcode)
+ */
+function extractStreamAudioDetails(transcodeSession: Record<string, unknown> | undefined): {
+  codec?: string;
+  details: StreamAudioDetails;
+} {
+  if (!transcodeSession) {
+    return { details: {} };
+  }
+
+  const details: StreamAudioDetails = {};
+
+  const channels = parseOptionalNumber(transcodeSession.audioChannels);
+  if (channels) details.channels = channels;
+
+  // Language is preserved through transcode
+  // (would need to track from source if needed)
+
+  const codec = parseOptionalString(transcodeSession.audioCodec)?.toUpperCase();
+
+  return { codec, details };
+}
+
+/**
+ * Extract all stream details from Media/Part/Stream hierarchy
+ */
+interface StreamDetailsResult {
+  sourceVideoCodec?: string;
+  sourceAudioCodec?: string;
+  sourceAudioChannels?: number;
+  sourceVideoDetails?: SourceVideoDetails;
+  sourceAudioDetails?: SourceAudioDetails;
+  streamVideoCodec?: string;
+  streamAudioCodec?: string;
+  streamVideoDetails?: StreamVideoDetails;
+  streamAudioDetails?: StreamAudioDetails;
+  transcodeInfo?: TranscodeInfo;
+  subtitleInfo?: SubtitleInfo;
+}
+
+function extractStreamDetails(
+  mediaArray: Array<Record<string, unknown>> | undefined,
+  transcodeSession: Record<string, unknown> | undefined
+): StreamDetailsResult {
+  // Find the selected media element (when multiple versions exist)
+  const selectedMedia = mediaArray?.find((m) => parseString(m.selected) === '1') ?? mediaArray?.[0];
+
+  // Get the first Part (most media has single part)
+  const parts = selectedMedia?.Part as Array<Record<string, unknown>> | undefined;
+  const part = parts?.[0];
+
+  // Find streams by type
+  const videoStream = findStreamByType(part, STREAM_TYPE.VIDEO);
+  const audioStream = findStreamByType(part, STREAM_TYPE.AUDIO);
+  const subtitleStream = findStreamByType(part, STREAM_TYPE.SUBTITLE);
+
+  const sourceVideo = extractSourceVideoDetails(videoStream, selectedMedia);
+  const sourceAudio = extractSourceAudioDetails(audioStream);
+
+  // Extract stream (output) details
+  const streamVideo = extractStreamVideoDetails(transcodeSession, sourceVideo.details);
+  const streamAudio = extractStreamAudioDetails(transcodeSession);
+
+  // Extract transcode and subtitle info
+  const transcodeInfo = extractTranscodeInfo(transcodeSession, part);
+  const subtitleInfo = extractSubtitleInfo(subtitleStream);
+
+  // CRITICAL: When transcoding, Plex's Stream[] array contains OUTPUT streams, not source streams.
+  // The TranscodeSession object provides the actual source codec information:
+  // - TranscodeSession.sourceVideoCodec / sourceAudioCodec = original file's codec
+  // - TranscodeSession.videoCodec / audioCodec = transcoded output codec
+  // - Stream[].codec = also the output codec when transcoding
+  // Only fall back to Stream[].codec for direct play (no TranscodeSession).
+  const transcodeSourceVideoCodec = parseOptionalString(transcodeSession?.sourceVideoCodec);
+  const transcodeSourceAudioCodec = parseOptionalString(transcodeSession?.sourceAudioCodec);
+
+  // Use TranscodeSession source codecs when transcoding, otherwise stream codec (direct play)
+  const resolvedSourceVideoCodec = transcodeSourceVideoCodec?.toUpperCase() ?? sourceVideo.codec;
+  const resolvedSourceAudioCodec = transcodeSourceAudioCodec?.toUpperCase() ?? sourceAudio.codec;
+
+  // Handle '*' codec placeholder (Plex uses '*' when transcoding, fallback to source codec)
+  const resolveCodec = (
+    streamCodec: string | undefined,
+    sourceCodec: string | undefined
+  ): string | undefined => (streamCodec && streamCodec !== '*' ? streamCodec : sourceCodec);
+
+  return {
+    // Scalar fields for indexing
+    sourceVideoCodec: resolvedSourceVideoCodec,
+    sourceAudioCodec: resolvedSourceAudioCodec,
+    sourceAudioChannels: sourceAudio.channels,
+    streamVideoCodec: resolveCodec(streamVideo.codec, resolvedSourceVideoCodec),
+    streamAudioCodec: resolveCodec(streamAudio.codec, resolvedSourceAudioCodec),
+
+    // JSONB details (only include if non-empty)
+    sourceVideoDetails:
+      Object.keys(sourceVideo.details).length > 0 ? sourceVideo.details : undefined,
+    sourceAudioDetails:
+      Object.keys(sourceAudio.details).length > 0 ? sourceAudio.details : undefined,
+    streamVideoDetails:
+      Object.keys(streamVideo.details).length > 0 ? streamVideo.details : undefined,
+    streamAudioDetails:
+      Object.keys(streamAudio.details).length > 0 ? streamAudio.details : undefined,
+    transcodeInfo,
+    subtitleInfo,
+  };
 }
 
 // ============================================================================
@@ -50,8 +459,15 @@ export interface PlexRawSession {
 
 /**
  * Parse Plex media type to unified type
+ * @param type - The media type string from Plex
+ * @param isLive - Whether this is a Live TV stream (live='1')
  */
-function parseMediaType(type: unknown): MediaSession['media']['type'] {
+function parseMediaType(type: unknown, isLive: boolean = false): MediaSession['media']['type'] {
+  // Live TV takes precedence - can be any type but we track it as 'live'
+  if (isLive) {
+    return 'live';
+  }
+
   const typeStr = parseString(type).toLowerCase();
   switch (typeStr) {
     case 'movie':
@@ -83,14 +499,6 @@ function parsePlaybackState(state: unknown): MediaSession['playback']['state'] {
 }
 
 /**
- * Calculate progress percentage from position and duration
- */
-function calculateProgress(positionMs: number, durationMs: number): number {
-  if (durationMs <= 0) return 0;
-  return Math.min(100, Math.round((positionMs / durationMs) * 100));
-}
-
-/**
  * Parse raw Plex session data into a MediaSession object
  */
 export function parseSession(item: Record<string, unknown>): MediaSession {
@@ -98,10 +506,15 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
   const user = (item.User as Record<string, unknown>) ?? {};
   const sessionInfo = (item.Session as Record<string, unknown>) ?? {};
   const transcodeSession = item.TranscodeSession as Record<string, unknown> | undefined;
+  const mediaArray = item.Media as Array<Record<string, unknown>> | undefined;
+  const firstMedia = mediaArray?.[0];
 
   const durationMs = parseNumber(item.duration);
   const positionMs = parseNumber(item.viewOffset);
-  const mediaType = parseMediaType(item.type);
+
+  // Detect Live TV - Plex sets live='1' on the session
+  const isLive = parseString(item.live) === '1';
+  const mediaType = parseMediaType(item.type, isLive);
 
   // Get bitrate and resolution from the selected Media element
   // When multiple versions exist (e.g., 4K and 1080p), Plex marks the playing one with selected=1
@@ -117,6 +530,9 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
     transcodeSession?.videoDecision as string | null,
     transcodeSession?.audioDecision as string | null
   );
+
+  // Extract detailed stream metadata from Media[].Part[].Stream[]
+  const streamDetails = extractStreamDetails(mediaArray, transcodeSession);
 
   const session: MediaSession = {
     sessionKey: parseString(item.sessionKey),
@@ -161,6 +577,8 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
       videoResolution,
       videoWidth,
       videoHeight,
+      // Spread in detailed stream metadata
+      ...streamDetails,
     },
     // Plex termination API requires Session.id, not sessionKey
     plexSessionId: parseOptionalString(sessionInfo.id),
@@ -176,6 +594,19 @@ export function parseSession(item: Record<string, unknown>): MediaSession {
       seasonName: parseOptionalString(item.parentTitle),
       showThumbPath: parseOptionalString(item.grandparentThumb),
     };
+  }
+
+  // Add Live TV metadata if this is a live stream
+  if (mediaType === 'live') {
+    const liveTvMetadata = extractPlexLiveTvMetadata(item, firstMedia);
+    if (liveTvMetadata) {
+      session.live = liveTvMetadata;
+    }
+  }
+
+  // Add music track metadata if this is a track
+  if (mediaType === 'track') {
+    session.music = extractPlexMusicMetadata(item);
   }
 
   return session;

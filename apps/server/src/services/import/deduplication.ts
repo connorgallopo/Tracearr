@@ -26,6 +26,7 @@ export interface ExistingSession {
   durationMs: number | null;
   pausedDurationMs: number | null;
   watched: boolean | null;
+  sourceVideoCodec: string | null;
 }
 
 /**
@@ -77,6 +78,7 @@ export async function queryExistingByExternalIds(
       durationMs: sessions.durationMs,
       pausedDurationMs: sessions.pausedDurationMs,
       watched: sessions.watched,
+      sourceVideoCodec: sessions.sourceVideoCodec,
     })
     .from(sessions)
     .where(and(eq(sessions.serverId, serverId), inArray(sessions.externalSessionId, externalIds)));
@@ -113,6 +115,7 @@ export async function queryExistingByTimeKeys(
       durationMs: sessions.durationMs,
       pausedDurationMs: sessions.pausedDurationMs,
       watched: sessions.watched,
+      sourceVideoCodec: sessions.sourceVideoCodec,
     })
     .from(sessions)
     .where(

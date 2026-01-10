@@ -9,8 +9,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
-import type { AuthUser, ActiveSession, DashboardStats } from '@tracearr/shared';
+import type { AuthUser, DashboardStats } from '@tracearr/shared';
 import { REDIS_KEYS } from '@tracearr/shared';
+import { createMockActiveSession } from '../../test/fixtures.js';
 
 // Mock the prepared statements module
 vi.mock('../../db/prepared.js', () => ({
@@ -94,62 +95,6 @@ function createOwnerUser(serverIds?: string[]): AuthUser {
     username: 'owner',
     role: 'owner',
     serverIds: serverIds ?? [randomUUID()],
-  };
-}
-
-function createActiveSession(overrides: Partial<ActiveSession> = {}): ActiveSession {
-  const serverId = overrides.serverId ?? randomUUID();
-  return {
-    id: overrides.id ?? randomUUID(),
-    sessionKey: overrides.sessionKey ?? 'session-123',
-    serverId,
-    serverUserId: overrides.serverUserId ?? randomUUID(),
-    state: overrides.state ?? 'playing',
-    mediaType: overrides.mediaType ?? 'movie',
-    mediaTitle: overrides.mediaTitle ?? 'Test Movie',
-    grandparentTitle: overrides.grandparentTitle ?? null,
-    seasonNumber: overrides.seasonNumber ?? null,
-    episodeNumber: overrides.episodeNumber ?? null,
-    year: overrides.year ?? 2024,
-    thumbPath: overrides.thumbPath ?? '/library/metadata/123/thumb',
-    ratingKey: overrides.ratingKey ?? 'media-123',
-    externalSessionId: overrides.externalSessionId ?? null,
-    startedAt: overrides.startedAt ?? new Date(),
-    stoppedAt: overrides.stoppedAt ?? null,
-    durationMs: overrides.durationMs ?? 0,
-    progressMs: overrides.progressMs ?? 0,
-    totalDurationMs: overrides.totalDurationMs ?? 7200000,
-    lastPausedAt: overrides.lastPausedAt ?? null,
-    pausedDurationMs: overrides.pausedDurationMs ?? 0,
-    referenceId: overrides.referenceId ?? null,
-    watched: overrides.watched ?? false,
-    ipAddress: overrides.ipAddress ?? '192.168.1.100',
-    geoCity: overrides.geoCity ?? 'New York',
-    geoRegion: overrides.geoRegion ?? 'NY',
-    geoCountry: overrides.geoCountry ?? 'US',
-    geoLat: overrides.geoLat ?? 40.7128,
-    geoLon: overrides.geoLon ?? -74.006,
-    playerName: overrides.playerName ?? 'Chrome',
-    deviceId: overrides.deviceId ?? 'device-123',
-    product: overrides.product ?? 'Plex Web',
-    device: overrides.device ?? 'Chrome',
-    platform: overrides.platform ?? 'Chrome',
-    quality: overrides.quality ?? '1080p',
-    isTranscode: overrides.isTranscode ?? false,
-    videoDecision: overrides.videoDecision ?? 'directplay',
-    audioDecision: overrides.audioDecision ?? 'directplay',
-    bitrate: overrides.bitrate ?? 20000,
-    user: overrides.user ?? {
-      id: randomUUID(),
-      username: 'testuser',
-      thumbUrl: null,
-      identityName: null,
-    },
-    server: overrides.server ?? {
-      id: serverId,
-      name: 'Test Server',
-      type: 'plex',
-    },
   };
 }
 
@@ -239,7 +184,11 @@ describe('Dashboard Stats Routes', () => {
 
     it('should count active sessions from cache', async () => {
       const ownerUser = createOwnerUser();
-      const activeSessions = [createActiveSession(), createActiveSession(), createActiveSession()];
+      const activeSessions = [
+        createMockActiveSession(),
+        createMockActiveSession(),
+        createMockActiveSession(),
+      ];
 
       // Mock the cache service to return active sessions
       mockGetAllActiveSessions.mockResolvedValueOnce(activeSessions);

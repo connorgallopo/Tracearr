@@ -5,7 +5,7 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, gte, sql, and } from 'drizzle-orm';
+import { eq, gte, sql, and, inArray } from 'drizzle-orm';
 import { REDIS_KEYS, TIME_MS, type DashboardStats, dashboardQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { sessions } from '../../db/schema.js';
@@ -22,6 +22,7 @@ import {
 } from '../../utils/serverFiltering.js';
 import { getCacheService } from '../../services/cache.js';
 import { getStartOfDayInTimezone } from './utils.js';
+import { PRIMARY_MEDIA_TYPES, MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
 
 export const dashboardRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -113,6 +114,7 @@ export const dashboardRoutes: FastifyPluginAsync = async (app) => {
             FROM sessions
             WHERE (started_at AT TIME ZONE ${tz})::date = (NOW() AT TIME ZONE ${tz})::date
               AND duration_ms >= ${MIN_PLAY_DURATION_MS}
+              ${MEDIA_TYPE_SQL_FILTER}
           `),
       ]);
 
@@ -125,7 +127,11 @@ export const dashboardRoutes: FastifyPluginAsync = async (app) => {
     } else {
       // Build server filter conditions for dynamic queries
       const buildSessionConditions = (since: Date) => {
-        const conditions = [gte(sessions.startedAt, since)];
+        const conditions = [
+          gte(sessions.startedAt, since),
+          // Exclude live TV and music tracks from dashboard stats
+          inArray(sessions.mediaType, PRIMARY_MEDIA_TYPES),
+        ];
 
         if (serverId) {
           // Specific server requested
@@ -226,6 +232,7 @@ export const dashboardRoutes: FastifyPluginAsync = async (app) => {
             FROM sessions
             WHERE (started_at AT TIME ZONE ${tz})::date = (NOW() AT TIME ZONE ${tz})::date
               AND duration_ms >= ${MIN_PLAY_DURATION_MS}
+              ${MEDIA_TYPE_SQL_FILTER}
             ${buildSessionServerFilter()}
           `),
       ]);
