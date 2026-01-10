@@ -409,7 +409,17 @@ describe('NotificationService', () => {
         pushoverApiToken: 'pushover-api-token',
       });
 
-      await notificationService.notifySessionStarted(createMockSession(), settings);
+      await notificationService.notifySessionStarted(
+        createMockActiveSession({
+          user: {
+            id: 'user-012',
+            username: 'testuser',
+            thumbUrl: null,
+            identityName: 'Test User',
+          },
+        }),
+        settings
+      );
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('https://api.pushover.net/1/messages.json'),
