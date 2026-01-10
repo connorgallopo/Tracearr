@@ -18,7 +18,8 @@ import { servers, sessions, serverUsers, users } from '../db/schema.js';
 import { createMediaServerClient } from '../services/mediaServer/index.js';
 import { sseManager } from '../services/sseManager.js';
 import type { CacheService, PubSubService } from '../services/cache.js';
-import { geoipService } from '../services/geoip.js';
+import { lookupGeoIP } from '../services/plexGeoip.js';
+import { getGeoIPSettings } from '../routes/settings.js';
 import { mapMediaSession } from './poller/sessionMapper.js';
 import { calculatePauseAccumulation, checkWatchCompletion } from './poller/stateTracker.js';
 import { getActiveRules, batchGetRecentUserSessions } from './poller/database.js';
@@ -438,7 +439,9 @@ async function createNewSession(
     identityName: serverUserFromDb.identityName,
   };
 
-  const geo = geoipService.lookup(processed.ipAddress);
+  // Get GeoIP location (uses Plex API if enabled, falls back to MaxMind)
+  const { usePlexGeoip } = await getGeoIPSettings();
+  const geo = await lookupGeoIP(processed.ipAddress, usePlexGeoip);
 
   if (!cacheService) {
     console.warn('[SSEProcessor] Cache service not available, skipping session creation');

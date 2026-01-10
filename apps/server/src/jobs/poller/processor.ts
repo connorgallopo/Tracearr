@@ -18,8 +18,10 @@ import {
 import { db } from '../../db/client.js';
 import { servers, serverUsers, sessions, users } from '../../db/schema.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
-import { geoipService, type GeoLocation } from '../../services/geoip.js';
+import { type GeoLocation } from '../../services/geoip.js';
+import { lookupGeoIP } from '../../services/plexGeoip.js';
 import type { CacheService, PubSubService } from '../../services/cache.js';
+import { getGeoIPSettings } from '../../routes/settings.js';
 import { sseManager } from '../../services/sseManager.js';
 
 import type { PollerConfig, ServerWithToken, ServerProcessingResult } from './types.js';
@@ -84,6 +86,9 @@ async function processServerSessions(
   const newSessions: ActiveSession[] = [];
   const updatedSessions: ActiveSession[] = [];
   const currentSessionKeys = new Set<string>();
+
+  // Get GeoIP settings once at the start
+  const { usePlexGeoip } = await getGeoIPSettings();
 
   try {
     // Fetch sessions from server using unified adapter
@@ -298,8 +303,8 @@ async function processServerSessions(
           }
         : { id: serverUserId, username: 'Unknown', thumbUrl: null, identityName: null };
 
-      // Get GeoIP location
-      const geo: GeoLocation = geoipService.lookup(processed.ipAddress);
+      // Get GeoIP location (uses Plex API if enabled, falls back to MaxMind)
+      const geo: GeoLocation = await lookupGeoIP(processed.ipAddress, usePlexGeoip);
 
       const isNew = !cachedSessionKeys.has(sessionKey);
 

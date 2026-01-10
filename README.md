@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Know who's streaming. Catch account sharers. Take back control.</strong>
+  <strong>Real-time monitoring for Plex, Jellyfin, and Emby. One dashboard for all your servers.</strong>
 </p>
 
 <p align="center">
@@ -17,45 +17,47 @@
 
 ---
 
-Tracearr is a streaming access manager for **Plex**, **Jellyfin**, and **Emby** that answers one question: _Who's actually using my server, and are they sharing their login?_
-
-Unlike monitoring tools that just show you data, Tracearr is built to detect account abuse. See streams in real-time, flag suspicious activity automatically, and get notified the moment something looks off.
+Tracearr is a monitoring platform for **Plex**, **Jellyfin**, and **Emby**. Track streams in real-time, dig into playback analytics, and spot account sharing before it gets out of hand.
 
 ## What It Does
 
-**Session Tracking** — Full history of who watched what, when, from where, on what device. Every stream logged with geolocation data.
+**Multi-Server Dashboard** — Connect Plex, Jellyfin, and Emby to a single interface. No more switching between apps.
 
-**Sharing Detection** — Five rule types catch account sharers:
+**Session Tracking** — Complete session history: who watched what, when, where, and on what device. Every stream includes geolocation data.
 
-- 🚀 **Impossible Travel** — NYC then London 30 minutes later? That's not one person.
-- 📍 **Simultaneous Locations** — Same account streaming from two cities at once.
-- 🔀 **Device Velocity** — Too many unique IPs in a short window signals shared credentials.
-- 📺 **Concurrent Streams** — Set limits per user. Simple but effective.
-- 🌍 **Geo Restrictions** — Block streaming from specific countries entirely.
+**Stream Analytics** — See what's transcoding vs direct playing, track bandwidth usage, and see what people actually watch. Codec breakdowns, resolution stats, device compatibility scores.
 
-**Real-Time Alerts** — Discord webhooks and custom notifications fire instantly when rules trigger. No waiting for daily reports.
+**Live TV & Music** — Not just movies and shows. Track live TV sessions and music playback across all your servers.
 
-**Stream Map** — Visualize where your streams originate on a world map. Filter by user, server, or time period to zero in on suspicious patterns.
+**Stream Map** — Visualize where your streams originate on a world map. Filter by user, server, or time period.
 
-**Trust Scores** — Users earn (or lose) trust based on their behavior. Violations drop scores automatically.
+**Sharing Detection** — Five rule types flag suspicious activity:
 
-**Multi-Server** — Connect Plex, Jellyfin, and Emby instances to the same dashboard.
+- **Impossible Travel** — NYC then London 30 minutes later? That's not one person.
+- **Simultaneous Locations** — Same account streaming from two cities at once.
+- **Device Velocity** — Too many unique IPs in a short window signals shared credentials.
+- **Concurrent Streams** — Set limits per user.
+- **Geo Restrictions** — Block streaming from specific countries.
 
-**Tautulli Import** — Already using Tautulli? Import your watch history so you don't start from scratch.
+**Trust Scores** — Users earn (or lose) trust based on behavior. Violations drop scores automatically.
 
-## What It Doesn't Do (Yet)
+**Real-Time Alerts** — Discord webhooks and custom notifications fire instantly when rules trigger.
 
-Tracearr v1 is focused on **detection and alerting**. Automated enforcement—killing streams, suspending accounts—is coming in future versions. For now, you see the problems; you decide the action.
+**Data Import** — Already using Tautulli or Jellystat? Import your watch history so you don't start from scratch.
 
-## Why Not Tautulli or Jellystat?
+## Why Tracearr?
 
-[Tautulli](https://github.com/Tautulli/Tautulli) and [Jellystat](https://github.com/CyferShepard/Jellystat) are great monitoring tools. We use Highcharts for graphs too. But they show you what happened—they don't tell you when something's wrong.
+Tautulli only works with Plex. Jellystat only works with Jellyfin and Emby. If you run multiple servers, you're stuck with multiple dashboards.
+
+Tracearr handles all three. One install, one interface.
 
 |                           | Tautulli | Jellystat | Tracearr |
 | ------------------------- | -------- | --------- | -------- |
 | Watch history             | ✅       | ✅        | ✅       |
 | Statistics & graphs       | ✅       | ✅        | ✅       |
 | Session monitoring        | ✅       | ✅        | ✅       |
+| Transcode analytics       | ✅       | ✅        | ✅       |
+| Live TV & Music           | ✅       | ✅        | ✅       |
 | Account sharing detection | ❌       | ❌        | ✅       |
 | Impossible travel alerts  | ❌       | ❌        | ✅       |
 | Trust scoring             | ❌       | ❌        | ✅       |
@@ -65,8 +67,7 @@ Tracearr v1 is focused on **detection and alerting**. Automated enforcement—ki
 | Multi-server dashboard    | ❌       | ❌        | ✅       |
 | IP geolocation            | ✅       | ✅        | ✅       |
 | Import from Tautulli      | —        | ❌        | ✅       |
-
-Tautulli is Plex-only. Jellystat is Jellyfin/Emby-only. If you just want stats, they work fine. If you're tired of your brother's roommate's cousin streaming on your dime, that's what Tracearr is for.
+| Import from Jellystat     | ❌       | —         | ✅       |
 
 ## Quick Start
 
@@ -136,7 +137,7 @@ Frontend runs at `localhost:5173`, API at `localhost:3000`.
 | Real-time | Socket.io                                 |
 | Monorepo  | pnpm + Turborepo                          |
 
-**TimescaleDB** handles session history. Regular Postgres works fine until you have a year of watch data and your stats queries start taking forever. TimescaleDB is built for exactly this kind of time-series data—dashboard stats stay fast because they're pre-computed, not recalculated every page load.
+**TimescaleDB** handles session history. Regular Postgres works for a few months, but long query histories kill performance. TimescaleDB is built for time-series data—dashboard stats stay fast because they're pre-computed, not recalculated every page load.
 
 **Fastify** over Express because it's measurably faster and schema validation catches bad requests before they hit handlers.
 
@@ -151,31 +152,11 @@ tracearr/
 │   ├── server/       # Fastify backend
 │   └── mobile/       # React Native app (coming soon)
 ├── packages/
-│   └── shared/       # Types, schemas, constants
+│   ├── shared/       # Types, schemas, constants
+│   └── translations/ # i18n support
 ├── docker/           # Compose files
 └── docs/             # Documentation
 ```
-
-## Configuration
-
-Tracearr uses environment variables for configuration. Key settings:
-
-```bash
-# Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/tracearr
-
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# Security
-JWT_SECRET=your-secret-here
-COOKIE_SECRET=your-cookie-secret-here
-
-# GeoIP (optional, for location detection)
-MAXMIND_LICENSE_KEY=your-maxmind-key
-```
-
-See `.env.example` for all options.
 
 ## Community
 
@@ -205,22 +186,26 @@ Run `pnpm dev` in a terminal to start both apps, then use the "Debug All" config
 
 ## Roadmap
 
-**Alpha** (current — v0.1.x)
+**v1.4** (current)
 
 - [x] Multi-server Plex, Jellyfin, and Emby support
 - [x] Session tracking with full history
-- [x] 5 sharing detection rules
+- [x] Sharing detection rules
 - [x] Real-time WebSocket updates
 - [x] Plex SSE for instant session detection
 - [x] Discord + webhook notifications
 - [x] Interactive stream map
 - [x] Trust scores
-- [x] Tautulli history import
+- [x] Tautulli & Jellystat history import
+- [x] Transcode analytics & device compatibility
+- [x] Live TV & music tracking
+- [x] Stream quality metrics (codec, resolution, bitrate)
+- [x] Stream termination
 
-**v1.5** (next milestone)
+**v1.5** (next)
 
-- [ ] Mobile app (iOS & Android) — _in development_
-- [ ] Stream termination (kill suspicious streams)
+- [ ] Mobile app (iOS & Android) — _in beta_
+- [ ] Rule based automated stream termination
 - [ ] Account suspension automation
 - [ ] Email notifications
 - [ ] Telegram notifier
@@ -228,7 +213,6 @@ Run `pnpm dev` in a terminal to start both apps, then use the "Debug All" config
 **v2.0** (future)
 
 - [ ] Tiered access controls
-- [ ] Arr integration (Radarr/Sonarr)
 - [ ] Multi-admin support
 
 ## License
@@ -238,5 +222,5 @@ Run `pnpm dev` in a terminal to start both apps, then use the "Debug All" config
 ---
 
 <p align="center">
-  <sub>Built because sharing is caring, but not when it's your server bill.</sub>
+  <sub>For Plex, Jellyfin, and Emby admins who want to see what's actually happening.</sub>
 </p>

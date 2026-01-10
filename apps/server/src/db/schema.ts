@@ -25,7 +25,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-import { ALL_MEDIA_TYPES } from '../constants/mediaTypes.js';
+import { MEDIA_TYPES } from '@tracearr/shared';
 
 // Server types enum
 export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
@@ -33,8 +33,8 @@ export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
 // Session state enum
 export const sessionStateEnum = ['playing', 'paused', 'stopped'] as const;
 
-// Media type enum - imported from centralized constants
-export const mediaTypeEnum = ALL_MEDIA_TYPES;
+// Media type enum - imported from shared package
+export const mediaTypeEnum = MEDIA_TYPES;
 
 // Rule type enum
 export const ruleTypeEnum = [
@@ -609,6 +609,8 @@ export const settings = pgTable('settings', {
   // Poller settings
   pollerEnabled: boolean('poller_enabled').notNull().default(true),
   pollerIntervalMs: integer('poller_interval_ms').notNull().default(15000),
+  // GeoIP settings
+  usePlexGeoip: boolean('use_plex_geoip').notNull().default(false), // Use Plex API for GeoIP lookups (sends IPs to plex.tv)
   // Tautulli integration
   tautulliUrl: text('tautulli_url'),
   tautulliApiKey: text('tautulli_api_key'), // Encrypted

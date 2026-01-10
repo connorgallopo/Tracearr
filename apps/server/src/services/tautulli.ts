@@ -1362,14 +1362,14 @@ export function mapStreamDataToSession(
 
   // Return mapped fields (only include non-empty objects)
   return {
-    // Scalar fields
-    sourceVideoCodec: streamData.video_codec ?? null,
+    // Scalar fields (uppercase codecs for consistency with other importers)
+    sourceVideoCodec: streamData.video_codec?.toUpperCase() ?? null,
     sourceVideoWidth: streamData.video_width ?? null,
     sourceVideoHeight: streamData.video_height ?? null,
-    sourceAudioCodec: streamData.audio_codec ?? null,
+    sourceAudioCodec: streamData.audio_codec?.toUpperCase() ?? null,
     sourceAudioChannels: streamData.audio_channels ?? null,
-    streamVideoCodec: streamData.stream_video_codec ?? null,
-    streamAudioCodec: streamData.stream_audio_codec ?? null,
+    streamVideoCodec: streamData.stream_video_codec?.toUpperCase() ?? null,
+    streamAudioCodec: streamData.stream_audio_codec?.toUpperCase() ?? null,
     bitrate: streamData.bandwidth ?? streamData.stream_bitrate ?? streamData.bitrate ?? null,
     quality: streamData.quality_profile ?? null,
 

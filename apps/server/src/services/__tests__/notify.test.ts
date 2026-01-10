@@ -46,6 +46,7 @@ describe('NotificationService', () => {
     trustProxy: false,
     mobileEnabled: false,
     primaryAuthMethod: 'local',
+    usePlexGeoip: false,
     ...overrides,
   });
 

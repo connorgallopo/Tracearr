@@ -53,6 +53,13 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
             'Recreates all TimescaleDB continuous aggregates and engagement views. ' +
             'Run this after upgrading if you see database errors about missing views or columns.',
         },
+        {
+          type: 'normalize_codecs',
+          name: 'Normalize Codec Names',
+          description:
+            'Converts all codec names to uppercase for consistency. ' +
+            'Run this if you see duplicate codecs in the Compatibility Matrix (e.g., "h264" and "H264").',
+        },
       ],
     };
   });
@@ -77,6 +84,7 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
         'normalize_countries',
         'fix_imported_progress',
         'rebuild_timescale_views',
+        'normalize_codecs',
       ];
       if (!validTypes.includes(type as MaintenanceJobType)) {
         return reply.badRequest(`Invalid job type: ${type}`);

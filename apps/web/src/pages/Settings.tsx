@@ -220,6 +220,23 @@ function GeneralSettings() {
             Lower values provide faster updates but increase server load.
           </p>
         </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="text-base">Enhanced GeoIP Lookup</Label>
+            <p className="text-muted-foreground text-sm">
+              Use Plex&apos;s GeoIP service for more accurate location data
+            </p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              When enabled, IP addresses are sent to plex.tv for lookup. Local MaxMind database is
+              used as fallback.
+            </p>
+          </div>
+          <Switch
+            checked={settings?.usePlexGeoip ?? false}
+            onCheckedChange={(checked) => updateSettings.mutate({ usePlexGeoip: checked })}
+          />
+        </div>
       </CardContent>
     </Card>
   );

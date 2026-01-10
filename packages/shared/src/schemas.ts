@@ -301,6 +301,8 @@ export const updateSettingsSchema = z.object({
   // Poller settings
   pollerEnabled: z.boolean().optional(),
   pollerIntervalMs: z.number().int().min(5000).max(300000).optional(),
+  // GeoIP settings
+  usePlexGeoip: z.boolean().optional(),
   // Tautulli integration
   tautulliUrl: z.url().nullable().optional(),
   tautulliApiKey: z.string().nullable().optional(),

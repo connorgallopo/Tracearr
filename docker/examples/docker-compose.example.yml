@@ -38,6 +38,7 @@ services:
       - COOKIE_SECRET=${COOKIE_SECRET}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      # - DATABASE_POOL_MAX=50  # Database connection pool size (default: 50)
     depends_on:
       timescale:
         condition: service_healthy

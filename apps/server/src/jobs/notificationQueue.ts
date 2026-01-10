@@ -189,6 +189,7 @@ async function processNotificationJob(job: Job<NotificationJobData>): Promise<vo
     trustProxy: false,
     mobileEnabled: settings.mobileEnabled ?? false,
     primaryAuthMethod: 'local' as const, // Not used in notifications, but required by Settings type
+    usePlexGeoip: false, // Not used in notifications, but required by Settings type
   };
 
   switch (type) {
