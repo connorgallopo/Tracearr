@@ -1063,6 +1063,12 @@ function NotificationSettings() {
     }
   }, [settings]);
 
+  useEffect(() => {
+    if (webhookFormat === 'pushover') {
+      customWebhookField.setValue('https://api.pushover.net/1/messages.json');
+    }
+  }, [webhookFormat]);
+
   const handleTestDiscord = async () => {
     setTestingDiscord(true);
     try {
