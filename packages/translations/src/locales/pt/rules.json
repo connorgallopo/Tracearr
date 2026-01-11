@@ -1,0 +1,47 @@
+{
+  "types": {
+    "impossible_travel": "Viagem impossível",
+    "simultaneous_locations": "Localizações simultâneas",
+    "device_velocity": "Velocidade do dispositivo",
+    "concurrent_streams": "Transmissões simultâneas",
+    "geo_restriction": "Restrição geográfica"
+  },
+  "descriptions": {
+    "impossible_travel": "Detetar quando um utilizador transmite a partir de locais muito distantes num curto espaço de tempo",
+    "simultaneous_locations": "Detetar quando um utilizador transmite a partir de várias localizações distantes ao mesmo tempo",
+    "device_velocity": "Detetar quando um utilizador se liga a partir de demasiados IPs num determinado intervalo de tempo",
+    "concurrent_streams": "Limitar o número de transmissões simultâneas por utilizador",
+    "geo_restriction": "Bloquear transmissões a partir de países específicos"
+  },
+  "labels": {
+    "ruleName": "Nome da regra",
+    "ruleType": "Tipo de regra",
+    "severity": "Severidade",
+    "enabled": "Ativado",
+    "maxSpeed": "Velocidade máxima",
+    "minDistance": "Distância mínima",
+    "maxIps": "Máximo de IPs",
+    "timeWindow": "Intervalo de tempo (horas)",
+    "maxStreams": "Máximo de transmissões",
+    "mode": "Modo",
+    "countries": "Países",
+    "excludePrivateIps": "Excluir rede local",
+    "groupByDevice": "Agrupar por dispositivo"
+  },
+  "modes": {
+    "blocklist": "Lista negra (bloquear estes países)",
+    "allowlist": "Lista branca (permitir apenas estes países)"
+  },
+  "messages": {
+    "created": "Regra criada com sucesso",
+    "updated": "Regra atualizada com sucesso",
+    "deleted": "Regra eliminada com sucesso",
+    "createFailed": "Falha ao criar a regra",
+    "updateFailed": "Falha ao atualizar a regra",
+    "deleteFailed": "Falha ao eliminar a regra"
+  },
+  "deleteConfirm": {
+    "title": "Eliminar regra",
+    "message": "Tem a certeza de que quer eliminar esta regra? Esta ação não pode ser desfeita."
+  }
+}

@@ -16,10 +16,10 @@ const LANGUAGE_STORAGE_KEY = 'tracearr_language';
 export const languageNames = {
   en: 'English',
   de: 'Deutsch',
+  pt: 'Português (Portugal)',
   // Add new languages here:
   // es: 'Español',
   // fr: 'Français',
-  // pt: 'Português',
   // ja: '日本語',
   // zh: '中文',
 } as const;

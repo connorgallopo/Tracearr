@@ -1,0 +1,91 @@
+{
+  "tabs": {
+    "general": "Geral",
+    "servers": "Servidores",
+    "notifications": "Notificações",
+    "mobile": "Aplicação móvel",
+    "import": "Importar",
+    "advanced": "Avançadas"
+  },
+  "general": {
+    "title": "Definições gerais",
+    "unitSystem": "Sistema de unidades",
+    "metric": "Métrico (km, km/h)",
+    "imperial": "Imperial (mi, mph)",
+    "timezone": "Fuso horário",
+    "primaryAuth": "Método de autenticação principal",
+    "localAccount": "Conta local",
+    "plexAccount": "Conta Plex",
+    "jellyfinAccount": "Conta Jellyfin"
+  },
+  "servers": {
+    "title": "Servidores ligados",
+    "addServer": "Adicionar servidor",
+    "serverName": "Nome do servidor",
+    "serverUrl": "URL do servidor",
+    "apiKey": "Chave API",
+    "syncInterval": "Intervalo de sincronização",
+    "testConnection": "Testar ligação",
+    "connectionSuccess": "Ligação bem-sucedida",
+    "connectionFailed": "Falha na ligação"
+  },
+  "mobile": {
+    "title": "Aplicação móvel",
+    "pairDevice": "Emparelhar dispositivo",
+    "connectedDevices": "Dispositivos ligados",
+    "generateToken": "Gerar token de emparelhamento",
+    "scanQrCode": "Digitalizar código QR",
+    "tokenExpires": "O token expira em {{time}}",
+    "noDevices": "Sem dispositivos ligados",
+    "revokeAll": "Revogar todas as sessões"
+  },
+  "webhooks": {
+    "title": "Configuração do webhook",
+    "discordWebhook": "URL do webhook do Discord",
+    "ntfyTopic": "Tópico Ntfy",
+    "customWebhook": "URL do webhook personalizado",
+    "webhookFormat": "Formato do webhook",
+    "testWebhook": "Testar webhook"
+  },
+  "advanced": {
+    "title": "Definições avançadas",
+    "basePath": "Diretório base",
+    "externalUrl": "URL externo",
+    "trustProxy": "Confiar nos headers do proxy",
+    "reverseProxy": "Proxy reverso",
+    "connectionScenarios": "Cenários de ligação"
+  },
+  "import": {
+    "title": "Importar dados",
+    "jellystat": "Importar do Jellystat",
+    "tautulli": "Importar do Tautulli",
+    "importProgress": "Progresso da importação",
+    "importComplete": "Importação concluída",
+    "importFailed": "Falha na importação"
+  },
+  "plex": {
+    "linkedAccounts": "Contas Plex ligadas",
+    "unlinkAccount": "Desvincular conta Plex",
+    "signInWithPlex": "Iniciar sessão com o Plex",
+    "signUpWithPlex": "Registar-se com o Plex",
+    "selectServer": "Selecionar servidor",
+    "chooseServer": "Escolha o servidor Plex que pretende monitorizar"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Iniciar sessão com o Jellyfin",
+    "username": "Nome de utilizador Jellyfin",
+    "password": "Palavra-passe Jellyfin"
+  },
+  "account": {
+    "createAccount": "Criar conta",
+    "signIn": "Iniciar sessão",
+    "email": "E-mail",
+    "password": "Palavra-passe",
+    "displayName": "Nome para exibição",
+    "createYourAccount": "Crie a sua conta para começar",
+    "signInToAccount": "Inicie sessão na sua conta",
+    "useLocalAccount": "Utilize a conta local em vez disso",
+    "useJellyfinAccount": "Utilize a conta Jellyfin em vez disso",
+    "waitingForPlex": "A aguardar autorização do Plex..."
+  }
+}

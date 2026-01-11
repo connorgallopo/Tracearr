@@ -1,0 +1,100 @@
+{
+  "toast": {
+    "success": {
+      "serverAdded": {
+        "title": "Servidor adicionado",
+        "message": "{{name}} foi adicionado com sucesso"
+      },
+      "serverRemoved": {
+        "title": "Servidor removido",
+        "message": "O servidor foi removido com sucesso"
+      },
+      "serverSynced": {
+        "title": "Servidor sincronizado",
+        "message": "Os dados do servidor foram sincronizados"
+      },
+      "settingsUpdated": {
+        "title": "Definições atualizadas",
+        "message": "As suas definições foram guardadas"
+      },
+      "tokenCopied": {
+        "title": "Token copiado",
+        "message": "O token foi copiado para a área de transferência"
+      },
+      "violationAcknowledged": {
+        "title": "Violação reconhecida",
+        "message": "A violação foi marcada como reconhecida"
+      },
+      "violationDismissed": {
+        "title": "Violação descartada",
+        "message": "A violação foi descartada"
+      },
+      "deviceRemoved": {
+        "title": "Dispositivo removido",
+        "message": "O dispositivo foi removido"
+      },
+      "sessionsRevoked": {
+        "title": "Sessões revogadas",
+        "message": "Todas as sessões foram revogadas"
+      },
+      "loggedIn": {
+        "title": "Sucesso",
+        "message": "Sessão iniciada com sucesso"
+      },
+      "webhookTest": {
+        "title": "Teste válido",
+        "message": "O webhook está a funcionar corretamente"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Falha ao adicionar servidor",
+      "serverRemoveFailed": "Falha ao remover servidor",
+      "serverSyncFailed": "Falha ao sincronizar servidor",
+      "settingsUpdateFailed": "Falha ao atualizar definições",
+      "copyFailed": "Não foi possível copiar para a área de transferência",
+      "acknowledgeFailed": "Falha ao reconhecer violação",
+      "dismissFailed": "Falha ao descartar violação",
+      "authFailed": "Autenticação falhou",
+      "webhookTestFailed": "Teste do webhook falhou"
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Nova transmissão iniciada",
+        "message": "{{user}} começou a ver {{media}}"
+      },
+      "streamStopped": {
+        "title": "Transmissão terminada",
+        "message": "{{user}} parou de ver a transmissão"
+      },
+      "updateAvailable": {
+        "title": "Atualização disponível",
+        "message": "Uma nova versão está disponível"
+      },
+      "serverOffline": {
+        "title": "Servidor offline",
+        "message": "{{name}} não está a responder"
+      },
+      "serverOnline": {
+        "title": "Servidor online",
+        "message": "{{name}} voltou a ficar online"
+      }
+    }
+  },
+  "push": {
+    "violationDetected": "Violação de partilha detetada",
+    "streamStarted": "Transmissão iniciada",
+    "streamEnded": "Transmissão terminada",
+    "serverDown": "Ligação ao servidor perdida",
+    "serverUp": "Servidor de volta online"
+  },
+  "settings": {
+    "title": "Definições de notificações",
+    "allSeverity": "Todas (Baixa, Aviso, Elevado)",
+    "warningAndHigh": "Apenas Aviso e Elevado",
+    "highOnly": "Apenas severidade elevada",
+    "allTypes": "Todos os tipos",
+    "rateLimit": "Estado atual do ratelimit",
+    "perMinute": "Por minuto",
+    "perHour": "Por hora"
+  }
+}

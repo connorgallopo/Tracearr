@@ -1,0 +1,43 @@
+{
+  "states": {
+    "playing": "A reproduzir",
+    "paused": "Pausado",
+    "stopped": "Parado"
+  },
+  "quality": {
+    "directPlay": "Reprodução direta",
+    "directStream": "Transmissão direta",
+    "transcode": "Transcodificação"
+  },
+  "labels": {
+    "nowPlaying": "A reproduzir",
+    "activeStreams": "Transmissões ativas",
+    "recentSessions": "Sessões recentes",
+    "sessionDetails": "Detalhes da sessão",
+    "watchTime": "Tempo de visualização",
+    "pausedTime": "Tempo em pausa",
+    "started": "Iniciado",
+    "stopped": "Parado",
+    "duration": "Duração",
+    "progress": "Progresso",
+    "device": "Dispositivo",
+    "player": "Cliente de reprodução",
+    "location": "Localização",
+    "ipAddress": "Endereço IP",
+    "server": "Servidor",
+    "media": "Conteúdo",
+    "quality": "Qualidade",
+    "bandwidth": "Largura de banda",
+    "resolution": "Resolução"
+  },
+  "empty": {
+    "noActiveStreams": "Nenhuma transmissão ativa",
+    "streamsWillAppear": "As transmissões aparecem aqui quando os utilizadores começarem a ver"
+  },
+  "terminate": {
+    "title": "Terminar transmissão",
+    "message": "Insira uma mensagem opcional para mostrar ao utilizador (deixe vazio para omitir):",
+    "success": "A sessão de reprodução foi interrompida",
+    "failed": "Falha ao terminar a transmissão"
+  }
+}
