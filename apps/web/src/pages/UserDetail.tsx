@@ -60,7 +60,12 @@ const sessionColumns: ColumnDef<Session>[] = [
     cell: ({ row }) => (
       <div className="max-w-[200px]">
         <p className="truncate font-medium">{row.original.mediaTitle}</p>
-        <p className="text-muted-foreground text-xs capitalize">{row.original.mediaType}</p>
+        <p className="text-muted-foreground truncate text-xs capitalize">
+          {row.original.mediaType}
+          {row.original.mediaType === 'episode' && row.original.grandparentTitle && (
+            <span> - {row.original.grandparentTitle}</span>
+          )}
+        </p>
       </div>
     ),
   },
