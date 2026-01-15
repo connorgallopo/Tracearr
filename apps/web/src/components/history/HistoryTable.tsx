@@ -103,9 +103,9 @@ function getEngagementTier(progress: number): EngagementTier {
 }
 
 // Engagement tier badge component
-function EngagementTierBadge({ progress }: { progress: number }) {
+function EngagementTierBadge({ progress, state }: { progress: number; state: SessionState }) {
   const tier = getEngagementTier(progress);
-  if (tier === 'unknown') return null;
+  if (tier === 'unknown' || state !== 'stopped') return null;
 
   const config = ENGAGEMENT_TIER_CONFIG[tier];
   return (
@@ -270,7 +270,7 @@ export const HistoryTableRow = forwardRef<
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="truncate font-medium">{primary}</span>
-                <EngagementTierBadge progress={progress} />
+                <EngagementTierBadge progress={progress} state={session.state} />
               </div>
               {secondary && (
                 <div className="text-muted-foreground truncate text-xs">{secondary}</div>
