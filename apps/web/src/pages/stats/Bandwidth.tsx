@@ -25,16 +25,16 @@ import type { DailyBandwidthRow } from '@tracearr/shared';
 
 // Format bytes for display
 function formatBytes(bytes: number): string {
-  if (bytes >= 1_099_511_627_776) {
-    return `${(bytes / 1_099_511_627_776).toFixed(2)} TB`;
+  const k = 1024;
+
+  if (!+bytes || bytes < k) {
+    return `${(bytes / k).toFixed(0)}`;
   }
-  if (bytes >= 1_073_741_824) {
-    return `${(bytes / 1_073_741_824).toFixed(2)} GB`;
-  }
-  if (bytes >= 1_048_576) {
-    return `${(bytes / 1_048_576).toFixed(1)} MB`;
-  }
-  return `${(bytes / 1024).toFixed(0)} KB`;
+
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(i <= 3 ? 1 : 2))} ${sizes[i]}`;
 }
 
 interface BandwidthChartProps {
