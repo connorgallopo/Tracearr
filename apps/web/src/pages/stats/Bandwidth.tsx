@@ -28,7 +28,7 @@ function formatBytes(bytes: number): string {
   const k = 1024;
 
   if (!+bytes || bytes < k) {
-    return `${(bytes / k).toFixed(0)}`;
+    return '0 KB';
   }
 
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
