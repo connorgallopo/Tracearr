@@ -617,9 +617,147 @@ export const showsQuerySchema = z
   });
 
 // ============================================================================
+// Library Stats Schemas
+// ============================================================================
+
+// Library stats query schema
+export const libraryStatsQuerySchema = z.object({
+  serverId: z.uuid().optional(),
+  libraryId: z.uuid().optional(),
+  timezone: timezoneSchema,
+});
+
+// Library growth query schema (time-series)
+export const libraryGrowthQuerySchema = z.object({
+  serverId: z.uuid().optional(),
+  libraryId: z.uuid().optional(),
+  period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
+  timezone: timezoneSchema,
+});
+
+// Library quality evolution query schema
+export const libraryQualityQuerySchema = z.object({
+  serverId: z.uuid().optional(),
+  period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
+  timezone: timezoneSchema,
+});
+
+// Library storage analytics query schema
+export const libraryStorageQuerySchema = z.object({
+  serverId: z.uuid().optional(),
+  libraryId: z.uuid().optional(),
+  period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
+  timezone: timezoneSchema,
+});
+
+// Library duplicates query schema (cross-server duplicate detection)
+export const libraryDuplicatesQuerySchema = z.object({
+  serverId: z.uuid().optional(), // Filter to show duplicates involving this server
+  mediaType: z.enum(['movie', 'episode', 'show']).optional(),
+  minConfidence: z.coerce.number().min(0).max(100).default(70),
+  includeFuzzy: booleanStringSchema.default(true), // Include fuzzy title matches
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(50),
+});
+
+// Library stale content query schema
+export const libraryStaleQuerySchema = z.object({
+  serverId: z.uuid().optional(),
+  libraryId: z.uuid().optional(),
+  mediaType: z.enum(['movie', 'episode', 'show']).optional(),
+  staleDays: z.coerce.number().int().min(1).default(90), // Configurable threshold
+  category: z.enum(['all', 'never_watched', 'stale']).default('all'),
+  sortBy: z.enum(['size', 'days_stale', 'title']).default('size'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(50),
+  timezone: timezoneSchema,
+});
+
+// Library watch statistics query schema
+export const libraryWatchQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  libraryId: z.string().optional(),
+  mediaType: z.enum(['movie', 'episode', 'show']).optional(),
+  minWatchCount: z.coerce.number().int().min(0).optional(),
+  maxWatchCount: z.coerce.number().int().min(0).optional(),
+  includeUnwatched: z.coerce.boolean().default(true),
+  sortBy: z.enum(['watch_count', 'last_watched', 'title', 'file_size']).default('watch_count'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+});
+
+// Library ROI (Return on Investment) query schema
+export const libraryRoiQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  libraryId: z.string().optional(),
+  mediaType: z.enum(['movie', 'episode', 'show', 'all']).default('all'),
+  // Filter by value category
+  valueCategory: z.enum(['low_value', 'moderate_value', 'high_value', 'all']).default('all'),
+  // Time range for watch calculations (affects recency weighting)
+  periodDays: z.coerce.number().int().min(30).max(365).default(90),
+  // Include age decay in value calculation
+  includeAgeDecay: z.coerce.boolean().default(true),
+  // Minimum file size to include (bytes) - filter out tiny files
+  minFileSize: z.coerce.number().int().min(0).default(0),
+  sortBy: z
+    .enum(['watch_hours_per_gb', 'value_score', 'file_size', 'title'])
+    .default('watch_hours_per_gb'),
+  sortOrder: z.enum(['asc', 'desc']).default('asc'), // Low value first by default
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+});
+
+// Library watch patterns query schema (binge, peak times, seasonal)
+export const libraryPatternsQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  libraryId: z.string().optional(),
+  // Time range for pattern analysis (default: 52 weeks per CONTEXT.md)
+  periodWeeks: z.coerce.number().int().min(4).max(104).default(52),
+  // Scope: per-user patterns or server-wide aggregate
+  scope: z.enum(['user', 'server']).default('server'),
+  // Which patterns to include
+  includeBinge: z.coerce.boolean().default(true),
+  includePeakTimes: z.coerce.boolean().default(true),
+  includeSeasonalTrends: z.coerce.boolean().default(true),
+  // For binge: minimum episodes to consider a binge session
+  bingeThreshold: z.coerce.number().int().min(2).max(10).default(3),
+  // Limit for top binge shows
+  limit: z.coerce.number().int().positive().max(50).default(10),
+});
+
+// Library completion rate analysis query schema
+export const libraryCompletionQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  libraryId: z.string().optional(),
+  mediaType: z.enum(['movie', 'episode', 'show']).optional(),
+  // For TV: aggregate to episode, season, or series level
+  aggregateLevel: z.enum(['item', 'season', 'series']).default('item'),
+  // Completion status filter
+  status: z.enum(['completed', 'in_progress', 'not_started', 'all']).default('all'),
+  minCompletionPct: z.coerce.number().min(0).max(100).optional(),
+  maxCompletionPct: z.coerce.number().min(0).max(100).optional(),
+  sortBy: z.enum(['completion_pct', 'title', 'last_watched']).default('completion_pct'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+});
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 
+export type LibraryStatsQueryInput = z.infer<typeof libraryStatsQuerySchema>;
+export type LibraryGrowthQueryInput = z.infer<typeof libraryGrowthQuerySchema>;
+export type LibraryQualityQueryInput = z.infer<typeof libraryQualityQuerySchema>;
+export type LibraryStorageQueryInput = z.infer<typeof libraryStorageQuerySchema>;
+export type LibraryDuplicatesQueryInput = z.infer<typeof libraryDuplicatesQuerySchema>;
+export type LibraryStaleQueryInput = z.infer<typeof libraryStaleQuerySchema>;
+export type LibraryWatchQueryInput = z.infer<typeof libraryWatchQuerySchema>;
+export type LibraryRoiQueryInput = z.infer<typeof libraryRoiQuerySchema>;
+export type LibraryPatternsQueryInput = z.infer<typeof libraryPatternsQuerySchema>;
+export type LibraryCompletionQueryInput = z.infer<typeof libraryCompletionQuerySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CallbackInput = z.infer<typeof callbackSchema>;
 export type CreateServerInput = z.infer<typeof createServerSchema>;

@@ -75,6 +75,8 @@ export type {
   // Jellystat import
   JellystatImportProgress,
   JellystatImportResult,
+  // Library sync
+  LibrarySyncProgress,
   // Maintenance jobs
   MaintenanceJobType,
   MaintenanceJobStatus,
@@ -219,6 +221,17 @@ export {
   userBehaviorTypeSchema,
   engagementQuerySchema,
   showsQuerySchema,
+  // Library stats
+  libraryStatsQuerySchema,
+  libraryGrowthQuerySchema,
+  libraryQualityQuerySchema,
+  libraryStorageQuerySchema,
+  libraryDuplicatesQuerySchema,
+  libraryStaleQuerySchema,
+  libraryWatchQuerySchema,
+  libraryRoiQuerySchema,
+  libraryPatternsQuerySchema,
+  libraryCompletionQuerySchema,
 } from './schemas.js';
 
 // Schema input type exports
@@ -252,6 +265,17 @@ export type {
   // Engagement tracking
   EngagementQueryInput,
   ShowsQueryInput,
+  // Library stats
+  LibraryStatsQueryInput,
+  LibraryGrowthQueryInput,
+  LibraryQualityQueryInput,
+  LibraryStorageQueryInput,
+  LibraryDuplicatesQueryInput,
+  LibraryStaleQueryInput,
+  LibraryWatchQueryInput,
+  LibraryRoiQueryInput,
+  LibraryPatternsQueryInput,
+  LibraryCompletionQueryInput,
 } from './schemas.js';
 
 // Constant exports

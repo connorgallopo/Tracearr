@@ -69,6 +69,8 @@ export const WS_EVENTS = {
   IMPORT_PROGRESS: 'import:progress',
   IMPORT_JELLYSTAT_PROGRESS: 'import:jellystat:progress',
   MAINTENANCE_PROGRESS: 'maintenance:progress',
+  /** Library sync progress updates */
+  LIBRARY_SYNC_PROGRESS: 'library:sync:progress',
   SUBSCRIBE_SESSIONS: 'subscribe:sessions',
   UNSUBSCRIBE_SESSIONS: 'unsubscribe:sessions',
   VERSION_UPDATE: 'version:update',
@@ -102,6 +104,17 @@ export const REDIS_KEYS = {
   },
   // Version check cache
   VERSION_LATEST: 'tracearr:version:latest',
+  // Library statistics
+  LIBRARY_STATS: 'tracearr:library:stats',
+  LIBRARY_GROWTH: 'tracearr:library:growth',
+  LIBRARY_QUALITY: 'tracearr:library:quality',
+  LIBRARY_STALE: 'tracearr:library:stale',
+  LIBRARY_DUPLICATES: 'tracearr:library:duplicates',
+  LIBRARY_STORAGE: 'tracearr:library:storage',
+  LIBRARY_WATCH: 'tracearr:library:watch',
+  LIBRARY_ROI: 'tracearr:library:roi',
+  LIBRARY_PATTERNS: 'tracearr:library:patterns',
+  LIBRARY_COMPLETION: 'tracearr:library:completion',
 } as const;
 
 // Cache TTLs in seconds
@@ -113,6 +126,17 @@ export const CACHE_TTL = {
   SERVER_HEALTH: 600, // 10 minutes - servers marked unhealthy if no update
   LOCATION_FILTERS: 300, // 5 minutes - filter options change infrequently
   VERSION_CHECK: 21600, // 6 hours - version check interval
+  // Library statistics
+  LIBRARY_STATS: 300, // 5 minutes
+  LIBRARY_GROWTH: 300, // 5 minutes
+  LIBRARY_QUALITY: 300, // 5 minutes
+  LIBRARY_STALE: 3600, // 1 hour (changes slowly)
+  LIBRARY_DUPLICATES: 3600, // 1 hour (changes slowly)
+  LIBRARY_STORAGE: 300, // 5 minutes
+  LIBRARY_WATCH: 300, // 5 minutes
+  LIBRARY_ROI: 3600, // 1 hour (ROI changes slowly)
+  LIBRARY_PATTERNS: 3600, // 1 hour (patterns change slowly)
+  LIBRARY_COMPLETION: 300, // 5 minutes
 } as const;
 
 // Notification event types (must match NotificationEventType in types.ts)
