@@ -302,6 +302,13 @@
       "when": 1768593060919,
       "tag": "0042_bizarre_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1768848861570,
+      "tag": "0043_open_drax",
+      "breakpoints": true
     }
   ]
 }
