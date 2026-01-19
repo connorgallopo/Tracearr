@@ -15,7 +15,13 @@ import {
   parseDateString,
 } from '../../../utils/parsing.js';
 import type { StreamDecisions } from '../../../utils/transcodeNormalizer.js';
-import type { MediaSession, MediaUser, MediaLibrary, MediaWatchHistoryItem } from '../types.js';
+import type {
+  MediaSession,
+  MediaUser,
+  MediaLibrary,
+  MediaWatchHistoryItem,
+  MediaLibraryItem,
+} from '../types.js';
 import {
   ticksToMs,
   parseMediaType,
@@ -419,4 +425,242 @@ export function parseItemsResponse(data: unknown): JellyfinEmbyItemResult[] {
   const items = (data as { Items?: unknown[] })?.Items;
   if (!Array.isArray(items)) return [];
   return items.map((item) => parseItem(item as Record<string, unknown>));
+}
+
+// ============================================================================
+// Library Items Parsing (for library snapshots)
+// ============================================================================
+
+/**
+ * Parse ProviderIds object to extract external IDs
+ * Handles both capitalized (Imdb) and lowercase (imdb) keys
+ */
+export function parseProviderIds(providerIds: unknown): {
+  imdbId?: string;
+  tmdbId?: number;
+  tvdbId?: number;
+} {
+  if (!providerIds || typeof providerIds !== 'object') {
+    return {};
+  }
+
+  const ids = providerIds as Record<string, unknown>;
+
+  // Handle both capitalized and lowercase keys
+  const imdbRaw = ids.Imdb ?? ids.imdb ?? ids.IMDB;
+  const tmdbRaw = ids.Tmdb ?? ids.tmdb ?? ids.TMDB;
+  const tvdbRaw = ids.Tvdb ?? ids.tvdb ?? ids.TVDB;
+
+  const result: { imdbId?: string; tmdbId?: number; tvdbId?: number } = {};
+
+  if (typeof imdbRaw === 'string' && imdbRaw.length > 0) {
+    result.imdbId = imdbRaw;
+  }
+
+  if (tmdbRaw !== undefined && tmdbRaw !== null) {
+    const parsed = typeof tmdbRaw === 'number' ? tmdbRaw : parseInt(String(tmdbRaw), 10);
+    if (!isNaN(parsed)) {
+      result.tmdbId = parsed;
+    }
+  }
+
+  if (tvdbRaw !== undefined && tvdbRaw !== null) {
+    const parsed = typeof tvdbRaw === 'number' ? tvdbRaw : parseInt(String(tvdbRaw), 10);
+    if (!isNaN(parsed)) {
+      result.tvdbId = parsed;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Map Jellyfin/Emby Type to MediaLibraryItem mediaType
+ */
+export function mapJellyfinType(
+  type: unknown
+): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' {
+  const typeStr = (typeof type === 'string' ? type : '').toLowerCase();
+
+  switch (typeStr) {
+    case 'movie':
+      return 'movie';
+    case 'series':
+      return 'show';
+    case 'season':
+      return 'season';
+    case 'episode':
+      return 'episode';
+    case 'musicartist':
+      return 'artist';
+    case 'musicalbum':
+      return 'album';
+    case 'audio':
+      return 'track';
+    default:
+      return 'movie'; // Default to movie for unknown types
+  }
+}
+
+/**
+ * Convert video dimensions to resolution string
+ */
+export function getResolutionString(width?: number, height?: number): string | undefined {
+  if (!width || width <= 0) return undefined;
+
+  if (width >= 3840) return '4k';
+  if (width >= 1920) return '1080p';
+  if (width >= 1280) return '720p';
+  if (width >= 720) return '480p';
+  return 'sd';
+}
+
+/**
+ * Extract quality information from MediaSources and MediaStreams
+ */
+export function extractQuality(
+  mediaSources: unknown,
+  mediaStreams?: unknown
+): {
+  videoResolution?: string;
+  videoCodec?: string;
+  audioCodec?: string;
+  audioChannels?: number;
+  fileSize?: number;
+  container?: string;
+} {
+  const result: {
+    videoResolution?: string;
+    videoCodec?: string;
+    audioCodec?: string;
+    audioChannels?: number;
+    fileSize?: number;
+    container?: string;
+  } = {};
+
+  // Get streams from MediaSources (preferred) or direct MediaStreams
+  let streams: unknown[] = [];
+  let source: Record<string, unknown> | undefined;
+
+  if (Array.isArray(mediaSources) && mediaSources.length > 0) {
+    source = mediaSources[0] as Record<string, unknown>;
+    streams = Array.isArray(source?.MediaStreams) ? (source.MediaStreams as unknown[]) : [];
+
+    // Extract container and file size from source
+    if (typeof source?.Container === 'string') {
+      result.container = source.Container.toLowerCase();
+    }
+    if (typeof source?.Size === 'number') {
+      result.fileSize = source.Size;
+    }
+  } else if (Array.isArray(mediaStreams)) {
+    streams = mediaStreams;
+  }
+
+  // Find video and audio streams
+  for (const stream of streams) {
+    if (!stream || typeof stream !== 'object') continue;
+    const s = stream as Record<string, unknown>;
+
+    if (s.Type === 'Video' && !result.videoCodec) {
+      const width = typeof s.Width === 'number' ? s.Width : undefined;
+      const height = typeof s.Height === 'number' ? s.Height : undefined;
+      result.videoResolution = getResolutionString(width, height);
+      if (typeof s.Codec === 'string') {
+        result.videoCodec = s.Codec.toUpperCase();
+      }
+    }
+
+    if (s.Type === 'Audio' && !result.audioCodec) {
+      if (typeof s.Codec === 'string') {
+        result.audioCodec = s.Codec.toUpperCase();
+      }
+      if (typeof s.Channels === 'number') {
+        result.audioChannels = s.Channels;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Safely parse a date string or timestamp
+ */
+export function parseLibraryDate(value: unknown): Date | undefined {
+  if (!value) return undefined;
+
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? undefined : value;
+  }
+
+  if (typeof value === 'string') {
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : date;
+  }
+
+  if (typeof value === 'number') {
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : date;
+  }
+
+  return undefined;
+}
+
+/**
+ * Parse a single library item from Jellyfin/Emby API response
+ */
+export function parseLibraryItem(item: Record<string, unknown>): MediaLibraryItem {
+  const providerIds = parseProviderIds(item.ProviderIds);
+  const quality = extractQuality(item.MediaSources, item.MediaStreams);
+
+  const result: MediaLibraryItem = {
+    ratingKey: parseString(item.Id),
+    title: parseString(item.Name),
+    mediaType: mapJellyfinType(item.Type),
+    year: parseOptionalNumber(item.ProductionYear),
+    addedAt: parseLibraryDate(item.DateCreated) ?? new Date(),
+    // Quality fields
+    videoResolution: quality.videoResolution,
+    videoCodec: quality.videoCodec,
+    audioCodec: quality.audioCodec,
+    audioChannels: quality.audioChannels,
+    fileSize: quality.fileSize,
+    container: quality.container,
+    // External IDs
+    imdbId: providerIds.imdbId,
+    tmdbId: providerIds.tmdbId,
+    tvdbId: providerIds.tvdbId,
+    // File path (debug only)
+    filePath: parseOptionalString(item.Path),
+  };
+
+  // Episode-specific fields
+  if (result.mediaType === 'episode') {
+    result.showTitle = parseOptionalString(item.SeriesName);
+    result.showRatingKey = parseOptionalString(item.SeriesId);
+    result.seasonNumber = parseOptionalNumber(item.ParentIndexNumber);
+    result.episodeNumber = parseOptionalNumber(item.IndexNumber);
+  }
+
+  // Music-specific fields
+  if (result.mediaType === 'track' || result.mediaType === 'album') {
+    // AlbumArtist is preferred, fall back to first artist in Artists array
+    const artists = item.Artists;
+    const albumArtist = parseOptionalString(item.AlbumArtist);
+    const firstArtist =
+      Array.isArray(artists) && artists.length > 0 ? parseOptionalString(artists[0]) : undefined;
+    result.artistName = albumArtist ?? firstArtist;
+    result.albumName = parseOptionalString(item.Album);
+  }
+
+  return result;
+}
+
+/**
+ * Parse library items from Jellyfin/Emby /Items API response
+ */
+export function parseLibraryItemsResponse(data: unknown[]): MediaLibraryItem[] {
+  if (!Array.isArray(data)) return [];
+  return data.map((item) => parseLibraryItem(item as Record<string, unknown>));
 }

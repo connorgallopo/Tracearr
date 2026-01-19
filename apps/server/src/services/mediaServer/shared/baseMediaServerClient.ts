@@ -13,6 +13,7 @@ import type {
   MediaSession,
   MediaUser,
   MediaLibrary,
+  MediaLibraryItem,
   MediaWatchHistoryItem,
   MediaServerConfig,
 } from '../types.js';
@@ -76,6 +77,7 @@ export interface MediaServerParsers {
   parseItemsResponse: (data: unknown) => JellyfinEmbyItemResult[];
   parseUser: (data: Record<string, unknown>) => MediaUser;
   parseAuthResponse: (data: Record<string, unknown>) => JellyfinEmbyAuthResult;
+  parseLibraryItemsResponse: (data: unknown[]) => MediaLibraryItem[];
 }
 
 /**
@@ -175,6 +177,47 @@ export abstract class BaseMediaServerClient
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Get all items in a library with pagination
+   *
+   * Uses /Items endpoint with ProviderIds field to get external IDs.
+   *
+   * @param libraryId - The parent library ID
+   * @param options - Pagination options
+   * @returns Items and total count for pagination tracking
+   */
+  async getLibraryItems(
+    libraryId: string,
+    options?: { offset?: number; limit?: number }
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
+    const offset = options?.offset ?? 0;
+    const limit = options?.limit ?? 100;
+
+    const params = new URLSearchParams({
+      ParentId: libraryId,
+      Recursive: 'true',
+      IncludeItemTypes: 'Movie,Series,Season,Episode,MusicArtist,MusicAlbum,Audio',
+      Fields:
+        'ProviderIds,Path,MediaSources,DateCreated,ProductionYear,SeriesName,SeriesId,ParentIndexNumber,IndexNumber,Album,AlbumArtist,Artists',
+      StartIndex: String(offset),
+      Limit: String(limit),
+    });
+
+    const data = await fetchJson<{ Items?: unknown[]; TotalRecordCount?: number }>(
+      `${this.baseUrl}/Items?${params}`,
+      {
+        headers: this.buildHeaders(),
+        service: this.serverType,
+        timeout: 30000,
+      }
+    );
+
+    const items = this.parsers.parseLibraryItemsResponse(data.Items ?? []);
+    const totalCount = data.TotalRecordCount ?? items.length;
+
+    return { items, totalCount };
   }
 
   // ==========================================================================

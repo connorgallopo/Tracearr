@@ -23,6 +23,7 @@ import {
   parseActivityLogResponse,
   parseAuthResponse,
   parseItemsResponse,
+  parseLibraryItemsResponse,
   parseUser,
 } from './parser.js';
 
@@ -48,6 +49,7 @@ export class EmbyClient extends BaseMediaServerClient {
     parseWatchHistoryResponse,
     parseActivityLogResponse,
     parseItemsResponse,
+    parseLibraryItemsResponse,
     parseUser,
     parseAuthResponse,
   };

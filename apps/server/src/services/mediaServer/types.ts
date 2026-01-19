@@ -229,6 +229,93 @@ export interface MediaLibrary {
 }
 
 // ============================================================================
+// Library Item Types
+// ============================================================================
+
+/**
+ * Unified library item representation across media servers
+ *
+ * Used for library scanning and snapshot generation. Contains both
+ * metadata and quality information needed for library statistics.
+ */
+export interface MediaLibraryItem {
+  // === Core Identification ===
+
+  /** Server-specific ID (Plex ratingKey, Jellyfin/Emby Id) */
+  ratingKey: string;
+
+  /** Item title */
+  title: string;
+
+  /** Content type */
+  mediaType: 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track';
+
+  /** Release year (optional) */
+  year?: number;
+
+  /** When item was added to library */
+  addedAt: Date;
+
+  // === Quality Fields (all optional) ===
+
+  /** Video resolution string ('4k', '1080p', '720p', 'sd') */
+  videoResolution?: string;
+
+  /** Video codec (HEVC, H264, VP9, AV1, etc.) */
+  videoCodec?: string;
+
+  /** Audio codec (TrueHD, DTS-HD MA, AAC, FLAC, etc.) */
+  audioCodec?: string;
+
+  /** Audio channel count (2, 6, 8) */
+  audioChannels?: number;
+
+  /** File size in bytes */
+  fileSize?: number;
+
+  /** Container format (mkv, mp4, avi, etc.) */
+  container?: string;
+
+  // === External ID Fields (filled by Phase 3 enrichment or from server data) ===
+
+  /** IMDB ID (e.g., "tt1234567") */
+  imdbId?: string;
+
+  /** TMDB numeric ID */
+  tmdbId?: number;
+
+  /** TVDB numeric ID */
+  tvdbId?: number;
+
+  // === Episode-Specific Fields (optional) ===
+
+  /** Parent show title for episodes */
+  showTitle?: string;
+
+  /** Parent show ID */
+  showRatingKey?: string;
+
+  /** Season number */
+  seasonNumber?: number;
+
+  /** Episode number */
+  episodeNumber?: number;
+
+  // === Music-Specific Fields (optional) ===
+
+  /** Artist name for albums/tracks */
+  artistName?: string;
+
+  /** Album name for tracks */
+  albumName?: string;
+
+  // === Debug Field ===
+
+  /** File path (debug only - NEVER use for matching across servers) */
+  filePath?: string;
+}
+
+// ============================================================================
 // Watch History Types
 // ============================================================================
 
@@ -319,6 +406,24 @@ export interface IMediaServerClient {
    * @throws Error if termination fails
    */
   terminateSession(sessionId: string, reason?: string): Promise<boolean>;
+
+  /**
+   * Get all items in a library with pagination support
+   *
+   * Used for library scanning and snapshot generation. Returns items
+   * with quality metadata and external IDs when available.
+   *
+   * @param libraryId - The library identifier
+   * @param options - Pagination options
+   * @returns Promise with items array and total count for pagination
+   */
+  getLibraryItems(
+    libraryId: string,
+    options?: {
+      offset?: number;
+      limit?: number;
+    }
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
 }
 
 /**

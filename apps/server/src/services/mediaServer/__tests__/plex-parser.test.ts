@@ -23,6 +23,7 @@ import {
   parseSharedServersXml,
   parsePlexTvUser,
   parseMediaMetadataResponse,
+  parseLibraryItemsResponse,
   getTranscodingSessionRatingKeys,
   type PlexOriginalMedia,
 } from '../plex/parser.js';
@@ -1233,6 +1234,265 @@ describe('Plex Original Media Metadata Parser', () => {
       expect(session.quality.sourceVideoCodec).toBe('HEVC'); // From TranscodeSession
       expect(session.quality.sourceAudioCodec).toBe('TRUEHD'); // From TranscodeSession
       expect(session.quality.isTranscode).toBe(true);
+    });
+  });
+});
+
+// ============================================================================
+// Library Item Parsing Tests (Plan 02-02)
+// ============================================================================
+
+describe('Plex Library Item Parser', () => {
+  describe('parseLibraryItemsResponse', () => {
+    it('should parse movie with new agent GUIDs', () => {
+      const response = {
+        MediaContainer: {
+          totalSize: 1,
+          Metadata: [
+            {
+              ratingKey: '12345',
+              title: 'Inception',
+              type: 'movie',
+              year: 2010,
+              addedAt: 1609459200, // 2021-01-01
+              guid: 'plex://movie/5d7768264de0ee001fcc87e0', // Internal ID - should be ignored
+              Guid: [{ id: 'imdb://tt1375666' }, { id: 'tmdb://27205' }, { id: 'tvdb://12345' }],
+              Media: [
+                {
+                  videoResolution: '4k',
+                  videoCodec: 'hevc',
+                  audioCodec: 'truehd',
+                  audioChannels: 8,
+                  container: 'mkv',
+                  Part: [{ size: 45000000000, file: '/movies/Inception/Inception (2010).mkv' }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.ratingKey).toBe('12345');
+      expect(item.title).toBe('Inception');
+      expect(item.mediaType).toBe('movie');
+      expect(item.year).toBe(2010);
+      expect(item.imdbId).toBe('tt1375666');
+      expect(item.tmdbId).toBe(27205);
+      expect(item.tvdbId).toBe(12345);
+      expect(item.videoResolution).toBe('4k');
+      expect(item.videoCodec).toBe('HEVC');
+      expect(item.audioCodec).toBe('TRUEHD');
+      expect(item.audioChannels).toBe(8);
+      expect(item.fileSize).toBe(45000000000);
+      expect(item.container).toBe('mkv');
+      expect(item.filePath).toBe('/movies/Inception/Inception (2010).mkv');
+    });
+
+    it('should normalize video resolution with p suffix', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '1',
+              title: 'Movie 1080',
+              type: 'movie',
+              addedAt: 1609459200,
+              Media: [{ videoResolution: '1080' }],
+            },
+            {
+              ratingKey: '2',
+              title: 'Movie 720',
+              type: 'movie',
+              addedAt: 1609459200,
+              Media: [{ videoResolution: '720' }],
+            },
+            {
+              ratingKey: '3',
+              title: 'Movie SD',
+              type: 'movie',
+              addedAt: 1609459200,
+              Media: [{ videoResolution: 'sd' }],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items[0]!.videoResolution).toBe('1080p');
+      expect(items[1]!.videoResolution).toBe('720p');
+      expect(items[2]!.videoResolution).toBe('sd');
+    });
+
+    it('should parse episode with show hierarchy', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '67890',
+              title: 'Pilot',
+              type: 'episode',
+              grandparentTitle: 'Breaking Bad',
+              grandparentRatingKey: '11111',
+              parentIndex: 1,
+              index: 1,
+              addedAt: 1609459200,
+              Guid: [{ id: 'imdb://tt0959621' }, { id: 'tmdb://62085' }, { id: 'tvdb://349232' }],
+              Media: [
+                {
+                  videoResolution: '1080',
+                  videoCodec: 'h264',
+                  Part: [{ size: 3500000000 }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.mediaType).toBe('episode');
+      expect(item.showTitle).toBe('Breaking Bad');
+      expect(item.showRatingKey).toBe('11111');
+      expect(item.seasonNumber).toBe(1);
+      expect(item.episodeNumber).toBe(1);
+      expect(item.imdbId).toBe('tt0959621');
+      expect(item.tmdbId).toBe(62085);
+      expect(item.tvdbId).toBe(349232);
+    });
+
+    it('should parse music track with artist and album', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '99999',
+              title: 'Bohemian Rhapsody',
+              type: 'track',
+              grandparentTitle: 'Queen', // Artist
+              parentTitle: 'A Night at the Opera', // Album
+              addedAt: 1609459200,
+              Media: [
+                {
+                  audioCodec: 'flac',
+                  audioChannels: 2,
+                  Part: [{ size: 50000000 }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.mediaType).toBe('track');
+      expect(item.artistName).toBe('Queen');
+      expect(item.albumName).toBe('A Night at the Opera');
+      expect(item.audioCodec).toBe('FLAC');
+      expect(item.audioChannels).toBe(2);
+    });
+
+    it('should handle missing optional fields gracefully', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '55555',
+              title: 'Minimal Movie',
+              type: 'movie',
+              // No year, no addedAt, no Guid, no Media
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.ratingKey).toBe('55555');
+      expect(item.title).toBe('Minimal Movie');
+      expect(item.mediaType).toBe('movie');
+      expect(item.year).toBeUndefined();
+      expect(item.imdbId).toBeUndefined();
+      expect(item.tmdbId).toBeUndefined();
+      expect(item.tvdbId).toBeUndefined();
+      expect(item.videoResolution).toBeUndefined();
+      expect(item.videoCodec).toBeUndefined();
+      expect(item.fileSize).toBeUndefined();
+      expect(item.addedAt).toBeInstanceOf(Date); // Should have a fallback date
+    });
+
+    it('should handle empty MediaContainer', () => {
+      expect(parseLibraryItemsResponse({})).toEqual([]);
+      expect(parseLibraryItemsResponse({ MediaContainer: {} })).toEqual([]);
+      expect(parseLibraryItemsResponse({ MediaContainer: { Metadata: [] } })).toEqual([]);
+      expect(parseLibraryItemsResponse(null)).toEqual([]);
+    });
+
+    it('should parse TV show type correctly', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '22222',
+              title: 'Breaking Bad',
+              type: 'show',
+              year: 2008,
+              addedAt: 1609459200,
+              Guid: [{ id: 'imdb://tt0903747' }, { id: 'tmdb://1396' }, { id: 'tvdb://81189' }],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.mediaType).toBe('show');
+      expect(item.imdbId).toBe('tt0903747');
+      expect(item.tmdbId).toBe(1396);
+      expect(item.tvdbId).toBe(81189);
+    });
+
+    it('should ignore invalid external ID formats', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '33333',
+              title: 'Test Movie',
+              type: 'movie',
+              addedAt: 1609459200,
+              Guid: [
+                { id: 'plex://movie/internal' }, // Should be ignored
+                { id: 'imdb://tt1234567' }, // Valid
+                { id: 'tmdb://notanumber' }, // Invalid - not a number
+                { id: 'unknown://12345' }, // Unknown provider - ignored
+              ],
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      const item = items[0]!;
+      expect(item.imdbId).toBe('tt1234567');
+      expect(item.tmdbId).toBeUndefined(); // Invalid number parsed as NaN
+      expect(item.tvdbId).toBeUndefined();
     });
   });
 });

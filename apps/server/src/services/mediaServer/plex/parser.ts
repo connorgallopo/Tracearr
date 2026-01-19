@@ -15,7 +15,13 @@ import {
   parseSelectedArrayElement,
 } from '../../../utils/parsing.js';
 import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
-import type { MediaSession, MediaUser, MediaLibrary, MediaWatchHistoryItem } from '../types.js';
+import type {
+  MediaSession,
+  MediaUser,
+  MediaLibrary,
+  MediaLibraryItem,
+  MediaWatchHistoryItem,
+} from '../types.js';
 import type {
   SourceVideoDetails,
   SourceAudioDetails,
@@ -1271,4 +1277,162 @@ export function parseStatisticsResourcesResponse(data: unknown): PlexStatisticsD
   return parseArray(rawStats, (item) =>
     parseStatisticsDataPoint(item as PlexRawStatisticsResource)
   ).sort((a, b) => b.at - a.at); // Sort newest first
+}
+
+// ============================================================================
+// Library Item Parsing (for library sync)
+// ============================================================================
+
+/**
+ * Parse external IDs from Plex Guid array
+ *
+ * CRITICAL: Plex new agents return `plex://` internal IDs in the main guid attribute.
+ * External IDs (IMDB, TMDB, TVDB) are in nested Guid elements requiring `includeGuids=1`.
+ *
+ * Guid array format: [{ id: "imdb://tt1234567" }, { id: "tmdb://12345" }, ...]
+ */
+function parseExternalIds(guids: Array<{ id: string }> | undefined): {
+  imdbId?: string;
+  tmdbId?: number;
+  tvdbId?: number;
+} {
+  if (!guids || !Array.isArray(guids)) return {};
+
+  const result: { imdbId?: string; tmdbId?: number; tvdbId?: number } = {};
+
+  for (const guid of guids) {
+    const id = guid.id;
+    if (id?.startsWith('imdb://')) {
+      result.imdbId = id.replace('imdb://', '');
+    } else if (id?.startsWith('tmdb://')) {
+      const parsed = parseInt(id.replace('tmdb://', ''), 10);
+      if (!isNaN(parsed)) result.tmdbId = parsed;
+    } else if (id?.startsWith('tvdb://')) {
+      const parsed = parseInt(id.replace('tvdb://', ''), 10);
+      if (!isNaN(parsed)) result.tvdbId = parsed;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Normalize video resolution string
+ * Plex returns "4k", "1080", "720", "480", "sd"
+ * Normalize to consistent format with 'p' suffix for numeric resolutions
+ */
+function normalizeVideoResolution(resolution: string | undefined): string | undefined {
+  if (!resolution) return undefined;
+
+  const lower = resolution.toLowerCase();
+  if (lower === '4k' || lower === 'uhd') return '4k';
+  if (lower === 'sd') return 'sd';
+
+  // Add 'p' suffix if not present and is numeric
+  if (/^\d+$/.test(lower)) {
+    return `${lower}p`;
+  }
+
+  return lower;
+}
+
+/**
+ * Map Plex type to MediaLibraryItem mediaType
+ */
+function mapPlexTypeToMediaType(
+  type: string
+): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' {
+  const typeStr = type.toLowerCase();
+  switch (typeStr) {
+    case 'movie':
+      return 'movie';
+    case 'show':
+      return 'show';
+    case 'season':
+      return 'season';
+    case 'episode':
+      return 'episode';
+    case 'artist':
+      return 'artist';
+    case 'album':
+      return 'album';
+    case 'track':
+      return 'track';
+    default:
+      // Default to movie for unknown types
+      return 'movie';
+  }
+}
+
+/**
+ * Parse a single library item from Plex API response
+ */
+function parseLibraryItem(item: Record<string, unknown>): MediaLibraryItem {
+  const mediaArray = item.Media as Array<Record<string, unknown>> | undefined;
+  const firstMedia = mediaArray?.[0];
+  const parts = firstMedia?.Part as Array<Record<string, unknown>> | undefined;
+  const firstPart = parts?.[0];
+
+  // Parse external IDs from Guid array (NOT main guid attribute)
+  const guids = item.Guid as Array<{ id: string }> | undefined;
+  const externalIds = parseExternalIds(guids);
+
+  // Parse addedAt from Unix timestamp
+  const addedAtTimestamp = parseOptionalNumber(item.addedAt);
+  const addedAt = addedAtTimestamp ? new Date(addedAtTimestamp * 1000) : new Date();
+
+  const result: MediaLibraryItem = {
+    ratingKey: parseString(item.ratingKey),
+    title: parseString(item.title),
+    mediaType: mapPlexTypeToMediaType(parseString(item.type)),
+    year: parseOptionalNumber(item.year),
+    addedAt,
+
+    // Quality fields from Media array
+    videoResolution: normalizeVideoResolution(parseOptionalString(firstMedia?.videoResolution)),
+    videoCodec: parseOptionalString(firstMedia?.videoCodec)?.toUpperCase(),
+    audioCodec: parseOptionalString(firstMedia?.audioCodec)?.toUpperCase(),
+    audioChannels: parseOptionalNumber(firstMedia?.audioChannels),
+    fileSize: parseOptionalNumber(firstPart?.size),
+    container: parseOptionalString(firstMedia?.container),
+
+    // External IDs
+    ...externalIds,
+
+    // File path (debug only)
+    filePath: parseOptionalString(firstPart?.file),
+  };
+
+  // Episode-specific fields
+  if (result.mediaType === 'episode') {
+    result.showTitle = parseOptionalString(item.grandparentTitle);
+    result.showRatingKey = parseOptionalString(item.grandparentRatingKey);
+    result.seasonNumber = parseOptionalNumber(item.parentIndex);
+    result.episodeNumber = parseOptionalNumber(item.index);
+  }
+
+  // Music-specific fields
+  if (result.mediaType === 'track') {
+    result.artistName = parseOptionalString(item.grandparentTitle);
+    result.albumName = parseOptionalString(item.parentTitle);
+  } else if (result.mediaType === 'album') {
+    result.artistName = parseOptionalString(item.parentTitle);
+  }
+
+  return result;
+}
+
+/**
+ * Parse library items response from Plex /library/sections/{id}/all endpoint
+ *
+ * Handles all item types: Video (movies), Directory (shows), Track (music)
+ * The MediaContainer may contain Metadata array with various item types.
+ *
+ * @param data - Raw response from Plex API
+ * @returns Array of parsed MediaLibraryItem objects
+ */
+export function parseLibraryItemsResponse(data: unknown): MediaLibraryItem[] {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const metadata = container?.MediaContainer?.Metadata;
+  return parseArray(metadata, (item) => parseLibraryItem(item as Record<string, unknown>));
 }

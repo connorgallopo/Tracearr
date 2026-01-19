@@ -93,6 +93,7 @@ export type {
   MediaSession,
   MediaUser,
   MediaLibrary,
+  MediaLibraryItem,
   MediaWatchHistoryItem,
 } from './types.js';
 

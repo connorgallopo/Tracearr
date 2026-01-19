@@ -716,6 +716,23 @@ export interface JellystatImportResult {
   }[];
 }
 
+// Library sync progress types
+export interface LibrarySyncProgress {
+  serverId: string;
+  serverName: string;
+  status: 'running' | 'complete' | 'error';
+  currentLibrary?: string;
+  currentLibraryName?: string;
+  totalLibraries: number;
+  processedLibraries: number;
+  totalItems: number;
+  processedItems: number;
+  message: string;
+  startedAt: string;
+  completedAt?: string;
+  error?: string;
+}
+
 // WebSocket event types
 export interface ServerToClientEvents {
   'session:started': (session: ActiveSession) => void;
@@ -726,6 +743,7 @@ export interface ServerToClientEvents {
   'import:progress': (progress: TautulliImportProgress) => void;
   'import:jellystat:progress': (progress: JellystatImportProgress) => void;
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
+  'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'version:update': (data: { current: string; latest: string; releaseUrl: string }) => void;
   'server:down': (data: { serverId: string; serverName: string }) => void;
   'server:up': (data: { serverId: string; serverName: string }) => void;
