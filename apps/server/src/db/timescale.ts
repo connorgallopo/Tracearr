@@ -18,8 +18,9 @@ import { PRIMARY_MEDIA_TYPES_SQL_LITERAL } from '../constants/mediaTypes.js';
  * - 1: Initial version (no media_type filtering)
  * - 2: Added media_type IN ('movie', 'episode') filter to all aggregates
  * - 3: Added daily_bandwidth_by_user aggregate for bandwidth analytics
+ * - 4: Added library_stats_daily and content_quality_daily aggregates for library statistics
  */
-const AGGREGATE_SCHEMA_VERSION = 3;
+const AGGREGATE_SCHEMA_VERSION = 4;
 
 /** Config for a continuous aggregate view */
 interface AggregateDefinition {
@@ -286,6 +287,103 @@ function getAggregateDefinitions(): AggregateDefinition[] {
         scheduleInterval: '1 hour',
       },
     },
+    // Library Statistics Aggregates (from library_snapshots hypertable)
+    {
+      name: 'library_stats_daily',
+      // Use MAX() not SUM() - multiple snapshots per day represent the same library state
+      // If a library has 1000 items and 3 snapshots exist, SUM would incorrectly produce 3000
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS library_stats_daily
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', snapshot_time) AS day,
+          server_id,
+          library_id,
+          MAX(item_count) AS total_items,
+          MAX(total_size) AS total_size_bytes,
+          MAX(movie_count) AS movie_count,
+          MAX(episode_count) AS episode_count,
+          MAX(show_count) AS show_count,
+          MAX(count_4k) AS count_4k,
+          MAX(count_1080p) AS count_1080p,
+          MAX(count_720p) AS count_720p,
+          MAX(count_sd) AS count_sd
+        FROM library_snapshots
+        GROUP BY day, server_id, library_id
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS library_stats_daily
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', snapshot_time) AS day,
+          server_id,
+          library_id,
+          MAX(item_count) AS total_items,
+          MAX(total_size) AS total_size_bytes,
+          MAX(movie_count) AS movie_count,
+          MAX(episode_count) AS episode_count,
+          MAX(show_count) AS show_count,
+          MAX(count_4k) AS count_4k,
+          MAX(count_1080p) AS count_1080p,
+          MAX(count_720p) AS count_720p,
+          MAX(count_sd) AS count_sd
+        FROM library_snapshots
+        GROUP BY day, server_id, library_id
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '7 days',
+        endOffset: '1 hour',
+        scheduleInterval: '1 hour',
+      },
+    },
+    {
+      name: 'content_quality_daily',
+      // Server-level quality and codec metrics for tracking quality evolution over time
+      // Use MAX() not SUM() - multiple intra-day snapshots represent the same server state
+      toolkitSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS content_quality_daily
+        WITH (timescaledb.continuous, timescaledb.materialized_only = false) AS
+        SELECT
+          time_bucket('1 day', snapshot_time) AS day,
+          server_id,
+          MAX(item_count) AS total_items,
+          MAX(count_4k) AS count_4k,
+          MAX(count_1080p) AS count_1080p,
+          MAX(count_720p) AS count_720p,
+          MAX(count_sd) AS count_sd,
+          MAX(hevc_count) AS hevc_count,
+          MAX(h264_count) AS h264_count,
+          MAX(av1_count) AS av1_count
+        FROM library_snapshots
+        GROUP BY day, server_id
+        WITH NO DATA
+      `,
+      fallbackSql: `
+        CREATE MATERIALIZED VIEW IF NOT EXISTS content_quality_daily
+        WITH (timescaledb.continuous) AS
+        SELECT
+          time_bucket('1 day', snapshot_time) AS day,
+          server_id,
+          MAX(item_count) AS total_items,
+          MAX(count_4k) AS count_4k,
+          MAX(count_1080p) AS count_1080p,
+          MAX(count_720p) AS count_720p,
+          MAX(count_sd) AS count_sd,
+          MAX(hevc_count) AS hevc_count,
+          MAX(h264_count) AS h264_count,
+          MAX(av1_count) AS av1_count
+        FROM library_snapshots
+        GROUP BY day, server_id
+        WITH NO DATA
+      `,
+      refreshPolicy: {
+        startOffset: '7 days',
+        endOffset: '1 hour',
+        scheduleInterval: '1 hour',
+      },
+    },
   ];
 }
 
@@ -372,6 +470,22 @@ async function getContinuousAggregates(): Promise<string[]> {
 }
 
 /**
+ * Get list of existing continuous aggregates for library_snapshots
+ */
+async function getLibrarySnapshotAggregates(): Promise<string[]> {
+  try {
+    const result = await db.execute(sql`
+      SELECT view_name
+      FROM timescaledb_information.continuous_aggregates
+      WHERE hypertable_name = 'library_snapshots'
+    `);
+    return (result.rows as { view_name: string }[]).map((r) => r.view_name);
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Check if a materialized view exists (regardless of type)
  */
 async function materializedViewExists(viewName: string): Promise<boolean> {
@@ -404,6 +518,8 @@ async function dropRegularMaterializedViewIfExists(
     'hourly_concurrent_streams',
     'daily_content_engagement',
     'daily_bandwidth_by_user',
+    'library_stats_daily',
+    'content_quality_daily',
   ];
 
   if (!allowedViews.includes(viewName)) {
@@ -705,6 +821,28 @@ async function isToolkitAvailableOnSystem(): Promise<boolean> {
 }
 
 /**
+ * Create continuous aggregates for library statistics
+ *
+ * Library aggregates (library_stats_daily, content_quality_daily) use simple
+ * MAX() aggregation and don't require HyperLogLog. They're created separately
+ * from session aggregates and integrated into initLibrarySnapshotsHypertable.
+ */
+async function createLibraryAggregates(): Promise<void> {
+  const definitions = getAggregateDefinitions();
+
+  // Filter to library-specific aggregates (based on library_snapshots hypertable)
+  const libraryAggregates = definitions.filter(
+    (def) => def.name === 'library_stats_daily' || def.name === 'content_quality_daily'
+  );
+
+  // Library aggregates don't use HyperLogLog, they use simple MAX() aggregation
+  // Pass hasToolkit=true to use toolkitSql which is identical to fallbackSql for these
+  for (const def of libraryAggregates) {
+    await createAggregate(def, true);
+  }
+}
+
+/**
  * Create continuous aggregates for dashboard performance
  *
  * Uses HyperLogLog from TimescaleDB Toolkit for approximate distinct counts
@@ -872,6 +1010,8 @@ export async function initTimescaleDB(): Promise<{
     'hourly_concurrent_streams',
     'daily_content_engagement', // Engagement tracking system
     'daily_bandwidth_by_user', // Bandwidth analytics
+    'library_stats_daily', // Library statistics aggregate
+    'content_quality_daily', // Quality/codec evolution tracking
   ];
 
   const missingAggregates = expectedAggregates.filter((agg) => !existingAggregates.includes(agg));
@@ -945,6 +1085,15 @@ export async function initTimescaleDB(): Promise<{
   } catch (err) {
     console.warn('Failed to create some content indexes:', err);
     actions.push('Content indexes: some may already exist');
+  }
+
+  // Initialize library_snapshots hypertable (for library statistics feature)
+  try {
+    const librarySnapshotsResult = await initLibrarySnapshotsHypertable();
+    actions.push(...librarySnapshotsResult.actions);
+  } catch (err) {
+    console.warn('Failed to initialize library_snapshots hypertable:', err);
+    actions.push('library_snapshots hypertable: initialization skipped (table may not exist yet)');
   }
 
   // Get final status
@@ -1275,4 +1424,221 @@ export async function rebuildTimescaleViews(
       message: `Failed to rebuild views: ${message}`,
     };
   }
+}
+
+// ============================================================================
+// Library Snapshots Hypertable
+// ============================================================================
+
+/**
+ * Check if library_snapshots table is already a hypertable
+ */
+async function isLibrarySnapshotsHypertable(): Promise<boolean> {
+  try {
+    const result = await db.execute(sql`
+      SELECT EXISTS(
+        SELECT 1 FROM timescaledb_information.hypertables
+        WHERE hypertable_name = 'library_snapshots'
+      ) as is_hypertable
+    `);
+    return (result.rows[0] as { is_hypertable: boolean })?.is_hypertable ?? false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Convert library_snapshots table to a TimescaleDB hypertable
+ *
+ * Uses 1-day chunk intervals to match daily snapshot cadence.
+ * Primary key modified to composite (id, snapshot_time) for hypertable requirements.
+ */
+async function convertLibrarySnapshotsToHypertable(): Promise<void> {
+  // Check if snapshot_time already in primary key
+  const pkResult = await db.execute(sql`
+    SELECT constraint_name
+    FROM information_schema.table_constraints
+    WHERE table_name = 'library_snapshots'
+    AND constraint_type = 'PRIMARY KEY'
+  `);
+
+  const pkName = (pkResult.rows[0] as { constraint_name: string })?.constraint_name;
+
+  if (pkName) {
+    const pkColsResult = await db.execute(sql`
+      SELECT column_name
+      FROM information_schema.key_column_usage
+      WHERE table_name = 'library_snapshots'
+      AND constraint_name = ${pkName}
+    `);
+
+    const pkColumns = (pkColsResult.rows as { column_name: string }[]).map((r) => r.column_name);
+
+    if (!pkColumns.includes('snapshot_time')) {
+      // Drop existing primary key
+      if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(pkName)) {
+        await db.execute(
+          sql`ALTER TABLE "library_snapshots" DROP CONSTRAINT IF EXISTS ${sql.identifier(pkName)}`
+        );
+      }
+
+      // Add composite primary key including time dimension
+      await db.execute(sql`
+        ALTER TABLE "library_snapshots" ADD PRIMARY KEY ("id", "snapshot_time")
+      `);
+    }
+  }
+
+  // Convert to hypertable with 1-day chunks (matches daily snapshot cadence)
+  await db.execute(sql`
+    SELECT create_hypertable('library_snapshots', 'snapshot_time',
+      chunk_time_interval => INTERVAL '1 day',
+      migrate_data => true,
+      if_not_exists => true
+    )
+  `);
+}
+
+/**
+ * Enable compression on library_snapshots hypertable
+ *
+ * Compression activates after 3 days to allow enrichment jobs to complete.
+ * Segmentby uses server_id and library_id (low cardinality) to prevent explosion.
+ */
+async function enableLibrarySnapshotsCompression(): Promise<void> {
+  // Enable compression settings with segmentby for efficient queries
+  await db.execute(sql`
+    ALTER TABLE library_snapshots SET (
+      timescaledb.compress,
+      timescaledb.compress_segmentby = 'server_id, library_id'
+    )
+  `);
+
+  // Compress chunks older than 3 days (allows enrichment to complete)
+  await db.execute(sql`
+    SELECT add_compression_policy('library_snapshots', INTERVAL '3 days', if_not_exists => true)
+  `);
+}
+
+/**
+ * Add retention policy to library_snapshots hypertable
+ *
+ * Drops chunks older than 1 year automatically.
+ */
+async function addLibrarySnapshotsRetention(): Promise<void> {
+  await db.execute(sql`
+    SELECT add_retention_policy('library_snapshots', INTERVAL '1 year', if_not_exists => true)
+  `);
+}
+
+/**
+ * Check if compression is enabled on library_snapshots
+ */
+async function isLibrarySnapshotsCompressionEnabled(): Promise<boolean> {
+  try {
+    const result = await db.execute(sql`
+      SELECT compression_enabled
+      FROM timescaledb_information.hypertables
+      WHERE hypertable_name = 'library_snapshots'
+    `);
+    return (result.rows[0] as { compression_enabled: boolean })?.compression_enabled ?? false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Initialize library_snapshots as a TimescaleDB hypertable
+ *
+ * This function is idempotent and safe to run multiple times:
+ * - Converts table to hypertable with 1-day chunks
+ * - Enables compression after 3-day window (allows enrichment to complete)
+ * - Adds 1-year retention policy
+ *
+ * Called from initTimescaleDB() on server startup.
+ */
+export async function initLibrarySnapshotsHypertable(): Promise<{
+  success: boolean;
+  actions: string[];
+}> {
+  const actions: string[] = [];
+
+  // Check if TimescaleDB extension is available
+  const hasExtension = await isTimescaleInstalled();
+  if (!hasExtension) {
+    return {
+      success: true, // Not a failure - just no TimescaleDB
+      actions: ['TimescaleDB extension not installed - skipping library_snapshots setup'],
+    };
+  }
+
+  // Check if table exists (might not if migration hasn't run)
+  const tableExists = await db.execute(sql`
+    SELECT EXISTS(
+      SELECT 1 FROM information_schema.tables
+      WHERE table_name = 'library_snapshots'
+    ) as exists
+  `);
+
+  if (!(tableExists.rows[0] as { exists: boolean })?.exists) {
+    return {
+      success: true,
+      actions: ['library_snapshots table does not exist yet - skipping hypertable setup'],
+    };
+  }
+
+  // Convert to hypertable if not already
+  const isHypertable = await isLibrarySnapshotsHypertable();
+  if (!isHypertable) {
+    await convertLibrarySnapshotsToHypertable();
+    actions.push('Converted library_snapshots to hypertable with 1-day chunks');
+  } else {
+    actions.push('library_snapshots already a hypertable');
+  }
+
+  // Enable compression (idempotent)
+  const hasCompression = await isLibrarySnapshotsCompressionEnabled();
+  if (!hasCompression) {
+    await enableLibrarySnapshotsCompression();
+    actions.push('Enabled compression on library_snapshots (3-day window)');
+  } else {
+    actions.push('Compression already enabled on library_snapshots');
+  }
+
+  // Add retention policy (idempotent via if_not_exists)
+  await addLibrarySnapshotsRetention();
+  actions.push('Ensured 1-year retention policy on library_snapshots');
+
+  // Check and create library continuous aggregates
+  const existingLibraryAggregates = await getLibrarySnapshotAggregates();
+  const expectedLibraryAggregates = ['library_stats_daily', 'content_quality_daily'];
+  const missingLibraryAggregates = expectedLibraryAggregates.filter(
+    (agg) => !existingLibraryAggregates.includes(agg)
+  );
+
+  if (missingLibraryAggregates.length > 0) {
+    await createLibraryAggregates();
+    // Setup refresh policies for library aggregates
+    const definitions = getAggregateDefinitions();
+    for (const def of definitions.filter(
+      (d) => d.name === 'library_stats_daily' || d.name === 'content_quality_daily'
+    )) {
+      await addRefreshPolicy(def);
+    }
+    actions.push(`Created library aggregates: ${missingLibraryAggregates.join(', ')}`);
+  } else {
+    actions.push('All library continuous aggregates exist');
+  }
+
+  // Verify aggregates were created by querying system catalog
+  const verifiedAggregates = await getLibrarySnapshotAggregates();
+  if (verifiedAggregates.length > 0) {
+    console.log(`[TimescaleDB] Library aggregates verified: ${verifiedAggregates.join(', ')}`);
+  } else {
+    console.warn(
+      '[TimescaleDB] Warning: No library aggregates found in timescaledb_information.continuous_aggregates'
+    );
+  }
+
+  return { success: true, actions };
 }
