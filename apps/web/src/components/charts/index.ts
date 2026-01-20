@@ -8,3 +8,4 @@ export { ConcurrentChart } from './ConcurrentChart';
 export { EngagementBreakdownChart, PlaysVsSessionsChart } from './EngagementChart';
 export { LibraryGrowthChart } from './LibraryGrowthChart';
 export { QualityDonutChart } from './QualityDonutChart';
+export { QualityTimelineChart } from './QualityTimelineChart';
