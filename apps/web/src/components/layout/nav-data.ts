@@ -8,11 +8,14 @@ import {
   AlertTriangle,
   Settings,
   TrendingUp,
-  Film,
   UserCircle,
   Gauge,
   Smartphone,
   Activity,
+  BookOpen,
+  Sparkles,
+  HardDrive,
+  Eye,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -42,8 +45,17 @@ export const navigation: NavEntry[] = [
     icon: BarChart3,
     children: [
       { name: 'Activity', href: '/stats/activity', icon: TrendingUp },
-      { name: 'Library', href: '/stats/library', icon: Film },
       { name: 'Users', href: '/stats/users', icon: UserCircle },
+    ],
+  },
+  {
+    name: 'Library',
+    icon: BookOpen,
+    children: [
+      { name: 'Overview', href: '/library', icon: LayoutDashboard },
+      { name: 'Quality', href: '/library/quality', icon: Sparkles },
+      { name: 'Storage', href: '/library/storage', icon: HardDrive },
+      { name: 'Watch', href: '/library/watch', icon: Eye },
     ],
   },
   {
