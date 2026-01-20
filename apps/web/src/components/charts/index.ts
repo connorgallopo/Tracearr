@@ -9,3 +9,4 @@ export { EngagementBreakdownChart, PlaysVsSessionsChart } from './EngagementChar
 export { LibraryGrowthChart } from './LibraryGrowthChart';
 export { QualityDonutChart } from './QualityDonutChart';
 export { QualityTimelineChart } from './QualityTimelineChart';
+export { StoragePredictionChart } from './StoragePredictionChart';

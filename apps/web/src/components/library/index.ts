@@ -3,3 +3,8 @@ export { EmptyState } from './EmptyState';
 export { CodecBreakdown } from './CodecBreakdown';
 export { QualityProgress } from './QualityProgress';
 export { QualityTrend } from './QualityTrend';
+export { MatchTypeBadge } from './MatchTypeBadge';
+export { ValueCategoryBadge } from './ValueCategoryBadge';
+export { DuplicatesTable } from './DuplicatesTable';
+export { StaleContentTabs } from './StaleContentTabs';
+export { RoiTable } from './RoiTable';

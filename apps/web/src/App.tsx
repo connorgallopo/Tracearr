@@ -15,7 +15,7 @@ import {
   StatsDevices,
   StatsBandwidth,
 } from '@/pages/stats';
-import { LibraryOverview, LibraryQuality } from '@/pages/library';
+import { LibraryOverview, LibraryQuality, LibraryStorage } from '@/pages/library';
 import { Users } from '@/pages/Users';
 import { UserDetail } from '@/pages/UserDetail';
 import { Rules } from '@/pages/Rules';
@@ -63,6 +63,7 @@ export function App() {
           {/* Library routes */}
           <Route path="library" element={<LibraryOverview />} />
           <Route path="library/quality" element={<LibraryQuality />} />
+          <Route path="library/storage" element={<LibraryStorage />} />
 
           {/* Other routes */}
           <Route path="history" element={<History />} />
