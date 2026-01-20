@@ -106,3 +106,17 @@ export {
 
 // Version hooks
 export { useVersion, useForceVersionCheck } from './useVersion';
+
+// Library hooks
+export {
+  useLibraryStats,
+  useLibraryGrowth,
+  useLibraryQuality,
+  useLibraryStorage,
+  useLibraryDuplicates,
+  useLibraryStale,
+  useLibraryWatch,
+  useLibraryCompletion,
+  useLibraryPatterns,
+  useLibraryRoi,
+} from './useLibrary';

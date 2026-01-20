@@ -50,6 +50,17 @@ import type {
   DailyBandwidthResponse,
   BandwidthTopUsersResponse,
   BandwidthSummary,
+  // Library statistics types
+  LibraryStatsResponse,
+  LibraryGrowthResponse,
+  LibraryQualityResponse,
+  LibraryStorageResponse,
+  DuplicatesResponse,
+  StaleResponse,
+  WatchResponse,
+  CompletionResponse,
+  PatternsResponse,
+  RoiResponse,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -917,6 +928,103 @@ class ApiClient {
     bandwidthSummary: async (timeRange?: StatsTimeRange, serverId?: string) => {
       const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
       return this.request<BandwidthSummary>(`/stats/bandwidth/summary?${params.toString()}`);
+    },
+  };
+
+  // Library statistics - data fetching for library analytics pages
+  library = {
+    stats: (serverId?: string, libraryId?: string) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('timezone', getBrowserTimezone());
+      return this.request<LibraryStatsResponse>(`/library/stats?${params.toString()}`);
+    },
+    growth: (serverId?: string, libraryId?: string, period: string = '30d') => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('period', period);
+      params.set('timezone', getBrowserTimezone());
+      return this.request<LibraryGrowthResponse>(`/library/growth?${params.toString()}`);
+    },
+    quality: (serverId?: string, libraryId?: string, period: string = '30d') => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('period', period);
+      params.set('timezone', getBrowserTimezone());
+      return this.request<LibraryQualityResponse>(`/library/quality?${params.toString()}`);
+    },
+    storage: (serverId?: string, libraryId?: string, period: string = '30d') => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('period', period);
+      params.set('timezone', getBrowserTimezone());
+      return this.request<LibraryStorageResponse>(`/library/storage?${params.toString()}`);
+    },
+    duplicates: (serverId?: string, page: number = 1, pageSize: number = 20) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<DuplicatesResponse>(`/library/duplicates?${params.toString()}`);
+    },
+    stale: (
+      serverId?: string,
+      libraryId?: string,
+      staleDays: number = 90,
+      page: number = 1,
+      pageSize: number = 20
+    ) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('staleDays', String(staleDays));
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<StaleResponse>(`/library/stale?${params.toString()}`);
+    },
+    watch: (serverId?: string, libraryId?: string, page: number = 1, pageSize: number = 20) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<WatchResponse>(`/library/watch?${params.toString()}`);
+    },
+    completion: (
+      serverId?: string,
+      libraryId?: string,
+      aggregateLevel: string = 'item',
+      page: number = 1,
+      pageSize: number = 20
+    ) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('aggregateLevel', aggregateLevel);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<CompletionResponse>(`/library/completion?${params.toString()}`);
+    },
+    patterns: (serverId?: string, libraryId?: string, periodWeeks: number = 12) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('periodWeeks', String(periodWeeks));
+      params.set('timezone', getBrowserTimezone());
+      return this.request<PatternsResponse>(`/library/patterns?${params.toString()}`);
+    },
+    roi: (serverId?: string, libraryId?: string, page: number = 1, pageSize: number = 20) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      params.set('timezone', getBrowserTimezone());
+      return this.request<RoiResponse>(`/library/roi?${params.toString()}`);
     },
   };
 
