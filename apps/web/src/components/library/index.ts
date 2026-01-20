@@ -8,3 +8,6 @@ export { ValueCategoryBadge } from './ValueCategoryBadge';
 export { DuplicatesTable } from './DuplicatesTable';
 export { StaleContentTabs } from './StaleContentTabs';
 export { RoiTable } from './RoiTable';
+export { EngagementTierBadge } from './EngagementTierBadge';
+export { CompletionTable } from './CompletionTable';
+export { BingeHighlightsTable } from './BingeHighlightsTable';

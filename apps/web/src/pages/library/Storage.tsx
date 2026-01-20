@@ -68,7 +68,7 @@ export function LibraryStorage() {
   const roi = useLibraryRoi(selectedServerId, null, roiPage, 10);
 
   // Fetch stale summary for KPI card (minimal page size since we only need summary)
-  const staleSummary = useLibraryStale(selectedServerId, null, 90, 1, 1);
+  const staleSummary = useLibraryStale(selectedServerId, null, 90, 'all', 1, 1);
   const staleCount =
     (staleSummary.data?.summary.neverWatched.count ?? 0) +
     (staleSummary.data?.summary.stale.count ?? 0);

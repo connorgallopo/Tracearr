@@ -10,3 +10,7 @@ export { LibraryGrowthChart } from './LibraryGrowthChart';
 export { QualityDonutChart } from './QualityDonutChart';
 export { QualityTimelineChart } from './QualityTimelineChart';
 export { StoragePredictionChart } from './StoragePredictionChart';
+export { WatchCountChart } from './WatchCountChart';
+export { CompletionDonutChart } from './CompletionDonutChart';
+export { HourlyDistributionChart } from './HourlyDistributionChart';
+export { MonthlyTrendChart } from './MonthlyTrendChart';
