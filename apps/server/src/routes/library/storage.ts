@@ -252,7 +252,8 @@ export const libraryStorageRoute: FastifyPluginAsync = async (app) => {
 
       // Calculate growth rate using linear regression
       // Use actual day offsets from first data point to handle gaps correctly
-      const firstDate = rows.length > 0 ? new Date(rows[0].day).getTime() : 0;
+      const firstRow = rows[0];
+      const firstDate = firstRow ? new Date(firstRow.day).getTime() : 0;
       const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
       const dataPoints: DataPoint[] = rows.map((row) => ({
