@@ -25,23 +25,35 @@ Tracearr is a monitoring platform for **Plex**, **Jellyfin**, and **Emby**. Trac
 
 **Session Tracking** — Complete session history: who watched what, when, where, and on what device. Every stream includes geolocation data.
 
-**Stream Analytics** — See what's transcoding vs direct playing, track bandwidth usage, and see what people actually watch. Codec breakdowns, resolution stats, device compatibility scores.
+**Stream Analytics** — See what's transcoding vs direct playing, track bandwidth usage, and see what people actually watch. Codec breakdowns, resolution stats, device compatibility scores. Enhanced IP geolocation includes ASN data, continent, and postal codes.
+
+**Library Analytics** — Four dedicated pages to understand your media collection:
+
+- **Overview** — Item counts, storage usage, growth charts over time.
+- **Quality** — Resolution and codec distribution. Track how your 4K vs 1080p ratio changes.
+- **Storage** — Usage predictions, duplicate detection across servers, stale content identification, and ROI analysis (watch hours per GB).
+- **Watch** — Engagement metrics, completion rates, viewing patterns by hour and month, binge detection.
 
 **Live TV & Music** — Not just movies and shows. Track live TV sessions and music playback across all your servers.
 
 **Stream Map** — Visualize where your streams originate on a world map. Filter by user, server, or time period.
 
-**Sharing Detection** — Five rule types flag suspicious activity:
+**Sharing Detection** — Six rule types flag suspicious activity:
 
 - **Impossible Travel** — NYC then London 30 minutes later? That's not one person.
 - **Simultaneous Locations** — Same account streaming from two cities at once.
 - **Device Velocity** — Too many unique IPs in a short window signals shared credentials.
 - **Concurrent Streams** — Set limits per user.
 - **Geo Restrictions** — Block streaming from specific countries.
+- **Account Inactivity** — Get notified when accounts go dormant for a configurable period.
 
 **Trust Scores** — Users earn (or lose) trust based on behavior. Violations drop scores automatically.
 
 **Real-Time Alerts** — Discord webhooks and custom notifications fire instantly when rules trigger.
+
+**Public API** — Read-only REST API for third-party integrations. Generate an API key in Settings, then explore endpoints at `/api-docs` (Swagger UI). Works with Homarr, Home Assistant, or anything that speaks HTTP.
+
+**Bulk Actions** — Multi-select operations across tables. Acknowledge or dismiss violations in bulk, reset trust scores, enable/disable rules, delete session history.
 
 **Data Import** — Already using Tautulli or Jellystat? Import your watch history so you don't start from scratch.
 
@@ -66,6 +78,8 @@ Tracearr handles all three. One install, one interface.
 | Emby support              | ❌       | ✅        | ✅       |
 | Multi-server dashboard    | ❌       | ❌        | ✅       |
 | IP geolocation            | ✅       | ✅        | ✅       |
+| Library analytics         | ✅       | ✅        | ✅       |
+| Public API                | ✅       | ✅        | ✅       |
 | Import from Tautulli      | —        | ❌        | ✅       |
 | Import from Jellystat     | ❌       | —         | ✅       |
 
@@ -206,7 +220,7 @@ Run `pnpm dev` in a terminal to start both apps, then use the "Debug All" config
 
 ## Roadmap
 
-**v1.4** (current)
+**v1.5** (current)
 
 - [x] Multi-server Plex, Jellyfin, and Emby support
 - [x] Session tracking with full history
@@ -221,8 +235,13 @@ Run `pnpm dev` in a terminal to start both apps, then use the "Debug All" config
 - [x] Live TV & music tracking
 - [x] Stream quality metrics (codec, resolution, bitrate)
 - [x] Stream termination
+- [x] Library analytics (storage, quality, duplicates, engagement)
+- [x] Public REST API with Swagger UI
+- [x] Account inactivity detection
+- [x] Bulk actions for violations, users, rules, sessions
+- [x] Enhanced IP geolocation (ASN, continent, postal code)
 
-**v1.5** (next)
+**v1.6** (next)
 
 - [ ] Mobile app (iOS & Android) — _in beta_
 - [ ] Rule based automated stream termination
