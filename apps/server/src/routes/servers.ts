@@ -16,6 +16,7 @@ import { servers, plexAccounts } from '../db/schema.js';
 import { PlexClient, JellyfinClient, EmbyClient } from '../services/mediaServer/index.js';
 import { syncServer } from '../services/sync.js';
 import { getCacheService } from '../services/cache.js';
+import { enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
 
 export const serverRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -410,11 +411,23 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       // Update server's updatedAt timestamp
       await db.update(servers).set({ updatedAt: new Date() }).where(eq(servers.id, id));
 
+      // Also trigger full library sync (items/episodes) in background
+      let librarySyncJobId: string | null = null;
+      try {
+        librarySyncJobId = await enqueueLibrarySync(id, authUser.userId);
+        app.log.info({ serverId: id, jobId: librarySyncJobId }, 'Library sync job enqueued');
+      } catch (err) {
+        // Don't fail the whole sync if library sync can't be queued
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        app.log.warn({ serverId: id, error: message }, 'Could not enqueue library sync');
+      }
+
       return {
         success: result.errors.length === 0,
         usersAdded: result.usersAdded,
         usersUpdated: result.usersUpdated,
         librariesSynced: result.librariesSynced,
+        librarySyncJobId,
         errors: result.errors,
         syncedAt: new Date().toISOString(),
       };

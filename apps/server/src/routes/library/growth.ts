@@ -2,6 +2,9 @@
  * Library Growth Route
  *
  * GET /growth - Time-series library growth data points
+ *
+ * Uses library_items.created_at (Plex's addedAt) for accurate growth tracking
+ * based on when items were actually added to the media server.
  */
 
 import type { FastifyPluginAsync } from 'fastify';
@@ -15,21 +18,21 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { validateServerAccess } from '../../utils/serverFiltering.js';
-import { buildLibraryServerFilter, buildLibraryCacheKey } from './utils.js';
+import { buildLibraryCacheKey } from './utils.js';
 
-/** Single data point in growth timeline */
+/** Single data point in growth timeline (per media type) */
 interface GrowthDataPoint {
   day: string;
-  totalItems: number;
-  totalSizeBytes: string;
+  total: number;
   additions: number;
-  removals: number;
 }
 
-/** Library growth response shape */
+/** Library growth response shape with separate series per media type */
 interface LibraryGrowthResponse {
   period: string;
-  data: GrowthDataPoint[];
+  movies: GrowthDataPoint[];
+  episodes: GrowthDataPoint[];
+  music: GrowthDataPoint[];
 }
 
 /**
@@ -55,8 +58,10 @@ export const libraryGrowthRoute: FastifyPluginAsync = async (app) => {
   /**
    * GET /growth - Library growth timeline
    *
-   * Returns time-series data points showing daily library totals.
-   * Calculates additions/removals as delta from previous day.
+   * Returns time-series data showing items added per day based on
+   * library_items.created_at (Plex's addedAt timestamp).
+   *
+   * Note: Removals are set to 0 since we don't track deletion dates.
    */
   app.get<{ Querystring: LibraryGrowthQueryInput }>(
     '/growth',
@@ -95,57 +100,168 @@ export const libraryGrowthRoute: FastifyPluginAsync = async (app) => {
         }
       }
 
-      // Calculate date range
-      const startDate = getStartDate(period);
-
-      // Build server filter
-      const serverFilter = buildLibraryServerFilter(serverId, authUser);
+      // Build server filter for library_items table
+      const serverFilter = serverId
+        ? sql`AND li.server_id = ${serverId}::uuid`
+        : authUser.serverIds?.length
+          ? sql`AND li.server_id = ANY(${authUser.serverIds}::uuid[])`
+          : sql``;
 
       // Optional library filter
-      const libraryFilter = libraryId ? sql`AND library_id = ${libraryId}` : sql``;
+      const libraryFilter = libraryId ? sql`AND li.library_id = ${libraryId}` : sql``;
 
-      // Date filter (only if not 'all')
-      const dateFilter = startDate ? sql`AND day >= ${startDate.toISOString()}::date` : sql``;
+      // Calculate date range
+      const startDate = getStartDate(period);
+      const endDate = new Date();
 
-      // Query library_stats_daily aggregate for time range
+      // For 'all' period, find the earliest item date from the database
+      let effectiveStartDate: Date;
+      if (startDate) {
+        effectiveStartDate = startDate;
+      } else {
+        // Query for the earliest created_at date
+        const earliestResult = await db.execute(sql`
+          SELECT MIN(created_at)::date AS earliest
+          FROM library_items li
+          WHERE li.media_type IN ('movie', 'episode', 'track')
+            ${serverFilter}
+            ${libraryFilter}
+        `);
+        const earliest = (earliestResult.rows[0] as { earliest: string | null })?.earliest;
+        effectiveStartDate = earliest ? new Date(earliest) : new Date('2020-01-01');
+      }
+
+      // Query with continuous date series for each category
+      // This ensures we have data points for every day, even if nothing was added
       const result = await db.execute(sql`
+        WITH date_series AS (
+          -- Generate all dates in the range
+          SELECT d::date AS day
+          FROM generate_series(
+            ${effectiveStartDate.toISOString()}::date,
+            ${endDate.toISOString()}::date,
+            '1 day'::interval
+          ) d
+        ),
+        categories AS (
+          -- The three media type categories we care about
+          SELECT unnest(ARRAY['movie', 'episode', 'track']) AS category
+        ),
+        date_category_grid AS (
+          -- Cross join to get all date+category combinations
+          SELECT ds.day, c.category
+          FROM date_series ds
+          CROSS JOIN categories c
+        ),
+        base_counts AS (
+          -- Count ALL items per category (total library size)
+          SELECT
+            CASE
+              WHEN li.media_type = 'movie' THEN 'movie'
+              WHEN li.media_type = 'episode' THEN 'episode'
+              WHEN li.media_type = 'track' THEN 'track'
+            END AS category,
+            COUNT(*)::int AS total_items
+          FROM library_items li
+          WHERE li.media_type IN ('movie', 'episode', 'track')
+            ${serverFilter}
+            ${libraryFilter}
+          GROUP BY 1
+        ),
+        items_before_period AS (
+          -- Count items added BEFORE the period (for calculating running total)
+          SELECT
+            CASE
+              WHEN li.media_type = 'movie' THEN 'movie'
+              WHEN li.media_type = 'episode' THEN 'episode'
+              WHEN li.media_type = 'track' THEN 'track'
+            END AS category,
+            COUNT(*)::int AS items_before
+          FROM library_items li
+          WHERE li.media_type IN ('movie', 'episode', 'track')
+            ${serverFilter}
+            ${libraryFilter}
+            AND li.created_at < ${effectiveStartDate.toISOString()}::timestamptz
+          GROUP BY 1
+        ),
+        daily_additions AS (
+          -- Count items added per day per category
+          SELECT
+            DATE(li.created_at AT TIME ZONE ${tz}) AS day,
+            CASE
+              WHEN li.media_type = 'movie' THEN 'movie'
+              WHEN li.media_type = 'episode' THEN 'episode'
+              WHEN li.media_type = 'track' THEN 'track'
+            END AS category,
+            COUNT(*)::int AS additions
+          FROM library_items li
+          WHERE li.media_type IN ('movie', 'episode', 'track')
+            ${serverFilter}
+            ${libraryFilter}
+            AND li.created_at >= ${effectiveStartDate.toISOString()}::timestamptz
+          GROUP BY 1, 2
+        ),
+        filled_data AS (
+          -- Join grid with actual data, fill nulls with 0
+          SELECT
+            dcg.day,
+            dcg.category,
+            COALESCE(da.additions, 0) AS additions,
+            COALESCE(ibp.items_before, 0) AS items_before
+          FROM date_category_grid dcg
+          LEFT JOIN daily_additions da ON da.day = dcg.day AND da.category = dcg.category
+          LEFT JOIN items_before_period ibp ON ibp.category = dcg.category
+        )
         SELECT
-          day::text AS day,
-          COALESCE(SUM(total_items), 0)::int AS total_items,
-          COALESCE(SUM(total_size_bytes), 0)::bigint AS total_size_bytes
-        FROM library_stats_daily
-        WHERE true
-          ${serverFilter}
-          ${libraryFilter}
-          ${dateFilter}
-        GROUP BY day
-        ORDER BY day ASC
+          fd.day::text,
+          fd.category,
+          fd.additions,
+          (fd.items_before + SUM(fd.additions) OVER (PARTITION BY fd.category ORDER BY fd.day))::int AS total
+        FROM filled_data fd
+        WHERE EXISTS (
+          -- Only include categories that have items
+          SELECT 1 FROM base_counts bc WHERE bc.category = fd.category
+        )
+        ORDER BY fd.day ASC, fd.category
       `);
 
       const rows = result.rows as Array<{
         day: string;
-        total_items: number;
-        total_size_bytes: string;
+        category: string;
+        additions: number;
+        total: number;
       }>;
 
-      // Calculate additions/removals as delta from previous day
-      const data: GrowthDataPoint[] = rows.map((row, index) => {
-        const prevRow = index > 0 ? rows[index - 1] : null;
-        const prevItems = prevRow?.total_items ?? row.total_items;
-        const delta = row.total_items - prevItems;
+      // Separate into movies, episodes, music arrays
+      const movies: GrowthDataPoint[] = [];
+      const episodes: GrowthDataPoint[] = [];
+      const music: GrowthDataPoint[] = [];
 
-        return {
+      for (const row of rows) {
+        const point: GrowthDataPoint = {
           day: row.day,
-          totalItems: row.total_items,
-          totalSizeBytes: row.total_size_bytes,
-          additions: delta > 0 ? delta : 0,
-          removals: delta < 0 ? Math.abs(delta) : 0,
+          total: row.total,
+          additions: row.additions,
         };
-      });
+
+        switch (row.category) {
+          case 'movie':
+            movies.push(point);
+            break;
+          case 'episode':
+            episodes.push(point);
+            break;
+          case 'track':
+            music.push(point);
+            break;
+        }
+      }
 
       const response: LibraryGrowthResponse = {
         period,
-        data,
+        movies,
+        episodes,
+        music,
       };
 
       // Cache for 5 minutes

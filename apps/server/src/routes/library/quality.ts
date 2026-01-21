@@ -1,7 +1,12 @@
 /**
  * Library Quality Evolution Route
  *
- * GET /quality - Quality distribution over time from content_quality_daily aggregate
+ * GET /quality - Quality distribution over time from library_stats_daily aggregate
+ *
+ * Supports filtering by media type:
+ * - 'all': All video content (movies + TV)
+ * - 'movies': Only movie libraries
+ * - 'shows': Only TV libraries
  */
 
 import type { FastifyPluginAsync } from 'fastify';
@@ -40,6 +45,7 @@ interface QualityDataPoint {
 /** Library quality evolution response */
 interface LibraryQualityResponse {
   period: string;
+  mediaType: 'all' | 'movies' | 'shows';
   data: QualityDataPoint[];
 }
 
@@ -66,8 +72,13 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
   /**
    * GET /quality - Quality evolution timeline
    *
-   * Returns daily quality distribution snapshots showing resolution and codec breakdowns.
-   * Uses content_quality_daily continuous aggregate.
+   * Returns daily quality distribution snapshots showing resolution breakdowns.
+   * Uses library_stats_daily continuous aggregate with media type filtering.
+   *
+   * Media type filtering:
+   * - 'all': All video libraries (movie_count > 0 OR episode_count > 0)
+   * - 'movies': Only movie libraries (movie_count > 0 AND episode_count = 0)
+   * - 'shows': Only TV libraries (episode_count > 0)
    */
   app.get<{ Querystring: LibraryQualityQueryInput }>(
     '/quality',
@@ -78,7 +89,7 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
         return reply.badRequest('Invalid query parameters');
       }
 
-      const { serverId, period, timezone } = query.data;
+      const { serverId, period, mediaType, timezone } = query.data;
       const authUser = request.user;
       const tz = timezone ?? 'UTC';
 
@@ -90,8 +101,13 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
         }
       }
 
-      // Build cache key with all varying params
-      const cacheKey = buildLibraryCacheKey(REDIS_KEYS.LIBRARY_QUALITY, serverId, period, tz);
+      // Build cache key with all varying params including mediaType
+      const cacheKey = buildLibraryCacheKey(
+        REDIS_KEYS.LIBRARY_QUALITY,
+        serverId,
+        `${period}:${mediaType}`,
+        tz
+      );
 
       // Try cache first
       const cached = await app.redis.get(cacheKey);
@@ -112,44 +128,60 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
       // Date filter (only if not 'all')
       const dateFilter = startDate ? sql`AND day >= ${startDate.toISOString()}::date` : sql``;
 
-      // Query content_quality_daily aggregate for time range
+      // Media type filter - determines which libraries to include
+      // Libraries are classified by their content:
+      // - Movie libraries: movie_count > 0 AND episode_count = 0
+      // - TV libraries: episode_count > 0 (may have some movies as specials)
+      // - Music libraries: excluded (no video quality metrics)
+      let mediaTypeFilter: ReturnType<typeof sql>;
+      switch (mediaType) {
+        case 'movies':
+          mediaTypeFilter = sql`AND movie_count > 0 AND episode_count = 0`;
+          break;
+        case 'shows':
+          mediaTypeFilter = sql`AND episode_count > 0`;
+          break;
+        case 'all':
+        default:
+          // Exclude music-only libraries (no video quality data)
+          mediaTypeFilter = sql`AND (movie_count > 0 OR episode_count > 0)`;
+          break;
+      }
+
+      // Query library_stats_daily aggregate with media type filtering
+      // This aggregate has per-library data, allowing us to filter by library type
       const result = await db.execute(sql`
         SELECT
           day::text AS day,
-          COALESCE(SUM(total_items), 0)::int AS total_items,
           COALESCE(SUM(count_4k), 0)::int AS count_4k,
           COALESCE(SUM(count_1080p), 0)::int AS count_1080p,
           COALESCE(SUM(count_720p), 0)::int AS count_720p,
-          COALESCE(SUM(count_sd), 0)::int AS count_sd,
-          COALESCE(SUM(hevc_count), 0)::int AS hevc_count,
-          COALESCE(SUM(h264_count), 0)::int AS h264_count,
-          COALESCE(SUM(av1_count), 0)::int AS av1_count
-        FROM content_quality_daily
+          COALESCE(SUM(count_sd), 0)::int AS count_sd
+        FROM library_stats_daily
         WHERE true
           ${serverFilter}
           ${dateFilter}
+          ${mediaTypeFilter}
         GROUP BY day
         ORDER BY day ASC
       `);
 
       const rows = result.rows as Array<{
         day: string;
-        total_items: number;
         count_4k: number;
         count_1080p: number;
         count_720p: number;
         count_sd: number;
-        hevc_count: number;
-        h264_count: number;
-        av1_count: number;
       }>;
 
       // Calculate percentages in application code
+      // totalItems = sum of all quality tiers (we filter out music libraries in the query)
       const data: QualityDataPoint[] = rows.map((row) => {
-        const total = row.total_items || 1; // Avoid division by zero
+        const videoTotal = row.count_4k + row.count_1080p + row.count_720p + row.count_sd;
+        const total = videoTotal || 1; // Avoid division by zero
         return {
           day: row.day,
-          totalItems: row.total_items,
+          totalItems: videoTotal,
           // Absolute counts
           count4k: row.count_4k,
           count1080p: row.count_1080p,
@@ -160,15 +192,17 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
           pct1080p: Math.round((row.count_1080p / total) * 10000) / 100,
           pct720p: Math.round((row.count_720p / total) * 10000) / 100,
           pctSd: Math.round((row.count_sd / total) * 10000) / 100,
-          // Codec counts
-          hevcCount: row.hevc_count,
-          h264Count: row.h264_count,
-          av1Count: row.av1_count,
+          // Codec counts not available per-library (set to 0)
+          // Codec distribution is shown separately in CodecDistributionSection
+          hevcCount: 0,
+          h264Count: 0,
+          av1Count: 0,
         };
       });
 
       const response: LibraryQualityResponse = {
         period,
+        mediaType,
         data,
       };
 

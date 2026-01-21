@@ -204,7 +204,7 @@ export const libraryCompletionRoute: FastifyPluginAsync = async (app) => {
       }
 
       // Build base filters for library_items (li)
-      const serverFilter = buildLibraryServerFilter(serverId, authUser);
+      const serverFilter = buildLibraryServerFilter(serverId, authUser, 'li');
       const libraryFilter = libraryId ? sql`AND li.library_id = ${libraryId}` : sql``;
       const mediaTypeFilter = mediaType ? sql`AND li.media_type = ${mediaType}` : sql``;
 

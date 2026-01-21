@@ -168,7 +168,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
       }
 
       // Build server filter for library_items
-      const serverFilter = buildLibraryServerFilter(serverId, authUser);
+      const serverFilter = buildLibraryServerFilter(serverId, authUser, 'li');
       const libraryFilter = libraryId ? sql`AND li.library_id = ${libraryId}` : sql``;
 
       // Initialize response
@@ -194,15 +194,14 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
               WITH binge_stats AS (
                 SELECT
                   ecs.show_title,
-                  MAX(s.server_id::text) AS server_id,
+                  MAX(ses.server_id::text) AS server_id,
                   MAX(ses.thumb_path) AS thumb_path,
                   SUM(ecs.total_episode_watches) AS total_episode_watches,
                   SUM(ecs.consecutive_episodes) AS consecutive_episodes,
-                  ROUND(AVG(ecs.consecutive_pct), 1) AS consecutive_pct,
-                  ROUND(AVG(ecs.avg_gap_minutes), 1) AS avg_gap_minutes,
+                  ROUND(AVG(ecs.consecutive_pct)::numeric, 1) AS consecutive_pct,
+                  ROUND(AVG(ecs.avg_gap_minutes)::numeric, 1) AS avg_gap_minutes,
                   MAX(dsi.max_episodes_in_one_day) AS max_episodes_in_one_day
                 FROM episode_continuity_stats ecs
-                JOIN sessions s ON ecs.server_user_id = s.server_user_id
                 LEFT JOIN show_engagement_summary ses ON ecs.show_title = ses.show_title
                   AND ecs.server_user_id = ses.server_user_id
                 LEFT JOIN (
@@ -211,8 +210,13 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
                   GROUP BY server_user_id, show_title
                 ) dsi ON ecs.show_title = dsi.show_title AND ecs.server_user_id = dsi.server_user_id
                 WHERE ecs.consecutive_episodes >= ${bingeThreshold}
-                  AND s.started_at >= NOW() - INTERVAL '1 week' * ${periodWeeks}
-                  ${serverId ? sql`AND s.server_id = ${serverId}` : sql``}
+                  AND EXISTS (
+                    SELECT 1 FROM sessions s
+                    WHERE s.server_user_id = ecs.server_user_id
+                      AND s.grandparent_title = ecs.show_title
+                      AND s.started_at >= NOW() - INTERVAL '1 week' * ${periodWeeks}
+                      ${serverId ? sql`AND s.server_id = ${serverId}` : sql``}
+                  )
                 GROUP BY ecs.show_title
               )
               SELECT
@@ -277,7 +281,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
                 h.hour::text AS hour,
                 h.watch_count::text AS watch_count,
                 h.total_watch_ms::text AS total_watch_ms,
-                ROUND(100.0 * h.watch_count / NULLIF(t.total, 0), 1)::text AS pct_of_total
+                ROUND((100.0 * h.watch_count / NULLIF(t.total, 0))::numeric, 1)::text AS pct_of_total
               FROM hourly h
               CROSS JOIN total t
               ORDER BY h.hour
@@ -341,7 +345,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
                   AND sess.started_at >= NOW() - INTERVAL '1 week' * ${periodWeeks}
                   ${serverFilter}
                   ${libraryFilter}
-                GROUP BY TO_CHAR(sess.started_at, 'YYYY-MM')
+                GROUP BY TO_CHAR(sess.started_at, 'YYYY-MM'), DATE_TRUNC('month', sess.started_at)
               )
               SELECT
                 month,
@@ -379,7 +383,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
               SELECT
                 COUNT(*) AS total_sessions,
                 COUNT(*) FILTER (
-                  WHERE media_type = 'episode'
+                  WHERE li.media_type = 'episode'
                     AND (stopped_at - started_at) < INTERVAL '30 minutes'
                 ) AS potential_binge_sessions
               FROM sessions sess
@@ -402,8 +406,8 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
             )
             SELECT
               s.total_sessions::text AS total_watch_sessions,
-              ROUND(s.total_sessions::float / NULLIF(d.days, 0), 1)::text AS avg_sessions_per_day,
-              ROUND(100.0 * s.potential_binge_sessions / NULLIF(s.total_sessions, 0), 1)::text AS binge_sessions_pct
+              ROUND((s.total_sessions::numeric / NULLIF(d.days, 0)), 1)::text AS avg_sessions_per_day,
+              ROUND((100.0 * s.potential_binge_sessions / NULLIF(s.total_sessions, 0))::numeric, 1)::text AS binge_sessions_pct
             FROM session_stats s
             CROSS JOIN day_count d
           `);

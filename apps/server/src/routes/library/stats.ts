@@ -1,7 +1,7 @@
 /**
  * Library Stats Route
  *
- * GET /stats - Current library statistics from library_stats_daily aggregate
+ * GET /stats - Current library statistics from library_items table (real-time)
  */
 
 import type { FastifyPluginAsync } from 'fastify';
@@ -14,7 +14,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { validateServerAccess } from '../../utils/serverFiltering.js';
-import { buildLibraryServerFilter, buildLibraryCacheKey } from './utils.js';
+import { buildLibraryCacheKey } from './utils.js';
 
 /** Library stats response shape */
 interface LibraryStatsResponse {
@@ -73,27 +73,31 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
         }
       }
 
-      // Build server filter
-      const serverFilter = buildLibraryServerFilter(serverId, authUser);
+      // Build server filter for library_items table
+      const serverFilter = serverId
+        ? sql`AND li.server_id = ${serverId}::uuid`
+        : authUser.serverIds?.length
+          ? sql`AND li.server_id = ANY(${authUser.serverIds}::uuid[])`
+          : sql``;
 
       // Optional library filter
-      const libraryFilter = libraryId ? sql`AND library_id = ${libraryId}` : sql``;
+      const libraryFilter = libraryId ? sql`AND li.library_id = ${libraryId}` : sql``;
 
-      // Query library_stats_daily aggregate for latest day's data
+      // Query library_items directly for real-time stats
       const result = await db.execute(sql`
         SELECT
-          COALESCE(SUM(total_items), 0)::int AS total_items,
-          COALESCE(SUM(total_size_bytes), 0)::bigint AS total_size_bytes,
-          COALESCE(SUM(movie_count), 0)::int AS movie_count,
-          COALESCE(SUM(episode_count), 0)::int AS episode_count,
-          COALESCE(SUM(show_count), 0)::int AS show_count,
-          COALESCE(SUM(count_4k), 0)::int AS count_4k,
-          COALESCE(SUM(count_1080p), 0)::int AS count_1080p,
-          COALESCE(SUM(count_720p), 0)::int AS count_720p,
-          COALESCE(SUM(count_sd), 0)::int AS count_sd,
-          MAX(day) AS as_of
-        FROM library_stats_daily
-        WHERE day = (SELECT MAX(day) FROM library_stats_daily WHERE true ${serverFilter} ${libraryFilter})
+          COUNT(*)::int AS total_items,
+          COALESCE(SUM(li.file_size), 0)::bigint AS total_size_bytes,
+          COUNT(*) FILTER (WHERE li.media_type = 'movie')::int AS movie_count,
+          COUNT(*) FILTER (WHERE li.media_type = 'episode')::int AS episode_count,
+          COUNT(DISTINCT CASE WHEN li.media_type = 'episode' THEN li.parent_rating_key END)::int AS show_count,
+          COUNT(*) FILTER (WHERE li.video_resolution = '4k')::int AS count_4k,
+          COUNT(*) FILTER (WHERE li.video_resolution = '1080p')::int AS count_1080p,
+          COUNT(*) FILTER (WHERE li.video_resolution = '720p')::int AS count_720p,
+          COUNT(*) FILTER (WHERE li.video_resolution IN ('sd', '480p', '576p') OR (li.video_resolution IS NULL AND li.media_type IN ('movie', 'episode')))::int AS count_sd,
+          MAX(li.updated_at) AS as_of
+        FROM library_items li
+        WHERE li.media_type IN ('movie', 'episode', 'track')
           ${serverFilter}
           ${libraryFilter}
       `);

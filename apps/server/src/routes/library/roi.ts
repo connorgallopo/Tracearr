@@ -193,7 +193,7 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
       }
 
       // Build filters
-      const serverFilter = buildLibraryServerFilter(serverId, authUser);
+      const serverFilter = buildLibraryServerFilter(serverId, authUser, 'li');
       const libraryFilter = libraryId ? sql`AND li.library_id = ${libraryId}` : sql``;
       const mediaTypeFilter =
         mediaType && mediaType !== 'all' ? sql`AND li.media_type = ${mediaType}` : sql``;
@@ -208,44 +208,108 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
               ? sql`AND value_category = 'high_value'`
               : sql``;
 
-      // Sort column mapping
-      const sortColumnMap = {
-        watch_hours_per_gb: sql`watch_hours_per_gb`,
-        value_score: sql`value_score`,
-        file_size: sql`file_size_bytes`,
-        title: sql`title`,
+      // Sort column mapping - use sql.raw() for identifiers
+      const sortColumnMap: Record<string, string> = {
+        watch_hours_per_gb: 'watch_hours_per_gb',
+        value_score: 'value_score',
+        file_size: 'file_size_bytes',
+        title: 'title',
       };
-      const sortColumn = sortColumnMap[sortBy] || sql`watch_hours_per_gb`;
-      const sortDir = sortOrder === 'asc' ? sql`ASC NULLS LAST` : sql`DESC NULLS FIRST`;
+      const sortColumnName = sortColumnMap[sortBy] || 'watch_hours_per_gb';
+      const sortDirStr = sortOrder === 'asc' ? 'ASC NULLS LAST' : 'DESC NULLS FIRST';
+      const orderByClause = sql.raw(`${sortColumnName} ${sortDirStr}`);
 
       const offset = (page - 1) * pageSize;
 
       // Main ROI query using CTEs for clarity
+      // For shows/artists: aggregate file_size and watch_hours from episodes/tracks
       const itemsResult = await db.execute(sql`
-        WITH item_roi AS (
+        WITH child_stats AS (
+          -- Aggregate child data for shows (episodes) and artists (tracks)
+          SELECT
+            grandparent_rating_key,
+            server_id,
+            SUM(file_size) AS total_size
+          FROM library_items
+          WHERE media_type IN ('episode', 'track') AND grandparent_rating_key IS NOT NULL
+          GROUP BY grandparent_rating_key, server_id
+        ),
+        child_watch_stats AS (
+          -- Get watch stats for shows/artists via their children
+          SELECT
+            child.grandparent_rating_key,
+            child.server_id,
+            COUNT(sess.id) FILTER (WHERE sess.duration_ms >= 120000) AS watch_count,
+            COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) AS total_watch_ms,
+            MAX(sess.stopped_at) AS last_watched_at
+          FROM library_items child
+          LEFT JOIN sessions sess ON sess.rating_key = child.rating_key
+            AND sess.server_id = child.server_id
+            AND sess.started_at >= NOW() - INTERVAL '1 day' * ${periodDays}
+          WHERE child.media_type IN ('episode', 'track') AND child.grandparent_rating_key IS NOT NULL
+          GROUP BY child.grandparent_rating_key, child.server_id
+        ),
+        item_roi AS (
           SELECT
             li.id,
             li.server_id,
             li.title,
             li.media_type,
             li.year,
-            li.file_size AS file_size_bytes,
-            li.file_size / 1073741824.0 AS file_size_gb,
+            -- For shows/artists: use aggregated child size, otherwise use item's file_size
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cs.total_size, li.file_size)
+              ELSE li.file_size
+            END AS file_size_bytes,
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cs.total_size, li.file_size) / 1073741824.0
+              ELSE li.file_size / 1073741824.0
+            END AS file_size_gb,
             li.created_at AS added_at,
-            COUNT(sess.id) FILTER (WHERE sess.duration_ms >= 120000) AS watch_count,
-            COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) AS total_watch_ms,
-            COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) / 3600000.0 AS total_watch_hours,
-            MAX(sess.stopped_at) AS last_watched_at,
-            EXTRACT(DAY FROM NOW() - MAX(sess.stopped_at))::int AS days_since_last_watch
+            -- For shows/artists: use child watch stats
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cws.watch_count, 0)
+              ELSE COUNT(sess.id) FILTER (WHERE sess.duration_ms >= 120000)
+            END AS watch_count,
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cws.total_watch_ms, 0)
+              ELSE COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0)
+            END AS total_watch_ms,
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cws.total_watch_ms, 0) / 3600000.0
+              ELSE COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) / 3600000.0
+            END AS total_watch_hours,
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN cws.last_watched_at
+              ELSE MAX(sess.stopped_at)
+            END AS last_watched_at,
+            CASE
+              WHEN li.media_type IN ('show', 'artist') THEN EXTRACT(DAY FROM NOW() - cws.last_watched_at)::int
+              ELSE EXTRACT(DAY FROM NOW() - MAX(sess.stopped_at))::int
+            END AS days_since_last_watch
           FROM library_items li
-          LEFT JOIN sessions sess ON sess.rating_key = li.rating_key
+          LEFT JOIN child_stats cs ON li.media_type IN ('show', 'artist')
+            AND cs.grandparent_rating_key = li.rating_key
+            AND cs.server_id = li.server_id
+          LEFT JOIN child_watch_stats cws ON li.media_type IN ('show', 'artist')
+            AND cws.grandparent_rating_key = li.rating_key
+            AND cws.server_id = li.server_id
+          LEFT JOIN sessions sess ON li.media_type NOT IN ('show', 'artist')
+            AND sess.rating_key = li.rating_key
             AND sess.server_id = li.server_id
             AND sess.started_at >= NOW() - INTERVAL '1 day' * ${periodDays}
-          WHERE li.file_size > ${minFileSize}
+          WHERE li.media_type NOT IN ('episode', 'track')  -- Exclude children, only show parent items
+            AND (
+              CASE
+                WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cs.total_size, li.file_size)
+                ELSE li.file_size
+              END
+            ) > ${minFileSize}
             ${serverFilter}
             ${libraryFilter}
             ${mediaTypeFilter}
-          GROUP BY li.id
+          GROUP BY li.id, li.server_id, li.title, li.media_type, li.year, li.file_size, li.created_at,
+                   cs.total_size, cws.watch_count, cws.total_watch_ms, cws.last_watched_at
         ),
         roi_scored AS (
           SELECT
@@ -311,7 +375,7 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
         FROM roi_scored
         WHERE 1=1
           ${valueCategoryFilter}
-        ORDER BY ${sortColumn} ${sortDir}
+        ORDER BY ${orderByClause}
         LIMIT ${pageSize} OFFSET ${offset}
       `);
 
