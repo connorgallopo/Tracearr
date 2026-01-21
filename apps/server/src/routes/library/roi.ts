@@ -109,11 +109,6 @@ interface RawSummaryRow {
   potential_savings_gb: string;
 }
 
-/** Raw row from database for count */
-interface RawCountRow {
-  count: string;
-}
-
 /**
  * Value thresholds by content type (watch hours per GB)
  *
@@ -221,9 +216,9 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
 
       const offset = (page - 1) * pageSize;
 
-      // Main ROI query using CTEs for clarity
-      // For shows/artists: aggregate file_size and watch_hours from episodes/tracks
-      const itemsResult = await db.execute(sql`
+      // Combined ROI query: items, summary, and count in one round-trip
+      // Uses window functions for summary aggregation alongside item results
+      const combinedResult = await db.execute(sql`
         WITH child_stats AS (
           -- Aggregate child data for shows (episodes) and artists (tracks)
           SELECT
@@ -353,33 +348,80 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
               ELSE 'moderate_value'
             END AS value_category
           FROM item_roi
+        ),
+        filtered_items AS (
+          SELECT
+            *,
+            -- Suggest deletion for low-value items with no recent watches
+            (value_category = 'low_value' AND (days_since_last_watch IS NULL OR days_since_last_watch > 180)) AS suggest_deletion
+          FROM roi_scored
+          WHERE 1=1
+            ${valueCategoryFilter}
+        ),
+        -- Summary aggregation computed once over all filtered items
+        summary_stats AS (
+          SELECT
+            COUNT(*) AS total_items,
+            COALESCE(SUM(file_size_gb), 0) AS total_storage_gb,
+            COALESCE(SUM(total_watch_hours), 0) AS total_watch_hours,
+            CASE
+              WHEN SUM(file_size_gb) > 0 THEN ROUND((SUM(total_watch_hours) / SUM(file_size_gb))::numeric, 2)
+              ELSE 0
+            END AS avg_watch_hours_per_gb,
+            COUNT(*) FILTER (WHERE value_category = 'low_value') AS low_value_items,
+            COALESCE(SUM(file_size_gb) FILTER (WHERE value_category = 'low_value'), 0) AS low_value_storage_gb,
+            COALESCE(SUM(file_size_gb) FILTER (WHERE suggest_deletion), 0) AS potential_savings_gb
+          FROM filtered_items
+        ),
+        paginated_items AS (
+          SELECT * FROM filtered_items
+          ORDER BY ${orderByClause}
+          LIMIT ${pageSize} OFFSET ${offset}
         )
         SELECT
-          id,
-          server_id,
-          title,
-          media_type,
-          year,
-          file_size_bytes::text AS file_size_bytes,
-          file_size_gb::text AS file_size_gb,
-          watch_count::text AS watch_count,
-          total_watch_ms::text AS total_watch_ms,
-          total_watch_hours::text AS total_watch_hours,
-          last_watched_at::text AS last_watched_at,
-          days_since_last_watch::text AS days_since_last_watch,
-          watch_hours_per_gb::text AS watch_hours_per_gb,
-          value_score::text AS value_score,
-          value_category,
-          -- Suggest deletion for low-value items with no recent watches
-          (value_category = 'low_value' AND (days_since_last_watch IS NULL OR days_since_last_watch > 180)) AS suggest_deletion
-        FROM roi_scored
-        WHERE 1=1
-          ${valueCategoryFilter}
-        ORDER BY ${orderByClause}
-        LIMIT ${pageSize} OFFSET ${offset}
+          -- Item fields
+          pi.id,
+          pi.server_id,
+          pi.title,
+          pi.media_type,
+          pi.year,
+          pi.file_size_bytes::text AS file_size_bytes,
+          pi.file_size_gb::text AS file_size_gb,
+          pi.watch_count::text AS watch_count,
+          pi.total_watch_ms::text AS total_watch_ms,
+          pi.total_watch_hours::text AS total_watch_hours,
+          pi.last_watched_at::text AS last_watched_at,
+          pi.days_since_last_watch::text AS days_since_last_watch,
+          pi.watch_hours_per_gb::text AS watch_hours_per_gb,
+          pi.value_score::text AS value_score,
+          pi.value_category,
+          pi.suggest_deletion,
+          -- Summary fields (same for all rows)
+          ss.total_items::text AS _total_items,
+          ss.total_storage_gb::text AS _total_storage_gb,
+          ss.total_watch_hours::text AS _total_watch_hours,
+          ss.avg_watch_hours_per_gb::text AS _avg_watch_hours_per_gb,
+          ss.low_value_items::text AS _low_value_items,
+          ss.low_value_storage_gb::text AS _low_value_storage_gb,
+          ss.potential_savings_gb::text AS _potential_savings_gb
+        FROM paginated_items pi
+        CROSS JOIN summary_stats ss
       `);
 
-      const items: RoiItem[] = (itemsResult.rows as unknown as RawRoiItemRow[]).map((row) => ({
+      // Extract items and summary from combined result
+      interface CombinedRoiRow extends RawRoiItemRow {
+        _total_items: string;
+        _total_storage_gb: string;
+        _total_watch_hours: string;
+        _avg_watch_hours_per_gb: string;
+        _low_value_items: string;
+        _low_value_storage_gb: string;
+        _potential_savings_gb: string;
+      }
+
+      const rows = combinedResult.rows as unknown as CombinedRoiRow[];
+
+      const items: RoiItem[] = rows.map((row) => ({
         id: row.id,
         serverId: row.server_id,
         title: row.title,
@@ -400,30 +442,37 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
         suggestDeletion: row.suggest_deletion,
       }));
 
-      // Summary query (aggregate over all filtered items, not just current page)
-      const summaryResult = await db.execute(sql`
-        WITH item_roi AS (
-          SELECT
-            li.id,
-            li.file_size / 1073741824.0 AS file_size_gb,
-            COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) / 3600000.0 AS total_watch_hours,
-            MAX(sess.stopped_at) AS last_watched_at,
-            EXTRACT(DAY FROM NOW() - MAX(sess.stopped_at))::int AS days_since_last_watch,
-            li.media_type
-          FROM library_items li
-          LEFT JOIN sessions sess ON sess.rating_key = li.rating_key
-            AND sess.server_id = li.server_id
-            AND sess.started_at >= NOW() - INTERVAL '1 day' * ${periodDays}
-          WHERE li.file_size > ${minFileSize}
-            ${serverFilter}
-            ${libraryFilter}
-            ${mediaTypeFilter}
-          GROUP BY li.id
-        ),
-        roi_scored AS (
-          SELECT
-            *,
-            CASE
+      // Extract summary from first row (or fetch separately if no items)
+      let summary: RoiSummary;
+      let total: number;
+
+      if (rows.length > 0) {
+        const firstRow = rows[0]!;
+        summary = {
+          totalItems: parseInt(firstRow._total_items, 10) || 0,
+          totalStorageGb: parseFloat(firstRow._total_storage_gb) || 0,
+          totalWatchHours: parseFloat(firstRow._total_watch_hours) || 0,
+          avgWatchHoursPerGb: parseFloat(firstRow._avg_watch_hours_per_gb) || 0,
+          lowValueItems: parseInt(firstRow._low_value_items, 10) || 0,
+          lowValueStorageGb: parseFloat(firstRow._low_value_storage_gb) || 0,
+          potentialSavingsGb: parseFloat(firstRow._potential_savings_gb) || 0,
+        };
+        total = summary.totalItems;
+      } else {
+        // No items on current page - need summary separately for empty page case
+        const summaryResult = await db.execute(sql`
+          WITH item_roi AS (
+            SELECT li.id, li.file_size / 1073741824.0 AS file_size_gb,
+              COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) / 3600000.0 AS total_watch_hours,
+              EXTRACT(DAY FROM NOW() - MAX(sess.stopped_at))::int AS days_since_last_watch, li.media_type
+            FROM library_items li
+            LEFT JOIN sessions sess ON sess.rating_key = li.rating_key AND sess.server_id = li.server_id
+              AND sess.started_at >= NOW() - INTERVAL '1 day' * ${periodDays}
+            WHERE li.file_size > ${minFileSize} ${serverFilter} ${libraryFilter} ${mediaTypeFilter}
+            GROUP BY li.id
+          ),
+          roi_scored AS (
+            SELECT *, CASE
               WHEN file_size_gb = 0 THEN 'moderate_value'
               WHEN media_type = 'movie' AND (total_watch_hours / NULLIF(file_size_gb, 0)) < 0.1 THEN 'low_value'
               WHEN media_type = 'movie' AND (total_watch_hours / NULLIF(file_size_gb, 0)) > 0.5 THEN 'high_value'
@@ -431,84 +480,33 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
               WHEN media_type = 'episode' AND (total_watch_hours / NULLIF(file_size_gb, 0)) > 2.0 THEN 'high_value'
               WHEN (total_watch_hours / NULLIF(file_size_gb, 0)) < 0.3 THEN 'low_value'
               WHEN (total_watch_hours / NULLIF(file_size_gb, 0)) > 1.0 THEN 'high_value'
-              ELSE 'moderate_value'
-            END AS value_category
-          FROM item_roi
-        ),
-        filtered AS (
-          SELECT
-            *,
-            (value_category = 'low_value' AND (days_since_last_watch IS NULL OR days_since_last_watch > 180)) AS suggest_deletion
-          FROM roi_scored
-          WHERE 1=1
-            ${valueCategoryFilter}
-        )
-        SELECT
-          COUNT(*) AS total_items,
-          COALESCE(SUM(file_size_gb), 0)::text AS total_storage_gb,
-          COALESCE(SUM(total_watch_hours), 0)::text AS total_watch_hours,
-          CASE
-            WHEN SUM(file_size_gb) > 0 THEN
-              ROUND((SUM(total_watch_hours) / SUM(file_size_gb))::numeric, 2)::text
-            ELSE '0'
-          END AS avg_watch_hours_per_gb,
-          COUNT(*) FILTER (WHERE value_category = 'low_value') AS low_value_items,
-          COALESCE(SUM(file_size_gb) FILTER (WHERE value_category = 'low_value'), 0)::text AS low_value_storage_gb,
-          COALESCE(SUM(file_size_gb) FILTER (WHERE suggest_deletion), 0)::text AS potential_savings_gb
-        FROM filtered
-      `);
-
-      const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow;
-
-      const summary: RoiSummary = {
-        totalItems: parseInt(summaryRow.total_items, 10) || 0,
-        totalStorageGb: parseFloat(summaryRow.total_storage_gb) || 0,
-        totalWatchHours: parseFloat(summaryRow.total_watch_hours) || 0,
-        avgWatchHoursPerGb: parseFloat(summaryRow.avg_watch_hours_per_gb) || 0,
-        lowValueItems: parseInt(summaryRow.low_value_items, 10) || 0,
-        lowValueStorageGb: parseFloat(summaryRow.low_value_storage_gb) || 0,
-        potentialSavingsGb: parseFloat(summaryRow.potential_savings_gb) || 0,
-      };
-
-      // Get total count for pagination (after filters applied)
-      const countResult = await db.execute(sql`
-        WITH item_roi AS (
-          SELECT
-            li.id,
-            li.file_size / 1073741824.0 AS file_size_gb,
-            COALESCE(SUM(sess.duration_ms) FILTER (WHERE sess.duration_ms >= 120000), 0) / 3600000.0 AS total_watch_hours,
-            li.media_type
-          FROM library_items li
-          LEFT JOIN sessions sess ON sess.rating_key = li.rating_key
-            AND sess.server_id = li.server_id
-            AND sess.started_at >= NOW() - INTERVAL '1 day' * ${periodDays}
-          WHERE li.file_size > ${minFileSize}
-            ${serverFilter}
-            ${libraryFilter}
-            ${mediaTypeFilter}
-          GROUP BY li.id
-        ),
-        roi_scored AS (
-          SELECT
-            *,
-            CASE
-              WHEN file_size_gb = 0 THEN 'moderate_value'
-              WHEN media_type = 'movie' AND (total_watch_hours / NULLIF(file_size_gb, 0)) < 0.1 THEN 'low_value'
-              WHEN media_type = 'movie' AND (total_watch_hours / NULLIF(file_size_gb, 0)) > 0.5 THEN 'high_value'
-              WHEN media_type = 'episode' AND (total_watch_hours / NULLIF(file_size_gb, 0)) < 0.5 THEN 'low_value'
-              WHEN media_type = 'episode' AND (total_watch_hours / NULLIF(file_size_gb, 0)) > 2.0 THEN 'high_value'
-              WHEN (total_watch_hours / NULLIF(file_size_gb, 0)) < 0.3 THEN 'low_value'
-              WHEN (total_watch_hours / NULLIF(file_size_gb, 0)) > 1.0 THEN 'high_value'
-              ELSE 'moderate_value'
-            END AS value_category
-          FROM item_roi
-        )
-        SELECT COUNT(*) AS count FROM roi_scored
-        WHERE 1=1
-          ${valueCategoryFilter}
-      `);
-
-      const total = parseInt((countResult.rows[0] as unknown as RawCountRow).count, 10) || 0;
+              ELSE 'moderate_value' END AS value_category
+            FROM item_roi
+          ),
+          filtered AS (
+            SELECT *, (value_category = 'low_value' AND (days_since_last_watch IS NULL OR days_since_last_watch > 180)) AS suggest_deletion
+            FROM roi_scored WHERE 1=1 ${valueCategoryFilter}
+          )
+          SELECT COUNT(*) AS total_items, COALESCE(SUM(file_size_gb), 0)::text AS total_storage_gb,
+            COALESCE(SUM(total_watch_hours), 0)::text AS total_watch_hours,
+            CASE WHEN SUM(file_size_gb) > 0 THEN ROUND((SUM(total_watch_hours) / SUM(file_size_gb))::numeric, 2)::text ELSE '0' END AS avg_watch_hours_per_gb,
+            COUNT(*) FILTER (WHERE value_category = 'low_value') AS low_value_items,
+            COALESCE(SUM(file_size_gb) FILTER (WHERE value_category = 'low_value'), 0)::text AS low_value_storage_gb,
+            COALESCE(SUM(file_size_gb) FILTER (WHERE suggest_deletion), 0)::text AS potential_savings_gb
+          FROM filtered
+        `);
+        const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow;
+        summary = {
+          totalItems: parseInt(summaryRow.total_items, 10) || 0,
+          totalStorageGb: parseFloat(summaryRow.total_storage_gb) || 0,
+          totalWatchHours: parseFloat(summaryRow.total_watch_hours) || 0,
+          avgWatchHoursPerGb: parseFloat(summaryRow.avg_watch_hours_per_gb) || 0,
+          lowValueItems: parseInt(summaryRow.low_value_items, 10) || 0,
+          lowValueStorageGb: parseFloat(summaryRow.low_value_storage_gb) || 0,
+          potentialSavingsGb: parseFloat(summaryRow.potential_savings_gb) || 0,
+        };
+        total = summary.totalItems;
+      }
 
       const response: RoiResponse = {
         items,

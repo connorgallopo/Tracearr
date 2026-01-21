@@ -9,7 +9,7 @@
  * 5. Report progress via callback for real-time updates
  */
 
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { servers, libraryItems, librarySnapshots } from '../db/schema.js';
 import { createMediaServerClient, type MediaLibraryItem } from './mediaServer/index.js';
@@ -404,46 +404,22 @@ export class LibrarySyncService {
   /**
    * Upsert items to libraryItems table
    *
-   * Uses Drizzle's onConflictDoUpdate for atomic upserts.
+   * Uses Drizzle's onConflictDoUpdate for atomic bulk upserts.
    * Conflict target: serverId + ratingKey
+   * Wrapped in transaction for atomicity - partial failures will rollback.
    */
   async upsertItems(serverId: string, libraryId: string, items: MediaLibraryItem[]): Promise<void> {
     if (items.length === 0) return;
 
-    // Process items one at a time using ON CONFLICT
-    for (const item of items) {
-      await db
+    // Bulk upsert with transaction for atomicity
+    await db.transaction(async (tx) => {
+      await tx
         .insert(libraryItems)
-        .values({
-          serverId,
-          libraryId,
-          ratingKey: item.ratingKey,
-          title: item.title,
-          mediaType: item.mediaType,
-          year: item.year ?? null,
-          imdbId: item.imdbId ?? null,
-          tmdbId: item.tmdbId ?? null,
-          tvdbId: item.tvdbId ?? null,
-          videoResolution: item.videoResolution ?? null,
-          videoCodec: item.videoCodec ?? null,
-          audioCodec: item.audioCodec ?? null,
-          audioChannels: item.audioChannels ?? null,
-          fileSize: item.fileSize ?? null,
-          filePath: item.filePath ?? null,
-          // Hierarchy fields (for episodes and tracks)
-          grandparentTitle: item.grandparentTitle ?? null,
-          grandparentRatingKey: item.grandparentRatingKey ?? null,
-          parentTitle: item.parentTitle ?? null,
-          parentRatingKey: item.parentRatingKey ?? null,
-          parentIndex: item.parentIndex ?? null,
-          itemIndex: item.itemIndex ?? null,
-          // Use Plex's addedAt timestamp (when item was added to library)
-          createdAt: item.addedAt,
-        })
-        .onConflictDoUpdate({
-          target: [libraryItems.serverId, libraryItems.ratingKey],
-          set: {
+        .values(
+          items.map((item) => ({
+            serverId,
             libraryId,
+            ratingKey: item.ratingKey,
             title: item.title,
             mediaType: item.mediaType,
             year: item.year ?? null,
@@ -463,12 +439,39 @@ export class LibrarySyncService {
             parentRatingKey: item.parentRatingKey ?? null,
             parentIndex: item.parentIndex ?? null,
             itemIndex: item.itemIndex ?? null,
-            // Fix created_at with Plex's addedAt (for existing items with wrong dates)
+            // Use Plex's addedAt timestamp (when item was added to library)
             createdAt: item.addedAt,
+          }))
+        )
+        .onConflictDoUpdate({
+          target: [libraryItems.serverId, libraryItems.ratingKey],
+          set: {
+            libraryId,
+            title: sql`excluded.title`,
+            mediaType: sql`excluded.media_type`,
+            year: sql`excluded.year`,
+            imdbId: sql`excluded.imdb_id`,
+            tmdbId: sql`excluded.tmdb_id`,
+            tvdbId: sql`excluded.tvdb_id`,
+            videoResolution: sql`excluded.video_resolution`,
+            videoCodec: sql`excluded.video_codec`,
+            audioCodec: sql`excluded.audio_codec`,
+            audioChannels: sql`excluded.audio_channels`,
+            fileSize: sql`excluded.file_size`,
+            filePath: sql`excluded.file_path`,
+            // Hierarchy fields (for episodes and tracks)
+            grandparentTitle: sql`excluded.grandparent_title`,
+            grandparentRatingKey: sql`excluded.grandparent_rating_key`,
+            parentTitle: sql`excluded.parent_title`,
+            parentRatingKey: sql`excluded.parent_rating_key`,
+            parentIndex: sql`excluded.parent_index`,
+            itemIndex: sql`excluded.item_index`,
+            // Fix created_at with Plex's addedAt (for existing items with wrong dates)
+            createdAt: sql`excluded.created_at`,
             updatedAt: new Date(),
           },
         });
-    }
+    });
   }
 
   /**

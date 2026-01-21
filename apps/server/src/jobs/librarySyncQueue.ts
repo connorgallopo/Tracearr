@@ -245,7 +245,7 @@ export async function scheduleAutoSync(): Promise<void> {
       },
       {
         repeat: {
-          pattern: '0 3 * * *', // 3 AM daily
+          pattern: '0 */6 * * *', // Every 6 hours
           tz: 'UTC',
         },
         jobId: `scheduled-${server.id}`,
@@ -253,7 +253,7 @@ export async function scheduleAutoSync(): Promise<void> {
     );
   }
 
-  console.log(`[LibrarySync] Scheduled auto-sync for ${allServers.length} server(s) at 3 AM UTC`);
+  console.log(`[LibrarySync] Scheduled auto-sync for ${allServers.length} server(s) every 6 hours`);
 }
 
 /**

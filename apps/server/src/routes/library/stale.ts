@@ -168,10 +168,9 @@ export const libraryStaleRoute: FastifyPluginAsync = async (app) => {
 
       const offset = (page - 1) * pageSize;
 
-      // Main query to get stale items with watch stats
-      // Uses CTE to join library_items with sessions and calculate staleness
-      // For shows/artists: aggregates child (episode/track) sizes and checks if any child was watched
-      const itemsResult = await db.execute(sql`
+      // Combined query: items with pagination AND summary statistics in one round-trip
+      // Uses window functions for summary aggregation alongside item results
+      const combinedResult = await db.execute(sql`
         WITH child_stats AS (
           -- Aggregate child data for shows (episodes) and artists (tracks)
           SELECT
@@ -203,10 +202,7 @@ export const libraryStaleRoute: FastifyPluginAsync = async (app) => {
             li.server_id,
             s.name AS server_name,
             li.library_id,
-            COALESCE(
-              (SELECT name FROM servers WHERE id = li.server_id LIMIT 1),
-              li.library_id
-            ) AS library_name,
+            s.name AS library_name,
             li.title,
             li.media_type,
             li.year,
@@ -281,33 +277,68 @@ export const libraryStaleRoute: FastifyPluginAsync = async (app) => {
             OR last_watched < NOW() - INTERVAL '1 day' * ${staleDays}
           )
         ),
-        sorted_items AS (
+        filtered_items AS (
           SELECT * FROM stale_items
           WHERE 1=1
             ${categoryFilter}
+        ),
+        -- Summary aggregation computed once over all filtered items
+        summary_stats AS (
+          SELECT
+            COUNT(*) FILTER (WHERE category = 'never_watched') AS never_watched_count,
+            COUNT(*) FILTER (WHERE category = 'stale') AS stale_count,
+            COALESCE(SUM(file_size) FILTER (WHERE category = 'never_watched'), 0) AS never_watched_bytes,
+            COALESCE(SUM(file_size) FILTER (WHERE category = 'stale'), 0) AS stale_bytes,
+            COUNT(*) AS total_stale_items,
+            COALESCE(SUM(file_size), 0) AS total_stale_bytes
+          FROM filtered_items
+        ),
+        paginated_items AS (
+          SELECT * FROM filtered_items
           ORDER BY ${orderByClause}
           LIMIT ${pageSize} OFFSET ${offset}
         )
         SELECT
-          id,
-          server_id,
-          server_name,
-          library_id,
-          library_name,
-          title,
-          media_type,
-          year,
-          file_size::text AS file_size,
-          video_resolution,
-          added_at::text AS added_at,
-          last_watched::text AS last_watched,
-          watch_count::text AS watch_count,
-          category,
-          days_stale::text AS days_stale
-        FROM sorted_items
+          -- Item fields
+          pi.id,
+          pi.server_id,
+          pi.server_name,
+          pi.library_id,
+          pi.library_name,
+          pi.title,
+          pi.media_type,
+          pi.year,
+          pi.file_size::text AS file_size,
+          pi.video_resolution,
+          pi.added_at::text AS added_at,
+          pi.last_watched::text AS last_watched,
+          pi.watch_count::text AS watch_count,
+          pi.category,
+          pi.days_stale::text AS days_stale,
+          -- Summary fields (same for all rows)
+          ss.never_watched_count::text AS _never_watched_count,
+          ss.stale_count::text AS _stale_count,
+          ss.never_watched_bytes::text AS _never_watched_bytes,
+          ss.stale_bytes::text AS _stale_bytes,
+          ss.total_stale_items::text AS _total_stale_items,
+          ss.total_stale_bytes::text AS _total_stale_bytes
+        FROM paginated_items pi
+        CROSS JOIN summary_stats ss
       `);
 
-      const items: StaleItem[] = (itemsResult.rows as unknown as RawStaleItemRow[]).map((row) => ({
+      // Extract items and summary from combined result
+      interface CombinedRow extends RawStaleItemRow {
+        _never_watched_count: string;
+        _stale_count: string;
+        _never_watched_bytes: string;
+        _stale_bytes: string;
+        _total_stale_items: string;
+        _total_stale_bytes: string;
+      }
+
+      const rows = combinedResult.rows as unknown as CombinedRow[];
+
+      const items: StaleItem[] = rows.map((row) => ({
         id: row.id,
         serverId: row.server_id,
         serverName: row.server_name,
@@ -325,107 +356,84 @@ export const libraryStaleRoute: FastifyPluginAsync = async (app) => {
         daysStale: parseInt(row.days_stale, 10),
       }));
 
-      // Summary query for totals
-      const summaryResult = await db.execute(sql`
-        WITH child_stats AS (
-          SELECT
-            grandparent_rating_key,
-            server_id,
-            SUM(file_size) AS total_size
-          FROM library_items
-          WHERE media_type IN ('episode', 'track') AND grandparent_rating_key IS NOT NULL
-          GROUP BY grandparent_rating_key, server_id
-        ),
-        child_watch_stats AS (
-          SELECT
-            child.grandparent_rating_key,
-            child.server_id,
-            MAX(sess.stopped_at) AS last_watched
-          FROM library_items child
-          LEFT JOIN sessions sess ON sess.rating_key = child.rating_key
-            AND sess.server_id = child.server_id
-            AND sess.duration_ms >= 120000
-          WHERE child.media_type IN ('episode', 'track') AND child.grandparent_rating_key IS NOT NULL
-          GROUP BY child.grandparent_rating_key, child.server_id
-        ),
-        item_watch_stats AS (
-          SELECT
-            li.id,
-            li.server_id,
-            CASE
-              WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cs.total_size, li.file_size)
-              ELSE li.file_size
-            END AS file_size,
-            CASE
-              WHEN li.media_type IN ('show', 'artist') THEN cws.last_watched
-              ELSE MAX(sess.stopped_at)
-            END AS last_watched
-          FROM library_items li
-          LEFT JOIN child_stats cs ON li.media_type IN ('show', 'artist')
-            AND cs.grandparent_rating_key = li.rating_key
-            AND cs.server_id = li.server_id
-          LEFT JOIN child_watch_stats cws ON li.media_type IN ('show', 'artist')
-            AND cws.grandparent_rating_key = li.rating_key
-            AND cws.server_id = li.server_id
-          LEFT JOIN sessions sess ON li.media_type NOT IN ('show', 'artist')
-            AND sess.rating_key = li.rating_key
-            AND sess.server_id = li.server_id
-            AND sess.duration_ms >= 120000
-          WHERE li.media_type NOT IN ('episode', 'track')
-            ${serverFilter}
-            ${libraryFilter}
-            ${mediaTypeFilter}
-          GROUP BY li.id, li.server_id, li.media_type, li.file_size,
-                   cs.total_size, cws.last_watched
-        ),
-        stale_items AS (
-          SELECT
-            id,
-            file_size,
-            CASE
-              WHEN last_watched IS NULL THEN 'never_watched'
-              ELSE 'stale'
-            END AS category
-          FROM item_watch_stats
-          WHERE (
-            last_watched IS NULL
-            OR last_watched < NOW() - INTERVAL '1 day' * ${staleDays}
-          )
-        ),
-        filtered AS (
-          SELECT * FROM stale_items
-          WHERE 1=1
-            ${categoryFilter}
-        )
-        SELECT
-          COUNT(*) FILTER (WHERE category = 'never_watched') AS never_watched_count,
-          COUNT(*) FILTER (WHERE category = 'stale') AS stale_count,
-          COALESCE(SUM(file_size) FILTER (WHERE category = 'never_watched'), 0)::text AS never_watched_bytes,
-          COALESCE(SUM(file_size) FILTER (WHERE category = 'stale'), 0)::text AS stale_bytes,
-          COUNT(*) AS total_stale_items,
-          COALESCE(SUM(file_size), 0)::text AS total_stale_bytes
-        FROM filtered
-      `);
+      // Extract summary from first row (or fetch separately if no items)
+      let summary: StaleSummary;
+      if (rows.length > 0) {
+        const firstRow = rows[0]!;
+        summary = {
+          neverWatched: {
+            count: parseInt(firstRow._never_watched_count, 10) || 0,
+            sizeBytes: parseInt(firstRow._never_watched_bytes, 10) || 0,
+          },
+          stale: {
+            count: parseInt(firstRow._stale_count, 10) || 0,
+            sizeBytes: parseInt(firstRow._stale_bytes, 10) || 0,
+          },
+          total: {
+            count: parseInt(firstRow._total_stale_items, 10) || 0,
+            sizeBytes: parseInt(firstRow._total_stale_bytes, 10) || 0,
+          },
+          threshold: { days: staleDays },
+        };
+      } else {
+        // No items on current page - need summary separately for empty page case
+        const summaryResult = await db.execute(sql`
+          WITH child_stats AS (
+            SELECT grandparent_rating_key, server_id, SUM(file_size) AS total_size
+            FROM library_items
+            WHERE media_type IN ('episode', 'track') AND grandparent_rating_key IS NOT NULL
+            GROUP BY grandparent_rating_key, server_id
+          ),
+          child_watch_stats AS (
+            SELECT child.grandparent_rating_key, child.server_id, MAX(sess.stopped_at) AS last_watched
+            FROM library_items child
+            LEFT JOIN sessions sess ON sess.rating_key = child.rating_key
+              AND sess.server_id = child.server_id AND sess.duration_ms >= 120000
+            WHERE child.media_type IN ('episode', 'track') AND child.grandparent_rating_key IS NOT NULL
+            GROUP BY child.grandparent_rating_key, child.server_id
+          ),
+          item_watch_stats AS (
+            SELECT li.id, li.server_id,
+              CASE WHEN li.media_type IN ('show', 'artist') THEN COALESCE(cs.total_size, li.file_size) ELSE li.file_size END AS file_size,
+              CASE WHEN li.media_type IN ('show', 'artist') THEN cws.last_watched ELSE MAX(sess.stopped_at) END AS last_watched
+            FROM library_items li
+            LEFT JOIN child_stats cs ON li.media_type IN ('show', 'artist') AND cs.grandparent_rating_key = li.rating_key AND cs.server_id = li.server_id
+            LEFT JOIN child_watch_stats cws ON li.media_type IN ('show', 'artist') AND cws.grandparent_rating_key = li.rating_key AND cws.server_id = li.server_id
+            LEFT JOIN sessions sess ON li.media_type NOT IN ('show', 'artist') AND sess.rating_key = li.rating_key AND sess.server_id = li.server_id AND sess.duration_ms >= 120000
+            WHERE li.media_type NOT IN ('episode', 'track') ${serverFilter} ${libraryFilter} ${mediaTypeFilter}
+            GROUP BY li.id, li.server_id, li.media_type, li.file_size, cs.total_size, cws.last_watched
+          ),
+          stale_items AS (
+            SELECT id, file_size, CASE WHEN last_watched IS NULL THEN 'never_watched' ELSE 'stale' END AS category
+            FROM item_watch_stats WHERE (last_watched IS NULL OR last_watched < NOW() - INTERVAL '1 day' * ${staleDays})
+          ),
+          filtered AS (SELECT * FROM stale_items WHERE 1=1 ${categoryFilter})
+          SELECT COUNT(*) FILTER (WHERE category = 'never_watched') AS never_watched_count,
+            COUNT(*) FILTER (WHERE category = 'stale') AS stale_count,
+            COALESCE(SUM(file_size) FILTER (WHERE category = 'never_watched'), 0)::text AS never_watched_bytes,
+            COALESCE(SUM(file_size) FILTER (WHERE category = 'stale'), 0)::text AS stale_bytes,
+            COUNT(*) AS total_stale_items, COALESCE(SUM(file_size), 0)::text AS total_stale_bytes
+          FROM filtered
+        `);
+        const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow;
+        summary = {
+          neverWatched: {
+            count: parseInt(summaryRow.never_watched_count, 10) || 0,
+            sizeBytes: parseInt(summaryRow.never_watched_bytes, 10) || 0,
+          },
+          stale: {
+            count: parseInt(summaryRow.stale_count, 10) || 0,
+            sizeBytes: parseInt(summaryRow.stale_bytes, 10) || 0,
+          },
+          total: {
+            count: parseInt(summaryRow.total_stale_items, 10) || 0,
+            sizeBytes: parseInt(summaryRow.total_stale_bytes, 10) || 0,
+          },
+          threshold: { days: staleDays },
+        };
+      }
 
-      const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow;
-
-      const summary: StaleSummary = {
-        neverWatched: {
-          count: parseInt(summaryRow.never_watched_count, 10) || 0,
-          sizeBytes: parseInt(summaryRow.never_watched_bytes, 10) || 0,
-        },
-        stale: {
-          count: parseInt(summaryRow.stale_count, 10) || 0,
-          sizeBytes: parseInt(summaryRow.stale_bytes, 10) || 0,
-        },
-        total: {
-          count: parseInt(summaryRow.total_stale_items, 10) || 0,
-          sizeBytes: parseInt(summaryRow.total_stale_bytes, 10) || 0,
-        },
-        threshold: { days: staleDays },
-      };
-
-      // Get total count for pagination
+      // Get total count for pagination from summary
       const total = summary.total.count;
 
       const response: StaleResponse = {
