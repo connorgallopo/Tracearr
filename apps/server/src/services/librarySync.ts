@@ -226,6 +226,158 @@ export class LibrarySyncService {
       }
     }
 
+    // For TV libraries (contains shows), also fetch all episodes
+    const hasShows = allItems.some((item) => item.mediaType === 'show');
+    if (hasShows && client.getLibraryLeaves) {
+      // Report episode fetching
+      if (onProgress) {
+        onProgress({
+          serverId,
+          serverName,
+          status: 'running',
+          currentLibrary: libraryId,
+          currentLibraryName: libraryName,
+          totalLibraries,
+          processedLibraries,
+          totalItems: totalCount,
+          processedItems,
+          message: `${libraryName}: Fetching episodes...`,
+          startedAt,
+        });
+      }
+
+      // Fetch episode count
+      const { totalCount: episodeCount } = await client.getLibraryLeaves(libraryId, {
+        offset: 0,
+        limit: 1,
+      });
+
+      // Fetch episodes in batches
+      let episodeOffset = 0;
+      let episodesProcessed = 0;
+
+      while (episodeOffset < episodeCount) {
+        const { items: episodes } = await client.getLibraryLeaves(libraryId, {
+          offset: episodeOffset,
+          limit: BATCH_SIZE,
+        });
+
+        if (episodes.length === 0) break;
+
+        // Track episode keys and add to allItems
+        for (const episode of episodes) {
+          currentKeys.add(episode.ratingKey);
+          allItems.push(episode);
+        }
+
+        // Upsert episodes to database
+        await this.upsertItems(serverId, libraryId, episodes);
+
+        episodesProcessed += episodes.length;
+        episodeOffset += BATCH_SIZE;
+
+        // Report progress
+        if (onProgress) {
+          onProgress({
+            serverId,
+            serverName,
+            status: 'running',
+            currentLibrary: libraryId,
+            currentLibraryName: libraryName,
+            totalLibraries,
+            processedLibraries,
+            totalItems: totalCount + episodeCount,
+            processedItems: processedItems + episodesProcessed,
+            message: `${libraryName}: ${episodesProcessed}/${episodeCount} episodes processed...`,
+            startedAt,
+          });
+        }
+
+        // Rate limit between batches
+        if (episodeOffset < episodeCount) {
+          await delay(BATCH_DELAY_MS);
+        }
+      }
+
+      processedItems += episodesProcessed;
+    }
+
+    // For music libraries (contains artists), also fetch all tracks
+    const hasArtists = allItems.some((item) => item.mediaType === 'artist');
+    if (hasArtists && client.getLibraryLeaves) {
+      // Report track fetching
+      if (onProgress) {
+        onProgress({
+          serverId,
+          serverName,
+          status: 'running',
+          currentLibrary: libraryId,
+          currentLibraryName: libraryName,
+          totalLibraries,
+          processedLibraries,
+          totalItems: totalCount,
+          processedItems,
+          message: `${libraryName}: Fetching tracks...`,
+          startedAt,
+        });
+      }
+
+      // Fetch track count
+      const { totalCount: trackCount } = await client.getLibraryLeaves(libraryId, {
+        offset: 0,
+        limit: 1,
+      });
+
+      // Fetch tracks in batches
+      let trackOffset = 0;
+      let tracksProcessed = 0;
+
+      while (trackOffset < trackCount) {
+        const { items: tracks } = await client.getLibraryLeaves(libraryId, {
+          offset: trackOffset,
+          limit: BATCH_SIZE,
+        });
+
+        if (tracks.length === 0) break;
+
+        // Track keys and add to allItems
+        for (const track of tracks) {
+          currentKeys.add(track.ratingKey);
+          allItems.push(track);
+        }
+
+        // Upsert tracks to database
+        await this.upsertItems(serverId, libraryId, tracks);
+
+        tracksProcessed += tracks.length;
+        trackOffset += BATCH_SIZE;
+
+        // Report progress
+        if (onProgress) {
+          onProgress({
+            serverId,
+            serverName,
+            status: 'running',
+            currentLibrary: libraryId,
+            currentLibraryName: libraryName,
+            totalLibraries,
+            processedLibraries,
+            totalItems: totalCount + trackCount,
+            processedItems: processedItems + tracksProcessed,
+            message: `${libraryName}: ${tracksProcessed}/${trackCount} tracks processed...`,
+            startedAt,
+          });
+        }
+
+        // Rate limit between batches
+        if (trackOffset < trackCount) {
+          await delay(BATCH_DELAY_MS);
+        }
+      }
+
+      processedItems += tracksProcessed;
+    }
+
     // Calculate delta
     const addedKeys = [...currentKeys].filter((k) => !previousKeys.has(k));
     const removedKeys = [...previousKeys].filter((k) => !currentKeys.has(k));
@@ -275,8 +427,18 @@ export class LibrarySyncService {
           videoResolution: item.videoResolution ?? null,
           videoCodec: item.videoCodec ?? null,
           audioCodec: item.audioCodec ?? null,
+          audioChannels: item.audioChannels ?? null,
           fileSize: item.fileSize ?? null,
           filePath: item.filePath ?? null,
+          // Hierarchy fields (for episodes and tracks)
+          grandparentTitle: item.grandparentTitle ?? null,
+          grandparentRatingKey: item.grandparentRatingKey ?? null,
+          parentTitle: item.parentTitle ?? null,
+          parentRatingKey: item.parentRatingKey ?? null,
+          parentIndex: item.parentIndex ?? null,
+          itemIndex: item.itemIndex ?? null,
+          // Use Plex's addedAt timestamp (when item was added to library)
+          createdAt: item.addedAt,
         })
         .onConflictDoUpdate({
           target: [libraryItems.serverId, libraryItems.ratingKey],
@@ -291,8 +453,18 @@ export class LibrarySyncService {
             videoResolution: item.videoResolution ?? null,
             videoCodec: item.videoCodec ?? null,
             audioCodec: item.audioCodec ?? null,
+            audioChannels: item.audioChannels ?? null,
             fileSize: item.fileSize ?? null,
             filePath: item.filePath ?? null,
+            // Hierarchy fields (for episodes and tracks)
+            grandparentTitle: item.grandparentTitle ?? null,
+            grandparentRatingKey: item.grandparentRatingKey ?? null,
+            parentTitle: item.parentTitle ?? null,
+            parentRatingKey: item.parentRatingKey ?? null,
+            parentIndex: item.parentIndex ?? null,
+            itemIndex: item.itemIndex ?? null,
+            // Fix created_at with Plex's addedAt (for existing items with wrong dates)
+            createdAt: item.addedAt,
             updatedAt: new Date(),
           },
         });

@@ -9,7 +9,8 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
-import { WS_EVENTS } from '@tracearr/shared';
+import { Redis } from 'ioredis';
+import { WS_EVENTS, REDIS_KEYS } from '@tracearr/shared';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
@@ -30,7 +31,46 @@ const QUEUE_NAME = 'library-sync';
 let connectionOptions: ConnectionOptions | null = null;
 let librarySyncQueue: Queue<LibrarySyncJobData> | null = null;
 let librarySyncWorker: Worker<LibrarySyncJobData> | null = null;
+let redisClient: Redis | null = null;
 const activeSyncs = new Map<string, boolean>();
+
+/**
+ * Invalidate library-related caches after sync completes.
+ * Uses pattern matching to clear all variants (per-server, per-library, with timezone, etc.)
+ */
+async function invalidateLibraryCaches(serverId: string): Promise<void> {
+  if (!redisClient) return;
+
+  const patterns = [
+    `${REDIS_KEYS.LIBRARY_STATS}*`,
+    `${REDIS_KEYS.LIBRARY_GROWTH}*`,
+    `${REDIS_KEYS.LIBRARY_QUALITY}*`,
+    `${REDIS_KEYS.LIBRARY_STORAGE}*`,
+    `${REDIS_KEYS.LIBRARY_DUPLICATES}*`,
+    `${REDIS_KEYS.LIBRARY_STALE}*`,
+    `${REDIS_KEYS.LIBRARY_WATCH}*`,
+    `${REDIS_KEYS.LIBRARY_COMPLETION}*`,
+    `${REDIS_KEYS.LIBRARY_PATTERNS}*`,
+    `${REDIS_KEYS.LIBRARY_ROI}*`,
+    `${REDIS_KEYS.LIBRARY_TOP_MOVIES}*`,
+    `${REDIS_KEYS.LIBRARY_TOP_SHOWS}*`,
+    `${REDIS_KEYS.LIBRARY_CODECS}*`,
+    `${REDIS_KEYS.LIBRARY_RESOLUTION}*`,
+  ];
+
+  let totalDeleted = 0;
+  for (const pattern of patterns) {
+    const keys = await redisClient.keys(pattern);
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+      totalDeleted += keys.length;
+    }
+  }
+
+  if (totalDeleted > 0) {
+    console.log(`[LibrarySync] Invalidated ${totalDeleted} cache keys for server ${serverId}`);
+  }
+}
 
 /**
  * Initialize the library sync queue with Redis connection
@@ -42,6 +82,7 @@ export function initLibrarySyncQueue(redisUrl: string): void {
   }
 
   connectionOptions = { url: redisUrl };
+  redisClient = new Redis(redisUrl);
 
   librarySyncQueue = new Queue<LibrarySyncJobData>(QUEUE_NAME, {
     connection: connectionOptions,
@@ -113,6 +154,9 @@ export function startLibrarySyncWorker(): void {
 
         // Execute sync
         const results = await librarySyncService.syncServer(serverId, onProgress);
+
+        // Invalidate library caches after successful sync
+        await invalidateLibraryCaches(serverId);
 
         const duration = Math.round((Date.now() - startTime) / 1000);
         console.log(`[LibrarySync] Job ${job.id} completed in ${duration}s:`, {
@@ -220,8 +264,8 @@ export async function enqueueLibrarySync(serverId: string, userId?: string): Pro
     throw new Error('Library sync queue not initialized');
   }
 
-  // Check for existing active/waiting jobs for this server
-  const activeJobs = await librarySyncQueue.getJobs(['active', 'waiting', 'delayed']);
+  // Only block if there's an active sync running - scheduled jobs shouldn't block manual syncs
+  const activeJobs = await librarySyncQueue.getJobs(['active']);
   const existingJob = activeJobs.find((job) => job.data.serverId === serverId);
 
   if (existingJob) {
@@ -287,6 +331,11 @@ export async function shutdownLibrarySyncQueue(): Promise<void> {
   if (librarySyncQueue) {
     await librarySyncQueue.close();
     librarySyncQueue = null;
+  }
+
+  if (redisClient) {
+    await redisClient.quit();
+    redisClient = null;
   }
 
   console.log('Library sync queue shutdown complete');
