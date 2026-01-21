@@ -1616,15 +1616,15 @@ export interface LibraryStatsResponse {
 // Library Growth Response (GET /library/growth)
 export interface GrowthDataPoint {
   day: string;
-  totalItems: number;
-  totalSizeBytes: string;
+  total: number;
   additions: number;
-  removals: number;
 }
 
 export interface LibraryGrowthResponse {
   period: string;
-  data: GrowthDataPoint[];
+  movies: GrowthDataPoint[];
+  episodes: GrowthDataPoint[];
+  music: GrowthDataPoint[];
 }
 
 // Library Quality Response (GET /library/quality)
@@ -1646,6 +1646,7 @@ export interface QualityDataPoint {
 
 export interface LibraryQualityResponse {
   period: string;
+  mediaType: 'all' | 'movies' | 'shows';
   data: QualityDataPoint[];
 }
 
@@ -1947,4 +1948,109 @@ export interface RoiResponse {
   summary: RoiSummary;
   thresholds: ValueThresholds;
   pagination: { page: number; pageSize: number; total: number };
+}
+
+// Library Top Content Types (GET /library/top-movies, /library/top-shows)
+export interface TopMovie {
+  ratingKey: string;
+  title: string;
+  year: number | null;
+  thumbPath: string | null;
+  serverId: string;
+  totalPlays: number;
+  totalWatchHours: number;
+  uniqueViewers: number;
+  completionRate: number;
+}
+
+export interface TopMoviesSummary {
+  totalMovies: number;
+  totalWatchHours: number;
+}
+
+export interface TopMoviesResponse {
+  items: TopMovie[];
+  summary: TopMoviesSummary;
+  pagination: { page: number; pageSize: number; total: number };
+}
+
+export interface TopShow {
+  showTitle: string;
+  year: number | null;
+  thumbPath: string | null;
+  serverId: string;
+  totalEpisodeViews: number;
+  totalWatchHours: number;
+  uniqueViewers: number;
+  avgCompletionRate: number;
+  bingeScore: number;
+}
+
+export interface TopShowsSummary {
+  totalShows: number;
+  totalWatchHours: number;
+}
+
+export interface TopShowsResponse {
+  items: TopShow[];
+  summary: TopShowsSummary;
+  pagination: { page: number; pageSize: number; total: number };
+}
+
+// ============================================================================
+// Library Codecs Types
+// ============================================================================
+
+/** Single codec entry with count and percentage */
+export interface CodecEntry {
+  codec: string;
+  count: number;
+  percentage: number;
+}
+
+/** Codec breakdown for a category (video, audio, or music) */
+export interface CodecBreakdown {
+  codecs: CodecEntry[];
+  total: number;
+}
+
+/** Response from /library/codecs endpoint */
+export interface LibraryCodecsResponse {
+  /** Video codecs for movies and episodes */
+  video: CodecBreakdown;
+  /** Audio codecs for movies and episodes */
+  audio: CodecBreakdown;
+  /** Audio channel configurations (Stereo, 5.1, 7.1, etc.) for movies and episodes */
+  channels: CodecBreakdown;
+  /** Audio codecs for music tracks */
+  music: CodecBreakdown;
+}
+
+// ============================================================================
+// Library Resolution Types
+// ============================================================================
+
+/** Single resolution entry with count and percentage */
+export interface ResolutionEntry {
+  resolution: string;
+  count: number;
+  percentage: number;
+}
+
+/** Resolution breakdown for a media type */
+export interface ResolutionBreakdown {
+  count4k: number;
+  count1080p: number;
+  count720p: number;
+  countSd: number;
+  total: number;
+  entries: ResolutionEntry[];
+}
+
+/** Response from /library/resolution endpoint */
+export interface LibraryResolutionResponse {
+  /** Resolution breakdown for movies */
+  movies: ResolutionBreakdown;
+  /** Resolution breakdown for TV episodes */
+  tv: ResolutionBreakdown;
 }

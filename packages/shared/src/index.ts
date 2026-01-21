@@ -197,6 +197,18 @@ export type {
   RoiSummary,
   ValueThresholds,
   RoiResponse,
+  TopMovie,
+  TopMoviesSummary,
+  TopMoviesResponse,
+  TopShow,
+  TopShowsSummary,
+  TopShowsResponse,
+  CodecEntry,
+  CodecBreakdown,
+  LibraryCodecsResponse,
+  ResolutionEntry,
+  ResolutionBreakdown,
+  LibraryResolutionResponse,
 } from './types.js';
 
 // Schema exports
@@ -269,6 +281,7 @@ export {
   libraryRoiQuerySchema,
   libraryPatternsQuerySchema,
   libraryCompletionQuerySchema,
+  topContentQuerySchema,
 } from './schemas.js';
 
 // Schema input type exports
@@ -313,6 +326,7 @@ export type {
   LibraryRoiQueryInput,
   LibraryPatternsQueryInput,
   LibraryCompletionQueryInput,
+  TopContentQueryInput,
 } from './schemas.js';
 
 // Constant exports

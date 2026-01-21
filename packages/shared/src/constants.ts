@@ -115,6 +115,10 @@ export const REDIS_KEYS = {
   LIBRARY_ROI: 'tracearr:library:roi',
   LIBRARY_PATTERNS: 'tracearr:library:patterns',
   LIBRARY_COMPLETION: 'tracearr:library:completion',
+  LIBRARY_TOP_MOVIES: 'tracearr:library:top-movies',
+  LIBRARY_TOP_SHOWS: 'tracearr:library:top-shows',
+  LIBRARY_CODECS: 'tracearr:library:codecs',
+  LIBRARY_RESOLUTION: 'tracearr:library:resolution',
 } as const;
 
 // Cache TTLs in seconds
@@ -137,6 +141,10 @@ export const CACHE_TTL = {
   LIBRARY_ROI: 3600, // 1 hour (ROI changes slowly)
   LIBRARY_PATTERNS: 3600, // 1 hour (patterns change slowly)
   LIBRARY_COMPLETION: 300, // 5 minutes
+  LIBRARY_TOP_MOVIES: 300, // 5 minutes
+  LIBRARY_TOP_SHOWS: 300, // 5 minutes
+  LIBRARY_CODECS: 300, // 5 minutes
+  LIBRARY_RESOLUTION: 300, // 5 minutes
 } as const;
 
 // Notification event types (must match NotificationEventType in types.ts)

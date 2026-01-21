@@ -639,6 +639,7 @@ export const libraryGrowthQuerySchema = z.object({
 export const libraryQualityQuerySchema = z.object({
   serverId: z.uuid().optional(),
   period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
+  mediaType: z.enum(['all', 'movies', 'shows']).default('all'),
   timezone: timezoneSchema,
 });
 
@@ -664,7 +665,7 @@ export const libraryDuplicatesQuerySchema = z.object({
 export const libraryStaleQuerySchema = z.object({
   serverId: z.uuid().optional(),
   libraryId: z.uuid().optional(),
-  mediaType: z.enum(['movie', 'episode', 'show']).optional(),
+  mediaType: z.enum(['movie', 'show', 'artist']).optional(),
   staleDays: z.coerce.number().int().min(1).default(90), // Configurable threshold
   category: z.enum(['all', 'never_watched', 'stale']).default('all'),
   sortBy: z.enum(['size', 'days_stale', 'title']).default('size'),
@@ -692,7 +693,7 @@ export const libraryWatchQuerySchema = z.object({
 export const libraryRoiQuerySchema = z.object({
   serverId: uuidSchema.optional(),
   libraryId: z.string().optional(),
-  mediaType: z.enum(['movie', 'episode', 'show', 'all']).default('all'),
+  mediaType: z.enum(['movie', 'show', 'artist', 'all']).default('all'),
   // Filter by value category
   valueCategory: z.enum(['low_value', 'moderate_value', 'high_value', 'all']).default('all'),
   // Time range for watch calculations (affects recency weighting)
@@ -744,6 +745,18 @@ export const libraryCompletionQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().max(100).default(20),
 });
 
+// Library top content query schema (for top movies and top shows endpoints)
+export const topContentQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
+  sortBy: z
+    .enum(['plays', 'watch_hours', 'viewers', 'completion_rate', 'binge_score'])
+    .default('plays'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(50).default(20),
+});
+
 // ============================================================================
 // Type Exports
 // ============================================================================
@@ -758,6 +771,7 @@ export type LibraryWatchQueryInput = z.infer<typeof libraryWatchQuerySchema>;
 export type LibraryRoiQueryInput = z.infer<typeof libraryRoiQuerySchema>;
 export type LibraryPatternsQueryInput = z.infer<typeof libraryPatternsQuerySchema>;
 export type LibraryCompletionQueryInput = z.infer<typeof libraryCompletionQuerySchema>;
+export type TopContentQueryInput = z.infer<typeof topContentQuerySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CallbackInput = z.infer<typeof callbackSchema>;
 export type CreateServerInput = z.infer<typeof createServerSchema>;
