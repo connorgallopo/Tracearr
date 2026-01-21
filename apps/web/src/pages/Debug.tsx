@@ -12,6 +12,10 @@ import {
   RefreshCw,
   Info,
   FileText,
+  Scale,
+  XSquare,
+  Library,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +30,9 @@ interface DebugStats {
     users: number;
     servers: number;
     rules: number;
+    terminationLogs: number;
+    libraryItems: number;
+    plexAccounts: number;
   };
   database: {
     size: string;
@@ -182,7 +189,7 @@ export function Debug() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <Film className="text-muted-foreground h-8 w-8" />
@@ -203,6 +210,15 @@ export function Debug() {
         </Card>
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
+            <Scale className="text-muted-foreground h-8 w-8" />
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.counts.rules ?? '-'}</p>
+              <p className="text-muted-foreground text-xs">Rules</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
             <Users className="text-muted-foreground h-8 w-8" />
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.users ?? '-'}</p>
@@ -216,6 +232,33 @@ export function Debug() {
             <div>
               <p className="text-2xl font-bold">{stats.data?.counts.servers ?? '-'}</p>
               <p className="text-muted-foreground text-xs">Servers</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <Link2 className="text-muted-foreground h-8 w-8" />
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.counts.plexAccounts ?? '-'}</p>
+              <p className="text-muted-foreground text-xs">Plex Accounts</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <XSquare className="text-muted-foreground h-8 w-8" />
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.counts.terminationLogs ?? '-'}</p>
+              <p className="text-muted-foreground text-xs">Terminations</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 p-4">
+            <Library className="text-muted-foreground h-8 w-8" />
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.counts.libraryItems ?? '-'}</p>
+              <p className="text-muted-foreground text-xs">Library Items</p>
             </div>
           </CardContent>
         </Card>
@@ -415,9 +458,30 @@ export function Debug() {
               </Button>
               <Button
                 variant="outline"
+                onClick={() =>
+                  handleDelete('termination-logs', 'Delete all stream termination logs')
+                }
+                disabled={deleteMutation.isPending}
+              >
+                Clear Termination Logs
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  handleDelete('library', 'Delete all library metadata cache (items and snapshots)')
+                }
+                disabled={deleteMutation.isPending}
+              >
+                Clear Library Cache
+              </Button>
+              <Button
+                variant="outline"
                 className="border-destructive/50 text-destructive hover:bg-destructive/10"
                 onClick={() =>
-                  handleDelete('sessions', 'Delete all session history and violations')
+                  handleDelete(
+                    'sessions',
+                    'Delete all session history, violations, and termination logs'
+                  )
                 }
                 disabled={deleteMutation.isPending}
               >
@@ -437,7 +501,7 @@ export function Debug() {
                 onClick={() =>
                   handleDelete(
                     'servers',
-                    'Delete all servers (cascades to users, sessions, violations)'
+                    'Delete all servers (cascades to users, sessions, violations, library data)'
                   )
                 }
                 disabled={deleteMutation.isPending}

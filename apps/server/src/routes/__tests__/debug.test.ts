@@ -202,8 +202,8 @@ describe('Debug Routes', () => {
     it('returns database statistics', async () => {
       app = await buildTestApp(ownerUser);
 
-      // Mock count queries
-      mockDbSelectCounts([100, 25, 50, 3, 10]);
+      // Mock count queries (sessions, violations, users, servers, rules, terminationLogs, libraryItems, plexAccounts)
+      mockDbSelectCounts([100, 25, 50, 3, 10, 5, 1000, 2]);
 
       // Mock execute for database size and table sizes
       mockDbExecute([
@@ -229,6 +229,9 @@ describe('Debug Routes', () => {
         users: 50,
         servers: 3,
         rules: 10,
+        terminationLogs: 5,
+        libraryItems: 1000,
+        plexAccounts: 2,
       });
       expect(body.database.size).toBe('256 MB');
       expect(body.database.tables).toHaveLength(2);
@@ -237,7 +240,7 @@ describe('Debug Routes', () => {
     it('handles empty database', async () => {
       app = await buildTestApp(ownerUser);
 
-      mockDbSelectCounts([0, 0, 0, 0, 0]);
+      mockDbSelectCounts([0, 0, 0, 0, 0, 0, 0, 0]);
       mockDbExecute([{ rows: [{ size: '8 KB' }] }, { rows: [] }]);
 
       const response = await app.inject({
@@ -279,12 +282,15 @@ describe('Debug Routes', () => {
       expect(body.counts.users).toBe(0);
       expect(body.counts.servers).toBe(0);
       expect(body.counts.rules).toBe(0);
+      expect(body.counts.terminationLogs).toBe(0);
+      expect(body.counts.libraryItems).toBe(0);
+      expect(body.counts.plexAccounts).toBe(0);
     });
 
     it('handles missing database size', async () => {
       app = await buildTestApp(ownerUser);
 
-      mockDbSelectCounts([100, 25, 50, 3, 10]);
+      mockDbSelectCounts([100, 25, 50, 3, 10, 5, 1000, 2]);
 
       // Mock execute with empty rows for database size
       mockDbExecute([
@@ -505,10 +511,10 @@ describe('Debug Routes', () => {
       expect(body.success).toBe(true);
       expect(body.message).toContain('Factory reset complete');
 
-      // Verify delete was called 12 times (violations, terminationLogs, sessions, rules,
+      // Verify delete was called 14 times (violations, terminationLogs, sessions, rules,
       // notificationChannelRouting, notificationPreferences, mobileSessions, mobileTokens,
-      // serverUsers, servers, plexAccounts, users)
-      expect(db.delete).toHaveBeenCalledTimes(12);
+      // librarySnapshots, libraryItems, serverUsers, servers, plexAccounts, users)
+      expect(db.delete).toHaveBeenCalledTimes(14);
 
       // Verify settings update was called
       expect(db.update).toHaveBeenCalled();

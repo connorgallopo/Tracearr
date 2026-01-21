@@ -24,6 +24,8 @@ import {
   notificationChannelRouting,
   terminationLogs,
   plexAccounts,
+  libraryItems,
+  librarySnapshots,
 } from '../db/schema.js';
 
 // Gate log explorer feature to supervised deployments only
@@ -102,12 +104,24 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
    * GET /debug/stats - Database statistics
    */
   app.get('/stats', async () => {
-    const [sessionCount, violationCount, userCount, serverCount, ruleCount] = await Promise.all([
+    const [
+      sessionCount,
+      violationCount,
+      userCount,
+      serverCount,
+      ruleCount,
+      terminationLogCount,
+      libraryItemCount,
+      plexAccountCount,
+    ] = await Promise.all([
       db.select({ count: sql<number>`count(*)::int` }).from(sessions),
       db.select({ count: sql<number>`count(*)::int` }).from(violations),
       db.select({ count: sql<number>`count(*)::int` }).from(users),
       db.select({ count: sql<number>`count(*)::int` }).from(servers),
       db.select({ count: sql<number>`count(*)::int` }).from(rules),
+      db.select({ count: sql<number>`count(*)::int` }).from(terminationLogs),
+      db.select({ count: sql<number>`count(*)::int` }).from(libraryItems),
+      db.select({ count: sql<number>`count(*)::int` }).from(plexAccounts),
     ]);
 
     // Get database size
@@ -132,6 +146,9 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
         users: userCount[0]?.count ?? 0,
         servers: serverCount[0]?.count ?? 0,
         rules: ruleCount[0]?.count ?? 0,
+        terminationLogs: terminationLogCount[0]?.count ?? 0,
+        libraryItems: libraryItemCount[0]?.count ?? 0,
+        plexAccounts: plexAccountCount[0]?.count ?? 0,
       },
       database: {
         size: (dbSize.rows[0] as { size: string })?.size ?? 'unknown',
@@ -146,6 +163,10 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
   app.delete('/sessions', async () => {
     // Delete violations first (FK constraint)
     const violationsDeleted = await db.delete(violations).returning({ id: violations.id });
+    // Delete termination logs (references sessions but no FK due to TimescaleDB)
+    const terminationLogsDeleted = await db
+      .delete(terminationLogs)
+      .returning({ id: terminationLogs.id });
     const sessionsDeleted = await db.delete(sessions).returning({ id: sessions.id });
 
     return {
@@ -153,6 +174,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
       deleted: {
         sessions: sessionsDeleted.length,
         violations: violationsDeleted.length,
+        terminationLogs: terminationLogsDeleted.length,
       },
     };
   });
@@ -176,7 +198,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
     const nonOwnerUsers = await db
       .select({ id: users.id })
       .from(users)
-      .where(sql`is_owner = false`);
+      .where(sql`role != 'owner'`);
 
     const userIds = nonOwnerUsers.map((u) => u.id);
 
@@ -184,19 +206,34 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
       return { success: true, deleted: 0 };
     }
 
-    // Build explicit PostgreSQL array literal (Drizzle doesn't auto-convert JS arrays for ANY())
+    // Get serverUser IDs for these users (sessions/violations link to serverUsers, not users)
     const userIdArray = sql.raw(`ARRAY[${userIds.map((id) => `'${id}'::uuid`).join(',')}]`);
+    const serverUserRows = await db
+      .select({ id: serverUsers.id })
+      .from(serverUsers)
+      .where(sql`user_id = ANY(${userIdArray})`);
 
-    // Delete violations for these users
-    await db.delete(violations).where(sql`user_id = ANY(${userIdArray})`);
+    const serverUserIds = serverUserRows.map((su) => su.id);
 
-    // Delete sessions for these users
-    await db.delete(sessions).where(sql`user_id = ANY(${userIdArray})`);
+    if (serverUserIds.length > 0) {
+      const serverUserIdArray = sql.raw(
+        `ARRAY[${serverUserIds.map((id) => `'${id}'::uuid`).join(',')}]`
+      );
 
-    // Delete the users
+      // Delete violations for these server users
+      await db.delete(violations).where(sql`server_user_id = ANY(${serverUserIdArray})`);
+
+      // Delete termination logs for these server users
+      await db.delete(terminationLogs).where(sql`server_user_id = ANY(${serverUserIdArray})`);
+
+      // Delete sessions for these server users
+      await db.delete(sessions).where(sql`server_user_id = ANY(${serverUserIdArray})`);
+    }
+
+    // Delete the users (cascades to serverUsers, plexAccounts, mobileTokens, mobileSessions)
     const deleted = await db
       .delete(users)
-      .where(sql`is_owner = false`)
+      .where(sql`role != 'owner'`)
       .returning({ id: users.id });
 
     return {
@@ -230,6 +267,34 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
   });
 
   /**
+   * DELETE /debug/library - Clear all library data (items and snapshots)
+   */
+  app.delete('/library', async () => {
+    const snapshotsDeleted = await db
+      .delete(librarySnapshots)
+      .returning({ id: librarySnapshots.id });
+    const itemsDeleted = await db.delete(libraryItems).returning({ id: libraryItems.id });
+    return {
+      success: true,
+      deleted: {
+        items: itemsDeleted.length,
+        snapshots: snapshotsDeleted.length,
+      },
+    };
+  });
+
+  /**
+   * DELETE /debug/termination-logs - Clear all termination logs
+   */
+  app.delete('/termination-logs', async () => {
+    const deleted = await db.delete(terminationLogs).returning({ id: terminationLogs.id });
+    return {
+      success: true,
+      deleted: deleted.length,
+    };
+  });
+
+  /**
    * POST /debug/reset - Full factory reset (deletes everything including owner)
    */
   app.post('/reset', async () => {
@@ -243,6 +308,8 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
     await db.delete(notificationPreferences);
     await db.delete(mobileSessions);
     await db.delete(mobileTokens);
+    await db.delete(librarySnapshots); // Library data (references servers)
+    await db.delete(libraryItems); // Library data (references servers)
     await db.delete(serverUsers);
     await db.delete(servers); // servers references plex_accounts
     await db.delete(plexAccounts); // plex_accounts references users
