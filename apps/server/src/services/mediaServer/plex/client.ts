@@ -210,6 +210,46 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     return { items, totalCount };
   }
 
+  /**
+   * Get all leaf items (episodes) from a library section
+   *
+   * For TV show libraries, this returns all episodes across all shows.
+   * Uses the /library/sections/{id}/allLeaves endpoint.
+   *
+   * @param libraryId - Library section ID
+   * @param options - Pagination options
+   * @returns Episodes and total count for pagination tracking
+   */
+  async getLibraryLeaves(
+    libraryId: string,
+    options?: { offset?: number; limit?: number }
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
+    const offset = options?.offset ?? 0;
+    const limit = options?.limit ?? 100;
+
+    const params = new URLSearchParams({
+      includeGuids: '1',
+      'X-Plex-Container-Start': String(offset),
+      'X-Plex-Container-Size': String(limit),
+    });
+
+    const data = await fetchJson<unknown>(
+      `${this.baseUrl}/library/sections/${libraryId}/allLeaves?${params}`,
+      {
+        headers: this.buildHeaders(),
+        service: 'plex',
+        timeout: 30000,
+      }
+    );
+
+    const container = data as { MediaContainer?: { totalSize?: number } };
+    const totalCount = container?.MediaContainer?.totalSize ?? 0;
+
+    const items = parseLibraryItemsResponse(data);
+
+    return { items, totalCount };
+  }
+
   // ==========================================================================
   // IMediaServerClientWithHistory Implementation
   // ==========================================================================

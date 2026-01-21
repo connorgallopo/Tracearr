@@ -287,27 +287,28 @@ export interface MediaLibraryItem {
   /** TVDB numeric ID */
   tvdbId?: number;
 
-  // === Episode-Specific Fields (optional) ===
+  // === Hierarchy Fields (for episodes and tracks) ===
+  // Uses Plex-style naming: grandparent (show/artist), parent (season/album)
+  // For episodes: grandparent=show, parent=season
+  // For tracks: grandparent=artist, parent=album
 
-  /** Parent show title for episodes */
-  showTitle?: string;
+  /** Grandparent title (show name for episodes, artist name for tracks) */
+  grandparentTitle?: string;
 
-  /** Parent show ID */
-  showRatingKey?: string;
+  /** Grandparent rating key (show ID for episodes, artist ID for tracks) */
+  grandparentRatingKey?: string;
 
-  /** Season number */
-  seasonNumber?: number;
+  /** Parent title (season name for episodes, album name for tracks) */
+  parentTitle?: string;
 
-  /** Episode number */
-  episodeNumber?: number;
+  /** Parent rating key (season ID for episodes, album ID for tracks) */
+  parentRatingKey?: string;
 
-  // === Music-Specific Fields (optional) ===
+  /** Parent index (season number for episodes, unused for tracks) */
+  parentIndex?: number;
 
-  /** Artist name for albums/tracks */
-  artistName?: string;
-
-  /** Album name for tracks */
-  albumName?: string;
+  /** Item index (episode number for episodes, track number for tracks) */
+  itemIndex?: number;
 
   // === Debug Field ===
 
@@ -418,6 +419,24 @@ export interface IMediaServerClient {
    * @returns Promise with items array and total count for pagination
    */
   getLibraryItems(
+    libraryId: string,
+    options?: {
+      offset?: number;
+      limit?: number;
+    }
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
+
+  /**
+   * Get all leaf items (episodes) from a library with pagination support
+   *
+   * For TV show libraries, returns all episodes across all shows.
+   * Optional - only implemented by servers that support hierarchical libraries.
+   *
+   * @param libraryId - The library identifier
+   * @param options - Pagination options
+   * @returns Promise with episode items and total count, or undefined if not supported
+   */
+  getLibraryLeaves?(
     libraryId: string,
     options?: {
       offset?: number;

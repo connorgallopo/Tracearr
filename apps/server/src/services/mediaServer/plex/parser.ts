@@ -1403,20 +1403,16 @@ function parseLibraryItem(item: Record<string, unknown>): MediaLibraryItem {
     filePath: parseOptionalString(firstPart?.file),
   };
 
-  // Episode-specific fields
-  if (result.mediaType === 'episode') {
-    result.showTitle = parseOptionalString(item.grandparentTitle);
-    result.showRatingKey = parseOptionalString(item.grandparentRatingKey);
-    result.seasonNumber = parseOptionalNumber(item.parentIndex);
-    result.episodeNumber = parseOptionalNumber(item.index);
-  }
-
-  // Music-specific fields
-  if (result.mediaType === 'track') {
-    result.artistName = parseOptionalString(item.grandparentTitle);
-    result.albumName = parseOptionalString(item.parentTitle);
-  } else if (result.mediaType === 'album') {
-    result.artistName = parseOptionalString(item.parentTitle);
+  // Hierarchy fields for episodes and tracks
+  if (result.mediaType === 'episode' || result.mediaType === 'track') {
+    result.grandparentTitle = parseOptionalString(item.grandparentTitle);
+    result.grandparentRatingKey = parseOptionalString(item.grandparentRatingKey);
+    result.parentTitle = parseOptionalString(item.parentTitle);
+    result.parentRatingKey = parseOptionalString(item.parentRatingKey);
+    result.itemIndex = parseOptionalNumber(item.index);
+    if (result.mediaType === 'episode') {
+      result.parentIndex = parseOptionalNumber(item.parentIndex); // season number
+    }
   }
 
   return result;

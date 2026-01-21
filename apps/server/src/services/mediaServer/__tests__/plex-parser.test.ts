@@ -1359,10 +1359,10 @@ describe('Plex Library Item Parser', () => {
       expect(items).toHaveLength(1);
       const item = items[0]!;
       expect(item.mediaType).toBe('episode');
-      expect(item.showTitle).toBe('Breaking Bad');
-      expect(item.showRatingKey).toBe('11111');
-      expect(item.seasonNumber).toBe(1);
-      expect(item.episodeNumber).toBe(1);
+      expect(item.grandparentTitle).toBe('Breaking Bad');
+      expect(item.grandparentRatingKey).toBe('11111');
+      expect(item.parentIndex).toBe(1);
+      expect(item.itemIndex).toBe(1);
       expect(item.imdbId).toBe('tt0959621');
       expect(item.tmdbId).toBe(62085);
       expect(item.tvdbId).toBe(349232);
@@ -1378,6 +1378,7 @@ describe('Plex Library Item Parser', () => {
               type: 'track',
               grandparentTitle: 'Queen', // Artist
               parentTitle: 'A Night at the Opera', // Album
+              index: 11, // Track number
               addedAt: 1609459200,
               Media: [
                 {
@@ -1396,8 +1397,9 @@ describe('Plex Library Item Parser', () => {
       expect(items).toHaveLength(1);
       const item = items[0]!;
       expect(item.mediaType).toBe('track');
-      expect(item.artistName).toBe('Queen');
-      expect(item.albumName).toBe('A Night at the Opera');
+      expect(item.grandparentTitle).toBe('Queen');
+      expect(item.parentTitle).toBe('A Night at the Opera');
+      expect(item.itemIndex).toBe(11);
       expect(item.audioCodec).toBe('FLAC');
       expect(item.audioChannels).toBe(2);
     });

@@ -635,23 +635,21 @@ export function parseLibraryItem(item: Record<string, unknown>): MediaLibraryIte
     filePath: parseOptionalString(item.Path),
   };
 
-  // Episode-specific fields
+  // Hierarchy fields for episodes and tracks
   if (result.mediaType === 'episode') {
-    result.showTitle = parseOptionalString(item.SeriesName);
-    result.showRatingKey = parseOptionalString(item.SeriesId);
-    result.seasonNumber = parseOptionalNumber(item.ParentIndexNumber);
-    result.episodeNumber = parseOptionalNumber(item.IndexNumber);
-  }
-
-  // Music-specific fields
-  if (result.mediaType === 'track' || result.mediaType === 'album') {
+    result.grandparentTitle = parseOptionalString(item.SeriesName);
+    result.grandparentRatingKey = parseOptionalString(item.SeriesId);
+    result.parentIndex = parseOptionalNumber(item.ParentIndexNumber); // season number
+    result.itemIndex = parseOptionalNumber(item.IndexNumber); // episode number
+  } else if (result.mediaType === 'track') {
     // AlbumArtist is preferred, fall back to first artist in Artists array
     const artists = item.Artists;
     const albumArtist = parseOptionalString(item.AlbumArtist);
     const firstArtist =
       Array.isArray(artists) && artists.length > 0 ? parseOptionalString(artists[0]) : undefined;
-    result.artistName = albumArtist ?? firstArtist;
-    result.albumName = parseOptionalString(item.Album);
+    result.grandparentTitle = albumArtist ?? firstArtist; // artist
+    result.parentTitle = parseOptionalString(item.Album); // album
+    result.itemIndex = parseOptionalNumber(item.IndexNumber); // track number
   }
 
   return result;

@@ -438,10 +438,10 @@ describe('parseLibraryItemsResponse', () => {
     expect(result).toHaveLength(1);
     const item = result[0]!;
     expect(item.mediaType).toBe('episode');
-    expect(item.showTitle).toBe('Show Title');
-    expect(item.showRatingKey).toBe('series789');
-    expect(item.seasonNumber).toBe(2);
-    expect(item.episodeNumber).toBe(5);
+    expect(item.grandparentTitle).toBe('Show Title');
+    expect(item.grandparentRatingKey).toBe('series789');
+    expect(item.parentIndex).toBe(2);
+    expect(item.itemIndex).toBe(5);
     expect(item.tvdbId).toBe(789012);
   });
 
@@ -454,6 +454,7 @@ describe('parseLibraryItemsResponse', () => {
         Album: 'Album Name',
         AlbumArtist: 'Artist Name',
         Artists: ['Artist Name', 'Featured Artist'],
+        IndexNumber: 3,
         DateCreated: '2024-03-10T08:00:00Z',
       },
     ];
@@ -463,8 +464,9 @@ describe('parseLibraryItemsResponse', () => {
     expect(result).toHaveLength(1);
     const item = result[0]!;
     expect(item.mediaType).toBe('track');
-    expect(item.artistName).toBe('Artist Name'); // AlbumArtist preferred
-    expect(item.albumName).toBe('Album Name');
+    expect(item.grandparentTitle).toBe('Artist Name'); // AlbumArtist preferred
+    expect(item.parentTitle).toBe('Album Name');
+    expect(item.itemIndex).toBe(3);
   });
 
   it('falls back to Artists array when no AlbumArtist', () => {
@@ -481,7 +483,7 @@ describe('parseLibraryItemsResponse', () => {
 
     const result = parseLibraryItemsResponse(input);
 
-    expect(result[0]!.artistName).toBe('First Artist');
+    expect(result[0]!.grandparentTitle).toBe('First Artist');
   });
 
   it('returns empty array for non-array input', () => {
