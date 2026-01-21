@@ -20,10 +20,10 @@ interface BingeHighlightsTableProps {
  * Get binge score badge based on score thresholds.
  */
 function getBingeScoreBadge(score: number) {
-  if (score >= 80) return <Badge variant="danger">Binge Master</Badge>;
-  if (score >= 60) return <Badge variant="warning">Heavy Binger</Badge>;
-  if (score >= 40) return <Badge variant="secondary">Casual Binger</Badge>;
-  return <Badge variant="outline">Light Viewer</Badge>;
+  if (score >= 80) return <Badge variant="danger">Highly Addictive</Badge>;
+  if (score >= 60) return <Badge variant="warning">Addictive</Badge>;
+  if (score >= 40) return <Badge variant="secondary">Bingeable</Badge>;
+  return <Badge variant="outline">Casual Watch</Badge>;
 }
 
 /**

@@ -119,4 +119,8 @@ export {
   useLibraryCompletion,
   useLibraryPatterns,
   useLibraryRoi,
+  useTopMovies,
+  useTopShows,
+  useLibraryCodecs,
+  useLibraryResolution,
 } from './useLibrary';

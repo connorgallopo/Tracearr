@@ -46,6 +46,13 @@ export function LibraryStorage() {
   const [duplicatesPage, setDuplicatesPage] = useState(1);
   const [roiPage, setRoiPage] = useState(1);
 
+  // ROI sorting and filtering state
+  const [roiSortBy, setRoiSortBy] = useState<
+    'watch_hours_per_gb' | 'value_score' | 'file_size' | 'title'
+  >('watch_hours_per_gb');
+  const [roiSortOrder, setRoiSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [roiMediaType, setRoiMediaType] = useState<'all' | 'movie' | 'show' | 'artist'>('all');
+
   // Map TimeRangePicker periods to API format
   const apiPeriod = useMemo(() => {
     switch (timeRange.period) {
@@ -65,7 +72,15 @@ export function LibraryStorage() {
   // Core data hooks
   const storage = useLibraryStorage(selectedServerId, null, apiPeriod);
   const duplicates = useLibraryDuplicates(selectedServerId, duplicatesPage, 10);
-  const roi = useLibraryRoi(selectedServerId, null, roiPage, 10);
+  const roi = useLibraryRoi(
+    selectedServerId,
+    null,
+    roiPage,
+    10,
+    roiMediaType === 'all' ? undefined : roiMediaType,
+    roiSortBy,
+    roiSortOrder
+  );
 
   // Fetch stale summary for KPI card (minimal page size since we only need summary)
   const staleSummary = useLibraryStale(selectedServerId, null, 90, 'all', 1, 1);
@@ -228,7 +243,19 @@ export function LibraryStorage() {
             data={roi.data}
             isLoading={roi.isLoading}
             page={roiPage}
-            onPageChange={setRoiPage}
+            onPageChange={(page) => setRoiPage(page)}
+            sortBy={roiSortBy}
+            sortOrder={roiSortOrder}
+            onSortChange={(sortBy, sortOrder) => {
+              setRoiSortBy(sortBy);
+              setRoiSortOrder(sortOrder);
+              setRoiPage(1); // Reset to first page when sort changes
+            }}
+            mediaType={roiMediaType}
+            onMediaTypeChange={(mediaType) => {
+              setRoiMediaType(mediaType);
+              setRoiPage(1); // Reset to first page when filter changes
+            }}
           />
         </CardContent>
       </Card>

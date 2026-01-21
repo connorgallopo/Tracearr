@@ -6,13 +6,13 @@ import { ChartSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/library';
 import { BarChart3 } from 'lucide-react';
 
-// Colorblind-friendly, distinct colors for each quality tier
-// Matches QualityDonutChart for visual consistency
+// Quality-based colors: higher quality = cooler/more vibrant colors
+// Visual hierarchy helps users quickly see quality distribution
 const QUALITY_COLORS = {
-  '4K': 'hsl(262, 83%, 58%)', // Purple - highest quality stands out
-  '1080p': 'hsl(221, 83%, 53%)', // Blue
-  '720p': 'hsl(142, 76%, 36%)', // Green
-  SD: 'hsl(38, 92%, 50%)', // Orange - lowest quality warning
+  '4K': '#10b981', // Emerald green - premium/best
+  '1080p': '#3b82f6', // Blue - good quality
+  '720p': '#f59e0b', // Amber - acceptable
+  SD: '#ef4444', // Red - needs upgrade
 };
 
 interface QualityTimelineChartProps {
@@ -66,8 +66,10 @@ export function QualityTimelineChart({
       xAxis: {
         categories: data.data.map((d) => d.day),
         labels: {
+          enabled: true,
           style: {
             color: 'hsl(var(--muted-foreground))',
+            fontSize: '11px',
           },
           formatter: function () {
             const categories = this.axis.categories;
@@ -79,30 +81,45 @@ export function QualityTimelineChart({
             );
             if (isNaN(date.getTime())) return '';
             if (period === '1y' || period === 'year') {
-              // Short month name for yearly view
-              return date.toLocaleDateString('en-US', { month: 'short' });
+              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }
-            // M/D format for shorter views
-            return `${date.getMonth() + 1}/${date.getDate()}`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
           },
-          step: Math.ceil(data.data.length / 12),
+          rotation: 0,
+          // Show ~6-8 labels regardless of data density
+          step: Math.max(1, Math.floor(data.data.length / 7)),
         },
         lineColor: 'hsl(var(--border))',
         tickColor: 'hsl(var(--border))',
+        tickLength: 5,
         showFirstLabel: true,
         showLastLabel: true,
       },
       yAxis: {
         title: {
-          text: undefined,
+          text: 'Items',
+          style: {
+            color: 'hsl(var(--muted-foreground))',
+            fontSize: '11px',
+          },
         },
         labels: {
           style: {
             color: 'hsl(var(--muted-foreground))',
+            fontSize: '11px',
+          },
+          formatter: function () {
+            // Format large numbers with K suffix
+            const value = this.value as number;
+            if (value >= 1000) {
+              return (value / 1000).toFixed(value >= 10000 ? 0 : 1) + 'K';
+            }
+            return String(value);
           },
         },
         gridLineColor: 'hsl(var(--border))',
         min: 0,
+        reversedStacks: false, // First series (SD) at bottom, last series (4K) at top
       },
       plotOptions: {
         area: {
@@ -136,7 +153,6 @@ export function QualityTimelineChart({
         shared: true,
         formatter: function () {
           const points = this.points || [];
-          // For shared tooltips, get category via the x index
           const xIndex = typeof this.x === 'number' ? this.x : 0;
           const categories = this.points?.[0]?.series.xAxis.categories || [];
           const categoryValue = categories[xIndex] as string | undefined;
@@ -156,14 +172,18 @@ export function QualityTimelineChart({
           let total = 0;
           points.forEach((point) => {
             total += point.y || 0;
-            html += `<br/><span style="color:${point.color}">●</span> ${point.series.name}: ${point.y?.toLocaleString()}`;
           });
-          html += `<br/><b>Total: ${total.toLocaleString()}</b>`;
+          // Show in reverse order (4K first) with percentage
+          [...points].reverse().forEach((point) => {
+            const pct = total > 0 ? (((point.y || 0) / total) * 100).toFixed(1) : '0';
+            html += `<br/><span style="color:${point.color}">●</span> ${point.series.name}: ${point.y?.toLocaleString()} (${pct}%)`;
+          });
+          html += `<br/><b>Total: ${total.toLocaleString()} items</b>`;
           return html;
         },
       },
       // Series order determines visual stacking (bottom to top)
-      // SD at bottom, 4K on top - lower quality forms base, higher quality stacks on top
+      // With reversedStacks: false, first series (SD) at bottom, last series (4K) at top
       series: [
         {
           type: 'area',
@@ -173,8 +193,8 @@ export function QualityTimelineChart({
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, 'hsl(38, 92%, 50% / 0.4)'],
-              [1, 'hsl(38, 92%, 50% / 0.1)'],
+              [0, 'rgba(239, 68, 68, 0.5)'], // Red with opacity
+              [1, 'rgba(239, 68, 68, 0.1)'],
             ],
           },
         },
@@ -186,8 +206,8 @@ export function QualityTimelineChart({
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, 'hsl(142, 76%, 36% / 0.4)'],
-              [1, 'hsl(142, 76%, 36% / 0.1)'],
+              [0, 'rgba(245, 158, 11, 0.5)'], // Amber with opacity
+              [1, 'rgba(245, 158, 11, 0.1)'],
             ],
           },
         },
@@ -199,8 +219,8 @@ export function QualityTimelineChart({
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, 'hsl(221, 83%, 53% / 0.4)'],
-              [1, 'hsl(221, 83%, 53% / 0.1)'],
+              [0, 'rgba(59, 130, 246, 0.5)'], // Blue with opacity
+              [1, 'rgba(59, 130, 246, 0.1)'],
             ],
           },
         },
@@ -212,8 +232,8 @@ export function QualityTimelineChart({
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, 'hsl(262, 83%, 58% / 0.4)'],
-              [1, 'hsl(262, 83%, 58% / 0.1)'],
+              [0, 'rgba(16, 185, 129, 0.5)'], // Emerald with opacity
+              [1, 'rgba(16, 185, 129, 0.1)'],
             ],
           },
         },

@@ -61,6 +61,10 @@ import type {
   CompletionResponse,
   PatternsResponse,
   RoiResponse,
+  TopMoviesResponse,
+  TopShowsResponse,
+  LibraryCodecsResponse,
+  LibraryResolutionResponse,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -948,11 +952,15 @@ class ApiClient {
       params.set('timezone', getBrowserTimezone());
       return this.request<LibraryGrowthResponse>(`/library/growth?${params.toString()}`);
     },
-    quality: (serverId?: string, libraryId?: string, period: string = '30d') => {
+    quality: (
+      serverId?: string,
+      period: string = '30d',
+      mediaType: 'all' | 'movies' | 'shows' = 'all'
+    ) => {
       const params = new URLSearchParams();
       if (serverId) params.set('serverId', serverId);
-      if (libraryId) params.set('libraryId', libraryId);
       params.set('period', period);
+      params.set('mediaType', mediaType);
       params.set('timezone', getBrowserTimezone());
       return this.request<LibraryQualityResponse>(`/library/quality?${params.toString()}`);
     },
@@ -975,15 +983,23 @@ class ApiClient {
       serverId?: string,
       libraryId?: string,
       staleDays: number = 90,
+      category: 'all' | 'never_watched' | 'stale' = 'all',
       page: number = 1,
-      pageSize: number = 20
+      pageSize: number = 20,
+      mediaType?: 'movie' | 'show' | 'artist',
+      sortBy: 'size' | 'title' | 'days_stale' = 'size',
+      sortOrder: 'asc' | 'desc' = 'desc'
     ) => {
       const params = new URLSearchParams();
       if (serverId) params.set('serverId', serverId);
       if (libraryId) params.set('libraryId', libraryId);
       params.set('staleDays', String(staleDays));
+      params.set('category', category);
       params.set('page', String(page));
       params.set('pageSize', String(pageSize));
+      if (mediaType) params.set('mediaType', mediaType);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
       return this.request<StaleResponse>(`/library/stale?${params.toString()}`);
     },
     watch: (serverId?: string, libraryId?: string, page: number = 1, pageSize: number = 20) => {
@@ -999,7 +1015,8 @@ class ApiClient {
       libraryId?: string,
       aggregateLevel: string = 'item',
       page: number = 1,
-      pageSize: number = 20
+      pageSize: number = 20,
+      mediaType?: 'movie' | 'episode'
     ) => {
       const params = new URLSearchParams();
       if (serverId) params.set('serverId', serverId);
@@ -1007,6 +1024,7 @@ class ApiClient {
       params.set('aggregateLevel', aggregateLevel);
       params.set('page', String(page));
       params.set('pageSize', String(pageSize));
+      if (mediaType) params.set('mediaType', mediaType);
       return this.request<CompletionResponse>(`/library/completion?${params.toString()}`);
     },
     patterns: (serverId?: string, libraryId?: string, periodWeeks: number = 12) => {
@@ -1017,14 +1035,71 @@ class ApiClient {
       params.set('timezone', getBrowserTimezone());
       return this.request<PatternsResponse>(`/library/patterns?${params.toString()}`);
     },
-    roi: (serverId?: string, libraryId?: string, page: number = 1, pageSize: number = 20) => {
+    roi: (
+      serverId?: string,
+      libraryId?: string,
+      page: number = 1,
+      pageSize: number = 20,
+      mediaType?: 'movie' | 'show' | 'artist',
+      sortBy: 'watch_hours_per_gb' | 'value_score' | 'file_size' | 'title' = 'watch_hours_per_gb',
+      sortOrder: 'asc' | 'desc' = 'asc'
+    ) => {
       const params = new URLSearchParams();
       if (serverId) params.set('serverId', serverId);
       if (libraryId) params.set('libraryId', libraryId);
       params.set('page', String(page));
       params.set('pageSize', String(pageSize));
+      if (mediaType) params.set('mediaType', mediaType);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
       params.set('timezone', getBrowserTimezone());
       return this.request<RoiResponse>(`/library/roi?${params.toString()}`);
+    },
+    topMovies: (
+      serverId?: string,
+      period: string = '30d',
+      sortBy: string = 'plays',
+      sortOrder: string = 'desc',
+      page: number = 1,
+      pageSize: number = 20
+    ) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      params.set('period', period);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<TopMoviesResponse>(`/library/top-movies?${params.toString()}`);
+    },
+    topShows: (
+      serverId?: string,
+      period: string = '30d',
+      sortBy: string = 'plays',
+      sortOrder: string = 'desc',
+      page: number = 1,
+      pageSize: number = 20
+    ) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      params.set('period', period);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      return this.request<TopShowsResponse>(`/library/top-shows?${params.toString()}`);
+    },
+    codecs: (serverId?: string, libraryId?: string) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      return this.request<LibraryCodecsResponse>(`/library/codecs?${params.toString()}`);
+    },
+    resolution: (serverId?: string, libraryId?: string) => {
+      const params = new URLSearchParams();
+      if (serverId) params.set('serverId', serverId);
+      if (libraryId) params.set('libraryId', libraryId);
+      return this.request<LibraryResolutionResponse>(`/library/resolution?${params.toString()}`);
     },
   };
 

@@ -1,7 +1,14 @@
-import { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, BarChart } from 'lucide-react';
+import { Film, Tv, Music, ArrowUpDown, ArrowUp, ArrowDown, BarChart } from 'lucide-react';
 import type { RoiResponse } from '@tracearr/shared';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -12,99 +19,197 @@ import {
 } from '@/components/ui/table';
 import { ValueCategoryBadge, EmptyState } from '@/components/library';
 
-type SortField = 'watchHoursPerGb' | 'fileSizeGb' | 'totalWatchHours';
-type SortDir = 'asc' | 'desc';
+type SortBy = 'watch_hours_per_gb' | 'value_score' | 'file_size' | 'title';
+type SortOrder = 'asc' | 'desc';
+type MediaTypeFilter = 'all' | 'movie' | 'show' | 'artist';
+
+/**
+ * Badge component for media type (Movie, TV, Music)
+ */
+function MediaTypeBadge({ mediaType }: { mediaType: string }) {
+  switch (mediaType) {
+    case 'movie':
+      return (
+        <Badge variant="secondary" className="gap-1">
+          <Film className="h-3 w-3" />
+          Movie
+        </Badge>
+      );
+    case 'show':
+      return (
+        <Badge variant="secondary" className="gap-1 bg-blue-500/10 text-blue-500">
+          <Tv className="h-3 w-3" />
+          TV
+        </Badge>
+      );
+    case 'artist':
+      return (
+        <Badge variant="secondary" className="gap-1 bg-purple-500/10 text-purple-500">
+          <Music className="h-3 w-3" />
+          Music
+        </Badge>
+      );
+    default:
+      return null;
+  }
+}
 
 interface RoiTableProps {
   data: RoiResponse | undefined;
   isLoading?: boolean;
   page: number;
   onPageChange: (page: number) => void;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
+  onSortChange: (sortBy: SortBy, sortOrder: SortOrder) => void;
+  mediaType: MediaTypeFilter;
+  onMediaTypeChange: (mediaType: MediaTypeFilter) => void;
 }
 
 /**
  * Table component for displaying ROI (Return on Investment) analysis.
- * Sortable by watch hours, file size, and hours per GB.
+ * Server-side sortable by watch hours, file size, hours per GB, and title.
  */
-export function RoiTable({ data, isLoading, page, onPageChange }: RoiTableProps) {
-  const [sortField, setSortField] = useState<SortField>('watchHoursPerGb');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+export function RoiTable({
+  data,
+  isLoading,
+  page,
+  onPageChange,
+  sortBy,
+  sortOrder,
+  onSortChange,
+  mediaType,
+  onMediaTypeChange,
+}: RoiTableProps) {
+  const handleSort = (field: SortBy) => {
+    if (sortBy === field) {
+      onSortChange(field, sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default sort direction: title asc, others asc (low value first)
+      onSortChange(field, field === 'title' ? 'asc' : 'asc');
+    }
+  };
 
-  // Client-side sorting (data already paginated from API)
-  const sortedItems = useMemo(() => {
-    if (!data?.items) return [];
-    return [...data.items].sort((a, b) => {
-      const aVal = a[sortField] ?? 0;
-      const bVal = b[sortField] ?? 0;
-      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
-    });
-  }, [data?.items, sortField, sortDir]);
+  const SortIcon = ({ field }: { field: SortBy }) => {
+    if (sortBy !== field) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
+    return sortOrder === 'asc' ? (
+      <ArrowUp className="h-4 w-4" />
+    ) : (
+      <ArrowDown className="h-4 w-4" />
+    );
+  };
 
   if (isLoading) {
     return (
-      <div className="flex h-48 items-center justify-center">
-        <div className="text-muted-foreground">Loading ROI data...</div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-end">
+          <Select value={mediaType} onValueChange={(v) => onMediaTypeChange(v as MediaTypeFilter)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="movie">Movies</SelectItem>
+              <SelectItem value="show">TV Shows</SelectItem>
+              <SelectItem value="artist">Music</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex h-48 items-center justify-center">
+          <div className="text-muted-foreground">Loading ROI data...</div>
+        </div>
       </div>
     );
   }
 
   if (!data?.items?.length) {
     return (
-      <EmptyState
-        icon={BarChart}
-        title="No ROI data available"
-        description="ROI analysis requires watch history data to calculate content value."
-      />
+      <div className="space-y-4">
+        <div className="flex items-center justify-end">
+          <Select value={mediaType} onValueChange={(v) => onMediaTypeChange(v as MediaTypeFilter)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="movie">Movies</SelectItem>
+              <SelectItem value="show">TV Shows</SelectItem>
+              <SelectItem value="artist">Music</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <EmptyState
+          icon={BarChart}
+          title="No ROI data available"
+          description="ROI analysis requires watch history data to calculate content value."
+        />
+      </div>
     );
   }
 
   const totalPages = Math.ceil(data.pagination.total / data.pagination.pageSize);
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortDir('asc');
-    }
-  };
-
-  const SortableHeader = ({ field, label }: { field: SortField; label: string }) => {
-    const isActive = sortField === field;
-    return (
-      <TableHead className="cursor-pointer select-none" onClick={() => handleSort(field)}>
-        <div className="flex items-center gap-1">
-          {label}
-          {isActive &&
-            (sortDir === 'asc' ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            ))}
-        </div>
-      </TableHead>
-    );
-  };
-
   return (
     <div className="space-y-4">
+      {/* Filter controls */}
+      <div className="flex items-center justify-end">
+        <Select value={mediaType} onValueChange={(v) => onMediaTypeChange(v as MediaTypeFilter)}>
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="movie">Movies</SelectItem>
+            <SelectItem value="show">TV Shows</SelectItem>
+            <SelectItem value="artist">Music</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Title</TableHead>
-            <SortableHeader field="fileSizeGb" label="Size" />
-            <SortableHeader field="totalWatchHours" label="Watch Hours" />
-            <SortableHeader field="watchHoursPerGb" label="Hours/GB" />
+            <TableHead>
+              <button
+                className="hover:text-foreground flex items-center gap-1"
+                onClick={() => handleSort('title')}
+              >
+                Title
+                <SortIcon field="title" />
+              </button>
+            </TableHead>
+            <TableHead>
+              <button
+                className="hover:text-foreground flex items-center gap-1"
+                onClick={() => handleSort('file_size')}
+              >
+                Size
+                <SortIcon field="file_size" />
+              </button>
+            </TableHead>
+            <TableHead>Watch Hours</TableHead>
+            <TableHead>
+              <button
+                className="hover:text-foreground flex items-center gap-1"
+                onClick={() => handleSort('watch_hours_per_gb')}
+              >
+                Hours/GB
+                <SortIcon field="watch_hours_per_gb" />
+              </button>
+            </TableHead>
             <TableHead>Value</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedItems.map((item) => (
+          {data.items.map((item) => (
             <TableRow key={item.id}>
               <TableCell>
-                <div>
-                  <span className="font-medium">{item.title}</span>
-                  {item.year && <span className="text-muted-foreground ml-1">({item.year})</span>}
+                <div className="flex items-center gap-2">
+                  <MediaTypeBadge mediaType={item.mediaType} />
+                  <div>
+                    <span className="font-medium">{item.title}</span>
+                    {item.year && <span className="text-muted-foreground ml-1">({item.year})</span>}
+                  </div>
                 </div>
               </TableCell>
               <TableCell>{item.fileSizeGb.toFixed(1)} GB</TableCell>

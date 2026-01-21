@@ -20,6 +20,10 @@ import type {
   CompletionResponse,
   PatternsResponse,
   RoiResponse,
+  TopMoviesResponse,
+  TopShowsResponse,
+  LibraryCodecsResponse,
+  LibraryResolutionResponse,
 } from '@tracearr/shared';
 
 // 5 minutes - library data is updated once daily
@@ -54,17 +58,18 @@ export function useLibraryGrowth(
 }
 
 /**
- * Fetch library quality evolution (resolution/codec breakdown over time)
+ * Fetch library quality evolution (resolution breakdown over time)
+ * @param mediaType - Filter by media type: 'all' | 'movies' | 'shows'
  */
 export function useLibraryQuality(
   serverId?: string | null,
-  libraryId?: string | null,
-  period: string = '30d'
+  period: string = '30d',
+  mediaType: 'all' | 'movies' | 'shows' = 'all'
 ) {
   const timezone = getBrowserTimezone();
   return useQuery<LibraryQualityResponse>({
-    queryKey: ['library', 'quality', serverId, libraryId, period, timezone],
-    queryFn: () => api.library.quality(serverId ?? undefined, libraryId ?? undefined, period),
+    queryKey: ['library', 'quality', serverId, period, mediaType, timezone],
+    queryFn: () => api.library.quality(serverId ?? undefined, period, mediaType),
     staleTime: LIBRARY_STALE_TIME,
   });
 }
@@ -107,13 +112,39 @@ export function useLibraryStale(
   serverId?: string | null,
   libraryId?: string | null,
   staleDays: number = 90,
+  category: 'all' | 'never_watched' | 'stale' = 'all',
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
+  mediaType?: 'movie' | 'show' | 'artist',
+  sortBy: 'size' | 'title' | 'days_stale' = 'size',
+  sortOrder: 'asc' | 'desc' = 'desc'
 ) {
   return useQuery<StaleResponse>({
-    queryKey: ['library', 'stale', serverId, libraryId, staleDays, page, pageSize],
+    queryKey: [
+      'library',
+      'stale',
+      serverId,
+      libraryId,
+      staleDays,
+      category,
+      page,
+      pageSize,
+      mediaType,
+      sortBy,
+      sortOrder,
+    ],
     queryFn: () =>
-      api.library.stale(serverId ?? undefined, libraryId ?? undefined, staleDays, page, pageSize),
+      api.library.stale(
+        serverId ?? undefined,
+        libraryId ?? undefined,
+        staleDays,
+        category,
+        page,
+        pageSize,
+        mediaType,
+        sortBy,
+        sortOrder
+      ),
     staleTime: LIBRARY_STALE_TIME,
   });
 }
@@ -142,17 +173,28 @@ export function useLibraryCompletion(
   libraryId?: string | null,
   aggregateLevel: string = 'item',
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
+  mediaType?: 'movie' | 'episode'
 ) {
   return useQuery<CompletionResponse>({
-    queryKey: ['library', 'completion', serverId, libraryId, aggregateLevel, page, pageSize],
+    queryKey: [
+      'library',
+      'completion',
+      serverId,
+      libraryId,
+      aggregateLevel,
+      page,
+      pageSize,
+      mediaType,
+    ],
     queryFn: () =>
       api.library.completion(
         serverId ?? undefined,
         libraryId ?? undefined,
         aggregateLevel,
         page,
-        pageSize
+        pageSize,
+        mediaType
       ),
     staleTime: LIBRARY_STALE_TIME,
   });
@@ -181,12 +223,95 @@ export function useLibraryRoi(
   serverId?: string | null,
   libraryId?: string | null,
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
+  mediaType?: 'movie' | 'show' | 'artist',
+  sortBy: 'watch_hours_per_gb' | 'value_score' | 'file_size' | 'title' = 'watch_hours_per_gb',
+  sortOrder: 'asc' | 'desc' = 'asc'
 ) {
   const timezone = getBrowserTimezone();
   return useQuery<RoiResponse>({
-    queryKey: ['library', 'roi', serverId, libraryId, page, pageSize, timezone],
-    queryFn: () => api.library.roi(serverId ?? undefined, libraryId ?? undefined, page, pageSize),
+    queryKey: [
+      'library',
+      'roi',
+      serverId,
+      libraryId,
+      page,
+      pageSize,
+      mediaType,
+      sortBy,
+      sortOrder,
+      timezone,
+    ],
+    queryFn: () =>
+      api.library.roi(
+        serverId ?? undefined,
+        libraryId ?? undefined,
+        page,
+        pageSize,
+        mediaType,
+        sortBy,
+        sortOrder
+      ),
+    staleTime: LIBRARY_STALE_TIME,
+  });
+}
+
+/**
+ * Fetch top movies by engagement metrics
+ */
+export function useTopMovies(
+  serverId?: string | null,
+  period: string = '30d',
+  sortBy: string = 'plays',
+  sortOrder: string = 'desc',
+  page: number = 1,
+  pageSize: number = 20
+) {
+  return useQuery<TopMoviesResponse>({
+    queryKey: ['library', 'top-movies', serverId, period, sortBy, sortOrder, page, pageSize],
+    queryFn: () =>
+      api.library.topMovies(serverId ?? undefined, period, sortBy, sortOrder, page, pageSize),
+    staleTime: LIBRARY_STALE_TIME,
+  });
+}
+
+/**
+ * Fetch top TV shows by engagement metrics
+ */
+export function useTopShows(
+  serverId?: string | null,
+  period: string = '30d',
+  sortBy: string = 'plays',
+  sortOrder: string = 'desc',
+  page: number = 1,
+  pageSize: number = 20
+) {
+  return useQuery<TopShowsResponse>({
+    queryKey: ['library', 'top-shows', serverId, period, sortBy, sortOrder, page, pageSize],
+    queryFn: () =>
+      api.library.topShows(serverId ?? undefined, period, sortBy, sortOrder, page, pageSize),
+    staleTime: LIBRARY_STALE_TIME,
+  });
+}
+
+/**
+ * Fetch codec distribution for library items
+ */
+export function useLibraryCodecs(serverId?: string | null, libraryId?: string | null) {
+  return useQuery<LibraryCodecsResponse>({
+    queryKey: ['library', 'codecs', serverId, libraryId],
+    queryFn: () => api.library.codecs(serverId ?? undefined, libraryId ?? undefined),
+    staleTime: LIBRARY_STALE_TIME,
+  });
+}
+
+/**
+ * Fetch resolution distribution for library items (movies vs TV)
+ */
+export function useLibraryResolution(serverId?: string | null, libraryId?: string | null) {
+  return useQuery<LibraryResolutionResponse>({
+    queryKey: ['library', 'resolution', serverId, libraryId],
+    queryFn: () => api.library.resolution(serverId ?? undefined, libraryId ?? undefined),
     staleTime: LIBRARY_STALE_TIME,
   });
 }

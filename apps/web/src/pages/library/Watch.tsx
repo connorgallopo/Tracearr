@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Eye, Clock, CheckCircle2, Flame, BarChart3 } from 'lucide-react';
 import { StatCard, formatWatchTime } from '@/components/ui/stat-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import {
   ErrorState,
   EmptyState,
-  CompletionTable,
   BingeHighlightsTable,
+  MostWatchedSection,
 } from '@/components/library';
 import {
-  WatchCountChart,
   CompletionDonutChart,
   HourlyDistributionChart,
   MonthlyTrendChart,
@@ -34,12 +32,12 @@ function formatPeakDay(day: number | undefined): string {
 export function LibraryWatch() {
   const { selectedServerId } = useServer();
 
-  // Watch data for KPIs and watch count chart
-  const [watchPage, setWatchPage] = useState(1);
-  const watch = useLibraryWatch(selectedServerId, null, watchPage, 20);
+  // Watch data for KPIs
+  const watch = useLibraryWatch(selectedServerId, null, 1, 20);
 
-  // Completion data for donut chart summary (just first page for counts)
-  const completionSummary = useLibraryCompletion(selectedServerId, null, 'item', 1, 1);
+  // Completion data by media type for donut charts
+  const movieCompletion = useLibraryCompletion(selectedServerId, null, 'item', 1, 1, 'movie');
+  const tvCompletion = useLibraryCompletion(selectedServerId, null, 'item', 1, 1, 'episode');
 
   // Patterns data for hourly/monthly charts, peak times, binge shows
   const patterns = useLibraryPatterns(selectedServerId, null, 12); // 12 weeks = ~3 months
@@ -85,9 +83,10 @@ export function LibraryWatch() {
     );
   }
 
-  // Extract completion summary data for the donut chart
-  const completionData = completionSummary.data;
-  const completionSummaryData = completionData?.summary;
+  // Extract completion summary data for the donut charts
+  const movieSummary = movieCompletion.data?.summary;
+  const tvSummary = tvCompletion.data?.summary;
+  const totalCompleted = (movieSummary?.completedCount ?? 0) + (tvSummary?.completedCount ?? 0);
 
   return (
     <div className="space-y-6">
@@ -112,9 +111,9 @@ export function LibraryWatch() {
         <StatCard
           icon={CheckCircle2}
           label="Completed"
-          value={`${completionSummaryData?.completedCount ?? 0}`}
+          value={`${totalCompleted}`}
           subValue="items"
-          isLoading={completionSummary.isLoading}
+          isLoading={movieCompletion.isLoading || tvCompletion.isLoading}
         />
         <StatCard
           icon={Flame}
@@ -125,91 +124,43 @@ export function LibraryWatch() {
         />
       </div>
 
-      {/* Watch Count Chart - Full Width */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium">Most Watched</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <WatchCountChart
-            data={watch.data?.items}
-            isLoading={watch.isLoading}
-            height={250}
-            limit={10}
-          />
-        </CardContent>
-      </Card>
+      {/* Most Watched Section with Movies/Shows Tabs */}
+      <MostWatchedSection serverId={selectedServerId} />
 
-      {/* Completion Section - Two Columns */}
+      {/* Completion Section - Two Columns (Movies / TV) */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Left: Completion Donut */}
+        {/* Left: Movies Completion */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Completion Status</CardTitle>
+            <CardTitle className="text-base font-medium">Movies</CardTitle>
           </CardHeader>
           <CardContent>
             <CompletionDonutChart
-              completed={completionSummaryData?.completedCount ?? 0}
-              inProgress={completionSummaryData?.inProgressCount ?? 0}
-              notStarted={completionSummaryData?.notStartedCount ?? 0}
-              isLoading={completionSummary.isLoading}
+              completed={movieSummary?.completedCount ?? 0}
+              inProgress={movieSummary?.inProgressCount ?? 0}
+              notStarted={movieSummary?.notStartedCount ?? 0}
+              isLoading={movieCompletion.isLoading}
               height={220}
             />
           </CardContent>
         </Card>
 
-        {/* Right: Completion Summary Stats */}
+        {/* Right: TV Shows Completion */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Completion Breakdown</CardTitle>
+            <CardTitle className="text-base font-medium">TV Shows</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Summary counts */}
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-green-500">
-                  {completionSummaryData?.completedCount ?? 0}
-                </p>
-                <p className="text-muted-foreground text-sm">Completed</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-orange-500">
-                  {completionSummaryData?.inProgressCount ?? 0}
-                </p>
-                <p className="text-muted-foreground text-sm">In Progress</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-2xl font-bold">
-                  {completionSummaryData?.notStartedCount ?? 0}
-                </p>
-                <p className="text-muted-foreground text-sm">Not Started</p>
-              </div>
-            </div>
-            {/* Average completion */}
-            {completionSummaryData && (
-              <div className="border-t pt-4 text-center">
-                <p className="text-lg font-medium">
-                  {completionSummaryData.overallCompletionPct.toFixed(0)}%
-                </p>
-                <p className="text-muted-foreground text-sm">Average Completion</p>
-              </div>
-            )}
+          <CardContent>
+            <CompletionDonutChart
+              completed={tvSummary?.completedCount ?? 0}
+              inProgress={tvSummary?.inProgressCount ?? 0}
+              notStarted={tvSummary?.notStartedCount ?? 0}
+              isLoading={tvCompletion.isLoading}
+              height={220}
+            />
           </CardContent>
         </Card>
       </div>
-
-      {/* Completion Table - Full Width */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-medium">Completion Details</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Track progress at item, season, or series level
-          </p>
-        </CardHeader>
-        <CardContent>
-          <CompletionTable serverId={selectedServerId} libraryId={null} />
-        </CardContent>
-      </Card>
 
       {/* Viewing Patterns Section - Two Columns */}
       <div className="grid gap-6 md:grid-cols-2">

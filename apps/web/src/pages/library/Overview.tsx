@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { Database, HardDrive, Film, Tv, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
+import { Database, HardDrive, Film, Tv, Calendar, TrendingUp } from 'lucide-react';
+import type { GrowthDataPoint } from '@tracearr/shared';
 import { StatCard, formatNumber } from '@/components/ui/stat-card';
 import { LibraryStatsSkeleton } from '@/components/ui/skeleton';
 import { TimeRangePicker } from '@/components/ui/time-range-picker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorState, EmptyState } from '@/components/library';
-import { LibraryGrowthChart, QualityDonutChart } from '@/components/charts';
+import { LibraryGrowthChart } from '@/components/charts';
 import { useLibraryStats, useLibraryGrowth } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
 import { useTimeRange } from '@/hooks/useTimeRange';
@@ -57,7 +58,7 @@ export function LibraryOverview() {
       case 'year':
         return '1y';
       case 'all':
-        return '1y'; // Default to 1y for "all" since growth data has limits
+        return 'all';
       default:
         return '30d';
     }
@@ -67,23 +68,19 @@ export function LibraryOverview() {
 
   // Calculate period changes from growth data
   const periodChanges = useMemo(() => {
-    if (!growth.data?.data || growth.data.data.length < 2) {
-      return { items: 0, additions: 0, removals: 0 };
+    if (!growth.data) {
+      return { movies: 0, episodes: 0, music: 0, total: 0 };
     }
 
-    const data = growth.data.data;
-    // Length >= 2 guaranteed by check above
-    const firstDay = data[0]!;
-    const lastDay = data[data.length - 1]!;
+    // Sum additions from each media type
+    const sumAdditions = (series: GrowthDataPoint[] | undefined) =>
+      series?.reduce((sum, d) => sum + d.additions, 0) ?? 0;
 
-    // Net change in items
-    const itemsChange = lastDay.totalItems - firstDay.totalItems;
+    const movies = sumAdditions(growth.data.movies);
+    const episodes = sumAdditions(growth.data.episodes);
+    const music = sumAdditions(growth.data.music);
 
-    // Sum of additions and removals in period
-    const additions = data.reduce((sum, d) => sum + d.additions, 0);
-    const removals = data.reduce((sum, d) => sum + d.removals, 0);
-
-    return { items: itemsChange, additions, removals };
+    return { movies, episodes, music, total: movies + episodes + music };
   }, [growth.data]);
 
   // Period label for display
@@ -96,7 +93,7 @@ export function LibraryOverview() {
       case 'year':
         return 'this year';
       case 'all':
-        return 'this year';
+        return 'all time';
       default:
         return 'this period';
     }
@@ -163,9 +160,7 @@ export function LibraryOverview() {
 
   // Format period change for display
   const periodChangeLabel =
-    periodChanges.items !== 0
-      ? `${periodChanges.items > 0 ? '+' : ''}${formatNumber(periodChanges.items)} ${periodLabel}`
-      : undefined;
+    periodChanges.total > 0 ? `+${formatNumber(periodChanges.total)} ${periodLabel}` : undefined;
 
   return (
     <div className="space-y-6">
@@ -182,8 +177,8 @@ export function LibraryOverview() {
         <TimeRangePicker value={timeRange} onChange={setTimeRange} />
       </div>
 
-      {/* KPI Cards Grid - 6 columns on desktop, 3 on tablet, 2 on mobile */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {/* KPI Cards Grid - 5 columns on desktop, 3 on tablet, 2 on mobile */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard
           icon={Database}
           label="Total Items"
@@ -202,46 +197,26 @@ export function LibraryOverview() {
         <StatCard
           icon={TrendingUp}
           label="Added"
-          value={`+${formatNumber(periodChanges.additions)}`}
-          subValue={periodLabel}
-          isLoading={growth.isLoading}
-        />
-        <StatCard
-          icon={TrendingDown}
-          label="Removed"
-          value={formatNumber(periodChanges.removals)}
+          value={`+${formatNumber(periodChanges.total)}`}
           subValue={periodLabel}
           isLoading={growth.isLoading}
         />
       </div>
 
-      {/* Charts grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Library Growth */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Library Growth</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LibraryGrowthChart
-              data={growth.data}
-              isLoading={growth.isLoading}
-              height={250}
-              period={timeRange.period}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Quality Breakdown */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Quality Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <QualityDonutChart data={stats.qualityBreakdown} isLoading={isLoading} height={250} />
-          </CardContent>
-        </Card>
-      </div>
+      {/* Library Growth */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-medium">Library Growth</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LibraryGrowthChart
+            data={growth.data}
+            isLoading={growth.isLoading}
+            height={250}
+            period={timeRange.period}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
