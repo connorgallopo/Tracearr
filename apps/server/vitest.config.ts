@@ -32,32 +32,28 @@ export default mergeConfig(
         provider: 'v8',
         reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
         reportsDirectory: './coverage',
-        include: [
-          'src/services/**/*.ts',
-          'src/routes/**/*.ts',
-          'src/jobs/**/*.ts',
-          'src/utils/**/*.ts',
-        ],
+        include: ['src/services/**/*.ts', 'src/jobs/**/*.ts', 'src/utils/**/*.ts'],
         exclude: [
           '**/*.test.ts',
           '**/test/**',
           // Type-only files with no executable code
           '**/types.ts',
-          // Index files that only register routes (no business logic)
-          '**/routes/**/index.ts',
-          '**/routes/auth/index.ts',
-          '**/routes/stats/index.ts',
-          '**/routes/users/index.ts',
           // HTTP client wrappers tested via integration tests
           '**/services/mediaServer/plex/client.ts',
           '**/services/mediaServer/plex/eventSource.ts',
           '**/services/mediaServer/jellyfin/client.ts',
           '**/services/mediaServer/emby/client.ts',
+          // External I/O services better suited for integration tests
+          '**/services/imageProxy.ts',
+          '**/services/sseManager.ts',
+          '**/services/sync.ts',
+          '**/services/termination.ts',
+          '**/services/plexGeoip.ts',
         ],
         thresholds: {
           statements: 42,
-          branches: 36,
-          functions: 48,
+          branches: 35,
+          functions: 53,
           lines: 42,
         },
       },

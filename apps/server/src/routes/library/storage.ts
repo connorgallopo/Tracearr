@@ -251,14 +251,24 @@ export const libraryStorageRoute: FastifyPluginAsync = async (app) => {
       };
 
       // Calculate growth rate using linear regression
-      const dataPoints: DataPoint[] = rows.map((row, index) => ({
-        x: index,
+      // Use actual day offsets from first data point to handle gaps correctly
+      const firstDate = rows.length > 0 ? new Date(rows[0].day).getTime() : 0;
+      const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+      const dataPoints: DataPoint[] = rows.map((row) => ({
+        x: Math.round((new Date(row.day).getTime() - firstDate) / MS_PER_DAY),
         y: Number(row.total_size_bytes),
       }));
 
       const regression = linearRegression(dataPoints);
 
-      // slope is bytes per day (each x increment = 1 day)
+      // Calculate actual days spanned (not row count) for data quality checks
+      const MIN_DATA_DAYS = 7;
+      const lastDataPoint = dataPoints[dataPoints.length - 1];
+      const lastDayOffset = lastDataPoint?.x ?? 0;
+      const actualDaysSpanned = lastDayOffset + 1; // +1 because day 0 counts as 1 day
+
+      // slope is bytes per day (x is now actual days elapsed)
       const bytesPerDay = regression.slope;
       const growthRate = {
         bytesPerDay: Math.round(bytesPerDay).toString(),
@@ -266,32 +276,26 @@ export const libraryStorageRoute: FastifyPluginAsync = async (app) => {
         bytesPerMonth: Math.round(bytesPerDay * 30).toString(),
       };
 
-      // Predictions require minimum 7 days of data
-      const MIN_DATA_DAYS = 7;
-      const currentDataDays = rows.length;
-
       let predictions: LibraryStorageResponse['predictions'];
 
-      if (currentDataDays < MIN_DATA_DAYS) {
+      if (actualDaysSpanned < MIN_DATA_DAYS) {
         predictions = {
           day30: null,
           day90: null,
           day365: null,
           confidence: null,
           minDataDays: MIN_DATA_DAYS,
-          currentDataDays,
-          message: `Predictions require at least ${MIN_DATA_DAYS} days of data. Currently have ${currentDataDays} days.`,
+          currentDataDays: actualDaysSpanned,
+          message: `Predictions require at least ${MIN_DATA_DAYS} days of data. Currently have ${actualDaysSpanned} days.`,
         };
       } else {
-        const lastX = currentDataDays - 1; // 0-indexed
-
         predictions = {
-          day30: calculatePrediction(regression, 30, lastX),
-          day90: calculatePrediction(regression, 90, lastX),
-          day365: calculatePrediction(regression, 365, lastX),
+          day30: calculatePrediction(regression, 30, lastDayOffset),
+          day90: calculatePrediction(regression, 90, lastDayOffset),
+          day365: calculatePrediction(regression, 365, lastDayOffset),
           confidence: getConfidenceLevel(regression.r2),
           minDataDays: MIN_DATA_DAYS,
-          currentDataDays,
+          currentDataDays: actualDaysSpanned,
         };
       }
 

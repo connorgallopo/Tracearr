@@ -92,16 +92,19 @@ export function useLibraryStorage(
 
 /**
  * Fetch cross-server duplicate detection results
+ * @param enabled - Set to false to skip fetching (e.g., when only one server exists)
  */
 export function useLibraryDuplicates(
   serverId?: string | null,
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
+  enabled: boolean = true
 ) {
   return useQuery<DuplicatesResponse>({
     queryKey: ['library', 'duplicates', serverId, page, pageSize],
     queryFn: () => api.library.duplicates(serverId ?? undefined, page, pageSize),
     staleTime: LIBRARY_STALE_TIME,
+    enabled,
   });
 }
 

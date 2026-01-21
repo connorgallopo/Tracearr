@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { HardDrive, TrendingUp, Copy, Archive } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
-import { TimeRangePicker } from '@/components/ui/time-range-picker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -19,7 +18,6 @@ import {
   useLibraryRoi,
 } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
-import { useTimeRange } from '@/hooks/useTimeRange';
 
 /**
  * Format bytes to human-readable size (TB/GB)
@@ -39,39 +37,24 @@ function formatBytes(bytesStr: string | number | null | undefined): string {
 }
 
 export function LibraryStorage() {
-  const { selectedServerId } = useServer();
-  const { value: timeRange, setValue: setTimeRange } = useTimeRange();
+  const { selectedServerId, servers } = useServer();
 
   // Pagination state for tables
   const [duplicatesPage, setDuplicatesPage] = useState(1);
   const [roiPage, setRoiPage] = useState(1);
 
-  // ROI sorting and filtering state
+  // ROI sorting and filtering state - default to high ROI first
   const [roiSortBy, setRoiSortBy] = useState<
     'watch_hours_per_gb' | 'value_score' | 'file_size' | 'title'
   >('watch_hours_per_gb');
-  const [roiSortOrder, setRoiSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [roiSortOrder, setRoiSortOrder] = useState<'asc' | 'desc'>('desc');
   const [roiMediaType, setRoiMediaType] = useState<'all' | 'movie' | 'show' | 'artist'>('all');
 
-  // Map TimeRangePicker periods to API format
-  const apiPeriod = useMemo(() => {
-    switch (timeRange.period) {
-      case 'week':
-        return '7d';
-      case 'month':
-        return '30d';
-      case 'year':
-        return '1y';
-      case 'all':
-        return '1y'; // Default to 1y for "all" since API has limits
-      default:
-        return '30d';
-    }
-  }, [timeRange.period]);
-
-  // Core data hooks
-  const storage = useLibraryStorage(selectedServerId, null, apiPeriod);
-  const duplicates = useLibraryDuplicates(selectedServerId, duplicatesPage, 10);
+  // Core data hooks - use all available history for storage trends
+  const storage = useLibraryStorage(selectedServerId, null, 'all');
+  // Only fetch duplicates when multiple servers exist (cross-server feature)
+  const hasMultipleServers = servers.length > 1;
+  const duplicates = useLibraryDuplicates(selectedServerId, duplicatesPage, 10, hasMultipleServers);
   const roi = useLibraryRoi(
     selectedServerId,
     null,
@@ -93,14 +76,9 @@ export function LibraryStorage() {
 
   // Header component (used in all states)
   const header = (
-    <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-2xl font-bold">Storage</h1>
-        <p className="text-muted-foreground text-sm">
-          Storage usage, predictions, and optimization
-        </p>
-      </div>
-      <TimeRangePicker value={timeRange} onChange={setTimeRange} />
+    <div>
+      <h1 className="text-2xl font-bold">Storage</h1>
+      <p className="text-muted-foreground text-sm">Storage usage, predictions, and optimization</p>
     </div>
   );
 
@@ -147,7 +125,18 @@ export function LibraryStorage() {
         <StatCard
           icon={TrendingUp}
           label="Growth Rate"
-          value={`+${formatBytes(storage.data?.growthRate.bytesPerMonth)}/mo`}
+          value={
+            storage.data?.predictions.currentDataDays &&
+            storage.data.predictions.currentDataDays < (storage.data.predictions.minDataDays ?? 7)
+              ? 'Insufficient data'
+              : `+${formatBytes(storage.data?.growthRate.bytesPerMonth)}/mo`
+          }
+          subValue={
+            storage.data?.predictions.currentDataDays &&
+            storage.data.predictions.currentDataDays < (storage.data.predictions.minDataDays ?? 7)
+              ? `${storage.data.predictions.currentDataDays} of ${storage.data.predictions.minDataDays} days`
+              : undefined
+          }
           isLoading={storage.isLoading}
         />
         <StatCard
@@ -191,21 +180,23 @@ export function LibraryStorage() {
         </CardContent>
       </Card>
 
-      {/* Duplicates Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-medium">Cross-Server Duplicates</CardTitle>
-          <p className="text-muted-foreground text-sm">Content that exists on multiple servers</p>
-        </CardHeader>
-        <CardContent>
-          <DuplicatesTable
-            data={duplicates.data}
-            isLoading={duplicates.isLoading}
-            page={duplicatesPage}
-            onPageChange={setDuplicatesPage}
-          />
-        </CardContent>
-      </Card>
+      {/* Duplicates Section - only show when multiple servers exist */}
+      {hasMultipleServers && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-medium">Cross-Server Duplicates</CardTitle>
+            <p className="text-muted-foreground text-sm">Content that exists on multiple servers</p>
+          </CardHeader>
+          <CardContent>
+            <DuplicatesTable
+              data={duplicates.data}
+              isLoading={duplicates.isLoading}
+              page={duplicatesPage}
+              onPageChange={setDuplicatesPage}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stale Content Section */}
       <Card>
