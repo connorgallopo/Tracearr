@@ -347,6 +347,7 @@ export const sessions = pgTable(
     index('sessions_device_idx').on(table.serverUserId, table.deviceId),
     index('sessions_reference_idx').on(table.referenceId), // For session grouping queries
     index('sessions_server_user_rating_idx').on(table.serverUserId, table.ratingKey), // For resume detection
+    index('sessions_server_rating_idx').on(table.serverId, table.ratingKey), // For library item joins (watch/stale/roi)
     // Index for Tautulli import deduplication fallback (when externalSessionId not found)
     index('sessions_dedup_fallback_idx').on(
       table.serverId,
@@ -871,6 +872,15 @@ export const libraryItems = pgTable(
 
     // Unique constraint to prevent duplicates (one rating_key per server)
     uniqueIndex('library_items_server_rating_key_unique').on(table.serverId, table.ratingKey),
+
+    // Composite index for media type filtering (used by nearly all library routes)
+    index('idx_library_items_server_media_type').on(table.serverId, table.mediaType),
+
+    // Composite index for growth queries (created_at range filtering with server context)
+    index('idx_library_items_server_created').on(table.serverId, table.createdAt),
+
+    // GIN trigram index for fuzzy duplicate detection (requires pg_trgm extension)
+    index('idx_library_items_title_trgm').using('gin', sql`${table.title} gin_trgm_ops`),
   ]
 );
 
