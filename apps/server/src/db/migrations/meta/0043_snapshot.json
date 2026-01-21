@@ -1,5 +1,5 @@
 {
-  "id": "b083cd38-9ad0-4150-be9c-ee44a100e0b3",
+  "id": "f56b7920-1ad8-42d8-947f-3a96edc02606",
   "prevId": "6d5c7b80-cb7c-43d2-a820-9dc182707225",
   "version": "7",
   "dialect": "postgresql",
@@ -87,6 +87,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "audio_channels": {
+          "name": "audio_channels",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "file_size": {
           "name": "file_size",
           "type": "bigint",
@@ -96,6 +102,42 @@
         "file_path": {
           "name": "file_path",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grandparent_title": {
+          "name": "grandparent_title",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grandparent_rating_key": {
+          "name": "grandparent_rating_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_title": {
+          "name": "parent_title",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_rating_key": {
+          "name": "parent_rating_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_index": {
+          "name": "parent_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "item_index": {
+          "name": "item_index",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },

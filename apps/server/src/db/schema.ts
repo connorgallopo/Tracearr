@@ -834,10 +834,21 @@ export const libraryItems = pgTable(
     videoResolution: varchar('video_resolution', { length: 20 }), // '4k', '1080p', '720p', 'sd'
     videoCodec: varchar('video_codec', { length: 50 }), // 'hevc', 'h264', 'av1'
     audioCodec: varchar('audio_codec', { length: 50 }),
+    audioChannels: integer('audio_channels'), // 2 (stereo), 6 (5.1), 8 (7.1)
     fileSize: bigint('file_size', { mode: 'number' }), // Bytes
 
     // Debug only - never used for matching (file paths differ across servers)
     filePath: text('file_path'),
+
+    // Hierarchy fields for episodes and tracks (Plex-style naming)
+    // For episodes: grandparent=show, parent=season, item_index=episode#, parent_index=season#
+    // For tracks: grandparent=artist, parent=album, item_index=track#
+    grandparentTitle: varchar('grandparent_title', { length: 500 }),
+    grandparentRatingKey: varchar('grandparent_rating_key', { length: 255 }),
+    parentTitle: varchar('parent_title', { length: 500 }),
+    parentRatingKey: varchar('parent_rating_key', { length: 255 }),
+    parentIndex: integer('parent_index'), // season number for episodes
+    itemIndex: integer('item_index'), // episode number or track number
 
     // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
