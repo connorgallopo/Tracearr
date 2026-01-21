@@ -61,8 +61,8 @@ export function LibraryWatch() {
           title="Failed to load watch analytics"
           message={watch.error?.message ?? patterns.error?.message ?? 'Could not fetch watch data.'}
           onRetry={() => {
-            watch.refetch();
-            patterns.refetch();
+            void watch.refetch();
+            void patterns.refetch();
           }}
         />
       </div>

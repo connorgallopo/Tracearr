@@ -588,7 +588,7 @@ describe('LibrarySyncService', () => {
       });
 
       mockInsertChain([{ id: randomUUID() }]);
-      const deleteChain = mockDeleteChain();
+      const _deleteChain = mockDeleteChain();
       mockMediaServerClient({
         libraries: mockLibraries,
         items: serverItems,

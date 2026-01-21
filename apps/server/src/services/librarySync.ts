@@ -9,7 +9,7 @@
  * 5. Report progress via callback for real-time updates
  */
 
-import { eq, and, sql, inArray } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { servers, libraryItems, librarySnapshots } from '../db/schema.js';
 import { createMediaServerClient, type MediaLibraryItem } from './mediaServer/index.js';

@@ -21,7 +21,7 @@ import { libraryStatsRoutes } from './library/index.js';
 
 // Validation schemas
 const serverIdParamSchema = z.object({
-  serverId: z.string().uuid(),
+  serverId: z.uuid(),
 });
 
 export const libraryRoutes: FastifyPluginAsync = async (app) => {

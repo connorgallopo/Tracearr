@@ -111,6 +111,9 @@ import { servers } from './db/schema.js';
 const PORT = parseInt(process.env.PORT ?? '3000', 10);
 const HOST = process.env.HOST ?? '0.0.0.0';
 
+// WebSocket subscriber - module level so it can be cleaned up in onClose hook
+let wsSubscriber: Redis | null = null;
+
 async function buildApp(options: { trustProxy?: boolean } = {}) {
   const app = Fastify({
     logger: {
@@ -358,6 +361,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     }
     stopImageCacheCleanup();
     await pubSubRedis.quit();
+    if (wsSubscriber) await wsSubscriber.quit();
     stopPoller();
     await sseManager.stop();
     stopSSEProcessor();
@@ -492,7 +496,7 @@ async function start() {
 
     // Set up Redis pub/sub to forward events to WebSocket clients
     const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
-    const wsSubscriber = new Redis(redisUrl);
+    wsSubscriber = new Redis(redisUrl);
 
     void wsSubscriber.subscribe(REDIS_KEYS.PUBSUB_EVENTS, (err) => {
       if (err) {
@@ -552,11 +556,6 @@ async function start() {
       } catch (err) {
         app.log.error({ err, message }, 'Failed to process pub/sub message');
       }
-    });
-
-    // Note: WebSocket subscriber cleanup is handled in Fastify's onClose hook
-    app.addHook('onClose', async () => {
-      await wsSubscriber.quit();
     });
 
     // Start session poller after server is listening (uses DB settings)

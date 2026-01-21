@@ -505,7 +505,7 @@ export function mapJellyfinType(
 /**
  * Convert video dimensions to resolution string
  */
-export function getResolutionString(width?: number, height?: number): string | undefined {
+export function getResolutionString(width?: number, _height?: number): string | undefined {
   if (!width || width <= 0) return undefined;
 
   if (width >= 3840) return '4k';

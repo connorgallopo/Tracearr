@@ -91,7 +91,7 @@ interface RawHourlyRow {
 }
 
 /** Raw peak row from database */
-interface RawPeakRow {
+interface _RawPeakRow {
   peak_hour: string;
   peak_day_of_week: string;
 }

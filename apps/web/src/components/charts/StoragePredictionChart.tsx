@@ -218,6 +218,7 @@ export function StoragePredictionChart({
         },
         shared: true,
         formatter: function () {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
           const date = new Date(this.x as number);
           const dateStr = date.toLocaleDateString('en-US', {
             month: 'short',

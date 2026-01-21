@@ -12,7 +12,6 @@ import {
   getResolutionString,
   extractQuality,
   parseLibraryDate,
-  parseLibraryItem,
   parseLibraryItemsResponse,
 } from '../jellyfinEmbyParser.js';
 

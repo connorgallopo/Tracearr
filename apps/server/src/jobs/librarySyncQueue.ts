@@ -229,10 +229,10 @@ export async function scheduleAutoSync(): Promise<void> {
     return;
   }
 
-  // Remove existing repeatable jobs first (in case servers changed)
-  const repeatableJobs = await librarySyncQueue.getRepeatableJobs();
-  for (const repeatJob of repeatableJobs) {
-    await librarySyncQueue.removeRepeatableByKey(repeatJob.key);
+  // Remove existing job schedulers first (in case servers changed)
+  const schedulers = await librarySyncQueue.getJobSchedulers();
+  for (const scheduler of schedulers) {
+    await librarySyncQueue.removeJobScheduler(scheduler.key);
   }
 
   // Add repeatable job for each server

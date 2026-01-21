@@ -8,13 +8,7 @@ import { PlexCallback } from '@/pages/PlexCallback';
 import { Setup } from '@/pages/Setup';
 import { Dashboard } from '@/pages/Dashboard';
 import { Map } from '@/pages/Map';
-import {
-  StatsActivity,
-  StatsLibrary,
-  StatsUsers,
-  StatsDevices,
-  StatsBandwidth,
-} from '@/pages/stats';
+import { StatsActivity, StatsUsers, StatsDevices, StatsBandwidth } from '@/pages/stats';
 import { LibraryOverview, LibraryQuality, LibraryStorage, LibraryWatch } from '@/pages/library';
 import { Users } from '@/pages/Users';
 import { UserDetail } from '@/pages/UserDetail';
