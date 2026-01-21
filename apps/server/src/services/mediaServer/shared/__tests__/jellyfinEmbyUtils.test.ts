@@ -12,6 +12,7 @@ import {
   extractMusicMetadata,
   shouldFilterItem,
   extractStreamDetails,
+  getBitrate,
 } from '../jellyfinEmbyUtils.js';
 import { calculateProgress } from '../parserUtils.js';
 
@@ -731,5 +732,65 @@ describe('extractStreamDetails', () => {
       expect(result.sourceAudioCodec).toBe('AC3');
       expect(result.sourceAudioChannels).toBe(6);
     });
+  });
+});
+
+// ============================================================================
+// getBitrate Tests
+// ============================================================================
+
+describe('getBitrate', () => {
+  it('returns TranscodingInfo.Bitrate when available', () => {
+    const session = {
+      TranscodingInfo: { Bitrate: 8000000 }, // 8 Mbps in bps
+    };
+    expect(getBitrate(session)).toBe(8000); // 8000 kbps
+  });
+
+  it('falls back to MediaSources[0].Bitrate', () => {
+    const session = {
+      NowPlayingItem: {
+        MediaSources: [{ Bitrate: 20000000 }], // 20 Mbps in bps
+      },
+    };
+    expect(getBitrate(session)).toBe(20000); // 20000 kbps
+  });
+
+  it('falls back to video stream BitRate', () => {
+    const session = {
+      NowPlayingItem: {
+        MediaStreams: [
+          { Type: 'Video', BitRate: 15000000 }, // 15 Mbps in bps
+        ],
+      },
+    };
+    expect(getBitrate(session)).toBe(15000); // 15000 kbps
+  });
+
+  it('falls back to NowPlayingItem.Bitrate (Emby)', () => {
+    const session = {
+      NowPlayingItem: {
+        Bitrate: 10000000, // 10 Mbps in bps
+      },
+    };
+    expect(getBitrate(session)).toBe(10000); // 10000 kbps
+  });
+
+  it('calculates bitrate from file size and duration when not explicitly provided', () => {
+    // 1 hour video (36,000,000,000 ticks = 1 hour)
+    // 4.5 GB file = 4,500,000,000 bytes
+    // Expected bitrate: (4,500,000,000 * 8 * 10000) / 36,000,000,000 = 10000 kbps
+    const session = {
+      NowPlayingItem: {
+        RunTimeTicks: 36000000000, // 1 hour in ticks
+        MediaSources: [{ Size: 4500000000 }], // 4.5 GB
+      },
+    };
+    expect(getBitrate(session)).toBe(10000); // 10 Mbps
+  });
+
+  it('returns 0 when no bitrate info available', () => {
+    const session = { NowPlayingItem: {} };
+    expect(getBitrate(session)).toBe(0);
   });
 });

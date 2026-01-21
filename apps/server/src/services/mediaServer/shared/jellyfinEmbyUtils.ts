@@ -150,6 +150,19 @@ export function getBitrate(session: Record<string, unknown>): number {
   const itemBitrate = parseNumber(nowPlaying?.Bitrate);
   if (itemBitrate > 0) return Math.round(itemBitrate / 1000);
 
+  // Final fallback: Calculate from file size and duration
+  // This helps for Direct Play sessions where bitrate isn't explicitly provided
+  const fileSize =
+    Array.isArray(mediaSources) && mediaSources.length > 0
+      ? parseNumber((mediaSources[0] as Record<string, unknown>)?.Size)
+      : 0;
+  const runTimeTicks = parseNumber(nowPlaying?.RunTimeTicks);
+  if (fileSize > 0 && runTimeTicks > 0) {
+    // fileSize in bytes, runTimeTicks in ticks (10,000,000 ticks = 1 second)
+    // bitrate (kbps) = (fileSize * 8 * 10,000) / runTimeTicks
+    return Math.round((fileSize * 8 * 10000) / runTimeTicks);
+  }
+
   return 0;
 }
 

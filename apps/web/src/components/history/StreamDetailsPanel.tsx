@@ -557,7 +557,7 @@ export function StreamDetailsPanel({
       )}
 
       {/* Overall bitrate */}
-      {bitrate && (
+      {!!bitrate && (
         <div className="flex justify-between border-t pt-1 text-sm">
           <span className="text-muted-foreground">Total Bitrate</span>
           <span className="font-medium">{formatBitrate(bitrate)}</span>
