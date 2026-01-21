@@ -18,6 +18,7 @@ vi.mock('../../db/client.js', () => ({
     select: vi.fn(),
     insert: vi.fn(),
     delete: vi.fn(),
+    transaction: vi.fn(),
   },
 }));
 
@@ -128,6 +129,27 @@ function mockDeleteChain() {
   return chain;
 }
 
+function mockTransaction() {
+  // Create a mock tx object with insert chain
+  const insertChain = {
+    values: vi.fn().mockReturnThis(),
+    onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
+  };
+  const deleteChain = {
+    where: vi.fn().mockResolvedValue(undefined),
+  };
+  const tx = {
+    insert: vi.fn().mockReturnValue(insertChain),
+    delete: vi.fn().mockReturnValue(deleteChain),
+  };
+  // Transaction executes the callback with tx and returns its result
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  vi.mocked(db.transaction).mockImplementation(async (callback: any) => {
+    return callback(tx);
+  });
+  return { tx, insertChain, deleteChain };
+}
+
 function mockMediaServerClient(options: {
   libraries?: ReturnType<typeof createMockLibrary>[];
   items?: MediaLibraryItem[];
@@ -213,6 +235,7 @@ describe('LibrarySyncService', () => {
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
+      mockTransaction();
       mockMediaServerClient({
         libraries: mockLibraries,
         items: mockItems,
@@ -266,6 +289,7 @@ describe('LibrarySyncService', () => {
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
+      mockTransaction();
       mockMediaServerClient({
         libraries: mockLibraries,
         items: mockItems,
@@ -292,11 +316,11 @@ describe('LibrarySyncService', () => {
         createMockLibraryItem({ ratingKey: 'item-2', title: 'Movie 2' }),
       ];
 
-      const insertChain = mockInsertChain([]);
+      const { tx, insertChain } = mockTransaction();
 
       await service.upsertItems(serverId, libraryId, items);
 
-      expect(db.insert).toHaveBeenCalled();
+      expect(tx.insert).toHaveBeenCalled();
       expect(insertChain.values).toHaveBeenCalled();
       expect(insertChain.onConflictDoUpdate).toHaveBeenCalled();
     });
@@ -330,11 +354,11 @@ describe('LibrarySyncService', () => {
         filePath: '/movies/test.mkv',
       });
 
-      const insertChain = mockInsertChain([]);
+      const { insertChain } = mockTransaction();
 
       await service.upsertItems(serverId, libraryId, [item]);
 
-      expect(insertChain.values).toHaveBeenCalledWith(
+      expect(insertChain.values).toHaveBeenCalledWith([
         expect.objectContaining({
           serverId,
           libraryId,
@@ -350,8 +374,8 @@ describe('LibrarySyncService', () => {
           tmdbId: 12345,
           tvdbId: 67890,
           filePath: '/movies/test.mkv',
-        })
-      );
+        }),
+      ]);
     });
   });
 
@@ -536,6 +560,7 @@ describe('LibrarySyncService', () => {
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
+      mockTransaction();
       mockMediaServerClient({
         libraries: mockLibraries,
         items: serverItems,
@@ -588,7 +613,8 @@ describe('LibrarySyncService', () => {
       });
 
       mockInsertChain([{ id: randomUUID() }]);
-      const _deleteChain = mockDeleteChain();
+      mockDeleteChain();
+      mockTransaction();
       mockMediaServerClient({
         libraries: mockLibraries,
         items: serverItems,
