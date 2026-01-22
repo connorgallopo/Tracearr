@@ -2,7 +2,7 @@
 # Runs TimescaleDB, Redis, and Tracearr in a single container
 # Ideal for simple deployments, Unraid, Synology, etc.
 
-FROM node:22-bookworm-slim AS builder
+FROM node:25-bookworm-slim AS builder
 
 # Build arguments for version info
 ARG APP_VERSION=0.0.0
