@@ -23,7 +23,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "i18next": "^25.7.4",
+    "i18next": "^25.8.0",
     "react-i18next": "^16.5.3"
   },
   "devDependencies": {

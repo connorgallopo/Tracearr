@@ -31,7 +31,7 @@
     "@react-navigation/drawer": "^7.7.13",
     "@react-navigation/native": "7.1.28",
     "@shopify/react-native-skia": "^2.4.14",
-    "@tanstack/react-query": "5.90.18",
+    "@tanstack/react-query": "5.90.19",
     "@tracearr/shared": "workspace:*",
     "axios": "^1.12.0",
     "buffer": "^6.0.3",

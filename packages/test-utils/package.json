@@ -52,7 +52,7 @@
     "ioredis": "^5.9.2",
     "ioredis-mock": "^8.9.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.17.1"
+    "pg": "^8.17.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.7",
