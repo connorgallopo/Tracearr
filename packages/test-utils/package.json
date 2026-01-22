@@ -58,7 +58,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/pg": "^8.16.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "vitest": "^4.0.0"
