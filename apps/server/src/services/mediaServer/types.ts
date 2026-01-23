@@ -13,6 +13,7 @@ import type {
   StreamAudioDetails,
   TranscodeInfo,
   SubtitleInfo,
+  WatchedItem,
 } from '@tracearr/shared';
 
 // ============================================================================
@@ -196,6 +197,8 @@ export interface MediaUser {
   isDisabled?: boolean;
   /** Plex-specific: whether this is a home/managed user */
   isHomeUser?: boolean;
+  /** Plex-specific: server-specific access token for shared users (from shared_servers endpoint) */
+  serverToken?: string;
   /** Library IDs this user has access to (empty = all libraries) */
   sharedLibraries?: string[];
   /** Last login timestamp */
@@ -455,6 +458,63 @@ export interface IMediaServerClientWithHistory extends IMediaServerClient {
    * @param options - Optional filters for history retrieval
    */
   getWatchHistory(options?: { userId?: string; limit?: number }): Promise<MediaWatchHistoryItem[]>;
+}
+
+/**
+ * Extended client interface with watch sync support
+ * Used for cross-server watch status synchronization (Jellyplex-watched style)
+ */
+export interface IMediaServerClientWithWatchSync extends IMediaServerClient {
+  /**
+   * Get all watched items for a user (movies and episodes)
+   *
+   * @param userId - Server user ID (externalId for Plex, user GUID for Jellyfin/Emby)
+   * @param options - Optional filters
+   * @param options.userToken - Plex-specific: user's server access token for per-user watch status.
+   *                           Required for Plex shared users. Ignored by Jellyfin/Emby.
+   * @returns Array of watched items with provider IDs for matching
+   */
+  getWatchedItems(
+    userId: string,
+    options?: {
+      includeInProgress?: boolean;
+      includeUnwatched?: boolean;
+      libraryIds?: string[];
+      userToken?: string;
+    }
+  ): Promise<WatchedItem[]>;
+
+  /**
+   * Mark an item as watched (completed)
+   *
+   * @param userId - Server user ID
+   * @param itemId - Server-specific item ID (ratingKey for Plex, item GUID for Jellyfin/Emby)
+   * @param viewedAt - Optional timestamp when item was watched
+   * @param userToken - Plex-specific: user's server access token. Ignored by Jellyfin/Emby.
+   * @returns true if successful
+   */
+  markWatched(
+    userId: string,
+    itemId: string,
+    viewedAt?: Date,
+    userToken?: string
+  ): Promise<boolean>;
+
+  /**
+   * Update playback progress for partial watches
+   *
+   * @param userId - Server user ID
+   * @param itemId - Server-specific item ID
+   * @param progressMs - Current playback position in milliseconds
+   * @param userToken - Plex-specific: user's server access token. Ignored by Jellyfin/Emby.
+   * @returns true if successful
+   */
+  updateProgress(
+    userId: string,
+    itemId: string,
+    progressMs: number,
+    userToken?: string
+  ): Promise<boolean>;
 }
 
 // ============================================================================

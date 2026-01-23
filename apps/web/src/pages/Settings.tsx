@@ -75,6 +75,7 @@ import { toast } from 'sonner';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { NotificationAgentsManager } from '@/components/settings/notification-agents';
 import { JobsSettings } from '@/components/settings/JobsSettings';
+import { WatchSyncSettings } from '@/components/settings/WatchSyncSettings';
 import { useTheme, ACCENT_PRESETS } from '@/components/theme-provider';
 import { PlexAccountsManager } from '@/components/settings/PlexAccountsManager';
 import { ImportProgressCard, FileDropzone, type ImportProgressData } from '@/components/import';
@@ -130,6 +131,7 @@ function SettingsNav() {
     { href: '/settings/access', label: 'Access Control' },
     { href: '/settings/mobile', label: 'Mobile' },
     { href: '/settings/import', label: 'Import' },
+    { href: '/settings/watch-sync', label: 'Watch Sync' },
     { href: '/settings/jobs', label: 'Jobs' },
   ];
 
@@ -3002,6 +3004,7 @@ export function Settings() {
         <Route path="access" element={<AccessSettings />} />
         <Route path="mobile" element={<MobileSettings />} />
         <Route path="import" element={<ImportSettings />} />
+        <Route path="watch-sync" element={<WatchSyncSettings />} />
         <Route path="jobs" element={<JobsSettings />} />
       </Routes>
     </div>

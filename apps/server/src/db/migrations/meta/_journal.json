@@ -316,6 +316,20 @@
       "when": 1769030759925,
       "tag": "0044_keen_karnak",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1769100000000,
+      "tag": "0045_dusty_dracula",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1769186678074,
+      "tag": "0046_fuzzy_sunfire",
+      "breakpoints": true
     }
   ]
 }

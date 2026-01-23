@@ -748,6 +748,7 @@ export interface ServerToClientEvents {
   'version:update': (data: { current: string; latest: string; releaseUrl: string }) => void;
   'server:down': (data: { serverId: string; serverName: string }) => void;
   'server:up': (data: { serverId: string; serverName: string }) => void;
+  'watch-sync:progress': (progress: WatchSyncProgress) => void;
 }
 
 export interface ClientToServerEvents {
@@ -2089,3 +2090,201 @@ export interface LibraryResolutionResponse {
   /** Resolution breakdown for TV episodes */
   tv: ResolutionBreakdown;
 }
+
+// =============================================================================
+// Watch Sync Types (cross-server watch status synchronization)
+// =============================================================================
+
+/**
+ * Watch sync configuration (per server pair)
+ */
+export interface WatchSyncConfig {
+  id: string;
+  sourceServerId: string;
+  sourceServerName?: string;
+  targetServerId: string;
+  targetServerName?: string;
+  enabled: boolean;
+  /** SAFETY: true by default - no writes until explicitly disabled */
+  dryRun: boolean;
+  syncMovies: boolean;
+  syncShows: boolean;
+  syncInProgress: boolean;
+  intervalMinutes: number;
+  lastSyncAt: Date | null;
+  lastSyncResult: WatchSyncResult | null;
+  createdAt?: Date;
+}
+
+/**
+ * User mapping for cross-server user matching
+ */
+export interface WatchSyncUserMapping {
+  id: string;
+  configId: string;
+  sourceServerUserId: string;
+  sourceUsername?: string;
+  targetServerUserId: string;
+  targetUsername?: string;
+  enabled: boolean;
+  /** True if source is Plex user missing serverToken (needs server sync) */
+  sourceMissingToken?: boolean;
+  /** True if target is Plex user missing serverToken (needs server sync) */
+  targetMissingToken?: boolean;
+}
+
+/**
+ * Watched item from a media server - used for sync matching
+ */
+export interface WatchedItem {
+  // Provider IDs for matching (from server metadata)
+  imdbId?: string;
+  tmdbId?: number;
+  tvdbId?: number;
+  // File names for path-based matching (basenames, no directories)
+  fileNames?: string[];
+  // Fallback matching
+  title: string;
+  type: 'movie' | 'episode';
+  year?: number;
+  // Episode info
+  showTitle?: string;
+  showImdbId?: string;
+  showTmdbId?: number;
+  showTvdbId?: number;
+  seasonNumber?: number;
+  episodeNumber?: number;
+  // Watch state
+  completed: boolean;
+  progressMs: number;
+  totalDurationMs?: number;
+  viewedAt?: Date;
+  // Server-specific ID (for marking watched)
+  serverItemId: string;
+  // Library info (for display and debugging)
+  libraryName?: string;
+}
+
+/**
+ * Watch sync job progress - broadcast via WebSocket
+ */
+export interface WatchSyncProgress {
+  status:
+    | 'idle'
+    | 'fetching_source'
+    | 'fetching_target'
+    | 'matching'
+    | 'syncing'
+    | 'complete'
+    | 'error';
+  configId: string;
+  /** Shows "DRY RUN" badge in UI when true */
+  dryRun: boolean;
+  sourceServer: string;
+  targetServer: string;
+  totalItems: number;
+  processedItems: number;
+  /** In dry run: items that WOULD be synced */
+  syncedItems: number;
+  skippedItems: number;
+  errorCount: number;
+  message: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+/**
+ * Item that would be synced (preview item)
+ * Contains all info needed to perform selective sync
+ */
+export interface WatchSyncPreviewItem {
+  /** @deprecated Use sourceTitle instead */
+  title: string;
+  sourceTitle: string;
+  targetTitle: string;
+  type: 'movie' | 'episode';
+  year?: number;
+  // Episode details
+  showTitle?: string;
+  seasonNumber?: number;
+  episodeNumber?: number;
+  // Server info
+  sourceServer: string;
+  targetServer: string;
+  // Library info
+  sourceLibrary?: string;
+  targetLibrary?: string;
+  /** Target copies that matched (e.g., same movie in multiple libraries) */
+  targetLibraries?: Array<{
+    libraryName?: string;
+    serverItemId: string;
+    title: string;
+    progress?: number;
+    progressMs?: number;
+    durationMs?: number;
+    viewedAt?: string;
+    completed?: boolean;
+  }>;
+  // User info
+  sourceServerUserId: string;
+  targetServerUserId: string;
+  sourceUsername: string;
+  targetUsername: string;
+  // Target item ID (needed for selective sync)
+  targetServerItemId: string;
+  // What would happen
+  action: 'mark_watched' | 'update_progress';
+  // Progress on both sides (percentage)
+  sourceProgress?: number;
+  targetProgress?: number;
+  // Raw milliseconds (for sync)
+  sourceProgressMs?: number;
+  targetProgressMs?: number;
+  sourceDurationMs?: number;
+  targetDurationMs?: number;
+  // Last watched timestamps
+  sourceViewedAt?: string;
+  targetViewedAt?: string;
+}
+
+/** @deprecated Use WatchSyncPreviewItem instead */
+export type WatchSyncDryRunItem = WatchSyncPreviewItem;
+
+/**
+ * Reason a user was skipped during watch sync
+ */
+export type WatchSyncSkipReason = 'missing_token' | 'fetch_failed';
+
+/**
+ * User that was skipped during watch sync
+ */
+export interface WatchSyncSkippedUser {
+  username: string;
+  reason: WatchSyncSkipReason;
+  /** Error message if reason is 'fetch_failed' */
+  error?: string;
+}
+
+/**
+ * Watch sync job result - stored in lastSyncResult
+ */
+export interface WatchSyncResult {
+  success: boolean;
+  synced: number;
+  skipped: number;
+  errors: number;
+  durationMs: number;
+  message: string;
+  timestamp: string;
+  // Preview items - list of items that would be synced (when not auto-syncing)
+  previewItems?: WatchSyncPreviewItem[];
+  /** @deprecated Use previewItems instead */
+  dryRunItems?: WatchSyncPreviewItem[];
+  /** Users that were skipped during sync (missing tokens, fetch failures) */
+  skippedUsers?: WatchSyncSkippedUser[];
+}
+
+/**
+ * Watch sync job type identifier
+ */
+export type WatchSyncJobType = 'watch_sync';

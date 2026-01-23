@@ -7,9 +7,11 @@
  */
 
 import { fetchJson, jellyfinEmbyHeaders } from '../../../utils/http.js';
+import { fileNameFromAnyPath } from '../../../utils/path.js';
 import type {
   IMediaServerClient,
   IMediaServerClientWithHistory,
+  IMediaServerClientWithWatchSync,
   MediaSession,
   MediaUser,
   MediaLibrary,
@@ -17,6 +19,7 @@ import type {
   MediaWatchHistoryItem,
   MediaServerConfig,
 } from '../types.js';
+import type { WatchedItem } from '@tracearr/shared';
 
 // Client identification constants
 const CLIENT_NAME = 'Tracearr';
@@ -84,7 +87,7 @@ export interface MediaServerParsers {
  * Abstract base client for Jellyfin and Emby media servers
  */
 export abstract class BaseMediaServerClient
-  implements IMediaServerClient, IMediaServerClientWithHistory
+  implements IMediaServerClient, IMediaServerClientWithHistory, IMediaServerClientWithWatchSync
 {
   /** Platform identifier for service tagging */
   public abstract readonly serverType: 'jellyfin' | 'emby';
@@ -371,6 +374,357 @@ export abstract class BaseMediaServerClient
     limit?: number;
     hasUserId?: boolean;
   }): Promise<JellyfinEmbyActivityEntry[]>;
+
+  // ==========================================================================
+  // IMediaServerClientWithWatchSync Implementation
+  // ==========================================================================
+
+  /**
+   * Get all watched items for a user (movies and episodes)
+   *
+   * Fetches watched items with provider IDs for cross-server matching.
+   *
+   * @param userId - Jellyfin/Emby user ID
+   * @param options - Optional filters
+   */
+  async getWatchedItems(
+    userId: string,
+    options?: {
+      includeInProgress?: boolean;
+      includeUnwatched?: boolean;
+      libraryIds?: string[];
+    }
+  ): Promise<WatchedItem[]> {
+    const PAGE_SIZE = 10000;
+    const includeInProgress = options?.includeInProgress ?? true;
+    const includeUnwatched = options?.includeUnwatched ?? false;
+    const allItems: WatchedItem[] = [];
+
+    // Build params for fetching items
+    const baseParams = new URLSearchParams({
+      Recursive: 'true',
+      IncludeItemTypes: 'Movie,Episode',
+      Fields:
+        'ProviderIds,Path,MediaSources,DateCreated,ParentId,SeriesName,SeasonName,IndexNumber,ParentIndexNumber,RunTimeTicks,UserData',
+      Limit: '10000',
+    });
+
+    // Fetch libraries to build path-to-name mapping for library name assignment
+    const libraries = await this.getLibraries();
+    const libraryIdToName = new Map<string, string>();
+    const libraryPathToName: Array<{ path: string; name: string }> = [];
+    for (const lib of libraries) {
+      if (
+        lib.type === 'movie' ||
+        lib.type === 'movies' ||
+        lib.type === 'show' ||
+        lib.type === 'tvshows'
+      ) {
+        libraryIdToName.set(lib.id, lib.name);
+        for (const location of lib.locations ?? []) {
+          libraryPathToName.push({ path: location, name: lib.name });
+        }
+      }
+    }
+    // Sort by path length descending so longer/more specific paths match first
+    libraryPathToName.sort((a, b) => b.path.length - a.path.length);
+
+    // Add library filter if specified
+    if (options?.libraryIds && options.libraryIds.length > 0) {
+      baseParams.set('ParentId', options.libraryIds.join(','));
+    }
+
+    // Helper to find library name for an item
+    const findLibraryName = (item: Record<string, unknown>): string | undefined => {
+      const parentId = item.ParentId as string | undefined;
+      if (parentId && libraryIdToName.has(parentId)) {
+        return libraryIdToName.get(parentId);
+      }
+      const itemPath = item.Path as string | undefined;
+      if (itemPath) {
+        for (const { path, name } of libraryPathToName) {
+          if (itemPath.startsWith(path)) {
+            return name;
+          }
+        }
+      }
+      return undefined;
+    };
+
+    const fetchAllItems = async (
+      params: URLSearchParams
+    ): Promise<Array<Record<string, unknown>>> => {
+      const items: Array<Record<string, unknown>> = [];
+      let startIndex = 0;
+      let totalCount: number | null = null;
+
+      while (true) {
+        const pageParams = new URLSearchParams(params);
+        pageParams.set('StartIndex', String(startIndex));
+        pageParams.set('Limit', String(PAGE_SIZE));
+
+        const data = await fetchJson<{
+          Items?: Array<Record<string, unknown>>;
+          TotalRecordCount?: number;
+        }>(`${this.baseUrl}/Users/${userId}/Items?${pageParams}`, {
+          headers: this.buildHeaders(),
+          service: this.serverType,
+        });
+
+        const pageItems = data?.Items ?? [];
+        items.push(...pageItems);
+
+        if (typeof data?.TotalRecordCount === 'number') {
+          totalCount = data.TotalRecordCount;
+        }
+
+        if (pageItems.length === 0) {
+          break;
+        }
+
+        if (totalCount !== null && startIndex + pageItems.length >= totalCount) {
+          break;
+        }
+
+        if (pageItems.length < PAGE_SIZE) {
+          break;
+        }
+
+        startIndex += pageItems.length;
+      }
+
+      return items;
+    };
+
+    // If includeUnwatched, fetch ALL items with pagination
+    if (includeUnwatched) {
+      try {
+        const allData = await fetchAllItems(baseParams);
+
+        for (const item of allData) {
+          const watchedItem = this.parseWatchedItemWithState(item);
+          if (watchedItem) {
+            watchedItem.libraryName = findLibraryName(item);
+            allItems.push(watchedItem);
+          }
+        }
+      } catch (error) {
+        console.error(`Failed to fetch all items for user ${userId}:`, error);
+      }
+
+      return allItems;
+    }
+
+    // Fetch watched and in-progress separately
+    const watchedParams = new URLSearchParams(baseParams);
+    watchedParams.set('IsPlayed', 'true');
+
+    try {
+      const watchedData = await fetchAllItems(watchedParams);
+
+      for (const item of watchedData) {
+        const watchedItem = this.parseWatchedItem(item, true);
+        if (watchedItem) {
+          watchedItem.libraryName = findLibraryName(item);
+          allItems.push(watchedItem);
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to fetch watched items for user ${userId}:`, error);
+    }
+
+    // Fetch in-progress items if requested
+    if (includeInProgress) {
+      const inProgressParams = new URLSearchParams(baseParams);
+      inProgressParams.set('Filters', 'IsResumable');
+
+      try {
+        const inProgressData = await fetchAllItems(inProgressParams);
+
+        for (const item of inProgressData) {
+          const watchedItem = this.parseWatchedItem(item, false);
+          if (watchedItem) {
+            watchedItem.libraryName = findLibraryName(item);
+            allItems.push(watchedItem);
+          }
+        }
+      } catch (error) {
+        console.error(`Failed to fetch in-progress items for user ${userId}:`, error);
+      }
+    }
+
+    return allItems;
+  }
+
+  /**
+   * Parse item with watch state from UserData (for includeUnwatched mode)
+   */
+  protected parseWatchedItemWithState(item: Record<string, unknown>): WatchedItem | null {
+    const userData = (item.UserData ?? {}) as Record<string, unknown>;
+    const played = (userData.Played as boolean) ?? false;
+
+    // Determine completed state from UserData
+    const completed = played;
+
+    return this.parseWatchedItem(item, completed);
+  }
+
+  /**
+   * Parse a Jellyfin/Emby item into a WatchedItem
+   */
+  protected parseWatchedItem(
+    item: Record<string, unknown>,
+    completed: boolean
+  ): WatchedItem | null {
+    const itemId = item.Id as string;
+    if (!itemId) return null;
+
+    const itemType = item.Type as string;
+    const type: 'movie' | 'episode' = itemType === 'Movie' ? 'movie' : 'episode';
+
+    // Extract provider IDs
+    const providerIds = (item.ProviderIds ?? {}) as Record<string, string>;
+    const imdbId = providerIds.Imdb ?? providerIds.imdb;
+    const tmdbId = providerIds.Tmdb ?? providerIds.tmdb;
+    const tvdbId = providerIds.Tvdb ?? providerIds.tvdb;
+
+    // Get user data for progress info
+    const userData = (item.UserData ?? {}) as Record<string, unknown>;
+    const playbackPositionTicks = (userData.PlaybackPositionTicks as number) ?? 0;
+    const lastPlayedDate = userData.LastPlayedDate as string | undefined;
+
+    // Duration is in ticks (10,000 ticks = 1ms)
+    const runTimeTicks = (item.RunTimeTicks as number) ?? 0;
+    const durationMs = Math.floor(runTimeTicks / 10000);
+    const progressMs = Math.floor(playbackPositionTicks / 10000);
+
+    const fileNames = this.collectFileNames(item);
+
+    const watchedItem: WatchedItem = {
+      title: (item.Name as string) ?? '',
+      type,
+      year: (item.ProductionYear as number) ?? undefined,
+      imdbId,
+      tmdbId: tmdbId ? parseInt(tmdbId, 10) : undefined,
+      tvdbId: tvdbId ? parseInt(tvdbId, 10) : undefined,
+      fileNames: fileNames.length > 0 ? fileNames : undefined,
+      completed,
+      progressMs: completed ? durationMs : progressMs,
+      totalDurationMs: durationMs,
+      viewedAt: lastPlayedDate ? new Date(lastPlayedDate) : undefined,
+      serverItemId: itemId,
+    };
+
+    // Add episode-specific info
+    if (type === 'episode') {
+      watchedItem.showTitle = (item.SeriesName as string) ?? undefined;
+      watchedItem.seasonNumber = (item.ParentIndexNumber as number) ?? undefined;
+      watchedItem.episodeNumber = (item.IndexNumber as number) ?? undefined;
+
+      // Try to get show provider IDs (may need separate API call in some cases)
+      // For now, we set them if available at the episode level
+      const seriesProviderIds = (item.SeriesProviderIds ?? {}) as Record<string, string>;
+      watchedItem.showImdbId = seriesProviderIds.Imdb ?? seriesProviderIds.imdb;
+      watchedItem.showTmdbId = seriesProviderIds.Tmdb
+        ? parseInt(seriesProviderIds.Tmdb, 10)
+        : undefined;
+      watchedItem.showTvdbId = seriesProviderIds.Tvdb
+        ? parseInt(seriesProviderIds.Tvdb, 10)
+        : undefined;
+    }
+
+    return watchedItem;
+  }
+
+  /**
+   * Collect file names from available path fields (basenames only)
+   */
+  protected collectFileNames(item: Record<string, unknown>): string[] {
+    const fileNames = new Set<string>();
+
+    const addFileName = (value: unknown) => {
+      if (typeof value !== 'string' || !value.trim()) return;
+      const fileName = fileNameFromAnyPath(value);
+      if (fileName) fileNames.add(fileName);
+    };
+
+    addFileName(item.Path);
+
+    const mediaSources = item.MediaSources as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(mediaSources)) {
+      for (const source of mediaSources) {
+        addFileName(source.Path);
+      }
+    }
+
+    return [...fileNames];
+  }
+
+  /**
+   * Mark an item as watched (completed)
+   *
+   * Uses the Jellyfin/Emby PlayedItems endpoint.
+   *
+   * @param userId - User ID
+   * @param itemId - The item ID to mark as watched
+   * @param viewedAt - Optional timestamp when item was watched
+   * @param _userToken - Ignored (Plex-specific, Jellyfin/Emby don't need it)
+   */
+  async markWatched(
+    userId: string,
+    itemId: string,
+    viewedAt?: Date,
+    _userToken?: string
+  ): Promise<boolean> {
+    // Build URL with optional DatePlayed parameter
+    let url = `${this.baseUrl}/Users/${userId}/PlayedItems/${itemId}`;
+    if (viewedAt) {
+      const params = new URLSearchParams({
+        DatePlayed: viewedAt.toISOString(),
+      });
+      url += `?${params}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: this.buildHeaders(),
+    });
+
+    return response.ok;
+  }
+
+  /**
+   * Update playback progress for partial watches
+   *
+   * Uses the Jellyfin/Emby UserData endpoint to update PlaybackPositionTicks.
+   *
+   * @param userId - User ID
+   * @param itemId - The item ID
+   * @param progressMs - Current playback position in milliseconds
+   * @param _userToken - Ignored (Plex-specific, Jellyfin/Emby don't need it)
+   */
+  async updateProgress(
+    userId: string,
+    itemId: string,
+    progressMs: number,
+    _userToken?: string
+  ): Promise<boolean> {
+    // Convert milliseconds to ticks (10,000 ticks = 1ms)
+    const positionTicks = progressMs * 10000;
+
+    const response = await fetch(`${this.baseUrl}/Users/${userId}/Items/${itemId}/UserData`, {
+      method: 'POST',
+      headers: {
+        ...this.buildHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        PlaybackPositionTicks: positionTicks,
+      }),
+    });
+
+    return response.ok;
+  }
 
   // ==========================================================================
   // Static Authentication Helpers

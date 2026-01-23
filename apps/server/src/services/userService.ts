@@ -527,12 +527,18 @@ export async function syncUserFromMediaServer(
     }
 
     if (existing) {
+      // Debug: Log serverToken presence for watch sync troubleshooting (no token contents)
+      console.log(
+        `[UserSync] Plex user ${mediaUser.username} has serverToken=${mediaUser.serverToken ? 'present' : 'missing'}`
+      );
+
       const updateData: Partial<typeof serverUsers.$inferInsert> = {
         username: mediaUser.username,
         email: mediaUser.email ?? null,
         thumbUrl: mediaUser.thumb ?? null,
         isServerAdmin: mediaUser.isAdmin,
         plexAccountId: mediaUser.id, // Set plex.tv ID
+        plexServerToken: mediaUser.serverToken ?? existing.plexServerToken, // Plex server-specific token for watch sync
         joinedAt: mediaUser.joinedAt ?? existing.joinedAt,
         updatedAt: new Date(),
       };
@@ -588,6 +594,7 @@ export async function syncUserFromMediaServer(
           serverId,
           externalId,
           plexAccountId: mediaUser.id,
+          plexServerToken: mediaUser.serverToken ?? null, // Plex server-specific token for watch sync
           username: mediaUser.username,
           email: mediaUser.email ?? null,
           thumbUrl: mediaUser.thumb ?? null,

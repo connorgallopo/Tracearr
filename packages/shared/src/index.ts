@@ -213,6 +213,18 @@ export type {
   ResolutionEntry,
   ResolutionBreakdown,
   LibraryResolutionResponse,
+  // Watch sync
+  WatchSyncConfig,
+  WatchSyncUserMapping,
+  WatchedItem,
+  WatchSyncProgress,
+  WatchSyncPreviewItem,
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  WatchSyncDryRunItem, // deprecated, use WatchSyncPreviewItem
+  WatchSyncResult,
+  WatchSyncJobType,
+  WatchSyncSkipReason,
+  WatchSyncSkippedUser,
 } from './types.js';
 
 // Schema exports

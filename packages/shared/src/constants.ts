@@ -73,6 +73,7 @@ export const WS_EVENTS = {
   LIBRARY_SYNC_PROGRESS: 'library:sync:progress',
   /** Unified running tasks updates */
   TASKS_UPDATED: 'tasks:updated',
+  WATCH_SYNC_PROGRESS: 'watch-sync:progress',
   SUBSCRIBE_SESSIONS: 'subscribe:sessions',
   UNSUBSCRIBE_SESSIONS: 'unsubscribe:sessions',
   VERSION_UPDATE: 'version:update',

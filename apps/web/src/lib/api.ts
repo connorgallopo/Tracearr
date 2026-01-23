@@ -66,6 +66,11 @@ import type {
   LibraryCodecsResponse,
   LibraryResolutionResponse,
   RunningTasksResponse,
+  // Watch sync types
+  WatchSyncConfig,
+  WatchSyncUserMapping,
+  WatchSyncProgress,
+  WatchSyncResult,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -1420,6 +1425,115 @@ class ApiClient {
   // Running tasks
   tasks = {
     getRunning: () => this.request<RunningTasksResponse>('/tasks/running'),
+  };
+
+  // Watch Sync - Cross-server watch status synchronization
+  watchSync = {
+    // Config management
+    getConfigs: async () => {
+      const response = await this.request<{ configs: WatchSyncConfig[] }>('/watch-sync/configs');
+      return response.configs;
+    },
+    getConfig: (id: string) =>
+      this.request<{ config: WatchSyncConfig }>(`/watch-sync/configs/${id}`),
+    createConfig: (data: {
+      sourceServerId: string;
+      targetServerId: string;
+      enabled?: boolean;
+      dryRun?: boolean;
+      syncMovies?: boolean;
+      syncShows?: boolean;
+      syncInProgress?: boolean;
+      intervalMinutes?: number;
+    }) =>
+      this.request<{ config: WatchSyncConfig }>('/watch-sync/configs', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    updateConfig: (
+      id: string,
+      data: {
+        enabled?: boolean;
+        dryRun?: boolean;
+        syncMovies?: boolean;
+        syncShows?: boolean;
+        syncInProgress?: boolean;
+        intervalMinutes?: number;
+      }
+    ) =>
+      this.request<{ config: WatchSyncConfig }>(`/watch-sync/configs/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    deleteConfig: (id: string) =>
+      this.request<{ success: boolean }>(`/watch-sync/configs/${id}`, { method: 'DELETE' }),
+
+    // Trigger manual sync (preview or auto depending on config.dryRun)
+    triggerSync: (configId: string) =>
+      this.request<{
+        status: string;
+        jobId: string;
+        dryRun: boolean;
+        message: string;
+      }>(`/watch-sync/configs/${configId}/sync`, { method: 'POST', body: '{}' }),
+
+    // Sync selected items (for approval workflow)
+    syncSelected: (
+      configId: string,
+      items: Array<{
+        targetServerItemId: string;
+        targetServerUserId: string;
+        action: 'mark_watched' | 'update_progress';
+        sourceProgressMs?: number;
+        sourceViewedAt?: string;
+        sourceTitle: string;
+      }>
+    ) =>
+      this.request<{
+        status: string;
+        result: WatchSyncResult;
+      }>(`/watch-sync/configs/${configId}/sync-selected`, {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      }),
+
+    // User mappings
+    getUsers: (configId: string) =>
+      this.request<{
+        sourceUsers: Array<{ id: string; username: string; externalId: string }>;
+        targetUsers: Array<{ id: string; username: string; externalId: string }>;
+        mappings: WatchSyncUserMapping[];
+      }>(`/watch-sync/configs/${configId}/users`),
+    addUserMapping: (
+      configId: string,
+      data: {
+        sourceServerUserId: string;
+        targetServerUserId: string;
+        enabled?: boolean;
+      }
+    ) =>
+      this.request<{ mapping: WatchSyncUserMapping }>(`/watch-sync/configs/${configId}/users`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    removeUserMapping: (configId: string, mappingId: string) =>
+      this.request<{ success: boolean }>(`/watch-sync/configs/${configId}/users/${mappingId}`, {
+        method: 'DELETE',
+      }),
+
+    // Progress and history
+    getProgress: () => this.request<{ progress: WatchSyncProgress | null }>('/watch-sync/progress'),
+    getHistory: () =>
+      this.request<{
+        history: Array<{
+          jobId: string;
+          configId: string;
+          state: string;
+          createdAt: number;
+          finishedAt?: number;
+          result?: WatchSyncResult;
+        }>;
+      }>('/watch-sync/history'),
   };
 }
 

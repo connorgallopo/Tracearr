@@ -25,7 +25,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
-import { MEDIA_TYPES, type WebhookFormat } from '@tracearr/shared';
+import { MEDIA_TYPES, type WebhookFormat, type WatchSyncResult } from '@tracearr/shared';
 
 // Server types enum
 export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
@@ -200,6 +200,9 @@ export const serverUsers = pgTable(
     // For Plex: plex.tv account ID (different from local PMS ID). Used for sync matching.
     // Sessions use externalId (local PMS ID), sync uses plexAccountId (plex.tv ID)
     plexAccountId: varchar('plex_account_id', { length: 255 }),
+    // For Plex shared users: server-specific access token from shared_servers endpoint.
+    // Used for watch sync to query per-user watch status.
+    plexServerToken: text('plex_server_token'),
     username: varchar('username', { length: 255 }).notNull(), // Username on this server
     email: varchar('email', { length: 255 }), // Email from server sync (may differ from users.email)
     thumbUrl: text('thumb_url'), // Avatar from server
@@ -662,6 +665,73 @@ export const settings = pgTable('settings', {
 });
 
 // ============================================================================
+// Watch Sync Tables (for cross-server watch status synchronization)
+// ============================================================================
+
+/**
+ * Watch sync configuration (per server pair)
+ *
+ * Defines a source → target sync direction. For bidirectional sync,
+ * create two configs (A→B and B→A).
+ */
+export const watchSyncConfigs = pgTable(
+  'watch_sync_configs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sourceServerId: uuid('source_server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    targetServerId: uuid('target_server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    enabled: boolean('enabled').notNull().default(true),
+    // SAFETY: Dry run mode is ON by default - must be explicitly disabled to write changes
+    dryRun: boolean('dry_run').notNull().default(true),
+    syncMovies: boolean('sync_movies').notNull().default(true),
+    syncShows: boolean('sync_shows').notNull().default(true),
+    syncInProgress: boolean('sync_in_progress').notNull().default(true),
+    intervalMinutes: integer('interval_minutes').notNull().default(60),
+    lastSyncAt: timestamp('last_sync_at', { withTimezone: true }),
+    lastSyncResult: jsonb('last_sync_result').$type<WatchSyncResult>(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique('watch_sync_configs_server_pair').on(table.sourceServerId, table.targetServerId),
+    index('watch_sync_configs_source_idx').on(table.sourceServerId),
+    index('watch_sync_configs_target_idx').on(table.targetServerId),
+  ]
+);
+
+/**
+ * User mapping for cross-server user matching
+ *
+ * Maps users between servers when usernames differ (e.g., "alice" on Plex → "Alice" on Jellyfin).
+ * This is REQUIRED for sync to work - users must be explicitly mapped.
+ */
+export const watchSyncUserMappings = pgTable(
+  'watch_sync_user_mappings',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    configId: uuid('config_id')
+      .notNull()
+      .references(() => watchSyncConfigs.id, { onDelete: 'cascade' }),
+    sourceServerUserId: uuid('source_server_user_id')
+      .notNull()
+      .references(() => serverUsers.id, { onDelete: 'cascade' }),
+    targetServerUserId: uuid('target_server_user_id')
+      .notNull()
+      .references(() => serverUsers.id, { onDelete: 'cascade' }),
+    enabled: boolean('enabled').notNull().default(true), // Can disable individual user sync
+  },
+  (table) => [
+    unique('watch_sync_user_mapping_unique').on(table.configId, table.sourceServerUserId),
+    index('watch_sync_user_mappings_config_idx').on(table.configId),
+    index('watch_sync_user_mappings_source_user_idx').on(table.sourceServerUserId),
+    index('watch_sync_user_mappings_target_user_idx').on(table.targetServerUserId),
+  ]
+);
+
+// ============================================================================
 // Relations
 // ============================================================================
 
@@ -958,5 +1028,36 @@ export const libraryItemsRelations = relations(libraryItems, ({ one }) => ({
   server: one(servers, {
     fields: [libraryItems.serverId],
     references: [servers.id],
+  }),
+}));
+
+export const watchSyncConfigsRelations = relations(watchSyncConfigs, ({ one, many }) => ({
+  sourceServer: one(servers, {
+    fields: [watchSyncConfigs.sourceServerId],
+    references: [servers.id],
+    relationName: 'watchSyncSourceServer',
+  }),
+  targetServer: one(servers, {
+    fields: [watchSyncConfigs.targetServerId],
+    references: [servers.id],
+    relationName: 'watchSyncTargetServer',
+  }),
+  userMappings: many(watchSyncUserMappings),
+}));
+
+export const watchSyncUserMappingsRelations = relations(watchSyncUserMappings, ({ one }) => ({
+  config: one(watchSyncConfigs, {
+    fields: [watchSyncUserMappings.configId],
+    references: [watchSyncConfigs.id],
+  }),
+  sourceServerUser: one(serverUsers, {
+    fields: [watchSyncUserMappings.sourceServerUserId],
+    references: [serverUsers.id],
+    relationName: 'watchSyncSourceUser',
+  }),
+  targetServerUser: one(serverUsers, {
+    fields: [watchSyncUserMappings.targetServerUserId],
+    references: [serverUsers.id],
+    relationName: 'watchSyncTargetUser',
   }),
 }));

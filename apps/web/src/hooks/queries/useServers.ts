@@ -102,6 +102,8 @@ export function useSyncServer() {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });
       void queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
+      // Invalidate watch sync users - server sync may update Plex tokens which affects user mappings
+      void queryClient.invalidateQueries({ queryKey: ['watchSync'] });
 
       // Show detailed results
       const parts: string[] = [];

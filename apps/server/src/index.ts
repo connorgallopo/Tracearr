@@ -35,6 +35,7 @@ import type {
   JellystatImportProgress,
   MaintenanceJobProgress,
   LibrarySyncProgress,
+  WatchSyncProgress,
 } from '@tracearr/shared';
 
 import authPlugin from './plugins/auth.js';
@@ -57,6 +58,7 @@ import { notificationPreferencesRoutes } from './routes/notificationPreferences.
 import { channelRoutingRoutes } from './routes/channelRouting.js';
 import { versionRoutes } from './routes/version.js';
 import { maintenanceRoutes } from './routes/maintenance.js';
+import { watchSyncRoutes } from './routes/watchSync.js';
 import { publicRoutes } from './routes/public.js';
 import { libraryRoutes } from './routes/library.js';
 import { tasksRoutes } from './routes/tasks.js';
@@ -102,6 +104,12 @@ import {
   scheduleInactivityChecks,
   shutdownInactivityCheckQueue,
 } from './jobs/inactivityCheckQueue.js';
+import {
+  initWatchSyncQueue,
+  startWatchSyncWorker,
+  initScheduledSyncs,
+  shutdownWatchSyncQueue,
+} from './jobs/watchSyncQueue.js';
 import { initPushRateLimiter } from './services/pushRateLimiter.js';
 import { processPushReceipts } from './services/pushNotification.js';
 import { db, runMigrations } from './db/client.js';
@@ -342,6 +350,17 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     // Don't throw - inactivity checks are non-critical
   }
 
+  // Initialize watch sync queue (cross-server watch status synchronization)
+  try {
+    initWatchSyncQueue(redisUrl);
+    startWatchSyncWorker();
+    void initScheduledSyncs();
+    app.log.info('Watch sync queue initialized');
+  } catch (err) {
+    app.log.error({ err }, 'Failed to initialize watch sync queue');
+    // Don't throw - watch sync is non-critical
+  }
+
   // Initialize poller with cache services
   initializePoller(cacheService, pubSubService);
 
@@ -372,6 +391,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownLibrarySyncQueue();
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
+    await shutdownWatchSyncQueue();
   });
 
   // Health check endpoint
@@ -444,6 +464,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(versionRoutes, { prefix: `${API_BASE_PATH}/version` });
   await app.register(maintenanceRoutes, { prefix: `${API_BASE_PATH}/maintenance` });
   await app.register(tasksRoutes, { prefix: `${API_BASE_PATH}/tasks` });
+  await app.register(watchSyncRoutes, { prefix: `${API_BASE_PATH}/watch-sync` });
   await app.register(publicRoutes, { prefix: `${API_BASE_PATH}/public` });
   await app.register(libraryRoutes, { prefix: `${API_BASE_PATH}/library` });
 
@@ -484,6 +505,7 @@ async function start() {
         void shutdownLibrarySyncQueue();
         void shutdownVersionCheckQueue();
         void shutdownInactivityCheckQueue();
+        void shutdownWatchSyncQueue();
         void app.close().then(() => process.exit(0));
       });
     }
@@ -544,6 +566,9 @@ async function start() {
             break;
           case WS_EVENTS.LIBRARY_SYNC_PROGRESS:
             broadcastToSessions('library:sync:progress', data as LibrarySyncProgress);
+            break;
+          case WS_EVENTS.WATCH_SYNC_PROGRESS:
+            broadcastToSessions('watch-sync:progress', data as WatchSyncProgress);
             break;
           case WS_EVENTS.VERSION_UPDATE:
             broadcastToSessions(

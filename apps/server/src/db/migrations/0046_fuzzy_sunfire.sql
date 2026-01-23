@@ -1,0 +1,1 @@
+ALTER TABLE "server_users" ADD COLUMN "plex_server_token" text;
