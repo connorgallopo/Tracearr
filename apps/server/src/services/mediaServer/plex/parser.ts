@@ -603,6 +603,8 @@ function parseMediaType(type: unknown, isLive: boolean = false): MediaSession['m
       return 'track';
     case 'photo':
       return 'photo';
+    case 'clip':
+      return 'trailer';
     default:
       return 'unknown';
   }

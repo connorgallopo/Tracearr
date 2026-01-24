@@ -22,6 +22,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Clapperboard,
 } from 'lucide-react';
 import {
   Table,
@@ -176,6 +177,7 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
     track: { icon: Music, label: 'Music' },
     live: { icon: Radio, label: 'Live TV' },
     photo: { icon: Image, label: 'Photo' },
+    trailer: { icon: Clapperboard, label: 'Trailer' },
     unknown: { icon: CircleHelp, label: 'Unknown' },
   };
   const { icon: Icon, label } = config[type];

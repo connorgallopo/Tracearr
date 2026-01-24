@@ -144,7 +144,7 @@ export interface AuthUser {
 export type SessionState = 'playing' | 'paused' | 'stopped';
 
 /** Supported media types */
-export const MEDIA_TYPES = ['movie', 'episode', 'track', 'live', 'photo', 'unknown'] as const;
+export const MEDIA_TYPES = ['movie', 'episode', 'track', 'live', 'photo', 'trailer', 'unknown'] as const;
 export type MediaType = (typeof MEDIA_TYPES)[number];
 
 // ============================================================================

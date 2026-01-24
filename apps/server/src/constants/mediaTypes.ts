@@ -25,9 +25,9 @@ export type PrimaryMediaType = (typeof PRIMARY_MEDIA_TYPES)[number];
 /**
  * Media types excluded from rule evaluation and primary statistics.
  * Live TV and music tracks typically don't represent sharing/abuse patterns.
- * Photos and unknown types are also excluded as they're not typical media consumption.
+ * Photos, trailers and unknown types are also excluded as they're not typical media consumption.
  */
-export const EXCLUDED_MEDIA_TYPES = ['live', 'track', 'photo', 'unknown'] as const;
+export const EXCLUDED_MEDIA_TYPES = ['live', 'track', 'photo', 'trailer', 'unknown'] as const;
 export type ExcludedMediaType = (typeof EXCLUDED_MEDIA_TYPES)[number];
 
 /**

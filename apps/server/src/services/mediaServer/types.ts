@@ -40,7 +40,7 @@ export interface MediaSession {
   /** Media metadata */
   media: {
     title: string;
-    type: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'unknown';
+    type: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'trailer' | 'unknown';
     /** Duration in milliseconds */
     durationMs: number;
     /** Release year */
@@ -329,7 +329,7 @@ export interface MediaWatchHistoryItem {
   /** Item title */
   title: string;
   /** Media type */
-  type: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'unknown';
+  type: 'movie' | 'episode' | 'track' | 'live' | 'photo' | 'trailer' | 'unknown';
   /** When item was last watched (Unix timestamp or ISO string) */
   watchedAt: number | string;
   /** User ID who watched (if available) */

@@ -38,6 +38,7 @@ import {
   Eye,
   ChevronRight,
   X,
+  Clapperboard,
 } from 'lucide-react-native';
 import { api, getServerUrl } from '@/lib/api';
 import { useMediaServer } from '@/providers/MediaServerProvider';
@@ -69,6 +70,7 @@ const MEDIA_CONFIG: Record<MediaType, { icon: typeof Film; label: string }> = {
   track: { icon: Music, label: 'Track' },
   live: { icon: Radio, label: 'Live TV' },
   photo: { icon: ImageIcon, label: 'Photo' },
+  trailer: { icon: Clapperboard, label: 'Trailer' },
   unknown: { icon: CircleHelp, label: 'Unknown' },
 };
 

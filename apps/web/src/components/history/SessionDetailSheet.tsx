@@ -35,6 +35,7 @@ import {
   Clock,
   ExternalLink,
   ChevronDown,
+  Clapperboard,
 } from 'lucide-react';
 import { cn, getCountryName, getMediaDisplay } from '@/lib/utils';
 import { getAvatarUrl } from '@/components/users/utils';
@@ -79,6 +80,7 @@ const MEDIA_CONFIG: Record<MediaType, { icon: typeof Film; label: string }> = {
   track: { icon: Music, label: 'Track' },
   live: { icon: Radio, label: 'Live TV' },
   photo: { icon: Image, label: 'Photo' },
+  trailer: { icon: Clapperboard, label: 'Trailer' },
   unknown: { icon: CircleHelp, label: 'Unknown' },
 };
 
