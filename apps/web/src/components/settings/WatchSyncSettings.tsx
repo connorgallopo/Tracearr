@@ -76,11 +76,13 @@ function AddConfigDialog({
   onOpenChange,
   servers,
   existingConfigs,
+  onConfigCreated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   servers: Server[];
   existingConfigs: WatchSyncConfig[];
+  onConfigCreated?: (configId: string) => void;
 }) {
   const [serverA, setServerA] = useState('');
   const [serverB, setServerB] = useState('');
@@ -105,13 +107,16 @@ function AddConfigDialog({
       : 60;
 
     try {
+      let firstCreatedConfigId: string | null = null;
+
       // Create first direction (A → B)
       if (!configExists(serverA, serverB)) {
-        await createConfig.mutateAsync({
+        const result = await createConfig.mutateAsync({
           sourceServerId: serverA,
           targetServerId: serverB,
           intervalMinutes: safeInterval,
         });
+        firstCreatedConfigId = result.config.id;
       }
 
       // Create second direction (B → A) if bidirectional
@@ -128,6 +133,11 @@ function AddConfigDialog({
       setServerB('');
       setBidirectional(true);
       setIntervalMinutes('60');
+
+      // Notify parent so it can open user mapping dialog
+      if (firstCreatedConfigId && onConfigCreated) {
+        onConfigCreated(firstCreatedConfigId);
+      }
     } catch {
       // Error toast already shown by mutation
     } finally {
@@ -482,20 +492,45 @@ function UserMappingDialog({
 }
 
 // Config Card
-function ConfigCard({ config, servers }: { config: WatchSyncConfig; servers: Server[] }) {
-  const [showUserMapping, setShowUserMapping] = useState(false);
+function ConfigCard({
+  config,
+  servers,
+  initialShowUserMapping = false,
+  onUserMappingClosed,
+}: {
+  config: WatchSyncConfig;
+  servers: Server[];
+  initialShowUserMapping?: boolean;
+  onUserMappingClosed?: () => void;
+}) {
+  const [showUserMapping, setShowUserMapping] = useState(initialShowUserMapping);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [intervalValue, setIntervalValue] = useState(String(config.intervalMinutes));
   const updateConfig = useUpdateWatchSyncConfig();
   const deleteConfig = useDeleteWatchSyncConfig();
   const triggerSync = useTriggerWatchSync();
-  const { data: usersData } = useWatchSyncUsers(config.id);
+  const { data: usersData, isLoading: usersLoading } = useWatchSyncUsers(config.id);
 
   const sourceServer = servers.find((s) => s.id === config.sourceServerId);
   const targetServer = servers.find((s) => s.id === config.targetServerId);
   const hasMissingTokens = usersData?.mappings.some(
     (m) => m.sourceMissingToken || m.targetMissingToken
   );
+  const hasNoMappings = !usersLoading && (usersData?.mappings.length ?? 0) === 0;
+
+  // Sync initialShowUserMapping prop changes
+  useEffect(() => {
+    if (initialShowUserMapping) {
+      setShowUserMapping(true);
+    }
+  }, [initialShowUserMapping]);
+
+  const handleUserMappingClose = (open: boolean) => {
+    setShowUserMapping(open);
+    if (!open && onUserMappingClosed) {
+      onUserMappingClosed();
+    }
+  };
 
   useEffect(() => {
     setIntervalValue(String(config.intervalMinutes));
@@ -640,40 +675,68 @@ function ConfigCard({ config, servers }: { config: WatchSyncConfig; servers: Ser
             </div>
           )}
 
+          {/* No user mappings warning */}
+          {hasNoMappings && (
+            <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-sm">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div>
+                <p className="font-medium text-amber-500">No user mappings configured</p>
+                <p className="text-muted-foreground mt-1">
+                  Add at least one user mapping before running a sync.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex items-center gap-2 border-t pt-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant={hasNoMappings ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setShowUserMapping(true)}
-                  className={hasMissingTokens ? 'border-amber-500/50' : ''}
+                  className={cn(
+                    hasNoMappings && 'animate-pulse',
+                    hasMissingTokens && !hasNoMappings && 'border-amber-500/50'
+                  )}
                 >
                   <Users className="mr-2 h-4 w-4" />
                   User Mappings
-                  {hasMissingTokens && <AlertTriangle className="ml-1 h-3 w-3 text-amber-500" />}
+                  {hasMissingTokens && !hasNoMappings && (
+                    <AlertTriangle className="ml-1 h-3 w-3 text-amber-500" />
+                  )}
                 </Button>
               </TooltipTrigger>
-              {hasMissingTokens && (
+              {hasMissingTokens && !hasNoMappings && (
                 <TooltipContent>
                   Some users missing Plex tokens - will be skipped. Sync Plex in Connected Servers.
                 </TooltipContent>
               )}
+              {hasNoMappings && <TooltipContent>Add user mappings to enable sync</TooltipContent>}
             </Tooltip>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => triggerSync.mutate(config.id)}
-              disabled={triggerSync.isPending || !config.enabled}
-            >
-              {triggerSync.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 h-4 w-4" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => triggerSync.mutate(config.id)}
+                    disabled={triggerSync.isPending || !config.enabled || hasNoMappings}
+                  >
+                    {triggerSync.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Play className="mr-2 h-4 w-4" />
+                    )}
+                    {config.dryRun ? 'Run Preview' : 'Sync Now'}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {hasNoMappings && (
+                <TooltipContent>Add user mappings before running sync</TooltipContent>
               )}
-              {config.dryRun ? 'Run Preview' : 'Sync Now'}
-            </Button>
+            </Tooltip>
             <Button
               variant="ghost"
               size="sm"
@@ -689,7 +752,7 @@ function ConfigCard({ config, servers }: { config: WatchSyncConfig; servers: Ser
       {/* User Mapping Dialog */}
       <UserMappingDialog
         open={showUserMapping}
-        onOpenChange={setShowUserMapping}
+        onOpenChange={handleUserMappingClose}
         configId={config.id}
         sourceServerName={sourceServer?.name ?? 'Source'}
         sourceServerType={sourceServer?.type ?? 'plex'}
@@ -1518,6 +1581,8 @@ function ActiveSyncProgress({ progress }: { progress: WatchSyncProgress }) {
 // Main Component
 export function WatchSyncSettings() {
   const [showAddDialog, setShowAddDialog] = useState(false);
+  // Track which config should show user mapping dialog (after creation)
+  const [openUserMappingForConfigId, setOpenUserMappingForConfigId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { data: configs, isLoading: configsLoading } = useWatchSyncConfigs();
   const { data: servers = [], isLoading: serversLoading } = useServers();
@@ -1525,6 +1590,11 @@ export function WatchSyncSettings() {
   const { data: historyData } = useWatchSyncHistory();
   const progress = progressData?.progress;
   const isLoading = configsLoading || serversLoading;
+
+  // Handle config created - open user mapping dialog for it
+  const handleConfigCreated = (configId: string) => {
+    setOpenUserMappingForConfigId(configId);
+  };
 
   // Track previous progress status to detect completion
   const prevStatusRef = useRef<string | undefined>(undefined);
@@ -1610,7 +1680,13 @@ export function WatchSyncSettings() {
       {(configs?.length ?? 0) > 0 && (
         <div className="space-y-4">
           {configs?.map((config) => (
-            <ConfigCard key={config.id} config={config} servers={servers} />
+            <ConfigCard
+              key={config.id}
+              config={config}
+              servers={servers}
+              initialShowUserMapping={openUserMappingForConfigId === config.id}
+              onUserMappingClosed={() => setOpenUserMappingForConfigId(null)}
+            />
           ))}
         </div>
       )}
@@ -1643,6 +1719,7 @@ export function WatchSyncSettings() {
         onOpenChange={setShowAddDialog}
         servers={servers}
         existingConfigs={configs ?? []}
+        onConfigCreated={handleConfigCreated}
       />
     </div>
   );

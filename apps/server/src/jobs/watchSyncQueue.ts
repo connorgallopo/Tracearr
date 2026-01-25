@@ -290,13 +290,63 @@ export async function cancelScheduledSync(configId: string): Promise<void> {
   const repeatJobKey = `watch-sync-repeat-${configId}`;
 
   // Remove the repeatable job
+  // BullMQ repeatable jobs have a 'name' property that matches our job name
+  // and a 'key' property that is a hash-based unique identifier
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   const repeatableJobs = await watchSyncQueue.getRepeatableJobs();
-  const existingJob = repeatableJobs.find((j) => j.key.includes(repeatJobKey));
+  const existingJob = repeatableJobs.find((j) => j.name === repeatJobKey);
   if (existingJob) {
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     await watchSyncQueue.removeRepeatableByKey(existingJob.key);
     console.log(`[WatchSync] Cancelled scheduled sync for config ${configId}`);
+  } else {
+    // Also try to find by key pattern for backward compatibility
+    // (older jobs might have been created with different naming)
+    const legacyJob = repeatableJobs.find((j) => j.key.includes(configId));
+    if (legacyJob) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      await watchSyncQueue.removeRepeatableByKey(legacyJob.key);
+      console.log(`[WatchSync] Cancelled legacy scheduled sync for config ${configId}`);
+    }
+  }
+}
+
+/**
+ * Clean up orphan repeatable jobs (configs that no longer exist)
+ */
+async function cleanupOrphanRepeatableJobs(): Promise<void> {
+  if (!watchSyncQueue) {
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  const repeatableJobs = await watchSyncQueue.getRepeatableJobs();
+  if (repeatableJobs.length === 0) {
+    return;
+  }
+
+  // Get all existing config IDs
+  const configs = await db.query.watchSyncConfigs.findMany({
+    columns: { id: true },
+  });
+  const existingConfigIds = new Set(configs.map((c) => c.id));
+
+  // Find and remove orphan jobs
+  let removedCount = 0;
+  for (const job of repeatableJobs) {
+    // Extract configId from job name (format: watch-sync-repeat-{configId})
+    const match = job.name?.match(/watch-sync-repeat-([0-9a-f-]+)/i);
+    const configId = match?.[1];
+    if (configId && !existingConfigIds.has(configId)) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      await watchSyncQueue.removeRepeatableByKey(job.key);
+      console.log(`[WatchSync] Removed orphan scheduled job for deleted config ${configId}`);
+      removedCount++;
+    }
+  }
+
+  if (removedCount > 0) {
+    console.log(`[WatchSync] Cleaned up ${removedCount} orphan scheduled job(s)`);
   }
 }
 
@@ -307,6 +357,9 @@ export async function initScheduledSyncs(): Promise<void> {
   if (!watchSyncQueue) {
     throw new Error('Watch sync queue not initialized');
   }
+
+  // First, clean up any orphan repeatable jobs from deleted configs
+  await cleanupOrphanRepeatableJobs();
 
   // Get all enabled configs
   const configs = await db.query.watchSyncConfigs.findMany({
