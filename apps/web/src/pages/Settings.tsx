@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Routes, Route, Link as RouterLink } from 'react-router';
 import { QRCodeSVG } from 'qrcode.react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -633,6 +634,7 @@ function ServerSettings() {
   const syncServer = useSyncServer();
   const updateServerUrl = useUpdateServerUrl();
   const reorderServers = useReorderServers();
+  const queryClient = useQueryClient();
   const { refetch: refetchUser, user } = useAuth();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -690,7 +692,7 @@ function ServerSettings() {
       deleteServer.mutate(deleteId, {
         onSuccess: () => {
           setDeleteId(null);
-          fetchPlexServers();
+          void queryClient.invalidateQueries({ queryKey: ['plex-accounts'] });
         },
       });
     }
@@ -818,9 +820,10 @@ function ServerSettings() {
 
       toast.success('Server Added', { description: `${name} has been connected successfully` });
 
-      // Refresh server list and user data
+      // Refresh server list, user data, and plex accounts (for server count)
       await refetch();
       await refetchUser();
+      void queryClient.invalidateQueries({ queryKey: ['plex-accounts'] });
 
       // Close dialog and reset
       setShowAddDialog(false);
