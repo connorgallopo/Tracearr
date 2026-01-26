@@ -690,6 +690,7 @@ function ServerSettings() {
       deleteServer.mutate(deleteId, {
         onSuccess: () => {
           setDeleteId(null);
+          fetchPlexServers();
         },
       });
     }
