@@ -86,9 +86,9 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
           video_decision,
           audio_decision,
           COUNT(*)::int AS session_count,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay')::int AS video_direct_count,
-          COUNT(*) FILTER (WHERE audio_decision = 'directplay')::int AS audio_direct_count,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay' AND audio_decision = 'directplay')::int AS full_direct_count,
+          COUNT(*) FILTER (WHERE video_decision != 'transcode')::int AS video_direct_count,
+          COUNT(*) FILTER (WHERE audio_decision != 'transcode')::int AS audio_direct_count,
+          COUNT(*) FILTER (WHERE video_decision != 'transcode' AND audio_decision != 'transcode')::int AS full_direct_count,
           COUNT(*) FILTER (WHERE video_decision = 'transcode' OR audio_decision = 'transcode')::int AS any_transcode_count
         FROM sessions
         ${baseWhere}
@@ -211,8 +211,8 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
           COALESCE(platform, 'Unknown') AS device_type,
           COALESCE(source_video_codec, 'Unknown') AS video_codec,
           COUNT(*)::int AS session_count,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay')::int AS direct_count,
-          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision = 'directplay') / NULLIF(COUNT(*), 0), 1) AS direct_pct
+          COUNT(*) FILTER (WHERE video_decision != 'transcode')::int AS direct_count,
+          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision != 'transcode') / NULLIF(COUNT(*), 0), 1) AS direct_pct
         FROM sessions
         ${baseWhere}
         AND source_video_codec IS NOT NULL
@@ -290,11 +290,11 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
         SELECT
           COALESCE(platform, 'Unknown') AS device,
           COUNT(*)::int AS sessions,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay')::int AS video_direct,
-          COUNT(*) FILTER (WHERE audio_decision = 'directplay')::int AS audio_direct,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay' AND audio_decision = 'directplay')::int AS full_direct,
+          COUNT(*) FILTER (WHERE video_decision != 'transcode')::int AS video_direct,
+          COUNT(*) FILTER (WHERE audio_decision != 'transcode')::int AS audio_direct,
+          COUNT(*) FILTER (WHERE video_decision != 'transcode' AND audio_decision != 'transcode')::int AS full_direct,
           COUNT(*) FILTER (WHERE video_decision = 'transcode' OR audio_decision = 'transcode')::int AS transcode_count,
-          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision = 'directplay' AND audio_decision = 'directplay') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
+          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision != 'transcode' AND audio_decision != 'transcode') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
         FROM sessions
         ${baseWhere}
         AND source_video_codec IS NOT NULL
@@ -363,9 +363,9 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
           COALESCE(source_video_codec, 'Unknown') AS video_codec,
           COALESCE(source_audio_codec, 'Unknown') AS audio_codec,
           COUNT(*)::int AS sessions,
-          COUNT(*) FILTER (WHERE video_decision = 'directplay' AND audio_decision = 'directplay')::int AS direct_count,
+          COUNT(*) FILTER (WHERE video_decision != 'transcode' AND audio_decision != 'transcode')::int AS direct_count,
           COUNT(*) FILTER (WHERE video_decision = 'transcode' OR audio_decision = 'transcode')::int AS transcode_count,
-          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision = 'directplay' AND audio_decision = 'directplay') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
+          ROUND(100.0 * COUNT(*) FILTER (WHERE video_decision != 'transcode' AND audio_decision != 'transcode') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
         FROM sessions
         ${baseWhere}
         AND source_video_codec IS NOT NULL
@@ -445,9 +445,9 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
           u.name AS identity_name,
           su.thumb_url AS avatar,
           COUNT(*)::int AS total_sessions,
-          COUNT(*) FILTER (WHERE s.video_decision = 'directplay' AND s.audio_decision = 'directplay')::int AS direct_play_count,
+          COUNT(*) FILTER (WHERE s.video_decision != 'transcode' AND s.audio_decision != 'transcode')::int AS direct_play_count,
           COUNT(*) FILTER (WHERE s.video_decision = 'transcode' OR s.audio_decision = 'transcode')::int AS transcode_count,
-          ROUND(100.0 * COUNT(*) FILTER (WHERE s.video_decision = 'directplay' AND s.audio_decision = 'directplay') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
+          ROUND(100.0 * COUNT(*) FILTER (WHERE s.video_decision != 'transcode' AND s.audio_decision != 'transcode') / NULLIF(COUNT(*), 0), 1) AS direct_play_pct
         FROM sessions s
         JOIN server_users su ON s.server_user_id = su.id
         LEFT JOIN users u ON su.user_id = u.id
