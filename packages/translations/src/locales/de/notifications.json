@@ -19,8 +19,8 @@
         "message": "Einstellungen wurden gespeichert"
       },
       "tokenCopied": {
-        "title": "Token kopiert",
-        "message": "Pairing-Token wurde in die Zwischenablage kopiert"
+        "title": "Code kopiert",
+        "message": "Kopplungscode wurde in die Zwischenablage kopiert"
       },
       "violationAcknowledged": {
         "title": "Verstoß bestätigt",
@@ -40,7 +40,7 @@
       },
       "sessionsRevoked": {
         "title": "Sitzungen widerrufen",
-        "message": "Alle mobilen Sitzungen wurden widerrufen"
+        "message": "Alle Sitzungen wurden widerrufen"
       },
       "loggedIn": {
         "title": "Erfolg",
@@ -132,7 +132,7 @@
         "message": "Alle mobilen Sitzungen wurden widerrufen"
       },
       "pairTokenGenerated": {
-        "title": "Pairing-Token generiert",
+        "title": "Pairing-Code generiert",
         "message": "Scannen Sie den QR-Code mit Ihrem Mobilgerät"
       },
       "displayNameUpdated": {
@@ -197,7 +197,7 @@
       },
       "streamStopped": {
         "title": "Stream beendet",
-        "message": "{{user}} schaut nicht mehr"
+        "message": "{{user}} hat aufgehört zu schauen"
       },
       "updateAvailable": {
         "title": "Update verfügbar",
@@ -209,7 +209,7 @@
       },
       "serverOnline": {
         "title": "Server online",
-        "message": "{{name}} ist wieder online"
+        "message": "{{name}} ist wieder erreichbar"
       },
       "violationDetected": {
         "title": "Neuer Verstoß: {{ruleName}}",
@@ -243,13 +243,13 @@
     "concurrentStreams": "Gleichzeitige Streams",
     "newDevice": "Neues Gerät",
     "trustScoreChanged": "Vertrauenswert geändert",
-    "serverDown": "Server Down",
-    "serverUp": "Server Up",
+    "serverDown": "Server nicht Erreichbar",
+    "serverUp": "Server Erreichbar",
     "violationFilters": "Verstoßfilter",
     "minimumSeverity": "Mindestschweregrad",
     "quietHours": "Ruhezeiten",
     "enableQuietHours": "Erlaube Ruhezeiten",
-    "overrideForCritical": "Überschreibung für Kritisch",
+    "overrideForCritical": "Überschreibung für kritische Verstöße",
     "rateLimiting": "Ratenbegrenzung"
   }
 }
