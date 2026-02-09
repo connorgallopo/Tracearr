@@ -4,11 +4,11 @@
     "general": "Allgemein",
     "servers": "Server",
     "notifications": "Benachrichtigungen",
-    "mobile": "Mobile App",
+    "mobile": "Handyapp",
     "import": "Importieren",
     "advanced": "Erweitert",
     "jobs": "Jobs",
-    "accessControl": "Zugangs kontrolle"
+    "accessControl": "Zugangskontrolle"
   },
   "general": {
     "title": "Allgemeine Einstellungen",
@@ -26,21 +26,21 @@
     "addServer": "Server hinzufügen",
     "serverName": "Servername",
     "serverUrl": "Server-URL",
-    "apiKey": "API Key",
+    "apiKey": "API Schlüssel",
     "syncInterval": "Synchronisierungsintervall",
     "testConnection": "Verbindung testen",
     "connectionSuccess": "Verbindung erfolgreich",
     "connectionFailed": "Verbindung fehlgeschlagen"
   },
   "mobile": {
-    "title": "Mobile App",
+    "title": "Handyapp",
     "pairDevice": "Gerät koppeln",
     "connectedDevices": "Verbundene Geräte",
-    "generateToken": "Pairing-Token generieren",
+    "generateToken": "Kopplungs-Code generieren",
     "scanQrCode": "QR-Code scannen",
-    "tokenExpires": "Token läuft in {{time}} ab",
+    "tokenExpires": "Code läuft in {{time}} ab",
     "noDevices": "Keine Geräte verbunden",
-    "revokeAll": "Alle Sitzungen widerrufen"
+    "revokeAll": "Alle Kopplungen widerrufen"
   },
   "webhooks": {
     "title": "Webhook-Konfiguration",
@@ -98,18 +98,18 @@
     "waitingForPlex": "Auf Plex-Autorisierung warten..."
   },
   "update": {
-    "title": "Update verfügbar",
-    "releaseNotes": "Release Notes",
-    "updateCommand": "Befehl aktualisieren",
-    "pullInstructions": "Starten Sie nach dem laden Ihren Container neu, um das Update anzuwenden.",
-    "stableRelease": "Stable Release",
-    "betaUpdate": "Beta Update",
+    "title": "Aktualisierung verfügbar",
+    "releaseNotes": "Versionshinweise",
+    "updateCommand": "Aktualisierungsbefehl",
+    "pullInstructions": "Starten Sie Ihren Container nach dem laden neu, um das Aktualisierung anzuwenden.",
+    "stableRelease": "Stabile Ausgabe",
+    "betaUpdate": "Beta Aktualisierung",
     "newVersion": "Neue Version",
     "versionAvailable": "{{version}} verfügabr"
   },
   "serverHealth": {
     "unreachable": "{{serverName}} ist unerreichbar",
-    "multipleUnreachable": "{{count}} Server nicht erreichbar {{serverNames}}"
+    "multipleUnreachable": "{{count}} Server nicht erreichbar: {{serverNames}}"
   },
   "ipWarning": {
     "message": "Alle Benutzer scheinen dieselbe IP-Adresse oder dieselben lokalen Netzwerk-IPs zu verwenden. Dies kann Auswirkungen auf die regelbasierte Logik für Standort oder IP-Adressen haben.",
