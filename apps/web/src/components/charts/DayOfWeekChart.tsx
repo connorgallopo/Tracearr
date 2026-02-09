@@ -80,7 +80,7 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
           color: 'hsl(var(--popover-foreground))',
         },
         formatter: function () {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
           const label = (this as any).point?.category || this.x;
           return `<b>${label}</b><br/>Plays: ${this.y}`;
         },
