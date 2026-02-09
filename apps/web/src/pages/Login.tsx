@@ -220,7 +220,7 @@ export function Login() {
   };
 
   // Handle local signup
-  const handleLocalSignup = async (e: React.FormEvent) => {
+  const handleLocalSignup = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLocalLoading(true);
 
@@ -249,7 +249,7 @@ export function Login() {
   };
 
   // Handle local login
-  const handleLocalLogin = async (e: React.FormEvent) => {
+  const handleLocalLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLocalLoading(true);
 
@@ -277,7 +277,7 @@ export function Login() {
   };
 
   // Handle Jellyfin login
-  const handleJellyfinLogin = async (e: React.FormEvent) => {
+  const handleJellyfinLogin = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setJellyfinLoading(true);
 
