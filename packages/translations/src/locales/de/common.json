@@ -135,7 +135,7 @@
     "bandwidth": "Bandbreite",
     "content": "Inhalt",
     "date": "Datum",
-    "days": "days",
+    "days": "Tage",
     "device": "Gerät",
     "disabled": "Deaktiviert",
     "duration": "Dauer",
@@ -148,7 +148,7 @@
     "never": "Nie",
     "pausedTime": "Pausierte Zeit",
     "platform": "Plattform",
-    "player": "Player",
+    "player": "Wiedergabegerät",
     "progress": "Fortschritt",
     "quality": "Qualität",
     "reason": "Grund",
@@ -179,21 +179,21 @@
   "messages": {
     "noChangesDetected": "Keine Änderungen erkannt"
   },
-  "or": "or",
+  "or": "oder",
   "periods": {
     "byDay": "Nach Tag",
     "byHour": "Nach Stunde",
-    "last30Days": "Letzten 30 Tage",
-    "last7Days": "Letzten 7 Tage",
-    "lastYear": "Letzte Jahr"
+    "last30Days": "Letzte 30 Tage",
+    "last7Days": "Letzte 7 Tage",
+    "lastYear": "Letztes Jahr"
   },
   "playback": {
-    "directPlay": "Direct Play",
-    "directStream": "Direct Stream",
+    "directPlay": "Direktes Spielen",
+    "directStream": "Direkter Stream",
     "paused": "Pausiert",
     "playing": "Läuft",
     "stopped": "Gestoppt",
-    "transcode": "Transcode"
+    "transcode": "Transkodiert"
   },
   "relativeTime": {
     "day_one": "vor {{count}} Tag",
@@ -229,7 +229,7 @@
   },
   "states": {
     "acknowledged": "Bestätigt",
-    "acknowledging": "Acknowledging...",
+    "acknowledging": "Bestätigen...",
     "active": "Aktiv",
     "connected": "Verbunden",
     "connecting": "Verbinden...",
