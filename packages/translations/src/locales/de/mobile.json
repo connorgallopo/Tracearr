@@ -6,9 +6,9 @@
     "connectToServer": "Server verbinden",
     "enterServerDetails": "Geben Sie die URL Ihres Tracearr-Servers und den Mobile-Zugriffstoken ein",
     "serverUrl": "Server URL",
-    "accessToken": "Access Token",
-    "scanQrCodeInstead": "Scanne QR Code stattdessen",
-    "enterManually": "URL und Token manuell eingeben",
+    "accessToken": "Zugriffscode",
+    "scanQrCodeInstead": "stattdessen QR-Code scannen",
+    "enterManually": "URL und Code manuell eingeben",
     "cameraPermissionRequired": "Kameraberechtigung ist erforderlich, um QR-Codes zu scannen",
     "scanQrInstructions": "Öffne Einstellungen → Mobile App in deinem Tracearr-Dashboard und scanne den QR-Code"
   },
@@ -26,21 +26,21 @@
     "invalidQrCodeMissingToken": "Ungültiger QR-Code: Kopplungs-Token fehlt",
     "invalidServerUrlInQr": "Ungültige Server-URL im QR-Code",
     "tooManyPairingAttempts": "Zu viele Kopplungsversuche. Bitte warten Sie ein paar Minuten.",
-    "invalidOrExpiredToken": "Ungültiges oder abgelaufenes Kopplungs-Token.",
-    "invalidPairingRequest": "Ungültige Kopplungsanfrage. Bitte Token überprüfen."
+    "invalidOrExpiredToken": "Ungültiger oder abgelaufener Kopplungs-Code.",
+    "invalidPairingRequest": "Ungültige Kopplungsanfrage. Bitte Code überprüfen."
   },
   "settings": {
     "preferences": "Einstellungen",
     "community": "Community",
     "discord": "Discord",
-    "joinCommunity": "Trete der Community bei",
+    "joinCommunity": "Der Community beitreten",
     "github": "GitHub",
-    "viewSourceCode": "Source Code anschauen",
+    "viewSourceCode": "Quellcode anzeigen",
     "account": "Account",
     "disconnectServer": "Server trennen",
     "disconnectConfirm": "Sind Sie sicher, dass Sie sich von \"{{serverName}}\" trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen",
     "disconnectConfirmGeneric": "Sind Sie sicher, dass Sie sich trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
-    "currentlyConnected": "Derzeit verbunden mit {{serverName}}"
+    "currentlyConnected": "Derzeit mit {{serverName}} verbunden"
   },
   "navigation": {
     "selectServer": "Server wählen",
