@@ -26,7 +26,7 @@
     "watchTime": "Wiedergabezeit"
   },
   "history": {
-    "deleteSession_one": "Lösche eine Session",
+    "deleteSession_one": "Lösche {{count}} Session",
     "deleteSession_other": "Lösche {{count}} Sessions",
     "deleteSessions": "Lösche {{count}} Sessions",
     "deleteSessionsConfirm": "Möchten Sie wirklich {{count}} Sitzungen löschen? Diese Aktion kann nicht rückgängig gemacht werden..",
@@ -119,7 +119,7 @@
     "days": "Tage",
     "deleteRule": "Regel löschen",
     "deleteRuleConfirm": "Diese Regel wirklich löschen? Dieser Vorgang ist unwiderruflich.",
-    "deleteRule_one": "Eine Regel löschen",
+    "deleteRule_one": "{{count}} Regel löschen",
     "deleteRule_other": "{{count}} Regeln löschen",
     "deleteRulesConfirm": "Diese Regeln wirklich löschen? Dieser Vorgang ist unwiderruflich.",
     "description": "Erkennungsregeln für Kontofreigabe und Richtlinienverletzungen konfigurieren",
@@ -210,7 +210,7 @@
       "webhookUrlPlaceholder": "https://..."
     },
     "plex": {
-      "accountsLinked_one": "Ein Plex-Konto verknüpft",
+      "accountsLinked_one": "{{count}} Plex-Konto verknüpft",
       "accountsLinked_other": "{{count}} Plex-Konten verknüpft",
       "connectingTo": "Verbinde mit {{name}}...",
       "connectionsAvailable": "{{count}} Verbindungen verfügbar",
