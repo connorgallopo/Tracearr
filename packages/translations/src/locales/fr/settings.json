@@ -27,7 +27,7 @@
     "serverUrl": "Server URL",
     "apiKey": "API Key",
     "syncInterval": "Sync Interval",
-    "testConnection": "Test Connection",
+    "testConnection": "Tester la connexion",
     "connectionSuccess": "Connection successful",
     "connectionFailed": "Connection failed"
   },
@@ -47,7 +47,7 @@
     "ntfyTopic": "Ntfy Topic",
     "customWebhook": "Custom Webhook URL",
     "webhookFormat": "Webhook Format",
-    "testWebhook": "Test Webhook"
+    "testWebhook": "Tester le webhook"
   },
   "advanced": {
     "title": "Advanced Settings",
@@ -94,7 +94,7 @@
     "signInToAccount": "Sign in to your account",
     "useLocalAccount": "Use local account instead",
     "useJellyfinAccount": "Use Jellyfin account instead",
-    "waitingForPlex": "Waiting for Plex authorization..."
+    "waitingForPlex": "En attente d'autorisation de Plex..."
   },
   "update": {
     "title": "Update Available",
@@ -112,6 +112,6 @@
   },
   "ipWarning": {
     "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses.",
-    "acknowledge": "Got it"
+    "acknowledge": "Compris"
   }
 }
