@@ -34,7 +34,7 @@
         "message": "L'appareil a bien été déconnecté"
       },
       "deviceRenamed": {
-        "title": "Device Renamed",
+        "title": "Appareil renommé",
         "message": "Le nom de l'appareil a été mis à jour"
       },
       "sessionsRevoked": {
@@ -177,42 +177,42 @@
       "agentUpdateFailed": "Échec de la mise à jour de l'agent",
       "agentRemoveFailed": "Échec de la suppression de l'agent",
       "agentTestFailed": "Échec du test",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead."
+      "jobAlreadyRunning": "Tâche déjà en cours d'exécution",
+      "jobStartFailed": "Échec de démarrage de la tâche",
+      "jobLoadFailed": "Échec du chargement des tâches de maintenance",
+      "invalidUrl": "URL invalide",
+      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai propriétaires à Plex qui ne peuvent pas être utilisées ici. Merci d'utiliser une adresse IP directe ou un nom d'hôte à la place."
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "Tâche échouée",
+        "message": "Une erreur est survenue lors de l'exécution de la tâche {{name}}"
       }
     },
     "info": {
       "streamStarted": {
         "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "message": "{{user}} a commencé a regarder {{media}}"
       },
       "streamStopped": {
         "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "message": "{{user}} a arrêté de regarder"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "Mise à jour disponible",
+        "message": "Une nouvelle version de Tracearr est disponible : {{version}}"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "Serveur hors ligne",
+        "message": "{{name}} est inaccessible"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "Serveur en ligne",
+        "message": "{{name}} est de retour en ligne"
       },
       "violationDetected": {
         "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "message": "{{user}} a déclenché {{ruleType}}"
       }
     }
   },
@@ -220,28 +220,28 @@
     "violationDetected": "Sharing Violation Detected",
     "streamStarted": "Stream Started",
     "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "serverDown": "Serveur hors-ligne",
+    "serverUp": "Serveur de retour en ligne",
+    "newDevice": "Nouvel appareil",
+    "trustScoreChanged": "Score de confiance changé"
   },
   "settings": {
-    "title": "Notification Settings",
+    "title": "Paramètres de notifications",
     "allSeverity": "All (Low, Warning, High)",
     "warningAndHigh": "Warning & High only",
     "highOnly": "High severity only",
     "allTypes": "All Types",
     "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
+    "perMinute": "Par minute",
+    "perHour": "Par heure",
+    "enablePushNotifications": "Activer les notifications Push",
     "notificationEvents": "Notification Events",
     "violationDetected": "Violation Detected",
     "streamStarted": "Stream Started",
     "streamStopped": "Stream Stopped",
     "concurrentStreams": "Concurrent Streams",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed",
+    "newDevice": "Nouvel appareil",
+    "trustScoreChanged": "Score de confiance changé",
     "serverDown": "Server Down",
     "serverUp": "Server Up",
     "violationFilters": "Violation Filters",
