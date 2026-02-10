@@ -54,7 +54,7 @@
     "testSent": "Test envoyé",
     "testFailed": "Échec du test",
     "failedToSendTest": "Échec de l'envoi de la notification de test",
-    "loadingPreferences": "Chargement des réglages...",
+    "loadingPreferences": "Chargement des réglages en cours...",
     "unableToLoadPreferences": "Impossible de charger les réglages"
   }
 }
