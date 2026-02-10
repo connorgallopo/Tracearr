@@ -11,19 +11,19 @@
       },
       "serverSynced": {
         "title": "Serveur synchronisé",
-        "message": "Server data has been synchronized"
+        "message": "Les données du serveur ont été synchronisées"
       },
       "settingsUpdated": {
-        "title": "Settings Updated",
-        "message": "Your settings have been saved"
+        "title": "Réglages mis à jour",
+        "message": "Vos réglages ont été sauvegardés"
       },
       "tokenCopied": {
-        "title": "Token Copied",
-        "message": "Pair token copied to clipboard"
+        "title": "Jeton copié",
+        "message": "Jeton d'appairage copié dans le presse-papiers"
       },
       "violationAcknowledged": {
-        "title": "Violation Acknowledged",
-        "message": "The violation has been marked as acknowledged"
+        "title": "Violation reconnue",
+        "message": "La violation a été marquée comme reconnue"
       },
       "violationDismissed": {
         "title": "Violation Dismissed",
@@ -35,148 +35,148 @@
       },
       "deviceRenamed": {
         "title": "Device Renamed",
-        "message": "The device name has been updated"
+        "message": "Le nom de l'appareil a été mis à jour"
       },
       "sessionsRevoked": {
-        "title": "Sessions Revoked",
-        "message": "All mobile sessions have been revoked"
+        "title": "Sessions révoquées",
+        "message": "Toutes les sessions mobile ont été révoquées"
       },
       "loggedIn": {
-        "title": "Success",
-        "message": "Logged in successfully"
+        "title": "Succès",
+        "message": "Connecté avec succès"
       },
       "webhookTest": {
-        "title": "Test Successful",
-        "message": "Webhook is working correctly"
+        "title": "Test réussi",
+        "message": "Le webhook fonctionne correctement"
       },
       "copiedToClipboard": {
-        "title": "Copied to clipboard"
+        "title": "Copié dans le presse-papiers"
       },
       "plexAccountLinked": {
-        "title": "Plex Account Linked",
-        "message": "You can now add servers from your Plex account"
+        "title": "Compte Plex lié",
+        "message": "Vous pouvez maintenant ajouter des serveurs depuis votre compte Plex"
       },
       "plexAccountUnlinked": {
-        "title": "Plex Account Unlinked",
-        "message": "Your Plex account has been disconnected"
+        "title": "Compte Plex dissocié",
+        "message": "Votre compte Plex a été déconnecté"
       },
       "agentAdded": {
-        "title": "Agent Added",
-        "message": "The notification agent has been added"
+        "title": "Agent ajouté",
+        "message": "L'agent de notification a été ajouté"
       },
       "agentUpdated": {
-        "title": "Agent Updated",
-        "message": "The notification agent has been updated"
+        "title": "Agent mis à jour",
+        "message": "L'agent de notification a été mis à jour"
       },
       "agentRemoved": {
         "title": "Agent supprimé",
         "message": "L'agent de notification a été supprimé"
       },
       "jobCompleted": {
-        "title": "Job Completed",
-        "message": "{{name}} finished successfully"
+        "title": "Tâche terminée",
+        "message": "{{name}} terminée avec succès"
       },
       "ruleCreated": {
-        "title": "Rule Created",
-        "message": "The rule has been created successfully"
+        "title": "Règle créée",
+        "message": "La règle a été créée avec succès"
       },
       "ruleUpdated": {
-        "title": "Rule Updated",
-        "message": "The rule has been updated successfully"
+        "title": "Règle mise à jour",
+        "message": "La règle a été mise à jour avec succès"
       },
       "ruleDeleted": {
-        "title": "Rule Deleted",
-        "message": "The rule has been deleted successfully"
+        "title": "Règle supprimée",
+        "message": "La règle a été supprimée avec succès"
       },
       "streamTerminated": {
-        "title": "Stream Terminated",
-        "message": "The playback session has been stopped"
+        "title": "Lecture interrompue",
+        "message": "La session de lecture a été interrompue"
       },
       "serverUrlUpdated": {
-        "title": "Server URL Updated",
-        "message": "The server URL has been updated successfully"
+        "title": "URL du serveur mise à jour",
+        "message": "L'URL du serveur a été mise à jour avec succès"
       },
       "serverUpdated": {
-        "title": "Server Updated",
-        "message": "The server has been updated successfully"
+        "title": "Serveur mis à jour",
+        "message": "Le serveur a été mis à jour avec succès"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "Synchronisation terminée avec des erreurs"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "title": "Sessions supprimées",
+        "message_one": "{{count}} session supprimée",
+        "message_other": "{{count}} sessions supprimées"
       },
       "violationsAcknowledged": {
-        "title": "Violations Acknowledged",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "title": "Violations reconnues",
+        "message_one": "{{count}} violation reconnue",
+        "message_other": "{{count}} violations reconnues"
       },
       "violationsDismissed": {
-        "title": "Violations Dismissed",
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed"
+        "title": "Violations ignorées",
+        "message_one": "{{count}} violation ignorée",
+        "message_other": "{{count}} violations ignorées"
       },
       "apiKeyGenerated": {
-        "title": "API Key Generated",
-        "message": "Your new API key is ready to use"
+        "title": "Clé API générée",
+        "message": "Votre nouvelle clé API est prête à être utilisée"
       },
       "mobileAccessEnabled": {
-        "title": "Mobile Access Enabled",
-        "message": "Scan the QR code with the Tracearr mobile app to connect"
+        "title": "Accès mobile activé",
+        "message": "Scannez le code QR avec l'application mobile Tracearr pour vous connecter"
       },
       "mobileAccessDisabled": {
-        "title": "Mobile Access Disabled",
-        "message": "All mobile sessions have been revoked"
+        "title": "Accès mobile désactivé",
+        "message": "Toutes les sessions mobile ont été révoquées"
       },
       "pairTokenGenerated": {
-        "title": "Pair Token Generated",
-        "message": "Scan the QR code with your mobile device to pair"
+        "title": "Jeton d'appairage généré",
+        "message": "Scannez le code QR avec votre appareil mobile pour appairer"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "Nom d'affichage mis à jour"
       },
       "trustScoresReset": {
-        "title": "Trust Scores Reset",
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100"
+        "title": "Réinitialiser les scores de confiance",
+        "message_one": "{{count}} utilisateur réinitialisé à 100",
+        "message_other": "{{count}} utilisateurs réinitialisés à 100"
       }
     },
     "error": {
-      "serverAddFailed": "Failed to add server",
+      "serverAddFailed": "Échec de l'ajout du serveur",
       "serverRemoveFailed": "Échec de la suppression du serveur",
-      "serverSyncFailed": "Failed to sync server",
-      "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "dismissFailed": "Failed to dismiss violation",
-      "authFailed": "Authentication failed",
-      "webhookTestFailed": "Webhook test failed",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
+      "serverSyncFailed": "Échec de la synchronisation du serveur",
+      "settingsUpdateFailed": "Échec de la mise à jour des réglages",
+      "copyFailed": "Impossible de copier dans le presse-papiers",
+      "acknowledgeFailed": "Échec de la reconnaissance de la violation",
+      "dismissFailed": "Échec de l'ignorance de la violation",
+      "authFailed": "Échec de l'authentification",
+      "webhookTestFailed": "Échec du test du webhook",
+      "ruleCreateFailed": "Échec de la création de la règle",
+      "ruleUpdateFailed": "Échec de la mise à jour de la règle",
+      "ruleDeleteFailed": "Échec de la suppression de la règle",
+      "streamTerminateFailed": "Échec de l'arrêt de la lecture",
+      "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
+      "serverUpdateFailed": "Échec de la mise à jour du serveur",
+      "serverReorderFailed": "Échec de la réorganisation des serveurs",
+      "sessionsDeleteFailed": "Échec de la suppression des sessions",
+      "apiKeyGenerateFailed": "Échec de la génération de la clé API",
+      "mobileAccessEnableFailed": "Échec de l'activation de l'accès mobile",
+      "mobileAccessDisableFailed": "Échec de la désactivation de l'accès mobile",
+      "pairTokenGenerateFailed": "Échec de la génération du jeton d'appairage",
       "deviceRemoveFailed": "Échec de la suppression de l'appareil",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
+      "deviceRenameFailed": "Échec du renommage de l'appareil",
+      "sessionsRevokeFailed": "Échec de la révocation des sessions",
+      "displayNameUpdateFailed": "Échec de la mise à jour du nom d'affichage",
+      "trustScoresResetFailed": "Échec de la réinitialisation des scores de confiance",
+      "routingUpdateFailed": "Échec de la mise à jour du routage",
+      "clipboardFailed": "Échec de la copie dans le presse-papiers",
+      "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
+      "agentAddFailed": "Échec de l'ajout de l'agent",
+      "agentUpdateFailed": "Échec de la mise à jour de l'agent",
       "agentRemoveFailed": "Échec de la suppression de l'agent",
-      "agentTestFailed": "Test failed",
+      "agentTestFailed": "Échec du test",
       "jobAlreadyRunning": "Job already running",
       "jobStartFailed": "Failed to start job",
       "jobLoadFailed": "Failed to load maintenance jobs",
