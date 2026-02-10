@@ -2,15 +2,15 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "Server Added",
-        "message": "{{name}} has been connected successfully"
+        "title": "Serveur ajouté",
+        "message": "{{name}} a été connecté avec succès"
       },
       "serverRemoved": {
-        "title": "Server Removed",
-        "message": "The server has been removed successfully"
+        "title": "Serveur supprimé",
+        "message": "Le serveur a été supprimé avec succès"
       },
       "serverSynced": {
-        "title": "Server Synced",
+        "title": "Serveur synchronisé",
         "message": "Server data has been synchronized"
       },
       "settingsUpdated": {
@@ -30,8 +30,8 @@
         "message": "The violation has been dismissed"
       },
       "deviceRemoved": {
-        "title": "Device Removed",
-        "message": "The device has been disconnected"
+        "title": "Appareil supprimé",
+        "message": "L'appareil a bien été déconnecté"
       },
       "deviceRenamed": {
         "title": "Device Renamed",
@@ -69,8 +69,8 @@
         "message": "The notification agent has been updated"
       },
       "agentRemoved": {
-        "title": "Agent Removed",
-        "message": "The notification agent has been removed"
+        "title": "Agent supprimé",
+        "message": "L'agent de notification a été supprimé"
       },
       "jobCompleted": {
         "title": "Job Completed",
@@ -145,7 +145,7 @@
     },
     "error": {
       "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
+      "serverRemoveFailed": "Échec de la suppression du serveur",
       "serverSyncFailed": "Failed to sync server",
       "settingsUpdateFailed": "Failed to update settings",
       "copyFailed": "Could not copy to clipboard",
@@ -165,7 +165,7 @@
       "mobileAccessEnableFailed": "Failed to enable mobile access",
       "mobileAccessDisableFailed": "Failed to disable mobile access",
       "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
+      "deviceRemoveFailed": "Échec de la suppression de l'appareil",
       "deviceRenameFailed": "Failed to rename device",
       "sessionsRevokeFailed": "Failed to revoke sessions",
       "displayNameUpdateFailed": "Failed to update display name",
@@ -175,7 +175,7 @@
       "plexUnlinkFailed": "Failed to unlink Plex account",
       "agentAddFailed": "Failed to add agent",
       "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
+      "agentRemoveFailed": "Échec de la suppression de l'agent",
       "agentTestFailed": "Test failed",
       "jobAlreadyRunning": "Job already running",
       "jobStartFailed": "Failed to start job",
