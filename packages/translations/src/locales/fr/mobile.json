@@ -1,11 +1,11 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "serverUrl": "Server URL",
-    "accessToken": "Access Token",
+    "welcome": "Bienvenue sur Tracearr",
+    "addServer": "Ajouter un serveur",
+    "connectToServer": "Se connecter au serveur",
+    "enterServerDetails": "Entrez l'URL de votre serveur Tracearr et le jeton d'accès mobile",
+    "serverUrl": "URL du serveur",
+    "accessToken": "Jeton d'accès",
     "scanQrCodeInstead": "Scan QR Code Instead",
     "enterManually": "Enter URL and Token Manually",
     "cameraPermissionRequired": "Camera permission is required to scan QR codes",
