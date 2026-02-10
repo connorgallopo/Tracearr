@@ -6,15 +6,15 @@
     "enterServerDetails": "Entrez l'URL de votre serveur Tracearr et le jeton d'accès mobile",
     "serverUrl": "URL du serveur",
     "accessToken": "Jeton d'accès",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "enterManually": "Enter URL and Token Manually",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "scanQrCodeInstead": "Scanner le QR code à la place",
+    "enterManually": "Entrer l'URL et le jeton d'accès mobile manuellement",
+    "cameraPermissionRequired": "L'autorisation \"Appareil photo\" est requise pour scanner les QR codes",
+    "scanQrInstructions": "Ouvrez Tableau de bord → Application mobile dans votre tableau de bord Tracearr et scannez le code QR"
   },
   "errors": {
-    "missingFields": "Missing Fields",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "invalidUrl": "Invalid URL",
+    "missingFields": "Champs manquants",
+    "pleaseEnterBothFields": "Veuillez entrer à la fois l'URL du serveur et le jeton d'accès mobile",
+    "invalidUrl": "URL invalide",
     "serverUrlMustStartWith": "L'URL du serveur doit commencer par http:// ou https://",
     "pleaseEnterValidUrl": "Veuillez entrer une URL de serveur valide",
     "pairingFailed": "Échec de l'appairage",
