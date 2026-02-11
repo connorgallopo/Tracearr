@@ -181,7 +181,7 @@
       "jobStartFailed": "Échec de démarrage de la tâche",
       "jobLoadFailed": "Échec du chargement des tâches de maintenance",
       "invalidUrl": "URL invalide",
-      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai propriétaires à Plex qui ne peuvent pas être utilisées ici. Merci d'utiliser une adresse IP directe ou un nom d'hôte à la place."
+      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place."
     },
     "warning": {
       "jobFailed": {
@@ -200,7 +200,7 @@
       },
       "updateAvailable": {
         "title": "Mise à jour disponible",
-        "message": "Une nouvelle version de Tracearr est disponible : {{version}}"
+        "message": "Tracearr {{version}} est disponible"
       },
       "serverOffline": {
         "title": "Serveur hors ligne",
@@ -220,13 +220,13 @@
     "violationDetected": "Violation de partage détectée",
     "streamStarted": "Lecture démarrée",
     "streamEnded": "Lecture terminée",
-    "serverDown": "Serveur hors-ligne",
+    "serverDown": "Connexion au serveur perdue",
     "serverUp": "Serveur de retour en ligne",
     "newDevice": "Nouvel appareil",
     "trustScoreChanged": "Score de confiance changé"
   },
   "settings": {
-    "title": "Paramètres de notifications",
+    "title": "Réglages de notifications",
     "allSeverity": "Toutes (Faible, Avertissement, Élevée)",
     "warningAndHigh": "Avertissement et Élevée seulement",
     "highOnly": "Gravité élevée seulement",
@@ -248,7 +248,7 @@
     "minimumSeverity": "Gravité minimum",
     "quietHours": "Heures silencieuses",
     "enableQuietHours": "Activer les heures silencieuses",
-    "overrideForCritical": "Override for Critical",
+    "overrideForCritical": "Remplacer pour Critique",
     "rateLimiting": "Limitation de débit"
   }
 }
