@@ -249,6 +249,6 @@
     "quietHours": "Heures silencieuses",
     "enableQuietHours": "Activer les heures silencieuses",
     "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "rateLimiting": "Limitation de débit"
   }
 }
