@@ -62,15 +62,15 @@
       },
       "agentAdded": {
         "title": "Agent hinzugefügt",
-        "message": "Der Benachrichtigungsagent wurde hinzugefügt"
+        "message": "Der Benachrichtigungs-Agent wurde hinzugefügt"
       },
       "agentUpdated": {
         "title": "Agent aktualisiert",
-        "message": "Der Benachrichtigungsagent wurde aktualisiert"
+        "message": "Der Benachrichtigungs-Agent wurde aktualisiert"
       },
       "agentRemoved": {
         "title": "Agent entfernt",
-        "message": "Der Benachrichtigungsagent wurde entfernt"
+        "message": "Der Benachrichtigungs-Agent wurde entfernt"
       },
       "jobCompleted": {
         "title": "Aufgabe abgeschlossen",
@@ -124,7 +124,7 @@
       },
       "mobileAccessEnabled": {
         "title": "Mobiler Zugriff aktiviert",
-        "message": "Scannen Sie den QR-Code mit der Tracearr-App"
+        "message": "Scannen Sie den QR-Code mit der Tracearr Mobile App um sich zu verbinden"
       },
       "mobileAccessDisabled": {
         "title": "Mobiler Zugriff deaktiviert",
@@ -143,8 +143,8 @@
         "message_other": "{{count}} Benutzer auf 100 zurückgesetzt"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Claim Code validiert",
+        "message": "Sie können nun mit dem Setup fortfahren"
       }
     },
     "error": {
@@ -185,10 +185,10 @@
       "jobStartFailed": "Aufgabe starten fehlgeschlagen",
       "jobLoadFailed": "Wartungsaufgaben laden fehlgeschlagen",
       "invalidUrl": "Ungültige URL",
-      "plexDirectUrl": "plex.direct-URLs sind Relay-Adressen und können hier nicht verwendet werden. Bitte verwenden Sie stattdessen eine direkte IP-Adresse oder einen Hostnamen.",
+      "plexDirectUrl": "plex.direct URLs sind Relayadressen, die hier nicht verwendet werden können. Bitte verwenden Sie stattdessen eine direkte IP-Adresse oder einen Hostnamen.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Ungültiger Claim Code",
+        "message": "Bitte überprüfen Sie die Server Logs"
       }
     },
     "warning": {
@@ -243,7 +243,7 @@
     "perMinute": "Pro Minute",
     "perHour": "Pro Stunde",
     "enablePushNotifications": "Push-Benachrichtigungen aktivieren",
-    "notificationEvents": "Benachrichtigungsereignisse",
+    "notificationEvents": "Benachrichtigungs-Events",
     "violationDetected": "Verstoß erkannt",
     "streamStarted": "Stream gestartet",
     "streamStopped": "Stream gestoppt",
@@ -257,6 +257,6 @@
     "quietHours": "Ruhezeiten",
     "enableQuietHours": "Erlaube Ruhezeiten",
     "overrideForCritical": "Überschreibung für Kritisch",
-    "rateLimiting": "Ratenbegrenzung"
+    "rateLimiting": "Anfragen begrenzen"
   }
 }
