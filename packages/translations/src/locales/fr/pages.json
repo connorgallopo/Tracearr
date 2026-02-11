@@ -17,7 +17,7 @@
     "jellyfinUsernamePlaceholder": "Votre nom d'utilisateur Jellyfin",
     "jellyfinPasswordPlaceholder": "Votre mot de passe Jellyfin",
     "jellyfinAdminNote": "Vous devez être administrateur sur un serveur Jellyfin configuré",
-    "setupNote": "Après avoir créé votre compte, vous pourrez ajouter vos serveurs Plex ou Jellyfin depuis les paramètres.",
+    "setupNote": "Après avoir créé votre compte, vous pourrez ajouter vos serveurs Plex ou Jellyfin depuis les réglages.",
     "accountCreated": "Compte créé avec succès !",
     "connectedTo": "Connecté à {{name}}",
     "plexAuthFailed": "Échec de l'authentification à Plex",
@@ -27,14 +27,14 @@
     "createAccountFailed": "Échec de la création du compte",
     "loginFailed": "Échec de la connexion",
     "invalidCredentials": "Adresse email ou mot de passe invalide",
-    "jellyfinInvalidCredentials": "Nom d'utilisateur ou mot de passe invalide, ou l'utilisateur n'est pas un administrateur Jellyfin"
+    "jellyfinInvalidCredentials": "Nom d'utilisateur ou mot de passe invalide, ou l'utilisateur n'est pas un administrateur"
   },
   "dashboard": {
     "alerts": "Alertes",
     "plays": "Lectures",
     "watchTime": "Temps de visionnage",
     "activeUsers": "Utilisateurs actifs",
-    "nowPlaying": "En cours de lecture",
+    "nowPlaying": "Lecture en cours",
     "streamLocations": "Emplacements des lectures",
     "serverResources": "Ressources du serveur",
     "noActiveStreams": "Aucune lecture en cours",
@@ -54,7 +54,7 @@
   "userDetail": {
     "backToUsers": "Retour aux utilisateurs",
     "userNotFound": "Utilisateur introuvable",
-    "userInfo": "Informations sur l'utilisateur",
+    "userInfo": "Informations de l'utilisateur",
     "statistics": "Statistiques",
     "sessions": "Sessions",
     "violations": "Violations",
@@ -141,7 +141,7 @@
     "description": "Configurer les règles de détection pour le partage de compte et les violations de politique",
     "addRule": "Ajouter une règle",
     "createRule": "Créer une règle",
-    "editRule": "Modifier une règle",
+    "editRule": "Modifier la règle",
     "updateDescription": "Mettez à jour la configuration de la règle ci-dessous.",
     "createDescription": "Configurez une nouvelle règle de détection pour vos serveurs multimédias.",
     "ruleName": "Nom de la règle",
@@ -150,8 +150,8 @@
     "updateRule": "Mettre à jour la règle",
     "deleteRule": "Supprimer la règle",
     "deleteRuleConfirm": "Êtes-vous sûr de vouloir supprimer cette règle ? Cette action est irréversible.",
-    "deleteRule_one": "Supprimer la règle {{count}}",
-    "deleteRule_other": "Supprimer les {{count}} règles",
+    "deleteRule_one": "Supprimer {{count}} règle",
+    "deleteRule_other": "Supprimer {{count}} règles",
     "deleteRulesConfirm": "Êtes-vous sûr de vouloir supprimer ceci ? Cette action est irréversible.",
     "enable": "Activer",
     "disable": "Désactiver",
@@ -264,7 +264,7 @@
       "webhookUrl": "URL du webhook",
       "webhookUrlPlaceholder": "https://...",
       "triggerEvents": "Déclencher des événements",
-      "allEvents": "Tous les évènements",
+      "allEvents": "Tous les événements",
       "customEvents": "Événements personnalisés",
       "eventSelection": "Sélection d'événement",
       "testingAgent": "Test en cours...",
@@ -277,7 +277,7 @@
       "allAgentsConfigured": "Tous les agents de notifications sont déjà configurés.",
       "noConfigNeeded": "Aucune configuration requise pour cet agent.",
       "saveAgent": "Ajouter un agent",
-      "updateAgent": "Mettre à jour un agent"
+      "updateAgent": "Mettre à jour l'agent"
     },
     "jobs": {
       "runNow": "Exécuter maintenant",
@@ -288,10 +288,10 @@
       "jobHistory": "Historique des tâches"
     },
     "mobile": {
-      "editDisplayName": "Modifier le nom affiché",
-      "editDisplayNameDesc": "Modifier l'apparence de cet appareil dans la liste des périphériques",
+      "editDisplayName": "Modifier le nom d'affichage",
+      "editDisplayNameDesc": "Modifier la façon dont cet appareil apparaît dans votre liste d’appareils",
       "displayName": "Nom d'affichage",
-      "displayNamePlaceholder": "ex. : Mon téléphone",
+      "displayNamePlaceholder": "ex. : Mon iPhone",
       "updating": "Mise à jour en cours..."
     }
   }
