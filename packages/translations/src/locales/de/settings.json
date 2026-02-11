@@ -1,5 +1,4 @@
 {
-  "_TODO": "New keys added - translate: tabs.jobs, tabs.accessControl, import.processed through import.errors, update.*, serverHealth.*",
   "tabs": {
     "general": "Allgemein",
     "servers": "Server",

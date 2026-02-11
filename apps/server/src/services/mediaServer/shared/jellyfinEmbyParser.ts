@@ -533,7 +533,7 @@ export function parseProviderIds(providerIds: unknown): {
  */
 export function mapJellyfinType(
   type: unknown
-): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' {
+): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' | 'photo' {
   const typeStr = (typeof type === 'string' ? type : '').toLowerCase();
 
   switch (typeStr) {
@@ -551,8 +551,10 @@ export function mapJellyfinType(
       return 'album';
     case 'audio':
       return 'track';
+    case 'photo':
+      return 'photo';
     default:
-      return 'movie'; // Default to movie for unknown types
+      return 'movie';
   }
 }
 

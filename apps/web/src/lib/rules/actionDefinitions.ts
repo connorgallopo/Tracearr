@@ -224,16 +224,6 @@ export const ACTION_DEFINITIONS: Record<ActionType, ActionDefinition> = {
     color: 'destructive',
     configFields: [
       {
-        name: 'delay_seconds',
-        label: 'Delay',
-        type: 'number',
-        min: 0,
-        max: 300,
-        step: 5,
-        unit: 'seconds',
-        description: 'Wait before terminating',
-      },
-      {
         name: 'cooldown_minutes',
         label: 'Cooldown',
         type: 'number',
@@ -241,7 +231,7 @@ export const ACTION_DEFINITIONS: Record<ActionType, ActionDefinition> = {
         max: 1440,
         step: 5,
         unit: 'minutes',
-        description: 'Minimum time between terminations',
+        description: 'Minimum time between terminations for the same user',
       },
       {
         name: 'target',

@@ -1,5 +1,4 @@
 {
-  "_TODO": "German translations needed - copy values from en/mobile.json and translate",
   "pair": {
     "welcome": "Wilkommen zu Tracearr",
     "addServer": "Server hinzufügen",

@@ -178,10 +178,11 @@ async function handlePlaying(event: {
       await updateExistingSession(existingSession, session, 'playing');
     } else {
       // Check if this session was recently terminated (cooldown prevents re-creation)
-      if (cacheService) {
+      if (cacheService && session.ratingKey) {
         const hasCooldown = await cacheService.hasTerminationCooldown(
           serverId,
-          notification.sessionKey
+          notification.sessionKey,
+          session.ratingKey
         );
         if (hasCooldown) {
           console.log(
@@ -545,7 +546,7 @@ async function createNewSession(
     return;
   }
 
-  const { insertedSession, violationResults, qualityChange } = result;
+  const { insertedSession, violationResults, qualityChange, wasTerminatedByRule } = result;
 
   if (qualityChange && cacheService) {
     await cacheService.removeActiveSession(qualityChange.stoppedSession.id);
@@ -556,6 +557,21 @@ async function createNewSession(
     if (pubSubService) {
       await pubSubService.publish('session:stopped', qualityChange.stoppedSession.id);
     }
+  }
+
+  if (pubSubService) {
+    try {
+      await broadcastViolations(violationResults, insertedSession.id, pubSubService);
+    } catch (error) {
+      console.error('[SSEProcessor] Error broadcasting violations:', error);
+    }
+  }
+
+  if (wasTerminatedByRule) {
+    console.log(
+      `[SSEProcessor] Session ${insertedSession.id} was terminated by rule, skipping cache add`
+    );
+    return;
   }
 
   const activeSession = buildActiveSession({
@@ -572,12 +588,6 @@ async function createNewSession(
   if (pubSubService) {
     await pubSubService.publish('session:started', activeSession);
     await enqueueNotification({ type: 'session_started', payload: activeSession });
-
-    try {
-      await broadcastViolations(violationResults, insertedSession.id, pubSubService);
-    } catch (error) {
-      console.error('[SSEProcessor] Error broadcasting violations:', error);
-    }
   }
 
   console.log(`[SSEProcessor] Created session ${insertedSession.id} for ${processed.mediaTitle}`);
@@ -642,7 +652,7 @@ async function handleMediaChange(
     return;
   }
 
-  const { stoppedSession, insertedSession, violationResults } = result;
+  const { stoppedSession, insertedSession, violationResults, wasTerminatedByRule } = result;
 
   // Update cache for stopped session
   await cacheService.removeActiveSession(stoppedSession.id);
@@ -650,6 +660,19 @@ async function handleMediaChange(
 
   if (pubSubService) {
     await pubSubService.publish('session:stopped', stoppedSession.id);
+
+    try {
+      await broadcastViolations(violationResults, insertedSession.id, pubSubService);
+    } catch (error) {
+      console.error('[SSEProcessor] Error broadcasting violations:', error);
+    }
+  }
+
+  if (wasTerminatedByRule) {
+    console.log(
+      `[SSEProcessor] Media change session ${insertedSession.id} was terminated by rule, skipping cache add`
+    );
+    return;
   }
 
   // Build and cache the new session
@@ -667,17 +690,10 @@ async function handleMediaChange(
   if (pubSubService) {
     await pubSubService.publish('session:started', activeSession);
     await enqueueNotification({ type: 'session_started', payload: activeSession });
-
-    try {
-      await broadcastViolations(violationResults, insertedSession.id, pubSubService);
-    } catch (error) {
-      console.error('[SSEProcessor] Error broadcasting violations for media change:', error);
-    }
   }
 
   console.log(
-    `[SSEProcessor] Media change: stopped session ${stoppedSession.id}, ` +
-      `created session ${insertedSession.id} for ${processed.mediaTitle}`
+    `[SSEProcessor] Media change created session ${insertedSession.id} for ${processed.mediaTitle}`
   );
 }
 

@@ -545,3 +545,61 @@ describe('Concurrent access handling', () => {
     expect(successes.length).toBe(1);
   });
 });
+
+// ============================================================================
+// 6. Rule-Terminated Session Detection (Issue #357)
+// ============================================================================
+
+describe('wasTerminatedByRule detection logic (Issue #357)', () => {
+  // These tests verify the wasTerminatedByRule detection logic conceptually.
+  // The actual targeting logic is tested in services/rules/__tests__/targeting.test.ts
+
+  it('should detect triggering session in kill list for target=triggering', () => {
+    const insertedSessionId = 'new-session-id';
+    const sessionsToKill = [{ id: 'new-session-id' }];
+
+    // This is the check performed in sessionLifecycle.ts
+    const wasTerminatedByRule = sessionsToKill.some((s) => s.id === insertedSessionId);
+    expect(wasTerminatedByRule).toBe(true);
+  });
+
+  it('should NOT detect triggering session in kill list when target=oldest (different session)', () => {
+    const insertedSessionId = 'new-session-id';
+    const sessionsToKill = [{ id: 'oldest-session-id' }]; // Different session
+
+    const wasTerminatedByRule = sessionsToKill.some((s) => s.id === insertedSessionId);
+    expect(wasTerminatedByRule).toBe(false);
+  });
+
+  it('should detect triggering session in kill list for target=all_except_one (newer session killed)', () => {
+    // Scenario: User has oldest session A, starts new session B
+    // Rule: all_except_one (keep oldest)
+    // Result: Session B (new, triggering) is killed, A survives
+    const insertedSessionId = 'session-B';
+    const sessionsToKill = [{ id: 'session-B' }]; // all_except_one kills newer sessions
+
+    const wasTerminatedByRule = sessionsToKill.some((s) => s.id === insertedSessionId);
+    expect(wasTerminatedByRule).toBe(true);
+  });
+
+  it('should detect triggering session in kill list for target=all_user', () => {
+    // all_user kills ALL sessions including the triggering one
+    const insertedSessionId = 'new-session-id';
+    const sessionsToKill = [
+      { id: 'old-session-1' },
+      { id: 'old-session-2' },
+      { id: 'new-session-id' },
+    ];
+
+    const wasTerminatedByRule = sessionsToKill.some((s) => s.id === insertedSessionId);
+    expect(wasTerminatedByRule).toBe(true);
+  });
+
+  it('should handle empty kill list gracefully', () => {
+    const insertedSessionId = 'session-id';
+    const sessionsToKill: { id: string }[] = [];
+
+    const wasTerminatedByRule = sessionsToKill.some((s) => s.id === insertedSessionId);
+    expect(wasTerminatedByRule).toBe(false);
+  });
+});

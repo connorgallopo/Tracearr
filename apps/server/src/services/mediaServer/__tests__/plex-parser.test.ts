@@ -1468,6 +1468,26 @@ describe('Plex Library Item Parser', () => {
       expect(item.tvdbId).toBe(81189);
     });
 
+    it('should map photo type correctly', () => {
+      const response = {
+        MediaContainer: {
+          Metadata: [
+            {
+              ratingKey: '44444',
+              title: 'Vacation Photos',
+              type: 'photo',
+              addedAt: 1609459200,
+            },
+          ],
+        },
+      };
+
+      const items = parseLibraryItemsResponse(response);
+
+      expect(items).toHaveLength(1);
+      expect(items[0]!.mediaType).toBe('photo');
+    });
+
     it('should ignore invalid external ID formats', () => {
       const response = {
         MediaContainer: {

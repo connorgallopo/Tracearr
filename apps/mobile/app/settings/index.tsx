@@ -17,7 +17,7 @@ import {
   Globe,
   Heart,
 } from 'lucide-react-native';
-import Constants from 'expo-constants';
+import * as Application from 'expo-application';
 import { Text } from '@/components/ui/text';
 import { useAuthStateStore } from '@/lib/authStateStore';
 import { colors } from '@/lib/theme';
@@ -78,8 +78,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const server = useAuthStateStore((s) => s.server);
   const unpairServer = useAuthStateStore((s) => s.unpairServer);
-  const appVersion = Constants.expoConfig?.version || '1.0.0';
-  const buildNumber = (Constants.expoConfig?.extra?.buildNumber as string | undefined) ?? 'dev';
+  const appVersion = Application.nativeApplicationVersion ?? '1.0.0';
+  const buildNumber = Application.nativeBuildVersion ?? 'dev';
 
   const handleDisconnect = () => {
     Alert.alert(

@@ -79,8 +79,18 @@ export class LibrarySyncService {
       name: server.name,
     });
 
-    // Fetch all libraries
-    const libraries = await client.getLibraries();
+    // Fetch all libraries and filter out unsupported types (e.g., photo libraries)
+    const UNSUPPORTED_LIBRARY_TYPES = new Set(['photo']);
+    const allLibraries = await client.getLibraries();
+    const libraries = allLibraries.filter((lib) => {
+      if (UNSUPPORTED_LIBRARY_TYPES.has(lib.type.toLowerCase())) {
+        console.log(
+          `[LibrarySync] Skipping unsupported library type "${lib.type}": ${lib.name} (${lib.id})`
+        );
+        return false;
+      }
+      return true;
+    });
     const totalLibraries = libraries.length;
 
     // Report initial progress

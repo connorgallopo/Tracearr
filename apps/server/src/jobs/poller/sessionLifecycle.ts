@@ -21,6 +21,7 @@ import { serverUsers, sessions, violations } from '../../db/schema.js';
 import type { GeoLocation } from '../../services/geoip.js';
 import { evaluateRulesAsync, hasTranscodeConditions } from '../../services/rules/engine.js';
 import { executeActions, type ActionResult } from '../../services/rules/executors/index.js';
+import { resolveTargetSessions } from '../../services/rules/executors/targeting.js';
 import { storeActionResults } from '../../services/rules/v2Integration.js';
 import type { EvaluationContext, EvaluationResult } from '../../services/rules/types.js';
 import {
@@ -688,7 +689,28 @@ export async function createSessionWithRulesAtomic(
       );
 
       // Execute side effect actions after transaction commits
+      let wasTerminatedByRule = false;
+
       for (const { context, result, rule } of pendingSideEffects) {
+        // Before executing, check if any kill_stream action will target the triggering session
+        for (const action of result.actions) {
+          if (action.type === 'kill_stream') {
+            const sessionsToKill = resolveTargetSessions({
+              target: action.target ?? 'triggering',
+              triggeringSession: context.session,
+              serverUserId: context.serverUser.id,
+              activeSessions: context.activeSessions.some((s) => s.id === context.session.id)
+                ? context.activeSessions
+                : [...context.activeSessions, context.session],
+            });
+
+            // Check if the triggering session is in the kill list
+            if (sessionsToKill.some((s) => s.id === insertedSession.id)) {
+              wasTerminatedByRule = true;
+            }
+          }
+        }
+
         const actionResults: ActionResult[] = await executeActions(context, result.actions);
 
         // Find violation ID if one was created for this rule
@@ -705,6 +727,7 @@ export async function createSessionWithRulesAtomic(
         violationResults,
         qualityChange,
         referenceId,
+        wasTerminatedByRule,
       };
     } catch (error) {
       lastError = error;
@@ -830,15 +853,16 @@ export async function handleMediaChangeAtomic(
   }
 
   // STEP 2: Create new session for the new media
-  const { insertedSession, violationResults } = await createSessionWithRulesAtomic({
-    processed,
-    server,
-    serverUser,
-    geo,
-    activeRulesV2,
-    activeSessions,
-    recentSessions,
-  });
+  const { insertedSession, violationResults, wasTerminatedByRule } =
+    await createSessionWithRulesAtomic({
+      processed,
+      server,
+      serverUser,
+      geo,
+      activeRulesV2,
+      activeSessions,
+      recentSessions,
+    });
 
   return {
     stoppedSession: {
@@ -848,6 +872,7 @@ export async function handleMediaChangeAtomic(
     },
     insertedSession,
     violationResults,
+    wasTerminatedByRule,
   };
 }
 

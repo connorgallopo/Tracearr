@@ -11,6 +11,7 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { getRedisPrefix } from '@tracearr/shared';
 import type {
   TautulliImportProgress,
   TautulliImportResult,
@@ -82,9 +83,11 @@ export function initImportQueue(redisUrl: string): void {
   }
 
   connectionOptions = { url: redisUrl };
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   importQueue = new Queue<ImportJobData>(QUEUE_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       attempts: 3,
       backoff: {
@@ -105,6 +108,7 @@ export function initImportQueue(redisUrl: string): void {
 
   dlqQueue = new Queue<ImportJobData>(DLQ_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       removeOnComplete: {
         count: 25, // Retried jobs from DLQ
@@ -132,6 +136,8 @@ export function startImportWorker(): void {
     console.log('Import worker already running');
     return;
   }
+
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   // Recover any stuck jobs from a previous crash before starting the worker
   if (importQueue) {
@@ -268,6 +274,7 @@ export function startImportWorker(): void {
     },
     {
       connection: connectionOptions,
+      prefix: bullPrefix,
       concurrency: 1, // Only 1 import at a time per worker
       // Large imports (300k+ records) can take hours - extend lock to prevent stalled job detection
       lockDuration: 2 * 60 * 60 * 1000, // 2 hours - large imports can take a long time

@@ -56,8 +56,8 @@ export interface CacheService {
   ): Promise<T | null>;
 
   // Termination cooldown (prevents re-creating recently terminated sessions)
-  setTerminationCooldown(serverId: string, sessionKey: string): Promise<void>;
-  hasTerminationCooldown(serverId: string, sessionKey: string): Promise<boolean>;
+  setTerminationCooldown(serverId: string, sessionKey: string, ratingKey: string): Promise<void>;
+  hasTerminationCooldown(serverId: string, sessionKey: string, ratingKey: string): Promise<boolean>;
 
   // Health check
   ping(): Promise<boolean>;
@@ -377,7 +377,7 @@ export function createCacheService(redis: Redis): CacheService {
       sessionKey: string,
       operation: () => Promise<T>
     ): Promise<T | null> {
-      const lockKey = `session:lock:${serverId}:${sessionKey}`;
+      const lockKey = REDIS_KEYS.SESSION_LOCK(serverId, sessionKey);
 
       const lockAcquired = await redis.set(lockKey, '1', 'EX', 15, 'NX');
       if (!lockAcquired) {
@@ -392,15 +392,23 @@ export function createCacheService(redis: Redis): CacheService {
     },
 
     // Termination cooldown methods
-    async setTerminationCooldown(serverId: string, sessionKey: string): Promise<void> {
-      const cooldownKey = `termination:cooldown:${serverId}:${sessionKey}`;
+    async setTerminationCooldown(
+      serverId: string,
+      sessionKey: string,
+      ratingKey: string
+    ): Promise<void> {
+      const cooldownKey = REDIS_KEYS.TERMINATION_COOLDOWN(serverId, sessionKey, ratingKey);
       // 5 minute cooldown to prevent re-creating recently terminated sessions
       // Plex can continue reporting terminated sessions as active for several minutes
       await redis.setex(cooldownKey, 300, '1');
     },
 
-    async hasTerminationCooldown(serverId: string, sessionKey: string): Promise<boolean> {
-      const cooldownKey = `termination:cooldown:${serverId}:${sessionKey}`;
+    async hasTerminationCooldown(
+      serverId: string,
+      sessionKey: string,
+      ratingKey: string
+    ): Promise<boolean> {
+      const cooldownKey = REDIS_KEYS.TERMINATION_COOLDOWN(serverId, sessionKey, ratingKey);
       const exists = await redis.exists(cooldownKey);
       return exists === 1;
     },

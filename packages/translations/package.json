@@ -24,8 +24,8 @@
     "check": "tsx scripts/check-translations.ts"
   },
   "dependencies": {
-    "i18next": "^25.8.0",
-    "react-i18next": "^16.5.3"
+    "i18next": "^25.8.4",
+    "react-i18next": "^16.5.4"
   },
   "devDependencies": {
     "tsx": "^4.19.2",

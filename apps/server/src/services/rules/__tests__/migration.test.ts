@@ -71,7 +71,7 @@ describe('Rule Migration', () => {
         expect(result?.actions.actions[0]?.type).toBe('create_violation');
       });
 
-      it('adds is_local_network condition when excludePrivateIps is true', () => {
+      it('adds is_local_network condition as separate AND group when excludePrivateIps is true', () => {
         const legacyRule: LegacyRule = {
           id: 'rule-1',
           name: 'Max 3 streams (public only)',
@@ -84,8 +84,18 @@ describe('Rule Migration', () => {
 
         const result = convertLegacyRule(legacyRule);
 
-        expect(result?.conditions.groups[0]?.conditions).toHaveLength(2);
-        expect(result?.conditions.groups[0]?.conditions[1]).toEqual({
+        // Should have 2 groups (AND logic between groups)
+        expect(result?.conditions.groups).toHaveLength(2);
+        // First group: concurrent_streams condition
+        expect(result?.conditions.groups[0]?.conditions).toHaveLength(1);
+        expect(result?.conditions.groups[0]?.conditions[0]).toEqual({
+          field: 'concurrent_streams',
+          operator: 'gt',
+          value: 3,
+        });
+        // Second group: is_local_network condition (AND with first group)
+        expect(result?.conditions.groups[1]?.conditions).toHaveLength(1);
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
           field: 'is_local_network',
           operator: 'eq',
           value: false,
@@ -133,6 +143,32 @@ describe('Rule Migration', () => {
           value: ['US'],
         });
       });
+
+      it('adds is_local_network as separate AND group when excludePrivateIps is true', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Block US (public only)',
+          type: 'geo_restriction',
+          params: { mode: 'blocklist', countries: ['US'], excludePrivateIps: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups).toHaveLength(2);
+        expect(result?.conditions.groups[0]?.conditions[0]).toEqual({
+          field: 'country',
+          operator: 'in',
+          value: ['US'],
+        });
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        });
+      });
     });
 
     describe('impossible_travel', () => {
@@ -155,6 +191,27 @@ describe('Rule Migration', () => {
           value: 500,
         });
       });
+
+      it('adds is_local_network as separate AND group when excludePrivateIps is true', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Speed limit (public only)',
+          type: 'impossible_travel',
+          params: { maxSpeedKmh: 500, excludePrivateIps: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups).toHaveLength(2);
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        });
+      });
     });
 
     describe('simultaneous_locations', () => {
@@ -175,6 +232,27 @@ describe('Rule Migration', () => {
           field: 'active_session_distance_km',
           operator: 'gt',
           value: 100,
+        });
+      });
+
+      it('adds is_local_network as separate AND group when excludePrivateIps is true', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Min 100km (public only)',
+          type: 'simultaneous_locations',
+          params: { minDistanceKm: 100, excludePrivateIps: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups).toHaveLength(2);
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
         });
       });
     });
@@ -217,6 +295,92 @@ describe('Rule Migration', () => {
         const result = convertLegacyRule(legacyRule);
 
         expect(result?.conditions.groups[0]?.conditions[0]?.params?.window_hours).toBe(48);
+      });
+
+      it('adds is_local_network as separate AND group when excludePrivateIps is true', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Max 5 IPs (public only)',
+          type: 'device_velocity',
+          params: { maxIps: 5, windowHours: 24, excludePrivateIps: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups).toHaveLength(2);
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        });
+      });
+
+      it('uses unique_devices_in_window when groupByDevice is true', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Max 5 devices',
+          type: 'device_velocity',
+          params: { maxIps: 5, windowHours: 24, groupByDevice: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups).toHaveLength(1);
+        expect(result?.conditions.groups[0]?.conditions[0]).toEqual({
+          field: 'unique_devices_in_window',
+          operator: 'gt',
+          value: 5,
+          params: {
+            window_hours: 24,
+          },
+        });
+      });
+
+      it('uses unique_ips_in_window when groupByDevice is false', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Max 5 IPs',
+          type: 'device_velocity',
+          params: { maxIps: 5, windowHours: 24, groupByDevice: false },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups[0]?.conditions[0]?.field).toBe('unique_ips_in_window');
+      });
+
+      it('handles groupByDevice with excludePrivateIps (both AND conditions)', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Max 5 devices (public only)',
+          type: 'device_velocity',
+          params: { maxIps: 5, windowHours: 24, groupByDevice: true, excludePrivateIps: true },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        // Should have 2 groups (AND logic)
+        expect(result?.conditions.groups).toHaveLength(2);
+        // First group: unique_devices_in_window condition
+        expect(result?.conditions.groups[0]?.conditions[0]?.field).toBe('unique_devices_in_window');
+        // Second group: is_local_network condition (AND with first)
+        expect(result?.conditions.groups[1]?.conditions[0]).toEqual({
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        });
       });
     });
 

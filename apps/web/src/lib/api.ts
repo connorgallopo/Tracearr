@@ -9,7 +9,6 @@ import type {
   SessionWithDetails,
   ActiveSession,
   Rule,
-  Violation,
   ViolationWithDetails,
   DashboardStats,
   PlayStats,
@@ -776,7 +775,11 @@ class ApiClient {
         `/violations?${searchParams.toString()}`
       );
     },
-    acknowledge: (id: string) => this.request<Violation>(`/violations/${id}`, { method: 'PATCH' }),
+    acknowledge: (id: string) =>
+      this.request<{ success: boolean; acknowledgedAt: Date | null }>(`/violations/${id}`, {
+        method: 'PATCH',
+        body: '{}',
+      }),
     dismiss: (id: string) => this.request<void>(`/violations/${id}`, { method: 'DELETE' }),
     bulkAcknowledge: (params: {
       ids?: string[];

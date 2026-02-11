@@ -6,6 +6,7 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { getRedisPrefix } from '@tracearr/shared';
 import type { ViolationWithDetails, ActiveSession, NotificationEventType } from '@tracearr/shared';
 import { WS_EVENTS } from '@tracearr/shared';
 import { notificationManager } from '../services/notifications/index.js';
@@ -58,9 +59,12 @@ export function initNotificationQueue(redisUrl: string): void {
 
   connectionOptions = { url: redisUrl };
 
+  const bullPrefix = `${getRedisPrefix()}bull`;
+
   // Create the main notification queue
   notificationQueue = new Queue<NotificationJobData>(QUEUE_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       attempts: 3,
       backoff: {
@@ -81,6 +85,7 @@ export function initNotificationQueue(redisUrl: string): void {
   // Create dead letter queue for jobs that fail all retries
   dlqQueue = new Queue<NotificationJobData>(DLQ_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       removeOnComplete: {
         count: 25,
@@ -109,6 +114,8 @@ export function startNotificationWorker(): void {
     return;
   }
 
+  const bullPrefix = `${getRedisPrefix()}bull`;
+
   notificationWorker = new Worker<NotificationJobData>(
     QUEUE_NAME,
     async (job: Job<NotificationJobData>) => {
@@ -130,6 +137,7 @@ export function startNotificationWorker(): void {
     },
     {
       connection: connectionOptions,
+      prefix: bullPrefix,
       concurrency: 5, // Process up to 5 notifications in parallel
       limiter: {
         max: 30, // Max 30 jobs per duration

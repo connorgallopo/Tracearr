@@ -7,13 +7,11 @@
 
 import { createHash, randomBytes } from 'crypto';
 import type { FastifyInstance } from 'fastify';
-import { JWT_CONFIG, type AuthUser, type UserRole } from '@tracearr/shared';
+import { JWT_CONFIG, REDIS_KEYS, type AuthUser, type UserRole } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 
-// Redis key prefixes
-export const REFRESH_TOKEN_PREFIX = 'tracearr:refresh:';
-export const PLEX_TEMP_TOKEN_PREFIX = 'tracearr:plex_temp:';
+// Redis TTLs
 export const REFRESH_TOKEN_TTL = 30 * 24 * 60 * 60; // 30 days
 export const PLEX_TEMP_TOKEN_TTL = 10 * 60; // 10 minutes for server selection
 
@@ -75,7 +73,7 @@ export async function generateTokens(
   const refreshTokenHash = hashRefreshToken(refreshToken);
 
   await app.redis.setex(
-    `${REFRESH_TOKEN_PREFIX}${refreshTokenHash}`,
+    REDIS_KEYS.REFRESH_TOKEN(refreshTokenHash),
     REFRESH_TOKEN_TTL,
     JSON.stringify({ userId, serverIds })
   );

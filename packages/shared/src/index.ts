@@ -392,6 +392,8 @@ export {
   type SeverityPriority,
   WS_EVENTS,
   REDIS_KEYS,
+  setRedisPrefix,
+  getRedisPrefix,
   CACHE_TTL,
   NOTIFICATION_EVENTS,
   API_VERSION,

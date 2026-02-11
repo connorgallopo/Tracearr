@@ -1,5 +1,4 @@
 {
-  "_TODO": "New keys added - translate: push.newDevice, push.trustScoreChanged, settings.enablePushNotifications through settings.rateLimiting",
   "toast": {
     "success": {
       "serverAdded": {

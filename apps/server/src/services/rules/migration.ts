@@ -56,26 +56,32 @@ export interface MigrationResult {
  * Also applies excludePrivateIps as is_local_network = false condition if enabled.
  */
 function convertImpossibleTravel(params: ImpossibleTravelParams): RuleConditions {
-  const conditions: Condition[] = [
+  const groups: Array<{ conditions: Condition[] }> = [
     {
-      field: 'travel_speed_kmh',
-      operator: 'gt',
-      value: params.maxSpeedKmh,
+      conditions: [
+        {
+          field: 'travel_speed_kmh',
+          operator: 'gt',
+          value: params.maxSpeedKmh,
+        },
+      ],
     },
   ];
 
-  // If excludePrivateIps is true, only match non-local IPs
+  // If excludePrivateIps is true, add separate AND group for non-local IPs
   if (params.excludePrivateIps) {
-    conditions.push({
-      field: 'is_local_network',
-      operator: 'eq',
-      value: false,
+    groups.push({
+      conditions: [
+        {
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        },
+      ],
     });
   }
 
-  return {
-    groups: [{ conditions }],
-  };
+  return { groups };
 }
 
 /**
@@ -85,56 +91,74 @@ function convertImpossibleTravel(params: ImpossibleTravelParams): RuleConditions
  * V2 equivalent: active_session_distance_km > minDistanceKm
  */
 function convertSimultaneousLocations(params: SimultaneousLocationsParams): RuleConditions {
-  const conditions: Condition[] = [
+  const groups: Array<{ conditions: Condition[] }> = [
     {
-      field: 'active_session_distance_km',
-      operator: 'gt',
-      value: params.minDistanceKm,
+      conditions: [
+        {
+          field: 'active_session_distance_km',
+          operator: 'gt',
+          value: params.minDistanceKm,
+        },
+      ],
     },
   ];
 
   if (params.excludePrivateIps) {
-    conditions.push({
-      field: 'is_local_network',
-      operator: 'eq',
-      value: false,
+    groups.push({
+      conditions: [
+        {
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        },
+      ],
     });
   }
 
-  return {
-    groups: [{ conditions }],
-  };
+  return { groups };
 }
 
 /**
  * Convert legacy device_velocity rule to V2 format.
  *
- * Original behavior: Flag if unique IPs in windowHours exceeds maxIps.
- * V2 equivalent: unique_ips_in_window > maxIps with window_hours param preserved.
+ * Original behavior: Flag if unique IPs (or devices if groupByDevice) in windowHours exceeds maxIps.
+ * V2 equivalent:
+ *   - groupByDevice=false (default): unique_ips_in_window > maxIps
+ *   - groupByDevice=true: unique_devices_in_window > maxIps
+ *
  */
 function convertDeviceVelocity(params: DeviceVelocityParams): RuleConditions {
-  const conditions: Condition[] = [
+  const field = params.groupByDevice ? 'unique_devices_in_window' : 'unique_ips_in_window';
+
+  const groups: Array<{ conditions: Condition[] }> = [
     {
-      field: 'unique_ips_in_window',
-      operator: 'gt',
-      value: params.maxIps,
-      params: {
-        window_hours: params.windowHours,
-      },
+      conditions: [
+        {
+          field,
+          operator: 'gt',
+          value: params.maxIps,
+          params: {
+            window_hours: params.windowHours,
+          },
+        },
+      ],
     },
   ];
 
+  // Separate AND group for excludePrivateIps
   if (params.excludePrivateIps) {
-    conditions.push({
-      field: 'is_local_network',
-      operator: 'eq',
-      value: false,
+    groups.push({
+      conditions: [
+        {
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        },
+      ],
     });
   }
 
-  return {
-    groups: [{ conditions }],
-  };
+  return { groups };
 }
 
 /**
@@ -144,25 +168,31 @@ function convertDeviceVelocity(params: DeviceVelocityParams): RuleConditions {
  * V2 equivalent: concurrent_streams > maxStreams
  */
 function convertConcurrentStreams(params: ConcurrentStreamsParams): RuleConditions {
-  const conditions: Condition[] = [
+  const groups: Array<{ conditions: Condition[] }> = [
     {
-      field: 'concurrent_streams',
-      operator: 'gt',
-      value: params.maxStreams,
+      conditions: [
+        {
+          field: 'concurrent_streams',
+          operator: 'gt',
+          value: params.maxStreams,
+        },
+      ],
     },
   ];
 
   if (params.excludePrivateIps) {
-    conditions.push({
-      field: 'is_local_network',
-      operator: 'eq',
-      value: false,
+    groups.push({
+      conditions: [
+        {
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        },
+      ],
     });
   }
 
-  return {
-    groups: [{ conditions }],
-  };
+  return { groups };
 }
 
 /**
@@ -177,35 +207,45 @@ function convertConcurrentStreams(params: ConcurrentStreamsParams): RuleConditio
  * - allowlist: country NOT IN [allowed countries]
  */
 function convertGeoRestriction(params: GeoRestrictionParams): RuleConditions {
-  const conditions: Condition[] = [];
+  const groups: Array<{ conditions: Condition[] }> = [];
 
   if (params.mode === 'blocklist') {
-    conditions.push({
-      field: 'country',
-      operator: 'in',
-      value: params.countries,
+    groups.push({
+      conditions: [
+        {
+          field: 'country',
+          operator: 'in',
+          value: params.countries,
+        },
+      ],
     });
   } else {
     // allowlist - flag if NOT in allowed countries
-    conditions.push({
-      field: 'country',
-      operator: 'not_in',
-      value: params.countries,
+    groups.push({
+      conditions: [
+        {
+          field: 'country',
+          operator: 'not_in',
+          value: params.countries,
+        },
+      ],
     });
   }
 
-  // If excludePrivateIps is true, only match non-local IPs (local IPs are allowed)
+  // If excludePrivateIps is true, add separate AND group for non-local IPs
   if (params.excludePrivateIps) {
-    conditions.push({
-      field: 'is_local_network',
-      operator: 'eq',
-      value: false,
+    groups.push({
+      conditions: [
+        {
+          field: 'is_local_network',
+          operator: 'eq',
+          value: false,
+        },
+      ],
     });
   }
 
-  return {
-    groups: [{ conditions }],
-  };
+  return { groups };
 }
 
 /**

@@ -5,6 +5,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import { Redis } from 'ioredis';
+import { setRedisPrefix } from '@tracearr/shared';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -14,6 +15,11 @@ declare module 'fastify' {
 
 const redisPlugin: FastifyPluginAsync = async (app) => {
   const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
+  const redisPrefix = process.env.REDIS_PREFIX ?? '';
+  if (redisPrefix) {
+    setRedisPrefix(redisPrefix);
+    app.log.info({ prefix: redisPrefix }, 'Redis key prefix configured');
+  }
 
   const redis = new Redis(redisUrl, {
     maxRetriesPerRequest: 3,

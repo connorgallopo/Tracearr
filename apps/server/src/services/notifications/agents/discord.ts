@@ -96,7 +96,7 @@ export class DiscordAgent extends BaseAgent {
     const detailFields = formatViolationDetailsForDiscord(violation.rule.type, violation.data);
 
     return {
-      title: 'Sharing Violation Detected',
+      title: 'Violation Detected',
       color,
       fields: [
         {

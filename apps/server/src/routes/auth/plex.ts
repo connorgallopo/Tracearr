@@ -13,25 +13,21 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { eq, and, count, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import type {
-  PlexAvailableServersResponse,
-  PlexDiscoveredServer,
-  PlexDiscoveredConnection,
-  PlexAccountsResponse,
-  LinkPlexAccountResponse,
-  UnlinkPlexAccountResponse,
+import {
+  REDIS_KEYS,
+  type PlexAvailableServersResponse,
+  type PlexDiscoveredServer,
+  type PlexDiscoveredConnection,
+  type PlexAccountsResponse,
+  type LinkPlexAccountResponse,
+  type UnlinkPlexAccountResponse,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers, users, serverUsers, plexAccounts } from '../../db/schema.js';
 import { PlexClient } from '../../services/mediaServer/index.js';
 // Token encryption removed - tokens now stored in plain text (DB is localhost-only)
 import { plexHeaders } from '../../utils/http.js';
-import {
-  generateTokens,
-  generateTempToken,
-  PLEX_TEMP_TOKEN_PREFIX,
-  PLEX_TEMP_TOKEN_TTL,
-} from './utils.js';
+import { generateTokens, generateTempToken, PLEX_TEMP_TOKEN_TTL } from './utils.js';
 import { syncServer } from '../../services/sync.js';
 import { getUserByPlexAccountId, getOwnerUser, getUserById } from '../../services/userService.js';
 
@@ -278,7 +274,7 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
       // Store temp token for completing registration
       const tempToken = generateTempToken();
       await app.redis.setex(
-        `${PLEX_TEMP_TOKEN_PREFIX}${tempToken}`,
+        REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken),
         PLEX_TEMP_TOKEN_TTL,
         JSON.stringify({
           plexAccountId: authResult.id,
@@ -350,7 +346,7 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
       });
 
       // Clean up temp token
-      await app.redis.del(`${PLEX_TEMP_TOKEN_PREFIX}${tempToken}`);
+      await app.redis.del(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
 
       app.log.info({ userId: newUser.id, role }, 'New Plex user created (no servers)');
 
@@ -376,13 +372,13 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
     const { tempToken, serverUri, serverName, clientIdentifier } = body.data;
 
     // Get stored Plex auth from temp token
-    const stored = await app.redis.get(`${PLEX_TEMP_TOKEN_PREFIX}${tempToken}`);
+    const stored = await app.redis.get(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
     if (!stored) {
       return reply.unauthorized('Invalid or expired temp token. Please restart login.');
     }
 
     // Delete temp token (one-time use)
-    await app.redis.del(`${PLEX_TEMP_TOKEN_PREFIX}${tempToken}`);
+    await app.redis.del(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
 
     const { plexAccountId, plexUsername, plexEmail, plexThumb, plexToken, isFirstUser } =
       JSON.parse(stored) as {

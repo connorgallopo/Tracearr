@@ -323,7 +323,7 @@ export function ServerSettings() {
           <Skeleton className="h-6 w-32" />
         </CardHeader>
         <CardContent className="space-y-4">
-          {[...Array(2)].map((_, i) => (
+          {Array.from({ length: 2 }, (_, i) => (
             <div key={i} className="flex items-center gap-4">
               <Skeleton className="h-10 w-10 rounded-lg" />
               <div className="space-y-2">

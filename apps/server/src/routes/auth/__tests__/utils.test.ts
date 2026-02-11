@@ -12,11 +12,10 @@ import {
   generateRefreshToken,
   hashRefreshToken,
   generateTempToken,
-  REFRESH_TOKEN_PREFIX,
-  PLEX_TEMP_TOKEN_PREFIX,
   REFRESH_TOKEN_TTL,
   PLEX_TEMP_TOKEN_TTL,
 } from '../utils.js';
+import { REDIS_KEYS } from '@tracearr/shared';
 
 describe('generateRefreshToken', () => {
   it('should generate a 64 character hex string', () => {
@@ -97,13 +96,13 @@ describe('generateTempToken', () => {
 });
 
 describe('Constants', () => {
-  describe('Redis key prefixes', () => {
-    it('should have correct REFRESH_TOKEN_PREFIX', () => {
-      expect(REFRESH_TOKEN_PREFIX).toBe('tracearr:refresh:');
+  describe('Redis key functions', () => {
+    it('should generate correct REFRESH_TOKEN key', () => {
+      expect(REDIS_KEYS.REFRESH_TOKEN('abc123')).toBe('tracearr:refresh:abc123');
     });
 
-    it('should have correct PLEX_TEMP_TOKEN_PREFIX', () => {
-      expect(PLEX_TEMP_TOKEN_PREFIX).toBe('tracearr:plex_temp:');
+    it('should generate correct PLEX_TEMP_TOKEN key', () => {
+      expect(REDIS_KEYS.PLEX_TEMP_TOKEN('xyz789')).toBe('tracearr:plex_temp:xyz789');
     });
   });
 

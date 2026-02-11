@@ -10,8 +10,7 @@
  */
 
 import type { Redis } from 'ioredis';
-
-const LOCK_KEY = 'tracearr:heavy-ops:lock';
+import { REDIS_KEYS } from '@tracearr/shared';
 const LOCK_TTL_SECONDS = 4 * 60 * 60; // 4 hours max (safety net)
 
 export interface HeavyOpsLockHolder {
@@ -31,7 +30,7 @@ export async function initHeavyOpsLock(redis: Redis): Promise<void> {
   redisClient = redis;
 
   // Clean up stale lock from previous server instance
-  const existingLock = await redis.get(LOCK_KEY);
+  const existingLock = await redis.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (existingLock) {
     try {
       const holder = JSON.parse(existingLock) as HeavyOpsLockHolder;
@@ -44,7 +43,7 @@ export async function initHeavyOpsLock(redis: Redis): Promise<void> {
     } catch {
       // Corrupt lock - clear it
       console.warn('[HeavyOpsLock] Found corrupt lock on startup, clearing');
-      await redis.del(LOCK_KEY);
+      await redis.del(REDIS_KEYS.HEAVY_OPS_LOCK);
     }
   }
 }
@@ -73,7 +72,7 @@ export async function acquireHeavyOpsLock(
 
   // Try to set the lock with NX (only if not exists)
   const result = await redisClient.set(
-    LOCK_KEY,
+    REDIS_KEYS.HEAVY_OPS_LOCK,
     JSON.stringify(lockData),
     'EX',
     LOCK_TTL_SECONDS,
@@ -86,7 +85,7 @@ export async function acquireHeavyOpsLock(
   }
 
   // Lock is held - check if it's us (reacquiring after restart) or someone else
-  const existingLock = await redisClient.get(LOCK_KEY);
+  const existingLock = await redisClient.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (existingLock) {
     try {
       const holder = JSON.parse(existingLock) as HeavyOpsLockHolder;
@@ -97,7 +96,12 @@ export async function acquireHeavyOpsLock(
           `[HeavyOpsLock] Reacquiring lock for ${jobType} job ${jobId} (was held from previous run)`
         );
         // Update the lock with fresh TTL
-        await redisClient.set(LOCK_KEY, JSON.stringify(lockData), 'EX', LOCK_TTL_SECONDS);
+        await redisClient.set(
+          REDIS_KEYS.HEAVY_OPS_LOCK,
+          JSON.stringify(lockData),
+          'EX',
+          LOCK_TTL_SECONDS
+        );
         return null; // Lock reacquired
       }
 
@@ -108,7 +112,7 @@ export async function acquireHeavyOpsLock(
     } catch {
       // Corrupt lock data - try to clean it up
       console.warn('[HeavyOpsLock] Corrupt lock data, attempting cleanup');
-      await redisClient.del(LOCK_KEY);
+      await redisClient.del(REDIS_KEYS.HEAVY_OPS_LOCK);
       return null;
     }
   }
@@ -129,7 +133,7 @@ export async function releaseHeavyOpsLock(jobId: string): Promise<boolean> {
   }
 
   // Get current lock to verify ownership
-  const existingLock = await redisClient.get(LOCK_KEY);
+  const existingLock = await redisClient.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (!existingLock) {
     return true; // Already released
   }
@@ -146,7 +150,7 @@ export async function releaseHeavyOpsLock(jobId: string): Promise<boolean> {
     // Corrupt data - clean it up
   }
 
-  await redisClient.del(LOCK_KEY);
+  await redisClient.del(REDIS_KEYS.HEAVY_OPS_LOCK);
   console.log(`[HeavyOpsLock] Released lock for job ${jobId}`);
   return true;
 }
@@ -161,7 +165,7 @@ export async function getHeavyOpsStatus(): Promise<HeavyOpsLockHolder | null> {
     return null;
   }
 
-  const existingLock = await redisClient.get(LOCK_KEY);
+  const existingLock = await redisClient.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (!existingLock) {
     return null;
   }
@@ -181,11 +185,11 @@ export async function forceReleaseHeavyOpsLock(): Promise<void> {
     return;
   }
 
-  const existingLock = await redisClient.get(LOCK_KEY);
+  const existingLock = await redisClient.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (existingLock) {
     console.warn('[HeavyOpsLock] Force releasing lock:', existingLock);
   }
-  await redisClient.del(LOCK_KEY);
+  await redisClient.del(REDIS_KEYS.HEAVY_OPS_LOCK);
 }
 
 /**
@@ -196,7 +200,7 @@ export async function extendHeavyOpsLock(jobId: string): Promise<boolean> {
     return true;
   }
 
-  const existingLock = await redisClient.get(LOCK_KEY);
+  const existingLock = await redisClient.get(REDIS_KEYS.HEAVY_OPS_LOCK);
   if (!existingLock) {
     return false; // Lock was lost
   }
@@ -210,6 +214,6 @@ export async function extendHeavyOpsLock(jobId: string): Promise<boolean> {
     return false;
   }
 
-  await redisClient.expire(LOCK_KEY, LOCK_TTL_SECONDS);
+  await redisClient.expire(REDIS_KEYS.HEAVY_OPS_LOCK, LOCK_TTL_SECONDS);
   return true;
 }

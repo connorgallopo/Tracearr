@@ -1,5 +1,4 @@
 {
-  "_TODO": "New keys added - translate: push.newDevice, push.trustScoreChanged, settings.enablePushNotifications through settings.rateLimiting",
   "toast": {
     "success": {
       "serverAdded": {
@@ -93,13 +92,13 @@
         "title": "Stream beendet",
         "message": "Die Wiedergabesitzung wurde gestoppt"
       },
-      "serverUpdated": {
-        "title": "Server aktualisiert",
-        "message": "Der Server wurde erfolgreich aktualisiert"
-      },
       "serverUrlUpdated": {
         "title": "Server-URL aktualisiert",
         "message": "Die Server-URL wurde erfolgreich aktualisiert"
+      },
+      "serverUpdated": {
+        "title": "Server aktualisiert",
+        "message": "Der Server wurde erfolgreich aktualisiert"
       },
       "syncCompletedWithErrors": {
         "title": "Synchronisation mit Fehlern abgeschlossen"

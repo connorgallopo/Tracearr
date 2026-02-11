@@ -250,7 +250,7 @@ export interface MediaLibraryItem {
   title: string;
 
   /** Content type */
-  mediaType: 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track';
+  mediaType: 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' | 'photo';
 
   /** Release year (optional) */
   year?: number;

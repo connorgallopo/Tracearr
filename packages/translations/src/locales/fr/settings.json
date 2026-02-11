@@ -1,0 +1,117 @@
+{
+  "tabs": {
+    "general": "Général",
+    "servers": "Serveurs",
+    "notifications": "Notifications",
+    "mobile": "Application mobile",
+    "import": "Import",
+    "advanced": "Avancé",
+    "jobs": "Tâches",
+    "accessControl": "Contrôle d'accès"
+  },
+  "general": {
+    "title": "Paramètres généraux",
+    "unitSystem": "Système d'unité",
+    "metric": "Métriques (km, km/h)",
+    "imperial": "Impériales (mi, mph)",
+    "timezone": "Fuseau horaire",
+    "primaryAuth": "Méthode d'authentification principale",
+    "localAccount": "Compte local",
+    "plexAccount": "Compte Plex",
+    "jellyfinAccount": "Compte Jellyfin"
+  },
+  "servers": {
+    "title": "Serveurs connectés",
+    "addServer": "Ajouter un serveur",
+    "serverName": "Nom du serveur",
+    "serverUrl": "URL du serveur",
+    "apiKey": "Clef d'API",
+    "syncInterval": "Intervalle de synchronisation",
+    "testConnection": "Tester la connexion",
+    "connectionSuccess": "Connexion réussie",
+    "connectionFailed": "Échec de la connexion"
+  },
+  "mobile": {
+    "title": "Application mobile",
+    "pairDevice": "Associer un appareil",
+    "connectedDevices": "Appareils connectés",
+    "generateToken": "Générer un jeton d'appairage",
+    "scanQrCode": "Scanner le code QR",
+    "tokenExpires": "Le jeton d'authentification expire dans {{time}}",
+    "noDevices": "Aucun appareil connecté",
+    "revokeAll": "Révoquer toutes les sessions"
+  },
+  "webhooks": {
+    "title": "Configuration du Webhook",
+    "discordWebhook": "URL du Webhook Discord",
+    "ntfyTopic": "Sujet Ntfy",
+    "customWebhook": "URL personnalisée du Webhook",
+    "webhookFormat": "Format du Webhook",
+    "testWebhook": "Tester le webhook"
+  },
+  "advanced": {
+    "title": "Paramètres avancés",
+    "basePath": "Chemin de base",
+    "externalUrl": "URL externe",
+    "trustProxy": "En-têtes de confiance du Proxy",
+    "reverseProxy": "Proxy inversé",
+    "connectionScenarios": "Scénarios de connexion"
+  },
+  "import": {
+    "title": "Importer des données",
+    "jellystat": "Importer depuis Jellystat",
+    "tautulli": "Importer depuis Tautulli",
+    "importProgress": "Progression de l'import",
+    "importComplete": "Importation terminée",
+    "importFailed": "Échec de l'importation",
+    "processed": "Traité",
+    "page": "Page",
+    "imported": "Importé",
+    "skipped": "Ignoré",
+    "enriched": "Enrichi",
+    "errors": "Erreurs"
+  },
+  "plex": {
+    "linkedAccounts": "Comptes Plex liés",
+    "unlinkAccount": "Délier le compte Plex",
+    "signInWithPlex": "Se connecter avec Plex",
+    "signUpWithPlex": "S'inscrire avec Plex",
+    "selectServer": "Sélectionner un serveur",
+    "chooseServer": "Choisir le serveur Plex à surveiller"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Se connecter avec Jellyfin",
+    "username": "Nom d'utilisateur Jellyfin",
+    "password": "Mot de passe Jellyfin"
+  },
+  "account": {
+    "createAccount": "Créer un compte",
+    "signIn": "Se connecter",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "displayName": "Nom d'affichage",
+    "createYourAccount": "Créez votre compte pour démarrer",
+    "signInToAccount": "Connectez-vous à votre compte",
+    "useLocalAccount": "Utiliser un compte local à la place",
+    "useJellyfinAccount": "Utiliser un compte Jellyfin à la place",
+    "waitingForPlex": "En attente d'autorisation de Plex..."
+  },
+  "update": {
+    "title": "Mise à jour disponible",
+    "releaseNotes": "Notes de version",
+    "updateCommand": "Commande de mise à jour",
+    "pullInstructions": "Après avoir réalisé le pull Docker, redémarrez cotre conteneur pour appliquer la modification.",
+    "stableRelease": "Mise à jour Stable",
+    "betaUpdate": "Mise à jour Beta",
+    "newVersion": "Nouvelle version",
+    "versionAvailable": "Version {{version}} disponible"
+  },
+  "serverHealth": {
+    "unreachable": "{{serverName}} est inaccessible",
+    "multipleUnreachable": "{{count}} serveurs injoignables : {{serverNames}}"
+  },
+  "ipWarning": {
+    "message": "Tous les utilisateurs semblent utiliser la même adresse IP ou des IP locales. Cela pourrait affecter la logique des règles basées sur l'emplacement ou l'adresse IP.",
+    "acknowledge": "Compris"
+  }
+}

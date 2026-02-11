@@ -188,6 +188,11 @@ describe('mapJellyfinType', () => {
     expect(mapJellyfinType('audio')).toBe('track');
   });
 
+  it('maps Photo -> photo', () => {
+    expect(mapJellyfinType('Photo')).toBe('photo');
+    expect(mapJellyfinType('photo')).toBe('photo');
+  });
+
   it('maps unknown type -> movie (default)', () => {
     expect(mapJellyfinType('Unknown')).toBe('movie');
     expect(mapJellyfinType('SomeNewType')).toBe('movie');

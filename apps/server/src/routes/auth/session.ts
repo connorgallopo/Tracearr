@@ -8,12 +8,11 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
-import { JWT_CONFIG, canLogin, type AuthUser } from '@tracearr/shared';
+import { JWT_CONFIG, REDIS_KEYS, canLogin, type AuthUser } from '@tracearr/shared';
 import {
   generateRefreshToken,
   hashRefreshToken,
   getAllServerIds,
-  REFRESH_TOKEN_PREFIX,
   REFRESH_TOKEN_TTL,
 } from './utils.js';
 import { getUserById } from '../../services/userService.js';
@@ -36,7 +35,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const { refreshToken } = body.data;
     const refreshTokenHash = hashRefreshToken(refreshToken);
 
-    const stored = await app.redis.get(`${REFRESH_TOKEN_PREFIX}${refreshTokenHash}`);
+    const stored = await app.redis.get(REDIS_KEYS.REFRESH_TOKEN(refreshTokenHash));
     if (!stored) {
       return reply.unauthorized('Invalid or expired refresh token');
     }
@@ -46,13 +45,13 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const user = await getUserById(userId);
 
     if (!user) {
-      await app.redis.del(`${REFRESH_TOKEN_PREFIX}${refreshTokenHash}`);
+      await app.redis.del(REDIS_KEYS.REFRESH_TOKEN(refreshTokenHash));
       return reply.unauthorized('User not found');
     }
 
     // Check if user can still log in
     if (!canLogin(user.role)) {
-      await app.redis.del(`${REFRESH_TOKEN_PREFIX}${refreshTokenHash}`);
+      await app.redis.del(REDIS_KEYS.REFRESH_TOKEN(refreshTokenHash));
       return reply.unauthorized('Account is not active');
     }
 
@@ -75,9 +74,9 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const newRefreshToken = generateRefreshToken();
     const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
 
-    await app.redis.del(`${REFRESH_TOKEN_PREFIX}${refreshTokenHash}`);
+    await app.redis.del(REDIS_KEYS.REFRESH_TOKEN(refreshTokenHash));
     await app.redis.setex(
-      `${REFRESH_TOKEN_PREFIX}${newRefreshTokenHash}`,
+      REDIS_KEYS.REFRESH_TOKEN(newRefreshTokenHash),
       REFRESH_TOKEN_TTL,
       JSON.stringify({ userId, serverIds })
     );
@@ -93,7 +92,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
 
     if (body.success) {
       const { refreshToken } = body.data;
-      await app.redis.del(`${REFRESH_TOKEN_PREFIX}${hashRefreshToken(refreshToken)}`);
+      await app.redis.del(REDIS_KEYS.REFRESH_TOKEN(hashRefreshToken(refreshToken)));
     }
 
     reply.clearCookie('token');

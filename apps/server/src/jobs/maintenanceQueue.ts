@@ -11,6 +11,7 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { getRedisPrefix } from '@tracearr/shared';
 import { extendJobLock } from './lockUtils.js';
 import {
   acquireHeavyOpsLock,
@@ -97,9 +98,11 @@ export function initMaintenanceQueue(redisUrl: string): void {
   }
 
   connectionOptions = { url: redisUrl };
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   maintenanceQueue = new Queue<MaintenanceJobData>(QUEUE_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       attempts: 3, // Allow retries for stalled job recovery after server restart
       removeOnComplete: {
@@ -128,6 +131,8 @@ export function startMaintenanceWorker(): void {
     console.log('Maintenance worker already running');
     return;
   }
+
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   // Recover any stuck jobs from a previous crash before starting the worker
   // If the server restarted, any "active" job is orphaned (worker died)
@@ -258,6 +263,7 @@ export function startMaintenanceWorker(): void {
     },
     {
       connection: connectionOptions,
+      prefix: bullPrefix,
       concurrency: 1, // Only 1 maintenance job at a time
       lockDuration: 60 * 60 * 1000, // 1 hour - maintenance jobs can be long-running
       stalledInterval: 30 * 1000, // Check for stalled jobs every 30 seconds

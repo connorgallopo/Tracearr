@@ -1312,6 +1312,7 @@ export class TautulliService {
     let totalSkipped = 0;
     let lastProgressTime = Date.now();
     let chunkNumber = 0;
+    let cursor: number | undefined;
 
     // Process in chunks until no more sessions to enrich
     while (true) {
@@ -1332,7 +1333,8 @@ export class TautulliService {
           and(
             eq(sessions.serverId, serverId),
             isNotNull(sessions.externalSessionId),
-            isNull(sessions.sourceVideoCodec)
+            isNull(sessions.sourceVideoCodec),
+            cursor ? sql`CAST(${sessions.externalSessionId} AS INTEGER) < ${cursor}` : undefined
           )
         )
         .orderBy(sql`CAST(${sessions.externalSessionId} AS INTEGER) DESC`)
@@ -1434,6 +1436,13 @@ export class TautulliService {
           publishProgress(progress);
           lastProgressTime = now;
         }
+      }
+
+      // Advance cursor to the lowest externalSessionId in this chunk so the next
+      // iteration skips already-processed sessions (including ones we skipped)
+      const lastSession = sessionsToEnrich.at(-1);
+      if (lastSession?.externalSessionId) {
+        cursor = parseInt(lastSession.externalSessionId, 10);
       }
 
       // If we got fewer than CHUNK_SIZE, we're done

@@ -260,6 +260,12 @@ export interface SessionCreationResult {
   qualityChange: QualityChangeResult | null;
   /** Reference ID for session grouping (resume tracking) */
   referenceId: string | null;
+  /**
+   * Whether the triggering session was terminated by a kill_stream rule action.
+   * When true, the session should NOT be added to the cache (it's already stopped).
+   * This prevents ghost sessions from appearing in the dashboard.
+   */
+  wasTerminatedByRule: boolean;
 }
 
 /**
@@ -337,6 +343,7 @@ export interface MediaChangeResult {
   insertedSession: typeof sessions.$inferSelect;
   /** Violations created during session creation */
   violationResults: ViolationInsertResult[];
+  wasTerminatedByRule: boolean;
 }
 
 // ============================================================================

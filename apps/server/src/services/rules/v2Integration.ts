@@ -7,6 +7,7 @@
 
 import type { Redis } from 'ioredis';
 import { eq, sql, and, isNull, isNotNull } from 'drizzle-orm';
+import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { rules, serverUsers, sessions, ruleActionResults } from '../../db/schema.js';
 import { rulesLogger } from '../../utils/logger.js';
@@ -260,7 +261,7 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
      * Check if a rule/target combination is on cooldown.
      */
     checkCooldown: async (ruleId, targetId, _cooldownMinutes) => {
-      const key = `rule:cooldown:${ruleId}:${targetId}`;
+      const key = REDIS_KEYS.RULE_COOLDOWN(ruleId, targetId);
       const exists = await redis.exists(key);
       return exists === 1;
     },
@@ -269,7 +270,7 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
      * Set cooldown for a rule/target combination.
      */
     setCooldown: async (ruleId, targetId, cooldownMinutes) => {
-      const key = `rule:cooldown:${ruleId}:${targetId}`;
+      const key = REDIS_KEYS.RULE_COOLDOWN(ruleId, targetId);
       const ttlSeconds = cooldownMinutes * 60;
       await redis.setex(key, ttlSeconds, '1');
 

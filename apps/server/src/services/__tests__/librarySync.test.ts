@@ -256,6 +256,57 @@ describe('LibrarySyncService', () => {
       );
     });
 
+    it('should skip photo libraries during sync', async () => {
+      const service = new LibrarySyncService();
+      const mockServer = createMockServer();
+      const mockLibraries = [
+        createMockLibrary({ id: '1', name: 'Movies', type: 'movie' }),
+        createMockLibrary({ id: '2', name: 'Photos', type: 'photo' }),
+        createMockLibrary({ id: '3', name: 'TV Shows', type: 'show' }),
+      ];
+      const mockItems = [createMockLibraryItem({ ratingKey: 'item-1' })];
+
+      let selectCallCount = 0;
+      vi.mocked(db.select).mockImplementation(() => {
+        selectCallCount++;
+        const chain = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockImplementation(() => {
+            const whereResult = Promise.resolve([]);
+            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
+              .fn()
+              .mockImplementation(() => {
+                if (selectCallCount === 1) return Promise.resolve([mockServer]);
+                return Promise.resolve([]);
+              });
+            return whereResult;
+          }),
+          limit: vi.fn().mockImplementation(() => {
+            if (selectCallCount === 1) return Promise.resolve([mockServer]);
+            return Promise.resolve([]);
+          }),
+          returning: vi.fn().mockResolvedValue([]),
+        };
+        return chain as never;
+      });
+
+      mockInsertChain([{ id: randomUUID() }]);
+      mockDeleteChain();
+      mockTransaction();
+      mockMediaServerClient({
+        libraries: mockLibraries,
+        items: mockItems,
+        totalCount: 1,
+      });
+
+      const results = await service.syncServer(mockServer.id);
+
+      // Photo library should be filtered out - only Movies and TV Shows synced
+      expect(results).toHaveLength(2);
+      expect(results[0]!.libraryId).toBe('1');
+      expect(results[1]!.libraryId).toBe('3');
+    });
+
     it('should report progress via callback', async () => {
       const service = new LibrarySyncService();
       const mockServer = createMockServer();

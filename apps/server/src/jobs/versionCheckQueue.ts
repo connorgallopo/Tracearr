@@ -6,6 +6,7 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { getRedisPrefix } from '@tracearr/shared';
 import type { Redis } from 'ioredis';
 import { REDIS_KEYS, CACHE_TTL, WS_EVENTS } from '@tracearr/shared';
 
@@ -67,10 +68,12 @@ export function initVersionCheckQueue(
   connectionOptions = { url: redisUrl };
   redisClient = redis;
   pubSubPublish = publishFn;
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   // Create the version check queue
   versionQueue = new Queue<VersionCheckJobData>(QUEUE_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       attempts: 3,
       backoff: {
@@ -104,6 +107,8 @@ export function startVersionCheckWorker(): void {
     return;
   }
 
+  const bullPrefix = `${getRedisPrefix()}bull`;
+
   versionWorker = new Worker<VersionCheckJobData>(
     QUEUE_NAME,
     async (job: Job<VersionCheckJobData>) => {
@@ -120,6 +125,7 @@ export function startVersionCheckWorker(): void {
     },
     {
       connection: connectionOptions,
+      prefix: bullPrefix,
       concurrency: 1, // Only one check at a time
     }
   );

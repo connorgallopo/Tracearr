@@ -9,6 +9,7 @@
  */
 
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { getRedisPrefix } from '@tracearr/shared';
 import { Redis } from 'ioredis';
 import { sql } from 'drizzle-orm';
 import { WS_EVENTS, REDIS_KEYS } from '@tracearr/shared';
@@ -90,9 +91,11 @@ export function initLibrarySyncQueue(redisUrl: string): void {
 
   connectionOptions = { url: redisUrl };
   redisClient = new Redis(redisUrl);
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   librarySyncQueue = new Queue<LibrarySyncJobData>(QUEUE_NAME, {
     connection: connectionOptions,
+    prefix: bullPrefix,
     defaultJobOptions: {
       attempts: 3,
       backoff: {
@@ -124,6 +127,8 @@ export function startLibrarySyncWorker(): void {
     console.log('Library sync worker already running');
     return;
   }
+
+  const bullPrefix = `${getRedisPrefix()}bull`;
 
   librarySyncWorker = new Worker<LibrarySyncJobData>(
     QUEUE_NAME,
@@ -181,6 +186,7 @@ export function startLibrarySyncWorker(): void {
     },
     {
       connection: connectionOptions,
+      prefix: bullPrefix,
       concurrency: 2, // Allow 2 concurrent syncs (different servers)
       lockDuration: 60 * 60 * 1000, // 1 hour - large libraries take time
       stalledInterval: 30 * 1000, // Check for stalled jobs every 30 seconds

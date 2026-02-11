@@ -80,48 +80,123 @@ export const WS_EVENTS = {
   SERVER_UP: 'server:up',
 } as const;
 
-// Redis key prefixes
+// Redis key prefix (set at startup via setRedisPrefix)
+let _redisPrefix = '';
+
+/**
+ * Set the global prefix prepended to all Redis keys.
+ * Call this at server startup before any Redis operations.
+ * @param prefix - Prefix string (e.g. 'myapp:')
+ */
+export function setRedisPrefix(prefix: string) {
+  _redisPrefix = prefix;
+}
+
+/**
+ * Get the current Redis key prefix.
+ */
+export function getRedisPrefix(): string {
+  return _redisPrefix;
+}
+
+// Redis key definitions (prefix-aware via getters)
 export const REDIS_KEYS = {
   // Active sessions: SET of session IDs for atomic add/remove
-  ACTIVE_SESSION_IDS: 'tracearr:sessions:active:ids',
+  get ACTIVE_SESSION_IDS() {
+    return `${_redisPrefix}tracearr:sessions:active:ids`;
+  },
   // Legacy: JSON array of sessions (deprecated, kept for migration)
-  ACTIVE_SESSIONS: 'tracearr:sessions:active',
+  get ACTIVE_SESSIONS() {
+    return `${_redisPrefix}tracearr:sessions:active`;
+  },
   // Individual session data
-  SESSION_BY_ID: (id: string) => `tracearr:sessions:${id}`,
-  USER_SESSIONS: (userId: string) => `tracearr:users:${userId}:sessions`,
-  DASHBOARD_STATS: 'tracearr:stats:dashboard',
-  RATE_LIMIT_LOGIN: (ip: string) => `tracearr:ratelimit:login:${ip}`,
-  RATE_LIMIT_MOBILE_PAIR: (ip: string) => `tracearr:ratelimit:mobile:pair:${ip}`,
-  RATE_LIMIT_MOBILE_REFRESH: (ip: string) => `tracearr:ratelimit:mobile:refresh:${ip}`,
-  SERVER_HEALTH: (serverId: string) => `tracearr:servers:${serverId}:health`,
-  PUBSUB_EVENTS: 'tracearr:events',
+  SESSION_BY_ID: (id: string) => `${_redisPrefix}tracearr:sessions:${id}`,
+  USER_SESSIONS: (userId: string) => `${_redisPrefix}tracearr:users:${userId}:sessions`,
+  get DASHBOARD_STATS() {
+    return `${_redisPrefix}tracearr:stats:dashboard`;
+  },
+  RATE_LIMIT_LOGIN: (ip: string) => `${_redisPrefix}tracearr:ratelimit:login:${ip}`,
+  RATE_LIMIT_MOBILE_PAIR: (ip: string) => `${_redisPrefix}tracearr:ratelimit:mobile:pair:${ip}`,
+  RATE_LIMIT_MOBILE_REFRESH: (ip: string) =>
+    `${_redisPrefix}tracearr:ratelimit:mobile:refresh:${ip}`,
+  SERVER_HEALTH: (serverId: string) => `${_redisPrefix}tracearr:servers:${serverId}:health`,
+  get PUBSUB_EVENTS() {
+    return `${_redisPrefix}tracearr:events`;
+  },
   // Notification rate limiting (sliding window counters)
-  PUSH_RATE_MINUTE: (sessionId: string) => `tracearr:push:rate:minute:${sessionId}`,
-  PUSH_RATE_HOUR: (sessionId: string) => `tracearr:push:rate:hour:${sessionId}`,
+  PUSH_RATE_MINUTE: (sessionId: string) => `${_redisPrefix}tracearr:push:rate:minute:${sessionId}`,
+  PUSH_RATE_HOUR: (sessionId: string) => `${_redisPrefix}tracearr:push:rate:hour:${sessionId}`,
   // Location stats filter caching (includes serverIds hash for proper scoping)
   LOCATION_FILTERS: (userId: string, serverIds: string[]) => {
     // Sort and hash serverIds for stable cache key
     const serverHash = serverIds.length > 0 ? serverIds.slice().sort().join(',') : 'all';
-    return `tracearr:filters:locations:${userId}:${serverHash}`;
+    return `${_redisPrefix}tracearr:filters:locations:${userId}:${serverHash}`;
   },
   // Version check cache
-  VERSION_LATEST: 'tracearr:version:latest',
+  get VERSION_LATEST() {
+    return `${_redisPrefix}tracearr:version:latest`;
+  },
   // Library statistics
-  LIBRARY_STATS: 'tracearr:library:stats',
-  LIBRARY_GROWTH: 'tracearr:library:growth',
-  LIBRARY_QUALITY: 'tracearr:library:quality',
-  LIBRARY_STALE: 'tracearr:library:stale',
-  LIBRARY_DUPLICATES: 'tracearr:library:duplicates',
-  LIBRARY_STORAGE: 'tracearr:library:storage',
-  LIBRARY_WATCH: 'tracearr:library:watch',
-  LIBRARY_ROI: 'tracearr:library:roi',
-  LIBRARY_PATTERNS: 'tracearr:library:patterns',
-  LIBRARY_COMPLETION: 'tracearr:library:completion',
-  LIBRARY_TOP_MOVIES: 'tracearr:library:top-movies',
-  LIBRARY_TOP_SHOWS: 'tracearr:library:top-shows',
-  LIBRARY_CODECS: 'tracearr:library:codecs',
-  LIBRARY_RESOLUTION: 'tracearr:library:resolution',
-} as const;
+  get LIBRARY_STATS() {
+    return `${_redisPrefix}tracearr:library:stats`;
+  },
+  get LIBRARY_GROWTH() {
+    return `${_redisPrefix}tracearr:library:growth`;
+  },
+  get LIBRARY_QUALITY() {
+    return `${_redisPrefix}tracearr:library:quality`;
+  },
+  get LIBRARY_STALE() {
+    return `${_redisPrefix}tracearr:library:stale`;
+  },
+  get LIBRARY_DUPLICATES() {
+    return `${_redisPrefix}tracearr:library:duplicates`;
+  },
+  get LIBRARY_STORAGE() {
+    return `${_redisPrefix}tracearr:library:storage`;
+  },
+  get LIBRARY_WATCH() {
+    return `${_redisPrefix}tracearr:library:watch`;
+  },
+  get LIBRARY_ROI() {
+    return `${_redisPrefix}tracearr:library:roi`;
+  },
+  get LIBRARY_PATTERNS() {
+    return `${_redisPrefix}tracearr:library:patterns`;
+  },
+  get LIBRARY_COMPLETION() {
+    return `${_redisPrefix}tracearr:library:completion`;
+  },
+  get LIBRARY_TOP_MOVIES() {
+    return `${_redisPrefix}tracearr:library:top-movies`;
+  },
+  get LIBRARY_TOP_SHOWS() {
+    return `${_redisPrefix}tracearr:library:top-shows`;
+  },
+  get LIBRARY_CODECS() {
+    return `${_redisPrefix}tracearr:library:codecs`;
+  },
+  get LIBRARY_RESOLUTION() {
+    return `${_redisPrefix}tracearr:library:resolution`;
+  },
+  // Auth tokens
+  REFRESH_TOKEN: (hash: string) => `${_redisPrefix}tracearr:refresh:${hash}`,
+  PLEX_TEMP_TOKEN: (token: string) => `${_redisPrefix}tracearr:plex_temp:${token}`,
+  MOBILE_REFRESH_TOKEN: (hash: string) => `${_redisPrefix}tracearr:mobile_refresh:${hash}`,
+  // Rate limiting
+  MOBILE_TOKEN_GEN_RATE: (userId: string) => `${_redisPrefix}mobile_token_gen:${userId}`,
+  // Distributed locks
+  get HEAVY_OPS_LOCK() {
+    return `${_redisPrefix}tracearr:heavy-ops:lock`;
+  },
+  SESSION_LOCK: (serverId: string, sessionKey: string) =>
+    `${_redisPrefix}session:lock:${serverId}:${sessionKey}`,
+  TERMINATION_COOLDOWN: (serverId: string, sessionKey: string, ratingKey: string) =>
+    `${_redisPrefix}termination:cooldown:${serverId}:${sessionKey}:${ratingKey}`,
+  // Rule cooldowns
+  RULE_COOLDOWN: (ruleId: string, targetId: string) =>
+    `${_redisPrefix}tracearr:rule:cooldown:${ruleId}:${targetId}`,
+};
 
 // Cache TTLs in seconds
 export const CACHE_TTL = {

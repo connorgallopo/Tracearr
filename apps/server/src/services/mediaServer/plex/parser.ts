@@ -1363,7 +1363,7 @@ function normalizeVideoResolution(resolution: string | undefined): string | unde
  */
 function mapPlexTypeToMediaType(
   type: string
-): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' {
+): 'movie' | 'show' | 'season' | 'episode' | 'artist' | 'album' | 'track' | 'photo' {
   const typeStr = type.toLowerCase();
   switch (typeStr) {
     case 'movie':
@@ -1380,8 +1380,9 @@ function mapPlexTypeToMediaType(
       return 'album';
     case 'track':
       return 'track';
+    case 'photo':
+      return 'photo';
     default:
-      // Default to movie for unknown types
       return 'movie';
   }
 }
