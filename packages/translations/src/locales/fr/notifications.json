@@ -26,8 +26,8 @@
         "message": "La violation a été marquée comme reconnue"
       },
       "violationDismissed": {
-        "title": "Violation Dismissed",
-        "message": "The violation has been dismissed"
+        "title": "Violation ignorée",
+        "message": "La violation a été ignorée"
       },
       "deviceRemoved": {
         "title": "Appareil supprimé",
@@ -191,11 +191,11 @@
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
+        "title": "Nouvelle lecture démarée",
         "message": "{{user}} a commencé a regarder {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
+        "title": "Lecture arrêtée",
         "message": "{{user}} a arrêté de regarder"
       },
       "updateAvailable": {
@@ -211,15 +211,15 @@
         "message": "{{name}} est de retour en ligne"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
+        "title": "Nouvelle violation : {{ruleName}}",
         "message": "{{user}} a déclenché {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
+    "violationDetected": "Violation de partage détectée",
+    "streamStarted": "Lecture démarrée",
+    "streamEnded": "Lecture terminée",
     "serverDown": "Serveur hors-ligne",
     "serverUp": "Serveur de retour en ligne",
     "newDevice": "Nouvel appareil",
@@ -227,7 +227,7 @@
   },
   "settings": {
     "title": "Paramètres de notifications",
-    "allSeverity": "All (Low, Warning, High)",
+    "allSeverity": "Toutes (Faible, Avertissement, Élevée)",
     "warningAndHigh": "Warning & High only",
     "highOnly": "High severity only",
     "allTypes": "All Types",
