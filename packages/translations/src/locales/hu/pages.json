@@ -27,7 +27,14 @@
     "createAccountFailed": "Failed to create account",
     "loginFailed": "Login failed",
     "invalidCredentials": "Invalid email or password",
-    "jellyfinInvalidCredentials": "Invalid username or password, or user is not an administrator"
+    "jellyfinInvalidCredentials": "Invalid username or password, or user is not an administrator",
+    "claimCodeRequired": "First-time setup requires a claim code",
+    "enterClaimCode": "Enter Claim Code",
+    "claimCodeDescription": "Check your server logs for the claim code to proceed with setup",
+    "claimCodeLabel": "Claim Code",
+    "claimCodeHint": "The claim code is printed in the server logs when the container starts",
+    "validateClaimCode": "Validate Claim Code",
+    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup"
   },
   "dashboard": {
     "alerts": "Alerts",
