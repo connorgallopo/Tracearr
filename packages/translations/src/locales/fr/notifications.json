@@ -143,8 +143,8 @@
         "message_other": "{{count}} utilisateurs réinitialisés à 100"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Code de réclamation validé",
+        "message": "Vous pouvez maintenant procéder à la configuration"
       }
     },
     "error": {
@@ -187,8 +187,8 @@
       "invalidUrl": "URL invalide",
       "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Code de réclamation invalide",
+        "message": "Veuillez vérifier les journaux du serveur"
       }
     },
     "warning": {
