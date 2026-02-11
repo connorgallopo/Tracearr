@@ -141,6 +141,10 @@
         "title": "Réinitialiser les scores de confiance",
         "message_one": "{{count}} utilisateur réinitialisé à 100",
         "message_other": "{{count}} utilisateurs réinitialisés à 100"
+      },
+      "claimCodeValidated": {
+        "title": "Claim code validated",
+        "message": "You can now proceed with setup"
       }
     },
     "error": {
@@ -181,7 +185,11 @@
       "jobStartFailed": "Échec de démarrage de la tâche",
       "jobLoadFailed": "Échec du chargement des tâches de maintenance",
       "invalidUrl": "URL invalide",
-      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place."
+      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
+      "invalidClaimCode": {
+        "title": "Invalid claim code",
+        "message": "Please check the server logs"
+      }
     },
     "warning": {
       "jobFailed": {
