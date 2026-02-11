@@ -39,7 +39,7 @@
       },
       "sessionsRevoked": {
         "title": "Sessions révoquées",
-        "message": "Toutes les sessions mobile ont été révoquées"
+        "message": "Toutes les sessions mobiles ont été révoquées"
       },
       "loggedIn": {
         "title": "Succès",
@@ -128,7 +128,7 @@
       },
       "mobileAccessDisabled": {
         "title": "Accès mobile désactivé",
-        "message": "Toutes les sessions mobile ont été révoquées"
+        "message": "Toutes les sessions mobiles ont été révoquées"
       },
       "pairTokenGenerated": {
         "title": "Jeton d'appairage généré",
@@ -199,7 +199,7 @@
     },
     "info": {
       "streamStarted": {
-        "title": "Nouvelle lecture démarée",
+        "title": "Nouvelle lecture démarrée",
         "message": "{{user}} a commencé a regarder {{media}}"
       },
       "streamStopped": {
