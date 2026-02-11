@@ -37,7 +37,7 @@
     "connectedDevices": "Appareils connectés",
     "generateToken": "Générer un jeton d'appairage",
     "scanQrCode": "Scanner le code QR",
-    "tokenExpires": "Le jeton d'authentification expire dans {{time}}",
+    "tokenExpires": "Le jeton d'appairage expire dans {{time}}",
     "noDevices": "Aucun appareil connecté",
     "revokeAll": "Révoquer toutes les sessions"
   },
