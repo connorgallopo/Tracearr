@@ -1,262 +1,262 @@
 {
-  "push": {
-    "newDevice": "Nouvel appareil",
-    "serverDown": "Serveur hors-ligne",
-    "serverUp": "Serveur de retour en ligne",
-    "streamEnded": "Lecture terminée",
-    "streamStarted": "Lecture démarrée",
-    "trustScoreChanged": "Score de confiance changé",
-    "violationDetected": "Violation de partage détectée"
-  },
-  "settings": {
-    "allSeverity": "Toutes (Faible, Avertissement, Élevée)",
-    "allTypes": "All Types",
-    "concurrentStreams": "Concurrent Streams",
-    "enablePushNotifications": "Activer les notifications Push",
-    "enableQuietHours": "Enable Quiet Hours",
-    "highOnly": "High severity only",
-    "minimumSeverity": "Minimum Severity",
-    "newDevice": "Nouvel appareil",
-    "notificationEvents": "Notification Events",
-    "overrideForCritical": "Override for Critical",
-    "perHour": "Par heure",
-    "perMinute": "Par minute",
-    "quietHours": "Quiet Hours",
-    "rateLimit": "Current Rate Limit Status",
-    "rateLimiting": "Rate Limiting",
-    "serverDown": "Server Down",
-    "serverUp": "Server Up",
-    "streamStarted": "Stream Started",
-    "streamStopped": "Stream Stopped",
-    "title": "Paramètres de notifications",
-    "trustScoreChanged": "Score de confiance changé",
-    "violationDetected": "Violation Detected",
-    "violationFilters": "Violation Filters",
-    "warningAndHigh": "Warning & High only"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Échec de la reconnaissance de la violation",
-      "agentAddFailed": "Échec de l'ajout de l'agent",
-      "agentRemoveFailed": "Échec de la suppression de l'agent",
-      "agentTestFailed": "Échec du test",
-      "agentUpdateFailed": "Échec de la mise à jour de l'agent",
-      "apiKeyGenerateFailed": "Échec de la génération de la clé API",
-      "authFailed": "Échec de l'authentification",
-      "clipboardFailed": "Échec de la copie dans le presse-papiers",
-      "copyFailed": "Impossible de copier dans le presse-papiers",
-      "deviceRemoveFailed": "Échec de la suppression de l'appareil",
-      "deviceRenameFailed": "Échec du renommage de l'appareil",
-      "dismissFailed": "Échec de l'ignorance de la violation",
-      "displayNameUpdateFailed": "Échec de la mise à jour du nom d'affichage",
-      "invalidClaimCode": {
-        "message": "Please check the server logs",
-        "title": "Invalid claim code"
-      },
-      "invalidUrl": "URL invalide",
-      "jobAlreadyRunning": "Tâche déjà en cours d'exécution",
-      "jobLoadFailed": "Échec du chargement des tâches de maintenance",
-      "jobStartFailed": "Échec de démarrage de la tâche",
-      "mobileAccessDisableFailed": "Échec de la désactivation de l'accès mobile",
-      "mobileAccessEnableFailed": "Échec de l'activation de l'accès mobile",
-      "pairTokenGenerateFailed": "Échec de la génération du jeton d'appairage",
-      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai propriétaires à Plex qui ne peuvent pas être utilisées ici. Merci d'utiliser une adresse IP directe ou un nom d'hôte à la place.",
-      "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
-      "routingUpdateFailed": "Échec de la mise à jour du routage",
-      "ruleCreateFailed": "Échec de la création de la règle",
-      "ruleDeleteFailed": "Échec de la suppression de la règle",
-      "ruleUpdateFailed": "Échec de la mise à jour de la règle",
-      "serverAddFailed": "Échec de l'ajout du serveur",
-      "serverRemoveFailed": "Échec de la suppression du serveur",
-      "serverReorderFailed": "Échec de la réorganisation des serveurs",
-      "serverSyncFailed": "Échec de la synchronisation du serveur",
-      "serverUpdateFailed": "Échec de la mise à jour du serveur",
-      "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
-      "sessionsDeleteFailed": "Échec de la suppression des sessions",
-      "sessionsRevokeFailed": "Échec de la révocation des sessions",
-      "settingsUpdateFailed": "Échec de la mise à jour des réglages",
-      "streamTerminateFailed": "Échec de l'arrêt de la lecture",
-      "trustScoresResetFailed": "Échec de la réinitialisation des scores de confiance",
-      "webhookTestFailed": "Échec du test du webhook"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} est inaccessible",
-        "title": "Serveur hors ligne"
-      },
-      "serverOnline": {
-        "message": "{{name}} est de retour en ligne",
-        "title": "Serveur en ligne"
-      },
-      "streamStarted": {
-        "message": "{{user}} a commencé a regarder {{media}}",
-        "title": "Nouvelle lecture démarée"
-      },
-      "streamStopped": {
-        "message": "{{user}} a arrêté de regarder",
-        "title": "Lecture arrêtée"
-      },
-      "updateAvailable": {
-        "message": "Une nouvelle version de Tracearr est disponible : {{version}}",
-        "title": "Mise à jour disponible"
-      },
-      "violationDetected": {
-        "message": "{{user}} a déclenché {{ruleType}}",
-        "title": "Nouvelle violation : {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "L'agent de notification a été ajouté",
-        "title": "Agent ajouté"
+      "serverAdded": {
+        "title": "Serveur ajouté",
+        "message": "{{name}} a été connecté avec succès"
       },
-      "agentRemoved": {
-        "message": "L'agent de notification a été supprimé",
-        "title": "Agent supprimé"
+      "serverRemoved": {
+        "title": "Serveur supprimé",
+        "message": "Le serveur a été supprimé avec succès"
       },
-      "agentUpdated": {
-        "message": "L'agent de notification a été mis à jour",
-        "title": "Agent mis à jour"
+      "serverSynced": {
+        "title": "Serveur synchronisé",
+        "message": "Les données du serveur ont été synchronisées"
       },
-      "apiKeyGenerated": {
-        "message": "Votre nouvelle clé API est prête à être utilisée",
-        "title": "Clé API générée"
+      "settingsUpdated": {
+        "title": "Réglages mis à jour",
+        "message": "Vos réglages ont été sauvegardés"
       },
-      "claimCodeValidated": {
-        "message": "You can now proceed with setup",
-        "title": "Claim code validated"
+      "tokenCopied": {
+        "title": "Jeton copié",
+        "message": "Jeton d'appairage copié dans le presse-papiers"
+      },
+      "violationAcknowledged": {
+        "title": "Violation reconnue",
+        "message": "La violation a été marquée comme reconnue"
+      },
+      "violationDismissed": {
+        "title": "Violation ignorée",
+        "message": "La violation a été ignorée"
+      },
+      "deviceRemoved": {
+        "title": "Appareil supprimé",
+        "message": "L'appareil a bien été déconnecté"
+      },
+      "deviceRenamed": {
+        "title": "Appareil renommé",
+        "message": "Le nom de l'appareil a été mis à jour"
+      },
+      "sessionsRevoked": {
+        "title": "Sessions révoquées",
+        "message": "Toutes les sessions mobiles ont été révoquées"
+      },
+      "loggedIn": {
+        "title": "Succès",
+        "message": "Connecté avec succès"
+      },
+      "webhookTest": {
+        "title": "Test réussi",
+        "message": "Le webhook fonctionne correctement"
       },
       "copiedToClipboard": {
         "title": "Copié dans le presse-papiers"
       },
-      "deviceRemoved": {
-        "message": "L'appareil a bien été déconnecté",
-        "title": "Appareil supprimé"
-      },
-      "deviceRenamed": {
-        "message": "Le nom de l'appareil a été mis à jour",
-        "title": "Appareil renommé"
-      },
-      "displayNameUpdated": {
-        "title": "Nom d'affichage mis à jour"
-      },
-      "jobCompleted": {
-        "message": "{{name}} terminée avec succès",
-        "title": "Tâche terminée"
-      },
-      "loggedIn": {
-        "message": "Connecté avec succès",
-        "title": "Succès"
-      },
-      "mobileAccessDisabled": {
-        "message": "Toutes les sessions mobile ont été révoquées",
-        "title": "Accès mobile désactivé"
-      },
-      "mobileAccessEnabled": {
-        "message": "Scannez le code QR avec l'application mobile Tracearr pour vous connecter",
-        "title": "Accès mobile activé"
-      },
-      "pairTokenGenerated": {
-        "message": "Scannez le code QR avec votre appareil mobile pour appairer",
-        "title": "Jeton d'appairage généré"
-      },
       "plexAccountLinked": {
-        "message": "Vous pouvez maintenant ajouter des serveurs depuis votre compte Plex",
-        "title": "Compte Plex lié"
+        "title": "Compte Plex lié",
+        "message": "Vous pouvez maintenant ajouter des serveurs depuis votre compte Plex"
       },
       "plexAccountUnlinked": {
-        "message": "Votre compte Plex a été déconnecté",
-        "title": "Compte Plex dissocié"
+        "title": "Compte Plex dissocié",
+        "message": "Votre compte Plex a été déconnecté"
+      },
+      "agentAdded": {
+        "title": "Agent ajouté",
+        "message": "L'agent de notification a été ajouté"
+      },
+      "agentUpdated": {
+        "title": "Agent mis à jour",
+        "message": "L'agent de notification a été mis à jour"
+      },
+      "agentRemoved": {
+        "title": "Agent supprimé",
+        "message": "L'agent de notification a été supprimé"
+      },
+      "jobCompleted": {
+        "title": "Tâche terminée",
+        "message": "{{name}} terminée avec succès"
       },
       "ruleCreated": {
-        "message": "La règle a été créée avec succès",
-        "title": "Règle créée"
-      },
-      "ruleDeleted": {
-        "message": "La règle a été supprimée avec succès",
-        "title": "Règle supprimée"
+        "title": "Règle créée",
+        "message": "La règle a été créée avec succès"
       },
       "ruleUpdated": {
-        "message": "La règle a été mise à jour avec succès",
-        "title": "Règle mise à jour"
+        "title": "Règle mise à jour",
+        "message": "La règle a été mise à jour avec succès"
       },
-      "serverAdded": {
-        "message": "{{name}} a été connecté avec succès",
-        "title": "Serveur ajouté"
-      },
-      "serverRemoved": {
-        "message": "Le serveur a été supprimé avec succès",
-        "title": "Serveur supprimé"
-      },
-      "serverSynced": {
-        "message": "Les données du serveur ont été synchronisées",
-        "title": "Serveur synchronisé"
-      },
-      "serverUpdated": {
-        "message": "Le serveur a été mis à jour avec succès",
-        "title": "Serveur mis à jour"
-      },
-      "serverUrlUpdated": {
-        "message": "L'URL du serveur a été mise à jour avec succès",
-        "title": "URL du serveur mise à jour"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} session supprimée",
-        "message_other": "{{count}} sessions supprimées",
-        "title": "Sessions supprimées"
-      },
-      "sessionsRevoked": {
-        "message": "Toutes les sessions mobile ont été révoquées",
-        "title": "Sessions révoquées"
-      },
-      "settingsUpdated": {
-        "message": "Vos réglages ont été sauvegardés",
-        "title": "Réglages mis à jour"
+      "ruleDeleted": {
+        "title": "Règle supprimée",
+        "message": "La règle a été supprimée avec succès"
       },
       "streamTerminated": {
-        "message": "La session de lecture a été interrompue",
-        "title": "Lecture interrompue"
+        "title": "Lecture interrompue",
+        "message": "La session de lecture a été interrompue"
+      },
+      "serverUrlUpdated": {
+        "title": "URL du serveur mise à jour",
+        "message": "L'URL du serveur a été mise à jour avec succès"
+      },
+      "serverUpdated": {
+        "title": "Serveur mis à jour",
+        "message": "Le serveur a été mis à jour avec succès"
       },
       "syncCompletedWithErrors": {
         "title": "Synchronisation terminée avec des erreurs"
       },
-      "tokenCopied": {
-        "message": "Jeton d'appairage copié dans le presse-papiers",
-        "title": "Jeton copié"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} utilisateur réinitialisé à 100",
-        "message_other": "{{count}} utilisateurs réinitialisés à 100",
-        "title": "Réinitialiser les scores de confiance"
-      },
-      "violationAcknowledged": {
-        "message": "La violation a été marquée comme reconnue",
-        "title": "Violation reconnue"
-      },
-      "violationDismissed": {
-        "message": "La violation a été ignorée",
-        "title": "Violation ignorée"
+      "sessionsDeleted": {
+        "title": "Sessions supprimées",
+        "message_one": "{{count}} session supprimée",
+        "message_other": "{{count}} sessions supprimées"
       },
       "violationsAcknowledged": {
+        "title": "Violations reconnues",
         "message_one": "{{count}} violation reconnue",
-        "message_other": "{{count}} violations reconnues",
-        "title": "Violations reconnues"
+        "message_other": "{{count}} violations reconnues"
       },
       "violationsDismissed": {
+        "title": "Violations ignorées",
         "message_one": "{{count}} violation ignorée",
-        "message_other": "{{count}} violations ignorées",
-        "title": "Violations ignorées"
+        "message_other": "{{count}} violations ignorées"
       },
-      "webhookTest": {
-        "message": "Le webhook fonctionne correctement",
-        "title": "Test réussi"
+      "apiKeyGenerated": {
+        "title": "Clé API générée",
+        "message": "Votre nouvelle clé API est prête à être utilisée"
+      },
+      "mobileAccessEnabled": {
+        "title": "Accès mobile activé",
+        "message": "Scannez le code QR avec l'application mobile Tracearr pour vous connecter"
+      },
+      "mobileAccessDisabled": {
+        "title": "Accès mobile désactivé",
+        "message": "Toutes les sessions mobiles ont été révoquées"
+      },
+      "pairTokenGenerated": {
+        "title": "Jeton d'appairage généré",
+        "message": "Scannez le code QR avec votre appareil mobile pour appairer"
+      },
+      "displayNameUpdated": {
+        "title": "Nom d'affichage mis à jour"
+      },
+      "trustScoresReset": {
+        "title": "Réinitialiser les scores de confiance",
+        "message_one": "{{count}} utilisateur réinitialisé à 100",
+        "message_other": "{{count}} utilisateurs réinitialisés à 100"
+      },
+      "claimCodeValidated": {
+        "title": "Code de réclamation validé",
+        "message": "Vous pouvez maintenant procéder à la configuration"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Échec de l'ajout du serveur",
+      "serverRemoveFailed": "Échec de la suppression du serveur",
+      "serverSyncFailed": "Échec de la synchronisation du serveur",
+      "settingsUpdateFailed": "Échec de la mise à jour des réglages",
+      "copyFailed": "Impossible de copier dans le presse-papiers",
+      "acknowledgeFailed": "Échec de la reconnaissance de la violation",
+      "dismissFailed": "Échec de l'ignorance de la violation",
+      "authFailed": "Échec de l'authentification",
+      "webhookTestFailed": "Échec du test du webhook",
+      "ruleCreateFailed": "Échec de la création de la règle",
+      "ruleUpdateFailed": "Échec de la mise à jour de la règle",
+      "ruleDeleteFailed": "Échec de la suppression de la règle",
+      "streamTerminateFailed": "Échec de l'arrêt de la lecture",
+      "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
+      "serverUpdateFailed": "Échec de la mise à jour du serveur",
+      "serverReorderFailed": "Échec de la réorganisation des serveurs",
+      "sessionsDeleteFailed": "Échec de la suppression des sessions",
+      "apiKeyGenerateFailed": "Échec de la génération de la clé API",
+      "mobileAccessEnableFailed": "Échec de l'activation de l'accès mobile",
+      "mobileAccessDisableFailed": "Échec de la désactivation de l'accès mobile",
+      "pairTokenGenerateFailed": "Échec de la génération du jeton d'appairage",
+      "deviceRemoveFailed": "Échec de la suppression de l'appareil",
+      "deviceRenameFailed": "Échec du renommage de l'appareil",
+      "sessionsRevokeFailed": "Échec de la révocation des sessions",
+      "displayNameUpdateFailed": "Échec de la mise à jour du nom d'affichage",
+      "trustScoresResetFailed": "Échec de la réinitialisation des scores de confiance",
+      "routingUpdateFailed": "Échec de la mise à jour du routage",
+      "clipboardFailed": "Échec de la copie dans le presse-papiers",
+      "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
+      "agentAddFailed": "Échec de l'ajout de l'agent",
+      "agentUpdateFailed": "Échec de la mise à jour de l'agent",
+      "agentRemoveFailed": "Échec de la suppression de l'agent",
+      "agentTestFailed": "Échec du test",
+      "jobAlreadyRunning": "Tâche déjà en cours d'exécution",
+      "jobStartFailed": "Échec de démarrage de la tâche",
+      "jobLoadFailed": "Échec du chargement des tâches de maintenance",
+      "invalidUrl": "URL invalide",
+      "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
+      "invalidClaimCode": {
+        "title": "Code de réclamation invalide",
+        "message": "Veuillez vérifier les journaux du serveur"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "Une erreur est survenue lors de l'exécution de la tâche {{name}}",
-        "title": "Tâche échouée"
+        "title": "Tâche échouée",
+        "message": "Une erreur est survenue lors de l'exécution de la tâche {{name}}"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Nouvelle lecture démarrée",
+        "message": "{{user}} a commencé a regarder {{media}}"
+      },
+      "streamStopped": {
+        "title": "Lecture arrêtée",
+        "message": "{{user}} a arrêté de regarder"
+      },
+      "updateAvailable": {
+        "title": "Mise à jour disponible",
+        "message": "Tracearr {{version}} est disponible"
+      },
+      "serverOffline": {
+        "title": "Serveur hors ligne",
+        "message": "{{name}} est inaccessible"
+      },
+      "serverOnline": {
+        "title": "Serveur en ligne",
+        "message": "{{name}} est de retour en ligne"
+      },
+      "violationDetected": {
+        "title": "Nouvelle violation : {{ruleName}}",
+        "message": "{{user}} a déclenché {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Violation de partage détectée",
+    "streamStarted": "Lecture démarrée",
+    "streamEnded": "Lecture terminée",
+    "serverDown": "Connexion au serveur perdue",
+    "serverUp": "Serveur de retour en ligne",
+    "newDevice": "Nouvel appareil",
+    "trustScoreChanged": "Score de confiance changé"
+  },
+  "settings": {
+    "title": "Réglages de notifications",
+    "allSeverity": "Toutes (Faible, Avertissement, Élevée)",
+    "warningAndHigh": "Avertissement et Élevée seulement",
+    "highOnly": "Gravité élevée seulement",
+    "allTypes": "Tous les types",
+    "rateLimit": "État actuel de la limite de débit",
+    "perMinute": "Par minute",
+    "perHour": "Par heure",
+    "enablePushNotifications": "Activer les notifications Push",
+    "notificationEvents": "Événements de notification",
+    "violationDetected": "Violation détectée",
+    "streamStarted": "Lecture démarrée",
+    "streamStopped": "Lecture arrêtée",
+    "concurrentStreams": "Lectures simultanées",
+    "newDevice": "Nouvel appareil",
+    "trustScoreChanged": "Score de confiance changé",
+    "serverDown": "Serveur hors ligne",
+    "serverUp": "Serveur en ligne",
+    "violationFilters": "Filtres de violation",
+    "minimumSeverity": "Gravité minimum",
+    "quietHours": "Heures silencieuses",
+    "enableQuietHours": "Activer les heures silencieuses",
+    "overrideForCritical": "Remplacer pour Critique",
+    "rateLimiting": "Limitation de débit"
   }
 }
