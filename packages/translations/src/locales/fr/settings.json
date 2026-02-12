@@ -4,16 +4,16 @@
     "servers": "Serveurs",
     "notifications": "Notifications",
     "mobile": "Application mobile",
-    "import": "Import",
+    "import": "Importation",
     "advanced": "Avancé",
     "jobs": "Tâches",
     "accessControl": "Contrôle d'accès"
   },
   "general": {
-    "title": "Paramètres généraux",
+    "title": "Réglages généraux",
     "unitSystem": "Système d'unité",
-    "metric": "Métriques (km, km/h)",
-    "imperial": "Impériales (mi, mph)",
+    "metric": "Métrique (km, km/h)",
+    "imperial": "Impérial (mi, mph)",
     "timezone": "Fuseau horaire",
     "primaryAuth": "Méthode d'authentification principale",
     "localAccount": "Compte local",
@@ -25,7 +25,7 @@
     "addServer": "Ajouter un serveur",
     "serverName": "Nom du serveur",
     "serverUrl": "URL du serveur",
-    "apiKey": "Clef d'API",
+    "apiKey": "Clé API",
     "syncInterval": "Intervalle de synchronisation",
     "testConnection": "Tester la connexion",
     "connectionSuccess": "Connexion réussie",
@@ -42,15 +42,15 @@
     "revokeAll": "Révoquer toutes les sessions"
   },
   "webhooks": {
-    "title": "Configuration du Webhook",
-    "discordWebhook": "URL du Webhook Discord",
+    "title": "Configuration du webhook",
+    "discordWebhook": "URL du webhook Discord",
     "ntfyTopic": "Sujet Ntfy",
-    "customWebhook": "URL personnalisée du Webhook",
-    "webhookFormat": "Format du Webhook",
+    "customWebhook": "URL personnalisée du webhook",
+    "webhookFormat": "Format du webhook",
     "testWebhook": "Tester le webhook"
   },
   "advanced": {
-    "title": "Paramètres avancés",
+    "title": "Réglages avancés",
     "basePath": "Chemin de base",
     "externalUrl": "URL externe",
     "trustProxy": "En-têtes de confiance du Proxy",
@@ -73,7 +73,7 @@
   },
   "plex": {
     "linkedAccounts": "Comptes Plex liés",
-    "unlinkAccount": "Délier le compte Plex",
+    "unlinkAccount": "Dissocier le compte Plex",
     "signInWithPlex": "Se connecter avec Plex",
     "signUpWithPlex": "S'inscrire avec Plex",
     "selectServer": "Sélectionner un serveur",
@@ -87,7 +87,7 @@
   "account": {
     "createAccount": "Créer un compte",
     "signIn": "Se connecter",
-    "email": "E-mail",
+    "email": "Email",
     "password": "Mot de passe",
     "displayName": "Nom d'affichage",
     "createYourAccount": "Créez votre compte pour démarrer",
@@ -101,8 +101,8 @@
     "releaseNotes": "Notes de version",
     "updateCommand": "Commande de mise à jour",
     "pullInstructions": "Après avoir réalisé le pull Docker, redémarrez cotre conteneur pour appliquer la modification.",
-    "stableRelease": "Mise à jour Stable",
-    "betaUpdate": "Mise à jour Beta",
+    "stableRelease": "Version stable",
+    "betaUpdate": "Mise à jour bêta",
     "newVersion": "Nouvelle version",
     "versionAvailable": "Version {{version}} disponible"
   },
@@ -111,7 +111,7 @@
     "multipleUnreachable": "{{count}} serveurs injoignables : {{serverNames}}"
   },
   "ipWarning": {
-    "message": "Tous les utilisateurs semblent utiliser la même adresse IP ou des IP locales. Cela pourrait affecter la logique des règles basées sur l'emplacement ou l'adresse IP.",
+    "message": "Tous les utilisateurs semblent utiliser la même adresse IP ou des IP locales. Cela peut affecter la logique des règles basées sur l'emplacement ou l'adresse IP.",
     "acknowledge": "Compris"
   }
 }
