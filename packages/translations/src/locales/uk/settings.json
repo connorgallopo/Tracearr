@@ -1,18 +1,18 @@
 {
   "tabs": {
     "general": "General",
-    "servers": "Servers",
-    "notifications": "Notifications",
-    "mobile": "Mobile App",
-    "import": "Import",
-    "advanced": "Advanced",
+    "servers": "Сервери",
+    "notifications": "Сповіщення",
+    "mobile": "Мобільний додаток",
+    "import": "Iмпорт",
+    "advanced": "Розширені",
     "jobs": "Jobs",
-    "accessControl": "Access Control"
+    "accessControl": "Контроль доступу"
   },
   "general": {
-    "title": "General Settings",
-    "unitSystem": "Unit System",
-    "metric": "Metric (km, km/h)",
+    "title": "Загальні налаштування",
+    "unitSystem": "Система одиниць",
+    "metric": "Метрична (км, км/год)",
     "imperial": "Imperial (mi, mph)",
     "timezone": "Timezone",
     "primaryAuth": "Primary Authentication Method",
