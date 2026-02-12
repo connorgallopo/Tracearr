@@ -301,5 +301,11 @@
       "displayNamePlaceholder": "e.g., My iPhone",
       "updating": "Updating..."
     }
+  },
+  "maintenance": {
+    "startingTitle": "Tracearr is starting up...",
+    "interruptionTitle": "Service interruption",
+    "startingDescription": "The server is waiting for backend services to become available. This page will automatically refresh when everything is ready.",
+    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored."
   }
 }
