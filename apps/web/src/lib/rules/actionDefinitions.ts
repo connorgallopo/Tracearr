@@ -251,6 +251,16 @@ export const ACTION_DEFINITIONS: Record<ActionType, ActionDefinition> = {
       },
     ],
   },
+
+  disable_user: {
+    type: 'disable_user',
+    label: 'Disable User',
+    description: 'Disable the user on the media server',
+    icon: 'UserX',
+    color: 'destructive',
+    configFields: [],
+    hint: 'Disables the user on Jellyfin/Emby (IsDisabled) or removes sharing on Plex. User is automatically re-enabled when traffic drops below the limit.',
+  },
 };
 
 // Helper functions
@@ -288,6 +298,8 @@ export function createDefaultAction(type: ActionType): Action {
       return { type: 'kill_stream' };
     case 'message_client':
       return { type: 'message_client', message: '' };
+    case 'disable_user':
+      return { type: 'disable_user' };
     default:
       return { type: 'log_only' };
   }

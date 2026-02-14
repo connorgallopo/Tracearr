@@ -32,6 +32,7 @@ export const RULE_DEFAULTS = {
     inactivityValue: 30,
     inactivityUnit: 'days',
   },
+  maximum_traffic: {},
 } as const;
 
 // Rule type display names
@@ -42,6 +43,7 @@ export const RULE_DISPLAY_NAMES = {
   concurrent_streams: 'Concurrent Streams',
   geo_restriction: 'Geo Restriction',
   account_inactivity: 'Account Inactivity',
+  maximum_traffic: 'Maximum Traffic Usage',
 } as const;
 
 // Severity levels

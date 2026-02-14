@@ -53,8 +53,13 @@ export function ConditionRow({
   const handleFieldChange = (newField: ConditionField) => {
     const newFieldDef = FIELD_DEFINITIONS[newField];
     // Build params based on field capabilities
-    const params: { window_hours?: number; exclude_same_device?: boolean } = {};
+    const params: {
+      window_hours?: number;
+      window_period?: 'day' | 'week' | 'month' | 'year';
+      exclude_same_device?: boolean;
+    } = {};
     if (newFieldDef.hasWindowHours) params.window_hours = 24;
+    if (newFieldDef.hasWindowPeriod) params.window_period = 'month';
     if (newFieldDef.hasExcludeSameDevice) params.exclude_same_device = true;
 
     onChange({
@@ -98,6 +103,14 @@ export function ConditionRow({
     onChange({
       ...condition,
       params: { ...condition.params, window_hours: hours },
+    });
+  };
+
+  // Handle window period change
+  const handleWindowPeriodChange = (period: 'day' | 'week' | 'month' | 'year') => {
+    onChange({
+      ...condition,
+      params: { ...condition.params, window_period: period },
     });
   };
 
@@ -172,6 +185,27 @@ export function ConditionRow({
             onChange={handleWindowHoursChange}
           />
           <span className="text-muted-foreground text-sm">hrs</span>
+        </div>
+      )}
+
+      {/* Window Period (for bandwidth/traffic fields) */}
+      {fieldDef.hasWindowPeriod && (
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground text-sm whitespace-nowrap">per</span>
+          <Select
+            value={(condition.params?.window_period as string) ?? 'month'}
+            onValueChange={handleWindowPeriodChange}
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Day</SelectItem>
+              <SelectItem value="week">Week</SelectItem>
+              <SelectItem value="month">Month</SelectItem>
+              <SelectItem value="year">Year</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       )}
 

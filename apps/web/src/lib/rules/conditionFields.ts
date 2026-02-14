@@ -102,6 +102,7 @@ export interface FieldDefinition {
   step?: number;
   placeholder?: string;
   hasWindowHours?: boolean; // For velocity-type fields
+  hasWindowPeriod?: boolean; // For bandwidth/traffic fields (day/week/month/year)
   hasExcludeSameDevice?: boolean; // For cross-session comparison fields
   hidden?: boolean; // Hide from UI (e.g., not yet implemented in backend)
 }
@@ -189,6 +190,18 @@ export const FIELD_DEFINITIONS: Record<ConditionField, FieldDefinition> = {
     unit: 'days',
     min: 0,
     step: 1,
+  },
+  bandwidth_usage_gb: {
+    field: 'bandwidth_usage_gb',
+    label: 'Bandwidth Usage',
+    description: 'Total data transferred by user in time period',
+    category: 'session_behavior',
+    operators: COMPARISON_OPERATORS,
+    valueType: 'number',
+    unit: 'GB',
+    min: 0,
+    step: 10,
+    hasWindowPeriod: true,
   },
 
   // Stream Quality

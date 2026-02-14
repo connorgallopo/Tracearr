@@ -41,6 +41,7 @@ import {
   Users,
   Globe,
   Clock,
+  HardDrive,
   Power,
   PowerOff,
   ChevronDown,
@@ -87,6 +88,7 @@ const RULE_TYPE_ICONS: Record<RuleType, React.ReactNode> = {
   concurrent_streams: <Shield className="h-4 w-4" />,
   geo_restriction: <Globe className="h-4 w-4" />,
   account_inactivity: <Clock className="h-4 w-4" />,
+  maximum_traffic: <HardDrive className="h-4 w-4" />,
 };
 
 function useRuleTypes() {
@@ -128,6 +130,12 @@ function useRuleTypes() {
       icon: RULE_TYPE_ICONS['account_inactivity'],
       description: t('rules.accountInactivityDesc'),
     },
+    {
+      value: 'maximum_traffic' as RuleType,
+      label: t('rules.maximumTraffic'),
+      icon: RULE_TYPE_ICONS['maximum_traffic'],
+      description: t('rules.maximumTrafficDesc'),
+    },
   ];
 }
 
@@ -141,6 +149,7 @@ const DEFAULT_PARAMS: Record<RuleType, RuleParams> = {
     inactivityValue: 30,
     inactivityUnit: 'days',
   },
+  maximum_traffic: {},
 };
 
 interface RuleFormData {

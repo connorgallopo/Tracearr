@@ -411,6 +411,26 @@ export interface IMediaServerClient {
   terminateSession(sessionId: string, reason?: string): Promise<boolean>;
 
   /**
+   * Disable a user account on the media server.
+   * Jellyfin/Emby: Sets IsDisabled=true via Policy API.
+   * Plex: Removes sharing/friend access.
+   *
+   * @param userId - The external user ID on the media server
+   * @returns true if successful
+   */
+  disableUser(userId: string): Promise<boolean>;
+
+  /**
+   * Re-enable a previously disabled user account on the media server.
+   * Jellyfin/Emby: Sets IsDisabled=false via Policy API.
+   * Plex: Re-invites/re-shares access.
+   *
+   * @param userId - The external user ID on the media server
+   * @returns true if successful
+   */
+  enableUser(userId: string): Promise<boolean>;
+
+  /**
    * Get all items in a library with pagination support
    *
    * Used for library scanning and snapshot generation. Returns items

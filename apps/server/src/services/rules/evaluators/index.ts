@@ -10,6 +10,9 @@ import type { ConditionEvaluator, EvaluationContext, EvaluatorResult } from '../
 import { compare } from '../comparisons.js';
 import { geoipService } from '../../geoip.js';
 import { normalizeResolution } from '../../../utils/resolutionNormalizer.js';
+import { db } from '../../../db/client.js';
+import { sessions } from '../../../db/schema.js';
+import { sql, eq, and, gte } from 'drizzle-orm';
 
 // ============================================================================
 // Helper Functions
@@ -815,6 +818,57 @@ const evaluateMediaType: ConditionEvaluator = (
 };
 
 // ============================================================================
+// Bandwidth Usage Evaluator
+// ============================================================================
+
+const evaluateBandwidthUsageGb: ConditionEvaluator = async (
+  context: EvaluationContext,
+  condition: Condition
+): Promise<EvaluatorResult> => {
+  const { serverUser } = context;
+  const windowPeriod = (condition.params as { window_period?: string })?.window_period ?? 'month';
+
+  // Calculate the start of the rolling window
+  const now = new Date();
+  let windowMs: number;
+  switch (windowPeriod) {
+    case 'day':
+      windowMs = 24 * 60 * 60 * 1000;
+      break;
+    case 'week':
+      windowMs = 7 * 24 * 60 * 60 * 1000;
+      break;
+    case 'month':
+      windowMs = 30 * 24 * 60 * 60 * 1000;
+      break;
+    case 'year':
+      windowMs = 365 * 24 * 60 * 60 * 1000;
+      break;
+    default:
+      windowMs = 30 * 24 * 60 * 60 * 1000;
+  }
+  const windowStart = new Date(now.getTime() - windowMs);
+
+  // Query total bandwidth for this user in the window
+  // Formula: SUM(bitrate_kbps * duration_ms) / 8 = total bytes
+  const result = await db
+    .select({
+      totalBytes: sql<string>`COALESCE(SUM(COALESCE(${sessions.bitrate}, 0)::bigint * COALESCE(${sessions.durationMs}, 0)::bigint) / 8, 0)`,
+    })
+    .from(sessions)
+    .where(and(eq(sessions.serverUserId, serverUser.id), gte(sessions.startedAt, windowStart)));
+
+  const totalBytes = Number(result[0]?.totalBytes ?? 0);
+  const usageGb = Math.round((totalBytes / 1e9) * 100) / 100;
+
+  return {
+    matched: compare(usageGb, condition.operator, condition.value),
+    actual: usageGb,
+    details: { windowPeriod, totalBytes, windowStart: windowStart.toISOString() },
+  };
+};
+
+// ============================================================================
 // Evaluator Registry
 // ============================================================================
 
@@ -826,6 +880,7 @@ export const evaluatorRegistry: Record<ConditionField, ConditionEvaluator> = {
   unique_ips_in_window: evaluateUniqueIpsInWindow,
   unique_devices_in_window: evaluateUniqueDevicesInWindow,
   inactive_days: evaluateInactiveDays,
+  bandwidth_usage_gb: evaluateBandwidthUsageGb,
 
   // Stream quality
   source_resolution: evaluateSourceResolution,

@@ -294,6 +294,7 @@ export const createRuleSchema = z.object({
     'concurrent_streams',
     'geo_restriction',
     'account_inactivity',
+    'maximum_traffic',
   ]),
   params: z.record(z.string(), z.unknown()),
   serverUserId: uuidSchema.nullable().default(null),
@@ -332,6 +333,7 @@ export const sessionBehaviorFieldSchema = z.enum([
   'unique_ips_in_window',
   'unique_devices_in_window',
   'inactive_days',
+  'bandwidth_usage_gb',
 ]);
 
 export const streamQualityFieldSchema = z.enum([
@@ -409,6 +411,7 @@ export const conditionSchema = z.object({
     .object({
       window_hours: z.number().int().positive().optional(),
       exclude_same_device: z.boolean().optional(),
+      window_period: z.enum(['day', 'week', 'month', 'year']).optional(),
     })
     .optional(),
 });
@@ -432,6 +435,7 @@ export const actionTypeSchema = z.enum([
   'reset_trust',
   'kill_stream',
   'message_client',
+  'disable_user',
 ]);
 
 export const notificationChannelV2Schema = z.enum(['push', 'discord', 'email', 'webhook']);
@@ -488,6 +492,10 @@ export const messageClientActionSchema = z.object({
   target: sessionTargetSchema.optional(),
 });
 
+export const disableUserActionSchema = z.object({
+  type: z.literal('disable_user'),
+});
+
 // Union of all actions
 export const actionSchema = z.discriminatedUnion('type', [
   logOnlyActionSchema,
@@ -497,6 +505,7 @@ export const actionSchema = z.discriminatedUnion('type', [
   resetTrustActionSchema,
   killStreamActionSchema,
   messageClientActionSchema,
+  disableUserActionSchema,
 ]);
 
 // Rule actions container (actions are optional side-effects; violations are always auto-created)

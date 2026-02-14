@@ -250,6 +250,39 @@ export function createAccountInactivityTemplate(
 }
 
 /**
+ * Generate V2 template for Maximum Traffic Usage rule
+ */
+export function createMaximumTrafficTemplate(
+  limitGb: number = 500,
+  period: 'day' | 'week' | 'month' | 'year' = 'month'
+): ClassicRuleTemplate {
+  return {
+    type: 'maximum_traffic',
+    label: 'Maximum Traffic Usage',
+    description: 'Disable user when bandwidth exceeds the limit',
+    defaultName: 'Maximum Traffic Usage',
+    severity: 'high',
+    conditions: {
+      groups: [
+        {
+          conditions: [
+            {
+              field: 'bandwidth_usage_gb',
+              operator: 'gte',
+              value: limitGb,
+              params: { window_period: period },
+            },
+          ],
+        },
+      ],
+    },
+    actions: {
+      actions: [{ type: 'disable_user' }],
+    },
+  };
+}
+
+/**
  * Get default template for a classic rule type
  */
 export function getClassicRuleTemplate(type: RuleType): ClassicRuleTemplate {
@@ -266,6 +299,8 @@ export function getClassicRuleTemplate(type: RuleType): ClassicRuleTemplate {
       return createGeoRestrictionTemplate();
     case 'account_inactivity':
       return createAccountInactivityTemplate();
+    case 'maximum_traffic':
+      return createMaximumTrafficTemplate();
     default:
       return createConcurrentStreamsTemplate();
   }
@@ -281,4 +316,5 @@ export const CLASSIC_RULE_TEMPLATES: ClassicRuleTemplate[] = [
   createSimultaneousLocationsTemplate(),
   createDeviceVelocityTemplate(),
   createAccountInactivityTemplate(),
+  createMaximumTrafficTemplate(),
 ];

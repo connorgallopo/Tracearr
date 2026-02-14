@@ -8,6 +8,7 @@ import {
   RotateCcw,
   XCircle,
   MessageSquare,
+  UserX,
   HelpCircle,
 } from 'lucide-react';
 import type { Action, ActionType } from '@tracearr/shared';
@@ -39,6 +40,7 @@ const ACTION_ICONS: Record<ActionType, React.ComponentType<{ className?: string 
   reset_trust: RotateCcw,
   kill_stream: XCircle,
   message_client: MessageSquare,
+  disable_user: UserX,
 };
 
 interface ActionRowProps {

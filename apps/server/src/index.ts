@@ -102,6 +102,12 @@ import {
   scheduleInactivityChecks,
   shutdownInactivityCheckQueue,
 } from './jobs/inactivityCheckQueue.js';
+import {
+  initTrafficCheckQueue,
+  startTrafficCheckWorker,
+  scheduleTrafficChecks,
+  shutdownTrafficCheckQueue,
+} from './jobs/trafficCheckQueue.js';
 import { initHeavyOpsLock } from './jobs/heavyOpsLock.js';
 import { initPushRateLimiter } from './services/pushRateLimiter.js';
 import { initializeV2Rules } from './services/rules/v2Integration.js';
@@ -334,6 +340,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownLibrarySyncQueue();
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
+    await shutdownTrafficCheckQueue();
   });
 
   // Probe DB and Redis to decide if we can initialize services now
@@ -599,6 +606,17 @@ async function initializeServices(app: FastifyInstance) {
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize inactivity check queue');
     // Don't throw - inactivity checks are non-critical
+  }
+
+  // Initialize traffic check queue (monitors bandwidth usage limits)
+  try {
+    initTrafficCheckQueue(redisUrl, app.redis, pubSubService.publish.bind(pubSubService));
+    startTrafficCheckWorker();
+    void scheduleTrafficChecks();
+    app.log.info('Traffic check queue initialized');
+  } catch (err) {
+    app.log.error({ err }, 'Failed to initialize traffic check queue');
+    // Don't throw - traffic checks are non-critical
   }
 
   // Initialize poller with cache services
@@ -867,6 +885,7 @@ async function start() {
         void shutdownLibrarySyncQueue();
         void shutdownVersionCheckQueue();
         void shutdownInactivityCheckQueue();
+        void shutdownTrafficCheckQueue();
         void app.close().then(() => process.exit(0));
       });
     }
@@ -899,6 +918,7 @@ async function start() {
           shutdownLibrarySyncQueue(),
           shutdownVersionCheckQueue(),
           shutdownInactivityCheckQueue(),
+          shutdownTrafficCheckQueue(),
         ]).catch((err) => {
           app.log.error({ err }, 'Error shutting down queues during maintenance');
         });

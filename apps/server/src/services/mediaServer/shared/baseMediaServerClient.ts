@@ -369,6 +369,46 @@ export abstract class BaseMediaServerClient
     return true;
   }
 
+  /**
+   * Disable a user account on Jellyfin/Emby by setting IsDisabled=true.
+   */
+  async disableUser(userId: string): Promise<boolean> {
+    const response = await fetch(`${this.baseUrl}/Users/${userId}/Policy`, {
+      method: 'POST',
+      headers: {
+        ...this.buildHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ IsDisabled: true }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to disable user: ${response.status} ${response.statusText}`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Re-enable a user account on Jellyfin/Emby by setting IsDisabled=false.
+   */
+  async enableUser(userId: string): Promise<boolean> {
+    const response = await fetch(`${this.baseUrl}/Users/${userId}/Policy`, {
+      method: 'POST',
+      headers: {
+        ...this.buildHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ IsDisabled: false }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to enable user: ${response.status} ${response.statusText}`);
+    }
+
+    return true;
+  }
+
   // ==========================================================================
   // Shared Extended Methods
   // ==========================================================================

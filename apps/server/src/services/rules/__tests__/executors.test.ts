@@ -167,6 +167,8 @@ function createMockDeps(): ActionExecutorDeps {
     checkCooldown: vi.fn().mockResolvedValue(false),
     setCooldown: vi.fn().mockResolvedValue(undefined),
     queueForConfirmation: vi.fn().mockResolvedValue(undefined),
+    disableUser: vi.fn().mockResolvedValue(undefined),
+    enableUser: vi.fn().mockResolvedValue(undefined),
   };
 }
 

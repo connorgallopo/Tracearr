@@ -351,7 +351,8 @@ export type RuleType =
   | 'device_velocity'
   | 'concurrent_streams'
   | 'geo_restriction'
-  | 'account_inactivity';
+  | 'account_inactivity'
+  | 'maximum_traffic';
 
 export interface ImpossibleTravelParams {
   maxSpeedKmh: number;
@@ -400,13 +401,18 @@ export interface AccountInactivityParams {
   inactivityUnit: AccountInactivityUnit;
 }
 
+export interface MaximumTrafficParams {
+  // No V1 params - configured via V2 conditions
+}
+
 export type RuleParams =
   | ImpossibleTravelParams
   | SimultaneousLocationsParams
   | DeviceVelocityParams
   | ConcurrentStreamsParams
   | GeoRestrictionParams
-  | AccountInactivityParams;
+  | AccountInactivityParams
+  | MaximumTrafficParams;
 
 export interface Rule {
   id: string;
@@ -444,7 +450,8 @@ export type SessionBehaviorField =
   | 'travel_speed_kmh'
   | 'unique_ips_in_window'
   | 'unique_devices_in_window'
-  | 'inactive_days';
+  | 'inactive_days'
+  | 'bandwidth_usage_gb';
 
 export type StreamQualityField =
   | 'source_resolution'
@@ -525,6 +532,8 @@ export interface Condition {
     // Useful for: concurrent_streams (don't double-count same device),
     // travel_speed_kmh (VPN switch isn't travel), active_session_distance_km (same device = same location)
     exclude_same_device?: boolean;
+    /** Rolling time window for bandwidth usage checks */
+    window_period?: 'day' | 'week' | 'month' | 'year';
   };
 }
 
@@ -546,7 +555,8 @@ export type ActionType =
   | 'set_trust'
   | 'reset_trust'
   | 'kill_stream'
-  | 'message_client';
+  | 'message_client'
+  | 'disable_user';
 
 // Notification channels
 export type NotificationChannelV2 = 'push' | 'discord' | 'email' | 'webhook';
@@ -593,6 +603,10 @@ export interface MessageClientAction {
   target?: SessionTarget;
 }
 
+export interface DisableUserAction {
+  type: 'disable_user';
+}
+
 export type Action =
   | LogOnlyAction
   | NotifyAction
@@ -600,7 +614,8 @@ export type Action =
   | SetTrustAction
   | ResetTrustAction
   | KillStreamAction
-  | MessageClientAction;
+  | MessageClientAction
+  | DisableUserAction;
 
 // Rule actions container
 export interface RuleActions {

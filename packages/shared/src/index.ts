@@ -59,6 +59,7 @@ export type {
   ResetTrustAction,
   KillStreamAction,
   MessageClientAction,
+  DisableUserAction,
   NotificationChannelV2,
   RuleActions,
   RuleV2,

@@ -25,6 +25,7 @@ import {
   Shield,
   Globe,
   Wifi,
+  HardDrive,
   Settings2,
 } from 'lucide-react';
 import { FIELD_DEFINITIONS } from './conditionFields';
@@ -39,6 +40,7 @@ const CONDITION_FIELD_ICONS: Partial<Record<ConditionField, ReactNode>> = {
   unique_ips_in_window: <Zap className="h-5 w-5" />,
   unique_devices_in_window: <Zap className="h-5 w-5" />,
   inactive_days: <Clock className="h-5 w-5" />,
+  bandwidth_usage_gb: <HardDrive className="h-5 w-5" />,
 
   // Stream quality
   source_resolution: <Monitor className="h-5 w-5" />,
@@ -84,6 +86,7 @@ const COMPACT_FIELD_LABELS: Partial<Record<ConditionField, string>> = {
   unique_devices_in_window: 'Unique devices',
   trust_score: 'Trust',
   account_age_days: 'Account age',
+  bandwidth_usage_gb: 'Bandwidth',
   source_resolution: 'Resolution',
   output_resolution: 'Output',
   is_transcoding: 'Transcoding',
@@ -255,6 +258,7 @@ const COMPACT_ACTION_LABELS: Partial<Record<ActionType, string>> = {
   reset_trust: 'Reset trust',
   kill_stream: 'Kill stream',
   message_client: 'Message',
+  disable_user: 'Disable user',
 };
 
 /**

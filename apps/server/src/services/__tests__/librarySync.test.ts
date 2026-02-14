@@ -166,6 +166,8 @@ function mockMediaServerClient(options: {
     getUsers: vi.fn(),
     testConnection: vi.fn(),
     terminateSession: vi.fn(),
+    disableUser: vi.fn(),
+    enableUser: vi.fn(),
   };
   vi.mocked(createMediaServerClient).mockReturnValue(client);
   return client;

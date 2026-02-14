@@ -62,6 +62,8 @@ export interface ActionExecutorDeps {
     serverId: string;
     action: Action;
   }) => Promise<void>;
+  disableUser: (serverUserId: string, serverId: string) => Promise<void>;
+  enableUser: (serverUserId: string, serverId: string) => Promise<void>;
 }
 
 // Default no-op dependencies for testing
@@ -92,6 +94,12 @@ const noopDeps: ActionExecutorDeps = {
     /* no-op */
   },
   queueForConfirmation: async () => {
+    /* no-op */
+  },
+  disableUser: async () => {
+    /* no-op */
+  },
+  enableUser: async () => {
     /* no-op */
   },
 };
@@ -326,6 +334,17 @@ const executeMessageClient: ActionExecutor = async (
   }
 };
 
+/**
+ * Disable the user on the media server.
+ */
+const executeDisableUser: ActionExecutor = async (
+  context: EvaluationContext,
+  _action: Action
+): Promise<void> => {
+  const { serverUser, server } = context;
+  await currentDeps.disableUser(serverUser.id, server.id);
+};
+
 // ============================================================================
 // Executor Registry
 // ============================================================================
@@ -338,6 +357,7 @@ export const executorRegistry: Record<ActionType, ActionExecutor> = {
   reset_trust: executeResetTrust,
   kill_stream: executeKillStream,
   message_client: executeMessageClient,
+  disable_user: executeDisableUser,
 };
 
 // ============================================================================

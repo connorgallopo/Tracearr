@@ -22,6 +22,7 @@ import { db } from '../db/client.js';
 import { rules, serverUsers, violations, servers } from '../db/schema.js';
 import { hasServerAccess } from '../utils/serverFiltering.js';
 import { scheduleInactivityChecks, hasInactivityCondition } from '../jobs/inactivityCheckQueue.js';
+import { scheduleTrafficChecks, hasTrafficCondition } from '../jobs/trafficCheckQueue.js';
 import {
   needsMigration,
   convertLegacyRule,
@@ -151,6 +152,9 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     if (type === 'account_inactivity') {
       void scheduleInactivityChecks();
     }
+    if (type === 'maximum_traffic') {
+      void scheduleTrafficChecks();
+    }
 
     return reply.status(201).send(rule);
   });
@@ -213,6 +217,9 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     // Reschedule inactivity checks if this V2 rule has inactivity conditions
     if (hasInactivityCondition(conditions)) {
       void scheduleInactivityChecks();
+    }
+    if (hasTrafficCondition(conditions)) {
+      void scheduleTrafficChecks();
     }
 
     return reply.status(201).send(rule);
@@ -365,6 +372,9 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     if (hasInactivityCondition(updatedRule.conditions)) {
       void scheduleInactivityChecks();
     }
+    if (hasTrafficCondition(updatedRule.conditions)) {
+      void scheduleTrafficChecks();
+    }
 
     return updatedRule;
   });
@@ -417,6 +427,7 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const hadInactivity = hasInactivityCondition(existingRule.conditions);
+    const hadTraffic = hasTrafficCondition(existingRule.conditions);
 
     // Build update object
     const updateData: Partial<{
@@ -468,6 +479,10 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     if (hadInactivity || hasInactivity) {
       void scheduleInactivityChecks();
     }
+    const hasTraffic = hasTrafficCondition(updatedRule.conditions);
+    if (hadTraffic || hasTraffic) {
+      void scheduleTrafficChecks();
+    }
 
     return updatedRule;
   });
@@ -517,6 +532,7 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const wasInactivityRule = hasInactivityCondition(existingRule.conditions);
+    const wasTrafficRule = hasTrafficCondition(existingRule.conditions);
 
     // Delete rule (cascade will handle violations)
     await db.delete(rules).where(eq(rules.id, id));
@@ -524,6 +540,9 @@ export const ruleRoutes: FastifyPluginAsync = async (app) => {
     // Reschedule inactivity checks if this was an inactivity rule
     if (wasInactivityRule) {
       void scheduleInactivityChecks();
+    }
+    if (wasTrafficRule) {
+      void scheduleTrafficChecks();
     }
 
     return { success: true };

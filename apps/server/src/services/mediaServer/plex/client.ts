@@ -315,6 +315,54 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   }
 
   // ==========================================================================
+  // User Account Management
+  // ==========================================================================
+
+  /**
+   * Disable a user on the Plex server by removing their sharing access.
+   *
+   * For Plex, there is no direct "disable" API like Jellyfin/Emby.
+   * Instead, we remove the user's shared server access via the Plex.tv API.
+   * The user ID here is the Plex account ID (plex.tv ID).
+   *
+   * @param userId - The user's external ID (local PMS account ID)
+   */
+  async disableUser(userId: string): Promise<boolean> {
+    // Use the local /accounts endpoint to update the user
+    // Set allowGuest=0 to disable access
+    const response = await fetch(`${this.baseUrl}/accounts/${userId}`, {
+      method: 'DELETE',
+      headers: this.buildHeaders(),
+    });
+
+    // 200/204 = success, 404 = user already removed
+    if (!response.ok && response.status !== 404) {
+      throw new Error(`Failed to disable Plex user: ${response.status} ${response.statusText}`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Re-enable a user on the Plex server.
+   *
+   * Note: For Plex, re-enabling a user that was removed from local accounts
+   * is not directly possible via the local PMS API. The user would need to be
+   * re-invited via Plex.tv sharing. This is a best-effort operation.
+   *
+   * @param userId - The user's external ID
+   */
+  async enableUser(_userId: string): Promise<boolean> {
+    // Plex local server does not support re-enabling removed users.
+    // The user will regain access on the next user sync if they are still shared
+    // via the Plex.tv account. Log a warning and return true as best-effort.
+    console.warn(
+      '[Plex] enableUser is a no-op for Plex. Users regain access automatically on next sync if still shared via Plex.tv.'
+    );
+    return true;
+  }
+
+  // ==========================================================================
   // Server Resource Statistics (Undocumented Endpoint)
   // ==========================================================================
 

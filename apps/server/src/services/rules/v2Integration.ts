@@ -9,7 +9,7 @@ import type { Redis } from 'ioredis';
 import { eq, sql, and, isNull, isNotNull } from 'drizzle-orm';
 import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { rules, serverUsers, sessions, ruleActionResults } from '../../db/schema.js';
+import { rules, serverUsers, servers, sessions, ruleActionResults } from '../../db/schema.js';
 import { rulesLogger } from '../../utils/logger.js';
 import {
   setActionExecutorDeps,
@@ -281,6 +281,86 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
         action: params.action.type,
       });
       // Future: Store pending actions in a queue table for admin approval
+    },
+
+    /**
+     * Disable a user on the media server.
+     * Looks up the server user's external ID and the server connection details,
+     * then calls the media server client to disable the user.
+     */
+    disableUser: async (serverUserId, serverId) => {
+      const serverUser = await db.query.serverUsers.findFirst({
+        where: eq(serverUsers.id, serverUserId),
+      });
+      if (!serverUser?.externalId) {
+        rulesLogger.warn('Cannot disable user: server user or externalId not found', {
+          serverUserId,
+        });
+        return;
+      }
+
+      const server = await db.query.servers.findFirst({
+        where: eq(servers.id, serverId),
+      });
+      if (!server) {
+        rulesLogger.warn('Cannot disable user: server not found', { serverId });
+        return;
+      }
+
+      const { createMediaServerClient } = await import('../mediaServer/index.js');
+      const client = createMediaServerClient({
+        type: server.type,
+        url: server.url,
+        token: server.token,
+      });
+
+      await client.disableUser(serverUser.externalId);
+      rulesLogger.info('User disabled on media server', {
+        serverUserId,
+        externalId: serverUser.externalId,
+        serverId,
+        serverType: server.type,
+      });
+    },
+
+    /**
+     * Re-enable a user on the media server.
+     * Looks up the server user's external ID and the server connection details,
+     * then calls the media server client to re-enable the user.
+     */
+    enableUser: async (serverUserId, serverId) => {
+      const serverUser = await db.query.serverUsers.findFirst({
+        where: eq(serverUsers.id, serverUserId),
+      });
+      if (!serverUser?.externalId) {
+        rulesLogger.warn('Cannot enable user: server user or externalId not found', {
+          serverUserId,
+        });
+        return;
+      }
+
+      const server = await db.query.servers.findFirst({
+        where: eq(servers.id, serverId),
+      });
+      if (!server) {
+        rulesLogger.warn('Cannot enable user: server not found', { serverId });
+        return;
+      }
+
+      const { createMediaServerClient } = await import('../mediaServer/index.js');
+      const client = createMediaServerClient({
+        type: server.type,
+        url: server.url,
+        token: server.token,
+      });
+
+      await client.enableUser(serverUser.externalId);
+      rulesLogger.info('User re-enabled on media server', {
+        serverUserId,
+        externalId: serverUser.externalId,
+        serverId,
+        serverType: server.type,
+      });
     },
   };
 }

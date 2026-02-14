@@ -135,6 +135,8 @@
     "maxSpeedDefault": "Velocidade máxima realista de viagem. Padrão: {{value}} {{unit}} (velocidade de avião)",
     "maxStreams": "Máximo de transmissões",
     "maxStreamsDefault": "Transmissões simultâneas máximas por utilizador. Padrão: 3",
+    "maximumTraffic": "Maximum Traffic Usage",
+    "maximumTrafficDesc": "Disable user when bandwidth exceeds the limit per time period",
     "minDistance": "Distância mínima ({{unit}})",
     "minDistanceDefault": "Distância mínima entre locais para acionar. Padrão: {{value}} {{unit}}",
     "mode": "Modo",

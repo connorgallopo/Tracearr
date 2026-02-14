@@ -176,6 +176,8 @@
     "geoRestrictionDesc": "Block streaming from specific countries",
     "accountInactivity": "Account Inactivity",
     "accountInactivityDesc": "Get notified when users have not watched anything for a specified period",
+    "maximumTraffic": "Maximum Traffic Usage",
+    "maximumTrafficDesc": "Disable user when bandwidth exceeds the limit per time period",
     "maxSpeed": "Max Speed ({{unit}})",
     "maxSpeedDefault": "Maximum realistic travel speed. Default: {{value}} {{unit}} (airplane speed)",
     "minDistance": "Min Distance ({{unit}})",

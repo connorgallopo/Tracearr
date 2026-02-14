@@ -1,4 +1,13 @@
-import { MapPin, Users, Zap, Monitor, Globe, Clock, type LucideIcon } from 'lucide-react-native';
+import {
+  MapPin,
+  Users,
+  Zap,
+  Monitor,
+  Globe,
+  Clock,
+  HardDrive,
+  type LucideIcon,
+} from 'lucide-react-native';
 import type { RuleType } from '@tracearr/shared';
 
 /** Rule type → Lucide icon component mapping for mobile */
@@ -9,4 +18,5 @@ export const ruleIcons: Record<RuleType, LucideIcon> = {
   concurrent_streams: Monitor,
   geo_restriction: Globe,
   account_inactivity: Clock,
+  maximum_traffic: HardDrive,
 };

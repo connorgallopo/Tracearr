@@ -44,6 +44,7 @@ export const ruleTypeEnum = [
   'concurrent_streams',
   'geo_restriction',
   'account_inactivity',
+  'maximum_traffic',
 ] as const;
 
 // Violation severity enum
