@@ -10,6 +10,7 @@ export { NtfyAgent } from './ntfy.js';
 export { AppriseAgent } from './apprise.js';
 export { PushoverAgent } from './pushover.js';
 export { JsonWebhookAgent } from './json-webhook.js';
+export { GotifyAgent } from './gotify.js';
 
 import type { NotificationAgent } from '../types.js';
 import { DiscordAgent } from './discord.js';
@@ -17,6 +18,7 @@ import { NtfyAgent } from './ntfy.js';
 import { AppriseAgent } from './apprise.js';
 import { PushoverAgent } from './pushover.js';
 import { JsonWebhookAgent } from './json-webhook.js';
+import { GotifyAgent } from './gotify.js';
 
 /**
  * Agent registry - lazy-loaded singleton instances
@@ -45,6 +47,9 @@ function getOrCreateAgent(name: string): NotificationAgent | undefined {
     case 'json-webhook':
       agentRegistry[name] = new JsonWebhookAgent();
       break;
+    case 'gotify':
+      agentRegistry[name] = new GotifyAgent();
+      break;
     default:
       return undefined;
   }
@@ -57,7 +62,7 @@ function getOrCreateAgent(name: string): NotificationAgent | undefined {
  */
 export function createAllAgents(): NotificationAgent[] {
   // Ensure all agents are created
-  const names = ['discord', 'ntfy', 'apprise', 'pushover', 'json-webhook'];
+  const names = ['discord', 'ntfy', 'gotify', 'apprise', 'pushover', 'json-webhook'];
   return names.map((name) => getOrCreateAgent(name)!);
 }
 

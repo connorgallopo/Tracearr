@@ -615,7 +615,7 @@ export const locationStatsQuerySchema = z
 // ============================================================================
 
 // Webhook format enum
-export const webhookFormatSchema = z.enum(['json', 'ntfy', 'apprise', 'pushover']);
+export const webhookFormatSchema = z.enum(['json', 'ntfy', 'apprise', 'pushover', 'gotify']);
 
 // Unit system enum for display preferences
 export const unitSystemSchema = z.enum(['metric', 'imperial']);

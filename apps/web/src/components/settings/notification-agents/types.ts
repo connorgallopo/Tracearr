@@ -8,6 +8,7 @@ export type NotificationAgentType =
   | 'webToast'
   | 'discord'
   | 'ntfy'
+  | 'gotify'
   | 'apprise'
   | 'pushover'
   | 'json'

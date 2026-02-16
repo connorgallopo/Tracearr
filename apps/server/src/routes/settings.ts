@@ -426,6 +426,9 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
         case 'pushover':
           agentName = 'pushover';
           break;
+        case 'gotify':
+          agentName = 'gotify';
+          break;
         default:
           agentName = 'json-webhook';
       }

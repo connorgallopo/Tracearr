@@ -82,6 +82,7 @@ export function useActiveAgents(settings: Settings | undefined): ActiveAgent[] {
               : undefined;
             break;
           case 'apprise':
+          case 'gotify':
           case 'json':
             isConfigured = !!settings.customWebhookUrl;
             displayValue = settings.customWebhookUrl

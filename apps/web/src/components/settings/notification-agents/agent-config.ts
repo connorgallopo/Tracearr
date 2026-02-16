@@ -70,6 +70,26 @@ export const AGENT_CONFIGS: Record<NotificationAgentType, AgentConfig> = {
     ],
   },
 
+  gotify: {
+    type: 'gotify',
+    name: 'Gotify',
+    icon: Bell,
+    imagePath: '/images/notification-agents/gotify.png',
+    description: 'Push notifications via Gotify',
+    isRemovable: true,
+    webhookFormat: 'gotify',
+    routingChannel: 'webhook',
+    fields: [
+      {
+        key: 'customWebhookUrl',
+        label: 'Server URL',
+        type: 'url',
+        placeholder: 'https://gotify.example.com/message?token=yourtoken',
+        required: true,
+      },
+    ],
+  },
+
   apprise: {
     type: 'apprise',
     name: 'Apprise',
@@ -154,6 +174,7 @@ export const AGENT_CONFIGS: Record<NotificationAgentType, AgentConfig> = {
 export const ADDABLE_AGENT_TYPES: NotificationAgentType[] = [
   'discord',
   'ntfy',
+  'gotify',
   'apprise',
   'pushover',
   'json',
@@ -164,6 +185,7 @@ export const ADDABLE_AGENT_TYPES: NotificationAgentType[] = [
  */
 export const CUSTOM_WEBHOOK_AGENTS: NotificationAgentType[] = [
   'ntfy',
+  'gotify',
   'apprise',
   'pushover',
   'json',
