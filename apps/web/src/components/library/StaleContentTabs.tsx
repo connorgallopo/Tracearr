@@ -117,6 +117,10 @@ type DaysPreset = 30 | 90 | 180 | 365 | 730;
 
 const PRESETS: DaysPreset[] = [30, 90, 180, 365, 730];
 
+/**
+ * Format the custom days button label. Returns 'Custom' when no custom value is set,
+ * otherwise returns an abbreviated human-readable string (e.g. '45 days', '3mo', '2y').
+ */
 function formatCustomLabel(isCustomDays: boolean, staleDays: number): string {
   if (!isCustomDays) return 'Custom';
   if (staleDays < 30) return staleDays === 1 ? '1 day' : `${staleDays} days`;
@@ -438,7 +442,7 @@ export function StaleContentTabs({ serverId, libraryId }: StaleContentTabsProps)
                     )}
                   >
                     <CalendarIcon className="h-3.5 w-3.5" />
-                    <span>{formatCustomLabel(isCustomDays, staleDays)}</span>
+                    {formatCustomLabel(isCustomDays, staleDays)}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80" align="end">
