@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Archive, Film, Tv, Music, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import {
+  Archive,
+  Film,
+  Tv,
+  Music,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  CalendarIcon,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatMediaTech, type StaleResponse } from '@tracearr/shared';
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +29,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
 import { useLibraryStale } from '@/hooks/queries/useLibrary';
 import { formatBytes } from '@/lib/formatters';
 import { EmptyState } from '@/components/library';
+import { cn } from '@/lib/utils';
 
 type MediaTypeFilter = 'all' | 'movie' | 'show' | 'artist';
 type SortBy = 'size' | 'title' | 'days_stale' | 'added_at';
@@ -101,13 +113,27 @@ interface StaleContentTabsProps {
   libraryId?: string | null;
 }
 
+type DaysPreset = 30 | 90 | 180 | 365 | 730;
+
+const PRESETS: DaysPreset[] = [30, 90, 180, 365, 730];
+
+function formatCustomLabel(isCustomDays: boolean, staleDays: number): string {
+  if (!isCustomDays) return 'Custom';
+  if (staleDays < 30) return staleDays === 1 ? '1 day' : `${staleDays} days`;
+  if (staleDays < 365) return `${Math.floor(staleDays / 30)}mo`;
+  return `${Math.floor(staleDays / 365)}y`;
+}
+
 /**
  * Tabbed component for displaying never-watched and stale content.
- * Includes a threshold selector for the "stale" category (3m/6m/1y/2y).
+ * Includes preset day buttons and custom input for the "stale" category threshold.
  */
 export function StaleContentTabs({ serverId, libraryId }: StaleContentTabsProps) {
   const [activeTab, setActiveTab] = useState<'never-watched' | 'stale'>('never-watched');
-  const [staleDays, setStaleDays] = useState('90');
+  const [staleDays, setStaleDays] = useState<number>(90);
+  const [isCustomDays, setIsCustomDays] = useState(false);
+  const [customDaysInput, setCustomDaysInput] = useState('');
+  const [isCustomPopoverOpen, setIsCustomPopoverOpen] = useState(false);
   const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaTypeFilter>('all');
   const [neverWatchedPage, setNeverWatchedPage] = useState(1);
   const [stalePage, setStalePage] = useState(1);
@@ -126,6 +152,22 @@ export function StaleContentTabs({ serverId, libraryId }: StaleContentTabsProps)
 
   // Convert filter value to API param
   const mediaTypeParam = mediaTypeFilter === 'all' ? undefined : mediaTypeFilter;
+
+  // Handle preset button click
+  const handlePresetClick = (days: DaysPreset) => {
+    setStaleDays(days);
+    setIsCustomDays(false);
+  };
+
+  // Handle custom days apply
+  const handleCustomApply = () => {
+    const days = parseInt(customDaysInput, 10);
+    if (Number.isFinite(days) && days > 0) {
+      setStaleDays(days);
+      setIsCustomDays(true);
+      setIsCustomPopoverOpen(false);
+    }
+  };
 
   // Handle sort click
   const handleSort = (column: SortBy) => {
@@ -152,7 +194,7 @@ export function StaleContentTabs({ serverId, libraryId }: StaleContentTabsProps)
   const stale = useLibraryStale(
     serverId,
     libraryId,
-    Number(staleDays),
+    staleDays,
     'stale',
     stalePage,
     20,
@@ -361,19 +403,87 @@ export function StaleContentTabs({ serverId, libraryId }: StaleContentTabsProps)
             </SelectContent>
           </Select>
 
-          {/* Threshold selector (only for stale tab) */}
+          {/* Days threshold selector (only for stale tab) */}
           {activeTab === 'stale' && (
-            <Select value={staleDays} onValueChange={setStaleDays}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="90">Unwatched for 3+ months</SelectItem>
-                <SelectItem value="180">Unwatched for 6+ months</SelectItem>
-                <SelectItem value="365">Unwatched for 1+ year</SelectItem>
-                <SelectItem value="730">Unwatched for 2+ years</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="bg-muted inline-flex items-center gap-1 rounded-lg p-1">
+              {/* Preset buttons */}
+              {PRESETS.map((days) => (
+                <button
+                  key={days}
+                  onClick={() => handlePresetClick(days)}
+                  className={cn(
+                    'cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                    staleDays === days && !isCustomDays
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {days >= 365
+                    ? `${Math.floor(days / 365)}y`
+                    : days >= 30
+                      ? `${Math.floor(days / 30)}mo`
+                      : `${days}d`}
+                </button>
+              ))}
+
+              {/* Custom days input */}
+              <Popover open={isCustomPopoverOpen} onOpenChange={setIsCustomPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    className={cn(
+                      'inline-flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                      isCustomDays
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="h-3.5 w-3.5" />
+                    <span>{formatCustomLabel(isCustomDays, staleDays)}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="mb-2 font-medium">Custom Days</h4>
+                      <p className="text-muted-foreground text-sm">
+                        Enter the number of days for stale content threshold
+                      </p>
+                    </div>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="e.g., 45"
+                      value={customDaysInput}
+                      onChange={(e) => setCustomDaysInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCustomApply();
+                        }
+                      }}
+                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setCustomDaysInput('');
+                          setIsCustomPopoverOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleCustomApply}
+                        disabled={!customDaysInput || parseInt(customDaysInput, 10) <= 0}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           )}
         </div>
       </div>
