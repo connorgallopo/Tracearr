@@ -100,7 +100,7 @@
     "engagementBreakdown": "Detalle de actividad de los usuarios",
     "howUsersEngage": "Cómo se relacionan los usuarios con el contenido",
     "playsVsSessions": "Reproducciones vs Sesiones",
-    "playsVsSessionsDesc": "Reproducciones validadas vs contador de sesiones sin procesar",
+    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
     "activityByDayOfWeek": "Actividad por el día de la semana",
     "activityByHourOfDay": "Actividad por hora del día",
     "platforms": "Plataformas",
