@@ -100,7 +100,7 @@
     "engagementBreakdown": "Overzicht betrokkenheid",
     "howUsersEngage": "Hoe gebruikers met inhoud omgaan",
     "playsVsSessions": "Weergaven vs. sessies",
-    "playsVsSessionsDesc": "Geverifiëerde weergaven vs. ruwe sessies",
+    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
     "activityByDayOfWeek": "Activiteit per weekdag",
     "activityByHourOfDay": "Activiteit per uur",
     "platforms": "Platforms",
