@@ -100,7 +100,7 @@
     "engagementBreakdown": "Engagement Breakdown",
     "howUsersEngage": "Як користувачі взаємодіють із контентом",
     "playsVsSessions": "Plays vs Sessions",
-    "playsVsSessionsDesc": "Validated plays vs raw session count",
+    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
     "activityByDayOfWeek": "Активність по днях тижня",
     "activityByHourOfDay": "Активність по годинах",
     "platforms": "Платформи",
