@@ -1,123 +1,123 @@
 {
-  "account": {
-    "createAccount": "Create Account",
-    "createYourAccount": "Create your account to get started",
-    "displayName": "Display Name",
-    "email": "Email",
-    "password": "Password",
-    "signIn": "Sign In",
-    "signInToAccount": "Sign in to your account",
-    "useJellyfinAccount": "Use Jellyfin account instead",
-    "useLocalAccount": "Use local account instead",
-    "waitingForPlex": "Waiting for Plex authorization..."
-  },
-  "advanced": {
-    "connectionScenarios": "Connection Scenarios",
-    "externalUrl": "External URL",
-    "reverseProxy": "Reverse Proxy",
-    "title": "Advanced Settings",
-    "trustProxy": "Trust Proxy Headers"
+  "tabs": {
+    "general": "Algemeen",
+    "servers": "Servers",
+    "notifications": "Meldingen",
+    "mobile": "Mobiele app",
+    "import": "Importeren",
+    "advanced": "Geavanceerd",
+    "jobs": "Taken",
+    "accessControl": "Toegangsbeheer"
   },
   "general": {
-    "helpTranslate": "Help translate Tracearr",
-    "imperial": "Imperial (mi, mph)",
-    "jellyfinAccount": "Jellyfin Account",
-    "language": "Language",
-    "languageDescription": "Choose your preferred display language.",
-    "localAccount": "Local Account",
-    "metric": "Metric (km, km/h)",
-    "plexAccount": "Plex Account",
-    "primaryAuth": "Primary Authentication Method",
-    "timeFormat": "Time Format",
-    "timeFormat12h": "12-hour (1:30 PM)",
-    "timeFormat24h": "24-hour (13:30)",
-    "timeFormatDescription": "Choose how times are displayed.",
-    "timezone": "Timezone",
-    "title": "General Settings",
-    "unitSystem": "Unit System"
-  },
-  "import": {
-    "enriched": "Enriched",
-    "errors": "Errors",
-    "importComplete": "Import Complete",
-    "importFailed": "Import Failed",
-    "importProgress": "Import Progress",
-    "imported": "Imported",
-    "jellystat": "Import from Jellystat",
-    "page": "Page",
-    "processed": "Processed",
-    "skipped": "Skipped",
-    "tautulli": "Import from Tautulli",
-    "title": "Import Data"
-  },
-  "ipWarning": {
-    "acknowledge": "Got it",
-    "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses."
-  },
-  "jellyfin": {
-    "password": "Jellyfin Password",
-    "signInWithJellyfin": "Sign in with Jellyfin",
-    "username": "Jellyfin Username"
-  },
-  "mobile": {
-    "connectedDevices": "Connected Devices",
-    "generateToken": "Generate Pair Token",
-    "noDevices": "No devices connected",
-    "pairDevice": "Pair Device",
-    "revokeAll": "Revoke All Sessions",
-    "scanQrCode": "Scan QR Code",
-    "title": "Mobile App",
-    "tokenExpires": "Token expires in {{time}}"
-  },
-  "plex": {
-    "chooseServer": "Choose which Plex Media Server to monitor",
-    "linkedAccounts": "Linked Plex Accounts",
-    "selectServer": "Select Server",
-    "signInWithPlex": "Sign in with Plex",
-    "signUpWithPlex": "Sign up with Plex",
-    "unlinkAccount": "Unlink Plex Account"
-  },
-  "serverHealth": {
-    "multipleUnreachable": "{{count}} servers unreachable: {{serverNames}}",
-    "unreachable": "{{serverName}} is unreachable"
+    "title": "Algemene instellingen",
+    "unitSystem": "Eenheidsstelsel",
+    "metric": "Metrisch (km, km/u)",
+    "imperial": "Imperiaal (mijl, mijl/u)",
+    "timezone": "Tijdzone",
+    "primaryAuth": "Primaire authenticatiemethode",
+    "localAccount": "Lokaal account",
+    "plexAccount": "Plex-account",
+    "jellyfinAccount": "Jellyfin-account",
+    "language": "Taal",
+    "languageDescription": "Kies je gewenste weergavetaal.",
+    "helpTranslate": "Help bij het vertalen van Tracearr",
+    "timeFormat": "Tijdnotatie",
+    "timeFormatDescription": "Kies hoe tijden worden weergegeven.",
+    "timeFormat12h": "12-uurs (1:30 PM)",
+    "timeFormat24h": "24-uurs (13:30)"
   },
   "servers": {
-    "addServer": "Add Server",
-    "apiKey": "API Key",
-    "connectionFailed": "Connection failed",
-    "connectionSuccess": "Connection successful",
-    "serverName": "Server Name",
-    "serverUrl": "Server URL",
-    "syncInterval": "Sync Interval",
-    "testConnection": "Test Connection",
-    "title": "Connected Servers"
+    "title": "Verbonden servers",
+    "addServer": "Server toevoegen",
+    "serverName": "Servernaam",
+    "serverUrl": "Server-URL",
+    "apiKey": "API-sleutel",
+    "syncInterval": "Synchronisatie-interval",
+    "testConnection": "Verbinding testen",
+    "connectionSuccess": "Succesvol verbonden",
+    "connectionFailed": "Verbinding mislukt"
   },
-  "tabs": {
-    "accessControl": "Access Control",
-    "advanced": "Advanced",
-    "general": "General",
-    "import": "Import",
-    "jobs": "Jobs",
-    "mobile": "Mobile App",
-    "notifications": "Notifications",
-    "servers": "Servers"
-  },
-  "update": {
-    "betaUpdate": "Beta Update",
-    "newVersion": "New Version",
-    "pullInstructions": "After pulling, restart your container to apply the update.",
-    "releaseNotes": "Release Notes",
-    "stableRelease": "Stable Release",
-    "title": "Update Available",
-    "updateCommand": "Update Command",
-    "versionAvailable": "{{version}} available"
+  "mobile": {
+    "title": "Mobiele app",
+    "pairDevice": "Apparaat koppelen",
+    "connectedDevices": "Verbonden apparaten",
+    "generateToken": "Koppeltoken genereren",
+    "scanQrCode": "QR-code scannen",
+    "tokenExpires": "Token verloopt in {{time}}",
+    "noDevices": "Geen apparaten verbonden",
+    "revokeAll": "Alle sessies intrekken"
   },
   "webhooks": {
-    "customWebhook": "Custom Webhook URL",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Topic",
-    "testWebhook": "Test Webhook",
-    "title": "Webhook Configuration",
-    "webhookFormat": "Webhook Format"
+    "title": "Webhook-configuratie",
+    "discordWebhook": "URL Discord-webhook",
+    "ntfyTopic": "Ntfy-topic",
+    "customWebhook": "Aangepaste webhook-URL",
+    "webhookFormat": "Webhook-formaat",
+    "testWebhook": "Webhook testen"
+  },
+  "advanced": {
+    "title": "Geavanceerde instellingen",
+    "externalUrl": "Externe URL",
+    "trustProxy": "Proxy-headers vertrouwen",
+    "reverseProxy": "Reverse proxy",
+    "connectionScenarios": "Verbindingsscenario's"
+  },
+  "import": {
+    "title": "Gegevens importeren",
+    "jellystat": "Importeren uit Jellystat",
+    "tautulli": "Importeren uit Tautulli",
+    "importProgress": "Importvoortgang",
+    "importComplete": "Importeren voltooid",
+    "importFailed": "Importeren mislukt",
+    "processed": "Verwerkt",
+    "page": "Pagina",
+    "imported": "Geïmporteerd",
+    "skipped": "Overgeslagen",
+    "enriched": "Verrijkt",
+    "errors": "Fouten"
+  },
+  "plex": {
+    "linkedAccounts": "Gekoppelde Plex-accounts",
+    "unlinkAccount": "Plex-account ontkoppelen",
+    "signInWithPlex": "Aanmelden met Plex",
+    "signUpWithPlex": "Registreren met Plex",
+    "selectServer": "Server selecteren",
+    "chooseServer": "Kies welke Plex-mediaserver je wilt monitoren"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Aanmelden met Jellyfin",
+    "username": "Jellyfin-gebruikersnaam",
+    "password": "Jellyfin-wachtwoord"
+  },
+  "account": {
+    "createAccount": "Account aanmaken",
+    "signIn": "Aanmelden",
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "displayName": "Weergavenaam",
+    "createYourAccount": "Maak je account aan om te beginnen",
+    "signInToAccount": "Aanmelden bij je account",
+    "useLocalAccount": "Lokaal account gebruiken",
+    "useJellyfinAccount": "Jellyfin-account gebruiken",
+    "waitingForPlex": "Wachten op Plex-autorisatie..."
+  },
+  "update": {
+    "title": "Update beschikbaar",
+    "releaseNotes": "Uitgave-opmerkingen",
+    "updateCommand": "Update-opdracht",
+    "pullInstructions": "Herstart je container na het ophalen om de update toe te passen.",
+    "stableRelease": "Stabiele versie",
+    "betaUpdate": "Bèta-update",
+    "newVersion": "Nieuwe versie",
+    "versionAvailable": "{{version}} beschikbaar"
+  },
+  "serverHealth": {
+    "unreachable": "{{serverName}} is onbereikbaar",
+    "multipleUnreachable": "{{count}} servers onbereikbaar: {{serverNames}}"
+  },
+  "ipWarning": {
+    "message": "Alle gebruikers lijken hetzelfde IP-adres of een lokaal IP te gebruiken. Dit kan invloed hebben op de regellogica voor locatie of IP-adressen.",
+    "acknowledge": "Begrepen"
   }
 }
