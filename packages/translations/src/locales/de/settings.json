@@ -1,123 +1,123 @@
 {
-  "account": {
-    "createAccount": "Konto erstellen",
-    "createYourAccount": "Konto erstellen, um zu beginnen",
-    "displayName": "Anzeigename",
-    "email": "E-Mail",
-    "password": "Passwort",
-    "signIn": "Anmelden",
-    "signInToAccount": "Bei Konto anmelden",
-    "useJellyfinAccount": "Stattdessen Jellyfin-Konto verwenden",
-    "useLocalAccount": "Stattdessen lokales Konto verwenden",
-    "waitingForPlex": "Auf Plex-Autorisierung warten..."
-  },
-  "advanced": {
-    "connectionScenarios": "Verbindungsszenarien",
-    "externalUrl": "Externe URL",
-    "reverseProxy": "Reverse Proxy",
-    "title": "Erweiterte Einstellungen",
-    "trustProxy": "Proxy-Header vertrauen"
+  "tabs": {
+    "general": "Allgemein",
+    "servers": "Server",
+    "notifications": "Benachrichtigungen",
+    "mobile": "Mobile App",
+    "import": "Importieren",
+    "advanced": "Erweitert",
+    "jobs": "Jobs",
+    "accessControl": "Zugangskontrolle"
   },
   "general": {
-    "helpTranslate": "Hilf bei der Übersetzung von Tracearr",
+    "title": "Allgemeine Einstellungen",
+    "unitSystem": "Einheitensystem",
+    "metric": "Metrisch (km, km/h)",
     "imperial": "Imperial (mi, mph)",
+    "timezone": "Zeitzone",
+    "primaryAuth": "Primäre Authentifizierungsmethode",
+    "localAccount": "Lokales Konto",
+    "plexAccount": "Plex-Konto",
     "jellyfinAccount": "Jellyfin-Konto",
     "language": "Sprache",
     "languageDescription": "Wählen Sie Ihre bevorzugte Anzeigesprache.",
-    "localAccount": "Lokales Konto",
-    "metric": "Metrisch (km, km/h)",
-    "plexAccount": "Plex-Konto",
-    "primaryAuth": "Primäre Authentifizierungsmethode",
-    "timeFormat": "Time Format",
-    "timeFormat12h": "12-hour (1:30 PM)",
-    "timeFormat24h": "24-hour (13:30)",
-    "timeFormatDescription": "Choose how times are displayed.",
-    "timezone": "Zeitzone",
-    "title": "Allgemeine Einstellungen",
-    "unitSystem": "Einheitensystem"
-  },
-  "import": {
-    "enriched": "Angereichert",
-    "errors": "Fehler",
-    "importComplete": "Import abgeschlossen",
-    "importFailed": "Import fehlgeschlagen",
-    "importProgress": "Importfortschritt",
-    "imported": "Importiert",
-    "jellystat": "Aus Jellystat importieren",
-    "page": "Seite",
-    "processed": "Verarbeitet",
-    "skipped": "Übersprungen",
-    "tautulli": "Aus Tautulli importieren",
-    "title": "Daten importieren"
-  },
-  "ipWarning": {
-    "acknowledge": "Verstanden",
-    "message": "Alle Benutzer scheinen dieselbe IP-Adresse oder dieselben lokalen Netzwerk-IPs zu verwenden. Dies kann Auswirkungen auf die regelbasierte Logik für Standort oder IP-Adressen haben."
-  },
-  "jellyfin": {
-    "password": "Jellyfin-Passwort",
-    "signInWithJellyfin": "Mit Jellyfin anmelden",
-    "username": "Jellyfin-Benutzername"
-  },
-  "mobile": {
-    "connectedDevices": "Verbundene Geräte",
-    "generateToken": "Pairing-Token generieren",
-    "noDevices": "Keine Geräte verbunden",
-    "pairDevice": "Gerät koppeln",
-    "revokeAll": "Alle Sitzungen widerrufen",
-    "scanQrCode": "QR-Code scannen",
-    "title": "Mobile App",
-    "tokenExpires": "Token läuft in {{time}} ab"
-  },
-  "plex": {
-    "chooseServer": "Wähle aus, welcher Plex Media Server überwacht werden soll",
-    "linkedAccounts": "Verknüpfte Plex-Konten",
-    "selectServer": "Server auswählen",
-    "signInWithPlex": "Mit Plex anmelden",
-    "signUpWithPlex": "Mit Plex registrieren",
-    "unlinkAccount": "Plex-Konto trennen"
-  },
-  "serverHealth": {
-    "multipleUnreachable": "{{count}} Server nicht erreichbar {{serverNames}}",
-    "unreachable": "{{serverName}} ist unerreichbar"
+    "helpTranslate": "Hilf bei der Übersetzung von Tracearr",
+    "timeFormat": "Zeitformat",
+    "timeFormatDescription": "Wählen Sie, wie die Uhrzeit angezeigt wird.",
+    "timeFormat12h": "12-Stunden (1:30 Uhr)",
+    "timeFormat24h": "24 Stunden (13:30)"
   },
   "servers": {
+    "title": "Verbundene Server",
     "addServer": "Server hinzufügen",
-    "apiKey": "API Key",
-    "connectionFailed": "Verbindung fehlgeschlagen",
-    "connectionSuccess": "Verbindung erfolgreich",
     "serverName": "Servername",
     "serverUrl": "Server-URL",
+    "apiKey": "API Key",
     "syncInterval": "Synchronisierungsintervall",
     "testConnection": "Verbindung testen",
-    "title": "Verbundene Server"
+    "connectionSuccess": "Verbindung erfolgreich",
+    "connectionFailed": "Verbindung fehlgeschlagen"
   },
-  "tabs": {
-    "accessControl": "Zugangs kontrolle",
-    "advanced": "Erweitert",
-    "general": "Allgemein",
-    "import": "Importieren",
-    "jobs": "Jobs",
-    "mobile": "Mobile App",
-    "notifications": "Benachrichtigungen",
-    "servers": "Server"
-  },
-  "update": {
-    "betaUpdate": "Beta Update",
-    "newVersion": "Neue Version",
-    "pullInstructions": "Starten Sie nach dem laden Ihren Container neu, um das Update anzuwenden.",
-    "releaseNotes": "Release Notes",
-    "stableRelease": "Stable Release",
-    "title": "Update verfügbar",
-    "updateCommand": "Befehl aktualisieren",
-    "versionAvailable": "{{version}} verfügabr"
+  "mobile": {
+    "title": "Mobile App",
+    "pairDevice": "Gerät koppeln",
+    "connectedDevices": "Verbundene Geräte",
+    "generateToken": "Pairing-Token generieren",
+    "scanQrCode": "QR-Code scannen",
+    "tokenExpires": "Token läuft in {{time}} ab",
+    "noDevices": "Keine Geräte verbunden",
+    "revokeAll": "Alle Sitzungen widerrufen"
   },
   "webhooks": {
-    "customWebhook": "Benutzerdefinierte Webhook-URL",
+    "title": "Webhook-Konfiguration",
     "discordWebhook": "Discord Webhook-URL",
     "ntfyTopic": "Ntfy Topic",
-    "testWebhook": "Webhook testen",
-    "title": "Webhook-Konfiguration",
-    "webhookFormat": "Webhook-Format"
+    "customWebhook": "Benutzerdefinierte Webhook-URL",
+    "webhookFormat": "Webhook-Format",
+    "testWebhook": "Webhook testen"
+  },
+  "advanced": {
+    "title": "Erweiterte Einstellungen",
+    "externalUrl": "Externe URL",
+    "trustProxy": "Proxy-Header vertrauen",
+    "reverseProxy": "Reverse Proxy",
+    "connectionScenarios": "Verbindungsszenarien"
+  },
+  "import": {
+    "title": "Daten importieren",
+    "jellystat": "Aus Jellystat importieren",
+    "tautulli": "Aus Tautulli importieren",
+    "importProgress": "Importfortschritt",
+    "importComplete": "Import abgeschlossen",
+    "importFailed": "Import fehlgeschlagen",
+    "processed": "Verarbeitet",
+    "page": "Seite",
+    "imported": "Importiert",
+    "skipped": "Übersprungen",
+    "enriched": "Angereichert",
+    "errors": "Fehler"
+  },
+  "plex": {
+    "linkedAccounts": "Verknüpfte Plex-Konten",
+    "unlinkAccount": "Plex-Konto trennen",
+    "signInWithPlex": "Mit Plex anmelden",
+    "signUpWithPlex": "Mit Plex registrieren",
+    "selectServer": "Server auswählen",
+    "chooseServer": "Wähle aus, welcher Plex Media Server überwacht werden soll"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Mit Jellyfin anmelden",
+    "username": "Jellyfin-Benutzername",
+    "password": "Jellyfin-Passwort"
+  },
+  "account": {
+    "createAccount": "Konto erstellen",
+    "signIn": "Anmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "displayName": "Anzeigename",
+    "createYourAccount": "Konto erstellen, um zu beginnen",
+    "signInToAccount": "Bei Konto anmelden",
+    "useLocalAccount": "Stattdessen lokales Konto verwenden",
+    "useJellyfinAccount": "Stattdessen Jellyfin-Konto verwenden",
+    "waitingForPlex": "Auf Plex-Autorisierung warten..."
+  },
+  "update": {
+    "title": "Update verfügbar",
+    "releaseNotes": "Release Notes",
+    "updateCommand": "Befehl aktualisieren",
+    "pullInstructions": "Starten Sie nach dem laden Ihren Container neu, um das Update anzuwenden.",
+    "stableRelease": "Stable Release",
+    "betaUpdate": "Beta Update",
+    "newVersion": "Neue Version",
+    "versionAvailable": "{{version}} verfügabr"
+  },
+  "serverHealth": {
+    "unreachable": "{{serverName}} ist unerreichbar",
+    "multipleUnreachable": "{{count}} Server nicht erreichbar {{serverNames}}"
+  },
+  "ipWarning": {
+    "message": "Alle Benutzer scheinen dieselbe IP-Adresse oder dieselben lokalen Netzwerk-IPs zu verwenden. Dies kann Auswirkungen auf die regelbasierte Logik für Standort oder IP-Adressen haben.",
+    "acknowledge": "Verstanden"
   }
 }
