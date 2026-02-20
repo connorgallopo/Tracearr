@@ -37,7 +37,7 @@
     "viewSourceCode": "Source Code anschauen",
     "account": "Account",
     "disconnectServer": "Server trennen",
-    "disconnectConfirm": "Sind Sie sicher, dass Sie sich von \"{{serverName}}\" trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen",
+    "disconnectConfirm": "Sind Sie sicher, dass Sie sich von \"{{serverName}}\" trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
     "disconnectConfirmGeneric": "Sind Sie sicher, dass Sie sich trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
     "currentlyConnected": "Derzeit verbunden mit {{serverName}}"
   },
