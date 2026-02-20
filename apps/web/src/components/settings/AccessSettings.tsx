@@ -64,7 +64,7 @@ export function AccessSettings() {
             label="Allow Guest Access"
             description="When disabled, only the server owner can log in to Tracearr"
             checked={false}
-            onChange={() => {}}
+            onChange={() => undefined}
             disabled
             status={allowGuestAccessField.status}
             errorMessage={allowGuestAccessField.errorMessage}
