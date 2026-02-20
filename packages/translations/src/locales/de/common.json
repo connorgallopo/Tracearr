@@ -73,7 +73,7 @@
     "saving": "Speichern...",
     "deleting": "Löschen...",
     "dismissing": "Schließen...",
-    "acknowledging": "Acknowledging..."
+    "acknowledging": "Bestätigt..."
   },
   "playback": {
     "playing": "Läuft",
@@ -81,7 +81,7 @@
     "stopped": "Gestoppt",
     "directPlay": "Direct Play",
     "directStream": "Direct Stream",
-    "transcode": "Transcode"
+    "transcode": "Transkodiere"
   },
   "severity": {
     "low": "Niedrig",
@@ -148,7 +148,7 @@
     "sessionDetails": "Sitzungsdetails",
     "recentSessions": "Letzte Sitzungen",
     "activeStreams": "Aktive Streams",
-    "days": "days"
+    "days": "Tage"
   },
   "search": {
     "placeholder": "Suchen...",
@@ -165,7 +165,7 @@
     "episode": "Episode",
     "track": "Track",
     "liveTV": "Live TV",
-    "photo": "Photo"
+    "photo": "Foto"
   },
   "servers": {
     "plex": "Plex",
@@ -272,5 +272,5 @@
     "unsavedChanges": "Ungespeicherte Änderungen gehen verloren. Fortfahren?"
   },
   "beta": "beta",
-  "or": "or"
+  "or": "oder"
 }
