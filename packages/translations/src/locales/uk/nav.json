@@ -8,7 +8,7 @@
   "users": "Користувачі",
   "rules": "Правила",
   "violations": "Порушення",
-  "alerts": "Alerts",
+  "alerts": "Попередження",
   "settings": "Налаштування",
   "overview": "Огляд",
   "quality": "Якість",
@@ -18,5 +18,5 @@
   "devices": "Пристрої",
   "bandwidth": "Пропускна здатність",
   "jobs": "Jobs",
-  "accessControl": "Access Control"
+  "accessControl": "Контроль доступу"
 }
