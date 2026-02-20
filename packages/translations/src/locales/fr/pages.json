@@ -305,7 +305,7 @@
   "maintenance": {
     "startingTitle": "Démarrage de Tracearr...",
     "interruptionTitle": "Interruption de service",
-    "startingDescription": "The server is waiting for backend services to become available. This page will automatically refresh when everything is ready.",
-    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored."
+    "startingDescription": "Le serveur attend que les services backend soient disponibles. Cette page s’actualisera automatiquement quand tout sera prêt.",
+    "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie."
   }
 }
