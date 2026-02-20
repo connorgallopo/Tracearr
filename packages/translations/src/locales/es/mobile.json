@@ -1,60 +1,60 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "serverUrl": "Server URL",
-    "accessToken": "Access Token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "enterManually": "Enter URL and Token Manually",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "welcome": "Bienvenido a Tracearr",
+    "addServer": "Añadir servidor",
+    "connectToServer": "Conectar con un servidor",
+    "enterServerDetails": "Introduzca la URL de su servidor Tracearr y el token de acceso móvil",
+    "serverUrl": "URL del servidor",
+    "accessToken": "Token de acceso",
+    "scanQrCodeInstead": "Escanear código QR ",
+    "enterManually": "Introducir URL y token manualmente",
+    "cameraPermissionRequired": "Se requiere permiso de cámara para escanear códigos QR",
+    "scanQrInstructions": "Abre Ajustes → Ve en la aplicación móvil a tu panel de seguimiento y escanea el código QR"
   },
   "errors": {
-    "missingFields": "Missing Fields",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "invalidUrl": "Invalid URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "pairingFailed": "Pairing Failed",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token."
+    "missingFields": "Campos que faltan",
+    "pleaseEnterBothFields": "Por favor, introduzca tanto la URL del servidor como el token",
+    "invalidUrl": "URL invalida",
+    "serverUrlMustStartWith": "La URL del servidor debe empezar con http:// o https://",
+    "pleaseEnterValidUrl": "Por favor, introduce una URL válida del servidor",
+    "pairingFailed": "Fallo de emparejamiento",
+    "invalidQrCode": "Código QR inválido",
+    "invalidQrCodeMissingData": "Código QR inválido: faltan datos de emparejamiento",
+    "invalidQrCodeFormat": "Formato de código QR inválido. Por favor, genere un nuevo código.",
+    "invalidQrCodeMissingUrl": "Código QR inválido: falta la URL del servidor",
+    "invalidQrCodeMissingToken": "Código QR inválido: falta el token de emparejamiento",
+    "invalidServerUrlInQr": "URL del servidor no válida en código QR",
+    "tooManyPairingAttempts": "Demasiados intentos de emparejamiento. Por favor, espere unos minutos.",
+    "invalidOrExpiredToken": "Token de emparejamiento inválido o caducado.",
+    "invalidPairingRequest": "Solicitud de emparejamiento inválida. Compruebe su token."
   },
   "settings": {
-    "preferences": "Preferences",
-    "community": "Community",
+    "preferences": "Preferencias",
+    "community": "Comunidad",
     "discord": "Discord",
-    "joinCommunity": "Join the community",
+    "joinCommunity": "Únase a la comunidad",
     "github": "GitHub",
-    "viewSourceCode": "View source code",
-    "account": "Account",
-    "disconnectServer": "Disconnect Server",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+    "viewSourceCode": "Ver código fuente",
+    "account": "Cuenta",
+    "disconnectServer": "Desconectar Servidor",
+    "disconnectConfirm": "¿Estás seguro de que quieres desconectarte de \"{{serverName}}\"? Necesitarás emparejarte de nuevo para usar la aplicación.",
+    "disconnectConfirmGeneric": "¿Estás seguro de que quieres desconectarte? Tendrás que emparejarte de nuevo para usar la aplicación.",
+    "currentlyConnected": "Actualmente conectado a {{serverName}}"
   },
   "navigation": {
-    "selectServer": "Select Server",
-    "server": "Server",
-    "navigation": "Navigation"
+    "selectServer": "Seleccionar Servidor",
+    "server": "Servidor",
+    "navigation": "Navegación"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
   "notifications": {
-    "testSent": "Test Sent",
-    "testFailed": "Test Failed",
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
+    "testSent": "Test enviado",
+    "testFailed": "Test fallido",
+    "failedToSendTest": "No se ha podido enviar la notificación de prueba",
+    "loadingPreferences": "Cargando preferencias...",
+    "unableToLoadPreferences": "No se pueden cargar preferencias"
   }
 }
