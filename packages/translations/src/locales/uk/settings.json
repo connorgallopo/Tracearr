@@ -1,123 +1,123 @@
 {
-  "account": {
-    "createAccount": "Create Account",
-    "createYourAccount": "Create your account to get started",
-    "displayName": "Display Name",
-    "email": "Email",
-    "password": "Password",
-    "signIn": "Sign In",
-    "signInToAccount": "Sign in to your account",
-    "useJellyfinAccount": "Use Jellyfin account instead",
-    "useLocalAccount": "Use local account instead",
-    "waitingForPlex": "Waiting for Plex authorization..."
-  },
-  "advanced": {
-    "connectionScenarios": "Connection Scenarios",
-    "externalUrl": "External URL",
-    "reverseProxy": "Reverse Proxy",
-    "title": "Advanced Settings",
-    "trustProxy": "Trust Proxy Headers"
+  "tabs": {
+    "general": "General",
+    "servers": "Сервери",
+    "notifications": "Сповіщення",
+    "mobile": "Мобільний додаток",
+    "import": "Iмпорт",
+    "advanced": "Розширені",
+    "jobs": "Jobs",
+    "accessControl": "Контроль доступу"
   },
   "general": {
-    "helpTranslate": "Help translate Tracearr",
-    "imperial": "Imperial (mi, mph)",
-    "jellyfinAccount": "Jellyfin Account",
-    "language": "Language",
-    "languageDescription": "Choose your preferred display language.",
-    "localAccount": "Local Account",
-    "metric": "Метрична (км, км/год)",
-    "plexAccount": "Plex Account",
-    "primaryAuth": "Primary Authentication Method",
-    "timeFormat": "Time Format",
-    "timeFormat12h": "12-hour (1:30 PM)",
-    "timeFormat24h": "24-hour (13:30)",
-    "timeFormatDescription": "Choose how times are displayed.",
-    "timezone": "Timezone",
     "title": "Загальні налаштування",
-    "unitSystem": "Система одиниць"
-  },
-  "import": {
-    "enriched": "Enriched",
-    "errors": "Errors",
-    "importComplete": "Import Complete",
-    "importFailed": "Import Failed",
-    "importProgress": "Import Progress",
-    "imported": "Imported",
-    "jellystat": "Import from Jellystat",
-    "page": "Page",
-    "processed": "Processed",
-    "skipped": "Skipped",
-    "tautulli": "Import from Tautulli",
-    "title": "Import Data"
-  },
-  "ipWarning": {
-    "acknowledge": "Got it",
-    "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses."
-  },
-  "jellyfin": {
-    "password": "Jellyfin Password",
-    "signInWithJellyfin": "Sign in with Jellyfin",
-    "username": "Jellyfin Username"
-  },
-  "mobile": {
-    "connectedDevices": "Connected Devices",
-    "generateToken": "Generate Pair Token",
-    "noDevices": "No devices connected",
-    "pairDevice": "Pair Device",
-    "revokeAll": "Revoke All Sessions",
-    "scanQrCode": "Scan QR Code",
-    "title": "Mobile App",
-    "tokenExpires": "Token expires in {{time}}"
-  },
-  "plex": {
-    "chooseServer": "Choose which Plex Media Server to monitor",
-    "linkedAccounts": "Linked Plex Accounts",
-    "selectServer": "Select Server",
-    "signInWithPlex": "Sign in with Plex",
-    "signUpWithPlex": "Sign up with Plex",
-    "unlinkAccount": "Unlink Plex Account"
-  },
-  "serverHealth": {
-    "multipleUnreachable": "{{count}} servers unreachable: {{serverNames}}",
-    "unreachable": "{{serverName}} is unreachable"
+    "unitSystem": "Система одиниць",
+    "metric": "Метрична (км, км/год)",
+    "imperial": "Імперська (милі, миль/год)",
+    "timezone": "Часовий пояс",
+    "primaryAuth": "Основний метод автентифікації",
+    "localAccount": "Локальний обліковий запис",
+    "plexAccount": "Обліковий запис Plex",
+    "jellyfinAccount": "Обліковий запис Jellyfin",
+    "language": "Мова",
+    "languageDescription": "Виберіть бажану мову.",
+    "helpTranslate": "Допоможіть перекласти Tracearr",
+    "timeFormat": "Формат часу",
+    "timeFormatDescription": "Choose how times are displayed.",
+    "timeFormat12h": "12-hour (1:30 PM)",
+    "timeFormat24h": "24-hour (13:30)"
   },
   "servers": {
-    "addServer": "Add Server",
-    "apiKey": "API Key",
-    "connectionFailed": "Connection failed",
-    "connectionSuccess": "Connection successful",
-    "serverName": "Server Name",
-    "serverUrl": "Server URL",
-    "syncInterval": "Sync Interval",
-    "testConnection": "Test Connection",
-    "title": "Connected Servers"
+    "title": "Підключені сервери",
+    "addServer": "Додати сервер",
+    "serverName": "Назва сервера",
+    "serverUrl": "URL-адреса сервера",
+    "apiKey": "Ключ API",
+    "syncInterval": "Інтервал синхронізації",
+    "testConnection": "Перевірити підключення",
+    "connectionSuccess": "Підключення успішне",
+    "connectionFailed": "Не вдалося підключитися"
   },
-  "tabs": {
-    "accessControl": "Контроль доступу",
-    "advanced": "Розширені",
-    "general": "General",
-    "import": "Iмпорт",
-    "jobs": "Jobs",
-    "mobile": "Мобільний додаток",
-    "notifications": "Сповіщення",
-    "servers": "Сервери"
-  },
-  "update": {
-    "betaUpdate": "Beta Update",
-    "newVersion": "New Version",
-    "pullInstructions": "After pulling, restart your container to apply the update.",
-    "releaseNotes": "Release Notes",
-    "stableRelease": "Stable Release",
-    "title": "Update Available",
-    "updateCommand": "Update Command",
-    "versionAvailable": "{{version}} available"
+  "mobile": {
+    "title": "Мобільний додаток",
+    "pairDevice": "Підключити пристрій",
+    "connectedDevices": "Підключені пристрої",
+    "generateToken": "Згенерувати парний токен",
+    "scanQrCode": "Проскануйте QR-код",
+    "tokenExpires": "Термін дії токена закінчується через {{time}}",
+    "noDevices": "Немає підключених пристроїв",
+    "revokeAll": "Скасувати всі сеанси"
   },
   "webhooks": {
-    "customWebhook": "Custom Webhook URL",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Topic",
-    "testWebhook": "Test Webhook",
     "title": "Webhook Configuration",
-    "webhookFormat": "Webhook Format"
+    "discordWebhook": "URL-адреса вебхука Discord",
+    "ntfyTopic": "Ntfy тема",
+    "customWebhook": "Custom Webhook URL",
+    "webhookFormat": "Формат вебхука",
+    "testWebhook": "Test Webhook"
+  },
+  "advanced": {
+    "title": "Розширені налаштування",
+    "externalUrl": "Зовнішня URL-адреса",
+    "trustProxy": "Trust Proxy Headers",
+    "reverseProxy": "Reverse Proxy",
+    "connectionScenarios": "Connection Scenarios"
+  },
+  "import": {
+    "title": "Імпорт даних",
+    "jellystat": "Імпортувати з Jellystat",
+    "tautulli": "Імпортувати з Tautulli",
+    "importProgress": "Import Progress",
+    "importComplete": "Імпорт завершено",
+    "importFailed": "Не вдалося імпортувати",
+    "processed": "Оброблено",
+    "page": "Сторінка",
+    "imported": "Імпортовано",
+    "skipped": "Пропущено",
+    "enriched": "Enriched",
+    "errors": "Помилки"
+  },
+  "plex": {
+    "linkedAccounts": "Зв'язані облікові записи Plex",
+    "unlinkAccount": "Від'єднати обліковий запис Plex",
+    "signInWithPlex": "Увійти через Plex",
+    "signUpWithPlex": "Sign up with Plex",
+    "selectServer": "Оберіть сервер",
+    "chooseServer": "Виберіть, який Plex медіасервер відстежувати"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Увійти через Jellyfin",
+    "username": "Ім'я користувача Jellyfin",
+    "password": "Пароль Jellyfin"
+  },
+  "account": {
+    "createAccount": "Створити обліковий запис",
+    "signIn": "Увійти",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "displayName": "Відображуване ім'я",
+    "createYourAccount": "Створіть обліковий запис, щоб розпочати",
+    "signInToAccount": "Увійдіть у свій обліковий запис",
+    "useLocalAccount": "Use local account instead",
+    "useJellyfinAccount": "Use Jellyfin account instead",
+    "waitingForPlex": "Очікування авторизації Plex..."
+  },
+  "update": {
+    "title": "Доступне оновлення",
+    "releaseNotes": "Примітки до оновлення",
+    "updateCommand": "Update Command",
+    "pullInstructions": "After pulling, restart your container to apply the update.",
+    "stableRelease": "Стабільна версія",
+    "betaUpdate": "Бета-оновлення",
+    "newVersion": "Нова версія",
+    "versionAvailable": "{{version}} доступно"
+  },
+  "serverHealth": {
+    "unreachable": "{{serverName}} недоступний",
+    "multipleUnreachable": "{{count}} сервери недоступні: {{serverNames}}"
+  },
+  "ipWarning": {
+    "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses.",
+    "acknowledge": "Зрозуміло"
   }
 }
