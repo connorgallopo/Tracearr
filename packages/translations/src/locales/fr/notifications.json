@@ -74,7 +74,7 @@
       },
       "jobCompleted": {
         "title": "Tâche terminée",
-        "message": "{{name}} terminée avec succès"
+        "message": "{{name}} terminé avec succès"
       },
       "ruleCreated": {
         "title": "Règle créée",
