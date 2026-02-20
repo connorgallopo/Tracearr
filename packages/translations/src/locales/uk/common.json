@@ -8,14 +8,14 @@
     "create": "Створити",
     "update": "Оновити",
     "remove": "Видалити",
-    "connect": "Підключитися",
-    "disconnect": "Disconnect",
+    "connect": "Підключити",
+    "disconnect": "Відключити",
     "submit": "Submit",
     "confirm": "Підтвердити",
     "close": "Закрити",
     "retry": "Повторити спробу",
     "refresh": "Оновити",
-    "sync": "Sync",
+    "sync": "Синхр",
     "test": "Тест",
     "copy": "Копіювати",
     "signIn": "Увійти",
@@ -25,8 +25,8 @@
     "back": "Назад",
     "next": "Далі",
     "acknowledge": "Підтвердити",
-    "dismiss": "Dismiss",
-    "terminate": "Terminate",
+    "dismiss": "Відхилити",
+    "terminate": "Завершити",
     "search": "Пошук",
     "filter": "Фільтр",
     "sort": "Сортувати",
@@ -39,15 +39,15 @@
     "export": "Експорт",
     "import": "Iмпорт",
     "download": "Завантажити",
-    "upload": "Upload",
+    "upload": "Вивантажити",
     "view": "View",
     "viewAll": "View All",
     "showMore": "Показати більше",
     "showLess": "Показати менше",
     "expand": "Розгорнути",
-    "collapse": "Collapse",
+    "collapse": "Згорнути",
     "goHome": "Go Home",
-    "tryAgain": "Try Again",
+    "tryAgain": "Повторити спробу",
     "grantPermission": "Надати дозвіл",
     "openSettings": "Відкрити налаштування",
     "viewProfile": "Переглянути профіль",
@@ -57,26 +57,26 @@
   "states": {
     "loading": "Завантаження...",
     "error": "Помилка",
-    "success": "Success",
+    "success": "Успішно",
     "failed": "Не вдалося",
-    "pending": "Pending",
-    "acknowledged": "Acknowledged",
+    "pending": "Очікує",
+    "acknowledged": "Підтверджено",
     "active": "Активний",
-    "inactive": "Inactive",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
+    "inactive": "Неактивно",
+    "enabled": "Увімкнено",
+    "disabled": "Вимкнено",
     "online": "Онлайн",
     "offline": "Не в мережі",
-    "connecting": "Connecting...",
+    "connecting": "Підключення...",
     "connected": "Підключено",
     "disconnected": "Відключено",
     "saving": "Збереження...",
     "deleting": "Видалення...",
-    "dismissing": "Dismissing...",
-    "acknowledging": "Acknowledging..."
+    "dismissing": "Відхилення...",
+    "acknowledging": "Підтверджено..."
   },
   "playback": {
-    "playing": "Playing",
+    "playing": "Відтворюється",
     "paused": "Призупинено",
     "stopped": "Зупинено",
     "directPlay": "Пряме відтворення",
@@ -84,16 +84,16 @@
     "transcode": "Перекодування"
   },
   "severity": {
-    "low": "Low",
+    "low": "Низька",
     "warning": "Попередження",
-    "high": "High"
+    "high": "Висока"
   },
   "time": {
     "now": "Зараз",
     "today": "Сьогодні",
     "yesterday": "Вчора",
     "thisWeek": "Цього тижня",
-    "thisMonth": "This Month",
+    "thisMonth": "Цього місяця",
     "allTime": "За весь час"
   },
   "periods": {
@@ -104,15 +104,15 @@
     "byHour": "За годину"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "км",
+    "mi": "миль",
+    "kmh": "км/год",
+    "mph": "миль/год"
   },
   "labels": {
     "date": "Дата",
     "user": "Користувач",
-    "content": "Content",
+    "content": "Контент",
     "platform": "Платформа",
     "location": "Розташування",
     "ipAddress": "IP-адреса",
@@ -122,7 +122,7 @@
     "status": "Статус",
     "rule": "Правило",
     "media": "Медіа",
-    "started": "Started",
+    "started": "Розпочато",
     "stopped": "Зупинено",
     "joined": "Приєднався",
     "server": "Сервер",
@@ -131,12 +131,12 @@
     "unknown": "Невідомо",
     "never": "Ніколи",
     "when": "Коли",
-    "severity": "Severity",
+    "severity": "Серйозність",
     "type": "Тип",
     "reason": "Причина",
     "actions": "Дії",
     "filters": "Фільтри",
-    "trustScore": "Trust Score",
+    "trustScore": "Рейтинг довіри",
     "lastActivity": "Остання активність",
     "serverOwner": "Власник сервера",
     "active": "Активний",
@@ -146,17 +146,17 @@
     "watchTime": "Час перегляду",
     "pausedTime": "Paused Time",
     "sessionDetails": "Деталі сеансу",
-    "recentSessions": "Recent Sessions",
+    "recentSessions": "Нещодавні сеанси",
     "activeStreams": "Активні потоки",
     "days": "днів"
   },
   "search": {
-    "placeholder": "Search...",
-    "searchUsers": "Search users...",
-    "searchTitles": "Search titles, users..."
+    "placeholder": "Пошук...",
+    "searchUsers": "Пошук користувачів...",
+    "searchTitles": "Пошук назв, користувачів..."
   },
   "table": {
-    "selectAllOnPage": "Select all on page",
+    "selectAllOnPage": "Вибрати все на сторінці",
     "selectRow": "Select row",
     "selectAllTotal": "Select all {{total}} items"
   },
@@ -164,7 +164,7 @@
     "movie": "Фільм",
     "episode": "Епізод",
     "track": "Трек",
-    "liveTV": "Live TV",
+    "liveTV": "ТБ",
     "photo": "Фото"
   },
   "servers": {
@@ -175,9 +175,9 @@
   "validation": {
     "required": "Це поле обовʼязкове",
     "invalidEmail": "Будь ласка, введіть дійсну адресу електронної пошти",
-    "invalidUrl": "Please enter a valid URL",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters"
+    "invalidUrl": "Будь ласка, введіть вірну URL-адресу",
+    "minLength": "Має бути щонайменше {{min}} символів",
+    "maxLength": "Має містити не більше {{max}} символів"
   },
   "errors": {
     "generic": "Сталася помилка",
@@ -186,7 +186,7 @@
     "notFound": "Не знайдено",
     "serverError": "Помилка сервера",
     "timeout": "Час очікування запиту минув",
-    "forbidden": "Access denied",
+    "forbidden": "Доступ заборонено",
     "badRequest": "Invalid request",
     "conflict": "A conflict occurred",
     "rateLimited": "Забагато запитів. Повторіть спробу пізніше",
@@ -196,26 +196,26 @@
     "unexpectedError": "Сталася неочікувана помилка. Спробуйте ще раз.",
     "failedToLoad": "Не вдалося завантажити {{item}}",
     "connectionFailed": "Не вдалося підключитися",
-    "connectionTimedOut": "Connection timed out. Check your server URL.",
-    "cannotReachServer": "Cannot reach server. Check URL and network connection."
+    "connectionTimedOut": "Час очікування з’єднання минув. Перевірте URL-адресу вашого сервера.",
+    "cannotReachServer": "Не вдалося зв'язатися з сервером. Перевірте URL-адресу та підключення до мережі."
   },
   "count": {
     "user_one": "{{count}} користувач",
     "user_other": "{{count}} користувачів",
-    "session_one": "{{count}} session",
-    "session_other": "{{count}} sessions",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
+    "session_one": "{{count}} сеанс",
+    "session_other": "{{count}} сеансів",
+    "stream_one": "{{count}} потік",
+    "stream_other": "{{count}} потоки",
     "server_one": "{{count}} сервер",
-    "server_other": "{{count}} servers",
+    "server_other": "{{count}} сервери",
     "rule_one": "{{count}} правило",
-    "rule_other": "{{count}} rules",
+    "rule_other": "{{count}} правила",
     "violation_one": "{{count}} порушення",
     "violation_other": "{{count}} порушень",
     "item_one": "{{count}} елемент",
     "item_other": "{{count}} елементів",
     "result_one": "{{count}} результат",
-    "result_other": "{{count}} results",
+    "result_other": "{{count}} результатів",
     "selected_one": "{{count}} selected",
     "selected_other": "{{count}} selected",
     "usersAdded_one": "{{count}} користувача додано",
@@ -228,7 +228,7 @@
     "error_other": "{{count}} помилок"
   },
   "messages": {
-    "noChangesDetected": "No changes detected"
+    "noChangesDetected": "Змін не виявлено"
   },
   "relativeTime": {
     "justNow": "Щойно",
