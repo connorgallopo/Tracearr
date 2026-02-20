@@ -1,123 +1,123 @@
 {
-  "account": {
-    "createAccount": "Créer un compte",
-    "createYourAccount": "Créez votre compte pour démarrer",
-    "displayName": "Nom d'affichage",
-    "email": "Email",
-    "password": "Mot de passe",
-    "signIn": "Se connecter",
-    "signInToAccount": "Connectez-vous à votre compte",
-    "useJellyfinAccount": "Utiliser un compte Jellyfin à la place",
-    "useLocalAccount": "Utiliser un compte local à la place",
-    "waitingForPlex": "En attente d'autorisation de Plex..."
-  },
-  "advanced": {
-    "connectionScenarios": "Scénarios de connexion",
-    "externalUrl": "URL externe",
-    "reverseProxy": "Proxy inversé",
-    "title": "Réglages avancés",
-    "trustProxy": "En-têtes de confiance du Proxy"
+  "tabs": {
+    "general": "Général",
+    "servers": "Serveurs",
+    "notifications": "Notifications",
+    "mobile": "Application mobile",
+    "import": "Importation",
+    "advanced": "Avancé",
+    "jobs": "Tâches",
+    "accessControl": "Contrôle d'accès"
   },
   "general": {
-    "helpTranslate": "Help translate Tracearr",
-    "imperial": "Impérial (mi, mph)",
-    "jellyfinAccount": "Compte Jellyfin",
-    "language": "Language",
-    "languageDescription": "Choose your preferred display language.",
-    "localAccount": "Compte local",
-    "metric": "Métrique (km, km/h)",
-    "plexAccount": "Compte Plex",
-    "primaryAuth": "Méthode d'authentification principale",
-    "timeFormat": "Time Format",
-    "timeFormat12h": "12-hour (1:30 PM)",
-    "timeFormat24h": "24-hour (13:30)",
-    "timeFormatDescription": "Choose how times are displayed.",
-    "timezone": "Fuseau horaire",
     "title": "Réglages généraux",
-    "unitSystem": "Système d'unité"
-  },
-  "import": {
-    "enriched": "Enrichi",
-    "errors": "Erreurs",
-    "importComplete": "Importation terminée",
-    "importFailed": "Échec de l'importation",
-    "importProgress": "Progression de l'import",
-    "imported": "Importé",
-    "jellystat": "Importer depuis Jellystat",
-    "page": "Page",
-    "processed": "Traité",
-    "skipped": "Ignoré",
-    "tautulli": "Importer depuis Tautulli",
-    "title": "Importer des données"
-  },
-  "ipWarning": {
-    "acknowledge": "Compris",
-    "message": "Tous les utilisateurs semblent utiliser la même adresse IP ou des IP locales. Cela peut affecter la logique des règles basées sur l'emplacement ou l'adresse IP."
-  },
-  "jellyfin": {
-    "password": "Mot de passe Jellyfin",
-    "signInWithJellyfin": "Se connecter avec Jellyfin",
-    "username": "Nom d'utilisateur Jellyfin"
-  },
-  "mobile": {
-    "connectedDevices": "Appareils connectés",
-    "generateToken": "Générer un jeton d'appairage",
-    "noDevices": "Aucun appareil connecté",
-    "pairDevice": "Associer un appareil",
-    "revokeAll": "Révoquer toutes les sessions",
-    "scanQrCode": "Scanner le code QR",
-    "title": "Application mobile",
-    "tokenExpires": "Le jeton d'authentification expire dans {{time}}"
-  },
-  "plex": {
-    "chooseServer": "Choisir le serveur Plex à surveiller",
-    "linkedAccounts": "Comptes Plex liés",
-    "selectServer": "Sélectionner un serveur",
-    "signInWithPlex": "Se connecter avec Plex",
-    "signUpWithPlex": "S'inscrire avec Plex",
-    "unlinkAccount": "Dissocier le compte Plex"
-  },
-  "serverHealth": {
-    "multipleUnreachable": "{{count}} serveurs injoignables : {{serverNames}}",
-    "unreachable": "{{serverName}} est inaccessible"
+    "unitSystem": "Système d'unité",
+    "metric": "Métrique (km, km/h)",
+    "imperial": "Impérial (mi, mph)",
+    "timezone": "Fuseau horaire",
+    "primaryAuth": "Méthode d'authentification principale",
+    "localAccount": "Compte local",
+    "plexAccount": "Compte Plex",
+    "jellyfinAccount": "Compte Jellyfin",
+    "language": "Langue",
+    "languageDescription": "Choisissez votre langue d'affichage préférée.",
+    "helpTranslate": "Aidez-nous à traduire Tracearr",
+    "timeFormat": "Format horaire",
+    "timeFormatDescription": "Choisissez comment l'heure est affichée.",
+    "timeFormat12h": "Format 12 heures (1:30 PM)",
+    "timeFormat24h": "Format 24 heures (13:30)"
   },
   "servers": {
+    "title": "Serveurs connectés",
     "addServer": "Ajouter un serveur",
-    "apiKey": "Clé API",
-    "connectionFailed": "Échec de la connexion",
-    "connectionSuccess": "Connexion réussie",
     "serverName": "Nom du serveur",
     "serverUrl": "URL du serveur",
+    "apiKey": "Clé API",
     "syncInterval": "Intervalle de synchronisation",
     "testConnection": "Tester la connexion",
-    "title": "Serveurs connectés"
+    "connectionSuccess": "Connexion réussie",
+    "connectionFailed": "Échec de la connexion"
   },
-  "tabs": {
-    "accessControl": "Contrôle d'accès",
-    "advanced": "Avancé",
-    "general": "Général",
-    "import": "Importation",
-    "jobs": "Tâches",
-    "mobile": "Application mobile",
-    "notifications": "Notifications",
-    "servers": "Serveurs"
-  },
-  "update": {
-    "betaUpdate": "Mise à jour bêta",
-    "newVersion": "Nouvelle version",
-    "pullInstructions": "Après avoir réalisé le pull Docker, redémarrez cotre conteneur pour appliquer la modification.",
-    "releaseNotes": "Notes de version",
-    "stableRelease": "Version stable",
-    "title": "Mise à jour disponible",
-    "updateCommand": "Commande de mise à jour",
-    "versionAvailable": "Version {{version}} disponible"
+  "mobile": {
+    "title": "Application mobile",
+    "pairDevice": "Associer un appareil",
+    "connectedDevices": "Appareils connectés",
+    "generateToken": "Générer un jeton d'appairage",
+    "scanQrCode": "Scanner le code QR",
+    "tokenExpires": "Le jeton d'appairage expire dans {{time}}",
+    "noDevices": "Aucun appareil connecté",
+    "revokeAll": "Révoquer toutes les sessions"
   },
   "webhooks": {
-    "customWebhook": "URL personnalisée du webhook",
+    "title": "Configuration du webhook",
     "discordWebhook": "URL du webhook Discord",
     "ntfyTopic": "Sujet Ntfy",
-    "testWebhook": "Tester le webhook",
-    "title": "Configuration du webhook",
-    "webhookFormat": "Format du webhook"
+    "customWebhook": "URL personnalisée du webhook",
+    "webhookFormat": "Format du webhook",
+    "testWebhook": "Tester le webhook"
+  },
+  "advanced": {
+    "title": "Réglages avancés",
+    "externalUrl": "URL externe",
+    "trustProxy": "En-têtes de confiance du Proxy",
+    "reverseProxy": "Proxy inversé",
+    "connectionScenarios": "Scénarios de connexion"
+  },
+  "import": {
+    "title": "Importer des données",
+    "jellystat": "Importer depuis Jellystat",
+    "tautulli": "Importer depuis Tautulli",
+    "importProgress": "Progression de l'import",
+    "importComplete": "Importation terminée",
+    "importFailed": "Échec de l'importation",
+    "processed": "Traité",
+    "page": "Page",
+    "imported": "Importé",
+    "skipped": "Ignoré",
+    "enriched": "Enrichi",
+    "errors": "Erreurs"
+  },
+  "plex": {
+    "linkedAccounts": "Comptes Plex liés",
+    "unlinkAccount": "Dissocier le compte Plex",
+    "signInWithPlex": "Se connecter avec Plex",
+    "signUpWithPlex": "S'inscrire avec Plex",
+    "selectServer": "Sélectionner un serveur",
+    "chooseServer": "Choisir le serveur Plex à surveiller"
+  },
+  "jellyfin": {
+    "signInWithJellyfin": "Se connecter avec Jellyfin",
+    "username": "Nom d'utilisateur Jellyfin",
+    "password": "Mot de passe Jellyfin"
+  },
+  "account": {
+    "createAccount": "Créer un compte",
+    "signIn": "Se connecter",
+    "email": "Email",
+    "password": "Mot de passe",
+    "displayName": "Nom d'affichage",
+    "createYourAccount": "Créez votre compte pour démarrer",
+    "signInToAccount": "Connectez-vous à votre compte",
+    "useLocalAccount": "Utiliser un compte local à la place",
+    "useJellyfinAccount": "Utiliser un compte Jellyfin à la place",
+    "waitingForPlex": "En attente d'autorisation de Plex..."
+  },
+  "update": {
+    "title": "Mise à jour disponible",
+    "releaseNotes": "Notes de version",
+    "updateCommand": "Commande de mise à jour",
+    "pullInstructions": "Après avoir réalisé le pull Docker, redémarrez cotre conteneur pour appliquer la modification.",
+    "stableRelease": "Version stable",
+    "betaUpdate": "Mise à jour bêta",
+    "newVersion": "Nouvelle version",
+    "versionAvailable": "Version {{version}} disponible"
+  },
+  "serverHealth": {
+    "unreachable": "{{serverName}} est inaccessible",
+    "multipleUnreachable": "{{count}} serveurs injoignables : {{serverNames}}"
+  },
+  "ipWarning": {
+    "message": "Tous les utilisateurs semblent utiliser la même adresse IP ou des IP locales. Cela peut affecter la logique des règles basées sur l'emplacement ou l'adresse IP.",
+    "acknowledge": "Compris"
   }
 }
