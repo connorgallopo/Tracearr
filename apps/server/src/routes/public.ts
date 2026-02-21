@@ -169,8 +169,8 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
     if (allServers.length > 0) {
       const serverIds = allServers.map((s) => s.id);
       const serverListDescription =
-        'Filter to specific server. Available servers:\n' +
-        allServers.map((s) => `• **${s.name}**: \`${s.id}\``).join('\n');
+        'Filter to specific server. Available servers:\n\n' +
+        allServers.map((s) => `• **${s.name}**: \`${s.id}\``).join('\n\n');
 
       const paths = spec.paths as Record<string, Record<string, unknown>> | undefined;
       if (paths) {
@@ -186,6 +186,42 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
                   }
                   // Update description to list available servers
                   param.description = serverListDescription;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Fetch users to populate user dropdown
+    const allUsers = await db
+      .select({ id: users.id, username: users.username, name: users.name })
+      .from(users)
+      .innerJoin(serverUsers, eq(users.id, serverUsers.userId))
+      .groupBy(users.id, users.username, users.name)
+      .orderBy(users.username);
+
+    if (allUsers.length > 0) {
+      const userIds = allUsers.map((u) => u.id);
+      const userListDescription =
+        'Filter by user. Available users:\n\n' +
+        allUsers.map((u) => `• **${u.name ?? u.username}**: \`${u.id}\``).join('\n\n');
+
+      const paths = spec.paths as Record<string, Record<string, unknown>> | undefined;
+      if (paths) {
+        for (const pathObj of Object.values(paths)) {
+          for (const methodObj of Object.values(pathObj)) {
+            const method = methodObj as { parameters?: Array<Record<string, unknown>> };
+            if (method.parameters) {
+              for (const param of method.parameters) {
+                if (param.name === 'user' && param.in === 'query') {
+                  const schema = param.schema as Record<string, unknown> | undefined;
+                  if (schema) {
+                    schema.enum = userIds;
+                  }
+                  // Update description to list available users
+                  param.description = userListDescription;
                 }
               }
             }
@@ -614,6 +650,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
   app.get('/history', { preHandler: [app.authenticatePublicApi] }, async (request, reply) => {
     const querySchema = paginationSchema.extend({
       serverId: z.uuid().optional(),
+      user: z.uuid().optional(),
       state: z.enum(['playing', 'paused', 'stopped']).optional(),
       mediaType: z.enum(['movie', 'episode', 'track', 'live', 'photo', 'unknown']).optional(),
       startDate: z.coerce.date().optional(),
@@ -626,7 +663,8 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       return reply.badRequest('Invalid query parameters');
     }
 
-    const { page, pageSize, serverId, state, mediaType, startDate, endDate, timezone } = query.data;
+    const { page, pageSize, serverId, user, state, mediaType, startDate, endDate, timezone } =
+      query.data;
     const offset = (page - 1) * pageSize;
 
     // Validate date range
@@ -638,6 +676,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
     // Dates are converted to UTC based on the provided timezone
     const conditions: ReturnType<typeof sql>[] = [];
     if (serverId) conditions.push(sql`s.server_id = ${serverId}`);
+    if (user)
+      conditions.push(
+        sql`s.server_user_id IN (SELECT su_f.id FROM server_users su_f WHERE su_f.user_id = ${user})`
+      );
     if (state) conditions.push(sql`s.state = ${state}`);
     if (mediaType) conditions.push(sql`s.media_type = ${mediaType}`);
     if (startDate) {

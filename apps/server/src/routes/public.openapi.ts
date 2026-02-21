@@ -46,6 +46,11 @@ const ServerIdParam = z.uuid().openapi({
   example: '550e8400-e29b-41d4-a716-446655440000',
 });
 
+const UserIdParam = z.uuid().openapi({
+  description: 'User UUID',
+  example: 'b9c41fea-44ca-45cd-b725-945c635a94bd',
+});
+
 const PaginationQuery = z.object({
   page: z.coerce.number().int().positive().default(1).openapi({ example: 1 }),
   pageSize: z.coerce.number().int().positive().max(100).default(25).openapi({ example: 25 }),
@@ -490,6 +495,7 @@ registry.registerPath({
 
 const HistoryQuery = PaginationQuery.extend({
   serverId: ServerIdParam.optional().openapi({ description: 'Filter by server' }),
+  user: UserIdParam.optional().openapi({ description: 'Filter by user' }),
   state: PlaybackStateEnum.optional(),
   mediaType: MediaTypeEnum.optional(),
   startDate: z.coerce.date().optional().openapi({
