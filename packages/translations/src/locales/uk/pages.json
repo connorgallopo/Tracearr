@@ -44,6 +44,7 @@
     "nowPlaying": "Зараз відтворюється",
     "streamLocations": "Stream Locations",
     "serverResources": "Ресурси сервера",
+    "bandwidth": "Bandwidth",
     "noActiveStreams": "Немає активних потоків",
     "streamsAppearHere": "Активні потоки з'являться тут, коли користувачі почнуть перегляд"
   },
