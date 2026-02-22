@@ -44,6 +44,7 @@
     "nowPlaying": "Teraz odtwarzane",
     "streamLocations": "Lokalizacje transmisji",
     "serverResources": "Zasoby Serwera",
+    "bandwidth": "Bandwidth",
     "noActiveStreams": "Brak aktywnych transmisji",
     "streamsAppearHere": "Aktywne transmisje pojawią się tutaj, gdy użytkownicy zaczną oglądać"
   },
