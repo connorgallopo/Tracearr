@@ -44,6 +44,7 @@
     "nowPlaying": "Aktive Streams",
     "streamLocations": "Stream-Standorte",
     "serverResources": "Server-Ressourcen",
+    "bandwidth": "Bandwidth",
     "noActiveStreams": "Keine aktiven Streams",
     "streamsAppearHere": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen"
   },
