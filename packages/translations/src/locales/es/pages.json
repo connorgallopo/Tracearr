@@ -44,6 +44,7 @@
     "nowPlaying": "Reproduciendo ahora",
     "streamLocations": "Ubicaciones de las reproducciones",
     "serverResources": "Recursos del servidor",
+    "bandwidth": "Bandwidth",
     "noActiveStreams": "No hay reproducciones activas",
     "streamsAppearHere": "Las reproducciones activas aparecerán aquí cuando los usuarios comiencen a reproducir"
   },
