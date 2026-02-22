@@ -44,6 +44,7 @@
     "nowPlaying": "Lecture en cours",
     "streamLocations": "Emplacements des lectures",
     "serverResources": "Ressources du serveur",
+    "bandwidth": "Bandwidth",
     "noActiveStreams": "Aucune lecture en cours",
     "streamsAppearHere": "Les lectures actives apparaîtront ici lorsque les utilisateurs commenceront à regarder"
   },
