@@ -1,10 +1,10 @@
 {
   "tabs": {
-    "general": "General",
-    "servers": "Servers",
-    "notifications": "Notifications",
-    "mobile": "Mobile App",
-    "import": "Import",
+    "general": "一般",
+    "servers": "伺服器",
+    "notifications": "通知",
+    "mobile": "手機應用程式",
+    "import": "匯入",
     "advanced": "Advanced",
     "jobs": "Jobs",
     "accessControl": "Access Control"
