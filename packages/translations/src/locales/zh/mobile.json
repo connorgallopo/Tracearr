@@ -54,7 +54,7 @@
     "testSent": "已發送測試",
     "testFailed": "測試失敗",
     "failedToSendTest": "發送測試通知失敗",
-    "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
+    "loadingPreferences": "載入偏好設定中……",
+    "unableToLoadPreferences": "無法載入偏好設定"
   }
 }
