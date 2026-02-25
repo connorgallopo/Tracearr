@@ -55,7 +55,7 @@
     "later": "Later"
   },
   "states": {
-    "loading": "Loading...",
+    "loading": "加载中…",
     "error": "Error",
     "success": "Success",
     "failed": "Failed",
@@ -117,8 +117,8 @@
     "location": "Location",
     "ipAddress": "IP Address",
     "quality": "Quality",
-    "duration": "Duration",
-    "progress": "Progress",
+    "duration": "持续时长",
+    "progress": "进度",
     "status": "Status",
     "rule": "Rule",
     "media": "Media",
@@ -180,9 +180,9 @@
     "maxLength": "Must be at most {{max}} characters"
   },
   "errors": {
-    "generic": "An error occurred",
+    "generic": "发生错误",
     "networkError": "Network connection failed",
-    "unauthorized": "You are not authorized to perform this action",
+    "unauthorized": "您未被授权来执行此操作",
     "notFound": "Not found",
     "serverError": "Server error",
     "timeout": "Request timed out",
@@ -203,7 +203,7 @@
     "user_one": "{{count}} user",
     "user_other": "{{count}} users",
     "session_one": "{{count}} session",
-    "session_other": "{{count}} sessions",
+    "session_other": "",
     "stream_one": "{{count}} stream",
     "stream_other": "{{count}} streams",
     "server_one": "{{count}} server",
@@ -225,7 +225,7 @@
     "library_one": "{{count}} library",
     "library_other": "{{count}} libraries",
     "error_one": "{{count}} error",
-    "error_other": "{{count}} errors"
+    "error_other": "{{count}}错误"
   },
   "messages": {
     "noChangesDetected": "No changes detected"
@@ -233,13 +233,13 @@
   "relativeTime": {
     "justNow": "Just now",
     "second_one": "{{count}} second ago",
-    "second_other": "{{count}} seconds ago",
+    "second_other": "{{count}} 秒前",
     "minute_one": "{{count}} minute ago",
     "minute_other": "{{count}} minutes ago",
     "hour_one": "{{count}} hour ago",
     "hour_other": "{{count}} hours ago",
     "day_one": "{{count}} day ago",
-    "day_other": "{{count}} days ago",
+    "day_other": "{{count}} 天前",
     "week_one": "{{count}} week ago",
     "week_other": "{{count}} weeks ago",
     "month_one": "{{count}} month ago",
@@ -258,7 +258,7 @@
     "day_other": "{{count}} days"
   },
   "empty": {
-    "noResults": "No results found",
+    "noResults": "未找到结果",
     "noData": "No data available",
     "noItems": "No items",
     "noDeviceData": "No device data available",
