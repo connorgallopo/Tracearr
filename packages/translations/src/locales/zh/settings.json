@@ -1,123 +1,123 @@
 {
   "tabs": {
-    "general": "一般",
-    "servers": "伺服器",
-    "notifications": "通知",
-    "mobile": "手機應用程式",
-    "import": "匯入",
-    "advanced": "進階",
-    "jobs": "工作",
-    "accessControl": "存取控制"
+    "general": "General",
+    "servers": "Servers",
+    "notifications": "Notifications",
+    "mobile": "Mobile App",
+    "import": "Import",
+    "advanced": "Advanced",
+    "jobs": "Jobs",
+    "accessControl": "Access Control"
   },
   "general": {
-    "title": "一般設定",
-    "unitSystem": "單位系統",
-    "metric": "公制（km, km/h）",
-    "imperial": "英制（mi, mph）",
-    "timezone": "時區",
-    "primaryAuth": "主要驗證方法",
-    "localAccount": "本地帳號",
-    "plexAccount": "Plex 帳號",
-    "jellyfinAccount": "Jellyfin 帳號",
-    "language": "語言",
-    "languageDescription": "請選擇你偏好的顯示語言。",
-    "helpTranslate": "幫助翻譯 Tracearr",
-    "timeFormat": "時間格式",
-    "timeFormatDescription": "請選擇如何顯示時間。",
-    "timeFormat12h": "12 小時制（1:30 PM）",
-    "timeFormat24h": "24 小時制（13:30）"
+    "title": "General Settings",
+    "unitSystem": "Unit System",
+    "metric": "Metric (km, km/h)",
+    "imperial": "Imperial (mi, mph)",
+    "timezone": "Timezone",
+    "primaryAuth": "Primary Authentication Method",
+    "localAccount": "Local Account",
+    "plexAccount": "Plex Account",
+    "jellyfinAccount": "Jellyfin Account",
+    "language": "Language",
+    "languageDescription": "Choose your preferred display language.",
+    "helpTranslate": "Help translate Tracearr",
+    "timeFormat": "Time Format",
+    "timeFormatDescription": "Choose how times are displayed.",
+    "timeFormat12h": "12-hour (1:30 PM)",
+    "timeFormat24h": "24-hour (13:30)"
   },
   "servers": {
-    "title": "已連接的伺服器",
-    "addServer": "新增伺服器",
-    "serverName": "伺服器名稱",
-    "serverUrl": "伺服器網址",
-    "apiKey": "API 金鑰",
-    "syncInterval": "同步間隔",
-    "testConnection": "測試連線",
-    "connectionSuccess": "連接成功",
-    "connectionFailed": "連接失敗"
+    "title": "Connected Servers",
+    "addServer": "Add Server",
+    "serverName": "Server Name",
+    "serverUrl": "Server URL",
+    "apiKey": "API Key",
+    "syncInterval": "Sync Interval",
+    "testConnection": "Test Connection",
+    "connectionSuccess": "Connection successful",
+    "connectionFailed": "Connection failed"
   },
   "mobile": {
-    "title": "手機應用程式",
-    "pairDevice": "配對裝置",
-    "connectedDevices": "已連接的裝置",
-    "generateToken": "產生配對憑證",
-    "scanQrCode": "掃描 QR 碼",
-    "tokenExpires": "憑證於 {{time}} 過期",
-    "noDevices": "未連接至任何裝置",
-    "revokeAll": "撤銷所有會話"
+    "title": "Mobile App",
+    "pairDevice": "Pair Device",
+    "connectedDevices": "Connected Devices",
+    "generateToken": "Generate Pair Token",
+    "scanQrCode": "Scan QR Code",
+    "tokenExpires": "令牌在...过期{{time}}",
+    "noDevices": "No devices connected",
+    "revokeAll": "Revoke All Sessions"
   },
   "webhooks": {
-    "title": "Webhook 設定",
-    "discordWebhook": "Discord Webhook 網址",
+    "title": "Webhook Configuration",
+    "discordWebhook": "Discord Webhook URL",
     "ntfyTopic": "Ntfy Topic",
-    "customWebhook": "自定義 Webhook 網址",
-    "webhookFormat": "Webhook 格式",
-    "testWebhook": "測試 Ｗebhook"
+    "customWebhook": "Custom Webhook URL",
+    "webhookFormat": "Webhook Format",
+    "testWebhook": "Test Webhook"
   },
   "advanced": {
-    "title": "進階設定",
-    "externalUrl": "外部網址",
-    "trustProxy": "信任代理標頭",
+    "title": "Advanced Settings",
+    "externalUrl": "External URL",
+    "trustProxy": "信任代理头",
     "reverseProxy": "反向代理",
-    "connectionScenarios": "連線情境"
+    "connectionScenarios": "Connection Scenarios"
   },
   "import": {
-    "title": "匯入資料",
-    "jellystat": "從 Jellyfin 匯入",
-    "tautulli": "從 Tautulli 匯入",
-    "importProgress": "匯入進度",
-    "importComplete": "匯入完成",
-    "importFailed": "匯入失敗",
-    "processed": "已處理",
-    "page": "頁",
-    "imported": "已匯入",
-    "skipped": "已略過",
-    "enriched": "豐富",
-    "errors": "錯誤"
+    "title": "Import Data",
+    "jellystat": "Import from Jellystat",
+    "tautulli": "Import from Tautulli",
+    "importProgress": "Import Progress",
+    "importComplete": "Import Complete",
+    "importFailed": "Import Failed",
+    "processed": "Processed",
+    "page": "Page",
+    "imported": "Imported",
+    "skipped": "Skipped",
+    "enriched": "Enriched",
+    "errors": "Errors"
   },
   "plex": {
-    "linkedAccounts": "已連接的 Plex 帳號",
-    "unlinkAccount": "取消連接 Pleex 帳號",
-    "signInWithPlex": "使用 Plex 登入",
-    "signUpWithPlex": "使用 Plex 註冊",
-    "selectServer": "選擇伺服器",
-    "chooseServer": "請選擇要監控的 Plex 伺服器"
+    "linkedAccounts": "Linked Plex Accounts",
+    "unlinkAccount": "Unlink Plex Account",
+    "signInWithPlex": "Sign in with Plex",
+    "signUpWithPlex": "Sign up with Plex",
+    "selectServer": "Select Server",
+    "chooseServer": "Choose which Plex Media Server to monitor"
   },
   "jellyfin": {
-    "signInWithJellyfin": "使用 Jellyfin 登入",
-    "username": "Jellyfin 使用者名稱",
-    "password": "Jellyfin 密碼"
+    "signInWithJellyfin": "Sign in with Jellyfin",
+    "username": "Jellyfin Username",
+    "password": "Jellyfin Password"
   },
   "account": {
-    "createAccount": "建立新帳號",
-    "signIn": "登入",
-    "email": "電子信箱",
-    "password": "密碼",
-    "displayName": "顯示名稱",
-    "createYourAccount": "建立你的帳號即可開始使用",
-    "signInToAccount": "登入你的帳號",
-    "useLocalAccount": "改用本地帳號",
-    "useJellyfinAccount": "改用 Jellyfin 帳號",
-    "waitingForPlex": "等待 Plex 認證……"
+    "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display Name",
+    "createYourAccount": "Create your account to get started",
+    "signInToAccount": "Sign in to your account",
+    "useLocalAccount": "Use local account instead",
+    "useJellyfinAccount": "Use Jellyfin account instead",
+    "waitingForPlex": "Waiting for Plex authorization..."
   },
   "update": {
-    "title": "有可用的更新",
-    "releaseNotes": "更新日誌",
-    "updateCommand": "更新指令",
-    "pullInstructions": "下載完成後，請重新啟動你的容器以套用更新。",
-    "stableRelease": "穩定版本",
-    "betaUpdate": "測試版更新",
-    "newVersion": "新版本",
-    "versionAvailable": "{{version}} 已可更新"
+    "title": "Update Available",
+    "releaseNotes": "Release Notes",
+    "updateCommand": "Update Command",
+    "pullInstructions": "After pulling, restart your container to apply the update.",
+    "stableRelease": "Stable Release",
+    "betaUpdate": "Beta Update",
+    "newVersion": "New Version",
+    "versionAvailable": "{{version}} available"
   },
   "serverHealth": {
-    "unreachable": "{{serverName}} 無法連接",
-    "multipleUnreachable": "{{count}} 個伺服器無法連接：{{serverNames}}"
+    "unreachable": "{{serverName}} is unreachable",
+    "multipleUnreachable": "{{count}} 服务器无法访问：{{serverNames}}"
   },
   "ipWarning": {
-    "message": "所有使用者似乎都在使用相同的 IP 地址或本地網路 IP 地址。這可能會影響基於規則的位置或 IP 地址邏輯。",
-    "acknowledge": "明白了"
+    "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses.",
+    "acknowledge": "知道了"
   }
 }
