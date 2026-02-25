@@ -1,8 +1,8 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
+    "welcome": "欢迎使用 Tracearr",
+    "addServer": "添加服务器",
+    "connectToServer": "连接到服务器",
     "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
     "serverUrl": "Server URL",
     "accessToken": "Access Token",
