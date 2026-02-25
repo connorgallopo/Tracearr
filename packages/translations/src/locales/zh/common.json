@@ -1,8 +1,8 @@
 {
   "actions": {
     "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
+    "cancel": "",
+    "delete": "删除",
     "edit": "Edit",
     "add": "Add",
     "create": "Create",
@@ -10,7 +10,7 @@
     "remove": "Remove",
     "connect": "Connect",
     "disconnect": "Disconnect",
-    "submit": "Submit",
+    "submit": "",
     "confirm": "Confirm",
     "close": "Close",
     "retry": "Retry",
@@ -51,7 +51,7 @@
     "grantPermission": "Grant Permission",
     "openSettings": "Open Settings",
     "viewProfile": "View Profile",
-    "viewOnGithub": "View on GitHub",
+    "viewOnGithub": "在 GitHub 上查看",
     "later": "Later"
   },
   "states": {
