@@ -51,9 +51,9 @@
   },
   "tailscale": {
     "title": "Tailscale VPN",
-    "description": "Access Tracearr securely on your Tailscale network without port forwarding.",
-    "notAvailable": "Tailscale binary not found. This feature is only available when running the official Docker image.",
-    "disabledDescription": "Enable Tailscale to put Tracearr on your private tailnet. No port forwarding or reverse proxy required.",
+    "description": "Krijg veilig toegang tot Tracearr op je Tailscale netwerk zonder poortforwarding.",
+    "notAvailable": "Het Tailscale binair bestand is niet gevonden. Deze functie is alleen beschikbaar bij gebruik van de officiële Docker-image.",
+    "disabledDescription": "Schakel Tailscale in om Tracearr op je privé tailnet te plaatsen. Geen port forwarding of reverse proxy nodig.",
     "hostnameLabel": "Device Hostname",
     "hostnameHint": "Optional custom name for this device on your tailnet. Letters, numbers, and hyphens only.",
     "enable": "Enable Tailscale",
