@@ -101,7 +101,7 @@
     "engagementBreakdown": "Répartition des engagements",
     "howUsersEngage": "Comment les utilisateurs interagissent avec le contenu",
     "playsVsSessions": "Lectures contre Sessions",
-    "playsVsSessionsDesc": "Lectures validées contre nombre brut de sessions",
+    "playsVsSessionsDesc": "Lectures complètes uniquement — considère une lecture comme valide lorsque le temps total de visionnage couvre l’intégralité de la durée du contenu",
     "activityByDayOfWeek": "Activité par jour de la semaine",
     "activityByHourOfDay": "Activité par heure de la journée",
     "platforms": "Plateformes",
