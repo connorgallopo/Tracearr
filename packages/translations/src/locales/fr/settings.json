@@ -70,7 +70,7 @@
     "tailnetUrl": "URL",
     "showLogs": "Afficher les journaux",
     "hideLogs": "Masquer les journaux",
-    "noLogs": "Aucune sortie de journal disponible.",
+    "noLogs": "Aucun journal de sortie disponible.",
     "exitNodeNone": "Aucun",
     "exitNodeOffline": "(hors ligne)",
     "unknownError": "Une erreur inconnue s'est produite.",
