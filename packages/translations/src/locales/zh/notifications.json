@@ -101,7 +101,7 @@
         "message": "The server has been updated successfully"
       },
       "syncCompletedWithErrors": {
-        "title": "同步完成时发生错误"
+        "title": "Sync Completed with Errors"
       },
       "sessionsDeleted": {
         "title": "Sessions Deleted",
@@ -135,7 +135,7 @@
         "message": "Scan the QR code with your mobile device to pair"
       },
       "displayNameUpdated": {
-        "title": "已更新显示名称"
+        "title": "Display Name Updated"
       },
       "trustScoresReset": {
         "title": "Trust Scores Reset",
@@ -175,7 +175,7 @@
       "displayNameUpdateFailed": "Failed to update display name",
       "trustScoresResetFailed": "Failed to reset trust scores",
       "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "复制到剪贴板失败",
+      "clipboardFailed": "Failed to copy to clipboard",
       "plexUnlinkFailed": "Failed to unlink Plex account",
       "agentAddFailed": "Failed to add agent",
       "agentUpdateFailed": "Failed to update agent",
@@ -257,6 +257,6 @@
     "quietHours": "Quiet Hours",
     "enableQuietHours": "Enable Quiet Hours",
     "overrideForCritical": "Override for Critical",
-    "rateLimiting": "速率限制"
+    "rateLimiting": "Rate Limiting"
   }
 }
