@@ -156,16 +156,16 @@
     "searchTitles": "Cerca títols, usuaris..."
   },
   "table": {
-    "selectAllOnPage": "Select all on page",
-    "selectRow": "Select row",
-    "selectAllTotal": "Select all {{total}} items"
+    "selectAllOnPage": "Selecciona-ho tot a la pàgina",
+    "selectRow": "Selecciona la fila",
+    "selectAllTotal": "Selecciona els {{total}} elements"
   },
   "media": {
-    "movie": "Movie",
-    "episode": "Episode",
-    "track": "Track",
-    "liveTV": "Live TV",
-    "photo": "Photo"
+    "movie": "Pel·lícula",
+    "episode": "Episodi",
+    "track": "Pista",
+    "liveTV": "TV en directe",
+    "photo": "Foto"
   },
   "servers": {
     "plex": "Plex",
@@ -173,29 +173,29 @@
     "emby": "Emby"
   },
   "validation": {
-    "required": "This field is required",
-    "invalidEmail": "Please enter a valid email address",
-    "invalidUrl": "Please enter a valid URL",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters"
+    "required": "Aquest camp és obligatori",
+    "invalidEmail": "Si us plau, introduïu una adreça de correu electrònic vàlida",
+    "invalidUrl": "Si us plau, introduïu un URL vàlid",
+    "minLength": "Ha de tenir com a mínim {{min}} caràcters",
+    "maxLength": "Ha de tenir com a màxim {{max}} caràcters"
   },
   "errors": {
-    "generic": "An error occurred",
-    "networkError": "Network connection failed",
-    "unauthorized": "You are not authorized to perform this action",
-    "notFound": "Not found",
-    "serverError": "Server error",
-    "timeout": "Request timed out",
-    "forbidden": "Access denied",
-    "badRequest": "Invalid request",
-    "conflict": "A conflict occurred",
-    "rateLimited": "Too many requests. Please try again later",
-    "pageNotFound": "Page Not Found",
-    "pageNotFoundDesc": "The page you're looking for doesn't exist or has been moved.",
-    "somethingWentWrong": "Something went wrong",
-    "unexpectedError": "An unexpected error occurred. Please try again.",
-    "failedToLoad": "Failed to load {{item}}",
-    "connectionFailed": "Connection failed",
+    "generic": "S'ha produït un error",
+    "networkError": "La connexió de xarxa ha fallat",
+    "unauthorized": "No teniu permís per realitzar aquesta acció",
+    "notFound": "No s'ha trobat",
+    "serverError": "Error del servidor",
+    "timeout": "S'ha esgotat el temps d'espera",
+    "forbidden": "Accés denegat",
+    "badRequest": "Sol·licitud no vàlida",
+    "conflict": "S'ha produït un conflicte",
+    "rateLimited": "Massa sol·licituds. Torneu-ho a provar més tard",
+    "pageNotFound": "No s'ha trobat la pàgina",
+    "pageNotFoundDesc": "La pàgina que cerqueu no existeix o s'ha mogut.",
+    "somethingWentWrong": "S'ha produït un error",
+    "unexpectedError": "Hi ha hagut un error inesperat. Si us plau, torneu-ho a provar.",
+    "failedToLoad": "No s’ha pogut carregar {{item}}",
+    "connectionFailed": "Ha fallat la connexió",
     "connectionTimedOut": "Connection timed out. Check your server URL.",
     "cannotReachServer": "Cannot reach server. Check URL and network connection."
   },
