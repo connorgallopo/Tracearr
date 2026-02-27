@@ -40,7 +40,6 @@
     "connectionFailed": "Połączenie nieudane"
   },
   "mobile": {
-    "tailscale": "Tailscale",
     "title": "Aplikacja mobilna",
     "pairDevice": "Sparuj urządzenie",
     "connectedDevices": "Podłączone urządzenia",
