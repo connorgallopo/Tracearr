@@ -44,7 +44,7 @@
     "nowPlaying": "Lecture en cours",
     "streamLocations": "Emplacements des lectures",
     "serverResources": "Ressources du serveur",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Bande passante",
     "noActiveStreams": "Aucune lecture en cours",
     "streamsAppearHere": "Les lectures actives apparaîtront ici lorsque les utilisateurs commenceront à regarder"
   },
@@ -101,7 +101,7 @@
     "engagementBreakdown": "Répartition des engagements",
     "howUsersEngage": "Comment les utilisateurs interagissent avec le contenu",
     "playsVsSessions": "Lectures contre Sessions",
-    "playsVsSessionsDesc": "Lectures validées contre nombre brut de sessions",
+    "playsVsSessionsDesc": "Lectures complètes uniquement — considère une lecture comme valide lorsque le temps total de visionnage couvre l’intégralité de la durée du contenu",
     "activityByDayOfWeek": "Activité par jour de la semaine",
     "activityByHourOfDay": "Activité par heure de la journée",
     "platforms": "Plateformes",
