@@ -52,7 +52,7 @@
   "tailscale": {
     "title": "VPN Tailscale",
     "description": "Accédez à Tracearr en toute sécurité sur votre réseau Tailscale, sans redirection de port.",
-    "notAvailable": "Le binaire de Tailscale est introuvable. Cette fonctionnalité n'est disponible que lorsque vous utilisez l'image Docker officielle.",
+    "notAvailable": "Le binaire de Tailscale est introuvable. Cette fonctionnalité n'est uniquement disponible que lorsque vous utilisez l'image Docker officielle.",
     "disabledDescription": "Activez Tailscale pour placer Tracearr sur votre tailnet privé. Aucune redirection de port ni reverse proxy requis.",
     "hostnameLabel": "Nom d'hôte de l'appareil",
     "hostnameHint": "Nom personnalisé facultatif pour cet appareil sur votre tailnet. Lettres, chiffres et tirets uniquement.",
@@ -70,7 +70,7 @@
     "tailnetUrl": "URL",
     "showLogs": "Afficher les journaux",
     "hideLogs": "Masquer les journaux",
-    "noLogs": "Aucun journal de sortie disponible.",
+    "noLogs": "Aucune journalisation de sortie disponible.",
     "exitNodeNone": "Aucun",
     "exitNodeOffline": "(hors ligne)",
     "unknownError": "Une erreur inconnue s'est produite.",
