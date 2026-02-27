@@ -101,10 +101,10 @@
         "message": "The server has been updated successfully"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "同步完成时发生错误"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
+        "title": "会话已删除",
         "message_one": "{{count}} session deleted",
         "message_other": "{{count}} sessions deleted"
       },
@@ -135,7 +135,7 @@
         "message": "Scan the QR code with your mobile device to pair"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "已更新显示名称"
       },
       "trustScoresReset": {
         "title": "Trust Scores Reset",
@@ -175,7 +175,7 @@
       "displayNameUpdateFailed": "Failed to update display name",
       "trustScoresResetFailed": "Failed to reset trust scores",
       "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
+      "clipboardFailed": "复制到剪贴板失败",
       "plexUnlinkFailed": "Failed to unlink Plex account",
       "agentAddFailed": "Failed to add agent",
       "agentUpdateFailed": "Failed to update agent",
@@ -211,7 +211,7 @@
         "message": "Tracearr {{version}} is available"
       },
       "serverOffline": {
-        "title": "Server Offline",
+        "title": "服务器离线",
         "message": "{{name}} is unreachable"
       },
       "serverOnline": {
@@ -252,11 +252,11 @@
     "trustScoreChanged": "Trust Score Changed",
     "serverDown": "Server Down",
     "serverUp": "Server Up",
-    "violationFilters": "Violation Filters",
+    "violationFilters": "违规过滤器",
     "minimumSeverity": "Minimum Severity",
     "quietHours": "Quiet Hours",
     "enableQuietHours": "Enable Quiet Hours",
     "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "rateLimiting": "速率限制"
   }
 }
