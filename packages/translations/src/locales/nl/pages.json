@@ -44,7 +44,7 @@
     "nowPlaying": "Nu afspelen",
     "streamLocations": "Streamlocaties",
     "serverResources": "Serverbronnen",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Bandbreedte",
     "noActiveStreams": "Geen actieve streams",
     "streamsAppearHere": "Actieve streams zullen hier verschijnen wanneer gebruikers gaan kijken"
   },
@@ -101,7 +101,7 @@
     "engagementBreakdown": "Overzicht betrokkenheid",
     "howUsersEngage": "Hoe gebruikers met inhoud omgaan",
     "playsVsSessions": "Weergaven vs. sessies",
-    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
+    "playsVsSessionsDesc": "Alleen volledig voltooide afleveringen tellen mee — een aflevering telt als de totale kijktijd de volledige speelduur van de content beslaat",
     "activityByDayOfWeek": "Activiteit per weekdag",
     "activityByHourOfDay": "Activiteit per uur",
     "platforms": "Platforms",
