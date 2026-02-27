@@ -40,7 +40,6 @@
     "connectionFailed": "Connection failed"
   },
   "mobile": {
-    "tailscale": "Tailscale",
     "title": "Mobile App",
     "pairDevice": "Pair Device",
     "connectedDevices": "Connected Devices",
