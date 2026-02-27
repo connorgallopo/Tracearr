@@ -5,7 +5,7 @@
     "notifications": "Notifications",
     "mobile": "Mobile App",
     "tailscale": "Tailscale",
-    "import": "Import",
+    "import": "Importa",
     "advanced": "Advanced",
     "jobs": "Jobs",
     "accessControl": "Access Control"
@@ -37,10 +37,9 @@
     "syncInterval": "Sync Interval",
     "testConnection": "Test Connection",
     "connectionSuccess": "Connection successful",
-    "connectionFailed": "Connection failed"
+    "connectionFailed": "Ha fallat la connexió"
   },
   "mobile": {
-    "tailscale": "Tailscale",
     "title": "Mobile App",
     "pairDevice": "Pair Device",
     "connectedDevices": "Connected Devices",
@@ -59,8 +58,8 @@
     "hostnameHint": "Optional custom name for this device on your tailnet. Letters, numbers, and hyphens only.",
     "enable": "Enable Tailscale",
     "disable": "Disable Tailscale",
-    "cancel": "Cancel",
-    "retry": "Retry",
+    "cancel": "Cancel·la",
+    "retry": "Torna-ho a provar",
     "starting": "Starting Tailscale...",
     "stopping": "Stopping Tailscale...",
     "awaitingAuth": "Waiting for authorization...",
@@ -73,11 +72,11 @@
     "hideLogs": "Hide Logs",
     "noLogs": "No log output available.",
     "exitNodeNone": "None",
-    "exitNodeOffline": "(offline)",
+    "exitNodeOffline": "(fora de línia)",
     "unknownError": "An unknown error occurred.",
     "disableConfirmTitle": "Disable Tailscale?",
     "disableConfirmDescription": "This will disconnect Tracearr from your tailnet. You can re-enable without re-authorizing.",
-    "reset": "Reset",
+    "reset": "Restableix",
     "resetConfirmTitle": "Reset Tailscale?",
     "resetConfirmDescription": "This will disconnect Tracearr from your tailnet and remove the device identity. You will need to re-authorize if you enable it again.",
     "toast": {
@@ -134,7 +133,7 @@
   },
   "account": {
     "createAccount": "Create Account",
-    "signIn": "Sign In",
+    "signIn": "Inicia la sessió",
     "email": "Email",
     "password": "Password",
     "displayName": "Display Name",
