@@ -44,7 +44,7 @@
     "nowPlaying": "Reproduciendo ahora",
     "streamLocations": "Ubicaciones de las reproducciones",
     "serverResources": "Recursos del servidor",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Ancho de banda",
     "noActiveStreams": "No hay reproducciones activas",
     "streamsAppearHere": "Las reproducciones activas aparecerán aquí cuando los usuarios comiencen a reproducir"
   },
@@ -101,7 +101,7 @@
     "engagementBreakdown": "Detalle de actividad de los usuarios",
     "howUsersEngage": "Cómo se relacionan los usuarios con el contenido",
     "playsVsSessions": "Reproducciones vs Sesiones",
-    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
+    "playsVsSessionsDesc": "Solo reproducciones completas — contabiliza una reproducción cuando el tiempo total de visualización cubre la duración íntegra del contenido",
     "activityByDayOfWeek": "Actividad por el día de la semana",
     "activityByHourOfDay": "Actividad por hora del día",
     "platforms": "Plataformas",
