@@ -10,10 +10,10 @@
     "waitingForPlex": "Waiting for Plex authorization...",
     "completeInPopup": "Complete sign-in in the popup window",
     "reopenPlexLogin": "Reopen Plex Login",
-    "emailPlaceholder": "your@email.com",
+    "emailPlaceholder": "elvostrecorreu@email.com",
     "displayNamePlaceholder": "Choose a display name",
     "passwordPlaceholder": "At least 8 characters",
-    "yourPasswordPlaceholder": "Your password",
+    "yourPasswordPlaceholder": "La teva contrasenya",
     "jellyfinUsernamePlaceholder": "Your Jellyfin username",
     "jellyfinPasswordPlaceholder": "Your Jellyfin password",
     "jellyfinAdminNote": "Must be an administrator on a configured Jellyfin server",
@@ -44,7 +44,7 @@
     "nowPlaying": "Now Playing",
     "streamLocations": "Stream Locations",
     "serverResources": "Server Resources",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Amplada de banda",
     "noActiveStreams": "No active streams",
     "streamsAppearHere": "Active streams will appear here when users start watching"
   },
@@ -52,7 +52,7 @@
     "title": "Users",
     "allUsers": "All Users",
     "noUsersFound": "No users found.",
-    "searchPlaceholder": "Search users...",
+    "searchPlaceholder": "Cerca d'usuaris...",
     "selectAllUsers": "Select all {{count}} users",
     "resetTrustScore": "Reset Trust Score",
     "resetTrustScoreTitle_one": "Reset Trust Score for {{count}} User",
@@ -135,7 +135,7 @@
       "actions": "Actions Taken",
       "timestamps": "Timestamps",
       "created": "Created",
-      "acknowledged": "Acknowledged",
+      "acknowledged": "Confirmat",
       "detected": "Detected",
       "inactivity": "Inactivity Details",
       "daysInactive": "Days Inactive",
@@ -220,8 +220,8 @@
   },
   "notFound": {
     "title": "404",
-    "heading": "Page Not Found",
-    "description": "The page you're looking for doesn't exist or has been moved."
+    "heading": "No s'ha trobat la pàgina",
+    "description": "La pàgina que cerqueu no existeix o s'ha mogut."
   },
   "settings": {
     "plex": {
