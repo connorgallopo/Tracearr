@@ -40,7 +40,6 @@
     "connectionFailed": "Verbindung fehlgeschlagen"
   },
   "mobile": {
-    "tailscale": "Tailscale",
     "title": "Mobile App",
     "pairDevice": "Gerät koppeln",
     "connectedDevices": "Verbundene Geräte",
