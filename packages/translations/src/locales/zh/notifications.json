@@ -161,83 +161,83 @@
       "ruleUpdateFailed": "更新规则失败",
       "ruleDeleteFailed": "删除规则失败",
       "streamTerminateFailed": "终止流失败",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
+      "serverUrlUpdateFailed": "无法更新服务器 URL",
+      "serverUpdateFailed": "更新服务器失败",
+      "serverReorderFailed": "服务器重新排序失败",
+      "sessionsDeleteFailed": "删除会话失败",
+      "apiKeyGenerateFailed": "API 密钥重置失败",
+      "mobileAccessEnableFailed": "启用移动访问失败",
+      "mobileAccessDisableFailed": "禁用移动访问失败",
+      "pairTokenGenerateFailed": "生成配对令牌失败",
+      "deviceRemoveFailed": "无法删除设备",
+      "deviceRenameFailed": "无法重命名设备",
+      "sessionsRevokeFailed": "撤销会话失败",
+      "displayNameUpdateFailed": "更新显示名失败",
+      "trustScoresResetFailed": "重置信任分失败",
+      "routingUpdateFailed": "更新路由失败",
       "clipboardFailed": "复制到剪贴板失败",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "plexUnlinkFailed": "取消链接Plex帐户失败",
+      "agentAddFailed": "添加代理失败",
+      "agentUpdateFailed": "更新代理失败",
+      "agentRemoveFailed": "移除代理失败",
+      "agentTestFailed": "测试失败",
+      "jobAlreadyRunning": "任务已在运行",
+      "jobStartFailed": "启动任务失败",
+      "jobLoadFailed": "加载维护任务失败",
+      "invalidUrl": "无效的 URL",
+      "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "无效的索赔码",
+        "message": "请检查服务器日志"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "任务失败",
+        "message": "{{name}} 遇到错误"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "title": "新流已开始",
+        "message": "{{user}}开始观看{{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "流停止",
+        "message": "{{user}}停止观看"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "有可用更新",
+        "message": "Tracearr{{version}}可用"
       },
       "serverOffline": {
         "title": "服务器离线",
-        "message": "{{name}} is unreachable"
+        "message": "{{name}} 无法联系"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "服务器在线",
+        "message": "{{name}} 已经上线了"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "title": "新违规：{{ruleName}}",
+        "message": "{{user}} 触发了 {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "检测到共享违约行为",
+    "streamStarted": "流开始",
+    "streamEnded": "流结束",
+    "serverDown": "服务器连接丢失",
+    "serverUp": "服务器已重新上线",
+    "newDevice": "新设备",
+    "trustScoreChanged": "信任分数已更改"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
+    "title": "通知设置",
+    "allSeverity": "所有(下, 警告, 高)",
+    "warningAndHigh": "仅警告和高",
+    "highOnly": "仅限高严重度",
     "allTypes": "全部类型",
     "rateLimit": "当前速率限制状态",
     "perMinute": "每分钟",
