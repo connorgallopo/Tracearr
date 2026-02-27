@@ -42,7 +42,7 @@
         "message": "All mobile sessions have been revoked"
       },
       "loggedIn": {
-        "title": "Success",
+        "title": "Realitzat amb èxit",
         "message": "Logged in successfully"
       },
       "webhookTest": {
