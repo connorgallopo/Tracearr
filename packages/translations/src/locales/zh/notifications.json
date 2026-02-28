@@ -175,81 +175,81 @@
       "displayNameUpdateFailed": "無法更新顯示名稱",
       "trustScoresResetFailed": "無法重置信任分數",
       "routingUpdateFailed": "無法更新路由",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "clipboardFailed": "無法複製到剪貼簿",
+      "plexUnlinkFailed": "無法取消連接 Plex 帳號",
+      "agentAddFailed": "無法新增代理",
+      "agentUpdateFailed": "無法更新代理",
+      "agentRemoveFailed": "無法移除代理",
+      "agentTestFailed": "測試失敗",
+      "jobAlreadyRunning": "任務已在運行",
+      "jobStartFailed": "無法啟動任務",
+      "jobLoadFailed": "無法加載維護任務",
+      "invalidUrl": "無效的網址",
+      "plexDirectUrl": "plex.direct URL 是中繼位址，這裡不能使用。請改用直接 IP 位址或主機名稱。",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "無效的申請碼",
+        "message": "請檢查伺服器日誌"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "任務失敗",
+        "message": "{{name}} 遇到錯誤"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "title": "新的串流已開始",
+        "message": "{{user}} 開始觀看 {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "串流已停止",
+        "message": "{{user}} 停止觀看"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "有可用的更新",
+        "message": "Tracearr {{version}} 可用"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "伺服器離線",
+        "message": "{{name}} 無法連接"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "伺服器在線",
+        "message": "{{name}} 重新上線"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "title": "新違規：{{ruleName}}",
+        "message": "{{user}} 觸發了 {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "偵測到共享違規行為",
+    "streamStarted": "串流已開始",
+    "streamEnded": "串流已結束",
+    "serverDown": "與伺服器連線中斷",
+    "serverUp": "伺服器已重新上線",
+    "newDevice": "新裝置",
+    "trustScoreChanged": "已更改信任分數"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
-    "allTypes": "All Types",
-    "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamStopped": "Stream Stopped",
-    "concurrentStreams": "Concurrent Streams",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed",
+    "title": "通知設定",
+    "allSeverity": "所有 (低,警告,高)",
+    "warningAndHigh": "僅警告和高",
+    "highOnly": "僅限高嚴重度",
+    "allTypes": "所有類型",
+    "rateLimit": "當前速率限制狀態",
+    "perMinute": "每分鐘",
+    "perHour": "每小時",
+    "enablePushNotifications": "啟用推送通知",
+    "notificationEvents": "通知事件",
+    "violationDetected": "檢測到違規",
+    "streamStarted": "串流已開始",
+    "streamStopped": "串流已停止",
+    "concurrentStreams": "並行串流",
+    "newDevice": "新裝置",
+    "trustScoreChanged": "信任分數已更改",
     "serverDown": "伺服器離線",
     "serverUp": "伺服器上線",
     "violationFilters": "違規篩選器",
