@@ -120,7 +120,7 @@
   },
   "plex": {
     "linkedAccounts": "已連接的 Plex 帳號",
-    "unlinkAccount": "取消連接 Pleex 帳號",
+    "unlinkAccount": "取消連接 Plex 帳號",
     "signInWithPlex": "使用 Plex 登入",
     "signUpWithPlex": "使用 Plex 註冊",
     "selectServer": "選擇伺服器",
