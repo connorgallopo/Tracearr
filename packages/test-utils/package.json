@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

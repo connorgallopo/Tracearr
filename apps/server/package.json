@@ -72,7 +72,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/country-list": "^2.1.4",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "@types/stream-json": "^1.7.8",
     "@vitest/coverage-v8": "^4.0.18",
     "drizzle-kit": "^0.31.9",
