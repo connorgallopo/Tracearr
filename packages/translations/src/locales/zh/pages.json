@@ -71,7 +71,7 @@
     "noSessionsFound": "未找到該使用者的會話。",
     "noViolationsFound": "該使用者無違規記錄。",
     "noTerminationsFound": "該使用者沒有串流終止記錄。",
-    "byRule": "按 / 規則",
+    "byRule": "根據規則",
     "manual": "手動",
     "unknownRule": "未知的規則"
   },
