@@ -85,23 +85,23 @@
   },
   "severity": {
     "low": "Reduïda",
-    "warning": "Warning",
+    "warning": "Avís",
     "high": "High"
   },
   "time": {
-    "now": "Now",
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "thisWeek": "This Week",
-    "thisMonth": "This Month",
-    "allTime": "All Time"
+    "now": "Ara",
+    "today": "Avui",
+    "yesterday": "Ahir",
+    "thisWeek": "Aquesta setmana",
+    "thisMonth": "Aquest mes",
+    "allTime": "Tot el temps"
   },
   "periods": {
-    "last7Days": "Last 7 Days",
-    "last30Days": "Last 30 Days",
-    "lastYear": "Last Year",
-    "byDay": "By Day",
-    "byHour": "By Hour"
+    "last7Days": "Darrers 7 dies",
+    "last30Days": "Darrers 30 dies",
+    "lastYear": "Darrer any",
+    "byDay": "Per dia",
+    "byHour": "Per hora"
   },
   "units": {
     "km": "km",
@@ -110,9 +110,9 @@
     "mph": "mph"
   },
   "labels": {
-    "date": "Date",
-    "user": "User",
-    "content": "Content",
+    "date": "Data",
+    "user": "Usuari",
+    "content": "Contingut",
     "platform": "Platform",
     "location": "Location",
     "ipAddress": "IP Address",
