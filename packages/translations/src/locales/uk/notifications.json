@@ -73,7 +73,7 @@
         "message": "The notification agent has been removed"
       },
       "jobCompleted": {
-        "title": "Job Completed",
+        "title": "Завдання завершене",
         "message": "{{name}} успішно завершено"
       },
       "ruleCreated": {
