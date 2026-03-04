@@ -62,7 +62,7 @@
     "retry": "Повторити",
     "starting": "Starting Tailscale...",
     "stopping": "Зупинка Tailscale...",
-    "awaitingAuth": "Очікування авторизації Plex...",
+    "awaitingAuth": "Очікування авторизації...",
     "authorize": "Авторизація в Tailscale",
     "connected": "Tailscale підключено. Ваш екземпляр Tracearr доступний у мережі Tailnet.",
     "hostname": "Hostname",
