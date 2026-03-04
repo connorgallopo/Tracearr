@@ -29,21 +29,21 @@
     "invalidPairingRequest": "Invalid pairing request. Check your token."
   },
   "settings": {
-    "preferences": "Preferences",
+    "preferences": "Налаштування",
     "community": "Community",
     "discord": "Discord",
     "joinCommunity": "Join the community",
     "github": "GitHub",
     "viewSourceCode": "View source code",
-    "account": "Account",
-    "disconnectServer": "Disconnect Server",
+    "account": "Обліковий запис",
+    "disconnectServer": "Відключити сервер",
     "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
     "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
     "currentlyConnected": "Currently connected to {{serverName}}"
   },
   "navigation": {
-    "selectServer": "Select Server",
-    "server": "Server",
+    "selectServer": "Виберіть сервер",
+    "server": "Сервер",
     "navigation": "Navigation"
   },
   "resources": {
