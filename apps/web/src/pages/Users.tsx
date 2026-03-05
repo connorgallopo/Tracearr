@@ -46,6 +46,7 @@ export function Users() {
           return display || row.username;
         },
         sortingFn: 'alphanumeric',
+
         cell: ({ row }) => {
           const user = row.original;
           const avatarUrl = getAvatarUrl(user.serverId, user.thumbUrl, 40);
@@ -76,6 +77,19 @@ export function Users() {
             </div>
           );
         },
+      },
+      {
+        id: 'searchableName',
+        accessorFn: (row) => {
+          const identity = row.identityName?.trim() ?? '';
+          return `${identity} ${row.username}`.toLowerCase();
+        },
+        filterFn: 'includesString',
+        enableSorting: false, // don't show in UI
+        enableHiding: true,
+        enableColumnFilter: true,
+        header: () => null,
+        cell: () => null
       },
       {
         accessorKey: 'trustScore',
@@ -198,7 +212,7 @@ export function Users() {
               pageCount={totalPages}
               page={page}
               onPageChange={setPage}
-              filterColumn="username"
+              filterColumn="searchableName"
               filterValue={searchFilter}
               onRowClick={(user) => {
                 void navigate(`/users/${user.id}`);
