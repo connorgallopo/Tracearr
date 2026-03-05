@@ -138,7 +138,7 @@
       "acknowledged": "Підтверджено",
       "detected": "Виявлено",
       "inactivity": "Inactivity Details",
-      "daysInactive": "Days Inactive",
+      "daysInactive": "Дні неактивності",
       "threshold": "Threshold",
       "lastActivity": "Остання активність",
       "neverActive": "Ніколи не активний"
@@ -279,7 +279,7 @@
       "testAgent": "Test Agent",
       "removeAgentTitle": "Видалити {{name}}?",
       "removeAgentDesc": "Це видалить {{name}} та вимкне всі його сповіщення. Ви зможете додати його знову пізніше.",
-      "webhookAgents": "Webhook Agents",
+      "webhookAgents": "Вебхук агенти",
       "oneWebhookLimit": "Одночасно може бути активним лише один агент вебхука.",
       "currentlyConfigured": "{{name}} наразі налаштовано.",
       "allAgentsConfigured": "Усі агенти сповіщень уже налаштовані.",
