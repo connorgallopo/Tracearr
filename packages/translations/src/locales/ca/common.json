@@ -86,7 +86,7 @@
   "severity": {
     "low": "Reduïda",
     "warning": "Avís",
-    "high": "High"
+    "high": "Alta"
   },
   "time": {
     "now": "Ara",
@@ -121,7 +121,7 @@
     "progress": "Progrés",
     "status": "Estat",
     "rule": "Regla",
-    "media": "Media",
+    "media": "Multimèdia",
     "started": "Iniciat",
     "stopped": "Aturat",
     "joined": "S'ha unit",
@@ -131,7 +131,7 @@
     "unknown": "Desconegut",
     "never": "Mai",
     "when": "Quan",
-    "severity": "Severity",
+    "severity": "Severitat",
     "type": "Tipus",
     "reason": "Motiu",
     "actions": "Accions",
@@ -222,7 +222,7 @@
     "usersAdded_other": "{{count}} users added",
     "usersUpdated_one": "{{count}} user updated",
     "usersUpdated_other": "{{count}} users updated",
-    "library_one": "{{count}} library",
+    "library_one": "{{count}} biblioteca",
     "library_other": "{{count}} libraries",
     "error_one": "{{count}} error",
     "error_other": "{{count}} errors"
