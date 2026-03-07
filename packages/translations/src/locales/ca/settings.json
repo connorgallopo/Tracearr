@@ -25,8 +25,8 @@
     "helpTranslate": "Ajudeu a traduir Tracearr",
     "timeFormat": "Format d'hora",
     "timeFormatDescription": "Choose how times are displayed.",
-    "timeFormat12h": "12-hour (1:30 PM)",
-    "timeFormat24h": "24-hour (13:30)"
+    "timeFormat12h": "12 hores (1:30 PM)",
+    "timeFormat24h": "24 hores (13:30)"
   },
   "servers": {
     "title": "Connected Servers",
