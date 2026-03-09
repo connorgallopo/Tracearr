@@ -3,13 +3,13 @@
     "welcome": "Benvingut a Tracearr",
     "addServer": "Afegeix un servidor",
     "connectToServer": "Connecta a un servidor",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
+    "enterServerDetails": "Introduïu l'URL del vostre servidor Tracearr i el testimoni d'accés mòbil",
     "serverUrl": "URL del servidor",
-    "accessToken": "Access Token",
+    "accessToken": "Testimoni d'accés",
     "scanQrCodeInstead": "En comptes d'això escaneja el codi QR",
-    "enterManually": "Enter URL and Token Manually",
+    "enterManually": "Introduïu l'URL i el testimoni manualment",
     "cameraPermissionRequired": "Cal permís de càmera per escanejar codis QR",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "scanQrInstructions": "Obriu la configuració → Aplicació mòbil al vostre tauler de control de Tracearr i escanegeu el codi QR"
   },
   "errors": {
     "missingFields": "Missing Fields",
