@@ -446,14 +446,13 @@ export abstract class BaseMediaServerClient
     header?: string,
     timeoutMs?: number
   ): Promise<boolean> {
-    const params = new URLSearchParams();
-    params.append('Text', text);
-    if (header) params.append('Header', header);
-    if (timeoutMs) params.append('TimeoutMs', String(timeoutMs));
-
-    const response = await fetch(`${this.baseUrl}/Sessions/${sessionId}/Message?${params}`, {
+    const response = await fetch(`${this.baseUrl}/Sessions/${sessionId}/Message`, {
       method: 'POST',
-      headers: this.buildHeaders(),
+      body: JSON.stringify({ Text: text, Header: header, TimeoutMs: timeoutMs }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.buildHeaders(),
+      },
     });
 
     // Best-effort: don't fail if client doesn't support messages or session ended
