@@ -63,9 +63,9 @@
     "backToUsers": "Back to Users",
     "userNotFound": "User not found",
     "userInfo": "User Info",
-    "statistics": "Statistics",
+    "statistics": "Estadí­stiques",
     "sessions": "Sessions",
-    "violations": "Violations",
+    "violations": "Incompliments",
     "locations": "Locations",
     "terminationHistory": "Termination History",
     "noSessionsFound": "No sessions found for this user.",
@@ -76,10 +76,10 @@
     "unknownRule": "Unknown rule"
   },
   "history": {
-    "title": "History",
+    "title": "Històric",
     "description": "Browse all streaming sessions with powerful filtering",
     "loadingMore": "Loading more...",
-    "scrollForMore": "Scroll for more",
+    "scrollForMore": "Desplaceu-vos per veure més",
     "showingAllResults": "Showing all {{total}} results",
     "deleteSession_one": "Delete {{count}} Session",
     "deleteSession_other": "Delete {{count}} Sessions",
@@ -94,7 +94,7 @@
     "noShowPlays": "No TV show plays in this period"
   },
   "activity": {
-    "title": "Activity",
+    "title": "Activitat",
     "description": "Play trends, patterns, and streaming behavior",
     "playsOverTime": "Plays Over Time",
     "concurrentStreams": "Concurrent Streams",
@@ -127,25 +127,25 @@
     "detail": {
       "notFound": "Violation not found",
       "violationDetails": "Violation Details",
-      "userInfo": "User",
+      "userInfo": "Usuari",
       "sessions": "Sessions",
       "noSessions": "No sessions associated with this violation",
       "trigger": "Trigger",
       "map": "Session Locations",
       "actions": "Actions Taken",
-      "timestamps": "Timestamps",
+      "timestamps": "Marca de temps",
       "created": "Created",
       "acknowledged": "Confirmat",
       "detected": "Detected",
       "inactivity": "Inactivity Details",
       "daysInactive": "Days Inactive",
       "threshold": "Threshold",
-      "lastActivity": "Last Activity",
+      "lastActivity": "Darrera activitat",
       "neverActive": "Never active"
     }
   },
   "rules": {
-    "title": "Rules",
+    "title": "Regles",
     "description": "Configure detection rules for account sharing and policy violations",
     "addRule": "Add Rule",
     "createRule": "Create Rule",
