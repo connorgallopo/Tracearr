@@ -10,13 +10,13 @@
   "violations": "Incompliments",
   "alerts": "Alertes",
   "settings": "Configuració",
-  "overview": "Overview",
-  "quality": "Quality",
-  "storage": "Storage",
-  "watch": "Watch",
-  "performance": "Performance",
-  "devices": "Devices",
+  "overview": "Visió general",
+  "quality": "Qualitat",
+  "storage": "Emmagatzematge",
+  "watch": "Reproduccions",
+  "performance": "Rendiment",
+  "devices": "Dispositius",
   "bandwidth": "Amplada de banda",
-  "jobs": "Jobs",
-  "accessControl": "Access Control"
+  "jobs": "Tasques",
+  "accessControl": "Control d'accés"
 }
