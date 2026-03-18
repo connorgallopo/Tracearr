@@ -307,6 +307,18 @@
     "startingTitle": "Tracearr is starting up...",
     "interruptionTitle": "Service interruption",
     "startingDescription": "The server is waiting for backend services to become available. This page will automatically refresh when everything is ready.",
-    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored."
+    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored.",
+    "restoreTitle": "Restoring from backup...",
+    "restoreFailed": "Restore failed",
+    "restorePhase": {
+      "validating": "Validating backup",
+      "creating_restore_point": "Creating restore point",
+      "shutting_down": "Shutting down services",
+      "restoring_database": "Restoring database",
+      "running_migrations": "Running migrations",
+      "rebuilding_aggregates": "Rebuilding aggregates",
+      "restarting": "Restarting services",
+      "complete": "Restore complete"
+    }
   }
 }
