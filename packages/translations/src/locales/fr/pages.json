@@ -307,6 +307,18 @@
     "startingTitle": "Démarrage de Tracearr...",
     "interruptionTitle": "Interruption de service",
     "startingDescription": "Le serveur attend que les services backend soient disponibles. Cette page s’actualisera automatiquement quand tout sera prêt.",
-    "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie."
+    "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie.",
+    "restoreTitle": "Restoring from backup...",
+    "restoreFailed": "Restore failed",
+    "restorePhase": {
+      "validating": "Validating backup",
+      "creating_restore_point": "Creating restore point",
+      "shutting_down": "Shutting down services",
+      "restoring_database": "Restoring database",
+      "running_migrations": "Running migrations",
+      "rebuilding_aggregates": "Rebuilding aggregates",
+      "restarting": "Restarting services",
+      "complete": "Restore complete"
+    }
   }
 }
