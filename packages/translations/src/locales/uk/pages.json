@@ -308,17 +308,17 @@
     "interruptionTitle": "Service interruption",
     "startingDescription": "Сервер очікує на доступність внутрішніх служб. Ця сторінка автоматично оновиться, коли все буде готове.",
     "interruptionDescription": "Один або декілька внутрішніх сервісів стали недоступними. Ця сторінка автоматично оновиться після відновлення з’єднання.",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "restoreTitle": "Відновлення з резервної копії...",
+    "restoreFailed": "Не вдалося відновити",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
+      "validating": "Перевірка резервної копії",
+      "creating_restore_point": "Створення точки відновлення",
       "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
+      "restoring_database": "Відновлення бази даних",
       "running_migrations": "Running migrations",
       "rebuilding_aggregates": "Rebuilding aggregates",
       "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "complete": "Відновлення завершено"
     }
   }
 }
