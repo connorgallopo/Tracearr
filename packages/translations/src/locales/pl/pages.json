@@ -307,6 +307,18 @@
     "startingTitle": "Tracearr jest uruchamiany...",
     "interruptionTitle": "Przerwa w działaniu usługi",
     "startingDescription": "Serwer oczekuje, aż usługi backendu staną się dostępne. Ta strona zostanie automatycznie odświeżona, gdy wszystko będzie gotowe.",
-    "interruptionDescription": "Jedna lub więcej usług backendu stała się niedostępna. Ta strona zostanie automatycznie odświeżona, gdy połączenie zostanie przywrócone."
+    "interruptionDescription": "Jedna lub więcej usług backendu stała się niedostępna. Ta strona zostanie automatycznie odświeżona, gdy połączenie zostanie przywrócone.",
+    "restoreTitle": "Restoring from backup...",
+    "restoreFailed": "Restore failed",
+    "restorePhase": {
+      "validating": "Validating backup",
+      "creating_restore_point": "Creating restore point",
+      "shutting_down": "Shutting down services",
+      "restoring_database": "Restoring database",
+      "running_migrations": "Running migrations",
+      "rebuilding_aggregates": "Rebuilding aggregates",
+      "restarting": "Restarting services",
+      "complete": "Restore complete"
+    }
   }
 }
