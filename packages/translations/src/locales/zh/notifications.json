@@ -2,261 +2,261 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "服务器已添加",
-        "message": "{{name}}已成功连接"
+        "title": "已新增伺服器",
+        "message": "{{name}} 已成功連接"
       },
       "serverRemoved": {
-        "title": "服务器已删除",
-        "message": "服务器已成功删除"
+        "title": "已移除伺服器",
+        "message": "已成功刪除伺服器"
       },
       "serverSynced": {
-        "title": "服务器同步",
-        "message": "服务器数据已同步"
+        "title": "已同步伺服器",
+        "message": "已同步伺服器資料"
       },
       "settingsUpdated": {
-        "title": "设置已更新",
-        "message": "您的设置已保存"
+        "title": "已更新設定",
+        "message": "已儲存你的設定"
       },
       "tokenCopied": {
-        "title": "Token已复制",
-        "message": "配对令牌已复制到剪贴板"
+        "title": "已複製憑證",
+        "message": "已複製配對憑證到剪貼簿"
       },
       "violationAcknowledged": {
-        "title": "确认违约行为",
-        "message": "违法行为已被标记为已确认"
+        "title": "已確認違規行為",
+        "message": "違規行為已被標記為已確認"
       },
       "violationDismissed": {
-        "title": "丢弃的违规行为",
-        "message": "违法行为已被拒绝"
+        "title": "違規撤銷",
+        "message": "違規行為已被撤銷"
       },
       "deviceRemoved": {
-        "title": "设备已移除",
-        "message": "设备连接已断开"
+        "title": "已移除裝置",
+        "message": "設備已中斷連接"
       },
       "deviceRenamed": {
-        "title": "设备已重命名",
-        "message": "设备名称已更新"
+        "title": "已重新命名裝置",
+        "message": "已更新裝置名稱"
       },
       "sessionsRevoked": {
-        "title": "会话已取消",
-        "message": "所有移动会话已被撤销"
+        "title": "會話已取消",
+        "message": "所有行動裝置的會話已被撤銷"
       },
       "loggedIn": {
         "title": "成功",
-        "message": "登录成功"
+        "message": "成功登入"
       },
       "webhookTest": {
-        "title": "测试成功",
-        "message": "Webhook 正常工作"
+        "title": "測試成功",
+        "message": "Webhook 正常運作"
       },
       "copiedToClipboard": {
-        "title": "已复制到剪贴板"
+        "title": "已複製到剪貼簿"
       },
       "plexAccountLinked": {
-        "title": "Plex 账户已链接",
-        "message": "您现在可以从Plex帐户添加服务器"
+        "title": "已連接 Plex 帳號",
+        "message": "你現在可以從 Plex 帳號新增伺服器"
       },
       "plexAccountUnlinked": {
-        "title": "Plex账户未链接",
-        "message": "您的Plex帐户已断开连接"
+        "title": "未連接 Plex 帳號",
+        "message": "你的 Plex 帳號已中斷連接"
       },
       "agentAdded": {
-        "title": "代理已添加",
-        "message": "通知代理已添加"
+        "title": "已新增代理",
+        "message": "已新增通知代理"
       },
       "agentUpdated": {
-        "title": "代理已更新",
-        "message": "通知代理已更新"
+        "title": "已更新代理",
+        "message": "已更新通知代理"
       },
       "agentRemoved": {
-        "title": "代理已删除",
-        "message": "通知代理已被删除"
+        "title": "已移除代理",
+        "message": "已移除通知代理"
       },
       "jobCompleted": {
-        "title": "任务已完成",
-        "message": "{{name}}成功完成"
+        "title": "任務已完成",
+        "message": "{{name}} 成功完成"
       },
       "ruleCreated": {
-        "title": "规则已创建",
-        "message": "已成功创建规则"
+        "title": "已建立規則",
+        "message": "已成功建立規則"
       },
       "ruleUpdated": {
-        "title": "规则已更新",
-        "message": "规则已成功更新"
+        "title": "已更新規則",
+        "message": "已成功更新規則"
       },
       "ruleDeleted": {
-        "title": "规则已删除",
-        "message": "规则已成功删除"
+        "title": "已刪除規則",
+        "message": "已成功刪除規則"
       },
       "streamTerminated": {
-        "title": "流已终止",
-        "message": "播放会话已停止"
+        "title": "已終止串流",
+        "message": "已停止播放會話"
       },
       "serverUrlUpdated": {
-        "title": "服务器URL已更新",
-        "message": "服务器URL已成功更新"
+        "title": "已更新伺服器網址",
+        "message": "已成功更新伺服器網址"
       },
       "serverUpdated": {
-        "title": "服务器更新",
-        "message": "该服务器被成功删除"
+        "title": "已更新伺服器",
+        "message": "已成功更新伺服器"
       },
       "syncCompletedWithErrors": {
-        "title": "同步完成时发生错误"
+        "title": "同步完成，但出現錯誤"
       },
       "sessionsDeleted": {
-        "title": "会话已删除",
-        "message_one": "{{count}}会话已删除",
-        "message_other": "{{count}}会话已删除"
+        "title": "已刪除會話",
+        "message_one": "已刪除 {{count}} 個會話",
+        "message_other": "已刪除 {{count}} 個會話"
       },
       "violationsAcknowledged": {
-        "title": "确认违规行为",
-        "message_one": "{{count}}确认违规行为",
-        "message_other": "{{count}}确认违规行为"
+        "title": "已確認違規行為",
+        "message_one": "{{count}} 個已確認的違規行為",
+        "message_other": "{{count}} 個已確認的違規行為"
       },
       "violationsDismissed": {
-        "title": "违规情况已清除",
-        "message_one": "{{count}}违规情况已清除",
-        "message_other": "{{count}}违规情况已清除"
+        "title": "已撤銷違規",
+        "message_one": "已撤銷 {{count}} 個違規",
+        "message_other": "已撤銷 {{count}} 個違規"
       },
       "apiKeyGenerated": {
-        "title": "已生成API密钥",
-        "message": "您的新 API 密钥已准备好使用"
+        "title": "已生成 API 密鑰",
+        "message": "你的新 API 密鑰已準備好使用"
       },
       "mobileAccessEnabled": {
-        "title": "移动访问已启用",
-        "message": "使用 Tracearr 移动应用程序扫描二维码以连接"
+        "title": "已啟用移動裝置存取",
+        "message": "使用 Tracearr 手機應用程式掃描 QR 碼來連接"
       },
       "mobileAccessDisabled": {
-        "title": "移动访问已禁用",
-        "message": "所有移动会话已被撤销"
+        "title": "已停用移動裝置存取",
+        "message": "已撤銷所有移動裝置的會話"
       },
       "pairTokenGenerated": {
-        "title": "配对令牌已生成",
-        "message": "用您的移动设备扫描二维码进行配对"
+        "title": "已生成配對憑證",
+        "message": "使用你的移動裝置掃描 QR 碼來進行配對"
       },
       "displayNameUpdated": {
-        "title": "已更新显示名称"
+        "title": "已更新顯示名稱"
       },
       "trustScoresReset": {
-        "title": "重置信任分数",
-        "message_one": "{{count}}用户重置为100",
-        "message_other": "{{count}}用户重置为100"
+        "title": "重置信任分數",
+        "message_one": "{{count}} 個使用者重置為 100",
+        "message_other": "{{count}} 個使用者重置為 100"
       },
       "claimCodeValidated": {
-        "title": "验证认领码",
-        "message": "您现在可以继续设置"
+        "title": "已驗證申請碼",
+        "message": "你現在可以繼續設定"
       }
     },
     "error": {
-      "serverAddFailed": "添加服务器失败",
-      "serverRemoveFailed": "删除服务器失败",
-      "serverSyncFailed": "同步服务器失败",
-      "settingsUpdateFailed": "更新设置失败",
-      "copyFailed": "无法复制到剪贴板",
-      "acknowledgeFailed": "无法识别违反行为",
-      "dismissFailed": "未能删除违规行为",
-      "authFailed": "验证失败",
-      "webhookTestFailed": "Webhook 测试失败",
-      "ruleCreateFailed": "创建规则失败",
-      "ruleUpdateFailed": "更新规则失败",
-      "ruleDeleteFailed": "删除规则失败",
-      "streamTerminateFailed": "终止流失败",
-      "serverUrlUpdateFailed": "无法更新服务器 URL",
-      "serverUpdateFailed": "更新服务器失败",
-      "serverReorderFailed": "服务器重新排序失败",
-      "sessionsDeleteFailed": "删除会话失败",
-      "apiKeyGenerateFailed": "API 密钥重置失败",
-      "mobileAccessEnableFailed": "启用移动访问失败",
-      "mobileAccessDisableFailed": "禁用移动访问失败",
-      "pairTokenGenerateFailed": "生成配对令牌失败",
-      "deviceRemoveFailed": "无法删除设备",
-      "deviceRenameFailed": "无法重命名设备",
-      "sessionsRevokeFailed": "撤销会话失败",
-      "displayNameUpdateFailed": "更新显示名失败",
-      "trustScoresResetFailed": "重置信任分失败",
-      "routingUpdateFailed": "更新路由失败",
-      "clipboardFailed": "复制到剪贴板失败",
-      "plexUnlinkFailed": "取消链接Plex帐户失败",
-      "agentAddFailed": "添加代理失败",
-      "agentUpdateFailed": "更新代理失败",
-      "agentRemoveFailed": "移除代理失败",
-      "agentTestFailed": "测试失败",
-      "jobAlreadyRunning": "任务已在运行",
-      "jobStartFailed": "启动任务失败",
-      "jobLoadFailed": "加载维护任务失败",
-      "invalidUrl": "无效的 URL",
-      "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
+      "serverAddFailed": "無法新增伺服器",
+      "serverRemoveFailed": "無法移除伺服器",
+      "serverSyncFailed": "無法同步伺服器",
+      "settingsUpdateFailed": "無法更新設定",
+      "copyFailed": "無法複製到剪貼簿",
+      "acknowledgeFailed": "無法辨識違規行為",
+      "dismissFailed": "無法排除違規",
+      "authFailed": "認證失敗",
+      "webhookTestFailed": "Webhook 測試失敗",
+      "ruleCreateFailed": "無法建立規則",
+      "ruleUpdateFailed": "無法更新規則",
+      "ruleDeleteFailed": "無法刪除規則",
+      "streamTerminateFailed": "無法終止串流",
+      "serverUrlUpdateFailed": "無法更新伺服器網址",
+      "serverUpdateFailed": "無法更新伺服器",
+      "serverReorderFailed": "無法重新排序伺服器",
+      "sessionsDeleteFailed": "無法刪除會話",
+      "apiKeyGenerateFailed": "無法生成 API 金鑰",
+      "mobileAccessEnableFailed": "無法啟用移動裝置存取",
+      "mobileAccessDisableFailed": "無法停用移動裝置存取",
+      "pairTokenGenerateFailed": "無法生成配對憑證",
+      "deviceRemoveFailed": "無法移除裝置",
+      "deviceRenameFailed": "無法重新命名裝置",
+      "sessionsRevokeFailed": "無法撤銷會話",
+      "displayNameUpdateFailed": "無法更新顯示名稱",
+      "trustScoresResetFailed": "無法重置信任分數",
+      "routingUpdateFailed": "無法更新路由",
+      "clipboardFailed": "無法複製到剪貼簿",
+      "plexUnlinkFailed": "無法取消連接 Plex 帳號",
+      "agentAddFailed": "無法新增代理",
+      "agentUpdateFailed": "無法更新代理",
+      "agentRemoveFailed": "無法移除代理",
+      "agentTestFailed": "測試失敗",
+      "jobAlreadyRunning": "任務已在運行",
+      "jobStartFailed": "無法啟動任務",
+      "jobLoadFailed": "無法加載維護任務",
+      "invalidUrl": "無效的網址",
+      "plexDirectUrl": "plex.direct URL 是中繼位址，這裡不能使用。請改用直接 IP 位址或主機名稱。",
       "invalidClaimCode": {
-        "title": "无效的索赔码",
-        "message": "请检查服务器日志"
+        "title": "無效的申請碼",
+        "message": "請檢查伺服器日誌"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "任务失败",
-        "message": "{{name}} 遇到错误"
+        "title": "任務失敗",
+        "message": "{{name}} 遇到錯誤"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "新流已开始",
-        "message": "{{user}}开始观看{{media}}"
+        "title": "新的串流已開始",
+        "message": "{{user}} 開始觀看 {{media}}"
       },
       "streamStopped": {
-        "title": "流停止",
-        "message": "{{user}}停止观看"
+        "title": "串流已停止",
+        "message": "{{user}} 停止觀看"
       },
       "updateAvailable": {
-        "title": "有可用更新",
-        "message": "Tracearr{{version}}可用"
+        "title": "有可用的更新",
+        "message": "Tracearr {{version}} 可用"
       },
       "serverOffline": {
-        "title": "服务器离线",
-        "message": "{{name}} 无法联系"
+        "title": "伺服器離線",
+        "message": "{{name}} 無法連接"
       },
       "serverOnline": {
-        "title": "服务器在线",
-        "message": "{{name}} 已经上线了"
+        "title": "伺服器在線",
+        "message": "{{name}} 重新上線"
       },
       "violationDetected": {
-        "title": "新违规：{{ruleName}}",
-        "message": "{{user}} 触发了 {{ruleType}}"
+        "title": "新違規：{{ruleName}}",
+        "message": "{{user}} 觸發了 {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "检测到共享违约行为",
-    "streamStarted": "流开始",
-    "streamEnded": "流结束",
-    "serverDown": "服务器连接丢失",
-    "serverUp": "服务器已重新上线",
-    "newDevice": "新设备",
-    "trustScoreChanged": "信任分数已更改"
+    "violationDetected": "偵測到共享違規行為",
+    "streamStarted": "串流已開始",
+    "streamEnded": "串流已結束",
+    "serverDown": "與伺服器連線中斷",
+    "serverUp": "伺服器已重新上線",
+    "newDevice": "新裝置",
+    "trustScoreChanged": "已更改信任分數"
   },
   "settings": {
-    "title": "通知设置",
-    "allSeverity": "所有(下, 警告, 高)",
-    "warningAndHigh": "仅警告和高",
-    "highOnly": "仅限高严重度",
-    "allTypes": "全部类型",
-    "rateLimit": "当前速率限制状态",
-    "perMinute": "每分钟",
-    "perHour": "每小时",
-    "enablePushNotifications": "启用推送通知",
+    "title": "通知設定",
+    "allSeverity": "所有 (低,警告,高)",
+    "warningAndHigh": "僅警告和高",
+    "highOnly": "僅限高嚴重度",
+    "allTypes": "所有類型",
+    "rateLimit": "當前速率限制狀態",
+    "perMinute": "每分鐘",
+    "perHour": "每小時",
+    "enablePushNotifications": "啟用推送通知",
     "notificationEvents": "通知事件",
-    "violationDetected": "检测到违规事件",
-    "streamStarted": "流开始",
-    "streamStopped": "流停止",
-    "concurrentStreams": "同步流",
-    "newDevice": "新设备",
-    "trustScoreChanged": "信任得分已更改",
-    "serverDown": "服务器关闭",
-    "serverUp": "服务器已启动",
-    "violationFilters": "违规过滤器",
-    "minimumSeverity": "最小的严重级别",
-    "quietHours": "安静时段",
-    "enableQuietHours": "启用安静时间",
-    "overrideForCritical": "覆盖临界值",
+    "violationDetected": "檢測到違規",
+    "streamStarted": "串流已開始",
+    "streamStopped": "串流已停止",
+    "concurrentStreams": "並行串流",
+    "newDevice": "新裝置",
+    "trustScoreChanged": "信任分數已更改",
+    "serverDown": "伺服器離線",
+    "serverUp": "伺服器上線",
+    "violationFilters": "違規篩選器",
+    "minimumSeverity": "最小的嚴重程度",
+    "quietHours": "勿擾時段",
+    "enableQuietHours": "啟用勿擾時段",
+    "overrideForCritical": "覆蓋臨界值",
     "rateLimiting": "速率限制"
   }
 }
