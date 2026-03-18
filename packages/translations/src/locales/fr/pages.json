@@ -312,13 +312,13 @@
     "restoreFailed": "Restore failed",
     "restorePhase": {
       "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
+      "creating_restore_point": "Création d'un point de restauration",
+      "shutting_down": "Arrêt des services",
+      "restoring_database": "Restauration de la base de données",
       "running_migrations": "Running migrations",
       "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "restarting": "Redémarrage des services",
+      "complete": "Restauration complète"
     }
   }
 }
