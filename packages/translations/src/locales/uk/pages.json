@@ -307,6 +307,18 @@
     "startingTitle": "Tracearr запускається...",
     "interruptionTitle": "Service interruption",
     "startingDescription": "Сервер очікує на доступність внутрішніх служб. Ця сторінка автоматично оновиться, коли все буде готове.",
-    "interruptionDescription": "Один або декілька внутрішніх сервісів стали недоступними. Ця сторінка автоматично оновиться після відновлення з’єднання."
+    "interruptionDescription": "Один або декілька внутрішніх сервісів стали недоступними. Ця сторінка автоматично оновиться після відновлення з’єднання.",
+    "restoreTitle": "Restoring from backup...",
+    "restoreFailed": "Restore failed",
+    "restorePhase": {
+      "validating": "Validating backup",
+      "creating_restore_point": "Creating restore point",
+      "shutting_down": "Shutting down services",
+      "restoring_database": "Restoring database",
+      "running_migrations": "Running migrations",
+      "rebuilding_aggregates": "Rebuilding aggregates",
+      "restarting": "Restarting services",
+      "complete": "Restore complete"
+    }
   }
 }
