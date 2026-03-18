@@ -307,6 +307,18 @@
     "startingTitle": "Tracearr opstarten...",
     "interruptionTitle": "Dienstonderbreking",
     "startingDescription": "De server wacht op de beschikbaarheid van achtergronddiensten. De pagina ververst automatisch wanneer alles klaar is.",
-    "interruptionDescription": "Een of meerdere achtergronddiensten zijn niet meer beschikbaar. De pagina ververst automatisch wanneer de verbinding is hesteld."
+    "interruptionDescription": "Een of meerdere achtergronddiensten zijn niet meer beschikbaar. De pagina ververst automatisch wanneer de verbinding is hesteld.",
+    "restoreTitle": "Restoring from backup...",
+    "restoreFailed": "Restore failed",
+    "restorePhase": {
+      "validating": "Validating backup",
+      "creating_restore_point": "Creating restore point",
+      "shutting_down": "Shutting down services",
+      "restoring_database": "Restoring database",
+      "running_migrations": "Running migrations",
+      "rebuilding_aggregates": "Rebuilding aggregates",
+      "restarting": "Restarting services",
+      "complete": "Restore complete"
+    }
   }
 }
