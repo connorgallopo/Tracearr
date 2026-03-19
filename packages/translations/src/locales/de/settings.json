@@ -165,7 +165,7 @@
   "backup": {
     "title": "Backup",
     "backToBackups": "Back to Backups",
-    "description": "Backups are saved to {{backupDir}} inside the container. Use a Docker bind mount to persist them to your host.",
+    "description": "Backup and restore your Tracearr data",
     "createBackup": "Create Backup",
     "creating": "Creating backup...",
     "uploadBackup": "Upload Backup",
