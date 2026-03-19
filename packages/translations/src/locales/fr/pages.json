@@ -309,7 +309,7 @@
     "startingDescription": "Le serveur attend que les services backend soient disponibles. Cette page s’actualisera automatiquement quand tout sera prêt.",
     "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie.",
     "restoreTitle": "Restauration de la sauvegarde...",
-    "restoreFailed": "Restore failed",
+    "restoreFailed": "Échec de la restauration",
     "restorePhase": {
       "validating": "Validation de la sauvegarde",
       "creating_restore_point": "Création d'un point de restauration",
