@@ -165,7 +165,7 @@
   "backup": {
     "title": "Copia de seguridad",
     "backToBackups": "Volver a Copias de Seguridad",
-    "description": "Las copias de seguridad se guardan en {{backupDir}} dentro del contenedor. Usa un punto de montaje Docker para persistirlas en tu host local.",
+    "description": "Backup and restore your Tracearr data",
     "createBackup": "Crear copia de seguridad",
     "creating": "Creando copia de seguridad...",
     "uploadBackup": "Subir copia de seguridad",
