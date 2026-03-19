@@ -315,7 +315,7 @@
       "creating_restore_point": "Création d'un point de restauration",
       "shutting_down": "Arrêt des services",
       "restoring_database": "Restauration de la base de données",
-      "running_migrations": "Running migrations",
+      "running_migrations": "Exécutions de migrations",
       "rebuilding_aggregates": "Rebuilding aggregates",
       "restarting": "Redémarrage des services",
       "complete": "Restauration complète"
