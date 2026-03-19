@@ -165,7 +165,7 @@
   "backup": {
     "title": "备份",
     "backToBackups": "返回备份",
-    "description": "备份保存在容器内的 {{backupDir}}。使用 Docker 绑定挂载将其持久化到您的主机上。",
+    "description": "Backup and restore your Tracearr data",
     "createBackup": "创建备份",
     "creating": "正在创建备份……",
     "uploadBackup": "上传备份",
