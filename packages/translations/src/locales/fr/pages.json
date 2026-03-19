@@ -308,10 +308,10 @@
     "interruptionTitle": "Interruption de service",
     "startingDescription": "Le serveur attend que les services backend soient disponibles. Cette page s’actualisera automatiquement quand tout sera prêt.",
     "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie.",
-    "restoreTitle": "Restoring from backup...",
+    "restoreTitle": "Restauration de la sauvegarde...",
     "restoreFailed": "Restore failed",
     "restorePhase": {
-      "validating": "Validating backup",
+      "validating": "Validation de la sauvegarde",
       "creating_restore_point": "Création d'un point de restauration",
       "shutting_down": "Arrêt des services",
       "restoring_database": "Restauration de la base de données",
