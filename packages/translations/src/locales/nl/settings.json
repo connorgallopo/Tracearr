@@ -165,7 +165,7 @@
   "backup": {
     "title": "Backup",
     "backToBackups": "Terug naar Backups",
-    "description": "Backups worden opgeslagen in {{backupDir}} in de container. Gebruik een Docker bind mount om ze permanent op je host te bewaren.",
+    "description": "Backup and restore your Tracearr data",
     "createBackup": "Backup Maken",
     "creating": "Backup aan het maken...",
     "uploadBackup": "Upload Backup",
