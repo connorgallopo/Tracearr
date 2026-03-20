@@ -316,7 +316,7 @@
       "shutting_down": "Arrêt des services",
       "restoring_database": "Restauration de la base de données",
       "running_migrations": "Exécutions de migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
+      "rebuilding_aggregates": "Reconstruction des agrégats",
       "restarting": "Redémarrage des services",
       "complete": "Restauration complète"
     }
