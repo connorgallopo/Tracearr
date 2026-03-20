@@ -9,7 +9,7 @@
     "advanced": "Avancé",
     "jobs": "Tâches",
     "accessControl": "Contrôle d'accès",
-    "backup": "Backup"
+    "backup": "Sauvegarde"
   },
   "general": {
     "title": "Réglages généraux",
@@ -163,9 +163,9 @@
     "acknowledge": "Compris"
   },
   "backup": {
-    "title": "Backup",
+    "title": "Sauvegarde",
     "backToBackups": "Retour aux sauvegardes",
-    "description": "Backup and restore your Tracearr data",
+    "description": "Sauvegardez et restaurez vos données Tracearr",
     "createBackup": "Créer une sauvegarde",
     "creating": "Création de la sauvegarde...",
     "uploadBackup": "Téléverser une sauvegarde",
