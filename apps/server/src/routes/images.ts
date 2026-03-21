@@ -81,6 +81,8 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
       reply.header('X-Cache', 'MISS');
     }
 
+    // Allow public proxy images to be embedded by third-party dashboards.
+    reply.header('Cross-Origin-Resource-Policy', 'cross-origin');
     // Cache for 1 hour in browser, allow CDN caching
     reply.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
     reply.header('Content-Type', result.contentType);
@@ -115,6 +117,7 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
         fallback: 'avatar',
       });
 
+      reply.header('Cross-Origin-Resource-Policy', 'cross-origin');
       reply.header('Cache-Control', 'public, max-age=3600');
       reply.header('Content-Type', result.contentType);
       return reply.send(result.data);
@@ -129,6 +132,7 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
       fallback: 'avatar',
     });
 
+    reply.header('Cross-Origin-Resource-Policy', 'cross-origin');
     reply.header('Cache-Control', 'public, max-age=86400');
     reply.header('Content-Type', result.contentType);
     return reply.send(result.data);

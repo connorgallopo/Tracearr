@@ -8,6 +8,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
+import helmet from '@fastify/helmet';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 
@@ -29,6 +30,12 @@ async function buildTestApp(): Promise<FastifyInstance> {
 
   // Register sensible for HTTP error helpers
   await app.register(sensible);
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    originAgentCluster: false,
+  });
 
   // Register routes
   await app.register(imageRoutes, { prefix: '/images' });
@@ -75,6 +82,7 @@ describe('Image Routes', () => {
       expect(response.headers['content-type']).toBe('image/jpeg');
       expect(response.headers['x-cache']).toBe('MISS');
       expect(response.headers['cache-control']).toContain('public');
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
       expect(response.rawPayload).toEqual(mockImageData);
 
       // Verify service was called with defaults
@@ -311,6 +319,7 @@ describe('Image Routes', () => {
       expect(response.statusCode).toBe(200);
       expect(response.headers['content-type']).toBe('image/png');
       expect(response.headers['cache-control']).toContain('public');
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
       expect(response.rawPayload).toEqual(mockImageData);
 
       expect(mockProxyImage).toHaveBeenCalledWith({
@@ -367,6 +376,7 @@ describe('Image Routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.headers['cache-control']).toContain('public');
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
 
       expect(mockProxyImage).toHaveBeenCalledWith({
         serverId: 'fallback',
