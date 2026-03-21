@@ -198,7 +198,7 @@
     "scheduleDayOfWeek": "Jour de la semaine",
     "scheduleDayOfMonth": "Jour du mois",
     "scheduleDayOfMonthHint": "Pour les mois comportant moins de jours, la sauvegarde est effectuée le dernier jour du mois.",
-    "retentionCount": "Garder les dernières : ",
+    "retentionCount": "Garder les dernières :",
     "retentionSuffix": "sauvegardes planifiées",
     "daySun": "Dimanche",
     "dayMon": "Lundi",
