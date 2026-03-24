@@ -308,17 +308,17 @@
     "interruptionTitle": "服務中斷",
     "startingDescription": "伺服器正在等待後端服務可用。一切就緒後，此頁面將自動更新。",
     "interruptionDescription": "一個或多個後端服務目前無法使用。連線恢復後，此​​頁面將自動更新。",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "restoreTitle": "正在從備份還原……",
+    "restoreFailed": "還原失敗",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "validating": "驗證備份",
+      "creating_restore_point": "建立還原點",
+      "shutting_down": "停止服務",
+      "restoring_database": "還原資料庫",
+      "running_migrations": "執行遷移",
+      "rebuilding_aggregates": "正在重建合集",
+      "restarting": "重新啟動服務",
+      "complete": "還原完成"
     }
   }
 }
