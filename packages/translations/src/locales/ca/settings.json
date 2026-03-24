@@ -9,7 +9,7 @@
     "advanced": "Avançat",
     "jobs": "Tasques",
     "accessControl": "Control d'accés",
-    "backup": "Backup"
+    "backup": "Còpia de seguretat"
   },
   "general": {
     "title": "Configuració general",
@@ -66,13 +66,13 @@
     "awaitingAuth": "S'està esperant l'autorització...",
     "authorize": "Authorize in Tailscale",
     "connected": "Tailscale is connected. Your Tracearr instance is available on the tailnet.",
-    "hostname": "Hostname",
+    "hostname": "Nom del servidor",
     "dnsName": "DNS Name",
     "tailnetUrl": "URL",
-    "showLogs": "Show Logs",
-    "hideLogs": "Hide Logs",
+    "showLogs": "Mostra els registres",
+    "hideLogs": "Amaga els registres",
     "noLogs": "No log output available.",
-    "exitNodeNone": "None",
+    "exitNodeNone": "Cap",
     "exitNodeOffline": "(fora de línia)",
     "unknownError": "An unknown error occurred.",
     "disableConfirmTitle": "Disable Tailscale?",
@@ -100,7 +100,7 @@
   },
   "advanced": {
     "title": "Advanced Settings",
-    "externalUrl": "External URL",
+    "externalUrl": "URL extern",
     "trustProxy": "Trust Proxy Headers",
     "reverseProxy": "Reverse Proxy",
     "connectionScenarios": "Connection Scenarios"
@@ -113,7 +113,7 @@
     "importComplete": "Import Complete",
     "importFailed": "Import Failed",
     "processed": "Processed",
-    "page": "Page",
+    "page": "Pàgina",
     "imported": "Imported",
     "skipped": "Skipped",
     "enriched": "Enriched",
@@ -124,7 +124,7 @@
     "unlinkAccount": "Unlink Plex Account",
     "signInWithPlex": "Sign in with Plex",
     "signUpWithPlex": "Sign up with Plex",
-    "selectServer": "Select Server",
+    "selectServer": "Selecciona el servidor",
     "chooseServer": "Choose which Plex Media Server to monitor"
   },
   "jellyfin": {
