@@ -72,10 +72,10 @@ interface ServerBandwidthChartProps {
 function PollIntervalSelect({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
     <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-      <SelectTrigger className="h-6 w-[52px] text-xs">
+      <SelectTrigger className="h-6 w-[60px] text-xs">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[52px]">
+      <SelectContent>
         {POLL_OPTIONS.map((opt) => (
           <SelectItem key={opt.value} value={opt.value} className="text-xs">
             {opt.label}
