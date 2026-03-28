@@ -1,12 +1,9 @@
 function resolveBasePath(): string {
-  if (import.meta.env.DEV) {
-    return import.meta.env.BASE_URL.replace(/\/+$/, '');
-  }
   const baseEl = document.querySelector('base');
   if (baseEl) {
     return new URL(baseEl.href).pathname.replace(/\/+$/, '');
   }
-  return '';
+  return import.meta.env.BASE_URL.replace(/\/+$/, '');
 }
 
 /** e.g. "/tracearr" or "" */
