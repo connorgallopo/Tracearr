@@ -30,15 +30,8 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { api } from '@/lib/api';
+import { formatBytes } from '@/lib/formatters';
 import { useMaintenanceMode, MAINTENANCE_EVENT } from '@/hooks/useMaintenanceMode';
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -183,10 +176,10 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
             <div className="space-y-2">
               <div className="text-muted-foreground space-y-0.5 text-sm">
                 {databaseSize != null && (
-                  <p>{t('backup.databaseSize', { size: formatBytes(databaseSize) })}</p>
+                  <p>{t('backup.databaseSize', { size: formatBytes(databaseSize, 2) })}</p>
                 )}
                 {freeSpace != null && (
-                  <p>{t('backup.freeSpace', { size: formatBytes(freeSpace) })}</p>
+                  <p>{t('backup.freeSpace', { size: formatBytes(freeSpace, 2) })}</p>
                 )}
               </div>
               {lowDiskSpace && (
@@ -227,7 +220,7 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
                     {backups.map((backup) => (
                       <tr key={backup.filename} className="border-b last:border-0">
                         <td className="py-2 pr-4 font-mono text-xs">{backup.filename}</td>
-                        <td className="py-2 pr-4">{formatBytes(backup.size)}</td>
+                        <td className="py-2 pr-4">{formatBytes(backup.size, 2)}</td>
                         <td className="py-2 pr-4">{formatDate(backup.createdAt)}</td>
                         <td className="py-2 pr-4">{typeLabel(backup.type)}</td>
                         <td className="py-2 pr-4">{backup.metadata.app.version}</td>
@@ -347,7 +340,7 @@ function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClose: () 
           <dt className="text-muted-foreground">{t('backup.version')}</dt>
           <dd>{backup.metadata.app.version}</dd>
           <dt className="text-muted-foreground">{t('backup.restore.databaseSize')}</dt>
-          <dd>{formatBytes(backup.metadata.database.databaseSize)}</dd>
+          <dd>{formatBytes(backup.metadata.database.databaseSize, 2)}</dd>
           <dt className="text-muted-foreground">{t('backup.restore.sessions')}</dt>
           <dd>{backup.metadata.counts.sessions.toLocaleString()}</dd>
           <dt className="text-muted-foreground">{t('backup.restore.users')}</dt>
