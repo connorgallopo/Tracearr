@@ -225,11 +225,15 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   });
 
   // Handle requests without a Content-Type header.
-  // Some reverse proxies add Content-Length or Transfer-Encoding headers to bodyless
-  // requests (e.g. DELETE), which triggers Fastify's body parser and causes 415 errors.
-  app.addContentTypeParser('', { parseAs: 'string' }, (_req, body, done) => {
-    if (!(body as string).length) return done(null, undefined);
-    done(new Error('Content-Type header is required when sending a request body'), undefined);
+  // Some reverse proxies (e.g. Zoraxy with chunked transfer encoding enabled) replace
+  // Content-Length with Transfer-Encoding: chunked on bodyless requests. Fastify sees
+  // transfer-encoding, assumes there's a body to parse, and returns 415 because there's
+  // no Content-Type. Strip the proxy-injected header so Fastify correctly treats the
+  // request as bodyless.
+  app.addHook('onRequest', async (request) => {
+    if (!request.headers['content-type']) {
+      delete request.headers['transfer-encoding'];
+    }
   });
 
   // Maintenance gate hook — MUST be registered before rate limiter so it
