@@ -44,7 +44,7 @@
     "nowPlaying": "Aktive Streams",
     "streamLocations": "Stream-Standorte",
     "serverResources": "Server-Ressourcen",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Bandbreite",
     "noActiveStreams": "Keine aktiven Streams",
     "streamsAppearHere": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen"
   },
@@ -308,7 +308,7 @@
     "interruptionTitle": "Service-Unterbrechung",
     "startingDescription": "Der Server wartet darauf, dass Backend-Dienste verfügbar sind. Diese Seite wird automatisch aktualisiert, sobald alles bereit ist.",
     "interruptionDescription": "Ein oder mehrere Backend-Dienste sind nicht mehr verfügbar. Diese Seite wird automatisch aktualisiert, wenn die Verbindung wiederhergestellt wird.",
-    "restoreTitle": "Restoring from backup...",
+    "restoreTitle": "Wiederherstellen vom Backup...",
     "restoreFailed": "Restore failed",
     "restorePhase": {
       "validating": "Validating backup",
@@ -318,7 +318,7 @@
       "running_migrations": "Running migrations",
       "rebuilding_aggregates": "Rebuilding aggregates",
       "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "complete": "Wiederherstellung abgeschlossen"
     }
   }
 }
