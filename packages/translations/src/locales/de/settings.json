@@ -164,7 +164,7 @@
   },
   "backup": {
     "title": "Backup",
-    "backToBackups": "Back to Backups",
+    "backToBackups": "Zurück zu Backups",
     "description": "Backup and restore your Tracearr data",
     "createBackup": "Create Backup",
     "creating": "Creating backup...",
