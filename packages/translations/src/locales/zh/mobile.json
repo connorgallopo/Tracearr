@@ -1,60 +1,60 @@
 {
   "pair": {
-    "welcome": "欢迎使用 Tracearr",
-    "addServer": "添加服务器",
-    "connectToServer": "连接到服务器",
-    "enterServerDetails": "输入您的 Tracearr 服务器 URL 和移动访问令牌",
-    "serverUrl": "服务器 URL",
-    "accessToken": "访问口令",
-    "scanQrCodeInstead": "改为扫描二维码",
-    "enterManually": "手动输入 URL 和令牌",
-    "cameraPermissionRequired": "请授予相机权限以扫描二维码",
-    "scanQrInstructions": "在您的 Tracearr 仪表盘中打开设置 -> 移动应用程序并扫描二维码"
+    "welcome": "歡迎來到 Tracearr",
+    "addServer": "新增伺服器",
+    "connectToServer": "連接至伺服器",
+    "enterServerDetails": "請輸入你的 Tracearr 網址和手機存取憑證",
+    "serverUrl": "伺服器網址",
+    "accessToken": "存取憑證",
+    "scanQrCodeInstead": "改為掃描 QR 碼",
+    "enterManually": "請手動輸入網址和憑證",
+    "cameraPermissionRequired": "掃描 QR 碼需要相機權限",
+    "scanQrInstructions": "在你的 Tracearr 儀表板中打開設定 → 手機應用程式，並掃描 QR 碼"
   },
   "errors": {
-    "missingFields": "缺失必填字段",
-    "pleaseEnterBothFields": "请同时输入服务器 URL 和令牌",
-    "invalidUrl": "地址无效",
-    "serverUrlMustStartWith": "服务器 URL 必须以 http:// 或 https:// 开头",
-    "pleaseEnterValidUrl": "请输入一个有效的服务器 URL",
-    "pairingFailed": "配对失败",
-    "invalidQrCode": "无效的二维码",
-    "invalidQrCodeMissingData": "无效的二维码：缺少配对数据",
-    "invalidQrCodeFormat": "无效的二维码格式。请生成一个新的代码。",
-    "invalidQrCodeMissingUrl": "无效的二维码：缺少服务器 URL",
-    "invalidQrCodeMissingToken": "无效的二维码：缺少配对令牌",
-    "invalidServerUrlInQr": "QR码中无效的服务器 URL",
-    "tooManyPairingAttempts": "尝试配对太多。请等待几分钟。",
-    "invalidOrExpiredToken": "配对令牌无效或过期。",
-    "invalidPairingRequest": "无效配对请求。请检查您的令牌。"
+    "missingFields": "缺少欄位",
+    "pleaseEnterBothFields": "請輸入伺服器網址和憑證",
+    "invalidUrl": "無效的網址",
+    "serverUrlMustStartWith": "伺服器網址必須以 http:// 或 https:// 開頭",
+    "pleaseEnterValidUrl": "請輸入有效的伺服器網址",
+    "pairingFailed": "配對失敗",
+    "invalidQrCode": "無效的 QR 碼",
+    "invalidQrCodeMissingData": "無效的 QR 碼: 缺少配對資料",
+    "invalidQrCodeFormat": "無效的 QR 碼格式，請生成新的 QR 碼。",
+    "invalidQrCodeMissingUrl": "無效的 QR 碼: 缺少伺服器網址",
+    "invalidQrCodeMissingToken": "無效的 QR 碼: 缺少配對憑證",
+    "invalidServerUrlInQr": "QR 碼中具有無效的伺服器網址",
+    "tooManyPairingAttempts": "配對嘗試次數過多，請稍候幾分鐘。",
+    "invalidOrExpiredToken": "無效或過期的配對憑證。",
+    "invalidPairingRequest": "無效的配對請求，請確認你的憑證。"
   },
   "settings": {
-    "preferences": "首选项",
-    "community": "社区",
+    "preferences": "偏好設定",
+    "community": "社群",
     "discord": "Discord",
-    "joinCommunity": "加入社区",
+    "joinCommunity": "加入社群",
     "github": "GitHub",
-    "viewSourceCode": "查看源代码",
-    "account": "帐户",
-    "disconnectServer": "断开服务器",
-    "disconnectConfirm": "您确定要断开与“{{serverName}}”的连接吗？您需要重新配对才能使用该应用。",
-    "disconnectConfirmGeneric": "您确定要断开连接？您需要再次配对才能使用应用程序。",
-    "currentlyConnected": "当前连接到 {{serverName}}"
+    "viewSourceCode": "檢視原始碼",
+    "account": "帳號",
+    "disconnectServer": "斷開伺服器",
+    "disconnectConfirm": "你確定要與 {{serverName}} 斷開連線嗎？你需要重新配對才能使用這個應用程式。",
+    "disconnectConfirmGeneric": "你確定要斷開連線嗎？你需要重新配對才能使用這個應用程式。",
+    "currentlyConnected": "目前連接到 {{serverName}}"
   },
   "navigation": {
-    "selectServer": "选择服务器",
-    "server": "服务器",
-    "navigation": "导航栏"
+    "selectServer": "選擇伺服器",
+    "server": "伺服器",
+    "navigation": "導覽"
   },
   "resources": {
-    "cpu": "CPU",
-    "ram": "内存"
+    "cpu": "處理器",
+    "ram": "記憶體"
   },
   "notifications": {
-    "testSent": "测试发送",
-    "testFailed": "测试失败",
-    "failedToSendTest": "发送测试通知失败",
-    "loadingPreferences": "正在加载首选项……",
-    "unableToLoadPreferences": "无法加载首选项"
+    "testSent": "已發送測試",
+    "testFailed": "測試失敗",
+    "failedToSendTest": "發送測試通知失敗",
+    "loadingPreferences": "載入偏好設定中……",
+    "unableToLoadPreferences": "無法載入偏好設定"
   }
 }
