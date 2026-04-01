@@ -1,15 +1,15 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "serverUrl": "Server URL",
-    "accessToken": "Access Token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "enterManually": "Enter URL and Token Manually",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "welcome": "Benvingut a Tracearr",
+    "addServer": "Afegeix un servidor",
+    "connectToServer": "Connecta a un servidor",
+    "enterServerDetails": "Introduïu l'URL del vostre servidor Tracearr i el testimoni d'accés mòbil",
+    "serverUrl": "URL del servidor",
+    "accessToken": "Testimoni d'accés",
+    "scanQrCodeInstead": "En comptes d'això escaneja el codi QR",
+    "enterManually": "Introduïu l'URL i el testimoni manualment",
+    "cameraPermissionRequired": "Cal permís de càmera per escanejar codis QR",
+    "scanQrInstructions": "Obriu la configuració → Aplicació mòbil al vostre tauler de control de Tracearr i escanegeu el codi QR"
   },
   "errors": {
     "missingFields": "Missing Fields",
@@ -34,9 +34,9 @@
     "discord": "Discord",
     "joinCommunity": "Join the community",
     "github": "GitHub",
-    "viewSourceCode": "View source code",
-    "account": "Account",
-    "disconnectServer": "Disconnect Server",
+    "viewSourceCode": "Mostra el codi font",
+    "account": "Compte",
+    "disconnectServer": "Desconnecta del servidor",
     "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
     "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
     "currentlyConnected": "Currently connected to {{serverName}}"
