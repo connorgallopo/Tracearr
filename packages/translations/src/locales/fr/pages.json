@@ -308,17 +308,17 @@
     "interruptionTitle": "Interruption de service",
     "startingDescription": "Le serveur attend que les services backend soient disponibles. Cette page s’actualisera automatiquement quand tout sera prêt.",
     "interruptionDescription": "Un ou plusieurs services backend sont actuellement indisponibles. Cette page s’actualisera automatiquement lorsque la connexion sera rétablie.",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "restoreTitle": "Restauration de la sauvegarde...",
+    "restoreFailed": "Échec de la restauration",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "validating": "Validation de la sauvegarde",
+      "creating_restore_point": "Création d'un point de restauration",
+      "shutting_down": "Arrêt des services",
+      "restoring_database": "Restauration de la base de données",
+      "running_migrations": "Exécutions de migrations",
+      "rebuilding_aggregates": "Reconstruction des agrégats",
+      "restarting": "Redémarrage des services",
+      "complete": "Restauration complète"
     }
   }
 }
