@@ -2,261 +2,261 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "Server Added",
-        "message": "{{name}} has been connected successfully"
+        "title": "Servidor afegit",
+        "message": "{{name}} s'ha connectat correctament"
       },
       "serverRemoved": {
-        "title": "Server Removed",
-        "message": "The server has been removed successfully"
+        "title": "Servidor eliminat",
+        "message": "El servidor s'ha eliminat correctament"
       },
       "serverSynced": {
-        "title": "Server Synced",
-        "message": "Server data has been synchronized"
+        "title": "Servidor sincronitzat",
+        "message": "Les dades del servidor s'han sincronitzat"
       },
       "settingsUpdated": {
-        "title": "Settings Updated",
-        "message": "Your settings have been saved"
+        "title": "Configuració actualitzada",
+        "message": "La vostra configuració s'ha desat"
       },
       "tokenCopied": {
-        "title": "Token Copied",
-        "message": "Pair token copied to clipboard"
+        "title": "Token copiat",
+        "message": "El token de vinculació s'ha copiat al porta-retalls"
       },
       "violationAcknowledged": {
-        "title": "Violation Acknowledged",
-        "message": "The violation has been marked as acknowledged"
+        "title": "Incompliment confirmat",
+        "message": "L'incompliment s'ha marcat com a confirmat"
       },
       "violationDismissed": {
-        "title": "Violation Dismissed",
-        "message": "The violation has been dismissed"
+        "title": "Incompliment descartat",
+        "message": "L'incompliment s'ha descartat"
       },
       "deviceRemoved": {
-        "title": "Device Removed",
-        "message": "The device has been disconnected"
+        "title": "Dispositiu eliminat",
+        "message": "El dispositiu s'ha desconnectat"
       },
       "deviceRenamed": {
-        "title": "Device Renamed",
-        "message": "The device name has been updated"
+        "title": "Dispositiu rebatejat",
+        "message": "El nom del dispositiu s'ha actualitzat"
       },
       "sessionsRevoked": {
-        "title": "Sessions Revoked",
-        "message": "All mobile sessions have been revoked"
+        "title": "Sessions revocades",
+        "message": "S'han revocat totes les sessions mòbils"
       },
       "loggedIn": {
         "title": "Realitzat amb èxit",
-        "message": "Logged in successfully"
+        "message": "Sessió iniciada correctament"
       },
       "webhookTest": {
-        "title": "Test Successful",
-        "message": "Webhook is working correctly"
+        "title": "Prova reeixida",
+        "message": "El Webhook funciona correctament"
       },
       "copiedToClipboard": {
-        "title": "Copied to clipboard"
+        "title": "Copiat al porta-retalls"
       },
       "plexAccountLinked": {
-        "title": "Plex Account Linked",
-        "message": "You can now add servers from your Plex account"
+        "title": "Compte de Plex enllaçat",
+        "message": "Ara ja podeu afegir servidors des del vostre compte de Plex"
       },
       "plexAccountUnlinked": {
-        "title": "Plex Account Unlinked",
-        "message": "Your Plex account has been disconnected"
+        "title": "Compte de Plex desenllaçat",
+        "message": "El vostre compte de Plex s'ha desconnectat"
       },
       "agentAdded": {
-        "title": "Agent Added",
-        "message": "The notification agent has been added"
+        "title": "Agent afegit",
+        "message": "S'ha afegit l'agent de notificació"
       },
       "agentUpdated": {
-        "title": "Agent Updated",
-        "message": "The notification agent has been updated"
+        "title": "Agent actualitzat",
+        "message": "S'ha actualitzat l'agent de notificació"
       },
       "agentRemoved": {
-        "title": "Agent Removed",
-        "message": "The notification agent has been removed"
+        "title": "Agent eliminat",
+        "message": "S'ha eliminat l'agent de notificació"
       },
       "jobCompleted": {
-        "title": "Job Completed",
-        "message": "{{name}} finished successfully"
+        "title": "Tasca completada",
+        "message": "{{name}} ha finalitzat correctament"
       },
       "ruleCreated": {
-        "title": "Rule Created",
-        "message": "The rule has been created successfully"
+        "title": "Regla creada",
+        "message": "La regla s'ha creat correctament"
       },
       "ruleUpdated": {
-        "title": "Rule Updated",
-        "message": "The rule has been updated successfully"
+        "title": "Regla actualitzada",
+        "message": "La regla s'ha actualitzat correctament"
       },
       "ruleDeleted": {
-        "title": "Rule Deleted",
-        "message": "The rule has been deleted successfully"
+        "title": "Regla eliminada",
+        "message": "La regla s'ha eliminat correctament"
       },
       "streamTerminated": {
-        "title": "Stream Terminated",
-        "message": "The playback session has been stopped"
+        "title": "Transmissió finalitzada",
+        "message": "La sessió de reproducció s'ha aturat"
       },
       "serverUrlUpdated": {
-        "title": "Server URL Updated",
-        "message": "The server URL has been updated successfully"
+        "title": "URL del servidor actualitzada",
+        "message": "L'URL del servidor s'ha actualitzat correctament"
       },
       "serverUpdated": {
-        "title": "Server Updated",
-        "message": "The server has been updated successfully"
+        "title": "Servidor actualitzat",
+        "message": "El servidor s'ha actualitzat correctament"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "Sincronització completada amb errors"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "title": "Sessions suprimides",
+        "message_one": "{{count}} sessió suprimida",
+        "message_other": "{{count}} sessions suprimides"
       },
       "violationsAcknowledged": {
-        "title": "Violations Acknowledged",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "title": "Incompliments confirmats",
+        "message_one": "{{count}} incompliment confirmat",
+        "message_other": "{{count}} incompliments confirmats"
       },
       "violationsDismissed": {
-        "title": "Violations Dismissed",
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed"
+        "title": "Incompliments descartats",
+        "message_one": "{{count}} incompliment descartat",
+        "message_other": "{{count}} incompliments descartats"
       },
       "apiKeyGenerated": {
-        "title": "API Key Generated",
-        "message": "Your new API key is ready to use"
+        "title": "Clau d'API generada",
+        "message": "La vostra nova clau d'API ja està a punt per fer-se servir"
       },
       "mobileAccessEnabled": {
-        "title": "Mobile Access Enabled",
-        "message": "Scan the QR code with the Tracearr mobile app to connect"
+        "title": "Accés mòbil habilitat",
+        "message": "Escanegeu el codi QR amb l'aplicació mòbil de Tracearr per connectar-vos"
       },
       "mobileAccessDisabled": {
-        "title": "Mobile Access Disabled",
-        "message": "All mobile sessions have been revoked"
+        "title": "Accés mòbil deshabilitat",
+        "message": "S'han revocat totes les sessions mòbils"
       },
       "pairTokenGenerated": {
-        "title": "Pair Token Generated",
-        "message": "Scan the QR code with your mobile device to pair"
+        "title": "Token de vinculació generat",
+        "message": "Escanegeu el codi QR amb el vostre dispositiu mòbil per vincular-lo"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "Nom de visualització actualitzat"
       },
       "trustScoresReset": {
-        "title": "Trust Scores Reset",
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100"
+        "title": "Puntuacions de confiança restablertes",
+        "message_one": "{{count}} usuari restablert a 100",
+        "message_other": "{{count}} usuaris restablerts a 100"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Codi de vinculació validat",
+        "message": "Ara podeu continuar amb la configuració"
       }
     },
     "error": {
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverSyncFailed": "Failed to sync server",
-      "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "dismissFailed": "Failed to dismiss violation",
-      "authFailed": "Authentication failed",
-      "webhookTestFailed": "Webhook test failed",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "serverAddFailed": "No s'ha pogut afegir el servidor",
+      "serverRemoveFailed": "No s'ha pogut eliminar el servidor",
+      "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
+      "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
+      "copyFailed": "No s'ha pogut copiar al porta-retalls",
+      "acknowledgeFailed": "No s'ha pogut confirmar l'incompliment",
+      "dismissFailed": "No s'ha pogut descartar l'incompliment",
+      "authFailed": "L'autenticació ha fallat",
+      "webhookTestFailed": "La prova del Webhook ha fallat",
+      "ruleCreateFailed": "No s'ha pogut crear la regla",
+      "ruleUpdateFailed": "No s'ha pogut actualitzar la regla",
+      "ruleDeleteFailed": "No s'ha pogut suprimir la regla",
+      "streamTerminateFailed": "No s'ha pogut finalitzar la transmissió",
+      "serverUrlUpdateFailed": "No s'ha pogut actualitzar l'URL del servidor",
+      "serverUpdateFailed": "No s'ha pogut actualitzar el servidor",
+      "serverReorderFailed": "No s'ha pogut reordenar els servidors",
+      "sessionsDeleteFailed": "No s'ha pogut suprimir les sessions",
+      "apiKeyGenerateFailed": "No s'ha pogut generar la clau d'API",
+      "mobileAccessEnableFailed": "No s'ha pogut habilitar l'accés mòbil",
+      "mobileAccessDisableFailed": "No s'ha pogut deshabilitar l'accés mòbil",
+      "pairTokenGenerateFailed": "No s'ha pogut generar el token de vinculació",
+      "deviceRemoveFailed": "No s'ha pogut eliminar el dispositiu",
+      "deviceRenameFailed": "No s'ha pogut canviar el nom del dispositiu",
+      "sessionsRevokeFailed": "No s'ha pogut revocar les sessions",
+      "displayNameUpdateFailed": "No s'ha pogut actualitzar el nom de visualització",
+      "trustScoresResetFailed": "No s'ha pogut restablir les puntuacions de confiança",
+      "routingUpdateFailed": "No s'ha pogut actualitzar l'encaminament",
+      "clipboardFailed": "No s'ha pogut copiar al porta-retalls",
+      "plexUnlinkFailed": "No s'ha pogut desenllaçar el compte de Plex",
+      "agentAddFailed": "No s'ha pogut afegir l'agent",
+      "agentUpdateFailed": "No s'ha pogut actualitzar l'agent",
+      "agentRemoveFailed": "No s'ha pogut eliminar l'agent",
+      "agentTestFailed": "La prova ha fallat",
+      "jobAlreadyRunning": "La tasca ja s'està executant",
+      "jobStartFailed": "No s'ha pogut iniciar la tasca",
+      "jobLoadFailed": "No s'ha pogut carregar les tasques de manteniment",
+      "invalidUrl": "URL no vàlida",
+      "plexDirectUrl": "Les URL de plex.direct són adreces de relleu que no es poden fer servir aquí. Si us plau, utilitzeu una adreça IP directa o un nom d'amfitrió.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Codi de vinculació no vàlid",
+        "message": "Si us plau, comproveu els registres del servidor"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "Tasca fallida",
+        "message": "{{name}} ha trobat un error"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "title": "Nova transmissió iniciada",
+        "message": "{{user}} ha començat a mirar {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "Transmissió aturada",
+        "message": "{{user}} ha deixat de mirar contingut"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "Actualització disponible",
+        "message": "Tracearr {{version}} està disponible"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "Servidor fora de línia",
+        "message": "{{name}} no és accessible"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "Servidor en línia",
+        "message": "{{name}} torna a estar operatiu"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "title": "Nou incompliment: {{ruleName}}",
+        "message": "{{user}} ha activat {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "S'ha detectat un incompliment per compartir",
+    "streamStarted": "S'ha iniciat una transmissió",
+    "streamEnded": "S'ha acabat la transmissió",
+    "serverDown": "S'ha perdut la connexió amb el servidor",
+    "serverUp": "El servidor torna a estar en línia",
+    "newDevice": "Nou dispositiu",
+    "trustScoreChanged": "La puntuació de confiança ha canviat"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
-    "allTypes": "All Types",
-    "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamStopped": "Stream Stopped",
-    "concurrentStreams": "Concurrent Streams",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed",
-    "serverDown": "Server Down",
-    "serverUp": "Server Up",
-    "violationFilters": "Violation Filters",
-    "minimumSeverity": "Minimum Severity",
-    "quietHours": "Quiet Hours",
-    "enableQuietHours": "Enable Quiet Hours",
-    "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "title": "Configuració de notificacions",
+    "allSeverity": "Totes (Baixa, Avís, Alta)",
+    "warningAndHigh": "Només Avís i Alta",
+    "highOnly": "Només gravetat Alta",
+    "allTypes": "Tots els tipus",
+    "rateLimit": "Estat actual del límit de velocitat",
+    "perMinute": "Per minut",
+    "perHour": "Per hora",
+    "enablePushNotifications": "Habilita les notificacions push",
+    "notificationEvents": "Esdeveniments de notificació",
+    "violationDetected": "Incompliment detectat",
+    "streamStarted": "Transmissió iniciada",
+    "streamStopped": "Transmissió aturada",
+    "concurrentStreams": "Transmissions simultànies",
+    "newDevice": "Nou dispositiu",
+    "trustScoreChanged": "La puntuació de confiança ha canviat",
+    "serverDown": "Servidor caigut",
+    "serverUp": "Servidor operatiu",
+    "violationFilters": "Filtres d'incompliments",
+    "minimumSeverity": "Gravetat mínima",
+    "quietHours": "Hores de silenci",
+    "enableQuietHours": "Habilita les hores de silenci",
+    "overrideForCritical": "Ignora per a avisos crítics",
+    "rateLimiting": "Limitació de velocitat"
   }
 }

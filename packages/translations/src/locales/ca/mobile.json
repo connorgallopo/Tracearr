@@ -12,49 +12,49 @@
     "scanQrInstructions": "Obriu la configuració → Aplicació mòbil al vostre tauler de control de Tracearr i escanegeu el codi QR"
   },
   "errors": {
-    "missingFields": "Missing Fields",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "invalidUrl": "Invalid URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "pairingFailed": "Pairing Failed",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token."
+    "missingFields": "Falten camps",
+    "pleaseEnterBothFields": "Si us plau, introduïu tant l'URL del servidor com el testimoni",
+    "invalidUrl": "URL no vàlida",
+    "serverUrlMustStartWith": "L'URL del servidor ha de començar per http:// o https://",
+    "pleaseEnterValidUrl": "Si us plau, introduïu una URL de servidor vàlida",
+    "pairingFailed": "La vinculació ha fallat",
+    "invalidQrCode": "Codi QR no vàlid",
+    "invalidQrCodeMissingData": "Codi QR no vàlid: falten dades de vinculació",
+    "invalidQrCodeFormat": "Format de codi QR no vàlid. Si us plau, genereu un codi nou.",
+    "invalidQrCodeMissingUrl": "Codi QR no vàlid: falta l'URL del servidor",
+    "invalidQrCodeMissingToken": "Codi QR no vàlid: falta el testimoni de vinculació",
+    "invalidServerUrlInQr": "URL de servidor no vàlida al codi QR",
+    "tooManyPairingAttempts": "Massa intents de vinculació. Si us plau, espereu uns minuts.",
+    "invalidOrExpiredToken": "Testimoni de vinculació no vàlid o caducat.",
+    "invalidPairingRequest": "Petició de vinculació no vàlida. Comproveu el vostre testimoni."
   },
   "settings": {
-    "preferences": "Preferences",
-    "community": "Community",
+    "preferences": "Preferències",
+    "community": "Comunitat",
     "discord": "Discord",
-    "joinCommunity": "Join the community",
+    "joinCommunity": "Uniu-vos a la comunitat",
     "github": "GitHub",
     "viewSourceCode": "Mostra el codi font",
     "account": "Compte",
     "disconnectServer": "Desconnecta del servidor",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+    "disconnectConfirm": "Esteu segur que voleu desconnectar-vos de \"{{serverName}}\"? Haureu de tornar a vincular el dispositiu per fer servir l'aplicació.",
+    "disconnectConfirmGeneric": "Esteu segur que voleu desconnectar-vos? Haureu de tornar a vincular el dispositiu per fer servir l'aplicació.",
+    "currentlyConnected": "Connectat actualment a {{serverName}}"
   },
   "navigation": {
-    "selectServer": "Select Server",
-    "server": "Server",
-    "navigation": "Navigation"
+    "selectServer": "Selecciona el servidor",
+    "server": "Servidor",
+    "navigation": "Navegació"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
   "notifications": {
-    "testSent": "Test Sent",
-    "testFailed": "Test Failed",
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
+    "testSent": "Prova enviada",
+    "testFailed": "La prova ha fallat",
+    "failedToSendTest": "No s'ha pogut enviar la notificació de prova",
+    "loadingPreferences": "S'estan carregant les preferències...",
+    "unableToLoadPreferences": "No s'han pogut carregar les preferències"
   }
 }
