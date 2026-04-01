@@ -70,7 +70,7 @@
     "connecting": "正在連接……",
     "connected": "已連接",
     "disconnected": "已中斷連接",
-    "saving": "正在儲存……",
+    "saving": "保存中......",
     "deleting": "正在刪除……",
     "dismissing": "忽略……",
     "acknowledging": "確認……"
@@ -152,7 +152,7 @@
   },
   "search": {
     "placeholder": "搜尋……",
-    "searchUsers": "搜尋使用者……",
+    "searchUsers": "搜索用户……",
     "searchTitles": "搜尋標題，使用者……"
   },
   "table": {
@@ -222,8 +222,8 @@
     "usersAdded_other": "{{count}} 個使用者已新增",
     "usersUpdated_one": "{{count}} 個使用者已更新",
     "usersUpdated_other": "{{count}} 個使用者已更新",
-    "library_one": "{{count}} 個媒體庫",
-    "library_other": "{{count}} 個媒體庫",
+    "library_one": "{{count}}媒体",
+    "library_other": "{{count}}媒体库",
     "error_one": "{{count}} 個錯誤",
     "error_other": "{{count}} 個錯誤"
   },
