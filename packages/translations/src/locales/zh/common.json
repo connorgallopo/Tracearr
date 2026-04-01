@@ -70,7 +70,7 @@
     "connecting": "正在连接……",
     "connected": "已连接",
     "disconnected": "已断开",
-    "saving": "保存中...",
+    "saving": "保存中......",
     "deleting": "正在删除……",
     "dismissing": "丢弃……",
     "acknowledging": "确认……"
@@ -151,8 +151,8 @@
     "days": "天"
   },
   "search": {
-    "placeholder": "搜索...",
-    "searchUsers": "搜索用户...",
+    "placeholder": "搜索……",
+    "searchUsers": "搜索用户……",
     "searchTitles": "搜索标题，用户……"
   },
   "table": {
@@ -222,8 +222,8 @@
     "usersAdded_other": "{{count}}用户已添加",
     "usersUpdated_one": "{{count}}用户已更新",
     "usersUpdated_other": "{{count}}用户已更新",
-    "library_one": "{{count}}图书",
-    "library_other": "{{count}}图书馆",
+    "library_one": "{{count}}媒体",
+    "library_other": "{{count}}媒体库",
     "error_one": "{{count}}错误",
     "error_other": "{{count}}错误"
   },
