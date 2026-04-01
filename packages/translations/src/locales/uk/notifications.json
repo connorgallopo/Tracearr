@@ -73,7 +73,7 @@
         "message": "The notification agent has been removed"
       },
       "jobCompleted": {
-        "title": "Job Completed",
+        "title": "Завдання завершене",
         "message": "{{name}} успішно завершено"
       },
       "ruleCreated": {
@@ -184,7 +184,7 @@
       "jobAlreadyRunning": "Job already running",
       "jobStartFailed": "Failed to start job",
       "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
+      "invalidUrl": "Неправильна URL-адреса",
       "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
       "invalidClaimCode": {
         "title": "Invalid claim code",
@@ -200,34 +200,34 @@
     "info": {
       "streamStarted": {
         "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "message": "{{user}} почав дивитися {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
+        "title": "Трансляцію зупинено",
         "message": "{{user}} stopped watching"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "Доступне оновлення",
+        "message": "Tracearr {{version}} доступний"
       },
       "serverOffline": {
-        "title": "Server Offline",
+        "title": "Сервер не в мережі",
         "message": "{{name}} is unreachable"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "Сервер онлайн",
+        "message": "{{name}} знову у мережі"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
+        "title": "Нове порушення: {{ruleName}}",
         "message": "{{user}} triggered {{ruleType}}"
       }
     }
   },
   "push": {
     "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
+    "streamStarted": "Трансляцію розпочато",
+    "streamEnded": "Трансляцію завершено",
     "serverDown": "З'єднання з сервером втрачено",
     "serverUp": "Сервер знову онлайн",
     "newDevice": "Новий пристрій",
