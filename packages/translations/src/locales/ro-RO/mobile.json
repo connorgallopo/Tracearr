@@ -1,0 +1,60 @@
+{
+  "pair": {
+    "welcome": "Welcome to Tracearr",
+    "addServer": "Add Server",
+    "connectToServer": "Connect to Server",
+    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
+    "serverUrl": "Server URL",
+    "accessToken": "Access Token",
+    "scanQrCodeInstead": "Scan QR Code Instead",
+    "enterManually": "Enter URL and Token Manually",
+    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
+    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+  },
+  "errors": {
+    "missingFields": "Missing Fields",
+    "pleaseEnterBothFields": "Please enter both server URL and token",
+    "invalidUrl": "Invalid URL",
+    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
+    "pleaseEnterValidUrl": "Please enter a valid server URL",
+    "pairingFailed": "Pairing Failed",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
+    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
+    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
+    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
+    "invalidServerUrlInQr": "Invalid server URL in QR code",
+    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
+    "invalidOrExpiredToken": "Invalid or expired pairing token.",
+    "invalidPairingRequest": "Invalid pairing request. Check your token."
+  },
+  "settings": {
+    "preferences": "Preferences",
+    "community": "Community",
+    "discord": "Discord",
+    "joinCommunity": "Join the community",
+    "github": "GitHub",
+    "viewSourceCode": "View source code",
+    "account": "Account",
+    "disconnectServer": "Disconnect Server",
+    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
+    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
+    "currentlyConnected": "Currently connected to {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Select Server",
+    "server": "Server",
+    "navigation": "Navigation"
+  },
+  "resources": {
+    "cpu": "CPU",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "Test Sent",
+    "testFailed": "Test Failed",
+    "failedToSendTest": "Failed to send test notification",
+    "loadingPreferences": "Loading preferences...",
+    "unableToLoadPreferences": "Unable to Load Preferences"
+  }
+}
