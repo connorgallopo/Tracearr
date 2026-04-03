@@ -1,0 +1,60 @@
+{
+  "pair": {
+    "welcome": "Welkom bij Tracearr",
+    "addServer": "Server toevoegen",
+    "connectToServer": "Verbinden met server",
+    "enterServerDetails": "Voer de URL van je Tracearr-server en mobiele toegangstoken in",
+    "serverUrl": "Server-URL",
+    "accessToken": "Toegangstoken",
+    "scanQrCodeInstead": "QR-code scannen",
+    "enterManually": "URL en token handmatig invoeren",
+    "cameraPermissionRequired": "Cameratoegang is vereist om QR-codes te scannen",
+    "scanQrInstructions": "Open Instellingen → Mobiele app in je Tracearr-controlepaneel en scan de QR-code"
+  },
+  "errors": {
+    "missingFields": "Ontbrekende velden",
+    "pleaseEnterBothFields": "Voer zowel server-URL als token in",
+    "invalidUrl": "Ongeldige URL",
+    "serverUrlMustStartWith": "Server-URL moet beginnen met http:// of https://",
+    "pleaseEnterValidUrl": "Voer een geldige server-URL in",
+    "pairingFailed": "Koppelen mislukt",
+    "invalidQrCode": "Ongeldige QR-code",
+    "invalidQrCodeMissingData": "Ongeldige QR-code: koppelingsgegevens ontbreken",
+    "invalidQrCodeFormat": "Ongeldig indeling QR-code. Genereer een nieuwe code.",
+    "invalidQrCodeMissingUrl": "Ongeldige QR-code: server-URL ontbreekt",
+    "invalidQrCodeMissingToken": "Ongeldige QR-code: koppeltoken ontbreekt",
+    "invalidServerUrlInQr": "Ongeldige server-URL in QR-code",
+    "tooManyPairingAttempts": "Te veel koppelpogingen. Wacht een paar minuten.",
+    "invalidOrExpiredToken": "Ongeldig of verlopen koppeltoken.",
+    "invalidPairingRequest": "Ongeldig koppelverzoek. Controleer je token."
+  },
+  "settings": {
+    "preferences": "Voorkeuren",
+    "community": "Community",
+    "discord": "Discord",
+    "joinCommunity": "Sluit je aan bij de community",
+    "github": "GitHub",
+    "viewSourceCode": "Broncode weergeven",
+    "account": "Account",
+    "disconnectServer": "Server ontkoppelen",
+    "disconnectConfirm": "Weet je zeker dat je wilt ontkoppelen van \"{{serverName}}\"? Je zult opnieuw moeten koppelen om de app te gebruiken.",
+    "disconnectConfirmGeneric": "Weet je zeker dat je wilt ontkoppelen? Je zult opnieuw moeten koppelen om de app te gebruiken.",
+    "currentlyConnected": "Momenteel verbonden met {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Server selecteren",
+    "server": "Server",
+    "navigation": "Navigatie"
+  },
+  "resources": {
+    "cpu": "CPU",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "Test verzonden",
+    "testFailed": "Test mislukt",
+    "failedToSendTest": "Versturen testmelding mislukt",
+    "loadingPreferences": "Voorkeuren laden...",
+    "unableToLoadPreferences": "Voorkeuren laden mislukt"
+  }
+}
