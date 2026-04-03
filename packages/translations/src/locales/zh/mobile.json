@@ -47,7 +47,7 @@
     "navigation": "导航栏"
   },
   "resources": {
-    "cpu": "處理器",
+    "cpu": "CPU",
     "ram": "内存"
   },
   "notifications": {
