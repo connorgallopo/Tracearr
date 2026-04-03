@@ -1,0 +1,22 @@
+{
+  "dashboard": "Painel",
+  "map": "Mapa",
+  "history": "Histórico",
+  "stats": "Estatísticas",
+  "activity": "Atividade",
+  "library": "Biblioteca",
+  "users": "Utilizadores",
+  "rules": "Regras",
+  "violations": "Violações",
+  "alerts": "Alertas",
+  "settings": "Definições",
+  "overview": "Overview",
+  "quality": "Quality",
+  "storage": "Storage",
+  "watch": "Watch",
+  "performance": "Performance",
+  "devices": "Devices",
+  "bandwidth": "Bandwidth",
+  "jobs": "Jobs",
+  "accessControl": "Access Control"
+}
