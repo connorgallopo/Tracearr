@@ -1,0 +1,22 @@
+{
+  "dashboard": "Tauler de control",
+  "map": "Mapa",
+  "history": "Històric",
+  "stats": "Estadístiques",
+  "activity": "Activitat",
+  "library": "Llibreries",
+  "users": "Usuaris",
+  "rules": "Regles",
+  "violations": "Incompliments",
+  "alerts": "Alertes",
+  "settings": "Configuració",
+  "overview": "Visió general",
+  "quality": "Qualitat",
+  "storage": "Emmagatzematge",
+  "watch": "Reproduccions",
+  "performance": "Rendiment",
+  "devices": "Dispositius",
+  "bandwidth": "Amplada de banda",
+  "jobs": "Tasques",
+  "accessControl": "Control d'accés"
+}
