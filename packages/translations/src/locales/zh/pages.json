@@ -269,7 +269,7 @@
       "noAgentsHint": "添加代理接收关于共享违反行为和流事件的通知。",
       "agentType": "代理类型",
       "selectType": "选择类型……",
-      "webhookUrl": "Webhook 網址",
+      "webhookUrl": "Webhook URL",
       "webhookUrlPlaceholder": "https://……",
       "triggerEvents": "触发事件",
       "allEvents": "全部事件",
