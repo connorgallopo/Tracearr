@@ -68,7 +68,7 @@
     "connected": "Tailscale 已连接。您的 Tracearr 实例在 tailnet 上可用。",
     "hostname": "主机名",
     "dnsName": "DNS 名称",
-    "tailnetUrl": "網址",
+    "tailnetUrl": "URL",
     "showLogs": "显示日志",
     "hideLogs": "隐藏日志",
     "noLogs": "无可用日志输出。",
