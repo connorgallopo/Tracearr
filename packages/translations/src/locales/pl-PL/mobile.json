@@ -1,0 +1,60 @@
+{
+  "pair": {
+    "welcome": "Witaj w Tracearr",
+    "addServer": "Dodaj serwer",
+    "connectToServer": "Połącz z serwerem",
+    "enterServerDetails": "Wprowadź swój adres URL serwera Tracearr i token dostępu mobilnego",
+    "serverUrl": "Adres URL serwera",
+    "accessToken": "Token dostępu",
+    "scanQrCodeInstead": "Zamiast tego zeskanuj kod QR",
+    "enterManually": "Wprowadź adres URL i token ręcznie",
+    "cameraPermissionRequired": "Wymagane uprawnienie do kamery, aby skanować kody QR",
+    "scanQrInstructions": "Otwórz Ustawienia → Aplikacja mobilna w panelu Tracearr i zeskanuj kod QR"
+  },
+  "errors": {
+    "missingFields": "Brakujące pola",
+    "pleaseEnterBothFields": "Wprowadź adres URL serwera i token",
+    "invalidUrl": "Nieprawidłowy adres URL",
+    "serverUrlMustStartWith": "Adres URL serwera musi zaczynać się od http:// lub https://",
+    "pleaseEnterValidUrl": "Wprowadź prawidłowy adres URL serwera",
+    "pairingFailed": "Parowanie nieudane",
+    "invalidQrCode": "Kod QR jest nieprawidłowy",
+    "invalidQrCodeMissingData": "Nieprawidłowy kod QR: brakuje danych parowania",
+    "invalidQrCodeFormat": "Nieprawidłowy format kodu QR. Wygeneruj nowy kod.",
+    "invalidQrCodeMissingUrl": "Nieprawidłowy kod QR: brakujący adres URL serwera",
+    "invalidQrCodeMissingToken": "Nieprawidłowy kod QR brakujący token parowania",
+    "invalidServerUrlInQr": "Nieprawidłowy adres URL serwera w kodzie QR",
+    "tooManyPairingAttempts": "Zbyt wiele prób parowania. Poczekaj kilka minut.",
+    "invalidOrExpiredToken": "Token parowania jest nieprawidłowy lub wygasł.",
+    "invalidPairingRequest": "Niepoprawna prośba o parowanie. Sprawdź token."
+  },
+  "settings": {
+    "preferences": "Ustawienia",
+    "community": "Społeczność",
+    "discord": "Discord",
+    "joinCommunity": "Dołącz do społeczności",
+    "github": "GitHub",
+    "viewSourceCode": "Pokaż kod źródłowy",
+    "account": "Konto",
+    "disconnectServer": "Rozłącz serwer",
+    "disconnectConfirm": "Czy na pewno chcesz odłączyć się od \"{{serverName}}\"? Będziesz musiał sparować ponownie, aby użyć aplikacji.",
+    "disconnectConfirmGeneric": "Czy jesteś pewien, że chcesz się rozłączyć? Będziesz musiał sparować ponownie, aby używać aplikacji.",
+    "currentlyConnected": "Obecnie połączono z {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Wybierz serwer",
+    "server": "Serwer",
+    "navigation": "Nawigacja"
+  },
+  "resources": {
+    "cpu": "Procesor",
+    "ram": "Pamięć RAM"
+  },
+  "notifications": {
+    "testSent": "Test wysłany",
+    "testFailed": "Test nieudany",
+    "failedToSendTest": "Nie udało się wysłać powiadomienia testowego",
+    "loadingPreferences": "Ładowanie ustawień...",
+    "unableToLoadPreferences": "Nie można załadować ustawień"
+  }
+}
