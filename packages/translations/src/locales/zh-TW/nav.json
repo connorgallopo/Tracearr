@@ -1,0 +1,22 @@
+{
+  "dashboard": "仪表板",
+  "map": "地图",
+  "history": "历史记录",
+  "stats": "统计信息",
+  "activity": "活动",
+  "library": "媒体库",
+  "users": "用户",
+  "rules": "规则",
+  "violations": "违规",
+  "alerts": "警告",
+  "settings": "设置",
+  "overview": "概览",
+  "quality": "品质",
+  "storage": "存储",
+  "watch": "观看",
+  "performance": "性能",
+  "devices": "设备",
+  "bandwidth": "带宽",
+  "jobs": "任务",
+  "accessControl": "访问控制"
+}
