@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -36,481 +37,73 @@ export const resources = {
 
 export const supportedLanguages = [
   'en',
-  'af',
-  'ar',
-  'ca',
-  'cs',
-  'da',
-  'de',
-  'el',
-  'es',
-  'fi',
-  'fr',
-  'he',
-  'hu',
-  'it',
-  'ja',
-  'ko',
-  'nl',
-  'no',
-  'pl',
-  'pt',
-  'ro',
-  'ru',
-  'sr',
-  'sv',
-  'tr',
-  'uk',
-  'vi',
-  'zh',
+  'af-ZA',
+  'ar-SA',
+  'ca-ES',
+  'cs-CZ',
+  'da-DK',
+  'de-DE',
+  'el-GR',
+  'es-ES',
+  'fi-FI',
+  'fr-FR',
+  'he-IL',
+  'hu-HU',
+  'it-IT',
+  'ja-JP',
+  'ko-KR',
+  'nl-NL',
+  'no-NO',
+  'pl-PL',
+  'pt-BR',
+  'pt-PT',
+  'ro-RO',
+  'ru-RU',
+  'sr-SP',
+  'sv-SE',
+  'tr-TR',
+  'uk-UA',
+  'vi-VN',
+  'zh-CN',
+  'zh-TW',
 ] as const;
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
 // ============================================================================
 // Lazy Locale Loaders
-// Each locale is loaded on-demand via dynamic import. Vite creates separate
-// chunks for each locale so only the active language is downloaded.
+// Vite discovers all locale JSON files at build time via import.meta.glob and
+// creates separate chunks for each. Only the active language is downloaded.
+// The *-* pattern matches locale-format dirs (af-ZA, zh-CN) but skips en/.
 // ============================================================================
 
 type LocaleData = Record<string, Record<string, unknown>>;
 type LocaleLoader = () => Promise<LocaleData>;
 
-// Module-scope loader map — each entry uses static import() strings so Vite can
-// discover and chunk them at build time.
-const localeLoaders: Record<string, LocaleLoader> = {
-  af: () =>
-    Promise.all([
-      import('./locales/af/common.json'),
-      import('./locales/af/notifications.json'),
-      import('./locales/af/settings.json'),
-      import('./locales/af/nav.json'),
-      import('./locales/af/pages.json'),
-      import('./locales/af/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ar: () =>
-    Promise.all([
-      import('./locales/ar/common.json'),
-      import('./locales/ar/notifications.json'),
-      import('./locales/ar/settings.json'),
-      import('./locales/ar/nav.json'),
-      import('./locales/ar/pages.json'),
-      import('./locales/ar/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ca: () =>
-    Promise.all([
-      import('./locales/ca/common.json'),
-      import('./locales/ca/notifications.json'),
-      import('./locales/ca/settings.json'),
-      import('./locales/ca/nav.json'),
-      import('./locales/ca/pages.json'),
-      import('./locales/ca/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  cs: () =>
-    Promise.all([
-      import('./locales/cs/common.json'),
-      import('./locales/cs/notifications.json'),
-      import('./locales/cs/settings.json'),
-      import('./locales/cs/nav.json'),
-      import('./locales/cs/pages.json'),
-      import('./locales/cs/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  da: () =>
-    Promise.all([
-      import('./locales/da/common.json'),
-      import('./locales/da/notifications.json'),
-      import('./locales/da/settings.json'),
-      import('./locales/da/nav.json'),
-      import('./locales/da/pages.json'),
-      import('./locales/da/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  de: () =>
-    Promise.all([
-      import('./locales/de/common.json'),
-      import('./locales/de/notifications.json'),
-      import('./locales/de/settings.json'),
-      import('./locales/de/nav.json'),
-      import('./locales/de/pages.json'),
-      import('./locales/de/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  el: () =>
-    Promise.all([
-      import('./locales/el/common.json'),
-      import('./locales/el/notifications.json'),
-      import('./locales/el/settings.json'),
-      import('./locales/el/nav.json'),
-      import('./locales/el/pages.json'),
-      import('./locales/el/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  es: () =>
-    Promise.all([
-      import('./locales/es/common.json'),
-      import('./locales/es/notifications.json'),
-      import('./locales/es/settings.json'),
-      import('./locales/es/nav.json'),
-      import('./locales/es/pages.json'),
-      import('./locales/es/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  fi: () =>
-    Promise.all([
-      import('./locales/fi/common.json'),
-      import('./locales/fi/notifications.json'),
-      import('./locales/fi/settings.json'),
-      import('./locales/fi/nav.json'),
-      import('./locales/fi/pages.json'),
-      import('./locales/fi/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  fr: () =>
-    Promise.all([
-      import('./locales/fr/common.json'),
-      import('./locales/fr/notifications.json'),
-      import('./locales/fr/settings.json'),
-      import('./locales/fr/nav.json'),
-      import('./locales/fr/pages.json'),
-      import('./locales/fr/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  he: () =>
-    Promise.all([
-      import('./locales/he/common.json'),
-      import('./locales/he/notifications.json'),
-      import('./locales/he/settings.json'),
-      import('./locales/he/nav.json'),
-      import('./locales/he/pages.json'),
-      import('./locales/he/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  hu: () =>
-    Promise.all([
-      import('./locales/hu/common.json'),
-      import('./locales/hu/notifications.json'),
-      import('./locales/hu/settings.json'),
-      import('./locales/hu/nav.json'),
-      import('./locales/hu/pages.json'),
-      import('./locales/hu/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  it: () =>
-    Promise.all([
-      import('./locales/it/common.json'),
-      import('./locales/it/notifications.json'),
-      import('./locales/it/settings.json'),
-      import('./locales/it/nav.json'),
-      import('./locales/it/pages.json'),
-      import('./locales/it/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ja: () =>
-    Promise.all([
-      import('./locales/ja/common.json'),
-      import('./locales/ja/notifications.json'),
-      import('./locales/ja/settings.json'),
-      import('./locales/ja/nav.json'),
-      import('./locales/ja/pages.json'),
-      import('./locales/ja/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ko: () =>
-    Promise.all([
-      import('./locales/ko/common.json'),
-      import('./locales/ko/notifications.json'),
-      import('./locales/ko/settings.json'),
-      import('./locales/ko/nav.json'),
-      import('./locales/ko/pages.json'),
-      import('./locales/ko/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  nl: () =>
-    Promise.all([
-      import('./locales/nl/common.json'),
-      import('./locales/nl/notifications.json'),
-      import('./locales/nl/settings.json'),
-      import('./locales/nl/nav.json'),
-      import('./locales/nl/pages.json'),
-      import('./locales/nl/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  no: () =>
-    Promise.all([
-      import('./locales/no/common.json'),
-      import('./locales/no/notifications.json'),
-      import('./locales/no/settings.json'),
-      import('./locales/no/nav.json'),
-      import('./locales/no/pages.json'),
-      import('./locales/no/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  pl: () =>
-    Promise.all([
-      import('./locales/pl/common.json'),
-      import('./locales/pl/notifications.json'),
-      import('./locales/pl/settings.json'),
-      import('./locales/pl/nav.json'),
-      import('./locales/pl/pages.json'),
-      import('./locales/pl/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  pt: () =>
-    Promise.all([
-      import('./locales/pt/common.json'),
-      import('./locales/pt/notifications.json'),
-      import('./locales/pt/settings.json'),
-      import('./locales/pt/nav.json'),
-      import('./locales/pt/pages.json'),
-      import('./locales/pt/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ro: () =>
-    Promise.all([
-      import('./locales/ro/common.json'),
-      import('./locales/ro/notifications.json'),
-      import('./locales/ro/settings.json'),
-      import('./locales/ro/nav.json'),
-      import('./locales/ro/pages.json'),
-      import('./locales/ro/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  ru: () =>
-    Promise.all([
-      import('./locales/ru/common.json'),
-      import('./locales/ru/notifications.json'),
-      import('./locales/ru/settings.json'),
-      import('./locales/ru/nav.json'),
-      import('./locales/ru/pages.json'),
-      import('./locales/ru/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  sr: () =>
-    Promise.all([
-      import('./locales/sr/common.json'),
-      import('./locales/sr/notifications.json'),
-      import('./locales/sr/settings.json'),
-      import('./locales/sr/nav.json'),
-      import('./locales/sr/pages.json'),
-      import('./locales/sr/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  sv: () =>
-    Promise.all([
-      import('./locales/sv/common.json'),
-      import('./locales/sv/notifications.json'),
-      import('./locales/sv/settings.json'),
-      import('./locales/sv/nav.json'),
-      import('./locales/sv/pages.json'),
-      import('./locales/sv/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  tr: () =>
-    Promise.all([
-      import('./locales/tr/common.json'),
-      import('./locales/tr/notifications.json'),
-      import('./locales/tr/settings.json'),
-      import('./locales/tr/nav.json'),
-      import('./locales/tr/pages.json'),
-      import('./locales/tr/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  uk: () =>
-    Promise.all([
-      import('./locales/uk/common.json'),
-      import('./locales/uk/notifications.json'),
-      import('./locales/uk/settings.json'),
-      import('./locales/uk/nav.json'),
-      import('./locales/uk/pages.json'),
-      import('./locales/uk/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  vi: () =>
-    Promise.all([
-      import('./locales/vi/common.json'),
-      import('./locales/vi/notifications.json'),
-      import('./locales/vi/settings.json'),
-      import('./locales/vi/nav.json'),
-      import('./locales/vi/pages.json'),
-      import('./locales/vi/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-  zh: () =>
-    Promise.all([
-      import('./locales/zh/common.json'),
-      import('./locales/zh/notifications.json'),
-      import('./locales/zh/settings.json'),
-      import('./locales/zh/nav.json'),
-      import('./locales/zh/pages.json'),
-      import('./locales/zh/mobile.json'),
-    ]).then(([common, notifications, settings, nav, pages, mobile]) => ({
-      common: common.default,
-      notifications: notifications.default,
-      settings: settings.default,
-      nav: nav.default,
-      pages: pages.default,
-      mobile: mobile.default,
-    })),
-};
+const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
+  './locales/*-*/*.json'
+);
+
+const localeLoaders: Record<string, LocaleLoader> = Object.fromEntries(
+  supportedLanguages
+    .filter((l) => l !== 'en')
+    .map((locale) => [
+      locale,
+      async () => {
+        const bundles: Record<string, Record<string, unknown>> = {};
+        await Promise.all(
+          namespaces.map(async (ns) => {
+            const path = `./locales/${locale}/${ns}.json`;
+            const loader = localeModules[path];
+            if (loader) {
+              const mod = await loader();
+              bundles[ns] = mod.default;
+            }
+          })
+        );
+        return bundles;
+      },
+    ])
+);
 
 // ============================================================================
 // Locale Loading

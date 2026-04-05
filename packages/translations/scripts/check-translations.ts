@@ -10,7 +10,7 @@
  * Usage:
  *   pnpm check                  # Check all languages against en
  *   pnpm check --strict         # Also report extra keys
- *   pnpm check --lang=de        # Check only German
+ *   pnpm check --lang=de-DE     # Check only German
  *   pnpm check --fix            # Add missing keys using English defaults
  *   pnpm check --fix --dry-run  # Preview fixes without writing files
  */

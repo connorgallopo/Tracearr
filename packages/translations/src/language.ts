@@ -2,6 +2,8 @@
  * Language detection and management utilities.
  *
  * Works in both web (browser) and mobile (React Native/Expo) environments.
+ * Language codes use full locale format (e.g., 'fr-FR', 'zh-CN') except for
+ * English which uses 'en' as the base/fallback language.
  */
 
 import { i18n, loadLocale } from './config.js';
@@ -15,33 +17,35 @@ const LANGUAGE_STORAGE_KEY = 'tracearr_language';
  */
 export const languageNames = {
   en: 'English',
-  af: 'Afrikaans',
-  ar: 'العربية',
-  ca: 'Català',
-  cs: 'Čeština',
-  da: 'Dansk',
-  de: 'Deutsch',
-  el: 'Ελληνικά',
-  es: 'Español',
-  fi: 'Suomi',
-  fr: 'Français',
-  he: 'עברית',
-  hu: 'Magyar',
-  it: 'Italiano',
-  ja: '日本語',
-  ko: '한국어',
-  nl: 'Nederlands',
-  no: 'Norsk',
-  pl: 'Polski',
-  pt: 'Português',
-  ro: 'Română',
-  ru: 'Русский',
-  sr: 'Српски',
-  sv: 'Svenska',
-  tr: 'Türkçe',
-  uk: 'Українська',
-  vi: 'Tiếng Việt',
-  zh: '中文',
+  'af-ZA': 'Afrikaans',
+  'ar-SA': 'العربية',
+  'ca-ES': 'Català',
+  'cs-CZ': 'Čeština',
+  'da-DK': 'Dansk',
+  'de-DE': 'Deutsch',
+  'el-GR': 'Ελληνικά',
+  'es-ES': 'Español',
+  'fi-FI': 'Suomi',
+  'fr-FR': 'Français',
+  'he-IL': 'עברית',
+  'hu-HU': 'Magyar',
+  'it-IT': 'Italiano',
+  'ja-JP': '日本語',
+  'ko-KR': '한국어',
+  'nl-NL': 'Nederlands',
+  'no-NO': 'Norsk',
+  'pl-PL': 'Polski',
+  'pt-BR': 'Português (Brasil)',
+  'pt-PT': 'Português (Portugal)',
+  'ro-RO': 'Română',
+  'ru-RU': 'Русский',
+  'sr-SP': 'Српски',
+  'sv-SE': 'Svenska',
+  'tr-TR': 'Türkçe',
+  'uk-UA': 'Українська',
+  'vi-VN': 'Tiếng Việt',
+  'zh-CN': '中文 (简体)',
+  'zh-TW': '中文 (繁體)',
 } as const;
 
 export type LanguageCode = keyof typeof languageNames;
@@ -54,12 +58,51 @@ export function getSupportedLanguages(): string[] {
 }
 
 /**
- * Check if a language code is supported.
+ * Check if a language code is supported (exact match).
  */
 export function isLanguageSupported(lang: string): boolean {
   if (!lang || typeof lang !== 'string') return false;
-  const baseLang = lang.split('-')[0] || lang;
-  return baseLang in languageNames;
+  return lang in languageNames;
+}
+
+/**
+ * Resolve a language code to the best matching supported locale.
+ *
+ * Handles exact matches, legacy two-letter codes (e.g., 'fr' → 'fr-FR'),
+ * and browser locale strings (e.g., 'zh-Hant-TW' → 'zh-TW').
+ *
+ * Returns null if no match is found.
+ */
+export function resolveLocale(lang: string): string | null {
+  if (!lang || typeof lang !== 'string') return null;
+
+  // Normalize: lowercase language, uppercase region
+  const normalized = normalizeLocaleCode(lang);
+
+  // Exact match (e.g., 'zh-CN', 'en')
+  if (normalized in languageNames) return normalized;
+
+  // Try base language match (e.g., 'fr' → 'fr-FR', 'zh' → 'zh-CN')
+  const baseLang = normalized.split('-')[0];
+  if (!baseLang) return null;
+
+  // 'en' is a direct match
+  if (baseLang === 'en') return 'en';
+
+  // Find first supported locale starting with the base language
+  const match = Object.keys(languageNames).find((code) => code.startsWith(baseLang + '-'));
+  return match ?? null;
+}
+
+/**
+ * Normalize a locale code: lowercase language, uppercase region.
+ * e.g., 'ZH-cn' → 'zh-CN', 'FR' → 'fr', 'pt-br' → 'pt-BR'
+ */
+function normalizeLocaleCode(code: string): string {
+  const trimmed = code.trim();
+  const [lang, region] = trimmed.split('-');
+  if (!region) return trimmed.toLowerCase();
+  return `${lang?.toLowerCase()}-${region.toUpperCase()}`;
 }
 
 /**
@@ -78,8 +121,9 @@ export async function detectLanguage(storage?: {
   // 1. Check stored preference
   try {
     const stored = await getStoredLanguage(storage);
-    if (stored && isLanguageSupported(stored)) {
-      return stored;
+    if (stored) {
+      const resolved = resolveLocale(stored);
+      if (resolved) return resolved;
     }
   } catch (error) {
     console.warn('[i18n] Failed to get stored language:', error);
@@ -87,9 +131,7 @@ export async function detectLanguage(storage?: {
 
   // 2. Check browser/device language
   const detected = detectSystemLanguage();
-  if (detected && isLanguageSupported(detected)) {
-    return detected;
-  }
+  if (detected) return detected;
 
   // 3. Fallback
   return 'en';
@@ -108,10 +150,8 @@ export function detectSystemLanguage(): string | null {
 
   for (const lang of languages) {
     if (!lang) continue;
-    const baseLang = lang.split('-')[0];
-    if (baseLang && isLanguageSupported(baseLang)) {
-      return baseLang;
-    }
+    const resolved = resolveLocale(lang);
+    if (resolved) return resolved;
   }
 
   return null;
@@ -180,7 +220,7 @@ async function setStoredLanguage(
 /**
  * Change the current language and persist the preference.
  *
- * @param lang - Language code (e.g., 'en', 'es', 'fr')
+ * @param lang - Locale code (e.g., 'en', 'fr-FR', 'zh-CN')
  * @param storage - Optional storage adapter for React Native
  * @throws Error if language code is invalid or unsupported
  */
@@ -193,21 +233,17 @@ export async function changeLanguage(
     throw new Error(`Invalid language code: ${String(lang)}`);
   }
 
-  const sanitized = lang.trim().toLowerCase();
+  const resolved = resolveLocale(lang);
 
-  if (!sanitized) {
-    throw new Error('Language code cannot be empty');
-  }
-
-  if (!isLanguageSupported(sanitized)) {
+  if (!resolved) {
     throw new Error(
-      `Language '${sanitized}' is not supported. Available: ${getSupportedLanguages().join(', ')}`
+      `Language '${lang}' is not supported. Available: ${getSupportedLanguages().join(', ')}`
     );
   }
 
-  await loadLocale(sanitized);
-  await i18n.changeLanguage(sanitized);
-  await setStoredLanguage(sanitized, storage);
+  await loadLocale(resolved);
+  await i18n.changeLanguage(resolved);
+  await setStoredLanguage(resolved, storage);
 }
 
 /**

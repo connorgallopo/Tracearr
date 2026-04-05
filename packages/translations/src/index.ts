@@ -32,7 +32,7 @@
  * const lang = await detectLanguage();
  *
  * // Change language
- * await changeLanguage('es');
+ * await changeLanguage('es-ES');
  *
  * // Get available languages with display names
  * Object.entries(languageNames).map(([code, name]) => ({ code, name }));
@@ -58,6 +58,7 @@ export {
   languageNames,
   getSupportedLanguages,
   isLanguageSupported,
+  resolveLocale,
   detectLanguage,
   detectSystemLanguage,
   changeLanguage,
