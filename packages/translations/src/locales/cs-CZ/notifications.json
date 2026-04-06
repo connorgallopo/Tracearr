@@ -1,270 +1,270 @@
 {
-  "push": {
-    "newDevice": "New Device",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "streamEnded": "Stream Ended",
-    "streamStarted": "Stream Started",
-    "trustScoreChanged": "Trust Score Changed",
-    "violationDetected": "Sharing Violation Detected"
-  },
-  "settings": {
-    "allSeverity": "All (Low, Warning, High)",
-    "allTypes": "All Types",
-    "concurrentStreams": "Concurrent Streams",
-    "concurrentStreamsDesc": "When max stream limit is exceeded",
-    "enablePushNotifications": "Enable Push Notifications",
-    "enableQuietHours": "Enable Quiet Hours",
-    "highOnly": "High severity only",
-    "minimumSeverity": "Minimum Severity",
-    "newDevice": "New Device",
-    "newDeviceDesc": "When a new device connects",
-    "notificationEvents": "Notification Events",
-    "overrideForCritical": "Override for Critical",
-    "perHour": "Per Hour",
-    "perMinute": "Per Minute",
-    "quietHours": "Quiet Hours",
-    "rateLimit": "Current Rate Limit Status",
-    "rateLimiting": "Rate Limiting",
-    "serverDown": "Server Down",
-    "serverDownDesc": "When a media server goes offline",
-    "serverUp": "Server Up",
-    "serverUpDesc": "When a media server comes back online",
-    "streamStarted": "Stream Started",
-    "streamStartedDesc": "When a user starts watching",
-    "streamStopped": "Stream Stopped",
-    "streamStoppedDesc": "When a user stops watching",
-    "title": "Notification Settings",
-    "trustScoreChanged": "Trust Score Changed",
-    "trustScoreChangedDesc": "When a user's trust score changes",
-    "violationDetected": "Violation Detected",
-    "violationDetectedDesc": "When a sharing violation is triggered",
-    "violationFilters": "Violation Filters",
-    "warningAndHigh": "Warning & High only"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "agentAddFailed": "Failed to add agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "agentUpdateFailed": "Failed to update agent",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "authFailed": "Authentication failed",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "copyFailed": "Could not copy to clipboard",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "dismissFailed": "Failed to dismiss violation",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "invalidClaimCode": {
-        "message": "Please check the server logs",
-        "title": "Invalid claim code"
-      },
-      "invalidUrl": "Invalid URL",
-      "jobAlreadyRunning": "Job already running",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "jobStartFailed": "Failed to start job",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "routingUpdateFailed": "Failed to update routing",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "serverSyncFailed": "Failed to sync server",
-      "serverUpdateFailed": "Failed to update server",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "settingsUpdateFailed": "Failed to update settings",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "webhookTestFailed": "Webhook test failed"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} is unreachable",
-        "title": "Server Offline"
-      },
-      "serverOnline": {
-        "message": "{{name}} is back online",
-        "title": "Server Online"
-      },
-      "streamStarted": {
-        "message": "{{user}} started watching {{media}}",
-        "title": "New Stream Started"
-      },
-      "streamStopped": {
-        "message": "{{user}} stopped watching",
-        "title": "Stream Stopped"
-      },
-      "updateAvailable": {
-        "message": "Tracearr {{version}} is available",
-        "title": "Update Available"
-      },
-      "violationDetected": {
-        "message": "{{user}} triggered {{ruleType}}",
-        "title": "New Violation: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "The notification agent has been added",
-        "title": "Agent Added"
-      },
-      "agentRemoved": {
-        "message": "The notification agent has been removed",
-        "title": "Agent Removed"
-      },
-      "agentUpdated": {
-        "message": "The notification agent has been updated",
-        "title": "Agent Updated"
-      },
-      "apiKeyGenerated": {
-        "message": "Your new API key is ready to use",
-        "title": "API Key Generated"
-      },
-      "claimCodeValidated": {
-        "message": "You can now proceed with setup",
-        "title": "Claim code validated"
-      },
-      "copiedToClipboard": {
-        "title": "Copied to clipboard"
-      },
-      "deviceRemoved": {
-        "message": "The device has been disconnected",
-        "title": "Device Removed"
-      },
-      "deviceRenamed": {
-        "message": "The device name has been updated",
-        "title": "Device Renamed"
-      },
-      "displayNameUpdated": {
-        "title": "Display Name Updated"
-      },
-      "jobCompleted": {
-        "message": "{{name}} finished successfully",
-        "title": "Job Completed"
-      },
-      "loggedIn": {
-        "message": "Logged in successfully",
-        "title": "Success"
-      },
-      "mobileAccessDisabled": {
-        "message": "All mobile sessions have been revoked",
-        "title": "Mobile Access Disabled"
-      },
-      "mobileAccessEnabled": {
-        "message": "Scan the QR code with the Tracearr mobile app to connect",
-        "title": "Mobile Access Enabled"
-      },
-      "pairTokenGenerated": {
-        "message": "Scan the QR code with your mobile device to pair",
-        "title": "Pair Token Generated"
-      },
-      "plexAccountLinked": {
-        "message": "You can now add servers from your Plex account",
-        "title": "Plex Account Linked"
-      },
-      "plexAccountUnlinked": {
-        "message": "Your Plex account has been disconnected",
-        "title": "Plex Account Unlinked"
-      },
-      "ruleCreated": {
-        "message": "The rule has been created successfully",
-        "title": "Rule Created"
-      },
-      "ruleDeleted": {
-        "message": "The rule has been deleted successfully",
-        "title": "Rule Deleted"
-      },
-      "ruleUpdated": {
-        "message": "The rule has been updated successfully",
-        "title": "Rule Updated"
-      },
       "serverAdded": {
-        "message": "{{name}} has been connected successfully",
-        "title": "Server Added"
+        "title": "Server přidán",
+        "message": "{{name}} byl úspěšně připojen"
       },
       "serverRemoved": {
-        "message": "The server has been removed successfully",
-        "title": "Server Removed"
+        "title": "Server byl odstraněn",
+        "message": "Server byl úspěšně odstraněn"
       },
       "serverSynced": {
-        "message": "Server data has been synchronized",
-        "title": "Server Synced"
-      },
-      "serverUpdated": {
-        "message": "The server has been updated successfully",
-        "title": "Server Updated"
-      },
-      "serverUrlUpdated": {
-        "message": "The server URL has been updated successfully",
-        "title": "Server URL Updated"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted",
-        "title": "Sessions Deleted"
-      },
-      "sessionsRevoked": {
-        "message": "All mobile sessions have been revoked",
-        "title": "Sessions Revoked"
+        "title": "Server synchronizován",
+        "message": "Data serveru byla synchronizována"
       },
       "settingsUpdated": {
-        "message": "Your settings have been saved",
-        "title": "Settings Updated"
-      },
-      "streamTerminated": {
-        "message": "The playback session has been stopped",
-        "title": "Stream Terminated"
-      },
-      "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "Nastavení aktualizováno",
+        "message": "Vaše nastavení bylo uloženo"
       },
       "tokenCopied": {
-        "message": "Pair token copied to clipboard",
-        "title": "Token Copied"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100",
-        "title": "Trust Scores Reset"
+        "title": "Token zkopírován",
+        "message": "Párovací token zkopírován do schránky"
       },
       "violationAcknowledged": {
-        "message": "The violation has been marked as acknowledged",
-        "title": "Violation Acknowledged"
+        "title": "Porušení potvrzeno",
+        "message": "Porušení bylo označeno jako potvrzeno"
       },
       "violationDismissed": {
-        "message": "The violation has been dismissed",
-        "title": "Violation Dismissed"
+        "title": "Porušení odmítnuto",
+        "message": "Porušení bylo zamítnuto"
       },
-      "violationsAcknowledged": {
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged",
-        "title": "Violations Acknowledged"
+      "deviceRemoved": {
+        "title": "Zařízení odstraněno",
+        "message": "Zařízení bylo odpojeno"
       },
-      "violationsDismissed": {
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed",
-        "title": "Violations Dismissed"
+      "deviceRenamed": {
+        "title": "Zařízení přejmenováno",
+        "message": "Název zařízení byl aktualizován"
+      },
+      "sessionsRevoked": {
+        "title": "Relace byly zrušeny",
+        "message": "Všechny relace v mobilu byly zrušeny"
+      },
+      "loggedIn": {
+        "title": "Úspěšně",
+        "message": "Přihlášení proběhlo úspěšně"
       },
       "webhookTest": {
-        "message": "Webhook is working correctly",
-        "title": "Test Successful"
+        "title": "Test byl úspěšný",
+        "message": "Webhook funguje správně"
+      },
+      "copiedToClipboard": {
+        "title": "Zkopírováno do schránky"
+      },
+      "plexAccountLinked": {
+        "title": "Účet Plexu propojen",
+        "message": "Nyní můžete přidat servery ze svého účtu Plex"
+      },
+      "plexAccountUnlinked": {
+        "title": "Účet Plex není propojen",
+        "message": "Váš účet Plex byl odpojen"
+      },
+      "agentAdded": {
+        "title": "Agent přidán",
+        "message": "Zástupce oznámení byl přidán"
+      },
+      "agentUpdated": {
+        "title": "Agent aktualizován",
+        "message": "Zástupce oznámení byl aktualizován"
+      },
+      "agentRemoved": {
+        "title": "Agent odstraněn",
+        "message": "Zástupce oznámení byl odstraněn"
+      },
+      "jobCompleted": {
+        "title": "Úloha dokončena",
+        "message": "{{name}} úspěšně dokončeno"
+      },
+      "ruleCreated": {
+        "title": "Pravidlo vytvořeno",
+        "message": "Pravidlo bylo úspěšně vytvořeno"
+      },
+      "ruleUpdated": {
+        "title": "Pravidlo aktualizováno",
+        "message": "Pravidlo bylo úspěšně aktualizováno"
+      },
+      "ruleDeleted": {
+        "title": "Pravidlo odstraněno",
+        "message": "Pravidlo bylo úspěšně odstraněno"
+      },
+      "streamTerminated": {
+        "title": "Stream ukončen",
+        "message": "Přehrávání bylo zastaveno"
+      },
+      "serverUrlUpdated": {
+        "title": "Adresa URL serveru byla aktualizována",
+        "message": "URL serveru byla úspěšně aktualizována"
+      },
+      "serverUpdated": {
+        "title": "Server aktualizován",
+        "message": "Server byl úspěšně aktualizován"
+      },
+      "syncCompletedWithErrors": {
+        "title": "Synchronizace dokončena s chybami"
+      },
+      "sessionsDeleted": {
+        "title": "Relace odstraněny",
+        "message_one": "{{count}} relace smazána",
+        "message_other": "{{count}} relace smazány"
+      },
+      "violationsAcknowledged": {
+        "title": "Potvrzeno porušení",
+        "message_one": "{{count}} porušení potvrzeno",
+        "message_other": "{{count}} porušení potvrzeno"
+      },
+      "violationsDismissed": {
+        "title": "Porušení odmítnuto",
+        "message_one": "{{count}} porušení zamítnuto",
+        "message_other": "{{count}} potlačení odmítnuto"
+      },
+      "apiKeyGenerated": {
+        "title": "API klíč vygenerován",
+        "message": "Váš nový API klíč je připraven k použití"
+      },
+      "mobileAccessEnabled": {
+        "title": "Mobilní přístup povolen",
+        "message": "Naskenujte QR kód pomocí mobilní aplikace Tracearr pro připojení"
+      },
+      "mobileAccessDisabled": {
+        "title": "Mobilní přístup zakázán",
+        "message": "Všechny relace v mobilu byly zrušeny"
+      },
+      "pairTokenGenerated": {
+        "title": "Vygenerovaný token páru",
+        "message": "Naskenujte QR kód pomocí vašeho mobilního zařízení pro párování"
+      },
+      "displayNameUpdated": {
+        "title": "Zobrazované jméno aktualizováno"
+      },
+      "trustScoresReset": {
+        "title": "Resetování důvěryhodných skóre",
+        "message_one": "Uživatel {{count}} byl resetován na 100",
+        "message_other": "{{count}} uživatelé resetovali na 100"
+      },
+      "claimCodeValidated": {
+        "title": "Kód žádosti byl potvrzen",
+        "message": "Nyní můžete pokračovat s nastavením"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Nepodařilo se přidat server",
+      "serverRemoveFailed": "Nepodařilo se odstranit server",
+      "serverSyncFailed": "Synchronizace serveru se nezdařila",
+      "settingsUpdateFailed": "Aktualizace nastavení se nezdařila",
+      "copyFailed": "Nelze zkopírovat do schránky",
+      "acknowledgeFailed": "Nepodařilo se potvrdit porušení",
+      "dismissFailed": "Nepodařilo se zrušit porušení",
+      "authFailed": "Ověření se nezdařilo",
+      "webhookTestFailed": "Test Webhooku se nezdařil",
+      "ruleCreateFailed": "Vytvoření pravidla se nezdařilo",
+      "ruleUpdateFailed": "Aktualizace pravidla se nezdařila",
+      "ruleDeleteFailed": "Nepodařilo se odstranit pravidlo",
+      "streamTerminateFailed": "Ukončení vysílání se nezdařilo",
+      "serverUrlUpdateFailed": "Aktualizace URL serveru se nezdařila",
+      "serverUpdateFailed": "Nepodařilo se aktualizovat server",
+      "serverReorderFailed": "Změna pořadí serverů se nezdařila",
+      "sessionsDeleteFailed": "Nepodařilo se odstranit relace",
+      "apiKeyGenerateFailed": "Generování API klíče se nezdařilo",
+      "mobileAccessEnableFailed": "Nepodařilo se povolit mobilní přístup",
+      "mobileAccessDisableFailed": "Nepodařilo se zakázat mobilní přístup",
+      "pairTokenGenerateFailed": "Generování tokenu páru se nezdařilo",
+      "deviceRemoveFailed": "Odstranění zařízení se nezdařilo",
+      "deviceRenameFailed": "Nepodařilo se přejmenovat zařízení",
+      "sessionsRevokeFailed": "Nepodařilo se zrušit relace",
+      "displayNameUpdateFailed": "Aktualizace zobrazeného jména se nezdařila",
+      "trustScoresResetFailed": "Obnovení důvěryhodnosti se nezdařilo",
+      "routingUpdateFailed": "Nepodařilo se aktualizovat směrování",
+      "clipboardFailed": "Kopírování do schránky se nezdařilo",
+      "plexUnlinkFailed": "Nepodařilo se odpojit Plex účet",
+      "agentAddFailed": "Nepodařilo se přidat agenta",
+      "agentUpdateFailed": "Nepodařilo se aktualizovat agenta",
+      "agentRemoveFailed": "Nepodařilo se odstranit agenta",
+      "agentTestFailed": "Test se nezdařil",
+      "jobAlreadyRunning": "Pracovní pozice již běží",
+      "jobStartFailed": "Nepodařilo se spustit zakázku",
+      "jobLoadFailed": "Nepodařilo se načíst úlohy údržby",
+      "invalidUrl": "Neplatná URL",
+      "plexDirectUrl": "plex.direct URL jsou překladové adresy, které zde nelze použít. Použijte prosím přímou IP adresu nebo název hostitele.",
+      "invalidClaimCode": {
+        "title": "Neplatný kód pozemku",
+        "message": "Zkontrolujte protokoly serveru"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} encountered an error",
-        "title": "Job Failed"
+        "title": "Pracovní pozice se nezdařila",
+        "message": "{{name}} došlo k chybě"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Nový Stream byl spuštěn",
+        "message": "{{user}} začal sledovat {{media}}"
+      },
+      "streamStopped": {
+        "title": "Stream zastaven",
+        "message": "{{user}} přestal sledovat"
+      },
+      "updateAvailable": {
+        "title": "Dostupná aktualizace",
+        "message": "Tracearr {{version}} je k dispozici"
+      },
+      "serverOffline": {
+        "title": "Server je offline",
+        "message": "{{name}} je nedostupný"
+      },
+      "serverOnline": {
+        "title": "Server online",
+        "message": "{{name}} je opět online"
+      },
+      "violationDetected": {
+        "title": "Nové násilí: {{ruleName}}",
+        "message": "{{user}} spustil {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Detekováno sdílení porušení",
+    "streamStarted": "Stream spuštěn",
+    "streamEnded": "Stream skončil",
+    "serverDown": "Připojení k serveru bylo ztraceno",
+    "serverUp": "Server Zpět online",
+    "newDevice": "Nové zařízení",
+    "trustScoreChanged": "Důvěra změněna skóre"
+  },
+  "settings": {
+    "title": "Nastavení oznámení",
+    "allSeverity": "Vše (řádky, varování, vysoké)",
+    "warningAndHigh": "Upozornění a pouze vysoké",
+    "highOnly": "Pouze vysoká závažnost",
+    "allTypes": "Všechny typy",
+    "rateLimit": "Stav limitu aktuální sazby",
+    "perMinute": "Za minutu",
+    "perHour": "Za hodinu",
+    "enablePushNotifications": "Povolit Push oznámení",
+    "notificationEvents": "Oznámení událostí",
+    "violationDetected": "Detekováno porušení",
+    "violationDetectedDesc": "Když je spuštěno porušení sdílení",
+    "streamStarted": "Stream spuštěn",
+    "streamStartedDesc": "Když uživatel začne sledovat",
+    "streamStopped": "Stream zastaven",
+    "streamStoppedDesc": "Když uživatel přestane sledovat",
+    "concurrentStreams": "Souběžné streamy",
+    "concurrentStreamsDesc": "Když je překročen maximální limit streamu",
+    "newDevice": "Nové zařízení",
+    "newDeviceDesc": "Když se připojí nové zařízení",
+    "trustScoreChanged": "Důvěra změněna skóre",
+    "trustScoreChangedDesc": "Když se změní skóre důvěry uživatele",
+    "serverDown": "Server dolů",
+    "serverDownDesc": "Když se server s médii odpojí",
+    "serverUp": "Server nahoru",
+    "serverUpDesc": "Když se mediální server vrátí online",
+    "violationFilters": "Porušení filtrů",
+    "minimumSeverity": "Minimální závažnost",
+    "quietHours": "Tiché hodiny",
+    "enableQuietHours": "Povolit Tiché hodiny",
+    "overrideForCritical": "Přepsat pro kritické",
+    "rateLimiting": "Omezení sazeb"
   }
 }
