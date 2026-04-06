@@ -28,13 +28,13 @@
     "loginFailed": "Login failed",
     "invalidCredentials": "Invalid email or password",
     "jellyfinInvalidCredentials": "Invalid username or password, or user is not an administrator",
-    "claimCodeRequired": "First-time setup requires a claim code",
-    "enterClaimCode": "Enter Claim Code",
-    "claimCodeDescription": "Check your server logs for the claim code to proceed with setup",
-    "claimCodeLabel": "Claim Code",
-    "claimCodeHint": "The claim code is printed in the server logs when the container starts",
+    "claimCodeRequired": "Primeira configuração requer um código de reivindicação",
+    "enterClaimCode": "Inserir código de solicitação",
+    "claimCodeDescription": "Verifique os logs do seu servidor para obter o código de reivindicação para prosseguir com a configuração",
+    "claimCodeLabel": "Solicitar Código",
+    "claimCodeHint": "O código de reivindicação é impresso nos logs do servidor quando o contêiner começa",
     "validateClaimCode": "Validate Claim Code",
-    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup"
+    "claimCodeSecurityNote": "Esta medida de segurança garante que somente usuários autorizados possam concluir a configuração inicial"
   },
   "dashboard": {
     "alerts": "Alertas",
@@ -44,7 +44,7 @@
     "nowPlaying": "A reproduzir",
     "streamLocations": "Localizações das transmissões",
     "serverResources": "Recursos do servidor",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Banda",
     "noActiveStreams": "Nenhuma transmissão ativa",
     "streamsAppearHere": "As transmissões aparecem aqui quando os utilizadores começarem a ver"
   },
@@ -101,7 +101,7 @@
     "engagementBreakdown": "Engagement Breakdown",
     "howUsersEngage": "How users engage with content",
     "playsVsSessions": "Plays vs Sessions",
-    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
+    "playsVsSessionsDesc": "Complementos completos apenas — conta uma jogada quando o relógio total cobre todo o tempo de execução de um conteúdo",
     "activityByDayOfWeek": "Activity by Day of Week",
     "activityByHourOfDay": "Activity by Hour of Day",
     "platforms": "Platforms",
@@ -304,20 +304,20 @@
     }
   },
   "maintenance": {
-    "startingTitle": "Tracearr is starting up...",
-    "interruptionTitle": "Service interruption",
-    "startingDescription": "The server is waiting for backend services to become available. This page will automatically refresh when everything is ready.",
-    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored.",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "startingTitle": "Tracearr está iniciando...",
+    "interruptionTitle": "Interrupção do serviço",
+    "startingDescription": "O servidor está aguardando que os serviços de backend estejam disponíveis. Esta página será atualizada automaticamente quando tudo estiver pronto.",
+    "interruptionDescription": "Um ou mais serviços de backend ficaram indisponíveis. Esta página será atualizada automaticamente quando a conectividade for restaurada.",
+    "restoreTitle": "Restaurar do backup...",
+    "restoreFailed": "Restauração falhou",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
+      "validating": "Validando backup",
+      "creating_restore_point": "Criando ponto de restauração",
+      "shutting_down": "Desligando serviços",
+      "restoring_database": "Restaurando banco de dados",
+      "running_migrations": "Migrações em execução",
+      "rebuilding_aggregates": "Recriando agregados",
+      "restarting": "Reiniciando serviços",
       "complete": "Restore complete"
     }
   }
