@@ -44,7 +44,7 @@
     "nowPlaying": "Teraz odtwarzane",
     "streamLocations": "Lokalizacje transmisji",
     "serverResources": "Zasoby Serwera",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "Przepustowość",
     "noActiveStreams": "Brak aktywnych transmisji",
     "streamsAppearHere": "Aktywne transmisje pojawią się tutaj, gdy użytkownicy zaczną oglądać"
   },
@@ -101,7 +101,7 @@
     "engagementBreakdown": "Podział zaangażowania",
     "howUsersEngage": "Jak użytkownicy angażują się w treści",
     "playsVsSessions": "Odtworzenia a Sesje",
-    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
+    "playsVsSessionsDesc": "Tylko pełne uzupełnienia - liczy odtworzenie, gdy całkowity czas oglądania pokrywa cały czas pracy",
     "activityByDayOfWeek": "Aktywność według dnia tygodnia",
     "activityByHourOfDay": "Aktywność według godziny dnia",
     "platforms": "Platformy",
@@ -308,16 +308,16 @@
     "interruptionTitle": "Przerwa w działaniu usługi",
     "startingDescription": "Serwer oczekuje, aż usługi backendu staną się dostępne. Ta strona zostanie automatycznie odświeżona, gdy wszystko będzie gotowe.",
     "interruptionDescription": "Jedna lub więcej usług backendu stała się niedostępna. Ta strona zostanie automatycznie odświeżona, gdy połączenie zostanie przywrócone.",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "restoreTitle": "Przywracanie z kopii zapasowej...",
+    "restoreFailed": "Przywracanie nie powiodło się",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
+      "validating": "Sprawdzanie kopii zapasowej",
+      "creating_restore_point": "Tworzenie punktu przywracania",
+      "shutting_down": "Usługi zamykania",
+      "restoring_database": "Przywracanie bazy danych",
+      "running_migrations": "Uruchamianie migracji",
+      "rebuilding_aggregates": "Odbudowa agregatów",
+      "restarting": "Ponowne uruchamianie usług",
       "complete": "Restore complete"
     }
   }
