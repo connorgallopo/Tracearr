@@ -143,8 +143,8 @@
         "message_other": "{{count}} utilizadores redefinidos para 100"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Recuperar código validado",
+        "message": "Agora você pode prosseguir com a configuração"
       }
     },
     "error": {
@@ -187,8 +187,8 @@
       "invalidUrl": "URL inválido",
       "plexDirectUrl": "URLs plex.direct são endereços de relay que não podem ser usados aqui. Por favor, use um endereço IP direto ou nome de host.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Código de reivindicação inválido",
+        "message": "Por favor, verifique os logs do servidor"
       }
     },
     "warning": {
