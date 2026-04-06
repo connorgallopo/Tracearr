@@ -165,7 +165,7 @@
   "backup": {
     "title": "Copia de seguridad",
     "backToBackups": "Volver a Copias de Seguridad",
-    "description": "Backup and restore your Tracearr data",
+    "description": "Copia de seguridad y restaura tus datos de Tracearr",
     "createBackup": "Crear copia de seguridad",
     "creating": "Creando copia de seguridad...",
     "uploadBackup": "Subir copia de seguridad",
@@ -236,8 +236,8 @@
       "backupDeleteFailed": "Error al eliminar copia de seguridad",
       "restoreStarted": "Iniciando restauración",
       "restoreStartFailed": "Error al iniciar la restauración",
-      "scheduleSaved": "Backup schedule saved",
-      "scheduleError": "Failed to save backup schedule"
+      "scheduleSaved": "Programa de copia de seguridad guardado",
+      "scheduleError": "Error al guardar el programa de copia de seguridad"
     }
   }
 }
