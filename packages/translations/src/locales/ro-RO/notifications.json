@@ -2,261 +2,261 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "Server Added",
-        "message": "{{name}} has been connected successfully"
+        "title": "Server adăugat",
+        "message": "{{name}} a fost conectat cu succes"
       },
       "serverRemoved": {
-        "title": "Server Removed",
-        "message": "The server has been removed successfully"
+        "title": "Server eliminat",
+        "message": "Serverul a fost eliminat cu succes"
       },
       "serverSynced": {
-        "title": "Server Synced",
-        "message": "Server data has been synchronized"
+        "title": "Server sincronizat",
+        "message": "Datele serverului au fost sincronizate"
       },
       "settingsUpdated": {
-        "title": "Settings Updated",
-        "message": "Your settings have been saved"
+        "title": "Setări actualizate",
+        "message": "Setările au fost salvate"
       },
       "tokenCopied": {
-        "title": "Token Copied",
-        "message": "Pair token copied to clipboard"
+        "title": "Token copiat",
+        "message": "Pair token copiat în clipboard"
       },
       "violationAcknowledged": {
-        "title": "Violation Acknowledged",
-        "message": "The violation has been marked as acknowledged"
+        "title": "Încălcarea este cunoscută",
+        "message": "Încălcarea a fost marcată ca fiind recunoscută"
       },
       "violationDismissed": {
-        "title": "Violation Dismissed",
-        "message": "The violation has been dismissed"
+        "title": "Încălcare respinsă",
+        "message": "Încălcarea a fost respinsă"
       },
       "deviceRemoved": {
-        "title": "Device Removed",
-        "message": "The device has been disconnected"
+        "title": "Dispozitiv eliminat",
+        "message": "Dispozitivul a fost deconectat"
       },
       "deviceRenamed": {
-        "title": "Device Renamed",
-        "message": "The device name has been updated"
+        "title": "Dispozitiv redenumit",
+        "message": "Numele dispozitivului a fost actualizat"
       },
       "sessionsRevoked": {
-        "title": "Sessions Revoked",
-        "message": "All mobile sessions have been revoked"
+        "title": "Sesiuni revocate",
+        "message": "Toate sesiunile mobile au fost revocate"
       },
       "loggedIn": {
-        "title": "Success",
-        "message": "Logged in successfully"
+        "title": "Succes",
+        "message": "Conectat cu succes"
       },
       "webhookTest": {
-        "title": "Test Successful",
-        "message": "Webhook is working correctly"
+        "title": "Test de succes",
+        "message": "Webhook funcționează corect"
       },
       "copiedToClipboard": {
-        "title": "Copied to clipboard"
+        "title": "Copiat în clipboard"
       },
       "plexAccountLinked": {
-        "title": "Plex Account Linked",
-        "message": "You can now add servers from your Plex account"
+        "title": "Cont Plex legat",
+        "message": "Acum poți adăuga servere din contul tău Plex"
       },
       "plexAccountUnlinked": {
-        "title": "Plex Account Unlinked",
-        "message": "Your Plex account has been disconnected"
+        "title": "Cont Plex Nelegat",
+        "message": "Contul tău Plex a fost deconectat"
       },
       "agentAdded": {
-        "title": "Agent Added",
-        "message": "The notification agent has been added"
+        "title": "Agent adăugat",
+        "message": "Agentul de notificare a fost adăugat"
       },
       "agentUpdated": {
-        "title": "Agent Updated",
-        "message": "The notification agent has been updated"
+        "title": "Agent actualizat",
+        "message": "Agentul de notificare a fost actualizat"
       },
       "agentRemoved": {
-        "title": "Agent Removed",
-        "message": "The notification agent has been removed"
+        "title": "Agent eliminat",
+        "message": "Agentul de notificare a fost eliminat"
       },
       "jobCompleted": {
-        "title": "Job Completed",
-        "message": "{{name}} finished successfully"
+        "title": "Lucrare Finalizată",
+        "message": "{{name}} s-a terminat cu succes"
       },
       "ruleCreated": {
-        "title": "Rule Created",
-        "message": "The rule has been created successfully"
+        "title": "Regulă creată",
+        "message": "Regula a fost creată cu succes"
       },
       "ruleUpdated": {
-        "title": "Rule Updated",
-        "message": "The rule has been updated successfully"
+        "title": "Regulă actualizată",
+        "message": "Regula a fost actualizată cu succes"
       },
       "ruleDeleted": {
-        "title": "Rule Deleted",
-        "message": "The rule has been deleted successfully"
+        "title": "Regulă ștearsă",
+        "message": "Regula a fost ștearsă cu succes"
       },
       "streamTerminated": {
-        "title": "Stream Terminated",
-        "message": "The playback session has been stopped"
+        "title": "Stream oprit",
+        "message": "Sesiunea de redare a fost oprită"
       },
       "serverUrlUpdated": {
-        "title": "Server URL Updated",
-        "message": "The server URL has been updated successfully"
+        "title": "URL Server actualizat",
+        "message": "URL-ul serverului a fost actualizat cu succes"
       },
       "serverUpdated": {
-        "title": "Server Updated",
-        "message": "The server has been updated successfully"
+        "title": "Server actualizat",
+        "message": "Serverul a fost actualizat cu succes"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "Sincronizare terminată cu erori"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "title": "Sesiuni șterse",
+        "message_one": "{{count}} sesiune ștearsă",
+        "message_other": "{{count}} sesiuni șterse"
       },
       "violationsAcknowledged": {
-        "title": "Violations Acknowledged",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "title": "Încălcări cunoscute",
+        "message_one": "{{count}} încălcare recunoscută",
+        "message_other": "{{count}} încălcări recunoscute"
       },
       "violationsDismissed": {
-        "title": "Violations Dismissed",
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed"
+        "title": "Incalcari respinse",
+        "message_one": "{{count}} încălcare respinsă",
+        "message_other": "{{count}} încălcări respinse"
       },
       "apiKeyGenerated": {
-        "title": "API Key Generated",
-        "message": "Your new API key is ready to use"
+        "title": "Cheie API generată",
+        "message": "Noua ta cheie API este gata de utilizare"
       },
       "mobileAccessEnabled": {
-        "title": "Mobile Access Enabled",
-        "message": "Scan the QR code with the Tracearr mobile app to connect"
+        "title": "Acces mobil activat",
+        "message": "Scanați codul QR cu aplicația pentru mobil Tracearr pentru a vă conecta"
       },
       "mobileAccessDisabled": {
-        "title": "Mobile Access Disabled",
-        "message": "All mobile sessions have been revoked"
+        "title": "Acces mobil dezactivat",
+        "message": "Toate sesiunile mobile au fost revocate"
       },
       "pairTokenGenerated": {
-        "title": "Pair Token Generated",
-        "message": "Scan the QR code with your mobile device to pair"
+        "title": "Token pereche generat",
+        "message": "Scanați codul QR cu dispozitivul dvs. mobil pentru a se asocia"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "Nume afișat actualizat"
       },
       "trustScoresReset": {
-        "title": "Trust Scores Reset",
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100"
+        "title": "Resetarea scorurilor de încredere",
+        "message_one": "{{count}} utilizator resetează la 100",
+        "message_other": "{{count}} utilizatori resetați la 100"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Solicitare cod validat",
+        "message": "Acum puteţi continua cu configurarea"
       }
     },
     "error": {
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverSyncFailed": "Failed to sync server",
-      "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "dismissFailed": "Failed to dismiss violation",
-      "authFailed": "Authentication failed",
-      "webhookTestFailed": "Webhook test failed",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "serverAddFailed": "Adăugarea serverului a eșuat",
+      "serverRemoveFailed": "Ștergerea serverului a eșuat",
+      "serverSyncFailed": "Sincronizarea serverului a eșuat",
+      "settingsUpdateFailed": "Actualizarea setărilor a eșuat",
+      "copyFailed": "Nu s-a putut copia în clipboard",
+      "acknowledgeFailed": "Nu s-a putut recunoaște încălcarea",
+      "dismissFailed": "Eroare la respingerea încălcării",
+      "authFailed": "Autentificare eșuată",
+      "webhookTestFailed": "Testul Webhook a eșuat",
+      "ruleCreateFailed": "Crearea regulii a eșuat",
+      "ruleUpdateFailed": "Actualizarea regulii a eșuat",
+      "ruleDeleteFailed": "Ștergerea regulii a eșuat",
+      "streamTerminateFailed": "Nu s-a putut termina transmisiunea",
+      "serverUrlUpdateFailed": "Actualizarea adresei serverului a eșuat",
+      "serverUpdateFailed": "Actualizarea serverului a eșuat",
+      "serverReorderFailed": "Reordonarea serverelor a eșuat",
+      "sessionsDeleteFailed": "Ștergerea sesiunilor a eșuat",
+      "apiKeyGenerateFailed": "Generarea cheii API a eșuat",
+      "mobileAccessEnableFailed": "Activarea accesului mobil a eșuat",
+      "mobileAccessDisableFailed": "Dezactivarea accesului mobil a eșuat",
+      "pairTokenGenerateFailed": "Generarea token-ului de pereche a eșuat",
+      "deviceRemoveFailed": "Ștergerea dispozitivului a eșuat",
+      "deviceRenameFailed": "Eroare la redenumirea dispozitivului",
+      "sessionsRevokeFailed": "Eroare la revocarea sesiunilor",
+      "displayNameUpdateFailed": "Actualizarea numelui afișat a eșuat",
+      "trustScoresResetFailed": "Resetarea scorurilor de încredere a eșuat",
+      "routingUpdateFailed": "Nu s-a reușit actualizarea rutării",
+      "clipboardFailed": "Copierea în clipboard a eșuat",
+      "plexUnlinkFailed": "Deconectarea contului Plex a eșuat",
+      "agentAddFailed": "Adăugarea agentului a eșuat",
+      "agentUpdateFailed": "Actualizarea agentului a eșuat",
+      "agentRemoveFailed": "Nu s-a reușit eliminarea agentului",
+      "agentTestFailed": "Testul a eșuat",
+      "jobAlreadyRunning": "Job ruleaza deja",
+      "jobStartFailed": "Pornirea jobului a eșuat",
+      "jobLoadFailed": "Încărcarea lucrărilor de întreținere a eșuat",
+      "invalidUrl": "URL invalid",
+      "plexDirectUrl": "URL-urile plex.direct sunt adrese de releu care nu pot fi folosite aici. Vă rugăm să folosiți o adresă IP directă sau numele gazdei.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Cod de solicitare nevalid",
+        "message": "Vă rugăm să verificaţi jurnalele serverului"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "Lucrare Eșuată",
+        "message": "{{name}} a întâlnit o eroare"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "title": "A început un nou flux",
+        "message": "{{user}} a început urmărirea {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "Stream oprit",
+        "message": "{{user}} a oprit vizionarea"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "Actualizare disponibilă",
+        "message": "Tracearr {{version}} este disponibil"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "Server offline",
+        "message": "{{name}} este inaccesibil"
       },
       "serverOnline": {
         "title": "Server Online",
-        "message": "{{name}} is back online"
+        "message": "{{name}} este din nou online"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "title": "Incalcare noua: {{ruleName}}",
+        "message": "{{user}} a declanșat {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "Partajare Încălcări detectate",
+    "streamStarted": "Flux pornit",
+    "streamEnded": "Stream încheiat",
+    "serverDown": "Conexiune la server pierdută",
+    "serverUp": "Server înapoi online",
+    "newDevice": "Dispozitiv nou",
+    "trustScoreChanged": "Scorul de încredere schimbat"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
-    "allTypes": "All Types",
-    "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamStopped": "Stream Stopped",
-    "concurrentStreams": "Concurrent Streams",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed",
-    "serverDown": "Server Down",
-    "serverUp": "Server Up",
-    "violationFilters": "Violation Filters",
-    "minimumSeverity": "Minimum Severity",
-    "quietHours": "Quiet Hours",
-    "enableQuietHours": "Enable Quiet Hours",
-    "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "title": "Setări de notificare",
+    "allSeverity": "Toate (Low, Atentie, High)",
+    "warningAndHigh": "Doar Avertisment și Ridicat",
+    "highOnly": "Doar severitate ridicată",
+    "allTypes": "Toate tipurile",
+    "rateLimit": "Rată limită curentă",
+    "perMinute": "Pe minut",
+    "perHour": "Pe oră",
+    "enablePushNotifications": "Activează notificările push",
+    "notificationEvents": "Evenimente de notificare",
+    "violationDetected": "Încălcare detectată",
+    "streamStarted": "Flux pornit",
+    "streamStopped": "Stream oprit",
+    "concurrentStreams": "Stream-uri Concurente",
+    "newDevice": "Dispozitiv nou",
+    "trustScoreChanged": "Scorul de încredere schimbat",
+    "serverDown": "Server Jos",
+    "serverUp": "Server-ul Sus",
+    "violationFilters": "Filtre de Incalcare",
+    "minimumSeverity": "Severitate minimă",
+    "quietHours": "Ore de linişte",
+    "enableQuietHours": "Activare Ore de linişte",
+    "overrideForCritical": "Suprascrie critica",
+    "rateLimiting": "Rata de limitare"
   }
 }
