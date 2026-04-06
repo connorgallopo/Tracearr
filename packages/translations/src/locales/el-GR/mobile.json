@@ -1,60 +1,60 @@
 {
-  "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
-  },
-  "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
   "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "welcome": "Καλώς ήλθατε στο Tracearr",
+    "addServer": "Προσθήκη Διακομιστή",
+    "connectToServer": "Σύνδεση σε διακομιστή",
+    "enterServerDetails": "Εισάγετε τη διεύθυνση URL του διακομιστή Tracearr και το διακριτικό πρόσβασης από το κινητό",
+    "serverUrl": "Url Διακομιστή",
+    "accessToken": "Διακριτικό Πρόσβασης",
+    "scanQrCodeInstead": "Σάρωση Κωδικού Qr Αντ' αυτού",
+    "enterManually": "Χειροκίνητη εισαγωγή URL και διακριτικού",
+    "cameraPermissionRequired": "Απαιτείται άδεια κάμερας για τη σάρωση κωδικών QR",
+    "scanQrInstructions": "Ανοίξτε τις Ρυθμίσεις → Mobile App στο ταμπλό του Tracearr και σαρώστε τον κωδικό QR"
   },
-  "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+  "errors": {
+    "missingFields": "Λείπει Πεδία",
+    "pleaseEnterBothFields": "Παρακαλώ εισάγετε το URL και το διακριτικό του διακομιστή",
+    "invalidUrl": "Μη Έγκυρο URL",
+    "serverUrlMustStartWith": "Η διεύθυνση URL του διακομιστή πρέπει να ξεκινά με http:// ή http://",
+    "pleaseEnterValidUrl": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL διακομιστή",
+    "pairingFailed": "Αποτυχία Σύζευξης",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeMissingData": "Μη έγκυρος κωδικός QR: λείπουν δεδομένα σύζευξης",
+    "invalidQrCodeFormat": "Μη έγκυρη μορφή κωδικού QR. Παρακαλούμε δημιουργήστε ένα νέο κωδικό.",
+    "invalidQrCodeMissingUrl": "Μη έγκυρος κωδικός QR: λείπει το URL του διακομιστή",
+    "invalidQrCodeMissingToken": "Μη έγκυρος κωδικός QR: λείπει το διακριτικό σύζευξης",
+    "invalidServerUrlInQr": "Μη έγκυρη διεύθυνση URL διακομιστή στον κωδικό QR",
+    "tooManyPairingAttempts": "Πάρα πολλές προσπάθειες σύζευξης. Παρακαλώ περιμένετε μερικά λεπτά.",
+    "invalidOrExpiredToken": "Μη έγκυρο ή ληγμένο διακριτικό σύζευξης.",
+    "invalidPairingRequest": "Άκυρο αίτημα σύζευξης. Ελέγξτε το διακριτικό σας."
   },
   "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
+    "preferences": "Ρυθμίσεις",
+    "community": "Κοινότητα",
     "discord": "Discord",
+    "joinCommunity": "Γίνετε μέλος της κοινότητας",
     "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+    "viewSourceCode": "Προβολή πηγαίου κώδικα",
+    "account": "Λογαριασμός",
+    "disconnectServer": "Αποσύνδεση Εξυπηρετητή",
+    "disconnectConfirm": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε από το \"{{serverName}}\"? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
+    "disconnectConfirmGeneric": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
+    "currentlyConnected": "Συνδεδεμένο με το {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Επιλογή Διακομιστή",
+    "server": "Διακομιστής",
+    "navigation": "Navigation"
+  },
+  "resources": {
+    "cpu": "Επεξεργαστής",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "Απεσταλμένη Δοκιμή",
+    "testFailed": "Αποτυχία Δοκιμής",
+    "failedToSendTest": "Αποτυχία αποστολής δοκιμαστικής ειδοποίησης",
+    "loadingPreferences": "Φόρτωση προτιμήσεων...",
+    "unableToLoadPreferences": "Αδυναμία φόρτωσης προτιμήσεων"
   }
 }
