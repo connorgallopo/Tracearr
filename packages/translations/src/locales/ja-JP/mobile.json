@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "Tracearへようこそ",
+    "addServer": "サーバーを追加",
+    "connectToServer": "サーバーに接続",
+    "enterServerDetails": "TracearrサーバーのURLとモバイルアクセストークンを入力してください",
+    "serverUrl": "サーバー URL",
+    "accessToken": "アクセストークン",
+    "scanQrCodeInstead": "代わりにQRコードをスキャン",
+    "enterManually": "URLとトークンを手動で入力",
+    "cameraPermissionRequired": "QRコードをスキャンするにはカメラの権限が必要です",
+    "scanQrInstructions": "Tracearrダッシュボードで設定→モバイルアプリを開き、QRコードをスキャン"
+  },
   "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
+    "missingFields": "フィールドがありません",
+    "pleaseEnterBothFields": "サーバーのURLとトークンの両方を入力してください",
+    "invalidUrl": "無効な URL",
+    "serverUrlMustStartWith": "サーバーのURLはhttp://またはhttps://で始まる必要があります",
+    "pleaseEnterValidUrl": "サーバーURLを正しく入力してください",
+    "pairingFailed": "ペアリングに失敗しました",
     "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
+    "invalidQrCodeMissingData": "QRコードが無効です: ペアリングデータがありません",
+    "invalidQrCodeFormat": "QRコード形式が無効です。新しいコードを生成してください。",
+    "invalidQrCodeMissingUrl": "無効な QR コード: サーバーの URL がありません",
+    "invalidQrCodeMissingToken": "QRコードが無効です: ペアリングトークンがありません",
+    "invalidServerUrlInQr": "QRコード内の無効なサーバーURLです",
+    "tooManyPairingAttempts": "ペアリングの試行回数が多すぎます。しばらくお待ちください。",
+    "invalidOrExpiredToken": "無効または期限切れのペアリングトークンです。",
+    "invalidPairingRequest": "ペアリングリクエストが無効です。トークンを確認してください。"
+  },
+  "settings": {
+    "preferences": "設定",
+    "community": "コミュニティ",
+    "discord": "Discord",
+    "joinCommunity": "コミュニティに参加する",
+    "github": "GitHub",
+    "viewSourceCode": "ソースコードを表示",
+    "account": "アカウント",
+    "disconnectServer": "サーバーを切断",
+    "disconnectConfirm": "「{{serverName}}」との接続を解除してもよろしいですか？アプリを使用するには再度ペアリングする必要があります。",
+    "disconnectConfirmGeneric": "切断してもよろしいですか？アプリを使用するには、もう一度ペアリングする必要があります。",
+    "currentlyConnected": "現在、 {{serverName}} に接続しています"
   },
   "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
-  "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "selectServer": "サーバーを選択",
+    "server": "サーバー",
+    "navigation": "Navigation"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+  "notifications": {
+    "testSent": "テストを送信しました",
+    "testFailed": "テスト失敗",
+    "failedToSendTest": "テスト通知の送信に失敗しました",
+    "loadingPreferences": "設定を読み込んでいます...",
+    "unableToLoadPreferences": "設定を読み込むことができません"
   }
 }
