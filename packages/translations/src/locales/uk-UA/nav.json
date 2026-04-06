@@ -1,5 +1,5 @@
 {
-  "dashboard": "Dashboard",
+  "dashboard": "Приладна дошка",
   "map": "Карта",
   "history": "Історія",
   "stats": "Статистика",
@@ -12,8 +12,8 @@
   "settings": "Налаштування",
   "overview": "Огляд",
   "quality": "Якість",
-  "storage": "Storage",
-  "watch": "Watch",
+  "storage": "Сховище",
+  "watch": "Дивитися",
   "performance": "Продуктивність",
   "devices": "Пристрої",
   "bandwidth": "Пропускна здатність",
