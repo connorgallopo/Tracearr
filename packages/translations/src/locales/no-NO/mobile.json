@@ -1,60 +1,60 @@
 {
-  "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
-  },
-  "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
   "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "welcome": "Velkommen til Tracearr",
+    "addServer": "Legg til server",
+    "connectToServer": "Koble til server",
+    "enterServerDetails": "Skriv inn din tracker server URL og mobil tilgangstoken",
+    "serverUrl": "URL til server",
+    "accessToken": "Tilgang til kode",
+    "scanQrCodeInstead": "Skann QR-koden i stedet",
+    "enterManually": "Skriv inn URL og Token manuelt",
+    "cameraPermissionRequired": "Kameratillatelse kreves for å skanne QR-koder",
+    "scanQrInstructions": "Åpne Innstillinger → Mobilapp i Tracearr dashbordet og skann QR-koden"
   },
-  "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+  "errors": {
+    "missingFields": "Manglende felt",
+    "pleaseEnterBothFields": "Vennligst skriv inn både serverens URL og token",
+    "invalidUrl": "Ugyldig nettadresse",
+    "serverUrlMustStartWith": "Server-URL-adressen må starte med http:// eller https://",
+    "pleaseEnterValidUrl": "Vennligst skriv inn en gyldig nettadresse til serveren",
+    "pairingFailed": "Sammenkobling mislyktes",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeMissingData": "Ugyldig QR-kode: mangler tilkoblingsdata",
+    "invalidQrCodeFormat": "Ugyldig QR-kode format. Opprett en ny kode.",
+    "invalidQrCodeMissingUrl": "Ugyldig QR-kode: manglende server-URL",
+    "invalidQrCodeMissingToken": "Ugyldig QR-kode: manglende tilkoblingstoken",
+    "invalidServerUrlInQr": "Ugyldig server URL i QR-kode",
+    "tooManyPairingAttempts": "For mange paringsforsøk. Vent et par minutter.",
+    "invalidOrExpiredToken": "Ugyldig eller utgått tilkoblingsnøkkel.",
+    "invalidPairingRequest": "Ugyldig sammenkoblingsforespørsel. Kontroller koden."
   },
   "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
-    "discord": "Discord",
+    "preferences": "Innstillinger",
+    "community": "Fellesskap",
+    "discord": "Splid",
+    "joinCommunity": "Bli med i samfunnet",
     "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+    "viewSourceCode": "Vis kildekode",
+    "account": "Konto",
+    "disconnectServer": "Koble fra server",
+    "disconnectConfirm": "Er du sikker på at du vil koble fra \"{{serverName}}\"? Du må parre igjen for å bruke appen.",
+    "disconnectConfirmGeneric": "Er du sikker på at du vil koble fra? Du må parre deg igjen for å bruke appen.",
+    "currentlyConnected": "Foreløpig koblet til {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Velg Server",
+    "server": "Tjener",
+    "navigation": "Navigation"
+  },
+  "resources": {
+    "cpu": "Prosessor",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "Test sendt",
+    "testFailed": "Testen mislyktes",
+    "failedToSendTest": "Kunne ikke sende testnotifikasjon",
+    "loadingPreferences": "Laster inn innstillinger...",
+    "unableToLoadPreferences": "Kan ikke laste innstillingene"
   }
 }
