@@ -2,261 +2,261 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "Server Added",
-        "message": "{{name}} has been connected successfully"
+        "title": "Palvelin Lisätty",
+        "message": "{{name}} on yhdistetty onnistuneesti"
       },
       "serverRemoved": {
-        "title": "Server Removed",
-        "message": "The server has been removed successfully"
+        "title": "Palvelin Poistettu",
+        "message": "Palvelin on poistettu onnistuneesti"
       },
       "serverSynced": {
-        "title": "Server Synced",
-        "message": "Server data has been synchronized"
+        "title": "Palvelin Synkronoitu",
+        "message": "Palvelimen tiedot on synkronoitu"
       },
       "settingsUpdated": {
-        "title": "Settings Updated",
-        "message": "Your settings have been saved"
+        "title": "Asetukset Päivitetty",
+        "message": "Asetuksesi on tallennettu"
       },
       "tokenCopied": {
-        "title": "Token Copied",
-        "message": "Pair token copied to clipboard"
+        "title": "Pääsymerkki Kopioitu",
+        "message": "Pari token kopioitu leikepöydälle"
       },
       "violationAcknowledged": {
-        "title": "Violation Acknowledged",
-        "message": "The violation has been marked as acknowledged"
+        "title": "Rikkominen Tunnettu",
+        "message": "Rikkomus on merkitty tunnustetuksi"
       },
       "violationDismissed": {
-        "title": "Violation Dismissed",
-        "message": "The violation has been dismissed"
+        "title": "Rikkomus Hylätty",
+        "message": "Rikkomus on hylätty"
       },
       "deviceRemoved": {
-        "title": "Device Removed",
-        "message": "The device has been disconnected"
+        "title": "Laite Poistettu",
+        "message": "Laite on katkaistu"
       },
       "deviceRenamed": {
-        "title": "Device Renamed",
-        "message": "The device name has been updated"
+        "title": "Laite Nimetään Uudelleen",
+        "message": "Laitteen nimi on päivitetty"
       },
       "sessionsRevoked": {
-        "title": "Sessions Revoked",
-        "message": "All mobile sessions have been revoked"
+        "title": "Istunnot Peruttu",
+        "message": "Kaikki mobiiliistunnot on peruutettu"
       },
       "loggedIn": {
-        "title": "Success",
-        "message": "Logged in successfully"
+        "title": "Onnistui",
+        "message": "Kirjautunut onnistuneesti"
       },
       "webhookTest": {
-        "title": "Test Successful",
-        "message": "Webhook is working correctly"
+        "title": "Testi Onnistui",
+        "message": "Webkoukku toimii oikein"
       },
       "copiedToClipboard": {
-        "title": "Copied to clipboard"
+        "title": "Kopioitu leikepöydälle"
       },
       "plexAccountLinked": {
-        "title": "Plex Account Linked",
-        "message": "You can now add servers from your Plex account"
+        "title": "Plex Tili Yhdistetty",
+        "message": "Voit nyt lisätä palvelimia Plex tilisi"
       },
       "plexAccountUnlinked": {
-        "title": "Plex Account Unlinked",
-        "message": "Your Plex account has been disconnected"
+        "title": "Plex Tili Linkittämätön",
+        "message": "Yhteys Plex-tiliisi on katkaistu"
       },
       "agentAdded": {
-        "title": "Agent Added",
-        "message": "The notification agent has been added"
+        "title": "Agentin Lisätty",
+        "message": "Ilmoituksen tekijä on lisätty"
       },
       "agentUpdated": {
-        "title": "Agent Updated",
-        "message": "The notification agent has been updated"
+        "title": "Agentin Päivitetty",
+        "message": "Ilmoituksen välittäjä on päivitetty"
       },
       "agentRemoved": {
-        "title": "Agent Removed",
-        "message": "The notification agent has been removed"
+        "title": "Agentin Poistettu",
+        "message": "Ilmoituksen tekijä on poistettu"
       },
       "jobCompleted": {
-        "title": "Job Completed",
-        "message": "{{name}} finished successfully"
+        "title": "Työ Suoritettu",
+        "message": "{{name}} suoritettiin onnistuneesti"
       },
       "ruleCreated": {
-        "title": "Rule Created",
-        "message": "The rule has been created successfully"
+        "title": "Sääntö Luotu",
+        "message": "Sääntöä on luotu onnistuneesti"
       },
       "ruleUpdated": {
-        "title": "Rule Updated",
-        "message": "The rule has been updated successfully"
+        "title": "Sääntö Päivitetty",
+        "message": "Sääntöä on päivitetty onnistuneesti"
       },
       "ruleDeleted": {
-        "title": "Rule Deleted",
-        "message": "The rule has been deleted successfully"
+        "title": "Sääntö Poistettu",
+        "message": "Sääntöä on poistettu onnistuneesti"
       },
       "streamTerminated": {
-        "title": "Stream Terminated",
-        "message": "The playback session has been stopped"
+        "title": "Virta Päätetty",
+        "message": "Toiston istunto on pysäytetty"
       },
       "serverUrlUpdated": {
-        "title": "Server URL Updated",
-        "message": "The server URL has been updated successfully"
+        "title": "Palvelimen URL Päivitetty",
+        "message": "Palvelimen URL on päivitetty onnistuneesti"
       },
       "serverUpdated": {
-        "title": "Server Updated",
-        "message": "The server has been updated successfully"
+        "title": "Palvelin Päivitetty",
+        "message": "Palvelin on päivitetty onnistuneesti"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "Synkronointi suoritettu virheiden kanssa"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "title": "Istunnot Poistettu",
+        "message_one": "{{count}} istunto poistettu",
+        "message_other": "{{count}} istuntoa poistettu"
       },
       "violationsAcknowledged": {
-        "title": "Violations Acknowledged",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "title": "Tunnustetut Rikkomukset",
+        "message_one": "{{count}} rikkomusta tunnistettu",
+        "message_other": "{{count}} rikkomusta tunnistettu"
       },
       "violationsDismissed": {
-        "title": "Violations Dismissed",
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed"
+        "title": "Rikkomukset Hylätty",
+        "message_one": "{{count}} rikkomusta hylätty",
+        "message_other": "{{count}} rikkomusta hylätty"
       },
       "apiKeyGenerated": {
-        "title": "API Key Generated",
-        "message": "Your new API key is ready to use"
+        "title": "Api Avain Luotu",
+        "message": "Uusi API-avaimesi on valmis käytettäväksi"
       },
       "mobileAccessEnabled": {
-        "title": "Mobile Access Enabled",
-        "message": "Scan the QR code with the Tracearr mobile app to connect"
+        "title": "Mobiilikäyttö Käytössä",
+        "message": "Skannaa QR-koodi Tracearr mobiilisovelluksella, jotta voit muodostaa yhteyden"
       },
       "mobileAccessDisabled": {
-        "title": "Mobile Access Disabled",
-        "message": "All mobile sessions have been revoked"
+        "title": "Mobiilikäyttö Pois Käytöstä",
+        "message": "Kaikki mobiiliistunnot on peruutettu"
       },
       "pairTokenGenerated": {
-        "title": "Pair Token Generated",
-        "message": "Scan the QR code with your mobile device to pair"
+        "title": "Pari Luotu",
+        "message": "Skannaa QR-koodi mobiililaitteellasi, jotta voit muodostaa parin"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "Näytön Nimi Päivitetty"
       },
       "trustScoresReset": {
-        "title": "Trust Scores Reset",
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100"
+        "title": "Luottamus Pisteet Nollaa",
+        "message_one": "{{count}} käyttäjän nollaus 100",
+        "message_other": "{{count}} käyttäjää nollattu 100 käyttäjäksi"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "Lunasta koodi vahvistettu",
+        "message": "Voit nyt jatkaa asetuksia"
       }
     },
     "error": {
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverSyncFailed": "Failed to sync server",
-      "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "dismissFailed": "Failed to dismiss violation",
-      "authFailed": "Authentication failed",
-      "webhookTestFailed": "Webhook test failed",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "serverAddFailed": "Palvelimen lisääminen epäonnistui",
+      "serverRemoveFailed": "Palvelimen poistaminen epäonnistui",
+      "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
+      "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
+      "copyFailed": "Ei voitu kopioida leikepöydälle",
+      "acknowledgeFailed": "Rikkomuksen hyväksyminen epäonnistui",
+      "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
+      "authFailed": "Todennus epäonnistui",
+      "webhookTestFailed": "Webkoukkutesti epäonnistui",
+      "ruleCreateFailed": "Sääntöä ei voitu luoda",
+      "ruleUpdateFailed": "Sääntöä ei voitu päivittää",
+      "ruleDeleteFailed": "Sääntöä ei voitu poistaa",
+      "streamTerminateFailed": "Virran lopettaminen epäonnistui",
+      "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
+      "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
+      "serverReorderFailed": "Palvelimien uudelleenjärjestäminen epäonnistui",
+      "sessionsDeleteFailed": "Istuntojen poistaminen epäonnistui",
+      "apiKeyGenerateFailed": "API-avaimen luonti epäonnistui",
+      "mobileAccessEnableFailed": "Mobiiliyhteyden käyttöoikeuden käyttöönotto epäonnistui",
+      "mobileAccessDisableFailed": "Mobiiliyhteyden käyttöoikeuden poistaminen käytöstä epäonnistui",
+      "pairTokenGenerateFailed": "Parin tunnuksen luonti epäonnistui",
+      "deviceRemoveFailed": "Laitteen poistaminen epäonnistui",
+      "deviceRenameFailed": "Laitteen uudelleennimeäminen epäonnistui",
+      "sessionsRevokeFailed": "Istuntojen peruuttaminen epäonnistui",
+      "displayNameUpdateFailed": "Näytön nimeä ei voitu päivittää",
+      "trustScoresResetFailed": "Luottamuspisteiden nollaaminen epäonnistui",
+      "routingUpdateFailed": "Reitityksen päivitys epäonnistui",
+      "clipboardFailed": "Kopiointi leikepöydälle epäonnistui",
+      "plexUnlinkFailed": "Plex tilin poisto epäonnistui",
+      "agentAddFailed": "Edustajan lisääminen epäonnistui",
+      "agentUpdateFailed": "Agenttia ei voitu päivittää",
+      "agentRemoveFailed": "Ei voitu poistaa agenttia",
+      "agentTestFailed": "Testi epäonnistui",
+      "jobAlreadyRunning": "Työ on jo käynnissä",
+      "jobStartFailed": "Työn aloittaminen epäonnistui",
+      "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
+      "invalidUrl": "Virheellinen URL",
+      "plexDirectUrl": "plex.direct URL-osoitteet ovat releosoitteita, joita ei voi käyttää tässä. Käytä sen sijaan suoraa IP-osoitetta tai isäntänimeä.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "Virheellinen korvauskoodi",
+        "message": "Ole hyvä ja tarkista palvelimen lokit"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "Työ Epäonnistui",
+        "message": "{{name}} kohtasi virheen"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
+        "title": "Uusi Virta Aloitettu",
         "message": "{{user}} started watching {{media}}"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "Virta Pysäytetty",
+        "message": "{{user}} pysäytti katselun"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "Päivitys Saatavilla",
+        "message": "Seuraa {{version}} on saatavilla"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "Palvelin Offline-tilassa",
+        "message": "{{name}} ei ole tavoitettavissa"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "Palvelin Paikalla",
+        "message": "{{name}} on taas verkossa"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
+        "title": "Uusi Väkivalta: {{ruleName}}",
         "message": "{{user}} triggered {{ruleType}}"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "Jakaminen Rikkominen Havaittu",
+    "streamStarted": "Virta Aloitettu",
+    "streamEnded": "Virta Päättyi",
+    "serverDown": "Palvelimen Yhteys Hävitty",
+    "serverUp": "Palvelin Takaisin Verkossa",
+    "newDevice": "Uusi Laite",
+    "trustScoreChanged": "Trust Pisteet Muutettu"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
-    "allTypes": "All Types",
-    "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamStopped": "Stream Stopped",
-    "concurrentStreams": "Concurrent Streams",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed",
-    "serverDown": "Server Down",
-    "serverUp": "Server Up",
-    "violationFilters": "Violation Filters",
-    "minimumSeverity": "Minimum Severity",
-    "quietHours": "Quiet Hours",
-    "enableQuietHours": "Enable Quiet Hours",
-    "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "title": "Ilmoitusten Asetukset",
+    "allSeverity": "Kaikki (matala, Varoitus, Korkea)",
+    "warningAndHigh": "Vain varoitus ja Korkea",
+    "highOnly": "Vain korkea vaikeusaste",
+    "allTypes": "Kaikki Tyypit",
+    "rateLimit": "Nykyisen Nopeusrajan Tila",
+    "perMinute": "Minuuttia kohti",
+    "perHour": "Per Tunti",
+    "enablePushNotifications": "Ota Push-Ilmoitukset Käyttöön",
+    "notificationEvents": "Ilmoitustapahtumat",
+    "violationDetected": "Rikkominen Havaittu",
+    "streamStarted": "Virta Aloitettu",
+    "streamStopped": "Virta Pysäytetty",
+    "concurrentStreams": "Samanaikaiset Streamit",
+    "newDevice": "Uusi Laite",
+    "trustScoreChanged": "Trust Pisteet Muutettu",
+    "serverDown": "Palvelin Alas",
+    "serverUp": "Palvelin Ylös",
+    "violationFilters": "Rikkomussuodattimet",
+    "minimumSeverity": "Vähimmäisvakavuus",
+    "quietHours": "Hiljaiset Tunnit",
+    "enableQuietHours": "Ota Hiljaisuusaika Käyttöön",
+    "overrideForCritical": "Ohita kriittinen",
+    "rateLimiting": "Arvostele Rajoitus"
   }
 }
