@@ -1,60 +1,60 @@
 {
-  "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
-  },
-  "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
   "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "welcome": "مرحبا بكم في Tracearr",
+    "addServer": "إضافة خادم",
+    "connectToServer": "الاتصال بالخادم",
+    "enterServerDetails": "أدخل عنوان خادم Tracearr الخاص بك ورمز الوصول إلى الجوال",
+    "serverUrl": "رابط الخادم",
+    "accessToken": "رمز الوصول",
+    "scanQrCodeInstead": "مسح رمز QR بدلاً من ذلك",
+    "enterManually": "أدخل عنوان URL والرمز المميز يدوياً",
+    "cameraPermissionRequired": "إذن الكاميرا مطلوب لمسح رموز QR",
+    "scanQrInstructions": "فتح الإعدادات → تطبيق الجوال في لوحة التحكم الخاصة بك Tracearr ومسح رمز QR"
   },
-  "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+  "errors": {
+    "missingFields": "الحقول المفقودة",
+    "pleaseEnterBothFields": "الرجاء إدخال عنوان URL ورمز الخادم",
+    "invalidUrl": "رابط غير صالح",
+    "serverUrlMustStartWith": "عنوان URL للخادم يجب أن يبدأ مع http:// أو https://",
+    "pleaseEnterValidUrl": "الرجاء إدخال رابط خادم صالح",
+    "pairingFailed": "فشل الاقتران",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeMissingData": "رمز QR غير صالح: بيانات الاقتران المفقودة",
+    "invalidQrCodeFormat": "تنسيق رمز QR غير صالح. الرجاء إنشاء رمز جديد.",
+    "invalidQrCodeMissingUrl": "رمز QR غير صالح: رابط الخادم مفقود",
+    "invalidQrCodeMissingToken": "رمز QR غير صالح: رمز الاقتران مفقود",
+    "invalidServerUrlInQr": "رابط الخادم غير صالح في رمز QR",
+    "tooManyPairingAttempts": "العديد من محاولات الاقتران. الرجاء الانتظار بضع دقائق.",
+    "invalidOrExpiredToken": "الرمز المميز للإقران غير صالح أو منتهي الصلاحية.",
+    "invalidPairingRequest": "طلب اقتران غير صالح. تحقق من الرمز المميز الخاص بك."
   },
   "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
-    "discord": "Discord",
+    "preferences": "التفضيلات",
+    "community": "المجتمع",
+    "discord": "ديسكورد",
+    "joinCommunity": "الانضمام إلى المجتمع",
     "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+    "viewSourceCode": "عرض رمز المصدر",
+    "account": "حساب",
+    "disconnectServer": "قطع اتصال الخادم",
+    "disconnectConfirm": "هل أنت متأكد من أنك تريد قطع الاتصال من \"{{serverName}}\"؟ ستحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
+    "disconnectConfirmGeneric": "هل أنت متأكد من أنك تريد قطع الاتصال؟ سوف تحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
+    "currentlyConnected": "متصل حاليا بـ {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "حدد الخادم",
+    "server": "خادم",
+    "navigation": "Navigation"
+  },
+  "resources": {
+    "cpu": "المعالج",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "تم ارسال الاختبار",
+    "testFailed": "فشل الاختبار",
+    "failedToSendTest": "فشل في إرسال إشعار الاختبار",
+    "loadingPreferences": "جاري تحميل التفضيلات...",
+    "unableToLoadPreferences": "تعذر تحميل التفضيلات"
   }
 }
