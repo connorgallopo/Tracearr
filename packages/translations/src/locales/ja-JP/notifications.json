@@ -1,270 +1,270 @@
 {
-  "push": {
-    "newDevice": "New Device",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "streamEnded": "Stream Ended",
-    "streamStarted": "Stream Started",
-    "trustScoreChanged": "Trust Score Changed",
-    "violationDetected": "Sharing Violation Detected"
-  },
-  "settings": {
-    "allSeverity": "All (Low, Warning, High)",
-    "allTypes": "All Types",
-    "concurrentStreams": "Concurrent Streams",
-    "concurrentStreamsDesc": "When max stream limit is exceeded",
-    "enablePushNotifications": "Enable Push Notifications",
-    "enableQuietHours": "Enable Quiet Hours",
-    "highOnly": "High severity only",
-    "minimumSeverity": "Minimum Severity",
-    "newDevice": "New Device",
-    "newDeviceDesc": "When a new device connects",
-    "notificationEvents": "Notification Events",
-    "overrideForCritical": "Override for Critical",
-    "perHour": "Per Hour",
-    "perMinute": "Per Minute",
-    "quietHours": "Quiet Hours",
-    "rateLimit": "Current Rate Limit Status",
-    "rateLimiting": "Rate Limiting",
-    "serverDown": "Server Down",
-    "serverDownDesc": "When a media server goes offline",
-    "serverUp": "Server Up",
-    "serverUpDesc": "When a media server comes back online",
-    "streamStarted": "Stream Started",
-    "streamStartedDesc": "When a user starts watching",
-    "streamStopped": "Stream Stopped",
-    "streamStoppedDesc": "When a user stops watching",
-    "title": "Notification Settings",
-    "trustScoreChanged": "Trust Score Changed",
-    "trustScoreChangedDesc": "When a user's trust score changes",
-    "violationDetected": "Violation Detected",
-    "violationDetectedDesc": "When a sharing violation is triggered",
-    "violationFilters": "Violation Filters",
-    "warningAndHigh": "Warning & High only"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "agentAddFailed": "Failed to add agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "agentUpdateFailed": "Failed to update agent",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "authFailed": "Authentication failed",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "copyFailed": "Could not copy to clipboard",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "dismissFailed": "Failed to dismiss violation",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "invalidClaimCode": {
-        "message": "Please check the server logs",
-        "title": "Invalid claim code"
-      },
-      "invalidUrl": "Invalid URL",
-      "jobAlreadyRunning": "Job already running",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "jobStartFailed": "Failed to start job",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "routingUpdateFailed": "Failed to update routing",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "serverSyncFailed": "Failed to sync server",
-      "serverUpdateFailed": "Failed to update server",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "settingsUpdateFailed": "Failed to update settings",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "webhookTestFailed": "Webhook test failed"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} is unreachable",
-        "title": "Server Offline"
-      },
-      "serverOnline": {
-        "message": "{{name}} is back online",
-        "title": "Server Online"
-      },
-      "streamStarted": {
-        "message": "{{user}} started watching {{media}}",
-        "title": "New Stream Started"
-      },
-      "streamStopped": {
-        "message": "{{user}} stopped watching",
-        "title": "Stream Stopped"
-      },
-      "updateAvailable": {
-        "message": "Tracearr {{version}} is available",
-        "title": "Update Available"
-      },
-      "violationDetected": {
-        "message": "{{user}} triggered {{ruleType}}",
-        "title": "New Violation: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "The notification agent has been added",
-        "title": "Agent Added"
-      },
-      "agentRemoved": {
-        "message": "The notification agent has been removed",
-        "title": "Agent Removed"
-      },
-      "agentUpdated": {
-        "message": "The notification agent has been updated",
-        "title": "Agent Updated"
-      },
-      "apiKeyGenerated": {
-        "message": "Your new API key is ready to use",
-        "title": "API Key Generated"
-      },
-      "claimCodeValidated": {
-        "message": "You can now proceed with setup",
-        "title": "Claim code validated"
-      },
-      "copiedToClipboard": {
-        "title": "Copied to clipboard"
-      },
-      "deviceRemoved": {
-        "message": "The device has been disconnected",
-        "title": "Device Removed"
-      },
-      "deviceRenamed": {
-        "message": "The device name has been updated",
-        "title": "Device Renamed"
-      },
-      "displayNameUpdated": {
-        "title": "Display Name Updated"
-      },
-      "jobCompleted": {
-        "message": "{{name}} finished successfully",
-        "title": "Job Completed"
-      },
-      "loggedIn": {
-        "message": "Logged in successfully",
-        "title": "Success"
-      },
-      "mobileAccessDisabled": {
-        "message": "All mobile sessions have been revoked",
-        "title": "Mobile Access Disabled"
-      },
-      "mobileAccessEnabled": {
-        "message": "Scan the QR code with the Tracearr mobile app to connect",
-        "title": "Mobile Access Enabled"
-      },
-      "pairTokenGenerated": {
-        "message": "Scan the QR code with your mobile device to pair",
-        "title": "Pair Token Generated"
-      },
-      "plexAccountLinked": {
-        "message": "You can now add servers from your Plex account",
-        "title": "Plex Account Linked"
-      },
-      "plexAccountUnlinked": {
-        "message": "Your Plex account has been disconnected",
-        "title": "Plex Account Unlinked"
-      },
-      "ruleCreated": {
-        "message": "The rule has been created successfully",
-        "title": "Rule Created"
-      },
-      "ruleDeleted": {
-        "message": "The rule has been deleted successfully",
-        "title": "Rule Deleted"
-      },
-      "ruleUpdated": {
-        "message": "The rule has been updated successfully",
-        "title": "Rule Updated"
-      },
       "serverAdded": {
-        "message": "{{name}} has been connected successfully",
-        "title": "Server Added"
+        "title": "サーバー追加済み",
+        "message": "{{name}} は正常に接続されました"
       },
       "serverRemoved": {
-        "message": "The server has been removed successfully",
-        "title": "Server Removed"
+        "title": "サーバーが削除されました",
+        "message": "サーバーが正常に削除されました"
       },
       "serverSynced": {
-        "message": "Server data has been synchronized",
-        "title": "Server Synced"
-      },
-      "serverUpdated": {
-        "message": "The server has been updated successfully",
-        "title": "Server Updated"
-      },
-      "serverUrlUpdated": {
-        "message": "The server URL has been updated successfully",
-        "title": "Server URL Updated"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted",
-        "title": "Sessions Deleted"
-      },
-      "sessionsRevoked": {
-        "message": "All mobile sessions have been revoked",
-        "title": "Sessions Revoked"
+        "title": "サーバー同期済み",
+        "message": "サーバーデータが同期されました"
       },
       "settingsUpdated": {
-        "message": "Your settings have been saved",
-        "title": "Settings Updated"
-      },
-      "streamTerminated": {
-        "message": "The playback session has been stopped",
-        "title": "Stream Terminated"
-      },
-      "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "設定が更新されました",
+        "message": "設定が保存されました"
       },
       "tokenCopied": {
-        "message": "Pair token copied to clipboard",
-        "title": "Token Copied"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100",
-        "title": "Trust Scores Reset"
+        "title": "トークンがコピーされました",
+        "message": "ペアトークンをクリップボードにコピーしました"
       },
       "violationAcknowledged": {
-        "message": "The violation has been marked as acknowledged",
-        "title": "Violation Acknowledged"
+        "title": "違反が認められました",
+        "message": "違反が認められたとしてマークされています"
       },
       "violationDismissed": {
-        "message": "The violation has been dismissed",
-        "title": "Violation Dismissed"
+        "title": "違反が解除されました",
+        "message": "違反が解除されました"
       },
-      "violationsAcknowledged": {
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged",
-        "title": "Violations Acknowledged"
+      "deviceRemoved": {
+        "title": "デバイスが削除されました",
+        "message": "デバイスが切断されました"
       },
-      "violationsDismissed": {
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed",
-        "title": "Violations Dismissed"
+      "deviceRenamed": {
+        "title": "端末名を変更しました",
+        "message": "デバイス名が更新されました"
+      },
+      "sessionsRevoked": {
+        "title": "セッションが取り消されました",
+        "message": "すべてのモバイルセッションが取り消されました"
+      },
+      "loggedIn": {
+        "title": "成功",
+        "message": "ログインに成功しました"
       },
       "webhookTest": {
-        "message": "Webhook is working correctly",
-        "title": "Test Successful"
+        "title": "テスト成功",
+        "message": "Webhookは正常に動作しています"
+      },
+      "copiedToClipboard": {
+        "title": "クリップボードにコピーしました"
+      },
+      "plexAccountLinked": {
+        "title": "プレックスアカウントがリンクされています",
+        "message": "プレックスアカウントからサーバーを追加できるようになりました"
+      },
+      "plexAccountUnlinked": {
+        "title": "プレックスアカウントのリンクが解除されました",
+        "message": "プレックスアカウントが切断されました"
+      },
+      "agentAdded": {
+        "title": "エージェントが追加されました",
+        "message": "通知エージェントが追加されました"
+      },
+      "agentUpdated": {
+        "title": "エージェントの更新",
+        "message": "通知エージェントが更新されました"
+      },
+      "agentRemoved": {
+        "title": "エージェントが削除されました",
+        "message": "通知エージェントが削除されました"
+      },
+      "jobCompleted": {
+        "title": "作業完了",
+        "message": "{{name}} が正常に終了しました"
+      },
+      "ruleCreated": {
+        "title": "作成されたルール",
+        "message": "ルールが正常に作成されました"
+      },
+      "ruleUpdated": {
+        "title": "ルールが更新されました",
+        "message": "ルールが正常に更新されました"
+      },
+      "ruleDeleted": {
+        "title": "ルールを削除しました",
+        "message": "ルールが正常に削除されました"
+      },
+      "streamTerminated": {
+        "title": "配信が終了しました",
+        "message": "再生セッションが停止されました"
+      },
+      "serverUrlUpdated": {
+        "title": "サーバー URL が更新されました",
+        "message": "サーバー URL が正常に更新されました"
+      },
+      "serverUpdated": {
+        "title": "サーバー更新",
+        "message": "The server has been updated successfully"
+      },
+      "syncCompletedWithErrors": {
+        "title": "同期がエラーと共に完了しました"
+      },
+      "sessionsDeleted": {
+        "title": "削除されたセッション",
+        "message_one": "{{count}} セッションが削除されました",
+        "message_other": "{{count}} セッションが削除されました"
+      },
+      "violationsAcknowledged": {
+        "title": "違反が認められました",
+        "message_one": "{{count}} 違反が承認されました",
+        "message_other": "{{count}} 違反が承認されました"
+      },
+      "violationsDismissed": {
+        "title": "違反が解雇されました",
+        "message_one": "{{count}} 違反が解除されました",
+        "message_other": "{{count}} 違反が解除されました"
+      },
+      "apiKeyGenerated": {
+        "title": "APIキーを生成しました",
+        "message": "新しいAPIキーを使用する準備ができました"
+      },
+      "mobileAccessEnabled": {
+        "title": "モバイルアクセスが有効です",
+        "message": "TracearrモバイルアプリでQRコードをスキャンして接続します"
+      },
+      "mobileAccessDisabled": {
+        "title": "モバイルアクセスは無効です",
+        "message": "すべてのモバイルセッションが取り消されました"
+      },
+      "pairTokenGenerated": {
+        "title": "ペアトークンが生成されました",
+        "message": "モバイル端末でQRコードをスキャンしてペアリングします"
+      },
+      "displayNameUpdated": {
+        "title": "表示名が更新されました"
+      },
+      "trustScoresReset": {
+        "title": "信頼スコアをリセット",
+        "message_one": "{{count}} ユーザーを 100 にリセットしました",
+        "message_other": "{{count}} ユーザーが 100 にリセットされました"
+      },
+      "claimCodeValidated": {
+        "title": "請求コードが検証されました",
+        "message": "セットアップを続けることができます"
+      }
+    },
+    "error": {
+      "serverAddFailed": "サーバーの追加に失敗しました",
+      "serverRemoveFailed": "サーバーの削除に失敗しました",
+      "serverSyncFailed": "サーバーの同期に失敗しました",
+      "settingsUpdateFailed": "設定の更新に失敗しました",
+      "copyFailed": "クリップボードにコピーできませんでした",
+      "acknowledgeFailed": "違反を認められませんでした",
+      "dismissFailed": "違反を解除できませんでした",
+      "authFailed": "認証に失敗しました",
+      "webhookTestFailed": "Webhookテストに失敗しました",
+      "ruleCreateFailed": "ルールの作成に失敗しました",
+      "ruleUpdateFailed": "ルールの更新に失敗しました",
+      "ruleDeleteFailed": "ルールの削除に失敗しました",
+      "streamTerminateFailed": "配信の終了に失敗しました",
+      "serverUrlUpdateFailed": "サーバー URL の更新に失敗しました",
+      "serverUpdateFailed": "サーバーの更新に失敗しました",
+      "serverReorderFailed": "サーバーの順序を変更できませんでした",
+      "sessionsDeleteFailed": "セッションの削除に失敗しました",
+      "apiKeyGenerateFailed": "API キーの生成に失敗しました",
+      "mobileAccessEnableFailed": "モバイルアクセスを有効にできませんでした",
+      "mobileAccessDisableFailed": "モバイルアクセスを無効にできませんでした",
+      "pairTokenGenerateFailed": "ペアトークンの生成に失敗しました",
+      "deviceRemoveFailed": "デバイスの削除に失敗しました",
+      "deviceRenameFailed": "端末の名前を変更できませんでした",
+      "sessionsRevokeFailed": "セッションの取り消しに失敗しました",
+      "displayNameUpdateFailed": "表示名の更新に失敗しました",
+      "trustScoresResetFailed": "信頼度のリセットに失敗しました",
+      "routingUpdateFailed": "ルーティングの更新に失敗しました",
+      "clipboardFailed": "クリップボードにコピーできませんでした",
+      "plexUnlinkFailed": "プレックスアカウントのリンクを解除できませんでした",
+      "agentAddFailed": "エージェントの追加に失敗しました",
+      "agentUpdateFailed": "エージェントの更新に失敗しました",
+      "agentRemoveFailed": "エージェントの削除に失敗しました",
+      "agentTestFailed": "テストに失敗しました",
+      "jobAlreadyRunning": "ジョブは既に実行されています",
+      "jobStartFailed": "ジョブの開始に失敗しました",
+      "jobLoadFailed": "メンテナンスジョブの読み込みに失敗しました",
+      "invalidUrl": "無効な URL",
+      "plexDirectUrl": "plex.directのURLはここでは使用できないリレーアドレスです。代わりにIPアドレスまたはホスト名を使用してください。",
+      "invalidClaimCode": {
+        "title": "無効な請求コードです",
+        "message": "サーバーのログを確認してください"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} encountered an error",
-        "title": "Job Failed"
+        "title": "作業に失敗しました",
+        "message": "{{name}} にエラーが発生しました"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "新しいストリームを開始",
+        "message": "{{user}} が {{media}} の視聴を開始しました"
+      },
+      "streamStopped": {
+        "title": "配信を停止しました",
+        "message": "{{user}} が視聴を停止しました"
+      },
+      "updateAvailable": {
+        "title": "アップデートがあります",
+        "message": "Tracearr {{version}} が利用できます"
+      },
+      "serverOffline": {
+        "title": "サーバーオフライン",
+        "message": "{{name}} に到達できません"
+      },
+      "serverOnline": {
+        "title": "サーバーオンライン",
+        "message": "{{name}} がオンラインに戻りました"
+      },
+      "violationDetected": {
+        "title": "新しい違反: {{ruleName}}",
+        "message": "{{user}} が {{ruleType}}をトリガーしました"
       }
     }
+  },
+  "push": {
+    "violationDetected": "違反が検出されました。",
+    "streamStarted": "配信開始",
+    "streamEnded": "配信が終了しました",
+    "serverDown": "サーバー接続が失われました",
+    "serverUp": "サーバーバックオンライン",
+    "newDevice": "新しいデバイス",
+    "trustScoreChanged": "Trust Score Changed"
+  },
+  "settings": {
+    "title": "通知設定",
+    "allSeverity": "すべて（低、警告、高）",
+    "warningAndHigh": "警告と高のみ",
+    "highOnly": "深刻度が高いのみ",
+    "allTypes": "すべてのタイプ",
+    "rateLimit": "現在のレート制限ステータス",
+    "perMinute": "1分あたり",
+    "perHour": "1時間あたり",
+    "enablePushNotifications": "プッシュ通知を有効にする",
+    "notificationEvents": "通知イベント",
+    "violationDetected": "違反が検出されました",
+    "violationDetectedDesc": "共有違反が発生した場合",
+    "streamStarted": "配信開始",
+    "streamStartedDesc": "ユーザーが視聴を開始したとき",
+    "streamStopped": "配信を停止しました",
+    "streamStoppedDesc": "ユーザーが視聴を停止したとき",
+    "concurrentStreams": "同時ストリーム",
+    "concurrentStreamsDesc": "最大配信制限を超えた場合",
+    "newDevice": "新しいデバイス",
+    "newDeviceDesc": "新しいデバイスが接続されたとき",
+    "trustScoreChanged": "Trust Score Changed",
+    "trustScoreChangedDesc": "ユーザーの信頼スコアが変更されたとき",
+    "serverDown": "サーバーダウン",
+    "serverDownDesc": "メディアサーバーがオフラインになったとき",
+    "serverUp": "サーバー アップ",
+    "serverUpDesc": "メディアサーバーがオンラインに戻ったとき",
+    "violationFilters": "違反フィルター",
+    "minimumSeverity": "最小重大度",
+    "quietHours": "サイレントタイム",
+    "enableQuietHours": "静かな時間を有効にする",
+    "overrideForCritical": "クリティカルを上書き",
+    "rateLimiting": "レート制限"
   }
 }
