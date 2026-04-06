@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "Vítejte v Tracearr",
+    "addServer": "Přidat server",
+    "connectToServer": "Připojit k serveru",
+    "enterServerDetails": "Zadejte URL serveru Tracearr a mobilní přístupový token",
+    "serverUrl": "URL serveru",
+    "accessToken": "Přístupový token",
+    "scanQrCodeInstead": "Namísto skenování QR kódu",
+    "enterManually": "Zadejte URL a Token ručně",
+    "cameraPermissionRequired": "Pro skenování QR kódů je vyžadováno oprávnění fotoaparátu",
+    "scanQrInstructions": "Otevřete nastavení → Mobilní aplikace ve vaší nástěnce Tracearr a naskenujte QR kód"
+  },
   "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
+    "missingFields": "Chybějící pole",
+    "pleaseEnterBothFields": "Zadejte URL adresu serveru a token",
+    "invalidUrl": "Neplatná URL",
+    "serverUrlMustStartWith": "Adresa URL serveru musí začínat http:// nebo https:////",
+    "pleaseEnterValidUrl": "Zadejte prosím platnou adresu URL serveru",
+    "pairingFailed": "Párování se nezdařilo",
     "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
+    "invalidQrCodeMissingData": "Neplatný QR kód: chybí data o párování",
+    "invalidQrCodeFormat": "Neplatný formát QR kódu. Vygenerujte prosím nový kód.",
+    "invalidQrCodeMissingUrl": "Neplatný QR kód: chybí URL serveru",
+    "invalidQrCodeMissingToken": "Neplatný QR kód: chybí párovací token",
+    "invalidServerUrlInQr": "Neplatná URL adresa serveru v QR kódu",
+    "tooManyPairingAttempts": "Příliš mnoho pokusů o párování. Počkejte prosím několik minut.",
+    "invalidOrExpiredToken": "Neplatný nebo vypršela platnost tokenu.",
+    "invalidPairingRequest": "Neplatný požadavek na párování. Zkontrolujte token."
+  },
+  "settings": {
+    "preferences": "Předvolby",
+    "community": "Komunita",
+    "discord": "Discord",
+    "joinCommunity": "Připojit se ke komunitě",
+    "github": "GitHub",
+    "viewSourceCode": "Zobrazit zdrojový kód",
+    "account": "Účet",
+    "disconnectServer": "Odpojit server",
+    "disconnectConfirm": "Jste si jisti, že se chcete odpojit od \"{{serverName}}\"? Budete muset znovu spárovat pro použití aplikace.",
+    "disconnectConfirmGeneric": "Jste si jisti, že se chcete odpojit? Budete muset znovu spárovat s použitím aplikace.",
+    "currentlyConnected": "Aktuálně připojeno k {{serverName}}"
   },
   "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
-  "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "selectServer": "Vybrat server",
+    "server": "Server",
+    "navigation": "Navigation"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+  "notifications": {
+    "testSent": "Test odeslán",
+    "testFailed": "Test se nezdařil",
+    "failedToSendTest": "Nepodařilo se odeslat testovací oznámení",
+    "loadingPreferences": "Načítání nastavení...",
+    "unableToLoadPreferences": "Nelze načíst předvolby"
   }
 }
