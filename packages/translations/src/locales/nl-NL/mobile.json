@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "Welkom bij Tracearr",
+    "addServer": "Server toevoegen",
+    "connectToServer": "Verbinden met server",
+    "enterServerDetails": "Voer de URL van je Tracearr-server en mobiele toegangstoken in",
+    "serverUrl": "Server-URL",
+    "accessToken": "Toegangstoken",
+    "scanQrCodeInstead": "QR-code scannen",
+    "enterManually": "URL en token handmatig invoeren",
+    "cameraPermissionRequired": "Cameratoegang is vereist om QR-codes te scannen",
+    "scanQrInstructions": "Open Instellingen → Mobiele app in je Tracearr-controlepaneel en scan de QR-code"
+  },
   "errors": {
-    "invalidOrExpiredToken": "Ongeldig of verlopen koppeltoken.",
-    "invalidPairingRequest": "Ongeldig koppelverzoek. Controleer je token.",
-    "invalidQrCode": "Ongeldige QR-code",
-    "invalidQrCodeFormat": "Ongeldig indeling QR-code. Genereer een nieuwe code.",
-    "invalidQrCodeMissingData": "Ongeldige QR-code: koppelingsgegevens ontbreken",
-    "invalidQrCodeMissingToken": "Ongeldige QR-code: koppeltoken ontbreekt",
-    "invalidQrCodeMissingUrl": "Ongeldige QR-code: server-URL ontbreekt",
-    "invalidServerUrlInQr": "Ongeldige server-URL in QR-code",
-    "invalidUrl": "Ongeldige URL",
     "missingFields": "Ontbrekende velden",
-    "pairingFailed": "Koppelen mislukt",
     "pleaseEnterBothFields": "Voer zowel server-URL als token in",
-    "pleaseEnterValidUrl": "Voer een geldige server-URL in",
+    "invalidUrl": "Ongeldige URL",
     "serverUrlMustStartWith": "Server-URL moet beginnen met http:// of https://",
-    "tooManyPairingAttempts": "Te veel koppelpogingen. Wacht een paar minuten."
+    "pleaseEnterValidUrl": "Voer een geldige server-URL in",
+    "pairingFailed": "Koppelen mislukt",
+    "invalidQrCode": "Ongeldige QR-code",
+    "invalidQrCodeMissingData": "Ongeldige QR-code: koppelingsgegevens ontbreken",
+    "invalidQrCodeFormat": "Ongeldig indeling QR-code. Genereer een nieuwe code.",
+    "invalidQrCodeMissingUrl": "Ongeldige QR-code: server-URL ontbreekt",
+    "invalidQrCodeMissingToken": "Ongeldige QR-code: koppeltoken ontbreekt",
+    "invalidServerUrlInQr": "Ongeldige server-URL in QR-code",
+    "tooManyPairingAttempts": "Te veel koppelpogingen. Wacht een paar minuten.",
+    "invalidOrExpiredToken": "Ongeldig of verlopen koppeltoken.",
+    "invalidPairingRequest": "Ongeldig koppelverzoek. Controleer je token."
+  },
+  "settings": {
+    "preferences": "Voorkeuren",
+    "community": "Community",
+    "discord": "Discord",
+    "joinCommunity": "Sluit je aan bij de community",
+    "github": "GitHub",
+    "viewSourceCode": "Broncode weergeven",
+    "account": "Account",
+    "disconnectServer": "Server ontkoppelen",
+    "disconnectConfirm": "Weet je zeker dat je wilt ontkoppelen van \"{{serverName}}\"? Je zult opnieuw moeten koppelen om de app te gebruiken.",
+    "disconnectConfirmGeneric": "Weet je zeker dat je wilt ontkoppelen? Je zult opnieuw moeten koppelen om de app te gebruiken.",
+    "currentlyConnected": "Momenteel verbonden met {{serverName}}"
   },
   "navigation": {
-    "navigation": "Navigatie",
     "selectServer": "Server selecteren",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Versturen testmelding mislukt",
-    "loadingPreferences": "Voorkeuren laden...",
-    "testFailed": "Test mislukt",
-    "testSent": "Test verzonden",
-    "unableToLoadPreferences": "Voorkeuren laden mislukt"
-  },
-  "pair": {
-    "accessToken": "Toegangstoken",
-    "addServer": "Server toevoegen",
-    "cameraPermissionRequired": "Cameratoegang is vereist om QR-codes te scannen",
-    "connectToServer": "Verbinden met server",
-    "enterManually": "URL en token handmatig invoeren",
-    "enterServerDetails": "Voer de URL van je Tracearr-server en mobiele toegangstoken in",
-    "scanQrCodeInstead": "QR-code scannen",
-    "scanQrInstructions": "Open Instellingen → Mobiele app in je Tracearr-controlepaneel en scan de QR-code",
-    "serverUrl": "Server-URL",
-    "welcome": "Welkom bij Tracearr"
+    "server": "Server",
+    "navigation": "Navigatie"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Momenteel verbonden met {{serverName}}",
-    "disconnectConfirm": "Weet je zeker dat je wilt ontkoppelen van \"{{serverName}}\"? Je zult opnieuw moeten koppelen om de app te gebruiken.",
-    "disconnectConfirmGeneric": "Weet je zeker dat je wilt ontkoppelen? Je zult opnieuw moeten koppelen om de app te gebruiken.",
-    "disconnectServer": "Server ontkoppelen",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "Sluit je aan bij de community",
-    "preferences": "Voorkeuren",
-    "viewSourceCode": "Broncode weergeven"
+  "notifications": {
+    "testSent": "Test verzonden",
+    "testFailed": "Test mislukt",
+    "failedToSendTest": "Versturen testmelding mislukt",
+    "loadingPreferences": "Voorkeuren laden...",
+    "unableToLoadPreferences": "Voorkeuren laden mislukt"
   }
 }
