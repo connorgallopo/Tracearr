@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "Ласкаво просимо до Tracearr",
+    "addServer": "Додати сервер",
+    "connectToServer": "Підключитися до сервера",
+    "enterServerDetails": "Введіть URL-адресу вашого серверу Tracearr та токен доступу",
+    "serverUrl": "URL-адреса сервера",
+    "accessToken": "Токен доступу",
+    "scanQrCodeInstead": "Натомість скануйте QR-код",
+    "enterManually": "Введіть URL-адресу та токен вручну",
+    "cameraPermissionRequired": "Для сканування QR-кодів потрібен дозвіл на доступ до камери",
+    "scanQrInstructions": "Відкрийте налаштування → Мобільний додаток в інформаційній панелі Tracearr і відскануйте QR-код"
+  },
   "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
-    "invalidQrCode": "Недійсний QR-код",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
+    "missingFields": "Пропущені поля",
+    "pleaseEnterBothFields": "Будь ласка, введіть URL-адресу сервера та токен",
     "invalidUrl": "Неправильна URL-адреса",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
     "serverUrlMustStartWith": "URL-адреса сервера має починатися з http:// або https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
+    "pleaseEnterValidUrl": "Будь ласка, введіть коректний URL сервера",
+    "pairingFailed": "Помилка парування",
+    "invalidQrCode": "Недійсний QR-код",
+    "invalidQrCodeMissingData": "Невірний QR-код: відсутні дані для парування",
+    "invalidQrCodeFormat": "Невірний формат QR-коду. Будь ласка, згенеруйте новий код.",
+    "invalidQrCodeMissingUrl": "Невірний QR-код: відсутній URL сервера",
+    "invalidQrCodeMissingToken": "Невірний QR-код: відсутній токен парування",
+    "invalidServerUrlInQr": "Хибна URL-адреса сервера у QR-коді",
+    "tooManyPairingAttempts": "Занадто багато спроб створення пари. Будь ласка, зачекайте кілька хвилин.",
+    "invalidOrExpiredToken": "Некоректний або прострочений токен парування.",
+    "invalidPairingRequest": "Хибний запит на парування. Перевірте свій маркер."
+  },
+  "settings": {
+    "preferences": "Налаштування",
+    "community": "Спільнота",
+    "discord": "Discord",
+    "joinCommunity": "Приєднатися до спільноти",
+    "github": "GitHub",
+    "viewSourceCode": "Переглянути вихідний код",
+    "account": "Обліковий запис",
+    "disconnectServer": "Відключити сервер",
+    "disconnectConfirm": "Ви впевнені у тому, що хочете відключитися від{{serverName}}? Вам потрібно буде знову під'єднатися до програми.",
+    "disconnectConfirmGeneric": "Ви дійсно хочете відключитися? Вам необхідно ще раз з'єднатися з додатком.",
+    "currentlyConnected": "Currently connected to {{serverName}}"
   },
   "navigation": {
-    "navigation": "Navigation",
     "selectServer": "Виберіть сервер",
-    "server": "Сервер"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
-  "pair": {
-    "accessToken": "Токен доступу",
-    "addServer": "Додати сервер",
-    "cameraPermissionRequired": "Для сканування QR-кодів потрібен дозвіл на доступ до камери",
-    "connectToServer": "Підключитися до сервера",
-    "enterManually": "Введіть URL-адресу та токен вручну",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Відкрийте налаштування → Мобільний додаток в інформаційній панелі Tracearr і відскануйте QR-код",
-    "serverUrl": "URL-адреса сервера",
-    "welcome": "Ласкаво просимо до Tracearr"
+    "server": "Сервер",
+    "navigation": "Navigation"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "settings": {
-    "account": "Обліковий запис",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Відключити сервер",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Налаштування",
-    "viewSourceCode": "View source code"
+  "notifications": {
+    "testSent": "Тестування надіслано",
+    "testFailed": "Перевірка не вдалася",
+    "failedToSendTest": "Помилка надсилання сповіщення",
+    "loadingPreferences": "Завантаження налаштувань...",
+    "unableToLoadPreferences": "Не вдалося завантажити параметри"
   }
 }
