@@ -1,60 +1,60 @@
 {
-  "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
-  },
-  "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
   "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "welcome": "Bun venit la Tracearr",
+    "addServer": "Adaugă server",
+    "connectToServer": "Conectează-te la Server",
+    "enterServerDetails": "Introduceți URL-ul serverului Tracearr și indicativul de acces mobil",
+    "serverUrl": "URL Server",
+    "accessToken": "Token de acces",
+    "scanQrCodeInstead": "Scanați codul QR în schimb",
+    "enterManually": "Introduceți manual URL-ul și Token-ul",
+    "cameraPermissionRequired": "Este necesară permisiunea camerei pentru a scana codurile QR",
+    "scanQrInstructions": "Deschide setările → Aplicaţia mobilă în tabloul de bord Tracearr şi scanează codul QR"
   },
-  "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+  "errors": {
+    "missingFields": "Câmpuri lipsă",
+    "pleaseEnterBothFields": "Vă rugăm să introduceţi atât URL-ul serverului cât şi codul",
+    "invalidUrl": "URL invalid",
+    "serverUrlMustStartWith": "URL-ul serverului trebuie să înceapă cu http:// sau http://",
+    "pleaseEnterValidUrl": "Te rog introdu un URL de server valid",
+    "pairingFailed": "Asociere eșuată",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeMissingData": "Cod QR invalid: date lipsă",
+    "invalidQrCodeFormat": "Format de cod QR invalid. Vă rugăm să generați un nou cod.",
+    "invalidQrCodeMissingUrl": "Cod QR nevalid: URL-ul serverului lipsă",
+    "invalidQrCodeMissingToken": "Cod QR invalid: token lipsă de asociere",
+    "invalidServerUrlInQr": "URL server nevalid în codul QR",
+    "tooManyPairingAttempts": "Prea multe încercări de împerechere. Vă rugăm așteptați câteva minute.",
+    "invalidOrExpiredToken": "Token de asociere invalid sau expirat.",
+    "invalidPairingRequest": "Cerere de asociere nevalidă. Verificați tokenul."
   },
   "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
+    "preferences": "Preferințe",
+    "community": "Comunitate",
     "discord": "Discord",
+    "joinCommunity": "Alătură-te comunității",
     "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+    "viewSourceCode": "Vezi codul sursă",
+    "account": "Cont",
+    "disconnectServer": "Deconectare server",
+    "disconnectConfirm": "Ești sigur că vrei să te deconectezi de la \"{{serverName}}\"? Va trebui să asociezi din nou pentru a utiliza aplicația.",
+    "disconnectConfirmGeneric": "Sunteți sigur că doriți să vă deconectați? Va trebui să vă conectați din nou pentru a utiliza aplicația.",
+    "currentlyConnected": "Conectat în prezent la {{serverName}}"
+  },
+  "navigation": {
+    "selectServer": "Selectare server",
+    "server": "Server",
+    "navigation": "Navigation"
+  },
+  "resources": {
+    "cpu": "procesor",
+    "ram": "RAM"
+  },
+  "notifications": {
+    "testSent": "Test trimis",
+    "testFailed": "Test eșuat",
+    "failedToSendTest": "Trimiterea notificării de test a eșuat",
+    "loadingPreferences": "Se încarcă preferințele...",
+    "unableToLoadPreferences": "Nu s-au putut încărca preferințele"
   }
 }
