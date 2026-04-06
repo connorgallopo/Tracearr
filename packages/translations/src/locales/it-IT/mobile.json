@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "Benvenuto su Tracearr",
+    "addServer": "Aggiungi Server",
+    "connectToServer": "Connetti al server",
+    "enterServerDetails": "Inserisci l'URL del tuo server Tracearr e il token di accesso mobile",
+    "serverUrl": "Url Del Server",
+    "accessToken": "Token Di Accesso",
+    "scanQrCodeInstead": "Scansiona Il Codice QR Invece",
+    "enterManually": "Inserisci manualmente URL e Token",
+    "cameraPermissionRequired": "È richiesto il permesso della fotocamera per la scansione dei codici QR",
+    "scanQrInstructions": "Apri Impostazioni → App mobile nella tua dashboard Tracearr e scansiona il codice QR"
+  },
   "errors": {
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token.",
+    "missingFields": "Campi Mancanti",
+    "pleaseEnterBothFields": "Inserisci l'URL e il token del server",
+    "invalidUrl": "Url Non Valido",
+    "serverUrlMustStartWith": "L'URL del server deve iniziare con http:// o ↓ ://",
+    "pleaseEnterValidUrl": "Inserisci un URL valido del server",
+    "pairingFailed": "Accoppiamento Fallito",
     "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "invalidUrl": "Invalid URL",
-    "missingFields": "Missing Fields",
-    "pairingFailed": "Pairing Failed",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes."
+    "invalidQrCodeMissingData": "Codice QR non valido: dati di accoppiamento mancanti",
+    "invalidQrCodeFormat": "Formato del codice QR non valido. Si prega di generare un nuovo codice.",
+    "invalidQrCodeMissingUrl": "Codice QR non valido: URL server mancante",
+    "invalidQrCodeMissingToken": "Codice QR non valido: token di accoppiamento mancante",
+    "invalidServerUrlInQr": "URL server non valido nel codice QR",
+    "tooManyPairingAttempts": "Troppi tentativi di accoppiamento. Attendere qualche minuto.",
+    "invalidOrExpiredToken": "Token di accoppiamento non valido o scaduto.",
+    "invalidPairingRequest": "Richiesta di accoppiamento non valida. Controlla il tuo token."
+  },
+  "settings": {
+    "preferences": "Preferenze",
+    "community": "Community",
+    "discord": "Discord",
+    "joinCommunity": "Unisciti alla community",
+    "github": "GitHub",
+    "viewSourceCode": "Visualizza codice sorgente",
+    "account": "Account",
+    "disconnectServer": "Disconnetti Server",
+    "disconnectConfirm": "Sei sicuro di voler disconnetterti da \"{{serverName}}\"? Dovrai accoppiarti di nuovo per usare l'app.",
+    "disconnectConfirmGeneric": "Sei sicuro di voler disconnetterti? Dovrai accoppiarti di nuovo per usare l'app.",
+    "currentlyConnected": "Attualmente connesso a {{serverName}}"
   },
   "navigation": {
-    "navigation": "Navigation",
-    "selectServer": "Select Server",
-    "server": "Server"
-  },
-  "notifications": {
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "testFailed": "Test Failed",
-    "testSent": "Test Sent",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  },
-  "pair": {
-    "accessToken": "Access Token",
-    "addServer": "Add Server",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "connectToServer": "Connect to Server",
-    "enterManually": "Enter URL and Token Manually",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
-    "serverUrl": "Server URL",
-    "welcome": "Welcome to Tracearr"
+    "selectServer": "Seleziona Server",
+    "server": "Server",
+    "navigation": "Navigation"
   },
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "settings": {
-    "account": "Account",
-    "community": "Community",
-    "currentlyConnected": "Currently connected to {{serverName}}",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "disconnectServer": "Disconnect Server",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "Join the community",
-    "preferences": "Preferences",
-    "viewSourceCode": "View source code"
+  "notifications": {
+    "testSent": "Test Inviato",
+    "testFailed": "Test Fallito",
+    "failedToSendTest": "Impossibile inviare la notifica di prova",
+    "loadingPreferences": "Caricamento preferenze...",
+    "unableToLoadPreferences": "Impossibile caricare le preferenze"
   }
 }
