@@ -1,48 +1,48 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
-    "serverUrl": "Server URL",
-    "accessToken": "Access Token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "enterManually": "Enter URL and Token Manually",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "welcome": "Vítejte v Tracearr",
+    "addServer": "Přidat server",
+    "connectToServer": "Připojit k serveru",
+    "enterServerDetails": "Zadejte URL serveru Tracearr a mobilní přístupový token",
+    "serverUrl": "URL serveru",
+    "accessToken": "Přístupový token",
+    "scanQrCodeInstead": "Namísto skenování QR kódu",
+    "enterManually": "Zadejte URL a Token ručně",
+    "cameraPermissionRequired": "Pro skenování QR kódů je vyžadováno oprávnění fotoaparátu",
+    "scanQrInstructions": "Otevřete nastavení → Mobilní aplikace ve vaší nástěnce Tracearr a naskenujte QR kód"
   },
   "errors": {
-    "missingFields": "Missing Fields",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "invalidUrl": "Invalid URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "pairingFailed": "Pairing Failed",
+    "missingFields": "Chybějící pole",
+    "pleaseEnterBothFields": "Zadejte URL adresu serveru a token",
+    "invalidUrl": "Neplatná URL",
+    "serverUrlMustStartWith": "Adresa URL serveru musí začínat http:// nebo https:////",
+    "pleaseEnterValidUrl": "Zadejte prosím platnou adresu URL serveru",
+    "pairingFailed": "Párování se nezdařilo",
     "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token."
+    "invalidQrCodeMissingData": "Neplatný QR kód: chybí data o párování",
+    "invalidQrCodeFormat": "Neplatný formát QR kódu. Vygenerujte prosím nový kód.",
+    "invalidQrCodeMissingUrl": "Neplatný QR kód: chybí URL serveru",
+    "invalidQrCodeMissingToken": "Neplatný QR kód: chybí párovací token",
+    "invalidServerUrlInQr": "Neplatná URL adresa serveru v QR kódu",
+    "tooManyPairingAttempts": "Příliš mnoho pokusů o párování. Počkejte prosím několik minut.",
+    "invalidOrExpiredToken": "Neplatný nebo vypršela platnost tokenu.",
+    "invalidPairingRequest": "Neplatný požadavek na párování. Zkontrolujte token."
   },
   "settings": {
-    "preferences": "Preferences",
-    "community": "Community",
+    "preferences": "Předvolby",
+    "community": "Komunita",
     "discord": "Discord",
-    "joinCommunity": "Join the community",
+    "joinCommunity": "Připojit se ke komunitě",
     "github": "GitHub",
-    "viewSourceCode": "View source code",
-    "account": "Account",
-    "disconnectServer": "Disconnect Server",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+    "viewSourceCode": "Zobrazit zdrojový kód",
+    "account": "Účet",
+    "disconnectServer": "Odpojit server",
+    "disconnectConfirm": "Jste si jisti, že se chcete odpojit od \"{{serverName}}\"? Budete muset znovu spárovat pro použití aplikace.",
+    "disconnectConfirmGeneric": "Jste si jisti, že se chcete odpojit? Budete muset znovu spárovat s použitím aplikace.",
+    "currentlyConnected": "Aktuálně připojeno k {{serverName}}"
   },
   "navigation": {
-    "selectServer": "Select Server",
+    "selectServer": "Vybrat server",
     "server": "Server",
     "navigation": "Navigation"
   },
@@ -51,10 +51,10 @@
     "ram": "RAM"
   },
   "notifications": {
-    "testSent": "Test Sent",
-    "testFailed": "Test Failed",
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
+    "testSent": "Test odeslán",
+    "testFailed": "Test se nezdařil",
+    "failedToSendTest": "Nepodařilo se odeslat testovací oznámení",
+    "loadingPreferences": "Načítání nastavení...",
+    "unableToLoadPreferences": "Nelze načíst předvolby"
   }
 }
