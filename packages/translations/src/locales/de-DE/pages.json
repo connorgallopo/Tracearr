@@ -309,15 +309,15 @@
     "startingDescription": "Der Server wartet darauf, dass Backend-Dienste verfügbar sind. Diese Seite wird automatisch aktualisiert, sobald alles bereit ist.",
     "interruptionDescription": "Ein oder mehrere Backend-Dienste sind nicht mehr verfügbar. Diese Seite wird automatisch aktualisiert, wenn die Verbindung wiederhergestellt wird.",
     "restoreTitle": "Wiederherstellen vom Backup...",
-    "restoreFailed": "Restore failed",
+    "restoreFailed": "Wiederherstellung fehlgeschlagen",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
+      "validating": "Sicherung wird überprüft",
+      "creating_restore_point": "Wiederherstellungspunkt wird erstellt",
+      "shutting_down": "Dienste herunterfahren",
+      "restoring_database": "Datenbank wiederherstellen",
+      "running_migrations": "Migrationen ausführen",
+      "rebuilding_aggregates": "Aggregate neu aufbauen",
+      "restarting": "Dienste neu starten",
       "complete": "Wiederherstellung abgeschlossen"
     }
   }
