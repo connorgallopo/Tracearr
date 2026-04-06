@@ -1,60 +1,60 @@
 {
+  "pair": {
+    "welcome": "欢迎使用 Tracearr",
+    "addServer": "添加服务器",
+    "connectToServer": "连接到服务器",
+    "enterServerDetails": "输入您的 Tracearr 服务器 URL 和移动访问令牌",
+    "serverUrl": "服务器 URL",
+    "accessToken": "访问口令",
+    "scanQrCodeInstead": "改为扫描二维码",
+    "enterManually": "手动输入 URL 和令牌",
+    "cameraPermissionRequired": "请授予相机权限以扫描二维码",
+    "scanQrInstructions": "在您的 Tracearr 仪表盘中打开设置 -> 移动应用程序并扫描二维码"
+  },
   "errors": {
-    "invalidOrExpiredToken": "配对令牌无效或过期。",
-    "invalidPairingRequest": "无效配对请求。请检查您的令牌。",
-    "invalidQrCode": "无效的二维码",
-    "invalidQrCodeFormat": "无效的二维码格式。请生成一个新的代码。",
-    "invalidQrCodeMissingData": "无效的二维码：缺少配对数据",
-    "invalidQrCodeMissingToken": "无效的二维码：缺少配对令牌",
-    "invalidQrCodeMissingUrl": "无效的二维码：缺少服务器 URL",
-    "invalidServerUrlInQr": "QR码中无效的服务器 URL",
-    "invalidUrl": "地址无效",
     "missingFields": "缺失必填字段",
-    "pairingFailed": "配对失败",
     "pleaseEnterBothFields": "请同时输入服务器 URL 和令牌",
-    "pleaseEnterValidUrl": "请输入一个有效的服务器 URL",
+    "invalidUrl": "地址无效",
     "serverUrlMustStartWith": "服务器 URL 必须以 http:// 或 https:// 开头",
-    "tooManyPairingAttempts": "尝试配对太多。请等待几分钟。"
+    "pleaseEnterValidUrl": "请输入一个有效的服务器 URL",
+    "pairingFailed": "配对失败",
+    "invalidQrCode": "无效的二维码",
+    "invalidQrCodeMissingData": "无效的二维码：缺少配对数据",
+    "invalidQrCodeFormat": "无效的二维码格式。请生成一个新的代码。",
+    "invalidQrCodeMissingUrl": "无效的二维码：缺少服务器 URL",
+    "invalidQrCodeMissingToken": "无效的二维码：缺少配对令牌",
+    "invalidServerUrlInQr": "QR码中无效的服务器 URL",
+    "tooManyPairingAttempts": "尝试配对太多。请等待几分钟。",
+    "invalidOrExpiredToken": "配对令牌无效或过期。",
+    "invalidPairingRequest": "无效配对请求。请检查您的令牌。"
+  },
+  "settings": {
+    "preferences": "首选项",
+    "community": "社区",
+    "discord": "Discord",
+    "joinCommunity": "加入社区",
+    "github": "GitHub",
+    "viewSourceCode": "查看源代码",
+    "account": "帐户",
+    "disconnectServer": "断开服务器",
+    "disconnectConfirm": "您确定要断开与“{{serverName}}”的连接吗？您需要重新配对才能使用该应用。",
+    "disconnectConfirmGeneric": "您确定要断开连接？您需要再次配对才能使用应用程序。",
+    "currentlyConnected": "当前连接到 {{serverName}}"
   },
   "navigation": {
-    "navigation": "导航栏",
     "selectServer": "选择服务器",
-    "server": "服务器"
-  },
-  "notifications": {
-    "failedToSendTest": "发送测试通知失败",
-    "loadingPreferences": "正在加载首选项……",
-    "testFailed": "测试失败",
-    "testSent": "测试发送",
-    "unableToLoadPreferences": "无法加载首选项"
-  },
-  "pair": {
-    "accessToken": "访问口令",
-    "addServer": "添加服务器",
-    "cameraPermissionRequired": "请授予相机权限以扫描二维码",
-    "connectToServer": "连接到服务器",
-    "enterManually": "手动输入 URL 和令牌",
-    "enterServerDetails": "输入您的 Tracearr 服务器 URL 和移动访问令牌",
-    "scanQrCodeInstead": "改为扫描二维码",
-    "scanQrInstructions": "在您的 Tracearr 仪表盘中打开设置 -> 移动应用程序并扫描二维码",
-    "serverUrl": "服务器 URL",
-    "welcome": "欢迎使用 Tracearr"
+    "server": "服务器",
+    "navigation": "导航栏"
   },
   "resources": {
     "cpu": "處理器",
     "ram": "内存"
   },
-  "settings": {
-    "account": "帐户",
-    "community": "社区",
-    "currentlyConnected": "当前连接到 {{serverName}}",
-    "disconnectConfirm": "您确定要断开与“{{serverName}}”的连接吗？您需要重新配对才能使用该应用。",
-    "disconnectConfirmGeneric": "您确定要断开连接？您需要再次配对才能使用应用程序。",
-    "disconnectServer": "断开服务器",
-    "discord": "Discord",
-    "github": "GitHub",
-    "joinCommunity": "加入社区",
-    "preferences": "首选项",
-    "viewSourceCode": "查看源代码"
+  "notifications": {
+    "testSent": "测试发送",
+    "testFailed": "测试失败",
+    "failedToSendTest": "发送测试通知失败",
+    "loadingPreferences": "正在加载首选项……",
+    "unableToLoadPreferences": "无法加载首选项"
   }
 }
