@@ -1,48 +1,48 @@
 {
   "pair": {
-    "welcome": "Welcome to Tracearr",
-    "addServer": "Add Server",
-    "connectToServer": "Connect to Server",
-    "enterServerDetails": "Enter your Tracearr server URL and mobile access token",
+    "welcome": "Välkommen till Tracearr",
+    "addServer": "Lägg till server",
+    "connectToServer": "Anslut till server",
+    "enterServerDetails": "Ange din Tracearr server-URL och mobilaccess-token",
     "serverUrl": "Server URL",
-    "accessToken": "Access Token",
-    "scanQrCodeInstead": "Scan QR Code Instead",
-    "enterManually": "Enter URL and Token Manually",
-    "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "accessToken": "Åtkomsttoken",
+    "scanQrCodeInstead": "Skanna QR-kod istället",
+    "enterManually": "Ange URL och token manuellt",
+    "cameraPermissionRequired": "Behörighet till kamera krävs för att skanna QR-koder",
+    "scanQrInstructions": "Öppna Inställningar → Mobilapp i din Tracearr instrumentpanel och skanna QR-koden"
   },
   "errors": {
-    "missingFields": "Missing Fields",
-    "pleaseEnterBothFields": "Please enter both server URL and token",
-    "invalidUrl": "Invalid URL",
-    "serverUrlMustStartWith": "Server URL must start with http:// or https://",
-    "pleaseEnterValidUrl": "Please enter a valid server URL",
-    "pairingFailed": "Pairing Failed",
+    "missingFields": "Fält saknas",
+    "pleaseEnterBothFields": "Ange både server-URL och token",
+    "invalidUrl": "Ogiltig URL",
+    "serverUrlMustStartWith": "Server-URL måste börja med http:// eller https://",
+    "pleaseEnterValidUrl": "Ange en giltig server-URL",
+    "pairingFailed": "Parkoppling misslyckades",
     "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
-    "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
-    "invalidQrCodeMissingUrl": "Invalid QR code: missing server URL",
-    "invalidQrCodeMissingToken": "Invalid QR code: missing pairing token",
-    "invalidServerUrlInQr": "Invalid server URL in QR code",
-    "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
-    "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token."
+    "invalidQrCodeMissingData": "Ogiltig QR-kod: saknar ihopkopplingsdata",
+    "invalidQrCodeFormat": "Ogiltigt QR-kodformat. Vänligen generera en ny kod.",
+    "invalidQrCodeMissingUrl": "Ogiltig QR-kod: saknar server-URL",
+    "invalidQrCodeMissingToken": "Ogiltig QR-kod: saknad parkopplingstoken",
+    "invalidServerUrlInQr": "Ogiltig server-URL i QR-kod",
+    "tooManyPairingAttempts": "För många parningsförsök. Vänligen vänta några minuter.",
+    "invalidOrExpiredToken": "Ogiltig eller utgången parkopplingstoken.",
+    "invalidPairingRequest": "Ogiltig parkopplingsbegäran. Kontrollera din token."
   },
   "settings": {
-    "preferences": "Preferences",
-    "community": "Community",
+    "preferences": "Inställningar",
+    "community": "Gemenskap",
     "discord": "Discord",
-    "joinCommunity": "Join the community",
+    "joinCommunity": "Gå med i communityn",
     "github": "GitHub",
-    "viewSourceCode": "View source code",
-    "account": "Account",
-    "disconnectServer": "Disconnect Server",
-    "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
-    "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+    "viewSourceCode": "Visa källkod",
+    "account": "Konto",
+    "disconnectServer": "Koppla från server",
+    "disconnectConfirm": "Är du säker på att du vill koppla från \"{{serverName}}\"? Du måste koppla ihop igen för att använda appen.",
+    "disconnectConfirmGeneric": "Är du säker på att du vill koppla från? Du måste koppla ihop igen för att använda appen.",
+    "currentlyConnected": "Ansluten till {{serverName}}"
   },
   "navigation": {
-    "selectServer": "Select Server",
+    "selectServer": "Välj server",
     "server": "Server",
     "navigation": "Navigation"
   },
@@ -51,10 +51,10 @@
     "ram": "RAM"
   },
   "notifications": {
-    "testSent": "Test Sent",
-    "testFailed": "Test Failed",
-    "failedToSendTest": "Failed to send test notification",
-    "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
+    "testSent": "Test skickat",
+    "testFailed": "Testet misslyckades",
+    "failedToSendTest": "Det gick inte att skicka testnotifiering",
+    "loadingPreferences": "Laddar inställningar...",
+    "unableToLoadPreferences": "Det går inte att ladda inställningar"
   }
 }
