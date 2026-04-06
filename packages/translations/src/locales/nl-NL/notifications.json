@@ -1,270 +1,270 @@
 {
-  "push": {
-    "newDevice": "Nieuw apparaat",
-    "serverDown": "Serververbinding verbroken",
-    "serverUp": "Server weer online",
-    "streamEnded": "Stream geëindigd",
-    "streamStarted": "Stream gestart",
-    "trustScoreChanged": "Vertrouwensscore gewijzigd",
-    "violationDetected": "Deelovertreding gedetecteerd"
-  },
-  "settings": {
-    "allSeverity": "Alle (laag, waarschuwing, hoog)",
-    "allTypes": "Alle types",
-    "concurrentStreams": "Gelijktijdige streams",
-    "concurrentStreamsDesc": "When max stream limit is exceeded",
-    "enablePushNotifications": "Pushmeldingen inschakelen",
-    "enableQuietHours": "Stille uren inschakelen",
-    "highOnly": "Alleen hoge ernst",
-    "minimumSeverity": "Minimale ernst",
-    "newDevice": "Nieuw apparaat",
-    "newDeviceDesc": "When a new device connects",
-    "notificationEvents": "Meldingsgebeurtenissen",
-    "overrideForCritical": "Overschrijven indien kritiek",
-    "perHour": "Per uur",
-    "perMinute": "Per minuut",
-    "quietHours": "Stille uren",
-    "rateLimit": "Huidige status aanvraaglimiet",
-    "rateLimiting": "Aanvraaglimiet",
-    "serverDown": "Server offline",
-    "serverDownDesc": "When a media server goes offline",
-    "serverUp": "Server online",
-    "serverUpDesc": "When a media server comes back online",
-    "streamStarted": "Stream gestart",
-    "streamStartedDesc": "When a user starts watching",
-    "streamStopped": "Stream gestopt",
-    "streamStoppedDesc": "When a user stops watching",
-    "title": "Meldingsinstellingen",
-    "trustScoreChanged": "Vertrouwensscore gewijzigd",
-    "trustScoreChangedDesc": "When a user's trust score changes",
-    "violationDetected": "Overtreding gedetecteerd",
-    "violationDetectedDesc": "When a sharing violation is triggered",
-    "violationFilters": "Overtredingsfilters",
-    "warningAndHigh": "Alleen waarschuwing & hoog"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Overtreding bevestigen mislukt",
-      "agentAddFailed": "Agent toevoegen mislukt",
-      "agentRemoveFailed": "Agent verwijderen mislukt",
-      "agentTestFailed": "Test mislukt",
-      "agentUpdateFailed": "Agent bijwerken mislukt",
-      "apiKeyGenerateFailed": "API-sleutel genereren mislukt",
-      "authFailed": "Authenticatie mislukt",
-      "clipboardFailed": "Kopiëren naar klembord mislukt",
-      "copyFailed": "Kopiëren naar klembord mislukt",
-      "deviceRemoveFailed": "Apparaat verwijderen mislukt",
-      "deviceRenameFailed": "Apparaat hernoemen mislukt",
-      "dismissFailed": "Overtreding negeren mislukt",
-      "displayNameUpdateFailed": "Weergavenaam bijwerken mislukt",
-      "invalidClaimCode": {
-        "message": "Controleer het serverlogboek",
-        "title": "Ongeldige claimcode"
-      },
-      "invalidUrl": "Ongeldige URL",
-      "jobAlreadyRunning": "Taak wordt al uitgevoerd",
-      "jobLoadFailed": "Onderhoudstaken laden mislukt",
-      "jobStartFailed": "Taak starten mislukt",
-      "mobileAccessDisableFailed": "Mobiele toegang uitschakelen mislukt",
-      "mobileAccessEnableFailed": "Mobiele toegang inschakelen mislukt",
-      "pairTokenGenerateFailed": "Koppeltoken genereren mislukt",
-      "plexDirectUrl": "Een plex.direct-URL is een relay-adres dat hier niet gebruikt kan worden. Gebruik een direct IP-adres of hostnaam.",
-      "plexUnlinkFailed": "Ontkoppelen Plex-account mislukt",
-      "routingUpdateFailed": "Routering bijwerken mislukt",
-      "ruleCreateFailed": "Regel aanmaken mislukt",
-      "ruleDeleteFailed": "Regel verwijderen mislukt",
-      "ruleUpdateFailed": "Regel bijwerken mislukt",
-      "serverAddFailed": "Server toevoegen mislukt",
-      "serverRemoveFailed": "Server verwijderen mislukt",
-      "serverReorderFailed": "Servers herschikken mislukt",
-      "serverSyncFailed": "Server synchroniseren mislukt",
-      "serverUpdateFailed": "Server bijwerken mislukt",
-      "serverUrlUpdateFailed": "Server-URL bijwerken mislukt",
-      "sessionsDeleteFailed": "Sessies verwijderen mislukt",
-      "sessionsRevokeFailed": "Sessies intrekken mislukt",
-      "settingsUpdateFailed": "Instellingen bijwerken mislukt",
-      "streamTerminateFailed": "Stream afbreken mislukt",
-      "trustScoresResetFailed": "Vertrouwensscores herstellen mislukt",
-      "webhookTestFailed": "Webhook-test mislukt"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} is onbereikbaar",
-        "title": "Server offline"
-      },
-      "serverOnline": {
-        "message": "{{name}} is weer online",
-        "title": "Server online"
-      },
-      "streamStarted": {
-        "message": "{{user}} is begonnen met kijken naar {{media}}",
-        "title": "Nieuwe stream gestart"
-      },
-      "streamStopped": {
-        "message": "{{user}} is gestopt met kijken",
-        "title": "Stream gestopt"
-      },
-      "updateAvailable": {
-        "message": "Tracearr {{version}} is beschikbaar",
-        "title": "Update beschikbaar"
-      },
-      "violationDetected": {
-        "message": "{{user}} heeft {{ruleType}} geactiveerd",
-        "title": "Nieuwe overtreding: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "De meldings-agent is toegevoegd",
-        "title": "Agent toegevoegd"
+      "serverAdded": {
+        "title": "Server toegevoegd",
+        "message": "{{name}} is succesvol verbonden"
       },
-      "agentRemoved": {
-        "message": "De meldings-agent is verwijderd",
-        "title": "Agent verwijderd"
+      "serverRemoved": {
+        "title": "Server verwijderd",
+        "message": "De server is succesvol verwijderd"
       },
-      "agentUpdated": {
-        "message": "De meldings-agent is bijgewerkt",
-        "title": "Agent bijgewerkt"
+      "serverSynced": {
+        "title": "Server gesynchroniseerd",
+        "message": "Servergegevens zijn gesynchroniseerd"
       },
-      "apiKeyGenerated": {
-        "message": "Je nieuwe API-sleutel is klaar voor gebruik",
-        "title": "API-sleutel gegenereerd"
+      "settingsUpdated": {
+        "title": "Instellingen bijgewerkt",
+        "message": "Je instellingen zijn opgeslagen"
       },
-      "claimCodeValidated": {
-        "message": "Je kunt nu doorgaan met instellen",
-        "title": "Claimcode geverifiëerd"
+      "tokenCopied": {
+        "title": "Token gekopieerd",
+        "message": "Koppeltoken gekopieerd naar klembord"
+      },
+      "violationAcknowledged": {
+        "title": "Overtreding bevestigd",
+        "message": "De overtreding is aangemerkt als bevestigd"
+      },
+      "violationDismissed": {
+        "title": "Overtreding genegeerd",
+        "message": "De overtreding is genegeerd"
+      },
+      "deviceRemoved": {
+        "title": "Apparaat verwijderd",
+        "message": "Het apparaat is losgekoppeld"
+      },
+      "deviceRenamed": {
+        "title": "Apparaat hernoemd",
+        "message": "De apparaatnaam is bijgewerkt"
+      },
+      "sessionsRevoked": {
+        "title": "Sessies ingetrokken",
+        "message": "Alle mobiele sessies zijn ingetrokken"
+      },
+      "loggedIn": {
+        "title": "Geslaagd",
+        "message": "Succesvol aangemeld"
+      },
+      "webhookTest": {
+        "title": "Test geslaagd",
+        "message": "Webhook werkt correct"
       },
       "copiedToClipboard": {
         "title": "Gekopieerd naar klembord"
       },
-      "deviceRemoved": {
-        "message": "Het apparaat is losgekoppeld",
-        "title": "Apparaat verwijderd"
-      },
-      "deviceRenamed": {
-        "message": "De apparaatnaam is bijgewerkt",
-        "title": "Apparaat hernoemd"
-      },
-      "displayNameUpdated": {
-        "title": "Weergavenaam bijgewerkt"
-      },
-      "jobCompleted": {
-        "message": "{{name}} is succesvol voltooid",
-        "title": "Taak voltooid"
-      },
-      "loggedIn": {
-        "message": "Succesvol aangemeld",
-        "title": "Geslaagd"
-      },
-      "mobileAccessDisabled": {
-        "message": "Alle mobiele sessies zijn ingetrokken",
-        "title": "Mobiele toegang uitgeschakeld"
-      },
-      "mobileAccessEnabled": {
-        "message": "Scan de QR-code met de mobiele Tracearr-app om te verbinden",
-        "title": "Mobiele toegang ingeschakeld"
-      },
-      "pairTokenGenerated": {
-        "message": "Scan de QR-code met je mobiele apparaat om te koppelen",
-        "title": "Koppeltoken gegenereerd"
-      },
       "plexAccountLinked": {
-        "message": "Je kunt nu servers uit je Plex-account toevoegen",
-        "title": "Plex-account gekoppeld"
+        "title": "Plex-account gekoppeld",
+        "message": "Je kunt nu servers uit je Plex-account toevoegen"
       },
       "plexAccountUnlinked": {
-        "message": "Je Plex-account is ontkoppeld",
-        "title": "Plex-account ontkoppeld"
+        "title": "Plex-account ontkoppeld",
+        "message": "Je Plex-account is ontkoppeld"
+      },
+      "agentAdded": {
+        "title": "Agent toegevoegd",
+        "message": "De meldings-agent is toegevoegd"
+      },
+      "agentUpdated": {
+        "title": "Agent bijgewerkt",
+        "message": "De meldings-agent is bijgewerkt"
+      },
+      "agentRemoved": {
+        "title": "Agent verwijderd",
+        "message": "De meldings-agent is verwijderd"
+      },
+      "jobCompleted": {
+        "title": "Taak voltooid",
+        "message": "{{name}} is succesvol voltooid"
       },
       "ruleCreated": {
-        "message": "De regel is succesvol aangemaakt",
-        "title": "Regel aangemaakt"
-      },
-      "ruleDeleted": {
-        "message": "De regel is succesvol verwijderd",
-        "title": "Regel verwijderd"
+        "title": "Regel aangemaakt",
+        "message": "De regel is succesvol aangemaakt"
       },
       "ruleUpdated": {
-        "message": "De regel is succesvol bijgewerkt",
-        "title": "Regel bijgewerkt"
+        "title": "Regel bijgewerkt",
+        "message": "De regel is succesvol bijgewerkt"
       },
-      "serverAdded": {
-        "message": "{{name}} is succesvol verbonden",
-        "title": "Server toegevoegd"
-      },
-      "serverRemoved": {
-        "message": "De server is succesvol verwijderd",
-        "title": "Server verwijderd"
-      },
-      "serverSynced": {
-        "message": "Servergegevens zijn gesynchroniseerd",
-        "title": "Server gesynchroniseerd"
-      },
-      "serverUpdated": {
-        "message": "De server is succesvol bijgewerkt",
-        "title": "Server bijgewerkt"
-      },
-      "serverUrlUpdated": {
-        "message": "De server-URL is succesvol bijgewerkt",
-        "title": "Server-URL bijgewerkt"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} sessie verwijderd",
-        "message_other": "{{count}} sessies verwijderd",
-        "title": "Sessies verwijderd"
-      },
-      "sessionsRevoked": {
-        "message": "Alle mobiele sessies zijn ingetrokken",
-        "title": "Sessies ingetrokken"
-      },
-      "settingsUpdated": {
-        "message": "Je instellingen zijn opgeslagen",
-        "title": "Instellingen bijgewerkt"
+      "ruleDeleted": {
+        "title": "Regel verwijderd",
+        "message": "De regel is succesvol verwijderd"
       },
       "streamTerminated": {
-        "message": "De afspeelsessie is gestopt",
-        "title": "Stream afgebroken"
+        "title": "Stream afgebroken",
+        "message": "De afspeelsessie is gestopt"
+      },
+      "serverUrlUpdated": {
+        "title": "Server-URL bijgewerkt",
+        "message": "De server-URL is succesvol bijgewerkt"
+      },
+      "serverUpdated": {
+        "title": "Server bijgewerkt",
+        "message": "De server is succesvol bijgewerkt"
       },
       "syncCompletedWithErrors": {
         "title": "Synchroniseren voltooid met fouten"
       },
-      "tokenCopied": {
-        "message": "Koppeltoken gekopieerd naar klembord",
-        "title": "Token gekopieerd"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} gebruiker hersteld naar 100",
-        "message_other": "{{count}} gebruikers hersteld naar 100",
-        "title": "Vertrouwensscores hersteld"
-      },
-      "violationAcknowledged": {
-        "message": "De overtreding is aangemerkt als bevestigd",
-        "title": "Overtreding bevestigd"
-      },
-      "violationDismissed": {
-        "message": "De overtreding is genegeerd",
-        "title": "Overtreding genegeerd"
+      "sessionsDeleted": {
+        "title": "Sessies verwijderd",
+        "message_one": "{{count}} sessie verwijderd",
+        "message_other": "{{count}} sessies verwijderd"
       },
       "violationsAcknowledged": {
+        "title": "Overtreding bevestigd",
         "message_one": "{{count}} overtreding bevestigd",
-        "message_other": "{{count}} overtredingen bevestigd",
-        "title": "Overtreding bevestigd"
+        "message_other": "{{count}} overtredingen bevestigd"
       },
       "violationsDismissed": {
+        "title": "Overtredingen genegeerd",
         "message_one": "{{count}} overtreding genegeerd",
-        "message_other": "{{count}} overtredingen genegeerd",
-        "title": "Overtredingen genegeerd"
+        "message_other": "{{count}} overtredingen genegeerd"
       },
-      "webhookTest": {
-        "message": "Webhook werkt correct",
-        "title": "Test geslaagd"
+      "apiKeyGenerated": {
+        "title": "API-sleutel gegenereerd",
+        "message": "Je nieuwe API-sleutel is klaar voor gebruik"
+      },
+      "mobileAccessEnabled": {
+        "title": "Mobiele toegang ingeschakeld",
+        "message": "Scan de QR-code met de mobiele Tracearr-app om te verbinden"
+      },
+      "mobileAccessDisabled": {
+        "title": "Mobiele toegang uitgeschakeld",
+        "message": "Alle mobiele sessies zijn ingetrokken"
+      },
+      "pairTokenGenerated": {
+        "title": "Koppeltoken gegenereerd",
+        "message": "Scan de QR-code met je mobiele apparaat om te koppelen"
+      },
+      "displayNameUpdated": {
+        "title": "Weergavenaam bijgewerkt"
+      },
+      "trustScoresReset": {
+        "title": "Vertrouwensscores hersteld",
+        "message_one": "{{count}} gebruiker hersteld naar 100",
+        "message_other": "{{count}} gebruikers hersteld naar 100"
+      },
+      "claimCodeValidated": {
+        "title": "Claimcode geverifiëerd",
+        "message": "Je kunt nu doorgaan met instellen"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Server toevoegen mislukt",
+      "serverRemoveFailed": "Server verwijderen mislukt",
+      "serverSyncFailed": "Server synchroniseren mislukt",
+      "settingsUpdateFailed": "Instellingen bijwerken mislukt",
+      "copyFailed": "Kopiëren naar klembord mislukt",
+      "acknowledgeFailed": "Overtreding bevestigen mislukt",
+      "dismissFailed": "Overtreding negeren mislukt",
+      "authFailed": "Authenticatie mislukt",
+      "webhookTestFailed": "Webhook-test mislukt",
+      "ruleCreateFailed": "Regel aanmaken mislukt",
+      "ruleUpdateFailed": "Regel bijwerken mislukt",
+      "ruleDeleteFailed": "Regel verwijderen mislukt",
+      "streamTerminateFailed": "Stream afbreken mislukt",
+      "serverUrlUpdateFailed": "Server-URL bijwerken mislukt",
+      "serverUpdateFailed": "Server bijwerken mislukt",
+      "serverReorderFailed": "Servers herschikken mislukt",
+      "sessionsDeleteFailed": "Sessies verwijderen mislukt",
+      "apiKeyGenerateFailed": "API-sleutel genereren mislukt",
+      "mobileAccessEnableFailed": "Mobiele toegang inschakelen mislukt",
+      "mobileAccessDisableFailed": "Mobiele toegang uitschakelen mislukt",
+      "pairTokenGenerateFailed": "Koppeltoken genereren mislukt",
+      "deviceRemoveFailed": "Apparaat verwijderen mislukt",
+      "deviceRenameFailed": "Apparaat hernoemen mislukt",
+      "sessionsRevokeFailed": "Sessies intrekken mislukt",
+      "displayNameUpdateFailed": "Weergavenaam bijwerken mislukt",
+      "trustScoresResetFailed": "Vertrouwensscores herstellen mislukt",
+      "routingUpdateFailed": "Routering bijwerken mislukt",
+      "clipboardFailed": "Kopiëren naar klembord mislukt",
+      "plexUnlinkFailed": "Ontkoppelen Plex-account mislukt",
+      "agentAddFailed": "Agent toevoegen mislukt",
+      "agentUpdateFailed": "Agent bijwerken mislukt",
+      "agentRemoveFailed": "Agent verwijderen mislukt",
+      "agentTestFailed": "Test mislukt",
+      "jobAlreadyRunning": "Taak wordt al uitgevoerd",
+      "jobStartFailed": "Taak starten mislukt",
+      "jobLoadFailed": "Onderhoudstaken laden mislukt",
+      "invalidUrl": "Ongeldige URL",
+      "plexDirectUrl": "Een plex.direct-URL is een relay-adres dat hier niet gebruikt kan worden. Gebruik een direct IP-adres of hostnaam.",
+      "invalidClaimCode": {
+        "title": "Ongeldige claimcode",
+        "message": "Controleer het serverlogboek"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} heeft een fout ondervonden",
-        "title": "Taak mislukt"
+        "title": "Taak mislukt",
+        "message": "{{name}} heeft een fout ondervonden"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Nieuwe stream gestart",
+        "message": "{{user}} is begonnen met kijken naar {{media}}"
+      },
+      "streamStopped": {
+        "title": "Stream gestopt",
+        "message": "{{user}} is gestopt met kijken"
+      },
+      "updateAvailable": {
+        "title": "Update beschikbaar",
+        "message": "Tracearr {{version}} is beschikbaar"
+      },
+      "serverOffline": {
+        "title": "Server offline",
+        "message": "{{name}} is onbereikbaar"
+      },
+      "serverOnline": {
+        "title": "Server online",
+        "message": "{{name}} is weer online"
+      },
+      "violationDetected": {
+        "title": "Nieuwe overtreding: {{ruleName}}",
+        "message": "{{user}} heeft {{ruleType}} geactiveerd"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Deelovertreding gedetecteerd",
+    "streamStarted": "Stream gestart",
+    "streamEnded": "Stream geëindigd",
+    "serverDown": "Serververbinding verbroken",
+    "serverUp": "Server weer online",
+    "newDevice": "Nieuw apparaat",
+    "trustScoreChanged": "Vertrouwensscore gewijzigd"
+  },
+  "settings": {
+    "title": "Meldingsinstellingen",
+    "allSeverity": "Alle (laag, waarschuwing, hoog)",
+    "warningAndHigh": "Alleen waarschuwing & hoog",
+    "highOnly": "Alleen hoge ernst",
+    "allTypes": "Alle types",
+    "rateLimit": "Huidige status aanvraaglimiet",
+    "perMinute": "Per minuut",
+    "perHour": "Per uur",
+    "enablePushNotifications": "Pushmeldingen inschakelen",
+    "notificationEvents": "Meldingsgebeurtenissen",
+    "violationDetected": "Overtreding gedetecteerd",
+    "violationDetectedDesc": "Wanneer een overtreding bij delen wordt geactiveerd",
+    "streamStarted": "Stream gestart",
+    "streamStartedDesc": "Wanneer een gebruiker begint te kijken",
+    "streamStopped": "Stream gestopt",
+    "streamStoppedDesc": "Wanneer een gebruiker stopt met kijken",
+    "concurrentStreams": "Gelijktijdige streams",
+    "concurrentStreamsDesc": "Wanneer de max stream limiet is overschreden",
+    "newDevice": "Nieuw apparaat",
+    "newDeviceDesc": "Wanneer een nieuw apparaat verbinding maakt",
+    "trustScoreChanged": "Vertrouwensscore gewijzigd",
+    "trustScoreChangedDesc": "Wanneer een gebruiker vertrouwt op score verandert",
+    "serverDown": "Server offline",
+    "serverDownDesc": "Wanneer een mediaserver offline gaat",
+    "serverUp": "Server online",
+    "serverUpDesc": "Wanneer een mediaserver weer online komt",
+    "violationFilters": "Overtredingsfilters",
+    "minimumSeverity": "Minimale ernst",
+    "quietHours": "Stille uren",
+    "enableQuietHours": "Stille uren inschakelen",
+    "overrideForCritical": "Overschrijven indien kritiek",
+    "rateLimiting": "Aanvraaglimiet"
   }
 }
