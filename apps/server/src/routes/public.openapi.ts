@@ -78,6 +78,10 @@ const UserInfo = z.object({
 const MediaInfo = z.object({
   mediaTitle: z.string().openapi({ example: 'Inception' }),
   mediaType: MediaTypeEnum,
+  ratingKey: z
+    .string()
+    .nullable()
+    .openapi({ description: 'Server-specific media identifier', example: '12345' }),
   showTitle: z
     .string()
     .nullable()
@@ -85,17 +89,28 @@ const MediaInfo = z.object({
   seasonNumber: z.number().int().nullable().openapi({ example: 5 }),
   episodeNumber: z.number().int().nullable().openapi({ example: 16 }),
   year: z.number().int().nullable().openapi({ example: 2010 }),
+  imdbId: z
+    .string()
+    .nullable()
+    .openapi({ description: 'IMDb identifier when available', example: 'tt1375666' }),
+  tmdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({ description: 'TMDb identifier when available', example: 27205 }),
+  tvdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({ description: 'TVDb identifier when available', example: 80379 }),
   artistName: z
     .string()
     .nullable()
     .openapi({ description: 'Artist name (music tracks only)', example: 'Pink Floyd' }),
-  albumName: z
-    .string()
-    .nullable()
-    .openapi({
-      description: 'Album name (music tracks only)',
-      example: 'The Dark Side of the Moon',
-    }),
+  albumName: z.string().nullable().openapi({
+    description: 'Album name (music tracks only)',
+    example: 'The Dark Side of the Moon',
+  }),
   trackNumber: z
     .number()
     .int()

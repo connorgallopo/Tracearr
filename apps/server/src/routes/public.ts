@@ -741,6 +741,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         s.track_number,
         s.disc_number,
         s.thumb_path,
+        s.rating_key,
         s.device,
         s.player_name,
         s.product,
@@ -762,6 +763,9 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         s.stream_audio_details,
         s.transcode_info,
         s.subtitle_info,
+        li.imdb_id,
+        li.tmdb_id,
+        li.tvdb_id,
         su.user_id,
         su.username as server_username,
         su.thumb_url as user_thumb_url,
@@ -769,6 +773,9 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         u.username as user_username
       FROM grouped_sessions gs
       JOIN sessions s ON s.id = gs.first_session_id
+      LEFT JOIN library_items li
+        ON li.server_id = s.server_id
+       AND li.rating_key = s.rating_key
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
       LEFT JOIN users u ON u.id = su.user_id
@@ -800,6 +807,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         track_number: number | null;
         disc_number: number | null;
         thumb_path: string | null;
+        rating_key: string | null;
         device: string | null;
         player_name: string | null;
         product: string | null;
@@ -821,6 +829,9 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         stream_audio_details: StreamAudioDetails | null;
         transcode_info: TranscodeInfo | null;
         subtitle_info: SubtitleInfo | null;
+        imdb_id: string | null;
+        tmdb_id: number | null;
+        tvdb_id: number | null;
         user_id: string;
         server_username: string;
         user_thumb_url: string | null;
@@ -838,6 +849,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       seasonNumber: row.season_number,
       episodeNumber: row.episode_number,
       year: row.year,
+      ratingKey: row.rating_key,
+      imdbId: row.imdb_id,
+      tmdbId: row.tmdb_id,
+      tvdbId: row.tvdb_id,
       artistName: row.artist_name,
       albumName: row.album_name,
       trackNumber: row.track_number,
