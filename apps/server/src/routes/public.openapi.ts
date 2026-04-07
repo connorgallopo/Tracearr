@@ -103,6 +103,36 @@ const MediaInfo = z.object({
     .int()
     .nullable()
     .openapi({ description: 'TVDb identifier when available', example: 80379 }),
+  showRatingKey: z
+    .string()
+    .nullable()
+    .openapi({
+      description: 'Parent show server identifier for episode history rows',
+      example: '54321',
+    }),
+  showImdbId: z
+    .string()
+    .nullable()
+    .openapi({
+      description: 'Parent show IMDb identifier for episode history rows',
+      example: 'tt1442437',
+    }),
+  showTmdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({
+      description: 'Parent show TMDb identifier for episode history rows',
+      example: 1421,
+    }),
+  showTvdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({
+      description: 'Parent show TVDb identifier for episode history rows',
+      example: 121361,
+    }),
   artistName: z
     .string()
     .nullable()
@@ -794,6 +824,65 @@ registry.registerPath({
     200: {
       description: 'History retrieved',
       content: { 'application/json': { schema: HistoryResponse } },
+    },
+    401: { description: 'Invalid or missing API key' },
+  },
+});
+
+// ============================================================================
+// GET /library/items
+// ============================================================================
+
+const LibraryItemsQuery = PaginationQuery.extend({
+  serverId: ServerIdParam.optional().openapi({ description: 'Filter by server' }),
+  mediaType: z.enum(['movie', 'show', 'episode', 'season', 'track', 'album', 'artist']).optional(),
+});
+
+const LibraryItem = z
+  .object({
+    id: z.uuid(),
+    ...ServerInfo.shape,
+    libraryId: z.string().openapi({ example: '1' }),
+    ratingKey: z.string().openapi({ example: '12345' }),
+    imdbId: z.string().nullable().openapi({ example: 'tt1375666' }),
+    tmdbId: z.number().int().nullable().openapi({ example: 27205 }),
+    tvdbId: z.number().int().nullable().openapi({ example: 80379 }),
+    title: z.string().openapi({ example: 'Inception' }),
+    mediaType: z
+      .enum(['movie', 'show', 'episode', 'season', 'track', 'album', 'artist'])
+      .openapi({ example: 'movie' }),
+    year: z.number().int().nullable().openapi({ example: 2010 }),
+    grandparentTitle: z.string().nullable().openapi({ example: 'Breaking Bad' }),
+    grandparentRatingKey: z.string().nullable().openapi({ example: '54321' }),
+    parentTitle: z.string().nullable().openapi({ example: 'Season 5' }),
+    parentRatingKey: z.string().nullable().openapi({ example: '67890' }),
+    parentIndex: z.number().int().nullable().openapi({ example: 5 }),
+    itemIndex: z.number().int().nullable().openapi({ example: 16 }),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
+  })
+  .openapi('LibraryItem');
+
+const LibraryItemsResponse = z
+  .object({
+    data: z.array(LibraryItem),
+    meta: PaginationMeta,
+  })
+  .openapi('LibraryItemsResponse');
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/v1/public/library/items',
+  tags: ['Public API'],
+  summary: 'Library items',
+  description:
+    'Paginated current library items with stable provider IDs for third-party integrations.',
+  security: [{ bearerAuth: [] }],
+  request: { query: LibraryItemsQuery },
+  responses: {
+    200: {
+      description: 'Library items retrieved',
+      content: { 'application/json': { schema: LibraryItemsResponse } },
     },
     401: { description: 'Invalid or missing API key' },
   },

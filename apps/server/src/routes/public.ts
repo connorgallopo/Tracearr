@@ -766,6 +766,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         li.imdb_id,
         li.tmdb_id,
         li.tvdb_id,
+        show_li.rating_key as show_rating_key,
+        show_li.imdb_id as show_imdb_id,
+        show_li.tmdb_id as show_tmdb_id,
+        show_li.tvdb_id as show_tvdb_id,
         su.user_id,
         su.username as server_username,
         su.thumb_url as user_thumb_url,
@@ -776,6 +780,9 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       LEFT JOIN library_items li
         ON li.server_id = s.server_id
        AND li.rating_key = s.rating_key
+      LEFT JOIN library_items show_li
+        ON show_li.server_id = li.server_id
+       AND show_li.rating_key = li.grandparent_rating_key
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
       LEFT JOIN users u ON u.id = su.user_id
@@ -832,6 +839,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         imdb_id: string | null;
         tmdb_id: number | null;
         tvdb_id: number | null;
+        show_rating_key: string | null;
+        show_imdb_id: string | null;
+        show_tmdb_id: number | null;
+        show_tvdb_id: number | null;
         user_id: string;
         server_username: string;
         user_thumb_url: string | null;
@@ -853,6 +864,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       imdbId: row.imdb_id,
       tmdbId: row.tmdb_id,
       tvdbId: row.tvdb_id,
+      showRatingKey: row.show_rating_key,
+      showImdbId: row.show_imdb_id,
+      showTmdbId: row.show_tmdb_id,
+      showTvdbId: row.show_tvdb_id,
       artistName: row.artist_name,
       albumName: row.album_name,
       trackNumber: row.track_number,
@@ -1000,6 +1015,114 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       platforms,
       quality,
     };
+  });
+
+  /**
+   * GET /library/items - Current library items with stable IDs for third-party integrations
+   */
+  app.get('/library/items', { preHandler: [app.authenticatePublicApi] }, async (request, reply) => {
+    const querySchema = paginationSchema.extend({
+      serverId: z.uuid().optional(),
+      mediaType: z
+        .enum(['movie', 'show', 'episode', 'season', 'track', 'album', 'artist'])
+        .optional(),
+    });
+
+    const query = querySchema.safeParse(request.query);
+    if (!query.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
+
+    const { page, pageSize, serverId, mediaType } = query.data;
+    const offset = (page - 1) * pageSize;
+    const conditions: ReturnType<typeof sql>[] = [];
+    if (serverId) conditions.push(sql`li.server_id = ${serverId}`);
+    if (mediaType) conditions.push(sql`li.media_type = ${mediaType}`);
+    const whereClause =
+      conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
+
+    const countResult = await db.execute(sql`
+      SELECT COUNT(*)::int AS count
+      FROM library_items li
+      ${whereClause}
+    `);
+    const total = (countResult.rows[0] as { count: number } | undefined)?.count ?? 0;
+
+    const result = await db.execute(sql`
+      SELECT
+        li.id,
+        li.server_id,
+        sv.name AS server_name,
+        li.library_id,
+        li.rating_key,
+        li.imdb_id,
+        li.tmdb_id,
+        li.tvdb_id,
+        li.title,
+        li.media_type,
+        li.year,
+        li.grandparent_title,
+        li.grandparent_rating_key,
+        li.parent_title,
+        li.parent_rating_key,
+        li.parent_index,
+        li.item_index,
+        li.created_at,
+        li.updated_at
+      FROM library_items li
+      JOIN servers sv ON sv.id = li.server_id
+      ${whereClause}
+      ORDER BY li.updated_at DESC, li.created_at DESC, li.id DESC
+      LIMIT ${pageSize} OFFSET ${offset}
+    `);
+
+    const rows = (
+      result.rows as {
+        id: string;
+        server_id: string;
+        server_name: string;
+        library_id: string;
+        rating_key: string;
+        imdb_id: string | null;
+        tmdb_id: number | null;
+        tvdb_id: number | null;
+        title: string;
+        media_type: string;
+        year: number | null;
+        grandparent_title: string | null;
+        grandparent_rating_key: string | null;
+        parent_title: string | null;
+        parent_rating_key: string | null;
+        parent_index: number | null;
+        item_index: number | null;
+        created_at: Date;
+        updated_at: Date;
+      }[]
+    ).map((row) => ({
+      id: row.id,
+      serverId: row.server_id,
+      serverName: row.server_name,
+      libraryId: row.library_id,
+      ratingKey: row.rating_key,
+      imdbId: row.imdb_id,
+      tmdbId: row.tmdb_id,
+      tvdbId: row.tvdb_id,
+      title: row.title,
+      mediaType: row.media_type,
+      year: row.year,
+      grandparentTitle: row.grandparent_title,
+      grandparentRatingKey: row.grandparent_rating_key,
+      parentTitle: row.parent_title,
+      parentRatingKey: row.parent_rating_key,
+      parentIndex: row.parent_index,
+      itemIndex: row.item_index,
+      createdAt:
+        row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+      updatedAt:
+        row.updated_at instanceof Date ? row.updated_at.toISOString() : String(row.updated_at),
+    }));
+
+    return paginatedResponse(rows, total, page, pageSize);
   });
 
   /**
