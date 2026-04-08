@@ -7,6 +7,7 @@ import { View, Pressable, TextInput } from 'react-native';
 import { Search, X, SlidersHorizontal } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 export type TimePeriod = '7d' | '30d' | '90d' | '1y' | 'all';
 export type MediaType = 'movie' | 'episode' | 'track' | 'live';
@@ -85,6 +86,7 @@ export function HistoryFilters({
   activeFilterCount,
   onFilterPress,
 }: HistoryFiltersProps) {
+  const { t } = useTranslation(['common']);
   const [localSearch, setLocalSearch] = useState(search);
 
   // Sync with external search value
@@ -119,7 +121,7 @@ export function HistoryFilters({
           <Search size={16} color={colors.text.muted.dark} className="mr-1" />
           <TextInput
             className="text-foreground flex-1 py-0 text-sm"
-            placeholder="Search titles, users..."
+            placeholder={t('common:search.searchTitles')}
             placeholderTextColor={colors.text.muted.dark}
             value={localSearch}
             onChangeText={setLocalSearch}

@@ -23,8 +23,11 @@ import { useAuthStateStore } from '@/lib/authStateStore';
 import { useConnectionValidator } from '@/hooks/useConnectionValidator';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { ACCENT_COLOR } from '@/lib/theme';
+import { i18nReady } from '@/lib/i18n';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 function RootLayoutNav() {
+  const { t } = useTranslation(['mobile']);
   // Use single-server auth state store with shallow compare for performance
   const { server, isInitializing, connectionState, tokenStatus } = useAuthStateStore(
     useShallow((s) => ({
@@ -97,7 +100,7 @@ function RootLayoutNav() {
       <StatusBar style="auto" />
       <OfflineBanner onRetry={validate} />
       <Toast
-        message="Reconnected"
+        message={t('mobile:reconnected')}
         visible={showReconnectedToast}
         onHide={() => setShowReconnectedToast(false)}
       />
@@ -145,6 +148,27 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [i18nLoaded, setI18nLoaded] = useState(false);
+
+  useEffect(() => {
+    void i18nReady.then(() => setI18nLoaded(true));
+  }, []);
+
+  if (!i18nLoaded) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: '#09090B',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ActivityIndicator size="large" color={ACCENT_COLOR} />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>

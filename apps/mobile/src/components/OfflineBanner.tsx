@@ -11,12 +11,14 @@ import { WifiOff } from 'lucide-react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { useAuthStateStore } from '../lib/authStateStore';
 import { colors, spacing, withAlpha } from '../lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 interface OfflineBannerProps {
   onRetry: () => void;
 }
 
 export function OfflineBanner({ onRetry }: OfflineBannerProps) {
+  const { t } = useTranslation(['mobile', 'common']);
   const { connectionState, server, tokenStatus } = useAuthStateStore(
     useShallow((s) => ({
       connectionState: s.connectionState,
@@ -75,7 +77,9 @@ export function OfflineBanner({ onRetry }: OfflineBannerProps) {
         <Animated.View style={{ opacity: pulseAnim }}>
           <WifiOff size={16} color={colors.background.dark} />
         </Animated.View>
-        <Text className="text-background text-sm font-medium">Connection lost</Text>
+        <Text className="text-background text-sm font-medium">
+          {t('mobile:errors.connectionLost')}
+        </Text>
       </View>
       <Pressable
         onPress={onRetry}
@@ -86,7 +90,7 @@ export function OfflineBanner({ onRetry }: OfflineBannerProps) {
           borderRadius: 4,
         }}
       >
-        <Text className="text-background text-xs font-semibold">Retry</Text>
+        <Text className="text-background text-xs font-semibold">{t('common:actions.retry')}</Text>
       </Pressable>
     </View>
   );

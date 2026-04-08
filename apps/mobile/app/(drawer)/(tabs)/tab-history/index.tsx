@@ -24,6 +24,7 @@ import {
   type FilterState,
 } from '@/components/history';
 import type { SessionWithDetails } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 const PAGE_SIZE = 50;
 
@@ -48,6 +49,7 @@ function getDateRange(period: TimePeriod): { startDate: Date; endDate: Date } {
 }
 
 export default function HistoryScreen() {
+  const { t } = useTranslation(['mobile']);
   const router = useRouter();
   const navigation = useNavigation();
   const { selectedServerId } = useMediaServer();
@@ -224,11 +226,13 @@ export default function HistoryScreen() {
                 >
                   <Play size={28} color={colors.icon.default} />
                 </View>
-                <Text className="mb-2 text-lg font-semibold">No History Found</Text>
+                <Text className="mb-2 text-lg font-semibold">
+                  {t('mobile:history.noHistoryFound')}
+                </Text>
                 <Text className="text-muted-foreground max-w-[280px] text-center text-sm">
                   {search || activeFilterCount > 0
-                    ? 'Try adjusting your filters'
-                    : 'Session history will appear here once users start streaming'}
+                    ? t('mobile:history.adjustFilters')
+                    : t('mobile:history.historyWillAppear')}
                 </Text>
               </View>
             )

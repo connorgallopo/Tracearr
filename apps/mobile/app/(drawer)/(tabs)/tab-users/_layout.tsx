@@ -5,6 +5,7 @@ import { Menu, Bell } from 'lucide-react-native';
 import { useUnacknowledgedAlertsCount } from '@/hooks';
 import { Text } from '@/components/ui/text';
 import { colors, spacing } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 function HeaderLeft() {
   const navigation = useNavigation();
@@ -49,6 +50,7 @@ function HeaderRight() {
 }
 
 export default function UsersStack() {
+  const { t } = useTranslation(['nav']);
   return (
     <Stack
       screenOptions={{
@@ -65,7 +67,7 @@ export default function UsersStack() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Users',
+          title: t('nav:users'),
         }}
       />
     </Stack>

@@ -51,6 +51,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { StreamDetailsPanel } from '@/components/session';
 import type { SessionWithDetails, SessionState, MediaType, ServerType } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 // Server type configuration
 const SERVER_CONFIG: Record<ServerType, { label: string; color: string }> = {
@@ -225,6 +226,7 @@ function InfoRow({
 }
 
 export default function SessionDetailScreen() {
+  const { t } = useTranslation(['mobile', 'common', 'pages']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -244,11 +246,11 @@ export default function SessionDetailScreen() {
       void queryClient.invalidateQueries({ queryKey: ['sessions', 'active'] });
       setTerminateModalVisible(false);
       setTerminateReason('');
-      Alert.alert('Stream Terminated', 'The playback session has been stopped.');
+      Alert.alert(t('mobile:session.streamTerminated'), t('mobile:session.sessionStopped'));
       router.back();
     },
     onError: (error: Error) => {
-      Alert.alert('Failed to Terminate', error.message);
+      Alert.alert(t('mobile:session.failedToTerminate'), error.message);
     },
   });
 
@@ -300,7 +302,7 @@ export default function SessionDetailScreen() {
         edges={['left', 'right', 'bottom']}
       >
         <Text className="text-destructive text-center">
-          {error instanceof Error ? error.message : 'Failed to load session'}
+          {error instanceof Error ? error.message : t('mobile:errors.failedToLoadSession')}
         </Text>
       </SafeAreaView>
     );
@@ -347,7 +349,9 @@ export default function SessionDetailScreen() {
           <View className="flex-row items-center justify-between pb-2">
             <View className="flex-1 flex-row items-center gap-2">
               <StateIcon size={16} color={stateConfig.color} />
-              <Text className="text-foreground text-base font-semibold">Session Details</Text>
+              <Text className="text-foreground text-base font-semibold">
+                {t('common:labels.sessionDetails')}
+              </Text>
               <Badge
                 variant={
                   session.state === 'playing'
@@ -433,14 +437,16 @@ export default function SessionDetailScreen() {
                 <Text className="text-muted-foreground text-xs">@{session.user.username}</Text>
               )}
               {!session.user.identityName && (
-                <Text className="text-muted-foreground text-xs">View profile</Text>
+                <Text className="text-muted-foreground text-xs">
+                  {t('common:actions.viewProfile')}
+                </Text>
               )}
             </View>
             <ChevronRight size={16} color={colors.text.muted.dark} />
           </Pressable>
 
           {/* Server */}
-          <Section icon={Server} title="Server">
+          <Section icon={Server} title={t('common:labels.server')}>
             <View className="flex-row items-center justify-between">
               <Text className="text-muted-foreground text-[13px]">Server</Text>
               <View className="flex-row items-center gap-1">
@@ -468,18 +474,32 @@ export default function SessionDetailScreen() {
             <View className="gap-1">
               {startedAt && (
                 <InfoRow
-                  label="Started"
+                  label={t('common:labels.started')}
                   value={format(startedAt, 'MMM d, h:mm a')}
                   subValue={formatDistanceToNow(startedAt, { addSuffix: true })}
                 />
               )}
-              {stoppedAt && <InfoRow label="Stopped" value={format(stoppedAt, 'MMM d, h:mm a')} />}
-              <InfoRow label="Watch time" value={formatDuration(getWatchTime(session))} />
+              {stoppedAt && (
+                <InfoRow
+                  label={t('common:labels.stopped')}
+                  value={format(stoppedAt, 'MMM d, h:mm a')}
+                />
+              )}
+              <InfoRow
+                label={t('common:labels.watchTime')}
+                value={formatDuration(getWatchTime(session))}
+              />
               {session.pausedDurationMs > 0 && (
-                <InfoRow label="Paused" value={formatDuration(session.pausedDurationMs)} />
+                <InfoRow
+                  label={t('common:labels.pausedTime')}
+                  value={formatDuration(session.pausedDurationMs)}
+                />
               )}
               {session.totalDurationMs && (
-                <InfoRow label="Media length" value={formatDuration(session.totalDurationMs)} />
+                <InfoRow
+                  label={t('common:labels.mediaLength')}
+                  value={formatDuration(session.totalDurationMs)}
+                />
               )}
             </View>
           </Section>
@@ -487,7 +507,7 @@ export default function SessionDetailScreen() {
           {/* Location & Network */}
           <Section icon={MapPin} title="Location">
             <View className="gap-1">
-              <InfoRow label="IP Address" value={session.ipAddress || '—'} mono />
+              <InfoRow label={t('common:labels.ipAddress')} value={session.ipAddress || '—'} mono />
               {locationString && (
                 <View className="flex-row items-center gap-1">
                   <Globe size={14} color={colors.text.muted.dark} />
@@ -500,20 +520,30 @@ export default function SessionDetailScreen() {
           </Section>
 
           {/* Device */}
-          <Section icon={Smartphone} title="Device">
+          <Section icon={Smartphone} title={t('common:labels.device')}>
             <View className="gap-1">
-              {session.platform && <InfoRow label="Platform" value={session.platform} />}
-              {session.product && <InfoRow label="Product" value={session.product} />}
-              {session.device && <InfoRow label="Device" value={session.device} />}
-              {session.playerName && <InfoRow label="Player" value={session.playerName} />}
-              {session.deviceId && <InfoRow label="Device ID" value={session.deviceId} mono />}
+              {session.platform && (
+                <InfoRow label={t('common:labels.platform')} value={session.platform} />
+              )}
+              {session.product && (
+                <InfoRow label={t('common:labels.product')} value={session.product} />
+              )}
+              {session.device && (
+                <InfoRow label={t('common:labels.device')} value={session.device} />
+              )}
+              {session.playerName && (
+                <InfoRow label={t('common:labels.player')} value={session.playerName} />
+              )}
+              {session.deviceId && (
+                <InfoRow label={t('common:labels.deviceId')} value={session.deviceId} mono />
+              )}
             </View>
           </Section>
 
           {/* Stream Details */}
           <Section
             icon={Gauge}
-            title="Stream Details"
+            title={t('common:labels.streamDetails')}
             badge={(() => {
               const isHwTranscode =
                 session.isTranscode &&
@@ -525,7 +555,9 @@ export default function SessionDetailScreen() {
                   <Badge variant="warning">
                     <View className="flex-row items-center gap-1">
                       <TranscodeIcon size={12} color={colors.warning} />
-                      <Text className="text-warning text-[11px] font-semibold">Transcode</Text>
+                      <Text className="text-warning text-[11px] font-semibold">
+                        {t('common:playback.transcode')}
+                      </Text>
                     </View>
                   </Badge>
                 );
@@ -537,8 +569,8 @@ export default function SessionDetailScreen() {
                     <MonitorPlay size={12} color={colors.text.primary.dark} />
                     <Text className="text-foreground text-[11px] font-semibold">
                       {session.videoDecision === 'copy' || session.audioDecision === 'copy'
-                        ? 'Direct Stream'
-                        : 'Direct Play'}
+                        ? t('common:playback.directStream')
+                        : t('common:playback.directPlay')}
                     </Text>
                   </View>
                 </Badge>
@@ -575,7 +607,9 @@ export default function SessionDetailScreen() {
                 borderColor: withAlpha(colors.warning, '30'),
               }}
             >
-              <Text className="text-warning mb-1 text-[11px] font-semibold">Transcode Reason</Text>
+              <Text className="text-warning mb-1 text-[11px] font-semibold">
+                {t('common:labels.transcodeReason')}
+              </Text>
               <Text className="text-xs font-medium" style={{ color: '#FAFAFA' }}>
                 {transcodeReasonText}
               </Text>
@@ -604,9 +638,11 @@ export default function SessionDetailScreen() {
             onPress={(e) => e.stopPropagation()}
           >
             <View className="px-4 pt-4 pb-2">
-              <Text className="text-lg font-semibold text-white">Terminate Stream</Text>
+              <Text className="text-lg font-semibold text-white">
+                {t('pages:terminateStream.title')}
+              </Text>
               <Text className="mt-1 text-sm" style={{ color: colors.text.muted.dark }}>
-                Message to user (optional)
+                {t('pages:terminateStream.messageLabel')}
               </Text>
             </View>
             <View className="px-4 pb-3">
@@ -628,7 +664,7 @@ export default function SessionDetailScreen() {
                 onPress={() => setTerminateModalVisible(false)}
               >
                 <Text className="text-sm font-medium" style={{ color: colors.text.muted.dark }}>
-                  Cancel
+                  {t('common:actions.cancel')}
                 </Text>
               </Pressable>
               <View style={{ width: 1, backgroundColor: colors.border.dark }} />
@@ -638,7 +674,9 @@ export default function SessionDetailScreen() {
                 disabled={terminateMutation.isPending}
               >
                 <Text className="text-sm font-medium" style={{ color: colors.error }}>
-                  {terminateMutation.isPending ? 'Terminating...' : 'Terminate'}
+                  {terminateMutation.isPending
+                    ? t('pages:terminateStream.terminating')
+                    : t('common:actions.terminate')}
                 </Text>
               </Pressable>
             </View>

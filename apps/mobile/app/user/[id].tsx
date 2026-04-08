@@ -57,6 +57,7 @@ import type {
   TerminationLogWithDetails,
 } from '@tracearr/shared';
 import { RULE_DISPLAY_NAMES } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 const PAGE_SIZE = 10;
 
@@ -386,6 +387,7 @@ function TerminationCard({ termination }: { termination: TerminationLogWithDetai
 }
 
 export default function UserDetailScreen() {
+  const { t } = useTranslation(['mobile', 'common', 'pages', 'nav']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const navigation = useNavigation();
   const router = useRouter();
@@ -551,9 +553,11 @@ export default function UserDetailScreen() {
           <View className="bg-card border-border mb-4 h-20 w-20 items-center justify-center rounded-full border">
             <User size={32} color={colors.text.muted.dark} />
           </View>
-          <Text className="mb-1 text-center text-lg font-semibold">User Not Found</Text>
+          <Text className="mb-1 text-center text-lg font-semibold">
+            {t('pages:userDetail.userNotFound')}
+          </Text>
           <Text className="text-muted-foreground text-center text-sm">
-            This user may have been removed.
+            {t('mobile:userDetail.userMayBeRemoved')}
           </Text>
         </View>
       </SafeAreaView>
@@ -609,20 +613,32 @@ export default function UserDetailScreen() {
         {/* Stats Grid - single row on tablet, 2 rows on phone */}
         {isTablet ? (
           <View className="mb-4 flex-row gap-3">
-            <StatCard icon={Play} label="Sessions" value={totalSessions} />
-            <StatCard icon={AlertTriangle} label="Violations" value={totalViolations} />
+            <StatCard icon={Play} label={t('pages:userDetail.sessions')} value={totalSessions} />
+            <StatCard
+              icon={AlertTriangle}
+              label={t('pages:userDetail.violations')}
+              value={totalViolations}
+            />
             <StatCard
               icon={Clock}
               label="Joined"
               value={safeFormatDate(user.createdAt, 'MMM d, yyyy')}
             />
-            <StatCard icon={Globe} label="Locations" value={locations?.length || 0} />
+            <StatCard
+              icon={Globe}
+              label={t('pages:userDetail.locations')}
+              value={locations?.length || 0}
+            />
           </View>
         ) : (
           <>
             <View className="mb-4 flex-row gap-3">
-              <StatCard icon={Play} label="Sessions" value={totalSessions} />
-              <StatCard icon={AlertTriangle} label="Violations" value={totalViolations} />
+              <StatCard icon={Play} label={t('pages:userDetail.sessions')} value={totalSessions} />
+              <StatCard
+                icon={AlertTriangle}
+                label={t('pages:userDetail.violations')}
+                value={totalViolations}
+              />
             </View>
             <View className="mb-4 flex-row gap-3">
               <StatCard
@@ -630,7 +646,11 @@ export default function UserDetailScreen() {
                 label="Joined"
                 value={safeFormatDate(user.createdAt, 'MMM d, yyyy')}
               />
-              <StatCard icon={Globe} label="Locations" value={locations?.length || 0} />
+              <StatCard
+                icon={Globe}
+                label={t('pages:userDetail.locations')}
+                value={locations?.length || 0}
+              />
             </View>
           </>
         )}
@@ -647,7 +667,7 @@ export default function UserDetailScreen() {
           <Card style={{ flex: isTablet ? 1 : undefined, marginBottom: isTablet ? 0 : spacing.md }}>
             <CardHeader>
               <View className="flex-row items-center justify-between">
-                <CardTitle>Locations</CardTitle>
+                <CardTitle>{t('pages:userDetail.locations')}</CardTitle>
                 <Text className="text-muted-foreground text-xs">
                   {locations?.length || 0} {locations?.length === 1 ? 'location' : 'locations'}
                 </Text>
@@ -667,7 +687,7 @@ export default function UserDetailScreen() {
                   ))
               ) : (
                 <Text className="text-muted-foreground py-4 text-center text-sm">
-                  No locations recorded
+                  {t('mobile:userDetail.noLocationsRecorded')}
                 </Text>
               )}
               {locations && locations.length > 5 && (
@@ -684,7 +704,7 @@ export default function UserDetailScreen() {
           <Card style={{ flex: isTablet ? 1 : undefined }}>
             <CardHeader>
               <View className="flex-row items-center justify-between">
-                <CardTitle>Devices</CardTitle>
+                <CardTitle>{t('nav:devices')}</CardTitle>
                 <Text className="text-muted-foreground text-xs">
                   {devices?.length || 0} {devices?.length === 1 ? 'device' : 'devices'}
                 </Text>
@@ -701,7 +721,7 @@ export default function UserDetailScreen() {
                   ))
               ) : (
                 <Text className="text-muted-foreground py-4 text-center text-sm">
-                  No devices recorded
+                  {t('mobile:userDetail.noDevicesRecorded')}
                 </Text>
               )}
               {devices && devices.length > 5 && (
@@ -719,7 +739,7 @@ export default function UserDetailScreen() {
         <Card className="mb-4">
           <CardHeader>
             <View className="flex-row items-center justify-between">
-              <CardTitle>Recent Sessions</CardTitle>
+              <CardTitle>{t('common:labels.recentSessions')}</CardTitle>
               <Text className="text-muted-foreground text-xs">{totalSessions} total</Text>
             </View>
           </CardHeader>
@@ -746,7 +766,9 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={ACCENT_COLOR} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-primary text-sm font-medium">Load More</Text>
+                        <Text className="text-primary text-sm font-medium">
+                          {t('common:labels.loadMore')}
+                        </Text>
                         <ChevronRight size={16} color={ACCENT_COLOR} />
                       </View>
                     )}
@@ -755,7 +777,7 @@ export default function UserDetailScreen() {
               </>
             ) : (
               <Text className="text-muted-foreground py-4 text-center text-sm">
-                No sessions found
+                {t('common:empty.noSessionsFound')}
               </Text>
             )}
           </CardContent>
@@ -765,7 +787,7 @@ export default function UserDetailScreen() {
         <Card className="mb-8">
           <CardHeader>
             <View className="flex-row items-center justify-between">
-              <CardTitle>Violations</CardTitle>
+              <CardTitle>{t('pages:userDetail.violations')}</CardTitle>
               <Text className="text-muted-foreground text-xs">{totalViolations} total</Text>
             </View>
           </CardHeader>
@@ -791,7 +813,9 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={ACCENT_COLOR} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-primary text-sm font-medium">Load More</Text>
+                        <Text className="text-primary text-sm font-medium">
+                          {t('common:labels.loadMore')}
+                        </Text>
                         <ChevronRight size={16} color={ACCENT_COLOR} />
                       </View>
                     )}
@@ -803,7 +827,9 @@ export default function UserDetailScreen() {
                 <View className="bg-success/10 mb-2 h-12 w-12 items-center justify-center rounded-full">
                   <Check size={24} color={colors.success} />
                 </View>
-                <Text className="text-muted-foreground text-sm">No violations</Text>
+                <Text className="text-muted-foreground text-sm">
+                  {t('mobile:userDetail.noViolations')}
+                </Text>
               </View>
             )}
           </CardContent>
@@ -815,7 +841,7 @@ export default function UserDetailScreen() {
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <XCircle size={18} color={colors.text.primary.dark} />
-                <CardTitle>Termination History</CardTitle>
+                <CardTitle>{t('pages:userDetail.terminationHistory')}</CardTitle>
               </View>
               <Text className="text-muted-foreground text-xs">{totalTerminations} total</Text>
             </View>
@@ -838,7 +864,9 @@ export default function UserDetailScreen() {
                       <ActivityIndicator size="small" color={ACCENT_COLOR} />
                     ) : (
                       <View className="flex-row items-center gap-1">
-                        <Text className="text-primary text-sm font-medium">Load More</Text>
+                        <Text className="text-primary text-sm font-medium">
+                          {t('common:labels.loadMore')}
+                        </Text>
                         <ChevronRight size={16} color={ACCENT_COLOR} />
                       </View>
                     )}
@@ -847,7 +875,7 @@ export default function UserDetailScreen() {
               </>
             ) : (
               <Text className="text-muted-foreground py-4 text-center text-sm">
-                No stream terminations
+                {t('mobile:userDetail.noTerminations')}
               </Text>
             )}
           </CardContent>

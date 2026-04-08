@@ -27,6 +27,7 @@ import {
   HourOfDayChart,
   QualityChart,
 } from '@/components/charts';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 function ChartSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -40,6 +41,7 @@ function ChartSection({ title, children }: { title: string; children: React.Reac
 }
 
 export default function ActivityScreen() {
+  const { t } = useTranslation(['mobile', 'common']);
   const router = useRouter();
   const navigation = useNavigation();
   const [period, setPeriod] = useState<StatsPeriod>('month');
@@ -99,9 +101,9 @@ export default function ActivityScreen() {
 
   // Period labels for display
   const periodLabels: Record<StatsPeriod, string> = {
-    week: 'Last 7 Days',
-    month: 'Last 30 Days',
-    year: 'Last Year',
+    week: t('common:periods.last7Days'),
+    month: t('common:periods.last30Days'),
+    year: t('common:periods.lastYear'),
   };
 
   return (
@@ -138,11 +140,11 @@ export default function ActivityScreen() {
             marginBottom: isTablet ? spacing.md : spacing.sm,
           }}
         >
-          <ChartSection title="Plays Over Time">
+          <ChartSection title={t('mobile:activity.playsOverTime')}>
             <PlaysChart data={playsData?.data || []} height={chartHeightLarge} />
           </ChartSection>
 
-          <ChartSection title="Concurrent Streams">
+          <ChartSection title={t('mobile:activity.concurrentStreams')}>
             <ConcurrentChart data={concurrentData?.data || []} height={chartHeightLarge} />
           </ChartSection>
         </View>
@@ -155,11 +157,11 @@ export default function ActivityScreen() {
             marginBottom: isTablet ? spacing.md : spacing.sm,
           }}
         >
-          <ChartSection title="By Day">
+          <ChartSection title={t('common:periods.byDay')}>
             <DayOfWeekChart data={dayOfWeekData?.data || []} height={chartHeightSmall} />
           </ChartSection>
 
-          <ChartSection title="By Hour">
+          <ChartSection title={t('common:periods.byHour')}>
             <HourOfDayChart data={hourOfDayData?.data || []} height={chartHeightSmall} />
           </ChartSection>
         </View>
@@ -171,11 +173,11 @@ export default function ActivityScreen() {
             gap: isTablet ? spacing.md : spacing.sm,
           }}
         >
-          <ChartSection title="Platforms">
+          <ChartSection title={t('mobile:activity.platforms')}>
             <PlatformChart data={platformsData?.data || []} height={chartHeightSmall} />
           </ChartSection>
 
-          <ChartSection title="Playback Quality">
+          <ChartSection title={t('mobile:activity.playbackQuality')}>
             {qualityData ? (
               <QualityChart
                 directPlay={qualityData.directPlay}
@@ -188,7 +190,7 @@ export default function ActivityScreen() {
               />
             ) : (
               <Card style={{ height: qualityHeight }} className="items-center justify-center">
-                <Text className="text-muted-foreground">Loading...</Text>
+                <Text className="text-muted-foreground">{t('common:states.loading')}</Text>
               </Card>
             )}
           </ChartSection>

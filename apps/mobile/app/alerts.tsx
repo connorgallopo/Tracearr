@@ -29,6 +29,7 @@ import type {
   UnitSystem,
 } from '@tracearr/shared';
 import { getViolationDescription, RULE_DISPLAY_NAMES } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 const PAGE_SIZE = 50;
 
@@ -98,19 +99,6 @@ function SegmentedControl<T extends string>({
   );
 }
 
-const SEVERITY_OPTIONS: { value: ViolationSeverity | 'all'; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'high', label: 'High' },
-  { value: 'warning', label: 'Warning' },
-  { value: 'low', label: 'Low' },
-];
-
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'acknowledged', label: 'Done' },
-];
-
 function ViolationCard({
   violation,
   onAcknowledge,
@@ -124,6 +112,7 @@ function ViolationCard({
   unitSystem: UnitSystem;
   isTablet?: boolean;
 }) {
+  const { t } = useTranslation(['mobile', 'common', 'pages', 'nav', 'notifications']);
   const displayName = violation.user?.identityName ?? violation.user?.username ?? 'Unknown User';
   const username = violation.user?.username ?? 'Unknown';
   const ruleType = violation.rule?.type as RuleType | undefined;
@@ -181,12 +170,14 @@ function ViolationCard({
             }}
           >
             <Check size={16} color={ACCENT_COLOR} />
-            <Text className="text-primary text-sm font-semibold">Acknowledge</Text>
+            <Text className="text-primary text-sm font-semibold">
+              {t('common:actions.acknowledge')}
+            </Text>
           </Pressable>
         ) : (
           <View className="bg-success/10 flex-row items-center justify-center gap-2 rounded-lg py-2.5">
             <Check size={16} color={colors.success} />
-            <Text className="text-success text-sm">Acknowledged</Text>
+            <Text className="text-success text-sm">{t('common:states.acknowledged')}</Text>
           </View>
         )}
       </Card>
@@ -195,11 +186,25 @@ function ViolationCard({
 }
 
 export default function AlertsScreen() {
+  const { t } = useTranslation(['mobile', 'common', 'pages', 'nav', 'notifications']);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { selectedServerId } = useMediaServer();
   const { isTablet, select } = useResponsive();
   const insets = useSafeAreaInsets();
+
+  const severityOptions: { value: ViolationSeverity | 'all'; label: string }[] = [
+    { value: 'all', label: t('notifications:settings.allTypes') },
+    { value: 'high', label: t('common:severity.high') },
+    { value: 'warning', label: t('common:severity.warning') },
+    { value: 'low', label: t('common:severity.low') },
+  ];
+
+  const statusOptions: { value: StatusFilter; label: string }[] = [
+    { value: 'all', label: t('notifications:settings.allTypes') },
+    { value: 'pending', label: t('common:states.pending') },
+    { value: 'acknowledged', label: t('mobile:alerts.done') },
+  ];
 
   // Filter state
   const [severityFilter, setSeverityFilter] = useState<ViolationSeverity | 'all'>('all');
@@ -319,7 +324,7 @@ export default function AlertsScreen() {
           >
             <ChevronLeft size={24} color={colors.text.primary.dark} />
           </Pressable>
-          <Text className="text-[17px] font-semibold">Alerts</Text>
+          <Text className="text-[17px] font-semibold">{t('nav:alerts')}</Text>
           <View className="w-11" />
         </View>
       </View>
@@ -362,12 +367,12 @@ export default function AlertsScreen() {
             <View className="flex-row items-center justify-between">
               <Text className="text-muted-foreground text-sm">
                 {hasActiveFilters ? `${violations.length} of ` : ''}
-                {total} {total === 1 ? 'alert' : 'alerts'}
+                {t('common:count.alert', { count: total })}
               </Text>
               {unacknowledgedCount > 0 && statusFilter !== 'acknowledged' && (
                 <View className="bg-destructive/20 rounded-full px-3 py-1">
                   <Text className="text-destructive text-xs font-semibold">
-                    {unacknowledgedCount} pending
+                    {unacknowledgedCount} {t('common:states.pending').toLowerCase()}
                   </Text>
                 </View>
               )}
@@ -375,9 +380,11 @@ export default function AlertsScreen() {
 
             {/* Severity filter */}
             <View className="gap-1.5">
-              <Text className="text-muted-foreground text-xs font-medium">Severity</Text>
+              <Text className="text-muted-foreground text-xs font-medium">
+                {t('common:labels.severity')}
+              </Text>
               <SegmentedControl
-                options={SEVERITY_OPTIONS}
+                options={severityOptions}
                 value={severityFilter}
                 onChange={setSeverityFilter}
               />
@@ -385,9 +392,11 @@ export default function AlertsScreen() {
 
             {/* Status filter */}
             <View className="gap-1.5">
-              <Text className="text-muted-foreground text-xs font-medium">Status</Text>
+              <Text className="text-muted-foreground text-xs font-medium">
+                {t('common:labels.status')}
+              </Text>
               <SegmentedControl
-                options={STATUS_OPTIONS}
+                options={statusOptions}
                 value={statusFilter}
                 onChange={setStatusFilter}
               />
@@ -435,7 +444,7 @@ export default function AlertsScreen() {
                     marginBottom: 8,
                   }}
                 >
-                  No Matches
+                  {t('pages:violations.noMatches')}
                 </Text>
                 <Text
                   style={{
@@ -446,7 +455,7 @@ export default function AlertsScreen() {
                     lineHeight: 20,
                   }}
                 >
-                  Try adjusting your filters
+                  {t('pages:violations.tryAdjustingFilters')}
                 </Text>
                 <Pressable
                   onPress={() => {
@@ -461,7 +470,7 @@ export default function AlertsScreen() {
                   }}
                 >
                   <Text style={{ color: ACCENT_COLOR, fontSize: 14, fontWeight: '600' }}>
-                    Clear Filters
+                    {t('mobile:alerts.clearFilters')}
                   </Text>
                 </Pressable>
               </>
@@ -489,7 +498,7 @@ export default function AlertsScreen() {
                     marginBottom: 8,
                   }}
                 >
-                  All Clear
+                  {t('pages:violations.allClear')}
                 </Text>
                 <Text
                   style={{
@@ -499,7 +508,7 @@ export default function AlertsScreen() {
                     lineHeight: 20,
                   }}
                 >
-                  No rule violations detected
+                  {t('pages:violations.noViolationsDetected')}
                 </Text>
               </>
             )}

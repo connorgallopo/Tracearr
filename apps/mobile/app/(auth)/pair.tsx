@@ -22,6 +22,7 @@ import { ROUTES } from '@/lib/routes';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/theme';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 interface QRPairingPayload {
   url: string;
@@ -29,6 +30,7 @@ interface QRPairingPayload {
 }
 
 export default function PairScreen() {
+  const { t } = useTranslation(['mobile', 'common']);
   const router = useRouter();
   const { prefillUrl } = useLocalSearchParams<{ prefillUrl?: string }>();
   const [permission, requestPermission] = useCameraPermissions();
@@ -91,7 +93,7 @@ export default function PairScreen() {
       const url = new URL(data);
       const base64Data = url.searchParams.get('data');
       if (!base64Data) {
-        throw new Error('Invalid QR code: missing pairing data');
+        throw new Error(t('mobile:errors.invalidQrCodeMissingData'));
       }
 
       // Decode and parse payload
@@ -100,15 +102,15 @@ export default function PairScreen() {
         const decoded = atob(base64Data);
         payload = JSON.parse(decoded) as QRPairingPayload;
       } catch {
-        throw new Error('Invalid QR code format. Please generate a new code.');
+        throw new Error(t('mobile:errors.invalidQrCodeFormat'));
       }
 
       // Validate payload fields
       if (!payload.url || typeof payload.url !== 'string') {
-        throw new Error('Invalid QR code: missing server URL');
+        throw new Error(t('mobile:errors.invalidQrCodeMissingUrl'));
       }
       if (!payload.token || typeof payload.token !== 'string') {
-        throw new Error('Invalid QR code: missing pairing token');
+        throw new Error(t('mobile:errors.invalidQrCodeMissingToken'));
       }
 
       // Use shared validation
@@ -133,8 +135,8 @@ export default function PairScreen() {
           router.replace(ROUTES.TABS);
         } catch (err) {
           Alert.alert(
-            'Pairing Failed',
-            err instanceof Error ? err.message : 'Unable to pair with server'
+            t('mobile:errors.pairingFailed'),
+            err instanceof Error ? err.message : t('mobile:errors.unableToPair')
           );
           setTimeout(() => {
             scanLockRef.current = false;
@@ -147,7 +149,10 @@ export default function PairScreen() {
       await pairServer(payload.url, payload.token);
       router.replace(ROUTES.TABS);
     } catch (err) {
-      Alert.alert('Pairing Failed', err instanceof Error ? err.message : 'Invalid QR code');
+      Alert.alert(
+        t('mobile:errors.pairingFailed'),
+        err instanceof Error ? err.message : t('mobile:errors.invalidQrCode')
+      );
       setTimeout(() => {
         scanLockRef.current = false;
         setScanned(false);
@@ -166,14 +171,17 @@ export default function PairScreen() {
     // Validate URL
     const urlValidation = validateServerUrl(trimmedUrl);
     if (!urlValidation.valid) {
-      Alert.alert('Invalid URL', urlValidation.error ?? 'Please enter a valid server URL');
+      Alert.alert(
+        t('mobile:errors.invalidUrl'),
+        urlValidation.error ?? t('mobile:errors.pleaseEnterValidUrl')
+      );
       setIsSubmitting(false);
       return;
     }
 
     // Validate token
     if (!trimmedToken) {
-      Alert.alert('Missing Token', 'Please enter your access token');
+      Alert.alert(t('mobile:pair.missingToken'), t('mobile:pair.pleaseEnterToken'));
       setIsSubmitting(false);
       return;
     }
@@ -217,21 +225,23 @@ export default function PairScreen() {
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
             <View className="items-center px-6 pt-8 pb-6">
               <Text className="text-foreground mb-2 text-center text-2xl font-bold">
-                Connect to Server
+                {t('mobile:pair.connectToServer')}
               </Text>
               <Text className="text-muted-foreground text-center text-base leading-6">
-                Enter your Tracearr server URL and mobile access token
+                {t('mobile:pair.enterServerDetails')}
               </Text>
             </View>
 
             <View className="flex-1 gap-4">
               <View className="gap-1">
-                <Text className="text-muted-foreground text-sm font-medium">Server URL</Text>
+                <Text className="text-muted-foreground text-sm font-medium">
+                  {t('mobile:pair.serverUrl')}
+                </Text>
                 <TextInput
                   className="bg-card border-border text-foreground rounded-md border p-4 text-base"
                   value={serverUrl}
                   onChangeText={handleServerUrlChange}
-                  placeholder="https://tracearr.example.com"
+                  placeholder={t('mobile:pair.urlPlaceholder')}
                   placeholderTextColor={colors.text.muted.dark}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -241,12 +251,14 @@ export default function PairScreen() {
               </View>
 
               <View className="gap-1">
-                <Text className="text-muted-foreground text-sm font-medium">Access Token</Text>
+                <Text className="text-muted-foreground text-sm font-medium">
+                  {t('mobile:pair.accessToken')}
+                </Text>
                 <TextInput
                   className="bg-card border-border text-foreground rounded-md border p-4 text-base"
                   value={token}
                   onChangeText={handleTokenChange}
-                  placeholder="trr_mob_..."
+                  placeholder={t('mobile:pair.tokenPlaceholder')}
                   placeholderTextColor={colors.text.muted.dark}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -266,7 +278,7 @@ export default function PairScreen() {
                 disabled={isLoading}
               >
                 <Text className="text-primary-foreground text-base font-semibold">
-                  {isLoading ? 'Connecting...' : 'Connect'}
+                  {isLoading ? t('common:states.connecting') : t('common:actions.connect')}
                 </Text>
               </Pressable>
 
@@ -275,7 +287,7 @@ export default function PairScreen() {
                 onPress={() => setManualMode(false)}
                 disabled={isLoading}
               >
-                <Text className="text-primary text-base">Scan QR Code Instead</Text>
+                <Text className="text-primary text-base">{t('mobile:pair.scanQrCodeInstead')}</Text>
               </Pressable>
             </View>
           </ScrollView>
@@ -290,10 +302,10 @@ export default function PairScreen() {
         style={{ alignItems: 'center', paddingHorizontal: 24, paddingTop: 32, paddingBottom: 24 }}
       >
         <Text className="text-foreground mb-2 text-center text-2xl font-bold">
-          Welcome to Tracearr
+          {t('mobile:pair.welcome')}
         </Text>
         <Text className="text-muted-foreground text-center text-base leading-6">
-          Open Settings → Mobile App in your Tracearr dashboard and scan the QR code
+          {t('mobile:pair.scanQrInstructions')}
         </Text>
       </View>
 
@@ -340,7 +352,7 @@ export default function PairScreen() {
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
             <Text className="text-muted-foreground mb-6 text-center text-base">
-              Camera permission is required to scan QR codes
+              {t('mobile:pair.cameraPermissionRequired')}
             </Text>
             <Pressable
               style={{
@@ -352,7 +364,9 @@ export default function PairScreen() {
               }}
               onPress={requestPermission}
             >
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#18181B' }}>Continue</Text>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#18181B' }}>
+                {t('common:actions.continue')}
+              </Text>
             </Pressable>
           </View>
         )}
@@ -360,7 +374,7 @@ export default function PairScreen() {
 
       <View className="items-center px-6 pb-6">
         <Pressable className="items-center py-4" onPress={() => setManualMode(true)}>
-          <Text className="text-primary text-base">Enter URL and Token Manually</Text>
+          <Text className="text-primary text-base">{t('mobile:pair.enterManually')}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

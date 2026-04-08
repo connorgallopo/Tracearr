@@ -9,6 +9,7 @@
 import i18n from 'i18next';
 
 // Locale loader — set by config.ts (web) or config.mobile.ts (mobile) at import time
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 let _loadLocaleFn: (lang: string) => Promise<void> = async () => {};
 
 /** @internal */

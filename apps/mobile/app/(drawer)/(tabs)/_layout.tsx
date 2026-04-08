@@ -8,6 +8,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { VectorIcon } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { ACCENT_COLOR } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 // Force Dashboard (index) as the initial tab on app launch
 export const unstable_settings = {
@@ -15,6 +16,7 @@ export const unstable_settings = {
 };
 
 export default function TabLayout() {
+  const { t } = useTranslation(['nav']);
   // On iOS, use SF Symbols. On Android, use Material Community Icons via VectorIcon.
   const isIOS = Platform.OS === 'ios';
 
@@ -30,7 +32,7 @@ export default function TabLayout() {
             src={<VectorIcon family={MaterialCommunityIcons} name="view-dashboard" />}
           />
         )}
-        <NativeTabs.Trigger.Label>Dashboard</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav:dashboard')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="tab-activity">
         {isIOS ? (
@@ -42,7 +44,7 @@ export default function TabLayout() {
             src={<VectorIcon family={MaterialCommunityIcons} name="pulse" />}
           />
         )}
-        <NativeTabs.Trigger.Label>Activity</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav:activity')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="tab-users">
         {isIOS ? (
@@ -52,7 +54,7 @@ export default function TabLayout() {
             src={<VectorIcon family={MaterialCommunityIcons} name="account-group" />}
           />
         )}
-        <NativeTabs.Trigger.Label>Users</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav:users')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="tab-history">
         {isIOS ? (
@@ -62,7 +64,7 @@ export default function TabLayout() {
             src={<VectorIcon family={MaterialCommunityIcons} name="history" />}
           />
         )}
-        <NativeTabs.Trigger.Label>History</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav:history')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

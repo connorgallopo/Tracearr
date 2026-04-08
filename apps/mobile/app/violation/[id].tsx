@@ -36,6 +36,7 @@ import {
   RULE_DISPLAY_NAMES,
 } from '@tracearr/shared';
 import type { ViolationWithDetails, ViolationSessionInfo } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 import { ruleIcons } from '@/lib/violations';
 
@@ -230,6 +231,7 @@ function findViolationInCache(
 }
 
 export default function ViolationDetailScreen() {
+  const { t } = useTranslation(['mobile', 'common', 'pages', 'nav']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -295,12 +297,12 @@ export default function ViolationDetailScreen() {
   const handleDismiss = () => {
     if (!violation) return;
     Alert.alert(
-      'Dismiss Violation',
-      "Are you sure you want to dismiss this violation? This will remove it permanently and restore the user's trust score.",
+      t('pages:violations.dismissViolation'),
+      t('pages:violations.dismissViolationConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common:actions.cancel'), style: 'cancel' },
         {
-          text: 'Dismiss',
+          text: t('common:actions.dismiss'),
           style: 'destructive',
           onPress: () => dismissMutation.mutate(violation.id),
         },
@@ -361,12 +363,14 @@ export default function ViolationDetailScreen() {
           <View className="bg-card border-border mb-4 h-20 w-20 items-center justify-center rounded-full border">
             <AlertTriangle size={32} color={colors.text.muted.dark} />
           </View>
-          <Text className="mb-1 text-center text-xl font-semibold">Violation Not Found</Text>
+          <Text className="mb-1 text-center text-xl font-semibold">
+            {t('pages:violations.detail.notFound')}
+          </Text>
           <Text className="text-muted-foreground text-center text-sm">
-            This violation may have been dismissed or is no longer available.
+            {t('mobile:violation.violationNotFoundDesc')}
           </Text>
           <Pressable className="bg-primary mt-6 rounded-lg px-6 py-3" onPress={() => router.back()}>
-            <Text className="font-semibold text-white">Go Back</Text>
+            <Text className="font-semibold text-white">{t('common:actions.back')}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -424,7 +428,7 @@ export default function ViolationDetailScreen() {
             <View className="flex-1">
               <Text className="text-base font-semibold">{violation.rule?.name || ruleName}</Text>
               <Text className="text-muted-foreground text-sm capitalize">
-                {ruleType?.replace(/_/g, ' ') || 'Custom Rule'}
+                {ruleType?.replace(/_/g, ' ') || t('mobile:violation.customRule')}
               </Text>
             </View>
           </View>
@@ -437,21 +441,25 @@ export default function ViolationDetailScreen() {
             <View className="mb-3 flex-row items-center gap-2">
               <Clock size={16} color={colors.text.muted.dark} />
               <Text className="text-muted-foreground text-sm font-semibold">
-                Inactivity Details
+                {t('pages:violations.detail.inactivity')}
               </Text>
             </View>
             <View className="bg-surface rounded-lg p-4">
               <View className="flex-row gap-4">
                 {/* Days Inactive */}
                 <View className="flex-1">
-                  <Text className="text-muted-foreground mb-1 text-xs">Days Inactive</Text>
+                  <Text className="text-muted-foreground mb-1 text-xs">
+                    {t('pages:violations.detail.daysInactive')}
+                  </Text>
                   <Text className="text-2xl font-bold">
                     {(violation.data?.inactiveDays as number) ?? 'N/A'}
                   </Text>
                 </View>
                 {/* Threshold */}
                 <View className="flex-1">
-                  <Text className="text-muted-foreground mb-1 text-xs">Threshold</Text>
+                  <Text className="text-muted-foreground mb-1 text-xs">
+                    {t('pages:violations.detail.threshold')}
+                  </Text>
                   <Text className="text-2xl font-bold">
                     {(violation.data?.thresholdDays as number) ?? 'N/A'}
                     <Text className="text-muted-foreground text-sm font-normal"> days</Text>
@@ -460,12 +468,14 @@ export default function ViolationDetailScreen() {
               </View>
               {/* Last Activity */}
               <View className="mt-4">
-                <Text className="text-muted-foreground mb-1 text-xs">Last Activity</Text>
+                <Text className="text-muted-foreground mb-1 text-xs">
+                  {t('pages:violations.detail.lastActivity')}
+                </Text>
                 {violation.data?.neverActive ? (
                   <View className="flex-row items-center gap-1">
                     <AlertCircle size={14} color={colors.warning} />
                     <Text className="text-warning text-sm font-medium">
-                      Never active - no recorded activity
+                      {t('pages:violations.detail.neverActive')}
                     </Text>
                   </View>
                 ) : violation.data?.lastActivityAt ? (
@@ -494,7 +504,7 @@ export default function ViolationDetailScreen() {
               <View className="flex-row items-center gap-2">
                 <Film size={16} color={colors.text.muted.dark} />
                 <Text className="text-muted-foreground text-sm font-semibold">
-                  Stream Comparison
+                  {t('mobile:violation.streamComparison')}
                 </Text>
                 {allSessions.length > 1 && (
                   <View className="bg-surface rounded px-2 py-0.5">
@@ -561,7 +571,7 @@ export default function ViolationDetailScreen() {
             <View className="flex-row items-center gap-2">
               <Clock size={16} color={colors.text.muted.dark} />
               <View className="flex-1">
-                <Text className="text-muted-foreground text-xs">Created</Text>
+                <Text className="text-muted-foreground text-xs">{t('common:labels.created')}</Text>
                 <Text className="text-sm">
                   {formatDistanceToNow(new Date(violation.createdAt), { addSuffix: true })}
                 </Text>
@@ -597,7 +607,9 @@ export default function ViolationDetailScreen() {
               ) : (
                 <>
                   <Check size={18} color="white" />
-                  <Text className="font-semibold text-white">Acknowledge</Text>
+                  <Text className="font-semibold text-white">
+                    {t('common:actions.acknowledge')}
+                  </Text>
                 </>
               )}
             </Pressable>
@@ -612,7 +624,7 @@ export default function ViolationDetailScreen() {
             ) : (
               <>
                 <X size={18} color="white" />
-                <Text className="font-semibold text-white">Dismiss</Text>
+                <Text className="font-semibold text-white">{t('common:actions.dismiss')}</Text>
               </>
             )}
           </Pressable>

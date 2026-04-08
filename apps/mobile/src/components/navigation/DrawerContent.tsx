@@ -15,6 +15,7 @@ import { ServerSelector } from '@/components/ServerSelector';
 import { useMediaServer } from '@/providers/MediaServerProvider';
 import { api } from '@/lib/api';
 import { ACCENT_COLOR, colors, spacing, withAlpha } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 interface DrawerItemProps {
   icon: React.ReactNode;
@@ -51,6 +52,7 @@ function DrawerSection({ title, children }: { title: string; children: React.Rea
 }
 
 export function DrawerContent(props: DrawerContentComponentProps) {
+  const { t } = useTranslation(['mobile', 'nav']);
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
@@ -91,17 +93,17 @@ export function DrawerContent(props: DrawerContentComponentProps) {
         </View>
 
         {/* Server Section - uses existing ServerSelector */}
-        <DrawerSection title="Server">
+        <DrawerSection title={t('mobile:navigation.server')}>
           <View className="py-2">
             <ServerSelector multiSelect={isDashboard} />
           </View>
         </DrawerSection>
 
         {/* Navigation Section */}
-        <DrawerSection title="Navigation">
+        <DrawerSection title={t('mobile:navigation.navigation')}>
           <DrawerItem
             icon={<Settings size={20} color={colors.icon.default} />}
-            label="Settings"
+            label={t('nav:settings')}
             onPress={handleSettingsPress}
           />
         </DrawerSection>

@@ -7,12 +7,14 @@ import { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { ACCENT_COLOR, colors } from '../lib/theme';
 import { useMediaServer } from '../providers/MediaServerProvider';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 interface ServerSelectorProps {
   multiSelect?: boolean;
 }
 
 export function ServerSelector({ multiSelect = false }: ServerSelectorProps) {
+  const { t } = useTranslation(['mobile', 'common']);
   const {
     servers,
     selectedServerIds,
@@ -49,8 +51,8 @@ export function ServerSelector({ multiSelect = false }: ServerSelectorProps) {
   }
 
   const buttonLabel = isMultiServer
-    ? `${selectedServerIds.length} Servers`
-    : (selectedServers[0]?.name ?? 'Select Server');
+    ? `${selectedServerIds.length} ${t('mobile:serverSelector.servers')}`
+    : (selectedServers[0]?.name ?? t('mobile:navigation.selectServer'));
 
   const handleSelect = (serverId: string) => {
     if (multiSelect) {
@@ -91,7 +93,9 @@ export function ServerSelector({ multiSelect = false }: ServerSelectorProps) {
           >
             <View className="flex-row items-center justify-between border-b border-gray-800 px-4 py-3">
               <Text className="text-lg font-semibold text-white">
-                {multiSelect ? 'Select Servers' : 'Select Server'}
+                {multiSelect
+                  ? t('mobile:serverSelector.selectServers')
+                  : t('mobile:navigation.selectServer')}
               </Text>
               {multiSelect && (
                 <TouchableOpacity
@@ -105,7 +109,9 @@ export function ServerSelector({ multiSelect = false }: ServerSelectorProps) {
                   activeOpacity={0.7}
                 >
                   <Text style={{ color: ACCENT_COLOR, fontSize: 13, fontWeight: '500' }}>
-                    {isAllServersSelected ? 'Deselect All' : 'All'}
+                    {isAllServersSelected
+                      ? t('common:actions.deselectAll')
+                      : t('common:actions.selectAll')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -162,7 +168,10 @@ export function ServerSelector({ multiSelect = false }: ServerSelectorProps) {
             {multiSelect && (
               <View className="border-t border-gray-800 px-4 py-2.5">
                 <Text className="text-center text-xs text-gray-500">
-                  {selectedServerIds.length} of {servers.length} servers selected
+                  {t('mobile:serverSelector.serversSelected', {
+                    selected: selectedServerIds.length,
+                    total: servers.length,
+                  })}
                 </Text>
               </View>
             )}

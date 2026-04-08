@@ -24,6 +24,7 @@ import { ServerResourceCard } from '@/components/server/ServerResourceCard';
 import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { colors, spacing, ACCENT_COLOR } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 /**
  * Compact stat pill for dashboard summary bar
@@ -61,6 +62,7 @@ function StatPill({
 }
 
 export default function DashboardScreen() {
+  const { t } = useTranslation(['mobile', 'pages', 'common']);
   const router = useRouter();
   const navigation = useNavigation();
   const { servers, selectedServerIds, selectedServerId, selectedServer, isMultiServer } =
@@ -149,17 +151,29 @@ export default function DashboardScreen() {
                   marginRight: 2,
                 }}
               >
-                TODAY
+                {t('mobile:dashboard.today')}
               </Text>
-              <StatPill icon="play-circle-outline" value={stats.todayPlays} unit="plays" />
-              <StatPill icon="time-outline" value={stats.watchTimeHours} unit="hrs" />
+              <StatPill
+                icon="play-circle-outline"
+                value={stats.todayPlays}
+                unit={t('pages:dashboard.plays')}
+              />
+              <StatPill
+                icon="time-outline"
+                value={stats.watchTimeHours}
+                unit={t('mobile:dashboard.hrs')}
+              />
               {isTablet && (
-                <StatPill icon="people-outline" value={stats.activeUsersToday} unit="users" />
+                <StatPill
+                  icon="people-outline"
+                  value={stats.activeUsersToday}
+                  unit={t('pages:dashboard.activeUsers')}
+                />
               )}
               <StatPill
                 icon="warning-outline"
                 value={stats.alertsLast24h}
-                unit="alerts"
+                unit={t('pages:dashboard.alerts')}
                 color={stats.alertsLast24h > 0 ? colors.warning : colors.text.muted.dark}
               />
             </View>
@@ -172,7 +186,7 @@ export default function DashboardScreen() {
             <View className="flex-row items-center gap-2">
               <Ionicons name="tv-outline" size={18} color={ACCENT_COLOR} />
               <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                Now Playing
+                {t('pages:dashboard.nowPlaying')}
               </Text>
             </View>
             {sortedSessions && sortedSessions.length > 0 && (
@@ -185,7 +199,7 @@ export default function DashboardScreen() {
                 }}
               >
                 <Text style={{ color: ACCENT_COLOR, fontSize: 12, fontWeight: '600' }}>
-                  {sortedSessions.length} {sortedSessions.length === 1 ? 'stream' : 'streams'}
+                  {t('common:count.stream', { count: sortedSessions.length })}
                 </Text>
               </View>
             )}
@@ -228,9 +242,11 @@ export default function DashboardScreen() {
                 >
                   <Ionicons name="tv-outline" size={32} color={colors.text.muted.dark} />
                 </View>
-                <Text className="text-base font-semibold">No active streams</Text>
+                <Text className="text-base font-semibold">
+                  {t('pages:dashboard.noActiveStreams')}
+                </Text>
                 <Text className="text-muted-foreground mt-1 text-sm">
-                  Streams will appear here when users start watching
+                  {t('pages:dashboard.streamsAppearHere')}
                 </Text>
               </View>
             </Card>
@@ -243,7 +259,7 @@ export default function DashboardScreen() {
             <View className="mb-3 flex-row items-center gap-2">
               <Ionicons name="location-outline" size={18} color={ACCENT_COLOR} />
               <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                Stream Locations
+                {t('pages:dashboard.streamLocations')}
               </Text>
             </View>
             <StreamMap
@@ -260,7 +276,7 @@ export default function DashboardScreen() {
             <View className="mb-3 flex-row items-center gap-2">
               <Ionicons name="server-outline" size={18} color={ACCENT_COLOR} />
               <Text className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                Server Resources
+                {t('pages:dashboard.serverResources')}
               </Text>
             </View>
             <ServerResourceCard

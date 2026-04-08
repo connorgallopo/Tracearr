@@ -3,6 +3,7 @@ import { CheckCircle, XCircle, SkipForward } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/theme';
 import type { ActionResult } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 interface ActionResultsListProps {
   results: ActionResult[];
@@ -13,11 +14,15 @@ interface ActionResultsListProps {
  * Shows success/failure/skipped status for each action.
  */
 export function ActionResultsList({ results }: ActionResultsListProps) {
+  const { t } = useTranslation(['mobile']);
+
   if (results.length === 0) return null;
 
   return (
     <View className="gap-2">
-      <Text className="text-muted-foreground text-sm font-medium">Actions Executed</Text>
+      <Text className="text-muted-foreground text-sm font-medium">
+        {t('mobile:actionsExecuted')}
+      </Text>
       <View className="gap-1.5">
         {results.map((result, index) => (
           <View key={index} className="flex-row items-center gap-2">

@@ -12,8 +12,10 @@ import { useRouter } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
 import { useAuthStateStore } from '../lib/authStateStore';
 import { colors } from '../lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 export function UnauthenticatedScreen() {
+  const { t } = useTranslation(['mobile']);
   const router = useRouter();
   const { cachedServerUrl, cachedServerName } = useAuthStateStore(
     useShallow((s) => ({
@@ -47,21 +49,25 @@ export function UnauthenticatedScreen() {
           <Unlink size={48} color={colors.text.muted.dark} />
         </View>
 
-        <Text className="text-foreground mb-4 text-2xl font-semibold">Connection Lost</Text>
+        <Text className="text-foreground mb-4 text-2xl font-semibold">
+          {t('mobile:unauthenticated.connectionLost')}
+        </Text>
 
         <Text className="text-secondary-foreground mb-8 text-center text-base leading-6">
-          Your access to {serverDisplay} was revoked. Ask the server owner for a new pairing code.
+          {t('mobile:unauthenticated.accessRevoked', { serverName: serverDisplay })}
         </Text>
 
         <Pressable
           className="bg-primary mb-4 w-full items-center rounded-md px-8 py-4"
           onPress={() => void handleScanQR()}
         >
-          <Text className="text-primary-foreground text-base font-semibold">Scan QR Code</Text>
+          <Text className="text-primary-foreground text-base font-semibold">
+            {t('mobile:unauthenticated.scanQrCode')}
+          </Text>
         </Pressable>
 
         <Pressable className="py-4" onPress={() => void handleManualEntry()}>
-          <Text className="text-muted-foreground text-base">Enter Manually</Text>
+          <Text className="text-muted-foreground text-base">{t('mobile:pair.enterManually')}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

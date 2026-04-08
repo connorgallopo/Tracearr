@@ -31,6 +31,7 @@ import { api } from '@/lib/api';
 import { useAuthStateStore } from '@/lib/authStateStore';
 import { colors, ACCENT_COLOR } from '@/lib/theme';
 import type { NotificationPreferences } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 // Rule types for violation filtering with icons
 const RULE_TYPES: { value: string; label: string; icon: LucideIcon }[] = [
@@ -198,6 +199,7 @@ function RateLimitStatus({
 }
 
 export default function NotificationSettingsScreen() {
+  const { t } = useTranslation(['mobile', 'common', 'notifications']);
   const queryClient = useQueryClient();
   const server = useAuthStateStore((s) => s.server);
 
@@ -263,7 +265,9 @@ export default function NotificationSettingsScreen() {
       >
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={ACCENT_COLOR} />
-          <Text className="text-muted-foreground mt-4">Loading preferences...</Text>
+          <Text className="text-muted-foreground mt-4">
+            {t('mobile:notifications.loadingPreferences')}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -276,7 +280,9 @@ export default function NotificationSettingsScreen() {
         edges={['left', 'right', 'bottom']}
       >
         <View className="flex-1 items-center justify-center px-8">
-          <Text className="mb-2 text-center text-xl font-semibold">Unable to Load Preferences</Text>
+          <Text className="mb-2 text-center text-xl font-semibold">
+            {t('mobile:notifications.unableToLoadPreferences')}
+          </Text>
           <Text className="text-muted-foreground text-center">
             {error instanceof Error ? error.message : 'An error occurred'}
           </Text>
@@ -297,19 +303,19 @@ export default function NotificationSettingsScreen() {
         <SettingsSection title="Push Notifications">
           <SettingRow
             icon={Bell}
-            label="Enable Push Notifications"
-            description="Receive alerts on this device"
+            label={t('notifications:settings.enablePushNotifications')}
+            description={t('mobile:notifications.receiveAlerts')}
             value={pushEnabled}
             onValueChange={(v) => handleUpdate('pushEnabled', v)}
           />
         </SettingsSection>
 
         {/* Event Toggles */}
-        <SettingsSection title="Notification Events">
+        <SettingsSection title={t('notifications:settings.notificationEvents')}>
           <SettingRow
             icon={ShieldAlert}
-            label="Violation Detected"
-            description="Rule violation triggered"
+            label={t('notifications:settings.violationDetected')}
+            description={t('mobile:notifications.ruleViolationTriggered')}
             value={preferences.onViolationDetected}
             onValueChange={(v) => handleUpdate('onViolationDetected', v)}
             disabled={!pushEnabled}
@@ -317,8 +323,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={Play}
-            label="Stream Started"
-            description="New playback began"
+            label={t('notifications:settings.streamStarted')}
+            description={t('mobile:notifications.newPlaybackBegan')}
             value={preferences.onStreamStarted}
             onValueChange={(v) => handleUpdate('onStreamStarted', v)}
             disabled={!pushEnabled}
@@ -326,8 +332,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={Square}
-            label="Stream Stopped"
-            description="Playback ended"
+            label={t('notifications:settings.streamStopped')}
+            description={t('mobile:notifications.playbackEnded')}
             value={preferences.onStreamStopped}
             onValueChange={(v) => handleUpdate('onStreamStopped', v)}
             disabled={!pushEnabled}
@@ -335,8 +341,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={Monitor}
-            label="Concurrent Streams"
-            description="User exceeded stream limit"
+            label={t('notifications:settings.concurrentStreams')}
+            description={t('mobile:notifications.exceededStreamLimit')}
             value={preferences.onConcurrentStreams}
             onValueChange={(v) => handleUpdate('onConcurrentStreams', v)}
             disabled={!pushEnabled}
@@ -344,8 +350,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={Smartphone}
-            label="New Device"
-            description="New device detected for user"
+            label={t('notifications:settings.newDevice')}
+            description={t('mobile:notifications.newDeviceDetected')}
             value={preferences.onNewDevice}
             onValueChange={(v) => handleUpdate('onNewDevice', v)}
             disabled={!pushEnabled}
@@ -353,8 +359,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={AlertTriangle}
-            label="Trust Score Changed"
-            description="User trust score degraded"
+            label={t('notifications:settings.trustScoreChanged')}
+            description={t('mobile:notifications.trustScoreDegraded')}
             value={preferences.onTrustScoreChanged}
             onValueChange={(v) => handleUpdate('onTrustScoreChanged', v)}
             disabled={!pushEnabled}
@@ -362,8 +368,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={ServerCrash}
-            label="Server Down"
-            description="Media server unreachable"
+            label={t('notifications:settings.serverDown')}
+            description={t('mobile:notifications.serverUnreachable')}
             value={preferences.onServerDown}
             onValueChange={(v) => handleUpdate('onServerDown', v)}
             disabled={!pushEnabled}
@@ -371,8 +377,8 @@ export default function NotificationSettingsScreen() {
           <Divider />
           <SettingRow
             icon={ServerCog}
-            label="Server Up"
-            description="Media server back online"
+            label={t('notifications:settings.serverUp')}
+            description={t('mobile:notifications.serverBackOnline')}
             value={preferences.onServerUp}
             onValueChange={(v) => handleUpdate('onServerUp', v)}
             disabled={!pushEnabled}
@@ -515,11 +521,13 @@ export default function NotificationSettingsScreen() {
             {testMutation.isPending ? (
               <ActivityIndicator size="small" color={colors.background.dark} />
             ) : (
-              <Text className="text-background font-semibold">Send Test Notification</Text>
+              <Text className="text-background font-semibold">
+                {t('mobile:notifications.sendTestNotification')}
+              </Text>
             )}
           </Button>
           <Text className="text-muted-foreground mt-2 text-center text-xs">
-            Verify that push notifications are working correctly
+            {t('mobile:notifications.testDescription')}
           </Text>
         </View>
       </ScrollView>

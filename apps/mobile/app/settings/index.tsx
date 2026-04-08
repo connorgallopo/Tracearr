@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import {
   Bell,
   ChevronRight,
+  Languages,
   LogOut,
   Info,
   Server,
@@ -21,6 +22,11 @@ import * as Application from 'expo-application';
 import { Text } from '@/components/ui/text';
 import { useAuthStateStore } from '@/lib/authStateStore';
 import { colors } from '@/lib/theme';
+import {
+  getCurrentLanguage,
+  getLanguageDisplayName,
+  useTranslation,
+} from '@tracearr/translations/mobile';
 
 const DISCORD_URL = 'https://discord.gg/a7n3sFd2Yw';
 const DOCS_URL = 'https://docs.tracearr.com/';
@@ -75,6 +81,7 @@ function SettingsRow({
 }
 
 export default function SettingsScreen() {
+  const { t } = useTranslation(['mobile', 'common']);
   const router = useRouter();
   const server = useAuthStateStore((s) => s.server);
   const unpairServer = useAuthStateStore((s) => s.unpairServer);
@@ -83,14 +90,14 @@ export default function SettingsScreen() {
 
   const handleDisconnect = () => {
     Alert.alert(
-      'Disconnect Server',
+      t('mobile:settings.disconnectServer'),
       server
-        ? `Are you sure you want to disconnect from "${server.name}"? You will need to pair again to use the app.`
-        : 'Are you sure you want to disconnect? You will need to pair again to use the app.',
+        ? t('mobile:settings.disconnectConfirm', { serverName: server.name })
+        : t('mobile:settings.disconnectConfirmGeneric'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common:actions.cancel'), style: 'cancel' },
         {
-          text: 'Disconnect',
+          text: t('common:actions.disconnect'),
           style: 'destructive',
           onPress: () => {
             void (async () => {
@@ -129,22 +136,29 @@ export default function SettingsScreen() {
       edges={['left', 'right', 'bottom']}
     >
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
-        {/* Notifications */}
-        <SettingsSection title="Preferences">
+        {/* Preferences */}
+        <SettingsSection title={t('mobile:settings.preferences')}>
           <SettingsRow
             icon={<Bell size={20} color={colors.icon.default} />}
-            label="Notifications"
-            description="Configure push notification preferences"
+            label={t('mobile:settings.notifications')}
+            description={t('mobile:settings.configureNotifications')}
             onPress={() => router.push('/settings/notifications')}
+          />
+          <View className="bg-border ml-14 h-px" />
+          <SettingsRow
+            icon={<Languages size={20} color={colors.icon.default} />}
+            label={t('mobile:settings.language')}
+            description={getLanguageDisplayName(getCurrentLanguage())}
+            onPress={() => router.push('/settings/language')}
           />
         </SettingsSection>
 
         {/* Links */}
-        <SettingsSection title="Community">
+        <SettingsSection title={t('mobile:settings.community')}>
           <SettingsRow
             icon={<MessageCircle size={20} color="#5865F2" />}
-            label="Discord"
-            description="Join the community"
+            label={t('mobile:settings.discord')}
+            description={t('mobile:settings.joinCommunity')}
             onPress={handleDiscordPress}
             showChevron={false}
             external
@@ -152,8 +166,8 @@ export default function SettingsScreen() {
           <View className="bg-border ml-14 h-px" />
           <SettingsRow
             icon={<BookOpen size={20} color={colors.icon.default} />}
-            label="Docs"
-            description="Read the documentation"
+            label={t('mobile:settings.docs')}
+            description={t('mobile:settings.readDocs')}
             onPress={handleDocsPress}
             showChevron={false}
             external
@@ -161,8 +175,8 @@ export default function SettingsScreen() {
           <View className="bg-border ml-14 h-px" />
           <SettingsRow
             icon={<Globe size={20} color={colors.icon.default} />}
-            label="Website"
-            description="Visit tracearr.com"
+            label={t('mobile:settings.website')}
+            description={t('mobile:settings.visitWebsite')}
             onPress={handleWebsitePress}
             showChevron={false}
             external
@@ -170,8 +184,8 @@ export default function SettingsScreen() {
           <View className="bg-border ml-14 h-px" />
           <SettingsRow
             icon={<Code2 size={20} color={colors.icon.default} />}
-            label="GitHub"
-            description="View source code"
+            label={t('mobile:settings.github')}
+            description={t('mobile:settings.viewSourceCode')}
             onPress={handleGithubPress}
             showChevron={false}
             external
@@ -179,8 +193,8 @@ export default function SettingsScreen() {
           <View className="bg-border ml-14 h-px" />
           <SettingsRow
             icon={<Heart size={20} color="#DB61A2" />}
-            label="Sponsor"
-            description="Support development"
+            label={t('mobile:settings.sponsor')}
+            description={t('mobile:settings.supportDevelopment')}
             onPress={handleSponsorPress}
             showChevron={false}
             external
@@ -188,11 +202,15 @@ export default function SettingsScreen() {
         </SettingsSection>
 
         {/* Account */}
-        <SettingsSection title="Account">
+        <SettingsSection title={t('mobile:settings.account')}>
           <SettingsRow
             icon={<LogOut size={20} color={colors.icon.danger} />}
-            label="Disconnect"
-            description={server ? `Currently connected to ${server.name}` : undefined}
+            label={t('mobile:settings.disconnect')}
+            description={
+              server
+                ? t('mobile:settings.currentlyConnected', { serverName: server.name })
+                : undefined
+            }
             onPress={handleDisconnect}
             showChevron={false}
             destructive
@@ -206,11 +224,15 @@ export default function SettingsScreen() {
         <View className="items-center gap-1 py-6">
           <View className="flex-row items-center gap-2">
             <Info size={16} color={colors.icon.default} />
-            <Text className="text-muted-foreground text-xs">Version {appVersion}</Text>
+            <Text className="text-muted-foreground text-xs">
+              {t('mobile:settings.version', { version: appVersion })}
+            </Text>
           </View>
           <View className="flex-row items-center gap-2">
             <Server size={16} color={colors.icon.default} />
-            <Text className="text-muted-foreground text-xs">Build {buildNumber}</Text>
+            <Text className="text-muted-foreground text-xs">
+              {t('mobile:settings.build', { build: buildNumber })}
+            </Text>
           </View>
         </View>
       </ScrollView>

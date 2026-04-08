@@ -5,8 +5,10 @@
 import { Drawer } from 'expo-router/drawer';
 import { DrawerContent } from '@/components/navigation/DrawerContent';
 import { colors } from '@/lib/theme';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 export default function DrawerLayout() {
+  const { t } = useTranslation(['mobile']);
   return (
     <Drawer
       drawerContent={(props) => <DrawerContent {...props} />}
@@ -25,7 +27,7 @@ export default function DrawerLayout() {
       <Drawer.Screen
         name="(tabs)"
         options={{
-          drawerLabel: 'Home',
+          drawerLabel: t('mobile:navigation.home'),
           headerShown: false,
         }}
       />

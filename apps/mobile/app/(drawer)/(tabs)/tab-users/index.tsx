@@ -31,6 +31,7 @@ import { UserAvatar } from '@/components/ui/user-avatar';
 import { cn } from '@/lib/utils';
 import { colors, spacing, borderRadius, ACCENT_COLOR } from '@/lib/theme';
 import type { ServerUserWithIdentity } from '@tracearr/shared';
+import { useTranslation } from '@tracearr/translations/mobile';
 
 const PAGE_SIZE = 50;
 
@@ -70,6 +71,7 @@ function UserCard({
   isTablet?: boolean;
 }) {
   const avatarSize = isTablet ? 56 : 48;
+  const { t } = useTranslation(['mobile', 'common']);
   const displayName = user.identityName ?? user.username;
   const isOwner = user.role === 'owner';
 
@@ -106,7 +108,7 @@ function UserCard({
             {/* Phone: show role text */}
             {!isTablet && !user.identityName && (
               <Text className="text-muted-foreground mt-0.5 text-sm">
-                {isOwner ? 'Owner' : 'User'}
+                {isOwner ? t('mobile:users.owner') : t('common:labels.user')}
               </Text>
             )}
           </View>
@@ -118,6 +120,7 @@ function UserCard({
 }
 
 export default function UsersScreen() {
+  const { t } = useTranslation(['mobile', 'common']);
   const router = useRouter();
   const navigation = useNavigation();
   const { selectedServerId } = useMediaServer();
@@ -208,7 +211,7 @@ export default function UsersScreen() {
             <View className="mb-3 flex-row items-center justify-between">
               <Text className="text-muted-foreground text-sm">
                 {searchQuery ? `${users.length} of ${total}` : total}{' '}
-                {total === 1 ? 'user' : 'users'}
+                {t('common:count.user', { count: total })}
               </Text>
             </View>
             {/* Search bar - tablet only */}
@@ -229,7 +232,7 @@ export default function UsersScreen() {
                 <TextInput
                   value={searchQuery}
                   onChangeText={setSearchQuery}
-                  placeholder="Search users..."
+                  placeholder={t('common:search.searchUsers')}
                   placeholderTextColor={colors.text.muted.dark}
                   style={{
                     flex: 1,
@@ -262,12 +265,12 @@ export default function UsersScreen() {
               <Ionicons name="people-outline" size={32} color={colors.text.muted.dark} />
             </View>
             <Text className="mb-1 text-lg font-semibold">
-              {searchQuery ? 'No Results' : 'No Users'}
+              {searchQuery ? t('common:empty.noResults') : t('mobile:users.noUsers')}
             </Text>
             <Text className="text-muted-foreground px-4 text-center text-sm">
               {searchQuery
-                ? `No users match "${searchQuery}"`
-                : 'Users will appear here after syncing with your media server'}
+                ? t('mobile:users.noUsersMatch', { query: searchQuery })
+                : t('mobile:users.usersWillAppear')}
             </Text>
           </View>
         }
