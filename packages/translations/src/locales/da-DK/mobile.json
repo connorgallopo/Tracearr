@@ -1,60 +1,163 @@
 {
-  "pair": {
-    "welcome": "Velkommen til Tracearr",
-    "addServer": "Tilføj Server",
-    "connectToServer": "Opret forbindelse til server",
-    "enterServerDetails": "Indtast din Tracearr server URL og mobil adgangstoken",
-    "serverUrl": "Server URL",
-    "accessToken": "Adgangs Token",
-    "scanQrCodeInstead": "Skan QR-koden i stedet",
-    "enterManually": "Indtast URL og Token Manuelt",
-    "cameraPermissionRequired": "Kamera-tilladelse kræves for at scanne QR-koder",
-    "scanQrInstructions": "Åbn indstillinger → Mobile App i dit Tracearr dashboard og skan QR-koden"
+  "actionsExecuted": "Actions Executed",
+  "activity": {
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality",
+    "playsOverTime": "Plays Over Time"
+  },
+  "alerts": {
+    "clearFilters": "Clear Filters",
+    "done": "Done"
+  },
+  "dashboard": {
+    "hrs": "hrs",
+    "today": "TODAY"
   },
   "errors": {
-    "missingFields": "Manglende Felter",
-    "pleaseEnterBothFields": "Indtast venligst både server URL og token",
-    "invalidUrl": "Ugyldig URL",
-    "serverUrlMustStartWith": "Server URL skal starte med http:// eller https://",
-    "pleaseEnterValidUrl": "Angiv en gyldig server URL",
-    "pairingFailed": "Parring Mislykkedes",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Ugyldig QR-kode: manglende parringsdata",
-    "invalidQrCodeFormat": "Ugyldig QR kode format. Opret venligst en ny kode.",
-    "invalidQrCodeMissingUrl": "Ugyldig QR-kode: manglende server-URL",
-    "invalidQrCodeMissingToken": "Ugyldig QR-kode: manglende parringstoken",
-    "invalidServerUrlInQr": "Ugyldig server-URL i QR-kode",
-    "tooManyPairingAttempts": "For mange parringsforsøg. Vent et par minutter.",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "errorDetails": "Error Details:",
+    "failedToLoadSession": "Failed to load session",
     "invalidOrExpiredToken": "Ugyldigt eller udløbet parringstoken.",
-    "invalidPairingRequest": "Ugyldig parringsanmodning. Tjek dit token."
+    "invalidPairingRequest": "Ugyldig parringsanmodning. Tjek dit token.",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeFormat": "Ugyldig QR kode format. Opret venligst en ny kode.",
+    "invalidQrCodeMissingData": "Ugyldig QR-kode: manglende parringsdata",
+    "invalidQrCodeMissingToken": "Ugyldig QR-kode: manglende parringstoken",
+    "invalidQrCodeMissingUrl": "Ugyldig QR-kode: manglende server-URL",
+    "invalidServerUrlInQr": "Ugyldig server-URL i QR-kode",
+    "invalidUrl": "Ugyldig URL",
+    "missingFields": "Manglende Felter",
+    "pairingFailed": "Parring Mislykkedes",
+    "pleaseEnterBothFields": "Indtast venligst både server URL og token",
+    "pleaseEnterValidUrl": "Angiv en gyldig server URL",
+    "serverUrlMustStartWith": "Server URL skal starte med http:// eller https://",
+    "tooManyPairingAttempts": "For mange parringsforsøg. Vent et par minutter.",
+    "unableToPair": "Unable to pair with server"
   },
-  "settings": {
-    "preferences": "Præferencer",
-    "community": "Fællesskab",
-    "discord": "Uenighed",
-    "joinCommunity": "Deltag i fællesskabet",
-    "github": "GitHub",
-    "viewSourceCode": "Vis kildekode",
-    "account": "Konto",
-    "disconnectServer": "Afbryd Server",
-    "disconnectConfirm": "Er du sikker på, at du vil afbryde forbindelsen til \"{{serverName}}\"? Du skal parre igen for at bruge appen.",
-    "disconnectConfirmGeneric": "Er du sikker på, at du vil afbryde forbindelsen? Du skal parre igen for at bruge appen.",
-    "currentlyConnected": "I øjeblikket forbundet til {{serverName}}"
+  "history": {
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming",
+    "noHistoryFound": "No History Found"
   },
   "navigation": {
+    "home": "Home",
+    "navigation": "Navigation",
     "selectServer": "Vælg Server",
-    "server": "Server",
-    "navigation": "Navigation"
+    "server": "Server"
   },
+  "notifications": {
+    "allViolationTypes": "All Violation Types",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "endTime": "End Time",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "failedToSendTest": "Afsendelse af testnotifikation mislykkedes",
+    "loadingPreferences": "Indlæser præferencer...",
+    "newDeviceDetected": "New device detected for user",
+    "newPlaybackBegan": "New playback began",
+    "notifyForEveryRule": "Notify for every rule type",
+    "playbackEnded": "Playback ended",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "sendTestNotification": "Send Test Notification",
+    "serverBackOnline": "Media server back online",
+    "serverUnreachable": "Media server unreachable",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "startTime": "Start Time",
+    "testDescription": "Verify that push notifications are working correctly",
+    "testFailed": "Test Mislykkedes",
+    "testSent": "Test Sendt",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "to": "to",
+    "trustScoreDegraded": "User trust score degraded",
+    "unableToLoadPreferences": "Kan ikke indlæse præferencer"
+  },
+  "pair": {
+    "accessToken": "Adgangs Token",
+    "addServer": "Tilføj Server",
+    "cameraPermissionRequired": "Kamera-tilladelse kræves for at scanne QR-koder",
+    "connectToServer": "Opret forbindelse til server",
+    "enterManually": "Indtast URL og Token Manuelt",
+    "enterServerDetails": "Indtast din Tracearr server URL og mobil adgangstoken",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token",
+    "scanQrCodeInstead": "Skan QR-koden i stedet",
+    "scanQrInstructions": "Åbn indstillinger → Mobile App i dit Tracearr dashboard og skan QR-koden",
+    "serverUrl": "Server URL",
+    "tokenPlaceholder": "trr_mob_...",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "welcome": "Velkommen til Tracearr"
+  },
+  "reconnected": "Reconnected",
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "notifications": {
-    "testSent": "Test Sendt",
-    "testFailed": "Test Mislykkedes",
-    "failedToSendTest": "Afsendelse af testnotifikation mislykkedes",
-    "loadingPreferences": "Indlæser præferencer...",
-    "unableToLoadPreferences": "Kan ikke indlæse præferencer"
+  "serverSelector": {
+    "selectServers": "Select Servers",
+    "servers": "Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "session": {
+    "failedToTerminate": "Failed to Terminate",
+    "sessionStopped": "The playback session has been stopped.",
+    "streamTerminated": "Stream Terminated"
+  },
+  "settings": {
+    "account": "Konto",
+    "build": "Build {{build}}",
+    "community": "Fællesskab",
+    "configureNotifications": "Configure push notification preferences",
+    "currentlyConnected": "I øjeblikket forbundet til {{serverName}}",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Er du sikker på, at du vil afbryde forbindelsen til \"{{serverName}}\"? Du skal parre igen for at bruge appen.",
+    "disconnectConfirmGeneric": "Er du sikker på, at du vil afbryde forbindelsen? Du skal parre igen for at bruge appen.",
+    "disconnectServer": "Afbryd Server",
+    "discord": "Uenighed",
+    "docs": "Docs",
+    "github": "GitHub",
+    "joinCommunity": "Deltag i fællesskabet",
+    "language": "Language",
+    "notifications": "Notifications",
+    "preferences": "Præferencer",
+    "readDocs": "Read the documentation",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
+    "version": "Version {{version}}",
+    "viewSourceCode": "Vis kildekode",
+    "visitWebsite": "Visit tracearr.com",
+    "website": "Website"
+  },
+  "unauthenticated": {
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "connectionLost": "Connection Lost",
+    "scanQrCode": "Scan QR Code"
+  },
+  "userDetail": {
+    "moreDevices": "+{{count}} more devices",
+    "moreLocations": "+{{count}} more locations",
+    "noDevicesRecorded": "No devices recorded",
+    "noLocationsRecorded": "No locations recorded",
+    "noTerminations": "No stream terminations",
+    "noViolations": "No violations",
+    "trustHigh": "High",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "userMayBeRemoved": "This user may have been removed."
+  },
+  "users": {
+    "noUsers": "No Users",
+    "noUsersMatch": "No users match \"{{query}}\"",
+    "owner": "Owner",
+    "usersWillAppear": "Users will appear here after syncing with your media server"
+  },
+  "violation": {
+    "customRule": "Custom Rule",
+    "ips": "IPs",
+    "streamComparison": "Stream Comparison",
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available."
   }
 }

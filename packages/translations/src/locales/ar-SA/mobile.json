@@ -1,60 +1,163 @@
 {
-  "pair": {
-    "welcome": "مرحبا بكم في Tracearr",
-    "addServer": "إضافة خادم",
-    "connectToServer": "الاتصال بالخادم",
-    "enterServerDetails": "أدخل عنوان خادم Tracearr الخاص بك ورمز الوصول إلى الجوال",
-    "serverUrl": "رابط الخادم",
-    "accessToken": "رمز الوصول",
-    "scanQrCodeInstead": "مسح رمز QR بدلاً من ذلك",
-    "enterManually": "أدخل عنوان URL والرمز المميز يدوياً",
-    "cameraPermissionRequired": "إذن الكاميرا مطلوب لمسح رموز QR",
-    "scanQrInstructions": "فتح الإعدادات → تطبيق الجوال في لوحة التحكم الخاصة بك Tracearr ومسح رمز QR"
+  "actionsExecuted": "Actions Executed",
+  "activity": {
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality",
+    "playsOverTime": "Plays Over Time"
+  },
+  "alerts": {
+    "clearFilters": "Clear Filters",
+    "done": "Done"
+  },
+  "dashboard": {
+    "hrs": "hrs",
+    "today": "TODAY"
   },
   "errors": {
-    "missingFields": "الحقول المفقودة",
-    "pleaseEnterBothFields": "الرجاء إدخال عنوان URL ورمز الخادم",
-    "invalidUrl": "رابط غير صالح",
-    "serverUrlMustStartWith": "عنوان URL للخادم يجب أن يبدأ مع http:// أو https://",
-    "pleaseEnterValidUrl": "الرجاء إدخال رابط خادم صالح",
-    "pairingFailed": "فشل الاقتران",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "رمز QR غير صالح: بيانات الاقتران المفقودة",
-    "invalidQrCodeFormat": "تنسيق رمز QR غير صالح. الرجاء إنشاء رمز جديد.",
-    "invalidQrCodeMissingUrl": "رمز QR غير صالح: رابط الخادم مفقود",
-    "invalidQrCodeMissingToken": "رمز QR غير صالح: رمز الاقتران مفقود",
-    "invalidServerUrlInQr": "رابط الخادم غير صالح في رمز QR",
-    "tooManyPairingAttempts": "العديد من محاولات الاقتران. الرجاء الانتظار بضع دقائق.",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "errorDetails": "Error Details:",
+    "failedToLoadSession": "Failed to load session",
     "invalidOrExpiredToken": "الرمز المميز للإقران غير صالح أو منتهي الصلاحية.",
-    "invalidPairingRequest": "طلب اقتران غير صالح. تحقق من الرمز المميز الخاص بك."
+    "invalidPairingRequest": "طلب اقتران غير صالح. تحقق من الرمز المميز الخاص بك.",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeFormat": "تنسيق رمز QR غير صالح. الرجاء إنشاء رمز جديد.",
+    "invalidQrCodeMissingData": "رمز QR غير صالح: بيانات الاقتران المفقودة",
+    "invalidQrCodeMissingToken": "رمز QR غير صالح: رمز الاقتران مفقود",
+    "invalidQrCodeMissingUrl": "رمز QR غير صالح: رابط الخادم مفقود",
+    "invalidServerUrlInQr": "رابط الخادم غير صالح في رمز QR",
+    "invalidUrl": "رابط غير صالح",
+    "missingFields": "الحقول المفقودة",
+    "pairingFailed": "فشل الاقتران",
+    "pleaseEnterBothFields": "الرجاء إدخال عنوان URL ورمز الخادم",
+    "pleaseEnterValidUrl": "الرجاء إدخال رابط خادم صالح",
+    "serverUrlMustStartWith": "عنوان URL للخادم يجب أن يبدأ مع http:// أو https://",
+    "tooManyPairingAttempts": "العديد من محاولات الاقتران. الرجاء الانتظار بضع دقائق.",
+    "unableToPair": "Unable to pair with server"
   },
-  "settings": {
-    "preferences": "التفضيلات",
-    "community": "المجتمع",
-    "discord": "ديسكورد",
-    "joinCommunity": "الانضمام إلى المجتمع",
-    "github": "GitHub",
-    "viewSourceCode": "عرض رمز المصدر",
-    "account": "حساب",
-    "disconnectServer": "قطع اتصال الخادم",
-    "disconnectConfirm": "هل أنت متأكد من أنك تريد قطع الاتصال من \"{{serverName}}\"؟ ستحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
-    "disconnectConfirmGeneric": "هل أنت متأكد من أنك تريد قطع الاتصال؟ سوف تحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
-    "currentlyConnected": "متصل حاليا بـ {{serverName}}"
+  "history": {
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming",
+    "noHistoryFound": "No History Found"
   },
   "navigation": {
+    "home": "Home",
+    "navigation": "Navigation",
     "selectServer": "حدد الخادم",
-    "server": "خادم",
-    "navigation": "Navigation"
+    "server": "خادم"
   },
+  "notifications": {
+    "allViolationTypes": "All Violation Types",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "endTime": "End Time",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "failedToSendTest": "فشل في إرسال إشعار الاختبار",
+    "loadingPreferences": "جاري تحميل التفضيلات...",
+    "newDeviceDetected": "New device detected for user",
+    "newPlaybackBegan": "New playback began",
+    "notifyForEveryRule": "Notify for every rule type",
+    "playbackEnded": "Playback ended",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "sendTestNotification": "Send Test Notification",
+    "serverBackOnline": "Media server back online",
+    "serverUnreachable": "Media server unreachable",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "startTime": "Start Time",
+    "testDescription": "Verify that push notifications are working correctly",
+    "testFailed": "فشل الاختبار",
+    "testSent": "تم ارسال الاختبار",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "to": "to",
+    "trustScoreDegraded": "User trust score degraded",
+    "unableToLoadPreferences": "تعذر تحميل التفضيلات"
+  },
+  "pair": {
+    "accessToken": "رمز الوصول",
+    "addServer": "إضافة خادم",
+    "cameraPermissionRequired": "إذن الكاميرا مطلوب لمسح رموز QR",
+    "connectToServer": "الاتصال بالخادم",
+    "enterManually": "أدخل عنوان URL والرمز المميز يدوياً",
+    "enterServerDetails": "أدخل عنوان خادم Tracearr الخاص بك ورمز الوصول إلى الجوال",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token",
+    "scanQrCodeInstead": "مسح رمز QR بدلاً من ذلك",
+    "scanQrInstructions": "فتح الإعدادات → تطبيق الجوال في لوحة التحكم الخاصة بك Tracearr ومسح رمز QR",
+    "serverUrl": "رابط الخادم",
+    "tokenPlaceholder": "trr_mob_...",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "welcome": "مرحبا بكم في Tracearr"
+  },
+  "reconnected": "Reconnected",
   "resources": {
     "cpu": "المعالج",
     "ram": "RAM"
   },
-  "notifications": {
-    "testSent": "تم ارسال الاختبار",
-    "testFailed": "فشل الاختبار",
-    "failedToSendTest": "فشل في إرسال إشعار الاختبار",
-    "loadingPreferences": "جاري تحميل التفضيلات...",
-    "unableToLoadPreferences": "تعذر تحميل التفضيلات"
+  "serverSelector": {
+    "selectServers": "Select Servers",
+    "servers": "Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "session": {
+    "failedToTerminate": "Failed to Terminate",
+    "sessionStopped": "The playback session has been stopped.",
+    "streamTerminated": "Stream Terminated"
+  },
+  "settings": {
+    "account": "حساب",
+    "build": "Build {{build}}",
+    "community": "المجتمع",
+    "configureNotifications": "Configure push notification preferences",
+    "currentlyConnected": "متصل حاليا بـ {{serverName}}",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "هل أنت متأكد من أنك تريد قطع الاتصال من \"{{serverName}}\"؟ ستحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
+    "disconnectConfirmGeneric": "هل أنت متأكد من أنك تريد قطع الاتصال؟ سوف تحتاج إلى الإقران مرة أخرى لاستخدام التطبيق.",
+    "disconnectServer": "قطع اتصال الخادم",
+    "discord": "ديسكورد",
+    "docs": "Docs",
+    "github": "GitHub",
+    "joinCommunity": "الانضمام إلى المجتمع",
+    "language": "Language",
+    "notifications": "Notifications",
+    "preferences": "التفضيلات",
+    "readDocs": "Read the documentation",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
+    "version": "Version {{version}}",
+    "viewSourceCode": "عرض رمز المصدر",
+    "visitWebsite": "Visit tracearr.com",
+    "website": "Website"
+  },
+  "unauthenticated": {
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "connectionLost": "Connection Lost",
+    "scanQrCode": "Scan QR Code"
+  },
+  "userDetail": {
+    "moreDevices": "+{{count}} more devices",
+    "moreLocations": "+{{count}} more locations",
+    "noDevicesRecorded": "No devices recorded",
+    "noLocationsRecorded": "No locations recorded",
+    "noTerminations": "No stream terminations",
+    "noViolations": "No violations",
+    "trustHigh": "High",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "userMayBeRemoved": "This user may have been removed."
+  },
+  "users": {
+    "noUsers": "No Users",
+    "noUsersMatch": "No users match \"{{query}}\"",
+    "owner": "Owner",
+    "usersWillAppear": "Users will appear here after syncing with your media server"
+  },
+  "violation": {
+    "customRule": "Custom Rule",
+    "ips": "IPs",
+    "streamComparison": "Stream Comparison",
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available."
   }
 }

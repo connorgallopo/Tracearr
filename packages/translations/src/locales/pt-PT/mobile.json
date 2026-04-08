@@ -1,60 +1,163 @@
 {
-  "pair": {
-    "welcome": "Bem-vindo ao Tracearr",
-    "addServer": "Adicionar Servidor",
-    "connectToServer": "Conectar ao servidor",
-    "enterServerDetails": "Digite seu URL do servidor Tracearr e token de acesso móvel",
-    "serverUrl": "URL do servidor",
-    "accessToken": "Token de acesso",
-    "scanQrCodeInstead": "Escanear Código QR",
-    "enterManually": "Insira a URL e Token Manualmente",
-    "cameraPermissionRequired": "É necessária permissão de câmera para ler códigos QR",
-    "scanQrInstructions": "Abra Configurações → Aplicativo Móvel no seu painel de controle de Tracearr e escaneie o código QR"
+  "actionsExecuted": "Actions Executed",
+  "activity": {
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality",
+    "playsOverTime": "Plays Over Time"
+  },
+  "alerts": {
+    "clearFilters": "Clear Filters",
+    "done": "Done"
+  },
+  "dashboard": {
+    "hrs": "hrs",
+    "today": "TODAY"
   },
   "errors": {
-    "missingFields": "Campos em Falta",
-    "pleaseEnterBothFields": "Por favor, insira o URL e o token do servidor",
-    "invalidUrl": "URL inválida",
-    "serverUrlMustStartWith": "O URL do servidor deve começar com http:// ou https://",
-    "pleaseEnterValidUrl": "Por favor, insira uma URL de servidor válida",
-    "pairingFailed": "Falha no pareamento",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Código QR inválido: falta dados de emparelhamento",
-    "invalidQrCodeFormat": "Formato de código QR inválido. Por favor, gere um novo código.",
-    "invalidQrCodeMissingUrl": "Código QR inválido: URL do servidor faltando",
-    "invalidQrCodeMissingToken": "Código QR inválido: falta o token de emparelhamento",
-    "invalidServerUrlInQr": "URL do servidor inválida no código QR",
-    "tooManyPairingAttempts": "Muitas tentativas de emparelhamento. Por favor, aguarde alguns minutos.",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "errorDetails": "Error Details:",
+    "failedToLoadSession": "Failed to load session",
     "invalidOrExpiredToken": "Token de pareamento inválido ou expirado.",
-    "invalidPairingRequest": "Pedido de emparelhamento inválido. Verifique seu token."
+    "invalidPairingRequest": "Pedido de emparelhamento inválido. Verifique seu token.",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeFormat": "Formato de código QR inválido. Por favor, gere um novo código.",
+    "invalidQrCodeMissingData": "Código QR inválido: falta dados de emparelhamento",
+    "invalidQrCodeMissingToken": "Código QR inválido: falta o token de emparelhamento",
+    "invalidQrCodeMissingUrl": "Código QR inválido: URL do servidor faltando",
+    "invalidServerUrlInQr": "URL do servidor inválida no código QR",
+    "invalidUrl": "URL inválida",
+    "missingFields": "Campos em Falta",
+    "pairingFailed": "Falha no pareamento",
+    "pleaseEnterBothFields": "Por favor, insira o URL e o token do servidor",
+    "pleaseEnterValidUrl": "Por favor, insira uma URL de servidor válida",
+    "serverUrlMustStartWith": "O URL do servidor deve começar com http:// ou https://",
+    "tooManyPairingAttempts": "Muitas tentativas de emparelhamento. Por favor, aguarde alguns minutos.",
+    "unableToPair": "Unable to pair with server"
   },
-  "settings": {
-    "preferences": "Preferências:",
-    "community": "Comunidade",
-    "discord": "Discord",
-    "joinCommunity": "Junte-se à comunidade",
-    "github": "GitHub",
-    "viewSourceCode": "Ver código-fonte",
-    "account": "conta",
-    "disconnectServer": "Desconectar servidor",
-    "disconnectConfirm": "Tem certeza que deseja desconectar do \"{{serverName}}\"? Você precisará parear novamente para usar o aplicativo.",
-    "disconnectConfirmGeneric": "Tem certeza que deseja desconectar? Você precisará parear novamente para usar o aplicativo.",
-    "currentlyConnected": "Conectado atualmente a {{serverName}}"
+  "history": {
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming",
+    "noHistoryFound": "No History Found"
   },
   "navigation": {
+    "home": "Home",
+    "navigation": "Navigation",
     "selectServer": "Selecionar servidor",
-    "server": "Servidor",
-    "navigation": "Navigation"
+    "server": "Servidor"
   },
+  "notifications": {
+    "allViolationTypes": "All Violation Types",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "endTime": "End Time",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "failedToSendTest": "Falha ao enviar notificação teste",
+    "loadingPreferences": "Carregando preferências...",
+    "newDeviceDetected": "New device detected for user",
+    "newPlaybackBegan": "New playback began",
+    "notifyForEveryRule": "Notify for every rule type",
+    "playbackEnded": "Playback ended",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "sendTestNotification": "Send Test Notification",
+    "serverBackOnline": "Media server back online",
+    "serverUnreachable": "Media server unreachable",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "startTime": "Start Time",
+    "testDescription": "Verify that push notifications are working correctly",
+    "testFailed": "Teste Falhou",
+    "testSent": "Teste Enviado",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "to": "to",
+    "trustScoreDegraded": "User trust score degraded",
+    "unableToLoadPreferences": "Não é possível carregar as preferências"
+  },
+  "pair": {
+    "accessToken": "Token de acesso",
+    "addServer": "Adicionar Servidor",
+    "cameraPermissionRequired": "É necessária permissão de câmera para ler códigos QR",
+    "connectToServer": "Conectar ao servidor",
+    "enterManually": "Insira a URL e Token Manualmente",
+    "enterServerDetails": "Digite seu URL do servidor Tracearr e token de acesso móvel",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token",
+    "scanQrCodeInstead": "Escanear Código QR",
+    "scanQrInstructions": "Abra Configurações → Aplicativo Móvel no seu painel de controle de Tracearr e escaneie o código QR",
+    "serverUrl": "URL do servidor",
+    "tokenPlaceholder": "trr_mob_...",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "welcome": "Bem-vindo ao Tracearr"
+  },
+  "reconnected": "Reconnected",
   "resources": {
     "cpu": "cpu",
     "ram": "RAM"
   },
-  "notifications": {
-    "testSent": "Teste Enviado",
-    "testFailed": "Teste Falhou",
-    "failedToSendTest": "Falha ao enviar notificação teste",
-    "loadingPreferences": "Carregando preferências...",
-    "unableToLoadPreferences": "Não é possível carregar as preferências"
+  "serverSelector": {
+    "selectServers": "Select Servers",
+    "servers": "Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "session": {
+    "failedToTerminate": "Failed to Terminate",
+    "sessionStopped": "The playback session has been stopped.",
+    "streamTerminated": "Stream Terminated"
+  },
+  "settings": {
+    "account": "conta",
+    "build": "Build {{build}}",
+    "community": "Comunidade",
+    "configureNotifications": "Configure push notification preferences",
+    "currentlyConnected": "Conectado atualmente a {{serverName}}",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Tem certeza que deseja desconectar do \"{{serverName}}\"? Você precisará parear novamente para usar o aplicativo.",
+    "disconnectConfirmGeneric": "Tem certeza que deseja desconectar? Você precisará parear novamente para usar o aplicativo.",
+    "disconnectServer": "Desconectar servidor",
+    "discord": "Discord",
+    "docs": "Docs",
+    "github": "GitHub",
+    "joinCommunity": "Junte-se à comunidade",
+    "language": "Language",
+    "notifications": "Notifications",
+    "preferences": "Preferências:",
+    "readDocs": "Read the documentation",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
+    "version": "Version {{version}}",
+    "viewSourceCode": "Ver código-fonte",
+    "visitWebsite": "Visit tracearr.com",
+    "website": "Website"
+  },
+  "unauthenticated": {
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "connectionLost": "Connection Lost",
+    "scanQrCode": "Scan QR Code"
+  },
+  "userDetail": {
+    "moreDevices": "+{{count}} more devices",
+    "moreLocations": "+{{count}} more locations",
+    "noDevicesRecorded": "No devices recorded",
+    "noLocationsRecorded": "No locations recorded",
+    "noTerminations": "No stream terminations",
+    "noViolations": "No violations",
+    "trustHigh": "High",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "userMayBeRemoved": "This user may have been removed."
+  },
+  "users": {
+    "noUsers": "No Users",
+    "noUsersMatch": "No users match \"{{query}}\"",
+    "owner": "Owner",
+    "usersWillAppear": "Users will appear here after syncing with your media server"
+  },
+  "violation": {
+    "customRule": "Custom Rule",
+    "ips": "IPs",
+    "streamComparison": "Stream Comparison",
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available."
   }
 }

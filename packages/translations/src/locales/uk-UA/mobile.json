@@ -1,60 +1,163 @@
 {
-  "pair": {
-    "welcome": "Ласкаво просимо до Tracearr",
-    "addServer": "Додати сервер",
-    "connectToServer": "Підключитися до сервера",
-    "enterServerDetails": "Введіть URL-адресу вашого серверу Tracearr та токен доступу",
-    "serverUrl": "URL-адреса сервера",
-    "accessToken": "Токен доступу",
-    "scanQrCodeInstead": "Натомість скануйте QR-код",
-    "enterManually": "Введіть URL-адресу та токен вручну",
-    "cameraPermissionRequired": "Для сканування QR-кодів потрібен дозвіл на доступ до камери",
-    "scanQrInstructions": "Відкрийте налаштування → Мобільний додаток в інформаційній панелі Tracearr і відскануйте QR-код"
+  "actionsExecuted": "Actions Executed",
+  "activity": {
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality",
+    "playsOverTime": "Plays Over Time"
+  },
+  "alerts": {
+    "clearFilters": "Clear Filters",
+    "done": "Done"
+  },
+  "dashboard": {
+    "hrs": "hrs",
+    "today": "TODAY"
   },
   "errors": {
-    "missingFields": "Пропущені поля",
-    "pleaseEnterBothFields": "Будь ласка, введіть URL-адресу сервера та токен",
-    "invalidUrl": "Неправильна URL-адреса",
-    "serverUrlMustStartWith": "URL-адреса сервера має починатися з http:// або https://",
-    "pleaseEnterValidUrl": "Будь ласка, введіть коректний URL сервера",
-    "pairingFailed": "Помилка парування",
-    "invalidQrCode": "Недійсний QR-код",
-    "invalidQrCodeMissingData": "Невірний QR-код: відсутні дані для парування",
-    "invalidQrCodeFormat": "Невірний формат QR-коду. Будь ласка, згенеруйте новий код.",
-    "invalidQrCodeMissingUrl": "Невірний QR-код: відсутній URL сервера",
-    "invalidQrCodeMissingToken": "Невірний QR-код: відсутній токен парування",
-    "invalidServerUrlInQr": "Хибна URL-адреса сервера у QR-коді",
-    "tooManyPairingAttempts": "Занадто багато спроб створення пари. Будь ласка, зачекайте кілька хвилин.",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "errorDetails": "Error Details:",
+    "failedToLoadSession": "Failed to load session",
     "invalidOrExpiredToken": "Некоректний або прострочений токен парування.",
-    "invalidPairingRequest": "Хибний запит на парування. Перевірте свій маркер."
+    "invalidPairingRequest": "Хибний запит на парування. Перевірте свій маркер.",
+    "invalidQrCode": "Недійсний QR-код",
+    "invalidQrCodeFormat": "Невірний формат QR-коду. Будь ласка, згенеруйте новий код.",
+    "invalidQrCodeMissingData": "Невірний QR-код: відсутні дані для парування",
+    "invalidQrCodeMissingToken": "Невірний QR-код: відсутній токен парування",
+    "invalidQrCodeMissingUrl": "Невірний QR-код: відсутній URL сервера",
+    "invalidServerUrlInQr": "Хибна URL-адреса сервера у QR-коді",
+    "invalidUrl": "Неправильна URL-адреса",
+    "missingFields": "Пропущені поля",
+    "pairingFailed": "Помилка парування",
+    "pleaseEnterBothFields": "Будь ласка, введіть URL-адресу сервера та токен",
+    "pleaseEnterValidUrl": "Будь ласка, введіть коректний URL сервера",
+    "serverUrlMustStartWith": "URL-адреса сервера має починатися з http:// або https://",
+    "tooManyPairingAttempts": "Занадто багато спроб створення пари. Будь ласка, зачекайте кілька хвилин.",
+    "unableToPair": "Unable to pair with server"
   },
-  "settings": {
-    "preferences": "Налаштування",
-    "community": "Спільнота",
-    "discord": "Discord",
-    "joinCommunity": "Приєднатися до спільноти",
-    "github": "GitHub",
-    "viewSourceCode": "Переглянути вихідний код",
-    "account": "Обліковий запис",
-    "disconnectServer": "Відключити сервер",
-    "disconnectConfirm": "Ви впевнені у тому, що хочете відключитися від{{serverName}}? Вам потрібно буде знову під'єднатися до програми.",
-    "disconnectConfirmGeneric": "Ви дійсно хочете відключитися? Вам необхідно ще раз з'єднатися з додатком.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+  "history": {
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming",
+    "noHistoryFound": "No History Found"
   },
   "navigation": {
+    "home": "Home",
+    "navigation": "Navigation",
     "selectServer": "Виберіть сервер",
-    "server": "Сервер",
-    "navigation": "Navigation"
+    "server": "Сервер"
   },
+  "notifications": {
+    "allViolationTypes": "All Violation Types",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "endTime": "End Time",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "failedToSendTest": "Помилка надсилання сповіщення",
+    "loadingPreferences": "Завантаження налаштувань...",
+    "newDeviceDetected": "New device detected for user",
+    "newPlaybackBegan": "New playback began",
+    "notifyForEveryRule": "Notify for every rule type",
+    "playbackEnded": "Playback ended",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "sendTestNotification": "Send Test Notification",
+    "serverBackOnline": "Media server back online",
+    "serverUnreachable": "Media server unreachable",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "startTime": "Start Time",
+    "testDescription": "Verify that push notifications are working correctly",
+    "testFailed": "Перевірка не вдалася",
+    "testSent": "Тестування надіслано",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "to": "to",
+    "trustScoreDegraded": "User trust score degraded",
+    "unableToLoadPreferences": "Не вдалося завантажити параметри"
+  },
+  "pair": {
+    "accessToken": "Токен доступу",
+    "addServer": "Додати сервер",
+    "cameraPermissionRequired": "Для сканування QR-кодів потрібен дозвіл на доступ до камери",
+    "connectToServer": "Підключитися до сервера",
+    "enterManually": "Введіть URL-адресу та токен вручну",
+    "enterServerDetails": "Введіть URL-адресу вашого серверу Tracearr та токен доступу",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token",
+    "scanQrCodeInstead": "Натомість скануйте QR-код",
+    "scanQrInstructions": "Відкрийте налаштування → Мобільний додаток в інформаційній панелі Tracearr і відскануйте QR-код",
+    "serverUrl": "URL-адреса сервера",
+    "tokenPlaceholder": "trr_mob_...",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "welcome": "Ласкаво просимо до Tracearr"
+  },
+  "reconnected": "Reconnected",
   "resources": {
     "cpu": "CPU",
     "ram": "RAM"
   },
-  "notifications": {
-    "testSent": "Тестування надіслано",
-    "testFailed": "Перевірка не вдалася",
-    "failedToSendTest": "Помилка надсилання сповіщення",
-    "loadingPreferences": "Завантаження налаштувань...",
-    "unableToLoadPreferences": "Не вдалося завантажити параметри"
+  "serverSelector": {
+    "selectServers": "Select Servers",
+    "servers": "Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "session": {
+    "failedToTerminate": "Failed to Terminate",
+    "sessionStopped": "The playback session has been stopped.",
+    "streamTerminated": "Stream Terminated"
+  },
+  "settings": {
+    "account": "Обліковий запис",
+    "build": "Build {{build}}",
+    "community": "Спільнота",
+    "configureNotifications": "Configure push notification preferences",
+    "currentlyConnected": "Currently connected to {{serverName}}",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Ви впевнені у тому, що хочете відключитися від{{serverName}}? Вам потрібно буде знову під'єднатися до програми.",
+    "disconnectConfirmGeneric": "Ви дійсно хочете відключитися? Вам необхідно ще раз з'єднатися з додатком.",
+    "disconnectServer": "Відключити сервер",
+    "discord": "Discord",
+    "docs": "Docs",
+    "github": "GitHub",
+    "joinCommunity": "Приєднатися до спільноти",
+    "language": "Language",
+    "notifications": "Notifications",
+    "preferences": "Налаштування",
+    "readDocs": "Read the documentation",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
+    "version": "Version {{version}}",
+    "viewSourceCode": "Переглянути вихідний код",
+    "visitWebsite": "Visit tracearr.com",
+    "website": "Website"
+  },
+  "unauthenticated": {
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "connectionLost": "Connection Lost",
+    "scanQrCode": "Scan QR Code"
+  },
+  "userDetail": {
+    "moreDevices": "+{{count}} more devices",
+    "moreLocations": "+{{count}} more locations",
+    "noDevicesRecorded": "No devices recorded",
+    "noLocationsRecorded": "No locations recorded",
+    "noTerminations": "No stream terminations",
+    "noViolations": "No violations",
+    "trustHigh": "High",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "userMayBeRemoved": "This user may have been removed."
+  },
+  "users": {
+    "noUsers": "No Users",
+    "noUsersMatch": "No users match \"{{query}}\"",
+    "owner": "Owner",
+    "usersWillAppear": "Users will appear here after syncing with your media server"
+  },
+  "violation": {
+    "customRule": "Custom Rule",
+    "ips": "IPs",
+    "streamComparison": "Stream Comparison",
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available."
   }
 }

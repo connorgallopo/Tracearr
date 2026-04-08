@@ -1,60 +1,163 @@
 {
-  "pair": {
-    "welcome": "Καλώς ήλθατε στο Tracearr",
-    "addServer": "Προσθήκη Διακομιστή",
-    "connectToServer": "Σύνδεση σε διακομιστή",
-    "enterServerDetails": "Εισάγετε τη διεύθυνση URL του διακομιστή Tracearr και το διακριτικό πρόσβασης από το κινητό",
-    "serverUrl": "Url Διακομιστή",
-    "accessToken": "Διακριτικό Πρόσβασης",
-    "scanQrCodeInstead": "Σάρωση Κωδικού Qr Αντ' αυτού",
-    "enterManually": "Χειροκίνητη εισαγωγή URL και διακριτικού",
-    "cameraPermissionRequired": "Απαιτείται άδεια κάμερας για τη σάρωση κωδικών QR",
-    "scanQrInstructions": "Ανοίξτε τις Ρυθμίσεις → Mobile App στο ταμπλό του Tracearr και σαρώστε τον κωδικό QR"
+  "actionsExecuted": "Actions Executed",
+  "activity": {
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality",
+    "playsOverTime": "Plays Over Time"
+  },
+  "alerts": {
+    "clearFilters": "Clear Filters",
+    "done": "Done"
+  },
+  "dashboard": {
+    "hrs": "hrs",
+    "today": "TODAY"
   },
   "errors": {
-    "missingFields": "Λείπει Πεδία",
-    "pleaseEnterBothFields": "Παρακαλώ εισάγετε το URL και το διακριτικό του διακομιστή",
-    "invalidUrl": "Μη Έγκυρο URL",
-    "serverUrlMustStartWith": "Η διεύθυνση URL του διακομιστή πρέπει να ξεκινά με http:// ή http://",
-    "pleaseEnterValidUrl": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL διακομιστή",
-    "pairingFailed": "Αποτυχία Σύζευξης",
-    "invalidQrCode": "Invalid QR code",
-    "invalidQrCodeMissingData": "Μη έγκυρος κωδικός QR: λείπουν δεδομένα σύζευξης",
-    "invalidQrCodeFormat": "Μη έγκυρη μορφή κωδικού QR. Παρακαλούμε δημιουργήστε ένα νέο κωδικό.",
-    "invalidQrCodeMissingUrl": "Μη έγκυρος κωδικός QR: λείπει το URL του διακομιστή",
-    "invalidQrCodeMissingToken": "Μη έγκυρος κωδικός QR: λείπει το διακριτικό σύζευξης",
-    "invalidServerUrlInQr": "Μη έγκυρη διεύθυνση URL διακομιστή στον κωδικό QR",
-    "tooManyPairingAttempts": "Πάρα πολλές προσπάθειες σύζευξης. Παρακαλώ περιμένετε μερικά λεπτά.",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "errorDetails": "Error Details:",
+    "failedToLoadSession": "Failed to load session",
     "invalidOrExpiredToken": "Μη έγκυρο ή ληγμένο διακριτικό σύζευξης.",
-    "invalidPairingRequest": "Άκυρο αίτημα σύζευξης. Ελέγξτε το διακριτικό σας."
+    "invalidPairingRequest": "Άκυρο αίτημα σύζευξης. Ελέγξτε το διακριτικό σας.",
+    "invalidQrCode": "Invalid QR code",
+    "invalidQrCodeFormat": "Μη έγκυρη μορφή κωδικού QR. Παρακαλούμε δημιουργήστε ένα νέο κωδικό.",
+    "invalidQrCodeMissingData": "Μη έγκυρος κωδικός QR: λείπουν δεδομένα σύζευξης",
+    "invalidQrCodeMissingToken": "Μη έγκυρος κωδικός QR: λείπει το διακριτικό σύζευξης",
+    "invalidQrCodeMissingUrl": "Μη έγκυρος κωδικός QR: λείπει το URL του διακομιστή",
+    "invalidServerUrlInQr": "Μη έγκυρη διεύθυνση URL διακομιστή στον κωδικό QR",
+    "invalidUrl": "Μη Έγκυρο URL",
+    "missingFields": "Λείπει Πεδία",
+    "pairingFailed": "Αποτυχία Σύζευξης",
+    "pleaseEnterBothFields": "Παρακαλώ εισάγετε το URL και το διακριτικό του διακομιστή",
+    "pleaseEnterValidUrl": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL διακομιστή",
+    "serverUrlMustStartWith": "Η διεύθυνση URL του διακομιστή πρέπει να ξεκινά με http:// ή http://",
+    "tooManyPairingAttempts": "Πάρα πολλές προσπάθειες σύζευξης. Παρακαλώ περιμένετε μερικά λεπτά.",
+    "unableToPair": "Unable to pair with server"
   },
-  "settings": {
-    "preferences": "Ρυθμίσεις",
-    "community": "Κοινότητα",
-    "discord": "Discord",
-    "joinCommunity": "Γίνετε μέλος της κοινότητας",
-    "github": "GitHub",
-    "viewSourceCode": "Προβολή πηγαίου κώδικα",
-    "account": "Λογαριασμός",
-    "disconnectServer": "Αποσύνδεση Εξυπηρετητή",
-    "disconnectConfirm": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε από το \"{{serverName}}\"? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
-    "disconnectConfirmGeneric": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
-    "currentlyConnected": "Συνδεδεμένο με το {{serverName}}"
+  "history": {
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming",
+    "noHistoryFound": "No History Found"
   },
   "navigation": {
+    "home": "Home",
+    "navigation": "Navigation",
     "selectServer": "Επιλογή Διακομιστή",
-    "server": "Διακομιστής",
-    "navigation": "Navigation"
+    "server": "Διακομιστής"
   },
+  "notifications": {
+    "allViolationTypes": "All Violation Types",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "endTime": "End Time",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "failedToSendTest": "Αποτυχία αποστολής δοκιμαστικής ειδοποίησης",
+    "loadingPreferences": "Φόρτωση προτιμήσεων...",
+    "newDeviceDetected": "New device detected for user",
+    "newPlaybackBegan": "New playback began",
+    "notifyForEveryRule": "Notify for every rule type",
+    "playbackEnded": "Playback ended",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "sendTestNotification": "Send Test Notification",
+    "serverBackOnline": "Media server back online",
+    "serverUnreachable": "Media server unreachable",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "startTime": "Start Time",
+    "testDescription": "Verify that push notifications are working correctly",
+    "testFailed": "Αποτυχία Δοκιμής",
+    "testSent": "Απεσταλμένη Δοκιμή",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "to": "to",
+    "trustScoreDegraded": "User trust score degraded",
+    "unableToLoadPreferences": "Αδυναμία φόρτωσης προτιμήσεων"
+  },
+  "pair": {
+    "accessToken": "Διακριτικό Πρόσβασης",
+    "addServer": "Προσθήκη Διακομιστή",
+    "cameraPermissionRequired": "Απαιτείται άδεια κάμερας για τη σάρωση κωδικών QR",
+    "connectToServer": "Σύνδεση σε διακομιστή",
+    "enterManually": "Χειροκίνητη εισαγωγή URL και διακριτικού",
+    "enterServerDetails": "Εισάγετε τη διεύθυνση URL του διακομιστή Tracearr και το διακριτικό πρόσβασης από το κινητό",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token",
+    "scanQrCodeInstead": "Σάρωση Κωδικού Qr Αντ' αυτού",
+    "scanQrInstructions": "Ανοίξτε τις Ρυθμίσεις → Mobile App στο ταμπλό του Tracearr και σαρώστε τον κωδικό QR",
+    "serverUrl": "Url Διακομιστή",
+    "tokenPlaceholder": "trr_mob_...",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "welcome": "Καλώς ήλθατε στο Tracearr"
+  },
+  "reconnected": "Reconnected",
   "resources": {
     "cpu": "Επεξεργαστής",
     "ram": "RAM"
   },
-  "notifications": {
-    "testSent": "Απεσταλμένη Δοκιμή",
-    "testFailed": "Αποτυχία Δοκιμής",
-    "failedToSendTest": "Αποτυχία αποστολής δοκιμαστικής ειδοποίησης",
-    "loadingPreferences": "Φόρτωση προτιμήσεων...",
-    "unableToLoadPreferences": "Αδυναμία φόρτωσης προτιμήσεων"
+  "serverSelector": {
+    "selectServers": "Select Servers",
+    "servers": "Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "session": {
+    "failedToTerminate": "Failed to Terminate",
+    "sessionStopped": "The playback session has been stopped.",
+    "streamTerminated": "Stream Terminated"
+  },
+  "settings": {
+    "account": "Λογαριασμός",
+    "build": "Build {{build}}",
+    "community": "Κοινότητα",
+    "configureNotifications": "Configure push notification preferences",
+    "currentlyConnected": "Συνδεδεμένο με το {{serverName}}",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε από το \"{{serverName}}\"? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
+    "disconnectConfirmGeneric": "Είστε βέβαιοι ότι θέλετε να αποσυνδεθείτε? Θα χρειαστεί να κάνετε ξανά σύζευξη για να χρησιμοποιήσετε την εφαρμογή.",
+    "disconnectServer": "Αποσύνδεση Εξυπηρετητή",
+    "discord": "Discord",
+    "docs": "Docs",
+    "github": "GitHub",
+    "joinCommunity": "Γίνετε μέλος της κοινότητας",
+    "language": "Language",
+    "notifications": "Notifications",
+    "preferences": "Ρυθμίσεις",
+    "readDocs": "Read the documentation",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
+    "version": "Version {{version}}",
+    "viewSourceCode": "Προβολή πηγαίου κώδικα",
+    "visitWebsite": "Visit tracearr.com",
+    "website": "Website"
+  },
+  "unauthenticated": {
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "connectionLost": "Connection Lost",
+    "scanQrCode": "Scan QR Code"
+  },
+  "userDetail": {
+    "moreDevices": "+{{count}} more devices",
+    "moreLocations": "+{{count}} more locations",
+    "noDevicesRecorded": "No devices recorded",
+    "noLocationsRecorded": "No locations recorded",
+    "noTerminations": "No stream terminations",
+    "noViolations": "No violations",
+    "trustHigh": "High",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "userMayBeRemoved": "This user may have been removed."
+  },
+  "users": {
+    "noUsers": "No Users",
+    "noUsersMatch": "No users match \"{{query}}\"",
+    "owner": "Owner",
+    "usersWillAppear": "Users will appear here after syncing with your media server"
+  },
+  "violation": {
+    "customRule": "Custom Rule",
+    "ips": "IPs",
+    "streamComparison": "Stream Comparison",
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available."
   }
 }
