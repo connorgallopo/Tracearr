@@ -44,6 +44,12 @@ export default function SettingsLayout() {
           title: 'Notifications',
         }}
       />
+      <Stack.Screen
+        name="language"
+        options={{
+          title: 'Language',
+        }}
+      />
     </Stack>
   );
 }
