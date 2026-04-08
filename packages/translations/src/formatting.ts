@@ -5,7 +5,7 @@
  * Works consistently across web and React Native environments.
  */
 
-import { i18n } from './config.js';
+import i18n from 'i18next';
 
 // ============================================================================
 // Date/Time Formatting

@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { _registerLocaleLoader } from './language.js';
 
 // ============================================================================
 // English Translations (Base Language — always bundled)
@@ -131,6 +132,9 @@ export async function loadLocale(lang: string): Promise<void> {
     console.error(`[i18n] Failed to load locale "${lang}", falling back to English`, err);
   }
 }
+
+// Register the Vite-based locale loader so language.ts can use it
+_registerLocaleLoader(loadLocale);
 
 // ============================================================================
 // i18next Configuration

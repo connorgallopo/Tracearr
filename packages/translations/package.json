@@ -9,6 +9,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./mobile": {
+      "types": "./dist/mobile.d.ts",
+      "react-native": "./src/mobile.ts",
+      "import": "./dist/mobile.js"
     }
   },
   "files": [
