@@ -9,7 +9,11 @@
     "scanQrCodeInstead": "Scan QR Code Instead",
     "enterManually": "Enter URL and Token Manually",
     "cameraPermissionRequired": "Camera permission is required to scan QR codes",
-    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code"
+    "scanQrInstructions": "Open Settings → Mobile App in your Tracearr dashboard and scan the QR code",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "tokenPlaceholder": "trr_mob_...",
+    "missingToken": "Missing Token",
+    "pleaseEnterToken": "Please enter your access token"
   },
   "errors": {
     "missingFields": "Missing Fields",
@@ -18,6 +22,7 @@
     "serverUrlMustStartWith": "Server URL must start with http:// or https://",
     "pleaseEnterValidUrl": "Please enter a valid server URL",
     "pairingFailed": "Pairing Failed",
+    "unableToPair": "Unable to pair with server",
     "invalidQrCode": "Invalid QR code",
     "invalidQrCodeMissingData": "Invalid QR code: missing pairing data",
     "invalidQrCodeFormat": "Invalid QR code format. Please generate a new code.",
@@ -26,22 +31,39 @@
     "invalidServerUrlInQr": "Invalid server URL in QR code",
     "tooManyPairingAttempts": "Too many pairing attempts. Please wait a few minutes.",
     "invalidOrExpiredToken": "Invalid or expired pairing token.",
-    "invalidPairingRequest": "Invalid pairing request. Check your token."
+    "invalidPairingRequest": "Invalid pairing request. Check your token.",
+    "errorDetails": "Error Details:",
+    "componentStack": "Component Stack:",
+    "connectionLost": "Connection lost",
+    "failedToLoadSession": "Failed to load session"
   },
   "settings": {
     "preferences": "Preferences",
+    "notifications": "Notifications",
+    "configureNotifications": "Configure push notification preferences",
+    "language": "Language",
     "community": "Community",
     "discord": "Discord",
     "joinCommunity": "Join the community",
+    "docs": "Docs",
+    "readDocs": "Read the documentation",
+    "website": "Website",
+    "visitWebsite": "Visit tracearr.com",
     "github": "GitHub",
     "viewSourceCode": "View source code",
+    "sponsor": "Sponsor",
+    "supportDevelopment": "Support development",
     "account": "Account",
+    "disconnect": "Disconnect",
     "disconnectServer": "Disconnect Server",
     "disconnectConfirm": "Are you sure you want to disconnect from \"{{serverName}}\"? You will need to pair again to use the app.",
     "disconnectConfirmGeneric": "Are you sure you want to disconnect? You will need to pair again to use the app.",
-    "currentlyConnected": "Currently connected to {{serverName}}"
+    "currentlyConnected": "Currently connected to {{serverName}}",
+    "version": "Version {{version}}",
+    "build": "Build {{build}}"
   },
   "navigation": {
+    "home": "Home",
     "selectServer": "Select Server",
     "server": "Server",
     "navigation": "Navigation"
@@ -55,6 +77,87 @@
     "testFailed": "Test Failed",
     "failedToSendTest": "Failed to send test notification",
     "loadingPreferences": "Loading preferences...",
-    "unableToLoadPreferences": "Unable to Load Preferences"
-  }
+    "unableToLoadPreferences": "Unable to Load Preferences",
+    "receiveAlerts": "Receive alerts on this device",
+    "ruleViolationTriggered": "Rule violation triggered",
+    "newPlaybackBegan": "New playback began",
+    "playbackEnded": "Playback ended",
+    "exceededStreamLimit": "User exceeded stream limit",
+    "newDeviceDetected": "New device detected for user",
+    "trustScoreDegraded": "User trust score degraded",
+    "serverUnreachable": "Media server unreachable",
+    "serverBackOnline": "Media server back online",
+    "allViolationTypes": "All Violation Types",
+    "notifyForEveryRule": "Notify for every rule type",
+    "severityDescription": "Only notify for violations at or above this severity level",
+    "quietHoursDescription": "Pause non-critical notifications during set hours",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "to": "to",
+    "timezoneLabel": "Timezone: {{timezone}}",
+    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
+    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
+    "sendTestNotification": "Send Test Notification",
+    "testDescription": "Verify that push notifications are working correctly"
+  },
+  "dashboard": {
+    "today": "TODAY",
+    "hrs": "hrs"
+  },
+  "session": {
+    "streamTerminated": "Stream Terminated",
+    "sessionStopped": "The playback session has been stopped.",
+    "failedToTerminate": "Failed to Terminate"
+  },
+  "userDetail": {
+    "userMayBeRemoved": "This user may have been removed.",
+    "noLocationsRecorded": "No locations recorded",
+    "noDevicesRecorded": "No devices recorded",
+    "moreLocations": "+{{count}} more locations",
+    "moreDevices": "+{{count}} more devices",
+    "noViolations": "No violations",
+    "noTerminations": "No stream terminations",
+    "trustLow": "Low",
+    "trustMedium": "Medium",
+    "trustHigh": "High"
+  },
+  "violation": {
+    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available.",
+    "customRule": "Custom Rule",
+    "streamComparison": "Stream Comparison",
+    "ips": "IPs"
+  },
+  "alerts": {
+    "done": "Done",
+    "clearFilters": "Clear Filters"
+  },
+  "history": {
+    "noHistoryFound": "No History Found",
+    "adjustFilters": "Try adjusting your filters",
+    "historyWillAppear": "Session history will appear here once users start streaming"
+  },
+  "users": {
+    "owner": "Owner",
+    "noUsers": "No Users",
+    "usersWillAppear": "Users will appear here after syncing with your media server",
+    "noUsersMatch": "No users match \"{{query}}\""
+  },
+  "activity": {
+    "playsOverTime": "Plays Over Time",
+    "concurrentStreams": "Concurrent Streams",
+    "platforms": "Platforms",
+    "playbackQuality": "Playback Quality"
+  },
+  "unauthenticated": {
+    "connectionLost": "Connection Lost",
+    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "scanQrCode": "Scan QR Code"
+  },
+  "serverSelector": {
+    "servers": "Servers",
+    "selectServers": "Select Servers",
+    "serversSelected": "{{selected}} of {{total}} servers selected"
+  },
+  "reconnected": "Reconnected",
+  "actionsExecuted": "Actions Executed"
 }
