@@ -53,7 +53,7 @@
     "bullmq": "^5.71.1",
     "cacheable-lookup": "^7.0.0",
     "dotenv": "^17.3.1",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "eventsource": "^4.1.0",
     "expo-server-sdk": "^6.1.0",
     "fastify": "^5.8.3",

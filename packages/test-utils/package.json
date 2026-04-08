@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@tracearr/shared": "workspace:*",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "ioredis": "^5.10.0",
     "ioredis-mock": "^8.13.1",
     "jsonwebtoken": "^9.0.3",
