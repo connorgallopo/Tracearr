@@ -5,7 +5,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@tracearr/shared": ["../../packages/shared/src"]
+      "@tracearr/shared": ["../../packages/shared/src"],
+      "@tracearr/translations/mobile": ["../../packages/translations/src/mobile"]
     },
     "types": ["expo-router/types", "node"],
     "skipLibCheck": true,
