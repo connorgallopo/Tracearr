@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Êtes-vous sûr de vouloir l'ignorer ? Elle sera définitivement supprimée du journal de violation et les scores de confiance associés seront restaurés.",
     "noViolationsFound": "Aucune violation trouvée",
     "noViolationsRecorded": "Il n'y a pas encore de violation enregistrée.",
+    "allRules": "Toutes les règles",
     "allSeverities": "Toutes les gravités",
     "allStatuses": "Tous les états",
     "detail": {
