@@ -431,6 +431,7 @@ export interface Rule {
   conditions?: RuleConditions | null;
   actions?: RuleActions | null;
   serverId?: string | null;
+  effectiveServerId?: string | null;
   // Common fields
   serverUserId: string | null;
   isActive: boolean;
