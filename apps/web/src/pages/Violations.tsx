@@ -29,6 +29,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { ViolationWithDetails, ViolationSeverity, ViolationSortField } from '@tracearr/shared';
 import {
   useViolations,
+  useRules,
   useAcknowledgeViolation,
   useDismissViolation,
   useBulkAcknowledgeViolations,
@@ -53,6 +54,7 @@ export function Violations() {
   const [page, setPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([{ id: 'createdAt', desc: true }]);
   const [severityFilter, setSeverityFilter] = useState<ViolationSeverity | 'all'>('all');
+  const [ruleFilter, setRuleFilter] = useState<string>('all');
   const [acknowledgedFilter, setAcknowledgedFilter] = useState<'all' | 'pending' | 'acknowledged'>(
     'all'
   );
@@ -60,6 +62,7 @@ export function Violations() {
   const [bulkDismissConfirmOpen, setBulkDismissConfirmOpen] = useState(false);
   const pageSize = 10;
   const { selectedServerId } = useServer();
+  const { data: rules = [] } = useRules();
 
   // Convert sorting state to API params
   const orderBy = sorting[0]?.id ? columnToSortField[sorting[0].id] : undefined;
@@ -68,6 +71,7 @@ export function Violations() {
   const { data: violationsData, isLoading } = useViolations({
     page,
     pageSize,
+    ruleId: ruleFilter === 'all' ? undefined : ruleFilter,
     severity: severityFilter === 'all' ? undefined : severityFilter,
     acknowledged: acknowledgedFilter === 'all' ? undefined : acknowledgedFilter === 'acknowledged',
     serverId: selectedServerId ?? undefined,
@@ -334,6 +338,29 @@ export function Violations() {
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <div className="space-y-2">
+              <label className="text-muted-foreground text-sm">{t('common:labels.rule')}</label>
+              <Select
+                value={ruleFilter}
+                onValueChange={(value) => {
+                  setRuleFilter(value);
+                  setPage(1);
+                  clearSelection();
+                }}
+              >
+                <SelectTrigger className="w-56">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('pages:violations.allRules')}</SelectItem>
+                  {rules.map((rule) => (
+                    <SelectItem key={rule.id} value={rule.id}>
+                      {rule.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <label className="text-muted-foreground text-sm">{t('common:labels.severity')}</label>
               <Select
                 value={severityFilter}
@@ -382,7 +409,7 @@ export function Violations() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t('violations.violationLog')}</CardTitle>
-          {selectedCount > 0 && !selectAllMode && total > selectedCount && (
+          {ruleFilter === 'all' && selectedCount > 0 && !selectAllMode && total > selectedCount && (
             <Button variant="link" size="sm" onClick={selectAll} className="text-sm">
               {t('violations.selectAllViolations', { count: total })}
             </Button>
@@ -407,7 +434,7 @@ export function Violations() {
               <div className="text-center">
                 <h3 className="font-semibold">{t('violations.noViolationsFound')}</h3>
                 <p className="text-muted-foreground text-sm">
-                  {severityFilter !== 'all' || acknowledgedFilter !== 'all'
+                  {ruleFilter !== 'all' || severityFilter !== 'all' || acknowledgedFilter !== 'all'
                     ? t('violations.tryAdjustingFilters')
                     : t('violations.noViolationsRecorded')}
                 </p>
