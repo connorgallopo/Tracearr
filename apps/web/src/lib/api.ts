@@ -805,6 +805,7 @@ class ApiClient {
       page?: number;
       pageSize?: number;
       userId?: string;
+      ruleId?: string;
       severity?: string;
       acknowledged?: boolean;
       serverId?: string;
@@ -815,6 +816,7 @@ class ApiClient {
       if (params?.page) searchParams.set('page', String(params.page));
       if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
       if (params?.userId) searchParams.set('userId', params.userId);
+      if (params?.ruleId) searchParams.set('ruleId', params.ruleId);
       if (params?.severity) searchParams.set('severity', params.severity);
       if (params?.acknowledged !== undefined)
         searchParams.set('acknowledged', String(params.acknowledged));
