@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "هل أنت متأكد من رغبتك في الرفض؟ سيؤدي هذا إلى إزالتهم من سجل الانتهاكات بشكل دائم واستعادة نقاط الثقة المرتبطة بها.",
     "noViolationsFound": "لم يتم العثور على أي انتهاكات",
     "noViolationsRecorded": "ولم تسجل أي انتهاكات حتى الآن.",
+    "allRules": "All Rules",
     "allSeverities": "جميع الجوانب",
     "allStatuses": "جميع الحالات",
     "detail": {

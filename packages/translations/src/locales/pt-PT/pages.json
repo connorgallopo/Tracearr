@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Tem certeza de que deseja descartar? Isto irá removê-los do registro de violação permanentemente e restaurar os pontos de confiança associados.",
     "noViolationsFound": "Nenhuma violação encontrada",
     "noViolationsRecorded": "Nenhuma violação foi registrada ainda.",
+    "allRules": "All Rules",
     "allSeverities": "Todas as Severidades",
     "allStatuses": "Todos os Status",
     "detail": {

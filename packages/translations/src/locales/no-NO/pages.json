@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Er du sikker på at du vil avvise? Dette vil fjerne dem fra voldsloggen permanent og gjenopprette tilknyttede tillitspoeng.",
     "noViolationsFound": "Ingen brudd funnet",
     "noViolationsRecorded": "Ingen brudd er registrert ennå.",
+    "allRules": "All Rules",
     "allSeverities": "Alle Alvorlighetsgrader",
     "allStatuses": "Alle statuser",
     "detail": {

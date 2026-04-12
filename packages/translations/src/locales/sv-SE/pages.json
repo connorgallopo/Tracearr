@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Är du säker på att du vill avfärda dem? Detta kommer att ta bort dem från överträdelseloggen permanent och återställa associerade trust-poäng.",
     "noViolationsFound": "Inga överträdelser hittades",
     "noViolationsRecorded": "Inga överträdelser har ännu registrerats.",
+    "allRules": "All Rules",
     "allSeverities": "Alla allvarligheter",
     "allStatuses": "Alla statusar",
     "detail": {

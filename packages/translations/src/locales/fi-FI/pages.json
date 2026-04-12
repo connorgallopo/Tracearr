@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Oletko varma, että haluat erottaa? Tämä poistaa ne rikkomuslokista pysyvästi ja palauttaa niihin liittyvät luottamuspisteet.",
     "noViolationsFound": "Rikkomuksia ei löytynyt",
     "noViolationsRecorded": "Rikkomuksia ei ole vielä tallennettu.",
+    "allRules": "All Rules",
     "allSeverities": "Kaikki Vakavuudet",
     "allStatuses": "Kaikki Tilat",
     "detail": {

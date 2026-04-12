@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Sei sicuro di voler eliminare? Questo li rimuoverà dal registro delle violazioni in modo permanente e ripristinerà i relativi punteggi di fiducia.",
     "noViolationsFound": "Nessuna violazione trovata",
     "noViolationsRecorded": "Nessuna violazione è stata ancora registrata.",
+    "allRules": "All Rules",
     "allSeverities": "Tutte Le Gravità",
     "allStatuses": "Tutti Gli Stati",
     "detail": {

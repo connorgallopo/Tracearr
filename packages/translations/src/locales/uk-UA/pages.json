@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Ви впевнені, що хочете відхилити? Їх буде видалено з журналу порушень і відновлення пов'язаних з ним очок довіри.",
     "noViolationsFound": "Порушень не знайдено",
     "noViolationsRecorded": "Порушень поки що не зафіксовано.",
+    "allRules": "All Rules",
     "allSeverities": "Всі рівні",
     "allStatuses": "Усі статуси",
     "detail": {

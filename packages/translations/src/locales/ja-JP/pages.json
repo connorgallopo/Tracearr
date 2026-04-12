@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "本当に却下しますか？これにより違反ログから削除され、関連する信頼スコアが復元されます。",
     "noViolationsFound": "違反は見つかりませんでした",
     "noViolationsRecorded": "違反は記録されていません。",
+    "allRules": "All Rules",
     "allSeverities": "すべての重要度",
     "allStatuses": "すべてのステータス",
     "detail": {

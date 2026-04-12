@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Czy na pewno chcesz odrzucić? Spowoduje to trwałe usunięcie ich z dziennika naruszeń i przywrócenie powiązanych wyników zaufania.",
     "noViolationsFound": "Nie znaleziono naruszeń",
     "noViolationsRecorded": "Nie odnotowano jeszcze żadnych naruszeń.",
+    "allRules": "All Rules",
     "allSeverities": "Wszystkie wagi",
     "allStatuses": "Wszystkie Statusy",
     "detail": {

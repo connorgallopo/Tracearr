@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Er du sikker på, at du vil afvise? Dette vil fjerne dem fra overtrædelsesloggen permanent og genoprette tilknyttede tillidsscore.",
     "noViolationsFound": "Ingen overtrædelser fundet",
     "noViolationsRecorded": "Der er endnu ikke registreret overtrædelser.",
+    "allRules": "All Rules",
     "allSeverities": "Alle Sværheder",
     "allStatuses": "Alle Status",
     "detail": {

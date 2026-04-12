@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Are you sure you want to dismiss {{count}} violation(s)? This will remove them from the violation log permanently and restore associated trust scores.",
     "noViolationsFound": "No violations found",
     "noViolationsRecorded": "No violations have been recorded yet.",
+    "allRules": "All Rules",
     "allSeverities": "All Severities",
     "allStatuses": "All Statuses",
     "detail": {

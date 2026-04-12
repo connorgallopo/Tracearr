@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Weet je zeker dat je wilt negeren? De overtredingen zullen permanent uit het logboek worden verwijderd en bijbehorende vertrouwensscores zullen worden hersteld.",
     "noViolationsFound": "Geen overtredingen gevonden",
     "noViolationsRecorded": "Er zijn nog geen overtredingen geregistreerd.",
+    "allRules": "All Rules",
     "allSeverities": "Alle ernstniveaus",
     "allStatuses": "Alle statussen",
     "detail": {

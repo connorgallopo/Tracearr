@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Sigur doriți să respingeți? Acest lucru le va elimina din jurnalul de încălcare permanent și va restabili scorurile de încredere asociate.",
     "noViolationsFound": "Nicio încălcare găsită",
     "noViolationsRecorded": "Nu au fost înregistrate încă încălcări ale legii.",
+    "allRules": "All Rules",
     "allSeverities": "Toate severitățile",
     "allStatuses": "Toate stările",
     "detail": {

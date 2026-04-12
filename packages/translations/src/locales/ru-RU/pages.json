@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Вы уверены, что хотите уволить? Это приведет к их удалению из журнала нарушений навсегда и восстановит связанные оценки доверия.",
     "noViolationsFound": "Нарушения не найдены",
     "noViolationsRecorded": "Пока никаких нарушений не зарегистрировано.",
+    "allRules": "All Rules",
     "allSeverities": "Все Серьезности",
     "allStatuses": "Все статусы",
     "detail": {

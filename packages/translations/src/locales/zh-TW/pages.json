@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "您确定要删除吗？这将永久从违反日志中删除它们并恢复相关的信任分数。",
     "noViolationsFound": "未发现任何违规行为",
     "noViolationsRecorded": "尚未记录任何违反行为。",
+    "allRules": "All Rules",
     "allSeverities": "所有严重程度",
     "allStatuses": "所有状态",
     "detail": {

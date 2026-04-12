@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Jste si jisti, že chcete odstranit? Tato akce je trvale odstraní z protokolu porušení a obnoví související skóre důvěryhodnosti.",
     "noViolationsFound": "Žádná porušení předpisů nenalezena",
     "noViolationsRecorded": "Zatím nebyla zaznamenána žádná porušení.",
+    "allRules": "All Rules",
     "allSeverities": "Všechny závažnosti",
     "allStatuses": "Všechny stavy",
     "detail": {

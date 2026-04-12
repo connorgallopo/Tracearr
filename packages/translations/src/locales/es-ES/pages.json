@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "¿Está seguro que desea eliminar? Esto los eliminará del registro de infracciones permanentemente y restaurará las puntuaciones de confianza asociadas.",
     "noViolationsFound": "No se encontraron infracciones",
     "noViolationsRecorded": "Todavía no se han registrado infracciones.",
+    "allRules": "All Rules",
     "allSeverities": "Todas los niveles de gravedad",
     "allStatuses": "Todos los estados",
     "detail": {

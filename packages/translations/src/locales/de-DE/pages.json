@@ -195,6 +195,7 @@
     "dismissViolationsConfirm": "Sind Sie sicher, dass Sie {{count}} Verstöße ablehnen möchten? Dadurch werden sie dauerhaft aus dem Verstoß-Protokoll entfernt und die zugehörigen Vertrauenswerte werden wiederhergestellt.",
     "noViolationsFound": "Es wurden keine Verstöße festgestellt",
     "noViolationsRecorded": "Bisher wurden keine Verstöße registriert.",
+    "allRules": "All Rules",
     "allSeverities": "Alle Schweregrade",
     "allStatuses": "Alle Statusmeldungen",
     "detail": {

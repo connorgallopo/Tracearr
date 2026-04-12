@@ -476,6 +476,7 @@
   },
   "violations": {
     "allClear": "All Clear",
+    "allRules": "All Rules",
     "allSeverities": "All Severities",
     "allStatuses": "All Statuses",
     "detail": {
