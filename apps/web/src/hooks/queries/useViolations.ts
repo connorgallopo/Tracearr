@@ -13,6 +13,7 @@ interface ViolationsParams {
   page?: number;
   pageSize?: number;
   userId?: string;
+  ruleId?: string;
   severity?: ViolationSeverity;
   acknowledged?: boolean;
   serverId?: string;
