@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,7 +62,8 @@ export function Violations() {
   const [bulkDismissConfirmOpen, setBulkDismissConfirmOpen] = useState(false);
   const pageSize = 10;
   const { selectedServerId } = useServer();
-  const { data: rules = [] } = useRules();
+  const { data: rulesData, isLoading: areRulesLoading } = useRules();
+  const rules = rulesData ?? [];
 
   // Convert sorting state to API params
   const orderBy = sorting[0]?.id ? columnToSortField[sorting[0].id] : undefined;
@@ -86,6 +87,13 @@ export function Violations() {
   const violations = violationsData?.data ?? [];
   const totalPages = violationsData?.totalPages ?? 1;
   const total = violationsData?.total ?? 0;
+
+  const availableRules = useMemo(() => {
+    if (!selectedServerId) return rules;
+    return rules.filter(
+      (rule) => rule.effectiveServerId === null || rule.effectiveServerId === selectedServerId
+    );
+  }, [rules, selectedServerId]);
 
   // Row selection
   const {
@@ -114,6 +122,17 @@ export function Violations() {
     }),
     [selectedServerId, severityFilter, acknowledgedFilter]
   );
+
+  useEffect(() => {
+    if (ruleFilter === 'all' || areRulesLoading || !rulesData) return;
+
+    const isRuleAvailable = availableRules.some((rule) => rule.id === ruleFilter);
+    if (!isRuleAvailable) {
+      setRuleFilter('all');
+      setPage(1);
+      clearSelection();
+    }
+  }, [ruleFilter, areRulesLoading, rulesData, availableRules, clearSelection]);
 
   const handleAcknowledge = (id: string) => {
     acknowledgeViolation.mutate(id);
@@ -352,7 +371,7 @@ export function Violations() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('pages:violations.allRules')}</SelectItem>
-                  {rules.map((rule) => (
+                  {availableRules.map((rule) => (
                     <SelectItem key={rule.id} value={rule.id}>
                       {rule.name}
                     </SelectItem>
