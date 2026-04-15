@@ -56,7 +56,7 @@
     "drizzle-orm": "^0.45.2",
     "eventsource": "^4.1.0",
     "expo-server-sdk": "^6.1.0",
-    "fastify": "^5.8.3",
+    "fastify": "^5.8.5",
     "fastify-plugin": "^5.1.0",
     "i18n-iso-countries": "^7.14.0",
     "ioredis": "^5.10.0",
