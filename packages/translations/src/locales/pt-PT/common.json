@@ -165,8 +165,8 @@
     "total": "total",
     "mediaLength": "Media length",
     "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
+    "streamDetails": "Detalhes da transmissão",
+    "transcodeReason": "Motivo da conversão",
     "loadMore": "Load More"
   },
   "search": {
