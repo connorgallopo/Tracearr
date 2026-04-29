@@ -43,7 +43,7 @@
     "activeUsers": "Usuaris actius",
     "nowPlaying": "Reproduint",
     "streamLocations": "Stream Locations",
-    "serverResources": "Server Resources",
+    "serverResources": "Recursos del servidor",
     "bandwidth": "Amplada de banda",
     "noActiveStreams": "No active streams",
     "streamsAppearHere": "Active streams will appear here when users start watching"
@@ -103,24 +103,24 @@
       "failedToLoad": "Failed to load library statistics",
       "failedToLoadDesc": "Could not fetch library data. Please try again.",
       "thisPeriod": "this period",
-      "thisWeek": "this week",
-      "thisMonth": "this month",
-      "thisYear": "this year"
+      "thisWeek": "aquesta setmana",
+      "thisMonth": "aquest mes",
+      "thisYear": "aquest any"
     },
     "quality": {
-      "title": "Quality",
+      "title": "Qualitat",
       "description": "Resolution and codec distribution",
       "qualityEvolution": "Quality Evolution",
-      "all": "All",
+      "all": "Tot",
       "failedToLoad": "Failed to load quality data",
       "failedToLoadDesc": "Could not fetch quality data. Please try again."
     },
     "storage": {
-      "title": "Storage",
+      "title": "Emmagatzematge",
       "description": "Storage usage, predictions, and optimization",
-      "totalStorage": "Total Storage",
+      "totalStorage": "Emmagatzematge total",
       "growthRate": "Growth Rate",
-      "duplicates": "Duplicates",
+      "duplicates": "Duplicats",
       "groups": "groups",
       "recoverable": "recoverable",
       "staleContent": "Stale Content",
@@ -138,8 +138,8 @@
       "contentROIDesc": "Watch value per storage cost",
       "avgHoursPerGB": "avg hours/GB",
       "insufficientData": "Insufficient data",
-      "of": "of",
-      "days": "days",
+      "of": "de",
+      "days": "dies",
       "failedToLoad": "Failed to load storage data",
       "failedToLoadDesc": "Could not fetch storage data. Please try again."
     },
