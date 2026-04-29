@@ -163,11 +163,11 @@
     "deviceId": "ID del dispositiu",
     "created": "Creat",
     "total": "total",
-    "mediaLength": "Media length",
+    "mediaLength": "Mida dels fitxers",
     "segments": "segments",
     "streamDetails": "Detalls de la transmissió",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "transcodeReason": "Raó per a la transcodificació",
+    "loadMore": "Veure més"
   },
   "search": {
     "placeholder": "Cerca...",
@@ -181,16 +181,16 @@
   },
   "media": {
     "movie": "Pel·lícula",
-    "movie_plural": "Movies",
+    "movie_plural": "Pel·lícules",
     "episode": "Episodi",
-    "episode_plural": "Episodes",
+    "episode_plural": "Episodis",
     "track": "Pista",
-    "track_plural": "Tracks",
+    "track_plural": "Pistes",
     "liveTV": "TV en directe",
     "photo": "Foto",
     "tv": "TV",
-    "tvShows": "TV Shows",
-    "music": "Music"
+    "tvShows": "Sèries",
+    "music": "Música"
   },
   "servers": {
     "plex": "Plex",
@@ -251,12 +251,12 @@
     "library_other": "{{count}} biblioteques",
     "error_one": "{{count}} error",
     "error_other": "{{count}} errors",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "{{count}} alerta",
+    "alert_other": "{{count}} alertes",
+    "location_one": "{{count}} ubicació",
+    "location_other": "{{count}} ubicacions",
+    "device_one": "{{count}} dispositiu",
+    "device_other": "{{count}} dispositius"
   },
   "messages": {
     "noChangesDetected": "No s'han detectat canvis"
@@ -296,7 +296,7 @@
     "noLocationData": "No hi ha dades de localització disponibles",
     "noJobHistory": "Encara no hi ha historial de tasques",
     "noSessionsFound": "No s'ha trobat cap sessió",
-    "noUserData": "No user data available"
+    "noUserData": "No hi ha dades d'usuari disponibles"
   },
   "confirmations": {
     "deleteTitle": "Confirmeu la supressió",
