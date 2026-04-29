@@ -53,7 +53,7 @@
     "viewProfile": "Mostra el perfil",
     "viewOnGithub": "Mostra al GitHub",
     "later": "Més tard",
-    "previous": "Previous"
+    "previous": "Anterior"
   },
   "states": {
     "loading": "S'està carregant...",
@@ -75,7 +75,7 @@
     "deleting": "S'està suprimint...",
     "dismissing": "S'està descartant...",
     "acknowledging": "S'està confirmant...",
-    "completed": "Completed"
+    "completed": "Completat"
   },
   "playback": {
     "playing": "S'està reproduïnt",
@@ -151,21 +151,21 @@
     "recentSessions": "Sessions recents",
     "activeStreams": "Transmissions actives",
     "days": "dies",
-    "totalSessions": "Total Sessions",
+    "totalSessions": "Sessions totals",
     "sessions": "Sessions",
     "apiKey": "Clau d'API",
-    "rank": "Rank",
-    "data": "Data",
-    "size": "Size",
-    "items": "Items",
-    "name": "Name",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
+    "rank": "Classificació",
+    "data": "Dades",
+    "size": "Mida",
+    "items": "Elements",
+    "name": "Nom",
+    "product": "Producte",
+    "deviceId": "ID del dispositiu",
+    "created": "Creat",
     "total": "total",
     "mediaLength": "Media length",
     "segments": "segments",
-    "streamDetails": "Stream Details",
+    "streamDetails": "Detalls de la transmissió",
     "transcodeReason": "Transcode Reason",
     "loadMore": "Load More"
   },
