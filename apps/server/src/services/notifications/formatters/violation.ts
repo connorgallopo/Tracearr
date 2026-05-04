@@ -9,6 +9,7 @@ import {
   type GroupEvidence,
 } from '@tracearr/shared';
 import type { ViolationWithDetails } from '../types.js';
+import type { DiscordEmbedField } from '../agents/discord.js';
 
 /** Fallback values when rule config doesn't specify */
 export const VIOLATION_DEFAULTS = {
@@ -77,20 +78,14 @@ export function getSeverityInfo(severity: string): { label: string; color: numbe
   };
 }
 
-export interface DiscordField {
-  name: string;
-  value: string;
-  inline?: boolean;
-}
-
 /**
  * Format violation details into Discord embed fields based on rule type
  */
 /**
  * Format evidence from V2 rule evaluation into Discord embed fields.
  */
-function formatEvidenceForDiscord(evidence: GroupEvidence[]): DiscordField[] {
-  const fields: DiscordField[] = [];
+function formatEvidenceForDiscord(evidence: GroupEvidence[]): DiscordEmbedField[] {
+  const fields: DiscordEmbedField[] = [];
 
   for (const group of evidence) {
     const matchedConditions = group.conditions.filter((c) => c.matched);
@@ -118,7 +113,7 @@ function formatEvidenceForDiscord(evidence: GroupEvidence[]): DiscordField[] {
 export function formatViolationDetailsForDiscord(
   ruleType: string | null,
   data: Record<string, unknown> | null
-): DiscordField[] {
+): DiscordEmbedField[] {
   if (!data) return [];
 
   // V2 violations: format from evidence
@@ -138,7 +133,7 @@ export function formatViolationDetailsForDiscord(
         currentLocation?: { lat: number; lon: number };
         previousLocation?: { lat: number; lon: number };
       };
-      const fields: DiscordField[] = [];
+      const fields: DiscordEmbedField[] = [];
 
       if (d.distance != null) {
         fields.push({
@@ -188,7 +183,7 @@ export function formatViolationDetailsForDiscord(
         minRequiredDistance?: number;
         locations?: Array<{ lat: number; lon: number; city?: string; country?: string }>;
       };
-      const fields: DiscordField[] = [];
+      const fields: DiscordEmbedField[] = [];
 
       if (d.locationCount != null) {
         fields.push({
@@ -232,7 +227,7 @@ export function formatViolationDetailsForDiscord(
         maxAllowed?: number;
         streams?: Array<{ title?: string; player?: string }>;
       };
-      const fields: DiscordField[] = [];
+      const fields: DiscordEmbedField[] = [];
 
       fields.push({
         name: 'Streams',
@@ -268,7 +263,7 @@ export function formatViolationDetailsForDiscord(
         windowHours?: number;
         ips?: string[];
       };
-      const fields: DiscordField[] = [];
+      const fields: DiscordEmbedField[] = [];
 
       fields.push({
         name: 'IPs Used',
@@ -294,7 +289,7 @@ export function formatViolationDetailsForDiscord(
         allowedCountries?: string[];
         blockedCountries?: string[];
       };
-      const fields: DiscordField[] = [];
+      const fields: DiscordEmbedField[] = [];
 
       if (d.country || d.countryCode) {
         fields.push({

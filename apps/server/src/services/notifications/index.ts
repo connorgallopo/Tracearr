@@ -13,6 +13,8 @@ import type {
   TestResult,
   ViolationWithDetails,
   ActiveSession,
+  Server,
+  ServerUser,
 } from './types.js';
 import { PayloadBuilders } from './types.js';
 import { createAllAgents } from './agents/index.js';
@@ -179,9 +181,18 @@ export class NotificationManager {
     deviceName: string,
     platform: string | null,
     location: string | null,
+    user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null },
+    server: Pick<Server, 'id' | 'name' | 'type'>,
     settings: NotificationSettings
   ): Promise<SendResult[]> {
-    const payload = PayloadBuilders.fromNewDevice(userName, deviceName, platform, location);
+    const payload = PayloadBuilders.fromNewDevice(
+      userName,
+      deviceName,
+      platform,
+      location,
+      user,
+      server
+    );
     return this.sendAll(payload, settings);
   }
 
@@ -193,13 +204,17 @@ export class NotificationManager {
     previousScore: number,
     newScore: number,
     reason: string | null,
+    user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null },
+    server: Pick<Server, 'id' | 'name' | 'type'>,
     settings: NotificationSettings
   ): Promise<SendResult[]> {
     const payload = PayloadBuilders.fromTrustScoreChanged(
       userName,
       previousScore,
       newScore,
-      reason
+      reason,
+      user,
+      server
     );
     return this.sendAll(payload, settings);
   }

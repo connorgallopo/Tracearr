@@ -13,6 +13,7 @@ import type {
   TestResult,
   ActiveSession,
 } from '../types.js';
+import type { ServerUser } from '@tracearr/shared';
 
 /**
  * Abstract base class that all notification agents should extend.
@@ -29,7 +30,11 @@ export abstract class BaseAgent implements NotificationAgent {
   /**
    * Format duration in milliseconds to human-readable string
    */
-  protected formatDuration(ms: number): string {
+  protected formatDuration(ms: number | null): string {
+    if (ms === null || ms === undefined) {
+      return 'Unknown';
+    }
+
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -83,6 +88,70 @@ export abstract class BaseAgent implements NotificationAgent {
    */
   protected getUserDisplayName(session: ActiveSession): string {
     return session.user.identityName ?? session.user.username;
+  }
+
+  /**
+   * Get the image URL of the user's avatar / thumbnail
+   */
+  protected getUserAvatarURL(user: Pick<ServerUser, 'thumbUrl'>): string | undefined {
+    return user.thumbUrl ? user.thumbUrl : undefined;
+  }
+
+  /**
+   * Get the image URL for the media's thumbnail
+   */
+  protected getMediaPosterURL(
+    session: ActiveSession,
+    netSettings: { externalUrl: string | null }
+  ): string | undefined {
+    if (!netSettings.externalUrl || !session.thumbPath) {
+      return undefined;
+    }
+
+    const url = new URL('/api/v1/images/proxy', netSettings.externalUrl);
+
+    url.searchParams.set('server', session.server.id);
+    url.searchParams.set('url', session.thumbPath);
+    url.searchParams.set('fallback', 'poster');
+
+    return url.toString();
+  }
+
+  /**
+   * Get the image URL for the server's icon
+   */
+  protected getServerIconURL(
+    server: string | undefined,
+    external: string | null
+  ): string | undefined {
+    if (server && external) {
+      switch (server) {
+        case 'plex':
+          return `${external}/images/servers/plex.png`;
+        case 'jellyfin':
+          return `${external}/images/servers/jellyfin.png`;
+        case 'emby':
+          return `${external}/images/servers/emby.png`;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Get the integer value for the server's color
+   */
+  protected getServerColorForDiscord(server: string | undefined): number {
+    switch (server) {
+      case 'plex':
+        return 15445760; // Plex Gold (https://brand.plex.tv/document/439975#/visual/color)
+      case 'jellyfin':
+        return 11164867; // Jellyfin Purple (https://jellyfin.org/docs/general/contributing/branding/#logo)
+      case 'emby':
+        return 5419850; // Emby Green (https://emby.media/resources/logowhite_1881.png)
+      default:
+        return 0x3498db; // Generic Blue
+    }
   }
 
   /**

@@ -17,18 +17,55 @@ import type {
   NewDeviceContext,
   TrustScoreChangedContext,
 } from '../types.js';
-import {
-  formatViolationDetailsForDiscord,
-  getSeverityInfo,
-  type DiscordField,
-} from '../formatters/violation.js';
+import { formatViolationDetailsForDiscord, getSeverityInfo } from '../formatters/violation.js';
+import { getNetworkSettings } from '../../settings.js';
 
+/**
+ * @see https://docs.discord.com/developers/resources/message#embed-object
+ */
 interface DiscordEmbed {
-  title: string;
+  title?: string;
   description?: string;
-  color: number;
-  fields?: DiscordField[];
   timestamp?: string;
+  color?: number;
+  footer?: DiscordEmbedFooter;
+  thumbnail?: DiscordEmbedImage;
+  author?: DiscordEmbedAuthor;
+  fields?: DiscordEmbedField[];
+}
+
+/**
+ * @see https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure
+ */
+interface DiscordEmbedFooter {
+  text: string;
+  icon_url?: string;
+}
+
+/**
+ * @see https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure
+ */
+interface DiscordEmbedImage {
+  url: string;
+  description?: string;
+}
+
+/**
+ * @see https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure
+ */
+interface DiscordEmbedAuthor {
+  name: string;
+  url?: string;
+  icon_url?: string;
+}
+
+/**
+ * @see https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure
+ */
+export interface DiscordEmbedField {
+  name: string;
+  value: string;
+  inline?: boolean;
 }
 
 export class DiscordAgent extends BaseAgent {
@@ -45,7 +82,7 @@ export class DiscordAgent extends BaseAgent {
     }
 
     try {
-      const embed = this.buildEmbed(payload);
+      const embed = await this.buildEmbed(payload);
       await this.sendWebhook(settings.discordWebhookUrl, embed);
       return this.successResult();
     } catch (error) {
@@ -71,194 +108,206 @@ export class DiscordAgent extends BaseAgent {
     }
   }
 
-  private buildEmbed(payload: NotificationPayload): DiscordEmbed {
+  private async buildEmbed(payload: NotificationPayload): Promise<DiscordEmbed> {
     switch (payload.context.type) {
       case 'violation_detected':
-        return this.buildViolationEmbed(payload, payload.context);
+        return await this.buildViolationEmbed(payload, payload.context);
       case 'stream_started':
-        return this.buildSessionStartedEmbed(payload, payload.context);
+        return await this.buildSessionStartedEmbed(payload, payload.context);
       case 'stream_stopped':
-        return this.buildSessionStoppedEmbed(payload, payload.context);
+        return await this.buildSessionStoppedEmbed(payload, payload.context);
       case 'server_down':
-        return this.buildServerDownEmbed(payload, payload.context);
+        return await this.buildServerDownEmbed(payload, payload.context);
       case 'server_up':
-        return this.buildServerUpEmbed(payload, payload.context);
+        return await this.buildServerUpEmbed(payload, payload.context);
       case 'new_device':
-        return this.buildNewDeviceEmbed(payload, payload.context);
+        return await this.buildNewDeviceEmbed(payload, payload.context);
       case 'trust_score_changed':
-        return this.buildTrustScoreChangedEmbed(payload, payload.context);
+        return await this.buildTrustScoreChangedEmbed(payload, payload.context);
     }
   }
 
-  private buildViolationEmbed(_payload: NotificationPayload, ctx: ViolationContext): DiscordEmbed {
+  private async buildViolationEmbed(
+    _payload: NotificationPayload,
+    ctx: ViolationContext
+  ): Promise<DiscordEmbed> {
     const { violation } = ctx;
     const { label: severityLabel, color } = getSeverityInfo(violation.severity);
+    const netSettings = await getNetworkSettings();
     const detailFields = formatViolationDetailsForDiscord(violation.rule.type, violation.data);
 
     return {
+      color: color,
+      author: {
+        name: violation.user.identityName ?? violation.user.username,
+        icon_url: violation.user.thumbUrl ? violation.user.thumbUrl : undefined,
+      },
       title: 'Violation Detected',
-      color,
       fields: [
-        {
-          name: 'User',
-          value: violation.user.identityName ?? violation.user.username,
-          inline: true,
-        },
-        {
-          name: 'Rule',
-          value: violation.rule.name,
-          inline: true,
-        },
-        {
-          name: 'Severity',
-          value: severityLabel,
-          inline: true,
-        },
+        { name: 'Rule', value: violation.rule.name, inline: true },
+        { name: 'Severity', value: severityLabel, inline: true },
         ...detailFields,
       ],
+      footer: {
+        text: ctx.violation.server?.name ?? 'Unknown Server',
+        icon_url: this.getServerIconURL(ctx.violation.server?.type, netSettings.externalUrl),
+      },
+      timestamp: new Date().toISOString(),
     };
   }
 
-  private buildSessionStartedEmbed(
+  private async buildSessionStartedEmbed(
     _payload: NotificationPayload,
     ctx: SessionContext
-  ): DiscordEmbed {
+  ): Promise<DiscordEmbed> {
     const { session } = ctx;
-    const { title: mediaTitle, subtitle } = this.getMediaDisplay(session);
-    const playbackType = this.getPlaybackType(session);
-
-    const fields: DiscordField[] = [
-      {
-        name: 'User',
-        value: this.getUserDisplayName(session),
-        inline: true,
-      },
-      {
-        name: 'Media',
-        value: mediaTitle,
-        inline: true,
-      },
-    ];
-
-    if (subtitle) {
-      fields.push({ name: 'Episode', value: subtitle, inline: true });
-    }
-
-    fields.push({ name: 'Playback', value: playbackType, inline: true });
-
-    if (session.geoCity && session.geoCountry) {
-      fields.push({
-        name: 'Location',
-        value: `${session.geoCity}, ${session.geoCountry}`,
-        inline: true,
-      });
-    }
-
-    fields.push({
-      name: 'Player',
-      value: session.product || session.playerName || 'Unknown',
-      inline: true,
-    });
+    const { title, subtitle } = this.getMediaDisplay(session);
+    const netSettings = await getNetworkSettings();
+    const poster = this.getMediaPosterURL(session, netSettings);
 
     return {
-      title: 'Stream Started',
-      color: 0x3498db, // Blue
-      fields,
+      color: this.getServerColorForDiscord(session.server.type),
+      author: {
+        name: this.getUserDisplayName(session),
+        icon_url: this.getUserAvatarURL(session.user),
+      },
+      title: 'Now Playing',
+      thumbnail: poster ? { url: poster, description: `Artwork for ${title}.` } : undefined,
+      description: subtitle ? `### ${title}\n**${subtitle}**` : `### ${title}`,
+      fields: [
+        { name: 'Playback', value: this.getPlaybackType(session), inline: true },
+        { name: 'Player', value: session.product || session.device || 'Unknown', inline: true },
+        {
+          name: 'Location',
+          value: session.geoCity || session.geoCountry || 'Unknown',
+          inline: true,
+        },
+      ],
+      footer: {
+        text: session.server.name,
+        icon_url: this.getServerIconURL(session.server.type, netSettings.externalUrl),
+      },
+      timestamp: session.startedAt
+        ? new Date(session.startedAt).toISOString()
+        : new Date().toISOString(),
     };
   }
 
-  private buildSessionStoppedEmbed(
+  private async buildSessionStoppedEmbed(
     _payload: NotificationPayload,
     ctx: SessionContext
-  ): DiscordEmbed {
+  ): Promise<DiscordEmbed> {
     const { session } = ctx;
-    const { title: mediaTitle, subtitle } = this.getMediaDisplay(session);
-    const durationStr = session.durationMs ? this.formatDuration(session.durationMs) : 'Unknown';
-
-    const fields: DiscordField[] = [
-      {
-        name: 'User',
-        value: this.getUserDisplayName(session),
-        inline: true,
-      },
-      {
-        name: 'Media',
-        value: mediaTitle,
-        inline: true,
-      },
-    ];
-
-    if (subtitle) {
-      fields.push({ name: 'Episode', value: subtitle, inline: true });
-    }
-
-    fields.push({ name: 'Duration', value: durationStr, inline: true });
+    const { title, subtitle } = this.getMediaDisplay(session);
+    const netSettings = await getNetworkSettings();
+    const poster = this.getMediaPosterURL(session, netSettings);
 
     return {
+      color: this.getServerColorForDiscord(session.server.type),
+      author: {
+        name: this.getUserDisplayName(session),
+        icon_url: this.getUserAvatarURL(session.user),
+      },
       title: 'Stream Ended',
-      color: 0x95a5a6, // Gray
-      fields,
+      thumbnail: poster ? { url: poster, description: `Artwork for ${title}.` } : undefined,
+      description: subtitle ? `### ${title}\n**${subtitle}**` : `### ${title}`,
+      fields: [
+        { name: 'Duration', value: this.formatDuration(session.durationMs), inline: true },
+        { name: 'Player', value: session.product || session.device || 'Unknown', inline: true },
+        {
+          name: 'Location',
+          value: session.geoCity || session.geoCountry || 'Unknown',
+          inline: true,
+        },
+      ],
+      footer: {
+        text: session.server.name,
+        icon_url: this.getServerIconURL(session.server.type, netSettings.externalUrl),
+      },
+      timestamp: session.startedAt
+        ? new Date(session.startedAt).toISOString()
+        : new Date().toISOString(),
     };
   }
 
-  private buildServerDownEmbed(_payload: NotificationPayload, ctx: ServerContext): DiscordEmbed {
+  private async buildServerDownEmbed(
+    _payload: NotificationPayload,
+    ctx: ServerContext
+  ): Promise<DiscordEmbed> {
     return {
-      title: 'Server Connection Lost',
-      description: `Lost connection to ${ctx.serverName}`,
-      color: 0xff0000, // Red
+      color: 0xe74c3c, // Red
+      title: 'Server Offline',
+      footer: {
+        text: ctx.serverName,
+      },
+      timestamp: new Date().toISOString(),
     };
   }
 
-  private buildServerUpEmbed(_payload: NotificationPayload, ctx: ServerContext): DiscordEmbed {
+  private async buildServerUpEmbed(
+    _payload: NotificationPayload,
+    ctx: ServerContext
+  ): Promise<DiscordEmbed> {
     return {
-      title: 'Server Back Online',
-      description: `${ctx.serverName} is back online`,
       color: 0x2ecc71, // Green
+      title: 'Server Online',
+      footer: {
+        text: ctx.serverName,
+      },
+      timestamp: new Date().toISOString(),
     };
   }
 
-  private buildNewDeviceEmbed(_payload: NotificationPayload, ctx: NewDeviceContext): DiscordEmbed {
-    const fields: DiscordField[] = [
-      { name: 'User', value: ctx.userName, inline: true },
-      { name: 'Device', value: ctx.deviceName, inline: true },
-    ];
-
-    if (ctx.platform) {
-      fields.push({ name: 'Platform', value: ctx.platform, inline: true });
-    }
-
-    if (ctx.location) {
-      fields.push({ name: 'Location', value: ctx.location, inline: true });
-    }
+  private async buildNewDeviceEmbed(
+    _payload: NotificationPayload,
+    ctx: NewDeviceContext
+  ): Promise<DiscordEmbed> {
+    const netSettings = await getNetworkSettings();
 
     return {
+      color: this.getServerColorForDiscord(ctx.server.type),
+      author: {
+        name: ctx.userName,
+        icon_url: this.getUserAvatarURL(ctx.user),
+      },
       title: 'New Device Detected',
-      color: 0xf39c12, // Orange/Warning
-      fields,
+      fields: [
+        { name: 'Device', value: ctx.deviceName || 'Unknown', inline: true },
+        { name: 'Platform', value: ctx.platform || 'Unknown', inline: true },
+        { name: 'Location', value: ctx.location || 'Unknown', inline: true },
+      ],
+      footer: {
+        text: ctx.server.name,
+        icon_url: this.getServerIconURL(ctx.server.type, netSettings.externalUrl),
+      },
+      timestamp: new Date().toISOString(),
     };
   }
 
-  private buildTrustScoreChangedEmbed(
+  private async buildTrustScoreChangedEmbed(
     _payload: NotificationPayload,
     ctx: TrustScoreChangedContext
-  ): DiscordEmbed {
-    const direction = ctx.newScore < ctx.previousScore ? 'decreased' : 'increased';
-    const color = ctx.newScore < ctx.previousScore ? 0xe74c3c : 0x2ecc71; // Red or Green
-
-    const fields: DiscordField[] = [
-      { name: 'User', value: ctx.userName, inline: true },
-      { name: 'Previous Score', value: String(ctx.previousScore), inline: true },
-      { name: 'New Score', value: String(ctx.newScore), inline: true },
-    ];
-
-    if (ctx.reason) {
-      fields.push({ name: 'Reason', value: ctx.reason, inline: false });
-    }
+  ): Promise<DiscordEmbed> {
+    const netSettings = await getNetworkSettings();
+    const direction = ctx.newScore < ctx.previousScore ? 'Decreased' : 'Increased';
 
     return {
-      title: `Trust Score ${direction.charAt(0).toUpperCase() + direction.slice(1)}`,
-      color,
-      fields,
+      color: ctx.newScore < ctx.previousScore ? 0xe74c3c : 0x2ecc71, // Red or Green
+      author: {
+        name: ctx.userName,
+        icon_url: this.getUserAvatarURL(ctx.user),
+      },
+      title: `Trust Score ${direction}`,
+      fields: [
+        { name: 'Previous Score', value: String(ctx.previousScore), inline: true },
+        { name: 'New Score', value: String(ctx.newScore), inline: true },
+        { name: 'Reason', value: ctx.reason || 'Unknown', inline: true },
+      ],
+      footer: {
+        text: ctx.server.name,
+        icon_url: this.getServerIconURL(ctx.server.type, netSettings.externalUrl),
+      },
+      timestamp: new Date().toISOString(),
     };
   }
 

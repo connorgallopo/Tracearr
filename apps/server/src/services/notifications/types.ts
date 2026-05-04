@@ -4,10 +4,16 @@
  * Based on Jellyseerr's agent pattern for extensible notifications.
  */
 
-import type { ViolationWithDetails, ActiveSession, Settings } from '@tracearr/shared';
+import type {
+  ViolationWithDetails,
+  ActiveSession,
+  Server,
+  ServerUser,
+  Settings,
+} from '@tracearr/shared';
 
 // Re-export for convenience
-export type { ViolationWithDetails, ActiveSession, Settings };
+export type { ViolationWithDetails, ActiveSession, Server, ServerUser, Settings };
 
 /**
  * Notification event types matching NOTIFICATION_EVENTS from shared
@@ -60,6 +66,8 @@ export interface NewDeviceContext {
   deviceName: string;
   platform: string | null;
   location: string | null;
+  user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null };
+  server: Pick<Server, 'id' | 'name' | 'type'>;
 }
 
 /**
@@ -68,9 +76,11 @@ export interface NewDeviceContext {
 export interface TrustScoreChangedContext {
   type: 'trust_score_changed';
   userName: string;
+  user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null };
   previousScore: number;
   newScore: number;
   reason: string | null;
+  server: Pick<Server, 'id' | 'name' | 'type'>;
 }
 
 /**
@@ -245,7 +255,9 @@ export const PayloadBuilders = {
     userName: string,
     deviceName: string,
     platform: string | null,
-    location: string | null
+    location: string | null,
+    user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null },
+    server: Pick<Server, 'id' | 'name' | 'type'>
   ): NotificationPayload {
     const locationStr = location ? ` from ${location}` : '';
     return {
@@ -254,7 +266,7 @@ export const PayloadBuilders = {
       message: `${userName} connected from a new device: ${deviceName}${locationStr}`,
       severity: 'warning',
       timestamp: new Date().toISOString(),
-      context: { type: 'new_device', userName, deviceName, platform, location },
+      context: { type: 'new_device', userName, deviceName, platform, location, user, server },
     };
   },
 
@@ -262,7 +274,9 @@ export const PayloadBuilders = {
     userName: string,
     previousScore: number,
     newScore: number,
-    reason: string | null
+    reason: string | null,
+    user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null },
+    server: Pick<Server, 'id' | 'name' | 'type'>
   ): NotificationPayload {
     const direction = newScore < previousScore ? 'decreased' : 'increased';
     const reasonStr = reason ? `: ${reason}` : '';
@@ -272,7 +286,15 @@ export const PayloadBuilders = {
       message: `${userName}'s trust score ${direction} from ${previousScore} to ${newScore}${reasonStr}`,
       severity: newScore < previousScore ? 'warning' : 'low',
       timestamp: new Date().toISOString(),
-      context: { type: 'trust_score_changed', userName, previousScore, newScore, reason },
+      context: {
+        type: 'trust_score_changed',
+        userName,
+        previousScore,
+        newScore,
+        reason,
+        user,
+        server,
+      },
     };
   },
 };
