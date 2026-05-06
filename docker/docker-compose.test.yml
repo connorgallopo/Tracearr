@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   timescale-test:
-    image: timescale/timescaledb:2.25.0-pg16
+    image: timescale/timescaledb:2.26.4-pg16@sha256:15e00162766bd6f0019afaad4e57b850dcf882de5909bd7633899eebd4c03d57
     shm_size: 512mb  # Required for PostgreSQL shared memory (increase for large imports)
     # Increase lock table size for large imports (Tautulli imports with many TimescaleDB chunks)
     command: postgres -c max_locks_per_transaction=4096 -c timescaledb.telemetry_level=off
