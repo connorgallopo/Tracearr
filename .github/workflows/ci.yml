@@ -117,7 +117,7 @@ jobs:
 
     services:
       timescale:
-        image: timescale/timescaledb:2.25.0-pg16
+        image: timescale/timescaledb:2.26.4-pg16@sha256:15e00162766bd6f0019afaad4e57b850dcf882de5909bd7633899eebd4c03d57
         ports:
           - 5433:5432
         env:
@@ -246,7 +246,7 @@ jobs:
 
     services:
       timescale:
-        image: timescale/timescaledb:2.25.0-pg16
+        image: timescale/timescaledb:2.26.4-pg16@sha256:15e00162766bd6f0019afaad4e57b850dcf882de5909bd7633899eebd4c03d57
         ports:
           - 5433:5432
         env:
