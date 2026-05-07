@@ -320,14 +320,14 @@
       "recommended": "Recommandé",
       "customUrl": "URL personnalisée",
       "connectionError": {
-        "timeout": "Timed out",
-        "dns": "DNS error",
-        "refused": "Connection refused",
-        "unreachable": "Host unreachable",
+        "timeout": "Expiré",
+        "dns": "Erreur DNS",
+        "refused": "Connexion refusée",
+        "unreachable": "Hôte injoignable",
         "reset": "Connection reset",
-        "tls": "TLS error",
+        "tls": "Erreur TLS",
         "http": "HTTP {{status}}",
-        "unknown": "Connection failed"
+        "unknown": "Connexion échouée"
       },
       "connectionsReachable": "{{reachable}} connexions joignables sur {{total}}",
       "connectionsAvailable": "{{count}} connexions disponibles",
