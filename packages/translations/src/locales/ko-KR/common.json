@@ -82,7 +82,7 @@
     "paused": "일시정지됨",
     "stopped": "중지됨",
     "directPlay": "직접 재생",
-    "directStream": "Direct Stream",
+    "directStream": "직접 재생",
     "transcode": "트랜스코딩"
   },
   "severity": {
@@ -101,7 +101,7 @@
   "periods": {
     "last7Days": "최근 7일",
     "last30Days": "최근 30일",
-    "lastYear": "Last Year",
+    "lastYear": "작년",
     "byDay": "일별",
     "byHour": "시간별"
   },
@@ -201,7 +201,7 @@
     "required": "필수 입력 항목입니다",
     "invalidEmail": "올바른 이메일 주소를 입력하세요",
     "invalidUrl": "올바른 URL을 입력하세요",
-    "minLength": "Must be at least {{min}} characters",
+    "minLength": "{{min}}자 이상이어야 합니다",
     "maxLength": "{{max}}자 이하여야 합니다"
   },
   "errors": {
@@ -219,7 +219,7 @@
     "pageNotFoundDesc": "찾으시는 페이지가 없거나 이동되었습니다.",
     "somethingWentWrong": "문제가 발생했습니다",
     "unexpectedError": "예상치 못한 오류가 발생했습니다. 다시 시도해 주세요.",
-    "failedToLoad": "Failed to load {{item}}",
+    "failedToLoad": "{{item}}을 불러오지 못했습니다",
     "connectionFailed": "연결에 실패했습니다",
     "connectionTimedOut": "연결 시간이 초과되었습니다. 서버 URL을 확인하세요.",
     "cannotReachServer": "서버에 연결할 수 없습니다. URL과 네트워크 연결을 확인하세요."
