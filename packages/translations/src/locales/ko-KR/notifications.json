@@ -2,269 +2,269 @@
   "toast": {
     "success": {
       "serverAdded": {
-        "title": "Server Added",
-        "message": "{{name}} has been connected successfully"
+        "title": "서버 추가됨",
+        "message": "{{name}}이(가) 성공적으로 연결되었습니다"
       },
       "serverRemoved": {
-        "title": "Server Removed",
-        "message": "The server has been removed successfully"
+        "title": "서버 제거됨",
+        "message": "서버가 성공적으로 제거되었습니다"
       },
       "serverSynced": {
-        "title": "Server Synced",
-        "message": "Server data has been synchronized"
+        "title": "서버 동기화됨",
+        "message": "서버 데이터가 동기화되었습니다"
       },
       "settingsUpdated": {
-        "title": "Settings Updated",
-        "message": "Your settings have been saved"
+        "title": "설정 저장됨",
+        "message": "설정이 저장되었습니다"
       },
       "tokenCopied": {
-        "title": "Token Copied",
-        "message": "Pair token copied to clipboard"
+        "title": "토큰 복사됨",
+        "message": "페어링 토큰이 클립보드에 복사되었습니다"
       },
       "violationAcknowledged": {
-        "title": "Violation Acknowledged",
-        "message": "The violation has been marked as acknowledged"
+        "title": "위반 확인됨",
+        "message": "위반 항목이 확인됨으로 표시되었습니다"
       },
       "violationDismissed": {
-        "title": "Violation Dismissed",
-        "message": "The violation has been dismissed"
+        "title": "위반 해제됨",
+        "message": "위반 항목이 해제되었습니다"
       },
       "deviceRemoved": {
-        "title": "Device Removed",
-        "message": "The device has been disconnected"
+        "title": "기기 제거됨",
+        "message": "기기 연결이 해제되었습니다"
       },
       "deviceRenamed": {
-        "title": "Device Renamed",
-        "message": "The device name has been updated"
+        "title": "기기 이름 변경됨",
+        "message": "기기 이름이 업데이트되었습니다"
       },
       "sessionsRevoked": {
-        "title": "Sessions Revoked",
-        "message": "All mobile sessions have been revoked"
+        "title": "세션 취소됨",
+        "message": "모든 모바일 세션이 취소되었습니다"
       },
       "loggedIn": {
-        "title": "Success",
-        "message": "Logged in successfully"
+        "title": "성공",
+        "message": "로그인되었습니다"
       },
       "webhookTest": {
-        "title": "Test Successful",
-        "message": "Webhook is working correctly"
+        "title": "테스트 성공",
+        "message": "Webhook이 정상적으로 작동합니다"
       },
       "copiedToClipboard": {
-        "title": "Copied to clipboard"
+        "title": "클립보드에 복사됨"
       },
       "plexAccountLinked": {
-        "title": "Plex Account Linked",
-        "message": "You can now add servers from your Plex account"
+        "title": "Plex 계정 연결됨",
+        "message": "이제 Plex 계정에서 서버를 추가할 수 있습니다"
       },
       "plexAccountUnlinked": {
-        "title": "Plex Account Unlinked",
-        "message": "Your Plex account has been disconnected"
+        "title": "Plex 계정 연결 해제됨",
+        "message": "Plex 계정 연결이 해제되었습니다"
       },
       "agentAdded": {
-        "title": "Agent Added",
-        "message": "The notification agent has been added"
+        "title": "에이전트 추가됨",
+        "message": "알림 에이전트가 추가되었습니다"
       },
       "agentUpdated": {
-        "title": "Agent Updated",
-        "message": "The notification agent has been updated"
+        "title": "에이전트 업데이트됨",
+        "message": "알림 에이전트가 업데이트되었습니다"
       },
       "agentRemoved": {
-        "title": "Agent Removed",
-        "message": "The notification agent has been removed"
+        "title": "에이전트 제거됨",
+        "message": "알림 에이전트가 제거되었습니다"
       },
       "jobCompleted": {
-        "title": "Job Completed",
-        "message": "{{name}} finished successfully"
+        "title": "작업 완료",
+        "message": "{{name}} 작업이 성공적으로 끝났습니다"
       },
       "ruleCreated": {
-        "title": "Rule Created",
-        "message": "The rule has been created successfully"
+        "title": "규칙 생성됨",
+        "message": "규칙이 성공적으로 생성되었습니다"
       },
       "ruleUpdated": {
-        "title": "Rule Updated",
-        "message": "The rule has been updated successfully"
+        "title": "규칙 업데이트됨",
+        "message": "규칙이 성공적으로 업데이트되었습니다"
       },
       "ruleDeleted": {
-        "title": "Rule Deleted",
-        "message": "The rule has been deleted successfully"
+        "title": "규칙 삭제됨",
+        "message": "규칙이 성공적으로 삭제되었습니다"
       },
       "streamTerminated": {
-        "title": "Stream Terminated",
-        "message": "The playback session has been stopped"
+        "title": "스트림 종료됨",
+        "message": "재생 세션이 중지되었습니다"
       },
       "serverUrlUpdated": {
-        "title": "Server URL Updated",
-        "message": "The server URL has been updated successfully"
+        "title": "서버 URL 업데이트됨",
+        "message": "서버 URL이 성공적으로 업데이트되었습니다"
       },
       "serverUpdated": {
-        "title": "Server Updated",
-        "message": "The server has been updated successfully"
+        "title": "서버 업데이트됨",
+        "message": "서버가 성공적으로 업데이트되었습니다"
       },
       "syncCompletedWithErrors": {
-        "title": "Sync Completed with Errors"
+        "title": "오류가 있는 동기화 완료"
       },
       "sessionsDeleted": {
-        "title": "Sessions Deleted",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "title": "세션 삭제됨",
+        "message_one": "세션 {{count}}개가 삭제되었습니다",
+        "message_other": "세션 {{count}}개가 삭제되었습니다"
       },
       "violationsAcknowledged": {
-        "title": "Violations Acknowledged",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "title": "위반 확인됨",
+        "message_one": "위반 {{count}}건이 확인되었습니다",
+        "message_other": "위반 {{count}}건이 확인되었습니다"
       },
       "violationsDismissed": {
-        "title": "Violations Dismissed",
-        "message_one": "{{count}} violation dismissed",
-        "message_other": "{{count}} violations dismissed"
+        "title": "위반 해제됨",
+        "message_one": "위반 {{count}}건이 해제되었습니다",
+        "message_other": "위반 {{count}}건이 해제되었습니다"
       },
       "apiKeyGenerated": {
-        "title": "API Key Generated",
-        "message": "Your new API key is ready to use"
+        "title": "API 키 생성됨",
+        "message": "새 API 키를 사용할 수 있습니다"
       },
       "mobileAccessEnabled": {
-        "title": "Mobile Access Enabled",
-        "message": "Scan the QR code with the Tracearr mobile app to connect"
+        "title": "모바일 접근 활성화됨",
+        "message": "Tracearr 모바일 앱으로 QR 코드를 스캔해 연결하세요"
       },
       "mobileAccessDisabled": {
-        "title": "Mobile Access Disabled",
-        "message": "All mobile sessions have been revoked"
+        "title": "모바일 접근 비활성화됨",
+        "message": "모든 모바일 세션이 취소되었습니다"
       },
       "pairTokenGenerated": {
-        "title": "Pair Token Generated",
-        "message": "Scan the QR code with your mobile device to pair"
+        "title": "페어링 토큰 생성됨",
+        "message": "모바일 기기로 QR 코드를 스캔해 페어링하세요"
       },
       "displayNameUpdated": {
-        "title": "Display Name Updated"
+        "title": "표시 이름 업데이트됨"
       },
       "trustScoresReset": {
-        "title": "Trust Scores Reset",
-        "message_one": "{{count}} user reset to 100",
-        "message_other": "{{count}} users reset to 100"
+        "title": "신뢰 점수 초기화됨",
+        "message_one": "사용자 {{count}}명의 점수가 100으로 초기화되었습니다",
+        "message_other": "사용자 {{count}}명의 점수가 100으로 초기화되었습니다"
       },
       "claimCodeValidated": {
-        "title": "Claim code validated",
-        "message": "You can now proceed with setup"
+        "title": "클레임 코드 확인됨",
+        "message": "이제 설정을 계속 진행할 수 있습니다"
       }
     },
     "error": {
-      "serverAddFailed": "Failed to add server",
-      "serverRemoveFailed": "Failed to remove server",
-      "serverSyncFailed": "Failed to sync server",
-      "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
-      "acknowledgeFailed": "Failed to acknowledge violation",
-      "dismissFailed": "Failed to dismiss violation",
-      "authFailed": "Authentication failed",
-      "webhookTestFailed": "Webhook test failed",
-      "ruleCreateFailed": "Failed to create rule",
-      "ruleUpdateFailed": "Failed to update rule",
-      "ruleDeleteFailed": "Failed to delete rule",
-      "streamTerminateFailed": "Failed to terminate stream",
-      "serverUrlUpdateFailed": "Failed to update server URL",
-      "serverUpdateFailed": "Failed to update server",
-      "serverReorderFailed": "Failed to reorder servers",
-      "sessionsDeleteFailed": "Failed to delete sessions",
-      "apiKeyGenerateFailed": "Failed to generate API key",
-      "mobileAccessEnableFailed": "Failed to enable mobile access",
-      "mobileAccessDisableFailed": "Failed to disable mobile access",
-      "pairTokenGenerateFailed": "Failed to generate pair token",
-      "deviceRemoveFailed": "Failed to remove device",
-      "deviceRenameFailed": "Failed to rename device",
-      "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
-      "trustScoresResetFailed": "Failed to reset trust scores",
-      "routingUpdateFailed": "Failed to update routing",
-      "clipboardFailed": "Failed to copy to clipboard",
-      "plexUnlinkFailed": "Failed to unlink Plex account",
-      "agentAddFailed": "Failed to add agent",
-      "agentUpdateFailed": "Failed to update agent",
-      "agentRemoveFailed": "Failed to remove agent",
-      "agentTestFailed": "Test failed",
-      "jobAlreadyRunning": "Job already running",
-      "jobStartFailed": "Failed to start job",
-      "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "serverAddFailed": "서버를 추가하지 못했습니다",
+      "serverRemoveFailed": "서버를 제거하지 못했습니다",
+      "serverSyncFailed": "서버를 동기화하지 못했습니다",
+      "settingsUpdateFailed": "설정을 업데이트하지 못했습니다",
+      "copyFailed": "클립보드에 복사하지 못했습니다",
+      "acknowledgeFailed": "위반을 확인 처리하지 못했습니다",
+      "dismissFailed": "위반을 해제하지 못했습니다",
+      "authFailed": "인증에 실패했습니다",
+      "webhookTestFailed": "Webhook 테스트에 실패했습니다",
+      "ruleCreateFailed": "규칙을 만들지 못했습니다",
+      "ruleUpdateFailed": "규칙을 업데이트하지 못했습니다",
+      "ruleDeleteFailed": "규칙을 삭제하지 못했습니다",
+      "streamTerminateFailed": "스트림을 종료하지 못했습니다",
+      "serverUrlUpdateFailed": "서버 URL을 업데이트하지 못했습니다",
+      "serverUpdateFailed": "서버를 업데이트하지 못했습니다",
+      "serverReorderFailed": "서버 순서를 바꾸지 못했습니다",
+      "sessionsDeleteFailed": "세션을 삭제하지 못했습니다",
+      "apiKeyGenerateFailed": "API 키를 생성하지 못했습니다",
+      "mobileAccessEnableFailed": "모바일 접근을 활성화하지 못했습니다",
+      "mobileAccessDisableFailed": "모바일 접근을 비활성화하지 못했습니다",
+      "pairTokenGenerateFailed": "페어링 토큰을 생성하지 못했습니다",
+      "deviceRemoveFailed": "기기를 제거하지 못했습니다",
+      "deviceRenameFailed": "기기 이름을 바꾸지 못했습니다",
+      "sessionsRevokeFailed": "세션을 취소하지 못했습니다",
+      "displayNameUpdateFailed": "표시 이름을 업데이트하지 못했습니다",
+      "trustScoresResetFailed": "신뢰 점수를 초기화하지 못했습니다",
+      "routingUpdateFailed": "라우팅을 업데이트하지 못했습니다",
+      "clipboardFailed": "클립보드에 복사하지 못했습니다",
+      "plexUnlinkFailed": "Plex 계정 연결을 해제하지 못했습니다",
+      "agentAddFailed": "에이전트를 추가하지 못했습니다",
+      "agentUpdateFailed": "에이전트를 업데이트하지 못했습니다",
+      "agentRemoveFailed": "에이전트를 제거하지 못했습니다",
+      "agentTestFailed": "테스트에 실패했습니다",
+      "jobAlreadyRunning": "작업이 이미 실행 중입니다",
+      "jobStartFailed": "작업을 시작하지 못했습니다",
+      "jobLoadFailed": "유지관리 작업을 불러오지 못했습니다",
+      "invalidUrl": "올바르지 않은 URL입니다",
+      "plexDirectUrl": "plex.direct URL은 릴레이 주소라서 여기에서 사용할 수 없습니다. 직접 연결되는 IP 주소나 호스트 이름을 사용하세요.",
       "invalidClaimCode": {
-        "title": "Invalid claim code",
-        "message": "Please check the server logs"
+        "title": "클레임 코드가 올바르지 않습니다",
+        "message": "서버 로그를 확인하세요"
       }
     },
     "warning": {
       "jobFailed": {
-        "title": "Job Failed",
-        "message": "{{name}} encountered an error"
+        "title": "작업 실패",
+        "message": "{{name}} 작업에서 오류가 발생했습니다"
       }
     },
     "info": {
       "streamStarted": {
-        "title": "New Stream Started",
-        "message": "{{user}} started watching {{media}}"
+        "title": "새 스트림 시작",
+        "message": "{{user}}님이 {{media}} 시청을 시작했습니다"
       },
       "streamStopped": {
-        "title": "Stream Stopped",
-        "message": "{{user}} stopped watching"
+        "title": "스트림 중지",
+        "message": "{{user}}님이 시청을 중지했습니다"
       },
       "updateAvailable": {
-        "title": "Update Available",
-        "message": "Tracearr {{version}} is available"
+        "title": "업데이트 사용 가능",
+        "message": "Tracearr {{version}} 버전을 사용할 수 있습니다"
       },
       "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} is unreachable"
+        "title": "서버 오프라인",
+        "message": "{{name}}에 연결할 수 없습니다"
       },
       "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} is back online"
+        "title": "서버 온라인",
+        "message": "{{name}}이(가) 다시 온라인 상태입니다"
       },
       "violationDetected": {
-        "title": "New Violation: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "title": "새 위반: {{ruleName}}",
+        "message": "{{user}}님이 {{ruleType}} 규칙을 트리거했습니다"
       }
     }
   },
   "push": {
-    "violationDetected": "Sharing Violation Detected",
-    "streamStarted": "Stream Started",
-    "streamEnded": "Stream Ended",
-    "serverDown": "Server Connection Lost",
-    "serverUp": "Server Back Online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "violationDetected": "공유 위반 감지됨",
+    "streamStarted": "스트림 시작됨",
+    "streamEnded": "스트림 종료됨",
+    "serverDown": "서버 연결 끊김",
+    "serverUp": "서버 다시 온라인",
+    "newDevice": "새 기기",
+    "trustScoreChanged": "신뢰 점수 변경됨"
   },
   "settings": {
-    "title": "Notification Settings",
-    "allSeverity": "All (Low, Warning, High)",
-    "warningAndHigh": "Warning & High only",
-    "highOnly": "High severity only",
-    "allTypes": "All Types",
-    "rateLimit": "Current Rate Limit Status",
-    "perMinute": "Per Minute",
-    "perHour": "Per Hour",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
-    "violationDetectedDesc": "When a sharing violation is triggered",
-    "streamStarted": "Stream Started",
-    "streamStartedDesc": "When a user starts watching",
-    "streamStopped": "Stream Stopped",
-    "streamStoppedDesc": "When a user stops watching",
-    "concurrentStreams": "Concurrent Streams",
-    "concurrentStreamsDesc": "When max stream limit is exceeded",
-    "newDevice": "New Device",
-    "newDeviceDesc": "When a new device connects",
-    "trustScoreChanged": "Trust Score Changed",
-    "trustScoreChangedDesc": "When a user's trust score changes",
-    "serverDown": "Server Down",
-    "serverDownDesc": "When a media server goes offline",
-    "serverUp": "Server Up",
-    "serverUpDesc": "When a media server comes back online",
-    "violationFilters": "Violation Filters",
-    "minimumSeverity": "Minimum Severity",
-    "quietHours": "Quiet Hours",
-    "enableQuietHours": "Enable Quiet Hours",
-    "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "title": "알림 설정",
+    "allSeverity": "전체(낮음, 경고, 높음)",
+    "warningAndHigh": "경고 및 높음만",
+    "highOnly": "높은 심각도만",
+    "allTypes": "모든 유형",
+    "rateLimit": "현재 전송 제한 상태",
+    "perMinute": "분당",
+    "perHour": "시간당",
+    "enablePushNotifications": "푸시 알림 활성화",
+    "notificationEvents": "알림 이벤트",
+    "violationDetected": "위반 감지",
+    "violationDetectedDesc": "공유 위반이 발생했을 때",
+    "streamStarted": "스트림 시작",
+    "streamStartedDesc": "사용자가 시청을 시작했을 때",
+    "streamStopped": "스트림 중지",
+    "streamStoppedDesc": "사용자가 시청을 중지했을 때",
+    "concurrentStreams": "동시 스트림",
+    "concurrentStreamsDesc": "최대 스트림 수를 초과했을 때",
+    "newDevice": "새 기기",
+    "newDeviceDesc": "새 기기가 연결되었을 때",
+    "trustScoreChanged": "신뢰 점수 변경",
+    "trustScoreChangedDesc": "사용자의 신뢰 점수가 변경되었을 때",
+    "serverDown": "서버 다운",
+    "serverDownDesc": "미디어 서버가 오프라인이 되었을 때",
+    "serverUp": "서버 복구",
+    "serverUpDesc": "미디어 서버가 다시 온라인이 되었을 때",
+    "violationFilters": "위반 필터",
+    "minimumSeverity": "최소 심각도",
+    "quietHours": "방해 금지 시간",
+    "enableQuietHours": "방해 금지 시간 활성화",
+    "overrideForCritical": "긴급 알림은 예외 처리",
+    "rateLimiting": "전송 제한"
   }
 }
