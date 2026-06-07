@@ -150,7 +150,7 @@
   },
   "unauthenticated": {
     "connectionLost": "Verbindung abgebrochen",
-    "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Paarungscode.",
+    "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Pairing Code.",
     "scanQrCode": "QR-Code scannen"
   },
   "serverSelector": {
