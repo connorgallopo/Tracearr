@@ -62,6 +62,7 @@ import { channelRoutingRoutes } from './routes/channelRouting.js';
 import { versionRoutes } from './routes/version.js';
 import { maintenanceRoutes } from './routes/maintenance.js';
 import { publicRoutes } from './routes/public.js';
+import { mcpRoutes } from './mcp/plugin.js';
 import { libraryRoutes } from './routes/library.js';
 import { tailscaleRoutes } from './routes/tailscale.js';
 import { tasksRoutes } from './routes/tasks.js';
@@ -391,6 +392,14 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(tailscaleRoutes, { prefix: `${API_BASE_PATH}/tailscale` });
   await app.register(tasksRoutes, { prefix: `${API_BASE_PATH}/tasks` });
   await app.register(publicRoutes, { prefix: `${API_BASE_PATH}/public` });
+
+  // MCP (Model Context Protocol) endpoint — opt-in via MCP_ENABLED. Reuses the
+  // owner-scoped trr_pub_* API keys and exposes read-only tools over the public API.
+  if (process.env.MCP_ENABLED === 'true') {
+    await app.register(mcpRoutes, { prefix: `${API_BASE_PATH}/mcp` });
+    app.log.info(`MCP endpoint enabled at ${API_BASE_PATH}/mcp`);
+  }
+
   await app.register(libraryRoutes, { prefix: `${API_BASE_PATH}/library` });
   await app.register(backupRoutes, { prefix: `${API_BASE_PATH}/backup` });
 

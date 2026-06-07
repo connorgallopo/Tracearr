@@ -56,6 +56,8 @@ Tracearr is a monitoring platform for **Plex**, **Jellyfin**, and **Emby**. Trac
 
 **Public API** — Read-only REST API for third-party integrations. Generate an API key in Settings, then explore endpoints at `/api-docs` (Swagger UI). Works with Homarr, Home Assistant, or anything that speaks HTTP.
 
+**MCP Server (AI assistants)** — Opt-in [Model Context Protocol](https://modelcontextprotocol.io) endpoint that exposes Tracearr's read-only data (server health, stats, active streams, users, violations, session history, activity trends) as tools for AI clients like Claude Desktop, VS Code, and Cursor. Enable it by setting `MCP_ENABLED=true`; the endpoint is served at `/api/v1/mcp` (Streamable HTTP) and authenticates with the same owner-scoped API key as the Public API. Point your MCP client at the URL with an `Authorization: Bearer trr_pub_...` header.
+
 **Bulk Actions** — Multi-select operations across tables. Acknowledge or dismiss violations in bulk, reset trust scores, enable/disable rules, delete session history.
 
 **Data Import** — Already using Tautulli or Jellystat? Import your watch history so you don't start from scratch.

@@ -47,6 +47,7 @@
     "@fastify/swagger": "^9.7.0",
     "@fastify/swagger-ui": "^5.2.6",
     "@fastify/websocket": "^11.2.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@tracearr/shared": "workspace:*",
     "archiver": "^7.0.1",
     "bcrypt": "^6.0.0",

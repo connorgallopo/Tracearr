@@ -18,7 +18,11 @@ export default mergeConfig(
   defineConfig({
     test: {
       name: 'routes',
-      include: ['src/routes/__tests__/*.test.ts', 'src/routes/stats/__tests__/*.test.ts'],
+      include: [
+        'src/routes/__tests__/*.test.ts',
+        'src/routes/stats/__tests__/*.test.ts',
+        'src/mcp/__tests__/*.test.ts',
+      ],
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'json-summary'],
