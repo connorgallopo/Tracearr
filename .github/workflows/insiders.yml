@@ -122,7 +122,7 @@ jobs:
 
     services:
       timescale:
-        image: timescale/timescaledb:2.25.0-pg16
+        image: timescale/timescaledb:2.27.2-pg16@sha256:51ac20ec295699c05573adf896e2449d8b3a026223a951905d5763687409d7d4
         ports:
           - 5433:5432
         env:
