@@ -1,7 +1,7 @@
 # TimescaleDB with Toolkit extension
 # Builds from official PostgreSQL image with TimescaleDB and Toolkit added
 # This provides feature parity with the supervised image
-FROM postgres:15-bookworm
+FROM postgres:15-bookworm@sha256:b395c9b05a57a43c079691104bc8468ea336a42e6148f44095e66d0c056cdd1c
 
 # Install TimescaleDB and Toolkit from official TimescaleDB repo
 RUN apt-get update \

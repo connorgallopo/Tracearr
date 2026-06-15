@@ -3,7 +3,7 @@
 tracearr:
   image:
     repository: ghcr.io/connorgallopo/tracearr
-    tag: ""  # defaults to appVersion
+    tag: "@sha256:ca93988326c26597e0d9c91d69c0f97e7ed23c517cf327c22bc7f188002af998"  # defaults to appVersion
     pullPolicy: IfNotPresent
 
   replicaCount: 1  # singleton poller — only 1 supported
@@ -106,7 +106,7 @@ timescale:
 
   image:
     repository: timescale/timescaledb-ha
-    tag: pg18.1-ts2.25.0
+    tag: pg18.1-ts2.25.0@sha256:9dcbd18e5cb966398ae19f3882fd5fb2e19b3cb98be54d290ab9f69c75bf0a8b
     pullPolicy: IfNotPresent
 
   service:
@@ -188,7 +188,7 @@ redis:
 
   image:
     repository: redis
-    tag: 8-alpine
+    tag: 8-alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1
     pullPolicy: IfNotPresent
 
   service:

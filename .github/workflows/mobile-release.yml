@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
           ref: ${{ inputs.tag }}
@@ -125,15 +125,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22
           cache: 'pnpm'
@@ -146,7 +146,7 @@ jobs:
         run: pnpm --filter @tracearr/shared build
 
       - name: Setup Expo
-        uses: expo/expo-github-action@main
+        uses: expo/expo-github-action@eab7a230208c952974db8c3245cfd78402c7b385 # main
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
@@ -181,7 +181,7 @@ jobs:
           echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}" | base64 -d > credentials/google-service-account.json
 
       - name: Deploy with fingerprint
-        uses: expo/expo-github-action/continuous-deploy-fingerprint@main
+        uses: expo/expo-github-action/continuous-deploy-fingerprint@eab7a230208c952974db8c3245cfd78402c7b385 # main
         id: deploy
         with:
           profile: ${{ inputs.target }}
@@ -227,15 +227,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           ref: ${{ inputs.tag }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22
           cache: 'pnpm'
@@ -248,7 +248,7 @@ jobs:
         run: pnpm --filter @tracearr/shared build
 
       - name: Setup Expo
-        uses: expo/expo-github-action@main
+        uses: expo/expo-github-action@eab7a230208c952974db8c3245cfd78402c7b385 # main
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}

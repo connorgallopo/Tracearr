@@ -2,7 +2,7 @@
 # Runs TimescaleDB, Redis, and Tracearr in a single container
 # Ideal for simple deployments, Unraid, Synology, etc.
 
-FROM node:24-bookworm-slim AS builder
+FROM node:24-bookworm-slim@sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203 AS builder
 
 # Build arguments for version info
 ARG APP_VERSION=0.0.0
@@ -35,7 +35,7 @@ RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --f
 # =============================================================================
 # Production All-in-One Image
 # =============================================================================
-FROM debian:bookworm-slim
+FROM debian:bookworm-slim@sha256:96e378d7e6531ac9a15ad505478fcc2e69f371b10f5cdf87857c4b8188404716
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

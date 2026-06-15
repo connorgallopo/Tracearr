@@ -24,7 +24,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:8-alpine
+    image: redis:8-alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1
     ports:
       - "6379:6379"
     volumes:
