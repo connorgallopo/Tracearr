@@ -117,7 +117,23 @@
     "plexServerPlaceholder": "My Plex Server",
     "plexServerUrlPlaceholder": "http://192.168.1.100:32400",
     "updateHint": "Or click Update below to save only the name change.",
-    "added": "Added {{date}}"
+    "added": "Added {{date}}",
+    "realtimeActive": "Real-time updates active",
+    "pollingMode": "Polling",
+    "setupRealtime": "Set up real-time updates",
+    "checkingConnection": "Checking connection…",
+    "realtimeDialog": {
+      "title": "Enable real-time updates",
+      "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "repositoryUrl": "Repository URL",
+      "copyUrl": "Copy URL",
+      "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
+      "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
+      "openReleases": "Open releases page",
+      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
+      "close": "Close"
+    }
   },
   "mobile": {
     "title": "Mobile App",
