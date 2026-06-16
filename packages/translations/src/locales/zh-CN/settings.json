@@ -117,7 +117,23 @@
     "plexServerPlaceholder": "我的Plex服务器",
     "plexServerUrlPlaceholder": "http://192.168.1/100:32400",
     "updateHint": "或者点击下面的更新，只保存名称更改。",
-    "added": "Added {{date}}"
+    "added": "已添加{{date}}",
+    "realtimeActive": "Real-time updates active",
+    "pollingMode": "Polling",
+    "setupRealtime": "Set up real-time updates",
+    "checkingConnection": "Checking connection…",
+    "realtimeDialog": {
+      "title": "Enable real-time updates",
+      "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "repositoryUrl": "Repository URL",
+      "copyUrl": "Copy URL",
+      "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
+      "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
+      "openReleases": "Open releases page",
+      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
+      "close": "Close"
+    }
   },
   "mobile": {
     "title": "移动 App",
@@ -139,15 +155,15 @@
     "mobileAccessDisabledDesc": "启用移动访问权限以允许 Tracearr 移动应用程序连接到您的服务器。",
     "enableMobileAccess": "启用移动访问权限",
     "enabling": "启用...",
-    "devicesConnected": "{{current}} of {{max}} devices connected",
-    "pendingTokens": "{{count}} pending pair tokens",
+    "devicesConnected": "{{current}}of {{max}}已连接设备",
+    "pendingTokens": "{{count}}待处理的配的令牌",
     "addDevice": "添加设备",
     "disableMobileAccess": "禁用移动访问权限",
-    "connectedDevicesDesc": "{{count}} devices paired to your server",
+    "connectedDevicesDesc": "{{count}}已配对到您的服务器的设备",
     "revokeAllSessions": "全部取消",
     "pairNewDevice": "配对新设备",
     "pairNewDeviceDesc": "用 Tracearr 移动应用程序扫描二维码，或手动输入令牌。",
-    "expiresIn": "Expires in {{time}}",
+    "expiresIn": "过期时间{{time}}",
     "oneTimePairToken": "一次性配对令牌",
     "copyToken": "复制令牌",
     "tokenExpiryNote": "此令牌在5分钟后过期，只能使用一次。",
@@ -161,7 +177,7 @@
     "deviceNamePlaceholder": "例如：iPhone 15",
     "removeDevice": "移除设备",
     "failedToGenerateToken": "生成令牌失败",
-    "removeDeviceConfirm": "Are you sure you want to remove {{deviceName}}? This device will need to pair again to reconnect.",
+    "removeDeviceConfirm": "您确定要移除吗{{deviceName}}？该设备需要重新配对才能重新连接。",
     "externalUrlBanner": "使用反向代理或远程访问吗？请设置您的",
     "externalUrlBannerLink": "外部 URL",
     "externalUrlBannerSuffix": "所以移动应用可以连接到您的服务器。"
@@ -231,7 +247,7 @@
     "lastJobFailed": "上次作业失败",
     "jobHistory": "任务历史",
     "jobHistoryDesc": "最近执行维护任务",
-    "runConfirm": "Run {{name}}?",
+    "runConfirm": "运行{{name}}？",
     "mayTakeAWhile": "这可能需要一些时间",
     "mayTakeAWhileDesc": "这个任务可能需要几分钟才能完成，取决于您的库的大小。",
     "startJob": "开始作业"
@@ -329,10 +345,10 @@
     "skipInProgress": "正在进行中的会话 — — 跳过没有参考ID的活动/不完整的会议。",
     "skipUserNotFoundJellyfin": "找不到用户 — — Jellyfin/Emby用户在 Tracearr。首先同步您的服务器以添加所有用户。",
     "skipSyncHint": "如果许多记录被跳过了，请确保您最近已经在“设置 -> 服务器”中同步了您的服务器。",
-    "importInProgressPercent": "Import in progress ({{percent}}% complete)...",
+    "importInProgressPercent": "导入中({{percent}}完成)……",
     "importInProgressGeneric": "正在导入...",
     "startingImport": "正在开始导入...",
-    "connectedFound": "Connected! Found {{users}} users and {{records}} history records."
+    "connectedFound": "已连接！找到{{users}}用户和{{records}}历史记录。"
   },
   "plex": {
     "signInWithPlex": "使用 Plex 登录",
