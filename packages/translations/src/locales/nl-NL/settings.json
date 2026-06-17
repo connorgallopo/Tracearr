@@ -118,21 +118,21 @@
     "plexServerUrlPlaceholder": "http://192.168.1.100:32400",
     "updateHint": "Of klik op Update hieronder om alleen de naam te wijzigen.",
     "added": "Toegevoegd {{date}}",
-    "realtimeActive": "Real-time updates active",
+    "realtimeActive": "Real-time updates actief",
     "pollingMode": "Polling",
-    "setupRealtime": "Set up real-time updates",
-    "checkingConnection": "Checking connection…",
+    "setupRealtime": "Stel real-time updates in",
+    "checkingConnection": "Connectie controleren…",
     "realtimeDialog": {
-      "title": "Enable real-time updates",
-      "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
-      "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "title": "Real-time updates aanzetten",
+      "jellyfinDescription": "Installeer de Tracearr SSE plugin om direct sessie updates te krijgen zonder te wachten voor de volgende polling.",
+      "embyDescription": "Installeer de Tracearr SSE plugin om direct sessie updates te krijgen zonder te wachten voor de volgende polling.",
       "repositoryUrl": "Repository URL",
-      "copyUrl": "Copy URL",
+      "copyUrl": "Kopieer URL",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
       "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
-      "openReleases": "Open releases page",
-      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
-      "close": "Close"
+      "openReleases": "Open releases pagina",
+      "autoDetectNote": "Zodra de plugin actief is, detecteert Tracearr deze automatisch — een herstart is niet nodig.",
+      "close": "Sluiten"
     }
   },
   "mobile": {
