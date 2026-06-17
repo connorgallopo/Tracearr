@@ -126,13 +126,13 @@
       "title": "Enable real-time updates",
       "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
       "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
-      "repositoryUrl": "Repository URL",
-      "copyUrl": "Copy URL",
+      "repositoryUrl": "URL du dépôt",
+      "copyUrl": "Copier l'URL",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
       "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
-      "openReleases": "Open releases page",
-      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
-      "close": "Close"
+      "openReleases": "Ouvrir la page des versions",
+      "autoDetectNote": "Une fois le plugin démarré, Tracearr le détectera automatiquement — aucun redémarrage n'est nécessaire.",
+      "close": "Fermer"
     }
   },
   "mobile": {
