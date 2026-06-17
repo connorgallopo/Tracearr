@@ -118,21 +118,21 @@
     "plexServerUrlPlaceholder": "http://192.168.1.100:32400",
     "updateHint": "또는 아래 업데이트를 클릭해 이름 변경만 저장하세요.",
     "added": "{{date}} 추가됨",
-    "realtimeActive": "Real-time updates active",
-    "pollingMode": "Polling",
-    "setupRealtime": "Set up real-time updates",
-    "checkingConnection": "Checking connection…",
+    "realtimeActive": "실시간 업데이트 활성화됨",
+    "pollingMode": "폴링",
+    "setupRealtime": "실시간 업데이트 설정",
+    "checkingConnection": "연결 확인 중…",
     "realtimeDialog": {
-      "title": "Enable real-time updates",
-      "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
-      "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
-      "repositoryUrl": "Repository URL",
-      "copyUrl": "Copy URL",
+      "title": "실시간 업데이트 활성화",
+      "jellyfinDescription": "다음 폴링을 기다리지 않고 즉시 세션 업데이트를 받으려면 Tracearr SSE 플러그인을 설치하세요.",
+      "embyDescription": "다음 폴링을 기다리지 않고 즉시 세션 업데이트를 받으려면 Tracearr SSE 플러그인을 설치하세요.",
+      "repositoryUrl": "저장소 URL",
+      "copyUrl": "URL 복사",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
       "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
-      "openReleases": "Open releases page",
-      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
-      "close": "Close"
+      "openReleases": "릴리스 페이지 열기",
+      "autoDetectNote": "플러그인이 실행되면 Tracearr가 자동으로 감지합니다. 여기서 재시작 할 필요는 없습니다.",
+      "close": "닫기"
     }
   },
   "mobile": {
