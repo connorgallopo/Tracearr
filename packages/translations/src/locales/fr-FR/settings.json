@@ -124,8 +124,8 @@
     "checkingConnection": "Vérification de la connexion…",
     "realtimeDialog": {
       "title": "Activer les mises à jour en temps réel",
-      "jellyfinDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
-      "embyDescription": "Install the Tracearr SSE plugin to get instant session updates without waiting for the next poll.",
+      "jellyfinDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
+      "embyDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
       "repositoryUrl": "URL du dépôt",
       "copyUrl": "Copier l'URL",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
