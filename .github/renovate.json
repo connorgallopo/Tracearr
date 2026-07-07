@@ -80,15 +80,6 @@
       "description": "Redis and Valkey majors need a config review"
     },
 
-    // pnpm 11 stopped reading the "pnpm" field in package.json (overrides and
-    // build-dep allowlists live there). Stay on 10.x until those move to
-    // pnpm-workspace.yaml, otherwise the lockfile refresh drops the overrides.
-    {
-      "matchManagers": ["npm"],
-      "matchDepNames": ["pnpm"],
-      "allowedVersions": "<11"
-    },
-
     // Odd Node majors aren't LTS.
     {
       "matchManagers": ["dockerfile", "docker-compose"],

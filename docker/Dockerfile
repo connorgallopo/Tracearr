@@ -7,7 +7,7 @@ ARG APP_TAG=
 ARG APP_COMMIT=
 ARG APP_BUILD_DATE=
 
-RUN corepack enable && corepack prepare pnpm@10.34.4 --activate
+RUN corepack enable && corepack prepare pnpm@11.10.0 --activate
 
 WORKDIR /app
 
@@ -38,7 +38,7 @@ ARG APP_TAG=
 ARG APP_COMMIT=
 ARG APP_BUILD_DATE=
 
-RUN corepack enable && corepack prepare pnpm@10.34.4 --activate
+RUN corepack enable && corepack prepare pnpm@11.10.0 --activate
 
 # Tailscale VPN binary (userspace networking, no root required)
 RUN apk add --no-cache tailscale postgresql-client

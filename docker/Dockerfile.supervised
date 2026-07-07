@@ -10,7 +10,7 @@ ARG APP_TAG=
 ARG APP_COMMIT=
 ARG APP_BUILD_DATE=
 
-RUN corepack enable && corepack prepare pnpm@10.34.4 --activate
+RUN corepack enable && corepack prepare pnpm@11.10.0 --activate
 
 WORKDIR /app
 
@@ -53,7 +53,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && corepack enable \
-    && corepack prepare pnpm@10.34.4 --activate \
+    && corepack prepare pnpm@11.10.0 --activate \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PostgreSQL 15 + TimescaleDB
