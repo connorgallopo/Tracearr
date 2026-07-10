@@ -82,7 +82,7 @@
     "ruleViolationTriggered": "Violation de règle déclenchée",
     "newPlaybackBegan": "Nouvelle lecture commencée",
     "playbackEnded": "Lecture terminée",
-    "exceededStreamLimit": "Un utilisateur a dépassé la limite de streaming",
+    "exceededStreamLimit": "Un utilisateur a dépassé la limite de diffusions",
     "newDeviceDetected": "Nouvel appareil détecté pour un utilisateur",
     "trustScoreDegraded": "Le score de confiance d'un utilisateur a été dégradé",
     "serverUnreachable": "Serveur multimédia inaccessible",
