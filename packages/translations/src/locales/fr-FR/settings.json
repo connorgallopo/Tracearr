@@ -126,10 +126,10 @@
     "pluginUpdateAvailable": "Mise à jour de l'extension disponible",
     "realtimeDialog": {
       "title": "Activer les mises à jour en temps réel",
-      "updateTitle": "Update the Tracearr SSE plugin",
+      "updateTitle": "Mettre à jour l'extension Tracearr SSE",
       "jellyfinDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
       "embyDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
-      "jellyfinUpdateDescription": "A newer plugin release is available. Open your Jellyfin dashboard, go to Plugins, Catalog, and update Tracearr SSE, then restart Jellyfin.",
+      "jellyfinUpdateDescription": "Une nouvelle version de l'extension est disponible. Ouvrez votre tableau de bord Jellyfin, rendez-vous dans Extensions, Catalogue, et mettez à jour Tracearr SSE, puis redémarrez Jellyfin.",
       "embyUpdateDescription": "A newer plugin release is available. Download the latest release zip, replace the plugin DLL in your Emby plugins folder, and restart Emby.",
       "repositoryUrl": "URL du dépôt",
       "copyUrl": "Copier l'URL",
