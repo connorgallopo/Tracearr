@@ -122,7 +122,7 @@
     "pollingMode": "Polling",
     "setupRealtime": "Configurer les mises à jour en temps réel",
     "checkingConnection": "Vérification de la connexion…",
-    "pluginVersion": "plugin v{{version}}",
+    "pluginVersion": "extension v{{version}}",
     "pluginUpdateAvailable": "Mise à jour de l'extension disponible",
     "realtimeDialog": {
       "title": "Activer les mises à jour en temps réel",
@@ -130,13 +130,13 @@
       "jellyfinDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
       "embyDescription": "Installez l'extension SSE de Tracearr pour recevoir les mises à jour de session instantanément, sans attendre la prochaine actualisation.",
       "jellyfinUpdateDescription": "Une nouvelle version de l'extension est disponible. Ouvrez votre tableau de bord Jellyfin, rendez-vous dans Extensions, Catalogue, et mettez à jour Tracearr SSE, puis redémarrez Jellyfin.",
-      "embyUpdateDescription": "A newer plugin release is available. Download the latest release zip, replace the plugin DLL in your Emby plugins folder, and restart Emby.",
+      "embyUpdateDescription": "Une nouvelle version de l'extension est disponible. Téléchargez la dernière version du zip, remplacez le DLL de l'extension dans votre dossier d'extensions Emby et redémarrez Emby.",
       "repositoryUrl": "URL du dépôt",
       "copyUrl": "Copier l'URL",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
       "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
       "openReleases": "Ouvrir la page des versions",
-      "autoDetectNote": "Une fois le plugin démarré, Tracearr le détectera automatiquement — aucun redémarrage n'est nécessaire.",
+      "autoDetectNote": "Une fois l'extension démarrée, Tracearr la détectera automatiquement — aucun redémarrage n'est nécessaire.",
       "close": "Fermer"
     }
   },
