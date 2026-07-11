@@ -147,11 +147,11 @@
         "message": "Vous pouvez maintenant procéder à la configuration"
       },
       "usersMerged": {
-        "title": "Users merged",
+        "title": "Utilisateurs fisionnés",
         "rulesKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": "Compte séparé en un utilisateur distinct"
       }
     },
     "error": {
@@ -193,8 +193,8 @@
       "jobLoadFailed": "Échec du chargement des tâches de maintenance",
       "invalidUrl": "URL invalide",
       "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "Échec de la fusion des utilisateurs",
+      "serverUserSplitFailed": "Échec de la séparation du compte",
       "invalidClaimCode": {
         "title": "Code de réclamation invalide",
         "message": "Veuillez vérifier les journaux du serveur"
