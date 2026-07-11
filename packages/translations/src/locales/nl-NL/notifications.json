@@ -145,6 +145,13 @@
       "claimCodeValidated": {
         "title": "Claimcode geverifiëerd",
         "message": "Je kunt nu doorgaan met instellen"
+      },
+      "usersMerged": {
+        "title": "Gebruikers samengevoegd",
+        "rulesKept": "De doelversie is behouden gebleven: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account opgesplitst naar een aparte gebruiker"
       }
     },
     "error": {
@@ -186,6 +193,8 @@
       "jobLoadFailed": "Onderhoudstaken laden mislukt",
       "invalidUrl": "Ongeldige URL",
       "plexDirectUrl": "Een plex.direct-URL is een relay-adres dat hier niet gebruikt kan worden. Gebruik een direct IP-adres of hostnaam.",
+      "userMergeFailed": "Het samenvoegen van gebruikers is mislukt",
+      "serverUserSplitFailed": "Splitsen van het account is mislukt",
       "invalidClaimCode": {
         "title": "Ongeldige claimcode",
         "message": "Controleer het serverlogboek"
