@@ -21,7 +21,6 @@
     "primaryAuth": "Primär autentiseringsmetod",
     "localAccount": "Lokalt konto",
     "plexAccount": "Plex konto",
-    "jellyfinAccount": "Jellyfin konto",
     "language": "Språk",
     "languageDescription": "Välj önskat visningsspråk.",
     "helpTranslate": "Hjälp till att översätta Tracearr",
@@ -287,9 +286,6 @@
     "description": "Konfigurera vem som kan komma åt Tracearr",
     "allowGuestAccess": "Tillåt gäståtkomst",
     "allowGuestAccessDesc": "När den är inaktiverad, kan endast serverägaren logga in på Tracearr",
-    "primaryAuthMethod": "Primär autentiseringsmetod",
-    "primaryAuthMethodDesc": "Välj vilken autentiseringsmetod som visas som standard på inloggningssidan",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Obs: När gäståtkomst är inaktiverad kan endast serverägaren logga in. Alla andra användare kommer att se ett meddelande \"Åtkomst nekad\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Välj server",
     "chooseServer": "Välj vilken Plex Media Server som ska övervaka"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Logga in med Jellyfin",
-    "username": "Jellyfin Användarnamn",
-    "password": "Jellyfin Lösenord"
-  },
   "account": {
     "createAccount": "Skapa konto",
     "email": "E-post",
@@ -373,8 +364,7 @@
     "displayName": "Visningsnamn",
     "createYourAccount": "Skapa ditt konto för att komma igång",
     "signInToAccount": "Logga in på ditt konto",
-    "useLocalAccount": "Använd lokalt konto istället",
-    "useJellyfinAccount": "Använd istället Jellyfin konto"
+    "useLocalAccount": "Använd lokalt konto istället"
   },
   "update": {
     "title": "Uppdatering tillgänglig",
