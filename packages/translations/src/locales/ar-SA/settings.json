@@ -21,7 +21,6 @@
     "primaryAuth": "طريقة المصادقة الرئيسية",
     "localAccount": "الحساب المحلي",
     "plexAccount": "حساب Plex",
-    "jellyfinAccount": "حساب جلفين",
     "language": "اللغة",
     "languageDescription": "اختر لغة العرض المفضلة لديك.",
     "helpTranslate": "المساعدة في ترجمة Tracearr",
@@ -287,9 +286,6 @@
     "description": "تكوين من يمكنه الوصول إلى Tracearr",
     "allowGuestAccess": "السماح للزائر بالوصول",
     "allowGuestAccessDesc": "عند التعطيل، يمكن لمالك الخادم فقط تسجيل الدخول إلى Tracearr",
-    "primaryAuthMethod": "طريقة المصادقة الرئيسية",
-    "primaryAuthMethodDesc": "اختر طريقة المصادقة التي تظهر بشكل افتراضي في صفحة تسجيل الدخول",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "ملاحظة: عندما يتم تعطيل وصول الضيف، فقط مالك الخادم يمكنه تسجيل الدخول. جميع المستخدمين الآخرين سيشاهدون رسالة \"رفض الوصول\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "حدد الخادم",
     "chooseServer": "اختر خادم Plex Media لمراقبة"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "تسجيل الدخول باستخدام جليفين",
-    "username": "اسم المستخدم جيليفين",
-    "password": "كلمة مرور جلفين"
-  },
   "account": {
     "createAccount": "إنشاء حساب",
     "email": "البريد الإلكتروني",
@@ -373,8 +364,7 @@
     "displayName": "اسم العرض",
     "createYourAccount": "أنشئ حسابك للبدء",
     "signInToAccount": "تسجيل الدخول إلى حسابك",
-    "useLocalAccount": "استخدام الحساب المحلي بدلاً من ذلك",
-    "useJellyfinAccount": "استخدام حساب Jellyfin بدلاً من ذلك"
+    "useLocalAccount": "استخدام الحساب المحلي بدلاً من ذلك"
   },
   "update": {
     "title": "تحديث متوفر",
