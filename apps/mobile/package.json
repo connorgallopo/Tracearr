@@ -71,7 +71,7 @@
     "react-i18next": "^17.0.6",
     "react-native": "0.85.3",
     "react-native-css": "^3.0.7",
-    "react-native-gesture-handler": "2.31.2",
+    "react-native-gesture-handler": "3.0.2",
     "react-native-nitro-modules": "^0.35.6",
     "react-native-quick-crypto": "^1.1.4",
     "react-native-reanimated": "4.3.1",
