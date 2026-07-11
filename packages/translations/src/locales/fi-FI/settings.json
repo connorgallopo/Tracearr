@@ -21,7 +21,6 @@
     "primaryAuth": "Ensisijainen Todennusmenetelmä",
     "localAccount": "Paikallinen Tili",
     "plexAccount": "Plex Tili",
-    "jellyfinAccount": "Jellyfin Tili",
     "language": "Kieli",
     "languageDescription": "Valitse haluamasi näytön kieli.",
     "helpTranslate": "Auta kääntämään Tracearr",
@@ -287,9 +286,6 @@
     "description": "Määritä kuka voi käyttää Tracearria",
     "allowGuestAccess": "Salli Vieraiden Käyttö",
     "allowGuestAccessDesc": "Kun poistettu käytöstä, vain palvelimen omistaja voi kirjautua tracearr:iin",
-    "primaryAuthMethod": "Ensisijainen Todennusmenetelmä",
-    "primaryAuthMethodDesc": "Valitse mikä tunnistautumismenetelmä on oletusarvoisesti näytetty kirjautumissivulla",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Huomautus: Kun vierailijoiden käyttö on poistettu käytöstä, vain palvelimen omistaja voi kirjautua sisään. Kaikki muut käyttäjät näkevät \"Pääsy estetty\" -viestin."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Valitse Palvelin",
     "chooseServer": "Valitse, mitä Plex Media Serveriä seurataan"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Kirjaudu sisään Jellyfinillä",
-    "username": "Jellyfin Käyttäjätunnus",
-    "password": "Jellyfin Salasana"
-  },
   "account": {
     "createAccount": "Luo Tili",
     "email": "Sähköposti",
@@ -373,8 +364,7 @@
     "displayName": "Näytön Nimi",
     "createYourAccount": "Luo tilisi päästäksesi alkuun",
     "signInToAccount": "Kirjaudu sisään tilillesi",
-    "useLocalAccount": "Käytä paikallista tiliä sen sijaan",
-    "useJellyfinAccount": "Käytä Jellyfin-tiliä sen sijaan"
+    "useLocalAccount": "Käytä paikallista tiliä sen sijaan"
   },
   "update": {
     "title": "Päivitys Saatavilla",
