@@ -145,6 +145,13 @@
       "claimCodeValidated": {
         "title": "Claim code validated",
         "message": "You can now proceed with setup"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
       }
     },
     "error": {
@@ -186,6 +193,8 @@
       "jobLoadFailed": "Failed to load maintenance jobs",
       "invalidUrl": "Invalid URL",
       "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
       "invalidClaimCode": {
         "title": "Invalid claim code",
         "message": "Please check the server logs"
