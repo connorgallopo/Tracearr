@@ -21,7 +21,6 @@
     "primaryAuth": "主要认证方法",
     "localAccount": "本地用户",
     "plexAccount": "Plex账户",
-    "jellyfinAccount": "Jellyfin 帐户",
     "language": "语言",
     "languageDescription": "选择您首选的显示语言。",
     "helpTranslate": "帮助翻译 Tracearr",
@@ -287,9 +286,6 @@
     "description": "Configure who can access Tracearr",
     "allowGuestAccess": "Allow Guest Access",
     "allowGuestAccessDesc": "When disabled, only the server owner can log in to Tracearr",
-    "primaryAuthMethod": "主要认证方法",
-    "primaryAuthMethodDesc": "Choose which authentication method is shown by default on the login page",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Note: When guest access is disabled, only the server owner can sign in. All other users will see an \"Access Denied\" message."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "选择服务器",
     "chooseServer": "选择要监视的Plex媒体服务器"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "使用 Jellyfin 登录",
-    "username": "Jellyfin 用户名",
-    "password": "Jellyfin 密码"
-  },
   "account": {
     "createAccount": "创建新账户",
     "email": "电子邮件",
@@ -373,8 +364,7 @@
     "displayName": "显示名称",
     "createYourAccount": "创建您的账户以开始",
     "signInToAccount": "登录到您的帐户",
-    "useLocalAccount": "使用本地账户",
-    "useJellyfinAccount": "使用Jellyfin帐户"
+    "useLocalAccount": "使用本地账户"
   },
   "update": {
     "title": "有可用更新",
