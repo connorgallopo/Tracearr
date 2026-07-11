@@ -21,7 +21,6 @@
     "primaryAuth": "Metoda primárního ověření",
     "localAccount": "Místní účet",
     "plexAccount": "Účet Plex",
-    "jellyfinAccount": "Účet Jellyfin",
     "language": "Jazyk",
     "languageDescription": "Vyberte preferovaný jazyk zobrazení.",
     "helpTranslate": "Pomozte přeložit Tracearr",
@@ -287,9 +286,6 @@
     "description": "Konfigurace, kdo má přístup k Tracearru",
     "allowGuestAccess": "Povolit přístup k hostům",
     "allowGuestAccessDesc": "Pokud je zakázáno, do Tracearr se může přihlásit pouze vlastník serveru",
-    "primaryAuthMethod": "Metoda primárního ověření",
-    "primaryAuthMethodDesc": "Zvolte, která metoda ověřování je zobrazena ve výchozím nastavení na přihlašovací stránce",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Poznámka: Pokud je přístup hosta zakázán, může se přihlásit pouze majitel serveru. Všichni ostatní uživatelé uvidí zprávu \"Přístup odepřen\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Vybrat server",
     "chooseServer": "Vyberte, který Plex Media Server bude monitorován"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Přihlásit se pomocí Jellyfin",
-    "username": "Jellyfin uživatelské jméno",
-    "password": "Jellyfin heslo"
-  },
   "account": {
     "createAccount": "Vytvořit účet",
     "email": "E-mailová adresa",
@@ -373,8 +364,7 @@
     "displayName": "Zobrazované jméno",
     "createYourAccount": "Vytvořte si účet, abyste mohli začít",
     "signInToAccount": "Přihlaste se ke svému účtu",
-    "useLocalAccount": "Místo toho použít místní účet",
-    "useJellyfinAccount": "Místo toho použít Jellyfin účet"
+    "useLocalAccount": "Místo toho použít místní účet"
   },
   "update": {
     "title": "Dostupná aktualizace",
