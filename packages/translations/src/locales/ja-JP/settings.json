@@ -21,7 +21,6 @@
     "primaryAuth": "プライマリ認証方法",
     "localAccount": "ローカルアカウント",
     "plexAccount": "プレックスアカウント",
-    "jellyfinAccount": "Jellyfinアカウント",
     "language": "言語",
     "languageDescription": "お好みの表示言語を選択します。",
     "helpTranslate": "Tracearrの翻訳に協力する",
@@ -287,9 +286,6 @@
     "description": "Tracearr にアクセスできるユーザーを設定します",
     "allowGuestAccess": "ゲストアクセスを許可する",
     "allowGuestAccessDesc": "無効にすると、サーバの所有者のみが Tracear にログインできます。",
-    "primaryAuthMethod": "プライマリ認証方法",
-    "primaryAuthMethodDesc": "ログインページにデフォルトで表示される認証方法を選択してください",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "注: ゲストアクセスが無効になっている場合、サーバーの所有者のみがサインインできます。他のすべてのユーザーには「アクセス拒否」メッセージが表示されます。"
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "サーバーを選択",
     "chooseServer": "モニターするプレックス メディア サーバーを選択してください"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Jellyfinでサインイン",
-    "username": "Jellyfinユーザー名",
-    "password": "Jellyfinパスワード"
-  },
   "account": {
     "createAccount": "アカウントを作成",
     "email": "Eメールアドレス",
@@ -373,8 +364,7 @@
     "displayName": "表示名",
     "createYourAccount": "アカウントを作成して開始する",
     "signInToAccount": "アカウントにサインインする",
-    "useLocalAccount": "代わりにローカルアカウントを使用する",
-    "useJellyfinAccount": "代わりにJellyfinアカウントを使用する"
+    "useLocalAccount": "代わりにローカルアカウントを使用する"
   },
   "update": {
     "title": "アップデートがあります",
