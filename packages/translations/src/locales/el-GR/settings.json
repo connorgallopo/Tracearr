@@ -21,7 +21,6 @@
     "primaryAuth": "Κύρια Μέθοδος Ταυτοποίησης",
     "localAccount": "Τοπικός Λογαριασμός",
     "plexAccount": "Λογαριασμός Plex",
-    "jellyfinAccount": "Λογαριασμός Jellyfin",
     "language": "Γλώσσα",
     "languageDescription": "Επιλέξτε την προτιμώμενη γλώσσα εμφάνισης.",
     "helpTranslate": "Βοηθήστε στη μετάφραση του Tracearr",
@@ -287,9 +286,6 @@
     "description": "Ρύθμιση παραμέτρων που μπορούν να έχουν πρόσβαση στο Tracearr",
     "allowGuestAccess": "Επιτρέψτε Την Πρόσβαση Επισκέπτη",
     "allowGuestAccessDesc": "Όταν είναι απενεργοποιημένη, μόνο ο ιδιοκτήτης του διακομιστή μπορεί να συνδεθεί στο Tracearr",
-    "primaryAuthMethod": "Κύρια Μέθοδος Ταυτοποίησης",
-    "primaryAuthMethodDesc": "Επιλέξτε ποια μέθοδος ελέγχου ταυτότητας εμφανίζεται από προεπιλογή στη σελίδα σύνδεσης",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Σημείωση: Όταν η πρόσβαση του επισκέπτη είναι απενεργοποιημένη, μόνο ο ιδιοκτήτης του διακομιστή μπορεί να εισέλθει. Όλοι οι άλλοι χρήστες θα δουν ένα μήνυμα \"Απαγορεύεται η πρόσβαση\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Επιλογή Διακομιστή",
     "chooseServer": "Επιλέξτε το Plex Media Server για παρακολούθηση"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Σύνδεση με Jellyfin",
-    "username": "Όνομα Χρήστη Jellyfin",
-    "password": "Κωδικός Πρόσβασης Jellyfin"
-  },
   "account": {
     "createAccount": "Δημιουργία Λογαριασμού",
     "email": "E-mail",
@@ -373,8 +364,7 @@
     "displayName": "Εμφανιζόμενο Όνομα",
     "createYourAccount": "Δημιουργήστε το λογαριασμό σας για να ξεκινήσετε",
     "signInToAccount": "Συνδεθείτε στο λογαριασμό σας",
-    "useLocalAccount": "Χρήση τοπικού λογαριασμού",
-    "useJellyfinAccount": "Χρήση λογαριασμού Jellyfin αντί"
+    "useLocalAccount": "Χρήση τοπικού λογαριασμού"
   },
   "update": {
     "title": "Διαθέσιμη Ενημέρωση",
