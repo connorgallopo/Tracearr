@@ -145,6 +145,13 @@
       "claimCodeValidated": {
         "title": "Επικυρωμένος κωδικός αξίωσης",
         "message": "Τώρα μπορείτε να προχωρήσετε με την εγκατάσταση"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
       }
     },
     "error": {
@@ -186,6 +193,8 @@
       "jobLoadFailed": "Αποτυχία φόρτωσης εργασιών συντήρησης",
       "invalidUrl": "Μη Έγκυρο URL",
       "plexDirectUrl": "Οι διευθύνσεις URL plex.direct είναι διευθύνσεις ρελέ που δεν μπορούν να χρησιμοποιηθούν εδώ. Παρακαλώ χρησιμοποιήστε μια άμεση διεύθυνση IP ή όνομα κεντρικού υπολογιστή.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
       "invalidClaimCode": {
         "title": "Μη έγκυρος κωδικός απαίτησης",
         "message": "Παρακαλούμε ελέγξτε τα αρχεία καταγραφής του διακομιστή"
