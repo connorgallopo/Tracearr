@@ -21,7 +21,6 @@
     "primaryAuth": "Primaire authenticatiemethode",
     "localAccount": "Lokaal account",
     "plexAccount": "Plex-account",
-    "jellyfinAccount": "Jellyfin-account",
     "language": "Taal",
     "languageDescription": "Kies je gewenste weergavetaal.",
     "helpTranslate": "Help bij het vertalen van Tracearr",
@@ -287,9 +286,6 @@
     "description": "Configureer wie toegang heeft tot Tracearr",
     "allowGuestAccess": "Gasttoegang toestaan",
     "allowGuestAccessDesc": "Indien uitgeschakeld kan alleen de server eigenaar inloggen op Tracearr",
-    "primaryAuthMethod": "Primaire authenticatiemethode",
-    "primaryAuthMethodDesc": "Kies welke authenticatiemethode standaard wordt weergegeven op de inlogpagina",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Opmerking: Wanneer gasttoegang is uitgeschakeld, kan alleen de servereigenaar inloggen. Alle andere gebruikers zien het bericht \"Toegang Geweigerd\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Server selecteren",
     "chooseServer": "Kies welke Plex-mediaserver je wilt monitoren"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Aanmelden met Jellyfin",
-    "username": "Jellyfin-gebruikersnaam",
-    "password": "Jellyfin-wachtwoord"
-  },
   "account": {
     "createAccount": "Account aanmaken",
     "email": "E-mail",
@@ -373,8 +364,7 @@
     "displayName": "Weergavenaam",
     "createYourAccount": "Maak je account aan om te beginnen",
     "signInToAccount": "Aanmelden bij je account",
-    "useLocalAccount": "Lokaal account gebruiken",
-    "useJellyfinAccount": "Jellyfin-account gebruiken"
+    "useLocalAccount": "Lokaal account gebruiken"
   },
   "update": {
     "title": "Update beschikbaar",
