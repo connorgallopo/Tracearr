@@ -21,7 +21,6 @@
     "primaryAuth": "Metoda de autentificare primară",
     "localAccount": "Cont local",
     "plexAccount": "Cont Plex",
-    "jellyfinAccount": "Cont Jellyfin",
     "language": "Limba",
     "languageDescription": "Alegeți limba de afișare preferată.",
     "helpTranslate": "Ajută la traducerea Tracearr",
@@ -287,9 +286,6 @@
     "description": "Configurați cine poate accesa Tracearr",
     "allowGuestAccess": "Permite accesul vizitatorilor",
     "allowGuestAccessDesc": "Când este dezactivat, numai proprietarul serverului se poate conecta la Tracearr",
-    "primaryAuthMethod": "Metoda de autentificare primară",
-    "primaryAuthMethodDesc": "Alegeți care metodă de autentificare este afișată în mod implicit pe pagina de autentificare",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Notă: Când accesul vizitatorilor este dezactivat, numai proprietarul serverului se poate conecta. Toți ceilalți utilizatori vor vedea un mesaj \"Acces refuzat\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Selectare server",
     "chooseServer": "Alege care Plex Media Server să fie monitorizat"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Autentificare cu Jellyfin",
-    "username": "Utilizator Jellyfin",
-    "password": "Parolă Jellyfin"
-  },
   "account": {
     "createAccount": "Creare cont",
     "email": "E-mail",
@@ -373,8 +364,7 @@
     "displayName": "Nume afișat",
     "createYourAccount": "Creează-ți un cont pentru a începe",
     "signInToAccount": "Conectează-te la contul tău",
-    "useLocalAccount": "Folosește în schimb contul local",
-    "useJellyfinAccount": "Folosește în schimb contul Jellyfin"
+    "useLocalAccount": "Folosește în schimb contul local"
   },
   "update": {
     "title": "Actualizare disponibilă",
