@@ -21,7 +21,6 @@
     "primaryAuth": "기본 인증 방식",
     "localAccount": "로컬 계정",
     "plexAccount": "Plex 계정",
-    "jellyfinAccount": "Jellyfin 계정",
     "language": "언어",
     "languageDescription": "표시할 언어를 선택하세요.",
     "helpTranslate": "Tracearr 번역 돕기",
@@ -287,9 +286,6 @@
     "description": "Tracearr에 접근할 수 있는 사용자를 구성하세요",
     "allowGuestAccess": "게스트 접근 허용",
     "allowGuestAccessDesc": "비활성화하면 서버 소유자만 Tracearr에 로그인할 수 있습니다",
-    "primaryAuthMethod": "기본 인증 방식",
-    "primaryAuthMethodDesc": "로그인 페이지에 기본으로 표시할 인증 방식을 선택하세요",
-    "jellyfinAdmin": "Jellyfin 관리자",
     "singleOwnerNote": "참고: 게스트 접근이 비활성화되면 서버 소유자만 로그인할 수 있습니다. 다른 모든 사용자는 \"접근 거부\" 메시지를 보게 됩니다."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "서버 선택",
     "chooseServer": "모니터링할 Plex Media Server를 선택하세요"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Jellyfin으로 로그인",
-    "username": "Jellyfin 사용자 이름",
-    "password": "Jellyfin 비밀번호"
-  },
   "account": {
     "createAccount": "계정 만들기",
     "email": "이메일",
@@ -373,8 +364,7 @@
     "displayName": "표시 이름",
     "createYourAccount": "시작하려면 계정을 만드세요",
     "signInToAccount": "계정에 로그인하세요",
-    "useLocalAccount": "로컬 계정 대신 사용",
-    "useJellyfinAccount": "Jellyfin 계정 대신 사용"
+    "useLocalAccount": "로컬 계정 대신 사용"
   },
   "update": {
     "title": "업데이트 사용 가능",
