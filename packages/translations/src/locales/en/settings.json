@@ -21,7 +21,6 @@
     "primaryAuth": "Primary Authentication Method",
     "localAccount": "Local Account",
     "plexAccount": "Plex Account",
-    "jellyfinAccount": "Jellyfin Account",
     "language": "Language",
     "languageDescription": "Choose your preferred display language.",
     "helpTranslate": "Help translate Tracearr",
@@ -287,9 +286,6 @@
     "description": "Configure who can access Tracearr",
     "allowGuestAccess": "Allow Guest Access",
     "allowGuestAccessDesc": "When disabled, only the server owner can log in to Tracearr",
-    "primaryAuthMethod": "Primary Authentication Method",
-    "primaryAuthMethodDesc": "Choose which authentication method is shown by default on the login page",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Note: When guest access is disabled, only the server owner can sign in. All other users will see an \"Access Denied\" message."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Select Server",
     "chooseServer": "Choose which Plex Media Server to monitor"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Sign in with Jellyfin",
-    "username": "Jellyfin Username",
-    "password": "Jellyfin Password"
-  },
   "account": {
     "createAccount": "Create Account",
     "email": "Email",
@@ -373,8 +364,7 @@
     "displayName": "Display Name",
     "createYourAccount": "Create your account to get started",
     "signInToAccount": "Sign in to your account",
-    "useLocalAccount": "Use local account instead",
-    "useJellyfinAccount": "Use Jellyfin account instead"
+    "useLocalAccount": "Use local account instead"
   },
   "update": {
     "title": "Update Available",
