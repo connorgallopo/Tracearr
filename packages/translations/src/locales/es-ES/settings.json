@@ -21,7 +21,6 @@
     "primaryAuth": "Método de autenticación principal",
     "localAccount": "Cuenta Local",
     "plexAccount": "Cuenta de Plex",
-    "jellyfinAccount": "Cuenta de Jellyfin",
     "language": "Idioma",
     "languageDescription": "Elige tu idioma de visualización preferido.",
     "helpTranslate": "Ayuda a traducir Tracearr",
@@ -287,9 +286,6 @@
     "description": "Configurar quién puede acceder a Tracearr",
     "allowGuestAccess": "Permitir acceso al invitado",
     "allowGuestAccessDesc": "Cuando está desactivado, sólo el propietario del servidor puede iniciar sesión en Tracearr",
-    "primaryAuthMethod": "Método de autenticación principal",
-    "primaryAuthMethodDesc": "Elija qué método de autenticación se muestra por defecto en la página de inicio de sesión",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Nota: Cuando el acceso invitado está deshabilitado, sólo el propietario del servidor puede iniciar sesión. Todos los demás usuarios verán un mensaje \"Acceso denegado\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Seleccionar Servidor",
     "chooseServer": "Elige qué Plex Media Server quieres monitorizar"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Iniciar sesión con Jellyfin",
-    "username": "Usuario de Jellyfin",
-    "password": "Contraseña de Jellyfin"
-  },
   "account": {
     "createAccount": "Crear cuenta",
     "email": "Correo electrónico",
@@ -373,8 +364,7 @@
     "displayName": "Nombre visible",
     "createYourAccount": "Crea tu cuenta para empezar",
     "signInToAccount": "Inicia sesión en tu cuenta",
-    "useLocalAccount": "Usar cuenta local",
-    "useJellyfinAccount": "Usar cuenta Jellyfin"
+    "useLocalAccount": "Usar cuenta local"
   },
   "update": {
     "title": "Actualización disponible",
