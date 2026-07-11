@@ -21,7 +21,6 @@
     "primaryAuth": "Podstawowa metoda uwierzytelniania",
     "localAccount": "Konto lokalne",
     "plexAccount": "Konto Plex",
-    "jellyfinAccount": "Konto Jellyfin",
     "language": "Język",
     "languageDescription": "Wybierz preferowany język wyświetlania.",
     "helpTranslate": "Pomóż tłumaczyć Tracearr",
@@ -287,9 +286,6 @@
     "description": "Skonfiguruj kto ma dostęp do Tracearr",
     "allowGuestAccess": "Zezwalaj na dostęp gości",
     "allowGuestAccessDesc": "Po wyłączeniu, tylko właściciel serwera może zalogować się do Tracearr",
-    "primaryAuthMethod": "Podstawowa metoda uwierzytelniania",
-    "primaryAuthMethodDesc": "Wybierz metodę uwierzytelniania domyślnie wyświetlaną na stronie logowania",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Uwaga: Gdy dostęp do gości jest wyłączony, tylko właściciel serwera może się zalogować. Wszyscy inni użytkownicy zobaczą komunikat \"Odmowa dostępu\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Wybierz serwer",
     "chooseServer": "Wybierz, który Plex Media Serwer będzie monitorowany"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Zaloguj się przy użyciu Jellyfin",
-    "username": "Nazwa użytkownika Jellyfin",
-    "password": "Hasło Jellyfin"
-  },
   "account": {
     "createAccount": "Załóż konto",
     "email": "Adres e-mail",
@@ -373,8 +364,7 @@
     "displayName": "Wyświetlana nazwa",
     "createYourAccount": "Utwórz konto, aby rozpocząć",
     "signInToAccount": "Zaloguj się na swoje konto",
-    "useLocalAccount": "Zamiast tego użyj konta lokalnego",
-    "useJellyfinAccount": "Zamiast tego używaj konta Jellyfin"
+    "useLocalAccount": "Zamiast tego użyj konta lokalnego"
   },
   "update": {
     "title": "Aktualizacja dostępna",
