@@ -21,7 +21,6 @@
     "primaryAuth": "Основний метод автентифікації",
     "localAccount": "Локальний обліковий запис",
     "plexAccount": "Обліковий запис Plex",
-    "jellyfinAccount": "Обліковий запис Jellyfin",
     "language": "Мова",
     "languageDescription": "Виберіть бажану мову.",
     "helpTranslate": "Допоможіть перекласти Tracearr",
@@ -287,9 +286,6 @@
     "description": "Конфігури, які мають доступ до Tracearr",
     "allowGuestAccess": "Дозволити гостьовий доступ",
     "allowGuestAccessDesc": "Коли вимкнено, лише власник сервера зможе увійти на Tracearr",
-    "primaryAuthMethod": "Основний метод автентифікації",
-    "primaryAuthMethodDesc": "Виберіть, який спосіб автентифікації відображати за замовчуванням на сторінці авторизації",
-    "jellyfinAdmin": "Jellyfin Admin",
     "singleOwnerNote": "Зауважте: якщо відключено доступ до гості, тільки власник сервера зможе ввійти в систему. Всі інші користувачі бачать повідомлення \"Доступ заборонено\"."
   },
   "import": {
@@ -361,11 +357,6 @@
     "selectServer": "Оберіть сервер",
     "chooseServer": "Виберіть, який Plex медіасервер відстежувати"
   },
-  "jellyfin": {
-    "signInWithJellyfin": "Увійти через Jellyfin",
-    "username": "Ім'я користувача Jellyfin",
-    "password": "Пароль Jellyfin"
-  },
   "account": {
     "createAccount": "Створити обліковий запис",
     "email": "Електронна пошта",
@@ -373,8 +364,7 @@
     "displayName": "Відображуване ім'я",
     "createYourAccount": "Створіть обліковий запис, щоб розпочати",
     "signInToAccount": "Увійдіть у свій обліковий запис",
-    "useLocalAccount": "Використовувати локальний обліковий запис замість",
-    "useJellyfinAccount": "Замість цього використовувати обліковий запис Jellyfin"
+    "useLocalAccount": "Використовувати локальний обліковий запис замість"
   },
   "update": {
     "title": "Доступне оновлення",
