@@ -145,6 +145,13 @@
       "claimCodeValidated": {
         "title": "Підтверджено код запиту",
         "message": "Ви можете зараз продовжити установку"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
       }
     },
     "error": {
@@ -186,6 +193,8 @@
       "jobLoadFailed": "Не вдалося завантажити завдання технічного обслуговування",
       "invalidUrl": "Неправильна URL-адреса",
       "plexDirectUrl": "plex.direct URL - це естафетні адреси, які не можуть бути використані тут. Замість цього використовуйте пряму IP адресу або ім'я хосту.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
       "invalidClaimCode": {
         "title": "Невірний код взяття",
         "message": "Будь ласка, перевірте логи сервера"
