@@ -145,6 +145,13 @@
       "claimCodeValidated": {
         "title": "클레임 코드 확인됨",
         "message": "이제 설정을 계속 진행할 수 있습니다"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
       }
     },
     "error": {
@@ -186,6 +193,8 @@
       "jobLoadFailed": "유지관리 작업을 불러오지 못했습니다",
       "invalidUrl": "올바르지 않은 URL입니다",
       "plexDirectUrl": "plex.direct URL은 릴레이 주소라서 여기에서 사용할 수 없습니다. 직접 연결되는 IP 주소나 호스트 이름을 사용하세요.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
       "invalidClaimCode": {
         "title": "클레임 코드가 올바르지 않습니다",
         "message": "서버 로그를 확인하세요"
