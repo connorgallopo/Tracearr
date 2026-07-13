@@ -48,7 +48,7 @@
     "cmdk": "^1.1.1",
     "country-list": "^2.4.1",
     "date-fns": "^4.1.0",
-    "highcharts": "^12.6.0",
+    "highcharts": "^13.0.0",
     "highcharts-react-official": "^3.2.3",
     "i18next": "^26.0.8",
     "leaflet": "^1.9.4",
