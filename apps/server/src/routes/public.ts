@@ -161,6 +161,15 @@ function paginatedResponse<T>(
   };
 }
 
+function calculatePercentComplete(
+  progressMs: number | null,
+  totalDurationMs: number | null
+): number | null {
+  if (!progressMs || !totalDurationMs || totalDurationMs <= 0) return null;
+  const percent = Math.round((progressMs / totalDurationMs) * 100);
+  return Math.min(100, Math.max(0, percent));
+}
+
 export const publicRoutes: FastifyPluginAsync = async (app) => {
   /**
    * GET /docs - OpenAPI 3.0 specification
@@ -732,6 +741,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         sv.name as server_name,
         s.media_type,
         s.media_title,
+        s.rating_key,
         s.grandparent_title,
         s.season_number,
         s.episode_number,
@@ -762,6 +772,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         s.stream_audio_details,
         s.transcode_info,
         s.subtitle_info,
+        li.imdb_id,
+        li.tmdb_id,
+        li.tvdb_id,
+        li.grandparent_rating_key,
         su.user_id,
         su.username as server_username,
         su.thumb_url as user_thumb_url,
@@ -772,6 +786,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
       LEFT JOIN users u ON u.id = su.user_id
+      LEFT JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key
       ORDER BY gs.started_at DESC
     `);
 
@@ -791,6 +806,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         server_name: string;
         media_type: string;
         media_title: string;
+        rating_key: string | null;
         grandparent_title: string | null;
         season_number: number | null;
         episode_number: number | null;
@@ -821,6 +837,10 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         stream_audio_details: StreamAudioDetails | null;
         transcode_info: TranscodeInfo | null;
         subtitle_info: SubtitleInfo | null;
+        imdb_id: string | null;
+        tmdb_id: number | null;
+        tvdb_id: number | null;
+        grandparent_rating_key: string | null;
         user_id: string;
         server_username: string;
         user_thumb_url: string | null;
@@ -834,6 +854,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       state: row.state,
       mediaType: row.media_type,
       mediaTitle: row.media_title,
+      ratingKey: row.rating_key,
       showTitle: row.grandparent_title,
       seasonNumber: row.season_number,
       episodeNumber: row.episode_number,
@@ -849,8 +870,18 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       totalDurationMs: row.total_duration_ms,
       startedAt: row.started_at ? new Date(row.started_at).toISOString() : null,
       stoppedAt: row.stopped_at ? new Date(row.stopped_at).toISOString() : null,
+      watchedAt: row.stopped_at
+        ? new Date(row.stopped_at).toISOString()
+        : row.started_at
+          ? new Date(row.started_at).toISOString()
+          : null,
       watched: row.watched,
+      percentComplete: calculatePercentComplete(row.progress_ms, row.total_duration_ms),
       segmentCount: Number(row.segment_count),
+      grandparentRatingKey: row.grandparent_rating_key,
+      imdbId: row.imdb_id,
+      tmdbId: row.tmdb_id,
+      tvdbId: row.tvdb_id,
       device: row.device,
       player: row.player_name,
       product: row.product,

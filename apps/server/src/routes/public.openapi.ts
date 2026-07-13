@@ -89,13 +89,10 @@ const MediaInfo = z.object({
     .string()
     .nullable()
     .openapi({ description: 'Artist name (music tracks only)', example: 'Pink Floyd' }),
-  albumName: z
-    .string()
-    .nullable()
-    .openapi({
-      description: 'Album name (music tracks only)',
-      example: 'The Dark Side of the Moon',
-    }),
+  albumName: z.string().nullable().openapi({
+    description: 'Album name (music tracks only)',
+    example: 'The Dark Side of the Moon',
+  }),
   trackNumber: z
     .number()
     .int()
@@ -108,6 +105,31 @@ const MediaInfo = z.object({
     .openapi({ description: 'Disc number (music tracks only)', example: 1 }),
   thumbPath: z.string().nullable().openapi({ description: 'Poster path' }),
   posterUrl: z.string().nullable().openapi({ description: 'Proxied poster URL' }),
+});
+
+const PublicHistoryMediaIdentifiers = z.object({
+  ratingKey: z
+    .string()
+    .nullable()
+    .openapi({ description: 'Server-specific media identifier', example: '25314' }),
+  grandparentRatingKey: z
+    .string()
+    .nullable()
+    .openapi({ description: 'Server-specific show/artist identifier for child media' }),
+  imdbId: z
+    .string()
+    .nullable()
+    .openapi({ description: 'IMDB identifier from library sync', example: 'tt1375666' }),
+  tmdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({ description: 'TMDB identifier from library sync', example: 27205 }),
+  tvdbId: z
+    .number()
+    .int()
+    .nullable()
+    .openapi({ description: 'TVDB identifier from library sync', example: 12345 }),
 });
 
 const DeviceInfo = z.object({
@@ -737,6 +759,7 @@ const SessionHistory = z
     ...ServerInfo.shape,
     state: PlaybackStateEnum,
     ...MediaInfo.shape,
+    ...PublicHistoryMediaIdentifiers.shape,
     durationMs: z
       .number()
       .int()
@@ -746,7 +769,18 @@ const SessionHistory = z
     totalDurationMs: z.number().int().nullable().openapi({ description: 'Media length' }),
     startedAt: z.iso.datetime(),
     stoppedAt: z.iso.datetime().nullable(),
+    watchedAt: z.iso
+      .datetime()
+      .nullable()
+      .openapi({ description: 'Stopped time when available, otherwise started time' }),
     watched: z.boolean().openapi({ description: 'True if watched 85%+' }),
+    percentComplete: z
+      .number()
+      .int()
+      .min(0)
+      .max(100)
+      .nullable()
+      .openapi({ description: 'Playback progress percentage derived from progress and duration' }),
     segmentCount: z
       .number()
       .int()
