@@ -85,7 +85,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@babel/core": "7.29.6",
+    "@babel/core": "7.29.7",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/react": "19.2.17",
     "babel-plugin-module-resolver": "5.0.3",
