@@ -57,7 +57,7 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.20.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.0",
     "vitest": "^4.1.5"
   },
   "peerDependencies": {
