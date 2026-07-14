@@ -235,7 +235,7 @@ jobs:
     name: Build iOS
     needs: [prepare-versions]
     if: inputs.platform == 'ios' || inputs.platform == 'both'
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 90
     defaults:
       run:
