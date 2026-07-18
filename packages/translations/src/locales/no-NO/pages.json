@@ -314,6 +314,8 @@
     "inactiveFor": "Inaktiv i {{value}} {{unit}}",
     "inactivityNote": "Oppretter et varsel når en bruker ikke har sett noe for denne perioden. Sjekker kjør time.",
     "inactivityPeriod": "Periode innaktivitet",
+    "ipv6PrefixLength": "IPv6-prefikslengde",
+    "ipv6PrefixLengthDesc": "Prefiks for å gruppere IPv6-adresser på samme nettverk. Standard: /64 (typisk hjemme-LAN). Bruk /128 for å sammenligne fulle adresser.",
     "maxIps": "Maks IPer",
     "maxIpsDefault": "Maksimalt antall unike IP-adresser tillatt innenfor tidsvinduet. Standard: 5 IP-adresser i 24 timer",
     "maxSpeed": "Maks hastighet ({{unit}})",

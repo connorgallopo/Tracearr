@@ -314,6 +314,8 @@
     "inactiveFor": "Inactief voor {{value}} {{unit}}",
     "inactivityNote": "Waarschuwt als een gebruiker niets heeft gekeken gedurende deze periode. Controleert elk uur.",
     "inactivityPeriod": "Periode van inactiviteit",
+    "ipv6PrefixLength": "IPv6-prefixlengte",
+    "ipv6PrefixLengthDesc": "Prefix om IPv6-adressen op hetzelfde netwerk te groeperen. Standaard: /64 (typisch thuisnetwerk). Gebruik /128 om volledige adressen te vergelijken.",
     "maxIps": "Max. IP's",
     "maxIpsDefault": "Maximaal aantal unieke IP's toegestaan in periode. Standaard: 5 IP's in 24 uur",
     "maxSpeed": "Max. snelheid ({{unit}})",

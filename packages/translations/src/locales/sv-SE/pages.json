@@ -314,6 +314,8 @@
     "inactiveFor": "Inaktiv för {{value}} {{unit}}",
     "inactivityNote": "Skapar en varning när en användare inte har sett något för denna period. Kontrollerna körs varje timme.",
     "inactivityPeriod": "Inaktivitetsperiod",
+    "ipv6PrefixLength": "IPv6-prefixlängd",
+    "ipv6PrefixLengthDesc": "Prefix för att gruppera IPv6-adresser på samma nätverk. Standard: /64 (typiskt hemmanät). Använd /128 för att jämföra hela adresser.",
     "maxIps": "Max antal IP-adresser",
     "maxIpsDefault": "Maximalt antal unika IP-adresser som tillåts i tidsfönstret. Standard: 5 IP-adresser på 24 timmar",
     "maxSpeed": "Max hastighet ({{unit}})",

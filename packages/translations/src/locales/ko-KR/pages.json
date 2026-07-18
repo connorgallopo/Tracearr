@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "IPv6 접두사 길이",
+    "ipv6PrefixLengthDesc": "같은 네트워크의 IPv6 주소를 그룹화하는 데 사용하는 접두사입니다. 기본값: /64(일반적인 가정용 LAN). 전체 주소를 비교하려면 /128을 사용하세요.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",

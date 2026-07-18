@@ -314,6 +314,8 @@
     "inactiveFor": "Nieaktywny dla {{value}} {{unit}}",
     "inactivityNote": "Tworzy powiadomienie, gdy użytkownik nie obejrzał niczego w tym okresie. Sprawdza działanie godzinowe.",
     "inactivityPeriod": "Szczegóły nieaktywności",
+    "ipv6PrefixLength": "Długość prefiksu IPv6",
+    "ipv6PrefixLengthDesc": "Prefiks do grupowania adresów IPv6 w tej samej sieci. Domyślnie: /64 (typyczna sieć domowa). Użyj /128, aby porównywać pełne adresy.",
     "maxIps": "Maksymalna ilość IP",
     "maxIpsDefault": "Maksymalna ilość unikalnych adresów IP dozwolona w oknie czasu. Domyślnie: 5 adresów IP w ciągu 24 godzin",
     "maxSpeed": "Maksymalna prędkość ({{unit}})",

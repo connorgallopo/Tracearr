@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "אורך קידומת IPv6",
+    "ipv6PrefixLengthDesc": "קידומת לקיבוץ כתובות IPv6 באותה רשת. ברירת מחדל: /64 (רשת ביתית טיפוסית). השתמשו ב-/128 להשוואת כתובות מלאות.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",

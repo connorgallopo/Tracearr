@@ -314,6 +314,8 @@
     "inactiveFor": "Neaktivní pro {{value}} {{unit}}",
     "inactivityNote": "Vytvoří upozornění, když uživatel nic nesledoval po tuto dobu. Kontroluje běh každou hodinu.",
     "inactivityPeriod": "Doba nečinnosti",
+    "ipv6PrefixLength": "Délka IPv6 prefixu",
+    "ipv6PrefixLengthDesc": "Prefix pro seskupení IPv6 adres ve stejné síti. Výchozí: /64 (typická domácí LAN). Použijte /128 pro porovnání celých adres.",
     "maxIps": "Maximální počet IP",
     "maxIpsDefault": "Maximální počet jedinečných IP adres povolených v časovém okně. Výchozí: 5 IP adres za 24 hodin",
     "maxSpeed": "Maximální rychlost ({{unit}})",

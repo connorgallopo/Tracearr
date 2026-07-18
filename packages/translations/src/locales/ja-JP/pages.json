@@ -314,6 +314,8 @@
     "inactiveFor": "{{value}} {{unit}} の非アクティブ",
     "inactivityNote": "ユーザーがこの期間の何も見ていないときにアラートを作成します。チェックは時間単位で実行されます。",
     "inactivityPeriod": "非アクティブ期間",
+    "ipv6PrefixLength": "IPv6プレフィックス長",
+    "ipv6PrefixLengthDesc": "同一ネットワーク上のIPv6アドレスをグループ化するためのプレフィックス。デフォルト: /64（一般的な家庭用LAN）。完全なアドレスを比較する場合は /128 を使用します。",
     "maxIps": "最大IP",
     "maxIpsDefault": "時間枠内で許可される最大一意のIPアドレス。デフォルト：24時間以内に5つのIPアドレス。",
     "maxSpeed": "最大速度 ({{unit}})",

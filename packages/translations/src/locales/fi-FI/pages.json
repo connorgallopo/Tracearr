@@ -314,6 +314,8 @@
     "inactiveFor": "Passiivinen kohteelle {{value}} {{unit}}",
     "inactivityNote": "Luo hälytyksen, kun käyttäjä ei ole katsellut mitään tälle kaudelle. Tarkistukset toimivat tunnissa.",
     "inactivityPeriod": "Passiivisuuden Aikaväli",
+    "ipv6PrefixLength": "IPv6-etuliitteen pituus",
+    "ipv6PrefixLengthDesc": "Etuliite saman verkon IPv6-osoitteiden ryhmittelyyn. Oletus: /64 (tyypillinen kotiverkko). Käytä /128 vertaillaksesi täysiä osoitteita.",
     "maxIps": "IP-osoitteiden Maksimi",
     "maxIpsDefault": "Suurin sallittu yksilöllinen IP-osoite aikaikkunassa. Oletus: 5 IP-osoitetta 24 tunnin kuluttua",
     "maxSpeed": "Maksimi Nopeus ({{unit}})",

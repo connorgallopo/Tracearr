@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "IPv6 előtag hossza",
+    "ipv6PrefixLengthDesc": "Előtag az azonos hálózaton lévő IPv6 címek csoportosításához. Alapértelmezett: /64 (tipikus otthoni LAN). Teljes címekhez használjon /128-at.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",

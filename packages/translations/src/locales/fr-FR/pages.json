@@ -314,6 +314,8 @@
     "inactiveFor": "Inactif pendant {{value}} {{unit}}",
     "inactivityNote": "Crée une alerte lorsqu’un utilisateur n’a lancé aucune lecture durant cette période. Les vérifications sont effectuées toutes les heures.",
     "inactivityPeriod": "Période d'inactivité",
+    "ipv6PrefixLength": "Longueur du préfixe IPv6",
+    "ipv6PrefixLengthDesc": "Préfixe utilisé pour regrouper les adresses IPv6 du même réseau. Par défaut : /64 (LAN domestique typique). Utilisez /128 pour comparer les adresses complètes.",
     "maxIps": "IP maximum",
     "maxIpsDefault": "Nombre maximum d'adresses IP uniques autorisées dans la fenêtre de temps. Par défaut : 5 adresses IP en 24 heures",
     "maxSpeed": "Vitesse maximum ({{unit}})",

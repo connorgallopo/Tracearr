@@ -314,6 +314,8 @@
     "inactiveFor": "Inactiv pentru {{value}} {{unit}}",
     "inactivityNote": "Creează o alertă atunci când un utilizator nu a urmărit nimic pentru această perioadă. Verificările se execută oră.",
     "inactivityPeriod": "Perioada de inactivitate",
+    "ipv6PrefixLength": "Lungimea prefixului IPv6",
+    "ipv6PrefixLengthDesc": "Prefix folosit pentru a grupa adresele IPv6 din aceeași rețea. Implicit: /64 (LAN de acasă tipic). Folosiți /128 pentru a compara adresele complete.",
     "maxIps": "IP-uri maxime",
     "maxIpsDefault": "IP-urile unice maxime permise în fereastra de timp. Implicit: 5 IP-uri în 24 de ore",
     "maxSpeed": "Viteză maximă ({{unit}})",

@@ -314,6 +314,8 @@
     "inactiveFor": "在{{value}} {{unit}}内未活动",
     "inactivityNote": "当用户没有观看这段时间的任何时候创建警报。检查每小时运行。",
     "inactivityPeriod": "不活动期间",
+    "ipv6PrefixLength": "IPv6 前缀长度",
+    "ipv6PrefixLengthDesc": "用于将同一网络上的 IPv6 地址分组的前缀。默认：/64（典型家庭局域网）。使用 /128 可比较完整地址。",
     "maxIps": "最多IP地址",
     "maxIpsDefault": "时间窗口内允许的最大唯一IP地址。默认值：24小时内5 个 IP",
     "maxSpeed": "最大速度 ({{unit}})",

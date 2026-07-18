@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "Độ dài tiền tố IPv6",
+    "ipv6PrefixLengthDesc": "Tiền tố dùng để nhóm các địa chỉ IPv6 trên cùng một mạng. Mặc định: /64 (mạng LAN gia đình điển hình). Dùng /128 để so sánh địa chỉ đầy đủ.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",

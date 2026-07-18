@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "Longitud del prefix IPv6",
+    "ipv6PrefixLengthDesc": "Prefix usat per agrupar adreces IPv6 de la mateixa xarxa. Per defecte: /64 (LAN domèstica típica). Feu servir /128 per comparar adreces completes.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",

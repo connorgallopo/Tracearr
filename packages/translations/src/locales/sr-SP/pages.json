@@ -314,6 +314,8 @@
     "inactiveFor": "Inactive for {{value}} {{unit}}",
     "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
     "inactivityPeriod": "Inactivity Period",
+    "ipv6PrefixLength": "Dužina IPv6 prefiksa",
+    "ipv6PrefixLengthDesc": "Prefiks za grupisanje IPv6 adresa na istoj mreži. Podrazumevano: /64 (tipičan kućni LAN). Koristite /128 za poređenje punih adresa.",
     "maxIps": "Max IPs",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
     "maxSpeed": "Max Speed ({{unit}})",
