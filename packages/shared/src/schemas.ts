@@ -318,6 +318,7 @@ export const simultaneousLocationsParamsSchema = z.object({
 export const deviceVelocityParamsSchema = z.object({
   maxIps: z.number().int().positive().default(5),
   windowHours: z.number().int().positive().default(24),
+  ipv6PrefixLength: z.number().int().min(0).max(128).optional().default(64),
 });
 
 export const concurrentStreamsParamsSchema = z.object({
@@ -470,6 +471,7 @@ export const conditionSchema = z.object({
       window_hours: z.number().int().positive().optional(),
       exclude_same_device: z.boolean().optional(),
       exclude_same_ip: z.boolean().optional(),
+      ipv6_prefix_length: z.number().int().min(0).max(128).optional(),
       count_device_types: z.array(deviceTypeSchema).optional(),
     })
     .optional(),

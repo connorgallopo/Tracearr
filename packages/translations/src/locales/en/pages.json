@@ -306,6 +306,8 @@
     "maxIps": "Max IPs",
     "timeWindow": "Time Window (hours)",
     "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
+    "ipv6PrefixLength": "IPv6 Prefix Length",
+    "ipv6PrefixLengthDesc": "Prefix used to group IPv6 addresses on the same network. Default: /64 (typical home LAN). Use /128 to compare full addresses.",
     "groupByDevice": "Group by Device",
     "groupByDeviceDesc": "Count by device instead of IP. Prevents false positives from VPN, DHCP, or Virtual Channels.",
     "maxStreams": "Max Streams",

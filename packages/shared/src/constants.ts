@@ -20,6 +20,7 @@ export const RULE_DEFAULTS = {
     windowHours: 24,
     excludePrivateIps: false,
     groupByDevice: false,
+    ipv6PrefixLength: 64,
   },
   concurrent_streams: {
     maxStreams: 3,

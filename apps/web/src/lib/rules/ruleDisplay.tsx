@@ -191,6 +191,13 @@ export function formatCondition(
   if (condition.params?.exclude_same_ip === true) {
     paramIndicators.push('unique IPs');
   }
+  // ipv6_prefix_length defaults to 64; show when set to a non-default value
+  if (
+    typeof condition.params?.ipv6_prefix_length === 'number' &&
+    condition.params.ipv6_prefix_length !== 64
+  ) {
+    paramIndicators.push(`IPv6 /${condition.params.ipv6_prefix_length}`);
+  }
   // count_device_types defaults to all devices, so show when set
   if (condition.params?.count_device_types?.length) {
     const labels = condition.params.count_device_types.map(

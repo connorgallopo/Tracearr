@@ -138,7 +138,13 @@ function useRuleTypes() {
 const DEFAULT_PARAMS: Record<RuleType, RuleParams> = {
   impossible_travel: { maxSpeedKmh: 500, excludePrivateIps: false },
   simultaneous_locations: { minDistanceKm: 100, excludePrivateIps: false },
-  device_velocity: { maxIps: 5, windowHours: 24, excludePrivateIps: false, groupByDevice: false },
+  device_velocity: {
+    maxIps: 5,
+    windowHours: 24,
+    excludePrivateIps: false,
+    groupByDevice: false,
+    ipv6PrefixLength: 64,
+  },
   concurrent_streams: { maxStreams: 3, excludePrivateIps: false },
   geo_restriction: { mode: 'blocklist', countries: [], excludePrivateIps: false },
   account_inactivity: {
@@ -316,6 +322,7 @@ function RuleParamsForm({
     }
     case 'device_velocity': {
       const groupByDevice = (params as { groupByDevice?: boolean }).groupByDevice ?? false;
+      const ipv6PrefixLength = (params as { ipv6PrefixLength?: number }).ipv6PrefixLength ?? 64;
       return (
         <div className="space-y-4">
           <div className="space-y-2">
@@ -339,6 +346,19 @@ function RuleParamsForm({
                 onChange({ ...params, windowHours: value });
               }}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ipv6PrefixLength">{t('rules.ipv6PrefixLength')}</Label>
+            <NumericInput
+              id="ipv6PrefixLength"
+              min={0}
+              max={128}
+              value={ipv6PrefixLength}
+              onChange={(value) => {
+                onChange({ ...params, ipv6PrefixLength: value });
+              }}
+            />
+            <p className="text-muted-foreground text-xs">{t('rules.ipv6PrefixLengthDesc')}</p>
           </div>
           <p className="text-muted-foreground text-xs">{t('rules.maxIpsDefault')}</p>
           <div className="flex items-center justify-between rounded-lg border p-3">

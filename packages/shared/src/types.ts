@@ -484,6 +484,8 @@ export interface DeviceVelocityParams {
   excludePrivateIps?: boolean;
   /** When true, count by deviceId instead of IP - same device with different IPs counts as 1 */
   groupByDevice?: boolean;
+  /** IPv6 prefix for unique-IP comparison (default 64) */
+  ipv6PrefixLength?: number;
 }
 
 export interface ConcurrentStreamsParams {
@@ -649,6 +651,8 @@ export interface Condition {
     exclude_same_device?: boolean;
     // When true, only count sessions from different IPs.
     exclude_same_ip?: boolean;
+    // IPv6 prefix for unique-IP / household comparison (default 64)
+    ipv6_prefix_length?: number;
     // When set, only count sessions from these device types.
     // Useful for: concurrent_streams (ignore phones/tablets when detecting sharing)
     count_device_types?: DeviceType[];

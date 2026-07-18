@@ -481,6 +481,61 @@ describe('Session Behavior Evaluators', () => {
       expect(result3.actual).toBe(2);
     });
 
+    it('treats same-/64 IPv6 addresses as one household when exclude_same_ip is true', async () => {
+      const session1 = createMockSession({
+        id: 's1',
+        serverUserId: 'user-1',
+        deviceId: 'device-1',
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const session2 = createMockSession({
+        id: 's2',
+        serverUserId: 'user-1',
+        deviceId: 'device-2',
+        ipAddress: '2001:db8:abcd:7800:c969:3c04:cdd4:13bd',
+      });
+      const session3 = createMockSession({
+        id: 's3',
+        serverUserId: 'user-1',
+        deviceId: 'device-3',
+        ipAddress: '2001:db8:abcd:7801:aaaa:bbbb:cccc:dddd',
+      });
+
+      const ctx = createTestContext({
+        session: session1,
+        serverUser: createMockServerUser({ id: 'user-1' }),
+        activeSessions: [session1, session2, session3],
+      });
+
+      const evaluator = evaluatorRegistry.concurrent_streams;
+
+      // Default /64: session1+session2 are one household, session3 is different → 2
+      const resultDefault = await evaluator(
+        ctx,
+        createCondition({
+          field: 'concurrent_streams',
+          operator: 'eq',
+          value: 2,
+          params: { exclude_same_ip: true },
+        })
+      );
+      expect(resultDefault.matched).toBe(true);
+      expect(resultDefault.actual).toBe(2);
+
+      // /128 compares full addresses → all 3 count
+      const resultFull = await evaluator(
+        ctx,
+        createCondition({
+          field: 'concurrent_streams',
+          operator: 'eq',
+          value: 3,
+          params: { exclude_same_ip: true, ipv6_prefix_length: 128 },
+        })
+      );
+      expect(resultFull.matched).toBe(true);
+      expect(resultFull.actual).toBe(3);
+    });
+
     it('only counts sessions from listed device types when count_device_types is set', async () => {
       const tvSession = createMockSession({
         id: 's1',
@@ -1066,6 +1121,59 @@ describe('Session Behavior Evaluators', () => {
               field: 'unique_ips_in_window',
               operator: 'eq',
               value: 1,
+            })
+          )
+        )
+      ).toBe(true);
+    });
+
+    it('counts same-/64 IPv6 addresses as one unique IP by default', async () => {
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+      const session1 = createMockSession({
+        id: 's1',
+        serverUserId: 'user-1',
+        startedAt: now,
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const session2 = createMockSession({
+        id: 's2',
+        serverUserId: 'user-1',
+        startedAt: oneHourAgo,
+        ipAddress: '2001:db8:abcd:7800:c969:3c04:cdd4:13bd',
+      });
+
+      const ctx = createTestContext({
+        session: session1,
+        serverUser: createMockServerUser({ id: 'user-1' }),
+        recentSessions: [session1, session2],
+      });
+
+      const evaluator = evaluatorRegistry.unique_ips_in_window;
+      const result = await evaluator(
+        ctx,
+        createCondition({
+          field: 'unique_ips_in_window',
+          operator: 'eq',
+          value: 1,
+          params: { window_hours: 24 },
+        })
+      );
+      expect(result.matched).toBe(true);
+      // Details keep a representative original address, not the masked network key
+      expect(result.details?.ips).toEqual(['2001:db8:abcd:7800:58f:b385:9778:7ab6']);
+
+      // Configurable: /128 still sees two unique addresses
+      expect(
+        matched(
+          await evaluator(
+            ctx,
+            createCondition({
+              field: 'unique_ips_in_window',
+              operator: 'eq',
+              value: 2,
+              params: { window_hours: 24, ipv6_prefix_length: 128 },
             })
           )
         )
@@ -2236,6 +2344,69 @@ describe('Network/Location Evaluators', () => {
           evaluator(
             ctx,
             createCondition({ field: 'ip_in_range', operator: 'in', value: ['0.0.0.0/0'] })
+          )
+        )
+      ).toBe(false);
+    });
+
+    it('matches IPv6 addresses within a /64 CIDR allowlist range', () => {
+      const session = createMockSession({
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const ctx = createTestContext({ session });
+
+      const evaluator = evaluatorRegistry.ip_in_range;
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'eq',
+              value: '2001:db8:abcd:7800::/64',
+            })
+          )
+        )
+      ).toBe(true);
+    });
+
+    it('does not match IPv6 outside the configured CIDR', () => {
+      const session = createMockSession({
+        ipAddress: '2001:db8:abcd:7801:58f:b385:9778:7ab6',
+      });
+      const ctx = createTestContext({ session });
+
+      const evaluator = evaluatorRegistry.ip_in_range;
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'eq',
+              value: '2001:db8:abcd:7800::/64',
+            })
+          )
+        )
+      ).toBe(false);
+    });
+
+    it('neq is false when the IPv6 address is inside the CIDR', () => {
+      const session = createMockSession({
+        ipAddress: '2001:db8:abcd:7800:c969:3c04:cdd4:13bd',
+      });
+      const ctx = createTestContext({ session });
+
+      const evaluator = evaluatorRegistry.ip_in_range;
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'neq',
+              value: '2001:db8:abcd:7800::/64',
+            })
           )
         )
       ).toBe(false);

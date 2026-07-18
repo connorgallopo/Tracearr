@@ -104,6 +104,7 @@ export interface FieldDefinition {
   hasWindowHours?: boolean; // For velocity-type fields
   hasExcludeSameDevice?: boolean; // For cross-session comparison fields
   hasExcludeSameIp?: boolean; // For detecting different-IP concurrent streams
+  hasIpv6PrefixLength?: boolean; // For IPv6 household / unique-IP prefix
   hasCountDeviceTypes?: boolean; // For limiting which device types are counted
   hidden?: boolean; // Hide from UI (e.g., not yet implemented in backend)
 }
@@ -133,6 +134,7 @@ export const FIELD_DEFINITIONS: Record<ConditionField, FieldDefinition> = {
     step: 1,
     hasExcludeSameDevice: true,
     hasExcludeSameIp: true,
+    hasIpv6PrefixLength: true,
     hasCountDeviceTypes: true,
   },
   active_session_distance_km: {
@@ -170,6 +172,7 @@ export const FIELD_DEFINITIONS: Record<ConditionField, FieldDefinition> = {
     max: 100,
     step: 1,
     hasWindowHours: true,
+    hasIpv6PrefixLength: true,
   },
   unique_devices_in_window: {
     field: 'unique_devices_in_window',
@@ -353,11 +356,11 @@ export const FIELD_DEFINITIONS: Record<ConditionField, FieldDefinition> = {
   ip_in_range: {
     field: 'ip_in_range',
     label: 'IP Range',
-    description: 'IP address in CIDR range',
+    description: 'IP address in CIDR range (IPv4 or IPv6)',
     category: 'network_location',
     operators: EQUALITY_OPERATORS,
     valueType: 'cidr',
-    placeholder: 'e.g., 192.168.1.0/24',
+    placeholder: 'e.g., 192.168.1.0/24 or 2001:db8:abcd:7800::/64',
   },
 
   // Scope

@@ -64,10 +64,15 @@ export function ConditionRow({
       window_hours?: number;
       exclude_same_device?: boolean;
       exclude_same_ip?: boolean;
+      ipv6_prefix_length?: number;
     } = {};
     if (newFieldDef.hasWindowHours) params.window_hours = 24;
     if (newFieldDef.hasExcludeSameDevice) params.exclude_same_device = true;
     if (newFieldDef.hasExcludeSameIp) params.exclude_same_ip = false; // Default to false (same household OK)
+    // Always default for unique-IP fields; for concurrent streams show when Unique IPs is on
+    if (newFieldDef.hasIpv6PrefixLength && !newFieldDef.hasExcludeSameIp) {
+      params.ipv6_prefix_length = 64;
+    }
 
     onChange({
       field: newField,
@@ -122,9 +127,20 @@ export function ConditionRow({
   };
 
   const handleExcludeSameIpChange = (exclude: boolean) => {
+    const nextParams = { ...condition.params, exclude_same_ip: exclude };
+    if (exclude && fieldDef.hasIpv6PrefixLength && nextParams.ipv6_prefix_length == null) {
+      nextParams.ipv6_prefix_length = 64;
+    }
     onChange({
       ...condition,
-      params: { ...condition.params, exclude_same_ip: exclude },
+      params: nextParams,
+    });
+  };
+
+  const handleIpv6PrefixLengthChange = (prefix: number) => {
+    onChange({
+      ...condition,
+      params: { ...condition.params, ipv6_prefix_length: prefix },
     });
   };
 
@@ -136,6 +152,10 @@ export function ConditionRow({
         types.length > 0 ? { ...rest, count_device_types: types as DeviceType[] } : { ...rest },
     });
   };
+
+  const showIpv6Prefix =
+    fieldDef.hasIpv6PrefixLength &&
+    (!fieldDef.hasExcludeSameIp || condition.params?.exclude_same_ip === true);
 
   return (
     <div className="flex flex-wrap items-start gap-2">
@@ -237,6 +257,28 @@ export function ConditionRow({
           <TooltipContent side="top" className="max-w-[240px]">
             When checked, only counts sessions from different IP addresses. Use this to detect
             account sharing while allowing same-household usage.
+          </TooltipContent>
+        </Tooltip>
+      )}
+
+      {/* IPv6 household prefix for unique-IP comparisons */}
+      {showIpv6Prefix && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground text-sm whitespace-nowrap">IPv6 /</span>
+              <NumericInput
+                className="w-16"
+                min={0}
+                max={128}
+                value={condition.params?.ipv6_prefix_length ?? 64}
+                onChange={handleIpv6PrefixLengthChange}
+              />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[240px]">
+            IPv6 prefix for grouping same-network devices. Default /64; /128 compares full
+            addresses.
           </TooltipContent>
         </Tooltip>
       )}

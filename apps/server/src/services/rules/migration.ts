@@ -141,6 +141,9 @@ function convertDeviceVelocity(params: DeviceVelocityParams): RuleConditions {
           value: params.maxIps,
           params: {
             window_hours: params.windowHours,
+            ...(params.ipv6PrefixLength != null
+              ? { ipv6_prefix_length: params.ipv6PrefixLength }
+              : {}),
           },
         },
       ],

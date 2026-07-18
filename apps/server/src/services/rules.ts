@@ -17,6 +17,7 @@ import type {
 } from '@tracearr/shared';
 import { GEOIP_CONFIG, TIME_MS } from '@tracearr/shared';
 import { geoipService } from './geoip.js';
+import { DEFAULT_IPV6_HOUSEHOLD_PREFIX, toIpNetworkKey } from '../utils/ip.js';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
 import { EXCLUDED_MEDIA_TYPES_SET } from '../constants/index.js';
@@ -330,7 +331,12 @@ export class RuleEngine {
     }
 
     let uniqueSources: Set<string>;
-    const uniqueIps = new Set<string>();
+    const ipsByNetwork = new Map<string, string>();
+    const ipv6Prefix = params.ipv6PrefixLength ?? DEFAULT_IPV6_HOUSEHOLD_PREFIX;
+    const addIp = (ip: string) => {
+      const key = toIpNetworkKey(ip, ipv6Prefix);
+      if (!ipsByNetwork.has(key)) ipsByNetwork.set(key, ip);
+    };
 
     if (params.groupByDevice) {
       // Group by deviceId - each device counts as 1 source regardless of IP changes
@@ -341,18 +347,19 @@ export class RuleEngine {
           continue;
         }
 
-        const sourceKey = s.deviceId ?? `ip:${s.ipAddress}`;
+        const networkKey = toIpNetworkKey(s.ipAddress, ipv6Prefix);
+        const sourceKey = s.deviceId ?? `ip:${networkKey}`;
         uniqueSources.add(sourceKey);
-        uniqueIps.add(s.ipAddress);
+        addIp(s.ipAddress);
       }
     } else {
       const allIps = allSessions.map((s) => s.ipAddress);
       const filteredIps = this.filterPrivateIps(allIps, params.excludePrivateIps);
 
       for (const ip of filteredIps) {
-        uniqueIps.add(ip);
+        addIp(ip);
       }
-      uniqueSources = uniqueIps;
+      uniqueSources = new Set(ipsByNetwork.keys());
     }
 
     if (uniqueSources.size > params.maxIps) {
@@ -363,7 +370,7 @@ export class RuleEngine {
           uniqueIpCount: uniqueSources.size,
           maxAllowedIps: params.maxIps,
           windowHours: params.windowHours,
-          ips: Array.from(uniqueIps),
+          ips: Array.from(ipsByNetwork.values()),
           ...(params.groupByDevice && { groupedByDevice: true }),
         },
       };

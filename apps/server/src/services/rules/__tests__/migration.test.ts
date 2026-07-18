@@ -297,6 +297,25 @@ describe('Rule Migration', () => {
         expect(result?.conditions.groups[0]?.conditions[0]?.params?.window_hours).toBe(48);
       });
 
+      it('preserves ipv6PrefixLength as ipv6_prefix_length', () => {
+        const legacyRule: LegacyRule = {
+          id: 'rule-1',
+          name: 'Max 5 IPs',
+          type: 'device_velocity',
+          params: { maxIps: 5, windowHours: 24, ipv6PrefixLength: 48 },
+          serverUserId: null,
+          serverId: null,
+          isActive: true,
+        };
+
+        const result = convertLegacyRule(legacyRule);
+
+        expect(result?.conditions.groups[0]?.conditions[0]?.params).toEqual({
+          window_hours: 24,
+          ipv6_prefix_length: 48,
+        });
+      });
+
       it('adds is_local_network as separate AND group when excludePrivateIps is true', () => {
         const legacyRule: LegacyRule = {
           id: 'rule-1',
