@@ -7,6 +7,7 @@ import type {
   TranscodingConditionValue,
   VideoResolution,
 } from '@tracearr/shared';
+import { isIpInCidr, toNetworkKey } from '../../../utils/ip.js';
 import { normalizeResolution } from '../../../utils/resolutionNormalizer.js';
 import { geoipService } from '../../geoip.js';
 import { compare } from '../comparisons.js';
@@ -218,10 +219,12 @@ const evaluateConcurrentStreams: ConditionEvaluator = (
     );
   }
 
-  // When exclude_same_ip is true, only count triggering session + sessions from different IPs.
+  // When exclude_same_ip is true, only count triggering session + sessions from different IPs
+  // (IPv6 compared by /64 network key).
   if (excludeSameIp) {
+    const sessionKey = toNetworkKey(session.ipAddress);
     userActiveSessions = userActiveSessions.filter(
-      (s) => s.id === session.id || s.ipAddress !== session.ipAddress
+      (s) => s.id === session.id || toNetworkKey(s.ipAddress) !== sessionKey
     );
   }
 
@@ -391,18 +394,21 @@ const evaluateUniqueIpsInWindow: ConditionEvaluator = (
     (s) => isIdentitySession(s) && new Date(s.startedAt) >= cutoff
   );
 
-  // Include the current session
-  const allIps = new Set<string>();
-  allIps.add(session.ipAddress);
-
+  // Include the current session. Count by network key; keep original IPs for details.
+  const ipsByNetwork = new Map<string, string>();
+  const addIp = (ip: string) => {
+    const key = toNetworkKey(ip);
+    if (!ipsByNetwork.has(key)) ipsByNetwork.set(key, ip);
+  };
+  addIp(session.ipAddress);
   for (const s of sessionsInWindow) {
-    allIps.add(s.ipAddress);
+    addIp(s.ipAddress);
   }
 
   return {
-    matched: compare(allIps.size, condition.operator, condition.value),
-    actual: allIps.size,
-    details: { ips: Array.from(allIps), windowHours },
+    matched: compare(ipsByNetwork.size, condition.operator, condition.value),
+    actual: ipsByNetwork.size,
+    details: { ips: Array.from(ipsByNetwork.values()), windowHours },
   };
 };
 
@@ -799,45 +805,6 @@ const evaluateCountry: ConditionEvaluator = (
     actual: country,
   };
 };
-
-/**
- * Parse an IPv4 address into a 32-bit number.
- */
-function ipv4ToNumber(ip: string): number | null {
-  const parts = ip.split('.');
-  if (parts.length !== 4) return null;
-
-  let result = 0;
-  for (const part of parts) {
-    const num = parseInt(part, 10);
-    if (isNaN(num) || num < 0 || num > 255) return null;
-    result = (result << 8) + num;
-  }
-  return result >>> 0; // Convert to unsigned 32-bit
-}
-
-/**
- * Check if an IP address is within a CIDR range.
- * Supports IPv4 only. Returns false for IPv6 or invalid input.
- */
-function isIpInCidr(ip: string, cidr: string): boolean {
-  const ipNum = ipv4ToNumber(ip);
-  if (ipNum === null) return false;
-
-  const [rangeIp, prefixStr] = cidr.split('/');
-  if (!rangeIp || !prefixStr) return false;
-
-  const rangeNum = ipv4ToNumber(rangeIp);
-  if (rangeNum === null) return false;
-
-  const prefix = parseInt(prefixStr, 10);
-  if (isNaN(prefix) || prefix < 0 || prefix > 32) return false;
-
-  // Create mask: for prefix=24, mask = 0xFFFFFF00
-  const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
-
-  return (ipNum & mask) === (rangeNum & mask);
-}
 
 const evaluateIpInRange: ConditionEvaluator = (
   context: EvaluationContext,

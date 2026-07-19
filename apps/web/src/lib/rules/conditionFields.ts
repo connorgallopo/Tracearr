@@ -353,11 +353,11 @@ export const FIELD_DEFINITIONS: Record<ConditionField, FieldDefinition> = {
   ip_in_range: {
     field: 'ip_in_range',
     label: 'IP Range',
-    description: 'IP address in CIDR range',
+    description: 'IP address in CIDR range (IPv4 or IPv6)',
     category: 'network_location',
     operators: EQUALITY_OPERATORS,
     valueType: 'cidr',
-    placeholder: 'e.g., 192.168.1.0/24',
+    placeholder: 'e.g., 192.168.1.0/24 or 2001:db8:abcd:7800::/64',
   },
 
   // Scope

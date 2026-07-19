@@ -481,6 +481,48 @@ describe('Session Behavior Evaluators', () => {
       expect(result3.actual).toBe(2);
     });
 
+    it('treats IPv6 addresses in the same /64 as one IP when exclude_same_ip is true', async () => {
+      const session1 = createMockSession({
+        id: 's1',
+        serverUserId: 'user-1',
+        deviceId: 'device-1',
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const session2 = createMockSession({
+        id: 's2',
+        serverUserId: 'user-1',
+        deviceId: 'device-2',
+        ipAddress: '2001:db8:abcd:7800:c969:3c04:cdd4:13bd', // Same /64 as session1
+      });
+      const session3 = createMockSession({
+        id: 's3',
+        serverUserId: 'user-1',
+        deviceId: 'device-3',
+        ipAddress: '2001:db8:abcd:7801:aaaa:bbbb:cccc:dddd', // Different /64
+      });
+
+      const ctx = createTestContext({
+        session: session1,
+        serverUser: createMockServerUser({ id: 'user-1' }),
+        activeSessions: [session1, session2, session3],
+      });
+
+      const evaluator = evaluatorRegistry.concurrent_streams;
+
+      // With exclude_same_ip: session1+session2 count as one IP, session3 is different → 2
+      const result = await evaluator(
+        ctx,
+        createCondition({
+          field: 'concurrent_streams',
+          operator: 'eq',
+          value: 2,
+          params: { exclude_same_ip: true },
+        })
+      );
+      expect(result.matched).toBe(true);
+      expect(result.actual).toBe(2);
+    });
+
     it('only counts sessions from listed device types when count_device_types is set', async () => {
       const tvSession = createMockSession({
         id: 's1',
@@ -1066,6 +1108,45 @@ describe('Session Behavior Evaluators', () => {
               field: 'unique_ips_in_window',
               operator: 'eq',
               value: 1,
+            })
+          )
+        )
+      ).toBe(true);
+    });
+
+    it('counts IPv6 addresses in the same /64 as one unique IP', () => {
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+      const session1 = createMockSession({
+        id: 's1',
+        serverUserId: 'user-1',
+        startedAt: now,
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const session2 = createMockSession({
+        id: 's2',
+        serverUserId: 'user-1',
+        startedAt: oneHourAgo,
+        ipAddress: '2001:db8:abcd:7800:c969:3c04:cdd4:13bd',
+      });
+
+      const ctx = createTestContext({
+        session: session1,
+        serverUser: createMockServerUser({ id: 'user-1' }),
+        recentSessions: [session1, session2],
+      });
+
+      const evaluator = evaluatorRegistry.unique_ips_in_window;
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'unique_ips_in_window',
+              operator: 'eq',
+              value: 1,
+              params: { window_hours: 24 },
             })
           )
         )
@@ -2236,6 +2317,51 @@ describe('Network/Location Evaluators', () => {
           evaluator(
             ctx,
             createCondition({ field: 'ip_in_range', operator: 'in', value: ['0.0.0.0/0'] })
+          )
+        )
+      ).toBe(false);
+    });
+
+    it('works with IPv6 CIDR ranges', () => {
+      const session = createMockSession({
+        ipAddress: '2001:db8:abcd:7800:58f:b385:9778:7ab6',
+      });
+      const ctx = createTestContext({ session });
+
+      const evaluator = evaluatorRegistry.ip_in_range;
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'eq',
+              value: '2001:db8:abcd:7800::/64',
+            })
+          )
+        )
+      ).toBe(true);
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'eq',
+              value: '2001:db8:abcd:7801::/64',
+            })
+          )
+        )
+      ).toBe(false);
+      expect(
+        matched(
+          evaluator(
+            ctx,
+            createCondition({
+              field: 'ip_in_range',
+              operator: 'neq',
+              value: '2001:db8:abcd:7800::/64',
+            })
           )
         )
       ).toBe(false);
