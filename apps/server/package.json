@@ -44,7 +44,7 @@
     "@fastify/multipart": "^10.1.0",
     "@fastify/rate-limit": "^11.0.0",
     "@fastify/sensible": "^6.0.4",
-    "@fastify/static": "^10.0.0",
+    "@fastify/static": "^10.1.2",
     "@fastify/swagger": "^9.8.1",
     "@fastify/swagger-ui": "^6.0.0",
     "@fastify/websocket": "^11.3.0",
