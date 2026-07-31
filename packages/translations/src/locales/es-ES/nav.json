@@ -18,5 +18,11 @@
   "devices": "Dispositivos",
   "bandwidth": "Ancho de banda",
   "jobs": "Tareas",
-  "accessControl": "Control de acceso"
+  "accessControl": "Control de acceso",
+  "media": "Multimedia",
+  "mediaBrowse": "Explorar",
+  "mediaGenres": "Géneros",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
