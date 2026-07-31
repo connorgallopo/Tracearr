@@ -18,5 +18,11 @@
   "devices": "Dispozitive",
   "bandwidth": "Lățimea benzii",
   "jobs": "Joburi",
-  "accessControl": "Control Acces"
+  "accessControl": "Control Acces",
+  "media": "Media",
+  "mediaBrowse": "Răsfoiește",
+  "mediaGenres": "Genuri",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
