@@ -18,5 +18,11 @@
   "devices": "设备",
   "bandwidth": "带宽",
   "jobs": "任务",
-  "accessControl": "访问控制"
+  "accessControl": "访问控制",
+  "media": "媒体",
+  "mediaBrowse": "浏览",
+  "mediaGenres": "类型",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
