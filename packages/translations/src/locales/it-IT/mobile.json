@@ -159,5 +159,15 @@
     "serversSelected": "{{selected}} of {{total}} servers selected"
   },
   "reconnected": "Reconnected",
-  "actionsExecuted": "Actions Executed"
+  "actionsExecuted": "Actions Executed",
+  "serverScope": {
+    "single": "Showing {{name}} only"
+  },
+  "a11y": {
+    "selectServer": "Select server",
+    "alerts": "Alerts",
+    "alertsCount": "Alerts, {{count}} unread",
+    "settings": "Settings",
+    "trustScore": "Trust score {{score}}"
+  }
 }
