@@ -18,5 +18,11 @@
   "devices": "Устройства",
   "bandwidth": "Трафик",
   "jobs": "Задания",
-  "accessControl": "Контроль доступа"
+  "accessControl": "Контроль доступа",
+  "media": "Медиа",
+  "mediaBrowse": "Обзор",
+  "mediaGenres": "Жанры",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
