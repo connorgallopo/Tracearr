@@ -18,5 +18,11 @@
   "devices": "Пристрої",
   "bandwidth": "Пропускна здатність",
   "jobs": "Завдання",
-  "accessControl": "Контроль доступу"
+  "accessControl": "Контроль доступу",
+  "media": "Медіа",
+  "mediaBrowse": "Огляд",
+  "mediaGenres": "Жанри",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
