@@ -18,5 +18,11 @@
   "devices": "Enheter",
   "bandwidth": "Båndbredde",
   "jobs": "Jobber",
-  "accessControl": "Kontroll av tilgang"
+  "accessControl": "Kontroll av tilgang",
+  "media": "Medier",
+  "mediaBrowse": "Bla gjennom",
+  "mediaGenres": "Sjangre",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
