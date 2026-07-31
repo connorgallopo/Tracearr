@@ -18,5 +18,11 @@
   "devices": "Enheter",
   "bandwidth": "Bandbredd",
   "jobs": "Jobb",
-  "accessControl": "Åtkomstkontroll"
+  "accessControl": "Åtkomstkontroll",
+  "media": "Media",
+  "mediaBrowse": "Bläddra",
+  "mediaGenres": "Genrer",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
