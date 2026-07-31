@@ -18,5 +18,11 @@
   "devices": "Dispositius",
   "bandwidth": "Amplada de banda",
   "jobs": "Tasques",
-  "accessControl": "Control d'accés"
+  "accessControl": "Control d'accés",
+  "media": "Mèdia",
+  "mediaBrowse": "Explora",
+  "mediaGenres": "Gèneres",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
