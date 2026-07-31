@@ -18,5 +18,11 @@
   "devices": "Appareils",
   "bandwidth": "Bande passante",
   "jobs": "Tâches",
-  "accessControl": "Contrôle d'accès"
+  "accessControl": "Contrôle d'accès",
+  "media": "Médias",
+  "mediaBrowse": "Parcourir",
+  "mediaGenres": "Genres",
+  "session": "Session",
+  "user": "User",
+  "violation": "Violation"
 }
