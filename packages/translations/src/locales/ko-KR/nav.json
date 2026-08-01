@@ -19,10 +19,10 @@
   "bandwidth": "Bandwidth",
   "jobs": "Jobs",
   "accessControl": "Access Control",
-  "media": "Media",
-  "mediaBrowse": "Browse",
-  "mediaGenres": "Genres",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation"
+  "media": "미디어",
+  "mediaBrowse": "브라우저",
+  "mediaGenres": "장르",
+  "session": "세션",
+  "user": "사용자",
+  "violation": "위반사항"
 }
