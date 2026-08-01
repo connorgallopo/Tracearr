@@ -10,10 +10,10 @@
     "enterManually": "Entrez l'URL et le jeton manuellement",
     "cameraPermissionRequired": "L'accès à la caméra est nécessaire pour scanner les codes QR",
     "scanQrInstructions": "Ouvrez Tableau de bord → Application mobile dans votre tableau de bord Tracearr et scannez le code QR",
-    "urlPlaceholder": "https://tracearr.example.com",
+    "urlPlaceholder": "https://tracearr.exemple.com",
     "tokenPlaceholder": "trr_mob_...",
-    "missingToken": "Missing Token",
-    "pleaseEnterToken": "Please enter your access token"
+    "missingToken": "Jeton d'accès manquant",
+    "pleaseEnterToken": "Veuillez entrer votre jeton d'accès"
   },
   "errors": {
     "missingFields": "Champs manquants",
