@@ -153,21 +153,21 @@
     "days": "jours",
     "totalSessions": "Nombre total de sessions",
     "sessions": "Sessions",
-    "apiKey": "Clé API",
+    "apiKey": "Clé d'API",
     "rank": "Rang",
     "data": "Donnée",
     "size": "Taille",
     "items": "Éléments",
     "name": "Nom",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
+    "product": "Produit",
+    "deviceId": "ID de l'appareil",
+    "created": "Créé",
     "total": "total",
-    "mediaLength": "Media length",
+    "mediaLength": "Longueur du média",
     "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "streamDetails": "Détails de la diffusion",
+    "transcodeReason": "Raison du transcodage",
+    "loadMore": "Charger plus"
   },
   "search": {
     "placeholder": "Rechercher...",
@@ -251,12 +251,12 @@
     "library_other": "{{count}} bibliothèques",
     "error_one": "{{count}} erreur",
     "error_other": "{{count}} erreurs",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "{{count}} alerte",
+    "alert_other": "{{count}} alertes",
+    "location_one": "{{count}} emplacement",
+    "location_other": "{{count}} emplacements",
+    "device_one": "{{count}} appareil",
+    "device_other": "{{count}} appareils"
   },
   "messages": {
     "noChangesDetected": "Aucun changement détecté"
@@ -293,7 +293,7 @@
     "noData": "Aucune donnée disponible",
     "noItems": "Aucun élément",
     "noDeviceData": "Aucune donnée de l'appareil disponible",
-    "noLocationData": "Aucune donnée de localisation disponible",
+    "noLocationData": "Aucune donnée d'emplacement disponible",
     "noJobHistory": "Il n'y a pas encore d'historique de tâche",
     "noSessionsFound": "Aucune session trouvée",
     "noUserData": "Aucune donnée utilisateur disponible"
