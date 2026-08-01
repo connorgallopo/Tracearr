@@ -161,13 +161,13 @@
   "reconnected": "Reconnected",
   "actionsExecuted": "Actions Executed",
   "serverScope": {
-    "single": "Showing {{name}} only"
+    "single": "Alleen {{name}} weergeven"
   },
   "a11y": {
-    "selectServer": "Select server",
-    "alerts": "Alerts",
-    "alertsCount": "Alerts, {{count}} unread",
-    "settings": "Settings",
+    "selectServer": "Selecteer server",
+    "alerts": "Waarschuwingen",
+    "alertsCount": "Waarschuwingen, {{count}} ongelezen",
+    "settings": "Instellingen",
     "trustScore": "Trust score {{score}}"
   }
 }
