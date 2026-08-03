@@ -140,7 +140,8 @@
       "thisPeriod": "este período",
       "thisWeek": "esta semana",
       "thisMonth": "este mes",
-      "thisYear": "este año"
+      "thisYear": "este año",
+      "serversNeedSync": "These servers need to sync:"
     },
     "quality": {
       "title": "Calidad",
@@ -176,7 +177,9 @@
       "of": "de",
       "days": "días",
       "failedToLoad": "Error al cargar los datos de almacenamiento",
-      "failedToLoadDesc": "No se pudo obtener datos de almacenamiento. Por favor, inténtelo de nuevo."
+      "failedToLoadDesc": "No se pudo obtener datos de almacenamiento. Por favor, inténtelo de nuevo.",
+      "duplicatesTitle": "Duplicates",
+      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions"
     },
     "watch": {
       "title": "Ver análisis",
@@ -199,6 +202,62 @@
       "noDataDesc": "Ver análisis aparecerán aquí una vez que el contenido haya sido reproducido. Vuelva a comprobar después de alguna actividad de visualización.",
       "failedToLoad": "Error al cargar análisis de reloj",
       "failedToLoadDesc": "No se pudieron obtener los datos de seguimiento."
+    },
+    "emptyState": {
+      "checkingStatus": "Comprobando el estado de la biblioteca...",
+      "backfillAvailable": {
+        "title": "Datos históricos disponibles",
+        "bodyWithDays": "Tu biblioteca tiene {{days}} días de historial. Genera instantáneas para ver tendencias en los gráficos.",
+        "bodyGeneric": "Genera instantáneas históricas para ver las tendencias de la biblioteca a lo largo del tiempo.",
+        "syncRunningTitle": "Sincronización de la biblioteca en curso...",
+        "syncRunningBody": "La generación de datos históricos comenzará automáticamente cuando termine la sincronización."
+      },
+      "generateHistory": "Generar historial",
+      "starting": "Iniciando...",
+      "syncInProgress": {
+        "title": "Sincronización de la biblioteca en curso...",
+        "body": "Las estadísticas de la biblioteca aparecerán cuando termine la sincronización. Esto puede tardar unos minutos según el tamaño de la biblioteca."
+      },
+      "notSynced": {
+        "title": "Biblioteca aún no sincronizada",
+        "body": "Las estadísticas de la biblioteca aparecerán aquí una vez sincronizada. Esto suele ocurrir automáticamente cada hora."
+      },
+      "noMedia": {
+        "title": "Todavía no hay películas ni series",
+        "body": "Esta biblioteca está sincronizada pero aún no tiene películas ni series."
+      },
+      "syncNow": "Sincronizar ahora",
+      "syncing": "Sincronizando...",
+      "notSyncedShort": "Aún no sincronizada",
+      "backfillRunning": {
+        "title": "Generando datos históricos...",
+        "fallbackBody": "Creando instantáneas a partir del historial de la biblioteca. Esto puede tardar unos minutos.",
+        "progress": "{{processed}} de {{total}} bibliotecas",
+        "snapshotsSuffix": " ({{count}} instantáneas)"
+      },
+      "multiServer": {
+        "title": "Algunas bibliotecas necesitan atención",
+        "body": "Sincroniza los servidores a continuación para ver las estadísticas combinadas de la biblioteca.",
+        "needsBackfillIntro": "Estos servidores están sincronizados pero aún no tienen datos históricos:"
+      },
+      "toast": {
+        "noServerSelected": "Ningún servidor seleccionado",
+        "syncStartedTitle": "Sincronización de la biblioteca iniciada",
+        "syncStartedDesc": "Esto puede tardar unos minutos según el tamaño de la biblioteca.",
+        "syncFailedTitle": "No se pudo iniciar la sincronización",
+        "genericRetry": "Inténtalo de nuevo.",
+        "backfillStartedTitle": "Generación de historial iniciada",
+        "backfillStartedDesc": "Se están generando las instantáneas históricas.",
+        "backfillFailedTitle": "No se pudo iniciar la generación de historial",
+        "backfillCompleteTitle": "Generación de historial completada",
+        "backfillErrorTitle": "Error al generar el historial"
+      }
+    },
+    "versionsBackfill": {
+      "banner": "File version data is still being collected for this server. Run a library sync to finish.",
+      "action": "Sync now",
+      "syncFailed": "Sync failed to start on {{count}} server(s). Check your permissions and server status.",
+      "syncStarted": "Library sync started."
     }
   },
   "activity": {
@@ -300,6 +359,7 @@
     "accountInactivity": "Inactividad de la cuenta",
     "accountInactivityDesc": "Recibir notificaciones cuando los usuarios no hayan visto nada durante un período especificado",
     "maxSpeed": "Velocidad Máxima ({{unit}})",
+    "recordsOnly": "Records violations only",
     "maxSpeedDefault": "Velocidad de viaje máxima realista. Predeterminada: {{value}} {{unit}} (velocidad de avión)",
     "minDistance": "Distancia mínima ({{unit}})",
     "minDistanceDefault": "Distancia mínima entre ubicaciones para activar. Predeterminada: {{value}} {{unit}}",
@@ -457,7 +517,13 @@
       "rebuilding_aggregates": "Reconstruyendo agregados",
       "restarting": "Reiniciando servicios",
       "complete": "Restauración completada"
-    }
+    },
+    "initStep": {
+      "migrations": "Applying database migrations",
+      "timescale": "Preparing TimescaleDB (this can take a while after an upgrade)",
+      "services": "Starting services"
+    },
+    "doNotRestart": "Do not restart or stop the server while this runs. Interrupting it can leave the database half-upgraded."
   },
   "map": {
     "allUsers": "Todos los usuarios",
@@ -524,7 +590,11 @@
   "apiDocs": {
     "backToSettings": "Volver a Ajustes",
     "apiKeyAutoLoaded": "Clave de API autocargada",
-    "noApiKey": "Ninguna clave API generada - cree una en Ajustes para probar los extremos"
+    "noApiKey": "Ninguna clave API generada - cree una en Ajustes para probar los extremos",
+    "versionSwitcherLabel": "API documentation version",
+    "versionV1": "API v1",
+    "versionV2": "API v2",
+    "specLoadError": "Failed to load the API specification. Check your API key and try again."
   },
   "debug": {
     "title": "Herramientas de depuración",
@@ -572,5 +642,300 @@
     "snapshots": "snapshot(s)",
     "of": "de",
     "logExplorerUnavailable": "El explorador de registros sólo está disponible en entornos Docker"
+  },
+  "media": {
+    "landing": {
+      "title": "Multimedia",
+      "lens": {
+        "label": "Viendo como",
+        "allUsers": "Todos los usuarios"
+      },
+      "shelves": {
+        "recentlyAddedMovies": "Recently Added Movies",
+        "recentlyAddedShows": "Recently Added Shows",
+        "mostPopularMovies": "Most Popular Movies",
+        "mostPopularShows": "Most Popular Shows",
+        "emptyRecentlyAdded": "Nothing added in this period",
+        "emptyMostPopular": "No plays in this period",
+        "captionRecentlyAdded": "deduped across servers",
+        "captionMostPopular": {
+          "day": "today",
+          "week": "last 7 days",
+          "month": "last 30 days",
+          "year": "last 12 months",
+          "all": "all time",
+          "custom": "selected date range"
+        }
+      },
+      "card": {
+        "newEpisodes_one": "{{count}} episodio nuevo",
+        "newEpisodes_other": "{{count}} episodios nuevos",
+        "addedAgo": "añadido {{date}}",
+        "addedCompactAgo": "añadido hace {{age}}",
+        "newEpisodesChip": "{{count}} nuevo"
+      },
+      "deadWeight": {
+        "title": "Dead Weight",
+        "summary": "{{count}} never-watched titles · {{size}}",
+        "empty": "Nothing to reclaim - everything in your library has been watched",
+        "columns": {
+          "poster": "Poster",
+          "title": "Title",
+          "size": "Size",
+          "added": "Added",
+          "servers": "Servers"
+        },
+        "viewAll": "View all",
+        "viewAllTooltip": "Coming soon"
+      },
+      "loadError": "No se pudo cargar tu biblioteca multimedia"
+    },
+    "movies": {
+      "title": "Películas"
+    },
+    "shows": {
+      "title": "Series"
+    },
+    "genres": {
+      "title": "Géneros",
+      "subtitle": "Plays and watch time by genre, across every server in view.",
+      "chart": {
+        "title": "Plays by genre",
+        "valueLabel": "Plays",
+        "itemCount_one": "{{count}} title",
+        "itemCount_other": "{{count}} titles",
+        "ariaLabel": "Bar chart of plays by genre, sorted highest to lowest. The full breakdown is available in the table below."
+      },
+      "table": {
+        "title": "Genre breakdown",
+        "columns": {
+          "genre": "Genre",
+          "items": "Items",
+          "plays": "Plays",
+          "watchTime": "Watch time"
+        },
+        "browseMovies": "Browse {{genre}} movies",
+        "browseShows": "Browse {{genre}} shows"
+      },
+      "empty": {
+        "title": "No genres captured yet",
+        "description": "Genres come from your media servers' metadata sync. Check back after the next sync completes."
+      },
+      "loadError": "Couldn't load genres"
+    },
+    "detail": {
+      "title": "Detalles multimedia",
+      "breadcrumb": {
+        "ariaLabel": "Breadcrumb"
+      },
+      "notFound": {
+        "title": "Media not found",
+        "message": "This title doesn't exist or you don't have access to it.",
+        "backLink": "Back to Media"
+      },
+      "hero": {
+        "loadError": "Couldn't load this title",
+        "meta": {
+          "seasons_one": "{{count}} season",
+          "seasons_other": "{{count}} seasons",
+          "episodes_one": "{{count}} episode",
+          "episodes_other": "{{count}} episodes"
+        },
+        "availability": {
+          "added": "added {{date}}",
+          "removed": "removed {{date}}"
+        },
+        "removedEverywhere": {
+          "caption": "No longer available on any connected server"
+        },
+        "actions": {
+          "fullHistory": "Full history",
+          "openOnServer": "Open on server"
+        }
+      },
+      "kpis": {
+        "ariaLabel": "Watch statistics",
+        "loadError": "Couldn't load watch statistics",
+        "completionLoadError": "Couldn't load completion",
+        "plays": {
+          "label": "Plays, all time",
+          "caption": "resume chains, short sessions excluded"
+        },
+        "watchTime": {
+          "label": "Watch time",
+          "detail": "+{{hours}}h in the last 30 days"
+        },
+        "viewers": {
+          "label": "Viewers",
+          "detail": "across all servers"
+        },
+        "completion": {
+          "label": "Avg completion",
+          "detail": "{{finished}} of {{total}} finished every episode",
+          "detailMovie": "{{finished}} of {{total}} watched to completion"
+        }
+      },
+      "watchers": {
+        "title": "Watchers",
+        "loadError": "Couldn't load watchers",
+        "empty": "No one has watched this yet.",
+        "lastWatchedAgo": "{{age}} ago",
+        "completionLabel": "{{percent}}% complete",
+        "columns": {
+          "user": "User",
+          "plays": "Plays",
+          "episodes": "Episodes",
+          "completion": "Completion",
+          "lastWatched": "Last watched"
+        }
+      },
+      "seasons": {
+        "title": "Seasons",
+        "loadError": "Couldn't load season data",
+        "empty": "No season data yet",
+        "episodeCount_one": "{{count}} episode",
+        "episodeCount_other": "{{count}} episodes",
+        "watchedPct": "{{percent}}% watched",
+        "stripSummary": "{{season}}: {{percent}}% watched",
+        "episodeLabel": {
+          "watched": "{{code}}: watched",
+          "partial": "{{code}}: partially watched",
+          "unwatched": "{{code}}: unwatched"
+        }
+      },
+      "platforms": {
+        "title": "Platforms",
+        "loadError": "Couldn't load platform breakdown",
+        "empty": "No platform data yet",
+        "unknown": "Unknown",
+        "columns": {
+          "platform": "Platform",
+          "plays": "Plays",
+          "watchTime": "Watch time"
+        }
+      },
+      "history": {
+        "title": "History",
+        "loadError": "Couldn't load history",
+        "empty": "No plays recorded yet",
+        "watched": "Watched",
+        "notWatched": "Not finished",
+        "columns": {
+          "date": "Date",
+          "user": "User",
+          "content": "Content",
+          "server": "Server",
+          "duration": "Duration"
+        }
+      },
+      "copies": {
+        "title": "Copies",
+        "loadError": "Couldn't load copies",
+        "unknownLibrary": "Unknown library",
+        "columns": {
+          "server": "Server",
+          "library": "Library",
+          "quality": "Quality",
+          "episodes": "Episodes",
+          "size": "Size",
+          "added": "Added"
+        },
+        "versionLabel": "File {{index}}"
+      }
+    },
+    "posterCard": {
+      "rankSuffix": ", puesto {{rank}}",
+      "onServers": "En {{servers}}",
+      "addedLabel": "Añadido {{date}}",
+      "plays_one": "{{count}} reproducción",
+      "plays_other": "{{count}} reproducciones",
+      "viewers_one": "{{count}} espectador",
+      "viewers_other": "{{count}} espectadores",
+      "watchedState": {
+        "watched": "Visto",
+        "partial": "Visto parcialmente",
+        "watchedByOthers": "Watched by others",
+        "watchedByYou": "Watched by you"
+      },
+      "tileLabel": {
+        "added": "añadido",
+        "plays": "reproducciones",
+        "viewers": "espectadores",
+        "resolution": "resolución"
+      },
+      "rankChip": "#{{rank}}",
+      "playsCompact_one": "{{compact}} reproducción",
+      "playsCompact_other": "{{compact}} reproducciones",
+      "versionsChip": "{{count}}×",
+      "versions_one": "{{count}} version",
+      "versions_other": "{{count}} versions",
+      "moreServers": "+{{count}} more"
+    },
+    "grid": {
+      "toolbar": {
+        "ariaLabel": "Filters and sort",
+        "typeLabel": "Media type",
+        "moviesToggle": "Movies",
+        "showsToggle": "Shows",
+        "searchPlaceholder": "Search titles…",
+        "searchLabel": "Search titles",
+        "removeFilter": "Remove {{label}} filter",
+        "filtersLabel": "Filters",
+        "filtersSheetTitle": "Filters",
+        "done": "Done",
+        "watchedLabel": "Watched",
+        "watched": {
+          "all": "All",
+          "watched": "Watched",
+          "partial": "Partially watched",
+          "unwatched": "Unwatched"
+        },
+        "unwatchedByLens": "Unwatched by {{name}}",
+        "resolutionLabel": "Resolution",
+        "resolutionAll": "Any resolution",
+        "hdrLabel": "Dynamic range",
+        "hdrAll": "Any",
+        "hdrOnly": "HDR only",
+        "hdrChip": "HDR",
+        "genreLabel": "Genre",
+        "genreAll": "Any genre",
+        "serverLabel": "Server",
+        "serverAll": "Any server",
+        "libraryLabel": "Library",
+        "libraryAll": "Any library",
+        "yearFromLabel": "From year",
+        "yearToLabel": "To year",
+        "sizeGbMinLabel": "Min size (GB)",
+        "sizeGbMaxLabel": "Max size (GB)",
+        "sizeChipAtLeast": "≥ {{min}} GB",
+        "sizeChipAtMost": "≤ {{max}} GB",
+        "sizeChipRange": "{{min}}–{{max}} GB",
+        "sortLabel": "Sort",
+        "sort": {
+          "title": "Title A–Z",
+          "added": "Recently added",
+          "year": "Year",
+          "plays": "Plays",
+          "watch_time": "Watch time",
+          "viewers": "Viewers"
+        },
+        "count": "{{loaded}} of {{total}} titles · {{size}}",
+        "countTotal_one": "{{count}} title · {{size}}",
+        "countTotal_other": "{{count}} titles · {{size}}"
+      },
+      "scrubber": {
+        "label": "Jump to letter",
+        "current": "Letter {{letter}}"
+      },
+      "loaderError": "Couldn't load more titles",
+      "retry": "Retry",
+      "clearJumpAction": "Clear",
+      "showingFrom": "Showing from {{letter}}",
+      "showAll": "Show all",
+      "emptyFilter": "No titles match these filters",
+      "emptySearch": "No titles match \"{{query}}\"",
+      "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
+      "loadError": "Couldn't load the catalog"
+    }
   }
 }
