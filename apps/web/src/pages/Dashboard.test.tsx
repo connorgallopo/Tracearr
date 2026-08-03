@@ -13,7 +13,16 @@ function renderDashboard() {
 }
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: { count?: number }) => {
+      const labels: Record<string, string> = {
+        'statsOverview.pills.transcode': `${options?.count} transcode`,
+        'statsOverview.pills.directPlay': `${options?.count} direct play`,
+        'statsOverview.pills.directStream': `${options?.count} direct stream`,
+      };
+      return labels[key] ?? key;
+    },
+  }),
 }));
 
 vi.mock('@/hooks/queries', () => ({
@@ -44,6 +53,16 @@ vi.mock('@/components/map', () => ({
 
 vi.mock('@/components/sessions', () => ({
   NowPlayingCard: () => null,
+  getStreamMode: (session: {
+    isTranscode: boolean;
+    videoDecision?: string | null;
+    audioDecision?: string | null;
+  }) =>
+    session.isTranscode
+      ? 'transcode'
+      : session.videoDecision === 'copy' || session.audioDecision === 'copy'
+        ? 'directStream'
+        : 'directPlay',
 }));
 
 vi.mock('@/hooks/useServer', () => ({
@@ -116,6 +135,45 @@ describe('Dashboard', () => {
     renderDashboard();
 
     expect(screen.getByText('dashboard.noActiveStreams')).toBeInTheDocument();
+  });
+
+  it('shows only non-zero stream mode summary pills', () => {
+    mockUseDashboardStats.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useDashboardStats>);
+    mockUseActiveSessions.mockReturnValue({
+      data: [
+        { id: '1', serverId: 'server-1', isTranscode: true },
+        {
+          id: '2',
+          serverId: 'server-1',
+          isTranscode: false,
+          videoDecision: 'copy',
+          audioDecision: 'directplay',
+        },
+        {
+          id: '3',
+          serverId: 'server-1',
+          isTranscode: false,
+          videoDecision: 'directplay',
+          audioDecision: 'directplay',
+        },
+      ],
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useActiveSessions>);
+
+    renderDashboard();
+
+    expect(screen.getByText('1 transcode')).toBeInTheDocument();
+    expect(screen.getByText('1 direct play')).toBeInTheDocument();
+    expect(screen.getByText('1 direct stream')).toBeInTheDocument();
+    expect(screen.queryByText('0 transcodes')).not.toBeInTheDocument();
   });
 
   it('shows a page-level error state when the stats query fails, and retry refetches both queries', async () => {

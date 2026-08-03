@@ -856,6 +856,7 @@ export interface PlayStats {
 
 export interface UserStats {
   serverUserId: string;
+  serverId: string | null;
   username: string;
   thumbUrl: string | null;
   playCount: number;
@@ -970,6 +971,7 @@ export interface TopContentStats {
 export interface PlatformStats {
   platform: string | null;
   count: number;
+  watchTimeHours: number;
 }
 
 // Server resource statistics (CPU, RAM)

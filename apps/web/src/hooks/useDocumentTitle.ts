@@ -33,10 +33,15 @@ const routeMap = buildRouteMap();
  */
 export function useDocumentTitle() {
   const location = useLocation();
-  const { t } = useTranslation('nav');
+  const { t } = useTranslation(['nav', 'pages']);
 
   useEffect(() => {
     const pathname = location.pathname;
+
+    if (pathname === '/stats/overview') {
+      document.title = `${t('pages:statsOverview.title')} | ${APP_NAME}`;
+      return;
+    }
 
     // Check for exact match in navigation
     const navKey = routeMap.get(pathname);

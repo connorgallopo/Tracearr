@@ -13,6 +13,7 @@ import type {
   DashboardStats,
   PlayStats,
   UserStats,
+  PlatformStats,
   TopUserStats,
   LocationStatsResponse,
   UserLocation,
@@ -988,8 +989,8 @@ class ApiClient {
       );
       return response.data;
     },
-    users: async (timeRange?: StatsTimeRange, serverId?: string) => {
-      const params = this.buildStatsParams(timeRange ?? { period: 'month' }, serverId);
+    users: async (timeRange?: StatsTimeRange, serverIds?: string[]) => {
+      const params = this.buildStatsParamsMulti(timeRange ?? { period: 'month' }, serverIds);
       const response = await this.request<{ data: UserStats[] }>(
         `/stats/users?${params.toString()}`
       );
@@ -1036,7 +1037,7 @@ class ApiClient {
     },
     platforms: async (timeRange?: StatsTimeRange, serverIds?: string[]) => {
       const params = this.buildStatsParamsMulti(timeRange ?? { period: 'month' }, serverIds);
-      const response = await this.request<{ data: { platform: string | null; count: number }[] }>(
+      const response = await this.request<{ data: PlatformStats[] }>(
         `/stats/platforms?${params.toString()}`
       );
       return response.data;

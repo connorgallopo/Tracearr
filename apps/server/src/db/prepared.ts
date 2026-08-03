@@ -222,6 +222,7 @@ function createStatements() {
       .select({
         platform: sessions.platform,
         count: sql<number>`count(DISTINCT COALESCE(reference_id, id))::int`,
+        watchTimeHours: sql<number>`round(COALESCE(sum(duration_ms), 0) / 3600000.0, 1)::float`,
       })
       .from(sessions)
       .where(

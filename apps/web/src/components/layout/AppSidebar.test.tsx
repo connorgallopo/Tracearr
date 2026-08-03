@@ -98,4 +98,17 @@ describe('AppSidebar navigation', () => {
       '/media/genres'
     );
   });
+
+  it('opens the Stats group on the Watch Statistics overview route', () => {
+    renderSidebar('/stats/overview');
+
+    expect(screen.getByRole('link', { name: /^overview$/i })).toHaveAttribute(
+      'href',
+      '/stats/overview'
+    );
+    expect(screen.getByRole('link', { name: /activity/i })).toHaveAttribute(
+      'href',
+      '/stats/activity'
+    );
+  });
 });

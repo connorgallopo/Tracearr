@@ -266,6 +266,7 @@ export async function queryConcurrentStreams(params: {
 export interface PlatformRow {
   platform: string | null;
   count: number;
+  watchTimeHours: number;
 }
 
 /**
@@ -281,7 +282,8 @@ export async function queryPlatforms(params: {
   const result = await db.execute(sql`
     SELECT
       platform,
-      COUNT(DISTINCT COALESCE(reference_id, id))::int AS count
+      COUNT(DISTINCT COALESCE(reference_id, id))::int AS count,
+      ROUND(COALESCE(SUM(duration_ms), 0) / 3600000.0, 1)::float AS "watchTimeHours"
     FROM sessions
     WHERE true
     ${MEDIA_TYPE_SQL_FILTER}

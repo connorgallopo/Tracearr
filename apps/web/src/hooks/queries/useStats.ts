@@ -28,10 +28,11 @@ export function usePlaysStats(timeRange?: StatsTimeRange, serverIds?: string[]) 
   });
 }
 
-export function useUserStats(timeRange?: StatsTimeRange, serverId?: string | null) {
+export function useUserStats(timeRange?: StatsTimeRange, serverIds?: string[]) {
+  const serverIdsKey = serverIds?.length ? [...serverIds].sort().join(',') : 'all';
   return useQuery({
-    queryKey: ['stats', 'users', timeRange, serverId],
-    queryFn: () => api.stats.users(timeRange ?? { period: 'month' }, serverId ?? undefined),
+    queryKey: ['stats', 'users', timeRange, serverIdsKey],
+    queryFn: () => api.stats.users(timeRange ?? { period: 'month' }, serverIds),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

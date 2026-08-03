@@ -1,4 +1,53 @@
 {
+  "statsOverview": {
+    "title": "Watch Statistics",
+    "subtitle": "Rankings and stream mix at a glance; deeper charts remain under Activity and Media.",
+    "controls": {
+      "ariaLabel": "Watch statistics controls",
+      "metricAriaLabel": "Ranking metric",
+      "periodAriaLabel": "Statistics period",
+      "playCount": "Play count",
+      "watchTime": "Watch time"
+    },
+    "kpis": {
+      "uniqueViewers": "Unique viewers",
+      "peakConcurrent": "Peak concurrent"
+    },
+    "leaderboards": {
+      "mostWatchedMovies": "Most watched movies",
+      "mostPopularMovies": "Most popular movies",
+      "mostWatchedShows": "Most watched shows",
+      "mostPopularShows": "Most popular shows",
+      "mostActiveUsers": "Most active users",
+      "mostActivePlatforms": "Most active platforms"
+    },
+    "units": {
+      "plays": "Plays",
+      "hours": "Hours",
+      "episodes": "Episodes",
+      "viewers": "Viewers"
+    },
+    "recent": {
+      "title": "Recently watched",
+      "viewHistory": "View history",
+      "empty": "No recent plays"
+    },
+    "streamMix": {
+      "title": "Peak concurrency & stream mix",
+      "peakStreams": "peak concurrent streams",
+      "ariaLabel": "Stream mode distribution: {{directPlay}}% Direct Play, {{directStream}}% Direct Stream, {{transcode}}% Transcode"
+    },
+    "pills": {
+      "transcode_one": "{{count}} transcode",
+      "transcode_other": "{{count}} transcodes",
+      "directPlay_one": "{{count}} direct play",
+      "directPlay_other": "{{count}} direct plays",
+      "directStream_one": "{{count}} direct stream",
+      "directStream_other": "{{count}} direct streams"
+    },
+    "noPlays": "No plays in this period",
+    "errorTitle": "Watch statistics failed to load"
+  },
   "activity": {
     "activityByDayOfWeek": "每周活跃度",
     "activityByHourOfDay": "每小时活跃度",

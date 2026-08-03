@@ -47,6 +47,7 @@ export const navigation: NavEntry[] = [
     nameKey: 'stats',
     icon: BarChart3,
     children: [
+      { nameKey: 'overview', href: '/stats/overview', icon: LayoutDashboard },
       { nameKey: 'activity', href: '/stats/activity', icon: TrendingUp },
       { nameKey: 'users', href: '/stats/users', icon: UserCircle },
     ],

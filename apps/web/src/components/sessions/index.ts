@@ -1,1 +1,1 @@
-export { NowPlayingCard } from './NowPlayingCard';
+export { NowPlayingCard, getStreamMode, type StreamMode } from './NowPlayingCard';

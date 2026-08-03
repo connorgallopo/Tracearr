@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Play, Clock, AlertTriangle, Tv, MapPin, Calendar, Users, Activity } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatCard } from '@/components/ui/stat-card';
-import { NowPlayingCard } from '@/components/sessions';
+import { NowPlayingCard, getStreamMode } from '@/components/sessions';
 import { StreamCard } from '@/components/map';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
 import { ServerResourceCharts } from '@/components/charts/ServerResourceCharts';
@@ -67,6 +67,11 @@ export function Dashboard() {
 
   const activeCount = sessions?.length ?? 0;
   const hasActiveStreams = activeCount > 0;
+  const streamModeCounts = useMemo(() => {
+    const counts = { transcode: 0, directPlay: 0, directStream: 0 };
+    for (const session of sessions ?? []) counts[getStreamMode(session)] += 1;
+    return counts;
+  }, [sessions]);
 
   if (statsError || sessionsError) {
     return (
@@ -134,15 +139,34 @@ export function Dashboard() {
           <Tv className="text-primary h-5 w-5" />
           <h2 className="text-lg font-semibold">{t('dashboard.nowPlaying')}</h2>
           {hasActiveStreams && (
-            <span className="bg-muted text-foreground rounded-full px-2 py-0.5 text-xs font-medium">
-              {t('common:count.stream', { count: activeCount })}
-            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="bg-muted text-foreground rounded-full px-2 py-0.5 text-xs font-medium">
+                {t('common:count.stream', { count: activeCount })}
+              </span>
+              {streamModeCounts.transcode > 0 && (
+                <span className="rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-400">
+                  {t('statsOverview.pills.transcode', { count: streamModeCounts.transcode })}
+                </span>
+              )}
+              {streamModeCounts.directPlay > 0 && (
+                <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600 dark:text-green-400">
+                  {t('statsOverview.pills.directPlay', { count: streamModeCounts.directPlay })}
+                </span>
+              )}
+              {streamModeCounts.directStream > 0 && (
+                <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                  {t('statsOverview.pills.directStream', {
+                    count: streamModeCounts.directStream,
+                  })}
+                </span>
+              )}
+            </div>
           )}
         </div>
 
         {!sortedSessions ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid gap-4 min-[2300px]:grid-cols-5! lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
               <NowPlayingCardSkeleton key={i} />
             ))}
           </div>
@@ -159,7 +183,7 @@ export function Dashboard() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 min-[2300px]:grid-cols-5! lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {sortedSessions.map((session) => (
               <NowPlayingCard
                 key={session.id}

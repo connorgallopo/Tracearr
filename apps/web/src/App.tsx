@@ -10,7 +10,13 @@ import { PlexCallback } from '@/pages/PlexCallback';
 import { Setup } from '@/pages/Setup';
 import { Dashboard } from '@/pages/Dashboard';
 import { Map } from '@/pages/Map';
-import { StatsActivity, StatsUsers, StatsDevices, StatsBandwidth } from '@/pages/stats';
+import {
+  StatsActivity,
+  StatsOverview,
+  StatsUsers,
+  StatsDevices,
+  StatsBandwidth,
+} from '@/pages/stats';
 import { LibraryQuality, LibraryStorage, LibraryWatch } from '@/pages/library';
 import { MediaOverview } from '@/pages/media/Overview';
 import { MediaGrid } from '@/pages/media/Grid';
@@ -61,7 +67,8 @@ export function App() {
           <Route path="map" element={<Map />} />
 
           {/* Stats routes */}
-          <Route path="stats" element={<Navigate to="/stats/activity" replace />} />
+          <Route path="stats" element={<Navigate to="/stats/overview" replace />} />
+          <Route path="stats/overview" element={<StatsOverview />} />
           <Route path="stats/activity" element={<StatsActivity />} />
           <Route path="stats/library" element={<Navigate to="/media" replace />} />
           <Route path="stats/users" element={<StatsUsers />} />

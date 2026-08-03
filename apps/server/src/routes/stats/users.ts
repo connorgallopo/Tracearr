@@ -57,6 +57,7 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
     const result = await db.execute(sql`
         SELECT
           rep.id as server_user_id,
+          rep.server_id::text as server_id,
           rep.username,
           rep.thumb_url,
           COUNT(DISTINCT COALESCE(s.reference_id, s.id)) FILTER (WHERE s.duration_ms >= ${SESSION_LIMITS.MIN_PLAY_TIME_MS})::int as play_count,
@@ -65,14 +66,14 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
         INNER JOIN server_users su ON su.user_id = u.id
         LEFT JOIN sessions s ON s.server_user_id = su.id ${dateJoinFilter}
         INNER JOIN LATERAL (
-          SELECT su2.id, su2.username, su2.thumb_url
+          SELECT su2.id, su2.server_id, su2.username, su2.thumb_url
           FROM server_users su2
           WHERE su2.user_id = u.id ${serverFilterSu2}
           ORDER BY ${representativeAccountOrderSql('su2')}
           LIMIT 1
         ) rep ON true
         WHERE true ${serverFilterSu}
-        GROUP BY u.id, rep.id, rep.username, rep.thumb_url
+        GROUP BY u.id, rep.id, rep.server_id, rep.username, rep.thumb_url
         ORDER BY play_count DESC, watch_time_ms DESC, u.id
         LIMIT 20
       `);
@@ -80,6 +81,7 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
     const userStats: UserStats[] = (
       result.rows as {
         server_user_id: string;
+        server_id: string | null;
         username: string;
         thumb_url: string | null;
         play_count: number;
@@ -87,6 +89,7 @@ export const usersRoutes: FastifyPluginAsync = async (app) => {
       }[]
     ).map((r) => ({
       serverUserId: r.server_user_id,
+      serverId: r.server_id,
       username: r.username,
       thumbUrl: r.thumb_url,
       playCount: r.play_count,
