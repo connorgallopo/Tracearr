@@ -156,7 +156,8 @@
   "serverSelector": {
     "servers": "Servers",
     "selectServers": "Select Servers",
-    "serversSelected": "{{selected}} of {{total}} servers selected"
+    "serversSelected": "{{selected}} of {{total}} servers selected",
+    "allServers": "All servers"
   },
   "reconnected": "Reconnected",
   "actionsExecuted": "Actions Executed",
