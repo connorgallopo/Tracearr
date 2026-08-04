@@ -171,7 +171,7 @@
     "trustScore": "Trust score {{score}}"
   },
   "map": {
-    "noData": "No location data available",
-    "unavailable": "Map unavailable"
+    "noData": "Geen locatiegegevens beschikbaar",
+    "unavailable": "Kaart niet beschikbaar"
   }
 }
