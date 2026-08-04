@@ -161,17 +161,17 @@
   "reconnected": "Reconnected",
   "actionsExecuted": "Actions Executed",
   "serverScope": {
-    "single": "Showing {{name}} only"
+    "single": "仅显示{{name}}"
   },
   "a11y": {
-    "selectServer": "Select server",
-    "alerts": "Alerts",
-    "alertsCount": "Alerts, {{count}} unread",
-    "settings": "Settings",
-    "trustScore": "Trust score {{score}}"
+    "selectServer": "选择服务器",
+    "alerts": "警告",
+    "alertsCount": "提醒，{{count}} 条未读",
+    "settings": "设置",
+    "trustScore": "信任分数{{score}}"
   },
   "map": {
-    "noData": "No location data available",
-    "unavailable": "Map unavailable"
+    "noData": "无可用位置数据",
+    "unavailable": "地图不可用"
   }
 }
