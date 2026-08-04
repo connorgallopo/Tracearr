@@ -651,20 +651,20 @@
         "allUsers": "所有用户"
       },
       "shelves": {
-        "recentlyAddedMovies": "Recently Added Movies",
-        "recentlyAddedShows": "Recently Added Shows",
-        "mostPopularMovies": "Most Popular Movies",
-        "mostPopularShows": "Most Popular Shows",
-        "emptyRecentlyAdded": "Nothing added in this period",
-        "emptyMostPopular": "No plays in this period",
-        "captionRecentlyAdded": "deduped across servers",
+        "recentlyAddedMovies": "最近添加的电影",
+        "recentlyAddedShows": "最近添加的剧集",
+        "mostPopularMovies": "最受欢迎的电影",
+        "mostPopularShows": "最受欢迎的剧集",
+        "emptyRecentlyAdded": "这段时间里没有添加任何内容",
+        "emptyMostPopular": "这段时间内没有播放",
+        "captionRecentlyAdded": "跨服务器支持",
         "captionMostPopular": {
-          "day": "today",
-          "week": "last 7 days",
-          "month": "last 30 days",
-          "year": "last 12 months",
-          "all": "all time",
-          "custom": "selected date range"
+          "day": "今天",
+          "week": "最近 7 天",
+          "month": "最近 30 天",
+          "year": "最后12个月",
+          "all": "所有时间",
+          "custom": "所选日期范围"
         }
       },
       "card": {
@@ -677,18 +677,18 @@
       "deadWeight": {
         "title": "Dead Weight",
         "summary": "{{count}} never-watched titles · {{size}}",
-        "empty": "Nothing to reclaim - everything in your library has been watched",
+        "empty": "没有什么可以恢复 - 您的知识库中的一切都已被观看了",
         "columns": {
-          "poster": "Poster",
-          "title": "Title",
-          "size": "Size",
-          "added": "Added",
-          "servers": "Servers"
+          "poster": "海报",
+          "title": "标题",
+          "size": "大小",
+          "added": "已添加",
+          "servers": "服务器"
         },
-        "viewAll": "View all",
-        "viewAllTooltip": "Coming soon"
+        "viewAll": "查看全部",
+        "viewAllTooltip": "即将呈现"
       },
-      "loadError": "Couldn't load your media library"
+      "loadError": "无法加载您的媒体库"
     },
     "movies": {
       "title": "电影"
@@ -698,30 +698,30 @@
     },
     "genres": {
       "title": "类型",
-      "subtitle": "Plays and watch time by genre, across every server in view.",
+      "subtitle": "视图中的每个服务器按类型播放和观看时间。",
       "chart": {
-        "title": "Plays by genre",
-        "valueLabel": "Plays",
+        "title": "按流派播",
+        "valueLabel": "播放",
         "itemCount_one": "{{count}} title",
         "itemCount_other": "{{count}} titles",
-        "ariaLabel": "Bar chart of plays by genre, sorted highest to lowest. The full breakdown is available in the table below."
+        "ariaLabel": "按性别排列的游戏条形图，排序最高至最低。完整的细目见下表。"
       },
       "table": {
-        "title": "Genre breakdown",
+        "title": "流派分类",
         "columns": {
-          "genre": "Genre",
-          "items": "Items",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "genre": "流派",
+          "items": "项目",
+          "plays": "播放",
+          "watchTime": "观看时长"
         },
         "browseMovies": "Browse {{genre}} movies",
         "browseShows": "Browse {{genre}} shows"
       },
       "empty": {
-        "title": "No genres captured yet",
-        "description": "Genres come from your media servers' metadata sync. Check back after the next sync completes."
+        "title": "尚未抓取任何流派",
+        "description": "流派来自您的媒体服务器的元数据同步。请在下次同步完成后重新查看。"
       },
-      "loadError": "Couldn't load genres"
+      "loadError": "无法加载类型"
     },
     "detail": {
       "title": "媒体详情",
@@ -729,12 +729,12 @@
         "ariaLabel": "Breadcrumb"
       },
       "notFound": {
-        "title": "Media not found",
-        "message": "This title doesn't exist or you don't have access to it.",
-        "backLink": "Back to Media"
+        "title": "未找到媒体",
+        "message": "此标题不存在或您没有访问权限。",
+        "backLink": "返回媒体"
       },
       "hero": {
-        "loadError": "Couldn't load this title",
+        "loadError": "无法加载更多标题",
         "meta": {
           "seasons_one": "{{count}} season",
           "seasons_other": "{{count}} seasons",
@@ -821,24 +821,24 @@
         "watched": "已观看",
         "notWatched": "未完成",
         "columns": {
-          "date": "Date",
-          "user": "User",
-          "content": "Content",
-          "server": "Server",
-          "duration": "Duration"
+          "date": "日期",
+          "user": "用户",
+          "content": "内容",
+          "server": "服务器",
+          "duration": "持续时长"
         }
       },
       "copies": {
-        "title": "Copies",
-        "loadError": "Couldn't load copies",
-        "unknownLibrary": "Unknown library",
+        "title": "份数",
+        "loadError": "无法加载类型",
+        "unknownLibrary": "未知库",
         "columns": {
-          "server": "Server",
-          "library": "Library",
-          "quality": "Quality",
-          "episodes": "Episodes",
-          "size": "Size",
-          "added": "Added"
+          "server": "服务器",
+          "library": "媒体库",
+          "quality": "品质",
+          "episodes": "剧集",
+          "size": "大小",
+          "added": "已添加"
         },
         "versionLabel": "File {{index}}"
       }
@@ -854,14 +854,14 @@
       "watchedState": {
         "watched": "已观看",
         "partial": "部分观看",
-        "watchedByOthers": "Watched by others",
-        "watchedByYou": "Watched by you"
+        "watchedByOthers": "其他人已观看的",
+        "watchedByYou": "您已观看的"
       },
       "tileLabel": {
         "added": "添加",
         "plays": "播放",
         "viewers": "观众",
-        "resolution": "resolution"
+        "resolution": "分辨率"
       },
       "rankChip": "#{{rank}}",
       "playsCompact_one": "{{compact}} play",
@@ -873,16 +873,16 @@
     },
     "grid": {
       "toolbar": {
-        "ariaLabel": "Filters and sort",
-        "typeLabel": "Media type",
-        "moviesToggle": "Movies",
-        "showsToggle": "Shows",
+        "ariaLabel": "筛选和排序",
+        "typeLabel": "媒体类型",
+        "moviesToggle": "电影总数",
+        "showsToggle": "剧集",
         "searchPlaceholder": "Search titles…",
-        "searchLabel": "Search titles",
+        "searchLabel": "搜索标题",
         "removeFilter": "Remove {{label}} filter",
-        "filtersLabel": "Filters",
-        "filtersSheetTitle": "Filters",
-        "done": "Done",
+        "filtersLabel": "过滤器",
+        "filtersSheetTitle": "过滤器",
+        "done": "完成",
         "watchedLabel": "已观看",
         "watched": {
           "all": "所有的",
@@ -932,10 +932,10 @@
       "clearJumpAction": "清除",
       "showingFrom": "Showing from {{letter}}",
       "showAll": "显示全部",
-      "emptyFilter": "No titles match these filters",
+      "emptyFilter": "没有匹配这些过滤规则的标题",
       "emptySearch": "No titles match \"{{query}}\"",
       "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
-      "loadError": "Couldn't load the catalog"
+      "loadError": "无法加载该目录"
     }
   }
 }
