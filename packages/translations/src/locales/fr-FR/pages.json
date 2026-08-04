@@ -659,9 +659,9 @@
         "emptyMostPopular": "No plays in this period",
         "captionRecentlyAdded": "deduped across servers",
         "captionMostPopular": {
-          "day": "today",
-          "week": "last 7 days",
-          "month": "last 30 days",
+          "day": "aujourd'hui",
+          "week": "7 derniers jours",
+          "month": "30 derniers jours",
           "year": "last 12 months",
           "all": "all time",
           "custom": "selected date range"
