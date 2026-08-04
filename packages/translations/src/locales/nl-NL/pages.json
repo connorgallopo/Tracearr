@@ -141,7 +141,7 @@
       "thisWeek": "deze week",
       "thisMonth": "deze maand",
       "thisYear": "dit jaar",
-      "serversNeedSync": "These servers need to sync:"
+      "serversNeedSync": "Deze servers moeten synchroniseren:"
     },
     "quality": {
       "title": "Kwaliteit",
@@ -178,8 +178,8 @@
       "days": "dagen",
       "failedToLoad": "Opslaggegevens laden mislukt",
       "failedToLoadDesc": "Opslaggegevens kunnen niet worden opgehaald. Probeer het opnieuw.",
-      "duplicatesTitle": "Duplicates",
-      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions"
+      "duplicatesTitle": "Duplicaten",
+      "duplicatesSubtitle": "Titels met meer dan een exemplaar of bestand, verspreid over servers, bibliotheken en versies"
     },
     "watch": {
       "title": "Bekijk Analytics",
@@ -204,60 +204,60 @@
       "failedToLoadDesc": "Kan horloge gegevens niet ophalen."
     },
     "emptyState": {
-      "checkingStatus": "Checking library status...",
+      "checkingStatus": "De bibliotheekstatus controleren...",
       "backfillAvailable": {
-        "title": "Historical data available",
-        "bodyWithDays": "Your library has {{days}} days of history. Generate snapshots to see trends in charts.",
-        "bodyGeneric": "Generate historical snapshots to see library trends over time.",
-        "syncRunningTitle": "Library sync in progress...",
-        "syncRunningBody": "Historical data generation will start automatically once the sync completes."
+        "title": "Historische gegevens beschikbaar",
+        "bodyWithDays": "Je bibliotheek heeft {{days}} dagen aan geschiedenis. Genereer momentopnamen om trends in grafieken te bekijken.",
+        "bodyGeneric": "Genereer historische momentopnamen om bibliotheektrends door de tijd heen te bekijken.",
+        "syncRunningTitle": "Bibliotheeksynchronisatie bezig...",
+        "syncRunningBody": "Het genereren van historische gegevens start automatisch zodra de synchronisatie is voltooid."
       },
-      "generateHistory": "Generate History",
-      "starting": "Starting...",
+      "generateHistory": "Geschiedenis genereren",
+      "starting": "Starten...",
       "syncInProgress": {
-        "title": "Library sync in progress...",
-        "body": "Library statistics will appear once the sync completes. This may take a few minutes depending on library size."
+        "title": "Bibliotheeksynchronisatie bezig...",
+        "body": "De bibliotheekstatistieken verschijnen zodra de synchronisatie is voltooid. Dit kan enkele minuten duren, afhankelijk van de grootte van de bibliotheek."
       },
       "notSynced": {
-        "title": "Library not synced yet",
-        "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
+        "title": "Bibliotheek nog niet gesynchroniseerd",
+        "body": "De bibliotheekstatistieken verschijnen hier zodra de bibliotheek is gesynchroniseerd. Dit gebeurt doorgaans automatisch elk uur."
       },
       "noMedia": {
-        "title": "No movies or shows yet",
-        "body": "This library is synced but doesn't have any movies or shows in it yet."
+        "title": "Nog geen films of series beschikbaar",
+        "body": "Deze bibliotheek is gesynchroniseerd, maar bevat nog geen films of series."
       },
-      "syncNow": "Sync Now",
-      "syncing": "Syncing...",
-      "notSyncedShort": "Not synced yet",
+      "syncNow": "Synchroniseer Nu",
+      "syncing": "Synchroniseren...",
+      "notSyncedShort": "Nog niet gesynchroniseerd",
       "backfillRunning": {
-        "title": "Generating historical data...",
-        "fallbackBody": "Creating snapshots from library history. This may take a few minutes.",
-        "progress": "{{processed}} of {{total}} libraries",
+        "title": "Historische gegevens genereren...",
+        "fallbackBody": "Er worden snapshots gemaakt van de bibliotheekgeschiedenis. Dit kan een paar minuten duren.",
+        "progress": "{{processed}} van {{total}} bibliotheken",
         "snapshotsSuffix": " ({{count}} snapshots)"
       },
       "multiServer": {
-        "title": "Some libraries need attention",
-        "body": "Sync the servers below to see combined library statistics.",
-        "needsBackfillIntro": "These servers are synced but have no historical data yet:"
+        "title": "Sommige bibliotheken hebben aandacht nodig",
+        "body": "Synchroniseer de onderstaande servers om gecombineerde bibliotheekstatistieken te bekijken.",
+        "needsBackfillIntro": "Deze servers zijn gesynchroniseerd, maar bevatten nog geen historische gegevens:"
       },
       "toast": {
-        "noServerSelected": "No server selected",
-        "syncStartedTitle": "Library sync started",
-        "syncStartedDesc": "This may take a few minutes depending on library size.",
-        "syncFailedTitle": "Failed to start sync",
-        "genericRetry": "Please try again.",
-        "backfillStartedTitle": "Backfill started",
-        "backfillStartedDesc": "Historical snapshots are being generated.",
-        "backfillFailedTitle": "Failed to start backfill",
-        "backfillCompleteTitle": "Backfill complete",
-        "backfillErrorTitle": "Backfill failed"
+        "noServerSelected": "Geen server geselecteerd",
+        "syncStartedTitle": "Bibliotheeksynchronisatie gestart",
+        "syncStartedDesc": "Dit kan een paar minuten duren, afhankelijk van de grootte van de bibliotheek.",
+        "syncFailedTitle": "Synchronisatie starten is mislukt",
+        "genericRetry": "Probeer opnieuw.",
+        "backfillStartedTitle": "Aanvulling gestart",
+        "backfillStartedDesc": "Er worden historische snapshots gegenereerd.",
+        "backfillFailedTitle": "Het starten van de backfill is mislukt",
+        "backfillCompleteTitle": "Backfill compleet",
+        "backfillErrorTitle": "Backfill mislukt"
       }
     },
     "versionsBackfill": {
-      "banner": "File version data is still being collected for this server. Run a library sync to finish.",
-      "action": "Sync now",
-      "syncFailed": "Sync failed to start on {{count}} server(s). Check your permissions and server status.",
-      "syncStarted": "Library sync started."
+      "banner": "Er worden nog steeds versiegegevens van bestanden verzameld voor deze server. Voer een bibliotheeksynchronisatie uit om dit te voltooien.",
+      "action": "Synchroniseer nu",
+      "syncFailed": "De synchronisatie is mislukt op {{count}} server(s). Controleer de machtigingen en de serverstatus.",
+      "syncStarted": "Bibliotheeksynchronisatie gestart."
     }
   },
   "activity": {
@@ -359,7 +359,7 @@
     "accountInactivity": "Accountinactiviteit",
     "accountInactivityDesc": "Krijg een melding wanneer een gebruiker een bepaalde tijd niets gekeken heeft",
     "maxSpeed": "Max. snelheid ({{unit}})",
-    "recordsOnly": "Records violations only",
+    "recordsOnly": "Slaat alleen overtredingen op",
     "maxSpeedDefault": "Maximale realistische reissnelheid. Standaard: {{value}} (vliegsnelheid)",
     "minDistance": "Min. afstand ({{unit}})",
     "minDistanceDefault": "Minimale afstand tussen locaties om te activeren. Standaard: {{value}} {{unit}}",
@@ -519,11 +519,11 @@
       "complete": "Herstel voltooid"
     },
     "initStep": {
-      "migrations": "Applying database migrations",
-      "timescale": "Preparing TimescaleDB (this can take a while after an upgrade)",
-      "services": "Starting services"
+      "migrations": "Databasemigraties toepassen",
+      "timescale": "TimescaleDB voorbereiden (dit kan na een upgrade even duren)",
+      "services": "Start diensten"
     },
-    "doNotRestart": "Do not restart or stop the server while this runs. Interrupting it can leave the database half-upgraded."
+    "doNotRestart": "Start de server niet opnieuw op en stop hem niet terwijl dit proces loopt. Een onderbreking kan ertoe leiden dat de database slechts gedeeltelijk is bijgewerkt."
   },
   "map": {
     "allUsers": "Alle gebruikers",
@@ -591,10 +591,10 @@
     "backToSettings": "Terug naar Instellingen",
     "apiKeyAutoLoaded": "API-sleutel automatisch geladen",
     "noApiKey": "Geen API-sleutel gegenereerd - maak er één in Instellingen om eindpunten te testen",
-    "versionSwitcherLabel": "API documentation version",
+    "versionSwitcherLabel": "API documentatieversie",
     "versionV1": "API v1",
     "versionV2": "API v2",
-    "specLoadError": "Failed to load the API specification. Check your API key and try again."
+    "specLoadError": "Het laden van de API specificatie is mislukt. Controleer de API sleutel en probeer het opnieuw."
   },
   "debug": {
     "title": "Foutopsporing Gereedschap",
@@ -651,44 +651,44 @@
         "allUsers": "Alle gebruikers"
       },
       "shelves": {
-        "recentlyAddedMovies": "Recently Added Movies",
-        "recentlyAddedShows": "Recently Added Shows",
-        "mostPopularMovies": "Most Popular Movies",
-        "mostPopularShows": "Most Popular Shows",
-        "emptyRecentlyAdded": "Nothing added in this period",
-        "emptyMostPopular": "No plays in this period",
-        "captionRecentlyAdded": "deduped across servers",
+        "recentlyAddedMovies": "Recent toegevoegde films",
+        "recentlyAddedShows": "Recent toegevoegde Shows",
+        "mostPopularMovies": "Meest Populaire Films",
+        "mostPopularShows": "Meest Populaire Series",
+        "emptyRecentlyAdded": "Niks toegevoegd in deze periode",
+        "emptyMostPopular": "Geen afspeelmomenten in deze periode",
+        "captionRecentlyAdded": "gededupliceerd over servers",
         "captionMostPopular": {
-          "day": "today",
-          "week": "last 7 days",
-          "month": "last 30 days",
-          "year": "last 12 months",
-          "all": "all time",
-          "custom": "selected date range"
+          "day": "vandaag",
+          "week": "laatste 7 dagen",
+          "month": "laatste 30 dagen",
+          "year": "laatste 12 maanden",
+          "all": "alle tijden",
+          "custom": "selecteer datum bereik"
         }
       },
       "card": {
         "newEpisodes_one": "{{count}} nieuwe aflevering",
         "newEpisodes_other": "{{count}} nieuwe afleveringen",
         "addedAgo": "toegevoegd {{date}}",
-        "addedCompactAgo": "added {{age}} ago",
-        "newEpisodesChip": "{{count}} new"
+        "addedCompactAgo": "toegevoegd {{age}} geleden",
+        "newEpisodesChip": "{{count}} nieuw"
       },
       "deadWeight": {
         "title": "Dead Weight",
-        "summary": "{{count}} never-watched titles · {{size}}",
-        "empty": "Nothing to reclaim - everything in your library has been watched",
+        "summary": "{{count}} titels die nog nooit zijn bekeken · {{size}}",
+        "empty": "Niets terug te vorderen - alles in je bibliotheek is bekeken",
         "columns": {
           "poster": "Poster",
-          "title": "Title",
-          "size": "Size",
-          "added": "Added",
+          "title": "Titel",
+          "size": "Grootte",
+          "added": "Toegevoegd",
           "servers": "Servers"
         },
-        "viewAll": "View all",
-        "viewAllTooltip": "Coming soon"
+        "viewAll": "Alles bekijken",
+        "viewAllTooltip": "Binnenkort"
       },
-      "loadError": "Couldn't load your media library"
+      "loadError": "Je mediabibliotheek kon niet worden geladen"
     },
     "movies": {
       "title": "Films"
@@ -698,30 +698,30 @@
     },
     "genres": {
       "title": "Genres",
-      "subtitle": "Plays and watch time by genre, across every server in view.",
+      "subtitle": "Afspeel- en kijktijd per genre, op alle weergegeven servers.",
       "chart": {
-        "title": "Plays by genre",
-        "valueLabel": "Plays",
-        "itemCount_one": "{{count}} title",
-        "itemCount_other": "{{count}} titles",
-        "ariaLabel": "Bar chart of plays by genre, sorted highest to lowest. The full breakdown is available in the table below."
+        "title": "Afspeelmomenten per genre",
+        "valueLabel": "Afspeelmomenten",
+        "itemCount_one": "{{count}} titel",
+        "itemCount_other": "{{count}} titels",
+        "ariaLabel": "Staafdiagram van toneelstukken per genre, gesorteerd van hoog naar laag. De volledige uitsplitsing is te vinden in de tabel hieronder."
       },
       "table": {
-        "title": "Genre breakdown",
+        "title": "Genre indeling",
         "columns": {
           "genre": "Genre",
-          "items": "Items",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "items": "Voorwerpen",
+          "plays": "Afspeelmomenten",
+          "watchTime": "Kijktijd"
         },
-        "browseMovies": "Browse {{genre}} movies",
-        "browseShows": "Browse {{genre}} shows"
+        "browseMovies": "Blader door {{genre}} films",
+        "browseShows": "Blader door {{genre}} shows"
       },
       "empty": {
-        "title": "No genres captured yet",
-        "description": "Genres come from your media servers' metadata sync. Check back after the next sync completes."
+        "title": "Nog geen genres geregistreerd",
+        "description": "De genres worden overgenomen uit de metadata synchronisatie van de mediaservers. Controleer het opnieuw nadat de volgende synchronisatie is voltooid."
       },
-      "loadError": "Couldn't load genres"
+      "loadError": "Kan genres niet laden"
     },
     "detail": {
       "title": "Mediadetails",
@@ -729,101 +729,101 @@
         "ariaLabel": "Breadcrumb"
       },
       "notFound": {
-        "title": "Media not found",
-        "message": "This title doesn't exist or you don't have access to it.",
-        "backLink": "Back to Media"
+        "title": "Media niet gevonden",
+        "message": "Deze titel bestaat niet of je hebt er geen toegang toe.",
+        "backLink": "Terug naar Media"
       },
       "hero": {
-        "loadError": "Couldn't load this title",
+        "loadError": "Deze titel kon niet worden geladen",
         "meta": {
-          "seasons_one": "{{count}} season",
-          "seasons_other": "{{count}} seasons",
-          "episodes_one": "{{count}} episode",
-          "episodes_other": "{{count}} episodes"
+          "seasons_one": "{{count}} seizoen",
+          "seasons_other": "{{count}} seizoenen",
+          "episodes_one": "{{count}} aflevering",
+          "episodes_other": "{{count}} afleveringen"
         },
         "availability": {
-          "added": "added {{date}}",
-          "removed": "removed {{date}}"
+          "added": "toegevoegd {{date}}",
+          "removed": "verwijdert {{date}}"
         },
         "removedEverywhere": {
-          "caption": "No longer available on any connected server"
+          "caption": "Niet langer beschikbaar op aangesloten servers"
         },
         "actions": {
-          "fullHistory": "Full history",
-          "openOnServer": "Open on server"
+          "fullHistory": "Volledige historie",
+          "openOnServer": "Open op de server"
         }
       },
       "kpis": {
-        "ariaLabel": "Watch statistics",
-        "loadError": "Couldn't load watch statistics",
-        "completionLoadError": "Couldn't load completion",
+        "ariaLabel": "Kijk statistieken",
+        "loadError": "Kan kijk statistieken niet laden",
+        "completionLoadError": "Voltooiing kon niet worden geladen",
         "plays": {
-          "label": "Plays, all time",
-          "caption": "resume chains, short sessions excluded"
+          "label": "Plays, alle tijden",
+          "caption": "hervatting van de sessieketens, korte sessies uitgezonderd"
         },
         "watchTime": {
-          "label": "Watch time",
-          "detail": "+{{hours}}h in the last 30 days"
+          "label": "Kijktijd",
+          "detail": "+{{hours}} uren in de afgelopen 30 dagen"
         },
         "viewers": {
-          "label": "Viewers",
-          "detail": "across all servers"
+          "label": "Kijkers",
+          "detail": "over alle servers"
         },
         "completion": {
-          "label": "Avg completion",
-          "detail": "{{finished}} of {{total}} finished every episode",
-          "detailMovie": "{{finished}} of {{total}} watched to completion"
+          "label": "Gem voltooiing",
+          "detail": "{{finished}} van {{total}} van alle afleveringen voltooid",
+          "detailMovie": "{{finished}} van {{total}} volledig bekeken"
         }
       },
       "watchers": {
         "title": "Watchers",
-        "loadError": "Couldn't load watchers",
-        "empty": "No one has watched this yet.",
-        "lastWatchedAgo": "{{age}} ago",
-        "completionLabel": "{{percent}}% complete",
+        "loadError": "Kon de watchers niet laden",
+        "empty": "Nog niemand heeft dit gezien.",
+        "lastWatchedAgo": "{{age}} geleden",
+        "completionLabel": "{{percent}}% compleet",
         "columns": {
-          "user": "User",
-          "plays": "Plays",
-          "episodes": "Episodes",
-          "completion": "Completion",
-          "lastWatched": "Last watched"
+          "user": "Gebruiker",
+          "plays": "Gespeeld",
+          "episodes": "Afleveringen",
+          "completion": "Voltooiing",
+          "lastWatched": "Laatst bekeken"
         }
       },
       "seasons": {
-        "title": "Seasons",
-        "loadError": "Couldn't load season data",
-        "empty": "No season data yet",
-        "episodeCount_one": "{{count}} episode",
-        "episodeCount_other": "{{count}} episodes",
-        "watchedPct": "{{percent}}% watched",
-        "stripSummary": "{{season}}: {{percent}}% watched",
+        "title": "Seizoenen",
+        "loadError": "Seizoensgegevens konden niet worden geladen",
+        "empty": "Geen seizoensdata beschikbaar",
+        "episodeCount_one": "{{count}} aflevering",
+        "episodeCount_other": "{{count}} afleveringen",
+        "watchedPct": "{{percent}}% bekeken",
+        "stripSummary": "{{season}}: {{percent}}% bekeken",
         "episodeLabel": {
-          "watched": "{{code}}: watched",
-          "partial": "{{code}}: partially watched",
-          "unwatched": "{{code}}: unwatched"
+          "watched": "{{code}}: bekeken",
+          "partial": "{{code}}: gedeeltelijk bekeken",
+          "unwatched": "{{code}}: niet bekeken"
         }
       },
       "platforms": {
         "title": "Platforms",
-        "loadError": "Couldn't load platform breakdown",
-        "empty": "No platform data yet",
-        "unknown": "Unknown",
+        "loadError": "Kon platformoverzicht niet laden",
+        "empty": "Er zijn nog geen platformgegevens beschikbaar",
+        "unknown": "Onbekend",
         "columns": {
           "platform": "Platform",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "plays": "Afgespeeld",
+          "watchTime": "Kijktijd"
         }
       },
       "history": {
-        "title": "History",
-        "loadError": "Couldn't load history",
-        "empty": "No plays recorded yet",
-        "watched": "Watched",
-        "notWatched": "Not finished",
+        "title": "Historie",
+        "loadError": "Geschiedenis kon niet worden geladen",
+        "empty": "Geen afspeelmomenten opgenomen",
+        "watched": "Bekeken",
+        "notWatched": "Nog niet afgemaakt",
         "columns": {
-          "date": "Date",
-          "user": "User",
-          "content": "Content",
+          "date": "Datum",
+          "user": "Gebruiker",
+          "content": "Inhoud",
           "server": "Server",
           "duration": "Duration"
         }
@@ -898,44 +898,44 @@
         "hdrOnly": "HDR only",
         "hdrChip": "HDR",
         "genreLabel": "Genre",
-        "genreAll": "Any genre",
+        "genreAll": "Ieder genre",
         "serverLabel": "Server",
-        "serverAll": "Any server",
-        "libraryLabel": "Library",
-        "libraryAll": "Any library",
-        "yearFromLabel": "From year",
-        "yearToLabel": "To year",
-        "sizeGbMinLabel": "Min size (GB)",
-        "sizeGbMaxLabel": "Max size (GB)",
+        "serverAll": "Alle servers",
+        "libraryLabel": "Bibliotheek",
+        "libraryAll": "Iedere bibliotheek",
+        "yearFromLabel": "Van het jaar",
+        "yearToLabel": "Tot jaar",
+        "sizeGbMinLabel": "Min grootte (GB)",
+        "sizeGbMaxLabel": "Max grootte (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
         "sizeChipAtMost": "≤ {{max}} GB",
         "sizeChipRange": "{{min}}–{{max}} GB",
-        "sortLabel": "Sort",
+        "sortLabel": "Sorteren",
         "sort": {
-          "title": "Title A–Z",
-          "added": "Recently added",
-          "year": "Year",
-          "plays": "Plays",
-          "watch_time": "Watch time",
-          "viewers": "Viewers"
+          "title": "Titel A-Z",
+          "added": "Recent toegevoegd",
+          "year": "Jaar",
+          "plays": "Afgespeeld",
+          "watch_time": "Kijktijd",
+          "viewers": "Kijkers"
         },
-        "count": "{{loaded}} of {{total}} titles · {{size}}",
-        "countTotal_one": "{{count}} title · {{size}}",
-        "countTotal_other": "{{count}} titles · {{size}}"
+        "count": "{{loaded}} van {{total}} titels · {{size}}",
+        "countTotal_one": "{{count}} titel · {{size}}",
+        "countTotal_other": "{{count}} titels · {{size}}"
       },
       "scrubber": {
-        "label": "Jump to letter",
+        "label": "Spring naar letter",
         "current": "Letter {{letter}}"
       },
-      "loaderError": "Couldn't load more titles",
-      "retry": "Retry",
-      "clearJumpAction": "Clear",
-      "showingFrom": "Showing from {{letter}}",
-      "showAll": "Show all",
-      "emptyFilter": "No titles match these filters",
-      "emptySearch": "No titles match \"{{query}}\"",
-      "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
-      "loadError": "Couldn't load the catalog"
+      "loaderError": "Kan niet meer titels laden",
+      "retry": "Probeer opnieuw",
+      "clearJumpAction": "Wis",
+      "showingFrom": "Weergave vanaf {{letter}}",
+      "showAll": "Alles bekijken",
+      "emptyFilter": "Geen titels die overeenkomen met de filters",
+      "emptySearch": "Er zijn geen titels die overeenkomen met \"{{query}}\"",
+      "emptyAnchored": "Niets op of na \"{{letter}}\" met deze filters",
+      "loadError": "De catalogus kon niet worden geladen"
     }
   }
 }
