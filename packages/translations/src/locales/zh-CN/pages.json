@@ -141,7 +141,7 @@
       "thisWeek": "本周",
       "thisMonth": "本月",
       "thisYear": "今年：",
-      "serversNeedSync": "These servers need to sync:"
+      "serversNeedSync": "这些服务器需要同步："
     },
     "quality": {
       "title": "品质",
@@ -178,8 +178,8 @@
       "days": "天",
       "failedToLoad": "加载存储数据失败",
       "failedToLoadDesc": "无法获取存储数据。请重试。",
-      "duplicatesTitle": "Duplicates",
-      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions"
+      "duplicatesTitle": "副本",
+      "duplicatesSubtitle": "在服务器、 库和版本之间具有多个副本或文件的标题"
     },
     "watch": {
       "title": "观察分析",
@@ -204,60 +204,60 @@
       "failedToLoadDesc": "无法获取观察数据。"
     },
     "emptyState": {
-      "checkingStatus": "Checking library status...",
+      "checkingStatus": "正在检查库状态……",
       "backfillAvailable": {
-        "title": "Historical data available",
-        "bodyWithDays": "Your library has {{days}} days of history. Generate snapshots to see trends in charts.",
-        "bodyGeneric": "Generate historical snapshots to see library trends over time.",
-        "syncRunningTitle": "Library sync in progress...",
-        "syncRunningBody": "Historical data generation will start automatically once the sync completes."
+        "title": "历史数据可用",
+        "bodyWithDays": "您的库已有 {{days}} 天的历史记录。生成快照以在图表中查看趋势。",
+        "bodyGeneric": "生成历史快照以查看库的长期趋势。",
+        "syncRunningTitle": "正在同步库……",
+        "syncRunningBody": "同步完成后，历史数据生成将自动开始。"
       },
-      "generateHistory": "Generate History",
-      "starting": "Starting...",
+      "generateHistory": "创建历史记录",
+      "starting": "正在启动……",
       "syncInProgress": {
-        "title": "Library sync in progress...",
-        "body": "Library statistics will appear once the sync completes. This may take a few minutes depending on library size."
+        "title": "正在同步库……",
+        "body": "同步完成后将显示库统计数据。这可能需要几分钟，取决于库的大小。"
       },
       "notSynced": {
-        "title": "Library not synced yet",
-        "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
+        "title": "库尚未同步",
+        "body": "库同步后，库统计将显示在这里。通常每小时自动发生。"
       },
       "noMedia": {
-        "title": "No movies or shows yet",
-        "body": "This library is synced but doesn't have any movies or shows in it yet."
+        "title": "尚无电影或剧集",
+        "body": "此库已同步，但还没有任何电影或节目。"
       },
-      "syncNow": "Sync Now",
-      "syncing": "Syncing...",
-      "notSyncedShort": "Not synced yet",
+      "syncNow": "立即同步",
+      "syncing": "同步中……",
+      "notSyncedShort": "尚未同步",
       "backfillRunning": {
-        "title": "Generating historical data...",
-        "fallbackBody": "Creating snapshots from library history. This may take a few minutes.",
-        "progress": "{{processed}} of {{total}} libraries",
-        "snapshotsSuffix": " ({{count}} snapshots)"
+        "title": "生成历史数据……",
+        "fallbackBody": "从知识库历史创建快照。这可能需要几分钟。",
+        "progress": "{{processed}}/{{total}} 库",
+        "snapshotsSuffix": " ({{count}} 个快照)"
       },
       "multiServer": {
-        "title": "Some libraries need attention",
-        "body": "Sync the servers below to see combined library statistics.",
-        "needsBackfillIntro": "These servers are synced but have no historical data yet:"
+        "title": "某些库需要关注",
+        "body": "同步下面的服务器以查看合并的库统计。",
+        "needsBackfillIntro": "这些服务器已同步，但尚无历史数据："
       },
       "toast": {
-        "noServerSelected": "No server selected",
-        "syncStartedTitle": "Library sync started",
-        "syncStartedDesc": "This may take a few minutes depending on library size.",
-        "syncFailedTitle": "Failed to start sync",
-        "genericRetry": "Please try again.",
-        "backfillStartedTitle": "Backfill started",
-        "backfillStartedDesc": "Historical snapshots are being generated.",
-        "backfillFailedTitle": "Failed to start backfill",
-        "backfillCompleteTitle": "Backfill complete",
-        "backfillErrorTitle": "Backfill failed"
+        "noServerSelected": "尚未选择任何服务器",
+        "syncStartedTitle": "库同步开始",
+        "syncStartedDesc": "这可能需要几分钟，取决于库的大小。",
+        "syncFailedTitle": "同步启动失败",
+        "genericRetry": "请重试。",
+        "backfillStartedTitle": "回填已开始",
+        "backfillStartedDesc": "正在生成历史快照。",
+        "backfillFailedTitle": "启动回填失败",
+        "backfillCompleteTitle": "回填完成",
+        "backfillErrorTitle": "回填失败"
       }
     },
     "versionsBackfill": {
-      "banner": "File version data is still being collected for this server. Run a library sync to finish.",
-      "action": "Sync now",
-      "syncFailed": "Sync failed to start on {{count}} server(s). Check your permissions and server status.",
-      "syncStarted": "Library sync started."
+      "banner": "正在为此服务器收集文件版本数据。运行库同步完成。",
+      "action": "立即同步",
+      "syncFailed": "在 {{count}} 台服务器上同步启动失败(s),请检查您的权限和服务器状态。",
+      "syncStarted": "库同步开始。"
     }
   },
   "activity": {
@@ -359,7 +359,7 @@
     "accountInactivity": "帐户不活动",
     "accountInactivityDesc": "当用户在指定时间段没有观看任何内容时获得通知",
     "maxSpeed": "最大速度 ({{unit}})",
-    "recordsOnly": "Records violations only",
+    "recordsOnly": "仅违反记录",
     "maxSpeedDefault": "最大现实旅行速度。默认值：{{value}} {{unit}}（飞机速度）",
     "minDistance": "最小距离 ({{unit}})",
     "minDistanceDefault": "触发的最小距离。默认值：{{value}} {{unit}}",
@@ -519,11 +519,11 @@
       "complete": "还原完成"
     },
     "initStep": {
-      "migrations": "Applying database migrations",
-      "timescale": "Preparing TimescaleDB (this can take a while after an upgrade)",
-      "services": "Starting services"
+      "migrations": "正在迁移应用数据库",
+      "timescale": "正在准备时间 Db (升级后可能需要一段时间)",
+      "services": "正在启动服务"
     },
-    "doNotRestart": "Do not restart or stop the server while this runs. Interrupting it can leave the database half-upgraded."
+    "doNotRestart": "运行时不要重新启动或停止服务器。中断它可以让数据库处于半升级状态。"
   },
   "map": {
     "allUsers": "所有用户",
@@ -591,10 +591,10 @@
     "backToSettings": "返回设置",
     "apiKeyAutoLoaded": "API 密钥自动加载",
     "noApiKey": "没有生成 API 密钥 - 在设置中创建一个测试端点",
-    "versionSwitcherLabel": "API documentation version",
+    "versionSwitcherLabel": "API 文档版本",
     "versionV1": "API v1",
     "versionV2": "API v2",
-    "specLoadError": "Failed to load the API specification. Check your API key and try again."
+    "specLoadError": "无法加载 API 规格。请检查您的 API 密钥然后重试。"
   },
   "debug": {
     "title": "调试工具",
@@ -746,53 +746,53 @@
           "removed": "removed {{date}}"
         },
         "removedEverywhere": {
-          "caption": "No longer available on any connected server"
+          "caption": "在任何已连接的服务器上不再可用"
         },
         "actions": {
-          "fullHistory": "Full history",
-          "openOnServer": "Open on server"
+          "fullHistory": "完整的历史",
+          "openOnServer": "在服务器上打开"
         }
       },
       "kpis": {
-        "ariaLabel": "Watch statistics",
-        "loadError": "Couldn't load watch statistics",
-        "completionLoadError": "Couldn't load completion",
+        "ariaLabel": "观察统计",
+        "loadError": "无法加载监视统计数据",
+        "completionLoadError": "无法加载完成",
         "plays": {
-          "label": "Plays, all time",
-          "caption": "resume chains, short sessions excluded"
+          "label": "随时播放",
+          "caption": "恢复链，排除短会话"
         },
         "watchTime": {
-          "label": "Watch time",
+          "label": "观看时长",
           "detail": "+{{hours}}h in the last 30 days"
         },
         "viewers": {
-          "label": "Viewers",
-          "detail": "across all servers"
+          "label": "观众",
+          "detail": "跨越所有服务器"
         },
         "completion": {
-          "label": "Avg completion",
+          "label": "平均完成",
           "detail": "{{finished}} of {{total}} finished every episode",
           "detailMovie": "{{finished}} of {{total}} watched to completion"
         }
       },
       "watchers": {
-        "title": "Watchers",
-        "loadError": "Couldn't load watchers",
-        "empty": "No one has watched this yet.",
+        "title": "观看者",
+        "loadError": "无法加载观看者",
+        "empty": "目前还没有人看到这一点。",
         "lastWatchedAgo": "{{age}} ago",
         "completionLabel": "{{percent}}% complete",
         "columns": {
-          "user": "User",
-          "plays": "Plays",
-          "episodes": "Episodes",
-          "completion": "Completion",
-          "lastWatched": "Last watched"
+          "user": "用户",
+          "plays": "播放",
+          "episodes": "剧集",
+          "completion": "完成",
+          "lastWatched": "上次观看"
         }
       },
       "seasons": {
-        "title": "Seasons",
-        "loadError": "Couldn't load season data",
-        "empty": "No season data yet",
+        "title": "季",
+        "loadError": "无法加载季数据",
+        "empty": "暂无季数据",
         "episodeCount_one": "{{count}} episode",
         "episodeCount_other": "{{count}} episodes",
         "watchedPct": "{{percent}}% watched",
@@ -804,22 +804,22 @@
         }
       },
       "platforms": {
-        "title": "Platforms",
-        "loadError": "Couldn't load platform breakdown",
-        "empty": "No platform data yet",
-        "unknown": "Unknown",
+        "title": "平台",
+        "loadError": "无法加载平台故障信息",
+        "empty": "暂无季数据",
+        "unknown": "未知",
         "columns": {
-          "platform": "Platform",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "platform": "平台",
+          "plays": "播放",
+          "watchTime": "观看时长"
         }
       },
       "history": {
-        "title": "History",
-        "loadError": "Couldn't load history",
-        "empty": "No plays recorded yet",
-        "watched": "Watched",
-        "notWatched": "Not finished",
+        "title": "历史记录",
+        "loadError": "无法加载历史记录",
+        "empty": "尚无播放记录",
+        "watched": "已观看",
+        "notWatched": "未完成",
         "columns": {
           "date": "Date",
           "user": "User",
@@ -883,55 +883,55 @@
         "filtersLabel": "Filters",
         "filtersSheetTitle": "Filters",
         "done": "Done",
-        "watchedLabel": "Watched",
+        "watchedLabel": "已观看",
         "watched": {
-          "all": "All",
-          "watched": "Watched",
-          "partial": "Partially watched",
-          "unwatched": "Unwatched"
+          "all": "所有的",
+          "watched": "已观看",
+          "partial": "部分观看",
+          "unwatched": "未观看"
         },
         "unwatchedByLens": "Unwatched by {{name}}",
-        "resolutionLabel": "Resolution",
-        "resolutionAll": "Any resolution",
-        "hdrLabel": "Dynamic range",
-        "hdrAll": "Any",
-        "hdrOnly": "HDR only",
+        "resolutionLabel": "分辨率",
+        "resolutionAll": "任何分辨率",
+        "hdrLabel": "动态范围",
+        "hdrAll": "任何",
+        "hdrOnly": "仅限HDR",
         "hdrChip": "HDR",
-        "genreLabel": "Genre",
-        "genreAll": "Any genre",
-        "serverLabel": "Server",
-        "serverAll": "Any server",
-        "libraryLabel": "Library",
-        "libraryAll": "Any library",
-        "yearFromLabel": "From year",
-        "yearToLabel": "To year",
+        "genreLabel": "类型",
+        "genreAll": "不限分类",
+        "serverLabel": "服务器",
+        "serverAll": "所有服务器",
+        "libraryLabel": "媒体库",
+        "libraryAll": "任何库",
+        "yearFromLabel": "起始年份",
+        "yearToLabel": "结束年份",
         "sizeGbMinLabel": "Min size (GB)",
-        "sizeGbMaxLabel": "Max size (GB)",
+        "sizeGbMaxLabel": "最大 (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
         "sizeChipAtMost": "≤ {{max}} GB",
         "sizeChipRange": "{{min}}–{{max}} GB",
-        "sortLabel": "Sort",
+        "sortLabel": "排序",
         "sort": {
-          "title": "Title A–Z",
-          "added": "Recently added",
-          "year": "Year",
-          "plays": "Plays",
-          "watch_time": "Watch time",
-          "viewers": "Viewers"
+          "title": "标题 A–Z",
+          "added": "最近添加",
+          "year": "年份",
+          "plays": "播放",
+          "watch_time": "观看时长",
+          "viewers": "观看人数"
         },
         "count": "{{loaded}} of {{total}} titles · {{size}}",
         "countTotal_one": "{{count}} title · {{size}}",
         "countTotal_other": "{{count}} titles · {{size}}"
       },
       "scrubber": {
-        "label": "Jump to letter",
+        "label": "跳转到字母",
         "current": "Letter {{letter}}"
       },
-      "loaderError": "Couldn't load more titles",
-      "retry": "Retry",
-      "clearJumpAction": "Clear",
+      "loaderError": "无法加载更多标题",
+      "retry": "重试",
+      "clearJumpAction": "清除",
       "showingFrom": "Showing from {{letter}}",
-      "showAll": "Show all",
+      "showAll": "显示全部",
       "emptyFilter": "No titles match these filters",
       "emptySearch": "No titles match \"{{query}}\"",
       "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
