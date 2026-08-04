@@ -66,7 +66,19 @@
     "regenerate": "再生成",
     "generateKey": "キーを生成",
     "regenerateApiKey": "APIキーを再生成しますか？",
-    "regenerateApiKeyDesc": "これは現在のAPIキーを無効にします。古いキーを使用しているすべての統合は機能しなくなります。"
+    "regenerateApiKeyDesc": "これは現在のAPIキーを無効にします。古いキーを使用しているすべての統合は機能しなくなります。",
+    "publicApiSettings": "Public API",
+    "publicApiSettingsDesc": "Configure watch-completion thresholds and request limits for the public API",
+    "watchedThresholdMovie": "Movie Watched Threshold",
+    "watchedThresholdMovieDesc": "Percentage of a movie that must be watched before it's marked complete",
+    "watchedThresholdTv": "TV Episode Watched Threshold",
+    "watchedThresholdTvDesc": "Percentage of an episode that must be watched before it's marked complete",
+    "watchedThresholdMusic": "Track Watched Threshold",
+    "watchedThresholdMusicDesc": "Percentage of a track that must be played before it's marked complete",
+    "watchedThresholdSuffix": "%",
+    "apiRateLimit": "API Rate Limit",
+    "apiRateLimitDesc": "Maximum public API requests per minute per key. Restart required to apply.",
+    "apiRateLimitSuffix": "/min"
   },
   "servers": {
     "title": "接続されたサーバー",
@@ -120,6 +132,7 @@
     "realtimeActive": "Real-time updates active",
     "pollingMode": "Polling",
     "setupRealtime": "Set up real-time updates",
+    "realtimeError": "Real-time error",
     "checkingConnection": "Checking connection…",
     "pluginVersion": "plugin v{{version}}",
     "pluginUpdateAvailable": "Plugin update available",
@@ -135,8 +148,19 @@
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
       "embyReleasesUrl": "https://github.com/Tracearr/Media-Server-SSE/releases",
       "openReleases": "Open releases page",
-      "autoDetectNote": "Once the plugin is running, Tracearr detects it automatically — no restart needed here.",
-      "close": "Close"
+      "autoDetectNote": "Restart Jellyfin or Emby after installing the plugin; the restart is required. Tracearr itself needs no restart and picks the plugin up automatically.",
+      "close": "Close",
+      "issueBlocked": "The server reports the plugin as installed and active, but Tracearr gets a 404 from its endpoint. A reverse proxy blocking the path is the usual cause.",
+      "issueRestartRequired": "The plugin is installed, but the media server needs a restart before it activates.",
+      "issueMalfunctioned": "The server reports the plugin failed to load. Updating the plugin or the media server usually clears this."
+    },
+    "posterSource": {
+      "title": "Poster Preferences",
+      "titleDesc": "Choose which server's poster is shown when a title exists on more than one server",
+      "label": "Preferred Poster Source",
+      "description": "When a title is on more than one server, use this server's poster. If it doesn't have one, we'll fall back to the most recently added copy.",
+      "automatic": "Automatic (most recent)",
+      "emptyHint": "Add a server to choose a preferred poster source."
     }
   },
   "mobile": {
