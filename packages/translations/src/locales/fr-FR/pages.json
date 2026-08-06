@@ -179,7 +179,19 @@
       "failedToLoad": "Impossible de charger les données de stockage",
       "failedToLoadDesc": "Impossible de récupérer les données de stockage. Veuillez réessayer.",
       "duplicatesTitle": "Doublons",
-      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions"
+      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions",
+      "growthPreChangeover": "based on pre-update history",
+      "loadingDuplicates": "Loading duplicates...",
+      "duplicatesFailed": "Failed to load duplicates",
+      "noDuplicatesTitle": "No duplicates found",
+      "noDuplicatesDesc": "No titles with more than one physical file detected.",
+      "colTitle": "Title",
+      "colMatchType": "Match Type",
+      "colCopies": "Copies",
+      "colRecoverable": "Recoverable Space",
+      "sameServer": "Same server",
+      "mirror": "Mirror",
+      "pageOf": "Page {{page}} of {{totalPages}}"
     },
     "watch": {
       "title": "Regarder les analyses",
