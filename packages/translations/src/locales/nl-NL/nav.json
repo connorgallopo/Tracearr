@@ -22,7 +22,7 @@
   "media": "Media",
   "mediaBrowse": "Bladeren",
   "mediaGenres": "Genres",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation"
+  "session": "Sessie",
+  "user": "Gebruiker",
+  "violation": "Overtreding"
 }
