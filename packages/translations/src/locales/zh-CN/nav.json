@@ -22,7 +22,7 @@
   "media": "媒体",
   "mediaBrowse": "浏览",
   "mediaGenres": "类型",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation"
+  "session": "会话",
+  "user": "用户",
+  "violation": "违反"
 }
