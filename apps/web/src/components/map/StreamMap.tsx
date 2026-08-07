@@ -126,6 +126,71 @@ interface CircleMarkersLayerProps {
   isMultiServer?: boolean;
 }
 
+interface LocationPopupContentProps {
+  location: LocationStats;
+  serverBreakdown?: { serverId: string; count: number }[];
+  serverNameMap?: Record<string, string>;
+}
+
+/**
+ * Body of a location marker popup.
+ *
+ * One marker can cover several people, because GeoIP resolves every address in
+ * a city to the same coordinates. /stats/locations already returns the accounts
+ * and the unique device count behind each marker, so both are listed here to
+ * make a shared location readable.
+ *
+ * Exported for tests: Leaflet mounts popup children only once the popup opens,
+ * which a jsdom render cannot drive.
+ */
+export function LocationPopupContent({
+  location,
+  serverBreakdown,
+  serverNameMap,
+}: LocationPopupContentProps) {
+  const users = location.users ?? [];
+  const deviceCount = location.deviceCount ?? 0;
+
+  return (
+    <div className="text-sm">
+      <div className="font-semibold">
+        {location.city ? `${location.city}, ` : ''}
+        {location.country || 'Unknown'}
+      </div>
+      <div className="text-muted-foreground">
+        {location.count.toLocaleString()} stream{location.count !== 1 ? 's' : ''}
+        {deviceCount > 0 && (
+          <>
+            {' from '}
+            {deviceCount.toLocaleString()} device{deviceCount !== 1 ? 's' : ''}
+          </>
+        )}
+      </div>
+      {users.length > 0 && (
+        <div className="mt-1.5 space-y-0.5 border-t pt-1.5">
+          {users.map((user) => (
+            <div key={user.id} className="text-muted-foreground">
+              {user.username}
+            </div>
+          ))}
+        </div>
+      )}
+      {serverBreakdown && serverNameMap && (
+        <div className="mt-1.5 space-y-0.5 border-t pt-1.5">
+          {serverBreakdown.map((entry) => (
+            <div key={entry.serverId} className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">
+                {serverNameMap[entry.serverId] ?? entry.serverId}
+              </span>
+              <span className="tabular-nums">{entry.count.toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Circle markers layer component
 function CircleMarkersLayer({
   locations,
@@ -186,30 +251,11 @@ function CircleMarkersLayer({
               }}
             >
               <Popup>
-                <div className="text-sm">
-                  <div className="font-semibold">
-                    {location.city ? `${location.city}, ` : ''}
-                    {location.country || 'Unknown'}
-                  </div>
-                  <div className="text-muted-foreground">
-                    {location.count.toLocaleString()} stream{location.count !== 1 ? 's' : ''}
-                  </div>
-                  {serverBreakdown && serverNameMap && (
-                    <div className="mt-1.5 space-y-0.5 border-t pt-1.5">
-                      {serverBreakdown.map((entry) => (
-                        <div
-                          key={entry.serverId}
-                          className="flex items-center justify-between gap-3"
-                        >
-                          <span className="text-muted-foreground">
-                            {serverNameMap[entry.serverId] ?? entry.serverId}
-                          </span>
-                          <span className="tabular-nums">{entry.count.toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <LocationPopupContent
+                  location={location}
+                  serverBreakdown={serverBreakdown}
+                  serverNameMap={serverNameMap}
+                />
               </Popup>
             </CircleMarker>
           );
