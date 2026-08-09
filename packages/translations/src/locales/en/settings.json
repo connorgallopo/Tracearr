@@ -373,7 +373,21 @@
     "importInProgressPercent": "Import in progress ({{percent}}% complete)...",
     "importInProgressGeneric": "Import in progress...",
     "startingImport": "Starting import...",
-    "connectedFound": "Connected! Found {{users}} users and {{records}} history records."
+    "connectedFound": "Connected! Found {{users}} users and {{records}} history records.",
+    "playbackReporting": "Playback Reporting Plugin",
+    "playbackReportingDesc": "Import history directly from the Playback Reporting plugin installed on your Jellyfin or Emby server. No file export needed.",
+    "checkPlugin": "Check Plugin",
+    "checkingPlugin": "Checking...",
+    "pluginFound": "Plugin found: {{records}} records from {{oldestDate}} to {{newestDate}}",
+    "pluginNotInstalled": "The Playback Reporting plugin is not installed on this server, or Tracearr cannot reach it. Install it from the server's plugin catalog to start recording history, or use the Jellystat import below.",
+    "serverTimezone": "Server Timezone",
+    "serverTimezoneHelp": "Must match the timezone configured on your media server host, not your browser's timezone. Playback Reporting timestamps are stored in local server time.",
+    "importFullRange": "Import full history",
+    "importFullRangeHelp": "By default only history older than Tracearr's earliest tracked session for this server is imported, so sessions Tracearr already recorded are never duplicated. Enable this to import the plugin's entire history regardless of overlap, if your Tracearr history has gaps. Exact duplicates are still skipped.",
+    "overlapSkipped": "{{count}} skipped as overlap",
+    "duplicates": "{{count}} duplicates skipped",
+    "skipOverlap": "Overlapping record - the timestamp falls inside the period Tracearr already tracks for this server. Enable full-range import to include it.",
+    "skipDuplicatePlugin": "Duplicate record - already imported directly or arrived earlier via a Jellystat import of the same plugin data."
   },
   "plex": {
     "signInWithPlex": "Sign in with Plex",
