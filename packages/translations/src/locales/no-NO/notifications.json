@@ -1,279 +1,279 @@
 {
-  "push": {
-    "newDevice": "Ny enhet",
-    "serverDown": "Servertilkobling mistet",
-    "serverUp": "Tjeneren tilbake på nettet",
-    "streamEnded": "Strøm avsluttet",
-    "streamStarted": "Strøm startet",
-    "trustScoreChanged": "Tillit score endret",
-    "violationDetected": "Deling oppdaget"
-  },
-  "settings": {
-    "allSeverity": "Alt (Low, Advarsel, Høy)",
-    "allTypes": "Alle typer",
-    "concurrentStreams": "Samtidige strømmer",
-    "concurrentStreamsDesc": "Når maks strømgrense er overskredet",
-    "enablePushNotifications": "Aktiver push-varsler",
-    "enableQuietHours": "Aktiver stilletid",
-    "highOnly": "Bare høy alvorlighetsgrad",
-    "minimumSeverity": "Minimum Alvorlighetsgrad",
-    "newDevice": "Ny enhet",
-    "newDeviceDesc": "Når en ny enhet kobles til",
-    "notificationEvents": "Varsel Hendelser",
-    "overrideForCritical": "Overstyr for kritiske",
-    "perHour": "Per time",
-    "perMinute": "Per minutt",
-    "quietHours": "Stille Timer",
-    "rateLimit": "Gjeldende sats grense status",
-    "rateLimiting": "Vurder begrensning",
-    "serverDown": "Server ned",
-    "serverDownDesc": "Når en medieserver går offline",
-    "serverUp": "Server opp",
-    "serverUpDesc": "Når en medieserver kommer tilbake online",
-    "streamStarted": "Strøm startet",
-    "streamStartedDesc": "Når en bruker begynner å se",
-    "streamStopped": "Strøm stoppet",
-    "streamStoppedDesc": "Når en bruker slutter å se på",
-    "title": "Innstillinger for varsling",
-    "trustScoreChanged": "Tillit score endret",
-    "trustScoreChangedDesc": "Når en brukers tillit endres",
-    "violationDetected": "Brudd oppdaget",
-    "violationDetectedDesc": "Når brudd på deling utløses",
-    "violationFilters": "Brudd filtre",
-    "warningAndHigh": "Advarsel og høy"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Mislyktes i å anerkjenne brudd",
-      "agentAddFailed": "Kan ikke legge til agent",
-      "agentRemoveFailed": "Kunne ikke fjerne agent",
-      "agentTestFailed": "Testen mislyktes",
-      "agentUpdateFailed": "Kunne ikke oppdatere agent",
-      "apiKeyGenerateFailed": "Kunne ikke generere API-nøkkel",
-      "authFailed": "Godkjenning mislyktes",
-      "clipboardFailed": "Kan ikke kopiere til utklippstavlen",
-      "copyFailed": "Kunne ikke kopiere til utklippstavlen",
-      "deviceRemoveFailed": "Kan ikke fjerne enheten",
-      "deviceRenameFailed": "Kunne ikke gi enheten nytt navn",
-      "dismissFailed": "Kunne ikke avvise brudd",
-      "displayNameUpdateFailed": "Kunne ikke oppdatere visningsnavnet",
-      "invalidClaimCode": {
-        "message": "Vennligst sjekk server loggene",
-        "title": "Ugyldig reklamasjonskode"
-      },
-      "invalidUrl": "Ugyldig nettadresse",
-      "jobAlreadyRunning": "Jobb kjører allerede",
-      "jobLoadFailed": "Kunne ikke laste vedlikeholdsjobber",
-      "jobStartFailed": "Kan ikke starte jobb",
-      "mobileAccessDisableFailed": "Kunne ikke deaktivere mobiltilgang",
-      "mobileAccessEnableFailed": "Kunne ikke aktivere mobiltilgang",
-      "pairTokenGenerateFailed": "Kunne ikke generere par token",
-      "plexDirectUrl": "plex.direkte URL-er er relay adresser som ikke kan brukes her. Vennligst bruk en direkte IP-adresse eller vertsnavn i stedet.",
-      "plexUnlinkFailed": "Klarte ikke koble fra Plex konto",
-      "routingUpdateFailed": "Kunne ikke oppdatere ruting",
-      "ruleCreateFailed": "Kunne ikke opprette regel",
-      "ruleDeleteFailed": "Kunne ikke slette regel",
-      "ruleUpdateFailed": "Kunne ikke oppdatere regel",
-      "serverAddFailed": "Klarte ikke å legge til server",
-      "serverRemoveFailed": "Kan ikke fjerne serveren",
-      "serverReorderFailed": "Kan ikke flytte servere",
-      "serverSyncFailed": "Kan ikke synkronisere serveren",
-      "serverUpdateFailed": "Kunne ikke oppdatere serveren",
-      "serverUrlUpdateFailed": "Klarte ikke å oppdatere nettadressen til serveren",
-      "serverUserSplitFailed": "Failed to split account",
-      "sessionsDeleteFailed": "Kunne ikke slette økter",
-      "sessionsRevokeFailed": "Kan ikke tilbakekalle økter",
-      "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
-      "streamTerminateFailed": "Kan ikke avslutte strømmen",
-      "trustScoresResetFailed": "Kan ikke tilbakestille tillit poengsum",
-      "userMergeFailed": "Failed to merge users",
-      "webhookTestFailed": "Webhook-test mislyktes"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} er utilgjengelig",
-        "title": "Server frakoblet"
-      },
-      "serverOnline": {
-        "message": "{{name}} er tilbake på nettet",
-        "title": "Server pålogget"
-      },
-      "streamStarted": {
-        "message": "{{user}} har startet å se på {{media}}",
-        "title": "Ny strømming startet"
-      },
-      "streamStopped": {
-        "message": "{{user}} sluttet å følge",
-        "title": "Strøm stoppet"
-      },
-      "updateAvailable": {
-        "message": "Tracearr {{version}} er tilgjengelig",
-        "title": "Oppdatering tilgjengelig"
-      },
-      "violationDetected": {
-        "message": "{{user}} har aktivert {{ruleType}}",
-        "title": "Ny Bruk: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "Meldingsagenten er lagt til",
-        "title": "Agent lagt til"
+      "serverAdded": {
+        "title": "Server lagt til",
+        "message": "{{name}} har blitt koblet til"
       },
-      "agentRemoved": {
-        "message": "Meldingsagenten har blitt fjernet",
-        "title": "Agent fjernet"
+      "serverRemoved": {
+        "title": "Serveren ble fjernet",
+        "message": "Serveren er fjernet vellykket"
       },
-      "agentUpdated": {
-        "message": "Meldingsagenten har blitt oppdatert",
-        "title": "Agent oppdatert"
+      "serverSynced": {
+        "title": "Synkronisert server",
+        "message": "Serverdata har blitt synkronisert"
       },
-      "apiKeyGenerated": {
-        "message": "Den nye API-nøkkelen er klar til bruk",
-        "title": "API-nøkkel generert"
+      "settingsUpdated": {
+        "title": "Innstillinger oppdatert",
+        "message": "Dine lagret innstillinger har blitt"
       },
-      "claimCodeValidated": {
-        "message": "Nå kan du fortsette med oppsettet",
-        "title": "Krever kode godkjent"
+      "tokenCopied": {
+        "title": "Token kopiert",
+        "message": "Knytt token kopiert til utklippstavlen"
+      },
+      "violationAcknowledged": {
+        "title": "Brudd Anerkjent",
+        "message": "Anbruddet er markert som anerkjent"
+      },
+      "violationDismissed": {
+        "title": "Brudd Avvist",
+        "message": "Brudd er blitt avvist"
+      },
+      "deviceRemoved": {
+        "title": "Enheten ble fjernet",
+        "message": "Enheten har blitt frakoblet"
+      },
+      "deviceRenamed": {
+        "title": "Enhet byttet navn",
+        "message": "Enhetsnavnet er oppdatert"
+      },
+      "sessionsRevoked": {
+        "title": "Opphevede økter",
+        "message": "Alle mobiløkter har blitt trukket tilbake"
+      },
+      "loggedIn": {
+        "title": "Vellykket",
+        "message": "Innlogging vellykket"
+      },
+      "webhookTest": {
+        "title": "Test vellykket",
+        "message": "Nettkrok fungerer riktig"
       },
       "copiedToClipboard": {
         "title": "Kopiert til utklippstavle"
       },
-      "deviceRemoved": {
-        "message": "Enheten har blitt frakoblet",
-        "title": "Enheten ble fjernet"
-      },
-      "deviceRenamed": {
-        "message": "Enhetsnavnet er oppdatert",
-        "title": "Enhet byttet navn"
-      },
-      "displayNameUpdated": {
-        "title": "Vis navn oppdatert"
-      },
-      "jobCompleted": {
-        "message": "{{name}} fullført",
-        "title": "Jobb fullført"
-      },
-      "loggedIn": {
-        "message": "Innlogging vellykket",
-        "title": "Vellykket"
-      },
-      "mobileAccessDisabled": {
-        "message": "Alle mobiløkter har blitt trukket tilbake",
-        "title": "Mobiltilgang deaktivert"
-      },
-      "mobileAccessEnabled": {
-        "message": "Skann QR-koden med Tracearr mobile app for å koble til",
-        "title": "Mobile tilgang aktivert"
-      },
-      "pairTokenGenerated": {
-        "message": "Skann QR-koden med din mobile enhet for å pare",
-        "title": "Par Token generert"
-      },
       "plexAccountLinked": {
-        "message": "Du kan nå legge til servere fra din Plex konto",
-        "title": "Plex konto lenket"
+        "title": "Plex konto lenket",
+        "message": "Du kan nå legge til servere fra din Plex konto"
       },
       "plexAccountUnlinked": {
-        "message": "Din Plex konto har blitt frakoblet",
-        "title": "Plex konto frakoblet"
+        "title": "Plex konto frakoblet",
+        "message": "Din Plex konto har blitt frakoblet"
+      },
+      "agentAdded": {
+        "title": "Agent lagt til",
+        "message": "Meldingsagenten er lagt til"
+      },
+      "agentUpdated": {
+        "title": "Agent oppdatert",
+        "message": "Meldingsagenten har blitt oppdatert"
+      },
+      "agentRemoved": {
+        "title": "Agent fjernet",
+        "message": "Meldingsagenten har blitt fjernet"
+      },
+      "jobCompleted": {
+        "title": "Jobb fullført",
+        "message": "{{name}} fullført"
       },
       "ruleCreated": {
-        "message": "Regelen har blitt opprettet",
-        "title": "Regel opprettet"
-      },
-      "ruleDeleted": {
-        "message": "Regelen har blitt slettet",
-        "title": "Regelen slettet"
+        "title": "Regel opprettet",
+        "message": "Regelen har blitt opprettet"
       },
       "ruleUpdated": {
-        "message": "Regelen har blitt oppdatert",
-        "title": "Regel oppdatert"
+        "title": "Regel oppdatert",
+        "message": "Regelen har blitt oppdatert"
       },
-      "serverAdded": {
-        "message": "{{name}} har blitt koblet til",
-        "title": "Server lagt til"
-      },
-      "serverRemoved": {
-        "message": "Serveren er fjernet vellykket",
-        "title": "Serveren ble fjernet"
-      },
-      "serverSynced": {
-        "message": "Serverdata har blitt synkronisert",
-        "title": "Synkronisert server"
-      },
-      "serverUpdated": {
-        "message": "Serveren er blitt oppdatert",
-        "title": "Serveren er oppdatert"
-      },
-      "serverUrlUpdated": {
-        "message": "Serverens nettadresse er oppdatert",
-        "title": "Server-URL oppdatert"
-      },
-      "serverUserSplit": {
-        "title": "Account split into a separate user"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} økt slettet",
-        "message_other": "{{count}} økter slettet",
-        "title": "Økter slettet"
-      },
-      "sessionsRevoked": {
-        "message": "Alle mobiløkter har blitt trukket tilbake",
-        "title": "Opphevede økter"
-      },
-      "settingsUpdated": {
-        "message": "Dine lagret innstillinger har blitt",
-        "title": "Innstillinger oppdatert"
+      "ruleDeleted": {
+        "title": "Regelen slettet",
+        "message": "Regelen har blitt slettet"
       },
       "streamTerminated": {
-        "message": "Avspillingsøkten har blitt stoppet",
-        "title": "Strømmen er avsluttet"
+        "title": "Strømmen er avsluttet",
+        "message": "Avspillingsøkten har blitt stoppet"
+      },
+      "serverUrlUpdated": {
+        "title": "Server-URL oppdatert",
+        "message": "Serverens nettadresse er oppdatert"
+      },
+      "serverUpdated": {
+        "title": "Serveren er oppdatert",
+        "message": "Serveren er blitt oppdatert"
       },
       "syncCompletedWithErrors": {
         "title": "Synkronisering fullført med feil"
       },
-      "tokenCopied": {
-        "message": "Knytt token kopiert til utklippstavlen",
-        "title": "Token kopiert"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} bruker tilbakestiller til 100",
-        "message_other": "{{count}} brukere tilbakestiller til 100",
-        "title": "Stol på resultater tilbakestilt"
-      },
-      "usersMerged": {
-        "rulesKept": "Kept target's version of: {{names}}",
-        "title": "Users merged"
-      },
-      "violationAcknowledged": {
-        "message": "Anbruddet er markert som anerkjent",
-        "title": "Brudd Anerkjent"
-      },
-      "violationDismissed": {
-        "message": "Brudd er blitt avvist",
-        "title": "Brudd Avvist"
+      "sessionsDeleted": {
+        "title": "Økter slettet",
+        "message_one": "{{count}} økt slettet",
+        "message_other": "{{count}} økter slettet"
       },
       "violationsAcknowledged": {
+        "title": "Brudd Anvist",
         "message_one": "{{count}} brudd godkjent",
-        "message_other": "{{count}} krenkelser godkjent",
-        "title": "Brudd Anvist"
+        "message_other": "{{count}} krenkelser godkjent"
       },
       "violationsDismissed": {
+        "title": "Brudd avvist",
         "message_one": "{{count}} brudd avvist",
-        "message_other": "{{count}} krenkelser avvist",
-        "title": "Brudd avvist"
+        "message_other": "{{count}} krenkelser avvist"
       },
-      "webhookTest": {
-        "message": "Nettkrok fungerer riktig",
-        "title": "Test vellykket"
+      "apiKeyGenerated": {
+        "title": "API-nøkkel generert",
+        "message": "Den nye API-nøkkelen er klar til bruk"
+      },
+      "mobileAccessEnabled": {
+        "title": "Mobile tilgang aktivert",
+        "message": "Skann QR-koden med Tracearr mobile app for å koble til"
+      },
+      "mobileAccessDisabled": {
+        "title": "Mobiltilgang deaktivert",
+        "message": "Alle mobiløkter har blitt trukket tilbake"
+      },
+      "pairTokenGenerated": {
+        "title": "Par Token generert",
+        "message": "Skann QR-koden med din mobile enhet for å pare"
+      },
+      "displayNameUpdated": {
+        "title": "Vis navn oppdatert"
+      },
+      "trustScoresReset": {
+        "title": "Stol på resultater tilbakestilt",
+        "message_one": "{{count}} bruker tilbakestiller til 100",
+        "message_other": "{{count}} brukere tilbakestiller til 100"
+      },
+      "claimCodeValidated": {
+        "title": "Krever kode godkjent",
+        "message": "Nå kan du fortsette med oppsettet"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Klarte ikke å legge til server",
+      "serverRemoveFailed": "Kan ikke fjerne serveren",
+      "serverSyncFailed": "Kan ikke synkronisere serveren",
+      "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
+      "copyFailed": "Kunne ikke kopiere til utklippstavlen",
+      "acknowledgeFailed": "Mislyktes i å anerkjenne brudd",
+      "dismissFailed": "Kunne ikke avvise brudd",
+      "authFailed": "Godkjenning mislyktes",
+      "webhookTestFailed": "Webhook-test mislyktes",
+      "ruleCreateFailed": "Kunne ikke opprette regel",
+      "ruleUpdateFailed": "Kunne ikke oppdatere regel",
+      "ruleDeleteFailed": "Kunne ikke slette regel",
+      "streamTerminateFailed": "Kan ikke avslutte strømmen",
+      "serverUrlUpdateFailed": "Klarte ikke å oppdatere nettadressen til serveren",
+      "serverUpdateFailed": "Kunne ikke oppdatere serveren",
+      "serverReorderFailed": "Kan ikke flytte servere",
+      "sessionsDeleteFailed": "Kunne ikke slette økter",
+      "apiKeyGenerateFailed": "Kunne ikke generere API-nøkkel",
+      "mobileAccessEnableFailed": "Kunne ikke aktivere mobiltilgang",
+      "mobileAccessDisableFailed": "Kunne ikke deaktivere mobiltilgang",
+      "pairTokenGenerateFailed": "Kunne ikke generere par token",
+      "deviceRemoveFailed": "Kan ikke fjerne enheten",
+      "deviceRenameFailed": "Kunne ikke gi enheten nytt navn",
+      "sessionsRevokeFailed": "Kan ikke tilbakekalle økter",
+      "displayNameUpdateFailed": "Kunne ikke oppdatere visningsnavnet",
+      "trustScoresResetFailed": "Kan ikke tilbakestille tillit poengsum",
+      "routingUpdateFailed": "Kunne ikke oppdatere ruting",
+      "clipboardFailed": "Kan ikke kopiere til utklippstavlen",
+      "plexUnlinkFailed": "Klarte ikke koble fra Plex konto",
+      "agentAddFailed": "Kan ikke legge til agent",
+      "agentUpdateFailed": "Kunne ikke oppdatere agent",
+      "agentRemoveFailed": "Kunne ikke fjerne agent",
+      "agentTestFailed": "Testen mislyktes",
+      "jobAlreadyRunning": "Jobb kjører allerede",
+      "jobStartFailed": "Kan ikke starte jobb",
+      "jobLoadFailed": "Kunne ikke laste vedlikeholdsjobber",
+      "invalidUrl": "Ugyldig nettadresse",
+      "plexDirectUrl": "plex.direkte URL-er er relay adresser som ikke kan brukes her. Vennligst bruk en direkte IP-adresse eller vertsnavn i stedet.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
+      "invalidClaimCode": {
+        "title": "Ugyldig reklamasjonskode",
+        "message": "Vennligst sjekk server loggene"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} støtte på en feil",
-        "title": "Jobb mislyktes"
+        "title": "Jobb mislyktes",
+        "message": "{{name}} støtte på en feil"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Ny strømming startet",
+        "message": "{{user}} har startet å se på {{media}}"
+      },
+      "streamStopped": {
+        "title": "Strøm stoppet",
+        "message": "{{user}} sluttet å følge"
+      },
+      "updateAvailable": {
+        "title": "Oppdatering tilgjengelig",
+        "message": "Tracearr {{version}} er tilgjengelig"
+      },
+      "serverOffline": {
+        "title": "Server frakoblet",
+        "message": "{{name}} er utilgjengelig"
+      },
+      "serverOnline": {
+        "title": "Server pålogget",
+        "message": "{{name}} er tilbake på nettet"
+      },
+      "violationDetected": {
+        "title": "Ny Bruk: {{ruleName}}",
+        "message": "{{user}} har aktivert {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Deling oppdaget",
+    "streamStarted": "Strøm startet",
+    "streamEnded": "Strøm avsluttet",
+    "serverDown": "Servertilkobling mistet",
+    "serverUp": "Tjeneren tilbake på nettet",
+    "newDevice": "Ny enhet",
+    "trustScoreChanged": "Tillit score endret"
+  },
+  "settings": {
+    "title": "Innstillinger for varsling",
+    "allSeverity": "Alt (Low, Advarsel, Høy)",
+    "warningAndHigh": "Advarsel og høy",
+    "highOnly": "Bare høy alvorlighetsgrad",
+    "allTypes": "Alle typer",
+    "rateLimit": "Gjeldende sats grense status",
+    "perMinute": "Per minutt",
+    "perHour": "Per time",
+    "enablePushNotifications": "Aktiver push-varsler",
+    "notificationEvents": "Varsel Hendelser",
+    "violationDetected": "Brudd oppdaget",
+    "violationDetectedDesc": "Når brudd på deling utløses",
+    "streamStarted": "Strøm startet",
+    "streamStartedDesc": "Når en bruker begynner å se",
+    "streamStopped": "Strøm stoppet",
+    "streamStoppedDesc": "Når en bruker slutter å se på",
+    "concurrentStreams": "Samtidige strømmer",
+    "concurrentStreamsDesc": "Når maks strømgrense er overskredet",
+    "newDevice": "Ny enhet",
+    "newDeviceDesc": "Når en ny enhet kobles til",
+    "trustScoreChanged": "Tillit score endret",
+    "trustScoreChangedDesc": "Når en brukers tillit endres",
+    "serverDown": "Server ned",
+    "serverDownDesc": "Når en medieserver går offline",
+    "serverUp": "Server opp",
+    "serverUpDesc": "Når en medieserver kommer tilbake online",
+    "violationFilters": "Brudd filtre",
+    "minimumSeverity": "Minimum Alvorlighetsgrad",
+    "quietHours": "Stille Timer",
+    "enableQuietHours": "Aktiver stilletid",
+    "overrideForCritical": "Overstyr for kritiske",
+    "rateLimiting": "Vurder begrensning"
   }
 }
