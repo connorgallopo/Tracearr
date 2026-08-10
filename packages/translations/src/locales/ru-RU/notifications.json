@@ -1,279 +1,279 @@
 {
-  "push": {
-    "newDevice": "Новое устройство",
-    "serverDown": "Соединение с сервером потеряно",
-    "serverUp": "Обратный сервер онлайн",
-    "streamEnded": "Поток завершен",
-    "streamStarted": "Поток начат",
-    "trustScoreChanged": "Счет доверия изменен",
-    "violationDetected": "Обнаружено нарушение"
-  },
-  "settings": {
-    "allSeverity": "Все (Ну, предупреждение, Высокое)",
-    "allTypes": "Все типы",
-    "concurrentStreams": "Одновременные потоки",
-    "concurrentStreamsDesc": "При превышении лимита потока",
-    "enablePushNotifications": "Включить Push-уведомления",
-    "enableQuietHours": "Включить тихие часы",
-    "highOnly": "Только повышенная тяжесть",
-    "minimumSeverity": "Минимальная Серьезность",
-    "newDevice": "Новое устройство",
-    "newDeviceDesc": "При подключении нового устройства",
-    "notificationEvents": "События уведомлений",
-    "overrideForCritical": "Переопределить критические",
-    "perHour": "За час",
-    "perMinute": "В минуту",
-    "quietHours": "Тихие часы",
-    "rateLimit": "Статус текущего лимита",
-    "rateLimiting": "Ограничение тарифа",
-    "serverDown": "Сервер выключен",
-    "serverDownDesc": "Когда медиа-сервер выходит в автономном режиме",
-    "serverUp": "Сервер выключен",
-    "serverUpDesc": "Когда медиа сервер возвращается в сеть",
-    "streamStarted": "Поток начат",
-    "streamStartedDesc": "Когда пользователь начинает смотреть",
-    "streamStopped": "Поток остановлен",
-    "streamStoppedDesc": "Когда пользователь перестает смотреть",
-    "title": "Настройки уведомлений",
-    "trustScoreChanged": "Счет доверия изменен",
-    "trustScoreChangedDesc": "Когда рейтинг доверия пользователя меняется",
-    "violationDetected": "Обнаружено нарушение",
-    "violationDetectedDesc": "При возникновении нарушения обмена",
-    "violationFilters": "Нарушение фильтров",
-    "warningAndHigh": "Только высокий уровень предупреждения"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Не удалось подтвердить нарушение",
-      "agentAddFailed": "Не удалось добавить агента",
-      "agentRemoveFailed": "Не удалось удалить агента",
-      "agentTestFailed": "Тест не пройден",
-      "agentUpdateFailed": "Не удалось обновить агента",
-      "apiKeyGenerateFailed": "Не удалось сгенерировать ключ API",
-      "authFailed": "Аутентификация не удалась",
-      "clipboardFailed": "Не удалось скопировать в буфер обмена",
-      "copyFailed": "Не удалось скопировать в буфер обмена",
-      "deviceRemoveFailed": "Не удалось удалить устройство",
-      "deviceRenameFailed": "Не удалось переименовать устройство",
-      "dismissFailed": "Не удалось уволить нарушение",
-      "displayNameUpdateFailed": "Не удалось обновить отображаемое имя",
-      "invalidClaimCode": {
-        "message": "Пожалуйста, проверьте журналы сервера",
-        "title": "Неверный код владения"
-      },
-      "invalidUrl": "Неверный URL",
-      "jobAlreadyRunning": "Вакансия уже запущена",
-      "jobLoadFailed": "Не удалось загрузить задания по техническому обслуживанию",
-      "jobStartFailed": "Не удалось запустить задание",
-      "mobileAccessDisableFailed": "Не удалось отключить мобильный доступ",
-      "mobileAccessEnableFailed": "Не удалось включить мобильный доступ",
-      "pairTokenGenerateFailed": "Не удалось сгенерировать токен пары",
-      "plexDirectUrl": "URL-адреса plex.direct это адреса ретрансляции, которые не могут быть использованы здесь. Пожалуйста, используйте прямой IP адрес или имя хоста.",
-      "plexUnlinkFailed": "Не удалось отвязать аккаунт Plex",
-      "routingUpdateFailed": "Не удалось обновить маршрутизацию",
-      "ruleCreateFailed": "Не удалось создать правило",
-      "ruleDeleteFailed": "Не удалось удалить правило",
-      "ruleUpdateFailed": "Не удалось обновить правило",
-      "serverAddFailed": "Не удалось добавить сервер",
-      "serverRemoveFailed": "Не удалось удалить сервер",
-      "serverReorderFailed": "Не удалось изменить порядок серверов",
-      "serverSyncFailed": "Не удалось синхронизировать сервер",
-      "serverUpdateFailed": "Не удалось обновить сервер",
-      "serverUrlUpdateFailed": "Не удалось обновить URL сервера",
-      "serverUserSplitFailed": "Failed to split account",
-      "sessionsDeleteFailed": "Не удалось удалить сессии",
-      "sessionsRevokeFailed": "Не удалось отозвать сессии",
-      "settingsUpdateFailed": "Не удалось обновить настройки",
-      "streamTerminateFailed": "Не удалось завершить поток",
-      "trustScoresResetFailed": "Не удалось сбросить баллы доверия",
-      "userMergeFailed": "Failed to merge users",
-      "webhookTestFailed": "Тест Webhook не удался"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} недоступен",
-        "title": "Сервер оффлайн"
-      },
-      "serverOnline": {
-        "message": "{{name}} вернулся онлайн",
-        "title": "Сервер онлайн"
-      },
-      "streamStarted": {
-        "message": "{{user}} начал просмотр {{media}}",
-        "title": "Новый поток начался"
-      },
-      "streamStopped": {
-        "message": "{{user}} перестал смотреть",
-        "title": "Поток остановлен"
-      },
-      "updateAvailable": {
-        "message": "Доступно Tracearr {{version}}",
-        "title": "Доступно обновление"
-      },
-      "violationDetected": {
-        "message": "{{user}} вызвал {{ruleType}}",
-        "title": "Новое нарушение: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "Агент уведомления был добавлен",
-        "title": "Агент добавлен"
+      "serverAdded": {
+        "title": "Сервер добавлен",
+        "message": "{{name}} был успешно подключен"
       },
-      "agentRemoved": {
-        "message": "Агент уведомления был удален",
-        "title": "Агент удален"
+      "serverRemoved": {
+        "title": "Сервер удален",
+        "message": "Сервер был успешно удален"
       },
-      "agentUpdated": {
-        "message": "Агент уведомления был обновлен",
-        "title": "Агент обновлён"
+      "serverSynced": {
+        "title": "Синхронизация с сервером",
+        "message": "Данные сервера синхронизированы"
       },
-      "apiKeyGenerated": {
-        "message": "Ваш новый ключ API готов к использованию",
-        "title": "Ключ API создан"
+      "settingsUpdated": {
+        "title": "Настройки обновлены",
+        "message": "Ваши настройки были сохранены"
       },
-      "claimCodeValidated": {
-        "message": "Теперь вы можете продолжить установку",
-        "title": "Код подтверждения подтвержден"
+      "tokenCopied": {
+        "title": "Токен скопирован",
+        "message": "Маркер пара скопирован в буфер обмена"
+      },
+      "violationAcknowledged": {
+        "title": "Подтверждено нарушение",
+        "message": "Нарушение было отмечено как признанное"
+      },
+      "violationDismissed": {
+        "title": "Нарушение прекращено",
+        "message": "Нарушение было отклонено"
+      },
+      "deviceRemoved": {
+        "title": "Устройство удалено",
+        "message": "Устройство было отключено"
+      },
+      "deviceRenamed": {
+        "title": "Устройство переименовано",
+        "message": "Имя устройства обновлено"
+      },
+      "sessionsRevoked": {
+        "title": "Сеансы отозваны",
+        "message": "Все мобильные сессии были отозваны"
+      },
+      "loggedIn": {
+        "title": "Успешно",
+        "message": "Вход выполнен успешно"
+      },
+      "webhookTest": {
+        "title": "Тест пройден",
+        "message": "Веб-хук работает корректно"
       },
       "copiedToClipboard": {
         "title": "Скопировано в буфер обмена"
       },
-      "deviceRemoved": {
-        "message": "Устройство было отключено",
-        "title": "Устройство удалено"
-      },
-      "deviceRenamed": {
-        "message": "Имя устройства обновлено",
-        "title": "Устройство переименовано"
-      },
-      "displayNameUpdated": {
-        "title": "Отображаемое имя обновлено"
-      },
-      "jobCompleted": {
-        "message": "{{name}} успешно завершен",
-        "title": "Вакансия выполнена"
-      },
-      "loggedIn": {
-        "message": "Вход выполнен успешно",
-        "title": "Успешно"
-      },
-      "mobileAccessDisabled": {
-        "message": "Все мобильные сессии были отозваны",
-        "title": "Мобильный доступ отключен"
-      },
-      "mobileAccessEnabled": {
-        "message": "Сканируйте QR-код с помощью мобильного приложения Tracearr для подключения",
-        "title": "Мобильный доступ включен"
-      },
-      "pairTokenGenerated": {
-        "message": "Сканируйте QR-код вашим мобильным устройством для сопряжения",
-        "title": "Токен пара создан"
-      },
       "plexAccountLinked": {
-        "message": "Теперь вы можете добавить серверы из вашего аккаунта Plex",
-        "title": "Аккаунт Plex привязан"
+        "title": "Аккаунт Plex привязан",
+        "message": "Теперь вы можете добавить серверы из вашего аккаунта Plex"
       },
       "plexAccountUnlinked": {
-        "message": "Ваша учетная запись Plex была отключена",
-        "title": "Учетная запись Plex удалена"
+        "title": "Учетная запись Plex удалена",
+        "message": "Ваша учетная запись Plex была отключена"
+      },
+      "agentAdded": {
+        "title": "Агент добавлен",
+        "message": "Агент уведомления был добавлен"
+      },
+      "agentUpdated": {
+        "title": "Агент обновлён",
+        "message": "Агент уведомления был обновлен"
+      },
+      "agentRemoved": {
+        "title": "Агент удален",
+        "message": "Агент уведомления был удален"
+      },
+      "jobCompleted": {
+        "title": "Вакансия выполнена",
+        "message": "{{name}} успешно завершен"
       },
       "ruleCreated": {
-        "message": "Правило успешно создано",
-        "title": "Правило создано"
-      },
-      "ruleDeleted": {
-        "message": "Правило успешно удалено",
-        "title": "Правило Удалено"
+        "title": "Правило создано",
+        "message": "Правило успешно создано"
       },
       "ruleUpdated": {
-        "message": "Правило успешно обновлено",
-        "title": "Правило обновлено"
+        "title": "Правило обновлено",
+        "message": "Правило успешно обновлено"
       },
-      "serverAdded": {
-        "message": "{{name}} был успешно подключен",
-        "title": "Сервер добавлен"
-      },
-      "serverRemoved": {
-        "message": "Сервер был успешно удален",
-        "title": "Сервер удален"
-      },
-      "serverSynced": {
-        "message": "Данные сервера синхронизированы",
-        "title": "Синхронизация с сервером"
-      },
-      "serverUpdated": {
-        "message": "Сервер был успешно обновлен",
-        "title": "Сервер обновлен"
-      },
-      "serverUrlUpdated": {
-        "message": "URL сервера был успешно обновлен",
-        "title": "URL сервера обновлен"
-      },
-      "serverUserSplit": {
-        "title": "Account split into a separate user"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} сессия удалена",
-        "message_other": "{{count}} сеансов удалено",
-        "title": "Сессии удалены"
-      },
-      "sessionsRevoked": {
-        "message": "Все мобильные сессии были отозваны",
-        "title": "Сеансы отозваны"
-      },
-      "settingsUpdated": {
-        "message": "Ваши настройки были сохранены",
-        "title": "Настройки обновлены"
+      "ruleDeleted": {
+        "title": "Правило Удалено",
+        "message": "Правило успешно удалено"
       },
       "streamTerminated": {
-        "message": "Сеанс воспроизведения остановлен",
-        "title": "Поток завершен"
+        "title": "Поток завершен",
+        "message": "Сеанс воспроизведения остановлен"
+      },
+      "serverUrlUpdated": {
+        "title": "URL сервера обновлен",
+        "message": "URL сервера был успешно обновлен"
+      },
+      "serverUpdated": {
+        "title": "Сервер обновлен",
+        "message": "Сервер был успешно обновлен"
       },
       "syncCompletedWithErrors": {
         "title": "Синхронизация завершена с ошибками"
       },
-      "tokenCopied": {
-        "message": "Маркер пара скопирован в буфер обмена",
-        "title": "Токен скопирован"
-      },
-      "trustScoresReset": {
-        "message_one": "Пользователь {{count}} сброшен на 100",
-        "message_other": "{{count}} пользователей сброшены на 100",
-        "title": "Сброс баллов доверия"
-      },
-      "usersMerged": {
-        "rulesKept": "Kept target's version of: {{names}}",
-        "title": "Users merged"
-      },
-      "violationAcknowledged": {
-        "message": "Нарушение было отмечено как признанное",
-        "title": "Подтверждено нарушение"
-      },
-      "violationDismissed": {
-        "message": "Нарушение было отклонено",
-        "title": "Нарушение прекращено"
+      "sessionsDeleted": {
+        "title": "Сессии удалены",
+        "message_one": "{{count}} сессия удалена",
+        "message_other": "{{count}} сеансов удалено"
       },
       "violationsAcknowledged": {
+        "title": "Признанные нарушения",
         "message_one": "Нарушение {{count}} признано",
-        "message_other": "Признанные нарушения {{count}}",
-        "title": "Признанные нарушения"
+        "message_other": "Признанные нарушения {{count}}"
       },
       "violationsDismissed": {
+        "title": "Нарушения прекращены",
         "message_one": "Нарушение {{count}} отклонено",
-        "message_other": "Убрано нарушений {{count}}",
-        "title": "Нарушения прекращены"
+        "message_other": "Убрано нарушений {{count}}"
       },
-      "webhookTest": {
-        "message": "Веб-хук работает корректно",
-        "title": "Тест пройден"
+      "apiKeyGenerated": {
+        "title": "Ключ API создан",
+        "message": "Ваш новый ключ API готов к использованию"
+      },
+      "mobileAccessEnabled": {
+        "title": "Мобильный доступ включен",
+        "message": "Сканируйте QR-код с помощью мобильного приложения Tracearr для подключения"
+      },
+      "mobileAccessDisabled": {
+        "title": "Мобильный доступ отключен",
+        "message": "Все мобильные сессии были отозваны"
+      },
+      "pairTokenGenerated": {
+        "title": "Токен пара создан",
+        "message": "Сканируйте QR-код вашим мобильным устройством для сопряжения"
+      },
+      "displayNameUpdated": {
+        "title": "Отображаемое имя обновлено"
+      },
+      "trustScoresReset": {
+        "title": "Сброс баллов доверия",
+        "message_one": "Пользователь {{count}} сброшен на 100",
+        "message_other": "{{count}} пользователей сброшены на 100"
+      },
+      "claimCodeValidated": {
+        "title": "Код подтверждения подтвержден",
+        "message": "Теперь вы можете продолжить установку"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Не удалось добавить сервер",
+      "serverRemoveFailed": "Не удалось удалить сервер",
+      "serverSyncFailed": "Не удалось синхронизировать сервер",
+      "settingsUpdateFailed": "Не удалось обновить настройки",
+      "copyFailed": "Не удалось скопировать в буфер обмена",
+      "acknowledgeFailed": "Не удалось подтвердить нарушение",
+      "dismissFailed": "Не удалось уволить нарушение",
+      "authFailed": "Аутентификация не удалась",
+      "webhookTestFailed": "Тест Webhook не удался",
+      "ruleCreateFailed": "Не удалось создать правило",
+      "ruleUpdateFailed": "Не удалось обновить правило",
+      "ruleDeleteFailed": "Не удалось удалить правило",
+      "streamTerminateFailed": "Не удалось завершить поток",
+      "serverUrlUpdateFailed": "Не удалось обновить URL сервера",
+      "serverUpdateFailed": "Не удалось обновить сервер",
+      "serverReorderFailed": "Не удалось изменить порядок серверов",
+      "sessionsDeleteFailed": "Не удалось удалить сессии",
+      "apiKeyGenerateFailed": "Не удалось сгенерировать ключ API",
+      "mobileAccessEnableFailed": "Не удалось включить мобильный доступ",
+      "mobileAccessDisableFailed": "Не удалось отключить мобильный доступ",
+      "pairTokenGenerateFailed": "Не удалось сгенерировать токен пары",
+      "deviceRemoveFailed": "Не удалось удалить устройство",
+      "deviceRenameFailed": "Не удалось переименовать устройство",
+      "sessionsRevokeFailed": "Не удалось отозвать сессии",
+      "displayNameUpdateFailed": "Не удалось обновить отображаемое имя",
+      "trustScoresResetFailed": "Не удалось сбросить баллы доверия",
+      "routingUpdateFailed": "Не удалось обновить маршрутизацию",
+      "clipboardFailed": "Не удалось скопировать в буфер обмена",
+      "plexUnlinkFailed": "Не удалось отвязать аккаунт Plex",
+      "agentAddFailed": "Не удалось добавить агента",
+      "agentUpdateFailed": "Не удалось обновить агента",
+      "agentRemoveFailed": "Не удалось удалить агента",
+      "agentTestFailed": "Тест не пройден",
+      "jobAlreadyRunning": "Вакансия уже запущена",
+      "jobStartFailed": "Не удалось запустить задание",
+      "jobLoadFailed": "Не удалось загрузить задания по техническому обслуживанию",
+      "invalidUrl": "Неверный URL",
+      "plexDirectUrl": "URL-адреса plex.direct это адреса ретрансляции, которые не могут быть использованы здесь. Пожалуйста, используйте прямой IP адрес или имя хоста.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
+      "invalidClaimCode": {
+        "title": "Неверный код владения",
+        "message": "Пожалуйста, проверьте журналы сервера"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} обнаружил ошибку",
-        "title": "Работа не удалась"
+        "title": "Работа не удалась",
+        "message": "{{name}} обнаружил ошибку"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Новый поток начался",
+        "message": "{{user}} начал просмотр {{media}}"
+      },
+      "streamStopped": {
+        "title": "Поток остановлен",
+        "message": "{{user}} перестал смотреть"
+      },
+      "updateAvailable": {
+        "title": "Доступно обновление",
+        "message": "Доступно Tracearr {{version}}"
+      },
+      "serverOffline": {
+        "title": "Сервер оффлайн",
+        "message": "{{name}} недоступен"
+      },
+      "serverOnline": {
+        "title": "Сервер онлайн",
+        "message": "{{name}} вернулся онлайн"
+      },
+      "violationDetected": {
+        "title": "Новое нарушение: {{ruleName}}",
+        "message": "{{user}} вызвал {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Обнаружено нарушение",
+    "streamStarted": "Поток начат",
+    "streamEnded": "Поток завершен",
+    "serverDown": "Соединение с сервером потеряно",
+    "serverUp": "Обратный сервер онлайн",
+    "newDevice": "Новое устройство",
+    "trustScoreChanged": "Счет доверия изменен"
+  },
+  "settings": {
+    "title": "Настройки уведомлений",
+    "allSeverity": "Все (Ну, предупреждение, Высокое)",
+    "warningAndHigh": "Только высокий уровень предупреждения",
+    "highOnly": "Только повышенная тяжесть",
+    "allTypes": "Все типы",
+    "rateLimit": "Статус текущего лимита",
+    "perMinute": "В минуту",
+    "perHour": "За час",
+    "enablePushNotifications": "Включить Push-уведомления",
+    "notificationEvents": "События уведомлений",
+    "violationDetected": "Обнаружено нарушение",
+    "violationDetectedDesc": "При возникновении нарушения обмена",
+    "streamStarted": "Поток начат",
+    "streamStartedDesc": "Когда пользователь начинает смотреть",
+    "streamStopped": "Поток остановлен",
+    "streamStoppedDesc": "Когда пользователь перестает смотреть",
+    "concurrentStreams": "Одновременные потоки",
+    "concurrentStreamsDesc": "При превышении лимита потока",
+    "newDevice": "Новое устройство",
+    "newDeviceDesc": "При подключении нового устройства",
+    "trustScoreChanged": "Счет доверия изменен",
+    "trustScoreChangedDesc": "Когда рейтинг доверия пользователя меняется",
+    "serverDown": "Сервер выключен",
+    "serverDownDesc": "Когда медиа-сервер выходит в автономном режиме",
+    "serverUp": "Сервер выключен",
+    "serverUpDesc": "Когда медиа сервер возвращается в сеть",
+    "violationFilters": "Нарушение фильтров",
+    "minimumSeverity": "Минимальная Серьезность",
+    "quietHours": "Тихие часы",
+    "enableQuietHours": "Включить тихие часы",
+    "overrideForCritical": "Переопределить критические",
+    "rateLimiting": "Ограничение тарифа"
   }
 }
