@@ -1,279 +1,279 @@
 {
-  "push": {
-    "newDevice": "Νέα Συσκευή",
-    "serverDown": "Η Σύνδεση Του Διακομιστή Χάθηκε",
-    "serverUp": "Συνδεδεμένος Με Διακομιστή",
-    "streamEnded": "Τέλος Ροής",
-    "streamStarted": "Η Ροή Ξεκίνησε",
-    "trustScoreChanged": "Αλλαγή Βαθμολογίας Εμπιστοσύνης",
-    "violationDetected": "Εντοπίστηκε Παραβίαση Κοινής Χρήσης"
-  },
-  "settings": {
-    "allSeverity": "Όλα (Χαμηλή, Προειδοποίηση, Υψηλή)",
-    "allTypes": "Όλοι Οι Τύποι",
-    "concurrentStreams": "Ταυτόχρονες Ροές",
-    "concurrentStreamsDesc": "Όταν ξεπεραστεί το μέγιστο όριο ροής",
-    "enablePushNotifications": "Ενεργοποίηση Ειδοποιήσεων Push",
-    "enableQuietHours": "Ενεργοποίηση Ώρες Ησυχίας",
-    "highOnly": "Μόνο υψηλή βαρύτητα",
-    "minimumSeverity": "Ελάχιστη Σοβαρότητα",
-    "newDevice": "Νέα Συσκευή",
-    "newDeviceDesc": "Όταν μια νέα συσκευή συνδέεται",
-    "notificationEvents": "Γεγονότα Ειδοποιήσεων",
-    "overrideForCritical": "Παράκαμψη κρίσιμης σημασίας",
-    "perHour": "Ανά Ώρα",
-    "perMinute": "Ανά Λεπτό",
-    "quietHours": "Ώρες Ησυχίας",
-    "rateLimit": "Τρέχουσα Κατάσταση Ορίου Αξιολόγησης",
-    "rateLimiting": "Περιορισμός Αξιολόγησης",
-    "serverDown": "Διακομιστής Κάτω",
-    "serverDownDesc": "Όταν ένας διακομιστής πολυμέσων πηγαίνει εκτός σύνδεσης",
-    "serverUp": "Εξυπηρετητής Επάνω",
-    "serverUpDesc": "Όταν ένας διακομιστής πολυμέσων επιστρέφει σε απευθείας σύνδεση",
-    "streamStarted": "Η Ροή Ξεκίνησε",
-    "streamStartedDesc": "Όταν ένας χρήστης αρχίζει να παρακολουθεί",
-    "streamStopped": "Η Ροή Σταμάτησε",
-    "streamStoppedDesc": "Όταν ένας χρήστης σταματήσει να παρακολουθεί",
-    "title": "Ρυθμίσεις Ειδοποιήσεων",
-    "trustScoreChanged": "Αλλαγή Βαθμολογίας Εμπιστοσύνης",
-    "trustScoreChangedDesc": "Όταν αλλάζει το σκορ εμπιστοσύνης χρήστη",
-    "violationDetected": "Εντοπίστηκε Παραβίαση",
-    "violationDetectedDesc": "Όταν ενεργοποιείται μια παραβίαση κοινής χρήσης",
-    "violationFilters": "Φίλτρα Παραβίασης",
-    "warningAndHigh": "Μόνο προειδοποίηση & υψηλή"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Αποτυχία αναγνώρισης παραβίασης",
-      "agentAddFailed": "Αποτυχία προσθήκης πράκτορα",
-      "agentRemoveFailed": "Αποτυχία κατάργησης πράκτορα",
-      "agentTestFailed": "Η δοκιμή απέτυχε",
-      "agentUpdateFailed": "Αποτυχία ενημέρωσης πράκτορα",
-      "apiKeyGenerateFailed": "Αποτυχία δημιουργίας κλειδιού API",
-      "authFailed": "Αποτυχία ταυτοποίησης",
-      "clipboardFailed": "Αποτυχία αντιγραφής στο πρόχειρο",
-      "copyFailed": "Αδυναμία αντιγραφής στο πρόχειρο",
-      "deviceRemoveFailed": "Αποτυχία κατάργησης συσκευής",
-      "deviceRenameFailed": "Αποτυχία μετονομασίας συσκευής",
-      "dismissFailed": "Αποτυχία απόρριψης παραβίασης",
-      "displayNameUpdateFailed": "Αποτυχία ενημέρωσης ονόματος οθόνης",
-      "invalidClaimCode": {
-        "message": "Παρακαλούμε ελέγξτε τα αρχεία καταγραφής του διακομιστή",
-        "title": "Μη έγκυρος κωδικός απαίτησης"
-      },
-      "invalidUrl": "Μη Έγκυρο URL",
-      "jobAlreadyRunning": "Η εργασία εκτελείται ήδη",
-      "jobLoadFailed": "Αποτυχία φόρτωσης εργασιών συντήρησης",
-      "jobStartFailed": "Αποτυχία έναρξης εργασίας",
-      "mobileAccessDisableFailed": "Αποτυχία απενεργοποίησης πρόσβασης για κινητά",
-      "mobileAccessEnableFailed": "Αποτυχία ενεργοποίησης πρόσβασης για κινητά",
-      "pairTokenGenerateFailed": "Αποτυχία δημιουργίας διακριτικού ζεύγους",
-      "plexDirectUrl": "Οι διευθύνσεις URL plex.direct είναι διευθύνσεις ρελέ που δεν μπορούν να χρησιμοποιηθούν εδώ. Παρακαλώ χρησιμοποιήστε μια άμεση διεύθυνση IP ή όνομα κεντρικού υπολογιστή.",
-      "plexUnlinkFailed": "Αποτυχία αποσύνδεσης του λογαριασμού Plex",
-      "routingUpdateFailed": "Αποτυχία ενημέρωσης δρομολόγησης",
-      "ruleCreateFailed": "Αποτυχία δημιουργίας κανόνα",
-      "ruleDeleteFailed": "Αποτυχία διαγραφής κανόνα",
-      "ruleUpdateFailed": "Αποτυχία ενημέρωσης κανόνα",
-      "serverAddFailed": "Αποτυχία προσθήκης διακομιστή",
-      "serverRemoveFailed": "Αποτυχία κατάργησης διακομιστή",
-      "serverReorderFailed": "Απέτυχε η αναδιάταξη διακομιστών",
-      "serverSyncFailed": "Αποτυχία συγχρονισμού διακομιστή",
-      "serverUpdateFailed": "Αποτυχία ενημέρωσης διακομιστή",
-      "serverUrlUpdateFailed": "Αποτυχία ενημέρωσης του διακομιστή URL",
-      "serverUserSplitFailed": "Failed to split account",
-      "sessionsDeleteFailed": "Αποτυχία διαγραφής συνεδριών",
-      "sessionsRevokeFailed": "Αποτυχία ανάκλησης συνεδριών",
-      "settingsUpdateFailed": "Αποτυχία ενημέρωσης των ρυθμίσεων",
-      "streamTerminateFailed": "Αποτυχία τερματισμού ροής",
-      "trustScoresResetFailed": "Αποτυχία επαναφοράς των βαθμολογιών εμπιστοσύνης",
-      "userMergeFailed": "Failed to merge users",
-      "webhookTestFailed": "Το τεστ Webhook απέτυχε"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "Το {{name}} δεν είναι προσβάσιμο",
-        "title": "Διακομιστής Χωρίς Σύνδεση"
-      },
-      "serverOnline": {
-        "message": "Το {{name}} είναι ξανά συνδεδεμένο",
-        "title": "Συνδεδεμένος Διακομιστής"
-      },
-      "streamStarted": {
-        "message": "Ο {{user}} άρχισε να βλέπει {{media}}",
-        "title": "Ξεκίνησε Η Νέα Ροή"
-      },
-      "streamStopped": {
-        "message": "Το {{user}} σταμάτησε να παρακολουθεί",
-        "title": "Η Ροή Σταμάτησε"
-      },
-      "updateAvailable": {
-        "message": "Το Tracearr {{version}} είναι διαθέσιμο",
-        "title": "Διαθέσιμη Ενημέρωση"
-      },
-      "violationDetected": {
-        "message": "{{user}} triggered {{ruleType}}",
-        "title": "New Violation: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "Ο πράκτορας ειδοποιήσεων έχει προστεθεί",
-        "title": "Προστέθηκε Πράκτορας"
+      "serverAdded": {
+        "title": "Ο Διακομιστής Προστέθηκε",
+        "message": "Το {{name}} συνδέθηκε με επιτυχία"
       },
-      "agentRemoved": {
-        "message": "Ο πράκτορας ειδοποιήσεων έχει αφαιρεθεί",
-        "title": "Ο Πράκτορας Αφαιρέθηκε"
+      "serverRemoved": {
+        "title": "Ο Διακομιστής Αφαιρέθηκε",
+        "message": "Ο διακομιστής αφαιρέθηκε με επιτυχία"
       },
-      "agentUpdated": {
-        "message": "Ο πράκτορας ειδοποιήσεων έχει ενημερωθεί",
-        "title": "Ο Πράκτορας Ενημερώθηκε"
+      "serverSynced": {
+        "title": "Συγχρονισμός Διακομιστή",
+        "message": "Τα δεδομένα του διακομιστή έχουν συγχρονιστεί"
       },
-      "apiKeyGenerated": {
-        "message": "Το νέο κλειδί API είναι έτοιμο προς χρήση",
-        "title": "Το Κλειδί Api Δημιουργήθηκε"
+      "settingsUpdated": {
+        "title": "Οι Ρυθμίσεις Ενημερώθηκαν",
+        "message": "Οι ρυθμίσεις σας έχουν αποθηκευτεί"
       },
-      "claimCodeValidated": {
-        "message": "Τώρα μπορείτε να προχωρήσετε με την εγκατάσταση",
-        "title": "Επικυρωμένος κωδικός αξίωσης"
+      "tokenCopied": {
+        "title": "Το διακριτικό Αντιγράφηκε",
+        "message": "Το ζευγάρι token αντιγράφηκε στο πρόχειρο"
+      },
+      "violationAcknowledged": {
+        "title": "Παραβίαση Αναγνωρισμένο",
+        "message": "Η παραβίαση έχει επισημανθεί ως αναγνωρισμένη"
+      },
+      "violationDismissed": {
+        "title": "Απορρίφθηκε Παραβίαση",
+        "message": "Η παραβίαση έχει απορριφθεί"
+      },
+      "deviceRemoved": {
+        "title": "Η Συσκευή Αφαιρέθηκε",
+        "message": "Η συσκευή έχει αποσυνδεθεί"
+      },
+      "deviceRenamed": {
+        "title": "Η Συσκευή Μετονομάστηκε",
+        "message": "Το όνομα της συσκευής έχει ενημερωθεί"
+      },
+      "sessionsRevoked": {
+        "title": "Ανακληθείσες Συνεδρίες",
+        "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί"
+      },
+      "loggedIn": {
+        "title": "Επιτυχία",
+        "message": "Επιτυχής σύνδεση"
+      },
+      "webhookTest": {
+        "title": "Δοκιμή Επιτυχής",
+        "message": "Το Webhook λειτουργεί σωστά"
       },
       "copiedToClipboard": {
         "title": "Αντιγράφηκε στο πρόχειρο"
       },
-      "deviceRemoved": {
-        "message": "Η συσκευή έχει αποσυνδεθεί",
-        "title": "Η Συσκευή Αφαιρέθηκε"
-      },
-      "deviceRenamed": {
-        "message": "Το όνομα της συσκευής έχει ενημερωθεί",
-        "title": "Η Συσκευή Μετονομάστηκε"
-      },
-      "displayNameUpdated": {
-        "title": "Εμφανιζόμενο Όνομα Ενημερώθηκε"
-      },
-      "jobCompleted": {
-        "message": "Το {{name}} ολοκληρώθηκε με επιτυχία",
-        "title": "Η Εργασία Ολοκληρώθηκε"
-      },
-      "loggedIn": {
-        "message": "Επιτυχής σύνδεση",
-        "title": "Επιτυχία"
-      },
-      "mobileAccessDisabled": {
-        "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί",
-        "title": "Απενεργοποιημένη Πρόσβαση Κινητού"
-      },
-      "mobileAccessEnabled": {
-        "message": "Σαρώστε τον κωδικό QR με την εφαρμογή Tracearr για να συνδεθείτε",
-        "title": "Πρόσβαση Για Κινητά"
-      },
-      "pairTokenGenerated": {
-        "message": "Σαρώστε τον κωδικό QR με την κινητή συσκευή σας για σύζευξη",
-        "title": "Ζεύγος Διακριτικού Δημιουργείται"
-      },
       "plexAccountLinked": {
-        "message": "Τώρα μπορείτε να προσθέσετε διακομιστές από το λογαριασμό σας στο Plex",
-        "title": "Συνδεδεμένος Λογαριασμός Plex"
+        "title": "Συνδεδεμένος Λογαριασμός Plex",
+        "message": "Τώρα μπορείτε να προσθέσετε διακομιστές από το λογαριασμό σας στο Plex"
       },
       "plexAccountUnlinked": {
-        "message": "Ο λογαριασμός σας στο Plex έχει αποσυνδεθεί",
-        "title": "Αποσύνδεση Λογαριασμού Plex"
+        "title": "Αποσύνδεση Λογαριασμού Plex",
+        "message": "Ο λογαριασμός σας στο Plex έχει αποσυνδεθεί"
+      },
+      "agentAdded": {
+        "title": "Προστέθηκε Πράκτορας",
+        "message": "Ο πράκτορας ειδοποιήσεων έχει προστεθεί"
+      },
+      "agentUpdated": {
+        "title": "Ο Πράκτορας Ενημερώθηκε",
+        "message": "Ο πράκτορας ειδοποιήσεων έχει ενημερωθεί"
+      },
+      "agentRemoved": {
+        "title": "Ο Πράκτορας Αφαιρέθηκε",
+        "message": "Ο πράκτορας ειδοποιήσεων έχει αφαιρεθεί"
+      },
+      "jobCompleted": {
+        "title": "Η Εργασία Ολοκληρώθηκε",
+        "message": "Το {{name}} ολοκληρώθηκε με επιτυχία"
       },
       "ruleCreated": {
-        "message": "Ο κανόνας έχει δημιουργηθεί με επιτυχία",
-        "title": "Ο Κανόνας Δημιουργήθηκε"
-      },
-      "ruleDeleted": {
-        "message": "Ο κανόνας έχει διαγραφεί με επιτυχία",
-        "title": "Κανόνας Διαγράφηκε"
+        "title": "Ο Κανόνας Δημιουργήθηκε",
+        "message": "Ο κανόνας έχει δημιουργηθεί με επιτυχία"
       },
       "ruleUpdated": {
-        "message": "Ο κανόνας έχει ενημερωθεί με επιτυχία",
-        "title": "Κανόνας Ενημερώθηκε"
+        "title": "Κανόνας Ενημερώθηκε",
+        "message": "Ο κανόνας έχει ενημερωθεί με επιτυχία"
       },
-      "serverAdded": {
-        "message": "Το {{name}} συνδέθηκε με επιτυχία",
-        "title": "Ο Διακομιστής Προστέθηκε"
-      },
-      "serverRemoved": {
-        "message": "Ο διακομιστής αφαιρέθηκε με επιτυχία",
-        "title": "Ο Διακομιστής Αφαιρέθηκε"
-      },
-      "serverSynced": {
-        "message": "Τα δεδομένα του διακομιστή έχουν συγχρονιστεί",
-        "title": "Συγχρονισμός Διακομιστή"
-      },
-      "serverUpdated": {
-        "message": "Ο διακομιστής έχει ενημερωθεί με επιτυχία",
-        "title": "Ο Διακομιστής Ενημερώθηκε"
-      },
-      "serverUrlUpdated": {
-        "message": "Η διεύθυνση URL του διακομιστή έχει ενημερωθεί με επιτυχία",
-        "title": "Το Url Του Διακομιστή Ενημερώθηκε"
-      },
-      "serverUserSplit": {
-        "title": "Account split into a separate user"
-      },
-      "sessionsDeleted": {
-        "message_one": "Η συνεδρία {{count}} διαγράφηκε",
-        "message_other": "{{count}} sessions deleted",
-        "title": "Οι Συνεδρίες Διαγράφηκαν"
-      },
-      "sessionsRevoked": {
-        "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί",
-        "title": "Ανακληθείσες Συνεδρίες"
-      },
-      "settingsUpdated": {
-        "message": "Οι ρυθμίσεις σας έχουν αποθηκευτεί",
-        "title": "Οι Ρυθμίσεις Ενημερώθηκαν"
+      "ruleDeleted": {
+        "title": "Κανόνας Διαγράφηκε",
+        "message": "Ο κανόνας έχει διαγραφεί με επιτυχία"
       },
       "streamTerminated": {
-        "message": "Η συνεδρία αναπαραγωγής έχει διακοπεί",
-        "title": "Η Ροή Τερματίστηκε"
+        "title": "Η Ροή Τερματίστηκε",
+        "message": "Η συνεδρία αναπαραγωγής έχει διακοπεί"
+      },
+      "serverUrlUpdated": {
+        "title": "Το Url Του Διακομιστή Ενημερώθηκε",
+        "message": "Η διεύθυνση URL του διακομιστή έχει ενημερωθεί με επιτυχία"
+      },
+      "serverUpdated": {
+        "title": "Ο Διακομιστής Ενημερώθηκε",
+        "message": "Ο διακομιστής έχει ενημερωθεί με επιτυχία"
       },
       "syncCompletedWithErrors": {
         "title": "Ο συγχρονισμός ολοκληρώθηκε με σφάλματα"
       },
-      "tokenCopied": {
-        "message": "Το ζευγάρι token αντιγράφηκε στο πρόχειρο",
-        "title": "Το διακριτικό Αντιγράφηκε"
-      },
-      "trustScoresReset": {
-        "message_one": "Επαναφορά του {{count}} χρήστη στο 100",
-        "message_other": "{{count}} users reset to 100",
-        "title": "Επαναφορά Βαθμών Εμπιστοσύνης"
-      },
-      "usersMerged": {
-        "rulesKept": "Kept target's version of: {{names}}",
-        "title": "Users merged"
-      },
-      "violationAcknowledged": {
-        "message": "Η παραβίαση έχει επισημανθεί ως αναγνωρισμένη",
-        "title": "Παραβίαση Αναγνωρισμένο"
-      },
-      "violationDismissed": {
-        "message": "Η παραβίαση έχει απορριφθεί",
-        "title": "Απορρίφθηκε Παραβίαση"
+      "sessionsDeleted": {
+        "title": "Οι Συνεδρίες Διαγράφηκαν",
+        "message_one": "Η συνεδρία {{count}} διαγράφηκε",
+        "message_other": "{{count}} sessions deleted"
       },
       "violationsAcknowledged": {
+        "title": "Παραβιάσεις Που Αναγνωρίζονται",
         "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged",
-        "title": "Παραβιάσεις Που Αναγνωρίζονται"
+        "message_other": "{{count}} violations acknowledged"
       },
       "violationsDismissed": {
+        "title": "Παραβιάσεις Απορρίφθηκαν",
         "message_one": "{{count}} violation dismissed",
-        "message_other": "Οι παραβιάσεις {{count}} απορρίφθηκαν",
-        "title": "Παραβιάσεις Απορρίφθηκαν"
+        "message_other": "Οι παραβιάσεις {{count}} απορρίφθηκαν"
       },
-      "webhookTest": {
-        "message": "Το Webhook λειτουργεί σωστά",
-        "title": "Δοκιμή Επιτυχής"
+      "apiKeyGenerated": {
+        "title": "Το Κλειδί Api Δημιουργήθηκε",
+        "message": "Το νέο κλειδί API είναι έτοιμο προς χρήση"
+      },
+      "mobileAccessEnabled": {
+        "title": "Πρόσβαση Για Κινητά",
+        "message": "Σαρώστε τον κωδικό QR με την εφαρμογή Tracearr για να συνδεθείτε"
+      },
+      "mobileAccessDisabled": {
+        "title": "Απενεργοποιημένη Πρόσβαση Κινητού",
+        "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί"
+      },
+      "pairTokenGenerated": {
+        "title": "Ζεύγος Διακριτικού Δημιουργείται",
+        "message": "Σαρώστε τον κωδικό QR με την κινητή συσκευή σας για σύζευξη"
+      },
+      "displayNameUpdated": {
+        "title": "Εμφανιζόμενο Όνομα Ενημερώθηκε"
+      },
+      "trustScoresReset": {
+        "title": "Επαναφορά Βαθμών Εμπιστοσύνης",
+        "message_one": "Επαναφορά του {{count}} χρήστη στο 100",
+        "message_other": "{{count}} users reset to 100"
+      },
+      "claimCodeValidated": {
+        "title": "Επικυρωμένος κωδικός αξίωσης",
+        "message": "Τώρα μπορείτε να προχωρήσετε με την εγκατάσταση"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Αποτυχία προσθήκης διακομιστή",
+      "serverRemoveFailed": "Αποτυχία κατάργησης διακομιστή",
+      "serverSyncFailed": "Αποτυχία συγχρονισμού διακομιστή",
+      "settingsUpdateFailed": "Αποτυχία ενημέρωσης των ρυθμίσεων",
+      "copyFailed": "Αδυναμία αντιγραφής στο πρόχειρο",
+      "acknowledgeFailed": "Αποτυχία αναγνώρισης παραβίασης",
+      "dismissFailed": "Αποτυχία απόρριψης παραβίασης",
+      "authFailed": "Αποτυχία ταυτοποίησης",
+      "webhookTestFailed": "Το τεστ Webhook απέτυχε",
+      "ruleCreateFailed": "Αποτυχία δημιουργίας κανόνα",
+      "ruleUpdateFailed": "Αποτυχία ενημέρωσης κανόνα",
+      "ruleDeleteFailed": "Αποτυχία διαγραφής κανόνα",
+      "streamTerminateFailed": "Αποτυχία τερματισμού ροής",
+      "serverUrlUpdateFailed": "Αποτυχία ενημέρωσης του διακομιστή URL",
+      "serverUpdateFailed": "Αποτυχία ενημέρωσης διακομιστή",
+      "serverReorderFailed": "Απέτυχε η αναδιάταξη διακομιστών",
+      "sessionsDeleteFailed": "Αποτυχία διαγραφής συνεδριών",
+      "apiKeyGenerateFailed": "Αποτυχία δημιουργίας κλειδιού API",
+      "mobileAccessEnableFailed": "Αποτυχία ενεργοποίησης πρόσβασης για κινητά",
+      "mobileAccessDisableFailed": "Αποτυχία απενεργοποίησης πρόσβασης για κινητά",
+      "pairTokenGenerateFailed": "Αποτυχία δημιουργίας διακριτικού ζεύγους",
+      "deviceRemoveFailed": "Αποτυχία κατάργησης συσκευής",
+      "deviceRenameFailed": "Αποτυχία μετονομασίας συσκευής",
+      "sessionsRevokeFailed": "Αποτυχία ανάκλησης συνεδριών",
+      "displayNameUpdateFailed": "Αποτυχία ενημέρωσης ονόματος οθόνης",
+      "trustScoresResetFailed": "Αποτυχία επαναφοράς των βαθμολογιών εμπιστοσύνης",
+      "routingUpdateFailed": "Αποτυχία ενημέρωσης δρομολόγησης",
+      "clipboardFailed": "Αποτυχία αντιγραφής στο πρόχειρο",
+      "plexUnlinkFailed": "Αποτυχία αποσύνδεσης του λογαριασμού Plex",
+      "agentAddFailed": "Αποτυχία προσθήκης πράκτορα",
+      "agentUpdateFailed": "Αποτυχία ενημέρωσης πράκτορα",
+      "agentRemoveFailed": "Αποτυχία κατάργησης πράκτορα",
+      "agentTestFailed": "Η δοκιμή απέτυχε",
+      "jobAlreadyRunning": "Η εργασία εκτελείται ήδη",
+      "jobStartFailed": "Αποτυχία έναρξης εργασίας",
+      "jobLoadFailed": "Αποτυχία φόρτωσης εργασιών συντήρησης",
+      "invalidUrl": "Μη Έγκυρο URL",
+      "plexDirectUrl": "Οι διευθύνσεις URL plex.direct είναι διευθύνσεις ρελέ που δεν μπορούν να χρησιμοποιηθούν εδώ. Παρακαλώ χρησιμοποιήστε μια άμεση διεύθυνση IP ή όνομα κεντρικού υπολογιστή.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
+      "invalidClaimCode": {
+        "title": "Μη έγκυρος κωδικός απαίτησης",
+        "message": "Παρακαλούμε ελέγξτε τα αρχεία καταγραφής του διακομιστή"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "Το {{name}} αντιμετώπισε ένα σφάλμα",
-        "title": "Η Εργασία Απέτυχε"
+        "title": "Η Εργασία Απέτυχε",
+        "message": "Το {{name}} αντιμετώπισε ένα σφάλμα"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Ξεκίνησε Η Νέα Ροή",
+        "message": "Ο {{user}} άρχισε να βλέπει {{media}}"
+      },
+      "streamStopped": {
+        "title": "Η Ροή Σταμάτησε",
+        "message": "Το {{user}} σταμάτησε να παρακολουθεί"
+      },
+      "updateAvailable": {
+        "title": "Διαθέσιμη Ενημέρωση",
+        "message": "Το Tracearr {{version}} είναι διαθέσιμο"
+      },
+      "serverOffline": {
+        "title": "Διακομιστής Χωρίς Σύνδεση",
+        "message": "Το {{name}} δεν είναι προσβάσιμο"
+      },
+      "serverOnline": {
+        "title": "Συνδεδεμένος Διακομιστής",
+        "message": "Το {{name}} είναι ξανά συνδεδεμένο"
+      },
+      "violationDetected": {
+        "title": "New Violation: {{ruleName}}",
+        "message": "{{user}} triggered {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Εντοπίστηκε Παραβίαση Κοινής Χρήσης",
+    "streamStarted": "Η Ροή Ξεκίνησε",
+    "streamEnded": "Τέλος Ροής",
+    "serverDown": "Η Σύνδεση Του Διακομιστή Χάθηκε",
+    "serverUp": "Συνδεδεμένος Με Διακομιστή",
+    "newDevice": "Νέα Συσκευή",
+    "trustScoreChanged": "Αλλαγή Βαθμολογίας Εμπιστοσύνης"
+  },
+  "settings": {
+    "title": "Ρυθμίσεις Ειδοποιήσεων",
+    "allSeverity": "Όλα (Χαμηλή, Προειδοποίηση, Υψηλή)",
+    "warningAndHigh": "Μόνο προειδοποίηση & υψηλή",
+    "highOnly": "Μόνο υψηλή βαρύτητα",
+    "allTypes": "Όλοι Οι Τύποι",
+    "rateLimit": "Τρέχουσα Κατάσταση Ορίου Αξιολόγησης",
+    "perMinute": "Ανά Λεπτό",
+    "perHour": "Ανά Ώρα",
+    "enablePushNotifications": "Ενεργοποίηση Ειδοποιήσεων Push",
+    "notificationEvents": "Γεγονότα Ειδοποιήσεων",
+    "violationDetected": "Εντοπίστηκε Παραβίαση",
+    "violationDetectedDesc": "Όταν ενεργοποιείται μια παραβίαση κοινής χρήσης",
+    "streamStarted": "Η Ροή Ξεκίνησε",
+    "streamStartedDesc": "Όταν ένας χρήστης αρχίζει να παρακολουθεί",
+    "streamStopped": "Η Ροή Σταμάτησε",
+    "streamStoppedDesc": "Όταν ένας χρήστης σταματήσει να παρακολουθεί",
+    "concurrentStreams": "Ταυτόχρονες Ροές",
+    "concurrentStreamsDesc": "Όταν ξεπεραστεί το μέγιστο όριο ροής",
+    "newDevice": "Νέα Συσκευή",
+    "newDeviceDesc": "Όταν μια νέα συσκευή συνδέεται",
+    "trustScoreChanged": "Αλλαγή Βαθμολογίας Εμπιστοσύνης",
+    "trustScoreChangedDesc": "Όταν αλλάζει το σκορ εμπιστοσύνης χρήστη",
+    "serverDown": "Διακομιστής Κάτω",
+    "serverDownDesc": "Όταν ένας διακομιστής πολυμέσων πηγαίνει εκτός σύνδεσης",
+    "serverUp": "Εξυπηρετητής Επάνω",
+    "serverUpDesc": "Όταν ένας διακομιστής πολυμέσων επιστρέφει σε απευθείας σύνδεση",
+    "violationFilters": "Φίλτρα Παραβίασης",
+    "minimumSeverity": "Ελάχιστη Σοβαρότητα",
+    "quietHours": "Ώρες Ησυχίας",
+    "enableQuietHours": "Ενεργοποίηση Ώρες Ησυχίας",
+    "overrideForCritical": "Παράκαμψη κρίσιμης σημασίας",
+    "rateLimiting": "Περιορισμός Αξιολόγησης"
   }
 }
