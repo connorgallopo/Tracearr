@@ -1,279 +1,279 @@
 {
-  "push": {
-    "newDevice": "Ny enhet",
-    "serverDown": "Serveranslutning förlorad",
-    "serverUp": "Server tillbaka online",
-    "streamEnded": "Stream avslutad",
-    "streamStarted": "Strömmen startad",
-    "trustScoreChanged": "Tillit Poäng Ändrad",
-    "violationDetected": "Delning av överträdelse upptäckt"
-  },
-  "settings": {
-    "allSeverity": "Alla (låg, varning, hög)",
-    "allTypes": "Alla typer",
-    "concurrentStreams": "Samtidiga strömmar",
-    "concurrentStreamsDesc": "När maxgränsen för ström överskrids",
-    "enablePushNotifications": "Aktivera push-meddelanden",
-    "enableQuietHours": "Aktivera tysta timmar",
-    "highOnly": "Endast hög svårighetsgrad",
-    "minimumSeverity": "Minsta svårighetsgrad",
-    "newDevice": "Ny enhet",
-    "newDeviceDesc": "När en ny enhet ansluts",
-    "notificationEvents": "Aviseringshändelser",
-    "overrideForCritical": "Åsidosätt för kritisk",
-    "perHour": "Per timme",
-    "perMinute": "Per minut",
-    "quietHours": "Tysta timmar",
-    "rateLimit": "Nuvarande hastighetsgräns status",
-    "rateLimiting": "Betygsätt Begränsning",
-    "serverDown": "Servern ner",
-    "serverDownDesc": "När en mediaserver går offline",
-    "serverUp": "Servern upp",
-    "serverUpDesc": "När en mediaserver kommer tillbaka online",
-    "streamStarted": "Strömmen startad",
-    "streamStartedDesc": "När en användare börjar titta på",
-    "streamStopped": "Stream stoppad",
-    "streamStoppedDesc": "När en användare slutar titta på",
-    "title": "Inställningar för aviseringar",
-    "trustScoreChanged": "Tillit Poäng Ändrad",
-    "trustScoreChangedDesc": "När en användares trust-poäng ändras",
-    "violationDetected": "Överträdelse upptäckt",
-    "violationDetectedDesc": "När en delningsöverträdelse utlöses",
-    "violationFilters": "Brott mot filter",
-    "warningAndHigh": "Varning & Hög endast"
-  },
   "toast": {
-    "error": {
-      "acknowledgeFailed": "Misslyckades att erkänna brott",
-      "agentAddFailed": "Det gick inte att lägga till agent",
-      "agentRemoveFailed": "Det gick inte att ta bort agent",
-      "agentTestFailed": "Testet misslyckades",
-      "agentUpdateFailed": "Det gick inte att uppdatera agent",
-      "apiKeyGenerateFailed": "Det gick inte att generera API-nyckel",
-      "authFailed": "Autentisering misslyckades",
-      "clipboardFailed": "Det gick inte att kopiera till urklipp",
-      "copyFailed": "Kunde inte kopiera till urklipp",
-      "deviceRemoveFailed": "Det gick inte att ta bort enheten",
-      "deviceRenameFailed": "Det gick inte att byta namn på enheten",
-      "dismissFailed": "Misslyckades att avfärda brott",
-      "displayNameUpdateFailed": "Det gick inte att uppdatera visningsnamnet",
-      "invalidClaimCode": {
-        "message": "Vänligen kontrollera serverns loggar",
-        "title": "Ogiltig kravkod"
-      },
-      "invalidUrl": "Ogiltig URL",
-      "jobAlreadyRunning": "Jobbet körs redan",
-      "jobLoadFailed": "Det gick inte att ladda underhållsjobb",
-      "jobStartFailed": "Det gick inte att starta jobbet",
-      "mobileAccessDisableFailed": "Det gick inte att inaktivera mobilåtkomst",
-      "mobileAccessEnableFailed": "Det gick inte att aktivera mobilåtkomst",
-      "pairTokenGenerateFailed": "Det gick inte att generera partoken",
-      "plexDirectUrl": "plex.direct URL:er är reläadresser som inte kan användas här. Använd en direkt IP-adress eller värdnamn istället.",
-      "plexUnlinkFailed": "Det gick inte att koppla bort Plex-kontot",
-      "routingUpdateFailed": "Det gick inte att uppdatera routing",
-      "ruleCreateFailed": "Kunde inte skapa regel",
-      "ruleDeleteFailed": "Det gick inte att ta bort regel",
-      "ruleUpdateFailed": "Det gick inte att uppdatera regel",
-      "serverAddFailed": "Det gick inte att lägga till server",
-      "serverRemoveFailed": "Det gick inte att ta bort servern",
-      "serverReorderFailed": "Det gick inte att ordna om servrar",
-      "serverSyncFailed": "Det gick inte att synkronisera servern",
-      "serverUpdateFailed": "Det gick inte att uppdatera servern",
-      "serverUrlUpdateFailed": "Det gick inte att uppdatera server-URL",
-      "serverUserSplitFailed": "Failed to split account",
-      "sessionsDeleteFailed": "Misslyckades att ta bort sessioner",
-      "sessionsRevokeFailed": "Det gick inte att återkalla sessioner",
-      "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
-      "streamTerminateFailed": "Det gick inte att avsluta strömmen",
-      "trustScoresResetFailed": "Det gick inte att återställa trust-poäng",
-      "userMergeFailed": "Failed to merge users",
-      "webhookTestFailed": "Webhook test misslyckades"
-    },
-    "info": {
-      "serverOffline": {
-        "message": "{{name}} kan inte nås",
-        "title": "Servern offline"
-      },
-      "serverOnline": {
-        "message": "{{name}} är tillbaka online",
-        "title": "Server online"
-      },
-      "streamStarted": {
-        "message": "{{user}} började titta på {{media}}",
-        "title": "Ny ström startad"
-      },
-      "streamStopped": {
-        "message": "{{user}} slutade titta på",
-        "title": "Stream stoppad"
-      },
-      "updateAvailable": {
-        "message": "Tracearr {{version}} är tillgänglig",
-        "title": "Uppdatering tillgänglig"
-      },
-      "violationDetected": {
-        "message": "{{user}} utlöst {{ruleType}}",
-        "title": "Ny överträdelse: {{ruleName}}"
-      }
-    },
     "success": {
-      "agentAdded": {
-        "message": "Anslagstavlan har lagts till",
-        "title": "Agentkommando tillagda"
+      "serverAdded": {
+        "title": "Servern tillagd",
+        "message": "{{name}} har anslutits"
       },
-      "agentRemoved": {
-        "message": "Anslagstavlan har tagits bort",
-        "title": "Agentkommando borttagen"
+      "serverRemoved": {
+        "title": "Servern borttagen",
+        "message": "Servern har tagits bort"
       },
-      "agentUpdated": {
-        "message": "Meddelandeombudet har uppdaterats",
-        "title": "Agentkommando Uppdaterad"
+      "serverSynced": {
+        "title": "Servern synkroniserad",
+        "message": "Serverdata har synkroniserats"
       },
-      "apiKeyGenerated": {
-        "message": "Din nya API-nyckel är klar att användas",
-        "title": "API-nyckel genererad"
+      "settingsUpdated": {
+        "title": "Inställningar uppdaterade",
+        "message": "Dina inställningar har sparats"
       },
-      "claimCodeValidated": {
-        "message": "Du kan nu fortsätta med installationen",
-        "title": "Begär kod validerad"
+      "tokenCopied": {
+        "title": "Token kopierad",
+        "message": "Par-token kopierad till urklipp"
+      },
+      "violationAcknowledged": {
+        "title": "Brott erkänt",
+        "message": "Brott har markerats som erkänt"
+      },
+      "violationDismissed": {
+        "title": "Överträdelse avfärdad",
+        "message": "Överträdelsen har avfärdats"
+      },
+      "deviceRemoved": {
+        "title": "Enhet borttagen",
+        "message": "Enheten har kopplats bort"
+      },
+      "deviceRenamed": {
+        "title": "Enhet bytte namn",
+        "message": "Enhetens namn har uppdaterats"
+      },
+      "sessionsRevoked": {
+        "title": "Sessioner återkallade",
+        "message": "Alla mobila sessioner har återkallats"
+      },
+      "loggedIn": {
+        "title": "Klart",
+        "message": "Inloggningen lyckades"
+      },
+      "webhookTest": {
+        "title": "Testet lyckades",
+        "message": "Webhook fungerar korrekt"
       },
       "copiedToClipboard": {
         "title": "Kopierad till urklipp"
       },
-      "deviceRemoved": {
-        "message": "Enheten har kopplats bort",
-        "title": "Enhet borttagen"
-      },
-      "deviceRenamed": {
-        "message": "Enhetens namn har uppdaterats",
-        "title": "Enhet bytte namn"
-      },
-      "displayNameUpdated": {
-        "title": "Visningsnamn uppdaterat"
-      },
-      "jobCompleted": {
-        "message": "{{name}} slutförd",
-        "title": "Jobb slutförd"
-      },
-      "loggedIn": {
-        "message": "Inloggningen lyckades",
-        "title": "Klart"
-      },
-      "mobileAccessDisabled": {
-        "message": "Alla mobila sessioner har återkallats",
-        "title": "Mobil åtkomst inaktiverad"
-      },
-      "mobileAccessEnabled": {
-        "message": "Skanna QR-koden med mobilappen Tracearr för att ansluta",
-        "title": "Mobil åtkomst aktiverad"
-      },
-      "pairTokenGenerated": {
-        "message": "Skanna QR-koden med din mobila enhet för att koppla",
-        "title": "Par-token genererad"
-      },
       "plexAccountLinked": {
-        "message": "Du kan nu lägga till servrar från ditt Plex-konto",
-        "title": "Plex konto länkat"
+        "title": "Plex konto länkat",
+        "message": "Du kan nu lägga till servrar från ditt Plex-konto"
       },
       "plexAccountUnlinked": {
-        "message": "Ditt Plex-konto har kopplats bort",
-        "title": "Plex konto olänkat"
+        "title": "Plex konto olänkat",
+        "message": "Ditt Plex-konto har kopplats bort"
+      },
+      "agentAdded": {
+        "title": "Agentkommando tillagda",
+        "message": "Anslagstavlan har lagts till"
+      },
+      "agentUpdated": {
+        "title": "Agentkommando Uppdaterad",
+        "message": "Meddelandeombudet har uppdaterats"
+      },
+      "agentRemoved": {
+        "title": "Agentkommando borttagen",
+        "message": "Anslagstavlan har tagits bort"
+      },
+      "jobCompleted": {
+        "title": "Jobb slutförd",
+        "message": "{{name}} slutförd"
       },
       "ruleCreated": {
-        "message": "Regeln har skapats framgångsrikt",
-        "title": "Regel skapad"
-      },
-      "ruleDeleted": {
-        "message": "Regeln har tagits bort",
-        "title": "Regel borttagen"
+        "title": "Regel skapad",
+        "message": "Regeln har skapats framgångsrikt"
       },
       "ruleUpdated": {
-        "message": "Regeln har uppdaterats",
-        "title": "Regel uppdaterad"
+        "title": "Regel uppdaterad",
+        "message": "Regeln har uppdaterats"
       },
-      "serverAdded": {
-        "message": "{{name}} har anslutits",
-        "title": "Servern tillagd"
-      },
-      "serverRemoved": {
-        "message": "Servern har tagits bort",
-        "title": "Servern borttagen"
-      },
-      "serverSynced": {
-        "message": "Serverdata har synkroniserats",
-        "title": "Servern synkroniserad"
-      },
-      "serverUpdated": {
-        "message": "Servern har uppdaterats",
-        "title": "Servern uppdaterad"
-      },
-      "serverUrlUpdated": {
-        "message": "Serverns URL har uppdaterats",
-        "title": "Server-URL uppdaterad"
-      },
-      "serverUserSplit": {
-        "title": "Account split into a separate user"
-      },
-      "sessionsDeleted": {
-        "message_one": "{{count}} session borttagen",
-        "message_other": "{{count}} sessioner raderade",
-        "title": "Sessioner borttagna"
-      },
-      "sessionsRevoked": {
-        "message": "Alla mobila sessioner har återkallats",
-        "title": "Sessioner återkallade"
-      },
-      "settingsUpdated": {
-        "message": "Dina inställningar har sparats",
-        "title": "Inställningar uppdaterade"
+      "ruleDeleted": {
+        "title": "Regel borttagen",
+        "message": "Regeln har tagits bort"
       },
       "streamTerminated": {
-        "message": "Uppspelningssessionen har stoppats",
-        "title": "Strömmen upphörde"
+        "title": "Strömmen upphörde",
+        "message": "Uppspelningssessionen har stoppats"
+      },
+      "serverUrlUpdated": {
+        "title": "Server-URL uppdaterad",
+        "message": "Serverns URL har uppdaterats"
+      },
+      "serverUpdated": {
+        "title": "Servern uppdaterad",
+        "message": "Servern har uppdaterats"
       },
       "syncCompletedWithErrors": {
         "title": "Synkronisering slutförd med fel"
       },
-      "tokenCopied": {
-        "message": "Par-token kopierad till urklipp",
-        "title": "Token kopierad"
-      },
-      "trustScoresReset": {
-        "message_one": "{{count}} användaråterställning till 100",
-        "message_other": "{{count}} användare återställs till 100",
-        "title": "Lita på poäng Återställ"
-      },
-      "usersMerged": {
-        "rulesKept": "Kept target's version of: {{names}}",
-        "title": "Users merged"
-      },
-      "violationAcknowledged": {
-        "message": "Brott har markerats som erkänt",
-        "title": "Brott erkänt"
-      },
-      "violationDismissed": {
-        "message": "Överträdelsen har avfärdats",
-        "title": "Överträdelse avfärdad"
+      "sessionsDeleted": {
+        "title": "Sessioner borttagna",
+        "message_one": "{{count}} session borttagen",
+        "message_other": "{{count}} sessioner raderade"
       },
       "violationsAcknowledged": {
+        "title": "Överträdelser erkända",
         "message_one": "{{count}} kränkning bekräftad",
-        "message_other": "{{count}} kränkningar erkända",
-        "title": "Överträdelser erkända"
+        "message_other": "{{count}} kränkningar erkända"
       },
       "violationsDismissed": {
+        "title": "Överträdelser avfärdade",
         "message_one": "{{count}} kränkning avfärdad",
-        "message_other": "{{count}} avfärdade överträdelser",
-        "title": "Överträdelser avfärdade"
+        "message_other": "{{count}} avfärdade överträdelser"
       },
-      "webhookTest": {
-        "message": "Webhook fungerar korrekt",
-        "title": "Testet lyckades"
+      "apiKeyGenerated": {
+        "title": "API-nyckel genererad",
+        "message": "Din nya API-nyckel är klar att användas"
+      },
+      "mobileAccessEnabled": {
+        "title": "Mobil åtkomst aktiverad",
+        "message": "Skanna QR-koden med mobilappen Tracearr för att ansluta"
+      },
+      "mobileAccessDisabled": {
+        "title": "Mobil åtkomst inaktiverad",
+        "message": "Alla mobila sessioner har återkallats"
+      },
+      "pairTokenGenerated": {
+        "title": "Par-token genererad",
+        "message": "Skanna QR-koden med din mobila enhet för att koppla"
+      },
+      "displayNameUpdated": {
+        "title": "Visningsnamn uppdaterat"
+      },
+      "trustScoresReset": {
+        "title": "Lita på poäng Återställ",
+        "message_one": "{{count}} användaråterställning till 100",
+        "message_other": "{{count}} användare återställs till 100"
+      },
+      "claimCodeValidated": {
+        "title": "Begär kod validerad",
+        "message": "Du kan nu fortsätta med installationen"
+      },
+      "usersMerged": {
+        "title": "Users merged",
+        "rulesKept": "Kept target's version of: {{names}}"
+      },
+      "serverUserSplit": {
+        "title": "Account split into a separate user"
+      }
+    },
+    "error": {
+      "serverAddFailed": "Det gick inte att lägga till server",
+      "serverRemoveFailed": "Det gick inte att ta bort servern",
+      "serverSyncFailed": "Det gick inte att synkronisera servern",
+      "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
+      "copyFailed": "Kunde inte kopiera till urklipp",
+      "acknowledgeFailed": "Misslyckades att erkänna brott",
+      "dismissFailed": "Misslyckades att avfärda brott",
+      "authFailed": "Autentisering misslyckades",
+      "webhookTestFailed": "Webhook test misslyckades",
+      "ruleCreateFailed": "Kunde inte skapa regel",
+      "ruleUpdateFailed": "Det gick inte att uppdatera regel",
+      "ruleDeleteFailed": "Det gick inte att ta bort regel",
+      "streamTerminateFailed": "Det gick inte att avsluta strömmen",
+      "serverUrlUpdateFailed": "Det gick inte att uppdatera server-URL",
+      "serverUpdateFailed": "Det gick inte att uppdatera servern",
+      "serverReorderFailed": "Det gick inte att ordna om servrar",
+      "sessionsDeleteFailed": "Misslyckades att ta bort sessioner",
+      "apiKeyGenerateFailed": "Det gick inte att generera API-nyckel",
+      "mobileAccessEnableFailed": "Det gick inte att aktivera mobilåtkomst",
+      "mobileAccessDisableFailed": "Det gick inte att inaktivera mobilåtkomst",
+      "pairTokenGenerateFailed": "Det gick inte att generera partoken",
+      "deviceRemoveFailed": "Det gick inte att ta bort enheten",
+      "deviceRenameFailed": "Det gick inte att byta namn på enheten",
+      "sessionsRevokeFailed": "Det gick inte att återkalla sessioner",
+      "displayNameUpdateFailed": "Det gick inte att uppdatera visningsnamnet",
+      "trustScoresResetFailed": "Det gick inte att återställa trust-poäng",
+      "routingUpdateFailed": "Det gick inte att uppdatera routing",
+      "clipboardFailed": "Det gick inte att kopiera till urklipp",
+      "plexUnlinkFailed": "Det gick inte att koppla bort Plex-kontot",
+      "agentAddFailed": "Det gick inte att lägga till agent",
+      "agentUpdateFailed": "Det gick inte att uppdatera agent",
+      "agentRemoveFailed": "Det gick inte att ta bort agent",
+      "agentTestFailed": "Testet misslyckades",
+      "jobAlreadyRunning": "Jobbet körs redan",
+      "jobStartFailed": "Det gick inte att starta jobbet",
+      "jobLoadFailed": "Det gick inte att ladda underhållsjobb",
+      "invalidUrl": "Ogiltig URL",
+      "plexDirectUrl": "plex.direct URL:er är reläadresser som inte kan användas här. Använd en direkt IP-adress eller värdnamn istället.",
+      "userMergeFailed": "Failed to merge users",
+      "serverUserSplitFailed": "Failed to split account",
+      "invalidClaimCode": {
+        "title": "Ogiltig kravkod",
+        "message": "Vänligen kontrollera serverns loggar"
       }
     },
     "warning": {
       "jobFailed": {
-        "message": "{{name}} stötte på ett fel",
-        "title": "Jobbet misslyckades"
+        "title": "Jobbet misslyckades",
+        "message": "{{name}} stötte på ett fel"
+      }
+    },
+    "info": {
+      "streamStarted": {
+        "title": "Ny ström startad",
+        "message": "{{user}} började titta på {{media}}"
+      },
+      "streamStopped": {
+        "title": "Stream stoppad",
+        "message": "{{user}} slutade titta på"
+      },
+      "updateAvailable": {
+        "title": "Uppdatering tillgänglig",
+        "message": "Tracearr {{version}} är tillgänglig"
+      },
+      "serverOffline": {
+        "title": "Servern offline",
+        "message": "{{name}} kan inte nås"
+      },
+      "serverOnline": {
+        "title": "Server online",
+        "message": "{{name}} är tillbaka online"
+      },
+      "violationDetected": {
+        "title": "Ny överträdelse: {{ruleName}}",
+        "message": "{{user}} utlöst {{ruleType}}"
       }
     }
+  },
+  "push": {
+    "violationDetected": "Delning av överträdelse upptäckt",
+    "streamStarted": "Strömmen startad",
+    "streamEnded": "Stream avslutad",
+    "serverDown": "Serveranslutning förlorad",
+    "serverUp": "Server tillbaka online",
+    "newDevice": "Ny enhet",
+    "trustScoreChanged": "Tillit Poäng Ändrad"
+  },
+  "settings": {
+    "title": "Inställningar för aviseringar",
+    "allSeverity": "Alla (låg, varning, hög)",
+    "warningAndHigh": "Varning & Hög endast",
+    "highOnly": "Endast hög svårighetsgrad",
+    "allTypes": "Alla typer",
+    "rateLimit": "Nuvarande hastighetsgräns status",
+    "perMinute": "Per minut",
+    "perHour": "Per timme",
+    "enablePushNotifications": "Aktivera push-meddelanden",
+    "notificationEvents": "Aviseringshändelser",
+    "violationDetected": "Överträdelse upptäckt",
+    "violationDetectedDesc": "När en delningsöverträdelse utlöses",
+    "streamStarted": "Strömmen startad",
+    "streamStartedDesc": "När en användare börjar titta på",
+    "streamStopped": "Stream stoppad",
+    "streamStoppedDesc": "När en användare slutar titta på",
+    "concurrentStreams": "Samtidiga strömmar",
+    "concurrentStreamsDesc": "När maxgränsen för ström överskrids",
+    "newDevice": "Ny enhet",
+    "newDeviceDesc": "När en ny enhet ansluts",
+    "trustScoreChanged": "Tillit Poäng Ändrad",
+    "trustScoreChangedDesc": "När en användares trust-poäng ändras",
+    "serverDown": "Servern ner",
+    "serverDownDesc": "När en mediaserver går offline",
+    "serverUp": "Servern upp",
+    "serverUpDesc": "När en mediaserver kommer tillbaka online",
+    "violationFilters": "Brott mot filter",
+    "minimumSeverity": "Minsta svårighetsgrad",
+    "quietHours": "Tysta timmar",
+    "enableQuietHours": "Aktivera tysta timmar",
+    "overrideForCritical": "Åsidosätt för kritisk",
+    "rateLimiting": "Betygsätt Begränsning"
   }
 }
