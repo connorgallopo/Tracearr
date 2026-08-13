@@ -755,8 +755,8 @@
         },
         "availability": {
           "added": "added {{date}}",
-          "addedRemoved": "added {{added}} – removed {{removed}}",
-          "replaced": "replaced {{date}}"
+          "addedRemoved": "toegevoegd {{added}} – verwijdert {{removed}}",
+          "replaced": "vervangen {{date}}"
         },
         "removedEverywhere": {
           "caption": "No longer available on any connected server"
