@@ -128,6 +128,7 @@ vi.mock('../../routes/settings.js', () => ({
 
 vi.mock('../../services/userService.js', () => ({
   getIdentityServerUserIds: mockGetIdentityServerUserIds,
+  canonicalPlexExternalUserId: vi.fn(async (id: string) => id),
 }));
 
 vi.mock('../poller/index.js', () => ({

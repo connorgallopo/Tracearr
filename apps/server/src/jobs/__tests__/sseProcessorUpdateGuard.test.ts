@@ -67,6 +67,7 @@ vi.mock('../../services/mediaServer/index.js', () => ({
 vi.mock('../../services/plexGeoip.js', () => ({ lookupGeoIP: vi.fn() }));
 vi.mock('../../services/userService.js', () => ({
   getIdentityServerUserIds: vi.fn().mockResolvedValue(['server-user-1']),
+  canonicalPlexExternalUserId: vi.fn(async (id: string) => id),
 }));
 vi.mock('../../routes/settings.js', () => ({
   getGeoIPSettings: vi.fn().mockResolvedValue({ usePlexGeoip: false }),

@@ -28,7 +28,7 @@ import { lookupGeoIP } from '../services/plexGeoip.js';
 import { registerService, unregisterService } from '../services/serviceTracker.js';
 import { getWatchedThreshold } from '../services/settings.js';
 import { sseManager } from '../services/sseManager.js';
-import { getIdentityServerUserIds } from '../services/userService.js';
+import { canonicalPlexExternalUserId, getIdentityServerUserIds } from '../services/userService.js';
 import { createLogger } from '../utils/logger.js';
 import { enqueueNotification } from './notificationQueue.js';
 import {
@@ -1028,6 +1028,11 @@ async function fetchFullSession(
     }
 
     const session = mapMediaSession(targetSession, server.type);
+    // Plex aliases the server owner as user id "1" in session payloads;
+    // resolve it to their plex.tv account id (see canonicalPlexExternalUserId).
+    if (server.type === 'plex') {
+      session.externalUserId = await canonicalPlexExternalUserId(session.externalUserId);
+    }
     // Stamp identity like the poller does or SSE session rows insert with null media columns
     if (session.ratingKey) {
       const identityMap = await batchGetLibraryItemIdentity(server.id, [session.ratingKey]);

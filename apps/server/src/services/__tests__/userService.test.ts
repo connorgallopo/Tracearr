@@ -5,7 +5,7 @@
  * Uses mocked database to test business logic in isolation.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { randomUUID } from 'node:crypto';
 
 // Mock the database
@@ -27,6 +27,7 @@ import {
   getUserByPlexAccountId,
   getUserByUsername,
   getOwnerUser,
+  canonicalPlexExternalUserId,
   getServerUserWithDetails,
   getUserWithStats,
   createOwnerUser,
@@ -208,6 +209,65 @@ describe('getOwnerUser', () => {
     const result = await getOwnerUser();
 
     expect(result).toBeNull();
+  });
+});
+
+describe('canonicalPlexExternalUserId', () => {
+  // The owner lookup result is cached at module level for 60s; use fake
+  // timers on a clock that advances past the TTL before every test so each
+  // scenario starts from a fresh lookup regardless of what ran before it.
+  let clock = Date.now();
+
+  beforeEach(() => {
+    clock += 120_000;
+    vi.useFakeTimers();
+    vi.setSystemTime(clock);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('passes through ids other than the local admin alias without touching the db', async () => {
+    const result = await canonicalPlexExternalUserId('ext-123');
+
+    expect(result).toBe('ext-123');
+    expect(db.select).not.toHaveBeenCalled();
+  });
+
+  it('resolves the "1" alias to the owner plex.tv account id', async () => {
+    mockSelectChain([createMockUser({ role: 'owner', plexAccountId: 'plex-12345' })]);
+
+    const result = await canonicalPlexExternalUserId('1');
+
+    expect(result).toBe('plex-12345');
+  });
+
+  it('caches the owner lookup between calls within the TTL', async () => {
+    mockSelectChain([createMockUser({ role: 'owner', plexAccountId: 'plex-12345' })]);
+
+    await canonicalPlexExternalUserId('1');
+    await canonicalPlexExternalUserId('1');
+
+    expect(db.select).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns the raw alias when the owner has no linked plex account', async () => {
+    mockSelectChain([createMockUser({ role: 'owner', plexAccountId: null })]);
+
+    const result = await canonicalPlexExternalUserId('1');
+
+    expect(result).toBe('1');
+  });
+
+  it('returns the raw alias when the owner lookup fails', async () => {
+    vi.mocked(db.select).mockImplementation(() => {
+      throw new Error('db down');
+    });
+
+    const result = await canonicalPlexExternalUserId('1');
+
+    expect(result).toBe('1');
   });
 });
 

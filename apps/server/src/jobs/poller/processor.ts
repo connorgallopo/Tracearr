@@ -26,6 +26,7 @@ import type { CacheService, PubSubService } from '../../services/cache.js';
 import { type GeoLocation } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
 import { lookupGeoIP } from '../../services/plexGeoip.js';
+import { canonicalPlexExternalUserId } from '../../services/userService.js';
 import { registerService, unregisterService } from '../../services/serviceTracker.js';
 import { getWatchedThreshold } from '../../services/settings.js';
 import { sseManager } from '../../services/sseManager.js';
@@ -768,6 +769,16 @@ async function processServerSessions(
     sseManager.nudgeReconnect(server.id);
 
     const processedSessions = mediaSessions.map((s) => mapMediaSession(s, server.type));
+
+    // Plex aliases the server owner as user id "1" in session payloads;
+    // resolve it to their plex.tv account id so the owner's plays land on
+    // their real server user instead of minting a duplicate (see
+    // canonicalPlexExternalUserId).
+    if (server.type === 'plex') {
+      for (const processed of processedSessions) {
+        processed.externalUserId = await canonicalPlexExternalUserId(processed.externalUserId);
+      }
+    }
 
     // OPTIMIZATION: Early return if no active sessions from media server
     if (processedSessions.length === 0) {

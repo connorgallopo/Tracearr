@@ -140,6 +140,42 @@ export async function getOwnerUser(): Promise<User | null> {
 }
 
 /**
+ * Plex reports the server owner in /status/sessions and SSE payloads with the
+ * local admin user id "1", while server sync and history imports know the same
+ * person by their plex.tv account id. Left as-is, the owner's first playback
+ * mints a fresh server user + identity under external id "1" (splitting their
+ * history and breaking user-scoped rules for them). Canonicalize the alias to
+ * the owner's plex.tv account id whenever that account is known.
+ *
+ * The owner lookup is cached briefly: this runs on every mapped session, and
+ * the owner's plex account id changes at most once (initial linking).
+ */
+let cachedOwnerPlexAccountId: { value: string | null; fetchedAt: number } | null = null;
+const OWNER_PLEX_ACCOUNT_ID_TTL_MS = 60_000;
+
+export async function canonicalPlexExternalUserId(externalUserId: string): Promise<string> {
+  if (externalUserId !== '1') return externalUserId;
+  const now = Date.now();
+  if (
+    !cachedOwnerPlexAccountId ||
+    now - cachedOwnerPlexAccountId.fetchedAt > OWNER_PLEX_ACCOUNT_ID_TTL_MS
+  ) {
+    try {
+      const owner = await getOwnerUser();
+      cachedOwnerPlexAccountId = {
+        value: owner?.plexAccountId ? String(owner.plexAccountId) : null,
+        fetchedAt: now,
+      };
+    } catch {
+      // Session processing must not die on an owner lookup hiccup; fall back
+      // to the raw id and retry the lookup on the next session.
+      return externalUserId;
+    }
+  }
+  return cachedOwnerPlexAccountId.value ?? externalUserId;
+}
+
+/**
  * Create a new user identity
  */
 export async function createUser(data: {
