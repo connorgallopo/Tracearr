@@ -755,7 +755,7 @@
         },
         "availability": {
           "added": "added {{date}}",
-          "addedRemoved": "added {{added}} – removed {{removed}}",
+          "addedRemoved": "a ajouté {{added}} - a supprimé {{removed}}",
           "replaced": "replaced {{date}}"
         },
         "removedEverywhere": {
