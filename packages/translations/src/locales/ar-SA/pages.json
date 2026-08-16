@@ -518,6 +518,7 @@
     "interruptionTitle": "انقطاع الخدمة",
     "startingDescription": "الخادم في انتظار أن تصبح خدمات الخلفية متاحة. سيتم تحديث هذه الصفحة تلقائياً عندما يكون كل شيء جاهزاً.",
     "interruptionDescription": "واحدة أو أكثر من خدمات النسخ الاحتياطي أصبحت غير متوفرة. سيتم تحديث هذه الصفحة تلقائياً عند استعادة الاتصال.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "الاستعادة من النسخة الاحتياطية...",
     "restoreFailed": "فشل الاستعادة",
     "restorePhase": {
