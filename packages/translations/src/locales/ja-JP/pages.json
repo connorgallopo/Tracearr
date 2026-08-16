@@ -518,6 +518,7 @@
     "interruptionTitle": "サービスの中断",
     "startingDescription": "サーバーはバックエンドサービスが利用可能になるのを待っています。このページは準備が整ったら自動的に更新されます。",
     "interruptionDescription": "1 つ以上のバックエンドサービスが利用できなくなりました。接続が復元されると、このページは自動的に更新されます。",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "バックアップから復元しています...",
     "restoreFailed": "復元に失敗しました",
     "restorePhase": {
