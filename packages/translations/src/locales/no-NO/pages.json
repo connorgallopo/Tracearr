@@ -518,6 +518,7 @@
     "interruptionTitle": "Vedlikehold av tjenester",
     "startingDescription": "Serveren venter på at backend-tjenester blir tilgjengelig. Denne siden vil oppdateres automatisk når alt er klar.",
     "interruptionDescription": "En eller flere backend tjenester har blitt utilgjengelige. Denne siden vil automatisk oppdateres når tilkoblingen er gjenopprettet.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Gjenoppretter fra sikkerhetskopi...",
     "restoreFailed": "Gjenoppretting mislyktes",
     "restorePhase": {
