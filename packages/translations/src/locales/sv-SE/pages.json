@@ -518,6 +518,7 @@
     "interruptionTitle": "Avbrott i tjänsten",
     "startingDescription": "Servern väntar på att backend-tjänster ska bli tillgängliga. Denna sida uppdateras automatiskt när allt är klart.",
     "interruptionDescription": "En eller flera backend-tjänster har blivit otillgängliga. Denna sida uppdateras automatiskt när anslutningen återställs.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Återställer från säkerhetskopian...",
     "restoreFailed": "Återställning misslyckades",
     "restorePhase": {
