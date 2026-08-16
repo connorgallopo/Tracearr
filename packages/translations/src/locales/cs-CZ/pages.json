@@ -518,6 +518,7 @@
     "interruptionTitle": "Přerušení provozu",
     "startingDescription": "Server čeká na dostupnost služeb backendu. Tato stránka se automaticky obnoví, až bude vše připraveno.",
     "interruptionDescription": "Jedna nebo více služeb backendu je nedostupná. Tato stránka se automaticky obnoví, jakmile bude obnoveno připojení.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Obnovení ze zálohy...",
     "restoreFailed": "Obnovení se nezdařilo",
     "restorePhase": {
