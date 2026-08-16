@@ -518,6 +518,7 @@
     "interruptionTitle": "Afbrydelse af tjenesten",
     "startingDescription": "Serveren venter på at backend-tjenester bliver tilgængelige. Denne side opdateres automatisk, når alt er klar.",
     "interruptionDescription": "En eller flere backend-tjenester er blevet utilgængelige. Denne side opdateres automatisk, når forbindelsen genoprettes.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Gendanner fra backup...",
     "restoreFailed": "Gendannelse mislykkedes",
     "restorePhase": {
