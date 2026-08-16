@@ -518,6 +518,7 @@
     "interruptionTitle": "Palvelun keskeytyminen",
     "startingDescription": "Palvelin odottaa taustaosan palvelujen tulevan saataville. Tämä sivu päivittyy automaattisesti, kun kaikki on valmis.",
     "interruptionDescription": "Yksi tai useampi taustaosan palvelu ei ole käytettävissä. Tämä sivu päivittyy automaattisesti, kun yhteys palautetaan.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Palautetaan varmuuskopiosta...",
     "restoreFailed": "Palautus epäonnistui",
     "restorePhase": {
