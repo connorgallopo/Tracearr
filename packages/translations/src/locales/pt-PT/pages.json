@@ -518,6 +518,7 @@
     "interruptionTitle": "Interrupção do serviço",
     "startingDescription": "O servidor está aguardando que os serviços de backend estejam disponíveis. Esta página será atualizada automaticamente quando tudo estiver pronto.",
     "interruptionDescription": "Um ou mais serviços de backend ficaram indisponíveis. Esta página será atualizada automaticamente quando a conectividade for restaurada.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Restaurar do backup...",
     "restoreFailed": "Restauração falhou",
     "restorePhase": {
