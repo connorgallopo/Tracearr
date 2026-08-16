@@ -518,6 +518,7 @@
     "interruptionTitle": "Întreruperea serviciului",
     "startingDescription": "Serverul așteaptă ca serviciile backend să devină disponibile. Această pagină se va reîmprospăta automat când totul este gata.",
     "interruptionDescription": "Unul sau mai multe servicii backend au devenit indisponibile. Această pagină se va reîmprospăta automat atunci când conectivitatea este restabilită.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Restaurare din backup...",
     "restoreFailed": "Restabilirea a eșuat",
     "restorePhase": {
