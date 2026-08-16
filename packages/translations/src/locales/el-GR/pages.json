@@ -518,6 +518,7 @@
     "interruptionTitle": "Διακοπή υπηρεσίας",
     "startingDescription": "Ο διακομιστής περιμένει να γίνουν διαθέσιμες οι υπηρεσίες του συστήματος διαχείρισης. Αυτή η σελίδα θα ανανεωθεί αυτόματα όταν όλα είναι έτοιμα.",
     "interruptionDescription": "Μία ή περισσότερες υπηρεσίες παρασκηνίου δεν είναι διαθέσιμες. Αυτή η σελίδα θα ανανεωθεί αυτόματα όταν αποκατασταθεί η συνδεσιμότητα.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Επαναφορά από αντίγραφο ασφαλείας...",
     "restoreFailed": "Η επαναφορά απέτυχε",
     "restorePhase": {
