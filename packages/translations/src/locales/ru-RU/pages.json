@@ -518,6 +518,7 @@
     "interruptionTitle": "Прерывание службы",
     "startingDescription": "Сервер ожидает доступа к сервисам бэкэнда. Эта страница будет автоматически обновляться, когда все будет готово.",
     "interruptionDescription": "Одна или несколько сервисов бэкэнда недоступны. Эта страница будет автоматически обновляться, когда подключение восстановлено.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Восстановление из резервной копии...",
     "restoreFailed": "Не удалось восстановить",
     "restorePhase": {
