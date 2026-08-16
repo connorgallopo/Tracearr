@@ -518,6 +518,7 @@
     "interruptionTitle": "Сервісне переривання",
     "startingDescription": "Сервер очікує на доступність внутрішніх служб. Ця сторінка автоматично оновиться, коли все буде готове.",
     "interruptionDescription": "Один або декілька внутрішніх сервісів стали недоступними. Ця сторінка автоматично оновиться після відновлення з’єднання.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Відновлення з резервної копії...",
     "restoreFailed": "Не вдалося відновити",
     "restorePhase": {
