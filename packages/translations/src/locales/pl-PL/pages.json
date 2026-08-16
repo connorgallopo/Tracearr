@@ -518,6 +518,7 @@
     "interruptionTitle": "Przerwa w działaniu usługi",
     "startingDescription": "Serwer oczekuje, aż usługi backendu staną się dostępne. Ta strona zostanie automatycznie odświeżona, gdy wszystko będzie gotowe.",
     "interruptionDescription": "Jedna lub więcej usług backendu stała się niedostępna. Ta strona zostanie automatycznie odświeżona, gdy połączenie zostanie przywrócone.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Przywracanie z kopii zapasowej...",
     "restoreFailed": "Przywracanie nie powiodło się",
     "restorePhase": {
