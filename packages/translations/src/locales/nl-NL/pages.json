@@ -518,6 +518,7 @@
     "interruptionTitle": "Dienstonderbreking",
     "startingDescription": "De server wacht op de beschikbaarheid van achtergronddiensten. De pagina ververst automatisch wanneer alles klaar is.",
     "interruptionDescription": "Een of meerdere achtergronddiensten zijn niet meer beschikbaar. De pagina ververst automatisch wanneer de verbinding is hesteld.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Herstellen van back-up...",
     "restoreFailed": "Terugzetten niet gelukt",
     "restorePhase": {
