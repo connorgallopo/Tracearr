@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS builder
+FROM node:24-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS builder
 
 # Build arguments for version info
 ARG APP_VERSION=0.0.0
@@ -30,7 +30,7 @@ COPY . .
 RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --filter=@tracearr/web
 
 # Production stage
-FROM node:24-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS runner
+FROM node:24-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS runner
 
 # Build arguments for version info (must redeclare in each stage)
 ARG APP_VERSION=0.0.0
