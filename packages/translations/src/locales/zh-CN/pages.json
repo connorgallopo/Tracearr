@@ -518,6 +518,7 @@
     "interruptionTitle": "服务中止",
     "startingDescription": "服务器正在等待后端服务可用。此页面将在一切就绪时自动刷新。",
     "interruptionDescription": "一个或多个后端服务已不可用。当连接恢复时，此页面将自动刷新。",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "正在从备份还原……",
     "restoreFailed": "还原失败",
     "restorePhase": {
