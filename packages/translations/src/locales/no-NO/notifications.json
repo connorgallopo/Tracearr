@@ -152,7 +152,10 @@
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
-      }
+      },
+      "destinationSaved": "Destination saved",
+      "destinationDeleted": "Destination deleted",
+      "destinationTestSent": "Test notification sent"
     },
     "error": {
       "serverAddFailed": "Klarte ikke å legge til server",
@@ -198,7 +201,11 @@
       "invalidClaimCode": {
         "title": "Ugyldig reklamasjonskode",
         "message": "Vennligst sjekk server loggene"
-      }
+      },
+      "destinationSaveFailed": "Failed to save destination: {{error}}",
+      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
+      "destinationTestFailed": "Test failed: {{error}}",
+      "destinationInUse": "Still used by: {{rules}}"
     },
     "warning": {
       "jobFailed": {
