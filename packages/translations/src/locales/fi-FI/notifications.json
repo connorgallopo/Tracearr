@@ -152,7 +152,10 @@
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
-      }
+      },
+      "destinationSaved": "Destination saved",
+      "destinationDeleted": "Destination deleted",
+      "destinationTestSent": "Test notification sent"
     },
     "error": {
       "serverAddFailed": "Palvelimen lisääminen epäonnistui",
@@ -198,7 +201,11 @@
       "invalidClaimCode": {
         "title": "Virheellinen korvauskoodi",
         "message": "Ole hyvä ja tarkista palvelimen lokit"
-      }
+      },
+      "destinationSaveFailed": "Failed to save destination: {{error}}",
+      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
+      "destinationTestFailed": "Test failed: {{error}}",
+      "destinationInUse": "Still used by: {{rules}}"
     },
     "warning": {
       "jobFailed": {
