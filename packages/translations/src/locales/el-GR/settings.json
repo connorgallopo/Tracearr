@@ -247,14 +247,6 @@
       "exitNodeFailed": "Αποτυχία ορισμού κόμβου εξόδου"
     }
   },
-  "webhooks": {
-    "title": "Ρύθμιση Webhook",
-    "discordWebhook": "Url Webhook Του Discord",
-    "ntfyTopic": "Θέμα Ntfy",
-    "customWebhook": "Προσαρμοσμένη Διεύθυνση Url Webhook",
-    "webhookFormat": "Μορφή Webhook",
-    "testWebhook": "Δοκιμή Webhook"
-  },
   "jobs": {
     "title": "Εργασίες Συντήρησης",
     "description": "Διαχειριστείτε εργασίες παρασκηνίου που διατηρούν τα δεδομένα σας ακριβή και βελτιστοποιημένα.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Αυτό μπορεί να διαρκέσει λίγο",
     "mayTakeAWhileDesc": "Αυτή η εργασία μπορεί να χρειαστούν μερικά λεπτά για να ολοκληρωθεί, ανάλογα με το μέγεθος της βιβλιοθήκης σας.",
     "startJob": "Έναρξη Εργασίας"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Γεγονός",
-      "web": "Ιστός",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Οι ειδοποιήσεις ώθησης διαμορφώνονται ανά συσκευή στην εφαρμογή για κινητά.",
-      "webToastNote": "εμφανίζει αναδυόμενες ειδοποιήσεις σε αυτό το πρόγραμμα περιήγησης."
-    },
-    "agentCard": {
-      "saved": "Αποθηκεύτηκε",
-      "default": "Προεπιλογή",
-      "events": "Συμβάντα",
-      "sendTest": "Αποστολή Δοκιμής",
-      "notConfigured": "Δεν έχει ρυθμιστεί πλήρως.",
-      "editSettings": "Επεξεργασία ρυθμίσεων"
-    }
   },
   "advanced": {
     "title": "Ρυθμίσεις Για Προχωρημένους",
