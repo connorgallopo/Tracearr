@@ -247,14 +247,6 @@
       "exitNodeFailed": "Exitnode instellen mislukt"
     }
   },
-  "webhooks": {
-    "title": "Webhook-configuratie",
-    "discordWebhook": "URL Discord-webhook",
-    "ntfyTopic": "Ntfy-topic",
-    "customWebhook": "Aangepaste webhook-URL",
-    "webhookFormat": "Webhook-formaat",
-    "testWebhook": "Webhook testen"
-  },
   "jobs": {
     "title": "Werk in onderhoud",
     "description": "Beheer achtergrondtaken die uw gegevens accuraat en geoptimaliseerd houden.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Dit kan een tijdje duren",
     "mayTakeAWhileDesc": "Deze taak kan enkele minuten duren om te voltooien, afhankelijk van de grootte van je bibliotheek.",
     "startJob": "Taak starten"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Gebeurtenis",
-      "web": "Internet",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Push-meldingen zijn per apparaat geconfigureerd in de mobiele app.",
-      "webToastNote": "Toon toast meldingen in deze browser."
-    },
-    "agentCard": {
-      "saved": "Opgeslagen",
-      "default": "Standaard",
-      "events": "Evenementen",
-      "sendTest": "Test verzenden",
-      "notConfigured": "Niet volledig geconfigureerd.",
-      "editSettings": "Instellingen bewerken"
-    }
   },
   "advanced": {
     "title": "Geavanceerde instellingen",
