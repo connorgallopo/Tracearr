@@ -247,14 +247,6 @@
       "exitNodeFailed": "終了ノードの設定に失敗しました"
     }
   },
-  "webhooks": {
-    "title": "Webhookの設定",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "トピックをNtfy",
-    "customWebhook": "カスタム Webhook URL",
-    "webhookFormat": "Webhookフォーマット",
-    "testWebhook": "Webhookをテスト"
-  },
   "jobs": {
     "title": "メンテナンス作業",
     "description": "データを正確に最適化するバックグラウンドタスクを管理します。",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "しばらく時間がかかることがあります",
     "mayTakeAWhileDesc": "このジョブは、ライブラリのサイズに応じて完了するまで数分かかる場合があります。",
     "startJob": "作業を開始"
-  },
-  "notifications": {
-    "routing": {
-      "event": "イベント",
-      "web": "ウェブ",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "プッシュ通知は、モバイルアプリでデバイスごとに設定されます。",
-      "webToastNote": "このブラウザにトースト通知を表示します。"
-    },
-    "agentCard": {
-      "saved": "保存しました",
-      "default": "デフォルト",
-      "events": "イベント",
-      "sendTest": "テストを送信",
-      "notConfigured": "設定が完了していません。",
-      "editSettings": "設定を編集"
-    }
   },
   "advanced": {
     "title": "詳細設定",
