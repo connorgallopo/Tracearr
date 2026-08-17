@@ -405,7 +405,14 @@
     "classicRule": "Klassieke regel",
     "customRule": "Aangepaste regel",
     "chooseTemplate": "Kies een regelsjabloon",
-    "chooseTemplateDesc": "Selecteer een vooraf geconfigureerd regeltype om snel te beginnen."
+    "chooseTemplateDesc": "Selecteer een vooraf geconfigureerd regeltype om snel te beginnen.",
+    "builder": {
+      "destinationDisabled": "Disabled destination",
+      "noDestinations": "No destinations yet. Add one to send notifications.",
+      "errors": {
+        "sendNeedsDestination": "Pick at least one destination"
+      }
+    }
   },
   "terminateStream": {
     "title": "Stream afbreken",
@@ -468,35 +475,57 @@
       "unlinkPlexAccount": "Plex-account ontkoppelen",
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt."
     },
-    "notifications": {
-      "title": "Notificatie Agents",
-      "description": "Configureer notificatiekanalen en selecteer welke gebeurtenissen elke agent moet ontvangen.",
-      "loadingSettings": "Meldingsinstellingen laden...",
-      "addAgent": "Meldings-agent toevoegen",
-      "editAgent": "Meldings-agent bewerken",
-      "addAgentDesc": "Kies een meldingsdienst en stel deze in.",
-      "editAgentDesc": "Bewerk de configuratie van de meldings-agent.",
-      "noAgents": "Geen meldings-agents ingesteld",
-      "noAgentsHint": "Voeg een agent toe om meldingen te ontvangen van overtredingen en streamgebeurtenissen.",
-      "agentType": "Type agent",
-      "selectType": "Type selecteren...",
-      "webhookUrl": "Webhook-URL",
-      "webhookUrlPlaceholder": "https://...",
-      "triggerEvents": "Activatie-gebeurtenissen",
-      "allEvents": "Alle gebeurtenissen",
-      "customEvents": "Aangepaste gebeurtenissen",
-      "eventSelection": "Gebeurtenisselectie",
-      "testingAgent": "Testen...",
-      "testAgent": "Agent testen",
-      "removeAgentTitle": "{{name}} verwijderen?",
-      "removeAgentDesc": "Dit verwijdert {{name}} en alle bijbehorende meldingen. Je kunt het later opnieuw toevoegen.",
-      "webhookAgents": "Webhook-agents",
-      "oneWebhookLimit": "Slechts één webhook-agent kan tegelijkertijd actief zijn.",
-      "currentlyConfigured": "{{name}} is momenteel ingesteld.",
-      "allAgentsConfigured": "Alle meldings-agents zijn al ingesteld.",
-      "noConfigNeeded": "Instellen van deze agent is niet nodig.",
-      "saveAgent": "Agent toevoegen",
-      "updateAgent": "Agent bijwerken"
+    "destinations": {
+      "title": "Notification destinations",
+      "description": "Where notifications go. Add as many as you like; each one picks the system events it receives, and rules can send to any of them.",
+      "add": "Add destination",
+      "empty": "No destinations yet.",
+      "ownerOnly": "Only the owner can manage notification destinations.",
+      "eventsLabel": "Events",
+      "builtinNote": "Built in",
+      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
+      "webToastNote": "Toasts in this browser.",
+      "usedBy": "Used by {{count}} rule",
+      "usedBy_other": "Used by {{count}} rules",
+      "reencrypt": "Re-enter this destination's secret",
+      "secretSet": "Set (leave blank to keep)",
+      "clearSecret": "Clear",
+      "test": "Test",
+      "testHint": "Save first to test",
+      "delete": "Delete",
+      "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
+      "events": {
+        "violation_detected": "Violation detected",
+        "stream_started": "Stream started",
+        "stream_stopped": "Stream stopped",
+        "server_down": "Server down",
+        "server_up": "Server up",
+        "plugin_update_available": "Plugin update available"
+      },
+      "types": {
+        "discord": "Discord",
+        "jsonWebhook": "Webhook (JSON)",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "push": "Mobile push",
+        "webToast": "Browser toasts"
+      },
+      "fields": {
+        "webhookUrl": "Webhook URL",
+        "url": "URL",
+        "serverUrl": "Server URL",
+        "apiUrl": "API URL",
+        "topic": "Topic",
+        "authToken": "Auth token",
+        "userKey": "User key",
+        "apiToken": "API token"
+      },
+      "hints": {
+        "authTokenOptional": "Optional for public topics"
+      },
+      "testNeedsForm": "Fill in the required fields to test"
     },
     "jobs": {
       "runNow": "Nu uitvoeren",
