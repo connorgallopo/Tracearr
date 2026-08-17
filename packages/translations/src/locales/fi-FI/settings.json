@@ -247,14 +247,6 @@
       "exitNodeFailed": "Poistumispalvelimen asettaminen epäonnistui"
     }
   },
-  "webhooks": {
-    "title": "Webkoukun Asetukset",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Aihe",
-    "customWebhook": "Mukautettu Webkoukun URL",
-    "webhookFormat": "Webkoukun Muoto",
-    "testWebhook": "Testaa Webkoukku"
-  },
   "jobs": {
     "title": "Huoltotyöt",
     "description": "Hallitse taustatehtäviä, jotka pitävät tietosi tarkkoina ja optimoituina.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Tämä voi kestää jonkin aikaa",
     "mayTakeAWhileDesc": "Tämä työ voi kestää useita minuutteja loppuun riippuen kirjaston koosta.",
     "startJob": "Aloita Työ"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Tapahtuma",
-      "web": "Verkko",
-      "discord": "Discord",
-      "webhook": "Webkoukku",
-      "webNote": "Push-ilmoitukset on määritetty laitteen kanssa mobiilisovelluksessa.",
-      "webToastNote": "näyttää paahdettuja ilmoituksia tässä selaimessa."
-    },
-    "agentCard": {
-      "saved": "Tallennettu",
-      "default": "Oletus",
-      "events": "Tapahtumat",
-      "sendTest": "Lähetä Testi",
-      "notConfigured": "Ei täysin määritetty.",
-      "editSettings": "Muokkaa asetuksia"
-    }
   },
   "advanced": {
     "title": "Edistyneet Asetukset",
