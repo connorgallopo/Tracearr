@@ -247,14 +247,6 @@
       "exitNodeFailed": "Kunne ikke indstille afslutningsknude"
     }
   },
-  "webhooks": {
-    "title": "Indstilling Af Webhook",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Emne",
-    "customWebhook": "Brugerdefineret Webhook URL",
-    "webhookFormat": "Webhook Format",
-    "testWebhook": "Test Webhook"
-  },
   "jobs": {
     "title": "Vedligeholdelse Job",
     "description": "Administrer baggrundsopgaver, der holder dine data nøjagtige og optimerede.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Dette kan tage et stykke tid",
     "mayTakeAWhileDesc": "Dette job kan tage flere minutter at fuldføre afhængigt af størrelsen af dit bibliotek.",
     "startJob": "Start Job"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Begivenhed",
-      "web": "Web",
-      "discord": "Uenighed",
-      "webhook": "Webhook",
-      "webNote": "Push-notifikationer er konfigureret pr. enhed i mobilappen.",
-      "webToastNote": "viser toast notifikationer i denne browser."
-    },
-    "agentCard": {
-      "saved": "Gemt",
-      "default": "Standard",
-      "events": "Begivenheder",
-      "sendTest": "Send Test",
-      "notConfigured": "Ikke fuldt konfigureret.",
-      "editSettings": "Rediger indstillinger"
-    }
   },
   "advanced": {
     "title": "Avancerede Indstillinger",
