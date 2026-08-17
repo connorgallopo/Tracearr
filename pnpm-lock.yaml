@@ -352,7 +352,7 @@ importers:
         version: 0.45.2(@opentelemetry/api@1.9.0)(@types/pg@8.20.0)(kysely@0.29.2)(pg@8.22.0)
       eventsource:
         specifier: ^4.1.0
-        version: 4.1.0
+        version: 4.1.1
       expo-server-sdk:
         specifier: ^6.1.0
         version: 6.1.0
@@ -5835,8 +5835,8 @@ packages:
     resolution: {integrity: sha512-CRT1WTyuQoD771GW56XEZFQ/ZoSfWid1alKGDYMmkt2yl8UXrVR4pspqWNEcqKvVIzg6PAltWjxcSSPrboA4iA==}
     engines: {node: '>=18.0.0'}
 
-  eventsource@4.1.0:
-    resolution: {integrity: sha512-2GuF51iuHX6A9xdTccMTsNb7VO0lHZihApxhvQzJB5A03DvHDd2FQepodbMaztPBmBcE/ox7o2gqaxGhYB9LhQ==}
+  eventsource@4.1.1:
+    resolution: {integrity: sha512-D6bTRWh6KahHTK/m4WnjPQyEinNPf9eFLEZSEoj7d6fTibspnAVYfzHvirL7u/aoX5d9YYfIkBVAhmigUELk9w==}
     engines: {node: '>=20.0.0'}
 
   evp_bytestokey@1.0.3:
@@ -15988,7 +15988,7 @@ snapshots:
     dependencies:
       eventsource-parser: 3.1.1
 
-  eventsource@4.1.0:
+  eventsource@4.1.1:
     dependencies:
       eventsource-parser: 3.1.1
 
