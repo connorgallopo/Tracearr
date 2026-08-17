@@ -247,14 +247,6 @@
       "exitNodeFailed": "Nepodařilo se nastavit výstupní uzel"
     }
   },
-  "webhooks": {
-    "title": "Nastavení webhooku",
-    "discordWebhook": "URL Discord Webhook",
-    "ntfyTopic": "Ntfy téma",
-    "customWebhook": "Vlastní URL webhook",
-    "webhookFormat": "Formát webhook",
-    "testWebhook": "Testovat webový háček"
-  },
   "jobs": {
     "title": "Údržba pracovních míst",
     "description": "Spravujte úkoly na pozadí, které udržují vaše data přesná a optimalizovaná.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Může to chvíli trvat",
     "mayTakeAWhileDesc": "Dokončení této práce může trvat několik minut v závislosti na velikosti vaší knihovny.",
     "startJob": "Zahájit práci"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Událost",
-      "web": "Webová",
-      "discord": "Discord",
-      "webhook": "Webový háček",
-      "webNote": "Push oznámení jsou nakonfigurována na zařízení v mobilní aplikaci.",
-      "webToastNote": "zobrazí upozornění na toast v tomto prohlížeči."
-    },
-    "agentCard": {
-      "saved": "Uloženo",
-      "default": "Výchozí",
-      "events": "Události",
-      "sendTest": "Odeslat test",
-      "notConfigured": "Není plně nakonfigurován.",
-      "editSettings": "Upravit nastavení"
-    }
   },
   "advanced": {
     "title": "Pokročilá nastavení",
