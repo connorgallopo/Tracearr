@@ -247,14 +247,6 @@
       "exitNodeFailed": "Failed to set exit node"
     }
   },
-  "webhooks": {
-    "title": "Webhook Configuration",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Topic",
-    "customWebhook": "Custom Webhook URL",
-    "webhookFormat": "Webhook Format",
-    "testWebhook": "Test Webhook"
-  },
   "jobs": {
     "title": "Maintenance Jobs",
     "description": "Manage background tasks that keep your data accurate and optimized.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "This may take a while",
     "mayTakeAWhileDesc": "This job may take several minutes to complete depending on the size of your library.",
     "startJob": "Start Job"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Event",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Push notifications are configured per-device in the mobile app.",
-      "webToastNote": "shows toast notifications in this browser."
-    },
-    "agentCard": {
-      "saved": "Saved",
-      "default": "Default",
-      "events": "Events",
-      "sendTest": "Send Test",
-      "notConfigured": "Not fully configured.",
-      "editSettings": "Edit settings"
-    }
   },
   "advanced": {
     "title": "Advanced Settings",
