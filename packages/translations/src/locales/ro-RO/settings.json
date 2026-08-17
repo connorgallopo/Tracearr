@@ -247,14 +247,6 @@
       "exitNodeFailed": "Setarea nodului de ieșire a eșuat"
     }
   },
-  "webhooks": {
-    "title": "Configurare Webhook",
-    "discordWebhook": "URL-ul Webhook-ului Discord",
-    "ntfyTopic": "Ntfy Topic",
-    "customWebhook": "URL Webhook personalizat",
-    "webhookFormat": "Format Webhook",
-    "testWebhook": "Testează Webhook-ul"
-  },
   "jobs": {
     "title": "Lucrări de mentenanță",
     "description": "Gestionați sarcinile de fundal care vă păstrează datele corecte și optimizate.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Aceasta poate dura o vreme",
     "mayTakeAWhileDesc": "Această sarcină poate dura câteva minute pentru a fi finalizată, în funcție de dimensiunea bibliotecii dvs.",
     "startJob": "Începe sarcina"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Eveniment",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Notificările push sunt configurate per dispozitiv în aplicația mobilă.",
-      "webToastNote": "afișează notificări toast în acest browser."
-    },
-    "agentCard": {
-      "saved": "Salvat",
-      "default": "Implicit",
-      "events": "Evenimente",
-      "sendTest": "Trimite test",
-      "notConfigured": "Nu este configurat complet.",
-      "editSettings": "Editare setări"
-    }
   },
   "advanced": {
     "title": "Setări avansate",
