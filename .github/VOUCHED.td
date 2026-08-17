@@ -7,3 +7,4 @@
 # Format: https://github.com/mitchellh/vouch
 connorgallopo
 durzo
+-emre155 did not follow contributing, invalid diff, reported as spam
