@@ -247,14 +247,6 @@
       "exitNodeFailed": "Det gick inte att ange avsluta noden"
     }
   },
-  "webhooks": {
-    "title": "Webhook konfiguration",
-    "discordWebhook": "Discord Webhook URL",
-    "ntfyTopic": "Ntfy Ämne",
-    "customWebhook": "Anpassad Webhook URL",
-    "webhookFormat": "Webhook Format",
-    "testWebhook": "Testa Webhook"
-  },
   "jobs": {
     "title": "Underhåll Jobb",
     "description": "Hantera bakgrundsuppgifter som håller dina data korrekta och optimerade.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Detta kan ta ett tag",
     "mayTakeAWhileDesc": "Detta jobb kan ta flera minuter att slutföra beroende på storleken på ditt bibliotek.",
     "startJob": "Starta jobb"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Händelse",
-      "web": "Webb",
-      "discord": "Discord",
-      "webhook": "Webbkrok",
-      "webNote": "Push-meddelanden är konfigurerade per enhet i mobilappen.",
-      "webToastNote": "visar toast-meddelanden i den här webbläsaren."
-    },
-    "agentCard": {
-      "saved": "Sparad",
-      "default": "Standard",
-      "events": "Händelser",
-      "sendTest": "Skicka test",
-      "notConfigured": "Inte fullt konfigurerad.",
-      "editSettings": "Redigera inställningar"
-    }
   },
   "advanced": {
     "title": "Avancerade inställningar",
