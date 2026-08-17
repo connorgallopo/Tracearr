@@ -247,14 +247,6 @@
       "exitNodeFailed": "Nie udało się ustawić węzła wyjścia"
     }
   },
-  "webhooks": {
-    "title": "Konfiguracja webhooka",
-    "discordWebhook": "Adres URL webhooka Discorda",
-    "ntfyTopic": "Temat Ntfy",
-    "customWebhook": "Własny adres URL webhooka",
-    "webhookFormat": "Format Webhooka",
-    "testWebhook": "Test Webhooka"
-  },
   "jobs": {
     "title": "Praca konserwacyjna",
     "description": "Zarządzaj zadaniami w tle, które pozwalają na dokładne i zoptymalizowane dane.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "To może zająć chwilę",
     "mayTakeAWhileDesc": "To zadanie może zająć kilka minut w zależności od rozmiaru Twojej biblioteki.",
     "startJob": "Rozpocznij pracę"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Wydarzenie",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Powiadomienia push są skonfigurowane dla każdego urządzenia w aplikacji mobilnej.",
-      "webToastNote": "pokazuje powiadomienia w dymku w tej przeglądarce."
-    },
-    "agentCard": {
-      "saved": "Zapisano",
-      "default": "Domyślny",
-      "events": "Wydarzenia",
-      "sendTest": "Wyślij test",
-      "notConfigured": "Nie w pełni skonfigurowane.",
-      "editSettings": "Edytuj ustawienia"
-    }
   },
   "advanced": {
     "title": "Ustawienia zaawansowane",
