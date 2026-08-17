@@ -451,7 +451,7 @@ importers:
         version: 29.1.1(@noble/hashes@2.2.0)
       postcss:
         specifier: ^8.5.10
-        version: 8.5.25
+        version: 8.5.26
       tailwindcss:
         specifier: ^4.2.1
         version: 4.3.3
@@ -6228,8 +6228,8 @@ packages:
     resolution: {integrity: sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg==}
     engines: {node: '>=4'}
 
-  postcss@8.5.25:
-    resolution: {integrity: sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==}
+  postcss@8.5.26:
+    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -10209,7 +10209,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
-      postcss: 8.5.25
+      postcss: 8.5.26
       tailwindcss: 4.3.3
 
   '@tanstack/query-core@5.101.4': {}
@@ -10622,7 +10622,7 @@ snapshots:
       '@vue/shared': 3.5.41
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.25
+      postcss: 8.5.26
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.41':
@@ -13902,7 +13902,7 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss@8.5.25:
+  postcss@8.5.26:
     dependencies:
       nanoid: 3.3.18
       picocolors: 1.1.1
@@ -14579,7 +14579,7 @@ snapshots:
       kleur: 4.1.5
       open: 11.0.0
       ora: 8.2.0
-      postcss: 8.5.25
+      postcss: 8.5.26
       postcss-selector-parser: 7.1.4
       prompts: 2.4.2
       recast: 0.23.12
@@ -15277,7 +15277,7 @@ snapshots:
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.5
-      postcss: 8.5.25
+      postcss: 8.5.26
       rolldown: 1.1.5
       tinyglobby: 0.2.17
     optionalDependencies:
@@ -15293,7 +15293,7 @@ snapshots:
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.5
-      postcss: 8.5.25
+      postcss: 8.5.26
       rolldown: 1.1.5
       tinyglobby: 0.2.17
     optionalDependencies:
