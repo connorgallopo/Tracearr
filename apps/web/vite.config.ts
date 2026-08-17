@@ -46,3 +46,5 @@ export default defineConfig(({ command }) => ({
     sourcemap: true,
   },
 }));
+
+# Fix for issue #991: safe input handling
