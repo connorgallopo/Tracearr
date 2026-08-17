@@ -42,7 +42,7 @@
     "@tanstack/react-virtual": "^3.13.24",
     "@tracearr/shared": "workspace:*",
     "@tracearr/translations": "workspace:*",
-    "better-auth": "1.6.23",
+    "better-auth": "1.6.26",
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
