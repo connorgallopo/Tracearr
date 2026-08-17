@@ -152,7 +152,10 @@
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
-      }
+      },
+      "destinationSaved": "Destination saved",
+      "destinationDeleted": "Destination deleted",
+      "destinationTestSent": "Test notification sent"
     },
     "error": {
       "serverAddFailed": "Falha ao adicionar servidor",
@@ -198,7 +201,11 @@
       "invalidClaimCode": {
         "title": "Código de reivindicação inválido",
         "message": "Por favor, verifique os logs do servidor"
-      }
+      },
+      "destinationSaveFailed": "Failed to save destination: {{error}}",
+      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
+      "destinationTestFailed": "Test failed: {{error}}",
+      "destinationInUse": "Still used by: {{rules}}"
     },
     "warning": {
       "jobFailed": {
