@@ -247,14 +247,6 @@
       "exitNodeFailed": "فشل في تعيين الخروج من العقدة"
     }
   },
-  "webhooks": {
-    "title": "تكوين Webhook",
-    "discordWebhook": "رابط ديسكورد Webhook",
-    "ntfyTopic": "موضوع Ntfy",
-    "customWebhook": "رابط Webhook مخصص",
-    "webhookFormat": "تنسيق Webhook",
-    "testWebhook": "اختبار Webhook"
-  },
   "jobs": {
     "title": "وظائف الصيانة",
     "description": "إدارة مهام الخلفية التي تحافظ على دقة البيانات الخاصة بك وتحسينها.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "قد يستغرق هذا بعض الوقت",
     "mayTakeAWhileDesc": "قد يستغرق إنجاز هذه المهمة عدة دقائق تبعاً لحجم مكتبتك.",
     "startJob": "بدء العمل"
-  },
-  "notifications": {
-    "routing": {
-      "event": "الحدث",
-      "web": "ويب",
-      "discord": "ديسكورد",
-      "webhook": "ويبهوك",
-      "webNote": "يتم تكوين الإشعارات لكل جهاز في تطبيق الجوال.",
-      "webToastNote": "تظهر التنبيهات المنبثقة في هذا المتصفح."
-    },
-    "agentCard": {
-      "saved": "محفوظ",
-      "default": "الافتراضي",
-      "events": "الأحداث",
-      "sendTest": "إرسال اختبار",
-      "notConfigured": "لم يتم تكوينه بالكامل.",
-      "editSettings": "تعديل الإعدادات"
-    }
   },
   "advanced": {
     "title": "الإعدادات المتقدمة",
