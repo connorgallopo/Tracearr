@@ -247,14 +247,6 @@
       "exitNodeFailed": "Impossible de définir l'exit node"
     }
   },
-  "webhooks": {
-    "title": "Configuration du webhook",
-    "discordWebhook": "URL du webhook Discord",
-    "ntfyTopic": "Sujet Ntfy",
-    "customWebhook": "URL personnalisée du webhook",
-    "webhookFormat": "Format du webhook",
-    "testWebhook": "Tester le webhook"
-  },
   "jobs": {
     "title": "Tâches d'entretien",
     "description": "Gérer les tâches de fond qui gardent vos données exactes et optimisées.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Cela peut prendre un certain temps",
     "mayTakeAWhileDesc": "Cette tâche peut prendre plusieurs minutes selon la taille de votre bibliothèque.",
     "startJob": "Commencer la tâche"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Evénement",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Les notifications push sont configurées par appareil dans l'application mobile.",
-      "webToastNote": "affiche les notifications toast dans ce navigateur."
-    },
-    "agentCard": {
-      "saved": "Enregistré",
-      "default": "Par défaut",
-      "events": "Évènements",
-      "sendTest": "Envoyer le test",
-      "notConfigured": "Non entièrement configuré.",
-      "editSettings": "Modifier les paramètres"
-    }
   },
   "advanced": {
     "title": "Réglages avancés",
