@@ -247,14 +247,6 @@
       "exitNodeFailed": "无法设置出口节点"
     }
   },
-  "webhooks": {
-    "title": "Webhook配置",
-    "discordWebhook": "Discord Webhook 链接",
-    "ntfyTopic": "Ntfy 主题",
-    "customWebhook": "自定义 Webhook URL",
-    "webhookFormat": "Webhook 格式",
-    "testWebhook": "测试 Webhook"
-  },
   "jobs": {
     "title": "维护作业",
     "description": "管理后台任务，使您的数据保持准确和最佳化。",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "这可能需要一些时间",
     "mayTakeAWhileDesc": "这个任务可能需要几分钟才能完成，取决于您的库的大小。",
     "startJob": "开始作业"
-  },
-  "notifications": {
-    "routing": {
-      "event": "事件",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "推送通知是在移动应用程序中每台设备配置的。",
-      "webToastNote": "在此浏览器中显示弹出通知。"
-    },
-    "agentCard": {
-      "saved": "已保存",
-      "default": "默认设置",
-      "events": "事件",
-      "sendTest": "发送测试",
-      "notConfigured": "未完全配置。",
-      "editSettings": "编辑设置"
-    }
   },
   "advanced": {
     "title": "高级设置",
