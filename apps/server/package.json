@@ -37,7 +37,7 @@
     "openapi:dump": "tsx scripts/generate-openapi.ts"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@asteasolutions/zod-to-openapi": "^9.0.0",
     "@fastify/cookie": "^11.1.1",
     "@fastify/cors": "^11.3.0",
     "@fastify/helmet": "^13.1.0",
