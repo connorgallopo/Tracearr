@@ -152,7 +152,10 @@
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
-      }
+      },
+      "destinationSaved": "Destination saved",
+      "destinationDeleted": "Destination deleted",
+      "destinationTestSent": "Test notification sent"
     },
     "error": {
       "serverAddFailed": "サーバーの追加に失敗しました",
@@ -198,7 +201,11 @@
       "invalidClaimCode": {
         "title": "無効な請求コードです",
         "message": "サーバーのログを確認してください"
-      }
+      },
+      "destinationSaveFailed": "Failed to save destination: {{error}}",
+      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
+      "destinationTestFailed": "Test failed: {{error}}",
+      "destinationInUse": "Still used by: {{rules}}"
     },
     "warning": {
       "jobFailed": {
