@@ -247,14 +247,6 @@
       "exitNodeFailed": "Falha ao definir o nó de saída"
     }
   },
-  "webhooks": {
-    "title": "Configuração do webhook",
-    "discordWebhook": "URL do webhook do Discord",
-    "ntfyTopic": "Tópico Ntfy",
-    "customWebhook": "URL do webhook personalizado",
-    "webhookFormat": "Formato do webhook",
-    "testWebhook": "Testar webhook"
-  },
   "jobs": {
     "title": "Trabalhos em Manutenção",
     "description": "Gerenciar tarefas em segundo plano que mantêm seus dados precisos e otimizados.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Isso pode demorar um pouco",
     "mayTakeAWhileDesc": "Este trabalho pode levar vários minutos para ser concluído, dependendo do tamanho da sua biblioteca.",
     "startJob": "Iniciar trabalho"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Evento",
-      "web": "Web",
-      "discord": "Discord",
-      "webhook": "Webhook",
-      "webNote": "Notificações push estão configuradas por dispositivo no aplicativo móvel.",
-      "webToastNote": "mostra notificações toast neste navegador."
-    },
-    "agentCard": {
-      "saved": "Salvo",
-      "default": "Padrão",
-      "events": "Eventos",
-      "sendTest": "Teste De Envio",
-      "notConfigured": "Não totalmente configurado.",
-      "editSettings": "Editar configurações"
-    }
   },
   "advanced": {
     "title": "Definições avançadas",
