@@ -247,14 +247,6 @@
       "exitNodeFailed": "Kan ikke angi avslutning av node"
     }
   },
-  "webhooks": {
-    "title": "Konfigurasjon av nettkrok",
-    "discordWebhook": "URL til Discord Webhook",
-    "ntfyTopic": "Ntfy Topic",
-    "customWebhook": "Egendefinert nettadresse",
-    "webhookFormat": "Webhook format",
-    "testWebhook": "Test Webhook"
-  },
   "jobs": {
     "title": "Vedlikeholdsjobber",
     "description": "Administrer bakgrunnsoppgaver som holder dataene dine nøyaktig og optimalisert.",
@@ -279,24 +271,6 @@
     "mayTakeAWhile": "Dette kan ta en stund",
     "mayTakeAWhileDesc": "Denne jobben kan ta flere minutter å fullføre, avhengig av størrelsen på biblioteket ditt.",
     "startJob": "Start jobb"
-  },
-  "notifications": {
-    "routing": {
-      "event": "Hendelse",
-      "web": "Nett",
-      "discord": "Splid",
-      "webhook": "Nettkrok",
-      "webNote": "Push-varsler er konfigurert for hver enhet i mobilappen.",
-      "webToastNote": "viser toast meldinger i denne nettleseren."
-    },
-    "agentCard": {
-      "saved": "Lagret",
-      "default": "Standard",
-      "events": "Hendelser",
-      "sendTest": "Send test",
-      "notConfigured": "Ikke fullstendig konfigurert.",
-      "editSettings": "Rediger innstillinger"
-    }
   },
   "advanced": {
     "title": "Avanserte innstillinger",
