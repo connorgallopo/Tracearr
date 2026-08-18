@@ -61,12 +61,12 @@
         "message": "Je Plex-account is ontkoppeld"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "Plex account opnieuw geautoriseerd",
+        "message_one": "{{count}} server opnieuw verbonden",
+        "message_other": "{{count}} servers hebben opnieuw verbinding gemaakt",
+        "messageNoServers": "Accounttoken bijgewerkt",
+        "partial": "Token bijgewerkt, maar {{names}} weigerde het nog steeds",
+        "unmatched": "Token bijgewerkt, maar {{names}} kon niet opnieuw gekoppeld worden"
       },
       "agentAdded": {
         "title": "Agent toegevoegd",
@@ -161,9 +161,9 @@
       "serverUserSplit": {
         "title": "Account split into a separate user"
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "Bestemming opgeslagen",
+      "destinationDeleted": "Bestemming verwijdert",
+      "destinationTestSent": "Test notificatie verzonden"
     },
     "error": {
       "serverAddFailed": "Server toevoegen mislukt",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Routering bijwerken mislukt",
       "clipboardFailed": "Kopiëren naar klembord mislukt",
       "plexUnlinkFailed": "Ontkoppelen Plex-account mislukt",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "Het opnieuw autoriseren van het Plex account is mislukt",
       "agentAddFailed": "Agent toevoegen mislukt",
       "agentUpdateFailed": "Agent bijwerken mislukt",
       "agentRemoveFailed": "Agent verwijderen mislukt",
@@ -211,10 +211,10 @@
         "title": "Ongeldige claimcode",
         "message": "Controleer het serverlogboek"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "Niet gelukt bestemming op te slaan: {{error}}",
+      "destinationDeleteFailed": "Niet gelukt bestemming te verwijderen: {{error}}",
+      "destinationTestFailed": "Test niet geslaagd: {{error}}",
+      "destinationInUse": "Nog in gebruik door: {{rules}}"
     },
     "warning": {
       "jobFailed": {
