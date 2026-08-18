@@ -60,6 +60,14 @@
         "title": "Plex Account Unlinked",
         "message": "Your Plex account has been disconnected"
       },
+      "plexAccountReauthorized": {
+        "title": "Plex Account Reauthorized",
+        "message_one": "{{count}} server reconnected",
+        "message_other": "{{count}} servers reconnected",
+        "messageNoServers": "Account token updated",
+        "partial": "Token updated, but {{names}} still refused it",
+        "unmatched": "Token updated, but {{names}} could not be re-linked"
+      },
       "agentAdded": {
         "title": "Agent Added",
         "message": "The notification agent has been added"
@@ -187,6 +195,7 @@
       "routingUpdateFailed": "Failed to update routing",
       "clipboardFailed": "Failed to copy to clipboard",
       "plexUnlinkFailed": "Failed to unlink Plex account",
+      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
       "agentAddFailed": "Failed to add agent",
       "agentUpdateFailed": "Failed to update agent",
       "agentRemoveFailed": "Failed to remove agent",
