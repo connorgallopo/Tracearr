@@ -468,6 +468,7 @@
       "serversConnected_one": "{{count}} server connected",
       "serversConnected_other": "{{count}} servers connected",
       "unlinkAccount": "Unlink this Plex account",
+      "reauthorizeAccount": "Reauthorize this Plex account",
       "deleteServersFirst": "Delete connected servers first to unlink this account",
       "linkedAccounts": "Linked Plex Accounts",
       "linkedAccountsDesc": "Manage the Plex accounts you can add servers from.",
