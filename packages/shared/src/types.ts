@@ -730,6 +730,15 @@ export interface KillStreamAction {
 export interface MessageClientAction {
   type: 'message_client';
   message: string;
+  /** Optional title shown above the message. Defaults to 'Tracearr'. */
+  header?: string;
+  /**
+   * Auto-dismiss timeout in milliseconds. Defaults to 10000 (previous
+   * behavior). Set to 0 to omit TimeoutMs from the Jellyfin/Emby payload:
+   * Jellyfin web then renders a persistent dialog the user must dismiss,
+   * instead of a ~3s toast that ignores the value.
+   */
+  timeout_ms?: number;
   target?: SessionTarget;
 }
 

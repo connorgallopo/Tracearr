@@ -591,6 +591,8 @@ export const killStreamActionSchema = z.object({
 export const messageClientActionSchema = z.object({
   type: z.literal('message_client'),
   message: z.string().min(1).max(500),
+  header: z.string().max(100).optional(),
+  timeout_ms: z.number().int().min(0).max(600000).optional(),
   target: sessionTargetSchema.optional(),
 });
 

@@ -222,7 +222,7 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
      * Send a message to the client device.
      * Plex does not support client messaging - only Jellyfin/Emby do.
      */
-    sendClientMessage: async (sessionId, message) => {
+    sendClientMessage: async (sessionId, message, header, timeoutMs) => {
       // Get session with server info to determine server type
       const session = await db.query.sessions.findFirst({
         where: eq(sessions.id, sessionId),
@@ -252,7 +252,12 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
 
       // Jellyfin/Emby use sessionKey for API calls
       if ('sendMessage' in client && typeof client.sendMessage === 'function') {
-        await client.sendMessage(session.sessionKey, message, 'Tracearr', 10000);
+        // timeout_ms === 0 means "no auto-dismiss": omit TimeoutMs so
+        // Jellyfin web renders a persistent dialog (its toast is a fixed
+        // ~3.3s and ignores the value entirely). Absent keeps the previous
+        // default of 10000 for backward compatibility.
+        const resolvedTimeout = timeoutMs === 0 ? undefined : (timeoutMs ?? 10000);
+        await client.sendMessage(session.sessionKey, message, header ?? 'Tracearr', resolvedTimeout);
         rulesLogger.debug('Client message sent', { sessionId, message });
       }
     },

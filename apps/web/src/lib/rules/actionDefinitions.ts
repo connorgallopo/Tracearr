@@ -246,6 +246,26 @@ export const ACTION_DEFINITIONS: Record<ActionType, ActionDefinition> = {
         placeholder: 'Message to display...',
         description: 'Text shown to the user',
       },
+      {
+        name: 'header',
+        label: 'Header',
+        type: 'text',
+        placeholder: 'Tracearr',
+        description: 'Title shown above the message (defaults to "Tracearr")',
+      },
+      {
+        name: 'timeout_ms',
+        label: 'Timeout',
+        type: 'number',
+        min: 0,
+        max: 600000,
+        step: 1000,
+        unit: 'ms',
+        description:
+          'Auto-dismiss after this many milliseconds (default 10000). ' +
+          'Set 0 for a persistent dialog on Jellyfin web that stays until dismissed. ' +
+          'TV clients show a brief toast regardless of this value.',
+      },
     ],
   },
 };

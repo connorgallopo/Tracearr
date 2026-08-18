@@ -74,7 +74,12 @@ export interface ActionExecutorDeps {
     // Returns the kill queue job id when a job was created or already exists,
     // or undefined when the enqueue was dropped (queue not initialized).
   ) => Promise<string | undefined>;
-  sendClientMessage: (sessionId: string, message: string) => Promise<void>;
+  sendClientMessage: (
+    sessionId: string,
+    message: string,
+    header?: string,
+    timeoutMs?: number
+  ) => Promise<void>;
   checkCooldown: (ruleId: string, targetId: string, cooldownMinutes: number) => Promise<boolean>;
   setCooldown: (ruleId: string, targetId: string, cooldownMinutes: number) => Promise<void>;
   queueForConfirmation: (params: {
@@ -402,6 +407,8 @@ const executeMessageClient: ActionExecutor = async (
   if (!session) return;
   const typedAction = action as MessageClientAction;
   const message = typedAction.message;
+  const header = typedAction.header;
+  const timeoutMs = typedAction.timeout_ms;
   const target = typedAction.target ?? 'triggering';
 
   if (!message) {
@@ -426,7 +433,7 @@ const executeMessageClient: ActionExecutor = async (
   });
 
   for (const targetSession of sessionsToMessage) {
-    await currentDeps.sendClientMessage(targetSession.id, message);
+    await currentDeps.sendClientMessage(targetSession.id, message, header, timeoutMs);
   }
 };
 

@@ -778,7 +778,49 @@ describe('Action Executor Registry', () => {
         const result = await executeAction(context, action);
 
         expect(result.success).toBe(true);
-        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(context.session.id, 'Please stop!');
+        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+          context.session.id,
+          'Please stop!',
+          undefined,
+          undefined
+        );
+      });
+
+      it('should pass header and timeout_ms through to sendClientMessage', async () => {
+        const context = createMockContext();
+        const action: MessageClientAction = {
+          type: 'message_client',
+          message: 'Maintenance tonight',
+          header: 'Whitehorse',
+          timeout_ms: 30000,
+        };
+
+        await executeAction(context, action);
+
+        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+          context.session.id,
+          'Maintenance tonight',
+          'Whitehorse',
+          30000
+        );
+      });
+
+      it('should pass timeout_ms 0 through (persistent display)', async () => {
+        const context = createMockContext();
+        const action: MessageClientAction = {
+          type: 'message_client',
+          message: 'Persistent notice',
+          timeout_ms: 0,
+        };
+
+        await executeAction(context, action);
+
+        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+          context.session.id,
+          'Persistent notice',
+          undefined,
+          0
+        );
       });
 
       it('should not send if message is empty', async () => {
@@ -808,8 +850,8 @@ describe('Action Executor Registry', () => {
           await executeAction(context, action);
 
           expect(mockDeps.sendClientMessage).toHaveBeenCalledTimes(2);
-          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s1', 'Warning!');
-          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s2', 'Warning!');
+          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s1', 'Warning!', undefined, undefined);
+          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s2', 'Warning!', undefined, undefined);
         });
       });
     });
