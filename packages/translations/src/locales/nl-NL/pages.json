@@ -407,10 +407,10 @@
     "chooseTemplate": "Kies een regelsjabloon",
     "chooseTemplateDesc": "Selecteer een vooraf geconfigureerd regeltype om snel te beginnen.",
     "builder": {
-      "destinationDisabled": "Disabled destination",
-      "noDestinations": "No destinations yet. Add one to send notifications.",
+      "destinationDisabled": "Bestemming uitgeschakeld",
+      "noDestinations": "Nog geen bestemming. Voeg er een toe om meldingen te ontvangen.",
       "errors": {
-        "sendNeedsDestination": "Pick at least one destination"
+        "sendNeedsDestination": "Kies minstens een bestemming"
       }
     }
   },
@@ -468,7 +468,7 @@
       "serversConnected_one": "{{count}} server verbonden",
       "serversConnected_other": "{{count}} servers verbonden",
       "unlinkAccount": "Dit Plex-account ontkoppelen",
-      "reauthorizeAccount": "Reauthorize this Plex account",
+      "reauthorizeAccount": "Autoriseer dit Plex account opnieuw",
       "deleteServersFirst": "Verwijder verbonden servers eerst om dit account te ontkoppelen",
       "linkedAccounts": "Gekoppelde Plex-accounts",
       "linkedAccountsDesc": "Beheer de Plex-accounts waarvan je servers kunt toevoegen.",
@@ -477,31 +477,31 @@
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt."
     },
     "destinations": {
-      "title": "Notification destinations",
-      "description": "Where notifications go. Add as many as you like; each one picks the system events it receives, and rules can send to any of them.",
-      "add": "Add destination",
-      "empty": "No destinations yet.",
-      "ownerOnly": "Only the owner can manage notification destinations.",
-      "eventsLabel": "Events",
-      "builtinNote": "Built in",
-      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
-      "webToastNote": "Toasts in this browser.",
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
-      "reencrypt": "Re-enter this destination's secret",
-      "secretSet": "Set (leave blank to keep)",
-      "clearSecret": "Clear",
+      "title": "Notificatiebestemmingen",
+      "description": "Waar meldingen naartoe gaan. Voeg er zoveel toe als je wilt; elke melding selecteert de systeemgebeurtenissen die hij ontvangt, en regels kunnen naar elk van hen berichten verzenden.",
+      "add": "Bestemming toevoegen",
+      "empty": "Nog geen bestemmingen.",
+      "ownerOnly": "Alleen de eigenaar kan de bestemming van meldingen beheren.",
+      "eventsLabel": "Evenementen",
+      "builtinNote": "Ingebouwd",
+      "pushNote": "Verzonden naar gekoppelde mobiele apparaten; elk apparaat filtert de meldingen in zijn eigen instellingen.",
+      "webToastNote": "Toastberichten in deze browser.",
+      "usedBy": "Gebruikt door de {{count}} regel",
+      "usedBy_other": "Gebruikt door {{count}} regels",
+      "reencrypt": "Voer opnieuw de code van deze bestemming in",
+      "secretSet": "Instellen (leeg laten om te behouden)",
+      "clearSecret": "Maak leeg",
       "test": "Test",
-      "testHint": "Save first to test",
-      "delete": "Delete",
-      "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
+      "testHint": "Sla eerst op om te testen",
+      "delete": "Verwijder",
+      "deleteConfirm": "Verwijder {{name}}? Regels die naar dit worden verzonden, worden geblokkeerd totdat ze zijn bijgewerkt.",
       "events": {
-        "violation_detected": "Violation detected",
-        "stream_started": "Stream started",
-        "stream_stopped": "Stream stopped",
+        "violation_detected": "Overtreding geconstateerd",
+        "stream_started": "Stream gestart",
+        "stream_stopped": "Stream gestopt",
         "server_down": "Server down",
         "server_up": "Server up",
-        "plugin_update_available": "Plugin update available"
+        "plugin_update_available": "Plugin update beschikbaar"
       },
       "types": {
         "discord": "Discord",
@@ -518,15 +518,15 @@
         "url": "URL",
         "serverUrl": "Server URL",
         "apiUrl": "API URL",
-        "topic": "Topic",
+        "topic": "Onderwerp",
         "authToken": "Auth token",
-        "userKey": "User key",
+        "userKey": "Gebruikerssleutel",
         "apiToken": "API token"
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": "Optioneel voor openbare onderwerpen"
       },
-      "testNeedsForm": "Fill in the required fields to test"
+      "testNeedsForm": "Vul de verplichte velden in om te testen"
     },
     "jobs": {
       "runNow": "Nu uitvoeren",
