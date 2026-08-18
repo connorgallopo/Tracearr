@@ -8,3 +8,4 @@
 connorgallopo
 durzo
 -emre155 did not follow contributing, invalid diff, reported as spam
+-nullable-eth AI Slop PR - Contributing guide ignored
