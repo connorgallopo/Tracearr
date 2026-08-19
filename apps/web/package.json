@@ -62,7 +62,7 @@
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.75.0",
     "react-i18next": "^17.0.9",
-    "react-intersection-observer": "^10.0.3",
+    "react-intersection-observer": "^11.0.0",
     "react-leaflet": "^5.0.0",
     "react-leaflet-heatmap-layer-v3": "3.0.3-beta-1",
     "react-router": "^8.0.0",
