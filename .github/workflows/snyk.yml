@@ -24,7 +24,7 @@ jobs:
       # @fastify/multipart) have no fix available to take yet.
       - name: Run Snyk to check for vulnerabilities
         continue-on-error: true
-        uses: snyk/actions/node@master
+        uses: snyk/actions/node@12140f4059e244892ae643824a95459a102120dd # master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
