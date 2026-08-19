@@ -24,7 +24,7 @@ overrides:
   minimatch@<4: '>=3.1.3'
   js-yaml@>=4: ^4.3.1
   nanoid@<4: ^3.3.17
-  '@esbuild-kit/core-utils>esbuild': ^0.25.0
+  '@esbuild-kit/core-utils>esbuild': ^0.28.0
 
 importers:
 
@@ -7988,7 +7988,7 @@ snapshots:
 
   '@esbuild-kit/core-utils@3.3.2':
     dependencies:
-      esbuild: 0.25.12
+      esbuild: 0.28.2
       source-map-support: 0.5.21
 
   '@esbuild-kit/esm-loader@2.6.5':
