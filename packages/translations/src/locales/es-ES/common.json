@@ -90,6 +90,18 @@
     "warning": "Advertencia",
     "high": "Alto"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "Ahora",
     "today": "Hoy",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "Seleccionar todos en la página",
     "selectRow": "Seleccionar fila",
-    "selectAllTotal": "Seleccionar todos los elementos {{total}}"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "Película",
@@ -304,5 +330,11 @@
     "unsavedChanges": "Tienes cambios sin guardar. ¿Seguro que quieres salir?"
   },
   "beta": "beta",
-  "or": "o"
+  "or": "o",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
