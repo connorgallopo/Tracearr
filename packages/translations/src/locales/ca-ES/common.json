@@ -90,6 +90,18 @@
     "warning": "Avís",
     "high": "Alta"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "Ara",
     "today": "Avui",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "Selecciona-ho tot a la pàgina",
     "selectRow": "Selecciona la fila",
-    "selectAllTotal": "Selecciona els {{total}} elements"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "Pel·lícula",
@@ -304,5 +330,11 @@
     "unsavedChanges": "Teniu canvis no desats. Esteu segur que voleu marxar?"
   },
   "beta": "beta",
-  "or": "o"
+  "or": "o",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
