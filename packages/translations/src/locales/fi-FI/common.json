@@ -90,6 +90,18 @@
     "warning": "Varoitus",
     "high": "Korkea"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "Nyt",
     "today": "Tänään",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "Valitse kaikki sivulla",
     "selectRow": "Valitse rivi",
-    "selectAllTotal": "Valitse kaikki {{total}} kohdetta"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "Elokuva",
@@ -304,5 +330,11 @@
     "unsavedChanges": "Sinulla on tallentamattomia muutoksia. Oletko varma, että haluat lähteä?"
   },
   "beta": "beta",
-  "or": "tai"
+  "or": "tai",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
