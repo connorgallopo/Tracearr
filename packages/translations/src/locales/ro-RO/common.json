@@ -90,6 +90,18 @@
     "warning": "Avertizare",
     "high": "Ridicat"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "Acum",
     "today": "Astăzi",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "Selectaţi toate pe pagină",
     "selectRow": "Selectare rând",
-    "selectAllTotal": "Selectați toate elementele {{total}}"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "Film",
@@ -304,5 +330,11 @@
     "unsavedChanges": "Aveți modificări nesalvate. Sunteți sigur că doriți să ieșiți?"
   },
   "beta": "beta",
-  "or": "sau"
+  "or": "sau",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
