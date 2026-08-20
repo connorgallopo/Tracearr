@@ -90,6 +90,18 @@
     "warning": "Advarsel",
     "high": "Høy"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "Nå",
     "today": "Idag",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "Velg alle på siden",
     "selectRow": "Velg rad",
-    "selectAllTotal": "Select all {{total}} items"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "Film",
@@ -304,5 +330,11 @@
     "unsavedChanges": "Du har ulagrede endringer. Er du sikker på at du vil forlate?"
   },
   "beta": "beta",
-  "or": "eller"
+  "or": "eller",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
