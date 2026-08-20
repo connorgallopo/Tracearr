@@ -90,6 +90,18 @@
     "warning": "警告",
     "high": "高"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "当前",
     "today": "今天",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "选择页面上的所有内容",
     "selectRow": "选择行",
-    "selectAllTotal": "选择所有{{total}}项目"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "电影",
@@ -304,5 +330,11 @@
     "unsavedChanges": "有尚未保存的更改，确定要离开吗？"
   },
   "beta": "测试版",
-  "or": "或者"
+  "or": "或者",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
