@@ -26,7 +26,7 @@
   "user": "User",
   "violation": "Violation",
   "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "manage": "Beheer",
+  "userStats": "Op Gebruiker",
+  "toggleSidebar": "Navigatie in-/uitschakelen"
 }
