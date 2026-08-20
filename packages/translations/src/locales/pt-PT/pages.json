@@ -83,7 +83,10 @@
     "suggestionsReview": "Review",
     "suggestionsMatchEmail": "Same email",
     "suggestionsMatchUsername": "Same username",
-    "suggestionsError": "Could not load merge suggestions"
+    "suggestionsError": "Could not load merge suggestions",
+    "filterHasAccessTo": "Has access to",
+    "filterHasAccessToPlaceholder": "Any server",
+    "filterHasAccessToHint": "Shows people with an active account on every server selected."
   },
   "userDetail": {
     "backToUsers": "Voltar para Usuários",
@@ -92,9 +95,7 @@
     "statistics": "estatísticas",
     "sessions": "Sessões",
     "violations": "Violações",
-    "locations": "Alocações",
     "terminationHistory": "Histórico de rescisão",
-    "noSessionsFound": "Não foram encontradas sessões para este usuário.",
     "noViolationsFound": "Sem violações para este usuário.",
     "noTerminationsFound": "Sem terminações de fluxo para este usuário.",
     "byRule": "Por / regra",
@@ -190,8 +191,7 @@
       "colCopies": "Copies",
       "colRecoverable": "Recoverable Space",
       "sameServer": "Same server",
-      "mirror": "Mirror",
-      "pageOf": "Page {{page}} of {{totalPages}}"
+      "mirror": "Mirror"
     },
     "watch": {
       "title": "Analítico de Observação",
@@ -288,11 +288,7 @@
   },
   "violations": {
     "title": "Violações",
-    "violationLog": "Registro de Violação",
-    "noMatches": "Sem Correspondências",
     "tryAdjustingFilters": "Tente ajustar seus filtros",
-    "allClear": "Tudo limpo",
-    "noViolationsDetected": "Nenhuma violação de regras detectada",
     "selectAllViolations": "Selecionar todas as {{count}} violações de filtros correspondentes",
     "dismissViolation": "Descartar Violação",
     "dismissViolationConfirm": "Tem certeza de que deseja descartar esta violação? Isto irá removê-lo do registro de violação permanentemente.",
@@ -303,6 +299,7 @@
     "noViolationsRecorded": "Nenhuma violação foi registrada ainda.",
     "allSeverities": "Todas as Severidades",
     "allStatuses": "Todos os Status",
+    "allRules": "All rules",
     "filterPeople": "People",
     "allPeople": "All people",
     "peopleSelectedCount": "{{count}} people",
@@ -410,7 +407,70 @@
       "destinationDisabled": "Disabled destination",
       "noDestinations": "No destinations yet. Add one to send notifications.",
       "errors": {
-        "sendNeedsDestination": "Pick at least one destination"
+        "sendNeedsDestination": "Pick at least one destination",
+        "nameRequired": "Rule name is required",
+        "title": "Please fix the following errors:",
+        "groupRequired": "At least one condition group is required",
+        "conditionRequired": "Each condition group must have at least one condition",
+        "scopeIncomplete": "Pick a target for the selected scope"
+      },
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "severityLabel": "Severity",
+      "activeLabel": "Active",
+      "saving": "Saving...",
+      "selectPlaceholder": "Select...",
+      "searchPlaceholder": "Search...",
+      "noMatches": "No matches",
+      "clearSelection": "Clear selection",
+      "selectedCount": "{{count}} selected",
+      "scope": {
+        "label": "Scope",
+        "global": "Global",
+        "server": "Specific server",
+        "account": "Specific account",
+        "person": "Person (all their servers)",
+        "serverLabel": "Server",
+        "serverPlaceholder": "Select server",
+        "accountLabel": "Account",
+        "accountPlaceholder": "Select account",
+        "personLabel": "Person",
+        "personPlaceholder": "Select person",
+        "noServers": "No servers connected yet.",
+        "enforceAcrossServers": "Enforce across servers",
+        "enforceAcrossServersDescription": "When on, this rule can act on a person's sessions on any of their servers, not just the one that triggered it. Off by default."
+      },
+      "conditions": {
+        "title": "Conditions",
+        "description": "Define when this rule should trigger. Groups are combined with AND logic.",
+        "groupLabel": "Group {{number}}",
+        "groupHint": "conditions match with OR logic",
+        "removeGroup": "Remove group",
+        "addCondition": "Add OR condition",
+        "addGroup": "Add AND condition group",
+        "removeCondition": "Remove condition",
+        "fieldPlaceholder": "Select field",
+        "operatorPlaceholder": "Operator",
+        "windowPrefix": "in",
+        "windowUnit": "hrs",
+        "uniqueDevices": "Unique devices",
+        "uniqueDevicesHint": "When checked, only compares sessions from different physical devices. Uncheck to include all sessions regardless of device.",
+        "uniqueIps": "Unique IPs",
+        "uniqueIpsHint": "When checked, only counts sessions from different IP addresses. Use this to detect account sharing while allowing same-household usage.",
+        "allDeviceTypes": "All device types",
+        "deviceTypesHint": "Only count streams from the selected device types. Leave empty to count every device.",
+        "yes": "Yes",
+        "no": "No",
+        "recentlySeen": "Recently seen",
+        "allCountries": "All countries"
+      },
+      "actions": {
+        "title": "Additional Actions",
+        "description": "Optional side-effects when conditions are met. A violation is always created automatically.",
+        "add": "Add action",
+        "remove": "Remove action",
+        "typePlaceholder": "Select action",
+        "typeLabel": "Action"
       }
     }
   },
