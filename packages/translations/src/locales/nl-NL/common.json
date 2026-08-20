@@ -91,16 +91,16 @@
     "high": "Hoog"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "Vertrouwd",
+    "caution": "Voorzichtig",
+    "untrusted": "Niet vertrouwd"
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "Lopende Taken",
+    "running": "Uitvoeren",
+    "waiting": "Wachten",
+    "queued": "In de wachtrij",
+    "startedAgo": "Gestart {{time}}"
   },
   "time": {
     "now": "Nu",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Alles selecteren op pagina",
     "selectRow": "Rij selecteren",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "Pagina {{page}} van {{total}}",
+    "pagination": "Paginering"
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "Alles wissen",
+    "done": "Klaar",
+    "remove": "Verwijder {{label}} filter",
+    "clearSearch": "Zoekopdracht wissen",
+    "anyDate": "Elke datum",
+    "dateAfter": "Na {{date}}",
+    "dateBefore": "Voor {{date}}",
+    "dateBetween": "{{from}} tot {{to}}",
+    "clearDates": "Datumbereik wissen",
+    "clearStartDate": "Startdatum wissen",
+    "clearEndDate": "Einddatum wissen"
   },
   "media": {
     "movie": "Film",
@@ -332,9 +332,9 @@
   "beta": "bèta",
   "or": "of",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "Alle servers",
+    "some": "{{count}} van {{total}} servers",
+    "search": "Zoek servers...",
+    "noMatches": "Geen servers gevonden"
   }
 }
