@@ -90,6 +90,18 @@
     "warning": "警告",
     "high": "高い"
   },
+  "trust": {
+    "trusted": "Trusted",
+    "caution": "Caution",
+    "untrusted": "Untrusted"
+  },
+  "tasks": {
+    "title": "Running Tasks",
+    "running": "Running",
+    "waiting": "Waiting",
+    "queued": "Queued",
+    "startedAgo": "Started {{time}}"
+  },
   "time": {
     "now": "現在",
     "today": "今日",
@@ -177,7 +189,21 @@
   "table": {
     "selectAllOnPage": "ページ上のすべてを選択",
     "selectRow": "行を選択",
-    "selectAllTotal": "すべての {{total}} アイテムを選択"
+    "pageOf": "Page {{page}} of {{total}}",
+    "pagination": "Pagination"
+  },
+  "filters": {
+    "clearAll": "Clear all",
+    "done": "Done",
+    "remove": "Remove {{label}} filter",
+    "clearSearch": "Clear search",
+    "anyDate": "Any date",
+    "dateAfter": "After {{date}}",
+    "dateBefore": "Before {{date}}",
+    "dateBetween": "{{from}} to {{to}}",
+    "clearDates": "Clear date range",
+    "clearStartDate": "Clear start date",
+    "clearEndDate": "Clear end date"
   },
   "media": {
     "movie": "映画",
@@ -304,5 +330,11 @@
     "unsavedChanges": "保存されていない変更があります。本当に退出しますか？"
   },
   "beta": "ベータ",
-  "or": "または"
+  "or": "または",
+  "serverSelector": {
+    "all": "All servers",
+    "some": "{{count}} of {{total}} servers",
+    "search": "Search servers...",
+    "noMatches": "No servers found"
+  }
 }
