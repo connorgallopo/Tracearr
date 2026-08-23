@@ -84,17 +84,17 @@
         "title": "Työ Suoritettu",
         "message": "{{name}} suoritettiin onnistuneesti"
       },
-      "ruleCreated": {
-        "title": "Sääntö Luotu",
-        "message": "Sääntöä on luotu onnistuneesti"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Sääntö Päivitetty",
-        "message": "Sääntöä on päivitetty onnistuneesti"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Sääntö Poistettu",
-        "message": "Sääntöä on poistettu onnistuneesti"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Virta Päätetty",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
       "authFailed": "Todennus epäonnistui",
       "webhookTestFailed": "Webkoukkutesti epäonnistui",
-      "ruleCreateFailed": "Sääntöä ei voitu luoda",
-      "ruleUpdateFailed": "Sääntöä ei voitu päivittää",
-      "ruleDeleteFailed": "Sääntöä ei voitu poistaa",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Virran lopettaminen epäonnistui",
       "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
       "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Uusi Virta Aloitettu",
-        "message": "{{user}} started watching {{media}}"
-      },
-      "streamStopped": {
-        "title": "Virta Pysäytetty",
-        "message": "{{user}} pysäytti katselun"
-      },
       "updateAvailable": {
         "title": "Päivitys Saatavilla",
         "message": "Seuraa {{version}} on saatavilla"
-      },
-      "serverOffline": {
-        "title": "Palvelin Offline-tilassa",
-        "message": "{{name}} ei ole tavoitettavissa"
-      },
-      "serverOnline": {
-        "title": "Palvelin Paikalla",
-        "message": "{{name}} on taas verkossa"
       },
       "violationDetected": {
         "title": "Uusi Väkivalta: {{ruleName}}",
