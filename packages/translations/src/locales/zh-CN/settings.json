@@ -78,7 +78,15 @@
     "watchedThresholdSuffix": "%",
     "apiRateLimit": "API Rate Limit",
     "apiRateLimitDesc": "Maximum public API requests per minute per key. Restart required to apply.",
-    "apiRateLimitSuffix": "/min"
+    "apiRateLimitSuffix": "/min",
+    "updateChecks": {
+      "title": "Update checks",
+      "description": "Tracearr looks for new releases every six hours. Notifications come from whatever automation listens for the update triggers.",
+      "plugin": "Realtime plugin",
+      "pluginDesc": "Check for new releases of the Tracearr plugin your Jellyfin and Emby servers stream events through.",
+      "server": "Media servers",
+      "serverDesc": "Compare what each Plex, Jellyfin and Emby server runs with the newest release its makers publish."
+    }
   },
   "servers": {
     "title": "连接的服务器",
@@ -161,6 +169,11 @@
       "description": "When a title is on more than one server, use this server's poster. If it doesn't have one, we'll fall back to the most recently added copy.",
       "automatic": "Automatic (most recent)",
       "emptyHint": "Add a server to choose a preferred poster source."
+    },
+    "version": {
+      "installed": "Version {{version}}",
+      "upToDate": "up to date",
+      "updateAvailable": "update {{version}} available"
     }
   },
   "mobile": {
@@ -447,7 +460,7 @@
       "sessions": "会话",
       "users": "用户",
       "servers": "服务器",
-      "rules": "规则",
+      "automations": "Automations",
       "libraryItems": "媒体库数量",
       "tables": "表",
       "warning": "还原将替换所有现有数据。您需要在还原完成后重新登录。",
