@@ -84,17 +84,17 @@
         "title": "Trabalho Completado",
         "message": "{{name}} finalizado com sucesso"
       },
-      "ruleCreated": {
-        "title": "Regra criada",
-        "message": "A regra foi criada com sucesso"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Regra Atualizada",
-        "message": "A regra foi atualizada com sucesso"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Regra Excluída",
-        "message": "A regra foi excluída com sucesso"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Transmissão terminada",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Falha ao descartar a violação",
       "authFailed": "Falha na autenticação",
       "webhookTestFailed": "Teste do Webhook falhou",
-      "ruleCreateFailed": "Falha ao criar regra",
-      "ruleUpdateFailed": "Falha ao atualizar regra",
-      "ruleDeleteFailed": "Falha ao excluir regra",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Falha ao encerrar transmissão",
       "serverUrlUpdateFailed": "Falha ao atualizar URL do servidor",
       "serverUpdateFailed": "Falha ao atualizar servidor",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Nova transmissão iniciada",
-        "message": "{{user}} começou a assistir {{media}}"
-      },
-      "streamStopped": {
-        "title": "Transmissão interrompida",
-        "message": "{{user}} parou de assistir"
-      },
       "updateAvailable": {
         "title": "Atualização disponível",
         "message": "O Tracearr {{version}} está disponível"
-      },
-      "serverOffline": {
-        "title": "Servidor Offline",
-        "message": "{{name}} é inacessível"
-      },
-      "serverOnline": {
-        "title": "Servidor online",
-        "message": "{{name}} está de volta online"
       },
       "violationDetected": {
         "title": "Nova Violação: {{ruleName}}",
