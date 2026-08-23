@@ -78,7 +78,15 @@
     "watchedThresholdSuffix": "%",
     "apiRateLimit": "API Rate Limit",
     "apiRateLimitDesc": "Maximum public API requests per minute per key. Restart required to apply.",
-    "apiRateLimitSuffix": "/min"
+    "apiRateLimitSuffix": "/min",
+    "updateChecks": {
+      "title": "Update checks",
+      "description": "Tracearr looks for new releases every six hours. Notifications come from whatever automation listens for the update triggers.",
+      "plugin": "Realtime plugin",
+      "pluginDesc": "Check for new releases of the Tracearr plugin your Jellyfin and Emby servers stream events through.",
+      "server": "Media servers",
+      "serverDesc": "Compare what each Plex, Jellyfin and Emby server runs with the newest release its makers publish."
+    }
   },
   "servers": {
     "title": "Connected Servers",
@@ -161,6 +169,11 @@
       "description": "When a title is on more than one server, use this server's poster. If it doesn't have one, we'll fall back to the most recently added copy.",
       "automatic": "Automatic (most recent)",
       "emptyHint": "Add a server to choose a preferred poster source."
+    },
+    "version": {
+      "installed": "Version {{version}}",
+      "upToDate": "up to date",
+      "updateAvailable": "update {{version}} available"
     }
   },
   "mobile": {
@@ -447,7 +460,7 @@
       "sessions": "Sessions",
       "users": "Users",
       "servers": "Servers",
-      "rules": "Rules",
+      "automations": "Automations",
       "libraryItems": "Library Items",
       "tables": "Tables",
       "warning": "Restoring will replace all existing data. You will need to re-login after the restore completes.",
