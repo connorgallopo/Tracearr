@@ -110,7 +110,8 @@
     "acrossAllServers": "Across all linked accounts:",
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
-    "allServers": "All servers"
+    "allServers": "All servers",
+    "title": "User Details"
   },
   "history": {
     "title": "History",
@@ -334,145 +335,1143 @@
       "relatedSessions_other": "{{count}} related sessions"
     }
   },
-  "rules": {
-    "title": "Rules",
-    "description": "Configure detection rules for account sharing and policy violations",
-    "addRule": "Add Rule",
-    "createRule": "Create Rule",
-    "editRule": "Edit Rule",
-    "updateDescription": "Update the rule configuration below.",
-    "createDescription": "Configure a new detection rule for your media servers.",
-    "ruleName": "Rule Name",
-    "ruleNamePlaceholder": "e.g., Concurrent Stream Limit",
-    "ruleType": "Rule Type",
-    "updateRule": "Update Rule",
-    "deleteRule": "Delete Rule",
-    "deleteRuleConfirm": "Are you sure you want to delete this rule? This action cannot be undone.",
-    "deleteRule_one": "Delete {{count}} Rule",
-    "deleteRule_other": "Delete {{count}} Rules",
-    "deleteRulesConfirm": "Are you sure you want to delete? This action cannot be undone.",
-    "enable": "Enable",
-    "disable": "Disable",
-    "noRulesConfigured": "No rules configured",
-    "createFirstRule": "Create your first detection rule to start monitoring for account sharing.",
-    "impossibleTravel": "Impossible Travel",
-    "impossibleTravelDesc": "Detect when a user streams from locations too far apart in a short time",
-    "simultaneousLocations": "Simultaneous Locations",
-    "simultaneousLocationsDesc": "Detect when a user streams from multiple distant locations at once",
-    "deviceVelocity": "Device Velocity",
-    "deviceVelocityDesc": "Detect when a user connects from too many IPs in a time window",
-    "concurrentStreams": "Concurrent Streams",
-    "concurrentStreamsDesc": "Limit the number of simultaneous streams per user",
-    "geoRestriction": "Geo Restriction",
-    "geoRestrictionDesc": "Block streaming from specific countries",
-    "accountInactivity": "Account Inactivity",
-    "accountInactivityDesc": "Get notified when users have not watched anything for a specified period",
-    "maxSpeed": "Max Speed ({{unit}})",
-    "recordsOnly": "Records violations only",
-    "maxSpeedDefault": "Maximum realistic travel speed. Default: {{value}} {{unit}} (airplane speed)",
-    "minDistance": "Min Distance ({{unit}})",
-    "minDistanceDefault": "Minimum distance between locations to trigger. Default: {{value}} {{unit}}",
-    "maxIps": "Max IPs",
-    "timeWindow": "Time Window (hours)",
-    "maxIpsDefault": "Maximum unique IPs allowed within the time window. Default: 5 IPs in 24 hours",
-    "groupByDevice": "Group by Device",
-    "groupByDeviceDesc": "Count by device instead of IP. Prevents false positives from VPN, DHCP, or Virtual Channels.",
-    "maxStreams": "Max Streams",
-    "maxStreamsDefault": "Maximum simultaneous streams per user. Default: 3",
-    "mode": "Mode",
-    "blocklist": "Blocklist (block these countries)",
-    "allowlist": "Allowlist (only allow these countries)",
-    "blockedCountries": "Blocked Countries",
-    "allowedCountries": "Allowed Countries",
-    "selectCountriesToBlock": "Select countries to block...",
-    "selectAllowedCountries": "Select allowed countries...",
-    "allowlistNote": "Streams from any other country will trigger a violation.",
-    "inactivityPeriod": "Inactivity Period",
-    "unit": "Unit",
-    "days": "Days",
-    "weeks": "Weeks",
-    "months": "Months",
-    "inactivityNote": "Creates an alert when a user has not watched anything for this period. Checks run hourly.",
-    "excludeLocalNetwork": "Exclude Local Network",
-    "excludeLocalNetworkDesc": "Ignore sessions from local/private IPs (e.g., 192.168.x.x, 10.x.x.x)",
-    "blocked": "Blocked",
-    "allowed": "Allowed",
-    "none": "None",
-    "inactiveFor": "Inactive for {{value}} {{unit}}",
-    "classicRule": "Classic Rule",
-    "customRule": "Custom Rule",
-    "chooseTemplate": "Choose a Rule Template",
-    "chooseTemplateDesc": "Select a pre-configured rule type to get started quickly.",
+  "automations": {
+    "actions": {
+      "send": {
+        "label": "Send Notification",
+        "description": "Send to one or more destinations",
+        "fields": {
+          "cooldown_minutes": {
+            "description": "Minimum time between notifications"
+          }
+        },
+        "ran": "Sent a notification"
+      },
+      "trust": {
+        "label": "Trust Score",
+        "description": "Adjust, set, or reset the trust score",
+        "fields": {
+          "mode": {
+            "label": "Mode"
+          },
+          "amount": {
+            "label": "Amount",
+            "description": "Positive to increase, negative to decrease"
+          },
+          "value": {
+            "label": "Value"
+          }
+        },
+        "ran": "Changed the trust score"
+      },
+      "kill_stream": {
+        "label": "Kill Stream",
+        "description": "Terminate the active stream",
+        "fields": {
+          "cooldown_minutes": {
+            "description": "Minimum time between terminations for the same user"
+          },
+          "delay_seconds": {
+            "label": "Sustain window",
+            "description": "Waits this many seconds, then kills the stream only if the automation still matches. 0 kills right after a final re-check."
+          },
+          "target": {
+            "description": "Which sessions to terminate"
+          },
+          "message": {
+            "placeholder": "Optional message"
+          }
+        },
+        "ran": "Stopped the stream"
+      },
+      "message_client": {
+        "label": "Message Client",
+        "description": "Send a message to the media player",
+        "hint": "Jellyfin and Emby only. Plex only supports messages when killing a stream.",
+        "fields": {
+          "target": {
+            "description": "Which sessions to message"
+          },
+          "message": {
+            "placeholder": "Message to display…"
+          }
+        },
+        "ran": "Put a message on the player"
+      }
+    },
+    "activity": {
+      "title": "Activity",
+      "description": "What this automation did, newest first. Runs are kept for {{days}} days.",
+      "outcome": "Outcome",
+      "who": "Who",
+      "where": "Where",
+      "playing": "Playing",
+      "from": "From",
+      "summary": "Summary",
+      "started": "Started",
+      "finished": "Finished",
+      "noSummary": "No notes",
+      "outcomes": {
+        "completed": "Ran",
+        "stopped_by_condition": "No match",
+        "error": "Failed"
+      },
+      "empty": "No runs yet",
+      "emptyDescription": "Runs are listed here once a trigger matches.",
+      "runTitle": "Run",
+      "runLoading": "Loading the run",
+      "triggeredBy": "Triggered by {{trigger}}",
+      "unknownStep": "Unrecognized step",
+      "tabs": {
+        "all": "All",
+        "completed": "Ran",
+        "stopped_by_condition": "No match",
+        "error": "Failed"
+      },
+      "group": "Group {{number}}",
+      "branch": {
+        "then": "Took the 'if' steps",
+        "else": "Took the 'otherwise' steps"
+      },
+      "whyBranch": "What it read",
+      "openInEditor": "Open in the builder with this run",
+      "tabsLabel": "Filter by outcome",
+      "emptyRan": "Nothing has matched yet",
+      "emptyRanDescription_one": "{{count}} check ran and did not match.",
+      "emptyRanDescription_other": "{{count}} checks ran and did not match.",
+      "item": "Item",
+      "recordedViolation": "Recorded a violation"
+    },
+    "allKinds": "All kinds",
+    "allStatuses": "All statuses",
+    "allSeverities": "All severities",
+    "bind": {
+      "nameHelper": "The name in the automations list.",
+      "namePlaceholder": "A name for this automation",
+      "activeLabel": "Turn it on now",
+      "back": "Back",
+      "submit": "Use this",
+      "submitting": "Setting it up…",
+      "customize": "Open in the builder",
+      "doors": {
+        "helper": "Use this keeps the steps as they are; the answers above can change later. Open in the builder makes every step editable and ends the link to the ready-made automation."
+      },
+      "anyServer": "Any server",
+      "serverHelper": "Any server means all of them.",
+      "serverLabel": "Which server",
+      "accountLabel": "Which account",
+      "personLabel": "Which person",
+      "destinationsLabel": "Send to",
+      "required": "Pick at least one.",
+      "needs": {
+        "title": "What it needs"
+      },
+      "helper": {
+        "killMessage": "Shown on the player when the stream stops.",
+        "clientMessage": "Shown on the player while it keeps playing."
+      },
+      "noInputs": "Nothing to fill in.",
+      "failed": "Couldn't set that up. Try again.",
+      "created": "{{name}} is set up and running.",
+      "createdOff": "{{name}} was created and is off. Turn it on from the list."
+    },
     "builder": {
       "destinationDisabled": "Disabled destination",
       "noDestinations": "No destinations yet. Add one to send notifications.",
+      "newDestination": "New destination",
       "errors": {
         "sendNeedsDestination": "Pick at least one destination",
-        "nameRequired": "Rule name is required",
-        "title": "Please fix the following errors:",
-        "groupRequired": "At least one condition group is required",
-        "conditionRequired": "Each condition group must have at least one condition",
-        "scopeIncomplete": "Pick a target for the selected scope"
+        "nameRequired": "Give this automation a name",
+        "scopeIncomplete": "Pick who this applies to",
+        "triggerRequired": "Add what starts this, or switch one back on",
+        "policyNeedsSubject": "Violations are about a person, so this needs a stream or account trigger.",
+        "fieldUnavailable": "This check is not available for every trigger here",
+        "operatorInvalid": "This comparison doesn't fit the check",
+        "valueInvalid": "This value doesn't fit the check",
+        "actionUnavailable": "These triggers do not supply what this action needs",
+        "variableUnavailable": "The message names something not every trigger here supplies",
+        "minutesRange": "Between {{min}} and {{max}} minutes",
+        "daysRange": "Between {{min}} and {{max}} days",
+        "measureInvalid": "Pick how the minutes are counted",
+        "fieldNotAvailableFor": "Not available for: {{triggers}}",
+        "trustAmountRange": "Trust changes by between -100 and 100 points",
+        "trustValueRange": "Trust score is between 0 and 100",
+        "messageRequired": "Type the message to show",
+        "tooLong": "At most {{max}} characters"
       },
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "severityLabel": "Severity",
+      "recordAs": {
+        "label": "When this runs, record it as",
+        "policy": "A violation",
+        "policyDescription": "Listed in Violations; can be acknowledged.",
+        "notification": "An alert",
+        "notificationDescription": "Recorded in Activity; never a violation."
+      },
+      "severityLabel": "How serious?",
       "activeLabel": "Active",
-      "saving": "Saving...",
-      "selectPlaceholder": "Select...",
-      "searchPlaceholder": "Search...",
+      "saving": "Saving…",
+      "selectPlaceholder": "Select…",
+      "searchPlaceholder": "Search…",
       "noMatches": "No matches",
       "clearSelection": "Clear selection",
       "selectedCount": "{{count}} selected",
       "scope": {
-        "label": "Scope",
-        "global": "Global",
-        "server": "Specific server",
-        "account": "Specific account",
-        "person": "Person (all their servers)",
+        "label": "Who this applies to",
+        "global": "Everyone",
+        "server": "One server",
+        "account": "One account",
+        "person": "One person",
         "serverLabel": "Server",
         "serverPlaceholder": "Select server",
         "accountLabel": "Account",
         "accountPlaceholder": "Select account",
         "personLabel": "Person",
         "personPlaceholder": "Select person",
+        "personHelper": "Matches this person on every server they have an account on.",
         "noServers": "No servers connected yet.",
-        "enforceAcrossServers": "Enforce across servers",
-        "enforceAcrossServersDescription": "When on, this rule can act on a person's sessions on any of their servers, not just the one that triggered it. Off by default."
+        "enforceAcrossServers": "Act on their streams on any of their servers",
+        "enforceAcrossServersDescription": "Acts on the person's sessions on any of their servers, not only the one that triggered it. Off by default."
       },
       "conditions": {
-        "title": "Conditions",
-        "description": "Define when this rule should trigger. Groups are combined with AND logic.",
-        "groupLabel": "Group {{number}}",
-        "groupHint": "conditions match with OR logic",
-        "removeGroup": "Remove group",
-        "addCondition": "Add OR condition",
-        "addGroup": "Add AND condition group",
-        "removeCondition": "Remove condition",
-        "fieldPlaceholder": "Select field",
-        "operatorPlaceholder": "Operator",
+        "addGroup": "Add a separate set of checks",
+        "fieldPlaceholder": "Pick something to check",
         "windowPrefix": "in",
         "windowUnit": "hrs",
         "uniqueDevices": "Unique devices",
-        "uniqueDevicesHint": "When checked, only compares sessions from different physical devices. Uncheck to include all sessions regardless of device.",
+        "uniqueDevicesHint": "Counts only sessions from different physical devices.",
         "uniqueIps": "Unique IPs",
-        "uniqueIpsHint": "When checked, only counts sessions from different IP addresses. Use this to detect account sharing while allowing same-household usage.",
+        "uniqueIpsHint": "Counts only sessions from different IP addresses, so same-household streams are not counted.",
         "allDeviceTypes": "All device types",
-        "deviceTypesHint": "Only count streams from the selected device types. Leave empty to count every device.",
+        "deviceTypesHint": "Counts only streams from the selected device types. Empty means every device.",
         "yes": "Yes",
         "no": "No",
         "recentlySeen": "Recently seen",
-        "allCountries": "All countries"
+        "allCountries": "All countries",
+        "sectionTitle": "And only if…",
+        "optional": "optional",
+        "helper": "Checks that must pass first. Empty means it runs every time.",
+        "emptyLine": "No extra checks. This runs every time.",
+        "all": "and",
+        "any": "or",
+        "allHint": "and: every check has to pass",
+        "anyHint": "or: any one check is enough",
+        "matchLabel": "Join these checks with",
+        "fieldLabel": "What to check",
+        "operatorLabel": "Is it",
+        "valueLabel": "Value",
+        "canNeverPass": "This can never pass. The trigger already fires at {{threshold}}.",
+        "noFields": "No checks are available for these triggers. Add a stream or account trigger first.",
+        "groupSeparator": "and also",
+        "addAnother": "Add a check",
+        "addFirst": "Add a check",
+        "removeGroup": "Remove this set of checks"
       },
       "actions": {
-        "title": "Additional Actions",
-        "description": "Optional side-effects when conditions are met. A violation is always created automatically.",
-        "add": "Add action",
-        "remove": "Remove action",
-        "typePlaceholder": "Select action",
-        "typeLabel": "Action"
+        "add": "Add another action",
+        "sectionTitle": "Then do…",
+        "ifTitle": "If…",
+        "helper": "These run in order, top to bottom.",
+        "emptyTitle": "What should happen?",
+        "emptyDescription": "Send a notification, stop the stream, change a trust score, or run steps only when an extra check passes.",
+        "emptyAction": "Choose what happens",
+        "moveUp": "Move {{name}} up",
+        "moveDown": "Move {{name}} down",
+        "menu": "More for {{name}}",
+        "branchName": "this branch",
+        "confirmRemoveTitle": "Remove this action?",
+        "confirmRemoveDescription": "Stops happening on save.",
+        "policyNote": "A branch does not decide whether this is flagged; the And only if… section does.",
+        "branchThen": "Do this",
+        "branchElse": "Otherwise",
+        "branchElseEmpty": "Nothing. The automation carries on.",
+        "ifNothing": "nothing picked yet",
+        "ifAddCheck": "Add another check",
+        "addBranch": "Add a step",
+        "expandBranch": "Show this branch's steps",
+        "collapseBranch": "Hide this branch's steps"
+      },
+      "when": {
+        "title": "When…",
+        "helper": "Any one of these starts it. At least one is required.",
+        "emptyTitle": "What should start this?",
+        "emptyDescription": "A stream starting, a server going down, an account going quiet.",
+        "emptyAction": "Choose what starts it",
+        "add": "Add another trigger",
+        "or": "or"
+      },
+      "heldFor": {
+        "prefix": "A stream has been paused for",
+        "minutesLabel": "Minutes",
+        "unit": "minutes",
+        "measureLabel": "Counted",
+        "current": "this time",
+        "total": "in total"
+      },
+      "inactiveFor": {
+        "prefix": "An account has been inactive for",
+        "daysLabel": "Days",
+        "unit": "days"
+      },
+      "rows": {
+        "toggle": "Include {{name}}",
+        "remove": "Remove {{name}}",
+        "skipped": "Skipped",
+        "toggleHint": "skip",
+        "removeHint": "remove",
+        "expandHint": "open",
+        "moveHint": "reorder"
+      },
+      "picker": {
+        "searchPlaceholder": "Search or describe what should happen",
+        "empty": "Nothing matches that.",
+        "navigate": "move",
+        "select": "pick",
+        "close": "close"
+      },
+      "sentence": {
+        "label": "In plain words",
+        "placeholderTrigger": "something happens",
+        "placeholderAction": "do something"
+      },
+      "footer": {
+        "problems_one": "{{count}} thing to fix",
+        "problems_other": "{{count}} things to fix",
+        "remaining_one": "{{count}} left to finish",
+        "remaining_other": "{{count}} left to finish",
+        "ready": "Ready to save",
+        "search": "to search"
+      },
+      "leave": {
+        "title": "Leave without saving?",
+        "confirm": "Leave"
+      },
+      "liveCheck": {
+        "title": "Right now on the servers",
+        "checking": "Checking what's playing now…",
+        "empty": "Nothing is playing right now; nothing to check against.",
+        "failed": "Could not reach the servers to check.",
+        "footnote": "Cooldowns and sessions already handled aren't simulated.",
+        "expand": "Show what matched for {{name}}",
+        "passed": "Passed",
+        "notPassed": "Did not pass",
+        "actual": "now {{value}}",
+        "unfinished": "Shows what this would do once the automation is complete.",
+        "paused": "Paused while this saves",
+        "sampleTitle": "What this would do to that run",
+        "sampleGone": "That session is no longer on record; nothing to check against.",
+        "backToLive": "Back to what's playing now"
       }
-    }
+    },
+    "categories": {
+      "session_behavior": "Session Behavior",
+      "stream_quality": "Stream Quality",
+      "user_attributes": "User Attributes",
+      "device_client": "Device & Client",
+      "network_location": "Network & Location",
+      "scope": "Who and where",
+      "media": "Media"
+    },
+    "createAutomation": "Create automation",
+    "customAutomation": "Custom automation",
+    "deleteAutomationConfirm": "Are you sure you want to delete this automation? This action cannot be undone.",
+    "deleteAutomation_one": "Delete Automation",
+    "deleteAutomation_other": "Delete {{count}} Automations",
+    "deleteAutomationsConfirm": "Are you sure you want to delete? This action cannot be undone.",
+    "describe": {
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more",
+      "noValues": "(none)",
+      "includesSameDevice": "includes same device",
+      "uniqueIps": "unique IPs",
+      "deviceTypesOnly": "{{types}} only",
+      "when": "When {{text}}",
+      "or": "or {{text}}",
+      "nothing": "nothing yet",
+      "onlyWhen": "and only if",
+      "andAlso": "and also",
+      "allOf": "all of:",
+      "anyOf": "any of:",
+      "joinAll": "and",
+      "joinAny": "or",
+      "then": "then {{text}}",
+      "otherwise": "Otherwise",
+      "appliesTo": "Applies to {{name}}",
+      "duration": {
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes",
+        "days_one": "{{count}} day",
+        "days_other": "{{count}} days"
+      },
+      "triggers": {
+        "sessionStarted": "a stream starts",
+        "sessionStopped": "a stream stops",
+        "sessionTranscodeChanged": "transcoding starts or stops",
+        "sessionPaused": "a stream is paused",
+        "sessionHeldFor": "a stream has been paused for {{duration}}",
+        "sessionHeldForTotal": "a stream has been paused for {{duration}} in total",
+        "accountInactiveFor": "an account has been inactive for {{duration}}",
+        "mediaAdded": "media is added",
+        "mediaUpgraded": "media is upgraded",
+        "serverDown": "a server goes down",
+        "serverUp": "a server comes back up",
+        "pluginUpdateAvailable": "a plugin update is available",
+        "serverUpdateAvailable": "a server update is available",
+        "tracearrUpdateAvailable": "a Tracearr update is available"
+      },
+      "operators": {
+        "eq": "is",
+        "neq": "is not",
+        "gt": "is above",
+        "gte": "is at least",
+        "lt": "is below",
+        "lte": "is at most",
+        "in": "is one of",
+        "not_in": "is not one of",
+        "contains": "contains",
+        "not_contains": "does not contain"
+      },
+      "fields": {
+        "concurrent_streams": "the stream count",
+        "active_session_distance_km": "the distance between streams",
+        "travel_speed_kmh": "the travel speed",
+        "unique_ips_in_window": "the number of IP addresses",
+        "unique_devices_in_window": "the number of devices",
+        "inactive_days": "the time since the last stream",
+        "current_pause_minutes": "the current pause",
+        "total_pause_minutes": "the total pause time",
+        "source_resolution": "the source resolution",
+        "output_resolution": "the output resolution",
+        "is_transcoding": "the transcoding",
+        "is_transcode_downgrade": "the downgrade",
+        "source_bitrate_mbps": "the source bitrate",
+        "user_id": "the user",
+        "trust_score": "the trust score",
+        "account_age_days": "the account age",
+        "device_type": "the device type",
+        "client_name": "the player",
+        "platform": "the platform",
+        "is_local_network": "the local network",
+        "country": "the country",
+        "ip_in_range": "the IP address",
+        "server_id": "the server",
+        "media_type": "the media type",
+        "library_item_type": "the item type",
+        "library_name": "the library",
+        "resolution_after": "the resolution",
+        "dynamic_range_after": "the dynamic range",
+        "video_codec_after": "the video codec",
+        "audio_channels_after": "the audio channels",
+        "file_size_after": "the file size"
+      },
+      "states": {
+        "is_local_network": {
+          "yes": "the user is on the local network",
+          "no": "the user is not on the local network"
+        },
+        "is_transcode_downgrade": {
+          "yes": "the stream is downgraded",
+          "no": "the stream is not downgraded"
+        },
+        "is_transcoding": {
+          "video": {
+            "yes": "the stream is transcoding video",
+            "no": "the stream is not transcoding video"
+          },
+          "audio": {
+            "yes": "the stream is transcoding audio",
+            "no": "the stream is not transcoding audio"
+          },
+          "video_or_audio": {
+            "yes": "the stream is transcoding",
+            "no": "the stream is not transcoding"
+          },
+          "neither": {
+            "yes": "the stream is not transcoding",
+            "no": "the stream is transcoding"
+          }
+        }
+      },
+      "actions": {
+        "if": "if",
+        "flagIt": "Flag it",
+        "doNothing": "do nothing",
+        "send": "send to {{destinations}}",
+        "sendAnywhere": "send a notification",
+        "kill_stream": "stop the stream",
+        "message_client": "message the player",
+        "trustUp": "raise trust by {{amount}}",
+        "trustDown": "drop trust by {{amount}}",
+        "trustAdjust": "adjust trust by {{amount}}",
+        "trustSet": "set trust to {{value}}",
+        "trustReset": "reset trust"
+      },
+      "scope": {
+        "server": "one server",
+        "account": "one account",
+        "person": "one person"
+      },
+      "sameDeviceInput": "same device: {{input}}",
+      "uniqueIpsInput": "unique IPs: {{input}}",
+      "unbound": {
+        "server": "a chosen server",
+        "account": "a chosen account",
+        "person": "a chosen person",
+        "destinations": "a chosen destination",
+        "field_value": "a chosen value",
+        "select": "a chosen option",
+        "number": "a chosen number",
+        "duration": "a chosen length of time",
+        "text": "a chosen message",
+        "boolean": "a chosen setting",
+        "listed": "those chosen"
+      }
+    },
+    "description": "Automations watch your servers and act when their conditions match",
+    "detail": {
+      "notFound": "Automation not found",
+      "title": "Automation",
+      "unsaved": "Unsaved changes",
+      "runsLine_one": "1 run · last run {{when}}",
+      "runsLine_other": "{{count}} runs · last run {{when}}",
+      "noRuns": "No runs yet"
+    },
+    "disable": "Disable",
+    "editAutomation": "Edit automation",
+    "effects": {
+      "title": "What this will do",
+      "kill": "Can stop a stream that is playing.",
+      "trust": "Changes trust scores.",
+      "message": "Puts a message on a player.",
+      "violation": "Records a violation against the matched person.",
+      "tellsOnly": "Only notifies. Never stops a stream or changes an account.",
+      "allServers": "Runs on every server unless one is chosen.",
+      "everyServer": "Runs on every server.",
+      "oneServer": "Runs on {{server}} only."
+    },
+    "emptyTitle": "No automations yet",
+    "emptyDescription": "Ready-made automations. Pick one and fill in the blanks.",
+    "emptySeeAll": "See all {{count}}",
+    "emptySeeAllLoading": "See all",
+    "enable": "Enable",
+    "evaluations": {
+      "disclosure": "Matches that did not start a run ({{total}})",
+      "reasons": {
+        "cooldown_active": "Cooldown was active",
+        "edge_replayed": "Same edge already handled",
+        "gate_blocked": "An open run already covers this",
+        "trigger_filter_failed": "Trigger threshold not reached"
+      }
+    },
+    "export": {
+      "title": "Share this automation",
+      "description": "A code another Tracearr can paste in.",
+      "carries": "The code carries the steps only. Destinations, servers and accounts are not included; the receiving side fills in its own.",
+      "copyCode": "Copy the share code",
+      "copyJson": "Copy the JSON",
+      "authorLabel": "Author",
+      "authorPlaceholder": "Name",
+      "authorHelper": "Shown on the gallery page and carried in the code. Optional.",
+      "save": "Save as ready-made",
+      "saved": "{{name}} saved as a ready-made automation.",
+      "saveFailed": "Could not save it.",
+      "failed": "Couldn't make a code for this one.",
+      "saveHelper": "Adds it to this server's list of ready-made automations.",
+      "authorInCode": "The code includes the author name.",
+      "groupLabel": "Section",
+      "groupHelper": "Which part of the gallery it is listed under.",
+      "gallery": {
+        "trigger": "Put this in the community gallery",
+        "body": "The gallery at docs.tracearr.com/templates lists shared automations. Adding one is a pull request to Tracearr/automation-templates with the JSON below. Tracearr never reads the gallery."
+      },
+      "openRepository": "Open the repository"
+    },
+    "fields": {
+      "concurrent_streams": {
+        "label": "Concurrent Streams",
+        "description": "Number of active streams from the same user"
+      },
+      "active_session_distance_km": {
+        "label": "Distance Between Sessions",
+        "description": "Distance between simultaneous sessions"
+      },
+      "travel_speed_kmh": {
+        "label": "Travel Speed",
+        "description": "Calculated travel speed between locations"
+      },
+      "unique_ips_in_window": {
+        "label": "Unique IPs in Window",
+        "description": "Number of unique IP addresses in the time window"
+      },
+      "unique_devices_in_window": {
+        "label": "Unique Devices in Window",
+        "description": "Number of unique devices in the time window"
+      },
+      "inactive_days": {
+        "label": "Days Inactive",
+        "description": "Days since last activity"
+      },
+      "current_pause_minutes": {
+        "label": "Current Pause Duration",
+        "description": "How long the session has been continuously paused"
+      },
+      "total_pause_minutes": {
+        "label": "Total Pause Duration",
+        "description": "Total accumulated pause time across all pause/resume cycles"
+      },
+      "source_resolution": {
+        "label": "Source Resolution",
+        "description": "Original media resolution"
+      },
+      "output_resolution": {
+        "label": "Output Resolution",
+        "description": "Transcoded or delivered resolution"
+      },
+      "is_transcoding": {
+        "label": "Is Transcoding",
+        "description": "Whether video or audio streams are being transcoded"
+      },
+      "is_transcode_downgrade": {
+        "label": "Transcode Downgrade",
+        "description": "Output resolution is lower than source"
+      },
+      "source_bitrate_mbps": {
+        "label": "Source Bitrate",
+        "description": "Original media bitrate"
+      },
+      "user_id": {
+        "label": "User",
+        "description": "Specific users by account",
+        "placeholder": "Select users…"
+      },
+      "trust_score": {
+        "label": "Trust Score",
+        "description": "The user's trust score, from 0 to 100"
+      },
+      "account_age_days": {
+        "label": "Account Age",
+        "description": "Days since account creation"
+      },
+      "device_type": {
+        "label": "Device Type",
+        "description": "Type of device used"
+      },
+      "client_name": {
+        "label": "Client/Player",
+        "description": "Media player application",
+        "placeholder": "e.g., Plex for iOS"
+      },
+      "platform": {
+        "label": "Platform/OS",
+        "description": "Operating system"
+      },
+      "is_local_network": {
+        "label": "Local Network",
+        "description": "Streaming from the local network"
+      },
+      "country": {
+        "label": "Country",
+        "description": "Geographic country",
+        "placeholder": "Select countries…"
+      },
+      "ip_in_range": {
+        "label": "IP Range",
+        "description": "IP address in a CIDR range, IPv4 or IPv6",
+        "placeholder": "e.g., 192.168.1.0/24 or 2001:db8:abcd:7800::/64"
+      },
+      "server_id": {
+        "label": "Server",
+        "description": "Specific media server",
+        "placeholder": "Select servers…"
+      },
+      "media_type": {
+        "label": "Media Type",
+        "description": "Type of content"
+      },
+      "library_item_type": {
+        "label": "Item Type",
+        "description": "What kind of library item it is"
+      },
+      "library_name": {
+        "label": "Library",
+        "description": "Name of the library it landed in",
+        "placeholder": "Movies"
+      },
+      "resolution_after": {
+        "label": "Resolution",
+        "description": "Resolution the item ends up at; unknown never matches, even for \"is not\""
+      },
+      "dynamic_range_after": {
+        "label": "Dynamic Range",
+        "description": "HDR format the item ends up with; unknown never matches, even for \"is not\""
+      },
+      "video_codec_after": {
+        "label": "Video Codec",
+        "description": "Video codec the item ends up with; unknown never matches, even for \"is not\""
+      },
+      "audio_channels_after": {
+        "label": "Audio Channels",
+        "description": "Audio channel count the item ends up with; unknown never matches"
+      },
+      "file_size_after": {
+        "label": "File Size",
+        "description": "Size the item ends up at across every copy; unknown never matches"
+      }
+    },
+    "gallery": {
+      "title": "New automation",
+      "description": "Ready-made automations. Pick one and fill in the blanks.",
+      "searchPlaceholder": "Search",
+      "noMatches": "Nothing matches “{{query}}”.",
+      "noMatchesHint": "Try a word from the outcome: discord, offline, paused.",
+      "group": {
+        "notifications": "Notifications",
+        "server_health": "Server health",
+        "policies": "Limits and rules",
+        "housekeeping": "Housekeeping",
+        "other": "Other ways to start"
+      },
+      "builtin": "Built-in",
+      "kind": {
+        "policy": "A violation",
+        "notification": "An alert"
+      },
+      "paste": {
+        "title": "Paste a share code",
+        "description": "Paste a code and review what it does before adding it."
+      },
+      "scratch": {
+        "title": "Start from scratch",
+        "description": "Build it step by step."
+      },
+      "failed": "Couldn't load the ready-made automations.",
+      "retry": "Try again",
+      "missing": "That ready-made automation is not on this server.",
+      "hint": {
+        "move": "move",
+        "use": "use",
+        "close": "close"
+      },
+      "loading": "Loading…"
+    },
+    "import": {
+      "title": "Paste a share code",
+      "description": "Paste the code. Everything is in the code; Tracearr fetches nothing.",
+      "reviewDescription": "What the code does, and what to fill in.",
+      "placeholder": "tracearr1.…",
+      "formatHint": "A code starts with tracearr1.",
+      "check": "Check it",
+      "checking": "Reading it…",
+      "valid": "Tracearr can read this code.",
+      "madeBy": "Author: {{author}}, as written in the code",
+      "codeShort": "Code {{fingerprint}}",
+      "paused": {
+        "label": "Start paused",
+        "helper": "Turn it on from the list after review."
+      },
+      "submit": "Add it",
+      "adding": "Adding it…",
+      "existing": "Already saved as {{name}}.",
+      "existingUse": "Use it",
+      "collision": {
+        "title": "A different automation named {{name}} already exists.",
+        "add": "Keep both",
+        "replace": "Replace mine"
+      },
+      "raw": "Show the JSON",
+      "errors": {
+        "notACode": "That doesn't look like a Tracearr share code.",
+        "notACodeHint": "A code starts with tracearr1. The JSON works too.",
+        "tooBig": "That's too big to be a Tracearr automation.",
+        "tooBigHint": "Codes are a few thousand characters at most.",
+        "truncated": "This code looks cut off.",
+        "truncatedHint": "Copy the whole code and paste it again; some chat apps split long codes across lines.",
+        "tooNew": "This needs Tracearr {{required}} or newer.",
+        "tooNewHint": "This server runs {{current}}. Update Tracearr, then paste again.",
+        "tooMany": "That's a lot of codes in one minute.",
+        "tooManyHint": "Wait a moment, then check it again.",
+        "rejected": "Tracearr couldn't read this one.",
+        "rejectedHint": "It may come from a different tool or have been edited by hand."
+      },
+      "source": "Shared automations are listed at docs.tracearr.com/templates.",
+      "validCaveat": "Nothing in a code says who wrote it or whether it is safe. The steps are below.",
+      "builtinMatch": "This is {{name}}, one of the automations Tracearr ships."
+    },
+    "kind": {
+      "policy": "Violation",
+      "notification": "Alert"
+    },
+    "kindColumn": "Kind",
+    "name": "Name",
+    "newAutomation": "New automation",
+    "namePlaceholder": "A name for this automation",
+    "nameInvalid": "Give it a name.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What this is for",
+    "thisAutomation": "This automation",
+    "cooldownLabel": "At most once every",
+    "cooldownInvalid": "Enter a whole number of minutes, 0 or more, or leave it empty.",
+    "retentionLabel": "Keep runs for",
+    "retentionPlaceholder": "{{days}}",
+    "retentionInvalid": "Enter a whole number of days, at least 1, or leave it empty.",
+    "noAutomationsFound": "No automations found",
+    "operators": {
+      "eq": "equals",
+      "neq": "not equals",
+      "gt": "greater than",
+      "gte": "at least",
+      "lt": "less than",
+      "lte": "at most",
+      "in": "is one of",
+      "not_in": "is not one of",
+      "contains": "contains",
+      "not_contains": "does not contain"
+    },
+    "options": {
+      "4K": "4K (2160p)",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "Unknown",
+      "mobile": "Mobile",
+      "tablet": "Tablet",
+      "tv": "TV",
+      "desktop": "Desktop",
+      "browser": "Browser",
+      "ios": "iOS",
+      "android": "Android",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
+      "tizen": "Tizen",
+      "movie": "Movie",
+      "episode": "TV Episode",
+      "track": "Music",
+      "photo": "Photo",
+      "live": "Live TV",
+      "trailer": "Trailer",
+      "video": "Video",
+      "audio": "Audio",
+      "video_or_audio": "Video or Audio",
+      "neither": "Neither (Direct Play)",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "Dolby Vision",
+      "libraryItemType": {
+        "movie": "Movie",
+        "show": "Show",
+        "season": "Season",
+        "episode": "Episode",
+        "artist": "Artist",
+        "album": "Album",
+        "track": "Track",
+        "photo": "Photo"
+      }
+    },
+    "provenance": {
+      "builtin": "Built-in · {{name}} {{version}}",
+      "imported": "Imported from a share code on {{date}} · {{name}} {{version}}",
+      "importedBy": "Imported from a share code by {{author}} on {{date}} · {{name}} {{version}}",
+      "saved": "Saved here from {{name}} on {{date}} · {{version}}",
+      "customized": "Customized from {{name}}",
+      "customizedFromRemoved": "Customized from a ready-made automation that has since been removed"
+    },
+    "recordsOnly": "Records runs only",
+    "scope": {
+      "global": "Global",
+      "person": "Person",
+      "account": "Account",
+      "crossServer": "Cross-server"
+    },
+    "searchPlaceholder": "Search automations…",
+    "sessionTargets": {
+      "triggering": {
+        "label": "Triggering session",
+        "tooltip": "Only the session that triggered this automation"
+      },
+      "oldest": {
+        "label": "Oldest session",
+        "tooltip": "The user's longest-running active session"
+      },
+      "newest": {
+        "label": "Newest session",
+        "tooltip": "The user's most recently started session"
+      },
+      "all_except_one": {
+        "label": "All except one (keep oldest)",
+        "tooltip": "All sessions except the oldest, bringing the user down to one stream"
+      },
+      "all_user": {
+        "label": "All user sessions",
+        "tooltip": "Every active session for this user"
+      }
+    },
+    "configFields": {
+      "cooldown_minutes": {
+        "label": "Cooldown"
+      },
+      "target": {
+        "label": "Target"
+      },
+      "message": {
+        "label": "Message"
+      }
+    },
+    "trustModes": {
+      "adjust": {
+        "label": "Adjust by amount"
+      },
+      "set": {
+        "label": "Set to value"
+      },
+      "reset": {
+        "label": "Reset to default (100)"
+      }
+    },
+    "severity": {
+      "low": "Low",
+      "warning": "Warning",
+      "high": "High"
+    },
+    "template": {
+      "version": "v{{version}}",
+      "updateAvailable": "An update is available",
+      "updatedTitle": "The ready-made automation is now on v{{version}}",
+      "updatedBody": "Review the answers below, then update.",
+      "before": "Now",
+      "after": "After the update",
+      "review": "Review and update",
+      "save": "Save changes",
+      "customize": "Open in the builder",
+      "customizeTitle": "Open this in the builder?",
+      "customizeConfirm": "Opening it in the builder makes this automation independent: every step is editable, and it no longer receives updates from the ready-made one. This cannot be undone.",
+      "customizeConfirmAction": "Open in the builder",
+      "customizeFirst": "This automation follows a ready-made one. Open it in the builder first.",
+      "customizeFailed": "Could not open it in the builder.",
+      "upgradeFailed": "Couldn't update that. Try again.",
+      "gone": "The ready-made automation this was built from is no longer on this server.",
+      "doorsHelper": "The steps come from the ready-made automation and are fixed. Open in the builder makes every step editable and ends the link."
+    },
+    "templates": {
+      "account-inactivity": {
+        "name": "Inactive account",
+        "description": "Raise a violation when an account goes unused for the days you allow.",
+        "keywords": "idle dormant unused stale cleanup inactive account"
+      },
+      "concurrent-streams": {
+        "name": "Too many streams at once",
+        "description": "Raise a violation when an account plays more streams at once than you allow.",
+        "keywords": "limit cap concurrent simultaneous sharing too many streams"
+      },
+      "device-velocity": {
+        "name": "Many IPs in a window",
+        "description": "Raise a violation when an account streams from more IP addresses in a window than you allow.",
+        "keywords": "ip addresses vpn sharing devices window"
+      },
+      "geo-restriction": {
+        "name": "Blocked countries",
+        "description": "Raise a violation when a stream comes from a country you block.",
+        "keywords": "country geo vpn abroad region block travel"
+      },
+      "impossible-travel": {
+        "name": "Impossible travel",
+        "description": "Raise a violation when two sessions sit further apart than anyone could travel between them.",
+        "keywords": "vpn travel speed distance location sharing"
+      },
+      "kill-paused-streams": {
+        "name": "Stop paused streams",
+        "description": "Stop a stream that has sat paused past the minutes you allow.",
+        "keywords": "pause idle afk stop kill terminate reclaim"
+      },
+      "media-added": {
+        "name": "New media added",
+        "description": "Tell a destination when a library item shows up for the first time.",
+        "keywords": "new library movie episode added import notify discord email webhook"
+      },
+      "media-upgraded": {
+        "name": "Media upgraded",
+        "description": "Tell a destination when a library item changes quality.",
+        "keywords": "upgrade quality remux 4k resolution replaced notify discord email webhook"
+      },
+      "no-4k-transcodes": {
+        "name": "No 4K transcodes",
+        "description": "Stop a stream that transcodes 4K source video.",
+        "keywords": "4k transcode quality cpu bandwidth stop"
+      },
+      "paused-too-long": {
+        "name": "Paused too long",
+        "description": "Tell a destination when a stream sits paused past the minutes you allow.",
+        "keywords": "pause idle afk stuck abandoned notify discord email webhook"
+      },
+      "plugin-update": {
+        "name": "Tracearr plugin update",
+        "description": "Tell a destination when a server has a newer Tracearr plugin to install.",
+        "keywords": "plugin update upgrade version release notify discord email webhook"
+      },
+      "server-down": {
+        "name": "Server down",
+        "description": "Tell a destination when a media server stops answering.",
+        "keywords": "offline outage unreachable down notify discord email webhook"
+      },
+      "server-up": {
+        "name": "Server back up",
+        "description": "Tell a destination when a media server answers again.",
+        "keywords": "online recovered restored back up notify discord email webhook"
+      },
+      "server-update": {
+        "name": "Media server update",
+        "description": "Tell a destination when a media server has an update available.",
+        "keywords": "update upgrade version release plex jellyfin emby notify discord"
+      },
+      "simultaneous-locations": {
+        "name": "Two places at once",
+        "description": "Raise a violation when one account streams from two distant places at the same time.",
+        "keywords": "distance location sharing vpn two places at once"
+      },
+      "stream-ended": {
+        "name": "Stream ended",
+        "description": "Tell a destination every time a stream stops.",
+        "keywords": "stop end finish playback notify discord email webhook"
+      },
+      "stream-started": {
+        "name": "Stream started",
+        "description": "Tell a destination every time a stream starts.",
+        "keywords": "play watch begin start viewing notify discord email webhook"
+      },
+      "tracearr-update": {
+        "name": "Tracearr update",
+        "description": "Tell a destination when a new Tracearr release is out.",
+        "keywords": "update upgrade version release tracearr notify discord email webhook"
+      },
+      "transcode-started": {
+        "name": "Stream is transcoding",
+        "description": "Tell a destination when a stream transcodes video or audio.",
+        "keywords": "transcode convert cpu direct play quality notify discord email webhook"
+      }
+    },
+    "title": "Automations",
+    "toggleAutomation": "Turn {{name}} on or off",
+    "tryAdjustingFilters": "Try adjusting your filters.",
+    "units": {
+      "km": "km",
+      "kmh": "km/h",
+      "mbps": "Mbps",
+      "days": "days",
+      "minutes": "minutes",
+      "hours": "hours",
+      "gb": "GB",
+      "seconds": "seconds"
+    },
+    "updateAutomation": "Save changes",
+    "catalog": {
+      "groups": {
+        "sessions": "Sessions",
+        "accounts": "Accounts",
+        "library": "Library",
+        "servers": "Servers",
+        "updates": "Updates",
+        "notify": "Notify",
+        "policy": "Take action",
+        "control": "If… then"
+      },
+      "suggested": "Suggested",
+      "triggers": {
+        "sessionStarted": {
+          "description": "The moment play is pressed.",
+          "synonyms": "play, watch, begin, start, viewing"
+        },
+        "sessionStopped": {
+          "description": "Playback ends, however it ended.",
+          "synonyms": "end, finish, quit, close"
+        },
+        "sessionTranscodeChanged": {
+          "description": "The server switches a stream between direct play and transcoding.",
+          "synonyms": "transcode, convert, direct play, cpu"
+        },
+        "sessionPaused": {
+          "description": "The moment a stream is paused.",
+          "synonyms": "pause, hold, idle"
+        },
+        "sessionHeldFor": {
+          "label": "A stream sits paused",
+          "description": "A stream has been paused longer than the set number of minutes.",
+          "synonyms": "pause, idle, abandoned, stuck, afk"
+        },
+        "accountInactiveFor": {
+          "label": "An account goes quiet",
+          "description": "An account has watched nothing for the set number of days.",
+          "synonyms": "inactive, dormant, unused, stale, cleanup"
+        },
+        "mediaAdded": {
+          "description": "A library item shows up on a server for the first time.",
+          "synonyms": "new, added, library, movie, episode, import"
+        },
+        "mediaUpgraded": {
+          "description": "A library item that was already there changes quality.",
+          "synonyms": "upgrade, quality, replaced, remux, 4k, resolution"
+        },
+        "serverDown": {
+          "description": "A media server stops answering.",
+          "synonyms": "unreachable, offline, outage, down"
+        },
+        "serverUp": {
+          "description": "A media server answers again.",
+          "synonyms": "online, recovered, restored, back"
+        },
+        "pluginUpdateAvailable": {
+          "description": "The Tracearr plugin on a server has a newer release.",
+          "synonyms": "plugin, upgrade, version, release"
+        },
+        "serverUpdateAvailable": {
+          "description": "A media server has a newer release.",
+          "synonyms": "upgrade, version, release, patch"
+        },
+        "tracearrUpdateAvailable": {
+          "description": "Tracearr itself has a newer release.",
+          "synonyms": "upgrade, version, release, self"
+        }
+      },
+      "actions": {
+        "send": {
+          "synonyms": "notify, alert, discord, email, webhook, push"
+        },
+        "trust": {
+          "synonyms": "score, reputation, penalise, reward"
+        },
+        "kill_stream": {
+          "synonyms": "stop, terminate, cut, end playback"
+        },
+        "message_client": {
+          "synonyms": "warn, tell, notice, on screen"
+        },
+        "if": {
+          "label": "If… otherwise…",
+          "description": "Run some steps only when an extra check passes.",
+          "synonyms": "if, else, otherwise, branch, split, condition"
+        }
+      }
+    },
+    "filters": {
+      "source": "Where it came from",
+      "allSources": "Anywhere",
+      "sources": {
+        "builtin": "Built-in",
+        "import": "Imported",
+        "local": "Saved here",
+        "own": "Built in the builder"
+      },
+      "trigger": "What starts it",
+      "allTriggers": "All triggers"
+    },
+    "openGallery": "Open the gallery"
   },
   "terminateStream": {
     "title": "Terminate Stream",
@@ -537,42 +1536,13 @@
       "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
     },
     "destinations": {
-      "title": "Notification destinations",
-      "description": "Where notifications go. Add as many as you like; each one picks the system events it receives, and rules can send to any of them.",
       "add": "Add destination",
-      "empty": "No destinations yet.",
-      "ownerOnly": "Only the owner can manage notification destinations.",
-      "eventsLabel": "Events",
       "builtinNote": "Built in",
-      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
-      "webToastNote": "Toasts in this browser.",
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
-      "reencrypt": "Re-enter this destination's secret",
-      "secretSet": "Set (leave blank to keep)",
       "clearSecret": "Clear",
-      "test": "Test",
-      "testHint": "Save first to test",
       "delete": "Delete",
-      "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
-      "events": {
-        "violation_detected": "Violation detected",
-        "stream_started": "Stream started",
-        "stream_stopped": "Stream stopped",
-        "server_down": "Server down",
-        "server_up": "Server up",
-        "plugin_update_available": "Plugin update available"
-      },
-      "types": {
-        "discord": "Discord",
-        "jsonWebhook": "Webhook (JSON)",
-        "ntfy": "ntfy",
-        "gotify": "Gotify",
-        "apprise": "Apprise",
-        "pushover": "Pushover",
-        "push": "Mobile push",
-        "webToast": "Browser toasts"
-      },
+      "deleteConfirm": "Delete {{name}}? Automations that send to it will be blocked until they are updated.",
+      "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
+      "empty": "No destinations yet.",
       "fields": {
         "webhookUrl": "Webhook URL",
         "url": "URL",
@@ -586,7 +1556,29 @@
       "hints": {
         "authTokenOptional": "Optional for public topics"
       },
-      "testNeedsForm": "Fill in the required fields to test"
+      "ownerOnly": "Only the owner can manage notification destinations.",
+      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
+      "receiveViolations": "Receive violations",
+      "receiveViolationsHint": "Send every violation to this destination",
+      "reencrypt": "Re-enter this destination's secret",
+      "secretSet": "Set (leave blank to keep)",
+      "test": "Test",
+      "testHint": "Save first to test",
+      "testNeedsForm": "Fill in the required fields to test",
+      "title": "Notification destinations",
+      "types": {
+        "discord": "Discord",
+        "jsonWebhook": "Webhook (JSON)",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "push": "Mobile push",
+        "webToast": "Browser toasts"
+      },
+      "usedBy": "Used by {{count}} automation",
+      "usedBy_other": "Used by {{count}} automations",
+      "webToastNote": "Toasts in this browser."
     },
     "jobs": {
       "runNow": "Run Now",
@@ -725,7 +1717,8 @@
     "clearQueryCache": "Clear Query Cache",
     "clearMobileDevices": "Clear Mobile Devices",
     "clearViolations": "Clear Violations",
-    "clearRules": "Clear Rules",
+    "clearAutomations": "Delete all automations and runs",
+    "clearAutomationsConfirm": "Delete every automation and all of their runs?",
     "clearTerminationLogs": "Clear Termination Logs",
     "clearLibraryCache": "Clear Library Cache",
     "clearSessions": "Clear Sessions",
