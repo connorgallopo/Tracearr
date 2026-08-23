@@ -916,6 +916,39 @@ describe('TautulliUsersResponseSchema', () => {
     const result = TautulliUsersResponseSchema.safeParse(response);
     expect(result.success).toBe(true);
   });
+
+  it('should accept users without do_notify (Tautulli nightly removed the field)', () => {
+    const response = {
+      response: {
+        result: 'success',
+        message: null,
+        data: [
+          {
+            user_id: 0,
+            username: 'Local',
+            friendly_name: 'Local',
+            thumb: null,
+            email: null,
+            is_home_user: null,
+            is_admin: 0,
+            is_active: 1,
+          },
+          {
+            user_id: 150112024,
+            username: 'Gallapagos',
+            friendly_name: 'Gallapagos',
+            thumb: 'https://plex.tv/users/ceac7bee6aac8175/avatar?c=1764478418',
+            email: 'connor.gallopo@gmail.com',
+            is_home_user: 1,
+            is_admin: 1,
+            is_active: 1,
+          },
+        ],
+      },
+    };
+    const result = TautulliUsersResponseSchema.safeParse(response);
+    expect(result.success).toBe(true);
+  });
 });
 
 // ============================================================================

@@ -157,7 +157,9 @@ export const TautulliUserRecordSchema = z.object({
   is_home_user: z.number().nullable(), // Can be null for local users
   is_admin: z.number(),
   is_active: z.number(),
-  do_notify: z.number(),
+  // Legacy per-user notification toggle. Tautulli removed do_notify from
+  // get_users (nightly branch, and upcoming stable); Tracearr never uses it.
+  do_notify: z.number().optional(),
 });
 
 export const TautulliUsersResponseSchema = z.object({
