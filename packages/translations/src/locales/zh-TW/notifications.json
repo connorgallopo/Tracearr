@@ -84,17 +84,17 @@
         "title": "任务已完成",
         "message": "{{name}}成功完成"
       },
-      "ruleCreated": {
-        "title": "规则已创建",
-        "message": "已成功创建规则"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "规则已更新",
-        "message": "规则已成功更新"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "规则已删除",
-        "message": "规则已成功删除"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "流已终止",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "未能删除违规行为",
       "authFailed": "验证失败",
       "webhookTestFailed": "Webhook 测试失败",
-      "ruleCreateFailed": "创建规则失败",
-      "ruleUpdateFailed": "更新规则失败",
-      "ruleDeleteFailed": "删除规则失败",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "终止流失败",
       "serverUrlUpdateFailed": "无法更新服务器 URL",
       "serverUpdateFailed": "更新服务器失败",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "新流已开始",
-        "message": "{{user}}开始观看{{media}}"
-      },
-      "streamStopped": {
-        "title": "流停止",
-        "message": "{{user}}停止观看"
-      },
       "updateAvailable": {
         "title": "有可用更新",
         "message": "Tracearr{{version}}可用"
-      },
-      "serverOffline": {
-        "title": "服务器离线",
-        "message": "{{name}} 无法联系"
-      },
-      "serverOnline": {
-        "title": "服务器在线",
-        "message": "{{name}} 已经上线了"
       },
       "violationDetected": {
         "title": "新违规：{{ruleName}}",
