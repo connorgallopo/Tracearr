@@ -84,17 +84,17 @@
         "title": "Job Afsluttet",
         "message": "{{name}} afsluttet"
       },
-      "ruleCreated": {
-        "title": "Regel Oprettet",
-        "message": "Reglen er blevet oprettet"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Regel Opdateret",
-        "message": "Reglen er blevet opdateret"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Regel Slettet",
-        "message": "Reglen er blevet slettet"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Stream Afsluttet",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Mislykkedes at afvise overtrædelse",
       "authFailed": "Godkendelse mislykkedes",
       "webhookTestFailed": "Webhook-test mislykkedes",
-      "ruleCreateFailed": "Kunne ikke oprette regel",
-      "ruleUpdateFailed": "Kunne ikke opdatere reglen",
-      "ruleDeleteFailed": "Kunne ikke slette reglen",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Kunne ikke afslutte stream",
       "serverUrlUpdateFailed": "Kunne ikke opdatere server-URL",
       "serverUpdateFailed": "Mislykkedes at opdatere server",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Ny Stream Startet",
-        "message": "{{user}} begyndte at se {{media}}"
-      },
-      "streamStopped": {
-        "title": "Stream Stoppet",
-        "message": "{{user}} holdt op med at se"
-      },
       "updateAvailable": {
         "title": "Opdatering Tilgængelig",
         "message": "Tracearr {{version}} er tilgængelig"
-      },
-      "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} er utilgængeligt"
-      },
-      "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} er online tilbage"
       },
       "violationDetected": {
         "title": "Ny Overtrædelse: {{ruleName}}",
