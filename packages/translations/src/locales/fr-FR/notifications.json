@@ -84,17 +84,17 @@
         "title": "Tâche terminée",
         "message": "{{name}} terminé avec succès"
       },
-      "ruleCreated": {
-        "title": "Règle créée",
-        "message": "La règle a été créée avec succès"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Règle mise à jour",
-        "message": "La règle a été mise à jour avec succès"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Règle supprimée",
-        "message": "La règle a été supprimée avec succès"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Lecture interrompue",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Échec de l'ignorance de la violation",
       "authFailed": "Échec de l'authentification",
       "webhookTestFailed": "Échec du test du webhook",
-      "ruleCreateFailed": "Échec de la création de la règle",
-      "ruleUpdateFailed": "Échec de la mise à jour de la règle",
-      "ruleDeleteFailed": "Échec de la suppression de la règle",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Nouvelle lecture démarrée",
-        "message": "{{user}} a commencé a regarder {{media}}"
-      },
-      "streamStopped": {
-        "title": "Lecture arrêtée",
-        "message": "{{user}} a arrêté de regarder"
-      },
       "updateAvailable": {
         "title": "Mise à jour disponible",
         "message": "Tracearr {{version}} est disponible"
-      },
-      "serverOffline": {
-        "title": "Serveur hors ligne",
-        "message": "{{name}} est inaccessible"
-      },
-      "serverOnline": {
-        "title": "Serveur en ligne",
-        "message": "{{name}} est de retour en ligne"
       },
       "violationDetected": {
         "title": "Nouvelle violation : {{ruleName}}",
