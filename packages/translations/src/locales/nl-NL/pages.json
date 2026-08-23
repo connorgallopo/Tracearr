@@ -709,6 +709,8 @@
         "sessionHeldFor": "a stream has been paused for {{duration}}",
         "sessionHeldForTotal": "a stream has been paused for {{duration}} in total",
         "accountInactiveFor": "an account has been inactive for {{duration}}",
+        "accountNewDevice": "an account plays from a new device",
+        "accountTrustChanged": "an account's trust score changes",
         "mediaAdded": "media is added",
         "mediaUpgraded": "media is upgraded",
         "serverDown": "a server goes down",
@@ -1301,6 +1303,11 @@
         "description": "Tell a destination when a library item changes quality.",
         "keywords": "upgrade quality remux 4k resolution replaced notify discord email webhook"
       },
+      "new-device": {
+        "name": "New device",
+        "description": "Tell a destination the first time an account streams from a device you have not seen.",
+        "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook"
+      },
       "no-4k-transcodes": {
         "name": "No 4K transcodes",
         "description": "Stop a stream that transcodes 4K source video.",
@@ -1355,6 +1362,11 @@
         "name": "Stream is transcoding",
         "description": "Tell a destination when a stream transcodes video or audio.",
         "keywords": "transcode convert cpu direct play quality notify discord email webhook"
+      },
+      "trust-score-changed": {
+        "name": "Trust score changed",
+        "description": "Tell a destination when an account's trust score changes.",
+        "keywords": "trust score reputation penalty adjusted notify discord email webhook"
       }
     },
     "title": "Automations",
@@ -1409,6 +1421,14 @@
           "label": "An account goes quiet",
           "description": "An account has watched nothing for the set number of days.",
           "synonyms": "inactive, dormant, unused, stale, cleanup"
+        },
+        "accountNewDevice": {
+          "description": "An account streams from a device for the first time.",
+          "synonyms": "device, new, unknown, unrecognized, phone, login, sharing"
+        },
+        "accountTrustChanged": {
+          "description": "An account's trust score changes, whether an automation or an owner moved it.",
+          "synonyms": "trust, score, reputation, penalty, adjusted"
         },
         "mediaAdded": {
           "description": "A library item shows up on a server for the first time.",
