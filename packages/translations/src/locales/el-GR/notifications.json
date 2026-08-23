@@ -84,17 +84,17 @@
         "title": "Η Εργασία Ολοκληρώθηκε",
         "message": "Το {{name}} ολοκληρώθηκε με επιτυχία"
       },
-      "ruleCreated": {
-        "title": "Ο Κανόνας Δημιουργήθηκε",
-        "message": "Ο κανόνας έχει δημιουργηθεί με επιτυχία"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Κανόνας Ενημερώθηκε",
-        "message": "Ο κανόνας έχει ενημερωθεί με επιτυχία"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Κανόνας Διαγράφηκε",
-        "message": "Ο κανόνας έχει διαγραφεί με επιτυχία"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Η Ροή Τερματίστηκε",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Αποτυχία απόρριψης παραβίασης",
       "authFailed": "Αποτυχία ταυτοποίησης",
       "webhookTestFailed": "Το τεστ Webhook απέτυχε",
-      "ruleCreateFailed": "Αποτυχία δημιουργίας κανόνα",
-      "ruleUpdateFailed": "Αποτυχία ενημέρωσης κανόνα",
-      "ruleDeleteFailed": "Αποτυχία διαγραφής κανόνα",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Αποτυχία τερματισμού ροής",
       "serverUrlUpdateFailed": "Αποτυχία ενημέρωσης του διακομιστή URL",
       "serverUpdateFailed": "Αποτυχία ενημέρωσης διακομιστή",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Ξεκίνησε Η Νέα Ροή",
-        "message": "Ο {{user}} άρχισε να βλέπει {{media}}"
-      },
-      "streamStopped": {
-        "title": "Η Ροή Σταμάτησε",
-        "message": "Το {{user}} σταμάτησε να παρακολουθεί"
-      },
       "updateAvailable": {
         "title": "Διαθέσιμη Ενημέρωση",
         "message": "Το Tracearr {{version}} είναι διαθέσιμο"
-      },
-      "serverOffline": {
-        "title": "Διακομιστής Χωρίς Σύνδεση",
-        "message": "Το {{name}} δεν είναι προσβάσιμο"
-      },
-      "serverOnline": {
-        "title": "Συνδεδεμένος Διακομιστής",
-        "message": "Το {{name}} είναι ξανά συνδεδεμένο"
       },
       "violationDetected": {
         "title": "New Violation: {{ruleName}}",
