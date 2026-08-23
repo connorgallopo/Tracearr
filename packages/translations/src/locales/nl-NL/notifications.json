@@ -84,17 +84,17 @@
         "title": "Taak voltooid",
         "message": "{{name}} is succesvol voltooid"
       },
-      "ruleCreated": {
-        "title": "Regel aangemaakt",
-        "message": "De regel is succesvol aangemaakt"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Regel bijgewerkt",
-        "message": "De regel is succesvol bijgewerkt"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Regel verwijderd",
-        "message": "De regel is succesvol verwijderd"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Stream afgebroken",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Overtreding negeren mislukt",
       "authFailed": "Authenticatie mislukt",
       "webhookTestFailed": "Webhook-test mislukt",
-      "ruleCreateFailed": "Regel aanmaken mislukt",
-      "ruleUpdateFailed": "Regel bijwerken mislukt",
-      "ruleDeleteFailed": "Regel verwijderen mislukt",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Stream afbreken mislukt",
       "serverUrlUpdateFailed": "Server-URL bijwerken mislukt",
       "serverUpdateFailed": "Server bijwerken mislukt",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Nieuwe stream gestart",
-        "message": "{{user}} is begonnen met kijken naar {{media}}"
-      },
-      "streamStopped": {
-        "title": "Stream gestopt",
-        "message": "{{user}} is gestopt met kijken"
-      },
       "updateAvailable": {
         "title": "Update beschikbaar",
         "message": "Tracearr {{version}} is beschikbaar"
-      },
-      "serverOffline": {
-        "title": "Server offline",
-        "message": "{{name}} is onbereikbaar"
-      },
-      "serverOnline": {
-        "title": "Server online",
-        "message": "{{name}} is weer online"
       },
       "violationDetected": {
         "title": "Nieuwe overtreding: {{ruleName}}",
