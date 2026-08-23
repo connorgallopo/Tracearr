@@ -86,6 +86,22 @@
       "pluginDesc": "Check for new releases of the Tracearr plugin your Jellyfin and Emby servers stream events through.",
       "server": "Media servers",
       "serverDesc": "Compare what each Plex, Jellyfin and Emby server runs with the newest release its makers publish."
+    },
+    "imageCache": {
+      "title": "Poster cache",
+      "description": "One copy of each poster, kept on disk until the poster changes. Nothing here is evicted to make room; when the disk runs low the cache stops growing and says so.",
+      "size": "On disk",
+      "files": "Files",
+      "need": "Estimated need",
+      "needHint": "{{count}} posters × 18 KB",
+      "free": "Free disk",
+      "freeOf": "of {{total}}",
+      "floor": "Keeps free",
+      "ceiling": "Ceiling",
+      "lastSweep": "Last sweep",
+      "never": "not yet",
+      "diskLimited": "Disk-limited since {{since}}: about {{shortfall}} of posters are not cached.",
+      "loadError": "Could not load the cache status."
     }
   },
   "servers": {
