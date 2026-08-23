@@ -84,17 +84,17 @@
         "title": "Завдання завершене",
         "message": "{{name}} успішно завершено"
       },
-      "ruleCreated": {
-        "title": "Правило створено",
-        "message": "Правило успішно створено"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Правило оновлено",
-        "message": "Правило успішно оновлено"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Правило видалено",
-        "message": "Правило успішно видалено"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Потік припинено",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Не вдалося відхилити порушення",
       "authFailed": "Помилка автентифікації",
       "webhookTestFailed": "Тест Webhook не вдався",
-      "ruleCreateFailed": "Не вдалося створити правило",
-      "ruleUpdateFailed": "Не вдалося оновити правило",
-      "ruleDeleteFailed": "Не вдалося видалити правило",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Не вдалося завершити потік",
       "serverUrlUpdateFailed": "Не вдалося оновити URL-адресу сервера",
       "serverUpdateFailed": "Не вдалося оновити сервер",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Нову стрім розпочато",
-        "message": "{{user}} почав дивитися {{media}}"
-      },
-      "streamStopped": {
-        "title": "Трансляцію зупинено",
-        "message": "Перестати відстежувати {{user}}"
-      },
       "updateAvailable": {
         "title": "Доступне оновлення",
         "message": "Tracearr {{version}} доступний"
-      },
-      "serverOffline": {
-        "title": "Сервер не в мережі",
-        "message": "{{name}} недоступний"
-      },
-      "serverOnline": {
-        "title": "Сервер онлайн",
-        "message": "{{name}} знову у мережі"
       },
       "violationDetected": {
         "title": "Нове порушення: {{ruleName}}",
