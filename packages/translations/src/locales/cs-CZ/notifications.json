@@ -84,17 +84,17 @@
         "title": "Úloha dokončena",
         "message": "{{name}} úspěšně dokončeno"
       },
-      "ruleCreated": {
-        "title": "Pravidlo vytvořeno",
-        "message": "Pravidlo bylo úspěšně vytvořeno"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Pravidlo aktualizováno",
-        "message": "Pravidlo bylo úspěšně aktualizováno"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Pravidlo odstraněno",
-        "message": "Pravidlo bylo úspěšně odstraněno"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Stream ukončen",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Nepodařilo se zrušit porušení",
       "authFailed": "Ověření se nezdařilo",
       "webhookTestFailed": "Test Webhooku se nezdařil",
-      "ruleCreateFailed": "Vytvoření pravidla se nezdařilo",
-      "ruleUpdateFailed": "Aktualizace pravidla se nezdařila",
-      "ruleDeleteFailed": "Nepodařilo se odstranit pravidlo",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Ukončení vysílání se nezdařilo",
       "serverUrlUpdateFailed": "Aktualizace URL serveru se nezdařila",
       "serverUpdateFailed": "Nepodařilo se aktualizovat server",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Nový Stream byl spuštěn",
-        "message": "{{user}} začal sledovat {{media}}"
-      },
-      "streamStopped": {
-        "title": "Stream zastaven",
-        "message": "{{user}} přestal sledovat"
-      },
       "updateAvailable": {
         "title": "Dostupná aktualizace",
         "message": "Tracearr {{version}} je k dispozici"
-      },
-      "serverOffline": {
-        "title": "Server je offline",
-        "message": "{{name}} je nedostupný"
-      },
-      "serverOnline": {
-        "title": "Server online",
-        "message": "{{name}} je opět online"
       },
       "violationDetected": {
         "title": "Nové násilí: {{ruleName}}",
