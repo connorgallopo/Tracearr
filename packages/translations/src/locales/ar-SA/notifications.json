@@ -84,17 +84,17 @@
         "title": "اكتمل العمل",
         "message": "{{name}} finished successfully"
       },
-      "ruleCreated": {
-        "title": "تم إنشاء قاعدة",
-        "message": "تم إنشاء القاعدة بنجاح"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "تم تحديث القاعدة",
-        "message": "تم تحديث القاعدة بنجاح"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "تم حذف القاعدة",
-        "message": "تم حذف القاعدة بنجاح"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "توقف البث",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "فشل في رفض الانتهاك",
       "authFailed": "فشل المصادقة",
       "webhookTestFailed": "فشل اختبار Webhook",
-      "ruleCreateFailed": "فشل في إنشاء قاعدة",
-      "ruleUpdateFailed": "فشل تحديث القاعدة",
-      "ruleDeleteFailed": "فشل في حذف القاعدة",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "فشل في إنهاء البث",
       "serverUrlUpdateFailed": "فشل تحديث رابط الخادم",
       "serverUpdateFailed": "فشل تحديث الخادم",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "بدأ بث جديد",
-        "message": "{{user}} started watching {{media}}"
-      },
-      "streamStopped": {
-        "title": "توقف البث",
-        "message": "{{user}} stopped watching"
-      },
       "updateAvailable": {
         "title": "تحديث متوفر",
         "message": "Tracearr {{version}} متاح"
-      },
-      "serverOffline": {
-        "title": "الخادم غير متصل",
-        "message": "{{name}} غير قابل للوصول"
-      },
-      "serverOnline": {
-        "title": "خادم متصل",
-        "message": "{{name}} يعود إلى الإنترنت"
       },
       "violationDetected": {
         "title": "انتهاك جديد: {{ruleName}}",
