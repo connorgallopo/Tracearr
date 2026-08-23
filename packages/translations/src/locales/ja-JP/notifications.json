@@ -84,17 +84,17 @@
         "title": "作業完了",
         "message": "{{name}} が正常に終了しました"
       },
-      "ruleCreated": {
-        "title": "作成されたルール",
-        "message": "ルールが正常に作成されました"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "ルールが更新されました",
-        "message": "ルールが正常に更新されました"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "ルールを削除しました",
-        "message": "ルールが正常に削除されました"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "配信が終了しました",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "違反を解除できませんでした",
       "authFailed": "認証に失敗しました",
       "webhookTestFailed": "Webhookテストに失敗しました",
-      "ruleCreateFailed": "ルールの作成に失敗しました",
-      "ruleUpdateFailed": "ルールの更新に失敗しました",
-      "ruleDeleteFailed": "ルールの削除に失敗しました",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "配信の終了に失敗しました",
       "serverUrlUpdateFailed": "サーバー URL の更新に失敗しました",
       "serverUpdateFailed": "サーバーの更新に失敗しました",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "新しいストリームを開始",
-        "message": "{{user}} が {{media}} の視聴を開始しました"
-      },
-      "streamStopped": {
-        "title": "配信を停止しました",
-        "message": "{{user}} が視聴を停止しました"
-      },
       "updateAvailable": {
         "title": "アップデートがあります",
         "message": "Tracearr {{version}} が利用できます"
-      },
-      "serverOffline": {
-        "title": "サーバーオフライン",
-        "message": "{{name}} に到達できません"
-      },
-      "serverOnline": {
-        "title": "サーバーオンライン",
-        "message": "{{name}} がオンラインに戻りました"
       },
       "violationDetected": {
         "title": "新しい違反: {{ruleName}}",
