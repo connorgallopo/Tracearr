@@ -84,17 +84,17 @@
         "title": "Lucrare Finalizată",
         "message": "{{name}} s-a terminat cu succes"
       },
-      "ruleCreated": {
-        "title": "Regulă creată",
-        "message": "Regula a fost creată cu succes"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Regulă actualizată",
-        "message": "Regula a fost actualizată cu succes"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Regulă ștearsă",
-        "message": "Regula a fost ștearsă cu succes"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Stream oprit",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Eroare la respingerea încălcării",
       "authFailed": "Autentificare eșuată",
       "webhookTestFailed": "Testul Webhook a eșuat",
-      "ruleCreateFailed": "Crearea regulii a eșuat",
-      "ruleUpdateFailed": "Actualizarea regulii a eșuat",
-      "ruleDeleteFailed": "Ștergerea regulii a eșuat",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Nu s-a putut termina transmisiunea",
       "serverUrlUpdateFailed": "Actualizarea adresei serverului a eșuat",
       "serverUpdateFailed": "Actualizarea serverului a eșuat",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "A început un nou flux",
-        "message": "{{user}} a început urmărirea {{media}}"
-      },
-      "streamStopped": {
-        "title": "Stream oprit",
-        "message": "{{user}} a oprit vizionarea"
-      },
       "updateAvailable": {
         "title": "Actualizare disponibilă",
         "message": "Tracearr {{version}} este disponibil"
-      },
-      "serverOffline": {
-        "title": "Server offline",
-        "message": "{{name}} este inaccesibil"
-      },
-      "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} este din nou online"
       },
       "violationDetected": {
         "title": "Incalcare noua: {{ruleName}}",
