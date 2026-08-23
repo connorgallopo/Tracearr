@@ -84,17 +84,17 @@
         "title": "Lavoro Completato",
         "message": "{{name}} completato con successo"
       },
-      "ruleCreated": {
-        "title": "Regola Creata",
-        "message": "La regola è stata creata con successo"
+      "automationCreated": {
+        "title": "Automation Created",
+        "message": "The automation has been created successfully"
       },
-      "ruleUpdated": {
-        "title": "Regola Aggiornata",
-        "message": "La regola è stata aggiornata con successo"
+      "automationUpdated": {
+        "title": "Automation Updated",
+        "message": "The automation has been updated successfully"
       },
-      "ruleDeleted": {
-        "title": "Regola Eliminata",
-        "message": "La regola è stata eliminata con successo"
+      "automationDeleted": {
+        "title": "Automation Deleted",
+        "message": "The automation has been deleted successfully"
       },
       "streamTerminated": {
         "title": "Stream Terminato",
@@ -156,7 +156,7 @@
       },
       "usersMerged": {
         "title": "Users merged",
-        "rulesKept": "Kept target's version of: {{names}}"
+        "automationsKept": "Kept target's version of: {{names}}"
       },
       "serverUserSplit": {
         "title": "Account split into a separate user"
@@ -175,9 +175,9 @@
       "dismissFailed": "Impossibile annullare la violazione",
       "authFailed": "Autenticazione non riuscita",
       "webhookTestFailed": "Test Webhook fallito",
-      "ruleCreateFailed": "Impossibile creare la regola",
-      "ruleUpdateFailed": "Impossibile aggiornare la regola",
-      "ruleDeleteFailed": "Impossibile eliminare la regola",
+      "automationCreateFailed": "Failed to create automation",
+      "automationUpdateFailed": "Failed to update automation",
+      "automationDeleteFailed": "Failed to delete automation",
       "streamTerminateFailed": "Terminazione dello stream non riuscita",
       "serverUrlUpdateFailed": "Impossibile aggiornare l'URL del server",
       "serverUpdateFailed": "Aggiornamento del server non riuscito",
@@ -223,25 +223,9 @@
       }
     },
     "info": {
-      "streamStarted": {
-        "title": "Nuovo Stream Iniziato",
-        "message": "{{user}} ha iniziato a guardare {{media}}"
-      },
-      "streamStopped": {
-        "title": "Stream Fermato",
-        "message": "{{user}} ha smesso di guardare"
-      },
       "updateAvailable": {
         "title": "Aggiornamento Disponibile",
         "message": "Tracearr {{version}} disponibile"
-      },
-      "serverOffline": {
-        "title": "Server Offline",
-        "message": "{{name}} è irraggiungibile"
-      },
-      "serverOnline": {
-        "title": "Server Online",
-        "message": "{{name}} è tornato online"
       },
       "violationDetected": {
         "title": "Nuova Violazione: {{ruleName}}",
