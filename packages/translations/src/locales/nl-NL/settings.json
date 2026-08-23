@@ -78,7 +78,15 @@
     "watchedThresholdSuffix": "%",
     "apiRateLimit": "API snelheidslimiet",
     "apiRateLimitDesc": "Maximaal aantal openbare API verzoeken per minuut per sleutel. Herstarten is vereist om de wijzigingen toe te passen.",
-    "apiRateLimitSuffix": "/min"
+    "apiRateLimitSuffix": "/min",
+    "updateChecks": {
+      "title": "Update checks",
+      "description": "Tracearr looks for new releases every six hours. Notifications come from whatever automation listens for the update triggers.",
+      "plugin": "Realtime plugin",
+      "pluginDesc": "Check for new releases of the Tracearr plugin your Jellyfin and Emby servers stream events through.",
+      "server": "Media servers",
+      "serverDesc": "Compare what each Plex, Jellyfin and Emby server runs with the newest release its makers publish."
+    }
   },
   "servers": {
     "title": "Verbonden servers",
@@ -161,6 +169,11 @@
       "description": "Als een titel op meerdere servers beschikbaar is, gebruik dan de poster van die server. Als die server geen poster heeft, gebruiken we de meest recent toegevoegde versie.",
       "automatic": "Automatisch (meest recent)",
       "emptyHint": "Voeg een server toe om een ​​voorkeursbron voor posters te kiezen."
+    },
+    "version": {
+      "installed": "Version {{version}}",
+      "upToDate": "up to date",
+      "updateAvailable": "update {{version}} available"
     }
   },
   "mobile": {
@@ -447,7 +460,7 @@
       "sessions": "Sessies",
       "users": "Gebruikers",
       "servers": "Servers",
-      "rules": "Regels",
+      "automations": "Automations",
       "libraryItems": "Bibliotheek Items",
       "tables": "Tabellen",
       "warning": "Bij het herstellen worden alle bestaande gegevens vervangen. U moet opnieuw inloggen nadat het herstel is voltooid.",
