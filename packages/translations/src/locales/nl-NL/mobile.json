@@ -10,10 +10,10 @@
     "enterManually": "URL en token handmatig invoeren",
     "cameraPermissionRequired": "Cameratoegang is vereist om QR-codes te scannen",
     "scanQrInstructions": "Open Instellingen → Mobiele app in je Tracearr-controlepaneel en scan de QR-code",
-    "urlPlaceholder": "https://tracearr.example.com",
-    "tokenPlaceholder": "trr_mob_...",
-    "missingToken": "Missing Token",
-    "pleaseEnterToken": "Please enter your access token"
+    "urlPlaceholder": "",
+    "tokenPlaceholder": "",
+    "missingToken": "Ontbrekende Token",
+    "pleaseEnterToken": "Voer de toegangstoken in"
   },
   "errors": {
     "missingFields": "Ontbrekende velden",
@@ -22,7 +22,7 @@
     "serverUrlMustStartWith": "Server-URL moet beginnen met http:// of https://",
     "pleaseEnterValidUrl": "Voer een geldige server-URL in",
     "pairingFailed": "Koppelen mislukt",
-    "unableToPair": "Unable to pair with server",
+    "unableToPair": "Kan geen verbinding maken met de server",
     "invalidQrCode": "Ongeldige QR-code",
     "invalidQrCodeMissingData": "Ongeldige QR-code: koppelingsgegevens ontbreken",
     "invalidQrCodeFormat": "Ongeldig indeling QR-code. Genereer een nieuwe code.",
@@ -32,45 +32,45 @@
     "tooManyPairingAttempts": "Te veel koppelpogingen. Wacht een paar minuten.",
     "invalidOrExpiredToken": "Ongeldig of verlopen koppeltoken.",
     "invalidPairingRequest": "Ongeldig koppelverzoek. Controleer je token.",
-    "errorDetails": "Error Details:",
-    "componentStack": "Component Stack:",
-    "connectionLost": "Connection lost",
-    "failedToLoadSession": "Failed to load session"
+    "errorDetails": "",
+    "componentStack": "",
+    "connectionLost": "Verbinding kwijt",
+    "failedToLoadSession": "Sessie laden mislukt"
   },
   "settings": {
     "preferences": "Voorkeuren",
-    "notifications": "Notifications",
-    "configureNotifications": "Configure push notification preferences",
-    "language": "Language",
-    "community": "Community",
-    "discord": "Discord",
+    "notifications": "Notificaties",
+    "configureNotifications": "Configureer de voorkeuren voor pushmeldingen",
+    "language": "Taal",
+    "community": "",
+    "discord": "",
     "joinCommunity": "Sluit je aan bij de community",
-    "docs": "Docs",
-    "readDocs": "Read the documentation",
-    "website": "Website",
-    "visitWebsite": "Visit tracearr.com",
-    "github": "GitHub",
+    "docs": "",
+    "readDocs": "Lees de documentatie",
+    "website": "",
+    "visitWebsite": "Bezoek tracearr.com",
+    "github": "",
     "viewSourceCode": "Broncode weergeven",
-    "sponsor": "Sponsor",
-    "supportDevelopment": "Support development",
-    "account": "Account",
-    "disconnect": "Disconnect",
+    "sponsor": "",
+    "supportDevelopment": "Support ontwikkeling",
+    "account": "",
+    "disconnect": "Ontkoppelen",
     "disconnectServer": "Server ontkoppelen",
     "disconnectConfirm": "Weet je zeker dat je wilt ontkoppelen van \"{{serverName}}\"? Je zult opnieuw moeten koppelen om de app te gebruiken.",
     "disconnectConfirmGeneric": "Weet je zeker dat je wilt ontkoppelen? Je zult opnieuw moeten koppelen om de app te gebruiken.",
     "currentlyConnected": "Momenteel verbonden met {{serverName}}",
-    "version": "Version {{version}}",
-    "build": "Build {{build}}"
+    "version": "Versie {{version}}",
+    "build": ""
   },
   "navigation": {
-    "home": "Home",
+    "home": "",
     "selectServer": "Server selecteren",
-    "server": "Server",
+    "server": "",
     "navigation": "Navigatie"
   },
   "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+    "cpu": "",
+    "ram": ""
   },
   "notifications": {
     "testSent": "Test verzonden",
@@ -78,89 +78,89 @@
     "failedToSendTest": "Versturen testmelding mislukt",
     "loadingPreferences": "Voorkeuren laden...",
     "unableToLoadPreferences": "Voorkeuren laden mislukt",
-    "receiveAlerts": "Receive alerts on this device",
-    "ruleViolationTriggered": "Rule violation triggered",
-    "newPlaybackBegan": "New playback began",
-    "playbackEnded": "Playback ended",
-    "exceededStreamLimit": "User exceeded stream limit",
-    "newDeviceDetected": "New device detected for user",
-    "trustScoreDegraded": "User trust score degraded",
-    "serverUnreachable": "Media server unreachable",
-    "serverBackOnline": "Media server back online",
-    "allViolationTypes": "All Violation Types",
-    "notifyForEveryRule": "Notify for every rule type",
-    "severityDescription": "Only notify for violations at or above this severity level",
-    "quietHoursDescription": "Pause non-critical notifications during set hours",
-    "startTime": "Start Time",
-    "endTime": "End Time",
-    "to": "to",
-    "timezoneLabel": "Timezone: {{timezone}}",
-    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
-    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
-    "sendTestNotification": "Send Test Notification",
-    "testDescription": "Verify that push notifications are working correctly"
+    "receiveAlerts": "Ontvang meldingen op dit apparaat",
+    "ruleViolationTriggered": "Regelovertreding geactiveerd",
+    "newPlaybackBegan": "Afspelen is begonnen",
+    "playbackEnded": "Afspelen beëindigd",
+    "exceededStreamLimit": "Gebruiker heeft de streamlimiet overschreden",
+    "newDeviceDetected": "Nieuw apparaat gedetecteerd voor gebruiker",
+    "trustScoreDegraded": "De vertrouwensscore van de gebruiker is gedaald",
+    "serverUnreachable": "Mediaserver onbereikbaar",
+    "serverBackOnline": "Mediaserver weer online",
+    "allViolationTypes": "Alle soorten overtredingen",
+    "notifyForEveryRule": "Meldingen voor elk regeltype",
+    "severityDescription": "Meld overtredingen alleen bij een ernstigheid van dit niveau of hoger",
+    "quietHoursDescription": "Niet-essentiële meldingen uitschakelen gedurende bepaalde uren",
+    "startTime": "Start Tijd",
+    "endTime": "Eind Tijd",
+    "to": "aan",
+    "timezoneLabel": "Tijdzone: {{timezone}}",
+    "criticalOverrideDescription": "Ernstige overtredingen worden ook tijdens rustige uren nog gemeld",
+    "rateLimitDescription": "Snelheidslimieten voorkomen spam met meldingen. Huidige limieten: {{perMinute}}/min, {{perHour}}/uur.",
+    "sendTestNotification": "Stuur Test Notificatie",
+    "testDescription": "Controleer of pushmeldingen correct werken"
   },
   "dashboard": {
-    "today": "TODAY",
-    "hrs": "hrs"
+    "today": "VANDAAG",
+    "hrs": "uren"
   },
   "session": {
-    "streamTerminated": "Stream Terminated",
-    "sessionStopped": "The playback session has been stopped.",
-    "failedToTerminate": "Failed to Terminate"
+    "streamTerminated": "Stream Beëindigd",
+    "sessionStopped": "De afspeelsessie is gestopt.",
+    "failedToTerminate": "Het beëindigen is mislukt"
   },
   "userDetail": {
-    "userMayBeRemoved": "This user may have been removed.",
-    "noLocationsRecorded": "No locations recorded",
-    "noDevicesRecorded": "No devices recorded",
-    "moreLocations": "+{{count}} more locations",
-    "moreDevices": "+{{count}} more devices",
-    "noViolations": "No violations",
-    "noTerminations": "No stream terminations",
-    "trustLow": "Low",
-    "trustMedium": "Medium",
-    "trustHigh": "High"
+    "userMayBeRemoved": "Deze gebruiker is mogelijk verwijderd.",
+    "noLocationsRecorded": "Geen locaties geregistreerd",
+    "noDevicesRecorded": "Geen apparaten geregistreerd",
+    "moreLocations": "+{{count}} meer locaties",
+    "moreDevices": "+{{count}} meer apparaten",
+    "noViolations": "Geen overtredingen",
+    "noTerminations": "Geen stream stops",
+    "trustLow": "Laag",
+    "trustMedium": "",
+    "trustHigh": "Hoog"
   },
   "violation": {
-    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available.",
-    "customRule": "Custom Rule",
-    "streamComparison": "Stream Comparison",
-    "ips": "IPs"
+    "violationNotFoundDesc": "Deze overtreding is mogelijk afgewezen of niet langer beschikbaar.",
+    "customRule": "Aangepaste regel",
+    "streamComparison": "Stream Vergelijking",
+    "ips": ""
   },
   "alerts": {
-    "done": "Done",
-    "clearFilters": "Clear Filters"
+    "done": "Klaar",
+    "clearFilters": "Filters opschonen"
   },
   "history": {
-    "noHistoryFound": "No History Found",
-    "adjustFilters": "Try adjusting your filters",
-    "historyWillAppear": "Session history will appear here once users start streaming"
+    "noHistoryFound": "Geen historie gevonden",
+    "adjustFilters": "Probeer je filters aan te passen",
+    "historyWillAppear": "De sessiegeschiedenis verschijnt hier zodra gebruikers beginnen met streamen"
   },
   "users": {
-    "owner": "Owner",
-    "noUsers": "No Users",
-    "usersWillAppear": "Users will appear here after syncing with your media server",
-    "noUsersMatch": "No users match \"{{query}}\""
+    "owner": "Eigenaar",
+    "noUsers": "Geen Gebruikers",
+    "usersWillAppear": "Gebruikers verschijnen hier nadat de synchronisatie met uw mediaserver is voltooid",
+    "noUsersMatch": "Geen gebruikers overeengekomen met \"{{query}}\""
   },
   "activity": {
-    "playsOverTime": "Plays Over Time",
-    "concurrentStreams": "Concurrent Streams",
-    "platforms": "Platforms",
-    "playbackQuality": "Playback Quality"
+    "playsOverTime": "Weergaven over tijd",
+    "concurrentStreams": "Gelijktijdige streams",
+    "platforms": "",
+    "playbackQuality": "Playback kwaliteit"
   },
   "unauthenticated": {
-    "connectionLost": "Connection Lost",
-    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
-    "scanQrCode": "Scan QR Code"
+    "connectionLost": "Verbinding Verbroken",
+    "accessRevoked": "Uw toegang tot {{serverName}} is ingetrokken. Vraag de serverbeheerder om een ​​nieuwe koppelingscode.",
+    "scanQrCode": ""
   },
   "serverSelector": {
-    "servers": "Servers",
-    "selectServers": "Select Servers",
-    "serversSelected": "{{selected}} of {{total}} servers selected",
+    "servers": "",
+    "selectServers": "Selecteer Servers",
+    "serversSelected": "{{selected}} van {{total}} servers geselecteerd",
     "allServers": "Alle servers"
   },
-  "reconnected": "Reconnected",
-  "actionsExecuted": "Actions Executed",
+  "reconnected": "Opnieuw verbonden",
+  "actionsExecuted": "Acties uitgevoerd",
   "serverScope": {
     "single": "Alleen {{name}} weergeven"
   },
@@ -169,7 +169,7 @@
     "alerts": "Waarschuwingen",
     "alertsCount": "Waarschuwingen, {{count}} ongelezen",
     "settings": "Instellingen",
-    "trustScore": "Trust score {{score}}"
+    "trustScore": ""
   },
   "map": {
     "noData": "Geen locatiegegevens beschikbaar",
