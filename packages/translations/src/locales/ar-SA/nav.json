@@ -6,7 +6,6 @@
   "activity": "النشاط",
   "library": "المكتبة",
   "users": "المستخدمون",
-  "automations": "Automations",
   "violations": "المخالفات",
   "alerts": "التنبيهات",
   "settings": "الإعدادات",
@@ -21,12 +20,5 @@
   "accessControl": "التحكم بالدخول",
   "media": "وسائط",
   "mediaBrowse": "تصفح",
-  "mediaGenres": "الأنواع",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "الأنواع"
 }
