@@ -61,12 +61,12 @@
         "message": "A sua conta Plex foi desligada"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agente adicionado",
@@ -85,16 +85,16 @@
         "message": "{{name}} concluído com sucesso"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Transmissão terminada",
@@ -155,15 +155,15 @@
         "message": "Agora você pode prosseguir com a configuração"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Falha ao adicionar servidor",
@@ -175,9 +175,9 @@
       "dismissFailed": "Falha ao descartar violação",
       "authFailed": "Autenticação falhou",
       "webhookTestFailed": "Teste do webhook falhou",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Falha ao terminar a transmissão",
       "serverUrlUpdateFailed": "Falha ao atualizar URL do servidor",
       "serverUpdateFailed": "Falha ao atualizar servidor",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Falha ao atualizar encaminhamento",
       "clipboardFailed": "Falha ao copiar para a área de transferência",
       "plexUnlinkFailed": "Falha ao desassociar conta Plex",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Falha ao adicionar agente",
       "agentUpdateFailed": "Falha ao atualizar agente",
       "agentRemoveFailed": "Falha ao remover agente",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Falha ao carregar tarefas de manutenção",
       "invalidUrl": "URL inválido",
       "plexDirectUrl": "URLs plex.direct são endereços de relay que não podem ser usados aqui. Por favor, use um endereço IP direto ou nome de host.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Código de reivindicação inválido",
         "message": "Por favor, verifique os logs do servidor"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
@@ -239,8 +239,8 @@
     "streamEnded": "Transmissão terminada",
     "serverDown": "Ligação ao servidor perdida",
     "serverUp": "Servidor de volta online",
-    "newDevice": "New Device",
-    "trustScoreChanged": "Trust Score Changed"
+    "newDevice": "",
+    "trustScoreChanged": ""
   },
   "settings": {
     "title": "Definições de notificações",
@@ -251,29 +251,29 @@
     "rateLimit": "Estado atual do ratelimit",
     "perMinute": "Por minuto",
     "perHour": "Por hora",
-    "enablePushNotifications": "Enable Push Notifications",
-    "notificationEvents": "Notification Events",
-    "violationDetected": "Violation Detected",
+    "enablePushNotifications": "",
+    "notificationEvents": "",
+    "violationDetected": "",
     "violationDetectedDesc": "Quando uma violação de compartilhamento é acionada",
-    "streamStarted": "Stream Started",
+    "streamStarted": "",
     "streamStartedDesc": "Quando um usuário começa a assistir",
-    "streamStopped": "Stream Stopped",
+    "streamStopped": "",
     "streamStoppedDesc": "Quando um usuário para de assistir",
-    "concurrentStreams": "Concurrent Streams",
+    "concurrentStreams": "",
     "concurrentStreamsDesc": "Quando o limite máximo de transmissão for excedido",
-    "newDevice": "New Device",
+    "newDevice": "",
     "newDeviceDesc": "Quando um novo dispositivo se conectar",
-    "trustScoreChanged": "Trust Score Changed",
+    "trustScoreChanged": "",
     "trustScoreChangedDesc": "Quando o ponto de confiança de um usuário mudar",
-    "serverDown": "Server Down",
+    "serverDown": "",
     "serverDownDesc": "Quando um servidor de mídia ficar offline",
-    "serverUp": "Server Up",
+    "serverUp": "",
     "serverUpDesc": "Quando um servidor de mídia está online",
-    "violationFilters": "Violation Filters",
-    "minimumSeverity": "Minimum Severity",
-    "quietHours": "Quiet Hours",
-    "enableQuietHours": "Enable Quiet Hours",
-    "overrideForCritical": "Override for Critical",
-    "rateLimiting": "Rate Limiting"
+    "violationFilters": "",
+    "minimumSeverity": "",
+    "quietHours": "",
+    "enableQuietHours": "",
+    "overrideForCritical": "",
+    "rateLimiting": ""
   }
 }
