@@ -32,7 +32,7 @@
     "sort": "並べ替え",
     "clear": "クリア",
     "apply": "適用",
-    "reset": "Reset",
+    "reset": "",
     "select": "選択",
     "selectAll": "すべて選択",
     "deselectAll": "すべての選択を解除",
@@ -91,16 +91,16 @@
     "high": "高い"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "現在",
@@ -118,9 +118,9 @@
     "byHour": "時間"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
+    "km": "",
+    "mi": "",
+    "kmh": "",
     "mph": "m/h"
   },
   "labels": {
@@ -155,7 +155,7 @@
     "serverOwner": "サーバー所有者",
     "active": "アクティブ",
     "disabled": "無効",
-    "bandwidth": "Bandwidth",
+    "bandwidth": "",
     "resolution": "解像度",
     "watchTime": "ウォッチ時間",
     "pausedTime": "一時停止時間",
@@ -171,15 +171,15 @@
     "size": "サイズ",
     "items": "アイテム",
     "name": "名前",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "検索...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "ページ上のすべてを選択",
     "selectRow": "行を選択",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "映画",
@@ -220,8 +220,8 @@
   },
   "servers": {
     "plex": "プレックス",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "このフィールドは必須項目です",
@@ -256,11 +256,11 @@
     "session_one": "{{count}} セッション",
     "session_other": "{{count}} セッション",
     "stream_one": "{{count}} ストリーム",
-    "stream_other": "{{count}} streams",
+    "stream_other": "",
     "server_one": "{{count}} サーバー",
     "server_other": "{{count}} サーバー",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} 違反",
     "violation_other": "{{count}} 違反",
     "item_one": "{{count}} アイテム",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} ライブラリ",
     "error_one": "{{count}} エラー",
     "error_other": "{{count}} エラー",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "変更は検出されませんでした"
@@ -291,7 +291,7 @@
     "justNow": "現在",
     "second_one": "{{count}} 秒前",
     "second_other": "{{count}} 秒前",
-    "minute_one": "{{count}} minute ago",
+    "minute_one": "",
     "minute_other": "{{count}} 分前",
     "hour_one": "{{count}} 時間前",
     "hour_other": "{{count}} 時間前",
@@ -307,10 +307,10 @@
   "duration": {
     "second_one": "{{count}} 秒",
     "second_other": "{{count}} 秒",
-    "minute_one": "{{count}} minute",
-    "minute_other": "{{count}} minutes",
+    "minute_one": "",
+    "minute_other": "",
     "hour_one": "{{count}} 時間",
-    "hour_other": "{{count}} hours",
+    "hour_other": "",
     "day_one": "{{count}} 日",
     "day_other": "{{count}} 日"
   },
@@ -332,9 +332,9 @@
   "beta": "ベータ",
   "or": "または",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
