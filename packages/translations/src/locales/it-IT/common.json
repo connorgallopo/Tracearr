@@ -66,8 +66,8 @@
     "inactive": "Inattivo",
     "enabled": "Abilitato",
     "disabled": "Disabilitato",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Connessione...",
     "connected": "Connesso",
     "disconnected": "Disconnesso",
@@ -91,16 +91,16 @@
     "high": "Alto"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Ora",
@@ -118,10 +118,10 @@
     "byHour": "Per Ora"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Data",
@@ -135,11 +135,11 @@
     "progress": "Avanzamento",
     "status": "Stato",
     "rule": "Regola",
-    "media": "Media",
+    "media": "",
     "started": "Avviato",
     "stopped": "Arrestato",
     "joined": "Unito",
-    "server": "Server",
+    "server": "",
     "device": "Dispositivo",
     "player": "Lettore",
     "unknown": "Sconosciuto",
@@ -171,15 +171,15 @@
     "size": "Dimensione",
     "items": "Oggetti",
     "name": "Nome",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "Prodotto",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Cerca...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Seleziona tutto sulla pagina",
     "selectRow": "Seleziona riga",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
@@ -214,21 +214,21 @@
     "track_plural": "Tracce",
     "liveTV": "TV in Diretta",
     "photo": "Foto",
-    "tv": "TV",
+    "tv": "",
     "tvShows": "Serie TV",
     "music": "Musica"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Questo campo è obbligatorio",
     "invalidEmail": "Inserisci un indirizzo email valido",
     "invalidUrl": "Inserisci un URL valido",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters"
+    "minLength": "",
+    "maxLength": ""
   },
   "errors": {
     "generic": "Si è verificato un errore",
@@ -251,38 +251,38 @@
     "cannotReachServer": "Impossibile raggiungere il server. Controlla l'URL e la connessione di rete."
   },
   "count": {
-    "user_one": "{{count}} user",
-    "user_other": "{{count}} users",
-    "session_one": "{{count}} session",
-    "session_other": "{{count}} sessions",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
+    "user_one": "",
+    "user_other": "",
+    "session_one": "",
+    "session_other": "",
+    "stream_one": "",
+    "stream_other": "",
     "server_one": "Server {{count}}",
-    "server_other": "{{count}} servers",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
-    "violation_one": "{{count}} violation",
-    "violation_other": "{{count}} violations",
+    "server_other": "",
+    "automation_one": "",
+    "automation_other": "",
+    "violation_one": "",
+    "violation_other": "",
     "item_one": "{{count}} elemento",
     "item_other": "{{count}} elementi",
     "result_one": "{{count}} risultato",
     "result_other": "{{count}} risultati",
     "selected_one": "{{count}} selezionato",
     "selected_other": "{{count}} selezionato",
-    "usersAdded_one": "{{count}} user added",
-    "usersAdded_other": "{{count}} users added",
-    "usersUpdated_one": "{{count}} user updated",
-    "usersUpdated_other": "{{count}} users updated",
-    "library_one": "{{count}} library",
-    "library_other": "{{count}} libraries",
-    "error_one": "{{count}} error",
-    "error_other": "{{count}} errors",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "usersAdded_one": "",
+    "usersAdded_other": "",
+    "usersUpdated_one": "",
+    "usersUpdated_other": "",
+    "library_one": "",
+    "library_other": "",
+    "error_one": "",
+    "error_other": "",
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Nessuna modifica rilevata"
@@ -329,12 +329,12 @@
     "deleteMessage": "Sei sicuro di voler eliminare questo? Questa azione non può essere annullata.",
     "unsavedChanges": "Alcune modifiche non sono state salvate. Vuoi davvero uscire?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "oppure",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
