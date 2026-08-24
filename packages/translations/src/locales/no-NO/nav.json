@@ -6,7 +6,6 @@
   "activity": "Aktivitet",
   "library": "Bibliotek",
   "users": "Brukere",
-  "automations": "Automations",
   "violations": "Brudd",
   "alerts": "Varsler",
   "settings": "Innstillinger",
@@ -21,12 +20,5 @@
   "accessControl": "Kontroll av tilgang",
   "media": "Medier",
   "mediaBrowse": "Bla gjennom",
-  "mediaGenres": "Sjangre",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Sjangre"
 }
