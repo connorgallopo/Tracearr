@@ -61,12 +61,12 @@
         "message": "Je Plex-account is ontkoppeld"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "Plex account opnieuw geautoriseerd",
+        "message_one": "{{count}} server opnieuw verbonden",
+        "message_other": "{{count}} servers hebben opnieuw verbinding gemaakt",
+        "messageNoServers": "Accounttoken bijgewerkt",
+        "partial": "Token bijgewerkt, maar {{names}} weigerde het nog steeds",
+        "unmatched": "Token bijgewerkt, maar {{names}} kon niet opnieuw gekoppeld worden"
       },
       "agentAdded": {
         "title": "Agent toegevoegd",
@@ -85,16 +85,16 @@
         "message": "{{name}} is succesvol voltooid"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "Automatisering gemaakt",
+        "message": "De automatisering is succesvol aangemaakt"
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "Automatisering geüpdatet",
+        "message": "De automatisering is succesvol aangemaakt"
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "Automatisering verwijderd",
+        "message": "De automatisering is succesvol verwijdert"
       },
       "streamTerminated": {
         "title": "Stream afgebroken",
@@ -155,15 +155,15 @@
         "message": "Je kunt nu doorgaan met instellen"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "Gebruikers samengevoegd",
+        "automationsKept": "Versie van doel verwijderd: {{names}}"
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": "Account opgesplitst naar een aparte gebruiker"
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "Bestemming opgeslagen",
+      "destinationDeleted": "Bestemming verwijdert",
+      "destinationTestSent": "Test notificatie verzonden"
     },
     "error": {
       "serverAddFailed": "Server toevoegen mislukt",
@@ -175,9 +175,9 @@
       "dismissFailed": "Overtreding negeren mislukt",
       "authFailed": "Authenticatie mislukt",
       "webhookTestFailed": "Webhook-test mislukt",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "Automatisering aanmaken is mislukt",
+      "automationUpdateFailed": "Automatisering bijwerken is mislukt",
+      "automationDeleteFailed": "Automatisering verwijderen is mislukt",
       "streamTerminateFailed": "Stream afbreken mislukt",
       "serverUrlUpdateFailed": "Server-URL bijwerken mislukt",
       "serverUpdateFailed": "Server bijwerken mislukt",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Routering bijwerken mislukt",
       "clipboardFailed": "Kopiëren naar klembord mislukt",
       "plexUnlinkFailed": "Ontkoppelen Plex-account mislukt",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "Het opnieuw autoriseren van het Plex account is mislukt",
       "agentAddFailed": "Agent toevoegen mislukt",
       "agentUpdateFailed": "Agent bijwerken mislukt",
       "agentRemoveFailed": "Agent verwijderen mislukt",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Onderhoudstaken laden mislukt",
       "invalidUrl": "Ongeldige URL",
       "plexDirectUrl": "Een plex.direct-URL is een relay-adres dat hier niet gebruikt kan worden. Gebruik een direct IP-adres of hostnaam.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "Het samenvoegen van gebruikers is mislukt",
+      "serverUserSplitFailed": "Splitsen van het account is mislukt",
       "invalidClaimCode": {
         "title": "Ongeldige claimcode",
         "message": "Controleer het serverlogboek"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "Niet gelukt bestemming op te slaan: {{error}}",
+      "destinationDeleteFailed": "Niet gelukt bestemming te verwijderen: {{error}}",
+      "destinationTestFailed": "Test niet geslaagd: {{error}}",
+      "destinationInUse": "Nog in gebruik door: {{rules}}"
     },
     "warning": {
       "jobFailed": {
