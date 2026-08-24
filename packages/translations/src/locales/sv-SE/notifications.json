@@ -61,12 +61,12 @@
         "message": "Ditt Plex-konto har kopplats bort"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agentkommando tillagda",
@@ -85,16 +85,16 @@
         "message": "{{name}} slutförd"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Strömmen upphörde",
@@ -155,15 +155,15 @@
         "message": "Du kan nu fortsätta med installationen"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Det gick inte att lägga till server",
@@ -175,9 +175,9 @@
       "dismissFailed": "Misslyckades att avfärda brott",
       "authFailed": "Autentisering misslyckades",
       "webhookTestFailed": "Webhook test misslyckades",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Det gick inte att avsluta strömmen",
       "serverUrlUpdateFailed": "Det gick inte att uppdatera server-URL",
       "serverUpdateFailed": "Det gick inte att uppdatera servern",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Det gick inte att uppdatera routing",
       "clipboardFailed": "Det gick inte att kopiera till urklipp",
       "plexUnlinkFailed": "Det gick inte att koppla bort Plex-kontot",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Det gick inte att lägga till agent",
       "agentUpdateFailed": "Det gick inte att uppdatera agent",
       "agentRemoveFailed": "Det gick inte att ta bort agent",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Det gick inte att ladda underhållsjobb",
       "invalidUrl": "Ogiltig URL",
       "plexDirectUrl": "plex.direct URL:er är reläadresser som inte kan användas här. Använd en direkt IP-adress eller värdnamn istället.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Ogiltig kravkod",
         "message": "Vänligen kontrollera serverns loggar"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
