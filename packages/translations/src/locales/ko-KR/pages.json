@@ -1,1963 +1,1963 @@
 {
   "login": {
-    "title": "Tracearr",
-    "tagline": "Tracearr - Stream access management",
-    "createAccountHeading": "Create your account to get started",
-    "signInHeading": "Sign in to your account",
-    "createAccountDescription": "Create an account to manage your media servers",
-    "signInDescription": "Sign in to access your dashboard",
-    "selectPlexServer": "Select your Plex server",
-    "waitingForPlex": "Waiting for Plex authorization...",
-    "completeInPopup": "Complete sign-in in the popup window",
-    "reopenPlexLogin": "Reopen Plex Login",
-    "continueWith": "Continue with {{provider}}",
-    "usernameOrEmail": "Username or Email",
-    "identifierPlaceholder": "Username or email address",
-    "username": "Username",
-    "usernamePlaceholder": "yourusername",
-    "emailPlaceholder": "your@email.com",
-    "displayNamePlaceholder": "Choose a display name",
-    "passwordPlaceholder": "At least 8 characters",
-    "yourPasswordPlaceholder": "Your password",
-    "setupNote": "After creating your account, you'll add your Plex or Jellyfin servers from Settings.",
-    "localDisabledHint": "Local sign-in is disabled for this instance. Ask an admin to run `enable-local-login` from the Tracearr CLI to re-enable it.",
-    "oidcError": "Single sign-on failed. Please try again or use another sign-in method.",
-    "accountCreated": "Account created successfully!",
-    "connectedTo": "Connected to {{name}}",
-    "plexAuthFailed": "Plex authentication failed",
-    "plexStartFailed": "Failed to start Plex login",
-    "serverConnectFailed": "Failed to connect to server",
-    "signupFailed": "Signup failed",
-    "createAccountFailed": "Failed to create account",
-    "loginFailed": "Login failed",
-    "invalidCredentials": "Invalid email or password",
-    "claimCodeRequired": "First-time setup requires a claim code",
-    "enterClaimCode": "Enter Claim Code",
-    "claimCodeDescription": "Check your server logs for the claim code to proceed with setup",
-    "claimCodeLabel": "Claim Code",
-    "claimCodeHint": "The claim code is printed in the server logs when the container starts",
-    "validateClaimCode": "Validate Claim Code",
-    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup"
+    "title": "",
+    "tagline": "Tracearr - 스트림 접근 관리",
+    "createAccountHeading": "시작하려면 계정을 만드세요",
+    "signInHeading": "계정에 로그인하세요",
+    "createAccountDescription": "미디어 서버를 관리할 계정을 만드세요",
+    "signInDescription": "대시보드에 접근하려면 로그인하세요",
+    "selectPlexServer": "Plex 서버 선택",
+    "waitingForPlex": "Plex 인증을 기다리는 중...",
+    "completeInPopup": "팝업 창에서 로그인을 완료하세요",
+    "reopenPlexLogin": "Plex 로그인 다시 열기",
+    "continueWith": "",
+    "usernameOrEmail": "",
+    "identifierPlaceholder": "",
+    "username": "",
+    "usernamePlaceholder": "",
+    "emailPlaceholder": "",
+    "displayNamePlaceholder": "표시 이름을 입력하세요",
+    "passwordPlaceholder": "최소 8자",
+    "yourPasswordPlaceholder": "비밀번호",
+    "setupNote": "계정을 만든 뒤 설정에서 Plex 또는 Jellyfin 서버를 추가하게 됩니다.",
+    "localDisabledHint": "",
+    "oidcError": "",
+    "accountCreated": "계정이 성공적으로 생성되었습니다!",
+    "connectedTo": "{{name}}에 연결됨",
+    "plexAuthFailed": "Plex 인증에 실패했습니다",
+    "plexStartFailed": "Plex 로그인을 시작하지 못했습니다",
+    "serverConnectFailed": "서버에 연결하지 못했습니다",
+    "signupFailed": "가입에 실패했습니다",
+    "createAccountFailed": "계정을 만들지 못했습니다",
+    "loginFailed": "로그인에 실패했습니다",
+    "invalidCredentials": "",
+    "claimCodeRequired": "초기 설정에는 클레임 코드가 필요합니다",
+    "enterClaimCode": "클레임 코드 입력",
+    "claimCodeDescription": "설정을 계속하려면 서버 로그에서 클레임 코드를 확인하세요",
+    "claimCodeLabel": "클레임 코드",
+    "claimCodeHint": "컨테이너가 시작될 때 서버 로그에 클레임 코드가 출력됩니다",
+    "validateClaimCode": "클레임 코드 확인",
+    "claimCodeSecurityNote": "이 보안 절차는 승인된 사용자만 초기 설정을 완료할 수 있도록 합니다"
   },
   "dashboard": {
-    "alerts": "Alerts",
-    "plays": "Plays",
-    "watchTime": "Watch Time",
-    "activeUsers": "Active Users",
-    "nowPlaying": "Now Playing",
-    "streamLocations": "Stream Locations",
-    "serverResources": "Server Resources",
-    "bandwidth": "Bandwidth",
-    "noActiveStreams": "No active streams",
-    "streamsAppearHere": "Active streams will appear here when users start watching"
+    "alerts": "알림",
+    "plays": "재생",
+    "watchTime": "시청 시간",
+    "activeUsers": "활성 사용자",
+    "nowPlaying": "현재 재생 중",
+    "streamLocations": "스트림 위치",
+    "serverResources": "서버 리소스",
+    "bandwidth": "대역폭",
+    "noActiveStreams": "활성 스트림이 없습니다",
+    "streamsAppearHere": "사용자가 시청을 시작하면 활성 스트림이 여기에 표시됩니다"
   },
   "users": {
-    "title": "Users",
-    "showRemoved": "Show removed",
-    "noUsersFound": "No users found.",
-    "searchPlaceholder": "Search users...",
-    "selectAllUsers": "Select all {{count}} users",
-    "serversColumn": "Servers",
-    "resetTrustScore": "Reset Trust Score",
-    "resetTrustScoreTitle_one": "Reset Trust Score for {{count}} User",
-    "resetTrustScoreTitle_other": "Reset Trust Score for {{count}} Users",
-    "resetTrustScoreConfirm": "Are you sure you want to reset the trust score to 100? This action cannot be undone.",
-    "mergeUsers": "Merge users",
-    "mergeDialogTitle": "Merge users",
-    "mergeDialogDescription": "Every server account, session, and violation from the duplicate moves to the primary. The duplicate identity is deleted.",
-    "mergePickPrimary": "Choose the primary identity",
-    "mergePrimaryBadge": "Primary",
-    "mergePrimaryForced": "This account can log in, so it must stay the primary.",
-    "mergeSameServerWarningTitle": "This action is irreversible",
-    "mergeSameServerDialogDescription": "This merge permanently combines both accounts on the same server. It cannot be undone.",
-    "mergeSameServerWarning": "Both identities already have an account on the same server. Merging will permanently combine their session history, violations, and trust score into a single account on that server. This cannot be undone, and splitting the account afterward will not restore the original two accounts.",
-    "mergeSameServerAcknowledge": "I understand the same-server history combine cannot be undone",
-    "mergeSameServerFallbackName": "this server",
-    "mergeServerAccountRemoved": "Removed",
-    "mergeConfirm": "Merge",
-    "mergeSelectTwo": "Select exactly two users to merge",
-    "mergeSameIdentity": "These accounts already belong to the same user",
-    "mergeSelectAllActive": "Clear the select-all selection and pick exactly two users to merge",
-    "suggestionsTitle": "Possible duplicate users",
-    "suggestionsDescription": "These identities look like the same person across servers. Review and merge them if they match.",
-    "suggestionsReview": "Review",
-    "suggestionsMatchEmail": "Same email",
-    "suggestionsMatchUsername": "Same username",
-    "suggestionsError": "Could not load merge suggestions",
-    "filterHasAccessTo": "Has access to",
-    "filterHasAccessToPlaceholder": "Any server",
-    "filterHasAccessToHint": "Shows people with an active account on every server selected."
+    "title": "사용자",
+    "showRemoved": "",
+    "noUsersFound": "사용자를 찾을 수 없습니다.",
+    "searchPlaceholder": "사용자 검색...",
+    "selectAllUsers": "사용자 {{count}}명 모두 선택",
+    "serversColumn": "",
+    "resetTrustScore": "신뢰 점수 초기화",
+    "resetTrustScoreTitle_one": "사용자 {{count}}명의 신뢰 점수 초기화",
+    "resetTrustScoreTitle_other": "사용자 {{count}}명의 신뢰 점수 초기화",
+    "resetTrustScoreConfirm": "신뢰 점수를 100으로 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
+    "mergeUsers": "",
+    "mergeDialogTitle": "",
+    "mergeDialogDescription": "",
+    "mergePickPrimary": "",
+    "mergePrimaryBadge": "",
+    "mergePrimaryForced": "",
+    "mergeSameServerWarningTitle": "",
+    "mergeSameServerDialogDescription": "",
+    "mergeSameServerWarning": "",
+    "mergeSameServerAcknowledge": "",
+    "mergeSameServerFallbackName": "",
+    "mergeServerAccountRemoved": "",
+    "mergeConfirm": "",
+    "mergeSelectTwo": "",
+    "mergeSameIdentity": "",
+    "mergeSelectAllActive": "",
+    "suggestionsTitle": "",
+    "suggestionsDescription": "",
+    "suggestionsReview": "",
+    "suggestionsMatchEmail": "",
+    "suggestionsMatchUsername": "",
+    "suggestionsError": "",
+    "filterHasAccessTo": "",
+    "filterHasAccessToPlaceholder": "",
+    "filterHasAccessToHint": ""
   },
   "userDetail": {
-    "backToUsers": "Back to Users",
-    "userNotFound": "User not found",
-    "userInfo": "User Info",
-    "statistics": "Statistics",
-    "sessions": "Sessions",
-    "violations": "Violations",
-    "terminationHistory": "Termination History",
-    "noViolationsFound": "No violations for this user.",
-    "noTerminationsFound": "No stream terminations for this user.",
-    "byRule": "By / Rule",
-    "manual": "Manual",
-    "unknownRule": "Unknown rule",
-    "adjustTrustScore": "Adjust Trust Score",
-    "linkedAccounts": "Linked accounts",
-    "splitAccount": "Split into separate user",
-    "splitConfirmTitle": "Split server account",
-    "splitConfirmDescription": "Detach this server account into its own user. Its watch history and violations move with it.",
-    "splitConfirmLoading": "Splitting...",
-    "acrossAllServers": "Across all linked accounts:",
-    "overallTrust": "Overall Trust",
-    "serverScope": "Server",
-    "allServers": "All servers",
-    "title": "User Details"
+    "backToUsers": "사용자로 돌아가기",
+    "userNotFound": "사용자를 찾을 수 없습니다",
+    "userInfo": "사용자 정보",
+    "statistics": "통계",
+    "sessions": "세션",
+    "violations": "위반 내역",
+    "terminationHistory": "종료 기록",
+    "noViolationsFound": "이 사용자의 위반 내역이 없습니다.",
+    "noTerminationsFound": "이 사용자의 스트림 종료 기록이 없습니다.",
+    "byRule": "처리자 / 규칙",
+    "manual": "수동",
+    "unknownRule": "알 수 없는 규칙",
+    "adjustTrustScore": "신뢰 점수 조정",
+    "linkedAccounts": "",
+    "splitAccount": "",
+    "splitConfirmTitle": "",
+    "splitConfirmDescription": "",
+    "splitConfirmLoading": "",
+    "acrossAllServers": "",
+    "overallTrust": "",
+    "serverScope": "",
+    "allServers": "",
+    "title": ""
   },
   "history": {
-    "title": "History",
-    "description": "Browse all streaming sessions with powerful filtering",
-    "loadingMore": "Loading more...",
-    "scrollForMore": "Scroll for more",
-    "showingAllResults": "Showing all {{total}} results",
-    "deleteSession_one": "Delete {{count}} Session",
-    "deleteSession_other": "Delete {{count}} Sessions",
-    "deleteSessionsConfirm": "Are you sure you want to delete? This action cannot be undone."
+    "title": "기록",
+    "description": "강력한 필터로 모든 스트리밍 세션을 살펴보세요",
+    "loadingMore": "더 불러오는 중...",
+    "scrollForMore": "더 보려면 스크롤하세요",
+    "showingAllResults": "전체 {{total}}개 결과 표시 중",
+    "deleteSession_one": "세션 {{count}}개 삭제",
+    "deleteSession_other": "세션 {{count}}개 삭제",
+    "deleteSessionsConfirm": "정말 삭제할까요? 이 작업은 되돌릴 수 없습니다."
   },
   "library": {
-    "title": "Library",
-    "description": "Top movies and shows on your server",
-    "topMovies": "Top Movies",
-    "topShows": "Top TV Shows",
-    "noMoviePlays": "No movie plays in this period",
-    "noShowPlays": "No TV show plays in this period",
+    "title": "라이브러리",
+    "description": "서버에서 가장 많이 이용된 영화와 프로그램",
+    "topMovies": "인기 영화",
+    "topShows": "인기 TV 프로그램",
+    "noMoviePlays": "이 기간에 재생된 영화가 없습니다",
+    "noShowPlays": "이 기간에 재생된 TV 프로그램이 없습니다",
     "overview": {
-      "description": "Library health and growth metrics",
-      "lastUpdated": "Last updated:",
-      "totalItems": "Total Items",
-      "shows": "shows",
-      "added": "Added",
-      "libraryGrowth": "Library Growth",
-      "failedToLoad": "Failed to load library statistics",
-      "failedToLoadDesc": "Could not fetch library data. Please try again.",
-      "thisPeriod": "this period",
-      "thisWeek": "this week",
-      "thisMonth": "this month",
-      "thisYear": "this year",
-      "serversNeedSync": "These servers need to sync:"
+      "description": "라이브러리 상태와 성장 지표",
+      "lastUpdated": "마지막 업데이트:",
+      "totalItems": "전체 항목",
+      "shows": "프로그램",
+      "added": "추가됨",
+      "libraryGrowth": "라이브러리 증가",
+      "failedToLoad": "라이브러리 통계를 불러오지 못했습니다",
+      "failedToLoadDesc": "라이브러리 데이터를 가져오지 못했습니다. 다시 시도해 주세요.",
+      "thisPeriod": "이 기간",
+      "thisWeek": "이번 주",
+      "thisMonth": "이번 달",
+      "thisYear": "올해",
+      "serversNeedSync": ""
     },
     "quality": {
-      "title": "Quality",
-      "description": "Resolution and codec distribution",
-      "qualityEvolution": "Quality Evolution",
-      "all": "All",
-      "failedToLoad": "Failed to load quality data",
-      "failedToLoadDesc": "Could not fetch quality data. Please try again."
+      "title": "품질",
+      "description": "해상도 및 코덱 분포",
+      "qualityEvolution": "품질 변화",
+      "all": "전체",
+      "failedToLoad": "품질 데이터를 불러오지 못했습니다",
+      "failedToLoadDesc": "품질 데이터를 가져오지 못했습니다. 다시 시도해 주세요."
     },
     "storage": {
-      "title": "Storage",
-      "description": "Storage usage, predictions, and optimization",
-      "totalStorage": "Total Storage",
-      "growthRate": "Growth Rate",
-      "duplicates": "Duplicates",
-      "groups": "groups",
-      "recoverable": "recoverable",
-      "staleContent": "Stale Content",
-      "staleContentDesc": "Content that may be candidates for removal",
-      "items": "items",
-      "unused": "unused",
-      "storageTrend": "Storage Trend",
-      "confidence": "Confidence",
-      "confidenceHigh": "High",
-      "confidenceMedium": "Medium",
-      "confidenceLow": "Low",
-      "zeroGrowth": "0 GB/mo",
-      "predictions": "Predictions",
-      "contentROI": "Content ROI",
-      "contentROIDesc": "Watch value per storage cost",
-      "avgHoursPerGB": "avg hours/GB",
-      "insufficientData": "Insufficient data",
-      "of": "of",
-      "days": "days",
-      "failedToLoad": "Failed to load storage data",
-      "failedToLoadDesc": "Could not fetch storage data. Please try again.",
-      "duplicatesTitle": "Duplicates",
-      "duplicatesSubtitle": "Titles with more than one copy or file, across servers, libraries, and versions",
-      "growthPreChangeover": "based on pre-update history",
-      "loadingDuplicates": "Loading duplicates...",
-      "duplicatesFailed": "Failed to load duplicates",
-      "noDuplicatesTitle": "No duplicates found",
-      "noDuplicatesDesc": "No titles with more than one physical file detected.",
-      "colTitle": "Title",
-      "colMatchType": "Match Type",
-      "colCopies": "Copies",
-      "colRecoverable": "Recoverable Space",
-      "sameServer": "Same server",
-      "mirror": "Mirror"
+      "title": "저장 공간",
+      "description": "저장 공간 사용량, 예측 및 최적화",
+      "totalStorage": "전체 저장 공간",
+      "growthRate": "증가율",
+      "duplicates": "중복 항목",
+      "groups": "그룹",
+      "recoverable": "회수 가능",
+      "staleContent": "오래된 콘텐츠",
+      "staleContentDesc": "삭제 후보가 될 수 있는 콘텐츠",
+      "items": "항목",
+      "unused": "미사용",
+      "storageTrend": "저장 공간 추세",
+      "confidence": "신뢰도",
+      "confidenceHigh": "높음",
+      "confidenceMedium": "보통",
+      "confidenceLow": "낮음",
+      "zeroGrowth": "0 GB/월",
+      "predictions": "예측",
+      "contentROI": "콘텐츠 효율",
+      "contentROIDesc": "저장 비용 대비 시청 가치",
+      "avgHoursPerGB": "GB당 평균 시간",
+      "insufficientData": "데이터가 부족합니다",
+      "of": "/",
+      "days": "일",
+      "failedToLoad": "저장 공간 데이터를 불러오지 못했습니다",
+      "failedToLoadDesc": "저장 공간 데이터를 가져오지 못했습니다. 다시 시도해 주세요.",
+      "duplicatesTitle": "",
+      "duplicatesSubtitle": "",
+      "growthPreChangeover": "",
+      "loadingDuplicates": "",
+      "duplicatesFailed": "",
+      "noDuplicatesTitle": "",
+      "noDuplicatesDesc": "",
+      "colTitle": "",
+      "colMatchType": "",
+      "colCopies": "",
+      "colRecoverable": "",
+      "sameServer": "",
+      "mirror": ""
     },
     "watch": {
-      "title": "Watch Analytics",
-      "description": "Viewing behavior and content engagement",
-      "watched": "Watched",
-      "percentWatched": "% watched",
-      "totalWatchTime": "Total Watch Time",
-      "avgPerItem": "avg per item",
-      "completed": "Completed",
-      "peakHour": "Peak Hour",
-      "viewingHours": "Viewing Hours",
-      "peak": "Peak:",
-      "monthlyTrends": "Monthly Trends",
-      "busiest": "Busiest:",
-      "quietest": "Quietest:",
-      "bingeHighlights": "Binge Highlights",
-      "bingeHighlightsDesc": "Shows with the most intensive viewing patterns",
-      "bingeSessions": "binge sessions",
-      "noData": "No watch data yet",
-      "noDataDesc": "Watch analytics will appear here once content has been played. Check back after some viewing activity.",
-      "failedToLoad": "Failed to load watch analytics",
-      "failedToLoadDesc": "Could not fetch watch data."
+      "title": "시청 분석",
+      "description": "시청 행동과 콘텐츠 참여도",
+      "watched": "시청됨",
+      "percentWatched": "% 시청",
+      "totalWatchTime": "전체 시청 시간",
+      "avgPerItem": "항목당 평균",
+      "completed": "완료됨",
+      "peakHour": "피크 시간",
+      "viewingHours": "시청 시간대",
+      "peak": "피크:",
+      "monthlyTrends": "월별 추세",
+      "busiest": "가장 바쁨:",
+      "quietest": "가장 한산함:",
+      "bingeHighlights": "몰아보기 하이라이트",
+      "bingeHighlightsDesc": "시청 집중도가 가장 높은 프로그램",
+      "bingeSessions": "몰아보기 세션",
+      "noData": "아직 시청 데이터가 없습니다",
+      "noDataDesc": "콘텐츠가 재생되면 시청 분석이 여기에 표시됩니다. 시청 활동이 생긴 뒤 다시 확인하세요.",
+      "failedToLoad": "시청 분석을 불러오지 못했습니다",
+      "failedToLoadDesc": "시청 데이터를 가져오지 못했습니다."
     },
     "emptyState": {
-      "checkingStatus": "Checking library status...",
+      "checkingStatus": "",
       "backfillAvailable": {
-        "title": "Historical data available",
-        "bodyWithDays": "Your library has {{days}} days of history. Generate snapshots to see trends in charts.",
-        "bodyGeneric": "Generate historical snapshots to see library trends over time.",
-        "syncRunningTitle": "Library sync in progress...",
-        "syncRunningBody": "Historical data generation will start automatically once the sync completes."
+        "title": "",
+        "bodyWithDays": "",
+        "bodyGeneric": "",
+        "syncRunningTitle": "",
+        "syncRunningBody": ""
       },
-      "generateHistory": "Generate History",
-      "starting": "Starting...",
+      "generateHistory": "",
+      "starting": "",
       "syncInProgress": {
-        "title": "Library sync in progress...",
-        "body": "Library statistics will appear once the sync completes. This may take a few minutes depending on library size."
+        "title": "",
+        "body": ""
       },
       "notSynced": {
-        "title": "Library not synced yet",
-        "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
+        "title": "",
+        "body": ""
       },
       "noMedia": {
-        "title": "No movies or shows yet",
-        "body": "This library is synced but doesn't have any movies or shows in it yet."
+        "title": "",
+        "body": ""
       },
-      "syncNow": "Sync Now",
-      "syncing": "Syncing...",
-      "notSyncedShort": "Not synced yet",
+      "syncNow": "",
+      "syncing": "",
+      "notSyncedShort": "",
       "backfillRunning": {
-        "title": "Generating historical data...",
-        "fallbackBody": "Creating snapshots from library history. This may take a few minutes.",
-        "progress": "{{processed}} of {{total}} libraries",
-        "snapshotsSuffix": " ({{count}} snapshots)"
+        "title": "",
+        "fallbackBody": "",
+        "progress": "",
+        "snapshotsSuffix": ""
       },
       "multiServer": {
-        "title": "Some libraries need attention",
-        "body": "Sync the servers below to see combined library statistics.",
-        "needsBackfillIntro": "These servers are synced but have no historical data yet:"
+        "title": "",
+        "body": "",
+        "needsBackfillIntro": ""
       },
       "toast": {
-        "noServerSelected": "No server selected",
-        "syncStartedTitle": "Library sync started",
-        "syncStartedDesc": "This may take a few minutes depending on library size.",
-        "syncFailedTitle": "Failed to start sync",
-        "genericRetry": "Please try again.",
-        "backfillStartedTitle": "Backfill started",
-        "backfillStartedDesc": "Historical snapshots are being generated.",
-        "backfillFailedTitle": "Failed to start backfill",
-        "backfillCompleteTitle": "Backfill complete",
-        "backfillErrorTitle": "Backfill failed"
+        "noServerSelected": "",
+        "syncStartedTitle": "",
+        "syncStartedDesc": "",
+        "syncFailedTitle": "",
+        "genericRetry": "",
+        "backfillStartedTitle": "",
+        "backfillStartedDesc": "",
+        "backfillFailedTitle": "",
+        "backfillCompleteTitle": "",
+        "backfillErrorTitle": ""
       }
     },
     "versionsBackfill": {
-      "banner": "File version data is still being collected for this server. Run a library sync to finish.",
-      "action": "Sync now",
-      "syncFailed": "Sync failed to start on {{count}} server(s). Check your permissions and server status.",
-      "syncStarted": "Library sync started."
+      "banner": "",
+      "action": "",
+      "syncFailed": "",
+      "syncStarted": ""
     }
   },
   "activity": {
-    "title": "Activity",
-    "description": "Play trends, patterns, and streaming behavior",
-    "playsOverTime": "Plays Over Time",
-    "concurrentStreams": "Concurrent Streams",
-    "engagementBreakdown": "Engagement Breakdown",
-    "howUsersEngage": "How users engage with content",
-    "playsVsSessions": "Plays vs Sessions",
-    "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
-    "activityByDayOfWeek": "Activity by Day of Week",
-    "activityByHourOfDay": "Activity by Hour of Day",
-    "platforms": "Platforms",
-    "streamQuality": "Stream Quality"
+    "title": "활동",
+    "description": "재생 추세, 패턴 및 스트리밍 행동",
+    "playsOverTime": "시간별 재생",
+    "concurrentStreams": "동시 스트림",
+    "engagementBreakdown": "참여도 분석",
+    "howUsersEngage": "사용자가 콘텐츠를 이용하는 방식",
+    "playsVsSessions": "재생 vs 세션",
+    "playsVsSessionsDesc": "완전 재생만 집계합니다. 총 시청 시간이 콘텐츠 전체 길이를 채울 때 재생으로 계산합니다",
+    "activityByDayOfWeek": "요일별 활동",
+    "activityByHourOfDay": "시간대별 활동",
+    "platforms": "플랫폼",
+    "streamQuality": "스트림 품질"
   },
   "violations": {
-    "title": "Violations",
-    "tryAdjustingFilters": "Try adjusting your filters",
-    "selectAllViolations": "Select all {{count}} violations matching filters",
-    "dismissViolation": "Dismiss Violation",
-    "dismissViolationConfirm": "Are you sure you want to dismiss this violation? This will remove it from the violation log permanently.",
-    "dismissViolation_one": "Dismiss {{count}} Violation",
-    "dismissViolation_other": "Dismiss {{count}} Violations",
-    "dismissViolationsConfirm": "Are you sure you want to dismiss? This will remove them from the violation log permanently and restore associated trust scores.",
-    "noViolationsFound": "No violations found",
-    "noViolationsRecorded": "No violations have been recorded yet.",
-    "allSeverities": "All Severities",
-    "allStatuses": "All Statuses",
-    "allRules": "All rules",
-    "filterPeople": "People",
-    "allPeople": "All people",
-    "peopleSelectedCount": "{{count}} people",
-    "personFilterPlaceholder": "Filter by person",
-    "personFilterEmpty": "No matching people found",
-    "personFilterError": "Failed to load people",
-    "filterByPerson": "Filter violations by this person",
+    "title": "위반 내역",
+    "tryAdjustingFilters": "필터를 조정해 보세요",
+    "selectAllViolations": "필터와 일치하는 위반 {{count}}건 모두 선택",
+    "dismissViolation": "위반 해제",
+    "dismissViolationConfirm": "이 위반을 해제할까요? 위반 로그에서 영구적으로 제거됩니다.",
+    "dismissViolation_one": "위반 {{count}}건 해제",
+    "dismissViolation_other": "위반 {{count}}건 해제",
+    "dismissViolationsConfirm": "정말 해제할까요? 위반 로그에서 영구적으로 제거되고 관련 신뢰 점수가 복원됩니다.",
+    "noViolationsFound": "위반을 찾을 수 없습니다",
+    "noViolationsRecorded": "아직 기록된 위반이 없습니다.",
+    "allSeverities": "모든 심각도",
+    "allStatuses": "모든 상태",
+    "allRules": "",
+    "filterPeople": "",
+    "allPeople": "",
+    "peopleSelectedCount": "",
+    "personFilterPlaceholder": "",
+    "personFilterEmpty": "",
+    "personFilterError": "",
+    "filterByPerson": "",
     "detail": {
-      "notFound": "Violation not found",
-      "violationDetails": "Violation Details",
-      "userInfo": "User",
-      "sessions": "Sessions",
-      "noSessions": "No sessions associated with this violation",
-      "trigger": "Trigger",
-      "map": "Session Locations",
-      "actions": "Actions Taken",
-      "timestamps": "Timestamps",
-      "created": "Created",
-      "acknowledged": "Acknowledged",
-      "detected": "Detected",
-      "inactivity": "Inactivity Details",
-      "daysInactive": "Days Inactive",
-      "threshold": "Threshold",
-      "lastActivity": "Last Activity",
-      "neverActive": "Never active",
-      "conditionEvidence": "Condition Evidence",
-      "conditionGroup": "Condition Group {{index}}",
-      "matched": "{{matched}}/{{total}} matched",
-      "actual": "Actual",
-      "relatedSessions": "{{count}} related session",
-      "relatedSessions_one": "{{count}} related session",
-      "relatedSessions_other": "{{count}} related sessions"
+      "notFound": "위반을 찾을 수 없습니다",
+      "violationDetails": "위반 상세",
+      "userInfo": "사용자",
+      "sessions": "세션",
+      "noSessions": "이 위반과 연결된 세션이 없습니다",
+      "trigger": "트리거",
+      "map": "세션 위치",
+      "actions": "수행된 작업",
+      "timestamps": "타임스탬프",
+      "created": "생성됨",
+      "acknowledged": "확인됨",
+      "detected": "감지됨",
+      "inactivity": "비활동 상세",
+      "daysInactive": "비활동 일수",
+      "threshold": "임계값",
+      "lastActivity": "최근 활동",
+      "neverActive": "활동 기록 없음",
+      "conditionEvidence": "조건 근거",
+      "conditionGroup": "조건 그룹 {{index}}",
+      "matched": "{{matched}}/{{total}} 일치",
+      "actual": "실제 값",
+      "relatedSessions": "관련 세션 {{count}}개",
+      "relatedSessions_one": "관련 세션 {{count}}개",
+      "relatedSessions_other": "관련 세션 {{count}}개"
     }
   },
   "automations": {
     "actions": {
       "send": {
-        "label": "Send Notification",
-        "description": "Send to one or more destinations",
+        "label": "",
+        "description": "",
         "fields": {
           "cooldown_minutes": {
-            "description": "Minimum time between notifications"
+            "description": ""
           }
         },
-        "ran": "Sent a notification"
+        "ran": ""
       },
       "trust": {
-        "label": "Trust Score",
-        "description": "Adjust, set, or reset the trust score",
+        "label": "",
+        "description": "",
         "fields": {
           "mode": {
-            "label": "Mode"
+            "label": ""
           },
           "amount": {
-            "label": "Amount",
-            "description": "Positive to increase, negative to decrease"
+            "label": "",
+            "description": ""
           },
           "value": {
-            "label": "Value"
+            "label": ""
           }
         },
-        "ran": "Changed the trust score"
+        "ran": ""
       },
       "kill_stream": {
-        "label": "Kill Stream",
-        "description": "Terminate the active stream",
+        "label": "",
+        "description": "",
         "fields": {
           "cooldown_minutes": {
-            "description": "Minimum time between terminations for the same user"
+            "description": ""
           },
           "delay_seconds": {
-            "label": "Sustain window",
-            "description": "Waits this many seconds, then kills the stream only if the automation still matches. 0 kills right after a final re-check."
+            "label": "",
+            "description": ""
           },
           "target": {
-            "description": "Which sessions to terminate"
+            "description": ""
           },
           "message": {
-            "placeholder": "Optional message"
+            "placeholder": ""
           }
         },
-        "ran": "Stopped the stream"
+        "ran": ""
       },
       "message_client": {
-        "label": "Message Client",
-        "description": "Send a message to the media player",
-        "hint": "Jellyfin and Emby only. Plex only supports messages when killing a stream.",
+        "label": "",
+        "description": "",
+        "hint": "",
         "fields": {
           "target": {
-            "description": "Which sessions to message"
+            "description": ""
           },
           "message": {
-            "placeholder": "Message to display…"
+            "placeholder": ""
           }
         },
-        "ran": "Put a message on the player"
+        "ran": ""
       }
     },
     "activity": {
-      "title": "Activity",
-      "description": "What this automation did, newest first. Runs are kept for {{days}} days.",
-      "outcome": "Outcome",
-      "who": "Who",
-      "where": "Where",
-      "playing": "Playing",
-      "from": "From",
-      "summary": "Summary",
-      "started": "Started",
-      "finished": "Finished",
-      "noSummary": "No notes",
+      "title": "",
+      "description": "",
+      "outcome": "",
+      "who": "",
+      "where": "",
+      "playing": "",
+      "from": "",
+      "summary": "",
+      "started": "",
+      "finished": "",
+      "noSummary": "",
       "outcomes": {
-        "completed": "Ran",
-        "stopped_by_condition": "No match",
-        "error": "Failed"
+        "completed": "",
+        "stopped_by_condition": "",
+        "error": ""
       },
-      "empty": "No runs yet",
-      "emptyDescription": "Runs are listed here once a trigger matches.",
-      "runTitle": "Run",
-      "runLoading": "Loading the run",
-      "triggeredBy": "Triggered by {{trigger}}",
-      "unknownStep": "Unrecognized step",
+      "empty": "",
+      "emptyDescription": "",
+      "runTitle": "",
+      "runLoading": "",
+      "triggeredBy": "",
+      "unknownStep": "",
       "tabs": {
-        "all": "All",
-        "completed": "Ran",
-        "stopped_by_condition": "No match",
-        "error": "Failed"
+        "all": "",
+        "completed": "",
+        "stopped_by_condition": "",
+        "error": ""
       },
-      "group": "Group {{number}}",
+      "group": "",
       "branch": {
-        "then": "Took the first branch",
-        "else": "Took the second branch"
+        "then": "",
+        "else": ""
       },
-      "whyBranch": "What it read",
-      "openInEditor": "Open in the builder with this run",
-      "tabsLabel": "Filter by outcome",
-      "emptyRan": "Nothing has matched yet",
-      "emptyRanDescription_one": "{{count}} check ran and did not match.",
-      "emptyRanDescription_other": "{{count}} checks ran and did not match.",
-      "item": "Item",
-      "recordedViolation": "Recorded a violation"
+      "whyBranch": "",
+      "openInEditor": "",
+      "tabsLabel": "",
+      "emptyRan": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_other": "",
+      "item": "",
+      "recordedViolation": ""
     },
-    "allKinds": "All kinds",
-    "allStatuses": "All statuses",
-    "allSeverities": "All severities",
+    "allKinds": "",
+    "allStatuses": "",
+    "allSeverities": "",
     "bind": {
-      "nameHelper": "The name in the automations list.",
-      "namePlaceholder": "A name for this automation",
-      "activeLabel": "Turn it on now",
-      "back": "Back",
-      "submit": "Use this",
-      "submitting": "Setting it up…",
-      "customize": "Open in the builder",
+      "nameHelper": "",
+      "namePlaceholder": "",
+      "activeLabel": "",
+      "back": "",
+      "submit": "",
+      "submitting": "",
+      "customize": "",
       "doors": {
-        "helper": "Use this keeps the steps as they are; the answers above can change later. Open in the builder makes every step editable and ends the link to the ready-made automation."
+        "helper": ""
       },
-      "anyServer": "Any server",
-      "serverHelper": "Any server means all of them.",
-      "serverLabel": "Which server",
-      "accountLabel": "Which account",
-      "personLabel": "Which person",
-      "destinationsLabel": "Send to",
-      "required": "Pick at least one.",
+      "anyServer": "",
+      "serverHelper": "",
+      "serverLabel": "",
+      "accountLabel": "",
+      "personLabel": "",
+      "destinationsLabel": "",
+      "required": "",
       "needs": {
-        "title": "What it needs"
+        "title": "What it needs from you"
       },
       "helper": {
-        "killMessage": "Shown on the player when the stream stops.",
-        "clientMessage": "Shown on the player while it keeps playing."
+        "killMessage": "",
+        "clientMessage": ""
       },
-      "noInputs": "Nothing to fill in.",
-      "failed": "Couldn't set that up. Try again.",
-      "created": "{{name}} is set up and running.",
-      "createdOff": "{{name}} was created and is off. Turn it on from the list."
+      "noInputs": "",
+      "failed": "",
+      "created": "",
+      "createdOff": ""
     },
     "builder": {
-      "destinationDisabled": "Disabled destination",
-      "noDestinations": "No destinations yet. Add one to send notifications.",
-      "newDestination": "New destination",
+      "destinationDisabled": "",
+      "noDestinations": "",
+      "newDestination": "",
       "errors": {
-        "sendNeedsDestination": "Pick at least one destination",
-        "nameRequired": "Automation name is required",
-        "scopeIncomplete": "Pick a target for the selected scope",
-        "triggerRequired": "Add what starts this, or switch one back on",
-        "policyNeedsSubject": "A policy needs a stream or account trigger: violations are about a person",
-        "fieldUnavailable": "This check is not available for every trigger here",
-        "operatorInvalid": "This comparison does not fit the condition",
-        "valueInvalid": "This value does not fit the condition",
-        "actionUnavailable": "These triggers do not supply what this action needs",
-        "variableUnavailable": "The message names something not every trigger here supplies",
-        "minutesRange": "Between {{min}} and {{max}} minutes",
-        "daysRange": "Between {{min}} and {{max}} days",
-        "measureInvalid": "Pick how the minutes are counted",
-        "fieldNotAvailableFor": "Not available for: {{triggers}}",
-        "trustAmountRange": "Trust changes by between -100 and 100 points",
-        "trustValueRange": "Trust score is between 0 and 100",
-        "messageRequired": "Type the message to show",
-        "tooLong": "At most {{max}} characters"
+        "sendNeedsDestination": "",
+        "nameRequired": "",
+        "scopeIncomplete": "",
+        "triggerRequired": "",
+        "policyNeedsSubject": "",
+        "fieldUnavailable": "",
+        "operatorInvalid": "",
+        "valueInvalid": "",
+        "actionUnavailable": "",
+        "variableUnavailable": "",
+        "minutesRange": "",
+        "daysRange": "",
+        "measureInvalid": "",
+        "fieldNotAvailableFor": "",
+        "trustAmountRange": "",
+        "trustValueRange": "",
+        "messageRequired": "",
+        "tooLong": ""
       },
       "recordAs": {
-        "label": "When this runs, record it as",
-        "policy": "A violation",
-        "policyDescription": "Listed in Violations; can be acknowledged.",
-        "notification": "An alert",
-        "notificationDescription": "Recorded in Activity; never a violation."
+        "label": "",
+        "policy": "",
+        "policyDescription": "",
+        "notification": "",
+        "notificationDescription": ""
       },
-      "severityLabel": "Severity",
-      "activeLabel": "Active",
-      "saving": "Saving…",
-      "selectPlaceholder": "Select…",
-      "searchPlaceholder": "Search…",
-      "noMatches": "No matches",
-      "clearSelection": "Clear selection",
-      "selectedCount": "{{count}} selected",
+      "severityLabel": "",
+      "activeLabel": "",
+      "saving": "",
+      "selectPlaceholder": "",
+      "searchPlaceholder": "",
+      "noMatches": "",
+      "clearSelection": "",
+      "selectedCount": "",
       "scope": {
-        "label": "Scope",
-        "global": "Global",
-        "server": "Specific server",
-        "account": "Specific account",
-        "person": "Person (all their servers)",
-        "serverLabel": "Server",
-        "serverPlaceholder": "Select server",
-        "accountLabel": "Account",
-        "accountPlaceholder": "Select account",
-        "personLabel": "Person",
-        "personPlaceholder": "Select person",
-        "personHelper": "Matches this person on every server they have an account on.",
-        "noServers": "No servers connected yet.",
-        "enforceAcrossServers": "Enforce across servers",
-        "enforceAcrossServersDescription": "Acts on the person's sessions on any of their servers, not only the one that triggered it. Off by default."
+        "label": "",
+        "global": "",
+        "server": "",
+        "account": "",
+        "person": "",
+        "serverLabel": "",
+        "serverPlaceholder": "",
+        "accountLabel": "",
+        "accountPlaceholder": "",
+        "personLabel": "",
+        "personPlaceholder": "",
+        "personHelper": "",
+        "noServers": "",
+        "enforceAcrossServers": "",
+        "enforceAcrossServersDescription": ""
       },
       "conditions": {
-        "addGroup": "Add AND condition group",
-        "fieldPlaceholder": "Select field",
-        "windowPrefix": "in",
-        "windowUnit": "hrs",
-        "uniqueDevices": "Unique devices",
-        "uniqueDevicesHint": "Counts only sessions from different physical devices.",
-        "uniqueIps": "Unique IPs",
-        "uniqueIpsHint": "Counts only sessions from different IP addresses, so same-household streams are not counted.",
-        "allDeviceTypes": "All device types",
-        "deviceTypesHint": "Counts only streams from the selected device types. Empty means every device.",
-        "yes": "Yes",
-        "no": "No",
-        "recentlySeen": "Recently seen",
-        "allCountries": "All countries",
-        "sectionTitle": "Only when…",
-        "optional": "optional",
-        "helper": "Checks that must pass first. Empty means it runs every time.",
-        "emptyLine": "No extra checks. This runs every time.",
-        "all": "all of these",
-        "any": "any of these",
-        "allHint": "and: every check has to pass",
-        "anyHint": "or: any one check is enough",
-        "matchLabel": "How these conditions combine",
-        "fieldLabel": "Condition",
-        "operatorLabel": "Comparison",
-        "valueLabel": "Value",
-        "canNeverPass": "This can never pass. The trigger already fires at {{threshold}}.",
-        "noFields": "No checks are available for these triggers. Add a stream or account trigger first.",
-        "groupSeparator": "and also",
-        "addAnother": "Add another condition",
-        "addFirst": "Add a condition",
-        "removeGroup": "Remove this set of checks"
+        "addGroup": "",
+        "fieldPlaceholder": "",
+        "windowPrefix": "",
+        "windowUnit": "",
+        "uniqueDevices": "",
+        "uniqueDevicesHint": "",
+        "uniqueIps": "",
+        "uniqueIpsHint": "",
+        "allDeviceTypes": "",
+        "deviceTypesHint": "",
+        "yes": "",
+        "no": "",
+        "recentlySeen": "",
+        "allCountries": "",
+        "sectionTitle": "",
+        "optional": "",
+        "helper": "",
+        "emptyLine": "",
+        "all": "",
+        "any": "",
+        "allHint": "",
+        "anyHint": "",
+        "matchLabel": "",
+        "fieldLabel": "",
+        "operatorLabel": "",
+        "valueLabel": "",
+        "canNeverPass": "",
+        "noFields": "",
+        "groupSeparator": "",
+        "addAnother": "",
+        "addFirst": "",
+        "removeGroup": ""
       },
       "actions": {
-        "add": "Add action",
-        "sectionTitle": "Do this…",
-        "ifTitle": "If…",
-        "helper": "These run in order, top to bottom.",
-        "emptyTitle": "What should happen?",
-        "emptyDescription": "Send a notification, stop the stream, change a trust score, or run steps only when an extra check passes.",
-        "emptyAction": "Choose what happens",
-        "moveUp": "Move {{name}} up",
-        "moveDown": "Move {{name}} down",
-        "menu": "More for {{name}}",
-        "branchName": "this branch",
-        "confirmRemoveTitle": "Remove this action?",
-        "confirmRemoveDescription": "Stops happening on save.",
-        "policyNote": "A branch does not decide whether this is flagged; the And only if… section does.",
-        "branchThen": "then",
-        "branchElse": "Otherwise…",
-        "branchElseEmpty": "Nothing. The automation carries on.",
-        "ifNothing": "nothing yet",
-        "ifAddCheck": "Add another check",
-        "addBranch": "Add action",
-        "expandBranch": "Show this branch's steps",
-        "collapseBranch": "Hide this branch's steps"
+        "add": "",
+        "sectionTitle": "",
+        "ifTitle": "",
+        "helper": "",
+        "emptyTitle": "",
+        "emptyDescription": "",
+        "emptyAction": "",
+        "moveUp": "",
+        "moveDown": "",
+        "menu": "",
+        "branchName": "",
+        "confirmRemoveTitle": "",
+        "confirmRemoveDescription": "",
+        "policyNote": "",
+        "branchThen": "",
+        "branchElse": "",
+        "branchElseEmpty": "",
+        "ifNothing": "",
+        "ifAddCheck": "",
+        "addBranch": "",
+        "expandBranch": "",
+        "collapseBranch": ""
       },
       "when": {
-        "title": "When…",
-        "helper": "Any one of these starts it. At least one is required.",
-        "emptyTitle": "What should start this?",
-        "emptyDescription": "A stream starting, a server going down, an account going quiet.",
-        "emptyAction": "Choose what starts it",
-        "add": "Add trigger",
-        "or": "or"
+        "title": "",
+        "helper": "",
+        "emptyTitle": "",
+        "emptyDescription": "",
+        "emptyAction": "",
+        "add": "",
+        "or": ""
       },
       "heldFor": {
-        "prefix": "A stream has been paused for",
-        "minutesLabel": "Minutes",
-        "unit": "minutes",
-        "measureLabel": "Counted",
-        "current": "this time",
-        "total": "in total"
+        "prefix": "",
+        "minutesLabel": "",
+        "unit": "",
+        "measureLabel": "",
+        "current": "",
+        "total": ""
       },
       "inactiveFor": {
-        "prefix": "An account has been inactive for",
-        "daysLabel": "Days",
-        "unit": "days"
+        "prefix": "",
+        "daysLabel": "",
+        "unit": ""
       },
       "rows": {
-        "toggle": "Include {{name}}",
-        "remove": "Remove {{name}}",
-        "skipped": "Skipped",
-        "toggleHint": "skip",
-        "removeHint": "remove",
-        "expandHint": "open",
-        "moveHint": "reorder"
+        "toggle": "",
+        "remove": "",
+        "skipped": "",
+        "toggleHint": "",
+        "removeHint": "",
+        "expandHint": "",
+        "moveHint": ""
       },
       "picker": {
-        "searchPlaceholder": "Search or describe what should happen",
-        "empty": "Nothing matches that.",
-        "navigate": "move",
-        "select": "pick",
-        "close": "close"
+        "searchPlaceholder": "",
+        "empty": "",
+        "navigate": "",
+        "select": "",
+        "close": ""
       },
       "sentence": {
-        "label": "What this automation does",
-        "placeholderTrigger": "something happens",
-        "placeholderAction": "do something"
+        "label": "",
+        "placeholderTrigger": "",
+        "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
-        "problems_other": "{{count}} problems",
-        "remaining_one": "{{count}} left to finish",
-        "remaining_other": "{{count}} left to finish",
-        "ready": "Ready to save",
-        "search": "to search"
+        "problems_one": "",
+        "problems_other": "",
+        "remaining_one": "",
+        "remaining_other": "",
+        "ready": "",
+        "search": ""
       },
       "leave": {
-        "title": "Leave without saving?",
-        "confirm": "Leave"
+        "title": "",
+        "confirm": ""
       },
       "liveCheck": {
-        "title": "Right now on the servers",
-        "checking": "Checking against the sessions playing now…",
-        "empty": "Nothing is playing right now; nothing to check against.",
-        "failed": "Could not reach the servers to check.",
-        "footnote": "Cooldowns and already-handled sessions aren't simulated.",
-        "expand": "Show what matched for {{name}}",
-        "passed": "Passed",
-        "notPassed": "Did not pass",
-        "actual": "now {{value}}",
-        "unfinished": "Shows what this would do once the automation is complete.",
-        "paused": "Paused while this saves",
-        "sampleTitle": "What this would do to that run",
-        "sampleGone": "That session is no longer on record; nothing to check against.",
-        "backToLive": "Back to what's playing now"
+        "title": "",
+        "checking": "",
+        "empty": "",
+        "failed": "",
+        "footnote": "",
+        "expand": "",
+        "passed": "",
+        "notPassed": "",
+        "actual": "",
+        "unfinished": "",
+        "paused": "",
+        "sampleTitle": "",
+        "sampleGone": "",
+        "backToLive": ""
       }
     },
     "categories": {
-      "session_behavior": "Session Behavior",
-      "stream_quality": "Stream Quality",
-      "user_attributes": "User Attributes",
-      "device_client": "Device & Client",
-      "network_location": "Network & Location",
-      "scope": "Scope",
-      "media": "Media"
+      "session_behavior": "",
+      "stream_quality": "",
+      "user_attributes": "",
+      "device_client": "",
+      "network_location": "",
+      "scope": "",
+      "media": ""
     },
-    "createAutomation": "Create Automation",
-    "customAutomation": "Custom automation",
-    "deleteAutomationConfirm": "Are you sure you want to delete this automation? This action cannot be undone.",
-    "deleteAutomation_one": "Delete {{count}} Automation",
-    "deleteAutomation_other": "Delete {{count}} Automations",
-    "deleteAutomationsConfirm": "Are you sure you want to delete? This action cannot be undone.",
+    "createAutomation": "",
+    "customAutomation": "",
+    "deleteAutomationConfirm": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_other": "",
+    "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "+{{count}} more",
-      "more_other": "+{{count}} more",
-      "noValues": "(none)",
-      "includesSameDevice": "includes same device",
-      "uniqueIps": "unique IPs",
-      "deviceTypesOnly": "{{types}} only",
-      "when": "When {{text}}",
-      "or": "or {{text}}",
-      "nothing": "nothing yet",
-      "onlyWhen": "only when",
-      "andAlso": "and also",
-      "allOf": "all of:",
-      "anyOf": "any of:",
-      "joinAll": "and",
-      "joinAny": "or",
-      "then": "then {{text}}",
-      "otherwise": "Otherwise",
-      "appliesTo": "Applies to {{name}}",
+      "more_one": "",
+      "more_other": "",
+      "noValues": "",
+      "includesSameDevice": "",
+      "uniqueIps": "",
+      "deviceTypesOnly": "",
+      "when": "",
+      "or": "",
+      "nothing": "",
+      "onlyWhen": "",
+      "andAlso": "",
+      "allOf": "",
+      "anyOf": "",
+      "joinAll": "",
+      "joinAny": "",
+      "then": "",
+      "otherwise": "",
+      "appliesTo": "",
       "duration": {
-        "minutes_one": "{{count}} minute",
-        "minutes_other": "{{count}} minutes",
-        "days_one": "{{count}} day",
-        "days_other": "{{count}} days"
+        "minutes_one": "",
+        "minutes_other": "",
+        "days_one": "",
+        "days_other": ""
       },
       "triggers": {
-        "sessionStarted": "a stream starts",
-        "sessionStopped": "a stream stops",
-        "sessionTranscodeChanged": "transcoding starts or stops",
-        "sessionPaused": "a stream is paused",
-        "sessionHeldFor": "a stream has been paused for {{duration}}",
-        "sessionHeldForTotal": "a stream has been paused for {{duration}} in total",
-        "accountInactiveFor": "an account has been inactive for {{duration}}",
-        "accountNewDevice": "an account plays from a new device",
-        "accountTrustChanged": "an account's trust score changes",
-        "mediaAdded": "media is added",
-        "mediaUpgraded": "media is upgraded",
-        "serverDown": "a server goes down",
-        "serverUp": "a server comes back up",
-        "pluginUpdateAvailable": "a plugin update is available",
-        "serverUpdateAvailable": "a server update is available",
-        "tracearrUpdateAvailable": "a Tracearr update is available"
+        "sessionStarted": "",
+        "sessionStopped": "",
+        "sessionTranscodeChanged": "",
+        "sessionPaused": "",
+        "sessionHeldFor": "",
+        "sessionHeldForTotal": "",
+        "accountInactiveFor": "",
+        "accountNewDevice": "",
+        "accountTrustChanged": "",
+        "mediaAdded": "",
+        "mediaUpgraded": "",
+        "serverDown": "",
+        "serverUp": "",
+        "pluginUpdateAvailable": "",
+        "serverUpdateAvailable": "",
+        "tracearrUpdateAvailable": ""
       },
       "operators": {
-        "eq": "is",
-        "neq": "is not",
-        "gt": "is above",
-        "gte": "is at least",
-        "lt": "is below",
-        "lte": "is at most",
-        "in": "is one of",
-        "not_in": "is not one of",
-        "contains": "contains",
-        "not_contains": "does not contain"
+        "eq": "",
+        "neq": "",
+        "gt": "",
+        "gte": "",
+        "lt": "",
+        "lte": "",
+        "in": "",
+        "not_in": "",
+        "contains": "",
+        "not_contains": ""
       },
       "fields": {
-        "concurrent_streams": "the stream count",
-        "active_session_distance_km": "the distance between streams",
-        "travel_speed_kmh": "the travel speed",
-        "unique_ips_in_window": "the number of IP addresses",
-        "unique_devices_in_window": "the number of devices",
-        "inactive_days": "the time since the last stream",
-        "current_pause_minutes": "the current pause",
-        "total_pause_minutes": "the total pause time",
-        "source_resolution": "the source resolution",
-        "output_resolution": "the output resolution",
-        "is_transcoding": "the transcoding",
-        "is_transcode_downgrade": "the downgrade",
-        "source_bitrate_mbps": "the source bitrate",
-        "user_id": "the user",
-        "trust_score": "the trust score",
-        "account_age_days": "the account age",
-        "device_type": "the device type",
-        "client_name": "the player",
-        "platform": "the platform",
-        "is_local_network": "the local network",
-        "country": "the country",
-        "ip_in_range": "the IP address",
-        "server_id": "the server",
-        "media_type": "the media type",
-        "library_item_type": "the item type",
-        "library_name": "the library",
-        "resolution_after": "the resolution",
-        "dynamic_range_after": "the dynamic range",
-        "video_codec_after": "the video codec",
-        "audio_channels_after": "the audio channels",
-        "file_size_after": "the file size"
+        "concurrent_streams": "",
+        "active_session_distance_km": "",
+        "travel_speed_kmh": "",
+        "unique_ips_in_window": "",
+        "unique_devices_in_window": "",
+        "inactive_days": "",
+        "current_pause_minutes": "",
+        "total_pause_minutes": "",
+        "source_resolution": "",
+        "output_resolution": "",
+        "is_transcoding": "",
+        "is_transcode_downgrade": "",
+        "source_bitrate_mbps": "",
+        "user_id": "",
+        "trust_score": "",
+        "account_age_days": "",
+        "device_type": "",
+        "client_name": "",
+        "platform": "",
+        "is_local_network": "",
+        "country": "",
+        "ip_in_range": "",
+        "server_id": "",
+        "media_type": "",
+        "library_item_type": "",
+        "library_name": "",
+        "resolution_after": "",
+        "dynamic_range_after": "",
+        "video_codec_after": "",
+        "audio_channels_after": "",
+        "file_size_after": ""
       },
       "states": {
         "is_local_network": {
-          "yes": "the user is on the local network",
-          "no": "the user is not on the local network"
+          "yes": "",
+          "no": ""
         },
         "is_transcode_downgrade": {
-          "yes": "the stream is downgraded",
-          "no": "the stream is not downgraded"
+          "yes": "",
+          "no": ""
         },
         "is_transcoding": {
           "video": {
-            "yes": "the stream is transcoding video",
-            "no": "the stream is not transcoding video"
+            "yes": "",
+            "no": ""
           },
           "audio": {
-            "yes": "the stream is transcoding audio",
-            "no": "the stream is not transcoding audio"
+            "yes": "",
+            "no": ""
           },
           "video_or_audio": {
-            "yes": "the stream is transcoding",
-            "no": "the stream is not transcoding"
+            "yes": "",
+            "no": ""
           },
           "neither": {
-            "yes": "the stream is not transcoding",
-            "no": "the stream is transcoding"
+            "yes": "",
+            "no": ""
           }
         }
       },
       "actions": {
-        "if": "if",
-        "flagIt": "Flag it",
-        "doNothing": "do nothing",
-        "send": "send to {{destinations}}",
-        "sendAnywhere": "send a notification",
-        "kill_stream": "stop the stream",
-        "message_client": "message the player",
-        "trustUp": "raise trust by {{amount}}",
-        "trustDown": "drop trust by {{amount}}",
-        "trustAdjust": "adjust trust by {{amount}}",
-        "trustSet": "set trust to {{value}}",
-        "trustReset": "reset trust"
+        "if": "",
+        "flagIt": "",
+        "doNothing": "",
+        "send": "",
+        "sendAnywhere": "",
+        "kill_stream": "",
+        "message_client": "",
+        "trustUp": "",
+        "trustDown": "",
+        "trustAdjust": "",
+        "trustSet": "",
+        "trustReset": ""
       },
       "scope": {
-        "server": "one server",
-        "account": "one account",
-        "person": "one person"
+        "server": "",
+        "account": "",
+        "person": ""
       },
-      "sameDeviceInput": "same device: {{input}}",
-      "uniqueIpsInput": "unique IPs: {{input}}",
+      "sameDeviceInput": "",
+      "uniqueIpsInput": "",
       "unbound": {
-        "server": "a chosen server",
-        "account": "a chosen account",
-        "person": "a chosen person",
-        "destinations": "a chosen destination",
-        "field_value": "a chosen value",
-        "select": "a chosen option",
-        "number": "a chosen number",
-        "duration": "a chosen length of time",
-        "text": "a chosen message",
-        "boolean": "a chosen setting",
-        "listed": "those chosen"
+        "server": "",
+        "account": "",
+        "person": "",
+        "destinations": "",
+        "field_value": "",
+        "select": "",
+        "number": "",
+        "duration": "",
+        "text": "",
+        "boolean": "",
+        "listed": ""
       }
     },
-    "description": "Automations watch your servers and act when their conditions match",
+    "description": "",
     "detail": {
-      "notFound": "Automation not found",
-      "title": "Automation",
-      "unsaved": "Unsaved changes",
-      "runsLine_one": "1 run · last run {{when}}",
-      "runsLine_other": "{{count}} runs · last run {{when}}",
-      "noRuns": "No runs yet"
+      "notFound": "",
+      "title": "",
+      "unsaved": "",
+      "runsLine_one": "",
+      "runsLine_other": "",
+      "noRuns": ""
     },
-    "disable": "Disable",
-    "editAutomation": "Edit Automation",
+    "disable": "",
+    "editAutomation": "",
     "effects": {
-      "title": "What this will do",
-      "kill": "Can stop a stream that is playing.",
-      "trust": "Changes trust scores.",
-      "message": "Puts a message on a player.",
-      "violation": "Records a violation against the matched person.",
-      "tellsOnly": "Only notifies. Never stops a stream or changes an account.",
-      "allServers": "Runs on every server unless one is chosen.",
-      "everyServer": "Runs on every server.",
-      "oneServer": "Runs on {{server}} only."
+      "title": "",
+      "kill": "",
+      "trust": "",
+      "message": "",
+      "violation": "",
+      "tellsOnly": "",
+      "allServers": "",
+      "everyServer": "",
+      "oneServer": ""
     },
-    "emptyTitle": "No automations yet",
-    "emptyDescription": "Ready-made automations. Pick one and fill in the blanks.",
-    "emptySeeAll": "See all {{count}}",
-    "emptySeeAllLoading": "See all",
-    "enable": "Enable",
+    "emptyTitle": "",
+    "emptyDescription": "",
+    "emptySeeAll": "",
+    "emptySeeAllLoading": "",
+    "enable": "",
     "evaluations": {
-      "disclosure": "Matches that did not start a run ({{total}})",
+      "disclosure": "",
       "reasons": {
-        "cooldown_active": "Cooldown was active",
-        "edge_replayed": "Same edge already handled",
-        "gate_blocked": "An open run already covers this",
-        "trigger_filter_failed": "Trigger threshold not reached"
+        "cooldown_active": "",
+        "edge_replayed": "",
+        "gate_blocked": "",
+        "trigger_filter_failed": ""
       }
     },
     "export": {
-      "title": "Share this automation",
-      "description": "A code another Tracearr can paste in.",
-      "carries": "The code carries the steps only. Destinations, servers and accounts are not included; the receiving side fills in its own.",
-      "copyCode": "Copy the share code",
-      "copyJson": "Copy the JSON",
-      "authorLabel": "Author",
-      "authorPlaceholder": "Name",
-      "authorHelper": "Shown on the gallery page and carried in the code. Optional.",
-      "save": "Save as ready-made",
-      "saved": "{{name}} saved as a ready-made automation.",
-      "saveFailed": "Could not save it.",
-      "failed": "Couldn't make a code for this one.",
-      "saveHelper": "Adds it to this server's list of ready-made automations.",
-      "authorInCode": "The code includes the author name.",
-      "groupLabel": "Section",
-      "groupHelper": "Which part of the gallery it is listed under.",
+      "title": "",
+      "description": "",
+      "carries": "",
+      "copyCode": "",
+      "copyJson": "",
+      "authorLabel": "",
+      "authorPlaceholder": "",
+      "authorHelper": "",
+      "save": "",
+      "saved": "",
+      "saveFailed": "",
+      "failed": "",
+      "saveHelper": "",
+      "authorInCode": "",
+      "groupLabel": "",
+      "groupHelper": "",
       "gallery": {
-        "trigger": "Put this in the community gallery",
-        "body": "The gallery at docs.tracearr.com/templates lists shared automations. Adding one is a pull request to Tracearr/automation-templates with the JSON below. Tracearr never reads the gallery."
+        "trigger": "",
+        "body": ""
       },
-      "openRepository": "Open the repository"
+      "openRepository": ""
     },
     "fields": {
       "concurrent_streams": {
-        "label": "Concurrent Streams",
-        "description": "Number of active streams from the same user"
+        "label": "",
+        "description": ""
       },
       "active_session_distance_km": {
-        "label": "Distance Between Sessions",
-        "description": "Distance between simultaneous sessions"
+        "label": "",
+        "description": ""
       },
       "travel_speed_kmh": {
-        "label": "Travel Speed",
-        "description": "Calculated travel speed between locations"
+        "label": "",
+        "description": ""
       },
       "unique_ips_in_window": {
-        "label": "Unique IPs in Window",
-        "description": "Number of unique IP addresses in the time window"
+        "label": "",
+        "description": ""
       },
       "unique_devices_in_window": {
-        "label": "Unique Devices in Window",
-        "description": "Number of unique devices in the time window"
+        "label": "",
+        "description": ""
       },
       "inactive_days": {
-        "label": "Days Inactive",
-        "description": "Days since last activity"
+        "label": "",
+        "description": ""
       },
       "current_pause_minutes": {
-        "label": "Current Pause Duration",
-        "description": "How long the session has been continuously paused"
+        "label": "",
+        "description": ""
       },
       "total_pause_minutes": {
-        "label": "Total Pause Duration",
-        "description": "Total accumulated pause time across all pause/resume cycles"
+        "label": "",
+        "description": ""
       },
       "source_resolution": {
-        "label": "Source Resolution",
-        "description": "Original media resolution"
+        "label": "",
+        "description": ""
       },
       "output_resolution": {
-        "label": "Output Resolution",
-        "description": "Transcoded or delivered resolution"
+        "label": "",
+        "description": ""
       },
       "is_transcoding": {
-        "label": "Is Transcoding",
-        "description": "Whether video or audio streams are being transcoded"
+        "label": "",
+        "description": ""
       },
       "is_transcode_downgrade": {
-        "label": "Transcode Downgrade",
-        "description": "Output resolution is lower than source"
+        "label": "",
+        "description": ""
       },
       "source_bitrate_mbps": {
-        "label": "Source Bitrate",
-        "description": "Original media bitrate"
+        "label": "",
+        "description": ""
       },
       "user_id": {
-        "label": "User",
-        "description": "Specific users by account",
-        "placeholder": "Select users…"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "trust_score": {
-        "label": "Trust Score",
-        "description": "The user's trust score, from 0 to 100"
+        "label": "",
+        "description": ""
       },
       "account_age_days": {
-        "label": "Account Age",
-        "description": "Days since account creation"
+        "label": "",
+        "description": ""
       },
       "device_type": {
-        "label": "Device Type",
-        "description": "Type of device used"
+        "label": "",
+        "description": ""
       },
       "client_name": {
-        "label": "Client/Player",
-        "description": "Media player application",
-        "placeholder": "e.g., Plex for iOS"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "platform": {
-        "label": "Platform/OS",
-        "description": "Operating system"
+        "label": "",
+        "description": ""
       },
       "is_local_network": {
-        "label": "Local Network",
-        "description": "Streaming from the local network"
+        "label": "",
+        "description": ""
       },
       "country": {
-        "label": "Country",
-        "description": "Geographic country",
-        "placeholder": "Select countries…"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "ip_in_range": {
-        "label": "IP Range",
-        "description": "IP address in a CIDR range, IPv4 or IPv6",
-        "placeholder": "e.g., 192.168.1.0/24 or 2001:db8:abcd:7800::/64"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "server_id": {
-        "label": "Server",
-        "description": "Specific media server",
-        "placeholder": "Select servers…"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "media_type": {
-        "label": "Media Type",
-        "description": "Type of content"
+        "label": "",
+        "description": ""
       },
       "library_item_type": {
-        "label": "Item Type",
-        "description": "What kind of library item it is"
+        "label": "",
+        "description": ""
       },
       "library_name": {
-        "label": "Library",
-        "description": "Name of the library it landed in",
-        "placeholder": "Movies"
+        "label": "",
+        "description": "",
+        "placeholder": ""
       },
       "resolution_after": {
-        "label": "Resolution",
-        "description": "Resolution the item ends up at"
+        "label": "",
+        "description": ""
       },
       "dynamic_range_after": {
-        "label": "Dynamic Range",
-        "description": "HDR format the item ends up with"
+        "label": "",
+        "description": ""
       },
       "video_codec_after": {
-        "label": "Video Codec",
-        "description": "Video codec the item ends up with"
+        "label": "",
+        "description": ""
       },
       "audio_channels_after": {
-        "label": "Audio Channels",
-        "description": "Audio channel count the item ends up with"
+        "label": "",
+        "description": ""
       },
       "file_size_after": {
-        "label": "File Size",
-        "description": "Size the item ends up at, across every copy"
+        "label": "",
+        "description": ""
       }
     },
     "gallery": {
-      "title": "New automation",
-      "description": "Ready-made automations. Pick one and fill in the blanks.",
-      "searchPlaceholder": "Search",
-      "noMatches": "Nothing matches “{{query}}”.",
-      "noMatchesHint": "Try a word from the outcome: discord, offline, paused.",
+      "title": "",
+      "description": "",
+      "searchPlaceholder": "",
+      "noMatches": "",
+      "noMatchesHint": "",
       "group": {
-        "notifications": "Notifications",
-        "server_health": "Server health",
-        "policies": "Limits and rules",
-        "housekeeping": "Housekeeping",
-        "other": "Other ways to start"
+        "notifications": "",
+        "server_health": "",
+        "policies": "",
+        "housekeeping": "",
+        "other": ""
       },
-      "builtin": "Built-in",
+      "builtin": "",
       "kind": {
-        "policy": "A violation",
-        "notification": "An alert"
+        "policy": "",
+        "notification": ""
       },
       "paste": {
-        "title": "Paste a share code",
-        "description": "Paste a code and review what it does before adding it."
+        "title": "",
+        "description": ""
       },
       "scratch": {
-        "title": "Start from scratch",
-        "description": "Build it step by step."
+        "title": "",
+        "description": ""
       },
-      "failed": "Couldn't load the ready-made automations.",
-      "retry": "Try again",
-      "missing": "That ready-made automation is not on this server.",
+      "failed": "",
+      "retry": "",
+      "missing": "",
       "hint": {
-        "move": "move",
-        "use": "use",
-        "close": "close"
+        "move": "",
+        "use": "",
+        "close": ""
       },
-      "loading": "Loading…"
+      "loading": ""
     },
     "import": {
-      "title": "Paste a share code",
-      "description": "Paste the code. Everything is in the code; Tracearr fetches nothing.",
-      "reviewDescription": "What the code does, and what to fill in.",
-      "placeholder": "tracearr1.…",
-      "formatHint": "A code starts with tracearr1.",
-      "check": "Check it",
-      "checking": "Reading it…",
-      "valid": "Tracearr can read this code.",
-      "madeBy": "Author: {{author}}, as written in the code",
-      "codeShort": "Code {{fingerprint}}",
+      "title": "",
+      "description": "",
+      "reviewDescription": "",
+      "placeholder": "",
+      "formatHint": "",
+      "check": "",
+      "checking": "",
+      "valid": "",
+      "madeBy": "",
+      "codeShort": "",
       "paused": {
-        "label": "Start paused",
-        "helper": "Turn it on from the list after review."
+        "label": "",
+        "helper": ""
       },
-      "submit": "Add it",
-      "adding": "Adding it…",
-      "existing": "Already saved as {{name}}.",
-      "existingUse": "Use it",
+      "submit": "",
+      "adding": "",
+      "existing": "",
+      "existingUse": "",
       "collision": {
-        "title": "A different automation named {{name}} already exists.",
-        "add": "Keep both",
-        "replace": "Replace mine"
+        "title": "",
+        "add": "",
+        "replace": ""
       },
-      "raw": "Show the JSON",
+      "raw": "",
       "errors": {
-        "notACode": "That doesn't look like a Tracearr share code.",
-        "notACodeHint": "A code starts with tracearr1. The JSON works too.",
-        "tooBig": "That's too big to be a Tracearr automation.",
-        "tooBigHint": "Codes are a few thousand characters at most.",
-        "truncated": "This code looks cut off.",
-        "truncatedHint": "Copy the whole code and paste it again; some chat apps split long codes across lines.",
-        "tooNew": "This needs Tracearr {{required}} or newer.",
-        "tooNewHint": "This server runs {{current}}. Update Tracearr, then paste again.",
-        "tooMany": "That's a lot of codes in one minute.",
-        "tooManyHint": "Wait a moment, then check it again.",
-        "rejected": "Tracearr couldn't read this one.",
-        "rejectedHint": "It may come from a different tool or have been edited by hand."
+        "notACode": "",
+        "notACodeHint": "",
+        "tooBig": "",
+        "tooBigHint": "",
+        "truncated": "",
+        "truncatedHint": "",
+        "tooNew": "",
+        "tooNewHint": "",
+        "tooMany": "",
+        "tooManyHint": "",
+        "rejected": "",
+        "rejectedHint": ""
       },
-      "source": "Shared automations are listed at docs.tracearr.com/templates.",
-      "validCaveat": "Nothing in a code says who wrote it or whether it is safe. The steps are below.",
-      "builtinMatch": "This is {{name}}, one of the automations Tracearr ships."
+      "source": "",
+      "validCaveat": "",
+      "builtinMatch": ""
     },
     "kind": {
-      "policy": "Violation",
-      "notification": "Alert"
+      "policy": "",
+      "notification": ""
     },
-    "kindColumn": "Kind",
-    "name": "Automation Name",
-    "newAutomation": "New automation",
-    "namePlaceholder": "A name for this automation",
-    "nameInvalid": "Give it a name.",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "What this is for",
-    "thisAutomation": "This automation",
-    "cooldownLabel": "At most once every",
-    "cooldownInvalid": "Enter a whole number of minutes, 0 or more, or leave it empty.",
-    "retentionLabel": "Keep runs for",
-    "retentionPlaceholder": "{{days}}",
-    "retentionInvalid": "Enter a whole number of days, at least 1, or leave it empty.",
-    "noAutomationsFound": "No automations found",
+    "kindColumn": "",
+    "name": "",
+    "newAutomation": "",
+    "namePlaceholder": "",
+    "nameInvalid": "",
+    "descriptionLabel": "",
+    "descriptionPlaceholder": "",
+    "thisAutomation": "",
+    "cooldownLabel": "",
+    "cooldownInvalid": "",
+    "retentionLabel": "",
+    "retentionPlaceholder": "",
+    "retentionInvalid": "",
+    "noAutomationsFound": "",
     "operators": {
-      "eq": "equals",
-      "neq": "not equals",
-      "gt": "greater than",
-      "gte": "at least",
-      "lt": "less than",
-      "lte": "at most",
-      "in": "is one of",
-      "not_in": "is not one of",
-      "contains": "contains",
-      "not_contains": "does not contain"
+      "eq": "",
+      "neq": "",
+      "gt": "",
+      "gte": "",
+      "lt": "",
+      "lte": "",
+      "in": "",
+      "not_in": "",
+      "contains": "",
+      "not_contains": ""
     },
     "options": {
-      "4K": "4K (2160p)",
-      "1080p": "1080p",
-      "720p": "720p",
-      "480p": "480p",
-      "SD": "SD",
-      "unknown": "Unknown",
-      "mobile": "Mobile",
-      "tablet": "Tablet",
-      "tv": "TV",
-      "desktop": "Desktop",
-      "browser": "Browser",
-      "ios": "iOS",
-      "android": "Android",
-      "windows": "Windows",
-      "macos": "macOS",
-      "linux": "Linux",
-      "tvos": "tvOS",
-      "androidtv": "Android TV",
-      "roku": "Roku",
-      "webos": "webOS",
-      "tizen": "Tizen",
-      "movie": "Movie",
-      "episode": "TV Episode",
-      "track": "Music",
-      "photo": "Photo",
-      "live": "Live TV",
-      "trailer": "Trailer",
-      "video": "Video",
-      "audio": "Audio",
-      "video_or_audio": "Video or Audio",
-      "neither": "Neither (Direct Play)",
-      "8K": "8K",
-      "1440p": "1440p",
-      "sdr": "SDR",
-      "hdr": "HDR",
-      "hdr10": "HDR10",
-      "hdr10+": "HDR10+",
-      "hlg": "HLG",
-      "dolby vision": "Dolby Vision",
+      "4K": "",
+      "1080p": "",
+      "720p": "",
+      "480p": "",
+      "SD": "",
+      "unknown": "",
+      "mobile": "",
+      "tablet": "",
+      "tv": "",
+      "desktop": "",
+      "browser": "",
+      "ios": "",
+      "android": "",
+      "windows": "",
+      "macos": "",
+      "linux": "",
+      "tvos": "",
+      "androidtv": "",
+      "roku": "",
+      "webos": "",
+      "tizen": "",
+      "movie": "",
+      "episode": "",
+      "track": "",
+      "photo": "",
+      "live": "",
+      "trailer": "",
+      "video": "",
+      "audio": "",
+      "video_or_audio": "",
+      "neither": "",
+      "8K": "",
+      "1440p": "",
+      "sdr": "",
+      "hdr": "",
+      "hdr10": "",
+      "hdr10+": "",
+      "hlg": "",
+      "dolby vision": "",
       "libraryItemType": {
-        "movie": "Movie",
-        "show": "Show",
-        "season": "Season",
-        "episode": "Episode",
-        "artist": "Artist",
-        "album": "Album",
-        "track": "Track",
-        "photo": "Photo"
+        "movie": "",
+        "show": "",
+        "season": "",
+        "episode": "",
+        "artist": "",
+        "album": "",
+        "track": "",
+        "photo": ""
       }
     },
     "provenance": {
-      "builtin": "Built-in · {{name}} {{version}}",
-      "imported": "Imported from a share code on {{date}} · {{name}} {{version}}",
-      "importedBy": "Imported from a share code by {{author}} on {{date}} · {{name}} {{version}}",
-      "saved": "Saved here from {{name}} on {{date}} · {{version}}",
-      "customized": "Customized from {{name}}",
-      "customizedFromRemoved": "Customized from a ready-made automation that has since been removed"
+      "builtin": "",
+      "imported": "",
+      "importedBy": "",
+      "saved": "",
+      "customized": "",
+      "customizedFromRemoved": ""
     },
-    "recordsOnly": "Records runs only",
+    "recordsOnly": "",
     "scope": {
-      "global": "Global",
-      "person": "Person",
-      "account": "Account",
-      "crossServer": "Cross-server"
+      "global": "",
+      "person": "",
+      "account": "",
+      "crossServer": ""
     },
-    "searchPlaceholder": "Search automations…",
+    "searchPlaceholder": "",
     "sessionTargets": {
       "triggering": {
-        "label": "Triggering session",
-        "tooltip": "Only the session that triggered this automation"
+        "label": "",
+        "tooltip": ""
       },
       "oldest": {
-        "label": "Oldest session",
-        "tooltip": "The user's longest-running active session"
+        "label": "",
+        "tooltip": ""
       },
       "newest": {
-        "label": "Newest session",
-        "tooltip": "The user's most recently started session"
+        "label": "",
+        "tooltip": ""
       },
       "all_except_one": {
-        "label": "All except one (keep oldest)",
-        "tooltip": "All sessions except the oldest, bringing the user down to one stream"
+        "label": "",
+        "tooltip": ""
       },
       "all_user": {
-        "label": "All user sessions",
-        "tooltip": "Every active session for this user"
+        "label": "",
+        "tooltip": ""
       }
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": "Cooldown"
+        "label": ""
       },
       "target": {
-        "label": "Target"
+        "label": ""
       },
       "message": {
-        "label": "Message"
+        "label": ""
       }
     },
     "trustModes": {
       "adjust": {
-        "label": "Adjust by amount"
+        "label": ""
       },
       "set": {
-        "label": "Set to value"
+        "label": ""
       },
       "reset": {
-        "label": "Reset to default (100)"
+        "label": ""
       }
     },
     "severity": {
-      "low": "Low",
-      "warning": "Warning",
-      "high": "High"
+      "low": "",
+      "warning": "",
+      "high": ""
     },
     "template": {
-      "version": "v{{version}}",
-      "updateAvailable": "An update is available",
-      "updatedTitle": "The ready-made automation is now on v{{version}}",
-      "updatedBody": "Review the answers below, then update.",
-      "before": "Now",
-      "after": "After the update",
-      "review": "Review and update",
-      "save": "Save changes",
-      "customize": "Customize",
-      "customizeTitle": "Open this in the builder?",
-      "customizeConfirm": "Opening it in the builder makes this automation independent: every step is editable, and it no longer receives updates from the ready-made one. This cannot be undone.",
-      "customizeConfirmAction": "Customize it",
-      "customizeFirst": "This automation follows a ready-made one. Open it in the builder first.",
-      "customizeFailed": "Could not open it in the builder.",
-      "upgradeFailed": "Couldn't update that. Try again.",
-      "gone": "The ready-made automation this was built from is no longer on this server.",
-      "doorsHelper": "The steps come from the ready-made automation and are fixed. Open in the builder makes every step editable and ends the link."
+      "version": "",
+      "updateAvailable": "",
+      "updatedTitle": "",
+      "updatedBody": "",
+      "before": "",
+      "after": "",
+      "review": "",
+      "save": "",
+      "customize": "",
+      "customizeTitle": "",
+      "customizeConfirm": "",
+      "customizeConfirmAction": "",
+      "customizeFirst": "",
+      "customizeFailed": "",
+      "upgradeFailed": "",
+      "gone": "",
+      "doorsHelper": ""
     },
     "templates": {
       "account-inactivity": {
-        "name": "Inactive account",
-        "description": "Raise a violation when an account goes unused for the days you allow.",
-        "keywords": "idle dormant unused stale cleanup inactive account"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "concurrent-streams": {
-        "name": "Too many streams at once",
-        "description": "Raise a violation when an account plays more streams at once than you allow.",
-        "keywords": "limit cap concurrent simultaneous sharing too many streams"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "device-velocity": {
-        "name": "Many IPs in a window",
-        "description": "Raise a violation when an account streams from more IP addresses in a window than you allow.",
-        "keywords": "ip addresses vpn sharing devices window"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "geo-restriction": {
-        "name": "Blocked countries",
-        "description": "Raise a violation when a stream comes from a country you block.",
-        "keywords": "country geo vpn abroad region block travel"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "impossible-travel": {
-        "name": "Impossible travel",
-        "description": "Raise a violation when two sessions sit further apart than anyone could travel between them.",
-        "keywords": "vpn travel speed distance location sharing"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "kill-paused-streams": {
-        "name": "Stop paused streams",
-        "description": "Stop a stream that has sat paused past the minutes you allow.",
-        "keywords": "pause idle afk stop kill terminate reclaim"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "media-added": {
-        "name": "New media added",
-        "description": "Tell a destination when a library item shows up for the first time.",
-        "keywords": "new library movie episode added import notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "media-upgraded": {
-        "name": "Media upgraded",
-        "description": "Tell a destination when a library item changes quality.",
-        "keywords": "upgrade quality remux 4k resolution replaced notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "new-device": {
-        "name": "New device",
-        "description": "Tell a destination the first time an account streams from a device you have not seen.",
-        "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "no-4k-transcodes": {
-        "name": "No 4K transcodes",
-        "description": "Stop a stream that transcodes 4K source video.",
-        "keywords": "4k transcode quality cpu bandwidth stop"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "paused-too-long": {
-        "name": "Paused too long",
-        "description": "Tell a destination when a stream sits paused past the minutes you allow.",
-        "keywords": "pause idle afk stuck abandoned notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "plugin-update": {
-        "name": "Tracearr plugin update",
-        "description": "Tell a destination when a server has a newer Tracearr plugin to install.",
-        "keywords": "plugin update upgrade version release notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "server-down": {
-        "name": "Server down",
-        "description": "Tell a destination when a media server stops answering.",
-        "keywords": "offline outage unreachable down notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "server-up": {
-        "name": "Server back up",
-        "description": "Tell a destination when a media server answers again.",
-        "keywords": "online recovered restored back up notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "server-update": {
-        "name": "Media server update",
-        "description": "Tell a destination when a media server has an update available.",
-        "keywords": "update upgrade version release plex jellyfin emby notify discord"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "simultaneous-locations": {
-        "name": "Two places at once",
-        "description": "Raise a violation when one account streams from two distant places at the same time.",
-        "keywords": "distance location sharing vpn two places at once"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "stream-ended": {
-        "name": "Stream ended",
-        "description": "Tell a destination every time a stream stops.",
-        "keywords": "stop end finish playback notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "stream-started": {
-        "name": "Stream started",
-        "description": "Tell a destination every time a stream starts.",
-        "keywords": "play watch begin start viewing notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "tracearr-update": {
-        "name": "Tracearr update",
-        "description": "Tell a destination when a new Tracearr release is out.",
-        "keywords": "update upgrade version release tracearr notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "transcode-started": {
-        "name": "Stream is transcoding",
-        "description": "Tell a destination when a stream transcodes video or audio.",
-        "keywords": "transcode convert cpu direct play quality notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "trust-score-changed": {
-        "name": "Trust score changed",
-        "description": "Tell a destination when an account's trust score changes.",
-        "keywords": "trust score reputation penalty adjusted notify discord email webhook"
+        "name": "",
+        "description": "",
+        "keywords": ""
       }
     },
-    "title": "Automations",
-    "toggleAutomation": "Turn {{name}} on or off",
-    "tryAdjustingFilters": "Try adjusting your filters.",
+    "title": "",
+    "toggleAutomation": "",
+    "tryAdjustingFilters": "",
     "units": {
-      "km": "km",
-      "kmh": "km/h",
-      "mbps": "Mbps",
-      "days": "days",
-      "minutes": "minutes",
-      "hours": "hours",
-      "gb": "GB",
-      "seconds": "seconds"
+      "km": "",
+      "kmh": "",
+      "mbps": "",
+      "days": "",
+      "minutes": "",
+      "hours": "",
+      "gb": "",
+      "seconds": ""
     },
-    "updateAutomation": "Update Automation",
+    "updateAutomation": "",
     "catalog": {
       "groups": {
-        "sessions": "Sessions",
-        "accounts": "Accounts",
-        "library": "Library",
-        "servers": "Servers",
-        "updates": "Updates",
-        "notify": "Notify",
-        "policy": "Policy",
-        "control": "Control flow"
+        "sessions": "",
+        "accounts": "",
+        "library": "",
+        "servers": "",
+        "updates": "",
+        "notify": "",
+        "policy": "",
+        "control": ""
       },
-      "suggested": "Suggested",
+      "suggested": "",
       "triggers": {
         "sessionStarted": {
-          "description": "The moment play is pressed.",
-          "synonyms": "play, watch, begin, start, viewing"
+          "description": "",
+          "synonyms": ""
         },
         "sessionStopped": {
-          "description": "Playback ends, however it ended.",
-          "synonyms": "end, finish, quit, close"
+          "description": "",
+          "synonyms": ""
         },
         "sessionTranscodeChanged": {
-          "description": "The server switches a stream between direct play and transcoding.",
-          "synonyms": "transcode, convert, direct play, cpu"
+          "description": "",
+          "synonyms": ""
         },
         "sessionPaused": {
-          "description": "The moment a stream is paused.",
-          "synonyms": "pause, hold, idle"
+          "description": "",
+          "synonyms": ""
         },
         "sessionHeldFor": {
-          "label": "A stream sits paused",
-          "description": "A stream has been paused longer than the set number of minutes.",
-          "synonyms": "pause, idle, abandoned, stuck, afk"
+          "label": "",
+          "description": "",
+          "synonyms": ""
         },
         "accountInactiveFor": {
-          "label": "An account goes quiet",
-          "description": "An account has watched nothing for the set number of days.",
-          "synonyms": "inactive, dormant, unused, stale, cleanup"
+          "label": "",
+          "description": "",
+          "synonyms": ""
         },
         "accountNewDevice": {
-          "description": "An account streams from a device for the first time.",
-          "synonyms": "device, new, unknown, unrecognized, phone, login, sharing"
+          "description": "",
+          "synonyms": ""
         },
         "accountTrustChanged": {
-          "description": "An account's trust score changes, whether an automation or an owner moved it.",
-          "synonyms": "trust, score, reputation, penalty, adjusted"
+          "description": "",
+          "synonyms": ""
         },
         "mediaAdded": {
-          "description": "A library item shows up on a server for the first time.",
-          "synonyms": "new, added, library, movie, episode, import"
+          "description": "",
+          "synonyms": ""
         },
         "mediaUpgraded": {
-          "description": "A library item that was already there changes quality.",
-          "synonyms": "upgrade, quality, replaced, remux, 4k, resolution"
+          "description": "",
+          "synonyms": ""
         },
         "serverDown": {
-          "description": "A media server stops answering.",
-          "synonyms": "unreachable, offline, outage, down"
+          "description": "",
+          "synonyms": ""
         },
         "serverUp": {
-          "description": "A media server answers again.",
-          "synonyms": "online, recovered, restored, back"
+          "description": "",
+          "synonyms": ""
         },
         "pluginUpdateAvailable": {
-          "description": "The Tracearr plugin on a server has a newer release.",
-          "synonyms": "plugin, upgrade, version, release"
+          "description": "",
+          "synonyms": ""
         },
         "serverUpdateAvailable": {
-          "description": "A media server has a newer release.",
-          "synonyms": "upgrade, version, release, patch"
+          "description": "",
+          "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "Tracearr itself has a newer release.",
-          "synonyms": "upgrade, version, release, self"
+          "description": "",
+          "synonyms": ""
         }
       },
       "actions": {
         "send": {
-          "synonyms": "notify, alert, discord, email, webhook, push"
+          "synonyms": ""
         },
         "trust": {
-          "synonyms": "score, reputation, penalise, reward"
+          "synonyms": ""
         },
         "kill_stream": {
-          "synonyms": "stop, terminate, cut, end playback"
+          "synonyms": ""
         },
         "message_client": {
-          "synonyms": "warn, tell, notice, on screen"
+          "synonyms": ""
         },
         "if": {
-          "label": "Branch on a condition",
-          "description": "Run one set of steps when a condition holds and another when it does not.",
-          "synonyms": "if, else, otherwise, branch, split, condition"
+          "label": "",
+          "description": "",
+          "synonyms": ""
         }
       }
     },
     "filters": {
-      "source": "Where it came from",
-      "allSources": "Anywhere",
+      "source": "",
+      "allSources": "",
       "sources": {
-        "builtin": "Built-in",
-        "import": "Imported",
-        "local": "Saved here",
-        "own": "Built in the builder"
+        "builtin": "",
+        "import": "",
+        "local": "",
+        "own": ""
       },
-      "trigger": "What starts it",
-      "allTriggers": "All triggers"
+      "trigger": "",
+      "allTriggers": ""
     },
-    "openGallery": "Open the gallery"
+    "openGallery": ""
   },
   "terminateStream": {
-    "title": "Terminate Stream",
-    "stopMedia": "Stop \"{{mediaTitle}}\" for @{{username}}?",
-    "messageLabel": "Message to user (optional)",
-    "messagePlaceholder": "e.g., Please don't share your account",
-    "messageHint": "This message will be shown to them during playback",
-    "terminating": "Terminating...",
-    "killStream": "Kill Stream"
+    "title": "스트림 종료",
+    "stopMedia": "@{{username}}님의 \"{{mediaTitle}}\" 재생을 중지할까요?",
+    "messageLabel": "사용자에게 보낼 메시지(선택 사항)",
+    "messagePlaceholder": "예: 계정을 공유하지 말아 주세요",
+    "messageHint": "이 메시지는 재생 중 사용자에게 표시됩니다",
+    "terminating": "종료 중...",
+    "killStream": "스트림 강제 종료"
   },
   "notFound": {
-    "title": "404",
-    "heading": "Page Not Found",
-    "description": "The page you're looking for doesn't exist or has been moved."
+    "title": "",
+    "heading": "페이지를 찾을 수 없습니다",
+    "description": "찾으시는 페이지가 없거나 이동되었습니다."
   },
   "settings": {
     "plex": {
-      "noServersFound": "No Plex servers found",
-      "noServersFoundHint": "Make sure you own at least one Plex server",
-      "noReachableConnections": "No reachable connections",
-      "local": "Local",
-      "remote": "Remote",
-      "custom": "Custom",
-      "secure": "Secure",
-      "mayNotConnect": "May not connect",
-      "recommended": "Recommended",
-      "customUrl": "Custom URL",
+      "noServersFound": "Plex 서버를 찾을 수 없습니다",
+      "noServersFoundHint": "소유한 Plex 서버가 하나 이상 있는지 확인하세요",
+      "noReachableConnections": "연결 가능한 항목이 없습니다",
+      "local": "로컬",
+      "remote": "원격",
+      "custom": "사용자 지정",
+      "secure": "보안",
+      "mayNotConnect": "연결되지 않을 수 있음",
+      "recommended": "권장",
+      "customUrl": "사용자 지정 URL",
       "connectionError": {
-        "timeout": "Timed out",
-        "dns": "DNS error",
-        "refused": "Connection refused",
-        "unreachable": "Host unreachable",
-        "reset": "Connection reset",
-        "tls": "TLS error",
-        "http": "HTTP {{status}}",
-        "unknown": "Connection failed"
+        "timeout": "시간 초과",
+        "dns": "DNS 오류",
+        "refused": "연결 거부됨",
+        "unreachable": "호스트에 도달할 수 없음",
+        "reset": "연결이 재설정됨",
+        "tls": "TLS 오류",
+        "http": "",
+        "unknown": "연결 실패"
       },
-      "connectionsReachable": "{{reachable}} of {{total}} connections reachable",
-      "connectionsAvailable": "{{count}} connections available",
-      "hideFiltered": "Hide filtered",
-      "showAll": "Show all",
-      "moreConnections": "+{{count}} more connections",
-      "connectingTo": "Connecting to {{name}}...",
-      "noAccountsLinked": "No Plex Accounts Linked",
-      "noAccountsLinkedHint": "Link a Plex account to add Plex servers to Tracearr.",
-      "linkPlexAccount": "Link Plex Account",
-      "linkAnotherAccount": "Link Another Plex Account",
-      "linking": "Linking...",
-      "accountsLinked_one": "{{count}} Plex account linked",
-      "accountsLinked_other": "{{count}} Plex accounts linked",
-      "noAccountsLinkedShort": "No Plex accounts linked",
-      "loginEnabled": "Login Enabled",
-      "serversConnected_one": "{{count}} server connected",
-      "serversConnected_other": "{{count}} servers connected",
-      "unlinkAccount": "Unlink this Plex account",
-      "reauthorizeAccount": "Reauthorize this Plex account",
-      "deleteServersFirst": "Delete connected servers first to unlink this account",
-      "linkedAccounts": "Linked Plex Accounts",
-      "linkedAccountsDesc": "Manage the Plex accounts you can add servers from.",
-      "noAccountsYet": "No Plex accounts linked yet.",
-      "unlinkPlexAccount": "Unlink Plex Account",
-      "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
+      "connectionsReachable": "전체 {{total}}개 중 {{reachable}}개 연결 가능",
+      "connectionsAvailable": "사용 가능한 연결 {{count}}개",
+      "hideFiltered": "필터링된 항목 숨기기",
+      "showAll": "모두 보기",
+      "moreConnections": "연결 {{count}}개 더 보기",
+      "connectingTo": "{{name}}에 연결 중...",
+      "noAccountsLinked": "연결된 Plex 계정이 없습니다",
+      "noAccountsLinkedHint": "Tracearr에 Plex 서버를 추가하려면 Plex 계정을 연결하세요.",
+      "linkPlexAccount": "Plex 계정 연결",
+      "linkAnotherAccount": "다른 Plex 계정 연결",
+      "linking": "연결 중...",
+      "accountsLinked_one": "Plex 계정 {{count}}개 연결됨",
+      "accountsLinked_other": "Plex 계정 {{count}}개 연결됨",
+      "noAccountsLinkedShort": "연결된 Plex 계정 없음",
+      "loginEnabled": "로그인 활성화됨",
+      "serversConnected_one": "서버 {{count}}대 연결됨",
+      "serversConnected_other": "서버 {{count}}대 연결됨",
+      "unlinkAccount": "이 Plex 계정 연결 해제",
+      "reauthorizeAccount": "",
+      "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
+      "linkedAccounts": "연결된 Plex 계정",
+      "linkedAccountsDesc": "서버를 추가할 때 사용할 Plex 계정을 관리하세요.",
+      "noAccountsYet": "아직 연결된 Plex 계정이 없습니다.",
+      "unlinkPlexAccount": "Plex 계정 연결 해제",
+      "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다."
     },
     "destinations": {
-      "add": "Add destination",
-      "builtinNote": "Built in",
-      "clearSecret": "Clear",
-      "delete": "Delete",
-      "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
-      "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
-      "empty": "No destinations yet.",
+      "add": "",
+      "builtinNote": "",
+      "clearSecret": "",
+      "delete": "",
+      "deleteConfirm": "",
+      "description": "",
+      "empty": "",
       "fields": {
-        "webhookUrl": "Webhook URL",
-        "url": "URL",
-        "serverUrl": "Server URL",
-        "apiUrl": "API URL",
-        "topic": "Topic",
-        "authToken": "Auth token",
-        "userKey": "User key",
-        "apiToken": "API token"
+        "webhookUrl": "",
+        "url": "",
+        "serverUrl": "",
+        "apiUrl": "",
+        "topic": "",
+        "authToken": "",
+        "userKey": "",
+        "apiToken": ""
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": ""
       },
-      "ownerOnly": "Only the owner can manage notification destinations.",
-      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
-      "receiveViolations": "Receive violations",
-      "receiveViolationsHint": "Send every violation to this destination",
-      "reencrypt": "Re-enter this destination's secret",
-      "secretSet": "Set (leave blank to keep)",
-      "test": "Test",
-      "testHint": "Save first to test",
-      "testNeedsForm": "Fill in the required fields to test",
-      "title": "Notification destinations",
+      "ownerOnly": "",
+      "pushNote": "",
+      "receiveViolations": "",
+      "receiveViolationsHint": "",
+      "reencrypt": "",
+      "secretSet": "",
+      "test": "",
+      "testHint": "",
+      "testNeedsForm": "",
+      "title": "",
       "types": {
-        "discord": "Discord",
-        "jsonWebhook": "Webhook (JSON)",
-        "ntfy": "ntfy",
-        "gotify": "Gotify",
-        "apprise": "Apprise",
-        "pushover": "Pushover",
-        "push": "Mobile push",
-        "webToast": "Browser toasts"
+        "discord": "",
+        "jsonWebhook": "",
+        "ntfy": "",
+        "gotify": "",
+        "apprise": "",
+        "pushover": "",
+        "push": "",
+        "webToast": ""
       },
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
-      "webToastNote": "Toasts in this browser."
+      "usedBy": "",
+      "usedBy_other": "",
+      "webToastNote": ""
     },
     "jobs": {
-      "runNow": "Run Now",
-      "running": "Running...",
-      "lastRun": "Last run",
-      "nextRun": "Next run",
-      "schedule": "Schedule"
+      "runNow": "지금 실행",
+      "running": "실행 중...",
+      "lastRun": "마지막 실행",
+      "nextRun": "다음 실행",
+      "schedule": "일정"
     },
     "mobile": {
-      "editDisplayName": "Edit Display Name",
-      "editDisplayNameDesc": "Change how this device appears in your device list",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "e.g., My iPhone",
-      "updating": "Updating..."
+      "editDisplayName": "표시 이름 수정",
+      "editDisplayNameDesc": "기기 목록에 표시되는 이름을 변경합니다",
+      "displayName": "표시 이름",
+      "displayNamePlaceholder": "예: 내 iPhone",
+      "updating": "업데이트 중..."
     }
   },
   "maintenance": {
-    "startingTitle": "Tracearr is starting up...",
-    "interruptionTitle": "Service interruption",
-    "startingDescription": "The server is waiting for backend services to become available. This page will automatically refresh when everything is ready.",
-    "interruptionDescription": "One or more backend services have become unavailable. This page will automatically refresh when connectivity is restored.",
-    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
-    "restoreTitle": "Restoring from backup...",
-    "restoreFailed": "Restore failed",
+    "startingTitle": "Tracearr가 시작 중입니다...",
+    "interruptionTitle": "서비스 중단",
+    "startingDescription": "서버가 백엔드 서비스를 사용할 수 있게 되기를 기다리고 있습니다. 준비가 완료되면 이 페이지가 자동으로 새로고침됩니다.",
+    "interruptionDescription": "하나 이상의 백엔드 서비스를 사용할 수 없습니다. 연결이 복구되면 이 페이지가 자동으로 새로고침됩니다.",
+    "unreachable": "",
+    "restoreTitle": "백업에서 복원 중...",
+    "restoreFailed": "복원 실패",
     "restorePhase": {
-      "validating": "Validating backup",
-      "creating_restore_point": "Creating restore point",
-      "shutting_down": "Shutting down services",
-      "restoring_database": "Restoring database",
-      "running_migrations": "Running migrations",
-      "rebuilding_aggregates": "Rebuilding aggregates",
-      "restarting": "Restarting services",
-      "complete": "Restore complete"
+      "validating": "백업 검증 중",
+      "creating_restore_point": "복원 지점 생성 중",
+      "shutting_down": "서비스 종료 중",
+      "restoring_database": "데이터베이스 복원 중",
+      "running_migrations": "마이그레이션 실행 중",
+      "rebuilding_aggregates": "집계 데이터 재구성 중",
+      "restarting": "서비스 재시작 중",
+      "complete": "복원 완료"
     },
     "initStep": {
-      "migrations": "Applying database migrations",
-      "timescale": "Preparing TimescaleDB (this can take a while after an upgrade)",
-      "services": "Starting services"
+      "migrations": "",
+      "timescale": "",
+      "services": ""
     },
-    "doNotRestart": "Do not restart or stop the server while this runs. Interrupting it can leave the database half-upgraded."
+    "doNotRestart": ""
   },
   "map": {
-    "allUsers": "All users",
-    "allTypes": "All types",
-    "heatmap": "Heatmap",
-    "circles": "Circles",
-    "streams": "streams",
-    "locations": "locations",
-    "allActivity": "All activity"
+    "allUsers": "모든 사용자",
+    "allTypes": "모든 유형",
+    "heatmap": "히트맵",
+    "circles": "원형 표시",
+    "streams": "스트림",
+    "locations": "위치",
+    "allActivity": "모든 활동"
   },
   "devices": {
-    "title": "Device Compatibility",
-    "description": "See which devices direct play vs transcode each codec",
-    "analyzedSessions": "Analyzed Sessions",
-    "analyzedSessionsTooltip": "Sessions in device + codec combinations with at least {{count}} sessions and a known codec. Rare combinations and sessions with no codec info aren't counted.",
-    "directPlayRate": "Direct Play Rate",
-    "videoAndAudio": "Video + audio",
-    "uniqueDevices": "Unique Devices",
-    "uniqueCodecs": "Unique Codecs",
-    "deviceHealth": "Device Health",
-    "deviceHealthDesc": "Direct play rate by device type",
-    "transcodeHotspots": "Transcode Hotspots",
-    "transcodeHotspotsDesc": "Combinations causing the most transcodes",
-    "deviceAndCodec": "Device + Codec",
-    "transcodes": "Transcodes",
-    "pctOfTotal": "% of Total",
-    "noTranscodeHotspots": "No transcode hotspots",
-    "compatibilityMatrix": "Compatibility Matrix",
-    "compatibilityMatrixDesc": "Direct play rates by device and video codec. Sorted by session volume.",
-    "noDeviceDataPeriod": "No device data in this period",
-    "legend": "Legend:",
-    "directPlayHigh": "≥80% Direct",
-    "directPlayMid": "50-79%",
-    "directPlayLow": "<50%",
-    "topTranscodingUsers": "Top Transcoding Users",
-    "topTranscodingUsersDesc": "Users causing the most transcodes on your server",
-    "noTranscodingUsers": "No transcoding users found"
+    "title": "기기 호환성",
+    "description": "각 코덱에서 기기가 직접 재생과 트랜스코딩 중 무엇을 사용하는지 확인하세요",
+    "analyzedSessions": "",
+    "analyzedSessionsTooltip": "",
+    "directPlayRate": "직접 재생 비율",
+    "videoAndAudio": "비디오 + 오디오",
+    "uniqueDevices": "고유 기기",
+    "uniqueCodecs": "고유 코덱",
+    "deviceHealth": "기기 상태",
+    "deviceHealthDesc": "기기 유형별 직접 재생 비율",
+    "transcodeHotspots": "트랜스코딩 집중 구간",
+    "transcodeHotspotsDesc": "트랜스코딩을 가장 많이 유발하는 조합",
+    "deviceAndCodec": "기기 + 코덱",
+    "transcodes": "트랜스코딩",
+    "pctOfTotal": "전체 대비 %",
+    "noTranscodeHotspots": "트랜스코딩 집중 구간이 없습니다",
+    "compatibilityMatrix": "호환성 매트릭스",
+    "compatibilityMatrixDesc": "기기와 비디오 코덱별 직접 재생 비율입니다. 세션 수 기준으로 정렬됩니다.",
+    "noDeviceDataPeriod": "이 기간에는 기기 데이터가 없습니다",
+    "legend": "범례:",
+    "directPlayHigh": "80% 이상 직접 재생",
+    "directPlayMid": "",
+    "directPlayLow": "50% 미만",
+    "topTranscodingUsers": "트랜스코딩 상위 사용자",
+    "topTranscodingUsersDesc": "서버에서 트랜스코딩을 가장 많이 유발한 사용자",
+    "noTranscodingUsers": "트랜스코딩 사용자를 찾을 수 없습니다"
   },
   "statsBandwidth": {
-    "title": "Bandwidth",
-    "description": "Streaming bandwidth usage and bitrate analysis",
-    "dataTransferred": "Data Transferred",
-    "avgBitrate": "Avg Bitrate",
-    "avgBitrateMbps": "Avg Bitrate (Mbps)",
-    "peakBitrate": "Peak: {{value}} Mbps",
-    "totalWatchTime": "Total Watch Time",
-    "uniqueUsers": "Unique Users",
-    "dailyUsage": "Daily Bandwidth Usage",
-    "dailyUsageDesc": "Average bitrate and session count over time",
-    "topUsers": "Top Bandwidth Users",
-    "topUsersDesc": "Users consuming the most bandwidth",
-    "noData": "No bandwidth data available"
+    "title": "대역폭",
+    "description": "스트리밍 대역폭 사용량과 비트레이트 분석",
+    "dataTransferred": "전송된 데이터",
+    "avgBitrate": "평균 비트레이트",
+    "avgBitrateMbps": "평균 비트레이트(Mbps)",
+    "peakBitrate": "피크: {{value}} Mbps",
+    "totalWatchTime": "전체 시청 시간",
+    "uniqueUsers": "고유 사용자",
+    "dailyUsage": "일별 대역폭 사용량",
+    "dailyUsageDesc": "시간에 따른 평균 비트레이트와 세션 수",
+    "topUsers": "대역폭 상위 사용자",
+    "topUsersDesc": "대역폭을 가장 많이 사용한 사용자",
+    "noData": "사용 가능한 대역폭 데이터가 없습니다"
   },
   "statsUsers": {
-    "noActivity": "No activity yet",
-    "noActivityDesc": "Start streaming to see your top users here",
-    "top3": "Top 3",
-    "runnersUp": "Runners Up"
+    "noActivity": "아직 활동이 없습니다",
+    "noActivityDesc": "스트리밍을 시작하면 상위 사용자가 여기에 표시됩니다",
+    "top3": "상위 3명",
+    "runnersUp": "그 외 상위"
   },
   "plexCallback": {
-    "authComplete": "Authentication complete",
-    "windowWillClose": "This window will close automatically..."
+    "authComplete": "인증 완료",
+    "windowWillClose": "이 창은 자동으로 닫힙니다..."
   },
   "apiDocs": {
-    "backToSettings": "Back to Settings",
-    "apiKeyAutoLoaded": "API key auto-loaded",
-    "noApiKey": "No API key generated - create one in Settings to test endpoints",
-    "versionSwitcherLabel": "API documentation version",
-    "versionV1": "API v1",
-    "versionV2": "API v2",
-    "specLoadError": "Failed to load the API specification. Check your API key and try again."
+    "backToSettings": "설정으로 돌아가기",
+    "apiKeyAutoLoaded": "API 키가 자동으로 불러와졌습니다",
+    "noApiKey": "생성된 API 키가 없습니다. 엔드포인트를 테스트하려면 설정에서 키를 만드세요",
+    "versionSwitcherLabel": "",
+    "versionV1": "",
+    "versionV2": "",
+    "specLoadError": ""
   },
   "debug": {
-    "title": "Debug Tools",
-    "description": "Administrative utilities for troubleshooting and data management",
-    "overview": "Overview",
-    "librarySnapshots": "Library Snapshots",
-    "tasks": "Tasks",
-    "logs": "Logs",
-    "plexAccounts": "Plex Accounts",
-    "terminations": "Terminations",
-    "libraryItems": "Library Items",
-    "environment": "Environment",
-    "systemInformation": "System Information",
-    "cpu": "CPU",
-    "memory": "Memory",
-    "uptime": "Uptime",
-    "database": "Database",
-    "databaseDesc": "Database size and table statistics",
-    "totalSize": "Total Size",
-    "maintenance": "Maintenance",
-    "destructiveActions": "Destructive Actions",
-    "refreshAggregates": "Refresh Aggregates",
-    "clearStuckJobs": "Clear Stuck Jobs",
-    "obliterateAllJobs": "Obliterate All Jobs",
-    "clearQueryCache": "Clear Query Cache",
-    "clearMobileDevices": "Clear Mobile Devices",
-    "clearViolations": "Clear Violations",
-    "clearAutomations": "Delete all automations and runs",
-    "clearAutomationsConfirm": "Delete every automation and all of their runs?",
-    "clearTerminationLogs": "Clear Termination Logs",
-    "clearLibraryCache": "Clear Library Cache",
-    "clearSessions": "Clear Sessions",
-    "clearUsers": "Clear Users",
-    "clearServers": "Clear Servers",
-    "factoryReset": "Factory Reset",
-    "manageSnapshots": "Manage library snapshots used for Storage Trend and Quality Evolution charts",
-    "suspiciousOnly": "Suspicious only",
-    "load": "Load",
-    "noSuspiciousSnapshots": "No suspicious snapshots found",
-    "clickLoadToView": "Click \"Load\" to view snapshots",
-    "deleteSelected": "Delete Selected",
-    "deleteAllSuspicious": "Delete All Suspicious",
-    "suspicious": "Suspicious",
-    "ok": "OK",
-    "selected": "selected",
-    "snapshots": "snapshot(s)",
-    "of": "of",
-    "logExplorerUnavailable": "Log explorer is only available in Docker environments"
+    "title": "디버그 도구",
+    "description": "문제 해결과 데이터 관리를 위한 관리자 유틸리티",
+    "overview": "개요",
+    "librarySnapshots": "라이브러리 스냅샷",
+    "tasks": "작업",
+    "logs": "로그",
+    "plexAccounts": "Plex 계정",
+    "terminations": "종료 기록",
+    "libraryItems": "라이브러리 항목",
+    "environment": "환경",
+    "systemInformation": "시스템 정보",
+    "cpu": "",
+    "memory": "메모리",
+    "uptime": "가동 시간",
+    "database": "데이터베이스",
+    "databaseDesc": "데이터베이스 크기와 테이블 통계",
+    "totalSize": "전체 크기",
+    "maintenance": "유지관리",
+    "destructiveActions": "파괴적 작업",
+    "refreshAggregates": "집계 새로고침",
+    "clearStuckJobs": "멈춘 작업 정리",
+    "obliterateAllJobs": "모든 작업 완전 삭제",
+    "clearQueryCache": "쿼리 기록 비우기",
+    "clearMobileDevices": "모바일 기기 목록 비우기",
+    "clearViolations": "위반 기록 비우기",
+    "clearAutomations": "",
+    "clearAutomationsConfirm": "",
+    "clearTerminationLogs": "종료 로그 비우기",
+    "clearLibraryCache": "라이브러리 기록 비우기",
+    "clearSessions": "세션 지우기",
+    "clearUsers": "사용자 목록 비우기",
+    "clearServers": "서버 목록 초기화",
+    "factoryReset": "초기화",
+    "manageSnapshots": "저장소 트렌드 및 품질 분석 차트용 라이브러리 스냅샷 관리",
+    "suspiciousOnly": "의심 항목만 보기",
+    "load": "불러오기",
+    "noSuspiciousSnapshots": "감지된 의심스러운 스냅샷이 없습니다",
+    "clickLoadToView": "스냅샷을 확인하려면 \"불러오기\"를 클릭하세요",
+    "deleteSelected": "선택 삭제",
+    "deleteAllSuspicious": "의심 항목 전체 삭제",
+    "suspicious": "의심 항목",
+    "ok": "확인",
+    "selected": "선택됨",
+    "snapshots": "스냅샷(들)",
+    "of": "/",
+    "logExplorerUnavailable": "로그 탐색기는 Docker 환경에서만 사용할 수 있습니다."
   },
   "media": {
     "landing": {
-      "title": "Media",
+      "title": "",
       "lens": {
         "label": "다음 사용자로 보기",
         "allUsers": "모든 사용자"
       },
       "shelves": {
-        "recentlyAddedMovies": "Recently Added Movies",
-        "recentlyAddedShows": "Recently Added Shows",
-        "mostPopularMovies": "Most Popular Movies",
-        "mostPopularShows": "Most Popular Shows",
-        "emptyRecentlyAdded": "Nothing added in this period",
-        "emptyMostPopular": "No plays in this period",
-        "captionRecentlyAdded": "deduped across servers",
+        "recentlyAddedMovies": "",
+        "recentlyAddedShows": "",
+        "mostPopularMovies": "",
+        "mostPopularShows": "",
+        "emptyRecentlyAdded": "",
+        "emptyMostPopular": "",
+        "captionRecentlyAdded": "",
         "captionMostPopular": {
-          "day": "today",
-          "week": "last 7 days",
-          "month": "last 30 days",
-          "year": "last 12 months",
-          "all": "all time",
-          "custom": "selected date range"
+          "day": "",
+          "week": "",
+          "month": "",
+          "year": "",
+          "all": "",
+          "custom": ""
         }
       },
       "card": {
         "newEpisodes_one": "새 에피소드 {{count}}개",
         "newEpisodes_other": "새 에피소드 {{count}}개",
         "addedAgo": "{{date}} 추가됨",
-        "addedCompactAgo": "added {{age}} ago",
-        "newEpisodesChip": "{{count}} new"
+        "addedCompactAgo": "",
+        "newEpisodesChip": ""
       },
       "deadWeight": {
-        "title": "Dead Weight",
-        "summary": "{{count}} never-watched titles · {{size}}",
-        "empty": "Nothing to reclaim - everything in your library has been watched",
+        "title": "",
+        "summary": "",
+        "empty": "",
         "columns": {
-          "poster": "Poster",
-          "title": "Title",
-          "size": "Size",
-          "added": "Added",
-          "servers": "Servers"
+          "poster": "",
+          "title": "",
+          "size": "",
+          "added": "",
+          "servers": ""
         },
-        "viewAll": "View all",
-        "viewAllTooltip": "Coming soon"
+        "viewAll": "",
+        "viewAllTooltip": ""
       },
-      "loadError": "Couldn't load your media library"
+      "loadError": ""
     },
     "movies": {
-      "title": "Movies"
+      "title": ""
     },
     "shows": {
-      "title": "Shows"
+      "title": ""
     },
     "genres": {
-      "title": "Genres",
-      "subtitle": "Plays and watch time by genre, across every server in view.",
+      "title": "",
+      "subtitle": "",
       "chart": {
-        "title": "Plays by genre",
-        "valueLabel": "Plays",
-        "itemCount_one": "{{count}} title",
-        "itemCount_other": "{{count}} titles",
-        "ariaLabel": "Bar chart of plays by genre, sorted highest to lowest. The full breakdown is available in the table below."
+        "title": "",
+        "valueLabel": "",
+        "itemCount_one": "",
+        "itemCount_other": "",
+        "ariaLabel": ""
       },
       "table": {
-        "title": "Genre breakdown",
+        "title": "",
         "columns": {
-          "genre": "Genre",
-          "items": "Items",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "genre": "",
+          "items": "",
+          "plays": "",
+          "watchTime": ""
         },
-        "browseMovies": "Browse {{genre}} movies",
-        "browseShows": "Browse {{genre}} shows"
+        "browseMovies": "",
+        "browseShows": ""
       },
       "empty": {
-        "title": "No genres captured yet",
-        "description": "Genres come from your media servers' metadata sync. Check back after the next sync completes."
+        "title": "",
+        "description": ""
       },
-      "loadError": "Couldn't load genres"
+      "loadError": ""
     },
     "detail": {
-      "title": "Media Details",
+      "title": "",
       "breadcrumb": {
-        "ariaLabel": "Breadcrumb"
+        "ariaLabel": ""
       },
       "notFound": {
-        "title": "Media not found",
-        "message": "This title doesn't exist or you don't have access to it.",
-        "backLink": "Back to Media"
+        "title": "",
+        "message": "",
+        "backLink": ""
       },
       "hero": {
-        "loadError": "Couldn't load this title",
+        "loadError": "",
         "meta": {
-          "seasons_one": "{{count}} season",
-          "seasons_other": "{{count}} seasons",
-          "episodes_one": "{{count}} episode",
-          "episodes_other": "{{count}} episodes"
+          "seasons_one": "",
+          "seasons_other": "",
+          "episodes_one": "",
+          "episodes_other": ""
         },
         "availability": {
-          "added": "added {{date}}",
-          "addedRemoved": "added {{added}} – removed {{removed}}",
-          "replaced": "replaced {{date}}"
+          "added": "",
+          "addedRemoved": "",
+          "replaced": ""
         },
         "removedEverywhere": {
-          "caption": "No longer available on any connected server"
+          "caption": ""
         },
         "actions": {
-          "fullHistory": "Full history",
-          "openOnServer": "Open on server"
+          "fullHistory": "",
+          "openOnServer": ""
         }
       },
       "kpis": {
-        "ariaLabel": "Watch statistics",
-        "loadError": "Couldn't load watch statistics",
-        "completionLoadError": "Couldn't load completion",
+        "ariaLabel": "",
+        "loadError": "",
+        "completionLoadError": "",
         "plays": {
-          "label": "Plays, all time",
-          "caption": "resume chains, short sessions excluded"
+          "label": "",
+          "caption": ""
         },
         "watchTime": {
-          "label": "Watch time",
-          "detail": "+{{hours}}h in the last 30 days"
+          "label": "",
+          "detail": ""
         },
         "viewers": {
-          "label": "Viewers",
-          "detail": "across all servers"
+          "label": "",
+          "detail": ""
         },
         "completion": {
-          "label": "Avg completion",
-          "detail": "{{finished}} of {{total}} finished every episode",
-          "detailMovie": "{{finished}} of {{total}} watched to completion"
+          "label": "",
+          "detail": "",
+          "detailMovie": ""
         }
       },
       "watchers": {
-        "title": "Watchers",
-        "loadError": "Couldn't load watchers",
-        "empty": "No one has watched this yet.",
-        "lastWatchedAgo": "{{age}} ago",
-        "completionLabel": "{{percent}}% complete",
+        "title": "",
+        "loadError": "",
+        "empty": "",
+        "lastWatchedAgo": "",
+        "completionLabel": "",
         "columns": {
-          "user": "User",
-          "plays": "Plays",
-          "episodes": "Episodes",
-          "completion": "Completion",
-          "lastWatched": "Last watched"
+          "user": "",
+          "plays": "",
+          "episodes": "",
+          "completion": "",
+          "lastWatched": ""
         }
       },
       "seasons": {
-        "title": "Seasons",
-        "loadError": "Couldn't load season data",
-        "empty": "No season data yet",
-        "episodeCount_one": "{{count}} episode",
-        "episodeCount_other": "{{count}} episodes",
-        "watchedPct": "{{percent}}% watched",
-        "stripSummary": "{{season}}: {{percent}}% watched",
+        "title": "",
+        "loadError": "",
+        "empty": "",
+        "episodeCount_one": "",
+        "episodeCount_other": "",
+        "watchedPct": "",
+        "stripSummary": "",
         "episodeLabel": {
-          "watched": "{{code}}: watched",
-          "partial": "{{code}}: partially watched",
-          "unwatched": "{{code}}: unwatched"
+          "watched": "",
+          "partial": "",
+          "unwatched": ""
         }
       },
       "platforms": {
-        "title": "Platforms",
-        "loadError": "Couldn't load platform breakdown",
-        "empty": "No platform data yet",
-        "unknown": "Unknown",
+        "title": "",
+        "loadError": "",
+        "empty": "",
+        "unknown": "",
         "columns": {
-          "platform": "Platform",
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "platform": "",
+          "plays": "",
+          "watchTime": ""
         }
       },
       "history": {
-        "title": "History",
-        "loadError": "Couldn't load history",
-        "empty": "No plays recorded yet",
-        "watched": "Watched",
-        "notWatched": "Not finished",
+        "title": "",
+        "loadError": "",
+        "empty": "",
+        "watched": "",
+        "notWatched": "",
         "columns": {
-          "date": "Date",
-          "user": "User",
-          "content": "Content",
-          "server": "Server",
-          "duration": "Duration"
+          "date": "",
+          "user": "",
+          "content": "",
+          "server": "",
+          "duration": ""
         }
       },
       "copies": {
-        "title": "Copies",
-        "loadError": "Couldn't load copies",
-        "unknownLibrary": "Unknown library",
+        "title": "",
+        "loadError": "",
+        "unknownLibrary": "",
         "columns": {
-          "server": "Server",
-          "library": "Library",
-          "quality": "Quality",
-          "episodes": "Episodes",
-          "size": "Size",
-          "added": "Added"
+          "server": "",
+          "library": "",
+          "quality": "",
+          "episodes": "",
+          "size": "",
+          "added": ""
         },
-        "versionLabel": "File {{index}}"
+        "versionLabel": ""
       }
     },
     "posterCard": {
@@ -1971,88 +1971,88 @@
       "watchedState": {
         "watched": "시청함",
         "partial": "일부 시청함",
-        "watchedByOthers": "Watched by others",
-        "watchedByYou": "Watched by you"
+        "watchedByOthers": "",
+        "watchedByYou": ""
       },
       "tileLabel": {
         "added": "추가됨",
         "plays": "재생",
         "viewers": "시청자",
-        "resolution": "resolution"
+        "resolution": ""
       },
-      "rankChip": "#{{rank}}",
-      "playsCompact_one": "{{compact}} play",
-      "playsCompact_other": "{{compact}} plays",
-      "versionsChip": "{{count}}×",
-      "versions_one": "{{count}} version",
-      "versions_other": "{{count}} versions",
-      "moreServers": "+{{count}} more"
+      "rankChip": "",
+      "playsCompact_one": "",
+      "playsCompact_other": "",
+      "versionsChip": "",
+      "versions_one": "",
+      "versions_other": "",
+      "moreServers": ""
     },
     "grid": {
       "toolbar": {
-        "ariaLabel": "Filters and sort",
-        "typeLabel": "Media type",
-        "moviesToggle": "Movies",
-        "showsToggle": "Shows",
-        "searchPlaceholder": "Search titles…",
-        "searchLabel": "Search titles",
-        "removeFilter": "Remove {{label}} filter",
-        "filtersLabel": "Filters",
-        "filtersSheetTitle": "Filters",
-        "done": "Done",
-        "watchedLabel": "Watched",
+        "ariaLabel": "",
+        "typeLabel": "",
+        "moviesToggle": "",
+        "showsToggle": "",
+        "searchPlaceholder": "",
+        "searchLabel": "",
+        "removeFilter": "",
+        "filtersLabel": "",
+        "filtersSheetTitle": "",
+        "done": "",
+        "watchedLabel": "",
         "watched": {
-          "all": "All",
-          "watched": "Watched",
-          "partial": "Partially watched",
-          "unwatched": "Unwatched"
+          "all": "",
+          "watched": "",
+          "partial": "",
+          "unwatched": ""
         },
-        "unwatchedByLens": "Unwatched by {{name}}",
-        "resolutionLabel": "Resolution",
-        "resolutionAll": "Any resolution",
-        "hdrLabel": "Dynamic range",
-        "hdrAll": "Any",
-        "hdrOnly": "HDR only",
-        "hdrChip": "HDR",
-        "genreLabel": "Genre",
-        "genreAll": "Any genre",
-        "serverLabel": "Server",
-        "serverAll": "Any server",
-        "libraryLabel": "Library",
-        "libraryAll": "Any library",
-        "yearFromLabel": "From year",
-        "yearToLabel": "To year",
-        "sizeGbMinLabel": "Min size (GB)",
-        "sizeGbMaxLabel": "Max size (GB)",
-        "sizeChipAtLeast": "≥ {{min}} GB",
-        "sizeChipAtMost": "≤ {{max}} GB",
-        "sizeChipRange": "{{min}}–{{max}} GB",
-        "sortLabel": "Sort",
+        "unwatchedByLens": "",
+        "resolutionLabel": "",
+        "resolutionAll": "",
+        "hdrLabel": "",
+        "hdrAll": "",
+        "hdrOnly": "",
+        "hdrChip": "",
+        "genreLabel": "",
+        "genreAll": "",
+        "serverLabel": "",
+        "serverAll": "",
+        "libraryLabel": "",
+        "libraryAll": "",
+        "yearFromLabel": "",
+        "yearToLabel": "",
+        "sizeGbMinLabel": "",
+        "sizeGbMaxLabel": "",
+        "sizeChipAtLeast": "",
+        "sizeChipAtMost": "",
+        "sizeChipRange": "",
+        "sortLabel": "",
         "sort": {
-          "title": "Title A–Z",
-          "added": "Recently added",
-          "year": "Year",
-          "plays": "Plays",
-          "watch_time": "Watch time",
-          "viewers": "Viewers"
+          "title": "",
+          "added": "",
+          "year": "",
+          "plays": "",
+          "watch_time": "",
+          "viewers": ""
         },
-        "count": "{{loaded}} of {{total}} titles · {{size}}",
-        "countTotal_one": "{{count}} title · {{size}}",
-        "countTotal_other": "{{count}} titles · {{size}}"
+        "count": "",
+        "countTotal_one": "",
+        "countTotal_other": ""
       },
       "scrubber": {
-        "label": "Jump to letter",
-        "current": "Letter {{letter}}"
+        "label": "",
+        "current": ""
       },
-      "loaderError": "Couldn't load more titles",
-      "retry": "Retry",
-      "clearJumpAction": "Clear",
-      "showingFrom": "Showing from {{letter}}",
-      "showAll": "Show all",
-      "emptyFilter": "No titles match these filters",
-      "emptySearch": "No titles match \"{{query}}\"",
-      "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
-      "loadError": "Couldn't load the catalog"
+      "loaderError": "",
+      "retry": "",
+      "clearJumpAction": "",
+      "showingFrom": "",
+      "showAll": "",
+      "emptyFilter": "",
+      "emptySearch": "",
+      "emptyAnchored": "",
+      "loadError": ""
     }
   }
 }
