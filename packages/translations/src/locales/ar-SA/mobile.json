@@ -143,9 +143,9 @@
     "noUsersMatch": "No users match \"{{query}}\""
   },
   "activity": {
-    "playsOverTime": "Plays Over Time",
-    "concurrentStreams": "Concurrent Streams",
-    "platforms": "Platforms",
+    "playsOverTime": "تشغيل عبر الوقت",
+    "concurrentStreams": "البث المتزامن",
+    "platforms": "المنصات",
     "playbackQuality": "Playback Quality"
   },
   "unauthenticated": {
