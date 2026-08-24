@@ -6,7 +6,6 @@
   "activity": "アクティビティ",
   "library": "ライブラリ",
   "users": "ユーザー",
-  "automations": "Automations",
   "violations": "違反",
   "alerts": "アラート",
   "settings": "設定",
@@ -16,17 +15,9 @@
   "watch": "見る",
   "performance": "パフォーマンス",
   "devices": "デバイス",
-  "bandwidth": "Bandwidth",
   "jobs": "ジョブ",
   "accessControl": "アクセスコントロール",
   "media": "メディア",
   "mediaBrowse": "閲覧",
-  "mediaGenres": "ジャンル",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "ジャンル"
 }
