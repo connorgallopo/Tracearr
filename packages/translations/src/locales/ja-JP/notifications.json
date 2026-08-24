@@ -61,12 +61,12 @@
         "message": "プレックスアカウントが切断されました"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "エージェントが追加されました",
@@ -85,16 +85,16 @@
         "message": "{{name}} が正常に終了しました"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "配信が終了しました",
@@ -106,7 +106,7 @@
       },
       "serverUpdated": {
         "title": "サーバー更新",
-        "message": "The server has been updated successfully"
+        "message": ""
       },
       "syncCompletedWithErrors": {
         "title": "同期がエラーと共に完了しました"
@@ -155,15 +155,15 @@
         "message": "セットアップを続けることができます"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "サーバーの追加に失敗しました",
@@ -175,9 +175,9 @@
       "dismissFailed": "違反を解除できませんでした",
       "authFailed": "認証に失敗しました",
       "webhookTestFailed": "Webhookテストに失敗しました",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "配信の終了に失敗しました",
       "serverUrlUpdateFailed": "サーバー URL の更新に失敗しました",
       "serverUpdateFailed": "サーバーの更新に失敗しました",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "ルーティングの更新に失敗しました",
       "clipboardFailed": "クリップボードにコピーできませんでした",
       "plexUnlinkFailed": "プレックスアカウントのリンクを解除できませんでした",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "エージェントの追加に失敗しました",
       "agentUpdateFailed": "エージェントの更新に失敗しました",
       "agentRemoveFailed": "エージェントの削除に失敗しました",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "メンテナンスジョブの読み込みに失敗しました",
       "invalidUrl": "無効な URL",
       "plexDirectUrl": "plex.directのURLはここでは使用できないリレーアドレスです。代わりにIPアドレスまたはホスト名を使用してください。",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "無効な請求コードです",
         "message": "サーバーのログを確認してください"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
@@ -240,7 +240,7 @@
     "serverDown": "サーバー接続が失われました",
     "serverUp": "サーバーバックオンライン",
     "newDevice": "新しいデバイス",
-    "trustScoreChanged": "Trust Score Changed"
+    "trustScoreChanged": ""
   },
   "settings": {
     "title": "通知設定",
@@ -263,7 +263,7 @@
     "concurrentStreamsDesc": "最大配信制限を超えた場合",
     "newDevice": "新しいデバイス",
     "newDeviceDesc": "新しいデバイスが接続されたとき",
-    "trustScoreChanged": "Trust Score Changed",
+    "trustScoreChanged": "",
     "trustScoreChangedDesc": "ユーザーの信頼スコアが変更されたとき",
     "serverDown": "サーバーダウン",
     "serverDownDesc": "メディアサーバーがオフラインになったとき",
