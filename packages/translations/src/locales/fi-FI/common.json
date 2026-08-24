@@ -32,7 +32,7 @@
     "sort": "Järjestä",
     "clear": "Tyhjennä",
     "apply": "Käytä",
-    "reset": "Reset",
+    "reset": "",
     "select": "Valitse",
     "selectAll": "Valitse Kaikki",
     "deselectAll": "Poista Kaikki Valinnat",
@@ -91,16 +91,16 @@
     "high": "Korkea"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Nyt",
@@ -118,10 +118,10 @@
     "byHour": "Tunnin Mukaan"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Päivämäärä",
@@ -135,7 +135,7 @@
     "progress": "Edistyminen",
     "status": "Tila",
     "rule": "Sääntö",
-    "media": "Media",
+    "media": "",
     "started": "Aloitettu",
     "stopped": "Pysäytetty",
     "joined": "Liittynyt",
@@ -171,15 +171,15 @@
     "size": "Koko",
     "items": "Kohteet",
     "name": "Nimi",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Etsi...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Valitse kaikki sivulla",
     "selectRow": "Valitse rivi",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Elokuva",
@@ -212,23 +212,23 @@
     "episode_plural": "Jaksot",
     "track": "Kappale",
     "track_plural": "Kappaleet",
-    "liveTV": "Live TV",
+    "liveTV": "",
     "photo": "Kuva",
     "tv": "Televisio",
     "tvShows": "TV-ohjelmat",
     "music": "Musiikki"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Tämä kenttä on pakollinen",
     "invalidEmail": "Syötä voimassa oleva sähköpostiosoite",
     "invalidUrl": "Anna kelvollinen URL-osoite",
     "minLength": "Täytyy olla vähintään {{min}} merkkiä",
-    "maxLength": "Must be at most {{max}} characters"
+    "maxLength": ""
   },
   "errors": {
     "generic": "Tapahtui virhe",
@@ -259,8 +259,8 @@
     "stream_other": "{{count}} streamia",
     "server_one": "{{count}} palvelin",
     "server_other": "{{count}} palvelinta",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} rikkomusta",
     "violation_other": "{{count}} rikkomusta",
     "item_one": "{{count}} kohde",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} kirjastoa",
     "error_one": "{{count}} virhe",
     "error_other": "{{count}} virhettä",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Muutoksia ei havaittu"
@@ -297,9 +297,9 @@
     "hour_other": "{{count}} tuntia sitten",
     "day_one": "{{count}} päivää sitten",
     "day_other": "{{count}} päivää sitten",
-    "week_one": "{{count}} week ago",
-    "week_other": "{{count}} weeks ago",
-    "month_one": "{{count}} month ago",
+    "week_one": "",
+    "week_other": "",
+    "month_one": "",
     "month_other": "{{count}} kuukautta sitten",
     "year_one": "{{count}} vuotta sitten",
     "year_other": "{{count}} vuotta sitten"
@@ -329,12 +329,12 @@
     "deleteMessage": "Oletko varma, että haluat poistaa tämän? Tätä toimintoa ei voi perua.",
     "unsavedChanges": "Sinulla on tallentamattomia muutoksia. Oletko varma, että haluat lähteä?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "tai",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
