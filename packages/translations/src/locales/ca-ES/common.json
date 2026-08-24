@@ -53,11 +53,11 @@
     "viewProfile": "Mostra el perfil",
     "viewOnGithub": "Mostra al GitHub",
     "later": "Més tard",
-    "previous": "Previous"
+    "previous": "Anterior"
   },
   "states": {
     "loading": "S'està carregant...",
-    "error": "Error",
+    "error": "",
     "success": "Realitzat amb èxit",
     "failed": "S'ha produït un error",
     "pending": "Pendent",
@@ -75,7 +75,7 @@
     "deleting": "S'està suprimint...",
     "dismissing": "S'està descartant...",
     "acknowledging": "S'està confirmant...",
-    "completed": "Completed"
+    "completed": "Completat"
   },
   "playback": {
     "playing": "S'està reproduïnt",
@@ -91,16 +91,16 @@
     "high": "Alta"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Ara",
@@ -118,10 +118,10 @@
     "byHour": "Per hora"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Data",
@@ -163,23 +163,23 @@
     "recentSessions": "Sessions recents",
     "activeStreams": "Transmissions actives",
     "days": "dies",
-    "totalSessions": "Total Sessions",
-    "sessions": "Sessions",
+    "totalSessions": "Sessions totals",
+    "sessions": "",
     "apiKey": "Clau d'API",
-    "rank": "Rank",
-    "data": "Data",
-    "size": "Size",
-    "items": "Items",
-    "name": "Name",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "rank": "Classificació",
+    "data": "Dades",
+    "size": "Mida",
+    "items": "Elements",
+    "name": "Nom",
+    "product": "Producte",
+    "deviceId": "ID del dispositiu",
+    "created": "Creat",
+    "total": "",
+    "mediaLength": "Mida dels fitxers",
+    "segments": "",
+    "streamDetails": "Detalls de la transmissió",
+    "transcodeReason": "Raó per a la transcodificació",
+    "loadMore": "Veure més"
   },
   "search": {
     "placeholder": "Cerca...",
@@ -189,39 +189,39 @@
   "table": {
     "selectAllOnPage": "Selecciona-ho tot a la pàgina",
     "selectRow": "Selecciona la fila",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Pel·lícula",
-    "movie_plural": "Movies",
+    "movie_plural": "Pel·lícules",
     "episode": "Episodi",
-    "episode_plural": "Episodes",
+    "episode_plural": "Episodis",
     "track": "Pista",
-    "track_plural": "Tracks",
+    "track_plural": "Pistes",
     "liveTV": "TV en directe",
     "photo": "Foto",
-    "tv": "TV",
-    "tvShows": "TV Shows",
-    "music": "Music"
+    "tv": "",
+    "tvShows": "Sèries",
+    "music": "Música"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Aquest camp és obligatori",
@@ -254,13 +254,13 @@
     "user_one": "{{count}} usuari",
     "user_other": "{{count}} usuaris",
     "session_one": "{{count}} sessió",
-    "session_other": "{{count}} sessions",
+    "session_other": "",
     "stream_one": "{{count}} flux",
     "stream_other": "{{count}} fluxos",
     "server_one": "{{count}} servidor",
     "server_other": "{{count}} servidors",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} incompliment",
     "violation_other": "{{count}} incompliments",
     "item_one": "{{count}} element",
@@ -275,14 +275,14 @@
     "usersUpdated_other": "{{count}} usuaris actualitzats",
     "library_one": "{{count}} biblioteca",
     "library_other": "{{count}} biblioteques",
-    "error_one": "{{count}} error",
-    "error_other": "{{count}} errors",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "error_one": "",
+    "error_other": "",
+    "alert_one": "{{count}} alerta",
+    "alert_other": "{{count}} alertes",
+    "location_one": "{{count}} ubicació",
+    "location_other": "{{count}} ubicacions",
+    "device_one": "{{count}} dispositiu",
+    "device_other": "{{count}} dispositius"
   },
   "messages": {
     "noChangesDetected": "No s'han detectat canvis"
@@ -322,19 +322,19 @@
     "noLocationData": "No hi ha dades de localització disponibles",
     "noJobHistory": "Encara no hi ha historial de tasques",
     "noSessionsFound": "No s'ha trobat cap sessió",
-    "noUserData": "No user data available"
+    "noUserData": "No hi ha dades d'usuari disponibles"
   },
   "confirmations": {
     "deleteTitle": "Confirmeu la supressió",
     "deleteMessage": "Estàs segur que vols eliminar aquest element? Aquesta acció és irreversible.",
     "unsavedChanges": "Teniu canvis no desats. Esteu segur que voleu marxar?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "o",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
