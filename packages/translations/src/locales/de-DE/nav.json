@@ -1,12 +1,10 @@
 {
-  "dashboard": "Dashboard",
   "map": "Karte",
   "history": "Verlauf",
   "stats": "Statistiken",
   "activity": "Aktivität",
   "library": "Mediathek",
   "users": "Benutzer",
-  "automations": "Automations",
   "violations": "Verstöße",
   "alerts": "Warnungen",
   "settings": "Einstellungen",
@@ -20,13 +18,5 @@
   "jobs": "Aufträge",
   "accessControl": "Zugangskontrolle",
   "media": "Medien",
-  "mediaBrowse": "Durchsuchen",
-  "mediaGenres": "Genres",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaBrowse": "Durchsuchen"
 }
