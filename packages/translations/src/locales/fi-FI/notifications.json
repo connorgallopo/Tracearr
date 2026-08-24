@@ -61,12 +61,12 @@
         "message": "Yhteys Plex-tiliisi on katkaistu"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agentin Lisätty",
@@ -85,16 +85,16 @@
         "message": "{{name}} suoritettiin onnistuneesti"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Virta Päätetty",
@@ -155,15 +155,15 @@
         "message": "Voit nyt jatkaa asetuksia"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Palvelimen lisääminen epäonnistui",
@@ -175,9 +175,9 @@
       "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
       "authFailed": "Todennus epäonnistui",
       "webhookTestFailed": "Webkoukkutesti epäonnistui",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Virran lopettaminen epäonnistui",
       "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
       "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Reitityksen päivitys epäonnistui",
       "clipboardFailed": "Kopiointi leikepöydälle epäonnistui",
       "plexUnlinkFailed": "Plex tilin poisto epäonnistui",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Edustajan lisääminen epäonnistui",
       "agentUpdateFailed": "Agenttia ei voitu päivittää",
       "agentRemoveFailed": "Ei voitu poistaa agenttia",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
       "invalidUrl": "Virheellinen URL",
       "plexDirectUrl": "plex.direct URL-osoitteet ovat releosoitteita, joita ei voi käyttää tässä. Käytä sen sijaan suoraa IP-osoitetta tai isäntänimeä.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Virheellinen korvauskoodi",
         "message": "Ole hyvä ja tarkista palvelimen lokit"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
@@ -229,7 +229,7 @@
       },
       "violationDetected": {
         "title": "Uusi Väkivalta: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "message": ""
       }
     }
   },
