@@ -506,7 +506,7 @@
         "notification": "",
         "notificationDescription": ""
       },
-      "severityLabel": "Severity",
+      "severityLabel": "",
       "activeLabel": "",
       "saving": "",
       "selectPlaceholder": "",
@@ -515,10 +515,10 @@
       "clearSelection": "",
       "selectedCount": "",
       "scope": {
-        "label": "Scope",
-        "global": "Global",
-        "server": "Specific server",
-        "account": "Specific account",
+        "label": "",
+        "global": "",
+        "server": "",
+        "account": "",
         "person": "",
         "serverLabel": "",
         "serverPlaceholder": "",
@@ -528,12 +528,12 @@
         "personPlaceholder": "",
         "personHelper": "",
         "noServers": "",
-        "enforceAcrossServers": "Enforce across servers",
+        "enforceAcrossServers": "",
         "enforceAcrossServersDescription": ""
       },
       "conditions": {
         "addGroup": "",
-        "fieldPlaceholder": "Select field",
+        "fieldPlaceholder": "",
         "windowPrefix": "",
         "windowUnit": "",
         "uniqueDevices": "",
@@ -546,28 +546,28 @@
         "no": "",
         "recentlySeen": "",
         "allCountries": "",
-        "sectionTitle": "Only when…",
+        "sectionTitle": "",
         "optional": "",
         "helper": "",
         "emptyLine": "",
-        "all": "all of these",
-        "any": "any of these",
+        "all": "",
+        "any": "",
         "allHint": "",
         "anyHint": "",
         "matchLabel": "",
-        "fieldLabel": "Condition",
-        "operatorLabel": "Comparison",
+        "fieldLabel": "",
+        "operatorLabel": "",
         "valueLabel": "",
         "canNeverPass": "",
         "noFields": "",
         "groupSeparator": "",
-        "addAnother": "Add another condition",
-        "addFirst": "Add a condition",
+        "addAnother": "",
+        "addFirst": "",
         "removeGroup": ""
       },
       "actions": {
-        "add": "Add action",
-        "sectionTitle": "Do this…",
+        "add": "",
+        "sectionTitle": "",
         "ifTitle": "",
         "helper": "",
         "emptyTitle": "",
@@ -580,12 +580,12 @@
         "confirmRemoveTitle": "",
         "confirmRemoveDescription": "",
         "policyNote": "",
-        "branchThen": "then",
-        "branchElse": "Otherwise…",
+        "branchThen": "",
+        "branchElse": "",
         "branchElseEmpty": "",
-        "ifNothing": "nothing yet",
+        "ifNothing": "",
         "ifAddCheck": "",
-        "addBranch": "Add action",
+        "addBranch": "",
         "expandBranch": "",
         "collapseBranch": ""
       },
@@ -595,7 +595,7 @@
         "emptyTitle": "",
         "emptyDescription": "",
         "emptyAction": "",
-        "add": "Add trigger",
+        "add": "",
         "or": ""
       },
       "heldFor": {
@@ -633,8 +633,8 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
-        "problems_other": "{{count}} problems",
+        "problems_one": "",
+        "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
         "ready": "",
@@ -667,13 +667,13 @@
       "user_attributes": "",
       "device_client": "",
       "network_location": "",
-      "scope": "Scope",
+      "scope": "",
       "media": ""
     },
-    "createAutomation": "Create Automation",
+    "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "Delete {{count}} Automation",
+    "deleteAutomation_one": "",
     "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
@@ -686,7 +686,7 @@
       "when": "",
       "or": "",
       "nothing": "",
-      "onlyWhen": "only when",
+      "onlyWhen": "",
       "andAlso": "",
       "allOf": "",
       "anyOf": "",
@@ -837,7 +837,7 @@
       "noRuns": ""
     },
     "disable": "",
-    "editAutomation": "Edit Automation",
+    "editAutomation": "",
     "effects": {
       "title": "",
       "kill": "",
@@ -1102,7 +1102,7 @@
       "notification": ""
     },
     "kindColumn": "",
-    "name": "Automation Name",
+    "name": "",
     "newAutomation": "",
     "namePlaceholder": "",
     "nameInvalid": "",
@@ -1252,10 +1252,10 @@
       "after": "",
       "review": "",
       "save": "",
-      "customize": "Customize",
+      "customize": "",
       "customizeTitle": "",
       "customizeConfirm": "",
-      "customizeConfirmAction": "Customize it",
+      "customizeConfirmAction": "",
       "customizeFirst": "",
       "customizeFailed": "",
       "upgradeFailed": "",
@@ -1382,7 +1382,7 @@
       "gb": "",
       "seconds": ""
     },
-    "updateAutomation": "Update Automation",
+    "updateAutomation": "",
     "catalog": {
       "groups": {
         "sessions": "",
@@ -1391,8 +1391,8 @@
         "servers": "",
         "updates": "",
         "notify": "",
-        "policy": "Policy",
-        "control": "Control flow"
+        "policy": "",
+        "control": ""
       },
       "suggested": "",
       "triggers": {
@@ -1596,8 +1596,8 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
+      "usedBy": "",
+      "usedBy_other": "",
       "webToastNote": ""
     },
     "jobs": {
