@@ -61,12 +61,12 @@
         "message": "Ваш обліковий запис Plex відключено"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Агент додано",
@@ -85,16 +85,16 @@
         "message": "{{name}} успішно завершено"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Потік припинено",
@@ -155,15 +155,15 @@
         "message": "Ви можете зараз продовжити установку"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Не вдалося додати сервер",
@@ -175,9 +175,9 @@
       "dismissFailed": "Не вдалося відхилити порушення",
       "authFailed": "Помилка автентифікації",
       "webhookTestFailed": "Тест Webhook не вдався",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Не вдалося завершити потік",
       "serverUrlUpdateFailed": "Не вдалося оновити URL-адресу сервера",
       "serverUpdateFailed": "Не вдалося оновити сервер",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Не вдалося оновити маршрутизацію",
       "clipboardFailed": "Не вдалося скопіювати в буфер обміну",
       "plexUnlinkFailed": "Не вдалося від'єднати акаунт Plex",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Не вдалося додати агента",
       "agentUpdateFailed": "Не вдалося оновити агента",
       "agentRemoveFailed": "Не вдалося видалити агента",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Не вдалося завантажити завдання технічного обслуговування",
       "invalidUrl": "Неправильна URL-адреса",
       "plexDirectUrl": "plex.direct URL - це естафетні адреси, які не можуть бути використані тут. Замість цього використовуйте пряму IP адресу або ім'я хосту.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Невірний код взяття",
         "message": "Будь ласка, перевірте логи сервера"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
