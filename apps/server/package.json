@@ -53,7 +53,7 @@
     "@tracearr/shared": "workspace:*",
     "archiver": "^8.0.0",
     "bcrypt": "^6.0.0",
-    "better-auth": "1.6.27",
+    "better-auth": "1.6.29",
     "bullmq": "^5.76.5",
     "cacheable-lookup": "^7.0.0",
     "dotenv": "^17.4.2",
