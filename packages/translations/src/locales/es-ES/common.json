@@ -57,7 +57,7 @@
   },
   "states": {
     "loading": "Cargando...",
-    "error": "Error",
+    "error": "",
     "success": "Éxito",
     "failed": "Fallido",
     "pending": "Pendiente",
@@ -91,16 +91,16 @@
     "high": "Alto"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Ahora",
@@ -118,10 +118,10 @@
     "byHour": "Por hora"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Fecha",
@@ -171,15 +171,15 @@
     "size": "Tamaño",
     "items": "Elementos",
     "name": "Nombre",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Buscar...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Seleccionar todos en la página",
     "selectRow": "Seleccionar fila",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Película",
@@ -219,9 +219,9 @@
     "music": "Música"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Obligatorio",
@@ -253,14 +253,14 @@
   "count": {
     "user_one": "{{count}} usuario",
     "user_other": "{{count}} usuarios",
-    "session_one": "{{count}} session",
+    "session_one": "{{count}} sesión",
     "session_other": "{{count}} sesiones",
     "stream_one": "{{count}} Transmisión",
     "stream_other": "{{count}} Transmisiones",
     "server_one": "Servidor {{count}}",
     "server_other": "Servidores {{count}}",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} infracción",
     "violation_other": "{{count}} infracción",
     "item_one": "{{count}} artículo",
@@ -275,14 +275,14 @@
     "usersUpdated_other": "{{count}} usuarios actualizados",
     "library_one": "{{count}} biblioteca",
     "library_other": "{{count}} bibliotecas",
-    "error_one": "{{count}} error",
+    "error_one": "",
     "error_other": "{{count}} errores",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "{{count}} alerta",
+    "alert_other": "{{count}} alertas",
+    "location_one": "{{count}} ubicación",
+    "location_other": "{{count}} ubicaciones",
+    "device_one": "{{count}} dispositivo",
+    "device_other": "{{count}} dispositivos"
   },
   "messages": {
     "noChangesDetected": "No se detectaron cambios"
@@ -329,12 +329,12 @@
     "deleteMessage": "¿Seguro que quieres borrar esto? Esta acción no puede deshacerse.",
     "unsavedChanges": "Tienes cambios sin guardar. ¿Seguro que quieres salir?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "o",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
