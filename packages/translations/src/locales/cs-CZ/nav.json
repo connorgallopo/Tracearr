@@ -6,7 +6,6 @@
   "activity": "Aktivita",
   "library": "Knihovna",
   "users": "Uživatelé",
-  "automations": "Automations",
   "violations": "Porušování",
   "alerts": "Výstrahy",
   "settings": "Nastavení",
@@ -21,12 +20,5 @@
   "accessControl": "Kontrola přístupu",
   "media": "Média",
   "mediaBrowse": "Procházet",
-  "mediaGenres": "Žánry",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Žánry"
 }
