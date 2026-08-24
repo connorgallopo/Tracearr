@@ -61,12 +61,12 @@
         "message": "Il tuo account Plex è stato disconnesso"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agente Aggiunto",
@@ -85,16 +85,16 @@
         "message": "{{name}} completato con successo"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Stream Terminato",
@@ -113,13 +113,13 @@
       },
       "sessionsDeleted": {
         "title": "Sessioni Eliminate",
-        "message_one": "{{count}} session deleted",
-        "message_other": "{{count}} sessions deleted"
+        "message_one": "",
+        "message_other": ""
       },
       "violationsAcknowledged": {
         "title": "Violazioni Riconosciute",
-        "message_one": "{{count}} violation acknowledged",
-        "message_other": "{{count}} violations acknowledged"
+        "message_one": "",
+        "message_other": ""
       },
       "violationsDismissed": {
         "title": "Violazioni Rimosse",
@@ -155,15 +155,15 @@
         "message": "Ora puoi procedere con la configurazione"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Impossibile aggiungere il server",
@@ -175,9 +175,9 @@
       "dismissFailed": "Impossibile annullare la violazione",
       "authFailed": "Autenticazione non riuscita",
       "webhookTestFailed": "Test Webhook fallito",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Terminazione dello stream non riuscita",
       "serverUrlUpdateFailed": "Impossibile aggiornare l'URL del server",
       "serverUpdateFailed": "Aggiornamento del server non riuscito",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Impossibile aggiornare il routing",
       "clipboardFailed": "Impossibile copiare negli appunti",
       "plexUnlinkFailed": "Scollegamento account Plex non riuscito",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Impossibile aggiungere l'agente",
       "agentUpdateFailed": "Impossibile aggiornare l'agente",
       "agentRemoveFailed": "Impossibile rimuovere l'agente",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Impossibile caricare i lavori di manutenzione",
       "invalidUrl": "Url Non Valido",
       "plexDirectUrl": "Gli URL plex.direct sono indirizzi relè che non possono essere utilizzati qui. Utilizza invece un indirizzo IP diretto o un nome host.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Codice sinistro non valido",
         "message": "Controlla i log del server"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
