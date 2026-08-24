@@ -91,16 +91,16 @@
     "high": "Висока"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Зараз",
@@ -171,15 +171,15 @@
     "size": "Розмір",
     "items": "Елементи",
     "name": "Ім'я",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Пошук...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Вибрати все на сторінці",
     "selectRow": "Виберіть рядок",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Фільм",
@@ -219,9 +219,9 @@
     "music": "Музика"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Це поле обовʼязкове",
@@ -259,8 +259,8 @@
     "stream_other": "{{count}} потоки",
     "server_one": "{{count}} сервер",
     "server_other": "{{count}} сервери",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} порушення",
     "violation_other": "{{count}} порушень",
     "item_one": "{{count}} елемент",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} бібліотеки",
     "error_one": "{{count}} помилка",
     "error_other": "{{count}} помилок",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Змін не виявлено"
@@ -332,9 +332,9 @@
   "beta": "бета",
   "or": "або",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
