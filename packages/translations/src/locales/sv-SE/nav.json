@@ -6,7 +6,6 @@
   "activity": "Aktivitet",
   "library": "Bibliotek",
   "users": "Användare",
-  "automations": "Automations",
   "violations": "Överträdelser",
   "alerts": "Varningar",
   "settings": "Inställningar",
@@ -19,14 +18,6 @@
   "bandwidth": "Bandbredd",
   "jobs": "Jobb",
   "accessControl": "Åtkomstkontroll",
-  "media": "Media",
   "mediaBrowse": "Bläddra",
-  "mediaGenres": "Genrer",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Genrer"
 }
