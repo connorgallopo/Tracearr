@@ -10,10 +10,10 @@
     "enterManually": "Inserisci manualmente URL e Token",
     "cameraPermissionRequired": "È richiesto il permesso della fotocamera per la scansione dei codici QR",
     "scanQrInstructions": "Apri Impostazioni → App mobile nella tua dashboard Tracearr e scansiona il codice QR",
-    "urlPlaceholder": "https://tracearr.example.com",
-    "tokenPlaceholder": "trr_mob_...",
-    "missingToken": "Missing Token",
-    "pleaseEnterToken": "Please enter your access token"
+    "urlPlaceholder": "",
+    "tokenPlaceholder": "",
+    "missingToken": "",
+    "pleaseEnterToken": ""
   },
   "errors": {
     "missingFields": "Campi Mancanti",
@@ -22,8 +22,8 @@
     "serverUrlMustStartWith": "L'URL del server deve iniziare con http:// o ↓ ://",
     "pleaseEnterValidUrl": "Inserisci un URL valido del server",
     "pairingFailed": "Accoppiamento Fallito",
-    "unableToPair": "Unable to pair with server",
-    "invalidQrCode": "Invalid QR code",
+    "unableToPair": "",
+    "invalidQrCode": "",
     "invalidQrCodeMissingData": "Codice QR non valido: dati di accoppiamento mancanti",
     "invalidQrCodeFormat": "Formato del codice QR non valido. Si prega di generare un nuovo codice.",
     "invalidQrCodeMissingUrl": "Codice QR non valido: URL server mancante",
@@ -32,45 +32,45 @@
     "tooManyPairingAttempts": "Troppi tentativi di accoppiamento. Attendere qualche minuto.",
     "invalidOrExpiredToken": "Token di accoppiamento non valido o scaduto.",
     "invalidPairingRequest": "Richiesta di accoppiamento non valida. Controlla il tuo token.",
-    "errorDetails": "Error Details:",
-    "componentStack": "Component Stack:",
-    "connectionLost": "Connection lost",
-    "failedToLoadSession": "Failed to load session"
+    "errorDetails": "",
+    "componentStack": "",
+    "connectionLost": "",
+    "failedToLoadSession": ""
   },
   "settings": {
     "preferences": "Preferenze",
-    "notifications": "Notifications",
-    "configureNotifications": "Configure push notification preferences",
-    "language": "Language",
-    "community": "Community",
-    "discord": "Discord",
+    "notifications": "",
+    "configureNotifications": "",
+    "language": "",
+    "community": "",
+    "discord": "",
     "joinCommunity": "Unisciti alla community",
-    "docs": "Docs",
-    "readDocs": "Read the documentation",
-    "website": "Website",
-    "visitWebsite": "Visit tracearr.com",
-    "github": "GitHub",
+    "docs": "",
+    "readDocs": "",
+    "website": "",
+    "visitWebsite": "",
+    "github": "",
     "viewSourceCode": "Visualizza codice sorgente",
-    "sponsor": "Sponsor",
-    "supportDevelopment": "Support development",
-    "account": "Account",
-    "disconnect": "Disconnect",
+    "sponsor": "",
+    "supportDevelopment": "",
+    "account": "",
+    "disconnect": "",
     "disconnectServer": "Disconnetti Server",
     "disconnectConfirm": "Sei sicuro di voler disconnetterti da \"{{serverName}}\"? Dovrai accoppiarti di nuovo per usare l'app.",
     "disconnectConfirmGeneric": "Sei sicuro di voler disconnetterti? Dovrai accoppiarti di nuovo per usare l'app.",
     "currentlyConnected": "Attualmente connesso a {{serverName}}",
-    "version": "Version {{version}}",
-    "build": "Build {{build}}"
+    "version": "",
+    "build": ""
   },
   "navigation": {
-    "home": "Home",
+    "home": "",
     "selectServer": "Seleziona Server",
-    "server": "Server",
-    "navigation": "Navigation"
+    "server": "",
+    "navigation": ""
   },
   "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+    "cpu": "",
+    "ram": ""
   },
   "notifications": {
     "testSent": "Test Inviato",
@@ -78,101 +78,101 @@
     "failedToSendTest": "Impossibile inviare la notifica di prova",
     "loadingPreferences": "Caricamento preferenze...",
     "unableToLoadPreferences": "Impossibile caricare le preferenze",
-    "receiveAlerts": "Receive alerts on this device",
-    "ruleViolationTriggered": "Rule violation triggered",
-    "newPlaybackBegan": "New playback began",
-    "playbackEnded": "Playback ended",
-    "exceededStreamLimit": "User exceeded stream limit",
-    "newDeviceDetected": "New device detected for user",
-    "trustScoreDegraded": "User trust score degraded",
-    "serverUnreachable": "Media server unreachable",
-    "serverBackOnline": "Media server back online",
-    "allViolationTypes": "All Violation Types",
-    "notifyForEveryRule": "Notify for every rule type",
-    "severityDescription": "Only notify for violations at or above this severity level",
-    "quietHoursDescription": "Pause non-critical notifications during set hours",
-    "startTime": "Start Time",
-    "endTime": "End Time",
-    "to": "to",
-    "timezoneLabel": "Timezone: {{timezone}}",
-    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
-    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
-    "sendTestNotification": "Send Test Notification",
-    "testDescription": "Verify that push notifications are working correctly"
+    "receiveAlerts": "",
+    "ruleViolationTriggered": "",
+    "newPlaybackBegan": "",
+    "playbackEnded": "",
+    "exceededStreamLimit": "",
+    "newDeviceDetected": "",
+    "trustScoreDegraded": "",
+    "serverUnreachable": "",
+    "serverBackOnline": "",
+    "allViolationTypes": "",
+    "notifyForEveryRule": "",
+    "severityDescription": "",
+    "quietHoursDescription": "",
+    "startTime": "",
+    "endTime": "",
+    "to": "",
+    "timezoneLabel": "",
+    "criticalOverrideDescription": "",
+    "rateLimitDescription": "",
+    "sendTestNotification": "",
+    "testDescription": ""
   },
   "dashboard": {
-    "today": "TODAY",
-    "hrs": "hrs"
+    "today": "",
+    "hrs": ""
   },
   "session": {
-    "streamTerminated": "Stream Terminated",
-    "sessionStopped": "The playback session has been stopped.",
-    "failedToTerminate": "Failed to Terminate"
+    "streamTerminated": "",
+    "sessionStopped": "",
+    "failedToTerminate": ""
   },
   "userDetail": {
-    "userMayBeRemoved": "This user may have been removed.",
-    "noLocationsRecorded": "No locations recorded",
-    "noDevicesRecorded": "No devices recorded",
-    "moreLocations": "+{{count}} more locations",
-    "moreDevices": "+{{count}} more devices",
-    "noViolations": "No violations",
-    "noTerminations": "No stream terminations",
-    "trustLow": "Low",
-    "trustMedium": "Medium",
-    "trustHigh": "High"
+    "userMayBeRemoved": "",
+    "noLocationsRecorded": "",
+    "noDevicesRecorded": "",
+    "moreLocations": "",
+    "moreDevices": "",
+    "noViolations": "",
+    "noTerminations": "",
+    "trustLow": "",
+    "trustMedium": "",
+    "trustHigh": ""
   },
   "violation": {
-    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available.",
-    "customRule": "Custom Rule",
-    "streamComparison": "Stream Comparison",
-    "ips": "IPs"
+    "violationNotFoundDesc": "",
+    "customRule": "",
+    "streamComparison": "",
+    "ips": ""
   },
   "alerts": {
-    "done": "Done",
-    "clearFilters": "Clear Filters"
+    "done": "",
+    "clearFilters": ""
   },
   "history": {
-    "noHistoryFound": "No History Found",
-    "adjustFilters": "Try adjusting your filters",
-    "historyWillAppear": "Session history will appear here once users start streaming"
+    "noHistoryFound": "",
+    "adjustFilters": "",
+    "historyWillAppear": ""
   },
   "users": {
-    "owner": "Owner",
-    "noUsers": "No Users",
-    "usersWillAppear": "Users will appear here after syncing with your media server",
-    "noUsersMatch": "No users match \"{{query}}\""
+    "owner": "",
+    "noUsers": "",
+    "usersWillAppear": "",
+    "noUsersMatch": ""
   },
   "activity": {
-    "playsOverTime": "Plays Over Time",
-    "concurrentStreams": "Concurrent Streams",
-    "platforms": "Platforms",
-    "playbackQuality": "Playback Quality"
+    "playsOverTime": "Riproduce Nel Tempo",
+    "concurrentStreams": "Flussi Concorrenti",
+    "platforms": "Piattaforme",
+    "playbackQuality": ""
   },
   "unauthenticated": {
-    "connectionLost": "Connection Lost",
-    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
-    "scanQrCode": "Scan QR Code"
+    "connectionLost": "",
+    "accessRevoked": "",
+    "scanQrCode": ""
   },
   "serverSelector": {
-    "servers": "Servers",
-    "selectServers": "Select Servers",
-    "serversSelected": "{{selected}} of {{total}} servers selected",
-    "allServers": "All servers"
+    "servers": "",
+    "selectServers": "",
+    "serversSelected": "",
+    "allServers": ""
   },
-  "reconnected": "Reconnected",
-  "actionsExecuted": "Actions Executed",
+  "reconnected": "",
+  "actionsExecuted": "",
   "serverScope": {
-    "single": "Showing {{name}} only"
+    "single": ""
   },
   "a11y": {
-    "selectServer": "Select server",
-    "alerts": "Alerts",
-    "alertsCount": "Alerts, {{count}} unread",
-    "settings": "Settings",
-    "trustScore": "Trust score {{score}}"
+    "selectServer": "",
+    "alerts": "",
+    "alertsCount": "",
+    "settings": "",
+    "trustScore": ""
   },
   "map": {
-    "noData": "No location data available",
-    "unavailable": "Map unavailable"
+    "noData": "",
+    "unavailable": ""
   }
 }
