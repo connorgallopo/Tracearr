@@ -6,7 +6,6 @@
   "activity": "Activitat",
   "library": "Llibreries",
   "users": "Usuaris",
-  "automations": "Automations",
   "violations": "Incompliments",
   "alerts": "Alertes",
   "settings": "Configuració",
@@ -21,12 +20,5 @@
   "accessControl": "Control d'accés",
   "media": "Mèdia",
   "mediaBrowse": "Explora",
-  "mediaGenres": "Gèneres",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Gèneres"
 }
