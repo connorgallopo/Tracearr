@@ -10,10 +10,10 @@
     "enterManually": "手动输入 URL 和令牌",
     "cameraPermissionRequired": "请授予相机权限以扫描二维码",
     "scanQrInstructions": "在您的 Tracearr 仪表盘中打开设置 -> 移动应用程序并扫描二维码",
-    "urlPlaceholder": "https://tracearr.example.com",
-    "tokenPlaceholder": "trr_mob_...",
-    "missingToken": "Missing Token",
-    "pleaseEnterToken": "Please enter your access token"
+    "urlPlaceholder": "",
+    "tokenPlaceholder": "trr_mob_……",
+    "missingToken": "缺失的令牌",
+    "pleaseEnterToken": "请输入您的访问令牌"
   },
   "errors": {
     "missingFields": "缺失必填字段",
@@ -22,7 +22,7 @@
     "serverUrlMustStartWith": "服务器 URL 必须以 http:// 或 https:// 开头",
     "pleaseEnterValidUrl": "请输入一个有效的服务器 URL",
     "pairingFailed": "配对失败",
-    "unableToPair": "Unable to pair with server",
+    "unableToPair": "无法与服务器配对",
     "invalidQrCode": "无效的二维码",
     "invalidQrCodeMissingData": "无效的二维码：缺少配对数据",
     "invalidQrCodeFormat": "无效的二维码格式。请生成一个新的代码。",
@@ -32,44 +32,44 @@
     "tooManyPairingAttempts": "尝试配对太多。请等待几分钟。",
     "invalidOrExpiredToken": "配对令牌无效或过期。",
     "invalidPairingRequest": "无效配对请求。请检查您的令牌。",
-    "errorDetails": "Error Details:",
-    "componentStack": "Component Stack:",
-    "connectionLost": "Connection lost",
-    "failedToLoadSession": "Failed to load session"
+    "errorDetails": "错误详情：",
+    "componentStack": "组件堆栈：",
+    "connectionLost": "连接丢失",
+    "failedToLoadSession": "加载会话失败"
   },
   "settings": {
     "preferences": "首选项",
-    "notifications": "Notifications",
-    "configureNotifications": "Configure push notification preferences",
-    "language": "Language",
+    "notifications": "通知",
+    "configureNotifications": "配置推送通知偏好设置",
+    "language": "语言",
     "community": "社区",
-    "discord": "Discord",
+    "discord": "",
     "joinCommunity": "加入社区",
-    "docs": "Docs",
-    "readDocs": "Read the documentation",
-    "website": "Website",
-    "visitWebsite": "Visit tracearr.com",
-    "github": "GitHub",
+    "docs": "文档",
+    "readDocs": "阅读文档",
+    "website": "网站",
+    "visitWebsite": "访问tracearr.com",
+    "github": "",
     "viewSourceCode": "查看源代码",
-    "sponsor": "Sponsor",
-    "supportDevelopment": "Support development",
+    "sponsor": "支持者",
+    "supportDevelopment": "支持发展",
     "account": "帐户",
-    "disconnect": "Disconnect",
+    "disconnect": "断开链接",
     "disconnectServer": "断开服务器",
     "disconnectConfirm": "您确定要断开与“{{serverName}}”的连接吗？您需要重新配对才能使用该应用。",
     "disconnectConfirmGeneric": "您确定要断开连接？您需要再次配对才能使用应用程序。",
     "currentlyConnected": "当前连接到 {{serverName}}",
-    "version": "Version {{version}}",
-    "build": "Build {{build}}"
+    "version": "版本 {{version}}",
+    "build": "构建{{build}}"
   },
   "navigation": {
-    "home": "Home",
+    "home": "主页",
     "selectServer": "选择服务器",
     "server": "服务器",
     "navigation": "导航栏"
   },
   "resources": {
-    "cpu": "CPU",
+    "cpu": "处理器",
     "ram": "内存"
   },
   "notifications": {
@@ -78,101 +78,101 @@
     "failedToSendTest": "发送测试通知失败",
     "loadingPreferences": "正在加载首选项……",
     "unableToLoadPreferences": "无法加载首选项",
-    "receiveAlerts": "Receive alerts on this device",
-    "ruleViolationTriggered": "Rule violation triggered",
-    "newPlaybackBegan": "New playback began",
-    "playbackEnded": "Playback ended",
-    "exceededStreamLimit": "User exceeded stream limit",
-    "newDeviceDetected": "New device detected for user",
-    "trustScoreDegraded": "User trust score degraded",
-    "serverUnreachable": "Media server unreachable",
-    "serverBackOnline": "Media server back online",
-    "allViolationTypes": "All Violation Types",
-    "notifyForEveryRule": "Notify for every rule type",
-    "severityDescription": "Only notify for violations at or above this severity level",
-    "quietHoursDescription": "Pause non-critical notifications during set hours",
-    "startTime": "Start Time",
-    "endTime": "End Time",
-    "to": "to",
-    "timezoneLabel": "Timezone: {{timezone}}",
-    "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
-    "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
-    "sendTestNotification": "Send Test Notification",
-    "testDescription": "Verify that push notifications are working correctly"
+    "receiveAlerts": "在此设备上接收提醒",
+    "ruleViolationTriggered": "触发了规则的违规行为",
+    "newPlaybackBegan": "开始新的播放",
+    "playbackEnded": "播放结束",
+    "exceededStreamLimit": "用户超过流限制",
+    "newDeviceDetected": "检测到用户的新设备",
+    "trustScoreDegraded": "用户信任得分已降级",
+    "serverUnreachable": "无法访问媒体服务器",
+    "serverBackOnline": "媒体服务器返回在线",
+    "allViolationTypes": "所有违反类型",
+    "notifyForEveryRule": "通知每个规则类型",
+    "severityDescription": "仅在这个严重性级别上或更高时通知犯规行为",
+    "quietHoursDescription": "在设置的小时内暂停非关键通知",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "to": "到",
+    "timezoneLabel": "时区：{{timezone}}",
+    "criticalOverrideDescription": "在静音时间内仍然有高严重性犯规通知",
+    "rateLimitDescription": "速率限制防止通知垃圾邮件。当前限制：{{perMinute}}/分钟，{{perHour}}/小时。",
+    "sendTestNotification": "发送测试通知",
+    "testDescription": "验证推送通知是否正常工作"
   },
   "dashboard": {
-    "today": "TODAY",
-    "hrs": "hrs"
+    "today": "今天",
+    "hrs": "小时"
   },
   "session": {
-    "streamTerminated": "Stream Terminated",
-    "sessionStopped": "The playback session has been stopped.",
-    "failedToTerminate": "Failed to Terminate"
+    "streamTerminated": "流已终止",
+    "sessionStopped": "播放会话已停止。",
+    "failedToTerminate": "未能终止"
   },
   "userDetail": {
-    "userMayBeRemoved": "This user may have been removed.",
-    "noLocationsRecorded": "No locations recorded",
-    "noDevicesRecorded": "No devices recorded",
-    "moreLocations": "+{{count}} more locations",
-    "moreDevices": "+{{count}} more devices",
-    "noViolations": "No violations",
-    "noTerminations": "No stream terminations",
-    "trustLow": "Low",
-    "trustMedium": "Medium",
-    "trustHigh": "High"
+    "userMayBeRemoved": "该用户可能已被删除。",
+    "noLocationsRecorded": "没有记录的位置",
+    "noDevicesRecorded": "没有任何设备记录",
+    "moreLocations": "+{{count}} 个更多连接",
+    "moreDevices": "{{count}}",
+    "noViolations": "没有违反行为",
+    "noTerminations": "没有流终止",
+    "trustLow": "低",
+    "trustMedium": "中等",
+    "trustHigh": "高"
   },
   "violation": {
-    "violationNotFoundDesc": "This violation may have been dismissed or is no longer available.",
-    "customRule": "Custom Rule",
-    "streamComparison": "Stream Comparison",
-    "ips": "IPs"
+    "violationNotFoundDesc": "更多设备。",
+    "customRule": "自定义规则",
+    "streamComparison": "串流比较",
+    "ips": ""
   },
   "alerts": {
-    "done": "Done",
-    "clearFilters": "Clear Filters"
+    "done": "完成",
+    "clearFilters": "清除筛选"
   },
   "history": {
-    "noHistoryFound": "No History Found",
-    "adjustFilters": "Try adjusting your filters",
-    "historyWillAppear": "Session history will appear here once users start streaming"
+    "noHistoryFound": "没有历史记录",
+    "adjustFilters": "尝试调整筛选条件",
+    "historyWillAppear": "一旦用户开始串流，会话历史将出现在这里"
   },
   "users": {
-    "owner": "Owner",
-    "noUsers": "No Users",
-    "usersWillAppear": "Users will appear here after syncing with your media server",
-    "noUsersMatch": "No users match \"{{query}}\""
+    "owner": "所有者",
+    "noUsers": "暂无用户",
+    "usersWillAppear": "用户将在与您的媒体服务器同步后显示在这里",
+    "noUsersMatch": "没有匹配的用户{{query}}"
   },
   "activity": {
-    "playsOverTime": "Plays Over Time",
-    "concurrentStreams": "Concurrent Streams",
-    "platforms": "Platforms",
-    "playbackQuality": "Playback Quality"
+    "playsOverTime": "一段时间后播放",
+    "concurrentStreams": "并发流",
+    "platforms": "平台",
+    "playbackQuality": "播放质量"
   },
   "unauthenticated": {
-    "connectionLost": "Connection Lost",
-    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
-    "scanQrCode": "Scan QR Code"
+    "connectionLost": "连接丢失",
+    "accessRevoked": "您对 {{serverName}} 的访问权限已被撤销。请向服务器所有者请求新的配对代。",
+    "scanQrCode": "扫描二维码"
   },
   "serverSelector": {
-    "servers": "Servers",
-    "selectServers": "Select Servers",
-    "serversSelected": "{{selected}} of {{total}} servers selected",
-    "allServers": "All servers"
+    "servers": "服务器",
+    "selectServers": "选择服务器",
+    "serversSelected": "已选择 {{selected}} 个服务器，共 {{total}} 个服务器",
+    "allServers": ""
   },
-  "reconnected": "Reconnected",
-  "actionsExecuted": "Actions Executed",
+  "reconnected": "已经重新连接",
+  "actionsExecuted": "操作已执行",
   "serverScope": {
-    "single": "Showing {{name}} only"
+    "single": "仅显示{{name}}"
   },
   "a11y": {
-    "selectServer": "Select server",
-    "alerts": "Alerts",
-    "alertsCount": "Alerts, {{count}} unread",
-    "settings": "Settings",
-    "trustScore": "Trust score {{score}}"
+    "selectServer": "选择服务器",
+    "alerts": "警告",
+    "alertsCount": "提醒，{{count}} 条未读",
+    "settings": "设置",
+    "trustScore": "信任分数{{score}}"
   },
   "map": {
-    "noData": "No location data available",
-    "unavailable": "Map unavailable"
+    "noData": "无可用位置数据",
+    "unavailable": "地图不可用"
   }
 }
