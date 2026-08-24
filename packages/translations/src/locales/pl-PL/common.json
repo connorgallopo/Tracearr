@@ -124,7 +124,7 @@
     "mph": "mi/h"
   },
   "labels": {
-    "date": "Data",
+    "date": "",
     "user": "Użytkownik",
     "content": "Zawartość",
     "platform": "Platforma",
