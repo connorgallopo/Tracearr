@@ -61,12 +61,12 @@
         "message": "تم قطع اتصال حساب Plex الخاص بك"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "تم إضافة الوكيل",
@@ -82,19 +82,19 @@
       },
       "jobCompleted": {
         "title": "اكتمل العمل",
-        "message": "{{name}} finished successfully"
+        "message": ""
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "توقف البث",
@@ -114,11 +114,11 @@
       "sessionsDeleted": {
         "title": "الجلسات المحذوفة",
         "message_one": "تم حذف جلسة {{count}}",
-        "message_other": "{{count}} sessions deleted"
+        "message_other": ""
       },
       "violationsAcknowledged": {
         "title": "الانتهاكات المعترف بها",
-        "message_one": "{{count}} violation acknowledged",
+        "message_one": "",
         "message_other": "تم الاعتراف بانتهاكات {{count}}"
       },
       "violationsDismissed": {
@@ -147,7 +147,7 @@
       },
       "trustScoresReset": {
         "title": "إعادة تعيين نقاط الثقة",
-        "message_one": "{{count}} user reset to 100",
+        "message_one": "",
         "message_other": "{{count}} إعادة تعيين المستخدمين إلى 100"
       },
       "claimCodeValidated": {
@@ -155,15 +155,15 @@
         "message": "يمكنك الآن المضي قدما في الإعداد"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "فشل في إضافة الخادم",
@@ -175,9 +175,9 @@
       "dismissFailed": "فشل في رفض الانتهاك",
       "authFailed": "فشل المصادقة",
       "webhookTestFailed": "فشل اختبار Webhook",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "فشل في إنهاء البث",
       "serverUrlUpdateFailed": "فشل تحديث رابط الخادم",
       "serverUpdateFailed": "فشل تحديث الخادم",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "فشل تحديث المسار",
       "clipboardFailed": "فشل النسخ إلى الحافظة",
       "plexUnlinkFailed": "فشل فك ربط حساب Plex",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "فشل في إضافة وكيل",
       "agentUpdateFailed": "فشل تحديث الوكيل",
       "agentRemoveFailed": "فشل في إزالة الوكيل",
@@ -205,21 +205,21 @@
       "jobLoadFailed": "فشل تحميل مهام الصيانة",
       "invalidUrl": "رابط غير صالح",
       "plexDirectUrl": "plex.direct URLs هي عناوين إعادة الإرسال التي لا يمكن استخدامها هنا. الرجاء استخدام عنوان IP مباشر أو اسم المضيف بدلاً من ذلك.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "رمز المطالبة غير صالح",
         "message": "الرجاء التحقق من سجلات الخادم"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
         "title": "فشل العمل",
-        "message": "{{name}} encountered an error"
+        "message": ""
       }
     },
     "info": {
@@ -229,7 +229,7 @@
       },
       "violationDetected": {
         "title": "انتهاك جديد: {{ruleName}}",
-        "message": "{{user}} triggered {{ruleType}}"
+        "message": ""
       }
     }
   },
