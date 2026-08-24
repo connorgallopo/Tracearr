@@ -32,7 +32,7 @@
     "sort": "Ταξινόμηση",
     "clear": "Εκκαθάριση",
     "apply": "Εφαρμογή",
-    "reset": "Reset",
+    "reset": "",
     "select": "Επιλογή",
     "selectAll": "Επιλογή Όλων",
     "deselectAll": "Αποεπιλογή Όλων",
@@ -91,16 +91,16 @@
     "high": "Υψηλή"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Τώρα",
@@ -120,7 +120,7 @@
   "units": {
     "km": "χλμ",
     "mi": "μίλια",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "μ/ω"
   },
   "labels": {
@@ -171,15 +171,15 @@
     "size": "Μέγεθος",
     "items": "Στοιχεία",
     "name": "Όνομα",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Αναζήτηση...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Επιλογή όλων στη σελίδα",
     "selectRow": "Επιλογή γραμμής",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Ταινία",
@@ -219,16 +219,16 @@
     "music": "Μουσική"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Αυτό το πεδίο είναι υποχρεωτικό",
     "invalidEmail": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση email",
     "invalidUrl": "Παρακαλώ εισάγετε μια έγκυρη διεύθυνση URL",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters"
+    "minLength": "",
+    "maxLength": ""
   },
   "errors": {
     "generic": "Παρουσιάστηκε ένα σφάλμα",
@@ -251,38 +251,38 @@
     "cannotReachServer": "Δεν είναι δυνατή η πρόσβαση στο διακομιστή. Ελέγξτε τη διεύθυνση URL και τη σύνδεση δικτύου."
   },
   "count": {
-    "user_one": "{{count}} user",
-    "user_other": "{{count}} users",
-    "session_one": "{{count}} session",
-    "session_other": "{{count}} sessions",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
-    "server_one": "{{count}} server",
-    "server_other": "{{count}} servers",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "user_one": "",
+    "user_other": "",
+    "session_one": "",
+    "session_other": "",
+    "stream_one": "",
+    "stream_other": "",
+    "server_one": "",
+    "server_other": "",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} παραβίαση",
-    "violation_other": "{{count}} violations",
-    "item_one": "{{count}} item",
-    "item_other": "{{count}} items",
-    "result_one": "{{count}} result",
-    "result_other": "{{count}} results",
-    "selected_one": "{{count}} selected",
-    "selected_other": "{{count}} selected",
-    "usersAdded_one": "{{count}} user added",
+    "violation_other": "",
+    "item_one": "",
+    "item_other": "",
+    "result_one": "",
+    "result_other": "",
+    "selected_one": "",
+    "selected_other": "",
+    "usersAdded_one": "",
     "usersAdded_other": "Προστέθηκαν {{count}} χρήστες",
-    "usersUpdated_one": "{{count}} user updated",
-    "usersUpdated_other": "{{count}} users updated",
-    "library_one": "{{count}} library",
-    "library_other": "{{count}} libraries",
+    "usersUpdated_one": "",
+    "usersUpdated_other": "",
+    "library_one": "",
+    "library_other": "",
     "error_one": "{{count}} σφάλμα",
-    "error_other": "{{count}} errors",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "error_other": "",
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Δεν εντοπίστηκαν αλλαγές"
@@ -305,14 +305,14 @@
     "year_other": "{{count}} πριν από χρόνια"
   },
   "duration": {
-    "second_one": "{{count}} second",
-    "second_other": "{{count}} seconds",
-    "minute_one": "{{count}} minute",
-    "minute_other": "{{count}} minutes",
-    "hour_one": "{{count}} hour",
-    "hour_other": "{{count}} hours",
-    "day_one": "{{count}} day",
-    "day_other": "{{count}} days"
+    "second_one": "",
+    "second_other": "",
+    "minute_one": "",
+    "minute_other": "",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
+    "day_other": ""
   },
   "empty": {
     "noResults": "Δεν βρέθηκαν αποτελέσματα",
@@ -332,9 +332,9 @@
   "beta": "βήτα",
   "or": "ή",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
