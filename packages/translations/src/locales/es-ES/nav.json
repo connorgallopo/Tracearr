@@ -6,7 +6,6 @@
   "activity": "Actividad",
   "library": "Biblioteca",
   "users": "Usuarios",
-  "automations": "Automations",
   "violations": "Infracciones",
   "alerts": "Alertas",
   "settings": "Ajustes",
@@ -21,12 +20,5 @@
   "accessControl": "Control de acceso",
   "media": "Multimedia",
   "mediaBrowse": "Explorar",
-  "mediaGenres": "Géneros",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Géneros"
 }
