@@ -6,7 +6,6 @@
   "activity": "Activitate",
   "library": "Bibliotecă",
   "users": "Utilizatori",
-  "automations": "Automations",
   "violations": "Incalcari",
   "alerts": "Alerte",
   "settings": "Setări",
@@ -19,14 +18,6 @@
   "bandwidth": "Lățimea benzii",
   "jobs": "Joburi",
   "accessControl": "Control Acces",
-  "media": "Media",
   "mediaBrowse": "Răsfoiește",
-  "mediaGenres": "Genuri",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Genuri"
 }
