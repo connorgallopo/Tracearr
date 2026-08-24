@@ -32,7 +32,7 @@
     "sort": "Ordenar",
     "clear": "Limpar",
     "apply": "Aplicar",
-    "reset": "Reset",
+    "reset": "",
     "select": "Selecionar",
     "selectAll": "Selecionar Todos",
     "deselectAll": "Desmarcar Todos",
@@ -91,16 +91,16 @@
     "high": "alta"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "agora",
@@ -120,7 +120,7 @@
   "units": {
     "km": "KM",
     "mi": "milhas",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "mi/h"
   },
   "labels": {
@@ -171,15 +171,15 @@
     "size": "Tamanho",
     "items": "itens",
     "name": "Nome:",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "Detalhes da transmissão",
+    "transcodeReason": "Motivo da conversão",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Buscar...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Selecionar tudo na página",
     "selectRow": "Selecione a linha",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Filme",
@@ -219,9 +219,9 @@
     "music": "Música"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Este campo é obrigatório",
@@ -255,18 +255,18 @@
     "user_other": "Usuários {{count}}",
     "session_one": "Sessão {{count}}",
     "session_other": "Sessões {{count}}",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
+    "stream_one": "",
+    "stream_other": "",
     "server_one": "Servidor {{count}}",
     "server_other": "Servidores {{count}}",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "Violação do {{count}}",
     "violation_other": "Violações de {{count}}",
     "item_one": "Itens de {{count}}",
     "item_other": "Itens de {{count}}",
     "result_one": "Resultado em {{count}}",
-    "result_other": "{{count}} results",
+    "result_other": "",
     "selected_one": "{{count}} selecionado",
     "selected_other": "{{count}} selecionado",
     "usersAdded_one": "Usuário {{count}} adicionado",
@@ -277,38 +277,38 @@
     "library_other": "Bibliotecas do {{count}}",
     "error_one": "Erro {{count}}",
     "error_other": "Erros {{count}}",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Nenhuma alteração detectada"
   },
   "relativeTime": {
     "justNow": "Agora há pouco",
-    "second_one": "{{count}} second ago",
-    "second_other": "{{count}} seconds ago",
-    "minute_one": "{{count}} minute ago",
-    "minute_other": "{{count}} minutes ago",
-    "hour_one": "{{count}} hour ago",
-    "hour_other": "{{count}} hours ago",
-    "day_one": "{{count}} day ago",
-    "day_other": "{{count}} days ago",
-    "week_one": "{{count}} week ago",
-    "week_other": "{{count}} weeks ago",
-    "month_one": "{{count}} month ago",
-    "month_other": "{{count}} months ago",
-    "year_one": "{{count}} year ago",
-    "year_other": "{{count}} years ago"
+    "second_one": "",
+    "second_other": "",
+    "minute_one": "",
+    "minute_other": "",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
+    "day_other": "",
+    "week_one": "",
+    "week_other": "",
+    "month_one": "",
+    "month_other": "",
+    "year_one": "",
+    "year_other": ""
   },
   "duration": {
-    "second_one": "{{count}} second",
-    "second_other": "{{count}} seconds",
+    "second_one": "",
+    "second_other": "",
     "minute_one": "{{count}} minuto",
-    "minute_other": "{{count}} minutes",
+    "minute_other": "",
     "hour_one": "{{count}} hora",
     "hour_other": "{{count}} horas",
     "day_one": "Dia {{count}}",
@@ -329,12 +329,12 @@
     "deleteMessage": "Tem certeza que deseja apagar isto? Esta ação não pode ser desfeita.",
     "unsavedChanges": "Você tem alterações não salvas. Tem certeza que deseja sair?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "ou",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
