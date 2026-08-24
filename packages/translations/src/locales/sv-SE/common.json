@@ -32,7 +32,7 @@
     "sort": "Sortera",
     "clear": "Rensa",
     "apply": "Tillämpa",
-    "reset": "Reset",
+    "reset": "",
     "select": "Välj",
     "selectAll": "Markera alla",
     "deselectAll": "Avmarkera alla",
@@ -66,8 +66,8 @@
     "inactive": "Inaktiv",
     "enabled": "Aktiverad",
     "disabled": "Inaktiverad",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Ansluter...",
     "connected": "Ansluten",
     "disconnected": "Frånkopplad",
@@ -91,16 +91,16 @@
     "high": "Hög"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Nu",
@@ -118,10 +118,10 @@
     "byHour": "Efter timme"
   },
   "units": {
-    "km": "km",
+    "km": "",
     "mi": "Mig",
-    "kmh": "km/h",
-    "mph": "mph"
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Datum",
@@ -133,13 +133,13 @@
     "quality": "Kvalitet",
     "duration": "Varaktighet",
     "progress": "Förlopp",
-    "status": "Status",
+    "status": "",
     "rule": "Regel",
-    "media": "Media",
+    "media": "",
     "started": "Startad",
     "stopped": "Stoppad",
     "joined": "Gick med",
-    "server": "Server",
+    "server": "",
     "device": "Enhet",
     "player": "Spelare",
     "unknown": "Okänd",
@@ -167,19 +167,19 @@
     "sessions": "Sessioner",
     "apiKey": "API nyckel",
     "rank": "Rankning",
-    "data": "Data",
+    "data": "",
     "size": "Storlek",
     "items": "Objekt",
     "name": "Namn",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Sök...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Välj alla på sidan",
     "selectRow": "Välj rad",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
@@ -212,23 +212,23 @@
     "episode_plural": "Avsnitt",
     "track": "Spår",
     "track_plural": "Spår",
-    "liveTV": "Live TV",
+    "liveTV": "",
     "photo": "Foto",
-    "tv": "TV",
+    "tv": "",
     "tvShows": "TV-program",
     "music": "Musik"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Detta fält är tvingande",
     "invalidEmail": "Ange en giltig e-postadress",
     "invalidUrl": "Ange en giltig URL",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters"
+    "minLength": "",
+    "maxLength": ""
   },
   "errors": {
     "generic": "Ett fel uppstod",
@@ -253,14 +253,14 @@
   "count": {
     "user_one": "{{count}} användare",
     "user_other": "{{count}} användare",
-    "session_one": "{{count}} session",
+    "session_one": "",
     "session_other": "{{count}} sessioner",
     "stream_one": "{{count}} ström",
     "stream_other": "{{count}} strömmar",
-    "server_one": "{{count}} server",
+    "server_one": "",
     "server_other": "{{count}} servrar",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} brott",
     "violation_other": "{{count}} överträdelser",
     "item_one": "{{count}} objekt",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} bibliotek",
     "error_one": "{{count}} fel",
     "error_other": "{{count}} fel",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Inga ändringar upptäckta"
@@ -329,12 +329,12 @@
     "deleteMessage": "Är du säker på att du vill ta bort detta? Denna åtgärd kan inte ångras.",
     "unsavedChanges": "Du har osparade ändringar. Är du säker på att du vill lämna?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "eller",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
