@@ -61,12 +61,12 @@
         "message": "Sua conta Plex foi desconectada"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agente Adicionado",
@@ -85,16 +85,16 @@
         "message": "{{name}} finalizado com sucesso"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Transmissão terminada",
@@ -155,15 +155,15 @@
         "message": "Agora você pode prosseguir com a configuração"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Falha ao adicionar servidor",
@@ -175,9 +175,9 @@
       "dismissFailed": "Falha ao descartar a violação",
       "authFailed": "Falha na autenticação",
       "webhookTestFailed": "Teste do Webhook falhou",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Falha ao encerrar transmissão",
       "serverUrlUpdateFailed": "Falha ao atualizar URL do servidor",
       "serverUpdateFailed": "Falha ao atualizar servidor",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Falha ao atualizar roteamento",
       "clipboardFailed": "Falha ao copiar para área de transferência",
       "plexUnlinkFailed": "Falha ao desvincular a conta Plex",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Falha ao adicionar agente",
       "agentUpdateFailed": "Falha ao atualizar o agente",
       "agentRemoveFailed": "Falha ao remover agente",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Falha ao carregar trabalhos de manutenção",
       "invalidUrl": "URL inválida",
       "plexDirectUrl": "URLs plex.direct são endereços de retransmissão que não podem ser usados aqui. Por favor, use um endereço IP direto ou nome de host.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Código de reivindicação inválido",
         "message": "Por favor, verifique os logs do servidor"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
