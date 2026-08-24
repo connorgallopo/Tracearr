@@ -11,7 +11,7 @@
     "cameraPermissionRequired": "L'accès à la caméra est nécessaire pour scanner les codes QR",
     "scanQrInstructions": "Ouvrez les Réglages → Application mobile dans votre tableau de bord Tracearr et scannez le code QR",
     "urlPlaceholder": "https://tracearr.exemple.com",
-    "tokenPlaceholder": "trr_mob_...",
+    "tokenPlaceholder": "",
     "missingToken": "Jeton d'accès manquant",
     "pleaseEnterToken": "Veuillez entrer votre jeton d'accès"
   },
@@ -39,17 +39,17 @@
   },
   "settings": {
     "preferences": "Réglages",
-    "notifications": "Notifications",
+    "notifications": "",
     "configureNotifications": "Configurer les réglages de notifications push",
     "language": "Langue",
     "community": "Communauté",
-    "discord": "Discord",
+    "discord": "",
     "joinCommunity": "Rejoindre la communauté",
     "docs": "Documentation",
     "readDocs": "Lire la documentation",
     "website": "Site web",
     "visitWebsite": "Visiter tracearr.com",
-    "github": "GitHub",
+    "github": "",
     "viewSourceCode": "Voir le code source",
     "sponsor": "Soutenir",
     "supportDevelopment": "Soutenir le développement",
@@ -59,18 +59,18 @@
     "disconnectConfirm": "Êtes-vous sûr de vouloir vous déconnecter de « {{serverName}} » ? Vous devrez l'appairer à nouveau pour utiliser l'application.",
     "disconnectConfirmGeneric": "Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous appairer à nouveau pour utiliser l'application.",
     "currentlyConnected": "Actuellement connecté à {{serverName}}",
-    "version": "Version {{version}}",
-    "build": "Build {{build}}"
+    "version": "",
+    "build": ""
   },
   "navigation": {
     "home": "Accueil",
     "selectServer": "Sélectionner un serveur",
     "server": "Serveur",
-    "navigation": "Navigation"
+    "navigation": ""
   },
   "resources": {
-    "cpu": "CPU",
-    "ram": "RAM"
+    "cpu": "",
+    "ram": ""
   },
   "notifications": {
     "testSent": "Test envoyé",
@@ -125,7 +125,7 @@
     "violationNotFoundDesc": "Cette violation a peut-être été ignorée ou n'est plus disponible.",
     "customRule": "Règle personnalisée",
     "streamComparison": "Comparaison de diffusion",
-    "ips": "IPs"
+    "ips": "IP"
   },
   "alerts": {
     "done": "Terminé",
