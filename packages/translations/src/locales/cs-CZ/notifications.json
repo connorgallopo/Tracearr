@@ -61,12 +61,12 @@
         "message": "Váš účet Plex byl odpojen"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agent přidán",
@@ -85,16 +85,16 @@
         "message": "{{name}} úspěšně dokončeno"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Stream ukončen",
@@ -155,15 +155,15 @@
         "message": "Nyní můžete pokračovat s nastavením"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": ""
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Nepodařilo se přidat server",
@@ -175,9 +175,9 @@
       "dismissFailed": "Nepodařilo se zrušit porušení",
       "authFailed": "Ověření se nezdařilo",
       "webhookTestFailed": "Test Webhooku se nezdařil",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Ukončení vysílání se nezdařilo",
       "serverUrlUpdateFailed": "Aktualizace URL serveru se nezdařila",
       "serverUpdateFailed": "Nepodařilo se aktualizovat server",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Nepodařilo se aktualizovat směrování",
       "clipboardFailed": "Kopírování do schránky se nezdařilo",
       "plexUnlinkFailed": "Nepodařilo se odpojit Plex účet",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Nepodařilo se přidat agenta",
       "agentUpdateFailed": "Nepodařilo se aktualizovat agenta",
       "agentRemoveFailed": "Nepodařilo se odstranit agenta",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Nepodařilo se načíst úlohy údržby",
       "invalidUrl": "Neplatná URL",
       "plexDirectUrl": "plex.direct URL jsou překladové adresy, které zde nelze použít. Použijte prosím přímou IP adresu nebo název hostitele.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "",
+      "serverUserSplitFailed": "",
       "invalidClaimCode": {
         "title": "Neplatný kód pozemku",
         "message": "Zkontrolujte protokoly serveru"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
