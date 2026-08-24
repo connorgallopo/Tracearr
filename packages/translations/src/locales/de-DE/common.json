@@ -66,8 +66,8 @@
     "inactive": "Inaktiv",
     "enabled": "Aktiviert",
     "disabled": "Deaktiviert",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Verbinden...",
     "connected": "Verbunden",
     "disconnected": "Getrennt",
@@ -81,8 +81,8 @@
     "playing": "Läuft",
     "paused": "Pausiert",
     "stopped": "Gestoppt",
-    "directPlay": "Direct Play",
-    "directStream": "Direct Stream",
+    "directPlay": "",
+    "directStream": "",
     "transcode": "Transkodiere"
   },
   "severity": {
@@ -91,16 +91,16 @@
     "high": "Hoch"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Jetzt",
@@ -118,10 +118,10 @@
     "byHour": "Nach Stunde"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Datum",
@@ -133,15 +133,15 @@
     "quality": "Qualität",
     "duration": "Dauer",
     "progress": "Fortschritt",
-    "status": "Status",
+    "status": "",
     "rule": "Regel",
     "media": "Medien",
     "started": "Gestartet",
     "stopped": "Gestoppt",
     "joined": "Beigetreten",
-    "server": "Server",
+    "server": "",
     "device": "Gerät",
-    "player": "Player",
+    "player": "",
     "unknown": "Unbekannt",
     "never": "Nie",
     "when": "Wann",
@@ -165,21 +165,21 @@
     "days": "Tage",
     "totalSessions": "Gesamte Sitzungen",
     "sessions": "Sitzungen",
-    "apiKey": "API Key",
+    "apiKey": "",
     "rank": "Rang",
     "data": "Daten",
     "size": "Größe",
     "items": "Artikel",
-    "name": "Name",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "name": "",
+    "product": "Produkt",
+    "deviceId": "Geräte ID",
+    "created": "Erstellt",
+    "total": "gesamt",
+    "mediaLength": "Medienlänge",
+    "segments": "Segmente",
+    "streamDetails": "Streamdetails",
+    "transcodeReason": "Transkodierungsgrund",
+    "loadMore": "Mehr laden"
   },
   "search": {
     "placeholder": "Suchen...",
@@ -189,39 +189,39 @@
   "table": {
     "selectAllOnPage": "Seite komplett auswählen",
     "selectRow": "Zeile auswählen",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
-    "movie": "Movie",
+    "movie": "",
     "movie_plural": "Filme",
-    "episode": "Episode",
+    "episode": "",
     "episode_plural": "Episoden",
-    "track": "Track",
-    "track_plural": "Tracks",
-    "liveTV": "Live TV",
+    "track": "",
+    "track_plural": "",
+    "liveTV": "",
     "photo": "Foto",
     "tv": "TM",
     "tvShows": "TV Serien",
     "music": "Musik"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Erforderlich",
@@ -259,8 +259,8 @@
     "stream_other": "{{count}} Streams",
     "server_one": "{{count}} Server",
     "server_other": "{{count}} Server",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} Verstoß",
     "violation_other": "{{count}} Verstöße",
     "item_one": "{{count}} Eintrag",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} Bibliotheken",
     "error_one": "{{count}} Fehler",
     "error_other": "{{count}} Fehler",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "{{count}} Warnung",
+    "alert_other": "{{count}} Warnungen",
+    "location_one": "{{count}} Standort",
+    "location_other": "{{count}} Standorte",
+    "device_one": "{{count}} Gerät",
+    "device_other": "{{count}} Geräte"
   },
   "messages": {
     "noChangesDetected": "Keine Änderungen erkannt"
@@ -329,12 +329,12 @@
     "deleteMessage": "Wirklich löschen? Dieser Vorgang ist unwiderruflich.",
     "unsavedChanges": "Ungespeicherte Änderungen gehen verloren. Fortfahren?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "oder",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
