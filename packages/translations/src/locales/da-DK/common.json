@@ -16,7 +16,7 @@
     "retry": "Forsøg igen",
     "refresh": "Opdater",
     "sync": "Synkroniser",
-    "test": "Test",
+    "test": "",
     "copy": "Kopiér",
     "signIn": "Log Ind",
     "signOut": "Log Ud",
@@ -32,14 +32,14 @@
     "sort": "Sortér",
     "clear": "Ryd",
     "apply": "Anvend",
-    "reset": "Reset",
+    "reset": "",
     "select": "Vælg",
     "selectAll": "Vælg Alle",
     "deselectAll": "Fravælg Alle",
     "export": "Eksporter",
     "import": "Importér",
     "download": "Hent",
-    "upload": "Upload",
+    "upload": "",
     "view": "Vis",
     "viewAll": "Vis Alle",
     "showMore": "Vis Mere",
@@ -66,8 +66,8 @@
     "inactive": "Inaktiv",
     "enabled": "Aktiveret",
     "disabled": "Deaktiveret",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Forbinder...",
     "connected": "Forbundet",
     "disconnected": "Afbrudt",
@@ -83,7 +83,7 @@
     "stopped": "Stoppet",
     "directPlay": "Direkte Afspil",
     "directStream": "Direkte Stream",
-    "transcode": "Transcode"
+    "transcode": ""
   },
   "severity": {
     "low": "Lav",
@@ -91,16 +91,16 @@
     "high": "Høj"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Nu",
@@ -118,35 +118,35 @@
     "byHour": "Efter Time"
   },
   "units": {
-    "km": "km",
-    "mi": "mi",
-    "kmh": "km/h",
-    "mph": "mph"
+    "km": "",
+    "mi": "",
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Dato",
     "user": "Bruger",
     "content": "Indhold",
-    "platform": "Platform",
+    "platform": "",
     "location": "Placering",
     "ipAddress": "Ip Adresse",
     "quality": "Kvalitet",
     "duration": "Varighed",
     "progress": "Fremskridt",
-    "status": "Status",
+    "status": "",
     "rule": "Regel",
     "media": "Medier",
     "started": "Startet",
     "stopped": "Stoppet",
     "joined": "Tilmeldt",
-    "server": "Server",
+    "server": "",
     "device": "Enhed",
     "player": "Spiller",
     "unknown": "Ukendt",
     "never": "Aldrig",
     "when": "Hvornår",
     "severity": "Alvorlighed",
-    "type": "Type",
+    "type": "",
     "reason": "Årsag",
     "actions": "Handlinger",
     "filters": "Filtre",
@@ -167,19 +167,19 @@
     "sessions": "Sessioner",
     "apiKey": "API Nøgle",
     "rank": "Rang",
-    "data": "Data",
+    "data": "",
     "size": "Størrelse",
     "items": "Varer",
     "name": "Navn",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Søg...",
@@ -189,39 +189,39 @@
   "table": {
     "selectAllOnPage": "Vælg alle på siden",
     "selectRow": "Vælg række",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
     "movie_plural": "Film",
-    "episode": "Episode",
+    "episode": "",
     "episode_plural": "Episoder",
     "track": "Spor",
     "track_plural": "Spor",
-    "liveTV": "Live TV",
+    "liveTV": "",
     "photo": "Foto",
     "tv": "Tv",
     "tvShows": "Tv- Serier",
     "music": "Musik"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Dette felt er påkrævet",
@@ -253,14 +253,14 @@
   "count": {
     "user_one": "{{count}} bruger",
     "user_other": "{{count}} brugere",
-    "session_one": "{{count}} session",
+    "session_one": "",
     "session_other": "{{count}} sessioner",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
-    "server_one": "{{count}} server",
+    "stream_one": "",
+    "stream_other": "",
+    "server_one": "",
     "server_other": "{{count}} servere",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} overtrædelse",
     "violation_other": "{{count}} overtrædelser",
     "item_one": "{{count}} vare",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} biblioteker",
     "error_one": "{{count}} fejl",
     "error_other": "{{count}} fejl",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Ingen ændringer fundet"
@@ -329,12 +329,12 @@
     "deleteMessage": "Er du sikker på, at du vil slette dette? Denne handling kan ikke fortrydes.",
     "unsavedChanges": "Du har ugemte ændringer. Er du sikker på, at du vil forlade?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "eller",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
