@@ -61,12 +61,12 @@
         "message": "Votre compte Plex a été déconnecté"
       },
       "plexAccountReauthorized": {
-        "title": "Plex Account Reauthorized",
-        "message_one": "{{count}} server reconnected",
-        "message_other": "{{count}} servers reconnected",
-        "messageNoServers": "Account token updated",
-        "partial": "Token updated, but {{names}} still refused it",
-        "unmatched": "Token updated, but {{names}} could not be re-linked"
+        "title": "",
+        "message_one": "",
+        "message_other": "",
+        "messageNoServers": "",
+        "partial": "",
+        "unmatched": ""
       },
       "agentAdded": {
         "title": "Agent ajouté",
@@ -85,16 +85,16 @@
         "message": "{{name}} terminé avec succès"
       },
       "automationCreated": {
-        "title": "Automation Created",
-        "message": "The automation has been created successfully"
+        "title": "",
+        "message": ""
       },
       "automationUpdated": {
-        "title": "Automation Updated",
-        "message": "The automation has been updated successfully"
+        "title": "",
+        "message": ""
       },
       "automationDeleted": {
-        "title": "Automation Deleted",
-        "message": "The automation has been deleted successfully"
+        "title": "",
+        "message": ""
       },
       "streamTerminated": {
         "title": "Lecture interrompue",
@@ -155,15 +155,15 @@
         "message": "Vous pouvez maintenant procéder à la configuration"
       },
       "usersMerged": {
-        "title": "Users merged",
-        "automationsKept": "Kept target's version of: {{names}}"
+        "title": "Utilisateurs fusionnés",
+        "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": "Account split into a separate user"
+        "title": "Compte séparé en un utilisateur distinct"
       },
-      "destinationSaved": "Destination saved",
-      "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationSaved": "",
+      "destinationDeleted": "",
+      "destinationTestSent": ""
     },
     "error": {
       "serverAddFailed": "Échec de l'ajout du serveur",
@@ -175,9 +175,9 @@
       "dismissFailed": "Échec de l'ignorance de la violation",
       "authFailed": "Échec de l'authentification",
       "webhookTestFailed": "Échec du test du webhook",
-      "automationCreateFailed": "Failed to create automation",
-      "automationUpdateFailed": "Failed to update automation",
-      "automationDeleteFailed": "Failed to delete automation",
+      "automationCreateFailed": "",
+      "automationUpdateFailed": "",
+      "automationDeleteFailed": "",
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Échec de la mise à jour du routage",
       "clipboardFailed": "Échec de la copie dans le presse-papiers",
       "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
-      "plexReauthorizeFailed": "Failed to reauthorize Plex account",
+      "plexReauthorizeFailed": "",
       "agentAddFailed": "Échec de l'ajout de l'agent",
       "agentUpdateFailed": "Échec de la mise à jour de l'agent",
       "agentRemoveFailed": "Échec de la suppression de l'agent",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "Échec du chargement des tâches de maintenance",
       "invalidUrl": "URL invalide",
       "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
-      "userMergeFailed": "Failed to merge users",
-      "serverUserSplitFailed": "Failed to split account",
+      "userMergeFailed": "Échec de la fusion des utilisateurs",
+      "serverUserSplitFailed": "Échec de la séparation du compte",
       "invalidClaimCode": {
         "title": "Code de réclamation invalide",
         "message": "Veuillez vérifier les journaux du serveur"
       },
-      "destinationSaveFailed": "Failed to save destination: {{error}}",
-      "destinationDeleteFailed": "Failed to delete destination: {{error}}",
-      "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationSaveFailed": "",
+      "destinationDeleteFailed": "",
+      "destinationTestFailed": "",
+      "destinationInUse": ""
     },
     "warning": {
       "jobFailed": {
