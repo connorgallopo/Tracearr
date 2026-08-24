@@ -84,9 +84,9 @@
     "suggestionsMatchEmail": "Same email",
     "suggestionsMatchUsername": "Same username",
     "suggestionsError": "Could not load merge suggestions",
-    "filterHasAccessTo": "Heeft toegang tot",
-    "filterHasAccessToPlaceholder": "Alle servers",
-    "filterHasAccessToHint": "Toont personen met een actief account op elke geselecteerde server."
+    "filterHasAccessTo": "Has access to",
+    "filterHasAccessToPlaceholder": "Any server",
+    "filterHasAccessToHint": "Shows people with an active account on every server selected."
   },
   "userDetail": {
     "backToUsers": "Terug naar gebruikers",
@@ -111,7 +111,7 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
-    "title": "Gebruiker details"
+    "title": "User Details"
   },
   "history": {
     "title": "Geschiedenis",
@@ -300,7 +300,7 @@
     "noViolationsRecorded": "Er zijn nog geen overtredingen geregistreerd.",
     "allSeverities": "Alle ernstniveaus",
     "allStatuses": "Alle statussen",
-    "allRules": "Alle regels",
+    "allRules": "All rules",
     "filterPeople": "People",
     "allPeople": "All people",
     "peopleSelectedCount": "{{count}} people",
@@ -338,86 +338,86 @@
   "automations": {
     "actions": {
       "send": {
-        "label": "Melding versturen",
-        "description": "Stuur naar één of meer bestemmingen",
+        "label": "Send Notification",
+        "description": "Send to one or more destinations",
         "fields": {
           "cooldown_minutes": {
-            "description": "Minimale tijd tussen meldingen"
+            "description": "Minimum time between notifications"
           }
         },
-        "ran": "Stuur een melding"
+        "ran": "Sent a notification"
       },
       "trust": {
-        "label": "Vertrouwensscore",
-        "description": "Pas aan, zet aan, of reset de trust score",
+        "label": "Trust Score",
+        "description": "Adjust, set, or reset the trust score",
         "fields": {
           "mode": {
-            "label": "Modus"
+            "label": "Mode"
           },
           "amount": {
-            "label": "Hoeveelheid",
-            "description": "Positief om te verhogen, negatief om te verminderen"
+            "label": "Amount",
+            "description": "Positive to increase, negative to decrease"
           },
           "value": {
-            "label": "Waarde"
+            "label": "Value"
           }
         },
-        "ran": "De trustscore is gewijzigd"
+        "ran": "Changed the trust score"
       },
       "kill_stream": {
-        "label": "Stream afbreken",
-        "description": "Beëindig de actieve stream",
+        "label": "Kill Stream",
+        "description": "Terminate the active stream",
         "fields": {
           "cooldown_minutes": {
-            "description": "Minimale tijd tussen terminaties voor dezelfde gebruiker"
+            "description": "Minimum time between terminations for the same user"
           },
           "delay_seconds": {
-            "label": "Window vasthouden",
-            "description": "Wacht dit aantal seconden, dan stopt de stream alleen als de automatisering nog steeds overeenkomt. 0 stops meteen na een laatste hercontrole."
+            "label": "Sustain window",
+            "description": "Waits this many seconds, then kills the stream only if the automation still matches. 0 kills right after a final re-check."
           },
           "target": {
-            "description": "Welke sessies te beëindigen"
+            "description": "Which sessions to terminate"
           },
           "message": {
-            "placeholder": "Optioneel bericht"
+            "placeholder": "Optional message"
           }
         },
-        "ran": "De stream is gestopt"
+        "ran": "Stopped the stream"
       },
       "message_client": {
-        "label": "Bericht client",
-        "description": "Stuur een bericht naar de mediaspeler",
-        "hint": "Alleen Jellyfin en Emby. Plex ondersteunt alleen berichten bij het stoppen van een stream.",
+        "label": "Message Client",
+        "description": "Send a message to the media player",
+        "hint": "Jellyfin and Emby only. Plex only supports messages when killing a stream.",
         "fields": {
           "target": {
-            "description": "Welke sessies berichten te sturen"
+            "description": "Which sessions to message"
           },
           "message": {
-            "placeholder": "Weer te geven bericht…"
+            "placeholder": "Message to display…"
           }
         },
-        "ran": "Plaats een bericht op de speler"
+        "ran": "Put a message on the player"
       }
     },
     "activity": {
-      "title": "Activiteit",
-      "description": "Every evaluation that reached a run, newest first.",
-      "outcome": "Resultaat",
-      "who": "Wie",
-      "where": "Waar",
-      "playing": "Speelt af",
-      "from": "Van",
-      "summary": "Samenvatting",
-      "started": "Gestart",
-      "finished": "Voltooid",
-      "noSummary": "Geen notities",
+      "title": "Activity",
+      "description": "What this automation did, newest first. Runs are kept for {{days}} days.",
+      "outcome": "Outcome",
+      "who": "Who",
+      "where": "Where",
+      "playing": "Playing",
+      "from": "From",
+      "summary": "Summary",
+      "started": "Started",
+      "finished": "Finished",
+      "noSummary": "No notes",
       "outcomes": {
-        "completed": "Completed",
-        "stopped_by_condition": "Stopped by a condition",
-        "error": "Error"
+        "completed": "Ran",
+        "stopped_by_condition": "No match",
+        "error": "Failed"
       },
-      "empty": "Nog geen uitvoeringen",
-      "emptyDescription": "Runs show up here once a trigger matches this automation.",
+      "empty": "No runs yet",
+      "emptyDescription": "Runs are listed here once a trigger matches.",
       "runTitle": "Run",
       "runLoading": "Loading the run",
       "triggeredBy": "Triggered by {{trigger}}",
@@ -425,7 +425,7 @@
       "tabs": {
         "all": "All",
         "completed": "Ran",
-        "stopped_by_condition": "Stopped",
+        "stopped_by_condition": "No match",
         "error": "Failed"
       },
       "group": "Group {{number}}",
@@ -434,7 +434,7 @@
         "else": "Took the second branch"
       },
       "whyBranch": "What it read",
-      "openInEditor": "Open in the editor with this run",
+      "openInEditor": "Open in the builder with this run",
       "tabsLabel": "Filter by outcome",
       "emptyRan": "Nothing has matched yet",
       "emptyRanDescription_one": "{{count}} check ran and did not match.",
@@ -446,34 +446,34 @@
     "allStatuses": "All statuses",
     "allSeverities": "All severities",
     "bind": {
-      "nameHelper": "What you'll see it called in your list.",
+      "nameHelper": "The name in the automations list.",
       "namePlaceholder": "A name for this automation",
-      "activeLabel": "Active",
+      "activeLabel": "Turn it on now",
       "back": "Back",
       "submit": "Use this",
       "submitting": "Setting it up…",
       "customize": "Open in the builder",
       "doors": {
-        "helper": "Use this keeps the link to the ready-made automation; its answers can change later. Open in the builder makes an independent copy with every step editable."
+        "helper": "Use this keeps the steps as they are; the answers above can change later. Open in the builder makes every step editable and ends the link to the ready-made automation."
       },
       "anyServer": "Any server",
-      "serverHelper": "Leave it on Any server and it watches all of them.",
+      "serverHelper": "Any server means all of them.",
       "serverLabel": "Which server",
       "accountLabel": "Which account",
       "personLabel": "Which person",
       "destinationsLabel": "Send to",
       "required": "Pick at least one.",
       "needs": {
-        "title": "Fill in"
+        "title": "What it needs"
       },
       "helper": {
         "killMessage": "Shown on the player when the stream stops.",
         "clientMessage": "Shown on the player while it keeps playing."
       },
-      "noInputs": "Nothing to fill in — this one works as it is.",
+      "noInputs": "Nothing to fill in.",
       "failed": "Couldn't set that up. Try again.",
       "created": "{{name}} is set up and running.",
-      "createdOff": "{{name}} is set up, and off. Turn it on from the list when you want it."
+      "createdOff": "{{name}} was created and is off. Turn it on from the list."
     },
     "builder": {
       "destinationDisabled": "Disabled destination",
@@ -483,9 +483,9 @@
         "sendNeedsDestination": "Pick at least one destination",
         "nameRequired": "Automation name is required",
         "scopeIncomplete": "Pick a target for the selected scope",
-        "triggerRequired": "Pick at least one trigger, or switch one back on",
+        "triggerRequired": "Add what starts this, or switch one back on",
         "policyNeedsSubject": "A policy needs a stream or account trigger: violations are about a person",
-        "fieldUnavailable": "This condition is not available for every trigger you picked",
+        "fieldUnavailable": "This check is not available for every trigger here",
         "operatorInvalid": "This comparison does not fit the condition",
         "valueInvalid": "This value does not fit the condition",
         "actionUnavailable": "These triggers do not supply what this action needs",
@@ -503,17 +503,17 @@
         "label": "When this runs, record it as",
         "policy": "A violation",
         "policyDescription": "Listed in Violations; can be acknowledged.",
-        "notification": "Een waarschuwing",
-        "notificationDescription": "Opgenomen in activiteit; nooit een overtreding."
+        "notification": "An alert",
+        "notificationDescription": "Recorded in Activity; never a violation."
       },
       "severityLabel": "Severity",
-      "activeLabel": "Actief",
-      "saving": "Saving...",
-      "selectPlaceholder": "Select...",
-      "searchPlaceholder": "Search...",
-      "noMatches": "Geen resultaten",
-      "clearSelection": "Selectie wissen",
-      "selectedCount": "{{count}} geselecteerd",
+      "activeLabel": "Active",
+      "saving": "Saving…",
+      "selectPlaceholder": "Select…",
+      "searchPlaceholder": "Search…",
+      "noMatches": "No matches",
+      "clearSelection": "Clear selection",
+      "selectedCount": "{{count}} selected",
       "scope": {
         "label": "Scope",
         "global": "Global",
@@ -521,88 +521,88 @@
         "account": "Specific account",
         "person": "Person (all their servers)",
         "serverLabel": "Server",
-        "serverPlaceholder": "Selecteer server",
+        "serverPlaceholder": "Select server",
         "accountLabel": "Account",
-        "accountPlaceholder": "Selecteer account",
-        "personLabel": "Persoon",
-        "personPlaceholder": "Selecteer persoon",
-        "personHelper": "Komt overeen met deze persoon op elke server waarop hij een account heeft.",
-        "noServers": "Nog geen servers verbonden.",
+        "accountPlaceholder": "Select account",
+        "personLabel": "Person",
+        "personPlaceholder": "Select person",
+        "personHelper": "Matches this person on every server they have an account on.",
+        "noServers": "No servers connected yet.",
         "enforceAcrossServers": "Enforce across servers",
-        "enforceAcrossServersDescription": "Activeert op een van zijn servers, niet alleen op de sessies die dit hebben veroorzaakt. Standaard uitgeschakeld."
+        "enforceAcrossServersDescription": "Acts on the person's sessions on any of their servers, not only the one that triggered it. Off by default."
       },
       "conditions": {
         "addGroup": "Add AND condition group",
         "fieldPlaceholder": "Select field",
         "windowPrefix": "in",
-        "windowUnit": "uren",
-        "uniqueDevices": "Unieke apparaten",
-        "uniqueDevicesHint": "When checked, only compares sessions from different physical devices. Uncheck to include all sessions regardless of device.",
-        "uniqueIps": "Unieke IPs",
-        "uniqueIpsHint": "When checked, only counts sessions from different IP addresses. Use this to detect account sharing while allowing same-household usage.",
-        "allDeviceTypes": "Alle apparaat types",
-        "deviceTypesHint": "Only count streams from the selected device types. Leave empty to count every device.",
-        "yes": "Ja",
-        "no": "Nee",
-        "recentlySeen": "Recent gezien",
-        "allCountries": "Alle landen",
+        "windowUnit": "hrs",
+        "uniqueDevices": "Unique devices",
+        "uniqueDevicesHint": "Counts only sessions from different physical devices.",
+        "uniqueIps": "Unique IPs",
+        "uniqueIpsHint": "Counts only sessions from different IP addresses, so same-household streams are not counted.",
+        "allDeviceTypes": "All device types",
+        "deviceTypesHint": "Counts only streams from the selected device types. Empty means every device.",
+        "yes": "Yes",
+        "no": "No",
+        "recentlySeen": "Recently seen",
+        "allCountries": "All countries",
         "sectionTitle": "Only when…",
-        "optional": "optioneel",
-        "helper": "Controles die eerst moeten worden uitgevoerd. Leeg betekent dat het elke keer wordt uitgevoerd.",
-        "emptyLine": "No extra checks — this runs every time.",
+        "optional": "optional",
+        "helper": "Checks that must pass first. Empty means it runs every time.",
+        "emptyLine": "No extra checks. This runs every time.",
         "all": "all of these",
         "any": "any of these",
-        "allHint": "and — every check has to pass",
-        "anyHint": "or — any one check is enough",
+        "allHint": "and: every check has to pass",
+        "anyHint": "or: any one check is enough",
         "matchLabel": "How these conditions combine",
         "fieldLabel": "Condition",
         "operatorLabel": "Comparison",
-        "valueLabel": "Waarde",
-        "canNeverPass": "Can never pass: the trigger fires at {{threshold}}",
-        "noFields": "The triggers you picked don't supply any conditions yet.",
-        "groupSeparator": "en ook",
+        "valueLabel": "Value",
+        "canNeverPass": "This can never pass. The trigger already fires at {{threshold}}.",
+        "noFields": "No checks are available for these triggers. Add a stream or account trigger first.",
+        "groupSeparator": "and also",
         "addAnother": "Add another condition",
         "addFirst": "Add a condition",
-        "removeGroup": "Remove group"
+        "removeGroup": "Remove this set of checks"
       },
       "actions": {
         "add": "Add action",
         "sectionTitle": "Do this…",
-        "ifTitle": "Als…",
-        "helper": "Deze worden in volgorde uitgevoerd, van boven naar beneden.",
-        "emptyTitle": "Wat moet er gebeuren?",
-        "emptyDescription": "Send a notification, stop the stream, adjust someone's trust score — or run some steps only when an extra check passes.",
-        "emptyAction": "Kies wat er gebeurt",
-        "moveUp": "Verplaats {{name}} omhoog",
-        "moveDown": "Verplaats {{name}} omlaag",
-        "menu": "Meer voor {{name}}",
-        "branchName": "deze branch",
-        "confirmRemoveTitle": "Deze actie verwijderen?",
-        "confirmRemoveDescription": "Stopt bij opslaan.",
-        "policyNote": "This doesn't decide whether it's flagged — use Only when… for that",
+        "ifTitle": "If…",
+        "helper": "These run in order, top to bottom.",
+        "emptyTitle": "What should happen?",
+        "emptyDescription": "Send a notification, stop the stream, change a trust score, or run steps only when an extra check passes.",
+        "emptyAction": "Choose what happens",
+        "moveUp": "Move {{name}} up",
+        "moveDown": "Move {{name}} down",
+        "menu": "More for {{name}}",
+        "branchName": "this branch",
+        "confirmRemoveTitle": "Remove this action?",
+        "confirmRemoveDescription": "Stops happening on save.",
+        "policyNote": "A branch does not decide whether this is flagged; the And only if… section does.",
         "branchThen": "then",
         "branchElse": "Otherwise…",
-        "branchElseEmpty": "Nothing — the automation carries on.",
+        "branchElseEmpty": "Nothing. The automation carries on.",
         "ifNothing": "nothing yet",
-        "ifAddCheck": "Nog een controle toevoegen",
+        "ifAddCheck": "Add another check",
         "addBranch": "Add action",
-        "expandBranch": "Toon stappen van deze branch",
-        "collapseBranch": "Verberg de stappen van deze branch"
+        "expandBranch": "Show this branch's steps",
+        "collapseBranch": "Hide this branch's steps"
       },
       "when": {
-        "title": "Wanneer...",
-        "helper": "Een van deze dingen start ermee, er is ten minste één nodig.",
-        "emptyTitle": "Wat moet dit starten?",
-        "emptyDescription": "Pick the moment that kicks it off — a stream starting, a server going down, an account going quiet.",
-        "emptyAction": "Kies wat het start",
+        "title": "When…",
+        "helper": "Any one of these starts it. At least one is required.",
+        "emptyTitle": "What should start this?",
+        "emptyDescription": "A stream starting, a server going down, an account going quiet.",
+        "emptyAction": "Choose what starts it",
         "add": "Add trigger",
-        "or": "of"
+        "or": "or"
       },
       "heldFor": {
-        "prefix": "Een stream is gepauzeerd voor",
-        "minutesLabel": "Minuten",
-        "unit": "minuten",
-        "measureLabel": "Geteld",
+        "prefix": "A stream has been paused for",
+        "minutesLabel": "Minutes",
+        "unit": "minutes",
+        "measureLabel": "Counted",
         "current": "this time",
         "total": "in total"
       },
@@ -645,16 +645,16 @@
         "confirm": "Leave"
       },
       "liveCheck": {
-        "title": "Right now",
+        "title": "Right now on the servers",
         "checking": "Checking against the sessions playing now…",
-        "empty": "Nothing is playing right now, so there is nothing to check.",
-        "failed": "Couldn't check against the sessions playing now.",
+        "empty": "Nothing is playing right now; nothing to check against.",
+        "failed": "Could not reach the servers to check.",
         "footnote": "Cooldowns and already-handled sessions aren't simulated.",
         "expand": "Show what matched for {{name}}",
         "passed": "Passed",
         "notPassed": "Did not pass",
         "actual": "now {{value}}",
-        "unfinished": "Fix the problems above to check again",
+        "unfinished": "Shows what this would do once the automation is complete.",
         "paused": "Paused while this saves",
         "sampleTitle": "What this would do to that run",
         "sampleGone": "That session is no longer on record; nothing to check against.",
@@ -684,67 +684,67 @@
       "uniqueIps": "unique IPs",
       "deviceTypesOnly": "{{types}} only",
       "when": "When {{text}}",
-      "or": "of {{text}}",
-      "nothing": "nog niks",
+      "or": "or {{text}}",
+      "nothing": "nothing yet",
       "onlyWhen": "only when",
-      "andAlso": "en ook",
-      "allOf": "alles van:",
-      "anyOf": "een van:",
-      "joinAll": "en",
-      "joinAny": "of",
-      "then": "dan {{text}}",
-      "otherwise": "Anders",
-      "appliesTo": "Van toepassing op {{name}}",
+      "andAlso": "and also",
+      "allOf": "all of:",
+      "anyOf": "any of:",
+      "joinAll": "and",
+      "joinAny": "or",
+      "then": "then {{text}}",
+      "otherwise": "Otherwise",
+      "appliesTo": "Applies to {{name}}",
       "duration": {
-        "minutes_one": "{{count}} minuut",
-        "minutes_other": "{{count}} minuten",
-        "days_one": "{{count}} dag",
-        "days_other": "{{count}} dagen"
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes",
+        "days_one": "{{count}} day",
+        "days_other": "{{count}} days"
       },
       "triggers": {
-        "sessionStarted": "een stream gestart",
-        "sessionStopped": "een stream stopt",
-        "sessionTranscodeChanged": "a stream starts or stops transcoding",
-        "sessionPaused": "een stream is gepauzeerd",
-        "sessionHeldFor": "een stream is gepauzeerd voor {{duration}}",
-        "sessionHeldForTotal": "een stream is in totaal gepauzeerd voor {{duration}}",
-        "accountInactiveFor": "een account is inactief voor {{duration}}",
+        "sessionStarted": "a stream starts",
+        "sessionStopped": "a stream stops",
+        "sessionTranscodeChanged": "transcoding starts or stops",
+        "sessionPaused": "a stream is paused",
+        "sessionHeldFor": "a stream has been paused for {{duration}}",
+        "sessionHeldForTotal": "a stream has been paused for {{duration}} in total",
+        "accountInactiveFor": "an account has been inactive for {{duration}}",
         "accountNewDevice": "an account plays from a new device",
         "accountTrustChanged": "an account's trust score changes",
-        "mediaAdded": "media is toegevoegd",
-        "mediaUpgraded": "media is geüpgraded",
-        "serverDown": "een server gaat uit",
-        "serverUp": "een server komt terug",
-        "pluginUpdateAvailable": "een plugin update is beschikbaar",
-        "serverUpdateAvailable": "er is een serverupdate beschikbaar",
-        "tracearrUpdateAvailable": "er is een Tracearr update beschikbaar"
+        "mediaAdded": "media is added",
+        "mediaUpgraded": "media is upgraded",
+        "serverDown": "a server goes down",
+        "serverUp": "a server comes back up",
+        "pluginUpdateAvailable": "a plugin update is available",
+        "serverUpdateAvailable": "a server update is available",
+        "tracearrUpdateAvailable": "a Tracearr update is available"
       },
       "operators": {
         "eq": "is",
-        "neq": "is niet",
-        "gt": "is hoger dan",
-        "gte": "is tenminste",
-        "lt": "is onder",
-        "lte": "is hooguit",
-        "in": "is één van",
-        "not_in": "is niet één van",
-        "contains": "bevat",
-        "not_contains": "bevat niet"
+        "neq": "is not",
+        "gt": "is above",
+        "gte": "is at least",
+        "lt": "is below",
+        "lte": "is at most",
+        "in": "is one of",
+        "not_in": "is not one of",
+        "contains": "contains",
+        "not_contains": "does not contain"
       },
       "fields": {
-        "concurrent_streams": "het aantal streams",
-        "active_session_distance_km": "de afstand tussen streams",
-        "travel_speed_kmh": "de reissnelheid",
-        "unique_ips_in_window": "het aantal IP-adressen",
-        "unique_devices_in_window": "het aantal apparaten",
-        "inactive_days": "de tijd sinds de laatste stream",
-        "current_pause_minutes": "de huidige pauze",
-        "total_pause_minutes": "de totale pauzetijd",
-        "source_resolution": "de bronresolutie",
-        "output_resolution": "de uitvoerresolutie",
-        "is_transcoding": "de transcodering",
-        "is_transcode_downgrade": "de downgrade",
-        "source_bitrate_mbps": "de bron bitrate",
+        "concurrent_streams": "the stream count",
+        "active_session_distance_km": "the distance between streams",
+        "travel_speed_kmh": "the travel speed",
+        "unique_ips_in_window": "the number of IP addresses",
+        "unique_devices_in_window": "the number of devices",
+        "inactive_days": "the time since the last stream",
+        "current_pause_minutes": "the current pause",
+        "total_pause_minutes": "the total pause time",
+        "source_resolution": "the source resolution",
+        "output_resolution": "the output resolution",
+        "is_transcoding": "the transcoding",
+        "is_transcode_downgrade": "the downgrade",
+        "source_bitrate_mbps": "the source bitrate",
         "user_id": "the user",
         "trust_score": "the trust score",
         "account_age_days": "the account age",
@@ -817,64 +817,64 @@
         "server": "a chosen server",
         "account": "a chosen account",
         "person": "a chosen person",
-        "destinations": "een gekozen bestemming",
-        "field_value": "een gekozen waarde",
-        "select": "een gekozen optie",
-        "number": "een gekozen nummer",
-        "duration": "een gekozen tijdsduur",
-        "text": "een gekozen bericht",
-        "boolean": "een gekozen instelling",
-        "listed": "de geselecteerde"
+        "destinations": "a chosen destination",
+        "field_value": "a chosen value",
+        "select": "a chosen option",
+        "number": "a chosen number",
+        "duration": "a chosen length of time",
+        "text": "a chosen message",
+        "boolean": "a chosen setting",
+        "listed": "those chosen"
       }
     },
-    "description": "Automatiseringen kijken naar uw servers en handelen wanneer hun voorwaarden overeenkomen",
+    "description": "Automations watch your servers and act when their conditions match",
     "detail": {
-      "notFound": "Automatisering niet gevonden",
-      "title": "Automatisering",
-      "unsaved": "Niet-opgeslagen wijzigingen",
-      "runsLine_one": "1 keer uitgevoerd · laatste {{when}}",
-      "runsLine_other": "{{count}} uitvoeringen · laatste uitvoering {{when}}",
-      "noRuns": "Nog geen uitvoeringen"
+      "notFound": "Automation not found",
+      "title": "Automation",
+      "unsaved": "Unsaved changes",
+      "runsLine_one": "1 run · last run {{when}}",
+      "runsLine_other": "{{count}} runs · last run {{when}}",
+      "noRuns": "No runs yet"
     },
-    "disable": "Uitschakelen",
+    "disable": "Disable",
     "editAutomation": "Edit Automation",
     "effects": {
-      "title": "What this does",
-      "kill": "Kan een stream die speelt stoppen.",
-      "trust": "Verandert vertrouwen scores.",
-      "message": "Plaats een bericht op de speler.",
-      "violation": "Voegt een schending toe op tegen de betreffende persoon.",
-      "tellsOnly": "Alleen meldingen. Stopt nooit een stream of wijzigt een account.",
-      "allServers": "Werkt op elke server tenzij er een wordt gekozen.",
-      "everyServer": "Werkt op elke server.",
-      "oneServer": "Werkt enkel op {{server}}."
+      "title": "What this will do",
+      "kill": "Can stop a stream that is playing.",
+      "trust": "Changes trust scores.",
+      "message": "Puts a message on a player.",
+      "violation": "Records a violation against the matched person.",
+      "tellsOnly": "Only notifies. Never stops a stream or changes an account.",
+      "allServers": "Runs on every server unless one is chosen.",
+      "everyServer": "Runs on every server.",
+      "oneServer": "Runs on {{server}} only."
     },
-    "emptyTitle": "Nog geen automatiseringen",
-    "emptyDescription": "Start from a ready-made one — you fill in the parts that are yours.",
-    "emptySeeAll": "Bekijk alle {{count}}",
-    "emptySeeAllLoading": "Alles weergeven",
-    "enable": "Inschakelen",
+    "emptyTitle": "No automations yet",
+    "emptyDescription": "Ready-made automations. Pick one and fill in the blanks.",
+    "emptySeeAll": "See all {{count}}",
+    "emptySeeAllLoading": "See all",
+    "enable": "Enable",
     "evaluations": {
-      "disclosure": "Uitkomsten die niet zijn uitgevoerd ({{total}})",
+      "disclosure": "Matches that did not start a run ({{total}})",
       "reasons": {
-        "cooldown_active": "Afkoeltijd was actief",
-        "edge_replayed": "Deze rand wordt al afgehandeld",
-        "gate_blocked": "Een open run dekt dit al",
-        "trigger_filter_failed": "Trigger drempel niet bereikt"
+        "cooldown_active": "Cooldown was active",
+        "edge_replayed": "Same edge already handled",
+        "gate_blocked": "An open run already covers this",
+        "trigger_filter_failed": "Trigger threshold not reached"
       }
     },
     "export": {
-      "title": "Deel deze automatisering",
-      "description": "Een code die een andere Tracearr kan plakken.",
+      "title": "Share this automation",
+      "description": "A code another Tracearr can paste in.",
       "carries": "The code carries the steps only. Destinations, servers and accounts are not included; the receiving side fills in its own.",
       "copyCode": "Copy the share code",
       "copyJson": "Copy the JSON",
-      "authorLabel": "Made by",
+      "authorLabel": "Author",
       "authorPlaceholder": "Name",
-      "authorHelper": "Included in the code as the author. Optional.",
-      "save": "Save as a template",
-      "saved": "{{name}} is in your templates.",
-      "saveFailed": "Couldn't save that as a template.",
+      "authorHelper": "Shown on the gallery page and carried in the code. Optional.",
+      "save": "Save as ready-made",
+      "saved": "{{name}} saved as a ready-made automation.",
+      "saveFailed": "Could not save it.",
       "failed": "Couldn't make a code for this one.",
       "saveHelper": "Adds it to this server's list of ready-made automations.",
       "authorInCode": "The code includes the author name.",
@@ -942,7 +942,7 @@
       "user_id": {
         "label": "User",
         "description": "Specific users by account",
-        "placeholder": "Select users..."
+        "placeholder": "Select users…"
       },
       "trust_score": {
         "label": "Trust Score",
@@ -972,7 +972,7 @@
       "country": {
         "label": "Country",
         "description": "Geographic country",
-        "placeholder": "Select countries..."
+        "placeholder": "Select countries…"
       },
       "ip_in_range": {
         "label": "IP Range",
@@ -982,7 +982,7 @@
       "server_id": {
         "label": "Server",
         "description": "Specific media server",
-        "placeholder": "Select servers..."
+        "placeholder": "Select servers…"
       },
       "media_type": {
         "label": "Media Type",
@@ -1020,10 +1020,10 @@
     },
     "gallery": {
       "title": "New automation",
-      "description": "Start from a ready-made one — you fill in the parts that are yours.",
+      "description": "Ready-made automations. Pick one and fill in the blanks.",
       "searchPlaceholder": "Search",
       "noMatches": "Nothing matches “{{query}}”.",
-      "noMatchesHint": "Try a word from what you want to happen — “discord”, “offline”, “paused”.",
+      "noMatchesHint": "Try a word from the outcome: discord, offline, paused.",
       "group": {
         "notifications": "Notifications",
         "server_health": "Server health",
@@ -1038,7 +1038,7 @@
       },
       "paste": {
         "title": "Paste a share code",
-        "description": "Someone sent you one? Paste it and see what it does."
+        "description": "Paste a code and review what it does before adding it."
       },
       "scratch": {
         "title": "Start from scratch",
@@ -1056,15 +1056,15 @@
     },
     "import": {
       "title": "Paste a share code",
-      "description": "Paste the code someone sent you. The whole thing is in the code — Tracearr doesn't go and fetch anything.",
+      "description": "Paste the code. Everything is in the code; Tracearr fetches nothing.",
       "reviewDescription": "What the code does, and what to fill in.",
       "placeholder": "tracearr1.…",
-      "formatHint": "A code starts with tracearr1. The JSON works too.",
+      "formatHint": "A code starts with tracearr1.",
       "check": "Check it",
       "checking": "Reading it…",
-      "valid": "This is a Tracearr automation.",
-      "madeBy": "Made by {{author}}",
-      "codeShort": "code {{fingerprint}}",
+      "valid": "Tracearr can read this code.",
+      "madeBy": "Author: {{author}}, as written in the code",
+      "codeShort": "Code {{fingerprint}}",
       "paused": {
         "label": "Start paused",
         "helper": "Turn it on from the list after review."
@@ -1078,14 +1078,14 @@
         "add": "Keep both",
         "replace": "Replace mine"
       },
-      "raw": "Show the raw code",
+      "raw": "Show the JSON",
       "errors": {
         "notACode": "That doesn't look like a Tracearr share code.",
-        "notACodeHint": "A code starts with tracearr1. — or paste the JSON instead.",
+        "notACodeHint": "A code starts with tracearr1. The JSON works too.",
         "tooBig": "That's too big to be a Tracearr automation.",
         "tooBigHint": "Codes are a few thousand characters at most.",
         "truncated": "This code looks cut off.",
-        "truncatedHint": "Copy the whole thing and paste it again — chat apps often break long codes across lines.",
+        "truncatedHint": "Copy the whole code and paste it again; some chat apps split long codes across lines.",
         "tooNew": "This needs Tracearr {{required}} or newer.",
         "tooNewHint": "This server runs {{current}}. Update Tracearr, then paste again.",
         "tooMany": "That's a lot of codes in one minute.",
@@ -1098,13 +1098,13 @@
       "builtinMatch": "This is {{name}}, one of the automations Tracearr ships."
     },
     "kind": {
-      "policy": "Policy",
-      "notification": "Notification"
+      "policy": "Violation",
+      "notification": "Alert"
     },
     "kindColumn": "Kind",
     "name": "Automation Name",
     "newAutomation": "New automation",
-    "namePlaceholder": "e.g., Concurrent Stream Limit",
+    "namePlaceholder": "A name for this automation",
     "nameInvalid": "Give it a name.",
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "What this is for",
@@ -1180,9 +1180,9 @@
     },
     "provenance": {
       "builtin": "Built-in · {{name}} {{version}}",
-      "imported": "Imported {{date}} · {{name}} {{version}}",
-      "importedBy": "Imported {{date}} by {{author}} · {{name}} {{version}}",
-      "saved": "From {{name}} {{version}}",
+      "imported": "Imported from a share code on {{date}} · {{name}} {{version}}",
+      "importedBy": "Imported from a share code by {{author}} on {{date}} · {{name}} {{version}}",
+      "saved": "Saved here from {{name}} on {{date}} · {{version}}",
       "customized": "Customized from {{name}}",
       "customizedFromRemoved": "Customized from a ready-made automation that has since been removed"
     },
@@ -1193,7 +1193,7 @@
       "account": "Account",
       "crossServer": "Cross-server"
     },
-    "searchPlaceholder": "Search automations...",
+    "searchPlaceholder": "Search automations…",
     "sessionTargets": {
       "triggering": {
         "label": "Triggering session",
@@ -1246,18 +1246,18 @@
     "template": {
       "version": "v{{version}}",
       "updateAvailable": "An update is available",
-      "updatedTitle": "The ready-made automation has moved on to v{{version}}",
-      "updatedBody": "Check the answers below, then update to pick up the new version.",
+      "updatedTitle": "The ready-made automation is now on v{{version}}",
+      "updatedBody": "Review the answers below, then update.",
       "before": "Now",
       "after": "After the update",
       "review": "Review and update",
       "save": "Save changes",
       "customize": "Customize",
-      "customizeTitle": "Make it yours?",
-      "customizeConfirm": "Customizing lets you edit every step yourself, and there is no way back: this automation stops following the ready-made one and will not pick up its updates.",
+      "customizeTitle": "Open this in the builder?",
+      "customizeConfirm": "Opening it in the builder makes this automation independent: every step is editable, and it no longer receives updates from the ready-made one. This cannot be undone.",
       "customizeConfirmAction": "Customize it",
-      "customizeFirst": "Customize this automation before editing its steps.",
-      "customizeFailed": "Couldn't customize that. Try again.",
+      "customizeFirst": "This automation follows a ready-made one. Open it in the builder first.",
+      "customizeFailed": "Could not open it in the builder.",
       "upgradeFailed": "Couldn't update that. Try again.",
       "gone": "The ready-made automation this was built from is no longer on this server.",
       "doorsHelper": "The steps come from the ready-made automation and are fixed. Open in the builder makes every step editable and ends the link."
@@ -1547,7 +1547,7 @@
       "serversConnected_one": "{{count}} server verbonden",
       "serversConnected_other": "{{count}} servers verbonden",
       "unlinkAccount": "Dit Plex-account ontkoppelen",
-      "reauthorizeAccount": "Autoriseer dit Plex account opnieuw",
+      "reauthorizeAccount": "Reauthorize this Plex account",
       "deleteServersFirst": "Verwijder verbonden servers eerst om dit account te ontkoppelen",
       "linkedAccounts": "Gekoppelde Plex-accounts",
       "linkedAccountsDesc": "Beheer de Plex-accounts waarvan je servers kunt toevoegen.",
@@ -1556,36 +1556,36 @@
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt."
     },
     "destinations": {
-      "add": "Bestemming toevoegen",
-      "builtinNote": "Ingebouwd",
-      "clearSecret": "Maak leeg",
-      "delete": "Verwijder",
+      "add": "Add destination",
+      "builtinNote": "Built in",
+      "clearSecret": "Clear",
+      "delete": "Delete",
       "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
-      "description": "Where notifications go. Add as many as you like; each one picks the system events it receives, and rules can send to any of them.",
-      "empty": "Nog geen bestemmingen.",
+      "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
+      "empty": "No destinations yet.",
       "fields": {
         "webhookUrl": "Webhook URL",
         "url": "URL",
         "serverUrl": "Server URL",
         "apiUrl": "API URL",
-        "topic": "Onderwerp",
+        "topic": "Topic",
         "authToken": "Auth token",
-        "userKey": "Gebruikerssleutel",
+        "userKey": "User key",
         "apiToken": "API token"
       },
       "hints": {
-        "authTokenOptional": "Optioneel voor openbare onderwerpen"
+        "authTokenOptional": "Optional for public topics"
       },
-      "ownerOnly": "Alleen de eigenaar kan de bestemming van meldingen beheren.",
-      "pushNote": "Verzonden naar gekoppelde mobiele apparaten; elk apparaat filtert de meldingen in zijn eigen instellingen.",
+      "ownerOnly": "Only the owner can manage notification destinations.",
+      "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
       "receiveViolations": "Receive violations",
       "receiveViolationsHint": "Send every violation to this destination",
-      "reencrypt": "Voer opnieuw de code van deze bestemming in",
-      "secretSet": "Instellen (leeg laten om te behouden)",
+      "reencrypt": "Re-enter this destination's secret",
+      "secretSet": "Set (leave blank to keep)",
       "test": "Test",
-      "testHint": "Sla eerst op om te testen",
-      "testNeedsForm": "Vul de verplichte velden in om te testen",
-      "title": "Notificatiebestemmingen",
+      "testHint": "Save first to test",
+      "testNeedsForm": "Fill in the required fields to test",
+      "title": "Notification destinations",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "Webhook (JSON)",
@@ -1598,7 +1598,7 @@
       },
       "usedBy": "Used by {{count}} rule",
       "usedBy_other": "Used by {{count}} rules",
-      "webToastNote": "Toastberichten in deze browser."
+      "webToastNote": "Toasts in this browser."
     },
     "jobs": {
       "runNow": "Nu uitvoeren",
@@ -1620,7 +1620,7 @@
     "interruptionTitle": "Dienstonderbreking",
     "startingDescription": "De server wacht op de beschikbaarheid van achtergronddiensten. De pagina ververst automatisch wanneer alles klaar is.",
     "interruptionDescription": "Een of meerdere achtergronddiensten zijn niet meer beschikbaar. De pagina ververst automatisch wanneer de verbinding is hesteld.",
-    "unreachable": "De Tracearr server is momenteel niet bereikbaar. Live updates zijn gepauzeerd en worden vanzelf hervat.",
+    "unreachable": "Can't reach the Tracearr server right now. Live updates are paused and will resume on their own.",
     "restoreTitle": "Herstellen van back-up...",
     "restoreFailed": "Terugzetten niet gelukt",
     "restorePhase": {
@@ -1859,8 +1859,8 @@
         },
         "availability": {
           "added": "added {{date}}",
-          "addedRemoved": "toegevoegd {{added}} – verwijdert {{removed}}",
-          "replaced": "vervangen {{date}}"
+          "addedRemoved": "added {{added}} – removed {{removed}}",
+          "replaced": "replaced {{date}}"
         },
         "removedEverywhere": {
           "caption": "No longer available on any connected server"
