@@ -6,7 +6,6 @@
   "activity": "Активність",
   "library": "Бібліотека",
   "users": "Користувачі",
-  "automations": "Automations",
   "violations": "Порушення",
   "alerts": "Попередження",
   "settings": "Налаштування",
@@ -21,12 +20,5 @@
   "accessControl": "Контроль доступу",
   "media": "Медіа",
   "mediaBrowse": "Огляд",
-  "mediaGenres": "Жанри",
-  "session": "Session",
-  "user": "User",
-  "violation": "Violation",
-  "monitor": "Monitor",
-  "manage": "Manage",
-  "userStats": "By User",
-  "toggleSidebar": "Toggle navigation"
+  "mediaGenres": "Жанри"
 }
