@@ -32,7 +32,7 @@
     "sort": "فرز",
     "clear": "مسح",
     "apply": "تطبيق",
-    "reset": "Reset",
+    "reset": "",
     "select": "حدد",
     "selectAll": "حدد الكل",
     "deselectAll": "إلغاء تحديد الكل",
@@ -91,16 +91,16 @@
     "high": "مرتفع"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "الآن",
@@ -120,7 +120,7 @@
   "units": {
     "km": "كيلومتر",
     "mi": "ميلي",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "ملي"
   },
   "labels": {
@@ -171,15 +171,15 @@
     "size": "الحجم",
     "items": "بنود",
     "name": "الاسم",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "بحث...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "حدد الكل في الصفحة",
     "selectRow": "حدد الصف",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "فيلم",
@@ -220,7 +220,7 @@
   },
   "servers": {
     "plex": "بيلكس",
-    "jellyfin": "Jellyfin",
+    "jellyfin": "",
     "emby": "إمبي"
   },
   "validation": {
@@ -251,68 +251,68 @@
     "cannotReachServer": "لا يمكن الوصول إلى الخادم. تحقق من الرابط والاتصال بالشبكة."
   },
   "count": {
-    "user_one": "{{count}} user",
+    "user_one": "",
     "user_other": "{{count}} مستخدمون",
-    "session_one": "{{count}} session",
+    "session_one": "",
     "session_other": "جلسات {{count}}",
     "stream_one": "بث {{count}}",
-    "stream_other": "{{count}} streams",
+    "stream_other": "",
     "server_one": "خادم {{count}}",
     "server_other": "خوادم {{count}}",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "انتهاك {{count}}",
     "violation_other": "انتهاكات {{count}}",
     "item_one": "عنصر {{count}}",
     "item_other": "عناصر {{count}}",
-    "result_one": "{{count}} result",
-    "result_other": "{{count}} results",
-    "selected_one": "{{count}} selected",
-    "selected_other": "{{count}} selected",
-    "usersAdded_one": "{{count}} user added",
-    "usersAdded_other": "{{count}} users added",
-    "usersUpdated_one": "{{count}} user updated",
-    "usersUpdated_other": "{{count}} users updated",
+    "result_one": "",
+    "result_other": "",
+    "selected_one": "",
+    "selected_other": "",
+    "usersAdded_one": "",
+    "usersAdded_other": "",
+    "usersUpdated_one": "",
+    "usersUpdated_other": "",
     "library_one": "مكتبة {{count}}",
     "library_other": "مكتبات {{count}}",
     "error_one": "خطأ {{count}}",
     "error_other": "أخطاء {{count}}",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "لم يتم اكتشاف أي تغييرات"
   },
   "relativeTime": {
     "justNow": "للتو الآن",
-    "second_one": "{{count}} second ago",
-    "second_other": "{{count}} seconds ago",
-    "minute_one": "{{count}} minute ago",
-    "minute_other": "{{count}} minutes ago",
-    "hour_one": "{{count}} hour ago",
-    "hour_other": "{{count}} hours ago",
-    "day_one": "{{count}} day ago",
-    "day_other": "{{count}} days ago",
-    "week_one": "{{count}} week ago",
-    "week_other": "{{count}} weeks ago",
-    "month_one": "{{count}} month ago",
-    "month_other": "{{count}} months ago",
-    "year_one": "{{count}} year ago",
-    "year_other": "{{count}} years ago"
+    "second_one": "",
+    "second_other": "",
+    "minute_one": "",
+    "minute_other": "",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
+    "day_other": "",
+    "week_one": "",
+    "week_other": "",
+    "month_one": "",
+    "month_other": "",
+    "year_one": "",
+    "year_other": ""
   },
   "duration": {
     "second_one": "{{count}} ثانية",
     "second_other": "{{count}} ثواني",
     "minute_one": "{{count}} دقيقة",
-    "minute_other": "{{count}} minutes",
+    "minute_other": "",
     "hour_one": "{{count}} ساعة",
     "hour_other": "{{count}} ساعات",
-    "day_one": "{{count}} day",
-    "day_other": "{{count}} days"
+    "day_one": "",
+    "day_other": ""
   },
   "empty": {
     "noResults": "لم يتم العثور على نتائج",
@@ -332,9 +332,9 @@
   "beta": "بيتا",
   "or": "أو",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
