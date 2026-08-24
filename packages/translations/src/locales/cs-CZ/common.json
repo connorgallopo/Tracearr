@@ -32,7 +32,7 @@
     "sort": "Seřadit",
     "clear": "Vyčistit",
     "apply": "Použít",
-    "reset": "Reset",
+    "reset": "",
     "select": "Vybrat",
     "selectAll": "Vybrat vše",
     "deselectAll": "Zrušit výběr všech",
@@ -66,8 +66,8 @@
     "inactive": "Neaktivní",
     "enabled": "Povoleno",
     "disabled": "Zakázáno",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Připojování...",
     "connected": "Připojeno",
     "disconnected": "Odpojeno",
@@ -91,16 +91,16 @@
     "high": "Vysoká"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Nyní",
@@ -118,10 +118,10 @@
     "byHour": "Podle Hodiny"
   },
   "units": {
-    "km": "km",
+    "km": "",
     "mi": "mil",
-    "kmh": "km/h",
-    "mph": "mph"
+    "kmh": "",
+    "mph": ""
   },
   "labels": {
     "date": "Datum:",
@@ -139,7 +139,7 @@
     "started": "Začínáno",
     "stopped": "Zastaveno",
     "joined": "Připojeno",
-    "server": "Server",
+    "server": "",
     "device": "Zařízení",
     "player": "Přehrávač",
     "unknown": "Neznámý",
@@ -171,15 +171,15 @@
     "size": "Velikost",
     "items": "Položky",
     "name": "Název",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Hledat...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Vybrat vše na stránce",
     "selectRow": "Vybrat řádek",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
@@ -219,9 +219,9 @@
     "music": "Hudba"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Toto pole je povinné",
@@ -255,12 +255,12 @@
     "user_other": "{{count}} uživatelé",
     "session_one": "{{count}} relace",
     "session_other": "{{count}} relace",
-    "stream_one": "{{count}} stream",
+    "stream_one": "",
     "stream_other": "{{count}} streamy",
-    "server_one": "{{count}} server",
+    "server_one": "",
     "server_other": "{{count}} servery",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "Porušení {{count}}",
     "violation_other": "{{count}} porušení",
     "item_one": "{{count}} položka",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} knihovny",
     "error_one": "Chyba {{count}}",
     "error_other": "Chyby {{count}}",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Nebyly zjištěny žádné změny"
@@ -295,14 +295,14 @@
     "minute_other": "{{count}} minut",
     "hour_one": "{{count}} hodinou",
     "hour_other": "{{count}} hodin",
-    "day_one": "{{count}} day ago",
-    "day_other": "{{count}} days ago",
-    "week_one": "{{count}} week ago",
+    "day_one": "",
+    "day_other": "",
+    "week_one": "",
     "week_other": "{{count}} týdny",
     "month_one": "{{count}} před měsícem",
     "month_other": "{{count}} před měsíci",
     "year_one": "před rokem {{count}}",
-    "year_other": "{{count}} years ago"
+    "year_other": ""
   },
   "duration": {
     "second_one": "{{count}} sekunda",
@@ -329,12 +329,12 @@
     "deleteMessage": "Opravdu chcete tuto akci odstranit? Tuto akci nelze vrátit zpět.",
     "unsavedChanges": "Máte neuložené změny. Jste si jisti, že chcete odejít?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "nebo",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
