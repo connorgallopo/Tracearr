@@ -32,7 +32,7 @@
     "sort": "Сортировка",
     "clear": "Очистить",
     "apply": "Применить",
-    "reset": "Reset",
+    "reset": "",
     "select": "Выбрать",
     "selectAll": "Выделить все",
     "deselectAll": "Отменить выбор",
@@ -91,16 +91,16 @@
     "high": "Высокий"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Сейчас",
@@ -120,7 +120,7 @@
   "units": {
     "km": "км",
     "mi": "ми",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "миль/ч"
   },
   "labels": {
@@ -171,15 +171,15 @@
     "size": "Размер",
     "items": "Предметы",
     "name": "Наименование",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Поиск...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Выбрать все на странице",
     "selectRow": "Выберите строку",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Фильм",
@@ -220,7 +220,7 @@
   },
   "servers": {
     "plex": "Плекс",
-    "jellyfin": "Jellyfin",
+    "jellyfin": "",
     "emby": "Эмби"
   },
   "validation": {
@@ -254,15 +254,15 @@
     "user_one": "Пользователь {{count}}",
     "user_other": "{{count}} пользователей",
     "session_one": "Сессия {{count}}",
-    "session_other": "{{count}} sessions",
+    "session_other": "",
     "stream_one": "Трансляция {{count}}",
     "stream_other": "{{count}} потоки",
     "server_one": "{{count}} сервер",
     "server_other": "{{count}} серверы",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "Нарушение {{count}}",
-    "violation_other": "{{count}} violations",
+    "violation_other": "",
     "item_one": "{{count}} элемент",
     "item_other": "{{count}} элементов",
     "result_one": "Результат {{count}}",
@@ -277,12 +277,12 @@
     "library_other": "Библиотеки {{count}}",
     "error_one": "Ошибка {{count}}",
     "error_other": "{{count}} ошибок",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Изменения не обнаружены"
@@ -290,29 +290,29 @@
   "relativeTime": {
     "justNow": "Только что",
     "second_one": "{{count}} секунда назад",
-    "second_other": "{{count}} seconds ago",
-    "minute_one": "{{count}} minute ago",
-    "minute_other": "{{count}} minutes ago",
-    "hour_one": "{{count}} hour ago",
-    "hour_other": "{{count}} hours ago",
-    "day_one": "{{count}} day ago",
-    "day_other": "{{count}} days ago",
-    "week_one": "{{count}} week ago",
-    "week_other": "{{count}} weeks ago",
-    "month_one": "{{count}} month ago",
-    "month_other": "{{count}} months ago",
-    "year_one": "{{count}} year ago",
-    "year_other": "{{count}} years ago"
+    "second_other": "",
+    "minute_one": "",
+    "minute_other": "",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
+    "day_other": "",
+    "week_one": "",
+    "week_other": "",
+    "month_one": "",
+    "month_other": "",
+    "year_one": "",
+    "year_other": ""
   },
   "duration": {
     "second_one": "{{count}} секунда",
     "second_other": "{{count}} секунд",
     "minute_one": "{{count}} минута",
-    "minute_other": "{{count}} minutes",
-    "hour_one": "{{count}} hour",
-    "hour_other": "{{count}} hours",
-    "day_one": "{{count}} day",
-    "day_other": "{{count}} days"
+    "minute_other": "",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
+    "day_other": ""
   },
   "empty": {
     "noResults": "Ничего не найдено",
@@ -332,9 +332,9 @@
   "beta": "бета",
   "or": "или",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
