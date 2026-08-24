@@ -66,8 +66,8 @@
     "inactive": "Inactiv",
     "enabled": "Activat",
     "disabled": "Dezactivat",
-    "online": "Online",
-    "offline": "Offline",
+    "online": "",
+    "offline": "",
     "connecting": "Conectare...",
     "connected": "Conectat",
     "disconnected": "Deconectat",
@@ -91,16 +91,16 @@
     "high": "Ridicat"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Acum",
@@ -120,7 +120,7 @@
   "units": {
     "km": "kilometri",
     "mi": "Mi",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "milă"
   },
   "labels": {
@@ -133,13 +133,13 @@
     "quality": "Calitate",
     "duration": "Durată",
     "progress": "Progresul",
-    "status": "Status",
+    "status": "",
     "rule": "Regulă",
-    "media": "Media",
+    "media": "",
     "started": "Început",
     "stopped": "Oprit",
     "joined": "S-a alăturat",
-    "server": "Server",
+    "server": "",
     "device": "Dispozitiv",
     "player": "Jucător",
     "unknown": "Necunoscut",
@@ -171,15 +171,15 @@
     "size": "Dimensiune",
     "items": "Articole",
     "name": "Nume",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Caută...",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "Selectaţi toate pe pagină",
     "selectRow": "Selectare rând",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
@@ -219,8 +219,8 @@
     "music": "Muzică"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
+    "plex": "",
+    "jellyfin": "",
     "emby": "Renate"
   },
   "validation": {
@@ -257,14 +257,14 @@
     "session_other": "{{count}} sesiuni",
     "stream_one": "{{count}} flux",
     "stream_other": "{{count}} stream-uri",
-    "server_one": "{{count}} server",
-    "server_other": "{{count}} servers",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "server_one": "",
+    "server_other": "",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} încălcare",
     "violation_other": "{{count}} încălcări",
-    "item_one": "{{count}} item",
-    "item_other": "{{count}} items",
+    "item_one": "",
+    "item_other": "",
     "result_one": "{{count}} rezultat",
     "result_other": "{{count}} rezultate",
     "selected_one": "{{count}} selectate",
@@ -275,14 +275,14 @@
     "usersUpdated_other": "{{count}} utilizatori actualizați",
     "library_one": "Librărie {{count}}",
     "library_other": "{{count}} biblioteci",
-    "error_one": "{{count}} error",
+    "error_one": "",
     "error_other": "{{count}} erori",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Nicio modificare detectată"
@@ -293,9 +293,9 @@
     "second_other": "{{count}} secunde în urmă",
     "minute_one": "{{count}} minute în urmă",
     "minute_other": "{{count}} minute în urmă",
-    "hour_one": "{{count}} hour ago",
-    "hour_other": "{{count}} hours ago",
-    "day_one": "{{count}} day ago",
+    "hour_one": "",
+    "hour_other": "",
+    "day_one": "",
     "day_other": "{{count}} zile acum",
     "week_one": "{{count}} săptămână în urmă",
     "week_other": "{{count}} săptămâni în urmă",
@@ -311,8 +311,8 @@
     "minute_other": "{{count}} minute",
     "hour_one": "{{count}} oră",
     "hour_other": "{{count}} ore",
-    "day_one": "{{count}} day",
-    "day_other": "{{count}} days"
+    "day_one": "",
+    "day_other": ""
   },
   "empty": {
     "noResults": "Nici un rezultat găsit",
@@ -329,12 +329,12 @@
     "deleteMessage": "Sunteţi sigur că doriţi să ştergeţi acest lucru? Această acţiune nu poate fi anulată.",
     "unsavedChanges": "Aveți modificări nesalvate. Sunteți sigur că doriți să ieșiți?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "sau",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
