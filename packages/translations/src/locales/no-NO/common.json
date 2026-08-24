@@ -32,7 +32,7 @@
     "sort": "Sorter",
     "clear": "Tøm",
     "apply": "Bruk",
-    "reset": "Reset",
+    "reset": "",
     "select": "Velg",
     "selectAll": "Velg alle",
     "deselectAll": "Opphev merking",
@@ -91,16 +91,16 @@
     "high": "Høy"
   },
   "trust": {
-    "trusted": "Trusted",
-    "caution": "Caution",
-    "untrusted": "Untrusted"
+    "trusted": "",
+    "caution": "",
+    "untrusted": ""
   },
   "tasks": {
-    "title": "Running Tasks",
-    "running": "Running",
-    "waiting": "Waiting",
-    "queued": "Queued",
-    "startedAgo": "Started {{time}}"
+    "title": "",
+    "running": "",
+    "waiting": "",
+    "queued": "",
+    "startedAgo": ""
   },
   "time": {
     "now": "Nå",
@@ -120,7 +120,7 @@
   "units": {
     "km": "KTM",
     "mi": "SMI",
-    "kmh": "km/h",
+    "kmh": "",
     "mph": "m/t"
   },
   "labels": {
@@ -167,19 +167,19 @@
     "sessions": "Økter",
     "apiKey": "API-nøkkel (Automatic Translation)",
     "rank": "Rangering",
-    "data": "Data",
+    "data": "",
     "size": "Størrelse",
     "items": "Elementer",
     "name": "Navn",
-    "product": "Product",
-    "deviceId": "Device ID",
-    "created": "Created",
-    "total": "total",
-    "mediaLength": "Media length",
-    "segments": "segments",
-    "streamDetails": "Stream Details",
-    "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "product": "",
+    "deviceId": "",
+    "created": "",
+    "total": "",
+    "mediaLength": "",
+    "segments": "",
+    "streamDetails": "",
+    "transcodeReason": "",
+    "loadMore": ""
   },
   "search": {
     "placeholder": "Søk...",
@@ -189,26 +189,26 @@
   "table": {
     "selectAllOnPage": "Velg alle på siden",
     "selectRow": "Velg rad",
-    "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pageOf": "",
+    "pagination": ""
   },
   "filters": {
-    "clearAll": "Clear all",
-    "done": "Done",
-    "remove": "Remove {{label}} filter",
-    "clearSearch": "Clear search",
-    "anyDate": "Any date",
-    "dateAfter": "After {{date}}",
-    "dateBefore": "Before {{date}}",
-    "dateBetween": "{{from}} to {{to}}",
-    "clearDates": "Clear date range",
-    "clearStartDate": "Clear start date",
-    "clearEndDate": "Clear end date"
+    "clearAll": "",
+    "done": "",
+    "remove": "",
+    "clearSearch": "",
+    "anyDate": "",
+    "dateAfter": "",
+    "dateBefore": "",
+    "dateBetween": "",
+    "clearDates": "",
+    "clearStartDate": "",
+    "clearEndDate": ""
   },
   "media": {
     "movie": "Film",
     "movie_plural": "Filmer",
-    "episode": "Episode",
+    "episode": "",
     "episode_plural": "Episoder",
     "track": "Spor",
     "track_plural": "Spor",
@@ -219,9 +219,9 @@
     "music": "Musikk"
   },
   "servers": {
-    "plex": "Plex",
-    "jellyfin": "Jellyfin",
-    "emby": "Emby"
+    "plex": "",
+    "jellyfin": "",
+    "emby": ""
   },
   "validation": {
     "required": "Dette feltet er obligatorisk",
@@ -257,18 +257,18 @@
     "session_other": "{{count}} økter",
     "stream_one": "{{count}} strøm",
     "stream_other": "{{count}} strømmer",
-    "server_one": "{{count}} server",
+    "server_one": "",
     "server_other": "{{count}} servere",
-    "automation_one": "{{count}} automation",
-    "automation_other": "{{count}} automations",
+    "automation_one": "",
+    "automation_other": "",
     "violation_one": "{{count}} brudd",
     "violation_other": "{{count}} brudd",
     "item_one": "{{count}} element",
     "item_other": "{{count}} objekter",
     "result_one": "{{count}} resultat",
     "result_other": "{{count}} resultater",
-    "selected_one": "{{count}} selected",
-    "selected_other": "{{count}} selected",
+    "selected_one": "",
+    "selected_other": "",
     "usersAdded_one": "{{count}} bruker lagt til",
     "usersAdded_other": "{{count}} brukere lagt til",
     "usersUpdated_one": "{{count}} bruker oppdatert",
@@ -277,12 +277,12 @@
     "library_other": "{{count}} biblioteker",
     "error_one": "{{count}} feil",
     "error_other": "{{count}} feil",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alerts",
-    "location_one": "{{count}} location",
-    "location_other": "{{count}} locations",
-    "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "alert_one": "",
+    "alert_other": "",
+    "location_one": "",
+    "location_other": "",
+    "device_one": "",
+    "device_other": ""
   },
   "messages": {
     "noChangesDetected": "Ingen endringer oppdaget"
@@ -329,12 +329,12 @@
     "deleteMessage": "Er du sikker på at du vil slette dette? Denne handlingen kan ikke angres.",
     "unsavedChanges": "Du har ulagrede endringer. Er du sikker på at du vil forlate?"
   },
-  "beta": "beta",
+  "beta": "",
   "or": "eller",
   "serverSelector": {
-    "all": "All servers",
-    "some": "{{count}} of {{total}} servers",
-    "search": "Search servers...",
-    "noMatches": "No servers found"
+    "all": "",
+    "some": "",
+    "search": "",
+    "noMatches": ""
   }
 }
