@@ -10,3 +10,4 @@ durzo
 -emre155 did not follow contributing, invalid diff, reported as spam
 -iokernel Slop PR, did not follow contributing guide.
 -nullable-eth AI Slop PR - Contributing guide ignored
+-tottencam AI slop bug report - fictional issue
