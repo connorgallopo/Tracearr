@@ -144,7 +144,7 @@
   },
   "activity": {
     "playsOverTime": "Spiller Over Tid",
-    "concurrentStreams": "Samtidige Streams",
+    "concurrentStreams": "",
     "platforms": "Platforme",
     "playbackQuality": ""
   },
