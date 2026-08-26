@@ -5,6 +5,7 @@
 # "!unvouch" on an issue or discussion, which opens and merges a PR here.
 #
 # Format: https://github.com/mitchellh/vouch
+-adkeyz low quality bug report, bad additude
 connorgallopo
 durzo
 -emre155 did not follow contributing, invalid diff, reported as spam
