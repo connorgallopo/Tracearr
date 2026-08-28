@@ -62,11 +62,11 @@
       },
       "plexAccountReauthorized": {
         "title": "Plex账户已重新授权",
-        "message_one": "",
-        "message_other": "",
+        "message_one": "{{count}} 服务器已连接",
+        "message_other": "{{count}} 台服务器已连接",
         "messageNoServers": "帐户令牌已更新",
-        "partial": "",
-        "unmatched": ""
+        "partial": "Token已更新，但{{names}}仍拒绝了它",
+        "unmatched": "令牌已更新，但 {{names}} 无法重新链接"
       },
       "agentAdded": {
         "title": "代理已添加",
@@ -156,14 +156,14 @@
       },
       "usersMerged": {
         "title": "用户已合并",
-        "automationsKept": ""
+        "automationsKept": "保留目标的版本：{{names}}"
       },
       "serverUserSplit": {
         "title": "账户拆分为单独用户"
       },
       "destinationSaved": "目标已保存",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationDeleted": "目标已删除",
+      "destinationTestSent": "发送测试通知"
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
@@ -175,9 +175,9 @@
       "dismissFailed": "未能删除违规行为",
       "authFailed": "验证失败",
       "webhookTestFailed": "Webhook 测试失败",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "无法创建自动化",
+      "automationUpdateFailed": "无法更新自动化",
+      "automationDeleteFailed": "无法删除自动化",
       "streamTerminateFailed": "终止流失败",
       "serverUrlUpdateFailed": "无法更新服务器 URL",
       "serverUpdateFailed": "更新服务器失败",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "更新路由失败",
       "clipboardFailed": "复制到剪贴板失败",
       "plexUnlinkFailed": "取消链接Plex帐户失败",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "取消链接Plex帐户失败",
       "agentAddFailed": "添加代理失败",
       "agentUpdateFailed": "更新代理失败",
       "agentRemoveFailed": "移除代理失败",
@@ -205,15 +205,15 @@
       "jobLoadFailed": "加载维护任务失败",
       "invalidUrl": "无效的 URL",
       "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
+      "userMergeFailed": "合并用户失败",
+      "serverUserSplitFailed": "分割帐户失败",
       "invalidClaimCode": {
         "title": "无效的索赔码",
         "message": "请检查服务器日志"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
+      "destinationSaveFailed": "保存目标失败：{{error}}",
+      "destinationDeleteFailed": "删除目标失败：{{error}}",
+      "destinationTestFailed": "测试失败{{error}}",
       "destinationInUse": ""
     },
     "warning": {
