@@ -304,10 +304,10 @@
     "filterPeople": "人员",
     "allPeople": "所有人",
     "peopleSelectedCount": "{{count}} 人",
-    "personFilterPlaceholder": "",
-    "personFilterEmpty": "",
-    "personFilterError": "",
-    "filterByPerson": "",
+    "personFilterPlaceholder": "按人筛选",
+    "personFilterEmpty": "没有找到匹配的人",
+    "personFilterError": "加载会话失败",
+    "filterByPerson": "过滤此人的违规行为",
     "detail": {
       "notFound": "未发现违规行为",
       "violationDetails": "违规详情",
@@ -338,75 +338,75 @@
   "automations": {
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "发送通知",
+        "description": "发送到一个或多个目标",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "通知之间的最短时间"
           }
         },
-        "ran": ""
+        "ran": "发送一个通知"
       },
       "trust": {
-        "label": "",
-        "description": "",
+        "label": "信任得分",
+        "description": "设置、设置或重置信任分数",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "模式"
           },
           "amount": {
-            "label": "",
-            "description": ""
+            "label": "金额",
+            "description": "积极增加，消极反而减少"
           },
           "value": {
-            "label": ""
+            "label": "值"
           }
         },
-        "ran": ""
+        "ran": "更改信任分数"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "结束流",
+        "description": "终止活动流",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "同一用户终止之间的最小时间"
           },
           "delay_seconds": {
-            "label": "",
-            "description": ""
+            "label": "保持窗口",
+            "description": "等待这么多秒钟，然后只在自动化仍然匹配时杀死流。0在最后重新检查后立即杀死。"
           },
           "target": {
-            "description": ""
+            "description": "哪个会话要终止"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "可选填信息"
           }
         },
-        "ran": ""
+        "ran": "停止流"
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "消息客户端",
+        "description": "向媒体播放器发送消息",
+        "hint": "Jellyfin 和 Emby 仅限Plex在杀死一个流时支持消息。",
         "fields": {
           "target": {
-            "description": ""
+            "description": "哪个会话要消息"
           },
           "message": {
             "placeholder": ""
           }
         },
-        "ran": ""
+        "ran": "在播放器上放置一条消息"
       }
     },
     "activity": {
-      "title": "",
+      "title": "活动",
       "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
+      "outcome": "结果",
+      "who": "谁",
+      "where": "地点",
+      "playing": "播放中",
+      "from": "从",
       "summary": "摘要",
       "started": "已开始",
       "finished": "已完成",
