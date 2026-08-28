@@ -195,12 +195,12 @@
   "filters": {
     "clearAll": "清除所有",
     "done": "完成",
-    "remove": "",
+    "remove": "移除{{label}}筛选",
     "clearSearch": "清除搜索",
     "anyDate": "任意日期",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
+    "dateAfter": "{{date}}之后",
+    "dateBefore": "在{{date}}之前",
+    "dateBetween": "{{from}} 到 {{to}}",
     "clearDates": "清除日期范围",
     "clearStartDate": "清除开始日期",
     "clearEndDate": "清除结束日期"
@@ -259,8 +259,8 @@
     "stream_other": "{{count}}流",
     "server_one": "{{count}}服务器",
     "server_other": "{{count}}服务器",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} 个自动化",
+    "automation_other": "{{count}} 个自动化",
     "violation_one": "{{count}}违反",
     "violation_other": "{{count}}违反",
     "item_one": "{{count}} 项",
@@ -333,7 +333,7 @@
   "or": "或者",
   "serverSelector": {
     "all": "所有服务器",
-    "some": "",
+    "some": "共 {{total}} 台服务器中的 {{count}} 台",
     "search": "搜索服务器中……",
     "noMatches": "未找到服务器"
   }
