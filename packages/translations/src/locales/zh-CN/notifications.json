@@ -61,10 +61,10 @@
         "message": "您的Plex帐户已断开连接"
       },
       "plexAccountReauthorized": {
-        "title": "",
+        "title": "Plex账户已重新授权",
         "message_one": "",
         "message_other": "",
-        "messageNoServers": "",
+        "messageNoServers": "帐户令牌已更新",
         "partial": "",
         "unmatched": ""
       },
@@ -85,16 +85,16 @@
         "message": "{{name}}成功完成"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "自动化操作已创建",
+        "message": "已成功创建规则"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "已更新自动化",
+        "message": "规则已成功更新"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "自动化操作已删除",
+        "message": "规则已成功删除"
       },
       "streamTerminated": {
         "title": "流已终止",
@@ -155,13 +155,13 @@
         "message": "您现在可以继续设置"
       },
       "usersMerged": {
-        "title": "",
+        "title": "用户已合并",
         "automationsKept": ""
       },
       "serverUserSplit": {
-        "title": ""
+        "title": "账户拆分为单独用户"
       },
-      "destinationSaved": "",
+      "destinationSaved": "目标已保存",
       "destinationDeleted": "",
       "destinationTestSent": ""
     },
