@@ -91,16 +91,16 @@
     "high": "高"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "可信的",
+    "caution": "警告",
+    "untrusted": "不信任的"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "进行中的任务",
+    "running": "正在运行",
+    "waiting": "等待中",
+    "queued": "队列中",
+    "startedAgo": "已在{{time}}开始"
   },
   "time": {
     "now": "当前",
@@ -121,7 +121,7 @@
     "km": "千米",
     "mi": "米",
     "kmh": "公里/小时",
-    "mph": ""
+    "mph": "mph"
   },
   "labels": {
     "date": "日期",
@@ -189,21 +189,21 @@
   "table": {
     "selectAllOnPage": "选择页面上的所有内容",
     "selectRow": "选择行",
-    "pageOf": "",
-    "pagination": ""
+    "pageOf": "第 {{page}} 页，共 {{total}} 页",
+    "pagination": "分页"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
+    "clearAll": "清除所有",
+    "done": "完成",
     "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
+    "clearSearch": "清除搜索",
+    "anyDate": "任意日期",
     "dateAfter": "",
     "dateBefore": "",
     "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearDates": "清除日期范围",
+    "clearStartDate": "清除开始日期",
+    "clearEndDate": "清除结束日期"
   },
   "media": {
     "movie": "电影",
@@ -219,9 +219,9 @@
     "music": "音乐"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "此字段是必填字段",
@@ -332,9 +332,9 @@
   "beta": "测试版",
   "or": "或者",
   "serverSelector": {
-    "all": "",
+    "all": "所有服务器",
     "some": "",
-    "search": "",
-    "noMatches": ""
+    "search": "搜索服务器中……",
+    "noMatches": "未找到服务器"
   }
 }
