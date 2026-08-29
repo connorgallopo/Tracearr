@@ -41,7 +41,7 @@
   },
   "dashboard": {
     "alerts": "Varningar",
-    "plays": "Pjäser",
+    "plays": "Uppspelningar",
     "watchTime": "Titta på tid",
     "activeUsers": "Aktiva användare",
     "nowPlaying": "Spelas nu",
