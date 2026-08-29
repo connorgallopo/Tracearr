@@ -18,6 +18,7 @@ import {
   parseJellystatBackup,
   transformActivityToSession,
   importJellystatBackup,
+  extractJellystatStreamDetails,
 } from '../jellystat.js';
 
 // Import schemas for validation tests
@@ -474,6 +475,66 @@ describe('parseJellystatBackup', () => {
 // ============================================================================
 // TRANSFORMATION TESTS
 // ============================================================================
+
+describe('extractJellystatStreamDetails', () => {
+  it('should thread TranscodeReasons into transcodeInfo.reasons', () => {
+    const result = extractJellystatStreamDetails(null, {
+      VideoCodec: 'h264',
+      AudioCodec: 'aac',
+      Container: 'ts',
+      IsVideoDirect: false,
+      IsAudioDirect: false,
+      HardwareAccelerationType: null,
+      TranscodeReasons: ['ContainerBitrateExceedsLimit'],
+    });
+
+    expect(result.transcodeInfo?.reasons).toEqual(['ContainerBitrateExceedsLimit']);
+  });
+
+  it('should trim, drop empty strings, and dedupe TranscodeReasons', () => {
+    const result = extractJellystatStreamDetails(null, {
+      TranscodeReasons: [
+        ' VideoCodecNotSupported ',
+        'ContainerBitrateExceedsLimit',
+        '',
+        'VideoCodecNotSupported',
+      ],
+    });
+
+    expect(result.transcodeInfo?.reasons).toEqual([
+      'VideoCodecNotSupported',
+      'ContainerBitrateExceedsLimit',
+    ]);
+  });
+
+  it('should leave transcodeInfo.reasons absent when TranscodeReasons is empty or missing', () => {
+    const noReasons = extractJellystatStreamDetails(null, {
+      TranscodeReasons: [],
+      Container: 'ts',
+    });
+    expect(noReasons.transcodeInfo?.reasons).toBeUndefined();
+    expect(noReasons.transcodeInfo?.streamContainer).toBe('ts');
+
+    const noTranscoding = extractJellystatStreamDetails(null, null);
+    expect(noTranscoding.transcodeInfo).toBeNull();
+  });
+
+  it('should coercively handle non-string TranscodeReasons elements', () => {
+    // The interface types TranscodeReasons as string[], but Jellystat backups are
+    // not schema-validated at this layer, so a malformed backup could carry
+    // non-string entries. parseString() coerces them defensively.
+    const result = extractJellystatStreamDetails(null, {
+      TranscodeReasons: [
+        'ContainerBitrateExceedsLimit',
+        null,
+        undefined,
+        42,
+      ] as unknown as string[],
+    });
+
+    expect(result.transcodeInfo?.reasons).toEqual(['ContainerBitrateExceedsLimit', '42']);
+  });
+});
 
 describe('transformActivityToSession', () => {
   // Mock GeoIP result

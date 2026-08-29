@@ -34,7 +34,7 @@ import {
 import { enqueueMaintenanceJob } from '../jobs/maintenanceQueue.js';
 import { batchGetLibraryItemIdentity, type SessionIdentity } from '../jobs/poller/database.js';
 import { sanitizeCodec } from '../utils/codecNormalizer.js';
-import { extractIpFromEndpoint } from '../utils/parsing.js';
+import { extractIpFromEndpoint, parseString } from '../utils/parsing.js';
 import { normalizeClient } from '../utils/platformNormalizer.js';
 import { parseJellystatPlayMethod } from '../utils/transcodeNormalizer.js';
 import type { PubSubService } from './cache.js';
@@ -247,6 +247,21 @@ export function extractJellystatStreamDetails(
     if (transcodingInfo.Container) transcodeDetails.streamContainer = transcodingInfo.Container;
     if (transcodingInfo.HardwareAccelerationType) {
       transcodeDetails.hwEncoding = transcodingInfo.HardwareAccelerationType;
+    }
+
+    // Transcode reasons (e.g. ContainerBitrateExceedsLimit, VideoCodecNotSupported)
+    // Coerce elements defensively, trim, and dedupe so the stored list is clean.
+    if (transcodingInfo.TranscodeReasons?.length) {
+      const reasons = Array.from(
+        new Set(
+          transcodingInfo.TranscodeReasons.map((reason) => parseString(reason).trim()).filter(
+            (reason) => reason.length > 0
+          )
+        )
+      );
+      if (reasons.length > 0) {
+        transcodeDetails.reasons = reasons;
+      }
     }
 
     if (Object.keys(transcodeDetails).length > 0) {
