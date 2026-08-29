@@ -12,4 +12,5 @@ durzo
 -hstorey219 AI generated bug report. Duplicated bug report
 -iokernel Slop PR, did not follow contributing guide.
 -nullable-eth AI Slop PR - Contributing guide ignored
+-ramonskie Contributing guide completely ignored
 -tottencam AI slop bug report - fictional issue
