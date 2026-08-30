@@ -53,7 +53,8 @@
     "viewProfile": "Προβολή Προφίλ",
     "viewOnGithub": "Προβολή στο GitHub",
     "later": "Αργότερα",
-    "previous": "Προηγούμενο"
+    "previous": "Προηγούμενο",
+    "reload": ""
   },
   "states": {
     "loading": "Φόρτωση...",
