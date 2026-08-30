@@ -1647,7 +1647,12 @@
     "circles": "Sirkler",
     "streams": "strømmer",
     "locations": "steder",
-    "allActivity": "All aktivitet"
+    "allActivity": "All aktivitet",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Enhetens kompatibilitet",
