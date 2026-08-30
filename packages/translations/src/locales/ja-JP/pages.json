@@ -464,7 +464,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "helper": {
         "killMessage": "",
@@ -1647,7 +1647,12 @@
     "circles": "円",
     "streams": "ストリーム",
     "locations": "場所",
-    "allActivity": "すべてのアクティビティ"
+    "allActivity": "すべてのアクティビティ",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "デバイスの互換性",
