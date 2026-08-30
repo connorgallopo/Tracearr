@@ -1647,7 +1647,12 @@
     "circles": "Cerchi",
     "streams": "stream",
     "locations": "posizioni",
-    "allActivity": "Tutte le attività"
+    "allActivity": "Tutte le attività",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Compatibilità Dispositivo",
