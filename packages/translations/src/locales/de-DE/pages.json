@@ -1647,7 +1647,12 @@
     "circles": "Kreise",
     "streams": "",
     "locations": "standorte",
-    "allActivity": "Alle Aktivitäten"
+    "allActivity": "Alle Aktivitäten",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Gerätekompatibilität",
