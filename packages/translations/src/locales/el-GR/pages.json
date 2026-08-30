@@ -1647,7 +1647,12 @@
     "circles": "Κύκλοι",
     "streams": "ροές",
     "locations": "τοποθεσίες",
-    "allActivity": "Όλη η δραστηριότητα"
+    "allActivity": "Όλη η δραστηριότητα",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Συμβατότητα Συσκευής",
