@@ -1647,7 +1647,12 @@
     "circles": "Cercles",
     "streams": "flux",
     "locations": "emplacements",
-    "allActivity": "Toutes les activités"
+    "allActivity": "Toutes les activités",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Compatibilité de l'appareil",
