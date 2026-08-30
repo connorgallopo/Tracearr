@@ -464,7 +464,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "helper": {
         "killMessage": "",
@@ -1647,7 +1647,12 @@
     "circles": "Кола",
     "streams": "трансляції",
     "locations": "місцезнаходження",
-    "allActivity": "Уся діяльність"
+    "allActivity": "Уся діяльність",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Сумісність пристроїв",
