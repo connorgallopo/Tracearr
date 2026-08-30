@@ -1647,7 +1647,12 @@
     "circles": "Kółka",
     "streams": "strumienie",
     "locations": "lokalizacje",
-    "allActivity": "Wszystkie działania"
+    "allActivity": "Wszystkie działania",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Kompatybilność urządzenia",
