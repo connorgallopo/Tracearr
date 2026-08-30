@@ -464,7 +464,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "helper": {
         "killMessage": "",
@@ -1647,7 +1647,12 @@
     "circles": "원형 표시",
     "streams": "스트림",
     "locations": "위치",
-    "allActivity": "모든 활동"
+    "allActivity": "모든 활동",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "기기 호환성",
