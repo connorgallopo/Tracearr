@@ -53,7 +53,8 @@
     "viewProfile": "Visa profil",
     "viewOnGithub": "Visa på GitHub",
     "later": "Senare",
-    "previous": "Föregående"
+    "previous": "Föregående",
+    "reload": ""
   },
   "states": {
     "loading": "Laddar...",
