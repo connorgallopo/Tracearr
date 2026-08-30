@@ -53,7 +53,8 @@
     "viewProfile": "Vis Profil",
     "viewOnGithub": "Se på GitHub",
     "later": "Senere",
-    "previous": "Forrige"
+    "previous": "Forrige",
+    "reload": ""
   },
   "states": {
     "loading": "Indlæser...",
