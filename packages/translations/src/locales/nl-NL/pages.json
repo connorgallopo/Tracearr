@@ -506,7 +506,7 @@
         "notification": "Een waarschuwing",
         "notificationDescription": "Opgenomen in activiteit; nooit een overtreding."
       },
-      "severityLabel": "Severity",
+      "severityLabel": "",
       "activeLabel": "Actief",
       "saving": "",
       "selectPlaceholder": "",
@@ -516,9 +516,9 @@
       "selectedCount": "{{count}} geselecteerd",
       "scope": {
         "label": "Scope",
-        "global": "Global",
-        "server": "Specific server",
-        "account": "Specific account",
+        "global": "",
+        "server": "",
+        "account": "",
         "person": "",
         "serverLabel": "",
         "serverPlaceholder": "Selecteer server",
@@ -528,7 +528,7 @@
         "personPlaceholder": "Selecteer persoon",
         "personHelper": "Komt overeen met deze persoon op elke server waarop hij een account heeft.",
         "noServers": "Nog geen servers verbonden.",
-        "enforceAcrossServers": "Enforce across servers",
+        "enforceAcrossServers": "",
         "enforceAcrossServersDescription": "Activeert op een van zijn servers, niet alleen op de sessies die dit hebben veroorzaakt. Standaard uitgeschakeld."
       },
       "conditions": {
@@ -546,28 +546,28 @@
         "no": "Nee",
         "recentlySeen": "Recent gezien",
         "allCountries": "Alle landen",
-        "sectionTitle": "Only when…",
+        "sectionTitle": "",
         "optional": "optioneel",
         "helper": "Controles die eerst moeten worden uitgevoerd. Leeg betekent dat het elke keer wordt uitgevoerd.",
         "emptyLine": "",
         "all": "all of these",
-        "any": "any of these",
+        "any": "",
         "allHint": "",
         "anyHint": "",
         "matchLabel": "",
-        "fieldLabel": "Condition",
-        "operatorLabel": "Comparison",
+        "fieldLabel": "",
+        "operatorLabel": "",
         "valueLabel": "Waarde",
         "canNeverPass": "",
         "noFields": "",
         "groupSeparator": "en ook",
-        "addAnother": "Add another condition",
-        "addFirst": "Add a condition",
+        "addAnother": "",
+        "addFirst": "",
         "removeGroup": ""
       },
       "actions": {
-        "add": "Add action",
-        "sectionTitle": "Do this…",
+        "add": "",
+        "sectionTitle": "",
         "ifTitle": "Als…",
         "helper": "Deze worden in volgorde uitgevoerd, van boven naar beneden.",
         "emptyTitle": "Wat moet er gebeuren?",
@@ -580,12 +580,12 @@
         "confirmRemoveTitle": "Deze actie verwijderen?",
         "confirmRemoveDescription": "Stopt bij opslaan.",
         "policyNote": "",
-        "branchThen": "then",
-        "branchElse": "Otherwise…",
+        "branchThen": "",
+        "branchElse": "",
         "branchElseEmpty": "",
-        "ifNothing": "nothing yet",
+        "ifNothing": "",
         "ifAddCheck": "Nog een controle toevoegen",
-        "addBranch": "Add action",
+        "addBranch": "",
         "expandBranch": "Toon stappen van deze branch",
         "collapseBranch": "Verberg de stappen van deze branch"
       },
@@ -595,7 +595,7 @@
         "emptyTitle": "Wat moet dit starten?",
         "emptyDescription": "",
         "emptyAction": "Kies wat het start",
-        "add": "Add trigger",
+        "add": "",
         "or": "of"
       },
       "heldFor": {
@@ -633,8 +633,8 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
-        "problems_other": "{{count}} problems",
+        "problems_one": "",
+        "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
         "ready": "",
@@ -670,7 +670,7 @@
       "scope": "Scope",
       "media": ""
     },
-    "createAutomation": "Create Automation",
+    "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
     "deleteAutomation_one": "Delete {{count}} Automation",
@@ -686,7 +686,7 @@
       "when": "",
       "or": "of {{text}}",
       "nothing": "nog niks",
-      "onlyWhen": "only when",
+      "onlyWhen": "",
       "andAlso": "en ook",
       "allOf": "alles van:",
       "anyOf": "een van:",
@@ -1102,7 +1102,7 @@
       "notification": ""
     },
     "kindColumn": "",
-    "name": "Automation Name",
+    "name": "",
     "newAutomation": "",
     "namePlaceholder": "",
     "nameInvalid": "",
@@ -1255,7 +1255,7 @@
       "customize": "Customize",
       "customizeTitle": "",
       "customizeConfirm": "",
-      "customizeConfirmAction": "Customize it",
+      "customizeConfirmAction": "",
       "customizeFirst": "",
       "customizeFailed": "",
       "upgradeFailed": "",
@@ -1392,7 +1392,7 @@
         "updates": "",
         "notify": "",
         "policy": "Policy",
-        "control": "Control flow"
+        "control": ""
       },
       "suggested": "",
       "triggers": {
@@ -1596,8 +1596,8 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
+      "usedBy": "",
+      "usedBy_other": "",
       "webToastNote": "Toastberichten in deze browser."
     },
     "jobs": {
@@ -1647,7 +1647,12 @@
     "circles": "Cirkels",
     "streams": "",
     "locations": "locaties",
-    "allActivity": "Alle activiteiten"
+    "allActivity": "Alle activiteiten",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Compatibiliteit van apparaat",
