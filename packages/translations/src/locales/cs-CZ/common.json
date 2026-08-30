@@ -53,7 +53,8 @@
     "viewProfile": "Zobrazit profil",
     "viewOnGithub": "Zobrazit na GitHub",
     "later": "Později",
-    "previous": "Předchozí"
+    "previous": "Předchozí",
+    "reload": ""
   },
   "states": {
     "loading": "Načítám...",
