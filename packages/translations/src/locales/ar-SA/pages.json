@@ -1647,7 +1647,12 @@
     "circles": "دوائر",
     "streams": "تدفق",
     "locations": "المواقع",
-    "allActivity": "جميع الأنشطة"
+    "allActivity": "جميع الأنشطة",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "توافق الجهاز",
