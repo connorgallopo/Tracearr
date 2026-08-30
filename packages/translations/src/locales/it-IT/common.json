@@ -53,7 +53,8 @@
     "viewProfile": "Visualizza Profilo",
     "viewOnGithub": "Visualizza su GitHub",
     "later": "Più tardi",
-    "previous": "Precedente"
+    "previous": "Precedente",
+    "reload": ""
   },
   "states": {
     "loading": "Caricamento in corso...",
@@ -124,7 +125,7 @@
     "mph": ""
   },
   "labels": {
-    "date": "Data",
+    "date": "",
     "user": "Utente",
     "content": "Contenuto",
     "platform": "Piattaforma",
