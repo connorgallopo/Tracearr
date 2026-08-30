@@ -53,7 +53,8 @@
     "viewProfile": "Просмотр профиля",
     "viewOnGithub": "Посмотреть на GitHub",
     "later": "Позже",
-    "previous": "Предыдущий"
+    "previous": "Предыдущий",
+    "reload": ""
   },
   "states": {
     "loading": "Загрузка...",
