@@ -53,7 +53,8 @@
     "viewProfile": "Profiel weergeven",
     "viewOnGithub": "Weergeven op GitHub",
     "later": "",
-    "previous": "named@@0"
+    "previous": "named@@0",
+    "reload": ""
   },
   "states": {
     "loading": "Laden...",
