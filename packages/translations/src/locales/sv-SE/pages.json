@@ -1647,7 +1647,12 @@
     "circles": "Cirklar",
     "streams": "strömmar",
     "locations": "platser",
-    "allActivity": "All aktivitet"
+    "allActivity": "All aktivitet",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Enhetens kompatibilitet",
