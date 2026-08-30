@@ -1647,7 +1647,12 @@
     "circles": "Circles",
     "streams": "streams",
     "locations": "locations",
-    "allActivity": "All activity"
+    "allActivity": "All activity",
+    "basemapMissing": "Basemap not installed",
+    "webglUnavailable": "WebGL is disabled in this browser",
+    "webglHint": "The map needs WebGL. Enable it for this site in your browser settings.",
+    "basemapShadowed": "Basemap missing from {{path}}. Tracearr ships it in the image, so a volume mounted over that directory is hiding it. To persist the poster cache, mount /app/data/image-cache instead of /app/data.",
+    "badMounts": "Incorrect volume mounts detected — functionality is not guaranteed."
   },
   "devices": {
     "title": "Device Compatibility",
