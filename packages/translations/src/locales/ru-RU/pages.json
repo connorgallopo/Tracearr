@@ -464,7 +464,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "helper": {
         "killMessage": "",
@@ -1647,7 +1647,12 @@
     "circles": "Круги",
     "streams": "потоки",
     "locations": "места",
-    "allActivity": "Все действия"
+    "allActivity": "Все действия",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Совместимость устройства",
