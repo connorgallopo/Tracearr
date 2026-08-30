@@ -1647,7 +1647,12 @@
     "circles": "Cercuri",
     "streams": "fluxuri",
     "locations": "locații",
-    "allActivity": "Toată activitatea"
+    "allActivity": "Toată activitatea",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Compatibilitate dispozitiv",
