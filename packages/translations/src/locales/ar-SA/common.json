@@ -53,7 +53,8 @@
     "viewProfile": "عرض الملف الشخصي",
     "viewOnGithub": "عرض على GitHub",
     "later": "لاحقاً",
-    "previous": "السابق"
+    "previous": "السابق",
+    "reload": ""
   },
   "states": {
     "loading": "تحميل...",
