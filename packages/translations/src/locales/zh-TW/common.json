@@ -53,7 +53,8 @@
     "viewProfile": "查看個人資料",
     "viewOnGithub": "",
     "later": "稍候",
-    "previous": "上一個"
+    "previous": "上一個",
+    "reload": ""
   },
   "states": {
     "loading": "載入中……",
