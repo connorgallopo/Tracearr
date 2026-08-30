@@ -53,7 +53,8 @@
     "viewProfile": "프로필 보기",
     "viewOnGithub": "GitHub에서 보기",
     "later": "나중에",
-    "previous": "이전"
+    "previous": "이전",
+    "reload": ""
   },
   "states": {
     "loading": "불러오는 중...",
