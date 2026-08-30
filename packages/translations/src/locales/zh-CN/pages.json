@@ -1647,7 +1647,12 @@
     "circles": "圆形",
     "streams": "流",
     "locations": "位置",
-    "allActivity": "所有活动"
+    "allActivity": "所有活动",
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "设备兼容性",
