@@ -11,6 +11,7 @@ durzo
 -emre155 did not follow contributing, invalid diff, reported as spam
 -hstorey219 AI generated bug report. Duplicated bug report
 -iokernel Slop PR, did not follow contributing guide.
+-ionbazan - Contributing guide not read or followed
 -nullable-eth AI Slop PR - Contributing guide ignored
 -ramonskie Contributing guide completely ignored
 -tottencam AI slop bug report - fictional issue
