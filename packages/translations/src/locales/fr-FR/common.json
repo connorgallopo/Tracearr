@@ -53,7 +53,8 @@
     "viewProfile": "Voir le profil",
     "viewOnGithub": "Voir sur GitHub",
     "later": "Plus tard",
-    "previous": "Retour"
+    "previous": "Retour",
+    "reload": "Recharge"
   },
   "states": {
     "loading": "Chargement en cours...",
