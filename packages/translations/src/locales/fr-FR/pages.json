@@ -703,6 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "",
+        "sessionFirstSeen": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
         "sessionPaused": "",
@@ -1397,6 +1398,10 @@
       "suggested": "",
       "triggers": {
         "sessionStarted": {
+          "description": "",
+          "synonyms": ""
+        },
+        "sessionFirstSeen": {
           "description": "",
           "synonyms": ""
         },
