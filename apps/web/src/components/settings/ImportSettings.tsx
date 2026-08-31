@@ -15,10 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Server as ServerIcon,
   Download,
   CheckCircle2,
+  ChevronRight,
   XCircle,
   Loader2,
   AlertTriangle,
@@ -48,6 +50,10 @@ interface TautulliImportSectionProps {
   setTautulliUrl: (url: string) => void;
   tautulliApiKey: string;
   setTautulliApiKey: (key: string) => void;
+  basicAuthUsername: string;
+  setBasicAuthUsername: (username: string) => void;
+  basicAuthPassword: string;
+  setBasicAuthPassword: (password: string) => void;
   connectionStatus: 'idle' | 'testing' | 'success' | 'error';
   connectionMessage: string;
   handleTestConnection: () => Promise<void>;
@@ -68,6 +74,10 @@ function TautulliImportSection({
   setTautulliUrl,
   tautulliApiKey,
   setTautulliApiKey,
+  basicAuthUsername,
+  setBasicAuthUsername,
+  basicAuthPassword,
+  setBasicAuthPassword,
   connectionStatus,
   connectionMessage,
   handleTestConnection,
@@ -117,6 +127,45 @@ function TautulliImportSection({
             />
             <p className="text-muted-foreground text-xs">{t('import.apiKeyHelp')}</p>
           </div>
+
+          <Collapsible defaultOpen={!!basicAuthUsername || !!basicAuthPassword}>
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="-ml-2 [&[data-state=open]>svg]:rotate-90"
+              >
+                <ChevronRight className="transition-transform" />
+                {t('import.basicAuth')}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-2">
+              <p className="text-muted-foreground text-xs">{t('import.basicAuthHelp')}</p>
+
+              <div className="space-y-2">
+                <Label htmlFor="tautulliBasicAuthUsername">{t('import.basicAuthUsername')}</Label>
+                <Input
+                  id="tautulliBasicAuthUsername"
+                  autoComplete="off"
+                  placeholder={t('import.basicAuthUsernamePlaceholder')}
+                  value={basicAuthUsername}
+                  onChange={(e) => setBasicAuthUsername(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tautulliBasicAuthPassword">{t('import.basicAuthPassword')}</Label>
+                <PasswordInput
+                  id="tautulliBasicAuthPassword"
+                  autoComplete="new-password"
+                  placeholder={t('import.basicAuthPasswordPlaceholder')}
+                  value={basicAuthPassword}
+                  onChange={(e) => setBasicAuthPassword(e.target.value)}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -481,6 +530,8 @@ export function ImportSettings() {
   // Tautulli state
   const [tautulliUrl, setTautulliUrl] = useState('');
   const [tautulliApiKey, setTautulliApiKey] = useState('');
+  const [basicAuthUsername, setBasicAuthUsername] = useState('');
+  const [basicAuthPassword, setBasicAuthPassword] = useState('');
   const [selectedPlexServerId, setSelectedPlexServerId] = useState<string>('');
   const [connectionStatus, setConnectionStatus] = useState<
     'idle' | 'testing' | 'success' | 'error'
@@ -523,6 +574,8 @@ export function ImportSettings() {
     if (settings) {
       setTautulliUrl(settings.tautulliUrl ?? '');
       setTautulliApiKey(settings.tautulliApiKey ?? '');
+      setBasicAuthUsername(settings.tautulliBasicAuthUsername ?? '');
+      setBasicAuthPassword(settings.tautulliBasicAuthPassword ?? '');
       if (settings.tautulliUrl && settings.tautulliApiKey) {
         setConnectionStatus('success');
       }
@@ -715,6 +768,8 @@ export function ImportSettings() {
     updateSettings.mutate({
       tautulliUrl: tautulliUrl || null,
       tautulliApiKey: tautulliApiKey || null,
+      tautulliBasicAuthUsername: basicAuthUsername || null,
+      tautulliBasicAuthPassword: basicAuthPassword || null,
     });
   };
 
@@ -729,7 +784,11 @@ export function ImportSettings() {
     setConnectionMessage(t('import.testingConnection'));
 
     try {
-      const result = await api.import.tautulli.test(tautulliUrl, tautulliApiKey);
+      const result = await api.import.tautulli.test(
+        tautulliUrl,
+        tautulliApiKey,
+        basicAuthUsername ? { username: basicAuthUsername, password: basicAuthPassword } : undefined
+      );
       if (result.success) {
         setConnectionStatus('success');
         setConnectionMessage(
@@ -1029,6 +1088,10 @@ export function ImportSettings() {
                 setTautulliUrl={setTautulliUrl}
                 tautulliApiKey={tautulliApiKey}
                 setTautulliApiKey={setTautulliApiKey}
+                basicAuthUsername={basicAuthUsername}
+                setBasicAuthUsername={setBasicAuthUsername}
+                basicAuthPassword={basicAuthPassword}
+                setBasicAuthPassword={setBasicAuthPassword}
                 connectionStatus={connectionStatus}
                 connectionMessage={connectionMessage}
                 handleTestConnection={handleTestConnection}
@@ -1079,6 +1142,10 @@ export function ImportSettings() {
             setTautulliUrl={setTautulliUrl}
             tautulliApiKey={tautulliApiKey}
             setTautulliApiKey={setTautulliApiKey}
+            basicAuthUsername={basicAuthUsername}
+            setBasicAuthUsername={setBasicAuthUsername}
+            basicAuthPassword={basicAuthPassword}
+            setBasicAuthPassword={setBasicAuthPassword}
             connectionStatus={connectionStatus}
             connectionMessage={connectionMessage}
             handleTestConnection={handleTestConnection}

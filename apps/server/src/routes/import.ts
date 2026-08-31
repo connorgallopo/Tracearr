@@ -222,14 +222,19 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can test Tautulli connection');
     }
 
-    const body = request.body as { url?: string; apiKey?: string } | undefined;
+    const body = request.body as
+      | { url?: string; apiKey?: string; basicAuthUsername?: string; basicAuthPassword?: string }
+      | undefined;
 
     if (!body?.url || !body?.apiKey) {
       return reply.badRequest('URL and API key are required');
     }
 
     try {
-      const tautulli = new TautulliService(body.url, body.apiKey);
+      const tautulli = new TautulliService(body.url, body.apiKey, {
+        username: body.basicAuthUsername,
+        password: body.basicAuthPassword,
+      });
       const connected = await tautulli.testConnection();
 
       if (connected) {
@@ -246,7 +251,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       } else {
         return {
           success: false,
-          message: 'Connection failed. Please check URL and API key.',
+          message: tautulli.connectionError ?? 'Connection failed. Please check URL and API key.',
         };
       }
     } catch (error) {

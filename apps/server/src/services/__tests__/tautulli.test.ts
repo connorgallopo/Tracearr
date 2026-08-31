@@ -432,6 +432,135 @@ describe('TautulliService.testConnection', () => {
   });
 });
 
+describe('TautulliService Basic Auth', () => {
+  let mockFetch: ReturnType<typeof vi.fn>;
+
+  const okResponse = { ok: true, json: async () => ({ response: { result: 'success' } }) };
+
+  const headersOf = (call: unknown[] | undefined): Record<string, string> | undefined =>
+    (call?.[1] as { headers?: Record<string, string> } | undefined)?.headers;
+
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    global.fetch = mockFetch as typeof global.fetch;
+  });
+
+  it('sends no Authorization header when no credentials are configured', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService('http://localhost:8181', 'api-key').testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])).toBeUndefined();
+  });
+
+  it('sends an Authorization header for explicit credentials', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService('https://tautulli.example.com', 'api-key', {
+      username: 'proxy-user',
+      password: 'proxy-pass',
+    }).testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])?.Authorization).toBe(
+      `Basic ${Buffer.from('proxy-user:proxy-pass').toString('base64')}`
+    );
+  });
+
+  it('ignores blank credentials', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService('http://localhost:8181', 'api-key', {
+      username: '  ',
+      password: null,
+    }).testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])).toBeUndefined();
+  });
+
+  it('encodes non-ASCII passwords as UTF-8', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService('http://localhost:8181', 'api-key', {
+      username: 'user',
+      password: 'pässwörd',
+    }).testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])?.Authorization).toBe(
+      `Basic ${Buffer.from('user:pässwörd', 'utf8').toString('base64')}`
+    );
+  });
+
+  it('lifts credentials embedded in the URL into the header', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService(
+      'https://proxy-user:proxy-pass@tautulli.example.com',
+      'api-key'
+    ).testConnection();
+
+    const [requestUrl] = mockFetch.mock.calls[0] as [string];
+    expect(requestUrl).toBe('https://tautulli.example.com/api/v2?apikey=api-key&cmd=arnold');
+    expect(headersOf(mockFetch.mock.calls[0])?.Authorization).toBe(
+      `Basic ${Buffer.from('proxy-user:proxy-pass').toString('base64')}`
+    );
+  });
+
+  it('decodes percent-encoded credentials embedded in the URL', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService(
+      'https://user%40example.com:pa%40ss@tautulli.example.com',
+      'api-key'
+    ).testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])?.Authorization).toBe(
+      `Basic ${Buffer.from('user@example.com:pa@ss').toString('base64')}`
+    );
+  });
+
+  it('prefers explicit credentials over URL-embedded ones', async () => {
+    mockFetch.mockResolvedValue(okResponse);
+
+    await new TautulliService('https://url-user:url-pass@tautulli.example.com', 'api-key', {
+      username: 'explicit-user',
+      password: 'explicit-pass',
+    }).testConnection();
+
+    expect(headersOf(mockFetch.mock.calls[0])?.Authorization).toBe(
+      `Basic ${Buffer.from('explicit-user:explicit-pass').toString('base64')}`
+    );
+  });
+
+  it('reports a 401 as a missing-credentials problem and does not retry it', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    mockFetch.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' });
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    expect(await service.testConnection()).toBe(false);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(service.connectionError).toContain('requires HTTP Basic auth');
+
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('reports a 401 as rejected credentials when credentials were sent', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    mockFetch.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' });
+
+    const service = new TautulliService('http://localhost:8181', 'api-key', {
+      username: 'proxy-user',
+      password: 'wrong',
+    });
+    expect(await service.testConnection()).toBe(false);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(service.connectionError).toContain('Basic auth credentials rejected');
+
+    consoleWarnSpy.mockRestore();
+  });
+});
+
 // ============================================================================
 // USER ID PARSING TESTS
 // ============================================================================

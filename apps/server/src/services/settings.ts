@@ -20,6 +20,8 @@ const PUBLIC_DEFAULTS: Settings = {
   usePlexGeoip: false,
   tautulliUrl: null,
   tautulliApiKey: null,
+  tautulliBasicAuthUsername: null,
+  tautulliBasicAuthPassword: null,
   externalUrl: null,
   trustProxy: false,
   mobileEnabled: false,

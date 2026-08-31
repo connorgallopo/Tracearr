@@ -1783,13 +1783,21 @@ class ApiClient {
   // Import
   import = {
     tautulli: {
-      test: (url: string, apiKey: string) =>
+      test: (url: string, apiKey: string, basicAuth?: { username: string; password: string }) =>
         this.request<{
           success: boolean;
           message: string;
           users?: number;
           historyRecords?: number;
-        }>('/import/tautulli/test', { method: 'POST', body: JSON.stringify({ url, apiKey }) }),
+        }>('/import/tautulli/test', {
+          method: 'POST',
+          body: JSON.stringify({
+            url,
+            apiKey,
+            basicAuthUsername: basicAuth?.username,
+            basicAuthPassword: basicAuth?.password,
+          }),
+        }),
       start: (
         serverId: string,
         overwriteFriendlyNames: boolean = false,

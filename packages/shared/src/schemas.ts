@@ -660,6 +660,8 @@ export const updateSettingsSchema = z.object({
   // Tautulli integration
   tautulliUrl: nullableUrlSchema.optional(),
   tautulliApiKey: nullableStringSchema().optional(),
+  tautulliBasicAuthUsername: nullableStringSchema(255).optional(),
+  tautulliBasicAuthPassword: nullableStringSchema(255).optional(),
   // Network/access settings
   externalUrl: nullableUrlSchema.optional(),
   trustProxy: z.boolean().optional(),

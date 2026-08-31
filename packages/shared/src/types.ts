@@ -873,6 +873,8 @@ export interface Settings {
   // Tautulli integration
   tautulliUrl: string | null;
   tautulliApiKey: string | null;
+  tautulliBasicAuthUsername: string | null;
+  tautulliBasicAuthPassword: string | null;
   // Network/access settings
   externalUrl: string | null;
   trustProxy: boolean;

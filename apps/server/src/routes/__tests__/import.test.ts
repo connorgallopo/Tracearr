@@ -17,6 +17,7 @@ let mockTautulliInstance: {
   testConnection: ReturnType<typeof vi.fn>;
   getUsers: ReturnType<typeof vi.fn>;
   getHistory: ReturnType<typeof vi.fn>;
+  connectionError: string | null;
 };
 
 // Mock external services
@@ -28,6 +29,10 @@ vi.mock('../../services/tautulli.js', () => {
     this.testConnection = mockTautulliInstance.testConnection;
     this.getUsers = mockTautulliInstance.getUsers;
     this.getHistory = mockTautulliInstance.getHistory;
+    Object.defineProperty(this, 'connectionError', {
+      get: () => mockTautulliInstance.connectionError,
+      configurable: true,
+    });
   });
   // Add static method
   (MockTautulliService as unknown as { importHistory: ReturnType<typeof vi.fn> }).importHistory =
@@ -152,6 +157,7 @@ describe('Import Routes', () => {
       testConnection: vi.fn().mockResolvedValue(false),
       getUsers: vi.fn().mockResolvedValue([]),
       getHistory: vi.fn().mockResolvedValue({ total: 0 }),
+      connectionError: null,
     };
     mockPlaybackReportingClient = {
       getPlaybackReportingInfo: vi.fn().mockResolvedValue({ installed: false }),
@@ -308,6 +314,51 @@ describe('Import Routes', () => {
       expect(body).toEqual({
         success: false,
         message: 'Connection failed. Please check URL and API key.',
+      });
+    });
+
+    it('forwards basic auth credentials to the Tautulli client', async () => {
+      mockTautulliInstance.testConnection.mockResolvedValue(true);
+      mockTautulliInstance.getUsers.mockResolvedValue([]);
+      mockTautulliInstance.getHistory.mockResolvedValue({ total: 0 });
+
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/tautulli/test',
+        payload: {
+          url: validUrl,
+          apiKey: validApiKey,
+          basicAuthUsername: 'proxy-user',
+          basicAuthPassword: 'proxy-pass',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(vi.mocked(TautulliService)).toHaveBeenCalledWith(validUrl, validApiKey, {
+        username: 'proxy-user',
+        password: 'proxy-pass',
+      });
+    });
+
+    it('reports why the connection failed when the client knows', async () => {
+      mockTautulliInstance.testConnection.mockResolvedValue(false);
+      mockTautulliInstance.connectionError =
+        'Tautulli API error: 401 Unauthorized (Basic auth credentials rejected)';
+
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/tautulli/test',
+        payload: { url: validUrl, apiKey: validApiKey },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({
+        success: false,
+        message: 'Tautulli API error: 401 Unauthorized (Basic auth credentials rejected)',
       });
     });
 

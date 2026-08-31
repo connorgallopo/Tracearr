@@ -267,21 +267,61 @@ export type TautulliUsersResponse = z.infer<typeof TautulliUsersResponseSchema>;
 export type TautulliStreamData = z.infer<typeof TautulliStreamDataSchema>;
 export type TautulliStreamDataResponse = z.infer<typeof TautulliStreamDataResponseSchema>;
 
+export interface TautulliBasicAuth {
+  username?: string | null;
+  password?: string | null;
+}
+
+export class TautulliAuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TautulliAuthError';
+  }
+}
+
+function encodeBasicAuth(username: string, password: string): string {
+  return `Basic ${Buffer.from(`${username}:${password}`, 'utf8').toString('base64')}`;
+}
+
+function decodeUserinfo(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export class TautulliService {
   private baseUrl: string;
   private apiKey: string;
+  private authHeader: string | null;
+  private lastConnectionError: string | null = null;
 
-  constructor(url: string, apiKey: string) {
+  constructor(url: string, apiKey: string, basicAuth?: TautulliBasicAuth) {
     // Validate URL format
+    let parsed: URL;
     try {
-      new URL(url);
+      parsed = new URL(url);
     } catch {
       throw new Error('Invalid Tautulli URL format');
     }
     if (!apiKey || apiKey.length < 1) {
       throw new Error('Tautulli API key is required');
     }
-    this.baseUrl = url.replace(/\/$/, '');
+
+    const urlUsername = parsed.username ? decodeUserinfo(parsed.username) : '';
+    const urlPassword = parsed.password ? decodeUserinfo(parsed.password) : '';
+    if (parsed.username || parsed.password) {
+      parsed.username = '';
+      parsed.password = '';
+    }
+
+    const explicitUsername = basicAuth?.username?.trim() ?? '';
+    const username = explicitUsername || urlUsername;
+    const password = explicitUsername ? (basicAuth?.password ?? '') : urlPassword;
+    this.authHeader = username ? encodeBasicAuth(username, password) : null;
+
+    this.baseUrl = parsed.toString().replace(/\/$/, '');
     this.apiKey = apiKey;
   }
 
@@ -379,11 +419,20 @@ export class TautulliService {
       try {
         const response = await fetch(url.toString(), {
           signal: controller.signal,
+          headers: this.authHeader ? { Authorization: this.authHeader } : undefined,
         });
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
+          if (response.status === 401 || response.status === 407) {
+            const hint = this.authHeader
+              ? 'Basic auth credentials rejected'
+              : 'server requires HTTP Basic auth - add a username and password';
+            throw new TautulliAuthError(
+              `Tautulli API error: ${response.status} ${response.statusText} (${hint})`
+            );
+          }
           throw new Error(`Tautulli API error: ${response.status} ${response.statusText}`);
         }
 
@@ -419,6 +468,10 @@ export class TautulliService {
           throw lastError;
         }
 
+        if (lastError instanceof TautulliAuthError) {
+          throw lastError;
+        }
+
         // Wait before retrying (exponential backoff)
         if (attempt < MAX_RETRIES) {
           const delay = RETRY_DELAY_MS * attempt;
@@ -437,13 +490,22 @@ export class TautulliService {
    * Test connection to Tautulli
    */
   async testConnection(): Promise<boolean> {
+    this.lastConnectionError = null;
     try {
       const result = await this.request<{ response: { result: string } }>('arnold');
-      return result.response.result === 'success';
+      if (result.response.result === 'success') return true;
+      this.lastConnectionError = `Tautulli returned "${result.response.result}"`;
+      return false;
     } catch (err) {
-      console.warn('[Tautulli] Connection test failed:', err instanceof Error ? err.message : err);
+      const message = err instanceof Error ? err.message : String(err);
+      this.lastConnectionError = message;
+      console.warn('[Tautulli] Connection test failed:', message);
       return false;
     }
+  }
+
+  get connectionError(): string | null {
+    return this.lastConnectionError;
   }
 
   /**
@@ -543,7 +605,12 @@ export class TautulliService {
     const skipRefresh = options?.skipRefresh ?? false;
 
     // Get Tautulli settings
-    const config = await getSettings(['tautulliUrl', 'tautulliApiKey']);
+    const config = await getSettings([
+      'tautulliUrl',
+      'tautulliApiKey',
+      'tautulliBasicAuthUsername',
+      'tautulliBasicAuthPassword',
+    ]);
 
     if (!config.tautulliUrl || !config.tautulliApiKey) {
       return {
@@ -557,7 +624,10 @@ export class TautulliService {
       };
     }
 
-    const tautulli = new TautulliService(config.tautulliUrl, config.tautulliApiKey);
+    const tautulli = new TautulliService(config.tautulliUrl, config.tautulliApiKey, {
+      username: config.tautulliBasicAuthUsername,
+      password: config.tautulliBasicAuthPassword,
+    });
 
     // Test connection
     const connected = await tautulli.testConnection();
@@ -569,7 +639,9 @@ export class TautulliService {
         linked: 0,
         skipped: 0,
         errors: 0,
-        message: 'Failed to connect to Tautulli. Please check URL and API key.',
+        message: tautulli.connectionError
+          ? `Failed to connect to Tautulli: ${tautulli.connectionError}`
+          : 'Failed to connect to Tautulli. Please check URL and API key.',
       };
     }
 
@@ -1314,17 +1386,33 @@ export class TautulliService {
     const CONCURRENCY = 10; // 10 parallel API calls
 
     // Get Tautulli settings
-    const tautulliConfig = await getSettings(['tautulliUrl', 'tautulliApiKey']);
+    const tautulliConfig = await getSettings([
+      'tautulliUrl',
+      'tautulliApiKey',
+      'tautulliBasicAuthUsername',
+      'tautulliBasicAuthPassword',
+    ]);
     if (!tautulliConfig.tautulliUrl || !tautulliConfig.tautulliApiKey) {
       throw new Error('Tautulli is not configured');
     }
 
-    const tautulli = new TautulliService(tautulliConfig.tautulliUrl, tautulliConfig.tautulliApiKey);
+    const tautulli = new TautulliService(
+      tautulliConfig.tautulliUrl,
+      tautulliConfig.tautulliApiKey,
+      {
+        username: tautulliConfig.tautulliBasicAuthUsername,
+        password: tautulliConfig.tautulliBasicAuthPassword,
+      }
+    );
 
     // Test connection
     const connected = await tautulli.testConnection();
     if (!connected) {
-      throw new Error('Failed to connect to Tautulli');
+      throw new Error(
+        tautulli.connectionError
+          ? `Failed to connect to Tautulli: ${tautulli.connectionError}`
+          : 'Failed to connect to Tautulli'
+      );
     }
 
     // Initialize progress

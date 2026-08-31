@@ -57,6 +57,8 @@ const mockAllSettings: Settings = {
   usePlexGeoip: false,
   tautulliUrl: 'http://localhost:8181',
   tautulliApiKey: 'secret-api-key',
+  tautulliBasicAuthUsername: null,
+  tautulliBasicAuthPassword: null,
   externalUrl: 'https://tracearr.example.com',
   trustProxy: true,
   mobileEnabled: false,
@@ -314,6 +316,50 @@ describe('Settings Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = response.json();
       expect(body.tautulliApiKey).toBe('new-api-key');
+    });
+
+    it('accepts and persists tautulli basic auth credentials', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getAllSettings).mockResolvedValue({
+        ...mockAllSettings,
+        tautulliBasicAuthUsername: 'proxy-user',
+        tautulliBasicAuthPassword: 'proxy-pass',
+      });
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/settings',
+        payload: {
+          tautulliBasicAuthUsername: 'proxy-user',
+          tautulliBasicAuthPassword: 'proxy-pass',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(setSettings).toHaveBeenCalledWith({
+        tautulliBasicAuthUsername: 'proxy-user',
+        tautulliBasicAuthPassword: 'proxy-pass',
+      });
+      const body = response.json();
+      expect(body.tautulliBasicAuthUsername).toBe('proxy-user');
+      expect(body.tautulliBasicAuthPassword).toBe('proxy-pass');
+    });
+
+    it('clears tautulli basic auth credentials when sent as empty strings', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getAllSettings).mockResolvedValue({ ...mockAllSettings });
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/settings',
+        payload: { tautulliBasicAuthUsername: '', tautulliBasicAuthPassword: '' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(setSettings).toHaveBeenCalledWith({
+        tautulliBasicAuthUsername: null,
+        tautulliBasicAuthPassword: null,
+      });
     });
 
     it('rejects viewer updating settings', async () => {
