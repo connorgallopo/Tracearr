@@ -703,6 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "a stream starts",
+        "sessionFirstSeen": "",
         "sessionStopped": "a stream stops",
         "sessionTranscodeChanged": "transcoding starts or stops",
         "sessionPaused": "a stream is paused",
@@ -1397,8 +1398,12 @@
       "suggested": "Suggested",
       "triggers": {
         "sessionStarted": {
-          "description": "The moment play is pressed.",
+          "description": "",
           "synonyms": "play, watch, begin, start, viewing"
+        },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
         },
         "sessionStopped": {
           "description": "Playback ends, however it ended.",
@@ -1648,7 +1653,11 @@
     "streams": "streams",
     "locations": "locations",
     "allActivity": "All activity",
-    "basemapMissing": "Basemap not installed"
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Device Compatibility",
