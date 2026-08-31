@@ -464,7 +464,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "helper": {
         "killMessage": "",
@@ -703,6 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "",
+        "sessionFirstSeen": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
         "sessionPaused": "",
@@ -1400,6 +1401,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionStopped": {
           "description": "",
           "synonyms": ""
@@ -1648,7 +1653,11 @@
     "streams": "трансляції",
     "locations": "місцезнаходження",
     "allActivity": "Уся діяльність",
-    "basemapMissing": "Basemap not installed"
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Сумісність пристроїв",
