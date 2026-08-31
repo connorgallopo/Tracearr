@@ -213,7 +213,7 @@
       },
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
+      "destinationTestFailed": "Test échoué : {{error}}",
       "destinationInUse": ""
     },
     "warning": {
