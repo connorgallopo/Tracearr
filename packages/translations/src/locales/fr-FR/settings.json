@@ -93,7 +93,7 @@
       "size": "",
       "files": "",
       "need": "",
-      "needHint": "",
+      "needHint": "Affiches {{count}} × 18 K",
       "free": "",
       "freeOf": "",
       "floor": "",
@@ -181,7 +181,7 @@
     "posterSource": {
       "title": "",
       "titleDesc": "",
-      "label": "",
+      "label": "Source d'affiche préférée",
       "description": "",
       "automatic": "",
       "emptyHint": ""
@@ -476,7 +476,7 @@
       "sessions": "",
       "users": "Utilisateurs",
       "servers": "Serveurs",
-      "automations": "",
+      "automations": "Automatisations",
       "libraryItems": "Éléments de la bibliothèque",
       "tables": "Tableaux",
       "warning": "La restauration remplacera toutes les données existantes. Vous devrez vous reconnecter une fois la restauration complétée.",
