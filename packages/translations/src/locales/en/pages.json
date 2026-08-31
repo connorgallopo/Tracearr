@@ -703,6 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "a stream starts",
+        "sessionFirstSeen": "a stream is first seen",
         "sessionStopped": "a stream stops",
         "sessionTranscodeChanged": "transcoding starts or stops",
         "sessionPaused": "a stream is paused",
@@ -1397,8 +1398,12 @@
       "suggested": "Suggested",
       "triggers": {
         "sessionStarted": {
-          "description": "The moment play is pressed.",
+          "description": "Playback confirmed, about thirty seconds after first sight.",
           "synonyms": "play, watch, begin, start, viewing"
+        },
+        "sessionFirstSeen": {
+          "description": "The instant a stream is first sighted, before the confirmation delay. A few never confirm.",
+          "synonyms": "play, immediate, instant, first sight, early, webhook"
         },
         "sessionStopped": {
           "description": "Playback ends, however it ended.",
