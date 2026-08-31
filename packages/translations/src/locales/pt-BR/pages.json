@@ -703,6 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "",
+        "sessionFirstSeen": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
         "sessionPaused": "",
@@ -1400,6 +1401,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionStopped": {
           "description": "",
           "synonyms": ""
@@ -1648,7 +1653,11 @@
     "streams": "transmissões",
     "locations": "",
     "allActivity": "Toda atividade",
-    "basemapMissing": "Basemap not installed"
+    "basemapMissing": "",
+    "webglUnavailable": "",
+    "webglHint": "",
+    "basemapShadowed": "",
+    "badMounts": ""
   },
   "devices": {
     "title": "Compatibilidade do dispositivo",
