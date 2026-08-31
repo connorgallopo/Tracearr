@@ -11,7 +11,7 @@
     "cameraPermissionRequired": "L'accès à la caméra est nécessaire pour scanner les codes QR",
     "scanQrInstructions": "Ouvrez les Réglages → Application mobile dans votre tableau de bord Tracearr et scannez le code QR",
     "urlPlaceholder": "https://tracearr.exemple.com",
-    "tokenPlaceholder": "",
+    "tokenPlaceholder": "trr_mob_...",
     "missingToken": "Jeton d'accès manquant",
     "pleaseEnterToken": "Veuillez entrer votre jeton d'accès"
   },
