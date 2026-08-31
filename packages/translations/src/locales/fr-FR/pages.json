@@ -396,7 +396,7 @@
             "placeholder": ""
           }
         },
-        "ran": ""
+        "ran": "Mettre un message sur le lecteur"
       }
     },
     "activity": {
@@ -461,10 +461,10 @@
       "serverLabel": "",
       "accountLabel": "Quel compte",
       "personLabel": "",
-      "destinationsLabel": "",
-      "required": "",
+      "destinationsLabel": "Envoyer à",
+      "required": "Choisissez au moins un.",
       "needs": {
-        "title": ""
+        "title": "Ce dont il a besoin"
       },
       "helper": {
         "killMessage": "",
@@ -523,13 +523,13 @@
         "serverLabel": "",
         "serverPlaceholder": "",
         "accountLabel": "",
-        "accountPlaceholder": "",
-        "personLabel": "",
+        "accountPlaceholder": "Sélectionnez un compte",
+        "personLabel": "Personne",
         "personPlaceholder": "",
         "personHelper": "",
         "noServers": "",
-        "enforceAcrossServers": "",
-        "enforceAcrossServersDescription": ""
+        "enforceAcrossServers": "Agir sur leurs streams sur n'importe lequel de leurs serveurs",
+        "enforceAcrossServersDescription": "Agit sur les sessions de la personne sur n'importe lequel de ses serveurs, pas seulement celui qui l'a déclenché. Désactivé par défaut."
       },
       "conditions": {
         "addGroup": "",
@@ -583,15 +583,15 @@
         "branchThen": "",
         "branchElse": "",
         "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
+        "ifNothing": "rien n'a encore été sélectionné",
+        "ifAddCheck": "Ajouter une autre vérification",
         "addBranch": "",
         "expandBranch": "",
         "collapseBranch": ""
       },
       "when": {
         "title": "",
-        "helper": "",
+        "helper": "Chacun de ces éléments démarre. Au moins un est requis.",
         "emptyTitle": "",
         "emptyDescription": "",
         "emptyAction": "",
