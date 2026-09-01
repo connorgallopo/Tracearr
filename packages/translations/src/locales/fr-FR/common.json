@@ -92,16 +92,16 @@
     "high": "Élevée"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "De confiance",
+    "caution": "Attention",
+    "untrusted": "Non fiable"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "Taches en cours d'exécution",
+    "running": "En cours d'exécution",
+    "waiting": "En attente",
+    "queued": "En file d'attente",
+    "startedAgo": "A démarré {{time}}"
   },
   "time": {
     "now": "Maintenant",
@@ -119,13 +119,13 @@
     "byHour": "Par heure"
   },
   "units": {
-    "km": "",
-    "mi": "",
-    "kmh": "",
-    "mph": ""
+    "km": "kilomètres",
+    "mi": "mile(s)",
+    "kmh": "km/h",
+    "mph": "mile/h"
   },
   "labels": {
-    "date": "",
+    "date": "Date",
     "user": "Utilisateur",
     "content": "Contenu",
     "platform": "Plateforme",
@@ -147,9 +147,9 @@
     "never": "Jamais",
     "when": "Quand",
     "severity": "Gravité",
-    "type": "",
+    "type": "Type",
     "reason": "Raison",
-    "actions": "",
+    "actions": "Actions",
     "filters": "Filtres",
     "trustScore": "Score de confiance",
     "lastActivity": "Dernière activité",
@@ -165,7 +165,7 @@
     "activeStreams": "Lectures actives",
     "days": "jours",
     "totalSessions": "Nombre total de sessions",
-    "sessions": "",
+    "sessions": "Sessions",
     "apiKey": "Clé API",
     "rank": "Rang",
     "data": "Donnée",
@@ -175,9 +175,9 @@
     "product": "Produit",
     "deviceId": "ID de l'appareil",
     "created": "Créé",
-    "total": "",
+    "total": "total",
     "mediaLength": "Longueur du média",
-    "segments": "",
+    "segments": "segments",
     "streamDetails": "Détails de la diffusion",
     "transcodeReason": "Raison du transcodage",
     "loadMore": "Charger plus"
@@ -190,21 +190,21 @@
   "table": {
     "selectAllOnPage": "Tout sélectionner sur la page",
     "selectRow": "Sélectionner la ligne",
-    "pageOf": "",
-    "pagination": ""
+    "pageOf": "Page {{page}} sur {{total}}",
+    "pagination": "Pagination"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "Tout effacer",
+    "done": "Terminé",
+    "remove": "Supprimer le filtre {{label}}",
+    "clearSearch": "Effacer la recherche",
+    "anyDate": "N'importe quelle date",
+    "dateAfter": "Après {{date}}",
+    "dateBefore": "Avant {{date}}",
+    "dateBetween": "{{from}} à {{to}}",
+    "clearDates": "Effacer la plage de dates",
+    "clearStartDate": "Effacer la date de début",
+    "clearEndDate": "Effacer la date de fin"
   },
   "media": {
     "movie": "Film",
@@ -214,15 +214,15 @@
     "track": "Piste",
     "track_plural": "Pistes",
     "liveTV": "TV en direct",
-    "photo": "",
+    "photo": "Photo",
     "tv": "Télévision",
     "tvShows": "Séries TV",
     "music": "Musique"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "Ce champ est obligatoire",
@@ -254,16 +254,16 @@
   "count": {
     "user_one": "{{count}} utilisateur",
     "user_other": "{{count}} utilisateurs",
-    "session_one": "",
-    "session_other": "",
+    "session_one": "{{count}} session",
+    "session_other": "{{count}} sessions",
     "stream_one": "{{count}} lecture",
     "stream_other": "{{count}} lectures",
     "server_one": "{{count}} serveur",
     "server_other": "{{count}} serveurs",
-    "automation_one": "",
-    "automation_other": "",
-    "violation_one": "",
-    "violation_other": "",
+    "automation_one": "Automatisation {{count}}",
+    "automation_other": "{{count}} automatisations",
+    "violation_one": "Violation {{count}}",
+    "violation_other": "Violations {{count}}",
     "item_one": "{{count}} élément",
     "item_other": "{{count}} éléments",
     "result_one": "{{count}} résultat",
@@ -308,8 +308,8 @@
   "duration": {
     "second_one": "{{count}} seconde",
     "second_other": "{{count}} secondes",
-    "minute_one": "",
-    "minute_other": "",
+    "minute_one": "{{count}} minute",
+    "minute_other": "{{count}} minutes",
     "hour_one": "{{count}} heure",
     "hour_other": "{{count}} heures",
     "day_one": "{{count}} jour",
@@ -333,9 +333,9 @@
   "beta": "bêta",
   "or": "ou",
   "serverSelector": {
-    "all": "",
-    "some": "",
-    "search": "",
-    "noMatches": ""
+    "all": "Tous les serveurs",
+    "some": "{{count}} des serveurs {{total}}",
+    "search": "Rechercher des serveurs...",
+    "noMatches": "Aucun serveur trouvé"
   }
 }
