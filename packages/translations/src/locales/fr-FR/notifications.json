@@ -61,12 +61,12 @@
         "message": "Votre compte Plex a été déconnecté"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
+        "title": "Compte Plex réautorisé",
+        "message_one": "Serveur {{count}} reconnecté",
+        "message_other": "Les serveurs {{count}} ont été reconnectés",
+        "messageNoServers": "Jeton de compte mis à jour",
+        "partial": "Jeton mis à jour, mais {{names}} l'a toujours refusé",
+        "unmatched": "Jeton mis à jour, mais {{names}} n'a pas pu être ré-lié"
       },
       "agentAdded": {
         "title": "Agent ajouté",
@@ -85,16 +85,16 @@
         "message": "{{name}} terminé avec succès"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation créée",
+        "message": "L'automatisation a été créée avec succès"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation mise à jour",
+        "message": "L'automatisation a été mise à jour avec succès"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation supprimée",
+        "message": "L'automatisation a été supprimée avec succès"
       },
       "streamTerminated": {
         "title": "Lecture interrompue",
@@ -156,14 +156,14 @@
       },
       "usersMerged": {
         "title": "Utilisateurs fusionnés",
-        "automationsKept": ""
+        "automationsKept": "La version de la cible est conservée : {{names}}"
       },
       "serverUserSplit": {
         "title": "Compte séparé en un utilisateur distinct"
       },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationSaved": "Destination enregistrée",
+      "destinationDeleted": "Destination supprimée",
+      "destinationTestSent": "Notification de test envoyée"
     },
     "error": {
       "serverAddFailed": "Échec de l'ajout du serveur",
@@ -175,9 +175,9 @@
       "dismissFailed": "Échec de l'ignorance de la violation",
       "authFailed": "Échec de l'authentification",
       "webhookTestFailed": "Échec du test du webhook",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "Échec de la création de l'automatisation",
+      "automationUpdateFailed": "Échec de la mise à jour de l'automatisation",
+      "automationDeleteFailed": "Échec de la suppression de l'automatisation",
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "Échec de la mise à jour du routage",
       "clipboardFailed": "Échec de la copie dans le presse-papiers",
       "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "Échec de la réautorisation du compte Plex",
       "agentAddFailed": "Échec de l'ajout de l'agent",
       "agentUpdateFailed": "Échec de la mise à jour de l'agent",
       "agentRemoveFailed": "Échec de la suppression de l'agent",
@@ -211,10 +211,10 @@
         "title": "Code de réclamation invalide",
         "message": "Veuillez vérifier les journaux du serveur"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
+      "destinationSaveFailed": "Impossible d'enregistrer la destination : {{error}}",
+      "destinationDeleteFailed": "Impossible de supprimer la destination : {{error}}",
       "destinationTestFailed": "Test échoué : {{error}}",
-      "destinationInUse": ""
+      "destinationInUse": "Toujours utilisé par : {{rules}}"
     },
     "warning": {
       "jobFailed": {
