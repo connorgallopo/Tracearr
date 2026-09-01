@@ -84,17 +84,17 @@
     "suggestionsMatchEmail": "Même adresse email",
     "suggestionsMatchUsername": "Nom d'utilisateur identique",
     "suggestionsError": "Impossible de charger les suggestions de fusion",
-    "filterHasAccessTo": "",
-    "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessTo": "A accès à",
+    "filterHasAccessToPlaceholder": "N’importe quel serveur",
+    "filterHasAccessToHint": "Affiche les personnes ayant un compte actif sur chaque serveur sélectionné."
   },
   "userDetail": {
     "backToUsers": "Retour aux utilisateurs",
     "userNotFound": "Utilisateur introuvable",
     "userInfo": "Informations de l'utilisateur",
     "statistics": "Statistiques",
-    "sessions": "",
-    "violations": "",
+    "sessions": "Sessions",
+    "violations": "Violations",
     "terminationHistory": "Historique des interruptions",
     "noViolationsFound": "Aucune violation pour cet utilisateur.",
     "noTerminationsFound": "Aucune interruption de lecture pour cet utilisateur.",
@@ -111,7 +111,7 @@
     "overallTrust": "Confiance globale",
     "serverScope": "Serveur",
     "allServers": "Tous les serveurs",
-    "title": ""
+    "title": "Détail de l'utilisateur"
   },
   "history": {
     "title": "Historique",
@@ -172,7 +172,7 @@
       "confidenceLow": "Faible",
       "zeroGrowth": "0 Go/mois",
       "predictions": "Prédictions",
-      "contentROI": "",
+      "contentROI": "Content ROI",
       "contentROIDesc": "Regarder la valeur par coût de stockage",
       "avgHoursPerGB": "heure moyenne/Go",
       "insufficientData": "Données insuffisantes",
@@ -181,18 +181,18 @@
       "failedToLoad": "Impossible de charger les données de stockage",
       "failedToLoadDesc": "Impossible de récupérer les données de stockage. Veuillez réessayer.",
       "duplicatesTitle": "Doublons",
-      "duplicatesSubtitle": "",
-      "growthPreChangeover": "",
-      "loadingDuplicates": "",
-      "duplicatesFailed": "",
-      "noDuplicatesTitle": "",
-      "noDuplicatesDesc": "",
-      "colTitle": "",
-      "colMatchType": "",
-      "colCopies": "",
-      "colRecoverable": "",
-      "sameServer": "",
-      "mirror": ""
+      "duplicatesSubtitle": "Titres stockés en tant que plus d'un fichier physique, entre les serveurs, les bibliothèques et les versions",
+      "growthPreChangeover": "basé sur l'historique de pré-mise à jour",
+      "loadingDuplicates": "Chargement des doublons...",
+      "duplicatesFailed": "Échec du chargement des doublons",
+      "noDuplicatesTitle": "Aucun doublon trouvé",
+      "noDuplicatesDesc": "Aucun titre avec plus d'un fichier physique détecté.",
+      "colTitle": "Titre",
+      "colMatchType": "Type de correspondance",
+      "colCopies": "Copies",
+      "colRecoverable": "Espace récupérable",
+      "sameServer": "Même serveur",
+      "mirror": "Miroir"
     },
     "watch": {
       "title": "Regarder les analyses",
@@ -267,10 +267,10 @@
       }
     },
     "versionsBackfill": {
-      "banner": "",
+      "banner": "Les données de la version du fichier sont toujours en cours de collecte pour ce serveur. Exécutez une synchronisation de la bibliothèque pour finir.",
       "action": "Synchroniser maintenant",
-      "syncFailed": "",
-      "syncStarted": ""
+      "syncFailed": "La synchronisation n'a pas pu démarrer sur {{count}} serveur(s). Vérifiez vos permissions et l'état du serveur.",
+      "syncStarted": "Synchronisation de la bibliothèque démarrée."
     }
   },
   "activity": {
@@ -288,7 +288,7 @@
     "streamQuality": "Qualité de lecture"
   },
   "violations": {
-    "title": "",
+    "title": "Violations",
     "tryAdjustingFilters": "Essayez d'ajuster vos filtres",
     "selectAllViolations": "Sélectionner les {{count}} violations correspondant aux filtres",
     "dismissViolation": "Ignorer la violation",
@@ -300,7 +300,7 @@
     "noViolationsRecorded": "Il n'y a pas encore de violation enregistrée.",
     "allSeverities": "Toutes les gravités",
     "allStatuses": "Tous les états",
-    "allRules": "",
+    "allRules": "Toutes les règles",
     "filterPeople": "Personne",
     "allPeople": "Toutes les personnes",
     "peopleSelectedCount": "{{count}} personne",
@@ -312,7 +312,7 @@
       "notFound": "Violation introuvable",
       "violationDetails": "Détails de la violation",
       "userInfo": "Utilisateur",
-      "sessions": "",
+      "sessions": "Sessions",
       "noSessions": "Aucune session associée à cette violation",
       "trigger": "Déclencheur",
       "map": "Emplacements de la session",
@@ -338,352 +338,352 @@
   "automations": {
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "Envoyer une notification",
+        "description": "Envoyer vers une ou plusieurs destinations",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps minimum entre les notifications"
           }
         },
-        "ran": ""
+        "ran": "Envoyer une notification"
       },
       "trust": {
-        "label": "",
-        "description": "",
+        "label": "Score de confiance",
+        "description": "Ajuster, définir ou réinitialiser le score de confiance",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Mode"
           },
           "amount": {
-            "label": "",
-            "description": ""
+            "label": "Quantité",
+            "description": "Positif pour augmenter, négatif pour diminuer"
           },
           "value": {
-            "label": ""
+            "label": "Valeur"
           }
         },
-        "ran": ""
+        "ran": "Score de confiance modifié"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "Interrompre la lecture",
+        "description": "Terminer le flux actif",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps minimum entre les interruptions pour le même utilisateur"
           },
           "delay_seconds": {
-            "label": "",
-            "description": ""
+            "label": "Fenêtre de support",
+            "description": "Attend ce nombre de secondes, puis interrompt le flux uniquement si l'automatisation est toujours valide. 0 interruption immédiatement après une dernière vérification."
           },
           "target": {
-            "description": ""
+            "description": "Quelles sessions arrêter"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Message facultatif"
           }
         },
-        "ran": ""
+        "ran": "Le flux a été arrêté"
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "Message Client",
+        "description": "Envoyer un message au lecteur multimédia",
+        "hint": "Jellyfin et Emby uniquement. Plex ne prend en charge que les messages lorsque vous tuez un flux.",
         "fields": {
           "target": {
-            "description": ""
+            "description": "Quelles sessions à envoyer au message"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Message à afficher..."
           }
         },
         "ran": "Mettre un message sur le lecteur"
       }
     },
     "activity": {
-      "title": "",
-      "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "title": "Activité",
+      "description": "Voici ce qu'a fait cette automatisation : les résultats les plus récents s'affichent en premier. Les exécutions sont conservées pendant {{days}} jours.",
+      "outcome": "Résultat",
+      "who": "Qui",
+      "where": "Où",
+      "playing": "Lecture en cours",
+      "from": "De",
+      "summary": "Résumé",
+      "started": "Démarré",
+      "finished": "Terminé",
+      "noSummary": "Pas de notes",
       "outcomes": {
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "completed": "Exécuté",
+        "stopped_by_condition": "Aucune correspondance",
+        "error": "Échec"
       },
-      "empty": "",
-      "emptyDescription": "",
-      "runTitle": "",
-      "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "empty": "Pas encore d'exécutions",
+      "emptyDescription": "Les exécutions sont listées ici une fois qu'un déclencheur correspond.",
+      "runTitle": "Exécuter",
+      "runLoading": "Chargement de l'exécution",
+      "triggeredBy": "Déclenché par {{trigger}}",
+      "unknownStep": "Étape non reconnue",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "all": "Tous",
+        "completed": "Exécuté",
+        "stopped_by_condition": "Aucune correspondance",
+        "error": "Échec"
       },
-      "group": "",
+      "group": "Groupe {{number}}",
       "branch": {
-        "then": "",
-        "else": ""
+        "then": "A pris les étapes 'si'",
+        "else": "A pris les étapes 'sinon'"
       },
-      "whyBranch": "",
-      "openInEditor": "",
-      "tabsLabel": "",
-      "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
-      "item": "",
-      "recordedViolation": ""
+      "whyBranch": "Ce qu'il a lu",
+      "openInEditor": "Ouvre dans le constructeur avec cette exécution",
+      "tabsLabel": "Filtrer par résultat",
+      "emptyRan": "Aucune correspondance n'a encore été trouvée",
+      "emptyRanDescription_one": "{{count}} vérifications ont été effectuées et n'ont pas abouti à une correspondance.",
+      "emptyRanDescription_other": "{{count}} vérifications ont été effectuées et n'ont pas abouti à une correspondance.",
+      "item": "Éléments",
+      "recordedViolation": "Une violation a été enregistrée"
     },
-    "allKinds": "",
-    "allStatuses": "",
+    "allKinds": "Tous les types",
+    "allStatuses": "Tous les status",
     "allSeverities": "Toutes les sévérités",
     "bind": {
-      "nameHelper": "",
-      "namePlaceholder": "",
-      "activeLabel": "",
-      "back": "",
-      "submit": "",
-      "submitting": "",
-      "customize": "",
+      "nameHelper": "Le nom dans la liste des automatisations.",
+      "namePlaceholder": "Un nom pour cette automatisation",
+      "activeLabel": "Activez-le maintenant",
+      "back": "Retour",
+      "submit": "Utiliser ceci",
+      "submitting": "Configuration de…",
+      "customize": "Ouvrir dans le constructeur",
       "doors": {
-        "helper": ""
+        "helper": "Utilisez ceci pour garder les étapes telles qu'elles sont ; les réponses ci-dessus peuvent changer plus tard. Ouvert dans le constructeur rend chaque étape modifiable et termine le lien vers l'automatisation prête à l'emploi."
       },
-      "anyServer": "",
-      "serverHelper": "",
-      "serverLabel": "",
+      "anyServer": "N’importe quel serveur",
+      "serverHelper": "N'importe quel serveur les désigne tous.",
+      "serverLabel": "Quel serveur",
       "accountLabel": "Quel compte",
-      "personLabel": "",
+      "personLabel": "Quelle personne",
       "destinationsLabel": "Envoyer à",
       "required": "Choisissez au moins un.",
       "needs": {
         "title": "Ce dont il a besoin"
       },
       "helper": {
-        "killMessage": "",
-        "clientMessage": ""
+        "killMessage": "Affiché sur le lecteur quand le flux s'arrête.",
+        "clientMessage": "Affiché sur le lecteur pendant qu'il continue à jouer."
       },
-      "noInputs": "",
-      "failed": "",
-      "created": "",
-      "createdOff": ""
+      "noInputs": "Il n'y a rien à remplir",
+      "failed": "Impossible de configurer cela. Réessayez.",
+      "created": "{{name}} est configuré et en cours d'exécution.",
+      "createdOff": "{{name}} a été créé et est désactivé. Activez-le dans la liste."
     },
     "builder": {
-      "destinationDisabled": "",
-      "noDestinations": "",
-      "newDestination": "",
+      "destinationDisabled": "Destination désactivée",
+      "noDestinations": "Aucune destination pour le moment. Ajoutez-en une pour envoyer des notifications.",
+      "newDestination": "Nouvelle destination",
       "errors": {
-        "sendNeedsDestination": "",
-        "nameRequired": "",
-        "scopeIncomplete": "",
-        "triggerRequired": "",
-        "policyNeedsSubject": "",
-        "fieldUnavailable": "",
-        "operatorInvalid": "",
-        "valueInvalid": "",
-        "actionUnavailable": "",
-        "variableUnavailable": "",
-        "minutesRange": "",
-        "daysRange": "",
-        "measureInvalid": "",
-        "fieldNotAvailableFor": "",
-        "trustAmountRange": "",
-        "trustValueRange": "",
-        "messageRequired": "",
-        "tooLong": ""
+        "sendNeedsDestination": "Choisissez au moins une destination",
+        "nameRequired": "Donner un nom à cette automatisation",
+        "scopeIncomplete": "Choisir à qui cela s'applique",
+        "triggerRequired": "Ajoute ce qui déclenche tout ça, ou réactive l'étape précédente",
+        "policyNeedsSubject": "Les violations concernent une personne, donc cela nécessite un déclencheur de flux ou de compte.",
+        "fieldUnavailable": "Cette vérification n'est pas disponible pour chaque déclencheur ici",
+        "operatorInvalid": "La comparaison ne correspond pas à la vérification",
+        "valueInvalid": "Cette valeur ne correspond pas à la vérification",
+        "actionUnavailable": "Ces déclencheurs ne fournissent pas ce dont cette action a besoin",
+        "variableUnavailable": "Le message nomme quelque chose que ne contient pas tous les déclencheurs",
+        "minutesRange": "Entre {{min}} et {{max}} minutes",
+        "daysRange": "Entre {{min}} et {{max}} jours",
+        "measureInvalid": "Choisissez comment les minutes sont comptées",
+        "fieldNotAvailableFor": "Non disponible pour : {{triggers}}",
+        "trustAmountRange": "Faire confiance aux changements de -100 à 100 points",
+        "trustValueRange": "Le score de confiance est compris entre 0 et 100",
+        "messageRequired": "Tapez le message à afficher",
+        "tooLong": "Au maximum {{max}} caractères"
       },
       "recordAs": {
-        "label": "",
-        "policy": "",
-        "policyDescription": "",
-        "notification": "",
-        "notificationDescription": ""
+        "label": "Lorsque cela s'exécute, enregistrez-le comme",
+        "policy": "Une violation",
+        "policyDescription": "Listés en Violations ; peuvent être reconnus.",
+        "notification": "Une alerte",
+        "notificationDescription": "Enregistré dans Activité ; jamais une violation."
       },
-      "severityLabel": "",
-      "activeLabel": "",
-      "saving": "",
-      "selectPlaceholder": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "clearSelection": "",
-      "selectedCount": "",
+      "severityLabel": "À quel point ?",
+      "activeLabel": "Actif",
+      "saving": "Enregistrement ...",
+      "selectPlaceholder": "Sélectionner",
+      "searchPlaceholder": "Rechercher…",
+      "noMatches": "Aucune correspondance",
+      "clearSelection": "Effacer la sélection",
+      "selectedCount": "{{count}} sélectionnés",
       "scope": {
-        "label": "",
-        "global": "",
-        "server": "",
-        "account": "",
-        "person": "",
-        "serverLabel": "",
-        "serverPlaceholder": "",
-        "accountLabel": "",
+        "label": "À qui cela s'applique",
+        "global": "Tout le monde",
+        "server": "Un serveur",
+        "account": "Un seul compte",
+        "person": "Une seule personne",
+        "serverLabel": "Serveur",
+        "serverPlaceholder": "Sélectionner le serveur",
+        "accountLabel": "Compte",
         "accountPlaceholder": "Sélectionnez un compte",
         "personLabel": "Personne",
-        "personPlaceholder": "",
-        "personHelper": "",
-        "noServers": "",
+        "personPlaceholder": "Sélectionner personne",
+        "personHelper": "Correspond à cette personne sur chaque serveur sur lequel elle a un compte.",
+        "noServers": "Aucun serveur connecté pour le moment.",
         "enforceAcrossServers": "Agir sur leurs streams sur n'importe lequel de leurs serveurs",
         "enforceAcrossServersDescription": "Agit sur les sessions de la personne sur n'importe lequel de ses serveurs, pas seulement celui qui l'a déclenché. Désactivé par défaut."
       },
       "conditions": {
-        "addGroup": "",
-        "fieldPlaceholder": "",
-        "windowPrefix": "",
-        "windowUnit": "",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "allDeviceTypes": "",
-        "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
-        "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
-        "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
-        "canNeverPass": "",
-        "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "addGroup": "Ajouter un ensemble de vérifications séparé",
+        "fieldPlaceholder": "Choisissez quelque chose à vérifier",
+        "windowPrefix": "dans",
+        "windowUnit": "heures",
+        "uniqueDevices": "Appareils uniques",
+        "uniqueDevicesHint": "Ne compte que les sessions provenant de différents appareils physiques.",
+        "uniqueIps": "IP uniques",
+        "uniqueIpsHint": "Ne compte que les sessions provenant d'adresses IP différentes, de sorte que les flux du même foyer ne sont pas comptés.",
+        "allDeviceTypes": "Tous les types d'appareils",
+        "deviceTypesHint": "Ne compte que les flux provenant des types de périphériques sélectionnés. Vide signifie chaque appareil.",
+        "yes": "Oui",
+        "no": "Non",
+        "recentlySeen": "Récemment vus",
+        "allCountries": "Tous les pays",
+        "sectionTitle": "Et seulement si…",
+        "optional": "optionnel",
+        "helper": "Vérifications qui doivent passer en premier. Vide signifie qu'il s'exécute à chaque fois.",
+        "emptyLine": "Aucun contrôle supplémentaire. Cela s'exécute à chaque fois.",
+        "all": "et",
+        "any": "ou",
+        "allHint": "et : chaque vérification doit être réussie",
+        "anyHint": "ou : une seule vérification suffit",
+        "matchLabel": "Rejoindre ces vérifications avec",
+        "fieldLabel": "Que vérifier",
+        "operatorLabel": "S'agit-il de",
+        "valueLabel": "Valeur",
+        "canNeverPass": "Cela ne peut jamais passer. Le déclencheur tire déjà sur {{threshold}}.",
+        "noFields": "Aucune vérification n'est disponible pour ces déclencheurs. Ajoutez d'abord un déclencheur de flux ou de compte.",
+        "groupSeparator": "et aussi",
+        "addAnother": "Ajouter une vérification",
+        "addFirst": "Ajouter une vérification",
+        "removeGroup": "Retirer cet ensemble de vérifications"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
-        "confirmRemoveDescription": "",
-        "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
+        "add": "Ajoutez une autre action",
+        "sectionTitle": "Puis faites…",
+        "ifTitle": "Si…",
+        "helper": "Celles-ci se déroulent dans l'ordre, de haut en bas.",
+        "emptyTitle": "Que doit-il se passer ?",
+        "emptyDescription": "Envoyer une notification, arrêter le flux, changer un score de confiance ou exécuter des étapes seulement quand une vérification supplémentaire passe.",
+        "emptyAction": "Choisir ce qu'il se passe",
+        "moveUp": "Déplacer {{name}} vers le haut",
+        "moveDown": "Déplacer {{name}} vers le bas",
+        "menu": "Plus pour {{name}}",
+        "branchName": "cette branche",
+        "confirmRemoveTitle": "Supprimer cette action ?",
+        "confirmRemoveDescription": "Arrêt lors de la sauvegarde.",
+        "policyNote": "Ce n'est pas une branche qui détermine si cela est signalé, mais la section Et seulement si…",
+        "branchThen": "Faire ceci",
+        "branchElse": "Ou bien",
+        "branchElseEmpty": "Rien. L'automatisation continue.",
         "ifNothing": "rien n'a encore été sélectionné",
         "ifAddCheck": "Ajouter une autre vérification",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "addBranch": "Ajouter une étape",
+        "expandBranch": "Afficher les étapes de cette branche",
+        "collapseBranch": "Masquer les étapes de cette branche"
       },
       "when": {
-        "title": "",
+        "title": "Quand...",
         "helper": "Chacun de ces éléments démarre. Au moins un est requis.",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "add": "",
-        "or": ""
+        "emptyTitle": "Par quoi commencer ?",
+        "emptyDescription": "Un flux en cours de démarrage, un serveur en panne, un compte se calme.",
+        "emptyAction": "Choisissez ce qui commence",
+        "add": "Ajouter un autre déclencheur",
+        "or": "ou"
       },
       "heldFor": {
-        "prefix": "",
-        "minutesLabel": "",
-        "unit": "",
-        "measureLabel": "",
-        "current": "",
-        "total": ""
+        "prefix": "Un flux a été mis en pause pour",
+        "minutesLabel": "Minutes",
+        "unit": "minutes",
+        "measureLabel": "Compté",
+        "current": "cette fois",
+        "total": "au total"
       },
       "inactiveFor": {
-        "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "prefix": "Un compte a été inactif pendant",
+        "daysLabel": "Jours",
+        "unit": "jours"
       },
       "rows": {
-        "toggle": "",
-        "remove": "",
-        "skipped": "",
-        "toggleHint": "",
-        "removeHint": "",
-        "expandHint": "",
-        "moveHint": ""
+        "toggle": "Inclure {{name}}",
+        "remove": "Retirer {{name}}",
+        "skipped": "Ignoré",
+        "toggleHint": "ignorer",
+        "removeHint": "supprimer",
+        "expandHint": "ouvrir",
+        "moveHint": "réordonner"
       },
       "picker": {
-        "searchPlaceholder": "",
-        "empty": "",
-        "navigate": "",
-        "select": "",
-        "close": ""
+        "searchPlaceholder": "Rechercher ou décrire ce qui devrait se passer",
+        "empty": "Rien ne correspond à cela.",
+        "navigate": "déplacer",
+        "select": "Sélectionner",
+        "close": "fermer"
       },
       "sentence": {
-        "label": "",
-        "placeholderTrigger": "",
-        "placeholderAction": ""
+        "label": "En termes clairs",
+        "placeholderTrigger": "quelque chose se passe",
+        "placeholderAction": "faire quelque chose"
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "problems_one": "{{count}} chose à corriger",
+        "problems_other": "{{count}} choses à corriger",
+        "remaining_one": "{{{count}}} avant la fin",
+        "remaining_other": "{{{count}}} avant la fin",
+        "ready": "Prêt à enregistrer",
+        "search": "pour rechercher"
       },
       "leave": {
-        "title": "",
-        "confirm": ""
+        "title": "Quitter sans sauvegarder ?",
+        "confirm": "Quitter"
       },
       "liveCheck": {
-        "title": "",
-        "checking": "",
-        "empty": "",
-        "failed": "",
-        "footnote": "",
-        "expand": "",
-        "passed": "",
-        "notPassed": "",
-        "actual": "",
-        "unfinished": "",
-        "paused": "",
-        "sampleTitle": "",
-        "sampleGone": "",
-        "backToLive": ""
+        "title": "Actuellement sur les serveurs",
+        "checking": "Vérification de ce qui est en train de jouer…",
+        "empty": "Rien ne joue en ce moment ; rien à vérifier.",
+        "failed": "Impossible d'accéder aux serveurs pour vérifier.",
+        "footnote": "Les temps de recharge et les sessions déjà gérées ne sont pas simulés.",
+        "expand": "Afficher ce qui correspond à {{name}}",
+        "passed": "Réussi",
+        "notPassed": "N'a pas réussi",
+        "actual": "maintenant {{value}}",
+        "unfinished": "Affiche ce que cela ferait une fois l'automation terminée.",
+        "paused": "Suspendu pendant les sauvegardes",
+        "sampleTitle": "Ce que cela ferait pour cette exécution",
+        "sampleGone": "Cette session n'est plus enregistrée; rien à vérifier.",
+        "backToLive": "Revenir à ce qui est en cours de lecture"
       }
     },
     "categories": {
-      "session_behavior": "",
-      "stream_quality": "",
-      "user_attributes": "",
-      "device_client": "",
-      "network_location": "",
-      "scope": "",
-      "media": ""
+      "session_behavior": "Comportement de session",
+      "stream_quality": "Qualité de la diffusion",
+      "user_attributes": "Attributs des utilisateurs",
+      "device_client": "Appareil & Client",
+      "network_location": "Réseau & Localisation",
+      "scope": "Qui et où",
+      "media": "Média"
     },
-    "createAutomation": "",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "Créer une automatisation",
+    "customAutomation": "Automatisation personnalisée",
+    "deleteAutomationConfirm": "Êtes-vous sûr de vouloir supprimer cette automatisation? Cette action est irréversible.",
+    "deleteAutomation_one": "Supprimer l'automatisation",
+    "deleteAutomation_other": "Supprimer {{count}} automatisations ",
+    "deleteAutomationsConfirm": "Êtes-vous sûr de vouloir supprimer ceci ? Cette action est irréversible.",
     "describe": {
-      "more_one": "",
-      "more_other": "",
-      "noValues": "",
-      "includesSameDevice": "",
-      "uniqueIps": "",
-      "deviceTypesOnly": "",
-      "when": "",
+      "more_one": "+{{count}} de plus",
+      "more_other": "+{{count}} de plus",
+      "noValues": "(aucun)",
+      "includesSameDevice": "inclut le même appareil",
+      "uniqueIps": "IPs uniques",
+      "deviceTypesOnly": "{{types}} seulement",
+      "when": "Quand {{text}}",
       "or": "",
       "nothing": "",
       "onlyWhen": "",
