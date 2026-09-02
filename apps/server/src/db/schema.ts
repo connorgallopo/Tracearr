@@ -28,6 +28,16 @@ import { relations, sql } from 'drizzle-orm';
 import {
   MEDIA_TYPES,
   type AutomationKind,
+  type EmailSuppressionReason,
+  type NewsletterImageMode,
+  type NewsletterRecipientStatus,
+  type NewsletterRecipients,
+  type NewsletterSchedule,
+  type NewsletterScope,
+  type NewsletterSections,
+  type NewsletterSendOutcome,
+  type NewsletterSendTrigger,
+  type NewsletterWindow,
   type NotificationEventType,
   type RunOutcome,
   type TEMPLATE_GROUPS,
@@ -118,6 +128,8 @@ export const users = pgTable(
     thumbnail: text('thumbnail'), // Custom avatar (nullable)
     email: varchar('email', { length: 255 }), // For identity matching (nullable)
     emailVerified: boolean('email_verified').notNull().default(false),
+    // Owner-typed address for newsletters only; never a login, never a sync match key
+    contactEmail: varchar('contact_email', { length: 255 }),
 
     // Authentication (nullable - not all users authenticate directly)
     passwordHash: text('password_hash'), // bcrypt hash for local login
@@ -175,6 +187,10 @@ export const users = pgTable(
     index('users_last_activity_idx').on(table.lastActivityAt.desc().nullsLast(), table.id),
     // Roster search matches users.name or any account's username
     index('users_name_trgm_idx').using('gin', sql`${table.name} gin_trgm_ops`),
+    check(
+      'users_contact_email_lower',
+      sql`${table.contactEmail} IS NULL OR ${table.contactEmail} = lower(${table.contactEmail})`
+    ),
   ]
 );
 
@@ -794,6 +810,100 @@ export const destinations = pgTable(
   ]
 );
 
+/** What a delivery needs to turn a `poster:<cardId>` reference back into bytes or a URL. */
+export interface PosterRef {
+  serverId: string;
+  thumbPath: string;
+  version: string;
+}
+
+export const newsletters = pgTable('newsletters', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull().unique(),
+  enabled: boolean('enabled').notNull().default(true),
+  destinationId: uuid('destination_id').references(() => destinations.id, { onDelete: 'set null' }),
+  schedule: jsonb('schedule').notNull().$type<NewsletterSchedule>(),
+  timezone: text('timezone').notNull(),
+  window: jsonb('window').notNull().$type<NewsletterWindow>(),
+  scope: jsonb('scope').notNull().$type<NewsletterScope>(),
+  sections: jsonb('sections').notNull().$type<NewsletterSections>(),
+  subject: text('subject').notNull(),
+  intro: text('intro'),
+  outro: text('outro'),
+  recipients: jsonb('recipients').notNull().$type<NewsletterRecipients>(),
+  imageMode: text('image_mode').notNull().default('auto').$type<NewsletterImageMode>(),
+  skipWhenEmpty: boolean('skip_when_empty').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const newsletterSends = pgTable(
+  'newsletter_sends',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    newsletterId: uuid('newsletter_id')
+      .notNull()
+      .references(() => newsletters.id, { onDelete: 'cascade' }),
+    // The transport at send time; no FK, so a deleted destination leaves history readable
+    destinationId: uuid('destination_id'),
+    viewToken: text('view_token').notNull().unique(),
+    trigger: text('trigger').notNull().$type<NewsletterSendTrigger>(),
+    windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
+    windowEnd: timestamp('window_end', { withTimezone: true }).notNull(),
+    itemCounts: jsonb('item_counts').notNull().default({}).$type<Record<string, number>>(),
+    recipientCount: integer('recipient_count').notNull().default(0),
+    outcome: text('outcome').notNull().default('rendering').$type<NewsletterSendOutcome>(),
+    error: text('error'),
+    // The rendered subject; the newsletter's template can change after the send
+    subject: text('subject').notNull().default(''),
+    // Rendered once with poster:<cardId> refs; nulled by retention
+    html: text('html'),
+    text: text('text'),
+    posters: jsonb('posters').notNull().default({}).$type<Record<string, PosterRef>>(),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp('finished_at', { withTimezone: true }),
+  },
+  (table) => [
+    // One open send per newsletter: a manual and a scheduled run cannot overlap
+    uniqueIndex('newsletter_sends_open_uidx')
+      .on(table.newsletterId)
+      .where(sql`${table.outcome} IN ('rendering', 'sending')`),
+    index('idx_newsletter_sends_newsletter_started').on(table.newsletterId, table.startedAt),
+  ]
+);
+
+export const newsletterSendRecipients = pgTable(
+  'newsletter_send_recipients',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sendId: uuid('send_id')
+      .notNull()
+      .references(() => newsletterSends.id, { onDelete: 'cascade' }),
+    address: text('address').notNull(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    status: text('status').notNull().default('queued').$type<NewsletterRecipientStatus>(),
+    attempts: integer('attempts').notNull().default(0),
+    error: text('error'),
+    // Written before the send is attempted, so a retry can tell a lost reply from a lost connection
+    messageId: text('message_id'),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+  },
+  (table) => [index('idx_newsletter_send_recipients_send_status').on(table.sendId, table.status)]
+);
+
+export const emailSuppressions = pgTable(
+  'email_suppressions',
+  {
+    address: text('address').primaryKey(),
+    reason: text('reason').notNull().$type<EmailSuppressionReason>(),
+    sourceSendId: uuid('source_send_id').references(() => newsletterSends.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check('email_suppressions_lower', sql`${table.address} = lower(${table.address})`)]
+);
+
 // Termination trigger type enum
 export const terminationTriggerEnum = ['manual', 'rule'] as const;
 
@@ -1283,6 +1393,10 @@ export const libraryItems = pgTable(
 
     index('idx_library_items_dynamic_range_active')
       .on(table.videoDynamicRange)
+      .where(sql`${table.removedAt} IS NULL`),
+
+    index('idx_library_items_first_seen_active')
+      .on(table.firstSeenAt)
       .where(sql`${table.removedAt} IS NULL`),
   ]
 );
