@@ -9,9 +9,10 @@ interface LayoutProps {
   branding: EmailBranding;
   logoRef: string | null;
   children: ReactNode;
+  footer?: ReactNode;
 }
 
-export function Layout({ preview, branding, logoRef, children }: LayoutProps) {
+export function Layout({ preview, branding, logoRef, children, footer }: LayoutProps) {
   return (
     <Html lang="en">
       <Head />
@@ -43,6 +44,7 @@ export function Layout({ preview, branding, logoRef, children }: LayoutProps) {
           {children}
           <Hr style={{ borderColor: colors.border, margin: '24px 0 12px' }} />
           <Cell style={{ paddingTop: '16px' }}>
+            {footer}
             {branding.footerText && <Text style={muted}>{branding.footerText}</Text>}
             {branding.postalAddress && <Text style={muted}>{branding.postalAddress}</Text>}
             <Text style={muted}>Sent by Tracearr for {branding.senderName}.</Text>

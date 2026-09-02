@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { paginationSchema, timezoneSchema, uuidSchema } from './schemas.js';
 
-export const NEWSLETTER_SECTION_MAX = 20;
+export const NEWSLETTER_SECTION_MAX = 15;
 export const NEWSLETTER_MOST_WATCHED_MAX = 10;
 export const NEWSLETTER_SEASONS_PER_SHOW_MAX = 8;
 export const NEWSLETTER_WINDOW_MAX_DAYS = 31;

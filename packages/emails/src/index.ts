@@ -1,6 +1,13 @@
-export { renderEvent, renderTest } from './render.js';
+export { renderDigest, renderEvent, renderTest } from './render.js';
 export { DEFAULT_ACCENT, defaultBranding } from './styles.js';
 export type {
+  DigestAlbum,
+  DigestArtist,
+  DigestInput,
+  DigestMovie,
+  DigestSeason,
+  DigestShow,
+  DigestWatched,
   EmailBranding,
   EmailLink,
   EventCard,

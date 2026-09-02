@@ -1,8 +1,15 @@
 import { render } from '@react-email/components';
 import type { ReactElement } from 'react';
+import { DigestEmail } from './templates/DigestEmail.js';
 import { EventEmail } from './templates/EventEmail.js';
 import { TestEmail } from './templates/TestEmail.js';
-import type { EmailBranding, EventEmailInput, RenderedEmail, TestEmailInput } from './types.js';
+import type {
+  DigestInput,
+  EmailBranding,
+  EventEmailInput,
+  RenderedEmail,
+  TestEmailInput,
+} from './types.js';
 
 async function renderBoth(element: ReactElement, subject: string): Promise<RenderedEmail> {
   const [html, text] = await Promise.all([render(element), render(element, { plainText: true })]);
@@ -21,4 +28,8 @@ export function renderEvent(
   branding: EmailBranding
 ): Promise<RenderedEmail> {
   return renderBoth(<EventEmail input={input} branding={branding} />, input.subject);
+}
+
+export function renderDigest(input: DigestInput, branding: EmailBranding): Promise<RenderedEmail> {
+  return renderBoth(<DigestEmail input={input} branding={branding} />, input.subject);
 }

@@ -51,3 +51,73 @@ export interface TestEmailInput {
   destinationName: string;
   logoRef: string | null;
 }
+
+export interface DigestMovie {
+  id: string;
+  title: string;
+  year: number | null;
+  posterRef: string | null;
+  genres: string[];
+  links: EmailLink[];
+}
+
+export interface DigestSeason {
+  number: number | null;
+  title: string;
+  /** "E01-E04, E07" or "" when the season came in whole. */
+  episodeRange: string;
+  episodeCount: number;
+}
+
+export interface DigestShow {
+  id: string;
+  title: string;
+  year: number | null;
+  posterRef: string | null;
+  seasons: DigestSeason[];
+  moreSeasons: number;
+  episodeCount: number;
+  links: EmailLink[];
+}
+
+export interface DigestAlbum {
+  id: string;
+  title: string;
+  year: number | null;
+  posterRef: string | null;
+  trackCount: number;
+}
+
+export interface DigestArtist {
+  id: string;
+  name: string;
+  albums: DigestAlbum[];
+  links: EmailLink[];
+}
+
+export interface DigestWatched {
+  id: string;
+  kind: 'movie' | 'show';
+  title: string;
+  year: number | null;
+  posterRef: string | null;
+  plays: number;
+}
+
+export interface DigestInput {
+  subject: string;
+  intro: string | null;
+  outro: string | null;
+  /** Already formatted for display in the newsletter's timezone. */
+  windowStart: string;
+  windowEnd: string;
+  movies: DigestMovie[];
+  shows: DigestShow[];
+  artists: DigestArtist[];
+  mostWatched: DigestWatched[];
+  logoRef: string | null;
+  /** Emitted verbatim; null renders the reply-to-unsubscribe line instead. */
+  unsubscribeUrl: string | null;
+  /** Emitted verbatim when set; stage 2 always passes null. */
+  viewUrl: string | null;
+}
