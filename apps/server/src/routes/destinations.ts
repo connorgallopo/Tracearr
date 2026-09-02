@@ -23,6 +23,10 @@ import {
   updateDestination,
   type DestinationRow,
 } from '../services/notifications/destinationStore.js';
+import {
+  assertSafeSmtpHost,
+  closeTransporter,
+} from '../services/notifications/destinations/emailTransport.js';
 import { getDestinationType } from '../services/notifications/destinations/registry.js';
 import { assertSafeProbeUrl } from '../utils/ssrf.js';
 import { firstIssueMessage } from '../utils/zod.js';
@@ -32,6 +36,19 @@ const REENCRYPT_MESSAGE = "Re-enter this destination's secret first";
 
 /** Throws with the field name so the 400 says which url was blocked. */
 function assertSafeUrls(kind: DestinationKind, config: Record<string, unknown>): void {
+  if (kind === 'email') {
+    const host = config['host'];
+    const port = config['port'];
+    if (typeof host === 'string' && typeof port === 'string') {
+      try {
+        assertSafeSmtpHost(host, port);
+      } catch (error) {
+        throw new Error(`host: ${error instanceof Error ? error.message : 'blocked host'}`, {
+          cause: error,
+        });
+      }
+    }
+  }
   for (const field of DESTINATION_TYPES[kind].fields) {
     if (field.input !== 'url') continue;
     const value = config[field.key];
@@ -61,9 +78,10 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
     reply: FastifyReply
   ): Promise<{ success: true } | FastifyReply> {
     try {
-      await getDestinationType(kind).test(config, {
+      const type = getDestinationType(kind);
+      await type.test(config, {
         destination: { id: 'test', name },
-        signal: AbortSignal.timeout(DELIVER_TEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(type.deliverTimeoutMs ?? DELIVER_TEST_TIMEOUT_MS),
       });
       return { success: true };
     } catch (error) {
@@ -176,6 +194,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
     }
 
     await deleteDestination(current.id);
+    closeTransporter(current.id);
     return reply.code(204).send();
   });
 

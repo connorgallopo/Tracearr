@@ -1,0 +1,279 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ViolationWithDetails } from '@tracearr/shared';
+
+const mockSendMail = vi.fn();
+const mockVerify = vi.fn();
+const mockClose = vi.fn();
+const mockCreateTransport = vi.fn((..._args: unknown[]) => ({
+  sendMail: mockSendMail,
+  verify: mockVerify,
+  close: mockClose,
+}));
+vi.mock('nodemailer', () => ({
+  createTransport: (...args: unknown[]) => mockCreateTransport(...args) as unknown,
+}));
+
+const mockProxyImage = vi.fn();
+vi.mock('../../imageProxy.js', () => ({
+  proxyImage: (...args: unknown[]) => mockProxyImage(...args) as unknown,
+}));
+
+const mockBuildMediaLinks = vi.fn();
+vi.mock('../mediaLinks.js', () => ({
+  buildMediaLinks: (...args: unknown[]) => mockBuildMediaLinks(...args) as unknown,
+}));
+
+const mockReadLogoPng = vi.fn();
+vi.mock('../emailLogo.js', () => ({
+  readLogoPng: () => mockReadLogoPng() as unknown,
+}));
+
+const mockGetNetworkSettings = vi.fn();
+vi.mock('../../settings.js', () => ({
+  getNetworkSettings: () => mockGetNetworkSettings() as unknown,
+}));
+
+import { createMockActiveSession } from '../../../test/fixtures.js';
+import { _resetTransportersForTests } from '../destinations/emailTransport.js';
+import { emailType, type EmailConfig, type EmailMessage } from '../destinations/email.js';
+import type { NotificationEvent } from '../events.js';
+import type { RenderContext } from '../destinations/types.js';
+
+const config: EmailConfig = {
+  preset: 'custom',
+  host: 'smtp.example.com',
+  port: '587',
+  security: 'starttls',
+  username: 'user',
+  password: 'pw',
+  fromName: 'Basement Plex',
+  fromAddress: 'plex@example.com',
+  to: 'a@example.com, b@example.org',
+  replyTo: '',
+  messagesPerSecond: '2',
+};
+const destination = { id: 'dest-1', name: 'Ops email' };
+const systemCtx: RenderContext = { destination, source: { kind: 'system' } };
+const deliverCtx = { destination, signal: AbortSignal.timeout(5000) };
+
+const violation: ViolationWithDetails = {
+  id: 'violation-123',
+  ruleId: 'rule-456',
+  serverUserId: 'user-789',
+  sessionId: 'session-123',
+  severity: 'warning',
+  data: { reason: 'test violation' },
+  acknowledgedAt: null,
+  createdAt: new Date('2026-01-02T03:04:05.000Z'),
+  user: {
+    id: 'user-789',
+    username: 'testuser',
+    serverId: 'server-id',
+    thumbUrl: null,
+    identityName: 'Test User',
+  },
+  rule: { id: 'rule-456', name: 'Test Rule', type: 'concurrent_streams' },
+};
+
+const mediaAdded: NotificationEvent = {
+  type: 'media_added',
+  payload: {
+    serverId: 'server-1',
+    serverName: 'Basement',
+    serverType: 'plex',
+    libraryItemId: 'item-1',
+    ratingKey: 'rk-1',
+    mediaId: null,
+    title: 'Heat',
+    grandparentTitle: null,
+    parentTitle: null,
+    grandparentRatingKey: null,
+    parentRatingKey: null,
+    parentIndex: null,
+    itemIndex: null,
+    mediaType: 'movie',
+    year: 1995,
+    imdbId: null,
+    tmdbId: null,
+    tvdbId: null,
+    thumbPath: '/library/metadata/1/thumb',
+    libraryName: 'Movies',
+    to: {
+      resolution: '4k',
+      dynamicRange: 'HDR10',
+      videoCodec: 'hevc',
+      audioCodec: 'truehd',
+      audioChannels: 8,
+      fileSize: null,
+    },
+  },
+};
+
+const render = (event: NotificationEvent, ctx: RenderContext = systemCtx): Promise<EmailMessage> =>
+  Promise.resolve(emailType.render(event, config, ctx));
+
+beforeEach(() => {
+  mockSendMail.mockReset().mockResolvedValue({ messageId: '<x@y>' });
+  mockVerify.mockReset().mockResolvedValue(true);
+  mockClose.mockReset();
+  mockCreateTransport.mockClear();
+  mockProxyImage.mockReset().mockResolvedValue({
+    data: Buffer.from('jpegbytes'),
+    contentType: 'image/jpeg',
+    cached: true,
+  });
+  mockBuildMediaLinks
+    .mockReset()
+    .mockResolvedValue([{ label: 'Open in Plex', url: 'https://plex/x' }]);
+  mockReadLogoPng.mockReset().mockReturnValue(Buffer.from('pngbytes'));
+  mockGetNetworkSettings
+    .mockReset()
+    .mockResolvedValue({ externalUrl: 'https://tracearr.example.com', trustProxy: false });
+});
+afterEach(() => _resetTransportersForTests());
+
+describe('emailType.render', () => {
+  it('renders a violation as a facts card with the automation override winning', async () => {
+    const event: NotificationEvent = { type: 'violation', payload: violation };
+    const ctx: RenderContext = {
+      destination,
+      source: {
+        kind: 'automation',
+        automationId: 'a-1',
+        automationName: 'Guard',
+        title: 'Custom title',
+        body: 'Custom body',
+      },
+    };
+    const out = await render(event, ctx);
+    expect(out.subject).toBe('Custom title');
+    expect(out.html).toContain('Custom body');
+    expect(out.html).toContain('Test User');
+    expect(out.html).toContain('Test Rule');
+    expect(out.html).toContain('href="https://tracearr.example.com"');
+    expect(out.attachments.map((a) => a.cid)).toEqual(['logo']);
+  });
+
+  it('renders a media event with the poster and logo attached inline and the links rendered', async () => {
+    const out = await render(mediaAdded);
+    expect(out.subject).toBe('New media added: Heat');
+    expect(out.html).toContain('HDR10');
+    expect(out.html).toContain('truehd 8ch');
+    expect(out.html).toContain('src="cid:poster"');
+    expect(out.html).toContain('src="cid:logo"');
+    expect(out.html).toContain('href="https://plex/x"');
+    expect(out.attachments).toEqual([
+      {
+        filename: 'logo.png',
+        cid: 'logo',
+        content: Buffer.from('pngbytes'),
+        contentType: 'image/png',
+      },
+      {
+        filename: 'poster.jpg',
+        cid: 'poster',
+        content: Buffer.from('jpegbytes'),
+        contentType: 'image/jpeg',
+      },
+    ]);
+    expect(mockProxyImage).toHaveBeenCalledWith({
+      serverId: 'server-1',
+      imagePath: '/library/metadata/1/thumb',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+    });
+  });
+
+  it('drops the poster when the proxy answers with a placeholder svg or throws', async () => {
+    mockProxyImage.mockResolvedValueOnce({
+      data: Buffer.from('<svg/>'),
+      contentType: 'image/svg+xml',
+      cached: false,
+    });
+    const svg = await render(mediaAdded);
+    expect(svg.attachments.map((a) => a.cid)).toEqual(['logo']);
+    expect(svg.html).not.toContain('cid:poster');
+
+    mockProxyImage.mockRejectedValueOnce(new Error('offline'));
+    const thrown = await render(mediaAdded);
+    expect(thrown.attachments.map((a) => a.cid)).toEqual(['logo']);
+  });
+
+  it('omits the logo when none is on disk and the app link when no external url is set', async () => {
+    mockReadLogoPng.mockReturnValue(null);
+    mockGetNetworkSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
+    const out = await render({ type: 'session_started', payload: createMockActiveSession() });
+    expect(out.attachments).toEqual([]);
+    expect(out.html).not.toContain('Open Tracearr');
+  });
+});
+
+describe('emailType.deliver', () => {
+  it('sends to every listed address with html, text, attachments and a message id', async () => {
+    const message = await render(mediaAdded);
+    await emailType.deliver(message, config, deliverCtx);
+    expect(mockSendMail).toHaveBeenCalledTimes(1);
+    const sent = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(sent).toMatchObject({
+      from: { name: 'Basement Plex', address: 'plex@example.com' },
+      to: ['a@example.com', 'b@example.org'],
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      attachments: message.attachments,
+    });
+    expect(sent).not.toHaveProperty('replyTo');
+    expect(sent.messageId).toMatch(/^<[0-9a-f-]{36}@example\.com>$/);
+    expect(mockCreateTransport).toHaveBeenCalledWith(
+      expect.objectContaining({ host: 'smtp.example.com', port: 587, requireTLS: true })
+    );
+  });
+
+  it('passes reply-to when set and falls back to Tracearr as the from name', async () => {
+    const message = await render(mediaAdded);
+    await emailType.deliver(
+      message,
+      { ...config, fromName: '', replyTo: 'owner@example.com' },
+      deliverCtx
+    );
+    expect(mockSendMail.mock.calls[0]?.[0]).toMatchObject({
+      from: { name: 'Tracearr', address: 'plex@example.com' },
+      replyTo: 'owner@example.com',
+    });
+  });
+
+  it('throws when the send fails so the queue retries', async () => {
+    mockSendMail.mockRejectedValueOnce(Object.assign(new Error('nope'), { code: 'EMESSAGE' }));
+    const message = await render(mediaAdded);
+    await expect(emailType.deliver(message, config, deliverCtx)).rejects.toThrow('Ops email: nope');
+  });
+
+  it('declares a longer deliver timeout than the http kinds', () => {
+    expect(emailType.deliverTimeoutMs).toBe(60_000);
+  });
+});
+
+describe('emailType.test', () => {
+  it('verifies before sending and closes the uncached transporter', async () => {
+    await emailType.test(config, deliverCtx);
+    expect(mockVerify).toHaveBeenCalledTimes(1);
+    expect(mockVerify.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSendMail.mock.invocationCallOrder[0] ?? 0
+    );
+    expect(mockSendMail.mock.calls[0]?.[0]).toMatchObject({
+      to: ['a@example.com', 'b@example.org'],
+      subject: 'Test email from Tracearr (Ops email)',
+    });
+    expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('turns an auth failure into a readable message and still closes', async () => {
+    mockVerify.mockRejectedValueOnce(Object.assign(new Error('535'), { code: 'EAUTH' }));
+    await expect(emailType.test(config, deliverCtx)).rejects.toThrow(
+      'SMTP authentication failed for user at smtp.example.com'
+    );
+    expect(mockSendMail).not.toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+});

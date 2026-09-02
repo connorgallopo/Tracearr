@@ -1,6 +1,7 @@
 import type { DestinationKind } from '@tracearr/shared';
 import { appriseType } from './apprise.js';
 import { discordType } from './discord.js';
+import { emailType } from './email.js';
 import { gotifyType } from './gotify.js';
 import { jsonWebhookType } from './jsonWebhook.js';
 import { ntfyType } from './ntfy.js';
@@ -17,6 +18,7 @@ const registry: Record<DestinationKind, DestinationType<any, any>> = {
   gotify: gotifyType,
   apprise: appriseType,
   pushover: pushoverType,
+  email: emailType,
   push: pushType,
   web_toast: webToastType,
 };

@@ -220,3 +220,86 @@ describe('EMAIL_SMTP_PRESETS', () => {
     }
   });
 });
+
+describe('email destination', () => {
+  const valid = {
+    preset: 'custom',
+    host: 'smtp.example.com',
+    port: '587',
+    security: 'starttls',
+    username: 'user',
+    password: 'pw',
+    fromName: 'Basement',
+    fromAddress: 'plex@example.com',
+    to: 'a@example.com, b@example.org',
+    replyTo: '',
+    messagesPerSecond: '2',
+  };
+
+  it('is a creatable kind that carries every event', () => {
+    expect(DESTINATION_KINDS).toContain('email');
+    expect(DESTINATION_TYPES.email.builtin).toBe(false);
+    expect(DESTINATION_TYPES.email.events).toEqual(NOTIFICATION_EVENT_TYPES);
+    expect(DESTINATION_TYPES.email.icon).toBe('Mail');
+  });
+
+  it('accepts a full config and keeps every value a string', () => {
+    const parsed = destinationConfigSchema('email').safeParse(valid);
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.port).toBe('587');
+    expect(parsed.data.messagesPerSecond).toBe('2');
+  });
+
+  it('fills defaults for port, security, fromName, preset and rate', () => {
+    const parsed = destinationConfigSchema('email').safeParse({
+      host: 'smtp.example.com',
+      fromAddress: 'plex@example.com',
+      to: 'a@example.com',
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data).toMatchObject({
+      port: '587',
+      security: 'starttls',
+      fromName: 'Tracearr',
+      preset: 'custom',
+      messagesPerSecond: '2',
+    });
+  });
+
+  it.each([
+    ['messagesPerSecond', '0'],
+    ['messagesPerSecond', '51'],
+    ['security', 'ssl'],
+    ['preset', 'fastmail'],
+    ['host', ''],
+  ])('rejects %s = %s', (key, value) => {
+    const parsed = destinationConfigSchema('email').safeParse({ ...valid, [key]: value });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('allows an empty reply-to and username', () => {
+    const parsed = destinationConfigSchema('email').safeParse({
+      ...valid,
+      replyTo: null,
+      username: null,
+      password: null,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it('wires the preset select to the shared presets', () => {
+    const presetField = DESTINATION_TYPES.email.fields.find((f) => f.key === 'preset');
+    expect(presetField?.presets).toBe(EMAIL_SMTP_PRESETS);
+    expect(presetField?.options?.map((o) => o.value)).toEqual([
+      'custom',
+      ...Object.keys(EMAIL_SMTP_PRESETS),
+    ]);
+  });
+
+  it('marks only the password as secret', () => {
+    const secrets = DESTINATION_TYPES.email.fields.filter((f) => f.secret).map((f) => f.key);
+    expect(secrets).toEqual(['password']);
+  });
+});

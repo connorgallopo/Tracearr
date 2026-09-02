@@ -326,7 +326,7 @@ async function processJob(job: Job<NotificationJob>): Promise<void> {
   const rendered = await type.render(event, opened.config, { destination: ref, source });
   await type.deliver(rendered, opened.config, {
     destination: ref,
-    signal: AbortSignal.timeout(DELIVER_TIMEOUT_MS),
+    signal: AbortSignal.timeout(type.deliverTimeoutMs ?? DELIVER_TIMEOUT_MS),
   });
 }
 

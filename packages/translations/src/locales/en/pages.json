@@ -1576,10 +1576,38 @@
         "topic": "Topic",
         "authToken": "Auth token",
         "userKey": "User key",
-        "apiToken": "API token"
+        "apiToken": "API token",
+        "preset": "Provider",
+        "host": "SMTP host",
+        "port": "Port",
+        "security": "Security",
+        "username": "Username",
+        "password": "Password",
+        "fromName": "From name",
+        "fromAddress": "From address",
+        "to": "Recipients",
+        "replyTo": "Reply-to",
+        "messagesPerSecond": "Messages per second"
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": "Optional for public topics",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "Leave blank when the server needs no login",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit"
+      },
+      "options": {
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)",
+        "securityNone": "None (plain text, port 25)",
+        "presetCustom": "Custom",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
       "ownerOnly": "Only the owner can manage notification destinations.",
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
@@ -1598,6 +1626,7 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "email": "Email",
         "push": "Mobile push",
         "webToast": "Browser toasts"
       },

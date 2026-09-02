@@ -764,6 +764,7 @@ export const destinationKindEnum = [
   'gotify',
   'apprise',
   'pushover',
+  'email',
   'push',
   'web_toast',
 ] as const;

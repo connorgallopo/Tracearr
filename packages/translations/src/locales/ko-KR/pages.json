@@ -1576,10 +1576,25 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "Provider",
+        "host": "SMTP host",
+        "port": "Port",
+        "security": "Security",
+        "username": "Username",
+        "password": "Password",
+        "fromName": "From name",
+        "fromAddress": "From address",
+        "to": "Recipients",
+        "replyTo": "Reply-to",
+        "messagesPerSecond": "Messages per second"
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "Leave blank when the server needs no login",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit"
       },
       "ownerOnly": "",
       "pushNote": "",
@@ -1599,11 +1614,25 @@
         "apprise": "",
         "pushover": "",
         "push": "",
-        "webToast": ""
+        "webToast": "",
+        "email": "Email"
       },
       "usedBy": "",
       "usedBy_other": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "options": {
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)",
+        "securityNone": "None (plain text, port 25)",
+        "presetCustom": "Custom",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
+      }
     },
     "jobs": {
       "runNow": "지금 실행",

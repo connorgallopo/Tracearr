@@ -8,6 +8,7 @@ export const DESTINATION_KINDS = [
   'gotify',
   'apprise',
   'pushover',
+  'email',
   'push',
   'web_toast',
 ] as const;
@@ -129,6 +130,85 @@ export const EMAIL_SMTP_PRESETS = {
   gmail: { host: 'smtp.gmail.com', port: '587', security: 'starttls' },
 } as const satisfies Record<string, { host: string; port: string; security: EmailSecurity }>;
 
+const select = (
+  key: string,
+  label: string,
+  options: readonly DestinationFieldOption[],
+  def: string,
+  extra: { hint?: string; presets?: DestinationFieldDescriptor['presets'] } = {}
+): DestinationFieldDescriptor => ({
+  key,
+  label,
+  input: 'select',
+  required: true,
+  secret: false,
+  options,
+  default: def,
+  ...extra,
+});
+const number = (
+  key: string,
+  label: string,
+  def: string,
+  min: number,
+  max: number,
+  hint?: string
+): DestinationFieldDescriptor => ({
+  key,
+  label,
+  input: 'number',
+  required: true,
+  secret: false,
+  default: def,
+  min,
+  max,
+  hint,
+});
+const email = (
+  key: string,
+  label: string,
+  required: boolean,
+  placeholder?: string
+): DestinationFieldDescriptor => ({
+  key,
+  label,
+  input: 'email',
+  required,
+  secret: false,
+  placeholder,
+});
+const emails = (
+  key: string,
+  label: string,
+  placeholder: string,
+  hint: string
+): DestinationFieldDescriptor => ({
+  key,
+  label,
+  input: 'emails',
+  required: true,
+  secret: false,
+  placeholder,
+  hint,
+});
+
+const PRESET_OPTIONS: readonly DestinationFieldOption[] = [
+  { value: 'custom', label: 'presetCustom' },
+  { value: 'postmark', label: 'presetPostmark' },
+  { value: 'resend', label: 'presetResend' },
+  { value: 'ses', label: 'presetSes' },
+  { value: 'mailgun', label: 'presetMailgun' },
+  { value: 'sendgrid', label: 'presetSendgrid' },
+  { value: 'brevo', label: 'presetBrevo' },
+  { value: 'gmail', label: 'presetGmail' },
+];
+
+const SECURITY_OPTIONS: readonly DestinationFieldOption[] = [
+  { value: 'starttls', label: 'securityStarttls' },
+  { value: 'tls', label: 'securityTls' },
+  { value: 'none', label: 'securityNone' },
+];
+
 export const DESTINATION_TYPES = {
   discord: {
     kind: 'discord',
@@ -181,6 +261,29 @@ export const DESTINATION_TYPES = {
     builtin: false,
     events: ALL_EVENTS,
     fields: [secret('userKey', 'userKey', true), secret('apiToken', 'apiToken', true)],
+  },
+  email: {
+    kind: 'email',
+    label: 'email',
+    icon: 'Mail',
+    builtin: false,
+    events: ALL_EVENTS,
+    fields: [
+      select('preset', 'preset', PRESET_OPTIONS, 'custom', {
+        hint: 'smtpPreset',
+        presets: EMAIL_SMTP_PRESETS,
+      }),
+      text('host', 'host', true, 'smtp.example.com'),
+      number('port', 'port', '587', 1, 65535),
+      select('security', 'security', SECURITY_OPTIONS, 'starttls'),
+      { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
+      secret('password', 'password', false),
+      text('fromName', 'fromName', false, undefined, 'Tracearr'),
+      email('fromAddress', 'fromAddress', true, 'tracearr@example.com'),
+      emails('to', 'to', 'you@example.com, admin@example.com', 'smtpTo'),
+      email('replyTo', 'replyTo', false),
+      number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
+    ],
   },
   push: {
     kind: 'push',

@@ -14,6 +14,8 @@ export interface DeliverContext {
 export interface DestinationType<C, R> {
   kind: DestinationKind;
   events: readonly NotificationEventType[];
+  /** Replaces the queue's default deliver timeout for kinds whose transport outlives an http call. */
+  deliverTimeoutMs?: number;
   render(event: NotificationEvent, config: C, ctx: RenderContext): Promise<R> | R;
   /** Throws on any failure; the queue's retries and DLQ depend on that. */
   deliver(rendered: R, config: C, ctx: DeliverContext): Promise<void>;
