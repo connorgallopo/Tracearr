@@ -1,4 +1,4 @@
-export { renderTest } from './render.js';
+export { renderEvent, renderTest } from './render.js';
 export { DEFAULT_ACCENT, defaultBranding } from './styles.js';
 export type {
   EmailBranding,
