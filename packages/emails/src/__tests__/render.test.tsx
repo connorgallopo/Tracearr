@@ -27,7 +27,7 @@ describe('renderTest', () => {
     expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {
       expect(cell).toMatch(/background-color:/);
-      expect(cell).toMatch(/color:/);
+      expect(cell).toMatch(/(?<!-)color:/);
     }
   });
 });
