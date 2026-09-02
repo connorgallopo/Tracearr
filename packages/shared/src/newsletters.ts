@@ -111,7 +111,7 @@ export const createNewsletterSchema = z.strictObject({
   enabled: z.boolean().default(true),
   destinationId: uuidSchema.nullable().default(null),
   schedule: newsletterScheduleSchema,
-  timezone: timezoneSchema,
+  timezone: timezoneSchema.unwrap(),
   window: newsletterWindowSchema.default({ kind: 'since_last_send', fallbackDays: 7 }),
   scope: newsletterScopeSchema.default({ serverIds: [], libraryIds: [] }),
   sections: newsletterSectionsSchema.default(DEFAULT_NEWSLETTER_SECTIONS),

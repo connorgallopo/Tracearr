@@ -85,6 +85,14 @@ describe('createNewsletterSchema', () => {
     if (!parsed.success) return;
     expect(parsed.data.recipients.extraAddresses[0]?.address).toBe('a@example.com');
   });
+
+  it('requires a timezone', () => {
+    const { timezone: _omitted, ...withoutTimezone } = minimal;
+    expect(createNewsletterSchema.safeParse(withoutTimezone).success).toBe(false);
+    expect(createNewsletterSchema.safeParse({ ...minimal, timezone: undefined }).success).toBe(
+      false
+    );
+  });
 });
 
 describe('updateNewsletterSchema', () => {
@@ -92,6 +100,7 @@ describe('updateNewsletterSchema', () => {
     expect(updateNewsletterSchema.safeParse({}).success).toBe(true);
     expect(updateNewsletterSchema.safeParse({ name: '' }).success).toBe(false);
     expect(updateNewsletterSchema.safeParse({ imageMode: 'none' }).success).toBe(true);
+    expect(updateNewsletterSchema.safeParse({ colour: 'red' }).success).toBe(false);
   });
 });
 
