@@ -16,6 +16,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/server/package.json ./apps/server/
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/emails/package.json ./packages/emails/
 COPY packages/translations/package.json ./packages/translations/
 COPY packages/test-utils/package.json ./packages/test-utils/
 
@@ -74,6 +75,10 @@ COPY --from=builder /app/apps/web/dist ./apps/web/dist
 # Shared package
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+
+# Emails package
+COPY --from=builder /app/packages/emails/package.json ./packages/emails/
+COPY --from=builder /app/packages/emails/dist ./packages/emails/dist
 
 # Database migrations
 COPY --from=builder /app/apps/server/src/db/migrations ./apps/server/src/db/migrations
