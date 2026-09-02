@@ -41,6 +41,7 @@ describe('unsubscribe tokens', () => {
     ).toBeNull();
     expect(verifyUnsubscribeToken('no-dot')).toBeNull();
     expect(verifyUnsubscribeToken('')).toBeNull();
+    expect(verifyUnsubscribeToken(signUnsubscribeToken('not-a-uuid'))).toBeNull();
   });
 
   it('does not verify a token signed under another secret', () => {
@@ -55,6 +56,12 @@ describe('unsubscribe tokens', () => {
     process.env.ENCRYPTION_KEY = 'ab'.repeat(32);
     _resetLinkKeyForTests();
     expect(signUnsubscribeToken(RECIPIENT)).not.toBe(fromJwt);
+  });
+
+  it('throws when ENCRYPTION_KEY is set but malformed', () => {
+    process.env.ENCRYPTION_KEY = 'zz';
+    _resetLinkKeyForTests();
+    expect(() => signUnsubscribeToken(RECIPIENT)).toThrow(/64 hex/);
   });
 
   it('view tokens are 43 base64url characters and unique', () => {

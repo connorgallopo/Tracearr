@@ -12,10 +12,13 @@ let key: Buffer | null = null;
 function linkKey(): Buffer {
   if (key) return key;
   const explicit = process.env.ENCRYPTION_KEY;
-  const secret =
-    explicit && /^[0-9a-f]{64}$/i.test(explicit)
-      ? Buffer.from(explicit, 'hex')
-      : process.env.JWT_SECRET;
+  let secret: string | Buffer | undefined = process.env.JWT_SECRET;
+  if (explicit) {
+    if (!/^[0-9a-f]{64}$/i.test(explicit)) {
+      throw new Error('ENCRYPTION_KEY is set but is not 64 hex characters; fix or unset it');
+    }
+    secret = Buffer.from(explicit, 'hex');
+  }
   if (!secret) throw new Error('JWT_SECRET is required to sign email links');
   key = Buffer.from(hkdfSync('sha256', secret, '', INFO, 32));
   return key;

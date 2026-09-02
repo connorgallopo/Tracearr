@@ -593,7 +593,7 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
   });
 
   /**
-   * PATCH /:id/identity - Update user identity (display name)
+   * PATCH /:id/identity - Update user identity (display name and contact email)
    * Owner-only. Updates the users table (identity), not server_users.
    */
   app.patch('/:id/identity', { preHandler: [app.authenticate] }, async (request, reply) => {
