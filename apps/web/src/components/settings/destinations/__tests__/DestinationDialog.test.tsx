@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {
   DESTINATION_KINDS,
   DESTINATION_TYPES,
+  EMAIL_SMTP_PRESETS,
   type Destination,
   type DestinationKind,
 } from '@tracearr/shared';
@@ -339,5 +340,79 @@ describe('DestinationDialog edit mode', () => {
     expect(
       screen.getByLabelText('pages:settings.destinations.receiveViolations')
     ).not.toBeChecked();
+  });
+});
+
+describe('email kind', () => {
+  async function openEmail() {
+    const user = userEvent.setup();
+    renderCreate();
+    await user.click(
+      screen.getByRole('button', { name: 'pages:settings.destinations.types.email' })
+    );
+    return user;
+  }
+
+  const label = (key: string) => new RegExp(`pages:settings\\.destinations\\.fields\\.${key}\\b`);
+
+  it('renders a provider select, a numeric port and address inputs', async () => {
+    await openEmail();
+    expect(screen.getByLabelText(label('preset'))).toHaveAttribute('role', 'combobox');
+    const port = screen.getByLabelText(label('port'));
+    expect(port).toHaveAttribute('type', 'number');
+    expect(port).toHaveAttribute('min', '1');
+    expect(port).toHaveAttribute('max', '65535');
+    expect(port).toHaveValue(587);
+    expect(screen.getByLabelText(label('fromAddress'))).toHaveAttribute('type', 'email');
+  });
+
+  it('copies host, port and security from a preset and saves them as strings', async () => {
+    const user = await openEmail();
+    await user.click(screen.getByLabelText(label('preset')));
+    await user.click(
+      screen.getByRole('option', { name: 'pages:settings.destinations.options.presetResend' })
+    );
+    expect(screen.getByLabelText(label('host'))).toHaveValue(EMAIL_SMTP_PRESETS.resend.host);
+    expect(screen.getByLabelText(label('port'))).toHaveValue(
+      Number(EMAIL_SMTP_PRESETS.resend.port)
+    );
+
+    await user.type(screen.getByLabelText(label('fromAddress')), 'plex@example.com');
+    await user.type(screen.getByLabelText(label('to')), 'a@example.com');
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'email',
+        config: expect.objectContaining({
+          preset: 'resend',
+          host: EMAIL_SMTP_PRESETS.resend.host,
+          port: EMAIL_SMTP_PRESETS.resend.port,
+          security: EMAIL_SMTP_PRESETS.resend.security,
+        }),
+      })
+    );
+  });
+
+  it('saves the defaults as strings when no preset is picked', async () => {
+    const user = await openEmail();
+    await user.type(screen.getByLabelText(label('host')), 'smtp.example.com');
+    await user.type(screen.getByLabelText(label('fromAddress')), 'plex@example.com');
+    await user.type(screen.getByLabelText(label('to')), 'a@example.com');
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'email',
+        config: expect.objectContaining({
+          preset: 'custom',
+          host: 'smtp.example.com',
+          port: '587',
+          security: 'starttls',
+          fromName: 'Tracearr',
+          fromAddress: 'plex@example.com',
+          to: 'a@example.com',
+          messagesPerSecond: '2',
+        }),
+      })
+    );
   });
 });

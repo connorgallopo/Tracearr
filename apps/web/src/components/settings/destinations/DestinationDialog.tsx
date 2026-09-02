@@ -38,6 +38,13 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -57,6 +64,7 @@ const subscribable = (event: NotificationEventType): event is SubscribableEvent 
 /** Field labels are plain strings on the shared descriptor; the pages resource decides which exist. */
 type FieldLabel = keyof PagesTranslations['settings']['destinations']['fields'];
 type FieldHint = keyof PagesTranslations['settings']['destinations']['hints'];
+type OptionLabel = keyof PagesTranslations['settings']['destinations']['options'];
 
 function isCreatable(kind: DestinationKind): kind is CreatableKind {
   return !DESTINATION_TYPES[kind].builtin;
@@ -157,6 +165,14 @@ export function DestinationDialog({
     setEdited((prev) => ({ ...prev, [key]: true }));
     setCleared((prev) => ({ ...prev, [key]: false }));
     setDirty(true);
+  };
+
+  /** A select with presets writes its sibling fields too, so a provider pick fills the form. */
+  const selectValue = (field: DestinationFieldDescriptor, value: string) => {
+    setFieldValue(field.key, value);
+    const preset = field.presets?.[value];
+    if (!preset) return;
+    for (const [key, sibling] of Object.entries(preset)) setFieldValue(key, sibling);
   };
 
   const clearSecret = (key: string) => {
@@ -337,6 +353,34 @@ export function DestinationDialog({
                   </FieldLabel>
                   {field.input === 'secret' ? (
                     <PasswordInput {...inputProps} />
+                  ) : field.input === 'select' ? (
+                    <Select
+                      value={values[field.key] ?? ''}
+                      onValueChange={(value) => selectValue(field, value)}
+                    >
+                      <SelectTrigger id={inputId} aria-invalid={missing}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(field.options ?? []).map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {t(
+                              `pages:settings.destinations.options.${option.label as OptionLabel}`
+                            )}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : field.input === 'number' ? (
+                    <Input
+                      {...inputProps}
+                      type="number"
+                      inputMode="numeric"
+                      min={field.min}
+                      max={field.max}
+                    />
+                  ) : field.input === 'email' ? (
+                    <Input {...inputProps} type="email" autoComplete="off" />
                   ) : (
                     <Input {...inputProps} />
                   )}
