@@ -206,9 +206,13 @@ describe('emailType.render', () => {
   it('omits the logo when none is on disk and the app link when no external url is set', async () => {
     mockReadLogoPng.mockReturnValue(null);
     mockGetNetworkSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
-    const out = await render({ type: 'session_started', payload: createMockActiveSession() });
+    const session = createMockActiveSession({
+      server: { id: 's1', name: 'Attic Plex', type: 'plex' },
+    });
+    const out = await render({ type: 'session_started', payload: session });
     expect(out.attachments).toEqual([]);
     expect(out.html).not.toContain('Open Tracearr');
+    expect(out.html).toContain('Attic Plex');
   });
 });
 

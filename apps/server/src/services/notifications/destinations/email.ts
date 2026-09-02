@@ -203,9 +203,8 @@ function serverNameOf(payload: NotificationPayload): string {
   const ctx = payload.context;
   if ('serverName' in ctx && typeof ctx.serverName === 'string') return ctx.serverName;
   if (ctx.type === 'violation_detected') return ctx.violation.server?.name ?? 'Tracearr';
-  if (ctx.type === 'stream_started' || ctx.type === 'stream_stopped') {
-    if (typeof ctx.session.serverName === 'string') return ctx.session.serverName;
-  }
+  if (ctx.type === 'stream_started' || ctx.type === 'stream_stopped')
+    return ctx.session.server.name;
   return 'Tracearr';
 }
 
