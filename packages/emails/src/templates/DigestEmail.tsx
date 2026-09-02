@@ -1,5 +1,6 @@
-import { Column, Img, Link, Row, Text } from '@react-email/components';
+import { Img, Link, Text } from '@react-email/components';
 import { Cell } from '../components/Cell.js';
+import { Columns } from '../components/Columns.js';
 import { Layout } from '../components/Layout.js';
 import { card, colors, heading, link, muted, paragraph } from '../styles.js';
 import type {
@@ -12,17 +13,16 @@ import type {
   EmailLink,
 } from '../types.js';
 
-const cardCell = { backgroundColor: colors.card, color: colors.text } as const;
-const posterColumn = {
-  ...cardCell,
-  width: '80px',
-  verticalAlign: 'top',
-  paddingRight: '12px',
-} as const;
-const bodyColumn = { ...cardCell, verticalAlign: 'top' } as const;
 const titleStyle = { ...paragraph, fontWeight: 600, margin: '0 0 2px' } as const;
 const lineStyle = { ...paragraph, margin: '0 0 2px' } as const;
 const rowGap = { ...card, padding: '10px', marginBottom: '8px' } as const;
+const posterBodyTable = {
+  border: `1px solid ${colors.border}`,
+  borderRadius: '6px',
+  marginBottom: '8px',
+} as const;
+const posterCell = { width: '80px', padding: '10px 12px 10px 10px' } as const;
+const bodyCell = { padding: '10px 10px 10px 0' } as const;
 
 function Poster({ src, alt }: { src: string | null; alt: string }) {
   if (!src) return null;
@@ -63,28 +63,30 @@ function SectionHeading({ text, accent }: { text: string; accent: string }) {
 
 function MovieCard({ item, accent }: { item: DigestMovie; accent: string }) {
   return (
-    <Cell style={rowGap}>
-      <Row>
-        <Column style={posterColumn}>
-          <Poster src={item.posterRef} alt={item.title} />
-        </Column>
-        <Column style={bodyColumn}>
+    <Columns
+      tableStyle={posterBodyTable}
+      leftStyle={posterCell}
+      rightStyle={bodyCell}
+      left={<Poster src={item.posterRef} alt={item.title} />}
+      right={
+        <>
           <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
           <Links links={item.links} accent={accent} />
-        </Column>
-      </Row>
-    </Cell>
+        </>
+      }
+    />
   );
 }
 
 function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
   return (
-    <Cell style={rowGap}>
-      <Row>
-        <Column style={posterColumn}>
-          <Poster src={item.posterRef} alt={item.title} />
-        </Column>
-        <Column style={bodyColumn}>
+    <Columns
+      tableStyle={posterBodyTable}
+      leftStyle={posterCell}
+      rightStyle={bodyCell}
+      left={<Poster src={item.posterRef} alt={item.title} />}
+      right={
+        <>
           <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
           {item.seasons.map((s) => (
             <Text key={`${s.number ?? 'x'}-${s.title}`} style={lineStyle}>
@@ -94,11 +96,11 @@ function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
                 ` (${s.episodeCount} ${s.episodeCount === 1 ? 'episode' : 'episodes'})`}
             </Text>
           ))}
-          {item.moreSeasons > 0 && <Text style={muted}>+{item.moreSeasons} more seasons</Text>}
+          {item.moreSeasons > 0 && <Text style={muted}>{`+${item.moreSeasons} more seasons`}</Text>}
           <Links links={item.links} accent={accent} />
-        </Column>
-      </Row>
-    </Cell>
+        </>
+      }
+    />
   );
 }
 

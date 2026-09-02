@@ -55,16 +55,18 @@ function maxInput(): DigestInput {
     episodeCount: 110,
     links: [links[0]!],
   }));
-  const artists = Array.from({ length: 10 }, (_, i) => ({
+  const artists = Array.from({ length: 15 }, (_, i) => ({
     id: `a${i}`,
     name: `Some Band Called ${i}`,
-    albums: [0, 1].map((j) => ({
-      id: `al${i}${j}`,
-      title: `Album Number ${j} With A Long Name`,
-      year: 2010 + j,
-      posterRef: hosted(3000 + i * 2 + j),
-      trackCount: 12,
-    })),
+    albums: [
+      {
+        id: `al${i}0`,
+        title: `Album Number 0 With A Long Name`,
+        year: 2010,
+        posterRef: hosted(3000 + i),
+        trackCount: 12,
+      },
+    ],
     links: [links[0]!],
   }));
   const mostWatched = Array.from({ length: 10 }, (_, i) => ({
@@ -145,6 +147,50 @@ describe('renderDigest', () => {
     const out = await renderDigest(base({ intro: '<script>x</script>' }), branding);
     expect(out.html).toContain('&lt;script&gt;');
     expect(out.html).not.toContain('<script>');
+  });
+
+  it('shows how many additional seasons did not make the digest', async () => {
+    const out = await renderDigest(
+      base({
+        shows: [
+          {
+            id: 's2',
+            title: 'Justified',
+            year: 2010,
+            posterRef: null,
+            seasons: [{ number: 1, title: 'Season 1', episodeRange: 'E01-E03', episodeCount: 3 }],
+            moreSeasons: 2,
+            episodeCount: 3,
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).toContain('+2 more seasons');
+  });
+
+  it('renders a season with no episode range or count as just its title', async () => {
+    const out = await renderDigest(
+      base({
+        shows: [
+          {
+            id: 's3',
+            title: 'Chernobyl',
+            year: 2019,
+            posterRef: null,
+            seasons: [{ number: 1, title: 'Season 1', episodeRange: '', episodeCount: 0 }],
+            moreSeasons: 0,
+            episodeCount: 0,
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).toContain('Season 1');
+    expect(out.html).not.toContain(' · ');
+    expect(out.html).not.toContain('(0 episodes)');
   });
 
   it('stays under the Gmail clip budget at every maximum cap with hosted urls', async () => {
