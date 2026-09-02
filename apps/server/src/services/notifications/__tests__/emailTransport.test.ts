@@ -8,6 +8,7 @@ vi.mock('nodemailer', () => ({
 import {
   _resetTransportersForTests,
   assertSafeSmtpHost,
+  closeAllTransporters,
   closeTransporter,
   describeSmtpError,
   getTransporter,
@@ -106,6 +107,16 @@ describe('getTransporter', () => {
       1
     );
     expect(getTransporter('dest-1', base)).not.toBe(first);
+  });
+
+  it('closeAllTransporters closes every pool and empties the cache', () => {
+    const a = getTransporter('dest-a', base);
+    const b = getTransporter('dest-b', base);
+    closeAllTransporters();
+    expect((a as unknown as { close: ReturnType<typeof vi.fn> }).close).toHaveBeenCalledTimes(1);
+    expect((b as unknown as { close: ReturnType<typeof vi.fn> }).close).toHaveBeenCalledTimes(1);
+    expect(getTransporter('dest-a', base)).not.toBe(a);
+    expect(mockCreateTransport).toHaveBeenCalledTimes(3);
   });
 });
 

@@ -81,7 +81,7 @@ export function closeTransporter(destinationId: string): void {
 }
 
 export function closeAllTransporters(): void {
-  for (const id of [...transporters.keys()]) closeTransporter(id);
+  for (const id of transporters.keys()) closeTransporter(id);
 }
 
 export function _resetTransportersForTests(): void {
