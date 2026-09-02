@@ -295,11 +295,13 @@ export type {
 export type {
   DestinationKind,
   DestinationFieldDescriptor,
+  DestinationFieldOption,
   DestinationDescriptor,
   Destination,
   CreateDestinationInput,
   UpdateDestinationInput,
   NotificationToast,
+  EmailSecurity,
 } from './destinations.js';
 
 // Automation type exports
@@ -532,9 +534,12 @@ export {
   NOTIFICATION_EVENT_TYPES,
   SUBSCRIBABLE_EVENTS,
   destinationConfigSchema,
+  configSchemaForFields,
   notificationEventTypeSchema,
   createDestinationSchema,
   updateDestinationSchema,
+  EMAIL_SECURITY,
+  EMAIL_SMTP_PRESETS,
 } from './destinations.js';
 
 // Schema input type exports

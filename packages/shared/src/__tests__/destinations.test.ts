@@ -132,3 +132,91 @@ describe('send action', () => {
     expect(actionSchema.safeParse({ type: 'notify', channels: ['push'] }).success).toBe(false);
   });
 });
+
+import {
+  EMAIL_SMTP_PRESETS,
+  configSchemaForFields,
+  type DestinationFieldDescriptor,
+} from '../index.js';
+
+describe('configSchemaForFields', () => {
+  const fields: readonly DestinationFieldDescriptor[] = [
+    {
+      key: 'mode',
+      label: 'mode',
+      input: 'select',
+      required: true,
+      secret: false,
+      default: 'a',
+      options: [
+        { value: 'a', label: 'modeA' },
+        { value: 'b', label: 'modeB' },
+      ],
+    },
+    {
+      key: 'port',
+      label: 'port',
+      input: 'number',
+      required: true,
+      secret: false,
+      default: '587',
+      min: 1,
+      max: 65535,
+    },
+    { key: 'from', label: 'from', input: 'email', required: true, secret: false },
+    { key: 'cc', label: 'cc', input: 'email', required: false, secret: false },
+    { key: 'to', label: 'to', input: 'emails', required: true, secret: false },
+  ];
+  const schema = configSchemaForFields(fields);
+
+  it('accepts valid strings and fills defaults', () => {
+    const parsed = schema.safeParse({ from: 'a@example.com', to: 'b@example.com, c@example.org' });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data).toMatchObject({ mode: 'a', port: '587' });
+    expect(parsed.data.port).toBe('587');
+  });
+
+  it.each([
+    ['port', '0'],
+    ['port', '70000'],
+    ['port', 'abc'],
+    ['port', '5.5'],
+    ['mode', 'c'],
+    ['from', 'not-an-address'],
+    ['to', 'a@example.com, nope'],
+    ['to', ''],
+  ])('rejects %s = %s', (key, value) => {
+    const parsed = schema.safeParse({ from: 'a@example.com', to: 'b@example.com', [key]: value });
+    expect(parsed.success).toBe(false);
+  });
+
+  it('lets an optional address be null or empty', () => {
+    expect(schema.safeParse({ from: 'a@example.com', to: 'b@example.com', cc: null }).success).toBe(
+      true
+    );
+    expect(schema.safeParse({ from: 'a@example.com', to: 'b@example.com', cc: '' }).success).toBe(
+      true
+    );
+  });
+
+  it('still builds every existing kind unchanged', () => {
+    for (const kind of DESTINATION_KINDS) {
+      expect(destinationConfigSchema(kind)).toBeDefined();
+    }
+    expect(
+      destinationConfigSchema('ntfy').safeParse({ url: 'https://ntfy.sh', topic: 't' }).success
+    ).toBe(true);
+  });
+});
+
+describe('EMAIL_SMTP_PRESETS', () => {
+  it('every preset names a host, a port in range and a known security', () => {
+    for (const [name, preset] of Object.entries(EMAIL_SMTP_PRESETS)) {
+      expect(name).not.toBe('custom');
+      expect(preset.host).toMatch(/^[a-z0-9.-]+$/);
+      expect(Number(preset.port)).toBeGreaterThan(0);
+      expect(['starttls', 'tls', 'none']).toContain(preset.security);
+    }
+  });
+});

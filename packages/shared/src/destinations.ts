@@ -40,11 +40,17 @@ const EVENTS_WITHOUT_PLUGIN = Object.freeze(
   NOTIFICATION_EVENT_TYPES.filter((e) => e !== 'plugin_update_available')
 );
 
+export interface DestinationFieldOption {
+  value: string;
+  /** i18n key under pages:settings.destinations.options */
+  label: string;
+}
+
 export interface DestinationFieldDescriptor {
   key: string;
   /** i18n key under pages:settings.destinations.fields */
   label: string;
-  input: 'text' | 'url' | 'secret';
+  input: 'text' | 'url' | 'secret' | 'select' | 'number' | 'email' | 'emails';
   required: boolean;
   /** Masked on read, kept on omit; every url is secret because webhook urls embed credentials */
   secret: boolean;
@@ -52,6 +58,13 @@ export interface DestinationFieldDescriptor {
   /** i18n key under pages:settings.destinations.hints, rendered as the field description */
   hint?: string;
   default?: string;
+  /** select only */
+  options?: readonly DestinationFieldOption[];
+  /** number only; validated on the string value */
+  min?: number;
+  max?: number;
+  /** select only: choosing a value also writes these sibling fields */
+  presets?: Readonly<Record<string, Readonly<Record<string, string>>>>;
 }
 
 export interface DestinationDescriptor {
@@ -101,6 +114,20 @@ const text = (
   placeholder,
   default: def,
 });
+
+export const EMAIL_SECURITY = ['starttls', 'tls', 'none'] as const;
+export type EmailSecurity = (typeof EMAIL_SECURITY)[number];
+
+/** Host, port and security per provider; the dialog copies them into the sibling fields. */
+export const EMAIL_SMTP_PRESETS = {
+  postmark: { host: 'smtp.postmarkapp.com', port: '587', security: 'starttls' },
+  resend: { host: 'smtp.resend.com', port: '465', security: 'tls' },
+  ses: { host: 'email-smtp.us-east-1.amazonaws.com', port: '587', security: 'starttls' },
+  mailgun: { host: 'smtp.mailgun.org', port: '587', security: 'starttls' },
+  sendgrid: { host: 'smtp.sendgrid.net', port: '587', security: 'starttls' },
+  brevo: { host: 'smtp-relay.brevo.com', port: '587', security: 'starttls' },
+  gmail: { host: 'smtp.gmail.com', port: '587', security: 'starttls' },
+} as const satisfies Record<string, { host: string; port: string; security: EmailSecurity }>;
 
 export const DESTINATION_TYPES = {
   discord: {
@@ -178,16 +205,78 @@ const httpUrl = z
   .trim()
   .refine((v) => /^https?:\/\/\S+$/i.test(v), 'Must be an http(s) URL');
 
-/** Zod object for one kind's config, built from its descriptor; unknown keys rejected. */
-export function destinationConfigSchema(kind: DestinationKind): z.ZodObject<z.ZodRawShape> {
+const address = z.email();
+
+function isAddress(value: string): boolean {
+  return address.safeParse(value).success;
+}
+
+function addressList(value: string): string[] {
+  return value
+    .split(',')
+    .map((part) => part.trim())
+    .filter((part) => part !== '');
+}
+
+/** An optional field may be left blank; a required one gets `.min(1)` after this, so blank fails there. */
+function fieldSchema(f: DestinationFieldDescriptor): z.ZodString {
+  const blankOk = (check: (v: string) => boolean) => (v: string) =>
+    (!f.required && v === '') || check(v);
+  switch (f.input) {
+    case 'url':
+      return httpUrl;
+    case 'email':
+      return z.string().trim().max(254).refine(blankOk(isAddress), 'Must be an email address');
+    case 'emails':
+      return z
+        .string()
+        .trim()
+        .max(2000)
+        .refine(
+          blankOk((v) => addressList(v).length > 0 && addressList(v).every(isAddress)),
+          'Must be one or more comma-separated email addresses'
+        );
+    case 'number': {
+      const min = f.min ?? Number.MIN_SAFE_INTEGER;
+      const max = f.max ?? Number.MAX_SAFE_INTEGER;
+      return z
+        .string()
+        .trim()
+        .refine(
+          blankOk((v) => /^\d+$/.test(v) && Number(v) >= min && Number(v) <= max),
+          `Must be a whole number between ${min} and ${max}`
+        );
+    }
+    case 'select': {
+      const allowed = (f.options ?? []).map((o) => o.value);
+      return z.string().refine(
+        blankOk((v) => allowed.includes(v)),
+        'Must be one of the listed options'
+      );
+    }
+    case 'text':
+    case 'secret':
+      return z.string().trim().max(2000);
+  }
+}
+
+/** Zod object for a field list; unknown keys rejected. Exported so refinements are testable without a kind. */
+export function configSchemaForFields(
+  fields: readonly DestinationFieldDescriptor[]
+): z.ZodObject<z.ZodRawShape> {
   const shape: Record<string, z.ZodType> = {};
-  for (const f of DESTINATION_TYPES[kind].fields) {
-    let s: z.ZodString = f.input === 'url' ? httpUrl : z.string().trim().max(2000);
+  for (const f of fields) {
+    let s = fieldSchema(f);
     if (f.required) s = s.min(1);
     shape[f.key] =
       f.default !== undefined ? s.default(f.default) : f.required ? s : s.optional().nullable();
   }
   return z.strictObject(shape);
+}
+
+/** Zod object for one kind's config, built from its descriptor. */
+export function destinationConfigSchema(kind: DestinationKind): z.ZodObject<z.ZodRawShape> {
+  return configSchemaForFields(DESTINATION_TYPES[kind].fields);
 }
 
 export const notificationEventTypeSchema = z.enum(NOTIFICATION_EVENT_TYPES);
