@@ -130,6 +130,12 @@ describe('assertSafeSmtpHost', () => {
     expect(() => assertSafeSmtpHost('169.254.169.254', '25')).toThrow(/link-local/);
     expect(() => assertSafeSmtpHost('fe80::1', '25')).toThrow(/link-local/);
   });
+  it('rejects a host carrying a scheme, port or path, but still allows an IPv6 literal', () => {
+    expect(() => assertSafeSmtpHost('smtp.example.com:465', '587')).toThrow(
+      'host must be a hostname or IP address without a scheme, port or path'
+    );
+    expect(() => assertSafeSmtpHost('2001:db8::1', '587')).not.toThrow();
+  });
 });
 
 describe('describeSmtpError', () => {

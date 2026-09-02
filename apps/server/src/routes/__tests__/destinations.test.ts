@@ -219,6 +219,55 @@ describe('Destination Routes', () => {
       expect(createDestination).not.toHaveBeenCalled();
     });
 
+    it('rejects a link-local smtp host naming the field', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations',
+        payload: {
+          name: 'Mail',
+          type: 'email',
+          config: {
+            host: '169.254.169.254',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
+      expect(createDestination).not.toHaveBeenCalled();
+    });
+
+    it('does not block a LAN smtp host', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(createDestination).mockResolvedValue(makeRow({ id: 'email-1', type: 'email' }));
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations',
+        payload: {
+          name: 'Mail',
+          type: 'email',
+          config: {
+            host: '192.168.1.10',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).not.toBe(400);
+      expect(createDestination).toHaveBeenCalled();
+    });
+
     it('409s a name the unique index already holds', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(createDestination).mockRejectedValue(
@@ -402,6 +451,35 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('url:');
+      expect(updateDestination).not.toHaveBeenCalled();
+    });
+
+    it('rejects a link-local smtp host in a merged config', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(
+        makeRow({ id: 'email-1', name: 'Mail', type: 'email' })
+      );
+      vi.mocked(readConfig).mockReturnValue({
+        ok: true,
+        config: {
+          host: 'smtp.example.com',
+          port: '587',
+          security: 'starttls',
+          fromAddress: 'a@example.com',
+          to: 'b@example.com',
+        },
+        rewrap: false,
+      });
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/destinations/email-1',
+        payload: { config: { host: '169.254.1.1' } },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
       expect(updateDestination).not.toHaveBeenCalled();
     });
 
@@ -613,6 +691,30 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('url:');
+      expect(mockTest).not.toHaveBeenCalled();
+    });
+
+    it('rejects a link-local smtp host', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations/test',
+        payload: {
+          type: 'email',
+          config: {
+            host: '169.254.169.254',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
       expect(mockTest).not.toHaveBeenCalled();
     });
 

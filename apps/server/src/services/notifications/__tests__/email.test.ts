@@ -73,6 +73,7 @@ const violation: ViolationWithDetails = {
     identityName: 'Test User',
   },
   rule: { id: 'rule-456', name: 'Test Rule', type: 'concurrent_streams' },
+  server: { id: 'server-id', name: 'Basement', type: 'plex' },
 };
 
 const mediaAdded: NotificationEvent = {
@@ -151,6 +152,8 @@ describe('emailType.render', () => {
     expect(out.html).toContain('Test User');
     expect(out.html).toContain('Test Rule');
     expect(out.html).toContain('href="https://tracearr.example.com"');
+    expect(out.html).toMatch(/Server<!-- -->: <\/span>Basement/);
+    expect(out.html).toContain('alt="Basement"');
     expect(out.attachments.map((a) => a.cid)).toEqual(['logo']);
   });
 
@@ -251,6 +254,14 @@ describe('emailType.deliver', () => {
 
   it('declares a longer deliver timeout than the http kinds', () => {
     expect(emailType.deliverTimeoutMs).toBe(60_000);
+  });
+
+  it('reuses the cached transporter across two sends to the same destination', async () => {
+    const message = await render(mediaAdded);
+    await emailType.deliver(message, config, deliverCtx);
+    await emailType.deliver(message, config, deliverCtx);
+    expect(mockCreateTransport).toHaveBeenCalledTimes(1);
+    expect(mockSendMail).toHaveBeenCalledTimes(2);
   });
 });
 

@@ -540,6 +540,7 @@ export {
   updateDestinationSchema,
   EMAIL_SECURITY,
   EMAIL_SMTP_PRESETS,
+  addressList,
 } from './destinations.js';
 
 // Schema input type exports

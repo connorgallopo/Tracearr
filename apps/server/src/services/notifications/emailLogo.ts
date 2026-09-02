@@ -1,13 +1,22 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const CUSTOM_LOGO_PATH = join(process.cwd(), 'data', 'logo.png');
 
+let cachedMtimeMs: number | null = null;
+let cachedPng: Buffer | null = null;
+
 /** The owner's PNG logo when one is installed; the SVG fallback the web uses does not render in Gmail. */
 export function readLogoPng(): Buffer | null {
+  let mtimeMs: number | null;
   try {
-    return readFileSync(CUSTOM_LOGO_PATH);
+    mtimeMs = statSync(CUSTOM_LOGO_PATH).mtimeMs;
   } catch {
-    return null;
+    mtimeMs = null;
   }
+  if (mtimeMs !== cachedMtimeMs) {
+    cachedMtimeMs = mtimeMs;
+    cachedPng = mtimeMs === null ? null : readFileSync(CUSTOM_LOGO_PATH);
+  }
+  return cachedPng;
 }

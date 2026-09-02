@@ -1591,7 +1591,7 @@
       },
       "hints": {
         "authTokenOptional": "Optional for public topics",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
         "smtpUsernameOptional": "Leave blank when the server needs no login",
         "smtpTo": "Comma-separated addresses that receive alerts from this destination",
         "smtpRate": "Per Tracearr instance; stay under your provider's limit"

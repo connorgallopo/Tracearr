@@ -62,7 +62,7 @@ function configHash(config: SmtpConfig): string {
     .digest('hex');
 }
 
-/** One pooled transporter per destination per process; a config change closes the old pool. */
+/** Use the result immediately: a pool closed by a config change never settles a send queued after close(). */
 export function getTransporter(destinationId: string, config: SmtpConfig): Transporter {
   const hash = configHash(config);
   const cached = transporters.get(destinationId);
@@ -90,8 +90,11 @@ export function _resetTransportersForTests(): void {
 
 /** The webhook policy, applied to a bare host: link-local literals are refused, LAN and loopback allowed. */
 export function assertSafeSmtpHost(host: string, port: string): void {
-  const literal = isIP(host) === 6 ? `[${host}]` : host;
-  assertSafeProbeUrl(`http://${literal}:${port}`);
+  const isIPv6 = isIP(host) === 6;
+  if (/[/\s]/.test(host) || (host.includes(':') && !isIPv6)) {
+    throw new Error('host must be a hostname or IP address without a scheme, port or path');
+  }
+  assertSafeProbeUrl(`http://${isIPv6 ? `[${host}]` : host}:${port}`);
 }
 
 export function describeSmtpError(error: unknown, config: SmtpConfig): string {

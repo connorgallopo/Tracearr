@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { DESTINATION_TYPES, POSTER_IMAGE_SIZE } from '@tracearr/shared';
+import { DESTINATION_TYPES, POSTER_IMAGE_SIZE, addressList } from '@tracearr/shared';
 import {
   defaultBranding,
   renderEvent,
@@ -57,13 +57,6 @@ const POSTER_EXTENSIONS: Record<string, string> = {
   'image/webp': 'webp',
   'image/gif': 'gif',
 };
-
-function addressList(value: string): string[] {
-  return value
-    .split(',')
-    .map((part) => part.trim())
-    .filter((part) => part !== '');
-}
 
 function messageId(fromAddress: string): string {
   const domain = fromAddress.split('@')[1] ?? 'tracearr.local';
@@ -201,13 +194,19 @@ function violationCard(payload: NotificationPayload): EventCard | null {
       { label: 'User', value: violation.user.identityName ?? violation.user.username },
       { label: 'Rule', value: violation.rule.name },
       { label: 'Severity', value: getSeverityInfo(violation.severity).label },
+      ...(violation.server ? [{ label: 'Server', value: violation.server.name }] : []),
     ],
   };
 }
 
 function serverNameOf(payload: NotificationPayload): string {
   const ctx = payload.context;
-  return 'serverName' in ctx && typeof ctx.serverName === 'string' ? ctx.serverName : 'Tracearr';
+  if ('serverName' in ctx && typeof ctx.serverName === 'string') return ctx.serverName;
+  if (ctx.type === 'violation_detected') return ctx.violation.server?.name ?? 'Tracearr';
+  if (ctx.type === 'stream_started' || ctx.type === 'stream_stopped') {
+    if (typeof ctx.session.serverName === 'string') return ctx.session.serverName;
+  }
+  return 'Tracearr';
 }
 
 async function build(event: NotificationEvent, ctx: RenderContext): Promise<EmailMessage> {

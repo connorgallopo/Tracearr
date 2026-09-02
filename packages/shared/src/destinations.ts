@@ -61,7 +61,7 @@ export interface DestinationFieldDescriptor {
   default?: string;
   /** select only */
   options?: readonly DestinationFieldOption[];
-  /** number only; validated on the string value */
+  /** number only; validated on the string value, whole non-negative integers regardless of min */
   min?: number;
   max?: number;
   /** select only: choosing a value also writes these sibling fields */
@@ -314,7 +314,7 @@ function isAddress(value: string): boolean {
   return address.safeParse(value).success;
 }
 
-function addressList(value: string): string[] {
+export function addressList(value: string): string[] {
   return value
     .split(',')
     .map((part) => part.trim())
