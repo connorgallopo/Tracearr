@@ -200,6 +200,7 @@ export async function updateUser(
     username: string;
     name: string | null;
     email: string | null;
+    contactEmail: string | null;
     thumbnail: string | null;
     passwordHash: string | null;
     plexAccountId: string | null;
@@ -210,6 +211,7 @@ export async function updateUser(
     .set({
       ...data,
       email: data.email?.toLowerCase() ?? data.email,
+      contactEmail: data.contactEmail?.toLowerCase() ?? data.contactEmail,
       updatedAt: new Date(),
     })
     .where(eq(users.id, userId))
