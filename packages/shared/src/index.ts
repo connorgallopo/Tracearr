@@ -546,6 +546,54 @@ export {
 // Schema input type exports
 export type { SubscribableEvent } from './destinations.js';
 
+// Newsletter constants, schemas and API shapes
+export {
+  NEWSLETTER_SECTION_MAX,
+  NEWSLETTER_MOST_WATCHED_MAX,
+  NEWSLETTER_SEASONS_PER_SHOW_MAX,
+  NEWSLETTER_WINDOW_MAX_DAYS,
+  NEWSLETTER_EXTRA_ADDRESSES_MAX,
+  NEWSLETTER_SEND_TRIGGERS,
+  NEWSLETTER_SEND_OUTCOMES,
+  NEWSLETTER_RECIPIENT_STATUSES,
+  NEWSLETTER_IMAGE_MODES,
+  EMAIL_SUPPRESSION_REASONS,
+  DEFAULT_NEWSLETTER_SUBJECT,
+  DEFAULT_NEWSLETTER_SECTIONS,
+  cronExpressionSchema,
+  newsletterScheduleSchema,
+  newsletterWindowSchema,
+  newsletterSectionsSchema,
+  newsletterScopeSchema,
+  newsletterRecipientsSchema,
+  createNewsletterSchema,
+  updateNewsletterSchema,
+  newsletterTestSendSchema,
+  emailSuppressionCreateSchema,
+  newsletterSendsQuerySchema,
+  newsletterCron,
+} from './newsletters.js';
+export type {
+  NewsletterSendTrigger,
+  NewsletterSendOutcome,
+  NewsletterRecipientStatus,
+  NewsletterImageMode,
+  EmailSuppressionReason,
+  NewsletterSchedule,
+  NewsletterWindow,
+  NewsletterSections,
+  NewsletterScope,
+  NewsletterRecipients,
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+  Newsletter,
+  NewsletterSendSummary,
+  NewsletterSendRecipient,
+  NewsletterSendDetail,
+  EmailSuppression,
+  NewsletterPreview,
+} from './newsletters.js';
+
 export type {
   LoginInput,
   CallbackInput,

@@ -180,6 +180,12 @@ export const updateUserSchema = z.object({
 
 export const updateUserIdentitySchema = z.object({
   name: z.string().max(255).nullable().optional(),
+  contactEmail: z
+    .email()
+    .max(255)
+    .transform((v) => v.trim().toLowerCase())
+    .nullable()
+    .optional(),
 });
 
 export type UpdateUserIdentityInput = z.infer<typeof updateUserIdentitySchema>;
