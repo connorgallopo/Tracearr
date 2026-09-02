@@ -20,4 +20,14 @@ describe('renderTest', () => {
     const out = await renderTest({ destinationName: 'x', logoRef: null }, defaultBranding('S'));
     expect(out.html).not.toContain('<img');
   });
+
+  it('gives every emitted table cell an explicit background and text color', async () => {
+    const out = await renderTest({ destinationName: 'x', logoRef: null }, defaultBranding('S'));
+    const cells = out.html.match(/<td[^>]*>/g) ?? [];
+    expect(cells.length).toBeGreaterThan(0);
+    for (const cell of cells) {
+      expect(cell).toMatch(/background-color:/);
+      expect(cell).toMatch(/color:/);
+    }
+  });
 });

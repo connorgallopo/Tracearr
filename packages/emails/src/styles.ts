@@ -31,15 +31,13 @@ export const body: CSSProperties = {
   lineHeight: '1.5',
 };
 
-export const container: CSSProperties = {
-  maxWidth: '600px',
-  margin: '0 auto',
-  padding: '24px 16px',
-  backgroundColor: colors.page,
-};
+export const frame: CSSProperties = { maxWidth: '600px', margin: '0 auto' };
+
+export const framePadding: CSSProperties = { padding: '24px 16px' };
 
 export const card: CSSProperties = {
   backgroundColor: colors.card,
+  color: colors.text,
   border: `1px solid ${colors.border}`,
   borderRadius: '6px',
   padding: '16px',
