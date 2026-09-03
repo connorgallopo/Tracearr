@@ -472,7 +472,7 @@ function variablesOf(event: NotificationEvent): Record<string, string> {
 const VARIABLE = /\{\{\s*([\w.]+)\s*\}\}/g;
 
 /** A name the trigger does not offer renders as nothing rather than leaving the braces in. */
-function renderTemplate(template: string, variables: Record<string, string>): string {
+export function renderTemplate(template: string, variables: Record<string, string>): string {
   return template.replace(VARIABLE, (_match, name: string) => variables[name] ?? '');
 }
 
