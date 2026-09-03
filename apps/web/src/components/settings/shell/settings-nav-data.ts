@@ -1,11 +1,13 @@
+import type { ParseKeys } from 'i18next';
+
 export interface SettingsSectionItem {
-  nameKey: string;
+  nameKey: ParseKeys<'settings'>;
   href: string;
   hidden?: boolean;
 }
 
 export interface SettingsGroup {
-  labelKey: string;
+  labelKey: ParseKeys<'settings'>;
   sections: SettingsSectionItem[];
 }
 

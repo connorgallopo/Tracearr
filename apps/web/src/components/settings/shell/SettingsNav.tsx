@@ -15,10 +15,9 @@ import {
   type SettingsSectionItem,
 } from './settings-nav-data';
 
-// SidebarGroupLabel's own classes, applied to a plain element: it needs no
-// SidebarProvider, and the --sidebar-* tokens are declared on :root.
+// The app's small-caps label convention (GeneralSettings.tsx, UpdateDialog.tsx).
 const GROUP_LABEL =
-  'text-sidebar-foreground/70 flex h-8 shrink-0 items-center px-2 text-xs font-medium';
+  'text-muted-foreground flex h-8 shrink-0 items-center px-2 text-xs font-medium tracking-wide uppercase';
 
 const LINK =
   'ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex h-8 items-center rounded-md px-2 text-sm outline-hidden transition-colors focus-visible:ring-2';
@@ -52,8 +51,8 @@ export function SettingsNav(): React.JSX.Element {
               visibleSections(group).map((section) => (
                 <SelectItem key={section.href} value={section.href}>
                   {t('nav.itemLabel', {
-                    group: t(group.labelKey, { defaultValue: group.labelKey }),
-                    section: t(section.nameKey, { defaultValue: section.nameKey }),
+                    group: t(group.labelKey),
+                    section: t(section.nameKey),
                   })}
                 </SelectItem>
               ))
@@ -65,14 +64,14 @@ export function SettingsNav(): React.JSX.Element {
       <nav aria-label={t('nav.label')} className="hidden w-52 space-y-4 @3xl/settings:block">
         {settingsNav.map((group) => (
           <div key={group.labelKey} className="space-y-0.5">
-            <p className={GROUP_LABEL}>{t(group.labelKey, { defaultValue: group.labelKey })}</p>
+            <p className={GROUP_LABEL}>{t(group.labelKey)}</p>
             {visibleSections(group).map((section) => (
               <NavLink
                 key={section.href}
                 to={section.href}
                 className={({ isActive }) => cn(LINK, isActive && LINK_ACTIVE)}
               >
-                {t(section.nameKey, { defaultValue: section.nameKey })}
+                {t(section.nameKey)}
               </NavLink>
             ))}
           </div>
