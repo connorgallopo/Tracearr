@@ -8,6 +8,16 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { EmptyState } from '@/components/ui/empty-state';
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from '@/components/ui/item';
 import {
   Wrench,
   Play,
@@ -45,6 +55,7 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { formatDuration } from '@/lib/formatters';
+import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 
 interface JobOption {
   name: string;
@@ -112,7 +123,7 @@ const CATEGORY_CONFIG = {
   cleanup: { icon: HardDrive, labelKey: 'jobs.cleanup' as const },
 } satisfies Record<JobCategory, { icon: typeof Database; labelKey: string }>;
 
-export function JobsSettings() {
+export function Jobs() {
   const { t } = useTranslation(['settings', 'notifications', 'pages', 'common']);
   const [jobs, setJobs] = useState<JobDefinition[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
@@ -159,6 +170,7 @@ export function JobsSettings() {
     };
 
     void fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount; t only labels the error toast and shouldn't force a refetch on locale change
   }, []);
 
   // Fetch job history
@@ -175,6 +187,7 @@ export function JobsSettings() {
 
   useEffect(() => {
     void fetchHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react/set-state-in-effect -- fetchHistory has a stable [] identity; this loads the initial page once on mount
   }, []);
 
   // Fetch queue stats
@@ -192,6 +205,7 @@ export function JobsSettings() {
     // Refresh stats every 10 seconds while on the page
     const interval = setInterval(() => void fetchQueueStats(), 10000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react/set-state-in-effect -- polls the server on an interval, not from local input
   }, [fetchQueueStats]);
 
   // Check for active job on mount
@@ -243,6 +257,7 @@ export function JobsSettings() {
     return () => {
       socket.off('maintenance:progress', handleProgress);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- t only labels the toasts and shouldn't re-subscribe the socket listener on locale change
   }, [socket, fetchHistory, fetchQueueStats]);
 
   const handleStartJob = async (type: string, options?: Record<string, boolean>) => {
@@ -283,7 +298,7 @@ export function JobsSettings() {
 
   if (isLoadingJobs) {
     return (
-      <div className="space-y-4">
+      <SettingsSection title={t('nav.sections.jobs')} description={t('nav.descriptions.jobs')}>
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-40" />
@@ -293,12 +308,12 @@ export function JobsSettings() {
             <Skeleton className="h-28 w-full" />
           </CardContent>
         </Card>
-      </div>
+      </SettingsSection>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <SettingsSection title={t('nav.sections.jobs')} description={t('nav.descriptions.jobs')}>
       {/* Queue Status Banner */}
       {queueStats &&
         (queueStats.active > 0 || queueStats.waiting > 0 || queueStats.delayed > 0) && (
@@ -442,7 +457,7 @@ export function JobsSettings() {
                       </span>
                       {progress.updatedRecords > 0 && (
                         <span className="text-muted-foreground">
-                          <span className="font-medium text-green-600">
+                          <span className="text-success font-medium">
                             {progress.updatedRecords.toLocaleString()}
                           </span>{' '}
                           {t('jobs.updated')}
@@ -481,41 +496,27 @@ export function JobsSettings() {
             );
           })}
 
-          {/* Completed Status Toast Area */}
+          {/* Completed Status Banner */}
           {progress?.status === 'complete' && !runningJob && (
-            <div className="flex items-start gap-3 rounded-lg border border-green-500/20 bg-green-500/5 p-3">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-green-600">{t('jobs.lastJobCompleted')}</p>
-                <p className="text-muted-foreground text-xs break-words">{progress.message}</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 shrink-0 px-2"
-                onClick={() => setProgress(null)}
-              >
+            <Alert>
+              <CheckCircle2 className="text-success" />
+              <AlertTitle>{t('jobs.lastJobCompleted')}</AlertTitle>
+              <AlertDescription>{progress.message}</AlertDescription>
+              <Button variant="ghost" size="sm" onClick={() => setProgress(null)}>
                 {t('common:actions.dismiss')}
               </Button>
-            </div>
+            </Alert>
           )}
 
           {progress?.status === 'error' && !runningJob && (
-            <div className="flex items-start gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-red-600">{t('jobs.lastJobFailed')}</p>
-                <p className="text-muted-foreground text-xs break-words">{progress.message}</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 shrink-0 px-2"
-                onClick={() => setProgress(null)}
-              >
+            <Alert variant="destructive">
+              <XCircle />
+              <AlertTitle>{t('jobs.lastJobFailed')}</AlertTitle>
+              <AlertDescription>{progress.message}</AlertDescription>
+              <Button variant="ghost" size="sm" onClick={() => setProgress(null)}>
                 {t('common:actions.dismiss')}
               </Button>
-            </div>
+            </Alert>
           )}
         </CardContent>
       </Card>
@@ -549,80 +550,63 @@ export function JobsSettings() {
         <CardContent>
           {isLoadingHistory ? (
             <div className="space-y-2">
-              {[...Array(3)].map((_, i) => (
+              {Array.from({ length: 3 }, (_, i) => (
                 <Skeleton key={i} className="h-14 w-full" />
               ))}
             </div>
           ) : history.length === 0 ? (
-            <div className="flex h-20 flex-col items-center justify-center gap-1 rounded-lg border border-dashed">
-              <ArrowUpDown className="text-muted-foreground h-4 w-4" />
-              <p className="text-muted-foreground text-xs">{t('common:empty.noJobHistory')}</p>
-            </div>
+            <EmptyState icon={ArrowUpDown} title={t('common:empty.noJobHistory')} />
           ) : (
             <div className="space-y-2">
               {history.map((item) => {
-                const _JobIcon = JOB_ICONS[item.type] || Wrench;
                 const isSuccess = item.state === 'completed';
 
                 return (
-                  <div
+                  <Item
                     key={item.jobId}
-                    className={cn(
-                      'flex items-center gap-3 rounded-lg border p-3',
-                      !isSuccess && 'border-red-500/20 bg-red-500/5'
-                    )}
+                    variant="outline"
+                    size="sm"
+                    className={cn(!isSuccess && 'border-destructive/30 bg-destructive/5')}
                   >
-                    <div
-                      className={cn(
-                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
-                        isSuccess ? 'bg-green-500/10' : 'bg-red-500/10'
-                      )}
-                    >
+                    <ItemMedia variant="icon">
                       {isSuccess ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <CheckCircle2 className="text-success" />
                       ) : (
-                        <XCircle className="h-4 w-4 text-red-600" />
+                        <XCircle className="text-destructive" />
                       )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium capitalize">
-                          {item.type.replace(/_/g, ' ')}
-                        </span>
-                        <Badge
-                          variant={isSuccess ? 'secondary' : 'destructive'}
-                          className="text-[10px]"
-                        >
+                    </ItemMedia>
+                    <ItemContent>
+                      <ItemTitle className="capitalize">
+                        {item.type.replace(/_/g, ' ')}
+                        <Badge variant={isSuccess ? 'success' : 'destructive'}>
                           {isSuccess ? t('common:states.success') : t('common:states.failed')}
                         </Badge>
-                      </div>
+                      </ItemTitle>
                       {item.result && (
-                        <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                        <ItemDescription className="tabular-nums">
                           {item.result.processed.toLocaleString()} {t('jobs.processed')}
                           {item.result.updated > 0 &&
                             ` · ${item.result.updated.toLocaleString()} ${t('jobs.updated')}`}
                           {item.result.errors > 0 && (
                             <span className="text-destructive">
-                              {' '}
-                              · {item.result.errors.toLocaleString()} {t('jobs.errors')}
+                              {' · '}
+                              {item.result.errors.toLocaleString()} {t('jobs.errors')}
                             </span>
                           )}
-                        </p>
+                        </ItemDescription>
                       )}
-                    </div>
-
-                    <div className="shrink-0 text-right">
-                      <p className="text-muted-foreground text-xs">
+                    </ItemContent>
+                    <ItemActions className="flex-col items-end gap-0">
+                      <span className="text-muted-foreground text-xs">
                         {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
-                      </p>
+                      </span>
                       {item.result && (
-                        <p className="text-muted-foreground text-xs tabular-nums">
+                        <span className="text-muted-foreground text-xs tabular-nums">
                           {formatDuration(item.result.durationMs, { style: 'compact' })}
-                        </p>
+                        </span>
                       )}
-                    </div>
-                  </div>
+                    </ItemActions>
+                  </Item>
                 );
               })}
             </div>
@@ -664,13 +648,11 @@ export function JobsSettings() {
             </div>
           )}
 
-          <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-            <div className="text-sm">
-              <p className="font-medium text-amber-600">{t('jobs.mayTakeAWhile')}</p>
-              <p className="text-muted-foreground mt-1 text-xs">{t('jobs.mayTakeAWhileDesc')}</p>
-            </div>
-          </div>
+          <Alert variant="warning">
+            <AlertTriangle />
+            <AlertTitle>{t('jobs.mayTakeAWhile')}</AlertTitle>
+            <AlertDescription>{t('jobs.mayTakeAWhileDesc')}</AlertDescription>
+          </Alert>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setConfirmJob(null)}>
               {t('common:actions.cancel')}
@@ -682,6 +664,6 @@ export function JobsSettings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </SettingsSection>
   );
 }

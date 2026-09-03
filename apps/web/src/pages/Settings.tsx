@@ -14,7 +14,7 @@ import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
 import { Guest } from '@/components/settings/access/Guest';
 import { MobileDevices } from '@/components/settings/access/MobileDevices';
 import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
-import { JobsSettings } from '@/components/settings/JobsSettings';
+import { Jobs } from '@/components/settings/data/Jobs';
 import { Backup } from '@/components/settings/data/Backup';
 import { Destinations } from '@/components/settings/notifications/Destinations';
 
@@ -52,7 +52,7 @@ export function Settings() {
 
             <Route path="data/import" element={<Import />} />
             <Route path="data/backup" element={<Backup />} />
-            <Route path="data/jobs" element={<JobsSettings />} />
+            <Route path="data/jobs" element={<Jobs />} />
             <Route path="data/api" element={<Api />} />
 
             <Route

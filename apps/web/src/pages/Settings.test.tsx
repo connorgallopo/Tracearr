@@ -43,8 +43,8 @@ vi.mock('@/components/settings/access/RemoteAccess', () => ({
 vi.mock('@/components/settings/data/Import', () => ({
   Import: () => <div>import settings</div>,
 }));
-vi.mock('@/components/settings/JobsSettings', () => ({
-  JobsSettings: () => <div>jobs settings</div>,
+vi.mock('@/components/settings/data/Jobs', () => ({
+  Jobs: () => <div>jobs settings</div>,
 }));
 vi.mock('@/components/settings/data/Backup', () => ({
   Backup: () => <div>backup settings</div>,
