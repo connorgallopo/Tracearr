@@ -241,25 +241,25 @@
       },
       "syncNow": "지금 동기화",
       "syncing": "동기화 중...",
-      "notSyncedShort": "",
+      "notSyncedShort": "아직 동기화되지 않음",
       "backfillRunning": {
-        "title": "",
-        "fallbackBody": "",
-        "progress": "",
-        "snapshotsSuffix": ""
+        "title": "기록 데이터 생성 중...",
+        "fallbackBody": "라이브러리 기록에서 스냅샷을 생성합니다. 이 작업은 몇 분 정도 걸릴 수 있습니다.",
+        "progress": "라이브러리 {{processed}}개 중 {{total}}개",
+        "snapshotsSuffix": "(스냅샷 {{count}}개)"
       },
       "multiServer": {
-        "title": "",
-        "body": "",
-        "needsBackfillIntro": ""
+        "title": "일부 라이브러리에는 주의가 필요합니다",
+        "body": "결합된 라이브러리 통계를 보려면 아래 서버를 동기화하세요.",
+        "needsBackfillIntro": "다음 서버는 동기화되었지만 아직 기록 데이터가 없습니다."
       },
       "toast": {
-        "noServerSelected": "",
-        "syncStartedTitle": "",
-        "syncStartedDesc": "",
-        "syncFailedTitle": "",
-        "genericRetry": "",
-        "backfillStartedTitle": "",
+        "noServerSelected": "서버를 선택하지 않았습니다.",
+        "syncStartedTitle": "라이브러리 동기화가 시작되었습니다.",
+        "syncStartedDesc": "라이브러리 크기에 따라 몇 분 정도 걸릴 수 있습니다.",
+        "syncFailedTitle": "동기화를 시작하지 못했습니다.",
+        "genericRetry": "다시 시도해 주세요.",
+        "backfillStartedTitle": "과거 데이터 생성이 시작되었습니다.",
         "backfillStartedDesc": "",
         "backfillFailedTitle": "",
         "backfillCompleteTitle": "",
