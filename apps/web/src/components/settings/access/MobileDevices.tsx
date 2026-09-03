@@ -87,8 +87,6 @@ export function MobileDevices() {
   const [pairToken, setPairToken] = useState<{ token: string; expiresAt: string } | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  // Timer for token expiration. timeLeft only renders while pairToken is
-  // truthy, so there is nothing to reset when the token clears.
   useEffect(() => {
     if (!pairToken?.expiresAt) {
       return;
@@ -103,6 +101,7 @@ export function MobileDevices() {
       if (remaining === 0) {
         setPairToken(null);
         setShowQRDialog(false);
+        setTimeLeft(null);
       }
     };
 
@@ -263,7 +262,10 @@ export function MobileDevices() {
         open={showQRDialog}
         onOpenChange={(open) => {
           setShowQRDialog(open);
-          if (!open) setPairToken(null);
+          if (!open) {
+            setPairToken(null);
+            setTimeLeft(null);
+          }
         }}
       >
         <DialogContent>
@@ -307,6 +309,7 @@ export function MobileDevices() {
               onClick={() => {
                 setShowQRDialog(false);
                 setPairToken(null);
+                setTimeLeft(null);
               }}
             >
               {t('mobile.done')}

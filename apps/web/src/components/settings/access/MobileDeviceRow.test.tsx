@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { format, formatDistanceToNow } from 'date-fns';
 import type { MobileSession } from '@tracearr/shared';
 import { MobileDeviceRow } from './MobileDeviceRow';
 
@@ -12,9 +13,11 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/hooks/queries', () => ({
-  useRevokeSession: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
-  useUpdateMobileSession: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+  useRevokeSession: vi.fn(),
+  useUpdateMobileSession: vi.fn(),
 }));
+
+import { useRevokeSession, useUpdateMobileSession } from '@/hooks/queries';
 
 function session(overrides: Partial<MobileSession> = {}): MobileSession {
   return {
@@ -28,11 +31,37 @@ function session(overrides: Partial<MobileSession> = {}): MobileSession {
 }
 
 describe('MobileDeviceRow', () => {
+  const revokeMutate = vi.fn();
+  const updateMutate = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useRevokeSession).mockReturnValue({
+      mutate: revokeMutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useRevokeSession>);
+    vi.mocked(useUpdateMobileSession).mockReturnValue({
+      mutate: updateMutate,
+      isPending: false,
+    } as unknown as ReturnType<typeof useUpdateMobileSession>);
+  });
+
   it('titles the row with the device name and badges its platform', () => {
     render(<MobileDeviceRow session={session()} />);
 
     expect(screen.getByText("Alice's iPhone")).toBeInTheDocument();
     expect(screen.getByText('iOS')).toBeInTheDocument();
+  });
+
+  it('renders the last-seen and connected-on meta text', () => {
+    const s = session();
+    render(<MobileDeviceRow session={s} />);
+
+    const when = formatDistanceToNow(new Date(s.lastSeenAt), { addSuffix: true });
+    const date = format(new Date(s.createdAt), 'MMM d, yyyy');
+
+    expect(screen.getByText(`mobile.lastSeen:${JSON.stringify({ when })}`)).toBeInTheDocument();
+    expect(screen.getByText(`mobile.connectedOn:${JSON.stringify({ date })}`)).toBeInTheDocument();
   });
 
   it('names the rename and revoke actions', () => {
@@ -58,5 +87,14 @@ describe('MobileDeviceRow', () => {
     expect(
       screen.getByText('mobile.removeDeviceConfirm:{"deviceName":"Alice\'s iPhone"}')
     ).toBeInTheDocument();
+  });
+
+  it('revokes the device by id once the confirm dialog is accepted', async () => {
+    render(<MobileDeviceRow session={session({ id: 'session-42' })} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'mobile.removeDevice' }));
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.remove' }));
+
+    expect(revokeMutate).toHaveBeenCalledWith('session-42');
   });
 });
