@@ -63,7 +63,6 @@ function maxInput(): DigestInput {
         id: `al${i}0`,
         title: `Album Number 0 With A Long Name`,
         year: 2010,
-        posterRef: hosted(3000 + i),
         trackCount: 12,
       },
     ],
@@ -74,7 +73,6 @@ function maxInput(): DigestInput {
     kind: i % 2 ? ('show' as const) : ('movie' as const),
     title: `Watched Title ${i}`,
     year: 2020,
-    posterRef: hosted(4000 + i),
     plays: 40 - i,
   }));
   return base({ movies, shows, artists, mostWatched, logoRef: hosted(1) });
@@ -103,13 +101,11 @@ describe('renderDigest', () => {
           {
             id: 'a1',
             name: 'Portishead',
-            albums: [{ id: 'al1', title: 'Dummy', year: 1994, posterRef: null, trackCount: 11 }],
+            albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
             links: [],
           },
         ],
-        mostWatched: [
-          { id: 'w1', kind: 'movie', title: 'Alien', year: 1979, posterRef: null, plays: 7 },
-        ],
+        mostWatched: [{ id: 'w1', kind: 'movie', title: 'Alien', year: 1979, plays: 7 }],
       }),
       branding
     );

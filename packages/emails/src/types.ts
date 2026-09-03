@@ -84,7 +84,6 @@ export interface DigestAlbum {
   id: string;
   title: string;
   year: number | null;
-  posterRef: string | null;
   trackCount: number;
 }
 
@@ -100,7 +99,6 @@ export interface DigestWatched {
   kind: 'movie' | 'show';
   title: string;
   year: number | null;
-  posterRef: string | null;
   plays: number;
 }
 

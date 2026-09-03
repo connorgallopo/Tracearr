@@ -95,9 +95,14 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
     : null;
 
   const mode = resolveImageMode(ctx.newsletter.imageMode, externalUrl);
-  const cid = mode === 'inline' ? ctx.send.posters : {};
   let html = substitutePosterRefs(ctx.send.html, ctx.send.posters, mode, externalUrl);
   let text = ctx.send.text;
+  const cid =
+    mode === 'inline'
+      ? Object.fromEntries(
+          Object.entries(ctx.send.posters).filter(([cardId]) => html.includes(`cid:${cardId}`))
+        )
+      : {};
   if (unsubscribeUrl) {
     html = html.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);
     text = text.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);

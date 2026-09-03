@@ -533,12 +533,7 @@ export async function assembleDigest(
     data.isEmpty = data.isEmpty && data.mostWatched.length === 0;
   }
 
-  const cards: DigestCard[] = [
-    ...data.movies,
-    ...data.shows,
-    ...data.artists.flatMap((a) => a.albums),
-    ...data.mostWatched.filter((w) => w.serverId !== ''),
-  ];
-  const posters = await warmPosters(cards);
+  // Only movie and show cards render a poster; warming any other card fetches an image nothing references.
+  const posters = await warmPosters([...data.movies, ...data.shows]);
   return { data, posters };
 }

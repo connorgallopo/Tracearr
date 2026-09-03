@@ -1,6 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
-import { episodeRange, groupDigest, type LibraryItemRow } from '../assemble.js';
+
+const mockExecute = vi.fn();
+vi.mock('../../../db/client.js', () => ({
+  db: { execute: (...a: unknown[]) => mockExecute(...a) },
+}));
+const mockProxy = vi.fn();
+vi.mock('../../imageProxy.js', () => ({
+  proxyImage: (...a: unknown[]) => mockProxy(...a) as unknown,
+  posterVersionFor: (path: string) => `v-${path}`,
+}));
+const mockTopWatched = vi.fn();
+vi.mock('../../stats/topContent.js', () => ({
+  topWatched: (...a: unknown[]) => mockTopWatched(...a) as unknown,
+}));
+
+import { assembleDigest, episodeRange, groupDigest, type LibraryItemRow } from '../assemble.js';
 
 const at = (h: number) => new Date(Date.UTC(2026, 8, 1, h));
 let n = 0;
@@ -159,5 +174,84 @@ describe('groupDigest', () => {
     expect(data.movies).toEqual([]);
     expect(data.counts.movies).toBe(0);
     expect(data.isEmpty).toBe(true);
+  });
+});
+
+describe('assembleDigest poster warming', () => {
+  const rawRow = (over: Record<string, unknown>) => ({
+    id: 'row',
+    server_id: 'srv-1',
+    server_name: 'Basement',
+    server_type: 'plex',
+    library_id: '1',
+    library_name: 'Movies',
+    rating_key: 'rk',
+    media_id: null,
+    media_type: 'movie',
+    title: 'Title',
+    year: 2000,
+    parent_title: null,
+    parent_rating_key: null,
+    parent_index: null,
+    grandparent_title: null,
+    grandparent_rating_key: null,
+    item_index: null,
+    thumb_path: null,
+    genres: null,
+    imdb_id: null,
+    added_at: new Date('2026-09-01T00:00:00Z'),
+    ...over,
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockProxy.mockResolvedValue({ data: Buffer.from('jpeg'), contentType: 'image/jpeg' });
+    mockExecute.mockResolvedValue({
+      rows: [
+        rawRow({ id: 'movie-1', media_type: 'movie', title: 'Heat', thumb_path: '/movie.jpg' }),
+        rawRow({ id: 'show-1', media_type: 'show', title: 'The Wire', thumb_path: '/show.jpg' }),
+        rawRow({
+          id: 'album-1',
+          media_type: 'album',
+          title: 'Dummy',
+          rating_key: 'album-rk',
+          parent_rating_key: 'artist-rk',
+          parent_title: 'Portishead',
+          thumb_path: '/album.jpg',
+        }),
+      ],
+    });
+    mockTopWatched.mockResolvedValue({
+      movies: [
+        {
+          serverId: 'srv-1',
+          ratingKey: 'w1',
+          title: 'Alien',
+          year: 1979,
+          plays: 9,
+          thumbPath: '/watched.jpg',
+        },
+      ],
+      shows: [],
+    });
+  });
+
+  it('warms only the movie and show cards the template renders a poster for', async () => {
+    const { data, posters } = await assembleDigest(
+      {
+        scope: { serverIds: [], libraryIds: [] },
+        sections: {
+          ...DEFAULT_NEWSLETTER_SECTIONS,
+          mostWatched: { enabled: true, max: 10 },
+        },
+      },
+      { start: new Date('2026-08-26T00:00:00Z'), end: new Date('2026-09-02T00:00:00Z') }
+    );
+    expect(data.artists).toHaveLength(1);
+    expect(data.mostWatched).toHaveLength(1);
+    expect(Object.keys(posters).sort()).toEqual(['movie-1', 'show-1']);
+    expect(
+      mockProxy.mock.calls.map(([arg]) => (arg as { imagePath: string }).imagePath).sort()
+    ).toEqual(['/movie.jpg', '/show.jpg']);
   });
 });

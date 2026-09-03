@@ -181,6 +181,25 @@ describe('deliverRecipient', () => {
     expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['m1']);
   });
 
+  it('leaves a poster the rendered html never referenced unfetched and unattached', async () => {
+    const withOrphan = ctx();
+    store.loadDelivery.mockResolvedValue({
+      ...withOrphan,
+      send: {
+        ...withOrphan.send,
+        posters: {
+          m1: { serverId: 's1', thumbPath: '/t', version: 'v1' },
+          w9: { serverId: 's1', thumbPath: '/watched', version: 'v2' },
+        },
+      },
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['logo', 'm1']);
+    expect(mockProxy).toHaveBeenCalledTimes(1);
+    expect(mockProxy).toHaveBeenCalledWith(expect.objectContaining({ imagePath: '/t' }));
+  });
+
   it('is a no-op when the row is not queued or the send is not sending', async () => {
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
