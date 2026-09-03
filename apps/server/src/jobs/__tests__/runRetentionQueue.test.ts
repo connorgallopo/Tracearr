@@ -45,7 +45,7 @@ interface RenderedQuery {
 function rendered(): RenderedQuery[] {
   return mockDb.execute.mock.calls.map((call) => {
     const query = dialect.sqlToQuery(call[0] as SQL);
-    return { sql: query.sql.replace(/\s+/g, ' ').toLowerCase(), params: query.params };
+    return { sql: query.sql.replace(/\s+/g, ' ').trim().toLowerCase(), params: query.params };
   });
 }
 
@@ -72,7 +72,7 @@ describe('processRunRetention', () => {
   it('purges completed runs per kind and non-completed runs on the flat window', async () => {
     await processRunRetention();
 
-    const queries = rendered();
+    const queries = rendered().filter((q) => q.sql.startsWith('delete from automation_runs'));
     expect(queries).toHaveLength(4);
 
     const [notification, policy, ...diagnostics] = queries;
@@ -96,7 +96,8 @@ describe('processRunRetention', () => {
   it('compares finished_at against a constant, never a joined per-row window', async () => {
     await processRunRetention();
 
-    for (const query of rendered()) {
+    const queries = rendered().filter((q) => q.sql.startsWith('delete from automation_runs'));
+    for (const query of queries) {
       expect(query.sql).not.toContain('join automations');
       expect(query.sql).not.toContain('coalesce');
       expect(query.sql).toContain('ar.finished_at < $');
@@ -137,7 +138,7 @@ describe('processRunRetention', () => {
   it('keeps every predicate blind to ack or dismiss', async () => {
     await processRunRetention();
 
-    const queries = rendered();
+    const queries = rendered().filter((q) => q.sql.startsWith('delete from automation_runs'));
     expect(queries).toHaveLength(4);
     for (const query of queries) {
       expect(query.sql).toContain('delete from automation_runs');
@@ -154,10 +155,11 @@ describe('processRunRetention', () => {
 
     const result = await processRunRetention();
 
-    // Two calls to drain the notification pass, one each for the three that follow.
-    expect(mockDb.execute).toHaveBeenCalledTimes(5);
+    // Two calls to drain the notification pass, one each for the three automation_runs
+    // passes that follow, two more for the newsletter purge and prune.
+    expect(mockDb.execute).toHaveBeenCalledTimes(7);
     expect(result.notificationPurged).toBe(5017);
-    for (const query of rendered()) {
+    for (const query of rendered().filter((q) => q.sql.startsWith('delete from automation_runs'))) {
       expect(query.sql).toContain('limit $');
       expect(query.params.at(-1)).toBe(5000);
     }
@@ -172,7 +174,13 @@ describe('processRunRetention', () => {
 
     const result = await processRunRetention();
 
-    expect(result).toEqual({ notificationPurged: 3, policyPurged: 7, diagnosticPurged: 15 });
+    expect(result).toEqual({
+      notificationPurged: 3,
+      policyPurged: 7,
+      diagnosticPurged: 15,
+      newsletterSendsPurged: 0,
+      newsletterSnapshotsPruned: 0,
+    });
   });
 
   it('restates each identity the policy pass removed rows from, once per batch', async () => {
@@ -197,5 +205,36 @@ describe('processRunRetention', () => {
     await processRunRetention();
 
     expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('newsletter sends', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.execute.mockResolvedValue({ rowCount: 0, rows: [] });
+    stageAutomations(
+      [{ id: NOTIFY_ID, retentionDays: null }],
+      [{ id: POLICY_ID, retentionDays: null }]
+    );
+  });
+
+  it('purges closed sends after a year and clears closed snapshots after 90 days', async () => {
+    const before = Date.now();
+    const result = await processRunRetention();
+    const queries = rendered();
+    const purge = queries.find((q) => q.sql.startsWith('delete from newsletter_sends'));
+    const prune = queries.find((q) => q.sql.startsWith('update newsletter_sends'));
+    expect(purge?.sql).toBe(
+      'delete from newsletter_sends where finished_at is not null and started_at < $1'
+    );
+    expect(prune?.sql).toBe(
+      "update newsletter_sends set html = null, text = null, posters = '{}'::jsonb where finished_at is not null and html is not null and started_at < $1"
+    );
+    const purgeCutoff = (purge!.params[0] as Date).getTime();
+    const pruneCutoff = (prune!.params[0] as Date).getTime();
+    expect(Math.abs(before - 365 * 86_400_000 - purgeCutoff)).toBeLessThan(5_000);
+    expect(Math.abs(before - 90 * 86_400_000 - pruneCutoff)).toBeLessThan(5_000);
+    expect(result.newsletterSendsPurged).toBe(0);
+    expect(result.newsletterSnapshotsPruned).toBe(0);
   });
 });

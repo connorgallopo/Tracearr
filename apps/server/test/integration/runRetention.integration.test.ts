@@ -18,7 +18,14 @@ import {
 import type { AutomationKind, RunOutcome } from '@tracearr/shared';
 import { eq } from 'drizzle-orm';
 import { db } from '../../src/db/client.js';
-import { automations, automationRuns, users } from '../../src/db/schema.js';
+import {
+  automations,
+  automationRuns,
+  users,
+  newsletters,
+  newsletterSends,
+  emailSuppressions,
+} from '../../src/db/schema.js';
 import { processRunRetention } from '../../src/jobs/runRetentionQueue.js';
 import { recomputeIdentityAggregatesForServerUser } from '../../src/services/userService.js';
 
@@ -293,5 +300,88 @@ describe('processRunRetention', () => {
     expect(result.policyPurged).toBe(3);
     expect((await survivors()).has(kept)).toBe(true);
     expect(await totalViolationsOf(userId)).toBe(1);
+  });
+});
+
+describe('newsletter send retention', () => {
+  async function seedSend(
+    newsletterId: string,
+    ageDays: number,
+    opts: { finished: boolean; html: string | null }
+  ): Promise<string> {
+    const [row] = await db
+      .insert(newsletterSends)
+      .values({
+        newsletterId,
+        viewToken: randomUUID().replaceAll('-', '') + randomUUID().slice(0, 11),
+        trigger: 'schedule',
+        windowStart: daysAgo(ageDays + 7),
+        windowEnd: daysAgo(ageDays),
+        itemCounts: {},
+        outcome: opts.finished ? 'sent' : 'sending',
+        subject: 's',
+        html: opts.html,
+        text: opts.html === null ? null : 'text',
+        posters: opts.html === null ? {} : { m1: { serverId: 's', thumbPath: '/t', version: 'v' } },
+        startedAt: daysAgo(ageDays),
+        finishedAt: opts.finished ? daysAgo(ageDays) : null,
+      })
+      .returning({ id: newsletterSends.id });
+    return row!.id;
+  }
+
+  it('deletes year-old closed sends, clears 90-day-old snapshots, and leaves open and young sends alone', async () => {
+    const [nl] = await db
+      .insert(newsletters)
+      .values({
+        name: `retention-${randomUUID().slice(0, 8)}`,
+        schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
+        timezone: 'UTC',
+        window: { kind: 'since_last_send', fallbackDays: 7 },
+        scope: { serverIds: [], libraryIds: [] },
+        sections: {
+          movies: { enabled: true, max: 12 },
+          shows: { enabled: true, max: 12, maxSeasonsPerShow: 8 },
+          music: { enabled: true, max: 8 },
+          mostWatched: { enabled: false, max: 10 },
+        },
+        subject: 's',
+        recipients: { members: true, extraAddresses: [] },
+      })
+      .returning({ id: newsletters.id });
+    const ancient = await seedSend(nl!.id, 400, { finished: true, html: '<p>a</p>' });
+    const old = await seedSend(nl!.id, 100, { finished: true, html: '<p>o</p>' });
+    const openOld = await seedSend(nl!.id, 100, { finished: false, html: '<p>x</p>' });
+    const young = await seedSend(nl!.id, 10, { finished: true, html: '<p>y</p>' });
+    await db.insert(emailSuppressions).values({
+      address: `retention-${randomUUID().slice(0, 8)}@example.com`,
+      reason: 'unsubscribed',
+      sourceSendId: ancient,
+    });
+
+    const result = await processRunRetention();
+
+    expect(result.newsletterSendsPurged).toBeGreaterThanOrEqual(1);
+    expect(result.newsletterSnapshotsPruned).toBeGreaterThanOrEqual(1);
+    const rows = await db
+      .select({
+        id: newsletterSends.id,
+        html: newsletterSends.html,
+        text: newsletterSends.text,
+        posters: newsletterSends.posters,
+      })
+      .from(newsletterSends)
+      .where(eq(newsletterSends.newsletterId, nl!.id));
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    expect(byId.has(ancient)).toBe(false);
+    expect(byId.get(old)).toEqual({ id: old, html: null, text: null, posters: {} });
+    expect(byId.get(openOld)?.html).toBe('<p>x</p>');
+    expect(byId.get(young)?.html).toBe('<p>y</p>');
+    const [suppression] = await db
+      .select({ sourceSendId: emailSuppressions.sourceSendId })
+      .from(emailSuppressions)
+      .where(eq(emailSuppressions.sourceSendId, ancient));
+    expect(suppression).toBeUndefined();
+    await db.delete(newsletters).where(eq(newsletters.id, nl!.id));
   });
 });

@@ -110,6 +110,7 @@ import {
   startNotificationWorker,
   shutdownNotificationQueue,
 } from './jobs/notificationQueue.js';
+import { closeAllTransporters } from './services/notifications/destinations/emailTransport.js';
 import { runAutomationModelMigration } from './services/automations/modelMigration.js';
 import { runSystemEventsMigration } from './services/automations/systemEventsMigration.js';
 import { seedBuiltinTemplates } from './services/automations/templates/seeder.js';
@@ -610,6 +611,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await stopLeaderLease();
     await tailscaleService.shutdown();
     await shutdownNotificationQueue();
+    closeAllTransporters();
     await shutdownKillQueue();
     await shutdownImportQueue();
     await shutdownMaintenanceQueue();
@@ -1429,6 +1431,7 @@ async function start() {
         void stopConnectionBudget(app.redis);
         void tailscaleService.shutdown();
         void shutdownNotificationQueue();
+        closeAllTransporters();
         void shutdownKillQueue();
         void shutdownImportQueue();
         void shutdownLibrarySyncQueue();
@@ -1470,6 +1473,7 @@ async function start() {
         }
 
         // Shut down BullMQ workers/queues (closes their internal Redis connections)
+        closeAllTransporters();
         void Promise.all([
           shutdownNotificationQueue(),
           shutdownKillQueue(),
