@@ -3,13 +3,13 @@ import { UnrecoverableError } from 'bullmq';
 import { POSTER_IMAGE_SIZE } from '@tracearr/shared';
 import type { PosterRef } from '../../db/schema.js';
 import { proxyImage } from '../imageProxy.js';
-import { getDestination, readConfig } from '../notifications/destinationStore.js';
+import { getDestination, readConfig, rewrapConfig } from '../notifications/destinationStore.js';
 import type { EmailAttachment, EmailConfig } from '../notifications/destinations/email.js';
 import { describeSmtpError, getTransporter } from '../notifications/destinations/emailTransport.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { getNetworkSettings } from '../settings.js';
 import { signUnsubscribeToken } from './links.js';
-import { resolveImageMode, substitutePosterRefs } from './render.js';
+import { UNSUBSCRIBE_PLACEHOLDER, resolveImageMode, substitutePosterRefs } from './render.js';
 import {
   beginAttempt,
   finalizeSend,
@@ -24,14 +24,16 @@ export interface DeliveryJob {
   recipientId: string;
 }
 
-const PLACEHOLDER = '{{unsubscribe_url}}';
-const TIMEOUT_CODES = new Set(['ETIMEDOUT', 'ESOCKET']);
+const CONNECTION_STAGE = /^(Connection timeout|Greeting never received)$/;
+const DROPPED_SESSION = /ECONNRESET|EPIPE/;
 
-function isTimeoutClass(error: unknown): boolean {
-  const code =
-    typeof error === 'object' && error !== null ? (error as { code?: string }).code : undefined;
-  if (code && TIMEOUT_CODES.has(code)) return true;
-  return error instanceof Error && /timeout/i.test(error.message);
+/** nodemailer reports a session that stopped answering as ETIMEDOUT "Timeout" or ESOCKET; connect and greeting timeouts carry their own messages and never reached DATA. */
+function mayHaveAccepted(error: unknown): error is Error {
+  if (!(error instanceof Error)) return false;
+  const code = (error as { code?: string }).code;
+  if (code === 'ETIMEDOUT') return !CONNECTION_STAGE.test(error.message);
+  if (code === 'ESOCKET') return DROPPED_SESSION.test(error.message);
+  return false;
 }
 
 async function openTransport(ctx: DeliveryContext): Promise<{ id: string; config: EmailConfig }> {
@@ -41,7 +43,12 @@ async function openTransport(ctx: DeliveryContext): Promise<{ id: string; config
   }
   const opened = readConfig(destination);
   if (!opened.ok) throw new UnrecoverableError('The email destination needs its secret re-entered');
-  return { id: destination.id, config: opened.config as unknown as EmailConfig };
+  if (opened.rewrap) await rewrapConfig(destination.id, opened.config);
+  const config = opened.config as Partial<EmailConfig>;
+  if (typeof config.host !== 'string' || typeof config.fromAddress !== 'string') {
+    throw new UnrecoverableError('The email destination is missing its host or from address');
+  }
+  return { id: destination.id, config: config as EmailConfig };
 }
 
 async function posterAttachments(posters: Record<string, PosterRef>): Promise<EmailAttachment[]> {
@@ -92,34 +99,29 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   let html = substitutePosterRefs(ctx.send.html, ctx.send.posters, mode, externalUrl);
   let text = ctx.send.text;
   if (unsubscribeUrl) {
-    html = html.replaceAll(PLACEHOLDER, unsubscribeUrl);
-    text = text.replaceAll(PLACEHOLDER, unsubscribeUrl);
+    html = html.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);
+    text = text.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);
   }
   const attachments: EmailAttachment[] = [];
   const logo = readLogoPng();
-  // logoRef is set unconditionally by send.ts whenever a logo exists, so
-  // Layout always embeds cid:logo when there is one to attach.
-  if (logo)
+  if (logo && html.includes('cid:logo')) {
     attachments.push({
       filename: 'logo.png',
       cid: 'logo',
       content: logo,
       contentType: 'image/png',
     });
+  }
   attachments.push(...(await posterAttachments(cid)));
 
   const domain = transport.config.fromAddress.split('@')[1] ?? 'tracearr.local';
   const messageId = `<${randomUUID()}@${domain}>`;
   const attempt = await beginAttempt(ctx.recipient.id, messageId);
-  if (
-    attempt.previousMessageId &&
-    attempt.previousError &&
-    isTimeoutClass(new Error(attempt.previousError))
-  ) {
+  if (attempt.previousMessageId && attempt.previousError === null) {
     await markRecipient(
       ctx.recipient.id,
       'unknown',
-      `A previous attempt timed out after sending; the message may have been delivered (${attempt.previousMessageId})`
+      `A previous attempt was cut off after the message went out; it may have been delivered (${attempt.previousMessageId})`
     );
     await finalizeSend(ctx.send.id);
     return;
@@ -148,9 +150,18 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
         : {}),
     });
   } catch (error) {
+    if (mayHaveAccepted(error)) {
+      await markRecipient(
+        ctx.recipient.id,
+        'unknown',
+        `The server stopped answering after the message went out; it may have been delivered (${messageId})`
+      );
+      await finalizeSend(ctx.send.id);
+      return;
+    }
     const message = describeSmtpError(error, transport.config);
     await noteRecipientError(ctx.recipient.id, message);
-    throw error instanceof Error ? error : new Error(message);
+    throw new Error(message, { cause: error });
   }
   await markRecipient(ctx.recipient.id, 'sent');
   await finalizeSend(ctx.send.id);

@@ -12,6 +12,9 @@ import type { ServerLink } from './store.js';
 
 export type ResolvedImageMode = 'hosted' | 'inline' | 'none';
 
+/** Written into the snapshot at render time and replaced per recipient at delivery. */
+export const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
+
 /** Hosted needs a reachable external URL and stays opt-in; auto is inline because that works everywhere. */
 export function resolveImageMode(
   mode: NewsletterImageMode,

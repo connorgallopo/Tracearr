@@ -9,6 +9,7 @@ const store = vi.hoisted(() => ({
   insertSend: vi.fn(),
   insertRecipients: vi.fn(),
   markSendSending: vi.fn(),
+  markSendOutcome: vi.fn(),
   loadServerLinks: vi.fn(),
   OpenSendConflict: class OpenSendConflict extends Error {},
 }));
@@ -148,6 +149,10 @@ describe('runNewsletter', () => {
       start: new Date('2026-08-26T00:00:00Z'),
       end: expect.any(Date),
     });
+    expect(mockDestination).toHaveBeenCalledWith(NEWSLETTER.destinationId);
+    expect(store.lastWatermark).toHaveBeenCalledWith(NEWSLETTER.id);
+    expect(mockResolve).toHaveBeenCalledWith(NEWSLETTER);
+    expect(store.loadServerLinks).toHaveBeenCalledWith(NEWSLETTER.scope.serverIds);
   });
 
   it('renders the subject template with the server name, dates and item count', async () => {
@@ -231,5 +236,50 @@ describe('runNewsletter', () => {
     const html = String((store.insertSend.mock.calls[0]?.[0] as { html: string }).html);
     expect(html).toContain('Reply to this email to unsubscribe');
     expect(html).not.toContain('{{unsubscribe_url}}');
+  });
+
+  it('closes the send as failed when it dies after insertSend, and rethrows', async () => {
+    store.insertRecipients.mockRejectedValueOnce(new Error('boom'));
+    await expect(runNewsletter(NEWSLETTER.id, 'schedule')).rejects.toThrow('boom');
+    expect(store.markSendOutcome).toHaveBeenCalledWith('send-1', 'failed', 'boom');
+  });
+
+  it('closes a stale rendering send as failed and lets the run continue', async () => {
+    store.findOpenSend.mockResolvedValueOnce({
+      id: 'open-1',
+      outcome: 'rendering',
+      startedAt: new Date(Date.now() - 11 * 60_000),
+    });
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(store.markSendOutcome).toHaveBeenCalledWith(
+      'open-1',
+      'failed',
+      'Interrupted before delivery started'
+    );
+    expect(store.insertSend).toHaveBeenCalled();
+    expect(result.outcome).toBe('queued');
+  });
+
+  it('resumes a rendering send that has not gone stale yet', async () => {
+    store.findOpenSend.mockResolvedValue({
+      id: 'open-1',
+      outcome: 'rendering',
+      startedAt: new Date(Date.now() - 60_000),
+    });
+    store.queuedRecipientIds.mockResolvedValue(['r7']);
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result).toEqual({ outcome: 'resumed', sendId: 'open-1', queuedRecipientIds: ['r7'] });
+    expect(store.markSendOutcome).not.toHaveBeenCalled();
+    expect(store.insertSend).not.toHaveBeenCalled();
+  });
+
+  it('resumes the other send when insertSend loses an open-send race', async () => {
+    store.findOpenSend
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: 'open-1', outcome: 'sending', startedAt: new Date() });
+    store.insertSend.mockRejectedValueOnce(new store.OpenSendConflict('n1'));
+    store.queuedRecipientIds.mockResolvedValue(['r9']);
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result).toEqual({ outcome: 'resumed', sendId: 'open-1', queuedRecipientIds: ['r9'] });
   });
 });

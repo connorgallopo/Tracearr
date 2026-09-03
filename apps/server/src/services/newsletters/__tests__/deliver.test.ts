@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type * as EmailTransportModule from '../../notifications/destinations/emailTransport.js';
 
 const store = vi.hoisted(() => ({
   loadDelivery: vi.fn(),
@@ -10,21 +11,43 @@ const store = vi.hoisted(() => ({
 vi.mock('../store.js', () => store);
 const mockSendMail = vi.fn();
 const mockGetTransporter = vi.fn((..._args: unknown[]) => ({ sendMail: mockSendMail }));
-vi.mock('../../notifications/destinations/emailTransport.js', () => ({
-  getTransporter: (...a: unknown[]) => mockGetTransporter(...a) as unknown,
-  describeSmtpError: (e: unknown) => (e instanceof Error ? e.message : 'smtp'),
-}));
+vi.mock('../../notifications/destinations/emailTransport.js', async (importActual) => {
+  const actual = await importActual<typeof EmailTransportModule>();
+  return {
+    ...actual,
+    getTransporter: (...a: unknown[]) => mockGetTransporter(...a) as unknown,
+  };
+});
 const mockDestination = vi.fn();
 const mockReadConfig = vi.fn();
+const mockRewrapConfig = vi.fn();
 vi.mock('../../notifications/destinationStore.js', () => ({
   getDestination: (...a: unknown[]) => mockDestination(...a) as unknown,
   readConfig: (...a: unknown[]) => mockReadConfig(...a) as unknown,
+  rewrapConfig: (...a: unknown[]) => mockRewrapConfig(...a) as unknown,
 }));
 const mockProxy = vi.fn();
 vi.mock('../../imageProxy.js', () => ({
   proxyImage: (...a: unknown[]) => mockProxy(...a) as unknown,
-  buildProxyUrl: (o: { serverId: string; path: string; version?: string }) =>
-    `/api/v1/images/proxy?server=${o.serverId}&url=${encodeURIComponent(o.path)}&v=${o.version ?? ''}`,
+  buildProxyUrl: (o: {
+    serverId: string;
+    path: string;
+    width?: number;
+    height?: number;
+    fallback?: string;
+    version?: string;
+  }) => {
+    const { serverId, path, width = 300, height = 450, fallback = 'poster', version } = o;
+    const params = new URLSearchParams({
+      server: serverId,
+      url: path,
+      width: String(width),
+      height: String(height),
+      fallback,
+    });
+    if (version) params.set('v', version);
+    return `/api/v1/images/proxy?${params}`;
+  },
   posterVersionFor: (path: string) => path,
 }));
 vi.mock('../../notifications/emailLogo.js', () => ({ readLogoPng: () => Buffer.from('png') }));
@@ -64,7 +87,7 @@ const ctx = () => ({
     destinationId: 'd1',
     outcome: 'sending',
     subject: 'x',
-    html: '<p>Hi</p><img src="poster:m1" alt="Heat"><a href="{{unsubscribe_url}}">Unsubscribe</a>',
+    html: '<img src="cid:logo"><p>Hi</p><img src="poster:m1" alt="Heat"><a href="{{unsubscribe_url}}">Unsubscribe</a>',
     text: 'Hi\nUnsubscribe [{{unsubscribe_url}}]',
     posters: { m1: { serverId: 's1', thumbPath: '/t', version: 'v1' } },
   },
@@ -145,6 +168,19 @@ describe('deliverRecipient', () => {
     expect(mail.headers).toBeUndefined();
   });
 
+  it('attaches no logo when the rendered snapshot never referenced cid:logo', async () => {
+    store.loadDelivery.mockResolvedValue({
+      ...ctx(),
+      send: {
+        ...ctx().send,
+        html: '<p>Hi</p><img src="poster:m1" alt="Heat"><a href="{{unsubscribe_url}}">Unsubscribe</a>',
+      },
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['m1']);
+  });
+
   it('is a no-op when the row is not queued or the send is not sending', async () => {
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
@@ -174,21 +210,82 @@ describe('deliverRecipient', () => {
     expect(mockSendMail).not.toHaveBeenCalled();
   });
 
+  it('rejects when the decrypted config is missing the host or from address', async () => {
+    mockReadConfig.mockReturnValue({ ok: true, config: {}, rewrap: false });
+    await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
+      /missing its host or from address/
+    );
+    expect(mockSendMail).not.toHaveBeenCalled();
+  });
+
+  it('rewraps a config opened under the secondary key before sending', async () => {
+    mockReadConfig.mockReturnValue({ ok: true, config, rewrap: true });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    expect(mockRewrapConfig).toHaveBeenCalledWith('d1', config);
+    expect(mockSendMail).toHaveBeenCalledTimes(1);
+  });
+
   it('notes the error and rethrows on a connection failure so the queue retries', async () => {
     mockSendMail.mockRejectedValueOnce(
       Object.assign(new Error('refused'), { code: 'ECONNECTION' })
     );
     await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
-      'refused'
+      'Could not connect to smtp.example.com:587'
     );
-    expect(store.noteRecipientError).toHaveBeenCalledWith('r1', 'refused');
+    expect(store.noteRecipientError).toHaveBeenCalledWith(
+      'r1',
+      'Could not connect to smtp.example.com:587'
+    );
     expect(store.markRecipient).not.toHaveBeenCalled();
   });
 
-  it('marks unknown without resending when a prior attempt timed out after its message id was written', async () => {
+  it('settles as unknown when a connect-stage or greeting timeout means the message never sent', async () => {
+    mockSendMail.mockRejectedValueOnce(
+      Object.assign(new Error('Connection timeout'), { code: 'ETIMEDOUT' })
+    );
+    await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
+      'Could not connect to smtp.example.com:587'
+    );
+    expect(store.noteRecipientError).toHaveBeenCalledWith(
+      'r1',
+      'Could not connect to smtp.example.com:587'
+    );
+    expect(store.markRecipient).not.toHaveBeenCalled();
+  });
+
+  it('settles as unknown when the session times out after the message may have gone out', async () => {
+    mockSendMail.mockRejectedValueOnce(Object.assign(new Error('Timeout'), { code: 'ETIMEDOUT' }));
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const messageId = store.beginAttempt.mock.calls[0]?.[1] as string;
+    expect(mockSendMail).toHaveBeenCalledTimes(1);
+    expect(store.markRecipient).toHaveBeenCalledWith(
+      'r1',
+      'unknown',
+      expect.stringContaining(messageId)
+    );
+    expect(store.finalizeSend).toHaveBeenCalledWith('send-1');
+    expect(store.noteRecipientError).not.toHaveBeenCalled();
+  });
+
+  it('settles as unknown when a live socket drops after the message may have gone out', async () => {
+    mockSendMail.mockRejectedValueOnce(
+      Object.assign(new Error('read ECONNRESET'), { code: 'ESOCKET' })
+    );
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const messageId = store.beginAttempt.mock.calls[0]?.[1] as string;
+    expect(store.markRecipient).toHaveBeenCalledWith(
+      'r1',
+      'unknown',
+      expect.stringContaining(messageId)
+    );
+    expect(store.finalizeSend).toHaveBeenCalledWith('send-1');
+    expect(store.noteRecipientError).not.toHaveBeenCalled();
+  });
+
+  it('settles as unknown without resending when a previous attempt never recorded an outcome', async () => {
     store.beginAttempt.mockResolvedValue({
-      previousMessageId: '<old@example.com>',
-      previousError: 'Timeout',
+      previousMessageId: '<old@x>',
+      previousError: null,
       attempts: 2,
     });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
@@ -196,19 +293,47 @@ describe('deliverRecipient', () => {
     expect(store.markRecipient).toHaveBeenCalledWith(
       'r1',
       'unknown',
-      expect.stringContaining('may have been delivered')
+      expect.stringContaining('<old@x>')
     );
     expect(store.finalizeSend).toHaveBeenCalledWith('send-1');
   });
 
-  it('a prior connection-stage failure retries normally even with a message id on the row', async () => {
+  it('retries normally when the previous attempt failed before the message was accepted', async () => {
     store.beginAttempt.mockResolvedValue({
-      previousMessageId: '<old@example.com>',
-      previousError: 'refused',
+      previousMessageId: '<old@x>',
+      previousError: 'Could not connect to h:1',
       attempts: 2,
     });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
     expect(mockSendMail).toHaveBeenCalledTimes(1);
+  });
+
+  it('hosted image mode points posters at the external proxy url and skips inline attachments', async () => {
+    store.loadDelivery.mockResolvedValue({
+      ...ctx(),
+      newsletter: { id: 'n1', imageMode: 'hosted' },
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(String(mail.html)).toContain(
+      'src="https://tracearr.example.com/api/v1/images/proxy?server=s1&url=%2Ft&width=360&height=540&fallback=poster&v=v1"'
+    );
+    expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['logo']);
+    expect(mockProxy).not.toHaveBeenCalled();
+  });
+
+  it('none image mode drops the poster image and attaches nothing', async () => {
+    store.loadDelivery.mockResolvedValue({
+      ...ctx(),
+      send: { ...ctx().send, html: '<p>Hi</p><img src="poster:m1" alt="Heat">', text: 'Hi' },
+      newsletter: { id: 'n1', imageMode: 'none' },
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(String(mail.html)).not.toContain('<img');
+    expect(String(mail.html)).not.toContain('poster:');
+    expect(mail.attachments).toEqual([]);
+    expect(mockProxy).not.toHaveBeenCalled();
   });
 });
 

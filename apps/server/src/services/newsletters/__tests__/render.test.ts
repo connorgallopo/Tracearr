@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatWindowDate, resolveImageMode, substitutePosterRefs } from '../render.js';
+import type { DigestData } from '../assemble.js';
+import {
+  buildDigestInput,
+  formatWindowDate,
+  resolveImageMode,
+  substitutePosterRefs,
+} from '../render.js';
+import type { ServerLink } from '../store.js';
 
 const posters = {
   m1: {
@@ -45,6 +52,69 @@ describe('resolveImageMode', () => {
     expect(resolveImageMode('hosted', 'https://x')).toBe('hosted');
     expect(resolveImageMode('inline', 'https://x')).toBe('inline');
     expect(resolveImageMode('none', 'https://x')).toBe('none');
+  });
+});
+
+describe('buildDigestInput', () => {
+  it('carries the exact Tracearr, media server and IMDb link strings for a movie card', () => {
+    const data: DigestData = {
+      movies: [
+        {
+          cardId: 'm1',
+          serverId: 's1',
+          serverName: 'Basement',
+          serverType: 'plex',
+          ratingKey: '42',
+          mediaId: 'media-1',
+          imdbId: 'tt0113277',
+          thumbPath: '/t',
+          title: 'Heat',
+          year: 1995,
+          genres: ['Crime', 'Drama'],
+          addedAt: new Date(),
+        },
+      ],
+      shows: [],
+      artists: [],
+      mostWatched: [],
+      counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+      isEmpty: false,
+    };
+    const serversById = new Map<string, ServerLink>([
+      [
+        's1',
+        {
+          id: 's1',
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://plex.local',
+          machineIdentifier: 'mach-1',
+        },
+      ],
+    ]);
+    const input = buildDigestInput(
+      data,
+      {},
+      {
+        subject: 'x',
+        intro: null,
+        outro: null,
+        windowStart: 'Aug 1, 2026',
+        windowEnd: 'Aug 8, 2026',
+        logoRef: null,
+        unsubscribeUrl: null,
+        externalUrl: 'https://tracearr.example.com',
+        serversById,
+      }
+    );
+    expect(input.movies[0]?.links).toEqual([
+      { label: 'Tracearr', url: 'https://tracearr.example.com/media/media-1' },
+      {
+        label: 'Basement',
+        url: 'https://app.plex.tv/desktop/#!/server/mach-1/details?key=%2Flibrary%2Fmetadata%2F42',
+      },
+      { label: 'IMDb', url: 'https://www.imdb.com/title/tt0113277/' },
+    ]);
   });
 });
 

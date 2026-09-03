@@ -7,7 +7,7 @@ import { getNetworkSettings } from '../settings.js';
 import { assembleDigest } from './assemble.js';
 import { newViewToken } from './links.js';
 import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
-import { buildDigestInput, formatWindowDate } from './render.js';
+import { UNSUBSCRIBE_PLACEHOLDER, buildDigestInput, formatWindowDate } from './render.js';
 import {
   OpenSendConflict,
   findOpenSend,
@@ -16,6 +16,7 @@ import {
   insertSend,
   lastWatermark,
   loadServerLinks,
+  markSendOutcome,
   markSendSending,
   queuedRecipientIds,
   type NewsletterRow,
@@ -28,8 +29,8 @@ export interface RunResult {
   queuedRecipientIds: string[];
 }
 
-/** The digest reads as the Tracearr sender; the run's transport is the run's own. */
-export const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
+/** A send still rendering this long after it started belongs to a run that died before it queued anything. */
+const RENDERING_STALE_MS = 10 * 60_000;
 
 async function transportProblem(newsletter: NewsletterRow): Promise<string | null> {
   if (!newsletter.destinationId) return 'No email destination is set';
@@ -46,6 +47,10 @@ async function resume(
 ): Promise<RunResult | null> {
   const open = await findOpenSend(newsletterId);
   if (!open) return null;
+  if (open.outcome === 'rendering' && Date.now() - open.startedAt.getTime() > RENDERING_STALE_MS) {
+    await markSendOutcome(open.id, 'failed', 'Interrupted before delivery started');
+    return null;
+  }
   if (trigger === 'test') return { outcome: 'busy', sendId: open.id, queuedRecipientIds: [] };
   return {
     outcome: 'resumed',
@@ -153,18 +158,27 @@ export async function runNewsletter(
     throw error;
   }
 
-  const rows = await insertRecipients(
-    send.id,
-    recipients.map((r) => ({
-      address: r.address,
-      userId: r.userId,
-      status: r.suppressed ? 'suppressed' : 'queued',
-    }))
-  );
-  await markSendSending(send.id, deliverable.length);
-  return {
-    outcome: 'queued',
-    sendId: send.id,
-    queuedRecipientIds: rows.filter((r) => r.status === 'queued').map((r) => r.id),
-  };
+  try {
+    const rows = await insertRecipients(
+      send.id,
+      recipients.map((r) => ({
+        address: r.address,
+        userId: r.userId,
+        status: r.suppressed ? 'suppressed' : 'queued',
+      }))
+    );
+    await markSendSending(send.id, deliverable.length);
+    return {
+      outcome: 'queued',
+      sendId: send.id,
+      queuedRecipientIds: rows.filter((r) => r.status === 'queued').map((r) => r.id),
+    };
+  } catch (error) {
+    await markSendOutcome(
+      send.id,
+      'failed',
+      error instanceof Error ? error.message : String(error)
+    );
+    throw error;
+  }
 }

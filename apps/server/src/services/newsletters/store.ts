@@ -159,7 +159,7 @@ export async function markSendSending(sendId: string, recipientCount: number): P
   await db
     .update(newsletterSends)
     .set({ outcome: 'sending', recipientCount })
-    .where(eq(newsletterSends.id, sendId));
+    .where(and(eq(newsletterSends.id, sendId), eq(newsletterSends.outcome, 'rendering')));
 }
 
 export async function markSendOutcome(
