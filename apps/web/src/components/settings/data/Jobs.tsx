@@ -12,6 +12,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/empty-state';
 import {
   Item,
+  ItemGroup,
   ItemMedia,
   ItemContent,
   ItemTitle,
@@ -123,6 +124,32 @@ const CATEGORY_CONFIG = {
   cleanup: { icon: HardDrive, labelKey: 'jobs.cleanup' as const },
 } satisfies Record<JobCategory, { icon: typeof Database; labelKey: string }>;
 
+function RunOutcomeBanner({
+  variant,
+  icon,
+  title,
+  description,
+  onDismiss,
+}: {
+  variant?: 'destructive';
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onDismiss: () => void;
+}) {
+  const { t } = useTranslation('common');
+  return (
+    <Alert variant={variant}>
+      {icon}
+      <AlertTitle>{title}</AlertTitle>
+      <AlertDescription>{description}</AlertDescription>
+      <Button variant="ghost" size="sm" onClick={onDismiss}>
+        {t('actions.dismiss')}
+      </Button>
+    </Alert>
+  );
+}
+
 export function Jobs() {
   const { t } = useTranslation(['settings', 'notifications', 'pages', 'common']);
   const [jobs, setJobs] = useState<JobDefinition[]>([]);
@@ -187,8 +214,8 @@ export function Jobs() {
 
   useEffect(() => {
     void fetchHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps, react/set-state-in-effect -- fetchHistory has a stable [] identity; this loads the initial page once on mount
-  }, []);
+    // eslint-disable-next-line react/set-state-in-effect -- loads history from the server on mount, not from local input
+  }, [fetchHistory]);
 
   // Fetch queue stats
   const fetchQueueStats = useCallback(async () => {
@@ -498,25 +525,22 @@ export function Jobs() {
 
           {/* Completed Status Banner */}
           {progress?.status === 'complete' && !runningJob && (
-            <Alert>
-              <CheckCircle2 className="text-success" />
-              <AlertTitle>{t('jobs.lastJobCompleted')}</AlertTitle>
-              <AlertDescription>{progress.message}</AlertDescription>
-              <Button variant="ghost" size="sm" onClick={() => setProgress(null)}>
-                {t('common:actions.dismiss')}
-              </Button>
-            </Alert>
+            <RunOutcomeBanner
+              icon={<CheckCircle2 className="text-success" />}
+              title={t('jobs.lastJobCompleted')}
+              description={progress.message}
+              onDismiss={() => setProgress(null)}
+            />
           )}
 
           {progress?.status === 'error' && !runningJob && (
-            <Alert variant="destructive">
-              <XCircle />
-              <AlertTitle>{t('jobs.lastJobFailed')}</AlertTitle>
-              <AlertDescription>{progress.message}</AlertDescription>
-              <Button variant="ghost" size="sm" onClick={() => setProgress(null)}>
-                {t('common:actions.dismiss')}
-              </Button>
-            </Alert>
+            <RunOutcomeBanner
+              variant="destructive"
+              icon={<XCircle />}
+              title={t('jobs.lastJobFailed')}
+              description={progress.message}
+              onDismiss={() => setProgress(null)}
+            />
           )}
         </CardContent>
       </Card>
@@ -557,7 +581,7 @@ export function Jobs() {
           ) : history.length === 0 ? (
             <EmptyState icon={ArrowUpDown} title={t('common:empty.noJobHistory')} />
           ) : (
-            <div className="space-y-2">
+            <ItemGroup className="space-y-2">
               {history.map((item) => {
                 const isSuccess = item.state === 'completed';
 
@@ -609,7 +633,7 @@ export function Jobs() {
                   </Item>
                 );
               })}
-            </div>
+            </ItemGroup>
           )}
         </CardContent>
       </Card>

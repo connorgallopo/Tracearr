@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Jobs } from './Jobs';
 
 vi.mock('react-i18next', () => ({
@@ -43,6 +44,30 @@ function withHistory(history: unknown[]) {
   vi.mocked(api.maintenance.getHistory).mockResolvedValue({ history } as never);
   vi.mocked(api.maintenance.getStats).mockResolvedValue({} as never);
   vi.mocked(api.maintenance.getProgress).mockResolvedValue({} as never);
+}
+
+const jobWithOption = {
+  type: 'normalize_players',
+  category: 'normalization',
+  name: 'Normalize players',
+  description: 'Normalizes player names across servers',
+  options: [
+    {
+      name: 'dryRun',
+      label: 'Dry run',
+      description: 'Preview without writing changes',
+      type: 'boolean',
+      default: false,
+    },
+  ],
+};
+
+function withJob() {
+  vi.mocked(api.maintenance.getJobs).mockResolvedValue({ jobs: [jobWithOption] } as never);
+  vi.mocked(api.maintenance.getHistory).mockResolvedValue({ history: [] } as never);
+  vi.mocked(api.maintenance.getStats).mockResolvedValue({} as never);
+  vi.mocked(api.maintenance.getProgress).mockResolvedValue({} as never);
+  vi.mocked(api.maintenance.startJob).mockResolvedValue({} as never);
 }
 
 describe('Jobs', () => {
@@ -89,5 +114,20 @@ describe('Jobs', () => {
     const row = (await screen.findByText('library sync')).closest('[data-slot="item"]');
     expect(row?.className).toContain('border-destructive/30');
     expect(row?.className).not.toContain('red-500');
+  });
+
+  it('starts a job with the confirm dialog options the user toggled', async () => {
+    withJob();
+    const user = userEvent.setup();
+
+    render(<Jobs />);
+
+    await user.click(await screen.findByRole('button', { name: 'jobs.runJob' }));
+    await user.click(await screen.findByRole('checkbox', { name: 'Dry run' }));
+    await user.click(screen.getByRole('button', { name: 'jobs.startJob' }));
+
+    expect(api.maintenance.startJob).toHaveBeenCalledWith('normalize_players', {
+      dryRun: true,
+    });
   });
 });
