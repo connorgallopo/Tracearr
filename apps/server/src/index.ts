@@ -154,6 +154,13 @@ import {
   shutdownBackupQueue,
 } from './jobs/backupQueue.js';
 import {
+  initNewsletterQueues,
+  startNewsletterWorkers,
+  resyncNewsletterSchedules,
+  shutdownNewsletterQueues,
+} from './jobs/newsletterQueue.js';
+import { listNewsletters } from './services/newsletters/store.js';
+import {
   initPlexTokenRefreshQueue,
   startPlexTokenRefreshWorker,
   schedulePlexTokenRefresh,
@@ -607,6 +614,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
     await shutdownBackupQueue();
+    await shutdownNewsletterQueues();
     await shutdownPlexTokenRefreshQueue();
     await shutdownRunRetentionQueue();
   });
@@ -994,6 +1002,15 @@ async function initializeServices(app: FastifyInstance) {
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize backup queue');
     // Don't throw - scheduled backups are non-critical
+  }
+
+  try {
+    initNewsletterQueues(redisUrl);
+    startNewsletterWorkers();
+    await resyncNewsletterSchedules(await listNewsletters());
+    app.log.info('Newsletter queues initialized');
+  } catch (error) {
+    app.log.error({ err: error }, 'Failed to initialize newsletter queues');
   }
 
   // Initialize run retention queue (daily purge of aged automation runs)
@@ -1415,6 +1432,7 @@ async function start() {
         void shutdownVersionCheckQueue();
         void shutdownInactivityCheckQueue();
         void shutdownBackupQueue();
+        void shutdownNewsletterQueues();
         void shutdownPlexTokenRefreshQueue();
         void shutdownRunRetentionQueue();
         void app.close().then(() => process.exit(0));
@@ -1458,6 +1476,7 @@ async function start() {
           shutdownVersionCheckQueue(),
           shutdownInactivityCheckQueue(),
           shutdownBackupQueue(),
+          shutdownNewsletterQueues(),
           shutdownPlexTokenRefreshQueue(),
           shutdownRunRetentionQueue(),
         ]).catch((err) => {

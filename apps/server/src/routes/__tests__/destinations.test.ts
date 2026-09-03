@@ -36,6 +36,9 @@ vi.mock('../../services/notifications/destinations/registry.js', () => ({
   getDestinationType: vi.fn(() => ({ test: mockTest })),
 }));
 
+vi.mock('../../jobs/newsletterQueue.js', () => ({ onDestinationUnavailable: vi.fn() }));
+
+import { onDestinationUnavailable } from '../../jobs/newsletterQueue.js';
 import { automationsReferencingDestinations } from '../../services/notifications/destinationRefs.js';
 import {
   createDestination,
@@ -578,6 +581,7 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(204);
       expect(deleteDestination).toHaveBeenCalledWith('dest-1');
+      expect(onDestinationUnavailable).toHaveBeenCalledWith('dest-1');
     });
   });
 

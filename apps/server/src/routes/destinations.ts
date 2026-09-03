@@ -12,6 +12,7 @@ import {
   type DestinationKind,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
+import { onDestinationUnavailable } from '../jobs/newsletterQueue.js';
 import { automationsReferencingDestinations } from '../services/notifications/destinationRefs.js';
 import {
   createDestination,
@@ -173,6 +174,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       }
       throw error;
     }
+    if (row.enabled === false) await onDestinationUnavailable(row.id);
     const refs = await automationsReferencingDestinations();
     return toPublicDestination(row, refs.get(row.id)?.length ?? 0);
   });
@@ -195,6 +197,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
 
     await deleteDestination(current.id);
     closeTransporter(current.id);
+    await onDestinationUnavailable(current.id);
     return reply.code(204).send();
   });
 
