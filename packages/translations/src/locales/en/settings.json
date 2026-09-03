@@ -417,6 +417,7 @@
     "jellyfinEmby": "Jellyfin/Emby (Jellystat)",
     "step1": "1",
     "step2": "2",
+    "step3": "3",
     "apiKeyPlaceholder": "Your Tautulli API key",
     "skipUserNotFoundPlex": "User not found — The Plex user doesn't exist in Tracearr. Sync your server first to add all users.",
     "skipDuplicate": "Duplicate session — The session was already imported previously.",

@@ -5,6 +5,7 @@ import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
 import { Appearance } from '@/components/settings/general/Appearance';
 import { Locale } from '@/components/settings/general/Locale';
 import { Behavior } from '@/components/settings/general/Behavior';
+import { Import } from '@/components/settings/data/Import';
 import { Api } from '@/components/settings/data/Api';
 import { Connections } from '@/components/settings/servers/Connections';
 import { PosterSource } from '@/components/settings/servers/PosterSource';
@@ -12,7 +13,6 @@ import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
 import { Guest } from '@/components/settings/access/Guest';
 import { MobileDevices } from '@/components/settings/access/MobileDevices';
 import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
-import { ImportSettings } from '@/components/settings/ImportSettings';
 import { JobsSettings } from '@/components/settings/JobsSettings';
 import { BackupSettings } from '@/components/settings/BackupSettings';
 import { Destinations } from '@/components/settings/notifications/Destinations';
@@ -45,7 +45,7 @@ export function Settings() {
             <Route path="access/mobile" element={<MobileDevices />} />
             <Route path="access/remote" element={<RemoteAccess />} />
 
-            <Route path="data/import" element={<ImportSettings />} />
+            <Route path="data/import" element={<Import />} />
             <Route path="data/backup" element={<BackupSettings />} />
             <Route path="data/jobs" element={<JobsSettings />} />
             <Route path="data/api" element={<Api />} />
