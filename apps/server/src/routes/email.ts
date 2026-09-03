@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { emailSuppressionCreateSchema } from '@tracearr/shared';
+import { emailBrandingSchema, emailSuppressionCreateSchema } from '@tracearr/shared';
 import {
   UNSUBSCRIBE_TOKEN_MAX_LENGTH,
   verifyUnsubscribeToken,
@@ -11,6 +11,7 @@ import {
   listSuppressions,
   removeSuppression,
 } from '../services/newsletters/suppressions.js';
+import { getEmailBranding, saveEmailBranding } from '../services/notifications/emailBranding.js';
 import { firstIssueMessage } from '../utils/zod.js';
 
 const PUBLIC_RATE_LIMIT = { max: 60, timeWindow: '1 minute' };
@@ -64,6 +65,15 @@ export async function emailRoutes(app: FastifyInstance): Promise<void> {
     const removed = await removeSuppression(params.data.address);
     if (!removed) return reply.notFound('Address is not suppressed');
     return reply.code(204).send();
+  });
+
+  app.get('/branding', owner, async () => getEmailBranding());
+
+  app.put('/branding', owner, async (request, reply) => {
+    const parsed = emailBrandingSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply.badRequest(`Invalid request body: ${firstIssueMessage(parsed.error)}`);
+    return saveEmailBranding(parsed.data);
   });
 
   const publicRoute = { config: { rateLimit: PUBLIC_RATE_LIMIT } };

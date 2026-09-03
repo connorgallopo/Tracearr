@@ -147,6 +147,7 @@ export function buildDigestInput(
       title: w.title,
       year: w.year,
       plays: w.plays,
+      links: [],
     })),
     logoRef: opts.logoRef,
     unsubscribeUrl: opts.unsubscribeUrl,

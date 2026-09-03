@@ -17,6 +17,11 @@ vi.mock('../../services/newsletters/links.js', () => ({
 }));
 const store = vi.hoisted(() => ({ loadDelivery: vi.fn() }));
 vi.mock('../../services/newsletters/store.js', () => store);
+const branding = vi.hoisted(() => ({
+  getEmailBranding: vi.fn(),
+  saveEmailBranding: vi.fn(),
+}));
+vi.mock('../../services/notifications/emailBranding.js', () => branding);
 
 import { emailRoutes } from '../email.js';
 
@@ -147,5 +152,72 @@ describe('public unsubscribe', () => {
         timeWindow: '1 minute',
       });
     }
+  });
+});
+
+describe('branding', () => {
+  const block = {
+    senderName: 'Family Media',
+    logo: { mode: 'tracearr' as const },
+    accentColor: '#123456',
+    footerText: null,
+    postalAddress: null,
+    mailtoUnsubscribe: true,
+  };
+
+  it('returns the stored block to the owner', async () => {
+    branding.getEmailBranding.mockResolvedValue(block);
+    const app = await build(owner);
+    const res = await app.inject({ method: 'GET', url: '/email/branding' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual(block);
+  });
+
+  it('saves a valid block with its defaults filled and returns it', async () => {
+    branding.saveEmailBranding.mockImplementation(async (input: unknown) => input);
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'PUT',
+      url: '/email/branding',
+      payload: { senderName: ' Family Media ', accentColor: '#123456' },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(branding.saveEmailBranding).toHaveBeenCalledWith({
+      senderName: 'Family Media',
+      logo: { mode: 'tracearr' },
+      accentColor: '#123456',
+      footerText: null,
+      postalAddress: null,
+      mailtoUnsubscribe: false,
+    });
+    expect(res.json().senderName).toBe('Family Media');
+  });
+
+  it('rejects an invalid block with the first issue', async () => {
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'PUT',
+      url: '/email/branding',
+      payload: { accentColor: 'teal' },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toContain('hex color');
+    expect(branding.saveEmailBranding).not.toHaveBeenCalled();
+  });
+
+  it('is owner only', async () => {
+    const admin: AuthUser = {
+      userId: randomUUID(),
+      username: 'admin',
+      role: 'admin',
+      serverIds: [],
+    };
+    const app = await build(admin);
+    expect((await app.inject({ method: 'GET', url: '/email/branding' })).statusCode).toBe(403);
+    expect(
+      (await app.inject({ method: 'PUT', url: '/email/branding', payload: {} })).statusCode
+    ).toBe(403);
+    const anon = await build(null);
+    expect((await anon.inject({ method: 'GET', url: '/email/branding' })).statusCode).toBe(401);
   });
 });
