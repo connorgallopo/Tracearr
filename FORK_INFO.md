@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `7066c7a9`
-- Last shared upstream commit found during inspection: `64401f0c`
-- Latest upstream commit merged into the current working tree: `7066c7a9`
+- Source branch/SHA inspected: `main` at `5c7912a1`
+- Last shared upstream commit found during inspection: `5c7912a1`
+- Latest upstream commit merged into the current working tree: `5c7912a1`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -221,6 +221,17 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `5c7912a1` was merged into `develop` on September 3,
+  2026 (merge commit `a20477e3`). The merge retains upstream migrations
+  `0095` and `0096` in the upstream ledger while preserving the separate
+  Dispatcharr fork-migration ledger. It also carries upstream's TypeScript 7 /
+  Oxlint transition, `session.first_seen` automation trigger, map and browser
+  recovery improvements, user-merge hardening, dependency updates, and Crowdin
+  translations. Dispatcharr realtime processing remains leader-gated, its
+  polling/library exclusions remain in place, and the progress hook keeps its
+  server timestamp anchoring while using the upstream fallback anchor for
+  sessions that do not provide one.
 
 - Upstream `main` at `7066c7a9` (Tracearr `v2.2.2`) was merged into
   `develop` on August 28, 2026 (merge commit `f9552a54`). The web automation
