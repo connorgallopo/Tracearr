@@ -61,11 +61,11 @@
         "message": "Plex 계정 연결이 해제되었습니다"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
+        "title": "Plex 계정 재인증 완료",
+        "message_one": "서버 {{count}}대가 다시 연결되었습니다",
+        "message_other": "서버 {{count}}대가 다시 연결되었습니다",
+        "messageNoServers": "계정 토큰이 업데이트되었습니다",
+        "partial": "토큰을 업데이트했지만 {{names}}에서 아직 거부되었습니다",
         "unmatched": ""
       },
       "agentAdded": {
@@ -85,16 +85,16 @@
         "message": "{{name}} 작업이 성공적으로 끝났습니다"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "자동화가 생성되었습니다",
+        "message": "자동화를 생성했습니다"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "자동화가 업데이트되었습니다",
+        "message": "자동화를 업데이트했습니다"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "자동화가 삭제되었습니다",
+        "message": "자동화를 삭제했습니다"
       },
       "streamTerminated": {
         "title": "스트림 종료됨",
@@ -155,15 +155,15 @@
         "message": "이제 설정을 계속 진행할 수 있습니다"
       },
       "usersMerged": {
-        "title": "",
-        "automationsKept": ""
+        "title": "사용자를 통합했습니다",
+        "automationsKept": "대상 사용자의 설정을 유지한 자동화: {{names}}"
       },
       "serverUserSplit": {
-        "title": ""
+        "title": "계정을 별도 사용자로 분리했습니다"
       },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationSaved": "알림 대상이 저장되었습니다",
+      "destinationDeleted": "알림 대상이 삭제되었습니다",
+      "destinationTestSent": "테스트 알림을 보냈습니다"
     },
     "error": {
       "serverAddFailed": "서버를 추가하지 못했습니다",
@@ -175,9 +175,9 @@
       "dismissFailed": "위반을 해제하지 못했습니다",
       "authFailed": "인증에 실패했습니다",
       "webhookTestFailed": "Webhook 테스트에 실패했습니다",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "자동화를 생성하지 못했습니다",
+      "automationUpdateFailed": "자동화를 업데이트하지 못했습니다",
+      "automationDeleteFailed": "자동화를 삭제하지 못했습니다",
       "streamTerminateFailed": "스트림을 종료하지 못했습니다",
       "serverUrlUpdateFailed": "서버 URL을 업데이트하지 못했습니다",
       "serverUpdateFailed": "서버를 업데이트하지 못했습니다",
@@ -195,7 +195,7 @@
       "routingUpdateFailed": "라우팅을 업데이트하지 못했습니다",
       "clipboardFailed": "클립보드에 복사하지 못했습니다",
       "plexUnlinkFailed": "Plex 계정 연결을 해제하지 못했습니다",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "Plex 계정을 다시 인증하지 못했습니다",
       "agentAddFailed": "에이전트를 추가하지 못했습니다",
       "agentUpdateFailed": "에이전트를 업데이트하지 못했습니다",
       "agentRemoveFailed": "에이전트를 제거하지 못했습니다",
@@ -205,16 +205,16 @@
       "jobLoadFailed": "유지관리 작업을 불러오지 못했습니다",
       "invalidUrl": "올바르지 않은 URL입니다",
       "plexDirectUrl": "plex.direct URL은 릴레이 주소라서 여기에서 사용할 수 없습니다. 직접 연결되는 IP 주소나 호스트 이름을 사용하세요.",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
+      "userMergeFailed": "사용자를 통합하지 못했습니다",
+      "serverUserSplitFailed": "계정을 분리하지 못했습니다",
       "invalidClaimCode": {
         "title": "클레임 코드가 올바르지 않습니다",
         "message": "서버 로그를 확인하세요"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationSaveFailed": "알림 대상을 저장하지 못했습니다: {{error}}",
+      "destinationDeleteFailed": "알림 대상을 삭제하지 못했습니다: {{error}}",
+      "destinationTestFailed": "테스트에 실패했습니다: {{error}}",
+      "destinationInUse": "다음 규칙에서 아직 사용 중입니다: {{rules}}"
     },
     "warning": {
       "jobFailed": {
