@@ -233,6 +233,25 @@ describe('delivery worker', () => {
     expect(markRecipientFailed).toHaveBeenCalledWith('r1', error);
   });
 
+  it('moves an exhausted delivery to the dlq under a job id that a later retry cannot collide with', () => {
+    const dlq = queues.get('newsletter-deliveries-dlq')!;
+    const onFailed = deliveryWorker().on.mock.calls.find(([event]) => event === 'failed')?.[1] as (
+      job: unknown,
+      error: unknown
+    ) => void;
+    const job = {
+      id: 'job-7',
+      data: { sendId: 's', recipientId: 'r1' },
+      attemptsMade: 3,
+      opts: { attempts: 3 },
+    };
+
+    onFailed(job, new Error('smtp down'));
+    expect(dlq.add).toHaveBeenCalledWith('dlq-delivery', job.data, {
+      jobId: expect.stringMatching(/^dlq-job-7-\d+$/),
+    });
+  });
+
   it('does not record the failure before the last attempt', async () => {
     const error = new Error('smtp down');
     vi.mocked(deliverRecipient).mockRejectedValueOnce(error);

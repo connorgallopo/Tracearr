@@ -163,6 +163,10 @@ describe('deliverRecipient', () => {
 
   it('sends no unsubscribe headers without an external url', async () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
+    store.loadDelivery.mockResolvedValue({
+      ...ctx(),
+      send: { ...ctx().send, html: '<p>Hi</p>', text: 'Hi' },
+    });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
     const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(mail.headers).toBeUndefined();
@@ -198,6 +202,14 @@ describe('deliverRecipient', () => {
     expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['logo', 'm1']);
     expect(mockProxy).toHaveBeenCalledTimes(1);
     expect(mockProxy).toHaveBeenCalledWith(expect.objectContaining({ imagePath: '/t' }));
+  });
+
+  it('refuses to send a snapshot whose unsubscribe placeholder can no longer be filled in', async () => {
+    mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
+    await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
+      'The external URL was removed after this send was rendered'
+    );
+    expect(mockSendMail).not.toHaveBeenCalled();
   });
 
   it('is a no-op when the row is not queued or the send is not sending', async () => {

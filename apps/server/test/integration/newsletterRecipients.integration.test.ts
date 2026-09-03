@@ -7,9 +7,9 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { eq } from 'drizzle-orm';
-import { seedMultipleUsers } from '@tracearr/test-utils';
+import { seedBasicOwner, seedMultipleUsers } from '@tracearr/test-utils';
 import { db } from '../../src/db/client.js';
-import { emailSuppressions, serverUsers, users } from '../../src/db/schema.js';
+import { emailSuppressions, serverUsers, servers, users } from '../../src/db/schema.js';
 import { loadCandidates } from '../../src/services/newsletters/recipients.js';
 import {
   addSuppression,
@@ -51,6 +51,32 @@ describe('recipient candidates', () => {
     const scoped = await loadCandidates(['00000000-0000-4000-8000-000000000000']);
     expect(scoped).toEqual([]);
     expect(seeded).toBeDefined();
+  });
+
+  it("orders an identity's account emails by the account's own age", async () => {
+    const seeded = await seedBasicOwner();
+    const older = new Date('2026-01-01T00:00:00Z');
+    const newer = new Date('2026-06-01T00:00:00Z');
+    const [second] = await db
+      .insert(servers)
+      .values({ name: 'Second Plex', type: 'plex', url: 'http://localhost:32401', token: 'tok' })
+      .returning();
+    // The younger account is the one already in the table, so row order alone would answer wrong.
+    await db
+      .update(serverUsers)
+      .set({ email: 'newer@example.com', createdAt: newer })
+      .where(eq(serverUsers.userId, seeded.userId));
+    await db.insert(serverUsers).values({
+      userId: seeded.userId,
+      serverId: second!.id,
+      externalId: 'plex-user-2',
+      username: 'testowner',
+      email: 'older@example.com',
+      createdAt: older,
+    });
+
+    const candidate = (await loadCandidates([])).find((c) => c.userId === seeded.userId);
+    expect(candidate?.accountEmails).toEqual(['older@example.com', 'newer@example.com']);
   });
 
   it('suppressions are lowercased, idempotent, and queryable by set', async () => {

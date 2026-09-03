@@ -93,6 +93,9 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   const unsubscribeUrl = base
     ? `${base}/api/v1/email/unsubscribe/${signUnsubscribeToken(ctx.recipient.id)}`
     : null;
+  if (!unsubscribeUrl && ctx.send.html.includes(UNSUBSCRIBE_PLACEHOLDER)) {
+    throw new UnrecoverableError('The external URL was removed after this send was rendered');
+  }
 
   const mode = resolveImageMode(ctx.newsletter.imageMode, externalUrl);
   let html = substitutePosterRefs(ctx.send.html, ctx.send.posters, mode, externalUrl);

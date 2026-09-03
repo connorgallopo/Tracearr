@@ -90,10 +90,6 @@ export async function runNewsletter(
     const { externalUrl } = await getNetworkSettings();
     const { data, posters } = await assembleDigest(newsletter, window);
 
-    const recipients: ResolvedRecipient[] = testAddress
-      ? [{ address: testAddress.trim().toLowerCase(), userId: null, name: null, suppressed: false }]
-      : (await resolveRecipients(newsletter)).recipients;
-
     if (data.isEmpty && newsletter.skipWhenEmpty && trigger !== 'test') {
       const send = await insertSend({
         ...base,
@@ -104,6 +100,10 @@ export async function runNewsletter(
       });
       return done({ outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] });
     }
+
+    const recipients: ResolvedRecipient[] = testAddress
+      ? [{ address: testAddress.trim().toLowerCase(), userId: null, name: null, suppressed: false }]
+      : (await resolveRecipients(newsletter)).recipients;
 
     const deliverable = recipients.filter((r) => !r.suppressed);
     if (deliverable.length === 0) {

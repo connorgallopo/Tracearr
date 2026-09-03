@@ -244,7 +244,7 @@ describe('newsletter routes', () => {
     expect(queue.removeNewsletterSchedule).toHaveBeenCalledWith(ID);
   });
 
-  it('send now and test enqueue runs, and send now answers 409 while a send is open', async () => {
+  it('send now and test enqueue runs, and both answer 409 while a send is open', async () => {
     const app = await build(owner);
     let res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/send` });
     expect(res.statusCode).toBe(202);
@@ -264,9 +264,18 @@ describe('newsletter routes', () => {
       testAddress: 'me@example.com',
     });
     store.findOpenSend.mockResolvedValue({ id: 'open' });
+    queue.enqueueNewsletterRun.mockClear();
     expect((await app.inject({ method: 'POST', url: `/newsletters/${ID}/send` })).statusCode).toBe(
       409
     );
+    const blocked = await app.inject({
+      method: 'POST',
+      url: `/newsletters/${ID}/test`,
+      payload: { address: 'me@example.com' },
+    });
+    expect(blocked.statusCode).toBe(409);
+    expect(blocked.json().message).toBe('A send is already in progress');
+    expect(queue.enqueueNewsletterRun).not.toHaveBeenCalled();
   });
 
   it('preview renders without writing and reports counts and recipients', async () => {

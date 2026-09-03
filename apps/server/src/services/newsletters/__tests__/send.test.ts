@@ -123,6 +123,12 @@ beforeEach(() => {
   });
 });
 
+function firstSend(): { html?: string } {
+  const [first] = store.insertSend.mock.calls[0] ?? [];
+  expect(first).toBeDefined();
+  return first as { html?: string };
+}
+
 describe('runNewsletter', () => {
   it('renders once, stores the send with placeholders and posters, inserts one row per recipient, and returns the queued ids', async () => {
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
@@ -159,8 +165,9 @@ describe('runNewsletter', () => {
 
   it('renders the subject template with the server name, dates and item count', async () => {
     await runNewsletter(NEWSLETTER.id, 'manual');
-    const html = String((store.insertSend.mock.calls[0]?.[0] as { html: string }).html);
-    expect(html).toMatch(/What&#x27;s new on Basement \(\w{3} \d{1,2}, \d{4}\) 1/);
+    expect(String(firstSend().html)).toMatch(
+      /What&#x27;s new on Basement \(\w{3} \d{1,2}, \d{4}\) 1/
+    );
   });
 
   it('skips an empty window with a recorded send and no recipients', async () => {
@@ -172,6 +179,7 @@ describe('runNewsletter', () => {
       html: null,
     });
     expect(store.insertRecipients).not.toHaveBeenCalled();
+    expect(mockResolve).not.toHaveBeenCalled();
   });
 
   it('a test send goes to the typed address only, bypasses suppression, and renders the empty state', async () => {
@@ -182,9 +190,7 @@ describe('runNewsletter', () => {
     expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
       { address: 'me@example.com', userId: null, status: 'queued' },
     ]);
-    expect(String((store.insertSend.mock.calls[0]?.[0] as { html: string }).html)).toContain(
-      'Nothing new this period'
-    );
+    expect(String(firstSend().html)).toContain('Nothing new this period');
   });
 
   it('fails with a recorded reason when the destination is missing, disabled, or needs re-entry', async () => {
@@ -235,7 +241,7 @@ describe('runNewsletter', () => {
   it('uses the reply line instead of a placeholder when there is no external url', async () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
     await runNewsletter(NEWSLETTER.id, 'schedule');
-    const html = String((store.insertSend.mock.calls[0]?.[0] as { html: string }).html);
+    const html = String(firstSend().html);
     expect(html).toContain('Reply to this email to unsubscribe');
     expect(html).not.toContain('{{unsubscribe_url}}');
   });

@@ -127,7 +127,8 @@ export function startNewsletterWorkers(): void {
     if (!exhausted && !(error instanceof UnrecoverableError)) return;
     if (dlqQueue) {
       void dlqQueue
-        .add('dlq-delivery', job.data, { jobId: `dlq-${job.id}` })
+        // A recipient retried after retry-failed reuses its job id, so the timestamp keeps the second trip from being dropped as a duplicate.
+        .add('dlq-delivery', job.data, { jobId: `dlq-${job.id}-${Date.now()}` })
         .catch((err: unknown) =>
           console.error('[Newsletters] could not move delivery to the DLQ:', err)
         );

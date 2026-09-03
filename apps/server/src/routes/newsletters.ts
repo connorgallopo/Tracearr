@@ -220,6 +220,7 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     const row = await getNewsletter(params.data.id);
     if (!row) return reply.notFound('Newsletter not found');
     if (!row.destinationId) return reply.badRequest('Set an email destination first');
+    if (await findOpenSend(row.id)) return reply.conflict('A send is already in progress');
     const jobId = await enqueueNewsletterRun({
       newsletterId: row.id,
       trigger: 'test',
