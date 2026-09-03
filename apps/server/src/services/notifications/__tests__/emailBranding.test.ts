@@ -7,6 +7,10 @@ vi.mock('../../settings.js', () => ({
   getSetting: (...a: unknown[]) => mockGetSetting(...a) as unknown,
   setSetting: (...a: unknown[]) => mockSetSetting(...a) as unknown,
 }));
+const mockWarn = vi.hoisted(() => vi.fn());
+vi.mock('../../../utils/logger.js', () => ({
+  createLogger: () => ({ info: vi.fn(), warn: mockWarn, error: vi.fn(), debug: vi.fn() }),
+}));
 
 import { getEmailBranding, resolveEmailBranding, saveEmailBranding } from '../emailBranding.js';
 
@@ -30,6 +34,10 @@ describe('getEmailBranding', () => {
   it('falls back to the defaults when the stored block fails the schema', async () => {
     mockGetSetting.mockResolvedValue({ accentColor: 'teal', bogus: 1 });
     expect(await getEmailBranding()).toEqual(DEFAULT_EMAIL_BRANDING);
+    expect(mockWarn).toHaveBeenCalledWith(
+      'Stored email branding failed validation; using defaults',
+      { issue: 'accentColor: Expected a hex color like #0ea0b3' }
+    );
   });
 });
 

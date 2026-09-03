@@ -385,6 +385,9 @@ describe('newsletter send retention', () => {
       .from(emailSuppressions)
       .where(eq(emailSuppressions.address, suppressionSeed!.address));
     expect(survivingSuppressions).toEqual([{ sourceSendId: null }]);
+    await db
+      .delete(emailSuppressions)
+      .where(eq(emailSuppressions.address, suppressionSeed!.address));
     await db.delete(newsletters).where(eq(newsletters.id, nl!.id));
   });
 });

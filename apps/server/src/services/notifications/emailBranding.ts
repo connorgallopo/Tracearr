@@ -4,7 +4,11 @@ import {
   type EmailBrandingSettings,
 } from '@tracearr/shared';
 import type { EmailBranding } from '@tracearr/emails';
+import { createLogger } from '../../utils/logger.js';
+import { firstIssueMessage } from '../../utils/zod.js';
 import { getSetting, setSetting } from '../settings.js';
+
+const logger = createLogger('email-branding');
 
 export interface ResolvedEmailBranding {
   branding: EmailBranding;
@@ -16,7 +20,13 @@ export interface ResolvedEmailBranding {
 export async function getEmailBranding(): Promise<EmailBrandingSettings> {
   const stored = await getSetting('emailBranding');
   const parsed = emailBrandingSchema.safeParse(stored ?? {});
-  return parsed.success ? parsed.data : DEFAULT_EMAIL_BRANDING;
+  if (parsed.success) return parsed.data;
+  if (stored !== null) {
+    logger.warn('Stored email branding failed validation; using defaults', {
+      issue: firstIssueMessage(parsed.error),
+    });
+  }
+  return DEFAULT_EMAIL_BRANDING;
 }
 
 export async function saveEmailBranding(

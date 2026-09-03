@@ -413,7 +413,7 @@ export async function loadWindowItems(
   return (result.rows as unknown as RawItemRow[]).map(mapItemRow);
 }
 
-/** Rows for a set of (server, rating key) pairs, restricted to one media type. */
+/** (server_id, rating_key) alone is unique on library_items; the media type filter rejects a key whose item is no longer the type the caller expects. */
 export async function loadItemRows(
   keys: { serverId: string; ratingKey: string }[],
   mediaType: 'movie' | 'show'

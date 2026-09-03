@@ -208,35 +208,26 @@ describe('processRunRetention', () => {
 
     expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledTimes(1);
   });
-});
 
-describe('newsletter sends', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockDb.execute.mockResolvedValue({ rowCount: 0, rows: [] });
-    stageAutomations(
-      [{ id: NOTIFY_ID, retentionDays: null }],
-      [{ id: POLICY_ID, retentionDays: null }]
-    );
-  });
-
-  it('purges closed sends after a year and clears closed snapshots after 90 days', async () => {
-    const before = Date.now();
-    const result = await processRunRetention();
-    const queries = rendered();
-    const purge = queries.find((q) => q.sql.startsWith('delete from newsletter_sends'));
-    const prune = queries.find((q) => q.sql.startsWith('update newsletter_sends'));
-    expect(purge?.sql).toBe(
-      'delete from newsletter_sends where finished_at is not null and started_at < $1'
-    );
-    expect(prune?.sql).toBe(
-      "update newsletter_sends set html = null, text = null, posters = '{}'::jsonb where finished_at is not null and html is not null and started_at < $1"
-    );
-    const purgeCutoff = (purge!.params[0] as Date).getTime();
-    const pruneCutoff = (prune!.params[0] as Date).getTime();
-    expect(Math.abs(before - 365 * 86_400_000 - purgeCutoff)).toBeLessThan(5_000);
-    expect(Math.abs(before - 90 * 86_400_000 - pruneCutoff)).toBeLessThan(5_000);
-    expect(result.newsletterSendsPurged).toBe(0);
-    expect(result.newsletterSnapshotsPruned).toBe(0);
+  describe('newsletter sends', () => {
+    it('purges closed sends after a year and clears closed snapshots after 90 days', async () => {
+      const before = Date.now();
+      const result = await processRunRetention();
+      const queries = rendered();
+      const purge = queries.find((q) => q.sql.startsWith('delete from newsletter_sends'));
+      const prune = queries.find((q) => q.sql.startsWith('update newsletter_sends'));
+      expect(purge?.sql).toBe(
+        'delete from newsletter_sends where finished_at is not null and started_at < $1'
+      );
+      expect(prune?.sql).toBe(
+        "update newsletter_sends set html = null, text = null, posters = '{}'::jsonb where finished_at is not null and html is not null and started_at < $1"
+      );
+      const purgeCutoff = (purge!.params[0] as Date).getTime();
+      const pruneCutoff = (prune!.params[0] as Date).getTime();
+      expect(Math.abs(before - 365 * 86_400_000 - purgeCutoff)).toBeLessThan(5_000);
+      expect(Math.abs(before - 90 * 86_400_000 - pruneCutoff)).toBeLessThan(5_000);
+      expect(result.newsletterSendsPurged).toBe(0);
+      expect(result.newsletterSnapshotsPruned).toBe(0);
+    });
   });
 });

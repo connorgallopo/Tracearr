@@ -96,12 +96,14 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   const transport = await openTransport(ctx);
   const { externalUrl } = await getNetworkSettings();
   const base = externalUrl?.replace(/\/$/, '') ?? null;
-  const unsubscribeUrl = base
-    ? `${base}/api/v1/email/unsubscribe/${signUnsubscribeToken(ctx.recipient.id)}`
+  const links = base
+    ? {
+        unsubscribe: `${base}/api/v1/email/unsubscribe/${signUnsubscribeToken(ctx.recipient.id)}`,
+        view: `${base}/api/v1/newsletters/view/${ctx.send.viewToken}`,
+      }
     : null;
-  const viewUrl = base ? `${base}/api/v1/newsletters/view/${ctx.send.viewToken}` : null;
   if (
-    !base &&
+    !links &&
     (ctx.send.html.includes(UNSUBSCRIBE_PLACEHOLDER) || ctx.send.html.includes(VIEW_PLACEHOLDER))
   ) {
     throw new UnrecoverableError('The external URL was removed after this send was rendered');
@@ -116,13 +118,13 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
           Object.entries(ctx.send.posters).filter(([cardId]) => html.includes(`cid:${cardId}`))
         )
       : {};
-  if (unsubscribeUrl && viewUrl) {
+  if (links) {
     html = html
-      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl)
-      .replaceAll(VIEW_PLACEHOLDER, viewUrl);
+      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, links.unsubscribe)
+      .replaceAll(VIEW_PLACEHOLDER, links.view);
     text = text
-      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl)
-      .replaceAll(VIEW_PLACEHOLDER, viewUrl);
+      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, links.unsubscribe)
+      .replaceAll(VIEW_PLACEHOLDER, links.view);
   }
   const attachments: EmailAttachment[] = [];
   const logo = readLogoPng();
@@ -137,10 +139,10 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   attachments.push(...(await posterAttachments(cid)));
 
   const { mailtoUnsubscribe } = await getEmailBranding();
-  const listUnsubscribe = unsubscribeUrl
+  const listUnsubscribe = links
     ? mailtoUnsubscribe && transport.config.replyTo
-      ? `<mailto:${transport.config.replyTo}?subject=unsubscribe>, <${unsubscribeUrl}>`
-      : `<${unsubscribeUrl}>`
+      ? `<mailto:${transport.config.replyTo}?subject=unsubscribe>, <${links.unsubscribe}>`
+      : `<${links.unsubscribe}>`
     : null;
 
   const domain = transport.config.fromAddress.split('@')[1] ?? 'tracearr.local';

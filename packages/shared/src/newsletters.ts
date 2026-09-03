@@ -158,6 +158,15 @@ export type EmailLogoMode = (typeof EMAIL_LOGO_MODES)[number];
 const DEFAULT_ACCENT_COLOR = '#0ea0b3';
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Expected a hex color like #0ea0b3');
 
+/** z.url() strips embedded CR/LF and parses what's left, so control characters are rejected before the URL parse ever sees them. */
+const logoUrl = z
+  .string()
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point of this check
+  .refine((value) => !/[\u0000-\u001f\u007f]/.test(value), {
+    message: 'URL must not contain control characters',
+  })
+  .pipe(z.url({ protocol: /^https?$/ }).max(500));
+
 export const emailBrandingSchema = z.strictObject({
   /** Null means the first server in the newsletter's scope, resolved at render time. */
   senderName: z.string().trim().min(1).max(100).nullable().default(null),
@@ -165,7 +174,7 @@ export const emailBrandingSchema = z.strictObject({
     .discriminatedUnion('mode', [
       z.strictObject({ mode: z.literal('tracearr') }),
       z.strictObject({ mode: z.literal('none') }),
-      z.strictObject({ mode: z.literal('url'), url: z.url({ protocol: /^https?$/ }).max(500) }),
+      z.strictObject({ mode: z.literal('url'), url: logoUrl }),
     ])
     .default({ mode: 'tracearr' }),
   accentColor: hexColor.default(DEFAULT_ACCENT_COLOR),

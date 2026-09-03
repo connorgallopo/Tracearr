@@ -94,7 +94,7 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
   };
 }
 
-/** The heaviest digest buildDigestInput can emit: every section at its cap, three links per movie and show, two per artist. */
+/** The heaviest digest buildDigestInput can emit: every section at its cap, three links per movie and show, two per artist and most-watched card. */
 function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
   const movies = Array.from({ length: sectionMax }, (_, i) => {
     const n = 100 + i;

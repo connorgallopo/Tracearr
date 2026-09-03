@@ -49,6 +49,7 @@ import {
   toSendSummary,
   updateNewsletter,
   type NewsletterRow,
+  type SendRow,
 } from '../services/newsletters/store.js';
 import { computeWindow } from '../services/newsletters/window.js';
 import { getDestination } from '../services/notifications/destinationStore.js';
@@ -91,6 +92,12 @@ async function validateReferences(input: {
 async function publicOf(row: NewsletterRow): Promise<Newsletter> {
   const [last, next] = await Promise.all([lastSend(row.id), nextRunAt(row.id).catch(() => null)]);
   return toPublicNewsletter(row, last, next);
+}
+
+/** The send when it belongs to the newsletter; null otherwise, so callers reply notFound without leaking a cross-newsletter row. */
+async function ownedSend(newsletterId: string, sendId: string): Promise<SendRow | null> {
+  const send = await getSend(sendId);
+  return send && send.newsletterId === newsletterId ? send : null;
 }
 
 export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
@@ -281,8 +288,8 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:id/sends/:sendId', owner, async (request, reply) => {
     const params = sendParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
-    const send = await getSend(params.data.sendId);
-    if (!send || send.newsletterId !== params.data.id) return reply.notFound('Send not found');
+    const send = await ownedSend(params.data.id, params.data.sendId);
+    if (!send) return reply.notFound('Send not found');
     const recipients = await listRecipients(send.id);
     return { ...toSendSummary(send), recipients: recipients.map(toRecipient) };
   });
@@ -290,8 +297,8 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:id/sends/:sendId/html', owner, async (request, reply) => {
     const params = sendParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
-    const send = await getSend(params.data.sendId);
-    if (!send || send.newsletterId !== params.data.id) return reply.notFound('Send not found');
+    const send = await ownedSend(params.data.id, params.data.sendId);
+    if (!send) return reply.notFound('Send not found');
     const html = snapshotForBrowser(send);
     if (!html) return reply.notFound('The snapshot has been pruned');
     const body: NewsletterSendHtml = { subject: send.subject, html };
@@ -301,8 +308,8 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
   app.post('/:id/sends/:sendId/retry-failed', owner, async (request, reply) => {
     const params = sendParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
-    const send = await getSend(params.data.sendId);
-    if (!send || send.newsletterId !== params.data.id) return reply.notFound('Send not found');
+    const send = await ownedSend(params.data.id, params.data.sendId);
+    if (!send) return reply.notFound('Send not found');
     if (send.html === null)
       return reply.conflict('The snapshot for this send has been pruned; nothing can be resent');
     const ids = await resetFailedRecipients(send.id);

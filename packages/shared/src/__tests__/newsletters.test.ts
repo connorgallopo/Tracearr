@@ -182,6 +182,14 @@ describe('emailBrandingSchema', () => {
     );
   });
 
+  it('rejects a logo URL containing embedded control characters', () => {
+    expect(
+      emailBrandingSchema.safeParse({
+        logo: { mode: 'url', url: 'https://x.test/logo.png\r\nEvil-Header: 1' },
+      }).success
+    ).toBe(false);
+  });
+
   it('requires a six-digit hex accent and trims the text fields', () => {
     expect(emailBrandingSchema.safeParse({ accentColor: '0ea0b3' }).success).toBe(false);
     expect(emailBrandingSchema.safeParse({ accentColor: '#abc' }).success).toBe(false);

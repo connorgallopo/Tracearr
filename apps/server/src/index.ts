@@ -1488,7 +1488,7 @@ async function start() {
           shutdownRunRetentionQueue(),
         ])
           .finally(() => closeAllTransporters())
-          .catch((err) => {
+          .catch((err: unknown) => {
             app.log.error({ err }, 'Error shutting down queues during maintenance');
           });
 
