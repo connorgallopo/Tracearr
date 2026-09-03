@@ -46,8 +46,8 @@ vi.mock('@/components/settings/data/Import', () => ({
 vi.mock('@/components/settings/JobsSettings', () => ({
   JobsSettings: () => <div>jobs settings</div>,
 }));
-vi.mock('@/components/settings/BackupSettings', () => ({
-  BackupSettings: () => <div>backup settings</div>,
+vi.mock('@/components/settings/data/Backup', () => ({
+  Backup: () => <div>backup settings</div>,
 }));
 vi.mock('@/components/settings/notifications/Destinations', () => ({
   Destinations: () => <div>destinations</div>,
@@ -115,10 +115,17 @@ describe('Settings routes', () => {
   });
 
   it('lays the nav beside a container-query-capped content column', () => {
-    renderAt('/settings/general/behavior');
+    renderAt('/settings/general/appearance');
 
-    const content = screen.getByText('behavior settings').parentElement;
+    const content = screen.getByText('appearance settings').parentElement;
     expect(content).toHaveClass('min-w-0', 'max-w-4xl');
     expect(content?.parentElement).toHaveClass('@3xl/settings:grid-cols-[13rem_minmax(0,1fr)]');
+  });
+
+  it('widens the one settings surface with a real grid', () => {
+    renderAt('/settings/data/backup');
+
+    const content = screen.getByText('backup settings').parentElement;
+    expect(content).toHaveClass('min-w-0', 'max-w-6xl');
   });
 });

@@ -5,8 +5,6 @@ import { toast } from 'sonner';
 import {
   Archive,
   ArrowLeft,
-  Download,
-  Trash2,
   DatabaseBackup,
   Upload,
   Loader2,
@@ -26,12 +24,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Field, FieldLabel, FieldDescription } from '@/components/ui/field';
+import { AutosaveNumberField } from '@/components/ui/autosave-field';
 import { api } from '@/lib/api';
 import { formatBytes } from '@/lib/formatters';
 import { useMaintenanceMode, MAINTENANCE_EVENT } from '@/hooks/useMaintenanceMode';
+import { SettingsSection } from '@/components/settings/shell/SettingsSection';
+import { BetaBadge } from '@/components/settings/shared/BetaBadge';
+import { BackupHistory } from './BackupHistory';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -108,19 +111,6 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
     [uploadMutation]
   );
 
-  const typeLabel = (type: string) => {
-    switch (type) {
-      case 'manual':
-        return t('backup.typeManual');
-      case 'scheduled':
-        return t('backup.typeScheduled');
-      case 'uploaded':
-        return t('backup.typeUploaded');
-      default:
-        return type;
-    }
-  };
-
   return (
     <>
       <Card>
@@ -128,9 +118,7 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
           <CardTitle className="flex items-center gap-2">
             <Archive className="h-5 w-5" />
             {t('backup.title')}
-            <span className="rounded bg-amber-500/10 px-2 py-1 text-sm leading-normal font-semibold tracking-wide text-amber-500">
-              BETA
-            </span>
+            <BetaBadge />
           </CardTitle>
           <CardDescription>
             {t('backup.description', { backupDir: info?.backupDir ?? '/data/backup' })}
@@ -170,19 +158,19 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
 
           {(databaseSize != null || freeSpace != null) && (
             <div className="space-y-2">
-              <div className="text-muted-foreground space-y-0.5 text-sm">
+              <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm tabular-nums">
                 {databaseSize != null && (
-                  <p>{t('backup.databaseSize', { size: formatBytes(databaseSize, 2) })}</p>
+                  <span>{t('backup.databaseSize', { size: formatBytes(databaseSize, 2) })}</span>
                 )}
                 {freeSpace != null && (
-                  <p>{t('backup.freeSpace', { size: formatBytes(freeSpace, 2) })}</p>
+                  <span>{t('backup.freeSpace', { size: formatBytes(freeSpace, 2) })}</span>
                 )}
               </div>
               {lowDiskSpace && (
-                <div className="flex items-center gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-400">
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
-                  {t('backup.lowDiskSpace')}
-                </div>
+                <Alert variant="warning">
+                  <AlertTriangle />
+                  <AlertDescription>{t('backup.lowDiskSpace')}</AlertDescription>
+                </Alert>
               )}
             </div>
           )}
@@ -190,64 +178,12 @@ function BackupCard({ onRestore }: { onRestore: (backup: BackupListItem) => void
           {/* Backup History */}
           <div>
             <h3 className="mb-3 text-sm font-medium">{t('backup.backupHistory')}</h3>
-            {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            ) : !backups || backups.length === 0 ? (
-              <p className="text-muted-foreground py-4 text-center text-sm">
-                {t('backup.noBackups')}
-              </p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-left">
-                      <th className="pr-4 pb-2 font-medium">{t('backup.filename')}</th>
-                      <th className="pr-4 pb-2 font-medium">{t('backup.size')}</th>
-                      <th className="pr-4 pb-2 font-medium">{t('backup.date')}</th>
-                      <th className="pr-4 pb-2 font-medium">{t('backup.type')}</th>
-                      <th className="pr-4 pb-2 font-medium">{t('backup.version')}</th>
-                      <th className="pb-2 text-right font-medium">{t('backup.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {backups.map((backup) => (
-                      <tr key={backup.filename} className="border-b last:border-0">
-                        <td className="py-2 pr-4 font-mono text-xs">{backup.filename}</td>
-                        <td className="py-2 pr-4">{formatBytes(backup.size, 2)}</td>
-                        <td className="py-2 pr-4">{formatDate(backup.createdAt)}</td>
-                        <td className="py-2 pr-4">{typeLabel(backup.type)}</td>
-                        <td className="py-2 pr-4">{backup.metadata.app.version}</td>
-                        <td className="py-2 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button variant="ghost" size="sm" onClick={() => onRestore(backup)}>
-                              <DatabaseBackup className="mr-1 h-3.5 w-3.5" />
-                              {t('backup.restoreAction')}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => void api.backup.download(backup.filename)}
-                            >
-                              <Download className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDeleteTarget(backup.filename)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <BackupHistory
+              backups={backups ?? []}
+              isLoading={isLoading}
+              onRestore={onRestore}
+              onDelete={setDeleteTarget}
+            />
           </div>
         </CardContent>
       </Card>
@@ -321,9 +257,7 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
         <CardTitle className="flex items-center gap-2">
           <DatabaseBackup className="h-5 w-5" />
           {t('backup.restore.title')}
-          <span className="rounded bg-amber-500/10 px-2 py-1 text-sm leading-normal font-semibold tracking-wide text-amber-500">
-            BETA
-          </span>
+          <BetaBadge />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -391,14 +325,10 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
 
         {/* Warning */}
         {!isRestoring && canStartRestore && (
-          <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-              <p className="text-sm text-amber-700 dark:text-amber-400">
-                {t('backup.restore.warning')}
-              </p>
-            </div>
-          </div>
+          <Alert variant="warning">
+            <AlertTriangle />
+            <AlertDescription>{t('backup.restore.warning')}</AlertDescription>
+          </Alert>
         )}
 
         {/* Progress display during restore */}
@@ -410,9 +340,9 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
               return (
                 <div key={phase} className="flex items-center gap-3 text-sm">
                   {isDone ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                    <CheckCircle2 className="text-success h-4 w-4 shrink-0" />
                   ) : isActive ? (
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-blue-500" />
+                    <Loader2 className="text-primary h-4 w-4 shrink-0 animate-spin" />
                   ) : (
                     <span className="bg-muted h-4 w-4 shrink-0 rounded-full" />
                   )}
@@ -435,27 +365,19 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
 
         {/* Failed state */}
         {isFailed && restoreProgress?.error && (
-          <div className="border-destructive/50 bg-destructive/10 rounded-md border p-3">
-            <div className="flex items-start gap-2">
-              <XCircle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
-              <div className="text-destructive text-sm">
-                <p className="font-medium">{t('backup.restore.failed')}</p>
-                <p className="mt-1 opacity-80">{restoreProgress.error}</p>
-              </div>
-            </div>
-          </div>
+          <Alert variant="destructive">
+            <XCircle />
+            <AlertTitle>{t('backup.restore.failed')}</AlertTitle>
+            <AlertDescription>{restoreProgress.error}</AlertDescription>
+          </Alert>
         )}
 
         {/* Complete state */}
         {isComplete && (
-          <div className="rounded-md border border-green-500/50 bg-green-500/10 p-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
-              <p className="text-sm text-green-700 dark:text-green-400">
-                {t('backup.restore.complete')}
-              </p>
-            </div>
-          </div>
+          <Alert>
+            <CheckCircle2 className="text-success" />
+            <AlertDescription>{t('backup.restore.complete')}</AlertDescription>
+          </Alert>
         )}
 
         {/* Actions */}
@@ -512,8 +434,6 @@ function ScheduleCard() {
     },
   });
 
-  const retentionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   if (isLoading || !schedule) {
     return (
       <Card>
@@ -548,17 +468,15 @@ function ScheduleCard() {
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5" />
           {t('backup.schedule')}
-          <span className="rounded bg-amber-500/10 px-2 py-1 text-sm leading-normal font-semibold tracking-wide text-amber-500">
-            BETA
-          </span>
+          <BetaBadge />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Schedule type */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium">{t('backup.scheduleType')}</label>
+        <Field>
+          <FieldLabel htmlFor="backup-schedule-type">{t('backup.scheduleType')}</FieldLabel>
           <Select value={schedule.type} onValueChange={(v) => handleChange('type', v)}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger id="backup-schedule-type" className="w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -568,15 +486,15 @@ function ScheduleCard() {
               <SelectItem value="monthly">{t('backup.scheduleMonthly')}</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </Field>
 
         {schedule.type !== 'disabled' && (
           <>
             {/* Time (hour + minute selects) */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
+            <Field>
+              <FieldLabel>
                 {t('backup.scheduleTime', { timezone: schedule.timezone ?? 'UTC' })}
-              </label>
+              </FieldLabel>
               <div className="flex items-center gap-2">
                 <Select
                   value={schedule.time.split(':')[0]}
@@ -610,17 +528,19 @@ function ScheduleCard() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </Field>
 
             {/* Day of week (weekly) */}
             {schedule.type === 'weekly' && (
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">{t('backup.scheduleDayOfWeek')}</label>
+              <Field>
+                <FieldLabel htmlFor="backup-schedule-day-of-week">
+                  {t('backup.scheduleDayOfWeek')}
+                </FieldLabel>
                 <Select
                   value={String(schedule.dayOfWeek)}
                   onValueChange={(v) => handleChange('dayOfWeek', parseInt(v, 10))}
                 >
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger id="backup-schedule-day-of-week" className="w-48">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -631,18 +551,20 @@ function ScheduleCard() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </Field>
             )}
 
             {/* Day of month (monthly) */}
             {schedule.type === 'monthly' && (
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">{t('backup.scheduleDayOfMonth')}</label>
+              <Field>
+                <FieldLabel htmlFor="backup-schedule-day-of-month">
+                  {t('backup.scheduleDayOfMonth')}
+                </FieldLabel>
                 <Select
                   value={String(schedule.dayOfMonth)}
                   onValueChange={(v) => handleChange('dayOfMonth', parseInt(v, 10))}
                 >
-                  <SelectTrigger className="w-24">
+                  <SelectTrigger id="backup-schedule-day-of-month" className="w-24">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -653,34 +575,21 @@ function ScheduleCard() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-muted-foreground text-xs">
-                  {t('backup.scheduleDayOfMonthHint')}
-                </p>
-              </div>
+                <FieldDescription>{t('backup.scheduleDayOfMonthHint')}</FieldDescription>
+              </Field>
             )}
 
             {/* Retention */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t('backup.retentionCount')}</label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  max={30}
-                  defaultValue={schedule.retentionCount}
-                  onChange={(e) => {
-                    if (retentionTimerRef.current) clearTimeout(retentionTimerRef.current);
-                    const val = parseInt(e.target.value, 10) || 7;
-                    retentionTimerRef.current = setTimeout(
-                      () => handleChange('retentionCount', val),
-                      1000
-                    );
-                  }}
-                  className="w-20"
-                />
-                <span className="text-muted-foreground text-sm">{t('backup.retentionSuffix')}</span>
-              </div>
-            </div>
+            <AutosaveNumberField
+              id="backup-retention"
+              label={t('backup.retentionCount')}
+              value={schedule.retentionCount}
+              onChange={(value) => handleChange('retentionCount', value)}
+              min={1}
+              max={30}
+              suffix={t('backup.retentionSuffix')}
+              status={updateMutation.isPending ? 'saving' : 'idle'}
+            />
           </>
         )}
       </CardContent>
@@ -692,26 +601,26 @@ function ScheduleCard() {
 // Main Export
 // ============================================================================
 
-export function BackupSettings() {
+export function Backup() {
   const { t } = useTranslation('settings');
   const [restoreTarget, setRestoreTarget] = useState<BackupListItem | null>(null);
 
-  if (restoreTarget) {
-    return (
-      <div className="space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => setRestoreTarget(null)}>
-          <ArrowLeft />
-          {t('backup.backToBackups')}
-        </Button>
-        <RestoreCard backup={restoreTarget} onClose={() => setRestoreTarget(null)} />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <BackupCard onRestore={setRestoreTarget} />
-      <ScheduleCard />
-    </div>
+    <SettingsSection title={t('nav.sections.backup')} description={t('nav.descriptions.backup')}>
+      {restoreTarget ? (
+        <div className="space-y-6">
+          <Button variant="ghost" size="sm" onClick={() => setRestoreTarget(null)}>
+            <ArrowLeft />
+            {t('backup.backToBackups')}
+          </Button>
+          <RestoreCard backup={restoreTarget} onClose={() => setRestoreTarget(null)} />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <BackupCard onRestore={setRestoreTarget} />
+          <ScheduleCard />
+        </div>
+      )}
+    </SettingsSection>
   );
 }

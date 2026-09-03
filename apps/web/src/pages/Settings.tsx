@@ -1,5 +1,6 @@
-import { Navigate, Route, Routes } from 'react-router';
+import { Navigate, Route, Routes, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import { SettingsNav } from '@/components/settings/shell/SettingsNav';
 import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
 import { Appearance } from '@/components/settings/general/Appearance';
@@ -14,11 +15,15 @@ import { Guest } from '@/components/settings/access/Guest';
 import { MobileDevices } from '@/components/settings/access/MobileDevices';
 import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
 import { JobsSettings } from '@/components/settings/JobsSettings';
-import { BackupSettings } from '@/components/settings/BackupSettings';
+import { Backup } from '@/components/settings/data/Backup';
 import { Destinations } from '@/components/settings/notifications/Destinations';
+
+// Backup history is the one settings surface with a real grid; everything else is a form.
+const WIDE_SECTIONS = new Set(['/settings/data/backup']);
 
 export function Settings() {
   const { t } = useTranslation('settings');
+  const { pathname } = useLocation();
 
   return (
     // The layout follows this container, not the viewport: the app sidebar
@@ -27,7 +32,7 @@ export function Settings() {
       <h1 className="text-3xl font-bold">{t('title')}</h1>
       <div className="grid gap-8 @3xl/settings:grid-cols-[13rem_minmax(0,1fr)]">
         <SettingsNav />
-        <div className="max-w-4xl min-w-0">
+        <div className={cn('min-w-0', WIDE_SECTIONS.has(pathname) ? 'max-w-6xl' : 'max-w-4xl')}>
           <Routes>
             <Route index element={<Navigate to={SETTINGS_HOME} replace />} />
 
@@ -46,7 +51,7 @@ export function Settings() {
             <Route path="access/remote" element={<RemoteAccess />} />
 
             <Route path="data/import" element={<Import />} />
-            <Route path="data/backup" element={<BackupSettings />} />
+            <Route path="data/backup" element={<Backup />} />
             <Route path="data/jobs" element={<JobsSettings />} />
             <Route path="data/api" element={<Api />} />
 
