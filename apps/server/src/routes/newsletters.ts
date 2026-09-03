@@ -7,8 +7,8 @@ import {
   newsletterTestSendSchema,
   updateNewsletterSchema,
   uuidSchema,
+  type Newsletter,
   type NewsletterPreview,
-  type UpdateNewsletterInput,
 } from '@tracearr/shared';
 import {
   InvalidScheduleError,
@@ -51,7 +51,7 @@ import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
 
 const idParams = z.object({ id: uuidSchema });
-const sendParams = z.object({ id: uuidSchema, sendId: z.string().min(1).max(100) });
+const sendParams = z.object({ id: uuidSchema, sendId: uuidSchema });
 
 /** The checks a body must pass beyond its shape: the transport must be an email kind and hosted needs a public url. */
 async function validateReferences(input: {
@@ -70,20 +70,7 @@ async function validateReferences(input: {
   return null;
 }
 
-/** Every field of createNewsletterSchema carries a default, so .partial() still fills omitted keys on parse; only keys present in the raw body are an actual change. */
-function providedPatch(
-  body: unknown,
-  parsed: UpdateNewsletterInput
-): Partial<UpdateNewsletterInput> {
-  if (typeof body !== 'object' || body === null) return {};
-  const patch: Record<string, unknown> = {};
-  for (const key of Object.keys(body)) {
-    if (key in parsed) patch[key] = parsed[key as keyof UpdateNewsletterInput];
-  }
-  return patch as Partial<UpdateNewsletterInput>;
-}
-
-async function publicOf(row: NewsletterRow) {
+async function publicOf(row: NewsletterRow): Promise<Newsletter> {
   const [last, next] = await Promise.all([lastSend(row.id), nextRunAt(row.id).catch(() => null)]);
   return toPublicNewsletter(row, last, next);
 }
@@ -131,10 +118,10 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       return reply.badRequest(`Invalid request body: ${firstIssueMessage(parsed.error)}`);
     const current = await getNewsletter(params.data.id);
     if (!current) return reply.notFound('Newsletter not found');
-    const patch = providedPatch(request.body, parsed.data);
+    const patch = parsed.data;
     const problem = await validateReferences({
-      destinationId: patch.destinationId ?? current.destinationId,
-      imageMode: patch.imageMode ?? current.imageMode,
+      destinationId: 'destinationId' in patch ? patch.destinationId : current.destinationId,
+      imageMode: 'imageMode' in patch ? patch.imageMode : current.imageMode,
     });
     if (problem) return reply.badRequest(problem);
     const row = await updateNewsletter(params.data.id, patch);

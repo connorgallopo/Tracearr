@@ -124,7 +124,26 @@ export const createNewsletterSchema = z.strictObject({
 });
 export type CreateNewsletterInput = z.infer<typeof createNewsletterSchema>;
 
-export const updateNewsletterSchema = createNewsletterSchema.partial();
+type WithoutDefaults<T extends z.ZodRawShape> = {
+  [K in keyof T]: z.ZodOptional<T[K] extends z.ZodDefault<infer Inner> ? Inner : T[K]>;
+};
+
+function partialWithoutDefaults<T extends z.ZodRawShape>(shape: T): WithoutDefaults<T> {
+  return Object.fromEntries(
+    Object.entries(shape).map(([key, field]) => [
+      key,
+      (field instanceof z.ZodDefault
+        ? (field as z.ZodDefault<z.ZodType>).unwrap()
+        : (field as z.ZodType)
+      ).optional(),
+    ])
+  ) as unknown as WithoutDefaults<T>;
+}
+
+/** A PATCH body: absent keys stay absent instead of resetting to the create defaults. */
+export const updateNewsletterSchema = z.strictObject(
+  partialWithoutDefaults(createNewsletterSchema.shape)
+);
 export type UpdateNewsletterInput = z.infer<typeof updateNewsletterSchema>;
 
 export const newsletterTestSendSchema = z.strictObject({ address });

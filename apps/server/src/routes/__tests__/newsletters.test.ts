@@ -58,6 +58,7 @@ const owner: AuthUser = { userId: randomUUID(), username: 'owner', role: 'owner'
 const admin: AuthUser = { userId: randomUUID(), username: 'admin', role: 'admin', serverIds: [] };
 const ID = '11111111-1111-4111-8111-111111111111';
 const DEST = '22222222-2222-4222-8222-222222222222';
+const SEND_ID = '5f0b3e3a-3f4e-4c46-9a5c-1d2f0d0f9d21';
 const body = {
   name: 'Weekly',
   schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
@@ -116,10 +117,20 @@ describe('newsletter routes', () => {
       ['GET', '/newsletters'],
       ['POST', '/newsletters'],
       ['GET', `/newsletters/${ID}`],
+      ['PATCH', `/newsletters/${ID}`],
       ['DELETE', `/newsletters/${ID}`],
+      ['POST', `/newsletters/${ID}/preview`],
+      ['POST', `/newsletters/${ID}/test`],
       ['POST', `/newsletters/${ID}/send`],
+      ['GET', `/newsletters/${ID}/sends`],
+      ['GET', `/newsletters/${ID}/sends/${SEND_ID}`],
+      ['POST', `/newsletters/${ID}/sends/${SEND_ID}/retry-failed`],
     ] as const) {
-      const res = await app.inject({ method, url, payload: method === 'POST' ? body : undefined });
+      const res = await app.inject({
+        method,
+        url,
+        payload: method === 'POST' || method === 'PATCH' ? body : undefined,
+      });
       expect(res.statusCode).toBe(403);
     }
   });
@@ -186,6 +197,19 @@ describe('newsletter routes', () => {
     expect(res.statusCode).toBe(200);
     expect(store.updateNewsletter).toHaveBeenCalledWith(ID, { enabled: false });
     expect(queue.upsertNewsletterSchedule).toHaveBeenCalledWith({ ...row, enabled: false });
+  });
+
+  it('clearing destinationId to null skips validating a destination that no longer exists', async () => {
+    const app = await build(owner);
+    mockDestination.mockResolvedValue(null);
+    store.updateNewsletter.mockResolvedValue({ ...row, destinationId: null });
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { destinationId: null },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(store.updateNewsletter).toHaveBeenCalledWith(ID, { destinationId: null });
   });
 
   it('refuses to delete while a send is open, otherwise deletes and drops the scheduler', async () => {
@@ -272,12 +296,11 @@ describe('newsletter routes', () => {
     expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
     expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
     expect(json.html).toContain('Heat');
-    expect(Object.keys(store)).not.toContain('insertSend');
   });
 
   it('lists sends with pagination and retries failed recipients', async () => {
     const app = await build(owner);
-    store.listSends.mockResolvedValue({ rows: [{ id: 'send-1' }], total: 1 });
+    store.listSends.mockResolvedValue({ rows: [{ id: SEND_ID }], total: 1 });
     let res = await app.inject({
       method: 'GET',
       url: `/newsletters/${ID}/sends?page=2&pageSize=10`,
@@ -285,25 +308,39 @@ describe('newsletter routes', () => {
     expect(res.statusCode).toBe(200);
     expect(store.listSends).toHaveBeenCalledWith(ID, 2, 10);
     store.getSend.mockResolvedValue({
-      id: 'send-1',
+      id: SEND_ID,
       newsletterId: ID,
       html: '<p>x</p>',
       outcome: 'partial',
     });
     store.resetFailedRecipients.mockResolvedValue(['r1', 'r2']);
-    res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/sends/send-1/retry-failed` });
+    res = await app.inject({
+      method: 'POST',
+      url: `/newsletters/${ID}/sends/${SEND_ID}/retry-failed`,
+    });
     expect(res.statusCode).toBe(202);
     expect(res.json()).toEqual({ queued: 2 });
-    expect(queue.enqueueDeliveries).toHaveBeenCalledWith('send-1', ['r1', 'r2']);
+    expect(queue.enqueueDeliveries).toHaveBeenCalledWith(SEND_ID, ['r1', 'r2']);
     store.getSend.mockResolvedValue({
-      id: 'send-1',
+      id: SEND_ID,
       newsletterId: ID,
       html: null,
       outcome: 'partial',
     });
     expect(
-      (await app.inject({ method: 'POST', url: `/newsletters/${ID}/sends/send-1/retry-failed` }))
-        .statusCode
+      (
+        await app.inject({
+          method: 'POST',
+          url: `/newsletters/${ID}/sends/${SEND_ID}/retry-failed`,
+        })
+      ).statusCode
     ).toBe(409);
+  });
+
+  it('rejects a malformed send id before touching the store', async () => {
+    const app = await build(owner);
+    const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/not-a-uuid` });
+    expect(res.statusCode).toBe(400);
+    expect(store.getSend).not.toHaveBeenCalled();
   });
 });

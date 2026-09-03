@@ -102,6 +102,15 @@ describe('updateNewsletterSchema', () => {
     expect(updateNewsletterSchema.safeParse({ imageMode: 'none' }).success).toBe(true);
     expect(updateNewsletterSchema.safeParse({ colour: 'red' }).success).toBe(false);
   });
+
+  it('leaves absent keys absent instead of filling create defaults', () => {
+    expect(updateNewsletterSchema.parse({})).toEqual({});
+    expect(updateNewsletterSchema.parse({ enabled: false })).toEqual({ enabled: false });
+    expect(updateNewsletterSchema.parse({ window: { kind: 'fixed', days: 3 } })).toEqual({
+      window: { kind: 'fixed', days: 3 },
+    });
+    expect(updateNewsletterSchema.safeParse({ bogus: 1 }).success).toBe(false);
+  });
 });
 
 describe('newsletterCron', () => {

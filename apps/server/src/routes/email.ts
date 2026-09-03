@@ -1,7 +1,10 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { emailSuppressionCreateSchema } from '@tracearr/shared';
-import { verifyUnsubscribeToken } from '../services/newsletters/links.js';
+import {
+  UNSUBSCRIBE_TOKEN_MAX_LENGTH,
+  verifyUnsubscribeToken,
+} from '../services/newsletters/links.js';
 import { loadDelivery } from '../services/newsletters/store.js';
 import {
   addSuppression,
@@ -11,7 +14,7 @@ import {
 import { firstIssueMessage } from '../utils/zod.js';
 
 const PUBLIC_RATE_LIMIT = { max: 60, timeWindow: '1 minute' };
-const tokenParams = z.object({ token: z.string().min(1).max(128) });
+const tokenParams = z.object({ token: z.string().min(1).max(UNSUBSCRIBE_TOKEN_MAX_LENGTH) });
 const addressParams = z.object({ address: z.string().min(3).max(254) });
 
 function page(title: string, body: string): string {
@@ -58,7 +61,7 @@ export async function emailRoutes(app: FastifyInstance): Promise<void> {
   app.delete('/suppressions/:address', owner, async (request, reply) => {
     const params = addressParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid address');
-    const removed = await removeSuppression(decodeURIComponent(params.data.address));
+    const removed = await removeSuppression(params.data.address);
     if (!removed) return reply.notFound('Address is not suppressed');
     return reply.code(204).send();
   });

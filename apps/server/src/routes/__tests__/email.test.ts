@@ -12,6 +12,7 @@ const suppressions = vi.hoisted(() => ({
 vi.mock('../../services/newsletters/suppressions.js', () => suppressions);
 const mockVerify = vi.fn();
 vi.mock('../../services/newsletters/links.js', () => ({
+  UNSUBSCRIBE_TOKEN_MAX_LENGTH: 92,
   verifyUnsubscribeToken: (...a: unknown[]) => mockVerify(...a) as unknown,
 }));
 const store = vi.hoisted(() => ({ loadDelivery: vi.fn() }));
@@ -71,6 +72,17 @@ describe('suppressions', () => {
     const anon = await build(null);
     expect((await anon.inject({ method: 'GET', url: '/email/suppressions' })).statusCode).toBe(401);
   });
+
+  it('does not double-decode a percent sign in the local part', async () => {
+    const app = await build(owner);
+    suppressions.removeSuppression.mockResolvedValue(true);
+    const res = await app.inject({
+      method: 'DELETE',
+      url: '/email/suppressions/foo%25bar%40x.com',
+    });
+    expect(res.statusCode).toBe(204);
+    expect(suppressions.removeSuppression).toHaveBeenCalledWith('foo%bar@x.com');
+  });
 });
 
 describe('public unsubscribe', () => {
@@ -90,7 +102,7 @@ describe('public unsubscribe', () => {
     expect(suppressions.addSuppression).not.toHaveBeenCalled();
   });
 
-  it('POST suppresses the recipient address with the send as source and is idempotent', async () => {
+  it('POST suppresses the recipient address with the send as source, and a repeat POST suppresses it again the same way', async () => {
     const app = await build(null);
     mockVerify.mockReturnValue('r1');
     const res = await app.inject({
@@ -103,8 +115,12 @@ describe('public unsubscribe', () => {
     expect(suppressions.addSuppression).toHaveBeenCalledWith('a@x.com', 'unsubscribed', 'send-1');
     expect(res.body).toContain('unsubscribed');
     expect(res.body).not.toContain('a@x.com');
-    expect((await app.inject({ method: 'POST', url: '/email/unsubscribe/tok' })).statusCode).toBe(
-      200
+    const again = await app.inject({ method: 'POST', url: '/email/unsubscribe/tok' });
+    expect(again.statusCode).toBe(200);
+    expect(suppressions.addSuppression).toHaveBeenLastCalledWith(
+      'a@x.com',
+      'unsubscribed',
+      'send-1'
     );
   });
 
