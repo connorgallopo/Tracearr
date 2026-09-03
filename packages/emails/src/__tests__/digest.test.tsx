@@ -144,7 +144,7 @@ function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
       title: `Watched Title ${i}`,
       year: 2020,
       plays: 40 - i,
-      links: [tracearrLink(n), variant.server(n), imdbLink(n)],
+      links: [tracearrLink(n), variant.server(n)],
     };
   });
   return base({ movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
