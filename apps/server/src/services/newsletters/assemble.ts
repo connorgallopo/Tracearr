@@ -419,8 +419,14 @@ async function loadShowRows(
 ): Promise<LibraryItemRow[]> {
   if (keys.length === 0) return [];
   const byServer = new Map<string, string[]>();
-  for (const k of keys)
-    byServer.set(k.serverId, [...(byServer.get(k.serverId) ?? []), k.ratingKey]);
+  for (const k of keys) {
+    let ratingKeys = byServer.get(k.serverId);
+    if (!ratingKeys) {
+      ratingKeys = [];
+      byServer.set(k.serverId, ratingKeys);
+    }
+    ratingKeys.push(k.ratingKey);
+  }
   const rows: LibraryItemRow[] = [];
   for (const [serverId, ratingKeys] of byServer) {
     const result = await db.execute(sql`
@@ -477,21 +483,24 @@ export async function assembleDigest(
   window: { start: Date; end: Date }
 ): Promise<{ data: DigestData; posters: Record<string, PosterRef> }> {
   const rows = await loadWindowItems(newsletter.scope, window);
-  const missingShows = new Map<string, { serverId: string; ratingKey: string }>();
-  const presentShows = new Set(
-    rows.filter((r) => r.mediaType === 'show').map((r) => `${r.serverId}:${r.ratingKey}`)
-  );
-  for (const r of rows) {
-    const key =
-      r.mediaType === 'episode'
-        ? r.grandparentRatingKey
-        : r.mediaType === 'season'
-          ? r.parentRatingKey
-          : null;
-    if (key && !presentShows.has(`${r.serverId}:${key}`))
-      missingShows.set(`${r.serverId}:${key}`, { serverId: r.serverId, ratingKey: key });
+  let showRows: LibraryItemRow[] = [];
+  if (newsletter.sections.shows.enabled) {
+    const missingShows = new Map<string, { serverId: string; ratingKey: string }>();
+    const presentShows = new Set(
+      rows.filter((r) => r.mediaType === 'show').map((r) => `${r.serverId}:${r.ratingKey}`)
+    );
+    for (const r of rows) {
+      const key =
+        r.mediaType === 'episode'
+          ? r.grandparentRatingKey
+          : r.mediaType === 'season'
+            ? r.parentRatingKey
+            : null;
+      if (key && !presentShows.has(`${r.serverId}:${key}`))
+        missingShows.set(`${r.serverId}:${key}`, { serverId: r.serverId, ratingKey: key });
+    }
+    showRows = await loadShowRows([...missingShows.values()]);
   }
-  const showRows = await loadShowRows([...missingShows.values()]);
   const data = groupDigest([...rows, ...showRows], newsletter.sections);
 
   if (newsletter.sections.mostWatched.enabled) {

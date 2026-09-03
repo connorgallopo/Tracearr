@@ -14,6 +14,10 @@ const START = new Date('2026-08-26T00:00:00Z');
 const END = new Date('2026-09-02T00:00:00Z');
 const inside = new Date('2026-08-30T00:00:00Z');
 const before = new Date('2026-08-01T00:00:00Z');
+// Distinct from `inside` so the three included rows have a well-defined recency
+// order instead of tying on the same COALESCE(first_seen_at, created_at) instant.
+const newerInside = new Date('2026-08-31T00:00:00Z');
+const olderInside = new Date('2026-08-29T00:00:00Z');
 
 describe('loadWindowItems', () => {
   let serverId: string;
@@ -31,7 +35,7 @@ describe('loadWindowItems', () => {
         title: 'Seen inside, added before',
         mediaType: 'movie',
         createdAt: before,
-        firstSeenAt: inside,
+        firstSeenAt: newerInside,
       },
       {
         serverId,
@@ -58,8 +62,8 @@ describe('loadWindowItems', () => {
         ratingKey: 'd',
         title: 'Other library',
         mediaType: 'movie',
-        createdAt: inside,
-        firstSeenAt: inside,
+        createdAt: olderInside,
+        firstSeenAt: olderInside,
       },
       {
         serverId,
@@ -89,6 +93,8 @@ describe('loadWindowItems', () => {
     );
     expect(rows.map((r) => r.ratingKey).sort()).toEqual(['a', 'b', 'd']);
     expect(rows.find((r) => r.ratingKey === 'a')?.addedAt).toEqual(before);
+    // groupDigest's artist/album ordering relies on rows already arriving newest-first.
+    expect(rows.map((r) => r.ratingKey)).toEqual(['a', 'b', 'd']);
   });
 
   it('applies server and library scope', async () => {
