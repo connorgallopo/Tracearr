@@ -100,6 +100,7 @@ export interface DigestWatched {
   title: string;
   year: number | null;
   plays: number;
+  links: EmailLink[];
 }
 
 export interface DigestInput {

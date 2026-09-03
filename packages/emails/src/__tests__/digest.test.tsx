@@ -136,13 +136,17 @@ function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
       links: [tracearrLink(n), variant.server(n)],
     };
   });
-  const mostWatched = Array.from({ length: MOST_WATCHED_MAX }, (_, i) => ({
-    id: uuid(400 + i),
-    kind: i % 2 ? ('show' as const) : ('movie' as const),
-    title: `Watched Title ${i}`,
-    year: 2020,
-    plays: 40 - i,
-  }));
+  const mostWatched = Array.from({ length: MOST_WATCHED_MAX }, (_, i) => {
+    const n = 400 + i;
+    return {
+      id: uuid(n),
+      kind: i % 2 ? ('show' as const) : ('movie' as const),
+      title: `Watched Title ${i}`,
+      year: 2020,
+      plays: 40 - i,
+      links: [tracearrLink(n), variant.server(n), imdbLink(n)],
+    };
+  });
   return base({ movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
 }
 
@@ -173,7 +177,16 @@ describe('renderDigest', () => {
             links: [],
           },
         ],
-        mostWatched: [{ id: 'w1', kind: 'movie', title: 'Alien', year: 1979, plays: 7 }],
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
+          },
+        ],
       }),
       branding
     );
@@ -192,6 +205,43 @@ describe('renderDigest', () => {
     expect(out.text).toContain('{{unsubscribe_url}}');
     expect(out.text).toContain('Heat (1995)');
     expect(out.text).not.toContain('poster:');
+  });
+
+  it('renders the most watched row links', async () => {
+    const out = await renderDigest(
+      base({
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).toContain('href="https://www.imdb.com/title/tt0078748/"');
+    expect(out.text).toContain('https://www.imdb.com/title/tt0078748/');
+  });
+
+  it('emits each footer placeholder once, as the only anchor of its own paragraph', async () => {
+    const out = await renderDigest(
+      base({ unsubscribeUrl: '{{unsubscribe_url}}', viewUrl: '{{view_url}}' }),
+      branding
+    );
+    expect(out.html.match(/\{\{view_url\}\}/g)).toHaveLength(1);
+    expect(out.html.match(/\{\{unsubscribe_url\}\}/g)).toHaveLength(1);
+    expect(out.html).toMatch(
+      /<p[^>]*>\s*<a[^>]*href="\{\{view_url\}\}"[^>]*>View in browser<\/a>\s*<\/p>/
+    );
+    expect(out.html).toMatch(
+      /<p[^>]*>\s*<a[^>]*href="\{\{unsubscribe_url\}\}"[^>]*>Unsubscribe<\/a>\s*<\/p>/
+    );
+    expect(out.text).toContain('{{view_url}}');
+    expect(out.text).toContain('{{unsubscribe_url}}');
   });
 
   it('renders the empty state when every section is empty', async () => {

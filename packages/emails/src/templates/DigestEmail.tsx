@@ -119,11 +119,14 @@ function ArtistCard({ item, accent }: { item: DigestArtist; accent: string }) {
   );
 }
 
-function WatchedRow({ item }: { item: DigestWatched }) {
+function WatchedRow({ item, accent }: { item: DigestWatched; accent: string }) {
   return (
-    <Text style={lineStyle}>
-      {withYear(item.title, item.year)} · {`${item.plays} ${item.plays === 1 ? 'play' : 'plays'}`}
-    </Text>
+    <>
+      <Text style={lineStyle}>
+        {withYear(item.title, item.year)} · {`${item.plays} ${item.plays === 1 ? 'play' : 'plays'}`}
+      </Text>
+      <Links links={item.links} accent={accent} />
+    </>
   );
 }
 
@@ -195,7 +198,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           <SectionHeading text="Most watched" accent={accent} />
           <Cell style={rowGap}>
             {input.mostWatched.map((w) => (
-              <WatchedRow key={w.id} item={w} />
+              <WatchedRow key={w.id} item={w} accent={accent} />
             ))}
           </Cell>
         </>
