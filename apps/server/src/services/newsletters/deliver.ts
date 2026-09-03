@@ -6,7 +6,7 @@ import { proxyImage } from '../imageProxy.js';
 import { getDestination, readConfig, rewrapConfig } from '../notifications/destinationStore.js';
 import type { EmailAttachment, EmailConfig } from '../notifications/destinations/email.js';
 import { describeSmtpError, getTransporter } from '../notifications/destinations/emailTransport.js';
-import { resolveEmailBranding } from '../notifications/emailBranding.js';
+import { getEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { getNetworkSettings } from '../settings.js';
 import { signUnsubscribeToken } from './links.js';
@@ -136,7 +136,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   }
   attachments.push(...(await posterAttachments(cid)));
 
-  const { mailtoUnsubscribe } = await resolveEmailBranding('Tracearr');
+  const { mailtoUnsubscribe } = await getEmailBranding();
   const listUnsubscribe = unsubscribeUrl
     ? mailtoUnsubscribe && transport.config.replyTo
       ? `<mailto:${transport.config.replyTo}?subject=unsubscribe>, <${unsubscribeUrl}>`

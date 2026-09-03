@@ -4,11 +4,12 @@
  *
  * Run with: pnpm --filter @tracearr/server test:integration -- newsletterAssemble
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { randomUUID } from 'node:crypto';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { seedBasicOwner } from '@tracearr/test-utils';
 import { db } from '../../src/db/client.js';
-import { libraryItems } from '../../src/db/schema.js';
-import { loadWindowItems } from '../../src/services/newsletters/assemble.js';
+import { libraryItems, servers } from '../../src/db/schema.js';
+import { loadItemRows, loadWindowItems } from '../../src/services/newsletters/assemble.js';
 
 const START = new Date('2026-08-26T00:00:00Z');
 const END = new Date('2026-09-02T00:00:00Z');
@@ -108,5 +109,90 @@ describe('loadWindowItems', () => {
       { start: START, end: END }
     );
     expect(other).toEqual([]);
+  });
+});
+
+describe('loadItemRows', () => {
+  let serverId: string;
+  let otherServerId: string;
+  const SHARED_KEY = 'shared-rk';
+  const REMOVED_KEY = 'removed-rk';
+  const movieMediaId = randomUUID();
+  const showMediaId = randomUUID();
+
+  // library_items_server_rating_key_unique is unique on (server_id, rating_key) alone,
+  // with no media_type in it, so a movie and a show can never share a rating key on
+  // the same server. The shared key lives on two servers instead, one row of each type.
+  beforeEach(async () => {
+    const seeded = await seedBasicOwner();
+    serverId = seeded.serverId;
+    const [other] = await db
+      .insert(servers)
+      .values({ name: 'Other Server', type: 'plex', url: 'http://other:32400', token: 'tok' })
+      .returning({ id: servers.id });
+    otherServerId = other!.id;
+    await db.insert(libraryItems).values([
+      {
+        serverId,
+        libraryId: '1',
+        ratingKey: SHARED_KEY,
+        title: 'Shared Movie',
+        mediaType: 'movie',
+        mediaId: movieMediaId,
+        imdbId: 'tt0000001',
+      },
+      {
+        serverId: otherServerId,
+        libraryId: '1',
+        ratingKey: SHARED_KEY,
+        title: 'Shared Show',
+        mediaType: 'show',
+        mediaId: showMediaId,
+        imdbId: 'tt0000002',
+      },
+      {
+        serverId,
+        libraryId: '1',
+        ratingKey: REMOVED_KEY,
+        title: 'Gone',
+        mediaType: 'movie',
+        removedAt: new Date('2026-08-01T00:00:00Z'),
+      },
+    ]);
+  });
+
+  it('filters by media_type, returning the movie row and not the show row sharing its key', async () => {
+    const keys = [
+      { serverId, ratingKey: SHARED_KEY },
+      { serverId: otherServerId, ratingKey: SHARED_KEY },
+    ];
+    const movieRows = await loadItemRows(keys, 'movie');
+    expect(movieRows).toHaveLength(1);
+    expect(movieRows[0]).toMatchObject({
+      title: 'Shared Movie',
+      mediaId: movieMediaId,
+      imdbId: 'tt0000001',
+    });
+
+    const showRows = await loadItemRows(keys, 'show');
+    expect(showRows).toHaveLength(1);
+    expect(showRows[0]).toMatchObject({
+      title: 'Shared Show',
+      mediaId: showMediaId,
+      imdbId: 'tt0000002',
+    });
+  });
+
+  it('excludes a removed row for its key', async () => {
+    const rows = await loadItemRows([{ serverId, ratingKey: REMOVED_KEY }], 'movie');
+    expect(rows).toEqual([]);
+  });
+
+  it('returns [] without a query for an empty key list', async () => {
+    const spy = vi.spyOn(db, 'execute');
+    const rows = await loadItemRows([], 'movie');
+    expect(rows).toEqual([]);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 });

@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SQL } from 'drizzle-orm';
 import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
+import { renderSql } from '../../../test/helpers.js';
 
 const mockExecute = vi.fn();
 vi.mock('../../../db/client.js', () => ({
@@ -253,5 +255,115 @@ describe('assembleDigest poster warming', () => {
     expect(
       mockProxy.mock.calls.map(([arg]) => (arg as { imagePath: string }).imagePath).sort()
     ).toEqual(['/movie.jpg', '/show.jpg']);
+  });
+});
+
+describe('assembleDigest most watched card identity', () => {
+  const itemRow = (over: Record<string, unknown>) => ({
+    id: 'item',
+    server_id: 'srv-1',
+    server_name: 'Basement',
+    server_type: 'plex',
+    library_id: '1',
+    library_name: 'Movies',
+    rating_key: 'rk',
+    media_id: null,
+    media_type: 'movie',
+    title: 'Title',
+    year: 2000,
+    parent_title: null,
+    parent_rating_key: null,
+    parent_index: null,
+    grandparent_title: null,
+    grandparent_rating_key: null,
+    item_index: null,
+    thumb_path: null,
+    genres: null,
+    imdb_id: null,
+    added_at: new Date('2026-09-01T00:00:00Z'),
+    ...over,
+  });
+
+  const sections = { ...DEFAULT_NEWSLETTER_SECTIONS, mostWatched: { enabled: true, max: 10 } };
+
+  it('carries mediaId and imdbId from the matching library row, and leaves both null with no match', async () => {
+    mockExecute
+      .mockResolvedValueOnce({ rows: [] }) // loadWindowItems
+      .mockResolvedValueOnce({
+        rows: [
+          itemRow({
+            media_type: 'movie',
+            rating_key: 'm-42',
+            media_id: 'movie-media-id',
+            imdb_id: 'tt0113277',
+          }),
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          itemRow({
+            media_type: 'show',
+            rating_key: 'show-77',
+            media_id: 'show-media-id',
+            imdb_id: 'tt0290978',
+          }),
+        ],
+      });
+    mockTopWatched.mockResolvedValue({
+      movies: [
+        {
+          serverId: 'srv-1',
+          ratingKey: 'm-42',
+          title: 'Heat',
+          year: 1995,
+          plays: 9,
+          thumbPath: '/movie.jpg',
+        },
+        {
+          serverId: 'srv-1',
+          ratingKey: 'no-match',
+          title: 'Unknown',
+          year: 2001,
+          plays: 3,
+          thumbPath: null,
+        },
+      ],
+      shows: [
+        {
+          serverId: 'srv-1',
+          ratingKey: 'show-77',
+          title: 'The Wire',
+          year: 2002,
+          plays: 12,
+          thumbPath: '/show.jpg',
+        },
+      ],
+    });
+
+    const { data } = await assembleDigest(
+      { scope: { serverIds: [], libraryIds: [] }, sections },
+      { start: new Date('2026-08-26T00:00:00Z'), end: new Date('2026-09-02T00:00:00Z') }
+    );
+
+    const heat = data.mostWatched.find((w) => w.title === 'Heat');
+    expect(heat?.mediaId).toBe('movie-media-id');
+    expect(heat?.imdbId).toBe('tt0113277');
+    const unknown = data.mostWatched.find((w) => w.title === 'Unknown');
+    expect(unknown?.mediaId).toBeNull();
+    expect(unknown?.imdbId).toBeNull();
+    const wire = data.mostWatched.find((w) => w.title === 'The Wire');
+    expect(wire?.mediaId).toBe('show-media-id');
+    expect(wire?.imdbId).toBe('tt0290978');
+
+    const movieParams = renderSql(mockExecute.mock.calls[1]![0] as SQL).params;
+    expect(movieParams).toContain('movie');
+    expect(movieParams).toContain('srv-1');
+    expect(movieParams).toContain('m-42');
+    expect(movieParams).toContain('no-match');
+
+    const showParams = renderSql(mockExecute.mock.calls[2]![0] as SQL).params;
+    expect(showParams).toContain('show');
+    expect(showParams).toContain('srv-1');
+    expect(showParams).toContain('show-77');
   });
 });

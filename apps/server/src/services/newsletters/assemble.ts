@@ -3,7 +3,7 @@ import { POSTER_IMAGE_SIZE, type NewsletterScope, type NewsletterSections } from
 import { db } from '../../db/client.js';
 import type { PosterRef } from '../../db/schema.js';
 import { posterVersionFor, proxyImage } from '../imageProxy.js';
-import { topWatched } from '../stats/topContent.js';
+import { topWatched, type TopWatchedRow } from '../stats/topContent.js';
 
 export interface LibraryItemRow {
   id: string;
@@ -413,9 +413,10 @@ export async function loadWindowItems(
   return (result.rows as unknown as RawItemRow[]).map(mapItemRow);
 }
 
-/** Show rows for episode-only groups, so a show card can carry the show's own poster and year. */
-async function loadShowRows(
-  keys: { serverId: string; ratingKey: string }[]
+/** Rows for a set of (server, rating key) pairs, restricted to one media type. */
+export async function loadItemRows(
+  keys: { serverId: string; ratingKey: string }[],
+  mediaType: 'movie' | 'show'
 ): Promise<LibraryItemRow[]> {
   if (keys.length === 0) return [];
   const byServer = new Map<string, string[]>();
@@ -439,7 +440,7 @@ async function loadShowRows(
       FROM library_items li
       JOIN servers s ON s.id = li.server_id
       LEFT JOIN libraries l ON l.server_id = li.server_id AND l.library_id = li.library_id
-      WHERE li.removed_at IS NULL AND li.media_type = 'show'
+      WHERE li.removed_at IS NULL AND li.media_type = ${mediaType}
         AND li.server_id = ${serverId} AND li.rating_key IN ${ratingKeys}
     `);
     for (const r of result.rows as unknown as RawItemRow[]) {
@@ -499,7 +500,7 @@ export async function assembleDigest(
       if (key && !presentShows.has(`${r.serverId}:${key}`))
         missingShows.set(`${r.serverId}:${key}`, { serverId: r.serverId, ratingKey: key });
     }
-    showRows = await loadShowRows([...missingShows.values()]);
+    showRows = await loadItemRows([...missingShows.values()], 'show');
   }
   const data = groupDigest([...rows, ...showRows], newsletter.sections);
 
@@ -511,21 +512,36 @@ export async function assembleDigest(
       libraryIds: newsletter.scope.libraryIds,
       limit: newsletter.sections.mostWatched.max,
     });
+    const keysFor = (list: TopWatchedRow[]): { serverId: string; ratingKey: string }[] =>
+      list.flatMap((t) =>
+        t.serverId && t.ratingKey ? [{ serverId: t.serverId, ratingKey: t.ratingKey }] : []
+      );
+    const [movieItems, showItems] = await Promise.all([
+      loadItemRows(keysFor(top.movies), 'movie'),
+      loadItemRows(keysFor(top.shows), 'show'),
+    ]);
+    const itemByKey = new Map<string, LibraryItemRow>();
+    for (const r of [...movieItems, ...showItems]) itemByKey.set(`${r.serverId}:${r.ratingKey}`, r);
+
     const rowsFor = (kind: 'movie' | 'show', list: typeof top.movies) =>
-      list.map((t, i) => ({
-        cardId: `watched-${kind}-${i}`,
-        serverId: t.serverId ?? '',
-        serverName: '',
-        serverType: '',
-        ratingKey: t.ratingKey ?? '',
-        mediaId: null,
-        imdbId: null,
-        thumbPath: t.serverId && t.thumbPath ? t.thumbPath : null,
-        kind,
-        title: t.title,
-        year: t.year,
-        plays: t.plays,
-      }));
+      list.map((t, i) => {
+        const item =
+          t.serverId && t.ratingKey ? itemByKey.get(`${t.serverId}:${t.ratingKey}`) : undefined;
+        return {
+          cardId: `watched-${kind}-${i}`,
+          serverId: t.serverId ?? '',
+          serverName: '',
+          serverType: '',
+          ratingKey: t.ratingKey ?? '',
+          mediaId: item?.mediaId ?? null,
+          imdbId: item?.imdbId ?? null,
+          thumbPath: t.serverId && t.thumbPath ? t.thumbPath : null,
+          kind,
+          title: t.title,
+          year: t.year,
+          plays: t.plays,
+        };
+      });
     data.mostWatched = [...rowsFor('movie', top.movies), ...rowsFor('show', top.shows)]
       .sort((a, b) => b.plays - a.plays)
       .slice(0, newsletter.sections.mostWatched.max);

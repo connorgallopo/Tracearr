@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DEFAULT_EMAIL_BRANDING } from '@tracearr/shared';
 import type * as EmailTransportModule from '../../notifications/destinations/emailTransport.js';
 
 const store = vi.hoisted(() => ({
@@ -53,7 +54,7 @@ vi.mock('../../imageProxy.js', () => ({
 vi.mock('../../notifications/emailLogo.js', () => ({ readLogoPng: () => Buffer.from('png') }));
 const mockBranding = vi.fn();
 vi.mock('../../notifications/emailBranding.js', () => ({
-  resolveEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
+  getEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
 }));
 const mockSettings = vi.fn();
 vi.mock('../../settings.js', () => ({ getNetworkSettings: () => mockSettings() as unknown }));
@@ -105,16 +106,7 @@ const ctx = () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockBranding.mockResolvedValue({
-    branding: {
-      senderName: 'Basement',
-      accentColor: '#0ea0b3',
-      footerText: null,
-      postalAddress: null,
-    },
-    logo: { mode: 'tracearr' },
-    mailtoUnsubscribe: false,
-  });
+  mockBranding.mockResolvedValue({ ...DEFAULT_EMAIL_BRANDING, mailtoUnsubscribe: false });
   store.loadDelivery.mockResolvedValue(ctx());
   store.beginAttempt.mockResolvedValue({
     previousMessageId: null,
@@ -224,16 +216,7 @@ describe('deliverRecipient', () => {
   });
 
   it('carries the mailto form alongside the https one when the owner turned it on', async () => {
-    mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
-      logo: { mode: 'tracearr' },
-      mailtoUnsubscribe: true,
-    });
+    mockBranding.mockResolvedValue({ ...DEFAULT_EMAIL_BRANDING, mailtoUnsubscribe: true });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
     const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(mail.headers).toEqual({
@@ -243,16 +226,7 @@ describe('deliverRecipient', () => {
   });
 
   it('keeps the https form alone when the mailto form has no reply-to address', async () => {
-    mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
-      logo: { mode: 'tracearr' },
-      mailtoUnsubscribe: true,
-    });
+    mockBranding.mockResolvedValue({ ...DEFAULT_EMAIL_BRANDING, mailtoUnsubscribe: true });
     mockReadConfig.mockReturnValue({ ok: true, config: { ...config, replyTo: '' }, rewrap: false });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
     const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
