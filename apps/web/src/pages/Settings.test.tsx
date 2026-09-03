@@ -10,14 +10,17 @@ vi.mock('react-i18next', () => ({
 vi.mock('@/components/settings/shell/SettingsNav', () => ({
   SettingsNav: () => <nav aria-label="settings nav" />,
 }));
-vi.mock('@/components/settings/GeneralSettings', () => ({
-  GeneralSettings: () => <div>general settings</div>,
-}));
 vi.mock('@/components/settings/general/Appearance', () => ({
   Appearance: () => <div>appearance settings</div>,
 }));
 vi.mock('@/components/settings/general/Locale', () => ({
   Locale: () => <div>locale settings</div>,
+}));
+vi.mock('@/components/settings/general/Behavior', () => ({
+  Behavior: () => <div>behavior settings</div>,
+}));
+vi.mock('@/components/settings/data/Api', () => ({
+  Api: () => <div>api settings</div>,
 }));
 vi.mock('@/components/settings/ServerSettings', () => ({
   ServerSettings: () => <div>server settings</div>,
@@ -87,8 +90,8 @@ describe('Settings routes', () => {
   it.each([
     ['/settings/general/appearance', 'appearance settings'],
     ['/settings/general/locale', 'locale settings'],
-    ['/settings/general/behavior', 'general settings'],
-    ['/settings/data/api', 'general settings'],
+    ['/settings/general/behavior', 'behavior settings'],
+    ['/settings/data/api', 'api settings'],
     ['/settings/servers/connections', 'server settings'],
     ['/settings/servers/posters', 'server settings'],
     ['/settings/servers/plex-accounts', 'server settings'],
@@ -108,7 +111,7 @@ describe('Settings routes', () => {
   it('lays the nav beside a container-query-capped content column', () => {
     renderAt('/settings/general/behavior');
 
-    const content = screen.getByText('general settings').parentElement;
+    const content = screen.getByText('behavior settings').parentElement;
     expect(content).toHaveClass('min-w-0', 'max-w-4xl');
     expect(content?.parentElement).toHaveClass('@3xl/settings:grid-cols-[13rem_minmax(0,1fr)]');
   });

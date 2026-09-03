@@ -2,9 +2,10 @@ import { Navigate, Route, Routes } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { SettingsNav } from '@/components/settings/shell/SettingsNav';
 import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
-import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { Appearance } from '@/components/settings/general/Appearance';
 import { Locale } from '@/components/settings/general/Locale';
+import { Behavior } from '@/components/settings/general/Behavior';
+import { Api } from '@/components/settings/data/Api';
 import { ServerSettings } from '@/components/settings/ServerSettings';
 import { AccessSettings } from '@/components/settings/AccessSettings';
 import { MobileSettings } from '@/components/settings/MobileSettings';
@@ -30,7 +31,7 @@ export function Settings() {
 
             <Route path="general/appearance" element={<Appearance />} />
             <Route path="general/locale" element={<Locale />} />
-            <Route path="general/behavior" element={<GeneralSettings />} />
+            <Route path="general/behavior" element={<Behavior />} />
 
             <Route path="servers/connections" element={<ServerSettings />} />
             <Route path="servers/posters" element={<ServerSettings />} />
@@ -45,7 +46,7 @@ export function Settings() {
             <Route path="data/import" element={<ImportSettings />} />
             <Route path="data/backup" element={<BackupSettings />} />
             <Route path="data/jobs" element={<JobsSettings />} />
-            <Route path="data/api" element={<GeneralSettings />} />
+            <Route path="data/api" element={<Api />} />
 
             <Route
               path="servers"
