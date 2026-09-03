@@ -239,7 +239,7 @@ describe('deliverRecipient', () => {
     expect(store.markRecipient).not.toHaveBeenCalled();
   });
 
-  it('settles as unknown when a connect-stage or greeting timeout means the message never sent', async () => {
+  it('notes a connect-stage timeout and rethrows because the message never went out', async () => {
     mockSendMail.mockRejectedValueOnce(
       Object.assign(new Error('Connection timeout'), { code: 'ETIMEDOUT' })
     );
