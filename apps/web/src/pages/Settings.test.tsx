@@ -25,6 +25,12 @@ vi.mock('@/components/settings/data/Api', () => ({
 vi.mock('@/components/settings/servers/Connections', () => ({
   Connections: () => <div>connections</div>,
 }));
+vi.mock('@/components/settings/servers/PosterSource', () => ({
+  PosterSource: () => <div>poster source</div>,
+}));
+vi.mock('@/components/settings/servers/PlexAccounts', () => ({
+  PlexAccounts: () => <div>plex accounts</div>,
+}));
 vi.mock('@/components/settings/AccessSettings', () => ({
   AccessSettings: () => <div>access settings</div>,
 }));
@@ -74,8 +80,6 @@ describe('Settings routes', () => {
   it.each([
     ['/settings', '/settings/general/appearance'],
     ['/settings/servers', '/settings/servers/connections'],
-    ['/settings/servers/posters', '/settings/servers/connections'],
-    ['/settings/servers/plex-accounts', '/settings/servers/connections'],
     ['/settings/notifications', '/settings/notifications/destinations'],
     ['/settings/access', '/settings/access/guest'],
     ['/settings/mobile', '/settings/access/mobile'],
@@ -95,6 +99,8 @@ describe('Settings routes', () => {
     ['/settings/general/behavior', 'behavior settings'],
     ['/settings/data/api', 'api settings'],
     ['/settings/servers/connections', 'connections'],
+    ['/settings/servers/posters', 'poster source'],
+    ['/settings/servers/plex-accounts', 'plex accounts'],
     ['/settings/notifications/destinations', 'destinations'],
     ['/settings/access/guest', 'access settings'],
     ['/settings/access/mobile', 'mobile settings'],

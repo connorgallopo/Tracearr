@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Server, Settings } from '@tracearr/shared';
-import { PosterSourceCard } from './ServerSettings';
+import { PosterSource } from './PosterSource';
 
 // jsdom has no pointer capture API, which Radix Select's trigger relies on
 // when handling pointerdown/click to open the listbox.
@@ -21,16 +21,22 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/queries', () => ({
   useSettings: vi.fn(),
+  useServers: vi.fn(),
 }));
+
+vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
 
 vi.mock('@/hooks/useDebouncedSave', () => ({
   useDebouncedSave: vi.fn(),
 }));
 
-import { useSettings } from '@/hooks/queries';
+import { useServers, useSettings } from '@/hooks/queries';
+import { useAuth } from '@/hooks/useAuth';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 
+const mockUseServers = vi.mocked(useServers);
 const mockUseSettings = vi.mocked(useSettings);
+const mockUseAuth = vi.mocked(useAuth);
 const mockUseDebouncedSave = vi.mocked(useDebouncedSave);
 
 function server(overrides: Partial<Server> = {}): Server {
@@ -69,19 +75,30 @@ function debouncedSaveResult(
   };
 }
 
-describe('PosterSourceCard', () => {
+describe('PosterSource', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseServers.mockReturnValue({
+      data: [server()],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
+    mockUseAuth.mockReturnValue({
+      user: { role: 'owner' },
+    } as unknown as ReturnType<typeof useAuth>);
   });
 
   it('renders nothing for a non-owner, even with servers present', () => {
+    mockUseAuth.mockReturnValue({
+      user: { role: 'admin' },
+    } as unknown as ReturnType<typeof useAuth>);
     mockUseSettings.mockReturnValue({
       data: settingsData(),
       isLoading: false,
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult(null));
 
-    const { container } = render(<PosterSourceCard servers={[server()]} isOwner={false} />);
+    const { container } = render(<PosterSource />);
+
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -92,18 +109,22 @@ describe('PosterSourceCard', () => {
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult(null));
 
-    render(<PosterSourceCard servers={[server()]} isOwner={true} />);
+    render(<PosterSource />);
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   it('disables the control and shows a helper hint when there are no servers', () => {
+    mockUseServers.mockReturnValue({
+      data: [],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
     mockUseSettings.mockReturnValue({
       data: settingsData(),
       isLoading: false,
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult(null));
 
-    render(<PosterSourceCard servers={[]} isOwner={true} />);
+    render(<PosterSource />);
     expect(screen.getByRole('combobox')).toBeDisabled();
     expect(screen.getByText('servers.posterSource.emptyHint')).toBeInTheDocument();
   });
@@ -111,13 +132,17 @@ describe('PosterSourceCard', () => {
   it('reflects the currently saved preference and offers Automatic plus every server', async () => {
     const serverA = server({ id: 'server-a', name: 'Plex Server' });
     const serverB = server({ id: 'server-b', name: 'Jellyfin Server' });
+    mockUseServers.mockReturnValue({
+      data: [serverA, serverB],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
     mockUseSettings.mockReturnValue({
       data: settingsData({ preferredPosterServerId: 'server-a' }),
       isLoading: false,
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult('server-a'));
 
-    render(<PosterSourceCard servers={[serverA, serverB]} isOwner={true} />);
+    render(<PosterSource />);
 
     expect(screen.getByRole('combobox')).toHaveTextContent('Plex Server');
 
@@ -132,13 +157,17 @@ describe('PosterSourceCard', () => {
   it('saves null when switching back to Automatic', async () => {
     const serverA = server({ id: 'server-a', name: 'Plex Server' });
     const setValue = vi.fn();
+    mockUseServers.mockReturnValue({
+      data: [serverA],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
     mockUseSettings.mockReturnValue({
       data: settingsData({ preferredPosterServerId: 'server-a' }),
       isLoading: false,
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult('server-a', { setValue }));
 
-    render(<PosterSourceCard servers={[serverA]} isOwner={true} />);
+    render(<PosterSource />);
 
     await userEvent.click(screen.getByRole('combobox'));
     await userEvent.click(screen.getByRole('option', { name: 'servers.posterSource.automatic' }));
@@ -150,13 +179,17 @@ describe('PosterSourceCard', () => {
     const serverA = server({ id: 'server-a', name: 'Plex Server' });
     const serverB = server({ id: 'server-b', name: 'Jellyfin Server' });
     const setValue = vi.fn();
+    mockUseServers.mockReturnValue({
+      data: [serverA, serverB],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
     mockUseSettings.mockReturnValue({
       data: settingsData({ preferredPosterServerId: null }),
       isLoading: false,
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult(null, { setValue }));
 
-    render(<PosterSourceCard servers={[serverA, serverB]} isOwner={true} />);
+    render(<PosterSource />);
 
     await userEvent.click(screen.getByRole('combobox'));
     await userEvent.click(screen.getByRole('option', { name: 'Jellyfin Server' }));

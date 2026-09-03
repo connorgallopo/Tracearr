@@ -7,6 +7,8 @@ import { Locale } from '@/components/settings/general/Locale';
 import { Behavior } from '@/components/settings/general/Behavior';
 import { Api } from '@/components/settings/data/Api';
 import { Connections } from '@/components/settings/servers/Connections';
+import { PosterSource } from '@/components/settings/servers/PosterSource';
+import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
 import { AccessSettings } from '@/components/settings/AccessSettings';
 import { MobileSettings } from '@/components/settings/MobileSettings';
 import { TailscaleSettings } from '@/components/settings/TailscaleSettings';
@@ -34,14 +36,8 @@ export function Settings() {
             <Route path="general/behavior" element={<Behavior />} />
 
             <Route path="servers/connections" element={<Connections />} />
-            <Route
-              path="servers/posters"
-              element={<Navigate to="/settings/servers/connections" replace />}
-            />
-            <Route
-              path="servers/plex-accounts"
-              element={<Navigate to="/settings/servers/connections" replace />}
-            />
+            <Route path="servers/posters" element={<PosterSource />} />
+            <Route path="servers/plex-accounts" element={<PlexAccounts />} />
 
             <Route path="notifications/destinations" element={<Destinations />} />
 
