@@ -198,6 +198,7 @@
     "plexServerPlaceholder": "My Plex Server",
     "plexServerUrlPlaceholder": "http://192.168.1.100:32400",
     "updateHint": "Or click Update below to save only the name change.",
+    "reorder": "Reorder server",
     "added": "Added {{date}}",
     "realtimeActive": "Real-time updates active",
     "pollingMode": "Polling",
