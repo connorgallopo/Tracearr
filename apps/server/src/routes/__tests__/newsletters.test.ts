@@ -145,6 +145,25 @@ describe('newsletter routes', () => {
     expect(queue.upsertNewsletterSchedule).toHaveBeenCalledWith(row);
   });
 
+  it('answers 409 when the name collides on create or on a rename', async () => {
+    const duplicate = () => new Error('duplicate key value', { cause: { code: '23505' } });
+    store.createNewsletter.mockRejectedValueOnce(duplicate());
+    const app = await build(owner);
+    const created = await app.inject({ method: 'POST', url: '/newsletters', payload: body });
+    expect(created.statusCode).toBe(409);
+    expect(created.json().message).toBe('A newsletter with that name already exists');
+    expect(queue.upsertNewsletterSchedule).not.toHaveBeenCalled();
+
+    store.updateNewsletter.mockRejectedValueOnce(duplicate());
+    const renamed = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { name: 'Taken' },
+    });
+    expect(renamed.statusCode).toBe(409);
+    expect(renamed.json().message).toBe('A newsletter with that name already exists');
+  });
+
   it('rejects a destination that is not an email kind and hosted images without an external url', async () => {
     const app = await build(owner);
     mockDestination.mockResolvedValue({

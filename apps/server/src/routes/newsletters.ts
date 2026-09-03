@@ -10,6 +10,7 @@ import {
   type Newsletter,
   type NewsletterPreview,
 } from '@tracearr/shared';
+import { isUniqueViolation } from '../db/pg.js';
 import {
   InvalidScheduleError,
   enqueueDeliveries,
@@ -50,6 +51,8 @@ import { renderTemplate } from '../services/notifications/types.js';
 import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
 
+const DUPLICATE_NAME = 'A newsletter with that name already exists';
+
 const idParams = z.object({ id: uuidSchema });
 const sendParams = z.object({ id: uuidSchema, sendId: uuidSchema });
 
@@ -89,7 +92,13 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       return reply.badRequest(`Invalid request body: ${firstIssueMessage(parsed.error)}`);
     const problem = await validateReferences(parsed.data);
     if (problem) return reply.badRequest(problem);
-    const row = await createNewsletter(parsed.data);
+    let row;
+    try {
+      row = await createNewsletter(parsed.data);
+    } catch (error) {
+      if (isUniqueViolation(error)) return reply.conflict(DUPLICATE_NAME);
+      throw error;
+    }
     try {
       await upsertNewsletterSchedule(row);
     } catch (error) {
@@ -124,7 +133,13 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       imageMode: 'imageMode' in patch ? patch.imageMode : current.imageMode,
     });
     if (problem) return reply.badRequest(problem);
-    const row = await updateNewsletter(params.data.id, patch);
+    let row;
+    try {
+      row = await updateNewsletter(params.data.id, patch);
+    } catch (error) {
+      if (isUniqueViolation(error)) return reply.conflict(DUPLICATE_NAME);
+      throw error;
+    }
     if (!row) return reply.notFound('Newsletter not found');
     try {
       await upsertNewsletterSchedule(row);
