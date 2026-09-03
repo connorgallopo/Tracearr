@@ -32,9 +32,12 @@ import { AutosaveNumberField } from '@/components/ui/autosave-field';
 import { api } from '@/lib/api';
 import { formatBytes } from '@/lib/formatters';
 import { useMaintenanceMode, MAINTENANCE_EVENT } from '@/hooks/useMaintenanceMode';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
 import { BackupHistory } from './BackupHistory';
+
+const RETENTION_DEBOUNCE_MS = 1000;
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
@@ -374,8 +377,8 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
 
         {/* Complete state */}
         {isComplete && (
-          <Alert>
-            <CheckCircle2 className="text-success" />
+          <Alert className="[&>svg]:text-success">
+            <CheckCircle2 />
             <AlertDescription>{t('backup.restore.complete')}</AlertDescription>
           </Alert>
         )}
@@ -413,6 +416,34 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
 // ============================================================================
 // Schedule Card — Automatic backup scheduling
 // ============================================================================
+
+/** Debounces retention edits locally; NumericInput fires onChange per keystroke, so saving on every one would fire mid-typing. */
+export function RetentionField({
+  retentionCount,
+  onSettle,
+  isSaving,
+}: {
+  retentionCount: number;
+  onSettle: (value: number) => void;
+  isSaving: boolean;
+}) {
+  const { t } = useTranslation('settings');
+  const [value, setValue] = useState(retentionCount);
+  const debounced = useDebouncedValue(value, RETENTION_DEBOUNCE_MS, onSettle);
+
+  return (
+    <AutosaveNumberField
+      id="backup-retention"
+      label={t('backup.retentionCount')}
+      value={value}
+      onChange={setValue}
+      min={1}
+      max={30}
+      suffix={t('backup.retentionSuffix')}
+      status={isSaving || value !== debounced ? 'saving' : 'idle'}
+    />
+  );
+}
 
 function ScheduleCard() {
   const { t } = useTranslation('settings');
@@ -580,15 +611,10 @@ function ScheduleCard() {
             )}
 
             {/* Retention */}
-            <AutosaveNumberField
-              id="backup-retention"
-              label={t('backup.retentionCount')}
-              value={schedule.retentionCount}
-              onChange={(value) => handleChange('retentionCount', value)}
-              min={1}
-              max={30}
-              suffix={t('backup.retentionSuffix')}
-              status={updateMutation.isPending ? 'saving' : 'idle'}
+            <RetentionField
+              retentionCount={schedule.retentionCount}
+              onSettle={(value) => handleChange('retentionCount', value)}
+              isSaving={updateMutation.isPending}
             />
           </>
         )}
