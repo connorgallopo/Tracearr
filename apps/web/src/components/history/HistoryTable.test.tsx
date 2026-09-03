@@ -118,7 +118,7 @@ function makeSession(overrides: Partial<SessionWithDetails> = {}): SessionWithDe
 }
 
 describe('HistoryTable content layout', () => {
-  it('applies upstream proportional sizing and content truncation classes', () => {
+  it('keeps content readable by restoring a scrollable minimum table width', () => {
     render(
       <TooltipProvider>
         <MemoryRouter>
@@ -129,17 +129,63 @@ describe('HistoryTable content layout', () => {
 
     const table = screen.getByRole('table');
     expect(table.className).toContain('w-full');
+    expect(table).toHaveStyle({ minWidth: '1264px' });
 
-    const title = screen.getByText('Very Long Movie Name That Should Be Truncated On Mobile Layout');
+    const title = screen.getByText(
+      'Very Long Movie Name That Should Be Truncated On Mobile Layout'
+    );
     expect(title.className).toContain('truncate');
     expect(title.className).toContain('min-w-0');
+    expect(title.className).toContain('flex-1');
 
     const contentHeader = screen.getByRole('columnheader', { name: 'Content' });
-    expect(contentHeader.className).toContain('w-[26%]');
+    expect(contentHeader).toHaveStyle({ width: '300px', minWidth: '300px' });
 
     const contentCell = title.closest('td');
     expect(contentCell).not.toBeNull();
-    expect(contentCell?.className).toContain('w-[26%]');
+    expect(contentCell).toHaveStyle({ width: '300px', minWidth: '300px' });
+    expect(contentCell?.className).toContain('overflow-hidden');
+  });
+
+  it('accounts for the server column only in multi-server mode', () => {
+    const { rerender } = render(
+      <TooltipProvider>
+        <MemoryRouter>
+          <HistoryTable
+            sessions={[makeSession()]}
+            columnVisibility={DEFAULT_COLUMN_VISIBILITY}
+            isMultiServer
+          />
+        </MemoryRouter>
+      </TooltipProvider>
+    );
+
+    expect(screen.getByRole('table')).toHaveStyle({ minWidth: '1414px' });
+
+    rerender(
+      <TooltipProvider>
+        <MemoryRouter>
+          <HistoryTable sessions={[makeSession()]} columnVisibility={DEFAULT_COLUMN_VISIBILITY} />
+        </MemoryRouter>
+      </TooltipProvider>
+    );
+
+    expect(screen.getByRole('table')).toHaveStyle({ minWidth: '1264px' });
+  });
+
+  it('recalculates its minimum width when visible columns change', () => {
+    render(
+      <TooltipProvider>
+        <MemoryRouter>
+          <HistoryTable
+            sessions={[makeSession()]}
+            columnVisibility={{ ...DEFAULT_COLUMN_VISIBILITY, content: false, ip: true }}
+          />
+        </MemoryRouter>
+      </TooltipProvider>
+    );
+
+    expect(screen.getByRole('table')).toHaveStyle({ minWidth: '1094px' });
   });
 });
 
