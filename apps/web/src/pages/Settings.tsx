@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { SettingsNav } from '@/components/settings/shell/SettingsNav';
 import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
 import { GeneralSettings } from '@/components/settings/GeneralSettings';
+import { Appearance } from '@/components/settings/general/Appearance';
+import { Locale } from '@/components/settings/general/Locale';
 import { ServerSettings } from '@/components/settings/ServerSettings';
 import { AccessSettings } from '@/components/settings/AccessSettings';
 import { MobileSettings } from '@/components/settings/MobileSettings';
@@ -26,8 +28,8 @@ export function Settings() {
           <Routes>
             <Route index element={<Navigate to={SETTINGS_HOME} replace />} />
 
-            <Route path="general/appearance" element={<GeneralSettings />} />
-            <Route path="general/locale" element={<GeneralSettings />} />
+            <Route path="general/appearance" element={<Appearance />} />
+            <Route path="general/locale" element={<Locale />} />
             <Route path="general/behavior" element={<GeneralSettings />} />
 
             <Route path="servers/connections" element={<ServerSettings />} />

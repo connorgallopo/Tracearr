@@ -13,6 +13,12 @@ vi.mock('@/components/settings/shell/SettingsNav', () => ({
 vi.mock('@/components/settings/GeneralSettings', () => ({
   GeneralSettings: () => <div>general settings</div>,
 }));
+vi.mock('@/components/settings/general/Appearance', () => ({
+  Appearance: () => <div>appearance settings</div>,
+}));
+vi.mock('@/components/settings/general/Locale', () => ({
+  Locale: () => <div>locale settings</div>,
+}));
 vi.mock('@/components/settings/ServerSettings', () => ({
   ServerSettings: () => <div>server settings</div>,
 }));
@@ -79,8 +85,8 @@ describe('Settings routes', () => {
   });
 
   it.each([
-    ['/settings/general/appearance', 'general settings'],
-    ['/settings/general/locale', 'general settings'],
+    ['/settings/general/appearance', 'appearance settings'],
+    ['/settings/general/locale', 'locale settings'],
     ['/settings/general/behavior', 'general settings'],
     ['/settings/data/api', 'general settings'],
     ['/settings/servers/connections', 'server settings'],
@@ -100,7 +106,7 @@ describe('Settings routes', () => {
   });
 
   it('lays the nav beside a container-query-capped content column', () => {
-    renderAt('/settings/general/appearance');
+    renderAt('/settings/general/behavior');
 
     const content = screen.getByText('general settings').parentElement;
     expect(content).toHaveClass('min-w-0', 'max-w-4xl');

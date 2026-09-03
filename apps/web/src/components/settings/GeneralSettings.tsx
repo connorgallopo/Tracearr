@@ -1,25 +1,18 @@
 /**
- * General settings section - appearance, application settings, network, API key, and public API.
+ * General settings section - application settings, network, API key, and public API.
  */
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { UpdateChecksCard } from '@/components/settings/UpdateChecksCard';
 import { ImageCacheCard } from '@/components/settings/ImageCacheCard';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
 import {
   AutosaveNumberField,
-  AutosaveSelectField,
   AutosaveSwitchField,
   SaveStatusIndicator,
 } from '@/components/ui/autosave-field';
@@ -32,39 +25,11 @@ import {
   Globe,
   AlertTriangle,
   KeyRound,
-  Sun,
-  Moon,
-  Monitor,
-  Check,
-  RotateCcw,
-  Palette,
   Settings as SettingsIcon,
-  Languages,
-  Clock,
   Gauge,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useTheme, ACCENT_PRESETS } from '@/components/theme-provider';
 import { useDebouncedSave, TEXT_INPUT_DELAY } from '@/hooks/useDebouncedSave';
 import { useSettings, useApiKey, useRegenerateApiKey } from '@/hooks/queries';
-import {
-  languageNames,
-  getCurrentLanguage,
-  changeLanguage,
-  useTranslation,
-} from '@tracearr/translations';
-import { getTimeFormat, setTimeFormat, type TimeFormat } from '@/lib/timeFormat';
-
-type ThemeMode = 'light' | 'dark' | 'system';
-
-const DEFAULT_THEME: ThemeMode = 'dark';
-const DEFAULT_HUE = 187; // Cyan
-
-const THEME_MODES = [
-  { value: 'light' as const, labelKey: 'general.themeLight' as const, icon: Sun },
-  { value: 'dark' as const, labelKey: 'general.themeDark' as const, icon: Moon, isDefault: true },
-  { value: 'system' as const, labelKey: 'general.themeSystem' as const, icon: Monitor },
-];
 
 function ApiKeyCard() {
   const { t } = useTranslation(['settings', 'common']);
@@ -161,92 +126,11 @@ function ApiKeyCard() {
   );
 }
 
-/**
- * Language selector field with localStorage persistence.
- */
-function LanguageField() {
-  const { t } = useTranslation('settings');
-  const [language, setLanguage] = useState(getCurrentLanguage);
-
-  const handleLanguageChange = (lang: string) => {
-    setLanguage(lang);
-    void changeLanguage(lang);
-  };
-
-  return (
-    <Field>
-      <FieldLabel htmlFor="language" className="flex items-center gap-2">
-        <Languages className="h-4 w-4" />
-        {t('general.language')}
-      </FieldLabel>
-      <Select value={language} onValueChange={handleLanguageChange}>
-        <SelectTrigger id="language" className="w-full max-w-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {Object.entries(languageNames).map(([code, name]) => (
-            <SelectItem key={code} value={code}>
-              {name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <FieldDescription>
-        {t('general.languageDescription')}{' '}
-        <a
-          href="https://crowdin.com/project/tracearr"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1"
-        >
-          {t('general.helpTranslate')}
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      </FieldDescription>
-    </Field>
-  );
-}
-
-/**
- * Time format selector field with localStorage persistence.
- */
-function TimeFormatField() {
-  const { t } = useTranslation('settings');
-  const [timeFormat, setTimeFormatState] = useState<TimeFormat>(getTimeFormat);
-
-  const handleTimeFormatChange = (value: string) => {
-    const tf = value as TimeFormat;
-    setTimeFormatState(tf);
-    setTimeFormat(tf);
-  };
-
-  return (
-    <Field>
-      <FieldLabel htmlFor="timeFormat" className="flex items-center gap-2">
-        <Clock className="h-4 w-4" />
-        {t('general.timeFormat')}
-      </FieldLabel>
-      <Select value={timeFormat} onValueChange={handleTimeFormatChange}>
-        <SelectTrigger id="timeFormat" className="w-full max-w-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="12h">{t('general.timeFormat12h')}</SelectItem>
-          <SelectItem value="24h">{t('general.timeFormat24h')}</SelectItem>
-        </SelectContent>
-      </Select>
-      <FieldDescription>{t('general.timeFormatDescription')}</FieldDescription>
-    </Field>
-  );
-}
-
 export function GeneralSettings() {
   const { t } = useTranslation(['settings', 'common']);
   const { data: settings, isLoading } = useSettings();
-  const { theme, setTheme, accentHue, setAccentHue } = useTheme();
 
   // General settings fields
-  const unitSystemField = useDebouncedSave('unitSystem', settings?.unitSystem);
   const pollerEnabledField = useDebouncedSave('pollerEnabled', settings?.pollerEnabled);
   const pollerIntervalField = useDebouncedSave('pollerIntervalMs', settings?.pollerIntervalMs, {
     delay: TEXT_INPUT_DELAY,
@@ -299,13 +183,6 @@ export function GeneralSettings() {
   const isLocalhost = externalUrl.includes('localhost') || externalUrl.includes('127.0.0.1');
   const isHttp = externalUrl.startsWith('http://') && !isLocalhost;
 
-  const isDefaultTheme = theme === DEFAULT_THEME && accentHue === DEFAULT_HUE;
-
-  const handleThemeReset = () => {
-    setTheme(DEFAULT_THEME);
-    setAccentHue(DEFAULT_HUE);
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -325,112 +202,6 @@ export function GeneralSettings() {
 
   return (
     <div className="space-y-6">
-      {/* Appearance */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                {t('general.appearance')}
-              </CardTitle>
-              <CardDescription>{t('general.appearanceDesc')}</CardDescription>
-            </div>
-            {!isDefaultTheme && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleThemeReset}
-                className="text-muted-foreground hover:text-foreground gap-1.5"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                {t('common:actions.reset')}
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Mode Selection */}
-          <div className="space-y-2">
-            <label className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              {t('general.theme')}
-            </label>
-            <div className="flex gap-2">
-              {THEME_MODES.map(({ value, labelKey, icon: Icon, isDefault: isDefaultMode }) => (
-                <Button
-                  key={value}
-                  variant={theme === value ? 'default' : 'outline'}
-                  size="sm"
-                  className={cn(
-                    'flex-1 gap-1.5',
-                    theme === value && 'ring-primary ring-offset-background ring-1 ring-offset-1'
-                  )}
-                  onClick={() => setTheme(value)}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{t(labelKey)}</span>
-                  {isDefaultMode && (
-                    <span className="text-[10px] opacity-60">{t('general.default')}</span>
-                  )}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Accent Color Selection */}
-          <div className="space-y-2">
-            <label className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              {t('general.accentColor')}
-            </label>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
-              {ACCENT_PRESETS.map((preset) => {
-                const isSelected = accentHue === preset.hue;
-                const isDefaultColor = preset.hue === DEFAULT_HUE;
-                return (
-                  <button
-                    key={preset.hue}
-                    onClick={() => setAccentHue(preset.hue)}
-                    className={cn(
-                      'group relative flex flex-col items-center gap-1 rounded-lg p-1.5 transition-all',
-                      'hover:bg-muted/50 focus:ring-primary focus:ring-offset-background focus:ring-2 focus:ring-offset-2 focus:outline-none'
-                    )}
-                    title={preset.name}
-                  >
-                    <div
-                      className={cn(
-                        'relative h-8 w-8 rounded-md transition-transform',
-                        'group-hover:scale-105',
-                        isSelected && 'ring-offset-background scale-105 ring-2 ring-offset-2'
-                      )}
-                      style={{
-                        backgroundColor: preset.hex,
-                        ['--tw-ring-color' as string]: isSelected ? preset.hex : undefined,
-                      }}
-                    >
-                      {isSelected && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Check className="h-4 w-4 text-white drop-shadow-md" />
-                        </div>
-                      )}
-                    </div>
-                    <span
-                      className={cn(
-                        'text-[10px] leading-tight',
-                        isSelected ? 'text-foreground font-medium' : 'text-muted-foreground'
-                      )}
-                    >
-                      {preset.name}
-                      {isDefaultColor && !isSelected && <span className="opacity-60">*</span>}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-muted-foreground text-[10px]">{t('general.cyanDefault')}</p>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Application Settings */}
       <Card>
         <CardHeader>
@@ -442,26 +213,6 @@ export function GeneralSettings() {
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <AutosaveSelectField
-              id="unitSystem"
-              label={t('general.unitSystem')}
-              description={t('general.unitSystemDesc')}
-              value={unitSystemField.value ?? 'metric'}
-              onChange={(v) => unitSystemField.setValue(v as 'metric' | 'imperial')}
-              options={[
-                { value: 'metric', label: t('general.metric') },
-                { value: 'imperial', label: t('general.imperial') },
-              ]}
-              status={unitSystemField.status}
-              errorMessage={unitSystemField.errorMessage}
-              onRetry={unitSystemField.retry}
-              onReset={unitSystemField.reset}
-            />
-
-            <LanguageField />
-
-            <TimeFormatField />
-
             <AutosaveSwitchField
               id="pollerEnabled"
               label={t('general.sessionSync')}
