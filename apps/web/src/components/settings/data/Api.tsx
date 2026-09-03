@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { ExternalLink, Gauge, KeyRound, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -110,6 +111,15 @@ const PERCENT = {
   transform: (v: number) => Math.max(1, Math.min(100, v)),
 };
 
+type ThresholdField = ReturnType<typeof useDebouncedSave<'watchedThresholdMovie'>>;
+
+interface ThresholdFieldConfig {
+  id: 'watchedThresholdMovie' | 'watchedThresholdTv' | 'watchedThresholdMusic';
+  labelKey: ParseKeys<'settings'>;
+  descriptionKey: ParseKeys<'settings'>;
+  field: ThresholdField;
+}
+
 export function Api() {
   const { t } = useTranslation(['settings', 'common']);
   const { data: settings } = useSettings();
@@ -131,6 +141,27 @@ export function Api() {
     { delay: TEXT_INPUT_DELAY, transform: (v) => Math.max(1, v) }
   );
 
+  const thresholdFields: ThresholdFieldConfig[] = [
+    {
+      id: 'watchedThresholdMovie',
+      labelKey: 'general.watchedThresholdMovie',
+      descriptionKey: 'general.watchedThresholdMovieDesc',
+      field: movieField,
+    },
+    {
+      id: 'watchedThresholdTv',
+      labelKey: 'general.watchedThresholdTv',
+      descriptionKey: 'general.watchedThresholdTvDesc',
+      field: tvField,
+    },
+    {
+      id: 'watchedThresholdMusic',
+      labelKey: 'general.watchedThresholdMusic',
+      descriptionKey: 'general.watchedThresholdMusicDesc',
+      field: musicField,
+    },
+  ];
+
   return (
     <SettingsSection title={t('nav.sections.api')} description={t('nav.descriptions.api')}>
       <ApiKeyCard />
@@ -145,56 +176,25 @@ export function Api() {
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <AutosaveNumberField
-              id="watchedThresholdMovie"
-              label={t('general.watchedThresholdMovie')}
-              description={t('general.watchedThresholdMovieDesc')}
-              value={movieField.value ?? 85}
-              onChange={(v) => {
-                movieField.setValue(v);
-              }}
-              min={1}
-              max={100}
-              suffix={t('general.watchedThresholdSuffix')}
-              status={movieField.status}
-              errorMessage={movieField.errorMessage}
-              onRetry={movieField.retry}
-              onReset={movieField.reset}
-            />
-
-            <AutosaveNumberField
-              id="watchedThresholdTv"
-              label={t('general.watchedThresholdTv')}
-              description={t('general.watchedThresholdTvDesc')}
-              value={tvField.value ?? 85}
-              onChange={(v) => {
-                tvField.setValue(v);
-              }}
-              min={1}
-              max={100}
-              suffix={t('general.watchedThresholdSuffix')}
-              status={tvField.status}
-              errorMessage={tvField.errorMessage}
-              onRetry={tvField.retry}
-              onReset={tvField.reset}
-            />
-
-            <AutosaveNumberField
-              id="watchedThresholdMusic"
-              label={t('general.watchedThresholdMusic')}
-              description={t('general.watchedThresholdMusicDesc')}
-              value={musicField.value ?? 85}
-              onChange={(v) => {
-                musicField.setValue(v);
-              }}
-              min={1}
-              max={100}
-              suffix={t('general.watchedThresholdSuffix')}
-              status={musicField.status}
-              errorMessage={musicField.errorMessage}
-              onRetry={musicField.retry}
-              onReset={musicField.reset}
-            />
+            {thresholdFields.map(({ id, labelKey, descriptionKey, field }) => (
+              <AutosaveNumberField
+                key={id}
+                id={id}
+                label={t(labelKey)}
+                description={t(descriptionKey)}
+                value={field.value ?? 85}
+                onChange={(v) => {
+                  field.setValue(v);
+                }}
+                min={1}
+                max={100}
+                suffix={t('general.watchedThresholdSuffix')}
+                status={field.status}
+                errorMessage={field.errorMessage}
+                onRetry={field.retry}
+                onReset={field.reset}
+              />
+            ))}
 
             <AutosaveNumberField
               id="publicApiRateLimitPerMinute"
