@@ -792,7 +792,7 @@ export function PosterSourceCard({ servers, isOwner }: { servers: Server[]; isOw
       </CardHeader>
       <CardContent>
         {isLoadingSettings ? (
-          <Skeleton className="h-10 w-full max-w-xs" />
+          <Skeleton className="h-9 w-full max-w-sm" />
         ) : (
           <AutosaveSelectField
             id="preferredPosterServerId"
@@ -815,7 +815,6 @@ export function PosterSourceCard({ servers, isOwner }: { servers: Server[]; isOw
             errorMessage={preferredPosterField.errorMessage}
             onRetry={preferredPosterField.retry}
             onReset={preferredPosterField.reset}
-            className="max-w-xs"
           />
         )}
       </CardContent>

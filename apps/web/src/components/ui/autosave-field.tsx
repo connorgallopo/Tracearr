@@ -4,6 +4,12 @@ import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { NumericInput } from '@/components/ui/numeric-input';
+import {
+  INPUT_GROUP_CONTROL,
+  INPUT_GROUP_UNIT,
+  InputGroup,
+  InputGroupAddon,
+} from '@/components/ui/input-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -246,9 +252,9 @@ export function AutosaveNumberField({
   const hasError = status === 'error';
 
   return (
-    <Field data-invalid={hasError} className={className}>
+    <Field data-invalid={hasError} className={cn('max-w-sm', className)}>
       <FieldHeader id={id} label={label} status={status} />
-      <div className="flex items-center gap-2">
+      <InputGroup data-disabled={disabled || undefined}>
         <NumericInput
           id={id}
           value={value}
@@ -258,10 +264,15 @@ export function AutosaveNumberField({
           step={step}
           disabled={disabled}
           aria-invalid={hasError}
-          className="flex-1"
+          data-slot="input-group-control"
+          className={cn('flex-1', INPUT_GROUP_CONTROL)}
         />
-        {suffix && <span className="text-muted-foreground text-sm">{suffix}</span>}
-      </div>
+        {suffix && (
+          <InputGroupAddon align="inline-end" className={INPUT_GROUP_UNIT}>
+            {suffix}
+          </InputGroupAddon>
+        )}
+      </InputGroup>
       {description && <FieldDescription>{description}</FieldDescription>}
       {hasError && errorMessage && (
         <ErrorActions errorMessage={errorMessage} onRetry={onRetry} onReset={onReset} />
@@ -302,7 +313,7 @@ export function AutosaveSelectField({
   const hasError = status === 'error';
 
   return (
-    <Field data-invalid={hasError} className={className}>
+    <Field data-invalid={hasError} className={cn('max-w-sm', className)}>
       <FieldHeader id={id} label={label} status={status} />
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger id={id} aria-invalid={hasError}>
