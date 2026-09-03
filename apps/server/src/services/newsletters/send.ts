@@ -85,63 +85,92 @@ export async function runNewsletter(
     return { outcome: 'failed', sendId: send.id, queuedRecipientIds: [] };
   }
 
-  const { externalUrl } = await getNetworkSettings();
-  const { data, posters } = await assembleDigest(newsletter, window);
+  const done = (result: RunResult) => ({ done: result });
+  const prepare = async () => {
+    const { externalUrl } = await getNetworkSettings();
+    const { data, posters } = await assembleDigest(newsletter, window);
 
-  const recipients: ResolvedRecipient[] = testAddress
-    ? [{ address: testAddress.trim().toLowerCase(), userId: null, name: null, suppressed: false }]
-    : (await resolveRecipients(newsletter)).recipients;
+    const recipients: ResolvedRecipient[] = testAddress
+      ? [{ address: testAddress.trim().toLowerCase(), userId: null, name: null, suppressed: false }]
+      : (await resolveRecipients(newsletter)).recipients;
 
-  if (data.isEmpty && newsletter.skipWhenEmpty && trigger !== 'test') {
-    const send = await insertSend({
-      ...base,
-      itemCounts: data.counts,
-      outcome: 'skipped_empty',
-      html: null,
-      text: null,
+    if (data.isEmpty && newsletter.skipWhenEmpty && trigger !== 'test') {
+      const send = await insertSend({
+        ...base,
+        itemCounts: data.counts,
+        outcome: 'skipped_empty',
+        html: null,
+        text: null,
+      });
+      return done({ outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] });
+    }
+
+    const deliverable = recipients.filter((r) => !r.suppressed);
+    if (deliverable.length === 0) {
+      const send = await insertSend({
+        ...base,
+        itemCounts: data.counts,
+        outcome: 'failed',
+        error: 'No deliverable recipients',
+      });
+      return done({ outcome: 'failed', sendId: send.id, queuedRecipientIds: [] });
+    }
+
+    const servers = await loadServerLinks(newsletter.scope.serverIds);
+    const serversById = new Map(servers.map((s) => [s.id, s]));
+    const senderName = servers[0]?.name ?? 'Tracearr';
+    const itemCount = data.counts.movies + data.counts.episodes + data.counts.albums;
+    const subject = renderTemplate(newsletter.subject, {
+      server_name: senderName,
+      start_date: formatWindowDate(window.start, newsletter.timezone),
+      end_date: formatWindowDate(window.end, newsletter.timezone),
+      item_count: String(itemCount),
     });
-    return { outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] };
-  }
-
-  const deliverable = recipients.filter((r) => !r.suppressed);
-  if (deliverable.length === 0) {
-    const send = await insertSend({
-      ...base,
-      itemCounts: data.counts,
-      outcome: 'failed',
-      error: 'No deliverable recipients',
+    const input = buildDigestInput(data, posters, {
+      subject,
+      intro: newsletter.intro,
+      outro: newsletter.outro,
+      windowStart: formatWindowDate(window.start, newsletter.timezone),
+      windowEnd: formatWindowDate(window.end, newsletter.timezone),
+      logoRef: readLogoPng() ? 'cid:logo' : null,
+      unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
+      externalUrl,
+      serversById,
     });
-    return { outcome: 'failed', sendId: send.id, queuedRecipientIds: [] };
-  }
+    return {
+      counts: data.counts,
+      posters,
+      recipients,
+      deliverable,
+      subject,
+      rendered: await renderDigest(input, defaultBranding(senderName)),
+    };
+  };
 
-  const servers = await loadServerLinks(newsletter.scope.serverIds);
-  const serversById = new Map(servers.map((s) => [s.id, s]));
-  const senderName = servers[0]?.name ?? 'Tracearr';
-  const itemCount = data.counts.movies + data.counts.episodes + data.counts.albums;
-  const subject = renderTemplate(newsletter.subject, {
-    server_name: senderName,
-    start_date: formatWindowDate(window.start, newsletter.timezone),
-    end_date: formatWindowDate(window.end, newsletter.timezone),
-    item_count: String(itemCount),
-  });
-  const input = buildDigestInput(data, posters, {
-    subject,
-    intro: newsletter.intro,
-    outro: newsletter.outro,
-    windowStart: formatWindowDate(window.start, newsletter.timezone),
-    windowEnd: formatWindowDate(window.end, newsletter.timezone),
-    logoRef: readLogoPng() ? 'cid:logo' : null,
-    unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
-    externalUrl,
-    serversById,
-  });
-  const rendered = await renderDigest(input, defaultBranding(senderName));
+  let ready;
+  try {
+    ready = await prepare();
+  } catch (error) {
+    try {
+      await insertSend({
+        ...base,
+        itemCounts: {},
+        outcome: 'failed',
+        error: (error instanceof Error ? error.message : String(error)).slice(0, 500),
+      });
+    } catch {
+      // The queue's failure record keeps the original error.
+    }
+    throw error;
+  }
+  if ('done' in ready) return ready.done;
+  const { counts, posters, recipients, deliverable, subject, rendered } = ready;
 
   let send;
   try {
     send = await insertSend({
       ...base,
-      itemCounts: data.counts,
+      itemCounts: counts,
       outcome: 'rendering',
       subject,
       html: rendered.html,

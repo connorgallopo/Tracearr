@@ -240,6 +240,18 @@ describe('runNewsletter', () => {
     expect(html).not.toContain('{{unsubscribe_url}}');
   });
 
+  it('records a failed send when assembly throws before any send row exists, and rethrows', async () => {
+    mockAssemble.mockRejectedValueOnce(new Error('boom'));
+    await expect(runNewsletter(NEWSLETTER.id, 'schedule')).rejects.toThrow('boom');
+    expect(store.insertSend).toHaveBeenCalledTimes(1);
+    expect(store.insertSend.mock.calls[0]?.[0]).toMatchObject({
+      newsletterId: NEWSLETTER.id,
+      outcome: 'failed',
+      error: 'boom',
+      itemCounts: {},
+    });
+  });
+
   it('closes the send as failed when it dies after insertSend, and rethrows', async () => {
     store.insertRecipients.mockRejectedValueOnce(new Error('boom'));
     await expect(runNewsletter(NEWSLETTER.id, 'schedule')).rejects.toThrow('boom');
