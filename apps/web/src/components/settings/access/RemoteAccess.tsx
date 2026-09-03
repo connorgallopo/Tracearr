@@ -1,13 +1,15 @@
 import { useState, useCallback, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
+import { SaveStatusIndicator } from '@/components/ui/autosave-field';
+import { SettingsSection } from '@/components/settings/shell/SettingsSection';
+import { BetaBadge } from '@/components/settings/shared/BetaBadge';
 // Exit node disabled — this will come back when we implement SOCKS proxy support
 // import {
 //   Select,
@@ -17,6 +19,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 //   SelectValue,
 // } from '@/components/ui/select';
 import {
+  Globe,
   Loader2,
   ExternalLink,
   CheckCircle2,
@@ -24,9 +27,11 @@ import {
   XCircle,
   RefreshCw,
   ChevronDown,
+  AlertTriangle,
 } from 'lucide-react';
 import { BASE_URL } from '@/lib/basePath';
 import {
+  useSettings,
   useTailscaleStatus,
   useTailscaleLogs,
   useEnableTailscale,
@@ -34,6 +39,105 @@ import {
   // useSetExitNode, // Exit node disabled — will come back with SOCKS proxy support
   useResetTailscale,
 } from '@/hooks/queries';
+import { useDebouncedSave, TEXT_INPUT_DELAY } from '@/hooks/useDebouncedSave';
+
+type TailnetInfo = NonNullable<ReturnType<typeof useTailscaleStatus>['data']>;
+
+function ExternalUrlCard() {
+  const { t } = useTranslation(['settings', 'common']);
+  const { data: settings } = useSettings();
+  const externalUrlField = useDebouncedSave('externalUrl', settings?.externalUrl, {
+    delay: TEXT_INPUT_DELAY,
+  });
+
+  const externalUrl = externalUrlField.value ?? '';
+  const isLocalhost = externalUrl.includes('localhost') || externalUrl.includes('127.0.0.1');
+  const isHttp = externalUrl.startsWith('http://') && !isLocalhost;
+  const hasError = externalUrlField.status === 'error';
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Globe className="h-5 w-5" />
+          {t('general.externalAccess')}
+        </CardTitle>
+        <CardDescription>{t('general.externalAccessDesc')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <FieldGroup>
+          <Field data-invalid={hasError}>
+            <div className="flex items-center justify-between">
+              <FieldLabel htmlFor="externalUrl">{t('general.externalUrl')}</FieldLabel>
+              <SaveStatusIndicator status={externalUrlField.status} />
+            </div>
+            <div className="flex gap-2">
+              <Input
+                id="externalUrl"
+                placeholder={t('general.externalUrlPlaceholder')}
+                value={externalUrl}
+                onChange={(e) => externalUrlField.setValue(e.target.value)}
+                aria-invalid={hasError}
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  let detected = window.location.origin;
+                  if (import.meta.env.DEV) {
+                    detected = detected.replace(':5173', ':3000');
+                  }
+                  externalUrlField.setValue(detected);
+                  setTimeout(() => externalUrlField.saveNow(), 0);
+                }}
+              >
+                {t('general.detect')}
+              </Button>
+            </div>
+            <FieldDescription>{t('general.externalUrlDesc')}</FieldDescription>
+            {hasError && externalUrlField.errorMessage && (
+              <div className="flex items-center justify-between">
+                <FieldError>{externalUrlField.errorMessage}</FieldError>
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={externalUrlField.retry}
+                  >
+                    {t('common:actions.retry')}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
+                    onClick={externalUrlField.reset}
+                  >
+                    {t('common:actions.reset')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Field>
+
+          {isLocalhost && (
+            <Alert variant="warning">
+              <AlertTriangle />
+              <AlertDescription>{t('general.localhostWarning')}</AlertDescription>
+            </Alert>
+          )}
+          {isHttp && (
+            <Alert variant="warning">
+              <AlertTriangle />
+              <AlertDescription>{t('general.iosHttpWarning')}</AlertDescription>
+            </Alert>
+          )}
+        </FieldGroup>
+      </CardContent>
+    </Card>
+  );
+}
 
 function TailscaleLogo({ className }: { className?: string }) {
   return (
@@ -52,10 +156,48 @@ function TailscaleLogo({ className }: { className?: string }) {
   );
 }
 
-export function TailscaleSettings() {
+function TailnetFacts({ status }: { status: TailnetInfo }) {
+  const { t } = useTranslation('settings');
+
+  const facts: { label: string; value: React.ReactNode }[] = [
+    ...(status.tailnetName ? [{ label: 'Tailnet', value: status.tailnetName }] : []),
+    ...(status.hostname ? [{ label: t('tailscale.hostname'), value: status.hostname }] : []),
+    { label: 'Tailnet IP', value: status.tailnetIp },
+    ...(status.dnsName ? [{ label: t('tailscale.dnsName'), value: status.dnsName }] : []),
+    ...(status.tailnetUrl
+      ? [
+          {
+            label: t('tailscale.tailnetUrl'),
+            value: (
+              <a
+                href={status.tailnetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {status.tailnetUrl}
+              </a>
+            ),
+          },
+        ]
+      : []),
+  ];
+
+  return (
+    <dl className="grid gap-x-6 gap-y-2 text-sm @md/field-group:grid-cols-[auto_minmax(0,1fr)]">
+      {facts.map((fact) => (
+        <div key={fact.label} className="contents">
+          <dt className="text-muted-foreground">{fact.label}</dt>
+          <dd className="font-mono text-xs break-all">{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function TailscaleCard() {
   const { t } = useTranslation(['settings', 'common']);
-  const { data: status, isLoading } = useTailscaleStatus();
-  const queryClient = useQueryClient();
+  const { data: status, isLoading, refetch } = useTailscaleStatus();
   const enableMutation = useEnableTailscale();
   const disableMutation = useDisableTailscale();
   const resetMutation = useResetTailscale();
@@ -68,13 +210,14 @@ export function TailscaleSettings() {
   const refreshTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const isActive = status?.status !== undefined && status.status !== 'disabled';
   const { data: logs } = useTailscaleLogs(showLogs && isActive);
+  const authUrl = status?.authUrl;
 
   const handleRefresh = useCallback(() => {
     setRefreshed(true);
-    void queryClient.invalidateQueries({ queryKey: ['tailscale', 'status'] });
+    void refetch();
     if (refreshTimer.current) clearTimeout(refreshTimer.current);
     refreshTimer.current = setTimeout(() => setRefreshed(false), 600);
-  }, [queryClient]);
+  }, [refetch]);
 
   if (isLoading) {
     return (
@@ -98,9 +241,7 @@ export function TailscaleSettings() {
           <CardTitle className="flex items-center gap-2">
             <TailscaleLogo className="h-5 w-5" />
             {t('tailscale.title')}
-            <span className="rounded bg-amber-500/10 px-2 py-1 text-sm leading-normal font-semibold tracking-wide text-amber-500">
-              BETA
-            </span>
+            <BetaBadge />
           </CardTitle>
           <CardDescription>{t('tailscale.description')}</CardDescription>
         </CardHeader>
@@ -121,9 +262,7 @@ export function TailscaleSettings() {
           <CardTitle className="flex items-center gap-2">
             <TailscaleLogo className="h-5 w-5" />
             {t('tailscale.title')}
-            <span className="rounded bg-amber-500/10 px-2 py-1 text-sm leading-normal font-semibold tracking-wide text-amber-500">
-              BETA
-            </span>
+            <BetaBadge />
             {status.status !== 'disabled' && (
               <Button
                 variant="ghost"
@@ -145,18 +284,17 @@ export function TailscaleSettings() {
           {status.status === 'disabled' && (
             <div className="space-y-4">
               <p className="text-muted-foreground text-sm">{t('tailscale.disabledDescription')}</p>
-              <div className="space-y-2">
-                <Label htmlFor="ts-hostname">{t('tailscale.hostnameLabel')}</Label>
+              <Field className="max-w-sm">
+                <FieldLabel htmlFor="ts-hostname">{t('tailscale.hostnameLabel')}</FieldLabel>
                 <Input
                   id="ts-hostname"
                   placeholder="tracearr"
                   value={hostname}
                   onChange={(e) => setHostname(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
                   pattern="^[a-zA-Z0-9-]*$"
-                  className="max-w-xs"
                 />
-                <p className="text-muted-foreground text-xs">{t('tailscale.hostnameHint')}</p>
-              </div>
+                <FieldDescription>{t('tailscale.hostnameHint')}</FieldDescription>
+              </Field>
               <div className="flex gap-2">
                 <Button
                   onClick={() => enableMutation.mutate(hostname || undefined)}
@@ -201,8 +339,8 @@ export function TailscaleSettings() {
                 <span className="text-muted-foreground">{t('tailscale.awaitingAuth')}</span>
               </div>
               <div className="flex gap-2">
-                {status.authUrl && (
-                  <Button variant="default" onClick={() => window.open(status.authUrl!, '_blank')}>
+                {authUrl && (
+                  <Button variant="default" onClick={() => window.open(authUrl, '_blank')}>
                     <ExternalLink />
                     {t('tailscale.authorize')}
                   </Button>
@@ -221,89 +359,38 @@ export function TailscaleSettings() {
           {/* Connected state */}
           {status.status === 'connected' && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <div className="text-success flex items-center gap-2 text-sm">
                 <CheckCircle2 className="h-4 w-4" />
                 <span>{t('tailscale.connected')}</span>
               </div>
-              <table className="text-sm">
-                <tbody>
-                  {status.tailnetName && (
-                    <tr>
-                      <td className="text-muted-foreground py-1.5 pr-4 align-top">Tailnet</td>
-                      <td className="py-1.5 font-mono text-xs">{status.tailnetName}</td>
-                    </tr>
-                  )}
-                  {status.hostname && (
-                    <tr>
-                      <td className="text-muted-foreground py-1.5 pr-4 align-top">
-                        {t('tailscale.hostname')}
-                      </td>
-                      <td className="py-1.5 font-mono text-xs">{status.hostname}</td>
-                    </tr>
-                  )}
-                  <tr>
-                    <td className="text-muted-foreground py-1.5 pr-4 align-top">Tailnet IP</td>
-                    <td className="py-1.5 font-mono text-xs">{status.tailnetIp}</td>
-                  </tr>
-                  {status.dnsName && (
-                    <tr>
-                      <td className="text-muted-foreground py-1.5 pr-4 align-top">
-                        {t('tailscale.dnsName')}
-                      </td>
-                      <td className="py-1.5 font-mono text-xs">{status.dnsName}</td>
-                    </tr>
-                  )}
-                  {status.tailnetUrl && (
-                    <tr>
-                      <td className="text-muted-foreground py-1.5 pr-4 align-top">
-                        {t('tailscale.tailnetUrl')}
-                      </td>
-                      <td className="py-1.5 font-mono text-xs">
-                        <a
-                          href={status.tailnetUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          {status.tailnetUrl}
-                        </a>
-                      </td>
-                    </tr>
-                  )}
-                  {/* Exit node disabled — this will come back when we implement SOCKS proxy support */}
-                  {/* {status.exitNodes.length > 0 && (
-                    <tr>
-                      <td className="text-muted-foreground py-1.5 pr-4 align-top">Exit Node</td>
-                      <td className="py-1.5">
-                        <Select
-                          value={status.exitNodes.find((n) => n.active)?.id ?? 'none'}
-                          onValueChange={(value) =>
-                            exitNodeMutation.mutate(value === 'none' ? null : value)
-                          }
-                          disabled={exitNodeMutation.isPending}
-                        >
-                          <SelectTrigger className="h-7 w-auto min-w-32 font-mono text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">{t('tailscale.exitNodeNone')}</SelectItem>
-                            {status.exitNodes.map((node) => (
-                              <SelectItem key={node.id} value={node.id}>
-                                {node.hostname}
-                                {!node.online && (
-                                  <span className="text-muted-foreground ml-1">
-                                    {t('tailscale.exitNodeOffline')}
-                                  </span>
-                                )}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                    </tr>
-                  )} */}
-                </tbody>
-              </table>
+              <TailnetFacts status={status} />
+              {/* Exit node disabled — this will come back when we implement SOCKS proxy support */}
+              {/* {status.exitNodes.length > 0 && (
+                <Select
+                  value={status.exitNodes.find((n) => n.active)?.id ?? 'none'}
+                  onValueChange={(value) =>
+                    exitNodeMutation.mutate(value === 'none' ? null : value)
+                  }
+                  disabled={exitNodeMutation.isPending}
+                >
+                  <SelectTrigger className="h-7 w-auto min-w-32 font-mono text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('tailscale.exitNodeNone')}</SelectItem>
+                    {status.exitNodes.map((node) => (
+                      <SelectItem key={node.id} value={node.id}>
+                        {node.hostname}
+                        {!node.online && (
+                          <span className="text-muted-foreground ml-1">
+                            {t('tailscale.exitNodeOffline')}
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )} */}
 
               <Button variant="destructive" onClick={() => setShowDisableConfirm(true)}>
                 {t('tailscale.disable')}
@@ -392,5 +479,16 @@ export function TailscaleSettings() {
         variant="destructive"
       />
     </>
+  );
+}
+
+export function RemoteAccess() {
+  const { t } = useTranslation('settings');
+
+  return (
+    <SettingsSection title={t('nav.sections.remote')} description={t('nav.descriptions.remote')}>
+      <ExternalUrlCard />
+      <TailscaleCard />
+    </SettingsSection>
   );
 }

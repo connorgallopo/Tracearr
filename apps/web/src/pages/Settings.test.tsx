@@ -37,8 +37,8 @@ vi.mock('@/components/settings/access/Guest', () => ({
 vi.mock('@/components/settings/access/MobileDevices', () => ({
   MobileDevices: () => <div>mobile settings</div>,
 }));
-vi.mock('@/components/settings/TailscaleSettings', () => ({
-  TailscaleSettings: () => <div>tailscale settings</div>,
+vi.mock('@/components/settings/access/RemoteAccess', () => ({
+  RemoteAccess: () => <div>remote access settings</div>,
 }));
 vi.mock('@/components/settings/ImportSettings', () => ({
   ImportSettings: () => <div>import settings</div>,
@@ -104,7 +104,7 @@ describe('Settings routes', () => {
     ['/settings/notifications/destinations', 'destinations'],
     ['/settings/access/guest', 'access settings'],
     ['/settings/access/mobile', 'mobile settings'],
-    ['/settings/access/remote', 'tailscale settings'],
+    ['/settings/access/remote', 'remote access settings'],
     ['/settings/data/import', 'import settings'],
     ['/settings/data/backup', 'backup settings'],
     ['/settings/data/jobs', 'jobs settings'],

@@ -11,7 +11,7 @@ import { PosterSource } from '@/components/settings/servers/PosterSource';
 import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
 import { Guest } from '@/components/settings/access/Guest';
 import { MobileDevices } from '@/components/settings/access/MobileDevices';
-import { TailscaleSettings } from '@/components/settings/TailscaleSettings';
+import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
 import { ImportSettings } from '@/components/settings/ImportSettings';
 import { JobsSettings } from '@/components/settings/JobsSettings';
 import { BackupSettings } from '@/components/settings/BackupSettings';
@@ -43,7 +43,7 @@ export function Settings() {
 
             <Route path="access/guest" element={<Guest />} />
             <Route path="access/mobile" element={<MobileDevices />} />
-            <Route path="access/remote" element={<TailscaleSettings />} />
+            <Route path="access/remote" element={<RemoteAccess />} />
 
             <Route path="data/import" element={<ImportSettings />} />
             <Route path="data/backup" element={<BackupSettings />} />
