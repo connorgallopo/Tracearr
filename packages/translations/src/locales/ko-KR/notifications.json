@@ -66,7 +66,7 @@
         "message_other": "서버 {{count}}대가 다시 연결되었습니다",
         "messageNoServers": "계정 토큰이 업데이트되었습니다",
         "partial": "토큰을 업데이트했지만 {{names}}에서 아직 거부되었습니다",
-        "unmatched": ""
+        "unmatched": "토큰은 업데이트됐지만 {{names}} 계정은 다시 연결하지 못했습니다"
       },
       "agentAdded": {
         "title": "에이전트 추가됨",
