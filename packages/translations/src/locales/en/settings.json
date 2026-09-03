@@ -12,6 +12,52 @@
     "accessControl": "Access Control",
     "backup": "Backup"
   },
+  "nav": {
+    "label": "Settings sections",
+    "selectLabel": "Settings section",
+    "itemLabel": "{{group}} / {{section}}",
+    "groups": {
+      "general": "General",
+      "servers": "Servers",
+      "notifications": "Notifications",
+      "access": "Access",
+      "data": "Data & API"
+    },
+    "sections": {
+      "appearance": "Appearance",
+      "locale": "Locale & units",
+      "behavior": "Behavior",
+      "connections": "Connections",
+      "posters": "Poster source",
+      "plexAccounts": "Plex accounts",
+      "destinations": "Destinations",
+      "newsletters": "Newsletters",
+      "email": "Email",
+      "guest": "Guest access",
+      "mobile": "Mobile devices",
+      "remote": "Remote access",
+      "import": "Import",
+      "backup": "Backup",
+      "jobs": "Jobs",
+      "api": "API"
+    },
+    "descriptions": {
+      "appearance": "Theme and accent color, stored in this browser.",
+      "locale": "Language, clock and units used across the dashboard.",
+      "behavior": "How often Tracearr polls your servers and what it caches.",
+      "connections": "Media servers Tracearr reads sessions and libraries from.",
+      "posters": "Which server's artwork wins when a title exists on more than one.",
+      "plexAccounts": "Plex.tv accounts Tracearr uses to discover and authorize servers.",
+      "destinations": "Where notifications and digests are delivered.",
+      "guest": "What signed-out and guest visitors can see.",
+      "mobile": "Devices paired to the Tracearr mobile app.",
+      "remote": "How people outside your network reach this instance.",
+      "import": "Bring watch history in from Tautulli, Jellystat or Playback Reporting.",
+      "backup": "Snapshots of the database and configuration.",
+      "jobs": "Maintenance tasks you can run on demand.",
+      "api": "The public API key, its rate limit and what counts as watched."
+    }
+  },
   "general": {
     "title": "General Settings",
     "unitSystem": "Unit System",
