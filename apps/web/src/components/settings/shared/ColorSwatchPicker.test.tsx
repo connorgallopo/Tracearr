@@ -15,9 +15,9 @@ describe('ColorSwatchPicker', () => {
       <ColorSwatchPicker label="Accent color" options={options} value="220" onChange={vi.fn()} />
     );
 
-    expect(screen.getByRole('radiogroup', { name: 'Accent color' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'Cyan' })).toHaveAttribute('aria-checked', 'false');
-    expect(screen.getByRole('radio', { name: 'Blue' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('group', { name: 'Accent color' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Cyan' })).not.toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Blue' })).toBeChecked();
   });
 
   it('paints each swatch with its own hex', () => {
@@ -25,7 +25,7 @@ describe('ColorSwatchPicker', () => {
       <ColorSwatchPicker label="Accent color" options={options} value="220" onChange={vi.fn()} />
     );
 
-    expect(screen.getByRole('radio', { name: 'Purple' })).toHaveStyle({
+    expect(screen.getByRole('radio', { name: 'Purple' }).closest('label')).toHaveStyle({
       backgroundColor: '#8B5CF6',
     });
   });
@@ -41,18 +41,18 @@ describe('ColorSwatchPicker', () => {
     expect(onChange).toHaveBeenCalledWith('270');
   });
 
-  it('keeps one swatch in the tab order and moves selection with the arrow keys', async () => {
+  it('moves selection with the arrow keys', async () => {
     const onChange = vi.fn();
     render(
       <ColorSwatchPicker label="Accent color" options={options} value="220" onChange={onChange} />
     );
 
-    expect(screen.getByRole('radio', { name: 'Blue' })).toHaveAttribute('tabindex', '0');
-    expect(screen.getByRole('radio', { name: 'Cyan' })).toHaveAttribute('tabindex', '-1');
-
     await userEvent.tab();
+    expect(screen.getByRole('radio', { name: 'Blue' })).toHaveFocus();
+
     await userEvent.keyboard('{ArrowRight}');
 
+    expect(screen.getByRole('radio', { name: 'Purple' })).toHaveFocus();
     expect(onChange).toHaveBeenCalledWith('270');
   });
 
