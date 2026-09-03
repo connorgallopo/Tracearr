@@ -1,12 +1,7 @@
-/**
- * Settings page with sub-routes for different settings sections.
- * Components are organized in components/settings/ for maintainability.
- */
-import { NavLink, Routes, Route } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
-
-// Settings section components
+import { SettingsNav } from '@/components/settings/shell/SettingsNav';
+import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
 import { GeneralSettings } from '@/components/settings/GeneralSettings';
 import { ServerSettings } from '@/components/settings/ServerSettings';
 import { AccessSettings } from '@/components/settings/AccessSettings';
@@ -15,90 +10,58 @@ import { TailscaleSettings } from '@/components/settings/TailscaleSettings';
 import { ImportSettings } from '@/components/settings/ImportSettings';
 import { JobsSettings } from '@/components/settings/JobsSettings';
 import { BackupSettings } from '@/components/settings/BackupSettings';
-import { DestinationsManager } from '@/components/settings/destinations';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
-import { Bell } from 'lucide-react';
-
-function SettingsNav() {
-  const { t } = useTranslation('settings');
-
-  const links = [
-    { href: '/settings', label: t('tabs.general'), end: true },
-    { href: '/settings/servers', label: t('tabs.servers') },
-    { href: '/settings/notifications', label: t('tabs.notifications') },
-    { href: '/settings/access', label: t('tabs.accessControl') },
-    { href: '/settings/mobile', label: t('tabs.mobile') },
-    { href: '/settings/tailscale', label: t('tabs.tailscale') },
-    { href: '/settings/import', label: t('tabs.import') },
-    { href: '/settings/jobs', label: t('tabs.jobs') },
-    { href: '/settings/backup', label: t('tabs.backup') },
-  ];
-
-  return (
-    <nav className="flex space-x-4 border-b pb-4">
-      {links.map((link) => (
-        <NavLink
-          key={link.href}
-          to={link.href}
-          end={link.end}
-          className={({ isActive }) =>
-            cn(
-              'text-sm font-medium transition-colors',
-              isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'
-            )
-          }
-        >
-          {link.label}
-        </NavLink>
-      ))}
-    </nav>
-  );
-}
-
-function NotificationSettings() {
-  const { t } = useTranslation('pages');
-  const { user } = useAuth();
-  const isOwner = user?.role === 'owner';
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          {t('settings.destinations.title')}
-        </CardTitle>
-        <CardDescription>{t('settings.destinations.description')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isOwner ? (
-          <DestinationsManager />
-        ) : (
-          <p className="text-muted-foreground text-sm">{t('settings.destinations.ownerOnly')}</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+import { Destinations } from '@/components/settings/notifications/Destinations';
 
 export function Settings() {
   const { t } = useTranslation('settings');
 
   return (
-    <div className="space-y-6">
+    // The layout follows this container, not the viewport: the app sidebar
+    // collapses to an icon rail, which changes the room Settings has.
+    <div className="@container/settings space-y-6">
       <h1 className="text-3xl font-bold">{t('title')}</h1>
-      <SettingsNav />
-      <Routes>
-        <Route index element={<GeneralSettings />} />
-        <Route path="servers" element={<ServerSettings />} />
-        <Route path="notifications" element={<NotificationSettings />} />
-        <Route path="access" element={<AccessSettings />} />
-        <Route path="mobile" element={<MobileSettings />} />
-        <Route path="tailscale" element={<TailscaleSettings />} />
-        <Route path="import" element={<ImportSettings />} />
-        <Route path="jobs" element={<JobsSettings />} />
-        <Route path="backup" element={<BackupSettings />} />
-      </Routes>
+      <div className="grid gap-8 @3xl/settings:grid-cols-[13rem_minmax(0,1fr)]">
+        <SettingsNav />
+        <div className="max-w-4xl min-w-0">
+          <Routes>
+            <Route index element={<Navigate to={SETTINGS_HOME} replace />} />
+
+            <Route path="general/appearance" element={<GeneralSettings />} />
+            <Route path="general/locale" element={<GeneralSettings />} />
+            <Route path="general/behavior" element={<GeneralSettings />} />
+
+            <Route path="servers/connections" element={<ServerSettings />} />
+            <Route path="servers/posters" element={<ServerSettings />} />
+            <Route path="servers/plex-accounts" element={<ServerSettings />} />
+
+            <Route path="notifications/destinations" element={<Destinations />} />
+
+            <Route path="access/guest" element={<AccessSettings />} />
+            <Route path="access/mobile" element={<MobileSettings />} />
+            <Route path="access/remote" element={<TailscaleSettings />} />
+
+            <Route path="data/import" element={<ImportSettings />} />
+            <Route path="data/backup" element={<BackupSettings />} />
+            <Route path="data/jobs" element={<JobsSettings />} />
+            <Route path="data/api" element={<GeneralSettings />} />
+
+            <Route
+              path="servers"
+              element={<Navigate to="/settings/servers/connections" replace />}
+            />
+            <Route
+              path="notifications"
+              element={<Navigate to="/settings/notifications/destinations" replace />}
+            />
+            <Route path="access" element={<Navigate to="/settings/access/guest" replace />} />
+            <Route path="mobile" element={<Navigate to="/settings/access/mobile" replace />} />
+            <Route path="tailscale" element={<Navigate to="/settings/access/remote" replace />} />
+            <Route path="import" element={<Navigate to="/settings/data/import" replace />} />
+            <Route path="jobs" element={<Navigate to="/settings/data/jobs" replace />} />
+            <Route path="backup" element={<Navigate to="/settings/data/backup" replace />} />
+          </Routes>
+        </div>
+      </div>
     </div>
   );
 }

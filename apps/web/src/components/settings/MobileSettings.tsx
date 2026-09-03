@@ -331,7 +331,10 @@ export function MobileSettings() {
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 {t('mobile.externalUrlBanner')}{' '}
-                <NavLink to="/settings" className="font-medium underline underline-offset-2">
+                <NavLink
+                  to="/settings/access/remote"
+                  className="font-medium underline underline-offset-2"
+                >
                   {t('mobile.externalUrlBannerLink')}
                 </NavLink>{' '}
                 {t('mobile.externalUrlBannerSuffix')}
