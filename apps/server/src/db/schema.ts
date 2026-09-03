@@ -1395,8 +1395,8 @@ export const libraryItems = pgTable(
       .on(table.videoDynamicRange)
       .where(sql`${table.removedAt} IS NULL`),
 
-    index('idx_library_items_first_seen_active')
-      .on(table.firstSeenAt)
+    index('idx_library_items_seen_active')
+      .on(sql`COALESCE(${table.firstSeenAt}, ${table.createdAt})`)
       .where(sql`${table.removedAt} IS NULL`),
   ]
 );

@@ -687,6 +687,13 @@
       "when": 1788391319666,
       "tag": "0097_plain_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1788405239693,
+      "tag": "0098_grey_bloodaxe",
+      "breakpoints": true
     }
   ]
 }

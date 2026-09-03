@@ -108,12 +108,12 @@ describe('newsletter tables', () => {
     await db.delete(users).where(sql`id = ${u!.id}`);
   });
 
-  it('created the first-seen partial index', async () => {
+  it('indexes the window predicate expression, not the bare first_seen_at column', async () => {
     const result = await db.execute(
-      sql`SELECT indexdef FROM pg_indexes WHERE indexname = 'idx_library_items_first_seen_active'`
+      sql`SELECT indexdef FROM pg_indexes WHERE indexname = 'idx_library_items_seen_active'`
     );
     const def = String((result.rows[0] as { indexdef?: string } | undefined)?.indexdef ?? '');
-    expect(def).toContain('first_seen_at');
-    expect(def.toLowerCase()).toContain('where');
+    expect(def).toContain('COALESCE(first_seen_at, created_at)');
+    expect(def).toContain('WHERE (removed_at IS NULL)');
   });
 });

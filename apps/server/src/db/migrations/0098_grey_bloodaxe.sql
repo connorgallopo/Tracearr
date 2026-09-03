@@ -1,0 +1,2 @@
+DROP INDEX "idx_library_items_first_seen_active";--> statement-breakpoint
+CREATE INDEX "idx_library_items_seen_active" ON "library_items" USING btree (COALESCE("first_seen_at", "created_at")) WHERE "library_items"."removed_at" IS NULL;
