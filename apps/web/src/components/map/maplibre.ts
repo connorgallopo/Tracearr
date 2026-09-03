@@ -33,6 +33,23 @@ export function checkBasemap(): Promise<boolean> {
   return basemapCheck;
 }
 
+let webglSupport: boolean | null = null;
+
+// maplibre v6 needs webgl2 and fires its GPU error inside the Map constructor,
+// before a caller can attach a listener, so probe before constructing one.
+export function isWebglSupported(): boolean {
+  if (webglSupport === null) {
+    try {
+      const gl = document.createElement('canvas').getContext('webgl2');
+      gl?.getExtension('WEBGL_lose_context')?.loseContext();
+      webglSupport = gl !== null;
+    } catch {
+      webglSupport = false;
+    }
+  }
+  return webglSupport;
+}
+
 export const DEFAULT_SERVER_COLOR = 'hsl(142, 76%, 48%)';
 
 export function hsl(h: number, s: number, l: number, a?: number): string {

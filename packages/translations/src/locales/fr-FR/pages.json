@@ -25,327 +25,327 @@
   "automations": {
     "actions": {
       "kill_stream": {
-        "description": "",
+        "description": "Terminer le flux actif",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps minimum entre les interruptions pour le même utilisateur"
           },
           "delay_seconds": {
-            "description": "",
-            "label": ""
+            "description": "Attend ce nombre de secondes, puis interrompt le flux uniquement si l'automatisation est toujours valide. 0 interruption immédiatement après une dernière vérification.",
+            "label": "Fenêtre de support"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Message facultatif"
           },
           "target": {
-            "description": ""
+            "description": "Quelles sessions arrêter"
           }
         },
-        "label": "",
-        "ran": ""
+        "label": "Interrompre la lecture",
+        "ran": "Le flux a été arrêté"
       },
       "message_client": {
-        "description": "",
+        "description": "Envoyer un message au lecteur multimédia",
         "fields": {
           "message": {
-            "placeholder": ""
+            "placeholder": "Message à afficher..."
           },
           "target": {
-            "description": ""
+            "description": "Quelles sessions à envoyer au message"
           }
         },
-        "hint": "",
-        "label": "",
-        "ran": ""
+        "hint": "Jellyfin et Emby uniquement. Plex ne prend en charge que les messages lorsque vous tuez un flux.",
+        "label": "Message Client",
+        "ran": "Mettre un message sur le lecteur"
       },
       "send": {
-        "description": "",
+        "description": "Envoyer vers une ou plusieurs destinations",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps minimum entre les notifications"
           }
         },
-        "label": "",
-        "ran": ""
+        "label": "Envoyer une notification",
+        "ran": "Envoyer une notification"
       },
       "trust": {
-        "description": "",
+        "description": "Ajuster, définir ou réinitialiser le score de confiance",
         "fields": {
           "amount": {
-            "description": "",
-            "label": ""
+            "description": "Positif pour augmenter, négatif pour diminuer",
+            "label": "Quantité"
           },
           "mode": {
-            "label": ""
+            "label": "Mode"
           },
           "value": {
-            "label": ""
+            "label": "Valeur"
           }
         },
-        "label": "",
-        "ran": ""
+        "label": "Score de confiance",
+        "ran": "Score de confiance modifié"
       }
     },
     "activity": {
       "branch": {
-        "else": "",
-        "then": ""
+        "else": "A pris les étapes 'sinon'",
+        "then": "A pris les étapes 'si'"
       },
-      "description": "",
-      "empty": "",
-      "emptyDescription": "",
-      "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
-      "finished": "",
-      "from": "",
-      "group": "",
-      "item": "",
-      "noSummary": "",
-      "openInEditor": "",
-      "outcome": "",
+      "description": "Voici ce qu'a fait cette automatisation : les résultats les plus récents s'affichent en premier. Les exécutions sont conservées pendant {{days}} jours.",
+      "empty": "Pas encore d'exécutions",
+      "emptyDescription": "Les exécutions sont listées ici une fois qu'un déclencheur correspond.",
+      "emptyRan": "Aucune correspondance n'a encore été trouvée",
+      "emptyRanDescription_one": "{{count}} vérifications ont été effectuées et n'ont pas abouti à une correspondance.",
+      "emptyRanDescription_other": "{{count}} vérifications ont été effectuées et n'ont pas abouti à une correspondance.",
+      "finished": "Terminé",
+      "from": "De",
+      "group": "Groupe {{number}}",
+      "item": "Éléments",
+      "noSummary": "Pas de notes",
+      "openInEditor": "Ouvre dans le constructeur avec cette exécution",
+      "outcome": "Résultat",
       "outcomes": {
-        "completed": "",
-        "error": "",
-        "stopped_by_condition": ""
+        "completed": "Exécuté",
+        "error": "Échec",
+        "stopped_by_condition": "Aucune correspondance"
       },
-      "playing": "",
-      "recordedViolation": "",
-      "runLoading": "",
-      "runTitle": "",
-      "started": "",
-      "summary": "",
+      "playing": "Lecture en cours",
+      "recordedViolation": "Une violation a été enregistrée",
+      "runLoading": "Chargement de l'exécution",
+      "runTitle": "Exécuter",
+      "started": "Démarré",
+      "summary": "Résumé",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "error": "",
-        "stopped_by_condition": ""
+        "all": "Tous",
+        "completed": "Exécuté",
+        "error": "Échec",
+        "stopped_by_condition": "Aucune correspondance"
       },
-      "tabsLabel": "",
-      "title": "",
-      "triggeredBy": "",
-      "unknownStep": "",
-      "where": "",
-      "who": "",
-      "whyBranch": ""
+      "tabsLabel": "Filtrer par résultat",
+      "title": "Activité",
+      "triggeredBy": "Déclenché par {{trigger}}",
+      "unknownStep": "Étape non reconnue",
+      "where": "Où",
+      "who": "Qui",
+      "whyBranch": "Ce qu'il a lu"
     },
-    "allKinds": "",
-    "allSeverities": "",
-    "allStatuses": "",
+    "allKinds": "Tous les types",
+    "allSeverities": "Toutes les sévérités",
+    "allStatuses": "Tous les status",
     "bind": {
-      "accountLabel": "",
-      "activeLabel": "Active",
-      "anyServer": "",
-      "back": "",
-      "created": "",
-      "createdOff": "",
-      "customize": "",
-      "destinationsLabel": "",
+      "accountLabel": "Quel compte",
+      "activeLabel": "Activez-le maintenant",
+      "anyServer": "N’importe quel serveur",
+      "back": "Retour",
+      "created": "{{name}} est configuré et en cours d'exécution.",
+      "createdOff": "{{name}} a été créé et est désactivé. Activez-le dans la liste.",
+      "customize": "Ouvrir dans le constructeur",
+      "destinationsLabel": "Envoyer à",
       "doors": {
-        "helper": ""
+        "helper": "Utilisez ceci pour garder les étapes telles qu'elles sont ; les réponses ci-dessus peuvent changer plus tard. Ouvert dans le constructeur rend chaque étape modifiable et termine le lien vers l'automatisation prête à l'emploi."
       },
-      "failed": "",
+      "failed": "Impossible de configurer cela. Réessayez.",
       "helper": {
-        "clientMessage": "",
-        "killMessage": ""
+        "clientMessage": "Affiché sur le lecteur pendant qu'il continue à jouer.",
+        "killMessage": "Affiché sur le lecteur quand le flux s'arrête."
       },
-      "nameHelper": "",
-      "namePlaceholder": "",
+      "nameHelper": "Le nom dans la liste des automatisations.",
+      "namePlaceholder": "Un nom pour cette automatisation",
       "needs": {
-        "title": ""
+        "title": "Ce dont il a besoin"
       },
-      "noInputs": "",
-      "personLabel": "",
-      "required": "",
-      "serverHelper": "",
-      "serverLabel": "",
-      "submit": "",
-      "submitting": ""
+      "noInputs": "Il n'y a rien à remplir",
+      "personLabel": "Quelle personne",
+      "required": "Choisissez au moins un.",
+      "serverHelper": "N'importe quel serveur les désigne tous.",
+      "serverLabel": "Quel serveur",
+      "submit": "Utiliser ceci",
+      "submitting": "Configuration de…"
     },
     "builder": {
       "actions": {
-        "add": "Add action",
-        "addBranch": "Add action",
-        "branchElse": "Otherwise…",
-        "branchElseEmpty": "",
-        "branchName": "",
-        "branchThen": "then",
-        "collapseBranch": "",
-        "confirmRemoveDescription": "",
-        "confirmRemoveTitle": "",
-        "emptyAction": "",
-        "emptyDescription": "",
-        "emptyTitle": "",
-        "expandBranch": "",
-        "helper": "",
-        "ifAddCheck": "",
-        "ifNothing": "nothing yet",
-        "ifTitle": "",
-        "menu": "",
-        "moveDown": "",
-        "moveUp": "",
-        "policyNote": "",
-        "sectionTitle": "Do this…"
+        "add": "Ajoutez une autre action",
+        "addBranch": "Ajouter une étape",
+        "branchElse": "Ou bien",
+        "branchElseEmpty": "Rien. L'automatisation continue.",
+        "branchName": "cette branche",
+        "branchThen": "Faire ceci",
+        "collapseBranch": "Masquer les étapes de cette branche",
+        "confirmRemoveDescription": "Arrêt lors de la sauvegarde.",
+        "confirmRemoveTitle": "Supprimer cette action ?",
+        "emptyAction": "Choisir ce qu'il se passe",
+        "emptyDescription": "Envoyer une notification, arrêter le flux, changer un score de confiance ou exécuter des étapes seulement quand une vérification supplémentaire passe.",
+        "emptyTitle": "Que doit-il se passer ?",
+        "expandBranch": "Afficher les étapes de cette branche",
+        "helper": "Celles-ci se déroulent dans l'ordre, de haut en bas.",
+        "ifAddCheck": "Ajouter une autre vérification",
+        "ifNothing": "rien n'a encore été sélectionné",
+        "ifTitle": "Si…",
+        "menu": "Plus pour {{name}}",
+        "moveDown": "Déplacer {{name}} vers le bas",
+        "moveUp": "Déplacer {{name}} vers le haut",
+        "policyNote": "Ce n'est pas une branche qui détermine si cela est signalé, mais la section Et seulement si…",
+        "sectionTitle": "Puis faites…"
       },
-      "activeLabel": "",
-      "clearSelection": "",
+      "activeLabel": "Actif",
+      "clearSelection": "Effacer la sélection",
       "conditions": {
-        "addAnother": "Add another condition",
-        "addFirst": "Add a condition",
-        "addGroup": "",
-        "all": "all of these",
-        "allCountries": "",
-        "allDeviceTypes": "",
-        "allHint": "",
-        "any": "any of these",
-        "anyHint": "",
-        "canNeverPass": "",
-        "deviceTypesHint": "",
-        "emptyLine": "",
-        "fieldLabel": "Condition",
-        "fieldPlaceholder": "Select field",
-        "groupSeparator": "",
-        "helper": "",
-        "matchLabel": "",
-        "no": "",
-        "noFields": "",
-        "operatorLabel": "Comparison",
-        "optional": "",
-        "recentlySeen": "",
-        "removeGroup": "",
-        "sectionTitle": "Only when…",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "valueLabel": "",
-        "windowPrefix": "",
-        "windowUnit": "",
-        "yes": ""
+        "addAnother": "Ajouter une vérification",
+        "addFirst": "Ajouter une vérification",
+        "addGroup": "Ajouter un ensemble de vérifications séparé",
+        "all": "et",
+        "allCountries": "Tous les pays",
+        "allDeviceTypes": "Tous les types d'appareils",
+        "allHint": "et : chaque vérification doit être réussie",
+        "any": "ou",
+        "anyHint": "ou : une seule vérification suffit",
+        "canNeverPass": "Cela ne peut jamais passer. Le déclencheur tire déjà sur {{threshold}}.",
+        "deviceTypesHint": "Ne compte que les flux provenant des types de périphériques sélectionnés. Vide signifie chaque appareil.",
+        "emptyLine": "Aucun contrôle supplémentaire. Cela s'exécute à chaque fois.",
+        "fieldLabel": "Que vérifier",
+        "fieldPlaceholder": "Choisissez quelque chose à vérifier",
+        "groupSeparator": "et aussi",
+        "helper": "Vérifications qui doivent passer en premier. Vide signifie qu'il s'exécute à chaque fois.",
+        "matchLabel": "Rejoindre ces vérifications avec",
+        "no": "Non",
+        "noFields": "Aucune vérification n'est disponible pour ces déclencheurs. Ajoutez d'abord un déclencheur de flux ou de compte.",
+        "operatorLabel": "S'agit-il de",
+        "optional": "optionnel",
+        "recentlySeen": "Récemment vus",
+        "removeGroup": "Retirer cet ensemble de vérifications",
+        "sectionTitle": "Et seulement si…",
+        "uniqueDevices": "Appareils uniques",
+        "uniqueDevicesHint": "Ne compte que les sessions provenant de différents appareils physiques.",
+        "uniqueIps": "IP uniques",
+        "uniqueIpsHint": "Ne compte que les sessions provenant d'adresses IP différentes, de sorte que les flux du même foyer ne sont pas comptés.",
+        "valueLabel": "Valeur",
+        "windowPrefix": "dans",
+        "windowUnit": "heures",
+        "yes": "Oui"
       },
-      "destinationDisabled": "",
+      "destinationDisabled": "Destination désactivée",
       "errors": {
-        "actionUnavailable": "",
-        "daysRange": "",
-        "fieldNotAvailableFor": "",
-        "fieldUnavailable": "",
-        "measureInvalid": "",
-        "messageRequired": "",
-        "minutesRange": "",
-        "nameRequired": "",
-        "operatorInvalid": "",
-        "policyNeedsSubject": "",
-        "scopeIncomplete": "",
-        "sendNeedsDestination": "",
-        "tooLong": "",
-        "triggerRequired": "",
-        "trustAmountRange": "",
-        "trustValueRange": "",
-        "valueInvalid": "",
-        "variableUnavailable": ""
+        "actionUnavailable": "Ces déclencheurs ne fournissent pas ce dont cette action a besoin",
+        "daysRange": "Entre {{min}} et {{max}} jours",
+        "fieldNotAvailableFor": "Non disponible pour : {{triggers}}",
+        "fieldUnavailable": "Cette vérification n'est pas disponible pour chaque déclencheur ici",
+        "measureInvalid": "Choisissez comment les minutes sont comptées",
+        "messageRequired": "Tapez le message à afficher",
+        "minutesRange": "Entre {{min}} et {{max}} minutes",
+        "nameRequired": "Donner un nom à cette automatisation",
+        "operatorInvalid": "La comparaison ne correspond pas à la vérification",
+        "policyNeedsSubject": "Les violations concernent une personne, donc cela nécessite un déclencheur de flux ou de compte.",
+        "scopeIncomplete": "Choisir à qui cela s'applique",
+        "sendNeedsDestination": "Choisissez au moins une destination",
+        "tooLong": "Au maximum {{max}} caractères",
+        "triggerRequired": "Ajoute ce qui déclenche tout ça, ou réactive l'étape précédente",
+        "trustAmountRange": "Faire confiance aux changements de -100 à 100 points",
+        "trustValueRange": "Le score de confiance est compris entre 0 et 100",
+        "valueInvalid": "Cette valeur ne correspond pas à la vérification",
+        "variableUnavailable": "Le message nomme quelque chose que ne contient pas tous les déclencheurs"
       },
       "footer": {
-        "problems_one": "{{count}} problem",
-        "problems_other": "{{count}} problems",
-        "ready": "",
-        "remaining_one": "",
-        "remaining_other": "",
-        "search": ""
+        "problems_one": "{{count}} chose à corriger",
+        "problems_other": "{{count}} choses à corriger",
+        "ready": "Prêt à enregistrer",
+        "remaining_one": "{{{count}}} avant la fin",
+        "remaining_other": "{{{count}}} avant la fin",
+        "search": "pour rechercher"
       },
       "heldFor": {
-        "current": "",
-        "measureLabel": "",
-        "minutesLabel": "",
-        "prefix": "",
-        "total": "",
-        "unit": ""
+        "current": "cette fois",
+        "measureLabel": "Compté",
+        "minutesLabel": "Minutes",
+        "prefix": "Un flux a été mis en pause pour",
+        "total": "au total",
+        "unit": "minutes"
       },
       "inactiveFor": {
-        "daysLabel": "",
-        "prefix": "",
-        "unit": ""
+        "daysLabel": "Jours",
+        "prefix": "Un compte a été inactif pendant",
+        "unit": "jours"
       },
       "leave": {
-        "confirm": "",
-        "title": ""
+        "confirm": "Quitter",
+        "title": "Quitter sans sauvegarder ?"
       },
       "liveCheck": {
-        "actual": "",
-        "backToLive": "",
-        "checking": "",
-        "empty": "",
-        "expand": "",
-        "failed": "",
-        "footnote": "",
-        "notPassed": "",
-        "passed": "",
-        "paused": "",
-        "sampleGone": "",
-        "sampleTitle": "",
-        "title": "",
-        "unfinished": ""
+        "actual": "maintenant {{value}}",
+        "backToLive": "Revenir à ce qui est en cours de lecture",
+        "checking": "Vérification de ce qui est en train de jouer…",
+        "empty": "Rien ne joue en ce moment ; rien à vérifier.",
+        "expand": "Afficher ce qui correspond à {{name}}",
+        "failed": "Impossible d'accéder aux serveurs pour vérifier.",
+        "footnote": "Les temps de recharge et les sessions déjà gérées ne sont pas simulés.",
+        "notPassed": "N'a pas réussi",
+        "passed": "Réussi",
+        "paused": "Suspendu pendant les sauvegardes",
+        "sampleGone": "Cette session n'est plus enregistrée; rien à vérifier.",
+        "sampleTitle": "Ce que cela ferait pour cette exécution",
+        "title": "Actuellement sur les serveurs",
+        "unfinished": "Affiche ce que cela ferait une fois l'automation terminée."
       },
-      "newDestination": "",
-      "noDestinations": "",
-      "noMatches": "",
+      "newDestination": "Nouvelle destination",
+      "noDestinations": "Aucune destination pour le moment. Ajoutez-en une pour envoyer des notifications.",
+      "noMatches": "Aucune correspondance",
       "picker": {
-        "close": "",
-        "empty": "",
-        "navigate": "",
-        "searchPlaceholder": "",
-        "select": ""
+        "close": "fermer",
+        "empty": "Rien ne correspond à cela.",
+        "navigate": "déplacer",
+        "searchPlaceholder": "Rechercher ou décrire ce qui devrait se passer",
+        "select": "Sélectionner"
       },
       "recordAs": {
-        "label": "",
-        "notification": "",
-        "notificationDescription": "",
-        "policy": "",
-        "policyDescription": ""
+        "label": "Lorsque cela s'exécute, enregistrez-le comme",
+        "notification": "Une alerte",
+        "notificationDescription": "Enregistré dans Activité ; jamais une violation.",
+        "policy": "Une violation",
+        "policyDescription": "Listés en Violations ; peuvent être reconnus."
       },
       "rows": {
-        "expandHint": "",
-        "moveHint": "",
-        "remove": "",
-        "removeHint": "",
-        "skipped": "",
-        "toggle": "",
-        "toggleHint": ""
+        "expandHint": "ouvrir",
+        "moveHint": "réordonner",
+        "remove": "Retirer {{name}}",
+        "removeHint": "supprimer",
+        "skipped": "Ignoré",
+        "toggle": "Inclure {{name}}",
+        "toggleHint": "ignorer"
       },
-      "saving": "",
+      "saving": "Enregistrement ...",
       "scope": {
-        "account": "Specific account",
-        "accountLabel": "",
-        "accountPlaceholder": "",
-        "enforceAcrossServers": "Enforce across servers",
-        "enforceAcrossServersDescription": "",
-        "global": "Global",
-        "label": "Scope",
-        "noServers": "",
-        "person": "",
-        "personHelper": "",
-        "personLabel": "",
-        "personPlaceholder": "",
-        "server": "Specific server",
-        "serverLabel": "",
-        "serverPlaceholder": ""
+        "account": "Un seul compte",
+        "accountLabel": "Compte",
+        "accountPlaceholder": "Sélectionnez un compte",
+        "enforceAcrossServers": "Agir sur leurs streams sur n'importe lequel de leurs serveurs",
+        "enforceAcrossServersDescription": "Agit sur les sessions de la personne sur n'importe lequel de ses serveurs, pas seulement celui qui l'a déclenché. Désactivé par défaut.",
+        "global": "Tout le monde",
+        "label": "À qui cela s'applique",
+        "noServers": "Aucun serveur connecté pour le moment.",
+        "person": "Une seule personne",
+        "personHelper": "Correspond à cette personne sur chaque serveur sur lequel elle a un compte.",
+        "personLabel": "Personne",
+        "personPlaceholder": "Sélectionner personne",
+        "server": "Un serveur",
+        "serverLabel": "Serveur",
+        "serverPlaceholder": "Sélectionner le serveur"
       },
-      "searchPlaceholder": "",
-      "selectPlaceholder": "",
-      "selectedCount": "",
+      "searchPlaceholder": "Rechercher…",
+      "selectPlaceholder": "Sélectionner",
+      "selectedCount": "{{count}} sélectionnés",
       "sentence": {
-        "label": "",
-        "placeholderAction": "",
-        "placeholderTrigger": ""
+        "label": "En termes clairs",
+        "placeholderAction": "faire quelque chose",
+        "placeholderTrigger": "quelque chose se passe"
       },
-      "severityLabel": "Severity",
+      "severityLabel": "À quel point ?",
       "when": {
-        "add": "Add trigger",
-        "emptyAction": "",
-        "emptyDescription": "",
-        "emptyTitle": "",
-        "helper": "",
-        "or": "",
-        "title": ""
+        "add": "Ajouter un autre déclencheur",
+        "emptyAction": "Choisissez ce qui commence",
+        "emptyDescription": "Un flux en cours de démarrage, un serveur en panne, un compte se calme.",
+        "emptyTitle": "Par quoi commencer ?",
+        "helper": "Chacun de ces éléments démarre. Au moins un est requis.",
+        "or": "ou",
+        "title": "Quand..."
       }
     },
     "catalog": {
@@ -370,10 +370,10 @@
       },
       "groups": {
         "accounts": "",
-        "control": "Control flow",
+        "control": "",
         "library": "",
         "notify": "",
-        "policy": "Policy",
+        "policy": "",
         "servers": "",
         "sessions": "",
         "updates": ""
@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -445,13 +449,13 @@
       }
     },
     "categories": {
-      "device_client": "",
-      "media": "",
-      "network_location": "",
-      "scope": "Scope",
-      "session_behavior": "",
-      "stream_quality": "",
-      "user_attributes": ""
+      "device_client": "Appareil & Client",
+      "media": "Média",
+      "network_location": "Réseau & Localisation",
+      "scope": "Qui et où",
+      "session_behavior": "Comportement de session",
+      "stream_quality": "Qualité de la diffusion",
+      "user_attributes": "Attributs des utilisateurs"
     },
     "configFields": {
       "cooldown_minutes": {
@@ -466,209 +470,210 @@
     },
     "cooldownInvalid": "",
     "cooldownLabel": "",
-    "createAutomation": "Create Automation",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "Delete {{count}} Automation",
-    "deleteAutomation_other": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "Créer une automatisation",
+    "customAutomation": "Automatisation personnalisée",
+    "deleteAutomationConfirm": "Êtes-vous sûr de vouloir supprimer cette automatisation? Cette action est irréversible.",
+    "deleteAutomation_one": "Supprimer l'automatisation",
+    "deleteAutomation_other": "Supprimer {{count}} automatisations ",
+    "deleteAutomationsConfirm": "Êtes-vous sûr de vouloir supprimer ceci ? Cette action est irréversible.",
     "describe": {
       "actions": {
-        "doNothing": "",
-        "flagIt": "",
-        "if": "",
-        "kill_stream": "",
-        "message_client": "",
-        "send": "",
-        "sendAnywhere": "",
-        "trustAdjust": "",
-        "trustDown": "",
-        "trustReset": "",
-        "trustSet": "",
-        "trustUp": ""
+        "doNothing": "Ne rien faire",
+        "flagIt": "le signaler",
+        "if": "si",
+        "kill_stream": "arrêter le flux",
+        "message_client": "envoyer un message au lecteur",
+        "send": "envoyer vers {{destinations}}",
+        "sendAnywhere": "Envoyer une notification",
+        "trustAdjust": "ajuster la confiance de {{amount}}",
+        "trustDown": "réduire la confiance de {{amount}}",
+        "trustReset": "réinitialiser la confiance",
+        "trustSet": "définir la confiance sur {{value}}",
+        "trustUp": "augmenter la confiance par {{amount}}"
       },
-      "allOf": "",
-      "andAlso": "",
-      "anyOf": "",
-      "appliesTo": "",
-      "deviceTypesOnly": "",
+      "allOf": "tous les :",
+      "andAlso": "et aussi",
+      "anyOf": "l'un des :",
+      "appliesTo": "S'applique à {{name}}",
+      "deviceTypesOnly": "{{types}} seulement",
       "duration": {
-        "days_one": "",
-        "days_other": "",
-        "minutes_one": "",
-        "minutes_other": ""
+        "days_one": "{{count}} jour",
+        "days_other": "{{count}} jours",
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes"
       },
       "fields": {
-        "account_age_days": "",
-        "active_session_distance_km": "",
-        "audio_channels_after": "",
-        "client_name": "",
-        "concurrent_streams": "",
-        "country": "",
-        "current_pause_minutes": "",
-        "device_type": "",
-        "dynamic_range_after": "",
-        "file_size_after": "",
-        "inactive_days": "",
-        "ip_in_range": "",
-        "is_local_network": "",
-        "is_transcode_downgrade": "",
-        "is_transcoding": "",
-        "library_item_type": "",
-        "library_name": "",
-        "media_type": "",
-        "output_resolution": "",
-        "platform": "",
-        "resolution_after": "",
-        "server_id": "",
-        "source_bitrate_mbps": "",
-        "source_resolution": "",
-        "total_pause_minutes": "",
-        "travel_speed_kmh": "",
-        "trust_score": "",
-        "unique_devices_in_window": "",
-        "unique_ips_in_window": "",
-        "user_id": "",
-        "video_codec_after": ""
+        "account_age_days": "l'âge du compte",
+        "active_session_distance_km": "la distance entre les flux",
+        "audio_channels_after": "les canaux audio",
+        "client_name": "le lecteur",
+        "concurrent_streams": "le nombre de flux",
+        "country": "le pays",
+        "current_pause_minutes": "la pause en cours",
+        "device_type": "le type d'appareil",
+        "dynamic_range_after": "la plage dynamique",
+        "file_size_after": "la taille du fichier",
+        "inactive_days": "le temps écoulé depuis le dernier flux",
+        "ip_in_range": "l'adresse IP",
+        "is_local_network": "le réseau local",
+        "is_transcode_downgrade": "le downgrade",
+        "is_transcoding": "le transcodage",
+        "library_item_type": "le type d'élément",
+        "library_name": "la bibliothèque",
+        "media_type": "le type de média",
+        "output_resolution": "la résolution de sortie",
+        "platform": "la plateforme",
+        "resolution_after": "la résolution",
+        "server_id": "le serveur",
+        "source_bitrate_mbps": "le débit source",
+        "source_resolution": "la résolution source",
+        "total_pause_minutes": "le temps total de pause",
+        "travel_speed_kmh": "la vitesse de déplacement",
+        "trust_score": "le score de confiance",
+        "unique_devices_in_window": "le nombre d'appareils",
+        "unique_ips_in_window": "le nombre d'adresses IP",
+        "user_id": "l'utilisateur",
+        "video_codec_after": "le codec vidéo"
       },
-      "includesSameDevice": "",
-      "joinAll": "",
-      "joinAny": "",
-      "more_one": "",
-      "more_other": "",
-      "noValues": "",
-      "nothing": "",
-      "onlyWhen": "only when",
+      "includesSameDevice": "inclut le même appareil",
+      "joinAll": "et",
+      "joinAny": "ou",
+      "more_one": "+{{count}} de plus",
+      "more_other": "+{{count}} de plus",
+      "noValues": "(aucun)",
+      "nothing": "rien pour le moment",
+      "onlyWhen": "et seulement si",
       "operators": {
-        "contains": "",
-        "eq": "",
-        "gt": "",
-        "gte": "",
-        "in": "",
-        "lt": "",
-        "lte": "",
-        "neq": "",
-        "not_contains": "",
-        "not_in": ""
+        "contains": "contient",
+        "eq": "est",
+        "gt": "est supérieur à",
+        "gte": "est supérieur ou égal à",
+        "in": "est un de",
+        "lt": "est inférieur à",
+        "lte": "est inférieur ou égal à",
+        "neq": "n'est pas",
+        "not_contains": "ne contient pas",
+        "not_in": "n'est pas un de"
       },
-      "or": "",
-      "otherwise": "",
-      "sameDeviceInput": "",
+      "or": "ou {{text}}",
+      "otherwise": "Sinon",
+      "sameDeviceInput": "même appareil : {{input}}",
       "scope": {
-        "account": "",
-        "person": "",
-        "server": ""
+        "account": "un compte",
+        "person": "une personne",
+        "server": "un serveur"
       },
       "states": {
         "is_local_network": {
-          "no": "",
-          "yes": ""
+          "no": "l'utilisateur n'est pas sur le réseau local",
+          "yes": "l'utilisateur est sur le réseau local"
         },
         "is_transcode_downgrade": {
-          "no": "",
-          "yes": ""
+          "no": "le flux n'est pas rétrogradé",
+          "yes": "le flux est rétrogradé"
         },
         "is_transcoding": {
           "audio": {
-            "no": "",
-            "yes": ""
+            "no": "le flux n'effectue pas de transcodage audio",
+            "yes": "le flux est en cours de transcodage audio"
           },
           "neither": {
-            "no": "",
-            "yes": ""
+            "no": "le flux est en cours de transcodage",
+            "yes": "Le flux n'est pas transcodé"
           },
           "video": {
-            "no": "",
-            "yes": ""
+            "no": "le flux n'effectue pas de transcodage vidéo",
+            "yes": "le flux est en cours de transcodage vidéo"
           },
           "video_or_audio": {
-            "no": "",
-            "yes": ""
+            "no": "Le flux n'est pas transcodé",
+            "yes": "le flux est en cours de transcodage"
           }
         }
       },
-      "then": "",
+      "then": "puis {{text}}",
       "triggers": {
-        "accountInactiveFor": "",
-        "accountNewDevice": "",
-        "accountTrustChanged": "",
-        "mediaAdded": "",
-        "mediaUpgraded": "",
-        "pluginUpdateAvailable": "",
-        "serverDown": "",
-        "serverUp": "",
-        "serverUpdateAvailable": "",
-        "sessionHeldFor": "",
-        "sessionHeldForTotal": "",
-        "sessionPaused": "",
-        "sessionStarted": "",
-        "sessionStopped": "",
-        "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": ""
+        "accountInactiveFor": "un compte est inactif depuis {{duration}}",
+        "accountNewDevice": "un compte joue depuis un nouvel appareil",
+        "accountTrustChanged": "changement de score de confiance d'un compte",
+        "mediaAdded": "média ajouté",
+        "mediaUpgraded": "média mis à jour",
+        "pluginUpdateAvailable": "une mise à jour du plugin est disponible",
+        "serverDown": "un serveur est en panne",
+        "serverUp": "un serveur est de retour",
+        "serverUpdateAvailable": "une mise à jour du serveur est disponible",
+        "sessionFirstSeen": "un flux est vu pour la première fois",
+        "sessionHeldFor": "un flux a été mis en pause depuis {{duration}}",
+        "sessionHeldForTotal": "un flux a été mis en pause pendant {{duration}} au total",
+        "sessionPaused": "un flux est mis en pause",
+        "sessionStarted": "un flux commence",
+        "sessionStopped": "un flux s'arrête",
+        "sessionTranscodeChanged": "le transcodage démarre ou s'arrête",
+        "tracearrUpdateAvailable": "une mise à jour Tracearr est disponible"
       },
       "unbound": {
-        "account": "",
-        "boolean": "",
-        "destinations": "",
-        "duration": "",
-        "field_value": "",
-        "listed": "",
-        "number": "",
-        "person": "",
-        "select": "",
-        "server": "",
-        "text": ""
+        "account": "un compte sélectionné",
+        "boolean": "un paramètre sélectionné",
+        "destinations": "une destination sélectionnée",
+        "duration": "une durée de temps sélectionnée",
+        "field_value": "une valeur sélectionnée",
+        "listed": "ceux sélectionnés",
+        "number": "un nombre sélectionné",
+        "person": "une personne sélectionnée",
+        "select": "une option sélectionnée",
+        "server": "un serveur sélectionné",
+        "text": "un message sélectionné"
       },
-      "uniqueIps": "",
-      "uniqueIpsInput": "",
-      "when": ""
+      "uniqueIps": "IPs uniques",
+      "uniqueIpsInput": "IP uniques: {{input}}",
+      "when": "Quand {{text}}"
     },
-    "description": "",
+    "description": "Les automatisations surveillent vos serveurs et agissent quand leurs conditions correspondent",
     "descriptionLabel": "",
     "descriptionPlaceholder": "",
     "detail": {
-      "noRuns": "",
-      "notFound": "",
-      "runsLine_one": "",
-      "runsLine_other": "",
-      "title": "",
-      "unsaved": ""
+      "noRuns": "Pas encore d'exécutions",
+      "notFound": "Automatisation non trouvée",
+      "runsLine_one": "1 exécution · dernière exécution {{when}}",
+      "runsLine_other": "{{count}} exécutions · dernière exécution {{when}}",
+      "title": "Automatisation",
+      "unsaved": "Modifications non enregistrées"
     },
-    "disable": "",
-    "editAutomation": "Edit Automation",
+    "disable": "Désactiver",
+    "editAutomation": "Modifier l'automatisation",
     "effects": {
-      "allServers": "",
-      "everyServer": "",
-      "kill": "",
-      "message": "",
-      "oneServer": "",
-      "tellsOnly": "",
-      "title": "",
-      "trust": "",
-      "violation": ""
+      "allServers": "Exécute sur chaque serveur à moins que l'un ne soit choisi.",
+      "everyServer": "Exécute sur tous les serveurs.",
+      "kill": "Peut arrêter un flux en cours de lecture.",
+      "message": "Affiche un message sur un lecteur.",
+      "oneServer": "Exécute uniquement sur {{server}}.",
+      "tellsOnly": "Se contente d'envoyer des notifications. N'interrompt jamais un flux et ne modifie jamais de compte.",
+      "title": "Ce que cela fera",
+      "trust": "Modifie les scores de confiance.",
+      "violation": "Enregistre une violation contre la personne correspondante."
     },
-    "emptyDescription": "",
-    "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "emptyTitle": "",
-    "enable": "",
+    "emptyDescription": "Automatisations prêtes à l'emploi. Choisissez-en une et remplissez les blancs.",
+    "emptySeeAll": "Voir toutes les {{count}}",
+    "emptySeeAllLoading": "Tout afficher",
+    "emptyTitle": "Pas encore d'automatisation",
+    "enable": "Activer",
     "evaluations": {
-      "disclosure": "",
+      "disclosure": "Correspondances qui n'ont pas démarré une exécution ({{total}})",
       "reasons": {
-        "cooldown_active": "",
-        "edge_replayed": "",
-        "gate_blocked": "",
-        "trigger_filter_failed": ""
+        "cooldown_active": "Le délai de récupération a été actif",
+        "edge_replayed": "Ce bord a déjà été traité",
+        "gate_blocked": "Un run ouvert couvre déjà ceci",
+        "trigger_filter_failed": "Seuil de déclenchement non atteint"
       }
     },
     "export": {
-      "authorHelper": "",
+      "authorHelper": "Affiché sur la page de la galerie et porté dans le code. Optionnel.",
       "authorInCode": "",
-      "authorLabel": "Made by",
-      "authorPlaceholder": "",
-      "carries": "",
-      "copyCode": "",
-      "copyJson": "",
+      "authorLabel": "Auteur",
+      "authorPlaceholder": "Nom",
+      "carries": "Le code ne comporte que les étapes. Les destinations, les serveurs et les comptes ne sont pas inclus; le côté récepteur se remplit dans le sien.",
+      "copyCode": "Copier le code de partage",
+      "copyJson": "Copier le JSON",
       "description": "",
       "failed": "",
       "gallery": {
@@ -678,11 +683,11 @@
       "groupHelper": "",
       "groupLabel": "",
       "openRepository": "",
-      "save": "",
+      "save": "Enregistrer comme prêt",
       "saveFailed": "",
       "saveHelper": "",
       "saved": "",
-      "title": ""
+      "title": "Partager cette automatisation"
     },
     "fields": {
       "account_age_days": {
@@ -893,7 +898,7 @@
       "existing": "",
       "existingUse": "",
       "formatHint": "",
-      "madeBy": "Made by {{author}}",
+      "madeBy": "",
       "paused": {
         "helper": "",
         "label": ""
@@ -908,11 +913,11 @@
       "validCaveat": ""
     },
     "kind": {
-      "notification": "Notification",
+      "notification": "",
       "policy": ""
     },
     "kindColumn": "",
-    "name": "Automation Name",
+    "name": "",
     "nameInvalid": "",
     "namePlaceholder": "",
     "newAutomation": "",
@@ -1030,9 +1035,9 @@
     "template": {
       "after": "",
       "before": "",
-      "customize": "Customize",
+      "customize": "",
       "customizeConfirm": "",
-      "customizeConfirmAction": "Customize it",
+      "customizeConfirmAction": "",
       "customizeFailed": "",
       "customizeFirst": "",
       "customizeTitle": "",
@@ -1178,7 +1183,7 @@
       "minutes": "",
       "seconds": ""
     },
-    "updateAutomation": "Update Automation"
+    "updateAutomation": ""
   },
   "dashboard": {
     "activeUsers": "Utilisateurs actifs",
@@ -1361,37 +1366,37 @@
     },
     "storage": {
       "avgHoursPerGB": "heure moyenne/Go",
-      "colCopies": "",
-      "colMatchType": "",
-      "colRecoverable": "",
-      "colTitle": "",
+      "colCopies": "Copies",
+      "colMatchType": "Type de correspondance",
+      "colRecoverable": "Espace récupérable",
+      "colTitle": "Titre",
       "confidence": "Confiance",
       "confidenceHigh": "Élevée",
       "confidenceLow": "Faible",
       "confidenceMedium": "Moyenne",
-      "contentROI": "",
+      "contentROI": "Content ROI",
       "contentROIDesc": "Regarder la valeur par coût de stockage",
       "days": "jours",
       "description": "Consommation de stockage, prédictions et optimisation",
       "duplicates": "Doublons",
-      "duplicatesFailed": "",
-      "duplicatesSubtitle": "",
+      "duplicatesFailed": "Échec du chargement des doublons",
+      "duplicatesSubtitle": "Titres stockés en tant que plus d'un fichier physique, entre les serveurs, les bibliothèques et les versions",
       "duplicatesTitle": "Doublons",
       "failedToLoad": "Impossible de charger les données de stockage",
       "failedToLoadDesc": "Impossible de récupérer les données de stockage. Veuillez réessayer.",
       "groups": "Groupes",
-      "growthPreChangeover": "",
+      "growthPreChangeover": "basé sur l'historique de pré-mise à jour",
       "growthRate": "Taux de croissance",
       "insufficientData": "Données insuffisantes",
       "items": "Eléments",
-      "loadingDuplicates": "",
-      "mirror": "",
-      "noDuplicatesDesc": "",
-      "noDuplicatesTitle": "",
+      "loadingDuplicates": "Chargement des doublons...",
+      "mirror": "Miroir",
+      "noDuplicatesDesc": "Aucun titre avec plus d'un fichier physique détecté.",
+      "noDuplicatesTitle": "Aucun doublon trouvé",
       "of": "de",
       "predictions": "Prédictions",
       "recoverable": "récupérable",
-      "sameServer": "",
+      "sameServer": "Même serveur",
       "staleContent": "Contenu de l'histoire",
       "staleContentDesc": "Contenu pouvant être des candidats à la suppression",
       "storageTrend": "Tendance de stockage",
@@ -1405,9 +1410,9 @@
     "topShows": "Meilleures séries",
     "versionsBackfill": {
       "action": "Synchroniser maintenant",
-      "banner": "",
-      "syncFailed": "",
-      "syncStarted": ""
+      "banner": "Les données de la version du fichier sont toujours en cours de collecte pour ce serveur. Exécutez une synchronisation de la bibliothèque pour finir.",
+      "syncFailed": "La synchronisation n'a pas pu démarrer sur {{count}} serveur(s). Vérifiez vos permissions et l'état du serveur.",
+      "syncStarted": "Synchronisation de la bibliothèque démarrée."
     },
     "watch": {
       "avgPerItem": "moy par élément",
@@ -1464,7 +1469,7 @@
     "signInHeading": "Connectez-vous à votre compte",
     "signupFailed": "Échec de l'inscription",
     "tagline": "Tracearr - Gestion d'accès aux lectures",
-    "title": "",
+    "title": "Tracearr",
     "username": "Nom d'utilisateur",
     "usernameOrEmail": "Nom d'utilisateur ou email",
     "usernamePlaceholder": "votrenomdutilisateur",
@@ -1501,11 +1506,15 @@
     "allActivity": "Toutes les activités",
     "allTypes": "Tous les types",
     "allUsers": "Tous les utilisateurs",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Cercles",
     "heatmap": "Carte de chaleur",
     "locations": "emplacements",
-    "streams": "flux"
+    "streams": "flux",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {
@@ -1855,8 +1864,8 @@
         "pushover": "",
         "webToast": ""
       },
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
+      "usedBy": "",
+      "usedBy_other": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1963,23 +1972,23 @@
     "noViolationsFound": "Aucune violation pour cet utilisateur.",
     "overallTrust": "Confiance globale",
     "serverScope": "Serveur",
-    "sessions": "",
+    "sessions": "Sessions",
     "splitAccount": "Séparer en un utilisateur distinct",
     "splitConfirmDescription": "Détachez ce compte serveur pour en faire un utilisateur distinct. Son historique de surveillance et ses infractions seront transférés avec lui.",
     "splitConfirmLoading": "Séparation en cours...",
     "splitConfirmTitle": "Séparer le compte serveur",
     "statistics": "Statistiques",
     "terminationHistory": "Historique des interruptions",
-    "title": "",
+    "title": "Détail de l'utilisateur",
     "unknownRule": "Règle inconnue",
     "userInfo": "Informations de l'utilisateur",
     "userNotFound": "Utilisateur introuvable",
-    "violations": ""
+    "violations": "Violations"
   },
   "users": {
-    "filterHasAccessTo": "",
-    "filterHasAccessToHint": "",
-    "filterHasAccessToPlaceholder": "",
+    "filterHasAccessTo": "A accès à",
+    "filterHasAccessToHint": "Affiche les personnes ayant un compte actif sur chaque serveur sélectionné.",
+    "filterHasAccessToPlaceholder": "N’importe quel serveur",
     "mergeConfirm": "Fusionner",
     "mergeDialogDescription": "Chaque compte serveur, session et infraction du serveur secondaire est transféré vers le serveur principal. L'identité dupliquée est supprimée.",
     "mergeDialogTitle": "Fusionner les utilisateurs",
@@ -2015,7 +2024,7 @@
   },
   "violations": {
     "allPeople": "Toutes les personnes",
-    "allRules": "",
+    "allRules": "Toutes les règles",
     "allSeverities": "Toutes les gravités",
     "allStatuses": "Tous les états",
     "detail": {
@@ -2037,7 +2046,7 @@
       "relatedSessions": "{{count}} sessions liées",
       "relatedSessions_one": "{{count}} session liée",
       "relatedSessions_other": "{{count}} sessions liées",
-      "sessions": "",
+      "sessions": "Sessions",
       "threshold": "Seuil",
       "timestamps": "Horodatage",
       "trigger": "Déclencheur",
@@ -2058,7 +2067,7 @@
     "personFilterError": "Échec du chargement de la personne",
     "personFilterPlaceholder": "Filtrer par personne",
     "selectAllViolations": "Sélectionner les {{count}} violations correspondant aux filtres",
-    "title": "",
+    "title": "Violations",
     "tryAdjustingFilters": "Essayez d'ajuster vos filtres"
   }
 }

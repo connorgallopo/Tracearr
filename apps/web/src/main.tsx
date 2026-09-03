@@ -6,6 +6,8 @@ import { ServerProvider } from '@/hooks/useServer';
 import { SocketProvider } from '@/hooks/useSocket';
 import { MaintenanceProvider } from '@/hooks/useMaintenanceMode';
 import { ThemeProvider } from '@/components/theme-provider';
+import { installChunkReload } from '@/lib/chunkReload';
+import { installClientErrorCapture } from '@/lib/clientErrors';
 import { sweepLegacyTokens } from '@/lib/legacyTokenSweep';
 import { App } from './App';
 import { i18nReady } from './i18n';
@@ -13,6 +15,9 @@ import './styles/globals.css';
 
 // Run before anything else can read stale localStorage tokens from pre-cookie-session builds.
 sweepLegacyTokens();
+
+installClientErrorCapture();
+installChunkReload();
 
 const queryClient = new QueryClient({
   defaultOptions: {

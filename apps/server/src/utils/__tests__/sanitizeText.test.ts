@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeText, scrubStringFields } from '../sanitizeText.js';
+import { sanitizeText, sanitizeTextArray, scrubStringFields } from '../sanitizeText.js';
 
 describe('sanitizeText', () => {
   it('passes null and undefined through', () => {
@@ -68,5 +68,46 @@ describe('scrubStringFields', () => {
     expect(out.active).toBe(true);
     expect(out.tags).toBe(input.tags);
     expect(out.title).toBe('x');
+  });
+
+  it('scrubs null bytes inside string array fields', () => {
+    const input = { ratingKey: 'abc', genres: ['Ra\u0000p', 'Hip Hop'] };
+    const out = scrubStringFields(input);
+    expect(out.genres).toEqual(['Rap', 'Hip Hop']);
+    expect(out.ratingKey).toBe('abc');
+  });
+
+  it('returns the original reference when an array field is already clean', () => {
+    const input = { genres: ['Rap', 'Hip Hop'] };
+    const out = scrubStringFields(input);
+    expect(out).toBe(input);
+    expect(out.genres).toBe(input.genres);
+  });
+});
+
+describe('sanitizeTextArray', () => {
+  it('strips null bytes from every element', () => {
+    expect(sanitizeTextArray(['a\u0000', '\u0000b', 'c'])).toEqual(['a', 'b', 'c']);
+  });
+
+  it('replaces unpaired surrogates in elements', () => {
+    expect(sanitizeTextArray(['bad \uD800 genre'])).toEqual(['bad \uFFFD genre']);
+  });
+
+  it('returns the original reference when nothing changed', () => {
+    const input = ['Rap', 'Hip Hop'];
+    expect(sanitizeTextArray(input)).toBe(input);
+  });
+
+  it('leaves non-string elements untouched', () => {
+    const nested = { a: 1 };
+    const out = sanitizeTextArray(['x\u0000', 7, null, nested]);
+    expect(out).toEqual(['x', 7, null, nested]);
+    expect(out[3]).toBe(nested);
+  });
+
+  it('handles an empty array', () => {
+    const input: string[] = [];
+    expect(sanitizeTextArray(input)).toBe(input);
   });
 });

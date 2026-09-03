@@ -51,7 +51,7 @@ import {
 } from '@tracearr/shared';
 import { resolutionBucketPredicate, resolutionRankSql } from '../utils/resolutionBuckets.js';
 import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
-import { scrubStringFields } from '../utils/sanitizeText.js';
+import { sanitizeTextArray, scrubStringFields } from '../utils/sanitizeText.js';
 import type { Redis } from 'ioredis';
 
 // Constants for batching and rate limiting.
@@ -216,7 +216,9 @@ function delay(ms: number): Promise<void> {
 
 /** Bind a genre list as one param; drizzle expands a raw array into a record that cannot cast to text[] */
 function toPgTextArrayLiteral(values: string[]): string {
-  const escaped = values.map((v) => `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+  const escaped = sanitizeTextArray(values).map(
+    (v) => `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+  );
   return `{${escaped.join(',')}}`;
 }
 

@@ -93,12 +93,8 @@ describe('TemplateEffects', () => {
       />
     );
 
-    expect(
-      screen.getByText("Can stop a stream that is playing.")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Records a violation against the matched person.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Can stop a stream that is playing.')).toBeInTheDocument();
+    expect(screen.getByText('Records a violation against the matched person.')).toBeInTheDocument();
     expect(screen.getByText('Runs on Beehive only.')).toBeInTheDocument();
   });
 

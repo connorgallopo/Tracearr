@@ -134,9 +134,7 @@ describe('LiveCheckStrip', () => {
       renderStrip(definition(), replay);
 
       expect(
-        screen.getByText(
-          'That session is no longer on record; nothing to check against.'
-        )
+        screen.getByText('That session is no longer on record; nothing to check against.')
       ).toBeInTheDocument();
     });
 
@@ -145,9 +143,7 @@ describe('LiveCheckStrip', () => {
       renderStrip(definition(), replay);
 
       expect(
-        screen.getByText(
-          'That session is no longer on record; nothing to check against.'
-        )
+        screen.getByText('That session is no longer on record; nothing to check against.')
       ).toBeInTheDocument();
     });
 

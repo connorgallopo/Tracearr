@@ -16,6 +16,9 @@ vi.mock('./ServerHealthBanner', () => ({
 vi.mock('./IpWarningBanner', () => ({
   IpWarningBanner: () => <div>ip-warning</div>,
 }));
+vi.mock('./BasemapBanner', () => ({
+  BasemapBanner: () => <div>basemap</div>,
+}));
 
 import { StatusBanners } from './StatusBanners';
 
@@ -26,6 +29,7 @@ describe('StatusBanners', () => {
 
     expect(screen.getByText('server-health')).toBeInTheDocument();
     expect(screen.getByText('ip-warning')).toBeInTheDocument();
+    expect(screen.getByText('basemap')).toBeInTheDocument();
     expect(screen.queryByText('maintenance.unreachable')).toBeNull();
   });
 
@@ -36,5 +40,6 @@ describe('StatusBanners', () => {
     expect(screen.getByText('maintenance.unreachable')).toBeInTheDocument();
     expect(screen.queryByText('server-health')).toBeNull();
     expect(screen.queryByText('ip-warning')).toBeNull();
+    expect(screen.queryByText('basemap')).toBeNull();
   });
 });

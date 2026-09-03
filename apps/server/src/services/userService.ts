@@ -15,7 +15,14 @@ import { eq, and, sql, inArray, isNull, type SQL } from 'drizzle-orm';
 import type { MediaUser } from './mediaServer/index.js';
 import type { UserRole } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { users, serverUsers, servers, sessions, automationRuns } from '../db/schema.js';
+import {
+  users,
+  serverUsers,
+  serverUserExternalAliases,
+  servers,
+  sessions,
+  automationRuns,
+} from '../db/schema.js';
 import { NotFoundError } from '../utils/errors.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
 
@@ -265,6 +272,28 @@ export async function getServerUserByExternalId(
     .where(and(eq(serverUsers.serverId, serverId), eq(serverUsers.externalId, externalId)))
     .limit(1);
   return rows[0] ?? null;
+}
+
+/**
+ * Whether a same-server merge folded this external id into another account.
+ *
+ * Deliberately separate from getServerUserByExternalId: sync uses that one to
+ * decide what to write, and resolving an alias there would overwrite the
+ * surviving account's username, email and plex linkage with the absorbed
+ * account's whenever both still exist on the media server.
+ */
+export async function isAliasedExternalId(serverId: string, externalId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: serverUserExternalAliases.id })
+    .from(serverUserExternalAliases)
+    .where(
+      and(
+        eq(serverUserExternalAliases.serverId, serverId),
+        eq(serverUserExternalAliases.externalId, externalId)
+      )
+    )
+    .limit(1);
+  return rows.length > 0;
 }
 
 /**
@@ -633,6 +662,12 @@ export async function syncUserFromMediaServer(
       return { serverUser: updated[0]!, user, created: false };
     }
 
+    // Already folded into another account by a same-server merge. Creating it
+    // again is what the alias table exists to prevent.
+    if (await isAliasedExternalId(serverId, mediaUser.id)) {
+      return null;
+    }
+
     // Create new Plex user
     // For shared users: plex.tv ID = local PMS ID, so use mediaUser.id for both
     // For owner (isAdmin): should already exist from OAuth, but handle edge case
@@ -727,6 +762,12 @@ export async function syncUserFromMediaServer(
 
     const user = await requireUserById(existing.userId);
     return { serverUser: updated, user, created: false };
+  }
+
+  // Already folded into another account by a same-server merge. Creating it
+  // again is what the alias table exists to prevent.
+  if (await isAliasedExternalId(serverId, mediaUser.id)) {
+    return null;
   }
 
   // Use transaction to prevent orphaned users if server user creation fails

@@ -45,6 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ClientErrors } from '@/components/debug/ClientErrors';
 import { useVersion } from '@/hooks/queries';
 import { tokenStorage, api, BASE_URL } from '@/lib/api';
 import { debugFetch, debugRawFetch } from '@/lib/debugFetch';
@@ -1028,6 +1029,8 @@ export function Debug() {
         </TabsContent>
 
         <TabsContent value="logs" className="space-y-6">
+          <ClientErrors />
+
           {/* Log Explorer */}
           <Card>
             <CardHeader>

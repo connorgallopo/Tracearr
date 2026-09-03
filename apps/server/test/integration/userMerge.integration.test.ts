@@ -73,7 +73,7 @@ describe('mergeUsers', () => {
     const target = await createTestUser({ role: 'member', email: 'bob@example.com' });
     const source = await createTestUser({ role: 'member', email: null });
 
-    const targetSu = await createTestServerUser({
+    await createTestServerUser({
       userId: target.id,
       serverId: serverA.id,
       trustScore: 90,
@@ -1056,7 +1056,7 @@ describe('GET /users dedup + includeRemoved + access scoping', () => {
       serverId: serverA.id,
       lastActivityAt: new Date('2026-06-01T00:00:00Z'),
     });
-    const sourceSu = await createTestServerUser({
+    await createTestServerUser({
       userId: source.id,
       serverId: serverB.id,
       lastActivityAt: new Date('2026-06-02T00:00:00Z'),
@@ -1175,7 +1175,7 @@ describe('GET /users serverIds (multi-select)', () => {
   });
 
   it('never widens beyond a non-owner viewer accessible servers when serverIds requests more', async () => {
-    const admin = await createTestUser({ role: 'owner' });
+    await createTestUser({ role: 'owner' });
     const serverA = await createTestServer({ type: 'plex' });
     const serverB = await createTestServer({ type: 'jellyfin' });
     const identityA = await createTestUser({ role: 'member' });

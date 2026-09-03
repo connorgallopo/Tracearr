@@ -15,6 +15,7 @@ import type {
   ServerDownEvent,
   ServerUpdateEvent,
   ServerUpEvent,
+  SessionFirstSeenEvent,
   SessionHeldForEvent,
   SessionPausedEvent,
   SessionStartedEvent,
@@ -26,6 +27,7 @@ import type {
 
 export type SessionEvaluatingEvent =
   | SessionStartedEvent
+  | SessionFirstSeenEvent
   | SessionStoppedEvent
   | SessionTranscodeChangedEvent
   | SessionPausedEvent

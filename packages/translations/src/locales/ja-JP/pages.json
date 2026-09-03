@@ -152,7 +152,7 @@
       "nameHelper": "",
       "namePlaceholder": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "noInputs": "",
       "personLabel": "",
@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -1501,11 +1506,15 @@
     "allActivity": "すべてのアクティビティ",
     "allTypes": "すべてのタイプ",
     "allUsers": "すべてのユーザー",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "円",
     "heatmap": "ヒートマップ",
     "locations": "場所",
-    "streams": "ストリーム"
+    "streams": "ストリーム",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {

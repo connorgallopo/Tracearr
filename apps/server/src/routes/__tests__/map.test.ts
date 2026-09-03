@@ -64,6 +64,26 @@ describe('GET /map/basemap', () => {
     expect(res.statusCode).toBe(404);
   });
 
+  it('reports the archive as installed', async () => {
+    process.env.MAP_BASEMAP_PATH = join(dir, 'basemap.pmtiles');
+    const res = await app.inject({ method: 'GET', url: '/map/basemap/status' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ installed: true, path: join(dir, 'basemap.pmtiles') });
+  });
+
+  it('reports the archive as missing when a mount has hidden it', async () => {
+    process.env.MAP_BASEMAP_PATH = join(dir, 'nope.pmtiles');
+    const res = await app.inject({ method: 'GET', url: '/map/basemap/status' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({ installed: false });
+  });
+
+  it('requires a session for status', async () => {
+    getSession.mockResolvedValue(null);
+    const res = await app.inject({ method: 'GET', url: '/map/basemap/status' });
+    expect(res.statusCode).toBe(401);
+  });
+
   it('serves the whole file without a range header', async () => {
     process.env.MAP_BASEMAP_PATH = join(dir, 'basemap.pmtiles');
     const res = await app.inject({ method: 'GET', url: '/map/basemap' });

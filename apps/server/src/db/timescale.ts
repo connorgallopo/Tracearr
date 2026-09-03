@@ -43,8 +43,12 @@ import { PRIMARY_MEDIA_TYPES_SQL_LITERAL } from '../constants/mediaTypes.js';
  * - 14: Added count_high_quality and version_count (multi-version rollups) to
  *       library_stats_daily and content_quality_daily. Resolution buckets in
  *       source snapshots are overlapping from this version on.
+ * - 15: Migration 0096 repoints sessions onto the surviving account when it
+ *       repairs a legacy plex owner. Every per-user aggregate groups by
+ *       server_user_id, so buckets materialized before the repair still credit
+ *       the deleted account.
  */
-export const AGGREGATE_SCHEMA_VERSION = 14;
+export const AGGREGATE_SCHEMA_VERSION = 15;
 
 /** Config for a continuous aggregate view */
 interface AggregateDefinition {

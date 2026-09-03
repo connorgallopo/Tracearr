@@ -3,6 +3,7 @@ import { getActiveAutomations } from '../../../jobs/poller/database.js';
 import { automationsLogger } from '../../../utils/logger.js';
 import { getPubSubService } from '../../cache.js';
 import {
+  assembleEvaluationInputs,
   installInputs,
   loadEvaluationContext,
   loadServerContext,
@@ -14,6 +15,7 @@ import type {
   AccountNewDeviceEvent,
   EvaluationInputs,
   EvaluationServer,
+  EvaluationServerUser,
   SessionStopReason,
   TriggerType,
 } from './types.js';
@@ -94,6 +96,38 @@ export async function dispatchSessionStopped(
         durationMs,
       },
       context.inputs
+    );
+  });
+}
+
+/**
+ * First sight of a new playback: the session exists only as a pending cache entry, so
+ * listeners fire ahead of the confirmation delay. The id it carries is the one the
+ * confirmed row will keep; a phantom that never confirms leaves its runs behind.
+ */
+export async function dispatchSessionFirstSeen(args: {
+  session: Session;
+  server: EvaluationServer;
+  serverUser: EvaluationServerUser;
+  at: Date;
+}): Promise<void> {
+  await guarded('session.first_seen', async () => {
+    const rules = await listeningRules('session.first_seen');
+    if (!rules) return;
+    const inputs = await assembleEvaluationInputs({
+      rules,
+      server: args.server,
+      serverUser: args.serverUser,
+    });
+    await dispatch(
+      {
+        type: 'session.first_seen',
+        at: args.at,
+        server: args.server,
+        serverUser: args.serverUser,
+        session: args.session,
+      },
+      inputs
     );
   });
 }

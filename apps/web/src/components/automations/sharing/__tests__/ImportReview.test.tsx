@@ -150,12 +150,8 @@ describe('ImportReview', () => {
 
     expect(screen.getByRole('region', { name: 'What this will do' })).toBeInTheDocument();
     // The kill sits inside an `if`, and it counts the same as one at the top.
-    expect(
-      screen.getByText("Can stop a stream that is playing.")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Records a violation against the matched person.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Can stop a stream that is playing.')).toBeInTheDocument();
+    expect(screen.getByText('Records a violation against the matched person.')).toBeInTheDocument();
     expect(screen.getByText('Runs on every server unless one is chosen.')).toBeInTheDocument();
   });
 
@@ -217,9 +213,7 @@ describe('ImportReview', () => {
       })
     );
 
-    expect(
-      screen.getByText('Already saved as Two places at once.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Already saved as Two places at once.')).toBeInTheDocument();
 
     await bindDestination(user);
     await user.click(screen.getByRole('button', { name: 'Use it' }));

@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -1501,11 +1506,15 @@
     "allActivity": "Alle Aktivitäten",
     "allTypes": "Alle Typen",
     "allUsers": "Alle Benutzer",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Kreise",
     "heatmap": "",
     "locations": "standorte",
-    "streams": ""
+    "streams": "",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {

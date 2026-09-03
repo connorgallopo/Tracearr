@@ -112,6 +112,12 @@ vi.mock('../../../services/automations/events/dispatcher.js', () => ({
   subscribe: vi.fn(),
 }));
 
+const mockDispatchSessionFirstSeen = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+vi.mock('../../../services/automations/events/producers.js', () => ({
+  dispatchServerHealth: vi.fn(),
+  dispatchSessionFirstSeen: mockDispatchSessionFirstSeen,
+}));
+
 vi.mock('../violations.js', () => ({
   broadcastViolations: vi.fn(),
 }));
@@ -123,6 +129,7 @@ vi.mock('../sessionMapper.js', () => ({
 
 import { servers, serverUsers, sessions as sessionsTable } from '../../../db/schema.js';
 import { initializePoller, stopPoller, triggerPoll } from '../processor.js';
+import { buildPendingActiveSession } from '../sessionLifecycle.js';
 
 function createMockProcessedSession(overrides: Partial<ProcessedSession> = {}): ProcessedSession {
   return {
@@ -332,6 +339,30 @@ describe('poller in-lock cross-user sessionKey guards', () => {
       { serverUser: { id: string } },
     ];
     expect(pendingData.serverUser.id).toBe('su-B');
+  });
+
+  it('a fresh pending entry announces session.first_seen with the pending session', async () => {
+    mockBatchFindActiveSessionsByKey.mockResolvedValue(new Map());
+    const pendingActive = { id: 'pending-id', serverId: 'server-1' } as unknown as ActiveSession;
+    vi.mocked(buildPendingActiveSession).mockReturnValue(pendingActive);
+    const cacheService = createCacheService([]);
+    initializePoller(
+      cacheService as unknown as CacheService,
+      { publish: vi.fn().mockResolvedValue(undefined) } as unknown as PubSubService
+    );
+
+    await triggerPoll();
+
+    expect(cacheService.setPendingSession).toHaveBeenCalledTimes(1);
+    expect(mockDispatchSessionFirstSeen).toHaveBeenCalledTimes(1);
+    expect(mockDispatchSessionFirstSeen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        session: pendingActive,
+        server: { id: 'server-1', name: 'Test Server', type: 'plex' },
+        serverUser: expect.objectContaining({ id: 'su-B' }),
+        at: expect.any(Date),
+      })
+    );
   });
 
   it('stale-cache path: creates fresh under the real user instead of skipping on the foreign row', async () => {

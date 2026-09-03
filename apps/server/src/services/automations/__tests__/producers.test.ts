@@ -71,6 +71,10 @@ vi.mock('../runRecorder.js', () => ({
   },
 }));
 
+vi.mock('../../userService.js', () => ({
+  getIdentityServerUserIds: vi.fn().mockResolvedValue(['su-1']),
+}));
+
 vi.mock('../executors/index.js', () => ({ executeActions: vi.fn().mockResolvedValue([]) }));
 vi.mock('../v2Integration.js', () => ({ storeActionResults: vi.fn() }));
 vi.mock('../../../utils/logger.js', () => ({
@@ -87,6 +91,7 @@ import {
   dispatchServerHealth,
   dispatchServerHealthById,
   dispatchServerUpdate,
+  dispatchSessionFirstSeen,
   dispatchSessionStopped,
   dispatchTracearrUpdate,
   dispatchTrustChanged,
@@ -336,6 +341,141 @@ describe('dispatchSessionStopped', () => {
       dispatchSessionStopped(stoppedSession(), 1_000, new Date())
     ).resolves.toBeUndefined();
     expect(seen.map(({ event }) => event.type)).toEqual(['session.ended']);
+  });
+});
+
+describe('dispatchSessionFirstSeen', () => {
+  const serverUser = {
+    id: 'su-1',
+    userId: 'u-1',
+    username: 'alice',
+    thumbUrl: null,
+    identityName: null,
+    trustScore: 100,
+    lastActivityAt: null,
+    createdAt: new Date(),
+    identityServerUserIds: ['su-1'],
+  };
+
+  function pendingSession(): Session {
+    return {
+      id: 'session-1',
+      serverId: 'server-1',
+      serverUserId: 'su-1',
+      state: 'playing',
+      mediaTitle: 'Test Movie',
+    } as Session;
+  }
+
+  const sessions = vi.fn().mockResolvedValue([]);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetDispatcherForTests();
+    mockGetActiveAutomations.mockResolvedValue([]);
+    sessions.mockResolvedValue([]);
+    setContextAssemblyDeps({
+      getAllActiveSessions: sessions,
+      gracePeriodSessionIds: () => new Set<string>(),
+    });
+  });
+
+  it('reads no context when nothing listens', async () => {
+    const seen = captureEvents('session.first_seen');
+
+    await dispatchSessionFirstSeen({
+      session: pendingSession(),
+      server,
+      serverUser,
+      at: new Date(),
+    });
+
+    expect(seen).toEqual([]);
+    expect(sessions).not.toHaveBeenCalled();
+  });
+
+  it('carries server, account and the pending session on freshly assembled inputs', async () => {
+    const rules = [automation([node('session.first_seen')])];
+    mockGetActiveAutomations.mockResolvedValue(rules);
+    const seen = captureEvents('session.first_seen');
+    const at = new Date('2026-08-31T10:00:00Z');
+
+    await dispatchSessionFirstSeen({ session: pendingSession(), server, serverUser, at });
+
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.event).toMatchObject({
+      type: 'session.first_seen',
+      at,
+      server,
+      serverUser,
+      session: { id: 'session-1' },
+    });
+    const inputs = seen[0]?.inputs as { activeAutomations: EngineAutomation[] };
+    expect(inputs.activeAutomations).toBe(rules);
+  });
+
+  it('logs and returns when the input assembly throws, leaving the caller intact', async () => {
+    mockGetActiveAutomations.mockResolvedValue([automation([node('session.first_seen')])]);
+    sessions.mockRejectedValue(new Error('redis down'));
+    const seen = captureEvents('session.first_seen');
+
+    await expect(
+      dispatchSessionFirstSeen({ session: pendingSession(), server, serverUser, at: new Date() })
+    ).resolves.toBeUndefined();
+    expect(seen).toEqual([]);
+  });
+});
+
+describe('a first sight reaches the recorder as a fresh session subject', () => {
+  const serverUser = {
+    id: 'su-1',
+    userId: 'u-1',
+    username: 'alice',
+    thumbUrl: null,
+    identityName: null,
+    trustScore: 100,
+    lastActivityAt: null,
+    createdAt: new Date(),
+    identityServerUserIds: ['su-1'],
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetDispatcherForTests();
+    resetRuleSubscribersForTests();
+    registerRuleSubscribers();
+    setContextAssemblyDeps({
+      getAllActiveSessions: async () => [],
+      gracePeriodSessionIds: () => new Set<string>(),
+    });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => fn({}));
+    mockRecordRun.mockResolvedValue({ id: 'run-1', automationId: 'a1' });
+    mockEvaluateRulesAsync.mockResolvedValue([
+      { ruleId: 'a1', ruleName: 'a1', matched: false, matchedGroups: [], actions: [] },
+    ]);
+  });
+
+  it('records the run fresh against the pending id, unkeyed on any edge', async () => {
+    mockGetActiveAutomations.mockResolvedValue([automation([node('session.first_seen')])]);
+    const session = {
+      id: 'session-1',
+      serverId: 'server-1',
+      serverUserId: 'su-1',
+      state: 'playing',
+    } as Session;
+
+    await dispatchSessionFirstSeen({ session, server, serverUser, at: new Date() });
+
+    expect(mockRecordRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: { kind: 'session', sessionId: 'session-1', fresh: true },
+        trigger: expect.objectContaining({
+          type: 'session.first_seen',
+          nodeId: 'session.first_seen-node',
+          edgeKey: null,
+        }),
+      })
+    );
   });
 });
 

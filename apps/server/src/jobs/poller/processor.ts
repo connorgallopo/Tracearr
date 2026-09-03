@@ -18,7 +18,13 @@ import {
 import { and, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../../db/client.js';
-import { servers, serverUsers, sessions, users } from '../../db/schema.js';
+import {
+  servers,
+  serverUserExternalAliases,
+  serverUsers,
+  sessions,
+  users,
+} from '../../db/schema.js';
 import { getGeoIPSettings } from '../../routes/settings.js';
 import { isMaintenance } from '../../serverState.js';
 import { isLeader } from '../../services/leaderLease.js';
@@ -33,7 +39,10 @@ import {
   toRuleSession,
 } from '../../services/automations/events/contextAssembly.js';
 import { dispatch } from '../../services/automations/events/dispatcher.js';
-import { dispatchServerHealth } from '../../services/automations/events/producers.js';
+import {
+  dispatchServerHealth,
+  dispatchSessionFirstSeen,
+} from '../../services/automations/events/producers.js';
 import { registerRuleSubscribers } from '../../services/automations/events/subscribers.js';
 import {
   registerPauseWakeSubscriptions,
@@ -871,6 +880,47 @@ export async function processServerSessions(
       serverUserById.set(serverUser.id, serverUser);
     }
 
+    // External ids a same-server merge folded into another account. Resolving
+    // these is what stops the merge from being undone by the next stream.
+    const aliasResolvedExternalIds = new Set<string>();
+    const unmatchedExternalIds = sessionExternalIds.filter(
+      (externalId) => !serverUserByExternalId.has(externalId)
+    );
+    if (unmatchedExternalIds.length > 0) {
+      const aliased = await db
+        .select({
+          aliasExternalId: serverUserExternalAliases.externalId,
+          id: serverUsers.id,
+          userId: serverUsers.userId,
+          serverId: serverUsers.serverId,
+          externalId: serverUsers.externalId,
+          username: serverUsers.username,
+          email: serverUsers.email,
+          thumbUrl: serverUsers.thumbUrl,
+          isServerAdmin: serverUsers.isServerAdmin,
+          trustScore: serverUsers.trustScore,
+          lastActivityAt: serverUsers.lastActivityAt,
+          createdAt: serverUsers.createdAt,
+          updatedAt: serverUsers.updatedAt,
+          identityName: users.name,
+        })
+        .from(serverUserExternalAliases)
+        .innerJoin(serverUsers, eq(serverUserExternalAliases.serverUserId, serverUsers.id))
+        .innerJoin(users, eq(serverUsers.userId, users.id))
+        .where(
+          and(
+            eq(serverUserExternalAliases.serverId, server.id),
+            inArray(serverUserExternalAliases.externalId, unmatchedExternalIds)
+          )
+        );
+
+      for (const { aliasExternalId, ...serverUser } of aliased) {
+        serverUserByExternalId.set(aliasExternalId, serverUser);
+        serverUserById.set(serverUser.id, serverUser);
+        aliasResolvedExternalIds.add(aliasExternalId);
+      }
+    }
+
     // Track server users that need to be created and their session indices
     const serverUsersToCreate: {
       externalId: string;
@@ -887,10 +937,12 @@ export async function processServerSessions(
       const existingServerUser = serverUserByExternalId.get(processed.externalUserId);
 
       if (existingServerUser) {
-        // Check if server user data needs update
+        // An aliased match is a different account on the media server that was
+        // folded into this one, so its name and avatar are not this account's.
         const needsUpdate =
-          existingServerUser.username !== processed.username ||
-          (processed.userThumb && existingServerUser.thumbUrl !== processed.userThumb);
+          !aliasResolvedExternalIds.has(processed.externalUserId) &&
+          (existingServerUser.username !== processed.username ||
+            (processed.userThumb && existingServerUser.thumbUrl !== processed.userThumb));
 
         if (needsUpdate) {
           await db
@@ -1271,6 +1323,12 @@ export async function processServerSessions(
             if (pubSubService) {
               await pubSubService.publish('session:started', activeSession);
             }
+            await dispatchSessionFirstSeen({
+              session: activeSession,
+              server: { id: server.id, name: server.name, type: server.type },
+              serverUser: userDetail,
+              at: new Date(createResult.pendingCreated.startedAt),
+            });
             continue;
           }
 
@@ -1627,6 +1685,15 @@ export async function processServerSessions(
               newSessions.push(activeSession);
               recordDbWrite(insertedSession.id, Date.now());
               cachedSessionKeys.add(sessionKey);
+
+              // Auto-play-next is a new playback too; it skips the pending phase,
+              // so first sight and confirmation announce at the same moment.
+              await dispatchSessionFirstSeen({
+                session: activeSession,
+                server: { id: server.id, name: server.name, type: server.type },
+                serverUser: userDetail,
+                at: insertedSession.startedAt,
+              });
             }
 
             continue; // Skip normal update path

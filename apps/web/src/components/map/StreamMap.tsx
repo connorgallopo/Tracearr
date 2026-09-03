@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import type { LocationStats } from '@tracearr/shared';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
+import { MapUnavailable } from './MapUnavailable';
 import {
   buildBaseStyle,
   colorToHue,
@@ -16,6 +17,7 @@ import {
   DEFAULT_SERVER_COLOR,
   heatmapLayer,
   hsl,
+  isWebglSupported,
   locationsGeojson,
   type LocationFeatureProps,
 } from './maplibre';
@@ -128,6 +130,7 @@ export function StreamMap({
     return s;
   }, [basemapOk, dark, lang, hasData, locations, perServer, serverColors, viewMode, accentHue]);
 
+  const webglOk = isWebglSupported();
   const map = useMapLibre(containerRef, style);
 
   const points = useMemo<[number, number][]>(
@@ -166,6 +169,10 @@ export function StreamMap({
       }
     };
   }, [map, onClick]);
+
+  if (!webglOk) {
+    return <MapUnavailable className={className} />;
+  }
 
   return (
     <div className={cn('relative h-full w-full', className)}>

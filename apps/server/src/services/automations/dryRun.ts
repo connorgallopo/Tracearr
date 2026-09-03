@@ -183,7 +183,9 @@ async function sampleFor(
     inputs,
     session.id
   );
-  const standIns = triggers.includes('session.started') ? [] : triggers;
+  // first_seen evaluates the same live-session shape, so it needs no stand-in note either.
+  const standIns =
+    triggers.includes('session.started') || triggers.includes('session.first_seen') ? [] : triggers;
 
   const [result] = await evaluateRulesAsync(baseContext, [automation], { includeUnmatched: true });
   if (!result) {

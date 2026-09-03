@@ -247,7 +247,7 @@ export abstract class BaseMediaServerClient
       // but the user doesn't have files for (fixes #240 - inflated episode counts)
       IsMissing: 'false',
       Fields:
-        'ProviderIds,Path,MediaSources,DateCreated,ProductionYear,SeriesName,SeriesId,ParentIndexNumber,IndexNumber,Album,AlbumArtist,Artists,Genres,ImageTags',
+        'ProviderIds,Path,MediaSources,DateCreated,ProductionYear,SeriesName,SeriesId,ParentIndexNumber,IndexNumber,Album,AlbumArtist,Artists,AlbumId,AlbumPrimaryImageTag,Genres,ImageTags',
       StartIndex: String(offset),
       Limit: String(limit),
     });
@@ -298,7 +298,7 @@ export abstract class BaseMediaServerClient
         IncludeItemTypes: 'Movie,Series,MusicArtist,MusicAlbum,Audio',
         IsMissing: 'false',
         Fields:
-          'ProviderIds,Path,MediaSources,DateCreated,ProductionYear,SeriesName,SeriesId,ParentIndexNumber,IndexNumber,Album,AlbumArtist,Artists,Genres,ImageTags',
+          'ProviderIds,Path,MediaSources,DateCreated,ProductionYear,SeriesName,SeriesId,ParentIndexNumber,IndexNumber,Album,AlbumArtist,Artists,AlbumId,AlbumPrimaryImageTag,Genres,ImageTags',
         StartIndex: String(serverOffset),
         Limit: String(PAGE_SIZE),
         SortBy: 'DateCreated',

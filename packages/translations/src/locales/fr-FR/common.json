@@ -30,6 +30,7 @@
     "openSettings": "Ouvrir les réglages",
     "previous": "Retour",
     "refresh": "Actualiser",
+    "reload": "Recharge",
     "remove": "Supprimer",
     "reset": "Réinitialiser",
     "retry": "Réessayer",
@@ -64,10 +65,8 @@
   "count": {
     "alert_one": "{{count}} alerte",
     "alert_other": "{{count}} alertes",
-    "automation_one": "",
-    "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
+    "automation_one": "Automatisation {{count}}",
+    "automation_other": "{{count}} automatisations",
     "device_one": "{{count}} appareil",
     "device_other": "{{count}} appareils",
     "error_one": "{{count}} erreur",
@@ -84,8 +83,8 @@
     "selected_other": "{{count}} sélectionnés",
     "server_one": "{{count}} serveur",
     "server_other": "{{count}} serveurs",
-    "session_one": "",
-    "session_other": "",
+    "session_one": "{{count}} session",
+    "session_other": "{{count}} sessions",
     "stream_one": "{{count}} lecture",
     "stream_other": "{{count}} lectures",
     "user_one": "{{count}} utilisateur",
@@ -94,16 +93,16 @@
     "usersAdded_other": "{{count}} utilisateurs ajoutés",
     "usersUpdated_one": "{{count}} utilisateur mis à jour",
     "usersUpdated_other": "{{count}} utilisateurs mis à jour",
-    "violation_one": "",
-    "violation_other": ""
+    "violation_one": "Violation {{count}}",
+    "violation_other": "Violations {{count}}"
   },
   "duration": {
     "day_one": "{{count}} jour",
     "day_other": "{{count}} jours",
     "hour_one": "{{count}} heure",
     "hour_other": "{{count}} heures",
-    "minute_one": "",
-    "minute_other": "",
+    "minute_one": "{{count}} minute",
+    "minute_other": "{{count}} minutes",
     "second_one": "{{count}} seconde",
     "second_other": "{{count}} secondes"
   },
@@ -138,20 +137,20 @@
     "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer."
   },
   "filters": {
-    "anyDate": "",
-    "clearAll": "",
-    "clearDates": "",
-    "clearEndDate": "",
-    "clearSearch": "",
-    "clearStartDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "done": "",
-    "remove": ""
+    "anyDate": "N'importe quelle date",
+    "clearAll": "Tout effacer",
+    "clearDates": "Effacer la plage de dates",
+    "clearEndDate": "Effacer la date de fin",
+    "clearSearch": "Effacer la recherche",
+    "clearStartDate": "Effacer la date de début",
+    "dateAfter": "Après {{date}}",
+    "dateBefore": "Avant {{date}}",
+    "dateBetween": "{{from}} à {{to}}",
+    "done": "Terminé",
+    "remove": "Supprimer le filtre {{label}}"
   },
   "labels": {
-    "actions": "",
+    "actions": "Actions",
     "active": "Actif",
     "activeStreams": "Lectures actives",
     "apiKey": "Clé API",
@@ -159,7 +158,7 @@
     "content": "Contenu",
     "created": "Créé",
     "data": "Donnée",
-    "date": "",
+    "date": "Date",
     "days": "jours",
     "device": "Appareil",
     "deviceId": "ID de l'appareil",
@@ -187,22 +186,22 @@
     "recentSessions": "Sessions récentes",
     "resolution": "Résolution",
     "rule": "Règle",
-    "segments": "",
+    "segments": "segments",
     "server": "Serveur",
     "serverOwner": "Propriétaire du serveur",
     "sessionDetails": "Détails de la session",
-    "sessions": "",
+    "sessions": "Sessions",
     "severity": "Gravité",
     "size": "Taille",
     "started": "Démarré",
     "status": "État",
     "stopped": "Arrêté",
     "streamDetails": "Détails de la diffusion",
-    "total": "",
+    "total": "total",
     "totalSessions": "Nombre total de sessions",
     "transcodeReason": "Raison du transcodage",
     "trustScore": "Score de confiance",
-    "type": "",
+    "type": "Type",
     "unknown": "Inconnu",
     "user": "Utilisateur",
     "watchTime": "Temps de visionnage",
@@ -215,7 +214,7 @@
     "movie": "Film",
     "movie_plural": "Films",
     "music": "Musique",
-    "photo": "",
+    "photo": "Photo",
     "track": "Piste",
     "track_plural": "Pistes",
     "tv": "Télévision",
@@ -263,15 +262,15 @@
     "searchUsers": "Rechercher des utilisateurs..."
   },
   "serverSelector": {
-    "all": "",
-    "noMatches": "",
-    "search": "",
-    "some": ""
+    "all": "Tous les serveurs",
+    "noMatches": "Aucun serveur trouvé",
+    "search": "Rechercher des serveurs...",
+    "some": "{{count}} des serveurs {{total}}"
   },
   "servers": {
-    "emby": "",
-    "jellyfin": "",
-    "plex": ""
+    "emby": "Emby",
+    "jellyfin": "Jellyfin",
+    "plex": "Plex"
   },
   "severity": {
     "high": "Élevée",
@@ -301,17 +300,17 @@
     "success": "Succès"
   },
   "table": {
-    "pageOf": "",
-    "pagination": "",
+    "pageOf": "Page {{page}} sur {{total}}",
+    "pagination": "Pagination",
     "selectAllOnPage": "Tout sélectionner sur la page",
     "selectRow": "Sélectionner la ligne"
   },
   "tasks": {
-    "queued": "",
-    "running": "",
-    "startedAgo": "",
-    "title": "",
-    "waiting": ""
+    "queued": "En file d'attente",
+    "running": "En cours d'exécution",
+    "startedAgo": "A démarré {{time}}",
+    "title": "Taches en cours d'exécution",
+    "waiting": "En attente"
   },
   "time": {
     "allTime": "Tout le temps",
@@ -322,15 +321,15 @@
     "yesterday": "Hier"
   },
   "trust": {
-    "caution": "",
-    "trusted": "",
-    "untrusted": ""
+    "caution": "Attention",
+    "trusted": "De confiance",
+    "untrusted": "Non fiable"
   },
   "units": {
-    "km": "",
-    "kmh": "",
-    "mi": "",
-    "mph": ""
+    "km": "kilomètres",
+    "kmh": "km/h",
+    "mi": "mile(s)",
+    "mph": "mile/h"
   },
   "validation": {
     "invalidEmail": "Veuillez entrer une adresse email valide",

@@ -230,7 +230,10 @@ function nativeEventFor(context: EvaluationContext): NotificationEvent | null {
   const { trigger, server } = context;
   if (!trigger) return null;
   switch (trigger.type) {
-    case 'session.started': {
+    case 'session.started':
+    // Same wire event as a confirmed start: integrators asked for the same
+    // stream_started payload earlier, not a second shape to parse.
+    case 'session.first_seen': {
       const payload = activeSessionOf(context);
       return payload ? { type: 'session_started', payload } : null;
     }

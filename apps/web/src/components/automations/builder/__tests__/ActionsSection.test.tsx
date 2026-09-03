@@ -180,7 +180,7 @@ describe('ActionsSection', () => {
 
     expect(
       screen.getByText(
-        "A branch does not decide whether this is flagged; the And only if… section does."
+        'A branch does not decide whether this is flagged; the And only if… section does.'
       )
     ).toBeInTheDocument();
   });

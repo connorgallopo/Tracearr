@@ -17,7 +17,7 @@ async function buildAutomation(page: Page, name: string) {
   await page.getByLabel('Name', { exact: true }).fill(name);
 
   await page.getByRole('button', { name: 'Choose what starts it' }).click();
-  await page.getByRole('option', { name: /play is pressed/ }).click();
+  await page.getByRole('option', { name: /Playback confirmed/ }).click();
 
   await page.getByRole('button', { name: 'Choose what happens' }).click();
   await page.getByRole('option', { name: /Send Notification/ }).click();

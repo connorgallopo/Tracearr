@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -1501,11 +1506,15 @@
     "allActivity": "Όλη η δραστηριότητα",
     "allTypes": "Όλοι οι τύποι",
     "allUsers": "Όλοι οι χρήστες",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Κύκλοι",
     "heatmap": "Χάρτης Θερμότητας",
     "locations": "τοποθεσίες",
-    "streams": "ροές"
+    "streams": "ροές",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {

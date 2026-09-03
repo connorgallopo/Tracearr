@@ -31,8 +31,6 @@
     "prepublishOnly": "pnpm build",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ --cache --cache-location .eslintcache --cache-strategy content",
-    "lint:fix": "eslint src/ --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "clean": "rm -rf dist .turbo"
@@ -42,7 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
-    "typescript": "^6.0.0",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.5"
   }
 }

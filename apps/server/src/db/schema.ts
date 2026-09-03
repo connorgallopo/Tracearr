@@ -278,6 +278,39 @@ export const serverUsers = pgTable(
   ]
 );
 
+/**
+ * External ids whose own server_users row was folded into another one by a
+ * same-server merge.
+ *
+ * Without this the fold is undone by ordinary playback: the merge deletes the
+ * absorbed row, the media server keeps reporting that external id, and the
+ * poller's (server_id, external_id) lookup misses and creates a fresh account
+ * under a fresh identity. Lookups fall back here so the session lands on the
+ * surviving account.
+ */
+export const serverUserExternalAliases = pgTable(
+  'server_user_external_aliases',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    serverId: uuid('server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    externalId: varchar('external_id', { length: 255 }).notNull(),
+    serverUserId: uuid('server_user_id')
+      .notNull()
+      .references(() => serverUsers.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // Mirrors server_users_server_external_unique: one owner per external id per server
+    uniqueIndex('server_user_external_aliases_server_external_unique').on(
+      table.serverId,
+      table.externalId
+    ),
+    index('server_user_external_aliases_server_user_idx').on(table.serverUserId),
+  ]
+);
+
 // Session history (will be converted to hypertable)
 export const sessions = pgTable(
   'sessions',

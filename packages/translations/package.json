@@ -37,8 +37,6 @@
     "prepublishOnly": "pnpm build",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/ --cache --cache-location .eslintcache --cache-strategy content",
-    "lint:fix": "eslint src/ --fix",
     "clean": "rm -rf dist .turbo",
     "check": "tsx scripts/check-translations.ts",
     "check:english": "tsx scripts/find-english-regressions.ts"
@@ -49,7 +47,7 @@
   },
   "devDependencies": {
     "tsx": "^4.23.1",
-    "typescript": "^6.0.0",
+    "typescript": "^7.0.2",
     "vite": "^8.0.5"
   },
   "peerDependencies": {

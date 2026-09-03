@@ -61,6 +61,18 @@ if (typeof window.matchMedia === 'undefined') {
     }) as MediaQueryList;
 }
 
+// jsdom has no WebGL; without this the map's support probe short-circuits every
+// test that mounts a map into the "WebGL disabled" panel.
+const realGetContext = HTMLCanvasElement.prototype.getContext;
+HTMLCanvasElement.prototype.getContext = function (
+  this: HTMLCanvasElement,
+  id: string,
+  ...rest: unknown[]
+) {
+  if (id === 'webgl2') return { getExtension: () => null };
+  return (realGetContext as (...a: unknown[]) => unknown).call(this, id, ...rest);
+} as typeof HTMLCanvasElement.prototype.getContext;
+
 afterEach(() => {
   cleanup();
 });

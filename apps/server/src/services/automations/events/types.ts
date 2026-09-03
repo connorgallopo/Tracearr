@@ -57,6 +57,11 @@ export interface SessionStartedEvent extends SessionEventBase {
   type: 'session.started';
 }
 
+/** First sight of a new playback, before the confirmation delay persists it. */
+export interface SessionFirstSeenEvent extends SessionEventBase {
+  type: 'session.first_seen';
+}
+
 export interface SessionTranscodeChangedEvent extends SessionEventBase {
   type: 'session.transcode_changed';
   previous: { videoDecision: string | null; audioDecision: string | null };
@@ -188,6 +193,7 @@ export interface TracearrUpdateEvent extends BaseEvent {
 
 export type RuleEvent =
   | SessionStartedEvent
+  | SessionFirstSeenEvent
   | SessionTranscodeChangedEvent
   | SessionPausedEvent
   | SessionHeldForEvent

@@ -92,6 +92,7 @@ function afterSignature(quality: MediaQuality): string {
 export function edgeKeyOf(event: ContextEvaluatingEvent, node: TriggerNode | null): string | null {
   switch (event.type) {
     case 'session.started':
+    case 'session.first_seen':
     case 'media.added':
     case 'account.new_device':
       return null;
@@ -305,6 +306,8 @@ export function registerRuleSubscribers(): void {
   registered = true;
 
   subscribe('session.started', 'session-rules', sessionRules(undefined, true));
+  // Fresh too: the pending id was minted moments ago, so nothing can contend it.
+  subscribe('session.first_seen', 'session-rules', sessionRules(undefined, true));
   subscribe('session.stopped', 'session-rules', sessionRules());
   subscribe('session.transcode_changed', 'session-rules', sessionRules({ transcodeReEval: true }));
   subscribe('session.paused', 'session-rules', sessionRules({ pauseReEval: true }));

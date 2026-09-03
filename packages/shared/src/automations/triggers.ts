@@ -77,6 +77,7 @@ export type TriggerGroup = (typeof TRIGGER_GROUPS)[number];
 
 export const TRIGGERS = {
   'session.started': { context: 'session', group: 'sessions', variables: SESSION_VARS },
+  'session.first_seen': { context: 'session', group: 'sessions', variables: SESSION_VARS },
   'session.stopped': {
     context: 'session',
     group: 'sessions',

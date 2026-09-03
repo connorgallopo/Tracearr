@@ -1785,6 +1785,11 @@ class ApiClient {
     getImageCache: () => this.request<ImageCacheStatus>('/settings/image-cache'),
   };
 
+  map = {
+    getBasemapStatus: () =>
+      this.request<{ installed: boolean; path: string }>('/map/basemap/status'),
+  };
+
   // Notification destinations
   destinations = {
     list: () => this.request<Destination[]>('/destinations'),

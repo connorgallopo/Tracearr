@@ -556,12 +556,18 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
           }
           return reply.sendFile(assetPath);
         }
+        // A hashed chunk that no longer exists after an upgrade must 404; the HTML
+        // fallback would resolve as a module and break the import with a parse error.
+        if (assetPath?.startsWith('assets/')) {
+          return reply.code(404).send();
+        }
       }
 
       // SPA fallback — always inject <base> tag so relative asset paths (./assets/...)
       // resolve correctly on nested routes like /library/watch
       const baseHref = BASE_PATH ? `${BASE_PATH}/` : '/';
       const html = cachedIndexHtml.replace('<head>', `<head>\n    <base href="${baseHref}">`);
+      reply.header('Cache-Control', 'no-cache');
       return reply.type('text/html').send(html);
     });
 

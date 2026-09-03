@@ -184,7 +184,7 @@ describe('NewAutomationDialog', () => {
     renderDialog({ templateId: 'template-nothing-here' });
 
     expect(await screen.findByText('Stream started')).toBeInTheDocument();
-    expect(toast.error).toHaveBeenCalledWith("That ready-made automation is not on this server.");
+    expect(toast.error).toHaveBeenCalledWith('That ready-made automation is not on this server.');
   });
 
   it('sends Esc back to the gallery before it closes anything', async () => {

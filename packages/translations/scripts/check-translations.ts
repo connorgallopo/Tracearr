@@ -406,7 +406,6 @@ function main() {
     console.log('Strict mode: also checking for extra keys');
   }
 
-  let hasAnyIssues = false;
   const summary: {
     lang: string;
     missing: number;
@@ -437,7 +436,6 @@ function main() {
     });
 
     if (hasIssues) {
-      hasAnyIssues = true;
     } else {
       console.log('\n  In sync with the source.');
     }

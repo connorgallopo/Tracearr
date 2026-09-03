@@ -19,6 +19,7 @@ import { db } from '../db/client.js';
 import {
   users,
   serverUsers,
+  serverUserExternalAliases,
   servers,
   sessions,
   automationRuns,
@@ -30,6 +31,7 @@ import {
   authAccounts,
   userMergeAudits,
 } from '../db/schema.js';
+import { uncapDecompressionForTx } from '../db/timescale.js';
 import { invalidateAutomationsCache } from '../jobs/poller/database.js';
 import { getAuth } from '../lib/auth.js';
 import {
@@ -274,6 +276,11 @@ async function combineServerUsers(
     throw new MergeValidationError('server user disappeared during merge');
   }
 
+  // server_user_id is a compress_segmentby key, so repointing an account with
+  // real history rewrites whole compressed segments. The default per-DML cap
+  // aborts the merge partway through once that gets large enough.
+  await uncapDecompressionForTx(tx);
+
   await tx
     .update(sessions)
     .set({ serverUserId: targetServerUserId })
@@ -334,6 +341,26 @@ async function combineServerUsers(
       updatedAt: new Date(),
     })
     .where(eq(serverUsers.id, targetServerUserId));
+
+  // Aliases already pointing at the source would cascade away with it.
+  await tx
+    .update(serverUserExternalAliases)
+    .set({ serverUserId: targetServerUserId })
+    .where(eq(serverUserExternalAliases.serverUserId, sourceServerUserId));
+
+  // The media server still reports the source's external id. Claim it for the
+  // surviving row, or the next session recreates the account we just folded.
+  await tx
+    .insert(serverUserExternalAliases)
+    .values({
+      serverId: sourceSu.serverId,
+      externalId: sourceSu.externalId,
+      serverUserId: targetServerUserId,
+    })
+    .onConflictDoUpdate({
+      target: [serverUserExternalAliases.serverId, serverUserExternalAliases.externalId],
+      set: { serverUserId: targetServerUserId },
+    });
 
   await tx.delete(serverUsers).where(eq(serverUsers.id, sourceServerUserId));
 

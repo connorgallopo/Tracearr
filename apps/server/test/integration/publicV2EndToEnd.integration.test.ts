@@ -26,7 +26,7 @@ import {
   createTestLibraryItem,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { users, media, libraryItems } from '../../src/db/schema.js';
+import { users, media } from '../../src/db/schema.js';
 import authPlugin from '../../src/plugins/auth.js';
 import { publicV2Routes } from '../../src/routes/publicV2/index.js';
 import { getRedis } from '../../src/lib/redisShared.js';

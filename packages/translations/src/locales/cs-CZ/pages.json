@@ -164,12 +164,12 @@
     },
     "builder": {
       "actions": {
-        "add": "Add action",
-        "addBranch": "Add action",
-        "branchElse": "Otherwise…",
+        "add": "",
+        "addBranch": "",
+        "branchElse": "",
         "branchElseEmpty": "",
         "branchName": "",
-        "branchThen": "then",
+        "branchThen": "",
         "collapseBranch": "",
         "confirmRemoveDescription": "",
         "confirmRemoveTitle": "",
@@ -179,41 +179,41 @@
         "expandBranch": "",
         "helper": "",
         "ifAddCheck": "",
-        "ifNothing": "nothing yet",
+        "ifNothing": "",
         "ifTitle": "",
         "menu": "",
         "moveDown": "",
         "moveUp": "",
         "policyNote": "",
-        "sectionTitle": "Do this…"
+        "sectionTitle": ""
       },
       "activeLabel": "",
       "clearSelection": "",
       "conditions": {
-        "addAnother": "Add another condition",
-        "addFirst": "Add a condition",
+        "addAnother": "",
+        "addFirst": "",
         "addGroup": "",
-        "all": "all of these",
+        "all": "",
         "allCountries": "",
         "allDeviceTypes": "",
         "allHint": "",
-        "any": "any of these",
+        "any": "",
         "anyHint": "",
         "canNeverPass": "",
         "deviceTypesHint": "",
         "emptyLine": "",
-        "fieldLabel": "Condition",
-        "fieldPlaceholder": "Select field",
+        "fieldLabel": "",
+        "fieldPlaceholder": "",
         "groupSeparator": "",
         "helper": "",
         "matchLabel": "",
         "no": "",
         "noFields": "",
-        "operatorLabel": "Comparison",
+        "operatorLabel": "",
         "optional": "",
         "recentlySeen": "",
         "removeGroup": "",
-        "sectionTitle": "Only when…",
+        "sectionTitle": "",
         "uniqueDevices": "",
         "uniqueDevicesHint": "",
         "uniqueIps": "",
@@ -245,8 +245,8 @@
         "variableUnavailable": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
-        "problems_other": "{{count}} problems",
+        "problems_one": "",
+        "problems_other": "",
         "ready": "",
         "remaining_one": "",
         "remaining_other": "",
@@ -313,19 +313,19 @@
       },
       "saving": "",
       "scope": {
-        "account": "Specific account",
+        "account": "",
         "accountLabel": "",
         "accountPlaceholder": "",
-        "enforceAcrossServers": "Enforce across servers",
+        "enforceAcrossServers": "",
         "enforceAcrossServersDescription": "",
         "global": "Global",
-        "label": "Scope",
+        "label": "",
         "noServers": "",
         "person": "",
         "personHelper": "",
         "personLabel": "",
         "personPlaceholder": "",
-        "server": "Specific server",
+        "server": "",
         "serverLabel": "",
         "serverPlaceholder": ""
       },
@@ -337,9 +337,9 @@
         "placeholderAction": "",
         "placeholderTrigger": ""
       },
-      "severityLabel": "Severity",
+      "severityLabel": "",
       "when": {
-        "add": "Add trigger",
+        "add": "",
         "emptyAction": "",
         "emptyDescription": "",
         "emptyTitle": "",
@@ -370,10 +370,10 @@
       },
       "groups": {
         "accounts": "",
-        "control": "Control flow",
+        "control": "",
         "library": "",
         "notify": "",
-        "policy": "Policy",
+        "policy": "",
         "servers": "",
         "sessions": "",
         "updates": ""
@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -448,7 +452,7 @@
       "device_client": "",
       "media": "",
       "network_location": "",
-      "scope": "Scope",
+      "scope": "",
       "session_behavior": "",
       "stream_quality": "",
       "user_attributes": ""
@@ -466,10 +470,10 @@
     },
     "cooldownInvalid": "",
     "cooldownLabel": "",
-    "createAutomation": "Create Automation",
+    "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "Delete {{count}} Automation",
+    "deleteAutomation_one": "",
     "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
@@ -538,7 +542,7 @@
       "more_other": "",
       "noValues": "",
       "nothing": "",
-      "onlyWhen": "only when",
+      "onlyWhen": "",
       "operators": {
         "contains": "",
         "eq": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -635,7 +640,7 @@
       "unsaved": ""
     },
     "disable": "",
-    "editAutomation": "Edit Automation",
+    "editAutomation": "",
     "effects": {
       "allServers": "",
       "everyServer": "",
@@ -912,7 +917,7 @@
       "policy": ""
     },
     "kindColumn": "",
-    "name": "Automation Name",
+    "name": "",
     "nameInvalid": "",
     "namePlaceholder": "",
     "newAutomation": "",
@@ -1030,9 +1035,9 @@
     "template": {
       "after": "",
       "before": "",
-      "customize": "Customize",
+      "customize": "",
       "customizeConfirm": "",
-      "customizeConfirmAction": "Customize it",
+      "customizeConfirmAction": "",
       "customizeFailed": "",
       "customizeFirst": "",
       "customizeTitle": "",
@@ -1178,7 +1183,7 @@
       "minutes": "",
       "seconds": ""
     },
-    "updateAutomation": "Update Automation"
+    "updateAutomation": ""
   },
   "dashboard": {
     "activeUsers": "Aktivní uživatelé",
@@ -1501,11 +1506,15 @@
     "allActivity": "Všechny aktivity",
     "allTypes": "Všechny typy",
     "allUsers": "Všichni uživatelé",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Kruhy",
     "heatmap": "Teplotní mapa",
     "locations": "místa",
-    "streams": "proudy"
+    "streams": "proudy",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {
@@ -1855,8 +1864,8 @@
         "pushover": "",
         "webToast": ""
       },
-      "usedBy": "Used by {{count}} rule",
-      "usedBy_other": "Used by {{count}} rules",
+      "usedBy": "",
+      "usedBy_other": "",
       "webToastNote": ""
     },
     "jobs": {

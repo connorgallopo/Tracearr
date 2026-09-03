@@ -45,6 +45,8 @@ export function useEstimatedProgress(session: ActiveSession) {
   const lastProgressUpdatedAt = useRef(session.progressUpdatedAt);
   const lastSessionId = useRef(session.id);
   const lastState = useRef(session.state);
+  const estimationStartTime = useRef(0);
+  const estimationStartProgress = useRef(session.progressMs ?? 0);
 
   // Reset estimation when server data changes
   useEffect(() => {
@@ -61,6 +63,9 @@ export function useEstimatedProgress(session: ActiveSession) {
       lastProgressUpdatedAt.current = session.progressUpdatedAt;
       lastSessionId.current = session.id;
       lastState.current = session.state;
+      estimationStartTime.current =
+        parseTimestampMs(session.progressUpdatedAt) ?? Date.now();
+      estimationStartProgress.current = session.progressMs ?? 0;
     }
   }, [session.id, session.progressMs, session.progressUpdatedAt, session.state, session.totalDurationMs]);
 
@@ -70,8 +75,15 @@ export function useEstimatedProgress(session: ActiveSession) {
       return;
     }
 
+    if (estimationStartTime.current === 0) {
+      estimationStartTime.current = parseTimestampMs(session.progressUpdatedAt) ?? Date.now();
+    }
+
     const intervalId = setInterval(() => {
-      setEstimatedProgressMs(getEstimatedProgressMs(session));
+      const elapsedMs = Math.max(0, Date.now() - estimationStartTime.current);
+      const estimatedProgressMs = estimationStartProgress.current + elapsedMs;
+      const maxProgress = session.totalDurationMs ?? Infinity;
+      setEstimatedProgressMs(Math.min(estimatedProgressMs, maxProgress));
     }, 1000);
 
     return () => clearInterval(intervalId);

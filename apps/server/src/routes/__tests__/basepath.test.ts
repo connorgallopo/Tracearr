@@ -14,7 +14,7 @@
 import { describe, it, expect, afterEach, beforeEach, afterAll } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyStatic from '@fastify/static';
-import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -88,12 +88,19 @@ async function buildTestApp(basePath: string): Promise<FastifyInstance> {
 
     // Serve static files (paths with a file extension)
     if (urlPath !== '/' && /\.\w+$/.test(urlPath)) {
-      return reply.sendFile(urlPath.slice(1));
+      const assetPath = urlPath.slice(1);
+      if (existsSync(resolve(TEMP_DIR, assetPath))) {
+        return reply.sendFile(assetPath);
+      }
+      if (assetPath.startsWith('assets/')) {
+        return reply.code(404).send();
+      }
     }
 
     // SPA fallback with <base> tag injection
     const baseHref = basePath ? `${basePath}/` : '/';
     const html = cachedIndexHtml.replace('<head>', `<head>\n    <base href="${baseHref}">`);
+    reply.header('Cache-Control', 'no-cache');
     return reply.type('text/html').send(html);
   });
 
@@ -278,6 +285,17 @@ describe('BASE_PATH support', () => {
       const res = await app.inject({ method: 'GET', url: '/assets/test.js' });
       expect(res.statusCode).toBe(200);
       expect(res.body).toBe(FAKE_JS);
+    });
+
+    it('404s a hashed chunk that no longer exists instead of serving the SPA html', async () => {
+      const res = await app.inject({ method: 'GET', url: '/assets/StreamMap-abc123.js' });
+      expect(res.statusCode).toBe(404);
+      expect(res.headers['content-type'] ?? '').not.toContain('text/html');
+    });
+
+    it('sends the SPA html with no-cache so an upgrade cannot leave stale chunk refs', async () => {
+      const res = await app.inject({ method: 'GET', url: '/library/watch' });
+      expect(res.headers['cache-control']).toBe('no-cache');
     });
 
     // --- API 404 ---

@@ -55,7 +55,7 @@ import {
   type WatchedState,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { resolutionBucketPredicate } from '../../utils/resolutionBuckets.js';
+import { resolutionBucketPredicate, resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { normalizeTitle } from '../../services/library/mediaMatchKey.js';
@@ -265,7 +265,24 @@ export function buildValueRollupCte(
  * same convention the totalFileSize the toolbar already displays uses). */
 const BYTES_PER_GB = 1024 ** 3;
 
+/**
+ * Correlated scope over one show copy's episodes: show containers carry no
+ * MediaSources on any server type, so quality and size live on the episode
+ * items reached through media.show_media_id, scoped to the same server +
+ * library as the outer li copy. `showIdCol` is a trusted column expression,
+ * never user input.
+ */
+function episodeVersionsScope(showIdCol: string): SQL {
+  return sql`
+    FROM media em
+    JOIN library_items epi ON epi.media_id = em.id AND epi.removed_at IS NULL
+    JOIN library_item_versions v ON v.library_item_id = epi.id AND v.removed_at IS NULL
+    WHERE em.show_media_id = ${sql.raw(showIdCol)} AND em.media_type = 'episode'
+      AND epi.server_id = li.server_id AND epi.library_id = li.library_id`;
+}
+
 function buildCommonWhere(params: {
+  type: 'movie' | 'show';
   genre: string | null;
   yearFrom: number | null;
   yearTo: number | null;
@@ -279,6 +296,7 @@ function buildCommonWhere(params: {
   serverFragmentLi: SQL;
 }): SQL {
   const {
+    type,
     genre,
     yearFrom,
     yearTo,
@@ -297,16 +315,43 @@ function buildCommonWhere(params: {
   // with the overlapping facet counts. The UI sends display case ('4K'/'SD');
   // resolutionBucket normalizes it.
   const resolutionFilterBucket = resolution ? (resolutionBucket(resolution) ?? 'sd') : null;
-  // Strict bucket membership, no NULL-as-SD: container rows (shows, seasons)
-  // carry NULL-resolution sentinel versions, and the display rule would make
-  // resolution=SD match the entire show catalog
-  const resolutionFilter = resolutionFilterBucket
-    ? sql`AND EXISTS (
-        SELECT 1 FROM library_item_versions liv
-        WHERE liv.library_item_id = li.id AND liv.removed_at IS NULL
-          AND ${resolutionBucketPredicate('liv.video_resolution', resolutionFilterBucket)}
-      )`
-    : sql``;
+  // Strict bucket membership, no NULL-as-SD: sentinel versions carry NULL
+  // resolution, and the display rule would make resolution=SD match everything.
+  const resolutionFilter = !resolutionFilterBucket
+    ? sql``
+    : type === 'show'
+      ? sql`AND EXISTS (
+          SELECT 1 ${episodeVersionsScope('m.id')}
+            AND ${resolutionBucketPredicate('v.video_resolution', resolutionFilterBucket)}
+        )`
+      : sql`AND EXISTS (
+          SELECT 1 FROM library_item_versions liv
+          WHERE liv.library_item_id = li.id AND liv.removed_at IS NULL
+            AND ${resolutionBucketPredicate('liv.video_resolution', resolutionFilterBucket)}
+        )`;
+  const hdrFilter = !hdr
+    ? sql``
+    : type === 'show'
+      ? sql`AND EXISTS (
+          SELECT 1 ${episodeVersionsScope('m.id')}
+            AND v.video_dynamic_range IS NOT NULL AND v.video_dynamic_range <> 'sdr'
+        )`
+      : sql`AND EXISTS (
+          SELECT 1 FROM library_item_versions livh
+          WHERE livh.library_item_id = li.id AND livh.removed_at IS NULL
+            AND livh.video_dynamic_range IS NOT NULL AND livh.video_dynamic_range <> 'sdr'
+        )`;
+  // Per-copy grain either way: a movie copy matches on its version-summed
+  // rollup, a show copy on its episode total for that server + library - the
+  // same figure the detail view reports for the copy.
+  const sizeFilter =
+    sizeMinBytes === null && sizeMaxBytes === null
+      ? sql``
+      : type === 'show'
+        ? sql`AND (SELECT COALESCE(SUM(v.file_size), 0) ${episodeVersionsScope('m.id')} AND v.file_size IS NOT NULL)
+              BETWEEN COALESCE(${sizeMinBytes}::bigint, 0) AND COALESCE(${sizeMaxBytes}::bigint, 9223372036854775807)`
+        : sql`AND (${sizeMinBytes}::bigint IS NULL OR li.file_size >= ${sizeMinBytes}::bigint)
+              AND (${sizeMaxBytes}::bigint IS NULL OR li.file_size <= ${sizeMaxBytes}::bigint)`;
   return sql`
     AND (${genre}::text IS NULL OR ${genre} = ANY(m.genres))
     AND (${yearFrom}::int IS NULL OR m.year >= ${yearFrom})
@@ -318,19 +363,8 @@ function buildCommonWhere(params: {
         ${resolutionFilter}
         AND (${libraryServerId}::uuid IS NULL OR li.server_id = ${libraryServerId}::uuid)
         AND (${libraryId}::text IS NULL OR li.library_id = ${libraryId})
-        AND (NOT ${hdr} OR EXISTS (
-          SELECT 1 FROM library_item_versions livh
-          WHERE livh.library_item_id = li.id AND livh.removed_at IS NULL
-            AND livh.video_dynamic_range IS NOT NULL AND livh.video_dynamic_range <> 'sdr'
-        ))
-        -- Per-copy grain: li.file_size is the copy's version-summed rollup, so
-        -- a show matches if any one episode's total falls in range and a
-        -- multi-version movie matches on its combined size. A canonical
-        -- cross-server rollup subquery here would run once per candidate row
-        -- in the letter/totals queries (same cost concern mediaSizeSubquery
-        -- calls out) - tracked as a known tradeoff rather than shipped slow.
-        AND (${sizeMinBytes}::bigint IS NULL OR li.file_size >= ${sizeMinBytes}::bigint)
-        AND (${sizeMaxBytes}::bigint IS NULL OR li.file_size <= ${sizeMaxBytes}::bigint)
+        ${hdrFilter}
+        ${sizeFilter}
     )
   `;
 }
@@ -430,7 +464,14 @@ function withRowDecorations(pageCte: SQL, serverFragmentLi: SQL, posterOrderFrag
     SELECT p.*,
       (SELECT json_agg(json_build_object(
           'serverId', li.server_id, 'addedAt', li.created_at,
-          'videoResolution', li.video_resolution, 'fileSize', li.file_size,
+          'videoResolution', CASE WHEN p.media_type = 'show' THEN (
+            SELECT v.video_resolution ${episodeVersionsScope('p.id')}
+              AND v.video_resolution IS NOT NULL
+            ORDER BY ${resolutionRankSql('v.video_resolution')} DESC LIMIT 1
+          ) ELSE li.video_resolution END,
+          'fileSize', CASE WHEN p.media_type = 'show' THEN (
+            SELECT SUM(v.file_size) ${episodeVersionsScope('p.id')} AND v.file_size IS NOT NULL
+          ) ELSE li.file_size END,
           'versionCount', li.version_count)
           ORDER BY li.created_at DESC)
        FROM library_items li
@@ -474,6 +515,7 @@ export function buildCatalogPageQuery(params: CatalogPageQueryParams): SQL {
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const commonWhere = buildCommonWhere({
+    type,
     genre,
     yearFrom,
     yearTo,
@@ -530,6 +572,7 @@ export function buildCatalogTotalsQuery(params: CatalogTotalsQueryParams): SQL {
   // entry for li.server_id.
   const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
   const commonWhere = buildCommonWhere({
+    type,
     genre,
     yearFrom,
     yearTo,
@@ -677,6 +720,7 @@ export function buildLetterCountsQuery(params: CatalogFilterParams): SQL {
   } = params;
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const commonWhere = buildCommonWhere({
+    type,
     genre,
     yearFrom,
     yearTo,
@@ -725,6 +769,7 @@ export function buildCatalogCandidatesQuery(
   } = params;
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const commonWhere = buildCommonWhere({
+    type,
     genre,
     yearFrom,
     yearTo,

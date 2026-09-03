@@ -96,6 +96,7 @@ export const SENTENCE_SECTIONS = {
 /** The camelCase translation key for each trigger type. */
 export const TRIGGER_KEYS = {
   'session.started': 'sessionStarted',
+  'session.first_seen': 'sessionFirstSeen',
   'session.stopped': 'sessionStopped',
   'session.transcode_changed': 'sessionTranscodeChanged',
   'session.paused': 'sessionPaused',

@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -1501,11 +1506,15 @@
     "allActivity": "Toată activitatea",
     "allTypes": "Toate tipurile",
     "allUsers": "Toți utilizatorii",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Cercuri",
     "heatmap": "Hartă",
     "locations": "locații",
-    "streams": "fluxuri"
+    "streams": "fluxuri",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {

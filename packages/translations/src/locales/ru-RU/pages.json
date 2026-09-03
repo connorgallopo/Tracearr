@@ -152,7 +152,7 @@
       "nameHelper": "",
       "namePlaceholder": "",
       "needs": {
-        "title": "What it needs from you"
+        "title": ""
       },
       "noInputs": "",
       "personLabel": "",
@@ -417,6 +417,10 @@
           "description": "",
           "synonyms": ""
         },
+        "sessionFirstSeen": {
+          "description": "",
+          "synonyms": ""
+        },
         "sessionHeldFor": {
           "description": "",
           "label": "",
@@ -598,6 +602,7 @@
         "serverDown": "",
         "serverUp": "",
         "serverUpdateAvailable": "",
+        "sessionFirstSeen": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
         "sessionPaused": "",
@@ -1501,11 +1506,15 @@
     "allActivity": "Все действия",
     "allTypes": "Все типы",
     "allUsers": "Все пользователи",
-    "basemapMissing": "Basemap not installed",
+    "badMounts": "",
+    "basemapMissing": "",
+    "basemapShadowed": "",
     "circles": "Круги",
     "heatmap": "Тепловая карта",
     "locations": "места",
-    "streams": "потоки"
+    "streams": "потоки",
+    "webglHint": "",
+    "webglUnavailable": ""
   },
   "media": {
     "detail": {
