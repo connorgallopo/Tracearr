@@ -353,11 +353,14 @@ describe('newsletter send retention', () => {
     const old = await seedSend(nl!.id, 100, { finished: true, html: '<p>o</p>' });
     const openOld = await seedSend(nl!.id, 100, { finished: false, html: '<p>x</p>' });
     const young = await seedSend(nl!.id, 10, { finished: true, html: '<p>y</p>' });
-    await db.insert(emailSuppressions).values({
-      address: `retention-${randomUUID().slice(0, 8)}@example.com`,
-      reason: 'unsubscribed',
-      sourceSendId: ancient,
-    });
+    const [suppressionSeed] = await db
+      .insert(emailSuppressions)
+      .values({
+        address: `retention-${randomUUID().slice(0, 8)}@example.com`,
+        reason: 'unsubscribed',
+        sourceSendId: ancient,
+      })
+      .returning({ address: emailSuppressions.address });
 
     const result = await processRunRetention();
 
@@ -377,11 +380,11 @@ describe('newsletter send retention', () => {
     expect(byId.get(old)).toEqual({ id: old, html: null, text: null, posters: {} });
     expect(byId.get(openOld)?.html).toBe('<p>x</p>');
     expect(byId.get(young)?.html).toBe('<p>y</p>');
-    const [suppression] = await db
+    const survivingSuppressions = await db
       .select({ sourceSendId: emailSuppressions.sourceSendId })
       .from(emailSuppressions)
-      .where(eq(emailSuppressions.sourceSendId, ancient));
-    expect(suppression).toBeUndefined();
+      .where(eq(emailSuppressions.address, suppressionSeed!.address));
+    expect(survivingSuppressions).toEqual([{ sourceSendId: null }]);
     await db.delete(newsletters).where(eq(newsletters.id, nl!.id));
   });
 });

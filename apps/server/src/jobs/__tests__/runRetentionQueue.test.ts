@@ -126,7 +126,9 @@ describe('processRunRetention', () => {
   it('exempts account-keyed completed rows and purges session, server and install ones', async () => {
     await processRunRetention();
 
-    const [notification, policy, ...diagnostics] = rendered();
+    const [notification, policy, ...diagnostics] = rendered().filter((q) =>
+      q.sql.startsWith('delete from automation_runs')
+    );
     for (const query of [notification, policy]) {
       expect(query?.sql).toContain('(ar.session_id is not null or ar.server_user_id is null)');
     }

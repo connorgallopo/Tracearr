@@ -611,7 +611,6 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await stopLeaderLease();
     await tailscaleService.shutdown();
     await shutdownNotificationQueue();
-    closeAllTransporters();
     await shutdownKillQueue();
     await shutdownImportQueue();
     await shutdownMaintenanceQueue();
@@ -621,6 +620,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownInactivityCheckQueue();
     await shutdownBackupQueue();
     await shutdownNewsletterQueues();
+    closeAllTransporters();
     await shutdownPlexTokenRefreshQueue();
     await shutdownRunRetentionQueue();
   });
@@ -1430,8 +1430,9 @@ async function start() {
         stopPoller();
         void stopConnectionBudget(app.redis);
         void tailscaleService.shutdown();
-        void shutdownNotificationQueue();
-        closeAllTransporters();
+        void Promise.all([shutdownNotificationQueue(), shutdownNewsletterQueues()]).finally(() =>
+          closeAllTransporters()
+        );
         void shutdownKillQueue();
         void shutdownImportQueue();
         void shutdownLibrarySyncQueue();
@@ -1439,7 +1440,6 @@ async function start() {
         void shutdownVersionCheckQueue();
         void shutdownInactivityCheckQueue();
         void shutdownBackupQueue();
-        void shutdownNewsletterQueues();
         void shutdownPlexTokenRefreshQueue();
         void shutdownRunRetentionQueue();
         void app.close().then(() => process.exit(0));
@@ -1473,7 +1473,6 @@ async function start() {
         }
 
         // Shut down BullMQ workers/queues (closes their internal Redis connections)
-        closeAllTransporters();
         void Promise.all([
           shutdownNotificationQueue(),
           shutdownKillQueue(),
@@ -1487,9 +1486,11 @@ async function start() {
           shutdownNewsletterQueues(),
           shutdownPlexTokenRefreshQueue(),
           shutdownRunRetentionQueue(),
-        ]).catch((err) => {
-          app.log.error({ err }, 'Error shutting down queues during maintenance');
-        });
+        ])
+          .finally(() => closeAllTransporters())
+          .catch((err) => {
+            app.log.error({ err }, 'Error shutting down queues during maintenance');
+          });
 
         // Stop the DB health interval — initializeServices will recreate it on recovery.
         if (dbHealthInterval) {
