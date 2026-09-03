@@ -1,30 +1,27 @@
 import { useTranslation } from 'react-i18next';
-import { Bell } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Info } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { DestinationsManager } from '@/components/settings/destinations';
 import { useAuth } from '@/hooks/useAuth';
 
 export function Destinations() {
-  const { t } = useTranslation('pages');
+  const { t } = useTranslation(['settings', 'pages']);
   const { user } = useAuth();
-  const isOwner = user?.role === 'owner';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          {t('settings.destinations.title')}
-        </CardTitle>
-        <CardDescription>{t('settings.destinations.description')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isOwner ? (
-          <DestinationsManager />
-        ) : (
-          <p className="text-muted-foreground text-sm">{t('settings.destinations.ownerOnly')}</p>
-        )}
-      </CardContent>
-    </Card>
+    <SettingsSection
+      title={t('settings:nav.sections.destinations')}
+      description={t('settings:nav.descriptions.destinations')}
+    >
+      {user?.role === 'owner' ? (
+        <DestinationsManager />
+      ) : (
+        <Alert>
+          <Info />
+          <AlertDescription>{t('pages:settings.destinations.ownerOnly')}</AlertDescription>
+        </Alert>
+      )}
+    </SettingsSection>
   );
 }
