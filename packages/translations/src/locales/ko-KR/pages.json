@@ -1202,301 +1202,301 @@
       },
       "oldest": {
         "label": "가장 오래된 세션",
-        "tooltip": ""
+        "tooltip": "사용자가 가장 오랫동안 실행한 활성 세션"
       },
       "newest": {
-        "label": "",
-        "tooltip": ""
+        "label": "최신 세션",
+        "tooltip": "사용자가 가장 최근에 시작한 세션"
       },
       "all_except_one": {
-        "label": "",
-        "tooltip": ""
+        "label": "하나만 제외하고 모두(가장 오래된 것 유지)",
+        "tooltip": "가장 오래된 세션 하나를 제외한 나머지 세션"
       },
       "all_user": {
-        "label": "",
-        "tooltip": ""
+        "label": "모든 사용자 세션",
+        "tooltip": "이 사용자의 모든 활성 세션"
       }
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": ""
+        "label": "쿨다운"
       },
       "target": {
-        "label": ""
+        "label": "대상"
       },
       "message": {
-        "label": ""
+        "label": "메시지"
       }
     },
     "trustModes": {
       "adjust": {
-        "label": ""
+        "label": "변경량으로 조정"
       },
       "set": {
-        "label": ""
+        "label": "값으로 설정"
       },
       "reset": {
-        "label": ""
+        "label": "기본값으로 재설정(100)"
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "낮음",
+      "warning": "경고",
+      "high": "높음"
     },
     "template": {
-      "version": "",
-      "updateAvailable": "",
-      "updatedTitle": "",
-      "updatedBody": "",
-      "before": "",
-      "after": "",
-      "review": "",
-      "save": "",
-      "customize": "",
-      "customizeTitle": "",
-      "customizeConfirm": "",
-      "customizeConfirmAction": "",
-      "customizeFirst": "",
-      "customizeFailed": "",
-      "upgradeFailed": "",
-      "gone": "",
-      "doorsHelper": ""
+      "version": "v{{version}}",
+      "updateAvailable": "업데이트를 사용할 수 있습니다.",
+      "updatedTitle": "지금",
+      "updatedBody": "아래 답변을 검토한 후 업데이트하세요.",
+      "before": "지금",
+      "after": "업데이트 후",
+      "review": "검토 및 업데이트",
+      "save": "변경사항 저장",
+      "customize": "빌더에서 열기",
+      "customizeTitle": "이것을 빌더에서 여시겠습니까?",
+      "customizeConfirm": "빌더에서 열면 이 자동화는 템플릿과 분리됩니다. 모든 단계를 직접 편집할 수 있지만 이후 템플릿 업데이트를 받지 않습니다. 이 작업은 되돌릴 수 없습니다.",
+      "customizeConfirmAction": "빌더에서 열기",
+      "customizeFirst": "이 자동화는 기성 자동화를 따릅니다. 먼저 빌더에서 열어보세요.",
+      "customizeFailed": "빌더에서 열 수 없습니다.",
+      "upgradeFailed": "업데이트할 수 없습니다. 다시 시도해 보세요.",
+      "gone": "이것이 구축된 기성 자동화는 더 이상 이 서버에 없습니다.",
+      "doorsHelper": "단계는 기성 자동화에서 제공되며 수정되었습니다. 빌더에서 열면 모든 단계를 편집할 수 있고 링크가 종료됩니다."
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "비활성 계정",
+        "description": "설정한 기간 동안 계정을 사용하지 않으면 위반으로 기록합니다.",
+        "keywords": "유휴 휴면 미사용 오래된 정리 비활성 계정"
       },
       "concurrent-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "한 번에 너무 많은 스트리밍이 발생함",
+        "description": "허용된 것보다 계정이 한 번에 더 많은 스트리밍을 재생하면 위반이 발생합니다.",
+        "keywords": "제한 한도 동시 동시 공유 너무 많은 스트리밍"
       },
       "device-velocity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "짧은 기간에 여러 IP 사용",
+        "description": "설정한 기간에 허용 개수보다 많은 IP 주소에서 스트리밍하면 위반으로 기록합니다.",
+        "keywords": "차단된 국가"
       },
       "geo-restriction": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "차단된 국가",
+        "description": "차단한 국가에서 스트리밍하면 위반으로 기록합니다.",
+        "keywords": "불가능한 여행"
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "불가능한 여행",
+        "description": "두 세션의 위치가 한 사용자가 이동할 수 없는 거리만큼 떨어져 있으면 위반으로 기록합니다.",
+        "keywords": "일시중지된 스트리밍 중지"
       },
       "kill-paused-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "일시중지된 스트리밍 중지",
+        "description": "허용된 시간(분)이 지나 일시 중지된 스트리밍을 중지하세요.",
+        "keywords": "일시 중지 유휴 afk 중지 종료 종료 회수"
       },
       "media-added": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "새로운 미디어가 추가되었습니다",
+        "description": "라이브러리 항목이 처음으로 표시되면 대상에게 알립니다.",
+        "keywords": "새 라이브러리 영화 에피소드 추가 가져오기 알림 discord 이메일 웹훅"
       },
       "media-upgraded": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "라이브러리 항목의 품질이 변경되면 대상에게 알립니다.",
+        "description": "라이브러리 항목의 품질이 변경되면 대상에게 알립니다.",
+        "keywords": "업그레이드 품질 remux 4k 해상도 교체 알림 discord 이메일 webhook"
       },
       "new-device": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "새 장치",
+        "description": "본 적이 없는 장치에서 계정이 처음 스트리밍될 때 대상에게 알립니다.",
+        "keywords": "장치 새 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 불일치 이메일 웹훅"
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "4K 트랜스코드 없음",
+        "description": "4K 소스 비디오를 트랜스코딩하는 스트림을 중지합니다.",
+        "keywords": "4K 트랜스코드 품질 CPU 대역폭 중지"
       },
       "paused-too-long": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "일시 중지 유휴 afk 멈춤 포기 알림 discord 이메일 webhook",
+        "description": "Tracearr 플러그인 업데이트",
+        "keywords": "일시 중지 유휴 afk 멈춤 포기 알림 discord 이메일 webhook"
       },
       "plugin-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Tracearr 플러그인 업데이트",
+        "description": "서버에 설치할 최신 Tracearr 플러그인이 있으면 대상에게 알립니다.",
+        "keywords": "플러그인 업데이트 업그레이드 버전 출시 알림 불일치 이메일 웹훅"
       },
       "server-down": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "서버 다운",
+        "description": "미디어 서버가 응답을 중지하면 대상에게 알립니다.",
+        "keywords": "오프라인 중단에 도달할 수 없음 알림 discord 이메일 webhook"
       },
       "server-up": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "서버 복구",
+        "description": "미디어 서버가 다시 응답하면 대상에게 알립니다.",
+        "keywords": "온라인 복구 복원 백업 알림 불일치 이메일 웹훅"
       },
       "server-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "미디어 서버 업데이트",
+        "description": "미디어 서버에 사용 가능한 업데이트가 있으면 대상에게 알립니다.",
+        "keywords": "업데이트 업그레이드 버전 출시 Plex Jellyfin Emby 불일치 알림"
       },
       "simultaneous-locations": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "한 번에 두 곳",
+        "description": "하나의 계정이 두 개의 멀리 있는 장소에서 동시에 스트리밍되면 위반이 발생합니다.",
+        "keywords": "거리 위치 공유 VPN 두 곳을 동시에 공유"
       },
       "stream-ended": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "스트리밍 종료됨",
+        "description": "스트리밍이 끝날 때마다 알림 대상에 알립니다.",
+        "keywords": "중지 끝 재생 완료 알림 불일치 이메일 웹훅"
       },
       "stream-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "스트리밍이 시작되었습니다.",
+        "description": "스트리밍이 시작될 때마다 알림 대상에 알립니다.",
+        "keywords": "재생 시청 시작 보기 시작 알림 불일치 이메일 웹훅"
       },
       "tracearr-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Tracearr 업데이트",
+        "description": "새 Tracearr 릴리스가 나오면 알림 대상에 알립니다.",
+        "keywords": "업데이트 업그레이드 버전 릴리스 추적 알림 불일치 이메일 웹훅 알림"
       },
       "transcode-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "스트림에서 비디오 또는 오디오 트랜스코딩이 시작되면 알림 대상에 알립니다.",
+        "description": "스트림에서 비디오 또는 오디오 트랜스코딩이 시작되면 알림 대상에 알립니다.",
+        "keywords": "신뢰 점수가 변경됨"
       },
       "trust-score-changed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "신뢰 점수가 변경됨",
+        "description": "계정의 신뢰 점수가 변경되면 대상에게 알립니다.",
+        "keywords": "신뢰 점수 평판 페널티 조정됨 불일치 알림 이메일 웹훅"
       }
     },
-    "title": "",
-    "toggleAutomation": "",
-    "tryAdjustingFilters": "",
+    "title": "자동화",
+    "toggleAutomation": "{{name}} 켜거나 끄기",
+    "tryAdjustingFilters": "필터를 조정해보세요.",
     "units": {
-      "km": "",
-      "kmh": "",
-      "mbps": "",
-      "days": "",
-      "minutes": "",
-      "hours": "",
-      "gb": "",
-      "seconds": ""
+      "km": "km",
+      "kmh": "km/h",
+      "mbps": "Mbps",
+      "days": "일",
+      "minutes": "분",
+      "hours": "시간",
+      "gb": "GB",
+      "seconds": "초"
     },
-    "updateAutomation": "",
+    "updateAutomation": "변경사항 저장",
     "catalog": {
       "groups": {
-        "sessions": "",
-        "accounts": "",
-        "library": "",
-        "servers": "",
-        "updates": "",
-        "notify": "",
-        "policy": "",
-        "control": ""
+        "sessions": "세션",
+        "accounts": "계정",
+        "library": "라이브러리",
+        "servers": "서버",
+        "updates": "업데이트",
+        "notify": "알림",
+        "policy": "조치를 취하세요",
+        "control": "만약… 그렇다면"
       },
-      "suggested": "",
+      "suggested": "제안",
       "triggers": {
         "sessionStarted": {
-          "description": "",
-          "synonyms": ""
+          "description": "확인 대기 시간 전에 스트림이 처음 감지된 순간입니다. 일부 스트림은 확인 단계까지 이어지지 않을 수 있습니다.",
+          "synonyms": "놀다, 시청하다, 시작하다, 시작하다, 보기"
         },
         "sessionFirstSeen": {
-          "description": "",
-          "synonyms": ""
+          "description": "확인 대기 시간 전에 스트림이 처음 감지된 순간입니다. 일부 스트림은 확인 단계까지 이어지지 않을 수 있습니다.",
+          "synonyms": "재생, 즉시, 즉시, 첫눈에, 초기, 웹훅"
         },
         "sessionStopped": {
-          "description": "",
-          "synonyms": ""
+          "description": "재생이 끝나거나 스트림이 종료된 시점입니다.",
+          "synonyms": "끝내다, 끝내다, 그만두다, 닫다"
         },
         "sessionTranscodeChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "서버는 직접 재생과 트랜스코딩 간에 스트림을 전환합니다.",
+          "synonyms": "스트림이 일시중지되는 순간입니다."
         },
         "sessionPaused": {
-          "description": "",
-          "synonyms": ""
+          "description": "스트림이 일시중지되는 순간입니다.",
+          "synonyms": "일시 중지, 보류, 유휴"
         },
         "sessionHeldFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "설정된 시간(분)보다 오랫동안 스트림이 일시중지되었습니다.",
+          "description": "계정은 설정된 일수 동안 아무것도 시청하지 않았습니다.",
+          "synonyms": "일시중지, 유휴, 포기, 멈춤, afk"
         },
         "accountInactiveFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "계정이 조용해짐",
+          "description": "계정은 설정된 일수 동안 아무것도 시청하지 않았습니다.",
+          "synonyms": "비활성, 휴면, 사용되지 않음, 부실, 정리"
         },
         "accountNewDevice": {
-          "description": "",
-          "synonyms": ""
+          "description": "계정이 처음으로 장치에서 스트리밍됩니다.",
+          "synonyms": "장치, 신규, 알 수 없음, 인식할 수 없음, 전화, 로그인, 공유"
         },
         "accountTrustChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "자동화나 소유자가 계정의 신뢰 점수를 변경한 시점입니다.",
+          "synonyms": "신뢰, 점수, 평판, 페널티, 조정됨"
         },
         "mediaAdded": {
-          "description": "",
-          "synonyms": ""
+          "description": "라이브러리 항목이 처음으로 서버에 표시됩니다.",
+          "synonyms": "신규, 추가됨, 라이브러리, 영화, 에피소드, 가져오기"
         },
         "mediaUpgraded": {
-          "description": "",
-          "synonyms": ""
+          "description": "이미 있던 라이브러리 항목의 품질이 변경됩니다.",
+          "synonyms": "업그레이드, 품질, 교체, 재다중화, 4K, 해상도"
         },
         "serverDown": {
-          "description": "",
-          "synonyms": ""
+          "description": "미디어 서버가 응답을 중지합니다.",
+          "synonyms": "연결할 수 없음, 오프라인, 중단, 작동 중지"
         },
         "serverUp": {
-          "description": "",
-          "synonyms": ""
+          "description": "미디어 서버가 다시 응답합니다.",
+          "synonyms": "온라인, 복구, 복원, 뒤로"
         },
         "pluginUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "서버에 설치된 Tracearr 플러그인의 새 릴리스가 있습니다.",
+          "synonyms": "플러그인, 업그레이드, 버전, 릴리스"
         },
         "serverUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "미디어 서버의 새 릴리스가 있습니다.",
+          "synonyms": "업그레이드, 버전, 릴리스, 패치"
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "Tracearr의 새 릴리스가 있습니다.",
+          "synonyms": "업그레이드, 버전, 릴리스, 자체"
         }
       },
       "actions": {
         "send": {
-          "synonyms": ""
+          "synonyms": "알림, 경고, 불일치, 이메일, 웹훅, 푸시"
         },
         "trust": {
-          "synonyms": ""
+          "synonyms": "점수, 평판, 처벌, 보상"
         },
         "kill_stream": {
-          "synonyms": ""
+          "synonyms": "재생 중지, 종료, 잘라내기, 종료"
         },
         "message_client": {
-          "synonyms": ""
+          "synonyms": "화면에 경고하다, 말하다, 주의하다"
         },
         "if": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "만약…그렇지 않다면…",
+          "description": "추가 검사를 통과한 경우에만 일부 단계를 실행하세요.",
+          "synonyms": "if, else, else, 분기, 분할, 조건"
         }
       }
     },
     "filters": {
-      "source": "",
-      "allSources": "",
+      "source": "어디서 왔는지",
+      "allSources": "어디서나",
       "sources": {
-        "builtin": "",
-        "import": "",
-        "local": "",
-        "own": ""
+        "builtin": "내장",
+        "import": "가져옴",
+        "local": "여기에 저장됨",
+        "own": "빌더에서 직접 만듦"
       },
-      "trigger": "",
-      "allTriggers": ""
+      "trigger": "무엇이 시작하는가",
+      "allTriggers": "모든 트리거"
     },
-    "openGallery": ""
+    "openGallery": "갤러리 열기"
   },
   "terminateStream": {
     "title": "스트림 종료",
@@ -1508,7 +1508,7 @@
     "killStream": "스트림 강제 종료"
   },
   "notFound": {
-    "title": "",
+    "title": "404",
     "heading": "페이지를 찾을 수 없습니다",
     "description": "찾으시는 페이지가 없거나 이동되었습니다."
   },
@@ -1531,7 +1531,7 @@
         "unreachable": "호스트에 도달할 수 없음",
         "reset": "연결이 재설정됨",
         "tls": "TLS 오류",
-        "http": "",
+        "http": "HTTP {{status}}",
         "unknown": "연결 실패"
       },
       "connectionsReachable": "전체 {{total}}개 중 {{reachable}}개 연결 가능",
@@ -1552,7 +1552,7 @@
       "serversConnected_one": "서버 {{count}}대 연결됨",
       "serversConnected_other": "서버 {{count}}대 연결됨",
       "unlinkAccount": "이 Plex 계정 연결 해제",
-      "reauthorizeAccount": "",
+      "reauthorizeAccount": "이 Plex 계정 다시 인증",
       "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
       "linkedAccounts": "연결된 Plex 계정",
       "linkedAccountsDesc": "서버를 추가할 때 사용할 Plex 계정을 관리하세요.",
@@ -1561,49 +1561,49 @@
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다."
     },
     "destinations": {
-      "add": "",
-      "builtinNote": "",
-      "clearSecret": "",
-      "delete": "",
-      "deleteConfirm": "",
-      "description": "",
-      "empty": "",
+      "add": "알림 대상 추가",
+      "builtinNote": "내장",
+      "clearSecret": "지우기",
+      "delete": "삭제",
+      "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
+      "description": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
+      "empty": "아직 알림 대상이 없습니다.",
       "fields": {
-        "webhookUrl": "",
-        "url": "",
-        "serverUrl": "",
-        "apiUrl": "",
-        "topic": "",
-        "authToken": "",
-        "userKey": "",
-        "apiToken": ""
+        "webhookUrl": "웹훅 URL",
+        "url": "URL",
+        "serverUrl": "서버 URL",
+        "apiUrl": "API URL",
+        "topic": "주제",
+        "authToken": "인증 토큰",
+        "userKey": "사용자 키",
+        "apiToken": "API 토큰"
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "공개 주제의 경우 선택사항"
       },
-      "ownerOnly": "",
-      "pushNote": "",
-      "receiveViolations": "",
-      "receiveViolationsHint": "",
-      "reencrypt": "",
-      "secretSet": "",
-      "test": "",
-      "testHint": "",
-      "testNeedsForm": "",
-      "title": "",
+      "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
+      "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
+      "receiveViolations": "위반사항 수신",
+      "receiveViolationsHint": "이 대상의 비밀번호를 다시 입력하세요.",
+      "reencrypt": "설정(유지하려면 비워두세요)",
+      "secretSet": "설정(유지하려면 비워두세요)",
+      "test": "테스트",
+      "testHint": "테스트를 위해 먼저 저장하세요.",
+      "testNeedsForm": "Discord",
+      "title": "알림 대상",
       "types": {
-        "discord": "",
-        "jsonWebhook": "",
-        "ntfy": "",
-        "gotify": "",
-        "apprise": "",
-        "pushover": "",
-        "push": "",
-        "webToast": ""
+        "discord": "Discord",
+        "jsonWebhook": "웹훅(JSON)",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "push": "모바일 푸시",
+        "webToast": "브라우저 알림"
       },
-      "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": ""
+      "usedBy": "{{count}}개의 자동화에서 사용됨",
+      "usedBy_other": "{{count}}개의 자동화에서 사용됨",
+      "webToastNote": "이 브라우저에 알림이 표시됩니다."
     },
     "jobs": {
       "runNow": "지금 실행",
@@ -1625,7 +1625,7 @@
     "interruptionTitle": "서비스 중단",
     "startingDescription": "서버가 백엔드 서비스를 사용할 수 있게 되기를 기다리고 있습니다. 준비가 완료되면 이 페이지가 자동으로 새로고침됩니다.",
     "interruptionDescription": "하나 이상의 백엔드 서비스를 사용할 수 없습니다. 연결이 복구되면 이 페이지가 자동으로 새로고침됩니다.",
-    "unreachable": "",
+    "unreachable": "지금은 Tracearr 서버에 연결할 수 없습니다. 실시간 업데이트가 일시 중지되었다가 자동으로 재개됩니다.",
     "restoreTitle": "백업에서 복원 중...",
     "restoreFailed": "복원 실패",
     "restorePhase": {
@@ -1639,11 +1639,11 @@
       "complete": "복원 완료"
     },
     "initStep": {
-      "migrations": "",
-      "timescale": "",
-      "services": ""
+      "migrations": "데이터베이스 마이그레이션 적용",
+      "timescale": "TimescaleDB 준비(업그레이드 후 다소 시간이 걸릴 수 있음)",
+      "services": "서비스 시작"
     },
-    "doNotRestart": ""
+    "doNotRestart": "이 작업이 실행되는 동안 서버를 다시 시작하거나 중지하지 마십시오. 이를 중단하면 데이터베이스가 절반만 업그레이드된 상태로 남을 수 있습니다."
   },
   "map": {
     "allUsers": "모든 사용자",
@@ -1653,17 +1653,17 @@
     "streams": "스트림",
     "locations": "위치",
     "allActivity": "모든 활동",
-    "basemapMissing": "",
-    "webglUnavailable": "",
-    "webglHint": "",
-    "basemapShadowed": "",
-    "badMounts": ""
+    "basemapMissing": "이 브라우저에서는 WebGL이 비활성화되어 있습니다",
+    "webglUnavailable": "이 브라우저에서는 WebGL이 비활성화되어 있습니다",
+    "webglHint": "지도에는 WebGL이 필요합니다. 브라우저 설정에서 이 사이트에 대해 활성화하세요.",
+    "basemapShadowed": "{{path}}에서 베이스맵이 누락되었습니다. Tracearr는 이를 이미지에 포함하므로 해당 디렉토리에 마운트된 볼륨이 이를 숨깁니다. 포스터 캐시를 유지하려면 /app/data 대신 /app/data/image-cache를 마운트하세요.",
+    "badMounts": "잘못된 볼륨 마운트가 감지되었습니다. 기능이 보장되지 않습니다."
   },
   "devices": {
     "title": "기기 호환성",
     "description": "각 코덱에서 기기가 직접 재생과 트랜스코딩 중 무엇을 사용하는지 확인하세요",
-    "analyzedSessions": "",
-    "analyzedSessionsTooltip": "",
+    "analyzedSessions": "분석된 세션",
+    "analyzedSessionsTooltip": "최소 {{count}}개의 세션과 알려진 코덱이 포함된 장치 + 코덱 조합의 세션입니다. 코덱 정보가 없는 드문 조합과 세션은 계산되지 않습니다.",
     "directPlayRate": "직접 재생 비율",
     "videoAndAudio": "비디오 + 오디오",
     "uniqueDevices": "고유 기기",
@@ -1681,7 +1681,7 @@
     "noDeviceDataPeriod": "이 기간에는 기기 데이터가 없습니다",
     "legend": "범례:",
     "directPlayHigh": "80% 이상 직접 재생",
-    "directPlayMid": "",
+    "directPlayMid": "50-79%",
     "directPlayLow": "50% 미만",
     "topTranscodingUsers": "트랜스코딩 상위 사용자",
     "topTranscodingUsersDesc": "서버에서 트랜스코딩을 가장 많이 유발한 사용자",
@@ -1716,10 +1716,10 @@
     "backToSettings": "설정으로 돌아가기",
     "apiKeyAutoLoaded": "API 키가 자동으로 불러와졌습니다",
     "noApiKey": "생성된 API 키가 없습니다. 엔드포인트를 테스트하려면 설정에서 키를 만드세요",
-    "versionSwitcherLabel": "",
-    "versionV1": "",
-    "versionV2": "",
-    "specLoadError": ""
+    "versionSwitcherLabel": "API 문서 버전",
+    "versionV1": "API v1",
+    "versionV2": "API v2",
+    "specLoadError": "API 사양을 불러오지 못했습니다. API 키를 확인하고 다시 시도하세요."
   },
   "debug": {
     "title": "디버그 도구",
@@ -1733,7 +1733,7 @@
     "libraryItems": "라이브러리 항목",
     "environment": "환경",
     "systemInformation": "시스템 정보",
-    "cpu": "",
+    "cpu": "CPU",
     "memory": "메모리",
     "uptime": "가동 시간",
     "database": "데이터베이스",
@@ -1747,8 +1747,8 @@
     "clearQueryCache": "쿼리 기록 비우기",
     "clearMobileDevices": "모바일 기기 목록 비우기",
     "clearViolations": "위반 기록 비우기",
-    "clearAutomations": "",
-    "clearAutomationsConfirm": "",
+    "clearAutomations": "모든 자동화 및 실행 삭제",
+    "clearAutomationsConfirm": "모든 자동화와 해당 실행을 모두 삭제하시겠습니까?",
     "clearTerminationLogs": "종료 로그 비우기",
     "clearLibraryCache": "라이브러리 기록 비우기",
     "clearSessions": "세션 지우기",
@@ -1771,203 +1771,203 @@
   },
   "media": {
     "landing": {
-      "title": "",
+      "title": "미디어",
       "lens": {
         "label": "다음 사용자로 보기",
         "allUsers": "모든 사용자"
       },
       "shelves": {
-        "recentlyAddedMovies": "",
-        "recentlyAddedShows": "",
-        "mostPopularMovies": "",
-        "mostPopularShows": "",
-        "emptyRecentlyAdded": "",
-        "emptyMostPopular": "",
-        "captionRecentlyAdded": "",
+        "recentlyAddedMovies": "최근 추가된 영화",
+        "recentlyAddedShows": "최근 추가된 프로그램",
+        "mostPopularMovies": "가장 인기 있는 영화",
+        "mostPopularShows": "가장 인기 있는 프로그램",
+        "emptyRecentlyAdded": "서버 전체에서 중복 제거",
+        "emptyMostPopular": "서버 전체에서 중복 제거",
+        "captionRecentlyAdded": "서버 전체에서 중복 제거",
         "captionMostPopular": {
-          "day": "",
-          "week": "",
-          "month": "",
-          "year": "",
-          "all": "",
-          "custom": ""
+          "day": "오늘",
+          "week": "지난 7일",
+          "month": "지난 30일",
+          "year": "지난 12개월",
+          "all": "전체 기간",
+          "custom": "선택한 기간"
         }
       },
       "card": {
         "newEpisodes_one": "새 에피소드 {{count}}개",
         "newEpisodes_other": "새 에피소드 {{count}}개",
         "addedAgo": "{{date}} 추가됨",
-        "addedCompactAgo": "",
-        "newEpisodesChip": ""
+        "addedCompactAgo": "{{age}} 전에 추가됨",
+        "newEpisodesChip": "{{count}} 신규"
       },
       "deadWeight": {
-        "title": "",
-        "summary": "",
-        "empty": "",
+        "title": "장기 미시청 콘텐츠",
+        "summary": "시청하지 않은 타이틀 {{count}}개 · {{size}}",
+        "empty": "정리할 항목이 없습니다. 라이브러리의 모든 항목에 시청 기록이 있습니다.",
         "columns": {
-          "poster": "",
-          "title": "",
-          "size": "",
-          "added": "",
-          "servers": ""
+          "poster": "포스터",
+          "title": "제목",
+          "size": "크기",
+          "added": "추가됨",
+          "servers": "서버"
         },
-        "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAll": "모두 보기",
+        "viewAllTooltip": "곧 출시 예정"
       },
-      "loadError": ""
+      "loadError": "영화"
     },
     "movies": {
-      "title": ""
+      "title": "영화"
     },
     "shows": {
-      "title": ""
+      "title": "TV 프로그램"
     },
     "genres": {
-      "title": "",
-      "subtitle": "",
+      "title": "장르",
+      "subtitle": "표시되는 모든 서버에서 장르별 재생 및 시청 시간입니다.",
       "chart": {
-        "title": "",
-        "valueLabel": "",
-        "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "title": "장르별 재생 수",
+        "valueLabel": "재생 수",
+        "itemCount_one": "콘텐츠 {{count}}개",
+        "itemCount_other": "콘텐츠 {{count}}개",
+        "ariaLabel": "장르별 재생 막대 차트로, 가장 높은 것에서 가장 낮은 것으로 정렬됩니다. 전체 분석 내용은 아래 표에서 확인할 수 있습니다."
       },
       "table": {
-        "title": "",
+        "title": "장르별 분류",
         "columns": {
-          "genre": "",
-          "items": "",
-          "plays": "",
-          "watchTime": ""
+          "genre": "장르",
+          "items": "항목",
+          "plays": "재생 수",
+          "watchTime": "시청 시간"
         },
-        "browseMovies": "",
-        "browseShows": ""
+        "browseMovies": "{{genre}} 영화 찾아보기",
+        "browseShows": "{{genre}} 프로그램 찾아보기"
       },
       "empty": {
-        "title": "",
-        "description": ""
+        "title": "장르는 미디어 서버의 메타데이터 동기화에서 가져옵니다. 다음 동기화가 완료된 후 다시 확인하세요.",
+        "description": "장르는 미디어 서버의 메타데이터 동기화에서 가져옵니다. 다음 동기화가 완료된 후 다시 확인하세요."
       },
-      "loadError": ""
+      "loadError": "탐색 경로"
     },
     "detail": {
-      "title": "",
+      "title": "미디어 세부정보",
       "breadcrumb": {
-        "ariaLabel": ""
+        "ariaLabel": "탐색 경로"
       },
       "notFound": {
-        "title": "",
-        "message": "",
-        "backLink": ""
+        "title": "미디어를 찾을 수 없습니다",
+        "message": "이 제목은 존재하지 않거나 해당 제목에 액세스할 수 없습니다.",
+        "backLink": "미디어로 돌아가기"
       },
       "hero": {
-        "loadError": "",
+        "loadError": "{{count}} 시즌",
         "meta": {
-          "seasons_one": "",
-          "seasons_other": "",
-          "episodes_one": "",
-          "episodes_other": ""
+          "seasons_one": "{{count}} 시즌",
+          "seasons_other": "{{count}} 시즌",
+          "episodes_one": "{{count}}개의 에피소드",
+          "episodes_other": "{{count}}개의 에피소드"
         },
         "availability": {
-          "added": "",
-          "addedRemoved": "",
-          "replaced": ""
+          "added": "{{date}}에 추가됨",
+          "addedRemoved": "추가됨 {{added}} – 제거됨 {{removed}}",
+          "replaced": "{{date}} 교체됨"
         },
         "removedEverywhere": {
-          "caption": ""
+          "caption": "서버에서 열기"
         },
         "actions": {
-          "fullHistory": "",
-          "openOnServer": ""
+          "fullHistory": "전체 역사",
+          "openOnServer": "서버에서 열기"
         }
       },
       "kpis": {
-        "ariaLabel": "",
-        "loadError": "",
-        "completionLoadError": "",
+        "ariaLabel": "통계 보기",
+        "loadError": "시계 통계를 불러올 수 없습니다.",
+        "completionLoadError": "시청 시간",
         "plays": {
-          "label": "",
-          "caption": ""
+          "label": "시청 시간",
+          "caption": "재개 체인, 짧은 세션 제외"
         },
         "watchTime": {
-          "label": "",
-          "detail": ""
+          "label": "시청 시간",
+          "detail": "지난 30일 동안 +{{hours}}시간"
         },
         "viewers": {
-          "label": "",
-          "detail": ""
+          "label": "시청자",
+          "detail": "모든 서버에서"
         },
         "completion": {
-          "label": "",
-          "detail": "",
-          "detailMovie": ""
+          "label": "평균 완료",
+          "detail": "{{finished}} 중 {{total}}가 모든 에피소드를 완료했습니다.",
+          "detailMovie": "{{finished}} 중 {{total}} 시청 완료"
         }
       },
       "watchers": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "lastWatchedAgo": "",
-        "completionLabel": "",
+        "title": "시청자",
+        "loadError": "아직 이 동영상을 시청한 사람이 없습니다.",
+        "empty": "아직 이 동영상을 시청한 사람이 없습니다.",
+        "lastWatchedAgo": "{{age}} 전",
+        "completionLabel": "{{percent}}% 완료",
         "columns": {
-          "user": "",
-          "plays": "",
-          "episodes": "",
-          "completion": "",
-          "lastWatched": ""
+          "user": "사용자",
+          "plays": "재생",
+          "episodes": "에피소드",
+          "completion": "완료",
+          "lastWatched": "마지막 시청"
         }
       },
       "seasons": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "title": "시즌",
+        "loadError": "{{count}}개의 에피소드",
+        "empty": "{{count}}개의 에피소드",
+        "episodeCount_one": "{{count}}개의 에피소드",
+        "episodeCount_other": "{{count}}개의 에피소드",
+        "watchedPct": "{{percent}}% 시청함",
+        "stripSummary": "{{season}}: {{percent}}% 시청",
         "episodeLabel": {
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "watched": "{{code}}: 시청함",
+          "partial": "{{code}}: 부분적으로 시청함",
+          "unwatched": "{{code}}: 시청하지 않음"
         }
       },
       "platforms": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "unknown": "",
+        "title": "플랫폼",
+        "loadError": "플랫폼 분석을 불러올 수 없습니다.",
+        "empty": "플랫폼",
+        "unknown": "알 수 없음",
         "columns": {
-          "platform": "",
-          "plays": "",
-          "watchTime": ""
+          "platform": "플랫폼",
+          "plays": "재생",
+          "watchTime": "시청 시간"
         }
       },
       "history": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "watched": "",
-        "notWatched": "",
+        "title": "기록",
+        "loadError": "아직 재생 기록이 없습니다.",
+        "empty": "완료되지 않음",
+        "watched": "시청함",
+        "notWatched": "완료되지 않음",
         "columns": {
-          "date": "",
-          "user": "",
-          "content": "",
-          "server": "",
-          "duration": ""
+          "date": "날짜",
+          "user": "사용자",
+          "content": "내용",
+          "server": "서버",
+          "duration": "재생 시간"
         }
       },
       "copies": {
-        "title": "",
-        "loadError": "",
-        "unknownLibrary": "",
+        "title": "사본",
+        "loadError": "알 수 없는 라이브러리",
+        "unknownLibrary": "알 수 없는 라이브러리",
         "columns": {
-          "server": "",
-          "library": "",
-          "quality": "",
-          "episodes": "",
-          "size": "",
-          "added": ""
+          "server": "서버",
+          "library": "라이브러리",
+          "quality": "품질",
+          "episodes": "에피소드",
+          "size": "크기",
+          "added": "추가됨"
         },
-        "versionLabel": ""
+        "versionLabel": "파일 {{index}}"
       }
     },
     "posterCard": {
@@ -1981,88 +1981,88 @@
       "watchedState": {
         "watched": "시청함",
         "partial": "일부 시청함",
-        "watchedByOthers": "",
-        "watchedByYou": ""
+        "watchedByOthers": "다른 사람이 시청함",
+        "watchedByYou": "내가 시청함"
       },
       "tileLabel": {
         "added": "추가됨",
         "plays": "재생",
         "viewers": "시청자",
-        "resolution": ""
+        "resolution": "해상도"
       },
-      "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
-      "versionsChip": "",
-      "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "rankChip": "#{{rank}}",
+      "playsCompact_one": "{{compact}} 플레이",
+      "playsCompact_other": "{{compact}} 플레이",
+      "versionsChip": "{{count}}×",
+      "versions_one": "{{count}} 버전",
+      "versions_other": "{{count}} 버전",
+      "moreServers": "+{{count}}개 이상"
     },
     "grid": {
       "toolbar": {
-        "ariaLabel": "",
-        "typeLabel": "",
-        "moviesToggle": "",
-        "showsToggle": "",
-        "searchPlaceholder": "",
-        "searchLabel": "",
-        "removeFilter": "",
-        "filtersLabel": "",
-        "filtersSheetTitle": "",
-        "done": "",
-        "watchedLabel": "",
+        "ariaLabel": "필터 및 정렬",
+        "typeLabel": "미디어 유형",
+        "moviesToggle": "영화",
+        "showsToggle": "제목 검색",
+        "searchPlaceholder": "제목 검색…",
+        "searchLabel": "제목 검색",
+        "removeFilter": "{{label}} 필터 제거",
+        "filtersLabel": "필터",
+        "filtersSheetTitle": "필터",
+        "done": "완료",
+        "watchedLabel": "시청함",
         "watched": {
-          "all": "",
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "all": "모두",
+          "watched": "시청함",
+          "partial": "부분적으로 시청함",
+          "unwatched": "시청하지 않음"
         },
-        "unwatchedByLens": "",
-        "resolutionLabel": "",
-        "resolutionAll": "",
-        "hdrLabel": "",
-        "hdrAll": "",
-        "hdrOnly": "",
-        "hdrChip": "",
-        "genreLabel": "",
-        "genreAll": "",
-        "serverLabel": "",
-        "serverAll": "",
-        "libraryLabel": "",
-        "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
-        "sizeGbMinLabel": "",
-        "sizeGbMaxLabel": "",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "unwatchedByLens": "{{name}}님이 시청하지 않음",
+        "resolutionLabel": "해상도",
+        "resolutionAll": "모든 해상도",
+        "hdrLabel": "다이내믹 레인지",
+        "hdrAll": "모두",
+        "hdrOnly": "HDR 전용",
+        "hdrChip": "HDR",
+        "genreLabel": "장르",
+        "genreAll": "모든 장르",
+        "serverLabel": "서버",
+        "serverAll": "모든 서버",
+        "libraryLabel": "라이브러리",
+        "libraryAll": "모든 라이브러리",
+        "yearFromLabel": "연도부터",
+        "yearToLabel": "연도까지",
+        "sizeGbMinLabel": "최소 크기(GB)",
+        "sizeGbMaxLabel": "최대 크기(GB)",
+        "sizeChipAtLeast": "≥ {{min}}GB",
+        "sizeChipAtMost": "≤ {{max}}GB",
+        "sizeChipRange": "{{min}}~{{max}}GB",
+        "sortLabel": "정렬",
         "sort": {
-          "title": "",
-          "added": "",
-          "year": "",
-          "plays": "",
-          "watch_time": "",
-          "viewers": ""
+          "title": "제목 A~Z",
+          "added": "최근 추가됨",
+          "year": "연도",
+          "plays": "재생 수",
+          "watch_time": "시청 시간",
+          "viewers": "시청자"
         },
-        "count": "",
-        "countTotal_one": "",
-        "countTotal_other": ""
+        "count": "전체 {{total}}개 중 {{loaded}}개 · {{size}}",
+        "countTotal_one": "콘텐츠 {{count}}개 · {{size}}",
+        "countTotal_other": "콘텐츠 {{count}}개 · {{size}}"
       },
       "scrubber": {
-        "label": "",
-        "current": ""
+        "label": "문자로 이동",
+        "current": "현재 {{letter}}"
       },
-      "loaderError": "",
-      "retry": "",
-      "clearJumpAction": "",
-      "showingFrom": "",
-      "showAll": "",
-      "emptyFilter": "",
-      "emptySearch": "",
-      "emptyAnchored": "",
-      "loadError": ""
+      "loaderError": "다시 시도",
+      "retry": "다시 시도",
+      "clearJumpAction": "지우기",
+      "showingFrom": "{{letter}}에서 표시 중",
+      "showAll": "모두 표시",
+      "emptyFilter": "\"{{query}}\"와(와) 일치하는 제목이 없습니다.",
+      "emptySearch": "카탈로그를 불러올 수 없습니다.",
+      "emptyAnchored": "카탈로그를 불러올 수 없습니다.",
+      "loadError": "카탈로그를 불러올 수 없습니다."
     }
   }
 }
