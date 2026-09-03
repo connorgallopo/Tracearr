@@ -51,7 +51,10 @@ async function resume(
     await markSendOutcome(open.id, 'failed', 'Interrupted before delivery started');
     return null;
   }
-  if (trigger === 'test') return { outcome: 'busy', sendId: open.id, queuedRecipientIds: [] };
+  // A rendering send has no full recipient list yet; handing out the partial one
+  // burns those job ids so the run that owns the send can never enqueue them.
+  if (trigger === 'test' || open.outcome === 'rendering')
+    return { outcome: 'busy', sendId: open.id, queuedRecipientIds: [] };
   return {
     outcome: 'resumed',
     sendId: open.id,

@@ -213,7 +213,7 @@ describe('runNewsletter', () => {
     });
   });
 
-  it('resumes an open send instead of creating a second one', async () => {
+  it('resumes a sending send with its queued ids instead of creating a second one', async () => {
     store.findOpenSend.mockResolvedValue({ id: 'open-1', outcome: 'sending' });
     store.queuedRecipientIds.mockResolvedValue(['r7']);
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
@@ -260,15 +260,15 @@ describe('runNewsletter', () => {
     expect(result.outcome).toBe('queued');
   });
 
-  it('resumes a rendering send that has not gone stale yet', async () => {
+  it('answers busy without ids for a rendering send that has not gone stale yet', async () => {
     store.findOpenSend.mockResolvedValue({
       id: 'open-1',
       outcome: 'rendering',
       startedAt: new Date(Date.now() - 60_000),
     });
-    store.queuedRecipientIds.mockResolvedValue(['r7']);
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
-    expect(result).toEqual({ outcome: 'resumed', sendId: 'open-1', queuedRecipientIds: ['r7'] });
+    expect(result).toEqual({ outcome: 'busy', sendId: 'open-1', queuedRecipientIds: [] });
+    expect(store.queuedRecipientIds).not.toHaveBeenCalled();
     expect(store.markSendOutcome).not.toHaveBeenCalled();
     expect(store.insertSend).not.toHaveBeenCalled();
   });
