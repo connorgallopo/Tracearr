@@ -1006,8 +1006,8 @@ async function initializeServices(app: FastifyInstance) {
 
   try {
     initNewsletterQueues(redisUrl);
-    startNewsletterWorkers();
     await resyncNewsletterSchedules(await listNewsletters());
+    startNewsletterWorkers();
     app.log.info('Newsletter queues initialized');
   } catch (error) {
     app.log.error({ err: error }, 'Failed to initialize newsletter queues');

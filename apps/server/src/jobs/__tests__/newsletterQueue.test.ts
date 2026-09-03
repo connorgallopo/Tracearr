@@ -3,10 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // vi.mock factories run before this module's own top-level statements (ESM
 // dependency evaluation order), so the classes they reference must come from
 // vi.hoisted rather than a plain class declaration below them.
-const { queues, FakeQueue, FakeWorker } = vi.hoisted(() => {
+const { queues, workers, FakeQueue, FakeWorker } = vi.hoisted(() => {
   const queues = new Map<string, FakeQueue>();
+  const workers = new Map<string, FakeWorker>();
   class FakeQueue {
     name: string;
+    opts: unknown;
     upsertJobScheduler = vi.fn(async () => ({}));
     removeJobScheduler = vi.fn(async () => true);
     getJobSchedulers = vi.fn(async () => [] as { key: string; id: string }[]);
@@ -20,16 +22,26 @@ const { queues, FakeQueue, FakeWorker } = vi.hoisted(() => {
     getDelayedCount = vi.fn(async () => 0);
     on = vi.fn();
     close = vi.fn(async () => undefined);
-    constructor(name: string) {
+    constructor(name: string, opts?: unknown) {
       this.name = name;
+      this.opts = opts;
       queues.set(name, this);
     }
   }
   class FakeWorker {
+    name: string;
+    processor: (job: unknown) => unknown;
+    opts: unknown;
     on = vi.fn();
     close = vi.fn(async () => undefined);
+    constructor(name: string, processor: (job: unknown) => unknown, opts?: unknown) {
+      this.name = name;
+      this.processor = processor;
+      this.opts = opts;
+      workers.set(name, this);
+    }
   }
-  return { queues, FakeQueue, FakeWorker };
+  return { queues, workers, FakeQueue, FakeWorker };
 });
 vi.mock('bullmq', () => ({
   Queue: FakeQueue,
@@ -49,18 +61,25 @@ const mockUsing = vi.fn();
 vi.mock('../../services/newsletters/store.js', () => ({
   newslettersUsingDestination: (...args: unknown[]) => mockUsing(...args) as unknown,
 }));
+const mockGetDestination = vi.fn();
+vi.mock('../../services/notifications/destinationStore.js', () => ({
+  getDestination: (...args: unknown[]) => mockGetDestination(...args) as unknown,
+}));
 
 import {
   InvalidScheduleError,
   enqueueDeliveries,
   enqueueNewsletterRun,
   initNewsletterQueues,
+  onDestinationChanged,
   onDestinationUnavailable,
   removeNewsletterSchedule,
   resyncNewsletterSchedules,
   shutdownNewsletterQueues,
+  startNewsletterWorkers,
   upsertNewsletterSchedule,
 } from '../newsletterQueue.js';
+import { deliverRecipient, markRecipientFailed } from '../../services/newsletters/deliver.js';
 
 const row = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -70,9 +89,21 @@ const row = {
   timezone: 'America/New_York',
 };
 
+const usableDestination = {
+  id: row.destinationId,
+  type: 'email' as const,
+  enabled: true,
+  configStatus: 'ok' as const,
+};
+
 beforeEach(() => {
   queues.clear();
+  workers.clear();
+  mockGetDestination.mockReset().mockResolvedValue(usableDestination);
+  vi.mocked(deliverRecipient).mockReset();
+  vi.mocked(markRecipientFailed).mockReset();
   initNewsletterQueues('redis://localhost:6379');
+  startNewsletterWorkers();
 });
 afterEach(async () => {
   await shutdownNewsletterQueues();
@@ -80,6 +111,7 @@ afterEach(async () => {
 
 const runQueue = () => queues.get('newsletters')!;
 const deliveryQueue = () => queues.get('newsletter-deliveries')!;
+const deliveryWorker = () => workers.get('newsletter-deliveries')!;
 
 describe('schedulers', () => {
   it('upserts one scheduler per enabled newsletter with the derived cron and its timezone', async () => {
@@ -96,6 +128,19 @@ describe('schedulers', () => {
     await upsertNewsletterSchedule({ ...row, destinationId: null });
     expect(runQueue().upsertJobScheduler).not.toHaveBeenCalled();
     expect(runQueue().removeJobScheduler).toHaveBeenCalledTimes(2);
+    expect(runQueue().removeJobScheduler).toHaveBeenCalledWith(`newsletter-${row.id}`);
+  });
+
+  it('removes the scheduler when the destination is disabled, not an email kind, or awaiting re-entry', async () => {
+    mockGetDestination.mockResolvedValueOnce({ ...usableDestination, enabled: false });
+    await upsertNewsletterSchedule(row);
+    mockGetDestination.mockResolvedValueOnce({ ...usableDestination, type: 'discord' });
+    await upsertNewsletterSchedule(row);
+    mockGetDestination.mockResolvedValueOnce({ ...usableDestination, configStatus: 'reencrypt' });
+    await upsertNewsletterSchedule(row);
+
+    expect(runQueue().upsertJobScheduler).not.toHaveBeenCalled();
+    expect(runQueue().removeJobScheduler).toHaveBeenCalledTimes(3);
     expect(runQueue().removeJobScheduler).toHaveBeenCalledWith(`newsletter-${row.id}`);
   });
 
@@ -125,6 +170,13 @@ describe('schedulers', () => {
     expect(runQueue().removeJobScheduler).toHaveBeenCalledWith(
       'newsletter-33333333-3333-4333-8333-333333333333'
     );
+  });
+
+  it('a destination change re-evaluates the schedule of every newsletter that uses it', async () => {
+    mockUsing.mockResolvedValueOnce([row, { ...row, id: '33333333-3333-4333-8333-333333333333' }]);
+    await onDestinationChanged(row.destinationId);
+    expect(mockUsing).toHaveBeenCalledWith(row.destinationId);
+    expect(runQueue().upsertJobScheduler).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -158,5 +210,39 @@ describe('jobs', () => {
   it('removeNewsletterSchedule targets the derived id', async () => {
     await removeNewsletterSchedule(row.id);
     expect(runQueue().removeJobScheduler).toHaveBeenCalledWith(`newsletter-${row.id}`);
+  });
+});
+
+describe('delivery worker', () => {
+  it('the delivery queue keeps no record of a failed job on its own', () => {
+    expect(deliveryQueue().opts).toMatchObject({
+      defaultJobOptions: expect.objectContaining({ removeOnFail: true }),
+    });
+  });
+
+  it('records the terminal failure and rethrows on the last attempt', async () => {
+    const error = new Error('smtp down');
+    vi.mocked(deliverRecipient).mockRejectedValueOnce(error);
+    const job = {
+      data: { sendId: 's', recipientId: 'r1' },
+      attemptsMade: 2,
+      opts: { attempts: 3 },
+    };
+
+    await expect(deliveryWorker().processor(job) as Promise<unknown>).rejects.toBe(error);
+    expect(markRecipientFailed).toHaveBeenCalledWith('r1', error);
+  });
+
+  it('does not record the failure before the last attempt', async () => {
+    const error = new Error('smtp down');
+    vi.mocked(deliverRecipient).mockRejectedValueOnce(error);
+    const job = {
+      data: { sendId: 's', recipientId: 'r1' },
+      attemptsMade: 0,
+      opts: { attempts: 3 },
+    };
+
+    await expect(deliveryWorker().processor(job) as Promise<unknown>).rejects.toBe(error);
+    expect(markRecipientFailed).not.toHaveBeenCalled();
   });
 });

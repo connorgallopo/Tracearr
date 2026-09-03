@@ -36,9 +36,12 @@ vi.mock('../../services/notifications/destinations/registry.js', () => ({
   getDestinationType: vi.fn(() => ({ test: mockTest })),
 }));
 
-vi.mock('../../jobs/newsletterQueue.js', () => ({ onDestinationUnavailable: vi.fn() }));
+vi.mock('../../jobs/newsletterQueue.js', () => ({
+  onDestinationUnavailable: vi.fn(),
+  onDestinationChanged: vi.fn(),
+}));
 
-import { onDestinationUnavailable } from '../../jobs/newsletterQueue.js';
+import { onDestinationChanged, onDestinationUnavailable } from '../../jobs/newsletterQueue.js';
 import { automationsReferencingDestinations } from '../../services/notifications/destinationRefs.js';
 import {
   createDestination,
@@ -383,6 +386,7 @@ describe('Destination Routes', () => {
       expect(response.statusCode).toBe(200);
       expect(response.json()).toMatchObject({ id: 'ntfy-1', referencedByAutomationCount: 1 });
       expect(updateDestination).toHaveBeenCalledWith('ntfy-1', { config: { topic: 'new' } });
+      expect(onDestinationChanged).toHaveBeenCalledWith('ntfy-1');
     });
 
     it('rejects clearing a required key', async () => {

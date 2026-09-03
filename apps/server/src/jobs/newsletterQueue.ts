@@ -7,6 +7,7 @@ import {
 } from '@tracearr/shared';
 import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
+import { getDestination } from '../services/notifications/destinationStore.js';
 import {
   deliverRecipient,
   markRecipientFailed,
@@ -58,7 +59,9 @@ export function initNewsletterQueues(redisUrl: string): void {
   deliveryQueue = new Queue<DeliveryJob>(DELIVERY_QUEUE, {
     connection,
     prefix,
-    defaultJobOptions: retention,
+    // A failed delivery job's own record is redundant once markRecipientFailed and the
+    // DLQ entry have run; keeping it around only leaves a duplicate to clean up.
+    defaultJobOptions: { removeOnComplete: retention.removeOnComplete, removeOnFail: true },
   });
   dlqQueue = new Queue<DeliveryJob>(DELIVERY_DLQ, {
     connection,
@@ -105,21 +108,45 @@ export function startNewsletterWorkers(): void {
 
   deliveryWorker = new Worker<DeliveryJob>(
     DELIVERY_QUEUE,
-    async (job: Job<DeliveryJob>) => deliverRecipient(job.data),
+    async (job: Job<DeliveryJob>) => {
+      try {
+        await deliverRecipient(job.data);
+      } catch (error) {
+        const last = job.attemptsMade + 1 >= (job.opts.attempts ?? DELIVERY_ATTEMPTS);
+        if (last || error instanceof UnrecoverableError) {
+          await markRecipientFailed(job.data.recipientId, error);
+        }
+        throw error;
+      }
+    },
     { connection, prefix, concurrency: 2 }
   );
   deliveryWorker.on('failed', (job, error) => {
     if (!job) return;
     const exhausted = job.attemptsMade >= (job.opts.attempts ?? DELIVERY_ATTEMPTS);
     if (!exhausted && !(error instanceof UnrecoverableError)) return;
-    void markRecipientFailed(job.data.recipientId, error).catch((err) =>
-      console.error('[Newsletters] could not record a failed delivery:', err)
-    );
-    if (dlqQueue) void dlqQueue.add('dlq-delivery', job.data, { jobId: `dlq-${job.id}` });
+    if (dlqQueue) {
+      void dlqQueue
+        .add('dlq-delivery', job.data, { jobId: `dlq-${job.id}` })
+        .catch((err: unknown) =>
+          console.error('[Newsletters] could not move delivery to the DLQ:', err)
+        );
+    }
   });
   deliveryWorker.on('error', (err) => {
     if (!isMaintenance()) console.error('[Newsletters] delivery worker error:', err);
   });
+}
+
+/** A schedule with nowhere usable to deliver to is not a schedule; the destination must exist, be an email destination, be enabled, and have a decryptable config. */
+async function destinationIsUsable(destinationId: string): Promise<boolean> {
+  const destination = await getDestination(destinationId);
+  return (
+    destination !== null &&
+    destination.type === 'email' &&
+    destination.enabled === true &&
+    destination.configStatus === 'ok'
+  );
 }
 
 export async function upsertNewsletterSchedule(row: {
@@ -131,7 +158,7 @@ export async function upsertNewsletterSchedule(row: {
 }): Promise<void> {
   const { run } = requireQueues();
   const id = schedulerId(row.id);
-  if (!row.enabled || !row.destinationId) {
+  if (!row.enabled || !row.destinationId || !(await destinationIsUsable(row.destinationId))) {
     await run.removeJobScheduler(id);
     return;
   }
@@ -200,6 +227,17 @@ export async function enqueueDeliveries(sendId: string, recipientIds: string[]):
 export async function onDestinationUnavailable(destinationId: string): Promise<void> {
   for (const row of await newslettersUsingDestination(destinationId)) {
     await removeNewsletterSchedule(row.id);
+  }
+}
+
+/** A destination edit (re-enabled, disabled, re-keyed, kind changed) can make or break every newsletter that points at it, so each gets its schedule reconsidered. */
+export async function onDestinationChanged(destinationId: string): Promise<void> {
+  for (const row of await newslettersUsingDestination(destinationId)) {
+    try {
+      await upsertNewsletterSchedule(row);
+    } catch (error) {
+      console.error(`[Newsletters] schedule for ${row.id} skipped:`, error);
+    }
   }
 }
 
