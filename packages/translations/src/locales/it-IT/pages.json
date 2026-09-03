@@ -703,7 +703,7 @@
       },
       "triggers": {
         "sessionStarted": "",
-        "sessionFirstSeen": "",
+        "sessionFirstSeen": "un flusso è visto per la prima volta",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
         "sessionPaused": "",
