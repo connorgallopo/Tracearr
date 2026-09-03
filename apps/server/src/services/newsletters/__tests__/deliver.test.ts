@@ -51,11 +51,19 @@ vi.mock('../../imageProxy.js', () => ({
   posterVersionFor: (path: string) => path,
 }));
 vi.mock('../../notifications/emailLogo.js', () => ({ readLogoPng: () => Buffer.from('png') }));
+const mockBranding = vi.fn();
+vi.mock('../../notifications/emailBranding.js', () => ({
+  resolveEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
+}));
 const mockSettings = vi.fn();
 vi.mock('../../settings.js', () => ({ getNetworkSettings: () => mockSettings() as unknown }));
 vi.mock('../links.js', () => ({ signUnsubscribeToken: (id: string) => `tok-${id}` }));
 
 import { deliverRecipient, markRecipientFailed } from '../deliver.js';
+
+const VIEW_TOKEN = 'v'.repeat(43);
+const VIEW_URL = `https://tracearr.example.com/api/v1/newsletters/view/${VIEW_TOKEN}`;
+const UNSUBSCRIBE_URL = 'https://tracearr.example.com/api/v1/email/unsubscribe/tok-r1';
 
 const config = {
   host: 'smtp.example.com',
@@ -87,8 +95,9 @@ const ctx = () => ({
     destinationId: 'd1',
     outcome: 'sending',
     subject: 'x',
-    html: '<img src="cid:logo"><p>Hi</p><img src="poster:m1" alt="Heat"><a href="{{unsubscribe_url}}">Unsubscribe</a>',
-    text: 'Hi\nUnsubscribe [{{unsubscribe_url}}]',
+    viewToken: VIEW_TOKEN,
+    html: '<img src="cid:logo"><p>Hi</p><img src="poster:m1" alt="Heat"><p><a href="{{view_url}}">View in browser</a></p><a href="{{unsubscribe_url}}">Unsubscribe</a>',
+    text: 'Hi\nView [{{view_url}}]\nUnsubscribe [{{unsubscribe_url}}]',
     posters: { m1: { serverId: 's1', thumbPath: '/t', version: 'v1' } },
   },
   newsletter: { id: 'n1', imageMode: 'auto' },
@@ -96,6 +105,16 @@ const ctx = () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockBranding.mockResolvedValue({
+    branding: {
+      senderName: 'Basement',
+      accentColor: '#0ea0b3',
+      footerText: null,
+      postalAddress: null,
+    },
+    logo: { mode: 'tracearr' },
+    mailtoUnsubscribe: false,
+  });
   store.loadDelivery.mockResolvedValue(ctx());
   store.beginAttempt.mockResolvedValue({
     previousMessageId: null,
@@ -137,17 +156,17 @@ describe('deliverRecipient', () => {
       replyTo: 'owner@example.com',
       subject: 'x',
       headers: {
-        'List-Unsubscribe': '<https://tracearr.example.com/api/v1/email/unsubscribe/tok-r1>',
+        'List-Unsubscribe': `<${UNSUBSCRIBE_URL}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
       },
     });
-    expect(String(mail.html)).toContain(
-      'href="https://tracearr.example.com/api/v1/email/unsubscribe/tok-r1"'
-    );
+    expect(String(mail.html)).toContain(`href="${UNSUBSCRIBE_URL}"`);
+    expect(String(mail.html)).toContain(`href="${VIEW_URL}"`);
+    expect(String(mail.html)).not.toContain('{{view_url}}');
     expect(String(mail.html)).toContain('src="cid:m1"');
-    expect(String(mail.text)).toContain(
-      'https://tracearr.example.com/api/v1/email/unsubscribe/tok-r1'
-    );
+    expect(String(mail.text)).toContain(UNSUBSCRIBE_URL);
+    expect(String(mail.text)).toContain(VIEW_URL);
+    expect(String(mail.text)).not.toContain('{{view_url}}');
     expect((mail.attachments as { cid: string }[]).map((a) => a.cid)).toEqual(['logo', 'm1']);
     expect(mockProxy).toHaveBeenCalledWith({
       serverId: 's1',
@@ -204,8 +223,58 @@ describe('deliverRecipient', () => {
     expect(mockProxy).toHaveBeenCalledWith(expect.objectContaining({ imagePath: '/t' }));
   });
 
-  it('refuses to send a snapshot whose unsubscribe placeholder can no longer be filled in', async () => {
+  it('carries the mailto form alongside the https one when the owner turned it on', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#0ea0b3',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: true,
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(mail.headers).toEqual({
+      'List-Unsubscribe': `<mailto:owner@example.com?subject=unsubscribe>, <${UNSUBSCRIBE_URL}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    });
+  });
+
+  it('keeps the https form alone when the mailto form has no reply-to address', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#0ea0b3',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: true,
+    });
+    mockReadConfig.mockReturnValue({ ok: true, config: { ...config, replyTo: '' }, rewrap: false });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(mail.headers).toEqual({
+      'List-Unsubscribe': `<${UNSUBSCRIBE_URL}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    });
+  });
+
+  it('refuses to send a snapshot whose placeholders can no longer be filled in', async () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
+    await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
+      'The external URL was removed after this send was rendered'
+    );
+    store.loadDelivery.mockResolvedValue({
+      ...ctx(),
+      send: {
+        ...ctx().send,
+        html: '<p><a href="{{view_url}}">View in browser</a></p>',
+        text: 'View [{{view_url}}]',
+      },
+    });
     await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
       'The external URL was removed after this send was rendered'
     );

@@ -117,6 +117,6 @@ export interface DigestInput {
   logoRef: string | null;
   /** Emitted verbatim; null renders the reply-to-unsubscribe line instead. */
   unsubscribeUrl: string | null;
-  /** Emitted verbatim when set; stage 2 always passes null. */
+  /** Emitted verbatim; null renders no browser-view link. */
   viewUrl: string | null;
 }

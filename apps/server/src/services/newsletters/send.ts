@@ -1,13 +1,21 @@
-import { renderDigest, defaultBranding } from '@tracearr/emails';
+import { renderDigest } from '@tracearr/emails';
 import type { NewsletterSendTrigger } from '@tracearr/shared';
 import { getDestination } from '../notifications/destinationStore.js';
+import { resolveEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { renderTemplate } from '../notifications/types.js';
 import { getNetworkSettings } from '../settings.js';
 import { assembleDigest } from './assemble.js';
 import { newViewToken } from './links.js';
 import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
-import { UNSUBSCRIBE_PLACEHOLDER, buildDigestInput, formatWindowDate } from './render.js';
+import {
+  UNSUBSCRIBE_PLACEHOLDER,
+  VIEW_PLACEHOLDER,
+  buildDigestInput,
+  formatWindowDate,
+  logoRefFor,
+  resolveImageMode,
+} from './render.js';
 import {
   OpenSendConflict,
   closeStaleSend,
@@ -118,10 +126,12 @@ export async function runNewsletter(
 
     const servers = await loadServerLinks(newsletter.scope.serverIds);
     const serversById = new Map(servers.map((s) => [s.id, s]));
-    const senderName = servers[0]?.name ?? 'Tracearr';
+    const { branding, logo } = await resolveEmailBranding(servers[0]?.name ?? 'Tracearr');
+    const mode = resolveImageMode(newsletter.imageMode, externalUrl);
+    const origin = externalUrl?.replace(/\/$/, '') ?? '';
     const itemCount = data.counts.movies + data.counts.episodes + data.counts.albums;
     const subject = renderTemplate(newsletter.subject, {
-      server_name: senderName,
+      server_name: branding.senderName,
       start_date: formatWindowDate(window.start, newsletter.timezone),
       end_date: formatWindowDate(window.end, newsletter.timezone),
       item_count: String(itemCount),
@@ -132,8 +142,9 @@ export async function runNewsletter(
       outro: newsletter.outro,
       windowStart: formatWindowDate(window.start, newsletter.timezone),
       windowEnd: formatWindowDate(window.end, newsletter.timezone),
-      logoRef: readLogoPng() ? 'cid:logo' : null,
+      logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
       unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
+      viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
       externalUrl,
       serversById,
     });
@@ -143,7 +154,7 @@ export async function runNewsletter(
       recipients,
       deliverable,
       subject,
-      rendered: await renderDigest(input, defaultBranding(senderName)),
+      rendered: await renderDigest(input, branding),
     };
   };
 

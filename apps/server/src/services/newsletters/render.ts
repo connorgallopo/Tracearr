@@ -1,6 +1,7 @@
 import {
   POSTER_IMAGE_SIZE,
   buildMediaServerItemUrl,
+  type EmailBrandingSettings,
   type NewsletterImageMode,
   type ServerType,
 } from '@tracearr/shared';
@@ -14,6 +15,22 @@ export type ResolvedImageMode = 'hosted' | 'inline' | 'none';
 
 /** Written into the snapshot at render time and replaced per recipient at delivery. */
 export const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
+export const VIEW_PLACEHOLDER = '{{view_url}}';
+/** Serves data/logo.png when the owner installed one; the browser surfaces use it relative to the app origin. */
+export const LOGO_ROUTE = '/api/v1/images/logo';
+
+/** The owner's URL in every mode but none; the Tracearr PNG inline or hosted; nothing when images are off. */
+export function logoRefFor(
+  logo: EmailBrandingSettings['logo'],
+  mode: ResolvedImageMode,
+  base: string,
+  hasPng: boolean
+): string | null {
+  if (mode === 'none' || logo.mode === 'none') return null;
+  if (logo.mode === 'url') return logo.url;
+  if (!hasPng) return null;
+  return mode === 'hosted' ? `${base}${LOGO_ROUTE}` : 'cid:logo';
+}
 
 /** Hosted needs a reachable external URL and stays opt-in; auto is inline because that works everywhere. */
 export function resolveImageMode(
@@ -60,7 +77,8 @@ const SERVER_TYPES = new Set<string>(['plex', 'jellyfin', 'emby']);
 export function digestLinks(
   card: DigestCard,
   externalUrl: string | null,
-  serversById: Map<string, ServerLink>
+  serversById: Map<string, ServerLink>,
+  includeImdb = true
 ): EmailLink[] {
   const links: EmailLink[] = [];
   if (externalUrl && card.mediaId) {
@@ -79,7 +97,8 @@ export function digestLinks(
     });
     if (url) links.push({ label: server.name, url });
   }
-  if (card.imdbId) links.push({ label: 'IMDb', url: `https://www.imdb.com/title/${card.imdbId}/` });
+  if (includeImdb && card.imdbId)
+    links.push({ label: 'IMDb', url: `https://www.imdb.com/title/${card.imdbId}/` });
   return links;
 }
 
@@ -94,6 +113,7 @@ export function buildDigestInput(
     windowEnd: string;
     logoRef: string | null;
     unsubscribeUrl: string | null;
+    viewUrl: string | null;
     externalUrl: string | null;
     serversById: Map<string, ServerLink>;
   }
@@ -147,10 +167,10 @@ export function buildDigestInput(
       title: w.title,
       year: w.year,
       plays: w.plays,
-      links: [],
+      links: digestLinks(w, opts.externalUrl, opts.serversById, false),
     })),
     logoRef: opts.logoRef,
     unsubscribeUrl: opts.unsubscribeUrl,
-    viewUrl: null,
+    viewUrl: opts.viewUrl,
   };
 }

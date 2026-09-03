@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { renderDigest, defaultBranding } from '@tracearr/emails';
+import { renderDigest } from '@tracearr/emails';
 import {
   createNewsletterSchema,
   newsletterSendsQuerySchema,
@@ -24,6 +24,7 @@ import { resolveRecipients } from '../services/newsletters/recipients.js';
 import {
   buildDigestInput,
   formatWindowDate,
+  logoRefFor,
   substitutePosterRefs,
 } from '../services/newsletters/render.js';
 import {
@@ -47,6 +48,8 @@ import {
 } from '../services/newsletters/store.js';
 import { computeWindow } from '../services/newsletters/window.js';
 import { getDestination } from '../services/notifications/destinationStore.js';
+import { resolveEmailBranding } from '../services/notifications/emailBranding.js';
+import { readLogoPng } from '../services/notifications/emailLogo.js';
 import { renderTemplate } from '../services/notifications/types.js';
 import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
@@ -175,9 +178,9 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       resolveRecipients(row),
       loadServerLinks(row.scope.serverIds),
     ]);
-    const senderName = servers[0]?.name ?? 'Tracearr';
+    const { branding, logo } = await resolveEmailBranding(servers[0]?.name ?? 'Tracearr');
     const subject = renderTemplate(row.subject, {
-      server_name: senderName,
+      server_name: branding.senderName,
       start_date: formatWindowDate(window.start, row.timezone),
       end_date: formatWindowDate(window.end, row.timezone),
       item_count: String(data.counts.movies + data.counts.episodes + data.counts.albums),
@@ -189,12 +192,13 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
         outro: row.outro,
         windowStart: formatWindowDate(window.start, row.timezone),
         windowEnd: formatWindowDate(window.end, row.timezone),
-        logoRef: null,
+        logoRef: logoRefFor(logo, 'hosted', '', readLogoPng() !== null),
         unsubscribeUrl: externalUrl ? '#' : null,
+        viewUrl: null,
         externalUrl,
         serversById: new Map(servers.map((s) => [s.id, s])),
       }),
-      defaultBranding(senderName)
+      branding
     );
     const suppressed = resolution.recipients.filter((r) => r.suppressed).length;
     const preview: NewsletterPreview = {

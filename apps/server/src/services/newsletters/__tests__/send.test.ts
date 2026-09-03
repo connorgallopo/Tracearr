@@ -26,7 +26,14 @@ vi.mock('../recipients.js', () => ({
 vi.mock('../links.js', () => ({ newViewToken: () => 'view-token' }));
 const mockSettings = vi.fn();
 vi.mock('../../settings.js', () => ({ getNetworkSettings: () => mockSettings() as unknown }));
-vi.mock('../../notifications/emailLogo.js', () => ({ readLogoPng: () => Buffer.from('png') }));
+const mockLogoPng = vi.fn();
+vi.mock('../../notifications/emailLogo.js', () => ({
+  readLogoPng: () => mockLogoPng() as unknown,
+}));
+const mockBranding = vi.fn();
+vi.mock('../../notifications/emailBranding.js', () => ({
+  resolveEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
+}));
 const mockDestination = vi.fn();
 vi.mock('../../notifications/destinationStore.js', () => ({
   getDestination: (...a: unknown[]) => mockDestination(...a) as unknown,
@@ -85,6 +92,12 @@ const ONE_MOVIE = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockLogoPng.mockReturnValue(Buffer.from('png'));
+  mockBranding.mockImplementation(async (name: string) => ({
+    branding: { senderName: name, accentColor: '#0ea0b3', footerText: null, postalAddress: null },
+    logo: { mode: 'tracearr' },
+    mailtoUnsubscribe: false,
+  }));
   store.getNewsletter.mockResolvedValue(NEWSLETTER);
   store.findOpenSend.mockResolvedValue(null);
   store.closeStaleSend.mockResolvedValue(false);
@@ -123,10 +136,16 @@ beforeEach(() => {
   });
 });
 
-function firstSend(): { html?: string } {
+function firstSend(): { subject?: string; html?: string; text?: string } {
   const [first] = store.insertSend.mock.calls[0] ?? [];
   expect(first).toBeDefined();
-  return first as { html?: string };
+  return first as { subject?: string; html?: string; text?: string };
+}
+
+async function renderedHtml(): Promise<string> {
+  store.insertSend.mockClear();
+  await runNewsletter(NEWSLETTER.id, 'schedule');
+  return String(firstSend().html);
 }
 
 describe('runNewsletter', () => {
@@ -147,7 +166,9 @@ describe('runNewsletter', () => {
     expect(String(send.subject)).toMatch(/^What's new on Basement \(\w{3} \d{1,2}, \d{4}\) 1$/);
     expect(String(send.html)).toContain('src="poster:m1"');
     expect(String(send.html)).toContain('href="{{unsubscribe_url}}"');
+    expect(String(send.html)).toContain('href="{{view_url}}"');
     expect(String(send.text)).toContain('{{unsubscribe_url}}');
+    expect(String(send.text)).toContain('{{view_url}}');
     expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
       { address: 'a@x.com', userId: 'u1', status: 'queued' },
       { address: 'gone@x.com', userId: 'u2', status: 'suppressed' },
@@ -168,6 +189,62 @@ describe('runNewsletter', () => {
     expect(String(firstSend().html)).toMatch(
       /What&#x27;s new on Basement \(\w{3} \d{1,2}, \d{4}\) 1/
     );
+  });
+
+  it('renders through the branding block, with its sender name in the subject and its accent in the html', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Family Media',
+        accentColor: '#123456',
+        footerText: 'The house server',
+        postalAddress: '1 Main St',
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: false,
+    });
+    await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(mockBranding).toHaveBeenCalledWith('Basement');
+    const send = firstSend();
+    expect(String(send.subject)).toMatch(/^What's new on Family Media \(\w{3} \d{1,2}, \d{4}\) 1$/);
+    const html = String(send.html);
+    expect(html).toContain('#123456');
+    expect(html).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(html).toContain('The house server');
+    expect(html).toContain('1 Main St');
+  });
+
+  it('points the logo at the hosted route, a cid, or nothing, by image mode', async () => {
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'hosted' });
+    expect(await renderedHtml()).toContain('src="https://tracearr.example.com/api/v1/images/logo"');
+
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'auto' });
+    expect(await renderedHtml()).toContain('src="cid:logo"');
+
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'none' });
+    expect(await renderedHtml()).not.toContain('cid:logo');
+
+    store.getNewsletter.mockResolvedValue(NEWSLETTER);
+    mockLogoPng.mockReturnValue(null);
+    expect(await renderedHtml()).not.toContain('cid:logo');
+  });
+
+  it('uses the owner logo url in place of the Tracearr png in either image mode', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#0ea0b3',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'url', url: 'https://x.test/l.png' },
+      mailtoUnsubscribe: false,
+    });
+    mockLogoPng.mockReturnValue(null);
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'hosted' });
+    expect(await renderedHtml()).toContain('src="https://x.test/l.png"');
+
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'auto' });
+    expect(await renderedHtml()).toContain('src="https://x.test/l.png"');
   });
 
   it('skips an empty window with a recorded send and no recipients', async () => {
@@ -244,6 +321,8 @@ describe('runNewsletter', () => {
     const html = String(firstSend().html);
     expect(html).toContain('Reply to this email to unsubscribe');
     expect(html).not.toContain('{{unsubscribe_url}}');
+    expect(html).not.toContain('{{view_url}}');
+    expect(html).not.toContain('View in browser');
   });
 
   it('records a failed send when assembly throws before any send row exists, and rethrows', async () => {

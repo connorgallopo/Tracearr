@@ -6,10 +6,16 @@ import { proxyImage } from '../imageProxy.js';
 import { getDestination, readConfig, rewrapConfig } from '../notifications/destinationStore.js';
 import type { EmailAttachment, EmailConfig } from '../notifications/destinations/email.js';
 import { describeSmtpError, getTransporter } from '../notifications/destinations/emailTransport.js';
+import { resolveEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { getNetworkSettings } from '../settings.js';
 import { signUnsubscribeToken } from './links.js';
-import { UNSUBSCRIBE_PLACEHOLDER, resolveImageMode, substitutePosterRefs } from './render.js';
+import {
+  UNSUBSCRIBE_PLACEHOLDER,
+  VIEW_PLACEHOLDER,
+  resolveImageMode,
+  substitutePosterRefs,
+} from './render.js';
 import {
   beginAttempt,
   finalizeSend,
@@ -93,7 +99,11 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   const unsubscribeUrl = base
     ? `${base}/api/v1/email/unsubscribe/${signUnsubscribeToken(ctx.recipient.id)}`
     : null;
-  if (!unsubscribeUrl && ctx.send.html.includes(UNSUBSCRIBE_PLACEHOLDER)) {
+  const viewUrl = base ? `${base}/api/v1/newsletters/view/${ctx.send.viewToken}` : null;
+  if (
+    !base &&
+    (ctx.send.html.includes(UNSUBSCRIBE_PLACEHOLDER) || ctx.send.html.includes(VIEW_PLACEHOLDER))
+  ) {
     throw new UnrecoverableError('The external URL was removed after this send was rendered');
   }
 
@@ -106,9 +116,13 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
           Object.entries(ctx.send.posters).filter(([cardId]) => html.includes(`cid:${cardId}`))
         )
       : {};
-  if (unsubscribeUrl) {
-    html = html.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);
-    text = text.replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl);
+  if (unsubscribeUrl && viewUrl) {
+    html = html
+      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl)
+      .replaceAll(VIEW_PLACEHOLDER, viewUrl);
+    text = text
+      .replaceAll(UNSUBSCRIBE_PLACEHOLDER, unsubscribeUrl)
+      .replaceAll(VIEW_PLACEHOLDER, viewUrl);
   }
   const attachments: EmailAttachment[] = [];
   const logo = readLogoPng();
@@ -121,6 +135,13 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
     });
   }
   attachments.push(...(await posterAttachments(cid)));
+
+  const { mailtoUnsubscribe } = await resolveEmailBranding('Tracearr');
+  const listUnsubscribe = unsubscribeUrl
+    ? mailtoUnsubscribe && transport.config.replyTo
+      ? `<mailto:${transport.config.replyTo}?subject=unsubscribe>, <${unsubscribeUrl}>`
+      : `<${unsubscribeUrl}>`
+    : null;
 
   const domain = transport.config.fromAddress.split('@')[1] ?? 'tracearr.local';
   const messageId = `<${randomUUID()}@${domain}>`;
@@ -148,10 +169,10 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
       text,
       messageId,
       attachments,
-      ...(unsubscribeUrl
+      ...(listUnsubscribe
         ? {
             headers: {
-              'List-Unsubscribe': `<${unsubscribeUrl}>`,
+              'List-Unsubscribe': listUnsubscribe,
               'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
             },
           }

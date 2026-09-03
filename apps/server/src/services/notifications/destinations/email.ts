@@ -1,14 +1,14 @@
 import { randomUUID } from 'node:crypto';
-import { DESTINATION_TYPES, POSTER_IMAGE_SIZE, addressList } from '@tracearr/shared';
 import {
-  defaultBranding,
-  renderEvent,
-  renderTest,
-  type EventCard,
-  type EventEmailInput,
-} from '@tracearr/emails';
+  DESTINATION_TYPES,
+  POSTER_IMAGE_SIZE,
+  addressList,
+  type EmailBrandingSettings,
+} from '@tracearr/shared';
+import { renderEvent, renderTest, type EventCard, type EventEmailInput } from '@tracearr/emails';
 import { proxyImage } from '../../imageProxy.js';
 import { getNetworkSettings } from '../../settings.js';
+import { resolveEmailBranding } from '../emailBranding.js';
 import { readLogoPng } from '../emailLogo.js';
 import { mediaHeadline, mediaSubtitle, qualityMoves, qualityText } from '../formatters/media.js';
 import { formatPluginUpdateMessage } from '../formatters/pluginUpdate.js';
@@ -66,6 +66,16 @@ function messageId(fromAddress: string): string {
 function logoAttachment(): EmailAttachment | null {
   const png = readLogoPng();
   return png ? { filename: 'logo.png', cid: 'logo', content: png, contentType: 'image/png' } : null;
+}
+
+/** The owner's URL needs no attachment; the Tracearr PNG rides along as a cid. */
+function eventLogo(setting: EmailBrandingSettings['logo']): {
+  ref: string | null;
+  attachment: EmailAttachment | null;
+} {
+  if (setting.mode === 'url') return { ref: setting.url, attachment: null };
+  const attachment = setting.mode === 'tracearr' ? logoAttachment() : null;
+  return { ref: attachment ? `cid:${attachment.cid}` : null, attachment };
 }
 
 /** A placeholder svg or a failed fetch means no poster, never a failed send. */
@@ -211,8 +221,9 @@ function serverNameOf(payload: NotificationPayload): string {
 async function build(event: NotificationEvent, ctx: RenderContext): Promise<EmailMessage> {
   const payload = toNotificationPayload(event, ctx.source);
   const attachments: EmailAttachment[] = [];
-  const logo = logoAttachment();
-  if (logo) attachments.push(logo);
+  const { branding, logo: logoSetting } = await resolveEmailBranding(serverNameOf(payload));
+  const logo = eventLogo(logoSetting);
+  if (logo.attachment) attachments.push(logo.attachment);
 
   let card: EventCard | null = violationCard(payload);
   if (payload.context.type === 'media_added' || payload.context.type === 'media_upgraded') {
@@ -230,10 +241,10 @@ async function build(event: NotificationEvent, ctx: RenderContext): Promise<Emai
     severity: payload.severity,
     timestamp: payload.timestamp,
     card,
-    logoRef: logo ? `cid:${logo.cid}` : null,
+    logoRef: logo.ref,
     appUrl: externalUrl,
   };
-  const rendered = await renderEvent(input, defaultBranding(serverNameOf(payload)));
+  const rendered = await renderEvent(input, branding);
   return { ...rendered, attachments };
 }
 
@@ -273,12 +284,17 @@ async function test(config: EmailConfig, ctx: DeliverContext): Promise<void> {
   const transporter = createTransporter(config);
   try {
     await transporter.verify();
-    const logo = logoAttachment();
+    const { branding, logo: logoSetting } = await resolveEmailBranding('Tracearr');
+    const logo = eventLogo(logoSetting);
     const rendered = await renderTest(
-      { destinationName: ctx.destination.name, logoRef: logo ? `cid:${logo.cid}` : null },
-      defaultBranding('Tracearr')
+      { destinationName: ctx.destination.name, logoRef: logo.ref },
+      branding
     );
-    await send(transporter, { ...rendered, attachments: logo ? [logo] : [] }, config);
+    await send(
+      transporter,
+      { ...rendered, attachments: logo.attachment ? [logo.attachment] : [] },
+      config
+    );
   } catch (error) {
     throw new Error(describeSmtpError(error, config), { cause: error });
   } finally {

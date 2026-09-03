@@ -33,6 +33,11 @@ vi.mock('../../settings.js', () => ({
   getNetworkSettings: () => mockGetNetworkSettings() as unknown,
 }));
 
+const mockBranding = vi.fn();
+vi.mock('../emailBranding.js', () => ({
+  resolveEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
+}));
+
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { _resetTransportersForTests } from '../destinations/emailTransport.js';
 import { emailType, type EmailConfig, type EmailMessage } from '../destinations/email.js';
@@ -130,6 +135,11 @@ beforeEach(() => {
   mockGetNetworkSettings
     .mockReset()
     .mockResolvedValue({ externalUrl: 'https://tracearr.example.com', trustProxy: false });
+  mockBranding.mockReset().mockImplementation(async (name: string) => ({
+    branding: { senderName: name, accentColor: '#0ea0b3', footerText: null, postalAddress: null },
+    logo: { mode: 'tracearr' },
+    mailtoUnsubscribe: false,
+  }));
 });
 afterEach(() => _resetTransportersForTests());
 
@@ -201,6 +211,53 @@ describe('emailType.render', () => {
     mockProxyImage.mockRejectedValueOnce(new Error('offline'));
     const thrown = await render(mediaAdded);
     expect(thrown.attachments.map((a) => a.cid)).toEqual(['logo']);
+  });
+
+  it('renders through the branding block, with a stored sender name beating the server name', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Family Media',
+        accentColor: '#123456',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: false,
+    });
+    const out = await render(mediaAdded);
+    expect(mockBranding).toHaveBeenCalledWith('Basement');
+    expect(out.html).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(out.html).toContain('#123456');
+  });
+
+  it('links the owner logo url instead of attaching the Tracearr png, and mode none renders none', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#0ea0b3',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'url', url: 'https://x.test/l.png' },
+      mailtoUnsubscribe: false,
+    });
+    const url = await render(mediaAdded);
+    expect(url.html).toContain('src="https://x.test/l.png"');
+    expect(url.attachments.map((a) => a.cid)).toEqual(['poster']);
+
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#0ea0b3',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'none' },
+      mailtoUnsubscribe: false,
+    });
+    const none = await render(mediaAdded);
+    expect(none.html).not.toContain('cid:logo');
+    expect(none.attachments.map((a) => a.cid)).toEqual(['poster']);
   });
 
   it('omits the logo when none is on disk and the app link when no external url is set', async () => {
@@ -280,7 +337,27 @@ describe('emailType.test', () => {
       to: ['a@example.com', 'b@example.org'],
       subject: 'Test email from Tracearr (Ops email)',
     });
+    expect(mockBranding).toHaveBeenCalledWith('Tracearr');
     expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the test email through the branding block and skips the logo it does not use', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Family Media',
+        accentColor: '#123456',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'none' },
+      mailtoUnsubscribe: false,
+    });
+    await emailType.test(config, deliverCtx);
+    const sent = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(String(sent.html)).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(String(sent.html)).toContain('#123456');
+    expect(String(sent.html)).not.toContain('cid:logo');
+    expect(sent.attachments).toEqual([]);
   });
 
   it('turns an auth failure into a readable message and still closes', async () => {

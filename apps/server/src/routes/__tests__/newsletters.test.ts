@@ -51,6 +51,13 @@ const mockResolve = vi.fn();
 vi.mock('../../services/newsletters/recipients.js', () => ({
   resolveRecipients: (...a: unknown[]) => mockResolve(...a) as unknown,
 }));
+const mockBranding = vi.fn();
+vi.mock('../../services/notifications/emailBranding.js', () => ({
+  resolveEmailBranding: (...a: unknown[]) => mockBranding(...a) as unknown,
+}));
+vi.mock('../../services/notifications/emailLogo.js', () => ({
+  readLogoPng: () => Buffer.from('png'),
+}));
 
 import { newsletterRoutes } from '../newsletters.js';
 
@@ -97,6 +104,11 @@ async function build(user: AuthUser): Promise<FastifyInstance> {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockBranding.mockImplementation(async (name: string) => ({
+    branding: { senderName: name, accentColor: '#123456', footerText: null, postalAddress: null },
+    logo: { mode: 'tracearr' },
+    mailtoUnsubscribe: false,
+  }));
   mockDestination.mockResolvedValue({ id: DEST, type: 'email', enabled: true, configStatus: 'ok' });
   mockSettings.mockResolvedValue({
     externalUrl: 'https://tracearr.example.com',
@@ -324,6 +336,40 @@ describe('newsletter routes', () => {
     expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
     expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
     expect(json.html).toContain('Heat');
+    expect(mockBranding).toHaveBeenCalledWith('Basement');
+    expect(json.html).toContain('#123456');
+    expect(json.html).toContain('src="/api/v1/images/logo"');
+  });
+
+  it('preview shows the owner logo url when the branding block carries one', async () => {
+    mockBranding.mockResolvedValue({
+      branding: {
+        senderName: 'Basement',
+        accentColor: '#123456',
+        footerText: null,
+        postalAddress: null,
+      },
+      logo: { mode: 'url', url: 'https://x.test/l.png' },
+      mailtoUnsubscribe: false,
+    });
+    const app = await build(owner);
+    store.lastWatermark.mockResolvedValue(null);
+    store.loadServerLinks.mockResolvedValue([]);
+    mockAssemble.mockResolvedValue({
+      data: {
+        movies: [],
+        shows: [],
+        artists: [],
+        mostWatched: [],
+        counts: { movies: 0, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: true,
+      },
+      posters: {},
+    });
+    mockResolve.mockResolvedValue({ recipients: [], missingEmail: 0 });
+    const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().html).toContain('src="https://x.test/l.png"');
   });
 
   it('lists sends with pagination and retries failed recipients', async () => {

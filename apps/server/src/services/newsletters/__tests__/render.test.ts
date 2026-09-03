@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { DigestData } from '../assemble.js';
 import {
+  LOGO_ROUTE,
+  VIEW_PLACEHOLDER,
   buildDigestInput,
+  digestLinks,
   formatWindowDate,
+  logoRefFor,
   resolveImageMode,
   substitutePosterRefs,
 } from '../render.js';
@@ -55,7 +59,50 @@ describe('resolveImageMode', () => {
   });
 });
 
+describe('logoRefFor', () => {
+  const tracearr = { mode: 'tracearr' as const };
+  const url = { mode: 'url' as const, url: 'https://x.test/logo.png' };
+  const none = { mode: 'none' as const };
+
+  it('attaches inline, links hosted, and drops the logo without images', () => {
+    expect(logoRefFor(tracearr, 'inline', '', true)).toBe('cid:logo');
+    expect(logoRefFor(tracearr, 'hosted', 'https://x.test', true)).toBe(
+      'https://x.test/api/v1/images/logo'
+    );
+    expect(logoRefFor(tracearr, 'hosted', '', true)).toBe(LOGO_ROUTE);
+    expect(logoRefFor(tracearr, 'none', 'https://x.test', true)).toBeNull();
+  });
+
+  it('needs a png for the tracearr logo', () => {
+    expect(logoRefFor(tracearr, 'inline', '', false)).toBeNull();
+    expect(logoRefFor(tracearr, 'hosted', 'https://x.test', false)).toBeNull();
+  });
+
+  it('uses the owner url in every mode but none, and none never renders one', () => {
+    expect(logoRefFor(url, 'inline', '', false)).toBe('https://x.test/logo.png');
+    expect(logoRefFor(url, 'hosted', 'https://x.test', false)).toBe('https://x.test/logo.png');
+    expect(logoRefFor(url, 'none', '', true)).toBeNull();
+    expect(logoRefFor(none, 'inline', '', true)).toBeNull();
+    expect(logoRefFor(none, 'hosted', 'https://x.test', true)).toBeNull();
+  });
+});
+
 describe('buildDigestInput', () => {
+  const watched = {
+    cardId: 'w1',
+    serverId: 's1',
+    serverName: 'Basement',
+    serverType: 'plex',
+    ratingKey: '77',
+    mediaId: 'media-9',
+    imdbId: 'tt0468569',
+    thumbPath: null,
+    kind: 'movie' as const,
+    title: 'The Dark Knight',
+    year: 2008,
+    plays: 12,
+  };
+
   it('carries the exact Tracearr, media server and IMDb link strings for a movie card', () => {
     const data: DigestData = {
       movies: [
@@ -76,8 +123,8 @@ describe('buildDigestInput', () => {
       ],
       shows: [],
       artists: [],
-      mostWatched: [],
-      counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+      mostWatched: [watched],
+      counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 1 },
       isEmpty: false,
     };
     const serversById = new Map<string, ServerLink>([
@@ -103,6 +150,7 @@ describe('buildDigestInput', () => {
         windowEnd: 'Aug 8, 2026',
         logoRef: null,
         unsubscribeUrl: null,
+        viewUrl: VIEW_PLACEHOLDER,
         externalUrl: 'https://tracearr.example.com',
         serversById,
       }
@@ -115,6 +163,18 @@ describe('buildDigestInput', () => {
       },
       { label: 'IMDb', url: 'https://www.imdb.com/title/tt0113277/' },
     ]);
+    expect(input.viewUrl).toBe('{{view_url}}');
+
+    const withoutImdb = digestLinks(watched, 'https://tracearr.example.com', serversById, false);
+    expect(withoutImdb).toEqual([
+      { label: 'Tracearr', url: 'https://tracearr.example.com/media/media-9' },
+      {
+        label: 'Basement',
+        url: 'https://app.plex.tv/desktop/#!/server/mach-1/details?key=%2Flibrary%2Fmetadata%2F77',
+      },
+    ]);
+    expect(digestLinks(watched, 'https://tracearr.example.com', serversById)).toHaveLength(3);
+    expect(input.mostWatched[0]?.links).toEqual(withoutImdb);
   });
 });
 
