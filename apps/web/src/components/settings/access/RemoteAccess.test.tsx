@@ -81,7 +81,7 @@ describe('RemoteAccess', () => {
   it('marks Tailscale as beta with the shared badge', () => {
     render(<RemoteAccess />);
 
-    expect(screen.getByText('BETA')).toHaveAttribute('data-variant', 'warning');
+    expect(screen.getByText('beta')).toHaveAttribute('data-variant', 'warning');
   });
 
   it('lists a connected tailnet as label and value pairs, never a table', () => {

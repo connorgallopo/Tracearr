@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   Upload,
   Info,
+  type LucideIcon,
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { api } from '@/lib/api';
@@ -72,6 +73,37 @@ function RecordsSkippedNotice({
         {hintKey && <span className="text-muted-foreground">{t(hintKey)}</span>}
       </AlertDescription>
     </Alert>
+  );
+}
+
+/** Tautulli and Jellystat both start their import with the same button; only the icon and target state differ. */
+function StartImportButton({
+  onClick,
+  disabled,
+  importing,
+  icon: Icon,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  importing: boolean;
+  icon: LucideIcon;
+}) {
+  const { t } = useTranslation('settings');
+
+  return (
+    <Button onClick={onClick} disabled={disabled} size="lg">
+      {importing ? (
+        <>
+          <Loader2 className="animate-spin" />
+          {t('import.importing')}
+        </>
+      ) : (
+        <>
+          <Icon className="mr-2 h-4 w-4" />
+          {t('import.startImport')}
+        </>
+      )}
+    </Button>
   );
 }
 
@@ -258,23 +290,12 @@ function TautulliImportSection({
                 </div>
               </div>
 
-              <Button
+              <StartImportButton
                 onClick={handleStartTautulliImport}
                 disabled={!selectedPlexServerId || isTautulliImporting}
-                size="lg"
-              >
-                {isTautulliImporting ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    {t('import.importing')}
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-4 w-4" />
-                    {t('import.startImport')}
-                  </>
-                )}
-              </Button>
+                importing={isTautulliImporting}
+                icon={Download}
+              />
 
               {tautulliProgressData && (
                 <ImportProgressCard progress={tautulliProgressData} showPageProgress />
@@ -436,23 +457,12 @@ function JellystatImportSection({
 
       {/* Import Button */}
       <div className="border-t pt-6">
-        <Button
+        <StartImportButton
           onClick={handleStartJellystatImport}
           disabled={!selectedJellyfinServerId || !selectedFile || isJellystatImporting}
-          size="lg"
-        >
-          {isJellystatImporting ? (
-            <>
-              <Loader2 className="animate-spin" />
-              {t('import.importing')}
-            </>
-          ) : (
-            <>
-              <Upload className="mr-2 h-4 w-4" />
-              {t('import.startImport')}
-            </>
-          )}
-        </Button>
+          importing={isJellystatImporting}
+          icon={Upload}
+        />
 
         {jellystatProgressData && (
           <div className="mt-4">
