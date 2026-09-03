@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type RouteOptions } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
@@ -14,6 +14,7 @@ const store = vi.hoisted(() => ({
   lastSend: vi.fn(),
   listSends: vi.fn(),
   getSend: vi.fn(),
+  getSendByViewToken: vi.fn(),
   listRecipients: vi.fn(),
   resetFailedRecipients: vi.fn(),
   loadServerLinks: vi.fn(),
@@ -59,6 +60,7 @@ vi.mock('../../services/notifications/emailLogo.js', () => ({
   readLogoPng: () => Buffer.from('png'),
 }));
 
+import { buildProxyUrl } from '../../services/imageProxy.js';
 import { newsletterRoutes } from '../newsletters.js';
 
 const owner: AuthUser = { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] };
@@ -66,6 +68,16 @@ const admin: AuthUser = { userId: randomUUID(), username: 'admin', role: 'admin'
 const ID = '11111111-1111-4111-8111-111111111111';
 const DEST = '22222222-2222-4222-8222-222222222222';
 const SEND_ID = '5f0b3e3a-3f4e-4c46-9a5c-1d2f0d0f9d21';
+const TOKEN = 'a'.repeat(43);
+const snapshotSend = {
+  id: SEND_ID,
+  newsletterId: ID,
+  viewToken: TOKEN,
+  subject: 'Weekly digest',
+  outcome: 'sent',
+  html: '<p>Hi</p><img src="poster:m1" alt="Heat"><img src="cid:logo" alt="x"><p style="m"><a href="{{view_url}}">View in browser</a></p><p style="m"><a href="{{unsubscribe_url}}">Unsubscribe</a></p>',
+  posters: { m1: { serverId: 's1', thumbPath: '/t/1', version: 'v1' } },
+};
 const body = {
   name: 'Weekly',
   schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
@@ -90,10 +102,16 @@ const row = {
   skipWhenEmpty: true,
 };
 
-async function build(user: AuthUser): Promise<FastifyInstance> {
+const routes: RouteOptions[] = [];
+
+async function build(user: AuthUser | null): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(sensible);
+  app.addHook('onRoute', (route) => {
+    routes.push(route);
+  });
   app.decorate('requireOwner', async (request: unknown, reply: FastifyReply) => {
+    if (!user) return reply.unauthorized('Login required');
     (request as { user: AuthUser }).user = user;
     if (user.role !== 'owner') await reply.forbidden('Owner access required');
   });
@@ -104,6 +122,7 @@ async function build(user: AuthUser): Promise<FastifyInstance> {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  routes.length = 0;
   mockBranding.mockImplementation(async (name: string) => ({
     branding: { senderName: name, accentColor: '#123456', footerText: null, postalAddress: null },
     logo: { mode: 'tracearr' },
@@ -136,6 +155,7 @@ describe('newsletter routes', () => {
       ['POST', `/newsletters/${ID}/send`],
       ['GET', `/newsletters/${ID}/sends`],
       ['GET', `/newsletters/${ID}/sends/${SEND_ID}`],
+      ['GET', `/newsletters/${ID}/sends/${SEND_ID}/html`],
       ['POST', `/newsletters/${ID}/sends/${SEND_ID}/retry-failed`],
     ] as const) {
       const res = await app.inject({
@@ -416,5 +436,79 @@ describe('newsletter routes', () => {
     const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/not-a-uuid` });
     expect(res.statusCode).toBe(400);
     expect(store.getSend).not.toHaveBeenCalled();
+  });
+});
+
+describe('public view', () => {
+  it('serves the snapshot with relative images and inert footer lines', async () => {
+    store.getSendByViewToken.mockResolvedValue(snapshotSend);
+    const app = await build(null);
+    const res = await app.inject({ method: 'GET', url: `/newsletters/view/${TOKEN}` });
+    expect(res.statusCode).toBe(200);
+    expect(store.getSendByViewToken).toHaveBeenCalledWith(TOKEN);
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.headers['x-robots-tag']).toBe('noindex');
+    expect(res.headers['cache-control']).toBe('private, no-store');
+    expect(res.headers['content-security-policy']).toBe(
+      "default-src 'none'; img-src 'self' https:; style-src 'unsafe-inline'"
+    );
+    expect(res.body).toContain(
+      `src="${buildProxyUrl({ serverId: 's1', path: '/t/1', width: 360, height: 540, fallback: 'poster', version: 'v1' })}"`
+    );
+    expect(res.body).toContain('src="/api/v1/images/logo"');
+    expect(res.body).not.toContain('{{');
+    expect(res.body).not.toContain('View in browser');
+    expect(res.body).toContain('Unsubscribe links are only in the email itself.');
+  });
+
+  it('answers one 404 page for a malformed, unknown, or pruned token', async () => {
+    store.getSendByViewToken.mockResolvedValue(null);
+    const app = await build(null);
+    const malformed = await app.inject({ method: 'GET', url: '/newsletters/view/not-a-token' });
+    const unknown = await app.inject({ method: 'GET', url: `/newsletters/view/${'b'.repeat(43)}` });
+    store.getSendByViewToken.mockResolvedValue({ ...snapshotSend, html: null });
+    const pruned = await app.inject({ method: 'GET', url: `/newsletters/view/${TOKEN}` });
+    for (const res of [malformed, unknown, pruned]) {
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toBe(malformed.body);
+      expect(res.headers['x-robots-tag']).toBe('noindex');
+    }
+    expect(store.getSendByViewToken).toHaveBeenCalledTimes(2);
+  });
+
+  it('is rate limited and unauthenticated', async () => {
+    await build(null);
+    const route = routes.find((r) => r.url === '/newsletters/view/:token' && r.method === 'GET');
+    expect(route?.config).toEqual({ rateLimit: { max: 60, timeWindow: '1 minute' } });
+    expect(route?.preHandler).toBeUndefined();
+  });
+});
+
+describe('send html', () => {
+  it('returns the subject and the browser snapshot to the owner', async () => {
+    store.getSend.mockResolvedValue(snapshotSend);
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'GET',
+      url: `/newsletters/${ID}/sends/${SEND_ID}/html`,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().subject).toBe('Weekly digest');
+    expect(res.json().html).toContain('src="/api/v1/images/logo"');
+    expect(res.json().html).not.toContain('{{');
+  });
+
+  it('answers 404 when the snapshot is pruned or the send belongs elsewhere', async () => {
+    store.getSend.mockResolvedValue({ ...snapshotSend, html: null });
+    const app = await build(owner);
+    expect(
+      (await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/${SEND_ID}/html` }))
+        .statusCode
+    ).toBe(404);
+    store.getSend.mockResolvedValue({ ...snapshotSend, newsletterId: randomUUID() });
+    expect(
+      (await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/${SEND_ID}/html` }))
+        .statusCode
+    ).toBe(404);
   });
 });

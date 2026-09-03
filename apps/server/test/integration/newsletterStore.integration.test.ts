@@ -2,8 +2,9 @@
  * The newsletter store's load-bearing SQL: finalizeSend's CASE arms and its two
  * guards, markSendSending's rendering guard, beginAttempt, resetFailedRecipients,
  * lastWatermark's trigger and outcome filter, closeStaleSend's two branches,
- * queuedRecipientIds, and deleteNewsletter. Every tier but this one mocks the
- * Drizzle chain, so only Postgres can prove any of these predicates.
+ * queuedRecipientIds, deleteNewsletter, and getSendByViewToken. Every tier but
+ * this one mocks the Drizzle chain, so only Postgres can prove any of these
+ * predicates.
  *
  * Run with: pnpm --filter @tracearr/server test:integration -- newsletterStore
  */
@@ -19,6 +20,7 @@ import {
   closeStaleSend,
   deleteNewsletter,
   finalizeSend,
+  getSendByViewToken,
   lastWatermark,
   markSendSending,
   queuedRecipientIds,
@@ -367,6 +369,16 @@ describe('queuedRecipientIds', () => {
     expect(await queuedRecipientIds(send.id)).toEqual([
       seeded.find((r) => r.address === 'queued@example.com')!.id,
     ]);
+  });
+});
+
+describe('getSendByViewToken', () => {
+  it('finds a send by its view token and nothing by another', async () => {
+    const newsletter = await seedNewsletter();
+    const send = await seedSend(newsletter.id, { outcome: 'sent' });
+    const found = await getSendByViewToken(send.viewToken);
+    expect(found?.id).toBe(send.id);
+    expect(await getSendByViewToken('no-such-token')).toBeNull();
   });
 });
 

@@ -333,6 +333,15 @@ export async function getSend(sendId: string): Promise<SendRow | null> {
   return row ?? null;
 }
 
+export async function getSendByViewToken(token: string): Promise<SendRow | null> {
+  const [row] = await db
+    .select()
+    .from(newsletterSends)
+    .where(eq(newsletterSends.viewToken, token))
+    .limit(1);
+  return row ?? null;
+}
+
 export async function listRecipients(sendId: string): Promise<RecipientRow[]> {
   return db
     .select()

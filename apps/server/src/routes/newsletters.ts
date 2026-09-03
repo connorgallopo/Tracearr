@@ -7,8 +7,10 @@ import {
   newsletterTestSendSchema,
   updateNewsletterSchema,
   uuidSchema,
+  NEWSLETTER_VIEW_TOKEN_LENGTH,
   type Newsletter,
   type NewsletterPreview,
+  type NewsletterSendHtml,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
 import {
@@ -27,12 +29,14 @@ import {
   logoRefFor,
   substitutePosterRefs,
 } from '../services/newsletters/render.js';
+import { snapshotForBrowser } from '../services/newsletters/snapshot.js';
 import {
   createNewsletter,
   deleteNewsletter,
   findOpenSend,
   getNewsletter,
   getSend,
+  getSendByViewToken,
   lastSend,
   lastWatermark,
   listNewsletters,
@@ -53,11 +57,19 @@ import { readLogoPng } from '../services/notifications/emailLogo.js';
 import { renderTemplate } from '../services/notifications/types.js';
 import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
+import { PUBLIC_RATE_LIMIT, page, sendPublicPage } from './publicPage.js';
 
 const DUPLICATE_NAME = 'A newsletter with that name already exists';
 
 const idParams = z.object({ id: uuidSchema });
 const sendParams = z.object({ id: uuidSchema, sendId: uuidSchema });
+const viewParams = z.object({
+  token: z.string().regex(new RegExp(`^[A-Za-z0-9_-]{${NEWSLETTER_VIEW_TOKEN_LENGTH}}$`)),
+});
+const NOT_AVAILABLE = page(
+  'This newsletter is not available',
+  '<p>The link is incomplete, or the newsletter has been removed.</p>'
+);
 
 /** The checks a body must pass beyond its shape: the transport must be an email kind and hosted needs a public url. */
 async function validateReferences(input: {
@@ -112,6 +124,14 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       throw error;
     }
     return reply.code(201).send(await publicOf(row));
+  });
+
+  app.get('/view/:token', { config: { rateLimit: PUBLIC_RATE_LIMIT } }, async (request, reply) => {
+    const params = viewParams.safeParse(request.params);
+    const send = params.success ? await getSendByViewToken(params.data.token) : null;
+    const html = send ? snapshotForBrowser(send) : null;
+    if (!html) return sendPublicPage(reply, 404, NOT_AVAILABLE);
+    return sendPublicPage(reply, 200, html, true);
   });
 
   app.get('/:id', owner, async (request, reply) => {
@@ -265,6 +285,17 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (!send || send.newsletterId !== params.data.id) return reply.notFound('Send not found');
     const recipients = await listRecipients(send.id);
     return { ...toSendSummary(send), recipients: recipients.map(toRecipient) };
+  });
+
+  app.get('/:id/sends/:sendId/html', owner, async (request, reply) => {
+    const params = sendParams.safeParse(request.params);
+    if (!params.success) return reply.badRequest('Invalid id');
+    const send = await getSend(params.data.sendId);
+    if (!send || send.newsletterId !== params.data.id) return reply.notFound('Send not found');
+    const html = snapshotForBrowser(send);
+    if (!html) return reply.notFound('The snapshot has been pruned');
+    const body: NewsletterSendHtml = { subject: send.subject, html };
+    return body;
   });
 
   app.post('/:id/sends/:sendId/retry-failed', owner, async (request, reply) => {
