@@ -83,7 +83,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
            u.name,
            u.contact_email,
            u.email AS identity_email,
-           array_remove(array_agg(su.email), NULL) AS account_emails
+           array_remove(array_agg(su.email ORDER BY su.created_at, su.id), NULL) AS account_emails
     FROM users u
     JOIN server_users su ON su.user_id = u.id AND su.removed_at IS NULL
     WHERE u.role <> 'disabled' ${scope}
@@ -108,7 +108,7 @@ export async function resolveRecipients(newsletter: {
     : [];
   const addresses = [
     ...candidates.map(firstAddress).filter((a): a is string => a !== null),
-    ...newsletter.recipients.extraAddresses.map((e) => e.address),
+    ...newsletter.recipients.extraAddresses.map((e) => normalizeAddress(e.address)),
   ];
   const suppressed = await suppressedAmong(addresses);
   return mergeRecipients(candidates, newsletter.recipients.extraAddresses, suppressed);

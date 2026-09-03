@@ -1,5 +1,16 @@
-import { describe, expect, it } from 'vitest';
-import { mergeRecipients, type RecipientCandidate } from '../recipients.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const mockExecute = vi.fn();
+vi.mock('../../../db/client.js', () => ({
+  db: { execute: (...a: unknown[]) => mockExecute(...a) as unknown },
+}));
+const mockSuppressed = vi.fn();
+vi.mock('../suppressions.js', async (importActual) => ({
+  ...(await importActual<typeof import('../suppressions.js')>()),
+  suppressedAmong: (...a: unknown[]) => mockSuppressed(...a) as unknown,
+}));
+
+import { mergeRecipients, resolveRecipients, type RecipientCandidate } from '../recipients.js';
 
 const c = (over: Partial<RecipientCandidate>): RecipientCandidate => ({
   userId: 'u1',
@@ -70,5 +81,63 @@ describe('mergeRecipients', () => {
       { address: 'x@y.com', userId: null, name: null, suppressed: false },
     ]);
     expect(missingEmail).toBe(0);
+  });
+});
+
+describe('resolveRecipients', () => {
+  beforeEach(() => {
+    mockExecute.mockReset();
+    mockSuppressed.mockReset().mockResolvedValue(new Set(['gone@x.com']));
+  });
+
+  it('skips the database when members are not included and still checks extras for suppression', async () => {
+    const out = await resolveRecipients({
+      scope: { serverIds: [], libraryIds: [] },
+      recipients: {
+        members: false,
+        extraAddresses: [{ address: 'Gone@X.com' }, { address: 'new@x.com', name: 'New' }],
+      },
+    });
+    expect(mockExecute).not.toHaveBeenCalled();
+    expect(mockSuppressed).toHaveBeenCalledWith(['gone@x.com', 'new@x.com']);
+    expect(out).toEqual({
+      recipients: [
+        { address: 'gone@x.com', userId: null, name: null, suppressed: true },
+        { address: 'new@x.com', userId: null, name: 'New', suppressed: false },
+      ],
+      missingEmail: 0,
+    });
+  });
+
+  it('loads candidates, asks suppression about every resolvable address plus extras, and merges', async () => {
+    mockExecute.mockResolvedValue({
+      rows: [
+        {
+          user_id: 'u1',
+          name: 'One',
+          contact_email: null,
+          identity_email: 'One@X.com',
+          account_emails: ['a1@x.com'],
+        },
+        {
+          user_id: 'u2',
+          name: null,
+          contact_email: null,
+          identity_email: null,
+          account_emails: null,
+        },
+      ],
+    });
+    const out = await resolveRecipients({
+      scope: { serverIds: ['11111111-1111-4111-8111-111111111111'], libraryIds: [] },
+      recipients: { members: true, extraAddresses: [{ address: 'extra@x.com' }] },
+    });
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(mockSuppressed).toHaveBeenCalledWith(['one@x.com', 'extra@x.com']);
+    expect(out.recipients.map((r) => [r.address, r.userId, r.suppressed])).toEqual([
+      ['one@x.com', 'u1', false],
+      ['extra@x.com', null, false],
+    ]);
+    expect(out.missingEmail).toBe(1);
   });
 });
