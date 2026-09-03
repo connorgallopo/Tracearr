@@ -499,6 +499,8 @@
     "stableRelease": "Version stable",
     "title": "Mise à jour disponible",
     "updateCommand": "Commande de mise à jour",
+    "upstreamAhead": "",
+    "upstreamAheadDescription": "",
     "versionAvailable": "Version {{version}} disponible"
   }
 }

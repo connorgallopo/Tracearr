@@ -67,6 +67,8 @@
     "alert_other": "{{count}} alertes",
     "automation_one": "Automatisation {{count}}",
     "automation_other": "{{count}} automatisations",
+    "channel_one": "",
+    "channel_other": "",
     "device_one": "{{count}} appareil",
     "device_other": "{{count}} appareils",
     "error_one": "{{count}} erreur",
