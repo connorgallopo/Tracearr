@@ -15,8 +15,13 @@ export function readLogoPng(): Buffer | null {
     mtimeMs = null;
   }
   if (mtimeMs !== cachedMtimeMs) {
-    cachedMtimeMs = mtimeMs;
-    cachedPng = mtimeMs === null ? null : readFileSync(CUSTOM_LOGO_PATH);
+    try {
+      cachedPng = mtimeMs === null ? null : readFileSync(CUSTOM_LOGO_PATH);
+      cachedMtimeMs = mtimeMs;
+    } catch {
+      // An unreadable logo is no logo; leaving the cached mtime alone retries on the next call.
+      cachedPng = null;
+    }
   }
   return cachedPng;
 }

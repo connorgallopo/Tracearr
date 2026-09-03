@@ -41,6 +41,19 @@ describe('readLogoPng', () => {
     expect(mockReadFileSync).toHaveBeenCalledTimes(2);
   });
 
+  it('returns null when the file cannot be read and tries again on the next call', async () => {
+    const { readLogoPng } = await importFresh();
+    mockStatSync.mockReturnValue({ mtimeMs: 100 });
+    mockReadFileSync.mockImplementationOnce(() => {
+      throw new Error('EACCES');
+    });
+
+    expect(readLogoPng()).toBeNull();
+    mockReadFileSync.mockReturnValue(Buffer.from('logo-a'));
+    expect(readLogoPng()).toEqual(Buffer.from('logo-a'));
+    expect(mockReadFileSync).toHaveBeenCalledTimes(2);
+  });
+
   it('returns null without reading the file when statSync throws', async () => {
     const { readLogoPng } = await importFresh();
     mockStatSync.mockImplementation(() => {
