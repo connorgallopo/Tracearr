@@ -3,8 +3,6 @@ import { defaultBranding, renderDigest, type DigestInput } from '../index.js';
 
 const branding = defaultBranding('Basement Plex');
 const SERVER = '11111111-1111-4111-8111-111111111111';
-const hosted = (n: number) =>
-  `https://tracearr.example.com/api/v1/images/proxy?server=${SERVER}&url=%2Flibrary%2Fmetadata%2F${n}%2Fthumb&width=360&height=540&fallback=poster&v=abcdef12`;
 const links = [
   {
     label: 'Basement Plex',
@@ -12,6 +10,71 @@ const links = [
   },
   { label: 'IMDb', url: 'https://www.imdb.com/title/tt0113277/' },
 ];
+
+// The caps the assembler feeds this template, mirroring NEWSLETTER_SECTION_MAX,
+// NEWSLETTER_SEASONS_PER_SHOW_MAX and NEWSLETTER_MOST_WATCHED_MAX in
+// @tracearr/shared; this package does not depend on that one.
+const SECTION_MAX = 12;
+const SEASONS_PER_SHOW_MAX = 8;
+const MOST_WATCHED_MAX = 10;
+
+/** 40 characters, a plausible length for the external URL every Tracearr link is built on. */
+const EXTERNAL = 'https://newsletters.mydomain-example.com';
+const PLEX_MACHINE = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+const JELLYFIN = 'https://jellyfin.mydomain-example.com';
+
+const hex = (n: number, length: number) =>
+  n.toString(16).padStart(2, '0').repeat(length).slice(0, length);
+const uuid = (n: number) => `${hex(n, 8)}-${hex(n, 4)}-4${hex(n, 3)}-8${hex(n, 3)}-${hex(n, 12)}`;
+
+/** buildProxyUrl's output under the external URL, the src every hosted poster carries. */
+const proxied = (thumbPath: string, n: number) => {
+  const params = new URLSearchParams({
+    server: SERVER,
+    url: thumbPath,
+    width: '360',
+    height: '540',
+    fallback: 'poster',
+  });
+  params.set('v', hex(n, 8));
+  return `${EXTERNAL}/api/v1/images/proxy?${params}`;
+};
+const plexThumb = (n: number) => `/library/metadata/${10000 + n}/thumb/${1756800000 + n}`;
+const jellyfinThumb = (n: number) => `Items/${hex(n, 32)}/Images/Primary?tag=${hex(n + 128, 32)}`;
+
+const tracearrLink = (n: number) => ({ label: 'Tracearr', url: `${EXTERNAL}/media/${uuid(n)}` });
+const imdbLink = (n: number) => ({
+  label: 'IMDb',
+  url: `https://www.imdb.com/title/tt${String(1000000 + n).padStart(7, '0')}/`,
+});
+const plexLink = (n: number) => ({
+  label: 'Basement Plex',
+  url: `https://app.plex.tv/desktop/#!/server/${PLEX_MACHINE}/details?key=${encodeURIComponent(`/library/metadata/${10000 + n}`)}`,
+});
+const jellyfinLink = (n: number) => ({
+  label: 'Basement Jellyfin',
+  url: `${JELLYFIN}/web/index.html#/details?id=${hex(n, 32)}`,
+});
+
+interface Variant {
+  poster: (n: number) => string;
+  server: (n: number) => { label: string; url: string };
+}
+
+const VARIANTS: Record<string, Variant> = {
+  'hosted urls over plex thumb paths': {
+    poster: (n) => proxied(plexThumb(n), n),
+    server: plexLink,
+  },
+  'hosted urls over jellyfin image paths': {
+    poster: (n) => proxied(jellyfinThumb(n), n),
+    server: jellyfinLink,
+  },
+  'inline cid references': {
+    poster: (n) => `cid:${uuid(n)}`,
+    server: jellyfinLink,
+  },
+};
 
 function base(over: Partial<DigestInput> = {}): DigestInput {
   return {
@@ -31,51 +94,56 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
   };
 }
 
-function maxInput(): DigestInput {
-  const movies = Array.from({ length: 15 }, (_, i) => ({
-    id: `m${i}`,
-    title: `A Reasonably Long Movie Title Number ${i}`,
-    year: 1990 + i,
-    posterRef: hosted(1000 + i),
-    genres: ['Action', 'Adventure', 'Science Fiction'],
-    links: [links[0]!],
-  }));
-  const shows = Array.from({ length: 15 }, (_, i) => ({
-    id: `s${i}`,
-    title: `A Long Running Television Series ${i}`,
-    year: 2000 + i,
-    posterRef: hosted(2000 + i),
-    seasons: Array.from({ length: 8 }, (_, s) => ({
-      number: s + 1,
-      title: `Season ${s + 1}`,
-      episodeRange: 'E01-E04, E07, E09-E12',
-      episodeCount: 10,
-    })),
-    moreSeasons: 3,
-    episodeCount: 110,
-    links: [links[0]!],
-  }));
-  const artists = Array.from({ length: 15 }, (_, i) => ({
-    id: `a${i}`,
-    name: `Some Band Called ${i}`,
-    albums: [
-      {
-        id: `al${i}0`,
-        title: `Album Number 0 With A Long Name`,
-        year: 2010,
-        trackCount: 12,
-      },
-    ],
-    links: [links[0]!],
-  }));
-  const mostWatched = Array.from({ length: 10 }, (_, i) => ({
-    id: `w${i}`,
+/** The heaviest digest buildDigestInput can emit: every section at its cap, three links per movie and show, two per artist. */
+function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
+  const movies = Array.from({ length: sectionMax }, (_, i) => {
+    const n = 100 + i;
+    return {
+      id: uuid(n),
+      title: `A Reasonably Long Movie Title Number ${i}`,
+      year: 1990 + i,
+      posterRef: variant.poster(n),
+      genres: ['Action', 'Adventure', 'Science Fiction'],
+      links: [tracearrLink(n), variant.server(n), imdbLink(n)],
+    };
+  });
+  const shows = Array.from({ length: sectionMax }, (_, i) => {
+    const n = 200 + i;
+    return {
+      id: uuid(n),
+      title: `A Long Running Television Series ${i}`,
+      year: 2000 + i,
+      posterRef: variant.poster(n),
+      seasons: Array.from({ length: SEASONS_PER_SHOW_MAX }, (_, s) => ({
+        number: s + 1,
+        title: `Season ${s + 1}`,
+        episodeRange: 'E01-E04, E07, E09-E12',
+        episodeCount: 10,
+      })),
+      moreSeasons: 3,
+      episodeCount: 110,
+      links: [tracearrLink(n), variant.server(n), imdbLink(n)],
+    };
+  });
+  const artists = Array.from({ length: sectionMax }, (_, i) => {
+    const n = 300 + i;
+    return {
+      id: uuid(n),
+      name: `Some Band Called ${i}`,
+      albums: [
+        { id: uuid(n + 50), title: 'Album Number 0 With A Long Name', year: 2010, trackCount: 12 },
+      ],
+      links: [tracearrLink(n), variant.server(n)],
+    };
+  });
+  const mostWatched = Array.from({ length: MOST_WATCHED_MAX }, (_, i) => ({
+    id: uuid(400 + i),
     kind: i % 2 ? ('show' as const) : ('movie' as const),
     title: `Watched Title ${i}`,
     year: 2020,
     plays: 40 - i,
   }));
-  return base({ movies, shows, artists, mostWatched, logoRef: hosted(1) });
+  return base({ movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
 }
 
 describe('renderDigest', () => {
@@ -189,13 +257,19 @@ describe('renderDigest', () => {
     expect(out.html).not.toContain('(0 episodes)');
   });
 
-  it('stays under the Gmail clip budget at every maximum cap with hosted urls', async () => {
-    const out = await renderDigest(maxInput(), branding);
-    expect(Buffer.byteLength(out.html, 'utf8')).toBeLessThan(100 * 1024);
-  });
+  it.each(Object.entries(VARIANTS))(
+    'stays under the Gmail clip budget at every maximum cap with %s',
+    async (_name, variant) => {
+      const out = await renderDigest(maxInput(variant), branding);
+      expect(Buffer.byteLength(out.html, 'utf8')).toBeLessThan(100 * 1024);
+    }
+  );
 
   it('gives every emitted table cell an explicit background and text color', async () => {
-    const out = await renderDigest(maxInput(), branding);
+    const out = await renderDigest(
+      maxInput(VARIANTS['hosted urls over plex thumb paths']!),
+      branding
+    );
     const cells = out.html.match(/<td[^>]*>/g) ?? [];
     expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {

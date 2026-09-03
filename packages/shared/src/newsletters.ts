@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { paginationSchema, timezoneSchema, uuidSchema } from './schemas.js';
 
-export const NEWSLETTER_SECTION_MAX = 15;
+/** 12 is the largest cap at which the heaviest digest the assembler can emit stays clear of Gmail's 102 KB clip, proven by the size gate in packages/emails. */
+export const NEWSLETTER_SECTION_MAX = 12;
 export const NEWSLETTER_MOST_WATCHED_MAX = 10;
 export const NEWSLETTER_SEASONS_PER_SHOW_MAX = 8;
 export const NEWSLETTER_WINDOW_MAX_DAYS = 31;
