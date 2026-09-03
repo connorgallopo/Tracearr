@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import type { TailscaleInfo } from '@tracearr/shared';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,8 +41,6 @@ import {
   useResetTailscale,
 } from '@/hooks/queries';
 import { useDebouncedSave, TEXT_INPUT_DELAY } from '@/hooks/useDebouncedSave';
-
-type TailnetInfo = NonNullable<ReturnType<typeof useTailscaleStatus>['data']>;
 
 function ExternalUrlCard() {
   const { t } = useTranslation(['settings', 'common']);
@@ -156,7 +155,7 @@ function TailscaleLogo({ className }: { className?: string }) {
   );
 }
 
-function TailnetFacts({ status }: { status: TailnetInfo }) {
+function TailnetFacts({ status }: { status: TailscaleInfo }) {
   const { t } = useTranslation('settings');
 
   const facts: { label: string; value: React.ReactNode }[] = [
@@ -184,14 +183,16 @@ function TailnetFacts({ status }: { status: TailnetInfo }) {
   ];
 
   return (
-    <dl className="grid gap-x-6 gap-y-2 text-sm @md/field-group:grid-cols-[auto_minmax(0,1fr)]">
-      {facts.map((fact) => (
-        <div key={fact.label} className="contents">
-          <dt className="text-muted-foreground">{fact.label}</dt>
-          <dd className="font-mono text-xs break-all">{fact.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="@container/tailnet">
+      <dl className="grid gap-x-6 gap-y-2 text-sm @md/tailnet:grid-cols-[auto_minmax(0,1fr)]">
+        {facts.map((fact) => (
+          <div key={fact.label} className="contents">
+            <dt className="text-muted-foreground">{fact.label}</dt>
+            <dd className="font-mono text-xs break-all">{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -435,6 +436,8 @@ function TailscaleCard() {
                 type="button"
                 className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
                 onClick={() => setShowLogs((v) => !v)}
+                aria-expanded={showLogs}
+                aria-controls="ts-logs"
               >
                 <ChevronDown
                   className={`h-3.5 w-3.5 transition-transform ${showLogs ? '' : '-rotate-90'}`}
@@ -442,7 +445,10 @@ function TailscaleCard() {
                 {showLogs ? t('tailscale.hideLogs') : t('tailscale.showLogs')}
               </button>
               {showLogs && (
-                <pre className="bg-muted mt-2 h-96 max-h-[48rem] min-h-24 resize-y overflow-auto rounded-md p-3 font-mono text-xs whitespace-pre-wrap">
+                <pre
+                  id="ts-logs"
+                  className="bg-muted mt-2 h-96 max-h-[48rem] min-h-24 resize-y overflow-auto rounded-md p-3 font-mono text-xs whitespace-pre-wrap"
+                >
                   {logs || t('tailscale.noLogs')}
                 </pre>
               )}

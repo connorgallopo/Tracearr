@@ -105,6 +105,10 @@ describe('RemoteAccess', () => {
       screen.getByRole('link', { name: 'https://tracearr.example.ts.net' })
     ).toBeInTheDocument();
     expect(document.querySelector('table')).toBeNull();
+
+    const list = document.querySelector('dl');
+    expect(list).toHaveClass('@md/tailnet:grid-cols-[auto_minmax(0,1fr)]');
+    expect(list?.parentElement).toHaveClass('@container/tailnet');
   });
 
   it('offers the hostname field when Tailscale is off', async () => {
