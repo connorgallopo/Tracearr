@@ -572,6 +572,12 @@ export {
   emailSuppressionCreateSchema,
   newsletterSendsQuerySchema,
   newsletterCron,
+  EMAIL_LOGO_MODES,
+  emailBrandingSchema,
+  DEFAULT_EMAIL_BRANDING,
+  NEWSLETTER_VIEW_TOKEN_LENGTH,
+  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
+  NEWSLETTER_SEND_RETENTION_DAYS,
 } from './newsletters.js';
 export type {
   NewsletterSendTrigger,
@@ -592,6 +598,9 @@ export type {
   NewsletterSendDetail,
   EmailSuppression,
   NewsletterPreview,
+  EmailLogoMode,
+  EmailBrandingSettings,
+  NewsletterSendHtml,
 } from './newsletters.js';
 
 export type {

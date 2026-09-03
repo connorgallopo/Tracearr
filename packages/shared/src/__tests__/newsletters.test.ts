@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_EMAIL_BRANDING,
   DEFAULT_NEWSLETTER_SECTIONS,
   DEFAULT_NEWSLETTER_SUBJECT,
+  EMAIL_LOGO_MODES,
   NEWSLETTER_SECTION_MAX,
+  NEWSLETTER_SEND_RETENTION_DAYS,
+  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
+  NEWSLETTER_VIEW_TOKEN_LENGTH,
   createNewsletterSchema,
   cronExpressionSchema,
+  emailBrandingSchema,
   emailSuppressionCreateSchema,
   newsletterCron,
   newsletterScheduleSchema,
@@ -143,5 +149,61 @@ describe('small bodies', () => {
       'who@example.com'
     );
     expect(updateUserIdentitySchema.safeParse({ contactEmail: 'nope' }).success).toBe(false);
+  });
+});
+
+describe('emailBrandingSchema', () => {
+  it('fills every default from an empty object', () => {
+    expect(emailBrandingSchema.parse({})).toEqual({
+      senderName: null,
+      logo: { mode: 'tracearr' },
+      accentColor: '#0ea0b3',
+      footerText: null,
+      postalAddress: null,
+      mailtoUnsubscribe: false,
+    });
+    expect(DEFAULT_EMAIL_BRANDING).toEqual(emailBrandingSchema.parse({}));
+  });
+
+  it('accepts a url logo over http or https and nothing else', () => {
+    expect(
+      emailBrandingSchema.safeParse({ logo: { mode: 'url', url: 'https://x.test/logo.png' } })
+        .success
+    ).toBe(true);
+    expect(
+      emailBrandingSchema.safeParse({ logo: { mode: 'url', url: 'ftp://x.test/a' } }).success
+    ).toBe(false);
+    expect(
+      emailBrandingSchema.safeParse({ logo: { mode: 'url', url: 'javascript:alert(1)' } }).success
+    ).toBe(false);
+    expect(emailBrandingSchema.safeParse({ logo: { mode: 'url' } }).success).toBe(false);
+    expect(emailBrandingSchema.safeParse({ logo: { mode: 'tracearr', url: 'x' } }).success).toBe(
+      false
+    );
+  });
+
+  it('requires a six-digit hex accent and trims the text fields', () => {
+    expect(emailBrandingSchema.safeParse({ accentColor: '0ea0b3' }).success).toBe(false);
+    expect(emailBrandingSchema.safeParse({ accentColor: '#abc' }).success).toBe(false);
+    const parsed = emailBrandingSchema.parse({
+      senderName: '  Movies  ',
+      footerText: ' see you next week ',
+      postalAddress: null,
+    });
+    expect(parsed.senderName).toBe('Movies');
+    expect(parsed.footerText).toBe('see you next week');
+    expect(emailBrandingSchema.safeParse({ senderName: '' }).success).toBe(false);
+    expect(emailBrandingSchema.safeParse({ footerText: 'x'.repeat(501) }).success).toBe(false);
+  });
+
+  it('rejects unknown keys', () => {
+    expect(emailBrandingSchema.safeParse({ theme: 'dark' }).success).toBe(false);
+  });
+
+  it('pins the constants the server and the routes rely on', () => {
+    expect(NEWSLETTER_VIEW_TOKEN_LENGTH).toBe(43);
+    expect(NEWSLETTER_SNAPSHOT_RETENTION_DAYS).toBe(90);
+    expect(NEWSLETTER_SEND_RETENTION_DAYS).toBe(365);
+    expect(EMAIL_LOGO_MODES).toEqual(['tracearr', 'none', 'url']);
   });
 });

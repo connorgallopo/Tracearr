@@ -151,6 +151,40 @@ export const newsletterTestSendSchema = z.strictObject({ address });
 export const emailSuppressionCreateSchema = z.strictObject({ address });
 export const newsletterSendsQuerySchema = paginationSchema;
 
+export const EMAIL_LOGO_MODES = ['tracearr', 'none', 'url'] as const;
+export type EmailLogoMode = (typeof EMAIL_LOGO_MODES)[number];
+
+/** The web palette's primary as hex; packages/emails ships the same value as DEFAULT_ACCENT. */
+const DEFAULT_ACCENT_COLOR = '#0ea0b3';
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Expected a hex color like #0ea0b3');
+
+export const emailBrandingSchema = z.strictObject({
+  /** Null means the first server in the newsletter's scope, resolved at render time. */
+  senderName: z.string().trim().min(1).max(100).nullable().default(null),
+  logo: z
+    .discriminatedUnion('mode', [
+      z.strictObject({ mode: z.literal('tracearr') }),
+      z.strictObject({ mode: z.literal('none') }),
+      z.strictObject({ mode: z.literal('url'), url: z.url({ protocol: /^https?$/ }).max(500) }),
+    ])
+    .default({ mode: 'tracearr' }),
+  accentColor: hexColor.default(DEFAULT_ACCENT_COLOR),
+  footerText: z.string().trim().max(500).nullable().default(null),
+  postalAddress: z.string().trim().max(500).nullable().default(null),
+  mailtoUnsubscribe: z.boolean().default(false),
+});
+export type EmailBrandingSettings = z.infer<typeof emailBrandingSchema>;
+export const DEFAULT_EMAIL_BRANDING: EmailBrandingSettings = emailBrandingSchema.parse({});
+
+export const NEWSLETTER_VIEW_TOKEN_LENGTH = 43;
+export const NEWSLETTER_SNAPSHOT_RETENTION_DAYS = 90;
+export const NEWSLETTER_SEND_RETENTION_DAYS = 365;
+
+export interface NewsletterSendHtml {
+  subject: string;
+  html: string;
+}
+
 export function newsletterCron(schedule: NewsletterSchedule): string {
   if (schedule.kind === 'cron') return schedule.expression;
   const [hh, mm] = schedule.time.split(':').map(Number) as [number, number];
