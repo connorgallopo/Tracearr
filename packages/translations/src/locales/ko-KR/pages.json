@@ -260,17 +260,17 @@
         "syncFailedTitle": "동기화를 시작하지 못했습니다.",
         "genericRetry": "다시 시도해 주세요.",
         "backfillStartedTitle": "과거 데이터 생성이 시작되었습니다.",
-        "backfillStartedDesc": "",
-        "backfillFailedTitle": "",
-        "backfillCompleteTitle": "",
-        "backfillErrorTitle": ""
+        "backfillStartedDesc": "기록 스냅샷을 생성하는 중입니다.",
+        "backfillFailedTitle": "과거 데이터 생성을 시작하지 못했습니다.",
+        "backfillCompleteTitle": "과거 데이터 생성 완료",
+        "backfillErrorTitle": "과거 데이터 생성 실패"
       }
     },
     "versionsBackfill": {
-      "banner": "",
-      "action": "",
-      "syncFailed": "",
-      "syncStarted": ""
+      "banner": "이 서버에 대한 파일 버전 데이터가 아직 수집되고 있습니다. 완료하려면 라이브러리 동기화를 실행하세요.",
+      "action": "지금 동기화",
+      "syncFailed": "{{count}}개의 서버에서 동기화를 시작하지 못했습니다. 권한과 서버 상태를 확인하세요.",
+      "syncStarted": "라이브러리 동기화가 시작되었습니다."
     }
   },
   "activity": {
@@ -300,14 +300,14 @@
     "noViolationsRecorded": "아직 기록된 위반이 없습니다.",
     "allSeverities": "모든 심각도",
     "allStatuses": "모든 상태",
-    "allRules": "",
-    "filterPeople": "",
-    "allPeople": "",
-    "peopleSelectedCount": "",
-    "personFilterPlaceholder": "",
-    "personFilterEmpty": "",
-    "personFilterError": "",
-    "filterByPerson": "",
+    "allRules": "모든 규칙",
+    "filterPeople": "사용자",
+    "allPeople": "모든 사용자",
+    "peopleSelectedCount": "{{count}}명",
+    "personFilterPlaceholder": "사용자별 필터",
+    "personFilterEmpty": "일치하는 사용자가 없습니다.",
+    "personFilterError": "알림 보내기",
+    "filterByPerson": "이 사용자의 위반만 보기",
     "detail": {
       "notFound": "위반을 찾을 수 없습니다",
       "violationDetails": "위반 상세",
@@ -338,870 +338,870 @@
   "automations": {
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "알림 보내기",
+        "description": "하나 이상의 대상으로 보내기",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "알림 간 최소 시간"
           }
         },
-        "ran": ""
+        "ran": "알림을 보냈습니다"
       },
       "trust": {
-        "label": "",
-        "description": "",
+        "label": "신뢰 점수",
+        "description": "신뢰 점수 조정, 설정 또는 재설정",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "모드"
           },
           "amount": {
-            "label": "",
-            "description": ""
+            "label": "변경량",
+            "description": "증가하려면 양수, 감소하려면 음수"
           },
           "value": {
-            "label": ""
+            "label": "값"
           }
         },
-        "ran": ""
+        "ran": "스트리밍 종료"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "스트리밍 종료",
+        "description": "활성 스트리밍 종료",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "동일한 사용자에 대한 종료 간 최소 시간"
           },
           "delay_seconds": {
-            "label": "",
-            "description": ""
+            "label": "유지 시간",
+            "description": "이 시간만큼 기다린 뒤 조건이 계속 일치할 때만 스트리밍을 종료합니다. 0이면 마지막 확인 직후 종료합니다."
           },
           "target": {
-            "description": ""
+            "description": "종료할 세션"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "선택적 메시지"
           }
         },
-        "ran": ""
+        "ran": "스트리밍을 중지했습니다."
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "메시지 클라이언트",
+        "description": "미디어 플레이어에 메시지 보내기",
+        "hint": "Jellyfin과 Emby만 가능합니다. Plex는 스트림을 종료할 때만 메시지를 지원합니다.",
         "fields": {
           "target": {
-            "description": ""
+            "description": "메시지를 보낼 세션"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "표시할 메시지…"
           }
         },
-        "ran": ""
+        "ran": "플레이어에 메시지를 보냈습니다"
       }
     },
     "activity": {
-      "title": "",
-      "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "title": "활동",
+      "description": "이 자동화가 수행한 작업은 최신 항목부터입니다. 실행은 {{days}}일 동안 유지됩니다.",
+      "outcome": "결과",
+      "who": "누구",
+      "where": "어디에",
+      "playing": "재생",
+      "from": "에서",
+      "summary": "요약",
+      "started": "시작됨",
+      "finished": "완료",
+      "noSummary": "메모 없음",
       "outcomes": {
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "completed": "완료",
+        "stopped_by_condition": "일치하지 않음",
+        "error": "실패"
       },
-      "empty": "",
-      "emptyDescription": "",
-      "runTitle": "",
-      "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "empty": "아직 실행 없음",
+      "emptyDescription": "트리거가 일치하면 실행이 여기에 나열됩니다.",
+      "runTitle": "실행",
+      "runLoading": "실행 로드 중",
+      "triggeredBy": "{{trigger}}에 의해 트리거됨",
+      "unknownStep": "인식할 수 없는 단계",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "all": "모두",
+        "completed": "완료",
+        "stopped_by_condition": "일치하지 않음",
+        "error": "실패"
       },
-      "group": "",
+      "group": "그룹 {{number}}",
       "branch": {
-        "then": "",
-        "else": ""
+        "then": "'만약' 단계를 밟았습니다",
+        "else": "'그렇지 않은 경우' 조치를 취함"
       },
-      "whyBranch": "",
-      "openInEditor": "",
-      "tabsLabel": "",
-      "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
-      "item": "",
-      "recordedViolation": ""
+      "whyBranch": "읽은 내용",
+      "openInEditor": "이 실행으로 빌더에서 열기",
+      "tabsLabel": "결과로 필터링",
+      "emptyRan": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
+      "emptyRanDescription_one": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
+      "emptyRanDescription_other": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
+      "item": "항목",
+      "recordedViolation": "위반을 기록했습니다."
     },
-    "allKinds": "",
-    "allStatuses": "",
-    "allSeverities": "",
+    "allKinds": "모든 종류",
+    "allStatuses": "모든 상태",
+    "allSeverities": "모든 심각도",
     "bind": {
-      "nameHelper": "",
-      "namePlaceholder": "",
-      "activeLabel": "",
-      "back": "",
-      "submit": "",
-      "submitting": "",
-      "customize": "",
+      "nameHelper": "자동화 목록의 이름입니다.",
+      "namePlaceholder": "이 자동화의 이름",
+      "activeLabel": "지금 활성화",
+      "back": "뒤로",
+      "submit": "이 자동화 사용",
+      "submitting": "설정 중…",
+      "customize": "빌더에서 열기",
       "doors": {
-        "helper": ""
+        "helper": "이를 사용하면 단계가 그대로 유지됩니다. 위의 답변은 나중에 변경될 수 있습니다. 빌더에서 열면 모든 단계를 편집할 수 있으며 이미 만들어진 자동화에 대한 링크가 종료됩니다."
       },
-      "anyServer": "",
-      "serverHelper": "",
-      "serverLabel": "",
-      "accountLabel": "",
-      "personLabel": "",
-      "destinationsLabel": "",
-      "required": "",
+      "anyServer": "모든 서버",
+      "serverHelper": "모든 서버는 이들 모두를 의미합니다.",
+      "serverLabel": "서버",
+      "accountLabel": "계정",
+      "personLabel": "사용자",
+      "destinationsLabel": "다음으로 보내기",
+      "required": "하나 이상을 선택하세요.",
       "needs": {
-        "title": ""
+        "title": "필요 조건"
       },
       "helper": {
-        "killMessage": "",
-        "clientMessage": ""
+        "killMessage": "스트림이 중지되면 플레이어에 표시됩니다.",
+        "clientMessage": "재생이 계속되는 동안 플레이어에 표시됩니다."
       },
-      "noInputs": "",
-      "failed": "",
-      "created": "",
-      "createdOff": ""
+      "noInputs": "채울 내용이 없습니다.",
+      "failed": "설정할 수 없습니다. 다시 시도해 보세요.",
+      "created": "비활성화된 알림 대상",
+      "createdOff": "비활성화된 알림 대상"
     },
     "builder": {
-      "destinationDisabled": "",
-      "noDestinations": "",
-      "newDestination": "",
+      "destinationDisabled": "비활성화된 알림 대상",
+      "noDestinations": "아직 알림 대상이 없습니다. 알림을 보내려면 하나를 추가하세요.",
+      "newDestination": "새로운 알림 대상",
       "errors": {
-        "sendNeedsDestination": "",
-        "nameRequired": "",
-        "scopeIncomplete": "",
-        "triggerRequired": "",
-        "policyNeedsSubject": "",
-        "fieldUnavailable": "",
-        "operatorInvalid": "",
-        "valueInvalid": "",
-        "actionUnavailable": "",
-        "variableUnavailable": "",
-        "minutesRange": "",
-        "daysRange": "",
-        "measureInvalid": "",
-        "fieldNotAvailableFor": "",
-        "trustAmountRange": "",
-        "trustValueRange": "",
-        "messageRequired": "",
-        "tooLong": ""
+        "sendNeedsDestination": "적용 대상을 선택하세요.",
+        "nameRequired": "이 자동화에 이름을 지정하세요",
+        "scopeIncomplete": "적용 대상을 선택하세요.",
+        "triggerRequired": "위반은 개인에 관한 것이므로 스트림 또는 계정 트리거가 필요합니다.",
+        "policyNeedsSubject": "위반은 개인에 관한 것이므로 스트림 또는 계정 트리거가 필요합니다.",
+        "fieldUnavailable": "이 비교 방식은 검사 항목과 맞지 않습니다.",
+        "operatorInvalid": "이 값은 검사 항목과 맞지 않습니다.",
+        "valueInvalid": "이 값은 검사 항목과 맞지 않습니다.",
+        "actionUnavailable": "일부 트리거에서 이 메시지 변수를 제공하지 않습니다.",
+        "variableUnavailable": "일부 트리거에서 이 메시지 변수를 제공하지 않습니다.",
+        "minutesRange": "{{min}}분에서 {{max}}분 사이",
+        "daysRange": "{{min}}에서 {{max}}일 사이",
+        "measureInvalid": "신뢰도는 -100에서 100포인트 사이로 변경됩니다.",
+        "fieldNotAvailableFor": "사용할 수 없음: {{triggers}}",
+        "trustAmountRange": "표시할 메시지를 입력하세요.",
+        "trustValueRange": "표시할 메시지를 입력하세요.",
+        "messageRequired": "표시할 메시지를 입력하세요.",
+        "tooLong": "최대 {{max}}자"
       },
       "recordAs": {
-        "label": "",
-        "policy": "",
-        "policyDescription": "",
-        "notification": "",
-        "notificationDescription": ""
+        "label": "위반 목록에 기록되며 확인 처리할 수 있습니다.",
+        "policy": "위반",
+        "policyDescription": "위반 목록에 기록되며 확인 처리할 수 있습니다.",
+        "notification": "경고",
+        "notificationDescription": "활동 기록에만 남고 위반으로 처리되지 않습니다."
       },
-      "severityLabel": "",
-      "activeLabel": "",
-      "saving": "",
-      "selectPlaceholder": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "clearSelection": "",
-      "selectedCount": "",
+      "severityLabel": "얼마나 심각합니까?",
+      "activeLabel": "활성",
+      "saving": "저장 중…",
+      "selectPlaceholder": "선택…",
+      "searchPlaceholder": "검색…",
+      "noMatches": "일치하는 항목 없음",
+      "clearSelection": "선택 취소",
+      "selectedCount": "{{count}}개 선택됨",
       "scope": {
-        "label": "",
-        "global": "",
-        "server": "",
-        "account": "",
-        "person": "",
-        "serverLabel": "",
-        "serverPlaceholder": "",
-        "accountLabel": "",
-        "accountPlaceholder": "",
-        "personLabel": "",
-        "personPlaceholder": "",
-        "personHelper": "",
-        "noServers": "",
-        "enforceAcrossServers": "",
-        "enforceAcrossServersDescription": ""
+        "label": "하나의 서버",
+        "global": "모두",
+        "server": "하나의 서버",
+        "account": "하나의 계정",
+        "person": "한 사용자",
+        "serverLabel": "서버",
+        "serverPlaceholder": "서버 선택",
+        "accountLabel": "계정",
+        "accountPlaceholder": "계정 선택",
+        "personLabel": "사용자",
+        "personPlaceholder": "사용자 선택",
+        "personHelper": "계정이 있는 모든 서버에서 이 사용자와 일치합니다.",
+        "noServers": "아직 연결된 서버가 없습니다.",
+        "enforceAcrossServers": "모든 서버의 스트림에 적용",
+        "enforceAcrossServersDescription": "이를 트리거한 서버뿐만 아니라 모든 서버의 세션에 대해 조치를 취합니다. 기본적으로 꺼져 있습니다."
       },
       "conditions": {
-        "addGroup": "",
-        "fieldPlaceholder": "",
-        "windowPrefix": "",
-        "windowUnit": "",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "allDeviceTypes": "",
-        "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
-        "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
-        "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
-        "canNeverPass": "",
-        "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "addGroup": "별도의 검사 세트 추가",
+        "fieldPlaceholder": "확인할 항목을 선택하세요.",
+        "windowPrefix": "안으로",
+        "windowUnit": "시간",
+        "uniqueDevices": "고유 장치",
+        "uniqueDevicesHint": "다른 물리적 장치의 세션만 계산합니다.",
+        "uniqueIps": "고유 IP",
+        "uniqueIpsHint": "다른 IP 주소의 세션만 계산하므로 동일 가구 스트림은 계산되지 않습니다.",
+        "allDeviceTypes": "모든 장치 유형",
+        "deviceTypesHint": "선택한 장치 유형의 스트림만 계산합니다. 비어 있음은 모든 장치를 의미합니다.",
+        "yes": "예",
+        "no": "아니요",
+        "recentlySeen": "최근에 본",
+        "allCountries": "모든 국가",
+        "sectionTitle": "그리고 만약에…",
+        "optional": "선택사항",
+        "helper": "실행 전에 통과해야 할 검사입니다. 비워 두면 항상 실행됩니다.",
+        "emptyLine": "추가 검사가 없습니다. 항상 실행됩니다.",
+        "all": "그리고",
+        "any": "또는",
+        "allHint": "그리고: 모든 검사를 통과해야 합니다",
+        "anyHint": "또는: 검사 하나만 통과하면 됩니다",
+        "matchLabel": "조건",
+        "fieldLabel": "확인해야 할 사항",
+        "operatorLabel": "조건",
+        "valueLabel": "값",
+        "canNeverPass": "이 조건은 충족될 수 없습니다. 트리거가 이미 {{threshold}}에서 실행됩니다.",
+        "noFields": "이러한 트리거에 대해서는 검사를 수행할 수 없습니다. 먼저 스트림 또는 계정 트리거를 추가하세요.",
+        "groupSeparator": "또는 다음 조건도",
+        "addAnother": "검사 추가",
+        "addFirst": "검사 추가",
+        "removeGroup": "이 검사 세트 제거"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
-        "confirmRemoveDescription": "",
-        "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "add": "다른 작업 추가",
+        "sectionTitle": "그럼…",
+        "ifTitle": "만약…",
+        "helper": "위에서 아래로 순서대로 실행됩니다.",
+        "emptyTitle": "무슨 일이 일어나야 할까요?",
+        "emptyDescription": "알림 전송, 스트림 종료, 신뢰 점수 변경 등의 단계를 추가하세요. 추가 검사를 통과한 경우에만 실행할 수도 있습니다.",
+        "emptyAction": "무슨 일이 일어날지 선택하세요",
+        "moveUp": "{{name}}을 위로 이동",
+        "moveDown": "이 지점",
+        "menu": "{{name}} 추가 옵션",
+        "branchName": "이 지점",
+        "confirmRemoveTitle": "이 작업을 삭제하시겠습니까?",
+        "confirmRemoveDescription": "저장 시 더 이상 발생하지 않습니다.",
+        "policyNote": "분기는 위반 기록 여부를 결정하지 않습니다. ‘그리고 다음 조건도 충족할 때’ 섹션에서 결정됩니다.",
+        "branchThen": "이렇게 하세요",
+        "branchElse": "그렇지 않으면",
+        "branchElseEmpty": "아무것도. 자동화는 계속됩니다.",
+        "ifNothing": "아직 아무것도 선택되지 않았습니다",
+        "ifAddCheck": "다른 검사 추가",
+        "addBranch": "단계 추가",
+        "expandBranch": "이 지점의 단계 표시",
+        "collapseBranch": "이 지점의 단계 숨기기"
       },
       "when": {
-        "title": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "add": "",
-        "or": ""
+        "title": "언제…",
+        "helper": "이 중 하나가 시작됩니다. 하나 이상이 필요합니다.",
+        "emptyTitle": "무엇을 시작해야합니까?",
+        "emptyDescription": "스트림 시작, 서버 오프라인, 계정 비활성 등의 조건입니다.",
+        "emptyAction": "또는",
+        "add": "다른 트리거 추가",
+        "or": "또는"
       },
       "heldFor": {
-        "prefix": "",
-        "minutesLabel": "",
-        "unit": "",
-        "measureLabel": "",
-        "current": "",
-        "total": ""
+        "prefix": "분",
+        "minutesLabel": "분",
+        "unit": "분",
+        "measureLabel": "계산됨",
+        "current": "이번에는",
+        "total": "전체적으로"
       },
       "inactiveFor": {
-        "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "prefix": "일",
+        "daysLabel": "일",
+        "unit": "일"
       },
       "rows": {
-        "toggle": "",
-        "remove": "",
-        "skipped": "",
-        "toggleHint": "",
-        "removeHint": "",
-        "expandHint": "",
-        "moveHint": ""
+        "toggle": "{{name}} 포함",
+        "remove": "{{name}} 삭제",
+        "skipped": "제거",
+        "toggleHint": "건너뛰기",
+        "removeHint": "제거",
+        "expandHint": "펼치기",
+        "moveHint": "순서 변경"
       },
       "picker": {
-        "searchPlaceholder": "",
-        "empty": "",
-        "navigate": "",
-        "select": "",
-        "close": ""
+        "searchPlaceholder": "무슨 일이 일어나야 하는지 검색하거나 설명하세요.",
+        "empty": "일치하는 항목이 없습니다.",
+        "navigate": "이동",
+        "select": "선택",
+        "close": "닫기"
       },
       "sentence": {
-        "label": "",
-        "placeholderTrigger": "",
-        "placeholderAction": ""
+        "label": "쉬운 말로",
+        "placeholderTrigger": "발생할 일",
+        "placeholderAction": "실행할 작업"
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "problems_one": "고쳐야 할 항목 {{count}}개",
+        "problems_other": "수정할 사항 {{count}}개",
+        "remaining_one": "완료까지 {{count}} 남았습니다",
+        "remaining_other": "완료까지 {{count}} 남았습니다",
+        "ready": "저장 준비 완료",
+        "search": "검색"
       },
       "leave": {
-        "title": "",
-        "confirm": ""
+        "title": "저장하지 않고 나가시겠습니까?",
+        "confirm": "나가기"
       },
       "liveCheck": {
-        "title": "",
-        "checking": "",
-        "empty": "",
-        "failed": "",
-        "footnote": "",
-        "expand": "",
-        "passed": "",
-        "notPassed": "",
-        "actual": "",
-        "unfinished": "",
-        "paused": "",
-        "sampleTitle": "",
-        "sampleGone": "",
-        "backToLive": ""
+        "title": "지금 서버에는",
+        "checking": "지금 재생 중인 항목을 확인하는 중…",
+        "empty": "지금은 재생 중인 항목이 없습니다. 확인할 것이 없습니다.",
+        "failed": "확인할 서버에 연결할 수 없습니다.",
+        "footnote": "종료되었거나 이미 처리한 세션은 시뮬레이션하지 않습니다.",
+        "expand": "통과",
+        "passed": "통과",
+        "notPassed": "통과하지 못함",
+        "actual": "현재 {{value}}",
+        "unfinished": "자동화가 완료되면 어떤 작업이 수행되는지 보여줍니다.",
+        "paused": "저장하는 동안 일시중지됨",
+        "sampleTitle": "지금 재생 중인 항목으로 돌아가기",
+        "sampleGone": "해당 세션은 더 이상 기록에 남지 않습니다. 확인할 것이 없습니다.",
+        "backToLive": "지금 재생 중인 항목으로 돌아가기"
       }
     },
     "categories": {
-      "session_behavior": "",
-      "stream_quality": "",
-      "user_attributes": "",
-      "device_client": "",
-      "network_location": "",
-      "scope": "",
-      "media": ""
+      "session_behavior": "세션 동작",
+      "stream_quality": "스트리밍 품질",
+      "user_attributes": "사용자 속성",
+      "device_client": "장치 및 클라이언트",
+      "network_location": "네트워크 및 위치",
+      "scope": "누구와 어디서",
+      "media": "미디어"
     },
-    "createAutomation": "",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "자동화 생성",
+    "customAutomation": "맞춤형 자동화",
+    "deleteAutomationConfirm": "이 자동화를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "deleteAutomation_one": "자동화 삭제",
+    "deleteAutomation_other": "자동화 {{count}}개 삭제",
+    "deleteAutomationsConfirm": "삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
     "describe": {
-      "more_one": "",
-      "more_other": "",
-      "noValues": "",
-      "includesSameDevice": "",
-      "uniqueIps": "",
-      "deviceTypesOnly": "",
-      "when": "",
-      "or": "",
-      "nothing": "",
-      "onlyWhen": "",
-      "andAlso": "",
-      "allOf": "",
-      "anyOf": "",
-      "joinAll": "",
-      "joinAny": "",
-      "then": "",
-      "otherwise": "",
-      "appliesTo": "",
+      "more_one": "+{{count}}개 이상",
+      "more_other": "+{{count}}개 이상",
+      "noValues": "(없음)",
+      "includesSameDevice": "동일한 장치가 포함되어 있습니다",
+      "uniqueIps": "고유한 IP",
+      "deviceTypesOnly": "{{types}}만",
+      "when": "{{text}}일 때",
+      "or": "또는 {{text}}",
+      "nothing": "아직 아무것도",
+      "onlyWhen": "그리고 만약에",
+      "andAlso": "그리고 또한",
+      "allOf": "모두:",
+      "anyOf": "다음 중 하나:",
+      "joinAll": "그리고",
+      "joinAny": "또는",
+      "then": "그럼 {{text}}",
+      "otherwise": "그렇지 않으면",
+      "appliesTo": "{{count}}분",
       "duration": {
-        "minutes_one": "",
-        "minutes_other": "",
-        "days_one": "",
-        "days_other": ""
+        "minutes_one": "{{count}}분",
+        "minutes_other": "{{count}}분",
+        "days_one": "{{count}}일",
+        "days_other": "{{count}}일"
       },
       "triggers": {
-        "sessionStarted": "",
-        "sessionFirstSeen": "",
-        "sessionStopped": "",
-        "sessionTranscodeChanged": "",
-        "sessionPaused": "",
-        "sessionHeldFor": "",
-        "sessionHeldForTotal": "",
-        "accountInactiveFor": "",
-        "accountNewDevice": "",
-        "accountTrustChanged": "",
-        "mediaAdded": "",
-        "mediaUpgraded": "",
-        "serverDown": "",
-        "serverUp": "",
-        "pluginUpdateAvailable": "",
-        "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "sessionStarted": "스트림이 시작된다",
+        "sessionFirstSeen": "트랜스코딩 시작 또는 중지",
+        "sessionStopped": "스트림이 중지됨",
+        "sessionTranscodeChanged": "트랜스코딩 시작 또는 중지",
+        "sessionPaused": "스트림이 일시중지되었습니다.",
+        "sessionHeldFor": "스트림이 총 {{duration}} 동안 일시중지되었습니다.",
+        "sessionHeldForTotal": "계정이 새 기기에서 재생됩니다.",
+        "accountInactiveFor": "계정이 {{duration}} 동안 비활성화되었습니다",
+        "accountNewDevice": "계정의 신뢰 점수가 변경됩니다.",
+        "accountTrustChanged": "계정의 신뢰 점수가 변경됩니다.",
+        "mediaAdded": "미디어가 추가되었습니다",
+        "mediaUpgraded": "미디어가 업그레이드되었습니다",
+        "serverDown": "서버가 오프라인이 됨",
+        "serverUp": "서버가 다시 온라인이 됨",
+        "pluginUpdateAvailable": "플러그인 업데이트가 가능합니다",
+        "serverUpdateAvailable": "서버 업데이트가 가능합니다",
+        "tracearrUpdateAvailable": "같지 않음"
       },
       "operators": {
-        "eq": "",
-        "neq": "",
-        "gt": "",
-        "gte": "",
-        "lt": "",
-        "lte": "",
-        "in": "",
-        "not_in": "",
-        "contains": "",
-        "not_contains": ""
+        "eq": "같음",
+        "neq": "같지 않음",
+        "gt": "보다 큼",
+        "gte": "이상",
+        "lt": "보다 작음",
+        "lte": "이하",
+        "in": "중 하나입니다",
+        "not_in": "다음 중 하나가 아닙니다.",
+        "contains": "포함",
+        "not_contains": "포함하지 않습니다"
       },
       "fields": {
-        "concurrent_streams": "",
-        "active_session_distance_km": "",
-        "travel_speed_kmh": "",
-        "unique_ips_in_window": "",
-        "unique_devices_in_window": "",
-        "inactive_days": "",
-        "current_pause_minutes": "",
-        "total_pause_minutes": "",
-        "source_resolution": "",
-        "output_resolution": "",
-        "is_transcoding": "",
-        "is_transcode_downgrade": "",
-        "source_bitrate_mbps": "",
-        "user_id": "",
-        "trust_score": "",
-        "account_age_days": "",
-        "device_type": "",
-        "client_name": "",
-        "platform": "",
-        "is_local_network": "",
-        "country": "",
-        "ip_in_range": "",
-        "server_id": "",
-        "media_type": "",
-        "library_item_type": "",
-        "library_name": "",
-        "resolution_after": "",
-        "dynamic_range_after": "",
-        "video_codec_after": "",
-        "audio_channels_after": "",
-        "file_size_after": ""
+        "concurrent_streams": "스트리밍 수",
+        "active_session_distance_km": "세션 간 거리",
+        "travel_speed_kmh": "이동 속도",
+        "unique_ips_in_window": "마지막 스트림 이후의 시간",
+        "unique_devices_in_window": "장치 수",
+        "inactive_days": "마지막 스트림 이후의 시간",
+        "current_pause_minutes": "현재 일시중지",
+        "total_pause_minutes": "총 일시 정지 시간",
+        "source_resolution": "소스 해상도",
+        "output_resolution": "출력 해상도",
+        "is_transcoding": "트랜스코딩",
+        "is_transcode_downgrade": "다운그레이드",
+        "source_bitrate_mbps": "소스 비트레이트",
+        "user_id": "사용자",
+        "trust_score": "신뢰 점수",
+        "account_age_days": "계정 연령",
+        "device_type": "장치 유형",
+        "client_name": "플레이어",
+        "platform": "플랫폼",
+        "is_local_network": "로컬 네트워크",
+        "country": "국가",
+        "ip_in_range": "서버",
+        "server_id": "서버",
+        "media_type": "미디어 유형",
+        "library_item_type": "항목 종류",
+        "library_name": "라이브러리",
+        "resolution_after": "해상도",
+        "dynamic_range_after": "동적 범위",
+        "video_codec_after": "비디오 코덱",
+        "audio_channels_after": "오디오 채널",
+        "file_size_after": "파일 크기"
       },
       "states": {
         "is_local_network": {
-          "yes": "",
-          "no": ""
+          "yes": "사용자가 로컬 네트워크에 있습니다",
+          "no": "사용자가 로컬 네트워크에 있지 않습니다"
         },
         "is_transcode_downgrade": {
-          "yes": "",
-          "no": ""
+          "yes": "스트림이 다운그레이드되었습니다",
+          "no": "스트림이 오디오를 트랜스코딩하고 있습니다."
         },
         "is_transcoding": {
           "video": {
-            "yes": "",
-            "no": ""
+            "yes": "스트림이 오디오를 트랜스코딩하고 있습니다.",
+            "no": "스트림이 오디오를 트랜스코딩하지 않습니다."
           },
           "audio": {
-            "yes": "",
-            "no": ""
+            "yes": "스트림이 오디오를 트랜스코딩하지 않습니다.",
+            "no": "스트림이 오디오를 트랜스코딩하지 않습니다."
           },
           "video_or_audio": {
-            "yes": "",
-            "no": ""
+            "yes": "스트림이 트랜스코딩 중입니다",
+            "no": "스트림이 트랜스코딩되지 않습니다"
           },
           "neither": {
-            "yes": "",
-            "no": ""
+            "yes": "스트림이 트랜스코딩되지 않습니다",
+            "no": "스트림이 트랜스코딩 중입니다"
           }
         }
       },
       "actions": {
-        "if": "",
-        "flagIt": "",
-        "doNothing": "",
-        "send": "",
-        "sendAnywhere": "",
-        "kill_stream": "",
-        "message_client": "",
-        "trustUp": "",
-        "trustDown": "",
-        "trustAdjust": "",
-        "trustSet": "",
-        "trustReset": ""
+        "if": "만약에",
+        "flagIt": "위반으로 기록",
+        "doNothing": "아무 작업도 하지 않음",
+        "send": "{{destinations}}에 알림 보내기",
+        "sendAnywhere": "알림 보내기",
+        "kill_stream": "스트리밍 종료",
+        "message_client": "플레이어에 메시지 보내기",
+        "trustUp": "신뢰 점수 {{amount}} 올리기",
+        "trustDown": "신뢰 점수 {{amount}} 내리기",
+        "trustAdjust": "신뢰 점수 {{amount}}만큼 조정",
+        "trustSet": "신뢰 점수를 {{value}}(으)로 설정",
+        "trustReset": "신뢰 점수 초기화"
       },
       "scope": {
-        "server": "",
-        "account": "",
-        "person": ""
+        "server": "하나의 서버",
+        "account": "하나의 계정",
+        "person": "한 사용자"
       },
-      "sameDeviceInput": "",
-      "uniqueIpsInput": "",
+      "sameDeviceInput": "동일한 기기: {{input}}",
+      "uniqueIpsInput": "고유 IP: {{input}}",
       "unbound": {
-        "server": "",
-        "account": "",
-        "person": "",
-        "destinations": "",
-        "field_value": "",
-        "select": "",
-        "number": "",
-        "duration": "",
-        "text": "",
-        "boolean": "",
-        "listed": ""
+        "server": "선택한 서버",
+        "account": "선택한 계정",
+        "person": "선택된 사용자",
+        "destinations": "선택한 알림 대상",
+        "field_value": "선택한 값",
+        "select": "선택한 옵션",
+        "number": "선택한 번호",
+        "duration": "선택한 시간",
+        "text": "선택한 메시지",
+        "boolean": "선택한 설정",
+        "listed": "선택한 사용자"
       }
     },
-    "description": "",
+    "description": "자동화를 찾을 수 없습니다",
     "detail": {
-      "notFound": "",
-      "title": "",
-      "unsaved": "",
-      "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "notFound": "자동화를 찾을 수 없습니다",
+      "title": "자동화",
+      "unsaved": "저장되지 않은 변경사항",
+      "runsLine_one": "1회 실행 · 마지막 실행 {{when}}",
+      "runsLine_other": "{{count}}번 실행 · 마지막 실행 {{when}}",
+      "noRuns": "아직 실행 없음"
     },
-    "disable": "",
-    "editAutomation": "",
+    "disable": "비활성화",
+    "editAutomation": "자동화 편집",
     "effects": {
-      "title": "",
-      "kill": "",
-      "trust": "",
-      "message": "",
-      "violation": "",
-      "tellsOnly": "",
-      "allServers": "",
-      "everyServer": "",
-      "oneServer": ""
+      "title": "실행되는 작업",
+      "kill": "재생 중인 스트림을 중지할 수 있습니다.",
+      "trust": "신뢰 점수를 변경합니다.",
+      "message": "플레이어에게 메시지를 보냅니다.",
+      "violation": "일치하는 사용자에 대한 위반 사항을 기록합니다.",
+      "tellsOnly": "알림만 보냅니다. 스트림을 중지하거나 계정을 변경하지 않습니다.",
+      "allServers": "하나를 선택하지 않는 한 모든 서버에서 실행됩니다.",
+      "everyServer": "모든 서버에서 실행됩니다.",
+      "oneServer": "{{server}}에서만 실행됩니다."
     },
-    "emptyTitle": "",
-    "emptyDescription": "",
-    "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "enable": "",
+    "emptyTitle": "미리 준비된 자동화를 골라 필요한 값만 채우세요.",
+    "emptyDescription": "미리 준비된 자동화를 골라 필요한 값만 채우세요.",
+    "emptySeeAll": "{{count}}개 모두 보기",
+    "emptySeeAllLoading": "모두 보기",
+    "enable": "활성화",
     "evaluations": {
-      "disclosure": "",
+      "disclosure": "실행으로 이어지지 않은 평가({{total}})",
       "reasons": {
-        "cooldown_active": "",
-        "edge_replayed": "",
-        "gate_blocked": "",
-        "trigger_filter_failed": ""
+        "cooldown_active": "이미 처리한 동일 이벤트",
+        "edge_replayed": "이미 처리한 동일 이벤트",
+        "gate_blocked": "이미 진행 중인 실행에서 처리 중",
+        "trigger_filter_failed": "트리거 임계값에 도달하지 않았습니다."
       }
     },
     "export": {
-      "title": "",
-      "description": "",
-      "carries": "",
-      "copyCode": "",
-      "copyJson": "",
-      "authorLabel": "",
-      "authorPlaceholder": "",
-      "authorHelper": "",
-      "save": "",
-      "saved": "",
-      "saveFailed": "",
-      "failed": "",
-      "saveHelper": "",
-      "authorInCode": "",
-      "groupLabel": "",
-      "groupHelper": "",
+      "title": "이 자동화 공유",
+      "description": "다른 Tracearr가 붙여넣을 수 있는 코드입니다.",
+      "carries": "코드에는 단계만 전달됩니다. 대상, 서버 및 계정은 포함되지 않습니다. 수신 측에서 자체적으로 채웁니다.",
+      "copyCode": "공유 코드를 복사하세요",
+      "copyJson": "JSON 복사",
+      "authorLabel": "작성자",
+      "authorPlaceholder": "이름",
+      "authorHelper": "갤러리 페이지와 공유 코드에 표시됩니다. 선택 사항입니다.",
+      "save": "템플릿으로 저장",
+      "saved": "이 항목에 대한 코드를 만들 수 없습니다.",
+      "saveFailed": "저장할 수 없습니다.",
+      "failed": "이 항목에 대한 코드를 만들 수 없습니다.",
+      "saveHelper": "이 서버의 자동화 템플릿 목록에 추가합니다.",
+      "authorInCode": "코드에는 작성자 이름이 포함됩니다.",
+      "groupLabel": "섹션",
+      "groupHelper": "갤러리에서 표시할 섹션을 선택하세요.",
       "gallery": {
-        "trigger": "",
-        "body": ""
+        "trigger": "커뮤니티 갤러리에 올려주세요",
+        "body": "docs.tracearr.com/templates의 갤러리에는 공유 자동화가 나열되어 있습니다. 하나를 추가하는 것은 아래 JSON을 사용하여 Tracearr/automation-templates에 대한 풀 요청입니다. Tracearr는 갤러리를 읽지 않습니다."
       },
-      "openRepository": ""
+      "openRepository": "저장소 열기"
     },
     "fields": {
       "concurrent_streams": {
-        "label": "",
-        "description": ""
+        "label": "동시 스트리밍",
+        "description": "동일한 사용자의 활성 스트리밍 수"
       },
       "active_session_distance_km": {
-        "label": "",
-        "description": ""
+        "label": "세션 간 거리",
+        "description": "동시 세션 간 거리"
       },
       "travel_speed_kmh": {
-        "label": "",
-        "description": ""
+        "label": "이동 속도",
+        "description": "위치 간 계산된 이동 속도"
       },
       "unique_ips_in_window": {
-        "label": "",
-        "description": ""
+        "label": "기간 내 고유 IP",
+        "description": "해당 기간의 고유 IP 주소 수"
       },
       "unique_devices_in_window": {
-        "label": "",
-        "description": ""
+        "label": "기간 내 고유 기기",
+        "description": "해당 기간의 고유 장치 수"
       },
       "inactive_days": {
-        "label": "",
-        "description": ""
+        "label": "비활성 일수",
+        "description": "마지막 활동 이후 일수"
       },
       "current_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "현재 일시 중지 기간",
+        "description": "세션이 지속적으로 일시 중지된 기간"
       },
       "total_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "총 일시 중지 기간",
+        "description": "모든 일시정지/재개 주기에 걸친 총 누적 일시정지 시간"
       },
       "source_resolution": {
-        "label": "",
-        "description": ""
+        "label": "소스 해상도",
+        "description": "원본 미디어 해상도"
       },
       "output_resolution": {
-        "label": "",
-        "description": ""
+        "label": "출력 해상도",
+        "description": "트랜스코딩되거나 전달된 해상도"
       },
       "is_transcoding": {
-        "label": "",
-        "description": ""
+        "label": "트랜스코딩 여부",
+        "description": "비디오 또는 오디오 스트림이 트랜스코딩되고 있는지 여부"
       },
       "is_transcode_downgrade": {
-        "label": "",
-        "description": ""
+        "label": "트랜스코드 다운그레이드",
+        "description": "출력 해상도가 소스보다 낮습니다."
       },
       "source_bitrate_mbps": {
-        "label": "",
-        "description": ""
+        "label": "소스 비트레이트",
+        "description": "원본 미디어 비트 전송률"
       },
       "user_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "사용자",
+        "description": "계정별 특정 사용자",
+        "placeholder": "사용자 선택…"
       },
       "trust_score": {
-        "label": "",
-        "description": ""
+        "label": "신뢰 점수",
+        "description": "계정 생성 이후 일수"
       },
       "account_age_days": {
-        "label": "",
-        "description": ""
+        "label": "계정 연령",
+        "description": "계정 생성 이후 일수"
       },
       "device_type": {
-        "label": "",
-        "description": ""
+        "label": "장치 유형",
+        "description": "사용된 장치 유형"
       },
       "client_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "클라이언트/플레이어",
+        "description": "미디어 플레이어 애플리케이션",
+        "placeholder": "예: iOS용 Plex"
       },
       "platform": {
-        "label": "",
-        "description": ""
+        "label": "플랫폼/OS",
+        "description": "운영 체제"
       },
       "is_local_network": {
-        "label": "",
-        "description": ""
+        "label": "로컬 네트워크",
+        "description": "로컬 네트워크에서 스트리밍"
       },
       "country": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "국가",
+        "description": "지리적 국가",
+        "placeholder": "국가 선택…"
       },
       "ip_in_range": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "IP 범위",
+        "description": "CIDR 범위, IPv4 또는 IPv6의 IP 주소",
+        "placeholder": "예: 192.168.1.0/24 또는 2001:db8:abcd:7800::/64"
       },
       "server_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "서버",
+        "description": "특정 미디어 서버",
+        "placeholder": "서버 선택…"
       },
       "media_type": {
-        "label": "",
-        "description": ""
+        "label": "미디어 유형",
+        "description": "콘텐츠 유형"
       },
       "library_item_type": {
-        "label": "",
-        "description": ""
+        "label": "항목 유형",
+        "description": "영화"
       },
       "library_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "라이브러리",
+        "description": "콘텐츠가 추가된 라이브러리 이름",
+        "placeholder": "영화"
       },
       "resolution_after": {
-        "label": "",
-        "description": ""
+        "label": "해상도",
+        "description": "변경 후 해상도입니다. 알 수 없음은 ‘같지 않음’ 조건에도 일치하지 않습니다."
       },
       "dynamic_range_after": {
-        "label": "",
-        "description": ""
+        "label": "다이내믹 레인지",
+        "description": "변경 후 비디오 코덱입니다. 알 수 없음은 ‘같지 않음’ 조건에도 일치하지 않습니다."
       },
       "video_codec_after": {
-        "label": "",
-        "description": ""
+        "label": "비디오 코덱",
+        "description": "변경 후 비디오 코덱입니다. 알 수 없음은 ‘같지 않음’ 조건에도 일치하지 않습니다."
       },
       "audio_channels_after": {
-        "label": "",
-        "description": ""
+        "label": "오디오 채널",
+        "description": "새로운 자동화"
       },
       "file_size_after": {
-        "label": "",
-        "description": ""
+        "label": "파일 크기",
+        "description": "미리 준비된 자동화입니다. 하나를 골라 필요한 값만 채우세요."
       }
     },
     "gallery": {
-      "title": "",
-      "description": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "noMatchesHint": "",
+      "title": "새로운 자동화",
+      "description": "미리 준비된 자동화입니다. 하나를 골라 필요한 값만 채우세요.",
+      "searchPlaceholder": "검색",
+      "noMatches": "“{{query}}”와 일치하는 항목이 없습니다.",
+      "noMatchesHint": "결과 중 한 단어를 선택해 보세요: 불일치, 오프라인, 일시중지.",
       "group": {
-        "notifications": "",
-        "server_health": "",
-        "policies": "",
-        "housekeeping": "",
-        "other": ""
+        "notifications": "알림",
+        "server_health": "서버 상태",
+        "policies": "제한 및 규칙",
+        "housekeeping": "하우스키핑",
+        "other": "다른 시작 방법"
       },
-      "builtin": "",
+      "builtin": "내장",
       "kind": {
-        "policy": "",
-        "notification": ""
+        "policy": "위반",
+        "notification": "경고"
       },
       "paste": {
-        "title": "",
-        "description": ""
+        "title": "공유 코드 붙여넣기",
+        "description": "코드를 붙여넣고 추가하기 전에 코드의 기능을 검토하세요."
       },
       "scratch": {
-        "title": "",
-        "description": ""
+        "title": "처음부터 만들기",
+        "description": "단계별로 직접 구성하세요."
       },
-      "failed": "",
-      "retry": "",
-      "missing": "",
+      "failed": "이미 만들어진 자동화를 불러올 수 없습니다.",
+      "retry": "다시 시도하세요",
+      "missing": "이미 만들어진 자동화는 이 서버에 없습니다.",
       "hint": {
-        "move": "",
-        "use": "",
-        "close": ""
+        "move": "이동",
+        "use": "사용",
+        "close": "닫기"
       },
-      "loading": ""
+      "loading": "로드 중…"
     },
     "import": {
-      "title": "",
-      "description": "",
-      "reviewDescription": "",
-      "placeholder": "",
-      "formatHint": "",
-      "check": "",
-      "checking": "",
-      "valid": "",
-      "madeBy": "",
-      "codeShort": "",
+      "title": "공유 코드 붙여넣기",
+      "description": "코드를 붙여넣으세요. 모든 것이 코드에 있습니다. Tracearr는 아무것도 가져오지 않습니다.",
+      "reviewDescription": "tracearr1.…",
+      "placeholder": "tracearr1.…",
+      "formatHint": "코드는 Tracearr1로 시작됩니다.",
+      "check": "코드 확인",
+      "checking": "읽는 중…",
+      "valid": "Tracearr는 이 코드를 읽을 수 있습니다.",
+      "madeBy": "작성자: {{author}}, 코드에 작성된 대로",
+      "codeShort": "코드 {{fingerprint}}",
       "paused": {
-        "label": "",
-        "helper": ""
+        "label": "처음에는 일시중지",
+        "helper": "검토 후 목록에서 활성화하세요."
       },
-      "submit": "",
-      "adding": "",
-      "existing": "",
-      "existingUse": "",
+      "submit": "추가",
+      "adding": "추가하는 중…",
+      "existing": "{{name}}(이)라는 다른 자동화가 이미 존재합니다.",
+      "existingUse": "그것을 사용",
       "collision": {
-        "title": "",
-        "add": "",
-        "replace": ""
+        "title": "{{name}}(이)라는 다른 자동화가 이미 존재합니다.",
+        "add": "둘 다 유지",
+        "replace": "내 자동화 교체"
       },
-      "raw": "",
+      "raw": "JSON 표시",
       "errors": {
-        "notACode": "",
-        "notACodeHint": "",
-        "tooBig": "",
-        "tooBigHint": "",
-        "truncated": "",
-        "truncatedHint": "",
-        "tooNew": "",
-        "tooNewHint": "",
-        "tooMany": "",
-        "tooManyHint": "",
-        "rejected": "",
-        "rejectedHint": ""
+        "notACode": "Tracearr 공유 코드처럼 보이지 않습니다.",
+        "notACodeHint": "코드는 Tracearr1로 시작됩니다. JSON도 작동합니다.",
+        "tooBig": "Tracearr 자동화라고 하기에는 너무 큽니다.",
+        "tooBigHint": "코드는 최대 수천 자입니다.",
+        "truncated": "이 코드는 잘린 것 같습니다.",
+        "truncatedHint": "전체 코드를 복사하여 다시 붙여넣으세요. 일부 채팅 앱은 긴 코드를 여러 줄로 분할합니다.",
+        "tooNew": "Tracearr {{required}} 이상이 필요합니다.",
+        "tooNewHint": "이 서버는 {{current}}를 실행합니다. Tracearr를 업데이트한 후 다시 붙여넣으세요.",
+        "tooMany": "Tracearr는 이 글을 읽을 수 없습니다.",
+        "tooManyHint": "잠시 기다렸다가 다시 확인해 보세요.",
+        "rejected": "Tracearr는 이 글을 읽을 수 없습니다.",
+        "rejectedHint": "다른 도구에서 가져왔을 수도 있고 직접 편집했을 수도 있습니다."
       },
-      "source": "",
-      "validCaveat": "",
-      "builtinMatch": ""
+      "source": "공유 자동화는 docs.tracearr.com/templates에 나열되어 있습니다.",
+      "validCaveat": "코드에는 누가 작성했는지, 안전한지 여부가 나와 있지 않습니다. 단계는 다음과 같습니다.",
+      "builtinMatch": "Tracearr가 제공하는 자동화 중 하나인 {{name}}입니다."
     },
     "kind": {
-      "policy": "",
-      "notification": ""
+      "policy": "위반",
+      "notification": "경고"
     },
-    "kindColumn": "",
-    "name": "",
-    "newAutomation": "",
-    "namePlaceholder": "",
-    "nameInvalid": "",
-    "descriptionLabel": "",
-    "descriptionPlaceholder": "",
-    "thisAutomation": "",
-    "cooldownLabel": "",
-    "cooldownInvalid": "",
-    "retentionLabel": "",
-    "retentionPlaceholder": "",
-    "retentionInvalid": "",
-    "noAutomationsFound": "",
+    "kindColumn": "종류",
+    "name": "이름",
+    "newAutomation": "새로운 자동화",
+    "namePlaceholder": "이 자동화의 이름",
+    "nameInvalid": "이름을 지어주세요.",
+    "descriptionLabel": "설명",
+    "descriptionPlaceholder": "이것은 무엇을 위한 것인가",
+    "thisAutomation": "이 자동화",
+    "cooldownLabel": "0 이상의 정수를 분 단위로 입력하거나 비워 두세요.",
+    "cooldownInvalid": "0 이상의 정수를 분 단위로 입력하거나 비워 두세요.",
+    "retentionLabel": "다음 기간 동안 계속 실행",
+    "retentionPlaceholder": "{{days}}",
+    "retentionInvalid": "정수(1일 이상)를 입력하거나 비워 두세요.",
+    "noAutomationsFound": "같지 않음",
     "operators": {
-      "eq": "",
-      "neq": "",
-      "gt": "",
-      "gte": "",
-      "lt": "",
-      "lte": "",
-      "in": "",
-      "not_in": "",
-      "contains": "",
-      "not_contains": ""
+      "eq": "같음",
+      "neq": "같지 않음",
+      "gt": "보다 큼",
+      "gte": "이상",
+      "lt": "미만",
+      "lte": "이하",
+      "in": "중 하나입니다",
+      "not_in": "포함",
+      "contains": "포함",
+      "not_contains": "포함하지 않습니다"
     },
     "options": {
-      "4K": "",
-      "1080p": "",
-      "720p": "",
-      "480p": "",
-      "SD": "",
-      "unknown": "",
-      "mobile": "",
-      "tablet": "",
-      "tv": "",
-      "desktop": "",
-      "browser": "",
-      "ios": "",
-      "android": "",
-      "windows": "",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
-      "tizen": "",
-      "movie": "",
-      "episode": "",
-      "track": "",
-      "photo": "",
-      "live": "",
-      "trailer": "",
-      "video": "",
-      "audio": "",
-      "video_or_audio": "",
-      "neither": "",
-      "8K": "",
-      "1440p": "",
-      "sdr": "",
-      "hdr": "",
-      "hdr10": "",
-      "hdr10+": "",
-      "hlg": "",
-      "dolby vision": "",
+      "4K": "4K(2160p)",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "알 수 없음",
+      "mobile": "모바일",
+      "tablet": "태블릿",
+      "tv": "TV",
+      "desktop": "데스크탑",
+      "browser": "브라우저",
+      "ios": "iOS",
+      "android": "안드로이드",
+      "windows": "윈도우",
+      "macos": "macOS",
+      "linux": "리눅스",
+      "tvos": "tvOS",
+      "androidtv": "안드로이드 TV",
+      "roku": "로쿠",
+      "webos": "웹OS",
+      "tizen": "타이젠",
+      "movie": "영화",
+      "episode": "TV 에피소드",
+      "track": "음악",
+      "photo": "사진",
+      "live": "라이브 TV",
+      "trailer": "예고편",
+      "video": "비디오",
+      "audio": "오디오",
+      "video_or_audio": "비디오 또는 오디오",
+      "neither": "둘 다 아님(직접 플레이)",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "돌비 비전",
       "libraryItemType": {
-        "movie": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "artist": "",
-        "album": "",
-        "track": "",
-        "photo": ""
+        "movie": "영화",
+        "show": "시즌",
+        "season": "시즌",
+        "episode": "에피소드",
+        "artist": "아티스트",
+        "album": "앨범",
+        "track": "트랙",
+        "photo": "사진"
       }
     },
     "provenance": {
-      "builtin": "",
-      "imported": "",
-      "importedBy": "",
-      "saved": "",
-      "customized": "",
-      "customizedFromRemoved": ""
+      "builtin": "내장 · {{name}} {{version}}",
+      "imported": "{{date}} · {{name}} {{version}} 공유 코드에서 가져옴",
+      "importedBy": "{{author}} · {{date}} {{name}}에 {{version}}의 공유 코드에서 가져옴",
+      "saved": "{{name}}의 맞춤설정",
+      "customized": "{{name}}의 맞춤설정",
+      "customizedFromRemoved": "이후 제거된 기성 자동화에서 사용자 정의됨"
     },
-    "recordsOnly": "",
+    "recordsOnly": "기록만 실행됨",
     "scope": {
-      "global": "",
-      "person": "",
-      "account": "",
-      "crossServer": ""
+      "global": "전체",
+      "person": "사용자",
+      "account": "계정",
+      "crossServer": "서버 간"
     },
-    "searchPlaceholder": "",
+    "searchPlaceholder": "자동화 검색…",
     "sessionTargets": {
       "triggering": {
-        "label": "",
-        "tooltip": ""
+        "label": "트리거링 세션",
+        "tooltip": "이 자동화를 트리거한 세션만"
       },
       "oldest": {
-        "label": "",
+        "label": "가장 오래된 세션",
         "tooltip": ""
       },
       "newest": {
