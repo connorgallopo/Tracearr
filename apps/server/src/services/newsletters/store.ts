@@ -28,6 +28,11 @@ const COUNTED: NewsletterSendTrigger[] = ['schedule', 'manual'];
 const WATERMARK: NewsletterSendOutcome[] = ['sent', 'partial'];
 const TERMINAL: NewsletterSendOutcome[] = ['sent', 'partial', 'failed', 'skipped_empty'];
 
+/** A send still rendering this long after it started belongs to a run that died before it queued anything. */
+export const RENDERING_STALE_MS = 10 * 60_000;
+/** A send still sending this long after it started has lost its delivery jobs; the rate limit bounds a real send well inside this. */
+export const SENDING_STALE_MS = 6 * 60 * 60_000;
+
 export class OpenSendConflict extends Error {
   constructor(public readonly newsletterId: string) {
     super('A send for this newsletter is already open');
@@ -71,8 +76,32 @@ export async function findOpenSend(newsletterId: string): Promise<SendRow | null
   return row ?? null;
 }
 
+/** Closes a send its run abandoned. Returns true when it closed one. */
+export async function closeStaleSend(open: SendRow, now = Date.now()): Promise<boolean> {
+  const age = now - open.startedAt.getTime();
+  if (open.outcome === 'rendering' && age > RENDERING_STALE_MS) {
+    await markSendOutcome(open.id, 'failed', 'Interrupted before delivery started');
+    return true;
+  }
+  if (open.outcome === 'sending' && age > SENDING_STALE_MS) {
+    await db
+      .update(newsletterSendRecipients)
+      .set({ status: 'failed', error: 'Delivery job lost' })
+      .where(
+        and(
+          eq(newsletterSendRecipients.sendId, open.id),
+          eq(newsletterSendRecipients.status, 'queued')
+        )
+      );
+    await finalizeSend(open.id);
+    return true;
+  }
+  return false;
+}
+
 export async function deleteNewsletter(id: string): Promise<'deleted' | 'missing' | 'open_send'> {
-  if (await findOpenSend(id)) return 'open_send';
+  const open = await findOpenSend(id);
+  if (open && !(await closeStaleSend(open))) return 'open_send';
   const rows = await db
     .delete(newsletters)
     .where(eq(newsletters.id, id))

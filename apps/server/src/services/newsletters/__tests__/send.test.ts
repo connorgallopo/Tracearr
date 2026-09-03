@@ -4,6 +4,7 @@ import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
 const store = vi.hoisted(() => ({
   getNewsletter: vi.fn(),
   findOpenSend: vi.fn(),
+  closeStaleSend: vi.fn(),
   queuedRecipientIds: vi.fn(),
   lastWatermark: vi.fn(),
   insertSend: vi.fn(),
@@ -86,6 +87,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   store.getNewsletter.mockResolvedValue(NEWSLETTER);
   store.findOpenSend.mockResolvedValue(null);
+  store.closeStaleSend.mockResolvedValue(false);
   store.lastWatermark.mockResolvedValue(new Date('2026-08-26T00:00:00Z'));
   store.insertSend.mockImplementation(async (v: Record<string, unknown>) => ({
     id: 'send-1',
@@ -244,18 +246,16 @@ describe('runNewsletter', () => {
     expect(store.markSendOutcome).toHaveBeenCalledWith('send-1', 'failed', 'boom');
   });
 
-  it('closes a stale rendering send as failed and lets the run continue', async () => {
-    store.findOpenSend.mockResolvedValueOnce({
+  it('closes a stale open send and lets the run continue', async () => {
+    const stale = {
       id: 'open-1',
       outcome: 'rendering',
       startedAt: new Date(Date.now() - 11 * 60_000),
-    });
+    };
+    store.findOpenSend.mockResolvedValueOnce(stale);
+    store.closeStaleSend.mockResolvedValueOnce(true);
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
-    expect(store.markSendOutcome).toHaveBeenCalledWith(
-      'open-1',
-      'failed',
-      'Interrupted before delivery started'
-    );
+    expect(store.closeStaleSend).toHaveBeenCalledWith(stale);
     expect(store.insertSend).toHaveBeenCalled();
     expect(result.outcome).toBe('queued');
   });

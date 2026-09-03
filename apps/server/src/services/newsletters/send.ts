@@ -10,6 +10,7 @@ import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
 import { UNSUBSCRIBE_PLACEHOLDER, buildDigestInput, formatWindowDate } from './render.js';
 import {
   OpenSendConflict,
+  closeStaleSend,
   findOpenSend,
   getNewsletter,
   insertRecipients,
@@ -29,9 +30,6 @@ export interface RunResult {
   queuedRecipientIds: string[];
 }
 
-/** A send still rendering this long after it started belongs to a run that died before it queued anything. */
-const RENDERING_STALE_MS = 10 * 60_000;
-
 async function transportProblem(newsletter: NewsletterRow): Promise<string | null> {
   if (!newsletter.destinationId) return 'No email destination is set';
   const destination = await getDestination(newsletter.destinationId);
@@ -47,10 +45,7 @@ async function resume(
 ): Promise<RunResult | null> {
   const open = await findOpenSend(newsletterId);
   if (!open) return null;
-  if (open.outcome === 'rendering' && Date.now() - open.startedAt.getTime() > RENDERING_STALE_MS) {
-    await markSendOutcome(open.id, 'failed', 'Interrupted before delivery started');
-    return null;
-  }
+  if (await closeStaleSend(open)) return null;
   // A rendering send has no full recipient list yet; handing out the partial one
   // burns those job ids so the run that owns the send can never enqueue them.
   if (trigger === 'test' || open.outcome === 'rendering')
