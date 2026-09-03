@@ -608,7 +608,9 @@ describe('updateUser', () => {
 
     set = mockUpdateChain([user]);
     await updateUser(user.id, { name: 'Renamed' });
-    expect((set.mock.calls[0]?.[0] as { contactEmail?: string }).contactEmail).toBeUndefined();
+    const [written] = set.mock.calls[0] ?? [];
+    expect(written).toBeDefined();
+    expect((written as { contactEmail?: string }).contactEmail).toBeUndefined();
   });
 });
 
