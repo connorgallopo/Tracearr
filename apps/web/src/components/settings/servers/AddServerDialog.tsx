@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Loader2, Server as ServerIcon, XCircle } from 'lucide-react';
+import { AlertTriangle, Loader2, Server as ServerIcon, XCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import type { PlexDiscoveredServer } from '@/lib/api';
+import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 
 export type PlexDialogStep =
   'loading' | 'no-accounts' | 'select-account' | 'loading-servers' | 'no-servers' | 'select';
@@ -123,7 +124,7 @@ export function AddServerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-fit max-w-[calc(100vw-2rem)] min-w-[28rem] sm:max-w-[calc(100vw-2rem)]">
+      <DialogContent className={SERVER_DIALOG_CONTENT_CLASS}>
         <DialogHeader>
           <DialogTitle>{t('servers.addServer')}</DialogTitle>
           <DialogDescription>
@@ -166,6 +167,7 @@ export function AddServerDialog({
 
               {plexStep === 'no-accounts' && (
                 <Alert variant="warning">
+                  <AlertTriangle />
                   <AlertDescription>
                     <span className="font-medium">{t('servers.noPlexAccountsLinked')}</span>
                     <span>{t('servers.noPlexAccountsLinkedHint')}</span>

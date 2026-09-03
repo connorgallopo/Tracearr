@@ -18,6 +18,7 @@ import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicke
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { api } from '@/lib/api';
 import { usePlexServerConnections } from '@/hooks/queries';
+import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 
 const SERVER_COLOR_OPTIONS = SERVER_COLOR_PALETTE.map((preset) => ({
   id: preset.hex,
@@ -71,7 +72,7 @@ export function EditServerDialog({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-fit max-w-[calc(100vw-2rem)] min-w-[28rem] sm:max-w-[calc(100vw-2rem)]">
+      <DialogContent className={SERVER_DIALOG_CONTENT_CLASS}>
         <DialogHeader>
           <DialogTitle>{t('servers.editServer')}</DialogTitle>
           <DialogDescription>{t('servers.editServerDesc')}</DialogDescription>
@@ -89,7 +90,7 @@ export function EditServerDialog({
             />
           </Field>
 
-          {isPlexServer && connectionsData?.server ? (
+          {isPlexServer ? (
             <Field>
               <FieldTitle>{t('servers.serverUrl')}</FieldTitle>
               {isLoadingConnections ? (
@@ -99,28 +100,37 @@ export function EditServerDialog({
                     {t('servers.discoveringConnections')}
                   </span>
                 </div>
+              ) : connectionsData?.server ? (
+                <>
+                  <PlexServerSelector
+                    servers={[connectionsData.server]}
+                    onSelect={(uri, _name, clientIdentifier) => {
+                      onUpdate(
+                        hasNameChange ? editName : undefined,
+                        uri,
+                        clientIdentifier,
+                        hasColorChange ? editColor : undefined
+                      );
+                    }}
+                    connecting={isUpdating}
+                    connectingToServer={isUpdating ? server.name : null}
+                    onCancel={onClose}
+                    showCancel
+                    onTestCustomUrl={async (uri) => {
+                      const result = await api.auth.testPlexConnection({ uri });
+                      return result.connection;
+                    }}
+                  />
+                  {hasNameChange && <FieldDescription>{t('servers.updateHint')}</FieldDescription>}
+                </>
               ) : (
-                <PlexServerSelector
-                  servers={[connectionsData.server]}
-                  onSelect={(uri, _name, clientIdentifier) => {
-                    onUpdate(
-                      hasNameChange ? editName : undefined,
-                      uri,
-                      clientIdentifier,
-                      hasColorChange ? editColor : undefined
-                    );
-                  }}
-                  connecting={isUpdating}
-                  connectingToServer={isUpdating ? server.name : null}
-                  onCancel={onClose}
-                  showCancel
-                  onTestCustomUrl={async (uri) => {
-                    const result = await api.auth.testPlexConnection({ uri });
-                    return result.connection;
-                  }}
+                <Input
+                  id="edit-url"
+                  value={manualUrl}
+                  onChange={(e) => setManualUrl(e.target.value)}
+                  placeholder={t('servers.plexServerUrlPlaceholder')}
                 />
               )}
-              {hasNameChange && <FieldDescription>{t('servers.updateHint')}</FieldDescription>}
             </Field>
           ) : (
             <Field>
@@ -129,9 +139,7 @@ export function EditServerDialog({
                 id="edit-url"
                 value={manualUrl}
                 onChange={(e) => setManualUrl(e.target.value)}
-                placeholder={
-                  isPlexServer ? t('servers.plexServerUrlPlaceholder') : 'http://192.168.1.100:8096'
-                }
+                placeholder="http://192.168.1.100:8096"
               />
             </Field>
           )}
