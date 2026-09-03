@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { BackupListItem, BackupMetadata } from '@tracearr/shared';
-import { RestoreCard } from './BackupSettings';
+import { RestoreCard } from './Backup';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
