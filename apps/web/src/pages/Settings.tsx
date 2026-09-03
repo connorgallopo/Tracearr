@@ -9,8 +9,8 @@ import { Api } from '@/components/settings/data/Api';
 import { Connections } from '@/components/settings/servers/Connections';
 import { PosterSource } from '@/components/settings/servers/PosterSource';
 import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
-import { AccessSettings } from '@/components/settings/AccessSettings';
-import { MobileSettings } from '@/components/settings/MobileSettings';
+import { Guest } from '@/components/settings/access/Guest';
+import { MobileDevices } from '@/components/settings/access/MobileDevices';
 import { TailscaleSettings } from '@/components/settings/TailscaleSettings';
 import { ImportSettings } from '@/components/settings/ImportSettings';
 import { JobsSettings } from '@/components/settings/JobsSettings';
@@ -41,8 +41,8 @@ export function Settings() {
 
             <Route path="notifications/destinations" element={<Destinations />} />
 
-            <Route path="access/guest" element={<AccessSettings />} />
-            <Route path="access/mobile" element={<MobileSettings />} />
+            <Route path="access/guest" element={<Guest />} />
+            <Route path="access/mobile" element={<MobileDevices />} />
             <Route path="access/remote" element={<TailscaleSettings />} />
 
             <Route path="data/import" element={<ImportSettings />} />

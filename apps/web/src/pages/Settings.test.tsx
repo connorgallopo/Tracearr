@@ -31,11 +31,11 @@ vi.mock('@/components/settings/servers/PosterSource', () => ({
 vi.mock('@/components/settings/servers/PlexAccounts', () => ({
   PlexAccounts: () => <div>plex accounts</div>,
 }));
-vi.mock('@/components/settings/AccessSettings', () => ({
-  AccessSettings: () => <div>access settings</div>,
+vi.mock('@/components/settings/access/Guest', () => ({
+  Guest: () => <div>access settings</div>,
 }));
-vi.mock('@/components/settings/MobileSettings', () => ({
-  MobileSettings: () => <div>mobile settings</div>,
+vi.mock('@/components/settings/access/MobileDevices', () => ({
+  MobileDevices: () => <div>mobile settings</div>,
 }));
 vi.mock('@/components/settings/TailscaleSettings', () => ({
   TailscaleSettings: () => <div>tailscale settings</div>,
