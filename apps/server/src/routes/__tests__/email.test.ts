@@ -1,0 +1,135 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import Fastify, { type FastifyInstance, type FastifyReply, type RouteOptions } from 'fastify';
+import sensible from '@fastify/sensible';
+import { randomUUID } from 'node:crypto';
+import type { AuthUser } from '@tracearr/shared';
+
+const suppressions = vi.hoisted(() => ({
+  listSuppressions: vi.fn(),
+  addSuppression: vi.fn(),
+  removeSuppression: vi.fn(),
+}));
+vi.mock('../../services/newsletters/suppressions.js', () => suppressions);
+const mockVerify = vi.fn();
+vi.mock('../../services/newsletters/links.js', () => ({
+  verifyUnsubscribeToken: (...a: unknown[]) => mockVerify(...a) as unknown,
+}));
+const store = vi.hoisted(() => ({ loadDelivery: vi.fn() }));
+vi.mock('../../services/newsletters/store.js', () => store);
+
+import { emailRoutes } from '../email.js';
+
+const owner: AuthUser = { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] };
+const routes: RouteOptions[] = [];
+
+async function build(user: AuthUser | null): Promise<FastifyInstance> {
+  const app = Fastify({ logger: false });
+  await app.register(sensible);
+  app.addHook('onRoute', (route) => {
+    routes.push(route);
+  });
+  app.decorate('requireOwner', async (request: unknown, reply: FastifyReply) => {
+    if (!user) return reply.unauthorized('Login required');
+    (request as { user: AuthUser }).user = user;
+    if (user.role !== 'owner') await reply.forbidden('Owner access required');
+  });
+  await app.register(emailRoutes, { prefix: '/email' });
+  await app.ready();
+  return app;
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  routes.length = 0;
+  store.loadDelivery.mockResolvedValue({
+    recipient: { id: 'r1', address: 'a@x.com', sendId: 'send-1' },
+    send: { id: 'send-1' },
+    newsletter: { id: 'n1' },
+  });
+});
+
+describe('suppressions', () => {
+  it('lists, adds lowercased, and removes for the owner only', async () => {
+    const app = await build(owner);
+    suppressions.listSuppressions.mockResolvedValue([]);
+    expect((await app.inject({ method: 'GET', url: '/email/suppressions' })).statusCode).toBe(200);
+    const res = await app.inject({
+      method: 'POST',
+      url: '/email/suppressions',
+      payload: { address: 'Gone@X.com' },
+    });
+    expect(res.statusCode).toBe(201);
+    expect(suppressions.addSuppression).toHaveBeenCalledWith('gone@x.com', 'manual');
+    suppressions.removeSuppression.mockResolvedValue(true);
+    expect(
+      (await app.inject({ method: 'DELETE', url: '/email/suppressions/gone%40x.com' })).statusCode
+    ).toBe(204);
+    suppressions.removeSuppression.mockResolvedValue(false);
+    expect(
+      (await app.inject({ method: 'DELETE', url: '/email/suppressions/nobody%40x.com' })).statusCode
+    ).toBe(404);
+    const anon = await build(null);
+    expect((await anon.inject({ method: 'GET', url: '/email/suppressions' })).statusCode).toBe(401);
+  });
+});
+
+describe('public unsubscribe', () => {
+  it('GET shows a confirmation page without the address and with the protective headers', async () => {
+    const app = await build(null);
+    mockVerify.mockReturnValue('r1');
+    const res = await app.inject({ method: 'GET', url: '/email/unsubscribe/tok' });
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['content-type']).toMatch(/text\/html/);
+    expect(res.headers['x-robots-tag']).toBe('noindex');
+    expect(res.headers['cache-control']).toBe('private, no-store');
+    expect(res.headers['content-security-policy']).toBe(
+      "default-src 'none'; style-src 'unsafe-inline'"
+    );
+    expect(res.body).toContain('<form method="post"');
+    expect(res.body).not.toContain('a@x.com');
+    expect(suppressions.addSuppression).not.toHaveBeenCalled();
+  });
+
+  it('POST suppresses the recipient address with the send as source and is idempotent', async () => {
+    const app = await build(null);
+    mockVerify.mockReturnValue('r1');
+    const res = await app.inject({
+      method: 'POST',
+      url: '/email/unsubscribe/tok',
+      payload: 'List-Unsubscribe=One-Click',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(suppressions.addSuppression).toHaveBeenCalledWith('a@x.com', 'unsubscribed', 'send-1');
+    expect(res.body).toContain('unsubscribed');
+    expect(res.body).not.toContain('a@x.com');
+    expect((await app.inject({ method: 'POST', url: '/email/unsubscribe/tok' })).statusCode).toBe(
+      200
+    );
+  });
+
+  it('answers 404 with the same page shape for a bad token or a missing recipient', async () => {
+    const app = await build(null);
+    mockVerify.mockReturnValue(null);
+    let res = await app.inject({ method: 'GET', url: '/email/unsubscribe/nope' });
+    expect(res.statusCode).toBe(404);
+    expect(res.headers['content-type']).toMatch(/text\/html/);
+    mockVerify.mockReturnValue('r1');
+    store.loadDelivery.mockResolvedValue(null);
+    res = await app.inject({ method: 'POST', url: '/email/unsubscribe/tok' });
+    expect(res.statusCode).toBe(404);
+    expect(suppressions.addSuppression).not.toHaveBeenCalled();
+  });
+
+  it('both public routes carry a per-route rate limit', async () => {
+    await build(null);
+    const publicRoutes = routes.filter((r) => String(r.url).includes('/unsubscribe/'));
+    expect(publicRoutes.length).toBeGreaterThanOrEqual(2);
+    for (const r of publicRoutes) {
+      expect((r.config as { rateLimit?: { max: number; timeWindow: string } }).rateLimit).toEqual({
+        max: 60,
+        timeWindow: '1 minute',
+      });
+    }
+  });
+});

@@ -1,0 +1,309 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
+import sensible from '@fastify/sensible';
+import { randomUUID } from 'node:crypto';
+import type { AuthUser } from '@tracearr/shared';
+
+const store = vi.hoisted(() => ({
+  listNewsletters: vi.fn(),
+  getNewsletter: vi.fn(),
+  createNewsletter: vi.fn(),
+  updateNewsletter: vi.fn(),
+  deleteNewsletter: vi.fn(),
+  findOpenSend: vi.fn(),
+  lastSend: vi.fn(),
+  listSends: vi.fn(),
+  getSend: vi.fn(),
+  listRecipients: vi.fn(),
+  resetFailedRecipients: vi.fn(),
+  loadServerLinks: vi.fn(),
+  lastWatermark: vi.fn(),
+  toPublicNewsletter: vi.fn((row: { id: string; name: string }) => ({
+    id: row.id,
+    name: row.name,
+  })),
+  toSendSummary: vi.fn((row: { id: string }) => ({ id: row.id })),
+  toRecipient: vi.fn((row: { id: string }) => ({ id: row.id })),
+}));
+vi.mock('../../services/newsletters/store.js', () => store);
+const queue = vi.hoisted(() => ({
+  upsertNewsletterSchedule: vi.fn(),
+  removeNewsletterSchedule: vi.fn(),
+  nextRunAt: vi.fn(async () => null),
+  enqueueNewsletterRun: vi.fn(async () => 'run-1'),
+  enqueueDeliveries: vi.fn(async (_s: string, ids: string[]) => ids.length),
+  InvalidScheduleError: class InvalidScheduleError extends Error {},
+}));
+vi.mock('../../jobs/newsletterQueue.js', () => queue);
+const mockDestination = vi.fn();
+vi.mock('../../services/notifications/destinationStore.js', () => ({
+  getDestination: (...a: unknown[]) => mockDestination(...a) as unknown,
+}));
+const mockSettings = vi.fn();
+vi.mock('../../services/settings.js', () => ({
+  getNetworkSettings: () => mockSettings() as unknown,
+}));
+const mockAssemble = vi.fn();
+vi.mock('../../services/newsletters/assemble.js', () => ({
+  assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
+}));
+const mockResolve = vi.fn();
+vi.mock('../../services/newsletters/recipients.js', () => ({
+  resolveRecipients: (...a: unknown[]) => mockResolve(...a) as unknown,
+}));
+
+import { newsletterRoutes } from '../newsletters.js';
+
+const owner: AuthUser = { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] };
+const admin: AuthUser = { userId: randomUUID(), username: 'admin', role: 'admin', serverIds: [] };
+const ID = '11111111-1111-4111-8111-111111111111';
+const DEST = '22222222-2222-4222-8222-222222222222';
+const body = {
+  name: 'Weekly',
+  schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
+  timezone: 'UTC',
+  destinationId: DEST,
+};
+const row = {
+  id: ID,
+  name: 'Weekly',
+  enabled: true,
+  destinationId: DEST,
+  schedule: body.schedule,
+  timezone: 'UTC',
+  imageMode: 'auto',
+  scope: { serverIds: [], libraryIds: [] },
+  sections: {},
+  recipients: { members: true, extraAddresses: [] },
+  subject: 's',
+  intro: null,
+  outro: null,
+  window: { kind: 'fixed', days: 7 },
+  skipWhenEmpty: true,
+};
+
+async function build(user: AuthUser): Promise<FastifyInstance> {
+  const app = Fastify({ logger: false });
+  await app.register(sensible);
+  app.decorate('requireOwner', async (request: unknown, reply: FastifyReply) => {
+    (request as { user: AuthUser }).user = user;
+    if (user.role !== 'owner') await reply.forbidden('Owner access required');
+  });
+  await app.register(newsletterRoutes, { prefix: '/newsletters' });
+  await app.ready();
+  return app;
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockDestination.mockResolvedValue({ id: DEST, type: 'email', enabled: true, configStatus: 'ok' });
+  mockSettings.mockResolvedValue({
+    externalUrl: 'https://tracearr.example.com',
+    trustProxy: false,
+  });
+  store.getNewsletter.mockResolvedValue(row);
+  store.createNewsletter.mockResolvedValue(row);
+  store.updateNewsletter.mockResolvedValue(row);
+  store.lastSend.mockResolvedValue(null);
+  store.findOpenSend.mockResolvedValue(null);
+  store.listNewsletters.mockResolvedValue([row]);
+});
+
+describe('newsletter routes', () => {
+  it('forbids non-owners everywhere', async () => {
+    const app = await build(admin);
+    for (const [method, url] of [
+      ['GET', '/newsletters'],
+      ['POST', '/newsletters'],
+      ['GET', `/newsletters/${ID}`],
+      ['DELETE', `/newsletters/${ID}`],
+      ['POST', `/newsletters/${ID}/send`],
+    ] as const) {
+      const res = await app.inject({ method, url, payload: method === 'POST' ? body : undefined });
+      expect(res.statusCode).toBe(403);
+    }
+  });
+
+  it('creates a newsletter, upserts its scheduler, and answers 201', async () => {
+    const app = await build(owner);
+    const res = await app.inject({ method: 'POST', url: '/newsletters', payload: body });
+    expect(res.statusCode).toBe(201);
+    expect(store.createNewsletter).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Weekly', destinationId: DEST, imageMode: 'auto' })
+    );
+    expect(queue.upsertNewsletterSchedule).toHaveBeenCalledWith(row);
+  });
+
+  it('rejects a destination that is not an email kind and hosted images without an external url', async () => {
+    const app = await build(owner);
+    mockDestination.mockResolvedValue({
+      id: DEST,
+      type: 'discord',
+      enabled: true,
+      configStatus: 'ok',
+    });
+    expect(
+      (await app.inject({ method: 'POST', url: '/newsletters', payload: body })).statusCode
+    ).toBe(400);
+    mockDestination.mockResolvedValue({
+      id: DEST,
+      type: 'email',
+      enabled: true,
+      configStatus: 'ok',
+    });
+    mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/newsletters',
+      payload: { ...body, imageMode: 'hosted' },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toMatch(/external url/i);
+    expect(store.createNewsletter).not.toHaveBeenCalled();
+  });
+
+  it('rolls back a created row whose schedule the parser rejects', async () => {
+    const app = await build(owner);
+    queue.upsertNewsletterSchedule.mockRejectedValueOnce(new queue.InvalidScheduleError('bad'));
+    store.deleteNewsletter.mockResolvedValue('deleted');
+    const res = await app.inject({
+      method: 'POST',
+      url: '/newsletters',
+      payload: { ...body, schedule: { kind: 'cron', expression: '99 99 * * *' } },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(store.deleteNewsletter).toHaveBeenCalledWith(ID);
+  });
+
+  it('patches and re-upserts, and removes the scheduler when disabled', async () => {
+    const app = await build(owner);
+    store.updateNewsletter.mockResolvedValue({ ...row, enabled: false });
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { enabled: false },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(store.updateNewsletter).toHaveBeenCalledWith(ID, { enabled: false });
+    expect(queue.upsertNewsletterSchedule).toHaveBeenCalledWith({ ...row, enabled: false });
+  });
+
+  it('refuses to delete while a send is open, otherwise deletes and drops the scheduler', async () => {
+    const app = await build(owner);
+    store.deleteNewsletter.mockResolvedValueOnce('open_send');
+    expect((await app.inject({ method: 'DELETE', url: `/newsletters/${ID}` })).statusCode).toBe(
+      409
+    );
+    store.deleteNewsletter.mockResolvedValueOnce('deleted');
+    expect((await app.inject({ method: 'DELETE', url: `/newsletters/${ID}` })).statusCode).toBe(
+      204
+    );
+    expect(queue.removeNewsletterSchedule).toHaveBeenCalledWith(ID);
+  });
+
+  it('send now and test enqueue runs, and send now answers 409 while a send is open', async () => {
+    const app = await build(owner);
+    let res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/send` });
+    expect(res.statusCode).toBe(202);
+    expect(queue.enqueueNewsletterRun).toHaveBeenCalledWith({
+      newsletterId: ID,
+      trigger: 'manual',
+    });
+    res = await app.inject({
+      method: 'POST',
+      url: `/newsletters/${ID}/test`,
+      payload: { address: 'Me@Example.com' },
+    });
+    expect(res.statusCode).toBe(202);
+    expect(queue.enqueueNewsletterRun).toHaveBeenCalledWith({
+      newsletterId: ID,
+      trigger: 'test',
+      testAddress: 'me@example.com',
+    });
+    store.findOpenSend.mockResolvedValue({ id: 'open' });
+    expect((await app.inject({ method: 'POST', url: `/newsletters/${ID}/send` })).statusCode).toBe(
+      409
+    );
+  });
+
+  it('preview renders without writing and reports counts and recipients', async () => {
+    const app = await build(owner);
+    store.lastWatermark.mockResolvedValue(null);
+    store.loadServerLinks.mockResolvedValue([
+      { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: null },
+    ]);
+    mockAssemble.mockResolvedValue({
+      data: {
+        movies: [
+          {
+            cardId: 'm1',
+            serverId: 's1',
+            serverName: 'Basement',
+            serverType: 'plex',
+            ratingKey: '1',
+            mediaId: null,
+            imdbId: null,
+            thumbPath: '/t',
+            title: 'Heat',
+            year: 1995,
+            genres: [],
+            addedAt: new Date(),
+          },
+        ],
+        shows: [],
+        artists: [],
+        mostWatched: [],
+        counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: false,
+      },
+      posters: { m1: { serverId: 's1', thumbPath: '/t', version: 'v1' } },
+    });
+    mockResolve.mockResolvedValue({
+      recipients: [
+        { address: 'a@x.com', userId: null, name: null, suppressed: false },
+        { address: 'b@x.com', userId: null, name: null, suppressed: true },
+      ],
+      missingEmail: 2,
+    });
+    const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(res.statusCode).toBe(200);
+    const json = res.json();
+    expect(json.counts).toEqual({ movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 });
+    expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
+    expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
+    expect(json.html).toContain('Heat');
+    expect(Object.keys(store)).not.toContain('insertSend');
+  });
+
+  it('lists sends with pagination and retries failed recipients', async () => {
+    const app = await build(owner);
+    store.listSends.mockResolvedValue({ rows: [{ id: 'send-1' }], total: 1 });
+    let res = await app.inject({
+      method: 'GET',
+      url: `/newsletters/${ID}/sends?page=2&pageSize=10`,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(store.listSends).toHaveBeenCalledWith(ID, 2, 10);
+    store.getSend.mockResolvedValue({
+      id: 'send-1',
+      newsletterId: ID,
+      html: '<p>x</p>',
+      outcome: 'partial',
+    });
+    store.resetFailedRecipients.mockResolvedValue(['r1', 'r2']);
+    res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/sends/send-1/retry-failed` });
+    expect(res.statusCode).toBe(202);
+    expect(res.json()).toEqual({ queued: 2 });
+    expect(queue.enqueueDeliveries).toHaveBeenCalledWith('send-1', ['r1', 'r2']);
+    store.getSend.mockResolvedValue({
+      id: 'send-1',
+      newsletterId: ID,
+      html: null,
+      outcome: 'partial',
+    });
+    expect(
+      (await app.inject({ method: 'POST', url: `/newsletters/${ID}/sends/send-1/retry-failed` }))
+        .statusCode
+    ).toBe(409);
+  });
+});
