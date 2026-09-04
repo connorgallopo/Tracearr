@@ -223,10 +223,10 @@ describe('emailRichTextDocSchema rejects', () => {
   });
 
   it('formatting past the weight budget', () => {
-    expect(firstIssue(heaviestList(3)).message).toBe(
+    expect(firstIssue(heaviestList(9)).message).toBe(
       'Too much formatting for the email size budget; shorten the text or remove some links'
     );
-    expect(emailRichTextDocSchema.safeParse(heaviestRuns(5)).success).toBe(false);
+    expect(emailRichTextDocSchema.safeParse(heaviestRuns(20)).success).toBe(false);
   });
 });
 
@@ -246,11 +246,11 @@ describe('measures', () => {
   });
 
   it('admits both gate fixtures under the weight cap', () => {
-    expect(EMAIL_RICH_TEXT_MAX_WEIGHT).toBe(900);
-    expect(emailRichTextWeight(heaviestList(2))).toBe(878);
-    expect(emailRichTextWeight(heaviestRuns(4))).toBe(826);
-    expect(emailRichTextDocSchema.safeParse(heaviestList(2)).success).toBe(true);
-    expect(emailRichTextDocSchema.safeParse(heaviestRuns(4)).success).toBe(true);
+    expect(EMAIL_RICH_TEXT_MAX_WEIGHT).toBe(3500);
+    expect(emailRichTextWeight(heaviestList(8))).toBe(3332);
+    expect(emailRichTextWeight(heaviestRuns(19))).toBe(3406);
+    expect(emailRichTextDocSchema.safeParse(heaviestList(8)).success).toBe(true);
+    expect(emailRichTextDocSchema.safeParse(heaviestRuns(19)).success).toBe(true);
   });
 
   it('normalizes a document with no text to null and leaves others alone', () => {

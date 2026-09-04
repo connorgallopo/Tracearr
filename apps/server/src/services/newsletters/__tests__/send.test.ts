@@ -16,9 +16,13 @@ const store = vi.hoisted(() => ({
 }));
 vi.mock('../store.js', () => store);
 const mockAssemble = vi.fn();
-vi.mock('../assemble.js', () => ({
-  assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
-}));
+vi.mock('../assemble.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../assemble.js')>();
+  return {
+    ...actual,
+    assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
+  };
+});
 const mockResolve = vi.fn();
 vi.mock('../recipients.js', () => ({
   resolveRecipients: (...a: unknown[]) => mockResolve(...a) as unknown,
@@ -40,6 +44,8 @@ vi.mock('../../notifications/destinationStore.js', () => ({
 }));
 
 import { runNewsletter } from '../send.js';
+import { EMAIL_CLIP_FIT_BYTES, deliveredBytes } from '../fit.js';
+import { EXTERNAL_URL, JELLYFIN_SERVER, heaviestDigest, heaviestRuns } from './heaviestDigest.js';
 
 const NEWSLETTER = {
   id: '11111111-1111-4111-8111-111111111111',
@@ -413,5 +419,43 @@ describe('runNewsletter', () => {
     store.queuedRecipientIds.mockResolvedValue(['r9']);
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(result).toEqual({ outcome: 'resumed', sendId: 'open-1', queuedRecipientIds: ['r9'] });
+  });
+
+  it('stores the trimmed render as the snapshot when the digest would be clipped', async () => {
+    const { data, posters } = heaviestDigest();
+    mockAssemble.mockResolvedValue({ data, posters });
+    mockSettings.mockResolvedValue({ externalUrl: EXTERNAL_URL, trustProxy: false });
+    store.loadServerLinks.mockResolvedValue([JELLYFIN_SERVER]);
+    store.getNewsletter.mockResolvedValue({
+      ...NEWSLETTER,
+      scope: { serverIds: [JELLYFIN_SERVER.id], libraryIds: [] },
+      imageMode: 'hosted',
+      links: { tracearr: true },
+      intro: heaviestRuns(),
+      outro: heaviestRuns(),
+    });
+    mockBranding.mockResolvedValue({
+      branding: {
+        accentColor: '#0ea0b3',
+        footerText: 'f'.repeat(500),
+        postalAddress: 'p'.repeat(500),
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: false,
+    });
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result.outcome).toBe('queued');
+    const send = store.insertSend.mock.calls[0]?.[0] as {
+      html: string;
+      itemCounts: unknown;
+      posters: unknown;
+    };
+    expect(send.html).toContain('+9 more shows');
+    expect(send.html).toContain('src="poster:');
+    expect(deliveredBytes(send.html, posters, 'hosted', EXTERNAL_URL)).toBeLessThanOrEqual(
+      EMAIL_CLIP_FIT_BYTES
+    );
+    expect(send.itemCounts).toEqual(data.counts);
+    expect(send.posters).toBe(posters);
   });
 });

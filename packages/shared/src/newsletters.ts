@@ -326,10 +326,20 @@ export interface EmailSuppression {
   createdAt: string;
 }
 
+/** Cards a section holds, albums counted across artists; also the shape of what the render-time fit loop removed per section. */
+export interface NewsletterSectionCounts {
+  movies: number;
+  shows: number;
+  albums: number;
+  mostWatched: number;
+}
+
 export interface NewsletterPreview {
   subject: string;
   html: string;
   counts: Record<string, number>;
+  /** Items the fit loop removed so the email stays under the clip budget; each shows in its section's "+N more" line. */
+  trimmed: NewsletterSectionCounts;
   window: { start: string; end: string };
   recipients: { resolved: number; missingEmail: number; suppressed: number };
 }

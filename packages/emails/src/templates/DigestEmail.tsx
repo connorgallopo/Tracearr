@@ -54,6 +54,11 @@ function Links({ links, accent }: { links: EmailLink[]; accent: string }) {
   );
 }
 
+function More({ count, noun }: { count: number; noun: string }) {
+  if (count <= 0) return null;
+  return <Text style={muted}>{`+${count} more ${count === 1 ? noun : `${noun}s`}`}</Text>;
+}
+
 function withYear(title: string, year: number | null): string {
   return year === null ? title : `${title} (${year})`;
 }
@@ -97,7 +102,7 @@ function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
                 ` (${s.episodeCount} ${s.episodeCount === 1 ? 'episode' : 'episodes'})`}
             </Text>
           ))}
-          {item.moreSeasons > 0 && <Text style={muted}>{`+${item.moreSeasons} more seasons`}</Text>}
+          <More count={item.moreSeasons} noun="season" />
           <Links links={item.links} accent={accent} />
         </>
       }
@@ -176,6 +181,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           {input.movies.map((m) => (
             <MovieCard key={m.id} item={m} accent={accent} />
           ))}
+          <More count={input.moreMovies} noun="movie" />
         </>
       )}
       {input.shows.length > 0 && (
@@ -184,6 +190,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           {input.shows.map((s) => (
             <ShowCard key={s.id} item={s} accent={accent} />
           ))}
+          <More count={input.moreShows} noun="show" />
         </>
       )}
       {input.artists.length > 0 && (
@@ -192,6 +199,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           {input.artists.map((a) => (
             <ArtistCard key={a.id} item={a} accent={accent} />
           ))}
+          <More count={input.moreAlbums} noun="album" />
         </>
       )}
       {input.mostWatched.length > 0 && (
@@ -201,6 +209,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
             {input.mostWatched.map((w) => (
               <WatchedRow key={w.id} item={w} accent={accent} />
             ))}
+            <More count={input.moreWatched} noun="title" />
           </Cell>
         </>
       )}

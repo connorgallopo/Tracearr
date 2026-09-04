@@ -1,4 +1,3 @@
-import { renderDigest } from '@tracearr/emails';
 import { resolveSenderName, type NewsletterSendTrigger } from '@tracearr/shared';
 import { getDestination } from '../notifications/destinationStore.js';
 import { resolveEmailBranding } from '../notifications/emailBranding.js';
@@ -6,12 +5,12 @@ import { readLogoPng } from '../notifications/emailLogo.js';
 import { renderTemplate } from '../notifications/types.js';
 import { getNetworkSettings } from '../settings.js';
 import { assembleDigest } from './assemble.js';
+import { renderDigestToFit } from './fit.js';
 import { newViewToken } from './links.js';
 import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
 import {
   UNSUBSCRIBE_PLACEHOLDER,
   VIEW_PLACEHOLDER,
-  buildDigestInput,
   formatWindowDate,
   logoRefFor,
   resolveImageMode,
@@ -148,26 +147,32 @@ export async function runNewsletter(
       end_date: formatWindowDate(window.end, newsletter.timezone),
       item_count: String(itemCount),
     });
-    const input = buildDigestInput(data, posters, {
-      subject,
-      intro: newsletter.intro,
-      outro: newsletter.outro,
-      windowStart: formatWindowDate(window.start, newsletter.timezone),
-      windowEnd: formatWindowDate(window.end, newsletter.timezone),
-      logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
-      unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
-      viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
-      externalUrl,
-      tracearrLinks: newsletter.links.tracearr,
-      serversById,
-    });
+    const fit = await renderDigestToFit(
+      data,
+      posters,
+      {
+        subject,
+        intro: newsletter.intro,
+        outro: newsletter.outro,
+        windowStart: formatWindowDate(window.start, newsletter.timezone),
+        windowEnd: formatWindowDate(window.end, newsletter.timezone),
+        logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
+        unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
+        viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
+        externalUrl,
+        tracearrLinks: newsletter.links.tracearr,
+        serversById,
+      },
+      { ...branding, senderName },
+      { newsletterId, mode, externalUrl }
+    );
     return {
       counts: data.counts,
       posters,
       recipients,
       deliverable,
       subject,
-      rendered: await renderDigest(input, { ...branding, senderName }),
+      rendered: fit.rendered,
     };
   };
 

@@ -114,6 +114,11 @@ export interface DigestInput {
   shows: DigestShow[];
   artists: DigestArtist[];
   mostWatched: DigestWatched[];
+  /** Items each section holds beyond the cards shown, from the section cap and the render-time fit loop; 0 renders no line. */
+  moreMovies: number;
+  moreShows: number;
+  moreAlbums: number;
+  moreWatched: number;
   logoRef: string | null;
   /** Emitted verbatim; null renders the reply-to-unsubscribe line instead. */
   unsubscribeUrl: string | null;

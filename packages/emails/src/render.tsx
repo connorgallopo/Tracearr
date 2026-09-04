@@ -11,9 +11,12 @@ import type {
   TestEmailInput,
 } from './types.js';
 
+/** React 19 hoists a preload link into head for every img; mail clients ignore it, and the server substitutes only img tags, so it would leak poster: refs. */
+const IMAGE_PRELOAD = /<link rel="preload" as="image" href="[^"]*"\/>/g;
+
 async function renderBoth(element: ReactElement, subject: string): Promise<RenderedEmail> {
   const [html, text] = await Promise.all([render(element), render(element, { plainText: true })]);
-  return { subject, html, text };
+  return { subject, html: html.replace(IMAGE_PRELOAD, ''), text };
 }
 
 export function renderTest(input: TestEmailInput, branding: EmailBranding): Promise<RenderedEmail> {

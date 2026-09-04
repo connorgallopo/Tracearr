@@ -1,6 +1,5 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { renderDigest } from '@tracearr/emails';
 import {
   createNewsletterSchema,
   newsletterSendsQuerySchema,
@@ -24,14 +23,16 @@ import {
   upsertNewsletterSchedule,
 } from '../jobs/newsletterQueue.js';
 import { assembleDigest } from '../services/newsletters/assemble.js';
+import { renderDigestToFit } from '../services/newsletters/fit.js';
 import { resolveRecipients } from '../services/newsletters/recipients.js';
 import {
-  buildDigestInput,
+  UNSUBSCRIBE_PLACEHOLDER,
+  VIEW_PLACEHOLDER,
   formatWindowDate,
   logoRefFor,
-  substitutePosterRefs,
+  resolveImageMode,
 } from '../services/newsletters/render.js';
-import { snapshotForBrowser } from '../services/newsletters/snapshot.js';
+import { digestForBrowser, snapshotForBrowser } from '../services/newsletters/snapshot.js';
 import {
   createNewsletter,
   deleteNewsletter,
@@ -212,33 +213,39 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       servers.map((s) => s.name)
     );
     const { branding, logo } = await resolveEmailBranding();
+    const mode = resolveImageMode(row.imageMode, externalUrl);
+    const origin = externalUrl?.replace(/\/$/, '') ?? '';
     const subject = renderTemplate(row.subject, {
       server_name: senderName,
       start_date: formatWindowDate(window.start, row.timezone),
       end_date: formatWindowDate(window.end, row.timezone),
       item_count: String(data.counts.movies + data.counts.episodes + data.counts.albums),
     });
-    const rendered = await renderDigest(
-      buildDigestInput(data, posters, {
+    const fit = await renderDigestToFit(
+      data,
+      posters,
+      {
         subject,
         intro: row.intro,
         outro: row.outro,
         windowStart: formatWindowDate(window.start, row.timezone),
         windowEnd: formatWindowDate(window.end, row.timezone),
-        logoRef: logoRefFor(logo, 'hosted', '', readLogoPng() !== null),
-        unsubscribeUrl: externalUrl ? '#' : null,
-        viewUrl: null,
+        logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
+        unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
+        viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
         externalUrl,
         tracearrLinks: row.links.tracearr,
         serversById: new Map(servers.map((s) => [s.id, s])),
-      }),
-      { ...branding, senderName }
+      },
+      { ...branding, senderName },
+      { newsletterId: row.id, mode, externalUrl }
     );
     const suppressed = resolution.recipients.filter((r) => r.suppressed).length;
     const preview: NewsletterPreview = {
       subject,
-      html: substitutePosterRefs(rendered.html, posters, 'hosted', ''),
+      html: digestForBrowser(fit.rendered.html, posters),
       counts: data.counts,
+      trimmed: fit.trimmed,
       window: { start: window.start.toISOString(), end: window.end.toISOString() },
       recipients: {
         resolved: resolution.recipients.length - suppressed,

@@ -4,8 +4,8 @@ export const EMAIL_RICH_TEXT_MAX_CHARS = 2000;
 export const EMAIL_RICH_TEXT_MAX_BLOCKS = 50;
 export const EMAIL_RICH_TEXT_MAX_LIST_ITEMS = 50;
 export const EMAIL_RICH_TEXT_MAX_MARKS = 3;
-/** Estimated rendered bytes per field: the digest size gate in packages/emails measured only about 2.5 KB free for intro and outro together at the section cap (the jellyfin poster variant, the heaviest), re-measured 2026-09-04 against the actual maxInput fixture rather than assumed headroom. */
-export const EMAIL_RICH_TEXT_MAX_WEIGHT = 900;
+/** Estimated rendered bytes per field. The clip budget is enforced at render time (apps/server/src/services/newsletters/fit.ts); this cap keeps one field from spending the whole digest. */
+export const EMAIL_RICH_TEXT_MAX_WEIGHT = 3500;
 
 /** Rendered bytes each node costs in packages/emails, measured against @react-email/components 1.0.12 on 2026-09-04. */
 const WEIGHT = {

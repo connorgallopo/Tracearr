@@ -1,5 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { POSTER_IMAGE_SIZE, type NewsletterScope, type NewsletterSections } from '@tracearr/shared';
+import {
+  POSTER_IMAGE_SIZE,
+  type NewsletterScope,
+  type NewsletterSectionCounts,
+  type NewsletterSections,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import type { PosterRef } from '../../db/schema.js';
 import { posterVersionFor, proxyImage } from '../imageProxy.js';
@@ -71,6 +76,16 @@ export interface DigestData {
   })[];
   counts: { movies: number; shows: number; episodes: number; albums: number; mostWatched: number };
   isEmpty: boolean;
+}
+
+/** Cards each section holds, albums counted across artists; the "+N more" lines and the fit loop both read it against `counts`. */
+export function sectionItemCounts(data: DigestData): NewsletterSectionCounts {
+  return {
+    movies: data.movies.length,
+    shows: data.shows.length,
+    albums: data.artists.reduce((n, artist) => n + artist.albums.length, 0),
+    mostWatched: data.mostWatched.length,
+  };
 }
 
 const pad = (n: number): string => `E${String(n).padStart(2, '0')}`;

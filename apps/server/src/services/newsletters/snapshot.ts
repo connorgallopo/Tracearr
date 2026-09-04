@@ -1,3 +1,4 @@
+import type { PosterRef } from '../../db/schema.js';
 import {
   LOGO_ROUTE,
   UNSUBSCRIBE_PLACEHOLDER,
@@ -16,13 +17,17 @@ const UNSUBSCRIBE_LINE = paragraphHolding(UNSUBSCRIBE_PLACEHOLDER);
 const INERT_UNSUBSCRIBE =
   '<p style="font-size:12px;line-height:18px;color:#8b93a1;margin:0 0 8px">Unsubscribe links are only in the email itself.</p>';
 
-/** The stored snapshot as a browser page: relative image urls and no link that could act for a recipient. */
-export function snapshotForBrowser(send: Pick<SendRow, 'html' | 'posters'>): string | null {
-  if (send.html === null) return null;
-  return substitutePosterRefs(send.html, send.posters, 'hosted', '')
+/** A rendered digest as a browser page: relative image urls and no link that could act for a recipient. */
+export function digestForBrowser(html: string, posters: Record<string, PosterRef>): string {
+  return substitutePosterRefs(html, posters, 'hosted', '')
     .replaceAll('src="cid:logo"', `src="${LOGO_ROUTE}"`)
     .replace(VIEW_LINE, '')
     .replace(UNSUBSCRIBE_LINE, INERT_UNSUBSCRIBE)
     .replaceAll(VIEW_PLACEHOLDER, '#')
     .replaceAll(UNSUBSCRIBE_PLACEHOLDER, '#');
+}
+
+/** The stored snapshot, or null once it has been pruned. */
+export function snapshotForBrowser(send: Pick<SendRow, 'html' | 'posters'>): string | null {
+  return send.html === null ? null : digestForBrowser(send.html, send.posters);
 }

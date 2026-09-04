@@ -9,7 +9,7 @@ import {
 import type { DigestInput, EmailLink, RichTextDoc } from '@tracearr/emails';
 import type { PosterRef } from '../../db/schema.js';
 import { buildProxyUrl } from '../imageProxy.js';
-import type { DigestCard, DigestData } from './assemble.js';
+import { sectionItemCounts, type DigestCard, type DigestData } from './assemble.js';
 import type { ServerLink } from './store.js';
 
 export type ResolvedImageMode = 'hosted' | 'inline' | 'none';
@@ -111,23 +111,26 @@ export function digestLinks(
   return links;
 }
 
+export interface DigestInputOptions {
+  subject: string;
+  intro: RenderableDoc | null;
+  outro: RenderableDoc | null;
+  windowStart: string;
+  windowEnd: string;
+  logoRef: string | null;
+  unsubscribeUrl: string | null;
+  viewUrl: string | null;
+  externalUrl: string | null;
+  tracearrLinks: boolean;
+  serversById: Map<string, ServerLink>;
+}
+
 export function buildDigestInput(
   data: DigestData,
   posters: Record<string, PosterRef>,
-  opts: {
-    subject: string;
-    intro: RenderableDoc | null;
-    outro: RenderableDoc | null;
-    windowStart: string;
-    windowEnd: string;
-    logoRef: string | null;
-    unsubscribeUrl: string | null;
-    viewUrl: string | null;
-    externalUrl: string | null;
-    tracearrLinks: boolean;
-    serversById: Map<string, ServerLink>;
-  }
+  opts: DigestInputOptions
 ): DigestInput {
+  const shown = sectionItemCounts(data);
   const ref = (card: DigestCard): string | null =>
     posters[card.cardId] ? `poster:${card.cardId}` : null;
   const links = (card: DigestCard) =>
@@ -183,6 +186,10 @@ export function buildDigestInput(
         imdb: false,
       }),
     })),
+    moreMovies: data.counts.movies - shown.movies,
+    moreShows: data.counts.shows - shown.shows,
+    moreAlbums: data.counts.albums - shown.albums,
+    moreWatched: data.counts.mostWatched - shown.mostWatched,
     logoRef: opts.logoRef,
     unsubscribeUrl: opts.unsubscribeUrl,
     viewUrl: opts.viewUrl,

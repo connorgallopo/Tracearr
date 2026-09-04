@@ -12,6 +12,7 @@ describe('renderTest', () => {
     expect(out.html).toContain('role="presentation"');
     expect(out.html).toContain('Ops inbox');
     expect(out.html).toContain('src="cid:logo"');
+    expect(out.html).not.toContain('rel="preload"');
     expect(out.text).toContain('Ops inbox');
     expect(out.text).not.toContain('cid:');
   });
@@ -104,6 +105,7 @@ describe('renderEvent', () => {
     );
     expect(out.subject).toBe('Added: Heat (1995)');
     expect(out.html).toContain('src="cid:poster"');
+    expect(out.html).not.toContain('rel="preload"');
     expect(out.html).toContain('alt="Heat"');
     expect(out.html).toContain('4K HDR');
     expect(out.html).toContain('href="https://app.plex.tv/x"');

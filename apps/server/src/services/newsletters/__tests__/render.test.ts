@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { DigestData } from '../assemble.js';
+import { sectionItemCounts, type DigestData } from '../assemble.js';
 import {
   LOGO_ROUTE,
   VIEW_PLACEHOLDER,
@@ -200,6 +200,65 @@ describe('buildDigestInput', () => {
     expect(on[0]).toEqual({ label: 'Tracearr', url: 'https://tracearr.example.com/media/media-9' });
     const noUrl = digestLinks(watched, null, serversById, { tracearr: true });
     expect(noUrl.map((l) => l.label)).toEqual(['Basement', 'IMDb']);
+  });
+
+  it('reports what each section holds beyond its cards from the assembler counts', () => {
+    const album = {
+      cardId: 'al1',
+      serverId: 's1',
+      serverName: 'Basement',
+      serverType: 'plex',
+      ratingKey: '10',
+      mediaId: null,
+      imdbId: null,
+      thumbPath: null,
+      title: 'Dummy',
+      year: 1994,
+      trackCount: 11,
+    };
+    const data: DigestData = {
+      movies: [],
+      shows: [],
+      artists: [
+        {
+          cardId: 'a1',
+          serverId: 's1',
+          serverName: 'Basement',
+          serverType: 'plex',
+          ratingKey: '9',
+          mediaId: null,
+          imdbId: null,
+          thumbPath: null,
+          name: 'Portishead',
+          albums: [album, { ...album, cardId: 'al2', title: 'Third' }],
+        },
+      ],
+      mostWatched: [watched],
+      counts: { movies: 3, shows: 0, episodes: 0, albums: 5, mostWatched: 1 },
+      isEmpty: false,
+    };
+    expect(sectionItemCounts(data)).toEqual({ movies: 0, shows: 0, albums: 2, mostWatched: 1 });
+    const input = buildDigestInput(
+      data,
+      {},
+      {
+        subject: 'x',
+        intro: null,
+        outro: null,
+        windowStart: 'Aug 1, 2026',
+        windowEnd: 'Aug 8, 2026',
+        logoRef: null,
+        unsubscribeUrl: null,
+        viewUrl: null,
+        externalUrl: null,
+        tracearrLinks: false,
+        serversById: new Map(),
+      }
+    );
+    expect(input.moreMovies).toBe(3);
+    expect(input.moreShows).toBe(0);
+    expect(input.moreAlbums).toBe(3);
+    expect(input.moreWatched).toBe(0);
   });
 });
 

@@ -45,9 +45,13 @@ vi.mock('../../services/settings.js', () => ({
   getNetworkSettings: () => mockSettings() as unknown,
 }));
 const mockAssemble = vi.fn();
-vi.mock('../../services/newsletters/assemble.js', () => ({
-  assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
-}));
+vi.mock('../../services/newsletters/assemble.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/newsletters/assemble.js')>();
+  return {
+    ...actual,
+    assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
+  };
+});
 const mockResolve = vi.fn();
 vi.mock('../../services/newsletters/recipients.js', () => ({
   resolveRecipients: (...a: unknown[]) => mockResolve(...a) as unknown,
@@ -62,6 +66,12 @@ vi.mock('../../services/notifications/emailLogo.js', () => ({
 
 import { buildProxyUrl } from '../../services/imageProxy.js';
 import { newsletterRoutes } from '../newsletters.js';
+import {
+  EXTERNAL_URL,
+  JELLYFIN_SERVER,
+  heaviestDigest,
+  heaviestRuns,
+} from '../../services/newsletters/__tests__/heaviestDigest.js';
 
 const owner: AuthUser = { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] };
 const admin: AuthUser = { userId: randomUUID(), username: 'admin', role: 'admin', serverIds: [] };
@@ -425,6 +435,10 @@ describe('newsletter routes', () => {
     const json = res.json();
     expect(json.counts).toEqual({ movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 });
     expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
+    expect(json.trimmed).toEqual({ movies: 0, shows: 0, albums: 0, mostWatched: 0 });
+    expect(json.html).toContain('Unsubscribe links are only in the email itself.');
+    expect(json.html).not.toContain('{{unsubscribe_url}}');
+    expect(json.html).not.toContain('rel="preload"');
     expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
     expect(json.html).toContain('Heat');
     expect(mockBranding).toHaveBeenCalledWith();
@@ -527,6 +541,45 @@ describe('newsletter routes', () => {
     store.getNewsletter.mockResolvedValue({ ...row, senderName: 'Family Media' });
     const named = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(named.json().html).toContain('Sent by Tracearr for <!-- -->Family Media');
+  });
+
+  it('preview trims the way a send would and reports what it removed', async () => {
+    const app = await build(owner);
+    store.lastWatermark.mockResolvedValue(null);
+    store.loadServerLinks.mockResolvedValue([JELLYFIN_SERVER]);
+    store.getNewsletter.mockResolvedValue({
+      ...row,
+      imageMode: 'hosted',
+      links: { tracearr: true },
+      intro: heaviestRuns(),
+      outro: heaviestRuns(),
+    });
+    mockSettings.mockResolvedValue({ externalUrl: EXTERNAL_URL, trustProxy: false });
+    mockBranding.mockResolvedValue({
+      branding: {
+        accentColor: '#123456',
+        footerText: 'f'.repeat(500),
+        postalAddress: 'p'.repeat(500),
+      },
+      logo: { mode: 'tracearr' },
+      mailtoUnsubscribe: false,
+    });
+    mockAssemble.mockResolvedValue(heaviestDigest());
+    mockResolve.mockResolvedValue({ recipients: [], missing: [], excluded: [] });
+    const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(res.statusCode).toBe(200);
+    const json = res.json();
+    expect(json.trimmed).toEqual({ movies: 0, shows: 1, albums: 0, mostWatched: 0 });
+    expect(json.counts).toEqual({
+      movies: 30,
+      shows: 20,
+      episodes: 1320,
+      albums: 20,
+      mostWatched: 10,
+    });
+    expect(json.html).toContain('+9 more shows');
+    expect(json.html).toContain('src="/api/v1/images/proxy?server=');
+    expect(json.html).not.toContain('poster:');
   });
 });
 

@@ -18,7 +18,7 @@ const SECTION_MAX = 12;
 const SEASONS_PER_SHOW_MAX = 8;
 const MOST_WATCHED_MAX = 10;
 
-/** Mirrors EMAIL_RICH_TEXT_MAX_WEIGHT = 900 in @tracearr/shared: two bold linked list items of 100 characters weigh 878, four one-character bold italic linked runs weigh 826. */
+/** Mirrors EMAIL_RICH_TEXT_MAX_WEIGHT = 3500 in @tracearr/shared: eight bold linked list items of 100 characters weigh 3332, nineteen one-character bold italic linked runs weigh 3406. */
 const RICH_HREF = `https://example.com/${'x'.repeat(20)}`;
 const paragraphDoc = (text: string): RichTextDoc => ({
   type: 'doc',
@@ -29,7 +29,7 @@ const heaviestList: RichTextDoc = {
   content: [
     {
       type: 'bulletList',
-      content: Array.from({ length: 2 }, () => ({
+      content: Array.from({ length: 8 }, () => ({
         type: 'listItem' as const,
         content: [
           {
@@ -55,7 +55,7 @@ const heaviestRuns: RichTextDoc = {
   content: [
     {
       type: 'paragraph',
-      content: Array.from({ length: 4 }, () => ({
+      content: Array.from({ length: 19 }, () => ({
         type: 'text' as const,
         text: 'x',
         marks: [
@@ -137,6 +137,10 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
     shows: [],
     artists: [],
     mostWatched: [],
+    moreMovies: 0,
+    moreShows: 0,
+    moreAlbums: 0,
+    moreWatched: 0,
     logoRef: null,
     unsubscribeUrl: '{{unsubscribe_url}}',
     viewUrl: null,
@@ -144,7 +148,7 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
   };
 }
 
-/** The heaviest digest buildDigestInput can emit: every section at its cap, three links per movie and show, two per artist and most-watched card. */
+/** The heaviest digest buildDigestInput can emit: every section at its cap, each cap's "+N more" line at the window limit (5,000 rows minus the cap), three links per movie and show, two per artist and most-watched card. */
 function maxInput(
   variant: Variant,
   copy: { intro: RichTextDoc; outro: RichTextDoc },
@@ -201,7 +205,18 @@ function maxInput(
       links: [tracearrLink(n), variant.server(n)],
     };
   });
-  return base({ ...copy, movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
+  return base({
+    ...copy,
+    movies,
+    shows,
+    artists,
+    mostWatched,
+    logoRef: 'cid:logo',
+    moreMovies: 4988,
+    moreShows: 4988,
+    moreAlbums: 4988,
+    moreWatched: 0,
+  });
 }
 
 describe('renderDigest', () => {
@@ -248,6 +263,7 @@ describe('renderDigest', () => {
     expect(out.html).toContain('Aug 26, 2026');
     expect(out.html).toContain('Here is what landed this week.');
     expect(out.html).toContain('src="poster:m1"');
+    expect(out.html).not.toContain('rel="preload"');
     expect(out.html).toContain('alt="Heat"');
     expect(out.html).toContain('Season 2');
     expect(out.html).toContain('E01-E04');
@@ -362,29 +378,50 @@ describe('renderDigest', () => {
   });
 
   const COPY = {
-    'four linked runs in both fields': { intro: heaviestRuns, outro: heaviestRuns },
-    'two linked list items in both fields': { intro: heaviestList, outro: heaviestList },
+    'nineteen linked runs in both fields': { intro: heaviestRuns, outro: heaviestRuns },
+    'eight linked list items in both fields': { intro: heaviestList, outro: heaviestList },
   };
 
+  // Measured 2026-09-04 with @react-email/components 1.0.12: plex runs 98,897 B, plex list
+  // 98,599 B, jellyfin runs 99,223 B, jellyfin list 98,925 B, cid runs 93,535 B, cid list
+  // 93,237 B. The clip ceiling is asserted by apps/server/src/services/newsletters/__tests__/fit.test.ts
+  // against what delivery substitutes; this file only records that each variant renders.
   it.each(
     Object.entries(VARIANTS).flatMap(([name, variant]) =>
       Object.entries(COPY).map(
         ([copyName, copy]) => [`${name}, ${copyName}`, variant, copy] as const
       )
     )
-  )(
-    'stays under the Gmail clip budget at every maximum cap with %s',
-    async (_name, variant, copy) => {
-      const out = await renderDigest(maxInput(variant, copy), branding);
-      expect(Buffer.byteLength(out.html, 'utf8')).toBeLessThan(100 * 1024);
-    }
-  );
+  )('renders every section at its cap with %s', async (_name, variant, copy) => {
+    const out = await renderDigest(maxInput(variant, copy), branding);
+    expect(Buffer.byteLength(out.html, 'utf8')).toBeGreaterThan(0);
+  });
+
+  it('says how many items each section holds beyond its cards, singular when one', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [{ id: 'm1', title: 'Heat', year: 1995, posterRef: null, genres: [], links: [] }],
+        artists: [{ id: 'a1', name: 'Portishead', albums: [], links: [] }],
+        mostWatched: [{ id: 'w1', kind: 'movie', title: 'Alien', year: 1979, plays: 7, links: [] }],
+        moreMovies: 18,
+        moreShows: 4,
+        moreAlbums: 1,
+        moreWatched: 2,
+      }),
+      branding
+    );
+    expect(out.html).toContain('+18 more movies');
+    expect(out.html).not.toContain('more shows');
+    expect(out.html).toContain('+1 more album');
+    expect(out.html).toContain('+2 more titles');
+    expect(out.text).toContain('+18 more movies');
+  });
 
   it('gives every emitted table cell an explicit background and text color', async () => {
     const out = await renderDigest(
       maxInput(
         VARIANTS['hosted urls over plex thumb paths']!,
-        COPY['four linked runs in both fields']
+        COPY['nineteen linked runs in both fields']
       ),
       branding
     );
