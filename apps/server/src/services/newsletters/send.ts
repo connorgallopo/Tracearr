@@ -1,5 +1,5 @@
 import { renderDigest } from '@tracearr/emails';
-import type { NewsletterSendTrigger } from '@tracearr/shared';
+import { resolveSenderName, type NewsletterSendTrigger } from '@tracearr/shared';
 import { getDestination } from '../notifications/destinationStore.js';
 import { resolveEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
@@ -110,7 +110,15 @@ export async function runNewsletter(
     }
 
     const recipients: ResolvedRecipient[] = testAddress
-      ? [{ address: testAddress.trim().toLowerCase(), userId: null, name: null, suppressed: false }]
+      ? [
+          {
+            address: testAddress.trim().toLowerCase(),
+            userId: null,
+            serverUserId: null,
+            name: null,
+            suppressed: false,
+          },
+        ]
       : (await resolveRecipients(newsletter)).recipients;
 
     const deliverable = recipients.filter((r) => !r.suppressed);
@@ -126,12 +134,16 @@ export async function runNewsletter(
 
     const servers = await loadServerLinks(newsletter.scope.serverIds);
     const serversById = new Map(servers.map((s) => [s.id, s]));
-    const { branding, logo } = await resolveEmailBranding(servers[0]?.name ?? 'Tracearr');
+    const senderName = resolveSenderName(
+      newsletter.senderName,
+      servers.map((s) => s.name)
+    );
+    const { branding, logo } = await resolveEmailBranding();
     const mode = resolveImageMode(newsletter.imageMode, externalUrl);
     const origin = externalUrl?.replace(/\/$/, '') ?? '';
     const itemCount = data.counts.movies + data.counts.episodes + data.counts.albums;
     const subject = renderTemplate(newsletter.subject, {
-      server_name: branding.senderName,
+      server_name: senderName,
       start_date: formatWindowDate(window.start, newsletter.timezone),
       end_date: formatWindowDate(window.end, newsletter.timezone),
       item_count: String(itemCount),
@@ -146,6 +158,7 @@ export async function runNewsletter(
       unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
       viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
       externalUrl,
+      tracearrLinks: newsletter.links.tracearr,
       serversById,
     });
     return {
@@ -154,7 +167,7 @@ export async function runNewsletter(
       recipients,
       deliverable,
       subject,
-      rendered: await renderDigest(input, branding),
+      rendered: await renderDigest(input, { ...branding, senderName }),
     };
   };
 

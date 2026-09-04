@@ -5,6 +5,7 @@ import {
   createNewsletterSchema,
   newsletterSendsQuerySchema,
   newsletterTestSendSchema,
+  resolveSenderName,
   updateNewsletterSchema,
   uuidSchema,
   NEWSLETTER_VIEW_TOKEN_LENGTH,
@@ -206,9 +207,13 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       resolveRecipients(row),
       loadServerLinks(row.scope.serverIds),
     ]);
-    const { branding, logo } = await resolveEmailBranding(servers[0]?.name ?? 'Tracearr');
+    const senderName = resolveSenderName(
+      row.senderName,
+      servers.map((s) => s.name)
+    );
+    const { branding, logo } = await resolveEmailBranding();
     const subject = renderTemplate(row.subject, {
-      server_name: branding.senderName,
+      server_name: senderName,
       start_date: formatWindowDate(window.start, row.timezone),
       end_date: formatWindowDate(window.end, row.timezone),
       item_count: String(data.counts.movies + data.counts.episodes + data.counts.albums),
@@ -224,9 +229,10 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
         unsubscribeUrl: externalUrl ? '#' : null,
         viewUrl: null,
         externalUrl,
+        tracearrLinks: row.links.tracearr,
         serversById: new Map(servers.map((s) => [s.id, s])),
       }),
-      branding
+      { ...branding, senderName }
     );
     const suppressed = resolution.recipients.filter((r) => r.suppressed).length;
     const preview: NewsletterPreview = {

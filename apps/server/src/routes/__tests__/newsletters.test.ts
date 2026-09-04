@@ -125,11 +125,11 @@ async function build(user: AuthUser | null): Promise<FastifyInstance> {
 beforeEach(() => {
   vi.clearAllMocks();
   routes.length = 0;
-  mockBranding.mockImplementation(async (name: string) => ({
-    branding: { senderName: name, accentColor: '#123456', footerText: null, postalAddress: null },
+  mockBranding.mockResolvedValue({
+    branding: { accentColor: '#123456', footerText: null, postalAddress: null },
     logo: { mode: 'tracearr' },
     mailtoUnsubscribe: false,
-  }));
+  });
   mockDestination.mockResolvedValue({ id: DEST, type: 'email', enabled: true, configStatus: 'ok' });
   mockSettings.mockResolvedValue({
     externalUrl: 'https://tracearr.example.com',
@@ -427,19 +427,14 @@ describe('newsletter routes', () => {
     expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
     expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
     expect(json.html).toContain('Heat');
-    expect(mockBranding).toHaveBeenCalledWith('Basement');
+    expect(mockBranding).toHaveBeenCalledWith();
     expect(json.html).toContain('#123456');
     expect(json.html).toContain('src="/api/v1/images/logo"');
   });
 
   it('preview shows the owner logo url when the branding block carries one', async () => {
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#123456',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#123456', footerText: null, postalAddress: null },
       logo: { mode: 'url', url: 'https://x.test/l.png' },
       mailtoUnsubscribe: false,
     });
@@ -507,6 +502,31 @@ describe('newsletter routes', () => {
     const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/not-a-uuid` });
     expect(res.statusCode).toBe(400);
     expect(store.getSend).not.toHaveBeenCalled();
+  });
+
+  it('preview names the sender from the newsletter and falls back to the one scoped server', async () => {
+    const app = await build(owner);
+    store.lastWatermark.mockResolvedValue(null);
+    store.loadServerLinks.mockResolvedValue([
+      { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: null },
+    ]);
+    mockAssemble.mockResolvedValue({
+      data: {
+        movies: [],
+        shows: [],
+        artists: [],
+        mostWatched: [],
+        counts: { movies: 0, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: true,
+      },
+      posters: {},
+    });
+    mockResolve.mockResolvedValue({ recipients: [], missing: [], excluded: [] });
+    const fallback = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(fallback.json().html).toContain('Sent by Tracearr for <!-- -->Basement');
+    store.getNewsletter.mockResolvedValue({ ...row, senderName: 'Family Media' });
+    const named = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(named.json().html).toContain('Sent by Tracearr for <!-- -->Family Media');
   });
 });
 

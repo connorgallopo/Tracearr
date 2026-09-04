@@ -95,11 +95,11 @@ const ONE_MOVIE = {
 beforeEach(() => {
   vi.clearAllMocks();
   mockLogoPng.mockReturnValue(Buffer.from('png'));
-  mockBranding.mockImplementation(async (name: string) => ({
-    branding: { senderName: name, accentColor: '#0ea0b3', footerText: null, postalAddress: null },
+  mockBranding.mockResolvedValue({
+    branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
     logo: { mode: 'tracearr' },
     mailtoUnsubscribe: false,
-  }));
+  });
   store.getNewsletter.mockResolvedValue(NEWSLETTER);
   store.findOpenSend.mockResolvedValue(null);
   store.closeStaleSend.mockResolvedValue(false);
@@ -194,10 +194,9 @@ describe('runNewsletter', () => {
     );
   });
 
-  it('renders through the branding block, with its sender name in the subject and its accent in the html', async () => {
+  it('renders through the branding block with the newsletter sender name in the subject and footer', async () => {
     mockBranding.mockResolvedValue({
       branding: {
-        senderName: 'Family Media',
         accentColor: '#123456',
         footerText: 'The house server',
         postalAddress: '1 Main St',
@@ -205,8 +204,9 @@ describe('runNewsletter', () => {
       logo: { mode: 'tracearr' },
       mailtoUnsubscribe: false,
     });
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, senderName: 'Family Media' });
     await runNewsletter(NEWSLETTER.id, 'schedule');
-    expect(mockBranding).toHaveBeenCalledWith('Basement');
+    expect(mockBranding).toHaveBeenCalledWith();
     const send = firstSend();
     expect(String(send.subject)).toMatch(/^What's new on Family Media \(\w{3} \d{1,2}, \d{4}\) 1$/);
     const html = String(send.html);
@@ -214,6 +214,26 @@ describe('runNewsletter', () => {
     expect(html).toContain('Sent by Tracearr for <!-- -->Family Media');
     expect(html).toContain('The house server');
     expect(html).toContain('1 Main St');
+  });
+
+  it('names the sender Tracearr when the scope spans two servers and no name is set', async () => {
+    store.loadServerLinks.mockResolvedValue([
+      { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'abc' },
+      { id: 's2', name: 'Attic', type: 'jellyfin', url: 'http://jf', machineIdentifier: null },
+    ]);
+    await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(String(firstSend().subject)).toMatch(/^What's new on Tracearr /);
+  });
+
+  it('emits the Tracearr media link only when the newsletter turns links on', async () => {
+    const withMedia = {
+      ...ONE_MOVIE,
+      movies: [{ ...ONE_MOVIE.movies[0]!, mediaId: 'media-1' }],
+    };
+    mockAssemble.mockResolvedValue({ data: withMedia, posters: {} });
+    expect(await renderedHtml()).not.toContain('https://tracearr.example.com/media/media-1');
+    store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, links: { tracearr: true } });
+    expect(await renderedHtml()).toContain('href="https://tracearr.example.com/media/media-1"');
   });
 
   it('points the logo at the hosted route, a cid, or nothing, by image mode', async () => {
@@ -233,12 +253,7 @@ describe('runNewsletter', () => {
 
   it('uses the owner logo url in place of the Tracearr png in either image mode', async () => {
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
       logo: { mode: 'url', url: 'https://x.test/l.png' },
       mailtoUnsubscribe: false,
     });
@@ -248,6 +263,22 @@ describe('runNewsletter', () => {
 
     store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, imageMode: 'auto' });
     expect(await renderedHtml()).toContain('src="https://x.test/l.png"');
+  });
+
+  it('renders a rich intro through the mapper', async () => {
+    store.getNewsletter.mockResolvedValue({
+      ...NEWSLETTER,
+      intro: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Hi all', marks: [{ type: 'bold' }] }],
+          },
+        ],
+      },
+    });
+    expect(await renderedHtml()).toContain('<strong>Hi all</strong>');
   });
 
   it('skips an empty window with a recorded send and no recipients', async () => {

@@ -39,43 +39,42 @@ describe('getEmailBranding', () => {
       { issue: 'accentColor: Expected a hex color like #0ea0b3' }
     );
   });
+
+  it('strips keys this build does not know instead of resetting the block', async () => {
+    mockGetSetting.mockResolvedValue({ senderName: 'Movies', accentColor: '#123456' });
+    expect(await getEmailBranding()).toEqual({ ...DEFAULT_EMAIL_BRANDING, accentColor: '#123456' });
+    expect(mockWarn).not.toHaveBeenCalled();
+  });
 });
 
 describe('saveEmailBranding', () => {
   it('writes the block under emailBranding and returns it', async () => {
-    const input = { ...DEFAULT_EMAIL_BRANDING, senderName: 'Movies', mailtoUnsubscribe: true };
+    const input = { ...DEFAULT_EMAIL_BRANDING, footerText: 'Movies', mailtoUnsubscribe: true };
     expect(await saveEmailBranding(input)).toEqual(input);
     expect(mockSetSetting).toHaveBeenCalledWith('emailBranding', input);
   });
 });
 
 describe('resolveEmailBranding', () => {
-  it('uses the fallback sender name when none is stored', async () => {
+  it('returns the block without a sender name, with the logo and mailto settings beside it', async () => {
     mockGetSetting.mockResolvedValue(null);
-    expect(await resolveEmailBranding('Plex Movies')).toEqual({
-      branding: {
-        senderName: 'Plex Movies',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
+    expect(await resolveEmailBranding()).toEqual({
+      branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
       logo: { mode: 'tracearr' },
       mailtoUnsubscribe: false,
     });
   });
 
-  it('prefers the stored sender name and carries the logo and mailto settings', async () => {
+  it('carries every stored field', async () => {
     mockGetSetting.mockResolvedValue({
-      senderName: 'Family Media',
       logo: { mode: 'url', url: 'https://x.test/logo.png' },
       accentColor: '#123456',
       footerText: 'see you next week',
       postalAddress: '1 Main St',
       mailtoUnsubscribe: true,
     });
-    expect(await resolveEmailBranding('Plex Movies')).toEqual({
+    expect(await resolveEmailBranding()).toEqual({
       branding: {
-        senderName: 'Family Media',
         accentColor: '#123456',
         footerText: 'see you next week',
         postalAddress: '1 Main St',

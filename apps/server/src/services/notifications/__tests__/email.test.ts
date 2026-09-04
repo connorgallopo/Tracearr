@@ -135,11 +135,11 @@ beforeEach(() => {
   mockGetNetworkSettings
     .mockReset()
     .mockResolvedValue({ externalUrl: 'https://tracearr.example.com', trustProxy: false });
-  mockBranding.mockReset().mockImplementation(async (name: string) => ({
-    branding: { senderName: name, accentColor: '#0ea0b3', footerText: null, postalAddress: null },
+  mockBranding.mockReset().mockResolvedValue({
+    branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
     logo: { mode: 'tracearr' },
     mailtoUnsubscribe: false,
-  }));
+  });
 });
 afterEach(() => _resetTransportersForTests());
 
@@ -213,31 +213,21 @@ describe('emailType.render', () => {
     expect(thrown.attachments.map((a) => a.cid)).toEqual(['logo']);
   });
 
-  it('renders through the branding block, with a stored sender name beating the server name', async () => {
+  it('renders through the branding block with the event server as the sender', async () => {
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Family Media',
-        accentColor: '#123456',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#123456', footerText: null, postalAddress: null },
       logo: { mode: 'tracearr' },
       mailtoUnsubscribe: false,
     });
     const out = await render(mediaAdded);
-    expect(mockBranding).toHaveBeenCalledWith('Basement');
-    expect(out.html).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(mockBranding).toHaveBeenCalledWith();
+    expect(out.html).toContain('Sent by Tracearr for <!-- -->Basement');
     expect(out.html).toContain('#123456');
   });
 
   it('links the owner logo url instead of attaching the Tracearr png, and mode none renders none', async () => {
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
       logo: { mode: 'url', url: 'https://x.test/l.png' },
       mailtoUnsubscribe: false,
     });
@@ -246,12 +236,7 @@ describe('emailType.render', () => {
     expect(url.attachments.map((a) => a.cid)).toEqual(['poster']);
 
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Basement',
-        accentColor: '#0ea0b3',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#0ea0b3', footerText: null, postalAddress: null },
       logo: { mode: 'none' },
       mailtoUnsubscribe: false,
     });
@@ -337,24 +322,19 @@ describe('emailType.test', () => {
       to: ['a@example.com', 'b@example.org'],
       subject: 'Test email from Tracearr (Ops email)',
     });
-    expect(mockBranding).toHaveBeenCalledWith('Tracearr');
+    expect(mockBranding).toHaveBeenCalledWith();
     expect(mockClose).toHaveBeenCalledTimes(1);
   });
 
   it('renders the test email through the branding block and skips the logo it does not use', async () => {
     mockBranding.mockResolvedValue({
-      branding: {
-        senderName: 'Family Media',
-        accentColor: '#123456',
-        footerText: null,
-        postalAddress: null,
-      },
+      branding: { accentColor: '#123456', footerText: null, postalAddress: null },
       logo: { mode: 'none' },
       mailtoUnsubscribe: false,
     });
     await emailType.test(config, deliverCtx);
     const sent = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(String(sent.html)).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(String(sent.html)).toContain('Sent by Tracearr for <!-- -->Tracearr');
     expect(String(sent.html)).toContain('#123456');
     expect(String(sent.html)).not.toContain('cid:logo');
     expect(sent.attachments).toEqual([]);

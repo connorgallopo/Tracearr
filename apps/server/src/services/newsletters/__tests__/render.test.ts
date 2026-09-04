@@ -152,6 +152,7 @@ describe('buildDigestInput', () => {
         unsubscribeUrl: null,
         viewUrl: VIEW_PLACEHOLDER,
         externalUrl: 'https://tracearr.example.com',
+        tracearrLinks: true,
         serversById,
       }
     );
@@ -165,7 +166,10 @@ describe('buildDigestInput', () => {
     ]);
     expect(input.viewUrl).toBe('{{view_url}}');
 
-    const withoutImdb = digestLinks(watched, 'https://tracearr.example.com', serversById, false);
+    const withoutImdb = digestLinks(watched, 'https://tracearr.example.com', serversById, {
+      tracearr: true,
+      imdb: false,
+    });
     expect(withoutImdb).toEqual([
       { label: 'Tracearr', url: 'https://tracearr.example.com/media/media-9' },
       {
@@ -173,8 +177,29 @@ describe('buildDigestInput', () => {
         url: 'https://app.plex.tv/desktop/#!/server/mach-1/details?key=%2Flibrary%2Fmetadata%2F77',
       },
     ]);
-    expect(digestLinks(watched, 'https://tracearr.example.com', serversById)).toHaveLength(3);
+    expect(
+      digestLinks(watched, 'https://tracearr.example.com', serversById, { tracearr: true })
+    ).toHaveLength(3);
     expect(input.mostWatched[0]?.links).toEqual(withoutImdb);
+  });
+
+  it('emits the Tracearr link only when the newsletter turns it on', () => {
+    const serversById = new Map<string, ServerLink>([
+      [
+        's1',
+        { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'abc' },
+      ],
+    ]);
+    const off = digestLinks(watched, 'https://tracearr.example.com', serversById, {
+      tracearr: false,
+    });
+    expect(off.map((l) => l.label)).toEqual(['Basement', 'IMDb']);
+    const on = digestLinks(watched, 'https://tracearr.example.com', serversById, {
+      tracearr: true,
+    });
+    expect(on[0]).toEqual({ label: 'Tracearr', url: 'https://tracearr.example.com/media/media-9' });
+    const noUrl = digestLinks(watched, null, serversById, { tracearr: true });
+    expect(noUrl.map((l) => l.label)).toEqual(['Basement', 'IMDb']);
   });
 });
 

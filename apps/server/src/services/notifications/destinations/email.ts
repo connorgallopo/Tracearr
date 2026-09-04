@@ -221,7 +221,7 @@ function serverNameOf(payload: NotificationPayload): string {
 async function build(event: NotificationEvent, ctx: RenderContext): Promise<EmailMessage> {
   const payload = toNotificationPayload(event, ctx.source);
   const attachments: EmailAttachment[] = [];
-  const { branding, logo: logoSetting } = await resolveEmailBranding(serverNameOf(payload));
+  const { branding, logo: logoSetting } = await resolveEmailBranding();
   const logo = eventLogo(logoSetting);
   if (logo.attachment) attachments.push(logo.attachment);
 
@@ -244,7 +244,7 @@ async function build(event: NotificationEvent, ctx: RenderContext): Promise<Emai
     logoRef: logo.ref,
     appUrl: externalUrl,
   };
-  const rendered = await renderEvent(input, branding);
+  const rendered = await renderEvent(input, { ...branding, senderName: serverNameOf(payload) });
   return { ...rendered, attachments };
 }
 
@@ -284,11 +284,11 @@ async function test(config: EmailConfig, ctx: DeliverContext): Promise<void> {
   const transporter = createTransporter(config);
   try {
     await transporter.verify();
-    const { branding, logo: logoSetting } = await resolveEmailBranding('Tracearr');
+    const { branding, logo: logoSetting } = await resolveEmailBranding();
     const logo = eventLogo(logoSetting);
     const rendered = await renderTest(
       { destinationName: ctx.destination.name, logoRef: logo.ref },
-      branding
+      { ...branding, senderName: 'Tracearr' }
     );
     await send(
       transporter,

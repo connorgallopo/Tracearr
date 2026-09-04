@@ -2,16 +2,25 @@ import {
   POSTER_IMAGE_SIZE,
   buildMediaServerItemUrl,
   type EmailBrandingSettings,
+  type EmailRichTextDoc,
   type NewsletterImageMode,
   type ServerType,
 } from '@tracearr/shared';
-import type { DigestInput, EmailLink } from '@tracearr/emails';
+import type { DigestInput, EmailLink, RichTextDoc } from '@tracearr/emails';
 import type { PosterRef } from '../../db/schema.js';
 import { buildProxyUrl } from '../imageProxy.js';
 import type { DigestCard, DigestData } from './assemble.js';
 import type { ServerLink } from './store.js';
 
 export type ResolvedImageMode = 'hosted' | 'inline' | 'none';
+
+/** packages/emails declares the grammar it renders and cannot depend on shared; a drift between the two turns this into never and the callers below stop compiling. */
+export type RenderableDoc = EmailRichTextDoc extends RichTextDoc ? EmailRichTextDoc : never;
+
+export interface DigestLinkOptions {
+  tracearr: boolean;
+  imdb?: boolean;
+}
 
 /** Written into the snapshot at render time and replaced per recipient at delivery. */
 export const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
@@ -73,15 +82,15 @@ export function substitutePosterRefs(
 
 const SERVER_TYPES = new Set<string>(['plex', 'jellyfin', 'emby']);
 
-/** Tracearr's own page when reachable, the item on its media server, and IMDb when the id is known. */
+/** Tracearr's own page when the owner turned links on and the URL is reachable, the item on its media server, and IMDb when the id is known. */
 export function digestLinks(
   card: DigestCard,
   externalUrl: string | null,
   serversById: Map<string, ServerLink>,
-  includeImdb = true
+  opts: DigestLinkOptions
 ): EmailLink[] {
   const links: EmailLink[] = [];
-  if (externalUrl && card.mediaId) {
+  if (opts.tracearr && externalUrl && card.mediaId) {
     links.push({
       label: 'Tracearr',
       url: `${externalUrl.replace(/\/$/, '')}/media/${card.mediaId}`,
@@ -97,7 +106,7 @@ export function digestLinks(
     });
     if (url) links.push({ label: server.name, url });
   }
-  if (includeImdb && card.imdbId)
+  if ((opts.imdb ?? true) && card.imdbId)
     links.push({ label: 'IMDb', url: `https://www.imdb.com/title/${card.imdbId}/` });
   return links;
 }
@@ -107,20 +116,22 @@ export function buildDigestInput(
   posters: Record<string, PosterRef>,
   opts: {
     subject: string;
-    intro: string | null;
-    outro: string | null;
+    intro: RenderableDoc | null;
+    outro: RenderableDoc | null;
     windowStart: string;
     windowEnd: string;
     logoRef: string | null;
     unsubscribeUrl: string | null;
     viewUrl: string | null;
     externalUrl: string | null;
+    tracearrLinks: boolean;
     serversById: Map<string, ServerLink>;
   }
 ): DigestInput {
   const ref = (card: DigestCard): string | null =>
     posters[card.cardId] ? `poster:${card.cardId}` : null;
-  const links = (card: DigestCard) => digestLinks(card, opts.externalUrl, opts.serversById);
+  const links = (card: DigestCard) =>
+    digestLinks(card, opts.externalUrl, opts.serversById, { tracearr: opts.tracearrLinks });
   return {
     subject: opts.subject,
     intro: opts.intro,
@@ -167,7 +178,10 @@ export function buildDigestInput(
       title: w.title,
       year: w.year,
       plays: w.plays,
-      links: digestLinks(w, opts.externalUrl, opts.serversById, false),
+      links: digestLinks(w, opts.externalUrl, opts.serversById, {
+        tracearr: opts.tracearrLinks,
+        imdb: false,
+      }),
     })),
     logoRef: opts.logoRef,
     unsubscribeUrl: opts.unsubscribeUrl,

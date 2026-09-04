@@ -157,7 +157,6 @@ describe('public unsubscribe', () => {
 
 describe('branding', () => {
   const block = {
-    senderName: 'Family Media',
     logo: { mode: 'tracearr' as const },
     accentColor: '#123456',
     footerText: null,
@@ -179,18 +178,17 @@ describe('branding', () => {
     const res = await app.inject({
       method: 'PUT',
       url: '/email/branding',
-      payload: { senderName: ' Family Media ', accentColor: '#123456' },
+      payload: { footerText: ' Family Media ', accentColor: '#123456' },
     });
     expect(res.statusCode).toBe(200);
     expect(branding.saveEmailBranding).toHaveBeenCalledWith({
-      senderName: 'Family Media',
       logo: { mode: 'tracearr' },
       accentColor: '#123456',
-      footerText: null,
+      footerText: 'Family Media',
       postalAddress: null,
       mailtoUnsubscribe: false,
     });
-    expect(res.json().senderName).toBe('Family Media');
+    expect(res.json().footerText).toBe('Family Media');
   });
 
   it('rejects an invalid block with the first issue', async () => {
@@ -202,6 +200,18 @@ describe('branding', () => {
     });
     expect(res.statusCode).toBe(400);
     expect(res.json().message).toContain('hex color');
+    expect(branding.saveEmailBranding).not.toHaveBeenCalled();
+  });
+
+  it('refuses the sender name the branding block no longer carries', async () => {
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'PUT',
+      url: '/email/branding',
+      payload: { senderName: 'Family Media' },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().message).toContain('senderName');
     expect(branding.saveEmailBranding).not.toHaveBeenCalled();
   });
 
