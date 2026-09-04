@@ -15,5 +15,10 @@ export type {
   FactsCard,
   MediaCard,
   RenderedEmail,
+  RichTextBlock,
+  RichTextDoc,
+  RichTextInline,
+  RichTextMark,
+  RichTextParagraph,
   TestEmailInput,
 } from './types.js';

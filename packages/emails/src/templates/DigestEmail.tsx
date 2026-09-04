@@ -2,6 +2,7 @@ import { Img, Link, Text } from '@react-email/components';
 import { Cell } from '../components/Cell.js';
 import { Columns } from '../components/Columns.js';
 import { Layout } from '../components/Layout.js';
+import { RichText } from '../components/RichText.js';
 import { card, colors, heading, link, muted, paragraph } from '../styles.js';
 import type {
   DigestArtist,
@@ -166,7 +167,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
         <Text style={muted}>
           {input.windowStart} to {input.windowEnd}
         </Text>
-        {input.intro && <Text style={paragraph}>{input.intro}</Text>}
+        {input.intro && <RichText doc={input.intro} accent={accent} />}
         {empty && <Text style={paragraph}>Nothing new this period.</Text>}
       </Cell>
       {input.movies.length > 0 && (
@@ -205,7 +206,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
       )}
       {input.outro && (
         <Cell style={{ paddingTop: '8px' }}>
-          <Text style={paragraph}>{input.outro}</Text>
+          <RichText doc={input.outro} accent={accent} />
         </Cell>
       )}
     </Layout>

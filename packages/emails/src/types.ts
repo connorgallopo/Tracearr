@@ -105,8 +105,8 @@ export interface DigestWatched {
 
 export interface DigestInput {
   subject: string;
-  intro: string | null;
-  outro: string | null;
+  intro: RichTextDoc | null;
+  outro: RichTextDoc | null;
   /** Already formatted for display in the newsletter's timezone. */
   windowStart: string;
   windowEnd: string;
@@ -119,4 +119,42 @@ export interface DigestInput {
   unsubscribeUrl: string | null;
   /** Emitted verbatim; null renders no browser-view link. */
   viewUrl: string | null;
+}
+
+export type RichTextMark =
+  { type: 'bold' } | { type: 'italic' } | { type: 'link'; attrs: { href: string } };
+
+export interface RichTextText {
+  type: 'text';
+  text: string;
+  marks?: RichTextMark[];
+}
+
+export interface RichTextHardBreak {
+  type: 'hardBreak';
+}
+
+export type RichTextInline = RichTextText | RichTextHardBreak;
+
+export interface RichTextParagraph {
+  type: 'paragraph';
+  content?: RichTextInline[];
+}
+
+export interface RichTextListItem {
+  type: 'listItem';
+  content: RichTextParagraph[];
+}
+
+export interface RichTextBulletList {
+  type: 'bulletList';
+  content: RichTextListItem[];
+}
+
+export type RichTextBlock = RichTextParagraph | RichTextBulletList;
+
+/** The allowlist @tracearr/shared enforces on write; this package renders it and depends on nothing else. */
+export interface RichTextDoc {
+  type: 'doc';
+  content: RichTextBlock[];
 }

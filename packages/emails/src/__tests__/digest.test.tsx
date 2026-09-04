@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultBranding, renderDigest, type DigestInput } from '../index.js';
+import { defaultBranding, renderDigest, type DigestInput, type RichTextDoc } from '../index.js';
 
 const branding = defaultBranding('Basement Plex');
 const SERVER = '11111111-1111-4111-8111-111111111111';
@@ -17,6 +17,56 @@ const links = [
 const SECTION_MAX = 12;
 const SEASONS_PER_SHOW_MAX = 8;
 const MOST_WATCHED_MAX = 10;
+
+/** Mirrors EMAIL_RICH_TEXT_MAX_WEIGHT = 900 in @tracearr/shared: two bold linked list items of 100 characters weigh 878, four one-character bold italic linked runs weigh 826. */
+const RICH_HREF = `https://example.com/${'x'.repeat(20)}`;
+const paragraphDoc = (text: string): RichTextDoc => ({
+  type: 'doc',
+  content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+});
+const heaviestList: RichTextDoc = {
+  type: 'doc',
+  content: [
+    {
+      type: 'bulletList',
+      content: Array.from({ length: 2 }, () => ({
+        type: 'listItem' as const,
+        content: [
+          {
+            type: 'paragraph' as const,
+            content: [
+              {
+                type: 'text' as const,
+                text: 'x'.repeat(100),
+                marks: [
+                  { type: 'bold' as const },
+                  { type: 'link' as const, attrs: { href: RICH_HREF } },
+                ],
+              },
+            ],
+          },
+        ],
+      })),
+    },
+  ],
+};
+const heaviestRuns: RichTextDoc = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: Array.from({ length: 4 }, () => ({
+        type: 'text' as const,
+        text: 'x',
+        marks: [
+          { type: 'bold' as const },
+          { type: 'italic' as const },
+          { type: 'link' as const, attrs: { href: RICH_HREF } },
+        ],
+      })),
+    },
+  ],
+};
 
 /** 40 characters, a plausible length for the external URL every Tracearr link is built on. */
 const EXTERNAL = 'https://newsletters.mydomain-example.com';
@@ -79,8 +129,8 @@ const VARIANTS: Record<string, Variant> = {
 function base(over: Partial<DigestInput> = {}): DigestInput {
   return {
     subject: "What's new on Basement Plex (Sep 2, 2026)",
-    intro: 'Here is what landed this week.',
-    outro: 'Enjoy!',
+    intro: paragraphDoc('Here is what landed this week.'),
+    outro: paragraphDoc('Enjoy!'),
     windowStart: 'Aug 26, 2026',
     windowEnd: 'Sep 2, 2026',
     movies: [],
@@ -95,7 +145,11 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
 }
 
 /** The heaviest digest buildDigestInput can emit: every section at its cap, three links per movie and show, two per artist and most-watched card. */
-function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
+function maxInput(
+  variant: Variant,
+  copy: { intro: RichTextDoc; outro: RichTextDoc },
+  sectionMax = SECTION_MAX
+): DigestInput {
   const movies = Array.from({ length: sectionMax }, (_, i) => {
     const n = 100 + i;
     return {
@@ -147,7 +201,7 @@ function maxInput(variant: Variant, sectionMax = SECTION_MAX): DigestInput {
       links: [tracearrLink(n), variant.server(n)],
     };
   });
-  return base({ movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
+  return base({ ...copy, movies, shows, artists, mostWatched, logoRef: 'cid:logo' });
 }
 
 describe('renderDigest', () => {
@@ -258,7 +312,7 @@ describe('renderDigest', () => {
   });
 
   it('escapes owner text', async () => {
-    const out = await renderDigest(base({ intro: '<script>x</script>' }), branding);
+    const out = await renderDigest(base({ intro: paragraphDoc('<script>x</script>') }), branding);
     expect(out.html).toContain('&lt;script&gt;');
     expect(out.html).not.toContain('<script>');
   });
@@ -307,17 +361,31 @@ describe('renderDigest', () => {
     expect(out.html).not.toContain('(0 episodes)');
   });
 
-  it.each(Object.entries(VARIANTS))(
+  const COPY = {
+    'four linked runs in both fields': { intro: heaviestRuns, outro: heaviestRuns },
+    'two linked list items in both fields': { intro: heaviestList, outro: heaviestList },
+  };
+
+  it.each(
+    Object.entries(VARIANTS).flatMap(([name, variant]) =>
+      Object.entries(COPY).map(
+        ([copyName, copy]) => [`${name}, ${copyName}`, variant, copy] as const
+      )
+    )
+  )(
     'stays under the Gmail clip budget at every maximum cap with %s',
-    async (_name, variant) => {
-      const out = await renderDigest(maxInput(variant), branding);
+    async (_name, variant, copy) => {
+      const out = await renderDigest(maxInput(variant, copy), branding);
       expect(Buffer.byteLength(out.html, 'utf8')).toBeLessThan(100 * 1024);
     }
   );
 
   it('gives every emitted table cell an explicit background and text color', async () => {
     const out = await renderDigest(
-      maxInput(VARIANTS['hosted urls over plex thumb paths']!),
+      maxInput(
+        VARIANTS['hosted urls over plex thumb paths']!,
+        COPY['four linked runs in both fields']
+      ),
       branding
     );
     const cells = out.html.match(/<td[^>]*>/g) ?? [];
