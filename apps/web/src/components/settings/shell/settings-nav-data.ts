@@ -13,6 +13,9 @@ export interface SettingsGroup {
 
 export const SETTINGS_HOME = '/settings/general/appearance';
 
+/** The one settings surface with a real grid; Settings.tsx widens its content column for it. */
+export const BACKUP_HREF = '/settings/data/backup';
+
 export const settingsNav: SettingsGroup[] = [
   {
     labelKey: 'nav.groups.general',
@@ -54,7 +57,7 @@ export const settingsNav: SettingsGroup[] = [
     labelKey: 'nav.groups.data',
     sections: [
       { nameKey: 'nav.sections.import', href: '/settings/data/import' },
-      { nameKey: 'nav.sections.backup', href: '/settings/data/backup' },
+      { nameKey: 'nav.sections.backup', href: BACKUP_HREF },
       { nameKey: 'nav.sections.jobs', href: '/settings/data/jobs' },
       { nameKey: 'nav.sections.api', href: '/settings/data/api' },
     ],

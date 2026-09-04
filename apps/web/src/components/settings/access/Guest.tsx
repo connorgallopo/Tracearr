@@ -31,10 +31,7 @@ export function Guest() {
 
       <Alert>
         <Info />
-        <AlertDescription>
-          In v1, Tracearr only supports single-owner access. Even with guest access enabled, guests
-          can only view their own sessions and violations.
-        </AlertDescription>
+        <AlertDescription>{t('accessControl.singleOwnerNote')}</AlertDescription>
       </Alert>
     </SettingsSection>
   );

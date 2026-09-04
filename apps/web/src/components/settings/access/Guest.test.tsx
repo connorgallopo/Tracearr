@@ -43,6 +43,6 @@ describe('Guest access', () => {
   it('explains the single-owner limit in a notice', () => {
     render(<Guest />);
 
-    expect(screen.getByRole('alert')).toHaveTextContent('single-owner access');
+    expect(screen.getByRole('alert')).toHaveTextContent('accessControl.singleOwnerNote');
   });
 });

@@ -87,7 +87,7 @@ describe('PosterSource', () => {
     } as unknown as ReturnType<typeof useAuth>);
   });
 
-  it('renders nothing for a non-owner, even with servers present', () => {
+  it('tells a non-owner the control is owner-only, even with servers present', () => {
     mockUseAuth.mockReturnValue({
       user: { role: 'admin' },
     } as unknown as ReturnType<typeof useAuth>);
@@ -97,9 +97,10 @@ describe('PosterSource', () => {
     } as unknown as ReturnType<typeof useSettings>);
     mockUseDebouncedSave.mockReturnValue(debouncedSaveResult(null));
 
-    const { container } = render(<PosterSource />);
+    render(<PosterSource />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('servers.posterSource.ownerOnly');
   });
 
   it('shows a skeleton while settings are loading', () => {

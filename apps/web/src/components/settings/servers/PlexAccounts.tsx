@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Link2, Loader2, Plus, XCircle } from 'lucide-react';
+import { Info, Link2, Loader2, Plus, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { PlexAccountRow } from '@/components/settings/servers/PlexAccountRow';
+import { useAuth } from '@/hooks/useAuth';
 
 // Plex OAuth configuration. The client identifier is NOT hardcoded: plex.tv
 // scopes a PIN to the identifier that created it, and the server redeems the
@@ -71,8 +73,42 @@ async function runPlexOAuth(clientIdentifier: string): Promise<string> {
   }
 }
 
+/** The empty-state and post-link buttons differ only in emphasis and label. */
+function LinkAccountButton({
+  variant,
+  labelKey,
+  onClick,
+  disabled,
+  isLinking,
+}: {
+  variant?: 'default' | 'outline';
+  labelKey: 'settings.plex.linkPlexAccount' | 'settings.plex.linkAnotherAccount';
+  onClick: () => void;
+  disabled: boolean;
+  isLinking: boolean;
+}) {
+  const { t } = useTranslation('pages');
+
+  return (
+    <Button variant={variant} onClick={onClick} disabled={disabled}>
+      {isLinking ? (
+        <>
+          <Loader2 className="animate-spin" />
+          {t('settings.plex.linking')}
+        </>
+      ) : (
+        <>
+          <Plus className="mr-2 h-4 w-4" />
+          {t(labelKey)}
+        </>
+      )}
+    </Button>
+  );
+}
+
 export function PlexAccounts() {
   const { t } = useTranslation(['notifications', 'pages', 'common', 'settings']);
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState<string | null>(null);
   const [isLinking, setIsLinking] = useState(false);
@@ -192,64 +228,55 @@ export function PlexAccounts() {
       title={t('settings:nav.sections.plexAccounts')}
       description={t('settings:nav.descriptions.plexAccounts')}
     >
-      {isLoading ? (
-        <div className="space-y-3">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      ) : accounts.length === 0 ? (
-        <EmptyState
-          icon={Link2}
-          title={t('pages:settings.plex.noAccountsLinked')}
-          description={t('pages:settings.plex.noAccountsLinkedHint')}
-        >
-          <Button onClick={startPlexOAuth} disabled={oauthBusy}>
-            {isLinking ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {t('pages:settings.plex.linking')}
-              </>
-            ) : (
-              <>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('pages:settings.plex.linkPlexAccount')}
-              </>
-            )}
-          </Button>
-          {linkError && (
-            <p className="text-destructive flex items-center gap-1 text-sm">
-              <XCircle className="h-4 w-4" />
-              {linkError}
-            </p>
-          )}
-        </EmptyState>
+      {user?.role !== 'owner' ? (
+        <Alert>
+          <Info />
+          <AlertDescription>{t('pages:settings.plex.ownerOnly')}</AlertDescription>
+        </Alert>
       ) : (
         <>
-          <ItemGroup className="gap-4">
-            {accounts.map((account) => (
-              <PlexAccountRow
-                key={account.id}
-                account={account}
-                onUnlink={() => setShowUnlinkConfirm(account.id)}
-                onReauthorize={() => void startReauthorize(account.id)}
-                isReauthorizing={reauthorizingId === account.id}
-                oauthBusy={oauthBusy}
+          {isLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : accounts.length === 0 ? (
+            <EmptyState
+              icon={Link2}
+              title={t('pages:settings.plex.noAccountsLinked')}
+              description={t('pages:settings.plex.noAccountsLinkedHint')}
+            >
+              <LinkAccountButton
+                labelKey="settings.plex.linkPlexAccount"
+                onClick={startPlexOAuth}
+                disabled={oauthBusy}
+                isLinking={isLinking}
               />
-            ))}
-          </ItemGroup>
-          <Button variant="outline" onClick={startPlexOAuth} disabled={oauthBusy}>
-            {isLinking ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {t('pages:settings.plex.linking')}
-              </>
-            ) : (
-              <>
-                <Plus className="mr-2 h-4 w-4" />
-                {t('pages:settings.plex.linkAnotherAccount')}
-              </>
-            )}
-          </Button>
+            </EmptyState>
+          ) : (
+            <>
+              <ItemGroup className="gap-4">
+                {accounts.map((account) => (
+                  <PlexAccountRow
+                    key={account.id}
+                    account={account}
+                    onUnlink={() => setShowUnlinkConfirm(account.id)}
+                    onReauthorize={() => void startReauthorize(account.id)}
+                    isReauthorizing={reauthorizingId === account.id}
+                    oauthBusy={oauthBusy}
+                  />
+                ))}
+              </ItemGroup>
+              <LinkAccountButton
+                variant="outline"
+                labelKey="settings.plex.linkAnotherAccount"
+                onClick={startPlexOAuth}
+                disabled={oauthBusy}
+                isLinking={isLinking}
+              />
+            </>
+          )}
+
           {linkError && (
             <p className="text-destructive flex items-center gap-1 text-sm">
               <XCircle className="h-4 w-4" />

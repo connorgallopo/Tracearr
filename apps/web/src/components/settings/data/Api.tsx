@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { CopyButton } from '@/components/ui/copy-button';
 import { FieldGroup } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AutosaveNumberField } from '@/components/ui/autosave-field';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
@@ -50,7 +50,7 @@ function ApiKeyCard() {
           ) : (
             <div className="space-y-3">
               <div className="flex gap-2">
-                <Input
+                <PasswordInput
                   readOnly
                   value={token ?? ''}
                   placeholder={t('general.noApiKeyGenerated')}

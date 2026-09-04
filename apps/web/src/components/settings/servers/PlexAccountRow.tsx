@@ -34,7 +34,7 @@ export function PlexAccountRow({
 
   return (
     <TooltipProvider delayDuration={100}>
-      <Item variant="outline">
+      <Item role="listitem" variant="outline">
         <ItemMedia>
           <Avatar className="size-10">
             <AvatarImage src={account.plexThumbnail ?? undefined} />

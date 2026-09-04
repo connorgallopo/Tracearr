@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { Info } from 'lucide-react';
 import type { Server } from '@tracearr/shared';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AutosaveSelectField } from '@/components/ui/autosave-field';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
@@ -9,10 +11,7 @@ import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 
 const AUTOMATIC_POSTER_SOURCE = 'auto';
 
-/**
- * Which server's poster wins when the same title exists on more than one.
- * "Automatic" (a null server id) keeps using the most recently added copy.
- */
+/** A null server id keeps using the most recently added copy of a title. */
 export function PosterSource() {
   const { t } = useTranslation(['settings']);
   const { user } = useAuth();
@@ -23,8 +22,6 @@ export function PosterSource() {
     settings?.preferredPosterServerId
   );
 
-  if (user?.role !== 'owner') return null;
-
   const servers = Array.isArray(serversData)
     ? serversData
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
@@ -32,7 +29,12 @@ export function PosterSource() {
 
   return (
     <SettingsSection title={t('nav.sections.posters')} description={t('nav.descriptions.posters')}>
-      {isLoadingSettings ? (
+      {user?.role !== 'owner' ? (
+        <Alert>
+          <Info />
+          <AlertDescription>{t('servers.posterSource.ownerOnly')}</AlertDescription>
+        </Alert>
+      ) : isLoadingSettings ? (
         <Skeleton className="h-9 w-full max-w-sm" />
       ) : (
         <AutosaveSelectField

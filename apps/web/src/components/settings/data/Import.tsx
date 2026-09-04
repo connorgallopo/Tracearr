@@ -50,7 +50,7 @@ import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
 
-/** Tautulli and Jellystat both warn that some records land on the floor; only the reasons differ. */
+/** Both importers warn about skipped records; only the reasons differ. */
 function RecordsSkippedNotice({
   reasonKeys,
   hintKey,
@@ -72,6 +72,19 @@ function RecordsSkippedNotice({
         </ul>
         {hintKey && <span className="text-muted-foreground">{t(hintKey)}</span>}
       </AlertDescription>
+    </Alert>
+  );
+}
+
+/** Both importers explain themselves with the same notice. */
+function HowItWorksNotice() {
+  const { t } = useTranslation('settings');
+
+  return (
+    <Alert>
+      <Info />
+      <AlertTitle>{t('import.howItWorks')}</AlertTitle>
+      <AlertDescription>{t('import.howItWorksDesc')}</AlertDescription>
     </Alert>
   );
 }
@@ -227,9 +240,9 @@ function TautulliImportSection({
 
             <div className="ml-8 space-y-4">
               <Field>
-                <FieldLabel>{t('import.targetServer')}</FieldLabel>
+                <FieldLabel htmlFor="targetServer">{t('import.targetServer')}</FieldLabel>
                 <Select value={selectedPlexServerId} onValueChange={setSelectedPlexServerId}>
-                  <SelectTrigger>
+                  <SelectTrigger id="targetServer">
                     <SelectValue placeholder={t('import.selectPlexServer')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -305,13 +318,7 @@ function TautulliImportSection({
 
           {/* Info cards */}
           <div className="space-y-3">
-            <div className="bg-muted/50 flex gap-3 rounded-lg p-4">
-              <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-              <div className="text-muted-foreground space-y-2 text-sm">
-                <p className="text-foreground font-medium">{t('import.howItWorks')}</p>
-                <p>{t('import.howItWorksDesc')}</p>
-              </div>
-            </div>
+            <HowItWorksNotice />
 
             <RecordsSkippedNotice
               reasonKeys={[
@@ -473,13 +480,7 @@ function JellystatImportSection({
 
       {/* Info cards */}
       <div className="space-y-3">
-        <div className="bg-muted/50 flex gap-3 rounded-lg p-4">
-          <Info className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
-          <div className="text-muted-foreground space-y-2 text-sm">
-            <p className="text-foreground font-medium">{t('import.howItWorks')}</p>
-            <p>{t('import.howItWorksDesc')}</p>
-          </div>
-        </div>
+        <HowItWorksNotice />
 
         <RecordsSkippedNotice
           reasonKeys={['import.skipUserNotFoundJellyfin', 'import.skipDuplicate']}
@@ -981,6 +982,58 @@ export function Import() {
   // Determine default tab based on available server types
   const defaultTab = hasPlexServers ? 'plex' : 'jellyfin';
 
+  const tautulliSection = (
+    <TautulliImportSection
+      tautulliUrl={tautulliUrl}
+      setTautulliUrl={setTautulliUrl}
+      tautulliApiKey={tautulliApiKey}
+      setTautulliApiKey={setTautulliApiKey}
+      connectionStatus={connectionStatus}
+      connectionMessage={connectionMessage}
+      handleTestConnection={handleTestConnection}
+      plexServers={plexServers}
+      selectedPlexServerId={selectedPlexServerId}
+      setSelectedPlexServerId={setSelectedPlexServerId}
+      isTautulliImporting={isTautulliImporting}
+      overwriteFriendlyNames={overwriteFriendlyNames}
+      setOverwriteFriendlyNames={setOverwriteFriendlyNames}
+      includeStreamDetails={includeStreamDetails}
+      setIncludeStreamDetails={setIncludeStreamDetails}
+      handleStartTautulliImport={handleStartTautulliImport}
+      tautulliProgressData={tautulliProgressData}
+    />
+  );
+
+  const jellyfinSections = (
+    <>
+      <PlaybackReportingImportSection
+        jellyfinServers={jellyfinEmbyServers}
+        selectedServerId={selectedJellyfinServerId}
+        onServerChange={setSelectedJellyfinServerId}
+        progress={playbackReportingProgress}
+        isImporting={isPlaybackReportingImporting}
+        onStartImport={handleStartPlaybackReportingImport}
+      />
+
+      <div className="border-t pt-6">
+        <JellystatImportSection
+          jellyfinEmbyServers={jellyfinEmbyServers}
+          selectedJellyfinServerId={selectedJellyfinServerId}
+          setSelectedJellyfinServerId={setSelectedJellyfinServerId}
+          selectedFile={selectedFile}
+          handleFileSelect={handleFileSelect}
+          enrichMedia={enrichMedia}
+          setEnrichMedia={setEnrichMedia}
+          updateStreamDetails={updateStreamDetails}
+          setUpdateStreamDetails={setUpdateStreamDetails}
+          isJellystatImporting={isJellystatImporting}
+          handleStartJellystatImport={handleStartJellystatImport}
+          jellystatProgressData={jellystatProgressData}
+        />
+      </div>
+    </>
+  );
+
   return (
     <SettingsSection title={t('nav.sections.import')} description={t('nav.descriptions.import')}>
       {settingsLoading || serversLoading ? (
@@ -1013,103 +1066,17 @@ export function Import() {
           </TabsList>
 
           <TabsContent value="plex" className="mt-0 space-y-6">
-            <TautulliImportSection
-              tautulliUrl={tautulliUrl}
-              setTautulliUrl={setTautulliUrl}
-              tautulliApiKey={tautulliApiKey}
-              setTautulliApiKey={setTautulliApiKey}
-              connectionStatus={connectionStatus}
-              connectionMessage={connectionMessage}
-              handleTestConnection={handleTestConnection}
-              plexServers={plexServers}
-              selectedPlexServerId={selectedPlexServerId}
-              setSelectedPlexServerId={setSelectedPlexServerId}
-              isTautulliImporting={isTautulliImporting}
-              overwriteFriendlyNames={overwriteFriendlyNames}
-              setOverwriteFriendlyNames={setOverwriteFriendlyNames}
-              includeStreamDetails={includeStreamDetails}
-              setIncludeStreamDetails={setIncludeStreamDetails}
-              handleStartTautulliImport={handleStartTautulliImport}
-              tautulliProgressData={tautulliProgressData}
-            />
+            {tautulliSection}
           </TabsContent>
 
           <TabsContent value="jellyfin" className="mt-0 space-y-6">
-            <PlaybackReportingImportSection
-              jellyfinServers={jellyfinEmbyServers}
-              selectedServerId={selectedJellyfinServerId}
-              onServerChange={setSelectedJellyfinServerId}
-              progress={playbackReportingProgress}
-              isImporting={isPlaybackReportingImporting}
-              onStartImport={handleStartPlaybackReportingImport}
-            />
-
-            <div className="border-t pt-6">
-              <JellystatImportSection
-                jellyfinEmbyServers={jellyfinEmbyServers}
-                selectedJellyfinServerId={selectedJellyfinServerId}
-                setSelectedJellyfinServerId={setSelectedJellyfinServerId}
-                selectedFile={selectedFile}
-                handleFileSelect={handleFileSelect}
-                enrichMedia={enrichMedia}
-                setEnrichMedia={setEnrichMedia}
-                updateStreamDetails={updateStreamDetails}
-                setUpdateStreamDetails={setUpdateStreamDetails}
-                isJellystatImporting={isJellystatImporting}
-                handleStartJellystatImport={handleStartJellystatImport}
-                jellystatProgressData={jellystatProgressData}
-              />
-            </div>
+            {jellyfinSections}
           </TabsContent>
         </Tabs>
       ) : hasPlexServers ? (
-        <TautulliImportSection
-          tautulliUrl={tautulliUrl}
-          setTautulliUrl={setTautulliUrl}
-          tautulliApiKey={tautulliApiKey}
-          setTautulliApiKey={setTautulliApiKey}
-          connectionStatus={connectionStatus}
-          connectionMessage={connectionMessage}
-          handleTestConnection={handleTestConnection}
-          plexServers={plexServers}
-          selectedPlexServerId={selectedPlexServerId}
-          setSelectedPlexServerId={setSelectedPlexServerId}
-          isTautulliImporting={isTautulliImporting}
-          overwriteFriendlyNames={overwriteFriendlyNames}
-          setOverwriteFriendlyNames={setOverwriteFriendlyNames}
-          includeStreamDetails={includeStreamDetails}
-          setIncludeStreamDetails={setIncludeStreamDetails}
-          handleStartTautulliImport={handleStartTautulliImport}
-          tautulliProgressData={tautulliProgressData}
-        />
+        tautulliSection
       ) : (
-        <div className="space-y-6">
-          <PlaybackReportingImportSection
-            jellyfinServers={jellyfinEmbyServers}
-            selectedServerId={selectedJellyfinServerId}
-            onServerChange={setSelectedJellyfinServerId}
-            progress={playbackReportingProgress}
-            isImporting={isPlaybackReportingImporting}
-            onStartImport={handleStartPlaybackReportingImport}
-          />
-
-          <div className="border-t pt-6">
-            <JellystatImportSection
-              jellyfinEmbyServers={jellyfinEmbyServers}
-              selectedJellyfinServerId={selectedJellyfinServerId}
-              setSelectedJellyfinServerId={setSelectedJellyfinServerId}
-              selectedFile={selectedFile}
-              handleFileSelect={handleFileSelect}
-              enrichMedia={enrichMedia}
-              setEnrichMedia={setEnrichMedia}
-              updateStreamDetails={updateStreamDetails}
-              setUpdateStreamDetails={setUpdateStreamDetails}
-              isJellystatImporting={isJellystatImporting}
-              handleStartJellystatImport={handleStartJellystatImport}
-              jellystatProgressData={jellystatProgressData}
-            />
-          </div>
-        </div>
+        <div className="space-y-6">{jellyfinSections}</div>
       )}
     </SettingsSection>
   );

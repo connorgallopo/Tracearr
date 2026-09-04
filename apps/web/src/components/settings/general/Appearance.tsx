@@ -3,13 +3,11 @@ import { Monitor, Moon, RotateCcw, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldTitle } from '@/components/ui/field';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { ACCENT_PRESETS, useTheme } from '@/components/theme-provider';
+import { ACCENT_PRESETS, useTheme, type Theme } from '@/components/theme-provider';
 import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicker';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 
-type ThemeMode = 'light' | 'dark' | 'system';
-
-const DEFAULT_THEME: ThemeMode = 'dark';
+const DEFAULT_THEME: Theme = 'dark';
 const DEFAULT_HUE = 187;
 
 const THEME_MODES = [
@@ -61,7 +59,7 @@ export function Appearance() {
               aria-label={t('general.theme')}
               value={theme}
               onValueChange={(value) => {
-                if (value) setTheme(value as ThemeMode);
+                if (value) setTheme(value as Theme);
               }}
             >
               {THEME_MODES.map(({ value, labelKey, icon: Icon, isDefault: isDefaultMode }) => (

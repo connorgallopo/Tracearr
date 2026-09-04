@@ -2,7 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { SettingsNav } from '@/components/settings/shell/SettingsNav';
-import { SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
+import { BACKUP_HREF, SETTINGS_HOME } from '@/components/settings/shell/settings-nav-data';
 import { Appearance } from '@/components/settings/general/Appearance';
 import { Locale } from '@/components/settings/general/Locale';
 import { Behavior } from '@/components/settings/general/Behavior';
@@ -18,16 +18,14 @@ import { Jobs } from '@/components/settings/data/Jobs';
 import { Backup } from '@/components/settings/data/Backup';
 import { Destinations } from '@/components/settings/notifications/Destinations';
 
-// Backup history is the one settings surface with a real grid; everything else is a form.
-const WIDE_SECTIONS = new Set(['/settings/data/backup']);
+const WIDE_SECTIONS = new Set([BACKUP_HREF]);
 
 export function Settings() {
   const { t } = useTranslation('settings');
   const { pathname } = useLocation();
 
   return (
-    // The layout follows this container, not the viewport: the app sidebar
-    // collapses to an icon rail, which changes the room Settings has.
+    // Layout follows this container, not the viewport: the app sidebar collapses to an icon rail.
     <div className="@container/settings space-y-6">
       <h1 className="text-3xl font-bold">{t('title')}</h1>
       <div className="grid gap-8 @3xl/settings:grid-cols-[13rem_minmax(0,1fr)]">
@@ -68,7 +66,9 @@ export function Settings() {
             <Route path="tailscale" element={<Navigate to="/settings/access/remote" replace />} />
             <Route path="import" element={<Navigate to="/settings/data/import" replace />} />
             <Route path="jobs" element={<Navigate to="/settings/data/jobs" replace />} />
-            <Route path="backup" element={<Navigate to="/settings/data/backup" replace />} />
+            <Route path="backup" element={<Navigate to={BACKUP_HREF} replace />} />
+
+            <Route path="*" element={<Navigate to={SETTINGS_HOME} replace />} />
           </Routes>
         </div>
       </div>

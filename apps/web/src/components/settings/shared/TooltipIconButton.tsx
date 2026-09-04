@@ -3,12 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-/**
- * An icon-only action: the tooltip and the button's accessible name share one
- * label. Render inside a `TooltipProvider`; this component doesn't supply one,
- * since callers usually already wrap a group of these actions with a single
- * provider.
- */
+/** Render inside a TooltipProvider; callers usually already wrap a group of these. */
 export function TooltipIconButton({
   label,
   icon: Icon,

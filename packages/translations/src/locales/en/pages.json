@@ -1540,6 +1540,7 @@
       "showAll": "Show all",
       "moreConnections": "+{{count}} more connections",
       "connectingTo": "Connecting to {{name}}...",
+      "ownerOnly": "Only the owner can manage linked Plex accounts.",
       "noAccountsLinked": "No Plex Accounts Linked",
       "noAccountsLinkedHint": "Link a Plex account to add Plex servers to Tracearr.",
       "linkPlexAccount": "Link Plex Account",

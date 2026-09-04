@@ -63,6 +63,7 @@ export function ServerRow({
   return (
     <div
       ref={setNodeRef}
+      role="listitem"
       className="touch-none"
       style={{
         transform: CSS.Transform.toString(transform),

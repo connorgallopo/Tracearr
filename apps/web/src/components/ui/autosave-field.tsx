@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Loader2, Check, AlertCircle, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
@@ -35,7 +36,7 @@ export function SaveStatusIndicator({ status, className }: SaveStatusIndicatorPr
       className={cn(
         'inline-flex items-center gap-1 text-xs',
         status === 'saving' && 'text-muted-foreground',
-        status === 'saved' && 'text-green-600 dark:text-green-500',
+        status === 'saved' && 'text-success',
         status === 'error' && 'text-destructive',
         className
       )}
@@ -137,6 +138,8 @@ interface AutosaveTextFieldProps extends AutosaveFieldBaseProps {
   type?: 'text' | 'url' | 'email';
   disabled?: boolean;
   maxLength?: number;
+  /** Rendered beside the input, e.g. a detect/generate action. */
+  trailing?: ReactNode;
 }
 
 export function AutosaveTextField({
@@ -153,23 +156,34 @@ export function AutosaveTextField({
   onReset,
   disabled,
   maxLength,
+  trailing,
   className,
 }: AutosaveTextFieldProps) {
   const hasError = status === 'error';
+  const input = (
+    <Input
+      id={id}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      maxLength={maxLength}
+      aria-invalid={hasError}
+    />
+  );
 
   return (
     <Field data-invalid={hasError} className={className}>
       <FieldHeader id={id} label={label} status={status} />
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        maxLength={maxLength}
-        aria-invalid={hasError}
-      />
+      {trailing ? (
+        <div className="flex gap-2">
+          {input}
+          {trailing}
+        </div>
+      ) : (
+        input
+      )}
       {description && <FieldDescription>{description}</FieldDescription>}
       {hasError && errorMessage && (
         <ErrorActions errorMessage={errorMessage} onRetry={onRetry} onReset={onReset} />

@@ -7,18 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
-import { SaveStatusIndicator } from '@/components/ui/autosave-field';
+import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field';
+import { AutosaveTextField } from '@/components/ui/autosave-field';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
-// Exit node disabled — this will come back when we implement SOCKS proxy support
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
+import { TooltipIconButton } from '@/components/settings/shared/TooltipIconButton';
 import {
   Globe,
   Loader2,
@@ -31,13 +25,13 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { BASE_URL } from '@/lib/basePath';
+import { cn } from '@/lib/utils';
 import {
   useSettings,
   useTailscaleStatus,
   useTailscaleLogs,
   useEnableTailscale,
   useDisableTailscale,
-  // useSetExitNode, // Exit node disabled — will come back with SOCKS proxy support
   useResetTailscale,
 } from '@/hooks/queries';
 import { useDebouncedSave, TEXT_INPUT_DELAY } from '@/hooks/useDebouncedSave';
@@ -52,7 +46,6 @@ function ExternalUrlCard() {
   const externalUrl = externalUrlField.value ?? '';
   const isLocalhost = externalUrl.includes('localhost') || externalUrl.includes('127.0.0.1');
   const isHttp = externalUrl.startsWith('http://') && !isLocalhost;
-  const hasError = externalUrlField.status === 'error';
 
   return (
     <Card>
@@ -65,19 +58,18 @@ function ExternalUrlCard() {
       </CardHeader>
       <CardContent>
         <FieldGroup>
-          <Field data-invalid={hasError}>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor="externalUrl">{t('general.externalUrl')}</FieldLabel>
-              <SaveStatusIndicator status={externalUrlField.status} />
-            </div>
-            <div className="flex gap-2">
-              <Input
-                id="externalUrl"
-                placeholder={t('general.externalUrlPlaceholder')}
-                value={externalUrl}
-                onChange={(e) => externalUrlField.setValue(e.target.value)}
-                aria-invalid={hasError}
-              />
+          <AutosaveTextField
+            id="externalUrl"
+            label={t('general.externalUrl')}
+            description={t('general.externalUrlDesc')}
+            placeholder={t('general.externalUrlPlaceholder')}
+            value={externalUrl}
+            onChange={externalUrlField.setValue}
+            status={externalUrlField.status}
+            errorMessage={externalUrlField.errorMessage}
+            onRetry={externalUrlField.retry}
+            onReset={externalUrlField.reset}
+            trailing={
               <Button
                 variant="outline"
                 onClick={() => {
@@ -91,34 +83,8 @@ function ExternalUrlCard() {
               >
                 {t('general.detect')}
               </Button>
-            </div>
-            <FieldDescription>{t('general.externalUrlDesc')}</FieldDescription>
-            {hasError && externalUrlField.errorMessage && (
-              <div className="flex items-center justify-between">
-                <FieldError>{externalUrlField.errorMessage}</FieldError>
-                <div className="flex gap-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={externalUrlField.retry}
-                  >
-                    {t('common:actions.retry')}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={externalUrlField.reset}
-                  >
-                    {t('common:actions.reset')}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Field>
+            }
+          />
 
           {isLocalhost && (
             <Alert variant="warning">
@@ -202,7 +168,6 @@ function TailscaleCard() {
   const enableMutation = useEnableTailscale();
   const disableMutation = useDisableTailscale();
   const resetMutation = useResetTailscale();
-  // const exitNodeMutation = useSetExitNode();
   const [hostname, setHostname] = useState('');
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -257,7 +222,7 @@ function TailscaleCard() {
   }
 
   return (
-    <>
+    <TooltipProvider delayDuration={100}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -265,17 +230,17 @@ function TailscaleCard() {
             {t('tailscale.title')}
             <BetaBadge />
             {status.status !== 'disabled' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
+              <TooltipIconButton
+                label={t('common:actions.refresh')}
+                icon={RefreshCw}
                 onClick={handleRefresh}
                 disabled={refreshed}
-              >
-                <RefreshCw
-                  className={`h-3.5 w-3.5 transition-opacity duration-300 ${refreshed ? 'opacity-30' : ''}`}
-                />
-              </Button>
+                size="icon-xs"
+                iconClassName={cn(
+                  'size-3.5 transition-opacity duration-300',
+                  refreshed && 'opacity-30'
+                )}
+              />
             )}
           </CardTitle>
           <CardDescription>{t('tailscale.description')}</CardDescription>
@@ -341,7 +306,10 @@ function TailscaleCard() {
               </div>
               <div className="flex gap-2">
                 {authUrl && (
-                  <Button variant="default" onClick={() => window.open(authUrl, '_blank')}>
+                  <Button
+                    variant="default"
+                    onClick={() => window.open(authUrl, '_blank', 'noopener,noreferrer')}
+                  >
                     <ExternalLink />
                     {t('tailscale.authorize')}
                   </Button>
@@ -365,33 +333,6 @@ function TailscaleCard() {
                 <span>{t('tailscale.connected')}</span>
               </div>
               <TailnetFacts status={status} />
-              {/* Exit node disabled — this will come back when we implement SOCKS proxy support */}
-              {/* {status.exitNodes.length > 0 && (
-                <Select
-                  value={status.exitNodes.find((n) => n.active)?.id ?? 'none'}
-                  onValueChange={(value) =>
-                    exitNodeMutation.mutate(value === 'none' ? null : value)
-                  }
-                  disabled={exitNodeMutation.isPending}
-                >
-                  <SelectTrigger className="h-7 w-auto min-w-32 font-mono text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t('tailscale.exitNodeNone')}</SelectItem>
-                    {status.exitNodes.map((node) => (
-                      <SelectItem key={node.id} value={node.id}>
-                        {node.hostname}
-                        {!node.online && (
-                          <span className="text-muted-foreground ml-1">
-                            {t('tailscale.exitNodeOffline')}
-                          </span>
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )} */}
 
               <Button variant="destructive" onClick={() => setShowDisableConfirm(true)}>
                 {t('tailscale.disable')}
@@ -484,7 +425,7 @@ function TailscaleCard() {
         isLoading={resetMutation.isPending}
         variant="destructive"
       />
-    </>
+    </TooltipProvider>
   );
 }
 

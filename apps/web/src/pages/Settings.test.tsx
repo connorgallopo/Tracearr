@@ -79,6 +79,7 @@ function renderAt(path: string) {
 describe('Settings routes', () => {
   it.each([
     ['/settings', '/settings/general/appearance'],
+    ['/settings/general', '/settings/general/appearance'],
     ['/settings/servers', '/settings/servers/connections'],
     ['/settings/notifications', '/settings/notifications/destinations'],
     ['/settings/access', '/settings/access/guest'],

@@ -43,7 +43,7 @@ interface BackupRow {
 }
 
 /** The current year is implied; anything older says which year it came from. */
-function dateLabel(iso: string): string {
+export function dateLabel(iso: string): string {
   const date = new Date(iso);
   const pattern = getDateTimeFormatString();
   return format(
@@ -156,7 +156,7 @@ export function BackupHistory({
 
       <ItemGroup data-testid="backup-list" className="gap-2 @2xl/backup-history:hidden">
         {rows.map((row) => (
-          <Item key={row.filename} variant="outline" size="sm" title={row.filename}>
+          <Item key={row.filename} role="listitem" variant="outline" size="sm" title={row.filename}>
             <ItemContent>
               <ItemTitle title={row.fullDate}>{row.date}</ItemTitle>
               <ItemDescription className="tabular-nums">

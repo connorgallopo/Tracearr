@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AutosaveNumberField, AutosaveSelectField } from './autosave-field';
+import { AutosaveNumberField, AutosaveSelectField, AutosaveTextField } from './autosave-field';
 
 describe('AutosaveNumberField', () => {
   it('puts the unit in the input group, at its trailing edge', () => {
@@ -47,6 +47,39 @@ describe('AutosaveNumberField', () => {
     await userEvent.type(screen.getByLabelText('Count'), '9');
 
     expect(onChange).toHaveBeenCalledWith(39);
+  });
+});
+
+describe('AutosaveTextField', () => {
+  it('renders a trailing slot beside the input, not somewhere else in the field', () => {
+    render(
+      <AutosaveTextField
+        id="externalUrl"
+        label="External URL"
+        value="https://example.com"
+        onChange={vi.fn()}
+        status="idle"
+        trailing={<button type="button">Detect</button>}
+      />
+    );
+
+    const input = screen.getByLabelText('External URL');
+    const trailingButton = screen.getByRole('button', { name: 'Detect' });
+    expect(trailingButton.parentElement).toBe(input.parentElement);
+  });
+
+  it('renders no trailing wrapper when the slot is empty', () => {
+    render(
+      <AutosaveTextField
+        id="externalUrl"
+        label="External URL"
+        value="https://example.com"
+        onChange={vi.fn()}
+        status="idle"
+      />
+    );
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
 

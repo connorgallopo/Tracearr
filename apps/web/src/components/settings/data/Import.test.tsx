@@ -89,8 +89,10 @@ describe('Import', () => {
 
     renderImport();
 
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
+    // Playback Reporting and Jellystat both render here and both start with
+    // steps 1 and 2 on the shared StepBadge, so those numbers appear twice.
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    expect(screen.getAllByText('2')).toHaveLength(2);
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 

@@ -44,7 +44,7 @@ export function MobileDeviceRow({ session }: { session: MobileSession }) {
   return (
     <>
       <TooltipProvider delayDuration={100}>
-        <Item variant="outline">
+        <Item role="listitem" variant="outline">
           <ItemMedia variant="icon">
             <Smartphone />
           </ItemMedia>

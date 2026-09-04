@@ -20,6 +20,7 @@ import {
   Search,
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
+import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { api } from '@/lib/api';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
@@ -109,9 +110,7 @@ export function PlaybackReportingImportSection({
       {/* Server Selection + Plugin Check */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs">
-            {t('import.step1')}
-          </span>
+          <StepBadge n={1} />
           {t('import.selectTargetServer')}
         </div>
 
@@ -180,9 +179,7 @@ export function PlaybackReportingImportSection({
       {/* Options */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs">
-            {t('import.step2')}
-          </span>
+          <StepBadge n={2} />
           {t('import.importOptions')}
         </div>
 

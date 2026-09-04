@@ -139,7 +139,10 @@ function RunOutcomeBanner({
 }) {
   const { t } = useTranslation('common');
   return (
-    <Alert variant={variant}>
+    <Alert
+      variant={variant}
+      className={variant === 'destructive' ? undefined : '[&>svg]:text-success'}
+    >
       {icon}
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>{description}</AlertDescription>
@@ -388,7 +391,7 @@ export function Jobs() {
           <Tabs
             value={activeCategory}
             onValueChange={(v) => setActiveCategory(v as JobCategory)}
-            className="w-full"
+            className="@container/job-tabs w-full"
           >
             <TabsList className="grid w-full grid-cols-3">
               {(Object.keys(CATEGORY_CONFIG) as JobCategory[]).map((category) => {
@@ -398,7 +401,7 @@ export function Jobs() {
                 return (
                   <TabsTrigger key={category} value={category} className="gap-1.5">
                     <CategoryIcon className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t(config.labelKey)}</span>
+                    <span className="hidden @md/job-tabs:inline">{t(config.labelKey)}</span>
                     <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
                       {jobCount}
                     </Badge>
@@ -408,125 +411,117 @@ export function Jobs() {
             </TabsList>
           </Tabs>
 
-          {filteredJobs.map((job) => {
-            const JobIcon = JOB_ICONS[job.type] || Wrench;
-            const isRunning = runningJob === job.type;
+          <ItemGroup className="gap-3">
+            {filteredJobs.map((job) => {
+              const JobIcon = JOB_ICONS[job.type] || Wrench;
+              const isRunning = runningJob === job.type;
 
-            return (
-              <div
-                key={job.type}
-                className={cn(
-                  'rounded-lg border p-4 transition-colors',
-                  isRunning && 'border-primary/30 bg-primary/5'
-                )}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex gap-3">
-                    <div
-                      className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
-                        isRunning ? 'bg-primary/10' : 'bg-muted'
-                      )}
-                    >
-                      <JobIcon
-                        className={cn(
-                          'h-5 w-5',
-                          isRunning ? 'text-primary' : 'text-muted-foreground'
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="leading-none font-medium">{job.name}</h3>
-                      <p className="text-muted-foreground text-sm">{job.description}</p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => openConfirmDialog(job)}
-                    disabled={runningJob !== null}
-                    size="sm"
-                    className="shrink-0 self-start sm:self-center"
+              return (
+                <Item
+                  key={job.type}
+                  role="listitem"
+                  variant="outline"
+                  className={cn(isRunning && 'border-primary/30 bg-primary/5')}
+                >
+                  <ItemMedia
+                    className={cn('size-10 rounded-lg', isRunning ? 'bg-primary/10' : 'bg-muted')}
                   >
-                    {isRunning ? (
-                      progress?.status === 'waiting' ? (
-                        <>
-                          <Clock className="mr-1.5 h-3.5 w-3.5 animate-pulse" />
-                          {t('jobs.waiting')}
-                        </>
+                    <JobIcon
+                      className={cn(
+                        'h-5 w-5',
+                        isRunning ? 'text-primary' : 'text-muted-foreground'
+                      )}
+                    />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>{job.name}</ItemTitle>
+                    <ItemDescription>{job.description}</ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Button
+                      onClick={() => openConfirmDialog(job)}
+                      disabled={runningJob !== null}
+                      size="sm"
+                    >
+                      {isRunning ? (
+                        progress?.status === 'waiting' ? (
+                          <>
+                            <Clock className="mr-1.5 h-3.5 w-3.5 animate-pulse" />
+                            {t('jobs.waiting')}
+                          </>
+                        ) : (
+                          <>
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                            {t('jobs.runningState')}
+                          </>
+                        )
                       ) : (
                         <>
-                          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                          {t('jobs.runningState')}
+                          <Play className="mr-1.5 h-3.5 w-3.5" />
+                          {t('jobs.runJob')}
                         </>
-                      )
-                    ) : (
-                      <>
-                        <Play className="mr-1.5 h-3.5 w-3.5" />
-                        {t('jobs.runJob')}
-                      </>
-                    )}
-                  </Button>
-                </div>
+                      )}
+                    </Button>
+                  </ItemActions>
 
-                {/* Inline Progress for Running Job */}
-                {isRunning && progress?.status === 'running' && (
-                  <div className="mt-4 space-y-3 border-t pt-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{progress.message}</span>
-                      <span className="font-medium tabular-nums">{getProgressPercent()}%</span>
-                    </div>
-                    <Progress value={getProgressPercent()} className="h-1.5" />
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                      <span className="text-muted-foreground">
-                        <span className="text-foreground font-medium">
-                          {progress.processedRecords.toLocaleString()}
-                        </span>{' '}
-                        / {progress.totalRecords.toLocaleString()} {t('jobs.processed')}
-                      </span>
-                      {progress.updatedRecords > 0 && (
+                  {isRunning && progress?.status === 'running' && (
+                    <div className="w-full space-y-3 border-t pt-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">{progress.message}</span>
+                        <span className="font-medium tabular-nums">{getProgressPercent()}%</span>
+                      </div>
+                      <Progress value={getProgressPercent()} className="h-1.5" />
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
                         <span className="text-muted-foreground">
-                          <span className="text-success font-medium">
-                            {progress.updatedRecords.toLocaleString()}
+                          <span className="text-foreground font-medium">
+                            {progress.processedRecords.toLocaleString()}
                           </span>{' '}
-                          {t('jobs.updated')}
+                          / {progress.totalRecords.toLocaleString()} {t('jobs.processed')}
                         </span>
-                      )}
-                      {progress.skippedRecords > 0 && (
-                        <span className="text-muted-foreground">
-                          <span className="font-medium">
-                            {progress.skippedRecords.toLocaleString()}
-                          </span>{' '}
-                          {t('jobs.unchanged')}
-                        </span>
-                      )}
-                      {progress.errorRecords > 0 && (
-                        <span className="text-destructive">
-                          <span className="font-medium">
-                            {progress.errorRecords.toLocaleString()}
-                          </span>{' '}
-                          {t('jobs.errors')}
-                        </span>
-                      )}
+                        {progress.updatedRecords > 0 && (
+                          <span className="text-muted-foreground">
+                            <span className="text-success font-medium">
+                              {progress.updatedRecords.toLocaleString()}
+                            </span>{' '}
+                            {t('jobs.updated')}
+                          </span>
+                        )}
+                        {progress.skippedRecords > 0 && (
+                          <span className="text-muted-foreground">
+                            <span className="font-medium">
+                              {progress.skippedRecords.toLocaleString()}
+                            </span>{' '}
+                            {t('jobs.unchanged')}
+                          </span>
+                        )}
+                        {progress.errorRecords > 0 && (
+                          <span className="text-destructive">
+                            <span className="font-medium">
+                              {progress.errorRecords.toLocaleString()}
+                            </span>{' '}
+                            {t('jobs.errors')}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Inline Waiting Status */}
-                {isRunning && progress?.status === 'waiting' && (
-                  <div className="mt-4 border-t pt-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="text-muted-foreground h-4 w-4 animate-pulse" />
-                      <span className="text-muted-foreground">{progress.message}</span>
+                  {isRunning && progress?.status === 'waiting' && (
+                    <div className="w-full border-t pt-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="text-muted-foreground h-4 w-4 animate-pulse" />
+                        <span className="text-muted-foreground">{progress.message}</span>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </Item>
+              );
+            })}
+          </ItemGroup>
 
-          {/* Completed Status Banner */}
           {progress?.status === 'complete' && !runningJob && (
             <RunOutcomeBanner
-              icon={<CheckCircle2 className="text-success" />}
+              icon={<CheckCircle2 />}
               title={t('jobs.lastJobCompleted')}
               description={progress.message}
               onDismiss={() => setProgress(null)}
@@ -588,6 +583,7 @@ export function Jobs() {
                 return (
                   <Item
                     key={item.jobId}
+                    role="listitem"
                     variant="outline"
                     size="sm"
                     className={cn(!isSuccess && 'border-destructive/30 bg-destructive/5')}

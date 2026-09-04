@@ -217,7 +217,8 @@
       "label": "Preferred Poster Source",
       "description": "When a title is on more than one server, use this server's poster. If it doesn't have one, we'll fall back to the most recently added copy.",
       "automatic": "Automatic (most recent)",
-      "emptyHint": "Add a server to choose a preferred poster source."
+      "emptyHint": "Add a server to choose a preferred poster source.",
+      "ownerOnly": "Only the owner can choose the preferred poster source."
     },
     "version": {
       "installed": "Version {{version}}",
@@ -396,7 +397,6 @@
     "jellyfinEmby": "Jellyfin/Emby (Jellystat)",
     "step1": "1",
     "step2": "2",
-    "step3": "3",
     "apiKeyPlaceholder": "Your Tautulli API key",
     "skipUserNotFoundPlex": "User not found — The Plex user doesn't exist in Tracearr. Sync your server first to add all users.",
     "skipDuplicate": "Duplicate session — The session was already imported previously.",
@@ -488,6 +488,8 @@
     "scheduleWeekly": "Weekly",
     "scheduleMonthly": "Monthly",
     "scheduleTime": "Time ({{timezone}})",
+    "scheduleHour": "Hour",
+    "scheduleMinute": "Minute",
     "scheduleDayOfWeek": "Day of Week",
     "scheduleDayOfMonth": "Day of Month",
     "scheduleDayOfMonthHint": "On months with fewer days, the backup runs on the last day.",

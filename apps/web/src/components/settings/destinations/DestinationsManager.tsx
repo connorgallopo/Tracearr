@@ -18,10 +18,12 @@ export function DestinationsManager() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-44 w-full" />
-        ))}
+      <div className="@container/destinations">
+        <div className="grid gap-4 @2xl/destinations:grid-cols-2 @4xl/destinations:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-44 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -36,14 +38,14 @@ export function DestinationsManager() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="@container/destinations space-y-4">
       {rows.length === 0 ? (
         <EmptyState icon={Bell} title={t('settings.destinations.empty')}>
           {addButton}
         </EmptyState>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 @2xl/destinations:grid-cols-2 @4xl/destinations:grid-cols-3">
             {rows.map((destination) => (
               <DestinationCard
                 key={destination.id}

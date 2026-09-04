@@ -16,7 +16,7 @@ export function ColorSwatchPicker({
   const groupName = useId();
 
   return (
-    <fieldset className="m-0 flex flex-wrap gap-2 border-0 p-0">
+    <fieldset className="flex flex-wrap gap-2">
       <legend className="sr-only">{label}</legend>
       {options.map((option) => {
         const isSelected = option.id === value;
@@ -24,6 +24,7 @@ export function ColorSwatchPicker({
         return (
           <label
             key={option.id}
+            title={option.name}
             className={cn(
               'ring-offset-background has-[:focus-visible]:ring-ring relative size-8 rounded-md transition-transform hover:scale-105 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-offset-2',
               isSelected && 'ring-foreground scale-105 ring-2 ring-offset-2'

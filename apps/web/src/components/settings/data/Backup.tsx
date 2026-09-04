@@ -35,13 +35,9 @@ import { useMaintenanceMode, MAINTENANCE_EVENT } from '@/hooks/useMaintenanceMod
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
-import { BackupHistory } from './BackupHistory';
+import { BackupHistory, dateLabel } from './BackupHistory';
 
 const RETENTION_DEBOUNCE_MS = 1000;
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString();
-}
 
 // ============================================================================
 // Backup Card — Create, Upload, History
@@ -269,7 +265,7 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
           <dt className="text-muted-foreground">{t('backup.restore.selectedBackup')}</dt>
           <dd className="font-mono">{backup.filename}</dd>
           <dt className="text-muted-foreground">{t('backup.date')}</dt>
-          <dd>{formatDate(backup.createdAt)}</dd>
+          <dd>{dateLabel(backup.createdAt)}</dd>
           <dt className="text-muted-foreground">{t('backup.version')}</dt>
           <dd>{backup.metadata.app.version}</dd>
           <dt className="text-muted-foreground">{t('backup.restore.databaseSize')}</dt>
@@ -300,30 +296,28 @@ export function RestoreCard({ backup, onClose }: { backup: BackupListItem; onClo
 
         {/* Cannot restore warnings */}
         {!canStartRestore && !isRestoring && (
-          <div className="border-destructive/50 bg-destructive/10 rounded-md border p-3">
-            <div className="flex items-start gap-2">
-              <XCircle className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
-              <div className="text-destructive space-y-1 text-sm">
-                {!canRestore && <p>{t('backup.restore.cannotRestore')}</p>}
-                {pgVersionMismatch && (
-                  <p>
-                    {t('backup.restore.pgVersionMismatch', {
-                      backupVersion: backupPgMajor,
-                      serverVersion: serverPgMajor,
-                    })}
-                  </p>
-                )}
-                {tsVersionMismatch && (
-                  <p>
-                    {t('backup.restore.tsVersionMismatch', {
-                      backupVersion: backupTsVersion,
-                      serverVersion: serverTsVersion,
-                    })}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+          <Alert variant="destructive">
+            <XCircle />
+            <AlertDescription>
+              {!canRestore && <p>{t('backup.restore.cannotRestore')}</p>}
+              {pgVersionMismatch && (
+                <p>
+                  {t('backup.restore.pgVersionMismatch', {
+                    backupVersion: backupPgMajor,
+                    serverVersion: serverPgMajor,
+                  })}
+                </p>
+              )}
+              {tsVersionMismatch && (
+                <p>
+                  {t('backup.restore.tsVersionMismatch', {
+                    backupVersion: backupTsVersion,
+                    serverVersion: serverTsVersion,
+                  })}
+                </p>
+              )}
+            </AlertDescription>
+          </Alert>
         )}
 
         {/* Warning */}
@@ -531,7 +525,7 @@ function ScheduleCard() {
                   value={schedule.time.split(':')[0]}
                   onValueChange={(h) => handleChange('time', `${h}:${schedule.time.split(':')[1]}`)}
                 >
-                  <SelectTrigger className="w-20">
+                  <SelectTrigger className="w-20" aria-label={t('backup.scheduleHour')}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -547,7 +541,7 @@ function ScheduleCard() {
                   value={schedule.time.split(':')[1]}
                   onValueChange={(m) => handleChange('time', `${schedule.time.split(':')[0]}:${m}`)}
                 >
-                  <SelectTrigger className="w-20">
+                  <SelectTrigger className="w-20" aria-label={t('backup.scheduleMinute')}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

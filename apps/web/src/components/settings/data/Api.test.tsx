@@ -81,6 +81,17 @@ describe('Api section', () => {
     );
   });
 
+  it('masks the key by default and reveals it on request', async () => {
+    renderApi();
+
+    const key = screen.getByDisplayValue('trr_abc123');
+    expect(key).toHaveAttribute('type', 'password');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }));
+
+    expect(key).toHaveAttribute('type', 'text');
+  });
+
   it('confirms before replacing an existing key', async () => {
     const mutate = vi.fn();
     vi.mocked(useRegenerateApiKey).mockReturnValue({
