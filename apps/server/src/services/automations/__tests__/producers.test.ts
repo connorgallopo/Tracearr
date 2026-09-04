@@ -87,6 +87,7 @@ import { resetDispatcherForTests, subscribe } from '../events/dispatcher.js';
 import {
   dispatchMediaAdded,
   dispatchMediaUpgraded,
+  dispatchNewsletterSend,
   dispatchPluginUpdate,
   dispatchServerHealth,
   dispatchServerHealthById,
@@ -908,5 +909,50 @@ describe('a media add reaches the recorder as a library-item subject', () => {
 
     const [[recorded]] = mockRecordRun.mock.calls as [[{ trigger: { edgeKey: string | null } }]];
     expect(recorded.trigger.edgeKey).toBe('4k||HEVC|TRUEHD|8|42000000000');
+  });
+});
+
+describe('dispatchNewsletterSend', () => {
+  const fields = {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial' as const,
+    trigger: 'manual' as const,
+    recipientCount: 12,
+    itemCounts: { movies: 2 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: 'https://tracearr.example.com/settings/notifications/newsletters/n-1',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetDispatcherForTests();
+    resetRuleSubscribersForTests();
+  });
+
+  it('fires newsletter.failed for a partial outcome with the fields and empty inputs', async () => {
+    mockGetActiveAutomations.mockResolvedValue([automation([node('newsletter.failed')])]);
+    const seen = captureEvents('newsletter.failed', 'newsletter.sent');
+
+    await dispatchNewsletterSend(fields);
+
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.event).toEqual({ type: 'newsletter.failed', at: expect.any(Date), ...fields });
+    expect((seen[0]?.inputs as { activeSessions: unknown[] }).activeSessions).toEqual([]);
+  });
+
+  it('fires newsletter.sent for a sent outcome and nothing when no automation listens', async () => {
+    mockGetActiveAutomations.mockResolvedValue([automation([node('newsletter.sent')])]);
+    const seen = captureEvents('newsletter.failed', 'newsletter.sent');
+
+    await dispatchNewsletterSend({ ...fields, outcome: 'sent' });
+    expect(seen.map((s) => s.event.type)).toEqual(['newsletter.sent']);
+
+    mockGetActiveAutomations.mockResolvedValue([automation([node('server.down')])]);
+    await dispatchNewsletterSend(fields);
+    expect(seen).toHaveLength(1);
   });
 });

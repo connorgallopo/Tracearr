@@ -127,7 +127,7 @@ describe('finalizeSend', () => {
       { address: 'a@example.com', status: 'sent' },
       { address: 'b@example.com', status: 'sent' },
     ]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBe('sent');
     const after = await readSend(send.id);
     expect(after.outcome).toBe('sent');
     expect(after.finishedAt).toBeInstanceOf(Date);
@@ -140,7 +140,7 @@ describe('finalizeSend', () => {
       { address: 'b@example.com', status: 'failed' },
       { address: 'c@example.com', status: 'suppressed' },
     ]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBe('partial');
     expect((await readSend(send.id)).outcome).toBe('partial');
   });
 
@@ -150,14 +150,14 @@ describe('finalizeSend', () => {
       { address: 'a@example.com', status: 'failed' },
       { address: 'b@example.com', status: 'unknown' },
     ]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBe('failed');
     expect((await readSend(send.id)).outcome).toBe('failed');
   });
 
   it('closes a send with no attempted rows at all as failed', async () => {
     const send = await seedSend(newsletterId);
     await seedRecipients(send.id, [{ address: 'a@example.com', status: 'suppressed' }]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBe('failed');
     expect((await readSend(send.id)).outcome).toBe('failed');
   });
 
@@ -167,7 +167,7 @@ describe('finalizeSend', () => {
       { address: 'a@example.com', status: 'sent' },
       { address: 'b@example.com', status: 'queued' },
     ]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBeNull();
     const after = await readSend(send.id);
     expect(after.outcome).toBe('sending');
     expect(after.finishedAt).toBeNull();
@@ -176,7 +176,7 @@ describe('finalizeSend', () => {
   it('leaves a send that is not sending alone', async () => {
     const send = await seedSend(newsletterId, { outcome: 'rendering' });
     await seedRecipients(send.id, [{ address: 'a@example.com', status: 'sent' }]);
-    await finalizeSend(send.id);
+    expect(await finalizeSend(send.id)).toBeNull();
     const after = await readSend(send.id);
     expect(after.outcome).toBe('rendering');
     expect(after.finishedAt).toBeNull();

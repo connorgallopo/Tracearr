@@ -1368,7 +1368,8 @@ export type NotificationEventType =
   | 'media_added'
   | 'media_upgraded'
   | 'new_device'
-  | 'trust_score_changed';
+  | 'trust_score_changed'
+  | 'newsletter_send';
 
 // Notification preferences (per-device settings)
 export interface NotificationPreferences {

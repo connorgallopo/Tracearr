@@ -191,6 +191,7 @@ function textFor(payload: NotificationPayload): { title: string; message: string
     case 'media_upgraded':
     case 'new_device':
     case 'trust_score_changed':
+    case 'newsletter_send':
       return ownText(payload);
   }
 }

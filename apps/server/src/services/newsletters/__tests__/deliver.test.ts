@@ -10,6 +10,10 @@ const store = vi.hoisted(() => ({
   finalizeSend: vi.fn(),
 }));
 vi.mock('../store.js', () => store);
+const mockAnnounce = vi.hoisted(() => vi.fn());
+vi.mock('../events.js', () => ({
+  announceSendFinished: (...a: unknown[]) => mockAnnounce(...a) as unknown,
+}));
 const mockSendMail = vi.fn();
 const mockGetTransporter = vi.fn((..._args: unknown[]) => ({ sendMail: mockSendMail }));
 vi.mock('../../notifications/destinations/emailTransport.js', async (importActual) => {
@@ -131,6 +135,7 @@ beforeEach(() => {
     trustProxy: false,
   });
   mockSendMail.mockResolvedValue({ messageId: '<x>' });
+  store.finalizeSend.mockResolvedValue('sent');
 });
 
 describe('deliverRecipient', () => {
@@ -170,6 +175,14 @@ describe('deliverRecipient', () => {
     });
     expect(store.markRecipient).toHaveBeenCalledWith('r1', 'sent');
     expect(store.finalizeSend).toHaveBeenCalledWith('send-1');
+    expect(mockAnnounce).toHaveBeenCalledWith('send-1');
+  });
+
+  it('does not announce when finalizeSend leaves the send open for another delivery to close', async () => {
+    store.finalizeSend.mockResolvedValueOnce(null);
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    expect(store.finalizeSend).toHaveBeenCalledWith('send-1');
+    expect(mockAnnounce).not.toHaveBeenCalled();
   });
 
   it('sends no unsubscribe headers without an external url', async () => {

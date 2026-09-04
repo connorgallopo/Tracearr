@@ -115,6 +115,23 @@ const mediaAdded: NotificationEvent = {
   },
 };
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial',
+    trigger: 'schedule',
+    recipientCount: 42,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: null,
+  },
+} as const;
+
 const render = (event: NotificationEvent, ctx: RenderContext = systemCtx): Promise<EmailMessage> =>
   Promise.resolve(emailType.render(event, config, ctx));
 
@@ -255,6 +272,16 @@ describe('emailType.render', () => {
     expect(out.attachments).toEqual([]);
     expect(out.html).not.toContain('Open Tracearr');
     expect(out.html).toContain('Attic Plex');
+  });
+
+  it('renders a newsletter outcome with Tracearr as the sender', async () => {
+    const out = await render(newsletterSend, {
+      destination,
+      source: { kind: 'automation', automationId: 'a-1', automationName: 'Digest watch' },
+    });
+    expect(out.subject).toBe('Newsletter partly sent');
+    expect(out.html).toContain('Weekly reached only part of its 42 recipients');
+    expect(out.html).toContain('Sent by Tracearr for <!-- -->Tracearr');
   });
 });
 

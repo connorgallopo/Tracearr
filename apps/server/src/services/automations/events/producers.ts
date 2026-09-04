@@ -21,6 +21,7 @@ import type {
 } from './types.js';
 import type { MediaQuality, MediaSubject } from '../types.js';
 import type { TrustMove } from '../../userService.js';
+import type { NewsletterSendPayload } from '../../notifications/events.js';
 
 /** The active automations when one of them listens for the trigger, else null: no listener, no context read. */
 async function listeningRules(trigger: TriggerType): Promise<EngineAutomation[] | null> {
@@ -305,5 +306,15 @@ export async function dispatchTracearrUpdate(args: {
       { type: 'tracearr.update_available', at: new Date(), ...args },
       installInputs(rules)
     );
+  });
+}
+
+/** A finished send announces itself once its outcome is written; which trigger fires follows the outcome. */
+export async function dispatchNewsletterSend(fields: NewsletterSendPayload): Promise<void> {
+  const trigger = fields.outcome === 'sent' ? 'newsletter.sent' : 'newsletter.failed';
+  await guarded(trigger, async () => {
+    const rules = await listeningRules(trigger);
+    if (!rules) return;
+    await dispatch({ type: trigger, at: new Date(), ...fields }, installInputs(rules));
   });
 }

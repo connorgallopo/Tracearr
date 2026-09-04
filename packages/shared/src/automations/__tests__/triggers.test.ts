@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { TRIGGERS, TRIGGER_TYPES, contextOf, contextSupplies, variablesFor } from '../index.js';
+import {
+  TRIGGERS,
+  TRIGGER_GROUPS,
+  TRIGGER_TYPES,
+  contextOf,
+  contextSupplies,
+  variablesFor,
+} from '../index.js';
 
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const started = { id: id(1), type: 'session.started', enabled: true } as const;
@@ -44,5 +51,23 @@ describe('trigger contexts', () => {
 
   it('offers no variables when nothing is enabled', () => {
     expect(variablesFor([])).toEqual([]);
+  });
+});
+
+describe('newsletter triggers', () => {
+  it('sit in the install context under the notifications group and offer the send variables', () => {
+    expect(TRIGGERS['newsletter.sent']).toEqual({
+      context: 'install',
+      group: 'notifications',
+      variables: [
+        'newsletter.name',
+        'newsletter.outcome',
+        'newsletter.recipientCount',
+        'newsletter.error',
+      ],
+    });
+    expect(TRIGGERS['newsletter.failed'].context).toBe('install');
+    expect(TRIGGER_GROUPS).toContain('notifications');
+    expect(contextOf([{ id: id(7), type: 'newsletter.failed', enabled: true }])).toBe('install');
   });
 });

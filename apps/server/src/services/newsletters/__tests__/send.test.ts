@@ -15,6 +15,10 @@ const store = vi.hoisted(() => ({
   OpenSendConflict: class OpenSendConflict extends Error {},
 }));
 vi.mock('../store.js', () => store);
+const mockAnnounce = vi.hoisted(() => vi.fn());
+vi.mock('../events.js', () => ({
+  announceSendFinished: (...a: unknown[]) => mockAnnounce(...a) as unknown,
+}));
 const mockAssemble = vi.fn();
 vi.mock('../assemble.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../assemble.js')>();
@@ -297,6 +301,7 @@ describe('runNewsletter', () => {
     });
     expect(store.insertRecipients).not.toHaveBeenCalled();
     expect(mockResolve).not.toHaveBeenCalled();
+    expect(mockAnnounce).not.toHaveBeenCalled();
   });
 
   it('a test send goes to the typed address only, bypasses suppression, and renders the empty state', async () => {
@@ -323,6 +328,7 @@ describe('runNewsletter', () => {
       outcome: 'failed',
       error: expect.stringContaining('destination'),
     });
+    expect(mockAnnounce).toHaveBeenCalledWith('send-1');
   });
 
   it('records a failure when nobody is deliverable', async () => {

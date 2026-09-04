@@ -186,6 +186,7 @@ function bodyOf(payload: NotificationPayload): Omit<NtfyMessage, 'topic'> {
     case 'media_upgraded':
     case 'new_device':
     case 'trust_score_changed':
+    case 'newsletter_send':
       return buildOwnText(payload);
   }
 }

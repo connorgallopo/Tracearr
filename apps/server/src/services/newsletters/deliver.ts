@@ -9,6 +9,7 @@ import { describeSmtpError, getTransporter } from '../notifications/destinations
 import { getEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { getNetworkSettings } from '../settings.js';
+import { announceSendFinished } from './events.js';
 import { signUnsubscribeToken } from './links.js';
 import {
   UNSUBSCRIBE_PLACEHOLDER,
@@ -154,7 +155,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
       'unknown',
       `A previous attempt was cut off after the message went out; it may have been delivered (${attempt.previousMessageId})`
     );
-    await finalizeSend(ctx.send.id);
+    if (await finalizeSend(ctx.send.id)) await announceSendFinished(ctx.send.id);
     return;
   }
 
@@ -187,7 +188,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
         'unknown',
         `The server stopped answering after the message went out; it may have been delivered (${messageId})`
       );
-      await finalizeSend(ctx.send.id);
+      if (await finalizeSend(ctx.send.id)) await announceSendFinished(ctx.send.id);
       return;
     }
     const message = describeSmtpError(error, transport.config);
@@ -195,7 +196,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
     throw new Error(message, { cause: error });
   }
   await markRecipient(ctx.recipient.id, 'sent');
-  await finalizeSend(ctx.send.id);
+  if (await finalizeSend(ctx.send.id)) await announceSendFinished(ctx.send.id);
 }
 
 /** Called by the worker once the attempts are spent, so the row and the send both close. */
@@ -203,5 +204,5 @@ export async function markRecipientFailed(recipientId: string, error: unknown): 
   const message = error instanceof Error ? error.message : String(error);
   await markRecipient(recipientId, 'failed', message.slice(0, 500));
   const ctx = await loadDelivery(recipientId);
-  if (ctx) await finalizeSend(ctx.send.id);
+  if (ctx && (await finalizeSend(ctx.send.id))) await announceSendFinished(ctx.send.id);
 }

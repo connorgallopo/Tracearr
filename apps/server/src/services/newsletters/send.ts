@@ -5,6 +5,7 @@ import { readLogoPng } from '../notifications/emailLogo.js';
 import { renderTemplate } from '../notifications/types.js';
 import { getNetworkSettings } from '../settings.js';
 import { assembleDigest } from './assemble.js';
+import { announceSendFinished } from './events.js';
 import { renderDigestToFit } from './fit.js';
 import { newViewToken } from './links.js';
 import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
@@ -52,7 +53,10 @@ async function resume(
 ): Promise<RunResult | null> {
   const open = await findOpenSend(newsletterId);
   if (!open) return null;
-  if (await closeStaleSend(open)) return null;
+  if (await closeStaleSend(open)) {
+    await announceSendFinished(open.id);
+    return null;
+  }
   // A rendering send has no full recipient list yet; handing out the partial one
   // burns those job ids so the run that owns the send can never enqueue them.
   if (trigger === 'test' || open.outcome === 'rendering')
@@ -89,6 +93,7 @@ export async function runNewsletter(
   const problem = await transportProblem(newsletter);
   if (problem) {
     const send = await insertSend({ ...base, itemCounts: {}, outcome: 'failed', error: problem });
+    await announceSendFinished(send.id);
     return { outcome: 'failed', sendId: send.id, queuedRecipientIds: [] };
   }
 
@@ -128,6 +133,7 @@ export async function runNewsletter(
         outcome: 'failed',
         error: 'No deliverable recipients',
       });
+      await announceSendFinished(send.id);
       return done({ outcome: 'failed', sendId: send.id, queuedRecipientIds: [] });
     }
 
@@ -181,12 +187,13 @@ export async function runNewsletter(
     ready = await prepare();
   } catch (error) {
     try {
-      await insertSend({
+      const failed = await insertSend({
         ...base,
         itemCounts: {},
         outcome: 'failed',
         error: (error instanceof Error ? error.message : String(error)).slice(0, 500),
       });
+      await announceSendFinished(failed.id);
     } catch {
       // The queue's failure record keeps the original error.
     }
@@ -235,6 +242,7 @@ export async function runNewsletter(
       'failed',
       error instanceof Error ? error.message : String(error)
     );
+    await announceSendFinished(send.id);
     throw error;
   }
 }

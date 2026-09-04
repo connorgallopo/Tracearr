@@ -283,8 +283,8 @@ export async function noteRecipientError(recipientId: string, error: string): Pr
 }
 
 /** One statement, guarded by "nothing still queued", so concurrent deliveries cannot race the outcome. */
-export async function finalizeSend(sendId: string): Promise<void> {
-  await db.execute(sql`
+export async function finalizeSend(sendId: string): Promise<NewsletterSendOutcome | null> {
+  const result = await db.execute(sql`
     UPDATE newsletter_sends AS s
     SET outcome = CASE
           WHEN c.total = 0 OR c.sent = 0 THEN 'failed'
@@ -300,7 +300,10 @@ export async function finalizeSend(sendId: string): Promise<void> {
       WHERE send_id = ${sendId}
     ) AS c
     WHERE s.id = ${sendId} AND s.outcome = 'sending' AND c.queued = 0
+    RETURNING s.outcome
   `);
+  const row = result.rows[0] as { outcome?: NewsletterSendOutcome } | undefined;
+  return row?.outcome ?? null;
 }
 
 export async function listSends(

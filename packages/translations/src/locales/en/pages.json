@@ -718,7 +718,9 @@
         "serverUp": "a server comes back up",
         "pluginUpdateAvailable": "a plugin update is available",
         "serverUpdateAvailable": "a server update is available",
-        "tracearrUpdateAvailable": "a Tracearr update is available"
+        "tracearrUpdateAvailable": "a Tracearr update is available",
+        "newsletterSent": "a newsletter is sent",
+        "newsletterFailed": "a newsletter send fails"
       },
       "operators": {
         "eq": "is",
@@ -1309,6 +1311,11 @@
         "description": "Tell a destination the first time an account streams from a device you have not seen.",
         "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook"
       },
+      "newsletter-failed": {
+        "name": "Newsletter failed",
+        "description": "Tell a destination when a newsletter send fails or reaches only part of its list.",
+        "keywords": "newsletter digest email failed partial bounce notify"
+      },
       "no-4k-transcodes": {
         "name": "No 4K transcodes",
         "description": "Stop a stream that transcodes 4K source video.",
@@ -1391,6 +1398,7 @@
         "library": "Library",
         "servers": "Servers",
         "updates": "Updates",
+        "notifications": "Newsletters",
         "notify": "Notify",
         "policy": "Take action",
         "control": "If… then"
@@ -1462,6 +1470,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr itself has a newer release.",
           "synonyms": "upgrade, version, release, self"
+        },
+        "newsletterSent": {
+          "description": "A scheduled or manual newsletter reached everyone on its list.",
+          "synonyms": "newsletter, digest, email, delivered"
+        },
+        "newsletterFailed": {
+          "description": "A newsletter reached nobody, or only part of its list.",
+          "synonyms": "newsletter, digest, email, bounce, partial, error"
         }
       },
       "actions": {

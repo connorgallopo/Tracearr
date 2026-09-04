@@ -15,7 +15,7 @@ export type PushRendered =
   /** These have no per-device toggle, so they carry their resolved text instead. */
   | {
       kind: 'text';
-      subject: 'update' | 'library';
+      subject: 'update' | 'library' | 'newsletter';
       title: string;
       body: string;
       data: Record<string, unknown>;
@@ -27,6 +27,7 @@ const TEXT_RENDERED_EVENTS: ReadonlySet<NotificationEvent['type']> = new Set([
   'tracearr_update_available',
   'media_added',
   'media_upgraded',
+  'newsletter_send',
 ]);
 
 const LIBRARY_EVENTS: ReadonlySet<NotificationEvent['type']> = new Set([
@@ -43,7 +44,12 @@ export const pushType: DestinationType<Record<string, never>, PushRendered> = {
       const payload = toNotificationPayload(event, ctx.source);
       return {
         kind: 'text',
-        subject: LIBRARY_EVENTS.has(event.type) ? 'library' : 'update',
+        subject:
+          event.type === 'newsletter_send'
+            ? 'newsletter'
+            : LIBRARY_EVENTS.has(event.type)
+              ? 'library'
+              : 'update',
         title: payload.title,
         body: payload.message,
         // The discriminator goes last: a payload key named `type` must never replace it.
@@ -65,9 +71,11 @@ export const pushType: DestinationType<Record<string, never>, PushRendered> = {
   async deliver(rendered) {
     if (rendered.kind === 'text') {
       const { title, body, data } = rendered;
-      return rendered.subject === 'library'
-        ? pushNotificationService.notifyLibrary(title, body, data)
-        : pushNotificationService.notifyUpdate(title, body, data);
+      if (rendered.subject === 'library')
+        return pushNotificationService.notifyLibrary(title, body, data);
+      if (rendered.subject === 'newsletter')
+        return pushNotificationService.notifyNewsletter(title, body, data);
+      return pushNotificationService.notifyUpdate(title, body, data);
     }
     const e = rendered.event;
     const override = rendered.override;
@@ -99,6 +107,7 @@ export const pushType: DestinationType<Record<string, never>, PushRendered> = {
       case 'tracearr_update_available':
       case 'media_added':
       case 'media_upgraded':
+      case 'newsletter_send':
         return; // an automation routes these as a text render; a system source has nowhere to go
     }
   },

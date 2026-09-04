@@ -143,6 +143,7 @@ function build(payload: NotificationPayload): AppriseMessage {
     case 'media_upgraded':
     case 'new_device':
     case 'trust_score_changed':
+    case 'newsletter_send':
       return buildOwnText(payload);
   }
 }
