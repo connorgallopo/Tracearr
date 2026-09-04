@@ -343,6 +343,7 @@ describe('runNewsletter', () => {
       outcome: 'failed',
       error: 'No deliverable recipients',
     });
+    expect(mockAnnounce).toHaveBeenCalledWith('send-1');
   });
 
   it('resumes a sending send with its queued ids instead of creating a second one', async () => {
@@ -382,12 +383,14 @@ describe('runNewsletter', () => {
       error: 'boom',
       itemCounts: {},
     });
+    expect(mockAnnounce).toHaveBeenCalledWith('send-1');
   });
 
   it('closes the send as failed when it dies after insertSend, and rethrows', async () => {
     store.insertRecipients.mockRejectedValueOnce(new Error('boom'));
     await expect(runNewsletter(NEWSLETTER.id, 'schedule')).rejects.toThrow('boom');
     expect(store.markSendOutcome).toHaveBeenCalledWith('send-1', 'failed', 'boom');
+    expect(mockAnnounce).toHaveBeenCalledWith('send-1');
   });
 
   it('closes a stale open send and lets the run continue', async () => {
@@ -397,11 +400,26 @@ describe('runNewsletter', () => {
       startedAt: new Date(Date.now() - 11 * 60_000),
     };
     store.findOpenSend.mockResolvedValueOnce(stale);
-    store.closeStaleSend.mockResolvedValueOnce(true);
+    store.closeStaleSend.mockResolvedValueOnce('failed');
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(store.closeStaleSend).toHaveBeenCalledWith(stale);
+    expect(mockAnnounce).toHaveBeenCalledWith('open-1');
     expect(store.insertSend).toHaveBeenCalled();
     expect(result.outcome).toBe('queued');
+  });
+
+  it('does not announce when a concurrent instance already closed the stale send', async () => {
+    const stale = {
+      id: 'open-1',
+      outcome: 'rendering',
+      startedAt: new Date(Date.now() - 11 * 60_000),
+    };
+    store.findOpenSend.mockResolvedValueOnce(stale);
+    store.closeStaleSend.mockResolvedValueOnce(null);
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(store.closeStaleSend).toHaveBeenCalledWith(stale);
+    expect(mockAnnounce).not.toHaveBeenCalled();
+    expect(result).toEqual({ outcome: 'busy', sendId: 'open-1', queuedRecipientIds: [] });
   });
 
   it('answers busy without ids for a rendering send that has not gone stale yet', async () => {

@@ -76,12 +76,27 @@ export async function findOpenSend(newsletterId: string): Promise<SendRow | null
   return row ?? null;
 }
 
-/** Closes a send its run abandoned. Returns true when it closed one. */
-export async function closeStaleSend(open: SendRow, now = Date.now()): Promise<boolean> {
+/**
+ * Closes a send its run abandoned. Returns the outcome it wrote, or null when nothing
+ * needed closing or a concurrent writer (another instance, or a schedule beside a manual
+ * send) already closed it first - workers start on every instance with no leader gate.
+ */
+export async function closeStaleSend(
+  open: SendRow,
+  now = Date.now()
+): Promise<NewsletterSendOutcome | null> {
   const age = now - open.startedAt.getTime();
   if (open.outcome === 'rendering' && age > RENDERING_STALE_MS) {
-    await markSendOutcome(open.id, 'failed', 'Interrupted before delivery started');
-    return true;
+    const [row] = await db
+      .update(newsletterSends)
+      .set({
+        outcome: 'failed',
+        error: 'Interrupted before delivery started',
+        finishedAt: new Date(),
+      })
+      .where(and(eq(newsletterSends.id, open.id), eq(newsletterSends.outcome, 'rendering')))
+      .returning({ outcome: newsletterSends.outcome });
+    return row?.outcome ?? null;
   }
   if (open.outcome === 'sending' && age > SENDING_STALE_MS) {
     await db
@@ -93,10 +108,9 @@ export async function closeStaleSend(open: SendRow, now = Date.now()): Promise<b
           eq(newsletterSendRecipients.status, 'queued')
         )
       );
-    await finalizeSend(open.id);
-    return true;
+    return finalizeSend(open.id);
   }
-  return false;
+  return null;
 }
 
 export async function deleteNewsletter(id: string): Promise<'deleted' | 'missing' | 'open_send'> {

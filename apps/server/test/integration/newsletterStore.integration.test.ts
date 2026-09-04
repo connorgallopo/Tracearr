@@ -1,10 +1,10 @@
 /**
  * The newsletter store's load-bearing SQL: finalizeSend's CASE arms and its two
  * guards, markSendSending's rendering guard, beginAttempt, resetFailedRecipients,
- * lastWatermark's trigger and outcome filter, closeStaleSend's two branches,
- * queuedRecipientIds, deleteNewsletter, and getSendByViewToken. Every tier but
- * this one mocks the Drizzle chain, so only Postgres can prove any of these
- * predicates.
+ * lastWatermark's trigger and outcome filter, closeStaleSend's two branches and
+ * their own compare-and-swap guards, queuedRecipientIds, deleteNewsletter, and
+ * getSendByViewToken. Every tier but this one mocks the Drizzle chain, so only
+ * Postgres can prove any of these predicates.
  *
  * Run with: pnpm --filter @tracearr/server test:integration -- newsletterStore
  */
@@ -322,11 +322,21 @@ describe('closeStaleSend', () => {
     const newsletter = await seedNewsletter();
     const startedAt = new Date('2026-09-02T00:00:00Z');
     const send = await seedSend(newsletter.id, { outcome: 'rendering', startedAt });
-    expect(await closeStaleSend(send, startedAt.getTime() + RENDERING_STALE_MS + 1)).toBe(true);
+    expect(await closeStaleSend(send, startedAt.getTime() + RENDERING_STALE_MS + 1)).toBe('failed');
     const after = await readSend(send.id);
     expect(after.outcome).toBe('failed');
     expect(after.error).toBe('Interrupted before delivery started');
     expect(after.finishedAt).toBeInstanceOf(Date);
+  });
+
+  it('returns null for the loser when two racing instances close the same stale rendering send', async () => {
+    const newsletter = await seedNewsletter();
+    const startedAt = new Date('2026-09-02T00:00:00Z');
+    const send = await seedSend(newsletter.id, { outcome: 'rendering', startedAt });
+    const at = startedAt.getTime() + RENDERING_STALE_MS + 1;
+    const results = await Promise.all([closeStaleSend(send, at), closeStaleSend(send, at)]);
+    expect(results.filter((r) => r !== null)).toEqual(['failed']);
+    expect(results.filter((r) => r === null)).toHaveLength(1);
   });
 
   it('fails the stranded queued rows of a sending send and closes it on what is known', async () => {
@@ -337,7 +347,7 @@ describe('closeStaleSend', () => {
       { address: 'a@example.com', status: 'sent' },
       { address: 'b@example.com', status: 'queued' },
     ]);
-    expect(await closeStaleSend(send, startedAt.getTime() + SENDING_STALE_MS + 1)).toBe(true);
+    expect(await closeStaleSend(send, startedAt.getTime() + SENDING_STALE_MS + 1)).toBe('partial');
     const rows = await readRecipients(send.id);
     expect(rows.map((r) => [r.address, r.status, r.error])).toEqual([
       ['a@example.com', 'sent', null],
@@ -346,11 +356,22 @@ describe('closeStaleSend', () => {
     expect((await readSend(send.id)).outcome).toBe('partial');
   });
 
+  it('returns null for the loser when two racing instances close the same stale sending send', async () => {
+    const newsletter = await seedNewsletter();
+    const startedAt = new Date('2026-09-02T00:00:00Z');
+    const send = await seedSend(newsletter.id, { outcome: 'sending', startedAt });
+    await seedRecipients(send.id, [{ address: 'a@example.com', status: 'queued' }]);
+    const at = startedAt.getTime() + SENDING_STALE_MS + 1;
+    const results = await Promise.all([closeStaleSend(send, at), closeStaleSend(send, at)]);
+    expect(results.filter((r) => r !== null)).toEqual(['failed']);
+    expect(results.filter((r) => r === null)).toHaveLength(1);
+  });
+
   it('leaves a send that is still inside its window alone', async () => {
     const newsletter = await seedNewsletter();
     const startedAt = new Date('2026-09-02T00:00:00Z');
     const send = await seedSend(newsletter.id, { outcome: 'rendering', startedAt });
-    expect(await closeStaleSend(send, startedAt.getTime() + RENDERING_STALE_MS - 1)).toBe(false);
+    expect(await closeStaleSend(send, startedAt.getTime() + RENDERING_STALE_MS - 1)).toBeNull();
     expect((await readSend(send.id)).outcome).toBe('rendering');
   });
 });
