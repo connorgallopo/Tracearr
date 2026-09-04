@@ -97,7 +97,7 @@ function VersionDisplay() {
           <Badge
             variant="secondary"
             className="h-5 cursor-pointer bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
-            onClick={() => navigate('/settings/servers')}
+            onClick={() => navigate('/settings/servers/connections')}
             title={t('settings:servers.pluginUpdateAvailable')}
             aria-label={t('settings:servers.pluginUpdateAvailable')}
           >

@@ -203,7 +203,7 @@ function TautulliImportSection({
             </Button>
 
             {connectionStatus === 'success' && connectionMessage && (
-              <span className="text-sm text-green-600">{connectionMessage}</span>
+              <span className="text-success text-sm">{connectionMessage}</span>
             )}
 
             {connectionStatus === 'error' && (

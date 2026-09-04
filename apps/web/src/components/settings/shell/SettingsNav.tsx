@@ -15,7 +15,7 @@ import {
   type SettingsSectionItem,
 } from './settings-nav-data';
 
-// The app's small-caps label convention (GeneralSettings.tsx, UpdateDialog.tsx).
+// The app's small-caps label convention (see UpdateDialog.tsx).
 const GROUP_LABEL =
   'text-muted-foreground flex h-8 shrink-0 items-center px-2 text-xs font-medium tracking-wide uppercase';
 
