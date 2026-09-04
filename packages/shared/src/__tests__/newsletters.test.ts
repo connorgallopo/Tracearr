@@ -11,10 +11,12 @@ import {
   createNewsletterSchema,
   cronExpressionSchema,
   emailBrandingSchema,
+  emailBrandingReadSchema,
   emailSuppressionCreateSchema,
   newsletterCron,
   newsletterScheduleSchema,
   newsletterTestSendSchema,
+  resolveSenderName,
   updateNewsletterSchema,
   updateUserIdentitySchema,
 } from '../index.js';
@@ -39,7 +41,9 @@ describe('createNewsletterSchema', () => {
       subject: DEFAULT_NEWSLETTER_SUBJECT,
       intro: null,
       outro: null,
-      recipients: { members: true, extraAddresses: [] },
+      senderName: null,
+      links: { tracearr: false },
+      recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
       imageMode: 'auto',
       skipWhenEmpty: true,
     });
@@ -70,6 +74,14 @@ describe('createNewsletterSchema', () => {
       { recipients: { members: true, extraAddresses: [{ address: 'nope' }] } },
     ],
     ['an unknown image mode', { imageMode: 'base64' }],
+    ['a string intro', { intro: 'plain' }],
+    ['an empty sender name', { senderName: '' }],
+    ['a sender name over 100 characters', { senderName: 'x'.repeat(101) }],
+    ['an unknown links key', { links: { tracearr: true, imdb: true } }],
+    [
+      'a non-uuid excluded user',
+      { recipients: { members: true, extraAddresses: [], excludeUserIds: ['nope'] } },
+    ],
     ['an unknown key', { colour: 'red' }],
   ])('rejects %s', (_label, patch) => {
     expect(createNewsletterSchema.safeParse({ ...minimal, ...patch }).success).toBe(false);
@@ -81,15 +93,27 @@ describe('createNewsletterSchema', () => {
       destinationId: '11111111-1111-4111-8111-111111111111',
       window: { kind: 'fixed', days: 14 },
       scope: { serverIds: ['22222222-2222-4222-8222-222222222222'], libraryIds: ['1', '2'] },
-      intro: 'Hello',
-      outro: null,
-      recipients: { members: false, extraAddresses: [{ address: 'A@Example.com', name: 'A' }] },
+      intro: {
+        type: 'doc',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello' }] }],
+      },
+      outro: { type: 'doc', content: [{ type: 'paragraph' }] },
+      senderName: '  Family Media ',
+      links: { tracearr: true },
+      recipients: {
+        members: false,
+        extraAddresses: [{ address: 'A@Example.com', name: 'A' }],
+        excludeUserIds: ['33333333-3333-4333-8333-333333333333'],
+      },
       imageMode: 'inline',
       skipWhenEmpty: false,
     });
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
     expect(parsed.data.recipients.extraAddresses[0]?.address).toBe('a@example.com');
+    expect(parsed.data.outro).toBeNull();
+    expect(parsed.data.senderName).toBe('Family Media');
+    expect(parsed.data.intro?.content[0]?.type).toBe('paragraph');
   });
 
   it('requires a timezone', () => {
@@ -116,6 +140,12 @@ describe('updateNewsletterSchema', () => {
       window: { kind: 'fixed', days: 3 },
     });
     expect(updateNewsletterSchema.safeParse({ bogus: 1 }).success).toBe(false);
+    expect(updateNewsletterSchema.parse({ links: { tracearr: true } })).toEqual({
+      links: { tracearr: true },
+    });
+    expect(updateNewsletterSchema.parse({ intro: { type: 'doc', content: [] } })).toEqual({
+      intro: null,
+    });
   });
 });
 
@@ -155,7 +185,6 @@ describe('small bodies', () => {
 describe('emailBrandingSchema', () => {
   it('fills every default from an empty object', () => {
     expect(emailBrandingSchema.parse({})).toEqual({
-      senderName: null,
       logo: { mode: 'tracearr' },
       accentColor: '#0ea0b3',
       footerText: null,
@@ -194,18 +223,25 @@ describe('emailBrandingSchema', () => {
     expect(emailBrandingSchema.safeParse({ accentColor: '0ea0b3' }).success).toBe(false);
     expect(emailBrandingSchema.safeParse({ accentColor: '#abc' }).success).toBe(false);
     const parsed = emailBrandingSchema.parse({
-      senderName: '  Movies  ',
       footerText: ' see you next week ',
       postalAddress: null,
     });
-    expect(parsed.senderName).toBe('Movies');
     expect(parsed.footerText).toBe('see you next week');
-    expect(emailBrandingSchema.safeParse({ senderName: '' }).success).toBe(false);
     expect(emailBrandingSchema.safeParse({ footerText: 'x'.repeat(501) }).success).toBe(false);
   });
 
-  it('rejects unknown keys', () => {
+  it('rejects unknown keys on write and strips them on read', () => {
     expect(emailBrandingSchema.safeParse({ theme: 'dark' }).success).toBe(false);
+    expect(emailBrandingSchema.safeParse({ senderName: 'Movies' }).success).toBe(false);
+    expect(emailBrandingReadSchema.parse({ senderName: 'Movies', accentColor: '#123456' })).toEqual(
+      {
+        logo: { mode: 'tracearr' },
+        accentColor: '#123456',
+        footerText: null,
+        postalAddress: null,
+        mailtoUnsubscribe: false,
+      }
+    );
   });
 
   it('pins the constants the server and the routes rely on', () => {
@@ -213,5 +249,14 @@ describe('emailBrandingSchema', () => {
     expect(NEWSLETTER_SNAPSHOT_RETENTION_DAYS).toBe(90);
     expect(NEWSLETTER_SEND_RETENTION_DAYS).toBe(365);
     expect(EMAIL_LOGO_MODES).toEqual(['tracearr', 'none', 'url']);
+  });
+});
+
+describe('resolveSenderName', () => {
+  it('prefers the newsletter name, then the one scoped server, then Tracearr', () => {
+    expect(resolveSenderName('Family Media', ['Basement'])).toBe('Family Media');
+    expect(resolveSenderName(null, ['Basement'])).toBe('Basement');
+    expect(resolveSenderName(null, ['Basement', 'Attic'])).toBe('Tracearr');
+    expect(resolveSenderName(null, [])).toBe('Tracearr');
   });
 });

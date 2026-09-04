@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  emailRichTextDocSchema,
+  normalizeEmailRichText,
+  type EmailRichTextDoc,
+} from './emailRichText.js';
 import { paginationSchema, timezoneSchema, uuidSchema } from './schemas.js';
 
 /** 12 is the largest cap at which the heaviest digest the assembler can emit stays clear of Gmail's 102 KB clip, proven by the size gate in packages/emails. */
@@ -7,6 +12,8 @@ export const NEWSLETTER_MOST_WATCHED_MAX = 10;
 export const NEWSLETTER_SEASONS_PER_SHOW_MAX = 8;
 export const NEWSLETTER_WINDOW_MAX_DAYS = 31;
 export const NEWSLETTER_EXTRA_ADDRESSES_MAX = 200;
+export const NEWSLETTER_EXCLUDED_USERS_MAX = 200;
+export const NEWSLETTER_SENDER_NAME_MAX = 100;
 
 export const NEWSLETTER_SEND_TRIGGERS = ['schedule', 'manual', 'test'] as const;
 export type NewsletterSendTrigger = (typeof NEWSLETTER_SEND_TRIGGERS)[number];
@@ -104,8 +111,18 @@ export const newsletterRecipientsSchema = z.strictObject({
     .array(z.strictObject({ address, name: z.string().trim().max(100).optional() }))
     .max(NEWSLETTER_EXTRA_ADDRESSES_MAX)
     .default([]),
+  excludeUserIds: z.array(uuidSchema).max(NEWSLETTER_EXCLUDED_USERS_MAX).default([]),
 });
 export type NewsletterRecipients = z.infer<typeof newsletterRecipientsSchema>;
+
+export const newsletterLinksSchema = z.strictObject({ tracearr: z.boolean() });
+export type NewsletterLinks = z.infer<typeof newsletterLinksSchema>;
+export const DEFAULT_NEWSLETTER_LINKS: NewsletterLinks = { tracearr: false };
+
+const richTextField = emailRichTextDocSchema
+  .nullable()
+  .transform((doc) => normalizeEmailRichText(doc))
+  .default(null);
 
 export const createNewsletterSchema = z.strictObject({
   name: z.string().trim().min(1).max(100),
@@ -117,11 +134,17 @@ export const createNewsletterSchema = z.strictObject({
   scope: newsletterScopeSchema.default({ serverIds: [], libraryIds: [] }),
   sections: newsletterSectionsSchema.default(DEFAULT_NEWSLETTER_SECTIONS),
   subject: z.string().trim().min(1).max(200).default(DEFAULT_NEWSLETTER_SUBJECT),
-  intro: z.string().trim().max(2000).nullable().default(null),
-  outro: z.string().trim().max(2000).nullable().default(null),
-  recipients: newsletterRecipientsSchema.default({ members: true, extraAddresses: [] }),
+  senderName: z.string().trim().min(1).max(NEWSLETTER_SENDER_NAME_MAX).nullable().default(null),
+  intro: richTextField,
+  outro: richTextField,
+  recipients: newsletterRecipientsSchema.default({
+    members: true,
+    extraAddresses: [],
+    excludeUserIds: [],
+  }),
   imageMode: z.enum(NEWSLETTER_IMAGE_MODES).default('auto'),
   skipWhenEmpty: z.boolean().default(true),
+  links: newsletterLinksSchema.default(DEFAULT_NEWSLETTER_LINKS),
 });
 export type CreateNewsletterInput = z.infer<typeof createNewsletterSchema>;
 
@@ -168,8 +191,6 @@ const logoUrl = z
   .pipe(z.url({ protocol: /^https?$/ }).max(500));
 
 export const emailBrandingSchema = z.strictObject({
-  /** Null means the first server in the newsletter's scope, resolved at render time. */
-  senderName: z.string().trim().min(1).max(100).nullable().default(null),
   logo: z
     .discriminatedUnion('mode', [
       z.strictObject({ mode: z.literal('tracearr') }),
@@ -184,6 +205,8 @@ export const emailBrandingSchema = z.strictObject({
 });
 export type EmailBrandingSettings = z.infer<typeof emailBrandingSchema>;
 export const DEFAULT_EMAIL_BRANDING: EmailBrandingSettings = emailBrandingSchema.parse({});
+/** A block an older build wrote may carry keys this one dropped; the read path strips them instead of resetting to defaults. */
+export const emailBrandingReadSchema = z.object(emailBrandingSchema.shape);
 
 export const NEWSLETTER_VIEW_TOKEN_LENGTH = 43;
 export const NEWSLETTER_SNAPSHOT_RETENTION_DAYS = 90;
@@ -205,6 +228,13 @@ export function newsletterCron(schedule: NewsletterSchedule): string {
     case 'monthly':
       return `${mm} ${hh} ${schedule.dayOfMonth} * *`;
   }
+}
+
+/** Null means the scoped server's name when the scope resolves to exactly one server; several servers have no natural name. */
+export function resolveSenderName(senderName: string | null, scopedServerNames: string[]): string {
+  if (senderName) return senderName;
+  const [only] = scopedServerNames;
+  return scopedServerNames.length === 1 && only !== undefined ? only : 'Tracearr';
 }
 
 /** API shapes. Dates are ISO strings. */
@@ -233,11 +263,13 @@ export interface Newsletter {
   scope: NewsletterScope;
   sections: NewsletterSections;
   subject: string;
-  intro: string | null;
-  outro: string | null;
+  senderName: string | null;
+  intro: EmailRichTextDoc | null;
+  outro: EmailRichTextDoc | null;
   recipients: NewsletterRecipients;
   imageMode: NewsletterImageMode;
   skipWhenEmpty: boolean;
+  links: NewsletterLinks;
   createdAt: string;
   updatedAt: string;
   lastSend: NewsletterSendSummary | null;
@@ -256,6 +288,35 @@ export interface NewsletterSendRecipient {
 
 export interface NewsletterSendDetail extends NewsletterSendSummary {
   recipients: NewsletterSendRecipient[];
+}
+
+export interface NewsletterSendsPage {
+  sends: NewsletterSendSummary[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface NewsletterRecipientPerson {
+  userId: string;
+  /** The person's oldest account on a scoped server; the identity PATCH route and the user page key on it. */
+  serverUserId: string;
+  name: string | null;
+}
+
+export interface NewsletterResolvedRecipient {
+  address: string;
+  userId: string | null;
+  serverUserId: string | null;
+  name: string | null;
+  suppressed: boolean;
+}
+
+/** GET /newsletters/:id/recipients: who the next send reaches, who has no address, and who the owner excluded. */
+export interface NewsletterRecipientsView {
+  recipients: NewsletterResolvedRecipient[];
+  missing: NewsletterRecipientPerson[];
+  excluded: NewsletterRecipientPerson[];
 }
 
 export interface EmailSuppression {
