@@ -2,11 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderDigest, type EmailBranding } from '@tracearr/emails';
 
 const mockDebug = vi.fn();
+const mockWarn = vi.fn();
 vi.mock('../../../utils/logger.js', () => ({
   createLogger: () => ({
     debug: (...args: unknown[]) => mockDebug(...args),
     info: vi.fn(),
-    warn: vi.fn(),
+    warn: (...args: unknown[]) => mockWarn(...args),
     error: vi.fn(),
   }),
 }));
@@ -218,5 +219,70 @@ describe('renderDigestToFit', () => {
     expect(result.renders).toBe(1);
     expect(result.data).toBe(light);
     expect(mockDebug).not.toHaveBeenCalled();
+  });
+
+  it('drops an album-less artist card without crediting it as a removed album', async () => {
+    const { data, posters } = heaviestDigest();
+    // The assembler can emit an artist card with no albums (groupDigest pushes one
+    // whenever the album budget allowed any album at all, even for an artist row
+    // with none). Give the first artist a second album so albums outnumbers shows
+    // and movies, forcing sectionToTrim to pick 'albums' first.
+    const extraAlbum = {
+      cardId: 'extra-album',
+      serverId: JELLYFIN_SERVER.id,
+      serverName: JELLYFIN_SERVER.name,
+      serverType: 'jellyfin',
+      ratingKey: 'extra-album-key',
+      mediaId: null,
+      imdbId: null,
+      thumbPath: null,
+      title: 'Bonus Album',
+      year: 2015,
+      trackCount: 8,
+    };
+    const artists = data.artists.map((a, i) =>
+      i === 0 ? { ...a, albums: [...a.albums, extraAlbum] } : a
+    );
+    const emptyArtist = {
+      cardId: 'artist-empty',
+      serverId: JELLYFIN_SERVER.id,
+      serverName: JELLYFIN_SERVER.name,
+      serverType: 'jellyfin',
+      ratingKey: 'empty-artist-key',
+      mediaId: null,
+      imdbId: null,
+      thumbPath: null,
+      name: 'No Albums Band',
+      albums: [] as DigestData['artists'][number]['albums'],
+    };
+    const heavy: DigestData = { ...data, artists: [...artists, emptyArtist] };
+    const result = await renderDigestToFit(heavy, posters, opts(), branding, delivery);
+    expect(result.data.artists.some((a) => a.cardId === 'artist-empty')).toBe(false);
+    expect(result.trimmed).toEqual({ movies: 0, shows: 0, albums: 1, mostWatched: 0 });
+    expect(sectionItemCounts(result.data)).toEqual({
+      movies: 12,
+      shows: 12,
+      albums: 12,
+      mostWatched: 10,
+    });
+    expect(result.rendered.html).toContain('+8 more albums');
+  });
+
+  it('warns with the final bytes and the budget when trimming everything still leaves it over', async () => {
+    const { data, posters } = heaviestDigest();
+    const heavyBranding: EmailBranding = {
+      ...branding,
+      // Trimming can only remove cards; an oversized footer stays no matter what's cut,
+      // so the loop exhausts its bound and the render never gets under budget.
+      footerText: 'f'.repeat(150_000),
+    };
+    const result = await renderDigestToFit(data, posters, opts(), heavyBranding, delivery);
+    expect(result.bytes).toBeGreaterThan(EMAIL_CLIP_FIT_BYTES);
+    expect(result.renders).toBe(47);
+    expect(mockDebug).not.toHaveBeenCalled();
+    expect(mockWarn).toHaveBeenCalledWith(
+      'Digest still exceeds the clip budget after trimming everything it could',
+      { newsletterId: 'n-1', bytes: result.bytes, budget: EMAIL_CLIP_FIT_BYTES }
+    );
   });
 });

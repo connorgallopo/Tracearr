@@ -76,8 +76,12 @@ export async function fitDigest(
     const section =
       bytes > EMAIL_CLIP_FIT_BYTES && renders <= limit ? sectionToTrim(current) : null;
     if (!section) return { rendered, data: current, bytes, trimmed, renders };
+    const before = sectionItemCounts(current)[section];
     current = dropLastItem(current, section);
-    trimmed[section] += 1;
+    // An artist with no albums can reach here (the assembler emits one whenever the
+    // budget allowed any album at all); popping it removes a card sectionItemCounts
+    // never counted, so credit only the albums actually gone.
+    trimmed[section] += before - sectionItemCounts(current)[section];
   }
 }
 
@@ -112,7 +116,13 @@ export async function renderDigestToFit(
       bytes: deliveredBytes(rendered.html, posters, delivery.mode, delivery.externalUrl),
     };
   });
-  if (result.renders > 1) {
+  if (result.bytes > EMAIL_CLIP_FIT_BYTES) {
+    logger.warn('Digest still exceeds the clip budget after trimming everything it could', {
+      newsletterId: delivery.newsletterId,
+      bytes: result.bytes,
+      budget: EMAIL_CLIP_FIT_BYTES,
+    });
+  } else if (result.renders > 1) {
     logger.debug('Trimmed the digest to fit the clip budget', {
       newsletterId: delivery.newsletterId,
       trimmed: result.trimmed,

@@ -19,7 +19,7 @@ const mockAssemble = vi.fn();
 vi.mock('../assemble.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../assemble.js')>();
   return {
-    ...actual,
+    sectionItemCounts: actual.sectionItemCounts,
     assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
   };
 });
