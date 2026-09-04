@@ -535,6 +535,23 @@
     }
   },
   "newsletters": {
-    "copyOf": "Copy of {{name}}"
+    "copyOf": "Copy of {{name}}",
+    "richText": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "link": "Link",
+      "bulletList": "Bulleted list",
+      "linkHref": "Link address",
+      "linkApply": "Apply",
+      "counter": "{{used}} / {{max}}"
+    }
+  },
+  "shared": {
+    "timezone": {
+      "placeholder": "Pick a timezone",
+      "search": "Search timezones",
+      "empty": "No timezone matches",
+      "other": "Other"
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AUTOMATION_NAME_MAX, type TemplateInput } from '@tracearr/shared';
-import { Button } from '@/components/ui/button';
+import { BindingDoors } from '@/components/ui/form-doors';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -206,51 +206,5 @@ export function TemplateBindingForm({
         }
       />
     </>
-  );
-}
-
-interface BindingDoorsProps extends Omit<TemplateBindingDoors, 'onPrimary' | 'onSecondary'> {
-  onPrimary: () => void;
-  onSecondary?: () => void;
-  /** Whatever sits left of the status: the dialog's own Turn it on now switch. */
-  leading?: ReactNode;
-  className?: string;
-}
-
-/** The row that ends a form: what is unsaved on the left, the ways out on the right. */
-export function BindingDoors({
-  primaryLabel,
-  primaryIcon,
-  pending,
-  disabled,
-  secondaryLabel,
-  helper,
-  status,
-  onPrimary,
-  onSecondary,
-  leading,
-  className,
-}: BindingDoorsProps) {
-  return (
-    <div className={cn('flex flex-col gap-2.5', className)}>
-      <div className="flex flex-wrap items-center gap-2.5">
-        {leading}
-        {status}
-        <div className="flex gap-2 max-sm:w-full max-sm:flex-col-reverse sm:ml-auto">
-          {secondaryLabel !== undefined && (
-            <Button type="button" variant="outline" onClick={onSecondary} disabled={pending}>
-              {secondaryLabel}
-            </Button>
-          )}
-          <Button type="button" onClick={onPrimary} disabled={pending || disabled === true}>
-            {primaryIcon}
-            {primaryLabel}
-          </Button>
-        </div>
-      </div>
-      {helper !== undefined && (
-        <p className="text-muted-foreground text-xs leading-relaxed">{helper}</p>
-      )}
-    </div>
   );
 }

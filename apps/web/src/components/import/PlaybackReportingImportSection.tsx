@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { StepBadge } from '@/components/settings/shared/StepBadge';
+import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { api } from '@/lib/api';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
@@ -40,8 +41,6 @@ interface PlaybackReportingImportSectionProps {
 }
 
 type PluginCheckState = 'idle' | 'checking' | 'installed' | 'not-installed';
-
-const timezoneOptions = Intl.supportedValuesOf('timeZone');
 
 export function PlaybackReportingImportSection({
   jellyfinServers,
@@ -185,19 +184,8 @@ export function PlaybackReportingImportSection({
 
         <div className="ml-8 space-y-4">
           <div className="space-y-2">
-            <Label>{t('import.serverTimezone')}</Label>
-            <Select value={timezone} onValueChange={setTimezone}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timezoneOptions.map((tz) => (
-                  <SelectItem key={tz} value={tz}>
-                    {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="pr-timezone">{t('import.serverTimezone')}</Label>
+            <TimezoneSelect id="pr-timezone" value={timezone} onChange={setTimezone} />
             <p className="text-muted-foreground text-xs">{t('import.serverTimezoneHelp')}</p>
           </div>
 

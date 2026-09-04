@@ -35,10 +35,8 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AutomationIdentityFields } from '@/components/automations/AutomationIdentityFields';
-import {
-  BindingDoors,
-  TemplateBindingForm,
-} from '@/components/automations/gallery/TemplateBindingForm';
+import { BindingDoors } from '@/components/ui/form-doors';
+import { TemplateBindingForm } from '@/components/automations/gallery/TemplateBindingForm';
 import { TemplateEffects } from '@/components/automations/gallery/TemplateEffects';
 import {
   AutomationSentencePanel,
