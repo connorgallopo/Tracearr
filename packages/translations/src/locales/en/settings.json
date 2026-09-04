@@ -533,5 +533,8 @@
       "scheduleSaved": "Backup schedule saved",
       "scheduleError": "Failed to save backup schedule"
     }
+  },
+  "newsletters": {
+    "copyOf": "Copy of {{name}}"
   }
 }

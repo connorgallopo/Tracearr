@@ -44,7 +44,7 @@ export function EditUserNameDialog({
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     mutation.mutate(
-      { id: userId, name: name.trim() || null },
+      { id: userId, data: { name: name.trim() || null } },
       { onSuccess: () => onOpenChange(false) }
     );
   };

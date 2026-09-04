@@ -48,6 +48,16 @@ import type {
   DestinationKind,
   CreateDestinationInput,
   UpdateDestinationInput,
+  Newsletter,
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+  NewsletterPreview,
+  NewsletterRecipientsView,
+  NewsletterSendsPage,
+  NewsletterSendDetail,
+  NewsletterSendHtml,
+  EmailBrandingSettings,
+  EmailSuppression,
   HistorySessionResponse,
   HistoryFilterOptions,
   AutomationFilterOptions,
@@ -727,11 +737,11 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify(data),
       }),
-    updateIdentity: (id: string, data: { name: string | null }) =>
-      this.request<{ success: boolean; name: string | null }>(`/users/${id}/identity`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      }),
+    updateIdentity: (id: string, data: { name?: string | null; contactEmail?: string | null }) =>
+      this.request<{ success: boolean; name: string | null; contactEmail: string | null }>(
+        `/users/${id}/identity`,
+        { method: 'PATCH', body: JSON.stringify(data) }
+      ),
     sessions: (id: string, params?: { page?: number; pageSize?: number; scope?: 'identity' }) => {
       const query = new URLSearchParams(params as Record<string, string>).toString();
       return this.request<PaginatedResponse<Session>>(`/users/${id}/sessions?${query}`);
@@ -1777,6 +1787,63 @@ class ApiClient {
       this.request<{ success: boolean; error?: string }>('/destinations/test', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+  };
+
+  // Newsletters
+  newsletters = {
+    list: () => this.request<Newsletter[]>('/newsletters'),
+    get: (id: string) => this.request<Newsletter>(`/newsletters/${id}`),
+    create: (data: CreateNewsletterInput) =>
+      this.request<Newsletter>('/newsletters', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: UpdateNewsletterInput) =>
+      this.request<Newsletter>(`/newsletters/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: string) => this.request<void>(`/newsletters/${id}`, { method: 'DELETE' }),
+    preview: (id: string) =>
+      this.request<NewsletterPreview>(`/newsletters/${id}/preview`, { method: 'POST' }),
+    recipients: (id: string) =>
+      this.request<NewsletterRecipientsView>(`/newsletters/${id}/recipients`),
+    test: (id: string, address: string) =>
+      this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/test`, {
+        method: 'POST',
+        body: JSON.stringify({ address }),
+      }),
+    send: (id: string) =>
+      this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/send`, {
+        method: 'POST',
+      }),
+    sends: (id: string, page: number) =>
+      this.request<NewsletterSendsPage>(`/newsletters/${id}/sends?page=${page}&pageSize=20`),
+    sendDetail: (id: string, sendId: string) =>
+      this.request<NewsletterSendDetail>(`/newsletters/${id}/sends/${sendId}`),
+    sendHtml: (id: string, sendId: string) =>
+      this.request<NewsletterSendHtml>(`/newsletters/${id}/sends/${sendId}/html`),
+    retryFailed: (id: string, sendId: string) =>
+      this.request<{ queued: number }>(`/newsletters/${id}/sends/${sendId}/retry-failed`, {
+        method: 'POST',
+      }),
+  };
+
+  // Email branding and the suppression list
+  email = {
+    branding: () => this.request<EmailBrandingSettings>('/email/branding'),
+    saveBranding: (data: EmailBrandingSettings) =>
+      this.request<EmailBrandingSettings>('/email/branding', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    suppressions: () => this.request<EmailSuppression[]>('/email/suppressions'),
+    addSuppression: (address: string) =>
+      this.request<{ address: string }>('/email/suppressions', {
+        method: 'POST',
+        body: JSON.stringify({ address }),
+      }),
+    removeSuppression: (address: string) =>
+      this.request<void>(`/email/suppressions/${encodeURIComponent(address)}`, {
+        method: 'DELETE',
       }),
   };
 
