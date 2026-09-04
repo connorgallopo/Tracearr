@@ -31,7 +31,7 @@ async function seedNewsletter(name = 'Weekly') {
         mostWatched: { enabled: false, max: 10 },
       },
       subject: 's',
-      recipients: { members: true, extraAddresses: [] },
+      recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
     })
     .returning();
   return row!;

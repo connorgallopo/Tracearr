@@ -1,10 +1,16 @@
 import { sql } from 'drizzle-orm';
-import type { NewsletterRecipients, NewsletterScope } from '@tracearr/shared';
+import type {
+  NewsletterRecipientPerson,
+  NewsletterRecipients,
+  NewsletterScope,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { normalizeAddress, suppressedAmong } from './suppressions.js';
 
 export interface RecipientCandidate {
   userId: string;
+  /** The oldest account on a scoped server; the identity PATCH route keys on it. */
+  serverUserId: string;
   name: string | null;
   contactEmail: string | null;
   identityEmail: string | null;
@@ -14,13 +20,15 @@ export interface RecipientCandidate {
 export interface ResolvedRecipient {
   address: string;
   userId: string | null;
+  serverUserId: string | null;
   name: string | null;
   suppressed: boolean;
 }
 
 export interface RecipientResolution {
   recipients: ResolvedRecipient[];
-  missingEmail: number;
+  missing: NewsletterRecipientPerson[];
+  excluded: NewsletterRecipientPerson[];
 }
 
 function firstAddress(candidate: RecipientCandidate): string | null {
@@ -29,19 +37,32 @@ function firstAddress(candidate: RecipientCandidate): string | null {
   return raw ? normalizeAddress(raw) : null;
 }
 
-/** Identities first, in the order given; hand-typed extras after; one row per address. */
+const person = (candidate: RecipientCandidate): NewsletterRecipientPerson => ({
+  userId: candidate.userId,
+  serverUserId: candidate.serverUserId,
+  name: candidate.name,
+});
+
+/** Identities first, in the order given; hand-typed extras after; one row per address. Excluded identities are set aside before addressing. */
 export function mergeRecipients(
   candidates: RecipientCandidate[],
   extras: { address: string; name?: string }[],
-  suppressed: Set<string>
+  suppressed: Set<string>,
+  excludeUserIds: readonly string[] = []
 ): RecipientResolution {
+  const excludedIds = new Set(excludeUserIds);
   const seen = new Set<string>();
   const recipients: ResolvedRecipient[] = [];
-  let missingEmail = 0;
+  const missing: NewsletterRecipientPerson[] = [];
+  const excluded: NewsletterRecipientPerson[] = [];
   for (const candidate of candidates) {
+    if (excludedIds.has(candidate.userId)) {
+      excluded.push(person(candidate));
+      continue;
+    }
     const address = firstAddress(candidate);
     if (!address) {
-      missingEmail += 1;
+      missing.push(person(candidate));
       continue;
     }
     if (seen.has(address)) continue;
@@ -49,6 +70,7 @@ export function mergeRecipients(
     recipients.push({
       address,
       userId: candidate.userId,
+      serverUserId: candidate.serverUserId,
       name: candidate.name,
       suppressed: suppressed.has(address),
     });
@@ -60,15 +82,17 @@ export function mergeRecipients(
     recipients.push({
       address,
       userId: null,
+      serverUserId: null,
       name: extra.name ?? null,
       suppressed: suppressed.has(address),
     });
   }
-  return { recipients, missingEmail };
+  return { recipients, missing, excluded };
 }
 
 interface CandidateRow {
   user_id: string;
+  server_user_id: string;
   name: string | null;
   contact_email: string | null;
   identity_email: string | null;
@@ -80,6 +104,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
   const scope = serverIds.length === 0 ? sql`` : sql`AND su.server_id IN ${serverIds}`;
   const result = await db.execute(sql`
     SELECT u.id AS user_id,
+           (array_agg(su.id ORDER BY su.created_at, su.id))[1] AS server_user_id,
            u.name,
            u.contact_email,
            u.email AS identity_email,
@@ -92,6 +117,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
   `);
   return (result.rows as unknown as CandidateRow[]).map((row) => ({
     userId: row.user_id,
+    serverUserId: row.server_user_id,
     name: row.name,
     contactEmail: row.contact_email,
     identityEmail: row.identity_email,
@@ -103,13 +129,16 @@ export async function resolveRecipients(newsletter: {
   scope: NewsletterScope;
   recipients: NewsletterRecipients;
 }): Promise<RecipientResolution> {
-  const candidates = newsletter.recipients.members
-    ? await loadCandidates(newsletter.scope.serverIds)
-    : [];
+  const { members, extraAddresses, excludeUserIds } = newsletter.recipients;
+  const candidates = members ? await loadCandidates(newsletter.scope.serverIds) : [];
+  const excludedIds = new Set(excludeUserIds);
   const addresses = [
-    ...candidates.map(firstAddress).filter((a): a is string => a !== null),
-    ...newsletter.recipients.extraAddresses.map((e) => normalizeAddress(e.address)),
+    ...candidates
+      .filter((candidate) => !excludedIds.has(candidate.userId))
+      .map(firstAddress)
+      .filter((a): a is string => a !== null),
+    ...extraAddresses.map((e) => normalizeAddress(e.address)),
   ];
   const suppressed = await suppressedAmong(addresses);
-  return mergeRecipients(candidates, newsletter.recipients.extraAddresses, suppressed);
+  return mergeRecipients(candidates, extraAddresses, suppressed, excludeUserIds);
 }

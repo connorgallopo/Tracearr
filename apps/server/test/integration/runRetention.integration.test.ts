@@ -346,7 +346,7 @@ describe('newsletter send retention', () => {
           mostWatched: { enabled: false, max: 10 },
         },
         subject: 's',
-        recipients: { members: true, extraAddresses: [] },
+        recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
       })
       .returning({ id: newsletters.id });
     const ancient = await seedSend(nl!.id, 400, { finished: true, html: '<p>a</p>' });

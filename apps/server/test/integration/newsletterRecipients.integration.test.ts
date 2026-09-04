@@ -43,6 +43,7 @@ describe('recipient candidates', () => {
     expect(byUser.get(a.userId)?.accountEmails).toEqual(['A@Example.com']);
     expect(byUser.get(b.userId)?.contactEmail).toBe('contact@example.com');
     expect(byUser.has(c.userId)).toBe(false);
+    expect(byUser.get(a.userId)?.serverUserId).toBe(a.id);
 
     await db.update(serverUsers).set({ removedAt: new Date() }).where(eq(serverUsers.id, a.id));
     const afterRemoval = await loadCandidates([]);

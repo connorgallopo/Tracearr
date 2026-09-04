@@ -694,6 +694,13 @@
       "when": 1788405239693,
       "tag": "0098_grey_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1788552084249,
+      "tag": "0099_condemned_hex",
+      "breakpoints": true
     }
   ]
 }

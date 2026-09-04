@@ -10,6 +10,7 @@ import {
   NEWSLETTER_VIEW_TOKEN_LENGTH,
   type Newsletter,
   type NewsletterPreview,
+  type NewsletterRecipientsView,
   type NewsletterSendHtml,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
@@ -235,7 +236,7 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
       window: { start: window.start.toISOString(), end: window.end.toISOString() },
       recipients: {
         resolved: resolution.recipients.length - suppressed,
-        missingEmail: resolution.missingEmail,
+        missingEmail: resolution.missing.length,
         suppressed,
       },
     };
@@ -269,6 +270,15 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (await findOpenSend(row.id)) return reply.conflict('A send is already in progress');
     const jobId = await enqueueNewsletterRun({ newsletterId: row.id, trigger: 'manual' });
     return reply.code(202).send({ queued: true, jobId });
+  });
+
+  app.get('/:id/recipients', owner, async (request, reply) => {
+    const params = idParams.safeParse(request.params);
+    if (!params.success) return reply.badRequest('Invalid id');
+    const row = await getNewsletter(params.data.id);
+    if (!row) return reply.notFound('Newsletter not found');
+    const view: NewsletterRecipientsView = await resolveRecipients(row);
+    return view;
   });
 
   app.get('/:id/sends', owner, async (request, reply) => {

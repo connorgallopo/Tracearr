@@ -54,9 +54,11 @@ const NEWSLETTER = {
   subject: "What's new on {{server_name}} ({{end_date}}) {{item_count}}",
   intro: null,
   outro: null,
-  recipients: { members: true, extraAddresses: [] },
+  recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
   imageMode: 'auto',
   skipWhenEmpty: true,
+  senderName: null,
+  links: { tracearr: false },
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -122,7 +124,8 @@ beforeEach(() => {
       { address: 'a@x.com', userId: 'u1', name: null, suppressed: false },
       { address: 'gone@x.com', userId: 'u2', name: null, suppressed: true },
     ],
-    missingEmail: 1,
+    missing: [{ userId: 'u9', serverUserId: 'su-9', name: null }],
+    excluded: [],
   });
   mockSettings.mockResolvedValue({
     externalUrl: 'https://tracearr.example.com',
@@ -288,7 +291,8 @@ describe('runNewsletter', () => {
   it('records a failure when nobody is deliverable', async () => {
     mockResolve.mockResolvedValue({
       recipients: [{ address: 'gone@x.com', userId: null, name: null, suppressed: true }],
-      missingEmail: 0,
+      missing: [],
+      excluded: [],
     });
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(result.outcome).toBe('failed');

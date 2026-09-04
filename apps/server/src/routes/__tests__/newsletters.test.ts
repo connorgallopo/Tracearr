@@ -94,7 +94,9 @@ const row = {
   imageMode: 'auto',
   scope: { serverIds: [], libraryIds: [] },
   sections: {},
-  recipients: { members: true, extraAddresses: [] },
+  recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
+  senderName: null,
+  links: { tracearr: false },
   subject: 's',
   intro: null,
   outro: null,
@@ -151,6 +153,7 @@ describe('newsletter routes', () => {
       ['PATCH', `/newsletters/${ID}`],
       ['DELETE', `/newsletters/${ID}`],
       ['POST', `/newsletters/${ID}/preview`],
+      ['GET', `/newsletters/${ID}/recipients`],
       ['POST', `/newsletters/${ID}/test`],
       ['POST', `/newsletters/${ID}/send`],
       ['GET', `/newsletters/${ID}/sends`],
@@ -172,7 +175,14 @@ describe('newsletter routes', () => {
     const res = await app.inject({ method: 'POST', url: '/newsletters', payload: body });
     expect(res.statusCode).toBe(201);
     expect(store.createNewsletter).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Weekly', destinationId: DEST, imageMode: 'auto' })
+      expect.objectContaining({
+        name: 'Weekly',
+        destinationId: DEST,
+        imageMode: 'auto',
+        senderName: null,
+        links: { tracearr: false },
+        recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
+      })
     );
     expect(queue.upsertNewsletterSchedule).toHaveBeenCalledWith(row);
   });
@@ -263,6 +273,63 @@ describe('newsletter routes', () => {
     expect(store.updateNewsletter).toHaveBeenCalledWith(ID, { destinationId: null });
   });
 
+  it('patches the sender name, the links toggle and a rich intro through the partial builder', async () => {
+    const app = await build(owner);
+    const intro = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hi' }] }],
+    };
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { senderName: ' Family Media ', links: { tracearr: true }, intro },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(store.updateNewsletter).toHaveBeenCalledWith(ID, {
+      senderName: 'Family Media',
+      links: { tracearr: true },
+      intro,
+    });
+  });
+
+  it('rejects a string intro and an unknown link key', async () => {
+    const app = await build(owner);
+    const text = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { intro: 'plain' },
+    });
+    expect(text.statusCode).toBe(400);
+    expect(text.json().message).toMatch(/intro/);
+    const links = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { links: { tracearr: true, imdb: false } },
+    });
+    expect(links.statusCode).toBe(400);
+    expect(store.updateNewsletter).not.toHaveBeenCalled();
+  });
+
+  it('lists who the next send reaches, who has no address, and who is excluded', async () => {
+    const app = await build(owner);
+    const view = {
+      recipients: [
+        { address: 'a@x.com', userId: 'u1', serverUserId: 'su-1', name: 'One', suppressed: false },
+      ],
+      missing: [{ userId: 'u2', serverUserId: 'su-2', name: 'Two' }],
+      excluded: [{ userId: 'u3', serverUserId: 'su-3', name: null }],
+    };
+    mockResolve.mockResolvedValue(view);
+    const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/recipients` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual(view);
+    expect(mockResolve).toHaveBeenCalledWith(row);
+    store.getNewsletter.mockResolvedValueOnce(null);
+    expect(
+      (await app.inject({ method: 'GET', url: `/newsletters/${ID}/recipients` })).statusCode
+    ).toBe(404);
+  });
+
   it('refuses to delete while a send is open, otherwise deletes and drops the scheduler', async () => {
     const app = await build(owner);
     store.deleteNewsletter.mockResolvedValueOnce('open_send');
@@ -347,7 +414,11 @@ describe('newsletter routes', () => {
         { address: 'a@x.com', userId: null, name: null, suppressed: false },
         { address: 'b@x.com', userId: null, name: null, suppressed: true },
       ],
-      missingEmail: 2,
+      missing: [
+        { userId: 'u1', serverUserId: 'su-1', name: 'One' },
+        { userId: 'u2', serverUserId: 'su-2', name: null },
+      ],
+      excluded: [],
     });
     const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(res.statusCode).toBe(200);
@@ -386,7 +457,7 @@ describe('newsletter routes', () => {
       },
       posters: {},
     });
-    mockResolve.mockResolvedValue({ recipients: [], missingEmail: 0 });
+    mockResolve.mockResolvedValue({ recipients: [], missing: [], excluded: [] });
     const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(res.statusCode).toBe(200);
     expect(res.json().html).toContain('src="https://x.test/l.png"');
