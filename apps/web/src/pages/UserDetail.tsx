@@ -23,6 +23,7 @@ import { TrustScoreBadge } from '@/components/users/TrustScoreBadge';
 import { UserLocationsCard } from '@/components/users/UserLocationsCard';
 import { UserDevicesCard } from '@/components/users/UserDevicesCard';
 import { EditUserIdentityDialog } from '@/components/users/EditUserIdentityDialog';
+import { ContactEmailLine } from '@/components/users/ContactEmailLine';
 import { EditTrustScoreDialog } from '@/components/users/EditTrustScoreDialog';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
 import { HistoryTable } from '@/components/history/HistoryTable';
@@ -584,23 +585,11 @@ export function UserDetail() {
                     )}
                   </div>
                   <p className="text-muted-foreground text-sm">@{user.username}</p>
-                  <p className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
-                    <span>
-                      {t('userDetail.contactEmailLabel')}{' '}
-                      {identity?.contactEmail ?? t('userDetail.contactEmailNone')}
-                    </span>
-                    {isOwner && (
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        aria-label={t('userDetail.editIdentity')}
-                        onClick={() => setIsEditIdentityOpen(true)}
-                      >
-                        <Pencil />
-                      </Button>
-                    )}
-                    <span className="text-xs">{t('userDetail.contactEmailNoLogin')}</span>
-                  </p>
+                  <ContactEmailLine
+                    contactEmail={identity?.contactEmail ?? null}
+                    isOwner={isOwner}
+                    onEdit={() => setIsEditIdentityOpen(true)}
+                  />
                   {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
                   <div className="flex items-center gap-4 pt-2">
                     <TrustScoreBadge
@@ -911,7 +900,6 @@ export function UserDetail() {
         </CardContent>
       </Card>
 
-      {/* Edit Display Name Dialog */}
       <EditUserIdentityDialog
         open={isEditIdentityOpen}
         onOpenChange={setIsEditIdentityOpen}

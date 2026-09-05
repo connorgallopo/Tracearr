@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
+import { updateUserIdentitySchema } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,8 +24,6 @@ interface EditUserIdentityDialogProps {
   username: string;
 }
 
-const address = z.email();
-
 /** The owner's edit of a person's display name and newsletter address; only what changed is sent. */
 export function EditUserIdentityDialog({
   open,
@@ -48,8 +46,10 @@ export function EditUserIdentityDialog({
   }, [open, currentName, currentContactEmail]);
 
   const nextName = name.trim() || null;
-  const nextEmail = contactEmail.trim().toLowerCase() || null;
-  const emailValid = nextEmail === null || address.safeParse(nextEmail).success;
+  const rawEmail = contactEmail.trim() || null;
+  const emailResult = updateUserIdentitySchema.shape.contactEmail.safeParse(rawEmail);
+  const emailValid = emailResult.success;
+  const nextEmail = emailValid ? (emailResult.data ?? null) : rawEmail;
   const data: { name?: string | null; contactEmail?: string | null } = {
     ...(nextName !== currentName && { name: nextName }),
     ...(nextEmail !== currentContactEmail && { contactEmail: nextEmail }),
