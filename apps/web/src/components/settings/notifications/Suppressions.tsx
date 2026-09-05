@@ -16,7 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { EmptyState } from '@/components/ui/empty-state';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+} from '@/components/ui/empty';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -41,7 +47,6 @@ export function Suppressions() {
   const [address, setAddress] = useState('');
   const [removing, setRemoving] = useState<EmailSuppression | null>(null);
   const parsed = emailSuppressionCreateSchema.safeParse({ address });
-  /** EmptyState already carries an h3; the card title would double it, so it steps aside for the empty case. */
   const isEmpty = data !== undefined && data.length === 0;
 
   const addButton = (
@@ -54,7 +59,7 @@ export function Suppressions() {
   return (
     <Card>
       <CardHeader>
-        {!isEmpty && <CardTitle>{t('email.suppressions.title')}</CardTitle>}
+        <CardTitle>{t('email.suppressions.title')}</CardTitle>
         <CardDescription>{t('email.suppressions.globalNote')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -65,15 +70,20 @@ export function Suppressions() {
           </Alert>
         )}
         {isEmpty && (
-          <EmptyState
-            icon={MailX}
-            title={t('email.suppressions.empty')}
-            description={t('email.suppressions.emptyDescription')}
-          >
-            {addButton}
-          </EmptyState>
+          // Composed from the low-level Empty primitives instead of EmptyState: EmptyState's
+          // title is always an h3, which would double the card's own heading right above it.
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="text-muted-foreground size-16 rounded-full">
+                <MailX className="size-8" />
+              </EmptyMedia>
+              <EmptyDescription>{t('email.suppressions.empty')}</EmptyDescription>
+              <EmptyDescription>{t('email.suppressions.emptyDescription')}</EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>{addButton}</EmptyContent>
+          </Empty>
         )}
-        {data && data.length > 0 && (
+        {data && !isEmpty && (
           <>
             <ItemGroup className="gap-1">
               {data.map((row) => (
@@ -91,7 +101,7 @@ export function Suppressions() {
                     {row.sourceNewsletterId && (
                       <Button asChild variant="ghost" size="icon-sm">
                         <Link
-                          to={`${NEWSLETTERS_PATH}/${row.sourceNewsletterId}`}
+                          to={`${NEWSLETTERS_PATH}/${row.sourceNewsletterId}?tab=history`}
                           aria-label={t('email.suppressions.openSource')}
                         >
                           <ExternalLink />
@@ -166,7 +176,7 @@ export function Suppressions() {
         isLoading={remove.isPending}
         onConfirm={() => {
           if (!removing) return;
-          remove.mutate(removing.address, { onSettled: () => setRemoving(null) });
+          remove.mutate(removing.address);
         }}
       />
     </Card>

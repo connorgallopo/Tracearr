@@ -27,6 +27,7 @@ vi.mock('@/hooks/queries', () => ({
   useDestinations: vi.fn(),
   useSettings: vi.fn(),
   useNewsletterRecipients: vi.fn(),
+  useNewsletterSends: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
   usePreviewNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   useTestNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
@@ -42,6 +43,7 @@ import {
   useDestinations,
   useNewsletter,
   useNewsletterRecipients,
+  useNewsletterSends,
   useSettings,
 } from '@/hooks/queries';
 
@@ -185,6 +187,25 @@ describe('NewsletterEditor', () => {
       screen.getByRole('tab', { name: 'newsletters.editor.tabs.history' })
     ).toBeInTheDocument();
     expect(screen.getByText(/newsletters.editor.nextRun/)).toBeInTheDocument();
+  });
+
+  it('opens straight to the History tab when the URL asks for it', () => {
+    vi.mocked(useNewsletter).mockReturnValue({
+      data: row,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletter>);
+    vi.mocked(useNewsletterSends).mockReturnValue({
+      data: { sends: [], total: 0, page: 1, pageSize: 10 },
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletterSends>);
+    renderAt('/settings/notifications/newsletters/n-1?tab=history');
+    expect(screen.getByRole('tab', { name: 'newsletters.editor.tabs.history' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+    expect(screen.getByText('newsletters.history.empty')).toBeInTheDocument();
   });
 
   it('gates non-owners and reports a load error', () => {

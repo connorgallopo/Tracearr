@@ -62,7 +62,7 @@ describe('Suppressions', () => {
     expect(items[0]).toHaveTextContent('email.suppressions.reason.unsubscribed');
     expect(screen.getByRole('link', { name: 'email.suppressions.openSource' })).toHaveAttribute(
       'href',
-      '/settings/notifications/newsletters/n-1'
+      '/settings/notifications/newsletters/n-1?tab=history'
     );
     expect(items[1]).toHaveTextContent('email.suppressions.reason.manual');
     expect(screen.getByText('email.suppressions.globalNote')).toBeInTheDocument();
@@ -77,12 +77,13 @@ describe('Suppressions', () => {
       'email.suppressions.removeDescription:{"address":"manual@x.com"}'
     );
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.remove' }));
-    expect(removeMutate).toHaveBeenCalledWith('manual@x.com', expect.anything());
+    expect(removeMutate).toHaveBeenCalledWith('manual@x.com');
   });
 
-  it('adds a validated address from the dialog', async () => {
+  it('adds a validated address from the dialog, and the card keeps its title when empty', async () => {
     renderCard([]);
-    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('email.suppressions.empty');
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('email.suppressions.title');
+    expect(screen.getByText('email.suppressions.empty')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'email.suppressions.add' }));
     const input = screen.getByLabelText('email.suppressions.address');
     await userEvent.type(input, 'nope');

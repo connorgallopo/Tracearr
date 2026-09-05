@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Info, Loader2, Save } from 'lucide-react';
 import type { Newsletter } from '@tracearr/shared';
@@ -42,6 +42,14 @@ interface EditorFormProps {
 function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const { t } = useTranslation(['settings', 'common', 'pages']);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'history' ? 'history' : 'edit';
+  const onTabChange = (tab: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (tab === 'history') next.set('tab', 'history');
+    else next.delete('tab');
+    setSearchParams(next, { replace: true });
+  };
   const [seed, setSeed] = useState<NewsletterFormState>(initialSeed);
   const [state, setState] = useState<NewsletterFormState>(initialSeed);
   const [richTextErrors, setRichTextErrors] = useState<RichTextErrors>({});
@@ -146,7 +154,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
       }
     >
       {newsletter ? (
-        <Tabs defaultValue="edit">
+        <Tabs value={activeTab} onValueChange={onTabChange}>
           <TabsList>
             <TabsTrigger value="edit">{t('newsletters.editor.tabs.edit')}</TabsTrigger>
             <TabsTrigger value="history">{t('newsletters.editor.tabs.history')}</TabsTrigger>
