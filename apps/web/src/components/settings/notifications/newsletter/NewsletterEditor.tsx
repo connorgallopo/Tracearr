@@ -19,6 +19,7 @@ import { DeliveryFields } from './DeliveryFields';
 import { IdentityFields } from './IdentityFields';
 import { LinksFields } from './LinksFields';
 import { MessageFields } from './MessageFields';
+import { NewsletterActions } from './NewsletterActions';
 import { NEWSLETTERS_PATH } from '../Newsletters';
 import { ReadinessList } from './ReadinessList';
 import { RecipientsFields } from './RecipientsFields';
@@ -49,12 +50,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const valid =
     Object.keys(errors).length === 0 && Object.values(richTextErrors).every((e) => e === undefined);
 
-  const {
-    dirty,
-    pending,
-    save,
-    saveThen: _saveThen,
-  } = useNewsletterSave({
+  const { dirty, pending, save, saveThen } = useNewsletterSave({
     newsletterId: newsletter?.id ?? null,
     seed,
     state,
@@ -142,7 +138,11 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   return (
     <SettingsSection
       title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}
-      actions={null}
+      actions={
+        newsletter ? (
+          <NewsletterActions newsletter={newsletter} dirty={dirty} saveThen={saveThen} />
+        ) : null
+      }
     >
       {newsletter ? (
         <Tabs defaultValue="edit">

@@ -6,6 +6,7 @@ import type { Newsletter } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,6 +20,7 @@ import {
 } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { NewsletterRow } from './NewsletterRow';
+import { SendNowDialog } from './newsletter/SendNowDialog';
 
 export const NEWSLETTERS_PATH = '/settings/notifications/newsletters';
 const DESTINATIONS_PATH = '/settings/notifications/destinations';
@@ -52,6 +54,7 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
   const remove = useDeleteNewsletter();
   const duplicate = useDuplicateNewsletter();
   const [deleting, setDeleting] = useState<Newsletter | null>(null);
+  const [sending, setSending] = useState<Newsletter | null>(null);
 
   if (isLoading) {
     return <NewslettersSkeleton />;
@@ -106,6 +109,11 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
               })
             }
             onDelete={() => setDeleting(newsletter)}
+            extraActions={
+              <DropdownMenuItem onSelect={() => setSending(newsletter)}>
+                {t('newsletters.sendNow')}
+              </DropdownMenuItem>
+            }
           />
         ))}
       </ItemGroup>
@@ -122,6 +130,14 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
         onConfirm={() => {
           if (!deleting) return;
           remove.mutate(deleting.id, { onSettled: () => setDeleting(null) });
+        }}
+      />
+      <SendNowDialog
+        newsletterId={sending?.id ?? null}
+        name={sending?.name ?? ''}
+        timezone={sending?.timezone ?? 'UTC'}
+        onOpenChange={(open) => {
+          if (!open) setSending(null);
         }}
       />
     </>

@@ -24,12 +24,15 @@ vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
 const updateMutate = vi.fn();
 const deleteMutate = vi.fn();
 const duplicateMutate = vi.fn();
+const previewMutate = vi.fn();
 vi.mock('@/hooks/queries', () => ({
   useNewsletters: vi.fn(),
   useDestinations: vi.fn(),
   useUpdateNewsletter: () => ({ mutate: updateMutate, isPending: false, variables: undefined }),
   useDeleteNewsletter: () => ({ mutate: deleteMutate, isPending: false }),
   useDuplicateNewsletter: () => ({ mutate: duplicateMutate, isPending: false }),
+  usePreviewNewsletter: () => ({ mutate: previewMutate, isPending: false }),
+  useSendNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 import { useAuth } from '@/hooks/useAuth';
@@ -132,6 +135,16 @@ describe('Newsletters section', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.delete' }));
     expect(deleteMutate).toHaveBeenCalledWith('n-1', expect.anything());
+  });
+
+  it('offers Send now from the row menu and previews before confirming', async () => {
+    renderPage({ newsletters: [newsletter] });
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.rowActions' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'newsletters.sendNow' }));
+    expect(previewMutate).toHaveBeenCalledWith('n-1', expect.anything());
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(
+      'newsletters.editor.send.title:{"name":"Weekly"}'
+    );
   });
 
   it('duplicates through the hook and opens the copy', async () => {

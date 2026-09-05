@@ -547,6 +547,7 @@
     "enabled": "Enabled",
     "rowActions": "Newsletter actions",
     "duplicate": "Duplicate",
+    "sendNow": "Send now",
     "deleteTitle": "Delete this newsletter?",
     "deleteDescription": "{{name}} and its send history will be deleted. Suppressed addresses stay suppressed.",
     "schedule": {
@@ -719,6 +720,35 @@
         "recipientsLoadFailed": "Recipients could not be loaded.",
         "dns": "Deliverability depends on SPF, DKIM and DMARC records for the sending domain.",
         "dnsLink": "Read how to set them"
+      },
+      "actions": {
+        "preview": "Preview",
+        "test": "Send test",
+        "send": "Send now",
+        "saveAndPreview": "Save and preview",
+        "saveAndTest": "Save and send test",
+        "saveAndSend": "Save and send now"
+      },
+      "preview": {
+        "title": "Preview",
+        "window": "{{start}} to {{end}}",
+        "recipients": "{{resolved}} recipients, {{missing}} without an address, {{suppressed}} suppressed"
+      },
+      "test": {
+        "title": "Send a test",
+        "description": "Renders the current window and sends it to one address, ignoring the suppression list.",
+        "address": "Send to",
+        "send": "Send test"
+      },
+      "send": {
+        "title": "Send {{name}} now?",
+        "previewing": "Working out who gets what...",
+        "summary": "Send to {{count}} recipients: {{counts}} added between {{start}} and {{end}}",
+        "nobody": "Nobody resolves to an address ({{missing}} members have none), so there is nothing to send.",
+        "trimmed_one": "{{count}} item is held back as a +N more line so the email stays under the 102 KB at which Gmail clips it.",
+        "trimmed_other": "{{count}} items are held back as +N more lines so the email stays under the 102 KB at which Gmail clips it.",
+        "confirm": "Send",
+        "sending": "Sending"
       }
     }
   },
