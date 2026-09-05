@@ -161,6 +161,7 @@ export interface ServerUserFullDetail {
     userId: string;
     aggregateTrustScore: number;
     totalViolations: number;
+    contactEmail: string | null;
     serverUsers: {
       id: string;
       serverId: string;

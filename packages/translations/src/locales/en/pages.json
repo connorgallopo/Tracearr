@@ -111,7 +111,15 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
-    "title": "User Details"
+    "title": "User Details",
+    "editIdentity": "Edit name and contact email",
+    "editIdentityDescription": "Both apply to this person everywhere. Leave the name empty to show @{{username}}.",
+    "displayName": "Display name",
+    "contactEmail": "Contact email",
+    "contactEmailHelp": "Where newsletters go. It grants no login and never matches a synced account.",
+    "contactEmailLabel": "Newsletter address:",
+    "contactEmailNone": "none set",
+    "contactEmailNoLogin": "Grants no login."
   },
   "history": {
     "title": "History",
