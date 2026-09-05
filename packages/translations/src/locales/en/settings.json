@@ -750,6 +750,31 @@
         "confirm": "Send",
         "sending": "Sending"
       }
+    },
+    "history": {
+      "empty": "No sends yet",
+      "emptyDescription": "Every scheduled, manual and test send lands here with who it reached.",
+      "loadFailed": "Could not load the send history.",
+      "trigger": { "schedule": "Scheduled", "manual": "Manual", "test": "Test" },
+      "window": "{{start}} to {{end}}",
+      "recipients": "{{count}} recipients",
+      "finished": "Finished {{when}}",
+      "open": "Open the send from {{when}}",
+      "page": "Page {{page}} of {{pages}}",
+      "sendTitle": "Send",
+      "status": {
+        "queued": "Queued",
+        "sent": "Sent",
+        "failed": "Failed",
+        "suppressed": "Suppressed",
+        "unknown": "Unknown"
+      },
+      "attempts": "{{count}} attempts",
+      "unknownHelp": "The server stopped answering after the message went out; it is never retried on its own.",
+      "openSnapshot": "Open snapshot",
+      "snapshotTitle": "Snapshot",
+      "pruned": "The snapshot was pruned after 90 days; nothing can be viewed or resent.",
+      "retryFailed": "Retry failed"
     }
   },
   "shared": {

@@ -24,6 +24,7 @@ import { NEWSLETTERS_PATH } from '../Newsletters';
 import { ReadinessList } from './ReadinessList';
 import { RecipientsFields } from './RecipientsFields';
 import { ScheduleFields } from './ScheduleFields';
+import { SendHistory } from './SendHistory';
 import { useNewsletterSave } from './useNewsletterSave';
 import {
   defaultFormState,
@@ -152,7 +153,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
           </TabsList>
           <TabsContent value="edit">{form}</TabsContent>
           <TabsContent value="history">
-            <div data-slot="editor-history" />
+            <SendHistory newsletterId={newsletter.id} timezone={newsletter.timezone} />
           </TabsContent>
         </Tabs>
       ) : (
