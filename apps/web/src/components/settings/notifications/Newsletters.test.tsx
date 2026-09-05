@@ -52,6 +52,7 @@ function renderPage({
   newsletters = [] as Newsletter[],
   destinations = [emailDestination] as Destination[],
   isLoading = false,
+  destinationsLoading = false,
 } = {}) {
   vi.mocked(useAuth).mockReturnValue({ user: { role } } as unknown as ReturnType<typeof useAuth>);
   vi.mocked(useNewsletters).mockReturnValue({
@@ -60,9 +61,12 @@ function renderPage({
     isError: false,
     error: null,
   } as unknown as ReturnType<typeof useNewsletters>);
-  vi.mocked(useDestinations).mockReturnValue({ data: destinations } as unknown as ReturnType<
-    typeof useDestinations
-  >);
+  vi.mocked(useDestinations).mockReturnValue({
+    data: destinations,
+    isLoading: destinationsLoading,
+    isError: false,
+    error: null,
+  } as unknown as ReturnType<typeof useDestinations>);
   return render(
     <MemoryRouter>
       <Newsletters />
@@ -91,6 +95,19 @@ describe('Newsletters section', () => {
       '/settings/notifications/destinations'
     );
     expect(screen.queryByRole('button', { name: 'newsletters.new' })).not.toBeInTheDocument();
+  });
+
+  it('hides the destination guidance and shows a skeleton while destinations are still loading', () => {
+    const { container } = renderPage({ newsletters: [newsletter], destinationsLoading: true });
+
+    expect(screen.queryByText('newsletters.noDestinationTitle')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-slot="skeleton"]')).toBeInTheDocument();
+  });
+
+  it('shows the header action once destinations resolve to an email destination', () => {
+    renderPage({ newsletters: [newsletter] });
+
+    expect(screen.getByRole('button', { name: 'newsletters.new' })).toBeInTheDocument();
   });
 
   it('offers a new newsletter from the empty state and the header', async () => {

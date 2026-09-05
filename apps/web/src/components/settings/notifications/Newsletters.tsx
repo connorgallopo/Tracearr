@@ -23,6 +23,27 @@ import { NewsletterRow } from './NewsletterRow';
 export const NEWSLETTERS_PATH = '/settings/notifications/newsletters';
 const DESTINATIONS_PATH = '/settings/notifications/destinations';
 
+/** Shared by the header action and the empty state; each caller's own useNavigate keeps this self-contained. */
+function NewNewsletterButton() {
+  const { t } = useTranslation('settings');
+  const navigate = useNavigate();
+  return (
+    <Button onClick={() => void navigate(`${NEWSLETTERS_PATH}/new`)}>
+      <Plus />
+      {t('newsletters.new')}
+    </Button>
+  );
+}
+
+function NewslettersSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-16 w-full" />
+      <Skeleton className="h-16 w-full" />
+    </div>
+  );
+}
+
 function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean }) {
   const { t } = useTranslation(['settings', 'common']);
   const navigate = useNavigate();
@@ -32,20 +53,8 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
   const duplicate = useDuplicateNewsletter();
   const [deleting, setDeleting] = useState<Newsletter | null>(null);
 
-  const newButton = (
-    <Button onClick={() => void navigate(`${NEWSLETTERS_PATH}/new`)}>
-      <Plus />
-      {t('newsletters.new')}
-    </Button>
-  );
-
   if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
-      </div>
-    );
+    return <NewslettersSkeleton />;
   }
 
   if (isError) {
@@ -66,7 +75,7 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
         title={t('newsletters.empty')}
         description={t('newsletters.emptyDescription')}
       >
-        {newButton}
+        <NewNewsletterButton />
       </EmptyState>
     ) : (
       <EmptyState
@@ -122,32 +131,36 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
 export function Newsletters() {
   const { t } = useTranslation('settings');
   const { user } = useAuth();
-  const navigate = useNavigate();
   const isOwner = user?.role === 'owner';
-  const { data: destinations } = useDestinations(isOwner);
+  const {
+    data: destinations,
+    isLoading: isDestinationsLoading,
+    isError: isDestinationsError,
+    error: destinationsError,
+  } = useDestinations(isOwner);
   const hasEmailDestination = (destinations ?? []).some((d) => d.type === 'email' && d.enabled);
+  const destinationsSettled = !isDestinationsLoading && !isDestinationsError;
 
   return (
     <SettingsSection
       title={t('nav.sections.newsletters')}
       description={t('nav.descriptions.newsletters')}
-      actions={
-        isOwner &&
-        hasEmailDestination && (
-          <Button onClick={() => void navigate(`${NEWSLETTERS_PATH}/new`)}>
-            <Plus />
-            {t('newsletters.new')}
-          </Button>
-        )
-      }
+      actions={isOwner && destinationsSettled && hasEmailDestination && <NewNewsletterButton />}
     >
-      {isOwner ? (
-        <NewsletterList hasEmailDestination={hasEmailDestination} />
-      ) : (
+      {!isOwner ? (
         <Alert>
           <Info />
           <AlertDescription>{t('newsletters.ownerOnly')}</AlertDescription>
         </Alert>
+      ) : isDestinationsLoading ? (
+        <NewslettersSkeleton />
+      ) : isDestinationsError ? (
+        <Alert variant="destructive">
+          <Info />
+          <AlertDescription>{destinationsError.message}</AlertDescription>
+        </Alert>
+      ) : (
+        <NewsletterList hasEmailDestination={hasEmailDestination} />
       )}
     </SettingsSection>
   );
