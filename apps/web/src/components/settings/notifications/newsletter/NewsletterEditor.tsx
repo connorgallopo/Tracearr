@@ -1,0 +1,132 @@
+import { useState } from 'react';
+import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { Info } from 'lucide-react';
+import type { Newsletter } from '@tracearr/shared';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { FieldGroup } from '@/components/ui/field';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { RichTextChange } from '@/components/ui/rich-text-normalize';
+import { SettingsSection } from '@/components/settings/shell/SettingsSection';
+import { useNewsletter } from '@/hooks/queries';
+import { useAuth } from '@/hooks/useAuth';
+import { ContentFields } from './ContentFields';
+import { IdentityFields } from './IdentityFields';
+import { MessageFields } from './MessageFields';
+import { ScheduleFields } from './ScheduleFields';
+import {
+  defaultFormState,
+  seedFromNewsletter,
+  validateForm,
+  type NewsletterFormState,
+  type RichTextErrors,
+} from './newsletterForm';
+
+interface EditorFormProps {
+  seed: NewsletterFormState;
+  newsletter: Newsletter | null;
+}
+
+function EditorForm({ seed, newsletter }: EditorFormProps) {
+  const { t } = useTranslation('settings');
+  const [state, setState] = useState<NewsletterFormState>(seed);
+  const [richTextErrors, setRichTextErrors] = useState<RichTextErrors>({});
+  const mode = newsletter ? 'edit' : 'create';
+  const errors = validateForm(state);
+
+  const onChange = (patch: Partial<NewsletterFormState>) =>
+    setState((current) => ({ ...current, ...patch }));
+  const onRichText = (field: 'intro' | 'outro', change: RichTextChange) => {
+    setRichTextErrors((current) => ({ ...current, [field]: change.error ?? undefined }));
+    if (change.error === null) onChange({ [field]: change.value });
+  };
+
+  const form = (
+    <FieldGroup className="gap-8">
+      <IdentityFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <ScheduleFields
+        state={state}
+        onChange={onChange}
+        errors={errors}
+        mode={mode}
+        nextRunAt={newsletter?.nextRunAt}
+      />
+      <ContentFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <MessageFields
+        state={state}
+        onChange={onChange}
+        errors={errors}
+        mode={mode}
+        richTextErrors={richTextErrors}
+        onRichText={onRichText}
+        fieldKey={newsletter?.id ?? 'new'}
+      />
+      <div data-slot="editor-footer" />
+    </FieldGroup>
+  );
+
+  return (
+    <SettingsSection title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}>
+      {newsletter ? (
+        <Tabs defaultValue="edit">
+          <TabsList>
+            <TabsTrigger value="edit">{t('newsletters.editor.tabs.edit')}</TabsTrigger>
+            <TabsTrigger value="history">{t('newsletters.editor.tabs.history')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="edit">{form}</TabsContent>
+          <TabsContent value="history">
+            <div data-slot="editor-history" />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        form
+      )}
+    </SettingsSection>
+  );
+}
+
+export function NewsletterEditor() {
+  const { t } = useTranslation('settings');
+  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const { data: newsletter, isLoading, isError, error } = useNewsletter(id);
+
+  if (user?.role !== 'owner') {
+    return (
+      <SettingsSection title={t('nav.sections.newsletters')}>
+        <Alert>
+          <Info />
+          <AlertDescription>{t('newsletters.ownerOnly')}</AlertDescription>
+        </Alert>
+      </SettingsSection>
+    );
+  }
+  if (id && isLoading) {
+    return (
+      <SettingsSection title={t('nav.sections.newsletters')}>
+        <Skeleton data-testid="newsletter-editor-loading" className="h-[40rem] w-full" />
+      </SettingsSection>
+    );
+  }
+  if (id && (isError || !newsletter)) {
+    return (
+      <SettingsSection title={t('nav.sections.newsletters')}>
+        <Alert variant="destructive">
+          <Info />
+          <AlertDescription>{error?.message ?? t('newsletters.editor.notFound')}</AlertDescription>
+        </Alert>
+      </SettingsSection>
+    );
+  }
+
+  const row = id ? (newsletter ?? null) : null;
+  // The form owns its state from the seed; a different row remounts it.
+  return (
+    <EditorForm
+      key={row?.id ?? 'new'}
+      seed={row ? seedFromNewsletter(row) : defaultFormState()}
+      newsletter={row}
+    />
+  );
+}

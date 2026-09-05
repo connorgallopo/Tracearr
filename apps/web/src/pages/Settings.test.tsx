@@ -55,6 +55,9 @@ vi.mock('@/components/settings/notifications/Destinations', () => ({
 vi.mock('@/components/settings/notifications/Newsletters', () => ({
   Newsletters: () => <div>newsletters</div>,
 }));
+vi.mock('@/components/settings/notifications/newsletter/NewsletterEditor', () => ({
+  NewsletterEditor: () => <div>newsletter editor</div>,
+}));
 
 function CurrentPath() {
   const { pathname } = useLocation();
@@ -91,7 +94,6 @@ describe('Settings routes', () => {
     ['/settings/import', '/settings/data/import'],
     ['/settings/jobs', '/settings/data/jobs'],
     ['/settings/backup', '/settings/data/backup'],
-    ['/settings/notifications/newsletters/new', '/settings/notifications/newsletters'],
     ['/settings/notifications/email', '/settings/notifications/destinations'],
   ])('redirects %s to %s', (from, to) => {
     renderAt(from);
@@ -109,6 +111,8 @@ describe('Settings routes', () => {
     ['/settings/servers/plex-accounts', 'plex accounts'],
     ['/settings/notifications/destinations', 'destinations'],
     ['/settings/notifications/newsletters', 'newsletters'],
+    ['/settings/notifications/newsletters/new', 'newsletter editor'],
+    ['/settings/notifications/newsletters/n-1', 'newsletter editor'],
     ['/settings/access/guest', 'access settings'],
     ['/settings/access/mobile', 'mobile settings'],
     ['/settings/access/remote', 'remote access settings'],
