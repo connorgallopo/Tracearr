@@ -675,7 +675,9 @@
         "includeAction": "Include",
         "excludedCount": "Excluded ({{count}})",
         "excludedAfterSave": "Excluded after save",
-        "includedAfterSave": "Included after save"
+        "includedAfterSave": "Included after save",
+        "emptyTitle": "Nobody will receive this newsletter",
+        "emptyDescription": "Turn on Members above, or add an extra address, to reach someone."
       },
       "delivery": {
         "title": "Delivery",
@@ -708,13 +710,13 @@
         "title": "Readiness",
         "externalUrl": "External URL is set; hosted posters, the browser view and Tracearr links work.",
         "externalUrlFail": "No external URL: hosted posters, the browser view and Tracearr links are off.",
-        "externalUrlUnknown": "External URL is set; hosted posters, the browser view and Tracearr links work.",
         "fromDomain": "The from address matches the SMTP account's domain.",
         "fromDomainFail": "The from address and the SMTP username sit on different domains; some providers refuse that.",
         "fromDomainUnknown": "Pick a destination to check its from address.",
         "recipients": "At least one recipient resolves.",
         "recipientsFail": "Nobody resolves to an address yet.",
         "recipientsUnknown": "Recipients are unknown until the newsletter is saved.",
+        "recipientsLoadFailed": "Recipients could not be loaded.",
         "dns": "Deliverability depends on SPF, DKIM and DMARC records for the sending domain.",
         "dnsLink": "Read how to set them"
       }

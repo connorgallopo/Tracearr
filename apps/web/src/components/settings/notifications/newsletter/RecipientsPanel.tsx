@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronRight, ExternalLink, UserX } from 'lucide-react';
 import type {
   NewsletterRecipientPerson,
   NewsletterRecipientsView,
@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { EmptyState } from '@/components/ui/empty-state';
 import { FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -66,6 +67,33 @@ export function partitionRecipients(
 }
 
 const address = z.email();
+
+/** One row shape shared by the receive, included and excluded lists: a label, an optional
+ * badge and description, and an optional trailing action. */
+function RecipientRow({
+  label,
+  description,
+  badge,
+  action,
+}: {
+  label: string;
+  description?: string | null;
+  badge?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <Item role="listitem" variant="outline" size="sm" aria-label={label}>
+      <ItemContent>
+        <ItemTitle>
+          {label}
+          {badge}
+        </ItemTitle>
+        {description && <ItemDescription>{description}</ItemDescription>}
+      </ItemContent>
+      {action && <ItemActions>{action}</ItemActions>}
+    </Item>
+  );
+}
 
 function MissingRow({
   person,
@@ -153,6 +181,16 @@ export function RecipientsPanel({
   const { receive, missing, excluded, included } = partitionRecipients(data, excludeUserIds);
   const personName = (p: NewsletterRecipientPerson) => p.name ?? p.serverUserId;
 
+  if (receive.length + missing.length + excluded.length + included.length === 0) {
+    return (
+      <EmptyState
+        icon={UserX}
+        title={t('newsletters.editor.recipients.emptyTitle')}
+        description={t('newsletters.editor.recipients.emptyDescription')}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -161,29 +199,17 @@ export function RecipientsPanel({
         </p>
         <ItemGroup className="mt-2 gap-1">
           {receive.map((r) => (
-            <Item
+            <RecipientRow
               key={r.address}
-              role="listitem"
-              variant="outline"
-              size="sm"
-              aria-label={r.address}
-            >
-              <ItemContent>
-                <ItemTitle>
-                  {r.address}
-                  {r.suppressed && (
-                    <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
-                  )}
-                  {r.userId !== null && excludeUserIds.includes(r.userId) && (
-                    <Badge variant="outline">
-                      {t('newsletters.editor.recipients.excludedAfterSave')}
-                    </Badge>
-                  )}
-                </ItemTitle>
-                {r.name && <ItemDescription>{r.name}</ItemDescription>}
-              </ItemContent>
-              {r.userId !== null && !excludeUserIds.includes(r.userId) && (
-                <ItemActions>
+              label={r.address}
+              description={r.name}
+              badge={
+                r.suppressed && (
+                  <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
+                )
+              }
+              action={
+                r.userId !== null && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -195,27 +221,31 @@ export function RecipientsPanel({
                   >
                     {t('newsletters.editor.recipients.excludeAction')}
                   </Button>
-                </ItemActions>
-              )}
-            </Item>
+                )
+              }
+            />
           ))}
           {included.map((p) => (
-            <Item
+            <RecipientRow
               key={p.userId}
-              role="listitem"
-              variant="outline"
-              size="sm"
-              aria-label={personName(p)}
-            >
-              <ItemContent>
-                <ItemTitle>
-                  {personName(p)}
-                  <Badge variant="outline">
-                    {t('newsletters.editor.recipients.includedAfterSave')}
-                  </Badge>
-                </ItemTitle>
-              </ItemContent>
-            </Item>
+              label={personName(p)}
+              badge={
+                <Badge variant="outline">
+                  {t('newsletters.editor.recipients.includedAfterSave')}
+                </Badge>
+              }
+              action={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  aria-label={t('newsletters.editor.recipients.exclude', { name: personName(p) })}
+                  onClick={() => onExclude(p.userId)}
+                >
+                  {t('newsletters.editor.recipients.excludeAction')}
+                </Button>
+              }
+            />
           ))}
         </ItemGroup>
       </div>
@@ -232,7 +262,7 @@ export function RecipientsPanel({
       </div>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
-          <Button type="button" variant="ghost" size="sm" aria-expanded={open}>
+          <Button type="button" variant="ghost" size="sm">
             {open ? <ChevronDown /> : <ChevronRight />}
             {t('newsletters.editor.recipients.excludedCount', { count: excluded.length })}
           </Button>
@@ -240,35 +270,30 @@ export function RecipientsPanel({
         <CollapsibleContent>
           <ItemGroup className="mt-2 gap-1">
             {excluded.map((p) => (
-              <Item
+              <RecipientRow
                 key={p.userId}
-                role="listitem"
-                variant="outline"
-                size="sm"
-                aria-label={personName(p)}
-              >
-                <ItemContent>
-                  <ItemTitle>
-                    {personName(p)}
-                    {p.pending && (
-                      <Badge variant="outline">
-                        {t('newsletters.editor.recipients.excludedAfterSave')}
-                      </Badge>
-                    )}
-                  </ItemTitle>
-                </ItemContent>
-                <ItemActions>
+                label={personName(p)}
+                badge={
+                  p.pending && (
+                    <Badge variant="outline">
+                      {t('newsletters.editor.recipients.excludedAfterSave')}
+                    </Badge>
+                  )
+                }
+                action={
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    aria-label={t('newsletters.editor.recipients.include', { name: personName(p) })}
+                    aria-label={t('newsletters.editor.recipients.include', {
+                      name: personName(p),
+                    })}
                     onClick={() => onInclude(p.userId)}
                   >
                     {t('newsletters.editor.recipients.includeAction')}
                   </Button>
-                </ItemActions>
-              </Item>
+                }
+              />
             ))}
           </ItemGroup>
         </CollapsibleContent>

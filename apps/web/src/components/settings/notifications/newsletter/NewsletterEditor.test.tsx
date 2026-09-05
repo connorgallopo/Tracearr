@@ -229,6 +229,7 @@ describe('NewsletterEditor save flows', () => {
       links: { tracearr: false },
     });
     expect(router.state.location.pathname).toBe('/settings/notifications/newsletters/n-9');
+    expect(router.state.historyAction).toBe('REPLACE');
   });
 
   it('patches only what moved on edit and clears the dirty state after', async () => {

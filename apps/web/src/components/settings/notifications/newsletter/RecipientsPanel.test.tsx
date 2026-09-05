@@ -131,4 +131,39 @@ describe('RecipientsPanel', () => {
     );
     expect(onInclude).toHaveBeenCalledWith('u4');
   });
+
+  it('offers an Exclude action on a person moved back from Excluded, same as any recipient', async () => {
+    const { onExclude } = renderPanel([]);
+    expect(screen.getByRole('listitem', { name: 'Dee' })).toHaveTextContent(
+      'newsletters.editor.recipients.includedAfterSave'
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
+    );
+    expect(onExclude).toHaveBeenCalledWith('u4');
+  });
+
+  it('shows an empty state when nobody resolves to a recipient at all', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: { recipients: [], missing: [], excluded: [] },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <MemoryRouter>
+        <RecipientsPanel
+          newsletterId="n-1"
+          excludeUserIds={[]}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+    expect(screen.getByText('newsletters.editor.recipients.emptyTitle')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.recipients.emptyDescription')).toBeInTheDocument();
+    expect(
+      screen.queryByText('newsletters.editor.recipients.willReceive:{"count":0}')
+    ).not.toBeInTheDocument();
+  });
 });

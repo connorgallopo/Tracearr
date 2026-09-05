@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import type { Destination, Settings } from '@tracearr/shared';
+import type { Destination, NewsletterRecipientsView, Settings } from '@tracearr/shared';
 import { defaultFormState, type NewsletterFormState } from './newsletterForm';
 import { RecipientsFields } from './RecipientsFields';
 import { DeliveryFields } from './DeliveryFields';
@@ -111,6 +111,72 @@ describe('RecipientsFields', () => {
       recipients: { ...p.state.recipients, extraAddresses: [] },
     });
   });
+
+  it('excludes, includes, and excludes a person again, patching recipients each time', async () => {
+    const view: NewsletterRecipientsView = {
+      recipients: [],
+      missing: [],
+      excluded: [{ userId: 'u4', serverUserId: 'su-4', name: 'Dee' }],
+    };
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: view,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    const p = props();
+    const { rerender } = render(
+      <MemoryRouter>
+        <RecipientsFields {...p} newsletterId="n-1" />
+      </MemoryRouter>
+    );
+
+    // Dee starts server-excluded but not locally excluded, so she opens in the "included after
+    // save" bucket; that bucket must offer the same Exclude action a normal recipient gets.
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
+    );
+    expect(p.onChange).toHaveBeenLastCalledWith({
+      recipients: { ...p.state.recipients, excludeUserIds: ['u4'] },
+    });
+
+    rerender(
+      <MemoryRouter>
+        <RecipientsFields
+          {...p}
+          newsletterId="n-1"
+          state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: ['u4'] } }}
+        />
+      </MemoryRouter>
+    );
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'newsletters.editor.recipients.excludedCount:{"count":1}',
+      })
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.recipients.include:{"name":"Dee"}' })
+    );
+    expect(p.onChange).toHaveBeenLastCalledWith({
+      recipients: { ...p.state.recipients, excludeUserIds: [] },
+    });
+
+    rerender(
+      <MemoryRouter>
+        <RecipientsFields
+          {...p}
+          newsletterId="n-1"
+          state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: [] } }}
+        />
+      </MemoryRouter>
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
+    );
+    expect(p.onChange).toHaveBeenLastCalledWith({
+      recipients: { ...p.state.recipients, excludeUserIds: ['u4'] },
+    });
+  });
 });
 
 describe('DeliveryFields', () => {
@@ -216,5 +282,24 @@ describe('readiness', () => {
       screen.getByRole('link', { name: 'newsletters.editor.readiness.dnsLink' })
     ).toHaveAttribute('href', 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc');
     expect(screen.getByText('newsletters.editor.readiness.recipientsUnknown')).toBeInTheDocument();
+  });
+
+  it('says recipients failed to load in edit mode instead of unknown-until-saved', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <MemoryRouter>
+        <ReadinessList state={{ ...defaultFormState(), destinationId: 'd-1' }} newsletterId="n-1" />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByText('newsletters.editor.readiness.recipientsLoadFailed')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('newsletters.editor.readiness.recipientsUnknown')
+    ).not.toBeInTheDocument();
   });
 });
