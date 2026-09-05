@@ -52,6 +52,9 @@ vi.mock('@/components/settings/data/Backup', () => ({
 vi.mock('@/components/settings/notifications/Destinations', () => ({
   Destinations: () => <div>destinations</div>,
 }));
+vi.mock('@/components/settings/notifications/Email', () => ({
+  Email: () => <div>email settings</div>,
+}));
 vi.mock('@/components/settings/notifications/Newsletters', () => ({
   Newsletters: () => <div>newsletters</div>,
 }));
@@ -94,7 +97,6 @@ describe('Settings routes', () => {
     ['/settings/import', '/settings/data/import'],
     ['/settings/jobs', '/settings/data/jobs'],
     ['/settings/backup', '/settings/data/backup'],
-    ['/settings/notifications/email', '/settings/notifications/destinations'],
   ])('redirects %s to %s', (from, to) => {
     renderAt(from);
 
@@ -110,6 +112,7 @@ describe('Settings routes', () => {
     ['/settings/servers/posters', 'poster source'],
     ['/settings/servers/plex-accounts', 'plex accounts'],
     ['/settings/notifications/destinations', 'destinations'],
+    ['/settings/notifications/email', 'email settings'],
     ['/settings/notifications/newsletters', 'newsletters'],
     ['/settings/notifications/newsletters/new', 'newsletter editor'],
     ['/settings/notifications/newsletters/n-1', 'newsletter editor'],

@@ -778,6 +778,46 @@
       "retryFailed": "Retry failed"
     }
   },
+  "email": {
+    "ownerOnly": "Only the owner can manage email branding and the suppression list.",
+    "branding": {
+      "title": "Branding",
+      "description": "Applied to every email Tracearr sends: alerts and newsletters alike.",
+      "logo": {
+        "label": "Logo",
+        "tracearr": "Tracearr",
+        "none": "No logo",
+        "url": "An image at a URL"
+      },
+      "logoUrl": "Logo URL",
+      "accent": "Accent color",
+      "accentPicker": "Pick the accent color",
+      "footerText": "Footer text",
+      "footerTextHelp": "One line under every email, such as who runs the server.",
+      "postalAddress": "Postal address",
+      "postalAddressHelp": "Optional; some jurisdictions expect one on bulk mail.",
+      "mailto": "Offer unsubscribe by email too",
+      "mailtoHelp": "Adds a mailto form to the List-Unsubscribe header; it points at the destination's reply-to, which someone has to read.",
+      "save": "Save branding",
+      "saving": "Saving"
+    },
+    "suppressions": {
+      "title": "Suppressed addresses",
+      "globalNote": "Suppression is global to the address: it opts the address out of every newsletter on this install.",
+      "empty": "No suppressed addresses",
+      "emptyDescription": "Unsubscribes land here on their own; add an address by hand to keep it off every list.",
+      "add": "Add address",
+      "addTitle": "Suppress an address",
+      "addDescription": "The address will not receive any newsletter until it is removed from this list.",
+      "address": "Email address",
+      "addConfirm": "Suppress",
+      "reason": { "unsubscribed": "Unsubscribed", "manual": "Added by hand" },
+      "openSource": "Open the newsletter this came from",
+      "remove": "Remove {{address}} from the list",
+      "removeTitle": "Remove this address?",
+      "removeDescription": "{{address}} will receive newsletters again from the next send."
+    }
+  },
   "shared": {
     "timezone": {
       "placeholder": "Pick a timezone",

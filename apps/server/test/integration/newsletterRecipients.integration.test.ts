@@ -8,8 +8,16 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { seedBasicOwner, seedMultipleUsers } from '@tracearr/test-utils';
+import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
-import { emailSuppressions, serverUsers, servers, users } from '../../src/db/schema.js';
+import {
+  emailSuppressions,
+  newsletters,
+  newsletterSends,
+  serverUsers,
+  servers,
+  users,
+} from '../../src/db/schema.js';
 import { loadCandidates } from '../../src/services/newsletters/recipients.js';
 import {
   addSuppression,
@@ -83,9 +91,36 @@ describe('recipient candidates', () => {
   it('suppressions are lowercased, idempotent, and queryable by set', async () => {
     await addSuppression('Gone@Example.com', 'manual');
     await addSuppression('gone@example.com', 'unsubscribed');
+    const [row] = await db
+      .insert(newsletters)
+      .values({
+        name: 'Weekly',
+        schedule: { kind: 'daily', time: '08:00' },
+        timezone: 'UTC',
+        window: { kind: 'fixed', days: 7 },
+        scope: { serverIds: [], libraryIds: [] },
+        sections: DEFAULT_NEWSLETTER_SECTIONS,
+        subject: 's',
+        recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
+      })
+      .returning();
+    const [send] = await db
+      .insert(newsletterSends)
+      .values({
+        newsletterId: row!.id,
+        viewToken: 'v'.repeat(43),
+        trigger: 'schedule',
+        windowStart: new Date('2026-08-26T00:00:00Z'),
+        windowEnd: new Date('2026-09-02T00:00:00Z'),
+        outcome: 'sent',
+      })
+      .returning();
+    await addSuppression('left@example.com', 'unsubscribed', send!.id);
     const list = await listSuppressions();
-    expect(list).toHaveLength(1);
-    expect(list[0]).toMatchObject({ address: 'gone@example.com', reason: 'manual' });
+    expect(list.map((s) => [s.address, s.reason, s.sourceSendId, s.sourceNewsletterId])).toEqual([
+      ['left@example.com', 'unsubscribed', send!.id, row!.id],
+      ['gone@example.com', 'manual', null, null],
+    ]);
     expect(await suppressedAmong(['GONE@example.com', 'stay@example.com'])).toEqual(
       new Set(['gone@example.com'])
     );

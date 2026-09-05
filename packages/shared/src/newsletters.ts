@@ -323,6 +323,7 @@ export interface EmailSuppression {
   address: string;
   reason: EmailSuppressionReason;
   sourceSendId: string | null;
+  sourceNewsletterId: string | null;
   createdAt: string;
 }
 

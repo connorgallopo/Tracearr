@@ -1,18 +1,29 @@
 import { desc, eq, inArray } from 'drizzle-orm';
 import type { EmailSuppression, EmailSuppressionReason } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { emailSuppressions } from '../../db/schema.js';
+import { emailSuppressions, newsletterSends } from '../../db/schema.js';
 
 export function normalizeAddress(address: string): string {
   return address.trim().toLowerCase();
 }
 
 export async function listSuppressions(): Promise<EmailSuppression[]> {
-  const rows = await db.select().from(emailSuppressions).orderBy(desc(emailSuppressions.createdAt));
+  const rows = await db
+    .select({
+      address: emailSuppressions.address,
+      reason: emailSuppressions.reason,
+      sourceSendId: emailSuppressions.sourceSendId,
+      sourceNewsletterId: newsletterSends.newsletterId,
+      createdAt: emailSuppressions.createdAt,
+    })
+    .from(emailSuppressions)
+    .leftJoin(newsletterSends, eq(newsletterSends.id, emailSuppressions.sourceSendId))
+    .orderBy(desc(emailSuppressions.createdAt));
   return rows.map((row) => ({
     address: row.address,
     reason: row.reason,
     sourceSendId: row.sourceSendId,
+    sourceNewsletterId: row.sourceNewsletterId ?? null,
     createdAt: row.createdAt.toISOString(),
   }));
 }

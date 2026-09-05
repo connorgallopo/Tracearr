@@ -17,6 +17,7 @@ import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
 import { Jobs } from '@/components/settings/data/Jobs';
 import { Backup } from '@/components/settings/data/Backup';
 import { Destinations } from '@/components/settings/notifications/Destinations';
+import { Email } from '@/components/settings/notifications/Email';
 import { Newsletters } from '@/components/settings/notifications/Newsletters';
 import { NewsletterEditor } from '@/components/settings/notifications/newsletter/NewsletterEditor';
 
@@ -48,10 +49,7 @@ export function Settings() {
             <Route path="notifications/newsletters" element={<Newsletters />} />
             <Route path="notifications/newsletters/new" element={<NewsletterEditor />} />
             <Route path="notifications/newsletters/:id" element={<NewsletterEditor />} />
-            <Route
-              path="notifications/email"
-              element={<Navigate to="/settings/notifications/destinations" replace />}
-            />
+            <Route path="notifications/email" element={<Email />} />
 
             <Route path="access/guest" element={<Guest />} />
             <Route path="access/mobile" element={<MobileDevices />} />
