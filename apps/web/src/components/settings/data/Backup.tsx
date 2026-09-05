@@ -35,7 +35,8 @@ import { useMaintenanceMode, MAINTENANCE_EVENT } from '@/hooks/useMaintenanceMod
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
-import { BackupHistory, dateLabel } from './BackupHistory';
+import { dateLabel } from '@/components/settings/shared/dateLabel';
+import { BackupHistory } from './BackupHistory';
 
 const RETENTION_DEBOUNCE_MS = 1000;
 

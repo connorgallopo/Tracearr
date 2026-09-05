@@ -29,8 +29,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatBytes } from '@/lib/formatters';
-import { getDateTimeFormatString, getFullDateTimeFormatString } from '@/lib/timeFormat';
+import { getFullDateTimeFormatString } from '@/lib/timeFormat';
 import { api } from '@/lib/api';
+import { dateLabel } from '@/components/settings/shared/dateLabel';
 
 interface BackupRow {
   filename: string;
@@ -40,18 +41,6 @@ interface BackupRow {
   size: string;
   version: string;
   item: BackupListItem;
-}
-
-/** The current year is implied; anything older says which year it came from. */
-export function dateLabel(iso: string): string {
-  const date = new Date(iso);
-  const pattern = getDateTimeFormatString();
-  return format(
-    date,
-    date.getFullYear() === new Date().getFullYear()
-      ? pattern
-      : pattern.replace('MMM d,', 'MMM d, yyyy,')
-  );
 }
 
 export function BackupHistory({

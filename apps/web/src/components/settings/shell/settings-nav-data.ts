@@ -3,7 +3,6 @@ import type { ParseKeys } from 'i18next';
 export interface SettingsSectionItem {
   nameKey: ParseKeys<'settings'>;
   href: string;
-  hidden?: boolean;
 }
 
 export interface SettingsGroup {
@@ -37,12 +36,8 @@ export const settingsNav: SettingsGroup[] = [
     labelKey: 'nav.groups.notifications',
     sections: [
       { nameKey: 'nav.sections.destinations', href: '/settings/notifications/destinations' },
-      {
-        nameKey: 'nav.sections.newsletters',
-        href: '/settings/notifications/newsletters',
-        hidden: true,
-      },
-      { nameKey: 'nav.sections.email', href: '/settings/notifications/email', hidden: true },
+      { nameKey: 'nav.sections.newsletters', href: '/settings/notifications/newsletters' },
+      { nameKey: 'nav.sections.email', href: '/settings/notifications/email' },
     ],
   },
   {
@@ -64,19 +59,21 @@ export const settingsNav: SettingsGroup[] = [
   },
 ];
 
-/** Hidden sections have no route until stage 4, so nothing can be active at their href. */
+/** A nested route such as the newsletter editor highlights the section it sits under; the longest matching href wins. */
 export function findSettingsSection(
   pathname: string
 ): { group: SettingsGroup; section: SettingsSectionItem } | null {
   const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+  let best: { group: SettingsGroup; section: SettingsSectionItem } | null = null;
 
   for (const group of settingsNav) {
     for (const section of group.sections) {
-      if (!section.hidden && section.href === normalized) {
-        return { group, section };
+      const matches = normalized === section.href || normalized.startsWith(`${section.href}/`);
+      if (matches && (best === null || section.href.length > best.section.href.length)) {
+        best = { group, section };
       }
     }
   }
 
-  return null;
+  return best;
 }

@@ -52,17 +52,14 @@ describe('SettingsNav', () => {
     );
   });
 
-  it('leaves the two hidden sections out of both the column and the select', async () => {
-    renderNav('/settings/notifications/destinations');
+  it('highlights Newsletters for a nested editor path in both the column and the select', () => {
+    renderNav('/settings/notifications/newsletters/new');
 
-    expect(
-      screen.queryByRole('link', { name: 'nav.sections.newsletters' })
-    ).not.toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('combobox'));
-    expect(
-      screen.queryByRole('option', { name: /nav.sections.newsletters/ })
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'nav.sections.newsletters' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByRole('combobox')).toHaveTextContent('nav.sections.newsletters');
   });
 
   it('offers every section in the select as "Group / Section"', async () => {

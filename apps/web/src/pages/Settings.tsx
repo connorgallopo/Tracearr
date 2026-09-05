@@ -17,6 +17,7 @@ import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
 import { Jobs } from '@/components/settings/data/Jobs';
 import { Backup } from '@/components/settings/data/Backup';
 import { Destinations } from '@/components/settings/notifications/Destinations';
+import { Newsletters } from '@/components/settings/notifications/Newsletters';
 
 const WIDE_SECTIONS = new Set([BACKUP_HREF]);
 
@@ -43,6 +44,19 @@ export function Settings() {
             <Route path="servers/plex-accounts" element={<PlexAccounts />} />
 
             <Route path="notifications/destinations" element={<Destinations />} />
+            <Route path="notifications/newsletters" element={<Newsletters />} />
+            <Route
+              path="notifications/newsletters/new"
+              element={<Navigate to="/settings/notifications/newsletters" replace />}
+            />
+            <Route
+              path="notifications/newsletters/:id"
+              element={<Navigate to="/settings/notifications/newsletters" replace />}
+            />
+            <Route
+              path="notifications/email"
+              element={<Navigate to="/settings/notifications/destinations" replace />}
+            />
 
             <Route path="access/guest" element={<Guest />} />
             <Route path="access/mobile" element={<MobileDevices />} />

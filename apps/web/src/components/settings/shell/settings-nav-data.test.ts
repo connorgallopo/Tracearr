@@ -23,13 +23,9 @@ describe('settings nav data', () => {
     expect(settingsNav[0]?.sections[0]?.href).toBe(SETTINGS_HOME);
   });
 
-  it('carries the two stage 4 sections hidden', () => {
-    const hidden = settingsNav
-      .flatMap((group) => group.sections)
-      .filter((section) => section.hidden)
-      .map((section) => section.href);
-
-    expect(hidden).toEqual([
+  it('lists newsletters and email under notifications', () => {
+    expect(settingsNav[2]?.sections.map((section) => section.href)).toEqual([
+      '/settings/notifications/destinations',
       '/settings/notifications/newsletters',
       '/settings/notifications/email',
     ]);
@@ -47,8 +43,16 @@ describe('settings nav data', () => {
     expect(findSettingsSection('/settings/data/jobs/')?.section.href).toBe('/settings/data/jobs');
   });
 
-  it('finds nothing for a hidden section or an unknown path', () => {
-    expect(findSettingsSection('/settings/notifications/newsletters')).toBeNull();
+  it('matches a nested editor path to its section by prefix', () => {
+    expect(findSettingsSection('/settings/notifications/newsletters/new')?.section.href).toBe(
+      '/settings/notifications/newsletters'
+    );
+    expect(
+      findSettingsSection(
+        '/settings/notifications/newsletters/2c7a0b1e-0000-4000-8000-000000000001'
+      )?.section.nameKey
+    ).toBe('nav.sections.newsletters');
+    expect(findSettingsSection('/settings/notifications/newslettersx')).toBeNull();
     expect(findSettingsSection('/settings/nope')).toBeNull();
   });
 });

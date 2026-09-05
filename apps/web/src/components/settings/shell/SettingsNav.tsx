@@ -8,12 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  findSettingsSection,
-  settingsNav,
-  type SettingsGroup,
-  type SettingsSectionItem,
-} from './settings-nav-data';
+import { findSettingsSection, settingsNav } from './settings-nav-data';
 
 // The app's small-caps label convention (see UpdateDialog.tsx).
 const GROUP_LABEL =
@@ -23,10 +18,6 @@ const LINK =
   'ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex h-8 items-center rounded-md px-2 text-sm outline-hidden transition-colors focus-visible:ring-2';
 
 const LINK_ACTIVE = 'bg-sidebar-primary text-sidebar-primary-foreground font-medium';
-
-function visibleSections(group: SettingsGroup): SettingsSectionItem[] {
-  return group.sections.filter((section) => !section.hidden);
-}
 
 export function SettingsNav(): React.JSX.Element {
   const { t } = useTranslation('settings');
@@ -48,7 +39,7 @@ export function SettingsNav(): React.JSX.Element {
           </SelectTrigger>
           <SelectContent>
             {settingsNav.flatMap((group) =>
-              visibleSections(group).map((section) => (
+              group.sections.map((section) => (
                 <SelectItem key={section.href} value={section.href}>
                   {t('nav.itemLabel', {
                     group: t(group.labelKey),
@@ -65,7 +56,7 @@ export function SettingsNav(): React.JSX.Element {
         {settingsNav.map((group) => (
           <div key={group.labelKey} className="space-y-0.5">
             <p className={GROUP_LABEL}>{t(group.labelKey)}</p>
-            {visibleSections(group).map((section) => (
+            {group.sections.map((section) => (
               <NavLink
                 key={section.href}
                 to={section.href}

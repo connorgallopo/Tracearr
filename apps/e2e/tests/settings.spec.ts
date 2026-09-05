@@ -15,7 +15,8 @@ test.describe('Settings', () => {
     for (const group of ['General', 'Servers', 'Notifications', 'Access', 'Data & API']) {
       await expect(nav.getByText(group, { exact: true })).toBeVisible();
     }
-    await expect(nav.getByRole('link', { name: 'Newsletters' })).toHaveCount(0);
+    await expect(nav.getByRole('link', { name: 'Newsletters' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Email' })).toBeVisible();
   });
 
   test('navigates between sections through the nav column', async ({ page }) => {

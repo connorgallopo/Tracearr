@@ -43,7 +43,9 @@
       "import": "Bring watch history in from Tautulli, Jellystat or Playback Reporting.",
       "backup": "Snapshots of the database and configuration.",
       "jobs": "Maintenance tasks you can run on demand.",
-      "api": "The public API key, its rate limit and what counts as watched."
+      "api": "The public API key, its rate limit and what counts as watched.",
+      "newsletters": "Recently added titles, emailed to a server's members on a schedule.",
+      "email": "Branding for every email Tracearr sends, and the addresses that opted out."
     }
   },
   "general": {
@@ -535,6 +537,45 @@
     }
   },
   "newsletters": {
+    "ownerOnly": "Only the owner can manage newsletters.",
+    "new": "New newsletter",
+    "empty": "No newsletters yet",
+    "emptyDescription": "A newsletter emails the members of a server what was added recently.",
+    "noDestinationTitle": "Add an email destination first",
+    "noDestinationDescription": "Newsletters send through an email destination, and none exists yet.",
+    "goToDestinations": "Go to Destinations",
+    "enabled": "Enabled",
+    "rowActions": "Newsletter actions",
+    "duplicate": "Duplicate",
+    "deleteTitle": "Delete this newsletter?",
+    "deleteDescription": "{{name}} and its send history will be deleted. Suppressed addresses stay suppressed.",
+    "schedule": {
+      "daily": "Daily at {{time}}",
+      "weekly": "Weekly on {{day}} at {{time}}",
+      "monthly": "Monthly on day {{day}} at {{time}}",
+      "cron": "Cron {{expression}}",
+      "inZone": "{{summary}}, {{timezone}}"
+    },
+    "nextRun": "Next run {{when}}",
+    "noNextRun": "Not scheduled",
+    "neverSent": "Never sent",
+    "lastSend": "{{outcome}} to {{count}}",
+    "outcome": {
+      "rendering": "Rendering",
+      "sending": "Sending",
+      "sent": "Sent",
+      "partial": "Partly sent",
+      "failed": "Failed",
+      "skipped_empty": "Nothing new"
+    },
+    "counts": {
+      "movies_one": "{{count}} movie",
+      "movies_other": "{{count}} movies",
+      "shows_one": "{{count}} show",
+      "shows_other": "{{count}} shows",
+      "albums_one": "{{count}} album",
+      "albums_other": "{{count}} albums"
+    },
     "copyOf": "Copy of {{name}}",
     "richText": {
       "bold": "Bold",
