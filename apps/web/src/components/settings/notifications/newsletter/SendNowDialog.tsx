@@ -23,7 +23,11 @@ export function SendNowDialog({ newsletterId, name, timezone, onOpenChange }: Se
   useEffect(() => {
     setSummary(null);
     if (!newsletterId) return;
-    preview.mutate(newsletterId, { onSuccess: setSummary });
+    preview.mutate(newsletterId, {
+      onSuccess: setSummary,
+      // The hook's own onError already toasts the failure; here we just close a dialog that can't proceed.
+      onError: () => onOpenChange(false),
+    });
     // The mutation object is a new reference each render; only the id decides when to preview.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newsletterId]);

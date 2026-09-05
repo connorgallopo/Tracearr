@@ -58,6 +58,11 @@ export function NewsletterActions({ newsletter, dirty, saveThen }: NewsletterAct
     });
   };
 
+  const openTest = () => {
+    setTestAddress(user?.email ?? '');
+    setTestOpen(true);
+  };
+
   const meta = previewed && (
     <div className="text-muted-foreground flex flex-col gap-1 text-sm">
       <span>
@@ -83,7 +88,7 @@ export function NewsletterActions({ newsletter, dirty, saveThen }: NewsletterAct
         <Eye />
         {label('preview')}
       </Button>
-      <Button variant="outline" onClick={() => saveThen(() => setTestOpen(true))}>
+      <Button variant="outline" onClick={() => saveThen(openTest)}>
         <TestTube2 />
         {label('test')}
       </Button>

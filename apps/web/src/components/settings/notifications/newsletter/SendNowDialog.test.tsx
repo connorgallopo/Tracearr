@@ -61,6 +61,18 @@ describe('SendNowDialog', () => {
     expect(screen.getByRole('button', { name: 'newsletters.editor.send.confirm' })).toBeDisabled();
   });
 
+  it('closes on a failed preview instead of sticking on "previewing"', async () => {
+    previewMutate.mockImplementation((_id: string, opts: { onError: () => void }) =>
+      opts.onError()
+    );
+    const onOpenChange = vi.fn();
+    render(
+      <SendNowDialog newsletterId="n-1" name="Weekly" timezone="UTC" onOpenChange={onOpenChange} />
+    );
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(sendMutate).not.toHaveBeenCalled();
+  });
+
   it('renders nothing while closed', () => {
     render(
       <SendNowDialog newsletterId={null} name="Weekly" timezone="UTC" onOpenChange={vi.fn()} />

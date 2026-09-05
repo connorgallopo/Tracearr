@@ -1,7 +1,5 @@
 import type { NewsletterPreview } from '@tracearr/shared';
-import { countsLine } from '../newsletterFormat';
-
-type Translate = (key: string, vars?: Record<string, unknown>) => string;
+import { countsLine, type Translate } from '../newsletterFormat';
 
 export function windowLabel(iso: string, locale?: string, timeZone?: string): string {
   return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', timeZone }).format(

@@ -101,6 +101,19 @@ describe('NewsletterActions', () => {
     );
   });
 
+  it('resets the test address on reopen instead of keeping an edited-then-cancelled value', async () => {
+    render(<NewsletterActions newsletter={newsletter} dirty={false} saveThen={(next) => next()} />);
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.actions.test' }));
+    const input = screen.getByLabelText('newsletters.editor.test.address');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'someone-else@example.com');
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.cancel' }));
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.actions.test' }));
+    expect(screen.getByLabelText('newsletters.editor.test.address')).toHaveValue(
+      'owner@example.com'
+    );
+  });
+
   it('opens the send-now confirmation', async () => {
     render(<NewsletterActions newsletter={newsletter} dirty={false} saveThen={(next) => next()} />);
     await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.actions.send' }));
