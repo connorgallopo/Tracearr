@@ -1,20 +1,29 @@
-import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Info } from 'lucide-react';
+import { Info, Loader2, Save } from 'lucide-react';
 import type { Newsletter } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { FieldGroup } from '@/components/ui/field';
+import { BindingDoors } from '@/components/ui/form-doors';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { RichTextChange } from '@/components/ui/rich-text-normalize';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { useNewsletter } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
+import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { ContentFields } from './ContentFields';
+import { DeliveryFields } from './DeliveryFields';
 import { IdentityFields } from './IdentityFields';
+import { LinksFields } from './LinksFields';
 import { MessageFields } from './MessageFields';
+import { NEWSLETTERS_PATH } from '../Newsletters';
+import { ReadinessList } from './ReadinessList';
+import { RecipientsFields } from './RecipientsFields';
 import { ScheduleFields } from './ScheduleFields';
+import { useNewsletterSave } from './useNewsletterSave';
 import {
   defaultFormState,
   seedFromNewsletter,
@@ -28,12 +37,40 @@ interface EditorFormProps {
   newsletter: Newsletter | null;
 }
 
-function EditorForm({ seed, newsletter }: EditorFormProps) {
-  const { t } = useTranslation('settings');
-  const [state, setState] = useState<NewsletterFormState>(seed);
+function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
+  const { t } = useTranslation(['settings', 'common', 'pages']);
+  const navigate = useNavigate();
+  const [seed, setSeed] = useState<NewsletterFormState>(initialSeed);
+  const [state, setState] = useState<NewsletterFormState>(initialSeed);
   const [richTextErrors, setRichTextErrors] = useState<RichTextErrors>({});
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const mode = newsletter ? 'edit' : 'create';
   const errors = validateForm(state);
+  const valid =
+    Object.keys(errors).length === 0 && Object.values(richTextErrors).every((e) => e === undefined);
+
+  const {
+    dirty,
+    pending,
+    save,
+    saveThen: _saveThen,
+  } = useNewsletterSave({
+    newsletterId: newsletter?.id ?? null,
+    seed,
+    state,
+    valid,
+    onSaved: (row, saved) => {
+      setSeed(saved);
+      if (!newsletter) setRedirectTo(`${NEWSLETTERS_PATH}/${row.id}`);
+    },
+  });
+  const blocker = useUnsavedChanges(dirty);
+
+  // Once the save has landed the guard is clean, and only then may a fresh row's page move:
+  // navigating in the same tick as the save would still see the pre-save dirty flag and block itself.
+  useEffect(() => {
+    if (redirectTo !== null && !dirty) void navigate(redirectTo, { replace: true });
+  }, [redirectTo, dirty, navigate]);
 
   const onChange = (patch: Partial<NewsletterFormState>) =>
     setState((current) => ({ ...current, ...patch }));
@@ -41,6 +78,13 @@ function EditorForm({ seed, newsletter }: EditorFormProps) {
     setRichTextErrors((current) => ({ ...current, [field]: change.error ?? undefined }));
     if (change.error === null) onChange({ [field]: change.value });
   };
+
+  const status = dirty ? (
+    <span className="text-muted-foreground flex items-center gap-2 text-sm">
+      <span className="bg-primary size-1.5 rounded-full" />
+      {t('newsletters.editor.unsaved')}
+    </span>
+  ) : null;
 
   const form = (
     <FieldGroup className="gap-8">
@@ -62,12 +106,44 @@ function EditorForm({ seed, newsletter }: EditorFormProps) {
         onRichText={onRichText}
         fieldKey={newsletter?.id ?? 'new'}
       />
-      <div data-slot="editor-footer" />
+      <RecipientsFields
+        state={state}
+        onChange={onChange}
+        errors={errors}
+        mode={mode}
+        newsletterId={newsletter?.id ?? null}
+      />
+      <DeliveryFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <LinksFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <ReadinessList state={state} newsletterId={newsletter?.id ?? null} />
+      <BindingDoors
+        className="bg-background/95 sticky bottom-0 z-10 border-t pt-4 pb-3 backdrop-blur"
+        primaryLabel={pending ? t('newsletters.editor.saving') : t('newsletters.editor.save')}
+        primaryIcon={pending ? <Loader2 className="animate-spin" /> : <Save />}
+        pending={pending}
+        disabled={!valid || !dirty}
+        status={status}
+        onPrimary={save}
+      />
+      <ConfirmDialog
+        open={blocker.state === 'blocked'}
+        onOpenChange={(open) => {
+          if (!open) blocker.reset?.();
+        }}
+        title={t('pages:automations.builder.leave.title')}
+        description={t('common:confirmations.unsavedChanges')}
+        confirmLabel={t('pages:automations.builder.leave.confirm')}
+        cancelLabel={t('common:actions.cancel')}
+        onConfirm={() => blocker.proceed?.()}
+      />
     </FieldGroup>
   );
 
   return (
-    <SettingsSection title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}>
+    <SettingsSection
+      title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}
+      actions={null}
+    >
       {newsletter ? (
         <Tabs defaultValue="edit">
           <TabsList>

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router';
+import userEvent from '@testing-library/user-event';
+import { createMemoryRouter, Link, RouterProvider } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { Newsletter } from '@tracearr/shared';
 import { NewsletterEditor } from './NewsletterEditor';
 
@@ -12,17 +14,33 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
+
+const createMutate = vi.fn();
+const updateMutate = vi.fn();
+
 vi.mock('@/hooks/queries', () => ({
   useNewsletter: vi.fn(),
   useServers: () => ({ data: [] }),
   useLibraries: () => ({ data: { data: [] }, isLoading: false }),
+  useCreateNewsletter: () => ({ mutate: createMutate, isPending: false }),
+  useUpdateNewsletter: () => ({ mutate: updateMutate, isPending: false }),
+  useDestinations: vi.fn(),
+  useSettings: vi.fn(),
+  useNewsletterRecipients: vi.fn(),
+  useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
+  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 vi.mock('@/components/ui/rich-text-field', () => ({
   RichTextField: ({ id }: { id: string }) => <div data-testid={`rich-${id}`} />,
 }));
 
 import { useAuth } from '@/hooks/useAuth';
-import { useNewsletter } from '@/hooks/queries';
+import {
+  useDestinations,
+  useNewsletter,
+  useNewsletterRecipients,
+  useSettings,
+} from '@/hooks/queries';
 
 const row = {
   id: 'n-1',
@@ -57,14 +75,37 @@ function renderAt(path: string, role = 'owner') {
   vi.mocked(useAuth).mockReturnValue({
     user: { role, email: 'me@example.com' },
   } as unknown as ReturnType<typeof useAuth>);
-  return render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path="/settings/notifications/newsletters/new" element={<NewsletterEditor />} />
-        <Route path="/settings/notifications/newsletters/:id" element={<NewsletterEditor />} />
-      </Routes>
-    </MemoryRouter>
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/settings/notifications/newsletters/new',
+        element: (
+          <>
+            <NewsletterEditor />
+            <Link to="/elsewhere">elsewhere</Link>
+          </>
+        ),
+      },
+      {
+        path: '/settings/notifications/newsletters/:id',
+        element: (
+          <>
+            <NewsletterEditor />
+            <Link to="/elsewhere">elsewhere</Link>
+          </>
+        ),
+      },
+      { path: '/elsewhere', element: <h1>elsewhere</h1> },
+    ],
+    { initialEntries: [path] }
   );
+  const view = render(
+    <QueryClientProvider client={client}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
+  return { ...view, router, client };
 }
 
 beforeEach(() => {
@@ -74,6 +115,18 @@ beforeEach(() => {
     isLoading: false,
     isError: false,
   } as unknown as ReturnType<typeof useNewsletter>);
+  vi.mocked(useDestinations).mockReturnValue({
+    data: [],
+  } as unknown as ReturnType<typeof useDestinations>);
+  vi.mocked(useSettings).mockReturnValue({
+    data: {},
+  } as unknown as ReturnType<typeof useSettings>);
+  vi.mocked(useNewsletterRecipients).mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof useNewsletterRecipients>);
 });
 
 describe('NewsletterEditor', () => {
@@ -96,7 +149,7 @@ describe('NewsletterEditor', () => {
       isLoading: true,
       isError: false,
     } as unknown as ReturnType<typeof useNewsletter>);
-    const { rerender } = renderAt('/settings/notifications/newsletters/n-1');
+    const { rerender, client } = renderAt('/settings/notifications/newsletters/n-1');
     expect(screen.getByTestId('newsletter-editor-loading')).toBeInTheDocument();
 
     vi.mocked(useNewsletter).mockReturnValue({
@@ -104,12 +157,21 @@ describe('NewsletterEditor', () => {
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof useNewsletter>);
+    // A fresh router (not the loading one) forces react-router's memoized route
+    // matches to recompute, so the newly-loaded row actually reaches the form.
+    const loadedRouter = createMemoryRouter(
+      [
+        {
+          path: '/settings/notifications/newsletters/:id',
+          element: <NewsletterEditor />,
+        },
+      ],
+      { initialEntries: ['/settings/notifications/newsletters/n-1'] }
+    );
     rerender(
-      <MemoryRouter initialEntries={['/settings/notifications/newsletters/n-1']}>
-        <Routes>
-          <Route path="/settings/notifications/newsletters/:id" element={<NewsletterEditor />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={client}>
+        <RouterProvider router={loadedRouter} />
+      </QueryClientProvider>
     );
     expect(useNewsletter).toHaveBeenCalledWith('n-1');
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Weekly');
@@ -135,5 +197,64 @@ describe('NewsletterEditor', () => {
     // apps/web's tsconfig lib omits general ES2022 Array methods, so Array#at is unavailable here.
     const alerts = screen.getAllByRole('alert');
     expect(alerts[alerts.length - 1]).toHaveTextContent('Newsletter not found');
+  });
+});
+
+describe('NewsletterEditor save flows', () => {
+  it('shows the unsaved dot once something changes, disables Save while invalid, and posts the whole object on create', async () => {
+    createMutate.mockImplementation(
+      (_body: unknown, opts: { onSuccess: (row: Newsletter) => void }) =>
+        opts.onSuccess({ ...row, id: 'n-9' })
+    );
+    vi.mocked(useNewsletter).mockImplementation(
+      (id) =>
+        (id === 'n-9'
+          ? { data: { ...row, id: 'n-9' }, isLoading: false, isError: false }
+          : { data: undefined, isLoading: false, isError: false }) as unknown as ReturnType<
+          typeof useNewsletter
+        >
+    );
+    const { router } = renderAt('/settings/notifications/newsletters/new');
+    const save = screen.getByRole('button', { name: 'newsletters.editor.save' });
+    expect(save).toBeDisabled();
+    expect(screen.queryByText('newsletters.editor.unsaved')).not.toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'Fresh');
+    expect(screen.getByText('newsletters.editor.unsaved')).toBeInTheDocument();
+    expect(save).toBeEnabled();
+    await userEvent.click(save);
+    expect(createMutate.mock.calls[0]?.[0]).toMatchObject({
+      name: 'Fresh',
+      enabled: true,
+      links: { tracearr: false },
+    });
+    expect(router.state.location.pathname).toBe('/settings/notifications/newsletters/n-9');
+  });
+
+  it('patches only what moved on edit and clears the dirty state after', async () => {
+    vi.mocked(useNewsletter).mockReturnValue({
+      data: row,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletter>);
+    updateMutate.mockImplementation(
+      (_vars: unknown, opts: { onSuccess: (r: Newsletter) => void }) => opts.onSuccess(row)
+    );
+    renderAt('/settings/notifications/newsletters/n-1');
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), '!');
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
+    expect(updateMutate.mock.calls[0]?.[0]).toEqual({ id: 'n-1', data: { name: 'Weekly!' } });
+    expect(screen.queryByText('newsletters.editor.unsaved')).not.toBeInTheDocument();
+  });
+
+  it('holds a dirty form on the page until the leave dialog is answered', async () => {
+    renderAt('/settings/notifications/newsletters/new');
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'Fresh');
+    await userEvent.click(screen.getByRole('link', { name: 'elsewhere' }));
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(
+      'common:confirmations.unsavedChanges'
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.cancel' }));
+    expect(screen.getByLabelText('newsletters.editor.name')).toHaveValue('Fresh');
   });
 });
