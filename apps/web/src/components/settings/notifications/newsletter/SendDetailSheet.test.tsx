@@ -90,7 +90,7 @@ describe('SendDetailSheet', () => {
     expect(rows[1]).toHaveTextContent('newsletters.history.attempts:{"count":3}');
   });
 
-  it('opens the snapshot in a sandboxed frame and retries failed recipients', async () => {
+  it('opens the snapshot as a modal dialog above the sheet, then retries after closing it', async () => {
     htmlMutate.mockImplementation(
       (_vars: unknown, opts: { onSuccess: (r: { subject: string; html: string }) => void }) =>
         opts.onSuccess({ subject: 'Weekly digest', html: '<p>Snap</p>' })
@@ -101,8 +101,24 @@ describe('SendDetailSheet', () => {
     const frame = await screen.findByTitle('newsletters.history.snapshotTitle');
     expect(frame).toHaveAttribute('sandbox', '');
     expect(frame).toHaveAttribute('srcdoc', '<p>Snap</p>');
+
+    // Radix's modal hideOthers() aria-hides the sheet while the preview sits above it; this pins that containment.
+    const sheetContent = document.querySelector('[data-slot="sheet-content"]');
+    expect(sheetContent).toHaveAttribute('aria-hidden', 'true');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByTitle('newsletters.history.snapshotTitle')).not.toBeInTheDocument();
+
     await userEvent.click(screen.getByRole('button', { name: 'newsletters.history.retryFailed' }));
     expect(retryMutate).toHaveBeenCalledWith({ id: 'n-1', sendId: 's-1' });
+  });
+
+  it('shows an empty state instead of an empty recipient list while a send is still starting', () => {
+    renderSheet({ recipients: [] });
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
+      'newsletters.history.recipientsEmpty'
+    );
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   });
 
   it('disables the snapshot when pruned and hides retry for a clean send', () => {

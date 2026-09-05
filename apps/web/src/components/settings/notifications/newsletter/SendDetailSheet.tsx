@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Users } from 'lucide-react';
 import type { NewsletterRecipientStatus, NewsletterSendHtml } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
 import {
   Sheet,
@@ -94,31 +96,35 @@ export function SendDetailSheet({
                   <AlertDescription>{data.error}</AlertDescription>
                 </Alert>
               )}
-              <ItemGroup className="gap-1">
-                {data.recipients.map((recipient) => (
-                  <Item key={recipient.id} role="listitem" variant="outline" size="sm">
-                    <ItemContent>
-                      <ItemTitle>
-                        {recipient.address}
-                        <Badge variant={recipientVariant(recipient.status)}>
-                          {t(`newsletters.history.status.${recipient.status}`)}
-                        </Badge>
-                      </ItemTitle>
-                      <ItemDescription>
-                        {t('newsletters.history.attempts', { count: recipient.attempts })}
-                        {recipient.sentAt && ` · ${dateLabel(recipient.sentAt)}`}
-                        {recipient.status === 'unknown' &&
-                          ` · ${t('newsletters.history.unknownHelp')}`}
-                      </ItemDescription>
-                      {recipient.error && (
-                        <ItemDescription className="text-destructive">
-                          {recipient.error}
+              {data.recipients.length === 0 ? (
+                <EmptyState icon={Users} title={t('newsletters.history.recipientsEmpty')} />
+              ) : (
+                <ItemGroup className="gap-1">
+                  {data.recipients.map((recipient) => (
+                    <Item key={recipient.id} role="listitem" variant="outline" size="sm">
+                      <ItemContent>
+                        <ItemTitle>
+                          {recipient.address}
+                          <Badge variant={recipientVariant(recipient.status)}>
+                            {t(`newsletters.history.status.${recipient.status}`)}
+                          </Badge>
+                        </ItemTitle>
+                        <ItemDescription>
+                          {t('newsletters.history.attempts', { count: recipient.attempts })}
+                          {recipient.sentAt && ` · ${dateLabel(recipient.sentAt)}`}
+                          {recipient.status === 'unknown' &&
+                            ` · ${t('newsletters.history.unknownHelp')}`}
                         </ItemDescription>
-                      )}
-                    </ItemContent>
-                  </Item>
-                ))}
-              </ItemGroup>
+                        {recipient.error && (
+                          <ItemDescription className="text-destructive">
+                            {recipient.error}
+                          </ItemDescription>
+                        )}
+                      </ItemContent>
+                    </Item>
+                  ))}
+                </ItemGroup>
+              )}
             </>
           )}
         </div>
@@ -160,7 +166,6 @@ export function SendDetailSheet({
         title={t('newsletters.history.snapshotTitle')}
         subject={snapshot?.subject}
         html={snapshot?.html ?? null}
-        modal={false}
       />
     </Sheet>
   );

@@ -758,6 +758,7 @@
       "trigger": { "schedule": "Scheduled", "manual": "Manual", "test": "Test" },
       "window": "{{start}} to {{end}}",
       "recipients": "{{count}} recipients",
+      "recipientsEmpty": "Recipients appear once the send starts.",
       "finished": "Finished {{when}}",
       "open": "Open the send from {{when}}",
       "page": "Page {{page}} of {{pages}}",

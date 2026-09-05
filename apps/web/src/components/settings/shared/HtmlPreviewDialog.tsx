@@ -17,7 +17,6 @@ export function HtmlPreviewDialog({
   meta,
   html,
   loading = false,
-  modal = true,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -26,11 +25,9 @@ export function HtmlPreviewDialog({
   meta?: ReactNode;
   html: string | null;
   loading?: boolean;
-  /** False when nested under another open Sheet/Dialog: Radix's modal hideOthers() would otherwise aria-hide the parent. */
-  modal?: boolean;
 }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={modal}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
