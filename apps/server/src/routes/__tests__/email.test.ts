@@ -15,7 +15,7 @@ vi.mock('../../services/newsletters/links.js', () => ({
   UNSUBSCRIBE_TOKEN_MAX_LENGTH: 92,
   verifyUnsubscribeToken: (...a: unknown[]) => mockVerify(...a) as unknown,
 }));
-const store = vi.hoisted(() => ({ loadDelivery: vi.fn() }));
+const store = vi.hoisted(() => ({ loadDelivery: vi.fn(), loadServerLinks: vi.fn() }));
 vi.mock('../../services/newsletters/store.js', () => store);
 const branding = vi.hoisted(() => ({
   getEmailBranding: vi.fn(),
@@ -50,8 +50,11 @@ beforeEach(() => {
   store.loadDelivery.mockResolvedValue({
     recipient: { id: 'r1', address: 'a@x.com', sendId: 'send-1' },
     send: { id: 'send-1' },
-    newsletter: { id: 'n1' },
+    newsletter: { id: 'n1', senderName: null, scope: { serverIds: ['s1'], libraries: [] } },
   });
+  store.loadServerLinks.mockResolvedValue([
+    { id: 's1', name: 'Base<ment', type: 'plex', url: 'http://plex', machineIdentifier: null },
+  ]);
 });
 
 describe('suppressions', () => {
@@ -104,6 +107,11 @@ describe('public unsubscribe', () => {
     );
     expect(res.body).toContain('<form method="post"');
     expect(res.body).not.toContain('a@x.com');
+    expect(store.loadServerLinks).toHaveBeenCalledWith(['s1']);
+    expect(res.body).toContain(
+      'Unsubscribe this address from all newsletters sent by Base&lt;ment?'
+    );
+    expect(res.body).not.toContain('Base<ment');
     expect(suppressions.addSuppression).not.toHaveBeenCalled();
   });
 
@@ -118,7 +126,9 @@ describe('public unsubscribe', () => {
     });
     expect(res.statusCode).toBe(200);
     expect(suppressions.addSuppression).toHaveBeenCalledWith('a@x.com', 'unsubscribed', 'send-1');
-    expect(res.body).toContain('unsubscribed');
+    expect(res.body).toContain(
+      'This address will not receive newsletters from Base&lt;ment again.'
+    );
     expect(res.body).not.toContain('a@x.com');
     const again = await app.inject({ method: 'POST', url: '/email/unsubscribe/tok' });
     expect(again.statusCode).toBe(200);
@@ -127,6 +137,18 @@ describe('public unsubscribe', () => {
       'unsubscribed',
       'send-1'
     );
+  });
+
+  it('names the newsletter sender when one is set', async () => {
+    const app = await build(null);
+    mockVerify.mockReturnValue('r1');
+    store.loadDelivery.mockResolvedValue({
+      recipient: { id: 'r1', address: 'a@x.com', sendId: 'send-1' },
+      send: { id: 'send-1' },
+      newsletter: { id: 'n1', senderName: 'Family Media', scope: { serverIds: [], libraries: [] } },
+    });
+    const res = await app.inject({ method: 'GET', url: '/email/unsubscribe/tok' });
+    expect(res.body).toContain('sent by Family Media?');
   });
 
   it('answers 404 with the same page shape for a bad token or a missing recipient', async () => {

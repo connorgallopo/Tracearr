@@ -1,11 +1,19 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { emailBrandingSchema, emailSuppressionCreateSchema } from '@tracearr/shared';
+import {
+  emailBrandingSchema,
+  emailSuppressionCreateSchema,
+  resolveSenderName,
+} from '@tracearr/shared';
 import {
   UNSUBSCRIBE_TOKEN_MAX_LENGTH,
   verifyUnsubscribeToken,
 } from '../services/newsletters/links.js';
-import { loadDelivery } from '../services/newsletters/store.js';
+import {
+  loadDelivery,
+  loadServerLinks,
+  type DeliveryContext,
+} from '../services/newsletters/store.js';
 import {
   addSuppression,
   listSuppressions,
@@ -22,6 +30,29 @@ const INVALID = page(
   'This link is not valid',
   '<p>The unsubscribe link is incomplete or has expired. Reply to the email you received and the sender will remove you.</p>'
 );
+
+const escapeHtml = (text: string): string =>
+  text.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c
+  );
+
+async function deliveryFor(params: unknown): Promise<DeliveryContext | null> {
+  const parsed = tokenParams.safeParse(params);
+  const recipientId = parsed.success ? verifyUnsubscribeToken(parsed.data.token) : null;
+  return recipientId ? loadDelivery(recipientId) : null;
+}
+
+/** The name the email was shown as, so the page names the sender the member recognizes; page() does not escape. */
+async function senderNameFor(ctx: DeliveryContext): Promise<string> {
+  const servers = await loadServerLinks(ctx.newsletter.scope.serverIds);
+  return escapeHtml(
+    resolveSenderName(
+      ctx.newsletter.senderName,
+      servers.map((s) => s.name)
+    )
+  );
+}
 
 export async function emailRoutes(app: FastifyInstance): Promise<void> {
   const owner = { preHandler: [app.requireOwner] };
@@ -64,30 +95,31 @@ export async function emailRoutes(app: FastifyInstance): Promise<void> {
   const publicRoute = { config: { rateLimit: PUBLIC_RATE_LIMIT } };
 
   app.get('/unsubscribe/:token', publicRoute, async (request, reply) => {
-    const params = tokenParams.safeParse(request.params);
-    const recipientId = params.success ? verifyUnsubscribeToken(params.data.token) : null;
-    const ctx = recipientId ? await loadDelivery(recipientId) : null;
+    const ctx = await deliveryFor(request.params);
     if (!ctx) return sendPublicPage(reply, 404, INVALID);
+    const sender = await senderNameFor(ctx);
     return sendPublicPage(
       reply,
       200,
       page(
-        'Unsubscribe from this newsletter?',
-        '<p>You will stop receiving this newsletter at this address.</p><form method="post"><button type="submit">Unsubscribe</button></form>'
+        'Unsubscribe from all newsletters?',
+        `<p>Unsubscribe this address from all newsletters sent by ${sender}?</p><form method="post"><button type="submit">Unsubscribe</button></form>`
       )
     );
   });
 
   app.post('/unsubscribe/:token', publicRoute, async (request, reply) => {
-    const params = tokenParams.safeParse(request.params);
-    const recipientId = params.success ? verifyUnsubscribeToken(params.data.token) : null;
-    const ctx = recipientId ? await loadDelivery(recipientId) : null;
+    const ctx = await deliveryFor(request.params);
     if (!ctx) return sendPublicPage(reply, 404, INVALID);
     await addSuppression(ctx.recipient.address, 'unsubscribed', ctx.send.id);
+    const sender = await senderNameFor(ctx);
     return sendPublicPage(
       reply,
       200,
-      page('You are unsubscribed', '<p>This address will not receive the newsletter again.</p>')
+      page(
+        'You are unsubscribed',
+        `<p>This address will not receive newsletters from ${sender} again.</p>`
+      )
     );
   });
 }
