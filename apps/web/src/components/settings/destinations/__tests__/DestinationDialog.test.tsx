@@ -529,6 +529,21 @@ describe('email kind', () => {
     );
     expect(screen.getByText('pages:settings.destinations.emailDescription')).toBeInTheDocument();
   });
+
+  it('ignores initialKind in edit mode and keeps the edited destination kind', () => {
+    render(
+      <DestinationDialog
+        open
+        onOpenChange={vi.fn()}
+        mode="edit"
+        destination={destination()}
+        initialKind="email"
+      />
+    );
+
+    expect(screen.getByLabelText(/fields\.userKey/)).toBeInTheDocument();
+    expect(screen.queryByLabelText(label('host'))).not.toBeInTheDocument();
+  });
 });
 
 describe('DestinationDialog layout and error gating', () => {

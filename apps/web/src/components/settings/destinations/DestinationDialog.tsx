@@ -2,7 +2,7 @@
  * The icon lookup returns a module-level component, so its reference is stable
  * across renders and nothing remounts. The rule cannot see that through the call.
  */
-import { Fragment, useEffect, useState, type ChangeEvent } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DESTINATION_KINDS,
@@ -119,12 +119,18 @@ export function DestinationDialog({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const seedKind = (next: CreatableKind) => {
+  /** Read through this instead of closing over `t` directly, so seedKind's identity stays stable across renders. */
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  });
+
+  const seedKind = useCallback((next: CreatableKind) => {
     setKind(next);
-    setName(t(`pages:settings.destinations.types.${DESTINATION_TYPES[next].label}`));
+    setName(tRef.current(`pages:settings.destinations.types.${DESTINATION_TYPES[next].label}`));
     setEvents(next === 'email' ? [] : [...SUBSCRIBABLE_EVENTS]);
     setValues(kindDefaults(next));
-  };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -156,8 +162,7 @@ export function DestinationDialog({
     setError(null);
     setTouched({});
     setSubmitted(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- seedKind is recreated every render; listing it (or t) reruns this mount effect on every render and wipes in-progress edits
-  }, [open, mode, destination, initialKind]);
+  }, [open, mode, destination, initialKind, seedKind]);
 
   const descriptor: DestinationDescriptor | null = kind ? DESTINATION_TYPES[kind] : null;
   const isBuiltin = destination?.builtin ?? false;
