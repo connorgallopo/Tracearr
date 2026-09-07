@@ -178,4 +178,39 @@ describe('DestinationsField', () => {
 
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
+
+  it('dims an email destination with no alert recipients, says why, and still lets a rule pick it', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail',
+        name: 'Ops mail',
+        type: 'email',
+        config: { fromAddress: 'news@example.com', to: '' },
+        secretsSet: [],
+      }),
+      destination({
+        id: 'dest-mail-2',
+        name: 'Alerts mail',
+        type: 'email',
+        config: { fromAddress: 'news@example.com', to: 'a@example.com' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const quiet = screen.getByRole('button', { name: 'Ops mail' });
+    expect(quiet.className).toContain('opacity-60');
+    expect(screen.getByRole('button', { name: 'Alerts mail' }).className).not.toContain(
+      'opacity-60'
+    );
+
+    await user.hover(quiet);
+    expect(
+      await screen.findAllByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toHaveLength(0);
+
+    await user.click(quiet);
+    expect(onChange).toHaveBeenCalledWith(['dest-mail']);
+  });
 });

@@ -485,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "Disabled destination",
+      "noAlertRecipientsTooltip": "This destination has no alert recipients, so alerts will not be sent.",
       "noDestinations": "No destinations yet. Add one to send notifications.",
       "newDestination": "New destination",
       "errors": {
