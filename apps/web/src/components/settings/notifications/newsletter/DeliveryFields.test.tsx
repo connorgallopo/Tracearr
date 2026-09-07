@@ -117,4 +117,76 @@ describe('DeliveryFields destination select with no destination chosen', () => {
       screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
     ).toHaveTextContent('newsletters.editor.delivery.noDestination');
   });
+
+  it('keeps the select controlled in create mode once a pick is followed by None', async () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <DeliveryFields state={stateWith()} onChange={onChange} errors={{}} mode="create" />
+    );
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
+    );
+    await userEvent.click(screen.getByRole('option', { name: 'Postmark' }));
+    expect(onChange).toHaveBeenCalledWith({ destinationId: 'd-1' });
+
+    rerender(
+      <DeliveryFields
+        state={stateWith({ destinationId: 'd-1' })}
+        onChange={onChange}
+        errors={{}}
+        mode="create"
+      />
+    );
+    await userEvent.click(
+      screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
+    );
+    await userEvent.click(
+      screen.getByRole('option', { name: 'newsletters.editor.delivery.noDestination' })
+    );
+    expect(onChange).toHaveBeenCalledWith({ destinationId: null });
+
+    rerender(<DeliveryFields state={stateWith()} onChange={onChange} errors={{}} mode="create" />);
+    expect(
+      screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
+    ).toHaveTextContent('newsletters.editor.delivery.noDestination');
+  });
+});
+
+describe('DeliveryFields destination query states', () => {
+  it('shows a skeleton while destinations are loading, not the empty-state add button', () => {
+    vi.mocked(useDestinations).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useDestinations>);
+    render(
+      <DeliveryFields state={defaultFormState()} onChange={vi.fn()} errors={{}} mode="create" />
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'newsletters.addEmailDestination' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('newsletters.noDestinationHint')).not.toBeInTheDocument();
+  });
+
+  it('shows the query error instead of the empty-state add button', () => {
+    vi.mocked(useDestinations).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('destinations request failed'),
+    } as unknown as ReturnType<typeof useDestinations>);
+    render(
+      <DeliveryFields state={defaultFormState()} onChange={vi.fn()} errors={{}} mode="create" />
+    );
+
+    expect(screen.getByText('destinations request failed')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'newsletters.addEmailDestination' })
+    ).not.toBeInTheDocument();
+  });
 });

@@ -437,7 +437,7 @@ describe('email kind', () => {
     expect(screen.queryByText('pages:settings.destinations.description')).not.toBeInTheDocument();
   });
 
-  it('renders the three group labels in order with a separator before each', async () => {
+  it('renders the three group fieldsets in order with a separator before each', async () => {
     await openEmail();
     const labels = screen.getAllByText(/pages:settings\.destinations\.groups\./);
     expect(labels.map((el) => el.textContent)).toEqual([
@@ -446,7 +446,10 @@ describe('email kind', () => {
       'pages:settings.destinations.groups.alerts',
     ]);
     for (const el of labels) {
-      expect(el.previousElementSibling).toHaveAttribute('data-slot', 'field-separator');
+      expect(el.tagName).toBe('LEGEND');
+      const fieldset = el.closest('fieldset');
+      expect(fieldset).toHaveAttribute('data-slot', 'field-set');
+      expect(fieldset?.previousElementSibling).toHaveAttribute('data-slot', 'field-separator');
     }
   });
 

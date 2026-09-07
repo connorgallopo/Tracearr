@@ -36,7 +36,9 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
+  FieldLegend,
   FieldSeparator,
+  FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -83,6 +85,25 @@ function kindDefaults(kind: CreatableKind): Record<string, string> {
   return defaults;
 }
 
+interface FieldSection {
+  group?: string;
+  fields: DestinationFieldDescriptor[];
+}
+
+/** Chunks consecutive same-group fields together; an ungrouped field stands alone. */
+function fieldSections(fields: readonly DestinationFieldDescriptor[]): FieldSection[] {
+  const sections: FieldSection[] = [];
+  for (const field of fields) {
+    const last = sections[sections.length - 1];
+    if (last && field.group !== undefined && last.group === field.group) {
+      last.fields.push(field);
+    } else {
+      sections.push({ group: field.group, fields: [field] });
+    }
+  }
+  return sections;
+}
+
 interface DestinationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -118,6 +139,13 @@ export function DestinationDialog({
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  /** Focus targets for the first invalid field when Save is refused. */
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const fieldRefs = useRef<Record<string, HTMLElement | null>>({});
+  const setFieldRef = (key: string) => (el: HTMLElement | null) => {
+    fieldRefs.current[key] = el;
+  };
 
   /** Read through this instead of closing over `t` directly, so seedKind's identity stays stable across renders. */
   const tRef = useRef(t);
@@ -249,7 +277,15 @@ export function DestinationDialog({
 
   const handleSave = async () => {
     setSubmitted(true);
-    if (!canSave) return;
+    if (!canSave) {
+      if (nameMissing) {
+        nameInputRef.current?.focus();
+      } else {
+        const missingField = (descriptor?.fields ?? []).find((f) => f.required && !isFilled(f));
+        if (missingField) fieldRefs.current[missingField.key]?.focus();
+      }
+      return;
+    }
     setError(null);
     try {
       if (mode === 'create') {
@@ -275,7 +311,6 @@ export function DestinationDialog({
   };
 
   const handleTest = async () => {
-    setSubmitted(true);
     setError(null);
     try {
       if (mode === 'edit' && destination) {
@@ -305,9 +340,9 @@ export function DestinationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+        <div className="@container/kind-grid min-h-0 flex-1 overflow-y-auto px-6 py-4">
           {descriptor === null ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 @sm/kind-grid:grid-cols-3">
               {CREATABLE_KINDS.map((creatable) => {
                 const Icon = iconFor(creatable);
                 return (
@@ -334,6 +369,7 @@ export function DestinationDialog({
                 </FieldLabel>
                 <Input
                   id="destination-name"
+                  ref={nameInputRef}
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
@@ -376,36 +412,27 @@ export function DestinationDialog({
                 />
               </Field>
 
-              {descriptor.fields.map((field, index) => {
-                const inputId = `destination-${field.key}`;
-                const stored = keepsStoredSecret(field.key);
-                const missing = field.required && !isFilled(field);
-                const invalid = missing && showsError(field.key);
-                const startsGroup =
-                  field.group !== undefined && field.group !== descriptor.fields[index - 1]?.group;
-                const inputProps = {
-                  id: inputId,
-                  placeholder: stored
-                    ? t('pages:settings.destinations.secretSet')
-                    : field.placeholder,
-                  value: values[field.key] ?? '',
-                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                    setFieldValue(field.key, e.target.value),
-                  onBlur: () => touch(field.key),
-                  'aria-invalid': invalid,
-                };
+              {fieldSections(descriptor.fields).map((section) => {
+                const fieldEls = section.fields.map((field) => {
+                  const inputId = `destination-${field.key}`;
+                  const stored = keepsStoredSecret(field.key);
+                  const missing = field.required && !isFilled(field);
+                  const invalid = missing && showsError(field.key);
+                  const inputProps = {
+                    id: inputId,
+                    ref: setFieldRef(field.key),
+                    placeholder: stored
+                      ? t('pages:settings.destinations.secretSet')
+                      : field.placeholder,
+                    value: values[field.key] ?? '',
+                    onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                      setFieldValue(field.key, e.target.value),
+                    onBlur: () => touch(field.key),
+                    'aria-invalid': invalid,
+                  };
 
-                return (
-                  <Fragment key={field.key}>
-                    {startsGroup && (
-                      <>
-                        <FieldSeparator role="presentation" />
-                        <p className="text-muted-foreground text-xs font-medium">
-                          {t(`pages:settings.destinations.groups.${field.group as GroupLabel}`)}
-                        </p>
-                      </>
-                    )}
-                    <Field data-invalid={invalid}>
+                  return (
+                    <Field key={field.key} data-invalid={invalid}>
                       <FieldLabel htmlFor={inputId}>
                         {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
                         {field.required && <span className="text-destructive ml-1">*</span>}
@@ -417,7 +444,11 @@ export function DestinationDialog({
                           value={values[field.key] ?? ''}
                           onValueChange={(value) => selectValue(field, value)}
                         >
-                          <SelectTrigger id={inputId} aria-invalid={invalid}>
+                          <SelectTrigger
+                            id={inputId}
+                            aria-invalid={invalid}
+                            ref={setFieldRef(field.key)}
+                          >
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -463,6 +494,22 @@ export function DestinationDialog({
                       )}
                       {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
                     </Field>
+                  );
+                });
+
+                if (section.group === undefined) {
+                  return <Fragment key={section.fields[0]?.key}>{fieldEls}</Fragment>;
+                }
+
+                return (
+                  <Fragment key={section.group}>
+                    <FieldSeparator role="presentation" />
+                    <FieldSet className="gap-4">
+                      <FieldLegend variant="label">
+                        {t(`pages:settings.destinations.groups.${section.group as GroupLabel}`)}
+                      </FieldLegend>
+                      {fieldEls}
+                    </FieldSet>
                   </Fragment>
                 );
               })}

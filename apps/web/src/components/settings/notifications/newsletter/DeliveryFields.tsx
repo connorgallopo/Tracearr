@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Plus } from 'lucide-react';
+import { AlertTriangle, Info, Plus } from 'lucide-react';
 import { NEWSLETTER_IMAGE_MODES } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { useDestinations, useSettings } from '@/hooks/queries';
 import type { FieldsetProps } from './newsletterForm';
@@ -29,11 +30,12 @@ const NONE = '__none__';
 
 export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps) {
   const { t } = useTranslation('settings');
-  const { data: destinations } = useDestinations();
+  const { data: destinations, isLoading, isError, error } = useDestinations();
   const { data: settings } = useSettings();
   const emailDestinations = (destinations ?? []).filter((d) => d.type === 'email');
   const hostedWithoutUrl = state.imageMode === 'hosted' && !settings?.externalUrl;
   const [addOpen, setAddOpen] = useState(false);
+  const [touched, setTouched] = useState(false);
 
   return (
     <FieldSet>
@@ -42,7 +44,14 @@ export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps)
         <FieldLabel htmlFor="newsletter-destination">
           {t('newsletters.editor.delivery.destination')}
         </FieldLabel>
-        {emailDestinations.length === 0 ? (
+        {isLoading ? (
+          <Skeleton className="h-9 w-full" />
+        ) : isError ? (
+          <Alert variant="destructive">
+            <Info />
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
+        ) : emailDestinations.length === 0 ? (
           <div className="flex flex-col items-start gap-2">
             <FieldDescription>{t('newsletters.noDestinationHint')}</FieldDescription>
             <Button type="button" variant="outline" size="sm" onClick={() => setAddOpen(true)}>
@@ -52,9 +61,12 @@ export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps)
           </div>
         ) : (
           <Select
-            /* A never-touched create form shows the placeholder; a saved row's cleared destination shows None. */
-            value={state.destinationId ?? (mode === 'edit' ? NONE : undefined)}
-            onValueChange={(value) => onChange({ destinationId: value === NONE ? null : value })}
+            /* A never-touched create form shows the placeholder; a saved row's cleared destination, or one this form already touched, shows None. */
+            value={state.destinationId ?? (mode === 'edit' || touched ? NONE : undefined)}
+            onValueChange={(value) => {
+              setTouched(true);
+              onChange({ destinationId: value === NONE ? null : value });
+            }}
           >
             <SelectTrigger
               id="newsletter-destination"

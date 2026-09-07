@@ -316,11 +316,11 @@ describe('email destination', () => {
       ['security', 'connection'],
       ['username', 'connection'],
       ['password', 'connection'],
+      ['messagesPerSecond', 'connection'],
       ['fromName', 'sender'],
       ['fromAddress', 'sender'],
       ['replyTo', 'sender'],
       ['to', 'alerts'],
-      ['messagesPerSecond', 'alerts'],
     ]);
   });
 

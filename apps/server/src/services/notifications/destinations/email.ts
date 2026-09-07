@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { UnrecoverableError } from 'bullmq';
 import {
   DESTINATION_TYPES,
   POSTER_IMAGE_SIZE,
@@ -277,7 +278,8 @@ async function deliver(
 ): Promise<void> {
   const to = addressList(config.to ?? '');
   // Thrown outside the try so describeSmtpError cannot reword it as an SMTP fault.
-  if (to.length === 0) throw new Error(NO_ALERT_RECIPIENTS);
+  // UnrecoverableError sends a permanent config fault straight to the DLQ instead of retrying it.
+  if (to.length === 0) throw new UnrecoverableError(NO_ALERT_RECIPIENTS);
   try {
     await send(getTransporter(ctx.destination.id, config), message, config, to);
   } catch (error) {

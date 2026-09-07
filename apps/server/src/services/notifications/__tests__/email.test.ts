@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { UnrecoverableError } from 'bullmq';
 import type { ViolationWithDetails } from '@tracearr/shared';
 
 const mockSendMail = vi.fn();
@@ -346,6 +347,21 @@ describe('emailType.deliver', () => {
     }
     expect(mockSendMail).not.toHaveBeenCalled();
     expect(mockCreateTransport).not.toHaveBeenCalled();
+  });
+
+  it('throws bullmq UnrecoverableError for an empty alert list so the job skips retries', async () => {
+    const message = await render(mediaAdded);
+    await expect(emailType.deliver(message, { ...config, to: '' }, deliverCtx)).rejects.toSatisfy(
+      (error: unknown) => {
+        expect(error).toBeInstanceOf(UnrecoverableError);
+        expect((error as Error).name).toBe('UnrecoverableError');
+        expect((error as Error).message).toBe(
+          'No alert recipients on this destination. Add one under Settings, Destinations.'
+        );
+        return true;
+      }
+    );
+    expect(mockSendMail).not.toHaveBeenCalled();
   });
 });
 

@@ -287,6 +287,7 @@ export const DESTINATION_TYPES = {
         select('security', 'security', SECURITY_OPTIONS, 'starttls'),
         { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
         secret('password', 'password', false),
+        number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
       ]),
       ...grouped('sender', [
         text('fromName', 'fromName', false, undefined, 'Tracearr'),
@@ -295,7 +296,6 @@ export const DESTINATION_TYPES = {
       ]),
       ...grouped('alerts', [
         emails('to', 'to', false, 'you@example.com, admin@example.com', 'smtpTo'),
-        number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
       ]),
     ],
   },
