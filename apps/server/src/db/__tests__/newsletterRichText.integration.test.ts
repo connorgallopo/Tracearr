@@ -70,8 +70,10 @@ async function rows(): Promise<Row[]> {
 }
 
 describe('migration 0099', () => {
+  // The suite-wide reset leaves newsletters in place, and this test asserts the whole table.
   beforeEach(async () => {
     await resetTestDb();
+    await db.execute(sql`DELETE FROM newsletters`);
   });
 
   // A failed assertion above must not leave the shared database on text columns.
