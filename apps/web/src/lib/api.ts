@@ -46,6 +46,7 @@ import type {
   ReauthorizePlexAccountResponse,
   Destination,
   DestinationKind,
+  DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
   Newsletter,
@@ -1780,11 +1781,9 @@ class ApiClient {
       }),
     remove: (id: string) => this.request<void>(`/destinations/${id}`, { method: 'DELETE' }),
     test: (id: string) =>
-      this.request<{ success: boolean; error?: string }>(`/destinations/${id}/test`, {
-        method: 'POST',
-      }),
+      this.request<DestinationTestResult>(`/destinations/${id}/test`, { method: 'POST' }),
     testUnsaved: (data: { type: DestinationKind; config: Record<string, unknown> }) =>
-      this.request<{ success: boolean; error?: string }>('/destinations/test', {
+      this.request<DestinationTestResult>('/destinations/test', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
