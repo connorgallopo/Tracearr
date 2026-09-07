@@ -701,6 +701,13 @@
       "when": 1788552084249,
       "tag": "0099_condemned_hex",
       "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788782400000,
+      "tag": "0100_newsletter_scope_libraries",
+      "breakpoints": true
     }
   ]
 }
