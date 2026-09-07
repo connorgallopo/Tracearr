@@ -67,6 +67,8 @@ export interface DestinationFieldDescriptor {
   max?: number;
   /** select only: choosing a value also writes these sibling fields */
   presets?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  /** i18n key under pages:settings.destinations.groups; the dialog draws a separator where the group changes */
+  group?: string;
 }
 
 export interface DestinationDescriptor {
@@ -181,17 +183,22 @@ const email = (
 const emails = (
   key: string,
   label: string,
+  required: boolean,
   placeholder: string,
   hint: string
 ): DestinationFieldDescriptor => ({
   key,
   label,
   input: 'emails',
-  required: true,
+  required,
   secret: false,
   placeholder,
   hint,
 });
+const grouped = (
+  group: string,
+  fields: readonly DestinationFieldDescriptor[]
+): DestinationFieldDescriptor[] => fields.map((field) => ({ ...field, group }));
 
 const PRESET_OPTIONS: readonly DestinationFieldOption[] = [
   { value: 'custom', label: 'presetCustom' },
@@ -270,20 +277,26 @@ export const DESTINATION_TYPES = {
     builtin: false,
     events: ALL_EVENTS,
     fields: [
-      select('preset', 'preset', PRESET_OPTIONS, 'custom', {
-        hint: 'smtpPreset',
-        presets: EMAIL_SMTP_PRESETS,
-      }),
-      text('host', 'host', true, 'smtp.example.com'),
-      number('port', 'port', '587', 1, 65535),
-      select('security', 'security', SECURITY_OPTIONS, 'starttls'),
-      { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
-      secret('password', 'password', false),
-      text('fromName', 'fromName', false, undefined, 'Tracearr'),
-      email('fromAddress', 'fromAddress', true, 'tracearr@example.com'),
-      emails('to', 'to', 'you@example.com, admin@example.com', 'smtpTo'),
-      email('replyTo', 'replyTo', false),
-      number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
+      ...grouped('connection', [
+        select('preset', 'preset', PRESET_OPTIONS, 'custom', {
+          hint: 'smtpPreset',
+          presets: EMAIL_SMTP_PRESETS,
+        }),
+        text('host', 'host', true, 'smtp.example.com'),
+        number('port', 'port', '587', 1, 65535),
+        select('security', 'security', SECURITY_OPTIONS, 'starttls'),
+        { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
+        secret('password', 'password', false),
+      ]),
+      ...grouped('sender', [
+        text('fromName', 'fromName', false, undefined, 'Tracearr'),
+        email('fromAddress', 'fromAddress', true, 'tracearr@example.com'),
+        email('replyTo', 'replyTo', false),
+      ]),
+      ...grouped('alerts', [
+        emails('to', 'to', false, 'you@example.com, admin@example.com', 'smtpTo'),
+        number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
+      ]),
     ],
   },
   push: {

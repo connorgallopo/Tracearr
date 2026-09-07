@@ -298,6 +298,39 @@ describe('email destination', () => {
     ]);
   });
 
+  it('leaves the alert list optional: blank, null or absent all validate, a bad address does not', () => {
+    for (const to of ['', null, undefined]) {
+      expect(destinationConfigSchema('email').safeParse({ ...valid, to }).success).toBe(true);
+    }
+    expect(destinationConfigSchema('email').safeParse({ ...valid, to: 'nope' }).success).toBe(
+      false
+    );
+    expect(DESTINATION_TYPES.email.fields.find((f) => f.key === 'to')?.required).toBe(false);
+  });
+
+  it('groups its fields connection, sender, alerts in that order', () => {
+    expect(DESTINATION_TYPES.email.fields.map((f) => [f.key, f.group])).toEqual([
+      ['preset', 'connection'],
+      ['host', 'connection'],
+      ['port', 'connection'],
+      ['security', 'connection'],
+      ['username', 'connection'],
+      ['password', 'connection'],
+      ['fromName', 'sender'],
+      ['fromAddress', 'sender'],
+      ['replyTo', 'sender'],
+      ['to', 'alerts'],
+      ['messagesPerSecond', 'alerts'],
+    ]);
+  });
+
+  it('is the only descriptor with groups', () => {
+    for (const kind of DESTINATION_KINDS) {
+      if (kind === 'email') continue;
+      for (const f of DESTINATION_TYPES[kind].fields) expect(f.group).toBeUndefined();
+    }
+  });
+
   it('marks only the password as secret', () => {
     const secrets = DESTINATION_TYPES.email.fields.filter((f) => f.secret).map((f) => f.key);
     expect(secrets).toEqual(['password']);
