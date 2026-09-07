@@ -1,6 +1,7 @@
 import {
   POSTER_IMAGE_SIZE,
   buildMediaServerItemUrl,
+  isPubliclyRoutableUrl,
   type EmailBrandingSettings,
   type EmailRichTextDoc,
   type NewsletterImageMode,
@@ -97,7 +98,13 @@ export function digestLinks(
     });
   }
   const server = serversById.get(card.serverId);
-  if (server && SERVER_TYPES.has(server.type) && card.ratingKey) {
+  // Plex routes through app.plex.tv; a Jellyfin or Emby link is the server URL itself, useless to a member off the LAN when it is private.
+  if (
+    server &&
+    SERVER_TYPES.has(server.type) &&
+    card.ratingKey &&
+    (server.type === 'plex' || isPubliclyRoutableUrl(server.url))
+  ) {
     const url = buildMediaServerItemUrl({
       serverType: server.type as ServerType,
       baseUrl: server.url,

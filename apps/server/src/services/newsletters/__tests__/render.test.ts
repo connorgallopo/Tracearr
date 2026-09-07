@@ -202,6 +202,70 @@ describe('buildDigestInput', () => {
     expect(noUrl.map((l) => l.label)).toEqual(['Basement', 'IMDb']);
   });
 
+  it('drops the Jellyfin and Emby item link when the server url is private and keeps Plex through app.plex.tv', () => {
+    const lan = new Map<string, ServerLink>([
+      [
+        'j',
+        {
+          id: 'j',
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'http://192.168.1.20:8096',
+          machineIdentifier: null,
+        },
+      ],
+      [
+        'e',
+        {
+          id: 'e',
+          name: 'Shed',
+          type: 'emby',
+          url: 'http://emby.local:8096',
+          machineIdentifier: 'emb-1',
+        },
+      ],
+      [
+        'p',
+        {
+          id: 'p',
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://192.168.1.10:32400',
+          machineIdentifier: 'mach-1',
+        },
+      ],
+    ]);
+    const on = (serverId: string) =>
+      digestLinks({ ...watched, serverId, imdbId: null }, null, lan, { tracearr: false });
+    expect(on('j')).toEqual([]);
+    expect(on('e')).toEqual([]);
+    expect(on('p')).toEqual([
+      {
+        label: 'Basement',
+        url: 'https://app.plex.tv/desktop/#!/server/mach-1/details?key=%2Flibrary%2Fmetadata%2F77',
+      },
+    ]);
+    const publicJellyfin = new Map<string, ServerLink>([
+      [
+        'j',
+        {
+          id: 'j',
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'https://jellyfin.example.com',
+          machineIdentifier: null,
+        },
+      ],
+    ]);
+    expect(
+      digestLinks({ ...watched, serverId: 'j', imdbId: null }, null, publicJellyfin, {
+        tracearr: false,
+      })
+    ).toEqual([
+      { label: 'Attic', url: 'https://jellyfin.example.com/web/index.html#/details?id=77' },
+    ]);
+  });
+
   it('reports what each section holds beyond its cards from the assembler counts', () => {
     const album = {
       cardId: 'al1',

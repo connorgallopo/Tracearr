@@ -1,22 +1,29 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, HelpCircle, Info, XCircle, type LucideIcon } from 'lucide-react';
-import type { Destination } from '@tracearr/shared';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  HelpCircle,
+  Info,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react';
+import { isPubliclyRoutableUrl, type Destination, type Server } from '@tracearr/shared';
 import { FieldLegend, FieldSet } from '@/components/ui/field';
-import { useDestinations, useNewsletterRecipients, useSettings } from '@/hooks/queries';
+import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
 import { cn } from '@/lib/utils';
 import type { NewsletterFormState } from './newsletterForm';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
 
-export type ReadinessStatus = 'pass' | 'fail' | 'unknown' | 'info';
+export type ReadinessStatus = 'pass' | 'warn' | 'fail' | 'unknown' | 'info';
 
-/** externalUrl is a plain on/off; only fromDomain and recipients ever land in 'unknown'; dns is
- * informational only. Narrowing per id keeps every `t()` key below a real, literal key. */
+/** externalUrl warns when set over http (the link works, one-click does not); a privateServer row exists per Jellyfin or Emby server whose URL members cannot reach. Narrowing per id keeps every `t()` key below a real, literal key. */
 export type ReadinessCheck =
-  | { id: 'externalUrl'; status: 'pass' | 'fail' }
+  | { id: 'externalUrl'; status: 'pass' | 'warn' | 'fail' }
   | { id: 'fromDomain'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown' }
+  | { id: 'privateServer'; status: 'warn'; server: string }
   | { id: 'dns'; status: 'info' };
 
 const domainOf = (address: string | null | undefined): string | null => {
@@ -28,11 +35,22 @@ export function readinessChecks(input: {
   externalUrl: string | null;
   destination: Destination | null;
   recipients: { resolvable: number; known: boolean };
+  servers: Pick<Server, 'name' | 'type' | 'url'>[];
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
+  const privateServers: ReadinessCheck[] = input.servers
+    .filter((s) => s.type !== 'plex' && !isPubliclyRoutableUrl(s.url))
+    .map((s) => ({ id: 'privateServer', status: 'warn', server: s.name }));
   return [
-    { id: 'externalUrl', status: input.externalUrl ? 'pass' : 'fail' },
+    {
+      id: 'externalUrl',
+      status: !input.externalUrl
+        ? 'fail'
+        : /^https:\/\//i.test(input.externalUrl)
+          ? 'pass'
+          : 'warn',
+    },
     // A username without an @ is an API key or a plain login; nothing to compare.
     {
       id: 'fromDomain',
@@ -46,18 +64,21 @@ export function readinessChecks(input: {
           ? 'pass'
           : 'fail',
     },
+    ...privateServers,
     { id: 'dns', status: 'info' },
   ];
 }
 
 const ICONS: Record<ReadinessStatus, LucideIcon> = {
   pass: CheckCircle2,
+  warn: AlertTriangle,
   fail: XCircle,
   unknown: HelpCircle,
   info: Info,
 };
 const TONES: Record<ReadinessStatus, string> = {
   pass: 'text-success',
+  warn: 'text-warning',
   fail: 'text-warning',
   unknown: 'text-muted-foreground',
   info: 'text-muted-foreground',
@@ -73,10 +94,14 @@ export function ReadinessList({
   const { t } = useTranslation('settings');
   const { data: settings } = useSettings();
   const { data: destinations } = useDestinations();
+  const { data: servers } = useServers();
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
     newsletterId ?? undefined
   );
   const destination = (destinations ?? []).find((d) => d.id === state.destinationId) ?? null;
+  const inScope = (servers ?? []).filter(
+    (s) => state.scope.serverIds.length === 0 || state.scope.serverIds.includes(s.id)
+  );
   const checks = readinessChecks({
     externalUrl: settings?.externalUrl ?? null,
     destination,
@@ -84,15 +109,16 @@ export function ReadinessList({
       known: view !== undefined,
       resolvable: view ? view.recipients.filter((r) => !r.suppressed).length : 0,
     },
+    servers: inScope,
   });
 
   // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
   const copyFor = (check: ReadinessCheck): ReactNode => {
     switch (check.id) {
       case 'externalUrl':
-        return check.status === 'pass'
-          ? t('newsletters.editor.readiness.externalUrl')
-          : t('newsletters.editor.readiness.externalUrlFail');
+        if (check.status === 'pass') return t('newsletters.editor.readiness.externalUrl');
+        if (check.status === 'warn') return t('newsletters.editor.readiness.externalUrlNotHttps');
+        return t('newsletters.editor.readiness.externalUrlFail');
       case 'fromDomain':
         if (check.status === 'pass') return t('newsletters.editor.readiness.fromDomain');
         if (check.status === 'unknown') return t('newsletters.editor.readiness.fromDomainUnknown');
@@ -104,6 +130,8 @@ export function ReadinessList({
         return newsletterId !== null && recipientsError
           ? t('newsletters.editor.readiness.recipientsLoadFailed')
           : t('newsletters.editor.readiness.recipientsUnknown');
+      case 'privateServer':
+        return t('newsletters.editor.readiness.privateServerLinks', { server: check.server });
       case 'dns':
         return (
           <>
@@ -129,7 +157,10 @@ export function ReadinessList({
           {checks.map((check) => {
             const Icon = ICONS[check.status];
             return (
-              <li key={check.id} className="flex items-start gap-2 text-sm leading-snug">
+              <li
+                key={check.id === 'privateServer' ? `privateServer-${check.server}` : check.id}
+                className="flex items-start gap-2 text-sm leading-snug"
+              >
                 <Icon
                   aria-hidden
                   className={cn('mt-0.5 size-[0.9375rem] shrink-0', TONES[check.status])}

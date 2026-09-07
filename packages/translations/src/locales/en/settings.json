@@ -716,6 +716,8 @@
         "title": "Readiness",
         "externalUrl": "External URL is set; hosted posters, the browser view and Tracearr links work.",
         "externalUrlFail": "No external URL: hosted posters, the browser view and Tracearr links are off.",
+        "externalUrlNotHttps": "External URL is set over http: members get an unsubscribe link, but one-click unsubscribe needs https.",
+        "privateServerLinks": "Item links for {{server}} are left out because its URL is private.",
         "fromDomain": "The from address matches the SMTP account's domain.",
         "fromDomainFail": "The from address and the SMTP username sit on different domains; some providers refuse that.",
         "fromDomainUnknown": "Pick a destination to check its from address.",

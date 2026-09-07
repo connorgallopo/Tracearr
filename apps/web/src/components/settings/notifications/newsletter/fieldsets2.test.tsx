@@ -19,6 +19,7 @@ vi.mock('@/hooks/queries', () => ({
   useDestinations: vi.fn(),
   useSettings: vi.fn(),
   useNewsletterRecipients: vi.fn(),
+  useServers: () => ({ data: [] }),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 import { useDestinations, useNewsletterRecipients, useSettings } from '@/hooks/queries';
@@ -219,11 +220,12 @@ describe('LinksFields', () => {
 });
 
 describe('readiness', () => {
-  it('evaluates the four checks', () => {
+  it('evaluates the checks, warns on an http external url, and lists each private Jellyfin or Emby server', () => {
     const checks = readinessChecks({
       externalUrl: 'https://tracearr.example.com',
       destination: email,
       recipients: { resolvable: 2, known: true },
+      servers: [],
     });
     expect(checks.map((c) => [c.id, c.status])).toEqual([
       ['externalUrl', 'pass'],
@@ -238,18 +240,31 @@ describe('readiness', () => {
         config: { fromAddress: 'news@example.com', username: 'bot@other.com' },
       } as unknown as Destination,
       recipients: { resolvable: 0, known: false },
+      servers: [],
     });
     expect(bad.map((c) => c.status)).toEqual(['fail', 'fail', 'unknown', 'info']);
-    const noUser = readinessChecks({
-      externalUrl: null,
+    const insecure = readinessChecks({
+      externalUrl: 'http://tracearr.example.com',
       destination: {
         ...email,
         config: { fromAddress: 'news@example.com', username: 'apikey' },
       } as unknown as Destination,
       recipients: { resolvable: 0, known: true },
+      servers: [
+        { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096' },
+        { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400' },
+        { name: 'Shed', type: 'emby', url: 'https://emby.example.com' },
+      ],
     });
-    expect(noUser[1]?.status).toBe('pass');
-    expect(noUser[2]?.status).toBe('fail');
+    expect(
+      insecure.map((c) => (c.id === 'privateServer' ? [c.id, c.server] : [c.id, c.status]))
+    ).toEqual([
+      ['externalUrl', 'warn'],
+      ['fromDomain', 'pass'],
+      ['recipients', 'fail'],
+      ['privateServer', 'Attic'],
+      ['dns', 'info'],
+    ]);
   });
 
   it('renders one row per check with the docs link', () => {
