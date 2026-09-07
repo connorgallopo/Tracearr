@@ -318,10 +318,10 @@ importers:
         version: 4.4.0
       highcharts:
         specifier: ^13.0.0
-        version: 13.0.0
+        version: 13.0.2
       highcharts-react-official:
         specifier: ^3.2.3
-        version: 3.2.3(highcharts@13.0.0)(react@19.2.8)
+        version: 3.2.3(highcharts@13.0.2)(react@19.2.8)
       i18next:
         specifier: ^26.3.6
         version: 26.3.6(typescript@7.0.2)
@@ -4916,8 +4916,8 @@ packages:
       highcharts: '>=6.0.0'
       react: '>=16.8.0'
 
-  highcharts@13.0.0:
-    resolution: {integrity: sha512-AoFXei9hSnVXo8X5PmXzSiNXwPMgA+NzyN35uRRy0N1XwbJbRI1laTCaaFci9QB9Wyv9ZFWlgF0xzgivavJpDA==}
+  highcharts@13.0.2:
+    resolution: {integrity: sha512-BBqoxQpRgA4c2oCfIIBRVIs+lt1CHKs1cZic9YBt54OukFY6DSyvQbLZ+/1UrN2iKu24I5HvMdVG89Z+Pis6zA==}
     peerDependencies:
       jspdf: ^4.1.0
       svg2pdf.js: ^2.7.0
@@ -11922,12 +11922,12 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  highcharts-react-official@3.2.3(highcharts@13.0.0)(react@19.2.8):
+  highcharts-react-official@3.2.3(highcharts@13.0.2)(react@19.2.8):
     dependencies:
-      highcharts: 13.0.0
+      highcharts: 13.0.2
       react: 19.2.8
 
-  highcharts@13.0.0: {}
+  highcharts@13.0.2: {}
 
   highlight.js@11.11.2: {}
 
