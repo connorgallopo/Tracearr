@@ -142,7 +142,7 @@ export function ServerBandwidthChart({
         height: 180,
         backgroundColor: 'transparent',
         style: { fontFamily: 'inherit' },
-        spacing: [10, 10, 15, 10],
+        spacing: [0, 10, 15, 10],
         reflow: true,
       },
       title: { text: undefined },
