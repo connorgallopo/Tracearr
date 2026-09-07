@@ -418,6 +418,7 @@ export interface Destination {
   config: Record<string, string | null> | null;
   secretsSet: string[];
   referencedByAutomationCount: number;
+  referencedByNewsletterCount: number;
   createdAt: string;
   updatedAt: string;
 }

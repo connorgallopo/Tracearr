@@ -20,16 +20,24 @@ vi.mock('../../services/notifications/destinationStore.js', () => ({
   updateDestination: vi.fn(),
   deleteDestination: vi.fn(),
   readConfig: vi.fn(),
-  toPublicDestination: vi.fn((row: { id: string; name: string; type: string }, count: number) => ({
-    id: row.id,
-    name: row.name,
-    type: row.type,
-    referencedByAutomationCount: count,
-  })),
+  toPublicDestination: vi.fn(
+    (
+      row: { id: string; name: string; type: string },
+      automations: number,
+      newsletters: number
+    ) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      referencedByAutomationCount: automations,
+      referencedByNewsletterCount: newsletters,
+    })
+  ),
 }));
 
 vi.mock('../../services/notifications/destinationRefs.js', () => ({
   automationsReferencingDestinations: vi.fn(),
+  newslettersReferencingDestinations: vi.fn(),
 }));
 
 vi.mock('../../services/notifications/destinations/registry.js', () => ({
@@ -42,7 +50,10 @@ vi.mock('../../jobs/newsletterQueue.js', () => ({
 }));
 
 import { onDestinationChanged, onDestinationUnavailable } from '../../jobs/newsletterQueue.js';
-import { automationsReferencingDestinations } from '../../services/notifications/destinationRefs.js';
+import {
+  automationsReferencingDestinations,
+  newslettersReferencingDestinations,
+} from '../../services/notifications/destinationRefs.js';
 import {
   createDestination,
   deleteDestination,
@@ -104,6 +115,7 @@ describe('Destination Routes', () => {
 
   beforeEach(() => {
     vi.mocked(automationsReferencingDestinations).mockResolvedValue(new Map());
+    vi.mocked(newslettersReferencingDestinations).mockResolvedValue(new Map());
     vi.mocked(readConfig).mockReturnValue({ ok: true, config: {}, rewrap: false });
     mockTest.mockResolvedValue(undefined);
   });
@@ -114,7 +126,7 @@ describe('Destination Routes', () => {
   });
 
   describe('GET /destinations', () => {
-    it('returns the public shape with rule reference counts', async () => {
+    it('returns the public shape with automation and newsletter reference counts', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(listDestinations).mockResolvedValue([
         makeRow(),
@@ -131,13 +143,28 @@ describe('Destination Routes', () => {
           ],
         ])
       );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-2', ['Weekly', 'Monthly']]])
+      );
 
       const response = await app.inject({ method: 'GET', url: '/destinations' });
 
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual([
-        { id: 'dest-1', name: 'Discord', type: 'discord', referencedByAutomationCount: 2 },
-        { id: 'dest-2', name: 'Ntfy', type: 'ntfy', referencedByAutomationCount: 0 },
+        {
+          id: 'dest-1',
+          name: 'Discord',
+          type: 'discord',
+          referencedByAutomationCount: 2,
+          referencedByNewsletterCount: 0,
+        },
+        {
+          id: 'dest-2',
+          name: 'Ntfy',
+          type: 'ntfy',
+          referencedByAutomationCount: 0,
+          referencedByNewsletterCount: 2,
+        },
       ]);
     });
 
@@ -168,7 +195,11 @@ describe('Destination Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json()).toMatchObject({ id: 'dest-1', referencedByAutomationCount: 0 });
+      expect(response.json()).toMatchObject({
+        id: 'dest-1',
+        referencedByAutomationCount: 0,
+        referencedByNewsletterCount: 0,
+      });
       expect(createDestination).toHaveBeenCalledWith({
         name: 'Discord',
         type: 'discord',
@@ -376,6 +407,9 @@ describe('Destination Routes', () => {
       vi.mocked(automationsReferencingDestinations).mockResolvedValue(
         new Map([['ntfy-1', [{ ruleId: 'r1', ruleName: 'Rule one', isActive: true }]]])
       );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['ntfy-1', ['Weekly']]])
+      );
 
       const response = await app.inject({
         method: 'PATCH',
@@ -384,7 +418,11 @@ describe('Destination Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json()).toMatchObject({ id: 'ntfy-1', referencedByAutomationCount: 1 });
+      expect(response.json()).toMatchObject({
+        id: 'ntfy-1',
+        referencedByAutomationCount: 1,
+        referencedByNewsletterCount: 1,
+      });
       expect(updateDestination).toHaveBeenCalledWith('ntfy-1', { config: { topic: 'new' } });
       expect(onDestinationChanged).toHaveBeenCalledWith('ntfy-1');
     });

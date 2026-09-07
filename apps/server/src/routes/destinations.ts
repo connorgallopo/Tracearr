@@ -13,7 +13,10 @@ import {
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
 import { onDestinationChanged, onDestinationUnavailable } from '../jobs/newsletterQueue.js';
-import { automationsReferencingDestinations } from '../services/notifications/destinationRefs.js';
+import {
+  automationsReferencingDestinations,
+  newslettersReferencingDestinations,
+} from '../services/notifications/destinationRefs.js';
 import {
   createDestination,
   deleteDestination,
@@ -95,11 +98,18 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
    * GET /destinations - List destinations with masked config
    */
   app.get('/', owner, async () => {
-    const [rows, refs] = await Promise.all([
+    const [rows, automationRefs, newsletterRefs] = await Promise.all([
       listDestinations(),
       automationsReferencingDestinations(),
+      newslettersReferencingDestinations(),
     ]);
-    return rows.map((row) => toPublicDestination(row, refs.get(row.id)?.length ?? 0));
+    return rows.map((row) =>
+      toPublicDestination(
+        row,
+        automationRefs.get(row.id)?.length ?? 0,
+        newsletterRefs.get(row.id)?.length ?? 0
+      )
+    );
   });
 
   /**
@@ -129,7 +139,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       }
       throw error;
     }
-    return reply.code(201).send(toPublicDestination(row, 0));
+    return reply.code(201).send(toPublicDestination(row, 0, 0));
   });
 
   /**
@@ -175,8 +185,15 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       throw error;
     }
     await onDestinationChanged(row.id);
-    const refs = await automationsReferencingDestinations();
-    return toPublicDestination(row, refs.get(row.id)?.length ?? 0);
+    const [automationRefs, newsletterRefs] = await Promise.all([
+      automationsReferencingDestinations(),
+      newslettersReferencingDestinations(),
+    ]);
+    return toPublicDestination(
+      row,
+      automationRefs.get(row.id)?.length ?? 0,
+      newsletterRefs.get(row.id)?.length ?? 0
+    );
   });
 
   /**

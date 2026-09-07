@@ -65,7 +65,8 @@ export function readConfig(row: DestinationRow): DecryptResult {
 
 export function toPublicDestination(
   row: DestinationRow,
-  referencedByAutomationCount: number
+  referencedByAutomationCount: number,
+  referencedByNewsletterCount: number
 ): Destination {
   const descriptor = DESTINATION_TYPES[row.type];
   const secretKeys = descriptor.fields.filter((f) => f.secret).map((f) => f.key);
@@ -99,6 +100,7 @@ export function toPublicDestination(
     config,
     secretsSet,
     referencedByAutomationCount,
+    referencedByNewsletterCount,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
