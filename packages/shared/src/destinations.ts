@@ -436,6 +436,12 @@ export interface Destination {
   updatedAt: string;
 }
 
+/** 200 body of the two test routes. `sentTo` is set by kinds that pick the address themselves. */
+export interface DestinationTestResult {
+  success: true;
+  sentTo?: string;
+}
+
 export interface NotificationToast {
   title: string;
   message: string;

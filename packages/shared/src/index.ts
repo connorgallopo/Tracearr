@@ -298,6 +298,7 @@ export type {
   DestinationFieldOption,
   DestinationDescriptor,
   Destination,
+  DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
   NotificationToast,

@@ -89,7 +89,6 @@ test.describe('Newsletters', () => {
           security: 'none',
           fromName: 'Tracearr',
           fromAddress: 'news@example.test',
-          to: 'owner@example.test',
           messagesPerSecond: '2',
         },
         events: [],

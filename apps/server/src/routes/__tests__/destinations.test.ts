@@ -614,6 +614,40 @@ describe('Destination Routes', () => {
       expect(deleteDestination).not.toHaveBeenCalled();
     });
 
+    it('409s with the newsletter names when a newsletter references it', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow());
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', ['Weekly', 'Monthly']]])
+      );
+
+      const response = await app.inject({ method: 'DELETE', url: '/destinations/dest-1' });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json()).toEqual({
+        message: 'Used by 2 newsletter(s)',
+        newsletters: ['Weekly', 'Monthly'],
+      });
+      expect(deleteDestination).not.toHaveBeenCalled();
+      expect(onDestinationUnavailable).not.toHaveBeenCalled();
+    });
+
+    it('names the automations first when both reference it', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow());
+      vi.mocked(automationsReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', [{ ruleId: 'r1', ruleName: 'Rule one', isActive: true }]]])
+      );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', ['Weekly']]])
+      );
+
+      const response = await app.inject({ method: 'DELETE', url: '/destinations/dest-1' });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json()).toEqual({ message: 'Used by 1 rule(s)', rules: ['Rule one'] });
+    });
+
     it('deletes an unreferenced destination', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getDestination).mockResolvedValue(makeRow());
@@ -677,6 +711,22 @@ describe('Destination Routes', () => {
         { webhookUrl: 'https://discord.com/api/webhooks/1/abc' },
         expect.objectContaining({ destination: { id: 'test', name: 'Discord' } })
       );
+    });
+
+    it('passes back the address a kind reports it sent to', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow({ id: 'mail-1', type: 'email' }));
+      vi.mocked(readConfig).mockReturnValue({
+        ok: true,
+        config: { host: 'smtp.example.com', fromAddress: 'plex@example.com' },
+        rewrap: false,
+      });
+      mockTest.mockResolvedValue({ sentTo: 'plex@example.com' });
+
+      const response = await app.inject({ method: 'POST', url: '/destinations/mail-1/test' });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ success: true, sentTo: 'plex@example.com' });
     });
 
     it('502s a failed delivery with the error truncated to 500 characters', async () => {

@@ -10,6 +10,7 @@ import {
   destinationConfigSchema,
   updateDestinationSchema,
   type DestinationKind,
+  type DestinationTestResult,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
 import { onDestinationChanged, onDestinationUnavailable } from '../jobs/newsletterQueue.js';
@@ -80,14 +81,14 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
     name: string,
     config: Record<string, unknown>,
     reply: FastifyReply
-  ): Promise<{ success: true } | FastifyReply> {
+  ): Promise<DestinationTestResult | FastifyReply> {
     try {
       const type = getDestinationType(kind);
-      await type.test(config, {
+      const report = await type.test(config, {
         destination: { id: 'test', name },
         signal: AbortSignal.timeout(type.deliverTimeoutMs ?? DELIVER_TEST_TIMEOUT_MS),
       });
-      return { success: true };
+      return report?.sentTo ? { success: true, sentTo: report.sentTo } : { success: true };
     } catch (error) {
       const message = (error instanceof Error ? error.message : 'Test failed').slice(0, 500);
       return reply.code(502).send({ success: false, error: message });
@@ -197,7 +198,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
   });
 
   /**
-   * DELETE /destinations/:id - Remove a destination no rule references
+   * DELETE /destinations/:id - Remove a destination no automation or newsletter references
    */
   app.delete<{ Params: { id: string } }>('/:id', owner, async (request, reply) => {
     const current = await getDestination(request.params.id);
@@ -209,6 +210,14 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       return reply.code(409).send({
         message: `Used by ${refs.length} rule(s)`,
         rules: refs.map((ref) => ref.ruleName),
+      });
+    }
+
+    const newsletterNames = (await newslettersReferencingDestinations()).get(current.id) ?? [];
+    if (newsletterNames.length > 0) {
+      return reply.code(409).send({
+        message: `Used by ${newsletterNames.length} newsletter(s)`,
+        newsletters: newsletterNames,
       });
     }
 

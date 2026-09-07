@@ -26,14 +26,14 @@ import { ownText, textOf } from './overrides.js';
 import { formatDuration, getMediaDisplay, getUserDisplayName } from './sessionText.js';
 import type { NotificationEvent } from '../events.js';
 import type { MediaAddedContext, MediaUpgradedContext, NotificationPayload } from '../types.js';
-import type { DeliverContext, DestinationType, RenderContext } from './types.js';
+import type { DeliverContext, DestinationType, RenderContext, TestReport } from './types.js';
 import type { Transporter } from 'nodemailer';
 
 export interface EmailConfig extends SmtpConfig {
   preset?: string | null;
   fromName?: string | null;
   fromAddress: string;
-  to: string;
+  to?: string | null;
   replyTo?: string | null;
 }
 
@@ -57,6 +57,9 @@ const POSTER_EXTENSIONS: Record<string, string> = {
   'image/webp': 'webp',
   'image/gif': 'gif',
 };
+
+const NO_ALERT_RECIPIENTS =
+  'No alert recipients on this destination. Add one under Settings, Destinations.';
 
 function messageId(fromAddress: string): string {
   const domain = fromAddress.split('@')[1] ?? 'tracearr.local';
@@ -252,11 +255,12 @@ async function build(event: NotificationEvent, ctx: RenderContext): Promise<Emai
 async function send(
   transporter: Transporter,
   message: EmailMessage,
-  config: EmailConfig
+  config: EmailConfig,
+  to: string[]
 ): Promise<void> {
   await transporter.sendMail({
     from: { name: config.fromName || 'Tracearr', address: config.fromAddress },
-    to: addressList(config.to),
+    to,
     ...(config.replyTo ? { replyTo: config.replyTo } : {}),
     subject: message.subject,
     html: message.html,
@@ -271,8 +275,11 @@ async function deliver(
   config: EmailConfig,
   ctx: DeliverContext
 ): Promise<void> {
+  const to = addressList(config.to ?? '');
+  // Thrown outside the try so describeSmtpError cannot reword it as an SMTP fault.
+  if (to.length === 0) throw new Error(NO_ALERT_RECIPIENTS);
   try {
-    await send(getTransporter(ctx.destination.id, config), message, config);
+    await send(getTransporter(ctx.destination.id, config), message, config, to);
   } catch (error) {
     throw new Error(`${ctx.destination.name}: ${describeSmtpError(error, config)}`, {
       cause: error,
@@ -280,8 +287,10 @@ async function deliver(
   }
 }
 
-/** Verify first so a bad password reads as one, then send through a transporter that is not cached. */
-async function test(config: EmailConfig, ctx: DeliverContext): Promise<void> {
+/** Verify first so a bad password reads as one, then send through a transporter that is not cached. With no alert list the test goes to the sender. */
+async function test(config: EmailConfig, ctx: DeliverContext): Promise<TestReport> {
+  const listed = addressList(config.to ?? '');
+  const to = listed.length > 0 ? listed : [config.fromAddress];
   const transporter = createTransporter(config);
   try {
     await transporter.verify();
@@ -294,8 +303,10 @@ async function test(config: EmailConfig, ctx: DeliverContext): Promise<void> {
     await send(
       transporter,
       { ...rendered, attachments: logo.attachment ? [logo.attachment] : [] },
-      config
+      config,
+      to
     );
+    return { sentTo: to.join(', ') };
   } catch (error) {
     throw new Error(describeSmtpError(error, config), { cause: error });
   } finally {

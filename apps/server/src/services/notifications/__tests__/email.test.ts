@@ -336,6 +336,17 @@ describe('emailType.deliver', () => {
     expect(mockCreateTransport).toHaveBeenCalledTimes(1);
     expect(mockSendMail).toHaveBeenCalledTimes(2);
   });
+
+  it('refuses an empty alert list before touching SMTP and keeps the sentence intact', async () => {
+    const message = await render(mediaAdded);
+    for (const to of ['', null, undefined]) {
+      await expect(emailType.deliver(message, { ...config, to }, deliverCtx)).rejects.toThrow(
+        /^No alert recipients on this destination\. Add one under Settings, Destinations\.$/
+      );
+    }
+    expect(mockSendMail).not.toHaveBeenCalled();
+    expect(mockCreateTransport).not.toHaveBeenCalled();
+  });
 });
 
 describe('emailType.test', () => {
@@ -374,5 +385,19 @@ describe('emailType.test', () => {
     );
     expect(mockSendMail).not.toHaveBeenCalled();
     expect(mockClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports the listed addresses it sent to', async () => {
+    await expect(emailType.test(config, deliverCtx)).resolves.toEqual({
+      sentTo: 'a@example.com, b@example.org',
+    });
+  });
+
+  it('falls back to the from address when the alert list is empty and says so', async () => {
+    await expect(emailType.test({ ...config, to: '' }, deliverCtx)).resolves.toEqual({
+      sentTo: 'plex@example.com',
+    });
+    expect(mockSendMail.mock.calls[0]?.[0]).toMatchObject({ to: ['plex@example.com'] });
+    expect(mockVerify).toHaveBeenCalledTimes(1);
   });
 });
