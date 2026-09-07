@@ -223,10 +223,7 @@ describe('renderDigestToFit', () => {
 
   it('drops an album-less artist card without crediting it as a removed album', async () => {
     const { data, posters } = heaviestDigest();
-    // The assembler can emit an artist card with no albums (groupDigest pushes one
-    // whenever the album budget allowed any album at all, even for an artist row
-    // with none). Give the first artist a second album so albums outnumbers shows
-    // and movies, forcing sectionToTrim to pick 'albums' first.
+    // groupDigest no longer emits an album-less artist card, but fit.ts must still trim one safely if it ever sees one; give the first artist a second album so albums outnumbers shows and movies, forcing sectionToTrim to pick 'albums' first.
     const extraAlbum = {
       cardId: 'extra-album',
       serverId: JELLYFIN_SERVER.id,
@@ -272,8 +269,7 @@ describe('renderDigestToFit', () => {
     const { data, posters } = heaviestDigest();
     const heavyBranding: EmailBranding = {
       ...branding,
-      // Trimming can only remove cards; an oversized footer stays no matter what's cut,
-      // so the loop exhausts its bound and the render never gets under budget.
+      // Trimming can only remove cards; an oversized footer stays no matter what's cut, so the loop exhausts its bound and the render never gets under budget.
       footerText: 'f'.repeat(150_000),
     };
     const result = await renderDigestToFit(data, posters, opts(), heavyBranding, delivery);

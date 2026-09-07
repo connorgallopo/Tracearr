@@ -131,8 +131,7 @@ describe('RecipientsFields', () => {
       </MemoryRouter>
     );
 
-    // Dee starts server-excluded but not locally excluded, so she opens in the "included after
-    // save" bucket; that bucket must offer the same Exclude action a normal recipient gets.
+    // Dee starts server-excluded but not locally excluded, so her "included after save" bucket must offer the same Exclude action a normal recipient gets.
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
     );

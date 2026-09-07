@@ -70,8 +70,7 @@ export function Suppressions() {
           </Alert>
         )}
         {isEmpty && (
-          // Composed from the low-level Empty primitives instead of EmptyState: EmptyState's
-          // title is always an h3, which would double the card's own heading right above it.
+          // Composed from the low-level Empty primitives instead of EmptyState: EmptyState's title is a heading-role element that would double the card's own heading right above it.
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon" className="text-muted-foreground size-16 rounded-full">

@@ -198,33 +198,36 @@ export function RecipientsPanel({
           {t('newsletters.editor.recipients.willReceive', { count: receive.length })}
         </p>
         <ItemGroup className="mt-2 gap-1">
-          {receive.map((r) => (
-            <RecipientRow
-              key={r.address}
-              label={r.address}
-              description={r.name}
-              badge={
-                r.suppressed && (
-                  <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
-                )
-              }
-              action={
-                r.userId !== null && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    aria-label={t('newsletters.editor.recipients.exclude', {
-                      name: r.name ?? r.address,
-                    })}
-                    onClick={() => onExclude(r.userId as string)}
-                  >
-                    {t('newsletters.editor.recipients.excludeAction')}
-                  </Button>
-                )
-              }
-            />
-          ))}
+          {receive.map((r) => {
+            const userId = r.userId;
+            return (
+              <RecipientRow
+                key={r.address}
+                label={r.address}
+                description={r.name}
+                badge={
+                  r.suppressed && (
+                    <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
+                  )
+                }
+                action={
+                  userId !== null && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={t('newsletters.editor.recipients.exclude', {
+                        name: r.name ?? r.address,
+                      })}
+                      onClick={() => onExclude(userId)}
+                    >
+                      {t('newsletters.editor.recipients.excludeAction')}
+                    </Button>
+                  )
+                }
+              />
+            );
+          })}
           {included.map((p) => (
             <RecipientRow
               key={p.userId}

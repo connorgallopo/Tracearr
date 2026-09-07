@@ -115,6 +115,7 @@ export async function closeStaleSend(
 
 export async function deleteNewsletter(id: string): Promise<'deleted' | 'missing' | 'open_send'> {
   const open = await findOpenSend(id);
+  // No announceSendFinished here: the newsletter is about to be deleted, and the event's historyUrl would 404.
   if (open && !(await closeStaleSend(open))) return 'open_send';
   const rows = await db
     .delete(newsletters)

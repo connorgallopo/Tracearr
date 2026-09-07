@@ -5,7 +5,8 @@ ALTER TABLE "newsletters" ADD COLUMN IF NOT EXISTS "links" jsonb DEFAULT '{"trac
 DO $$
 BEGIN
   IF (SELECT data_type FROM information_schema.columns
-      WHERE table_name = 'newsletters' AND column_name = 'intro') = 'text' THEN
+      WHERE table_name = 'newsletters' AND column_name = 'intro'
+        AND table_schema = current_schema()) = 'text' THEN
     ALTER TABLE "newsletters" ALTER COLUMN "intro" TYPE jsonb USING CASE
       WHEN "intro" IS NULL OR btrim("intro") = '' THEN NULL
       ELSE jsonb_build_object('type', 'doc', 'content', jsonb_build_array(
@@ -14,7 +15,8 @@ BEGIN
     END;
   END IF;
   IF (SELECT data_type FROM information_schema.columns
-      WHERE table_name = 'newsletters' AND column_name = 'outro') = 'text' THEN
+      WHERE table_name = 'newsletters' AND column_name = 'outro'
+        AND table_schema = current_schema()) = 'text' THEN
     ALTER TABLE "newsletters" ALTER COLUMN "outro" TYPE jsonb USING CASE
       WHEN "outro" IS NULL OR btrim("outro") = '' THEN NULL
       ELSE jsonb_build_object('type', 'doc', 'content', jsonb_build_array(

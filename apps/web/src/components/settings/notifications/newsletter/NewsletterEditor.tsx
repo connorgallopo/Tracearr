@@ -71,8 +71,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   });
   const blocker = useUnsavedChanges(dirty);
 
-  // Once the save has landed the guard is clean, and only then may a fresh row's page move:
-  // navigating in the same tick as the save would still see the pre-save dirty flag and block itself.
+  // Once the save has landed the guard is clean, and only then may a fresh row's page move: navigating in the same tick as the save would still see the pre-save dirty flag and block itself.
   useEffect(() => {
     if (redirectTo !== null && !dirty) void navigate(redirectTo, { replace: true });
   }, [redirectTo, dirty, navigate]);

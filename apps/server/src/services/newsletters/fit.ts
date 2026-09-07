@@ -23,7 +23,12 @@ export type TrimmableSection = keyof NewsletterSectionCounts;
 /** Ties go to the section whose item costs the most bytes, so the fewest items leave: a show card (3.5 KB) before a movie card (1.8 KB), an artist card (1.4 KB), a most-watched row (0.6 KB). */
 export const TRIM_ORDER: readonly TrimmableSection[] = ['shows', 'movies', 'albums', 'mostWatched'];
 
-export const NO_TRIM: NewsletterSectionCounts = { movies: 0, shows: 0, albums: 0, mostWatched: 0 };
+export const NO_TRIM: NewsletterSectionCounts = Object.freeze({
+  movies: 0,
+  shows: 0,
+  albums: 0,
+  mostWatched: 0,
+});
 
 export function sectionToTrim(data: DigestData): TrimmableSection | null {
   const counts = sectionItemCounts(data);
@@ -78,9 +83,7 @@ export async function fitDigest(
     if (!section) return { rendered, data: current, bytes, trimmed, renders };
     const before = sectionItemCounts(current)[section];
     current = dropLastItem(current, section);
-    // An artist with no albums can reach here (the assembler emits one whenever the
-    // budget allowed any album at all); popping it removes a card sectionItemCounts
-    // never counted, so credit only the albums actually gone.
+    // A hand-built digest can still hand this an artist with no albums; credit only the albums actually gone.
     trimmed[section] += before - sectionItemCounts(current)[section];
   }
 }

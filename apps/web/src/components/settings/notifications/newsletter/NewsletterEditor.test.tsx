@@ -162,8 +162,7 @@ describe('NewsletterEditor', () => {
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof useNewsletter>);
-    // A fresh router (not the loading one) forces react-router's memoized route
-    // matches to recompute, so the newly-loaded row actually reaches the form.
+    // A fresh router (not the loading one) forces react-router's memoized route matches to recompute, so the newly-loaded row actually reaches the form.
     const loadedRouter = createMemoryRouter(
       [
         {

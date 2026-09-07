@@ -86,9 +86,7 @@ export function ReadinessList({
     },
   });
 
-  // Each branch calls `t()` with one literal key, so nothing here can drift to a key the
-  // translations don't have: a template built from `${check.id}${suffix}` can't express that
-  // externalUrl never has an 'unknown' state, but a switch on the discriminant can.
+  // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
   const copyFor = (check: ReadinessCheck): ReactNode => {
     switch (check.id) {
       case 'externalUrl':
@@ -102,8 +100,7 @@ export function ReadinessList({
       case 'recipients':
         if (check.status === 'pass') return t('newsletters.editor.readiness.recipients');
         if (check.status === 'fail') return t('newsletters.editor.readiness.recipientsFail');
-        // A saved newsletter whose recipients failed to load says so; an unsaved one has
-        // nothing to query yet, so it says recipients are unknown until save.
+        // A saved newsletter whose recipients failed to load says so; an unsaved one has nothing to query yet, so it says recipients are unknown until save.
         return newsletterId !== null && recipientsError
           ? t('newsletters.editor.readiness.recipientsLoadFailed')
           : t('newsletters.editor.readiness.recipientsUnknown');

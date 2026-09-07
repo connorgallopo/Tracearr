@@ -17,7 +17,13 @@ vi.mock('../../stats/topContent.js', () => ({
   topWatched: (...a: unknown[]) => mockTopWatched(...a) as unknown,
 }));
 
-import { assembleDigest, episodeRange, groupDigest, type LibraryItemRow } from '../assemble.js';
+import {
+  assembleDigest,
+  episodeRange,
+  groupDigest,
+  sectionItemCounts,
+  type LibraryItemRow,
+} from '../assemble.js';
 
 const at = (h: number) => new Date(Date.UTC(2026, 8, 1, h));
 let n = 0;
@@ -166,6 +172,26 @@ describe('groupDigest', () => {
       ['Third', 0, 2008],
     ]);
     expect(data.counts.albums).toBe(3);
+  });
+
+  it('drops an artist row with no albums or tracks in the window instead of an empty card', () => {
+    const rows = [
+      row({ mediaType: 'artist', title: 'Ghost Act', ratingKey: 'ar-ghost' }),
+      row({ mediaType: 'artist', title: 'Portishead', ratingKey: 'ar-Portishead' }),
+      row({
+        mediaType: 'album',
+        title: 'Dummy',
+        parentTitle: 'Portishead',
+        parentRatingKey: 'ar-Portishead',
+        ratingKey: 'al-Portishead-Dummy',
+      }),
+    ];
+    const data = groupDigest(rows, {
+      ...DEFAULT_NEWSLETTER_SECTIONS,
+      music: { enabled: true, max: 12 },
+    });
+    expect(data.artists.map((a) => a.name)).toEqual(['Portishead']);
+    expect(sectionItemCounts(data).albums).toBe(1);
   });
 
   it('honors disabled sections and reports empty', () => {

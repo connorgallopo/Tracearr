@@ -111,9 +111,7 @@ describe('ScheduleFields', () => {
     const p = props();
     render(<ScheduleFields {...p} mode="edit" nextRunAt="2026-09-07T07:00:00.000Z" />);
     const time = screen.getByLabelText('newsletters.editor.time');
-    // A controlled `type="time"` input reverts to its unchanged prop value between
-    // keystrokes when onChange is a bare mock, so a native input event over the whole
-    // value stands in for typing one digit at a time.
+    // A controlled time input reverts between keystrokes under a bare mock, so change the whole value at once.
     fireEvent.change(time, { target: { value: '18:30' } });
     expect(p.onChange).toHaveBeenLastCalledWith({
       schedule: { kind: 'weekly', dayOfWeek: 1, time: '18:30' },

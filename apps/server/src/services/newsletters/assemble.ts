@@ -312,7 +312,7 @@ export function groupDigest(rows: LibraryItemRow[], sections: NewsletterSections
   for (const artist of artistGroups) {
     const albums = [...artist.albums.values()];
     albumTotal += albums.length;
-    if (albumBudget <= 0) continue;
+    if (albums.length === 0 || albumBudget <= 0) continue;
     const taken = albums.slice(0, albumBudget);
     albumBudget -= taken.length;
     artists.push({
