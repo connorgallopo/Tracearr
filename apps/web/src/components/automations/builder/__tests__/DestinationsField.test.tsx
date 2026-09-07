@@ -213,4 +213,69 @@ describe('DestinationsField', () => {
     await user.click(quiet);
     expect(onChange).toHaveBeenCalledWith(['dest-mail']);
   });
+
+  it('does not dim an email destination mid-reencrypt with a null config', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail-reencrypt',
+        name: 'Reencrypting mail',
+        type: 'email',
+        config: null,
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const toggle = screen.getByRole('button', { name: 'Reencrypting mail' });
+    expect(toggle.className).not.toContain('opacity-60');
+
+    await user.hover(toggle);
+    expect(
+      screen.queryByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not dim a non-email destination that has no alert list', () => {
+    setDestinations([
+      destination({
+        id: 'dest-push-empty',
+        name: 'Quiet push',
+        type: 'push',
+        config: { to: '' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    expect(screen.getByRole('button', { name: 'Quiet push' }).className).not.toContain(
+      'opacity-60'
+    );
+  });
+
+  it('shows the disabled tooltip, not the alert-recipients one, for a disabled email destination with no alert list', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail-off',
+        name: 'Off mail',
+        type: 'email',
+        enabled: false,
+        config: { fromAddress: 'news@example.com', to: '' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const toggle = screen.getByRole('button', { name: 'Off mail' });
+    expect(toggle.className).toContain('opacity-60');
+
+    await user.hover(toggle);
+    expect(
+      await screen.findAllByText('pages:automations.builder.destinationDisabled')
+    ).not.toHaveLength(0);
+    expect(
+      screen.queryByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toBeInTheDocument();
+  });
 });
