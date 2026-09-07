@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, ExternalLink, UserX } from 'lucide-react';
 import type {
   NewsletterExcludedPerson,
   NewsletterRecipientPerson,
+  NewsletterRecipients,
   NewsletterRecipientsView,
   NewsletterResolvedRecipient,
 } from '@tracearr/shared';
@@ -34,6 +35,8 @@ interface PendingPerson extends NewsletterExcludedPerson {
 
 export interface RecipientPartition {
   receive: NewsletterResolvedRecipient[];
+  /** On the suppression list; the send records them as suppressed and mails nothing. */
+  suppressed: NewsletterResolvedRecipient[];
   missing: NewsletterRecipientPerson[];
   excluded: PendingPerson[];
   /** Excluded on the server, included here; they return to the list once saved. */
@@ -46,7 +49,9 @@ export function partitionRecipients(
   excludeUserIds: readonly string[]
 ): RecipientPartition {
   const local = new Set(excludeUserIds);
-  const receive = view.recipients.filter((r) => r.userId === null || !local.has(r.userId));
+  const kept = view.recipients.filter((r) => r.userId === null || !local.has(r.userId));
+  const receive = kept.filter((r) => !r.suppressed);
+  const suppressed = kept.filter((r) => r.suppressed);
   const excluded: PendingPerson[] = [
     ...view.excluded
       .filter((p) => p.reason !== 'excluded' || local.has(p.userId))
@@ -67,10 +72,23 @@ export function partitionRecipients(
   const included = view.excluded
     .filter((p) => p.reason === 'excluded' && !local.has(p.userId))
     .map((p) => ({ ...p, pending: true }));
-  return { receive, missing: view.missing, excluded, included };
+  return { receive, suppressed, missing: view.missing, excluded, included };
 }
 
 const address = z.email();
+
+/** What the send reaches with Members off: the typed addresses, normalized and deduped, the first name winning. */
+export function extraRecipients(
+  extraAddresses: readonly { address: string; name?: string }[]
+): { address: string; name: string | null }[] {
+  const seen = new Map<string, string | null>();
+  for (const row of extraAddresses) {
+    const normalized = row.address.trim().toLowerCase();
+    if (seen.has(normalized) || !address.safeParse(normalized).success) continue;
+    seen.set(normalized, row.name ?? null);
+  }
+  return [...seen].map(([addr, name]) => ({ address: addr, name }));
+}
 
 /** One row shape shared by the receive, included and excluded lists: a label, an optional
  * badge and description, and an optional trailing action. */
@@ -154,21 +172,39 @@ function MissingRow({
 
 export function RecipientsPanel({
   newsletterId,
-  excludeUserIds,
+  recipients,
   onExclude,
   onInclude,
 }: {
   newsletterId: string | null;
-  excludeUserIds: readonly string[];
+  recipients: NewsletterRecipients;
   onExclude: (userId: string) => void;
   onInclude: (userId: string) => void;
 }) {
   const { t } = useTranslation(['settings', 'common']);
+  const { members, extraAddresses, excludeUserIds } = recipients;
+  // With Members off the server has nothing to add: the list is the typed addresses.
   const { data, isLoading, isError, error, refetch } = useNewsletterRecipients(
-    newsletterId ?? undefined
+    members && newsletterId ? newsletterId : undefined
   );
   const [open, setOpen] = useState(false);
 
+  if (!members) {
+    const extras = extraRecipients(extraAddresses);
+    return (
+      <div className="flex flex-col gap-2">
+        <FieldDescription>{t('newsletters.editor.recipients.membersOff')}</FieldDescription>
+        <p className="text-sm font-medium">
+          {t('newsletters.editor.recipients.willReceive', { count: extras.length })}
+        </p>
+        <ItemGroup className="gap-1">
+          {extras.map((extra) => (
+            <RecipientRow key={extra.address} label={extra.address} description={extra.name} />
+          ))}
+        </ItemGroup>
+      </div>
+    );
+  }
   if (!newsletterId)
     return <FieldDescription>{t('newsletters.editor.recipients.saveFirst')}</FieldDescription>;
   if (isLoading) return <Skeleton className="h-24 w-full" />;
@@ -182,10 +218,31 @@ export function RecipientsPanel({
     );
   }
 
-  const { receive, missing, excluded, included } = partitionRecipients(data, excludeUserIds);
+  const { receive, suppressed, missing, excluded, included } = partitionRecipients(
+    data,
+    excludeUserIds
+  );
   const personName = (p: NewsletterRecipientPerson) => p.name ?? p.serverUserId;
+  const excludeAction = (r: NewsletterResolvedRecipient) => {
+    const userId = r.userId;
+    if (userId === null) return null;
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        aria-label={t('newsletters.editor.recipients.exclude', { name: r.name ?? r.address })}
+        onClick={() => onExclude(userId)}
+      >
+        {t('newsletters.editor.recipients.excludeAction')}
+      </Button>
+    );
+  };
 
-  if (receive.length + missing.length + excluded.length + included.length === 0) {
+  if (
+    receive.length + suppressed.length + missing.length + excluded.length + included.length ===
+    0
+  ) {
     return (
       <EmptyState
         icon={UserX}
@@ -202,36 +259,14 @@ export function RecipientsPanel({
           {t('newsletters.editor.recipients.willReceive', { count: receive.length })}
         </p>
         <ItemGroup className="mt-2 gap-1">
-          {receive.map((r) => {
-            const userId = r.userId;
-            return (
-              <RecipientRow
-                key={r.address}
-                label={r.address}
-                description={r.name}
-                badge={
-                  r.suppressed && (
-                    <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
-                  )
-                }
-                action={
-                  userId !== null && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      aria-label={t('newsletters.editor.recipients.exclude', {
-                        name: r.name ?? r.address,
-                      })}
-                      onClick={() => onExclude(userId)}
-                    >
-                      {t('newsletters.editor.recipients.excludeAction')}
-                    </Button>
-                  )
-                }
-              />
-            );
-          })}
+          {receive.map((r) => (
+            <RecipientRow
+              key={r.address}
+              label={r.address}
+              description={r.name}
+              action={excludeAction(r)}
+            />
+          ))}
           {included.map((p) => (
             <RecipientRow
               key={p.userId}
@@ -256,6 +291,27 @@ export function RecipientsPanel({
           ))}
         </ItemGroup>
       </div>
+      {suppressed.length > 0 && (
+        <div>
+          <p className="text-sm font-medium">
+            {t('newsletters.editor.recipients.suppressedHeading', { count: suppressed.length })}
+          </p>
+          <FieldDescription>{t('newsletters.editor.recipients.suppressedHelp')}</FieldDescription>
+          <ItemGroup className="mt-2 gap-1">
+            {suppressed.map((r) => (
+              <RecipientRow
+                key={r.address}
+                label={r.address}
+                description={r.name}
+                badge={
+                  <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
+                }
+                action={excludeAction(r)}
+              />
+            ))}
+          </ItemGroup>
+        </div>
+      )}
       <div>
         <p className="text-sm font-medium">
           {t('newsletters.editor.recipients.noAddress', { count: missing.length })}

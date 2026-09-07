@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import type { NewsletterRecipientsView } from '@tracearr/shared';
-import { RecipientsPanel, partitionRecipients } from './RecipientsPanel';
+import type { NewsletterRecipients, NewsletterRecipientsView } from '@tracearr/shared';
+import { RecipientsPanel, partitionRecipients, extraRecipients } from './RecipientsPanel';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -32,7 +32,7 @@ const view: NewsletterRecipientsView = {
   ],
 };
 
-function renderPanel(excludeUserIds: string[] = ['u4'], id: string | null = 'n-1') {
+function renderPanel(over: Partial<NewsletterRecipients> = {}, id: string | null = 'n-1') {
   const onExclude = vi.fn();
   const onInclude = vi.fn();
   vi.mocked(useNewsletterRecipients).mockReturnValue({
@@ -45,7 +45,7 @@ function renderPanel(excludeUserIds: string[] = ['u4'], id: string | null = 'n-1
     <MemoryRouter>
       <RecipientsPanel
         newsletterId={id}
-        excludeUserIds={excludeUserIds}
+        recipients={{ members: true, extraAddresses: [], excludeUserIds: ['u4'], ...over }}
         onExclude={onExclude}
         onInclude={onInclude}
       />
@@ -57,7 +57,9 @@ function renderPanel(excludeUserIds: string[] = ['u4'], id: string | null = 'n-1
 describe('partitionRecipients', () => {
   it('moves a locally excluded person to the excluded list and a locally included one back', () => {
     const out = partitionRecipients(view, ['u4', 'u1']);
-    expect(out.receive.map((r) => r.address)).toEqual(['gone@x.com', 'extra@x.com']);
+    expect(out.receive.map((r) => r.address)).toEqual(['extra@x.com']);
+    expect(out.suppressed.map((r) => r.address)).toEqual(['gone@x.com']);
+    expect(partitionRecipients(view, ['u4', 'u2']).suppressed).toEqual([]);
     expect(out.excluded.map((p) => [p.userId, p.reason, p.pending])).toEqual([
       ['u4', 'excluded', false],
       ['u5', 'banned', false],
@@ -75,7 +77,7 @@ describe('RecipientsPanel', () => {
   });
 
   it('says to save first in create mode', () => {
-    renderPanel([], null);
+    renderPanel({ excludeUserIds: [] }, null);
     expect(screen.getByText('newsletters.editor.recipients.saveFirst')).toBeInTheDocument();
     expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
   });
@@ -83,7 +85,10 @@ describe('RecipientsPanel', () => {
   it('lists who will receive with counts, a suppressed badge, and an exclude action for members', async () => {
     const { onExclude } = renderPanel();
     expect(
-      screen.getByText('newsletters.editor.recipients.willReceive:{"count":3}')
+      screen.getByText('newsletters.editor.recipients.willReceive:{"count":2}')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('newsletters.editor.recipients.suppressedHeading:{"count":1}')
     ).toBeInTheDocument();
     expect(
       screen.getByText('newsletters.editor.recipients.noAddress:{"count":1}')
@@ -140,7 +145,7 @@ describe('RecipientsPanel', () => {
   });
 
   it('offers an Exclude action on a person moved back from Excluded, same as any recipient', async () => {
-    const { onExclude } = renderPanel([]);
+    const { onExclude } = renderPanel({ excludeUserIds: [] });
     expect(screen.getByRole('listitem', { name: 'Dee' })).toHaveTextContent(
       'newsletters.editor.recipients.includedAfterSave'
     );
@@ -161,7 +166,7 @@ describe('RecipientsPanel', () => {
       <MemoryRouter>
         <RecipientsPanel
           newsletterId="n-1"
-          excludeUserIds={[]}
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
         />
@@ -172,5 +177,47 @@ describe('RecipientsPanel', () => {
     expect(
       screen.queryByText('newsletters.editor.recipients.willReceive:{"count":0}')
     ).not.toBeInTheDocument();
+  });
+
+  it('shows only the extra addresses when members are off and never asks the server', () => {
+    renderPanel({
+      members: false,
+      extraAddresses: [
+        { address: ' Ann@X.com ', name: 'Ann' },
+        { address: 'ann@x.com' },
+        { address: 'nope' },
+        { address: 'bo@x.com' },
+      ],
+    });
+    expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
+    expect(
+      screen.getByText('newsletters.editor.recipients.willReceive:{"count":2}')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('listitem', { name: 'ann@x.com' })).toHaveTextContent('Ann');
+    expect(screen.getByRole('listitem', { name: 'bo@x.com' })).toBeInTheDocument();
+    expect(screen.queryByText('Cid')).not.toBeInTheDocument();
+  });
+
+  it('restores the resolved list when members are on again', () => {
+    renderPanel({ members: true });
+    expect(useNewsletterRecipients).toHaveBeenCalledWith('n-1');
+    expect(screen.getByRole('listitem', { name: 'ann@x.com' })).toBeInTheDocument();
+  });
+});
+
+describe('extraRecipients', () => {
+  it('normalizes, drops invalid rows, and keeps the first name for a repeated address', () => {
+    expect(
+      extraRecipients([
+        { address: ' Ann@X.com ', name: 'Ann' },
+        { address: 'ann@x.com', name: 'Other' },
+        { address: '' },
+        { address: 'nope' },
+        { address: 'bo@x.com' },
+      ])
+    ).toEqual([
+      { address: 'ann@x.com', name: 'Ann' },
+      { address: 'bo@x.com', name: null },
+    ]);
   });
 });

@@ -46,6 +46,7 @@ export function RecipientsFields({
             {t('newsletters.editor.recipients.members')}
           </FieldLabel>
           <FieldDescription>{t('newsletters.editor.recipients.membersHelp')}</FieldDescription>
+          <FieldDescription>{t('newsletters.editor.recipients.ownerNote')}</FieldDescription>
         </FieldContent>
         <Switch
           id="newsletter-members"
@@ -126,7 +127,7 @@ export function RecipientsFields({
       </div>
       <RecipientsPanel
         newsletterId={newsletterId}
-        excludeUserIds={recipients.excludeUserIds}
+        recipients={recipients}
         onExclude={(userId) =>
           setRecipients({ excludeUserIds: [...recipients.excludeUserIds, userId] })
         }
