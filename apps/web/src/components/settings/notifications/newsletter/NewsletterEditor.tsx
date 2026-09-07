@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Info, Loader2, Save } from 'lucide-react';
 import type { Newsletter } from '@tracearr/shared';
@@ -28,6 +28,7 @@ import { SendHistory } from './SendHistory';
 import { useNewsletterSave } from './useNewsletterSave';
 import {
   defaultFormState,
+  prefillFromRouterState,
   seedFromNewsletter,
   validateForm,
   type NewsletterFormState,
@@ -173,6 +174,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
 export function NewsletterEditor() {
   const { t } = useTranslation('settings');
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { user } = useAuth();
   const { data: newsletter, isLoading, isError, error } = useNewsletter(id);
 
@@ -209,7 +211,11 @@ export function NewsletterEditor() {
   return (
     <EditorForm
       key={row?.id ?? 'new'}
-      seed={row ? seedFromNewsletter(row) : defaultFormState()}
+      seed={
+        row
+          ? seedFromNewsletter(row)
+          : { ...defaultFormState(), ...prefillFromRouterState(location.state) }
+      }
       newsletter={row}
     />
   );

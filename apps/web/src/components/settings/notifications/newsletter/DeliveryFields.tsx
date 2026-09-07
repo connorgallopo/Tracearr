@@ -1,8 +1,10 @@
-import { Link } from 'react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Plus } from 'lucide-react';
 import { NEWSLETTER_IMAGE_MODES } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { DestinationDialog } from '@/components/settings/destinations/DestinationDialog';
 import {
   Field,
   FieldContent,
@@ -31,6 +33,7 @@ export function DeliveryFields({ state, onChange, errors }: FieldsetProps) {
   const { data: settings } = useSettings();
   const emailDestinations = (destinations ?? []).filter((d) => d.type === 'email');
   const hostedWithoutUrl = state.imageMode === 'hosted' && !settings?.externalUrl;
+  const [addOpen, setAddOpen] = useState(false);
 
   return (
     <FieldSet>
@@ -40,15 +43,16 @@ export function DeliveryFields({ state, onChange, errors }: FieldsetProps) {
           {t('newsletters.editor.delivery.destination')}
         </FieldLabel>
         {emailDestinations.length === 0 ? (
-          <FieldDescription>
-            {t('newsletters.noDestinationDescription')}{' '}
-            <Link to="/settings/notifications/destinations">
-              {t('newsletters.goToDestinations')}
-            </Link>
-          </FieldDescription>
+          <div className="flex flex-col items-start gap-2">
+            <FieldDescription>{t('newsletters.noDestinationHint')}</FieldDescription>
+            <Button type="button" variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+              <Plus />
+              {t('newsletters.addEmailDestination')}
+            </Button>
+          </div>
         ) : (
           <Select
-            value={state.destinationId ?? NONE}
+            value={state.destinationId ?? undefined}
             onValueChange={(value) => onChange({ destinationId: value === NONE ? null : value })}
           >
             <SelectTrigger
@@ -117,6 +121,15 @@ export function DeliveryFields({ state, onChange, errors }: FieldsetProps) {
           aria-label={t('newsletters.editor.delivery.skipWhenEmpty')}
         />
       </Field>
+      {addOpen && (
+        <DestinationDialog
+          open
+          onOpenChange={setAddOpen}
+          mode="create"
+          initialKind="email"
+          onCreated={(created) => onChange({ destinationId: created.id })}
+        />
+      )}
     </FieldSet>
   );
 }

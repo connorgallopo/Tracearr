@@ -4,6 +4,7 @@ import {
   deepEqual,
   defaultFormState,
   diffPatch,
+  prefillFromRouterState,
   seedFromNewsletter,
   validateForm,
 } from './newsletterForm';
@@ -82,5 +83,16 @@ describe('newsletter form model', () => {
     });
     expect(Object.keys(errors).sort()).toEqual(['name', 'recipients', 'subject']);
     expect(errors.recipients).toMatch(/email/i);
+  });
+});
+
+describe('prefillFromRouterState', () => {
+  it('takes a destination id from router state and nothing else', () => {
+    expect(prefillFromRouterState({ destinationId: 'd-1' })).toEqual({ destinationId: 'd-1' });
+    expect(prefillFromRouterState({ destinationId: 7 })).toEqual({});
+    expect(prefillFromRouterState({ name: 'x' })).toEqual({});
+    expect(prefillFromRouterState(null)).toEqual({});
+    expect(prefillFromRouterState(undefined)).toEqual({});
+    expect(prefillFromRouterState('d-1')).toEqual({});
   });
 });

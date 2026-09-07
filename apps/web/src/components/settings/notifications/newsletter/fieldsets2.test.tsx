@@ -204,21 +204,6 @@ describe('DeliveryFields', () => {
     );
     expect(p.onChange).toHaveBeenCalledWith({ skipWhenEmpty: false });
   });
-
-  it('links to Destinations when no email destination exists', () => {
-    vi.mocked(useDestinations).mockReturnValue({ data: [discord] } as unknown as ReturnType<
-      typeof useDestinations
-    >);
-    render(
-      <MemoryRouter>
-        <DeliveryFields {...props()} />
-      </MemoryRouter>
-    );
-    expect(screen.getByRole('link', { name: 'newsletters.goToDestinations' })).toHaveAttribute(
-      'href',
-      '/settings/notifications/destinations'
-    );
-  });
 });
 
 describe('LinksFields', () => {

@@ -19,6 +19,26 @@ vi.mock('react-router', async () => {
   return { ...actual, useNavigate: () => navigate };
 });
 
+vi.mock('@/components/settings/destinations/DestinationDialog', () => ({
+  DestinationDialog: ({
+    open,
+    initialKind,
+    onCreated,
+  }: {
+    open: boolean;
+    initialKind?: string;
+    onCreated?: (created: { id: string }) => void;
+  }) =>
+    open ? (
+      <div>
+        <span>dialog kind: {initialKind}</span>
+        <button type="button" onClick={() => onCreated?.({ id: 'dest-new' })}>
+          simulate created
+        </button>
+      </div>
+    ) : null,
+}));
+
 vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
 
 const updateMutate = vi.fn();
@@ -88,16 +108,22 @@ describe('Newsletters section', () => {
     expect(useNewsletters).not.toHaveBeenCalled();
   });
 
-  it('points at Destinations before anything else when no email destination exists', () => {
+  it('creates the email destination in place and lands on the new newsletter with it selected', async () => {
     renderPage({ destinations: [] });
     expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
       'newsletters.noDestinationTitle'
     );
-    expect(screen.getByRole('link', { name: 'newsletters.goToDestinations' })).toHaveAttribute(
-      'href',
-      '/settings/notifications/destinations'
-    );
+    expect(screen.getByText('newsletters.noDestinationDescription')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'newsletters.new' })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.addEmailDestination' }));
+    expect(screen.getByText('dialog kind: email')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'simulate created' }));
+    expect(navigate).toHaveBeenCalledWith('/settings/notifications/newsletters/new', {
+      state: { destinationId: 'dest-new' },
+    });
   });
 
   it('hides the destination guidance and shows a skeleton while destinations are still loading', () => {

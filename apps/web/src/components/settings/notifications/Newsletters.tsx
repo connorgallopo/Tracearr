@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Info, Mail, Plus } from 'lucide-react';
 import type { Newsletter } from '@tracearr/shared';
@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
+import { DestinationDialog } from '@/components/settings/destinations/DestinationDialog';
 import {
   useDeleteNewsletter,
   useDestinations,
@@ -23,7 +24,6 @@ import { NewsletterRow } from './NewsletterRow';
 import { SendNowDialog } from './newsletter/SendNowDialog';
 
 export const NEWSLETTERS_PATH = '/settings/notifications/newsletters';
-const DESTINATIONS_PATH = '/settings/notifications/destinations';
 
 /** Shared by the header action and the empty state; each caller's own useNavigate keeps this self-contained. */
 function NewNewsletterButton() {
@@ -34,6 +34,32 @@ function NewNewsletterButton() {
       <Plus />
       {t('newsletters.new')}
     </Button>
+  );
+}
+
+/** The empty state creates the SMTP destination here and lands on the new newsletter with it selected. */
+function AddEmailDestinationButton() {
+  const { t } = useTranslation('settings');
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <Plus />
+        {t('newsletters.addEmailDestination')}
+      </Button>
+      {open && (
+        <DestinationDialog
+          open
+          onOpenChange={setOpen}
+          mode="create"
+          initialKind="email"
+          onCreated={(created) =>
+            void navigate(`${NEWSLETTERS_PATH}/new`, { state: { destinationId: created.id } })
+          }
+        />
+      )}
+    </>
   );
 }
 
@@ -86,9 +112,7 @@ function NewsletterList({ hasEmailDestination }: { hasEmailDestination: boolean 
         title={t('newsletters.noDestinationTitle')}
         description={t('newsletters.noDestinationDescription')}
       >
-        <Button asChild variant="outline">
-          <Link to={DESTINATIONS_PATH}>{t('newsletters.goToDestinations')}</Link>
-        </Button>
+        <AddEmailDestinationButton />
       </EmptyState>
     );
   }

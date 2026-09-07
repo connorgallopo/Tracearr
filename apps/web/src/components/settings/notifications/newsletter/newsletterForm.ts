@@ -107,3 +107,9 @@ export function validateForm(state: NewsletterFormState): FieldErrors {
   }
   return errors;
 }
+
+export function prefillFromRouterState(state: unknown): Partial<NewsletterFormState> {
+  if (typeof state !== 'object' || state === null) return {};
+  const { destinationId } = state as { destinationId?: unknown };
+  return typeof destinationId === 'string' ? { destinationId } : {};
+}
