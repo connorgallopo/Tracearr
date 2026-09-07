@@ -116,7 +116,7 @@ describe('RecipientsFields', () => {
     const view: NewsletterRecipientsView = {
       recipients: [],
       missing: [],
-      excluded: [{ userId: 'u4', serverUserId: 'su-4', name: 'Dee' }],
+      excluded: [{ userId: 'u4', serverUserId: 'su-4', name: 'Dee', reason: 'excluded' }],
     };
     vi.mocked(useNewsletterRecipients).mockReturnValue({
       data: view,

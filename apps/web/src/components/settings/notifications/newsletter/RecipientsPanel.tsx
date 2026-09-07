@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, ExternalLink, UserX } from 'lucide-react';
 import type {
+  NewsletterExcludedPerson,
   NewsletterRecipientPerson,
   NewsletterRecipientsView,
   NewsletterResolvedRecipient,
@@ -26,7 +27,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
 
-interface PendingPerson extends NewsletterRecipientPerson {
+interface PendingPerson extends NewsletterExcludedPerson {
   /** True when the change waits for Save: excluded here but not on the server, or the reverse. */
   pending: boolean;
 }
@@ -47,7 +48,9 @@ export function partitionRecipients(
   const local = new Set(excludeUserIds);
   const receive = view.recipients.filter((r) => r.userId === null || !local.has(r.userId));
   const excluded: PendingPerson[] = [
-    ...view.excluded.filter((p) => local.has(p.userId)).map((p) => ({ ...p, pending: false })),
+    ...view.excluded
+      .filter((p) => p.reason !== 'excluded' || local.has(p.userId))
+      .map((p) => ({ ...p, pending: false })),
     ...view.recipients
       .filter(
         (r): r is NewsletterResolvedRecipient & { userId: string; serverUserId: string } =>
@@ -57,11 +60,12 @@ export function partitionRecipients(
         userId: r.userId,
         serverUserId: r.serverUserId,
         name: r.name,
+        reason: 'excluded' as const,
         pending: true,
       })),
   ];
   const included = view.excluded
-    .filter((p) => !local.has(p.userId))
+    .filter((p) => p.reason === 'excluded' && !local.has(p.userId))
     .map((p) => ({ ...p, pending: true }));
   return { receive, missing: view.missing, excluded, included };
 }
@@ -277,24 +281,36 @@ export function RecipientsPanel({
                 key={p.userId}
                 label={personName(p)}
                 badge={
-                  p.pending && (
-                    <Badge variant="outline">
-                      {t('newsletters.editor.recipients.excludedAfterSave')}
+                  p.reason === 'banned' ? (
+                    <Badge variant="warning">
+                      {t('newsletters.editor.recipients.reasons.banned')}
                     </Badge>
+                  ) : p.reason === 'pending' ? (
+                    <Badge variant="warning">
+                      {t('newsletters.editor.recipients.reasons.pending')}
+                    </Badge>
+                  ) : (
+                    p.pending && (
+                      <Badge variant="outline">
+                        {t('newsletters.editor.recipients.excludedAfterSave')}
+                      </Badge>
+                    )
                   )
                 }
                 action={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    aria-label={t('newsletters.editor.recipients.include', {
-                      name: personName(p),
-                    })}
-                    onClick={() => onInclude(p.userId)}
-                  >
-                    {t('newsletters.editor.recipients.includeAction')}
-                  </Button>
+                  p.reason === 'excluded' && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={t('newsletters.editor.recipients.include', {
+                        name: personName(p),
+                      })}
+                      onClick={() => onInclude(p.userId)}
+                    >
+                      {t('newsletters.editor.recipients.includeAction')}
+                    </Button>
+                  )
                 }
               />
             ))}

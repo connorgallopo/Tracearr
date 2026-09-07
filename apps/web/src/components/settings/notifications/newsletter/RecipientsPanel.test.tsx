@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import type { NewsletterRecipientsView } from '@tracearr/shared';
@@ -26,7 +26,10 @@ const view: NewsletterRecipientsView = {
     { address: 'extra@x.com', userId: null, serverUserId: null, name: null, suppressed: false },
   ],
   missing: [{ userId: 'u3', serverUserId: 'su-3', name: 'Cid' }],
-  excluded: [{ userId: 'u4', serverUserId: 'su-4', name: 'Dee' }],
+  excluded: [
+    { userId: 'u4', serverUserId: 'su-4', name: 'Dee', reason: 'excluded' },
+    { userId: 'u5', serverUserId: 'su-5', name: 'Eve', reason: 'banned' },
+  ],
 };
 
 function renderPanel(excludeUserIds: string[] = ['u4'], id: string | null = 'n-1') {
@@ -55,12 +58,13 @@ describe('partitionRecipients', () => {
   it('moves a locally excluded person to the excluded list and a locally included one back', () => {
     const out = partitionRecipients(view, ['u4', 'u1']);
     expect(out.receive.map((r) => r.address)).toEqual(['gone@x.com', 'extra@x.com']);
-    expect(out.excluded.map((p) => [p.userId, p.pending])).toEqual([
-      ['u4', false],
-      ['u1', true],
+    expect(out.excluded.map((p) => [p.userId, p.reason, p.pending])).toEqual([
+      ['u4', 'excluded', false],
+      ['u5', 'banned', false],
+      ['u1', 'excluded', true],
     ]);
     const back = partitionRecipients(view, []);
-    expect(back.excluded).toEqual([]);
+    expect(back.excluded.map((p) => p.userId)).toEqual(['u5']);
     expect(back.included.map((p) => p.userId)).toEqual(['u4']);
   });
 });
@@ -85,7 +89,7 @@ describe('RecipientsPanel', () => {
       screen.getByText('newsletters.editor.recipients.noAddress:{"count":1}')
     ).toBeInTheDocument();
     expect(
-      screen.getByText('newsletters.editor.recipients.excludedCount:{"count":1}')
+      screen.getByText('newsletters.editor.recipients.excludedCount:{"count":2}')
     ).toBeInTheDocument();
     const bob = screen.getByRole('listitem', { name: 'gone@x.com' });
     expect(bob).toHaveTextContent('newsletters.editor.recipients.suppressed');
@@ -123,9 +127,12 @@ describe('RecipientsPanel', () => {
     expect(screen.queryByText('Dee')).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('button', {
-        name: 'newsletters.editor.recipients.excludedCount:{"count":1}',
+        name: 'newsletters.editor.recipients.excludedCount:{"count":2}',
       })
     );
+    expect(
+      within(screen.getByRole('listitem', { name: 'Eve' })).queryByRole('button')
+    ).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.include:{"name":"Dee"}' })
     );

@@ -587,6 +587,7 @@ export {
   NEWSLETTER_VIEW_TOKEN_LENGTH,
   NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
   NEWSLETTER_SEND_RETENTION_DAYS,
+  NEWSLETTER_EXCLUDED_REASONS,
 } from './newsletters.js';
 export type {
   NewsletterSendTrigger,
@@ -609,6 +610,8 @@ export type {
   NewsletterSendDetail,
   NewsletterSendsPage,
   NewsletterRecipientPerson,
+  NewsletterExcludedReason,
+  NewsletterExcludedPerson,
   NewsletterResolvedRecipient,
   NewsletterRecipientsView,
   EmailSuppression,

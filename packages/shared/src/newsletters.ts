@@ -313,6 +313,14 @@ export interface NewsletterRecipientPerson {
   name: string | null;
 }
 
+export const NEWSLETTER_EXCLUDED_REASONS = ['excluded', 'banned', 'pending'] as const;
+export type NewsletterExcludedReason = (typeof NEWSLETTER_EXCLUDED_REASONS)[number];
+
+/** Why a person with an account on a scoped server is not on the list: the owner excluded them, or their identity is banned or still pending. */
+export interface NewsletterExcludedPerson extends NewsletterRecipientPerson {
+  reason: NewsletterExcludedReason;
+}
+
 export interface NewsletterResolvedRecipient {
   address: string;
   userId: string | null;
@@ -325,7 +333,7 @@ export interface NewsletterResolvedRecipient {
 export interface NewsletterRecipientsView {
   recipients: NewsletterResolvedRecipient[];
   missing: NewsletterRecipientPerson[];
-  excluded: NewsletterRecipientPerson[];
+  excluded: NewsletterExcludedPerson[];
 }
 
 export interface EmailSuppression {

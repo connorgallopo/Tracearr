@@ -32,11 +32,13 @@ describe('recipient candidates', () => {
     await db.delete(emailSuppressions);
   });
 
-  it('joins active accounts to identities, honors scope, and skips disabled and removed rows', async () => {
-    const seeded = await seedMultipleUsers(3);
+  it('joins active accounts to identities, honors scope, skips disabled and removed rows, and names banned and pending ones', async () => {
+    const seeded = await seedMultipleUsers(5);
     const members = await db.select().from(serverUsers);
-    expect(members.length).toBeGreaterThanOrEqual(3);
-    const [a, b, c] = members as [
+    expect(members.length).toBeGreaterThanOrEqual(5);
+    const [a, b, c, d, e] = members as [
+      (typeof members)[number],
+      (typeof members)[number],
       (typeof members)[number],
       (typeof members)[number],
       (typeof members)[number],
@@ -45,12 +47,17 @@ describe('recipient candidates', () => {
     await db.update(serverUsers).set({ email: 'A@Example.com' }).where(eq(serverUsers.id, a.id));
     await updateUser(b.userId, { contactEmail: 'Contact@Example.com' });
     await db.update(users).set({ role: 'disabled' }).where(eq(users.id, c.userId));
+    await db.update(users).set({ banned: true }).where(eq(users.id, d.userId));
+    await db.update(users).set({ role: 'pending' }).where(eq(users.id, e.userId));
 
     const all = await loadCandidates([]);
     const byUser = new Map(all.map((cand) => [cand.userId, cand]));
     expect(byUser.get(a.userId)?.accountEmails).toEqual(['A@Example.com']);
+    expect(byUser.get(a.userId)?.blocked).toBeNull();
     expect(byUser.get(b.userId)?.contactEmail).toBe('contact@example.com');
     expect(byUser.has(c.userId)).toBe(false);
+    expect(byUser.get(d.userId)?.blocked).toBe('banned');
+    expect(byUser.get(e.userId)?.blocked).toBe('pending');
     expect(byUser.get(a.userId)?.serverUserId).toBe(a.id);
 
     await db.update(serverUsers).set({ removedAt: new Date() }).where(eq(serverUsers.id, a.id));

@@ -19,6 +19,7 @@ const c = (over: Partial<RecipientCandidate>): RecipientCandidate => ({
   contactEmail: null,
   identityEmail: null,
   accountEmails: [],
+  blocked: null,
   ...over,
 });
 
@@ -84,8 +85,34 @@ describe('mergeRecipients', () => {
     ]);
     expect(missing).toEqual([]);
     expect(excluded).toEqual([
-      { userId: 'u2', serverUserId: 'su-u2', name: 'Two' },
-      { userId: 'u3', serverUserId: 'su-u3', name: 'Three' },
+      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'excluded' },
+      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'excluded' },
+    ]);
+  });
+
+  it('sets banned and pending identities aside with their reason, ahead of the owner exclusion', () => {
+    const { recipients, missing, excluded } = mergeRecipients(
+      [
+        c({ userId: 'u1', serverUserId: 'su-u1', name: 'One', contactEmail: 'one@x.com' }),
+        c({
+          userId: 'u2',
+          serverUserId: 'su-u2',
+          name: 'Two',
+          contactEmail: 'two@x.com',
+          blocked: 'banned',
+        }),
+        c({ userId: 'u3', serverUserId: 'su-u3', name: 'Three', blocked: 'pending' }),
+      ],
+      [],
+      new Set(),
+      ['u1', 'u2']
+    );
+    expect(recipients).toEqual([]);
+    expect(missing).toEqual([]);
+    expect(excluded).toEqual([
+      { userId: 'u1', serverUserId: 'su-u1', name: 'One', reason: 'excluded' },
+      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'banned' },
+      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'pending' },
     ]);
   });
 
@@ -203,6 +230,15 @@ describe('resolveRecipients', () => {
           identity_email: null,
           account_emails: null,
         },
+        {
+          user_id: 'u3',
+          server_user_id: 'su-u3',
+          name: 'Three',
+          contact_email: 'three@x.com',
+          identity_email: null,
+          account_emails: null,
+          blocked: 'banned',
+        },
       ],
     });
     const out = await resolveRecipients({
@@ -211,6 +247,9 @@ describe('resolveRecipients', () => {
     });
     expect(mockSuppressed).toHaveBeenCalledWith(['one@x.com']);
     expect(out.recipients.map((r) => r.address)).toEqual(['one@x.com']);
-    expect(out.excluded).toEqual([{ userId: 'u2', serverUserId: 'su-u2', name: 'Two' }]);
+    expect(out.excluded).toEqual([
+      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'excluded' },
+      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'banned' },
+    ]);
   });
 });

@@ -678,6 +678,10 @@
         "excludedCount": "Excluded ({{count}})",
         "excludedAfterSave": "Excluded after save",
         "includedAfterSave": "Included after save",
+        "reasons": {
+          "banned": "Banned",
+          "pending": "Pending"
+        },
         "emptyTitle": "Nobody will receive this newsletter",
         "emptyDescription": "Turn on Members above, or add an extra address, to reach someone."
       },

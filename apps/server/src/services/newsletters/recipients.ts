@@ -1,5 +1,7 @@
 import { sql } from 'drizzle-orm';
 import type {
+  NewsletterExcludedPerson,
+  NewsletterExcludedReason,
   NewsletterRecipientPerson,
   NewsletterRecipients,
   NewsletterScope,
@@ -15,6 +17,8 @@ export interface RecipientCandidate {
   contactEmail: string | null;
   identityEmail: string | null;
   accountEmails: string[];
+  /** Banned or pending identities stay on the list as excluded so the owner sees why a name is missing. */
+  blocked: Exclude<NewsletterExcludedReason, 'excluded'> | null;
 }
 
 export interface ResolvedRecipient {
@@ -28,7 +32,7 @@ export interface ResolvedRecipient {
 export interface RecipientResolution {
   recipients: ResolvedRecipient[];
   missing: NewsletterRecipientPerson[];
-  excluded: NewsletterRecipientPerson[];
+  excluded: NewsletterExcludedPerson[];
 }
 
 function firstAddress(candidate: RecipientCandidate): string | null {
@@ -54,10 +58,14 @@ export function mergeRecipients(
   const seen = new Set<string>();
   const recipients: ResolvedRecipient[] = [];
   const missing: NewsletterRecipientPerson[] = [];
-  const excluded: NewsletterRecipientPerson[] = [];
+  const excluded: NewsletterExcludedPerson[] = [];
   for (const candidate of candidates) {
+    if (candidate.blocked) {
+      excluded.push({ ...person(candidate), reason: candidate.blocked });
+      continue;
+    }
     if (excludedIds.has(candidate.userId)) {
-      excluded.push(person(candidate));
+      excluded.push({ ...person(candidate), reason: 'excluded' });
       continue;
     }
     const address = firstAddress(candidate);
@@ -97,9 +105,10 @@ interface CandidateRow {
   contact_email: string | null;
   identity_email: string | null;
   account_emails: string[] | null;
+  blocked: 'banned' | 'pending' | null;
 }
 
-/** One row per identity with an active account on a scoped server; disabled identities never receive mail. */
+/** One row per identity with an active account on a scoped server; disabled identities never receive mail, banned and pending ones are reported. */
 export async function loadCandidates(serverIds: string[]): Promise<RecipientCandidate[]> {
   const scope = serverIds.length === 0 ? sql`` : sql`AND su.server_id IN ${serverIds}`;
   const result = await db.execute(sql`
@@ -108,7 +117,8 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
            u.name,
            u.contact_email,
            u.email AS identity_email,
-           array_remove(array_agg(su.email ORDER BY su.created_at, su.id), NULL) AS account_emails
+           array_remove(array_agg(su.email ORDER BY su.created_at, su.id), NULL) AS account_emails,
+           CASE WHEN u.banned IS TRUE THEN 'banned' WHEN u.role = 'pending' THEN 'pending' END AS blocked
     FROM users u
     JOIN server_users su ON su.user_id = u.id AND su.removed_at IS NULL
     WHERE u.role <> 'disabled' ${scope}
@@ -122,6 +132,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
     contactEmail: row.contact_email,
     identityEmail: row.identity_email,
     accountEmails: row.account_emails ?? [],
+    blocked: row.blocked ?? null,
   }));
 }
 
@@ -134,7 +145,7 @@ export async function resolveRecipients(newsletter: {
   const excludedIds = new Set(excludeUserIds);
   const addresses = [
     ...candidates
-      .filter((candidate) => !excludedIds.has(candidate.userId))
+      .filter((candidate) => !candidate.blocked && !excludedIds.has(candidate.userId))
       .map(firstAddress)
       .filter((a): a is string => a !== null),
     ...extraAddresses.map((e) => normalizeAddress(e.address)),
