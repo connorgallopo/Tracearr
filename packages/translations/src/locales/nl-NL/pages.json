@@ -372,6 +372,7 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "Policy",
         "servers": "",
@@ -398,6 +399,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -598,6 +607,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "media is toegevoegd",
         "mediaUpgraded": "media is geüpgraded",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "een plugin update is beschikbaar",
         "serverDown": "een server gaat uit",
         "serverUp": "een server komt terug",
@@ -1093,6 +1104,11 @@
         "name": ""
       },
       "new-device": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
+      "newsletter-failed": {
         "description": "",
         "keywords": "",
         "name": ""
@@ -1984,6 +2000,14 @@
     "allServers": "Alle servers",
     "backToUsers": "Terug naar gebruikers",
     "byRule": "Door / Regel",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "Gekoppelde accounts",
     "manual": "Handmatig",
     "noTerminationsFound": "Geen afgebroken streams voor deze gebruiker.",

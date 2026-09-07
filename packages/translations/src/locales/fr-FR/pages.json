@@ -372,6 +372,7 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
@@ -398,6 +399,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -598,6 +607,8 @@
         "accountTrustChanged": "changement de score de confiance d'un compte",
         "mediaAdded": "média ajouté",
         "mediaUpgraded": "média mis à jour",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "une mise à jour du plugin est disponible",
         "serverDown": "un serveur est en panne",
         "serverUp": "un serveur est de retour",
@@ -1093,6 +1104,11 @@
         "name": ""
       },
       "new-device": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
+      "newsletter-failed": {
         "description": "",
         "keywords": "",
         "name": ""
@@ -1984,6 +2000,14 @@
     "allServers": "Tous les serveurs",
     "backToUsers": "Retour aux utilisateurs",
     "byRule": "Par / Règle",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "Comptes liés",
     "manual": "Manuel",
     "noTerminationsFound": "Aucune interruption de lecture pour cet utilisateur.",

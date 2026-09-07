@@ -372,6 +372,7 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
@@ -398,6 +399,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -598,6 +607,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "",
         "serverDown": "",
         "serverUp": "",
@@ -1093,6 +1104,11 @@
         "name": ""
       },
       "new-device": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
+      "newsletter-failed": {
         "description": "",
         "keywords": "",
         "name": ""
@@ -1984,6 +2000,14 @@
     "allServers": "",
     "backToUsers": "사용자로 돌아가기",
     "byRule": "처리자 / 규칙",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "",
     "manual": "수동",
     "noTerminationsFound": "이 사용자의 스트림 종료 기록이 없습니다.",

@@ -372,6 +372,7 @@
         "accounts": "Accounts",
         "control": "Control flow",
         "library": "Library",
+        "notifications": "",
         "notify": "Notify",
         "policy": "Policy",
         "servers": "Servers",
@@ -400,6 +401,14 @@
         "mediaUpgraded": {
           "description": "A library item that was already there changes quality.",
           "synonyms": "upgrade, quality, replaced, remux, 4k, resolution"
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
         },
         "pluginUpdateAvailable": {
           "description": "The Tracearr plugin on a server has a newer release.",
@@ -598,6 +607,8 @@
         "accountTrustChanged": "an account's trust score changes",
         "mediaAdded": "media is added",
         "mediaUpgraded": "media is upgraded",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "a plugin update is available",
         "serverDown": "a server goes down",
         "serverUp": "a server comes back up",
@@ -1096,6 +1107,11 @@
         "description": "Tell a destination the first time an account streams from a device you have not seen.",
         "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook",
         "name": "New device"
+      },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
       },
       "no-4k-transcodes": {
         "description": "Stop a stream that transcodes 4K source video.",
@@ -1984,6 +2000,14 @@
     "allServers": "All servers",
     "backToUsers": "Back to Users",
     "byRule": "By / Rule",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "Linked accounts",
     "manual": "Manual",
     "noTerminationsFound": "No stream terminations for this user.",
