@@ -14,6 +14,11 @@ export interface RecipientCandidate {
   /** The oldest account on a scoped server; the identity PATCH route keys on it. */
   serverUserId: string;
   name: string | null;
+  /** Username, server and avatar of that same oldest account. */
+  username: string | null;
+  serverId: string;
+  serverName: string;
+  thumbUrl: string | null;
   contactEmail: string | null;
   identityEmail: string | null;
   accountEmails: string[];
@@ -27,6 +32,10 @@ export interface ResolvedRecipient {
   serverUserId: string | null;
   name: string | null;
   suppressed: boolean;
+  serverId: string | null;
+  username: string | null;
+  serverName: string | null;
+  thumbUrl: string | null;
 }
 
 export interface RecipientResolution {
@@ -45,6 +54,10 @@ const person = (candidate: RecipientCandidate): NewsletterRecipientPerson => ({
   userId: candidate.userId,
   serverUserId: candidate.serverUserId,
   name: candidate.name,
+  username: candidate.username,
+  serverId: candidate.serverId,
+  serverName: candidate.serverName,
+  thumbUrl: candidate.thumbUrl,
 });
 
 /** Identities first, in the order given; hand-typed extras after; one row per address. Excluded identities are set aside before addressing. */
@@ -81,6 +94,10 @@ export function mergeRecipients(
       serverUserId: candidate.serverUserId,
       name: candidate.name,
       suppressed: suppressed.has(address),
+      username: candidate.username,
+      serverId: candidate.serverId,
+      serverName: candidate.serverName,
+      thumbUrl: candidate.thumbUrl,
     });
   }
   for (const extra of extras) {
@@ -93,6 +110,10 @@ export function mergeRecipients(
       serverUserId: null,
       name: extra.name ?? null,
       suppressed: suppressed.has(address),
+      username: null,
+      serverId: null,
+      serverName: null,
+      thumbUrl: null,
     });
   }
   return { recipients, missing, excluded };
@@ -105,6 +126,10 @@ interface CandidateRow {
   contact_email: string | null;
   identity_email: string | null;
   account_emails: string[] | null;
+  usernames: string[] | null;
+  server_ids: string[] | null;
+  server_names: string[] | null;
+  thumb_urls: (string | null)[] | null;
   blocked: 'banned' | 'pending' | null;
 }
 
@@ -118,9 +143,14 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
            u.contact_email,
            u.email AS identity_email,
            array_remove(array_agg(su.email ORDER BY su.created_at, su.id), NULL) AS account_emails,
+           array_remove(array_agg(su.username ORDER BY su.created_at, su.id), NULL) AS usernames,
+           array_agg(su.server_id ORDER BY su.created_at, su.id) AS server_ids,
+           array_agg(s.name ORDER BY su.created_at, su.id) AS server_names,
+           array_agg(su.thumb_url ORDER BY su.created_at, su.id) AS thumb_urls,
            CASE WHEN u.banned IS TRUE THEN 'banned' WHEN u.role = 'pending' THEN 'pending' END AS blocked
     FROM users u
     JOIN server_users su ON su.user_id = u.id AND su.removed_at IS NULL
+    JOIN servers s ON s.id = su.server_id
     WHERE u.role <> 'disabled' ${scope}
     GROUP BY u.id
     ORDER BY u.created_at, u.id
@@ -129,6 +159,10 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
     userId: row.user_id,
     serverUserId: row.server_user_id,
     name: row.name,
+    username: row.usernames?.[0] ?? null,
+    serverId: row.server_ids?.[0] ?? '',
+    serverName: row.server_names?.[0] ?? '',
+    thumbUrl: row.thumb_urls?.[0] ?? null,
     contactEmail: row.contact_email,
     identityEmail: row.identity_email,
     accountEmails: row.account_emails ?? [],

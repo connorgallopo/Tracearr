@@ -120,6 +120,10 @@ export async function runNewsletter(
             serverUserId: null,
             name: null,
             suppressed: false,
+            serverId: null,
+            username: null,
+            serverName: null,
+            thumbUrl: null,
           },
         ]
       : (await resolveRecipients(newsletter)).recipients;

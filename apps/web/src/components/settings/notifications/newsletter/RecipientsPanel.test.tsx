@@ -1,8 +1,10 @@
+import type { ComponentProps } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import type { NewsletterRecipients, NewsletterRecipientsView } from '@tracearr/shared';
+import { getAvatarUrl } from '@/components/users/utils';
 import { RecipientsPanel, partitionRecipients, extraRecipients } from './RecipientsPanel';
 
 vi.mock('react-i18next', () => ({
@@ -17,18 +19,84 @@ vi.mock('@/hooks/queries', () => ({
   useNewsletterRecipients: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: identityMutate, isPending: false }),
 }));
+// Radix's Avatar image only mounts once the browser reports the image loaded, which jsdom never does.
+vi.mock('@/components/ui/avatar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui/avatar')>();
+  return {
+    ...actual,
+    AvatarImage: (props: ComponentProps<'img'>) => <img alt="" {...props} />,
+  };
+});
 import { useNewsletterRecipients } from '@/hooks/queries';
 
 const view: NewsletterRecipientsView = {
   recipients: [
-    { address: 'ann@x.com', userId: 'u1', serverUserId: 'su-1', name: 'Ann', suppressed: false },
-    { address: 'gone@x.com', userId: 'u2', serverUserId: 'su-2', name: 'Bob', suppressed: true },
-    { address: 'extra@x.com', userId: null, serverUserId: null, name: null, suppressed: false },
+    {
+      address: 'ann@x.com',
+      userId: 'u1',
+      serverUserId: 'su-1',
+      name: 'Ann',
+      suppressed: false,
+      username: 'ann',
+      serverId: 's1',
+      serverName: 'Home Plex',
+      thumbUrl: null,
+    },
+    {
+      address: 'gone@x.com',
+      userId: 'u2',
+      serverUserId: 'su-2',
+      name: 'Bob',
+      suppressed: true,
+      username: 'bob',
+      serverId: 's1',
+      serverName: 'Home Plex',
+      thumbUrl: null,
+    },
+    {
+      address: 'extra@x.com',
+      userId: null,
+      serverUserId: null,
+      name: null,
+      suppressed: false,
+      username: null,
+      serverId: null,
+      serverName: null,
+      thumbUrl: null,
+    },
   ],
-  missing: [{ userId: 'u3', serverUserId: 'su-3', name: 'Cid' }],
+  missing: [
+    {
+      userId: 'u3',
+      serverUserId: 'su-3',
+      name: 'Cid',
+      username: 'cid',
+      serverId: 's1',
+      serverName: 'Home Plex',
+      thumbUrl: null,
+    },
+  ],
   excluded: [
-    { userId: 'u4', serverUserId: 'su-4', name: 'Dee', reason: 'excluded' },
-    { userId: 'u5', serverUserId: 'su-5', name: 'Eve', reason: 'banned' },
+    {
+      userId: 'u4',
+      serverUserId: 'su-4',
+      name: 'Dee',
+      username: 'dee',
+      serverId: 's1',
+      serverName: 'Home Plex',
+      thumbUrl: null,
+      reason: 'excluded',
+    },
+    {
+      userId: 'u5',
+      serverUserId: 'su-5',
+      name: 'Eve',
+      username: 'eve',
+      serverId: 's1',
+      serverName: 'Home Plex',
+      thumbUrl: null,
+      reason: 'banned',
+    },
   ],
 };
 
@@ -96,7 +164,7 @@ describe('RecipientsPanel', () => {
     expect(
       screen.getByText('newsletters.editor.recipients.excludedCount:{"count":2}')
     ).toBeInTheDocument();
-    const bob = screen.getByRole('listitem', { name: 'gone@x.com' });
+    const bob = screen.getByRole('listitem', { name: 'Bob' });
     expect(bob).toHaveTextContent('newsletters.editor.recipients.suppressed');
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Ann"}' })
@@ -123,7 +191,9 @@ describe('RecipientsPanel', () => {
     );
     expect(refetch).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByRole('link', { name: 'newsletters.editor.recipients.openUser' })
+      screen.getByRole('link', {
+        name: 'newsletters.editor.recipients.openUserPage:{"name":"Cid"}',
+      })
     ).toHaveAttribute('href', '/users/su-3');
   });
 
@@ -201,7 +271,135 @@ describe('RecipientsPanel', () => {
   it('restores the resolved list when members are on again', () => {
     renderPanel({ members: true });
     expect(useNewsletterRecipients).toHaveBeenCalledWith('n-1');
-    expect(screen.getByRole('listitem', { name: 'ann@x.com' })).toBeInTheDocument();
+    expect(screen.getByRole('listitem', { name: 'Ann' })).toBeInTheDocument();
+  });
+
+  it('shows a missing-address person by their username, linked to their page, with no uuid on screen', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [],
+        missing: [
+          {
+            userId: 'u9',
+            serverUserId: 'su-9',
+            name: null,
+            username: 'garry',
+            serverId: 's2',
+            serverName: 'Basement Jellyfin',
+            thumbUrl: null,
+          },
+        ],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <MemoryRouter>
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+    const link = screen.getByRole('link', {
+      name: 'newsletters.editor.recipients.openUserPage:{"name":"garry"}',
+    });
+    expect(link).toHaveTextContent('garry');
+    expect(link).toHaveAttribute('href', '/users/su-9');
+    expect(
+      screen.getByText(
+        'newsletters.editor.recipients.account:{"username":"garry","server":"Basement Jellyfin"}'
+      )
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/[0-9a-f]{8}-[0-9a-f]{4}/)).not.toBeInTheDocument();
+  });
+
+  it('renders a member with an address using the account avatar, a name link, and the email in the muted line', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [
+          {
+            address: 'sarah@x.com',
+            userId: 'u1',
+            serverUserId: 'su-1',
+            name: 'Sarah',
+            suppressed: false,
+            username: 'sarah',
+            serverId: 's1',
+            serverName: 'Home Plex',
+            thumbUrl: '/library/avatar.png',
+          },
+        ],
+        missing: [],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <MemoryRouter>
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+    const row = screen.getByRole('listitem', { name: 'Sarah' });
+    const img = row.querySelector('img');
+    expect(img).toHaveAttribute('src', getAvatarUrl('s1', '/library/avatar.png', 40) ?? '');
+    expect(screen.getByRole('link', { name: /Sarah/ })).toHaveAttribute('href', '/users/su-1');
+    expect(
+      screen.getByText(
+        'sarah@x.com · newsletters.editor.recipients.account:{"username":"sarah","server":"Home Plex"}'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('renders an extra address with a Mail icon, the address as the title, and no link', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [
+          {
+            address: 'guest@x.com',
+            userId: null,
+            serverUserId: null,
+            name: null,
+            suppressed: false,
+            username: null,
+            serverId: null,
+            serverName: null,
+            thumbUrl: null,
+          },
+        ],
+        missing: [],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <MemoryRouter>
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+    const row = screen.getByRole('listitem', { name: 'guest@x.com' });
+    expect(row).toHaveTextContent('guest@x.com');
+    expect(row).toHaveTextContent('newsletters.editor.recipients.extraAddress');
+    expect(within(row).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(row).queryByRole('img')).not.toBeInTheDocument();
   });
 });
 

@@ -16,6 +16,10 @@ const c = (over: Partial<RecipientCandidate>): RecipientCandidate => ({
   userId: 'u1',
   serverUserId: 'su-u1',
   name: null,
+  username: null,
+  serverId: 's1',
+  serverName: 'Server One',
+  thumbUrl: null,
   contactEmail: null,
   identityEmail: null,
   accountEmails: [],
@@ -63,9 +67,23 @@ describe('mergeRecipients', () => {
         serverUserId: 'su-u1',
         name: 'One',
         suppressed: false,
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
       },
     ]);
-    expect(missing).toEqual([{ userId: 'u3', serverUserId: 'su-u3', name: 'Three' }]);
+    expect(missing).toEqual([
+      {
+        userId: 'u3',
+        serverUserId: 'su-u3',
+        name: 'Three',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+      },
+    ]);
     expect(excluded).toEqual([]);
   });
 
@@ -81,12 +99,40 @@ describe('mergeRecipients', () => {
       ['u2', 'u3']
     );
     expect(recipients).toEqual([
-      { address: 'one@x.com', userId: 'u1', serverUserId: 'su-u1', name: 'One', suppressed: false },
+      {
+        address: 'one@x.com',
+        userId: 'u1',
+        serverUserId: 'su-u1',
+        name: 'One',
+        suppressed: false,
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+      },
     ]);
     expect(missing).toEqual([]);
     expect(excluded).toEqual([
-      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'excluded' },
-      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'excluded' },
+      {
+        userId: 'u2',
+        serverUserId: 'su-u2',
+        name: 'Two',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+        reason: 'excluded',
+      },
+      {
+        userId: 'u3',
+        serverUserId: 'su-u3',
+        name: 'Three',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+        reason: 'excluded',
+      },
     ]);
   });
 
@@ -110,9 +156,36 @@ describe('mergeRecipients', () => {
     expect(recipients).toEqual([]);
     expect(missing).toEqual([]);
     expect(excluded).toEqual([
-      { userId: 'u1', serverUserId: 'su-u1', name: 'One', reason: 'excluded' },
-      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'banned' },
-      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'pending' },
+      {
+        userId: 'u1',
+        serverUserId: 'su-u1',
+        name: 'One',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+        reason: 'excluded',
+      },
+      {
+        userId: 'u2',
+        serverUserId: 'su-u2',
+        name: 'Two',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+        reason: 'banned',
+      },
+      {
+        userId: 'u3',
+        serverUserId: 'su-u3',
+        name: 'Three',
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+        reason: 'pending',
+      },
     ]);
   });
 
@@ -126,8 +199,28 @@ describe('mergeRecipients', () => {
       new Set(['extra@x.com'])
     );
     expect(recipients).toEqual([
-      { address: 'a@x.com', userId: 'u1', serverUserId: 'su-u1', name: null, suppressed: false },
-      { address: 'extra@x.com', userId: null, serverUserId: null, name: 'Extra', suppressed: true },
+      {
+        address: 'a@x.com',
+        userId: 'u1',
+        serverUserId: 'su-u1',
+        name: null,
+        suppressed: false,
+        username: null,
+        serverId: 's1',
+        serverName: 'Server One',
+        thumbUrl: null,
+      },
+      {
+        address: 'extra@x.com',
+        userId: null,
+        serverUserId: null,
+        name: 'Extra',
+        suppressed: true,
+        username: null,
+        serverId: null,
+        serverName: null,
+        thumbUrl: null,
+      },
     ]);
   });
 
@@ -138,7 +231,17 @@ describe('mergeRecipients', () => {
       new Set()
     );
     expect(recipients).toEqual([
-      { address: 'x@y.com', userId: null, serverUserId: null, name: null, suppressed: false },
+      {
+        address: 'x@y.com',
+        userId: null,
+        serverUserId: null,
+        name: null,
+        suppressed: false,
+        username: null,
+        serverId: null,
+        serverName: null,
+        thumbUrl: null,
+      },
     ]);
     expect(missing).toEqual([]);
     expect(excluded).toEqual([]);
@@ -164,8 +267,28 @@ describe('resolveRecipients', () => {
     expect(mockSuppressed).toHaveBeenCalledWith(['gone@x.com', 'new@x.com']);
     expect(out).toEqual({
       recipients: [
-        { address: 'gone@x.com', userId: null, serverUserId: null, name: null, suppressed: true },
-        { address: 'new@x.com', userId: null, serverUserId: null, name: 'New', suppressed: false },
+        {
+          address: 'gone@x.com',
+          userId: null,
+          serverUserId: null,
+          name: null,
+          suppressed: true,
+          username: null,
+          serverId: null,
+          serverName: null,
+          thumbUrl: null,
+        },
+        {
+          address: 'new@x.com',
+          userId: null,
+          serverUserId: null,
+          name: 'New',
+          suppressed: false,
+          username: null,
+          serverId: null,
+          serverName: null,
+          thumbUrl: null,
+        },
       ],
       missing: [],
       excluded: [],
@@ -182,6 +305,10 @@ describe('resolveRecipients', () => {
           contact_email: null,
           identity_email: 'One@X.com',
           account_emails: ['a1@x.com'],
+          usernames: ['user-one'],
+          server_ids: ['s1'],
+          server_names: ['Basement Plex'],
+          thumb_urls: ['/thumb1'],
         },
         {
           user_id: 'u2',
@@ -190,6 +317,10 @@ describe('resolveRecipients', () => {
           contact_email: null,
           identity_email: null,
           account_emails: null,
+          usernames: ['garry'],
+          server_ids: ['s2'],
+          server_names: ['Basement Jellyfin'],
+          thumb_urls: [null],
         },
       ],
     });
@@ -203,11 +334,23 @@ describe('resolveRecipients', () => {
     });
     expect(mockExecute).toHaveBeenCalledTimes(1);
     expect(mockSuppressed).toHaveBeenCalledWith(['one@x.com', 'extra@x.com']);
-    expect(out.recipients.map((r) => [r.address, r.userId, r.suppressed])).toEqual([
-      ['one@x.com', 'u1', false],
-      ['extra@x.com', null, false],
+    expect(
+      out.recipients.map((r) => [r.address, r.userId, r.suppressed, r.username, r.serverName])
+    ).toEqual([
+      ['one@x.com', 'u1', false, 'user-one', 'Basement Plex'],
+      ['extra@x.com', null, false, null, null],
     ]);
-    expect(out.missing).toEqual([{ userId: 'u2', serverUserId: 'su-u2', name: null }]);
+    expect(out.missing).toEqual([
+      {
+        userId: 'u2',
+        serverUserId: 'su-u2',
+        name: null,
+        username: 'garry',
+        serverId: 's2',
+        serverName: 'Basement Jellyfin',
+        thumbUrl: null,
+      },
+    ]);
     expect(out.excluded).toEqual([]);
   });
 
@@ -221,6 +364,10 @@ describe('resolveRecipients', () => {
           contact_email: 'one@x.com',
           identity_email: null,
           account_emails: null,
+          usernames: ['one'],
+          server_ids: ['s1'],
+          server_names: ['Server'],
+          thumb_urls: [null],
         },
         {
           user_id: 'u2',
@@ -229,6 +376,10 @@ describe('resolveRecipients', () => {
           contact_email: 'two@x.com',
           identity_email: null,
           account_emails: null,
+          usernames: ['two'],
+          server_ids: ['s1'],
+          server_names: ['Server'],
+          thumb_urls: [null],
         },
         {
           user_id: 'u3',
@@ -237,6 +388,10 @@ describe('resolveRecipients', () => {
           contact_email: 'three@x.com',
           identity_email: null,
           account_emails: null,
+          usernames: ['three'],
+          server_ids: ['s1'],
+          server_names: ['Server'],
+          thumb_urls: [null],
           blocked: 'banned',
         },
       ],
@@ -248,8 +403,26 @@ describe('resolveRecipients', () => {
     expect(mockSuppressed).toHaveBeenCalledWith(['one@x.com']);
     expect(out.recipients.map((r) => r.address)).toEqual(['one@x.com']);
     expect(out.excluded).toEqual([
-      { userId: 'u2', serverUserId: 'su-u2', name: 'Two', reason: 'excluded' },
-      { userId: 'u3', serverUserId: 'su-u3', name: 'Three', reason: 'banned' },
+      {
+        userId: 'u2',
+        serverUserId: 'su-u2',
+        name: 'Two',
+        username: 'two',
+        serverId: 's1',
+        serverName: 'Server',
+        thumbUrl: null,
+        reason: 'excluded',
+      },
+      {
+        userId: 'u3',
+        serverUserId: 'su-u3',
+        name: 'Three',
+        username: 'three',
+        serverId: 's1',
+        serverName: 'Server',
+        thumbUrl: null,
+        reason: 'banned',
+      },
     ]);
   });
 });

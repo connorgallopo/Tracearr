@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, ExternalLink, UserX } from 'lucide-react';
+import { ChevronDown, ChevronRight, Mail, UserX } from 'lucide-react';
 import type {
   NewsletterExcludedPerson,
   NewsletterRecipientPerson,
@@ -11,6 +11,7 @@ import type {
 } from '@tracearr/shared';
 import { z } from 'zod';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -23,10 +24,28 @@ import {
   ItemContent,
   ItemDescription,
   ItemGroup,
+  ItemMedia,
   ItemTitle,
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getAvatarUrl } from '@/components/users/utils';
 import { useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
+import type { Translate } from '../newsletterFormat';
+
+/** The fields every recipient list row carries, whether or not an address or badge applies. */
+interface RecipientPerson {
+  serverUserId: string | null;
+  name: string | null;
+  username: string | null;
+  serverId: string | null;
+  serverName: string | null;
+  thumbUrl: string | null;
+}
+
+/** The name the row leads with; falls back through the account's own username before the generic label. */
+function displayName(person: RecipientPerson, t: Translate): string {
+  return person.name ?? person.username ?? t('newsletters.editor.recipients.unknownMember');
+}
 
 interface PendingPerson extends NewsletterExcludedPerson {
   /** True when the change waits for Save: excluded here but not on the server, or the reverse. */
@@ -65,6 +84,10 @@ export function partitionRecipients(
         userId: r.userId,
         serverUserId: r.serverUserId,
         name: r.name,
+        username: r.username,
+        serverId: r.serverId ?? '',
+        serverName: r.serverName ?? '',
+        thumbUrl: r.thumbUrl,
         reason: 'excluded' as const,
         pending: true,
       })),
@@ -90,8 +113,7 @@ export function extraRecipients(
   return [...seen].map(([addr, name]) => ({ address: addr, name }));
 }
 
-/** One row shape shared by the receive, included and excluded lists: a label, an optional
- * badge and description, and an optional trailing action. */
+/** The Members-off preview: a typed address with its optional name, no account behind it. */
 function RecipientRow({
   label,
   description,
@@ -117,6 +139,83 @@ function RecipientRow({
   );
 }
 
+/** The person behind every receive, suppressed, missing and excluded row: an avatar, the name
+ * linked to their user page, and an address or account line underneath. An extra address (no
+ * account behind it) gets a Mail icon in place of the avatar and no link. */
+function PersonRow({
+  person,
+  address: recipientAddress,
+  badge,
+  action,
+  children,
+}: {
+  person: RecipientPerson;
+  /** The resolved address, when this row has one; absent for a missing or excluded person. */
+  address?: string | null;
+  badge?: ReactNode;
+  action?: ReactNode;
+  children?: ReactNode;
+}) {
+  const { t } = useTranslation(['settings', 'common']);
+  const isExtra = person.serverUserId === null;
+  const title = isExtra ? (recipientAddress ?? '') : displayName(person, t as Translate);
+  const avatarUrl = isExtra ? null : getAvatarUrl(person.serverId, person.thumbUrl, 40);
+  const account =
+    !isExtra && person.username !== null && person.serverName !== null
+      ? t('newsletters.editor.recipients.account', {
+          username: person.username,
+          server: person.serverName,
+        })
+      : null;
+  const mutedLine = isExtra
+    ? t('newsletters.editor.recipients.extraAddress')
+    : recipientAddress
+      ? account
+        ? `${recipientAddress} · ${account}`
+        : recipientAddress
+      : account;
+
+  return (
+    <Item role="listitem" variant="outline" size="sm" aria-label={title}>
+      <ItemMedia>
+        <Avatar className="size-10">
+          {isExtra ? (
+            <AvatarFallback>
+              <Mail className="text-muted-foreground size-5" />
+            </AvatarFallback>
+          ) : (
+            <>
+              {avatarUrl !== null && <AvatarImage src={avatarUrl} alt="" />}
+              <AvatarFallback className="text-sm font-medium">
+                {title.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </>
+          )}
+        </Avatar>
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>
+          {isExtra ? (
+            title
+          ) : (
+            <Link
+              to={`/users/${person.serverUserId}`}
+              aria-label={t('newsletters.editor.recipients.openUserPage', { name: title })}
+              className="hover:underline"
+            >
+              {title}
+            </Link>
+          )}
+          {badge}
+        </ItemTitle>
+        {mutedLine && <ItemDescription>{mutedLine}</ItemDescription>}
+        {children}
+      </ItemContent>
+      {action && <ItemActions>{action}</ItemActions>}
+    </Item>
+  );
+}
+
 function MissingRow({
   person,
   onSaved,
@@ -127,46 +226,35 @@ function MissingRow({
   const { t } = useTranslation(['settings', 'common']);
   const identity = useUpdateUserIdentity();
   const [value, setValue] = useState('');
-  const label = person.name ?? person.serverUserId;
+  const label = displayName(person, t as Translate);
   const valid = address.safeParse(value.trim()).success;
   return (
-    <Item role="listitem" variant="outline" size="sm" aria-label={label}>
-      <ItemContent>
-        <ItemTitle>{label}</ItemTitle>
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
-            className="max-w-xs"
-            type="email"
-            value={value}
-            aria-label={t('newsletters.editor.recipients.contactEmailFor', { name: label })}
-            onChange={(event) => setValue(event.target.value)}
-          />
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            disabled={!valid || identity.isPending}
-            aria-label={t('newsletters.editor.recipients.saveEmail', { name: label })}
-            onClick={() =>
-              identity.mutate(
-                { id: person.serverUserId, data: { contactEmail: value.trim() } },
-                { onSuccess: onSaved }
-              )
-            }
-          >
-            {t('common:actions.save')}
-          </Button>
-          <Button asChild variant="ghost" size="sm">
-            <Link
-              to={`/users/${person.serverUserId}`}
-              aria-label={t('newsletters.editor.recipients.openUser')}
-            >
-              <ExternalLink />
-            </Link>
-          </Button>
-        </div>
-      </ItemContent>
-    </Item>
+    <PersonRow person={person}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          className="max-w-xs"
+          type="email"
+          value={value}
+          aria-label={t('newsletters.editor.recipients.contactEmailFor', { name: label })}
+          onChange={(event) => setValue(event.target.value)}
+        />
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          disabled={!valid || identity.isPending}
+          aria-label={t('newsletters.editor.recipients.saveEmail', { name: label })}
+          onClick={() =>
+            identity.mutate(
+              { id: person.serverUserId, data: { contactEmail: value.trim() } },
+              { onSuccess: onSaved }
+            )
+          }
+        >
+          {t('common:actions.save')}
+        </Button>
+      </div>
+    </PersonRow>
   );
 }
 
@@ -222,7 +310,7 @@ export function RecipientsPanel({
     data,
     excludeUserIds
   );
-  const personName = (p: NewsletterRecipientPerson) => p.name ?? p.serverUserId;
+  const personName = (p: NewsletterRecipientPerson) => displayName(p, t as Translate);
   const excludeAction = (r: NewsletterResolvedRecipient) => {
     const userId = r.userId;
     if (userId === null) return null;
@@ -260,17 +348,12 @@ export function RecipientsPanel({
         </p>
         <ItemGroup className="mt-2 gap-1">
           {receive.map((r) => (
-            <RecipientRow
-              key={r.address}
-              label={r.address}
-              description={r.name}
-              action={excludeAction(r)}
-            />
+            <PersonRow key={r.address} person={r} address={r.address} action={excludeAction(r)} />
           ))}
           {included.map((p) => (
-            <RecipientRow
+            <PersonRow
               key={p.userId}
-              label={personName(p)}
+              person={p}
               badge={
                 <Badge variant="outline">
                   {t('newsletters.editor.recipients.includedAfterSave')}
@@ -299,10 +382,10 @@ export function RecipientsPanel({
           <FieldDescription>{t('newsletters.editor.recipients.suppressedHelp')}</FieldDescription>
           <ItemGroup className="mt-2 gap-1">
             {suppressed.map((r) => (
-              <RecipientRow
+              <PersonRow
                 key={r.address}
-                label={r.address}
-                description={r.name}
+                person={r}
+                address={r.address}
                 badge={
                   <Badge variant="warning">{t('newsletters.editor.recipients.suppressed')}</Badge>
                 }
@@ -333,9 +416,9 @@ export function RecipientsPanel({
         <CollapsibleContent>
           <ItemGroup className="mt-2 gap-1">
             {excluded.map((p) => (
-              <RecipientRow
+              <PersonRow
                 key={p.userId}
-                label={personName(p)}
+                person={p}
                 badge={
                   p.reason === 'banned' ? (
                     <Badge variant="warning">

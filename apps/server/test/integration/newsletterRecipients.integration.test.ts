@@ -18,7 +18,7 @@ import {
   servers,
   users,
 } from '../../src/db/schema.js';
-import { loadCandidates } from '../../src/services/newsletters/recipients.js';
+import { loadCandidates, mergeRecipients } from '../../src/services/newsletters/recipients.js';
 import {
   addSuppression,
   listSuppressions,
@@ -67,6 +67,42 @@ describe('recipient candidates', () => {
     const scoped = await loadCandidates(['00000000-0000-4000-8000-000000000000']);
     expect(scoped).toEqual([]);
     expect(seeded).toBeDefined();
+  });
+
+  it('carries the username and server name onto a missing-address person, for a Jellyfin account with no identity name', async () => {
+    const [jellyfin] = await db
+      .insert(servers)
+      .values({
+        name: 'Basement Jellyfin',
+        type: 'jellyfin',
+        url: 'http://localhost:8096',
+        token: 'tok',
+      })
+      .returning();
+    const [identity] = await db
+      .insert(users)
+      .values({ username: 'garry-login', name: null, role: 'member' })
+      .returning();
+    await db.insert(serverUsers).values({
+      userId: identity!.id,
+      serverId: jellyfin!.id,
+      externalId: 'jf-user-1',
+      username: 'garry',
+    });
+
+    const candidates = await loadCandidates([]);
+    const candidate = candidates.find((c) => c.userId === identity!.id);
+    expect(candidate?.username).toBe('garry');
+    expect(candidate?.serverName).toBe('Basement Jellyfin');
+
+    const { missing } = mergeRecipients(candidates, [], new Set());
+    const person = missing.find((p) => p.userId === identity!.id);
+    expect(person).toMatchObject({
+      name: null,
+      username: 'garry',
+      serverId: jellyfin!.id,
+      serverName: 'Basement Jellyfin',
+    });
   });
 
   it("orders an identity's account emails by the account's own age", async () => {

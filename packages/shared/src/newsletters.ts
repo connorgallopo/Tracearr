@@ -311,6 +311,10 @@ export interface NewsletterRecipientPerson {
   /** The person's oldest account on a scoped server; the identity PATCH route and the user page key on it. */
   serverUserId: string;
   name: string | null;
+  username: string | null;
+  serverId: string;
+  serverName: string;
+  thumbUrl: string | null;
 }
 
 export const NEWSLETTER_EXCLUDED_REASONS = ['excluded', 'banned', 'pending'] as const;
@@ -327,6 +331,10 @@ export interface NewsletterResolvedRecipient {
   serverUserId: string | null;
   name: string | null;
   suppressed: boolean;
+  serverId: string | null;
+  username: string | null;
+  serverName: string | null;
+  thumbUrl: string | null;
 }
 
 /** GET /newsletters/:id/recipients: who the next send reaches, who has no address, and who the owner excluded. */

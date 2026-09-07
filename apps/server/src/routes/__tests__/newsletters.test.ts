@@ -353,15 +353,65 @@ describe('newsletter routes', () => {
     const app = await build(owner);
     const view = {
       recipients: [
-        { address: 'a@x.com', userId: 'u1', serverUserId: 'su-1', name: 'One', suppressed: false },
+        {
+          address: 'a@x.com',
+          userId: 'u1',
+          serverUserId: 'su-1',
+          name: 'One',
+          suppressed: false,
+          username: 'one',
+          serverId: 's1',
+          serverName: 'Basement Plex',
+          thumbUrl: null,
+        },
+        {
+          address: 'extra@x.com',
+          userId: null,
+          serverUserId: null,
+          name: 'Extra',
+          suppressed: false,
+          username: null,
+          serverId: null,
+          serverName: null,
+          thumbUrl: null,
+        },
       ],
-      missing: [{ userId: 'u2', serverUserId: 'su-2', name: 'Two' }],
-      excluded: [{ userId: 'u3', serverUserId: 'su-3', name: null }],
+      missing: [
+        {
+          userId: 'u2',
+          serverUserId: 'su-2',
+          name: 'Two',
+          username: 'two',
+          serverId: 's1',
+          serverName: 'Basement Plex',
+          thumbUrl: null,
+        },
+      ],
+      excluded: [
+        {
+          userId: 'u3',
+          serverUserId: 'su-3',
+          name: null,
+          username: 'three',
+          serverId: 's1',
+          serverName: 'Basement Plex',
+          thumbUrl: null,
+          reason: 'excluded',
+        },
+      ],
     };
     mockResolve.mockResolvedValue(view);
     const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/recipients` });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual(view);
+    const [member, extra] = res.json().recipients;
+    expect(member).toMatchObject({ username: 'one', serverName: 'Basement Plex' });
+    expect(extra).toMatchObject({
+      username: null,
+      serverId: null,
+      serverName: null,
+      thumbUrl: null,
+    });
     expect(mockResolve).toHaveBeenCalledWith(row);
     store.getNewsletter.mockResolvedValueOnce(null);
     expect(
