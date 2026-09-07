@@ -1581,10 +1581,12 @@
     },
     "destinations": {
       "add": "Add destination",
+      "alertsGoTo": "Alerts go to {{count}} address",
+      "alertsGoTo_other": "Alerts go to {{count}} addresses",
       "builtinNote": "Built in",
       "clearSecret": "Clear",
       "delete": "Delete",
-      "deleteConfirm": "Delete {{name}}? Automations that send to it will be blocked until they are updated.",
+      "deleteConfirm": "Delete {{name}}? Automations and newsletters that use it stop until they are updated.",
       "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
       "empty": "No destinations yet.",
       "fields": {
@@ -1615,6 +1617,8 @@
         "smtpTo": "Comma-separated addresses that receive alerts from this destination",
         "smtpRate": "Per Tracearr instance; stay under your provider's limit"
       },
+      "newslettersOnly": "Newsletters only",
+      "noAlertRecipients": "No alert recipients",
       "options": {
         "securityStarttls": "STARTTLS (usually port 587)",
         "securityTls": "TLS (usually port 465)",
@@ -1650,6 +1654,8 @@
       },
       "usedBy": "Used by {{count}} automation",
       "usedBy_other": "Used by {{count}} automations",
+      "usedByNewsletters": "Used by {{count}} newsletter",
+      "usedByNewsletters_other": "Used by {{count}} newsletters",
       "webToastNote": "Toasts in this browser."
     },
     "jobs": {

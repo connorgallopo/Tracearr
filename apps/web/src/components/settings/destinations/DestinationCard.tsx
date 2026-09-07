@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DESTINATION_TYPES, type Destination } from '@tracearr/shared';
+import { DESTINATION_TYPES, addressList, type Destination } from '@tracearr/shared';
 import { Loader2, Pencil, Send, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,11 @@ export function DestinationCard({ destination, onEdit }: DestinationCardProps) {
   const Icon = iconFor(destination.type);
   const editLabel = `${t('common:actions.edit')} ${destination.name}`;
 
+  const emailConfig =
+    destination.type === 'email' && destination.config !== null ? destination.config : null;
+  const alertRecipients = emailConfig ? addressList(emailConfig.to ?? '') : [];
+  const fromAddress = emailConfig?.fromAddress ?? null;
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -43,7 +48,7 @@ export function DestinationCard({ destination, onEdit }: DestinationCardProps) {
               <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 <CardTitle className="truncate text-base">{destination.name}</CardTitle>
                 {destination.builtin && (
                   <Badge variant="secondary">{t('pages:settings.destinations.builtinNote')}</Badge>
@@ -91,10 +96,30 @@ export function DestinationCard({ destination, onEdit }: DestinationCardProps) {
           </p>
         )}
 
+        {emailConfig && (
+          <div className="text-muted-foreground flex flex-col gap-1 text-sm">
+            {fromAddress && <p className="truncate">{fromAddress}</p>}
+            <p>
+              {alertRecipients.length > 0
+                ? t('pages:settings.destinations.alertsGoTo', { count: alertRecipients.length })
+                : destination.referencedByNewsletterCount > 0
+                  ? t('pages:settings.destinations.newslettersOnly')
+                  : t('pages:settings.destinations.noAlertRecipients')}
+            </p>
+          </div>
+        )}
+
         {destination.referencedByAutomationCount > 0 && (
           <p className="text-muted-foreground text-sm">
             {t('pages:settings.destinations.usedBy', {
               count: destination.referencedByAutomationCount,
+            })}
+          </p>
+        )}
+        {destination.referencedByNewsletterCount > 0 && (
+          <p className="text-muted-foreground text-sm">
+            {t('pages:settings.destinations.usedByNewsletters', {
+              count: destination.referencedByNewsletterCount,
             })}
           </p>
         )}
