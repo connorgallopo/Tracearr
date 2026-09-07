@@ -36,7 +36,7 @@ export function DestinationCard({ destination, onEdit }: DestinationCardProps) {
 
   return (
     <Card className="flex flex-col">
-      <CardHeader className="pb-3">
+      <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
             <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">

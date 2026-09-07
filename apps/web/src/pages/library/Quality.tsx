@@ -142,7 +142,7 @@ export function LibraryQuality() {
 
       {/* Quality Evolution Chart - page-level media-type tabs + time range apply to all cards */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <CardTitle className="text-base font-medium">

@@ -265,7 +265,7 @@ function SingleServerResolutionSection({ serverId }: { serverId?: string | null 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Film className="text-muted-foreground h-4 w-4" />
@@ -290,7 +290,7 @@ function SingleServerResolutionSection({ serverId }: { serverId?: string | null 
       </Card>
 
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Tv className="text-muted-foreground h-4 w-4" />

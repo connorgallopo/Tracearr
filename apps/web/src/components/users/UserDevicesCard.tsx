@@ -175,7 +175,7 @@ export function UserDevicesCard({ devices, isLoading, totalSessions = 0 }: UserD
   return (
     <TooltipProvider>
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Monitor className="h-5 w-5" />

@@ -212,7 +212,7 @@ export function LibraryWatch() {
         <div className="grid gap-6 md:grid-cols-2">
           {/* Left: Movies Completion */}
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader>
               <CardTitle className="text-base font-medium">
                 {t('common:media.movie_plural')}
               </CardTitle>
@@ -230,7 +230,7 @@ export function LibraryWatch() {
 
           {/* Right: TV Shows Completion */}
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader>
               <CardTitle className="text-base font-medium">{t('common:media.tvShows')}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -250,7 +250,7 @@ export function LibraryWatch() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Left: Hourly Distribution */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-medium">
                 {t('library.watch.viewingHours')}
@@ -273,7 +273,7 @@ export function LibraryWatch() {
 
         {/* Right: Monthly Trends with highlights */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-medium">
                 {t('library.watch.monthlyTrends')}
@@ -302,7 +302,7 @@ export function LibraryWatch() {
 
       {/* Binge Highlights Section - Full Width */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base font-medium">

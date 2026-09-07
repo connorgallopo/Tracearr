@@ -497,7 +497,7 @@ export function MediaOverview() {
             </div>
 
             <Card>
-              <CardHeader className="pb-2">
+              <CardHeader>
                 <CardTitle className="text-base font-medium">
                   {t('library.overview.libraryGrowth')}
                 </CardTitle>

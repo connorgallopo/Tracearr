@@ -209,7 +209,7 @@ function ResourceChart({
   }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, clockSkewMs]);
 
   const header = (
-    <CardHeader className="pb-2">
+    <CardHeader>
       <CardTitle className="flex items-center gap-2 text-sm font-medium">
         {icon}
         {title}
@@ -244,7 +244,7 @@ function ResourceChart({
   return (
     <Card>
       {header}
-      <CardContent className="pb-2">
+      <CardContent>
         <HighchartsReact
           ref={chartRef}
           highcharts={Highcharts}

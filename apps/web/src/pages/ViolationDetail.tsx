@@ -175,7 +175,7 @@ function EvidenceGroupCard({
 
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader>
         <CardTitle className="flex items-center justify-between text-sm">
           <span className="flex items-center gap-2">
             <Shield className="h-4 w-4" />

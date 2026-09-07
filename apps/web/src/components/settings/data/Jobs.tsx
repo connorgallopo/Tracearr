@@ -380,7 +380,7 @@ export function Jobs() {
 
       {/* Available Jobs */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />
             {t('jobs.title')}
