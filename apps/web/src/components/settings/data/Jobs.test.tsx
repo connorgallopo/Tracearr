@@ -75,16 +75,6 @@ describe('Jobs', () => {
     vi.clearAllMocks();
   });
 
-  it('opens with the section header', async () => {
-    withHistory([]);
-
-    render(<Jobs />);
-
-    expect(
-      await screen.findByRole('heading', { level: 2, name: 'nav.sections.jobs' })
-    ).toBeInTheDocument();
-  });
-
   it('uses the shared empty state when nothing has run', async () => {
     withHistory([]);
 

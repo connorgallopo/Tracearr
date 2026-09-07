@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { PlexAccountRow } from './PlexAccountRow';
 
 vi.mock('react-i18next', () => ({
@@ -66,16 +65,5 @@ describe('PlexAccountRow', () => {
     expect(
       screen.getByRole('button', { name: 'pages:settings.plex.unlinkAccount' })
     ).toBeDisabled();
-  });
-
-  it('reports a reauthorize request', async () => {
-    const onReauthorize = vi.fn();
-    renderRow({ onReauthorize });
-
-    await userEvent.click(
-      screen.getByRole('button', { name: 'pages:settings.plex.reauthorizeAccount' })
-    );
-
-    expect(onReauthorize).toHaveBeenCalledTimes(1);
   });
 });

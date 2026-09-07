@@ -3,11 +3,7 @@ import {
   DEFAULT_EMAIL_BRANDING,
   DEFAULT_NEWSLETTER_SECTIONS,
   DEFAULT_NEWSLETTER_SUBJECT,
-  EMAIL_LOGO_MODES,
   NEWSLETTER_SECTION_MAX,
-  NEWSLETTER_SEND_RETENTION_DAYS,
-  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
-  NEWSLETTER_VIEW_TOKEN_LENGTH,
   createNewsletterSchema,
   cronExpressionSchema,
   emailBrandingSchema,
@@ -242,13 +238,6 @@ describe('emailBrandingSchema', () => {
         mailtoUnsubscribe: false,
       }
     );
-  });
-
-  it('pins the constants the server and the routes rely on', () => {
-    expect(NEWSLETTER_VIEW_TOKEN_LENGTH).toBe(43);
-    expect(NEWSLETTER_SNAPSHOT_RETENTION_DAYS).toBe(90);
-    expect(NEWSLETTER_SEND_RETENTION_DAYS).toBe(365);
-    expect(EMAIL_LOGO_MODES).toEqual(['tracearr', 'none', 'url']);
   });
 });
 

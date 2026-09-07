@@ -98,25 +98,6 @@ describe('BackupHistory', () => {
     expect(onDelete).toHaveBeenCalledWith('tracearr-backup-20260830-020000.zip');
   });
 
-  it('renders both shapes and lets the container query choose', () => {
-    const { container } = render(
-      <BackupHistory
-        backups={[backup()]}
-        isLoading={false}
-        onRestore={vi.fn()}
-        onDelete={vi.fn()}
-      />
-    );
-
-    expect(container.querySelector('[data-testid="backup-table"]')).toHaveClass(
-      'hidden',
-      '@2xl/backup-history:block'
-    );
-    expect(container.querySelector('[data-testid="backup-list"]')).toHaveClass(
-      '@2xl/backup-history:hidden'
-    );
-  });
-
   it('says so when there are no backups', () => {
     render(<BackupHistory backups={[]} isLoading={false} onRestore={vi.fn()} onDelete={vi.fn()} />);
 

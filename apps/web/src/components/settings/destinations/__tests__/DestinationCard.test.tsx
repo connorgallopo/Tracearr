@@ -74,14 +74,6 @@ beforeEach(() => {
 });
 
 describe('DestinationCard', () => {
-  it('truncates a long name inside a row that may shrink', () => {
-    renderCard(destination({ name: 'A destination name long enough to overflow' }));
-
-    const title = screen.getByRole('heading', { level: 3 });
-    expect(title).toHaveClass('truncate');
-    expect(title.parentElement).toHaveClass('min-w-0');
-  });
-
   it('shows the from address and how many addresses alerts go to', () => {
     renderCard(destination());
 

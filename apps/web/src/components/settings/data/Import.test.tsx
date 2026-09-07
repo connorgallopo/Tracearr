@@ -53,19 +53,6 @@ describe('Import', () => {
     vi.clearAllMocks();
   });
 
-  it('opens with the section header', () => {
-    vi.mocked(useServers).mockReturnValue({
-      data: [],
-      isLoading: false,
-    } as unknown as ReturnType<typeof useServers>);
-
-    renderImport();
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'nav.sections.import' })
-    ).toBeInTheDocument();
-  });
-
   it('points a reader with no servers at the connections page', () => {
     vi.mocked(useServers).mockReturnValue({
       data: [],

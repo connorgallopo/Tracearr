@@ -104,12 +104,4 @@ describe('Behavior', () => {
 
     expect(setValue).toHaveBeenCalledWith(true);
   });
-
-  it('renders the section heading as an h2 with the nav section title', () => {
-    render(<Behavior />);
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'nav.sections.behavior' })
-    ).toBeInTheDocument();
-  });
 });

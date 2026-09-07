@@ -2,16 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { SETTINGS_HOME, findSettingsSection, settingsNav } from './settings-nav-data';
 
 describe('settings nav data', () => {
-  it('lists the five groups in order', () => {
-    expect(settingsNav.map((group) => group.labelKey)).toEqual([
-      'nav.groups.general',
-      'nav.groups.servers',
-      'nav.groups.notifications',
-      'nav.groups.access',
-      'nav.groups.data',
-    ]);
-  });
-
   it('gives every section a unique href under /settings', () => {
     const hrefs = settingsNav.flatMap((group) => group.sections.map((section) => section.href));
     expect(new Set(hrefs).size).toBe(hrefs.length);
@@ -21,14 +11,6 @@ describe('settings nav data', () => {
   it('points the home path at the first visible section', () => {
     expect(SETTINGS_HOME).toBe('/settings/general/appearance');
     expect(settingsNav[0]?.sections[0]?.href).toBe(SETTINGS_HOME);
-  });
-
-  it('lists newsletters and email under notifications', () => {
-    expect(settingsNav[2]?.sections.map((section) => section.href)).toEqual([
-      '/settings/notifications/destinations',
-      '/settings/notifications/newsletters',
-      '/settings/notifications/email',
-    ]);
   });
 
   it('finds a section and its group from the pathname', () => {

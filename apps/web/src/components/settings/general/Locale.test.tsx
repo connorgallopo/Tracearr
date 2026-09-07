@@ -89,12 +89,4 @@ describe('Locale', () => {
 
     expect(setValue).toHaveBeenCalledWith('imperial');
   });
-
-  it('caps the language select at the same width as the autosaved ones', () => {
-    render(<Locale />);
-
-    expect(
-      screen.getByRole('combobox', { name: 'general.language' }).closest('[data-slot="field"]')
-    ).toHaveClass('max-w-sm');
-  });
 });

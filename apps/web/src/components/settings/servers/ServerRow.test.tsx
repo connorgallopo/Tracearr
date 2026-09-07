@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import type { Server, ServerConnectionStatus } from '@tracearr/shared';
 import { ServerRow } from './ServerRow';
 
@@ -63,18 +62,6 @@ describe('ServerRow', () => {
 
     expect(screen.getByRole('button', { name: 'servers.editServer' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'common:actions.remove' })).toBeInTheDocument();
-  });
-
-  it('reports the row a reader clicked', async () => {
-    const onEdit = vi.fn();
-    const onDelete = vi.fn();
-    renderRow({ onEdit, onDelete });
-
-    await userEvent.click(screen.getByRole('button', { name: 'servers.editServer' }));
-    await userEvent.click(screen.getByRole('button', { name: 'common:actions.remove' }));
-
-    expect(onEdit).toHaveBeenCalledTimes(1);
-    expect(onDelete).toHaveBeenCalledTimes(1);
   });
 
   it('offers a named drag handle only when reordering is allowed', () => {

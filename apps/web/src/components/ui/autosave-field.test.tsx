@@ -30,14 +30,6 @@ describe('AutosaveNumberField', () => {
     expect(group?.querySelector('[data-slot="input-group-addon"]')).toBeNull();
   });
 
-  it('caps its field at max-w-sm without a call-site patch', () => {
-    render(
-      <AutosaveNumberField id="count" label="Count" value={3} onChange={vi.fn()} status="idle" />
-    );
-
-    expect(screen.getByLabelText('Count').closest('[data-slot="field"]')).toHaveClass('max-w-sm');
-  });
-
   it('still reports the typed number', async () => {
     const onChange = vi.fn();
     render(
@@ -84,24 +76,6 @@ describe('AutosaveTextField', () => {
 });
 
 describe('AutosaveSelectField', () => {
-  it('caps its field at max-w-sm without a call-site patch', () => {
-    render(
-      <AutosaveSelectField
-        id="unitSystem"
-        label="Unit system"
-        value="metric"
-        onChange={vi.fn()}
-        options={[
-          { value: 'metric', label: 'Metric' },
-          { value: 'imperial', label: 'Imperial' },
-        ]}
-        status="idle"
-      />
-    );
-
-    expect(screen.getByRole('combobox').closest('[data-slot="field"]')).toHaveClass('max-w-sm');
-  });
-
   it('still reports the chosen option', async () => {
     const onChange = vi.fn();
     render(

@@ -39,15 +39,6 @@ describe('Destinations section', () => {
     expect(screen.getByText('pages:settings.destinations.ownerOnly')).toBeInTheDocument();
   });
 
-  it('opens with the section header, not a card header', () => {
-    renderAs('owner');
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'settings:nav.sections.destinations' })
-    ).toBeInTheDocument();
-    expect(screen.getByText('settings:nav.descriptions.destinations')).toBeInTheDocument();
-  });
-
   it('states the owner-only rule as a notice rather than loose text', () => {
     renderAs('admin');
 

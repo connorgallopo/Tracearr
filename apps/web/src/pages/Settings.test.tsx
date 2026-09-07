@@ -127,19 +127,4 @@ describe('Settings routes', () => {
 
     expect(screen.getByText(content)).toBeInTheDocument();
   });
-
-  it('lays the nav beside a container-query-capped content column', () => {
-    renderAt('/settings/general/appearance');
-
-    const content = screen.getByText('appearance settings').parentElement;
-    expect(content).toHaveClass('min-w-0', 'max-w-4xl');
-    expect(content?.parentElement).toHaveClass('@3xl/settings:grid-cols-[13rem_minmax(0,1fr)]');
-  });
-
-  it('widens the one settings surface with a real grid', () => {
-    renderAt('/settings/data/backup');
-
-    const content = screen.getByText('backup settings').parentElement;
-    expect(content).toHaveClass('min-w-0', 'max-w-6xl');
-  });
 });

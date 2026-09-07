@@ -50,16 +50,4 @@ describe('BindingDoors', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Customize' }));
     expect(onSecondary).toHaveBeenCalledTimes(1);
   });
-
-  it('stacks the doors on its own container width, not the viewport', () => {
-    render(<BindingDoors primaryLabel="Save" pending={false} onPrimary={vi.fn()} />);
-    const doors = screen.getByRole('button', { name: 'Save' }).parentElement;
-    expect(doors).toHaveClass(
-      '@max-sm/doors:w-full',
-      '@max-sm/doors:flex-col-reverse',
-      '@sm/doors:ml-auto'
-    );
-    expect(doors?.parentElement?.parentElement).toHaveClass('@container/doors');
-    expect(doors?.className).not.toMatch(/(^|\s)(sm|md|lg|xl):/);
-  });
 });

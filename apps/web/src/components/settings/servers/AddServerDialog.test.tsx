@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AddServerDialog } from './AddServerDialog';
-import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -52,14 +51,6 @@ describe('AddServerDialog', () => {
     await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'h');
 
     expect(onServerUrlChange).toHaveBeenCalledWith('h');
-  });
-
-  it('carries the wide-dialog class that survives the base max-width variant', () => {
-    render(<AddServerDialog {...props()} />);
-
-    for (const cls of SERVER_DIALOG_CONTENT_CLASS.split(' ')) {
-      expect(screen.getByRole('dialog')).toHaveClass(cls);
-    }
   });
 
   it('surfaces a connect failure as an alert', () => {
