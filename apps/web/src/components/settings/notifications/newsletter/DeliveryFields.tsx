@@ -27,7 +27,7 @@ import type { FieldsetProps } from './newsletterForm';
 
 const NONE = '__none__';
 
-export function DeliveryFields({ state, onChange, errors }: FieldsetProps) {
+export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: destinations } = useDestinations();
   const { data: settings } = useSettings();
@@ -52,7 +52,8 @@ export function DeliveryFields({ state, onChange, errors }: FieldsetProps) {
           </div>
         ) : (
           <Select
-            value={state.destinationId ?? undefined}
+            /* A never-touched create form shows the placeholder; a saved row's cleared destination shows None. */
+            value={state.destinationId ?? (mode === 'edit' ? NONE : undefined)}
             onValueChange={(value) => onChange({ destinationId: value === NONE ? null : value })}
           >
             <SelectTrigger
