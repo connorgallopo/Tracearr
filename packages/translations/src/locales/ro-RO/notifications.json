@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Ștergerea dispozitivului a eșuat",
       "deviceRenameFailed": "Eroare la redenumirea dispozitivului",
       "dismissFailed": "Eroare la respingerea încălcării",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Dispozitivul a fost deconectat",
         "title": "Dispozitiv eliminat"

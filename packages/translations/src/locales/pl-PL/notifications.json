@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Nie udało się usunąć urządzenia",
       "deviceRenameFailed": "Nie udało się zmienić nazwy urządzenia",
       "dismissFailed": "Nie udało się odrzucić naruszenia",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Urządzenie zostało rozłączone",
         "title": "Urządzenie usunięte"

@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
       "deviceRenameFailed": "Impossibile rinominare il dispositivo",
       "dismissFailed": "Impossibile annullare la violazione",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Il dispositivo è stato disconnesso",
         "title": "Dispositivo Rimosso"

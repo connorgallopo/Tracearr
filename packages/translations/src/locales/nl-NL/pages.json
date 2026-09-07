@@ -286,6 +286,7 @@
         "unfinished": ""
       },
       "newDestination": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "noMatches": "Geen resultaten",
       "picker": {
@@ -1836,11 +1837,14 @@
   "settings": {
     "destinations": {
       "add": "Bestemming toevoegen",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "Ingebouwd",
       "clearSecret": "Maak leeg",
       "delete": "Verwijder",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "Nog geen bestemmingen.",
       "fields": {
         "apiToken": "",
@@ -1863,6 +1867,11 @@
         "username": "Username",
         "webhookUrl": ""
       },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
+      },
       "hints": {
         "authTokenOptional": "Optioneel voor openbare onderwerpen",
         "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
@@ -1870,6 +1879,8 @@
         "smtpTo": "Comma-separated addresses that receive alerts from this destination",
         "smtpUsernameOptional": "Leave blank when the server needs no login"
       },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
       "options": {
         "presetBrevo": "Brevo",
         "presetCustom": "Custom",
@@ -1887,6 +1898,7 @@
       "pushNote": "Verzonden naar gekoppelde mobiele apparaten; elk apparaat filtert de meldingen in zijn eigen instellingen.",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "Voer opnieuw de code van deze bestemming in",
       "secretSet": "Instellen (leeg laten om te behouden)",
       "test": "",
@@ -1904,6 +1916,8 @@
         "webToast": ""
       },
       "usedBy": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
       "usedBy_other": "",
       "webToastNote": "Toastberichten in deze browser."
     },

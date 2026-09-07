@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Gerät entfernen fehlgeschlagen",
       "deviceRenameFailed": "Gerät umbenennen fehlgeschlagen",
       "dismissFailed": "Verstoß verwerfen fehlgeschlagen",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Das Gerät wurde getrennt",
         "title": "Gerät entfernt"

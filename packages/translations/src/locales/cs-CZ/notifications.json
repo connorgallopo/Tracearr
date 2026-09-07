@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Odstranění zařízení se nezdařilo",
       "deviceRenameFailed": "Nepodařilo se přejmenovat zařízení",
       "dismissFailed": "Nepodařilo se zrušit porušení",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Zařízení bylo odpojeno",
         "title": "Zařízení odstraněno"

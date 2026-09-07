@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "فشل في إزالة الجهاز",
       "deviceRenameFailed": "فشل في إعادة تسمية الجهاز",
       "dismissFailed": "فشل في رفض الانتهاك",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "تم قطع اتصال الجهاز",
         "title": "تم حذف الجهاز"

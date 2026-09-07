@@ -61,6 +61,7 @@
       "destinationInUse": "Still used by: {{rules}}",
       "destinationSaveFailed": "Failed to save destination: {{error}}",
       "destinationTestFailed": "Test failed: {{error}}",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Failed to remove device",
       "deviceRenameFailed": "Failed to rename device",
       "dismissFailed": "Failed to dismiss violation",
@@ -155,6 +156,7 @@
       "destinationDeleted": "Destination deleted",
       "destinationSaved": "Destination saved",
       "destinationTestSent": "Test notification sent",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "The device has been disconnected",
         "title": "Device Removed"

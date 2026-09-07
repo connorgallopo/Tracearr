@@ -61,6 +61,7 @@
       "destinationInUse": "Toujours utilisé par : {{rules}}",
       "destinationSaveFailed": "Impossible d'enregistrer la destination : {{error}}",
       "destinationTestFailed": "Test échoué : {{error}}",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Échec de la suppression de l'appareil",
       "deviceRenameFailed": "Échec du renommage de l'appareil",
       "dismissFailed": "Échec de l'ignorance de la violation",
@@ -155,6 +156,7 @@
       "destinationDeleted": "Destination supprimée",
       "destinationSaved": "Destination enregistrée",
       "destinationTestSent": "Notification de test envoyée",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "L'appareil a bien été déconnecté",
         "title": "Appareil supprimé"

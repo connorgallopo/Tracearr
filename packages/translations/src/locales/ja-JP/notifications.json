@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "デバイスの削除に失敗しました",
       "deviceRenameFailed": "端末の名前を変更できませんでした",
       "dismissFailed": "違反を解除できませんでした",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "デバイスが切断されました",
         "title": "デバイスが削除されました"

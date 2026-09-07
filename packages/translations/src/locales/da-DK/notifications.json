@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Kunne ikke fjerne enheden",
       "deviceRenameFailed": "Kunne ikke omdøbe enhed",
       "dismissFailed": "Mislykkedes at afvise overtrædelse",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Enheden er blevet afbrudt",
         "title": "Enhed Fjernet"

@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Det gick inte att ta bort enheten",
       "deviceRenameFailed": "Det gick inte att byta namn på enheten",
       "dismissFailed": "Misslyckades att avfärda brott",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Enheten har kopplats bort",
         "title": "Enhet borttagen"

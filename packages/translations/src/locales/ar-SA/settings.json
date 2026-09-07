@@ -432,6 +432,7 @@
     "selectLabel": ""
   },
   "newsletters": {
+    "addEmailDestination": "",
     "copyOf": "",
     "counts": {
       "albums_one": "",
@@ -617,7 +618,6 @@
     "empty": "",
     "emptyDescription": "",
     "enabled": "",
-    "goToDestinations": "",
     "history": {
       "attempts": "",
       "empty": "",
@@ -653,6 +653,7 @@
     "new": "",
     "nextRun": "",
     "noDestinationDescription": "",
+    "noDestinationHint": "",
     "noDestinationTitle": "",
     "noNextRun": "",
     "outcome": {

@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Не вдалося видалити пристрій",
       "deviceRenameFailed": "Не вдалося перейменувати пристрій",
       "dismissFailed": "Не вдалося відхилити порушення",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Пристрій відключено",
         "title": "Пристрій видалено"

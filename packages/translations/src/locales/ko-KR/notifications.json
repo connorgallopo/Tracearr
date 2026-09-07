@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "기기를 제거하지 못했습니다",
       "deviceRenameFailed": "기기 이름을 바꾸지 못했습니다",
       "dismissFailed": "위반을 해제하지 못했습니다",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "기기 연결이 해제되었습니다",
         "title": "기기 제거됨"

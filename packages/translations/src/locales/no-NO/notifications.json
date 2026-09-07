@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Kan ikke fjerne enheten",
       "deviceRenameFailed": "Kunne ikke gi enheten nytt navn",
       "dismissFailed": "Kunne ikke avvise brudd",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Enheten har blitt frakoblet",
         "title": "Enheten ble fjernet"

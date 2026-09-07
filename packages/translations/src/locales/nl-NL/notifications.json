@@ -61,6 +61,7 @@
       "destinationInUse": "Nog in gebruik door: {{rules}}",
       "destinationSaveFailed": "Niet gelukt bestemming op te slaan: {{error}}",
       "destinationTestFailed": "Test niet geslaagd: {{error}}",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Apparaat verwijderen mislukt",
       "deviceRenameFailed": "Apparaat hernoemen mislukt",
       "dismissFailed": "Overtreding negeren mislukt",
@@ -155,6 +156,7 @@
       "destinationDeleted": "Bestemming verwijdert",
       "destinationSaved": "Bestemming opgeslagen",
       "destinationTestSent": "Test notificatie verzonden",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "Het apparaat is losgekoppeld",
         "title": "Apparaat verwijderd"

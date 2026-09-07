@@ -61,6 +61,7 @@
       "destinationInUse": "",
       "destinationSaveFailed": "",
       "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
       "deviceRemoveFailed": "Error al eliminar el dispositivo",
       "deviceRenameFailed": "Error al renombrar el dispositivo",
       "dismissFailed": "Error al descartar la infracción",
@@ -155,6 +156,7 @@
       "destinationDeleted": "",
       "destinationSaved": "",
       "destinationTestSent": "",
+      "destinationTestSentTo": "",
       "deviceRemoved": {
         "message": "El dispositivo ha sido desconectado",
         "title": "Dispositivo eliminado"
