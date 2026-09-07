@@ -99,9 +99,18 @@ export const DEFAULT_NEWSLETTER_SECTIONS: NewsletterSections = {
   mostWatched: { enabled: false, max: 10 },
 };
 
+export const NEWSLETTER_SCOPE_LIBRARIES_MAX = 200;
+
+/** A library id is only unique with its server: Plex section ids start at 1 on every server. */
+export const newsletterScopeLibrarySchema = z.strictObject({
+  serverId: uuidSchema,
+  libraryId: z.string().min(1).max(100),
+});
+export type NewsletterScopeLibrary = z.infer<typeof newsletterScopeLibrarySchema>;
+
 export const newsletterScopeSchema = z.strictObject({
   serverIds: z.array(uuidSchema).max(50).default([]),
-  libraryIds: z.array(z.string().min(1).max(100)).max(200).default([]),
+  libraries: z.array(newsletterScopeLibrarySchema).max(NEWSLETTER_SCOPE_LIBRARIES_MAX).default([]),
 });
 export type NewsletterScope = z.infer<typeof newsletterScopeSchema>;
 
@@ -131,7 +140,7 @@ export const createNewsletterSchema = z.strictObject({
   schedule: newsletterScheduleSchema,
   timezone: timezoneSchema.unwrap(),
   window: newsletterWindowSchema.default({ kind: 'since_last_send', fallbackDays: 7 }),
-  scope: newsletterScopeSchema.default({ serverIds: [], libraryIds: [] }),
+  scope: newsletterScopeSchema.default({ serverIds: [], libraries: [] }),
   sections: newsletterSectionsSchema.default(DEFAULT_NEWSLETTER_SECTIONS),
   subject: z.string().trim().min(1).max(200).default(DEFAULT_NEWSLETTER_SUBJECT),
   senderName: z.string().trim().min(1).max(NEWSLETTER_SENDER_NAME_MAX).nullable().default(null),

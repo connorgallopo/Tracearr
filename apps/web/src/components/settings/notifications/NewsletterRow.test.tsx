@@ -20,7 +20,7 @@ const newsletter: Newsletter = {
   schedule: { kind: 'weekly', dayOfWeek: 1, time: '09:00' },
   timezone: 'Europe/Berlin',
   window: { kind: 'since_last_send', fallbackDays: 7 },
-  scope: { serverIds: [], libraryIds: [] },
+  scope: { serverIds: [], libraries: [] },
   sections: {
     movies: { enabled: true, max: 12 },
     shows: { enabled: true, max: 12, maxSeasonsPerShow: 8 },

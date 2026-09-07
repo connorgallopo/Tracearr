@@ -9,6 +9,7 @@ import { db } from '../../db/client.js';
 import type { PosterRef } from '../../db/schema.js';
 import { posterVersionFor, proxyImage } from '../imageProxy.js';
 import { topWatched, type TopWatchedRow } from '../stats/topContent.js';
+import { libraryPairs } from './scopeSql.js';
 
 export interface LibraryItemRow {
   id: string;
@@ -406,7 +407,9 @@ export async function loadWindowItems(
   const serverFilter =
     scope.serverIds.length === 0 ? sql`` : sql`AND li.server_id IN ${scope.serverIds}`;
   const libraryFilter =
-    scope.libraryIds.length === 0 ? sql`` : sql`AND li.library_id IN ${scope.libraryIds}`;
+    scope.libraries.length === 0
+      ? sql``
+      : sql`AND (li.server_id, li.library_id) IN ${libraryPairs(scope.libraries)}`;
   const seen = sql`COALESCE(li.first_seen_at, li.created_at)`;
   const result = await db.execute(sql`
     SELECT li.id, li.server_id, s.name AS server_name, s.type AS server_type,
@@ -524,7 +527,7 @@ export async function assembleDigest(
       start: window.start,
       end: window.end,
       serverIds: newsletter.scope.serverIds,
-      libraryIds: newsletter.scope.libraryIds,
+      libraries: newsletter.scope.libraries,
       limit: newsletter.sections.mostWatched.max,
     });
     const keysFor = (list: TopWatchedRow[]): { serverId: string; ratingKey: string }[] =>

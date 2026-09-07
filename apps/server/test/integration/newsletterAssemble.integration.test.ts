@@ -89,7 +89,7 @@ describe('loadWindowItems', () => {
 
   it('includes first-seen-inside and added-inside rows, excludes removed, out-of-window, and end-boundary rows', async () => {
     const rows = await loadWindowItems(
-      { serverIds: [], libraryIds: [] },
+      { serverIds: [], libraries: [] },
       { start: START, end: END }
     );
     expect(rows.map((r) => r.ratingKey).sort()).toEqual(['a', 'b', 'd']);
@@ -98,17 +98,46 @@ describe('loadWindowItems', () => {
     expect(rows.map((r) => r.ratingKey)).toEqual(['a', 'b', 'd']);
   });
 
-  it('applies server and library scope', async () => {
+  it('pairs a library with its server, so the same section id on another server stays out', async () => {
+    const [other] = await db
+      .insert(servers)
+      .values({ name: 'Attic', type: 'plex', url: 'http://attic:32400', token: 'tok' })
+      .returning({ id: servers.id });
+    const otherId = other!.id;
+    await db.insert(libraryItems).values({
+      serverId: otherId,
+      libraryId: '1',
+      ratingKey: 'z',
+      title: 'Section 1 on the other server',
+      mediaType: 'movie',
+      createdAt: inside,
+      firstSeenAt: inside,
+    });
+    const window = { start: START, end: END };
+
+    const basement = await loadWindowItems(
+      { serverIds: [], libraries: [{ serverId, libraryId: '1' }] },
+      window
+    );
+    expect(basement.map((r) => r.ratingKey).sort()).toEqual(['a', 'b']);
+
+    const attic = await loadWindowItems(
+      { serverIds: [], libraries: [{ serverId: otherId, libraryId: '1' }] },
+      window
+    );
+    expect(attic.map((r) => r.ratingKey)).toEqual(['z']);
+
     const scoped = await loadWindowItems(
-      { serverIds: [serverId], libraryIds: ['2'] },
-      { start: START, end: END }
+      { serverIds: [serverId], libraries: [{ serverId, libraryId: '2' }] },
+      window
     );
     expect(scoped.map((r) => r.ratingKey)).toEqual(['d']);
-    const other = await loadWindowItems(
-      { serverIds: ['00000000-0000-4000-8000-000000000000'], libraryIds: [] },
-      { start: START, end: END }
+
+    const none = await loadWindowItems(
+      { serverIds: ['00000000-0000-4000-8000-000000000000'], libraries: [] },
+      window
     );
-    expect(other).toEqual([]);
+    expect(none).toEqual([]);
   });
 });
 

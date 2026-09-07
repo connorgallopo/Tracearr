@@ -57,6 +57,7 @@ beforeEach(() => {
           name: 'Movies',
           mediaType: 'movie',
         },
+        { serverId: 's-2', serverName: 'Attic', libraryId: '1', name: 'Anime', mediaType: 'show' },
         { serverId: 's-2', serverName: 'Attic', libraryId: '7', name: 'Shows', mediaType: 'show' },
       ],
     },
@@ -126,8 +127,16 @@ describe('ScheduleFields', () => {
 });
 
 describe('ContentFields', () => {
-  it('edits the window, scopes servers, groups libraries by server, and flags an unknown library', async () => {
-    const p = props({ scope: { serverIds: [], libraryIds: ['1', 'gone-9'] } });
+  it('edits the window, keeps the same library id on two servers apart, and flags an unknown pair', async () => {
+    const p = props({
+      scope: {
+        serverIds: [],
+        libraries: [
+          { serverId: 's-1', libraryId: '1' },
+          { serverId: 's-9', libraryId: 'gone-9' },
+        ],
+      },
+    });
     render(<ContentFields {...p} />);
     await userEvent.click(screen.getByRole('combobox', { name: 'newsletters.editor.windowKind' }));
     await userEvent.click(screen.getByRole('option', { name: 'newsletters.editor.windows.fixed' }));
@@ -136,9 +145,17 @@ describe('ContentFields', () => {
     await userEvent.click(screen.getByRole('combobox', { name: 'newsletters.editor.libraries' }));
     expect(screen.getByText('Basement')).toBeInTheDocument();
     expect(screen.getByText('Attic')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('option', { name: /Shows/ }));
+    expect(screen.getAllByRole('option')).toHaveLength(3);
+    await userEvent.click(screen.getByRole('option', { name: /Anime/ }));
     expect(p.onChange).toHaveBeenCalledWith({
-      scope: { serverIds: [], libraryIds: ['1', 'gone-9', '7'] },
+      scope: {
+        serverIds: [],
+        libraries: [
+          { serverId: 's-1', libraryId: '1' },
+          { serverId: 's-9', libraryId: 'gone-9' },
+          { serverId: 's-2', libraryId: '1' },
+        ],
+      },
     });
 
     const chip = screen.getByText('newsletters.editor.unknownLibrary');
@@ -146,7 +163,9 @@ describe('ContentFields', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.removeLibrary:{"id":"gone-9"}' })
     );
-    expect(p.onChange).toHaveBeenCalledWith({ scope: { serverIds: [], libraryIds: ['1'] } });
+    expect(p.onChange).toHaveBeenCalledWith({
+      scope: { serverIds: [], libraries: [{ serverId: 's-1', libraryId: '1' }] },
+    });
   });
 
   it('toggles a section and caps its count', async () => {
@@ -168,7 +187,7 @@ describe('ContentFields', () => {
 
 describe('MessageFields', () => {
   it('shows the resolved sender name as the placeholder and stores a typed one', async () => {
-    const p = props({ scope: { serverIds: ['s-2'], libraryIds: [] } });
+    const p = props({ scope: { serverIds: ['s-2'], libraries: [] } });
     render(<MessageFields {...p} richTextErrors={{}} onRichText={vi.fn()} fieldKey="new" />);
     const shownAs = screen.getByLabelText('newsletters.editor.senderName');
     expect(shownAs).toHaveAttribute('placeholder', 'Attic');

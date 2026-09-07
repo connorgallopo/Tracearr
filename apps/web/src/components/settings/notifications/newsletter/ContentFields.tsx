@@ -6,6 +6,7 @@ import {
   NEWSLETTER_SEASONS_PER_SHOW_MAX,
   NEWSLETTER_SECTION_MAX,
   NEWSLETTER_WINDOW_MAX_DAYS,
+  type NewsletterScopeLibrary,
   type NewsletterSections,
   type NewsletterWindow,
 } from '@tracearr/shared';
@@ -50,6 +51,8 @@ const CAP: Record<(typeof SECTIONS)[number], number> = {
 const windowDays = (window: NewsletterWindow) =>
   window.kind === 'fixed' ? window.days : window.fallbackDays;
 
+const pairKey = (pair: NewsletterScopeLibrary): string => `${pair.serverId}:${pair.libraryId}`;
+
 export function ContentFields({ state, onChange, errors }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: servers } = useServers();
@@ -60,21 +63,29 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
     value: server.id,
     label: server.name,
   }));
-  // The scope stores bare library ids; an id two servers share is one option, so the label names the first.
-  const libraryOptions = useMemo(() => {
-    const byId = new Map<string, MultiSelectOption>();
-    for (const library of libraries?.data ?? []) {
-      if (!byId.has(library.libraryId))
-        byId.set(library.libraryId, {
-          value: library.libraryId,
-          label: library.name,
-          group: library.serverName,
-        });
-    }
-    return [...byId.values()];
-  }, [libraries]);
+  const libraryOptions = useMemo<MultiSelectOption[]>(
+    () =>
+      (libraries?.data ?? []).map((library) => ({
+        value: pairKey(library),
+        label: library.name,
+        group: library.serverName,
+      })),
+    [libraries]
+  );
+  // Keys map back to pairs through this table, so a pair the picker no longer lists survives a toggle of another one.
+  const pairsByKey = useMemo(() => {
+    const map = new Map<string, NewsletterScopeLibrary>();
+    for (const library of libraries?.data ?? [])
+      map.set(pairKey(library), { serverId: library.serverId, libraryId: library.libraryId });
+    for (const pair of scope.libraries) map.set(pairKey(pair), pair);
+    return map;
+  }, [libraries, scope.libraries]);
   const known = new Set(libraryOptions.map((option) => option.value));
-  const unknownLibraries = librariesLoading ? [] : scope.libraryIds.filter((id) => !known.has(id));
+  const unknownLibraries = librariesLoading
+    ? []
+    : scope.libraries.filter((pair) => !known.has(pairKey(pair)));
+  const setLibraries = (next: NewsletterScopeLibrary[]) =>
+    onChange({ scope: { ...scope, libraries: next } });
 
   const setWindow = (next: NewsletterWindow) => onChange({ window: next });
   const setSection = <K extends keyof NewsletterSections>(
@@ -168,8 +179,15 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
           id={NEWSLETTER_FIELD_IDS.libraries}
           aria-labelledby={`${NEWSLETTER_FIELD_IDS.libraries}-label`}
           options={libraryOptions}
-          value={scope.libraryIds}
-          onChange={(libraryIds) => onChange({ scope: { ...scope, libraryIds } })}
+          value={scope.libraries.map(pairKey)}
+          onChange={(keys) =>
+            setLibraries(
+              keys.flatMap((key) => {
+                const pair = pairsByKey.get(key);
+                return pair ? [pair] : [];
+              })
+            )
+          }
           placeholder={t('newsletters.editor.allLibraries')}
           searchPlaceholder={t('newsletters.editor.searchLibraries')}
           emptyMessage={t('newsletters.editor.noLibraries')}
@@ -178,18 +196,16 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
         />
         {unknownLibraries.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {unknownLibraries.map((id) => (
-              <Badge key={id} variant="outline" title={id}>
+            {unknownLibraries.map((pair) => (
+              <Badge key={pairKey(pair)} variant="outline" title={pair.libraryId}>
                 {t('newsletters.editor.unknownLibrary')}
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-xs"
-                  aria-label={t('newsletters.editor.removeLibrary', { id })}
+                  aria-label={t('newsletters.editor.removeLibrary', { id: pair.libraryId })}
                   onClick={() =>
-                    onChange({
-                      scope: { ...scope, libraryIds: scope.libraryIds.filter((x) => x !== id) },
-                    })
+                    setLibraries(scope.libraries.filter((x) => pairKey(x) !== pairKey(pair)))
                   }
                 >
                   <X />

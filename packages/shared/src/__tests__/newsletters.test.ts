@@ -32,7 +32,7 @@ describe('createNewsletterSchema', () => {
       enabled: true,
       destinationId: null,
       window: { kind: 'since_last_send', fallbackDays: 7 },
-      scope: { serverIds: [], libraryIds: [] },
+      scope: { serverIds: [], libraries: [] },
       sections: DEFAULT_NEWSLETTER_SECTIONS,
       subject: DEFAULT_NEWSLETTER_SUBJECT,
       intro: null,
@@ -79,6 +79,11 @@ describe('createNewsletterSchema', () => {
       { recipients: { members: true, extraAddresses: [], excludeUserIds: ['nope'] } },
     ],
     ['an unknown key', { colour: 'red' }],
+    ['the old bare library id list', { scope: { serverIds: [], libraryIds: ['1'] } }],
+    [
+      'a library pair without a server',
+      { scope: { serverIds: [], libraries: [{ libraryId: '1' }] } },
+    ],
   ])('rejects %s', (_label, patch) => {
     expect(createNewsletterSchema.safeParse({ ...minimal, ...patch }).success).toBe(false);
   });
@@ -88,7 +93,13 @@ describe('createNewsletterSchema', () => {
       ...minimal,
       destinationId: '11111111-1111-4111-8111-111111111111',
       window: { kind: 'fixed', days: 14 },
-      scope: { serverIds: ['22222222-2222-4222-8222-222222222222'], libraryIds: ['1', '2'] },
+      scope: {
+        serverIds: ['22222222-2222-4222-8222-222222222222'],
+        libraries: [
+          { serverId: '22222222-2222-4222-8222-222222222222', libraryId: '1' },
+          { serverId: '22222222-2222-4222-8222-222222222222', libraryId: '2' },
+        ],
+      },
       intro: {
         type: 'doc',
         content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello' }] }],

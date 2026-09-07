@@ -59,7 +59,7 @@ const NEWSLETTER = {
   schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
   timezone: 'UTC',
   window: { kind: 'since_last_send', fallbackDays: 7 },
-  scope: { serverIds: [], libraryIds: [] },
+  scope: { serverIds: [], libraries: [] },
   sections: DEFAULT_NEWSLETTER_SECTIONS,
   subject: "What's new on {{server_name}} ({{end_date}}) {{item_count}}",
   intro: null,
@@ -452,7 +452,7 @@ describe('runNewsletter', () => {
     store.loadServerLinks.mockResolvedValue([JELLYFIN_SERVER]);
     store.getNewsletter.mockResolvedValue({
       ...NEWSLETTER,
-      scope: { serverIds: [JELLYFIN_SERVER.id], libraryIds: [] },
+      scope: { serverIds: [JELLYFIN_SERVER.id], libraries: [] },
       imageMode: 'hosted',
       links: { tracearr: true },
       intro: heaviestRuns(),

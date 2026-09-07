@@ -338,7 +338,7 @@ describe('newsletter send retention', () => {
         schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
         timezone: 'UTC',
         window: { kind: 'since_last_send', fallbackDays: 7 },
-        scope: { serverIds: [], libraryIds: [] },
+        scope: { serverIds: [], libraries: [] },
         sections: {
           movies: { enabled: true, max: 12 },
           shows: { enabled: true, max: 12, maxSeasonsPerShow: 8 },

@@ -50,7 +50,7 @@ export function defaultFormState(): NewsletterFormState {
     schedule: { kind: 'weekly', dayOfWeek: 1, time: '09:00' },
     timezone: browserTimeZone(),
     window: { kind: 'since_last_send', fallbackDays: 7 },
-    scope: { serverIds: [], libraryIds: [] },
+    scope: { serverIds: [], libraries: [] },
     sections: DEFAULT_NEWSLETTER_SECTIONS,
     subject: DEFAULT_NEWSLETTER_SUBJECT,
     senderName: null,

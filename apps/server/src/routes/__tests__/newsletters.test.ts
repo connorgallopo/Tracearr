@@ -102,7 +102,7 @@ const row = {
   schedule: body.schedule,
   timezone: 'UTC',
   imageMode: 'auto',
-  scope: { serverIds: [], libraryIds: [] },
+  scope: { serverIds: [], libraries: [] },
   sections: {},
   recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
   senderName: null,
@@ -300,6 +300,35 @@ describe('newsletter routes', () => {
       links: { tracearr: true },
       intro,
     });
+  });
+
+  it('stores library scope as server and library pairs and refuses the bare id list', async () => {
+    const app = await build(owner);
+    const scope = {
+      serverIds: [],
+      libraries: [{ serverId: '33333333-3333-4333-8333-333333333333', libraryId: '1' }],
+    };
+    const created = await app.inject({
+      method: 'POST',
+      url: '/newsletters',
+      payload: { ...body, scope },
+    });
+    expect(created.statusCode).toBe(201);
+    expect(store.createNewsletter).toHaveBeenCalledWith(expect.objectContaining({ scope }));
+    const res = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { scope },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(store.updateNewsletter).toHaveBeenCalledWith(ID, { scope });
+    const old = await app.inject({
+      method: 'PATCH',
+      url: `/newsletters/${ID}`,
+      payload: { scope: { serverIds: [], libraryIds: ['1'] } },
+    });
+    expect(old.statusCode).toBe(400);
+    expect(old.json().message).toMatch(/libraryIds/);
   });
 
   it('rejects a string intro and an unknown link key', async () => {

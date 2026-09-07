@@ -1,5 +1,7 @@
 import { sql } from 'drizzle-orm';
+import type { NewsletterScopeLibrary } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { libraryPairs } from '../newsletters/scopeSql.js';
 
 export interface TopWatchedRow {
   title: string;
@@ -14,7 +16,7 @@ interface TopWatchedOptions {
   start: Date;
   end: Date;
   serverIds: string[];
-  libraryIds: string[];
+  libraries: NewsletterScopeLibrary[];
   limit: number;
 }
 
@@ -53,9 +55,9 @@ export async function topWatched(opts: TopWatchedOptions): Promise<{
   const serverFilter =
     opts.serverIds.length === 0 ? sql`` : sql`AND s.server_id IN ${opts.serverIds}`;
   const libraryJoin =
-    opts.libraryIds.length === 0
+    opts.libraries.length === 0
       ? sql``
-      : sql`JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key AND li.library_id IN ${opts.libraryIds}`;
+      : sql`JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key AND (li.server_id, li.library_id) IN ${libraryPairs(opts.libraries)}`;
   const range = sql`s.started_at >= ${opts.start} AND s.started_at < ${opts.end}`;
 
   const [movies, shows] = await Promise.all([

@@ -126,7 +126,7 @@ describe('resolveRecipients', () => {
 
   it('skips the database when members are not included and still checks extras for suppression', async () => {
     const out = await resolveRecipients({
-      scope: { serverIds: [], libraryIds: [] },
+      scope: { serverIds: [], libraries: [] },
       recipients: {
         members: false,
         extraAddresses: [{ address: 'Gone@X.com' }, { address: 'new@x.com', name: 'New' }],
@@ -167,7 +167,7 @@ describe('resolveRecipients', () => {
       ],
     });
     const out = await resolveRecipients({
-      scope: { serverIds: ['11111111-1111-4111-8111-111111111111'], libraryIds: [] },
+      scope: { serverIds: ['11111111-1111-4111-8111-111111111111'], libraries: [] },
       recipients: {
         members: true,
         extraAddresses: [{ address: 'extra@x.com' }],
@@ -206,7 +206,7 @@ describe('resolveRecipients', () => {
       ],
     });
     const out = await resolveRecipients({
-      scope: { serverIds: [], libraryIds: [] },
+      scope: { serverIds: [], libraries: [] },
       recipients: { members: true, extraAddresses: [], excludeUserIds: ['u2'] },
     });
     expect(mockSuppressed).toHaveBeenCalledWith(['one@x.com']);

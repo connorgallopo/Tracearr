@@ -55,7 +55,7 @@ const row = {
   schedule: { kind: 'daily', time: '07:15' },
   timezone: 'Europe/Berlin',
   window: { kind: 'fixed', days: 3 },
-  scope: { serverIds: [], libraryIds: [] },
+  scope: { serverIds: [], libraries: [] },
   sections: {
     movies: { enabled: true, max: 12 },
     shows: { enabled: true, max: 12, maxSeasonsPerShow: 8 },

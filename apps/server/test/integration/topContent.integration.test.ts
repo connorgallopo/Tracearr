@@ -16,7 +16,7 @@ import {
   createTestUser,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { sessions } from '../../src/db/schema.js';
+import { libraryItems, sessions } from '../../src/db/schema.js';
 import { topWatched } from '../../src/services/stats/topContent.js';
 
 const START = new Date('2026-08-26T00:00:00Z');
@@ -77,7 +77,7 @@ describe('topWatched', () => {
       start: START,
       end: END,
       serverIds: [],
-      libraryIds: [],
+      libraries: [],
       limit: 10,
     });
     expect(movies).toHaveLength(2);
@@ -101,12 +101,46 @@ describe('topWatched', () => {
       start: START,
       end: END,
       serverIds: [serverAId],
-      libraryIds: [],
+      libraries: [],
       limit: 10,
     });
     expect(movies).toHaveLength(2);
     expect(movies.every((m) => m.serverId === serverAId)).toBe(true);
     const shared = movies.find((m) => m.title === 'Shared Movie');
     expect(shared).toMatchObject({ plays: 1, serverId: serverAId, ratingKey: 'a-1' });
+  });
+
+  it('scopes plays by the server and library pair, not the bare library id', async () => {
+    await db.insert(libraryItems).values([
+      {
+        serverId: serverAId,
+        libraryId: '1',
+        ratingKey: 'a-1',
+        title: 'Shared Movie',
+        mediaType: 'movie',
+      },
+      {
+        serverId: serverBId,
+        libraryId: '1',
+        ratingKey: 'b-9',
+        title: 'Shared Movie',
+        mediaType: 'movie',
+      },
+    ]);
+    const { movies } = await topWatched({
+      start: START,
+      end: END,
+      serverIds: [],
+      libraries: [{ serverId: serverBId, libraryId: '1' }],
+      limit: 10,
+    });
+    expect(movies).toEqual([
+      expect.objectContaining({
+        title: 'Shared Movie',
+        plays: 1,
+        serverId: serverBId,
+        ratingKey: 'b-9',
+      }),
+    ]);
   });
 });

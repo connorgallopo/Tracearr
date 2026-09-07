@@ -267,7 +267,7 @@ describe('assembleDigest poster warming', () => {
   it('warms only the movie and show cards the template renders a poster for', async () => {
     const { data, posters } = await assembleDigest(
       {
-        scope: { serverIds: [], libraryIds: [] },
+        scope: { serverIds: [], libraries: [] },
         sections: {
           ...DEFAULT_NEWSLETTER_SECTIONS,
           mostWatched: { enabled: true, max: 10 },
@@ -367,7 +367,7 @@ describe('assembleDigest most watched card identity', () => {
     });
 
     const { data } = await assembleDigest(
-      { scope: { serverIds: [], libraryIds: [] }, sections },
+      { scope: { serverIds: [], libraries: [] }, sections },
       { start: new Date('2026-08-26T00:00:00Z'), end: new Date('2026-09-02T00:00:00Z') }
     );
 

@@ -98,7 +98,7 @@ describe('recipient candidates', () => {
         schedule: { kind: 'daily', time: '08:00' },
         timezone: 'UTC',
         window: { kind: 'fixed', days: 7 },
-        scope: { serverIds: [], libraryIds: [] },
+        scope: { serverIds: [], libraries: [] },
         sections: DEFAULT_NEWSLETTER_SECTIONS,
         subject: 's',
         recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
