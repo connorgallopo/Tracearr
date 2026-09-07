@@ -2,12 +2,13 @@
  * The icon lookup returns a module-level component, so its reference is stable
  * across renders and nothing remounts. The rule cannot see that through the call.
  */
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { Fragment, useEffect, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DESTINATION_KINDS,
   DESTINATION_TYPES,
   SUBSCRIBABLE_EVENTS,
+  addressList,
   type CreateDestinationInput,
   type Destination,
   type DestinationDescriptor,
@@ -35,6 +36,7 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
+  FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -65,6 +67,7 @@ const subscribable = (event: NotificationEventType): event is SubscribableEvent 
 type FieldLabel = keyof PagesTranslations['settings']['destinations']['fields'];
 type FieldHint = keyof PagesTranslations['settings']['destinations']['hints'];
 type OptionLabel = keyof PagesTranslations['settings']['destinations']['options'];
+type GroupLabel = keyof PagesTranslations['settings']['destinations']['groups'];
 
 function isCreatable(kind: DestinationKind): kind is CreatableKind {
   return !DESTINATION_TYPES[kind].builtin;
@@ -72,11 +75,21 @@ function isCreatable(kind: DestinationKind): kind is CreatableKind {
 
 const CREATABLE_KINDS = DESTINATION_KINDS.filter(isCreatable);
 
+function kindDefaults(kind: CreatableKind): Record<string, string> {
+  const defaults: Record<string, string> = {};
+  for (const field of DESTINATION_TYPES[kind].fields) {
+    if (field.default !== undefined) defaults[field.key] = field.default;
+  }
+  return defaults;
+}
+
 interface DestinationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'create' | 'edit';
   destination?: Destination;
+  /** Seeds the kind on open and skips the kind grid. */
+  initialKind?: DestinationKind;
   onCreated?: (destination: Destination) => void;
 }
 
@@ -85,6 +98,7 @@ export function DestinationDialog({
   onOpenChange,
   mode,
   destination,
+  initialKind,
   onCreated,
 }: DestinationDialogProps) {
   const { t } = useTranslation(['pages', 'common']);
@@ -105,6 +119,13 @@ export function DestinationDialog({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
 
+  const seedKind = (next: CreatableKind) => {
+    setKind(next);
+    setName(t(`pages:settings.destinations.types.${DESTINATION_TYPES[next].label}`));
+    setEvents(next === 'email' ? [] : [...SUBSCRIBABLE_EVENTS]);
+    setValues(kindDefaults(next));
+  };
+
   useEffect(() => {
     if (!open) return;
     if (mode === 'edit' && destination) {
@@ -120,11 +141,14 @@ export function DestinationDialog({
       setEvents(destination.events.filter(subscribable));
       setValues(stored);
     } else {
-      setKind(null);
-      setName('');
       setEnabled(true);
-      setEvents([]);
-      setValues({});
+      if (initialKind && isCreatable(initialKind)) seedKind(initialKind);
+      else {
+        setKind(null);
+        setName('');
+        setEvents([]);
+        setValues({});
+      }
     }
     setEdited({});
     setCleared({});
@@ -132,7 +156,8 @@ export function DestinationDialog({
     setError(null);
     setTouched({});
     setSubmitted(false);
-  }, [open, mode, destination]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seedKind is recreated every render; listing it (or t) reruns this mount effect on every render and wipes in-progress edits
+  }, [open, mode, destination, initialKind]);
 
   const descriptor: DestinationDescriptor | null = kind ? DESTINATION_TYPES[kind] : null;
   const isBuiltin = destination?.builtin ?? false;
@@ -152,24 +177,17 @@ export function DestinationDialog({
   const canSave =
     name.trim() !== '' && (descriptor?.fields ?? []).filter((f) => f.required).every(isFilled);
 
+  /** An email destination with no alert list has nowhere to deliver a violation. */
+  const alertListBlank = kind === 'email' && addressList(values['to'] ?? '').length === 0;
+  const receivesViolations = !alertListBlank && events.includes('violation_detected');
+  const savedEvents = alertListBlank ? [] : events;
+
   /** Required errors stay quiet until the field is left or a submit is attempted. */
   const showsError = (key: string): boolean => submitted || touched[key] === true;
   const touch = (key: string) =>
     setTouched((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
   const nameMissing = name.trim() === '';
   const nameInvalid = nameMissing && showsError('name');
-
-  const selectKind = (next: CreatableKind) => {
-    const picked: DestinationDescriptor = DESTINATION_TYPES[next];
-    const defaults: Record<string, string> = {};
-    for (const field of picked.fields) {
-      if (field.default !== undefined) defaults[field.key] = field.default;
-    }
-    setKind(next);
-    setName(t(`pages:settings.destinations.types.${DESTINATION_TYPES[next].label}`));
-    setEvents([...SUBSCRIBABLE_EVENTS]);
-    setValues(defaults);
-  };
 
   const setFieldValue = (key: string, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -235,12 +253,12 @@ export function DestinationDialog({
           name: name.trim(),
           type: kind,
           config: fullConfig(),
-          events,
+          events: savedEvents,
           enabled,
         });
         onCreated?.(created);
       } else if (destination) {
-        const data: UpdateDestinationInput = { name: name.trim(), enabled, events };
+        const data: UpdateDestinationInput = { name: name.trim(), enabled, events: savedEvents };
         const patch = configPatch();
         if (!isBuiltin && Object.keys(patch).length > 0) data.config = patch;
         await updateDestination.mutateAsync({ id: destination.id, data });
@@ -275,7 +293,11 @@ export function DestinationDialog({
       <DialogContent className="flex h-[min(72dvh,40rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="gap-1 px-6 pt-5 pr-12 pb-3 text-left">
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{t('pages:settings.destinations.description')}</DialogDescription>
+          <DialogDescription>
+            {kind === 'email'
+              ? t('pages:settings.destinations.emailDescription')
+              : t('pages:settings.destinations.description')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
@@ -288,7 +310,7 @@ export function DestinationDialog({
                     key={creatable}
                     variant="outline"
                     className="h-auto flex-col gap-2 py-4"
-                    onClick={() => selectKind(creatable)}
+                    onClick={() => seedKind(creatable)}
                   >
                     <Icon className="h-5 w-5" />
                     <span className="text-sm">
@@ -336,21 +358,26 @@ export function DestinationDialog({
                     {t('pages:settings.destinations.receiveViolations')}
                   </FieldLabel>
                   <FieldDescription>
-                    {t('pages:settings.destinations.receiveViolationsHint')}
+                    {alertListBlank
+                      ? t('pages:settings.destinations.receiveViolationsNeedsRecipients')
+                      : t('pages:settings.destinations.receiveViolationsHint')}
                   </FieldDescription>
                 </FieldContent>
                 <Switch
                   id="destination-violations"
-                  checked={events.includes('violation_detected')}
+                  checked={receivesViolations}
+                  disabled={alertListBlank}
                   onCheckedChange={toggleViolations}
                 />
               </Field>
 
-              {descriptor.fields.map((field) => {
+              {descriptor.fields.map((field, index) => {
                 const inputId = `destination-${field.key}`;
                 const stored = keepsStoredSecret(field.key);
                 const missing = field.required && !isFilled(field);
                 const invalid = missing && showsError(field.key);
+                const startsGroup =
+                  field.group !== undefined && field.group !== descriptor.fields[index - 1]?.group;
                 const inputProps = {
                   id: inputId,
                   placeholder: stored
@@ -364,64 +391,74 @@ export function DestinationDialog({
                 };
 
                 return (
-                  <Field key={field.key} data-invalid={invalid}>
-                    <FieldLabel htmlFor={inputId}>
-                      {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
-                      {field.required && <span className="text-destructive ml-1">*</span>}
-                    </FieldLabel>
-                    {field.input === 'secret' ? (
-                      <PasswordInput {...inputProps} />
-                    ) : field.input === 'select' ? (
-                      <Select
-                        value={values[field.key] ?? ''}
-                        onValueChange={(value) => selectValue(field, value)}
-                      >
-                        <SelectTrigger id={inputId} aria-invalid={invalid}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(field.options ?? []).map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {t(
-                                `pages:settings.destinations.options.${option.label as OptionLabel}`
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : field.input === 'number' ? (
-                      <Input
-                        {...inputProps}
-                        type="number"
-                        inputMode="numeric"
-                        min={field.min}
-                        max={field.max}
-                      />
-                    ) : field.input === 'email' ? (
-                      <Input {...inputProps} type="email" autoComplete="off" />
-                    ) : (
-                      <Input {...inputProps} />
+                  <Fragment key={field.key}>
+                    {startsGroup && (
+                      <>
+                        <FieldSeparator role="presentation" />
+                        <p className="text-muted-foreground text-xs font-medium">
+                          {t(`pages:settings.destinations.groups.${field.group as GroupLabel}`)}
+                        </p>
+                      </>
                     )}
-                    {field.hint && !stored && (
-                      <FieldDescription>
-                        {t(`pages:settings.destinations.hints.${field.hint as FieldHint}`)}
-                      </FieldDescription>
-                    )}
-                    {stored && (
-                      <FieldDescription>
-                        <Button
-                          type="button"
-                          variant="link"
-                          size="sm"
-                          className="h-auto p-0"
-                          onClick={() => clearSecret(field.key)}
+                    <Field data-invalid={invalid}>
+                      <FieldLabel htmlFor={inputId}>
+                        {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
+                        {field.required && <span className="text-destructive ml-1">*</span>}
+                      </FieldLabel>
+                      {field.input === 'secret' ? (
+                        <PasswordInput {...inputProps} />
+                      ) : field.input === 'select' ? (
+                        <Select
+                          value={values[field.key] ?? ''}
+                          onValueChange={(value) => selectValue(field, value)}
                         >
-                          {t('pages:settings.destinations.clearSecret')}
-                        </Button>
-                      </FieldDescription>
-                    )}
-                    {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
-                  </Field>
+                          <SelectTrigger id={inputId} aria-invalid={invalid}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(field.options ?? []).map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {t(
+                                  `pages:settings.destinations.options.${option.label as OptionLabel}`
+                                )}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : field.input === 'number' ? (
+                        <Input
+                          {...inputProps}
+                          type="number"
+                          inputMode="numeric"
+                          min={field.min}
+                          max={field.max}
+                        />
+                      ) : field.input === 'email' ? (
+                        <Input {...inputProps} type="email" autoComplete="off" />
+                      ) : (
+                        <Input {...inputProps} />
+                      )}
+                      {field.hint && !stored && (
+                        <FieldDescription>
+                          {t(`pages:settings.destinations.hints.${field.hint as FieldHint}`)}
+                        </FieldDescription>
+                      )}
+                      {stored && (
+                        <FieldDescription>
+                          <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0"
+                            onClick={() => clearSecret(field.key)}
+                          >
+                            {t('pages:settings.destinations.clearSecret')}
+                          </Button>
+                        </FieldDescription>
+                      )}
+                      {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
+                    </Field>
+                  </Fragment>
                 );
               })}
 

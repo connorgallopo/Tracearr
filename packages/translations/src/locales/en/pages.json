@@ -1588,6 +1588,7 @@
       "delete": "Delete",
       "deleteConfirm": "Delete {{name}}? Automations and newsletters that use it stop until they are updated.",
       "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
+      "emailDescription": "Tracearr sends mail through this SMTP server. Newsletters pick their own recipients; automation alerts go to the addresses below.",
       "empty": "No destinations yet.",
       "fields": {
         "webhookUrl": "Webhook URL",
@@ -1609,6 +1610,11 @@
         "to": "Alert recipients",
         "replyTo": "Reply-to",
         "messagesPerSecond": "Messages per second"
+      },
+      "groups": {
+        "connection": "Connection",
+        "sender": "Sender",
+        "alerts": "Alerts"
       },
       "hints": {
         "authTokenOptional": "Optional for public topics",
@@ -1636,6 +1642,7 @@
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
       "receiveViolations": "Receive violations",
       "receiveViolationsHint": "Send every violation to this destination",
+      "receiveViolationsNeedsRecipients": "Add alert recipients to send violations here",
       "reencrypt": "Re-enter this destination's secret",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",

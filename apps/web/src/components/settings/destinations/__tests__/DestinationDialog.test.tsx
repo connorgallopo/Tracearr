@@ -126,7 +126,14 @@ describe('DestinationDialog create mode', () => {
         }
       }
 
-      expect(screen.getByLabelText('pages:settings.destinations.receiveViolations')).toBeChecked();
+      const violations = screen.getByLabelText('pages:settings.destinations.receiveViolations');
+      if (kind === 'email') {
+        expect(violations).not.toBeChecked();
+        expect(violations).toBeDisabled();
+      } else {
+        expect(violations).toBeChecked();
+        expect(violations).toBeEnabled();
+      }
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     }
   );
@@ -422,6 +429,105 @@ describe('email kind', () => {
         }),
       })
     );
+  });
+
+  it('describes what an email destination is for, under the title', async () => {
+    await openEmail();
+    expect(screen.getByText('pages:settings.destinations.emailDescription')).toBeInTheDocument();
+    expect(screen.queryByText('pages:settings.destinations.description')).not.toBeInTheDocument();
+  });
+
+  it('renders the three group labels in order with a separator before each', async () => {
+    await openEmail();
+    const labels = screen.getAllByText(/pages:settings\.destinations\.groups\./);
+    expect(labels.map((el) => el.textContent)).toEqual([
+      'pages:settings.destinations.groups.connection',
+      'pages:settings.destinations.groups.sender',
+      'pages:settings.destinations.groups.alerts',
+    ]);
+    for (const el of labels) {
+      expect(el.previousElementSibling).toHaveAttribute('data-slot', 'field-separator');
+    }
+  });
+
+  it('starts with no events and no way to subscribe until an alert address is typed', async () => {
+    const user = await openEmail();
+    const violations = screen.getByLabelText('pages:settings.destinations.receiveViolations');
+    expect(violations).toBeDisabled();
+    expect(
+      screen.getByText('pages:settings.destinations.receiveViolationsNeedsRecipients')
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(label('host')), 'smtp.example.com');
+    await user.type(screen.getByLabelText(label('fromAddress')), 'plex@example.com');
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenLastCalledWith(expect.objectContaining({ events: [] }));
+
+    await user.type(screen.getByLabelText(label('to')), 'a@example.com');
+    expect(violations).toBeEnabled();
+    expect(
+      screen.getByText('pages:settings.destinations.receiveViolationsHint')
+    ).toBeInTheDocument();
+    await user.click(violations);
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenLastCalledWith(
+      expect.objectContaining({ events: ['violation_detected'] })
+    );
+  });
+
+  it('turns the switch off and saves no events once an existing list is cleared', async () => {
+    const user = userEvent.setup();
+    render(
+      <DestinationDialog
+        open
+        onOpenChange={vi.fn()}
+        mode="edit"
+        destination={destination({
+          type: 'email',
+          events: ['violation_detected'],
+          config: {
+            preset: 'custom',
+            host: 'smtp.example.com',
+            port: '587',
+            security: 'starttls',
+            username: null,
+            password: null,
+            fromName: 'Tracearr',
+            fromAddress: 'plex@example.com',
+            replyTo: null,
+            to: 'a@example.com',
+            messagesPerSecond: '2',
+          },
+          secretsSet: [],
+        })}
+      />
+    );
+
+    const violations = screen.getByLabelText('pages:settings.destinations.receiveViolations');
+    expect(violations).toBeChecked();
+
+    await user.clear(screen.getByLabelText(label('to')));
+    expect(violations).not.toBeChecked();
+    expect(violations).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(updateAsync).toHaveBeenCalledWith({
+      id: 'dest-1',
+      data: expect.objectContaining({ events: [], config: { to: null } }),
+    });
+  });
+
+  it('opens straight on the email form when given initialKind', () => {
+    render(<DestinationDialog open onOpenChange={vi.fn()} mode="create" initialKind="email" />);
+
+    expect(
+      screen.queryByRole('button', { name: 'pages:settings.destinations.types.discord' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText(label('host'))).toBeInTheDocument();
+    expect(screen.getByLabelText(/^common:labels\.name/)).toHaveValue(
+      'pages:settings.destinations.types.email'
+    );
+    expect(screen.getByText('pages:settings.destinations.emailDescription')).toBeInTheDocument();
   });
 });
 
