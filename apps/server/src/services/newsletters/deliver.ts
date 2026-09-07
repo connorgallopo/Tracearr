@@ -43,6 +43,14 @@ function mayHaveAccepted(error: unknown): error is Error {
   return false;
 }
 
+function isHttpsUrl(url: string): boolean {
+  try {
+    return new URL(url).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 async function openTransport(ctx: DeliveryContext): Promise<{ id: string; config: EmailConfig }> {
   const destination = ctx.send.destinationId ? await getDestination(ctx.send.destinationId) : null;
   if (!destination || destination.type !== 'email' || !destination.enabled) {
@@ -145,6 +153,8 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
       ? `<mailto:${transport.config.replyTo}?subject=unsubscribe>, <${links.unsubscribe}>`
       : `<${links.unsubscribe}>`
     : null;
+  // RFC 8058 allows the one-click POST target over https only; an http external URL keeps the link and drops the header.
+  const oneClick = base !== null && isHttpsUrl(base);
 
   const domain = transport.config.fromAddress.split('@')[1] ?? 'tracearr.local';
   const messageId = `<${randomUUID()}@${domain}>`;
@@ -176,7 +186,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
         ? {
             headers: {
               'List-Unsubscribe': listUnsubscribe,
-              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+              ...(oneClick ? { 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } : {}),
             },
           }
         : {}),

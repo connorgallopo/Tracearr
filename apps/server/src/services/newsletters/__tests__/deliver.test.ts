@@ -249,6 +249,21 @@ describe('deliverRecipient', () => {
     });
   });
 
+  it('keeps the unsubscribe link but drops the one-click header when the external url is http', async () => {
+    mockSettings.mockResolvedValue({
+      externalUrl: 'http://tracearr.example.com',
+      trustProxy: false,
+    });
+    await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
+    const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(mail.headers).toEqual({
+      'List-Unsubscribe': '<http://tracearr.example.com/api/v1/email/unsubscribe/tok-r1>',
+    });
+    expect(String(mail.html)).toContain(
+      'href="http://tracearr.example.com/api/v1/email/unsubscribe/tok-r1"'
+    );
+  });
+
   it('refuses to send a snapshot whose placeholders can no longer be filled in', async () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
     await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(

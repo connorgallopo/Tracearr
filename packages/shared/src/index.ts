@@ -834,4 +834,8 @@ export {
   type ServerScope,
 } from './serverScope.js';
 
-export { buildMediaServerItemUrl, type MediaServerItemLinkInput } from './mediaServerLinks.js';
+export {
+  buildMediaServerItemUrl,
+  isPubliclyRoutableUrl,
+  type MediaServerItemLinkInput,
+} from './mediaServerLinks.js';
