@@ -165,6 +165,11 @@ describe('buildDigestInput', () => {
       { label: 'IMDb', url: 'https://www.imdb.com/title/tt0113277/' },
     ]);
     expect(input.viewUrl).toBe('{{view_url}}');
+    expect(input.multiServer).toBe(false);
+    expect(input.serverNames).toEqual(['Basement']);
+    expect(input.movies[0]?.serverName).toBe('Basement');
+    expect(input.movies[0]?.genres).toEqual(['Crime', 'Drama']);
+    expect(input.mostWatched[0]?.serverName).toBe('Basement');
 
     const withoutImdb = digestLinks(watched, 'https://tracearr.example.com', serversById, {
       tracearr: true,
@@ -181,6 +186,73 @@ describe('buildDigestInput', () => {
       digestLinks(watched, 'https://tracearr.example.com', serversById, { tracearr: true })
     ).toHaveLength(3);
     expect(input.mostWatched[0]?.links).toEqual(withoutImdb);
+  });
+
+  it('marks the digest multi-server from the resolved scope and lists the names in order', () => {
+    const two = new Map<string, ServerLink>([
+      [
+        'a',
+        {
+          id: 'a',
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'https://jf.example.com',
+          machineIdentifier: null,
+        },
+      ],
+      [
+        'b',
+        { id: 'b', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'm' },
+      ],
+    ]);
+    const data: DigestData = {
+      movies: [],
+      shows: [
+        {
+          cardId: 's1',
+          serverId: 'a',
+          serverName: 'Attic',
+          serverType: 'jellyfin',
+          ratingKey: '5',
+          mediaId: null,
+          imdbId: null,
+          thumbPath: null,
+          title: 'Chernobyl',
+          year: 2019,
+          seasons: [
+            { number: 1, title: 'Season 1', episodeRange: '', episodeCount: 0, whole: true },
+          ],
+          moreSeasons: 0,
+          episodeCount: 0,
+          addedAt: new Date(),
+        },
+      ],
+      artists: [],
+      mostWatched: [],
+      counts: { movies: 0, shows: 1, episodes: 0, albums: 0, mostWatched: 0 },
+      isEmpty: false,
+    };
+    const input = buildDigestInput(
+      data,
+      {},
+      {
+        subject: 'x',
+        intro: null,
+        outro: null,
+        windowStart: 'Aug 1, 2026',
+        windowEnd: 'Aug 8, 2026',
+        logoRef: null,
+        unsubscribeUrl: null,
+        viewUrl: null,
+        externalUrl: null,
+        tracearrLinks: false,
+        serversById: two,
+      }
+    );
+    expect(input.multiServer).toBe(true);
+    expect(input.serverNames).toEqual(['Attic', 'Basement']);
+    expect(input.shows[0]?.serverName).toBe('Attic');
+    expect(input.shows[0]?.seasons[0]?.whole).toBe(true);
   });
 
   it('emits the Tracearr link only when the newsletter turns it on', () => {

@@ -548,7 +548,7 @@ export async function assembleDigest(
         return {
           cardId: `watched-${kind}-${i}`,
           serverId: t.serverId ?? '',
-          serverName: '',
+          serverName: item?.serverName ?? '',
           serverType: '',
           ratingKey: t.ratingKey ?? '',
           mediaId: item?.mediaId ?? null,

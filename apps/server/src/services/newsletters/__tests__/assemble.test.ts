@@ -374,9 +374,11 @@ describe('assembleDigest most watched card identity', () => {
     const heat = data.mostWatched.find((w) => w.title === 'Heat');
     expect(heat?.mediaId).toBe('movie-media-id');
     expect(heat?.imdbId).toBe('tt0113277');
+    expect(heat?.serverName).toBe('Basement');
     const unknown = data.mostWatched.find((w) => w.title === 'Unknown');
     expect(unknown?.mediaId).toBeNull();
     expect(unknown?.imdbId).toBeNull();
+    expect(unknown?.serverName).toBe('');
     const wire = data.mostWatched.find((w) => w.title === 'The Wire');
     expect(wire?.mediaId).toBe('show-media-id');
     expect(wire?.imdbId).toBe('tt0290978');

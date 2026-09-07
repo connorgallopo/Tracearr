@@ -138,6 +138,7 @@ export function buildDigestInput(
   opts: DigestInputOptions
 ): DigestInput {
   const shown = sectionItemCounts(data);
+  const servers = [...opts.serversById.values()];
   const ref = (card: DigestCard): string | null =>
     posters[card.cardId] ? `poster:${card.cardId}` : null;
   const links = (card: DigestCard) =>
@@ -153,7 +154,8 @@ export function buildDigestInput(
       title: m.title,
       year: m.year,
       posterRef: ref(m),
-      genres: m.genres.slice(0, 3),
+      genres: m.genres,
+      serverName: m.serverName,
       links: links(m),
     })),
     shows: data.shows.map((s) => ({
@@ -166,9 +168,11 @@ export function buildDigestInput(
         title: x.title,
         episodeRange: x.episodeRange,
         episodeCount: x.episodeCount,
+        whole: x.whole,
       })),
       moreSeasons: s.moreSeasons,
       episodeCount: s.episodeCount,
+      serverName: s.serverName,
       links: links(s),
     })),
     artists: data.artists.map((a) => ({
@@ -180,6 +184,7 @@ export function buildDigestInput(
         year: al.year,
         trackCount: al.trackCount,
       })),
+      serverName: a.serverName,
       links: links(a),
     })),
     mostWatched: data.mostWatched.map((w) => ({
@@ -188,6 +193,7 @@ export function buildDigestInput(
       title: w.title,
       year: w.year,
       plays: w.plays,
+      serverName: w.serverName,
       links: digestLinks(w, opts.externalUrl, opts.serversById, {
         tracearr: opts.tracearrLinks,
         imdb: false,
@@ -200,5 +206,7 @@ export function buildDigestInput(
     logoRef: opts.logoRef,
     unsubscribeUrl: opts.unsubscribeUrl,
     viewUrl: opts.viewUrl,
+    multiServer: servers.length > 1,
+    serverNames: servers.map((s) => s.name),
   };
 }

@@ -144,6 +144,8 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
     logoRef: null,
     unsubscribeUrl: '{{unsubscribe_url}}',
     viewUrl: null,
+    multiServer: false,
+    serverNames: ['Basement Plex'],
     ...over,
   };
 }
@@ -162,6 +164,7 @@ function maxInput(
       year: 1990 + i,
       posterRef: variant.poster(n),
       genres: ['Action', 'Adventure', 'Science Fiction'],
+      serverName: 'Basement Plex',
       links: [tracearrLink(n), variant.server(n), imdbLink(n)],
     };
   });
@@ -177,9 +180,11 @@ function maxInput(
         title: `Season ${s + 1}`,
         episodeRange: 'E01-E04, E07, E09-E12',
         episodeCount: 10,
+        whole: false,
       })),
       moreSeasons: 3,
       episodeCount: 110,
+      serverName: 'Basement Plex',
       links: [tracearrLink(n), variant.server(n), imdbLink(n)],
     };
   });
@@ -191,6 +196,7 @@ function maxInput(
       albums: [
         { id: uuid(n + 50), title: 'Album Number 0 With A Long Name', year: 2010, trackCount: 12 },
       ],
+      serverName: 'Basement Plex',
       links: [tracearrLink(n), variant.server(n)],
     };
   });
@@ -202,6 +208,7 @@ function maxInput(
       title: `Watched Title ${i}`,
       year: 2020,
       plays: 40 - i,
+      serverName: 'Basement Plex',
       links: [tracearrLink(n), variant.server(n)],
     };
   });
@@ -224,7 +231,15 @@ describe('renderDigest', () => {
     const out = await renderDigest(
       base({
         movies: [
-          { id: 'm1', title: 'Heat', year: 1995, posterRef: 'poster:m1', genres: ['Crime'], links },
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: 'poster:m1',
+            genres: ['Crime'],
+            serverName: 'Basement Plex',
+            links,
+          },
         ],
         shows: [
           {
@@ -232,9 +247,18 @@ describe('renderDigest', () => {
             title: 'The Wire',
             year: 2002,
             posterRef: 'poster:s1',
-            seasons: [{ number: 2, title: 'Season 2', episodeRange: 'E01-E04', episodeCount: 4 }],
+            seasons: [
+              {
+                number: 2,
+                title: 'Season 2',
+                episodeRange: 'E01-E04',
+                episodeCount: 4,
+                whole: false,
+              },
+            ],
             moreSeasons: 0,
             episodeCount: 4,
+            serverName: 'Basement Plex',
             links,
           },
         ],
@@ -243,6 +267,7 @@ describe('renderDigest', () => {
             id: 'a1',
             name: 'Portishead',
             albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
+            serverName: 'Basement Plex',
             links: [],
           },
         ],
@@ -253,6 +278,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            serverName: 'Basement Plex',
             links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
           },
         ],
@@ -287,6 +313,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            serverName: 'Basement Plex',
             links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
           },
         ],
@@ -342,9 +369,18 @@ describe('renderDigest', () => {
             title: 'Justified',
             year: 2010,
             posterRef: null,
-            seasons: [{ number: 1, title: 'Season 1', episodeRange: 'E01-E03', episodeCount: 3 }],
+            seasons: [
+              {
+                number: 1,
+                title: 'Season 1',
+                episodeRange: 'E01-E03',
+                episodeCount: 3,
+                whole: false,
+              },
+            ],
             moreSeasons: 2,
             episodeCount: 3,
+            serverName: 'Basement Plex',
             links: [],
           },
         ],
@@ -354,7 +390,7 @@ describe('renderDigest', () => {
     expect(out.html).toContain('+2 more seasons');
   });
 
-  it('renders a season with no episode range or count as just its title', async () => {
+  it('says a whole season came in full and keeps the range for a partial one', async () => {
     const out = await renderDigest(
       base({
         shows: [
@@ -363,18 +399,145 @@ describe('renderDigest', () => {
             title: 'Chernobyl',
             year: 2019,
             posterRef: null,
-            seasons: [{ number: 1, title: 'Season 1', episodeRange: '', episodeCount: 0 }],
+            seasons: [
+              { number: 1, title: 'Season 1', episodeRange: '', episodeCount: 0, whole: true },
+              {
+                number: 2,
+                title: 'Season 2',
+                episodeRange: 'E01-E03',
+                episodeCount: 3,
+                whole: false,
+              },
+            ],
             moreSeasons: 0,
-            episodeCount: 0,
+            episodeCount: 3,
+            serverName: 'Basement Plex',
             links: [],
           },
         ],
       }),
       branding
     );
-    expect(out.html).toContain('Season 1');
-    expect(out.html).not.toContain(' · ');
-    expect(out.html).not.toContain('(0 episodes)');
+    expect(out.text).toContain('Season 1, all episodes');
+    expect(out.text).toContain('Season 2 · E01-E03 (3 episodes)');
+    expect(out.text).not.toContain('(0 episodes)');
+  });
+
+  it('lists up to three genres under a movie and names the server only on a multi-server digest', async () => {
+    const movie = {
+      id: 'm1',
+      title: 'Heat',
+      year: 1995,
+      posterRef: null,
+      genres: ['Crime', 'Drama', 'Thriller', 'Action'],
+      serverName: 'Basement Plex',
+      links: [],
+    };
+    const alien = {
+      id: 'w1',
+      kind: 'movie' as const,
+      title: 'Alien',
+      year: 1979,
+      plays: 7,
+      serverName: 'Attic',
+      links: [],
+    };
+    const single = await renderDigest(base({ movies: [movie], mostWatched: [alien] }), branding);
+    expect(single.text).toContain('Crime, Drama, Thriller');
+    expect(single.text).not.toContain('Action');
+    expect(single.text).not.toContain('Basement Plex · Crime');
+    expect(single.text).toContain('Alien (1979) · 7 plays');
+    expect(single.text).not.toContain('Attic · Alien');
+
+    const multi = await renderDigest(
+      base({
+        multiServer: true,
+        serverNames: ['Attic', 'Basement Plex'],
+        movies: [movie],
+        mostWatched: [alien],
+      }),
+      branding
+    );
+    expect(multi.text).toContain('Basement Plex · Crime, Drama, Thriller');
+    expect(multi.text).toContain('Attic · Alien (1979) · 7 plays');
+  });
+
+  it('previews what was added instead of repeating the subject, and falls back to the subject with nothing added', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: null,
+            genres: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreMovies: 11,
+        shows: [
+          {
+            id: 's1',
+            title: 'The Wire',
+            year: 2002,
+            posterRef: null,
+            seasons: [],
+            moreSeasons: 0,
+            episodeCount: 0,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreAlbums: 2,
+      }),
+      branding
+    );
+    expect(out.html).toContain(
+      '12 movies, 1 show and 3 albums added between Aug 26, 2026 and Sep 2, 2026'
+    );
+    const watchedOnly = await renderDigest(
+      base({
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(watchedOnly.html).not.toContain('added between');
+  });
+
+  it('tells the member why they got it, above the unsubscribe line, listing every scoped server', async () => {
+    const three = await renderDigest(
+      base({ serverNames: ['Attic', 'Basement Plex', 'Shed'] }),
+      branding
+    );
+    expect(three.text).toContain(
+      'You get this because you are a member of Attic, Basement Plex and Shed.'
+    );
+    const one = await renderDigest(base(), branding);
+    expect(one.text).toContain('You get this because you are a member of Basement Plex.');
+    expect(one.text.indexOf('member of Basement Plex')).toBeLessThan(
+      one.text.indexOf('{{unsubscribe_url}}')
+    );
   });
 
   const COPY = {
@@ -400,9 +563,31 @@ describe('renderDigest', () => {
   it('says how many items each section holds beyond its cards, singular when one', async () => {
     const out = await renderDigest(
       base({
-        movies: [{ id: 'm1', title: 'Heat', year: 1995, posterRef: null, genres: [], links: [] }],
-        artists: [{ id: 'a1', name: 'Portishead', albums: [], links: [] }],
-        mostWatched: [{ id: 'w1', kind: 'movie', title: 'Alien', year: 1979, plays: 7, links: [] }],
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: null,
+            genres: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        artists: [
+          { id: 'a1', name: 'Portishead', albums: [], serverName: 'Basement Plex', links: [] },
+        ],
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
         moreMovies: 18,
         moreShows: 4,
         moreAlbums: 1,

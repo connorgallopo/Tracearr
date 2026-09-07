@@ -57,7 +57,10 @@ export interface DigestMovie {
   title: string;
   year: number | null;
   posterRef: string | null;
+  /** The full list; the card shows the first three. */
   genres: string[];
+  /** Shown on the meta line only when the digest spans more than one server. */
+  serverName: string;
   links: EmailLink[];
 }
 
@@ -67,6 +70,8 @@ export interface DigestSeason {
   /** "E01-E04, E07" or "" when the season came in whole. */
   episodeRange: string;
   episodeCount: number;
+  /** The season itself arrived in the window, so every episode did; the line says so instead of a range. */
+  whole: boolean;
 }
 
 export interface DigestShow {
@@ -77,6 +82,7 @@ export interface DigestShow {
   seasons: DigestSeason[];
   moreSeasons: number;
   episodeCount: number;
+  serverName: string;
   links: EmailLink[];
 }
 
@@ -91,6 +97,7 @@ export interface DigestArtist {
   id: string;
   name: string;
   albums: DigestAlbum[];
+  serverName: string;
   links: EmailLink[];
 }
 
@@ -100,6 +107,8 @@ export interface DigestWatched {
   title: string;
   year: number | null;
   plays: number;
+  /** Empty when the play no longer matches a library item. */
+  serverName: string;
   links: EmailLink[];
 }
 
@@ -124,6 +133,10 @@ export interface DigestInput {
   unsubscribeUrl: string | null;
   /** Emitted verbatim; null renders no browser-view link. */
   viewUrl: string | null;
+  /** True when the scope resolves to more than one server; every card then names its server. */
+  multiServer: boolean;
+  /** The scoped servers, in name order, for the footer's permission reminder. */
+  serverNames: string[];
 }
 
 export type RichTextMark =

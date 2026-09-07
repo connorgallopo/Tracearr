@@ -67,7 +67,46 @@ function SectionHeading({ text, accent }: { text: string; accent: string }) {
   return <Text style={{ ...heading(accent), fontSize: '16px', margin: '16px 0 8px' }}>{text}</Text>;
 }
 
-function MovieCard({ item, accent }: { item: DigestMovie; accent: string }) {
+/** "A", "A and B", "A, B and C". */
+function listNames(names: readonly string[]): string {
+  if (names.length <= 1) return names[0] ?? '';
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+const plural = (count: number, noun: string): string =>
+  `${count} ${count === 1 ? noun : `${noun}s`}`;
+
+/** The inbox preview: what was added, so it does not repeat the subject; the subject when nothing was. */
+function preheader(input: DigestInput): string {
+  const albums = input.artists.reduce((n, a) => n + a.albums.length, 0) + input.moreAlbums;
+  const parts = (
+    [
+      [input.movies.length + input.moreMovies, 'movie'],
+      [input.shows.length + input.moreShows, 'show'],
+      [albums, 'album'],
+    ] as const
+  )
+    .filter(([count]) => count > 0)
+    .map(([count, noun]) => plural(count, noun));
+  if (parts.length === 0) return input.subject;
+  return `${listNames(parts)} added between ${input.windowStart} and ${input.windowEnd}`;
+}
+
+function Meta({ parts }: { parts: (string | null)[] }) {
+  const shown = parts.filter((p): p is string => p !== null && p !== '');
+  if (shown.length === 0) return null;
+  return <Text style={{ ...muted, margin: '0 0 2px' }}>{shown.join(' · ')}</Text>;
+}
+
+function MovieCard({
+  item,
+  accent,
+  multiServer,
+}: {
+  item: DigestMovie;
+  accent: string;
+  multiServer: boolean;
+}) {
   return (
     <Columns
       tableStyle={posterBodyTable}
@@ -77,6 +116,9 @@ function MovieCard({ item, accent }: { item: DigestMovie; accent: string }) {
       right={
         <>
           <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
+          <Meta
+            parts={[multiServer ? item.serverName : null, item.genres.slice(0, 3).join(', ')]}
+          />
           <Links links={item.links} accent={accent} />
         </>
       }
@@ -84,7 +126,15 @@ function MovieCard({ item, accent }: { item: DigestMovie; accent: string }) {
   );
 }
 
-function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
+function ShowCard({
+  item,
+  accent,
+  multiServer,
+}: {
+  item: DigestShow;
+  accent: string;
+  multiServer: boolean;
+}) {
   return (
     <Columns
       tableStyle={posterBodyTable}
@@ -94,12 +144,15 @@ function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
       right={
         <>
           <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
+          <Meta parts={[multiServer ? item.serverName : null]} />
           {item.seasons.map((s) => (
             <Text key={`${s.number ?? 'x'}-${s.title}`} style={lineStyle}>
               {s.title}
-              {s.episodeRange && ` · ${s.episodeRange}`}
-              {s.episodeCount > 0 &&
-                ` (${s.episodeCount} ${s.episodeCount === 1 ? 'episode' : 'episodes'})`}
+              {s.whole
+                ? ', all episodes'
+                : `${s.episodeRange ? ` · ${s.episodeRange}` : ''}${
+                    s.episodeCount > 0 ? ` (${plural(s.episodeCount, 'episode')})` : ''
+                  }`}
             </Text>
           ))}
           <More count={item.moreSeasons} noun="season" />
@@ -110,14 +163,22 @@ function ShowCard({ item, accent }: { item: DigestShow; accent: string }) {
   );
 }
 
-function ArtistCard({ item, accent }: { item: DigestArtist; accent: string }) {
+function ArtistCard({
+  item,
+  accent,
+  multiServer,
+}: {
+  item: DigestArtist;
+  accent: string;
+  multiServer: boolean;
+}) {
   return (
     <Cell style={rowGap}>
       <Text style={titleStyle}>{item.name}</Text>
+      <Meta parts={[multiServer ? item.serverName : null]} />
       {item.albums.map((a) => (
         <Text key={a.id} style={lineStyle}>
-          {withYear(a.title, a.year)} ·{' '}
-          {`${a.trackCount} ${a.trackCount === 1 ? 'track' : 'tracks'}`}
+          {withYear(a.title, a.year)} · {plural(a.trackCount, 'track')}
         </Text>
       ))}
       <Links links={item.links} accent={accent} />
@@ -125,11 +186,21 @@ function ArtistCard({ item, accent }: { item: DigestArtist; accent: string }) {
   );
 }
 
-function WatchedRow({ item, accent }: { item: DigestWatched; accent: string }) {
+function WatchedRow({
+  item,
+  accent,
+  multiServer,
+}: {
+  item: DigestWatched;
+  accent: string;
+  multiServer: boolean;
+}) {
+  const prefix = multiServer && item.serverName ? `${item.serverName} · ` : '';
   return (
     <>
       <Text style={lineStyle}>
-        {withYear(item.title, item.year)} · {`${item.plays} ${item.plays === 1 ? 'play' : 'plays'}`}
+        {prefix}
+        {withYear(item.title, item.year)} · {plural(item.plays, 'play')}
       </Text>
       <Links links={item.links} accent={accent} />
     </>
@@ -153,6 +224,11 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           </Link>
         </Text>
       )}
+      {input.serverNames.length > 0 && (
+        <Text style={muted}>
+          You get this because you are a member of {listNames(input.serverNames)}.
+        </Text>
+      )}
       <Text style={muted}>
         {input.unsubscribeUrl ? (
           <Link href={input.unsubscribeUrl} style={link(accent)}>
@@ -166,7 +242,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
   );
 
   return (
-    <Layout preview={input.subject} branding={branding} logoRef={input.logoRef} footer={footer}>
+    <Layout preview={preheader(input)} branding={branding} logoRef={input.logoRef} footer={footer}>
       <Cell style={card}>
         <Text style={heading(accent)}>{input.subject}</Text>
         <Text style={muted}>
@@ -179,7 +255,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
         <>
           <SectionHeading text="Movies" accent={accent} />
           {input.movies.map((m) => (
-            <MovieCard key={m.id} item={m} accent={accent} />
+            <MovieCard key={m.id} item={m} accent={accent} multiServer={input.multiServer} />
           ))}
           <More count={input.moreMovies} noun="movie" />
         </>
@@ -188,7 +264,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
         <>
           <SectionHeading text="TV" accent={accent} />
           {input.shows.map((s) => (
-            <ShowCard key={s.id} item={s} accent={accent} />
+            <ShowCard key={s.id} item={s} accent={accent} multiServer={input.multiServer} />
           ))}
           <More count={input.moreShows} noun="show" />
         </>
@@ -197,7 +273,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
         <>
           <SectionHeading text="Music" accent={accent} />
           {input.artists.map((a) => (
-            <ArtistCard key={a.id} item={a} accent={accent} />
+            <ArtistCard key={a.id} item={a} accent={accent} multiServer={input.multiServer} />
           ))}
           <More count={input.moreAlbums} noun="album" />
         </>
@@ -207,7 +283,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           <SectionHeading text="Most watched" accent={accent} />
           <Cell style={rowGap}>
             {input.mostWatched.map((w) => (
-              <WatchedRow key={w.id} item={w} accent={accent} />
+              <WatchedRow key={w.id} item={w} accent={accent} multiServer={input.multiServer} />
             ))}
             <More count={input.moreWatched} noun="title" />
           </Cell>

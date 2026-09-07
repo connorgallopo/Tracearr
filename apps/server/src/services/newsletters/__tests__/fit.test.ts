@@ -255,10 +255,11 @@ describe('renderDigestToFit', () => {
     const heavy: DigestData = { ...data, artists: [...artists, emptyArtist] };
     const result = await renderDigestToFit(heavy, posters, opts(), branding, delivery);
     expect(result.data.artists.some((a) => a.cardId === 'artist-empty')).toBe(false);
-    expect(result.trimmed).toEqual({ movies: 0, shows: 0, albums: 1, mostWatched: 0 });
+    // Measured 2026-09-07: the heavier digest copy now needs one show trimmed alongside the credited album.
+    expect(result.trimmed).toEqual({ movies: 0, shows: 1, albums: 1, mostWatched: 0 });
     expect(sectionItemCounts(result.data)).toEqual({
       movies: 12,
-      shows: 12,
+      shows: 11,
       albums: 12,
       mostWatched: 10,
     });
