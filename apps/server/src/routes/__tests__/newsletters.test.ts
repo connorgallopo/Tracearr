@@ -598,7 +598,9 @@ describe('newsletter routes', () => {
     const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(res.statusCode).toBe(200);
     const json = res.json();
-    expect(json.trimmed).toEqual({ movies: 0, shows: 1, albums: 0, mostWatched: 0 });
+    // Measured 2026-09-07: album covers and most-watched posters tie movies, shows and
+    // albums at 12 items each, so the largest-section trim interleaves all three.
+    expect(json.trimmed).toEqual({ movies: 2, shows: 3, albums: 2, mostWatched: 0 });
     expect(json.counts).toEqual({
       movies: 30,
       shows: 20,
@@ -606,7 +608,7 @@ describe('newsletter routes', () => {
       albums: 20,
       mostWatched: 10,
     });
-    expect(json.html).toContain('+9 more shows');
+    expect(json.html).toContain('+11 more shows');
     expect(json.html).toContain('src="/api/v1/images/proxy?server=');
     expect(json.html).not.toContain('poster:');
   });

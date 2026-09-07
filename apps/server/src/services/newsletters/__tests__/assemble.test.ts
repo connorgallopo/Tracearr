@@ -264,7 +264,7 @@ describe('assembleDigest poster warming', () => {
     });
   });
 
-  it('warms only the movie and show cards the template renders a poster for', async () => {
+  it('warms movie, show, first-album and most-watched posters, and nothing else', async () => {
     const { data, posters } = await assembleDigest(
       {
         scope: { serverIds: [], libraries: [] },
@@ -277,10 +277,25 @@ describe('assembleDigest poster warming', () => {
     );
     expect(data.artists).toHaveLength(1);
     expect(data.mostWatched).toHaveLength(1);
-    expect(Object.keys(posters).sort()).toEqual(['movie-1', 'show-1']);
+    expect(Object.keys(posters).sort()).toEqual([
+      'album-1',
+      'movie-1',
+      'show-1',
+      'watched-movie-0',
+    ]);
+    expect(posters['album-1']).toEqual({
+      serverId: 'srv-1',
+      thumbPath: '/album.jpg',
+      version: 'v-/album.jpg',
+    });
+    expect(posters['watched-movie-0']).toEqual({
+      serverId: 'srv-1',
+      thumbPath: '/watched.jpg',
+      version: 'v-/watched.jpg',
+    });
     expect(
       mockProxy.mock.calls.map(([arg]) => (arg as { imagePath: string }).imagePath).sort()
-    ).toEqual(['/movie.jpg', '/show.jpg']);
+    ).toEqual(['/album.jpg', '/movie.jpg', '/show.jpg', '/watched.jpg']);
   });
 });
 

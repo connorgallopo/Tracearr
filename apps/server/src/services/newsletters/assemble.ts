@@ -567,7 +567,13 @@ export async function assembleDigest(
     data.isEmpty = data.isEmpty && data.mostWatched.length === 0;
   }
 
-  // Only movie and show cards render a poster; warming any other card fetches an image nothing references.
-  const posters = await warmPosters([...data.movies, ...data.shows]);
+  // An artist card shows its first album's cover; a most-watched row carries its session's thumb.
+  const covers = data.artists.flatMap((artist) => (artist.albums[0] ? [artist.albums[0]] : []));
+  const posters = await warmPosters([
+    ...data.movies,
+    ...data.shows,
+    ...covers,
+    ...data.mostWatched,
+  ]);
   return { data, posters };
 }

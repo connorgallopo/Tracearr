@@ -178,6 +178,7 @@ export function buildDigestInput(
     artists: data.artists.map((a) => ({
       id: a.cardId,
       name: a.name,
+      posterRef: a.albums[0] ? ref(a.albums[0]) : null,
       albums: a.albums.map((al) => ({
         id: al.cardId,
         title: al.title,
@@ -193,6 +194,7 @@ export function buildDigestInput(
       title: w.title,
       year: w.year,
       plays: w.plays,
+      posterRef: ref(w),
       serverName: w.serverName,
       links: digestLinks(w, opts.externalUrl, opts.serversById, {
         tracearr: opts.tracearrLinks,

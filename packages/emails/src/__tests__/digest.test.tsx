@@ -193,6 +193,7 @@ function maxInput(
     return {
       id: uuid(n),
       name: `Some Band Called ${i}`,
+      posterRef: variant.poster(n + 50),
       albums: [
         { id: uuid(n + 50), title: 'Album Number 0 With A Long Name', year: 2010, trackCount: 12 },
       ],
@@ -208,6 +209,7 @@ function maxInput(
       title: `Watched Title ${i}`,
       year: 2020,
       plays: 40 - i,
+      posterRef: variant.poster(n),
       serverName: 'Basement Plex',
       links: [tracearrLink(n), variant.server(n)],
     };
@@ -266,6 +268,7 @@ describe('renderDigest', () => {
           {
             id: 'a1',
             name: 'Portishead',
+            posterRef: null,
             albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
             serverName: 'Basement Plex',
             links: [],
@@ -278,6 +281,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            posterRef: null,
             serverName: 'Basement Plex',
             links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
           },
@@ -313,6 +317,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            posterRef: null,
             serverName: 'Basement Plex',
             links: [{ label: 'IMDb', url: 'https://www.imdb.com/title/tt0078748/' }],
           },
@@ -439,6 +444,7 @@ describe('renderDigest', () => {
       title: 'Alien',
       year: 1979,
       plays: 7,
+      posterRef: null,
       serverName: 'Attic',
       links: [],
     };
@@ -459,7 +465,8 @@ describe('renderDigest', () => {
       branding
     );
     expect(multi.text).toContain('Basement Plex · Crime, Drama, Thriller');
-    expect(multi.text).toContain('Attic · Alien (1979) · 7 plays');
+    expect(multi.text).toContain('Alien (1979) · 7 plays');
+    expect(multi.text).toContain('Attic');
   });
 
   it('previews what was added instead of repeating the subject, and falls back to the subject with nothing added', async () => {
@@ -494,6 +501,7 @@ describe('renderDigest', () => {
           {
             id: 'a1',
             name: 'Portishead',
+            posterRef: null,
             albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
             serverName: 'Basement Plex',
             links: [],
@@ -515,6 +523,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            posterRef: null,
             serverName: 'Basement Plex',
             links: [],
           },
@@ -540,14 +549,68 @@ describe('renderDigest', () => {
     );
   });
 
+  it('renders the album cover on an artist card and the poster on a most watched row', async () => {
+    const out = await renderDigest(
+      base({
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: 'poster:al1',
+            albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            posterRef: 'poster:w1',
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).toContain('src="poster:al1"');
+    expect(out.html).toContain('alt="Portishead"');
+    expect(out.html).toContain('src="poster:w1"');
+    expect(out.html).toContain('alt="Alien"');
+    expect(out.html.match(/width="80"/g)).toHaveLength(2);
+  });
+
+  it('renders an artist card with no warmed cover without an image', async () => {
+    const out = await renderDigest(
+      base({
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: null,
+            albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).not.toContain('<img');
+  });
+
   const COPY = {
     'nineteen linked runs in both fields': { intro: heaviestRuns, outro: heaviestRuns },
     'eight linked list items in both fields': { intro: heaviestList, outro: heaviestList },
   };
 
-  // Measured 2026-09-04 with @react-email/components 1.0.12: plex runs 98,897 B, plex list
-  // 98,599 B, jellyfin runs 99,223 B, jellyfin list 98,925 B, cid runs 93,535 B, cid list
-  // 93,237 B. The clip ceiling is asserted by apps/server/src/services/newsletters/__tests__/fit.test.ts
+  // Measured 2026-09-07 with @react-email/components 1.0.12: plex runs 113,246 B, plex list
+  // 112,948 B, jellyfin runs 114,672 B, jellyfin list 114,374 B, cid runs 103,770 B, cid list
+  // 103,472 B. The clip ceiling is asserted by apps/server/src/services/newsletters/__tests__/fit.test.ts
   // against what delivery substitutes; this file only records that each variant renders.
   it.each(
     Object.entries(VARIANTS).flatMap(([name, variant]) =>
@@ -575,7 +638,14 @@ describe('renderDigest', () => {
           },
         ],
         artists: [
-          { id: 'a1', name: 'Portishead', albums: [], serverName: 'Basement Plex', links: [] },
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: null,
+            albums: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
         ],
         mostWatched: [
           {
@@ -584,6 +654,7 @@ describe('renderDigest', () => {
             title: 'Alien',
             year: 1979,
             plays: 7,
+            posterRef: null,
             serverName: 'Basement Plex',
             links: [],
           },

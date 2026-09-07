@@ -118,7 +118,7 @@ export function heaviestDigest(): { data: DigestData; posters: Record<string, Po
     name: `Some Band Called ${i}`,
     albums: [
       {
-        ...card(350 + i, false),
+        ...card(350 + i, true),
         title: 'Album Number 0 With A Long Name',
         year: 2010,
         trackCount: 12,
@@ -126,14 +126,20 @@ export function heaviestDigest(): { data: DigestData; posters: Record<string, Po
     ],
   }));
   const mostWatched = Array.from({ length: 10 }, (_, i) => ({
-    ...card(400 + i, false),
+    ...card(400 + i, true),
     kind: i % 2 ? ('show' as const) : ('movie' as const),
     title: `Watched Title ${i}`,
     year: 2020,
     plays: 40 - i,
   }));
   const posters: Record<string, PosterRef> = {};
-  for (const c of [...movies, ...shows]) {
+  const withPoster = [
+    ...movies,
+    ...shows,
+    ...artists.flatMap((a) => (a.albums[0] ? [a.albums[0]] : [])),
+    ...mostWatched,
+  ];
+  for (const c of withPoster) {
     if (c.thumbPath) {
       posters[c.cardId] = {
         serverId: c.serverId,

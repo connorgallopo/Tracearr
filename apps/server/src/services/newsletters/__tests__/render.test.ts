@@ -347,7 +347,7 @@ describe('buildDigestInput', () => {
       ratingKey: '10',
       mediaId: null,
       imdbId: null,
-      thumbPath: null,
+      thumbPath: '/dummy',
       title: 'Dummy',
       year: 1994,
       trackCount: 11,
@@ -376,7 +376,10 @@ describe('buildDigestInput', () => {
     expect(sectionItemCounts(data)).toEqual({ movies: 0, shows: 0, albums: 2, mostWatched: 1 });
     const input = buildDigestInput(
       data,
-      {},
+      {
+        al1: { serverId: 's1', thumbPath: '/dummy', version: 'v' },
+        w1: { serverId: 's1', thumbPath: '/alien', version: 'v' },
+      },
       {
         subject: 'x',
         intro: null,
@@ -395,6 +398,8 @@ describe('buildDigestInput', () => {
     expect(input.moreShows).toBe(0);
     expect(input.moreAlbums).toBe(3);
     expect(input.moreWatched).toBe(0);
+    expect(input.artists[0]?.posterRef).toBe('poster:al1');
+    expect(input.mostWatched[0]?.posterRef).toBe('poster:w1');
   });
 });
 

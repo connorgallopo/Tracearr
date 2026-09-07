@@ -96,6 +96,8 @@ export interface DigestAlbum {
 export interface DigestArtist {
   id: string;
   name: string;
+  /** The first album's cover. */
+  posterRef: string | null;
   albums: DigestAlbum[];
   serverName: string;
   links: EmailLink[];
@@ -107,6 +109,7 @@ export interface DigestWatched {
   title: string;
   year: number | null;
   plays: number;
+  posterRef: string | null;
   /** Empty when the play no longer matches a library item. */
   serverName: string;
   links: EmailLink[];

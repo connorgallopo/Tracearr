@@ -474,7 +474,7 @@ describe('runNewsletter', () => {
       itemCounts: unknown;
       posters: unknown;
     };
-    expect(send.html).toContain('+9 more shows');
+    expect(send.html).toContain('+11 more shows');
     expect(send.html).toContain('src="poster:');
     expect(deliveredBytes(send.html, posters, 'hosted', EXTERNAL_URL)).toBeLessThanOrEqual(
       EMAIL_CLIP_FIT_BYTES

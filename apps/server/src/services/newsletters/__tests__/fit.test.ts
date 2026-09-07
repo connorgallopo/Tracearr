@@ -165,29 +165,28 @@ describe('fitDigest', () => {
 });
 
 describe('renderDigestToFit', () => {
-  it('measures what delivery substitutes: the heaviest digest passes the line only once the hosted poster urls are in', async () => {
+  it('measures what delivery substitutes: hosted poster urls weigh more than cid references', async () => {
     const { data, posters } = heaviestDigest();
     const raw = await renderDigest(buildDigestInput(data, posters, opts()), branding);
-    expect(Buffer.byteLength(raw.html, 'utf8')).toBeLessThan(EMAIL_CLIP_FIT_BYTES);
-    expect(deliveredBytes(raw.html, posters, 'hosted', EXTERNAL_URL)).toBeGreaterThan(
-      EMAIL_CLIP_FIT_BYTES
-    );
     expect(deliveredBytes(raw.html, posters, 'inline', EXTERNAL_URL)).toBeLessThan(
-      EMAIL_CLIP_FIT_BYTES
+      deliveredBytes(raw.html, posters, 'hosted', EXTERNAL_URL)
     );
   });
 
-  it('brings the heaviest digest the assembler can produce under the budget by one show and says so', async () => {
+  it('brings the heaviest digest the assembler can produce under the budget by trimming shows, movies and albums and says so', async () => {
     const { data, posters } = heaviestDigest();
     const result = await renderDigestToFit(data, posters, opts(), branding, delivery);
     expect(result.bytes).toBeLessThanOrEqual(EMAIL_CLIP_FIT_BYTES);
-    expect(result.trimmed).toEqual({ movies: 0, shows: 1, albums: 0, mostWatched: 0 });
-    expect(result.renders).toBe(2);
-    expect(result.data.shows).toHaveLength(11);
+    // Measured 2026-09-07: album covers and most-watched posters tie movies, shows and albums
+    // at 12 items each, so the largest-section tie-break interleaves all three instead of
+    // stopping at shows alone.
+    expect(result.trimmed).toEqual({ movies: 2, shows: 3, albums: 2, mostWatched: 0 });
+    expect(result.renders).toBe(8);
+    expect(result.data.shows).toHaveLength(9);
     expect(result.data.counts).toEqual(data.counts);
-    expect(result.rendered.html).toContain('+9 more shows');
-    expect(result.rendered.html).toContain('+18 more movies');
-    expect(result.rendered.html).toContain('+8 more albums');
+    expect(result.rendered.html).toContain('+11 more shows');
+    expect(result.rendered.html).toContain('+20 more movies');
+    expect(result.rendered.html).toContain('+10 more albums');
     expect(result.rendered.html).not.toContain('more titles');
     expect(result.rendered.html).not.toContain('rel="preload"');
     expect(deliveredBytes(result.rendered.html, posters, 'hosted', EXTERNAL_URL)).toBe(
@@ -195,9 +194,9 @@ describe('renderDigestToFit', () => {
     );
     expect(mockDebug).toHaveBeenCalledWith('Trimmed the digest to fit the clip budget', {
       newsletterId: 'n-1',
-      trimmed: { movies: 0, shows: 1, albums: 0, mostWatched: 0 },
+      trimmed: { movies: 2, shows: 3, albums: 2, mostWatched: 0 },
       bytes: result.bytes,
-      renders: 2,
+      renders: 8,
     });
   });
 
@@ -255,15 +254,16 @@ describe('renderDigestToFit', () => {
     const heavy: DigestData = { ...data, artists: [...artists, emptyArtist] };
     const result = await renderDigestToFit(heavy, posters, opts(), branding, delivery);
     expect(result.data.artists.some((a) => a.cardId === 'artist-empty')).toBe(false);
-    // Measured 2026-09-07: the heavier digest copy now needs one show trimmed alongside the credited album.
-    expect(result.trimmed).toEqual({ movies: 0, shows: 1, albums: 1, mostWatched: 0 });
+    // Measured 2026-09-07: the extra album starts the tie-break on albums, but the same
+    // three-way tie as the previous test still interleaves movies and shows into the trim.
+    expect(result.trimmed).toEqual({ movies: 2, shows: 2, albums: 3, mostWatched: 0 });
     expect(sectionItemCounts(result.data)).toEqual({
-      movies: 12,
-      shows: 11,
-      albums: 12,
+      movies: 10,
+      shows: 10,
+      albums: 10,
       mostWatched: 10,
     });
-    expect(result.rendered.html).toContain('+8 more albums');
+    expect(result.rendered.html).toContain('+10 more albums');
   });
 
   it('warns with the final bytes and the budget when trimming everything still leaves it over', async () => {

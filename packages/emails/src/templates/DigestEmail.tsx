@@ -16,7 +16,6 @@ import type {
 
 const titleStyle = { ...paragraph, fontWeight: 600, margin: '0 0 2px' } as const;
 const lineStyle = { ...paragraph, margin: '0 0 2px' } as const;
-const rowGap = { ...card, padding: '10px', marginBottom: '8px' } as const;
 const posterBodyTable = {
   border: `1px solid ${colors.border}`,
   borderRadius: '6px',
@@ -173,16 +172,24 @@ function ArtistCard({
   multiServer: boolean;
 }) {
   return (
-    <Cell style={rowGap}>
-      <Text style={titleStyle}>{item.name}</Text>
-      <Meta parts={[multiServer ? item.serverName : null]} />
-      {item.albums.map((a) => (
-        <Text key={a.id} style={lineStyle}>
-          {withYear(a.title, a.year)} · {plural(a.trackCount, 'track')}
-        </Text>
-      ))}
-      <Links links={item.links} accent={accent} />
-    </Cell>
+    <Columns
+      tableStyle={posterBodyTable}
+      leftStyle={posterCell}
+      rightStyle={bodyCell}
+      left={<Poster src={item.posterRef} alt={item.name} />}
+      right={
+        <>
+          <Text style={titleStyle}>{item.name}</Text>
+          <Meta parts={[multiServer ? item.serverName : null]} />
+          {item.albums.map((a) => (
+            <Text key={a.id} style={lineStyle}>
+              {withYear(a.title, a.year)} · {plural(a.trackCount, 'track')}
+            </Text>
+          ))}
+          <Links links={item.links} accent={accent} />
+        </>
+      }
+    />
   );
 }
 
@@ -195,15 +202,22 @@ function WatchedRow({
   accent: string;
   multiServer: boolean;
 }) {
-  const prefix = multiServer && item.serverName ? `${item.serverName} · ` : '';
   return (
-    <>
-      <Text style={lineStyle}>
-        {prefix}
-        {withYear(item.title, item.year)} · {plural(item.plays, 'play')}
-      </Text>
-      <Links links={item.links} accent={accent} />
-    </>
+    <Columns
+      tableStyle={posterBodyTable}
+      leftStyle={posterCell}
+      rightStyle={bodyCell}
+      left={<Poster src={item.posterRef} alt={item.title} />}
+      right={
+        <>
+          <Text style={titleStyle}>
+            {withYear(item.title, item.year)} · {plural(item.plays, 'play')}
+          </Text>
+          <Meta parts={[multiServer ? item.serverName : null]} />
+          <Links links={item.links} accent={accent} />
+        </>
+      }
+    />
   );
 }
 
@@ -281,12 +295,10 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
       {input.mostWatched.length > 0 && (
         <>
           <SectionHeading text="Most watched" accent={accent} />
-          <Cell style={rowGap}>
-            {input.mostWatched.map((w) => (
-              <WatchedRow key={w.id} item={w} accent={accent} multiServer={input.multiServer} />
-            ))}
-            <More count={input.moreWatched} noun="title" />
-          </Cell>
+          {input.mostWatched.map((w) => (
+            <WatchedRow key={w.id} item={w} accent={accent} multiServer={input.multiServer} />
+          ))}
+          <More count={input.moreWatched} noun="title" />
         </>
       )}
       {input.outro && (
