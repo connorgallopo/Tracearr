@@ -160,19 +160,24 @@ describe('DestinationDialog create mode', () => {
     expect(createAsync).toHaveBeenCalledWith(expect.objectContaining({ events: [] }));
   });
 
-  it('keeps Save disabled until every required field is filled', async () => {
+  it('refuses to save an unfilled form, shows what is missing, then saves once filled', async () => {
     const user = userEvent.setup();
     renderCreate();
     await pickType(user, 'discord');
 
     const save = screen.getByRole('button', { name: 'common:actions.save' });
-    expect(save).toBeDisabled();
+    expect(screen.queryByText('common:validation.required')).not.toBeInTheDocument();
+
+    await user.click(save);
+    expect(createAsync).not.toHaveBeenCalled();
+    expect(screen.getAllByText('common:validation.required')).toHaveLength(1);
+    expect(screen.getByLabelText(/fields\.webhookUrl/)).toHaveAttribute('aria-invalid', 'true');
 
     await user.type(
       screen.getByLabelText(/fields\.webhookUrl/),
       'https://discord.com/api/webhooks/1/x'
     );
-    expect(save).toBeEnabled();
+    expect(screen.queryByText('common:validation.required')).not.toBeInTheDocument();
 
     await user.click(save);
     expect(createAsync).toHaveBeenCalledWith(
@@ -257,13 +262,15 @@ describe('DestinationDialog edit mode', () => {
     );
 
     const save = screen.getByRole('button', { name: 'common:actions.save' });
-    expect(save).toBeDisabled();
     const userKey = screen.getByLabelText(/fields\.userKey/);
     expect(userKey).not.toHaveAttribute('placeholder', 'pages:settings.destinations.secretSet');
 
+    await user.click(save);
+    expect(updateAsync).not.toHaveBeenCalled();
+    expect(screen.getAllByText('common:validation.required')).toHaveLength(2);
+
     await user.type(userKey, 'u');
     await user.type(screen.getByLabelText(/fields\.apiToken/), 't');
-    expect(save).toBeEnabled();
     await user.click(save);
     expect(updateAsync).toHaveBeenCalledWith({
       id: 'dest-1',
@@ -415,5 +422,66 @@ describe('email kind', () => {
         }),
       })
     );
+  });
+});
+
+describe('DestinationDialog layout and error gating', () => {
+  const label = (key: string) => new RegExp(`pages:settings\\.destinations\\.fields\\.${key}\\b`);
+
+  it('opens quiet and only marks a required field once it is left blank', async () => {
+    const user = userEvent.setup();
+    renderCreate();
+    await pickType(user, 'email');
+
+    expect(screen.queryByText('common:validation.required')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(label('host'))).toHaveAttribute('aria-invalid', 'false');
+
+    await user.click(screen.getByLabelText(label('host')));
+    await user.tab();
+
+    expect(screen.getAllByText('common:validation.required')).toHaveLength(1);
+    expect(screen.getByLabelText(label('host'))).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText(label('fromAddress'))).toHaveAttribute('aria-invalid', 'false');
+  });
+
+  it('marks every missing required field once Save is clicked', async () => {
+    const user = userEvent.setup();
+    renderCreate();
+    await pickType(user, 'email');
+
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+
+    // The name is prefilled from the kind, so host and from address are the two left.
+    expect(screen.getAllByText('common:validation.required')).toHaveLength(2);
+    expect(createAsync).not.toHaveBeenCalled();
+  });
+
+  it('marks the name field once it is blanked and left', async () => {
+    const user = userEvent.setup();
+    renderCreate();
+    await pickType(user, 'discord');
+
+    const name = screen.getByLabelText(/^common:labels\.name/);
+    await user.clear(name);
+    expect(screen.queryByText('common:validation.required')).not.toBeInTheDocument();
+    await user.tab();
+    expect(screen.getAllByText('common:validation.required')).toHaveLength(1);
+    expect(name).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('keeps the footer outside the scrolling body', async () => {
+    const user = userEvent.setup();
+    renderCreate();
+    await pickType(user, 'discord');
+
+    const body = screen.getByLabelText(/fields\.webhookUrl/).closest('.overflow-y-auto');
+    const footer = screen
+      .getByRole('button', { name: 'common:actions.save' })
+      .closest('[data-slot="dialog-footer"]');
+    expect(body).not.toBeNull();
+    expect(footer).not.toBeNull();
+    expect(body?.contains(footer)).toBe(false);
+    expect(screen.getByRole('dialog')).toHaveClass('flex', 'flex-col', 'overflow-hidden');
+    expect(footer).toHaveClass('border-t');
   });
 });

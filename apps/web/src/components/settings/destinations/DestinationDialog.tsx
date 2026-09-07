@@ -102,6 +102,8 @@ export function DestinationDialog({
   const [cleared, setCleared] = useState<Record<string, boolean>>({});
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -128,6 +130,8 @@ export function DestinationDialog({
     setCleared({});
     setDirty(false);
     setError(null);
+    setTouched({});
+    setSubmitted(false);
   }, [open, mode, destination]);
 
   const descriptor: DestinationDescriptor | null = kind ? DESTINATION_TYPES[kind] : null;
@@ -147,6 +151,13 @@ export function DestinationDialog({
 
   const canSave =
     name.trim() !== '' && (descriptor?.fields ?? []).filter((f) => f.required).every(isFilled);
+
+  /** Required errors stay quiet until the field is left or a submit is attempted. */
+  const showsError = (key: string): boolean => submitted || touched[key] === true;
+  const touch = (key: string) =>
+    setTouched((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
+  const nameMissing = name.trim() === '';
+  const nameInvalid = nameMissing && showsError('name');
 
   const selectKind = (next: CreatableKind) => {
     const picked: DestinationDescriptor = DESTINATION_TYPES[next];
@@ -214,6 +225,8 @@ export function DestinationDialog({
   };
 
   const handleSave = async () => {
+    setSubmitted(true);
+    if (!canSave) return;
     setError(null);
     try {
       if (mode === 'create') {
@@ -239,6 +252,7 @@ export function DestinationDialog({
   };
 
   const handleTest = async () => {
+    setSubmitted(true);
     setError(null);
     try {
       if (mode === 'edit' && destination) {
@@ -258,164 +272,169 @@ export function DestinationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex h-[min(72dvh,40rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
+        <DialogHeader className="gap-1 px-6 pt-5 pr-12 pb-3 text-left">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{t('pages:settings.destinations.description')}</DialogDescription>
         </DialogHeader>
 
-        {descriptor === null ? (
-          <div className="grid grid-cols-2 gap-3 py-2 sm:grid-cols-3">
-            {CREATABLE_KINDS.map((creatable) => {
-              const Icon = iconFor(creatable);
-              return (
-                <Button
-                  key={creatable}
-                  variant="outline"
-                  className="h-auto flex-col gap-2 py-4"
-                  onClick={() => selectKind(creatable)}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-sm">
-                    {t(`pages:settings.destinations.types.${DESTINATION_TYPES[creatable].label}`)}
-                  </span>
-                </Button>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4 py-2">
-            <Field data-invalid={name.trim() === ''}>
-              <FieldLabel htmlFor="destination-name">
-                {t('common:labels.name')}
-                <span className="text-destructive ml-1">*</span>
-              </FieldLabel>
-              <Input
-                id="destination-name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  setDirty(true);
-                }}
-                aria-invalid={name.trim() === ''}
-              />
-              {name.trim() === '' && <FieldError>{t('common:validation.required')}</FieldError>}
-            </Field>
-
-            <Field orientation="horizontal">
-              <FieldLabel htmlFor="destination-enabled">{t('common:states.enabled')}</FieldLabel>
-              <Switch
-                id="destination-enabled"
-                checked={enabled}
-                onCheckedChange={(checked) => {
-                  setEnabled(checked);
-                  setDirty(true);
-                }}
-              />
-            </Field>
-
-            <Field orientation="horizontal">
-              <FieldContent>
-                <FieldLabel htmlFor="destination-violations">
-                  {t('pages:settings.destinations.receiveViolations')}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+          {descriptor === null ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {CREATABLE_KINDS.map((creatable) => {
+                const Icon = iconFor(creatable);
+                return (
+                  <Button
+                    key={creatable}
+                    variant="outline"
+                    className="h-auto flex-col gap-2 py-4"
+                    onClick={() => selectKind(creatable)}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-sm">
+                      {t(`pages:settings.destinations.types.${DESTINATION_TYPES[creatable].label}`)}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <Field data-invalid={nameInvalid}>
+                <FieldLabel htmlFor="destination-name">
+                  {t('common:labels.name')}
+                  <span className="text-destructive ml-1">*</span>
                 </FieldLabel>
-                <FieldDescription>
-                  {t('pages:settings.destinations.receiveViolationsHint')}
-                </FieldDescription>
-              </FieldContent>
-              <Switch
-                id="destination-violations"
-                checked={events.includes('violation_detected')}
-                onCheckedChange={toggleViolations}
-              />
-            </Field>
+                <Input
+                  id="destination-name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setDirty(true);
+                  }}
+                  onBlur={() => touch('name')}
+                  aria-invalid={nameInvalid}
+                />
+                {nameInvalid && <FieldError>{t('common:validation.required')}</FieldError>}
+              </Field>
 
-            {descriptor.fields.map((field) => {
-              const inputId = `destination-${field.key}`;
-              const stored = keepsStoredSecret(field.key);
-              const missing = field.required && !isFilled(field);
-              const inputProps = {
-                id: inputId,
-                placeholder: stored
-                  ? t('pages:settings.destinations.secretSet')
-                  : field.placeholder,
-                value: values[field.key] ?? '',
-                onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                  setFieldValue(field.key, e.target.value),
-                'aria-invalid': missing,
-              };
+              <Field orientation="horizontal">
+                <FieldLabel htmlFor="destination-enabled">{t('common:states.enabled')}</FieldLabel>
+                <Switch
+                  id="destination-enabled"
+                  checked={enabled}
+                  onCheckedChange={(checked) => {
+                    setEnabled(checked);
+                    setDirty(true);
+                  }}
+                />
+              </Field>
 
-              return (
-                <Field key={field.key} data-invalid={missing}>
-                  <FieldLabel htmlFor={inputId}>
-                    {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
-                    {field.required && <span className="text-destructive ml-1">*</span>}
+              <Field orientation="horizontal">
+                <FieldContent>
+                  <FieldLabel htmlFor="destination-violations">
+                    {t('pages:settings.destinations.receiveViolations')}
                   </FieldLabel>
-                  {field.input === 'secret' ? (
-                    <PasswordInput {...inputProps} />
-                  ) : field.input === 'select' ? (
-                    <Select
-                      value={values[field.key] ?? ''}
-                      onValueChange={(value) => selectValue(field, value)}
-                    >
-                      <SelectTrigger id={inputId} aria-invalid={missing}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(field.options ?? []).map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {t(
-                              `pages:settings.destinations.options.${option.label as OptionLabel}`
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : field.input === 'number' ? (
-                    <Input
-                      {...inputProps}
-                      type="number"
-                      inputMode="numeric"
-                      min={field.min}
-                      max={field.max}
-                    />
-                  ) : field.input === 'email' ? (
-                    <Input {...inputProps} type="email" autoComplete="off" />
-                  ) : (
-                    <Input {...inputProps} />
-                  )}
-                  {field.hint && !stored && (
-                    <FieldDescription>
-                      {t(`pages:settings.destinations.hints.${field.hint as FieldHint}`)}
-                    </FieldDescription>
-                  )}
-                  {stored && (
-                    <FieldDescription>
-                      <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        className="h-auto p-0"
-                        onClick={() => clearSecret(field.key)}
+                  <FieldDescription>
+                    {t('pages:settings.destinations.receiveViolationsHint')}
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="destination-violations"
+                  checked={events.includes('violation_detected')}
+                  onCheckedChange={toggleViolations}
+                />
+              </Field>
+
+              {descriptor.fields.map((field) => {
+                const inputId = `destination-${field.key}`;
+                const stored = keepsStoredSecret(field.key);
+                const missing = field.required && !isFilled(field);
+                const invalid = missing && showsError(field.key);
+                const inputProps = {
+                  id: inputId,
+                  placeholder: stored
+                    ? t('pages:settings.destinations.secretSet')
+                    : field.placeholder,
+                  value: values[field.key] ?? '',
+                  onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                    setFieldValue(field.key, e.target.value),
+                  onBlur: () => touch(field.key),
+                  'aria-invalid': invalid,
+                };
+
+                return (
+                  <Field key={field.key} data-invalid={invalid}>
+                    <FieldLabel htmlFor={inputId}>
+                      {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
+                      {field.required && <span className="text-destructive ml-1">*</span>}
+                    </FieldLabel>
+                    {field.input === 'secret' ? (
+                      <PasswordInput {...inputProps} />
+                    ) : field.input === 'select' ? (
+                      <Select
+                        value={values[field.key] ?? ''}
+                        onValueChange={(value) => selectValue(field, value)}
                       >
-                        {t('pages:settings.destinations.clearSecret')}
-                      </Button>
-                    </FieldDescription>
-                  )}
-                  {missing && <FieldError>{t('common:validation.required')}</FieldError>}
-                </Field>
-              );
-            })}
+                        <SelectTrigger id={inputId} aria-invalid={invalid}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(field.options ?? []).map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {t(
+                                `pages:settings.destinations.options.${option.label as OptionLabel}`
+                              )}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : field.input === 'number' ? (
+                      <Input
+                        {...inputProps}
+                        type="number"
+                        inputMode="numeric"
+                        min={field.min}
+                        max={field.max}
+                      />
+                    ) : field.input === 'email' ? (
+                      <Input {...inputProps} type="email" autoComplete="off" />
+                    ) : (
+                      <Input {...inputProps} />
+                    )}
+                    {field.hint && !stored && (
+                      <FieldDescription>
+                        {t(`pages:settings.destinations.hints.${field.hint as FieldHint}`)}
+                      </FieldDescription>
+                    )}
+                    {stored && (
+                      <FieldDescription>
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          className="h-auto p-0"
+                          onClick={() => clearSecret(field.key)}
+                        >
+                          {t('pages:settings.destinations.clearSecret')}
+                        </Button>
+                      </FieldDescription>
+                    )}
+                    {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
+                  </Field>
+                );
+              })}
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-          </div>
-        )}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          )}
+        </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t px-6 py-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('common:actions.cancel')}
           </Button>
@@ -447,7 +466,7 @@ export function DestinationDialog({
             </TooltipProvider>
           )}
           {descriptor !== null && (
-            <Button onClick={handleSave} disabled={!canSave || isSaving}>
+            <Button onClick={handleSave} disabled={isSaving}>
               {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSaving ? t('common:states.saving') : t('common:actions.save')}
             </Button>
