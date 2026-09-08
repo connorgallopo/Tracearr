@@ -210,7 +210,7 @@
       "quietest": "Kysely:",
       "bingeHighlights": "Bingen Yksityiskohdat",
       "bingeHighlightsDesc": "Näyttää intensiivisimmällä katselumallilla",
-      "bingeSessions": "binge istuntoja",
+      "bingeSessions": "",
       "noData": "Ei vielä kellon tietoja",
       "noDataDesc": "Katsella analytiikka ilmestyy tänne, kun sisältöä on toistettava. Tarkista sen jälkeen, kun olet tarkastellut toimintoja.",
       "failedToLoad": "Kellon analytiikan lataaminen epäonnistui",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Poista yhdistetyt palvelimet ensin poistaaksesi linkitys tähän tiliin",
       "linkedAccounts": "Yhdistetyt Plex Tilit",
-      "linkedAccountsDesc": "Hallitse Plex tilejä, joita voit lisätä palvelimia.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Ei vielä linkitettyjä Plex-tilejä.",
       "unlinkPlexAccount": "Irroita Plex Tili",
       "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
-    "noActivityDesc": "Aloita streaming nähdäksesi alkuun käyttäjät täällä",
+    "noActivityDesc": "",
     "top3": "",
     "runnersUp": "Juoksijat Ylös"
   },
