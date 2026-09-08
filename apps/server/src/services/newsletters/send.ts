@@ -171,6 +171,7 @@ export async function runNewsletter(
         externalUrl,
         tracearrLinks: newsletter.links.tracearr,
         serversById,
+        memberSend: trigger !== 'test',
       },
       { ...branding, senderName },
       { newsletterId, mode, externalUrl }

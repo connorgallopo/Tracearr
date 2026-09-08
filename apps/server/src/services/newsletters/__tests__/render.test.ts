@@ -155,6 +155,7 @@ describe('buildDigestInput', () => {
         externalUrl: 'https://tracearr.example.com',
         tracearrLinks: true,
         serversById,
+        memberSend: true,
       }
     );
     expect(input.movies[0]?.links).toEqual([
@@ -167,6 +168,7 @@ describe('buildDigestInput', () => {
     ]);
     expect(input.viewUrl).toBe('{{view_url}}');
     expect(input.multiServer).toBe(false);
+    expect(input.memberSend).toBe(true);
     expect(input.serverNames).toEqual(['Basement']);
     expect(input.movies[0]?.serverName).toBe('Basement');
     expect(input.movies[0]?.genres).toEqual(['Crime', 'Drama']);
@@ -256,9 +258,11 @@ describe('buildDigestInput', () => {
         externalUrl: null,
         tracearrLinks: false,
         serversById: two,
+        memberSend: false,
       }
     );
     expect(input.multiServer).toBe(true);
+    expect(input.memberSend).toBe(false);
     expect(input.serverNames).toEqual(['Attic', 'Basement']);
     expect(input.shows[0]?.serverName).toBe('Attic');
     expect(input.shows[0]?.seasons[0]?.whole).toBe(true);
@@ -457,6 +461,7 @@ describe('buildDigestInput', () => {
         externalUrl: null,
         tracearrLinks: false,
         serversById: new Map(),
+        memberSend: true,
       }
     );
     expect(input.moreMovies).toBe(3);

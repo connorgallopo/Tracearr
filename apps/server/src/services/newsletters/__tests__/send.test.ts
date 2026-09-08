@@ -313,6 +313,8 @@ describe('runNewsletter', () => {
       { address: 'me@example.com', userId: null, status: 'queued' },
     ]);
     expect(String(firstSend().html)).toContain('Nothing new this period');
+    // A test send reaches the owner's own address, not because they are a member of a scoped server.
+    expect(String(firstSend().html)).not.toContain('member of');
   });
 
   it('fails with a recorded reason when the destination is missing, disabled, or needs re-entry', async () => {

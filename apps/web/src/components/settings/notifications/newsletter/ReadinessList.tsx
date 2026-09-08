@@ -9,11 +9,18 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react';
-import { memberFacingUrl, type Destination, type Server } from '@tracearr/shared';
+import {
+  memberFacingUrl,
+  type Destination,
+  type NewsletterRecipients,
+  type NewsletterRecipientsView,
+  type Server,
+} from '@tracearr/shared';
 import { FieldLegend, FieldSet } from '@/components/ui/field';
 import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
 import { cn } from '@/lib/utils';
 import type { NewsletterFormState } from './newsletterForm';
+import { extraRecipients, partitionRecipients } from './RecipientsPanel';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
 
@@ -36,14 +43,26 @@ const domainOf = (address: string | null | undefined): string | null => {
   return address.slice(address.lastIndexOf('@') + 1).toLowerCase();
 };
 
+/** Members off is always known client-side; members on is known once the saved view resolves. */
+function recipientsState(
+  form: NewsletterRecipients,
+  view: NewsletterRecipientsView | undefined
+): { resolvable: number; known: boolean } {
+  if (!form.members)
+    return { resolvable: extraRecipients(form.extraAddresses).length, known: true };
+  if (!view) return { resolvable: 0, known: false };
+  return { resolvable: partitionRecipients(view, form.excludeUserIds).receive.length, known: true };
+}
+
 export function readinessChecks(input: {
   externalUrl: string | null;
   destination: Destination | null;
-  recipients: { resolvable: number; known: boolean };
+  recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
+  const recipients = recipientsState(input.recipients.form, input.recipients.view);
   const privateServers: ReadinessCheck[] = input.servers
     .filter((s) => s.type !== 'plex' && memberFacingUrl(s) === null)
     .map((s) => ({
@@ -68,11 +87,7 @@ export function readinessChecks(input: {
     },
     {
       id: 'recipients',
-      status: !input.recipients.known
-        ? 'unknown'
-        : input.recipients.resolvable > 0
-          ? 'pass'
-          : 'fail',
+      status: !recipients.known ? 'unknown' : recipients.resolvable > 0 ? 'pass' : 'fail',
     },
     ...privateServers,
     { id: 'dns', status: 'info' },
@@ -106,7 +121,7 @@ export function ReadinessList({
   const { data: destinations } = useDestinations();
   const { data: servers } = useServers();
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
-    newsletterId ?? undefined
+    state.recipients.members && newsletterId ? newsletterId : undefined
   );
   const destination = (destinations ?? []).find((d) => d.id === state.destinationId) ?? null;
   const inScope = (servers ?? []).filter(
@@ -115,10 +130,7 @@ export function ReadinessList({
   const checks = readinessChecks({
     externalUrl: settings?.externalUrl ?? null,
     destination,
-    recipients: {
-      known: view !== undefined,
-      resolvable: view ? view.recipients.filter((r) => !r.suppressed).length : 0,
-    },
+    recipients: { form: state.recipients, view },
     servers: inScope,
   });
 

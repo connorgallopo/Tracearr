@@ -143,7 +143,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
            u.contact_email,
            u.email AS identity_email,
            array_remove(array_agg(su.email ORDER BY su.created_at, su.id), NULL) AS account_emails,
-           array_remove(array_agg(su.username ORDER BY su.created_at, su.id), NULL) AS usernames,
+           array_agg(su.username ORDER BY su.created_at, su.id) AS usernames,
            array_agg(su.server_id ORDER BY su.created_at, su.id) AS server_ids,
            array_agg(s.name ORDER BY su.created_at, su.id) AS server_names,
            array_agg(su.thumb_url ORDER BY su.created_at, su.id) AS thumb_urls,

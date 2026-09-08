@@ -9,6 +9,7 @@ import type {
   NewsletterRecipientsView,
   NewsletterResolvedRecipient,
 } from '@tracearr/shared';
+import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,8 +30,14 @@ import {
 } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAvatarUrl } from '@/components/users/utils';
-import { useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
+import { newsletterKeys, useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
 import type { Translate } from '../newsletterFormat';
+
+/** react-i18next's `t` overloads don't collapse to the plain `Translate` signature; this is the one cast. */
+function useTranslate(): Translate {
+  const { t } = useTranslation(['settings', 'common']);
+  return t as Translate;
+}
 
 /** The fields every recipient list row carries, whether or not an address or badge applies. */
 interface RecipientPerson {
@@ -104,37 +111,24 @@ const address = z.email();
 export function extraRecipients(
   extraAddresses: readonly { address: string; name?: string }[]
 ): { address: string; name: string | null }[] {
-  const seen = new Map<string, string | null>();
+  const seen = new Map<string, { address: string; name: string | null }>();
   for (const row of extraAddresses) {
-    const normalized = row.address.trim().toLowerCase();
-    if (seen.has(normalized) || !address.safeParse(normalized).success) continue;
-    seen.set(normalized, row.name ?? null);
+    const typed = row.address.trim();
+    const key = typed.toLowerCase();
+    if (seen.has(key) || !address.safeParse(key).success) continue;
+    seen.set(key, { address: typed, name: row.name ?? null });
   }
-  return [...seen].map(([addr, name]) => ({ address: addr, name }));
+  return [...seen.values()];
 }
 
 /** The Members-off preview: a typed address with its optional name, no account behind it. */
-function RecipientRow({
-  label,
-  description,
-  badge,
-  action,
-}: {
-  label: string;
-  description?: string | null;
-  badge?: ReactNode;
-  action?: ReactNode;
-}) {
+function RecipientRow({ label, description }: { label: string; description?: string | null }) {
   return (
     <Item role="listitem" variant="outline" size="sm" aria-label={label}>
       <ItemContent>
-        <ItemTitle>
-          {label}
-          {badge}
-        </ItemTitle>
+        <ItemTitle>{label}</ItemTitle>
         {description && <ItemDescription>{description}</ItemDescription>}
       </ItemContent>
-      {action && <ItemActions>{action}</ItemActions>}
     </Item>
   );
 }
@@ -156,9 +150,9 @@ function PersonRow({
   action?: ReactNode;
   children?: ReactNode;
 }) {
-  const { t } = useTranslation(['settings', 'common']);
+  const t = useTranslate();
   const isExtra = person.serverUserId === null;
-  const title = isExtra ? (recipientAddress ?? '') : displayName(person, t as Translate);
+  const title = isExtra ? (recipientAddress ?? '') : displayName(person, t);
   const avatarUrl = isExtra ? null : getAvatarUrl(person.serverId, person.thumbUrl, 40);
   const account =
     !isExtra && person.username !== null && person.serverName !== null
@@ -223,10 +217,10 @@ function MissingRow({
   person: NewsletterRecipientPerson;
   onSaved: () => void;
 }) {
-  const { t } = useTranslation(['settings', 'common']);
+  const t = useTranslate();
   const identity = useUpdateUserIdentity();
   const [value, setValue] = useState('');
-  const label = displayName(person, t as Translate);
+  const label = displayName(person, t);
   const valid = address.safeParse(value.trim()).success;
   return (
     <PersonRow person={person}>
@@ -269,19 +263,45 @@ export function RecipientsPanel({
   onExclude: (userId: string) => void;
   onInclude: (userId: string) => void;
 }) {
-  const { t } = useTranslation(['settings', 'common']);
+  const t = useTranslate();
   const { members, extraAddresses, excludeUserIds } = recipients;
   // With Members off the server has nothing to add: the list is the typed addresses.
   const { data, isLoading, isError, error, refetch } = useNewsletterRecipients(
     members && newsletterId ? newsletterId : undefined
   );
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const noRecipients = (
+    <EmptyState
+      icon={UserX}
+      title={t('newsletters.editor.recipients.emptyTitle')}
+      description={t('newsletters.editor.recipients.emptyDescription')}
+    />
+  );
 
   if (!members) {
     const extras = extraRecipients(extraAddresses);
+    if (extras.length === 0) return noRecipients;
+
+    // A saved view already in the cache tells us who's suppressed without a fetch of our own.
+    const cachedView = newsletterId
+      ? queryClient.getQueryData<NewsletterRecipientsView>(newsletterKeys.recipients(newsletterId))
+      : undefined;
+    const suppressedAddresses = new Set(
+      (cachedView?.recipients ?? []).filter((r) => r.suppressed).map((r) => r.address.toLowerCase())
+    );
+    const suppressedCount = extras.filter((extra) =>
+      suppressedAddresses.has(extra.address.toLowerCase())
+    ).length;
+
     return (
       <div className="flex flex-col gap-2">
-        <FieldDescription>{t('newsletters.editor.recipients.membersOff')}</FieldDescription>
+        <FieldDescription>
+          {suppressedCount > 0
+            ? t('newsletters.editor.recipients.membersOffSuppressed', { count: suppressedCount })
+            : t('newsletters.editor.recipients.membersOff')}
+        </FieldDescription>
         <p className="text-sm font-medium">
           {t('newsletters.editor.recipients.willReceive', { count: extras.length })}
         </p>
@@ -310,7 +330,7 @@ export function RecipientsPanel({
     data,
     excludeUserIds
   );
-  const personName = (p: NewsletterRecipientPerson) => displayName(p, t as Translate);
+  const personName = (p: NewsletterRecipientPerson) => displayName(p, t);
   const excludeAction = (r: NewsletterResolvedRecipient) => {
     const userId = r.userId;
     if (userId === null) return null;
@@ -331,13 +351,7 @@ export function RecipientsPanel({
     receive.length + suppressed.length + missing.length + excluded.length + included.length ===
     0
   ) {
-    return (
-      <EmptyState
-        icon={UserX}
-        title={t('newsletters.editor.recipients.emptyTitle')}
-        description={t('newsletters.editor.recipients.emptyDescription')}
-      />
-    );
+    return noRecipients;
   }
 
   return (

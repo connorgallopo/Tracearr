@@ -14,12 +14,15 @@ function migrationSql(): string {
   return readFileSync(`${MIGRATIONS}/${file}`, 'utf8');
 }
 
-/** Mirrors how drizzle applies a breakpoints file: one execute per statement. */
-async function apply(): Promise<void> {
-  const statements = migrationSql()
+function statementsOf(migration: string): string[] {
+  return migration
     .split('--> statement-breakpoint')
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+/** Mirrors how drizzle applies a breakpoints file: one execute per statement. */
+async function apply(statements: string[]): Promise<void> {
   for (const statement of statements) await db.execute(sql.raw(statement));
 }
 
@@ -37,10 +40,18 @@ describe('migration 0101', () => {
   });
 
   it('adds a nullable text public_url that the newsletter server links read back', async () => {
-    await db.execute(sql`ALTER TABLE servers DROP COLUMN IF EXISTS public_url`);
-    expect(await publicUrlColumn()).toBeUndefined();
-
-    await apply();
+    // Read and parse the migration before dropping the column, so a bad file never leaves the column missing.
+    const statements = statementsOf(migrationSql());
+    try {
+      await db.execute(sql`ALTER TABLE servers DROP COLUMN IF EXISTS public_url`);
+      expect(await publicUrlColumn()).toBeUndefined();
+      await apply(statements);
+    } finally {
+      // Other integration files in this worker share the DB, so a throw here must not leave public_url dropped.
+      if ((await publicUrlColumn()) === undefined) {
+        await db.execute(sql`ALTER TABLE servers ADD COLUMN IF NOT EXISTS public_url text`);
+      }
+    }
     expect(await publicUrlColumn()).toEqual({ data_type: 'text', is_nullable: 'YES' });
 
     const rows = await db

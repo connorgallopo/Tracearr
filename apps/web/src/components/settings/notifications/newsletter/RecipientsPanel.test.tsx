@@ -1,8 +1,9 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { NewsletterRecipients, NewsletterRecipientsView } from '@tracearr/shared';
 import { getAvatarUrl } from '@/components/users/utils';
 import { RecipientsPanel, partitionRecipients, extraRecipients } from './RecipientsPanel';
@@ -18,6 +19,7 @@ const refetch = vi.fn();
 vi.mock('@/hooks/queries', () => ({
   useNewsletterRecipients: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: identityMutate, isPending: false }),
+  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 // Radix's Avatar image only mounts once the browser reports the image loaded, which jsdom never does.
 vi.mock('@/components/ui/avatar', async (importOriginal) => {
@@ -27,7 +29,18 @@ vi.mock('@/components/ui/avatar', async (importOriginal) => {
     AvatarImage: (props: ComponentProps<'img'>) => <img alt="" {...props} />,
   };
 });
-import { useNewsletterRecipients } from '@/hooks/queries';
+import { useNewsletterRecipients, newsletterKeys } from '@/hooks/queries';
+
+let queryClient: QueryClient;
+
+/** The Members-off suppression note peeks at the query cache directly, so every render needs a real client. */
+function Providers({ children }: { children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
+  );
+}
 
 const view: NewsletterRecipientsView = {
   recipients: [
@@ -110,14 +123,14 @@ function renderPanel(over: Partial<NewsletterRecipients> = {}, id: string | null
     refetch,
   } as unknown as ReturnType<typeof useNewsletterRecipients>);
   render(
-    <MemoryRouter>
+    <Providers>
       <RecipientsPanel
         newsletterId={id}
         recipients={{ members: true, extraAddresses: [], excludeUserIds: ['u4'], ...over }}
         onExclude={onExclude}
         onInclude={onInclude}
       />
-    </MemoryRouter>
+    </Providers>
   );
   return { onExclude, onInclude };
 }
@@ -142,6 +155,7 @@ describe('partitionRecipients', () => {
 describe('RecipientsPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   });
 
   it('says to save first in create mode', () => {
@@ -233,14 +247,14 @@ describe('RecipientsPanel', () => {
       refetch,
     } as unknown as ReturnType<typeof useNewsletterRecipients>);
     render(
-      <MemoryRouter>
+      <Providers>
         <RecipientsPanel
           newsletterId="n-1"
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
         />
-      </MemoryRouter>
+      </Providers>
     );
     expect(screen.getByText('newsletters.editor.recipients.emptyTitle')).toBeInTheDocument();
     expect(screen.getByText('newsletters.editor.recipients.emptyDescription')).toBeInTheDocument();
@@ -263,9 +277,47 @@ describe('RecipientsPanel', () => {
     expect(
       screen.getByText('newsletters.editor.recipients.willReceive:{"count":2}')
     ).toBeInTheDocument();
-    expect(screen.getByRole('listitem', { name: 'ann@x.com' })).toHaveTextContent('Ann');
+    // The typed casing survives display; only the dedupe key lower-cases.
+    expect(screen.getByRole('listitem', { name: 'Ann@X.com' })).toHaveTextContent('Ann');
     expect(screen.getByRole('listitem', { name: 'bo@x.com' })).toBeInTheDocument();
     expect(screen.queryByText('Cid')).not.toBeInTheDocument();
+  });
+
+  it('shows the empty state when members are off and no extra addresses are typed', () => {
+    renderPanel({ members: false, extraAddresses: [] });
+    expect(screen.getByText('newsletters.editor.recipients.emptyTitle')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.recipients.emptyDescription')).toBeInTheDocument();
+    expect(
+      screen.queryByText('newsletters.editor.recipients.willReceive:{"count":0}')
+    ).not.toBeInTheDocument();
+  });
+
+  it('notes a cached suppressed address when members are off, without asking the server again', () => {
+    queryClient.setQueryData(newsletterKeys.recipients('n-1'), {
+      recipients: [
+        {
+          address: 'ann@x.com',
+          userId: 'u1',
+          serverUserId: 'su-1',
+          name: 'Ann',
+          suppressed: true,
+          username: 'ann',
+          serverId: 's1',
+          serverName: 'Home Plex',
+          thumbUrl: null,
+        },
+      ],
+      missing: [],
+      excluded: [],
+    } satisfies NewsletterRecipientsView);
+    renderPanel({
+      members: false,
+      extraAddresses: [{ address: 'ann@x.com' }, { address: 'bo@x.com' }],
+    });
+    expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
+    expect(
+      screen.getByText('newsletters.editor.recipients.membersOffSuppressed:{"count":1}')
+    ).toBeInTheDocument();
   });
 
   it('restores the resolved list when members are on again', () => {
@@ -296,14 +348,14 @@ describe('RecipientsPanel', () => {
       refetch,
     } as unknown as ReturnType<typeof useNewsletterRecipients>);
     render(
-      <MemoryRouter>
+      <Providers>
         <RecipientsPanel
           newsletterId="n-1"
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
         />
-      </MemoryRouter>
+      </Providers>
     );
     const link = screen.getByRole('link', {
       name: 'newsletters.editor.recipients.openUserPage:{"name":"garry"}',
@@ -342,14 +394,14 @@ describe('RecipientsPanel', () => {
       refetch,
     } as unknown as ReturnType<typeof useNewsletterRecipients>);
     render(
-      <MemoryRouter>
+      <Providers>
         <RecipientsPanel
           newsletterId="n-1"
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
         />
-      </MemoryRouter>
+      </Providers>
     );
     const row = screen.getByRole('listitem', { name: 'Sarah' });
     const img = row.querySelector('img');
@@ -386,14 +438,14 @@ describe('RecipientsPanel', () => {
       refetch,
     } as unknown as ReturnType<typeof useNewsletterRecipients>);
     render(
-      <MemoryRouter>
+      <Providers>
         <RecipientsPanel
           newsletterId="n-1"
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
         />
-      </MemoryRouter>
+      </Providers>
     );
     const row = screen.getByRole('listitem', { name: 'guest@x.com' });
     expect(row).toHaveTextContent('guest@x.com');
@@ -404,7 +456,7 @@ describe('RecipientsPanel', () => {
 });
 
 describe('extraRecipients', () => {
-  it('normalizes, drops invalid rows, and keeps the first name for a repeated address', () => {
+  it('normalizes for dedupe but displays the typed casing, and keeps the first name for a repeated address', () => {
     expect(
       extraRecipients([
         { address: ' Ann@X.com ', name: 'Ann' },
@@ -414,7 +466,7 @@ describe('extraRecipients', () => {
         { address: 'bo@x.com' },
       ])
     ).toEqual([
-      { address: 'ann@x.com', name: 'Ann' },
+      { address: 'Ann@X.com', name: 'Ann' },
       { address: 'bo@x.com', name: null },
     ]);
   });

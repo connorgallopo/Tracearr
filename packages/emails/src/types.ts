@@ -140,6 +140,8 @@ export interface DigestInput {
   multiServer: boolean;
   /** The scoped servers, in name order, for the footer's permission reminder. */
   serverNames: string[];
+  /** False for a test send: it goes to the owner's own address, not because they are a member. */
+  memberSend: boolean;
 }
 
 export type RichTextMark =

@@ -148,7 +148,9 @@ function ShowCard({
             <Text key={`${s.number ?? 'x'}-${s.title}`} style={lineStyle}>
               {s.title}
               {s.whole
-                ? ', all episodes'
+                ? s.episodeCount > 0
+                  ? `, all ${plural(s.episodeCount, 'episode')}`
+                  : ', all episodes'
                 : `${s.episodeRange ? ` · ${s.episodeRange}` : ''}${
                     s.episodeCount > 0 ? ` (${plural(s.episodeCount, 'episode')})` : ''
                   }`}
@@ -238,7 +240,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
           </Link>
         </Text>
       )}
-      {input.serverNames.length > 0 && (
+      {input.memberSend && input.serverNames.length > 0 && (
         <Text style={muted}>
           You get this because you are a member of {listNames(input.serverNames)}.
         </Text>

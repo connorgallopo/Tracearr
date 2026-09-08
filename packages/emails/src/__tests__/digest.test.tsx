@@ -146,6 +146,7 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
     viewUrl: null,
     multiServer: false,
     serverNames: ['Basement Plex'],
+    memberSend: true,
     ...over,
   };
 }
@@ -406,16 +407,17 @@ describe('renderDigest', () => {
             posterRef: null,
             seasons: [
               { number: 1, title: 'Season 1', episodeRange: '', episodeCount: 0, whole: true },
+              { number: 2, title: 'Season 2', episodeRange: '', episodeCount: 12, whole: true },
               {
-                number: 2,
-                title: 'Season 2',
+                number: 3,
+                title: 'Season 3',
                 episodeRange: 'E01-E03',
                 episodeCount: 3,
                 whole: false,
               },
             ],
             moreSeasons: 0,
-            episodeCount: 3,
+            episodeCount: 15,
             serverName: 'Basement Plex',
             links: [],
           },
@@ -423,8 +425,10 @@ describe('renderDigest', () => {
       }),
       branding
     );
+    // A season-level add event carries no episode count; an episode-by-episode one does.
     expect(out.text).toContain('Season 1, all episodes');
-    expect(out.text).toContain('Season 2 · E01-E03 (3 episodes)');
+    expect(out.text).toContain('Season 2, all 12 episodes');
+    expect(out.text).toContain('Season 3 · E01-E03 (3 episodes)');
     expect(out.text).not.toContain('(0 episodes)');
   });
 
@@ -547,6 +551,11 @@ describe('renderDigest', () => {
     expect(one.text.indexOf('member of Basement Plex')).toBeLessThan(
       one.text.indexOf('{{unsubscribe_url}}')
     );
+  });
+
+  it('drops the member reminder on a test send even with servers scoped', async () => {
+    const out = await renderDigest(base({ memberSend: false }), branding);
+    expect(out.text).not.toContain('member of');
   });
 
   it('renders the album cover on an artist card and the poster on a most watched row', async () => {

@@ -42,6 +42,7 @@ const opts = (): DigestInputOptions => ({
   externalUrl: EXTERNAL_URL,
   tracearrLinks: true,
   serversById: new Map([[JELLYFIN_SERVER.id, JELLYFIN_SERVER]]),
+  memberSend: true,
 });
 /** The branding block at its schema limits: 500-character footer and postal address. */
 const branding: EmailBranding = {

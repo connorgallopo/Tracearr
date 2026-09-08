@@ -659,6 +659,7 @@
         "membersHelp": "Everyone with an active account on the servers above who has an address.",
         "ownerNote": "You are a member too, so you receive it as well; exclude yourself in the recipients list if you prefer.",
         "membersOff": "Members are off; only the extra addresses receive this newsletter.",
+        "membersOffSuppressed": "Members are off; only the extra addresses receive this newsletter. {{count}} of them are on the suppression list and will not be mailed.",
         "extraAddresses": "Extra addresses",
         "addAddress": "Add address",
         "addressLabel": "Address {{n}}",

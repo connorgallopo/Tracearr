@@ -236,6 +236,8 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
         externalUrl,
         tracearrLinks: row.links.tracearr,
         serversById: new Map(servers.map((s) => [s.id, s])),
+        // Preview shows a member what a real send looks like, not a test send.
+        memberSend: true,
       },
       { ...branding, senderName },
       { newsletterId: row.id, mode, externalUrl }

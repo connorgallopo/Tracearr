@@ -129,6 +129,8 @@ export interface DigestInputOptions {
   externalUrl: string | null;
   tracearrLinks: boolean;
   serversById: Map<string, ServerLink>;
+  /** False for a test send: it goes to the owner's own address, not because they are a member. */
+  memberSend: boolean;
 }
 
 export function buildDigestInput(
@@ -209,5 +211,6 @@ export function buildDigestInput(
     viewUrl: opts.viewUrl,
     multiServer: servers.length > 1,
     serverNames: servers.map((s) => s.name),
+    memberSend: opts.memberSend,
   };
 }

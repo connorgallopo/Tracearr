@@ -43,7 +43,7 @@ async function insertLegacy(
       '{"kind":"daily","time":"08:00"}',
       'UTC',
       '{"kind":"fixed","days":7}',
-      '{"serverIds":[],"libraryIds":[]}',
+      '{"serverIds":[],"libraries":[]}',
       '{"movies":{"enabled":true,"max":12},"shows":{"enabled":true,"max":12,"maxSeasonsPerShow":8},"music":{"enabled":true,"max":8},"mostWatched":{"enabled":false,"max":10}}',
       's',
       ${intro},
