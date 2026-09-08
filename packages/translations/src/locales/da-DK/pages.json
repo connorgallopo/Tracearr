@@ -210,7 +210,7 @@
       "quietest": "Rolig:",
       "bingeHighlights": "Binge Markeringer",
       "bingeHighlightsDesc": "Viser med de mest intensive visningsmønstre",
-      "bingeSessions": "binge sessioner",
+      "bingeSessions": "",
       "noData": "Ingen overvågningsdata endnu",
       "noDataDesc": "Se analytics vises her, når indholdet er blevet spillet. Tjek tilbage efter nogle visningsaktiviteter.",
       "failedToLoad": "Kunne ikke indlæse overvågningsanalyse",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Slet forbundne servere først for at frakoble denne konto",
       "linkedAccounts": "Linkede Plex Konti",
-      "linkedAccountsDesc": "Administrer Plex konti du kan tilføje servere fra.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Ingen Plex konti linket endnu.",
       "unlinkPlexAccount": "Frakobl Plex Konto",
       "unlinkConfirm": "Er du sikker på, at du vil frakoble denne Plex konto? Du vil ikke kunne tilføje servere fra denne konto, før du forbinder den igen."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet endnu",
-    "noActivityDesc": "Start streaming for at se dine bedste brugere her",
+    "noActivityDesc": "",
     "top3": "",
     "runnersUp": "Løbere Op"
   },
