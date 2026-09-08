@@ -210,7 +210,7 @@
       "quietest": "Nejvíce ticho:",
       "bingeHighlights": "Zvýraznění Binge",
       "bingeHighlightsDesc": "Zobrazí s nejintenzivnějším obrazcem",
-      "bingeSessions": "binge relace",
+      "bingeSessions": "",
       "noData": "Zatím žádná sledovaná data",
       "noDataDesc": "Analytika se zobrazí zde, jakmile bude obsah přehrán. Po nějaké aktivitě se vraťte zpět.",
       "failedToLoad": "Nepodařilo se načíst analýzu hodinek",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Odstranit připojené servery jako první pro odpojení tohoto účtu",
       "linkedAccounts": "Propojené Plex účty",
-      "linkedAccountsDesc": "Spravujte Plex účty, ze kterých můžete přidat servery.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Zatím nejsou propojeny žádné Plex účty.",
       "unlinkPlexAccount": "Odpojit Plex účet",
       "unlinkConfirm": "Opravdu chcete odpojit tento Plex účet? Nebudete moci přidat servery z tohoto účtu dokud jej znovu nepropojíte."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Zatím žádná aktivita",
-    "noActivityDesc": "Začněte streamovat, abyste zde viděli své nejlepší uživatele",
+    "noActivityDesc": "",
     "top3": "Horní 3",
     "runnersUp": "Runnery nahoru"
   },
