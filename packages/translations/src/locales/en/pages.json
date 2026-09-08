@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "Reauthorize this Plex account",
       "deleteServersFirst": "Delete connected servers first to unlink this account",
       "linkedAccounts": "Linked Plex Accounts",
-      "linkedAccountsDesc": "Manage the Plex accounts you can add servers from.",
+      "linkedAccountsDesc": "Manage the Plex accounts you can add servers from",
       "noAccountsYet": "No Plex accounts linked yet.",
       "unlinkPlexAccount": "Unlink Plex Account",
       "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
@@ -1584,7 +1584,7 @@
       "ownerOnly": "Only the owner can manage notification destinations.",
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
       "receiveViolations": "Receive violations",
-      "receiveViolationsHint": "Send every violation to this destination",
+      "receiveViolationsHint": "Send every violation to this destination.",
       "reencrypt": "Re-enter this destination's secret",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "No activity yet",
-    "noActivityDesc": "Start streaming to see your top users here",
+    "noActivityDesc": "Start streaming to see your top users here.",
     "top3": "Top 3",
     "runnersUp": "Runners Up"
   },
