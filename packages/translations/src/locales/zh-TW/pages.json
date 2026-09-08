@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "先刪除已連接的伺服器才能取消連接此帳號",
       "linkedAccounts": "已連接的 Plex 帳號",
-      "linkedAccountsDesc": "管理您可以新增伺服器的 Plex 帳戶。",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "沒有已連接的 Plex 帳號。",
       "unlinkPlexAccount": "取消連接 Plex 帳號",
       "unlinkConfirm": "您確定要取消連接此 Plex 帳號嗎？取消連接後，您將無法使用此帳號新增伺服器，直到您重新連接為止。"
