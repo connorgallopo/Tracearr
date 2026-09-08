@@ -241,7 +241,7 @@
   },
   "tailscale": {
     "title": "",
-    "description": "在你的 Tailscale 網路上安全訪問 Tracearr，無須端口轉發。",
+    "description": "",
     "notAvailable": "未找到 Tailscale 二進位檔案。此功能只在運行官方 Docker 鏡像的時候可用。",
     "disabledDescription": "啟用 Tailscale 以將 Tracearr 放在你的私人 tailnet 上。無須端口轉發或反向代理。",
     "hostnameLabel": "裝置主機名稱",

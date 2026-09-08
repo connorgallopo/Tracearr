@@ -241,7 +241,7 @@
   },
   "tailscale": {
     "title": "",
-    "description": "Accediu a Tracearr de manera segura a la vostra xarxa Tailscale sense redirecció de ports.",
+    "description": "",
     "notAvailable": "No s'ha trobat el binari Tailscale. Aquesta funció només està disponible quan s'executa la imatge oficial de Docker.",
     "disabledDescription": "Habilita Tailscale per posar Tracearr a la teva xarxa tailnet. No cal cap redirecció de ports ni proxy invers.",
     "hostnameLabel": "Nom del dispositiu",

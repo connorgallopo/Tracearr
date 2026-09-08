@@ -53,7 +53,8 @@
     "viewProfile": "프로필 보기",
     "viewOnGithub": "GitHub에서 보기",
     "later": "나중에",
-    "previous": "이전"
+    "previous": "이전",
+    "reload": "새로고침"
   },
   "states": {
     "loading": "불러오는 중...",
@@ -91,16 +92,16 @@
     "high": "높음"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "신뢰",
+    "caution": "주의",
+    "untrusted": "신뢰하지 않음"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "실행 중인 작업",
+    "running": "실행 중",
+    "waiting": "대기 중",
+    "queued": "대기열에 추가됨",
+    "startedAgo": "{{time}}에 시작"
   },
   "time": {
     "now": "지금",
@@ -118,10 +119,10 @@
     "byHour": "시간별"
   },
   "units": {
-    "km": "",
-    "mi": "",
-    "kmh": "",
-    "mph": ""
+    "km": "km",
+    "mi": "mi",
+    "kmh": "km/h",
+    "mph": "mph"
   },
   "labels": {
     "date": "날짜",
@@ -189,21 +190,21 @@
   "table": {
     "selectAllOnPage": "이 페이지의 항목 모두 선택",
     "selectRow": "행 선택",
-    "pageOf": "",
-    "pagination": ""
+    "pageOf": "{{page}}페이지 중 {{total}}페이지",
+    "pagination": "페이지 이동"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "모두 지우기",
+    "done": "완료",
+    "remove": "{{label}} 필터 제거",
+    "clearSearch": "검색어 지우기",
+    "anyDate": "모든 날짜",
+    "dateAfter": "{{date}} 이후",
+    "dateBefore": "{{date}} 이전",
+    "dateBetween": "{{from}}~{{to}}",
+    "clearDates": "날짜 범위 지우기",
+    "clearStartDate": "시작일 지우기",
+    "clearEndDate": "종료일 지우기"
   },
   "media": {
     "movie": "영화",
@@ -214,14 +215,14 @@
     "track_plural": "트랙",
     "liveTV": "라이브 TV",
     "photo": "사진",
-    "tv": "",
+    "tv": "TV",
     "tvShows": "TV 프로그램",
     "music": "음악"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "필수 입력 항목입니다",
@@ -259,8 +260,8 @@
     "stream_other": "스트림 {{count}}개",
     "server_one": "서버 {{count}}대",
     "server_other": "서버 {{count}}대",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "자동화 {{count}}개",
+    "automation_other": "자동화 {{count}}개",
     "violation_one": "위반 {{count}}건",
     "violation_other": "위반 {{count}}건",
     "item_one": "항목 {{count}}개",
@@ -332,9 +333,9 @@
   "beta": "베타",
   "or": "또는",
   "serverSelector": {
-    "all": "",
-    "some": "",
-    "search": "",
-    "noMatches": ""
+    "all": "모든 서버",
+    "some": "서버 {{count}}개 중 {{total}}개",
+    "search": "서버 검색...",
+    "noMatches": "서버를 찾지 못했습니다"
   }
 }

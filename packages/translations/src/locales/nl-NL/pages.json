@@ -210,7 +210,7 @@
       "quietest": "Stiltesten:",
       "bingeHighlights": "Rand accentueringen",
       "bingeHighlightsDesc": "Toont de meest intensieve kijkpatronen",
-      "bingeSessions": "buik sessies",
+      "bingeSessions": "",
       "noData": "Nog geen controlegegevens",
       "noDataDesc": "Horlogeanalytics zullen hier verschijnen zodra de inhoud is afgespeeld. Kom terug na sommige activiteiten te bekijken.",
       "failedToLoad": "Fout bij het laden van horloge analytics",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "Autoriseer dit Plex account opnieuw",
       "deleteServersFirst": "Verwijder verbonden servers eerst om dit account te ontkoppelen",
       "linkedAccounts": "Gekoppelde Plex-accounts",
-      "linkedAccountsDesc": "Beheer de Plex-accounts waarvan je servers kunt toevoegen.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Er zijn nog geen Plex-accounts gekoppeld.",
       "unlinkPlexAccount": "Plex-account ontkoppelen",
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Nog geen activiteit",
-    "noActivityDesc": "Start met streamen om je top gebruikers hier te zien",
+    "noActivityDesc": "",
     "top3": "",
     "runnersUp": "Runners Omhoog"
   },

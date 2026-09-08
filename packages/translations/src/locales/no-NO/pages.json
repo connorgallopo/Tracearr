@@ -210,7 +210,7 @@
       "quietest": "Stillevær:",
       "bingeHighlights": "Binge markeringer",
       "bingeHighlightsDesc": "Viser med de mest intensive visningsmønstrene",
-      "bingeSessions": "grener for grener",
+      "bingeSessions": "",
       "noData": "Ingen overvåkningsdata ennå",
       "noDataDesc": "Se analyser vil vises her når innholdet er spillt. Sjekk tilbake etter at du har sett på aktivitet.",
       "failedToLoad": "Kan ikke laste inn overvåkningsanalyser",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Slett tilkoblede servere først for å fjerne denne kontoen",
       "linkedAccounts": "Koblede Plex-kontoer",
-      "linkedAccountsDesc": "Administrer Plex-kontoene du kan legge til servere fra.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Ingen Plex kontoer er linket ennå.",
       "unlinkPlexAccount": "Koble fra Plex konto",
       "unlinkConfirm": "Er du sikker på at du vil koble fra denne Plex kontoen? Du kan ikke legge til servere fra denne kontoen frem til du kobler den til igjen."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet",
-    "noActivityDesc": "Start streaming for å se de beste brukerne dine her",
+    "noActivityDesc": "",
     "top3": "Topp 3",
     "runnersUp": "Runnere opp"
   },

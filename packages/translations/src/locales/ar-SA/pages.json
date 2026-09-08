@@ -210,7 +210,7 @@
       "quietest": "هادئ:",
       "bingeHighlights": "أضواء Binge",
       "bingeHighlightsDesc": "يظهر مع أنماط العرض الأكثر كثافة",
-      "bingeSessions": "جلسات باينج",
+      "bingeSessions": "",
       "noData": "لا توجد بيانات مشاهدة بعد",
       "noDataDesc": "سوف تظهر تحليلات المشاهدة هنا بمجرد تشغيل المحتوى. تحقق مرة أخرى بعد بعض نشاط المشاهدة.",
       "failedToLoad": "فشل تحميل تحليلات الساعة",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "حذف الخوادم المتصلة أولاً لإلغاء ربط هذا الحساب",
       "linkedAccounts": "حسابات Plex المرتبطة",
-      "linkedAccountsDesc": "إدارة حسابات Plex يمكنك إضافة خوادم منها.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "لا توجد حسابات Plex مرتبطة بعد.",
       "unlinkPlexAccount": "إلغاء ربط حساب Plex",
       "unlinkConfirm": "هل أنت متأكد من أنك تريد إلغاء ربط حساب Plex هذا؟ لن تتمكن من إضافة خوادم من هذا الحساب حتى تقوم بربطه مرة أخرى."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "لا يوجد نشاط بعد",
-    "noActivityDesc": "ابدأ البث لرؤية أعلى المستخدمين هنا",
+    "noActivityDesc": "",
     "top3": "أفضل 3",
     "runnersUp": "تشغيل أعلى"
   },

@@ -210,7 +210,7 @@
       "quietest": "Liniște:",
       "bingeHighlights": "Evidențieri ale bătăliei",
       "bingeHighlightsDesc": "Arată cu cele mai intensive modele de vizualizare",
-      "bingeSessions": "sesiuni bursiere",
+      "bingeSessions": "",
       "noData": "Nu există date de vizionare",
       "noDataDesc": "Vizionați datele analitice vor apărea aici odată ce conținutul a fost redat. Verificați din nou după o activitate de vizualizare.",
       "failedToLoad": "Încărcarea datelor analitice a eșuat",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Șterge mai întâi serverele conectate pentru a deconecta acest cont",
       "linkedAccounts": "Conturi Plex asociate",
-      "linkedAccountsDesc": "Gestionează conturile Plex de la care poți adăuga servere.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Nici un cont Plex încă asociat.",
       "unlinkPlexAccount": "Deconectează contul Plex",
       "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Nicio activitate încă",
-    "noActivityDesc": "Începe streaming-ul pentru a vedea utilizatorii de top aici",
+    "noActivityDesc": "",
     "top3": "",
     "runnersUp": "Alergători sus"
   },

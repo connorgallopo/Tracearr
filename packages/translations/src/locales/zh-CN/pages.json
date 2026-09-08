@@ -210,7 +210,7 @@
       "quietest": "安静：",
       "bingeHighlights": "Binge 高光",
       "bingeHighlightsDesc": "显示最密集视图模式",
-      "bingeSessions": "Binge 会话",
+      "bingeSessions": "",
       "noData": "尚无观察数据",
       "noDataDesc": "一旦播放了内容后，观察分析将会显示在这里。请在查看某些活动后再查看。",
       "failedToLoad": "加载监视分析失败",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "先删除已连接的服务器来取消此帐户",
       "linkedAccounts": "链接的Plex账户",
-      "linkedAccountsDesc": "管理您可以添加服务器的 Plex账户。",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "尚无Plex帐户链接。",
       "unlinkPlexAccount": "取消链接Plex账户",
       "unlinkConfirm": "您确定要取消链接此Plex帐户吗？在您再次链接之前，您将无法从此帐户添加服务器。"
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "尚无活动",
-    "noActivityDesc": "开始串流以在这里查看您的顶级用户",
+    "noActivityDesc": "",
     "top3": "顶部3",
     "runnersUp": "向上运行者"
   },

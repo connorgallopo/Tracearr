@@ -210,7 +210,7 @@
       "quietest": "Tyst:",
       "bingeHighlights": "Binge Höjdpunkter",
       "bingeHighlightsDesc": "Visar med de mest intensiva visningsmönstren",
-      "bingeSessions": "binge sessioner",
+      "bingeSessions": "",
       "noData": "Inga klockdata ännu",
       "noDataDesc": "Titta på analyser visas här när innehållet har spelats. Kom tillbaka efter viss visningsaktivitet.",
       "failedToLoad": "Det gick inte att läsa in analytics",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Ta bort anslutna servrar först för att avlänka detta konto",
       "linkedAccounts": "Länkade Plex-konton",
-      "linkedAccountsDesc": "Hantera Plex-konton som du kan lägga till servrar från.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Inga Plex konton länkade ännu.",
       "unlinkPlexAccount": "Avlänka Plex-konto",
       "unlinkConfirm": "Är du säker på att du vill avlänka detta Plex-konto? Du kommer inte att kunna lägga till servrar från detta konto förrän du länkar det igen."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet ännu",
-    "noActivityDesc": "Börja strömma för att se dina toppanvändare här",
+    "noActivityDesc": "",
     "top3": "Topp 3",
     "runnersUp": "Löpare upp"
   },

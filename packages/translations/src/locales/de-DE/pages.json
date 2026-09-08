@@ -210,7 +210,7 @@
       "quietest": "Ruhe:",
       "bingeHighlights": "Scharnier-Highlights",
       "bingeHighlightsDesc": "Zeigt mit den intensivsten Ansichtsmustern",
-      "bingeSessions": "binge Sitzungen",
+      "bingeSessions": "",
       "noData": "Noch keine Beobachtungsdaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Beobachtungsanalyse",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Verbundene Server zuerst löschen, um dieses Konto zu trennen",
       "linkedAccounts": "Verknüpfte Plex-Konten",
-      "linkedAccountsDesc": "Verwalten Sie die Plex-Konten, von denen Sie Server hinzufügen können.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "Noch keine Plex-Konten verknüpft.",
       "unlinkPlexAccount": "Plex-Konto trennen",
       "unlinkConfirm": "Möchten Sie dieses Plex-Konto wirklich trennen? Sie können erst dann wieder Server von diesem Konto hinzufügen, wenn Sie es erneut verknüpfen."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Noch keine Aktivität",
-    "noActivityDesc": "Starte Streaming, um deine Top-Nutzer hier zu sehen",
+    "noActivityDesc": "",
     "top3": "Oben 3",
     "runnersUp": "Läufer oben"
   },

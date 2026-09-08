@@ -210,7 +210,7 @@
       "quietest": "Más tranquilo:",
       "bingeHighlights": "Destacados Binge",
       "bingeHighlightsDesc": "Muestra con los patrones de visualización más intensivos",
-      "bingeSessions": "sesiones de binge",
+      "bingeSessions": "",
       "noData": "Aún no hay datos de reloj",
       "noDataDesc": "Ver análisis aparecerán aquí una vez que el contenido haya sido reproducido. Vuelva a comprobar después de alguna actividad de visualización.",
       "failedToLoad": "Error al cargar análisis de reloj",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "",
       "deleteServersFirst": "Eliminar los servidores conectados primero para desvincular esta cuenta",
       "linkedAccounts": "Cuentas de Plex vinculadas",
-      "linkedAccountsDesc": "Administre las cuentas de Plex desde las que puede añadir servidores.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "No hay cuentas de Plex vinculadas.",
       "unlinkPlexAccount": "Desvincular cuenta de Plex",
       "unlinkConfirm": "¿Estás seguro de que quieres desvincular esta cuenta de Plex? No podrás añadir servidores de esta cuenta hasta que la vincules de nuevo."
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "Aún no hay actividad",
-    "noActivityDesc": "Empieza a transmitir para ver tus mejores usuarios aquí",
+    "noActivityDesc": "",
     "top3": "",
     "runnersUp": "Ejecutar arriba"
   },
