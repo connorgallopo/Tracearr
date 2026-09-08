@@ -26,6 +26,15 @@ const SERVER_COLOR_OPTIONS = SERVER_COLOR_PALETTE.map((preset) => ({
   hex: preset.hex,
 }));
 
+/** Only the fields that changed; a null publicUrl clears the address. */
+export interface ServerPatch {
+  name?: string;
+  url?: string;
+  clientIdentifier?: string;
+  color?: string | null;
+  publicUrl?: string | null;
+}
+
 export function EditServerDialog({
   server,
   servers,
@@ -36,12 +45,13 @@ export function EditServerDialog({
   server: Server | null;
   servers: Server[];
   onClose: () => void;
-  onUpdate: (name?: string, url?: string, clientIdentifier?: string, color?: string | null) => void;
+  onUpdate: (patch: ServerPatch) => void;
   isUpdating: boolean;
 }) {
   const { t } = useTranslation(['settings', 'common', 'pages']);
   const [editName, setEditName] = useState('');
   const [manualUrl, setManualUrl] = useState('');
+  const [manualPublicUrl, setManualPublicUrl] = useState('');
   const [editColor, setEditColor] = useState<string>(SERVER_COLOR_OPTIONS[3]?.hex ?? '#3B82F6');
   const [seededServer, setSeededServer] = useState<Server | null>(null);
   const isPlexServer = server?.type === 'plex';
@@ -58,6 +68,7 @@ export function EditServerDialog({
     if (server) {
       setEditName(server.name);
       setManualUrl(server.url);
+      setManualPublicUrl(server.publicUrl ?? '');
       const otherColors = servers.filter((s) => s.id !== server.id).map((s) => s.color);
       setEditColor(server.color ?? pickServerColor(server.type, otherColors));
     }
@@ -65,8 +76,12 @@ export function EditServerDialog({
 
   const hasNameChange = server ? editName.trim() !== server.name : false;
   const hasUrlChange = server ? manualUrl.trim() !== server.url : false;
+  const hasPublicUrlChange =
+    server && !isPlexServer ? manualPublicUrl.trim() !== (server.publicUrl ?? '') : false;
   const hasColorChange = server ? editColor !== (server.color ?? '') : false;
-  const canSave = (hasNameChange || hasUrlChange || hasColorChange) && editName.trim().length > 0;
+  const canSave =
+    (hasNameChange || hasUrlChange || hasPublicUrlChange || hasColorChange) &&
+    editName.trim().length > 0;
 
   if (!server) return null;
 
@@ -105,12 +120,12 @@ export function EditServerDialog({
                   <PlexServerSelector
                     servers={[connectionsData.server]}
                     onSelect={(uri, _name, clientIdentifier) => {
-                      onUpdate(
-                        hasNameChange ? editName : undefined,
-                        uri,
+                      onUpdate({
+                        name: hasNameChange ? editName : undefined,
+                        url: uri,
                         clientIdentifier,
-                        hasColorChange ? editColor : undefined
-                      );
+                        color: hasColorChange ? editColor : undefined,
+                      });
                     }}
                     connecting={isUpdating}
                     connectingToServer={isUpdating ? server.name : null}
@@ -133,15 +148,27 @@ export function EditServerDialog({
               )}
             </Field>
           ) : (
-            <Field>
-              <FieldLabel htmlFor="edit-url">{t('servers.serverUrl')}</FieldLabel>
-              <Input
-                id="edit-url"
-                value={manualUrl}
-                onChange={(e) => setManualUrl(e.target.value)}
-                placeholder="http://192.168.1.100:8096"
-              />
-            </Field>
+            <>
+              <Field>
+                <FieldLabel htmlFor="edit-url">{t('servers.serverUrl')}</FieldLabel>
+                <Input
+                  id="edit-url"
+                  value={manualUrl}
+                  onChange={(e) => setManualUrl(e.target.value)}
+                  placeholder="http://192.168.1.100:8096"
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="edit-public-url">{t('servers.publicUrl')}</FieldLabel>
+                <Input
+                  id="edit-public-url"
+                  value={manualPublicUrl}
+                  onChange={(e) => setManualPublicUrl(e.target.value)}
+                  placeholder="https://jellyfin.example.com"
+                />
+                <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
+              </Field>
+            </>
           )}
 
           <Field>
@@ -164,12 +191,12 @@ export function EditServerDialog({
           <Button
             disabled={isUpdating || !canSave}
             onClick={() => {
-              onUpdate(
-                hasNameChange ? editName.trim() : undefined,
-                hasUrlChange ? manualUrl.trim() : undefined,
-                undefined,
-                hasColorChange ? editColor : undefined
-              );
+              onUpdate({
+                name: hasNameChange ? editName.trim() : undefined,
+                url: hasUrlChange ? manualUrl.trim() : undefined,
+                color: hasColorChange ? editColor : undefined,
+                publicUrl: hasPublicUrlChange ? manualPublicUrl.trim() || null : undefined,
+              });
             }}
           >
             {isUpdating ? (

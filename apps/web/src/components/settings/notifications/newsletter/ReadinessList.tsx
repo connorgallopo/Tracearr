@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -8,13 +9,17 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react';
-import { isPubliclyRoutableUrl, type Destination, type Server } from '@tracearr/shared';
+import { memberFacingUrl, type Destination, type Server } from '@tracearr/shared';
 import { FieldLegend, FieldSet } from '@/components/ui/field';
 import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
 import { cn } from '@/lib/utils';
 import type { NewsletterFormState } from './newsletterForm';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
+
+export const SERVER_SETTINGS_PATH = '/settings/servers/connections';
+
+export type PrivateServerReason = 'noPublicUrl' | 'privatePublicUrl';
 
 export type ReadinessStatus = 'pass' | 'warn' | 'fail' | 'unknown' | 'info';
 
@@ -23,7 +28,7 @@ export type ReadinessCheck =
   | { id: 'externalUrl'; status: 'pass' | 'warn' | 'fail' }
   | { id: 'fromDomain'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown' }
-  | { id: 'privateServer'; status: 'warn'; server: string }
+  | { id: 'privateServer'; status: 'warn'; server: string; reason: PrivateServerReason }
   | { id: 'dns'; status: 'info' };
 
 const domainOf = (address: string | null | undefined): string | null => {
@@ -35,13 +40,18 @@ export function readinessChecks(input: {
   externalUrl: string | null;
   destination: Destination | null;
   recipients: { resolvable: number; known: boolean };
-  servers: Pick<Server, 'name' | 'type' | 'url'>[];
+  servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
   const privateServers: ReadinessCheck[] = input.servers
-    .filter((s) => s.type !== 'plex' && !isPubliclyRoutableUrl(s.url))
-    .map((s) => ({ id: 'privateServer', status: 'warn', server: s.name }));
+    .filter((s) => s.type !== 'plex' && memberFacingUrl(s) === null)
+    .map((s) => ({
+      id: 'privateServer',
+      status: 'warn',
+      server: s.name,
+      reason: s.publicUrl ? 'privatePublicUrl' : 'noPublicUrl',
+    }));
   return [
     {
       id: 'externalUrl',
@@ -130,8 +140,25 @@ export function ReadinessList({
         return newsletterId !== null && recipientsError
           ? t('newsletters.editor.readiness.recipientsLoadFailed')
           : t('newsletters.editor.readiness.recipientsUnknown');
-      case 'privateServer':
-        return t('newsletters.editor.readiness.privateServerLinks', { server: check.server });
+      case 'privateServer': {
+        const link = (
+          <Link to={SERVER_SETTINGS_PATH} className="underline underline-offset-4">
+            {t('newsletters.editor.readiness.serverSettingsLink')}
+          </Link>
+        );
+        if (check.reason === 'noPublicUrl') {
+          return (
+            <>
+              {t('newsletters.editor.readiness.noPublicUrl', { server: check.server })} {link}
+            </>
+          );
+        }
+        return (
+          <>
+            {t('newsletters.editor.readiness.privatePublicUrl', { server: check.server })} {link}
+          </>
+        );
+      }
       case 'dns':
         return (
           <>

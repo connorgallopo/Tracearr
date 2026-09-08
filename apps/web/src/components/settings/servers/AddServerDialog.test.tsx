@@ -20,6 +20,8 @@ function props(overrides: Partial<React.ComponentProps<typeof AddServerDialog>> 
     onServerTypeChange: vi.fn(),
     serverUrl: '',
     onServerUrlChange: vi.fn(),
+    publicUrl: '',
+    onPublicUrlChange: vi.fn(),
     serverName: '',
     onServerNameChange: vi.fn(),
     apiKey: '',
@@ -40,17 +42,20 @@ function props(overrides: Partial<React.ComponentProps<typeof AddServerDialog>> 
 }
 
 describe('AddServerDialog', () => {
-  it('labels the three Jellyfin fields and reports what was typed', async () => {
+  it('labels the four Jellyfin fields and reports what was typed', async () => {
     const onServerUrlChange = vi.fn();
-    render(<AddServerDialog {...props({ onServerUrlChange })} />);
+    const onPublicUrlChange = vi.fn();
+    render(<AddServerDialog {...props({ onServerUrlChange, onPublicUrlChange })} />);
 
     expect(screen.getByLabelText('servers.serverUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.publicUrl')).toBeInTheDocument();
     expect(screen.getByLabelText('servers.serverName')).toBeInTheDocument();
     expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'h');
-
     expect(onServerUrlChange).toHaveBeenCalledWith('h');
+    await userEvent.type(screen.getByLabelText('servers.publicUrl'), 'j');
+    expect(onPublicUrlChange).toHaveBeenCalledWith('j');
   });
 
   it('surfaces a connect failure as an alert', () => {
@@ -65,6 +70,7 @@ describe('AddServerDialog', () => {
 
     rerender(<AddServerDialog {...props({ serverType: 'plex', plexStep: 'select' })} />);
     expect(screen.queryByRole('button', { name: 'servers.connectServer' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('servers.publicUrl')).not.toBeInTheDocument();
   });
 
   it('tells the owner when no Plex account is linked', () => {

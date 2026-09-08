@@ -19,10 +19,10 @@ vi.mock('@/hooks/queries', () => ({
   useDestinations: vi.fn(),
   useSettings: vi.fn(),
   useNewsletterRecipients: vi.fn(),
-  useServers: () => ({ data: [] }),
+  useServers: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
 }));
-import { useDestinations, useNewsletterRecipients, useSettings } from '@/hooks/queries';
+import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
 
 const email = {
   id: 'd-1',
@@ -61,6 +61,7 @@ beforeEach(() => {
     data: undefined,
     isLoading: false,
   } as unknown as ReturnType<typeof useNewsletterRecipients>);
+  vi.mocked(useServers).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useServers>);
 });
 
 describe('RecipientsFields', () => {
@@ -262,9 +263,9 @@ describe('readiness', () => {
       } as unknown as Destination,
       recipients: { resolvable: 0, known: true },
       servers: [
-        { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096' },
-        { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400' },
-        { name: 'Shed', type: 'emby', url: 'https://emby.example.com' },
+        { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096', publicUrl: null },
+        { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400', publicUrl: null },
+        { name: 'Shed', type: 'emby', url: 'https://emby.example.com', publicUrl: null },
       ],
     });
     expect(
@@ -276,6 +277,76 @@ describe('readiness', () => {
       ['privateServer', 'Attic'],
       ['dns', 'info'],
     ]);
+  });
+
+  it('names the reason a Jellyfin or Emby server has no member link and skips the ones that do', () => {
+    const rows = readinessChecks({
+      externalUrl: 'https://tracearr.example.com',
+      destination: email,
+      recipients: { resolvable: 2, known: true },
+      servers: [
+        { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096', publicUrl: null },
+        {
+          name: 'Shed',
+          type: 'emby',
+          url: 'https://emby.example.com',
+          publicUrl: 'http://10.0.0.5:8096',
+        },
+        {
+          name: 'Loft',
+          type: 'jellyfin',
+          url: 'http://192.168.1.21:8096',
+          publicUrl: 'https://loft.example.com',
+        },
+        { name: 'Porch', type: 'emby', url: 'https://porch.example.com', publicUrl: null },
+        { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400', publicUrl: null },
+      ],
+    }).flatMap((c) => (c.id === 'privateServer' ? [[c.server, c.reason]] : []));
+    expect(rows).toEqual([
+      ['Attic', 'noPublicUrl'],
+      ['Shed', 'privatePublicUrl'],
+    ]);
+  });
+
+  it('renders each in-scope private server row with its reason and a link to the server settings', () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        {
+          id: 's-1',
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'http://192.168.1.20:8096',
+          publicUrl: null,
+        },
+        {
+          id: 's-2',
+          name: 'Shed',
+          type: 'emby',
+          url: 'https://emby.example.com',
+          publicUrl: 'http://10.0.0.5:8096',
+        },
+      ],
+    } as unknown as ReturnType<typeof useServers>);
+    render(
+      <MemoryRouter>
+        <ReadinessList
+          state={{
+            ...defaultFormState(),
+            destinationId: 'd-1',
+            scope: { serverIds: ['s-2'], libraries: [] },
+          }}
+          newsletterId={null}
+        />
+      </MemoryRouter>
+    );
+    const rows = screen.getAllByRole('listitem').map((li) => li.textContent);
+    expect(rows).toContain(
+      'newsletters.editor.readiness.privatePublicUrl:{"server":"Shed"} newsletters.editor.readiness.serverSettingsLink'
+    );
+    expect(rows.join('\n')).not.toContain('"server":"Attic"');
+    expect(
+      screen.getByRole('link', { name: 'newsletters.editor.readiness.serverSettingsLink' })
+    ).toHaveAttribute('href', '/settings/servers/connections');
   });
 
   it('renders one row per check with the docs link', () => {

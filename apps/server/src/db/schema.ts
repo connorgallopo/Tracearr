@@ -93,6 +93,8 @@ export const servers = pgTable(
     name: varchar('name', { length: 100 }).notNull(),
     type: varchar('type', { length: 20 }).notNull().$type<(typeof serverTypeEnum)[number]>(),
     url: text('url').notNull(),
+    // The address members open a Jellyfin or Emby server at; always null for Plex, which links through app.plex.tv.
+    publicUrl: text('public_url'),
     token: text('token').notNull(), // Encrypted
     machineIdentifier: varchar('machine_identifier', { length: 100 }), // The media server's own id: Plex clientIdentifier (also used for dedup), Jellyfin/Emby System/Info Id
     // For Plex servers: which linked Plex account this server was added from (nullable for Jellyfin/Emby and legacy)

@@ -96,7 +96,31 @@ describe('EditServerDialog', () => {
     await userEvent.click(screen.getByRole('radio', { name: 'Red' }));
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.update' }));
 
-    expect(onUpdate).toHaveBeenCalledWith(undefined, undefined, undefined, '#EF4444');
+    expect(onUpdate).toHaveBeenCalledWith({ color: '#EF4444' });
+  });
+
+  it('seeds the public address, sends it trimmed on save, and clears it with null', async () => {
+    const onUpdate = vi.fn();
+    render(
+      <EditServerDialog
+        server={server({ publicUrl: 'https://jellyfin.example.com' })}
+        servers={[server()]}
+        onClose={vi.fn()}
+        onUpdate={onUpdate}
+        isUpdating={false}
+      />
+    );
+
+    const field = screen.getByLabelText('servers.publicUrl');
+    expect(field).toHaveValue('https://jellyfin.example.com');
+    await userEvent.clear(field);
+    await userEvent.type(field, ' members.example.com ');
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.update' }));
+    expect(onUpdate).toHaveBeenCalledWith({ publicUrl: 'members.example.com' });
+
+    await userEvent.clear(field);
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.update' }));
+    expect(onUpdate).toHaveBeenLastCalledWith({ publicUrl: null });
   });
 
   it('keeps the save button disabled until something changes', () => {
@@ -174,5 +198,6 @@ describe('EditServerDialog', () => {
     expect(screen.getByPlaceholderText('servers.plexServerUrlPlaceholder')).toHaveValue(
       'http://plex.local:32400'
     );
+    expect(screen.queryByLabelText('servers.publicUrl')).not.toBeInTheDocument();
   });
 });

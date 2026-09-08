@@ -136,6 +136,7 @@ describe('buildDigestInput', () => {
           type: 'plex',
           url: 'http://plex.local',
           machineIdentifier: 'mach-1',
+          publicUrl: null,
         },
       ],
     ]);
@@ -198,11 +199,19 @@ describe('buildDigestInput', () => {
           type: 'jellyfin',
           url: 'https://jf.example.com',
           machineIdentifier: null,
+          publicUrl: null,
         },
       ],
       [
         'b',
-        { id: 'b', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'm' },
+        {
+          id: 'b',
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://plex',
+          machineIdentifier: 'm',
+          publicUrl: null,
+        },
       ],
     ]);
     const data: DigestData = {
@@ -259,7 +268,14 @@ describe('buildDigestInput', () => {
     const serversById = new Map<string, ServerLink>([
       [
         's1',
-        { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'abc' },
+        {
+          id: 's1',
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://plex',
+          machineIdentifier: 'abc',
+          publicUrl: null,
+        },
       ],
     ]);
     const off = digestLinks(watched, 'https://tracearr.example.com', serversById, {
@@ -284,6 +300,7 @@ describe('buildDigestInput', () => {
           type: 'jellyfin',
           url: 'http://192.168.1.20:8096',
           machineIdentifier: null,
+          publicUrl: null,
         },
       ],
       [
@@ -294,6 +311,7 @@ describe('buildDigestInput', () => {
           type: 'emby',
           url: 'http://emby.local:8096',
           machineIdentifier: 'emb-1',
+          publicUrl: null,
         },
       ],
       [
@@ -304,6 +322,7 @@ describe('buildDigestInput', () => {
           type: 'plex',
           url: 'http://192.168.1.10:32400',
           machineIdentifier: 'mach-1',
+          publicUrl: null,
         },
       ],
     ]);
@@ -326,6 +345,7 @@ describe('buildDigestInput', () => {
           type: 'jellyfin',
           url: 'https://jellyfin.example.com',
           machineIdentifier: null,
+          publicUrl: null,
         },
       ],
     ]);
@@ -335,6 +355,51 @@ describe('buildDigestInput', () => {
       })
     ).toEqual([
       { label: 'Attic', url: 'https://jellyfin.example.com/web/index.html#/details?id=77' },
+    ]);
+  });
+
+  it('builds the Jellyfin and Emby link from the public address first, then a public server url, else nothing', () => {
+    const link = (over: Partial<ServerLink>) =>
+      digestLinks(
+        { ...watched, serverId: 'j', imdbId: null },
+        null,
+        new Map<string, ServerLink>([
+          [
+            'j',
+            {
+              id: 'j',
+              name: 'Attic',
+              type: 'jellyfin',
+              url: 'http://192.168.1.20:8096',
+              publicUrl: null,
+              machineIdentifier: null,
+              ...over,
+            },
+          ],
+        ]),
+        { tracearr: false }
+      );
+    expect(link({ publicUrl: 'https://jellyfin.example.com' })).toEqual([
+      { label: 'Attic', url: 'https://jellyfin.example.com/web/index.html#/details?id=77' },
+    ]);
+    expect(
+      link({ url: 'https://lan-name.example.com', publicUrl: 'https://members.example.com/' })
+    ).toEqual([
+      { label: 'Attic', url: 'https://members.example.com/web/index.html#/details?id=77' },
+    ]);
+    expect(link({ url: 'https://lan-name.example.com' })).toEqual([
+      { label: 'Attic', url: 'https://lan-name.example.com/web/index.html#/details?id=77' },
+    ]);
+    expect(
+      link({ url: 'https://lan-name.example.com', publicUrl: 'http://10.0.0.5:8096' })
+    ).toEqual([]);
+    expect(
+      link({ type: 'emby', machineIdentifier: 'emb-1', publicUrl: 'https://emby.example.com' })
+    ).toEqual([
+      {
+        label: 'Attic',
+        url: 'https://emby.example.com/web/index.html#!/item?id=77&serverId=emb-1',
+      },
     ]);
   });
 

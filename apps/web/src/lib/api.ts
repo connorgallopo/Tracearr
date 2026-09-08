@@ -626,7 +626,12 @@ class ApiClient {
       }),
 
     // Jellyfin server connection with API key (requires auth)
-    connectJellyfinWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
+    connectJellyfinWithApiKey: (data: {
+      serverUrl: string;
+      serverName: string;
+      apiKey: string;
+      publicUrl?: string;
+    }) =>
       this.request<{
         accessToken: string;
         refreshToken: string;
@@ -637,7 +642,12 @@ class ApiClient {
       }),
 
     // Emby server connection with API key (requires auth)
-    connectEmbyWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
+    connectEmbyWithApiKey: (data: {
+      serverUrl: string;
+      serverName: string;
+      apiKey: string;
+      publicUrl?: string;
+    }) =>
       this.request<{
         accessToken: string;
         refreshToken: string;
@@ -654,11 +664,22 @@ class ApiClient {
       const response = await this.request<{ data: Server[] }>('/servers');
       return response.data;
     },
-    create: (data: { name: string; type: string; url: string; token: string }) =>
-      this.request<Server>('/servers', { method: 'POST', body: JSON.stringify(data) }),
+    create: (data: {
+      name: string;
+      type: string;
+      url: string;
+      token: string;
+      publicUrl?: string;
+    }) => this.request<Server>('/servers', { method: 'POST', body: JSON.stringify(data) }),
     update: (
       id: string,
-      data: { name?: string; url?: string; clientIdentifier?: string; color?: string | null }
+      data: {
+        name?: string;
+        url?: string;
+        clientIdentifier?: string;
+        color?: string | null;
+        publicUrl?: string | null;
+      }
     ) =>
       this.request<Server>(`/servers/${id}`, {
         method: 'PATCH',

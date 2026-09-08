@@ -1,7 +1,7 @@
 import {
   POSTER_IMAGE_SIZE,
   buildMediaServerItemUrl,
-  isPubliclyRoutableUrl,
+  memberFacingUrl,
   type EmailBrandingSettings,
   type EmailRichTextDoc,
   type NewsletterImageMode,
@@ -98,19 +98,18 @@ export function digestLinks(
     });
   }
   const server = serversById.get(card.serverId);
-  // Plex routes through app.plex.tv; a Jellyfin or Emby link is the server URL itself, useless to a member off the LAN when it is private.
-  if (
-    server &&
-    SERVER_TYPES.has(server.type) &&
-    card.ratingKey &&
-    (server.type === 'plex' || isPubliclyRoutableUrl(server.url))
-  ) {
-    const url = buildMediaServerItemUrl({
-      serverType: server.type as ServerType,
-      baseUrl: server.url,
-      ratingKey: card.ratingKey,
-      machineIdentifier: server.machineIdentifier,
-    });
+  if (server && SERVER_TYPES.has(server.type) && card.ratingKey) {
+    // Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach.
+    const baseUrl = server.type === 'plex' ? server.url : memberFacingUrl(server);
+    const url =
+      baseUrl === null
+        ? null
+        : buildMediaServerItemUrl({
+            serverType: server.type as ServerType,
+            baseUrl,
+            ratingKey: card.ratingKey,
+            machineIdentifier: server.machineIdentifier,
+          });
     if (url) links.push({ label: server.name, url });
   }
   if ((opts.imdb ?? true) && card.imdbId)

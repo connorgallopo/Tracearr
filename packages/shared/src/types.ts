@@ -49,6 +49,8 @@ export interface Server {
   name: string;
   type: ServerType;
   url: string;
+  /** The address members open a Jellyfin or Emby server at; null for Plex, which links through app.plex.tv. */
+  publicUrl?: string | null;
   /** The media server's own id, used to build item deep links. */
   machineIdentifier?: string | null;
   displayOrder?: number;

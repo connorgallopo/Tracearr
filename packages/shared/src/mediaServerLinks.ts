@@ -108,3 +108,13 @@ export function isPubliclyRoutableUrl(url: string): boolean {
   if (PRIVATE_SUFFIXES.some((suffix) => host.endsWith(suffix))) return false;
   return !privateIpv4(host);
 }
+
+/**
+ * The address a member off the LAN opens the server at: the admin's public address when set,
+ * else the configured URL when that is public itself. Null means no member-facing link exists;
+ * a private public address is not rescued by a public URL, since the admin said members use it.
+ */
+export function memberFacingUrl(server: { url: string; publicUrl?: string | null }): string | null {
+  const candidate = server.publicUrl ?? server.url;
+  return isPubliclyRoutableUrl(candidate) ? candidate : null;
+}

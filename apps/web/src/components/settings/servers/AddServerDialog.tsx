@@ -41,6 +41,8 @@ export interface AddServerDialogProps {
   onServerTypeChange: (type: 'plex' | 'jellyfin' | 'emby') => void;
   serverUrl: string;
   onServerUrlChange: (value: string) => void;
+  publicUrl: string;
+  onPublicUrlChange: (value: string) => void;
   serverName: string;
   onServerNameChange: (value: string) => void;
   apiKey: string;
@@ -103,6 +105,8 @@ export function AddServerDialog({
   onServerTypeChange,
   serverUrl,
   onServerUrlChange,
+  publicUrl,
+  onPublicUrlChange,
   serverName,
   onServerNameChange,
   apiKey,
@@ -247,6 +251,17 @@ export function AddServerDialog({
                     ? t('servers.serverUrlHelpJellyfin')
                     : t('servers.serverUrlHelpEmby')}
                 </FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="publicUrl">{t('servers.publicUrl')}</FieldLabel>
+                <Input
+                  id="publicUrl"
+                  placeholder="https://jellyfin.example.com"
+                  value={publicUrl}
+                  onChange={(e) => onPublicUrlChange(e.target.value)}
+                />
+                <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
               </Field>
 
               <Field>

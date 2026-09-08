@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { DragEndEvent } from '@dnd-kit/core';
 import type { Server } from '@tracearr/shared';
@@ -37,8 +37,48 @@ vi.mock('@/components/settings/servers/ServerRow', () => ({
   ),
 }));
 
+const { connectJellyfinWithApiKey } = vi.hoisted(() => ({ connectJellyfinWithApiKey: vi.fn() }));
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    auth: {
+      getPlexAccounts: vi.fn().mockResolvedValue({ accounts: [] }),
+      getAvailablePlexServers: vi.fn(),
+      addPlexServer: vi.fn(),
+      testPlexConnection: vi.fn(),
+      connectJellyfinWithApiKey,
+      connectEmbyWithApiKey: vi.fn(),
+    },
+  },
+  tokenStorage: { setTokens: vi.fn() },
+}));
+
 vi.mock('@/components/settings/servers/AddServerDialog', () => ({
-  AddServerDialog: () => <div>add server dialog</div>,
+  AddServerDialog: (props: {
+    open: boolean;
+    onServerTypeChange: (type: 'jellyfin') => void;
+    onServerUrlChange: (value: string) => void;
+    onServerNameChange: (value: string) => void;
+    onApiKeyChange: (value: string) => void;
+    onPublicUrlChange: (value: string) => void;
+    onConnect: () => void;
+  }) =>
+    props.open ? (
+      <div>
+        <button
+          onClick={() => {
+            props.onServerTypeChange('jellyfin');
+            props.onServerUrlChange('http://192.168.1.20:8096');
+            props.onServerNameChange('Attic');
+            props.onApiKeyChange('key-1');
+            props.onPublicUrlChange(' jellyfin.example.com ');
+          }}
+        >
+          fill jellyfin
+        </button>
+        <button onClick={props.onConnect}>connect</button>
+      </div>
+    ) : null,
 }));
 
 vi.mock('@/components/settings/servers/EditServerDialog', () => ({
@@ -140,5 +180,23 @@ describe('Connections', () => {
 
     expect(deleteMutate).toHaveBeenCalledWith('server-1', expect.any(Object));
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['plex-accounts'] });
+  });
+
+  it('sends the trimmed public address with the Jellyfin connect call', async () => {
+    connectJellyfinWithApiKey.mockResolvedValue({});
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.addServer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'fill jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'connect' }));
+
+    await waitFor(() =>
+      expect(connectJellyfinWithApiKey).toHaveBeenCalledWith({
+        serverUrl: 'http://192.168.1.20:8096',
+        serverName: 'Attic',
+        apiKey: 'key-1',
+        publicUrl: 'jellyfin.example.com',
+      })
+    );
   });
 });

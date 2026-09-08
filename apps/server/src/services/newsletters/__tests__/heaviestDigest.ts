@@ -12,6 +12,7 @@ export const JELLYFIN_SERVER: ServerLink = {
   name: 'Basement Jellyfin',
   type: 'jellyfin',
   url: 'https://jellyfin.mydomain-example.com',
+  publicUrl: null,
   machineIdentifier: null,
 };
 

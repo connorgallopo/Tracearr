@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { buildMediaServerItemUrl, isPubliclyRoutableUrl } from '../mediaServerLinks.js';
+import {
+  buildMediaServerItemUrl,
+  isPubliclyRoutableUrl,
+  memberFacingUrl,
+} from '../mediaServerLinks.js';
 
 const PLEX_MACHINE = '02aede436384ae67d1d1dc879dcd69f8504c27ca';
 const EMBY_SERVER = 'a1c97fc391d842678fb3f3a4cb42e185';
@@ -102,5 +106,32 @@ describe('isPubliclyRoutableUrl', () => {
     'http://[2001:db8::1]:8096',
   ])('treats %s as public', (url) => {
     expect(isPubliclyRoutableUrl(url)).toBe(true);
+  });
+});
+
+describe('memberFacingUrl', () => {
+  it('prefers the public address, falls back to a public server url, and yields nothing otherwise', () => {
+    expect(
+      memberFacingUrl({
+        url: 'http://192.168.1.20:8096',
+        publicUrl: 'https://jellyfin.example.com',
+      })
+    ).toBe('https://jellyfin.example.com');
+    expect(
+      memberFacingUrl({
+        url: 'https://lan-name.example.com',
+        publicUrl: 'https://members.example.com',
+      })
+    ).toBe('https://members.example.com');
+    expect(memberFacingUrl({ url: 'https://lan-name.example.com', publicUrl: null })).toBe(
+      'https://lan-name.example.com'
+    );
+    expect(memberFacingUrl({ url: 'https://lan-name.example.com' })).toBe(
+      'https://lan-name.example.com'
+    );
+    expect(memberFacingUrl({ url: 'http://192.168.1.20:8096', publicUrl: null })).toBeNull();
+    expect(
+      memberFacingUrl({ url: 'https://lan-name.example.com', publicUrl: 'http://10.0.0.5:8096' })
+    ).toBeNull();
   });
 });

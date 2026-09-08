@@ -708,6 +708,13 @@
       "when": 1788782400000,
       "tag": "0100_newsletter_scope_libraries",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788820752155,
+      "tag": "0101_true_lucky_pierre",
+      "breakpoints": true
     }
   ]
 }

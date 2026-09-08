@@ -394,6 +394,7 @@ export interface ServerLink {
   name: string;
   type: string;
   url: string;
+  publicUrl: string | null;
   machineIdentifier: string | null;
 }
 
@@ -404,6 +405,7 @@ export async function loadServerLinks(serverIds: string[]): Promise<ServerLink[]
       name: servers.name,
       type: servers.type,
       url: servers.url,
+      publicUrl: servers.publicUrl,
       machineIdentifier: servers.machineIdentifier,
     })
     .from(servers);

@@ -60,6 +60,7 @@ export function Connections() {
   const [editServer, setEditServer] = useState<Server | null>(null);
   const [serverType, setServerType] = useState<'plex' | 'jellyfin' | 'emby'>('plex');
   const [serverUrl, setServerUrl] = useState('');
+  const [publicUrl, setPublicUrl] = useState('');
   const [serverName, setServerName] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
@@ -143,6 +144,7 @@ export function Connections() {
 
   const resetAddForm = () => {
     setServerUrl('');
+    setPublicUrl('');
     setServerName('');
     setApiKey('');
     setConnectError(null);
@@ -194,7 +196,12 @@ export function Connections() {
         serverType === 'jellyfin'
           ? api.auth.connectJellyfinWithApiKey
           : api.auth.connectEmbyWithApiKey;
-      const result = await connectFn({ serverUrl, serverName, apiKey });
+      const result = await connectFn({
+        serverUrl,
+        serverName,
+        apiKey,
+        ...(publicUrl.trim() ? { publicUrl: publicUrl.trim() } : {}),
+      });
 
       if (result.accessToken && result.refreshToken) {
         tokenStorage.setTokens(result.accessToken, result.refreshToken);
@@ -290,6 +297,8 @@ export function Connections() {
         }}
         serverUrl={serverUrl}
         onServerUrlChange={setServerUrl}
+        publicUrl={publicUrl}
+        onPublicUrlChange={setPublicUrl}
         serverName={serverName}
         onServerNameChange={setServerName}
         apiKey={apiKey}
@@ -341,10 +350,10 @@ export function Connections() {
         servers={servers}
         onClose={() => setEditServer(null)}
         isUpdating={updateServer.isPending}
-        onUpdate={(name, url, clientIdentifier, color) => {
+        onUpdate={(patch) => {
           if (!editServer) return;
           updateServer.mutate(
-            { id: editServer.id, name, url, clientIdentifier, color },
+            { id: editServer.id, ...patch },
             { onSuccess: () => setEditServer(null) }
           );
         }}

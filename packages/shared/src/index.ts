@@ -433,6 +433,9 @@ export {
   callbackSchema,
   // Server
   createServerSchema,
+  PUBLIC_URL_PLEX_MESSAGE,
+  apiKeyConnectSchema,
+  publicUrlSchema,
   serverIdParamSchema,
   reorderServersSchema,
   updateServerSchema,
@@ -837,5 +840,6 @@ export {
 export {
   buildMediaServerItemUrl,
   isPubliclyRoutableUrl,
+  memberFacingUrl,
   type MediaServerItemLinkInput,
 } from './mediaServerLinks.js';
