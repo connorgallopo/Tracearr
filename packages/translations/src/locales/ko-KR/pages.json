@@ -210,7 +210,7 @@
       "quietest": "가장 한산함:",
       "bingeHighlights": "몰아보기 하이라이트",
       "bingeHighlightsDesc": "시청 집중도가 가장 높은 프로그램",
-      "bingeSessions": "몰아보기 세션",
+      "bingeSessions": "",
       "noData": "아직 시청 데이터가 없습니다",
       "noDataDesc": "콘텐츠가 재생되면 시청 분석이 여기에 표시됩니다. 시청 활동이 생긴 뒤 다시 확인하세요.",
       "failedToLoad": "시청 분석을 불러오지 못했습니다",
@@ -1555,7 +1555,7 @@
       "reauthorizeAccount": "이 Plex 계정 다시 인증",
       "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
       "linkedAccounts": "연결된 Plex 계정",
-      "linkedAccountsDesc": "서버를 추가할 때 사용할 Plex 계정을 관리하세요.",
+      "linkedAccountsDesc": "",
       "noAccountsYet": "아직 연결된 Plex 계정이 없습니다.",
       "unlinkPlexAccount": "Plex 계정 연결 해제",
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다."
@@ -1584,7 +1584,7 @@
       "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
       "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
       "receiveViolations": "위반사항 수신",
-      "receiveViolationsHint": "이 대상의 비밀번호를 다시 입력하세요.",
+      "receiveViolationsHint": "",
       "reencrypt": "설정(유지하려면 비워두세요)",
       "secretSet": "설정(유지하려면 비워두세요)",
       "test": "테스트",
@@ -1704,7 +1704,7 @@
   },
   "statsUsers": {
     "noActivity": "아직 활동이 없습니다",
-    "noActivityDesc": "스트리밍을 시작하면 상위 사용자가 여기에 표시됩니다",
+    "noActivityDesc": "",
     "top3": "상위 3명",
     "runnersUp": "그 외 상위"
   },
