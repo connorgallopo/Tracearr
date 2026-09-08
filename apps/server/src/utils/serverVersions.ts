@@ -24,9 +24,10 @@ export const SERVER_RELEASE_PAGES: Record<ServerType, string> = {
 };
 
 const FEED_TIMEOUT_MS = 10_000;
-// Three or four parts: `compareVersions` reads a shorter version's missing parts as zeros,
-// so `10.11` would compare equal to `10.11.0.0` and nudge about a release nobody shipped.
-const DOTTED = /^\d+(\.\d+){2,3}$/;
+// Two to four parts. `compareVersions` only reads three- and four-part versions, so a
+// two-part release gets padded rather than dropped: Jellyfin tags 12.0 as `v12.0` while
+// the server reports `12.0.0`, and the two have to compare equal.
+const DOTTED = /^\d+(\.\d+){1,3}$/;
 
 interface PlexDownloads {
   computer?: Record<string, { version?: unknown } | undefined>;
@@ -34,15 +35,16 @@ interface PlexDownloads {
 
 /**
  * The comparable digits of a version: Plex appends a build hash, Jellyfin tags with a
- * leading `v`, Emby is already numeric. Null when what is left is not three or four
- * dotted numbers.
+ * leading `v`, Emby is already numeric. A two-part version gains a `.0` so the
+ * comparator can read it. Null when what is left is not two to four dotted numbers.
  */
 export function normalizeServerVersion(type: ServerType, raw: string): string | null {
   const trimmed = raw.trim();
   let candidate = trimmed;
   if (type === 'plex') candidate = trimmed.split('-')[0] ?? '';
   if (type === 'jellyfin') candidate = trimmed.replace(/^v/, '');
-  return DOTTED.test(candidate) ? candidate : null;
+  if (!DOTTED.test(candidate)) return null;
+  return candidate.split('.').length === 2 ? `${candidate}.0` : candidate;
 }
 
 /** An unparseable version on either side is never newer: a nudge needs both numbers. */
