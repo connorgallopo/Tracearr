@@ -526,11 +526,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "privateServerLinks": "",
+        "noPublicUrl": "",
+        "privatePublicUrl": "",
         "recipients": "",
         "recipientsFail": "",
         "recipientsLoadFailed": "",
         "recipientsUnknown": "",
+        "serverSettingsLink": "",
         "title": ""
       },
       "recipients": {
@@ -558,7 +560,6 @@
         "namePlaceholder": "",
         "noAddress": "",
         "noAddressHelp": "",
-        "openUser": "",
         "openUserPage": "",
         "ownerNote": "",
         "reasons": {
@@ -751,6 +752,8 @@
       "title": "",
       "titleDesc": ""
     },
+    "publicUrl": "",
+    "publicUrlHint": "",
     "realtimeActive": "实时更新已启用",
     "realtimeDialog": {
       "autoDetectNote": "",

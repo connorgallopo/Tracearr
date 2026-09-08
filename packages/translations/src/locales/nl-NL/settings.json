@@ -526,11 +526,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "privateServerLinks": "",
+        "noPublicUrl": "",
+        "privatePublicUrl": "",
         "recipients": "",
         "recipientsFail": "",
         "recipientsLoadFailed": "",
         "recipientsUnknown": "",
+        "serverSettingsLink": "",
         "title": ""
       },
       "recipients": {
@@ -558,7 +560,6 @@
         "namePlaceholder": "",
         "noAddress": "",
         "noAddressHelp": "",
-        "openUser": "",
         "openUserPage": "",
         "ownerNote": "",
         "reasons": {
@@ -751,6 +752,8 @@
       "title": "Postervoorkeuren",
       "titleDesc": "Kies van welke server de poster wordt weergegeven wanneer een titel op meer dan één server beschikbaar is"
     },
+    "publicUrl": "",
+    "publicUrlHint": "",
     "realtimeActive": "Real-time updates actief",
     "realtimeDialog": {
       "autoDetectNote": "Start Jellyfin of Emby opnieuw op na het installeren van de plugin; dit is noodzakelijk. Tracearr zelf hoeft niet opnieuw opgestart te worden en detecteert de plugin automatisch.",
