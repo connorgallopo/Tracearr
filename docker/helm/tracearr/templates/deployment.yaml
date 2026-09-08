@@ -86,7 +86,7 @@ spec:
           imagePullPolicy: {{ .Values.tracearr.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: {{ include "tracearr.containerPort" . }}
               protocol: TCP
           env:
             {{- range $key, $val := .Values.tracearr.env }}

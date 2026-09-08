@@ -105,3 +105,9 @@ app.kubernetes.io/part-of: {{ include "tracearr.name" . }}
 {{- printf "%s:%s" .Values.tracearr.image.repository $tag }}
 {{- end }}
 {{- end }}
+
+{{/* The port the server binds to. containerPort, the Service targetPort and the
+NetworkPolicy all read this, so tracearr.env.PORT is the only place to set it. */}}
+{{- define "tracearr.containerPort" -}}
+{{- index (.Values.tracearr.env | default dict) "PORT" | default 3000 | int -}}
+{{- end }}

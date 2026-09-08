@@ -23,7 +23,7 @@ tracearr:
   env:
     NODE_ENV: production
     HOST: "0.0.0.0"
-    PORT: "3000"  # must match containerPort (3000)
+    PORT: "3000"  # containerPort, the Service targetPort and the probes all follow this
     LOG_LEVEL: info
     CORS_ORIGIN: "*"
     TZ: UTC
