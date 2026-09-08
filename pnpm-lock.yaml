@@ -151,8 +151,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.1
       expo-server-sdk:
-        specifier: ^6.1.0
-        version: 6.1.0
+        specifier: ^7.0.0
+        version: 7.2.0
       fastify:
         specifier: ^5.12.1
         version: 5.12.1
@@ -4564,9 +4564,9 @@ packages:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
 
-  expo-server-sdk@6.1.0:
-    resolution: {integrity: sha512-ISuax1AQ7cpM5RAqcu8gVcoLL0ZKskJ5OLoMWmdITBe9nYjTucjdGyBq817YkIvTcj1pAUwx+9toUT7l/V7thA==}
-    engines: {node: '>=20'}
+  expo-server-sdk@7.2.0:
+    resolution: {integrity: sha512-np157Ylo2X+aX3VYazXoXNc/akSskzEzHmVkxlGlkzOTVkSRgzBk93BX/8fjl6+O7KfimyWx5JJmoa+D5KgXdQ==}
+    engines: {node: '>=22.12.0'}
 
   express-rate-limit@8.7.0:
     resolution: {integrity: sha512-hOwV7WOxXfjRpAM1DSJWZDXx3GhplwD8IfwuwvogD8i1Qnkgosw/H45s4ZnFAUHDAhPjlY9hLBvJhKmGMyY26g==}
@@ -11444,7 +11444,7 @@ snapshots:
 
   expect-type@1.4.0: {}
 
-  expo-server-sdk@6.1.0:
+  expo-server-sdk@7.2.0:
     dependencies:
       promise-limit: 2.7.0
       promise-retry: 2.0.1
