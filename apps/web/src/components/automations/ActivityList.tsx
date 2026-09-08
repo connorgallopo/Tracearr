@@ -192,7 +192,7 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
       </ToggleGroup>
 
       <DataTableRoot density="default">
-        <DataTableViewport>
+        <DataTableViewport flush>
           <DataTableHeader table={table} />
           <DataTableBody
             table={table}

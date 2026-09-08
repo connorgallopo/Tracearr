@@ -959,7 +959,7 @@ export function Debug() {
 
                   {/* Snapshot table */}
                   <DataTableRoot density="compact">
-                    <DataTableViewport>
+                    <DataTableViewport flush>
                       <DataTableHeader table={snapshotsTable} />
                       <DataTableBody
                         table={snapshotsTable}

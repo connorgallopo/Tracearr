@@ -823,7 +823,7 @@ export function UserDetail() {
         </CardHeader>
         <CardContent>
           <DataTableRoot>
-            <DataTableViewport>
+            <DataTableViewport flush>
               <DataTableHeader table={violationsTable} />
               <DataTableBody
                 table={violationsTable}
@@ -863,7 +863,7 @@ export function UserDetail() {
         </CardHeader>
         <CardContent>
           <DataTableRoot>
-            <DataTableViewport>
+            <DataTableViewport flush>
               <DataTableHeader table={terminationsTable} />
               <DataTableBody
                 table={terminationsTable}

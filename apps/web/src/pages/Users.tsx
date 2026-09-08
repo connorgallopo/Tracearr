@@ -526,7 +526,7 @@ export function Users() {
               )}
 
               <DataTableRoot density="default">
-                <DataTableViewport>
+                <DataTableViewport flush>
                   <DataTableHeader table={table} />
                   <DataTableBody
                     table={table}

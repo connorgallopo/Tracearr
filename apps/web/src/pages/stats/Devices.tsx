@@ -524,7 +524,7 @@ export function StatsDevices() {
               />
             ) : (
               <DataTableRoot density="compact">
-                <DataTableViewport>
+                <DataTableViewport flush>
                   <DataTableHeader table={hotspotsTable} />
                   <DataTableBody
                     table={hotspotsTable}
@@ -592,7 +592,7 @@ export function StatsDevices() {
             />
           ) : (
             <DataTableRoot density="compact">
-              <DataTableViewport>
+              <DataTableViewport flush>
                 <DataTableHeader table={transcodingUsersTable} />
                 <DataTableBody
                   table={transcodingUsersTable}

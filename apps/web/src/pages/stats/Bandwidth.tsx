@@ -508,7 +508,7 @@ export function StatsBandwidth() {
             />
           ) : (
             <DataTableRoot density="default">
-              <DataTableViewport>
+              <DataTableViewport flush>
                 <DataTableHeader table={topUsersTable} />
                 <DataTableBody
                   table={topUsersTable}
