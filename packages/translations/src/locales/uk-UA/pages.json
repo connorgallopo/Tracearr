@@ -1418,7 +1418,7 @@
       "avgPerItem": "середня одиниця на товар",
       "bingeHighlights": "Відмітини на бінге",
       "bingeHighlightsDesc": "Показує за допомогою найбільш інтенсивних шаблонів перегляду",
-      "bingeSessions": "сесій бінге",
+      "bingeSessions": "",
       "busiest": "Берегий:",
       "completed": "Завершені",
       "description": "Перегляд поведінки і вмісту залучення",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Прив'язати інший обліковий запис Plex",
       "linkPlexAccount": "Пов'язати обліковий запис Plex",
       "linkedAccounts": "Пов'язані облікові записи Plex",
-      "linkedAccountsDesc": "Керуйте обліковими записами Plex, з якого ви можете додавати сервери.",
+      "linkedAccountsDesc": "",
       "linking": "Посилання...",
       "local": "Місцевий",
       "loginEnabled": "Вхід увімкнено",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Поки що ніякої активності",
-    "noActivityDesc": "Почніть трансляцію, щоб побачити ваших топ користувачів тут",
+    "noActivityDesc": "",
     "runnersUp": "Верх Runner'ів",
     "top3": "Найпопулярніші 3"
   },

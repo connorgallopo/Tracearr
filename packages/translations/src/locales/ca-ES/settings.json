@@ -457,7 +457,7 @@
     "authorize": "",
     "awaitingAuth": "S'està esperant l'autorització...",
     "connected": "",
-    "description": "Accediu a Tracearr de manera segura a la vostra xarxa Tailscale sense redirecció de ports.",
+    "description": "",
     "disable": "Desactiva Tailscale",
     "disableConfirmDescription": "",
     "disableConfirmTitle": "",

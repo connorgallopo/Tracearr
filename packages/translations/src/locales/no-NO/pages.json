@@ -1418,7 +1418,7 @@
       "avgPerItem": "bruk per element",
       "bingeHighlights": "Binge markeringer",
       "bingeHighlightsDesc": "Viser med de mest intensive visningsmønstrene",
-      "bingeSessions": "grener for grener",
+      "bingeSessions": "",
       "busiest": "Kjøpest:",
       "completed": "Fullført",
       "description": "Vise atferd og involvering av innhold",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Koble til en annen Plex konto",
       "linkPlexAccount": "Koble sammen Plex konto",
       "linkedAccounts": "Koblede Plex-kontoer",
-      "linkedAccountsDesc": "Administrer Plex-kontoene du kan legge til servere fra.",
+      "linkedAccountsDesc": "",
       "linking": "Lenker...",
       "local": "Lokal",
       "loginEnabled": "Innlogging aktivert",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet",
-    "noActivityDesc": "Start streaming for å se de beste brukerne dine her",
+    "noActivityDesc": "",
     "runnersUp": "Runnere opp",
     "top3": "Topp 3"
   },

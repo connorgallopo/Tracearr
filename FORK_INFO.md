@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `5c7912a1`
+- Source branch/SHA inspected: `main` at `877c7f8a`
 - Last shared upstream commit found during inspection: `5c7912a1`
-- Latest upstream commit merged into the current working tree: `5c7912a1`
+- Latest upstream commit merged into the current working tree: `877c7f8a`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -221,6 +221,25 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `877c7f8a` was merged into `develop` on September 9,
+  2026. The merge adds the public API v2 watched-media endpoint, two-part
+  server-version normalization, shared table spacing improvements, Helm and
+  Compose port configuration fixes, dependency updates, and Crowdin translations.
+  Locale conflicts were reconciled by key, retaining fork-only labels while
+  accepting updated upstream translations. The Snyk modify/delete conflict
+  retains the fork's removal; PR-only CI, disabled Renovate, and manual-only
+  releases with the Helm push job disabled remain intact. No migrations changed.
+  Dispatcharr library-sync exclusions and API server types remain intact, and
+  History retains its fixed column widths and mobile minimum table width.
+  Full non-Docker CI passed with Node 24 and pnpm 11.11.0: lint (752 warnings,
+  unchanged), typecheck, translations, unit/services/routes/auth/security,
+  web, coverage, and build. The individual test jobs passed 7,677 tests with
+  two skipped; the separate coverage run passed 5,063 tests with two skipped
+  (65.46% statements, 59.93% branches, 72.65% functions, 66.50% lines).
+  No live Dispatcharr instance was exercised in this local validation.
+  Docker-backed integration and E2E validation are explicitly omitted at the
+  user's request for this merge.
 
 - Upstream `main` at `5c7912a1` was merged into `develop` on September 3,
   2026 (merge commit `a20477e3`). The merge retains upstream migrations

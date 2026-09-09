@@ -50,6 +50,12 @@ const CELL_PADDING: Record<DataTableDensity, string> = {
   compact: 'px-3 py-1.5',
 };
 
+const FLUSH_OFFSET: Record<DataTableDensity, string> = {
+  comfortable: '-mx-4 -mb-4',
+  default: '-mx-4 -mb-3',
+  compact: '-mx-3 -mb-1.5',
+};
+
 const HEADER_TEXT: Record<DataTableHeaderVariant, string | undefined> = {
   default: undefined,
   micro: 'text-[10.5px] font-semibold tracking-[0.07em]',
@@ -94,19 +100,32 @@ export function DataTableRoot({
 interface DataTableViewportProps {
   /** Clamps the height and scrolls inside the table instead of the page. */
   contained?: boolean;
+  /**
+   * Cancels the cell padding against the padding of a surrounding CardContent,
+   * so the first column lines up with the card title instead of sitting inset
+   * by one more gutter.
+   */
+  flush?: boolean;
   className?: string;
   children: ReactNode;
 }
 
 export function DataTableViewport({
   contained = false,
+  flush = false,
   className,
   children,
 }: DataTableViewportProps) {
+  const { density } = use(ChromeContext);
   return (
     <div
       data-slot="data-table-viewport"
-      className={cn('relative w-full overflow-auto', contained && 'scrollbar-thin', className)}
+      className={cn(
+        'relative w-full overflow-auto',
+        contained && 'scrollbar-thin',
+        flush && FLUSH_OFFSET[density],
+        className
+      )}
       style={contained ? { maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT } : undefined}
     >
       <table data-slot="table" className="w-full caption-bottom text-sm">

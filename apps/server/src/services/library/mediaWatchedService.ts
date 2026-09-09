@@ -1,6 +1,8 @@
 import { sql, type SQL } from 'drizzle-orm';
 import type { WatchedState } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { windowDayFilter } from '../../routes/publicV2/shared.js';
+import { encodeCursor } from '../../utils/cursor.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 
 export interface WatchedProbeArgs {
@@ -50,6 +52,25 @@ export function buildAliasMapCte(ids: string[]): SQL {
 }
 
 /** Movie matrix: watched wins, otherwise any recorded plays make it partial. */
+export function movieWatchedState(watched: boolean, hasPlays: boolean): WatchedState {
+  if (watched) return 'watched';
+  return hasPlays ? 'partial' : 'unwatched';
+}
+
+/**
+ * Show matrix: an unknown or zero episode count can never resolve to
+ * watched/partial, since there's nothing to compare epsWatched against.
+ */
+export function showWatchedState(
+  epsWatched: number,
+  episodeCount: number | undefined,
+  hasPlays: boolean
+): WatchedState {
+  if (!episodeCount) return 'unwatched';
+  if (epsWatched >= episodeCount) return 'watched';
+  return epsWatched > 0 || hasPlays ? 'partial' : 'unwatched';
+}
+
 export function mapMovieWatchedRows(
   movieIds: string[],
   rows: MovieWatchedRow[]
@@ -58,23 +79,11 @@ export function mapMovieWatchedRows(
   const result = new Map<string, WatchedState>();
   for (const id of movieIds) {
     const row = byId.get(id);
-    if (!row) {
-      result.set(id, 'unwatched');
-    } else if (row.watched) {
-      result.set(id, 'watched');
-    } else if (row.has_plays) {
-      result.set(id, 'partial');
-    } else {
-      result.set(id, 'unwatched');
-    }
+    result.set(id, movieWatchedState(row?.watched ?? false, row?.has_plays ?? false));
   }
   return result;
 }
 
-/**
- * Show matrix: an unknown or zero episode count can never resolve to watched/partial,
- * since there's nothing to compare eps_watched against.
- */
 export function mapShowWatchedRows(
   showIds: string[],
   rows: ShowWatchedRow[],
@@ -83,21 +92,11 @@ export function mapShowWatchedRows(
   const byId = new Map(rows.map((row) => [row.canonical_id, row]));
   const result = new Map<string, WatchedState>();
   for (const id of showIds) {
-    const known = episodeCounts.get(id);
-    if (!known) {
-      result.set(id, 'unwatched');
-      continue;
-    }
     const row = byId.get(id);
-    const epsWatched = row?.eps_watched ?? 0;
-    const hasPlays = row?.has_plays ?? false;
-    if (epsWatched >= known) {
-      result.set(id, 'watched');
-    } else if (epsWatched > 0 || hasPlays) {
-      result.set(id, 'partial');
-    } else {
-      result.set(id, 'unwatched');
-    }
+    result.set(
+      id,
+      showWatchedState(row?.eps_watched ?? 0, episodeCounts.get(id), row?.has_plays ?? false)
+    );
   }
   return result;
 }
@@ -202,4 +201,250 @@ export async function resolveWatchedStates(
   }
 
   return result;
+}
+
+// ============================================================================
+// Watched-media listing
+//
+// The inverse of resolveWatchedStates: rather than probing a known id list,
+// this walks user_media_plays_daily in the listing direction and returns only
+// media with recorded engagement, so absence from a page means unwatched and
+// no per-id probe round is needed. The CASE/HAVING matrices below are the SQL
+// form of mapMovieWatchedRows and mapShowWatchedRows and must keep agreeing
+// with them, or a badge built on this endpoint contradicts the library UI.
+//
+// State is resolved in SQL rather than after the page is sliced: min_state
+// filters and the keyset cursor both read it, and applying either after LIMIT
+// would return short pages and pages that are empty behind a live cursor.
+// ============================================================================
+
+export type WatchedMediaKind = 'movie' | 'show' | 'episode';
+
+export interface ListWatchedMediaArgs {
+  kind: WatchedMediaKind;
+  /** Identity to report a second per-user state for; null omits it. */
+  lensUserId: string | null;
+  serverIds: string[] | undefined;
+  /** UTC calendar days back, or null for all time (see STATS_WINDOWS). */
+  windowDays: number | null;
+  minState: Exclude<WatchedState, 'unwatched'>;
+  pageSize: number;
+  cursorValue: { startedAt: Date; id: string } | null;
+}
+
+export interface WatchedMediaRecord {
+  media_id: string;
+  media_type: string;
+  title: string;
+  year: number | null;
+  imdb_id: string | null;
+  tmdb_id: number | null;
+  tvdb_id: number | null;
+  show_media_id: string | null;
+  show_title: string | null;
+  show_imdb_id: string | null;
+  show_tmdb_id: number | null;
+  show_tvdb_id: number | null;
+  watched_state: WatchedState;
+  watched_state_user: WatchedState | null;
+  plays: number;
+  last_watched_day: string;
+  episodes_watched: number | null;
+  episode_count: number | null;
+}
+
+interface WatchedMediaQueryRow {
+  canonical_id: string;
+  media_type: string;
+  title: string;
+  year: number | null;
+  imdb_id: string | null;
+  tmdb_id: number | null;
+  tvdb_id: number | null;
+  show_media_id: string | null;
+  show_title: string | null;
+  show_imdb_id: string | null;
+  show_tmdb_id: number | null;
+  show_tvdb_id: number | null;
+  plays: string | number;
+  last_day: string;
+  last_watched_day: string;
+  watched_any: boolean;
+  has_plays_any: boolean;
+  watched_user: boolean | null;
+  has_plays_user: boolean | null;
+  eps_watched_any: number | null;
+  eps_watched_user: number | null;
+  episode_count: number | null;
+}
+
+function mapWatchedMediaRow(row: WatchedMediaQueryRow, isShow: boolean): WatchedMediaRecord {
+  const episodeCount = row.episode_count;
+  const watchedState = isShow
+    ? showWatchedState(row.eps_watched_any ?? 0, episodeCount ?? undefined, row.has_plays_any)
+    : movieWatchedState(row.watched_any, row.has_plays_any);
+  // has_plays_user is null exactly when no lens was supplied, which is the
+  // same condition that leaves watched_user/eps_watched_user null.
+  const userState =
+    row.has_plays_user === null
+      ? null
+      : isShow
+        ? showWatchedState(row.eps_watched_user ?? 0, episodeCount ?? undefined, row.has_plays_user)
+        : movieWatchedState(row.watched_user ?? false, row.has_plays_user);
+
+  return {
+    media_id: row.canonical_id,
+    media_type: row.media_type,
+    title: row.title,
+    year: row.year,
+    imdb_id: row.imdb_id,
+    tmdb_id: row.tmdb_id,
+    tvdb_id: row.tvdb_id,
+    show_media_id: row.show_media_id,
+    show_title: row.show_title,
+    show_imdb_id: row.show_imdb_id,
+    show_tmdb_id: row.show_tmdb_id,
+    show_tvdb_id: row.show_tvdb_id,
+    watched_state: watchedState,
+    watched_state_user: userState,
+    plays: Number(row.plays),
+    last_watched_day: row.last_watched_day,
+    episodes_watched: isShow ? (row.eps_watched_any ?? 0) : null,
+    episode_count: isShow ? episodeCount : null,
+  };
+}
+
+/** Keyset predicate over the grouped result; mirrors the ORDER BY exactly. */
+function watchedCursorFragment(cursorValue: { startedAt: Date; id: string } | null): SQL {
+  if (!cursorValue) return sql``;
+  return sql` AND (c.last_day, c.canonical_id) < (${cursorValue.startedAt}::timestamptz, ${cursorValue.id}::uuid)`;
+}
+
+export function buildMovieListQuery(args: ListWatchedMediaArgs): SQL {
+  const { kind, lensUserId, serverIds, windowDays, minState, pageSize, cursorValue } = args;
+  const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
+  const lensAgg = lensUserId
+    ? sql`COALESCE(BOOL_OR(p.any_watched) FILTER (WHERE su.user_id = ${lensUserId}), false) AS watched_user,
+          COALESCE(SUM(p.plays) FILTER (WHERE su.user_id = ${lensUserId}), 0) > 0 AS has_plays_user,`
+    : sql`NULL::boolean AS watched_user, NULL::boolean AS has_plays_user,`;
+  const stateFilter =
+    minState === 'watched' ? sql`c.watched_any` : sql`(c.watched_any OR c.has_plays_any)`;
+
+  return sql`
+    WITH counted AS (
+      SELECT COALESCE(am.merged_into_id, p.media_id) AS canonical_id,
+             BOOL_OR(p.any_watched) AS watched_any,
+             COALESCE(SUM(p.plays), 0) > 0 AS has_plays_any,
+             ${lensAgg}
+             COALESCE(SUM(p.plays), 0)::bigint AS plays,
+             MAX(p.day) AS last_day
+      FROM user_media_plays_daily p
+      JOIN media am ON am.id = p.media_id
+      JOIN server_users su ON su.id = p.server_user_id
+      WHERE am.media_type = ${kind}${windowDayFilter(sql`p.day`, windowDays)} ${serverFragment}
+      GROUP BY COALESCE(am.merged_into_id, p.media_id)
+    )
+    SELECT c.canonical_id,
+           c.watched_any, c.has_plays_any, c.watched_user, c.has_plays_user,
+           c.plays, c.last_day,
+           (c.last_day AT TIME ZONE 'utc')::date::text AS last_watched_day,
+           NULL::int AS eps_watched_any, NULL::int AS eps_watched_user, NULL::int AS episode_count,
+           m.media_type, m.title, m.year, m.imdb_id, m.tmdb_id, m.tvdb_id, m.show_media_id,
+           sm.title AS show_title, sm.imdb_id AS show_imdb_id,
+           sm.tmdb_id AS show_tmdb_id, sm.tvdb_id AS show_tvdb_id
+    FROM counted c
+    JOIN media m ON m.id = c.canonical_id
+    LEFT JOIN media sm ON sm.id = m.show_media_id
+    WHERE ${stateFilter}${watchedCursorFragment(cursorValue)}
+    ORDER BY c.last_day DESC, c.canonical_id DESC
+    LIMIT ${pageSize}
+  `;
+}
+
+export function buildShowListQuery(args: ListWatchedMediaArgs): SQL {
+  const { lensUserId, serverIds, windowDays, minState, pageSize, cursorValue } = args;
+  const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
+  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  // Materialized once and hash-joined: the same EXISTS evaluated per cagg row
+  // inside the COUNT(DISTINCT) FILTER degrades to a nested loop over the whole
+  // aggregate, which is what makes the unbounded listing slow.
+  const lensAgg = lensUserId
+    ? sql`COUNT(DISTINCT p.media_id) FILTER (
+            WHERE p.any_watched AND ae.media_id IS NOT NULL AND su.user_id = ${lensUserId}
+          )::int AS eps_watched_user,
+          COALESCE(SUM(p.plays) FILTER (WHERE su.user_id = ${lensUserId}), 0) > 0 AS has_plays_user,`
+    : sql`NULL::int AS eps_watched_user, NULL::boolean AS has_plays_user,`;
+  const stateFilter =
+    minState === 'watched'
+      ? sql`c.eps_watched_any >= ec.episode_count`
+      : sql`(c.eps_watched_any > 0 OR c.has_plays_any)`;
+
+  return sql`
+    WITH active_episodes AS (
+      SELECT m.id AS media_id, m.show_media_id AS show_id
+      FROM media m
+      WHERE m.media_type = 'episode' AND m.show_media_id IS NOT NULL
+        AND EXISTS (
+          SELECT 1 FROM library_items li
+          WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}
+        )
+    ),
+    episode_counts AS (
+      SELECT show_id, COUNT(*)::int AS episode_count FROM active_episodes GROUP BY show_id
+    ),
+    counted AS (
+      SELECT COALESCE(am.merged_into_id, p.show_media_id) AS canonical_id,
+             COUNT(DISTINCT p.media_id) FILTER (
+               WHERE p.any_watched AND ae.media_id IS NOT NULL
+             )::int AS eps_watched_any,
+             COALESCE(SUM(p.plays), 0) > 0 AS has_plays_any,
+             ${lensAgg}
+             COALESCE(SUM(p.plays), 0)::bigint AS plays,
+             MAX(p.day) AS last_day
+      FROM user_media_plays_daily p
+      JOIN media am ON am.id = p.show_media_id
+      JOIN server_users su ON su.id = p.server_user_id
+      LEFT JOIN active_episodes ae ON ae.media_id = p.media_id
+      WHERE p.show_media_id IS NOT NULL${windowDayFilter(sql`p.day`, windowDays)} ${serverFragment}
+      GROUP BY COALESCE(am.merged_into_id, p.show_media_id)
+    )
+    SELECT c.canonical_id,
+           NULL::boolean AS watched_any, c.has_plays_any,
+           NULL::boolean AS watched_user, c.has_plays_user,
+           c.plays, c.last_day,
+           (c.last_day AT TIME ZONE 'utc')::date::text AS last_watched_day,
+           c.eps_watched_any, c.eps_watched_user, ec.episode_count,
+           m.media_type, m.title, m.year, m.imdb_id, m.tmdb_id, m.tvdb_id,
+           NULL::uuid AS show_media_id,
+           NULL::text AS show_title, NULL::varchar AS show_imdb_id,
+           NULL::int AS show_tmdb_id, NULL::int AS show_tvdb_id
+    FROM counted c
+    JOIN media m ON m.id = c.canonical_id
+    JOIN episode_counts ec ON ec.show_id = c.canonical_id
+    WHERE ${stateFilter}${watchedCursorFragment(cursorValue)}
+    ORDER BY c.last_day DESC, c.canonical_id DESC
+    LIMIT ${pageSize}
+  `;
+}
+
+/**
+ * One page of media with recorded engagement, newest activity first, carrying
+ * the all-users watched state and (when lensUserId is set) that identity's own
+ * state. A show with no active episodes resolves to unwatched and never
+ * appears, matching mapShowWatchedRows' unknown-count rule.
+ */
+export async function listWatchedMedia(
+  args: ListWatchedMediaArgs
+): Promise<{ data: WatchedMediaRecord[]; nextCursor: string | null }> {
+  const isShow = args.kind === 'show';
+  const query = isShow ? buildShowListQuery(args) : buildMovieListQuery(args);
+  const result = await db.execute(query);
+  const rows = result.rows as unknown as WatchedMediaQueryRow[];
+
+  const data = rows.map((row) => mapWatchedMediaRow(row, isShow));
+  const lastRow = rows.length === args.pageSize ? rows[rows.length - 1] : undefined;
+  const nextCursor = lastRow
+    ? encodeCursor(new Date(lastRow.last_day), lastRow.canonical_id)
+    : null;
+  return { data, nextCursor };
 }

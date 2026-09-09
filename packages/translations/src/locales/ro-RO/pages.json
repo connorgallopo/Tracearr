@@ -1418,7 +1418,7 @@
       "avgPerItem": "medie pe articol",
       "bingeHighlights": "Evidențieri ale bătăliei",
       "bingeHighlightsDesc": "Arată cu cele mai intensive modele de vizualizare",
-      "bingeSessions": "sesiuni bursiere",
+      "bingeSessions": "",
       "busiest": "Puternic:",
       "completed": "Completat",
       "description": "Vizualizare comportament și conținut de angajament",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Leagă un alt cont Plex",
       "linkPlexAccount": "Asociază contul Plex",
       "linkedAccounts": "Conturi Plex asociate",
-      "linkedAccountsDesc": "Gestionează conturile Plex de la care poți adăuga servere.",
+      "linkedAccountsDesc": "",
       "linking": "Conectare...",
       "local": "",
       "loginEnabled": "Autentificare activată",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Nicio activitate încă",
-    "noActivityDesc": "Începe streaming-ul pentru a vedea utilizatorii de top aici",
+    "noActivityDesc": "",
     "runnersUp": "Alergători sus",
     "top3": ""
   },

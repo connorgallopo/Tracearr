@@ -1418,7 +1418,7 @@
       "avgPerItem": "متوسط لكل عنصر",
       "bingeHighlights": "أضواء Binge",
       "bingeHighlightsDesc": "يظهر مع أنماط العرض الأكثر كثافة",
-      "bingeSessions": "جلسات باينج",
+      "bingeSessions": "",
       "busiest": "مشغول:",
       "completed": "مكتمل",
       "description": "عرض السلوك وإشراك المحتوى",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "ربط حساب Plex آخر",
       "linkPlexAccount": "ربط حساب Plex",
       "linkedAccounts": "حسابات Plex المرتبطة",
-      "linkedAccountsDesc": "إدارة حسابات Plex يمكنك إضافة خوادم منها.",
+      "linkedAccountsDesc": "",
       "linking": "ربط...",
       "local": "محلي",
       "loginEnabled": "تسجيل الدخول مفعل",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "لا يوجد نشاط بعد",
-    "noActivityDesc": "ابدأ البث لرؤية أعلى المستخدمين هنا",
+    "noActivityDesc": "",
     "runnersUp": "تشغيل أعلى",
     "top3": "أفضل 3"
   },

@@ -1,7 +1,7 @@
 {
   "accessControl": {
     "allowGuestAccess": "Gasttoegang toestaan",
-    "allowGuestAccessDesc": "Indien uitgeschakeld kan alleen de server eigenaar inloggen op Tracearr",
+    "allowGuestAccessDesc": "",
     "description": "Configureer wie toegang heeft tot Tracearr",
     "singleOwnerNote": "Opmerking: Wanneer gasttoegang is uitgeschakeld, kan alleen de servereigenaar inloggen. Alle andere gebruikers zien het bericht \"Toegang Geweigerd\".",
     "title": "Toegangsbeheer"
@@ -158,9 +158,9 @@
     "regenerateApiKey": "API-sleutel opnieuw genereren?",
     "regenerateApiKeyDesc": "Dit zal je huidige API-sleutel ongeldig maken. Alle integraties die de oude sleutel gebruiken zullen niet meer werken.",
     "sessionSync": "Sessie Sync",
-    "sessionSyncDesc": "Sessie volgen voor uw mediaservers inschakelen",
+    "sessionSyncDesc": "",
     "syncInterval": "Synchronisatie-interval",
-    "syncIntervalDesc": "Stemfrequentie voor Jellyfin/Emby (5-300 seconden)",
+    "syncIntervalDesc": "",
     "syncIntervalSuffix": "sec.",
     "theme": "Thema",
     "themeDark": "Donker",
@@ -173,7 +173,7 @@
     "timezone": "Tijdzone",
     "title": "Algemene instellingen",
     "unitSystem": "Eenheidsstelsel",
-    "unitSystemDesc": "Kies hoe afstanden en snelheden worden weergegeven",
+    "unitSystemDesc": "",
     "updateChecks": {
       "description": "",
       "plugin": "",
@@ -183,12 +183,12 @@
       "title": ""
     },
     "watchedThresholdMovie": "Drempelwaarde voor bekeken films",
-    "watchedThresholdMovieDesc": "Het percentage van een film dat bekeken moet worden voordat deze als voltooid wordt gemarkeerd",
+    "watchedThresholdMovieDesc": "",
     "watchedThresholdMusic": "Drempelwaarde voor bekeken track",
-    "watchedThresholdMusicDesc": "Het percentage van een nummer dat nog afgespeeld moet worden voordat het als voltooid wordt gemarkeerd",
+    "watchedThresholdMusicDesc": "",
     "watchedThresholdSuffix": "",
     "watchedThresholdTv": "Drempelwaarde voor bekeken tv afleveringen",
-    "watchedThresholdTvDesc": "Het percentage van een aflevering dat bekeken moet worden voordat deze als voltooid wordt gemarkeerd"
+    "watchedThresholdTvDesc": ""
   },
   "import": {
     "apiKeyHelp": "Gevonden in Tautulli instellingen → Web Interface → API Key.",
@@ -275,7 +275,7 @@
     "backfill": "",
     "cleanup": "Opschonen",
     "delayed": "vertraagde",
-    "description": "Beheer achtergrondtaken die uw gegevens accuraat en geoptimaliseerd houden.",
+    "description": "",
     "errors": "fouten",
     "jobHistory": "Taakgeschiedenis",
     "jobHistoryDesc": "Recente onderhoudswerkzaamheden",
@@ -329,7 +329,7 @@
     "pairNewDevice": "Nieuw apparaat koppelen",
     "pairNewDeviceDesc": "Scan de QR-code met de Tracearr app of voer de token handmatig in.",
     "pairYourDevice": "Koppel je apparaat",
-    "pairYourDeviceDesc": "Scan de QR-code met de Tracearr app om deze server te verbinden.",
+    "pairYourDeviceDesc": "",
     "pendingTokens": "{{count}} hangende paar tokens",
     "removeDevice": "Apparaat verwijderen",
     "removeDeviceConfirm": "Weet u zeker dat u {{deviceName}}wilt verwijderen? Dit apparaat zal opnieuw moeten koppelen om opnieuw te verbinden.",
@@ -457,7 +457,7 @@
     "authorize": "Autoriseren in Tailscale",
     "awaitingAuth": "Wachten op autorisatie...",
     "connected": "Tailscale is verbonden. Je Tracearr-instantie is beschikbaar op het tailnet.",
-    "description": "Krijg veilig toegang tot Tracearr op je Tailscale-netwerk zonder poortforwarding.",
+    "description": "",
     "disable": "Tailscale uitschakelen",
     "disableConfirmDescription": "Dit zal de verbinding van Tracearr met je tailnet verbreken. Je kunt dit opnieuw inschakelen zonder autorisatie.",
     "disableConfirmTitle": "Tailscale uitschakelen?",

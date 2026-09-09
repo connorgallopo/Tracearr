@@ -457,7 +457,7 @@
     "authorize": "在 Tailscale 中認證",
     "awaitingAuth": "正在等待認證……",
     "connected": "Tailscale 已連接。你的 Tracearr 已在 tailnet 上可用。",
-    "description": "在你的 Tailscale 網路上安全訪問 Tracearr，無須端口轉發。",
+    "description": "",
     "disable": "停用 Tailscale",
     "disableConfirmDescription": "這將使 Tracearr 與你的 tailnet 中斷連接。你可以在不重新認證的情況下重新啟用。",
     "disableConfirmTitle": "停用 Tailscale？",

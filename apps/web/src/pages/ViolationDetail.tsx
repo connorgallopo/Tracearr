@@ -591,7 +591,7 @@ export function ViolationDetail() {
           </CardHeader>
           <CardContent>
             <DataTableRoot>
-              <DataTableViewport>
+              <DataTableViewport flush>
                 <DataTableHeader table={sessionsTable} />
                 <DataTableBody
                   table={sessionsTable}

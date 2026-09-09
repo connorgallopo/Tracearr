@@ -1418,7 +1418,7 @@
       "avgPerItem": "Průměr za položku",
       "bingeHighlights": "Zvýraznění Binge",
       "bingeHighlightsDesc": "Zobrazí s nejintenzivnějším obrazcem",
-      "bingeSessions": "binge relace",
+      "bingeSessions": "",
       "busiest": "Nejlepší:",
       "completed": "Dokončeno",
       "description": "Zobrazení chování a zapojení obsahu",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Propojit další účet Plex",
       "linkPlexAccount": "Propojit účet Plex",
       "linkedAccounts": "Propojené Plex účty",
-      "linkedAccountsDesc": "Spravujte Plex účty, ze kterých můžete přidat servery.",
+      "linkedAccountsDesc": "",
       "linking": "Propojování...",
       "local": "Místní",
       "loginEnabled": "Přihlášení povoleno",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Zatím žádná aktivita",
-    "noActivityDesc": "Začněte streamovat, abyste zde viděli své nejlepší uživatele",
+    "noActivityDesc": "",
     "runnersUp": "Runnery nahoru",
     "top3": "Horní 3"
   },

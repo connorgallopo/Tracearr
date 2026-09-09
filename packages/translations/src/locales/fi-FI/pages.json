@@ -1418,7 +1418,7 @@
       "avgPerItem": "avg per kohde",
       "bingeHighlights": "Bingen Yksityiskohdat",
       "bingeHighlightsDesc": "Näyttää intensiivisimmällä katselumallilla",
-      "bingeSessions": "binge istuntoja",
+      "bingeSessions": "",
       "busiest": "Mutta:",
       "completed": "Valmis",
       "description": "Näytön käyttäytyminen ja sisällön sitoutuminen",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Linkitä Toinen Plex -tili",
       "linkPlexAccount": "Linkitä Plex Tili",
       "linkedAccounts": "Yhdistetyt Plex Tilit",
-      "linkedAccountsDesc": "Hallitse Plex tilejä, joita voit lisätä palvelimia.",
+      "linkedAccountsDesc": "",
       "linking": "Yhdistetään...",
       "local": "Paikallinen",
       "loginEnabled": "Kirjautuminen Käytössä",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
-    "noActivityDesc": "Aloita streaming nähdäksesi alkuun käyttäjät täällä",
+    "noActivityDesc": "",
     "runnersUp": "Juoksijat Ylös",
     "top3": ""
   },

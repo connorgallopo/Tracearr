@@ -1418,7 +1418,7 @@
       "avgPerItem": "średnia na przedmiot",
       "bingeHighlights": "Podkreślenia Binge",
       "bingeHighlightsDesc": "Pokazuje z najbardziej intensywnymi wzorcami oglądania",
-      "bingeSessions": "sesje binge",
+      "bingeSessions": "",
       "busiest": "",
       "completed": "Zakończone",
       "description": "Przeglądanie zachowań i treści",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Połącz kolejne konto Plex",
       "linkPlexAccount": "Połącz konto Plex",
       "linkedAccounts": "Połączone konta Plex",
-      "linkedAccountsDesc": "Zarządzaj kontami Plex, z których możesz dodawać serwery.",
+      "linkedAccountsDesc": "",
       "linking": "Łączenie...",
       "local": "Lokalny",
       "loginEnabled": "Logowanie włączone",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Brak aktywności",
-    "noActivityDesc": "Rozpocznij przesyłanie strumieniowe, aby zobaczyć tutaj najlepszych użytkowników",
+    "noActivityDesc": "",
     "runnersUp": "Robotnicy w górę",
     "top3": ""
   },

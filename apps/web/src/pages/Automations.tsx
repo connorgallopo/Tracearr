@@ -573,7 +573,7 @@ export function Automations() {
             </EmptyState>
           ) : (
             <DataTableRoot density="default">
-              <DataTableViewport>
+              <DataTableViewport flush>
                 <DataTableHeader table={table} />
                 <DataTableBody
                   table={table}

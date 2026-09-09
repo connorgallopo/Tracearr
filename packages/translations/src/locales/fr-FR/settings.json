@@ -1,7 +1,7 @@
 {
   "accessControl": {
     "allowGuestAccess": "Autoriser l'accès aux invités",
-    "allowGuestAccessDesc": "Lorsque désactivé, seul le propriétaire du serveur peut se connecter à Tracearr",
+    "allowGuestAccessDesc": "",
     "description": "Configurer qui peut accéder à Tracearr",
     "singleOwnerNote": "Remarque : Lorsque l'accès des invités est désactivé, seul le propriétaire du serveur peut se connecter. Tous les autres utilisateurs verront un message \"Accès refusé\".",
     "title": "Contrôle d'accès"
@@ -158,9 +158,9 @@
     "regenerateApiKey": "Régénérer la clé API ?",
     "regenerateApiKeyDesc": "Ceci invalidera votre clé API actuelle. Toute intégration utilisant l'ancienne clé cessera de fonctionner.",
     "sessionSync": "Synchronisation de session",
-    "sessionSyncDesc": "Activer le suivi de session pour vos serveurs multimédia",
+    "sessionSyncDesc": "",
     "syncInterval": "Intervalle de synchronisation",
-    "syncIntervalDesc": "Fréquence de vote pour Jellyfin/Emby (5-300 secondes)",
+    "syncIntervalDesc": "",
     "syncIntervalSuffix": "s",
     "theme": "Thème",
     "themeDark": "Sombre",
@@ -173,7 +173,7 @@
     "timezone": "Fuseau horaire",
     "title": "Réglages généraux",
     "unitSystem": "Système d'unité",
-    "unitSystemDesc": "Choisir comment les distances et les vitesses sont affichées",
+    "unitSystemDesc": "",
     "updateChecks": {
       "description": "Tracearr recherche des nouvelles versions toutes les six heures. Les notifications proviennent de n'importe quelle automation qui écoute les déclencheurs de mise à jour.",
       "plugin": "Plugin en temps réel",
@@ -183,12 +183,12 @@
       "title": "Vérifications des mises à jour"
     },
     "watchedThresholdMovie": "Seuil de visionnement du film",
-    "watchedThresholdMovieDesc": "Pourcentage d'un film qu'il faut avoir regardé avant de pouvoir le marquer comme terminé",
+    "watchedThresholdMovieDesc": "",
     "watchedThresholdMusic": "Seuil de suivi des visionnages",
-    "watchedThresholdMusicDesc": "Pourcentage d'un morceau qui doit être écouté avant qu'il ne soit considéré comme terminé",
+    "watchedThresholdMusicDesc": "",
     "watchedThresholdSuffix": "%",
     "watchedThresholdTv": "Seuil d'épisode regardé",
-    "watchedThresholdTvDesc": "Pourcentage d'un épisode qu'il faut avoir regardé avant de pouvoir le marquer comme terminé"
+    "watchedThresholdTvDesc": ""
   },
   "import": {
     "apiKeyHelp": "Trouvé dans les paramètres Tautulli → Interface Web → Clé d'API.",
@@ -275,7 +275,7 @@
     "backfill": "Remplissage",
     "cleanup": "Nettoyage",
     "delayed": "différé",
-    "description": "Gérer les tâches de fond qui gardent vos données exactes et optimisées.",
+    "description": "",
     "errors": "erreurs",
     "jobHistory": "Historique des tâches",
     "jobHistoryDesc": "Exécution récente d'une tâche de maintenance",
@@ -329,7 +329,7 @@
     "pairNewDevice": "Associer un nouvel appareil",
     "pairNewDeviceDesc": "Scannez le code QR avec l'application mobile Tracearr ou saisissez le jeton manuellement.",
     "pairYourDevice": "Associer votre appareil",
-    "pairYourDeviceDesc": "Scannez le code QR avec l'application Tracearr pour connecter ce serveur.",
+    "pairYourDeviceDesc": "",
     "pendingTokens": "{{count}} token en attente",
     "removeDevice": "Supprimer l'appareil",
     "removeDeviceConfirm": "Êtes-vous sûr de vouloir supprimer {{deviceName}}? Cet appareil devra être relié à nouveau pour se reconnecter.",
@@ -457,7 +457,7 @@
     "authorize": "Autoriser dans Tailscale",
     "awaitingAuth": "En attente d'autorisation...",
     "connected": "Tailscale est connecté. Votre instance Tracearr est disponible sur le tailnet.",
-    "description": "Accédez à Tracearr en toute sécurité sur votre réseau Tailscale, sans redirection de port.",
+    "description": "",
     "disable": "Désactiver Tailscale",
     "disableConfirmDescription": "Cela déconnectera Tracearr de votre tailnet. Vous pourrez le réactiver sans avoir à l'autoriser de nouveau.",
     "disableConfirmTitle": "Désactiver Tailscale ?",

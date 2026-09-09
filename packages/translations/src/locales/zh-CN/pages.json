@@ -1418,7 +1418,7 @@
       "avgPerItem": "每个项目avg",
       "bingeHighlights": "Binge 高光",
       "bingeHighlightsDesc": "显示最密集视图模式",
-      "bingeSessions": "Binge 会话",
+      "bingeSessions": "",
       "busiest": "最重要的版本：",
       "completed": "已完成",
       "description": "查看行为和内容接触",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "链接另一个Plex账户",
       "linkPlexAccount": "链接Plex账户",
       "linkedAccounts": "链接的Plex账户",
-      "linkedAccountsDesc": "管理您可以添加服务器的 Plex账户。",
+      "linkedAccountsDesc": "",
       "linking": "正在连接……",
       "local": "本地",
       "loginEnabled": "登录已启用",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "尚无活动",
-    "noActivityDesc": "开始串流以在这里查看您的顶级用户",
+    "noActivityDesc": "",
     "runnersUp": "向上运行者",
     "top3": "顶部3"
   },

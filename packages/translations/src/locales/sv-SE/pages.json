@@ -1418,7 +1418,7 @@
       "avgPerItem": "genomsnitt per objekt",
       "bingeHighlights": "Binge Höjdpunkter",
       "bingeHighlightsDesc": "Visar med de mest intensiva visningsmönstren",
-      "bingeSessions": "binge sessioner",
+      "bingeSessions": "",
       "busiest": "",
       "completed": "Slutförd",
       "description": "Visa beteende och innehåll engagemang",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Länka ett annat Plex-konto",
       "linkPlexAccount": "Länka Plex-konto",
       "linkedAccounts": "Länkade Plex-konton",
-      "linkedAccountsDesc": "Hantera Plex-konton som du kan lägga till servrar från.",
+      "linkedAccountsDesc": "",
       "linking": "Länka...",
       "local": "Lokal",
       "loginEnabled": "Inloggning aktiverad",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet ännu",
-    "noActivityDesc": "Börja strömma för att se dina toppanvändare här",
+    "noActivityDesc": "",
     "runnersUp": "Löpare upp",
     "top3": "Topp 3"
   },

@@ -1418,7 +1418,7 @@
       "avgPerItem": "avg pro Artikel",
       "bingeHighlights": "Scharnier-Highlights",
       "bingeHighlightsDesc": "Zeigt mit den intensivsten Ansichtsmustern",
-      "bingeSessions": "binge Sitzungen",
+      "bingeSessions": "",
       "busiest": "",
       "completed": "Abgeschlossen",
       "description": "Verhalten und Content-Verlobung anzeigen",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Weiteres Plex-Konto verknüpfen",
       "linkPlexAccount": "Plex-Konto verknüpfen",
       "linkedAccounts": "Verknüpfte Plex-Konten",
-      "linkedAccountsDesc": "Verwalten Sie die Plex-Konten, von denen Sie Server hinzufügen können.",
+      "linkedAccountsDesc": "",
       "linking": "Verknüpfen...",
       "local": "Lokal",
       "loginEnabled": "Anmeldung aktiviert",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Noch keine Aktivität",
-    "noActivityDesc": "Starte Streaming, um deine Top-Nutzer hier zu sehen",
+    "noActivityDesc": "",
     "runnersUp": "Läufer oben",
     "top3": "Oben 3"
   },

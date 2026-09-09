@@ -30,7 +30,7 @@
     "openSettings": "설정 열기",
     "previous": "이전",
     "refresh": "새로 고침",
-    "reload": "",
+    "reload": "새로고침",
     "remove": "제거",
     "reset": "초기화",
     "retry": "다시 시도",
@@ -65,8 +65,8 @@
   "count": {
     "alert_one": "알림 {{count}}개",
     "alert_other": "알림 {{count}}개",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "자동화 {{count}}개",
+    "automation_other": "자동화 {{count}}개",
     "channel_one": "",
     "channel_other": "",
     "device_one": "기기 {{count}}대",
@@ -139,17 +139,17 @@
     "unexpectedError": "예상치 못한 오류가 발생했습니다. 다시 시도해 주세요."
   },
   "filters": {
-    "anyDate": "",
-    "clearAll": "",
-    "clearDates": "",
-    "clearEndDate": "",
-    "clearSearch": "",
-    "clearStartDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "done": "",
-    "remove": ""
+    "anyDate": "모든 날짜",
+    "clearAll": "모두 지우기",
+    "clearDates": "날짜 범위 지우기",
+    "clearEndDate": "종료일 지우기",
+    "clearSearch": "검색어 지우기",
+    "clearStartDate": "시작일 지우기",
+    "dateAfter": "{{date}} 이후",
+    "dateBefore": "{{date}} 이전",
+    "dateBetween": "{{from}}~{{to}}",
+    "done": "완료",
+    "remove": "{{label}} 필터 제거"
   },
   "labels": {
     "actions": "작업",
@@ -219,7 +219,7 @@
     "photo": "사진",
     "track": "트랙",
     "track_plural": "트랙",
-    "tv": "",
+    "tv": "TV",
     "tvShows": "TV 프로그램"
   },
   "messages": {
@@ -264,15 +264,15 @@
     "searchUsers": "사용자 검색..."
   },
   "serverSelector": {
-    "all": "",
-    "noMatches": "",
-    "search": "",
-    "some": ""
+    "all": "모든 서버",
+    "noMatches": "서버를 찾지 못했습니다",
+    "search": "서버 검색...",
+    "some": "서버 {{count}}개 중 {{total}}개"
   },
   "servers": {
-    "emby": "",
-    "jellyfin": "",
-    "plex": ""
+    "emby": "Emby",
+    "jellyfin": "Jellyfin",
+    "plex": "Plex"
   },
   "severity": {
     "high": "높음",
@@ -302,17 +302,17 @@
     "success": "성공"
   },
   "table": {
-    "pageOf": "",
-    "pagination": "",
+    "pageOf": "{{page}}페이지 중 {{total}}페이지",
+    "pagination": "페이지 이동",
     "selectAllOnPage": "이 페이지의 항목 모두 선택",
     "selectRow": "행 선택"
   },
   "tasks": {
-    "queued": "",
-    "running": "",
-    "startedAgo": "",
-    "title": "",
-    "waiting": ""
+    "queued": "대기열에 추가됨",
+    "running": "실행 중",
+    "startedAgo": "{{time}}에 시작",
+    "title": "실행 중인 작업",
+    "waiting": "대기 중"
   },
   "time": {
     "allTime": "전체 기간",
@@ -323,15 +323,15 @@
     "yesterday": "어제"
   },
   "trust": {
-    "caution": "",
-    "trusted": "",
-    "untrusted": ""
+    "caution": "주의",
+    "trusted": "신뢰",
+    "untrusted": "신뢰하지 않음"
   },
   "units": {
-    "km": "",
-    "kmh": "",
-    "mi": "",
-    "mph": ""
+    "km": "km",
+    "kmh": "km/h",
+    "mi": "mi",
+    "mph": "mph"
   },
   "validation": {
     "invalidEmail": "올바른 이메일 주소를 입력하세요",

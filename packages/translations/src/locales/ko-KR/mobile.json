@@ -10,8 +10,8 @@
     "enterManually": "URL과 토큰 직접 입력",
     "cameraPermissionRequired": "QR 코드를 스캔하려면 카메라 권한이 필요합니다",
     "scanQrInstructions": "Tracearr 대시보드에서 설정 > 모바일 앱을 열고 QR 코드를 스캔하세요",
-    "urlPlaceholder": "",
-    "tokenPlaceholder": "",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "tokenPlaceholder": "trr_mob_...",
     "missingToken": "토큰 없음",
     "pleaseEnterToken": "접근 토큰을 입력하세요"
   },
@@ -43,13 +43,13 @@
     "configureNotifications": "푸시 알림 환경설정 구성",
     "language": "언어",
     "community": "커뮤니티",
-    "discord": "",
+    "discord": "Discord",
     "joinCommunity": "커뮤니티 참여",
     "docs": "문서",
     "readDocs": "문서 보기",
     "website": "웹사이트",
     "visitWebsite": "tracearr.com 방문",
-    "github": "",
+    "github": "GitHub",
     "viewSourceCode": "소스 코드 보기",
     "sponsor": "후원",
     "supportDevelopment": "개발 지원",
@@ -69,8 +69,8 @@
     "navigation": "탐색"
   },
   "resources": {
-    "cpu": "",
-    "ram": ""
+    "cpu": "CPU",
+    "ram": "RAM"
   },
   "notifications": {
     "testSent": "테스트 전송됨",
@@ -157,22 +157,22 @@
     "servers": "서버",
     "selectServers": "서버 선택",
     "serversSelected": "전체 {{total}}대 중 {{selected}}대 선택됨",
-    "allServers": ""
+    "allServers": "모든 서버"
   },
   "reconnected": "다시 연결됨",
   "actionsExecuted": "실행된 작업",
   "serverScope": {
-    "single": ""
+    "single": "{{name}}만 표시 중"
   },
   "a11y": {
-    "selectServer": "",
-    "alerts": "",
-    "alertsCount": "",
-    "settings": "",
-    "trustScore": ""
+    "selectServer": "서버 선택",
+    "alerts": "알림",
+    "alertsCount": "알림, 읽지 않음 {{count}}개",
+    "settings": "설정",
+    "trustScore": "신뢰 점수 {{score}}"
   },
   "map": {
-    "noData": "",
-    "unavailable": ""
+    "noData": "위치 데이터가 없습니다",
+    "unavailable": "지도를 사용할 수 없습니다"
   }
 }

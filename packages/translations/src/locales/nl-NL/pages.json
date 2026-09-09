@@ -1418,7 +1418,7 @@
       "avgPerItem": "gem. per artikel",
       "bingeHighlights": "Rand accentueringen",
       "bingeHighlightsDesc": "Toont de meest intensieve kijkpatronen",
-      "bingeSessions": "buik sessies",
+      "bingeSessions": "",
       "busiest": "",
       "completed": "Voltooid",
       "description": "Gedrag en content betrokkenheid bekijken",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Nog een Plex-account koppelen",
       "linkPlexAccount": "Plex-account koppelen",
       "linkedAccounts": "Gekoppelde Plex-accounts",
-      "linkedAccountsDesc": "Beheer de Plex-accounts waarvan je servers kunt toevoegen.",
+      "linkedAccountsDesc": "",
       "linking": "Koppelen...",
       "local": "Lokaal",
       "loginEnabled": "Aanmelden ingeschakeld",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Nog geen activiteit",
-    "noActivityDesc": "Start met streamen om je top gebruikers hier te zien",
+    "noActivityDesc": "",
     "runnersUp": "Runners Omhoog",
     "top3": ""
   },

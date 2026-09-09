@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "連接另一個 Plex 帳號",
       "linkPlexAccount": "連接 Plex 帳號",
       "linkedAccounts": "已連接的 Plex 帳號",
-      "linkedAccountsDesc": "管理您可以新增伺服器的 Plex 帳戶。",
+      "linkedAccountsDesc": "",
       "linking": "正在連接……",
       "local": "",
       "loginEnabled": "登入已啟用",

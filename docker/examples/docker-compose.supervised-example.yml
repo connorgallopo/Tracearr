@@ -16,7 +16,7 @@
 # Then open http://your-server:3000
 #
 # OPTIONAL ENVIRONMENT VARIABLES:
-#   PORT=3000              # External port mapping
+#   PORT=3000              # Host port to publish on (the container always listens on 3000)
 #   TZ=UTC                 # Timezone (e.g., America/New_York)
 #   LOG_LEVEL=info         # Log level (debug, info, warn, error)
 #   PG_MAX_MEMORY=2GB      # PostgreSQL memory (default: mem_limit minus a Node/Redis reserve,

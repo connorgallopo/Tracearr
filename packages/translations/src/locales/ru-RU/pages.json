@@ -1418,7 +1418,7 @@
       "avgPerItem": "в среднем за единицу",
       "bingeHighlights": "Отметины на Бинге",
       "bingeHighlightsDesc": "Показывает с самыми интенсивными шаблонами просмотра",
-      "bingeSessions": "стыковочные сессии",
+      "bingeSessions": "",
       "busiest": "",
       "completed": "Выполнено",
       "description": "Просмотр поведения и вовлечения контента",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Связать другой аккаунт Plex",
       "linkPlexAccount": "Связать аккаунт Plex",
       "linkedAccounts": "Связанные Plex аккаунты",
-      "linkedAccountsDesc": "Управление аккаунтами Plex, с которых можно добавлять сервера.",
+      "linkedAccountsDesc": "",
       "linking": "Связь...",
       "local": "Локальный",
       "loginEnabled": "Вход включен",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Нет активности",
-    "noActivityDesc": "Начните поток, чтобы увидеть ваших топ пользователей здесь",
+    "noActivityDesc": "",
     "runnersUp": "Бегуны вверх",
     "top3": "Топ 3"
   },

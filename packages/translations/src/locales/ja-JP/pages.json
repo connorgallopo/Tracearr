@@ -1418,7 +1418,7 @@
       "avgPerItem": "項目あたりの平均値",
       "bingeHighlights": "Bingeハイライト",
       "bingeHighlightsDesc": "最も集中的な表示パターンで表示",
-      "bingeSessions": "bingeセッション",
+      "bingeSessions": "",
       "busiest": "最も印象的な:",
       "completed": "完了",
       "description": "行動とコンテンツエンゲージメントを表示",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "別のプレックスアカウントにリンク",
       "linkPlexAccount": "プレックスアカウントをリンク",
       "linkedAccounts": "リンクされたプレックスアカウント",
-      "linkedAccountsDesc": "サーバーを追加できるプレックスアカウントを管理します。",
+      "linkedAccountsDesc": "",
       "linking": "リンクしています...",
       "local": "ローカル",
       "loginEnabled": "ログインが有効です",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "アクティビティはまだありません",
-    "noActivityDesc": "あなたのトップユーザーをここで見るためにストリーミングを開始します",
+    "noActivityDesc": "",
     "runnersUp": "Runner Up",
     "top3": "トップ 3"
   },

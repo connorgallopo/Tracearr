@@ -1418,7 +1418,7 @@
       "avgPerItem": "avg ανά αντικείμενο",
       "bingeHighlights": "Στιγμιότυπα Binge",
       "bingeHighlightsDesc": "Εμφανίζεται με τα πιο εντατικά μοτίβα προβολής",
-      "bingeSessions": "συνεδρίες binge",
+      "bingeSessions": "",
       "busiest": "Αγοράστε:",
       "completed": "Ολοκληρώθηκε",
       "description": "Προβολή συμπεριφοράς και εμπλοκής περιεχομένου",
@@ -1905,7 +1905,7 @@
       "linkAnotherAccount": "Σύνδεση Άλλου Λογαριασμού Plex",
       "linkPlexAccount": "Σύνδεση Λογαριασμού Plex",
       "linkedAccounts": "Συνδεδεμένοι Λογαριασμοί Plex",
-      "linkedAccountsDesc": "Διαχειριστείτε τους λογαριασμούς Plex μπορείτε να προσθέσετε διακομιστές.",
+      "linkedAccountsDesc": "",
       "linking": "Σύνδεση...",
       "local": "Τοπικό",
       "loginEnabled": "Ενεργοποίηση Σύνδεσης",
@@ -1947,7 +1947,7 @@
   },
   "statsUsers": {
     "noActivity": "Καμία δραστηριότητα ακόμα",
-    "noActivityDesc": "Ξεκινήστε να κάνετε streaming για να δείτε τους κορυφαίους χρήστες σας εδώ",
+    "noActivityDesc": "",
     "runnersUp": "Επάνω Δρομείς",
     "top3": "Κορυφή 3"
   },
