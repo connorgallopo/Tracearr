@@ -11,8 +11,8 @@
  * - a show's state compares distinct watched episodes against the episodes
  *   actually present on the server, so min_state filtering happens before the
  *   page is sliced rather than after.
- * - the dual lens returns titles only other people watched, with the lens
- *   identity's own state alongside the all-users state.
+ * - user_id scopes the whole aggregate rather than annotating rows, so a
+ *   two-tone badge is built from the difference of two pulls.
  *
  * Every call scopes to its own server so a worker database shared with other
  * seeded suites can't leak rows into the assertions.
@@ -99,9 +99,8 @@ describe('listWatchedMedia', () => {
 
     const { data } = await listWatchedMedia({
       kind: 'movie',
-      lensUserId: null,
+      userId: null,
       serverIds: [server.id],
-      windowDays: null,
       minState: 'watched',
       pageSize: 100,
       cursorValue: null,
@@ -112,7 +111,6 @@ describe('listWatchedMedia', () => {
     expect(movie?.tmdb_id).toBe(710001);
     expect(movie?.title).toBe('Listed Movie');
     expect(movie?.plays).toBe(1);
-    expect(movie?.watched_state_user).toBeNull();
     // The episode's own media_id is set on its session row, so without the
     // media_type guard it would join into the movie list as a "movie".
     expect(data.some((row) => row.media_id === episodeId)).toBe(false);
@@ -169,9 +167,8 @@ describe('listWatchedMedia', () => {
     const listShows = (minState: 'watched' | 'partial') =>
       listWatchedMedia({
         kind: 'show',
-        lensUserId: null,
+        userId: null,
         serverIds: [server.id],
-        windowDays: null,
         minState,
         pageSize: 100,
         cursorValue: null,
@@ -208,33 +205,43 @@ describe('listWatchedMedia', () => {
     expect(completeRow?.episodes_watched).toBe(2);
   });
 
-  it('returns a title only other people watched, with the lens identity marked unwatched', async () => {
+  it('scopes the whole result to one identity, so the badge is a set difference', async () => {
     const server = await createTestServer({ type: 'plex' });
     const viewer = await createTestUser({ role: 'member' });
     const other = await createTestUser({ role: 'member' });
     const viewerAccount = await createTestServerUser({ userId: viewer.id, serverId: server.id });
     const otherAccount = await createTestServerUser({ userId: other.id, serverId: server.id });
 
-    const sharedId = await resolveMediaForItem({
+    const mineId = await resolveMediaForItem({
       mediaType: 'movie',
       tmdbId: 730001,
-      title: 'Watched By Both',
+      title: 'Watched By Viewer',
       year: 2024,
       serverId: server.id,
-      ratingKey: 'shared-movie',
+      ratingKey: 'mine-movie',
     });
-    const othersOnlyId = await resolveMediaForItem({
+    const theirsId = await resolveMediaForItem({
       mediaType: 'movie',
       tmdbId: 730002,
       title: 'Watched By Others Only',
       year: 2024,
       serverId: server.id,
-      ratingKey: 'others-movie',
+      ratingKey: 'theirs-movie',
+    });
+    const sharedId = await resolveMediaForItem({
+      mediaType: 'movie',
+      tmdbId: 730003,
+      title: 'Watched By Both',
+      year: 2024,
+      serverId: server.id,
+      ratingKey: 'shared-movie',
     });
 
     for (const [mediaId, ratingKey, account] of [
+      [mineId, 'mine-movie', viewerAccount],
+      [theirsId, 'theirs-movie', otherAccount],
       [sharedId, 'shared-movie', viewerAccount],
-      [othersOnlyId, 'others-movie', otherAccount],
+      [sharedId, 'shared-movie', otherAccount],
     ] as const) {
       await createTestSession({
         serverId: server.id,
@@ -251,24 +258,180 @@ describe('listWatchedMedia', () => {
 
     await refreshPlaysAggregate();
 
+    const listMovies = (userId: string | null) =>
+      listWatchedMedia({
+        kind: 'movie',
+        userId,
+        serverIds: [server.id],
+        minState: 'watched',
+        pageSize: 100,
+        cursorValue: null,
+      });
+
+    const everyone = await listMovies(null);
+    const mine = await listMovies(viewer.id);
+
+    const everyoneIds = everyone.data.map((row) => row.media_id);
+    const mineIds = mine.data.map((row) => row.media_id);
+
+    expect(everyoneIds).toContain(mineId);
+    expect(everyoneIds).toContain(theirsId);
+    // The scoped pull is a strict subset: a title this identity never played is
+    // absent, not present with an unwatched marker.
+    expect(mineIds.sort()).toEqual([mineId, sharedId].sort());
+    // Which makes the two-tone badge a set difference: green is the scoped pull,
+    // orange is what is left of the unscoped one.
+    const othersOnly = everyoneIds.filter((id) => !mineIds.includes(id));
+    expect(othersOnly).toEqual([theirsId]);
+
+    // Scoping has to re-grain the measures too, not just the row set: the title
+    // both identities played counts once for the viewer and twice overall.
+    expect(mine.data.find((row) => row.media_id === sharedId)?.plays).toBe(1);
+    expect(everyone.data.find((row) => row.media_id === sharedId)?.plays).toBe(2);
+  });
+
+  it('scopes a show to one identity while the episode total stays server-wide', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const viewer = await createTestUser({ role: 'member' });
+    const other = await createTestUser({ role: 'member' });
+    const viewerAccount = await createTestServerUser({ userId: viewer.id, serverId: server.id });
+    const otherAccount = await createTestServerUser({ userId: other.id, serverId: server.id });
+
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 760001,
+      title: 'Split Between Two',
+      year: 2025,
+      serverId: server.id,
+      ratingKey: 'split-show',
+    });
+    const episodeIds: string[] = [];
+    for (const [index, key] of ['split-ep-1', 'split-ep-2'].entries()) {
+      const episodeId = await resolveMediaForItem({
+        mediaType: 'episode',
+        tvdbId: 760010 + index,
+        title: `Split Episode ${index + 1}`,
+        year: 2025,
+        serverId: server.id,
+        ratingKey: key,
+        showMediaId: showId,
+      });
+      await createTestLibraryItem({
+        serverId: server.id,
+        ratingKey: key,
+        mediaType: 'episode',
+        mediaId: episodeId,
+      });
+      episodeIds.push(episodeId);
+    }
+
+    // Between them the household has finished the show; neither identity has.
+    for (const [episodeId, ratingKey, account] of [
+      [episodeIds[0], 'split-ep-1', viewerAccount],
+      [episodeIds[1], 'split-ep-2', otherAccount],
+    ] as const) {
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        mediaType: 'episode',
+        mediaId: episodeId,
+        showMediaId: showId,
+        ratingKey,
+        durationMs: 1_800_000,
+        totalDurationMs: 1_800_000,
+        referenceId: null,
+        watched: true,
+      });
+    }
+
+    await refreshPlaysAggregate();
+
+    const listShows = (userId: string | null, minState: 'watched' | 'partial') =>
+      listWatchedMedia({
+        kind: 'show',
+        userId,
+        serverIds: [server.id],
+        minState,
+        pageSize: 100,
+        cursorValue: null,
+      });
+
+    const household = await listShows(null, 'watched');
+    expect(household.data.find((row) => row.media_id === showId)?.watched_state).toBe('watched');
+
+    // The denominator must stay server-wide. Scoping it to the identity too
+    // would make one-of-one look complete and mark the show watched for both.
+    const scopedWatched = await listShows(viewer.id, 'watched');
+    expect(scopedWatched.data.some((row) => row.media_id === showId)).toBe(false);
+
+    const scopedPartial = await listShows(viewer.id, 'partial');
+    const row = scopedPartial.data.find((r) => r.media_id === showId);
+    expect(row?.watched_state).toBe('partial');
+    expect(row?.episodes_watched).toBe(1);
+    expect(row?.episode_count).toBe(2);
+  });
+
+  it('places an episode row in its series with season and episode numbers', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser({ role: 'member' });
+    const account = await createTestServerUser({ userId: user.id, serverId: server.id });
+
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 750001,
+      title: 'Numbered Show',
+      year: 2022,
+      serverId: server.id,
+      ratingKey: 'numbered-show',
+    });
+    const episodeId = await resolveMediaForItem({
+      mediaType: 'episode',
+      tvdbId: 750010,
+      title: 'Numbered Episode',
+      year: 2022,
+      serverId: server.id,
+      ratingKey: 'numbered-ep',
+      showMediaId: showId,
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'numbered-ep',
+      mediaType: 'episode',
+      mediaId: episodeId,
+      parentIndex: 2,
+      itemIndex: 5,
+    });
+
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaType: 'episode',
+      mediaId: episodeId,
+      showMediaId: showId,
+      ratingKey: 'numbered-ep',
+      durationMs: 1_800_000,
+      totalDurationMs: 1_800_000,
+      referenceId: null,
+      watched: true,
+    });
+
+    await refreshPlaysAggregate();
+
     const { data } = await listWatchedMedia({
-      kind: 'movie',
-      lensUserId: viewer.id,
+      kind: 'episode',
+      userId: null,
       serverIds: [server.id],
-      windowDays: null,
       minState: 'watched',
       pageSize: 100,
       cursorValue: null,
     });
 
-    const own = data.find((row) => row.media_id === sharedId);
-    expect(own?.watched_state).toBe('watched');
-    expect(own?.watched_state_user).toBe('watched');
-
-    // The row set stays everyone who watched, so one call answers both badges:
-    // watched_state says somebody did, watched_state_user says it wasn't them.
-    const others = data.find((row) => row.media_id === othersOnlyId);
-    expect(others?.watched_state).toBe('watched');
-    expect(others?.watched_state_user).toBe('unwatched');
+    // An episode's own tvdb id is only set when the server supplied one, so the
+    // series id plus these numbers are what actually locate the episode.
+    const row = data.find((r) => r.media_id === episodeId);
+    expect(row?.season_number).toBe(2);
+    expect(row?.episode_number).toBe(5);
+    expect(row?.show_media_id).toBe(showId);
+    expect(row?.show_tvdb_id).toBe(750001);
   });
 });

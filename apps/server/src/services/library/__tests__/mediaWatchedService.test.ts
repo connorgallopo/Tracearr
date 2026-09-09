@@ -121,9 +121,8 @@ describe('buildAliasMapCte', () => {
 describe('buildMovieListQuery', () => {
   const base = {
     kind: 'movie' as const,
-    lensUserId: null,
+    userId: null,
     serverIds: undefined,
-    windowDays: null,
     minState: 'watched' as const,
     pageSize: 100,
     cursorValue: null,
@@ -143,14 +142,15 @@ describe('buildMovieListQuery', () => {
     expect(render()).toContain('GROUP BY COALESCE(am.merged_into_id, p.media_id)');
   });
 
-  it('emits null per-user columns when no lens identity is given', () => {
-    expect(render()).toContain('NULL::boolean AS watched_user, NULL::boolean AS has_plays_user');
+  it('aggregates across every identity when no user is given', () => {
+    expect(render()).toContain('WHERE am.media_type = $1 GROUP BY');
   });
 
-  it('filters the per-user aggregates to the lens identity when one is given', () => {
-    const query = render({ lensUserId: 'user-1' });
-    expect(query).toContain('BOOL_OR(p.any_watched) FILTER (WHERE su.user_id = $1)');
-    expect(query).toContain('SUM(p.plays) FILTER (WHERE su.user_id = $2)');
+  it('scopes the aggregate to one identity rather than annotating every row', () => {
+    // Filtering in the CTE re-grains plays, last_day and the state together, so
+    // one min_state covers both grains and a title the identity never played is
+    // absent instead of present-and-unwatched.
+    expect(render({ userId: 'user-1' })).toContain('WHERE am.media_type = $1 AND su.user_id = $2');
   });
 
   it('widens the state filter to started titles when min_state is partial', () => {
@@ -162,14 +162,21 @@ describe('buildMovieListQuery', () => {
     expect(query).toContain('(c.last_day, c.canonical_id) < ($2::timestamptz, $3::uuid)');
     expect(query).toContain('ORDER BY c.last_day DESC, c.canonical_id DESC');
   });
+
+  it('joins library_items for season and episode numbers only on the episode branch', () => {
+    // The lateral runs per surviving candidate, not per returned row, and a
+    // movie has no season or episode of its own.
+    expect(render({ kind: 'episode' })).toContain('SELECT li.parent_index, li.item_index');
+    expect(render()).not.toContain('li.parent_index');
+    expect(render()).toContain('NULL::int AS season_number');
+  });
 });
 
 describe('buildShowListQuery', () => {
   const base = {
     kind: 'show' as const,
-    lensUserId: null,
+    userId: null,
     serverIds: undefined,
-    windowDays: null,
     minState: 'watched' as const,
     pageSize: 100,
     cursorValue: null,
@@ -196,6 +203,12 @@ describe('buildShowListQuery', () => {
   it('counts an episode only when it is one of the active episodes', () => {
     expect(render()).toContain(
       'COUNT(DISTINCT p.media_id) FILTER ( WHERE p.any_watched AND ae.media_id IS NOT NULL )'
+    );
+  });
+
+  it('scopes the watched episode count to one identity when a user is given', () => {
+    expect(render({ userId: 'user-1' })).toContain(
+      'WHERE p.show_media_id IS NOT NULL AND su.user_id = $1'
     );
   });
 

@@ -1154,19 +1154,20 @@ const WatchedMediaQuery = z.object({
     .optional()
     .openapi({
       description:
-        'Identity to report watched_state_user for. The row set stays every identity that ' +
-        'watched the title, so media only other people watched still comes back, with ' +
-        'watched_state_user "unwatched"',
+        'Scope every row to one identity, as on /history. Omit it and the response describes ' +
+        'the whole install. A title this identity never played is absent rather than returned ' +
+        'as unwatched, so watched_state, plays, last_watched_day and episodes_watched all ' +
+        'describe that identity alone. episode_count stays server-wide, so a scoped show is ' +
+        'watched once that identity has seen every episode present on the server',
     }),
   server_id: z.uuid().optional().openapi({ description: 'Filter to specific server' }),
-  window: z.enum(['all_time', 'last_30', 'last_7']).default('all_time'),
   min_state: z
     .enum(['watched', 'partial'])
     .default('watched')
     .openapi({
       description:
-        'Lowest all-users state to include. "partial" also returns titles started but not ' +
-        'finished. Filtered on watched_state, never on watched_state_user',
+        'Lowest state to include, at whatever grain user_id set. "partial" also returns ' +
+        'titles started but not finished',
     }),
   cursor: z.string().optional().openapi({ description: 'Opaque cursor from meta.nextCursor' }),
   pageSize: z.coerce.number().int().positive().max(1000).default(100),
@@ -1191,22 +1192,36 @@ const WatchedMediaRecord = z
     show_tvdb_id: z.number().int().nullable().openapi({
       description: "Episode rows only: the series' tvdb id, since tvdb_id is the episode's own",
     }),
+    season_number: z
+      .number()
+      .int()
+      .nullable()
+      .openapi({
+        description:
+          'Episode rows only: season number. An episode carries a provider id of its own only ' +
+          'when the media server supplied one, so this and episode_number are the reliable way ' +
+          'to place an episode within show_tvdb_id',
+      }),
+    episode_number: z.number().int().nullable().openapi({
+      description: 'Episode rows only: episode number within the season',
+    }),
     watched_state: WatchedStateEnum.openapi({
-      description: 'State across every identity, matching the library UI with no user lens',
+      description:
+        'Watched or partial, for the user_id identity when one was given and across every ' +
+        'identity otherwise. Never unwatched: an unwatched title is simply absent',
     }),
-    watched_state_user: WatchedStateEnum.nullable().openapi({
-      description: "The user_id identity's own state; null when user_id was not supplied",
-    }),
-    plays: z.number().int().openapi({ description: 'Plays across every identity in the window' }),
+    plays: z.number().int().openapi({ description: 'Plays at the same grain as watched_state' }),
     last_watched_day: z.string().openapi({
-      description: 'Most recent UTC day with activity, YYYY-MM-DD (the rollup buckets by day)',
+      description:
+        'Most recent UTC day with activity, YYYY-MM-DD (the rollup buckets by day). Filter on ' +
+        'this client-side for a recent-activity view',
       example: '2026-08-30',
     }),
     episodes_watched: z
       .number()
       .int()
       .nullable()
-      .openapi({ description: 'Show rows only: distinct episodes watched by any identity' }),
+      .openapi({ description: 'Show rows only: distinct episodes watched, at the same grain' }),
     episode_count: z
       .number()
       .int()
@@ -1227,11 +1242,14 @@ registry.registerPath({
   description:
     'The distinct set of media with recorded engagement, newest activity first, for matching ' +
     'against an external library by tmdb/tvdb/imdb id. Absence from the result means ' +
-    'unwatched, so an unwatched title is never returned. A movie is watched once any play ' +
-    'passed 85% of its runtime; a show is watched once every episode present on the server ' +
-    'has been. A show with no episodes on any server is treated as unwatched and omitted. ' +
-    "Pass user_id to get that identity's state alongside the all-users state in one call. " +
-    WINDOW_SEMANTICS,
+    'unwatched, so an unwatched title is never returned. A movie is watched once a play passed ' +
+    "this server's watch-completion threshold (85% of runtime by default, configurable per " +
+    'media type in Settings); a show is watched once every episode present on the server has ' +
+    'been. A show with no episodes on any server is treated as unwatched and omitted. ' +
+    'To distinguish "this person watched it" from "somebody else did", pull twice, once with ' +
+    'user_id and once without: the scoped result is always a subset of the unscoped one, and ' +
+    'the difference is what other people watched. The first page of a result is cached for 60 ' +
+    'seconds; pages fetched with a cursor are always computed fresh.',
   security: [{ bearerAuth: [] }],
   request: { query: WatchedMediaQuery },
   responses: {
@@ -1277,7 +1295,8 @@ full set in one response.
 
 ## Filtering
 
-History, streams, watchers, and recently-added accept \`server_id\` to filter by media server.
+History, streams, watchers, recently-added, and watched-media accept \`server_id\` to filter
+by media server.
       `.trim(),
       contact: {
         name: 'Tracearr',
