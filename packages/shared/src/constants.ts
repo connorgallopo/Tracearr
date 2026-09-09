@@ -272,6 +272,11 @@ export const REDIS_KEYS = {
   // Public API v2 per-media stats/watchers responses
   PUBLIC_MEDIA_STATS: (cacheKey: string) =>
     `${_redisPrefix}tracearr:public:media-stats:${cacheKey}`,
+  // Ordered candidate list behind /watched-media. Its aggregate is O(the whole
+  // cagg) and the keyset predicate reads MAX()/BOOL_OR(), so it can only run
+  // after the group - paging it directly would re-aggregate everything per page.
+  PUBLIC_WATCHED_MEDIA: (cacheKey: string) =>
+    `${_redisPrefix}tracearr:public:watched-media:v1:${cacheKey}`,
 };
 
 // Cache TTLs in seconds

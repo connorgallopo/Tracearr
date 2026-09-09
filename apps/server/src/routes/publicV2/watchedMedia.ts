@@ -13,13 +13,9 @@
 
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { getCacheService } from '../../services/cache.js';
-import {
-  listWatchedMedia,
-  type WatchedMediaRecord,
-} from '../../services/library/mediaWatchedService.js';
+import { listWatchedMedia } from '../../services/library/mediaWatchedService.js';
 import { decodeCursor } from '../../utils/cursor.js';
-import { cursorPage, type CursorPage, type RouteConfig } from './shared.js';
+import { cursorPage, type RouteConfig } from './shared.js';
 
 const querySchema = z.object({
   media_type: z.enum(['movie', 'show', 'episode']),
@@ -58,29 +54,24 @@ export function registerWatchedMediaRoutes(app: FastifyInstance, routeConfig: Ro
         }
       }
 
-      // Only the first page is cached. A walking client never repeats a cursor,
-      // so per-cursor entries are written once and read never - and Redis runs
-      // maxmemory-policy noeviction for BullMQ, where filling it fails every
-      // write, job enqueues included.
-      const cache = cursor ? null : getCacheService();
-      const cacheKey = `watched-media:${kind}:${minState}:${userId ?? 'all'}:${serverId ?? 'all'}:${pageSize}`;
-      if (cache) {
-        const cached = await cache.getMediaStats<CursorPage<WatchedMediaRecord>>(cacheKey);
-        if (cached) return cached;
-      }
+      // No response cache: the expensive part is the ordered candidate list,
+      // which listWatchedMedia caches and single-flights per filter set. Caching
+      // whole pages as well would write a megabyte per cursor that no client
+      // ever reads back, into a Redis running maxmemory-policy noeviction for
+      // BullMQ, where filling it fails every write including job enqueues.
+      const { data, nextCursor } = await listWatchedMedia(
+        {
+          kind,
+          userId: userId ?? null,
+          serverIds: serverId ? [serverId] : undefined,
+          minState,
+          pageSize,
+          cursorValue,
+        },
+        app.redis
+      );
 
-      const { data, nextCursor } = await listWatchedMedia({
-        kind,
-        userId: userId ?? null,
-        serverIds: serverId ? [serverId] : undefined,
-        minState,
-        pageSize,
-        cursorValue,
-      });
-
-      const response = cursorPage(data, nextCursor, pageSize);
-      if (cache) await cache.setMediaStats(cacheKey, response);
-      return response;
+      return cursorPage(data, nextCursor, pageSize);
     }
   );
 }

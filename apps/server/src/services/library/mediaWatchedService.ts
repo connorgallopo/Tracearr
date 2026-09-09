@@ -1,8 +1,11 @@
 import { sql, type SQL } from 'drizzle-orm';
-import type { WatchedState } from '@tracearr/shared';
+import type { Redis } from 'ioredis';
+import { CACHE_TTL, REDIS_KEYS, type WatchedState } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { withComputeSingleFlight } from '../../routes/library/utils.js';
 import { encodeCursor } from '../../utils/cursor.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { uuidArraySql } from '../../utils/sqlArrays.js';
 
 export interface WatchedProbeArgs {
   /** Canonical movie media ids, page-batched (caller keeps <=100). */
@@ -201,7 +204,6 @@ export async function resolveWatchedStates(
 
   return result;
 }
-
 // ============================================================================
 // Watched-media listing
 //
@@ -212,9 +214,13 @@ export async function resolveWatchedStates(
 // of mapMovieWatchedRows and mapShowWatchedRows and must keep agreeing with
 // them, or a badge built on this endpoint contradicts the library UI.
 //
-// State is resolved in SQL rather than after the page is sliced: min_state
-// filters and the keyset cursor both read it, and applying either after LIMIT
-// would return short pages and pages that are empty behind a live cursor.
+// Paging is an index into a cached ordered candidate list, not a keyset over
+// the live aggregate. last_day is a MAX and watched_any a BOOL_OR, so any
+// predicate over them is semantically a HAVING and cannot run before the
+// group: a keyset walk re-aggregated the entire cagg once per page, making a
+// full pull cost pages x dataset. The candidate compute now runs once per TTL
+// per filter set, single-flighted, and a page is a bounded media lookup.
+// Same pattern as catalog.ts's getWatchedCandidates, for the same reason.
 //
 // userId scopes the whole aggregate, exactly as /history does, so every field
 // on a row describes that one identity. It is a filter, not an annotation: a
@@ -224,7 +230,7 @@ export async function resolveWatchedStates(
 export type WatchedMediaKind = 'movie' | 'show' | 'episode';
 
 /** Long enough for a cold full-catalog aggregate, short enough that a few
- * concurrent walks cannot pin the pool (which floors at 5 connections). */
+ * concurrent computes cannot pin the pool (which floors at 5 connections). */
 const WATCHED_LIST_TIMEOUT_MS = 15_000;
 
 export interface ListWatchedMediaArgs {
@@ -259,8 +265,26 @@ export interface WatchedMediaRecord {
   episode_count: number | null;
 }
 
-interface WatchedMediaQueryRow {
+/**
+ * One candidate, stored as a tuple rather than an object: the whole ordered
+ * list goes into Redis, which runs maxmemory-policy noeviction for BullMQ, so
+ * per-entry overhead is worth minimising.
+ * [canonical_id, last_day ISO, watched, has_plays, plays, eps_watched, episode_count]
+ */
+type CandidateTuple = [string, string, boolean, boolean, number, number | null, number | null];
+
+interface CandidateRow {
   canonical_id: string;
+  last_day: string;
+  watched_any: boolean | null;
+  has_plays_any: boolean;
+  plays: string | number;
+  eps_watched_any: number | null;
+  episode_count: number | null;
+}
+
+interface HydrationRow {
+  id: string;
   media_type: string;
   title: string;
   year: number | null;
@@ -274,46 +298,6 @@ interface WatchedMediaQueryRow {
   show_tvdb_id: number | null;
   season_number: number | null;
   episode_number: number | null;
-  plays: string | number;
-  last_day: string;
-  last_watched_day: string;
-  watched_any: boolean;
-  has_plays_any: boolean;
-  eps_watched_any: number | null;
-  episode_count: number | null;
-}
-
-function mapWatchedMediaRow(row: WatchedMediaQueryRow, isShow: boolean): WatchedMediaRecord {
-  const episodeCount = row.episode_count;
-  return {
-    media_id: row.canonical_id,
-    media_type: row.media_type,
-    title: row.title,
-    year: row.year,
-    imdb_id: row.imdb_id,
-    tmdb_id: row.tmdb_id,
-    tvdb_id: row.tvdb_id,
-    show_media_id: row.show_media_id,
-    show_title: row.show_title,
-    show_imdb_id: row.show_imdb_id,
-    show_tmdb_id: row.show_tmdb_id,
-    show_tvdb_id: row.show_tvdb_id,
-    season_number: row.season_number,
-    episode_number: row.episode_number,
-    watched_state: isShow
-      ? showWatchedState(row.eps_watched_any ?? 0, episodeCount ?? undefined, row.has_plays_any)
-      : movieWatchedState(row.watched_any, row.has_plays_any),
-    plays: Number(row.plays),
-    last_watched_day: row.last_watched_day,
-    episodes_watched: isShow ? (row.eps_watched_any ?? 0) : null,
-    episode_count: isShow ? episodeCount : null,
-  };
-}
-
-/** Keyset predicate over the grouped result; mirrors the ORDER BY exactly. */
-function watchedCursorFragment(cursorValue: { startedAt: Date; id: string } | null): SQL {
-  if (!cursorValue) return sql``;
-  return sql` AND (c.last_day, c.canonical_id) < (${cursorValue.startedAt}::timestamptz, ${cursorValue.id}::uuid)`;
 }
 
 /** Scoping an identity in the CTE's WHERE re-grains every aggregate below it,
@@ -323,28 +307,12 @@ function userFragment(userId: string | null): SQL {
   return userId === null ? sql`` : sql` AND su.user_id = ${userId}`;
 }
 
-export function buildMovieListQuery(args: ListWatchedMediaArgs): SQL {
-  const { kind, userId, serverIds, minState, pageSize, cursorValue } = args;
+/** Whole ordered candidate set for a filter tuple - no cursor, no LIMIT. */
+export function buildMovieCandidateQuery(args: ListWatchedMediaArgs): SQL {
+  const { kind, userId, serverIds, minState } = args;
   const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const stateFilter =
     minState === 'watched' ? sql`c.watched_any` : sql`(c.watched_any OR c.has_plays_any)`;
-  // Movies have no season/episode of their own, and this lateral runs per
-  // surviving candidate rather than per returned row, so it stays off that branch.
-  const hierarchySelect =
-    kind === 'episode'
-      ? sql`ep.parent_index AS season_number, ep.item_index AS episode_number`
-      : sql`NULL::int AS season_number, NULL::int AS episode_number`;
-  const hierarchyJoin =
-    kind === 'episode'
-      ? sql`LEFT JOIN LATERAL (
-            SELECT li.parent_index, li.item_index
-            FROM library_items li
-            WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}
-            ORDER BY (li.parent_index IS NULL), (li.item_index IS NULL), li.id
-            LIMIT 1
-          ) ep ON true`
-      : sql``;
 
   return sql`
     WITH counted AS (
@@ -356,29 +324,24 @@ export function buildMovieListQuery(args: ListWatchedMediaArgs): SQL {
       FROM user_media_plays_daily p
       JOIN media am ON am.id = p.media_id
       JOIN server_users su ON su.id = p.server_user_id
+      -- Guards on the media row, not the cagg's own media_type, even though
+      -- doing the latter would prune before this join. That column is
+      -- MAX(media_type) over a group keyed by (day, user, server, media_id)
+      -- with the type outside the GROUP BY, so a movie that also had a trailer
+      -- played the same day keeps 'trailer' and the whole day's plays would drop.
       WHERE am.media_type = ${kind}${userFragment(userId)} ${serverFragment}
       GROUP BY COALESCE(am.merged_into_id, p.media_id)
     )
-    SELECT c.canonical_id,
-           c.watched_any, c.has_plays_any, c.plays, c.last_day,
-           (c.last_day AT TIME ZONE 'utc')::date::text AS last_watched_day,
-           NULL::int AS eps_watched_any, NULL::int AS episode_count,
-           m.media_type, m.title, m.year, m.imdb_id, m.tmdb_id, m.tvdb_id, m.show_media_id,
-           sm.title AS show_title, sm.imdb_id AS show_imdb_id,
-           sm.tmdb_id AS show_tmdb_id, sm.tvdb_id AS show_tvdb_id,
-           ${hierarchySelect}
+    SELECT c.canonical_id, c.last_day, c.watched_any, c.has_plays_any, c.plays,
+           NULL::int AS eps_watched_any, NULL::int AS episode_count
     FROM counted c
-    JOIN media m ON m.id = c.canonical_id
-    LEFT JOIN media sm ON sm.id = m.show_media_id
-    ${hierarchyJoin}
-    WHERE ${stateFilter}${watchedCursorFragment(cursorValue)}
+    WHERE ${stateFilter}
     ORDER BY c.last_day DESC, c.canonical_id DESC
-    LIMIT ${pageSize}
   `;
 }
 
-export function buildShowListQuery(args: ListWatchedMediaArgs): SQL {
-  const { userId, serverIds, minState, pageSize, cursorValue } = args;
+export function buildShowCandidateQuery(args: ListWatchedMediaArgs): SQL {
+  const { userId, serverIds, minState } = args;
   const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const stateFilter =
@@ -414,53 +377,173 @@ export function buildShowListQuery(args: ListWatchedMediaArgs): SQL {
       WHERE p.show_media_id IS NOT NULL${userFragment(userId)} ${serverFragment}
       GROUP BY COALESCE(am.merged_into_id, p.show_media_id)
     )
-    SELECT c.canonical_id,
-           NULL::boolean AS watched_any, c.has_plays_any,
-           c.plays, c.last_day,
-           (c.last_day AT TIME ZONE 'utc')::date::text AS last_watched_day,
-           c.eps_watched_any, ec.episode_count,
-           m.media_type, m.title, m.year, m.imdb_id, m.tmdb_id, m.tvdb_id,
-           NULL::uuid AS show_media_id,
-           NULL::text AS show_title, NULL::varchar AS show_imdb_id,
-           NULL::int AS show_tmdb_id, NULL::int AS show_tvdb_id,
-           NULL::int AS season_number, NULL::int AS episode_number
+    SELECT c.canonical_id, c.last_day, NULL::boolean AS watched_any, c.has_plays_any, c.plays,
+           c.eps_watched_any, ec.episode_count
     FROM counted c
-    JOIN media m ON m.id = c.canonical_id
     JOIN episode_counts ec ON ec.show_id = c.canonical_id
-    WHERE ${stateFilter}${watchedCursorFragment(cursorValue)}
+    WHERE ${stateFilter}
     ORDER BY c.last_day DESC, c.canonical_id DESC
-    LIMIT ${pageSize}
   `;
 }
 
-/**
- * One page of media the scope has engagement with, newest activity first.
- * A show with no active episodes resolves to unwatched and never appears,
- * matching mapShowWatchedRows' unknown-count rule.
- *
- * Every page re-runs the full aggregate, since last_day is a MAX and
- * watched_any a BOOL_OR, so the keyset predicate is semantically a HAVING.
- * The timeout bounds that rather than letting a cold walk pin a connection.
- */
-export async function listWatchedMedia(
-  args: ListWatchedMediaArgs
-): Promise<{ data: WatchedMediaRecord[]; nextCursor: string | null }> {
-  const isShow = args.kind === 'show';
-  const query = isShow ? buildShowListQuery(args) : buildMovieListQuery(args);
+/** Page-bounded metadata lookup; the aggregates already came from the cached
+ * candidate list, so this never touches the cagg. */
+export function buildHydrationQuery(kind: WatchedMediaKind, ids: string[]): SQL {
+  // The lateral runs once per id here (bounded by page size), and only episodes
+  // have a season or number of their own.
+  const hierarchySelect =
+    kind === 'episode'
+      ? sql`ep.parent_index AS season_number, ep.item_index AS episode_number`
+      : sql`NULL::int AS season_number, NULL::int AS episode_number`;
+  const hierarchyJoin =
+    kind === 'episode'
+      ? sql`LEFT JOIN LATERAL (
+            SELECT li.parent_index, li.item_index
+            FROM library_items li
+            WHERE li.media_id = m.id AND li.removed_at IS NULL
+            ORDER BY (li.parent_index IS NULL), (li.item_index IS NULL), li.id
+            LIMIT 1
+          ) ep ON true`
+      : sql``;
 
+  return sql`
+    SELECT m.id, m.media_type, m.title, m.year, m.imdb_id, m.tmdb_id, m.tvdb_id, m.show_media_id,
+           sm.title AS show_title, sm.imdb_id AS show_imdb_id,
+           sm.tmdb_id AS show_tmdb_id, sm.tvdb_id AS show_tvdb_id,
+           ${hierarchySelect}
+    FROM media m
+    LEFT JOIN media sm ON sm.id = m.show_media_id
+    ${hierarchyJoin}
+    WHERE m.id = ANY(${uuidArraySql(ids)})
+  `;
+}
+
+function candidateCacheKey(args: ListWatchedMediaArgs): string {
+  const servers = args.serverIds === undefined ? 'all' : [...args.serverIds].sort().join(',');
+  return REDIS_KEYS.PUBLIC_WATCHED_MEDIA(
+    `${args.kind}:${args.minState}:${args.userId ?? 'all'}:${servers}`
+  );
+}
+
+async function computeCandidates(args: ListWatchedMediaArgs): Promise<CandidateTuple[]> {
+  const query =
+    args.kind === 'show' ? buildShowCandidateQuery(args) : buildMovieCandidateQuery(args);
   const rows = await db.transaction(async (tx) => {
     // SET LOCAL takes no parameters, so the value is raw-interpolated.
     await tx.execute(
       sql`SET LOCAL statement_timeout = ${sql.raw(String(WATCHED_LIST_TIMEOUT_MS))}`
     );
     const result = await tx.execute(query);
-    return result.rows as unknown as WatchedMediaQueryRow[];
+    return result.rows as unknown as CandidateRow[];
   });
+  return rows.map((row) => [
+    row.canonical_id,
+    new Date(row.last_day).toISOString(),
+    row.watched_any ?? false,
+    row.has_plays_any,
+    Number(row.plays),
+    row.eps_watched_any,
+    row.episode_count,
+  ]);
+}
 
-  const data = rows.map((row) => mapWatchedMediaRow(row, isShow));
-  const lastRow = rows.length === args.pageSize ? rows[rows.length - 1] : undefined;
-  const nextCursor = lastRow
-    ? encodeCursor(new Date(lastRow.last_day), lastRow.canonical_id)
-    : null;
+async function getCandidates(
+  redis: Redis | undefined,
+  args: ListWatchedMediaArgs
+): Promise<CandidateTuple[]> {
+  if (!redis) return computeCandidates(args);
+  const cacheKey = candidateCacheKey(args);
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached) as CandidateTuple[];
+  } catch {
+    // Redis unreachable - compute directly rather than failing the request.
+  }
+
+  return withComputeSingleFlight(
+    redis,
+    cacheKey,
+    async () => {
+      const computed = await computeCandidates(args);
+      try {
+        await redis.setex(cacheKey, CACHE_TTL.PUBLIC_MEDIA_STATS, JSON.stringify(computed));
+      } catch {
+        // A cache write failure must not fail the request.
+      }
+      return computed;
+    },
+    (raw) => JSON.parse(raw) as CandidateTuple[]
+  );
+}
+
+/**
+ * One page of media the scope has engagement with, newest activity first.
+ * A show with no active episodes resolves to unwatched and never appears,
+ * matching mapShowWatchedRows' unknown-count rule.
+ */
+export async function listWatchedMedia(
+  args: ListWatchedMediaArgs,
+  redis?: Redis
+): Promise<{ data: WatchedMediaRecord[]; nextCursor: string | null }> {
+  const isShow = args.kind === 'show';
+  const candidates = await getCandidates(redis, args);
+
+  // The cursor stays a keyset value rather than an offset, so it survives the
+  // list being recomputed mid-walk: the position is found by value, and a
+  // title that gained activity since simply sorts ahead of where we are.
+  const start = args.cursorValue
+    ? candidates.findIndex(([id, day]) => {
+        const cursorTime = args.cursorValue!.startedAt.getTime();
+        const rowTime = new Date(day).getTime();
+        return rowTime < cursorTime || (rowTime === cursorTime && id < args.cursorValue!.id);
+      })
+    : 0;
+  const window = start === -1 ? [] : candidates.slice(start, start + args.pageSize);
+
+  if (window.length === 0) return { data: [], nextCursor: null };
+
+  const result = await db.execute(
+    buildHydrationQuery(
+      args.kind,
+      window.map(([id]) => id)
+    )
+  );
+  const byId = new Map((result.rows as unknown as HydrationRow[]).map((row) => [row.id, row]));
+
+  const data: WatchedMediaRecord[] = [];
+  for (const [id, day, watched, hasPlays, plays, epsWatched, episodeCount] of window) {
+    const meta = byId.get(id);
+    // A media row deleted between the candidate compute and the page fetch.
+    if (!meta) continue;
+    data.push({
+      media_id: id,
+      media_type: meta.media_type,
+      title: meta.title,
+      year: meta.year,
+      imdb_id: meta.imdb_id,
+      tmdb_id: meta.tmdb_id,
+      tvdb_id: meta.tvdb_id,
+      show_media_id: meta.show_media_id,
+      show_title: meta.show_title,
+      show_imdb_id: meta.show_imdb_id,
+      show_tmdb_id: meta.show_tmdb_id,
+      show_tvdb_id: meta.show_tvdb_id,
+      season_number: meta.season_number,
+      episode_number: meta.episode_number,
+      watched_state: isShow
+        ? showWatchedState(epsWatched ?? 0, episodeCount ?? undefined, hasPlays)
+        : movieWatchedState(watched, hasPlays),
+      plays,
+      last_watched_day: day.slice(0, 10),
+      episodes_watched: isShow ? (epsWatched ?? 0) : null,
+      episode_count: isShow ? episodeCount : null,
+    });
+  }
+
+  const lastEntry = window.length === args.pageSize ? window[window.length - 1] : undefined;
+  const nextCursor =
+    lastEntry && start + args.pageSize < candidates.length
+      ? encodeCursor(new Date(lastEntry[1]), lastEntry[0])
+      : null;
   return { data, nextCursor };
 }

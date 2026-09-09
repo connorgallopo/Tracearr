@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildAliasMapCte,
-  buildMovieListQuery,
-  buildShowListQuery,
+  buildMovieCandidateQuery,
+  buildShowCandidateQuery,
   mapMovieWatchedRows,
   mapShowWatchedRows,
 } from '../mediaWatchedService.js';
@@ -118,7 +118,7 @@ describe('buildAliasMapCte', () => {
   });
 });
 
-describe('buildMovieListQuery', () => {
+describe('buildMovieCandidateQuery', () => {
   const base = {
     kind: 'movie' as const,
     userId: null,
@@ -128,12 +128,12 @@ describe('buildMovieListQuery', () => {
     cursorValue: null,
   };
   const render = (overrides = {}) =>
-    renderSql(buildMovieListQuery({ ...base, ...overrides }))
+    renderSql(buildMovieCandidateQuery({ ...base, ...overrides }))
       .sql.replace(/\s+/g, ' ')
       .trim();
 
   it('guards on the media type so episode rows never enter the movie list', () => {
-    const { sql: query, params } = renderSql(buildMovieListQuery(base));
+    const { sql: query, params } = renderSql(buildMovieCandidateQuery(base));
     expect(query.replace(/\s+/g, ' ')).toContain('WHERE am.media_type = $1');
     expect(params[0]).toBe('movie');
   });
@@ -157,22 +157,24 @@ describe('buildMovieListQuery', () => {
     expect(render({ minState: 'partial' })).toContain('WHERE (c.watched_any OR c.has_plays_any)');
   });
 
-  it('keys the cursor predicate on the same tuple the ORDER BY sorts on', () => {
-    const query = render({ cursorValue: { startedAt: new Date('2026-01-01'), id: 'media-1' } });
-    expect(query).toContain('(c.last_day, c.canonical_id) < ($2::timestamptz, $3::uuid)');
+  it('orders the whole candidate set so the cached list can be sliced by cursor', () => {
+    // No LIMIT and no keyset predicate: the aggregate reads MAX()/BOOL_OR(), so
+    // paging it directly would re-aggregate the cagg once per page.
+    const query = render();
     expect(query).toContain('ORDER BY c.last_day DESC, c.canonical_id DESC');
+    expect(query).not.toContain('LIMIT');
   });
 
-  it('joins library_items for season and episode numbers only on the episode branch', () => {
-    // The lateral runs per surviving candidate, not per returned row, and a
-    // movie has no season or episode of its own.
-    expect(render({ kind: 'episode' })).toContain('SELECT li.parent_index, li.item_index');
-    expect(render()).not.toContain('li.parent_index');
-    expect(render()).toContain('NULL::int AS season_number');
+  it('leaves media metadata to the page hydration, keeping the candidate set narrow', () => {
+    // Only ids, ordering keys and aggregates are cached; titles and hierarchy
+    // are looked up per page.
+    const query = render();
+    expect(query).not.toContain('m.title');
+    expect(query).not.toContain('li.parent_index');
   });
 });
 
-describe('buildShowListQuery', () => {
+describe('buildShowCandidateQuery', () => {
   const base = {
     kind: 'show' as const,
     userId: null,
@@ -182,7 +184,7 @@ describe('buildShowListQuery', () => {
     cursorValue: null,
   };
   const render = (overrides = {}) =>
-    renderSql(buildShowListQuery({ ...base, ...overrides }))
+    renderSql(buildShowCandidateQuery({ ...base, ...overrides }))
       .sql.replace(/\s+/g, ' ')
       .trim();
 
@@ -213,7 +215,9 @@ describe('buildShowListQuery', () => {
   });
 
   it('scopes both the plays and the episode count when a server is given', () => {
-    const { sql: query, params } = renderSql(buildShowListQuery({ ...base, serverIds: ['srv-1'] }));
+    const { sql: query, params } = renderSql(
+      buildShowCandidateQuery({ ...base, serverIds: ['srv-1'] })
+    );
     const normalized = query.replace(/\s+/g, ' ');
     // Scoping only the plays would resolve a show whose episodes and plays sit
     // on different servers differently from the library UI.

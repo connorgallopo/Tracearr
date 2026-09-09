@@ -30,6 +30,7 @@ import {
   createTestLibraryItem,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
+import { decodeCursor } from '../../src/utils/cursor.js';
 import { resolveMediaForItem } from '../../src/services/library/mediaResolutionService.js';
 import { listWatchedMedia } from '../../src/services/library/mediaWatchedService.js';
 
@@ -433,5 +434,59 @@ describe('listWatchedMedia', () => {
     expect(row?.episode_number).toBe(5);
     expect(row?.show_media_id).toBe(showId);
     expect(row?.show_tvdb_id).toBe(750001);
+  });
+  it('walks every page exactly once and stops, paging over the ordered candidate list', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser({ role: 'member' });
+    const account = await createTestServerUser({ userId: user.id, serverId: server.id });
+
+    const ids: string[] = [];
+    for (const [index, key] of ['walk-1', 'walk-2', 'walk-3'].entries()) {
+      const mediaId = await resolveMediaForItem({
+        mediaType: 'movie',
+        tmdbId: 770001 + index,
+        title: `Walk Movie ${index + 1}`,
+        year: 2026,
+        serverId: server.id,
+        ratingKey: key,
+      });
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        mediaType: 'movie',
+        mediaId,
+        ratingKey: key,
+        durationMs: 1_800_000,
+        totalDurationMs: 1_800_000,
+        referenceId: null,
+        watched: true,
+      });
+      ids.push(mediaId);
+    }
+
+    await refreshPlaysAggregate();
+
+    // pageSize 1 over titles that share a last_watched_day, so the walk leans on
+    // the canonical-id tiebreak rather than on distinct timestamps.
+    const seen: string[] = [];
+    let cursorValue: { startedAt: Date; id: string } | null = null;
+    for (let guard = 0; guard < 10; guard += 1) {
+      const page = await listWatchedMedia({
+        kind: 'movie',
+        userId: user.id,
+        serverIds: [server.id],
+        minState: 'watched',
+        pageSize: 1,
+        cursorValue,
+      });
+      seen.push(...page.data.map((row) => row.media_id));
+      if (!page.nextCursor) break;
+      const decoded = decodeCursor(page.nextCursor);
+      expect(decoded).not.toBeNull();
+      cursorValue = decoded;
+    }
+
+    expect(seen.sort()).toEqual([...ids].sort());
+    expect(new Set(seen).size).toBe(seen.length);
   });
 });

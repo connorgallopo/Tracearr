@@ -1248,8 +1248,8 @@ registry.registerPath({
     'been. A show with no episodes on any server is treated as unwatched and omitted. ' +
     'To distinguish "this person watched it" from "somebody else did", pull twice, once with ' +
     'user_id and once without: the scoped result is always a subset of the unscoped one, and ' +
-    'the difference is what other people watched. The first page of a result is cached for 60 ' +
-    'seconds; pages fetched with a cursor are always computed fresh.',
+    'the difference is what other people watched. The matching set is computed once per filter ' +
+    'combination and cached for 60 seconds, and every page of a walk reads that same snapshot.',
   security: [{ bearerAuth: [] }],
   request: { query: WatchedMediaQuery },
   responses: {
