@@ -230,8 +230,17 @@ export async function resolveWatchedStates(
 export type WatchedMediaKind = 'movie' | 'show' | 'episode';
 
 /** Long enough for a cold full-catalog aggregate, short enough that a few
- * concurrent computes cannot pin the pool (which floors at 5 connections). */
-const WATCHED_LIST_TIMEOUT_MS = 15_000;
+ * concurrent computes cannot pin the pool (which floors at 5 connections).
+ * Must also leave the holder's whole turn - pool acquisition (up to 5s) plus
+ * this query plus serialising the list - inside withComputeSingleFlight's 15s
+ * poll deadline, or waiters give up and run the duplicate compute the lock
+ * exists to prevent. */
+const WATCHED_LIST_TIMEOUT_MS = 10_000;
+
+/** A candidate tuple serialises to roughly 90 bytes, so this is on the order of
+ * ten thousand titles per filter set. Past it the list is not worth the share
+ * of a 384MB budget it would take. */
+const MAX_CACHED_CANDIDATES_BYTES = 1_000_000;
 
 export interface ListWatchedMediaArgs {
   kind: WatchedMediaKind;
@@ -325,10 +334,14 @@ export function buildMovieCandidateQuery(args: ListWatchedMediaArgs): SQL {
       JOIN media am ON am.id = p.media_id
       JOIN server_users su ON su.id = p.server_user_id
       -- Guards on the media row, not the cagg's own media_type, even though
-      -- doing the latter would prune before this join. That column is
-      -- MAX(media_type) over a group keyed by (day, user, server, media_id)
-      -- with the type outside the GROUP BY, so a movie that also had a trailer
-      -- played the same day keeps 'trailer' and the whole day's plays would drop.
+      -- doing the latter would prune before this join. The cagg materialises
+      -- the session-time type, and buckets outside the refresh window are
+      -- frozen: migration 13 in timescale.ts is a case where media rows were
+      -- corrected and aggregate rows kept the stale value until a full
+      -- recompute. This guard reads current truth. The column is also
+      -- MAX(media_type) over a group that excludes the type, so a mixed bucket
+      -- resolves to whichever type sorts highest.
+      -- 'trailer' and 'unknown' both sort above 'movie' and 'episode'.
       WHERE am.media_type = ${kind}${userFragment(userId)} ${serverFragment}
       GROUP BY COALESCE(am.merged_into_id, p.media_id)
     )
@@ -388,9 +401,16 @@ export function buildShowCandidateQuery(args: ListWatchedMediaArgs): SQL {
 
 /** Page-bounded metadata lookup; the aggregates already came from the cached
  * candidate list, so this never touches the cagg. */
-export function buildHydrationQuery(kind: WatchedMediaKind, ids: string[]): SQL {
+export function buildHydrationQuery(
+  kind: WatchedMediaKind,
+  ids: string[],
+  serverIds: string[] | undefined
+): SQL {
   // The lateral runs once per id here (bounded by page size), and only episodes
-  // have a season or number of their own.
+  // have a season or number of their own. It carries the same server scope as
+  // the candidate query: without it a server-scoped request would number an
+  // episode from a copy on a server the caller did not ask about.
+  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
   const hierarchySelect =
     kind === 'episode'
       ? sql`ep.parent_index AS season_number, ep.item_index AS episode_number`
@@ -400,7 +420,7 @@ export function buildHydrationQuery(kind: WatchedMediaKind, ids: string[]): SQL 
       ? sql`LEFT JOIN LATERAL (
             SELECT li.parent_index, li.item_index
             FROM library_items li
-            WHERE li.media_id = m.id AND li.removed_at IS NULL
+            WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}
             ORDER BY (li.parent_index IS NULL), (li.item_index IS NULL), li.id
             LIMIT 1
           ) ep ON true`
@@ -466,7 +486,13 @@ async function getCandidates(
     async () => {
       const computed = await computeCandidates(args);
       try {
-        await redis.setex(cacheKey, CACHE_TTL.PUBLIC_MEDIA_STATS, JSON.stringify(computed));
+        const payload = JSON.stringify(computed);
+        // Redis runs maxmemory-policy noeviction for BullMQ, where filling it
+        // fails every write, job enqueues included. An install whose list does
+        // not fit recomputes each time; the lock still stops the stampede.
+        if (Buffer.byteLength(payload) <= MAX_CACHED_CANDIDATES_BYTES) {
+          await redis.setex(cacheKey, CACHE_TTL.PUBLIC_MEDIA_STATS, payload);
+        }
       } catch {
         // A cache write failure must not fail the request.
       }
@@ -494,8 +520,9 @@ export async function listWatchedMedia(
   const start = args.cursorValue
     ? candidates.findIndex(([id, day]) => {
         const cursorTime = args.cursorValue!.startedAt.getTime();
+        const cursorId = args.cursorValue!.id.toLowerCase();
         const rowTime = new Date(day).getTime();
-        return rowTime < cursorTime || (rowTime === cursorTime && id < args.cursorValue!.id);
+        return rowTime < cursorTime || (rowTime === cursorTime && id < cursorId);
       })
     : 0;
   const window = start === -1 ? [] : candidates.slice(start, start + args.pageSize);
@@ -505,7 +532,8 @@ export async function listWatchedMedia(
   const result = await db.execute(
     buildHydrationQuery(
       args.kind,
-      window.map(([id]) => id)
+      window.map(([id]) => id),
+      args.serverIds
     )
   );
   const byId = new Map((result.rows as unknown as HydrationRow[]).map((row) => [row.id, row]));

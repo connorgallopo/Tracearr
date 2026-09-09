@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildAliasMapCte,
+  buildHydrationQuery,
   buildMovieCandidateQuery,
   buildShowCandidateQuery,
   mapMovieWatchedRows,
@@ -224,5 +225,30 @@ describe('buildShowCandidateQuery', () => {
     expect(normalized).toContain('li.removed_at IS NULL AND li.server_id = $1');
     expect(normalized).toContain('p.show_media_id IS NOT NULL AND p.server_id = $2');
     expect(params.slice(0, 2)).toEqual(['srv-1', 'srv-1']);
+  });
+});
+
+describe('buildHydrationQuery', () => {
+  const render = (kind: 'movie' | 'show' | 'episode', serverIds: string[] | undefined) =>
+    renderSql(buildHydrationQuery(kind, ['11111111-1111-1111-1111-111111111111'], serverIds))
+      .sql.replace(/\s+/g, ' ')
+      .trim();
+
+  it('scopes the episode numbering lateral to the same servers as the candidate query', () => {
+    // Without this a server-scoped request numbers an episode from a copy on a
+    // server the caller never asked about.
+    expect(render('episode', ['srv-1'])).toContain(
+      'WHERE li.media_id = m.id AND li.removed_at IS NULL AND li.server_id = $1'
+    );
+  });
+
+  it('leaves the lateral unscoped when no server filter was given', () => {
+    const query = render('episode', undefined);
+    expect(query).toContain('WHERE li.media_id = m.id AND li.removed_at IS NULL ORDER BY');
+  });
+
+  it('skips the lateral entirely for movies and shows', () => {
+    expect(render('movie', undefined)).not.toContain('li.parent_index');
+    expect(render('show', undefined)).not.toContain('li.parent_index');
   });
 });
