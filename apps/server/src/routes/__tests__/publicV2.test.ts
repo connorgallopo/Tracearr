@@ -159,6 +159,30 @@ describe('public API v2 skeleton', () => {
       expect(res.statusCode).toBe(400);
     });
 
+    it('rejects a watched-media request with no media_type with 400', async () => {
+      const res = await app.inject({ method: 'GET', url: '/api/v2/public/watched-media' });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it('rejects a watched-media pageSize above the 1000 cap with 400', async () => {
+      const res = await app.inject({
+        method: 'GET',
+        url: '/api/v2/public/watched-media?media_type=movie&pageSize=1001',
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it('rejects an unreadable watched-media cursor with 400', async () => {
+      const res = await app.inject({
+        method: 'GET',
+        url: '/api/v2/public/watched-media?media_type=movie&cursor=not-a-cursor',
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
     it('returns an empty streams payload with a zeroed summary when no cache service exists', async () => {
       const res = await app.inject({ method: 'GET', url: '/api/v2/public/streams' });
 
@@ -198,13 +222,15 @@ describe('public API v2 skeleton', () => {
       app = await buildTestApp(false);
     });
 
-    it.each(['/api/v2/public/docs', '/api/v2/public/history', '/api/v2/public/streams'])(
-      'returns 401 for %s',
-      async (url) => {
-        const res = await app.inject({ method: 'GET', url });
+    it.each([
+      '/api/v2/public/docs',
+      '/api/v2/public/history',
+      '/api/v2/public/streams',
+      '/api/v2/public/watched-media?media_type=movie',
+    ])('returns 401 for %s', async (url) => {
+      const res = await app.inject({ method: 'GET', url });
 
-        expect(res.statusCode).toBe(401);
-      }
-    );
+      expect(res.statusCode).toBe(401);
+    });
   });
 });
