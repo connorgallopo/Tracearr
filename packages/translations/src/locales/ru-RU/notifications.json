@@ -142,9 +142,7 @@
         "title": "Токен пара создан",
         "message": "Сканируйте QR-код вашим мобильным устройством для сопряжения"
       },
-      "displayNameUpdated": {
-        "title": "Отображаемое имя обновлено"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Сброс баллов доверия",
         "message_one": "Пользователь {{count}} сброшен на 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Не удалось добавить сервер",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Не удалось удалить устройство",
       "deviceRenameFailed": "Не удалось переименовать устройство",
       "sessionsRevokeFailed": "Не удалось отозвать сессии",
-      "displayNameUpdateFailed": "Не удалось обновить отображаемое имя",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Не удалось сбросить баллы доверия",
       "routingUpdateFailed": "Не удалось обновить маршрутизацию",
       "clipboardFailed": "Не удалось скопировать в буфер обмена",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
