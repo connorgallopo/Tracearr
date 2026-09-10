@@ -42,16 +42,18 @@ export function DestinationCard({ destination, onEdit }: DestinationCardProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex min-w-0 items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
             <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
               <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
               <div className="flex min-w-0 items-center gap-2">
-                <CardTitle className="truncate text-base">{destination.name}</CardTitle>
+                <CardTitle className="min-w-0 truncate text-base">{destination.name}</CardTitle>
                 {destination.builtin && (
-                  <Badge variant="secondary">{t('pages:settings.destinations.builtinNote')}</Badge>
+                  <Badge variant="secondary" className="shrink-0">
+                    {t('pages:settings.destinations.builtinNote')}
+                  </Badge>
                 )}
               </div>
               <CardDescription className="truncate">
