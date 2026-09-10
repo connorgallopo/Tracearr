@@ -10,6 +10,12 @@ describe('renderTest', () => {
     expect(out.subject).toBe('Test email from Tracearr (Ops inbox)');
     expect(out.html).toContain('lang="en"');
     expect(out.html).toContain('role="presentation"');
+    expect(out.html).toContain(
+      '<meta name="viewport" content="width=device-width, initial-scale=1"/>'
+    );
+    expect(out.html).toContain('<meta name="color-scheme" content="dark"/>');
+    expect(out.html).toContain('<meta name="supported-color-schemes" content="dark"/>');
+    expect(out.html).toContain('<body lang="en" dir="ltr"');
     expect(out.html).toContain('Ops inbox');
     expect(out.html).toContain('src="cid:logo"');
     expect(out.html).not.toContain('rel="preload"');

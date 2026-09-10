@@ -210,6 +210,7 @@ export function buildDigestInput(
         imdb: false,
       }),
     })),
+    episodes: data.counts.episodes,
     moreMovies: data.counts.movies - shown.movies,
     moreShows: data.counts.shows - shown.shows,
     moreAlbums: data.counts.albums - shown.albums,

@@ -141,6 +141,7 @@ function base(over: Partial<DigestInput> = {}): DigestInput {
     moreShows: 0,
     moreAlbums: 0,
     moreWatched: 0,
+    episodes: 0,
     logoRef: null,
     unsubscribeUrl: '{{unsubscribe_url}}',
     viewUrl: null,
@@ -226,6 +227,7 @@ function maxInput(
     moreShows: 4988,
     moreAlbums: 4988,
     moreWatched: 0,
+    episodes: 1320,
   });
 }
 

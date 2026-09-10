@@ -7,8 +7,11 @@ export const DEFAULT_ACCENT = '#0ea0b3';
 export const colors = {
   page: '#0f1115',
   card: '#1a1d23',
+  raised: '#23272f',
   border: '#2a2e36',
+  edge: '#343945',
   text: '#e6e8eb',
+  soft: '#c7cdd6',
   muted: '#9aa3ad',
   low: '#3498db',
   warning: '#f39c12',
@@ -33,7 +36,8 @@ export const body: CSSProperties = {
 
 export const frame: CSSProperties = { maxWidth: '600px', margin: '0 auto' };
 
-export const framePadding: CSSProperties = { padding: '24px 16px' };
+/** Outlook.com can drop body styles; the frame cell restates the font so nothing falls back to Times. */
+export const framePadding: CSSProperties = { padding: '24px 16px 32px', fontFamily: font };
 
 export const card: CSSProperties = {
   backgroundColor: colors.card,

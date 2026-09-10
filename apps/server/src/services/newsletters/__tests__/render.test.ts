@@ -444,7 +444,7 @@ describe('buildDigestInput', () => {
         },
       ],
       mostWatched: [watched],
-      counts: { movies: 3, shows: 0, episodes: 0, albums: 5, mostWatched: 1 },
+      counts: { movies: 3, shows: 0, episodes: 7, albums: 5, mostWatched: 1 },
       isEmpty: false,
     };
     expect(sectionItemCounts(data)).toEqual({ movies: 0, shows: 0, albums: 2, mostWatched: 1 });
@@ -473,6 +473,7 @@ describe('buildDigestInput', () => {
     expect(input.moreShows).toBe(0);
     expect(input.moreAlbums).toBe(3);
     expect(input.moreWatched).toBe(0);
+    expect(input.episodes).toBe(7);
     expect(input.artists[0]?.posterRef).toBe('poster:al1');
     expect(input.mostWatched[0]?.posterRef).toBe('poster:w1');
   });

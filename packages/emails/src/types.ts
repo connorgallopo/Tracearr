@@ -126,6 +126,8 @@ export interface DigestInput {
   shows: DigestShow[];
   artists: DigestArtist[];
   mostWatched: DigestWatched[];
+  /** Episodes added in the window across every show, shown or not; the hero total reads it. */
+  episodes: number;
   /** Items each section holds beyond the cards shown, from the section cap and the render-time fit loop; 0 renders no line. */
   moreMovies: number;
   moreShows: number;

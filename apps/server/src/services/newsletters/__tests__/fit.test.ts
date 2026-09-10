@@ -257,12 +257,12 @@ describe('renderDigestToFit', () => {
     const heavy: DigestData = { ...data, artists: [...artists, emptyArtist] };
     const result = await renderDigestToFit(heavy, posters, opts(), branding, delivery);
     expect(result.data.artists.some((a) => a.cardId === 'artist-empty')).toBe(false);
-    // Measured 2026-09-07: the extra album starts the tie-break on albums, but the same
+    // Measured 2026-09-10: the extra album starts the tie-break on albums, but the same
     // three-way tie as the previous test still interleaves movies and shows into the trim.
-    expect(result.trimmed).toEqual({ movies: 2, shows: 2, albums: 3, mostWatched: 0 });
+    expect(result.trimmed).toEqual({ movies: 2, shows: 3, albums: 3, mostWatched: 0 });
     expect(sectionItemCounts(result.data)).toEqual({
       movies: 10,
-      shows: 10,
+      shows: 9,
       albums: 10,
       mostWatched: 10,
     });
