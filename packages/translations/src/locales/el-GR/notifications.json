@@ -142,9 +142,7 @@
         "title": "Ζεύγος Διακριτικού Δημιουργείται",
         "message": "Σαρώστε τον κωδικό QR με την κινητή συσκευή σας για σύζευξη"
       },
-      "displayNameUpdated": {
-        "title": "Εμφανιζόμενο Όνομα Ενημερώθηκε"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Επαναφορά Βαθμών Εμπιστοσύνης",
         "message_one": "Επαναφορά του {{count}} χρήστη στο 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Αποτυχία προσθήκης διακομιστή",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Αποτυχία κατάργησης συσκευής",
       "deviceRenameFailed": "Αποτυχία μετονομασίας συσκευής",
       "sessionsRevokeFailed": "Αποτυχία ανάκλησης συνεδριών",
-      "displayNameUpdateFailed": "Αποτυχία ενημέρωσης ονόματος οθόνης",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Αποτυχία επαναφοράς των βαθμολογιών εμπιστοσύνης",
       "routingUpdateFailed": "Αποτυχία ενημέρωσης δρομολόγησης",
       "clipboardFailed": "Αποτυχία αντιγραφής στο πρόχειρο",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
