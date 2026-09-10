@@ -91,6 +91,27 @@ describe('Image Routes', () => {
       });
     });
 
+    it('sets a cross-origin resource policy so sandboxed previews and mail clients can load it', async () => {
+      app = await buildTestApp();
+
+      mockProxyImage.mockResolvedValue({
+        data: Buffer.from('fake-image-data'),
+        contentType: 'image/jpeg',
+        cached: false,
+      });
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/images/proxy',
+        query: {
+          server: validServerId,
+          url: '/library/metadata/123/thumb/456',
+        },
+      });
+
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
+    });
+
     it('returns cache HIT header when image is cached', async () => {
       app = await buildTestApp();
 

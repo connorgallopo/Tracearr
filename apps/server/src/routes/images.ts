@@ -65,6 +65,12 @@ const proxyQuerySchema = z
   });
 
 export const imageRoutes: FastifyPluginAsync = async (app) => {
+  // Sandboxed previews (opaque origin) and hosted-mode mail clients both need
+  // these public images to bypass helmet's default same-origin CORP.
+  app.addHook('onSend', async (_request, reply) => {
+    reply.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  });
+
   /**
    * GET /images/proxy - Proxy an image from a media server
    *
