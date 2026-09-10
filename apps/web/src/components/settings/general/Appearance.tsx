@@ -31,22 +31,6 @@ export function Appearance() {
     <SettingsSection
       title={t('nav.sections.appearance')}
       description={t('nav.descriptions.appearance')}
-      actions={
-        isDefault ? undefined : (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground gap-1.5"
-            onClick={() => {
-              setTheme(DEFAULT_THEME);
-              setAccentHue(DEFAULT_HUE);
-            }}
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            {t('common:actions.reset')}
-          </Button>
-        )
-      }
     >
       <FieldGroup>
         <Field>
@@ -87,6 +71,21 @@ export function Appearance() {
           />
           <FieldDescription>{t('general.cyanDefault')}</FieldDescription>
         </Field>
+
+        {!isDefault && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground w-fit gap-1.5"
+            onClick={() => {
+              setTheme(DEFAULT_THEME);
+              setAccentHue(DEFAULT_HUE);
+            }}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            {t('common:actions.reset')}
+          </Button>
+        )}
       </FieldGroup>
     </SettingsSection>
   );

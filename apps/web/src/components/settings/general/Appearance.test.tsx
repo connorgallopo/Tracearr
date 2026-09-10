@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -25,6 +26,20 @@ function theme(overrides: Partial<ReturnType<typeof useTheme>> = {}) {
     accentHue: 187,
     setAccentHue: vi.fn(),
     ...overrides,
+  });
+}
+
+// Backs useTheme with real React state so a click's effect shows up in the render.
+function themeState(initial: { theme: ReturnType<typeof useTheme>['theme']; accentHue: number }) {
+  mockUseTheme.mockImplementation(() => {
+    const [state, setState] = useState(initial);
+    return {
+      theme: state.theme,
+      setTheme: (next: ReturnType<typeof useTheme>['theme']) =>
+        setState((s) => ({ ...s, theme: next })),
+      accentHue: state.accentHue,
+      setAccentHue: (next: number) => setState((s) => ({ ...s, accentHue: next })),
+    };
   });
 }
 
@@ -81,15 +96,20 @@ describe('Appearance', () => {
     expect(screen.getByRole('button', { name: /common:actions.reset/ })).toBeInTheDocument();
   });
 
-  it('resets both the mode and the hue to their defaults', async () => {
-    const setTheme = vi.fn();
-    const setAccentHue = vi.fn();
-    theme({ theme: 'light', accentHue: 330, setTheme, setAccentHue });
+  it('renders reset inside the section content, not the header, and restores the defaults on click', async () => {
+    themeState({ theme: 'light', accentHue: 330 });
 
     render(<Appearance />);
-    await userEvent.click(screen.getByRole('button', { name: /common:actions.reset/ }));
+    const heading = screen.getByRole('heading', { name: 'nav.sections.appearance' });
+    const resetButton = screen.getByRole('button', { name: /common:actions.reset/ });
+    expect(heading.parentElement?.parentElement?.contains(resetButton)).toBe(false);
 
-    expect(setTheme).toHaveBeenCalledWith('dark');
-    expect(setAccentHue).toHaveBeenCalledWith(187);
+    await userEvent.click(resetButton);
+
+    expect(screen.getByRole('radio', { name: 'general.themeDark' })).toHaveAttribute(
+      'data-state',
+      'on'
+    );
+    expect(screen.getByRole('radio', { name: 'Cyan' })).toBeChecked();
   });
 });
