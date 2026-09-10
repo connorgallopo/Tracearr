@@ -21,7 +21,10 @@ vi.mock('@/hooks/queries', () => ({
   usePreviewNewsletter: () => ({ mutate: previewMutate, isPending: false }),
   useTestNewsletter: () => ({ mutate: testMutate, isPending: false }),
   useSendNewsletter: () => ({ mutate: sendMutate, isPending: false }),
+  useNewsletterVariants: vi.fn(),
 }));
+
+import { useNewsletterVariants } from '@/hooks/queries';
 
 const newsletter = { id: 'n-1', name: 'Weekly', timezone: 'UTC' } as Newsletter;
 const preview: NewsletterPreview = {
@@ -41,12 +44,37 @@ const preview: NewsletterPreview = {
   ],
 };
 
+const twoVariants: NewsletterPreview = {
+  ...preview,
+  variants: [
+    {
+      ...preview.variants[0],
+      key: 's-1,s-2',
+      serverNames: ['Attic', 'Basement'],
+      recipientCount: 1,
+      subject: 'Both',
+      html: '<p>Both</p>',
+    },
+    {
+      ...preview.variants[0],
+      key: 's-2',
+      serverNames: ['Attic'],
+      recipientCount: 4,
+      subject: 'Attic only',
+      html: '<p>Attic</p>',
+    },
+  ],
+};
+
 describe('NewsletterActions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     previewMutate.mockImplementation(
       (_id: string, opts: { onSuccess: (p: NewsletterPreview) => void }) => opts.onSuccess(preview)
     );
+    vi.mocked(useNewsletterVariants).mockReturnValue({
+      data: undefined,
+    } as unknown as ReturnType<typeof useNewsletterVariants>);
   });
 
   it('labels the doors as save-and-act while dirty and saves first', async () => {
@@ -119,6 +147,80 @@ describe('NewsletterActions', () => {
     await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.actions.test' }));
     expect(screen.getByLabelText('newsletters.editor.test.address')).toHaveValue(
       'owner@example.com'
+    );
+  });
+
+  it('shows a variant switcher only for several variants and swaps the frame and subject', async () => {
+    previewMutate.mockImplementation(
+      (_id: string, opts: { onSuccess: (p: NewsletterPreview) => void }) =>
+        opts.onSuccess(twoVariants)
+    );
+    render(<NewsletterActions newsletter={newsletter} dirty={false} saveThen={(next) => next()} />);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.actions.preview' })
+    );
+    const frame = await screen.findByTitle('newsletters.editor.preview.title');
+    expect(frame).toHaveAttribute('srcdoc', '<p>Both</p>');
+    const attic = screen.getByRole('radio', {
+      name: 'newsletters.editor.previewVariant:{"servers":"Attic"}',
+    });
+    expect(attic).toHaveTextContent('4');
+    await userEvent.click(attic);
+    expect(screen.getByTitle('newsletters.editor.preview.title')).toHaveAttribute(
+      'srcdoc',
+      '<p>Attic</p>'
+    );
+    expect(screen.getByText('Attic only')).toBeInTheDocument();
+  });
+
+  it('renders no switcher for a single variant', async () => {
+    render(<NewsletterActions newsletter={newsletter} dirty={false} saveThen={(next) => next()} />);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.actions.preview' })
+    );
+    await screen.findByTitle('newsletters.editor.preview.title');
+    // Radix renders a single-select ToggleGroup's items with role radio; none means no switcher.
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+  });
+
+  it('the test dialog offers the variants and sends the picked key, none for the union', async () => {
+    vi.mocked(useNewsletterVariants).mockReturnValue({
+      data: {
+        window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
+        variants: [
+          {
+            key: 's-1,s-2',
+            serverIds: ['s-1', 's-2'],
+            serverNames: ['Attic', 'Basement'],
+            recipientCount: 1,
+            counts: {},
+            isEmpty: false,
+          },
+          {
+            key: 's-2',
+            serverIds: ['s-2'],
+            serverNames: ['Attic'],
+            recipientCount: 4,
+            counts: {},
+            isEmpty: false,
+          },
+        ],
+      },
+    } as unknown as ReturnType<typeof useNewsletterVariants>);
+    render(<NewsletterActions newsletter={newsletter} dirty={false} saveThen={(next) => next()} />);
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.actions.test' }));
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.test.send' }));
+    expect(testMutate).toHaveBeenLastCalledWith(
+      { id: 'n-1', address: 'owner@example.com' },
+      expect.anything()
+    );
+    await userEvent.click(
+      screen.getByRole('radio', { name: 'newsletters.editor.previewVariant:{"servers":"Attic"}' })
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.test.send' }));
+    expect(testMutate).toHaveBeenLastCalledWith(
+      { id: 'n-1', address: 'owner@example.com', variantKey: 's-2' },
+      expect.anything()
     );
   });
 

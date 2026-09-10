@@ -644,6 +644,7 @@
       "message": "Message",
       "senderName": "Shown as",
       "senderNameHelp": "Leave empty to use {{name}}.",
+      "previewVariant": "Members on {{servers}}",
       "subject": "Subject",
       "subjectHelp": "Placeholders:",
       "intro": "Intro",
@@ -749,6 +750,7 @@
         "saveAndSend": "Save and send now"
       },
       "preview": {
+        "variants": "Version",
         "title": "Preview",
         "window": "{{start}} to {{end}}",
         "recipients": "{{resolved}} recipients, {{missing}} without an address, {{suppressed}} suppressed"
@@ -756,6 +758,7 @@
       "test": {
         "title": "Send a test",
         "description": "Renders the current window and sends it to one address, ignoring the suppression list.",
+        "variant": "Send the version for",
         "address": "Send to",
         "send": "Send test"
       },
