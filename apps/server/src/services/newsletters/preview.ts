@@ -68,7 +68,7 @@ export async function buildPreview(
     window: {
       start: window.start.toISOString(),
       end: window.end.toISOString(),
-      fromWatermark: newsletter.window.kind === 'since_last_send' && lastWindowEnd !== null,
+      fromWatermark: lastWindowEnd !== null && window.start.getTime() === lastWindowEnd.getTime(),
     },
     recipients: {
       resolved: resolution.recipients.length - suppressed,

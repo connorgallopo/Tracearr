@@ -899,6 +899,30 @@ describe('newsletter routes', () => {
     expect(fresh.json().window.fromWatermark).toBe(false);
   });
 
+  it('preview reports fromWatermark false when the watermark is clamped to the window floor', async () => {
+    store.getNewsletter.mockResolvedValue({
+      ...row,
+      window: { kind: 'since_last_send', fallbackDays: 3 },
+    });
+    store.lastWatermark.mockResolvedValue(new Date(Date.now() - 40 * 86_400_000));
+    const app = await build(owner);
+    const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().window.fromWatermark).toBe(false);
+  });
+
+  it('preview from a draft answers 404 when newsletterId names no row', async () => {
+    store.getNewsletter.mockResolvedValue(null);
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletterId: ID, newsletter: body },
+    });
+    expect(res.statusCode).toBe(404);
+    expect(store.lastWatermark).not.toHaveBeenCalled();
+  });
+
   it('preview from a draft refuses a non-email destination and a bad body the way create does', async () => {
     mockDestination.mockResolvedValue({ id: DEST, type: 'discord', enabled: true });
     const app = await build(owner);

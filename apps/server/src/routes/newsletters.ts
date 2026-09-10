@@ -195,6 +195,8 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     const problem = await validateReferences(parsed.data.newsletter);
     if (problem) return reply.badRequest(problem);
     const { newsletterId, newsletter } = parsed.data;
+    if (newsletterId !== undefined && !(await getNewsletter(newsletterId)))
+      return reply.notFound('Newsletter not found');
     const watermark = newsletterId === undefined ? null : await lastWatermark(newsletterId);
     return buildPreview({ ...newsletter, id: newsletterId ?? 'draft' }, watermark);
   });
