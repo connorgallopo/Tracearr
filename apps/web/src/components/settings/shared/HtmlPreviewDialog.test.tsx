@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -61,6 +62,36 @@ describe('HtmlPreviewDialog', () => {
       screen.getByRole('radio', { name: 'newsletters.editor.preview.imagesOn' })
     );
     expect(screen.getByTitle('Preview')).toHaveAttribute('srcdoc', html);
+  });
+
+  it('reopens on the shown images and the desktop width after a close', async () => {
+    function Harness() {
+      const [open, setOpen] = useState(true);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            reopen
+          </button>
+          <HtmlPreviewDialog open={open} onOpenChange={setOpen} title="Preview" html={html} />
+        </>
+      );
+    }
+    render(<Harness />);
+    await userEvent.click(
+      screen.getByRole('radio', { name: 'newsletters.editor.preview.imagesBlocked' })
+    );
+    await userEvent.click(
+      screen.getByRole('radio', { name: 'newsletters.editor.preview.widths.phone' })
+    );
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByTitle('Preview')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'reopen' }));
+    expect(screen.getByTitle('Preview')).toHaveAttribute('srcdoc', html);
+    expect(screen.getByTitle('Preview')).toHaveStyle({ width: '600px' });
+    expect(
+      screen.queryByText('newsletters.editor.preview.imagesBlockedNote')
+    ).not.toBeInTheDocument();
   });
 
   it('narrows the frame to 375 px on the phone width', async () => {

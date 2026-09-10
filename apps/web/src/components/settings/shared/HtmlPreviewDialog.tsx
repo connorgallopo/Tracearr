@@ -53,8 +53,17 @@ export function HtmlPreviewDialog({
   const ready = !loading && html !== null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl">
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) {
+          setWidth('desktop');
+          setImages('shown');
+        }
+        onOpenChange(next);
+      }}
+    >
+      <DialogContent className="flex h-[80vh] flex-col sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle className="flex flex-wrap items-center gap-2">
             {title}
@@ -121,7 +130,7 @@ export function HtmlPreviewDialog({
           </div>
         )}
         {loading ? (
-          <Skeleton data-testid="html-preview-loading" className="h-[60vh] w-full" />
+          <Skeleton data-testid="html-preview-loading" className="min-h-0 w-full flex-1" />
         ) : (
           ready && (
             <iframe
@@ -129,7 +138,7 @@ export function HtmlPreviewDialog({
               sandbox=""
               srcDoc={images === 'blocked' ? withoutImages(html) : html}
               style={{ width: `${PREVIEW_WIDTHS[width]}px` }}
-              className="mx-auto block h-[60vh] max-w-full rounded-md border bg-[#0f1115]"
+              className="mx-auto block min-h-0 max-w-full flex-1 rounded-md border bg-[#0f1115]"
             />
           )
         )}
