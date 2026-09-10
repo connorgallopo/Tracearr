@@ -20,7 +20,7 @@ export const EMAIL_CLIP_FIT_BYTES = EMAIL_CLIP_BUDGET_BYTES - EMAIL_CLIP_MARGIN_
 
 export type TrimmableSection = keyof NewsletterSectionCounts;
 
-/** Ties go to the section whose item costs the most bytes, so the fewest items leave: a show card (3.5 KB) before a movie card (1.8 KB), an artist card (1.4 KB), a most-watched row (0.6 KB). */
+/** Ties go to the section whose item costs the most bytes, so the fewest items leave: a show card (3.3 KB) before a movie card (1.9 KB), an artist card (1.7 KB), a most-watched row (1.7 KB). */
 export const TRIM_ORDER: readonly TrimmableSection[] = ['shows', 'movies', 'albums', 'mostWatched'];
 
 export const NO_TRIM: NewsletterSectionCounts = Object.freeze({
