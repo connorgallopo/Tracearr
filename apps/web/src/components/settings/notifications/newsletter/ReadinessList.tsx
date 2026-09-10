@@ -17,6 +17,8 @@ import {
   type NewsletterVariantsView,
   type Server,
 } from '@tracearr/shared';
+import { Button } from '@/components/ui/button';
+import { FieldDescription } from '@/components/ui/field';
 import {
   useDestinations,
   useNewsletterRecipients,
@@ -26,27 +28,45 @@ import {
 } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
 import { cn } from '@/lib/utils';
+import type { Translate } from '../newsletterFormat';
 import { EditorCard } from './EditorCard';
-import { scopedServers, type NewsletterFormState } from './newsletterForm';
+import {
+  NEWSLETTER_FIELD_IDS,
+  RECIPIENTS_CARD_ID,
+  scopeMoved,
+  scopedServers,
+  type NewsletterFormState,
+} from './newsletterForm';
 import { extraRecipients, partitionRecipients } from './RecipientsPanel';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
 
 export const SERVER_SETTINGS_PATH = '/settings/servers/connections';
 
+export const REMOTE_ACCESS_PATH = '/settings/access/remote';
+
 export type PrivateServerReason = 'noPublicUrl' | 'privatePublicUrl';
 
 export type ReadinessStatus = 'pass' | 'warn' | 'fail' | 'unknown' | 'info';
 
-/** externalUrl warns when set over http (the link works, one-click does not); a privateServer row exists per Jellyfin or Emby server whose URL members cannot reach. Narrowing per id keeps every `t()` key below a real, literal key. */
+/** destination is unknown while the form names one the destinations query has not returned; externalUrl warns when set over http (the link works, one-click does not); a privateServer row exists per Jellyfin or Emby server whose URL members cannot reach. Narrowing per id keeps every `t()` key below a real, literal key. */
 export type ReadinessCheck =
+  | { id: 'destination'; status: 'pass' | 'fail' | 'unknown'; name: string | null }
   | { id: 'externalUrl'; status: 'pass' | 'warn' | 'fail' }
   | { id: 'fromDomain'; status: 'pass' | 'fail' | 'unknown' }
-  | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown' }
+  | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown'; count: number }
   | { id: 'privateServer'; status: 'warn'; server: string; reason: PrivateServerReason }
   | { id: 'emptyVariant'; status: 'warn'; servers: string[] }
   | { id: 'variantsLoadFailed'; status: 'unknown' }
   | { id: 'dns'; status: 'info' };
+
+const SEVERITY: Record<ReadinessStatus, number> = {
+  fail: 0,
+  warn: 1,
+  unknown: 2,
+  pass: 3,
+  info: 4,
+};
 
 const domainOf = (address: string | null | undefined): string | null => {
   if (!address || !address.includes('@')) return null;
@@ -64,8 +84,17 @@ export function recipientsState(
   return { resolvable: partitionRecipients(view, form.excludeUserIds).receive.length, known: true };
 }
 
+/** Only a saved newsletter with Members on has a member list to resolve; anything else has nothing to ask for. */
+export function recipientsQueryId(
+  form: NewsletterRecipients,
+  newsletterId: string | null
+): string | undefined {
+  return form.members && newsletterId ? newsletterId : undefined;
+}
+
 export function readinessChecks(input: {
   externalUrl: string | null;
+  destinationId: string | null;
   destination: Destination | null;
   recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
@@ -92,7 +121,12 @@ export function readinessChecks(input: {
   const variantsLoadFailed: ReadinessCheck[] = input.variantsError
     ? [{ id: 'variantsLoadFailed', status: 'unknown' }]
     : [];
-  return [
+  const checks: ReadinessCheck[] = [
+    {
+      id: 'destination',
+      status: !input.destinationId ? 'fail' : input.destination ? 'pass' : 'unknown',
+      name: input.destination?.name ?? null,
+    },
     {
       id: 'externalUrl',
       status: !input.externalUrl
@@ -109,12 +143,15 @@ export function readinessChecks(input: {
     {
       id: 'recipients',
       status: !recipients.known ? 'unknown' : recipients.resolvable > 0 ? 'pass' : 'fail',
+      count: recipients.resolvable,
     },
     ...privateServers,
     ...emptyVariants,
     ...variantsLoadFailed,
     { id: 'dns', status: 'info' },
   ];
+  // Array.prototype.sort is stable, so rows of one severity keep the order above.
+  return checks.sort((a, b) => SEVERITY[a.status] - SEVERITY[b.status]);
 }
 
 const ICONS: Record<ReadinessStatus, LucideIcon> = {
@@ -127,7 +164,7 @@ const ICONS: Record<ReadinessStatus, LucideIcon> = {
 const TONES: Record<ReadinessStatus, string> = {
   pass: 'text-success',
   warn: 'text-warning',
-  fail: 'text-warning',
+  fail: 'text-destructive',
   unknown: 'text-muted-foreground',
   info: 'text-muted-foreground',
 };
@@ -135,16 +172,20 @@ const TONES: Record<ReadinessStatus, string> = {
 export function ReadinessList({
   state,
   newsletterId,
+  savedServerIds,
 }: {
   state: NewsletterFormState;
   newsletterId: string | null;
+  /** The saved row's `scope.serverIds`, or null before the first save; the recipient rows read the saved row. */
+  savedServerIds: string[] | null;
 }) {
   const { t, i18n } = useTranslation('settings');
+  const translate = t as Translate;
   const { data: settings } = useSettings();
   const { data: destinations } = useDestinations();
   const { data: servers } = useServers();
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
-    state.recipients.members && newsletterId ? newsletterId : undefined
+    recipientsQueryId(state.recipients, newsletterId)
   );
   const { data: variants, isError: variantsError } = useNewsletterVariants(
     newsletterId ?? undefined
@@ -153,16 +194,23 @@ export function ReadinessList({
   const inScope = scopedServers(state.scope, servers ?? []);
   const checks = readinessChecks({
     externalUrl: settings?.externalUrl ?? null,
+    destinationId: state.destinationId,
     destination,
     recipients: { form: state.recipients, view },
     servers: inScope,
     variants,
     variantsError,
   });
+  const staleScope = scopeMoved(savedServerIds, state.scope.serverIds);
 
   // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
   const copyFor = (check: ReadinessCheck): ReactNode => {
     switch (check.id) {
+      case 'destination':
+        if (check.status === 'pass')
+          return t('newsletters.editor.readiness.destination', { name: check.name ?? '' });
+        if (check.status === 'unknown') return t('newsletters.editor.readiness.destinationUnknown');
+        return t('newsletters.editor.readiness.destinationFail');
       case 'externalUrl':
         if (check.status === 'pass') return t('newsletters.editor.readiness.externalUrl');
         if (check.status === 'warn') return t('newsletters.editor.readiness.externalUrlNotHttps');
@@ -172,7 +220,8 @@ export function ReadinessList({
         if (check.status === 'unknown') return t('newsletters.editor.readiness.fromDomainUnknown');
         return t('newsletters.editor.readiness.fromDomainFail');
       case 'recipients':
-        if (check.status === 'pass') return t('newsletters.editor.readiness.recipients');
+        if (check.status === 'pass')
+          return translate('newsletters.editor.readiness.recipients', { count: check.count });
         if (check.status === 'fail') return t('newsletters.editor.readiness.recipientsFail');
         // A saved newsletter whose recipients failed to load says so; an unsaved one has nothing to query yet, so it says recipients are unknown until save.
         return newsletterId !== null && recipientsError
@@ -220,14 +269,61 @@ export function ReadinessList({
     }
   };
 
+  /** A failing row ends with the way to the control it is about. */
+  const actionFor = (check: ReadinessCheck): ReactNode => {
+    if (check.status !== 'fail') return null;
+    switch (check.id) {
+      case 'destination':
+        return (
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="h-auto p-0"
+            onClick={() => document.getElementById(NEWSLETTER_FIELD_IDS.destination)?.focus()}
+          >
+            {t('newsletters.editor.readiness.fixDestination')}
+          </Button>
+        );
+      case 'recipients':
+        return (
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="h-auto p-0"
+            onClick={() =>
+              document
+                .getElementById(RECIPIENTS_CARD_ID)
+                ?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+            }
+          >
+            {t('newsletters.editor.readiness.fixRecipients')}
+          </Button>
+        );
+      case 'externalUrl':
+        return (
+          <Link to={REMOTE_ACCESS_PATH} className="underline underline-offset-4">
+            {t('newsletters.editor.readiness.fixExternalUrl')}
+          </Link>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <EditorCard
       title={t('newsletters.editor.readiness.title')}
       description={t('newsletters.editor.readiness.intro')}
     >
+      {staleScope && (
+        <FieldDescription>{t('newsletters.editor.readiness.staleScope')}</FieldDescription>
+      )}
       <ul className="flex flex-col gap-2">
         {checks.map((check) => {
           const Icon = ICONS[check.status];
+          const action = actionFor(check);
           return (
             <li
               key={
@@ -243,7 +339,10 @@ export function ReadinessList({
                 aria-hidden
                 className={cn('mt-0.5 size-[0.9375rem] shrink-0', TONES[check.status])}
               />
-              <span>{copyFor(check)}</span>
+              <span>
+                {copyFor(check)}
+                {action && <> {action}</>}
+              </span>
             </li>
           );
         })}

@@ -21,7 +21,7 @@ import { MessageFields } from './MessageFields';
 import { NewsletterActions, type NewsletterActionsHandle } from './NewsletterActions';
 import { NEWSLETTERS_PATH } from '../Newsletters';
 import { scheduleSummary, type Translate } from '../newsletterFormat';
-import { ReadinessList, recipientsState } from './ReadinessList';
+import { ReadinessList, recipientsQueryId, recipientsState } from './ReadinessList';
 import { RecipientsFields } from './RecipientsFields';
 import { ScheduleFields } from './ScheduleFields';
 import { SendHistory } from './SendHistory';
@@ -101,7 +101,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   });
   const blocker = useUnsavedChanges(dirty);
   const { data: recipientsView } = useNewsletterRecipients(
-    state.recipients.members && newsletter ? newsletter.id : undefined
+    recipientsQueryId(state.recipients, newsletter?.id ?? null)
   );
   const resolvable = recipientsState(state.recipients, recipientsView);
   const schedule = scheduleSummary(state.schedule, state.timezone, translate, i18n.language);
@@ -235,7 +235,11 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
       <div className="grid items-start gap-6 @4xl/editor:grid-cols-[minmax(0,1fr)_18rem]">
         {cards}
         <aside className="@4xl/editor:sticky @4xl/editor:top-6">
-          <ReadinessList state={state} newsletterId={newsletter?.id ?? null} />
+          <ReadinessList
+            state={state}
+            newsletterId={newsletter?.id ?? null}
+            savedServerIds={newsletter ? seed.scope.serverIds : null}
+          />
         </aside>
       </div>
       <BindingDoors
