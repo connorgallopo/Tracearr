@@ -260,15 +260,6 @@
   --sidebar-ring: var(--accent-hue) 80% 50%;
 }
 
-/* Base styles */
-* {
-  @apply border-border;
-}
-
-body {
-  @apply bg-background text-foreground;
-}
-
 /* Container utility - Tailwind v4 requires @utility for custom config */
 @utility container {
   margin-inline: auto;
