@@ -111,7 +111,15 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
-    "title": ""
+    "title": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "История",
@@ -210,7 +218,7 @@
       "quietest": "Тихий тест:",
       "bingeHighlights": "Отметины на Бинге",
       "bingeHighlightsDesc": "Показывает с самыми интенсивными шаблонами просмотра",
-      "bingeSessions": "",
+      "bingeSessions": "стыковочные сессии",
       "noData": "Нет данных для просмотра",
       "noDataDesc": "Статистика наблюдения будет отображаться здесь после воспроизведения содержимого. Возвращайтесь после некоторых действий просмотра.",
       "failedToLoad": "Не удалось загрузить аналитику",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "",
         "pluginUpdateAvailable": "",
         "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Показать все",
       "moreConnections": "",
       "connectingTo": "Подключение к {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "Нет привязанных аккаунтов Plex",
       "noAccountsLinkedHint": "Привяжите учетную запись Plex для добавления Plex серверов в Tracearr.",
       "linkPlexAccount": "Связать аккаунт Plex",
       "linkAnotherAccount": "Связать другой аккаунт Plex",
       "linking": "Связь...",
-      "accountsLinked_one": "{{count}} Plex аккаунт привязан",
-      "accountsLinked_other": "{{count}} Plex аккаунты привязаны",
-      "noAccountsLinkedShort": "Нет привязанных аккаунтов Plex",
       "loginEnabled": "Вход включен",
       "serversConnected_one": "{{count}} сервер подключен",
       "serversConnected_other": "{{count}} подключены к серверам",
       "unlinkAccount": "Отвязать этот аккаунт Plex",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Сначала удалите подключенные сервера, чтобы отвязать этот аккаунт",
-      "linkedAccounts": "Связанные Plex аккаунты",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "Нет привязанных аккаунтов Plex.",
       "unlinkPlexAccount": "Отвязать аккаунт Plex",
       "unlinkConfirm": "Вы уверены, что хотите отвязать этот Plex аккаунт? Вы не сможете добавить серверы из этого аккаунта, пока не привяжите его снова."
     },
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Нет активности",
-    "noActivityDesc": "",
+    "noActivityDesc": "Начните поток, чтобы увидеть ваших топ пользователей здесь",
     "top3": "Топ 3",
     "runnersUp": "Бегуны вверх"
   },
