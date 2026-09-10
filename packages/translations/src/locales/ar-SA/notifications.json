@@ -142,9 +142,7 @@
         "title": "تم توليد رمز الاقتران",
         "message": "قم بمسح رمز QR باستخدام جهازك المحمول للإقران"
       },
-      "displayNameUpdated": {
-        "title": "تم تحديث اسم العرض"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "إعادة تعيين نقاط الثقة",
         "message_one": "",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "فشل في إضافة الخادم",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "فشل في إزالة الجهاز",
       "deviceRenameFailed": "فشل في إعادة تسمية الجهاز",
       "sessionsRevokeFailed": "فشل في إلغاء الجلسات",
-      "displayNameUpdateFailed": "فشل تحديث اسم العرض",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "فشل في إعادة تعيين نقاط الثقة",
       "routingUpdateFailed": "فشل تحديث المسار",
       "clipboardFailed": "فشل النسخ إلى الحافظة",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
