@@ -4,9 +4,10 @@ import type { Destination } from '@tracearr/shared';
 import { Bell, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDestinations } from '@/hooks/queries/useDestinations';
-import { DestinationCard } from './DestinationCard';
+import { DestinationRow } from './DestinationRow';
 import { DestinationDialog } from './DestinationDialog';
 
 type DialogState = { mode: 'create' } | { mode: 'edit'; destination: Destination };
@@ -18,12 +19,10 @@ export function DestinationsManager() {
 
   if (isLoading) {
     return (
-      <div className="@container/destinations">
-        <div className="grid gap-4 @2xl/destinations:grid-cols-2 @4xl/destinations:grid-cols-3">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-44 w-full" />
-          ))}
-        </div>
+      <div className="space-y-2">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-16 w-full" />
+        ))}
       </div>
     );
   }
@@ -38,22 +37,22 @@ export function DestinationsManager() {
   );
 
   return (
-    <div className="@container/destinations space-y-4">
+    <div className="space-y-4">
       {rows.length === 0 ? (
         <EmptyState icon={Bell} title={t('settings.destinations.empty')}>
           {addButton}
         </EmptyState>
       ) : (
         <>
-          <div className="grid gap-4 @2xl/destinations:grid-cols-2 @4xl/destinations:grid-cols-3">
+          <ItemGroup className="gap-2">
             {rows.map((destination) => (
-              <DestinationCard
+              <DestinationRow
                 key={destination.id}
                 destination={destination}
                 onEdit={() => setDialog({ mode: 'edit', destination })}
               />
             ))}
-          </div>
+          </ItemGroup>
           {addButton}
         </>
       )}

@@ -1916,6 +1916,7 @@
       "receiveViolationsHint": "Send every violation to this destination",
       "receiveViolationsNeedsRecipients": "",
       "reencrypt": "Re-enter this destination's secret",
+      "rowActions": "",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",
       "testHint": "Save first to test",
@@ -1935,6 +1936,8 @@
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
       "usedBy_other": "Used by {{count}} rules",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": "Toasts in this browser."
     },
     "jobs": {

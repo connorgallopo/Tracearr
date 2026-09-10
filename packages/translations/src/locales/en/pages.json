@@ -1661,6 +1661,7 @@
       "receiveViolationsHint": "Send every violation to this destination",
       "receiveViolationsNeedsRecipients": "Add alert recipients to send violations here",
       "reencrypt": "Re-enter this destination's secret",
+      "rowActions": "Destination actions",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",
       "testHint": "Save first to test",
@@ -1680,6 +1681,8 @@
       "usedBy_other": "Used by {{count}} automations",
       "usedByNewsletters": "Used by {{count}} newsletter",
       "usedByNewsletters_other": "Used by {{count}} newsletters",
+      "violationsOff": "Violations off",
+      "violationsOn": "Violations on",
       "webToastNote": "Toasts in this browser."
     },
     "jobs": {

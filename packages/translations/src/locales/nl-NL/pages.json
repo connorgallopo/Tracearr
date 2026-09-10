@@ -1916,6 +1916,7 @@
       "receiveViolationsHint": "",
       "receiveViolationsNeedsRecipients": "",
       "reencrypt": "Voer opnieuw de code van deze bestemming in",
+      "rowActions": "",
       "secretSet": "Instellen (leeg laten om te behouden)",
       "test": "",
       "testHint": "Sla eerst op om te testen",
@@ -1935,6 +1936,8 @@
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
       "usedBy_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": "Toastberichten in deze browser."
     },
     "jobs": {

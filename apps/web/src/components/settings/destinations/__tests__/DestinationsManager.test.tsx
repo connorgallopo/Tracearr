@@ -62,6 +62,10 @@ const pushRow = destination({
   secretsSet: [],
 });
 
+function rowMenus() {
+  return screen.getAllByRole('button', { name: 'pages:settings.destinations.rowActions' });
+}
+
 function setDestinations(rows: Destination[]) {
   vi.mocked(useDestinations).mockReturnValue({
     data: rows,
@@ -100,22 +104,31 @@ describe('DestinationsManager', () => {
     expect(screen.getByRole('button', { name: 'settings.destinations.add' })).toBeInTheDocument();
   });
 
-  it('lists built-ins first and locks them: no delete, no test', () => {
+  it('lists built-ins first and locks them: no delete, no test', async () => {
+    const user = userEvent.setup();
     setDestinations([destination(), pushRow]);
     render(<DestinationsManager />);
 
-    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
-      'Mobile push',
-      'Discord',
-    ]);
+    const rows = screen.getAllByRole('listitem');
+    expect(rows[0]).toHaveTextContent('Mobile push');
+    expect(rows[1]).toHaveTextContent('Discord');
     expect(screen.getByText('pages:settings.destinations.builtinNote')).toBeInTheDocument();
     expect(screen.getByText('pages:settings.destinations.pushNote')).toBeInTheDocument();
+
+    await user.click(rowMenus()[0]!);
     expect(
-      screen.getAllByRole('button', { name: 'pages:settings.destinations.delete' })
-    ).toHaveLength(1);
+      screen.queryByRole('menuitem', { name: 'pages:settings.destinations.test' })
+    ).not.toBeInTheDocument();
     expect(
-      screen.getAllByRole('button', { name: 'pages:settings.destinations.test' })
-    ).toHaveLength(1);
+      screen.queryByRole('menuitem', { name: 'common:actions.delete' })
+    ).not.toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await user.click(rowMenus()[1]!);
+    expect(
+      screen.getByRole('menuitem', { name: 'pages:settings.destinations.test' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'common:actions.delete' })).toBeInTheDocument();
   });
 
   it('flips enabled through the update mutation', async () => {
@@ -133,7 +146,8 @@ describe('DestinationsManager', () => {
     setDestinations([destination()]);
     render(<DestinationsManager />);
 
-    await user.click(screen.getByRole('button', { name: 'pages:settings.destinations.delete' }));
+    await user.click(rowMenus()[0]!);
+    await user.click(screen.getByRole('menuitem', { name: 'common:actions.delete' }));
     expect(deleteMutate).not.toHaveBeenCalled();
     expect(screen.getByText('pages:settings.destinations.deleteConfirm')).toBeInTheDocument();
 
@@ -141,19 +155,16 @@ describe('DestinationsManager', () => {
     expect(deleteMutate).toHaveBeenCalledWith('dest-discord');
   });
 
-  it('explains the disabled test button on a row whose config stopped decrypting', async () => {
+  it('explains the disabled test action on a row whose config stopped decrypting', async () => {
     const user = userEvent.setup();
     setDestinations([destination({ configStatus: 'reencrypt' })]);
     render(<DestinationsManager />);
 
-    const test = screen.getByRole('button', { name: 'pages:settings.destinations.test' });
-    expect(test).toBeDisabled();
+    await user.click(rowMenus()[0]!);
 
-    await user.hover(test.parentElement as HTMLElement);
-
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'pages:settings.destinations.reencrypt'
-    );
+    expect(
+      screen.getByRole('menuitem', { name: 'pages:settings.destinations.reencrypt' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('sends a test for a saved destination', async () => {
@@ -161,7 +172,8 @@ describe('DestinationsManager', () => {
     setDestinations([destination()]);
     render(<DestinationsManager />);
 
-    await user.click(screen.getByRole('button', { name: 'pages:settings.destinations.test' }));
+    await user.click(rowMenus()[0]!);
+    await user.click(screen.getByRole('menuitem', { name: 'pages:settings.destinations.test' }));
 
     expect(testMutate).toHaveBeenCalledWith('dest-discord');
   });

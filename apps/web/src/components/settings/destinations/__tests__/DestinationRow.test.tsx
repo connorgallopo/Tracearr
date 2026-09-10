@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { Destination } from '@tracearr/shared';
-import { DestinationCard } from '../DestinationCard';
+import { DestinationRow } from '../DestinationRow';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -57,8 +57,9 @@ function destination(overrides: Partial<Destination> = {}): Destination {
   };
 }
 
-function renderCard(row: Destination) {
-  return render(<DestinationCard destination={row} onEdit={vi.fn()} />);
+function renderRow(row: Destination) {
+  const { container } = render(<DestinationRow destination={row} onEdit={vi.fn()} />);
+  return within(container).getByRole('listitem');
 }
 
 beforeEach(() => {
@@ -73,58 +74,66 @@ beforeEach(() => {
   );
 });
 
-describe('DestinationCard', () => {
+describe('DestinationRow', () => {
   it('shows the from address and how many addresses alerts go to', () => {
-    renderCard(destination());
+    const row = renderRow(destination());
 
-    expect(screen.getByText('news@example.com')).toBeInTheDocument();
-    expect(
-      screen.getByText('pages:settings.destinations.alertsGoTo:{"count":2}')
-    ).toBeInTheDocument();
+    expect(row).toHaveTextContent(
+      'news@example.com · pages:settings.destinations.alertsGoTo:{"count":2}'
+    );
   });
 
   it('reads newsletters-only when the list is empty and a newsletter uses it', () => {
-    renderCard(
+    const row = renderRow(
       destination({
         config: { ...destination().config, to: '' },
         referencedByNewsletterCount: 2,
       })
     );
 
-    expect(screen.getByText('pages:settings.destinations.newslettersOnly')).toBeInTheDocument();
-    expect(
-      screen.getByText('pages:settings.destinations.usedByNewsletters:{"count":2}')
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/destinations\.usedBy:/)).not.toBeInTheDocument();
+    expect(row).toHaveTextContent('pages:settings.destinations.newslettersOnly');
+    expect(row).toHaveTextContent('pages:settings.destinations.usedByNewsletters:{"count":2}');
+    expect(row).not.toHaveTextContent(/destinations\.usedBy:/);
   });
 
   it('reads no alert recipients when the list is empty and nothing uses it', () => {
-    renderCard(destination({ config: { ...destination().config, to: null } }));
+    const row = renderRow(destination({ config: { ...destination().config, to: null } }));
 
-    expect(screen.getByText('pages:settings.destinations.noAlertRecipients')).toBeInTheDocument();
-    expect(screen.queryByText(/destinations\.usedBy/)).not.toBeInTheDocument();
+    expect(row).toHaveTextContent('pages:settings.destinations.noAlertRecipients');
+    expect(row).not.toHaveTextContent(/destinations\.usedBy/);
   });
 
-  it('lists automations and newsletters on two lines when both use it', () => {
-    renderCard(destination({ referencedByAutomationCount: 1, referencedByNewsletterCount: 3 }));
+  it('lists automations and newsletters on the meta line when both use it', () => {
+    renderRow(destination({ referencedByAutomationCount: 1, referencedByNewsletterCount: 3 }));
 
-    expect(screen.getByText('pages:settings.destinations.usedBy:{"count":1}')).toBeInTheDocument();
     expect(
-      screen.getByText('pages:settings.destinations.usedByNewsletters:{"count":3}')
+      screen.getByText(
+        'pages:settings.destinations.violationsOff · pages:settings.destinations.usedBy:{"count":1} · pages:settings.destinations.usedByNewsletters:{"count":3}'
+      )
     ).toBeInTheDocument();
   });
 
-  it('says nothing about mail on a row whose config no longer decrypts', () => {
-    renderCard(destination({ configStatus: 'reencrypt', config: null }));
+  it('says whether the destination gets violations', () => {
+    expect(renderRow(destination({ events: ['violation_detected'] }))).toHaveTextContent(
+      'pages:settings.destinations.violationsOn'
+    );
 
-    expect(screen.getByText('pages:settings.destinations.reencrypt')).toBeInTheDocument();
-    expect(
-      screen.queryByText(/noAlertRecipients|newslettersOnly|alertsGoTo/)
-    ).not.toBeInTheDocument();
+    expect(renderRow(destination())).toHaveTextContent('pages:settings.destinations.violationsOff');
+  });
+
+  it('dims the whole row when the destination is switched off', () => {
+    expect(renderRow(destination({ enabled: false }))).toHaveClass('opacity-60');
+  });
+
+  it('says nothing about mail on a row whose config no longer decrypts', () => {
+    const row = renderRow(destination({ configStatus: 'reencrypt', config: null }));
+
+    expect(row).toHaveTextContent('pages:settings.destinations.reencrypt');
+    expect(row).not.toHaveTextContent(/noAlertRecipients|newslettersOnly|alertsGoTo/);
   });
 
   it('shows none of the email lines on another kind', () => {
-    renderCard(
+    const row = renderRow(
       destination({
         id: 'dest-discord',
         type: 'discord',
@@ -133,8 +142,7 @@ describe('DestinationCard', () => {
       })
     );
 
-    expect(
-      screen.queryByText(/alertsGoTo|newslettersOnly|noAlertRecipients/)
-    ).not.toBeInTheDocument();
+    expect(row).toHaveTextContent('pages:settings.destinations.types.discord');
+    expect(row).not.toHaveTextContent(/alertsGoTo|newslettersOnly|noAlertRecipients/);
   });
 });
