@@ -142,9 +142,7 @@
         "title": "Par-token genererad",
         "message": "Skanna QR-koden med din mobila enhet för att koppla"
       },
-      "displayNameUpdated": {
-        "title": "Visningsnamn uppdaterat"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Lita på poäng Återställ",
         "message_one": "{{count}} användaråterställning till 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Det gick inte att lägga till server",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Det gick inte att ta bort enheten",
       "deviceRenameFailed": "Det gick inte att byta namn på enheten",
       "sessionsRevokeFailed": "Det gick inte att återkalla sessioner",
-      "displayNameUpdateFailed": "Det gick inte att uppdatera visningsnamnet",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Det gick inte att återställa trust-poäng",
       "routingUpdateFailed": "Det gick inte att uppdatera routing",
       "clipboardFailed": "Det gick inte att kopiera till urklipp",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
