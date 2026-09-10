@@ -624,6 +624,8 @@ export type {
   NewsletterRecipientsView,
   EmailSuppression,
   NewsletterPreview,
+  NewsletterPreviewVariant,
+  NewsletterVariantsView,
   NewsletterSectionCounts,
   EmailLogoMode,
   EmailBrandingSettings,

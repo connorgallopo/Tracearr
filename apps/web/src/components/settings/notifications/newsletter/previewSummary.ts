@@ -14,14 +14,15 @@ export function sendSummary(
   locale?: string,
   timeZone?: string
 ): string {
+  const union = preview.variants[0];
   const sentence = t('newsletters.editor.send.summary', {
     count: preview.recipients.resolved,
-    counts: countsLine(preview.counts, t),
+    counts: countsLine(union.counts, t),
     start: windowLabel(preview.window.start, locale, timeZone),
     end: windowLabel(preview.window.end, locale, timeZone),
   });
-  // Object.values(preview.trimmed) types as any[]: NewsletterSectionCounts has no index signature.
-  const { movies, shows, albums, mostWatched } = preview.trimmed;
+  // Object.values(union.trimmed) types as any[]: NewsletterSectionCounts has no index signature.
+  const { movies, shows, albums, mostWatched } = union.trimmed;
   const held = movies + shows + albums + mostWatched;
   return held === 0
     ? sentence

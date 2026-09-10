@@ -25,12 +25,20 @@ vi.mock('@/hooks/queries', () => ({
 
 const newsletter = { id: 'n-1', name: 'Weekly', timezone: 'UTC' } as Newsletter;
 const preview: NewsletterPreview = {
-  subject: 'Hello there',
-  html: '<p>Hi</p>',
-  counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
-  trimmed: { movies: 0, shows: 0, albums: 0, mostWatched: 0 },
   window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
   recipients: { resolved: 3, missingEmail: 0, suppressed: 0 },
+  variants: [
+    {
+      key: 's-1',
+      serverIds: ['s-1'],
+      serverNames: ['Basement'],
+      recipientCount: 3,
+      subject: 'Hello there',
+      html: '<p>Hi</p>',
+      counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+      trimmed: { movies: 0, shows: 0, albums: 0, mostWatched: 0 },
+    },
+  ],
 };
 
 describe('NewsletterActions', () => {

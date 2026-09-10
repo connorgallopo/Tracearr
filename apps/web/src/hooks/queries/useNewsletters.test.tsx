@@ -218,7 +218,7 @@ describe('newsletter mutations', () => {
     result.current.mutate({ id: 'n-1', address: 'me@example.com' });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockTest).toHaveBeenCalledWith('n-1', 'me@example.com');
+    expect(mockTest).toHaveBeenCalledWith('n-1', 'me@example.com', undefined);
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['newsletters', 'n-1', 'sends'] });
     expect(toast.success).toHaveBeenCalledWith(
       'notifications:toast.success.newsletterTestQueued:{"address":"me@example.com"}'

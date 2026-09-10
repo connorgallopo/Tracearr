@@ -16,6 +16,7 @@ export const newsletterKeys = {
   sendsAll: (id: string) => [...NEWSLETTERS_KEY, id, 'sends'],
   sends: (id: string, page: number) => [...NEWSLETTERS_KEY, id, 'sends', page],
   recipients: (id: string) => [...NEWSLETTERS_KEY, id, 'recipients'],
+  variants: (id: string) => [...NEWSLETTERS_KEY, id, 'variants'],
 };
 
 /** No socket event exists for sends, so a list polls while one of its sends is open. */
@@ -76,6 +77,20 @@ export function useNewsletterRecipients(id: string | undefined) {
     },
     enabled: !!id,
     staleTime: 30_000,
+    retry: false,
+  });
+}
+
+/** Per-variant counts for the next send; assembled without posters, so it is cheap enough for the editor to keep fresh. */
+export function useNewsletterVariants(id: string | undefined) {
+  return useQuery({
+    queryKey: newsletterKeys.variants(id ?? ''),
+    queryFn: () => {
+      if (!id) throw new Error('newsletter id required');
+      return api.newsletters.variants(id);
+    },
+    enabled: Boolean(id),
+    staleTime: 60_000,
     retry: false,
   });
 }
@@ -191,8 +206,15 @@ export function useTestNewsletter() {
   const { t } = useTranslation(['notifications']);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, address }: { id: string; address: string }) =>
-      api.newsletters.test(id, address),
+    mutationFn: ({
+      id,
+      address,
+      variantKey,
+    }: {
+      id: string;
+      address: string;
+      variantKey?: string;
+    }) => api.newsletters.test(id, address, variantKey),
     onSuccess: (_result, { id, address }) => {
       void queryClient.invalidateQueries({ queryKey: newsletterKeys.sendsAll(id) });
       toast.success(t('notifications:toast.success.newsletterTestQueued', { address }));
@@ -222,8 +244,8 @@ export function useSendNewsletter() {
 export function useNewsletterSendHtml() {
   const { t } = useTranslation('notifications');
   return useMutation({
-    mutationFn: ({ id, sendId }: { id: string; sendId: string }) =>
-      api.newsletters.sendHtml(id, sendId),
+    mutationFn: ({ id, sendId, variantKey }: { id: string; sendId: string; variantKey?: string }) =>
+      api.newsletters.sendHtml(id, sendId, variantKey),
     onError: (err) => {
       toast.error(t('toast.error.newsletterSnapshotFailed', { error: err.message }));
     },

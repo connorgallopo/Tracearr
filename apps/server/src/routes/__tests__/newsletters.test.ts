@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance, type FastifyReply, type RouteOptions } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
-import type { AuthUser } from '@tracearr/shared';
+import { DEFAULT_NEWSLETTER_SECTIONS, type AuthUser } from '@tracearr/shared';
 
 const store = vi.hoisted(() => ({
   listNewsletters: vi.fn(),
@@ -50,6 +50,7 @@ vi.mock('../../services/newsletters/assemble.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../services/newsletters/assemble.js')>();
   return {
     sectionItemCounts: actual.sectionItemCounts,
+    groupDigest: actual.groupDigest,
     assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
   };
 });
@@ -121,7 +122,7 @@ const row = {
   timezone: 'UTC',
   imageMode: 'auto',
   scope: { serverIds: [], libraries: [] },
-  sections: {},
+  sections: DEFAULT_NEWSLETTER_SECTIONS,
   recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
   senderName: null,
   links: { tracearr: false },
@@ -131,6 +132,72 @@ const row = {
   window: { kind: 'fixed', days: 7 },
   skipWhenEmpty: true,
 };
+
+const S1 = {
+  id: '11111111-1111-4111-8111-111111111111',
+  name: 'Basement',
+  type: 'plex',
+  url: 'http://plex',
+  machineIdentifier: null,
+  publicUrl: null,
+};
+const S2 = {
+  id: '22222222-2222-4222-8222-222222222222',
+  name: 'Attic',
+  type: 'jellyfin',
+  url: 'http://jf',
+  machineIdentifier: null,
+  publicUrl: null,
+};
+const empty = {
+  movies: [],
+  shows: [],
+  artists: [],
+  mostWatched: [],
+  counts: { movies: 0, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+  isEmpty: true,
+};
+const movie = (cardId: string, serverId: string, title: string) => ({
+  ...empty,
+  movies: [
+    {
+      cardId,
+      serverId,
+      serverName: '',
+      serverType: 'plex',
+      ratingKey: '1',
+      mediaId: null,
+      imdbId: null,
+      thumbPath: null,
+      mirrors: [],
+      title,
+      year: 2000,
+      genres: [],
+      addedAt: new Date(),
+    },
+  ],
+  counts: { ...empty.counts, movies: 1 },
+  isEmpty: false,
+});
+/** Basement has Heat, Attic has nothing new, the union has Heat. */
+function twoServerScope() {
+  store.lastWatermark.mockResolvedValue(null);
+  store.loadServerLinks.mockResolvedValue([S2, S1]);
+  mockAssemble.mockImplementation(async (nl: { scope: { serverIds: string[] } }) => {
+    const ids = nl.scope.serverIds;
+    if (ids.length === 1 && ids[0] === S2.id) return { data: empty, posters: {} };
+    return { data: movie('m1', S1.id, 'Heat'), posters: {} };
+  });
+  mockResolve.mockResolvedValue({
+    recipients: [
+      { address: 'ann@x.com', userId: 'u1', serverIds: [S1.id], name: null, suppressed: false },
+      { address: 'bob@x.com', userId: 'u2', serverIds: [S2.id], name: null, suppressed: false },
+      { address: 'gone@x.com', userId: 'u3', serverIds: [S2.id], name: null, suppressed: true },
+    ],
+    missing: [],
+    excluded: [],
+  });
+}
 
 const routes: RouteOptions[] = [];
 
@@ -182,6 +249,7 @@ describe('newsletter routes', () => {
       ['DELETE', `/newsletters/${ID}`],
       ['POST', `/newsletters/${ID}/preview`],
       ['GET', `/newsletters/${ID}/recipients`],
+      ['GET', `/newsletters/${ID}/variants`],
       ['POST', `/newsletters/${ID}/test`],
       ['POST', `/newsletters/${ID}/send`],
       ['GET', `/newsletters/${ID}/sends`],
@@ -523,8 +591,8 @@ describe('newsletter routes', () => {
     });
     mockResolve.mockResolvedValue({
       recipients: [
-        { address: 'a@x.com', userId: null, name: null, suppressed: false },
-        { address: 'b@x.com', userId: null, name: null, suppressed: true },
+        { address: 'a@x.com', userId: null, serverIds: ['s1'], name: null, suppressed: false },
+        { address: 'b@x.com', userId: null, serverIds: ['s1'], name: null, suppressed: true },
       ],
       missing: [
         { userId: 'u1', serverUserId: 'su-1', name: 'One' },
@@ -535,17 +603,23 @@ describe('newsletter routes', () => {
     const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(res.statusCode).toBe(200);
     const json = res.json();
-    expect(json.counts).toEqual({ movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 });
+    expect(json.variants[0].counts).toEqual({
+      movies: 1,
+      shows: 0,
+      episodes: 0,
+      albums: 0,
+      mostWatched: 0,
+    });
     expect(json.recipients).toEqual({ resolved: 1, missingEmail: 2, suppressed: 1 });
-    expect(json.trimmed).toEqual({ movies: 0, shows: 0, albums: 0, mostWatched: 0 });
-    expect(json.html).toContain('Unsubscribe links are only in the email itself.');
-    expect(json.html).not.toContain('{{unsubscribe_url}}');
-    expect(json.html).not.toContain('rel="preload"');
-    expect(json.html).toContain('src="/api/v1/images/proxy?server=s1');
-    expect(json.html).toContain('Heat');
+    expect(json.variants[0].trimmed).toEqual({ movies: 0, shows: 0, albums: 0, mostWatched: 0 });
+    expect(json.variants[0].html).toContain('Unsubscribe links are only in the email itself.');
+    expect(json.variants[0].html).not.toContain('{{unsubscribe_url}}');
+    expect(json.variants[0].html).not.toContain('rel="preload"');
+    expect(json.variants[0].html).toContain('src="/api/v1/images/proxy?server=s1');
+    expect(json.variants[0].html).toContain('Heat');
     expect(mockBranding).toHaveBeenCalledWith();
-    expect(json.html).toContain('#123456');
-    expect(json.html).toContain('src="/api/v1/images/logo"');
+    expect(json.variants[0].html).toContain('#123456');
+    expect(json.variants[0].html).toContain('src="/api/v1/images/logo"');
   });
 
   it('preview shows the owner logo url when the branding block carries one', async () => {
@@ -571,7 +645,7 @@ describe('newsletter routes', () => {
     mockResolve.mockResolvedValue({ recipients: [], missing: [], excluded: [] });
     const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
     expect(res.statusCode).toBe(200);
-    expect(res.json().html).toContain('src="https://x.test/l.png"');
+    expect(res.json().variants[0].html).toContain('src="https://x.test/l.png"');
   });
 
   it('lists sends with pagination and retries failed recipients', async () => {
@@ -639,10 +713,10 @@ describe('newsletter routes', () => {
     });
     mockResolve.mockResolvedValue({ recipients: [], missing: [], excluded: [] });
     const fallback = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
-    expect(fallback.json().html).toContain('Sent by Tracearr for <!-- -->Basement');
+    expect(fallback.json().variants[0].html).toContain('Sent by Tracearr for <!-- -->Basement');
     store.getNewsletter.mockResolvedValue({ ...row, senderName: 'Family Media' });
     const named = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
-    expect(named.json().html).toContain('Sent by Tracearr for <!-- -->Family Media');
+    expect(named.json().variants[0].html).toContain('Sent by Tracearr for <!-- -->Family Media');
   });
 
   it('preview trims the way a send would and reports what it removed', async () => {
@@ -673,17 +747,104 @@ describe('newsletter routes', () => {
     const json = res.json();
     // Measured 2026-09-07: album covers and most-watched posters tie movies, shows and
     // albums at 12 items each, so the largest-section trim interleaves all three.
-    expect(json.trimmed).toEqual({ movies: 2, shows: 3, albums: 2, mostWatched: 0 });
-    expect(json.counts).toEqual({
+    expect(json.variants[0].trimmed).toEqual({ movies: 2, shows: 3, albums: 2, mostWatched: 0 });
+    expect(json.variants[0].counts).toEqual({
       movies: 30,
       shows: 20,
       episodes: 1320,
       albums: 20,
       mostWatched: 10,
     });
-    expect(json.html).toContain('+11 more shows');
-    expect(json.html).toContain('src="/api/v1/images/proxy?server=');
-    expect(json.html).not.toContain('poster:');
+    expect(json.variants[0].html).toContain('+11 more shows');
+    expect(json.variants[0].html).toContain('src="/api/v1/images/proxy?server=');
+    expect(json.variants[0].html).not.toContain('poster:');
+  });
+
+  it('preview returns one variant per membership set with the union first, its recipient counts and an empty one for a server with nothing new', async () => {
+    twoServerScope();
+    const app = await build(owner);
+    const res = await app.inject({ method: 'POST', url: `/newsletters/${ID}/preview` });
+    expect(res.statusCode).toBe(200);
+    const json = res.json();
+    expect(json.recipients).toEqual({ resolved: 2, missingEmail: 0, suppressed: 1 });
+    expect(
+      json.variants.map(
+        (v: {
+          key: string;
+          serverNames: string[];
+          recipientCount: number;
+          counts: { movies: number };
+        }) => [v.key, v.serverNames, v.recipientCount, v.counts.movies]
+      )
+    ).toEqual([
+      // The scope names no server, so the union follows loadServerLinks' name order while its key sorts by id.
+      // Nobody is on both servers, so the union carries no recipients; bob (Attic-only) lands in the Attic group.
+      [`${S1.id},${S2.id}`, ['Attic', 'Basement'], 0, 1],
+      [S1.id, ['Basement'], 1, 1],
+      [S2.id, ['Attic'], 1, 0],
+    ]);
+    expect(json.variants[1].html).toContain('Heat');
+    expect(json.variants[2].html).toContain('Nothing new this period');
+    expect(json.variants[1].subject).toMatch(/^s$/);
+  });
+
+  it('test send carries the picked variant to the run and refuses one outside the newsletter', async () => {
+    store.loadServerLinks.mockResolvedValue([S1, S2]);
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'POST',
+      url: `/newsletters/${ID}/test`,
+      payload: { address: 'me@example.com', variantKey: S2.id },
+    });
+    expect(res.statusCode).toBe(202);
+    expect(queue.enqueueNewsletterRun).toHaveBeenCalledWith({
+      newsletterId: ID,
+      trigger: 'test',
+      testAddress: 'me@example.com',
+      variantKey: S2.id,
+    });
+    const outside = await app.inject({
+      method: 'POST',
+      url: `/newsletters/${ID}/test`,
+      payload: { address: 'me@example.com', variantKey: '33333333-3333-4333-8333-333333333333' },
+    });
+    expect(outside.statusCode).toBe(400);
+    expect(outside.json().message).toBe('variantKey names a server outside this newsletter');
+  });
+
+  it('lists the variants of the next send with their counts, without rendering or warming posters', async () => {
+    twoServerScope();
+    const app = await build(owner);
+    const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/variants` });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().variants).toEqual([
+      {
+        key: `${S1.id},${S2.id}`,
+        serverIds: [S2.id, S1.id],
+        serverNames: ['Attic', 'Basement'],
+        recipientCount: 0,
+        counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: false,
+      },
+      {
+        key: S1.id,
+        serverIds: [S1.id],
+        serverNames: ['Basement'],
+        recipientCount: 1,
+        counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: false,
+      },
+      {
+        key: S2.id,
+        serverIds: [S2.id],
+        serverNames: ['Attic'],
+        recipientCount: 1,
+        counts: { movies: 0, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+        isEmpty: true,
+      },
+    ]);
+    for (const call of mockAssemble.mock.calls) expect(call[2]).toEqual({ posters: false });
+    expect(mockBranding).not.toHaveBeenCalled();
   });
 });
 

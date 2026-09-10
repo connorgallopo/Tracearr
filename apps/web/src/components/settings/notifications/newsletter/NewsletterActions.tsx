@@ -71,7 +71,7 @@ export function NewsletterActions({ newsletter, dirty, saveThen }: NewsletterAct
           end: windowLabel(previewed.window.end, i18n.language, newsletter.timezone),
         })}
       </span>
-      <span>{countsLine(previewed.counts, translate)}</span>
+      <span>{countsLine(previewed.variants[0].counts, translate)}</span>
       <span>
         {t('newsletters.editor.preview.recipients', {
           resolved: previewed.recipients.resolved,
@@ -101,9 +101,9 @@ export function NewsletterActions({ newsletter, dirty, saveThen }: NewsletterAct
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         title={t('newsletters.editor.preview.title')}
-        subject={previewed?.subject}
+        subject={previewed?.variants[0].subject}
         meta={meta}
-        html={previewed?.html ?? null}
+        html={previewed?.variants[0].html ?? null}
         loading={previewed === null}
       />
 

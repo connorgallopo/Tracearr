@@ -412,12 +412,35 @@ export interface NewsletterSectionCounts {
   mostWatched: number;
 }
 
-export interface NewsletterPreview {
+export interface NewsletterPreviewVariant {
+  key: string;
+  serverIds: string[];
+  serverNames: string[];
+  /** Deliverable recipients in this variant. */
+  recipientCount: number;
   subject: string;
   html: string;
   counts: Record<string, number>;
   /** Items the fit loop removed so the email stays under the clip budget; each shows in its section's "+N more" line. */
   trimmed: NewsletterSectionCounts;
+}
+
+export interface NewsletterPreview {
   window: { start: string; end: string };
   recipients: { resolved: number; missingEmail: number; suppressed: number };
+  /** The union of the newsletter's servers first, then one entry per set some recipient belongs to. */
+  variants: [NewsletterPreviewVariant, ...NewsletterPreviewVariant[]];
+}
+
+/** GET /newsletters/:id/variants: what each set of servers would get from the next send, without rendering. */
+export interface NewsletterVariantsView {
+  window: { start: string; end: string };
+  variants: {
+    key: string;
+    serverIds: string[];
+    serverNames: string[];
+    recipientCount: number;
+    counts: Record<string, number>;
+    isEmpty: boolean;
+  }[];
 }

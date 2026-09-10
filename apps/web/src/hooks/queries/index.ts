@@ -138,6 +138,7 @@ export {
   useNewsletters,
   useNewsletter,
   useNewsletterRecipients,
+  useNewsletterVariants,
   useNewsletterSends,
   useNewsletterSend,
   useCreateNewsletter,

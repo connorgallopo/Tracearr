@@ -19,12 +19,20 @@ vi.mock('@/hooks/queries', () => ({
 }));
 
 const preview: NewsletterPreview = {
-  subject: 'x',
-  html: '<p/>',
-  counts: { movies: 12, shows: 3, episodes: 30, albums: 0, mostWatched: 0 },
-  trimmed: { movies: 0, shows: 0, albums: 0, mostWatched: 0 },
   window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
   recipients: { resolved: 42, missingEmail: 2, suppressed: 1 },
+  variants: [
+    {
+      key: 's-1',
+      serverIds: ['s-1'],
+      serverNames: ['Basement'],
+      recipientCount: 42,
+      subject: 'x',
+      html: '<p/>',
+      counts: { movies: 12, shows: 3, episodes: 30, albums: 0, mostWatched: 0 },
+      trimmed: { movies: 0, shows: 0, albums: 0, mostWatched: 0 },
+    },
+  ],
 };
 
 describe('SendNowDialog', () => {

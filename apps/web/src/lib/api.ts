@@ -54,6 +54,7 @@ import type {
   UpdateNewsletterInput,
   NewsletterPreview,
   NewsletterRecipientsView,
+  NewsletterVariantsView,
   NewsletterSendsPage,
   NewsletterSendDetail,
   NewsletterSendHtml,
@@ -1824,12 +1825,13 @@ class ApiClient {
     remove: (id: string) => this.request<void>(`/newsletters/${id}`, { method: 'DELETE' }),
     preview: (id: string) =>
       this.request<NewsletterPreview>(`/newsletters/${id}/preview`, { method: 'POST' }),
+    variants: (id: string) => this.request<NewsletterVariantsView>(`/newsletters/${id}/variants`),
     recipients: (id: string) =>
       this.request<NewsletterRecipientsView>(`/newsletters/${id}/recipients`),
-    test: (id: string, address: string) =>
+    test: (id: string, address: string, variantKey?: string) =>
       this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/test`, {
         method: 'POST',
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(variantKey === undefined ? { address } : { address, variantKey }),
       }),
     send: (id: string) =>
       this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/send`, {
@@ -1839,8 +1841,10 @@ class ApiClient {
       this.request<NewsletterSendsPage>(`/newsletters/${id}/sends?page=${page}&pageSize=20`),
     sendDetail: (id: string, sendId: string) =>
       this.request<NewsletterSendDetail>(`/newsletters/${id}/sends/${sendId}`),
-    sendHtml: (id: string, sendId: string) =>
-      this.request<NewsletterSendHtml>(`/newsletters/${id}/sends/${sendId}/html`),
+    sendHtml: (id: string, sendId: string, variantKey?: string) =>
+      this.request<NewsletterSendHtml>(
+        `/newsletters/${id}/sends/${sendId}/html${variantKey === undefined ? '' : `?variant=${encodeURIComponent(variantKey)}`}`
+      ),
     retryFailed: (id: string, sendId: string) =>
       this.request<{ queued: number }>(`/newsletters/${id}/sends/${sendId}/retry-failed`, {
         method: 'POST',

@@ -4,15 +4,16 @@ import {
   createNewsletterSchema,
   newsletterSendsQuerySchema,
   newsletterTestSendSchema,
-  resolveSenderName,
   updateNewsletterSchema,
   uuidSchema,
   variantKeySchema,
   NEWSLETTER_VIEW_TOKEN_LENGTH,
   type Newsletter,
   type NewsletterPreview,
+  type NewsletterPreviewVariant,
   type NewsletterRecipientsView,
   type NewsletterSendHtml,
+  type NewsletterVariantsView,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
 import {
@@ -23,16 +24,7 @@ import {
   removeNewsletterSchedule,
   upsertNewsletterSchedule,
 } from '../jobs/newsletterQueue.js';
-import { assembleDigest } from '../services/newsletters/assemble.js';
-import { renderDigestToFit } from '../services/newsletters/fit.js';
 import { resolveRecipients } from '../services/newsletters/recipients.js';
-import {
-  UNSUBSCRIBE_PLACEHOLDER,
-  VIEW_PLACEHOLDER,
-  formatWindowDate,
-  logoRefFor,
-  resolveImageMode,
-} from '../services/newsletters/render.js';
 import { digestForBrowser } from '../services/newsletters/snapshot.js';
 import {
   createNewsletter,
@@ -56,11 +48,15 @@ import {
   type NewsletterRow,
   type SendView,
 } from '../services/newsletters/store.js';
+import {
+  assembleVariant,
+  renderVariant,
+  type VariantRenderContext,
+} from '../services/newsletters/variantRender.js';
+import { orderServers, planVariants } from '../services/newsletters/variants.js';
 import { computeWindow } from '../services/newsletters/window.js';
 import { getDestination } from '../services/notifications/destinationStore.js';
 import { resolveEmailBranding } from '../services/notifications/emailBranding.js';
-import { readLogoPng } from '../services/notifications/emailLogo.js';
-import { renderTemplate } from '../services/notifications/types.js';
 import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
 import { PUBLIC_RATE_LIMIT, page, sendPublicPage } from './publicPage.js';
@@ -204,58 +200,48 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (!row) return reply.notFound('Newsletter not found');
     const now = new Date();
     const window = computeWindow(row.window, await lastWatermark(row.id), now);
-    const [{ externalUrl }, { data, posters }, resolution, servers] = await Promise.all([
+    const [{ externalUrl }, links, resolution, branding] = await Promise.all([
       getNetworkSettings(),
-      assembleDigest(row, window),
-      resolveRecipients(row),
       loadServerLinks(row.scope.serverIds),
+      resolveRecipients(row),
+      resolveEmailBranding(),
     ]);
-    const senderName = resolveSenderName(
-      row.senderName,
-      servers.map((s) => s.name)
-    );
-    const { branding, logo } = await resolveEmailBranding();
-    const mode = resolveImageMode(row.imageMode, externalUrl);
-    const origin = externalUrl?.replace(/\/$/, '') ?? '';
-    const subject = renderTemplate(row.subject, {
-      server_name: senderName,
-      start_date: formatWindowDate(window.start, row.timezone),
-      end_date: formatWindowDate(window.end, row.timezone),
-      item_count: String(data.counts.movies + data.counts.episodes + data.counts.albums),
-    });
-    const fit = await renderDigestToFit(
-      data,
-      posters,
-      {
-        subject,
-        intro: row.intro,
-        outro: row.outro,
-        windowStart: formatWindowDate(window.start, row.timezone),
-        windowEnd: formatWindowDate(window.end, row.timezone),
-        logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
-        unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
-        viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
-        externalUrl,
-        tracearrLinks: row.links.tracearr,
-        serversById: new Map(servers.map((s) => [s.id, s])),
-        // Preview shows a member what a real send looks like, not a test send.
-        memberSend: true,
-      },
-      { ...branding, senderName },
-      { newsletterId: row.id, mode, externalUrl }
-    );
+    const servers = orderServers(row.scope, links);
+    // Preview shows a member what a real send looks like, not a test send.
+    const ctx: VariantRenderContext = {
+      newsletter: row,
+      window,
+      externalUrl,
+      branding,
+      servers,
+      memberSend: true,
+    };
+    const rendered: NewsletterPreviewVariant[] = [];
+    for (const variant of planVariants(servers, resolution).variants) {
+      const { data, posters } = await assembleVariant(ctx, variant);
+      const out = await renderVariant(ctx, variant, data, posters);
+      rendered.push({
+        key: variant.key,
+        serverIds: variant.serverIds,
+        serverNames: variant.serverNames,
+        recipientCount: variant.recipients.filter((r) => !r.suppressed).length,
+        subject: out.subject,
+        html: digestForBrowser(out.fit.rendered.html, posters),
+        counts: data.counts,
+        trimmed: out.fit.trimmed,
+      });
+    }
+    const [union, ...rest] = rendered;
+    if (!union) throw new Error('planVariants always lists the union');
     const suppressed = resolution.recipients.filter((r) => r.suppressed).length;
     const preview: NewsletterPreview = {
-      subject,
-      html: digestForBrowser(fit.rendered.html, posters),
-      counts: data.counts,
-      trimmed: fit.trimmed,
       window: { start: window.start.toISOString(), end: window.end.toISOString() },
       recipients: {
         resolved: resolution.recipients.length - suppressed,
         missingEmail: resolution.missing.length,
         suppressed,
       },
+      variants: [union, ...rest],
     };
     return preview;
   });
@@ -270,10 +256,17 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (!row) return reply.notFound('Newsletter not found');
     if (!row.destinationId) return reply.badRequest('Set an email destination first');
     if (await findOpenSend(row.id)) return reply.conflict('A send is already in progress');
+    const { address, variantKey: picked } = parsed.data;
+    if (picked !== undefined) {
+      const known = new Set((await loadServerLinks(row.scope.serverIds)).map((s) => s.id));
+      if (!picked.split(',').every((id) => known.has(id)))
+        return reply.badRequest('variantKey names a server outside this newsletter');
+    }
     const jobId = await enqueueNewsletterRun({
       newsletterId: row.id,
       trigger: 'test',
-      testAddress: parsed.data.address,
+      testAddress: address,
+      ...(picked === undefined ? {} : { variantKey: picked }),
     });
     return reply.code(202).send({ queued: true, jobId });
   });
@@ -295,6 +288,38 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     const row = await getNewsletter(params.data.id);
     if (!row) return reply.notFound('Newsletter not found');
     const view: NewsletterRecipientsView = await resolveRecipients(row);
+    return view;
+  });
+
+  app.get('/:id/variants', owner, async (request, reply) => {
+    const params = idParams.safeParse(request.params);
+    if (!params.success) return reply.badRequest('Invalid id');
+    const row = await getNewsletter(params.data.id);
+    if (!row) return reply.notFound('Newsletter not found');
+    const window = computeWindow(row.window, await lastWatermark(row.id), new Date());
+    const [links, resolution] = await Promise.all([
+      loadServerLinks(row.scope.serverIds),
+      resolveRecipients(row),
+    ]);
+    const servers = orderServers(row.scope, links);
+    const variants: NewsletterVariantsView['variants'] = [];
+    for (const variant of planVariants(servers, resolution).variants) {
+      const { data } = await assembleVariant({ newsletter: row, window }, variant, {
+        posters: false,
+      });
+      variants.push({
+        key: variant.key,
+        serverIds: variant.serverIds,
+        serverNames: variant.serverNames,
+        recipientCount: variant.recipients.filter((r) => !r.suppressed).length,
+        counts: data.counts,
+        isEmpty: data.isEmpty,
+      });
+    }
+    const view: NewsletterVariantsView = {
+      window: { start: window.start.toISOString(), end: window.end.toISOString() },
+      variants,
+    };
     return view;
   });
 
