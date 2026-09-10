@@ -357,7 +357,7 @@ jobs:
         run: pnpm --filter @tracearr/e2e exec playwright install --with-deps chromium
 
       - name: Build dependencies
-        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/translations --filter=@tracearr/test-utils
+        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/translations --filter=@tracearr/test-utils --filter=@tracearr/emails
 
       - name: Create .env file
         run: cp .env.example .env
