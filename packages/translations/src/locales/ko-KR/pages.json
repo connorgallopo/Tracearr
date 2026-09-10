@@ -111,7 +111,15 @@
     "overallTrust": "전반적인 신뢰",
     "serverScope": "서버",
     "allServers": "모든 서버",
-    "title": "사용자 세부정보"
+    "title": "사용자 세부정보",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "기록",
@@ -210,7 +218,7 @@
       "quietest": "가장 한산함:",
       "bingeHighlights": "몰아보기 하이라이트",
       "bingeHighlightsDesc": "시청 집중도가 가장 높은 프로그램",
-      "bingeSessions": "",
+      "bingeSessions": "몰아보기 세션",
       "noData": "아직 시청 데이터가 없습니다",
       "noDataDesc": "콘텐츠가 재생되면 시청 분석이 여기에 표시됩니다. 시청 활동이 생긴 뒤 다시 확인하세요.",
       "failedToLoad": "시청 분석을 불러오지 못했습니다",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "비활성화된 알림 대상",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "아직 알림 대상이 없습니다. 알림을 보내려면 하나를 추가하세요.",
       "newDestination": "새로운 알림 대상",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "서버가 다시 온라인이 됨",
         "pluginUpdateAvailable": "플러그인 업데이트가 가능합니다",
         "serverUpdateAvailable": "서버 업데이트가 가능합니다",
-        "tracearrUpdateAvailable": "같지 않음"
+        "tracearrUpdateAvailable": "같지 않음",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "같음",
@@ -1309,6 +1320,11 @@
         "description": "본 적이 없는 장치에서 계정이 처음 스트리밍될 때 대상에게 알립니다.",
         "keywords": "장치 새 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 불일치 이메일 웹훅"
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "4K 트랜스코드 없음",
         "description": "4K 소스 비디오를 트랜스코딩하는 스트림을 중지합니다.",
@@ -1391,6 +1407,7 @@
         "library": "라이브러리",
         "servers": "서버",
         "updates": "업데이트",
+        "notifications": "",
         "notify": "알림",
         "policy": "조치를 취하세요",
         "control": "만약… 그렇다면"
@@ -1462,6 +1479,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr의 새 릴리스가 있습니다.",
           "synonyms": "업그레이드, 버전, 릴리스, 자체"
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
         }
       },
       "actions": {
@@ -1540,33 +1565,31 @@
       "showAll": "모두 보기",
       "moreConnections": "연결 {{count}}개 더 보기",
       "connectingTo": "{{name}}에 연결 중...",
+      "ownerOnly": "",
       "noAccountsLinked": "연결된 Plex 계정이 없습니다",
       "noAccountsLinkedHint": "Tracearr에 Plex 서버를 추가하려면 Plex 계정을 연결하세요.",
       "linkPlexAccount": "Plex 계정 연결",
       "linkAnotherAccount": "다른 Plex 계정 연결",
       "linking": "연결 중...",
-      "accountsLinked_one": "Plex 계정 {{count}}개 연결됨",
-      "accountsLinked_other": "Plex 계정 {{count}}개 연결됨",
-      "noAccountsLinkedShort": "연결된 Plex 계정 없음",
       "loginEnabled": "로그인 활성화됨",
       "serversConnected_one": "서버 {{count}}대 연결됨",
       "serversConnected_other": "서버 {{count}}대 연결됨",
       "unlinkAccount": "이 Plex 계정 연결 해제",
       "reauthorizeAccount": "이 Plex 계정 다시 인증",
       "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
-      "linkedAccounts": "연결된 Plex 계정",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "아직 연결된 Plex 계정이 없습니다.",
       "unlinkPlexAccount": "Plex 계정 연결 해제",
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다."
     },
     "destinations": {
       "add": "알림 대상 추가",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "내장",
       "clearSecret": "지우기",
       "delete": "삭제",
-      "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
+      "deleteConfirm": "",
       "description": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
+      "emailDescription": "",
       "empty": "아직 알림 대상이 없습니다.",
       "fields": {
         "webhookUrl": "웹훅 URL",
@@ -1576,21 +1599,73 @@
         "topic": "주제",
         "authToken": "인증 토큰",
         "userKey": "사용자 키",
-        "apiToken": "API 토큰"
+        "apiToken": "API 토큰",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": "공개 주제의 경우 선택사항"
+        "authTokenOptional": "공개 주제의 경우 선택사항",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
       "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
       "receiveViolations": "위반사항 수신",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "설정(유지하려면 비워두세요)",
+      "rowActions": "",
       "secretSet": "설정(유지하려면 비워두세요)",
       "test": "테스트",
       "testHint": "테스트를 위해 먼저 저장하세요.",
       "testNeedsForm": "Discord",
-      "title": "알림 대상",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "웹훅(JSON)",
@@ -1598,11 +1673,16 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "email": "",
         "push": "모바일 푸시",
         "webToast": "브라우저 알림"
       },
       "usedBy": "{{count}}개의 자동화에서 사용됨",
       "usedBy_other": "{{count}}개의 자동화에서 사용됨",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": "이 브라우저에 알림이 표시됩니다."
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "아직 활동이 없습니다",
-    "noActivityDesc": "",
+    "noActivityDesc": "스트리밍을 시작하면 상위 사용자가 여기에 표시됩니다",
     "top3": "상위 3명",
     "runnersUp": "그 외 상위"
   },
