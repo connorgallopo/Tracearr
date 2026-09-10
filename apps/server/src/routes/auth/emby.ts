@@ -35,11 +35,16 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
     const { serverUrl, serverName, apiKey, publicUrl } = body.data;
 
     try {
-      // Verify the API key has admin access
-      const isAdmin = await EmbyClient.verifyServerAdmin(apiKey, serverUrl);
+      const adminCheck = await EmbyClient.verifyServerAdmin(apiKey, serverUrl);
 
-      if (!isAdmin) {
-        return reply.forbidden('API key does not have administrator access to this Emby server');
+      if (!adminCheck.success) {
+        if (adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED) {
+          return reply.serviceUnavailable(adminCheck.message);
+        }
+        if (adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY) {
+          return reply.unauthorized(adminCheck.message);
+        }
+        return reply.forbidden(adminCheck.message);
       }
 
       // Create or update server

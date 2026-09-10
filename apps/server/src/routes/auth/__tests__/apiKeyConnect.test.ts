@@ -17,7 +17,14 @@ vi.mock('../../../services/mediaServer/index.js', () => ({
       NOT_ADMIN: 'NOT_ADMIN',
     },
   },
-  EmbyClient: { verifyServerAdmin: vi.fn() },
+  EmbyClient: {
+    verifyServerAdmin: vi.fn(),
+    AdminVerifyError: {
+      CONNECTION_FAILED: 'CONNECTION_FAILED',
+      INVALID_KEY: 'INVALID_KEY',
+      NOT_ADMIN: 'NOT_ADMIN',
+    },
+  },
 }));
 vi.mock('../../../services/sync.js', () => ({
   syncServer: vi.fn().mockResolvedValue({ usersAdded: 0, librariesSynced: 0 }),
@@ -69,7 +76,7 @@ function mockUpdate() {
 
 beforeEach(() => {
   vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue({ success: true });
-  vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue(true);
+  vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({ success: true });
 });
 
 describe('connect-api-key public address', () => {

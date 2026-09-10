@@ -50,6 +50,11 @@ vi.mock('../../services/mediaServer/index.js', () => ({
   },
   EmbyClient: {
     verifyServerAdmin: vi.fn(),
+    AdminVerifyError: {
+      CONNECTION_FAILED: 'CONNECTION_FAILED',
+      INVALID_KEY: 'INVALID_KEY',
+      NOT_ADMIN: 'NOT_ADMIN',
+    },
   },
 }));
 
@@ -309,7 +314,7 @@ describe('Server Routes', () => {
     beforeEach(() => {
       vi.mocked(PlexClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue({ success: true });
-      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue(true);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(syncServer).mockResolvedValue({
         usersAdded: 5,
         usersUpdated: 0,
@@ -613,6 +618,56 @@ describe('Server Routes', () => {
           name: 'Bad Key',
           type: 'jellyfin',
           url: 'http://jellyfin.local:8096',
+          token: 'bad-key',
+        },
+      });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.json().message).toContain('rejected');
+    });
+
+    it('returns 503 when the Emby server cannot be reached', async () => {
+      app = await buildTestApp(ownerUser);
+
+      mockDbSelectLimit([]);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({
+        success: false,
+        code: 'CONNECTION_FAILED',
+        message: 'Cannot reach Emby server at http://emby.local:8096. ECONNREFUSED',
+      });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Down Emby',
+          type: 'emby',
+          url: 'http://emby.local:8096',
+          token: 'some-token',
+        },
+      });
+
+      expect(response.statusCode).toBe(503);
+      expect(response.json().message).toContain('Cannot reach');
+    });
+
+    it('returns 401 when Emby rejects the API key', async () => {
+      app = await buildTestApp(ownerUser);
+
+      mockDbSelectLimit([]);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({
+        success: false,
+        code: 'INVALID_KEY',
+        message: 'Emby rejected this API key (it may be invalid or expired).',
+      });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Bad Key',
+          type: 'emby',
+          url: 'http://emby.local:8096',
           token: 'bad-key',
         },
       });

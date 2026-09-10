@@ -24,6 +24,7 @@ export default mergeConfig(
         'src/services/mediaServer/shared/__tests__/*.test.ts',
         'src/services/mediaServer/plex/__tests__/*.test.ts',
         'src/services/mediaServer/jellyfin/__tests__/*.test.ts',
+        'src/services/mediaServer/emby/__tests__/*.test.ts',
         'src/services/library/__tests__/*.test.ts',
         'src/services/automations/__tests__/*.test.ts',
         'src/lib/__tests__/*.test.ts',

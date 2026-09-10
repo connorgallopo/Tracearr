@@ -148,9 +148,15 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
           return reply.forbidden(adminCheck.message);
         }
       } else if (type === 'emby') {
-        const isAdmin = await EmbyClient.verifyServerAdmin(token, url);
-        if (!isAdmin) {
-          return reply.forbidden('Token does not have admin access to this Emby server');
+        const adminCheck = await EmbyClient.verifyServerAdmin(token, url);
+        if (!adminCheck.success) {
+          if (adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED) {
+            return reply.serviceUnavailable(adminCheck.message);
+          }
+          if (adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY) {
+            return reply.unauthorized(adminCheck.message);
+          }
+          return reply.forbidden(adminCheck.message);
         }
       }
     } catch (error) {
@@ -321,9 +327,15 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
             return reply.forbidden(adminCheck.message);
           }
         } else if (server.type === 'emby') {
-          const isAdmin = await EmbyClient.verifyServerAdmin(server.token, newUrl);
-          if (!isAdmin) {
-            return reply.forbidden('Token does not have admin access at this URL');
+          const adminCheck = await EmbyClient.verifyServerAdmin(server.token, newUrl);
+          if (!adminCheck.success) {
+            if (adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED) {
+              return reply.serviceUnavailable(adminCheck.message);
+            }
+            if (adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY) {
+              return reply.unauthorized(adminCheck.message);
+            }
+            return reply.forbidden(adminCheck.message);
           }
         }
       } catch (error) {
