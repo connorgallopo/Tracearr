@@ -103,6 +103,32 @@ describe('collapseMirrors', () => {
       [{ serverId: 'srv-2', ratingKey: 'b-heat' }],
     ]);
   });
+
+  it('carries the mirrors a dropped copy was holding onto the kept row, once per server', () => {
+    const rank = (id: string) => ['srv-1', 'srv-2', 'srv-3'].indexOf(id);
+    const rows = [
+      row({ serverId: 'srv-1', ratingKey: 'a-heat', mediaId: 'media-heat', title: 'Heat' }),
+      row({
+        serverId: 'srv-2',
+        ratingKey: 'b-heat',
+        mediaId: 'media-heat',
+        title: 'Heat',
+        mirrors: [
+          { serverId: 'srv-3', ratingKey: 'c-heat' },
+          { serverId: 'srv-1', ratingKey: 'a-heat-4k' },
+        ],
+      }),
+    ];
+    expect(collapseMirrors(rows, rank).map((r) => [r.serverId, r.mirrors])).toEqual([
+      [
+        'srv-1',
+        [
+          { serverId: 'srv-2', ratingKey: 'b-heat' },
+          { serverId: 'srv-3', ratingKey: 'c-heat' },
+        ],
+      ],
+    ]);
+  });
 });
 
 describe('groupDigest', () => {
@@ -176,6 +202,47 @@ describe('groupDigest', () => {
     ]);
     expect(data.counts.shows).toBe(2);
     expect(data.counts.episodes).toBe(5);
+  });
+
+  it('keeps a mirrored show to one card when each server contributed different episodes', () => {
+    const ep = (serverId: string, showKey: string, e: number) =>
+      row({
+        serverId,
+        mediaType: 'episode',
+        title: `Ep ${e}`,
+        grandparentTitle: 'Wire',
+        grandparentRatingKey: showKey,
+        parentTitle: 'Season 1',
+        parentRatingKey: `${showKey}-s1`,
+        parentIndex: 1,
+        itemIndex: e,
+        thumbPath: null,
+      });
+    const rows = [
+      ep('srv-1', 'show-a', 1),
+      ep('srv-1', 'show-a', 2),
+      ep('srv-2', 'show-b', 3),
+      row({
+        serverId: 'srv-1',
+        mediaType: 'show',
+        title: 'Wire',
+        ratingKey: 'show-a',
+        mediaId: 'media-wire',
+        year: 2002,
+        thumbPath: '/wire',
+        mirrors: [{ serverId: 'srv-2', ratingKey: 'show-b' }],
+      }),
+    ];
+    const data = groupDigest(rows, DEFAULT_NEWSLETTER_SECTIONS);
+    expect(data.shows.map((s) => [s.title, s.serverId, s.thumbPath, s.year, s.mirrors])).toEqual([
+      ['Wire', 'srv-1', '/wire', 2002, [{ serverId: 'srv-2', ratingKey: 'show-b' }]],
+    ]);
+    expect(data.shows[0]?.seasons.map((s) => [s.number, s.episodeRange, s.episodeCount])).toEqual([
+      [1, 'E01-E03', 3],
+    ]);
+    expect(data.shows[0]?.episodeCount).toBe(3);
+    expect(data.counts.shows).toBe(1);
+    expect(data.counts.episodes).toBe(3);
   });
 
   it('groups tracks and albums under artists and caps by album count', () => {

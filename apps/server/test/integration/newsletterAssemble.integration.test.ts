@@ -314,4 +314,75 @@ describe('assembleDigest mirrors', () => {
       ['b-heat', []],
     ]);
   });
+
+  it("folds a show whose refetched rows mirror each other into one card counting both servers' new episodes", async () => {
+    const seeded = await seedBasicOwner();
+    const [attic] = await db
+      .insert(servers)
+      .values({ name: 'Attic', type: 'plex', url: 'http://attic:32400', token: 'tok' })
+      .returning({ id: servers.id });
+    const atticId = attic!.id;
+    const wire = randomUUID();
+    const episode = (serverId: string, showKey: string, e: number) => ({
+      serverId,
+      libraryId: '1',
+      ratingKey: `${showKey}-e${e}`,
+      title: `Ep ${e}`,
+      mediaType: 'episode',
+      grandparentTitle: 'Wire',
+      grandparentRatingKey: showKey,
+      parentTitle: 'Season 1',
+      parentRatingKey: `${showKey}-s1`,
+      parentIndex: 1,
+      itemIndex: e,
+      createdAt: inside,
+      firstSeenAt: inside,
+    });
+    // The show rows sit outside the window, so assembleDigest refetches one per server
+    // and only the second collapse pass can see they are the same title.
+    await db.insert(libraryItems).values([
+      {
+        serverId: seeded.serverId,
+        libraryId: '1',
+        ratingKey: 'show-a',
+        title: 'Wire',
+        mediaType: 'show',
+        mediaId: wire,
+        year: 2002,
+        thumbPath: '/wire',
+        createdAt: before,
+        firstSeenAt: before,
+      },
+      {
+        serverId: atticId,
+        libraryId: '1',
+        ratingKey: 'show-b',
+        title: 'Wire',
+        mediaType: 'show',
+        mediaId: wire,
+        year: 2002,
+        thumbPath: '/wire-attic',
+        createdAt: before,
+        firstSeenAt: before,
+      },
+      episode(seeded.serverId, 'show-a', 1),
+      episode(seeded.serverId, 'show-a', 2),
+      episode(atticId, 'show-b', 3),
+    ]);
+
+    const { data } = await assembleDigest(
+      {
+        scope: { serverIds: [seeded.serverId, atticId], libraries: [] },
+        sections: { ...DEFAULT_NEWSLETTER_SECTIONS, music: { enabled: false, max: 8 } },
+      },
+      { start: START, end: END },
+      { posters: false }
+    );
+    expect(data.counts.shows).toBe(1);
+    expect(data.shows.map((s) => [s.title, s.serverId, s.thumbPath, s.year, s.mirrors])).toEqual([
+      ['Wire', seeded.serverId, '/wire', 2002, [{ serverId: atticId, ratingKey: 'show-b' }]],
+    ]);
+    expect(data.shows[0]?.episodeCount).toBe(3);
+    expect(data.shows[0]?.seasons.map((s) => [s.number, s.episodeRange])).toEqual([[1, 'E01-E03']]);
+  });
 });

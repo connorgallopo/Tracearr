@@ -131,6 +131,22 @@ function cardOf(row: LibraryItemRow, cardId = row.id): DigestCard {
 const newestFirst = <T extends { addedAt: Date }>(a: T, b: T): number =>
   b.addedAt.getTime() - a.addedAt.getTime();
 
+type ParentKey = (serverId: string, ratingKey: string) => string;
+
+/** A parent whose copy on this server was dropped as a mirror resolves to the copy that was kept, so its children land on one card. */
+function parentKeys(rows: LibraryItemRow[]): ParentKey {
+  const kept = new Map<string, string>();
+  for (const row of rows) {
+    for (const mirror of row.mirrors) {
+      kept.set(`${mirror.serverId}:${mirror.ratingKey}`, `${row.serverId}:${row.ratingKey}`);
+    }
+  }
+  return (serverId, ratingKey) => {
+    const key = `${serverId}:${ratingKey}`;
+    return kept.get(key) ?? key;
+  };
+}
+
 interface ShowAccumulator {
   card: DigestCard;
   title: string;
@@ -143,10 +159,10 @@ interface ShowAccumulator {
   episodeCount: number;
 }
 
-function groupShows(rows: LibraryItemRow[]): ShowAccumulator[] {
+function groupShows(rows: LibraryItemRow[], parentKey: ParentKey): ShowAccumulator[] {
   const shows = new Map<string, ShowAccumulator>();
   const ensure = (row: LibraryItemRow, key: string, title: string): ShowAccumulator => {
-    const mapKey = `${row.serverId}:${key}`;
+    const mapKey = parentKey(row.serverId, key);
     let show = shows.get(mapKey);
     if (!show) {
       show = {
@@ -215,10 +231,10 @@ interface ArtistAccumulator {
   albums: Map<string, { card: DigestCard; title: string; year: number | null; trackCount: number }>;
 }
 
-function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
+function groupArtists(rows: LibraryItemRow[], parentKey: ParentKey): ArtistAccumulator[] {
   const artists = new Map<string, ArtistAccumulator>();
   const ensure = (row: LibraryItemRow, key: string, name: string): ArtistAccumulator => {
-    const mapKey = `${row.serverId}:${key}`;
+    const mapKey = parentKey(row.serverId, key);
     let artist = artists.get(mapKey);
     if (!artist) {
       artist = {
@@ -248,7 +264,8 @@ function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
     }
     if (row.mediaType === 'album' && row.parentRatingKey) {
       const artist = ensure(row, row.parentRatingKey, row.parentTitle ?? row.title);
-      const album = artist.albums.get(row.ratingKey) ?? {
+      const albumKey = parentKey(row.serverId, row.ratingKey);
+      const album = artist.albums.get(albumKey) ?? {
         card: cardOf(row),
         title: row.title,
         year: row.year,
@@ -256,7 +273,7 @@ function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
       };
       album.card = cardOf(row);
       album.year = row.year;
-      artist.albums.set(row.ratingKey, album);
+      artist.albums.set(albumKey, album);
       continue;
     }
     if (row.mediaType === 'track' && row.grandparentRatingKey && row.parentRatingKey) {
@@ -265,7 +282,8 @@ function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
         row.grandparentRatingKey,
         row.grandparentTitle ?? 'Unknown artist'
       );
-      const album = artist.albums.get(row.parentRatingKey) ?? {
+      const albumKey = parentKey(row.serverId, row.parentRatingKey);
+      const album = artist.albums.get(albumKey) ?? {
         card: {
           ...cardOf(row, `album-${row.serverId}-${row.parentRatingKey}`),
           ratingKey: row.parentRatingKey,
@@ -276,7 +294,7 @@ function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
         trackCount: 0,
       };
       album.trackCount += 1;
-      artist.albums.set(row.parentRatingKey, album);
+      artist.albums.set(albumKey, album);
     }
   }
   return [...artists.values()];
@@ -295,7 +313,8 @@ export function groupDigest(rows: LibraryItemRow[], sections: NewsletterSections
           addedAt: r.addedAt,
         }))
     : [];
-  const showGroups = sections.shows.enabled ? groupShows(rows).sort(newestFirst) : [];
+  const parentKey = parentKeys(rows);
+  const showGroups = sections.shows.enabled ? groupShows(rows, parentKey).sort(newestFirst) : [];
   const shows = showGroups.map((show) => {
     const seasons = [...show.seasons.values()].sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
     const shown = seasons.slice(0, sections.shows.maxSeasonsPerShow);
@@ -317,7 +336,7 @@ export function groupDigest(rows: LibraryItemRow[], sections: NewsletterSections
   });
   // Not resorted: rows already arrive newest-first from loadWindowItems, and an
   // artist's Map position follows the first track or album encountered for it.
-  const artistGroups = sections.music.enabled ? groupArtists(rows) : [];
+  const artistGroups = sections.music.enabled ? groupArtists(rows, parentKey) : [];
   const artists: DigestData['artists'] = [];
   let albumBudget = sections.music.max;
   let albumTotal = 0;
@@ -445,9 +464,12 @@ export function collapseMirrors(
     for (const copy of rest) {
       if (copy.serverId === first.serverId) continue;
       dropped.add(copy);
-      if (mirrored.has(copy.serverId)) continue;
-      mirrored.add(copy.serverId);
-      mirrors.push({ serverId: copy.serverId, ratingKey: copy.ratingKey });
+      const carried = [{ serverId: copy.serverId, ratingKey: copy.ratingKey }, ...copy.mirrors];
+      for (const mirror of carried) {
+        if (mirrored.has(mirror.serverId)) continue;
+        mirrored.add(mirror.serverId);
+        mirrors.push(mirror);
+      }
     }
     replaced.set(first, { ...first, mirrors: [...first.mirrors, ...mirrors] });
   }
