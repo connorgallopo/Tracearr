@@ -58,7 +58,7 @@ export function StatsActivity() {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Plays Over Time */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">{t('activity.playsOverTime')}</CardTitle>
           </CardHeader>
           <CardContent>
@@ -82,7 +82,7 @@ export function StatsActivity() {
 
         {/* Concurrent Streams */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">
               {t('activity.concurrentStreams')}
             </CardTitle>
@@ -106,7 +106,7 @@ export function StatsActivity() {
 
         {/* Engagement Breakdown */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">
               {t('activity.engagementBreakdown')}
             </CardTitle>
@@ -130,7 +130,7 @@ export function StatsActivity() {
 
         {/* Plays vs Sessions */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">{t('activity.playsVsSessions')}</CardTitle>
             <CardDescription>{t('activity.playsVsSessionsDesc')}</CardDescription>
           </CardHeader>
@@ -153,7 +153,7 @@ export function StatsActivity() {
 
         {/* Day of Week */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">
               {t('activity.activityByDayOfWeek')}
             </CardTitle>
@@ -172,7 +172,7 @@ export function StatsActivity() {
 
         {/* Hour of Day */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">
               {t('activity.activityByHourOfDay')}
             </CardTitle>
@@ -191,7 +191,7 @@ export function StatsActivity() {
 
         {/* Platforms */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">{t('activity.platforms')}</CardTitle>
           </CardHeader>
           <CardContent>
@@ -208,7 +208,7 @@ export function StatsActivity() {
 
         {/* Stream Quality */}
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader>
             <CardTitle className="text-base font-medium">{t('activity.streamQuality')}</CardTitle>
           </CardHeader>
           <CardContent>

@@ -1,4 +1,9 @@
-import type { ActiveSession, NotificationEventType, ViolationWithDetails } from '@tracearr/shared';
+import type {
+  ActiveSession,
+  NewsletterSendTrigger,
+  NotificationEventType,
+  ViolationWithDetails,
+} from '@tracearr/shared';
 import type { MediaQuality } from '../automations/types.js';
 
 /** The SSE fallback's down timer holds only the name and id, so the type is optional. */
@@ -80,6 +85,22 @@ export interface TrustChangedPayload {
   reason: string | null;
 }
 
+/** What a finished newsletter send announces; test sends and skipped windows announce nothing. */
+export interface NewsletterSendPayload {
+  newsletterId: string;
+  sendId: string;
+  name: string;
+  outcome: 'sent' | 'partial' | 'failed';
+  trigger: NewsletterSendTrigger;
+  recipientCount: number;
+  itemCounts: Record<string, number>;
+  error: string | null;
+  windowStart: string;
+  windowEnd: string;
+  /** The newsletter's History tab under the external URL; null when none is set. */
+  historyUrl: string | null;
+}
+
 export type NotificationEvent =
   | { type: 'violation'; payload: ViolationWithDetails }
   | { type: 'session_started'; payload: ActiveSession }
@@ -115,7 +136,8 @@ export type NotificationEvent =
   | { type: 'media_added'; payload: MediaEventPayload }
   | { type: 'media_upgraded'; payload: MediaUpgradedPayload }
   | { type: 'new_device'; payload: NewDevicePayload }
-  | { type: 'trust_score_changed'; payload: TrustChangedPayload };
+  | { type: 'trust_score_changed'; payload: TrustChangedPayload }
+  | { type: 'newsletter_send'; payload: NewsletterSendPayload };
 
 /** Producers keep their discriminators; rows and the UI use NotificationEventType names. */
 export const JOB_TYPE_TO_EVENT_TYPE: Record<NotificationEvent['type'], NotificationEventType> = {
@@ -131,6 +153,7 @@ export const JOB_TYPE_TO_EVENT_TYPE: Record<NotificationEvent['type'], Notificat
   media_upgraded: 'media_upgraded',
   new_device: 'new_device',
   trust_score_changed: 'trust_score_changed',
+  newsletter_send: 'newsletter_send',
 };
 
 export function eventTypeOf(event: NotificationEvent): NotificationEventType {

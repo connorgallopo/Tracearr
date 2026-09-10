@@ -68,6 +68,8 @@ import { debugRoutes } from './routes/debug.js';
 import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
 import { destinationRoutes } from './routes/destinations.js';
+import { newsletterRoutes } from './routes/newsletters.js';
+import { emailRoutes } from './routes/email.js';
 import { versionRoutes } from './routes/version.js';
 import { maintenanceRoutes } from './routes/maintenance.js';
 import { mapRoutes } from './routes/map.js';
@@ -108,6 +110,7 @@ import {
   startNotificationWorker,
   shutdownNotificationQueue,
 } from './jobs/notificationQueue.js';
+import { closeAllTransporters } from './services/notifications/destinations/emailTransport.js';
 import { runAutomationModelMigration } from './services/automations/modelMigration.js';
 import { runSystemEventsMigration } from './services/automations/systemEventsMigration.js';
 import { seedBuiltinTemplates } from './services/automations/templates/seeder.js';
@@ -153,6 +156,13 @@ import {
   scheduleBackupJob,
   shutdownBackupQueue,
 } from './jobs/backupQueue.js';
+import {
+  initNewsletterQueues,
+  startNewsletterWorkers,
+  resyncNewsletterSchedules,
+  shutdownNewsletterQueues,
+} from './jobs/newsletterQueue.js';
+import { listNewsletters } from './services/newsletters/store.js';
 import {
   initPlexTokenRefreshQueue,
   startPlexTokenRefreshWorker,
@@ -491,6 +501,8 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(statsRoutes, { prefix: `${API_BASE_PATH}/stats` });
   await app.register(settingsRoutes, { prefix: `${API_BASE_PATH}/settings` });
   await app.register(destinationRoutes, { prefix: `${API_BASE_PATH}/destinations` });
+  await app.register(newsletterRoutes, { prefix: `${API_BASE_PATH}/newsletters` });
+  await app.register(emailRoutes, { prefix: `${API_BASE_PATH}/email` });
   await app.register(importRoutes, { prefix: `${API_BASE_PATH}/import` });
   await app.register(imageRoutes, { prefix: `${API_BASE_PATH}/images` });
   await app.register(debugRoutes, { prefix: `${API_BASE_PATH}/debug` });
@@ -607,6 +619,8 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
     await shutdownBackupQueue();
+    await shutdownNewsletterQueues();
+    closeAllTransporters();
     await shutdownPlexTokenRefreshQueue();
     await shutdownRunRetentionQueue();
   });
@@ -994,6 +1008,15 @@ async function initializeServices(app: FastifyInstance) {
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize backup queue');
     // Don't throw - scheduled backups are non-critical
+  }
+
+  try {
+    initNewsletterQueues(redisUrl);
+    await resyncNewsletterSchedules(await listNewsletters());
+    startNewsletterWorkers();
+    app.log.info('Newsletter queues initialized');
+  } catch (error) {
+    app.log.error({ err: error }, 'Failed to initialize newsletter queues');
   }
 
   // Initialize run retention queue (daily purge of aged automation runs)
@@ -1407,7 +1430,9 @@ async function start() {
         stopPoller();
         void stopConnectionBudget(app.redis);
         void tailscaleService.shutdown();
-        void shutdownNotificationQueue();
+        void Promise.all([shutdownNotificationQueue(), shutdownNewsletterQueues()]).finally(() =>
+          closeAllTransporters()
+        );
         void shutdownKillQueue();
         void shutdownImportQueue();
         void shutdownLibrarySyncQueue();
@@ -1458,11 +1483,14 @@ async function start() {
           shutdownVersionCheckQueue(),
           shutdownInactivityCheckQueue(),
           shutdownBackupQueue(),
+          shutdownNewsletterQueues(),
           shutdownPlexTokenRefreshQueue(),
           shutdownRunRetentionQueue(),
-        ]).catch((err) => {
-          app.log.error({ err }, 'Error shutting down queues during maintenance');
-        });
+        ])
+          .finally(() => closeAllTransporters())
+          .catch((err: unknown) => {
+            app.log.error({ err }, 'Error shutting down queues during maintenance');
+          });
 
         // Stop the DB health interval — initializeServices will recreate it on recovery.
         if (dbHealthInterval) {

@@ -142,9 +142,7 @@
         "title": "Pair Token Generated",
         "message": "Scan the QR code with your mobile device to pair"
       },
-      "displayNameUpdated": {
-        "title": "Display Name Updated"
-      },
+      "identityUpdated": "Profile updated",
       "trustScoresReset": {
         "title": "Trust Scores Reset",
         "message_one": "{{count}} user reset to 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "Destination saved",
       "destinationDeleted": "Destination deleted",
-      "destinationTestSent": "Test notification sent"
+      "destinationTestSent": "Test notification sent",
+      "destinationTestSentTo": "Test sent to {{address}}",
+      "newsletterSaved": "Newsletter saved",
+      "newsletterDeleted": "Newsletter deleted",
+      "newsletterDuplicated": "Newsletter duplicated",
+      "newsletterTestQueued": "Test queued to {{address}}",
+      "newsletterSendQueued": "Send queued",
+      "newsletterRetryQueued": "Retrying {{count}} recipients",
+      "brandingSaved": "Email branding saved",
+      "suppressionAdded": "Address added to the suppression list",
+      "suppressionRemoved": "Address removed from the suppression list"
     },
     "error": {
       "serverAddFailed": "Failed to add server",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Failed to remove device",
       "deviceRenameFailed": "Failed to rename device",
       "sessionsRevokeFailed": "Failed to revoke sessions",
-      "displayNameUpdateFailed": "Failed to update display name",
+      "identityUpdateFailed": "Could not update the profile",
       "trustScoresResetFailed": "Failed to reset trust scores",
       "routingUpdateFailed": "Failed to update routing",
       "clipboardFailed": "Failed to copy to clipboard",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "Failed to save destination: {{error}}",
       "destinationDeleteFailed": "Failed to delete destination: {{error}}",
       "destinationTestFailed": "Test failed: {{error}}",
-      "destinationInUse": "Still used by: {{rules}}"
+      "destinationInUse": "Still used by: {{rules}}",
+      "destinationUsedByNewsletters": "Still used by newsletters: {{names}}",
+      "newsletterSaveFailed": "Could not save the newsletter: {{error}}",
+      "newsletterDeleteFailed": "Could not delete the newsletter: {{error}}",
+      "newsletterDuplicateFailed": "Could not duplicate the newsletter: {{error}}",
+      "newsletterPreviewFailed": "Could not build the preview: {{error}}",
+      "newsletterTestFailed": "Could not queue the test: {{error}}",
+      "newsletterSendFailed": "Could not queue the send: {{error}}",
+      "newsletterRetryFailed": "Could not retry the failed recipients: {{error}}",
+      "newsletterSnapshotFailed": "Could not load the snapshot: {{error}}",
+      "brandingSaveFailed": "Could not save the email branding: {{error}}",
+      "suppressionAddFailed": "Could not add the address: {{error}}",
+      "suppressionRemoveFailed": "Could not remove the address: {{error}}"
     },
     "warning": {
       "jobFailed": {

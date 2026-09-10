@@ -11,6 +11,8 @@ import type {
   EvaluationInputs,
   MediaAddedEvent,
   MediaUpgradedEvent,
+  NewsletterFailedEvent,
+  NewsletterSentEvent,
   PluginUpdateEvent,
   ServerDownEvent,
   ServerUpdateEvent,
@@ -45,9 +47,13 @@ export type ServerEvaluatingEvent =
 /** The events about one library item on a server. */
 export type MediaEvaluatingEvent = MediaAddedEvent | MediaUpgradedEvent;
 
+/** The install-wide events: no server, no account, one subject for the whole instance. */
+export type InstallEvaluatingEvent =
+  TracearrUpdateEvent | NewsletterSentEvent | NewsletterFailedEvent;
+
 /** One per catalog trigger: every event that carries a context to evaluate in. */
 export type ContextEvaluatingEvent =
-  UserEvaluatingEvent | MediaEvaluatingEvent | ServerEvaluatingEvent | TracearrUpdateEvent;
+  UserEvaluatingEvent | MediaEvaluatingEvent | ServerEvaluatingEvent | InstallEvaluatingEvent;
 
 // The seam declares three trigger types the catalog does not: resumed, media_changed and
 // ended only cancel wakes and must never reach evaluation even if a stored node names one.

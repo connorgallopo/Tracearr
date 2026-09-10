@@ -376,6 +376,24 @@ describe('Template routes', () => {
       });
     });
 
+    it('runs a share code on a tagged prerelease build past the required release', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getCurrentVersion).mockReturnValue('v2.2.4-beta.3');
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/templates/preview',
+        payload: { envelope: envelopeOf('stream-started') },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json().minServerVersion).toEqual({
+        required: '2.2.0',
+        current: 'v2.2.4-beta.3',
+        satisfied: true,
+      });
+    });
+
     it('400s with the reason a share code was rejected', async () => {
       app = await buildTestApp(ownerUser);
 

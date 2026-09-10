@@ -7,9 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile.timescale
     image: tracearr-timescale:latest
-    shm_size: 512mb  # Required for PostgreSQL shared memory (increase for large imports)
+    shm_size: 512mb # Required for PostgreSQL shared memory (increase for large imports)
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       - POSTGRES_USER=tracearr
       - POSTGRES_PASSWORD=tracearr
@@ -18,7 +18,7 @@ services:
       - timescale_dev_data:/var/lib/postgresql/data
       - ./init-timescale.sql:/docker-entrypoint-initdb.d/init-timescale.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tracearr"]
+      test: ['CMD-SHELL', 'pg_isready -U tracearr']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,14 +26,24 @@ services:
   redis:
     image: redis:8-alpine@sha256:becdda6c7f4b3fb42e42fd7f120bbf5c54c4caaaf16f26da24e4563d2c1f0576
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_dev_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Dev-only SMTP sink: point an email destination at 127.0.0.1:1025 (security none) and read the inbox at http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit:v1.31.0
+    ports:
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
+    environment:
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
 
 volumes:
   timescale_dev_data:

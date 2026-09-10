@@ -1,279 +1,299 @@
 {
-  "toast": {
-    "success": {
-      "serverAdded": {
-        "title": "Palvelin Lisätty",
-        "message": "{{name}} on yhdistetty onnistuneesti"
-      },
-      "serverRemoved": {
-        "title": "Palvelin Poistettu",
-        "message": "Palvelin on poistettu onnistuneesti"
-      },
-      "serverSynced": {
-        "title": "Palvelin Synkronoitu",
-        "message": "Palvelimen tiedot on synkronoitu"
-      },
-      "settingsUpdated": {
-        "title": "Asetukset Päivitetty",
-        "message": "Asetuksesi on tallennettu"
-      },
-      "tokenCopied": {
-        "title": "Pääsymerkki Kopioitu",
-        "message": "Pari token kopioitu leikepöydälle"
-      },
-      "violationAcknowledged": {
-        "title": "Rikkominen Tunnettu",
-        "message": "Rikkomus on merkitty tunnustetuksi"
-      },
-      "violationDismissed": {
-        "title": "Rikkomus Hylätty",
-        "message": "Rikkomus on hylätty"
-      },
-      "deviceRemoved": {
-        "title": "Laite Poistettu",
-        "message": "Laite on katkaistu"
-      },
-      "deviceRenamed": {
-        "title": "Laite Nimetään Uudelleen",
-        "message": "Laitteen nimi on päivitetty"
-      },
-      "sessionsRevoked": {
-        "title": "Istunnot Peruttu",
-        "message": "Kaikki mobiiliistunnot on peruutettu"
-      },
-      "loggedIn": {
-        "title": "Onnistui",
-        "message": "Kirjautunut onnistuneesti"
-      },
-      "webhookTest": {
-        "title": "Testi Onnistui",
-        "message": "Webkoukku toimii oikein"
-      },
-      "copiedToClipboard": {
-        "title": "Kopioitu leikepöydälle"
-      },
-      "plexAccountLinked": {
-        "title": "Plex Tili Yhdistetty",
-        "message": "Voit nyt lisätä palvelimia Plex tilisi"
-      },
-      "plexAccountUnlinked": {
-        "title": "Plex Tili Linkittämätön",
-        "message": "Yhteys Plex-tiliisi on katkaistu"
-      },
-      "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
-      },
-      "agentAdded": {
-        "title": "Agentin Lisätty",
-        "message": "Ilmoituksen tekijä on lisätty"
-      },
-      "agentUpdated": {
-        "title": "Agentin Päivitetty",
-        "message": "Ilmoituksen välittäjä on päivitetty"
-      },
-      "agentRemoved": {
-        "title": "Agentin Poistettu",
-        "message": "Ilmoituksen tekijä on poistettu"
-      },
-      "jobCompleted": {
-        "title": "Työ Suoritettu",
-        "message": "{{name}} suoritettiin onnistuneesti"
-      },
-      "automationCreated": {
-        "title": "",
-        "message": ""
-      },
-      "automationUpdated": {
-        "title": "",
-        "message": ""
-      },
-      "automationDeleted": {
-        "title": "",
-        "message": ""
-      },
-      "streamTerminated": {
-        "title": "Virta Päätetty",
-        "message": "Toiston istunto on pysäytetty"
-      },
-      "serverUrlUpdated": {
-        "title": "Palvelimen URL Päivitetty",
-        "message": "Palvelimen URL on päivitetty onnistuneesti"
-      },
-      "serverUpdated": {
-        "title": "Palvelin Päivitetty",
-        "message": "Palvelin on päivitetty onnistuneesti"
-      },
-      "syncCompletedWithErrors": {
-        "title": "Synkronointi suoritettu virheiden kanssa"
-      },
-      "sessionsDeleted": {
-        "title": "Istunnot Poistettu",
-        "message_one": "{{count}} istunto poistettu",
-        "message_other": "{{count}} istuntoa poistettu"
-      },
-      "violationsAcknowledged": {
-        "title": "Tunnustetut Rikkomukset",
-        "message_one": "{{count}} rikkomusta tunnistettu",
-        "message_other": "{{count}} rikkomusta tunnistettu"
-      },
-      "violationsDismissed": {
-        "title": "Rikkomukset Hylätty",
-        "message_one": "{{count}} rikkomusta hylätty",
-        "message_other": "{{count}} rikkomusta hylätty"
-      },
-      "apiKeyGenerated": {
-        "title": "Api Avain Luotu",
-        "message": "Uusi API-avaimesi on valmis käytettäväksi"
-      },
-      "mobileAccessEnabled": {
-        "title": "Mobiilikäyttö Käytössä",
-        "message": "Skannaa QR-koodi Tracearr mobiilisovelluksella, jotta voit muodostaa yhteyden"
-      },
-      "mobileAccessDisabled": {
-        "title": "Mobiilikäyttö Pois Käytöstä",
-        "message": "Kaikki mobiiliistunnot on peruutettu"
-      },
-      "pairTokenGenerated": {
-        "title": "Pari Luotu",
-        "message": "Skannaa QR-koodi mobiililaitteellasi, jotta voit muodostaa parin"
-      },
-      "displayNameUpdated": {
-        "title": "Näytön Nimi Päivitetty"
-      },
-      "trustScoresReset": {
-        "title": "Luottamus Pisteet Nollaa",
-        "message_one": "{{count}} käyttäjän nollaus 100",
-        "message_other": "{{count}} käyttäjää nollattu 100 käyttäjäksi"
-      },
-      "claimCodeValidated": {
-        "title": "Lunasta koodi vahvistettu",
-        "message": "Voit nyt jatkaa asetuksia"
-      },
-      "usersMerged": {
-        "title": "",
-        "automationsKept": ""
-      },
-      "serverUserSplit": {
-        "title": ""
-      },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
-    },
-    "error": {
-      "serverAddFailed": "Palvelimen lisääminen epäonnistui",
-      "serverRemoveFailed": "Palvelimen poistaminen epäonnistui",
-      "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
-      "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
-      "copyFailed": "Ei voitu kopioida leikepöydälle",
-      "acknowledgeFailed": "Rikkomuksen hyväksyminen epäonnistui",
-      "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
-      "authFailed": "Todennus epäonnistui",
-      "webhookTestFailed": "Webkoukkutesti epäonnistui",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
-      "streamTerminateFailed": "Virran lopettaminen epäonnistui",
-      "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
-      "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
-      "serverReorderFailed": "Palvelimien uudelleenjärjestäminen epäonnistui",
-      "sessionsDeleteFailed": "Istuntojen poistaminen epäonnistui",
-      "apiKeyGenerateFailed": "API-avaimen luonti epäonnistui",
-      "mobileAccessEnableFailed": "Mobiiliyhteyden käyttöoikeuden käyttöönotto epäonnistui",
-      "mobileAccessDisableFailed": "Mobiiliyhteyden käyttöoikeuden poistaminen käytöstä epäonnistui",
-      "pairTokenGenerateFailed": "Parin tunnuksen luonti epäonnistui",
-      "deviceRemoveFailed": "Laitteen poistaminen epäonnistui",
-      "deviceRenameFailed": "Laitteen uudelleennimeäminen epäonnistui",
-      "sessionsRevokeFailed": "Istuntojen peruuttaminen epäonnistui",
-      "displayNameUpdateFailed": "Näytön nimeä ei voitu päivittää",
-      "trustScoresResetFailed": "Luottamuspisteiden nollaaminen epäonnistui",
-      "routingUpdateFailed": "Reitityksen päivitys epäonnistui",
-      "clipboardFailed": "Kopiointi leikepöydälle epäonnistui",
-      "plexUnlinkFailed": "Plex tilin poisto epäonnistui",
-      "plexReauthorizeFailed": "",
-      "agentAddFailed": "Edustajan lisääminen epäonnistui",
-      "agentUpdateFailed": "Agenttia ei voitu päivittää",
-      "agentRemoveFailed": "Ei voitu poistaa agenttia",
-      "agentTestFailed": "Testi epäonnistui",
-      "jobAlreadyRunning": "Työ on jo käynnissä",
-      "jobStartFailed": "Työn aloittaminen epäonnistui",
-      "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
-      "invalidUrl": "Virheellinen URL",
-      "plexDirectUrl": "plex.direct URL-osoitteet ovat releosoitteita, joita ei voi käyttää tässä. Käytä sen sijaan suoraa IP-osoitetta tai isäntänimeä.",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "invalidClaimCode": {
-        "title": "Virheellinen korvauskoodi",
-        "message": "Ole hyvä ja tarkista palvelimen lokit"
-      },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
-    },
-    "warning": {
-      "jobFailed": {
-        "title": "Työ Epäonnistui",
-        "message": "{{name}} kohtasi virheen"
-      }
-    },
-    "info": {
-      "updateAvailable": {
-        "title": "Päivitys Saatavilla",
-        "message": "Seuraa {{version}} on saatavilla"
-      },
-      "violationDetected": {
-        "title": "Uusi Väkivalta: {{ruleName}}",
-        "message": ""
-      }
-    }
-  },
   "push": {
-    "violationDetected": "Jakaminen Rikkominen Havaittu",
-    "streamStarted": "Virta Aloitettu",
-    "streamEnded": "Virta Päättyi",
+    "newDevice": "Uusi Laite",
     "serverDown": "Palvelimen Yhteys Hävitty",
     "serverUp": "Palvelin Takaisin Verkossa",
-    "newDevice": "Uusi Laite",
-    "trustScoreChanged": "Trust Pisteet Muutettu"
+    "streamEnded": "Virta Päättyi",
+    "streamStarted": "Virta Aloitettu",
+    "trustScoreChanged": "Trust Pisteet Muutettu",
+    "violationDetected": "Jakaminen Rikkominen Havaittu"
   },
   "settings": {
-    "title": "Ilmoitusten Asetukset",
     "allSeverity": "Kaikki (matala, Varoitus, Korkea)",
-    "warningAndHigh": "Vain varoitus ja Korkea",
-    "highOnly": "Vain korkea vaikeusaste",
     "allTypes": "Kaikki Tyypit",
-    "rateLimit": "Nykyisen Nopeusrajan Tila",
-    "perMinute": "Minuuttia kohti",
-    "perHour": "Per Tunti",
-    "enablePushNotifications": "Ota Push-Ilmoitukset Käyttöön",
-    "notificationEvents": "Ilmoitustapahtumat",
-    "violationDetected": "Rikkominen Havaittu",
-    "violationDetectedDesc": "Kun jakamisen rikkominen on käynnistetty",
-    "streamStarted": "Virta Aloitettu",
-    "streamStartedDesc": "Kun käyttäjä alkaa katsella",
-    "streamStopped": "Virta Pysäytetty",
-    "streamStoppedDesc": "Kun käyttäjä lopettaa katselun",
     "concurrentStreams": "Samanaikaiset Streamit",
     "concurrentStreamsDesc": "Kun maksimi virtausraja ylittyy",
+    "enablePushNotifications": "Ota Push-Ilmoitukset Käyttöön",
+    "enableQuietHours": "Ota Hiljaisuusaika Käyttöön",
+    "highOnly": "Vain korkea vaikeusaste",
+    "minimumSeverity": "Vähimmäisvakavuus",
     "newDevice": "Uusi Laite",
     "newDeviceDesc": "Kun uusi laite yhdistää",
-    "trustScoreChanged": "Trust Pisteet Muutettu",
-    "trustScoreChangedDesc": "Kun käyttäjän luottamuspisteet muuttuvat",
+    "notificationEvents": "Ilmoitustapahtumat",
+    "overrideForCritical": "Ohita kriittinen",
+    "perHour": "Per Tunti",
+    "perMinute": "Minuuttia kohti",
+    "quietHours": "Hiljaiset Tunnit",
+    "rateLimit": "Nykyisen Nopeusrajan Tila",
+    "rateLimiting": "Arvostele Rajoitus",
     "serverDown": "Palvelin Alas",
     "serverDownDesc": "Kun mediapalvelin siirtyy pois päältä",
     "serverUp": "Palvelin Ylös",
     "serverUpDesc": "Kun mediapalvelin tulee takaisin verkossa",
+    "streamStarted": "Virta Aloitettu",
+    "streamStartedDesc": "Kun käyttäjä alkaa katsella",
+    "streamStopped": "Virta Pysäytetty",
+    "streamStoppedDesc": "Kun käyttäjä lopettaa katselun",
+    "title": "Ilmoitusten Asetukset",
+    "trustScoreChanged": "Trust Pisteet Muutettu",
+    "trustScoreChangedDesc": "Kun käyttäjän luottamuspisteet muuttuvat",
+    "violationDetected": "Rikkominen Havaittu",
+    "violationDetectedDesc": "Kun jakamisen rikkominen on käynnistetty",
     "violationFilters": "Rikkomussuodattimet",
-    "minimumSeverity": "Vähimmäisvakavuus",
-    "quietHours": "Hiljaiset Tunnit",
-    "enableQuietHours": "Ota Hiljaisuusaika Käyttöön",
-    "overrideForCritical": "Ohita kriittinen",
-    "rateLimiting": "Arvostele Rajoitus"
+    "warningAndHigh": "Vain varoitus ja Korkea"
+  },
+  "toast": {
+    "error": {
+      "acknowledgeFailed": "Rikkomuksen hyväksyminen epäonnistui",
+      "agentAddFailed": "Edustajan lisääminen epäonnistui",
+      "agentRemoveFailed": "Ei voitu poistaa agenttia",
+      "agentTestFailed": "Testi epäonnistui",
+      "agentUpdateFailed": "Agenttia ei voitu päivittää",
+      "apiKeyGenerateFailed": "API-avaimen luonti epäonnistui",
+      "authFailed": "Todennus epäonnistui",
+      "automationCreateFailed": "",
+      "automationDeleteFailed": "",
+      "automationUpdateFailed": "",
+      "brandingSaveFailed": "",
+      "clipboardFailed": "Kopiointi leikepöydälle epäonnistui",
+      "copyFailed": "Ei voitu kopioida leikepöydälle",
+      "destinationDeleteFailed": "",
+      "destinationInUse": "",
+      "destinationSaveFailed": "",
+      "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
+      "deviceRemoveFailed": "Laitteen poistaminen epäonnistui",
+      "deviceRenameFailed": "Laitteen uudelleennimeäminen epäonnistui",
+      "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
+      "identityUpdateFailed": "",
+      "invalidClaimCode": {
+        "message": "Ole hyvä ja tarkista palvelimen lokit",
+        "title": "Virheellinen korvauskoodi"
+      },
+      "invalidUrl": "Virheellinen URL",
+      "jobAlreadyRunning": "Työ on jo käynnissä",
+      "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
+      "jobStartFailed": "Työn aloittaminen epäonnistui",
+      "mobileAccessDisableFailed": "Mobiiliyhteyden käyttöoikeuden poistaminen käytöstä epäonnistui",
+      "mobileAccessEnableFailed": "Mobiiliyhteyden käyttöoikeuden käyttöönotto epäonnistui",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSaveFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterSnapshotFailed": "",
+      "newsletterTestFailed": "",
+      "pairTokenGenerateFailed": "Parin tunnuksen luonti epäonnistui",
+      "plexDirectUrl": "plex.direct URL-osoitteet ovat releosoitteita, joita ei voi käyttää tässä. Käytä sen sijaan suoraa IP-osoitetta tai isäntänimeä.",
+      "plexReauthorizeFailed": "",
+      "plexUnlinkFailed": "Plex tilin poisto epäonnistui",
+      "routingUpdateFailed": "Reitityksen päivitys epäonnistui",
+      "serverAddFailed": "Palvelimen lisääminen epäonnistui",
+      "serverRemoveFailed": "Palvelimen poistaminen epäonnistui",
+      "serverReorderFailed": "Palvelimien uudelleenjärjestäminen epäonnistui",
+      "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
+      "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
+      "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
+      "serverUserSplitFailed": "",
+      "sessionsDeleteFailed": "Istuntojen poistaminen epäonnistui",
+      "sessionsRevokeFailed": "Istuntojen peruuttaminen epäonnistui",
+      "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
+      "streamTerminateFailed": "Virran lopettaminen epäonnistui",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": "",
+      "trustScoresResetFailed": "Luottamuspisteiden nollaaminen epäonnistui",
+      "userMergeFailed": "",
+      "webhookTestFailed": "Webkoukkutesti epäonnistui"
+    },
+    "info": {
+      "updateAvailable": {
+        "message": "Seuraa {{version}} on saatavilla",
+        "title": "Päivitys Saatavilla"
+      },
+      "violationDetected": {
+        "message": "",
+        "title": "Uusi Väkivalta: {{ruleName}}"
+      }
+    },
+    "success": {
+      "agentAdded": {
+        "message": "Ilmoituksen tekijä on lisätty",
+        "title": "Agentin Lisätty"
+      },
+      "agentRemoved": {
+        "message": "Ilmoituksen tekijä on poistettu",
+        "title": "Agentin Poistettu"
+      },
+      "agentUpdated": {
+        "message": "Ilmoituksen välittäjä on päivitetty",
+        "title": "Agentin Päivitetty"
+      },
+      "apiKeyGenerated": {
+        "message": "Uusi API-avaimesi on valmis käytettäväksi",
+        "title": "Api Avain Luotu"
+      },
+      "automationCreated": {
+        "message": "",
+        "title": ""
+      },
+      "automationDeleted": {
+        "message": "",
+        "title": ""
+      },
+      "automationUpdated": {
+        "message": "",
+        "title": ""
+      },
+      "brandingSaved": "",
+      "claimCodeValidated": {
+        "message": "Voit nyt jatkaa asetuksia",
+        "title": "Lunasta koodi vahvistettu"
+      },
+      "copiedToClipboard": {
+        "title": "Kopioitu leikepöydälle"
+      },
+      "destinationDeleted": "",
+      "destinationSaved": "",
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "deviceRemoved": {
+        "message": "Laite on katkaistu",
+        "title": "Laite Poistettu"
+      },
+      "deviceRenamed": {
+        "message": "Laitteen nimi on päivitetty",
+        "title": "Laite Nimetään Uudelleen"
+      },
+      "identityUpdated": "",
+      "jobCompleted": {
+        "message": "{{name}} suoritettiin onnistuneesti",
+        "title": "Työ Suoritettu"
+      },
+      "loggedIn": {
+        "message": "Kirjautunut onnistuneesti",
+        "title": "Onnistui"
+      },
+      "mobileAccessDisabled": {
+        "message": "Kaikki mobiiliistunnot on peruutettu",
+        "title": "Mobiilikäyttö Pois Käytöstä"
+      },
+      "mobileAccessEnabled": {
+        "message": "Skannaa QR-koodi Tracearr mobiilisovelluksella, jotta voit muodostaa yhteyden",
+        "title": "Mobiilikäyttö Käytössä"
+      },
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterRetryQueued": "",
+      "newsletterSaved": "",
+      "newsletterSendQueued": "",
+      "newsletterTestQueued": "",
+      "pairTokenGenerated": {
+        "message": "Skannaa QR-koodi mobiililaitteellasi, jotta voit muodostaa parin",
+        "title": "Pari Luotu"
+      },
+      "plexAccountLinked": {
+        "message": "Voit nyt lisätä palvelimia Plex tilisi",
+        "title": "Plex Tili Yhdistetty"
+      },
+      "plexAccountReauthorized": {
+        "messageNoServers": "",
+        "message_one": "",
+        "message_other": "",
+        "partial": "",
+        "title": "",
+        "unmatched": ""
+      },
+      "plexAccountUnlinked": {
+        "message": "Yhteys Plex-tiliisi on katkaistu",
+        "title": "Plex Tili Linkittämätön"
+      },
+      "serverAdded": {
+        "message": "{{name}} on yhdistetty onnistuneesti",
+        "title": "Palvelin Lisätty"
+      },
+      "serverRemoved": {
+        "message": "Palvelin on poistettu onnistuneesti",
+        "title": "Palvelin Poistettu"
+      },
+      "serverSynced": {
+        "message": "Palvelimen tiedot on synkronoitu",
+        "title": "Palvelin Synkronoitu"
+      },
+      "serverUpdated": {
+        "message": "Palvelin on päivitetty onnistuneesti",
+        "title": "Palvelin Päivitetty"
+      },
+      "serverUrlUpdated": {
+        "message": "Palvelimen URL on päivitetty onnistuneesti",
+        "title": "Palvelimen URL Päivitetty"
+      },
+      "serverUserSplit": {
+        "title": ""
+      },
+      "sessionsDeleted": {
+        "message_one": "{{count}} istunto poistettu",
+        "message_other": "{{count}} istuntoa poistettu",
+        "title": "Istunnot Poistettu"
+      },
+      "sessionsRevoked": {
+        "message": "Kaikki mobiiliistunnot on peruutettu",
+        "title": "Istunnot Peruttu"
+      },
+      "settingsUpdated": {
+        "message": "Asetuksesi on tallennettu",
+        "title": "Asetukset Päivitetty"
+      },
+      "streamTerminated": {
+        "message": "Toiston istunto on pysäytetty",
+        "title": "Virta Päätetty"
+      },
+      "suppressionAdded": "",
+      "suppressionRemoved": "",
+      "syncCompletedWithErrors": {
+        "title": "Synkronointi suoritettu virheiden kanssa"
+      },
+      "tokenCopied": {
+        "message": "Pari token kopioitu leikepöydälle",
+        "title": "Pääsymerkki Kopioitu"
+      },
+      "trustScoresReset": {
+        "message_one": "{{count}} käyttäjän nollaus 100",
+        "message_other": "{{count}} käyttäjää nollattu 100 käyttäjäksi",
+        "title": "Luottamus Pisteet Nollaa"
+      },
+      "usersMerged": {
+        "automationsKept": "",
+        "title": ""
+      },
+      "violationAcknowledged": {
+        "message": "Rikkomus on merkitty tunnustetuksi",
+        "title": "Rikkominen Tunnettu"
+      },
+      "violationDismissed": {
+        "message": "Rikkomus on hylätty",
+        "title": "Rikkomus Hylätty"
+      },
+      "violationsAcknowledged": {
+        "message_one": "{{count}} rikkomusta tunnistettu",
+        "message_other": "{{count}} rikkomusta tunnistettu",
+        "title": "Tunnustetut Rikkomukset"
+      },
+      "violationsDismissed": {
+        "message_one": "{{count}} rikkomusta hylätty",
+        "message_other": "{{count}} rikkomusta hylätty",
+        "title": "Rikkomukset Hylätty"
+      },
+      "webhookTest": {
+        "message": "Webkoukku toimii oikein",
+        "title": "Testi Onnistui"
+      }
+    },
+    "warning": {
+      "jobFailed": {
+        "message": "{{name}} kohtasi virheen",
+        "title": "Työ Epäonnistui"
+      }
+    }
   }
 }

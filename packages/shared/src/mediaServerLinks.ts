@@ -55,3 +55,66 @@ export function buildMediaServerItemUrl({
       return null;
   }
 }
+
+const PRIVATE_SUFFIXES = ['.local', '.ts.net'];
+
+function privateIpv4(host: string): boolean {
+  const parts = host.split('.').map(Number);
+  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) {
+    return false;
+  }
+  const [a, b] = parts as [number, number, number, number];
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168)
+  );
+}
+
+function privateIpv6(host: string): boolean {
+  const h = host.toLowerCase();
+  if (h.startsWith('::ffff:')) return privateIpv4(h.slice(7));
+  return (
+    h === '::1' ||
+    h === '::' ||
+    h.startsWith('fc') ||
+    h.startsWith('fd') ||
+    h.startsWith('fe8') ||
+    h.startsWith('fe9') ||
+    h.startsWith('fea') ||
+    h.startsWith('feb')
+  );
+}
+
+/**
+ * Whether a member off the LAN could open this URL: false for loopback, RFC 1918,
+ * link-local, CGNAT (Tailscale's 100.64.0.0/10), `.local`, `.ts.net` and any host
+ * without a dot; true otherwise. A URL that does not parse counts as private.
+ */
+export function isPubliclyRoutableUrl(url: string): boolean {
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  if (host.startsWith('[') && host.endsWith(']')) return !privateIpv6(host.slice(1, -1));
+  if (host.includes(':')) return !privateIpv6(host);
+  if (!host.includes('.')) return false;
+  if (PRIVATE_SUFFIXES.some((suffix) => host.endsWith(suffix))) return false;
+  return !privateIpv4(host);
+}
+
+/**
+ * The address a member off the LAN opens the server at: the admin's public address when set,
+ * else the configured URL when that is public itself. Null means no member-facing link exists;
+ * a private public address is not rescued by a public URL, since the admin said members use it.
+ */
+export function memberFacingUrl(server: { url: string; publicUrl?: string | null }): string | null {
+  const candidate = server.publicUrl ?? server.url;
+  return isPubliclyRoutableUrl(candidate) ? candidate : null;
+}

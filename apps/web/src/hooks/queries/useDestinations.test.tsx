@@ -12,6 +12,8 @@ vi.mock('@/lib/api', async () => {
         list: vi.fn(),
         create: vi.fn(),
         remove: vi.fn(),
+        test: vi.fn(),
+        testUnsaved: vi.fn(),
       },
     },
     ApiError,
@@ -31,12 +33,21 @@ vi.mock('react-i18next', () => ({
 
 import { api, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
-import { useCreateDestination, useDeleteDestination, useDestinations } from './useDestinations';
+import {
+  useCreateDestination,
+  useDeleteDestination,
+  useDestinations,
+  useTestDestination,
+  useTestUnsavedDestination,
+} from './useDestinations';
 
 const mockList = vi.mocked(api.destinations.list);
 const mockCreate = vi.mocked(api.destinations.create);
 const mockRemove = vi.mocked(api.destinations.remove);
+const mockTestSaved = vi.mocked(api.destinations.test);
+const mockTestUnsaved = vi.mocked(api.destinations.testUnsaved);
 const mockToastError = vi.mocked(toast.error);
+const mockToastSuccess = vi.mocked(toast.success);
 
 function wrapper(client: QueryClient) {
   function Wrapper({ children }: { children: ReactNode }) {
@@ -122,5 +133,49 @@ describe('destination mutations', () => {
     expect(mockToastError).toHaveBeenCalledWith(
       'toast.error.destinationDeleteFailed:{"error":"Not Found"}'
     );
+  });
+
+  it('names the blocking newsletters when a delete comes back 409 with newsletters', async () => {
+    mockRemove.mockRejectedValueOnce(
+      new ApiError('Used by 2 newsletter(s)', 409, { newsletters: ['Weekly', 'Monthly'] })
+    );
+
+    const client = new QueryClient();
+    const { result } = renderHook(() => useDeleteDestination(), { wrapper: wrapper(client) });
+
+    result.current.mutate('d1');
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(mockToastError).toHaveBeenCalledWith(
+      'toast.error.destinationUsedByNewsletters:{"names":"Weekly, Monthly"}'
+    );
+  });
+
+  it('says where a saved test went when the server names an address', async () => {
+    mockTestSaved.mockResolvedValueOnce({ success: true, sentTo: 'plex@example.com' });
+
+    const client = new QueryClient();
+    const { result } = renderHook(() => useTestDestination(), { wrapper: wrapper(client) });
+
+    result.current.mutate('d1');
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockToastSuccess).toHaveBeenCalledWith(
+      'toast.success.destinationTestSentTo:{"address":"plex@example.com"}'
+    );
+  });
+
+  it('keeps the plain toast for an unsaved test that names no address', async () => {
+    mockTestUnsaved.mockResolvedValueOnce({ success: true });
+
+    const client = new QueryClient();
+    const { result } = renderHook(() => useTestUnsavedDestination(), {
+      wrapper: wrapper(client),
+    });
+
+    result.current.mutate({ type: 'discord', config: { webhookUrl: 'https://x' } });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockToastSuccess).toHaveBeenCalledWith('toast.success.destinationTestSent');
   });
 });

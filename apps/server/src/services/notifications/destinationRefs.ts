@@ -1,7 +1,7 @@
 import { isNotNull } from 'drizzle-orm';
 import type { Action, AutomationActions, LeafAction } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { automations } from '../../db/schema.js';
+import { automations, newsletters } from '../../db/schema.js';
 import { listDestinations } from './destinationStore.js';
 
 /** A branch holds effects of its own, so a destination can live one level down. */
@@ -53,6 +53,21 @@ export async function automationsReferencingDestinations(): Promise<Map<string, 
         refs.set(id, list);
       }
     }
+  }
+  return refs;
+}
+
+/** Newsletter names per destination id; a newsletter with no destination references nothing. */
+export async function newslettersReferencingDestinations(): Promise<Map<string, string[]>> {
+  const rows = await db
+    .select({ name: newsletters.name, destinationId: newsletters.destinationId })
+    .from(newsletters)
+    .where(isNotNull(newsletters.destinationId));
+
+  const refs = new Map<string, string[]>();
+  for (const row of rows) {
+    if (row.destinationId === null) continue;
+    refs.set(row.destinationId, [...(refs.get(row.destinationId) ?? []), row.name]);
   }
   return refs;
 }

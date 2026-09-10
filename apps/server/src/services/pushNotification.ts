@@ -1078,6 +1078,15 @@ export class PushNotificationService {
     await this.notifyText('media', 'Library', title, body, data);
   }
 
+  /** The same for a newsletter outcome an automation announced; there is no per-device toggle for it. */
+  async notifyNewsletter(
+    title: string,
+    body: string,
+    data: Record<string, unknown>
+  ): Promise<void> {
+    await this.notifyText('newsletter', 'Newsletter', title, body, data);
+  }
+
   private async notifyText(
     context: string,
     subtitle: string,

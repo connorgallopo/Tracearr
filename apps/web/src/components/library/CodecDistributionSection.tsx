@@ -158,7 +158,7 @@ export function CodecDistributionSection({
   // Single-server path - unchanged layout
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle className="text-base font-medium">Codec Distribution</CardTitle>
       </CardHeader>
       <CardContent>

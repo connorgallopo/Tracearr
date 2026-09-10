@@ -277,6 +277,11 @@ function nativeEventFor(context: EvaluationContext): NotificationEvent | null {
           releaseUrl: trigger.releaseUrl,
         },
       };
+    case 'newsletter.sent':
+    case 'newsletter.failed': {
+      const { type: _type, at: _at, ...payload } = trigger;
+      return { type: 'newsletter_send', payload };
+    }
     // Both carry an account, so the violation shape would succeed and send the wrong thing.
     case 'account.new_device': {
       const { session, serverUser } = context;

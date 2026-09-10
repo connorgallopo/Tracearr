@@ -49,6 +49,23 @@ const trustChanged = {
   },
 } as const;
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial',
+    trigger: 'schedule',
+    recipientCount: 42,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: null,
+  },
+} as const;
+
 const automationCtx = (over: { title?: string; body?: string } = {}): RenderContext => ({
   destination,
   source: { kind: 'automation', automationId: 'a-1', automationName: 'Now playing', ...over },
@@ -217,6 +234,15 @@ describe('webToastType.render', () => {
       severity: 'low',
     });
     expect(await render(event)).toEqual({});
+  });
+
+  it('toasts a newsletter outcome from an automation', async () => {
+    const out = await render(newsletterSend, automationCtx());
+    expect(out.toast).toMatchObject({
+      title: 'Newsletter partly sent',
+      message: 'Weekly reached only part of its 42 recipients',
+      severity: 'warning',
+    });
   });
 });
 

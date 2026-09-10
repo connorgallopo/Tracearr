@@ -867,7 +867,7 @@ export function Debug() {
         <TabsContent value="snapshots" className="space-y-6">
           {/* Snapshot Management */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">

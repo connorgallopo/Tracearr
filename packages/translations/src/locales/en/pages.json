@@ -111,7 +111,15 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
-    "title": "User Details"
+    "title": "User Details",
+    "editIdentity": "Edit name and contact email",
+    "editIdentityDescription": "Both apply to this person everywhere. Leave the name empty to show @{{username}}.",
+    "displayName": "Display name",
+    "contactEmail": "Contact email",
+    "contactEmailHelp": "Where newsletters go. It grants no login and never matches a synced account.",
+    "contactEmailLabel": "Newsletter address:",
+    "contactEmailNone": "none set",
+    "contactEmailNoLogin": "Grants no login."
   },
   "history": {
     "title": "History",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "Disabled destination",
+      "noAlertRecipientsTooltip": "This destination has no alert recipients, so alerts will not be sent.",
       "noDestinations": "No destinations yet. Add one to send notifications.",
       "newDestination": "New destination",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "a server comes back up",
         "pluginUpdateAvailable": "a plugin update is available",
         "serverUpdateAvailable": "a server update is available",
-        "tracearrUpdateAvailable": "a Tracearr update is available"
+        "tracearrUpdateAvailable": "a Tracearr update is available",
+        "newsletterSent": "a newsletter is sent",
+        "newsletterFailed": "a newsletter send fails"
       },
       "operators": {
         "eq": "is",
@@ -1309,6 +1320,11 @@
         "description": "Tell a destination the first time an account streams from a device you have not seen.",
         "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook"
       },
+      "newsletter-failed": {
+        "name": "Newsletter failed",
+        "description": "Tell a destination when a newsletter send fails or reaches only part of its list.",
+        "keywords": "newsletter digest email failed partial bounce notify"
+      },
       "no-4k-transcodes": {
         "name": "No 4K transcodes",
         "description": "Stop a stream that transcodes 4K source video.",
@@ -1391,6 +1407,7 @@
         "library": "Library",
         "servers": "Servers",
         "updates": "Updates",
+        "notifications": "Newsletters",
         "notify": "Notify",
         "policy": "Take action",
         "control": "If… then"
@@ -1462,6 +1479,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr itself has a newer release.",
           "synonyms": "upgrade, version, release, self"
+        },
+        "newsletterSent": {
+          "description": "A scheduled or manual newsletter reached everyone on its list.",
+          "synonyms": "newsletter, digest, email, delivered"
+        },
+        "newsletterFailed": {
+          "description": "A newsletter reached nobody, or only part of its list.",
+          "synonyms": "newsletter, digest, email, bounce, partial, error"
         }
       },
       "actions": {
@@ -1540,33 +1565,31 @@
       "showAll": "Show all",
       "moreConnections": "+{{count}} more connections",
       "connectingTo": "Connecting to {{name}}...",
+      "ownerOnly": "Only the owner can manage linked Plex accounts.",
       "noAccountsLinked": "No Plex Accounts Linked",
       "noAccountsLinkedHint": "Link a Plex account to add Plex servers to Tracearr.",
       "linkPlexAccount": "Link Plex Account",
       "linkAnotherAccount": "Link Another Plex Account",
       "linking": "Linking...",
-      "accountsLinked_one": "{{count}} Plex account linked",
-      "accountsLinked_other": "{{count}} Plex accounts linked",
-      "noAccountsLinkedShort": "No Plex accounts linked",
       "loginEnabled": "Login Enabled",
       "serversConnected_one": "{{count}} server connected",
       "serversConnected_other": "{{count}} servers connected",
       "unlinkAccount": "Unlink this Plex account",
       "reauthorizeAccount": "Reauthorize this Plex account",
       "deleteServersFirst": "Delete connected servers first to unlink this account",
-      "linkedAccounts": "Linked Plex Accounts",
-      "linkedAccountsDesc": "Manage the Plex accounts you can add servers from",
-      "noAccountsYet": "No Plex accounts linked yet.",
       "unlinkPlexAccount": "Unlink Plex Account",
       "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
     },
     "destinations": {
       "add": "Add destination",
+      "alertsGoTo": "Alerts go to {{count}} address",
+      "alertsGoTo_other": "Alerts go to {{count}} addresses",
       "builtinNote": "Built in",
       "clearSecret": "Clear",
       "delete": "Delete",
-      "deleteConfirm": "Delete {{name}}? Automations that send to it will be blocked until they are updated.",
+      "deleteConfirm": "Delete {{name}}? Automations and newsletters that use it stop until they are updated.",
       "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
+      "emailDescription": "Tracearr sends mail through this SMTP server. Newsletters pick their own recipients; automation alerts go to the addresses below.",
       "empty": "No destinations yet.",
       "fields": {
         "webhookUrl": "Webhook URL",
@@ -1576,21 +1599,73 @@
         "topic": "Topic",
         "authToken": "Auth token",
         "userKey": "User key",
-        "apiToken": "API token"
+        "apiToken": "API token",
+        "preset": "Provider",
+        "host": "SMTP host",
+        "port": "Port",
+        "security": "Security",
+        "username": "Username",
+        "password": "Password",
+        "fromName": "From name",
+        "fromAddress": "From address",
+        "to": "Alert recipients",
+        "replyTo": "Reply-to",
+        "messagesPerSecond": "Messages per second",
+        "messageStream": "Message stream"
+      },
+      "groups": {
+        "connection": "Connection",
+        "sender": "Sender",
+        "alerts": "Alerts"
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": "Optional for public topics",
+        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
+        "smtpUsernameOptional": "Leave blank when the server needs no login",
+        "smtpTo": "Alerts sent to this destination go to these addresses. Newsletters ignore this list and pick their own recipients, so you can leave it blank.",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpMessageStream": "Postmark only: the stream ID to send through, for example broadcast. Leave blank elsewhere.",
+        "smtpGmailUsername": "Your full Gmail address. Gmail sends from this address whatever the sender address says, and personal accounts stop near 500 recipients a day.",
+        "smtpGmailPassword": "An app password from Google Account > Security > 2-Step Verification > App passwords. Your account password is rejected.",
+        "smtpResendUsername": "The word resend, exactly.",
+        "smtpResendPassword": "Your Resend API key. The sender domain must be verified in Resend first.",
+        "smtpSendgridUsername": "The word apikey, exactly.",
+        "smtpSendgridPassword": "Your SendGrid API key.",
+        "smtpMailgunUsername": "postmaster@yourdomain, not your Mailgun login.",
+        "smtpMailgunPassword": "The SMTP password from that domain's settings. A sandbox domain only reaches its authorized recipients.",
+        "smtpBrevoUsername": "Your Brevo login email.",
+        "smtpBrevoPassword": "An SMTP key from SMTP & API > SMTP, not the API key.",
+        "smtpSesUsername": "The SMTP user name from the SES console, not an IAM access key. Put your region in the host.",
+        "smtpSesPassword": "The SMTP password from the SES console. Sandbox accounts send 200 messages a day to verified addresses only.",
+        "smtpPostmarkUsername": "Your Server API token.",
+        "smtpPostmarkPassword": "The same Server API token, or a stream token's secret."
+      },
+      "newslettersOnly": "Newsletters only",
+      "noAlertRecipients": "No alert recipients",
+      "options": {
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)",
+        "securityNone": "None (plain text, port 25)",
+        "presetCustom": "Custom",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
       "ownerOnly": "Only the owner can manage notification destinations.",
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
       "receiveViolations": "Receive violations",
       "receiveViolationsHint": "Send every violation to this destination.",
+      "receiveViolationsNeedsRecipients": "Add alert recipients to send violations here",
       "reencrypt": "Re-enter this destination's secret",
+      "rowActions": "Destination actions",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",
       "testHint": "Save first to test",
       "testNeedsForm": "Fill in the required fields to test",
-      "title": "Notification destinations",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "Webhook (JSON)",
@@ -1598,11 +1673,16 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "email": "Email",
         "push": "Mobile push",
         "webToast": "Browser toasts"
       },
       "usedBy": "Used by {{count}} automation",
       "usedBy_other": "Used by {{count}} automations",
+      "usedByNewsletters": "Used by {{count}} newsletter",
+      "usedByNewsletters_other": "Used by {{count}} newsletters",
+      "violationsOff": "Violations off",
+      "violationsOn": "Violations on",
       "webToastNote": "Toasts in this browser."
     },
     "jobs": {

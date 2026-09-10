@@ -346,7 +346,7 @@ export function LibraryStorage() {
 
       {/* Storage Trend & Predictions Chart */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-3">
               <CardTitle className="text-base font-medium">

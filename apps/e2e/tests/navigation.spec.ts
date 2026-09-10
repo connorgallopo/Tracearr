@@ -39,6 +39,7 @@ test.describe('Page Navigation', () => {
     await page.goto('/');
     await page.getByRole('link', { name: 'Settings' }).click();
     await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+    await expect(page).toHaveURL(/\/settings\/general\/appearance$/);
   });
 });
 

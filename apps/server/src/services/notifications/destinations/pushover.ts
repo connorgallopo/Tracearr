@@ -158,6 +158,7 @@ function build(payload: NotificationPayload): PushoverMessage {
     case 'media_upgraded':
     case 'new_device':
     case 'trust_score_changed':
+    case 'newsletter_send':
       return buildOwnText(payload);
   }
 }

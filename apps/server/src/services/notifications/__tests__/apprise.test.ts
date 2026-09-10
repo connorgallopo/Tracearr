@@ -256,6 +256,23 @@ const trustChanged = {
   },
 } as const;
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial',
+    trigger: 'schedule',
+    recipientCount: 42,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: null,
+  },
+} as const;
+
 const automationCtx = (over: { title?: string; body?: string } = {}): RenderContext => ({
   destination,
   source: { kind: 'automation', automationId: 'a-1', automationName: 'Now playing', ...over },
@@ -297,5 +314,11 @@ describe('appriseType.render with an automation source', () => {
 
     expect(message.title).toBe('Heads up');
     expect(message.body).toBe('testuser pressed play');
+  });
+
+  it('carries the newsletter outcome as its own text', async () => {
+    const message = await render(newsletterSend, automationCtx());
+    expect(message.title).toBe('Newsletter partly sent');
+    expect(message.body).toBe('Weekly reached only part of its 42 recipients');
   });
 });

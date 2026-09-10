@@ -57,6 +57,7 @@ const TABLE: Array<[string, string, string]> = [
   ['media-upgraded', 'notifications', 'notification'],
   ['new-device', 'notifications', 'notification'],
   ['trust-score-changed', 'notifications', 'notification'],
+  ['newsletter-failed', 'notifications', 'notification'],
   ['server-down', 'server_health', 'notification'],
   ['server-up', 'server_health', 'notification'],
   ['plugin-update', 'server_health', 'notification'],
@@ -73,7 +74,7 @@ const TABLE: Array<[string, string, string]> = [
 ];
 
 describe('builtin template envelopes', () => {
-  it('bundles the twenty-one templates the design names, in its order', () => {
+  it('bundles the twenty-two templates the design names, in its order', () => {
     expect(BUILTIN_ENVELOPES.map((envelope) => envelope.slug)).toEqual(TABLE.map(([slug]) => slug));
   });
 

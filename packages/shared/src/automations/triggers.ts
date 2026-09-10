@@ -70,9 +70,22 @@ const MEDIA_QUALITY_VARS = [
   'media.from.fileSize',
   'media.to.fileSize',
 ] as const;
+const NEWSLETTER_VARS = [
+  'newsletter.name',
+  'newsletter.outcome',
+  'newsletter.recipientCount',
+  'newsletter.error',
+] as const;
 
 /** What a trigger is about, and what the list filters on. */
-export const TRIGGER_GROUPS = ['sessions', 'accounts', 'library', 'servers', 'updates'] as const;
+export const TRIGGER_GROUPS = [
+  'sessions',
+  'accounts',
+  'library',
+  'servers',
+  'updates',
+  'notifications',
+] as const;
 export type TriggerGroup = (typeof TRIGGER_GROUPS)[number];
 
 export const TRIGGERS = {
@@ -134,6 +147,8 @@ export const TRIGGERS = {
     group: 'updates',
     variables: ['current', 'latest', 'releaseUrl'],
   },
+  'newsletter.sent': { context: 'install', group: 'notifications', variables: NEWSLETTER_VARS },
+  'newsletter.failed': { context: 'install', group: 'notifications', variables: NEWSLETTER_VARS },
 } as const satisfies Record<
   string,
   { context: TriggerContext; group: TriggerGroup; variables: readonly string[] }

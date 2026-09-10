@@ -409,6 +409,8 @@ function buildEmbed(payload: NotificationPayload): DiscordEmbed {
       return buildOwnText(payload, 0xf39c12); // Orange/Warning
     case 'trust_score_changed':
       return buildOwnText(payload, 0x9b59b6); // Purple
+    case 'newsletter_send':
+      return buildOwnText(payload, payload.context.outcome === 'sent' ? 0x2ecc71 : 0xe74c3c);
   }
 }
 

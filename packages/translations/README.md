@@ -86,7 +86,7 @@ Object.entries(languageNames).map(([code, name]) => ({ code, name }));
 
 ## Adding or updating translations
 
-Translations are managed in Crowdin. The English files under `src/locales/en/` are the source of truth; new keys are backfilled into every locale as English and Crowdin syncs translated values back. Do not hand-edit non-English locale JSON or open PRs that do.
+Translations are managed in Crowdin. The English files under `src/locales/en/` are the source of truth; new keys go into `en` only. The check script (`pnpm check --fix`) backfills every other locale with an empty string for each new key, never with the English text. i18next runs with `returnEmptyString: false` and `fallbackLng: 'en'`, so an empty value renders current English until Crowdin supplies a real translation. Do not hand-edit non-English locale JSON, and never copy English into another locale's file.
 
 ## Type safety
 

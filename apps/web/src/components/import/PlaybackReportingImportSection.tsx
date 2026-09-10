@@ -20,6 +20,8 @@ import {
   Search,
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
+import { StepBadge } from '@/components/settings/shared/StepBadge';
+import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { api } from '@/lib/api';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
@@ -39,8 +41,6 @@ interface PlaybackReportingImportSectionProps {
 }
 
 type PluginCheckState = 'idle' | 'checking' | 'installed' | 'not-installed';
-
-const timezoneOptions = Intl.supportedValuesOf('timeZone');
 
 export function PlaybackReportingImportSection({
   jellyfinServers,
@@ -109,9 +109,7 @@ export function PlaybackReportingImportSection({
       {/* Server Selection + Plugin Check */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs">
-            {t('import.step1')}
-          </span>
+          <StepBadge n={1} />
           {t('import.selectTargetServer')}
         </div>
 
@@ -180,27 +178,14 @@ export function PlaybackReportingImportSection({
       {/* Options */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <span className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs">
-            {t('import.step2')}
-          </span>
+          <StepBadge n={2} />
           {t('import.importOptions')}
         </div>
 
         <div className="ml-8 space-y-4">
           <div className="space-y-2">
-            <Label>{t('import.serverTimezone')}</Label>
-            <Select value={timezone} onValueChange={setTimezone}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timezoneOptions.map((tz) => (
-                  <SelectItem key={tz} value={tz}>
-                    {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="pr-timezone">{t('import.serverTimezone')}</Label>
+            <TimezoneSelect id="pr-timezone" value={timezone} onChange={setTimezone} />
             <p className="text-muted-foreground text-xs">{t('import.serverTimezoneHelp')}</p>
           </div>
 

@@ -4,9 +4,10 @@ import type { Destination } from '@tracearr/shared';
 import { Bell, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDestinations } from '@/hooks/queries/useDestinations';
-import { DestinationCard } from './DestinationCard';
+import { DestinationRow } from './DestinationRow';
 import { DestinationDialog } from './DestinationDialog';
 
 type DialogState = { mode: 'create' } | { mode: 'edit'; destination: Destination };
@@ -18,9 +19,9 @@ export function DestinationsManager() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-2">
         {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-44 w-full" />
+          <Skeleton key={i} className="h-16 w-full" />
         ))}
       </div>
     );
@@ -43,15 +44,15 @@ export function DestinationsManager() {
         </EmptyState>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ItemGroup className="gap-2">
             {rows.map((destination) => (
-              <DestinationCard
+              <DestinationRow
                 key={destination.id}
                 destination={destination}
                 onEdit={() => setDialog({ mode: 'edit', destination })}
               />
             ))}
-          </div>
+          </ItemGroup>
           {addButton}
         </>
       )}

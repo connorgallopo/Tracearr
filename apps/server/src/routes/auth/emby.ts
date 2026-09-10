@@ -6,7 +6,7 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { eq, and } from 'drizzle-orm';
-import { z } from 'zod';
+import { apiKeyConnectSchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { invalidateServersCache } from '../../jobs/poller/database.js';
@@ -15,19 +15,12 @@ import { EmbyClient } from '../../services/mediaServer/index.js';
 import { generateTokens } from './utils.js';
 import { syncServer } from '../../services/sync.js';
 
-// Schema for API key connection
-const embyConnectApiKeySchema = z.object({
-  serverUrl: z.url(),
-  serverName: z.string().min(1).max(100),
-  apiKey: z.string().min(1),
-});
-
 export const embyRoutes: FastifyPluginAsync = async (app) => {
   /**
    * POST /emby/connect-api-key - Connect an Emby server with API key (requires authentication)
    */
   app.post('/emby/connect-api-key', { preHandler: [app.authenticate] }, async (request, reply) => {
-    const body = embyConnectApiKeySchema.safeParse(request.body);
+    const body = apiKeyConnectSchema.safeParse(request.body);
     if (!body.success) {
       return reply.badRequest('serverUrl, serverName, and apiKey are required');
     }
@@ -39,7 +32,7 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only owners can add servers');
     }
 
-    const { serverUrl, serverName, apiKey } = body.data;
+    const { serverUrl, serverName, apiKey, publicUrl } = body.data;
 
     try {
       // Verify the API key has admin access
@@ -64,6 +57,7 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
             type: 'emby',
             url: serverUrl,
             token: apiKey,
+            publicUrl: publicUrl ?? null,
           })
           .returning();
         server = inserted;
@@ -74,6 +68,7 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
           .set({
             name: serverName,
             token: apiKey,
+            ...(publicUrl !== undefined ? { publicUrl } : {}),
             updatedAt: new Date(),
           })
           .where(eq(servers.id, existingServer.id));

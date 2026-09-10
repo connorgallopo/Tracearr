@@ -1,9 +1,16 @@
+import type { ReactNode } from 'react';
 import { Loader2, Check, AlertCircle, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Field, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { NumericInput } from '@/components/ui/numeric-input';
+import {
+  INPUT_GROUP_CONTROL,
+  INPUT_GROUP_UNIT,
+  InputGroup,
+  InputGroupAddon,
+} from '@/components/ui/input-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -29,7 +36,7 @@ export function SaveStatusIndicator({ status, className }: SaveStatusIndicatorPr
       className={cn(
         'inline-flex items-center gap-1 text-xs',
         status === 'saving' && 'text-muted-foreground',
-        status === 'saved' && 'text-green-600 dark:text-green-500',
+        status === 'saved' && 'text-success',
         status === 'error' && 'text-destructive',
         className
       )}
@@ -131,6 +138,8 @@ interface AutosaveTextFieldProps extends AutosaveFieldBaseProps {
   type?: 'text' | 'url' | 'email';
   disabled?: boolean;
   maxLength?: number;
+  /** Rendered beside the input, e.g. a detect/generate action. */
+  trailing?: ReactNode;
 }
 
 export function AutosaveTextField({
@@ -147,23 +156,34 @@ export function AutosaveTextField({
   onReset,
   disabled,
   maxLength,
+  trailing,
   className,
 }: AutosaveTextFieldProps) {
   const hasError = status === 'error';
+  const input = (
+    <Input
+      id={id}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      maxLength={maxLength}
+      aria-invalid={hasError}
+    />
+  );
 
   return (
     <Field data-invalid={hasError} className={className}>
       <FieldHeader id={id} label={label} status={status} />
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        maxLength={maxLength}
-        aria-invalid={hasError}
-      />
+      {trailing ? (
+        <div className="flex gap-2">
+          {input}
+          {trailing}
+        </div>
+      ) : (
+        input
+      )}
       {description && <FieldDescription>{description}</FieldDescription>}
       {hasError && errorMessage && (
         <ErrorActions errorMessage={errorMessage} onRetry={onRetry} onReset={onReset} />
@@ -246,9 +266,9 @@ export function AutosaveNumberField({
   const hasError = status === 'error';
 
   return (
-    <Field data-invalid={hasError} className={className}>
+    <Field data-invalid={hasError} className={cn('max-w-sm', className)}>
       <FieldHeader id={id} label={label} status={status} />
-      <div className="flex items-center gap-2">
+      <InputGroup data-disabled={disabled || undefined}>
         <NumericInput
           id={id}
           value={value}
@@ -258,10 +278,15 @@ export function AutosaveNumberField({
           step={step}
           disabled={disabled}
           aria-invalid={hasError}
-          className="flex-1"
+          data-slot="input-group-control"
+          className={cn('flex-1', INPUT_GROUP_CONTROL)}
         />
-        {suffix && <span className="text-muted-foreground text-sm">{suffix}</span>}
-      </div>
+        {suffix && (
+          <InputGroupAddon align="inline-end" className={INPUT_GROUP_UNIT}>
+            {suffix}
+          </InputGroupAddon>
+        )}
+      </InputGroup>
       {description && <FieldDescription>{description}</FieldDescription>}
       {hasError && errorMessage && (
         <ErrorActions errorMessage={errorMessage} onRetry={onRetry} onReset={onReset} />
@@ -302,7 +327,7 @@ export function AutosaveSelectField({
   const hasError = status === 'error';
 
   return (
-    <Field data-invalid={hasError} className={className}>
+    <Field data-invalid={hasError} className={cn('max-w-sm', className)}>
       <FieldHeader id={id} label={label} status={status} />
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger id={id} aria-invalid={hasError}>

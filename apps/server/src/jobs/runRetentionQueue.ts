@@ -18,6 +18,8 @@ import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
 import { eq, sql, type SQL } from 'drizzle-orm';
 import {
   AUTOMATION_KINDS,
+  NEWSLETTER_SEND_RETENTION_DAYS,
+  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
   RETENTION_DEFAULTS,
   TIME_MS,
   type AutomationKind,
@@ -108,7 +110,8 @@ export function startRunRetentionWorker(): void {
         console.log(
           `[RunRetention] Job ${job.id} completed in ${Date.now() - startTime}ms ` +
             `(notification=${result.notificationPurged} policy=${result.policyPurged} ` +
-            `diagnostic=${result.diagnosticPurged})`
+            `diagnostic=${result.diagnosticPurged} ` +
+            `newsletters=${result.newsletterSendsPurged}/${result.newsletterSnapshotsPruned})`
         );
       } catch (error) {
         console.error(
@@ -178,6 +181,8 @@ export interface RunRetentionResult {
   notificationPurged: number;
   policyPurged: number;
   diagnosticPurged: number;
+  newsletterSendsPurged: number;
+  newsletterSnapshotsPruned: number;
 }
 
 /** The identities whose rows one batch removed, so the caller can restate their rollups. */
@@ -266,6 +271,21 @@ async function recomputeIdentities(serverUserIds: string[]): Promise<void> {
   }
 }
 
+/** Closed sends keep their row for a year and their rendered snapshots for 90 days; an open send is never touched. */
+async function pruneNewsletterSends(): Promise<{ purged: number; pruned: number }> {
+  const purged = await db.execute(sql`
+    DELETE FROM newsletter_sends
+    WHERE finished_at IS NOT NULL AND started_at < ${cutoffOf(NEWSLETTER_SEND_RETENTION_DAYS)}
+  `);
+  const pruned = await db.execute(sql`
+    DELETE FROM newsletter_send_snapshots AS ns
+    USING newsletter_sends AS s
+    WHERE s.id = ns.send_id AND s.finished_at IS NOT NULL
+      AND s.started_at < ${cutoffOf(NEWSLETTER_SNAPSHOT_RETENTION_DAYS)}
+  `);
+  return { purged: purged.rowCount ?? 0, pruned: pruned.rowCount ?? 0 };
+}
+
 /**
  * Hard-delete runs past their retention window.
  */
@@ -285,7 +305,15 @@ export async function processRunRetention(): Promise<RunRetentionResult> {
     diagnosticPurged += await deleteBatched(diagnosticsOfKind(kind));
   }
 
-  return { notificationPurged, policyPurged, diagnosticPurged };
+  const newsletter = await pruneNewsletterSends();
+
+  return {
+    notificationPurged,
+    policyPurged,
+    diagnosticPurged,
+    newsletterSendsPurged: newsletter.purged,
+    newsletterSnapshotsPruned: newsletter.pruned,
+  };
 }
 
 /**

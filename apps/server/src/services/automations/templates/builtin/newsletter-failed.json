@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "slug": "newsletter-failed",
+  "name": "Newsletter failed",
+  "description": "Tell a destination when a newsletter send fails or reaches only part of its list.",
+  "group": "notifications",
+  "kind": "notification",
+  "minServerVersion": "2.2.0",
+  "inputs": [
+    {
+      "key": "to",
+      "kind": "destinations",
+      "label": "Send to",
+      "required": true
+    }
+  ],
+  "definition": {
+    "kind": "notification",
+    "triggers": [
+      {
+        "id": "1f1c0b6e-9c1a-4b2e-8d7a-000000002201",
+        "type": "newsletter.failed",
+        "enabled": true
+      }
+    ],
+    "conditions": {
+      "groups": []
+    },
+    "actions": {
+      "actions": [
+        {
+          "id": "1f1c0b6e-9c1a-4b2e-8d7a-000000002202",
+          "type": "send",
+          "enabled": true,
+          "to": {
+            "$input": "to"
+          }
+        }
+      ]
+    },
+    "scope": {}
+  },
+  "fingerprint": "c01ff93b1da7a3a81c4da13cbaa2ace88fec6abf64c199205f736de473c29162"
+}

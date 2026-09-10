@@ -18,6 +18,11 @@ vi.mock('../../services/imageProxy.js', () => ({
   posterVersionFor: vi.fn(() => 'abcd1234'),
 }));
 
+const mockReadLogoPng = vi.fn();
+vi.mock('../../services/notifications/emailLogo.js', () => ({
+  readLogoPng: () => mockReadLogoPng() as unknown,
+}));
+
 // Import mocked service and routes
 import { proxyImage } from '../../services/imageProxy.js';
 import { imageRoutes } from '../images.js';
@@ -89,6 +94,27 @@ describe('Image Routes', () => {
         version: undefined,
         lqip: false,
       });
+    });
+
+    it('sets a cross-origin resource policy so sandboxed previews and mail clients can load it', async () => {
+      app = await buildTestApp();
+
+      mockProxyImage.mockResolvedValue({
+        data: Buffer.from('fake-image-data'),
+        contentType: 'image/jpeg',
+        cached: false,
+      });
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/images/proxy',
+        query: {
+          server: validServerId,
+          url: '/library/metadata/123/thumb/456',
+        },
+      });
+
+      expect(response.headers['cross-origin-resource-policy']).toBe('cross-origin');
     });
 
     it('returns cache HIT header when image is cached', async () => {
@@ -585,6 +611,22 @@ describe('Image Routes', () => {
       expect(response.statusCode).toBe(200);
       // Fallback should have longer cache (86400 seconds = 1 day)
       expect(response.headers['cache-control']).toContain('max-age=86400');
+    });
+  });
+
+  describe('GET /images/logo', () => {
+    it('serves the resolved PNG and falls back to the SVG when there is none', async () => {
+      app = await buildTestApp();
+      mockReadLogoPng.mockReturnValue(Buffer.from('png-bytes'));
+      const png = await app.inject({ method: 'GET', url: '/images/logo' });
+      expect(png.statusCode).toBe(200);
+      expect(png.headers['content-type']).toBe('image/png');
+      expect(png.rawPayload).toEqual(Buffer.from('png-bytes'));
+
+      mockReadLogoPng.mockReturnValue(null);
+      const svg = await app.inject({ method: 'GET', url: '/images/logo' });
+      expect(svg.headers['content-type']).toBe('image/svg+xml');
+      expect(svg.payload).toContain('<svg');
     });
   });
 });

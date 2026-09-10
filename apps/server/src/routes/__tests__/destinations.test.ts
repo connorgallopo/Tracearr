@@ -20,23 +20,40 @@ vi.mock('../../services/notifications/destinationStore.js', () => ({
   updateDestination: vi.fn(),
   deleteDestination: vi.fn(),
   readConfig: vi.fn(),
-  toPublicDestination: vi.fn((row: { id: string; name: string; type: string }, count: number) => ({
-    id: row.id,
-    name: row.name,
-    type: row.type,
-    referencedByAutomationCount: count,
-  })),
+  toPublicDestination: vi.fn(
+    (
+      row: { id: string; name: string; type: string },
+      automations: number,
+      newsletters: number
+    ) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      referencedByAutomationCount: automations,
+      referencedByNewsletterCount: newsletters,
+    })
+  ),
 }));
 
 vi.mock('../../services/notifications/destinationRefs.js', () => ({
   automationsReferencingDestinations: vi.fn(),
+  newslettersReferencingDestinations: vi.fn(),
 }));
 
 vi.mock('../../services/notifications/destinations/registry.js', () => ({
   getDestinationType: vi.fn(() => ({ test: mockTest })),
 }));
 
-import { automationsReferencingDestinations } from '../../services/notifications/destinationRefs.js';
+vi.mock('../../jobs/newsletterQueue.js', () => ({
+  onDestinationUnavailable: vi.fn(),
+  onDestinationChanged: vi.fn(),
+}));
+
+import { onDestinationChanged, onDestinationUnavailable } from '../../jobs/newsletterQueue.js';
+import {
+  automationsReferencingDestinations,
+  newslettersReferencingDestinations,
+} from '../../services/notifications/destinationRefs.js';
 import {
   createDestination,
   deleteDestination,
@@ -98,6 +115,7 @@ describe('Destination Routes', () => {
 
   beforeEach(() => {
     vi.mocked(automationsReferencingDestinations).mockResolvedValue(new Map());
+    vi.mocked(newslettersReferencingDestinations).mockResolvedValue(new Map());
     vi.mocked(readConfig).mockReturnValue({ ok: true, config: {}, rewrap: false });
     mockTest.mockResolvedValue(undefined);
   });
@@ -108,7 +126,7 @@ describe('Destination Routes', () => {
   });
 
   describe('GET /destinations', () => {
-    it('returns the public shape with rule reference counts', async () => {
+    it('returns the public shape with automation and newsletter reference counts', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(listDestinations).mockResolvedValue([
         makeRow(),
@@ -125,13 +143,28 @@ describe('Destination Routes', () => {
           ],
         ])
       );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-2', ['Weekly', 'Monthly']]])
+      );
 
       const response = await app.inject({ method: 'GET', url: '/destinations' });
 
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual([
-        { id: 'dest-1', name: 'Discord', type: 'discord', referencedByAutomationCount: 2 },
-        { id: 'dest-2', name: 'Ntfy', type: 'ntfy', referencedByAutomationCount: 0 },
+        {
+          id: 'dest-1',
+          name: 'Discord',
+          type: 'discord',
+          referencedByAutomationCount: 2,
+          referencedByNewsletterCount: 0,
+        },
+        {
+          id: 'dest-2',
+          name: 'Ntfy',
+          type: 'ntfy',
+          referencedByAutomationCount: 0,
+          referencedByNewsletterCount: 2,
+        },
       ]);
     });
 
@@ -162,7 +195,11 @@ describe('Destination Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json()).toMatchObject({ id: 'dest-1', referencedByAutomationCount: 0 });
+      expect(response.json()).toMatchObject({
+        id: 'dest-1',
+        referencedByAutomationCount: 0,
+        referencedByNewsletterCount: 0,
+      });
       expect(createDestination).toHaveBeenCalledWith({
         name: 'Discord',
         type: 'discord',
@@ -217,6 +254,55 @@ describe('Destination Routes', () => {
       expect(response.json().message).toContain('url:');
       expect(response.json().message).toContain('link-local');
       expect(createDestination).not.toHaveBeenCalled();
+    });
+
+    it('rejects a link-local smtp host naming the field', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations',
+        payload: {
+          name: 'Mail',
+          type: 'email',
+          config: {
+            host: '169.254.169.254',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
+      expect(createDestination).not.toHaveBeenCalled();
+    });
+
+    it('does not block a LAN smtp host', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(createDestination).mockResolvedValue(makeRow({ id: 'email-1', type: 'email' }));
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations',
+        payload: {
+          name: 'Mail',
+          type: 'email',
+          config: {
+            host: '192.168.1.10',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).not.toBe(400);
+      expect(createDestination).toHaveBeenCalled();
     });
 
     it('409s a name the unique index already holds', async () => {
@@ -321,6 +407,9 @@ describe('Destination Routes', () => {
       vi.mocked(automationsReferencingDestinations).mockResolvedValue(
         new Map([['ntfy-1', [{ ruleId: 'r1', ruleName: 'Rule one', isActive: true }]]])
       );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['ntfy-1', ['Weekly']]])
+      );
 
       const response = await app.inject({
         method: 'PATCH',
@@ -329,8 +418,13 @@ describe('Destination Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json()).toMatchObject({ id: 'ntfy-1', referencedByAutomationCount: 1 });
+      expect(response.json()).toMatchObject({
+        id: 'ntfy-1',
+        referencedByAutomationCount: 1,
+        referencedByNewsletterCount: 1,
+      });
       expect(updateDestination).toHaveBeenCalledWith('ntfy-1', { config: { topic: 'new' } });
+      expect(onDestinationChanged).toHaveBeenCalledWith('ntfy-1');
     });
 
     it('rejects clearing a required key', async () => {
@@ -402,6 +496,35 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('url:');
+      expect(updateDestination).not.toHaveBeenCalled();
+    });
+
+    it('rejects a link-local smtp host in a merged config', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(
+        makeRow({ id: 'email-1', name: 'Mail', type: 'email' })
+      );
+      vi.mocked(readConfig).mockReturnValue({
+        ok: true,
+        config: {
+          host: 'smtp.example.com',
+          port: '587',
+          security: 'starttls',
+          fromAddress: 'a@example.com',
+          to: 'b@example.com',
+        },
+        rewrap: false,
+      });
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/destinations/email-1',
+        payload: { config: { host: '169.254.1.1' } },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
       expect(updateDestination).not.toHaveBeenCalled();
     });
 
@@ -491,6 +614,40 @@ describe('Destination Routes', () => {
       expect(deleteDestination).not.toHaveBeenCalled();
     });
 
+    it('409s with the newsletter names when a newsletter references it', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow());
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', ['Weekly', 'Monthly']]])
+      );
+
+      const response = await app.inject({ method: 'DELETE', url: '/destinations/dest-1' });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json()).toEqual({
+        message: 'Used by 2 newsletter(s)',
+        newsletters: ['Weekly', 'Monthly'],
+      });
+      expect(deleteDestination).not.toHaveBeenCalled();
+      expect(onDestinationUnavailable).not.toHaveBeenCalled();
+    });
+
+    it('names the automations first when both reference it', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow());
+      vi.mocked(automationsReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', [{ ruleId: 'r1', ruleName: 'Rule one', isActive: true }]]])
+      );
+      vi.mocked(newslettersReferencingDestinations).mockResolvedValue(
+        new Map([['dest-1', ['Weekly']]])
+      );
+
+      const response = await app.inject({ method: 'DELETE', url: '/destinations/dest-1' });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json()).toEqual({ message: 'Used by 1 rule(s)', rules: ['Rule one'] });
+    });
+
     it('deletes an unreferenced destination', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getDestination).mockResolvedValue(makeRow());
@@ -500,6 +657,7 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(204);
       expect(deleteDestination).toHaveBeenCalledWith('dest-1');
+      expect(onDestinationUnavailable).toHaveBeenCalledWith('dest-1');
     });
   });
 
@@ -553,6 +711,22 @@ describe('Destination Routes', () => {
         { webhookUrl: 'https://discord.com/api/webhooks/1/abc' },
         expect.objectContaining({ destination: { id: 'test', name: 'Discord' } })
       );
+    });
+
+    it('passes back the address a kind reports it sent to', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getDestination).mockResolvedValue(makeRow({ id: 'mail-1', type: 'email' }));
+      vi.mocked(readConfig).mockReturnValue({
+        ok: true,
+        config: { host: 'smtp.example.com', fromAddress: 'plex@example.com' },
+        rewrap: false,
+      });
+      mockTest.mockResolvedValue({ sentTo: 'plex@example.com' });
+
+      const response = await app.inject({ method: 'POST', url: '/destinations/mail-1/test' });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ success: true, sentTo: 'plex@example.com' });
     });
 
     it('502s a failed delivery with the error truncated to 500 characters', async () => {
@@ -613,6 +787,30 @@ describe('Destination Routes', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('url:');
+      expect(mockTest).not.toHaveBeenCalled();
+    });
+
+    it('rejects a link-local smtp host', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/destinations/test',
+        payload: {
+          type: 'email',
+          config: {
+            host: '169.254.169.254',
+            port: '25',
+            security: 'none',
+            fromAddress: 'a@example.com',
+            to: 'b@example.com',
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json().message).toContain('host:');
+      expect(response.json().message).toContain('link-local');
       expect(mockTest).not.toHaveBeenCalled();
     });
 

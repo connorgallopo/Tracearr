@@ -6,6 +6,7 @@ import type {
   MediaAddedContext,
   MediaUpgradedContext,
   NewDeviceContext,
+  NewsletterSendContext,
   TrustChangedContext,
   NotificationPayload,
   PluginUpdateContext,
@@ -190,7 +191,12 @@ function buildTracearrUpdate(
 /** The contexts that are already flat: the discriminator names the event, the rest is the body. */
 function buildFlat(
   payload: NotificationPayload,
-  ctx: MediaAddedContext | MediaUpgradedContext | NewDeviceContext | TrustChangedContext
+  ctx:
+    | MediaAddedContext
+    | MediaUpgradedContext
+    | NewDeviceContext
+    | TrustChangedContext
+    | NewsletterSendContext
 ): JsonWebhookBody {
   const { type, ...data } = ctx;
   return { event: type, timestamp: payload.timestamp, data };
@@ -223,6 +229,7 @@ function bodyOf(payload: NotificationPayload): JsonWebhookBody {
     case 'media_upgraded':
     case 'new_device':
     case 'trust_score_changed':
+    case 'newsletter_send':
       return buildFlat(payload, payload.context);
   }
 }

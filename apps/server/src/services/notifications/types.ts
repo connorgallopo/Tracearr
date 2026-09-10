@@ -16,6 +16,7 @@ import type {
   MediaEventPayload,
   MediaUpgradedPayload,
   NewDevicePayload,
+  NewsletterSendPayload,
   NotificationEvent,
   NotificationSource,
   TrustChangedPayload,
@@ -119,6 +120,13 @@ export interface TrustChangedContext extends TrustChangedPayload {
 }
 
 /**
+ * Context provided when a newsletter send finished
+ */
+export interface NewsletterSendContext extends NewsletterSendPayload {
+  type: 'newsletter_send';
+}
+
+/**
  * Union of all notification contexts
  */
 export type NotificationContext =
@@ -131,7 +139,8 @@ export type NotificationContext =
   | MediaAddedContext
   | MediaUpgradedContext
   | NewDeviceContext
-  | TrustChangedContext;
+  | TrustChangedContext
+  | NewsletterSendContext;
 
 /**
  * Unified notification payload for all agents
@@ -293,6 +302,33 @@ export const PayloadBuilders = {
       severity: dropped ? 'warning' : 'low',
       timestamp: new Date().toISOString(),
       context: { type: 'trust_score_changed', ...ctx },
+    };
+  },
+
+  fromNewsletterSend(ctx: NewsletterSendPayload): NotificationPayload {
+    const detail = ctx.error ? `: ${ctx.error}` : '';
+    const copy = {
+      sent: {
+        title: 'Newsletter sent',
+        message: `${ctx.name} went to ${String(ctx.recipientCount)} recipients`,
+        severity: 'low' as const,
+      },
+      partial: {
+        title: 'Newsletter partly sent',
+        message: `${ctx.name} reached only part of its ${String(ctx.recipientCount)} recipients${detail}`,
+        severity: 'warning' as const,
+      },
+      failed: {
+        title: 'Newsletter failed',
+        message: `${ctx.name} reached nobody${detail}`,
+        severity: 'high' as const,
+      },
+    }[ctx.outcome];
+    return {
+      event: 'newsletter_send',
+      ...copy,
+      timestamp: new Date().toISOString(),
+      context: { type: 'newsletter_send', ...ctx },
     };
   },
 
@@ -466,13 +502,22 @@ function variablesOf(event: NotificationEvent): Record<string, string> {
         'trust.reason': t.reason ?? '',
       };
     }
+    case 'newsletter_send': {
+      const n = event.payload;
+      return {
+        'newsletter.name': n.name,
+        'newsletter.outcome': n.outcome,
+        'newsletter.recipientCount': String(n.recipientCount),
+        'newsletter.error': n.error ?? '',
+      };
+    }
   }
 }
 
 const VARIABLE = /\{\{\s*([\w.]+)\s*\}\}/g;
 
 /** A name the trigger does not offer renders as nothing rather than leaving the braces in. */
-function renderTemplate(template: string, variables: Record<string, string>): string {
+export function renderTemplate(template: string, variables: Record<string, string>): string {
   return template.replace(VARIABLE, (_match, name: string) => variables[name] ?? '');
 }
 
@@ -516,6 +561,8 @@ export function toNotificationPayload(
         return PayloadBuilders.fromNewDevice(event.payload);
       case 'trust_score_changed':
         return PayloadBuilders.fromTrustScoreChanged(event.payload);
+      case 'newsletter_send':
+        return PayloadBuilders.fromNewsletterSend(event.payload);
     }
   })();
   if (source.kind === 'rule') {

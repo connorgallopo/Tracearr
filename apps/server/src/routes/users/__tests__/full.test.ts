@@ -83,4 +83,48 @@ describe('GET /users/:id/full violations panel', () => {
       expect(where).toContain('automation_runs.dismissed_at is null');
     }
   });
+
+  it('carries the identity contact email in the identity block', async () => {
+    const serverUserId = randomUUID();
+    const serverId = randomUUID();
+    const authUser: AuthUser = {
+      userId: randomUUID(),
+      username: 'owner',
+      role: 'owner',
+      serverIds: [serverId],
+    };
+    app = await buildTestApp(authUser);
+
+    let selectCall = 0;
+    const tx = {
+      select: vi.fn(() => {
+        selectCall++;
+        const rows =
+          selectCall === 1
+            ? [
+                {
+                  id: serverUserId,
+                  serverId,
+                  userId: randomUUID(),
+                  identityName: 'Ann',
+                  identityContactEmail: 'ann@example.com',
+                  identityAggregateTrustScore: 90,
+                  identityTotalViolations: 0,
+                },
+              ]
+            : [];
+        const chain = queryChain(vi.fn, rows);
+        chains.push(chain);
+        return chain;
+      }),
+      execute: vi.fn(async () => ({ rows: [] })),
+    };
+    vi.mocked((db as any).transaction).mockImplementation(async (callback: any) => callback(tx));
+
+    const response = await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().identity.contactEmail).toBe('ann@example.com');
+    expect(response.json().user).not.toHaveProperty('identityContactEmail');
+  });
 });

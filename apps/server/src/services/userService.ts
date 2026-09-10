@@ -191,6 +191,12 @@ export async function createOwnerUser(data: {
   });
 }
 
+/** The column's CHECK requires lowercase, and an address that trims to nothing means no contact email. */
+function normalizeContactEmail(value: string | null | undefined): string | null | undefined {
+  if (value === undefined || value === null) return value;
+  return value.trim().toLowerCase() || null;
+}
+
 /**
  * Update user identity
  */
@@ -200,6 +206,7 @@ export async function updateUser(
     username: string;
     name: string | null;
     email: string | null;
+    contactEmail: string | null;
     thumbnail: string | null;
     passwordHash: string | null;
     plexAccountId: string | null;
@@ -210,6 +217,7 @@ export async function updateUser(
     .set({
       ...data,
       email: data.email?.toLowerCase() ?? data.email,
+      contactEmail: normalizeContactEmail(data.contactEmail),
       updatedAt: new Date(),
     })
     .where(eq(users.id, userId))

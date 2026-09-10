@@ -295,11 +295,14 @@ export type {
 export type {
   DestinationKind,
   DestinationFieldDescriptor,
+  DestinationFieldOption,
   DestinationDescriptor,
   Destination,
+  DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
   NotificationToast,
+  EmailSecurity,
 } from './destinations.js';
 
 // Automation type exports
@@ -430,6 +433,9 @@ export {
   callbackSchema,
   // Server
   createServerSchema,
+  PUBLIC_URL_PLEX_MESSAGE,
+  apiKeyConnectSchema,
+  publicUrlSchema,
   serverIdParamSchema,
   reorderServersSchema,
   updateServerSchema,
@@ -532,13 +538,122 @@ export {
   NOTIFICATION_EVENT_TYPES,
   SUBSCRIBABLE_EVENTS,
   destinationConfigSchema,
+  configSchemaForFields,
   notificationEventTypeSchema,
   createDestinationSchema,
   updateDestinationSchema,
+  EMAIL_SECURITY,
+  EMAIL_SMTP_PRESETS,
+  addressList,
 } from './destinations.js';
 
 // Schema input type exports
 export type { SubscribableEvent } from './destinations.js';
+
+// Newsletter constants, schemas and API shapes
+export {
+  NEWSLETTER_SECTION_MAX,
+  NEWSLETTER_MOST_WATCHED_MAX,
+  NEWSLETTER_SEASONS_PER_SHOW_MAX,
+  NEWSLETTER_WINDOW_MAX_DAYS,
+  NEWSLETTER_EXTRA_ADDRESSES_MAX,
+  NEWSLETTER_EXCLUDED_USERS_MAX,
+  NEWSLETTER_SENDER_NAME_MAX,
+  NEWSLETTER_SEND_TRIGGERS,
+  NEWSLETTER_SEND_OUTCOMES,
+  NEWSLETTER_RECIPIENT_STATUSES,
+  NEWSLETTER_IMAGE_MODES,
+  EMAIL_SUPPRESSION_REASONS,
+  DEFAULT_NEWSLETTER_SUBJECT,
+  DEFAULT_NEWSLETTER_SECTIONS,
+  cronExpressionSchema,
+  newsletterScheduleSchema,
+  newsletterWindowSchema,
+  newsletterSectionsSchema,
+  newsletterScopeSchema,
+  NEWSLETTER_SCOPE_LIBRARIES_MAX,
+  newsletterScopeLibrarySchema,
+  newsletterRecipientsSchema,
+  newsletterLinksSchema,
+  DEFAULT_NEWSLETTER_LINKS,
+  createNewsletterSchema,
+  updateNewsletterSchema,
+  newsletterTestSendSchema,
+  newsletterPreviewDraftSchema,
+  emailSuppressionCreateSchema,
+  newsletterSendsQuerySchema,
+  newsletterCron,
+  resolveSenderName,
+  variantKey,
+  variantServerIds,
+  needsSenderName,
+  variantKeySchema,
+  EMAIL_LOGO_MODES,
+  emailBrandingSchema,
+  emailBrandingReadSchema,
+  DEFAULT_EMAIL_BRANDING,
+  NEWSLETTER_VIEW_TOKEN_LENGTH,
+  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
+  NEWSLETTER_SEND_RETENTION_DAYS,
+  NEWSLETTER_EXCLUDED_REASONS,
+} from './newsletters.js';
+export type {
+  NewsletterSendTrigger,
+  NewsletterSendOutcome,
+  NewsletterRecipientStatus,
+  NewsletterImageMode,
+  EmailSuppressionReason,
+  NewsletterSchedule,
+  NewsletterWindow,
+  NewsletterSections,
+  NewsletterScope,
+  NewsletterScopeLibrary,
+  NewsletterRecipients,
+  NewsletterLinks,
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+  Newsletter,
+  NewsletterSendSummary,
+  NewsletterSendVariant,
+  NewsletterSendRecipient,
+  NewsletterSendDetail,
+  NewsletterSendsPage,
+  NewsletterRecipientPerson,
+  NewsletterExcludedReason,
+  NewsletterExcludedPerson,
+  NewsletterResolvedRecipient,
+  NewsletterRecipientsView,
+  EmailSuppression,
+  NewsletterPreview,
+  NewsletterPreviewDraftInput,
+  NewsletterPreviewVariant,
+  NewsletterVariantsView,
+  NewsletterSectionCounts,
+  EmailLogoMode,
+  EmailBrandingSettings,
+  NewsletterSendHtml,
+} from './newsletters.js';
+
+// Rich text for newsletter intro and outro
+export {
+  EMAIL_RICH_TEXT_MAX_CHARS,
+  EMAIL_RICH_TEXT_MAX_BLOCKS,
+  EMAIL_RICH_TEXT_MAX_LIST_ITEMS,
+  EMAIL_RICH_TEXT_MAX_MARKS,
+  EMAIL_RICH_TEXT_MAX_WEIGHT,
+  emailRichTextHrefSchema,
+  emailRichTextDocSchema,
+  emailRichTextLength,
+  emailRichTextWeight,
+  normalizeEmailRichText,
+} from './emailRichText.js';
+export type {
+  EmailRichTextDoc,
+  EmailRichTextBlock,
+  EmailRichTextParagraph,
+  EmailRichTextInline,
+  EmailRichTextMark,
+} from './emailRichText.js';
 
 export type {
   LoginInput,
@@ -731,4 +846,9 @@ export {
   type ServerScope,
 } from './serverScope.js';
 
-export { buildMediaServerItemUrl, type MediaServerItemLinkInput } from './mediaServerLinks.js';
+export {
+  buildMediaServerItemUrl,
+  isPubliclyRoutableUrl,
+  memberFacingUrl,
+  type MediaServerItemLinkInput,
+} from './mediaServerLinks.js';

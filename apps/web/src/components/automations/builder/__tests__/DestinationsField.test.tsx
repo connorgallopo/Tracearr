@@ -45,6 +45,7 @@ function destination(overrides: Partial<Destination> = {}): Destination {
     config: { webhookUrl: null },
     secretsSet: ['webhookUrl'],
     referencedByAutomationCount: 0,
+    referencedByNewsletterCount: 0,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -176,5 +177,105 @@ describe('DestinationsField', () => {
     );
 
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+  });
+
+  it('dims an email destination with no alert recipients, says why, and still lets a rule pick it', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail',
+        name: 'Ops mail',
+        type: 'email',
+        config: { fromAddress: 'news@example.com', to: '' },
+        secretsSet: [],
+      }),
+      destination({
+        id: 'dest-mail-2',
+        name: 'Alerts mail',
+        type: 'email',
+        config: { fromAddress: 'news@example.com', to: 'a@example.com' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const quiet = screen.getByRole('button', { name: 'Ops mail' });
+    expect(quiet.className).toContain('opacity-60');
+    expect(screen.getByRole('button', { name: 'Alerts mail' }).className).not.toContain(
+      'opacity-60'
+    );
+
+    await user.hover(quiet);
+    expect(
+      await screen.findAllByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toHaveLength(0);
+
+    await user.click(quiet);
+    expect(onChange).toHaveBeenCalledWith(['dest-mail']);
+  });
+
+  it('does not dim an email destination mid-reencrypt with a null config', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail-reencrypt',
+        name: 'Reencrypting mail',
+        type: 'email',
+        config: null,
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const toggle = screen.getByRole('button', { name: 'Reencrypting mail' });
+    expect(toggle.className).not.toContain('opacity-60');
+
+    await user.hover(toggle);
+    expect(
+      screen.queryByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not dim a non-email destination that has no alert list', () => {
+    setDestinations([
+      destination({
+        id: 'dest-push-empty',
+        name: 'Quiet push',
+        type: 'push',
+        config: { to: '' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    expect(screen.getByRole('button', { name: 'Quiet push' }).className).not.toContain(
+      'opacity-60'
+    );
+  });
+
+  it('shows the disabled tooltip, not the alert-recipients one, for a disabled email destination with no alert list', async () => {
+    const user = userEvent.setup();
+    setDestinations([
+      destination({
+        id: 'dest-mail-off',
+        name: 'Off mail',
+        type: 'email',
+        enabled: false,
+        config: { fromAddress: 'news@example.com', to: '' },
+        secretsSet: [],
+      }),
+    ]);
+    render(<DestinationsField value={[]} onChange={onChange} label="Destinations" />);
+
+    const toggle = screen.getByRole('button', { name: 'Off mail' });
+    expect(toggle.className).toContain('opacity-60');
+
+    await user.hover(toggle);
+    expect(
+      await screen.findAllByText('pages:automations.builder.destinationDisabled')
+    ).not.toHaveLength(0);
+    expect(
+      screen.queryByText('pages:automations.builder.noAlertRecipientsTooltip')
+    ).not.toBeInTheDocument();
   });
 });

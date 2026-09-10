@@ -111,6 +111,8 @@ export const TRIGGER_KEYS = {
   'plugin.update_available': 'pluginUpdateAvailable',
   'server.update_available': 'serverUpdateAvailable',
   'tracearr.update_available': 'tracearrUpdateAvailable',
+  'newsletter.sent': 'newsletterSent',
+  'newsletter.failed': 'newsletterFailed',
 } as const satisfies Record<TriggerType, string>;
 
 /** Fields whose truth reads as a state, not as a comparison against `true`. */
