@@ -17,7 +17,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('@/components/ui/rich-text-field', () => ({
-  RichTextField: ({ id }: { id: string }) => <div data-testid={`rich-${id}`} />,
+  RichTextField: ({ id, placeholder }: { id: string; placeholder?: string }) => (
+    <div data-testid={`rich-${id}`}>{placeholder}</div>
+  ),
 }));
 
 vi.mock('@/hooks/queries', () => ({
@@ -285,19 +287,36 @@ describe('ContentFields', () => {
 });
 
 describe('MessageFields', () => {
-  it('shows the resolved sender name as the placeholder and stores a typed one', async () => {
+  it('shows the resolved sender as the placeholder with its help for one server, explains each subject token on its own line, and locates intro and outro', async () => {
     const p = props({ scope: { serverIds: ['s-2'], libraries: [] } });
     render(<MessageFields {...p} richTextErrors={{}} onRichText={vi.fn()} fieldKey="new" />);
-    const shownAs = screen.getByLabelText('newsletters.editor.senderName');
-    expect(shownAs).toHaveAttribute('placeholder', 'Attic');
-    await userEvent.type(shownAs, 'F');
+    const fromName = screen.getByLabelText('newsletters.editor.senderName');
+    expect(fromName).toHaveAttribute('placeholder', 'Attic');
+    expect(
+      screen.getByText('newsletters.editor.senderNameHelp:{"name":"Attic"}')
+    ).toBeInTheDocument();
+    await userEvent.type(fromName, 'F');
     expect(p.onChange).toHaveBeenCalledWith({ senderName: 'F' });
-    expect(screen.getByText(/{{server_name}}/)).toBeInTheDocument();
-    expect(await screen.findByTestId('rich-newsletter-intro')).toBeInTheDocument();
-    expect(await screen.findByTestId('rich-newsletter-outro')).toBeInTheDocument();
+    await userEvent.tab();
+    expect(p.touch).toHaveBeenCalledWith('senderName');
+
+    expect(screen.getByText('newsletters.editor.subjectHelp')).toBeInTheDocument();
+    const lines = screen.getAllByRole('listitem').map((li) => li.textContent);
+    expect(lines).toEqual([
+      '{{server_name}}: newsletters.editor.placeholders.server_name',
+      '{{start_date}}: newsletters.editor.placeholders.start_date',
+      '{{end_date}}: newsletters.editor.placeholders.end_date',
+      '{{item_count}}: newsletters.editor.placeholders.item_count',
+    ]);
+    expect(await screen.findByTestId('rich-newsletter-intro')).toHaveTextContent(
+      'newsletters.editor.introPlaceholder'
+    );
+    expect(await screen.findByTestId('rich-newsletter-outro')).toHaveTextContent(
+      'newsletters.editor.outroPlaceholder'
+    );
   });
 
-  it('falls back to Tracearr for two scoped servers and surfaces a rich text error', () => {
+  it('falls back to Tracearr for two scoped servers, hides the leave-it-empty help, and surfaces a rich text error', () => {
     const p = props();
     render(
       <MessageFields
@@ -311,6 +330,7 @@ describe('MessageFields', () => {
       'placeholder',
       'Tracearr'
     );
+    expect(screen.queryByText(/newsletters\.editor\.senderNameHelp/)).not.toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Too much formatting');
   });
 });

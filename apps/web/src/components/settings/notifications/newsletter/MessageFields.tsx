@@ -1,10 +1,11 @@
 import { Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
-import { resolveSenderName } from '@tracearr/shared';
+import { needsSenderName, resolveSenderName } from '@tracearr/shared';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useServers } from '@/hooks/queries';
+import type { Translate } from '../newsletterFormat';
 import { EditorCard } from './EditorCard';
 import {
   NEWSLETTER_FIELD_IDS,
@@ -19,7 +20,13 @@ const RichTextField = lazy(() =>
   import('@/components/ui/rich-text-field').then((m) => ({ default: m.RichTextField }))
 );
 
-const PLACEHOLDERS = ['{{server_name}}', '{{start_date}}', '{{end_date}}', '{{item_count}}'];
+/** The tokens stay in code: i18next would interpolate a {{token}} written into a translation value. */
+const PLACEHOLDERS = [
+  { token: '{{server_name}}', key: 'newsletters.editor.placeholders.server_name' },
+  { token: '{{start_date}}', key: 'newsletters.editor.placeholders.start_date' },
+  { token: '{{end_date}}', key: 'newsletters.editor.placeholders.end_date' },
+  { token: '{{item_count}}', key: 'newsletters.editor.placeholders.item_count' },
+] as const;
 
 export function MessageFields({
   state,
@@ -35,12 +42,14 @@ export function MessageFields({
   fieldKey: string;
 }) {
   const { t } = useTranslation('settings');
+  const translate = t as Translate;
   const { data: servers } = useServers();
   const scoped = scopedServers(state.scope, servers ?? []);
   const resolvedSender = resolveSenderName(
     null,
     scoped.map((server) => server.name)
   );
+  const nameRequired = needsSenderName(state.senderName, scoped.length);
 
   const richText = (field: 'intro' | 'outro') => (
     <Field data-invalid={richTextErrors[field] !== undefined}>
@@ -78,9 +87,11 @@ export function MessageFields({
           }
           onBlur={() => touch('senderName')}
         />
-        <FieldDescription>
-          {t('newsletters.editor.senderNameHelp', { name: resolvedSender })}
-        </FieldDescription>
+        {!nameRequired && (
+          <FieldDescription>
+            {t('newsletters.editor.senderNameHelp', { name: resolvedSender })}
+          </FieldDescription>
+        )}
         <FieldError>{errors.senderName}</FieldError>
       </Field>
       <Field data-invalid={errors.subject !== undefined}>
@@ -95,9 +106,14 @@ export function MessageFields({
           onChange={(event) => onChange({ subject: event.target.value })}
           onBlur={() => touch('subject')}
         />
-        <FieldDescription>
-          {t('newsletters.editor.subjectHelp')} {PLACEHOLDERS.join(', ')}
-        </FieldDescription>
+        <FieldDescription>{t('newsletters.editor.subjectHelp')}</FieldDescription>
+        <ul className="text-muted-foreground flex flex-col gap-1 text-sm">
+          {PLACEHOLDERS.map(({ token, key }) => (
+            <li key={token}>
+              <code className="text-foreground">{token}</code>: {translate(key)}
+            </li>
+          ))}
+        </ul>
         <FieldError>{errors.subject}</FieldError>
       </Field>
       {richText('intro')}
