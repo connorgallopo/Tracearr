@@ -111,7 +111,15 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
-    "title": ""
+    "title": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "Istoric",
@@ -210,7 +218,7 @@
       "quietest": "Liniște:",
       "bingeHighlights": "Evidențieri ale bătăliei",
       "bingeHighlightsDesc": "Arată cu cele mai intensive modele de vizualizare",
-      "bingeSessions": "",
+      "bingeSessions": "sesiuni bursiere",
       "noData": "Nu există date de vizionare",
       "noDataDesc": "Vizionați datele analitice vor apărea aici odată ce conținutul a fost redat. Verificați din nou după o activitate de vizualizare.",
       "failedToLoad": "Încărcarea datelor analitice a eșuat",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "",
         "pluginUpdateAvailable": "",
         "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Arată toate",
       "moreConnections": "+{{count}} mai multe conexiuni",
       "connectingTo": "Conectare la {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "Niciun cont Plex legat",
       "noAccountsLinkedHint": "Leagă un cont Plex pentru a adăuga servere Plex la Tracearr.",
       "linkPlexAccount": "Asociază contul Plex",
       "linkAnotherAccount": "Leagă un alt cont Plex",
       "linking": "Conectare...",
-      "accountsLinked_one": "{{count}} Plex cont asociat",
-      "accountsLinked_other": "{{count}} Plex conturi legate",
-      "noAccountsLinkedShort": "Niciun cont Plex legat",
       "loginEnabled": "Autentificare activată",
       "serversConnected_one": "{{count}} server conectat",
       "serversConnected_other": "{{count}} servere conectate",
       "unlinkAccount": "Deconectați acest cont Plex",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Șterge mai întâi serverele conectate pentru a deconecta acest cont",
-      "linkedAccounts": "Conturi Plex asociate",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "Nici un cont Plex încă asociat.",
       "unlinkPlexAccount": "Deconectează contul Plex",
       "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou."
     },
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Nicio activitate încă",
-    "noActivityDesc": "",
+    "noActivityDesc": "Începe streaming-ul pentru a vedea utilizatorii de top aici",
     "top3": "",
     "runnersUp": "Alergători sus"
   },
