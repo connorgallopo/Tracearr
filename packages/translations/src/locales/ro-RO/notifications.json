@@ -142,9 +142,7 @@
         "title": "Token pereche generat",
         "message": "Scanați codul QR cu dispozitivul dvs. mobil pentru a se asocia"
       },
-      "displayNameUpdated": {
-        "title": "Nume afișat actualizat"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Resetarea scorurilor de încredere",
         "message_one": "{{count}} utilizator resetează la 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Adăugarea serverului a eșuat",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Ștergerea dispozitivului a eșuat",
       "deviceRenameFailed": "Eroare la redenumirea dispozitivului",
       "sessionsRevokeFailed": "Eroare la revocarea sesiunilor",
-      "displayNameUpdateFailed": "Actualizarea numelui afișat a eșuat",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Resetarea scorurilor de încredere a eșuat",
       "routingUpdateFailed": "Nu s-a reușit actualizarea rutării",
       "clipboardFailed": "Copierea în clipboard a eșuat",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
