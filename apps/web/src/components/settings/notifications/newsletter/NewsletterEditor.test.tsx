@@ -297,6 +297,8 @@ describe('NewsletterEditor save flows', () => {
       isError: false,
     } as unknown as ReturnType<typeof useNewsletter>);
     renderAt('/settings/notifications/newsletters/n-1');
+    // Dirties the form through a field the sender-name rule doesn't touch, so the save button's disabled state below comes from validation, not the untouched-form gate.
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), '!');
     expect(
       await screen.findByText('newsletters.editor.senderNameRequiredMulti')
     ).toBeInTheDocument();
@@ -305,5 +307,6 @@ describe('NewsletterEditor save flows', () => {
     expect(
       screen.queryByText('newsletters.editor.senderNameRequiredMulti')
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'newsletters.editor.save' })).toBeEnabled();
   });
 });
