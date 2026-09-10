@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import {
@@ -18,8 +18,11 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
+  FieldLegend,
+  FieldSet,
 } from '@/components/ui/field';
 import {
+  INPUT_GROUP_CONTROL,
   INPUT_GROUP_UNIT,
   InputGroup,
   InputGroupAddon,
@@ -36,27 +39,103 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useLibraries, useServers } from '@/hooks/queries';
+import { cn } from '@/lib/utils';
 import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, scopedServers, type FieldsetProps } from './newsletterForm';
-
-const SECTIONS = ['movies', 'shows', 'music', 'mostWatched'] as const;
-const CAP: Record<(typeof SECTIONS)[number], number> = {
-  movies: NEWSLETTER_SECTION_MAX,
-  shows: NEWSLETTER_SECTION_MAX,
-  music: NEWSLETTER_SECTION_MAX,
-  mostWatched: NEWSLETTER_MOST_WATCHED_MAX,
-};
 
 const windowDays = (window: NewsletterWindow) =>
   window.kind === 'fixed' ? window.days : window.fallbackDays;
 
 const pairKey = (pair: NewsletterScopeLibrary): string => `${pair.serverId}:${pair.libraryId}`;
 
+/** A number inside a sentence: the box carries its unit, and the label repeats the whole sentence for a screen reader. */
+function UnitInput({
+  id,
+  label,
+  unit,
+  value,
+  min,
+  max,
+  disabled = false,
+  onChange,
+  onBlur,
+}: {
+  id: string;
+  label: string;
+  unit: string;
+  value: number;
+  min: number;
+  max: number;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+  onBlur: () => void;
+}) {
+  return (
+    <InputGroup className="w-40" data-disabled={disabled}>
+      <NumericInput
+        id={id}
+        data-slot="input-group-control"
+        className={cn('flex-1', INPUT_GROUP_CONTROL)}
+        aria-label={label}
+        value={value}
+        min={min}
+        max={max}
+        disabled={disabled}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+      <InputGroupAddon align="inline-end" className={INPUT_GROUP_UNIT}>
+        <InputGroupText>{unit}</InputGroupText>
+      </InputGroupAddon>
+    </InputGroup>
+  );
+}
+
+/** A switch, the section name, and the sentence holding its numbers, all on one wrapping row; help drops to a line of its own. */
+function SectionRow({
+  label,
+  htmlFor,
+  enabled,
+  onToggle,
+  help,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  enabled: boolean;
+  onToggle: (enabled: boolean) => void;
+  help?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Field orientation="horizontal" className="flex-wrap">
+      <Switch checked={enabled} onCheckedChange={onToggle} aria-label={label} />
+      <FieldContent className="flex-row flex-wrap items-center gap-x-3 gap-y-2">
+        <FieldLabel htmlFor={htmlFor} className={cn(!enabled && 'text-muted-foreground')}>
+          {label}
+        </FieldLabel>
+        <span
+          aria-disabled={!enabled}
+          className={cn(
+            'flex flex-wrap items-center gap-2 text-sm',
+            !enabled && 'text-muted-foreground'
+          )}
+        >
+          {children}
+        </span>
+        {help && <FieldDescription className="basis-full">{help}</FieldDescription>}
+      </FieldContent>
+    </Field>
+  );
+}
+
 export function ContentFields({ state, onChange, errors, touch }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: servers } = useServers();
   const { data: libraries, isLoading: librariesLoading } = useLibraries(state.scope.serverIds);
   const { scope, sections, window } = state;
+  const scoped = scopedServers(scope, servers ?? []);
+  const days = windowDays(window);
 
   const serverOptions: MultiSelectOption[] = (servers ?? []).map((server) => ({
     value: server.id,
@@ -92,6 +171,12 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
     touch('window');
     onChange({ window: next });
   };
+  const setDays = (value: number) =>
+    setWindow(
+      window.kind === 'fixed'
+        ? { kind: 'fixed', days: value }
+        : { kind: 'since_last_send', fallbackDays: value }
+    );
   const setSection = <K extends keyof NewsletterSections>(
     key: K,
     patch: Partial<NewsletterSections[K]>
@@ -99,68 +184,72 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
     touch('sections');
     onChange({ sections: { ...sections, [key]: { ...sections[key], ...patch } } });
   };
+  const capId = (section: string) => `${NEWSLETTER_FIELD_IDS.sectionCap}-${section}`;
+  const touchSections = () => touch('sections');
 
   return (
     <EditorCard title={t('newsletters.editor.content')}>
-      <div className="flex flex-wrap gap-4">
-        <Field className="w-56">
-          <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.windowKind}>
-            {t('newsletters.editor.windowKind')}
-          </FieldLabel>
-          <Select
-            value={window.kind}
-            onValueChange={(kind) =>
-              setWindow(
-                kind === 'fixed'
-                  ? { kind: 'fixed', days: windowDays(window) }
-                  : { kind: 'since_last_send', fallbackDays: windowDays(window) }
-              )
-            }
+      <Field className="max-w-sm">
+        <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.windowKind}>
+          {t('newsletters.editor.windowKind')}
+        </FieldLabel>
+        <Select
+          value={window.kind}
+          onValueChange={(kind) =>
+            setWindow(
+              kind === 'fixed'
+                ? { kind: 'fixed', days }
+                : { kind: 'since_last_send', fallbackDays: days }
+            )
+          }
+        >
+          <SelectTrigger
+            id={NEWSLETTER_FIELD_IDS.windowKind}
+            aria-label={t('newsletters.editor.windowKind')}
           >
-            <SelectTrigger
-              id={NEWSLETTER_FIELD_IDS.windowKind}
-              aria-label={t('newsletters.editor.windowKind')}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="since_last_send">
-                {t('newsletters.editor.windows.since_last_send')}
-              </SelectItem>
-              <SelectItem value="fixed">{t('newsletters.editor.windows.fixed')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field className="w-44">
-          <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.windowDays}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="since_last_send">
+              {t('newsletters.editor.windows.since_last_send')}
+            </SelectItem>
+            <SelectItem value="fixed">{t('newsletters.editor.windows.fixed')}</SelectItem>
+          </SelectContent>
+        </Select>
+        <FieldDescription>
+          {window.kind === 'fixed'
+            ? t('newsletters.editor.windowHelp.fixed')
+            : t('newsletters.editor.windowHelp.since_last_send')}
+        </FieldDescription>
+      </Field>
+      <Field>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span>
             {window.kind === 'fixed'
-              ? t('newsletters.editor.windowDays')
-              : t('newsletters.editor.fallbackDays')}
-          </FieldLabel>
-          <InputGroup>
-            <NumericInput
-              id={NEWSLETTER_FIELD_IDS.windowDays}
-              data-slot="input-group-control"
-              className="min-w-0 flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent"
-              value={windowDays(window)}
-              min={1}
-              max={NEWSLETTER_WINDOW_MAX_DAYS}
-              onChange={(days) =>
-                setWindow(
-                  window.kind === 'fixed'
-                    ? { kind: 'fixed', days }
-                    : { kind: 'since_last_send', fallbackDays: days }
-                )
-              }
-              onBlur={() => touch('window')}
-            />
-            <InputGroupAddon align="inline-end" className={INPUT_GROUP_UNIT}>
-              <InputGroupText>{t('newsletters.editor.days')}</InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
-        </Field>
-      </div>
-      <FieldError>{errors.window}</FieldError>
+              ? t('newsletters.editor.windowSentence.fixed')
+              : t('newsletters.editor.windowSentence.fallback')}
+          </span>
+          <UnitInput
+            id={NEWSLETTER_FIELD_IDS.windowDays}
+            label={
+              window.kind === 'fixed'
+                ? t('newsletters.editor.windowSentence.fixedLabel', { count: days })
+                : t('newsletters.editor.windowSentence.fallbackLabel', { count: days })
+            }
+            unit={t('newsletters.editor.days')}
+            value={days}
+            min={1}
+            max={NEWSLETTER_WINDOW_MAX_DAYS}
+            onChange={setDays}
+            onBlur={() => touch('window')}
+          />
+          {window.kind === 'fixed' && (
+            <span>{t('newsletters.editor.windowSentence.fixedAfter')}</span>
+          )}
+        </div>
+        <FieldDescription>{t('newsletters.editor.windowMax')}</FieldDescription>
+        <FieldError>{errors.window}</FieldError>
+      </Field>
       <Field className="max-w-sm">
         <FieldLabel id={`${NEWSLETTER_FIELD_IDS.servers}-label`}>
           {t('newsletters.editor.servers')}
@@ -180,8 +269,11 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
           clearLabel={t('newsletters.editor.clear')}
           countLabel={(count) => t('newsletters.editor.serversSelected', { count })}
         />
-        {scopedServers(scope, servers ?? []).length > 1 && (
+        {scoped.length > 1 && (
           <FieldDescription>{t('newsletters.editor.variantsNote')}</FieldDescription>
+        )}
+        {scoped.length === 1 && (
+          <FieldDescription>{t('newsletters.editor.serversHelp')}</FieldDescription>
         )}
       </Field>
       <Field className="max-w-sm">
@@ -207,6 +299,7 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
           clearLabel={t('newsletters.editor.clear')}
           countLabel={(count) => t('newsletters.editor.librariesSelected', { count })}
         />
+        <FieldDescription>{t('newsletters.editor.librariesHelp')}</FieldDescription>
         {unknownLibraries.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {unknownLibraries.map((pair) => (
@@ -229,46 +322,105 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
         )}
         <FieldError>{errors.scope}</FieldError>
       </Field>
-      <div className="flex flex-col gap-3">
-        {SECTIONS.map((section) => {
-          const label = t(`newsletters.editor.sections.${section}`);
-          const capId = `${NEWSLETTER_FIELD_IDS.sectionCap}-${section}`;
-          return (
-            <Field key={section} orientation="horizontal" className="flex-wrap">
-              <Switch
-                checked={sections[section].enabled}
-                onCheckedChange={(enabled) => setSection(section, { enabled })}
-                aria-label={label}
-              />
-              <FieldContent>
-                <FieldLabel htmlFor={capId}>{label}</FieldLabel>
-              </FieldContent>
-              <NumericInput
-                id={capId}
-                className="w-20"
-                aria-label={t('newsletters.editor.sectionMax', { section: label })}
-                value={sections[section].max}
-                min={1}
-                max={CAP[section]}
-                onChange={(max) => setSection(section, { max })}
-              />
-              {section === 'shows' && (
-                <NumericInput
-                  id={`${NEWSLETTER_FIELD_IDS.sectionCap}-shows-seasons`}
-                  className="w-20"
-                  aria-label={t('newsletters.editor.seasonsPerShow')}
-                  value={sections.shows.maxSeasonsPerShow}
-                  min={1}
-                  max={NEWSLETTER_SEASONS_PER_SHOW_MAX}
-                  onChange={(maxSeasonsPerShow) => setSection('shows', { maxSeasonsPerShow })}
-                />
-              )}
-            </Field>
-          );
-        })}
-        <FieldDescription>{t('newsletters.editor.sectionsHelp')}</FieldDescription>
+      <FieldSet className="gap-3">
+        <FieldLegend variant="label">{t('newsletters.editor.sections.legend')}</FieldLegend>
+        <FieldDescription>{t('newsletters.editor.sections.description')}</FieldDescription>
+        <SectionRow
+          label={t('newsletters.editor.sections.movies')}
+          htmlFor={capId('movies')}
+          enabled={sections.movies.enabled}
+          onToggle={(enabled) => setSection('movies', { enabled })}
+        >
+          <span>{t('newsletters.editor.sections.upTo')}</span>
+          <UnitInput
+            id={capId('movies')}
+            label={t('newsletters.editor.sections.labels.movies', { count: sections.movies.max })}
+            unit={t('newsletters.editor.sections.units.movies')}
+            value={sections.movies.max}
+            min={1}
+            max={NEWSLETTER_SECTION_MAX}
+            disabled={!sections.movies.enabled}
+            onChange={(max) => setSection('movies', { max })}
+            onBlur={touchSections}
+          />
+        </SectionRow>
+        <SectionRow
+          label={t('newsletters.editor.sections.shows')}
+          htmlFor={capId('shows')}
+          enabled={sections.shows.enabled}
+          onToggle={(enabled) => setSection('shows', { enabled })}
+        >
+          <span>{t('newsletters.editor.sections.upTo')}</span>
+          <UnitInput
+            id={capId('shows')}
+            label={t('newsletters.editor.sections.labels.shows', { count: sections.shows.max })}
+            unit={t('newsletters.editor.sections.units.shows')}
+            value={sections.shows.max}
+            min={1}
+            max={NEWSLETTER_SECTION_MAX}
+            disabled={!sections.shows.enabled}
+            onChange={(max) => setSection('shows', { max })}
+            onBlur={touchSections}
+          />
+          <span>,</span>
+          <UnitInput
+            id={capId('shows-seasons')}
+            label={t('newsletters.editor.sections.labels.seasons', {
+              count: sections.shows.maxSeasonsPerShow,
+            })}
+            unit={t('newsletters.editor.sections.units.seasonsEach')}
+            value={sections.shows.maxSeasonsPerShow}
+            min={1}
+            max={NEWSLETTER_SEASONS_PER_SHOW_MAX}
+            disabled={!sections.shows.enabled}
+            onChange={(maxSeasonsPerShow) => setSection('shows', { maxSeasonsPerShow })}
+            onBlur={touchSections}
+          />
+        </SectionRow>
+        <SectionRow
+          label={t('newsletters.editor.sections.music')}
+          htmlFor={capId('music')}
+          enabled={sections.music.enabled}
+          onToggle={(enabled) => setSection('music', { enabled })}
+          help={t('newsletters.editor.sections.musicHelp')}
+        >
+          <span>{t('newsletters.editor.sections.upTo')}</span>
+          <UnitInput
+            id={capId('music')}
+            label={t('newsletters.editor.sections.labels.music', { count: sections.music.max })}
+            unit={t('newsletters.editor.sections.units.albums')}
+            value={sections.music.max}
+            min={1}
+            max={NEWSLETTER_SECTION_MAX}
+            disabled={!sections.music.enabled}
+            onChange={(max) => setSection('music', { max })}
+            onBlur={touchSections}
+          />
+        </SectionRow>
+        <SectionRow
+          label={t('newsletters.editor.sections.mostWatched')}
+          htmlFor={capId('mostWatched')}
+          enabled={sections.mostWatched.enabled}
+          onToggle={(enabled) => setSection('mostWatched', { enabled })}
+          help={t('newsletters.editor.sections.mostWatchedHelp')}
+        >
+          <span>{t('newsletters.editor.sections.the')}</span>
+          <UnitInput
+            id={capId('mostWatched')}
+            label={t('newsletters.editor.sections.labels.mostWatched', {
+              count: sections.mostWatched.max,
+            })}
+            unit={t('newsletters.editor.sections.units.mostPlayed')}
+            value={sections.mostWatched.max}
+            min={1}
+            max={NEWSLETTER_MOST_WATCHED_MAX}
+            disabled={!sections.mostWatched.enabled}
+            onChange={(max) => setSection('mostWatched', { max })}
+            onBlur={touchSections}
+          />
+        </SectionRow>
         <FieldError>{errors.sections}</FieldError>
-      </div>
+      </FieldSet>
     </EditorCard>
   );
 }

@@ -178,7 +178,7 @@ describe('ScheduleFields', () => {
 });
 
 describe('ContentFields', () => {
-  it('edits the window, keeps the same library id on two servers apart, and flags an unknown pair', async () => {
+  it('edits the window as a sentence, keeps the same library id on two servers apart, and flags an unknown pair', async () => {
     const p = props({
       scope: {
         serverIds: [],
@@ -188,10 +188,24 @@ describe('ContentFields', () => {
         ],
       },
     });
-    render(<ContentFields {...p} />);
+    const { rerender } = render(<ContentFields {...p} />);
+    expect(screen.getByText('newsletters.editor.windowSentence.fallback')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('newsletters.editor.windowSentence.fallbackLabel:{"count":7}')
+    ).toHaveValue('7');
+    expect(screen.getByText('newsletters.editor.windowHelp.since_last_send')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.windowMax')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('combobox', { name: 'newsletters.editor.windowKind' }));
     await userEvent.click(screen.getByRole('option', { name: 'newsletters.editor.windows.fixed' }));
     expect(p.onChange).toHaveBeenCalledWith({ window: { kind: 'fixed', days: 7 } });
+
+    rerender(<ContentFields {...p} state={{ ...p.state, window: { kind: 'fixed', days: 7 } }} />);
+    expect(screen.getByText('newsletters.editor.windowSentence.fixed')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.windowSentence.fixedAfter')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('newsletters.editor.windowSentence.fixedLabel:{"count":7}')
+    ).toHaveValue('7');
+    expect(screen.getByText('newsletters.editor.windowHelp.fixed')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('combobox', { name: 'newsletters.editor.libraries' }));
     expect(screen.getByText('Basement')).toBeInTheDocument();
@@ -217,29 +231,55 @@ describe('ContentFields', () => {
     expect(p.onChange).toHaveBeenCalledWith({
       scope: { serverIds: [], libraries: [{ serverId: 's-1', libraryId: '1' }] },
     });
+    expect(screen.getByText('newsletters.editor.librariesHelp')).toBeInTheDocument();
   });
 
-  it('toggles a section and caps its count', async () => {
-    const p = props();
+  it("names each cap as a sentence with the right noun, disables a section's numbers when it is off and keeps their values", async () => {
+    const p = props({
+      sections: {
+        ...defaultFormState().sections,
+        movies: { enabled: false, max: 9 },
+      },
+    });
     render(<ContentFields {...p} />);
+    const movies = screen.getByLabelText('newsletters.editor.sections.labels.movies:{"count":9}');
+    expect(movies).toBeDisabled();
+    expect(movies).toHaveValue('9');
+    expect(movies).toHaveAttribute('max', '12');
+    expect(
+      screen.getByLabelText('newsletters.editor.sections.labels.shows:{"count":12}')
+    ).toBeEnabled();
+    expect(
+      screen.getByLabelText('newsletters.editor.sections.labels.seasons:{"count":8}')
+    ).toHaveValue('8');
+    expect(
+      screen.getByLabelText('newsletters.editor.sections.labels.music:{"count":8}')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('newsletters.editor.sections.labels.mostWatched:{"count":10}')
+    ).toBeDisabled();
+    expect(screen.getByText('newsletters.editor.sections.units.albums')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.sections.musicHelp')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.sections.mostWatchedHelp')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.sections.description')).toBeInTheDocument();
+    expect(screen.queryByText('newsletters.editor.sectionsHelp')).not.toBeInTheDocument();
+
     await userEvent.click(
       screen.getByRole('switch', { name: 'newsletters.editor.sections.mostWatched' })
     );
     expect(p.onChange).toHaveBeenCalledWith({
       sections: { ...p.state.sections, mostWatched: { enabled: true, max: 10 } },
     });
-    const cap = screen.getByLabelText(
-      'newsletters.editor.sectionMax:{"section":"newsletters.editor.sections.movies"}'
-    );
-    expect(cap).toHaveValue('12');
-    expect(cap).toHaveAttribute('max', '12');
+    expect(p.touch).toHaveBeenCalledWith('sections');
   });
 
-  it('explains variants under the servers picker only when the scope covers several servers', () => {
+  it('says what the servers select decides, for one server and for several', () => {
     const { unmount } = render(<ContentFields {...props()} />);
     expect(screen.getByText('newsletters.editor.variantsNote')).toBeInTheDocument();
+    expect(screen.queryByText('newsletters.editor.serversHelp')).not.toBeInTheDocument();
     unmount();
     render(<ContentFields {...props({ scope: { serverIds: ['s-2'], libraries: [] } })} />);
+    expect(screen.getByText('newsletters.editor.serversHelp')).toBeInTheDocument();
     expect(screen.queryByText('newsletters.editor.variantsNote')).not.toBeInTheDocument();
   });
 });
