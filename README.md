@@ -231,6 +231,7 @@ pnpm install
 
 # Start database services
 docker compose -f docker/docker-compose.dev.yml up -d
+# Includes Mailpit for email testing: SMTP on 1025, inbox at http://localhost:8025
 
 # Copy and configure environment
 cp .env.example .env

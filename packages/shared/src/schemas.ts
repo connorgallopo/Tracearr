@@ -130,6 +130,31 @@ export const callbackSchema = z.object({
   serverType: serverTypeSchema,
 });
 
+const permissiveUrlSchema = z.string().refine(
+  (val) => {
+    // Must start with http:// or https://
+    if (!/^https?:\/\//i.test(val)) return false;
+    // Must have something after the protocol
+    const afterProtocol = val.replace(/^https?:\/\//i, '');
+    if (!afterProtocol || afterProtocol === '/') return false;
+    // Check hostname doesn't have whitespace
+    const hostPart = afterProtocol.split('/')[0];
+    if (!hostPart || /\s/.test(hostPart)) return false;
+    return true;
+  },
+  { message: 'Invalid URL. Must start with http:// or https:// followed by a hostname' }
+);
+
+export const PUBLIC_URL_PLEX_MESSAGE = 'Public address applies to Jellyfin and Emby servers only';
+
+/** Same rules as externalUrl, except a bare host gets https: the address leaves the LAN. Empty clears it. */
+export const publicUrlSchema = z.preprocess((val) => {
+  if (val === null || val === undefined) return null;
+  const str = String(val).trim();
+  if (!str) return null;
+  return /^https?:\/\//i.test(str) ? str : `https://${str}`;
+}, permissiveUrlSchema.nullable());
+
 // ============================================================================
 // Server Schemas
 // ============================================================================
@@ -143,6 +168,7 @@ export const createServerSchema = z
     username: z.string().min(1).optional(),
     password: z.string().min(1).optional(),
     ignoreAnonymousStreams: z.boolean().default(true),
+    publicUrl: publicUrlSchema.optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'dispatcharr') {
@@ -165,7 +191,18 @@ export const createServerSchema = z
         path: ['token'],
       });
     }
+  })
+  .refine((data) => data.type !== 'plex' || data.publicUrl == null, {
+    message: PUBLIC_URL_PLEX_MESSAGE,
+    path: ['publicUrl'],
   });
+
+export const apiKeyConnectSchema = z.object({
+  serverUrl: z.url(),
+  serverName: z.string().min(1).max(100),
+  apiKey: z.string().min(1),
+  publicUrl: publicUrlSchema.optional(),
+});
 
 export const serverIdParamSchema = z.object({
   id: uuidSchema,
@@ -194,6 +231,7 @@ export const updateServerSchema = z
       .regex(/^#[0-9a-fA-F]{6}$/, 'Color must be a valid hex color (e.g. #3b82f6)')
       .optional()
       .nullable(),
+    publicUrl: publicUrlSchema.optional(),
   })
   .superRefine((data, ctx) => {
     const hasToken = data.token !== undefined;
@@ -227,12 +265,13 @@ export const updateServerSchema = z
       data.token === undefined &&
       data.username === undefined &&
       data.password === undefined &&
+      data.publicUrl === undefined &&
       data.ignoreAnonymousStreams === undefined
     ) {
       ctx.addIssue({
         code: 'custom',
         message:
-          'At least one of name, url, color, token, username, password, or ignoreAnonymousStreams is required',
+          'At least one of name, url, color, publicUrl, token, username, password, or ignoreAnonymousStreams is required',
       });
     }
   });
@@ -248,6 +287,12 @@ export const updateUserSchema = z.object({
 
 export const updateUserIdentitySchema = z.object({
   name: z.string().max(255).nullable().optional(),
+  contactEmail: z
+    .email()
+    .max(255)
+    .transform((v) => v.trim().toLowerCase())
+    .nullable()
+    .optional(),
 });
 
 export type UpdateUserIdentityInput = z.infer<typeof updateUserIdentitySchema>;
@@ -679,21 +724,6 @@ export const locationStatsQuerySchema = z
 
 // Unit system enum for display preferences
 export const unitSystemSchema = z.enum(['metric', 'imperial']);
-
-const permissiveUrlSchema = z.string().refine(
-  (val) => {
-    // Must start with http:// or https://
-    if (!/^https?:\/\//i.test(val)) return false;
-    // Must have something after the protocol
-    const afterProtocol = val.replace(/^https?:\/\//i, '');
-    if (!afterProtocol || afterProtocol === '/') return false;
-    // Check hostname doesn't have whitespace
-    const hostPart = afterProtocol.split('/')[0];
-    if (!hostPart || /\s/.test(hostPart)) return false;
-    return true;
-  },
-  { message: 'Invalid URL. Must start with http:// or https:// followed by a hostname' }
-);
 
 // Nullable URL schema that converts empty strings to null (for clearing fields)
 // Auto-prepends http:// if a bare hostname is provided (no protocol)

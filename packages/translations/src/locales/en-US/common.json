@@ -54,7 +54,7 @@
     "viewOnGithub": "View on GitHub",
     "later": "Later",
     "previous": "Previous",
-    "reload": "Reload"
+    "reload": ""
   },
   "states": {
     "loading": "Loading...",

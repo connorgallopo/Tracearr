@@ -14,16 +14,16 @@
  * - Progress tracking
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Import ACTUAL production schemas and service - not local duplicates
-// This ensures tests validate the same schemas used in production
 import {
   TautulliService,
+  TautulliApiError,
   TautulliHistoryRecordSchema,
   TautulliHistoryResponseSchema,
   TautulliUserRecordSchema,
   TautulliUsersResponseSchema,
+  isFatalImportError,
   parseHistoryGuid,
   type TautulliHistoryRecord,
   type TautulliUserRecord,
@@ -429,6 +429,97 @@ describe('TautulliService.testConnection', () => {
 
       consoleWarnSpy.mockRestore();
     });
+  });
+});
+
+describe('TautulliService.getHistory failures', () => {
+  let mockFetch: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    global.fetch = mockFetch as typeof global.fetch;
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('rejects with the status and response body, without retrying, on 401', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      text: async () => '{"response":{"result":"error","message":"Invalid apikey"}}',
+    });
+
+    const service = new TautulliService('http://localhost:8181', 'bad-key');
+    const err = await service.getHistory(0, 1).catch((e: unknown) => e);
+
+    expect(err).toBeInstanceOf(TautulliApiError);
+    expect((err as TautulliApiError).status).toBe(401);
+    expect((err as TautulliApiError).message).toContain('Invalid apikey');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a 500 three times and then rejects with the body', async () => {
+    vi.useFakeTimers();
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () => 'Traceback: KeyError',
+    });
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    const pending = service.getHistory(0, 5000).catch((e: unknown) => e);
+    await vi.runAllTimersAsync();
+    const err = await pending;
+
+    expect(err).toBeInstanceOf(TautulliApiError);
+    expect((err as TautulliApiError).status).toBe(500);
+    expect((err as TautulliApiError).body).toBe('Traceback: KeyError');
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('redacts the api key from the error message and body', async () => {
+    vi.useFakeTimers();
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      text: async () => 'Bad request to http://localhost:8181/api/v2?apikey=super-secret-key',
+    });
+
+    const service = new TautulliService('http://localhost:8181', 'super-secret-key');
+    const pending = service.getHistory(0, 5000).catch((e: unknown) => e);
+    await vi.runAllTimersAsync();
+    const err = await pending;
+
+    expect(err).toBeInstanceOf(TautulliApiError);
+    expect((err as TautulliApiError).message).toContain('[redacted]');
+    expect((err as TautulliApiError).message).not.toContain('super-secret-key');
+    expect((err as TautulliApiError).body).toContain('[redacted]');
+    expect((err as TautulliApiError).body).not.toContain('super-secret-key');
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('isFatalImportError', () => {
+  it('is fatal for auth rejections', () => {
+    expect(isFatalImportError(new TautulliApiError(401, 'Unauthorized', ''))).toBe(true);
+    expect(isFatalImportError(new TautulliApiError(403, 'Forbidden', ''))).toBe(true);
+  });
+
+  it('is fatal for a response that fails schema validation', () => {
+    expect(isFatalImportError(new Error('Invalid Tautulli API response: bad shape'))).toBe(true);
+  });
+
+  it('is not fatal for server errors, timeouts or unknown values', () => {
+    expect(isFatalImportError(new TautulliApiError(500, 'Internal Server Error', 'x'))).toBe(false);
+    expect(isFatalImportError(new Error('Tautulli API timeout after 30000ms'))).toBe(false);
+    expect(isFatalImportError('nope')).toBe(false);
   });
 });
 

@@ -2276,7 +2276,7 @@ describe('edgeKeyOf', () => {
 describe('server and install triggers', () => {
   const serverAutomation = (
     id: string,
-    type: 'server.down' | 'tracearr.update_available',
+    type: 'server.down' | 'tracearr.update_available' | 'newsletter.failed',
     overrides: Partial<EngineAutomation> = {}
   ): EngineAutomation =>
     migrated(
@@ -2371,6 +2371,37 @@ describe('server and install triggers', () => {
     );
     const [[recorded]] = mockRecordRun.mock.calls as [[{ trigger: { edgeKey: string | null } }]];
     expect(recorded.trigger.edgeKey).toBe('1.1.0');
+  });
+
+  it('records a failed newsletter against the install subject, keyed on the send', async () => {
+    const automation = serverAutomation('digest', 'newsletter.failed');
+    const event = {
+      type: 'newsletter.failed' as const,
+      at: new Date(),
+      newsletterId: 'n-1',
+      sendId: 'send-1',
+      name: 'Weekly',
+      outcome: 'failed' as const,
+      trigger: 'schedule' as const,
+      recipientCount: 0,
+      itemCounts: {},
+      error: 'No deliverable recipients',
+      windowStart: '2026-08-26T00:00:00.000Z',
+      windowEnd: '2026-09-02T00:00:00.000Z',
+      historyUrl: null,
+    };
+    mockEvaluateRulesAsync.mockResolvedValue([
+      { ruleId: 'digest', ruleName: 'digest', matched: true, matchedGroups: [], actions: [] },
+    ]);
+
+    const result = await dispatch(event, inputs([automation]));
+
+    expect(result.outcomes).toEqual([{ subscriber: 'install-rules', ok: true }]);
+    expect(mockRecordRun).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: { kind: 'install' }, serverUserId: null, serverId: null })
+    );
+    const [[recorded]] = mockRecordRun.mock.calls as [[{ trigger: { edgeKey: string | null } }]];
+    expect(recorded.trigger.edgeKey).toBe('send-1');
   });
 
   it('evaluates the server context with no user and no history', async () => {

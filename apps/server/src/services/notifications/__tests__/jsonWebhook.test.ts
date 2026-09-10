@@ -309,6 +309,23 @@ const trustChanged = {
   },
 } as const;
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial',
+    trigger: 'schedule',
+    recipientCount: 42,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: null,
+  },
+} as const;
+
 const automationCtx = (over: { title?: string; body?: string } = {}): RenderContext => ({
   destination,
   source: { kind: 'automation', automationId: 'a-1', automationName: 'Now playing', ...over },
@@ -356,5 +373,11 @@ describe('jsonWebhookType.render with an automation source', () => {
     const body = await render({ type: 'session_started', payload: session });
 
     expect(body.automation).toBeUndefined();
+  });
+
+  it('carries the whole newsletter payload as data under the event name', async () => {
+    const body = await render(newsletterSend, automationCtx());
+    expect(body.event).toBe('newsletter_send');
+    expect(body.data).toEqual(newsletterSend.payload);
   });
 });

@@ -27,5 +27,5 @@ export function resolveWebAsset(root: string, urlPath: string): string | null {
   const fullPath = resolve(resolvedRoot, decoded.slice(1));
   if (fullPath !== resolvedRoot && !fullPath.startsWith(resolvedRoot + sep)) return null;
 
-  return relative(resolvedRoot, fullPath);
+  return relative(resolvedRoot, fullPath).split(sep).join('/');
 }

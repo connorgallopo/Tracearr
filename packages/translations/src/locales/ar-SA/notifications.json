@@ -1,279 +1,299 @@
 {
-  "toast": {
-    "success": {
-      "serverAdded": {
-        "title": "تم إضافة الخادم",
-        "message": "تم توصيل {{name}} بنجاح"
-      },
-      "serverRemoved": {
-        "title": "تمت إزالة الخادم",
-        "message": "تم إزالة الخادم بنجاح"
-      },
-      "serverSynced": {
-        "title": "مزامنة الخادم",
-        "message": "تم مزامنة بيانات الخادم"
-      },
-      "settingsUpdated": {
-        "title": "تم تحديث الإعدادات",
-        "message": "تم حفظ الإعدادات الخاصة بك"
-      },
-      "tokenCopied": {
-        "title": "تم نسخ الرمز",
-        "message": "تم نسخ رمز الاقتران إلى الحافظة"
-      },
-      "violationAcknowledged": {
-        "title": "تم الاعتراف بالانتهاك",
-        "message": "وقد وُسم الانتهاك بأنه معترف به"
-      },
-      "violationDismissed": {
-        "title": "تم إلغاء الانتهاك",
-        "message": "تم رفض المخالفة"
-      },
-      "deviceRemoved": {
-        "title": "تم حذف الجهاز",
-        "message": "تم قطع اتصال الجهاز"
-      },
-      "deviceRenamed": {
-        "title": "تم إعادة تسمية الجهاز",
-        "message": "تم تحديث اسم الجهاز"
-      },
-      "sessionsRevoked": {
-        "title": "الجلسات الملغاة",
-        "message": "تم إلغاء جميع الجلسات المتنقلة"
-      },
-      "loggedIn": {
-        "title": "نجاح",
-        "message": "تم تسجيل الدخول بنجاح"
-      },
-      "webhookTest": {
-        "title": "تم الاختبار بنجاح",
-        "message": "يعمل Webhook بشكل صحيح"
-      },
-      "copiedToClipboard": {
-        "title": "نسخ إلى الحافظة"
-      },
-      "plexAccountLinked": {
-        "title": "حساب Plex مرتبط",
-        "message": "يمكنك الآن إضافة خوادم من حساب Plex الخاص بك"
-      },
-      "plexAccountUnlinked": {
-        "title": "حساب Plex غير مرتبط",
-        "message": "تم قطع اتصال حساب Plex الخاص بك"
-      },
-      "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
-      },
-      "agentAdded": {
-        "title": "تم إضافة الوكيل",
-        "message": "تم إضافة وكيل الإخطار"
-      },
-      "agentUpdated": {
-        "title": "تم تحديث الوكيل",
-        "message": "تم تحديث وكيل الإخطار"
-      },
-      "agentRemoved": {
-        "title": "تم حذف الوكيل",
-        "message": "تم إزالة وكيل الإخطار"
-      },
-      "jobCompleted": {
-        "title": "اكتمل العمل",
-        "message": ""
-      },
-      "automationCreated": {
-        "title": "",
-        "message": ""
-      },
-      "automationUpdated": {
-        "title": "",
-        "message": ""
-      },
-      "automationDeleted": {
-        "title": "",
-        "message": ""
-      },
-      "streamTerminated": {
-        "title": "توقف البث",
-        "message": "تم إيقاف جلسة التشغيل"
-      },
-      "serverUrlUpdated": {
-        "title": "تم تحديث رابط الخادم",
-        "message": "تم تحديث رابط الخادم بنجاح"
-      },
-      "serverUpdated": {
-        "title": "تم تحديث الخادم",
-        "message": "تم تحديث الخادم بنجاح"
-      },
-      "syncCompletedWithErrors": {
-        "title": "اكتمل المزامنة مع الأخطاء"
-      },
-      "sessionsDeleted": {
-        "title": "الجلسات المحذوفة",
-        "message_one": "تم حذف جلسة {{count}}",
-        "message_other": ""
-      },
-      "violationsAcknowledged": {
-        "title": "الانتهاكات المعترف بها",
-        "message_one": "",
-        "message_other": "تم الاعتراف بانتهاكات {{count}}"
-      },
-      "violationsDismissed": {
-        "title": "تم إلغاء الانتهاكات",
-        "message_one": "رفض المخالفة {{count}}",
-        "message_other": "تم رفض انتهاكات {{count}}"
-      },
-      "apiKeyGenerated": {
-        "title": "تم إنشاء مفتاح API",
-        "message": "مفتاح API الجديد الخاص بك جاهز للاستخدام"
-      },
-      "mobileAccessEnabled": {
-        "title": "تمكين الوصول إلى الجوال",
-        "message": "امسح رمز QR باستخدام تطبيق Tracearr المحمول للاتصال"
-      },
-      "mobileAccessDisabled": {
-        "title": "تم تعطيل الوصول إلى الجوال",
-        "message": "تم إلغاء جميع الجلسات المتنقلة"
-      },
-      "pairTokenGenerated": {
-        "title": "تم توليد رمز الاقتران",
-        "message": "قم بمسح رمز QR باستخدام جهازك المحمول للإقران"
-      },
-      "displayNameUpdated": {
-        "title": "تم تحديث اسم العرض"
-      },
-      "trustScoresReset": {
-        "title": "إعادة تعيين نقاط الثقة",
-        "message_one": "",
-        "message_other": "{{count}} إعادة تعيين المستخدمين إلى 100"
-      },
-      "claimCodeValidated": {
-        "title": "تم التحقق من صحة رمز المطالبة",
-        "message": "يمكنك الآن المضي قدما في الإعداد"
-      },
-      "usersMerged": {
-        "title": "",
-        "automationsKept": ""
-      },
-      "serverUserSplit": {
-        "title": ""
-      },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
-    },
-    "error": {
-      "serverAddFailed": "فشل في إضافة الخادم",
-      "serverRemoveFailed": "فشل في إزالة الخادم",
-      "serverSyncFailed": "فشل في مزامنة الخادم",
-      "settingsUpdateFailed": "فشل تحديث الإعدادات",
-      "copyFailed": "تعذر النسخ إلى الحافظة",
-      "acknowledgeFailed": "فشل في الإقرار بالانتهاك",
-      "dismissFailed": "فشل في رفض الانتهاك",
-      "authFailed": "فشل المصادقة",
-      "webhookTestFailed": "فشل اختبار Webhook",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
-      "streamTerminateFailed": "فشل في إنهاء البث",
-      "serverUrlUpdateFailed": "فشل تحديث رابط الخادم",
-      "serverUpdateFailed": "فشل تحديث الخادم",
-      "serverReorderFailed": "فشل في إعادة ترتيب الخوادم",
-      "sessionsDeleteFailed": "فشل في حذف الجلسات",
-      "apiKeyGenerateFailed": "فشل في إنشاء مفتاح API",
-      "mobileAccessEnableFailed": "فشل في تمكين الوصول إلى الجوال",
-      "mobileAccessDisableFailed": "فشل في تعطيل الوصول إلى الجوال",
-      "pairTokenGenerateFailed": "فشل في إنشاء الرمز المميز للزوج",
-      "deviceRemoveFailed": "فشل في إزالة الجهاز",
-      "deviceRenameFailed": "فشل في إعادة تسمية الجهاز",
-      "sessionsRevokeFailed": "فشل في إلغاء الجلسات",
-      "displayNameUpdateFailed": "فشل تحديث اسم العرض",
-      "trustScoresResetFailed": "فشل في إعادة تعيين نقاط الثقة",
-      "routingUpdateFailed": "فشل تحديث المسار",
-      "clipboardFailed": "فشل النسخ إلى الحافظة",
-      "plexUnlinkFailed": "فشل فك ربط حساب Plex",
-      "plexReauthorizeFailed": "",
-      "agentAddFailed": "فشل في إضافة وكيل",
-      "agentUpdateFailed": "فشل تحديث الوكيل",
-      "agentRemoveFailed": "فشل في إزالة الوكيل",
-      "agentTestFailed": "فشل الاختبار",
-      "jobAlreadyRunning": "العمل قيد التشغيل مسبقاً",
-      "jobStartFailed": "فشل في بدء المهمة",
-      "jobLoadFailed": "فشل تحميل مهام الصيانة",
-      "invalidUrl": "رابط غير صالح",
-      "plexDirectUrl": "plex.direct URLs هي عناوين إعادة الإرسال التي لا يمكن استخدامها هنا. الرجاء استخدام عنوان IP مباشر أو اسم المضيف بدلاً من ذلك.",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "invalidClaimCode": {
-        "title": "رمز المطالبة غير صالح",
-        "message": "الرجاء التحقق من سجلات الخادم"
-      },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
-    },
-    "warning": {
-      "jobFailed": {
-        "title": "فشل العمل",
-        "message": ""
-      }
-    },
-    "info": {
-      "updateAvailable": {
-        "title": "تحديث متوفر",
-        "message": "Tracearr {{version}} متاح"
-      },
-      "violationDetected": {
-        "title": "انتهاك جديد: {{ruleName}}",
-        "message": ""
-      }
-    }
-  },
   "push": {
-    "violationDetected": "تم اكتشاف انتهاك المشاركة",
-    "streamStarted": "بدأ البث",
-    "streamEnded": "انتهى البث",
+    "newDevice": "جهاز جديد",
     "serverDown": "فقدت اتصال الخادم",
     "serverUp": "خادم الرجوع على الإنترنت",
-    "newDevice": "جهاز جديد",
-    "trustScoreChanged": "تم تغيير نقاط الثقة"
+    "streamEnded": "انتهى البث",
+    "streamStarted": "بدأ البث",
+    "trustScoreChanged": "تم تغيير نقاط الثقة",
+    "violationDetected": "تم اكتشاف انتهاك المشاركة"
   },
   "settings": {
-    "title": "إعدادات الإشعارات",
     "allSeverity": "الكل (منخفض، تحذير، عالي)",
-    "warningAndHigh": "تحذير و ارتفاع فقط",
-    "highOnly": "شدة عالية فقط",
     "allTypes": "جميع الأنواع",
-    "rateLimit": "حالة حد المعدل الحالي",
-    "perMinute": "لكل دقيقة",
-    "perHour": "لكل ساعة",
-    "enablePushNotifications": "تمكين الإشعارات",
-    "notificationEvents": "أحداث الإشعارات",
-    "violationDetected": "تم اكتشاف انتهاك",
-    "violationDetectedDesc": "عندما يتم تشغيل مخالفة المشاركة",
-    "streamStarted": "بدأ البث",
-    "streamStartedDesc": "عندما يبدأ المستخدم في المشاهدة",
-    "streamStopped": "توقف البث",
-    "streamStoppedDesc": "عندما يتوقف المستخدم عن مشاهدة",
     "concurrentStreams": "البث المتزامن",
     "concurrentStreamsDesc": "عند تجاوز الحد الأقصى للبث",
+    "enablePushNotifications": "تمكين الإشعارات",
+    "enableQuietHours": "تمكين ساعات الهدوء",
+    "highOnly": "شدة عالية فقط",
+    "minimumSeverity": "أدنى درجة من الخطورة",
     "newDevice": "جهاز جديد",
     "newDeviceDesc": "عندما يتصل جهاز جديد",
-    "trustScoreChanged": "تم تغيير نقاط الثقة",
-    "trustScoreChangedDesc": "عند تغيير نقاط ثقة المستخدم",
+    "notificationEvents": "أحداث الإشعارات",
+    "overrideForCritical": "التجاوز للنقد",
+    "perHour": "لكل ساعة",
+    "perMinute": "لكل دقيقة",
+    "quietHours": "ساعات هادئة",
+    "rateLimit": "حالة حد المعدل الحالي",
+    "rateLimiting": "تحديد السعر",
     "serverDown": "السيرفر أسفل",
     "serverDownDesc": "عندما يتحول خادم الوسائط إلى غير متصل",
     "serverUp": "سيرفر لأعلى",
     "serverUpDesc": "عندما يعود خادم الوسائط إلى الإنترنت",
+    "streamStarted": "بدأ البث",
+    "streamStartedDesc": "عندما يبدأ المستخدم في المشاهدة",
+    "streamStopped": "توقف البث",
+    "streamStoppedDesc": "عندما يتوقف المستخدم عن مشاهدة",
+    "title": "إعدادات الإشعارات",
+    "trustScoreChanged": "تم تغيير نقاط الثقة",
+    "trustScoreChangedDesc": "عند تغيير نقاط ثقة المستخدم",
+    "violationDetected": "تم اكتشاف انتهاك",
+    "violationDetectedDesc": "عندما يتم تشغيل مخالفة المشاركة",
     "violationFilters": "فلاتر المخالفة",
-    "minimumSeverity": "أدنى درجة من الخطورة",
-    "quietHours": "ساعات هادئة",
-    "enableQuietHours": "تمكين ساعات الهدوء",
-    "overrideForCritical": "التجاوز للنقد",
-    "rateLimiting": "تحديد السعر"
+    "warningAndHigh": "تحذير و ارتفاع فقط"
+  },
+  "toast": {
+    "error": {
+      "acknowledgeFailed": "فشل في الإقرار بالانتهاك",
+      "agentAddFailed": "فشل في إضافة وكيل",
+      "agentRemoveFailed": "فشل في إزالة الوكيل",
+      "agentTestFailed": "فشل الاختبار",
+      "agentUpdateFailed": "فشل تحديث الوكيل",
+      "apiKeyGenerateFailed": "فشل في إنشاء مفتاح API",
+      "authFailed": "فشل المصادقة",
+      "automationCreateFailed": "",
+      "automationDeleteFailed": "",
+      "automationUpdateFailed": "",
+      "brandingSaveFailed": "",
+      "clipboardFailed": "فشل النسخ إلى الحافظة",
+      "copyFailed": "تعذر النسخ إلى الحافظة",
+      "destinationDeleteFailed": "",
+      "destinationInUse": "",
+      "destinationSaveFailed": "",
+      "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
+      "deviceRemoveFailed": "فشل في إزالة الجهاز",
+      "deviceRenameFailed": "فشل في إعادة تسمية الجهاز",
+      "dismissFailed": "فشل في رفض الانتهاك",
+      "identityUpdateFailed": "",
+      "invalidClaimCode": {
+        "message": "الرجاء التحقق من سجلات الخادم",
+        "title": "رمز المطالبة غير صالح"
+      },
+      "invalidUrl": "رابط غير صالح",
+      "jobAlreadyRunning": "العمل قيد التشغيل مسبقاً",
+      "jobLoadFailed": "فشل تحميل مهام الصيانة",
+      "jobStartFailed": "فشل في بدء المهمة",
+      "mobileAccessDisableFailed": "فشل في تعطيل الوصول إلى الجوال",
+      "mobileAccessEnableFailed": "فشل في تمكين الوصول إلى الجوال",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSaveFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterSnapshotFailed": "",
+      "newsletterTestFailed": "",
+      "pairTokenGenerateFailed": "فشل في إنشاء الرمز المميز للزوج",
+      "plexDirectUrl": "plex.direct URLs هي عناوين إعادة الإرسال التي لا يمكن استخدامها هنا. الرجاء استخدام عنوان IP مباشر أو اسم المضيف بدلاً من ذلك.",
+      "plexReauthorizeFailed": "",
+      "plexUnlinkFailed": "فشل فك ربط حساب Plex",
+      "routingUpdateFailed": "فشل تحديث المسار",
+      "serverAddFailed": "فشل في إضافة الخادم",
+      "serverRemoveFailed": "فشل في إزالة الخادم",
+      "serverReorderFailed": "فشل في إعادة ترتيب الخوادم",
+      "serverSyncFailed": "فشل في مزامنة الخادم",
+      "serverUpdateFailed": "فشل تحديث الخادم",
+      "serverUrlUpdateFailed": "فشل تحديث رابط الخادم",
+      "serverUserSplitFailed": "",
+      "sessionsDeleteFailed": "فشل في حذف الجلسات",
+      "sessionsRevokeFailed": "فشل في إلغاء الجلسات",
+      "settingsUpdateFailed": "فشل تحديث الإعدادات",
+      "streamTerminateFailed": "فشل في إنهاء البث",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": "",
+      "trustScoresResetFailed": "فشل في إعادة تعيين نقاط الثقة",
+      "userMergeFailed": "",
+      "webhookTestFailed": "فشل اختبار Webhook"
+    },
+    "info": {
+      "updateAvailable": {
+        "message": "Tracearr {{version}} متاح",
+        "title": "تحديث متوفر"
+      },
+      "violationDetected": {
+        "message": "",
+        "title": "انتهاك جديد: {{ruleName}}"
+      }
+    },
+    "success": {
+      "agentAdded": {
+        "message": "تم إضافة وكيل الإخطار",
+        "title": "تم إضافة الوكيل"
+      },
+      "agentRemoved": {
+        "message": "تم إزالة وكيل الإخطار",
+        "title": "تم حذف الوكيل"
+      },
+      "agentUpdated": {
+        "message": "تم تحديث وكيل الإخطار",
+        "title": "تم تحديث الوكيل"
+      },
+      "apiKeyGenerated": {
+        "message": "مفتاح API الجديد الخاص بك جاهز للاستخدام",
+        "title": "تم إنشاء مفتاح API"
+      },
+      "automationCreated": {
+        "message": "",
+        "title": ""
+      },
+      "automationDeleted": {
+        "message": "",
+        "title": ""
+      },
+      "automationUpdated": {
+        "message": "",
+        "title": ""
+      },
+      "brandingSaved": "",
+      "claimCodeValidated": {
+        "message": "يمكنك الآن المضي قدما في الإعداد",
+        "title": "تم التحقق من صحة رمز المطالبة"
+      },
+      "copiedToClipboard": {
+        "title": "نسخ إلى الحافظة"
+      },
+      "destinationDeleted": "",
+      "destinationSaved": "",
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "deviceRemoved": {
+        "message": "تم قطع اتصال الجهاز",
+        "title": "تم حذف الجهاز"
+      },
+      "deviceRenamed": {
+        "message": "تم تحديث اسم الجهاز",
+        "title": "تم إعادة تسمية الجهاز"
+      },
+      "identityUpdated": "",
+      "jobCompleted": {
+        "message": "",
+        "title": "اكتمل العمل"
+      },
+      "loggedIn": {
+        "message": "تم تسجيل الدخول بنجاح",
+        "title": "نجاح"
+      },
+      "mobileAccessDisabled": {
+        "message": "تم إلغاء جميع الجلسات المتنقلة",
+        "title": "تم تعطيل الوصول إلى الجوال"
+      },
+      "mobileAccessEnabled": {
+        "message": "امسح رمز QR باستخدام تطبيق Tracearr المحمول للاتصال",
+        "title": "تمكين الوصول إلى الجوال"
+      },
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterRetryQueued": "",
+      "newsletterSaved": "",
+      "newsletterSendQueued": "",
+      "newsletterTestQueued": "",
+      "pairTokenGenerated": {
+        "message": "قم بمسح رمز QR باستخدام جهازك المحمول للإقران",
+        "title": "تم توليد رمز الاقتران"
+      },
+      "plexAccountLinked": {
+        "message": "يمكنك الآن إضافة خوادم من حساب Plex الخاص بك",
+        "title": "حساب Plex مرتبط"
+      },
+      "plexAccountReauthorized": {
+        "messageNoServers": "",
+        "message_one": "",
+        "message_other": "",
+        "partial": "",
+        "title": "",
+        "unmatched": ""
+      },
+      "plexAccountUnlinked": {
+        "message": "تم قطع اتصال حساب Plex الخاص بك",
+        "title": "حساب Plex غير مرتبط"
+      },
+      "serverAdded": {
+        "message": "تم توصيل {{name}} بنجاح",
+        "title": "تم إضافة الخادم"
+      },
+      "serverRemoved": {
+        "message": "تم إزالة الخادم بنجاح",
+        "title": "تمت إزالة الخادم"
+      },
+      "serverSynced": {
+        "message": "تم مزامنة بيانات الخادم",
+        "title": "مزامنة الخادم"
+      },
+      "serverUpdated": {
+        "message": "تم تحديث الخادم بنجاح",
+        "title": "تم تحديث الخادم"
+      },
+      "serverUrlUpdated": {
+        "message": "تم تحديث رابط الخادم بنجاح",
+        "title": "تم تحديث رابط الخادم"
+      },
+      "serverUserSplit": {
+        "title": ""
+      },
+      "sessionsDeleted": {
+        "message_one": "تم حذف جلسة {{count}}",
+        "message_other": "",
+        "title": "الجلسات المحذوفة"
+      },
+      "sessionsRevoked": {
+        "message": "تم إلغاء جميع الجلسات المتنقلة",
+        "title": "الجلسات الملغاة"
+      },
+      "settingsUpdated": {
+        "message": "تم حفظ الإعدادات الخاصة بك",
+        "title": "تم تحديث الإعدادات"
+      },
+      "streamTerminated": {
+        "message": "تم إيقاف جلسة التشغيل",
+        "title": "توقف البث"
+      },
+      "suppressionAdded": "",
+      "suppressionRemoved": "",
+      "syncCompletedWithErrors": {
+        "title": "اكتمل المزامنة مع الأخطاء"
+      },
+      "tokenCopied": {
+        "message": "تم نسخ رمز الاقتران إلى الحافظة",
+        "title": "تم نسخ الرمز"
+      },
+      "trustScoresReset": {
+        "message_one": "",
+        "message_other": "{{count}} إعادة تعيين المستخدمين إلى 100",
+        "title": "إعادة تعيين نقاط الثقة"
+      },
+      "usersMerged": {
+        "automationsKept": "",
+        "title": ""
+      },
+      "violationAcknowledged": {
+        "message": "وقد وُسم الانتهاك بأنه معترف به",
+        "title": "تم الاعتراف بالانتهاك"
+      },
+      "violationDismissed": {
+        "message": "تم رفض المخالفة",
+        "title": "تم إلغاء الانتهاك"
+      },
+      "violationsAcknowledged": {
+        "message_one": "",
+        "message_other": "تم الاعتراف بانتهاكات {{count}}",
+        "title": "الانتهاكات المعترف بها"
+      },
+      "violationsDismissed": {
+        "message_one": "رفض المخالفة {{count}}",
+        "message_other": "تم رفض انتهاكات {{count}}",
+        "title": "تم إلغاء الانتهاكات"
+      },
+      "webhookTest": {
+        "message": "يعمل Webhook بشكل صحيح",
+        "title": "تم الاختبار بنجاح"
+      }
+    },
+    "warning": {
+      "jobFailed": {
+        "message": "",
+        "title": "فشل العمل"
+      }
+    }
   }
 }

@@ -136,12 +136,15 @@ describe('destinationStore', () => {
     });
   });
 
-  it('toPublicDestination masks secrets and lists which are set', () => {
-    const pub = toPublicDestination(discord(), 2);
+  it('toPublicDestination masks secrets, lists which are set, and carries both reference counts', () => {
+    const pub = toPublicDestination(discord(), 2, 3);
     expect(pub.config).toEqual({ webhookUrl: null });
     expect(pub.secretsSet).toEqual(['webhookUrl']);
     expect(pub.referencedByAutomationCount).toBe(2);
-    expect(toPublicDestination({ ...discord(), configStatus: 'reencrypt' }, 0).config).toBeNull();
+    expect(pub.referencedByNewsletterCount).toBe(3);
+    expect(
+      toPublicDestination({ ...discord(), configStatus: 'reencrypt' }, 0, 0).config
+    ).toBeNull();
   });
 
   it('createDestination encrypts, publishes destinations:changed, and invalidates', async () => {
@@ -164,18 +167,18 @@ describe('destinationStore', () => {
       type: 'ntfy',
       config: encryptConfig({ url: 'https://n', topic: 'alerts', authToken: 'tok' }),
     };
-    const pub = toPublicDestination(ntfy, 0);
+    const pub = toPublicDestination(ntfy, 0, 0);
     expect(pub.config).toEqual({ url: null, topic: 'alerts', authToken: null });
     expect(pub.secretsSet).toEqual(['url', 'authToken']);
-    expect(toPublicDestination(push(), 0).config).toBeNull();
-    expect(toPublicDestination({ ...discord(), config: 'v1:zzz' }, 0).config).toBeNull();
+    expect(toPublicDestination(push(), 0, 0).config).toBeNull();
+    expect(toPublicDestination({ ...discord(), config: 'v1:zzz' }, 0, 0).config).toBeNull();
   });
 
   it('toPublicDestination reports reencrypt for a stored-ok row that no longer opens', () => {
-    const pub = toPublicDestination({ ...discord(), config: 'v1:zzz' }, 0);
+    const pub = toPublicDestination({ ...discord(), config: 'v1:zzz' }, 0, 0);
     expect(pub.configStatus).toBe('reencrypt');
     expect(pub.secretsSet).toEqual([]);
-    expect(toPublicDestination(push(), 0).configStatus).toBe('ok');
+    expect(toPublicDestination(push(), 0, 0).configStatus).toBe('ok');
   });
 
   it('updateDestination keeps omitted secrets, clears null, replaces strings', async () => {

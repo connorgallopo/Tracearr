@@ -79,17 +79,22 @@ export function useUpdateUserIdentity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string | null }) =>
-      api.users.updateIdentity(id, { name }),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name?: string | null; contactEmail?: string | null };
+    }) => api.users.updateIdentity(id, data),
     onSuccess: () => {
-      // A display name is shared across the whole identity, so every cached
+      // A name or contact email is shared across the whole identity, so every cached
       // full-detail view (any account anchor, any scope) needs a refetch.
       void queryClient.invalidateQueries({ queryKey: ['users', 'full'] });
       void queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
-      toast.success(t('toast.success.displayNameUpdated.title'));
+      toast.success(t('toast.success.identityUpdated'));
     },
     onError: (error: Error) => {
-      toast.error(t('toast.error.displayNameUpdateFailed'), { description: error.message });
+      toast.error(t('toast.error.identityUpdateFailed'), { description: error.message });
     },
   });
 }

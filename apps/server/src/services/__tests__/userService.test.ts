@@ -39,6 +39,7 @@ import {
   batchSyncUsersFromMediaServer,
   getServerUserDisplayNames,
   recomputeIdentityAggregates,
+  updateUser,
   UserNotFoundError,
 } from '../userService.js';
 
@@ -566,6 +567,50 @@ describe('syncUserFromMediaServer', () => {
     expect(result).not.toBeNull();
     expect(result!.created).toBe(false);
     expect(result!.serverUser.username).toBe(mediaUser.username);
+  });
+});
+
+describe('updateUser', () => {
+  function mockUpdateChain(result: unknown[]) {
+    const set = vi.fn().mockReturnThis();
+    const chain = {
+      set,
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue(result),
+    };
+    vi.mocked(db.update).mockReturnValue(chain as never);
+    return set;
+  }
+
+  it('trims and lowercases a contact email before the column check sees it', async () => {
+    const user = createMockUser();
+    const set = mockUpdateChain([user]);
+
+    await updateUser(user.id, { contactEmail: '  Contact@Example.COM \n' });
+
+    expect(set.mock.calls[0]?.[0]).toMatchObject({ contactEmail: 'contact@example.com' });
+  });
+
+  it('stores a contact email of only whitespace as no contact email', async () => {
+    const user = createMockUser();
+    const set = mockUpdateChain([user]);
+
+    await updateUser(user.id, { contactEmail: '   ' });
+
+    expect(set.mock.calls[0]?.[0]).toMatchObject({ contactEmail: null });
+  });
+
+  it('leaves an explicit null and an absent key alone', async () => {
+    const user = createMockUser();
+    let set = mockUpdateChain([user]);
+    await updateUser(user.id, { contactEmail: null });
+    expect(set.mock.calls[0]?.[0]).toMatchObject({ contactEmail: null });
+
+    set = mockUpdateChain([user]);
+    await updateUser(user.id, { name: 'Renamed' });
+    const [written] = set.mock.calls[0] ?? [];
+    expect(written).toBeDefined();
+    expect((written as { contactEmail?: string }).contactEmail).toBeUndefined();
   });
 });
 

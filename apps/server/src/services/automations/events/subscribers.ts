@@ -121,6 +121,9 @@ export function edgeKeyOf(event: ContextEvaluatingEvent, node: TriggerNode | nul
       return event.latestVersion;
     case 'tracearr.update_available':
       return event.latest;
+    case 'newsletter.sent':
+    case 'newsletter.failed':
+      return event.sendId;
   }
 }
 
@@ -299,6 +302,12 @@ const SERVER_TRIGGERS = [
   'server.update_available',
 ] as const;
 
+const INSTALL_TRIGGERS = [
+  'tracearr.update_available',
+  'newsletter.sent',
+  'newsletter.failed',
+] as const;
+
 let registered = false;
 
 export function registerRuleSubscribers(): void {
@@ -338,10 +347,12 @@ export function registerRuleSubscribers(): void {
       });
     });
   }
-  subscribe('tracearr.update_available', 'install-rules', async (event, inputs, opts) => {
-    if (!inputs) return;
-    return runRulePipeline(event, inputs, opts, { kind: 'install' });
-  });
+  for (const trigger of INSTALL_TRIGGERS) {
+    subscribe(trigger, 'install-rules', async (event, inputs, opts) => {
+      if (!inputs) return;
+      return runRulePipeline(event, inputs, opts, { kind: 'install' });
+    });
+  }
 }
 
 export function resetRuleSubscribersForTests(): void {

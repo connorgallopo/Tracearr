@@ -36,8 +36,8 @@ const base = {
 };
 
 describe('catalog', () => {
-  it('has sixteen triggers with a context and a group', () => {
-    expect(TRIGGER_TYPES).toHaveLength(16);
+  it('has eighteen triggers with a context and a group', () => {
+    expect(TRIGGER_TYPES).toHaveLength(18);
     for (const t of TRIGGER_TYPES)
       expect(TRIGGERS[t].context).toMatch(/session|account|media|server|install/);
     expect(TRIGGERS['server.down'].context).toBe('server');
@@ -49,6 +49,10 @@ describe('catalog', () => {
     expect(TRIGGERS['account.new_device'].group).toBe('accounts');
     expect(TRIGGERS['account.trust_changed'].context).toBe('account');
     expect(TRIGGERS['account.trust_changed'].group).toBe('accounts');
+    expect(TRIGGERS['newsletter.sent'].context).toBe('install');
+    expect(TRIGGERS['newsletter.sent'].group).toBe('notifications');
+    expect(TRIGGERS['newsletter.failed'].context).toBe('install');
+    expect(TRIGGERS['newsletter.failed'].group).toBe('notifications');
   });
   it('has 31 condition fields each with requires and operators', () => {
     expect(Object.keys(CONDITION_FIELDS)).toHaveLength(31);

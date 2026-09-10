@@ -10,9 +10,14 @@ import {
   destinationConfigSchema,
   updateDestinationSchema,
   type DestinationKind,
+  type DestinationTestResult,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
-import { automationsReferencingDestinations } from '../services/notifications/destinationRefs.js';
+import { onDestinationChanged, onDestinationUnavailable } from '../jobs/newsletterQueue.js';
+import {
+  automationsReferencingDestinations,
+  newslettersReferencingDestinations,
+} from '../services/notifications/destinationRefs.js';
 import {
   createDestination,
   deleteDestination,
@@ -23,6 +28,10 @@ import {
   updateDestination,
   type DestinationRow,
 } from '../services/notifications/destinationStore.js';
+import {
+  assertSafeSmtpHost,
+  closeTransporter,
+} from '../services/notifications/destinations/emailTransport.js';
 import { getDestinationType } from '../services/notifications/destinations/registry.js';
 import { assertSafeProbeUrl } from '../utils/ssrf.js';
 import { firstIssueMessage } from '../utils/zod.js';
@@ -32,6 +41,19 @@ const REENCRYPT_MESSAGE = "Re-enter this destination's secret first";
 
 /** Throws with the field name so the 400 says which url was blocked. */
 function assertSafeUrls(kind: DestinationKind, config: Record<string, unknown>): void {
+  if (kind === 'email') {
+    const host = config['host'];
+    const port = config['port'];
+    if (typeof host === 'string' && typeof port === 'string') {
+      try {
+        assertSafeSmtpHost(host, port);
+      } catch (error) {
+        throw new Error(`host: ${error instanceof Error ? error.message : 'blocked host'}`, {
+          cause: error,
+        });
+      }
+    }
+  }
   for (const field of DESTINATION_TYPES[kind].fields) {
     if (field.input !== 'url') continue;
     const value = config[field.key];
@@ -59,13 +81,14 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
     name: string,
     config: Record<string, unknown>,
     reply: FastifyReply
-  ): Promise<{ success: true } | FastifyReply> {
+  ): Promise<DestinationTestResult | FastifyReply> {
     try {
-      await getDestinationType(kind).test(config, {
+      const type = getDestinationType(kind);
+      const report = await type.test(config, {
         destination: { id: 'test', name },
-        signal: AbortSignal.timeout(DELIVER_TEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(type.deliverTimeoutMs ?? DELIVER_TEST_TIMEOUT_MS),
       });
-      return { success: true };
+      return report?.sentTo ? { success: true, sentTo: report.sentTo } : { success: true };
     } catch (error) {
       const message = (error instanceof Error ? error.message : 'Test failed').slice(0, 500);
       return reply.code(502).send({ success: false, error: message });
@@ -76,11 +99,18 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
    * GET /destinations - List destinations with masked config
    */
   app.get('/', owner, async () => {
-    const [rows, refs] = await Promise.all([
+    const [rows, automationRefs, newsletterRefs] = await Promise.all([
       listDestinations(),
       automationsReferencingDestinations(),
+      newslettersReferencingDestinations(),
     ]);
-    return rows.map((row) => toPublicDestination(row, refs.get(row.id)?.length ?? 0));
+    return rows.map((row) =>
+      toPublicDestination(
+        row,
+        automationRefs.get(row.id)?.length ?? 0,
+        newsletterRefs.get(row.id)?.length ?? 0
+      )
+    );
   });
 
   /**
@@ -110,7 +140,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       }
       throw error;
     }
-    return reply.code(201).send(toPublicDestination(row, 0));
+    return reply.code(201).send(toPublicDestination(row, 0, 0));
   });
 
   /**
@@ -155,12 +185,20 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       }
       throw error;
     }
-    const refs = await automationsReferencingDestinations();
-    return toPublicDestination(row, refs.get(row.id)?.length ?? 0);
+    await onDestinationChanged(row.id);
+    const [automationRefs, newsletterRefs] = await Promise.all([
+      automationsReferencingDestinations(),
+      newslettersReferencingDestinations(),
+    ]);
+    return toPublicDestination(
+      row,
+      automationRefs.get(row.id)?.length ?? 0,
+      newsletterRefs.get(row.id)?.length ?? 0
+    );
   });
 
   /**
-   * DELETE /destinations/:id - Remove a destination no rule references
+   * DELETE /destinations/:id - Remove a destination no automation or newsletter references
    */
   app.delete<{ Params: { id: string } }>('/:id', owner, async (request, reply) => {
     const current = await getDestination(request.params.id);
@@ -175,7 +213,17 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
+    const newsletterNames = (await newslettersReferencingDestinations()).get(current.id) ?? [];
+    if (newsletterNames.length > 0) {
+      return reply.code(409).send({
+        message: `Used by ${newsletterNames.length} newsletter(s)`,
+        newsletters: newsletterNames,
+      });
+    }
+
     await deleteDestination(current.id);
+    closeTransporter(current.id);
+    await onDestinationUnavailable(current.id);
     return reply.code(204).send();
   });
 

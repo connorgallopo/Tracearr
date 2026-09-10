@@ -50,6 +50,11 @@ vi.mock('../../services/mediaServer/index.js', () => ({
   },
   EmbyClient: {
     verifyServerAdmin: vi.fn(),
+    AdminVerifyError: {
+      CONNECTION_FAILED: 'CONNECTION_FAILED',
+      INVALID_KEY: 'INVALID_KEY',
+      NOT_ADMIN: 'NOT_ADMIN',
+    },
   },
   DispatcharrClient: {
     verifyServerAdmin: vi.fn(),
@@ -384,7 +389,7 @@ describe('Server Routes', () => {
     beforeEach(() => {
       vi.mocked(PlexClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue({ success: true });
-      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue(true);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(DispatcharrClient.verifyServerAdmin).mockResolvedValue({ success: true });
       vi.mocked(syncServer).mockResolvedValue({
         usersAdded: 5,
@@ -550,6 +555,67 @@ describe('Server Routes', () => {
       );
     });
 
+    it('stores the public address with https prepended on a Jellyfin server and refuses one on Plex', async () => {
+      app = await buildTestApp(ownerUser);
+
+      let selectCall = 0;
+      vi.mocked(db.select).mockImplementation(() => {
+        selectCall++;
+        const chain = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue([]),
+        };
+        if (selectCall === 2) {
+          chain.from = vi.fn().mockResolvedValue([]);
+        }
+        return chain as never;
+      });
+      const insert = mockDbInsert([
+        {
+          id: randomUUID(),
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'http://192.168.1.20:8096',
+          publicUrl: 'https://jellyfin.example.com',
+          color: '#9B59B6',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
+
+      const created = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'http://192.168.1.20:8096',
+          token: 'key-1',
+          publicUrl: 'jellyfin.example.com',
+        },
+      });
+      expect(created.statusCode).toBe(201);
+      expect(insert.values).toHaveBeenCalledWith(
+        expect.objectContaining({ publicUrl: 'https://jellyfin.example.com' })
+      );
+      expect(created.json().publicUrl).toBe('https://jellyfin.example.com');
+
+      const plex = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://192.168.1.10:32400',
+          token: 'plex-token',
+          publicUrl: 'https://plex.example.com',
+        },
+      });
+      expect(plex.statusCode).toBe(400);
+      expect(plex.json().message).toBe('Public address applies to Jellyfin and Emby servers only');
+    });
+
     it('rejects guest creating server', async () => {
       app = await buildTestApp(viewerUser);
 
@@ -691,6 +757,56 @@ describe('Server Routes', () => {
       expect(response.json().message).toContain('rejected');
     });
 
+    it('returns 503 when the Emby server cannot be reached', async () => {
+      app = await buildTestApp(ownerUser);
+
+      mockDbSelectLimit([]);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({
+        success: false,
+        code: 'CONNECTION_FAILED',
+        message: 'Cannot reach Emby server at http://emby.local:8096. ECONNREFUSED',
+      });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Down Emby',
+          type: 'emby',
+          url: 'http://emby.local:8096',
+          token: 'some-token',
+        },
+      });
+
+      expect(response.statusCode).toBe(503);
+      expect(response.json().message).toContain('Cannot reach');
+    });
+
+    it('returns 401 when Emby rejects the API key', async () => {
+      app = await buildTestApp(ownerUser);
+
+      mockDbSelectLimit([]);
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({
+        success: false,
+        code: 'INVALID_KEY',
+        message: 'Emby rejected this API key (it may be invalid or expired).',
+      });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Bad Key',
+          type: 'emby',
+          url: 'http://emby.local:8096',
+          token: 'bad-key',
+        },
+      });
+
+      expect(response.statusCode).toBe(401);
+      expect(response.json().message).toContain('rejected');
+    });
+
     it('handles connection error to media server', async () => {
       app = await buildTestApp(ownerUser);
 
@@ -752,6 +868,52 @@ describe('Server Routes', () => {
       expect(body.name).toBe('Renamed Server');
       expect(body.id).toBe(mockServer.id);
       expect(db.update).toHaveBeenCalled();
+    });
+
+    it('saves a public address on a Jellyfin server, clears it on an empty string, and refuses it on Plex', async () => {
+      app = await buildTestApp(ownerUser);
+      const jellyfin = {
+        ...mockServer,
+        type: 'jellyfin' as const,
+        url: 'http://192.168.1.20:8096',
+        publicUrl: null as string | null,
+        color: '#9B59B6',
+      };
+
+      mockDbSelectLimit([jellyfin]);
+      let update = mockDbUpdateReturning([
+        { ...jellyfin, publicUrl: 'https://jellyfin.example.com' },
+      ]);
+      const saved = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${jellyfin.id}`,
+        payload: { publicUrl: 'jellyfin.example.com' },
+      });
+      expect(saved.statusCode).toBe(200);
+      expect(update.set).toHaveBeenCalledWith({
+        publicUrl: 'https://jellyfin.example.com',
+        updatedAt: expect.any(Date),
+      });
+      expect(saved.json().publicUrl).toBe('https://jellyfin.example.com');
+
+      mockDbSelectLimit([{ ...jellyfin, publicUrl: 'https://jellyfin.example.com' }]);
+      update = mockDbUpdateReturning([jellyfin]);
+      const cleared = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${jellyfin.id}`,
+        payload: { publicUrl: '' },
+      });
+      expect(cleared.statusCode).toBe(200);
+      expect(update.set).toHaveBeenCalledWith({ publicUrl: null, updatedAt: expect.any(Date) });
+
+      mockDbSelectLimit([mockServer]);
+      const plex = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${mockServer.id}`,
+        payload: { publicUrl: 'https://plex.example.com' },
+      });
+      expect(plex.statusCode).toBe(400);
+      expect(plex.json().message).toBe('Public address applies to Jellyfin and Emby servers only');
     });
 
     it('rejects when neither name nor url provided', async () => {

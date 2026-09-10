@@ -346,7 +346,8 @@
         "helper": "",
         "or": "",
         "title": ""
-      }
+      },
+      "noAlertRecipientsTooltip": ""
     },
     "catalog": {
       "actions": {
@@ -376,7 +377,8 @@
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": ""
+        "updates": "",
+        "notifications": ""
       },
       "suggested": "",
       "triggers": {
@@ -443,6 +445,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -609,7 +619,9 @@
         "sessionStarted": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterFailed": "",
+        "newsletterSent": ""
       },
       "unbound": {
         "account": "",
@@ -1153,6 +1165,11 @@
         "name": ""
       },
       "trust-score-changed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
+      "newsletter-failed": {
         "description": "",
         "keywords": "",
         "name": ""
@@ -1839,10 +1856,41 @@
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": ""
+        "webhookUrl": "",
+        "fromAddress": "From address",
+        "fromName": "From name",
+        "host": "SMTP host",
+        "messageStream": "",
+        "messagesPerSecond": "Messages per second",
+        "password": "Password",
+        "port": "Port",
+        "preset": "Provider",
+        "replyTo": "Reply-to",
+        "security": "Security",
+        "to": "Recipients",
+        "username": "Username"
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpBrevoPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpGmailPassword": "",
+        "smtpGmailUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMessageStream": "",
+        "smtpPostmarkPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpResendPassword": "",
+        "smtpResendUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSesPassword": "",
+        "smtpSesUsername": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpUsernameOptional": "Leave blank when the server needs no login"
       },
       "ownerOnly": "",
       "pushNote": "",
@@ -1862,11 +1910,41 @@
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": ""
+        "webToast": "",
+        "email": "Email"
       },
       "usedBy": "",
       "usedBy_other": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
+      "emailDescription": "",
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "Brevo",
+        "presetCustom": "Custom",
+        "presetGmail": "Gmail",
+        "presetMailgun": "Mailgun",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSendgrid": "SendGrid",
+        "presetSes": "Amazon SES",
+        "securityNone": "None (plain text, port 25)",
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)"
+      },
+      "receiveViolationsNeedsRecipients": "",
+      "rowActions": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": ""
     },
     "jobs": {
       "lastRun": "",
@@ -1927,7 +2005,8 @@
       "showAll": "",
       "unlinkAccount": "",
       "unlinkConfirm": "",
-      "unlinkPlexAccount": ""
+      "unlinkPlexAccount": "",
+      "ownerOnly": ""
     }
   },
   "statsBandwidth": {
@@ -1983,7 +2062,15 @@
     "unknownRule": "",
     "userInfo": "Informació de l'usuari",
     "userNotFound": "No s'ha trobat l'usuari",
-    "violations": "Incompliments"
+    "violations": "Incompliments",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": ""
   },
   "users": {
     "filterHasAccessTo": "",

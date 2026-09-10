@@ -115,7 +115,15 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
-    "title": "User Details"
+    "title": "User Details",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": ""
   },
   "history": {
     "title": "History",
@@ -663,7 +671,8 @@
         "sampleTitle": "What this would do to that run",
         "sampleGone": "That session is no longer on record; nothing to check against.",
         "backToLive": "Back to what's playing now"
-      }
+      },
+      "noAlertRecipientsTooltip": ""
     },
     "categories": {
       "session_behavior": "Session Behavior",
@@ -722,7 +731,9 @@
         "serverUp": "a server comes back up",
         "pluginUpdateAvailable": "a plugin update is available",
         "serverUpdateAvailable": "a server update is available",
-        "tracearrUpdateAvailable": "a Tracearr update is available"
+        "tracearrUpdateAvailable": "a Tracearr update is available",
+        "newsletterFailed": "",
+        "newsletterSent": ""
       },
       "operators": {
         "eq": "is",
@@ -1372,6 +1383,11 @@
         "name": "Trust score changed",
         "description": "Tell a destination when an account's trust score changes.",
         "keywords": "trust score reputation penalty adjusted notify discord email webhook"
+      },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
       }
     },
     "title": "Automations",
@@ -1397,7 +1413,8 @@
         "updates": "Updates",
         "notify": "Notify",
         "policy": "Policy",
-        "control": "Control flow"
+        "control": "Control flow",
+        "notifications": ""
       },
       "suggested": "Suggested",
       "triggers": {
@@ -1466,6 +1483,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr itself has a newer release.",
           "synonyms": "upgrade, version, release, self"
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
         }
       },
       "actions": {
@@ -1562,7 +1587,8 @@
       "linkedAccountsDesc": "",
       "noAccountsYet": "No Plex accounts linked yet.",
       "unlinkPlexAccount": "Unlink Plex Account",
-      "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
+      "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again.",
+      "ownerOnly": ""
     },
     "destinations": {
       "add": "Add destination",
@@ -1580,10 +1606,41 @@
         "topic": "Topic",
         "authToken": "Auth token",
         "userKey": "User key",
-        "apiToken": "API token"
+        "apiToken": "API token",
+        "fromAddress": "From address",
+        "fromName": "From name",
+        "host": "SMTP host",
+        "messageStream": "",
+        "messagesPerSecond": "Messages per second",
+        "password": "Password",
+        "port": "Port",
+        "preset": "Provider",
+        "replyTo": "Reply-to",
+        "security": "Security",
+        "to": "Recipients",
+        "username": "Username"
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": "Optional for public topics",
+        "smtpBrevoPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpGmailPassword": "",
+        "smtpGmailUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMessageStream": "",
+        "smtpPostmarkPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpResendPassword": "",
+        "smtpResendUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSesPassword": "",
+        "smtpSesUsername": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpUsernameOptional": "Leave blank when the server needs no login"
       },
       "ownerOnly": "Only the owner can manage notification destinations.",
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
@@ -1603,11 +1660,41 @@
         "apprise": "Apprise",
         "pushover": "Pushover",
         "push": "Mobile push",
-        "webToast": "Browser toasts"
+        "webToast": "Browser toasts",
+        "email": "Email"
       },
       "usedBy": "Used by {{count}} rule",
       "usedBy_other": "Used by {{count}} rules",
-      "webToastNote": "Toasts in this browser."
+      "webToastNote": "Toasts in this browser.",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
+      "emailDescription": "",
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "Brevo",
+        "presetCustom": "Custom",
+        "presetGmail": "Gmail",
+        "presetMailgun": "Mailgun",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSendgrid": "SendGrid",
+        "presetSes": "Amazon SES",
+        "securityNone": "None (plain text, port 25)",
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)"
+      },
+      "receiveViolationsNeedsRecipients": "",
+      "rowActions": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": ""
     },
     "jobs": {
       "runNow": "Run Now",

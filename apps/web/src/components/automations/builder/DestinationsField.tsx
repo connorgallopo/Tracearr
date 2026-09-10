@@ -4,7 +4,7 @@
  */
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Destination } from '@tracearr/shared';
+import { addressList, type Destination } from '@tracearr/shared';
 import { Check, Plus, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,12 @@ interface DestinationsFieldProps {
 function byBuiltinThenName(a: Destination, b: Destination): number {
   if (a.builtin !== b.builtin) return Number(b.builtin) - Number(a.builtin);
   return a.name.localeCompare(b.name);
+}
+
+function lacksAlertRecipients(row: Destination): boolean {
+  return (
+    row.type === 'email' && row.config !== null && addressList(row.config.to ?? '').length === 0
+  );
 }
 
 export function DestinationsField({ value, onChange, label, labelledBy }: DestinationsFieldProps) {
@@ -81,25 +87,32 @@ export function DestinationsField({ value, onChange, label, labelledBy }: Destin
             {rows.map((row) => {
               const Icon = iconFor(row.type);
               const picked = value.includes(row.id);
-              // A disabled row stays pickable so an existing rule can keep it; the tooltip says why it is dimmed.
+              const quiet = lacksAlertRecipients(row);
+              // A dimmed row stays pickable so an existing rule can keep it; the tooltip says why it is dimmed.
               const item = (
                 <ToggleGroupItem
                   key={row.id}
                   value={row.id}
-                  className={cn('rounded-full', SELECTED_TOGGLE, !row.enabled && 'opacity-60')}
+                  className={cn(
+                    'rounded-full',
+                    SELECTED_TOGGLE,
+                    (!row.enabled || quiet) && 'opacity-60'
+                  )}
                 >
                   {picked ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                   {row.name}
                 </ToggleGroupItem>
               );
 
-              if (row.enabled) return item;
+              if (row.enabled && !quiet) return item;
 
               return (
                 <Tooltip key={row.id}>
                   <TooltipTrigger asChild>{item}</TooltipTrigger>
                   <TooltipContent>
-                    {t('pages:automations.builder.destinationDisabled')}
+                    {row.enabled
+                      ? t('pages:automations.builder.noAlertRecipientsTooltip')
+                      : t('pages:automations.builder.destinationDisabled')}
                   </TooltipContent>
                 </Tooltip>
               );

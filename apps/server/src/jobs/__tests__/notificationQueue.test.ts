@@ -341,6 +341,31 @@ describe('enqueueNotification - dedupe ids', () => {
     expect(jobId).not.toMatch(/:/);
   });
 
+  it('keys newsletter outcomes on the send, so two newsletters in one bucket both go out', async () => {
+    const mod = await loadInitializedQueue();
+    mockFindDestinationsForEvent.mockResolvedValue([destination({ id: 'd1' })]);
+    const event: NotificationEvent = {
+      type: 'newsletter_send',
+      payload: {
+        newsletterId: 'n-1',
+        sendId: 'send-1',
+        name: 'Weekly',
+        outcome: 'sent',
+        trigger: 'schedule',
+        recipientCount: 1,
+        itemCounts: {},
+        error: null,
+        windowStart: '2026-08-26T00:00:00.000Z',
+        windowEnd: '2026-09-02T00:00:00.000Z',
+        historyUrl: null,
+      },
+    };
+
+    await mod.enqueueNotification(event);
+
+    expect(bulkEntries()[0]?.opts.jobId).toBe(`d1|newsletter_send-send-1-${bucket()}`);
+  });
+
   it('keys server events on the server id', async () => {
     const mod = await loadInitializedQueue();
     mockFindDestinationsForEvent.mockResolvedValue([destination({ id: 'd1' })]);

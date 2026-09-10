@@ -131,6 +131,39 @@ export {
   useTestUnsavedDestination,
 } from './useDestinations';
 
+// Newsletter hooks
+export {
+  NEWSLETTERS_KEY,
+  newsletterKeys,
+  useNewsletters,
+  useNewsletter,
+  useNewsletterRecipients,
+  useNewsletterVariants,
+  useNewsletterSends,
+  useNewsletterSend,
+  useCreateNewsletter,
+  useUpdateNewsletter,
+  useDeleteNewsletter,
+  useDuplicateNewsletter,
+  usePreviewNewsletter,
+  usePreviewDraftNewsletter,
+  useTestNewsletter,
+  useSendNewsletter,
+  useNewsletterSendHtml,
+  useRetryFailedSend,
+} from './useNewsletters';
+
+// Email branding and suppression hooks
+export {
+  EMAIL_BRANDING_KEY,
+  EMAIL_SUPPRESSIONS_KEY,
+  useEmailBranding,
+  useSaveEmailBranding,
+  useEmailSuppressions,
+  useAddSuppression,
+  useRemoveSuppression,
+} from './useEmail';
+
 // Mobile hooks
 export {
   useMobileConfig,

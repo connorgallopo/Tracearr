@@ -6,7 +6,12 @@
  */
 
 import { eq, inArray, sql } from 'drizzle-orm';
-import { SESSION_LIMITS, type Settings, type BackupScheduleType } from '@tracearr/shared';
+import {
+  SESSION_LIMITS,
+  type Settings,
+  type BackupScheduleType,
+  type EmailBrandingSettings,
+} from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { settings } from '../db/schema.js';
 
@@ -60,6 +65,8 @@ const INTERNAL_DEFAULTS = {
   // Per-install Plex client identifier, generated on first boot. Scopes plex.tv
   // PINs to this deployment. Served to the web UI, so it is public, not secret.
   plexClientIdentifier: null as string | null,
+  // The owner's email branding block, validated by emailBrandingSchema on read and write.
+  emailBranding: null as EmailBrandingSettings | null,
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;

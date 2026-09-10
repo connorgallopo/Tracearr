@@ -2341,6 +2341,63 @@ describe('LibrarySyncService', () => {
       ]);
     });
 
+    it('strips NUL bytes from library names before the upsert', async () => {
+      const service = new LibrarySyncService();
+      const mockServer = createMockServer();
+      const mockLibraries = [
+        createMockLibrary({ id: 'lib-1', name: 'Movies\u0000', type: 'movie\u0000' }),
+      ];
+
+      setupSelectForIncrementalTest(mockServer);
+      mockSelectDistinctChain([[], []]);
+      const insertChain = mockInsertChain([{ id: randomUUID() }]);
+      mockDeleteChain();
+      mockTransaction();
+      mockMediaServerClient({ libraries: mockLibraries, items: [], totalCount: 0 });
+
+      await service.syncServer(mockServer.id);
+
+      const insertCallIndex = vi
+        .mocked(db.insert)
+        .mock.calls.findIndex(([table]) => table === librariesTable);
+      expect(insertCallIndex).toBeGreaterThanOrEqual(0);
+      expect(insertChain.values).toHaveBeenNthCalledWith(insertCallIndex + 1, [
+        { serverId: mockServer.id, libraryId: 'lib-1', name: 'Movies', mediaType: 'movie' },
+      ]);
+    });
+
+    it('continues the sync when the library name upsert throws', async () => {
+      const service = new LibrarySyncService();
+      const mockServer = createMockServer();
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      setupSelectForIncrementalTest(mockServer);
+      mockSelectDistinctChain([[], []]);
+      mockInsertChain([{ id: randomUUID() }]);
+      mockDeleteChain();
+      mockTransaction();
+      mockMediaServerClient({
+        libraries: [createMockLibrary({ id: 'lib-1', name: 'Movies', type: 'movie' })],
+        items: [createMockLibraryItem({ ratingKey: 'item-1' })],
+        totalCount: 1,
+      });
+      vi.spyOn(
+        service as unknown as { syncLibraryNames: () => Promise<void> },
+        'syncLibraryNames'
+      ).mockRejectedValueOnce(new Error('invalid byte sequence for encoding "UTF8": 0x00'));
+
+      const results = await service.syncServer(mockServer.id);
+
+      expect(results).toHaveLength(1);
+      expect(reconcileMediaDuplicates).toHaveBeenCalledTimes(1);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Library name sync failed'),
+        expect.any(Error)
+      );
+
+      warnSpy.mockRestore();
+    });
+
     it('deletes libraries the server no longer reports', async () => {
       const service = new LibrarySyncService();
       const mockServer = createMockServer();

@@ -1,279 +1,299 @@
 {
-  "toast": {
-    "success": {
-      "serverAdded": {
-        "title": "Server Aggiunto",
-        "message": "{{name}} è stato connesso con successo"
-      },
-      "serverRemoved": {
-        "title": "Server Rimosso",
-        "message": "Il server è stato rimosso con successo"
-      },
-      "serverSynced": {
-        "title": "Server Sincronizzato",
-        "message": "I dati del server sono stati sincronizzati"
-      },
-      "settingsUpdated": {
-        "title": "Impostazioni Aggiornate",
-        "message": "Le tue impostazioni sono state salvate"
-      },
-      "tokenCopied": {
-        "title": "Token Copiato",
-        "message": "Token di coppia copiato negli appunti"
-      },
-      "violationAcknowledged": {
-        "title": "Violazione Riconosciuta",
-        "message": "La violazione è stata contrassegnata come riconosciuta"
-      },
-      "violationDismissed": {
-        "title": "Violazione Respinta",
-        "message": "La violazione è stata respinta"
-      },
-      "deviceRemoved": {
-        "title": "Dispositivo Rimosso",
-        "message": "Il dispositivo è stato disconnesso"
-      },
-      "deviceRenamed": {
-        "title": "Dispositivo Rinominato",
-        "message": "Il nome del dispositivo è stato aggiornato"
-      },
-      "sessionsRevoked": {
-        "title": "Sessioni Revocate",
-        "message": "Tutte le sessioni mobili sono state revocate"
-      },
-      "loggedIn": {
-        "title": "Successo",
-        "message": "Accesso effettuato con successo"
-      },
-      "webhookTest": {
-        "title": "Test Riuscito",
-        "message": "Webhook funziona correttamente"
-      },
-      "copiedToClipboard": {
-        "title": "Copiato negli appunti"
-      },
-      "plexAccountLinked": {
-        "title": "Account Plex Collegato",
-        "message": "Ora puoi aggiungere server dal tuo account Plex"
-      },
-      "plexAccountUnlinked": {
-        "title": "Account Plex Scollegato",
-        "message": "Il tuo account Plex è stato disconnesso"
-      },
-      "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
-      },
-      "agentAdded": {
-        "title": "Agente Aggiunto",
-        "message": "L'agente di notifica è stato aggiunto"
-      },
-      "agentUpdated": {
-        "title": "Agente Aggiornato",
-        "message": "L'agente di notifica è stato aggiornato"
-      },
-      "agentRemoved": {
-        "title": "Agente Rimosso",
-        "message": "L'agente di notifica è stato rimosso"
-      },
-      "jobCompleted": {
-        "title": "Lavoro Completato",
-        "message": "{{name}} completato con successo"
-      },
-      "automationCreated": {
-        "title": "",
-        "message": ""
-      },
-      "automationUpdated": {
-        "title": "",
-        "message": ""
-      },
-      "automationDeleted": {
-        "title": "",
-        "message": ""
-      },
-      "streamTerminated": {
-        "title": "Stream Terminato",
-        "message": "La sessione di riproduzione è stata interrotta"
-      },
-      "serverUrlUpdated": {
-        "title": "Url Del Server Aggiornato",
-        "message": "L'URL del server è stato aggiornato con successo"
-      },
-      "serverUpdated": {
-        "title": "Server Aggiornato",
-        "message": "Il server è stato aggiornato con successo"
-      },
-      "syncCompletedWithErrors": {
-        "title": "Sincronizzazione completata con errori"
-      },
-      "sessionsDeleted": {
-        "title": "Sessioni Eliminate",
-        "message_one": "",
-        "message_other": ""
-      },
-      "violationsAcknowledged": {
-        "title": "Violazioni Riconosciute",
-        "message_one": "",
-        "message_other": ""
-      },
-      "violationsDismissed": {
-        "title": "Violazioni Rimosse",
-        "message_one": "{{count}} violazione licenziata",
-        "message_other": "{{count}} violazioni respinte"
-      },
-      "apiKeyGenerated": {
-        "title": "Chiave API Generata",
-        "message": "La tua nuova chiave API è pronta per l'uso"
-      },
-      "mobileAccessEnabled": {
-        "title": "Accesso Mobile Abilitato",
-        "message": "Scansiona il codice QR con l'app mobile Tracearr per connetterti"
-      },
-      "mobileAccessDisabled": {
-        "title": "Accesso Mobile Disabilitato",
-        "message": "Tutte le sessioni mobili sono state revocate"
-      },
-      "pairTokenGenerated": {
-        "title": "Token Di Coppia Generato",
-        "message": "Scansiona il codice QR con il tuo dispositivo mobile per abbinare"
-      },
-      "displayNameUpdated": {
-        "title": "Nome Visualizzato Aggiornato"
-      },
-      "trustScoresReset": {
-        "title": "Resetta Punteggi Di Fiducia",
-        "message_one": "{{count}} utente resettato a 100",
-        "message_other": "{{count}} utenti reimpostati a 100"
-      },
-      "claimCodeValidated": {
-        "title": "Codice sinistro convalidato",
-        "message": "Ora puoi procedere con la configurazione"
-      },
-      "usersMerged": {
-        "title": "",
-        "automationsKept": ""
-      },
-      "serverUserSplit": {
-        "title": ""
-      },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
-    },
-    "error": {
-      "serverAddFailed": "Impossibile aggiungere il server",
-      "serverRemoveFailed": "Impossibile rimuovere il server",
-      "serverSyncFailed": "Sincronizzazione del server non riuscita",
-      "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
-      "copyFailed": "Impossibile copiare negli appunti",
-      "acknowledgeFailed": "Impossibile riconoscere la violazione",
-      "dismissFailed": "Impossibile annullare la violazione",
-      "authFailed": "Autenticazione non riuscita",
-      "webhookTestFailed": "Test Webhook fallito",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
-      "streamTerminateFailed": "Terminazione dello stream non riuscita",
-      "serverUrlUpdateFailed": "Impossibile aggiornare l'URL del server",
-      "serverUpdateFailed": "Aggiornamento del server non riuscito",
-      "serverReorderFailed": "Riordino server non riuscito",
-      "sessionsDeleteFailed": "Impossibile eliminare le sessioni",
-      "apiKeyGenerateFailed": "Impossibile generare la chiave API",
-      "mobileAccessEnableFailed": "Impossibile abilitare l'accesso mobile",
-      "mobileAccessDisableFailed": "Impossibile disattivare l'accesso mobile",
-      "pairTokenGenerateFailed": "Impossibile generare il token della coppia",
-      "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
-      "deviceRenameFailed": "Impossibile rinominare il dispositivo",
-      "sessionsRevokeFailed": "Impossibile revocare le sessioni",
-      "displayNameUpdateFailed": "Aggiornamento del nome visualizzato non riuscito",
-      "trustScoresResetFailed": "Impossibile ripristinare i punteggi di fiducia",
-      "routingUpdateFailed": "Impossibile aggiornare il routing",
-      "clipboardFailed": "Impossibile copiare negli appunti",
-      "plexUnlinkFailed": "Scollegamento account Plex non riuscito",
-      "plexReauthorizeFailed": "",
-      "agentAddFailed": "Impossibile aggiungere l'agente",
-      "agentUpdateFailed": "Impossibile aggiornare l'agente",
-      "agentRemoveFailed": "Impossibile rimuovere l'agente",
-      "agentTestFailed": "Test fallito",
-      "jobAlreadyRunning": "Job già in esecuzione",
-      "jobStartFailed": "Impossibile avviare il processo",
-      "jobLoadFailed": "Impossibile caricare i lavori di manutenzione",
-      "invalidUrl": "Url Non Valido",
-      "plexDirectUrl": "Gli URL plex.direct sono indirizzi relè che non possono essere utilizzati qui. Utilizza invece un indirizzo IP diretto o un nome host.",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "invalidClaimCode": {
-        "title": "Codice sinistro non valido",
-        "message": "Controlla i log del server"
-      },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
-    },
-    "warning": {
-      "jobFailed": {
-        "title": "Job Fallito",
-        "message": "{{name}} ha riscontrato un errore"
-      }
-    },
-    "info": {
-      "updateAvailable": {
-        "title": "Aggiornamento Disponibile",
-        "message": "Tracearr {{version}} disponibile"
-      },
-      "violationDetected": {
-        "title": "Nuova Violazione: {{ruleName}}",
-        "message": "{{user}} attivato {{ruleType}}"
-      }
-    }
-  },
   "push": {
-    "violationDetected": "Violazione Condivisione Rilevata",
-    "streamStarted": "Stream Iniziato",
-    "streamEnded": "Stream Terminato",
+    "newDevice": "Nuovo Dispositivo",
     "serverDown": "Connessione Del Server Persa",
     "serverUp": "Server Indietro Online",
-    "newDevice": "Nuovo Dispositivo",
-    "trustScoreChanged": "Trust Punteggio Cambiato"
+    "streamEnded": "Stream Terminato",
+    "streamStarted": "Stream Iniziato",
+    "trustScoreChanged": "Trust Punteggio Cambiato",
+    "violationDetected": "Violazione Condivisione Rilevata"
   },
   "settings": {
-    "title": "Impostazioni Notifiche",
     "allSeverity": "Tutto (Low, Attenzione, Alto)",
-    "warningAndHigh": "Solo avvertimento & alto",
-    "highOnly": "Solo gravità elevata",
     "allTypes": "Tutti I Tipi",
-    "rateLimit": "Stato Limite Tariffa Attuale",
-    "perMinute": "Al Minuto",
-    "perHour": "Per Ora",
-    "enablePushNotifications": "Abilita Notifiche Push",
-    "notificationEvents": "Eventi Di Notifica",
-    "violationDetected": "Violazione Rilevata",
-    "violationDetectedDesc": "Quando viene attivata una violazione della condivisione",
-    "streamStarted": "Stream Iniziato",
-    "streamStartedDesc": "Quando un utente inizia a guardare",
-    "streamStopped": "Stream Fermato",
-    "streamStoppedDesc": "Quando un utente smette di guardare",
     "concurrentStreams": "Flussi Concorrenti",
     "concurrentStreamsDesc": "Quando il limite massimo dello stream è superato",
+    "enablePushNotifications": "Abilita Notifiche Push",
+    "enableQuietHours": "Abilita Ore Silenziose",
+    "highOnly": "Solo gravità elevata",
+    "minimumSeverity": "Gravità Minima",
     "newDevice": "Nuovo Dispositivo",
     "newDeviceDesc": "Quando un nuovo dispositivo si connette",
-    "trustScoreChanged": "Trust Punteggio Cambiato",
-    "trustScoreChangedDesc": "Quando il punteggio di fiducia di un utente cambia",
+    "notificationEvents": "Eventi Di Notifica",
+    "overrideForCritical": "Sovrascrivi per Critico",
+    "perHour": "Per Ora",
+    "perMinute": "Al Minuto",
+    "quietHours": "Ore Di Tranquillo",
+    "rateLimit": "Stato Limite Tariffa Attuale",
+    "rateLimiting": "Limite Di Tasso",
     "serverDown": "Server Giù",
     "serverDownDesc": "Quando un media server va offline",
     "serverUp": "Server Su",
     "serverUpDesc": "Quando un media server torna online",
+    "streamStarted": "Stream Iniziato",
+    "streamStartedDesc": "Quando un utente inizia a guardare",
+    "streamStopped": "Stream Fermato",
+    "streamStoppedDesc": "Quando un utente smette di guardare",
+    "title": "Impostazioni Notifiche",
+    "trustScoreChanged": "Trust Punteggio Cambiato",
+    "trustScoreChangedDesc": "Quando il punteggio di fiducia di un utente cambia",
+    "violationDetected": "Violazione Rilevata",
+    "violationDetectedDesc": "Quando viene attivata una violazione della condivisione",
     "violationFilters": "Filtri Di Violazione",
-    "minimumSeverity": "Gravità Minima",
-    "quietHours": "Ore Di Tranquillo",
-    "enableQuietHours": "Abilita Ore Silenziose",
-    "overrideForCritical": "Sovrascrivi per Critico",
-    "rateLimiting": "Limite Di Tasso"
+    "warningAndHigh": "Solo avvertimento & alto"
+  },
+  "toast": {
+    "error": {
+      "acknowledgeFailed": "Impossibile riconoscere la violazione",
+      "agentAddFailed": "Impossibile aggiungere l'agente",
+      "agentRemoveFailed": "Impossibile rimuovere l'agente",
+      "agentTestFailed": "Test fallito",
+      "agentUpdateFailed": "Impossibile aggiornare l'agente",
+      "apiKeyGenerateFailed": "Impossibile generare la chiave API",
+      "authFailed": "Autenticazione non riuscita",
+      "automationCreateFailed": "",
+      "automationDeleteFailed": "",
+      "automationUpdateFailed": "",
+      "brandingSaveFailed": "",
+      "clipboardFailed": "Impossibile copiare negli appunti",
+      "copyFailed": "Impossibile copiare negli appunti",
+      "destinationDeleteFailed": "",
+      "destinationInUse": "",
+      "destinationSaveFailed": "",
+      "destinationTestFailed": "",
+      "destinationUsedByNewsletters": "",
+      "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
+      "deviceRenameFailed": "Impossibile rinominare il dispositivo",
+      "dismissFailed": "Impossibile annullare la violazione",
+      "identityUpdateFailed": "",
+      "invalidClaimCode": {
+        "message": "Controlla i log del server",
+        "title": "Codice sinistro non valido"
+      },
+      "invalidUrl": "Url Non Valido",
+      "jobAlreadyRunning": "Job già in esecuzione",
+      "jobLoadFailed": "Impossibile caricare i lavori di manutenzione",
+      "jobStartFailed": "Impossibile avviare il processo",
+      "mobileAccessDisableFailed": "Impossibile disattivare l'accesso mobile",
+      "mobileAccessEnableFailed": "Impossibile abilitare l'accesso mobile",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSaveFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterSnapshotFailed": "",
+      "newsletterTestFailed": "",
+      "pairTokenGenerateFailed": "Impossibile generare il token della coppia",
+      "plexDirectUrl": "Gli URL plex.direct sono indirizzi relè che non possono essere utilizzati qui. Utilizza invece un indirizzo IP diretto o un nome host.",
+      "plexReauthorizeFailed": "",
+      "plexUnlinkFailed": "Scollegamento account Plex non riuscito",
+      "routingUpdateFailed": "Impossibile aggiornare il routing",
+      "serverAddFailed": "Impossibile aggiungere il server",
+      "serverRemoveFailed": "Impossibile rimuovere il server",
+      "serverReorderFailed": "Riordino server non riuscito",
+      "serverSyncFailed": "Sincronizzazione del server non riuscita",
+      "serverUpdateFailed": "Aggiornamento del server non riuscito",
+      "serverUrlUpdateFailed": "Impossibile aggiornare l'URL del server",
+      "serverUserSplitFailed": "",
+      "sessionsDeleteFailed": "Impossibile eliminare le sessioni",
+      "sessionsRevokeFailed": "Impossibile revocare le sessioni",
+      "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
+      "streamTerminateFailed": "Terminazione dello stream non riuscita",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": "",
+      "trustScoresResetFailed": "Impossibile ripristinare i punteggi di fiducia",
+      "userMergeFailed": "",
+      "webhookTestFailed": "Test Webhook fallito"
+    },
+    "info": {
+      "updateAvailable": {
+        "message": "Tracearr {{version}} disponibile",
+        "title": "Aggiornamento Disponibile"
+      },
+      "violationDetected": {
+        "message": "{{user}} attivato {{ruleType}}",
+        "title": "Nuova Violazione: {{ruleName}}"
+      }
+    },
+    "success": {
+      "agentAdded": {
+        "message": "L'agente di notifica è stato aggiunto",
+        "title": "Agente Aggiunto"
+      },
+      "agentRemoved": {
+        "message": "L'agente di notifica è stato rimosso",
+        "title": "Agente Rimosso"
+      },
+      "agentUpdated": {
+        "message": "L'agente di notifica è stato aggiornato",
+        "title": "Agente Aggiornato"
+      },
+      "apiKeyGenerated": {
+        "message": "La tua nuova chiave API è pronta per l'uso",
+        "title": "Chiave API Generata"
+      },
+      "automationCreated": {
+        "message": "",
+        "title": ""
+      },
+      "automationDeleted": {
+        "message": "",
+        "title": ""
+      },
+      "automationUpdated": {
+        "message": "",
+        "title": ""
+      },
+      "brandingSaved": "",
+      "claimCodeValidated": {
+        "message": "Ora puoi procedere con la configurazione",
+        "title": "Codice sinistro convalidato"
+      },
+      "copiedToClipboard": {
+        "title": "Copiato negli appunti"
+      },
+      "destinationDeleted": "",
+      "destinationSaved": "",
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "deviceRemoved": {
+        "message": "Il dispositivo è stato disconnesso",
+        "title": "Dispositivo Rimosso"
+      },
+      "deviceRenamed": {
+        "message": "Il nome del dispositivo è stato aggiornato",
+        "title": "Dispositivo Rinominato"
+      },
+      "identityUpdated": "",
+      "jobCompleted": {
+        "message": "{{name}} completato con successo",
+        "title": "Lavoro Completato"
+      },
+      "loggedIn": {
+        "message": "Accesso effettuato con successo",
+        "title": "Successo"
+      },
+      "mobileAccessDisabled": {
+        "message": "Tutte le sessioni mobili sono state revocate",
+        "title": "Accesso Mobile Disabilitato"
+      },
+      "mobileAccessEnabled": {
+        "message": "Scansiona il codice QR con l'app mobile Tracearr per connetterti",
+        "title": "Accesso Mobile Abilitato"
+      },
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterRetryQueued": "",
+      "newsletterSaved": "",
+      "newsletterSendQueued": "",
+      "newsletterTestQueued": "",
+      "pairTokenGenerated": {
+        "message": "Scansiona il codice QR con il tuo dispositivo mobile per abbinare",
+        "title": "Token Di Coppia Generato"
+      },
+      "plexAccountLinked": {
+        "message": "Ora puoi aggiungere server dal tuo account Plex",
+        "title": "Account Plex Collegato"
+      },
+      "plexAccountReauthorized": {
+        "messageNoServers": "",
+        "message_one": "",
+        "message_other": "",
+        "partial": "",
+        "title": "",
+        "unmatched": ""
+      },
+      "plexAccountUnlinked": {
+        "message": "Il tuo account Plex è stato disconnesso",
+        "title": "Account Plex Scollegato"
+      },
+      "serverAdded": {
+        "message": "{{name}} è stato connesso con successo",
+        "title": "Server Aggiunto"
+      },
+      "serverRemoved": {
+        "message": "Il server è stato rimosso con successo",
+        "title": "Server Rimosso"
+      },
+      "serverSynced": {
+        "message": "I dati del server sono stati sincronizzati",
+        "title": "Server Sincronizzato"
+      },
+      "serverUpdated": {
+        "message": "Il server è stato aggiornato con successo",
+        "title": "Server Aggiornato"
+      },
+      "serverUrlUpdated": {
+        "message": "L'URL del server è stato aggiornato con successo",
+        "title": "Url Del Server Aggiornato"
+      },
+      "serverUserSplit": {
+        "title": ""
+      },
+      "sessionsDeleted": {
+        "message_one": "",
+        "message_other": "",
+        "title": "Sessioni Eliminate"
+      },
+      "sessionsRevoked": {
+        "message": "Tutte le sessioni mobili sono state revocate",
+        "title": "Sessioni Revocate"
+      },
+      "settingsUpdated": {
+        "message": "Le tue impostazioni sono state salvate",
+        "title": "Impostazioni Aggiornate"
+      },
+      "streamTerminated": {
+        "message": "La sessione di riproduzione è stata interrotta",
+        "title": "Stream Terminato"
+      },
+      "suppressionAdded": "",
+      "suppressionRemoved": "",
+      "syncCompletedWithErrors": {
+        "title": "Sincronizzazione completata con errori"
+      },
+      "tokenCopied": {
+        "message": "Token di coppia copiato negli appunti",
+        "title": "Token Copiato"
+      },
+      "trustScoresReset": {
+        "message_one": "{{count}} utente resettato a 100",
+        "message_other": "{{count}} utenti reimpostati a 100",
+        "title": "Resetta Punteggi Di Fiducia"
+      },
+      "usersMerged": {
+        "automationsKept": "",
+        "title": ""
+      },
+      "violationAcknowledged": {
+        "message": "La violazione è stata contrassegnata come riconosciuta",
+        "title": "Violazione Riconosciuta"
+      },
+      "violationDismissed": {
+        "message": "La violazione è stata respinta",
+        "title": "Violazione Respinta"
+      },
+      "violationsAcknowledged": {
+        "message_one": "",
+        "message_other": "",
+        "title": "Violazioni Riconosciute"
+      },
+      "violationsDismissed": {
+        "message_one": "{{count}} violazione licenziata",
+        "message_other": "{{count}} violazioni respinte",
+        "title": "Violazioni Rimosse"
+      },
+      "webhookTest": {
+        "message": "Webhook funziona correttamente",
+        "title": "Test Riuscito"
+      }
+    },
+    "warning": {
+      "jobFailed": {
+        "message": "{{name}} ha riscontrato un errore",
+        "title": "Job Fallito"
+      }
+    }
   }
 }

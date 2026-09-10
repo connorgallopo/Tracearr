@@ -96,7 +96,11 @@
     "typeUploaded": "已上傳",
     "uploadBackup": "上傳備份",
     "uploading": "上傳中……",
-    "version": ""
+    "version": "",
+    "download": "",
+    "rowActions": "",
+    "scheduleHour": "",
+    "scheduleMinute": ""
   },
   "general": {
     "accentColor": "",
@@ -341,7 +345,10 @@
     "scanQrCode": "掃描 QR 碼",
     "title": "手機應用程式",
     "tokenExpires": "憑證於 {{time}} 過期",
-    "tokenExpiryNote": ""
+    "tokenExpiryNote": "",
+    "connectedOn": "",
+    "lastSeen": "",
+    "noDevicesDesc": ""
   },
   "plex": {
     "chooseServer": "請選擇要監控的 Plex 伺服器",
@@ -393,7 +400,8 @@
       "emptyHint": "",
       "label": "",
       "title": "",
-      "titleDesc": ""
+      "titleDesc": "",
+      "ownerOnly": ""
     },
     "realtimeActive": "",
     "realtimeDialog": {
@@ -439,7 +447,10 @@
       "installed": "",
       "upToDate": "",
       "updateAvailable": ""
-    }
+    },
+    "publicUrl": "",
+    "publicUrlHint": "",
+    "reorder": ""
   },
   "tabs": {
     "accessControl": "存取控制",
@@ -502,5 +513,464 @@
     "upstreamAhead": "",
     "upstreamAheadDescription": "",
     "versionAvailable": "{{version}} 已可更新"
+  },
+  "email": {
+    "branding": {
+      "accent": "",
+      "accentPicker": "",
+      "description": "",
+      "footerText": "",
+      "footerTextHelp": "",
+      "logo": {
+        "label": "",
+        "none": "",
+        "tracearr": "",
+        "url": ""
+      },
+      "logoUrl": "",
+      "mailto": "",
+      "mailtoHelp": "",
+      "postalAddress": "",
+      "postalAddressHelp": "",
+      "save": "",
+      "saving": "",
+      "title": ""
+    },
+    "ownerOnly": "",
+    "suppressions": {
+      "add": "",
+      "addConfirm": "",
+      "addDescription": "",
+      "addTitle": "",
+      "address": "",
+      "empty": "",
+      "emptyDescription": "",
+      "globalNote": "",
+      "openSource": "",
+      "reason": {
+        "manual": "",
+        "unsubscribed": ""
+      },
+      "remove": "",
+      "removeDescription": "",
+      "removeTitle": "",
+      "title": ""
+    }
+  },
+  "nav": {
+    "descriptions": {
+      "api": "",
+      "appearance": "",
+      "backup": "",
+      "behavior": "",
+      "connections": "",
+      "destinations": "",
+      "email": "",
+      "guest": "",
+      "import": "",
+      "jobs": "",
+      "locale": "",
+      "mobile": "",
+      "newsletters": "",
+      "plexAccounts": "",
+      "posters": "",
+      "remote": ""
+    },
+    "groups": {
+      "access": "",
+      "data": "",
+      "general": "",
+      "notifications": "",
+      "servers": ""
+    },
+    "itemLabel": "",
+    "label": "",
+    "sections": {
+      "api": "",
+      "appearance": "",
+      "backup": "",
+      "behavior": "",
+      "connections": "",
+      "destinations": "",
+      "email": "",
+      "guest": "",
+      "import": "",
+      "jobs": "",
+      "locale": "",
+      "mobile": "",
+      "newsletters": "",
+      "plexAccounts": "",
+      "posters": "",
+      "remote": ""
+    },
+    "selectLabel": ""
+  },
+  "newsletters": {
+    "addEmailDestination": "",
+    "copyOf": "",
+    "counts": {
+      "albums_one": "",
+      "albums_other": "",
+      "movies_one": "",
+      "movies_other": "",
+      "shows_one": "",
+      "shows_other": "",
+      "watched_one": "",
+      "watched_other": ""
+    },
+    "deleteDescription": "",
+    "deleteTitle": "",
+    "duplicate": "",
+    "editor": {
+      "actions": {
+        "more": "",
+        "preview": "",
+        "send": "",
+        "sendHint": "",
+        "test": "",
+        "testHint": ""
+      },
+      "allLibraries": "",
+      "allServers": "",
+      "basics": "",
+      "clear": "",
+      "content": "",
+      "cron": "",
+      "cronHint": "",
+      "dayOfMonth": "",
+      "dayOfMonthHelp": "",
+      "dayOfWeek": "",
+      "days": "",
+      "delivery": {
+        "destination": "",
+        "destinationHelp": "",
+        "hostedNeedsUrl": "",
+        "imageMode": "",
+        "modeHelp": {
+          "hosted": "",
+          "inline": "",
+          "none": ""
+        },
+        "modePreviewHint": "",
+        "modes": {
+          "hosted": "",
+          "inline": "",
+          "none": ""
+        },
+        "noDestination": "",
+        "pickDestination": "",
+        "skipWhenEmpty": "",
+        "skipWhenEmptyHelp": "",
+        "title": ""
+      },
+      "dstNote": "",
+      "enabledHelp": "",
+      "fixFirst": "",
+      "headerSummary": "",
+      "historyNeedsSave": "",
+      "intro": "",
+      "introPlaceholder": "",
+      "kinds": {
+        "cron": "",
+        "daily": "",
+        "monthly": "",
+        "weekly": ""
+      },
+      "libraries": "",
+      "librariesHelp": "",
+      "librariesSelected": "",
+      "links": {
+        "tracearr": "",
+        "tracearrNote": ""
+      },
+      "message": "",
+      "name": "",
+      "nameHelp": "",
+      "newTitle": "",
+      "nextRun": "",
+      "nextRunPending": "",
+      "noLibraries": "",
+      "noServers": "",
+      "notFound": "",
+      "outro": "",
+      "outroPlaceholder": "",
+      "placeholders": {
+        "end_date": "",
+        "item_count": "",
+        "server_name": "",
+        "start_date": ""
+      },
+      "preview": {
+        "countsListed": {
+          "albums": "",
+          "movies": "",
+          "shows": ""
+        },
+        "draft": "",
+        "images": "",
+        "imagesBlocked": "",
+        "imagesBlockedNote": "",
+        "imagesOn": "",
+        "linksNote": "",
+        "recipients": "",
+        "subjectLabel": "",
+        "title": "",
+        "variantTab": "",
+        "variants": "",
+        "width": "",
+        "widths": {
+          "desktop": "",
+          "phone": ""
+        },
+        "window": "",
+        "windowSince": ""
+      },
+      "previewVariant_one": "",
+      "previewVariant_other": "",
+      "readiness": {
+        "destination": "",
+        "destinationError": "",
+        "destinationFail": "",
+        "destinationUnknown": "",
+        "dns": "",
+        "dnsLink": "",
+        "emptyVariant": "",
+        "externalUrl": "",
+        "externalUrlFail": "",
+        "externalUrlNotHttps": "",
+        "fixDestination": "",
+        "fixExternalUrl": "",
+        "fixRecipients": "",
+        "fromDomain": "",
+        "fromDomainFail": "",
+        "fromDomainUnknown": "",
+        "intro": "",
+        "noPublicUrl": "",
+        "privatePublicUrl": "",
+        "recipientsFail": "",
+        "recipientsLoadFailed": "",
+        "recipientsUnknown": "",
+        "recipients_one": "",
+        "recipients_other": "",
+        "serverSettingsLink": "",
+        "staleScope": "",
+        "title": "",
+        "variantsLoadFailed": ""
+      },
+      "recipients": {
+        "account": "",
+        "addAddress": "",
+        "addressLabel": "",
+        "badAddress": "",
+        "contactEmailFor": "",
+        "emptyDescription": "",
+        "emptyTitle": "",
+        "exclude": "",
+        "excludeAction": "",
+        "excludedAfterSave": "",
+        "excludedCount": "",
+        "excludedHelp": "",
+        "extraAddress": "",
+        "extraAddresses": "",
+        "extraAddressesHelp": "",
+        "groupsNote": "",
+        "include": "",
+        "includeAction": "",
+        "includedAfterSave": "",
+        "loadFailed": "",
+        "members": "",
+        "membersHelp": "",
+        "membersOff": "",
+        "membersOffSuppressed": "",
+        "nameLabel": "",
+        "namePlaceholder": "",
+        "noAddress": "",
+        "noAddressHelp": "",
+        "openUserPage": "",
+        "ownerNote": "",
+        "reasons": {
+          "banned": "",
+          "pending": ""
+        },
+        "removeAddress": "",
+        "saveEmail": "",
+        "saveFirst": "",
+        "saveFirstHelp": "",
+        "staleScope": "",
+        "suppressed": "",
+        "suppressedHeading": "",
+        "suppressedHelp": "",
+        "title": "",
+        "unknownMember": "",
+        "willReceive": ""
+      },
+      "removeLibrary": "",
+      "save": "",
+      "saving": "",
+      "schedule": "",
+      "scheduleKind": "",
+      "searchLibraries": "",
+      "searchServers": "",
+      "sections": {
+        "description": "",
+        "labels": {
+          "mostWatched": "",
+          "movies": "",
+          "music": "",
+          "seasons": "",
+          "shows": ""
+        },
+        "legend": "",
+        "mostWatched": "",
+        "mostWatchedHelp": "",
+        "movies": "",
+        "music": "",
+        "musicHelp": "",
+        "shows": "",
+        "the": "",
+        "units": {
+          "albums": "",
+          "mostPlayed": "",
+          "movies": "",
+          "seasonsEach": "",
+          "shows": ""
+        },
+        "upTo": ""
+      },
+      "send": {
+        "confirm": "",
+        "nobody": "",
+        "previewing": "",
+        "sending": "",
+        "summary": "",
+        "title": "",
+        "trimmed_one": "",
+        "trimmed_other": ""
+      },
+      "sendNeedsSave": "",
+      "senderName": "",
+      "senderNameHelp": "",
+      "senderNameRequiredMulti": "",
+      "servers": "",
+      "serversHelp": "",
+      "serversSelected": "",
+      "subject": "",
+      "subjectHelp": "",
+      "tabs": {
+        "edit": "",
+        "history": ""
+      },
+      "test": {
+        "address": "",
+        "description": "",
+        "send": "",
+        "title": "",
+        "variant": ""
+      },
+      "time": "",
+      "timezone": "",
+      "timezoneHelp": "",
+      "turnOnNow": "",
+      "unknownLibrary": "",
+      "unsaved": "",
+      "variantHeading": "",
+      "variantsNote": "",
+      "windowHelp": {
+        "fixed": "",
+        "since_last_send": ""
+      },
+      "windowKind": "",
+      "windowMax": "",
+      "windowSentence": {
+        "fallback": "",
+        "fallbackLabel": "",
+        "fixed": "",
+        "fixedAfter": "",
+        "fixedLabel": ""
+      },
+      "windows": {
+        "fixed": "",
+        "since_last_send": ""
+      }
+    },
+    "empty": "",
+    "emptyDescription": "",
+    "enabled": "",
+    "history": {
+      "attempts": "",
+      "empty": "",
+      "emptyDescription": "",
+      "finished": "",
+      "loadFailed": "",
+      "open": "",
+      "openSnapshot": "",
+      "openVariantSnapshot": "",
+      "page": "",
+      "pruned": "",
+      "recipients": "",
+      "recipientsEmpty": "",
+      "retryFailed": "",
+      "sendTitle": "",
+      "snapshotTitle": "",
+      "status": {
+        "failed": "",
+        "queued": "",
+        "sent": "",
+        "suppressed": "",
+        "unknown": ""
+      },
+      "trigger": {
+        "manual": "",
+        "schedule": "",
+        "test": ""
+      },
+      "unknownHelp": "",
+      "variant": "",
+      "variantEmpty": "",
+      "window": ""
+    },
+    "lastSend": "",
+    "neverSent": "",
+    "new": "",
+    "nextRun": "",
+    "noDestinationDescription": "",
+    "noDestinationHint": "",
+    "noDestinationTitle": "",
+    "noNextRun": "",
+    "outcome": {
+      "failed": "",
+      "partial": "",
+      "rendering": "",
+      "sending": "",
+      "sent": "",
+      "skipped_empty": ""
+    },
+    "ownerOnly": "",
+    "richText": {
+      "bold": "",
+      "bulletList": "",
+      "counter": "",
+      "italic": "",
+      "link": "",
+      "linkApply": "",
+      "linkHref": ""
+    },
+    "rowActions": "",
+    "schedule": {
+      "cron": "",
+      "daily": "",
+      "inZone": "",
+      "monthly": "",
+      "weekly": ""
+    },
+    "sendNow": ""
+  },
+  "shared": {
+    "timezone": {
+      "empty": "",
+      "other": "",
+      "placeholder": "",
+      "search": ""
+    }
   }
 }

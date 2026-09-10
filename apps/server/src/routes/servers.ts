@@ -10,6 +10,7 @@ import {
   reorderServersSchema,
   updateServerSchema,
   pickServerColor,
+  PUBLIC_URL_PLEX_MESSAGE,
   type ServerConnectionStatus,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
@@ -95,13 +96,18 @@ async function verifyServerAccess(params: {
   }
 
   if (type === 'emby') {
-    const isAdmin = await EmbyClient.verifyServerAdmin(token, url);
-    return isAdmin
+    const adminCheck = await EmbyClient.verifyServerAdmin(token, url);
+    return adminCheck.success
       ? { ok: true }
       : {
           ok: false,
-          statusCode: 403,
-          message: 'Token does not have admin access to this Emby server',
+          statusCode:
+            adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED
+              ? 503
+              : adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY
+                ? 401
+                : 403,
+          message: adminCheck.message,
         };
   }
 
@@ -131,6 +137,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         machineIdentifier: servers.machineIdentifier,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         displayOrder: servers.displayOrder,
@@ -179,10 +186,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
   app.post('/', { preHandler: [app.authenticate] }, async (request, reply) => {
     const body = createServerSchema.safeParse(request.body);
     if (!body.success) {
-      return reply.badRequest('Invalid request body');
+      return reply.badRequest(body.error.issues[0]?.message ?? 'Invalid request body');
     }
 
-    const { name, type, url, token, username, password, ignoreAnonymousStreams } = body.data;
+    const { name, type, url, token, username, password, ignoreAnonymousStreams, publicUrl } =
+      body.data;
     const authUser = request.user;
 
     // Only owners can add servers
@@ -262,6 +270,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         url,
         token: normalizedToken,
         ignoreAnonymousStreams,
+        publicUrl: publicUrl ?? null,
         color,
         plexAccountId, // Links Plex servers to their owning account (undefined for non-Plex)
       })
@@ -271,6 +280,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         color: servers.color,
         createdAt: servers.createdAt,
@@ -342,6 +352,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       password: newPassword,
       ignoreAnonymousStreams: newIgnoreAnonymousStreams,
       color: newColor,
+      publicUrl: newPublicUrl,
     } = body.data;
     const newUrl = bodyUrl !== undefined ? bodyUrl.replace(/\/$/, '') : undefined;
     const authUser = request.user;
@@ -380,89 +391,46 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
     const verifiedToken = normalizedToken ?? undefined;
 
-    // If only name is being updated, no URL verification needed
-    if (newUrl !== undefined) {
-      // Don't update if URL is the same (and no name change, or name is same)
-      if (
-        server.url === newUrl &&
-        (newName === undefined || server.name === newName) &&
-        !authChanged &&
-        newIgnoreAnonymousStreams === undefined &&
-        newColor === undefined
-      ) {
-        return {
-          id: server.id,
-          name: newName ?? server.name,
-          type: server.type,
-          url: server.url,
-          dispatcharrAuthMode:
-            server.type === 'dispatcharr' ? getDispatcharrAuthMode(server.token) : undefined,
-          ignoreAnonymousStreams: server.ignoreAnonymousStreams,
-          createdAt: server.createdAt,
-          updatedAt: server.updatedAt,
-        };
-      }
-
-      // Only verify when the URL is actually changing
-      if (server.url !== newUrl || authChanged) {
-        // For Plex servers: Validate machineIdentifier if provided
-        if (server.type === 'plex' && clientIdentifier) {
-          if (server.machineIdentifier && server.machineIdentifier !== clientIdentifier) {
-            return reply.badRequest(
-              'Server mismatch: The selected connection belongs to a different server. ' +
-                'Please select a connection for the correct server.'
-            );
-          }
-        }
-
-        // Verify the new URL/auth combination works
-        try {
-          const accessCheck = await verifyServerAccess({
-            type: server.type,
-            token: verifiedToken as string,
-            url: effectiveUrl,
-          });
-          if (!accessCheck.ok) {
-            if (accessCheck.statusCode === 503)
-              return await reply.serviceUnavailable(accessCheck.message);
-            if (accessCheck.statusCode === 401)
-              return await reply.unauthorized(accessCheck.message);
-            return await reply.forbidden(
-              server.type === 'emby' && accessCheck.message.includes('this Emby server')
-                ? 'Token does not have admin access at this URL'
-                : accessCheck.message
-            );
-          }
-        } catch (error) {
-          app.log.error(
-            { err: error, serverId: id, newUrl: effectiveUrl },
-            'Failed to verify updated server configuration'
-          );
-          return reply.badRequest(
-            'Failed to connect to server with updated configuration. Please verify the settings.'
-          );
-        }
-      }
-    } else if (
-      newName !== undefined &&
-      server.name === newName &&
+    if (server.type === 'plex' && newPublicUrl !== undefined) {
+      return reply.badRequest(PUBLIC_URL_PLEX_MESSAGE);
+    }
+    const same = <T>(value: T | undefined, current: T): boolean =>
+      value === undefined || value === current;
+    if (
       !authChanged &&
-      newIgnoreAnonymousStreams === undefined &&
-      newColor === undefined
+      same(newName, server.name) &&
+      same(newUrl, server.url) &&
+      same(newColor, server.color) &&
+      same(newPublicUrl, server.publicUrl) &&
+      same(newIgnoreAnonymousStreams, server.ignoreAnonymousStreams)
     ) {
-      // Name-only update but name unchanged
       return {
         id: server.id,
         name: server.name,
         type: server.type,
         url: server.url,
+        publicUrl: server.publicUrl,
+        color: server.color,
         dispatcharrAuthMode:
           server.type === 'dispatcharr' ? getDispatcharrAuthMode(server.token) : undefined,
         ignoreAnonymousStreams: server.ignoreAnonymousStreams,
         createdAt: server.createdAt,
         updatedAt: server.updatedAt,
       };
-    } else if (authChanged) {
+    }
+
+    if ((newUrl !== undefined && server.url !== newUrl) || authChanged) {
+      if (
+        server.type === 'plex' &&
+        clientIdentifier &&
+        server.machineIdentifier &&
+        server.machineIdentifier !== clientIdentifier
+      ) {
+        return reply.badRequest(
+          'Server mismatch: The selected connection belongs to a different server. ' +
+            'Please select a connection for the correct server.'
+        );
+      }
       try {
         const accessCheck = await verifyServerAccess({
           type: server.type,
@@ -477,8 +445,8 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         }
       } catch (error) {
         app.log.error(
-          { err: error, serverId: id, url: effectiveUrl },
-          'Failed to verify updated server authentication'
+          { err: error, serverId: id, newUrl: effectiveUrl },
+          'Failed to verify updated server configuration'
         );
         return reply.badRequest(
           'Failed to connect to server with updated configuration. Please verify the settings.'
@@ -493,6 +461,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       token?: string;
       ignoreAnonymousStreams?: boolean;
       color?: string | null;
+      publicUrl?: string | null;
       updatedAt: Date;
     } = { updatedAt: new Date() };
     if (newName !== undefined) updatePayload.name = newName;
@@ -502,6 +471,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       updatePayload.ignoreAnonymousStreams = newIgnoreAnonymousStreams;
     }
     if (newColor !== undefined) updatePayload.color = newColor;
+    if (newPublicUrl !== undefined) updatePayload.publicUrl = newPublicUrl;
 
     const updated = await db
       .update(servers)
@@ -513,6 +483,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         color: servers.color,
         createdAt: servers.createdAt,

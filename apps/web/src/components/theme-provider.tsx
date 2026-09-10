@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getBrowserDocument, getBrowserWindow } from '@/lib/browser';
 
-type Theme = 'dark' | 'light' | 'system';
+export type Theme = 'dark' | 'light' | 'system';
 
 // Default accent hue (cyan = 187)
 const DEFAULT_ACCENT_HUE = 187;

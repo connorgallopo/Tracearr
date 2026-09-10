@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `28b8c344`
-- Last shared upstream commit found during inspection: `877c7f8a`
-- Latest upstream commit merged into the current working tree: `28b8c344`
+- Source branch/SHA inspected: `main` at `32c9d378`
+- Last shared upstream commit found during inspection: `28b8c344`
+- Latest upstream commit merged into the current working tree: `32c9d378`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -192,7 +192,11 @@ Realtime and polling:
 
 Web UI:
 
-- `apps/web/src/components/settings/ServerSettings.tsx` adds Dispatcharr server creation/editing, in-place auth mode switching, anonymous-stream filtering, and Dispatcharr-specific realtime setup guidance for legacy token-based servers.
+- `apps/web/src/components/settings/servers/` contains the Dispatcharr overlay
+  on upstream's split settings UI: `Connections.tsx` creates servers,
+  `AddServerDialog.tsx` and `EditServerDialog.tsx` use `DispatcharrFields.tsx`
+  for auth modes and anonymous filtering, and `RealtimeSetupDialog.tsx`
+  provides Metrics plugin and legacy-token migration guidance.
 - `apps/web/src/components/icons/MediaServerIcon.tsx` and `apps/web/public/images/servers/dispatcharr.png` add Dispatcharr branding.
 - `apps/web/src/components/sessions/NowPlayingCard.tsx` shows Live TV channel/programme-oriented cards.
 - Catch-up cards must continue to use the Live TV visual grouping, but favor progress/remaining-time presentation over FFmpeg live-speed presentation.
@@ -243,6 +247,23 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `32c9d378` was merged into `develop` on September 10,
+  2026. This adds newsletters/email destinations, the emails workspace package,
+  split settings components, public Jellyfin/Emby addresses, Emby connection
+  diagnostics, library-name sanitization, and resilient Tautulli page imports.
+  Upstream migrations `0097`–`0102` remain unchanged in the upstream ledger;
+  Dispatcharr migrations remain separate and are still copied into both images.
+  Conflicts were reconciled by porting Dispatcharr creation, auth edits,
+  anonymous filtering, and Metrics setup onto the new settings components and
+  combining public URL updates with the fork's server-access validation.
+  Localized JSON was merged by key, retaining fork labels and upstream values.
+  Dashboard uncropped artwork, image-cache markers, leader-owned realtime, and
+  Dispatcharr library exclusions remain intact. CI remains PR-only with no
+  integration matrix, and release remains manual with the Helm push job disabled.
+  Build shared, emails, and test-utils before server validation; local command
+  instructions were updated. Validation results are recorded below once complete.
+  Docker integration, E2E, and Docker builds are omitted at the user's request.
 
 - Upstream `main` at `28b8c344` was merged into `develop` on September 10,
   2026 without textual conflicts. The watched-media API now scopes all results

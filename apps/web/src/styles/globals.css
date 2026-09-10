@@ -1,12 +1,13 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
 /* Tailwind v4 CSS-first theme configuration */
 @theme {
   /* Font Family */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Border Radius */
   --radius-lg: var(--radius);
@@ -77,33 +78,65 @@
 }
 
 @keyframes accordion-down {
-  from { height: 0; }
-  to { height: var(--radix-accordion-content-height); }
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
 }
 
 @keyframes accordion-up {
-  from { height: var(--radix-accordion-content-height); }
-  to { height: 0; }
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* CSS Variables for both light and dark modes */
@@ -113,33 +146,33 @@
   --accent-hue: 187;
 
   /* Brand Colors - Tracearr (derived from accent hue) */
-  --cyan-core: var(--accent-hue) 80% 50%;     /* Primary accent */
-  --cyan-deep: var(--accent-hue) 86% 42%;     /* Hover/gradients */
-  --cyan-dark: var(--accent-hue) 85% 31%;     /* Shadows/outlines */
-  --blue-core: 213 62% 11%;     /* #0B1A2E - Dark background */
-  --blue-steel: 213 47% 17%;    /* #162840 - Panels/cards */
-  --blue-soft: 212 49% 24%;     /* #1E3A5C - Hover/selection */
+  --cyan-core: var(--accent-hue) 80% 50%; /* Primary accent */
+  --cyan-deep: var(--accent-hue) 86% 42%; /* Hover/gradients */
+  --cyan-dark: var(--accent-hue) 85% 31%; /* Shadows/outlines */
+  --blue-core: 213 62% 11%; /* #0B1A2E - Dark background */
+  --blue-steel: 213 47% 17%; /* #162840 - Panels/cards */
+  --blue-soft: 212 49% 24%; /* #1E3A5C - Hover/selection */
 
   /* Light Mode - shadcn neutral backgrounds with accent primary */
-  --background: 0 0% 100%;                    /* Pure white */
-  --foreground: 240 10% 4%;                   /* Near black text */
-  --card: 0 0% 100%;                          /* Pure white cards */
+  --background: 0 0% 100%; /* Pure white */
+  --foreground: 240 10% 4%; /* Near black text */
+  --card: 0 0% 100%; /* Pure white cards */
   --card-foreground: 240 10% 4%;
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 4%;
-  --primary: var(--accent-hue) 85% 38%;       /* Accent color */
-  --primary-foreground: 0 0% 100%;            /* White text on primary */
-  --secondary: 240 5% 96%;                    /* Neutral gray */
+  --primary: var(--accent-hue) 85% 38%; /* Accent color */
+  --primary-foreground: 0 0% 100%; /* White text on primary */
+  --secondary: 240 5% 96%; /* Neutral gray */
   --secondary-foreground: 240 6% 10%;
-  --muted: 240 5% 96%;                        /* Neutral gray */
+  --muted: 240 5% 96%; /* Neutral gray */
   --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 96%;                       /* Neutral gray for hover */
+  --accent: 240 5% 96%; /* Neutral gray for hover */
   --accent-foreground: 240 6% 10%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 240 6% 90%;                       /* Neutral border */
+  --border: 240 6% 90%; /* Neutral border */
   --input: 240 6% 90%;
-  --ring: var(--accent-hue) 85% 38%;          /* Accent color for focus */
+  --ring: var(--accent-hue) 85% 38%; /* Accent color for focus */
   --radius: 0.5rem;
 
   /* Semantic status colors */
@@ -152,19 +185,19 @@
   --card-raised: 240 5% 98%;
 
   /* Chart Colors - Light Mode */
-  --chart-1: var(--accent-hue) 85% 38%;       /* Accent */
-  --chart-2: var(--accent-hue) 70% 50%;       /* Accent variant */
-  --chart-3: 197 37% 24%;                     /* Neutral dark */
-  --chart-4: 43 90% 45%;                      /* Amber */
-  --chart-5: 0 72% 51%;                       /* Red */
+  --chart-1: var(--accent-hue) 85% 38%; /* Accent */
+  --chart-2: var(--accent-hue) 70% 50%; /* Accent variant */
+  --chart-3: 197 37% 24%; /* Neutral dark */
+  --chart-4: 43 90% 45%; /* Amber */
+  --chart-5: 0 72% 51%; /* Red */
 
   /* Icon Colors - Light Mode */
-  --icon-default: 240 4% 46%;                 /* Neutral */
-  --icon-active: var(--accent-hue) 85% 38%;   /* Accent color */
+  --icon-default: 240 4% 46%; /* Neutral */
+  --icon-active: var(--accent-hue) 85% 38%; /* Accent color */
   --icon-danger: 0 72% 51%;
 
   /* Sidebar Colors - Light Mode */
-  --sidebar: 0 0% 98%;                        /* Slight off-white */
+  --sidebar: 0 0% 98%; /* Slight off-white */
   --sidebar-foreground: 240 6% 10%;
   --sidebar-primary: var(--accent-hue) 85% 38%;
   --sidebar-primary-foreground: 0 0% 100%;
@@ -176,25 +209,25 @@
 
 .dark {
   /* Dark Mode - shadcn neutral backgrounds with accent primary */
-  --background: 240 10% 4%;                   /* Near black */
-  --foreground: 0 0% 98%;                     /* Off-white text */
-  --card: 240 10% 4%;                         /* Same as background */
+  --background: 240 10% 4%; /* Near black */
+  --foreground: 0 0% 98%; /* Off-white text */
+  --card: 240 10% 4%; /* Same as background */
   --card-foreground: 0 0% 98%;
   --popover: 240 10% 4%;
   --popover-foreground: 0 0% 98%;
-  --primary: var(--accent-hue) 80% 50%;       /* Accent color */
-  --primary-foreground: 240 6% 10%;           /* Dark text on primary */
-  --secondary: 240 4% 16%;                    /* Dark neutral */
+  --primary: var(--accent-hue) 80% 50%; /* Accent color */
+  --primary-foreground: 240 6% 10%; /* Dark text on primary */
+  --secondary: 240 4% 16%; /* Dark neutral */
   --secondary-foreground: 0 0% 98%;
-  --muted: 240 4% 16%;                        /* Dark neutral */
+  --muted: 240 4% 16%; /* Dark neutral */
   --muted-foreground: 240 5% 65%;
-  --accent: 240 4% 16%;                       /* Dark neutral for hover */
+  --accent: 240 4% 16%; /* Dark neutral for hover */
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62% 50%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 4% 16%;                       /* Dark neutral border */
+  --border: 240 4% 16%; /* Dark neutral border */
   --input: 240 4% 16%;
-  --ring: var(--accent-hue) 80% 50%;          /* Accent color */
+  --ring: var(--accent-hue) 80% 50%; /* Accent color */
 
   /* Semantic status colors */
   --success: 150 60% 45%;
@@ -205,19 +238,19 @@
   --card-raised: 240 8% 7%;
 
   /* Chart Colors - Dark Mode */
-  --chart-1: var(--accent-hue) 80% 50%;       /* Accent color */
-  --chart-2: var(--accent-hue) 70% 60%;       /* Accent variant */
-  --chart-3: 197 37% 50%;                     /* Neutral */
-  --chart-4: 43 80% 55%;                      /* Warning */
-  --chart-5: 0 75% 55%;                       /* Danger */
+  --chart-1: var(--accent-hue) 80% 50%; /* Accent color */
+  --chart-2: var(--accent-hue) 70% 60%; /* Accent variant */
+  --chart-3: 197 37% 50%; /* Neutral */
+  --chart-4: 43 80% 55%; /* Warning */
+  --chart-5: 0 75% 55%; /* Danger */
 
   /* Icon Colors - Dark Mode */
-  --icon-default: 240 5% 65%;                 /* Neutral */
-  --icon-active: var(--accent-hue) 80% 50%;   /* Accent color */
+  --icon-default: 240 5% 65%; /* Neutral */
+  --icon-active: var(--accent-hue) 80% 50%; /* Accent color */
   --icon-danger: 0 100% 65%;
 
   /* Sidebar Colors - Dark Mode */
-  --sidebar: 240 6% 10%;                      /* Slightly lighter than bg */
+  --sidebar: 240 6% 10%; /* Slightly lighter than bg */
   --sidebar-foreground: 0 0% 98%;
   --sidebar-primary: var(--accent-hue) 80% 50%;
   --sidebar-primary-foreground: 240 6% 10%;
@@ -225,15 +258,6 @@
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: 240 4% 16%;
   --sidebar-ring: var(--accent-hue) 80% 50%;
-}
-
-/* Base styles */
-* {
-  @apply border-border;
-}
-
-body {
-  @apply bg-background text-foreground;
 }
 
 /* Container utility - Tailwind v4 requires @utility for custom config */
@@ -245,11 +269,11 @@ body {
 
 /* Shared card hover effects */
 @utility card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02];
+  @apply hover:shadow-primary/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
 }
 
 @utility card-hover-border {
-  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] hover:border-primary/50;
+  @apply hover:shadow-primary/10 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
 }
 
 /* Thin styled scrollbar matching shadcn ScrollArea appearance */
@@ -333,4 +357,17 @@ body {
  */
 [data-radix-scroll-area-viewport] > div {
   display: block !important;
+}
+
+/* Tiptap: preflight strips list markers, and the placeholder extension paints through this attribute. */
+.tiptap ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }

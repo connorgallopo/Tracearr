@@ -43,6 +43,23 @@ const trustChanged = {
   },
 } as const;
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'partial',
+    trigger: 'schedule',
+    recipientCount: 42,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: null,
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: null,
+  },
+} as const;
+
 const automationCtx = (over: { title?: string; body?: string } = {}): RenderContext => ({
   destination,
   source: { kind: 'automation', automationId: 'a-1', automationName: 'Now playing', ...over },
@@ -171,6 +188,17 @@ describe('pushType.render', () => {
       data: { ...mediaAdded.payload, type: 'media_added' },
     });
   });
+
+  it('renders a newsletter outcome as text under the newsletter subject', async () => {
+    const out = await render(newsletterSend, automationCtx());
+    expect(out).toEqual({
+      kind: 'text',
+      subject: 'newsletter',
+      title: 'Newsletter partly sent',
+      body: 'Weekly reached only part of its 42 recipients',
+      data: { ...newsletterSend.payload, type: 'newsletter_send' },
+    });
+  });
 });
 
 function spyOnNotifiers() {
@@ -197,6 +225,9 @@ function spyOnNotifiers() {
       .mockResolvedValue(undefined),
     notifyTrustChanged: vi
       .spyOn(pushNotificationService, 'notifyTrustChanged')
+      .mockResolvedValue(undefined),
+    notifyNewsletter: vi
+      .spyOn(pushNotificationService, 'notifyNewsletter')
       .mockResolvedValue(undefined),
   };
 }
@@ -336,6 +367,28 @@ describe('pushType.deliver', () => {
       'New media added',
       'Cars (2006) was added to Movies on Basement',
       { type: 'media_added' }
+    );
+    expect(spies.notifyUpdate).not.toHaveBeenCalled();
+  });
+
+  it('sends a newsletter outcome through notifyNewsletter', async () => {
+    await pushType.deliver(
+      {
+        kind: 'text',
+        subject: 'newsletter',
+        title: 'Newsletter failed',
+        body: 'Weekly reached nobody',
+        data: { type: 'newsletter_send' },
+      },
+      {},
+      deliverCtx
+    );
+    expect(spies.notifyNewsletter).toHaveBeenCalledWith(
+      'Newsletter failed',
+      'Weekly reached nobody',
+      {
+        type: 'newsletter_send',
+      }
     );
     expect(spies.notifyUpdate).not.toHaveBeenCalled();
   });

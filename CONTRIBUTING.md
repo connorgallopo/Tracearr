@@ -47,7 +47,7 @@ packages/
 ## Development Setup
 
 ```bash
-# Start databases (TimescaleDB + Redis)
+# Start databases and Mailpit (TimescaleDB + Redis + an SMTP inbox at http://localhost:8025)
 pnpm docker:up
 
 # Install dependencies

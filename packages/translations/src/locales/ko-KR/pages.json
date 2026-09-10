@@ -346,7 +346,8 @@
         "helper": "이 중 하나가 시작됩니다. 하나 이상이 필요합니다.",
         "or": "또는",
         "title": "언제…"
-      }
+      },
+      "noAlertRecipientsTooltip": ""
     },
     "catalog": {
       "actions": {
@@ -376,7 +377,8 @@
         "policy": "조치를 취하세요",
         "servers": "서버",
         "sessions": "세션",
-        "updates": "업데이트"
+        "updates": "업데이트",
+        "notifications": ""
       },
       "suggested": "제안",
       "triggers": {
@@ -445,6 +447,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr의 새 릴리스가 있습니다.",
           "synonyms": "업그레이드, 버전, 릴리스, 자체"
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
         }
       }
     },
@@ -609,7 +619,9 @@
         "sessionStarted": "스트림이 시작된다",
         "sessionStopped": "스트림이 중지됨",
         "sessionTranscodeChanged": "트랜스코딩 시작 또는 중지",
-        "tracearrUpdateAvailable": "같지 않음"
+        "tracearrUpdateAvailable": "같지 않음",
+        "newsletterFailed": "",
+        "newsletterSent": ""
       },
       "unbound": {
         "account": "선택한 계정",
@@ -1156,6 +1168,11 @@
         "description": "계정의 신뢰 점수가 변경되면 대상에게 알립니다.",
         "keywords": "신뢰 점수 평판 페널티 조정됨 불일치 알림 이메일 웹훅",
         "name": "신뢰 점수가 변경됨"
+      },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
       }
     },
     "thisAutomation": "이 자동화",
@@ -1839,10 +1856,41 @@
         "topic": "주제",
         "url": "URL",
         "userKey": "사용자 키",
-        "webhookUrl": "웹훅 URL"
+        "webhookUrl": "웹훅 URL",
+        "fromAddress": "From address",
+        "fromName": "From name",
+        "host": "SMTP host",
+        "messageStream": "",
+        "messagesPerSecond": "Messages per second",
+        "password": "Password",
+        "port": "Port",
+        "preset": "Provider",
+        "replyTo": "Reply-to",
+        "security": "Security",
+        "to": "Recipients",
+        "username": "Username"
       },
       "hints": {
-        "authTokenOptional": "공개 주제의 경우 선택사항"
+        "authTokenOptional": "공개 주제의 경우 선택사항",
+        "smtpBrevoPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpGmailPassword": "",
+        "smtpGmailUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMessageStream": "",
+        "smtpPostmarkPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
+        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpResendPassword": "",
+        "smtpResendUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSesPassword": "",
+        "smtpSesUsername": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpUsernameOptional": "Leave blank when the server needs no login"
       },
       "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
       "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
@@ -1862,11 +1910,41 @@
         "ntfy": "ntfy",
         "push": "모바일 푸시",
         "pushover": "Pushover",
-        "webToast": "브라우저 알림"
+        "webToast": "브라우저 알림",
+        "email": "Email"
       },
       "usedBy": "{{count}}개의 자동화에서 사용됨",
       "usedBy_other": "{{count}}개의 자동화에서 사용됨",
-      "webToastNote": "이 브라우저에 알림이 표시됩니다."
+      "webToastNote": "이 브라우저에 알림이 표시됩니다.",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
+      "emailDescription": "",
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "Brevo",
+        "presetCustom": "Custom",
+        "presetGmail": "Gmail",
+        "presetMailgun": "Mailgun",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSendgrid": "SendGrid",
+        "presetSes": "Amazon SES",
+        "securityNone": "None (plain text, port 25)",
+        "securityStarttls": "STARTTLS (usually port 587)",
+        "securityTls": "TLS (usually port 465)"
+      },
+      "receiveViolationsNeedsRecipients": "",
+      "rowActions": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": ""
     },
     "jobs": {
       "lastRun": "마지막 실행",
@@ -1927,7 +2005,8 @@
       "showAll": "모두 보기",
       "unlinkAccount": "이 Plex 계정 연결 해제",
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다.",
-      "unlinkPlexAccount": "Plex 계정 연결 해제"
+      "unlinkPlexAccount": "Plex 계정 연결 해제",
+      "ownerOnly": ""
     }
   },
   "statsBandwidth": {
@@ -1983,7 +2062,15 @@
     "unknownRule": "알 수 없는 규칙",
     "userInfo": "사용자 정보",
     "userNotFound": "사용자를 찾을 수 없습니다",
-    "violations": "위반 내역"
+    "violations": "위반 내역",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": ""
   },
   "users": {
     "filterHasAccessTo": "액세스 가능",

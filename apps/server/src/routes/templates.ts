@@ -41,7 +41,7 @@ import {
 } from '../services/automations/templates/store.js';
 import { unknownDestinationIds } from '../services/notifications/destinationRefs.js';
 import { getCurrentVersion } from '../utils/buildInfo.js';
-import { compareVersions } from '../utils/pluginVersion.js';
+import { compareVersions, getBaseVersion } from '../jobs/versionCheckQueue.js';
 import { firstIssueMessage } from '../utils/zod.js';
 
 const idParamSchema = z.object({ id: uuidSchema });
@@ -79,16 +79,14 @@ interface MinServerVersion {
   satisfied: boolean;
 }
 
-const releaseOf = (version: string): string => version.split('-')[0] ?? version;
-
 /** A build with no version stamped into it is a dev build, and runs anything. */
 function minServerVersionState(required: string): MinServerVersion {
   const current = getCurrentVersion();
-  const release = releaseOf(current);
+  const release = getBaseVersion(current);
   return {
     required,
     current,
-    satisfied: release === '0.0.0' || compareVersions(release, releaseOf(required)) >= 0,
+    satisfied: release === '0.0.0' || compareVersions(release, getBaseVersion(required)) >= 0,
   };
 }
 

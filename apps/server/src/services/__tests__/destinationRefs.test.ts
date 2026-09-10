@@ -9,11 +9,12 @@ interface RuleRow {
 }
 
 const ruleRows: RuleRow[] = [];
+const newsletterRows: { name: string; destinationId: string | null }[] = [];
 vi.mock('../../db/client.js', () => ({
   db: {
-    select: () => ({
+    select: (columns: Record<string, unknown>) => ({
       from: () => ({
-        where: async () => [...ruleRows],
+        where: async () => ('destinationId' in columns ? [...newsletterRows] : [...ruleRows]),
       }),
     }),
   },
@@ -26,6 +27,7 @@ vi.mock('../notifications/destinationStore.js', () => ({
 
 import {
   automationsReferencingDestinations,
+  newslettersReferencingDestinations,
   unknownDestinationIds,
 } from '../notifications/destinationRefs.js';
 
@@ -100,5 +102,21 @@ describe('unknownDestinationIds', () => {
 
     expect(await unknownDestinationIds(branchSend('dest-c'))).toEqual(['dest-c']);
     expect(await unknownDestinationIds(branchSend('dest-a'))).toEqual([]);
+  });
+});
+
+describe('newslettersReferencingDestinations', () => {
+  it('groups newsletter names by destination and skips rows that point at none', async () => {
+    newsletterRows.length = 0;
+    newsletterRows.push(
+      { name: 'Weekly', destinationId: 'dest-a' },
+      { name: 'Monthly', destinationId: 'dest-a' },
+      { name: 'Orphan', destinationId: null }
+    );
+
+    const refs = await newslettersReferencingDestinations();
+
+    expect(refs.get('dest-a')).toEqual(['Weekly', 'Monthly']);
+    expect(refs.size).toBe(1);
   });
 });

@@ -50,6 +50,8 @@ export interface Server {
   name: string;
   type: ServerType;
   url: string;
+  /** The address members open a Jellyfin or Emby server at; null for Plex, which links through app.plex.tv. */
+  publicUrl?: string | null;
   /** The media server's own id, used to build item deep links. */
   machineIdentifier?: string | null;
   dispatcharrAuthMode?: DispatcharrAuthMode;
@@ -164,6 +166,7 @@ export interface ServerUserFullDetail {
     userId: string;
     aggregateTrustScore: number;
     totalViolations: number;
+    contactEmail: string | null;
     serverUsers: {
       id: string;
       serverId: string;
@@ -1380,7 +1383,8 @@ export type NotificationEventType =
   | 'media_added'
   | 'media_upgraded'
   | 'new_device'
-  | 'trust_score_changed';
+  | 'trust_score_changed'
+  | 'newsletter_send';
 
 // Notification preferences (per-device settings)
 export interface NotificationPreferences {
