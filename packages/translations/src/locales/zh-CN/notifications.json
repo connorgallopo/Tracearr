@@ -61,12 +61,12 @@
         "message": "您的Plex帐户已断开连接"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
+        "title": "Plex账户已重新授权",
+        "message_one": "{{count}} 服务器已连接",
+        "message_other": "{{count}} 台服务器已连接",
+        "messageNoServers": "帐户令牌已更新",
+        "partial": "Token已更新，但{{names}}仍拒绝了它",
+        "unmatched": "令牌已更新，但 {{names}} 无法重新链接"
       },
       "agentAdded": {
         "title": "代理已添加",
@@ -85,16 +85,16 @@
         "message": "{{name}}成功完成"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "自动化操作已创建",
+        "message": "已成功创建规则"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "已更新自动化",
+        "message": "规则已成功更新"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "自动化操作已删除",
+        "message": "规则已成功删除"
       },
       "streamTerminated": {
         "title": "流已终止",
@@ -142,9 +142,7 @@
         "title": "配对令牌已生成",
         "message": "用您的移动设备扫描二维码进行配对"
       },
-      "displayNameUpdated": {
-        "title": "已更新显示名称"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "重置信任分数",
         "message_one": "{{count}}用户重置为100",
@@ -155,15 +153,25 @@
         "message": "您现在可以继续设置"
       },
       "usersMerged": {
-        "title": "",
-        "automationsKept": ""
+        "title": "用户已合并",
+        "automationsKept": "保留目标的版本：{{names}}"
       },
       "serverUserSplit": {
-        "title": ""
+        "title": "账户拆分为单独用户"
       },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationSaved": "目标已保存",
+      "destinationDeleted": "目标已删除",
+      "destinationTestSent": "发送测试通知",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
@@ -175,9 +183,9 @@
       "dismissFailed": "未能删除违规行为",
       "authFailed": "验证失败",
       "webhookTestFailed": "Webhook 测试失败",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "无法创建自动化",
+      "automationUpdateFailed": "无法更新自动化",
+      "automationDeleteFailed": "无法删除自动化",
       "streamTerminateFailed": "终止流失败",
       "serverUrlUpdateFailed": "无法更新服务器 URL",
       "serverUpdateFailed": "更新服务器失败",
@@ -190,12 +198,12 @@
       "deviceRemoveFailed": "无法删除设备",
       "deviceRenameFailed": "无法重命名设备",
       "sessionsRevokeFailed": "撤销会话失败",
-      "displayNameUpdateFailed": "更新显示名失败",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "重置信任分失败",
       "routingUpdateFailed": "更新路由失败",
       "clipboardFailed": "复制到剪贴板失败",
       "plexUnlinkFailed": "取消链接Plex帐户失败",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "取消链接Plex帐户失败",
       "agentAddFailed": "添加代理失败",
       "agentUpdateFailed": "更新代理失败",
       "agentRemoveFailed": "移除代理失败",
@@ -205,16 +213,28 @@
       "jobLoadFailed": "加载维护任务失败",
       "invalidUrl": "无效的 URL",
       "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
+      "userMergeFailed": "合并用户失败",
+      "serverUserSplitFailed": "分割帐户失败",
       "invalidClaimCode": {
         "title": "无效的索赔码",
         "message": "请检查服务器日志"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationSaveFailed": "保存目标失败：{{error}}",
+      "destinationDeleteFailed": "删除目标失败：{{error}}",
+      "destinationTestFailed": "测试失败{{error}}",
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
