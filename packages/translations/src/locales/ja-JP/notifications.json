@@ -142,9 +142,7 @@
         "title": "ペアトークンが生成されました",
         "message": "モバイル端末でQRコードをスキャンしてペアリングします"
       },
-      "displayNameUpdated": {
-        "title": "表示名が更新されました"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "信頼スコアをリセット",
         "message_one": "{{count}} ユーザーを 100 にリセットしました",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "サーバーの追加に失敗しました",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "デバイスの削除に失敗しました",
       "deviceRenameFailed": "端末の名前を変更できませんでした",
       "sessionsRevokeFailed": "セッションの取り消しに失敗しました",
-      "displayNameUpdateFailed": "表示名の更新に失敗しました",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "信頼度のリセットに失敗しました",
       "routingUpdateFailed": "ルーティングの更新に失敗しました",
       "clipboardFailed": "クリップボードにコピーできませんでした",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
