@@ -111,7 +111,15 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
-    "title": "User Details"
+    "title": "User Details",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "History",
@@ -210,7 +218,7 @@
       "quietest": "Quietest:",
       "bingeHighlights": "Binge Highlights",
       "bingeHighlightsDesc": "Shows with the most intensive viewing patterns",
-      "bingeSessions": "",
+      "bingeSessions": "binge sessions",
       "noData": "No watch data yet",
       "noDataDesc": "Watch analytics will appear here once content has been played. Check back after some viewing activity.",
       "failedToLoad": "Failed to load watch analytics",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "Disabled destination",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "No destinations yet. Add one to send notifications.",
       "newDestination": "New destination",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "a server comes back up",
         "pluginUpdateAvailable": "a plugin update is available",
         "serverUpdateAvailable": "a server update is available",
-        "tracearrUpdateAvailable": "a Tracearr update is available"
+        "tracearrUpdateAvailable": "a Tracearr update is available",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "is",
@@ -1309,6 +1320,11 @@
         "description": "Tell a destination the first time an account streams from a device you have not seen.",
         "keywords": "device new unknown unrecognized phone login sharing notify discord email webhook"
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "No 4K transcodes",
         "description": "Stop a stream that transcodes 4K source video.",
@@ -1391,6 +1407,7 @@
         "library": "Library",
         "servers": "Servers",
         "updates": "Updates",
+        "notifications": "",
         "notify": "Notify",
         "policy": "Policy",
         "control": "Control flow"
@@ -1462,6 +1479,14 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr itself has a newer release.",
           "synonyms": "upgrade, version, release, self"
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
         }
       },
       "actions": {
@@ -1540,33 +1565,31 @@
       "showAll": "Show all",
       "moreConnections": "+{{count}} more connections",
       "connectingTo": "Connecting to {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "No Plex Accounts Linked",
       "noAccountsLinkedHint": "Link a Plex account to add Plex servers to Tracearr.",
       "linkPlexAccount": "Link Plex Account",
       "linkAnotherAccount": "Link Another Plex Account",
       "linking": "Linking...",
-      "accountsLinked_one": "{{count}} Plex account linked",
-      "accountsLinked_other": "{{count}} Plex accounts linked",
-      "noAccountsLinkedShort": "No Plex accounts linked",
       "loginEnabled": "Login Enabled",
       "serversConnected_one": "{{count}} server connected",
       "serversConnected_other": "{{count}} servers connected",
       "unlinkAccount": "Unlink this Plex account",
       "reauthorizeAccount": "Reauthorize this Plex account",
       "deleteServersFirst": "Delete connected servers first to unlink this account",
-      "linkedAccounts": "Linked Plex Accounts",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "No Plex accounts linked yet.",
       "unlinkPlexAccount": "Unlink Plex Account",
       "unlinkConfirm": "Are you sure you want to unlink this Plex account? You won't be able to add servers from this account until you link it again."
     },
     "destinations": {
       "add": "Add destination",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "Built in",
       "clearSecret": "Clear",
       "delete": "Delete",
       "deleteConfirm": "Delete {{name}}? Rules that send to it will be blocked until they are updated.",
       "description": "Where notifications go. Add as many as you like, and automations can send to any of them.",
+      "emailDescription": "",
       "empty": "No destinations yet.",
       "fields": {
         "webhookUrl": "Webhook URL",
@@ -1576,21 +1599,73 @@
         "topic": "Topic",
         "authToken": "Auth token",
         "userKey": "User key",
-        "apiToken": "API token"
+        "apiToken": "API token",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": "Optional for public topics"
+        "authTokenOptional": "Optional for public topics",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "Only the owner can manage notification destinations.",
       "pushNote": "Delivered to paired mobile devices; each device filters in its own notification settings.",
       "receiveViolations": "Receive violations",
-      "receiveViolationsHint": "",
+      "receiveViolationsHint": "Send every violation to this destination",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "Re-enter this destination's secret",
+      "rowActions": "",
       "secretSet": "Set (leave blank to keep)",
       "test": "Test",
       "testHint": "Save first to test",
       "testNeedsForm": "Fill in the required fields to test",
-      "title": "Notification destinations",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "Webhook (JSON)",
@@ -1598,11 +1673,16 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "email": "",
         "push": "Mobile push",
         "webToast": "Browser toasts"
       },
       "usedBy": "Used by {{count}} rule",
       "usedBy_other": "Used by {{count}} rules",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": "Toasts in this browser."
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "No activity yet",
-    "noActivityDesc": "",
+    "noActivityDesc": "Start streaming to see your top users here",
     "top3": "Top 3",
     "runnersUp": "Runners Up"
   },
