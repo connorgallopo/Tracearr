@@ -179,7 +179,40 @@ export const updateNewsletterSchema = z.strictObject(
 );
 export type UpdateNewsletterInput = z.infer<typeof updateNewsletterSchema>;
 
-export const newsletterTestSendSchema = z.strictObject({ address });
+/** The set of a newsletter's servers a person belongs to, as one string: the ids deduped, sorted and joined by a comma. */
+export function variantKey(serverIds: readonly string[]): string {
+  return [...new Set(serverIds)].sort().join(',');
+}
+
+/** The scoped servers a member has an account on, in the scope's order; every scoped server for null, an extra address that belongs to no server. */
+export function variantServerIds(
+  memberServerIds: readonly string[] | null,
+  scopedServerIds: readonly string[]
+): string[] {
+  if (memberServerIds === null) return [...scopedServerIds];
+  return scopedServerIds.filter((id) => memberServerIds.includes(id));
+}
+
+/** A digest that covers several servers has no natural sender name, so the editor asks for one before the Tracearr fallback could fire. */
+export function needsSenderName(senderName: string | null, scopedServerCount: number): boolean {
+  return !senderName && scopedServerCount > 1;
+}
+
+/** The shape variantKey() produces; anything else is refused before a send looks the variant up. */
+export const variantKeySchema = z
+  .string()
+  .max(50 * 37)
+  .refine(
+    (key) =>
+      key.split(',').every((id) => uuidSchema.safeParse(id).success) &&
+      variantKey(key.split(',')) === key,
+    'variantKey must be sorted, comma-separated server ids'
+  );
+
+export const newsletterTestSendSchema = z.strictObject({
+  address,
+  variantKey: variantKeySchema.optional(),
+});
 export const emailSuppressionCreateSchema = z.strictObject({ address });
 export const newsletterSendsQuerySchema = paginationSchema;
 
@@ -315,9 +348,11 @@ export interface NewsletterRecipientPerson {
   serverId: string;
   serverName: string;
   thumbUrl: string | null;
+  /** Every scoped server this person has an active account on, oldest account first. */
+  serverIds: string[];
 }
 
-export const NEWSLETTER_EXCLUDED_REASONS = ['excluded', 'banned', 'pending'] as const;
+export const NEWSLETTER_EXCLUDED_REASONS = ['excluded', 'banned', 'pending', 'noServer'] as const;
 export type NewsletterExcludedReason = (typeof NEWSLETTER_EXCLUDED_REASONS)[number];
 
 /** Why a person with an account on a scoped server is not on the list: the owner excluded them, or their identity is banned or still pending. */
@@ -335,6 +370,8 @@ export interface NewsletterResolvedRecipient {
   username: string | null;
   serverName: string | null;
   thumbUrl: string | null;
+  /** Every scoped server the person has an account on; empty for an extra address. */
+  serverIds: string[];
 }
 
 /** GET /newsletters/:id/recipients: who the next send reaches, who has no address, and who the owner excluded. */

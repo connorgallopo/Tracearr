@@ -19,6 +19,7 @@ const c = (over: Partial<RecipientCandidate>): RecipientCandidate => ({
   username: null,
   serverId: 's1',
   serverName: 'Server One',
+  serverIds: ['s1'],
   thumbUrl: null,
   contactEmail: null,
   identityEmail: null,
@@ -70,6 +71,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
       },
     ]);
@@ -81,6 +83,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
       },
     ]);
@@ -108,6 +111,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
       },
     ]);
@@ -120,6 +124,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'excluded',
       },
@@ -130,6 +135,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'excluded',
       },
@@ -163,6 +169,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'excluded',
       },
@@ -173,6 +180,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'banned',
       },
@@ -183,6 +191,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'pending',
       },
@@ -208,6 +217,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: 's1',
         serverName: 'Server One',
+        serverIds: ['s1'],
         thumbUrl: null,
       },
       {
@@ -219,6 +229,7 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: null,
         serverName: null,
+        serverIds: [],
         thumbUrl: null,
       },
     ]);
@@ -240,11 +251,24 @@ describe('mergeRecipients', () => {
         username: null,
         serverId: null,
         serverName: null,
+        serverIds: [],
         thumbUrl: null,
       },
     ]);
     expect(missing).toEqual([]);
     expect(excluded).toEqual([]);
+  });
+
+  it('carries every scoped server of the identity onto the recipient and none onto an extra address', () => {
+    const { recipients } = mergeRecipients(
+      [c({ userId: 'u1', contactEmail: 'both@x.com', serverIds: ['s1', 's2'] })],
+      [{ address: 'extra@x.com' }],
+      new Set()
+    );
+    expect(recipients.map((r) => [r.address, r.serverIds])).toEqual([
+      ['both@x.com', ['s1', 's2']],
+      ['extra@x.com', []],
+    ]);
   });
 });
 
@@ -276,6 +300,7 @@ describe('resolveRecipients', () => {
           username: null,
           serverId: null,
           serverName: null,
+          serverIds: [],
           thumbUrl: null,
         },
         {
@@ -287,6 +312,7 @@ describe('resolveRecipients', () => {
           username: null,
           serverId: null,
           serverName: null,
+          serverIds: [],
           thumbUrl: null,
         },
       ],
@@ -348,6 +374,7 @@ describe('resolveRecipients', () => {
         username: 'garry',
         serverId: 's2',
         serverName: 'Basement Jellyfin',
+        serverIds: ['s2'],
         thumbUrl: null,
       },
     ]);
@@ -410,6 +437,7 @@ describe('resolveRecipients', () => {
         username: 'two',
         serverId: 's1',
         serverName: 'Server',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'excluded',
       },
@@ -420,6 +448,7 @@ describe('resolveRecipients', () => {
         username: 'three',
         serverId: 's1',
         serverName: 'Server',
+        serverIds: ['s1'],
         thumbUrl: null,
         reason: 'banned',
       },

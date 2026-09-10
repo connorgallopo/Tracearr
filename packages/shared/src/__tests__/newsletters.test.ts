@@ -9,12 +9,15 @@ import {
   emailBrandingSchema,
   emailBrandingReadSchema,
   emailSuppressionCreateSchema,
+  needsSenderName,
   newsletterCron,
   newsletterScheduleSchema,
   newsletterTestSendSchema,
   resolveSenderName,
   updateNewsletterSchema,
   updateUserIdentitySchema,
+  variantKey,
+  variantServerIds,
 } from '../index.js';
 
 const minimal = {
@@ -258,5 +261,37 @@ describe('resolveSenderName', () => {
     expect(resolveSenderName(null, ['Basement'])).toBe('Basement');
     expect(resolveSenderName(null, ['Basement', 'Attic'])).toBe('Tracearr');
     expect(resolveSenderName(null, [])).toBe('Tracearr');
+  });
+});
+
+describe('variants', () => {
+  it('keys a variant by its sorted server ids and intersects a member with the scope in scope order', () => {
+    expect(variantKey(['b', 'a', 'b'])).toBe('a,b');
+    expect(variantServerIds(['c', 'a'], ['a', 'b', 'c'])).toEqual(['a', 'c']);
+    expect(variantServerIds(null, ['b', 'a'])).toEqual(['b', 'a']);
+    expect(variantServerIds(['z'], ['a'])).toEqual([]);
+  });
+
+  it('needs a sender name only when none is set and the scope has several servers', () => {
+    expect(needsSenderName(null, 2)).toBe(true);
+    expect(needsSenderName('Family Media', 2)).toBe(false);
+    expect(needsSenderName(null, 1)).toBe(false);
+  });
+
+  it('accepts a test send with a sorted variant key and refuses an unsorted or malformed one', () => {
+    const a = '11111111-1111-4111-8111-111111111111';
+    const b = '22222222-2222-4222-8222-222222222222';
+    expect(
+      newsletterTestSendSchema.parse({ address: 'Me@X.com', variantKey: `${a},${b}` })
+    ).toEqual({ address: 'me@x.com', variantKey: `${a},${b}` });
+    expect(newsletterTestSendSchema.parse({ address: 'me@x.com' })).toEqual({
+      address: 'me@x.com',
+    });
+    expect(
+      newsletterTestSendSchema.safeParse({ address: 'me@x.com', variantKey: `${b},${a}` }).success
+    ).toBe(false);
+    expect(
+      newsletterTestSendSchema.safeParse({ address: 'me@x.com', variantKey: 'nope' }).success
+    ).toBe(false);
   });
 });

@@ -95,6 +95,7 @@ export function partitionRecipients(
         serverId: r.serverId ?? '',
         serverName: r.serverName ?? '',
         thumbUrl: r.thumbUrl,
+        serverIds: r.serverIds,
         reason: 'excluded' as const,
         pending: true,
       })),

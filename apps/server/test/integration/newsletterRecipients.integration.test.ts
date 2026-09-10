@@ -129,6 +129,7 @@ describe('recipient candidates', () => {
 
     const candidate = (await loadCandidates([])).find((c) => c.userId === seeded.userId);
     expect(candidate?.accountEmails).toEqual(['older@example.com', 'newer@example.com']);
+    expect(candidate?.serverIds).toEqual([second!.id, seeded.serverId]);
   });
 
   it('suppressions are lowercased, idempotent, and queryable by set', async () => {

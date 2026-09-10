@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm';
 import type {
   NewsletterExcludedPerson,
-  NewsletterExcludedReason,
   NewsletterRecipientPerson,
   NewsletterRecipients,
   NewsletterScope,
@@ -19,11 +18,13 @@ export interface RecipientCandidate {
   serverId: string;
   serverName: string;
   thumbUrl: string | null;
+  /** Every scoped server the identity has an active account on, oldest first. */
+  serverIds: string[];
   contactEmail: string | null;
   identityEmail: string | null;
   accountEmails: string[];
   /** Banned or pending identities stay on the list as excluded so the owner sees why a name is missing. */
-  blocked: Exclude<NewsletterExcludedReason, 'excluded'> | null;
+  blocked: 'banned' | 'pending' | null;
 }
 
 export interface ResolvedRecipient {
@@ -36,6 +37,7 @@ export interface ResolvedRecipient {
   username: string | null;
   serverName: string | null;
   thumbUrl: string | null;
+  serverIds: string[];
 }
 
 export interface RecipientResolution {
@@ -58,6 +60,7 @@ const person = (candidate: RecipientCandidate): NewsletterRecipientPerson => ({
   serverId: candidate.serverId,
   serverName: candidate.serverName,
   thumbUrl: candidate.thumbUrl,
+  serverIds: candidate.serverIds,
 });
 
 /** Identities first, in the order given; hand-typed extras after; one row per address. Excluded identities are set aside before addressing. */
@@ -98,6 +101,7 @@ export function mergeRecipients(
       serverId: candidate.serverId,
       serverName: candidate.serverName,
       thumbUrl: candidate.thumbUrl,
+      serverIds: candidate.serverIds,
     });
   }
   for (const extra of extras) {
@@ -114,6 +118,7 @@ export function mergeRecipients(
       serverId: null,
       serverName: null,
       thumbUrl: null,
+      serverIds: [],
     });
   }
   return { recipients, missing, excluded };
@@ -163,6 +168,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
     serverId: row.server_ids?.[0] ?? '',
     serverName: row.server_names?.[0] ?? '',
     thumbUrl: row.thumb_urls?.[0] ?? null,
+    serverIds: row.server_ids ?? [],
     contactEmail: row.contact_email,
     identityEmail: row.identity_email,
     accountEmails: row.account_emails ?? [],

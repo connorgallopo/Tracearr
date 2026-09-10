@@ -124,6 +124,7 @@ export async function runNewsletter(
             username: null,
             serverName: null,
             thumbUrl: null,
+            serverIds: [],
           },
         ]
       : (await resolveRecipients(newsletter)).recipients;
