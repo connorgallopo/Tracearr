@@ -149,7 +149,8 @@ Server routes and services:
 - Uncropped Dashboard artwork is a permanent, intentional fork behavior,
   not a temporary workaround:
   preserve it when merging upstream image-proxy or Dashboard changes.
-  Dashboard artwork uses `object-contain` for every media type. Shared
+  Dashboard artwork reserves the normal poster slot, but an inner visual
+  element takes the image's actual bounded aspect ratio. Shared
   poster cache entries preserve the full image with Sharp `fit: inside` for
   every provider; avatars/art retain their prior sizing behavior. Jellyfin/Emby
   thumbnails constrain both dimensions, while Plex posters use the source
@@ -160,7 +161,10 @@ Server routes and services:
   `artwork=2` only to refresh browser caches; this is not a server cache variant.
   The artwork container is transparent when an image exists, exposing the
   card's blurred backdrop in letterbox/pillarbox space; it keeps `bg-muted`
-  only for the missing-image server-icon placeholder.
+  only for the missing-image server-icon placeholder. The shadow and hover
+  dimmer belong to that inner visual element, never to the fixed poster slot.
+  The `32px` Play/Pause icon is `shrink-0` and may extend past an extremely
+  small image, so it must never be clipped by the artwork container.
   Validated with Node 24 / pnpm 12.3.4: services (3,347 passed, one skipped),
   web (1,224 passed with two workers), typecheck, lint (754 warnings, unchanged),
   and build. Docker and live-provider manual smoke checks were not run.
@@ -402,9 +406,10 @@ High-conflict areas to review manually:
   wiring in `apps/server/src/index.ts`, and web `NowPlayingCard.tsx`: preserve
   full poster images for all providers, the shared cache, the one-time cleanup
   marker, and the browser refresh marker. Do not restore upstream poster
-  `cover` resizing or limit `object-contain` to Live TV/music. Preserve the
+  `cover` resizing or restore a fixed poster-shaped visual wrapper. Preserve the
   transparent artwork container for real images and the `bg-muted` missing-image
-  placeholder. Keep the existing
+  placeholder, inner aspect-ratio-bound effects, and unclipped fixed-size
+  Play/Pause control. Keep the existing
   image-proxy, cache-migration, and NowPlayingCard regression tests. An upstream
   replacement is acceptable only if it preserves this behavior end to end.
 - Shared server type definitions and schemas.

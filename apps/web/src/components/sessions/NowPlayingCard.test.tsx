@@ -363,8 +363,14 @@ describe('NowPlayingCard ffmpeg speed display', () => {
       );
       const poster = container.querySelector('img[src*="images/proxy"]');
       expect(screen.getByTestId('card-artwork')).not.toHaveClass('bg-muted');
-      expect(poster).toHaveClass('object-contain');
-      expect(poster).not.toHaveClass('object-cover');
+      expect(screen.getByTestId('card-artwork')).not.toHaveClass('overflow-hidden');
+      expect(poster).toHaveClass('max-h-28');
+      expect(poster).toHaveClass('max-w-20');
+      expect(poster).toHaveClass('shadow-lg');
+      expect(screen.getByTestId('artwork-playback-overlay').parentElement).toHaveClass(
+        'overflow-visible'
+      );
+      expect(container.querySelector('svg.lucide-play')).toHaveClass('h-8', 'w-8', 'shrink-0');
       expect(poster?.getAttribute('src')).toContain('&artwork=2');
     }
   );
