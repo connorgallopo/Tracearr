@@ -111,7 +111,15 @@
     "overallTrust": "Algemeen vertrouwen",
     "serverScope": "",
     "allServers": "Alle servers",
-    "title": "Gebruiker details"
+    "title": "Gebruiker details",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "Geschiedenis",
@@ -210,7 +218,7 @@
       "quietest": "Stiltesten:",
       "bingeHighlights": "Rand accentueringen",
       "bingeHighlightsDesc": "Toont de meest intensieve kijkpatronen",
-      "bingeSessions": "",
+      "bingeSessions": "buik sessies",
       "noData": "Nog geen controlegegevens",
       "noDataDesc": "Horlogeanalytics zullen hier verschijnen zodra de inhoud is afgespeeld. Kom terug na sommige activiteiten te bekijken.",
       "failedToLoad": "Fout bij het laden van horloge analytics",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "een server komt terug",
         "pluginUpdateAvailable": "een plugin update is beschikbaar",
         "serverUpdateAvailable": "er is een serverupdate beschikbaar",
-        "tracearrUpdateAvailable": "er is een Tracearr update beschikbaar"
+        "tracearrUpdateAvailable": "er is een Tracearr update beschikbaar",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "Policy",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Alles weergeven",
       "moreConnections": "+{{count}} meer connecties",
       "connectingTo": "Verbinden met {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "Geen Plex-accounts gekoppeld",
       "noAccountsLinkedHint": "Koppel een Plex-account om Plex-servers aan Tracearr toe te voegen.",
       "linkPlexAccount": "Plex-account koppelen",
       "linkAnotherAccount": "Nog een Plex-account koppelen",
       "linking": "Koppelen...",
-      "accountsLinked_one": "{{count}} Plex-account gekoppeld",
-      "accountsLinked_other": "{{count}} Plex-accounts gekoppeld",
-      "noAccountsLinkedShort": "Geen Plex-accounts gekoppeld",
       "loginEnabled": "Aanmelden ingeschakeld",
       "serversConnected_one": "{{count}} server verbonden",
       "serversConnected_other": "{{count}} servers verbonden",
       "unlinkAccount": "Dit Plex-account ontkoppelen",
       "reauthorizeAccount": "Autoriseer dit Plex account opnieuw",
       "deleteServersFirst": "Verwijder verbonden servers eerst om dit account te ontkoppelen",
-      "linkedAccounts": "Gekoppelde Plex-accounts",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "Er zijn nog geen Plex-accounts gekoppeld.",
       "unlinkPlexAccount": "Plex-account ontkoppelen",
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt."
     },
     "destinations": {
       "add": "Bestemming toevoegen",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "Ingebouwd",
       "clearSecret": "Maak leeg",
       "delete": "Verwijder",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "Nog geen bestemmingen.",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "Onderwerp",
         "authToken": "",
         "userKey": "Gebruikerssleutel",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": "Optioneel voor openbare onderwerpen"
+        "authTokenOptional": "Optioneel voor openbare onderwerpen",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "Alleen de eigenaar kan de bestemming van meldingen beheren.",
       "pushNote": "Verzonden naar gekoppelde mobiele apparaten; elk apparaat filtert de meldingen in zijn eigen instellingen.",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "Voer opnieuw de code van deze bestemming in",
+      "rowActions": "",
       "secretSet": "Instellen (leeg laten om te behouden)",
       "test": "",
       "testHint": "Sla eerst op om te testen",
       "testNeedsForm": "Vul de verplichte velden in om te testen",
-      "title": "Notificatiebestemmingen",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": "Toastberichten in deze browser."
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Nog geen activiteit",
-    "noActivityDesc": "",
+    "noActivityDesc": "Start met streamen om je top gebruikers hier te zien",
     "top3": "",
     "runnersUp": "Runners Omhoog"
   },
