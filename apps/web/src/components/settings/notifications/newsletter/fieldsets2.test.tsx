@@ -117,11 +117,11 @@ describe('RecipientsFields', () => {
         />
       </Providers>
     );
+    const first = screen.getByLabelText('newsletters.editor.recipients.addressLabel:{"n":1}');
+    await userEvent.click(first);
+    await userEvent.tab();
     expect(screen.getByRole('alert')).toHaveTextContent('newsletters.editor.recipients.badAddress');
-    await userEvent.type(
-      screen.getByLabelText('newsletters.editor.recipients.addressLabel:{"n":1}'),
-      'x'
-    );
+    await userEvent.type(first, 'x');
     expect(p.onChange).toHaveBeenLastCalledWith({
       recipients: { ...p.state.recipients, extraAddresses: [{ address: 'nopex' }] },
     });
@@ -131,6 +131,39 @@ describe('RecipientsFields', () => {
     expect(p.onChange).toHaveBeenLastCalledWith({
       recipients: { ...p.state.recipients, extraAddresses: [] },
     });
+  });
+
+  it('calls an address bad only once the field has been left', async () => {
+    const p = props({
+      recipients: { members: true, extraAddresses: [{ address: '' }], excludeUserIds: [] },
+    });
+    const { rerender } = render(
+      <Providers>
+        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
+      </Providers>
+    );
+    const input = screen.getByLabelText('newsletters.editor.recipients.addressLabel:{"n":1}');
+    await userEvent.type(input, 'someone@');
+    rerender(
+      <Providers>
+        <RecipientsFields
+          {...p}
+          newsletterId={null}
+          savedServerIds={null}
+          onPreview={vi.fn()}
+          state={{
+            ...p.state,
+            recipients: { ...p.state.recipients, extraAddresses: [{ address: 'someone@' }] },
+          }}
+        />
+      </Providers>
+    );
+    expect(screen.queryByText('newsletters.editor.recipients.badAddress')).not.toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'false');
+
+    await userEvent.tab();
+    expect(screen.getByText('newsletters.editor.recipients.badAddress')).toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
   it("keeps the surviving row's input when the row above it is removed", async () => {

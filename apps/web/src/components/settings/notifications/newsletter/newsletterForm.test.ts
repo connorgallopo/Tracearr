@@ -7,6 +7,7 @@ import {
   firstInvalidField,
   focusTargetId,
   prefillFromRouterState,
+  scopeMoved,
   seedFromNewsletter,
   validateForm,
   visibleErrors,
@@ -151,6 +152,16 @@ describe('newsletter form model', () => {
     expect(focusTargetId('sections', state)).toBe('newsletter-section-cap-movies');
     expect(focusTargetId('destinationId', state)).toBe('newsletter-destination');
     expect(focusTargetId('recipients', state)).toBe('newsletter-members');
+  });
+});
+
+describe('scopeMoved', () => {
+  it('never flags a form that has never been saved, and compares the ids in order otherwise', () => {
+    expect(scopeMoved(null, ['s-1'])).toBe(false);
+    expect(scopeMoved(null, [])).toBe(false);
+    expect(scopeMoved(['s-1'], ['s-1'])).toBe(false);
+    expect(scopeMoved(['s-1'], ['s-2'])).toBe(true);
+    expect(scopeMoved([], ['s-1'])).toBe(true);
   });
 });
 

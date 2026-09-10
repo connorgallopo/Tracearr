@@ -73,7 +73,7 @@ export function ScheduleFields({
 
   return (
     <EditorCard title={t('newsletters.editor.schedule')}>
-      <div className="grid gap-4 @md/field-group:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
+      <div className="grid gap-4 @md/field-group:grid-cols-[repeat(auto-fit,minmax(14rem,1fr))]">
         <Field>
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.scheduleKind}>
             {t('newsletters.editor.scheduleKind')}
@@ -151,7 +151,7 @@ export function ScheduleFields({
           </Field>
         )}
         {schedule.kind !== 'cron' && (
-          <Field>
+          <Field data-invalid={errors.schedule !== undefined}>
             <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.time}>
               {t('newsletters.editor.time')}
             </FieldLabel>
@@ -159,9 +159,11 @@ export function ScheduleFields({
               id={NEWSLETTER_FIELD_IDS.time}
               type="time"
               value={schedule.time}
+              aria-invalid={errors.schedule !== undefined}
               onChange={(event) => setSchedule({ ...schedule, time: event.target.value })}
               onBlur={() => touch('schedule')}
             />
+            <FieldError>{errors.schedule}</FieldError>
           </Field>
         )}
         <Field>
@@ -199,7 +201,6 @@ export function ScheduleFields({
           <FieldError>{errors.schedule}</FieldError>
         </Field>
       )}
-      {schedule.kind !== 'cron' && <FieldError>{errors.schedule}</FieldError>}
       <FieldDescription>{nextRun}</FieldDescription>
     </EditorCard>
   );

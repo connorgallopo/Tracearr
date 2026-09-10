@@ -150,6 +150,14 @@ describe('ScheduleFields', () => {
     });
   });
 
+  it('marks the time field invalid when the weekly schedule is rejected', () => {
+    const p = { ...props(), errors: { schedule: 'Pick a time' } };
+    render(<ScheduleFields {...p} scheduleDirty={false} />);
+    const time = screen.getByLabelText('newsletters.editor.time');
+    expect(time).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByRole('alert')).toHaveTextContent('Pick a time');
+  });
+
   it('shows the next run in the newsletter zone for a saved schedule and says it is set on save otherwise', () => {
     const p = props({ timezone: 'Europe/Berlin' });
     const { rerender } = render(

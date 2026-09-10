@@ -57,6 +57,7 @@ export function RecipientsFields({
   const { recipients } = state;
   const scoped = scopedServers(state.scope, servers ?? []);
   const [rowIds, setRowIds] = useState<string[]>(() => recipients.extraAddresses.map(mintRowId));
+  const [blurred, setBlurred] = useState<string[]>([]);
   const keys = alignRowIds(rowIds, recipients.extraAddresses.length);
 
   const setRecipients = (patch: Partial<typeof recipients>) => {
@@ -87,14 +88,16 @@ export function RecipientsFields({
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.members}>
             {t('newsletters.editor.recipients.members')}
           </FieldLabel>
-          <FieldDescription>
-            {t('newsletters.editor.recipients.membersHelp', {
-              servers: formatList(
-                i18n.language,
-                scoped.map((server) => server.name)
-              ),
-            })}
-          </FieldDescription>
+          {scoped.length > 0 && (
+            <FieldDescription>
+              {t('newsletters.editor.recipients.membersHelp', {
+                servers: formatList(
+                  i18n.language,
+                  scoped.map((server) => server.name)
+                ),
+              })}
+            </FieldDescription>
+          )}
           <FieldDescription>{t('newsletters.editor.recipients.ownerNote')}</FieldDescription>
         </FieldContent>
         <Switch
@@ -109,15 +112,13 @@ export function RecipientsFields({
         <FieldDescription>{t('newsletters.editor.recipients.extraAddressesHelp')}</FieldDescription>
         <ItemGroup className="gap-1">
           {recipients.extraAddresses.map((row, index) => {
-            const bad = row.address !== '' && !address.safeParse(row.address).success;
+            const rowId = keys[index] ?? `extra-${index}`;
+            const bad =
+              blurred.includes(rowId) &&
+              row.address !== '' &&
+              !address.safeParse(row.address).success;
             return (
-              <Item
-                key={keys[index]}
-                role="listitem"
-                variant="outline"
-                size="sm"
-                className="flex-wrap"
-              >
+              <Item key={rowId} role="listitem" variant="outline" size="sm" className="flex-wrap">
                 <ItemContent className="flex-row flex-wrap gap-2">
                   <Input
                     className="max-w-xs"
@@ -127,7 +128,10 @@ export function RecipientsFields({
                     aria-label={t('newsletters.editor.recipients.addressLabel', { n: index + 1 })}
                     placeholder="someone@example.com"
                     onChange={(event) => setRow(index, { address: event.target.value })}
-                    onBlur={() => touch('recipients')}
+                    onBlur={() => {
+                      setBlurred((ids) => (ids.includes(rowId) ? ids : [...ids, rowId]));
+                      touch('recipients');
+                    }}
                   />
                   <Input
                     className="max-w-48"
