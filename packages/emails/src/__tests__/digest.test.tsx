@@ -332,6 +332,34 @@ describe('renderDigest', () => {
     expect(out.text).toContain('https://www.imdb.com/title/tt0078748/');
   });
 
+  it('ranks the most watched rows inside one card, the play count after the title and a rule between rows', async () => {
+    const row = (n: number, title: string, plays: number) => ({
+      id: `w${n}`,
+      kind: 'movie' as const,
+      title,
+      year: 2000 + n,
+      plays,
+      posterRef: n === 2 ? null : `poster:w${n}`,
+      serverName: 'Basement Plex',
+      links: [{ label: 'IMDb', url: `https://www.imdb.com/title/tt000000${n}/` }],
+    });
+    const out = await renderDigest(
+      base({ mostWatched: [row(1, 'Alien', 9), row(2, 'Heat', 5), row(3, 'Seven', 1)] }),
+      branding
+    );
+    expect(out.text).toContain('1 Alien (2001)');
+    expect(out.text).toContain('9 plays · IMDb');
+    expect(out.text).toContain('2 Heat (2002)');
+    expect(out.text).toContain('3 Seven (2003)');
+    expect(out.text).toContain('1 play · IMDb');
+    expect(out.text.indexOf('1 Alien')).toBeLessThan(out.text.indexOf('2 Heat'));
+    expect(out.text.indexOf('2 Heat')).toBeLessThan(out.text.indexOf('3 Seven'));
+    expect(out.html).toContain(`<span style="color:${branding.accentColor}">1</span>`);
+    // The one most-watched card: no row carries an outline of its own.
+    expect(out.html.match(/border:1px solid #343945/g)).toHaveLength(1);
+    expect(out.html.match(/width="44"/g)).toHaveLength(2);
+  });
+
   it('emits each footer placeholder once, as the only anchor of its own paragraph', async () => {
     const out = await renderDigest(
       base({ unsubscribeUrl: '{{unsubscribe_url}}', viewUrl: '{{view_url}}' }),
@@ -539,8 +567,9 @@ describe('renderDigest', () => {
     expect(single.text).toContain('Crime · Drama · Thriller');
     expect(single.text).not.toContain('Action');
     expect(single.text).not.toContain('Basement Plex · Crime');
-    expect(single.text).toContain('Alien (1979) · 7 plays');
-    expect(single.text).not.toContain('Attic · Alien');
+    expect(single.text).toContain('1 Alien (1979)');
+    expect(single.text).toContain('7 plays');
+    expect(single.text).not.toContain('Attic');
 
     const multi = await renderDigest(
       base({
@@ -552,8 +581,8 @@ describe('renderDigest', () => {
       branding
     );
     expect(multi.text).toContain('Basement Plex · Crime · Drama · Thriller');
-    expect(multi.text).toContain('Alien (1979) · 7 plays');
-    expect(multi.text).toContain('Attic');
+    expect(multi.text).toContain('1 Alien (1979)');
+    expect(multi.text).toContain('7 plays · Attic');
   });
 
   it('previews what was added instead of repeating the subject, and falls back to the subject with nothing added', async () => {
@@ -673,7 +702,10 @@ describe('renderDigest', () => {
     expect(out.html).toContain('alt="Portishead"');
     expect(out.html).toContain('src="poster:w1"');
     expect(out.html).toContain('alt="Alien"');
-    expect(out.html.match(/width="100"/g)).toHaveLength(2);
+    expect(out.html).toContain('<img alt="Portishead" height="150" src="poster:al1"');
+    expect(out.html).toContain('<img alt="Alien" height="66" src="poster:w1"');
+    expect(out.html.match(/width="100"/g)).toHaveLength(1);
+    expect(out.html.match(/width="44"/g)).toHaveLength(1);
   });
 
   it('renders an artist card with no warmed cover without an image', async () => {

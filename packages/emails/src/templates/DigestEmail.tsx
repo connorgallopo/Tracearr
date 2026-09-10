@@ -345,22 +345,49 @@ function ArtistCard({
 
 function WatchedRow({
   item,
+  rank,
   accent,
   multiServer,
+  first,
 }: {
   item: DigestWatched;
+  rank: number;
   accent: string;
   multiServer: boolean;
+  first: boolean;
 }) {
-  return (
-    <Card posterRef={item.posterRef} alt={item.title}>
-      <Text style={title}>
-        {item.title}
-        <Year year={item.year} /> · {plural(item.plays, 'play')}
+  const divider: CSSProperties = first ? {} : { borderTop: `1px solid ${colors.border}` };
+  const bodyStyle: CSSProperties = { ...divider, padding: '10px 14px 10px 10px' };
+  const line = (
+    <>
+      <Text style={{ ...title, fontSize: '15px', lineHeight: '20px' }}>
+        <span style={{ color: accent }}>{rank}</span> {item.title}
+        <Year year={item.year} />
       </Text>
-      <Meta parts={[multiServer ? item.serverName : null]} />
-      <Links links={item.links} accent={accent} />
-    </Card>
+      <Text style={{ ...meta, marginBottom: 0 }}>
+        <span style={{ color: colors.soft, fontWeight: 600 }}>{plural(item.plays, 'play')}</span>
+        {multiServer && item.serverName ? ` · ${item.serverName}` : ''}
+        {item.links.map((l) => (
+          <span key={l.url}>
+            {' · '}
+            <Link href={l.url} style={link(accent)}>
+              {l.label}
+            </Link>
+          </span>
+        ))}
+      </Text>
+    </>
+  );
+  if (!item.posterRef) {
+    return <Cell style={{ ...bodyStyle, backgroundColor: colors.card }}>{line}</Cell>;
+  }
+  return (
+    <Columns
+      leftStyle={{ ...divider, width: '58px', padding: '10px 0 10px 10px' }}
+      rightStyle={bodyStyle}
+      left={<Poster src={item.posterRef} alt={item.title} width={44} />}
+      right={line}
+    />
   );
 }
 
@@ -492,9 +519,18 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
             count={`top ${input.mostWatched.length}`}
             accent={accent}
           />
-          {input.mostWatched.map((w) => (
-            <WatchedRow key={w.id} item={w} accent={accent} multiServer={input.multiServer} />
-          ))}
+          <Cell tableStyle={cardTable} style={{ backgroundColor: colors.card, padding: 0 }}>
+            {input.mostWatched.map((w, i) => (
+              <WatchedRow
+                key={w.id}
+                item={w}
+                rank={i + 1}
+                accent={accent}
+                multiServer={input.multiServer}
+                first={i === 0}
+              />
+            ))}
+          </Cell>
           <More count={input.moreWatched} noun="more title" />
         </>
       )}
