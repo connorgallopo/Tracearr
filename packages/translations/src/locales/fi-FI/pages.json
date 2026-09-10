@@ -111,7 +111,15 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
-    "title": ""
+    "title": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "Historia",
@@ -210,7 +218,7 @@
       "quietest": "Kysely:",
       "bingeHighlights": "Bingen Yksityiskohdat",
       "bingeHighlightsDesc": "Näyttää intensiivisimmällä katselumallilla",
-      "bingeSessions": "",
+      "bingeSessions": "binge istuntoja",
       "noData": "Ei vielä kellon tietoja",
       "noDataDesc": "Katsella analytiikka ilmestyy tänne, kun sisältöä on toistettava. Tarkista sen jälkeen, kun olet tarkastellut toimintoja.",
       "failedToLoad": "Kellon analytiikan lataaminen epäonnistui",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "",
         "pluginUpdateAvailable": "",
         "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Näytä kaikki",
       "moreConnections": "+{{count}} lisää yhteyksiä",
       "connectingTo": "Yhdistetään {{name}} tiedostoon...",
+      "ownerOnly": "",
       "noAccountsLinked": "Ei Ole Ole Yhdistetty Plex Tilejä",
       "noAccountsLinkedHint": "Yhdistä Plex tili lisätäksesi Plex palvelimet Tracearriin.",
       "linkPlexAccount": "Linkitä Plex Tili",
       "linkAnotherAccount": "Linkitä Toinen Plex -tili",
       "linking": "Yhdistetään...",
-      "accountsLinked_one": "{{count}} Plex tili linkitetty",
-      "accountsLinked_other": "{{count}} Plex tiliä yhdistetty",
-      "noAccountsLinkedShort": "Ei linkitettyjä Plex tilejä",
       "loginEnabled": "Kirjautuminen Käytössä",
       "serversConnected_one": "{{count}} palvelin yhdistetty",
       "serversConnected_other": "{{count}} palvelinta yhdistetty",
       "unlinkAccount": "Poista yhteys Plex tiliin",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Poista yhdistetyt palvelimet ensin poistaaksesi linkitys tähän tiliin",
-      "linkedAccounts": "Yhdistetyt Plex Tilit",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "Ei vielä linkitettyjä Plex-tilejä.",
       "unlinkPlexAccount": "Irroita Plex Tili",
       "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen."
     },
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
-    "noActivityDesc": "",
+    "noActivityDesc": "Aloita streaming nähdäksesi alkuun käyttäjät täällä",
     "top3": "",
     "runnersUp": "Juoksijat Ylös"
   },
