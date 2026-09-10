@@ -111,7 +111,15 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
-    "title": ""
+    "title": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "Historial",
@@ -210,7 +218,7 @@
       "quietest": "Más tranquilo:",
       "bingeHighlights": "Destacados Binge",
       "bingeHighlightsDesc": "Muestra con los patrones de visualización más intensivos",
-      "bingeSessions": "",
+      "bingeSessions": "sesiones de binge",
       "noData": "Aún no hay datos de reloj",
       "noDataDesc": "Ver análisis aparecerán aquí una vez que el contenido haya sido reproducido. Vuelva a comprobar después de alguna actividad de visualización.",
       "failedToLoad": "Error al cargar análisis de reloj",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "",
         "pluginUpdateAvailable": "",
         "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Mostrar todo",
       "moreConnections": "+{{count}} más conexiones",
       "connectingTo": "Conectando a {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "No hay cuentas Plex vinculadas",
       "noAccountsLinkedHint": "Vincula una cuenta de Plex para añadir servidores Plex a Tracearr.",
       "linkPlexAccount": "Vincular cuenta de Plex",
       "linkAnotherAccount": "Vincular otra cuenta de Plex",
       "linking": "Vinculando...",
-      "accountsLinked_one": "{{count}} cuenta de Plex vinculada",
-      "accountsLinked_other": "{{count}} cuentas de Plex vinculadas",
-      "noAccountsLinkedShort": "No hay cuentas de Plex vinculadas",
       "loginEnabled": "Inicio de sesión activado",
       "serversConnected_one": "{{count}} servidor conectado",
       "serversConnected_other": "{{count}} servidores conectados",
       "unlinkAccount": "Desvincular esta cuenta de Plex",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Eliminar los servidores conectados primero para desvincular esta cuenta",
-      "linkedAccounts": "Cuentas de Plex vinculadas",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "No hay cuentas de Plex vinculadas.",
       "unlinkPlexAccount": "Desvincular cuenta de Plex",
       "unlinkConfirm": "¿Estás seguro de que quieres desvincular esta cuenta de Plex? No podrás añadir servidores de esta cuenta hasta que la vincules de nuevo."
     },
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Aún no hay actividad",
-    "noActivityDesc": "",
+    "noActivityDesc": "Empieza a transmitir para ver tus mejores usuarios aquí",
     "top3": "",
     "runnersUp": "Ejecutar arriba"
   },
