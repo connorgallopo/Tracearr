@@ -785,7 +785,7 @@ describe('newsletter routes', () => {
       [S2.id, ['Attic'], 1, 0],
     ]);
     expect(json.variants[1].html).toContain('Heat');
-    expect(json.variants[2].html).toContain('Nothing new this period');
+    expect(json.variants[2].html).toContain('Nothing was added to <!-- -->Attic<!-- --> between');
     expect(json.variants[1].subject).toMatch(/^s$/);
   });
 

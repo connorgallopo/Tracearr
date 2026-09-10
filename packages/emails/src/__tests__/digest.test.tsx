@@ -349,10 +349,91 @@ describe('renderDigest', () => {
     expect(out.text).toContain('{{unsubscribe_url}}');
   });
 
-  it('renders the empty state when every section is empty', async () => {
+  it('names the servers and the window in the empty state, falling back to the sender name', async () => {
     const out = await renderDigest(base(), branding);
-    expect(out.html).toContain('Nothing new this period');
+    expect(out.text).toContain(
+      'Nothing was added to Basement Plex between Aug 26, 2026 and Sep 2, 2026.'
+    );
     expect(out.html).not.toContain('<img');
+    const bare = await renderDigest(base({ serverNames: [] }), defaultBranding('Attic Media'));
+    expect(bare.text).toContain('Nothing was added to Attic Media between');
+  });
+
+  it('puts the browser link first, then the logo and the sender name centered in the masthead', async () => {
+    const out = await renderDigest(
+      base({ viewUrl: '{{view_url}}', logoRef: 'cid:logo' }),
+      branding
+    );
+    expect(out.html).toContain('<img alt="" height="48" src="cid:logo"');
+    expect(out.html.indexOf('View in browser')).toBeLessThan(out.html.indexOf('src="cid:logo"'));
+    expect(out.html.indexOf('src="cid:logo"')).toBeLessThan(out.html.indexOf('Basement Plex</p>'));
+    expect(out.html).toMatch(/font-size:20px[^"]*">Basement Plex<\/p>/);
+    expect(out.text.indexOf('View in browser')).toBeLessThan(out.text.indexOf('Basement Plex'));
+    const noLogo = await renderDigest(base({ logoRef: null }), branding);
+    expect(noLogo.html).not.toContain('<img');
+    expect(noLogo.html).toMatch(/font-size:22px[^"]*">Basement Plex<\/p>/);
+  });
+
+  it('totals the window in the hero, counting what the caps hid and the episodes across every show', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: null,
+            genres: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreMovies: 1,
+        shows: [
+          {
+            id: 's1',
+            title: 'The Wire',
+            year: 2002,
+            posterRef: null,
+            seasons: [],
+            moreSeasons: 0,
+            episodeCount: 4,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        episodes: 6,
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: null,
+            albums: [{ id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 }],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreAlbums: 2,
+      }),
+      branding
+    );
+    expect(out.text).toContain('2 movies · 1 show · 6 episodes · 3 albums');
+    expect(out.text.indexOf('Aug 26, 2026 to Sep 2, 2026')).toBeLessThan(
+      out.text.indexOf('2 movies · 1 show')
+    );
+    const nothing = await renderDigest(base(), branding);
+    expect(nothing.text).not.toContain('0 movies');
+  });
+
+  it('places the outro above the footer rule and the permission line above the unsubscribe line', async () => {
+    const out = await renderDigest(base(), branding);
+    expect(out.text.indexOf('Enjoy!')).toBeLessThan(out.text.indexOf('member of Basement Plex'));
+    expect(out.text.indexOf('member of Basement Plex')).toBeLessThan(
+      out.text.indexOf('{{unsubscribe_url}}')
+    );
+    expect(out.text.indexOf('{{unsubscribe_url}}')).toBeLessThan(
+      out.text.indexOf('Sent by Tracearr for Basement Plex.')
+    );
   });
 
   it('says to reply when there is no unsubscribe link and omits a null view link', async () => {

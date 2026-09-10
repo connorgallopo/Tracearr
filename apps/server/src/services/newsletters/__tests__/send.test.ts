@@ -400,7 +400,7 @@ describe('runNewsletter', () => {
     expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
       { address: 'me@example.com', userId: null, status: 'queued', variantKey: 's1' },
     ]);
-    expect(firstSnapshot().html).toContain('Nothing new this period');
+    expect(firstSnapshot().html).toContain('Nothing was added to');
     // A test send reaches the owner's own address, not because they are a member of a scoped server.
     expect(firstSnapshot().html).not.toContain('member of');
   });

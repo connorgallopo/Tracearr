@@ -1,9 +1,10 @@
-import { Img, Link, Text } from '@react-email/components';
+import { Heading, Hr, Img, Link, Text } from '@react-email/components';
+import type { CSSProperties } from 'react';
 import { Cell } from '../components/Cell.js';
 import { Columns } from '../components/Columns.js';
-import { Layout } from '../components/Layout.js';
+import { Document } from '../components/Document.js';
 import { RichText } from '../components/RichText.js';
-import { card, colors, heading, link, muted, paragraph } from '../styles.js';
+import { colors, heading, link, muted, paragraph } from '../styles.js';
 import type {
   DigestArtist,
   DigestInput,
@@ -23,6 +24,38 @@ const posterBodyTable = {
 } as const;
 const posterCell = { width: '80px', padding: '10px 12px 10px 10px' } as const;
 const bodyCell = { padding: '10px 10px 10px 0' } as const;
+
+const h1: CSSProperties = {
+  color: colors.text,
+  fontSize: '26px',
+  lineHeight: '32px',
+  fontWeight: 600,
+  marginTop: 0,
+  marginBottom: '8px',
+};
+const eyebrow: CSSProperties = {
+  color: colors.muted,
+  fontSize: '11px',
+  lineHeight: '16px',
+  letterSpacing: '0.09em',
+  textTransform: 'uppercase',
+  marginTop: 0,
+  marginBottom: '10px',
+};
+const summary: CSSProperties = {
+  color: colors.soft,
+  fontSize: '13px',
+  lineHeight: '20px',
+  marginTop: 0,
+  marginBottom: '14px',
+};
+const footNote: CSSProperties = {
+  color: colors.muted,
+  fontSize: '12px',
+  lineHeight: '18px',
+  marginTop: 0,
+  marginBottom: '6px',
+};
 
 function Poster({ src, alt }: { src: string | null; alt: string }) {
   if (!src) return null;
@@ -75,20 +108,45 @@ function listNames(names: readonly string[]): string {
 const plural = (count: number, noun: string): string =>
   `${count} ${count === 1 ? noun : `${noun}s`}`;
 
+interface Tally {
+  movies: number;
+  shows: number;
+  albums: number;
+}
+
+/** Window totals: the cards shown plus what the caps and the fit loop held back. */
+function tally(input: DigestInput): Tally {
+  return {
+    movies: input.movies.length + input.moreMovies,
+    shows: input.shows.length + input.moreShows,
+    albums: input.artists.reduce((n, a) => n + a.albums.length, 0) + input.moreAlbums,
+  };
+}
+
 /** The inbox preview: what was added, so it does not repeat the subject; the subject when nothing was. */
-function preheader(input: DigestInput): string {
-  const albums = input.artists.reduce((n, a) => n + a.albums.length, 0) + input.moreAlbums;
+function preheader(input: DigestInput, counts: Tally): string {
   const parts = (
     [
-      [input.movies.length + input.moreMovies, 'movie'],
-      [input.shows.length + input.moreShows, 'show'],
-      [albums, 'album'],
+      [counts.movies, 'movie'],
+      [counts.shows, 'show'],
+      [counts.albums, 'album'],
     ] as const
   )
     .filter(([count]) => count > 0)
     .map(([count, noun]) => plural(count, noun));
   if (parts.length === 0) return input.subject;
   return `${listNames(parts)} added between ${input.windowStart} and ${input.windowEnd}`;
+}
+
+function summaryLine(input: DigestInput, counts: Tally): string {
+  return [
+    counts.movies > 0 ? plural(counts.movies, 'movie') : null,
+    counts.shows > 0 ? plural(counts.shows, 'show') : null,
+    input.episodes > 0 ? plural(input.episodes, 'episode') : null,
+    counts.albums > 0 ? plural(counts.albums, 'album') : null,
+  ]
+    .filter((p): p is string => p !== null)
+    .join(' · ');
 }
 
 function Meta({ parts }: { parts: (string | null)[] }) {
@@ -223,49 +281,99 @@ function WatchedRow({
   );
 }
 
+function Masthead({
+  senderName,
+  logoRef,
+  viewUrl,
+  accent,
+}: {
+  senderName: string;
+  logoRef: string | null;
+  viewUrl: string | null;
+  accent: string;
+}) {
+  return (
+    <>
+      {viewUrl && (
+        <Cell style={{ paddingBottom: '10px', textAlign: 'center' }}>
+          <Text style={{ ...footNote, marginBottom: 0 }}>
+            <Link href={viewUrl} style={link(accent)}>
+              View in browser
+            </Link>
+          </Text>
+        </Cell>
+      )}
+      <Cell
+        tableStyle={{ marginBottom: '22px' }}
+        style={{
+          borderBottom: `1px solid ${colors.border}`,
+          padding: '18px 0',
+          textAlign: 'center',
+        }}
+      >
+        {logoRef && (
+          <Img
+            src={logoRef}
+            alt=""
+            width="48"
+            height="48"
+            style={{
+              display: 'inline-block',
+              backgroundColor: colors.raised,
+            }}
+          />
+        )}
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: logoRef ? '20px' : '22px',
+            lineHeight: logoRef ? '26px' : '28px',
+            fontWeight: 600,
+            textAlign: 'center',
+            marginTop: logoRef ? '8px' : 0,
+            marginBottom: 0,
+          }}
+        >
+          {senderName}
+        </Text>
+      </Cell>
+    </>
+  );
+}
+
 export function DigestEmail({ input, branding }: { input: DigestInput; branding: EmailBranding }) {
   const accent = branding.accentColor;
+  const counts = tally(input);
+  const totals = summaryLine(input, counts);
   const empty =
     input.movies.length === 0 &&
     input.shows.length === 0 &&
     input.artists.length === 0 &&
     input.mostWatched.length === 0;
 
-  const footer = (
-    <>
-      {input.viewUrl && (
-        <Text style={muted}>
-          <Link href={input.viewUrl} style={link(accent)}>
-            View in browser
-          </Link>
-        </Text>
-      )}
-      {input.memberSend && input.serverNames.length > 0 && (
-        <Text style={muted}>
-          You get this because you are a member of {listNames(input.serverNames)}.
-        </Text>
-      )}
-      <Text style={muted}>
-        {input.unsubscribeUrl ? (
-          <Link href={input.unsubscribeUrl} style={link(accent)}>
-            Unsubscribe
-          </Link>
-        ) : (
-          'Reply to this email to unsubscribe.'
-        )}
-      </Text>
-    </>
-  );
-
   return (
-    <Layout preview={preheader(input)} branding={branding} logoRef={input.logoRef} footer={footer}>
-      <Cell style={card}>
-        <Text style={heading(accent)}>{input.subject}</Text>
-        <Text style={muted}>
+    <Document preview={preheader(input, counts)}>
+      <Masthead
+        senderName={branding.senderName}
+        logoRef={input.logoRef}
+        viewUrl={input.viewUrl}
+        accent={accent}
+      />
+      <Cell style={{ padding: '0 2px' }}>
+        <Text style={eyebrow}>
           {input.windowStart} to {input.windowEnd}
         </Text>
+        <Heading as="h1" style={h1}>
+          {input.subject}
+        </Heading>
+        {totals && <Text style={summary}>{totals}</Text>}
         {input.intro && <RichText doc={input.intro} accent={accent} />}
-        {empty && <Text style={paragraph}>Nothing new this period.</Text>}
+        {empty && (
+          <Text style={{ ...summary, color: colors.muted }}>
+            Nothing was added to {listNames(input.serverNames) || branding.senderName} between{' '}
+            {input.windowStart} and {input.windowEnd}.
+          </Text>
+        )}
       </Cell>
       {input.movies.length > 0 && (
         <>
@@ -304,10 +412,32 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
         </>
       )}
       {input.outro && (
-        <Cell style={{ paddingTop: '8px' }}>
+        <Cell style={{ padding: '18px 2px 0' }}>
           <RichText doc={input.outro} accent={accent} />
         </Cell>
       )}
-    </Layout>
+      <Hr style={{ borderColor: colors.border, marginTop: '24px', marginBottom: '14px' }} />
+      <Cell style={{ padding: '0 2px' }}>
+        {input.memberSend && input.serverNames.length > 0 && (
+          <Text style={footNote}>
+            You get this because you are a member of {listNames(input.serverNames)}.
+          </Text>
+        )}
+        <Text style={footNote}>
+          {input.unsubscribeUrl ? (
+            <Link href={input.unsubscribeUrl} style={link(accent)}>
+              Unsubscribe
+            </Link>
+          ) : (
+            'Reply to this email to unsubscribe.'
+          )}
+        </Text>
+        {branding.footerText && <Text style={footNote}>{branding.footerText}</Text>}
+        {branding.postalAddress && <Text style={footNote}>{branding.postalAddress}</Text>}
+        <Text style={{ ...footNote, marginBottom: 0 }}>
+          Sent by Tracearr for {branding.senderName}.
+        </Text>
+      </Cell>
+    </Document>
   );
 }
