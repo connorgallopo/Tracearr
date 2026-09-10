@@ -142,9 +142,7 @@
         "title": "Token Di Coppia Generato",
         "message": "Scansiona il codice QR con il tuo dispositivo mobile per abbinare"
       },
-      "displayNameUpdated": {
-        "title": "Nome Visualizzato Aggiornato"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Resetta Punteggi Di Fiducia",
         "message_one": "{{count}} utente resettato a 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Impossibile aggiungere il server",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
       "deviceRenameFailed": "Impossibile rinominare il dispositivo",
       "sessionsRevokeFailed": "Impossibile revocare le sessioni",
-      "displayNameUpdateFailed": "Aggiornamento del nome visualizzato non riuscito",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Impossibile ripristinare i punteggi di fiducia",
       "routingUpdateFailed": "Impossibile aggiornare il routing",
       "clipboardFailed": "Impossibile copiare negli appunti",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
