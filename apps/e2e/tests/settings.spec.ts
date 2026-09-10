@@ -106,9 +106,17 @@ test.describe('Newsletters', () => {
     await expect(page).toHaveURL(/\/settings\/notifications\/newsletters\/new$/);
 
     await page.getByLabel('Name', { exact: true }).fill(name);
-    await page.getByLabel('Shown as').fill('Family Media');
+    await page.getByLabel('From name').fill('Family Media');
     await page.getByRole('combobox', { name: 'Email destination' }).click();
     await page.getByRole('option', { name: destinationName }).click();
+
+    // Preview before the first save: the draft route renders it, and no row exists yet.
+    await page.getByRole('button', { name: 'Preview', exact: true }).first().click();
+    await expect(page.getByText('Preview of unsaved changes')).toBeVisible();
+    await expect(page.locator('iframe[title="Preview"]')).toBeVisible();
+    await expect(page).toHaveURL(/\/settings\/notifications\/newsletters\/new$/);
+    await page.keyboard.press('Escape');
+
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page).toHaveURL(/\/settings\/notifications\/newsletters\/[0-9a-f-]{36}$/);
     await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();

@@ -440,41 +440,45 @@
       "movies_one": "",
       "movies_other": "",
       "shows_one": "",
-      "shows_other": ""
+      "shows_other": "",
+      "watched_one": "",
+      "watched_other": ""
     },
     "deleteDescription": "",
     "deleteTitle": "",
     "duplicate": "",
     "editor": {
       "actions": {
+        "more": "",
         "preview": "",
-        "saveAndPreview": "",
-        "saveAndSend": "",
-        "saveAndTest": "",
         "send": "",
-        "test": ""
+        "sendHint": "",
+        "test": "",
+        "testHint": ""
       },
       "allLibraries": "",
       "allServers": "",
+      "basics": "",
       "clear": "",
       "content": "",
       "cron": "",
       "cronHint": "",
       "dayOfMonth": "",
+      "dayOfMonthHelp": "",
       "dayOfWeek": "",
       "days": "",
       "delivery": {
         "destination": "",
+        "destinationHelp": "",
         "hostedNeedsUrl": "",
         "imageMode": "",
         "modeHelp": {
-          "auto": "",
           "hosted": "",
           "inline": "",
           "none": ""
         },
+        "modePreviewHint": "",
         "modes": {
-          "auto": "",
           "hosted": "",
           "inline": "",
           "none": ""
@@ -487,7 +491,9 @@
       },
       "dstNote": "",
       "enabledHelp": "",
-      "fallbackDays": "",
+      "fixFirst": "",
+      "headerSummary": "",
+      "historyNeedsSave": "",
       "intro": "",
       "introPlaceholder": "",
       "kinds": {
@@ -497,45 +503,82 @@
         "weekly": ""
       },
       "libraries": "",
+      "librariesHelp": "",
       "librariesSelected": "",
       "links": {
-        "title": "",
         "tracearr": "",
         "tracearrNote": ""
       },
       "message": "",
       "name": "",
+      "nameHelp": "",
       "newTitle": "",
       "nextRun": "",
+      "nextRunPending": "",
       "noLibraries": "",
       "noServers": "",
       "notFound": "",
       "outro": "",
       "outroPlaceholder": "",
-      "preview": {
-        "recipients": "",
-        "title": "",
-        "variants": "",
-        "window": ""
+      "placeholders": {
+        "end_date": "",
+        "item_count": "",
+        "server_name": "",
+        "start_date": ""
       },
-      "previewVariant": "",
+      "preview": {
+        "countsListed": {
+          "albums": "",
+          "movies": "",
+          "shows": ""
+        },
+        "draft": "",
+        "images": "",
+        "imagesBlocked": "",
+        "imagesBlockedNote": "",
+        "imagesOn": "",
+        "linksNote": "",
+        "recipients": "",
+        "subjectLabel": "",
+        "title": "",
+        "variantTab": "",
+        "variants": "",
+        "width": "",
+        "widths": {
+          "desktop": "",
+          "phone": ""
+        },
+        "window": "",
+        "windowSince": ""
+      },
+      "previewVariant_one": "",
+      "previewVariant_other": "",
       "readiness": {
+        "destination": "",
+        "destinationFail": "",
+        "destinationUnknown": "",
         "dns": "",
         "dnsLink": "",
         "emptyVariant": "",
         "externalUrl": "",
         "externalUrlFail": "",
         "externalUrlNotHttps": "",
+        "fixDestination": "",
+        "fixExternalUrl": "",
+        "fixRecipients": "",
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
+        "intro": "",
         "noPublicUrl": "",
         "privatePublicUrl": "",
-        "recipients": "",
         "recipientsFail": "",
         "recipientsLoadFailed": "",
         "recipientsUnknown": "",
+        "recipients_one": "",
+        "recipients_other": "",
         "serverSettingsLink": "",
+        "staleScope": "",
         "title": "",
         "variantsLoadFailed": ""
       },
@@ -551,8 +594,11 @@
         "excludeAction": "",
         "excludedAfterSave": "",
         "excludedCount": "",
+        "excludedHelp": "",
         "extraAddress": "",
         "extraAddresses": "",
+        "extraAddressesHelp": "",
+        "groupsNote": "",
         "include": "",
         "includeAction": "",
         "includedAfterSave": "",
@@ -574,6 +620,8 @@
         "removeAddress": "",
         "saveEmail": "",
         "saveFirst": "",
+        "saveFirstHelp": "",
+        "staleScope": "",
         "suppressed": "",
         "suppressedHeading": "",
         "suppressedHelp": "",
@@ -588,15 +636,32 @@
       "scheduleKind": "",
       "searchLibraries": "",
       "searchServers": "",
-      "seasonsPerShow": "",
-      "sectionMax": "",
       "sections": {
+        "description": "",
+        "labels": {
+          "mostWatched": "",
+          "movies": "",
+          "music": "",
+          "seasons": "",
+          "shows": ""
+        },
+        "legend": "",
         "mostWatched": "",
+        "mostWatchedHelp": "",
         "movies": "",
         "music": "",
-        "shows": ""
+        "musicHelp": "",
+        "shows": "",
+        "the": "",
+        "units": {
+          "albums": "",
+          "mostPlayed": "",
+          "movies": "",
+          "seasonsEach": "",
+          "shows": ""
+        },
+        "upTo": ""
       },
-      "sectionsHelp": "",
       "send": {
         "confirm": "",
         "nobody": "",
@@ -607,10 +672,12 @@
         "trimmed_one": "",
         "trimmed_other": ""
       },
+      "sendNeedsSave": "",
       "senderName": "",
       "senderNameHelp": "",
       "senderNameRequiredMulti": "",
       "servers": "",
+      "serversHelp": "",
       "serversSelected": "",
       "subject": "",
       "subjectHelp": "",
@@ -627,13 +694,25 @@
       },
       "time": "",
       "timezone": "",
+      "timezoneHelp": "",
       "turnOnNow": "",
       "unknownLibrary": "",
       "unsaved": "",
       "variantHeading": "",
       "variantsNote": "",
-      "windowDays": "",
+      "windowHelp": {
+        "fixed": "",
+        "since_last_send": ""
+      },
       "windowKind": "",
+      "windowMax": "",
+      "windowSentence": {
+        "fallback": "",
+        "fallbackLabel": "",
+        "fixed": "",
+        "fixedAfter": "",
+        "fixedLabel": ""
+      },
       "windows": {
         "fixed": "",
         "since_last_send": ""
