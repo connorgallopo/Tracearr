@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Info, Plus } from 'lucide-react';
-import { NEWSLETTER_IMAGE_MODES } from '@tracearr/shared';
+import { Info, Plus } from 'lucide-react';
+import type { NEWSLETTER_IMAGE_MODES } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { DestinationDialog } from '@/components/settings/destinations/DestinationDialog';
@@ -27,11 +27,15 @@ import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 const NONE = '__none__';
 
+/** `auto` stays valid in the schema for rows saved before it left the select; it reads as Attached here and is rewritten by the next pick. */
+const SELECTABLE_IMAGE_MODES = ['hosted', 'inline', 'none'] as const;
+
 export function DeliveryFields({ state, onChange, errors, mode, touch, touched }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: destinations, isLoading, isError, error } = useDestinations();
   const { data: settings } = useSettings();
   const emailDestinations = (destinations ?? []).filter((d) => d.type === 'email');
+  const shownMode = state.imageMode === 'auto' ? 'inline' : state.imageMode;
   const hostedWithoutUrl = state.imageMode === 'hosted' && !settings?.externalUrl;
   const [addOpen, setAddOpen] = useState(false);
 
@@ -83,6 +87,7 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
             </SelectContent>
           </Select>
         )}
+        <FieldDescription>{t('newsletters.editor.delivery.destinationHelp')}</FieldDescription>
         <FieldError>{errors.destinationId}</FieldError>
       </Field>
       <Field className="max-w-sm">
@@ -90,7 +95,7 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
           {t('newsletters.editor.delivery.imageMode')}
         </FieldLabel>
         <Select
-          value={state.imageMode}
+          value={shownMode}
           onValueChange={(imageMode) => {
             touch('imageMode');
             onChange({ imageMode: imageMode as (typeof NEWSLETTER_IMAGE_MODES)[number] });
@@ -103,19 +108,22 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {NEWSLETTER_IMAGE_MODES.map((mode) => (
-              <SelectItem key={mode} value={mode}>
-                {t(`newsletters.editor.delivery.modes.${mode}`)}
+            {SELECTABLE_IMAGE_MODES.map((imageMode) => (
+              <SelectItem key={imageMode} value={imageMode}>
+                {t(`newsletters.editor.delivery.modes.${imageMode}`)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <FieldDescription>
-          {t(`newsletters.editor.delivery.modeHelp.${state.imageMode}`)}
+          {t(`newsletters.editor.delivery.modeHelp.${shownMode}`)}
         </FieldDescription>
+        {shownMode !== 'none' && (
+          <FieldDescription>{t('newsletters.editor.delivery.modePreviewHint')}</FieldDescription>
+        )}
         {hostedWithoutUrl && (
-          <Alert variant="warning">
-            <AlertTriangle />
+          <Alert>
+            <Info />
             <AlertDescription>{t('newsletters.editor.delivery.hostedNeedsUrl')}</AlertDescription>
           </Alert>
         )}

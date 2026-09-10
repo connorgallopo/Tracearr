@@ -42,6 +42,10 @@ const row: Newsletter = {
 };
 
 describe('newsletter form model', () => {
+  it('starts a new newsletter with posters attached', () => {
+    expect(defaultFormState().imageMode).toBe('inline');
+  });
+
   it('starts a new row on the create defaults and the browser zone', () => {
     const state = defaultFormState();
     expect(state.timezone).toBe(Intl.DateTimeFormat().resolvedOptions().timeZone);

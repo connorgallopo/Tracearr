@@ -90,7 +90,7 @@ export function defaultFormState(): NewsletterFormState {
     intro: null,
     outro: null,
     recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
-    imageMode: 'auto',
+    imageMode: 'inline',
     skipWhenEmpty: true,
     links: DEFAULT_NEWSLETTER_LINKS,
   };

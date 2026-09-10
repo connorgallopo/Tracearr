@@ -757,24 +757,24 @@
       "delivery": {
         "title": "Delivery",
         "destination": "Email destination",
+        "destinationHelp": "The SMTP account this sends through. It does not decide who receives it.",
         "pickDestination": "Pick a destination",
         "noDestination": "None",
         "imageMode": "Poster images",
         "modes": {
-          "auto": "Automatic",
           "hosted": "Hosted",
           "inline": "Attached",
           "none": "No posters"
         },
         "modeHelp": {
-          "auto": "Attached to the email, which every client shows.",
           "hosted": "Loaded from this Tracearr over the external URL; the URL must be reachable from the public internet, and every recipient's mail provider sees it.",
-          "inline": "Attached to the email, which every client shows.",
+          "inline": "Attached to the email. Every client shows them, and the email is larger, so the size limit trims more titles.",
           "none": "Cards render without posters."
         },
-        "hostedNeedsUrl": "Hosted posters need the external URL set under Access, Remote access.",
+        "modePreviewHint": "Preview renders the current choice; set its Images toggle to Blocked to see the email without remote images.",
+        "hostedNeedsUrl": "No external URL is set, so posters will be attached instead. Set one under Access, Remote access to host them.",
         "skipWhenEmpty": "Skip when nothing was added",
-        "skipWhenEmptyHelp": "A window with no new titles sends nothing instead of an empty digest."
+        "skipWhenEmptyHelp": "Nothing new means no email. On a newsletter covering several servers this is per group: people whose servers added nothing hear nothing, the rest still get theirs. A test send always renders."
       },
       "links": {
         "tracearr": "Link titles to Tracearr",

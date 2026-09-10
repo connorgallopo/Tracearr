@@ -258,3 +258,74 @@ describe('DeliveryFields destination query states', () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe('DeliveryFields image mode', () => {
+  beforeEach(() => {
+    vi.mocked(useDestinations).mockReturnValue({ data: [postmark] } as unknown as ReturnType<
+      typeof useDestinations
+    >);
+  });
+
+  it('offers hosted, attached and none, and shows a saved automatic row as attached', async () => {
+    const onChange = vi.fn();
+    render(
+      <DeliveryFields
+        state={stateWith({ imageMode: 'auto' })}
+        onChange={onChange}
+        errors={{}}
+        mode="edit"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
+    const select = screen.getByRole('combobox', { name: 'newsletters.editor.delivery.imageMode' });
+    expect(select).toHaveTextContent('newsletters.editor.delivery.modes.inline');
+    expect(screen.getByText('newsletters.editor.delivery.modeHelp.inline')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.delivery.modePreviewHint')).toBeInTheDocument();
+    await userEvent.click(select);
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'newsletters.editor.delivery.modes.hosted',
+      'newsletters.editor.delivery.modes.inline',
+      'newsletters.editor.delivery.modes.none',
+    ]);
+    await userEvent.click(
+      screen.getByRole('option', { name: 'newsletters.editor.delivery.modes.none' })
+    );
+    expect(onChange).toHaveBeenCalledWith({ imageMode: 'none' });
+  });
+
+  it('drops the preview hint with posters off, names the destination as the sending account, and downgrades hosted without a URL', () => {
+    vi.mocked(useSettings).mockReturnValue({
+      data: { externalUrl: null } as Settings,
+    } as unknown as ReturnType<typeof useSettings>);
+    const { rerender } = render(
+      <DeliveryFields
+        state={stateWith({ imageMode: 'none' })}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="edit"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
+    expect(
+      screen.queryByText('newsletters.editor.delivery.modePreviewHint')
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.delivery.destinationHelp')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    rerender(
+      <DeliveryFields
+        state={stateWith({ imageMode: 'hosted' })}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="edit"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'newsletters.editor.delivery.hostedNeedsUrl'
+    );
+  });
+});
