@@ -142,9 +142,7 @@
         "title": "Koppeltoken gegenereerd",
         "message": "Scan de QR-code met je mobiele apparaat om te koppelen"
       },
-      "displayNameUpdated": {
-        "title": "Weergavenaam bijgewerkt"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Vertrouwensscores hersteld",
         "message_one": "{{count}} gebruiker hersteld naar 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "Bestemming opgeslagen",
       "destinationDeleted": "Bestemming verwijdert",
-      "destinationTestSent": "Test notificatie verzonden"
+      "destinationTestSent": "Test notificatie verzonden",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Server toevoegen mislukt",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Apparaat verwijderen mislukt",
       "deviceRenameFailed": "Apparaat hernoemen mislukt",
       "sessionsRevokeFailed": "Sessies intrekken mislukt",
-      "displayNameUpdateFailed": "Weergavenaam bijwerken mislukt",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Vertrouwensscores herstellen mislukt",
       "routingUpdateFailed": "Routering bijwerken mislukt",
       "clipboardFailed": "Kopiëren naar klembord mislukt",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "Niet gelukt bestemming op te slaan: {{error}}",
       "destinationDeleteFailed": "Niet gelukt bestemming te verwijderen: {{error}}",
       "destinationTestFailed": "Test niet geslaagd: {{error}}",
-      "destinationInUse": "Nog in gebruik door: {{rules}}"
+      "destinationInUse": "Nog in gebruik door: {{rules}}",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
