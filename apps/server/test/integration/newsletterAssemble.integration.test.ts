@@ -6,10 +6,15 @@
  */
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
 import { seedBasicOwner } from '@tracearr/test-utils';
 import { db } from '../../src/db/client.js';
 import { libraryItems, servers } from '../../src/db/schema.js';
-import { loadItemRows, loadWindowItems } from '../../src/services/newsletters/assemble.js';
+import {
+  assembleDigest,
+  loadItemRows,
+  loadWindowItems,
+} from '../../src/services/newsletters/assemble.js';
 
 const START = new Date('2026-08-26T00:00:00Z');
 const END = new Date('2026-09-02T00:00:00Z');
@@ -223,5 +228,90 @@ describe('loadItemRows', () => {
     expect(rows).toEqual([]);
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+});
+
+describe('assembleDigest mirrors', () => {
+  it('collapses a title on two servers into one card with the first scoped server first and the other as a mirror, and never collapses a null media id', async () => {
+    const seeded = await seedBasicOwner();
+    const [attic] = await db
+      .insert(servers)
+      .values({ name: 'Attic', type: 'plex', url: 'http://attic:32400', token: 'tok' })
+      .returning({ id: servers.id });
+    const atticId = attic!.id;
+    const heat = randomUUID();
+    await db.insert(libraryItems).values([
+      {
+        serverId: seeded.serverId,
+        libraryId: '1',
+        ratingKey: 'a-heat',
+        title: 'Heat',
+        mediaType: 'movie',
+        mediaId: heat,
+        createdAt: inside,
+        firstSeenAt: inside,
+      },
+      {
+        serverId: atticId,
+        libraryId: '1',
+        ratingKey: 'b-heat',
+        title: 'Heat',
+        mediaType: 'movie',
+        mediaId: heat,
+        createdAt: inside,
+        firstSeenAt: inside,
+      },
+      {
+        serverId: seeded.serverId,
+        libraryId: '1',
+        ratingKey: 'a-alien',
+        title: 'Alien',
+        mediaType: 'movie',
+        mediaId: null,
+        createdAt: inside,
+        firstSeenAt: inside,
+      },
+      {
+        serverId: atticId,
+        libraryId: '1',
+        ratingKey: 'b-alien',
+        title: 'Alien',
+        mediaType: 'movie',
+        mediaId: null,
+        createdAt: inside,
+        firstSeenAt: inside,
+      },
+    ]);
+    const window = { start: START, end: END };
+    const sections = { ...DEFAULT_NEWSLETTER_SECTIONS, music: { enabled: false, max: 8 } };
+
+    const both = await assembleDigest(
+      { scope: { serverIds: [atticId, seeded.serverId], libraries: [] }, sections },
+      window,
+      { posters: false }
+    );
+    const cards = both.data.movies.map((m) => [m.title, m.serverId, m.mirrors]);
+    expect(cards.filter(([title]) => title === 'Heat')).toEqual([
+      ['Heat', atticId, [{ serverId: seeded.serverId, ratingKey: 'a-heat' }]],
+    ]);
+    expect(
+      cards
+        .filter(([title]) => title === 'Alien')
+        .map(([, serverId]) => serverId)
+        .sort()
+    ).toEqual([atticId, seeded.serverId].sort());
+    expect(both.data.counts.movies).toBe(3);
+    expect(both.posters).toEqual({});
+
+    const atticOnly = await assembleDigest(
+      { scope: { serverIds: [atticId], libraries: [] }, sections },
+      window,
+      { posters: false }
+    );
+    // The two Attic rows share a first-seen instant, so their order is not defined; sort before comparing.
+    expect(atticOnly.data.movies.map((m) => [m.ratingKey, m.mirrors]).sort()).toEqual([
+      ['b-alien', []],
+      ['b-heat', []],
+    ]);
   });
 });

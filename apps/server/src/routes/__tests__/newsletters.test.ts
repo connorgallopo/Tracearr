@@ -488,6 +488,7 @@ describe('newsletter routes', () => {
             mediaId: null,
             imdbId: null,
             thumbPath: '/t',
+            mirrors: [],
             title: 'Heat',
             year: 1995,
             genres: [],

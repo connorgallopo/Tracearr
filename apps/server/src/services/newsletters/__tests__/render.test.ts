@@ -97,6 +97,7 @@ describe('buildDigestInput', () => {
     mediaId: 'media-9',
     imdbId: 'tt0468569',
     thumbPath: null,
+    mirrors: [],
     kind: 'movie' as const,
     title: 'The Dark Knight',
     year: 2008,
@@ -115,6 +116,7 @@ describe('buildDigestInput', () => {
           mediaId: 'media-1',
           imdbId: 'tt0113277',
           thumbPath: '/t',
+          mirrors: [],
           title: 'Heat',
           year: 1995,
           genres: ['Crime', 'Drama'],
@@ -228,6 +230,7 @@ describe('buildDigestInput', () => {
           mediaId: null,
           imdbId: null,
           thumbPath: null,
+          mirrors: [],
           title: 'Chernobyl',
           year: 2019,
           seasons: [
@@ -417,6 +420,7 @@ describe('buildDigestInput', () => {
       mediaId: null,
       imdbId: null,
       thumbPath: '/dummy',
+      mirrors: [],
       title: 'Dummy',
       year: 1994,
       trackCount: 11,
@@ -434,6 +438,7 @@ describe('buildDigestInput', () => {
           mediaId: null,
           imdbId: null,
           thumbPath: null,
+          mirrors: [],
           name: 'Portishead',
           albums: [album, { ...album, cardId: 'al2', title: 'Third' }],
         },
@@ -470,6 +475,83 @@ describe('buildDigestInput', () => {
     expect(input.moreWatched).toBe(0);
     expect(input.artists[0]?.posterRef).toBe('poster:al1');
     expect(input.mostWatched[0]?.posterRef).toBe('poster:w1');
+  });
+
+  it('links every server a collapsed card exists on and names them all on the meta line', () => {
+    const serversById = new Map<string, ServerLink>([
+      [
+        's1',
+        {
+          id: 's1',
+          name: 'Basement',
+          type: 'plex',
+          url: 'http://plex.local',
+          machineIdentifier: 'mach-1',
+          publicUrl: null,
+        },
+      ],
+      [
+        's2',
+        {
+          id: 's2',
+          name: 'Attic',
+          type: 'jellyfin',
+          url: 'http://10.0.0.5:8096',
+          machineIdentifier: null,
+          publicUrl: 'https://jellyfin.example.com',
+        },
+      ],
+    ]);
+    const data: DigestData = {
+      movies: [
+        {
+          cardId: 'm1',
+          serverId: 's1',
+          serverName: 'Basement',
+          serverType: 'plex',
+          ratingKey: '42',
+          mediaId: 'media-1',
+          imdbId: null,
+          thumbPath: null,
+          mirrors: [{ serverId: 's2', ratingKey: 'abc123' }],
+          title: 'Heat',
+          year: 1995,
+          genres: [],
+          addedAt: new Date(),
+        },
+      ],
+      shows: [],
+      artists: [],
+      mostWatched: [],
+      counts: { movies: 1, shows: 0, episodes: 0, albums: 0, mostWatched: 0 },
+      isEmpty: false,
+    };
+    const input = buildDigestInput(
+      data,
+      {},
+      {
+        subject: 'x',
+        intro: null,
+        outro: null,
+        windowStart: 'Aug 1, 2026',
+        windowEnd: 'Aug 8, 2026',
+        logoRef: null,
+        unsubscribeUrl: null,
+        viewUrl: null,
+        externalUrl: null,
+        tracearrLinks: false,
+        serversById,
+        memberSend: true,
+      }
+    );
+    expect(input.movies[0]?.links).toEqual([
+      {
+        label: 'Basement',
+        url: 'https://app.plex.tv/desktop/#!/server/mach-1/details?key=%2Flibrary%2Fmetadata%2F42',
+      },
+      { label: 'Attic', url: 'https://jellyfin.example.com/web/index.html#/details?id=abc123' },
+    ]);
+    expect(input.movies[0]?.serverName).toBe('Basement, Attic');
   });
 });
 

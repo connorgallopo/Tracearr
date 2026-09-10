@@ -83,7 +83,21 @@ export function substitutePosterRefs(
 
 const SERVER_TYPES = new Set<string>(['plex', 'jellyfin', 'emby']);
 
-/** Tracearr's own page when the owner turned links on and the URL is reachable, the item on its media server, and IMDb when the id is known. */
+/** The item on its media server: Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
+function serverItemLink(server: ServerLink, ratingKey: string): EmailLink | null {
+  if (!SERVER_TYPES.has(server.type) || !ratingKey) return null;
+  const baseUrl = server.type === 'plex' ? server.url : memberFacingUrl(server);
+  if (baseUrl === null) return null;
+  const url = buildMediaServerItemUrl({
+    serverType: server.type as ServerType,
+    baseUrl,
+    ratingKey,
+    machineIdentifier: server.machineIdentifier,
+  });
+  return url ? { label: server.name, url } : null;
+}
+
+/** Tracearr's own page when the owner turned links on and the URL is reachable, the item on every server that has it, and IMDb when the id is known. */
 export function digestLinks(
   card: DigestCard,
   externalUrl: string | null,
@@ -97,20 +111,10 @@ export function digestLinks(
       url: `${externalUrl.replace(/\/$/, '')}/media/${card.mediaId}`,
     });
   }
-  const server = serversById.get(card.serverId);
-  if (server && SERVER_TYPES.has(server.type) && card.ratingKey) {
-    // Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach.
-    const baseUrl = server.type === 'plex' ? server.url : memberFacingUrl(server);
-    const url =
-      baseUrl === null
-        ? null
-        : buildMediaServerItemUrl({
-            serverType: server.type as ServerType,
-            baseUrl,
-            ratingKey: card.ratingKey,
-            machineIdentifier: server.machineIdentifier,
-          });
-    if (url) links.push({ label: server.name, url });
+  for (const copy of [{ serverId: card.serverId, ratingKey: card.ratingKey }, ...card.mirrors]) {
+    const server = serversById.get(copy.serverId);
+    const link = server ? serverItemLink(server, copy.ratingKey) : null;
+    if (link) links.push(link);
   }
   if ((opts.imdb ?? true) && card.imdbId)
     links.push({ label: 'IMDb', url: `https://www.imdb.com/title/${card.imdbId}/` });
@@ -144,6 +148,10 @@ export function buildDigestInput(
     posters[card.cardId] ? `poster:${card.cardId}` : null;
   const links = (card: DigestCard) =>
     digestLinks(card, opts.externalUrl, opts.serversById, { tracearr: opts.tracearrLinks });
+  const serverName = (card: DigestCard): string =>
+    [card.serverName, ...card.mirrors.map((m) => opts.serversById.get(m.serverId)?.name)]
+      .filter((name): name is string => Boolean(name))
+      .join(', ');
   return {
     subject: opts.subject,
     intro: opts.intro,
@@ -156,7 +164,7 @@ export function buildDigestInput(
       year: m.year,
       posterRef: ref(m),
       genres: m.genres,
-      serverName: m.serverName,
+      serverName: serverName(m),
       links: links(m),
     })),
     shows: data.shows.map((s) => ({
@@ -173,7 +181,7 @@ export function buildDigestInput(
       })),
       moreSeasons: s.moreSeasons,
       episodeCount: s.episodeCount,
-      serverName: s.serverName,
+      serverName: serverName(s),
       links: links(s),
     })),
     artists: data.artists.map((a) => ({
@@ -186,7 +194,7 @@ export function buildDigestInput(
         year: al.year,
         trackCount: al.trackCount,
       })),
-      serverName: a.serverName,
+      serverName: serverName(a),
       links: links(a),
     })),
     mostWatched: data.mostWatched.map((w) => ({
@@ -196,7 +204,7 @@ export function buildDigestInput(
       year: w.year,
       plays: w.plays,
       posterRef: ref(w),
-      serverName: w.serverName,
+      serverName: serverName(w),
       links: digestLinks(w, opts.externalUrl, opts.serversById, {
         tracearr: opts.tracearrLinks,
         imdb: false,

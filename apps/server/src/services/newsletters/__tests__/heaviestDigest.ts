@@ -86,6 +86,7 @@ function card(n: number, thumb: boolean): DigestCard {
     mediaId: uuid(n + 1000),
     imdbId: `tt${String(1000000 + n).padStart(7, '0')}`,
     thumbPath: thumb ? jellyfinThumb(n) : null,
+    mirrors: [],
   };
 }
 

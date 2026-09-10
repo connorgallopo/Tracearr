@@ -19,6 +19,7 @@ vi.mock('../../stats/topContent.js', () => ({
 
 import {
   assembleDigest,
+  collapseMirrors,
   episodeRange,
   groupDigest,
   sectionItemCounts,
@@ -51,6 +52,7 @@ function row(over: Partial<LibraryItemRow>): LibraryItemRow {
     genres: null,
     imdbId: null,
     addedAt: at(n),
+    mirrors: [],
     ...over,
   };
 }
@@ -61,6 +63,25 @@ describe('episodeRange', () => {
     expect(episodeRange([5])).toBe('E05');
     expect(episodeRange([])).toBe('');
     expect(episodeRange([3, 3, 3])).toBe('E03');
+  });
+});
+
+describe('collapseMirrors', () => {
+  it('folds a title mirrored on two servers into the first-ranked copy with the other as a mirror, and leaves null media ids and same-server copies alone', () => {
+    const rank = (id: string) => ['srv-1', 'srv-2'].indexOf(id);
+    const rows = [
+      row({ serverId: 'srv-2', ratingKey: 'b-heat', mediaId: 'media-heat', title: 'Heat' }),
+      row({ serverId: 'srv-1', ratingKey: 'a-heat', mediaId: 'media-heat', title: 'Heat' }),
+      row({ serverId: 'srv-1', ratingKey: 'a-heat-4k', mediaId: 'media-heat', title: 'Heat' }),
+      row({ serverId: 'srv-2', ratingKey: 'b-alien', mediaId: null, title: 'Alien' }),
+      row({ serverId: 'srv-1', ratingKey: 'a-alien', mediaId: null, title: 'Alien' }),
+    ];
+    expect(collapseMirrors(rows, rank).map((r) => [r.serverId, r.ratingKey, r.mirrors])).toEqual([
+      ['srv-1', 'a-heat', [{ serverId: 'srv-2', ratingKey: 'b-heat' }]],
+      ['srv-1', 'a-heat-4k', []],
+      ['srv-2', 'b-alien', []],
+      ['srv-1', 'a-alien', []],
+    ]);
   });
 });
 

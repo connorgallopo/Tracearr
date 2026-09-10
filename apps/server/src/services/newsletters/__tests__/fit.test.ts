@@ -233,6 +233,7 @@ describe('renderDigestToFit', () => {
       mediaId: null,
       imdbId: null,
       thumbPath: null,
+      mirrors: [],
       title: 'Bonus Album',
       year: 2015,
       trackCount: 8,
@@ -249,6 +250,7 @@ describe('renderDigestToFit', () => {
       mediaId: null,
       imdbId: null,
       thumbPath: null,
+      mirrors: [],
       name: 'No Albums Band',
       albums: [] as DigestData['artists'][number]['albums'],
     };

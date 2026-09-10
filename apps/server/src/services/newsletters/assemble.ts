@@ -11,6 +11,12 @@ import { posterVersionFor, proxyImage } from '../imageProxy.js';
 import { topWatched, type TopWatchedRow } from '../stats/topContent.js';
 import { libraryPairs } from './scopeSql.js';
 
+/** Another server's copy of the same title, folded into one card with a link of its own. */
+export interface MirrorCopy {
+  serverId: string;
+  ratingKey: string;
+}
+
 export interface LibraryItemRow {
   id: string;
   serverId: string;
@@ -33,6 +39,7 @@ export interface LibraryItemRow {
   genres: string[] | null;
   imdbId: string | null;
   addedAt: Date;
+  mirrors: MirrorCopy[];
 }
 
 /** What every card needs to build links and resolve a poster. */
@@ -45,6 +52,7 @@ export interface DigestCard {
   mediaId: string | null;
   imdbId: string | null;
   thumbPath: string | null;
+  mirrors: MirrorCopy[];
 }
 
 export interface DigestSeasonGroup {
@@ -116,6 +124,7 @@ function cardOf(row: LibraryItemRow, cardId = row.id): DigestCard {
     mediaId: row.mediaId,
     imdbId: row.imdbId,
     thumbPath: row.thumbPath,
+    mirrors: row.mirrors,
   };
 }
 
@@ -147,6 +156,7 @@ function groupShows(rows: LibraryItemRow[]): ShowAccumulator[] {
           thumbPath: null,
           mediaId: null,
           imdbId: null,
+          mirrors: [],
         },
         title,
         year: null,
@@ -218,6 +228,7 @@ function groupArtists(rows: LibraryItemRow[]): ArtistAccumulator[] {
           thumbPath: null,
           mediaId: null,
           imdbId: null,
+          mirrors: [],
         },
         name,
         addedAt: row.addedAt,
@@ -396,7 +407,51 @@ function mapItemRow(r: RawItemRow): LibraryItemRow {
     genres: r.genres,
     imdbId: r.imdb_id,
     addedAt: new Date(r.added_at),
+    mirrors: [],
   };
+}
+
+/** Position in the newsletter's server list; a server the list does not name sorts last. */
+export function serverRank(serverIds: readonly string[]): (serverId: string) => number {
+  return (serverId) => {
+    const i = serverIds.indexOf(serverId);
+    return i === -1 ? serverIds.length : i;
+  };
+}
+
+/** One row per (media type, media id) across servers: the copy on the first-ranked server is kept with the others as mirrors; a null media id and a second copy on the same server stand alone. */
+export function collapseMirrors(
+  rows: LibraryItemRow[],
+  rank: (serverId: string) => number
+): LibraryItemRow[] {
+  const groups = new Map<string, LibraryItemRow[]>();
+  for (const row of rows) {
+    if (row.mediaId === null) continue;
+    const key = `${row.mediaType}:${row.mediaId}`;
+    const list = groups.get(key) ?? [];
+    list.push(row);
+    groups.set(key, list);
+  }
+  const replaced = new Map<LibraryItemRow, LibraryItemRow>();
+  const dropped = new Set<LibraryItemRow>();
+  for (const list of groups.values()) {
+    if (list.length < 2) continue;
+    const [first, ...rest] = [...list].sort((a, b) => rank(a.serverId) - rank(b.serverId)) as [
+      LibraryItemRow,
+      ...LibraryItemRow[],
+    ];
+    const mirrored = new Set([first.serverId]);
+    const mirrors: MirrorCopy[] = [];
+    for (const copy of rest) {
+      if (copy.serverId === first.serverId) continue;
+      dropped.add(copy);
+      if (mirrored.has(copy.serverId)) continue;
+      mirrored.add(copy.serverId);
+      mirrors.push({ serverId: copy.serverId, ratingKey: copy.ratingKey });
+    }
+    replaced.set(first, { ...first, mirrors: [...first.mirrors, ...mirrors] });
+  }
+  return rows.flatMap((row) => (dropped.has(row) ? [] : [replaced.get(row) ?? row]));
 }
 
 /** Items first seen inside the window; the server-reported added date only decides the card's display order. */
@@ -499,9 +554,11 @@ async function warmPosters(cards: DigestCard[]): Promise<Record<string, PosterRe
 
 export async function assembleDigest(
   newsletter: { scope: NewsletterScope; sections: NewsletterSections },
-  window: { start: Date; end: Date }
+  window: { start: Date; end: Date },
+  opts: { posters?: boolean } = {}
 ): Promise<{ data: DigestData; posters: Record<string, PosterRef> }> {
-  const rows = await loadWindowItems(newsletter.scope, window);
+  const rank = serverRank(newsletter.scope.serverIds);
+  const rows = collapseMirrors(await loadWindowItems(newsletter.scope, window), rank);
   let showRows: LibraryItemRow[] = [];
   if (newsletter.sections.shows.enabled) {
     const missingShows = new Map<string, { serverId: string; ratingKey: string }>();
@@ -520,7 +577,7 @@ export async function assembleDigest(
     }
     showRows = await loadItemRows([...missingShows.values()], 'show');
   }
-  const data = groupDigest([...rows, ...showRows], newsletter.sections);
+  const data = groupDigest(collapseMirrors([...rows, ...showRows], rank), newsletter.sections);
 
   if (newsletter.sections.mostWatched.enabled) {
     const top = await topWatched({
@@ -554,6 +611,7 @@ export async function assembleDigest(
           mediaId: item?.mediaId ?? null,
           imdbId: item?.imdbId ?? null,
           thumbPath: t.serverId && t.thumbPath ? t.thumbPath : null,
+          mirrors: [],
           kind,
           title: t.title,
           year: t.year,
@@ -569,11 +627,9 @@ export async function assembleDigest(
 
   // An artist card shows its first album's cover; a most-watched row carries its session's thumb.
   const covers = data.artists.flatMap((artist) => (artist.albums[0] ? [artist.albums[0]] : []));
-  const posters = await warmPosters([
-    ...data.movies,
-    ...data.shows,
-    ...covers,
-    ...data.mostWatched,
-  ]);
+  const posters =
+    opts.posters === false
+      ? {}
+      : await warmPosters([...data.movies, ...data.shows, ...covers, ...data.mostWatched]);
   return { data, posters };
 }
