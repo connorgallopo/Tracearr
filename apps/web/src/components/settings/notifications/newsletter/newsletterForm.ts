@@ -3,6 +3,7 @@ import {
   DEFAULT_NEWSLETTER_SECTIONS,
   DEFAULT_NEWSLETTER_SUBJECT,
   createNewsletterSchema,
+  needsSenderName,
   type CreateNewsletterInput,
   type Newsletter,
   type NewsletterScope,
@@ -95,16 +96,27 @@ export function diffPatch(
   return patch as UpdateNewsletterInput;
 }
 
-/** The shared create schema is the one source of rules; the first issue per top-level field is what the form shows. */
-export function validateForm(state: NewsletterFormState): FieldErrors {
+/** The shared create schema is the one source of rules; the first issue per top-level field is what the form shows. The sender-name rule needs the resolved server count, which only the editor has. */
+export function validateForm(
+  state: NewsletterFormState,
+  opts?: { scopedServerCount: number; senderNameRequired: string }
+): FieldErrors {
   const parsed = createNewsletterSchema.safeParse(state);
-  if (parsed.success) return {};
   const errors: FieldErrors = {};
-  for (const issue of parsed.error.issues) {
-    const key = issue.path[0];
-    if (typeof key !== 'string') continue;
-    const field = key as keyof NewsletterFormState;
-    if (errors[field] === undefined) errors[field] = issue.message;
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0];
+      if (typeof key !== 'string') continue;
+      const field = key as keyof NewsletterFormState;
+      if (errors[field] === undefined) errors[field] = issue.message;
+    }
+  }
+  if (
+    opts &&
+    errors.senderName === undefined &&
+    needsSenderName(state.senderName, opts.scopedServerCount)
+  ) {
+    errors.senderName = opts.senderNameRequired;
   }
   return errors;
 }

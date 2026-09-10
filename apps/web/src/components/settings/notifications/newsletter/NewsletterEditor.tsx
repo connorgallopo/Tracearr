@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { RichTextChange } from '@/components/ui/rich-text-normalize';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
-import { useNewsletter } from '@/hooks/queries';
+import { useNewsletter, useServers } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { ContentFields } from './ContentFields';
@@ -29,6 +29,7 @@ import { useNewsletterSave } from './useNewsletterSave';
 import {
   defaultFormState,
   prefillFromRouterState,
+  scopedServers,
   seedFromNewsletter,
   validateForm,
   type NewsletterFormState,
@@ -56,7 +57,11 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const [richTextErrors, setRichTextErrors] = useState<RichTextErrors>({});
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const mode = newsletter ? 'edit' : 'create';
-  const errors = validateForm(state);
+  const { data: servers } = useServers();
+  const errors = validateForm(state, {
+    scopedServerCount: scopedServers(state.scope, servers ?? []).length,
+    senderNameRequired: t('newsletters.editor.senderNameRequiredMulti'),
+  });
   const valid =
     Object.keys(errors).length === 0 && Object.values(richTextErrors).every((e) => e === undefined);
 

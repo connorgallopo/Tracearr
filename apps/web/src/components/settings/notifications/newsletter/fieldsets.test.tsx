@@ -183,6 +183,14 @@ describe('ContentFields', () => {
     expect(cap).toHaveValue('12');
     expect(cap).toHaveAttribute('max', '12');
   });
+
+  it('explains variants under the servers picker only when the scope covers several servers', () => {
+    const { unmount } = render(<ContentFields {...props()} />);
+    expect(screen.getByText('newsletters.editor.variantsNote')).toBeInTheDocument();
+    unmount();
+    render(<ContentFields {...props({ scope: { serverIds: ['s-2'], libraries: [] } })} />);
+    expect(screen.queryByText('newsletters.editor.variantsNote')).not.toBeInTheDocument();
+  });
 });
 
 describe('MessageFields', () => {

@@ -38,7 +38,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useLibraries, useServers } from '@/hooks/queries';
-import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
+import { NEWSLETTER_FIELD_IDS, scopedServers, type FieldsetProps } from './newsletterForm';
 
 const SECTIONS = ['movies', 'shows', 'music', 'mostWatched'] as const;
 const CAP: Record<(typeof SECTIONS)[number], number> = {
@@ -170,6 +170,9 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
           clearLabel={t('newsletters.editor.clear')}
           countLabel={(count) => t('newsletters.editor.serversSelected', { count })}
         />
+        {scopedServers(scope, servers ?? []).length > 1 && (
+          <FieldDescription>{t('newsletters.editor.variantsNote')}</FieldDescription>
+        )}
       </Field>
       <Field className="max-w-sm">
         <FieldLabel id={`${NEWSLETTER_FIELD_IDS.libraries}-label`}>

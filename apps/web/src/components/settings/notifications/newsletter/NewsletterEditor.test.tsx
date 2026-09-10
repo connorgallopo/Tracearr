@@ -20,7 +20,7 @@ const updateMutate = vi.fn();
 
 vi.mock('@/hooks/queries', () => ({
   useNewsletter: vi.fn(),
-  useServers: () => ({ data: [] }),
+  useServers: vi.fn(() => ({ data: [] })),
   useLibraries: () => ({ data: { data: [] }, isLoading: false }),
   useCreateNewsletter: () => ({ mutate: createMutate, isPending: false }),
   useUpdateNewsletter: () => ({ mutate: updateMutate, isPending: false }),
@@ -45,6 +45,7 @@ import {
   useNewsletter,
   useNewsletterRecipients,
   useNewsletterSends,
+  useServers,
   useSettings,
 } from '@/hooks/queries';
 
@@ -281,5 +282,28 @@ describe('NewsletterEditor save flows', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.cancel' }));
     expect(screen.getByLabelText('newsletters.editor.name')).toHaveValue('Fresh');
+  });
+
+  it('blocks the save with the sender-name error when two servers are in scope and no name is set', async () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        { id: 's-1', name: 'Basement', type: 'plex' },
+        { id: 's-2', name: 'Attic', type: 'jellyfin' },
+      ],
+    } as unknown as ReturnType<typeof useServers>);
+    vi.mocked(useNewsletter).mockReturnValue({
+      data: { ...row, senderName: null },
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletter>);
+    renderAt('/settings/notifications/newsletters/n-1');
+    expect(
+      await screen.findByText('newsletters.editor.senderNameRequiredMulti')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'newsletters.editor.save' })).toBeDisabled();
+    await userEvent.type(screen.getByLabelText('newsletters.editor.senderName'), 'Family');
+    expect(
+      screen.queryByText('newsletters.editor.senderNameRequiredMulti')
+    ).not.toBeInTheDocument();
   });
 });

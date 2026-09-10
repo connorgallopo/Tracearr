@@ -56,6 +56,14 @@ describe('newsletter form model', () => {
     expect(validateForm(seed)).toEqual({});
   });
 
+  it('requires a sender name once the scope resolves to more than one server', () => {
+    const seed = seedFromNewsletter(row);
+    const opts = { scopedServerCount: 2, senderNameRequired: 'Pick a name' };
+    expect(validateForm(seed, opts)).toEqual({ senderName: 'Pick a name' });
+    expect(validateForm({ ...seed, senderName: 'Family' }, opts)).toEqual({});
+    expect(validateForm(seed, { ...opts, scopedServerCount: 1 })).toEqual({});
+  });
+
   it('diffs only the keys that moved, by value', () => {
     const seed = seedFromNewsletter(row);
     expect(diffPatch(seed, { ...seed })).toEqual({});
