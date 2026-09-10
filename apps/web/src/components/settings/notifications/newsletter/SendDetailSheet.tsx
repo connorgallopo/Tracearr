@@ -6,7 +6,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Item, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item';
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from '@/components/ui/item';
 import {
   Sheet,
   SheetContent,
@@ -19,6 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { HtmlPreviewDialog } from '@/components/settings/shared/HtmlPreviewDialog';
 import { dateLabel } from '@/components/settings/shared/dateLabel';
 import { useNewsletterSend, useNewsletterSendHtml, useRetryFailedSend } from '@/hooks/queries';
+import { formatList } from '@/lib/listFormat';
 import { outcomeVariant, type OutcomeVariant } from '../newsletterFormat';
 import { windowLabel } from './previewSummary';
 
@@ -55,6 +63,18 @@ export function SendDetailSheet({
   const [snapshot, setSnapshot] = useState<NewsletterSendHtml | null>(null);
   const [snapshotOpen, setSnapshotOpen] = useState(false);
   const canRetry = data?.outcome === 'partial' || data?.outcome === 'failed';
+
+  const openSnapshot = (variantKey?: string) =>
+    sendId &&
+    html.mutate(
+      { id: newsletterId, sendId, ...(variantKey === undefined ? {} : { variantKey }) },
+      {
+        onSuccess: (body) => {
+          setSnapshot(body);
+          setSnapshotOpen(true);
+        },
+      }
+    );
 
   return (
     <Sheet open={sendId !== null} onOpenChange={onOpenChange}>
@@ -96,6 +116,43 @@ export function SendDetailSheet({
                   <AlertDescription>{data.error}</AlertDescription>
                 </Alert>
               )}
+              {data.variants.length > 1 && (
+                <ItemGroup className="gap-1">
+                  {data.variants.map((variant) => {
+                    const servers = formatList(i18n.language, variant.serverNames);
+                    return (
+                      <Item
+                        key={variant.key}
+                        role="listitem"
+                        variant="outline"
+                        size="sm"
+                        aria-label={t('newsletters.history.variant', { servers })}
+                      >
+                        <ItemContent>
+                          <ItemTitle>{t('newsletters.history.variant', { servers })}</ItemTitle>
+                          <ItemDescription>
+                            {t('newsletters.history.recipients', { count: variant.recipientCount })}
+                            {variant.empty && ` · ${t('newsletters.history.variantEmpty')}`}
+                          </ItemDescription>
+                        </ItemContent>
+                        {!variant.empty && (
+                          <ItemActions>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={!data.hasSnapshot || html.isPending}
+                              aria-label={t('newsletters.history.openVariantSnapshot', { servers })}
+                              onClick={() => openSnapshot(variant.key)}
+                            >
+                              {t('newsletters.history.openSnapshot')}
+                            </Button>
+                          </ItemActions>
+                        )}
+                      </Item>
+                    );
+                  })}
+                </ItemGroup>
+              )}
               {data.recipients.length === 0 ? (
                 <EmptyState icon={Users} title={t('newsletters.history.recipientsEmpty')} />
               ) : (
@@ -132,24 +189,15 @@ export function SendDetailSheet({
           {data && !data.hasSnapshot && (
             <span className="text-muted-foreground text-sm">{t('newsletters.history.pruned')}</span>
           )}
-          <Button
-            variant="outline"
-            disabled={!data?.hasSnapshot || html.isPending}
-            onClick={() =>
-              sendId &&
-              html.mutate(
-                { id: newsletterId, sendId },
-                {
-                  onSuccess: (body) => {
-                    setSnapshot(body);
-                    setSnapshotOpen(true);
-                  },
-                }
-              )
-            }
-          >
-            {t('newsletters.history.openSnapshot')}
-          </Button>
+          {(data?.variants.length ?? 0) <= 1 && (
+            <Button
+              variant="outline"
+              disabled={!data?.hasSnapshot || html.isPending}
+              onClick={() => openSnapshot()}
+            >
+              {t('newsletters.history.openSnapshot')}
+            </Button>
+          )}
           {canRetry && (
             <Button
               disabled={retry.isPending || !data?.hasSnapshot}

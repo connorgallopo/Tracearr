@@ -124,6 +124,57 @@ describe('SendDetailSheet', () => {
     expect(screen.queryAllByRole('listitem')).toHaveLength(0);
   });
 
+  it('lists several variants with their counts, opens the snapshot of one, and says which got nothing', async () => {
+    const zero = { movies: 0, shows: 0, albums: 0, mostWatched: 0 };
+    renderSheet({
+      variants: [
+        {
+          key: 's-1,s-2',
+          serverIds: ['s-1', 's-2'],
+          serverNames: ['Attic', 'Basement'],
+          recipientCount: 1,
+          trimmed: zero,
+          bytes: 900,
+          empty: false,
+        },
+        {
+          key: 's-2',
+          serverIds: ['s-2'],
+          serverNames: ['Attic'],
+          recipientCount: 3,
+          trimmed: zero,
+          bytes: 0,
+          empty: true,
+        },
+      ],
+    });
+    const both = screen.getByRole('listitem', {
+      name: 'newsletters.history.variant:{"servers":"Attic and Basement"}',
+    });
+    expect(both).toHaveTextContent('newsletters.history.recipients:{"count":1}');
+    const attic = screen.getByRole('listitem', {
+      name: 'newsletters.history.variant:{"servers":"Attic"}',
+    });
+    expect(attic).toHaveTextContent('newsletters.history.variantEmpty');
+    expect(
+      screen.queryByRole('button', {
+        name: 'newsletters.history.openVariantSnapshot:{"servers":"Attic"}',
+      })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'newsletters.history.openSnapshot' })
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'newsletters.history.openVariantSnapshot:{"servers":"Attic and Basement"}',
+      })
+    );
+    expect(htmlMutate).toHaveBeenCalledWith(
+      { id: 'n-1', sendId: 's-1', variantKey: 's-1,s-2' },
+      expect.anything()
+    );
+  });
+
   it('disables the snapshot when pruned and hides retry for a clean send', () => {
     renderSheet({ hasSnapshot: false, outcome: 'sent' });
     expect(screen.getByRole('button', { name: 'newsletters.history.openSnapshot' })).toBeDisabled();

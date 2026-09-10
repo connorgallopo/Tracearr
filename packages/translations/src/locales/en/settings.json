@@ -795,6 +795,9 @@
       "attempts": "{{count}} attempts",
       "unknownHelp": "The server stopped answering after the message went out; it is never retried on its own.",
       "openSnapshot": "Open snapshot",
+      "variant": "Members on {{servers}}",
+      "variantEmpty": "Nothing new for these servers; nobody in this group was mailed.",
+      "openVariantSnapshot": "Open the snapshot for {{servers}}",
       "snapshotTitle": "Snapshot",
       "pruned": "The snapshot was pruned after 90 days; nothing can be viewed or resent.",
       "retryFailed": "Retry failed"
