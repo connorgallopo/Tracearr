@@ -536,7 +536,7 @@ describe('renderDigest', () => {
       links: [],
     };
     const single = await renderDigest(base({ movies: [movie], mostWatched: [alien] }), branding);
-    expect(single.text).toContain('Crime, Drama, Thriller');
+    expect(single.text).toContain('Crime · Drama · Thriller');
     expect(single.text).not.toContain('Action');
     expect(single.text).not.toContain('Basement Plex · Crime');
     expect(single.text).toContain('Alien (1979) · 7 plays');
@@ -551,7 +551,7 @@ describe('renderDigest', () => {
       }),
       branding
     );
-    expect(multi.text).toContain('Basement Plex · Crime, Drama, Thriller');
+    expect(multi.text).toContain('Basement Plex · Crime · Drama · Thriller');
     expect(multi.text).toContain('Alien (1979) · 7 plays');
     expect(multi.text).toContain('Attic');
   });
@@ -673,7 +673,7 @@ describe('renderDigest', () => {
     expect(out.html).toContain('alt="Portishead"');
     expect(out.html).toContain('src="poster:w1"');
     expect(out.html).toContain('alt="Alien"');
-    expect(out.html.match(/width="80"/g)).toHaveLength(2);
+    expect(out.html.match(/width="100"/g)).toHaveLength(2);
   });
 
   it('renders an artist card with no warmed cover without an image', async () => {
@@ -693,6 +693,203 @@ describe('renderDigest', () => {
       branding
     );
     expect(out.html).not.toContain('<img');
+  });
+
+  it('heads each section with its window total', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: null,
+            genres: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreMovies: 11,
+        shows: [
+          {
+            id: 's1',
+            title: 'The Wire',
+            year: 2002,
+            posterRef: null,
+            seasons: [],
+            moreSeasons: 0,
+            episodeCount: 0,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: null,
+            albums: [
+              { id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 },
+              { id: 'al2', title: 'Third', year: 2008, trackCount: 11 },
+            ],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreAlbums: 1,
+        mostWatched: [
+          {
+            id: 'w1',
+            kind: 'movie',
+            title: 'Alien',
+            year: 1979,
+            plays: 7,
+            posterRef: null,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+        moreWatched: 4,
+      }),
+      branding
+    );
+    expect(out.html).toMatch(/<h2[^>]*>Movies<\/h2>/);
+    expect(out.html).toContain('>12 new</p>');
+    expect(out.html).toMatch(/<h2[^>]*>TV<\/h2>/);
+    expect(out.html).toContain('>1 new</p>');
+    expect(out.html).toMatch(/<h2[^>]*>Music<\/h2>/);
+    expect(out.html).toContain('>3 new</p>');
+    expect(out.html).toMatch(/<h2[^>]*>Most watched<\/h2>/);
+    expect(out.html).toContain('>top 1</p>');
+    expect(out.html).toContain('+11 more movies');
+    expect(out.html).toContain('+1 more album');
+    expect(out.html).toContain('+4 more titles');
+  });
+
+  it('sets the year beside the title in the muted tone and keeps the plain text as title (year)', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: 1995,
+            posterRef: 'poster:m1',
+            genres: ['Crime'],
+            serverName: 'Basement Plex',
+            links,
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).toMatch(/Heat<span style="color:#9aa3ad;font-weight:400"> \(1995\)<\/span>/);
+    expect(out.text).toContain('Heat (1995)');
+    expect(out.html).toContain('<img alt="Heat" height="150" src="poster:m1"');
+    expect(out.html).toContain('width:112px');
+  });
+
+  it('spreads a card without a poster across the full width instead of leaving an empty gutter', async () => {
+    const out = await renderDigest(
+      base({
+        movies: [
+          {
+            id: 'm1',
+            title: 'Heat',
+            year: null,
+            posterRef: null,
+            genres: [],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.html).not.toContain('<img');
+    expect(out.html).not.toContain('width:112px');
+    expect(out.text).toContain('Heat');
+    expect(out.text).not.toContain('Heat (');
+  });
+
+  it('counts the new episodes on the show meta line and groups the seasons in one box', async () => {
+    const out = await renderDigest(
+      base({
+        shows: [
+          {
+            id: 's1',
+            title: 'The Wire',
+            year: 2002,
+            posterRef: null,
+            seasons: [
+              { number: 1, title: 'Season 1', episodeRange: '', episodeCount: 13, whole: true },
+              {
+                number: 2,
+                title: 'Season 2',
+                episodeRange: 'E01-E06',
+                episodeCount: 6,
+                whole: false,
+              },
+            ],
+            moreSeasons: 0,
+            episodeCount: 19,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.text).toContain('19 new episodes');
+    expect(out.text.indexOf('19 new episodes')).toBeLessThan(out.text.indexOf('Season 1'));
+    expect(out.html.match(/background-color:#23272f/g)).toHaveLength(1);
+    expect(out.text).toContain('Season 1, all 13 episodes');
+    expect(out.text).toContain('Season 2 · E01-E06 (6 episodes)');
+    const one = await renderDigest(
+      base({
+        shows: [
+          {
+            id: 's2',
+            title: 'Andor',
+            year: 2022,
+            posterRef: null,
+            seasons: [
+              { number: 2, title: 'Season 2', episodeRange: 'E07', episodeCount: 1, whole: false },
+            ],
+            moreSeasons: 0,
+            episodeCount: 1,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(one.text).toContain('1 new episode');
+    expect(one.text).not.toContain('1 new episodes');
+  });
+
+  it('writes each album as title, year and track count on its own line', async () => {
+    const out = await renderDigest(
+      base({
+        artists: [
+          {
+            id: 'a1',
+            name: 'Portishead',
+            posterRef: null,
+            albums: [
+              { id: 'al1', title: 'Dummy', year: 1994, trackCount: 11 },
+              { id: 'al2', title: 'Roseland NYC Live', year: null, trackCount: 1 },
+            ],
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.text).toContain('Dummy (1994) · 11 tracks');
+    expect(out.text).toContain('Roseland NYC Live · 1 track');
   });
 
   const COPY = {

@@ -1,29 +1,33 @@
 import { Heading, Hr, Img, Link, Text } from '@react-email/components';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Cell } from '../components/Cell.js';
 import { Columns } from '../components/Columns.js';
 import { Document } from '../components/Document.js';
 import { RichText } from '../components/RichText.js';
-import { colors, heading, link, muted, paragraph } from '../styles.js';
+import { colors, link } from '../styles.js';
 import type {
   DigestArtist,
   DigestInput,
   DigestMovie,
+  DigestSeason,
   DigestShow,
   DigestWatched,
   EmailBranding,
   EmailLink,
 } from '../types.js';
 
-const titleStyle = { ...paragraph, fontWeight: 600, margin: '0 0 2px' } as const;
-const lineStyle = { ...paragraph, margin: '0 0 2px' } as const;
-const posterBodyTable = {
-  border: `1px solid ${colors.border}`,
-  borderRadius: '6px',
-  marginBottom: '8px',
-} as const;
-const posterCell = { width: '80px', padding: '10px 12px 10px 10px' } as const;
-const bodyCell = { padding: '10px 10px 10px 0' } as const;
+const cardTable: CSSProperties = {
+  border: `1px solid ${colors.edge}`,
+  borderRadius: '10px',
+  marginBottom: '10px',
+};
+const posterCell: CSSProperties = { width: '112px', padding: '12px 0 12px 12px' };
+const bodyCell: CSSProperties = { padding: '12px 14px', verticalAlign: 'middle' };
+const soloCell: CSSProperties = {
+  ...bodyCell,
+  backgroundColor: colors.card,
+  borderRadius: '10px',
+};
 
 const h1: CSSProperties = {
   color: colors.text,
@@ -49,6 +53,35 @@ const summary: CSSProperties = {
   marginTop: 0,
   marginBottom: '14px',
 };
+const title: CSSProperties = {
+  color: colors.text,
+  fontSize: '17px',
+  lineHeight: '22px',
+  fontWeight: 600,
+  marginTop: 0,
+  marginBottom: '3px',
+};
+const yearMark: CSSProperties = { color: colors.muted, fontWeight: 400 };
+const meta: CSSProperties = {
+  color: colors.muted,
+  fontSize: '12px',
+  lineHeight: '18px',
+  marginTop: 0,
+  marginBottom: '2px',
+};
+const listLine: CSSProperties = {
+  color: colors.soft,
+  fontSize: '13px',
+  lineHeight: '19px',
+  marginTop: 0,
+  marginBottom: '2px',
+};
+const groupTable: CSSProperties = { marginTop: '8px' };
+const groupCell: CSSProperties = {
+  backgroundColor: colors.raised,
+  borderRadius: '6px',
+  padding: '8px 10px',
+};
 const footNote: CSSProperties = {
   color: colors.muted,
   fontSize: '12px',
@@ -57,56 +90,25 @@ const footNote: CSSProperties = {
   marginBottom: '6px',
 };
 
-function Poster({ src, alt }: { src: string | null; alt: string }) {
-  if (!src) return null;
-  return (
-    <Img
-      src={src}
-      alt={alt}
-      width="80"
-      height="120"
-      style={{ display: 'block', borderRadius: '4px' }}
-    />
-  );
-}
+const sectionLabel = (accent: string): CSSProperties => ({
+  color: accent,
+  fontSize: '12px',
+  lineHeight: '16px',
+  fontWeight: 600,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  marginTop: 0,
+  marginBottom: 0,
+});
 
-function Links({ links, accent }: { links: EmailLink[]; accent: string }) {
-  if (links.length === 0) return null;
-  return (
-    <Text style={{ ...muted, marginTop: '4px' }}>
-      {links.map((l, i) => (
-        <span key={l.url}>
-          {i > 0 && ' · '}
-          <Link href={l.url} style={link(accent)}>
-            {l.label}
-          </Link>
-        </span>
-      ))}
-    </Text>
-  );
-}
-
-function More({ count, noun }: { count: number; noun: string }) {
-  if (count <= 0) return null;
-  return <Text style={muted}>{`+${count} more ${count === 1 ? noun : `${noun}s`}`}</Text>;
-}
-
-function withYear(title: string, year: number | null): string {
-  return year === null ? title : `${title} (${year})`;
-}
-
-function SectionHeading({ text, accent }: { text: string; accent: string }) {
-  return <Text style={{ ...heading(accent), fontSize: '16px', margin: '16px 0 8px' }}>{text}</Text>;
-}
+const plural = (count: number, noun: string): string =>
+  `${count} ${count === 1 ? noun : `${noun}s`}`;
 
 /** "A", "A and B", "A, B and C". */
 function listNames(names: readonly string[]): string {
   if (names.length <= 1) return names[0] ?? '';
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
 }
-
-const plural = (count: number, noun: string): string =>
-  `${count} ${count === 1 ? noun : `${noun}s`}`;
 
 interface Tally {
   movies: number;
@@ -149,10 +151,105 @@ function summaryLine(input: DigestInput, counts: Tally): string {
     .join(' · ');
 }
 
+/** 2:3 at the given width; the raised background is what a blocked-images client shows in its place. */
+function Poster({ src, alt, width }: { src: string; alt: string; width: number }) {
+  return (
+    <Img
+      src={src}
+      alt={alt}
+      width={String(width)}
+      height={String(width * 1.5)}
+      style={{ display: 'block', borderRadius: '6px', backgroundColor: colors.raised }}
+    />
+  );
+}
+
+function Year({ year }: { year: number | null }) {
+  if (year === null) return null;
+  return <span style={yearMark}>{` (${year})`}</span>;
+}
+
 function Meta({ parts }: { parts: (string | null)[] }) {
   const shown = parts.filter((p): p is string => p !== null && p !== '');
   if (shown.length === 0) return null;
-  return <Text style={{ ...muted, margin: '0 0 2px' }}>{shown.join(' · ')}</Text>;
+  return <Text style={meta}>{shown.join(' · ')}</Text>;
+}
+
+function Links({ links, accent }: { links: EmailLink[]; accent: string }) {
+  if (links.length === 0) return null;
+  return (
+    <Text style={{ ...meta, marginTop: '6px' }}>
+      {links.map((l, i) => (
+        <span key={l.url}>
+          {i > 0 && ' · '}
+          <Link href={l.url} style={link(accent)}>
+            {l.label}
+          </Link>
+        </span>
+      ))}
+    </Text>
+  );
+}
+
+function More({ count, noun }: { count: number; noun: string }) {
+  if (count <= 0) return null;
+  return <Text style={{ ...footNote, marginBottom: '4px' }}>{`+${plural(count, noun)}`}</Text>;
+}
+
+/** Fixed 55/45 so the accent rule is the same length in every section. */
+function SectionHead({ label, count, accent }: { label: string; count: string; accent: string }) {
+  return (
+    <Columns
+      tableStyle={{ marginTop: '26px', marginBottom: '10px' }}
+      leftStyle={{
+        backgroundColor: colors.page,
+        borderTop: `2px solid ${accent}`,
+        padding: '10px 0 0',
+        width: '55%',
+      }}
+      rightStyle={{
+        backgroundColor: colors.page,
+        borderTop: `1px solid ${colors.border}`,
+        padding: '10px 0 0',
+        textAlign: 'right',
+        width: '45%',
+      }}
+      left={
+        <Heading as="h2" style={sectionLabel(accent)}>
+          {label}
+        </Heading>
+      }
+      right={<Text style={{ ...meta, marginBottom: 0 }}>{count}</Text>}
+    />
+  );
+}
+
+/** A card body next to its poster, or across the full width when there is no poster to show. */
+function Card({
+  posterRef,
+  alt,
+  children,
+}: {
+  posterRef: string | null;
+  alt: string;
+  children: ReactNode;
+}) {
+  if (!posterRef) {
+    return (
+      <Cell tableStyle={cardTable} style={soloCell}>
+        {children}
+      </Cell>
+    );
+  }
+  return (
+    <Columns
+      tableStyle={cardTable}
+      leftStyle={posterCell}
+      rightStyle={bodyCell}
+      left={<Poster src={posterRef} alt={alt} width={100} />}
+      right={children}
+    />
+  );
 }
 
 function MovieCard({
@@ -165,22 +262,27 @@ function MovieCard({
   multiServer: boolean;
 }) {
   return (
-    <Columns
-      tableStyle={posterBodyTable}
-      leftStyle={posterCell}
-      rightStyle={bodyCell}
-      left={<Poster src={item.posterRef} alt={item.title} />}
-      right={
-        <>
-          <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
-          <Meta
-            parts={[multiServer ? item.serverName : null, item.genres.slice(0, 3).join(', ')]}
-          />
-          <Links links={item.links} accent={accent} />
-        </>
-      }
-    />
+    <Card posterRef={item.posterRef} alt={item.title}>
+      <Text style={title}>
+        {item.title}
+        <Year year={item.year} />
+      </Text>
+      <Meta parts={[multiServer ? item.serverName : null, item.genres.slice(0, 3).join(' · ')]} />
+      <Links links={item.links} accent={accent} />
+    </Card>
   );
+}
+
+/** A season-level add event carries no episode count; an episode-by-episode one does. */
+function seasonLine(s: DigestSeason): string {
+  if (s.whole) {
+    return s.episodeCount > 0
+      ? `${s.title}, all ${plural(s.episodeCount, 'episode')}`
+      : `${s.title}, all episodes`;
+  }
+  const range = s.episodeRange ? ` · ${s.episodeRange}` : '';
+  const count = s.episodeCount > 0 ? ` (${plural(s.episodeCount, 'episode')})` : '';
+  return `${s.title}${range}${count}`;
 }
 
 function ShowCard({
@@ -193,32 +295,27 @@ function ShowCard({
   multiServer: boolean;
 }) {
   return (
-    <Columns
-      tableStyle={posterBodyTable}
-      leftStyle={posterCell}
-      rightStyle={bodyCell}
-      left={<Poster src={item.posterRef} alt={item.title} />}
-      right={
-        <>
-          <Text style={titleStyle}>{withYear(item.title, item.year)}</Text>
-          <Meta parts={[multiServer ? item.serverName : null]} />
-          {item.seasons.map((s) => (
-            <Text key={`${s.number ?? 'x'}-${s.title}`} style={lineStyle}>
-              {s.title}
-              {s.whole
-                ? s.episodeCount > 0
-                  ? `, all ${plural(s.episodeCount, 'episode')}`
-                  : ', all episodes'
-                : `${s.episodeRange ? ` · ${s.episodeRange}` : ''}${
-                    s.episodeCount > 0 ? ` (${plural(s.episodeCount, 'episode')})` : ''
-                  }`}
-            </Text>
-          ))}
-          <More count={item.moreSeasons} noun="season" />
-          <Links links={item.links} accent={accent} />
-        </>
-      }
-    />
+    <Card posterRef={item.posterRef} alt={item.title}>
+      <Text style={title}>
+        {item.title}
+        <Year year={item.year} />
+      </Text>
+      <Meta
+        parts={[
+          multiServer ? item.serverName : null,
+          item.episodeCount > 0 ? plural(item.episodeCount, 'new episode') : null,
+        ]}
+      />
+      <Cell tableStyle={groupTable} style={groupCell}>
+        {item.seasons.map((s) => (
+          <Text key={`${s.number ?? 'x'}-${s.title}`} style={listLine}>
+            {seasonLine(s)}
+          </Text>
+        ))}
+        <More count={item.moreSeasons} noun="more season" />
+      </Cell>
+      <Links links={item.links} accent={accent} />
+    </Card>
   );
 }
 
@@ -232,24 +329,17 @@ function ArtistCard({
   multiServer: boolean;
 }) {
   return (
-    <Columns
-      tableStyle={posterBodyTable}
-      leftStyle={posterCell}
-      rightStyle={bodyCell}
-      left={<Poster src={item.posterRef} alt={item.name} />}
-      right={
-        <>
-          <Text style={titleStyle}>{item.name}</Text>
-          <Meta parts={[multiServer ? item.serverName : null]} />
-          {item.albums.map((a) => (
-            <Text key={a.id} style={lineStyle}>
-              {withYear(a.title, a.year)} · {plural(a.trackCount, 'track')}
-            </Text>
-          ))}
-          <Links links={item.links} accent={accent} />
-        </>
-      }
-    />
+    <Card posterRef={item.posterRef} alt={item.name}>
+      <Text style={title}>{item.name}</Text>
+      <Meta parts={[multiServer ? item.serverName : null]} />
+      {item.albums.map((a) => (
+        <Text key={a.id} style={listLine}>
+          {a.title}
+          {a.year === null ? '' : ` (${a.year})`} · {plural(a.trackCount, 'track')}
+        </Text>
+      ))}
+      <Links links={item.links} accent={accent} />
+    </Card>
   );
 }
 
@@ -263,21 +353,14 @@ function WatchedRow({
   multiServer: boolean;
 }) {
   return (
-    <Columns
-      tableStyle={posterBodyTable}
-      leftStyle={posterCell}
-      rightStyle={bodyCell}
-      left={<Poster src={item.posterRef} alt={item.title} />}
-      right={
-        <>
-          <Text style={titleStyle}>
-            {withYear(item.title, item.year)} · {plural(item.plays, 'play')}
-          </Text>
-          <Meta parts={[multiServer ? item.serverName : null]} />
-          <Links links={item.links} accent={accent} />
-        </>
-      }
-    />
+    <Card posterRef={item.posterRef} alt={item.title}>
+      <Text style={title}>
+        {item.title}
+        <Year year={item.year} /> · {plural(item.plays, 'play')}
+      </Text>
+      <Meta parts={[multiServer ? item.serverName : null]} />
+      <Links links={item.links} accent={accent} />
+    </Card>
   );
 }
 
@@ -377,38 +460,42 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
       </Cell>
       {input.movies.length > 0 && (
         <>
-          <SectionHeading text="Movies" accent={accent} />
+          <SectionHead label="Movies" count={`${counts.movies} new`} accent={accent} />
           {input.movies.map((m) => (
             <MovieCard key={m.id} item={m} accent={accent} multiServer={input.multiServer} />
           ))}
-          <More count={input.moreMovies} noun="movie" />
+          <More count={input.moreMovies} noun="more movie" />
         </>
       )}
       {input.shows.length > 0 && (
         <>
-          <SectionHeading text="TV" accent={accent} />
+          <SectionHead label="TV" count={`${counts.shows} new`} accent={accent} />
           {input.shows.map((s) => (
             <ShowCard key={s.id} item={s} accent={accent} multiServer={input.multiServer} />
           ))}
-          <More count={input.moreShows} noun="show" />
+          <More count={input.moreShows} noun="more show" />
         </>
       )}
       {input.artists.length > 0 && (
         <>
-          <SectionHeading text="Music" accent={accent} />
+          <SectionHead label="Music" count={`${counts.albums} new`} accent={accent} />
           {input.artists.map((a) => (
             <ArtistCard key={a.id} item={a} accent={accent} multiServer={input.multiServer} />
           ))}
-          <More count={input.moreAlbums} noun="album" />
+          <More count={input.moreAlbums} noun="more album" />
         </>
       )}
       {input.mostWatched.length > 0 && (
         <>
-          <SectionHeading text="Most watched" accent={accent} />
+          <SectionHead
+            label="Most watched"
+            count={`top ${input.mostWatched.length}`}
+            accent={accent}
+          />
           {input.mostWatched.map((w) => (
             <WatchedRow key={w.id} item={w} accent={accent} multiServer={input.multiServer} />
           ))}
-          <More count={input.moreWatched} noun="title" />
+          <More count={input.moreWatched} noun="more title" />
         </>
       )}
       {input.outro && (
