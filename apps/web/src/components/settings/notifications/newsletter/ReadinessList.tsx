@@ -45,6 +45,7 @@ export type ReadinessCheck =
   | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'privateServer'; status: 'warn'; server: string; reason: PrivateServerReason }
   | { id: 'emptyVariant'; status: 'warn'; servers: string[] }
+  | { id: 'variantsLoadFailed'; status: 'unknown' }
   | { id: 'dns'; status: 'info' };
 
 const domainOf = (address: string | null | undefined): string | null => {
@@ -69,6 +70,7 @@ export function readinessChecks(input: {
   recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
   variants: NewsletterVariantsView | undefined;
+  variantsError: boolean;
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
@@ -87,6 +89,9 @@ export function readinessChecks(input: {
           .filter((v) => v.isEmpty)
           .map((v) => ({ id: 'emptyVariant', status: 'warn', servers: v.serverNames }))
       : [];
+  const variantsLoadFailed: ReadinessCheck[] = input.variantsError
+    ? [{ id: 'variantsLoadFailed', status: 'unknown' }]
+    : [];
   return [
     {
       id: 'externalUrl',
@@ -107,6 +112,7 @@ export function readinessChecks(input: {
     },
     ...privateServers,
     ...emptyVariants,
+    ...variantsLoadFailed,
     { id: 'dns', status: 'info' },
   ];
 }
@@ -140,7 +146,9 @@ export function ReadinessList({
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
     state.recipients.members && newsletterId ? newsletterId : undefined
   );
-  const { data: variants } = useNewsletterVariants(newsletterId ?? undefined);
+  const { data: variants, isError: variantsError } = useNewsletterVariants(
+    newsletterId ?? undefined
+  );
   const destination = (destinations ?? []).find((d) => d.id === state.destinationId) ?? null;
   const inScope = scopedServers(state.scope, servers ?? []);
   const checks = readinessChecks({
@@ -149,6 +157,7 @@ export function ReadinessList({
     recipients: { form: state.recipients, view },
     servers: inScope,
     variants,
+    variantsError,
   });
 
   // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
@@ -192,6 +201,8 @@ export function ReadinessList({
         return t('newsletters.editor.readiness.emptyVariant', {
           servers: formatList(i18n.language, check.servers),
         });
+      case 'variantsLoadFailed':
+        return t('newsletters.editor.readiness.variantsLoadFailed');
       case 'dns':
         return (
           <>

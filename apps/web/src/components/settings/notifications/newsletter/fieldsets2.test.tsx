@@ -87,6 +87,7 @@ beforeEach(() => {
   vi.mocked(useServers).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useServers>);
   vi.mocked(useNewsletterVariants).mockReturnValue({
     data: undefined,
+    isError: false,
   } as unknown as ReturnType<typeof useNewsletterVariants>);
 });
 
@@ -270,6 +271,7 @@ describe('readiness', () => {
   it('evaluates the checks, warns on an http external url, and lists each private Jellyfin or Emby server', () => {
     const checks = readinessChecks({
       variants: undefined,
+      variantsError: false,
       externalUrl: 'https://tracearr.example.com',
       destination: email,
       recipients: { form: twoExtras, view: undefined },
@@ -283,6 +285,7 @@ describe('readiness', () => {
     ]);
     const bad = readinessChecks({
       variants: undefined,
+      variantsError: false,
       externalUrl: null,
       destination: {
         ...email,
@@ -294,6 +297,7 @@ describe('readiness', () => {
     expect(bad.map((c) => c.status)).toEqual(['fail', 'fail', 'unknown', 'info']);
     const insecure = readinessChecks({
       variants: undefined,
+      variantsError: false,
       externalUrl: 'http://tracearr.example.com',
       destination: {
         ...email,
@@ -325,6 +329,7 @@ describe('readiness', () => {
       recipientsCheck(
         readinessChecks({
           variants: undefined,
+          variantsError: false,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: noExtras, view: undefined },
@@ -355,6 +360,7 @@ describe('readiness', () => {
       recipientsCheck(
         readinessChecks({
           variants: undefined,
+          variantsError: false,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: { members: true, extraAddresses: [], excludeUserIds: [] }, view },
@@ -367,6 +373,7 @@ describe('readiness', () => {
       recipientsCheck(
         readinessChecks({
           variants: undefined,
+          variantsError: false,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: { members: true, extraAddresses: [], excludeUserIds: ['u1'] }, view },
@@ -379,6 +386,7 @@ describe('readiness', () => {
   it('names the reason a Jellyfin or Emby server has no member link and skips the ones that do', () => {
     const rows = readinessChecks({
       variants: undefined,
+      variantsError: false,
       externalUrl: 'https://tracearr.example.com',
       destination: email,
       recipients: { form: twoExtras, view: undefined },
@@ -482,6 +490,19 @@ describe('readiness', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('says variant counts failed to load when the variants query errors', () => {
+    vi.mocked(useNewsletterVariants).mockReturnValue({
+      data: undefined,
+      isError: true,
+    } as unknown as ReturnType<typeof useNewsletterVariants>);
+    render(
+      <Providers>
+        <ReadinessList state={{ ...defaultFormState(), destinationId: 'd-1' }} newsletterId="n-1" />
+      </Providers>
+    );
+    expect(screen.getByText('newsletters.editor.readiness.variantsLoadFailed')).toBeInTheDocument();
+  });
+
   it('never asks the server for recipients when Members is off, and fails readiness with nothing typed', () => {
     render(
       <Providers>
@@ -527,6 +548,7 @@ describe('readiness', () => {
       recipients: { form: twoExtras, view: undefined },
       servers: [],
       variants: view,
+      variantsError: false,
     });
     expect(rows.filter((c) => c.id === 'emptyVariant')).toEqual([
       { id: 'emptyVariant', status: 'warn', servers: ['Attic'] },
@@ -537,6 +559,7 @@ describe('readiness', () => {
       recipients: { form: twoExtras, view: undefined },
       servers: [],
       variants: { ...view, variants: [{ ...view.variants[1]! }] },
+      variantsError: false,
     });
     expect(single.some((c) => c.id === 'emptyVariant')).toBe(false);
   });
