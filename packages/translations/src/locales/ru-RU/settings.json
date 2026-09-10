@@ -515,11 +515,14 @@
       "preview": {
         "recipients": "",
         "title": "",
+        "variants": "",
         "window": ""
       },
+      "previewVariant": "",
       "readiness": {
         "dns": "",
         "dnsLink": "",
+        "emptyVariant": "",
         "externalUrl": "",
         "externalUrlFail": "",
         "externalUrlNotHttps": "",
@@ -533,7 +536,8 @@
         "recipientsLoadFailed": "",
         "recipientsUnknown": "",
         "serverSettingsLink": "",
-        "title": ""
+        "title": "",
+        "variantsLoadFailed": ""
       },
       "recipients": {
         "account": "",
@@ -605,6 +609,7 @@
       },
       "senderName": "",
       "senderNameHelp": "",
+      "senderNameRequiredMulti": "",
       "servers": "",
       "serversSelected": "",
       "subject": "",
@@ -617,13 +622,16 @@
         "address": "",
         "description": "",
         "send": "",
-        "title": ""
+        "title": "",
+        "variant": ""
       },
       "time": "",
       "timezone": "",
       "turnOnNow": "",
       "unknownLibrary": "",
       "unsaved": "",
+      "variantHeading": "",
+      "variantsNote": "",
       "windowDays": "",
       "windowKind": "",
       "windows": {
@@ -642,6 +650,7 @@
       "loadFailed": "",
       "open": "",
       "openSnapshot": "",
+      "openVariantSnapshot": "",
       "page": "",
       "pruned": "",
       "recipients": "",
@@ -662,6 +671,8 @@
         "test": ""
       },
       "unknownHelp": "",
+      "variant": "",
+      "variantEmpty": "",
       "window": ""
     },
     "lastSend": "",
