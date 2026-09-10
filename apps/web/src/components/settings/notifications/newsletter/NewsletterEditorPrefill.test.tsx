@@ -26,6 +26,7 @@ vi.mock('@/hooks/queries', () => ({
   useNewsletterVariants: () => ({ data: undefined }),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
   usePreviewNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
+  usePreviewDraftNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   useTestNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   useSendNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },

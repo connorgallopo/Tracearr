@@ -53,6 +53,7 @@ import type {
   CreateNewsletterInput,
   UpdateNewsletterInput,
   NewsletterPreview,
+  NewsletterPreviewDraftInput,
   NewsletterRecipientsView,
   NewsletterVariantsView,
   NewsletterSendsPage,
@@ -1825,6 +1826,11 @@ class ApiClient {
     remove: (id: string) => this.request<void>(`/newsletters/${id}`, { method: 'DELETE' }),
     preview: (id: string) =>
       this.request<NewsletterPreview>(`/newsletters/${id}/preview`, { method: 'POST' }),
+    previewDraft: (body: NewsletterPreviewDraftInput) =>
+      this.request<NewsletterPreview>('/newsletters/preview', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
     variants: (id: string) => this.request<NewsletterVariantsView>(`/newsletters/${id}/variants`),
     recipients: (id: string) =>
       this.request<NewsletterRecipientsView>(`/newsletters/${id}/recipients`),

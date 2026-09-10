@@ -3,8 +3,6 @@ import type { Newsletter } from '@tracearr/shared';
 import { newsletterKeys, useCreateNewsletter, useUpdateNewsletter } from '@/hooks/queries';
 import { deepEqual, diffPatch, type NewsletterFormState } from './newsletterForm';
 
-export type SaveThen = (next: () => void) => void;
-
 interface UseNewsletterSaveArgs {
   newsletterId: string | null;
   seed: NewsletterFormState;
@@ -13,7 +11,7 @@ interface UseNewsletterSaveArgs {
   onSaved: (row: Newsletter, saved: NewsletterFormState) => void;
 }
 
-/** Create posts the whole object; edit patches the keys that moved. A header action on a dirty form saves first and only then acts. */
+/** Create posts the whole object; edit patches the keys that moved. Nothing else on the page saves. */
 export function useNewsletterSave({
   newsletterId,
   seed,
@@ -27,18 +25,11 @@ export function useNewsletterSave({
   const dirty = !deepEqual(seed, state);
   const pending = create.isPending || update.isPending;
 
-  const save = (after?: () => void) => {
+  const save = () => {
     if (!valid || pending) return;
     const saved = state;
     if (newsletterId === null) {
-      create.mutate(saved, {
-        onSuccess: (row) => {
-          onSaved(row, saved);
-          after?.();
-        },
-        // A failed save must not run the queued action; the hook's own onError already toasts it.
-        onError: () => {},
-      });
+      create.mutate(saved, { onSuccess: (row) => onSaved(row, saved) });
       return;
     }
     update.mutate(
@@ -47,20 +38,10 @@ export function useNewsletterSave({
         onSuccess: (row) => {
           void queryClient.invalidateQueries({ queryKey: newsletterKeys.recipients(newsletterId) });
           onSaved(row, saved);
-          after?.();
         },
-        onError: () => {},
       }
     );
   };
 
-  const saveThen: SaveThen = (next) => {
-    if (!dirty) {
-      next();
-      return;
-    }
-    save(next);
-  };
-
-  return { dirty, pending, save: () => save(), saveThen };
+  return { dirty, pending, save };
 }

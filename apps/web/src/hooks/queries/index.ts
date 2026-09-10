@@ -146,6 +146,7 @@ export {
   useDeleteNewsletter,
   useDuplicateNewsletter,
   usePreviewNewsletter,
+  usePreviewDraftNewsletter,
   useTestNewsletter,
   useSendNewsletter,
   useNewsletterSendHtml,

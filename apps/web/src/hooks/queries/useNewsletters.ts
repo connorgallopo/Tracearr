@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type {
   CreateNewsletterInput,
   Newsletter,
+  NewsletterPreviewDraftInput,
   NewsletterSendSummary,
   UpdateNewsletterInput,
 } from '@tracearr/shared';
@@ -196,6 +197,17 @@ export function usePreviewNewsletter() {
   const { t } = useTranslation('notifications');
   return useMutation({
     mutationFn: (id: string) => api.newsletters.preview(id),
+    onError: (err) => {
+      toast.error(t('toast.error.newsletterPreviewFailed', { error: err.message }));
+    },
+  });
+}
+
+/** The same render as usePreviewNewsletter, from the form instead of the saved row; nothing is written. */
+export function usePreviewDraftNewsletter() {
+  const { t } = useTranslation('notifications');
+  return useMutation({
+    mutationFn: (body: NewsletterPreviewDraftInput) => api.newsletters.previewDraft(body),
     onError: (err) => {
       toast.error(t('toast.error.newsletterPreviewFailed', { error: err.message }));
     },

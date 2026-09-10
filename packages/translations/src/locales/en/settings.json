@@ -578,7 +578,9 @@
       "shows_one": "{{count}} show",
       "shows_other": "{{count}} shows",
       "albums_one": "{{count}} album",
-      "albums_other": "{{count}} albums"
+      "albums_other": "{{count}} albums",
+      "watched_one": "{{count}} most watched",
+      "watched_other": "{{count}} most watched"
     },
     "copyOf": "Copy of {{name}}",
     "richText": {
@@ -650,7 +652,8 @@
       "senderName": "Shown as",
       "senderNameHelp": "Leave empty to use {{name}}.",
       "senderNameRequiredMulti": "This newsletter covers {{count}} servers, so there is no one server name to sign it with. Pick a name.",
-      "previewVariant": "Members on {{servers}}",
+      "previewVariant_one": "{{count}} person with an account on {{servers}}",
+      "previewVariant_other": "{{count}} people with an account on {{servers}}",
       "variantHeading": "Gets {{servers}} ({{count}})",
       "subject": "Subject",
       "subjectHelp": "Placeholders:",
@@ -662,6 +665,7 @@
       "saving": "Saving",
       "unsaved": "Unsaved changes",
       "fixFirst": "Fix the highlighted fields before saving.",
+      "sendNeedsSave": "Save your changes before sending.",
       "recipients": {
         "title": "Recipients",
         "members": "Members of the scoped servers",
@@ -757,15 +761,31 @@
         "preview": "Preview",
         "test": "Send test",
         "send": "Send now",
-        "saveAndPreview": "Save and preview",
-        "saveAndTest": "Save and send test",
-        "saveAndSend": "Save and send now"
+        "more": "More send options",
+        "testHint": "Sends one copy to one address and leaves the window where it is.",
+        "sendHint": "Mails everyone now and moves the window forward, the same as a scheduled run."
       },
       "preview": {
-        "variants": "Version",
+        "variants": "Who is looking",
+        "variantTab": "{{count}} on {{servers}}",
         "title": "Preview",
-        "window": "{{start}} to {{end}}",
-        "recipients": "{{resolved}} recipients, {{missing}} without an address, {{suppressed}} suppressed"
+        "draft": "Preview of unsaved changes",
+        "subjectLabel": "Subject",
+        "window": "Added between {{start}} and {{end}}",
+        "windowSince": "Added since the last email, {{start}} to {{end}}",
+        "countsListed": {
+          "movies": "{{listed}} of {{found}} movies",
+          "shows": "{{listed}} of {{found}} shows",
+          "albums": "{{listed}} of {{found}} albums"
+        },
+        "recipients": "{{resolved}} people get this newsletter across all versions. {{missing}} have no address and {{suppressed}} unsubscribed.",
+        "width": "Width",
+        "widths": { "desktop": "600 px", "phone": "375 px" },
+        "images": "Images",
+        "imagesOn": "Shown",
+        "imagesBlocked": "Blocked",
+        "imagesBlockedNote": "Many clients block remote images until the reader allows them.",
+        "linksNote": "The unsubscribe and view-in-browser links are filled in per recipient when the email is sent, so they do nothing here."
       },
       "test": {
         "title": "Send a test",
@@ -810,7 +830,7 @@
       "variant": "Members on {{servers}}",
       "variantEmpty": "Nothing new for these servers; nobody in this group was mailed.",
       "openVariantSnapshot": "Open the snapshot for {{servers}}",
-      "snapshotTitle": "Snapshot",
+      "snapshotTitle": "Sent copy",
       "pruned": "The snapshot was pruned after 90 days; nothing can be viewed or resent.",
       "retryFailed": "Retry failed"
     }

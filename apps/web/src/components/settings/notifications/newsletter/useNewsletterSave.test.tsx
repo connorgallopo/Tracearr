@@ -68,39 +68,6 @@ describe('useNewsletterSave', () => {
     expect(onSaved).toHaveBeenCalledWith({ id: 'n-1' }, state);
   });
 
-  it('saveThen runs the action after a save, at once when clean, and not after a failed save', () => {
-    const next = vi.fn();
-    const state = { ...seed, name: 'Renamed' };
-    update.mockImplementation(
-      (_vars: unknown, opts: { onSuccess: (row: { id: string }) => void }) =>
-        opts.onSuccess({ id: 'n-1' })
-    );
-    const { result, rerender } = renderHook(
-      ({ current }) =>
-        useNewsletterSave({
-          newsletterId: 'n-1',
-          seed,
-          state: current,
-          valid: true,
-          onSaved: vi.fn(),
-        }),
-      { initialProps: { current: state } }
-    );
-    act(() => result.current.saveThen(next));
-    expect(update).toHaveBeenCalledTimes(1);
-    expect(next).toHaveBeenCalledTimes(1);
-
-    rerender({ current: seed });
-    act(() => result.current.saveThen(next));
-    expect(update).toHaveBeenCalledTimes(1);
-    expect(next).toHaveBeenCalledTimes(2);
-
-    update.mockImplementation((_vars: unknown, opts: { onError: () => void }) => opts.onError());
-    rerender({ current: state });
-    act(() => result.current.saveThen(next));
-    expect(next).toHaveBeenCalledTimes(2);
-  });
-
   it('refuses to save while invalid', () => {
     const { result } = renderHook(() =>
       useNewsletterSave({

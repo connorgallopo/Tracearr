@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Info, Loader2, Save } from 'lucide-react';
@@ -18,7 +18,7 @@ import { ContentFields } from './ContentFields';
 import { DeliveryFields } from './DeliveryFields';
 import { IdentityFields } from './IdentityFields';
 import { MessageFields } from './MessageFields';
-import { NewsletterActions } from './NewsletterActions';
+import { NewsletterActions, type NewsletterActionsHandle } from './NewsletterActions';
 import { NEWSLETTERS_PATH } from '../Newsletters';
 import { scheduleSummary, type Translate } from '../newsletterFormat';
 import { ReadinessList, recipientsState } from './ReadinessList';
@@ -63,6 +63,7 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const [touched, setTouched] = useState<TouchedFields>({});
   const [submitted, setSubmitted] = useState(false);
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
+  const actionsRef = useRef<NewsletterActionsHandle>(null);
   const mode = newsletter ? 'edit' : 'create';
   const { data: servers } = useServers();
   const scopedServerCount = scopedServers(state.scope, servers ?? []).length;
@@ -86,7 +87,6 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
     dirty,
     pending,
     save: saveNow,
-    saveThen,
   } = useNewsletterSave({
     newsletterId: newsletter?.id ?? null,
     seed,
@@ -139,12 +139,16 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
     control?.scrollIntoView({ block: 'center' });
     control?.focus();
   };
-  const save = () => {
+  const refuse = () => {
     setSubmitted(true);
+    focusFirstInvalid();
+  };
+  const save = () => {
     if (!valid) {
-      focusFirstInvalid();
+      refuse();
       return;
     }
+    setSubmitted(true);
     saveNow();
   };
 
@@ -256,9 +260,14 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
       title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}
       description={summary}
       actions={
-        newsletter ? (
-          <NewsletterActions newsletter={newsletter} dirty={dirty} saveThen={saveThen} />
-        ) : null
+        <NewsletterActions
+          ref={actionsRef}
+          newsletter={newsletter}
+          state={state}
+          dirty={dirty}
+          valid={valid}
+          onRefuse={refuse}
+        />
       }
     >
       <Tabs value={newsletter ? activeTab : 'edit'} onValueChange={onTabChange} className="gap-6">
