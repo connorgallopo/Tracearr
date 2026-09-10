@@ -1,17 +1,11 @@
 import { Suspense, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveSenderName } from '@tracearr/shared';
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from '@/components/ui/field';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useServers } from '@/hooks/queries';
+import { EditorCard } from './EditorCard';
 import {
   NEWSLETTER_FIELD_IDS,
   scopedServers,
@@ -68,8 +62,7 @@ export function MessageFields({
   );
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.message')}</FieldLegend>
+    <EditorCard title={t('newsletters.editor.message')}>
       <Field className="max-w-sm" data-invalid={errors.senderName !== undefined}>
         <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.senderName}>
           {t('newsletters.editor.senderName')}
@@ -109,6 +102,6 @@ export function MessageFields({
       </Field>
       {richText('intro')}
       {richText('outro')}
-    </FieldSet>
+    </EditorCard>
   );
 }

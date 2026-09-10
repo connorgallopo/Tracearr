@@ -1,13 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { NewsletterSchedule } from '@tracearr/shared';
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from '@/components/ui/field';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -18,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { dateLabel } from '@/components/settings/shared/dateLabel';
+import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 const KINDS = ['daily', 'weekly', 'monthly', 'cron'] as const;
@@ -63,8 +57,7 @@ export function ScheduleFields({
   };
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.schedule')}</FieldLegend>
+    <EditorCard title={t('newsletters.editor.schedule')}>
       <div className="flex flex-wrap gap-4">
         <Field className="w-44">
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.scheduleKind}>
@@ -197,6 +190,6 @@ export function ScheduleFields({
             : t('newsletters.noNextRun')}
         </FieldDescription>
       )}
-    </FieldSet>
+    </EditorCard>
   );
 }

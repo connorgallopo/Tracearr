@@ -9,15 +9,19 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemGroup } from '@/components/ui/item';
 import { Switch } from '@/components/ui/switch';
 import { useServers } from '@/hooks/queries';
 import { RecipientsPanel } from './RecipientsPanel';
-import { NEWSLETTER_FIELD_IDS, scopedServers, type FieldsetProps } from './newsletterForm';
+import { EditorCard } from './EditorCard';
+import {
+  NEWSLETTER_FIELD_IDS,
+  RECIPIENTS_CARD_ID,
+  scopedServers,
+  type FieldsetProps,
+} from './newsletterForm';
 
 const address = z.email();
 
@@ -43,8 +47,7 @@ export function RecipientsFields({
     });
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.recipients.title')}</FieldLegend>
+    <EditorCard id={RECIPIENTS_CARD_ID} title={t('newsletters.editor.recipients.title')}>
       <Field orientation="horizontal">
         <FieldContent>
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.members}>
@@ -142,6 +145,6 @@ export function RecipientsFields({
         }
         servers={scopedServers(state.scope, servers ?? []).map((s) => ({ id: s.id, name: s.name }))}
       />
-    </FieldSet>
+    </EditorCard>
   );
 }

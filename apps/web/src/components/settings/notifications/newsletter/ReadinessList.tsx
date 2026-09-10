@@ -17,7 +17,6 @@ import {
   type NewsletterVariantsView,
   type Server,
 } from '@tracearr/shared';
-import { FieldLegend, FieldSet } from '@/components/ui/field';
 import {
   useDestinations,
   useNewsletterRecipients,
@@ -27,6 +26,7 @@ import {
 } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
 import { cn } from '@/lib/utils';
+import { EditorCard } from './EditorCard';
 import { scopedServers, type NewsletterFormState } from './newsletterForm';
 import { extraRecipients, partitionRecipients } from './RecipientsPanel';
 
@@ -54,7 +54,7 @@ const domainOf = (address: string | null | undefined): string | null => {
 };
 
 /** Members off is always known client-side; members on is known once the saved view resolves. */
-function recipientsState(
+export function recipientsState(
   form: NewsletterRecipients,
   view: NewsletterRecipientsView | undefined
 ): { resolvable: number; known: boolean } {
@@ -221,33 +221,33 @@ export function ReadinessList({
   };
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.readiness.title')}</FieldLegend>
-      <section className="bg-muted/25 rounded-lg px-3.5 py-3">
-        <ul className="flex flex-col gap-2">
-          {checks.map((check) => {
-            const Icon = ICONS[check.status];
-            return (
-              <li
-                key={
-                  check.id === 'privateServer'
-                    ? `privateServer-${check.server}`
-                    : check.id === 'emptyVariant'
-                      ? `emptyVariant-${check.servers.join(',')}`
-                      : check.id
-                }
-                className="flex items-start gap-2 text-sm leading-snug"
-              >
-                <Icon
-                  aria-hidden
-                  className={cn('mt-0.5 size-[0.9375rem] shrink-0', TONES[check.status])}
-                />
-                <span>{copyFor(check)}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    </FieldSet>
+    <EditorCard
+      title={t('newsletters.editor.readiness.title')}
+      description={t('newsletters.editor.readiness.intro')}
+    >
+      <ul className="flex flex-col gap-2">
+        {checks.map((check) => {
+          const Icon = ICONS[check.status];
+          return (
+            <li
+              key={
+                check.id === 'privateServer'
+                  ? `privateServer-${check.server}`
+                  : check.id === 'emptyVariant'
+                    ? `emptyVariant-${check.servers.join(',')}`
+                    : check.id
+              }
+              className="flex items-start gap-2 text-sm leading-snug"
+            >
+              <Icon
+                aria-hidden
+                className={cn('mt-0.5 size-[0.9375rem] shrink-0', TONES[check.status])}
+              />
+              <span>{copyFor(check)}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </EditorCard>
   );
 }

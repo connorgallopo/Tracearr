@@ -36,7 +36,30 @@ vi.mock('@/hooks/queries', () => ({
   newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 vi.mock('@/components/ui/rich-text-field', () => ({
-  RichTextField: ({ id }: { id: string }) => <div data-testid={`rich-${id}`} />,
+  RichTextField: ({
+    id,
+    onChange,
+  }: {
+    id: string;
+    onChange: (change: { value: unknown; error: string | null }) => void;
+  }) => (
+    <div id={id} data-testid={`rich-${id}`} tabIndex={-1}>
+      <button
+        type="button"
+        onClick={() =>
+          onChange({
+            value: {
+              type: 'doc',
+              content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x'.repeat(2100) }] }],
+            },
+            error: null,
+          })
+        }
+      >
+        {`overfill ${id}`}
+      </button>
+    </div>
+  ),
 }));
 
 import { useAuth } from '@/hooks/useAuth';
@@ -137,7 +160,7 @@ beforeEach(() => {
 });
 
 describe('NewsletterEditor', () => {
-  it('opens a new row on the defaults with a create title and no tabs', () => {
+  it('opens a new row on the defaults with a create title and a disabled History tab', () => {
     renderAt('/settings/notifications/newsletters/new');
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
       'newsletters.editor.newTitle'
@@ -146,7 +169,21 @@ describe('NewsletterEditor', () => {
     expect(screen.getByLabelText('newsletters.editor.subject')).toHaveValue(
       "What's new on {{server_name}} ({{end_date}})"
     );
-    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'newsletters.editor.tabs.edit' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+    expect(screen.getByRole('tab', { name: 'newsletters.editor.tabs.history' })).toBeDisabled();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'newsletters.editor.basics' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.nameHelp')).toBeInTheDocument();
+    expect(
+      screen.getByRole('switch', { name: 'newsletters.editor.links.tracearr' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 3, name: 'newsletters.editor.links.title' })
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(document.querySelector('[aria-invalid="true"]')).toBeNull();
     expect(useNewsletter).toHaveBeenCalledWith(undefined);
@@ -190,6 +227,11 @@ describe('NewsletterEditor', () => {
       screen.getByRole('tab', { name: 'newsletters.editor.tabs.history' })
     ).toBeInTheDocument();
     expect(screen.getByText(/newsletters.editor.nextRun/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'newsletters.schedule.inZone:{"summary":"newsletters.schedule.daily:{\\"time\\":\\"7:15 AM\\"}","timezone":"Europe/Berlin"}'
+      )
+    ).toBeInTheDocument();
   });
 
   it('opens straight to the History tab when the URL asks for it', () => {
@@ -224,6 +266,43 @@ describe('NewsletterEditor', () => {
     // apps/web's tsconfig lib omits general ES2022 Array methods, so Array#at is unavailable here.
     const alerts = screen.getAllByRole('alert');
     expect(alerts[alerts.length - 1]).toHaveTextContent('Newsletter not found');
+  });
+
+  it('puts the recipient count in the header once the saved view resolves', () => {
+    vi.mocked(useNewsletter).mockReturnValue({
+      data: row,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletter>);
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [
+          {
+            address: 'ann@x.com',
+            userId: 'u1',
+            serverUserId: 'su-1',
+            name: 'Ann',
+            suppressed: false,
+            username: 'ann',
+            serverId: 's1',
+            serverName: 'Home Plex',
+            serverIds: ['s1'],
+            thumbUrl: null,
+          },
+        ],
+        missing: [],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    renderAt('/settings/notifications/newsletters/n-1');
+    expect(
+      screen.getByText(
+        'newsletters.editor.headerSummary:{"schedule":"newsletters.schedule.inZone:{\\"summary\\":\\"newsletters.schedule.daily:{\\\\\\"time\\\\\\":\\\\\\"7:15 AM\\\\\\"}\\",\\"timezone\\":\\"Europe/Berlin\\"}","recipients":"newsletters.editor.readiness.recipients:{\\"count\\":1}"}'
+      )
+    ).toBeInTheDocument();
   });
 
   it('paints the required error only once Name has been left empty', async () => {
@@ -296,6 +375,32 @@ describe('NewsletterEditor save flows', () => {
     await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
     expect(updateMutate.mock.calls[0]?.[0]).toEqual({ id: 'n-1', data: { name: 'Weekly!' } });
     expect(screen.queryByText('newsletters.editor.unsaved')).not.toBeInTheDocument();
+  });
+
+  it('sends focus to a rich text field the editor called clean but the schema rejects', async () => {
+    renderAt('/settings/notifications/newsletters/new');
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'Fresh');
+    await userEvent.click(await screen.findByRole('button', { name: 'overfill newsletter-intro' }));
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
+    expect(createMutate).not.toHaveBeenCalled();
+    expect(screen.getByTestId('rich-newsletter-intro')).toHaveFocus();
+  });
+
+  it('forgets the refusal after a save, so the next invalid keystroke stays quiet', async () => {
+    vi.mocked(useNewsletter).mockReturnValue({
+      data: row,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useNewsletter>);
+    updateMutate.mockImplementation(
+      (_vars: unknown, opts: { onSuccess: (r: Newsletter) => void }) => opts.onSuccess(row)
+    );
+    renderAt('/settings/notifications/newsletters/n-1');
+    const name = screen.getByLabelText('newsletters.editor.name');
+    await userEvent.type(name, '!');
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
+    await userEvent.clear(name);
+    expect(screen.queryByText('newsletters.editor.fixFirst')).not.toBeInTheDocument();
   });
 
   it('holds a dirty form on the page until the leave dialog is answered', async () => {

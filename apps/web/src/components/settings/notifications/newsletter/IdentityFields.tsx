@@ -4,18 +4,18 @@ import {
   FieldContent,
   FieldDescription,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 export function IdentityFields({ state, onChange, errors, mode, touch }: FieldsetProps) {
   const { t } = useTranslation('settings');
   return (
-    <FieldGroup className="bg-card-raised gap-5 rounded-xl border p-5">
-      <div className="grid items-start gap-4 @md/field-group:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @md/field-group:gap-x-6">
+    <EditorCard title={t('newsletters.editor.basics')}>
+      <div className="grid items-start gap-4 @md/field-group:grid-cols-2 @md/field-group:gap-x-6">
         <Field data-invalid={errors.name !== undefined}>
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.name}>
             {t('newsletters.editor.name')}
@@ -28,6 +28,7 @@ export function IdentityFields({ state, onChange, errors, mode, touch }: Fieldse
             onChange={(event) => onChange({ name: event.target.value })}
             onBlur={() => touch('name')}
           />
+          <FieldDescription>{t('newsletters.editor.nameHelp')}</FieldDescription>
           <FieldError>{errors.name}</FieldError>
         </Field>
         <Field orientation="horizontal">
@@ -44,6 +45,6 @@ export function IdentityFields({ state, onChange, errors, mode, touch }: Fieldse
           />
         </Field>
       </div>
-    </FieldGroup>
+    </EditorCard>
   );
 }

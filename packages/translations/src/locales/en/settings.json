@@ -592,9 +592,13 @@
     },
     "editor": {
       "newTitle": "New newsletter",
+      "headerSummary": "{{schedule}} · {{recipients}}",
       "notFound": "This newsletter no longer exists.",
+      "basics": "Basics",
       "tabs": { "edit": "Edit", "history": "History" },
+      "historyNeedsSave": "History appears once the newsletter is saved.",
       "name": "Name",
+      "nameHelp": "Only you see this. It names the newsletter in this list and in the send history.",
       "turnOnNow": "Turn it on now",
       "enabledHelp": "Off means the schedule does not run; Send now still works.",
       "schedule": "Schedule",
@@ -723,12 +727,12 @@
         "skipWhenEmptyHelp": "A window with no new titles sends nothing instead of an empty digest."
       },
       "links": {
-        "title": "Links",
         "tracearr": "Link titles to Tracearr",
         "tracearrNote": "The Tracearr UI is admin-only today, so members will hit the login page; the media server link stays either way."
       },
       "readiness": {
-        "title": "Readiness",
+        "title": "Before you send",
+        "intro": "These do not block saving. They decide whether a send reaches anyone.",
         "externalUrl": "External URL is set; hosted posters, the browser view and Tracearr links work.",
         "externalUrlFail": "No external URL: hosted posters, the browser view and Tracearr links are off.",
         "externalUrlNotHttps": "External URL is set over http: members get an unsubscribe link, but one-click unsubscribe needs https.",
@@ -741,6 +745,8 @@
         "fromDomainFail": "The from address and the SMTP username sit on different domains; some providers refuse that.",
         "fromDomainUnknown": "Pick a destination to check its from address.",
         "recipients": "At least one recipient resolves.",
+        "recipients_one": "{{count}} recipient resolves to an address.",
+        "recipients_other": "{{count}} recipients resolve to an address.",
         "recipientsFail": "Nobody resolves to an address yet.",
         "recipientsUnknown": "Recipients are unknown until the newsletter is saved.",
         "recipientsLoadFailed": "Recipients could not be loaded.",

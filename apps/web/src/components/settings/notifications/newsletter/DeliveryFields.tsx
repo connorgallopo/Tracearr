@@ -11,8 +11,6 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from '@/components/ui/field';
 import {
   Select,
@@ -24,6 +22,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { useDestinations, useSettings } from '@/hooks/queries';
+import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 const NONE = '__none__';
@@ -37,8 +36,7 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
   const [addOpen, setAddOpen] = useState(false);
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.delivery.title')}</FieldLegend>
+    <EditorCard title={t('newsletters.editor.delivery.title')}>
       <Field className="max-w-sm" data-invalid={errors.destinationId !== undefined}>
         <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.destination}>
           {t('newsletters.editor.delivery.destination')}
@@ -136,6 +134,20 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
           aria-label={t('newsletters.editor.delivery.skipWhenEmpty')}
         />
       </Field>
+      <Field orientation="horizontal">
+        <FieldContent>
+          <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.linksTracearr}>
+            {t('newsletters.editor.links.tracearr')}
+          </FieldLabel>
+          <FieldDescription>{t('newsletters.editor.links.tracearrNote')}</FieldDescription>
+        </FieldContent>
+        <Switch
+          id={NEWSLETTER_FIELD_IDS.linksTracearr}
+          checked={state.links.tracearr}
+          onCheckedChange={(tracearr) => onChange({ links: { tracearr } })}
+          aria-label={t('newsletters.editor.links.tracearr')}
+        />
+      </Field>
       {addOpen && (
         <DestinationDialog
           open
@@ -145,6 +157,6 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
           onCreated={(created) => onChange({ destinationId: created.id })}
         />
       )}
-    </FieldSet>
+    </EditorCard>
   );
 }

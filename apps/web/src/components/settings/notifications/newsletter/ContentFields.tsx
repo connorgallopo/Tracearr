@@ -18,8 +18,6 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from '@/components/ui/field';
 import {
   INPUT_GROUP_UNIT,
@@ -38,6 +36,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useLibraries, useServers } from '@/hooks/queries';
+import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, scopedServers, type FieldsetProps } from './newsletterForm';
 
 const SECTIONS = ['movies', 'shows', 'music', 'mostWatched'] as const;
@@ -102,8 +101,7 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
   };
 
   return (
-    <FieldSet>
-      <FieldLegend>{t('newsletters.editor.content')}</FieldLegend>
+    <EditorCard title={t('newsletters.editor.content')}>
       <div className="flex flex-wrap gap-4">
         <Field className="w-56">
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.windowKind}>
@@ -271,6 +269,6 @@ export function ContentFields({ state, onChange, errors, touch }: FieldsetProps)
         <FieldDescription>{t('newsletters.editor.sectionsHelp')}</FieldDescription>
         <FieldError>{errors.sections}</FieldError>
       </div>
-    </FieldSet>
+    </EditorCard>
   );
 }

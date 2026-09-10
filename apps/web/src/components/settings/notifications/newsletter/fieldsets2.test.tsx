@@ -8,7 +8,6 @@ import type { Destination, NewsletterRecipientsView, Settings } from '@tracearr/
 import { defaultFormState, type NewsletterFormState } from './newsletterForm';
 import { RecipientsFields } from './RecipientsFields';
 import { DeliveryFields } from './DeliveryFields';
-import { LinksFields } from './LinksFields';
 import { ReadinessList, readinessChecks } from './ReadinessList';
 
 vi.mock('react-i18next', () => ({
@@ -247,12 +246,14 @@ describe('DeliveryFields', () => {
     );
     expect(p.onChange).toHaveBeenCalledWith({ skipWhenEmpty: false });
   });
-});
 
-describe('LinksFields', () => {
-  it('toggles the tracearr links switch, off by default, with the admin-only note', async () => {
+  it('carries the tracearr links switch as its last row, off by default, with the admin-only note', async () => {
     const p = props();
-    render(<LinksFields {...p} />);
+    render(
+      <Providers>
+        <DeliveryFields {...p} />
+      </Providers>
+    );
     const toggle = screen.getByRole('switch', { name: 'newsletters.editor.links.tracearr' });
     expect(toggle).not.toBeChecked();
     expect(screen.getByText('newsletters.editor.links.tracearrNote')).toBeInTheDocument();

@@ -5,23 +5,23 @@ import { Info, Loader2, Save } from 'lucide-react';
 import type { Newsletter } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { FieldGroup } from '@/components/ui/field';
 import { BindingDoors } from '@/components/ui/form-doors';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { RichTextChange } from '@/components/ui/rich-text-normalize';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
-import { useNewsletter, useServers } from '@/hooks/queries';
+import { useNewsletter, useNewsletterRecipients, useServers } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { ContentFields } from './ContentFields';
 import { DeliveryFields } from './DeliveryFields';
 import { IdentityFields } from './IdentityFields';
-import { LinksFields } from './LinksFields';
 import { MessageFields } from './MessageFields';
 import { NewsletterActions } from './NewsletterActions';
 import { NEWSLETTERS_PATH } from '../Newsletters';
-import { ReadinessList } from './ReadinessList';
+import { scheduleSummary, type Translate } from '../newsletterFormat';
+import { ReadinessList, recipientsState } from './ReadinessList';
 import { RecipientsFields } from './RecipientsFields';
 import { ScheduleFields } from './ScheduleFields';
 import { SendHistory } from './SendHistory';
@@ -46,7 +46,8 @@ interface EditorFormProps {
 }
 
 function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
-  const { t } = useTranslation(['settings', 'common', 'pages']);
+  const { t, i18n } = useTranslation(['settings', 'common', 'pages']);
+  const translate = t as Translate;
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') === 'history' ? 'history' : 'edit';
@@ -93,10 +94,24 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
     valid,
     onSaved: (row, saved) => {
       setSeed(saved);
+      setSubmitted(false);
       if (!newsletter) setRedirectTo(`${NEWSLETTERS_PATH}/${row.id}`);
     },
   });
   const blocker = useUnsavedChanges(dirty);
+  const { data: recipientsView } = useNewsletterRecipients(
+    state.recipients.members && newsletter ? newsletter.id : undefined
+  );
+  const resolvable = recipientsState(state.recipients, recipientsView);
+  const schedule = scheduleSummary(state.schedule, state.timezone, translate, i18n.language);
+  const summary = resolvable.known
+    ? translate('newsletters.editor.headerSummary', {
+        schedule,
+        recipients: translate('newsletters.editor.readiness.recipients', {
+          count: resolvable.resolvable,
+        }),
+      })
+    : schedule;
 
   // Once the save has landed the guard is clean, and only then may a fresh row's page move: navigating in the same tick as the save would still see the pre-save dirty flag and block itself.
   useEffect(() => {
@@ -105,9 +120,15 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
 
   const onChange = (patch: Partial<NewsletterFormState>) =>
     setState((current) => ({ ...current, ...patch }));
+  // A cleared key is removed, not set to undefined: focusFirstInvalid merges these over the Zod errors.
   const onRichText = (field: 'intro' | 'outro', change: RichTextChange) => {
     touch(field);
-    setRichTextErrors((current) => ({ ...current, [field]: change.error ?? undefined }));
+    setRichTextErrors((current) => {
+      const next = { ...current };
+      if (change.error === null) delete next[field];
+      else next[field] = change.error;
+      return next;
+    });
     if (change.error === null) onChange({ [field]: change.value });
   };
 
@@ -141,8 +162,8 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
       </span>
     ) : null;
 
-  const form = (
-    <FieldGroup className="gap-8">
+  const cards = (
+    <div className="flex min-w-0 flex-col gap-6">
       <IdentityFields
         state={state}
         onChange={onChange}
@@ -196,15 +217,17 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
         touch={touch}
         touched={touched}
       />
-      <LinksFields
-        state={state}
-        onChange={onChange}
-        errors={shownErrors}
-        mode={mode}
-        touch={touch}
-        touched={touched}
-      />
-      <ReadinessList state={state} newsletterId={newsletter?.id ?? null} />
+    </div>
+  );
+
+  const form = (
+    <div className="@container/editor flex flex-col gap-6">
+      <div className="grid items-start gap-6 @4xl/editor:grid-cols-[minmax(0,1fr)_18rem]">
+        {cards}
+        <aside className="@4xl/editor:sticky @4xl/editor:top-6">
+          <ReadinessList state={state} newsletterId={newsletter?.id ?? null} />
+        </aside>
+      </div>
       <BindingDoors
         className="bg-background/95 sticky bottom-0 z-10 border-t pt-4 pb-3 backdrop-blur"
         primaryLabel={pending ? t('newsletters.editor.saving') : t('newsletters.editor.save')}
@@ -225,32 +248,48 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
         cancelLabel={t('common:actions.cancel')}
         onConfirm={() => blocker.proceed?.()}
       />
-    </FieldGroup>
+    </div>
   );
 
   return (
     <SettingsSection
       title={newsletter ? newsletter.name : t('newsletters.editor.newTitle')}
+      description={summary}
       actions={
         newsletter ? (
           <NewsletterActions newsletter={newsletter} dirty={dirty} saveThen={saveThen} />
         ) : null
       }
     >
-      {newsletter ? (
-        <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList>
+      <Tabs value={newsletter ? activeTab : 'edit'} onValueChange={onTabChange} className="gap-6">
+        <div className="border-b">
+          <TabsList variant="line" className="-mb-px">
             <TabsTrigger value="edit">{t('newsletters.editor.tabs.edit')}</TabsTrigger>
-            <TabsTrigger value="history">{t('newsletters.editor.tabs.history')}</TabsTrigger>
+            {newsletter ? (
+              <TabsTrigger value="history">{t('newsletters.editor.tabs.history')}</TabsTrigger>
+            ) : (
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex">
+                      <TabsTrigger value="history" disabled>
+                        {t('newsletters.editor.tabs.history')}
+                      </TabsTrigger>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('newsletters.editor.historyNeedsSave')}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </TabsList>
-          <TabsContent value="edit">{form}</TabsContent>
+        </div>
+        <TabsContent value="edit">{form}</TabsContent>
+        {newsletter && (
           <TabsContent value="history">
             <SendHistory newsletterId={newsletter.id} timezone={newsletter.timezone} />
           </TabsContent>
-        </Tabs>
-      ) : (
-        form
-      )}
+        )}
+      </Tabs>
     </SettingsSection>
   );
 }
