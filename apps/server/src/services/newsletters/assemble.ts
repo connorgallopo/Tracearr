@@ -440,7 +440,7 @@ export function collapseMirrors(
       LibraryItemRow,
       ...LibraryItemRow[],
     ];
-    const mirrored = new Set([first.serverId]);
+    const mirrored = new Set([first.serverId, ...first.mirrors.map((m) => m.serverId)]);
     const mirrors: MirrorCopy[] = [];
     for (const copy of rest) {
       if (copy.serverId === first.serverId) continue;

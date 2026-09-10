@@ -83,6 +83,26 @@ describe('collapseMirrors', () => {
       ['srv-1', 'a-alien', []],
     ]);
   });
+
+  it('does not re-record a mirror already carried on the kept row when a second pass sees that server again', () => {
+    const rank = (id: string) => ['srv-1', 'srv-2'].indexOf(id);
+    const alreadyMirrored = row({
+      serverId: 'srv-1',
+      ratingKey: 'a-heat',
+      mediaId: 'media-heat',
+      title: 'Heat',
+      mirrors: [{ serverId: 'srv-2', ratingKey: 'b-heat' }],
+    });
+    const refetchedCopy = row({
+      serverId: 'srv-2',
+      ratingKey: 'b-heat',
+      mediaId: 'media-heat',
+      title: 'Heat',
+    });
+    expect(collapseMirrors([alreadyMirrored, refetchedCopy], rank).map((r) => r.mirrors)).toEqual([
+      [{ serverId: 'srv-2', ratingKey: 'b-heat' }],
+    ]);
+  });
 });
 
 describe('groupDigest', () => {
