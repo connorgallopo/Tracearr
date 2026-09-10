@@ -20,6 +20,7 @@ export interface RunJob {
   newsletterId: string;
   trigger: NewsletterSendTrigger;
   testAddress?: string;
+  variantKey?: string;
 }
 export type { DeliveryJob };
 
@@ -93,7 +94,8 @@ export function startNewsletterWorkers(): void {
       const result = await runNewsletter(
         job.data.newsletterId,
         job.data.trigger,
-        job.data.testAddress
+        job.data.testAddress,
+        job.data.variantKey
       );
       if (result.sendId && result.queuedRecipientIds.length > 0) {
         await enqueueDeliveries(result.sendId, result.queuedRecipientIds);

@@ -25,6 +25,7 @@ vi.mock('../assemble.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../assemble.js')>();
   return {
     sectionItemCounts: actual.sectionItemCounts,
+    groupDigest: actual.groupDigest,
     assembleDigest: (...a: unknown[]) => mockAssemble(...a) as unknown,
   };
 });
@@ -103,6 +104,62 @@ const ONE_MOVIE = {
   counts: { ...EMPTY.counts, movies: 1 },
   isEmpty: false,
 };
+const ATTIC = {
+  id: 's2',
+  name: 'Attic',
+  type: 'jellyfin',
+  url: 'http://jf',
+  machineIdentifier: null,
+};
+const ONE_MOVIE_ATTIC = {
+  ...EMPTY,
+  movies: [
+    { ...ONE_MOVIE.movies[0]!, cardId: 'm2', serverId: 's2', serverName: 'Attic', title: 'Alien' },
+  ],
+  counts: { ...EMPTY.counts, movies: 1 },
+  isEmpty: false,
+};
+/** What the assembler answers per scope: the Basement title on s1, the Attic title on s2, both on the union. */
+function assembleByScope(empty: string[] = []) {
+  mockAssemble.mockImplementation(async (nl: { scope: { serverIds: string[] } }) => {
+    const ids = nl.scope.serverIds;
+    if (ids.some((id) => empty.includes(id)) && ids.length === 1)
+      return { data: EMPTY, posters: {} };
+    if (ids.length === 1 && ids[0] === 's2') return { data: ONE_MOVIE_ATTIC, posters: {} };
+    if (ids.length === 2)
+      return {
+        data: {
+          ...ONE_MOVIE,
+          movies: [...ONE_MOVIE.movies, ...ONE_MOVIE_ATTIC.movies],
+          counts: { ...EMPTY.counts, movies: 2 },
+        },
+        posters: {},
+      };
+    return { data: ONE_MOVIE, posters: {} };
+  });
+}
+function twoServers() {
+  store.loadServerLinks.mockResolvedValue([
+    { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'abc' },
+    ATTIC,
+  ]);
+  mockResolve.mockResolvedValue({
+    recipients: [
+      { address: 'ann@x.com', userId: 'u1', serverIds: ['s1'], name: null, suppressed: false },
+      { address: 'bob@x.com', userId: 'u2', serverIds: ['s2'], name: null, suppressed: false },
+      {
+        address: 'cid@x.com',
+        userId: 'u3',
+        serverIds: ['s1', 's2'],
+        name: null,
+        suppressed: false,
+      },
+      { address: 'extra@x.com', userId: null, serverIds: [], name: null, suppressed: false },
+    ],
+    missing: [],
+    excluded: [],
+  });
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -133,8 +190,8 @@ beforeEach(() => {
   });
   mockResolve.mockResolvedValue({
     recipients: [
-      { address: 'a@x.com', userId: 'u1', name: null, suppressed: false },
-      { address: 'gone@x.com', userId: 'u2', name: null, suppressed: true },
+      { address: 'a@x.com', userId: 'u1', serverIds: ['s1'], name: null, suppressed: false },
+      { address: 'gone@x.com', userId: 'u2', serverIds: ['s1'], name: null, suppressed: true },
     ],
     missing: [{ userId: 'u9', serverUserId: 'su-9', name: null }],
     excluded: [],
@@ -217,10 +274,11 @@ describe('runNewsletter', () => {
       { address: 'gone@x.com', userId: 'u2', status: 'suppressed', variantKey: 's1' },
     ]);
     expect(store.markSendSending).toHaveBeenCalledWith('send-1', 1);
-    expect(mockAssemble).toHaveBeenCalledWith(NEWSLETTER, {
-      start: new Date('2026-08-26T00:00:00Z'),
-      end: expect.any(Date),
-    });
+    expect(mockAssemble).toHaveBeenCalledWith(
+      { scope: { serverIds: ['s1'], libraries: [] }, sections: NEWSLETTER.sections },
+      { start: new Date('2026-08-26T00:00:00Z'), end: expect.any(Date) },
+      {}
+    );
     expect(mockDestination).toHaveBeenCalledWith(NEWSLETTER.destinationId);
     expect(store.lastWatermark).toHaveBeenCalledWith(NEWSLETTER.id);
     expect(mockResolve).toHaveBeenCalledWith(NEWSLETTER);
@@ -254,13 +312,17 @@ describe('runNewsletter', () => {
     expect(html).toContain('1 Main St');
   });
 
-  it('names the sender Tracearr when the scope spans two servers and no name is set', async () => {
-    store.loadServerLinks.mockResolvedValue([
-      { id: 's1', name: 'Basement', type: 'plex', url: 'http://plex', machineIdentifier: 'abc' },
-      { id: 's2', name: 'Attic', type: 'jellyfin', url: 'http://jf', machineIdentifier: null },
-    ]);
+  it('names the sender Tracearr on a variant that spans two servers when no name is set', async () => {
+    twoServers();
+    assembleByScope();
     await runNewsletter(NEWSLETTER.id, 'schedule');
-    expect(firstSnapshot().subject).toMatch(/^What's new on Tracearr /);
+    const [, rows] = store.insertSnapshots.mock.calls[0] ?? [];
+    const subjects = Object.fromEntries(
+      (rows as SnapshotArg[]).map((r) => [r.variantKey, r.subject])
+    );
+    expect(subjects['s1,s2']).toMatch(/^What's new on Tracearr /);
+    expect(subjects['s1']).toMatch(/^What's new on Basement /);
+    expect(subjects['s2']).toMatch(/^What's new on Attic /);
   });
 
   it('emits the Tracearr media link only when the newsletter turns links on', async () => {
@@ -478,6 +540,19 @@ describe('runNewsletter', () => {
     mockAssemble.mockResolvedValue({ data, posters });
     mockSettings.mockResolvedValue({ externalUrl: EXTERNAL_URL, trustProxy: false });
     store.loadServerLinks.mockResolvedValue([JELLYFIN_SERVER]);
+    mockResolve.mockResolvedValue({
+      recipients: [
+        {
+          address: 'a@x.com',
+          userId: 'u1',
+          serverIds: [JELLYFIN_SERVER.id],
+          name: null,
+          suppressed: false,
+        },
+      ],
+      missing: [],
+      excluded: [],
+    });
     store.getNewsletter.mockResolvedValue({
       ...NEWSLETTER,
       scope: { serverIds: [JELLYFIN_SERVER.id], libraries: [] },
@@ -505,5 +580,114 @@ describe('runNewsletter', () => {
     );
     expect(firstSend().itemCounts).toEqual(data.counts);
     expect(snapshot.posters).toBe(posters);
+  });
+
+  it('renders one digest per set of servers its recipients belong to, keys every row by it, and stores one snapshot per variant', async () => {
+    twoServers();
+    assembleByScope();
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result.outcome).toBe('queued');
+    const scopes = mockAssemble.mock.calls.map(
+      (c) => (c[0] as { scope: { serverIds: string[] } }).scope.serverIds
+    );
+    expect(scopes).toEqual([['s1', 's2'], ['s1'], ['s2']]);
+    const [, rows] = store.insertSnapshots.mock.calls[0] ?? [];
+    const byKey = Object.fromEntries((rows as SnapshotArg[]).map((r) => [r.variantKey, r.html]));
+    expect(Object.keys(byKey).sort()).toEqual(['s1', 's1,s2', 's2']);
+    expect(byKey['s1']).toContain('Heat');
+    expect(byKey['s1']).not.toContain('Alien');
+    expect(byKey['s2']).toContain('Alien');
+    expect(byKey['s2']).not.toContain('Heat');
+    expect(byKey['s1,s2']).toContain('Heat');
+    expect(byKey['s1,s2']).toContain('Alien');
+    // The footer follows the newsletter's server order: the scope names none, so it is the order loadServerLinks answered.
+    expect(byKey['s1,s2']).toContain('member of <!-- -->Basement and Attic');
+    expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
+      { address: 'cid@x.com', userId: 'u3', status: 'queued', variantKey: 's1,s2' },
+      { address: 'extra@x.com', userId: null, status: 'queued', variantKey: 's1,s2' },
+      { address: 'ann@x.com', userId: 'u1', status: 'queued', variantKey: 's1' },
+      { address: 'bob@x.com', userId: 'u2', status: 'queued', variantKey: 's2' },
+    ]);
+    expect(firstSend()).toMatchObject({
+      itemCounts: { ...EMPTY.counts, movies: 2 },
+      variants: [
+        { key: 's1,s2', serverNames: ['Basement', 'Attic'], recipientCount: 2, empty: false },
+        { key: 's1', serverNames: ['Basement'], recipientCount: 1, empty: false },
+        { key: 's2', serverNames: ['Attic'], recipientCount: 1, empty: false },
+      ],
+    });
+    expect(store.markSendSending).toHaveBeenCalledWith('send-1', 4);
+  });
+
+  it('records a variant with nothing new as empty, gives its people no rows, and still sends the others', async () => {
+    twoServers();
+    assembleByScope(['s2']);
+    await runNewsletter(NEWSLETTER.id, 'schedule');
+    const [, rows] = store.insertSnapshots.mock.calls[0] ?? [];
+    expect((rows as SnapshotArg[]).map((r) => r.variantKey)).toEqual(['s1,s2', 's1']);
+    expect(store.insertRecipients.mock.calls[0]?.[1]).toEqual([
+      { address: 'cid@x.com', userId: 'u3', status: 'queued', variantKey: 's1,s2' },
+      { address: 'extra@x.com', userId: null, status: 'queued', variantKey: 's1,s2' },
+      { address: 'ann@x.com', userId: 'u1', status: 'queued', variantKey: 's1' },
+    ]);
+    expect(firstSend()).toMatchObject({
+      variants: [
+        { key: 's1,s2', empty: false },
+        { key: 's1', empty: false },
+        { key: 's2', recipientCount: 1, bytes: 0, empty: true },
+      ],
+    });
+  });
+
+  it('skips the send when every variant that reaches someone is empty, recording those variants', async () => {
+    twoServers();
+    mockResolve.mockResolvedValue({
+      recipients: [
+        { address: 'bob@x.com', userId: 'u2', serverIds: ['s2'], name: null, suppressed: false },
+      ],
+      missing: [],
+      excluded: [],
+    });
+    assembleByScope(['s2']);
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result).toEqual({ outcome: 'skipped_empty', sendId: 'send-1', queuedRecipientIds: [] });
+    expect(firstSend()).toMatchObject({
+      outcome: 'skipped_empty',
+      variants: [{ key: 's2', recipientCount: 1, empty: true }],
+    });
+    expect(store.insertSnapshots).not.toHaveBeenCalled();
+    expect(store.insertRecipients).not.toHaveBeenCalled();
+  });
+
+  it('a test send on a picked variant assembles and renders that variant only', async () => {
+    twoServers();
+    assembleByScope();
+    await runNewsletter(NEWSLETTER.id, 'test', 'me@example.com', 's2');
+    expect(mockAssemble).toHaveBeenCalledTimes(1);
+    expect(mockAssemble.mock.calls[0]?.[0]).toMatchObject({ scope: { serverIds: ['s2'] } });
+    expect(mockResolve).not.toHaveBeenCalled();
+    expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
+      { address: 'me@example.com', userId: null, status: 'queued', variantKey: 's2' },
+    ]);
+    expect(firstSnapshot().html).toContain('Alien');
+    expect(firstSnapshot().html).not.toContain('member of');
+  });
+
+  it('assembles a variant with no library pairs on its servers as empty instead of every library there', async () => {
+    twoServers();
+    store.getNewsletter.mockResolvedValue({
+      ...NEWSLETTER,
+      scope: { serverIds: [], libraries: [{ serverId: 's1', libraryId: '1' }] },
+    });
+    assembleByScope();
+    await runNewsletter(NEWSLETTER.id, 'schedule');
+    const scopes = mockAssemble.mock.calls.map((c) => (c[0] as { scope: unknown }).scope);
+    expect(scopes).toEqual([
+      { serverIds: ['s1', 's2'], libraries: [{ serverId: 's1', libraryId: '1' }] },
+      { serverIds: ['s1'], libraries: [{ serverId: 's1', libraryId: '1' }] },
+    ]);
+    expect(firstSend()).toMatchObject({
+      variants: [{ key: 's1,s2' }, { key: 's1' }, { key: 's2', empty: true }],
+    });
   });
 });

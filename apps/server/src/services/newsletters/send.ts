@@ -1,26 +1,13 @@
-import {
-  resolveSenderName,
-  variantKey,
-  type NewsletterSendTrigger,
-  type NewsletterSendVariant,
-} from '@tracearr/shared';
+import type { NewsletterSendTrigger, NewsletterSendVariant } from '@tracearr/shared';
+import type { PosterRef } from '../../db/schema.js';
 import { getDestination } from '../notifications/destinationStore.js';
 import { resolveEmailBranding } from '../notifications/emailBranding.js';
-import { readLogoPng } from '../notifications/emailLogo.js';
-import { renderTemplate } from '../notifications/types.js';
 import { getNetworkSettings } from '../settings.js';
-import { assembleDigest } from './assemble.js';
+import type { DigestData } from './assemble.js';
 import { announceSendFinished } from './events.js';
-import { renderDigestToFit } from './fit.js';
+import { NO_TRIM } from './fit.js';
 import { newViewToken } from './links.js';
-import { resolveRecipients, type ResolvedRecipient } from './recipients.js';
-import {
-  UNSUBSCRIBE_PLACEHOLDER,
-  VIEW_PLACEHOLDER,
-  formatWindowDate,
-  logoRefFor,
-  resolveImageMode,
-} from './render.js';
+import { resolveRecipients } from './recipients.js';
 import {
   OpenSendConflict,
   closeStaleSend,
@@ -34,8 +21,11 @@ import {
   markSendOutcome,
   markSendSending,
   queuedRecipientIds,
+  type NewSnapshot,
   type NewsletterRow,
 } from './store.js';
+import { assembleVariant, renderVariant, type VariantRenderContext } from './variantRender.js';
+import { orderServers, planVariants, testVariantPlan, variantFor } from './variants.js';
 import { computeWindow } from './window.js';
 
 export interface RunResult {
@@ -73,10 +63,18 @@ async function resume(
   };
 }
 
+interface RecipientRowInput {
+  address: string;
+  userId: string | null;
+  status: 'queued' | 'suppressed';
+  variantKey: string;
+}
+
 export async function runNewsletter(
   newsletterId: string,
   trigger: NewsletterSendTrigger,
-  testAddress?: string
+  testAddress?: string,
+  testVariantKey?: string
 ): Promise<RunResult> {
   const newsletter = await getNewsletter(newsletterId);
   if (!newsletter) return { outcome: 'failed', sendId: null, queuedRecipientIds: [] };
@@ -101,42 +99,51 @@ export async function runNewsletter(
     return { outcome: 'failed', sendId: send.id, queuedRecipientIds: [] };
   }
 
+  const skipEmpty = newsletter.skipWhenEmpty && trigger !== 'test';
   const done = (result: RunResult) => ({ done: result });
   const prepare = async () => {
-    const { externalUrl } = await getNetworkSettings();
-    const { data, posters } = await assembleDigest(newsletter, window);
+    const [{ externalUrl }, links, branding] = await Promise.all([
+      getNetworkSettings(),
+      loadServerLinks(newsletter.scope.serverIds),
+      resolveEmailBranding(),
+    ]);
+    const servers = orderServers(newsletter.scope, links);
+    const ctx: VariantRenderContext = {
+      newsletter,
+      window,
+      externalUrl,
+      branding,
+      servers,
+      memberSend: trigger !== 'test',
+    };
 
-    if (data.isEmpty && newsletter.skipWhenEmpty && trigger !== 'test') {
+    // The union (or the one test variant) is assembled first: its counts are the send's, and an empty whole scope skips before anyone is resolved.
+    const testPlan = testAddress ? testVariantPlan(servers, testAddress, testVariantKey) : null;
+    const primary =
+      testPlan?.variants[0] ??
+      variantFor(
+        servers,
+        servers.map((s) => s.id),
+        []
+      );
+    const assembled = new Map<string, { data: DigestData; posters: Record<string, PosterRef> }>();
+    const primaryDigest = await assembleVariant(ctx, primary);
+    assembled.set(primary.key, primaryDigest);
+    if (primaryDigest.data.isEmpty && skipEmpty) {
       const send = await insertSend({
         ...base,
-        itemCounts: data.counts,
+        itemCounts: primaryDigest.data.counts,
         outcome: 'skipped_empty',
       });
       return done({ outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] });
     }
 
-    const recipients: ResolvedRecipient[] = testAddress
-      ? [
-          {
-            address: testAddress.trim().toLowerCase(),
-            userId: null,
-            serverUserId: null,
-            name: null,
-            suppressed: false,
-            serverId: null,
-            username: null,
-            serverName: null,
-            thumbUrl: null,
-            serverIds: [],
-          },
-        ]
-      : (await resolveRecipients(newsletter)).recipients;
-
-    const deliverable = recipients.filter((r) => !r.suppressed);
-    if (deliverable.length === 0) {
+    const plan = testPlan ?? planVariants(servers, await resolveRecipients(newsletter));
+    const populated = plan.variants.filter((v) => v.recipients.length > 0);
+    if (!populated.some((v) => v.recipients.some((r) => !r.suppressed))) {
       const send = await insertSend({
         ...base,
-        itemCounts: data.counts,
+        itemCounts: primaryDigest.data.counts,
         outcome: 'failed',
         error: 'No deliverable recipients',
       });
@@ -144,61 +151,57 @@ export async function runNewsletter(
       return done({ outcome: 'failed', sendId: send.id, queuedRecipientIds: [] });
     }
 
-    const servers = await loadServerLinks(newsletter.scope.serverIds);
-    const serversById = new Map(servers.map((s) => [s.id, s]));
-    const senderName = resolveSenderName(
-      newsletter.senderName,
-      servers.map((s) => s.name)
-    );
-    const { branding, logo } = await resolveEmailBranding();
-    const mode = resolveImageMode(newsletter.imageMode, externalUrl);
-    const origin = externalUrl?.replace(/\/$/, '') ?? '';
-    const itemCount = data.counts.movies + data.counts.episodes + data.counts.albums;
-    const subject = renderTemplate(newsletter.subject, {
-      server_name: senderName,
-      start_date: formatWindowDate(window.start, newsletter.timezone),
-      end_date: formatWindowDate(window.end, newsletter.timezone),
-      item_count: String(itemCount),
-    });
-    const fit = await renderDigestToFit(
-      data,
-      posters,
-      {
-        subject,
-        intro: newsletter.intro,
-        outro: newsletter.outro,
-        windowStart: formatWindowDate(window.start, newsletter.timezone),
-        windowEnd: formatWindowDate(window.end, newsletter.timezone),
-        logoRef: logoRefFor(logo, mode, origin, readLogoPng() !== null),
-        unsubscribeUrl: externalUrl ? UNSUBSCRIBE_PLACEHOLDER : null,
-        viewUrl: externalUrl ? VIEW_PLACEHOLDER : null,
-        externalUrl,
-        tracearrLinks: newsletter.links.tracearr,
-        serversById,
-        memberSend: trigger !== 'test',
-      },
-      { ...branding, senderName },
-      { newsletterId, mode, externalUrl }
-    );
-    const ids = servers.map((s) => s.id);
-    const variant: NewsletterSendVariant = {
-      key: variantKey(ids),
-      serverIds: ids,
-      serverNames: servers.map((s) => s.name),
-      recipientCount: deliverable.length,
-      trimmed: fit.trimmed,
-      bytes: fit.bytes,
-      empty: false,
-    };
-    return {
-      counts: data.counts,
-      posters,
-      recipients,
-      deliverable,
-      subject,
-      rendered: fit.rendered,
-      variant,
-    };
+    const variants: NewsletterSendVariant[] = [];
+    const snapshots: NewSnapshot[] = [];
+    const recipientRows: RecipientRowInput[] = [];
+    for (const variant of populated) {
+      const digest = assembled.get(variant.key) ?? (await assembleVariant(ctx, variant));
+      const recipientCount = variant.recipients.filter((r) => !r.suppressed).length;
+      const record = {
+        key: variant.key,
+        serverIds: variant.serverIds,
+        serverNames: variant.serverNames,
+        recipientCount,
+      };
+      if (digest.data.isEmpty && skipEmpty) {
+        variants.push({ ...record, trimmed: NO_TRIM, bytes: 0, empty: true });
+        continue;
+      }
+      const rendered = await renderVariant(ctx, variant, digest.data, digest.posters);
+      variants.push({
+        ...record,
+        trimmed: rendered.fit.trimmed,
+        bytes: rendered.fit.bytes,
+        empty: false,
+      });
+      snapshots.push({
+        variantKey: variant.key,
+        viewToken: newViewToken(),
+        subject: rendered.subject,
+        html: rendered.fit.rendered.html,
+        text: rendered.fit.rendered.text,
+        posters: digest.posters,
+      });
+      recipientRows.push(
+        ...variant.recipients.map((r) => ({
+          address: r.address,
+          userId: r.userId,
+          status: r.suppressed ? ('suppressed' as const) : ('queued' as const),
+          variantKey: variant.key,
+        }))
+      );
+    }
+    if (snapshots.length === 0) {
+      // Something is new somewhere, but nothing on the servers anyone here belongs to.
+      const send = await insertSend({
+        ...base,
+        itemCounts: primaryDigest.data.counts,
+        outcome: 'skipped_empty',
+        variants,
+      });
+      return done({ outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] });
+    }
+    return { counts: primaryDigest.data.counts, variants, snapshots, recipientRows };
   };
 
   let ready;
@@ -219,16 +222,11 @@ export async function runNewsletter(
     throw error;
   }
   if ('done' in ready) return ready.done;
-  const { counts, posters, recipients, deliverable, subject, rendered, variant } = ready;
+  const { counts, variants, snapshots, recipientRows } = ready;
 
   let send;
   try {
-    send = await insertSend({
-      ...base,
-      itemCounts: counts,
-      outcome: 'rendering',
-      variants: [variant],
-    });
+    send = await insertSend({ ...base, itemCounts: counts, outcome: 'rendering', variants });
   } catch (error) {
     if (error instanceof OpenSendConflict) {
       const raced = await resume(newsletterId, trigger);
@@ -238,31 +236,11 @@ export async function runNewsletter(
   }
 
   try {
-    await insertSnapshots(send.id, [
-      {
-        variantKey: variant.key,
-        viewToken: newViewToken(),
-        subject,
-        html: rendered.html,
-        text: rendered.text,
-        posters,
-      },
-    ]);
-    const rows = await insertRecipients(
-      send.id,
-      recipients.map((r) => ({
-        address: r.address,
-        userId: r.userId,
-        status: r.suppressed ? 'suppressed' : 'queued',
-        variantKey: variant.key,
-      }))
-    );
-    await markSendSending(send.id, deliverable.length);
-    return {
-      outcome: 'queued',
-      sendId: send.id,
-      queuedRecipientIds: rows.filter((r) => r.status === 'queued').map((r) => r.id),
-    };
+    await insertSnapshots(send.id, snapshots);
+    const rows = await insertRecipients(send.id, recipientRows);
+    const queued = rows.filter((r) => r.status === 'queued').map((r) => r.id);
+    await markSendSending(send.id, queued.length);
+    return { outcome: 'queued', sendId: send.id, queuedRecipientIds: queued };
   } catch (error) {
     await markSendOutcome(
       send.id,
