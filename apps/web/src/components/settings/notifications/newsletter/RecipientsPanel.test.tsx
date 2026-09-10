@@ -6,12 +6,12 @@ import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { NewsletterRecipients, NewsletterRecipientsView } from '@tracearr/shared';
 import { getAvatarUrl } from '@/components/users/utils';
-import { RecipientsPanel, partitionRecipients, extraRecipients } from './RecipientsPanel';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, vars?: Record<string, unknown>) =>
       vars ? `${key}:${JSON.stringify(vars)}` : key,
+    i18n: { language: 'en-US' },
   }),
 }));
 const identityMutate = vi.fn();
@@ -30,6 +30,12 @@ vi.mock('@/components/ui/avatar', async (importOriginal) => {
   };
 });
 import { useNewsletterRecipients, newsletterKeys } from '@/hooks/queries';
+import {
+  RecipientsPanel,
+  partitionRecipients,
+  extraRecipients,
+  groupByVariant,
+} from './RecipientsPanel';
 
 let queryClient: QueryClient;
 
@@ -119,7 +125,16 @@ const view: NewsletterRecipientsView = {
   ],
 };
 
-function renderPanel(over: Partial<NewsletterRecipients> = {}, id: string | null = 'n-1') {
+const servers = [
+  { id: 's1', name: 'Home Plex' },
+  { id: 's2', name: 'Attic' },
+];
+
+function renderPanel(
+  over: Partial<NewsletterRecipients> = {},
+  id: string | null = 'n-1',
+  panelServers: { id: string; name: string }[] = [{ id: 's1', name: 'Home Plex' }]
+) {
   const onExclude = vi.fn();
   const onInclude = vi.fn();
   vi.mocked(useNewsletterRecipients).mockReturnValue({
@@ -135,11 +150,32 @@ function renderPanel(over: Partial<NewsletterRecipients> = {}, id: string | null
         recipients={{ members: true, extraAddresses: [], excludeUserIds: ['u4'], ...over }}
         onExclude={onExclude}
         onInclude={onInclude}
+        servers={panelServers}
       />
     </Providers>
   );
   return { onExclude, onInclude };
 }
+
+describe('groupByVariant', () => {
+  it('puts each row under the scoped servers it belongs to, extras under the union, union first', () => {
+    const rows = [
+      { userId: 'u1', serverIds: ['s1'] },
+      { userId: null, serverIds: [] },
+      { userId: 'u2', serverIds: ['s2', 's1'] },
+      { userId: 'u3', serverIds: ['s2'] },
+    ];
+    const groups = groupByVariant(rows, [
+      { id: 's2', name: 'Attic' },
+      { id: 's1', name: 'Home Plex' },
+    ]);
+    expect(groups.map((g) => [g.key, g.serverNames, g.rows.map((r) => r.userId)])).toEqual([
+      ['s1,s2', ['Attic', 'Home Plex'], [null, 'u2']],
+      ['s1', ['Home Plex'], ['u1']],
+      ['s2', ['Attic'], ['u3']],
+    ]);
+  });
+});
 
 describe('partitionRecipients', () => {
   it('moves a locally excluded person to the excluded list and a locally included one back', () => {
@@ -162,6 +198,18 @@ describe('RecipientsPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  });
+
+  it('groups the receive list under a heading per variant when the scope has several servers, and not for one', () => {
+    renderPanel({ excludeUserIds: [] }, 'n-1', servers);
+    const headings = screen
+      .getAllByText(/newsletters\.editor\.variantHeading/)
+      .map((el) => el.textContent);
+    expect(headings).toEqual([
+      'newsletters.editor.variantHeading:{"servers":"Home Plex and Attic","count":1}',
+      'newsletters.editor.variantHeading:{"servers":"Home Plex","count":2}',
+    ]);
+    expect(screen.getByRole('listitem', { name: 'extra@x.com' })).toBeInTheDocument();
   });
 
   it('says to save first in create mode', () => {
@@ -259,6 +307,7 @@ describe('RecipientsPanel', () => {
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
+          servers={[]}
         />
       </Providers>
     );
@@ -361,6 +410,7 @@ describe('RecipientsPanel', () => {
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
+          servers={[]}
         />
       </Providers>
     );
@@ -407,6 +457,7 @@ describe('RecipientsPanel', () => {
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
+          servers={[]}
         />
       </Providers>
     );
@@ -451,6 +502,7 @@ describe('RecipientsPanel', () => {
           recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
+          servers={[]}
         />
       </Providers>
     );

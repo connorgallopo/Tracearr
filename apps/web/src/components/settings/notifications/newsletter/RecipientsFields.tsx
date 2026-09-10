@@ -15,8 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemGroup } from '@/components/ui/item';
 import { Switch } from '@/components/ui/switch';
+import { useServers } from '@/hooks/queries';
 import { RecipientsPanel } from './RecipientsPanel';
-import type { FieldsetProps } from './newsletterForm';
+import { scopedServers, type FieldsetProps } from './newsletterForm';
 
 const address = z.email();
 
@@ -27,6 +28,7 @@ export function RecipientsFields({
   newsletterId,
 }: FieldsetProps & { newsletterId: string | null }) {
   const { t } = useTranslation('settings');
+  const { data: servers } = useServers();
   const { recipients } = state;
   const setRecipients = (patch: Partial<typeof recipients>) =>
     onChange({ recipients: { ...recipients, ...patch } });
@@ -134,6 +136,7 @@ export function RecipientsFields({
         onInclude={(userId) =>
           setRecipients({ excludeUserIds: recipients.excludeUserIds.filter((id) => id !== userId) })
         }
+        servers={scopedServers(state.scope, servers ?? []).map((s) => ({ id: s.id, name: s.name }))}
       />
     </FieldSet>
   );

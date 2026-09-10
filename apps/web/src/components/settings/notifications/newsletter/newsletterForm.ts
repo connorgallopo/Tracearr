@@ -5,6 +5,7 @@ import {
   createNewsletterSchema,
   type CreateNewsletterInput,
   type Newsletter,
+  type NewsletterScope,
   type UpdateNewsletterInput,
 } from '@tracearr/shared';
 import type { RichTextChange } from '@/components/ui/rich-text-normalize';
@@ -106,6 +107,18 @@ export function validateForm(state: NewsletterFormState): FieldErrors {
     if (errors[field] === undefined) errors[field] = issue.message;
   }
   return errors;
+}
+
+/** The servers a scope resolves to, in the scope's own order; every server when it names none. */
+export function scopedServers<T extends { id: string }>(
+  scope: Pick<NewsletterScope, 'serverIds'>,
+  servers: readonly T[]
+): T[] {
+  if (scope.serverIds.length === 0) return [...servers];
+  return scope.serverIds.flatMap((id) => {
+    const server = servers.find((s) => s.id === id);
+    return server ? [server] : [];
+  });
 }
 
 export function prefillFromRouterState(state: unknown): Partial<NewsletterFormState> {

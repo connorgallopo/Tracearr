@@ -2,12 +2,14 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, Mail, UserX } from 'lucide-react';
-import type {
-  NewsletterExcludedPerson,
-  NewsletterRecipientPerson,
-  NewsletterRecipients,
-  NewsletterRecipientsView,
-  NewsletterResolvedRecipient,
+import {
+  variantKey,
+  variantServerIds,
+  type NewsletterExcludedPerson,
+  type NewsletterRecipientPerson,
+  type NewsletterRecipients,
+  type NewsletterRecipientsView,
+  type NewsletterResolvedRecipient,
 } from '@tracearr/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -31,12 +33,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAvatarUrl } from '@/components/users/utils';
 import { newsletterKeys, useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
+import { formatList } from '@/lib/listFormat';
 import type { Translate } from '../newsletterFormat';
 
 /** react-i18next's `t` overloads don't collapse to the plain `Translate` signature; this is the one cast. */
-function useTranslate(): Translate {
-  const { t } = useTranslation(['settings', 'common']);
-  return t as Translate;
+function useTranslate(): { t: Translate; i18n: { language: string } } {
+  const { t, i18n } = useTranslation(['settings', 'common']);
+  return { t: t as Translate, i18n };
 }
 
 /** The fields every recipient list row carries, whether or not an address or badge applies. */
@@ -122,6 +125,37 @@ export function extraRecipients(
   return [...seen.values()];
 }
 
+export interface VariantGroup<T> {
+  key: string;
+  serverNames: string[];
+  rows: T[];
+}
+
+/** Rows under the set of scoped servers each belongs to, the union first; an extra address, or a member matching none, goes to the union. */
+export function groupByVariant<T extends { userId: string | null; serverIds: string[] }>(
+  rows: readonly T[],
+  servers: readonly { id: string; name: string }[]
+): VariantGroup<T>[] {
+  const all = servers.map((s) => s.id);
+  const unionKey = variantKey(all);
+  const groups = new Map<string, VariantGroup<T>>();
+  for (const row of rows) {
+    const matched = variantServerIds(row.userId === null ? null : row.serverIds, all);
+    const ids = matched.length === 0 ? all : matched;
+    const key = variantKey(ids);
+    const group = groups.get(key) ?? {
+      key,
+      serverNames: servers.filter((s) => ids.includes(s.id)).map((s) => s.name),
+      rows: [],
+    };
+    group.rows.push(row);
+    groups.set(key, group);
+  }
+  return [...groups.values()].sort((a, b) =>
+    a.key === unionKey ? -1 : b.key === unionKey ? 1 : a.key.localeCompare(b.key)
+  );
+}
+
 /** The Members-off preview: a typed address with its optional name, no account behind it. */
 function RecipientRow({ label, description }: { label: string; description?: string | null }) {
   return (
@@ -151,7 +185,7 @@ function PersonRow({
   action?: ReactNode;
   children?: ReactNode;
 }) {
-  const t = useTranslate();
+  const { t } = useTranslate();
   const isExtra = person.serverUserId === null;
   const title = isExtra ? (recipientAddress ?? '') : displayName(person, t);
   const avatarUrl = isExtra ? null : getAvatarUrl(person.serverId, person.thumbUrl, 40);
@@ -218,7 +252,7 @@ function MissingRow({
   person: NewsletterRecipientPerson;
   onSaved: () => void;
 }) {
-  const t = useTranslate();
+  const { t } = useTranslate();
   const identity = useUpdateUserIdentity();
   const [value, setValue] = useState('');
   const label = displayName(person, t);
@@ -258,13 +292,15 @@ export function RecipientsPanel({
   recipients,
   onExclude,
   onInclude,
+  servers,
 }: {
   newsletterId: string | null;
   recipients: NewsletterRecipients;
   onExclude: (userId: string) => void;
   onInclude: (userId: string) => void;
+  servers: { id: string; name: string }[];
 }) {
-  const t = useTranslate();
+  const { t, i18n } = useTranslate();
   const { members, extraAddresses, excludeUserIds } = recipients;
   // With Members off the server has nothing to add: the list is the typed addresses.
   const { data, isLoading, isError, error, refetch } = useNewsletterRecipients(
@@ -361,33 +397,56 @@ export function RecipientsPanel({
         <p className="text-sm font-medium">
           {t('newsletters.editor.recipients.willReceive', { count: receive.length })}
         </p>
-        <ItemGroup className="mt-2 gap-1">
-          {receive.map((r) => (
-            <PersonRow key={r.address} person={r} address={r.address} action={excludeAction(r)} />
-          ))}
-          {included.map((p) => (
-            <PersonRow
-              key={p.userId}
-              person={p}
-              badge={
-                <Badge variant="outline">
-                  {t('newsletters.editor.recipients.includedAfterSave')}
-                </Badge>
-              }
-              action={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  aria-label={t('newsletters.editor.recipients.exclude', { name: personName(p) })}
-                  onClick={() => onExclude(p.userId)}
-                >
-                  {t('newsletters.editor.recipients.excludeAction')}
-                </Button>
-              }
-            />
-          ))}
-        </ItemGroup>
+        {groupByVariant<NewsletterResolvedRecipient | PendingPerson>(
+          [...receive, ...included],
+          servers
+        ).map((group, _i, groups) => (
+          <div key={group.key}>
+            {groups.length > 1 && (
+              <p className="text-muted-foreground mt-2 text-xs font-medium">
+                {t('newsletters.editor.variantHeading', {
+                  servers: formatList(i18n.language, group.serverNames),
+                  count: group.rows.length,
+                })}
+              </p>
+            )}
+            <ItemGroup className="mt-2 gap-1">
+              {group.rows.map((row) =>
+                'address' in row ? (
+                  <PersonRow
+                    key={row.address}
+                    person={row}
+                    address={row.address}
+                    action={excludeAction(row)}
+                  />
+                ) : (
+                  <PersonRow
+                    key={row.userId}
+                    person={row}
+                    badge={
+                      <Badge variant="outline">
+                        {t('newsletters.editor.recipients.includedAfterSave')}
+                      </Badge>
+                    }
+                    action={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        aria-label={t('newsletters.editor.recipients.exclude', {
+                          name: personName(row),
+                        })}
+                        onClick={() => onExclude(row.userId)}
+                      >
+                        {t('newsletters.editor.recipients.excludeAction')}
+                      </Button>
+                    }
+                  />
+                )
+              )}
+            </ItemGroup>
+          </div>
+        ))}
       </div>
       {suppressed.length > 0 && (
         <div>

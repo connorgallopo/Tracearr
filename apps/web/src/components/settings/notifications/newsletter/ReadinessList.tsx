@@ -14,12 +14,20 @@ import {
   type Destination,
   type NewsletterRecipients,
   type NewsletterRecipientsView,
+  type NewsletterVariantsView,
   type Server,
 } from '@tracearr/shared';
 import { FieldLegend, FieldSet } from '@/components/ui/field';
-import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
+import {
+  useDestinations,
+  useNewsletterRecipients,
+  useNewsletterVariants,
+  useServers,
+  useSettings,
+} from '@/hooks/queries';
+import { formatList } from '@/lib/listFormat';
 import { cn } from '@/lib/utils';
-import type { NewsletterFormState } from './newsletterForm';
+import { scopedServers, type NewsletterFormState } from './newsletterForm';
 import { extraRecipients, partitionRecipients } from './RecipientsPanel';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
@@ -36,6 +44,7 @@ export type ReadinessCheck =
   | { id: 'fromDomain'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'privateServer'; status: 'warn'; server: string; reason: PrivateServerReason }
+  | { id: 'emptyVariant'; status: 'warn'; servers: string[] }
   | { id: 'dns'; status: 'info' };
 
 const domainOf = (address: string | null | undefined): string | null => {
@@ -59,6 +68,7 @@ export function readinessChecks(input: {
   destination: Destination | null;
   recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
+  variants: NewsletterVariantsView | undefined;
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
@@ -71,6 +81,12 @@ export function readinessChecks(input: {
       server: s.name,
       reason: s.publicUrl ? 'privatePublicUrl' : 'noPublicUrl',
     }));
+  const emptyVariants: ReadinessCheck[] =
+    input.variants && input.variants.variants.length > 1
+      ? input.variants.variants
+          .filter((v) => v.isEmpty)
+          .map((v) => ({ id: 'emptyVariant', status: 'warn', servers: v.serverNames }))
+      : [];
   return [
     {
       id: 'externalUrl',
@@ -90,6 +106,7 @@ export function readinessChecks(input: {
       status: !recipients.known ? 'unknown' : recipients.resolvable > 0 ? 'pass' : 'fail',
     },
     ...privateServers,
+    ...emptyVariants,
     { id: 'dns', status: 'info' },
   ];
 }
@@ -116,22 +133,22 @@ export function ReadinessList({
   state: NewsletterFormState;
   newsletterId: string | null;
 }) {
-  const { t } = useTranslation('settings');
+  const { t, i18n } = useTranslation('settings');
   const { data: settings } = useSettings();
   const { data: destinations } = useDestinations();
   const { data: servers } = useServers();
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
     state.recipients.members && newsletterId ? newsletterId : undefined
   );
+  const { data: variants } = useNewsletterVariants(newsletterId ?? undefined);
   const destination = (destinations ?? []).find((d) => d.id === state.destinationId) ?? null;
-  const inScope = (servers ?? []).filter(
-    (s) => state.scope.serverIds.length === 0 || state.scope.serverIds.includes(s.id)
-  );
+  const inScope = scopedServers(state.scope, servers ?? []);
   const checks = readinessChecks({
     externalUrl: settings?.externalUrl ?? null,
     destination,
     recipients: { form: state.recipients, view },
     servers: inScope,
+    variants,
   });
 
   // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
@@ -171,6 +188,10 @@ export function ReadinessList({
           </>
         );
       }
+      case 'emptyVariant':
+        return t('newsletters.editor.readiness.emptyVariant', {
+          servers: formatList(i18n.language, check.servers),
+        });
       case 'dns':
         return (
           <>
@@ -197,7 +218,13 @@ export function ReadinessList({
             const Icon = ICONS[check.status];
             return (
               <li
-                key={check.id === 'privateServer' ? `privateServer-${check.server}` : check.id}
+                key={
+                  check.id === 'privateServer'
+                    ? `privateServer-${check.server}`
+                    : check.id === 'emptyVariant'
+                      ? `emptyVariant-${check.servers.join(',')}`
+                      : check.id
+                }
                 className="flex items-start gap-2 text-sm leading-snug"
               >
                 <Icon

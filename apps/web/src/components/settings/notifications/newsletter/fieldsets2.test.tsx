@@ -15,6 +15,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, vars?: Record<string, unknown>) =>
       vars ? `${key}:${JSON.stringify(vars)}` : key,
+    i18n: { language: 'en-US' },
   }),
 }));
 vi.mock('@/hooks/queries', () => ({
@@ -22,10 +23,17 @@ vi.mock('@/hooks/queries', () => ({
   useSettings: vi.fn(),
   useNewsletterRecipients: vi.fn(),
   useServers: vi.fn(),
+  useNewsletterVariants: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
   newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
-import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
+import {
+  useDestinations,
+  useNewsletterRecipients,
+  useNewsletterVariants,
+  useServers,
+  useSettings,
+} from '@/hooks/queries';
 
 let queryClient: QueryClient;
 
@@ -77,6 +85,9 @@ beforeEach(() => {
     isLoading: false,
   } as unknown as ReturnType<typeof useNewsletterRecipients>);
   vi.mocked(useServers).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useServers>);
+  vi.mocked(useNewsletterVariants).mockReturnValue({
+    data: undefined,
+  } as unknown as ReturnType<typeof useNewsletterVariants>);
 });
 
 describe('RecipientsFields', () => {
@@ -258,6 +269,7 @@ const membersUnresolved = { members: true as const, extraAddresses: [], excludeU
 describe('readiness', () => {
   it('evaluates the checks, warns on an http external url, and lists each private Jellyfin or Emby server', () => {
     const checks = readinessChecks({
+      variants: undefined,
       externalUrl: 'https://tracearr.example.com',
       destination: email,
       recipients: { form: twoExtras, view: undefined },
@@ -270,6 +282,7 @@ describe('readiness', () => {
       ['dns', 'info'],
     ]);
     const bad = readinessChecks({
+      variants: undefined,
       externalUrl: null,
       destination: {
         ...email,
@@ -280,6 +293,7 @@ describe('readiness', () => {
     });
     expect(bad.map((c) => c.status)).toEqual(['fail', 'fail', 'unknown', 'info']);
     const insecure = readinessChecks({
+      variants: undefined,
       externalUrl: 'http://tracearr.example.com',
       destination: {
         ...email,
@@ -310,6 +324,7 @@ describe('readiness', () => {
     expect(
       recipientsCheck(
         readinessChecks({
+          variants: undefined,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: noExtras, view: undefined },
@@ -339,6 +354,7 @@ describe('readiness', () => {
     expect(
       recipientsCheck(
         readinessChecks({
+          variants: undefined,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: { members: true, extraAddresses: [], excludeUserIds: [] }, view },
@@ -350,6 +366,7 @@ describe('readiness', () => {
     expect(
       recipientsCheck(
         readinessChecks({
+          variants: undefined,
           externalUrl: 'https://tracearr.example.com',
           destination: email,
           recipients: { form: { members: true, extraAddresses: [], excludeUserIds: ['u1'] }, view },
@@ -361,6 +378,7 @@ describe('readiness', () => {
 
   it('names the reason a Jellyfin or Emby server has no member link and skips the ones that do', () => {
     const rows = readinessChecks({
+      variants: undefined,
       externalUrl: 'https://tracearr.example.com',
       destination: email,
       recipients: { form: twoExtras, view: undefined },
@@ -479,5 +497,82 @@ describe('readiness', () => {
     );
     expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
     expect(screen.getByText('newsletters.editor.readiness.recipientsFail')).toBeInTheDocument();
+  });
+
+  it('warns once per variant with nothing new when there are several, and never for a single one', () => {
+    const view = {
+      window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
+      variants: [
+        {
+          key: 's-1,s-2',
+          serverIds: ['s-1', 's-2'],
+          serverNames: ['Attic', 'Basement'],
+          recipientCount: 1,
+          counts: {},
+          isEmpty: false,
+        },
+        {
+          key: 's-2',
+          serverIds: ['s-2'],
+          serverNames: ['Attic'],
+          recipientCount: 4,
+          counts: {},
+          isEmpty: true,
+        },
+      ],
+    };
+    const rows = readinessChecks({
+      externalUrl: 'https://tracearr.example.com',
+      destination: email,
+      recipients: { form: twoExtras, view: undefined },
+      servers: [],
+      variants: view,
+    });
+    expect(rows.filter((c) => c.id === 'emptyVariant')).toEqual([
+      { id: 'emptyVariant', status: 'warn', servers: ['Attic'] },
+    ]);
+    const single = readinessChecks({
+      externalUrl: 'https://tracearr.example.com',
+      destination: email,
+      recipients: { form: twoExtras, view: undefined },
+      servers: [],
+      variants: { ...view, variants: [{ ...view.variants[1]! }] },
+    });
+    expect(single.some((c) => c.id === 'emptyVariant')).toBe(false);
+  });
+
+  it('renders the empty-variant row with the server names joined', () => {
+    vi.mocked(useNewsletterVariants).mockReturnValue({
+      data: {
+        window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
+        variants: [
+          {
+            key: 's-1,s-2',
+            serverIds: ['s-1', 's-2'],
+            serverNames: ['Attic', 'Basement'],
+            recipientCount: 0,
+            counts: {},
+            isEmpty: false,
+          },
+          {
+            key: 's-1',
+            serverIds: ['s-1'],
+            serverNames: ['Basement'],
+            recipientCount: 2,
+            counts: {},
+            isEmpty: true,
+          },
+        ],
+      },
+    } as unknown as ReturnType<typeof useNewsletterVariants>);
+    render(
+      <Providers>
+        <ReadinessList state={{ ...defaultFormState(), destinationId: 'd-1' }} newsletterId="n-1" />
+      </Providers>
+    );
+    expect(useNewsletterVariants).toHaveBeenCalledWith('n-1');
+    expect(
+      screen.getByText('newsletters.editor.readiness.emptyVariant:{"servers":"Basement"}')
+    ).toBeInTheDocument();
   });
 });

@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useServers } from '@/hooks/queries';
 import {
   NEWSLETTER_FIELD_IDS,
+  scopedServers,
   type FieldsetProps,
   type RichTextErrors,
   type RichTextHandler,
@@ -40,9 +41,7 @@ export function MessageFields({
 }) {
   const { t } = useTranslation('settings');
   const { data: servers } = useServers();
-  const scoped = (servers ?? []).filter(
-    (server) => state.scope.serverIds.length === 0 || state.scope.serverIds.includes(server.id)
-  );
+  const scoped = scopedServers(state.scope, servers ?? []);
   const resolvedSender = resolveSenderName(
     null,
     scoped.map((server) => server.name)
