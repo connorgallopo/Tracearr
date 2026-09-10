@@ -4,9 +4,12 @@ import {
   deepEqual,
   defaultFormState,
   diffPatch,
+  firstInvalidField,
+  focusTargetId,
   prefillFromRouterState,
   seedFromNewsletter,
   validateForm,
+  visibleErrors,
 } from './newsletterForm';
 
 const row: Newsletter = {
@@ -58,7 +61,14 @@ describe('newsletter form model', () => {
 
   it('requires a sender name once the scope resolves to more than one server', () => {
     const seed = seedFromNewsletter(row);
-    const opts = { scopedServerCount: 2, senderNameRequired: 'Pick a name' };
+    const opts = {
+      scopedServerCount: 2,
+      messages: {
+        required: 'Required',
+        maxLength: (max: number) => `At most ${max}`,
+        senderNameRequired: 'Pick a name',
+      },
+    };
     expect(validateForm(seed, opts)).toEqual({ senderName: 'Pick a name' });
     expect(validateForm({ ...seed, senderName: 'Family' }, opts)).toEqual({});
     expect(validateForm(seed, { ...opts, scopedServerCount: 1 })).toEqual({});
@@ -91,6 +101,52 @@ describe('newsletter form model', () => {
     });
     expect(Object.keys(errors).sort()).toEqual(['name', 'recipients', 'subject']);
     expect(errors.recipients).toMatch(/email/i);
+  });
+
+  it('maps the two string issues the form can raise to the given messages and leaves the rest raw', () => {
+    const messages = {
+      required: 'Required',
+      maxLength: (max: number) => `At most ${max}`,
+      senderNameRequired: 'Pick a name',
+    };
+    const blank = validateForm(defaultFormState(), { scopedServerCount: 1, messages });
+    expect(blank).toEqual({ name: 'Required' });
+    const long = validateForm(
+      { ...defaultFormState(), name: 'x'.repeat(101) },
+      { scopedServerCount: 1, messages }
+    );
+    expect(long).toEqual({ name: 'At most 100' });
+    const multi = validateForm(
+      { ...defaultFormState(), name: 'Weekly' },
+      { scopedServerCount: 2, messages }
+    );
+    expect(multi).toEqual({ senderName: 'Pick a name' });
+    const cron = validateForm(
+      { ...defaultFormState(), name: 'Weekly', schedule: { kind: 'cron', expression: 'nope' } },
+      { scopedServerCount: 1, messages }
+    );
+    expect(cron.schedule).toBe('Cron needs five fields made of digits, *, comma, dash and slash');
+  });
+
+  it('shows an error only for a touched field until the form is submitted', () => {
+    const errors = { name: 'Required', senderName: 'Pick a name' };
+    expect(visibleErrors(errors, {}, false)).toEqual({});
+    expect(visibleErrors(errors, { name: true }, false)).toEqual({ name: 'Required' });
+    expect(visibleErrors(errors, {}, true)).toEqual(errors);
+  });
+
+  it('names the first invalid field in page order and the control that answers for it', () => {
+    const state = defaultFormState();
+    expect(firstInvalidField({ senderName: 'x', name: 'y' })).toBe('name');
+    expect(firstInvalidField({})).toBeNull();
+    expect(focusTargetId('name', state)).toBe('newsletter-name');
+    expect(focusTargetId('schedule', state)).toBe('newsletter-time');
+    expect(
+      focusTargetId('schedule', { ...state, schedule: { kind: 'cron', expression: '* * * * *' } })
+    ).toBe('newsletter-cron');
+    expect(focusTargetId('sections', state)).toBe('newsletter-section-cap-movies');
+    expect(focusTargetId('destinationId', state)).toBe('newsletter-destination');
+    expect(focusTargetId('recipients', state)).toBe('newsletter-members');
   });
 });
 

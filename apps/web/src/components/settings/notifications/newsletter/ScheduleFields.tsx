@@ -52,11 +52,15 @@ export function ScheduleFields({
   onChange,
   errors,
   mode,
+  touch,
   nextRunAt,
 }: FieldsetProps & { nextRunAt?: string | null }) {
   const { t, i18n } = useTranslation('settings');
   const { schedule } = state;
-  const setSchedule = (next: NewsletterSchedule) => onChange({ schedule: next });
+  const setSchedule = (next: NewsletterSchedule) => {
+    touch('schedule');
+    onChange({ schedule: next });
+  };
 
   return (
     <FieldSet>
@@ -147,6 +151,7 @@ export function ScheduleFields({
               type="time"
               value={schedule.time}
               onChange={(event) => setSchedule({ ...schedule, time: event.target.value })}
+              onBlur={() => touch('schedule')}
             />
           </Field>
         )}
@@ -158,7 +163,10 @@ export function ScheduleFields({
             id={NEWSLETTER_FIELD_IDS.timezone}
             aria-labelledby={`${NEWSLETTER_FIELD_IDS.timezone}-label`}
             value={state.timezone}
-            onChange={(timezone) => onChange({ timezone })}
+            onChange={(timezone) => {
+              touch('timezone');
+              onChange({ timezone });
+            }}
           />
           <FieldError>{errors.timezone}</FieldError>
         </Field>
@@ -174,6 +182,7 @@ export function ScheduleFields({
             className="font-mono"
             aria-invalid={errors.schedule !== undefined}
             onChange={(event) => setSchedule({ kind: 'cron', expression: event.target.value })}
+            onBlur={() => touch('schedule')}
           />
           <FieldDescription>{t('newsletters.editor.cronHint')}</FieldDescription>
           <FieldDescription>{t('newsletters.editor.dstNote')}</FieldDescription>

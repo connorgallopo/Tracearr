@@ -54,7 +54,14 @@ describe('DeliveryFields without an email destination', () => {
     >);
     const onChange = vi.fn();
     render(
-      <DeliveryFields state={defaultFormState()} onChange={onChange} errors={{}} mode="create" />
+      <DeliveryFields
+        state={defaultFormState()}
+        onChange={onChange}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{}}
+      />
     );
 
     expect(screen.getByText('newsletters.noDestinationHint')).toBeInTheDocument();
@@ -79,14 +86,32 @@ describe('DeliveryFields destination select with no destination chosen', () => {
   });
 
   it('shows None in edit mode, where a null destination was explicitly cleared', () => {
-    render(<DeliveryFields state={stateWith()} onChange={vi.fn()} errors={{}} mode="edit" />);
+    render(
+      <DeliveryFields
+        state={stateWith()}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="edit"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
     expect(
       screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
     ).toHaveTextContent('newsletters.editor.delivery.noDestination');
   });
 
   it('shows the placeholder in create mode, where a null destination has never been touched', () => {
-    render(<DeliveryFields state={stateWith()} onChange={vi.fn()} errors={{}} mode="create" />);
+    render(
+      <DeliveryFields
+        state={stateWith()}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
     const combobox = screen.getByRole('combobox', {
       name: 'newsletters.editor.delivery.destination',
     });
@@ -102,6 +127,8 @@ describe('DeliveryFields destination select with no destination chosen', () => {
         onChange={onChange}
         errors={{}}
         mode="edit"
+        touch={vi.fn()}
+        touched={{}}
       />
     );
     await userEvent.click(
@@ -112,7 +139,16 @@ describe('DeliveryFields destination select with no destination chosen', () => {
     );
     expect(onChange).toHaveBeenCalledWith({ destinationId: null });
 
-    rerender(<DeliveryFields state={stateWith()} onChange={onChange} errors={{}} mode="edit" />);
+    rerender(
+      <DeliveryFields
+        state={stateWith()}
+        onChange={onChange}
+        errors={{}}
+        mode="edit"
+        touch={vi.fn()}
+        touched={{}}
+      />
+    );
     expect(
       screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
     ).toHaveTextContent('newsletters.editor.delivery.noDestination');
@@ -121,7 +157,14 @@ describe('DeliveryFields destination select with no destination chosen', () => {
   it('keeps the select controlled in create mode once a pick is followed by None', async () => {
     const onChange = vi.fn();
     const { rerender } = render(
-      <DeliveryFields state={stateWith()} onChange={onChange} errors={{}} mode="create" />
+      <DeliveryFields
+        state={stateWith()}
+        onChange={onChange}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{}}
+      />
     );
     await userEvent.click(
       screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
@@ -135,6 +178,8 @@ describe('DeliveryFields destination select with no destination chosen', () => {
         onChange={onChange}
         errors={{}}
         mode="create"
+        touch={vi.fn()}
+        touched={{ destinationId: true }}
       />
     );
     await userEvent.click(
@@ -145,7 +190,16 @@ describe('DeliveryFields destination select with no destination chosen', () => {
     );
     expect(onChange).toHaveBeenCalledWith({ destinationId: null });
 
-    rerender(<DeliveryFields state={stateWith()} onChange={onChange} errors={{}} mode="create" />);
+    rerender(
+      <DeliveryFields
+        state={stateWith()}
+        onChange={onChange}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{ destinationId: true }}
+      />
+    );
     expect(
       screen.getByRole('combobox', { name: 'newsletters.editor.delivery.destination' })
     ).toHaveTextContent('newsletters.editor.delivery.noDestination');
@@ -161,7 +215,14 @@ describe('DeliveryFields destination query states', () => {
       error: null,
     } as unknown as ReturnType<typeof useDestinations>);
     render(
-      <DeliveryFields state={defaultFormState()} onChange={vi.fn()} errors={{}} mode="create" />
+      <DeliveryFields
+        state={defaultFormState()}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{}}
+      />
     );
 
     expect(
@@ -181,7 +242,14 @@ describe('DeliveryFields destination query states', () => {
       error: new Error('destinations request failed'),
     } as unknown as ReturnType<typeof useDestinations>);
     render(
-      <DeliveryFields state={defaultFormState()} onChange={vi.fn()} errors={{}} mode="create" />
+      <DeliveryFields
+        state={defaultFormState()}
+        onChange={vi.fn()}
+        errors={{}}
+        mode="create"
+        touch={vi.fn()}
+        touched={{}}
+      />
     );
 
     expect(screen.getByText('destinations request failed')).toBeInTheDocument();

@@ -645,7 +645,7 @@
       "message": "Message",
       "senderName": "Shown as",
       "senderNameHelp": "Leave empty to use {{name}}.",
-      "senderNameRequiredMulti": "Pick a sender name for a newsletter that covers several servers.",
+      "senderNameRequiredMulti": "This newsletter covers {{count}} servers, so there is no one server name to sign it with. Pick a name.",
       "previewVariant": "Members on {{servers}}",
       "variantHeading": "Gets {{servers}} ({{count}})",
       "subject": "Subject",
@@ -657,6 +657,7 @@
       "save": "Save",
       "saving": "Saving",
       "unsaved": "Unsaved changes",
+      "fixFirst": "Fix the highlighted fields before saving.",
       "recipients": {
         "title": "Recipients",
         "members": "Members of the scoped servers",

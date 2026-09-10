@@ -17,7 +17,7 @@ import { Item, ItemActions, ItemContent, ItemGroup } from '@/components/ui/item'
 import { Switch } from '@/components/ui/switch';
 import { useServers } from '@/hooks/queries';
 import { RecipientsPanel } from './RecipientsPanel';
-import { scopedServers, type FieldsetProps } from './newsletterForm';
+import { NEWSLETTER_FIELD_IDS, scopedServers, type FieldsetProps } from './newsletterForm';
 
 const address = z.email();
 
@@ -25,13 +25,16 @@ export function RecipientsFields({
   state,
   onChange,
   errors,
+  touch,
   newsletterId,
 }: FieldsetProps & { newsletterId: string | null }) {
   const { t } = useTranslation('settings');
   const { data: servers } = useServers();
   const { recipients } = state;
-  const setRecipients = (patch: Partial<typeof recipients>) =>
+  const setRecipients = (patch: Partial<typeof recipients>) => {
+    touch('recipients');
     onChange({ recipients: { ...recipients, ...patch } });
+  };
   const setRow = (index: number, patch: { address?: string; name?: string }) =>
     setRecipients({
       extraAddresses: recipients.extraAddresses.map((row, i) =>
@@ -44,14 +47,14 @@ export function RecipientsFields({
       <FieldLegend>{t('newsletters.editor.recipients.title')}</FieldLegend>
       <Field orientation="horizontal">
         <FieldContent>
-          <FieldLabel htmlFor="newsletter-members">
+          <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.members}>
             {t('newsletters.editor.recipients.members')}
           </FieldLabel>
           <FieldDescription>{t('newsletters.editor.recipients.membersHelp')}</FieldDescription>
           <FieldDescription>{t('newsletters.editor.recipients.ownerNote')}</FieldDescription>
         </FieldContent>
         <Switch
-          id="newsletter-members"
+          id={NEWSLETTER_FIELD_IDS.members}
           checked={recipients.members}
           onCheckedChange={(members) => setRecipients({ members })}
           aria-label={t('newsletters.editor.recipients.members')}
@@ -73,6 +76,7 @@ export function RecipientsFields({
                     aria-label={t('newsletters.editor.recipients.addressLabel', { n: index + 1 })}
                     placeholder="someone@example.com"
                     onChange={(event) => setRow(index, { address: event.target.value })}
+                    onBlur={() => touch('recipients')}
                   />
                   <Input
                     className="max-w-48"

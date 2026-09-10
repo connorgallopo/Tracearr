@@ -53,7 +53,7 @@ const windowDays = (window: NewsletterWindow) =>
 
 const pairKey = (pair: NewsletterScopeLibrary): string => `${pair.serverId}:${pair.libraryId}`;
 
-export function ContentFields({ state, onChange, errors }: FieldsetProps) {
+export function ContentFields({ state, onChange, errors, touch }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: servers } = useServers();
   const { data: libraries, isLoading: librariesLoading } = useLibraries(state.scope.serverIds);
@@ -84,14 +84,22 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
   const unknownLibraries = librariesLoading
     ? []
     : scope.libraries.filter((pair) => !known.has(pairKey(pair)));
-  const setLibraries = (next: NewsletterScopeLibrary[]) =>
+  const setLibraries = (next: NewsletterScopeLibrary[]) => {
+    touch('scope');
     onChange({ scope: { ...scope, libraries: next } });
+  };
 
-  const setWindow = (next: NewsletterWindow) => onChange({ window: next });
+  const setWindow = (next: NewsletterWindow) => {
+    touch('window');
+    onChange({ window: next });
+  };
   const setSection = <K extends keyof NewsletterSections>(
     key: K,
     patch: Partial<NewsletterSections[K]>
-  ) => onChange({ sections: { ...sections, [key]: { ...sections[key], ...patch } } });
+  ) => {
+    touch('sections');
+    onChange({ sections: { ...sections, [key]: { ...sections[key], ...patch } } });
+  };
 
   return (
     <FieldSet>
@@ -146,6 +154,7 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
                     : { kind: 'since_last_send', fallbackDays: days }
                 )
               }
+              onBlur={() => touch('window')}
             />
             <InputGroupAddon align="inline-end" className={INPUT_GROUP_UNIT}>
               <InputGroupText>{t('newsletters.editor.days')}</InputGroupText>
@@ -163,7 +172,10 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
           aria-labelledby={`${NEWSLETTER_FIELD_IDS.servers}-label`}
           options={serverOptions}
           value={scope.serverIds}
-          onChange={(serverIds) => onChange({ scope: { ...scope, serverIds } })}
+          onChange={(serverIds) => {
+            touch('scope');
+            onChange({ scope: { ...scope, serverIds } });
+          }}
           placeholder={t('newsletters.editor.allServers')}
           searchPlaceholder={t('newsletters.editor.searchServers')}
           emptyMessage={t('newsletters.editor.noServers')}
@@ -222,7 +234,7 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
       <div className="flex flex-col gap-3">
         {SECTIONS.map((section) => {
           const label = t(`newsletters.editor.sections.${section}`);
-          const capId = `${NEWSLETTER_FIELD_IDS.name}-cap-${section}`;
+          const capId = `${NEWSLETTER_FIELD_IDS.sectionCap}-${section}`;
           return (
             <Field key={section} orientation="horizontal" className="flex-wrap">
               <Switch
@@ -244,6 +256,7 @@ export function ContentFields({ state, onChange, errors }: FieldsetProps) {
               />
               {section === 'shows' && (
                 <NumericInput
+                  id={`${NEWSLETTER_FIELD_IDS.sectionCap}-shows-seasons`}
                   className="w-20"
                   aria-label={t('newsletters.editor.seasonsPerShow')}
                   value={sections.shows.maxSeasonsPerShow}

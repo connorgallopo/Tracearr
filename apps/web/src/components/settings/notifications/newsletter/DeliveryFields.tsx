@@ -24,24 +24,23 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { useDestinations, useSettings } from '@/hooks/queries';
-import type { FieldsetProps } from './newsletterForm';
+import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 const NONE = '__none__';
 
-export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps) {
+export function DeliveryFields({ state, onChange, errors, mode, touch, touched }: FieldsetProps) {
   const { t } = useTranslation('settings');
   const { data: destinations, isLoading, isError, error } = useDestinations();
   const { data: settings } = useSettings();
   const emailDestinations = (destinations ?? []).filter((d) => d.type === 'email');
   const hostedWithoutUrl = state.imageMode === 'hosted' && !settings?.externalUrl;
   const [addOpen, setAddOpen] = useState(false);
-  const [touched, setTouched] = useState(false);
 
   return (
     <FieldSet>
       <FieldLegend>{t('newsletters.editor.delivery.title')}</FieldLegend>
       <Field className="max-w-sm" data-invalid={errors.destinationId !== undefined}>
-        <FieldLabel htmlFor="newsletter-destination">
+        <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.destination}>
           {t('newsletters.editor.delivery.destination')}
         </FieldLabel>
         {isLoading ? (
@@ -62,14 +61,16 @@ export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps)
         ) : (
           <Select
             /* A never-touched create form shows the placeholder; a saved row's cleared destination, or one this form already touched, shows None. */
-            value={state.destinationId ?? (mode === 'edit' || touched ? NONE : undefined)}
+            value={
+              state.destinationId ?? (mode === 'edit' || touched.destinationId ? NONE : undefined)
+            }
             onValueChange={(value) => {
-              setTouched(true);
+              touch('destinationId');
               onChange({ destinationId: value === NONE ? null : value });
             }}
           >
             <SelectTrigger
-              id="newsletter-destination"
+              id={NEWSLETTER_FIELD_IDS.destination}
               aria-label={t('newsletters.editor.delivery.destination')}
             >
               <SelectValue placeholder={t('newsletters.editor.delivery.pickDestination')} />
@@ -87,17 +88,18 @@ export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps)
         <FieldError>{errors.destinationId}</FieldError>
       </Field>
       <Field className="max-w-sm">
-        <FieldLabel htmlFor="newsletter-image-mode">
+        <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.imageMode}>
           {t('newsletters.editor.delivery.imageMode')}
         </FieldLabel>
         <Select
           value={state.imageMode}
-          onValueChange={(imageMode) =>
-            onChange({ imageMode: imageMode as (typeof NEWSLETTER_IMAGE_MODES)[number] })
-          }
+          onValueChange={(imageMode) => {
+            touch('imageMode');
+            onChange({ imageMode: imageMode as (typeof NEWSLETTER_IMAGE_MODES)[number] });
+          }}
         >
           <SelectTrigger
-            id="newsletter-image-mode"
+            id={NEWSLETTER_FIELD_IDS.imageMode}
             aria-label={t('newsletters.editor.delivery.imageMode')}
           >
             <SelectValue />
@@ -122,13 +124,13 @@ export function DeliveryFields({ state, onChange, errors, mode }: FieldsetProps)
       </Field>
       <Field orientation="horizontal">
         <FieldContent>
-          <FieldLabel htmlFor="newsletter-skip-empty">
+          <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.skipWhenEmpty}>
             {t('newsletters.editor.delivery.skipWhenEmpty')}
           </FieldLabel>
           <FieldDescription>{t('newsletters.editor.delivery.skipWhenEmptyHelp')}</FieldDescription>
         </FieldContent>
         <Switch
-          id="newsletter-skip-empty"
+          id={NEWSLETTER_FIELD_IDS.skipWhenEmpty}
           checked={state.skipWhenEmpty}
           onCheckedChange={(skipWhenEmpty) => onChange({ skipWhenEmpty })}
           aria-label={t('newsletters.editor.delivery.skipWhenEmpty')}

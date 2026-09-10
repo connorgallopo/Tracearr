@@ -147,6 +147,8 @@ describe('NewsletterEditor', () => {
       "What's new on {{server_name}} ({{end_date}})"
     );
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(document.querySelector('[aria-invalid="true"]')).toBeNull();
     expect(useNewsletter).toHaveBeenCalledWith(undefined);
   });
 
@@ -223,10 +225,21 @@ describe('NewsletterEditor', () => {
     const alerts = screen.getAllByRole('alert');
     expect(alerts[alerts.length - 1]).toHaveTextContent('Newsletter not found');
   });
+
+  it('paints the required error only once Name has been left empty', async () => {
+    renderAt('/settings/notifications/newsletters/new');
+    const name = screen.getByLabelText('newsletters.editor.name');
+    await userEvent.type(name, 'W');
+    await userEvent.clear(name);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await userEvent.tab();
+    expect(screen.getByRole('alert')).toHaveTextContent('common:validation.required');
+    expect(name).toHaveAttribute('aria-invalid', 'true');
+  });
 });
 
 describe('NewsletterEditor save flows', () => {
-  it('shows the unsaved dot once something changes, disables Save while invalid, and posts the whole object on create', async () => {
+  it('keeps Save enabled while invalid, refuses inline with focus on the first bad field, and posts the whole object once valid', async () => {
     createMutate.mockImplementation(
       (_body: unknown, opts: { onSuccess: (row: Newsletter) => void }) =>
         opts.onSuccess({ ...row, id: 'n-9' })
@@ -244,13 +257,25 @@ describe('NewsletterEditor save flows', () => {
     expect(save).toBeDisabled();
     expect(screen.queryByText('newsletters.editor.unsaved')).not.toBeInTheDocument();
 
-    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'Fresh');
+    await userEvent.type(screen.getByLabelText('newsletters.editor.subject'), '!');
     expect(screen.getByText('newsletters.editor.unsaved')).toBeInTheDocument();
     expect(save).toBeEnabled();
+    await userEvent.click(save);
+    expect(screen.getByText('newsletters.editor.fixFirst')).toBeInTheDocument();
+    expect(screen.getByLabelText('newsletters.editor.name')).toHaveFocus();
+    expect(screen.getByLabelText('newsletters.editor.name')).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(createMutate).not.toHaveBeenCalled();
+
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'Fresh');
+    expect(screen.queryByText('newsletters.editor.fixFirst')).not.toBeInTheDocument();
     await userEvent.click(save);
     expect(createMutate.mock.calls[0]?.[0]).toMatchObject({
       name: 'Fresh',
       enabled: true,
+      subject: "What's new on {{server_name}} ({{end_date}})!",
       links: { tracearr: false },
     });
     expect(router.state.location.pathname).toBe('/settings/notifications/newsletters/n-9');
@@ -284,7 +309,7 @@ describe('NewsletterEditor save flows', () => {
     expect(screen.getByLabelText('newsletters.editor.name')).toHaveValue('Fresh');
   });
 
-  it('blocks the save with the sender-name error when two servers are in scope and no name is set', async () => {
+  it('refuses the save with the sender-name sentence when two servers are in scope, then saves once a name is typed', async () => {
     vi.mocked(useServers).mockReturnValue({
       data: [
         { id: 's-1', name: 'Basement', type: 'plex' },
@@ -296,17 +321,26 @@ describe('NewsletterEditor save flows', () => {
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof useNewsletter>);
+    updateMutate.mockImplementation(
+      (_vars: unknown, opts: { onSuccess: (r: Newsletter) => void }) => opts.onSuccess(row)
+    );
     renderAt('/settings/notifications/newsletters/n-1');
-    // Dirties the form through a field the sender-name rule doesn't touch, so the save button's disabled state below comes from validation, not the untouched-form gate.
     await userEvent.type(screen.getByLabelText('newsletters.editor.name'), '!');
+    expect(screen.queryByText(/senderNameRequiredMulti/)).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
     expect(
-      await screen.findByText('newsletters.editor.senderNameRequiredMulti')
+      screen.getByText('newsletters.editor.senderNameRequiredMulti:{"count":2}')
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'newsletters.editor.save' })).toBeDisabled();
+    expect(screen.getByText('newsletters.editor.fixFirst')).toBeInTheDocument();
+    expect(screen.getByLabelText('newsletters.editor.senderName')).toHaveFocus();
+    expect(updateMutate).not.toHaveBeenCalled();
+
     await userEvent.type(screen.getByLabelText('newsletters.editor.senderName'), 'Family');
-    expect(
-      screen.queryByText('newsletters.editor.senderNameRequiredMulti')
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'newsletters.editor.save' })).toBeEnabled();
+    await userEvent.click(screen.getByRole('button', { name: 'newsletters.editor.save' }));
+    expect(updateMutate.mock.calls[0]?.[0]).toEqual({
+      id: 'n-1',
+      data: { name: 'Weekly!', senderName: 'Family' },
+    });
   });
 });

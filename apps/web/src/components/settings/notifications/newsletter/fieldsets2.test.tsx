@@ -68,6 +68,8 @@ function props(over: Partial<NewsletterFormState> = {}) {
     onChange,
     errors: {},
     mode: 'create' as const,
+    touch: vi.fn(),
+    touched: {},
   };
 }
 

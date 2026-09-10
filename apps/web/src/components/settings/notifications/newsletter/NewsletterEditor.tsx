@@ -28,12 +28,16 @@ import { SendHistory } from './SendHistory';
 import { useNewsletterSave } from './useNewsletterSave';
 import {
   defaultFormState,
+  firstInvalidField,
+  focusTargetId,
   prefillFromRouterState,
   scopedServers,
   seedFromNewsletter,
   validateForm,
+  visibleErrors,
   type NewsletterFormState,
   type RichTextErrors,
+  type TouchedFields,
 } from './newsletterForm';
 
 interface EditorFormProps {
@@ -55,17 +59,34 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const [seed, setSeed] = useState<NewsletterFormState>(initialSeed);
   const [state, setState] = useState<NewsletterFormState>(initialSeed);
   const [richTextErrors, setRichTextErrors] = useState<RichTextErrors>({});
+  const [touched, setTouched] = useState<TouchedFields>({});
+  const [submitted, setSubmitted] = useState(false);
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const mode = newsletter ? 'edit' : 'create';
   const { data: servers } = useServers();
+  const scopedServerCount = scopedServers(state.scope, servers ?? []).length;
   const errors = validateForm(state, {
-    scopedServerCount: scopedServers(state.scope, servers ?? []).length,
-    senderNameRequired: t('newsletters.editor.senderNameRequiredMulti'),
+    scopedServerCount,
+    messages: {
+      required: t('common:validation.required'),
+      maxLength: (max) => t('common:validation.maxLength', { max }),
+      senderNameRequired: t('newsletters.editor.senderNameRequiredMulti', {
+        count: scopedServerCount,
+      }),
+    },
   });
   const valid =
     Object.keys(errors).length === 0 && Object.values(richTextErrors).every((e) => e === undefined);
+  const shownErrors = visibleErrors(errors, touched, submitted);
+  const touch = (key: keyof NewsletterFormState) =>
+    setTouched((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
 
-  const { dirty, pending, save, saveThen } = useNewsletterSave({
+  const {
+    dirty,
+    pending,
+    save: saveNow,
+    saveThen,
+  } = useNewsletterSave({
     newsletterId: newsletter?.id ?? null,
     seed,
     state,
@@ -85,33 +106,75 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
   const onChange = (patch: Partial<NewsletterFormState>) =>
     setState((current) => ({ ...current, ...patch }));
   const onRichText = (field: 'intro' | 'outro', change: RichTextChange) => {
+    touch(field);
     setRichTextErrors((current) => ({ ...current, [field]: change.error ?? undefined }));
     if (change.error === null) onChange({ [field]: change.value });
   };
 
-  const status = dirty ? (
-    <span className="text-muted-foreground flex items-center gap-2 text-sm">
-      <span className="bg-primary size-1.5 rounded-full" />
-      {t('newsletters.editor.unsaved')}
-    </span>
-  ) : null;
+  const focusFirstInvalid = () => {
+    const field = firstInvalidField({ ...errors, ...richTextErrors });
+    if (field === null) return;
+    const control = document.getElementById(focusTargetId(field, state));
+    control?.scrollIntoView({ block: 'center' });
+    control?.focus();
+  };
+  const save = () => {
+    setSubmitted(true);
+    if (!valid) {
+      focusFirstInvalid();
+      return;
+    }
+    saveNow();
+  };
+
+  const refused = submitted && !valid;
+  const status =
+    dirty || refused ? (
+      <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+        {dirty && (
+          <span className="text-muted-foreground flex items-center gap-2">
+            <span className="bg-primary size-1.5 rounded-full" />
+            {t('newsletters.editor.unsaved')}
+          </span>
+        )}
+        {refused && <span className="text-destructive">{t('newsletters.editor.fixFirst')}</span>}
+      </span>
+    ) : null;
 
   const form = (
     <FieldGroup className="gap-8">
-      <IdentityFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <IdentityFields
+        state={state}
+        onChange={onChange}
+        errors={shownErrors}
+        mode={mode}
+        touch={touch}
+        touched={touched}
+      />
       <ScheduleFields
         state={state}
         onChange={onChange}
-        errors={errors}
+        errors={shownErrors}
         mode={mode}
+        touch={touch}
+        touched={touched}
         nextRunAt={newsletter?.nextRunAt}
       />
-      <ContentFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <ContentFields
+        state={state}
+        onChange={onChange}
+        errors={shownErrors}
+        mode={mode}
+        touch={touch}
+        touched={touched}
+      />
       <MessageFields
         state={state}
         onChange={onChange}
-        errors={errors}
+        errors={shownErrors}
         mode={mode}
+        touch={touch}
+        touched={touched}
         richTextErrors={richTextErrors}
         onRichText={onRichText}
         fieldKey={newsletter?.id ?? 'new'}
@@ -119,19 +182,35 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
       <RecipientsFields
         state={state}
         onChange={onChange}
-        errors={errors}
+        errors={shownErrors}
         mode={mode}
+        touch={touch}
+        touched={touched}
         newsletterId={newsletter?.id ?? null}
       />
-      <DeliveryFields state={state} onChange={onChange} errors={errors} mode={mode} />
-      <LinksFields state={state} onChange={onChange} errors={errors} mode={mode} />
+      <DeliveryFields
+        state={state}
+        onChange={onChange}
+        errors={shownErrors}
+        mode={mode}
+        touch={touch}
+        touched={touched}
+      />
+      <LinksFields
+        state={state}
+        onChange={onChange}
+        errors={shownErrors}
+        mode={mode}
+        touch={touch}
+        touched={touched}
+      />
       <ReadinessList state={state} newsletterId={newsletter?.id ?? null} />
       <BindingDoors
         className="bg-background/95 sticky bottom-0 z-10 border-t pt-4 pb-3 backdrop-blur"
         primaryLabel={pending ? t('newsletters.editor.saving') : t('newsletters.editor.save')}
         primaryIcon={pending ? <Loader2 className="animate-spin" /> : <Save />}
         pending={pending}
-        disabled={!valid || !dirty}
+        disabled={!dirty}
         status={status}
         onPrimary={save}
       />

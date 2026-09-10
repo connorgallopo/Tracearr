@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
-export function IdentityFields({ state, onChange, errors, mode }: FieldsetProps) {
+export function IdentityFields({ state, onChange, errors, mode, touch }: FieldsetProps) {
   const { t } = useTranslation('settings');
   return (
     <FieldGroup className="bg-card-raised gap-5 rounded-xl border p-5">
@@ -26,6 +26,7 @@ export function IdentityFields({ state, onChange, errors, mode }: FieldsetProps)
             maxLength={100}
             aria-invalid={errors.name !== undefined}
             onChange={(event) => onChange({ name: event.target.value })}
+            onBlur={() => touch('name')}
           />
           <FieldError>{errors.name}</FieldError>
         </Field>

@@ -31,6 +31,7 @@ export function MessageFields({
   state,
   onChange,
   errors,
+  touch,
   richTextErrors,
   onRichText,
   fieldKey,
@@ -82,6 +83,7 @@ export function MessageFields({
           onChange={(event) =>
             onChange({ senderName: event.target.value === '' ? null : event.target.value })
           }
+          onBlur={() => touch('senderName')}
         />
         <FieldDescription>
           {t('newsletters.editor.senderNameHelp', { name: resolvedSender })}
@@ -98,6 +100,7 @@ export function MessageFields({
           maxLength={200}
           aria-invalid={errors.subject !== undefined}
           onChange={(event) => onChange({ subject: event.target.value })}
+          onBlur={() => touch('subject')}
         />
         <FieldDescription>
           {t('newsletters.editor.subjectHelp')} {PLACEHOLDERS.join(', ')}

@@ -39,6 +39,8 @@ function props(over: Partial<NewsletterFormState> = {}) {
     onChange,
     errors: {},
     mode: 'create' as const,
+    touch: vi.fn(),
+    touched: {},
   };
 }
 
@@ -81,6 +83,14 @@ describe('IdentityFields', () => {
     render(<IdentityFields {...p} />);
     expect(screen.getByRole('alert')).toHaveTextContent('Too short');
     expect(screen.getByRole('switch', { name: 'newsletters.enabled' })).toBeInTheDocument();
+  });
+
+  it('marks the name touched when the input is left', async () => {
+    const p = props();
+    render(<IdentityFields {...p} />);
+    await userEvent.type(screen.getByLabelText('newsletters.editor.name'), 'W');
+    await userEvent.tab();
+    expect(p.touch).toHaveBeenCalledWith('name');
   });
 });
 
