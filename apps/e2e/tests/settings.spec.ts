@@ -106,6 +106,7 @@ test.describe('Newsletters', () => {
     await expect(page).toHaveURL(/\/settings\/notifications\/newsletters\/new$/);
 
     await page.getByLabel('Name', { exact: true }).fill(name);
+    await page.getByLabel('Shown as').fill('Family Media');
     await page.getByRole('combobox', { name: 'Email destination' }).click();
     await page.getByRole('option', { name: destinationName }).click();
     await page.getByRole('button', { name: 'Save', exact: true }).click();
