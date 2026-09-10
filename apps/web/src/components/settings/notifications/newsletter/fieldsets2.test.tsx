@@ -97,7 +97,7 @@ describe('RecipientsFields', () => {
     const p = props();
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId={null} />
+        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
       </Providers>
     );
     await userEvent.click(
@@ -106,6 +106,7 @@ describe('RecipientsFields', () => {
     expect(p.onChange).toHaveBeenCalledWith({
       recipients: { ...p.state.recipients, members: false },
     });
+    expect(p.touch).toHaveBeenCalledWith('recipients');
 
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.addAddress' })
@@ -119,6 +120,8 @@ describe('RecipientsFields', () => {
         <RecipientsFields
           {...p}
           newsletterId={null}
+          savedServerIds={null}
+          onPreview={vi.fn()}
           state={{
             ...p.state,
             recipients: { ...p.state.recipients, extraAddresses: [{ address: 'nope' }] },
@@ -140,6 +143,96 @@ describe('RecipientsFields', () => {
     expect(p.onChange).toHaveBeenLastCalledWith({
       recipients: { ...p.state.recipients, extraAddresses: [] },
     });
+  });
+
+  it("keeps the surviving row's input when the row above it is removed", async () => {
+    const p = props({
+      recipients: {
+        members: true,
+        extraAddresses: [{ address: 'a@x.com' }, { address: 'b@x.com' }],
+        excludeUserIds: [],
+      },
+    });
+    const { rerender } = render(
+      <Providers>
+        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
+      </Providers>
+    );
+    const second = screen.getByDisplayValue('b@x.com');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.recipients.removeAddress:{"n":1}' })
+    );
+    expect(p.onChange).toHaveBeenLastCalledWith({
+      recipients: { ...p.state.recipients, extraAddresses: [{ address: 'b@x.com' }] },
+    });
+    rerender(
+      <Providers>
+        <RecipientsFields
+          {...p}
+          newsletterId={null}
+          savedServerIds={null}
+          onPreview={vi.fn()}
+          state={{
+            ...p.state,
+            recipients: { ...p.state.recipients, extraAddresses: [{ address: 'b@x.com' }] },
+          }}
+        />
+      </Providers>
+    );
+    expect(screen.getByDisplayValue('b@x.com')).toBe(second);
+  });
+
+  it('names the chosen servers in the members help, says what an extra address gets, and flags a moved scope', () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        { id: 's-1', name: 'Basement' },
+        { id: 's-2', name: 'Attic' },
+      ],
+    } as unknown as ReturnType<typeof useServers>);
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [
+          {
+            address: 'ann@x.com',
+            userId: 'u1',
+            serverUserId: 'su-1',
+            name: 'Ann',
+            suppressed: false,
+            username: 'ann',
+            serverId: 's-1',
+            serverName: 'Basement',
+            serverIds: ['s-1'],
+            thumbUrl: null,
+          },
+        ],
+        missing: [],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    const p = props({ scope: { serverIds: ['s-2'], libraries: [] } });
+    const { rerender } = render(
+      <Providers>
+        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={['s-1']} onPreview={vi.fn()} />
+      </Providers>
+    );
+    expect(
+      screen.getByText('newsletters.editor.recipients.membersHelp:{"servers":"Attic"}')
+    ).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.recipients.ownerNote')).toBeInTheDocument();
+    expect(
+      screen.getByText('newsletters.editor.recipients.extraAddressesHelp')
+    ).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.recipients.staleScope')).toBeInTheDocument();
+
+    rerender(
+      <Providers>
+        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={['s-2']} onPreview={vi.fn()} />
+      </Providers>
+    );
+    expect(screen.queryByText('newsletters.editor.recipients.staleScope')).not.toBeInTheDocument();
   });
 
   it('excludes, includes, and excludes a person again, patching recipients each time', async () => {
@@ -169,7 +262,7 @@ describe('RecipientsFields', () => {
     const p = props();
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId="n-1" />
+        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={[]} onPreview={vi.fn()} />
       </Providers>
     );
 
@@ -186,6 +279,8 @@ describe('RecipientsFields', () => {
         <RecipientsFields
           {...p}
           newsletterId="n-1"
+          savedServerIds={[]}
+          onPreview={vi.fn()}
           state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: ['u4'] } }}
         />
       </Providers>
@@ -207,6 +302,8 @@ describe('RecipientsFields', () => {
         <RecipientsFields
           {...p}
           newsletterId="n-1"
+          savedServerIds={[]}
+          onPreview={vi.fn()}
           state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: [] } }}
         />
       </Providers>

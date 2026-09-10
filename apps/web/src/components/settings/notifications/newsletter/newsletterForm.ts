@@ -242,6 +242,11 @@ export function scopedServers<T extends { id: string }>(
   });
 }
 
+/** The form's servers no longer match the saved row's, so anything resolved from the saved row answers for the old ones. */
+export function scopeMoved(savedServerIds: string[] | null, serverIds: string[]): boolean {
+  return savedServerIds !== null && !deepEqual(savedServerIds, serverIds);
+}
+
 export function prefillFromRouterState(state: unknown): Partial<NewsletterFormState> {
   if (typeof state !== 'object' || state === null) return {};
   const { destinationId } = state as { destinationId?: unknown };

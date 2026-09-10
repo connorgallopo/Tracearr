@@ -133,17 +133,19 @@ const servers = [
 function renderPanel(
   over: Partial<NewsletterRecipients> = {},
   id: string | null = 'n-1',
-  panelServers: { id: string; name: string }[] = [{ id: 's1', name: 'Home Plex' }]
+  panelServers: { id: string; name: string }[] = [{ id: 's1', name: 'Home Plex' }],
+  staleScope = false
 ) {
   const onExclude = vi.fn();
   const onInclude = vi.fn();
+  const onPreview = vi.fn();
   vi.mocked(useNewsletterRecipients).mockReturnValue({
     data: view,
     isLoading: false,
     isError: false,
     refetch,
   } as unknown as ReturnType<typeof useNewsletterRecipients>);
-  render(
+  const { unmount } = render(
     <Providers>
       <RecipientsPanel
         newsletterId={id}
@@ -151,10 +153,12 @@ function renderPanel(
         onExclude={onExclude}
         onInclude={onInclude}
         servers={panelServers}
+        staleScope={staleScope}
+        onPreview={onPreview}
       />
     </Providers>
   );
-  return { onExclude, onInclude };
+  return { onExclude, onInclude, onPreview, unmount };
 }
 
 describe('groupByVariant', () => {
@@ -200,22 +204,138 @@ describe('RecipientsPanel', () => {
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   });
 
-  it('groups the receive list under a heading per variant when the scope has several servers, and not for one', () => {
-    renderPanel({ excludeUserIds: [] }, 'n-1', servers);
+  it('heads each group with its people, explains the split once, and does neither for one server', () => {
+    const { unmount } = renderPanel({ excludeUserIds: [] }, 'n-1', servers);
     const headings = screen
       .getAllByText(/newsletters\.editor\.variantHeading/)
       .map((el) => el.textContent);
     expect(headings).toEqual([
-      'newsletters.editor.variantHeading:{"servers":"Home Plex and Attic","count":1}',
-      'newsletters.editor.variantHeading:{"servers":"Home Plex","count":2}',
+      'newsletters.editor.variantHeading:{"count":1,"servers":"Home Plex and Attic"}',
+      'newsletters.editor.variantHeading:{"count":2,"servers":"Home Plex"}',
     ]);
+    expect(screen.getByText('newsletters.editor.recipients.groupsNote')).toBeInTheDocument();
     expect(screen.getByRole('listitem', { name: 'extra@x.com' })).toBeInTheDocument();
+    unmount();
+
+    renderPanel({ excludeUserIds: [] });
+    expect(screen.queryByText(/newsletters\.editor\.variantHeading/)).not.toBeInTheDocument();
+    expect(screen.queryByText('newsletters.editor.recipients.groupsNote')).not.toBeInTheDocument();
   });
 
-  it('says to save first in create mode', () => {
-    renderPanel({ excludeUserIds: [] }, null);
-    expect(screen.getByText('newsletters.editor.recipients.saveFirst')).toBeInTheDocument();
+  it('offers Preview from the create-mode empty state instead of asking the server', async () => {
+    const { onPreview } = renderPanel({ excludeUserIds: [] }, null);
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'newsletters.editor.recipients.saveFirst' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.recipients.saveFirstHelp')).toBeInTheDocument();
     expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.actions.preview' })
+    );
+    expect(onPreview).toHaveBeenCalled();
+  });
+
+  it('counts a person coming back from Excluded in the header, the same as the groups below', () => {
+    renderPanel({ excludeUserIds: [] });
+    expect(
+      screen.getByText('newsletters.editor.recipients.willReceive:{"count":3}')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('listitem', { name: 'Dee' })).toHaveTextContent(
+      'newsletters.editor.recipients.includedAfterSave'
+    );
+  });
+
+  it('hides the no-address block when everyone has one', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: { ...view, missing: [] },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <Providers>
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+          servers={[{ id: 's1', name: 'Home Plex' }]}
+          staleScope={false}
+          onPreview={vi.fn()}
+        />
+      </Providers>
+    );
+    expect(
+      screen.queryByText(/newsletters\.editor\.recipients\.noAddress/)
+    ).not.toBeInTheDocument();
+  });
+
+  it('says the list reflects the saved servers when the scope has moved', () => {
+    renderPanel({}, 'n-1', servers, true);
+    expect(screen.getByRole('alert')).toHaveTextContent('newsletters.editor.recipients.staleScope');
+  });
+
+  it('explains what Exclude does inside the excluded list', async () => {
+    renderPanel();
+    await userEvent.click(
+      screen.getByRole('button', {
+        name: 'newsletters.editor.recipients.excludedCount:{"count":2}',
+      })
+    );
+    expect(screen.getByText('newsletters.editor.recipients.excludedHelp')).toBeInTheDocument();
+  });
+
+  it('prefills the address box with a username that is already an email, and leaves the rest empty', () => {
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: {
+        recipients: [],
+        missing: [
+          {
+            userId: 'u7',
+            serverUserId: 'su-7',
+            name: 'Fay',
+            username: 'fay@x.com',
+            serverId: 's1',
+            serverName: 'Home Plex',
+            serverIds: ['s1'],
+            thumbUrl: null,
+          },
+          {
+            userId: 'u8',
+            serverUserId: 'su-8',
+            name: 'Gil',
+            username: 'gil',
+            serverId: 's1',
+            serverName: 'Home Plex',
+            serverIds: ['s1'],
+            thumbUrl: null,
+          },
+        ],
+        excluded: [],
+      },
+      isLoading: false,
+      isError: false,
+      refetch,
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    render(
+      <Providers>
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={{ members: true, extraAddresses: [], excludeUserIds: [] }}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+          servers={[{ id: 's1', name: 'Home Plex' }]}
+          staleScope={false}
+          onPreview={vi.fn()}
+        />
+      </Providers>
+    );
+    expect(
+      screen.getByLabelText('newsletters.editor.recipients.contactEmailFor:{"name":"Fay"}')
+    ).toHaveValue('fay@x.com');
+    expect(
+      screen.getByLabelText('newsletters.editor.recipients.contactEmailFor:{"name":"Gil"}')
+    ).toHaveValue('');
   });
 
   it('lists who will receive with counts, a suppressed badge, and an exclude action for members', async () => {
@@ -308,6 +428,8 @@ describe('RecipientsPanel', () => {
           onExclude={vi.fn()}
           onInclude={vi.fn()}
           servers={[]}
+          staleScope={false}
+          onPreview={vi.fn()}
         />
       </Providers>
     );
@@ -411,6 +533,8 @@ describe('RecipientsPanel', () => {
           onExclude={vi.fn()}
           onInclude={vi.fn()}
           servers={[]}
+          staleScope={false}
+          onPreview={vi.fn()}
         />
       </Providers>
     );
@@ -458,6 +582,8 @@ describe('RecipientsPanel', () => {
           onExclude={vi.fn()}
           onInclude={vi.fn()}
           servers={[]}
+          staleScope={false}
+          onPreview={vi.fn()}
         />
       </Providers>
     );
@@ -503,6 +629,8 @@ describe('RecipientsPanel', () => {
           onExclude={vi.fn()}
           onInclude={vi.fn()}
           servers={[]}
+          staleScope={false}
+          onPreview={vi.fn()}
         />
       </Providers>
     );

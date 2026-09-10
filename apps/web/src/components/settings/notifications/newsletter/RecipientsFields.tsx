@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Trash2 } from 'lucide-react';
 import { NEWSLETTER_EXTRA_ADDRESSES_MAX } from '@tracearr/shared';
@@ -14,16 +15,28 @@ import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemGroup } from '@/components/ui/item';
 import { Switch } from '@/components/ui/switch';
 import { useServers } from '@/hooks/queries';
+import { formatList } from '@/lib/listFormat';
 import { RecipientsPanel } from './RecipientsPanel';
 import { EditorCard } from './EditorCard';
 import {
   NEWSLETTER_FIELD_IDS,
   RECIPIENTS_CARD_ID,
+  scopeMoved,
   scopedServers,
   type FieldsetProps,
 } from './newsletterForm';
 
 const address = z.email();
+
+/** The row shape is fixed by the schema, so a row's key lives beside the state rather than in it. */
+let nextRowId = 0;
+const mintRowId = () => `extra-${nextRowId++}`;
+
+/** A count set from outside the add and remove handlers, a prefill, is padded or trimmed for the render alone. */
+function alignRowIds(ids: readonly string[], count: number): string[] {
+  if (ids.length >= count) return ids.slice(0, count);
+  return [...ids, ...Array.from({ length: count - ids.length }, (_, i) => `extra-prefill-${i}`)];
+}
 
 export function RecipientsFields({
   state,
@@ -31,10 +44,21 @@ export function RecipientsFields({
   errors,
   touch,
   newsletterId,
-}: FieldsetProps & { newsletterId: string | null }) {
-  const { t } = useTranslation('settings');
+  savedServerIds,
+  onPreview,
+}: FieldsetProps & {
+  newsletterId: string | null;
+  /** The saved row's `scope.serverIds`, or null before the first save; the panel reads the saved row, so a moved scope is flagged. */
+  savedServerIds: string[] | null;
+  onPreview: () => void;
+}) {
+  const { t, i18n } = useTranslation('settings');
   const { data: servers } = useServers();
   const { recipients } = state;
+  const scoped = scopedServers(state.scope, servers ?? []);
+  const [rowIds, setRowIds] = useState<string[]>(() => recipients.extraAddresses.map(mintRowId));
+  const keys = alignRowIds(rowIds, recipients.extraAddresses.length);
+
   const setRecipients = (patch: Partial<typeof recipients>) => {
     touch('recipients');
     onChange({ recipients: { ...recipients, ...patch } });
@@ -45,6 +69,16 @@ export function RecipientsFields({
         i === index ? { ...row, ...patch } : row
       ),
     });
+  const removeRow = (index: number) => {
+    setRowIds((ids) => ids.filter((_, i) => i !== index));
+    setRecipients({
+      extraAddresses: recipients.extraAddresses.filter((_, i) => i !== index),
+    });
+  };
+  const addRow = () => {
+    setRowIds((ids) => [...ids, mintRowId()]);
+    setRecipients({ extraAddresses: [...recipients.extraAddresses, { address: '' }] });
+  };
 
   return (
     <EditorCard id={RECIPIENTS_CARD_ID} title={t('newsletters.editor.recipients.title')}>
@@ -53,7 +87,14 @@ export function RecipientsFields({
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.members}>
             {t('newsletters.editor.recipients.members')}
           </FieldLabel>
-          <FieldDescription>{t('newsletters.editor.recipients.membersHelp')}</FieldDescription>
+          <FieldDescription>
+            {t('newsletters.editor.recipients.membersHelp', {
+              servers: formatList(
+                i18n.language,
+                scoped.map((server) => server.name)
+              ),
+            })}
+          </FieldDescription>
           <FieldDescription>{t('newsletters.editor.recipients.ownerNote')}</FieldDescription>
         </FieldContent>
         <Switch
@@ -65,11 +106,18 @@ export function RecipientsFields({
       </Field>
       <div className="flex flex-col gap-2">
         <FieldLabel>{t('newsletters.editor.recipients.extraAddresses')}</FieldLabel>
+        <FieldDescription>{t('newsletters.editor.recipients.extraAddressesHelp')}</FieldDescription>
         <ItemGroup className="gap-1">
           {recipients.extraAddresses.map((row, index) => {
             const bad = row.address !== '' && !address.safeParse(row.address).success;
             return (
-              <Item key={index} role="listitem" variant="outline" size="sm" className="flex-wrap">
+              <Item
+                key={keys[index]}
+                role="listitem"
+                variant="outline"
+                size="sm"
+                className="flex-wrap"
+              >
                 <ItemContent className="flex-row flex-wrap gap-2">
                   <Input
                     className="max-w-xs"
@@ -105,11 +153,7 @@ export function RecipientsFields({
                     variant="ghost"
                     size="icon-sm"
                     aria-label={t('newsletters.editor.recipients.removeAddress', { n: index + 1 })}
-                    onClick={() =>
-                      setRecipients({
-                        extraAddresses: recipients.extraAddresses.filter((_, i) => i !== index),
-                      })
-                    }
+                    onClick={() => removeRow(index)}
                   >
                     <Trash2 />
                   </Button>
@@ -124,9 +168,7 @@ export function RecipientsFields({
             variant="outline"
             size="sm"
             disabled={recipients.extraAddresses.length >= NEWSLETTER_EXTRA_ADDRESSES_MAX}
-            onClick={() =>
-              setRecipients({ extraAddresses: [...recipients.extraAddresses, { address: '' }] })
-            }
+            onClick={addRow}
           >
             <Plus />
             {t('newsletters.editor.recipients.addAddress')}
@@ -143,7 +185,9 @@ export function RecipientsFields({
         onInclude={(userId) =>
           setRecipients({ excludeUserIds: recipients.excludeUserIds.filter((id) => id !== userId) })
         }
-        servers={scopedServers(state.scope, servers ?? []).map((s) => ({ id: s.id, name: s.name }))}
+        servers={scoped.map((s) => ({ id: s.id, name: s.name }))}
+        staleScope={scopeMoved(savedServerIds, state.scope.serverIds)}
+        onPreview={onPreview}
       />
     </EditorCard>
   );

@@ -216,6 +216,8 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
         touch={touch}
         touched={touched}
         newsletterId={newsletter?.id ?? null}
+        savedServerIds={newsletter ? seed.scope.serverIds : null}
+        onPreview={() => actionsRef.current?.openPreview()}
       />
       <DeliveryFields
         state={state}

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronRight, Mail, UserX } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Eye, Mail, Users, UserX } from 'lucide-react';
 import {
   variantKey,
   variantServerIds,
@@ -254,7 +254,10 @@ function MissingRow({
 }) {
   const { t } = useTranslate();
   const identity = useUpdateUserIdentity();
-  const [value, setValue] = useState('');
+  // Jellyfin and Emby expose no email, and a username often is one; prefilling makes Save one click.
+  const [value, setValue] = useState(() =>
+    person.username !== null && address.safeParse(person.username).success ? person.username : ''
+  );
   const label = displayName(person, t);
   const valid = address.safeParse(value.trim()).success;
   return (
@@ -293,12 +296,17 @@ export function RecipientsPanel({
   onExclude,
   onInclude,
   servers,
+  staleScope,
+  onPreview,
 }: {
   newsletterId: string | null;
   recipients: NewsletterRecipients;
   onExclude: (userId: string) => void;
   onInclude: (userId: string) => void;
   servers: { id: string; name: string }[];
+  /** The form's servers differ from the saved row's; the view below still answers for the saved ones. */
+  staleScope: boolean;
+  onPreview: () => void;
 }) {
   const { t, i18n } = useTranslate();
   const { members, extraAddresses, excludeUserIds } = recipients;
@@ -350,8 +358,20 @@ export function RecipientsPanel({
       </div>
     );
   }
-  if (!newsletterId)
-    return <FieldDescription>{t('newsletters.editor.recipients.saveFirst')}</FieldDescription>;
+  if (!newsletterId) {
+    return (
+      <EmptyState
+        icon={Users}
+        title={t('newsletters.editor.recipients.saveFirst')}
+        description={t('newsletters.editor.recipients.saveFirstHelp')}
+      >
+        <Button type="button" variant="outline" size="sm" onClick={onPreview}>
+          <Eye />
+          {t('newsletters.editor.actions.preview')}
+        </Button>
+      </EmptyState>
+    );
+  }
   if (isLoading) return <Skeleton className="h-24 w-full" />;
   if (isError || !data) {
     return (
@@ -384,29 +404,48 @@ export function RecipientsPanel({
     );
   };
 
+  const staleNote = staleScope ? (
+    <Alert variant="warning">
+      <AlertTriangle />
+      <AlertDescription>{t('newsletters.editor.recipients.staleScope')}</AlertDescription>
+    </Alert>
+  ) : null;
+  const groups = groupByVariant<NewsletterResolvedRecipient | PendingPerson>(
+    [...receive, ...included],
+    servers
+  );
+
   if (
     receive.length + suppressed.length + missing.length + excluded.length + included.length ===
     0
   ) {
-    return noRecipients;
+    return (
+      <div className="flex flex-col gap-4">
+        {staleNote}
+        {noRecipients}
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
+      {staleNote}
       <div>
         <p className="text-sm font-medium">
-          {t('newsletters.editor.recipients.willReceive', { count: receive.length })}
+          {t('newsletters.editor.recipients.willReceive', {
+            count: receive.length + included.length,
+          })}
         </p>
-        {groupByVariant<NewsletterResolvedRecipient | PendingPerson>(
-          [...receive, ...included],
-          servers
-        ).map((group, _i, groups) => (
+        {groups.length > 1 && (
+          <FieldDescription>{t('newsletters.editor.recipients.groupsNote')}</FieldDescription>
+        )}
+        {groups.map((group) => (
           <div key={group.key}>
             {groups.length > 1 && (
               <p className="text-muted-foreground mt-2 text-xs font-medium">
                 {t('newsletters.editor.variantHeading', {
-                  servers: formatList(i18n.language, group.serverNames),
                   count: group.rows.length,
+                  servers: formatList(i18n.language, group.serverNames),
                 })}
               </p>
             )}
@@ -469,17 +508,19 @@ export function RecipientsPanel({
           </ItemGroup>
         </div>
       )}
-      <div>
-        <p className="text-sm font-medium">
-          {t('newsletters.editor.recipients.noAddress', { count: missing.length })}
-        </p>
-        <FieldDescription>{t('newsletters.editor.recipients.noAddressHelp')}</FieldDescription>
-        <ItemGroup className="mt-2 gap-1">
-          {missing.map((p) => (
-            <MissingRow key={p.userId} person={p} onSaved={() => void refetch()} />
-          ))}
-        </ItemGroup>
-      </div>
+      {missing.length > 0 && (
+        <div>
+          <p className="text-sm font-medium">
+            {t('newsletters.editor.recipients.noAddress', { count: missing.length })}
+          </p>
+          <FieldDescription>{t('newsletters.editor.recipients.noAddressHelp')}</FieldDescription>
+          <ItemGroup className="mt-2 gap-1">
+            {missing.map((p) => (
+              <MissingRow key={p.userId} person={p} onSaved={() => void refetch()} />
+            ))}
+          </ItemGroup>
+        </div>
+      )}
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
           <Button type="button" variant="ghost" size="sm">
@@ -488,6 +529,7 @@ export function RecipientsPanel({
           </Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
+          <FieldDescription>{t('newsletters.editor.recipients.excludedHelp')}</FieldDescription>
           <ItemGroup className="mt-2 gap-1">
             {excluded.map((p) => (
               <PersonRow
