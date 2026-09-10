@@ -113,6 +113,7 @@ COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/packages/emails/package.json ./packages/emails/
 COPY --from=builder /app/packages/emails/dist ./packages/emails/dist
 COPY --from=builder /app/apps/server/src/db/migrations ./apps/server/src/db/migrations
+COPY --from=builder /app/assets/logo.png ./assets/logo.png
 
 # GeoIP database (bundled for geolocation features)
 COPY data/GeoLite2-City.mmdb ./data/GeoLite2-City.mmdb
