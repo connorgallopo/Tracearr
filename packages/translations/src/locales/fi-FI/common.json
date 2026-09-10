@@ -53,7 +53,8 @@
     "viewProfile": "Näytä Profiili",
     "viewOnGithub": "Näytä GitHubissa",
     "later": "Myöhemmin",
-    "previous": "Edellinen"
+    "previous": "Edellinen",
+    "reload": ""
   },
   "states": {
     "loading": "Ladataan...",
