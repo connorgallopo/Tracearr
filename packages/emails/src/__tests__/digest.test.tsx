@@ -901,6 +901,29 @@ describe('renderDigest', () => {
     expect(one.text).not.toContain('1 new episodes');
   });
 
+  it('leaves the season box out when a show arrives with no seasons', async () => {
+    const out = await renderDigest(
+      base({
+        shows: [
+          {
+            id: 's3',
+            title: 'Andor',
+            year: 2022,
+            posterRef: null,
+            seasons: [],
+            moreSeasons: 0,
+            episodeCount: 0,
+            serverName: 'Basement Plex',
+            links: [],
+          },
+        ],
+      }),
+      branding
+    );
+    expect(out.text).toContain('Andor (2022)');
+    expect(out.html).not.toContain('background-color:#23272f');
+  });
+
   it('writes each album as title, year and track count on its own line', async () => {
     const out = await renderDigest(
       base({

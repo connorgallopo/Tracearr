@@ -49,7 +49,7 @@ const eyebrow: CSSProperties = {
 const summary: CSSProperties = {
   color: colors.soft,
   fontSize: '13px',
-  lineHeight: '20px',
+  lineHeight: '19px',
   marginTop: 0,
   marginBottom: '14px',
 };
@@ -306,14 +306,16 @@ function ShowCard({
           item.episodeCount > 0 ? plural(item.episodeCount, 'new episode') : null,
         ]}
       />
-      <Cell tableStyle={groupTable} style={groupCell}>
-        {item.seasons.map((s) => (
-          <Text key={`${s.number ?? 'x'}-${s.title}`} style={listLine}>
-            {seasonLine(s)}
-          </Text>
-        ))}
-        <More count={item.moreSeasons} noun="more season" />
-      </Cell>
+      {(item.seasons.length > 0 || item.moreSeasons > 0) && (
+        <Cell tableStyle={groupTable} style={groupCell}>
+          {item.seasons.map((s) => (
+            <Text key={`${s.number ?? 'x'}-${s.title}`} style={listLine}>
+              {seasonLine(s)}
+            </Text>
+          ))}
+          <More count={item.moreSeasons} noun="more season" />
+        </Cell>
+      )}
       <Links links={item.links} accent={accent} />
     </Card>
   );
@@ -334,8 +336,7 @@ function ArtistCard({
       <Meta parts={[multiServer ? item.serverName : null]} />
       {item.albums.map((a) => (
         <Text key={a.id} style={listLine}>
-          {a.title}
-          {a.year === null ? '' : ` (${a.year})`} · {plural(a.trackCount, 'track')}
+          {`${a.title}${a.year === null ? '' : ` (${a.year})`} · ${plural(a.trackCount, 'track')}`}
         </Text>
       ))}
       <Links links={item.links} accent={accent} />
@@ -405,8 +406,8 @@ function Masthead({
   return (
     <>
       {viewUrl && (
-        <Cell style={{ paddingBottom: '10px', textAlign: 'center' }}>
-          <Text style={{ ...footNote, marginBottom: 0 }}>
+        <Cell style={{ textAlign: 'center' }}>
+          <Text style={{ ...footNote, marginBottom: '10px' }}>
             <Link href={viewUrl} style={link(accent)}>
               View in browser
             </Link>
@@ -455,11 +456,7 @@ export function DigestEmail({ input, branding }: { input: DigestInput; branding:
   const accent = branding.accentColor;
   const counts = tally(input);
   const totals = summaryLine(input, counts);
-  const empty =
-    input.movies.length === 0 &&
-    input.shows.length === 0 &&
-    input.artists.length === 0 &&
-    input.mostWatched.length === 0;
+  const empty = !totals && input.artists.length === 0 && input.mostWatched.length === 0;
 
   return (
     <Document preview={preheader(input, counts)}>

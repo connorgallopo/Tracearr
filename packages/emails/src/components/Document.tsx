@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { body, frame, framePadding } from '../styles.js';
 import { Cell } from './Cell.js';
 
-/** The message declares its own dark scheme; the two metas are what stop Apple Mail re-colouring it. */
+/** The message declares its own dark scheme; the two colour-scheme metas are what stop Apple Mail re-colouring it. */
 export function Document({ preview, children }: { preview: string; children: ReactNode }) {
   return (
     <Html lang="en" dir="ltr">
