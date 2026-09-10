@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `877c7f8a`
-- Last shared upstream commit found during inspection: `5c7912a1`
-- Latest upstream commit merged into the current working tree: `877c7f8a`
+- Source branch/SHA inspected: `main` at `28b8c344`
+- Last shared upstream commit found during inspection: `877c7f8a`
+- Latest upstream commit merged into the current working tree: `28b8c344`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -222,6 +222,26 @@ When merging or rebasing on source `main`, preserve the Dispatcharr overlay deli
 
 ### Latest upstream merge
 
+- Upstream `main` at `28b8c344` was merged into `develop` on September 10,
+  2026 without textual conflicts. The watched-media API now scopes all results
+  by `user_id`, removes `window` and `watched_state_user`, includes episode
+  numbering scoped by server, and pages a bounded Redis-cached candidate list.
+  React, MapLibre, undici, Expo server SDK, jsdom, and image digests were updated.
+  The toolchain is now Node 24 / pnpm 12.3.4, as selected by CI through the root
+  `packageManager`; current local validation commands in `AGENTS.md` and
+  `MERGE_INSTRUCTION.md` were updated accordingly. No migrations changed.
+  Dispatcharr API types, library exclusions, and fork distribution policies
+  remain intact. Docker integration and E2E are omitted at the user's request.
+  Full non-Docker CI passed: install, lint, typecheck, translations, all five
+  server groups, web, coverage, and build. The group/web jobs passed 7,687 tests
+  with two skipped; coverage passed 5,068 with two skipped (65.34% statements,
+  59.87% branches, 72.44% functions, 66.39% lines). Lint reported 756 warnings
+  before rebuilding shared and 754 afterwards (two new upstream non-null
+  assertions); other warning counts match September 9. Logs use
+  `.tmp/github-ci-<job>-20260910.log`, with the final lint result in
+  `.tmp/github-ci-lint-after-build-20260910.log`. Live Dispatcharr manual smoke
+  checks and Docker image builds were not performed.
+
 - Upstream `main` at `877c7f8a` was merged into `develop` on September 9,
   2026. The merge adds the public API v2 watched-media endpoint, two-part
   server-version normalization, shared table spacing improvements, Helm and
@@ -417,7 +437,8 @@ Current upstream merge notes:
 - Upstream migration history is now aligned through `0082_backfill_last_activity.sql`; the Dispatcharr overlay remains in its separate fork ledger.
 - Migration `0063_long_maria_hill.sql` must keep upstream's login-username collision auto-rename block before creating `users_login_username_unique`; without it, `loginUsernameCollision.integration.test.ts` fails.
 - Dispatcharr migrations now live in the separate fork overlay, leaving `apps/server/src/db/migrations/` aligned to upstream through `0066`.
-- Local CI-equivalent validation for this merge should be rerun with Node 24 via `npx --yes -p node@24 -p pnpm@11.11.0 pnpm ...` before considering the working tree ready.
+- Local CI-equivalent validation for that merge used Node 24 and pnpm 11.11.0;
+  use the current toolchain in `AGENTS.md` for subsequent validation.
 
 ### Migration History Policy
 
@@ -444,7 +465,7 @@ pnpm test:security
 For this environment, if global `pnpm` or Node is unavailable, use:
 
 ```bash
-npx --yes -p node@24 -p pnpm@11.11.0 pnpm test:unit
+npx --yes -p node@24 -p pnpm@12.3.4 pnpm test:unit
 ```
 
 ## Minimum Dispatcharr Smoke Test After Merge

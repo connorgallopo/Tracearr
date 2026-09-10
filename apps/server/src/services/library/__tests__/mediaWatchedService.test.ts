@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildAliasMapCte,
-  buildMovieListQuery,
-  buildShowListQuery,
+  buildHydrationQuery,
+  buildMovieCandidateQuery,
+  buildShowCandidateQuery,
   mapMovieWatchedRows,
   mapShowWatchedRows,
 } from '../mediaWatchedService.js';
@@ -118,23 +119,22 @@ describe('buildAliasMapCte', () => {
   });
 });
 
-describe('buildMovieListQuery', () => {
+describe('buildMovieCandidateQuery', () => {
   const base = {
     kind: 'movie' as const,
-    lensUserId: null,
+    userId: null,
     serverIds: undefined,
-    windowDays: null,
     minState: 'watched' as const,
     pageSize: 100,
     cursorValue: null,
   };
   const render = (overrides = {}) =>
-    renderSql(buildMovieListQuery({ ...base, ...overrides }))
+    renderSql(buildMovieCandidateQuery({ ...base, ...overrides }))
       .sql.replace(/\s+/g, ' ')
       .trim();
 
   it('guards on the media type so episode rows never enter the movie list', () => {
-    const { sql: query, params } = renderSql(buildMovieListQuery(base));
+    const { sql: query, params } = renderSql(buildMovieCandidateQuery(base));
     expect(query.replace(/\s+/g, ' ')).toContain('WHERE am.media_type = $1');
     expect(params[0]).toBe('movie');
   });
@@ -143,39 +143,49 @@ describe('buildMovieListQuery', () => {
     expect(render()).toContain('GROUP BY COALESCE(am.merged_into_id, p.media_id)');
   });
 
-  it('emits null per-user columns when no lens identity is given', () => {
-    expect(render()).toContain('NULL::boolean AS watched_user, NULL::boolean AS has_plays_user');
+  it('aggregates across every identity when no user is given', () => {
+    expect(render()).toContain('WHERE am.media_type = $1 GROUP BY');
   });
 
-  it('filters the per-user aggregates to the lens identity when one is given', () => {
-    const query = render({ lensUserId: 'user-1' });
-    expect(query).toContain('BOOL_OR(p.any_watched) FILTER (WHERE su.user_id = $1)');
-    expect(query).toContain('SUM(p.plays) FILTER (WHERE su.user_id = $2)');
+  it('scopes the aggregate to one identity rather than annotating every row', () => {
+    // Filtering in the CTE re-grains plays, last_day and the state together, so
+    // one min_state covers both grains and a title the identity never played is
+    // absent instead of present-and-unwatched.
+    expect(render({ userId: 'user-1' })).toContain('WHERE am.media_type = $1 AND su.user_id = $2');
   });
 
   it('widens the state filter to started titles when min_state is partial', () => {
     expect(render({ minState: 'partial' })).toContain('WHERE (c.watched_any OR c.has_plays_any)');
   });
 
-  it('keys the cursor predicate on the same tuple the ORDER BY sorts on', () => {
-    const query = render({ cursorValue: { startedAt: new Date('2026-01-01'), id: 'media-1' } });
-    expect(query).toContain('(c.last_day, c.canonical_id) < ($2::timestamptz, $3::uuid)');
+  it('orders the whole candidate set so the cached list can be sliced by cursor', () => {
+    // No LIMIT and no keyset predicate: the aggregate reads MAX()/BOOL_OR(), so
+    // paging it directly would re-aggregate the cagg once per page.
+    const query = render();
     expect(query).toContain('ORDER BY c.last_day DESC, c.canonical_id DESC');
+    expect(query).not.toContain('LIMIT');
+  });
+
+  it('leaves media metadata to the page hydration, keeping the candidate set narrow', () => {
+    // Only ids, ordering keys and aggregates are cached; titles and hierarchy
+    // are looked up per page.
+    const query = render();
+    expect(query).not.toContain('m.title');
+    expect(query).not.toContain('li.parent_index');
   });
 });
 
-describe('buildShowListQuery', () => {
+describe('buildShowCandidateQuery', () => {
   const base = {
     kind: 'show' as const,
-    lensUserId: null,
+    userId: null,
     serverIds: undefined,
-    windowDays: null,
     minState: 'watched' as const,
     pageSize: 100,
     cursorValue: null,
   };
   const render = (overrides = {}) =>
-    renderSql(buildShowListQuery({ ...base, ...overrides }))
+    renderSql(buildShowCandidateQuery({ ...base, ...overrides }))
       .sql.replace(/\s+/g, ' ')
       .trim();
 
@@ -199,13 +209,46 @@ describe('buildShowListQuery', () => {
     );
   });
 
+  it('scopes the watched episode count to one identity when a user is given', () => {
+    expect(render({ userId: 'user-1' })).toContain(
+      'WHERE p.show_media_id IS NOT NULL AND su.user_id = $1'
+    );
+  });
+
   it('scopes both the plays and the episode count when a server is given', () => {
-    const { sql: query, params } = renderSql(buildShowListQuery({ ...base, serverIds: ['srv-1'] }));
+    const { sql: query, params } = renderSql(
+      buildShowCandidateQuery({ ...base, serverIds: ['srv-1'] })
+    );
     const normalized = query.replace(/\s+/g, ' ');
     // Scoping only the plays would resolve a show whose episodes and plays sit
     // on different servers differently from the library UI.
     expect(normalized).toContain('li.removed_at IS NULL AND li.server_id = $1');
     expect(normalized).toContain('p.show_media_id IS NOT NULL AND p.server_id = $2');
     expect(params.slice(0, 2)).toEqual(['srv-1', 'srv-1']);
+  });
+});
+
+describe('buildHydrationQuery', () => {
+  const render = (kind: 'movie' | 'show' | 'episode', serverIds: string[] | undefined) =>
+    renderSql(buildHydrationQuery(kind, ['11111111-1111-1111-1111-111111111111'], serverIds))
+      .sql.replace(/\s+/g, ' ')
+      .trim();
+
+  it('scopes the episode numbering lateral to the same servers as the candidate query', () => {
+    // Without this a server-scoped request numbers an episode from a copy on a
+    // server the caller never asked about.
+    expect(render('episode', ['srv-1'])).toContain(
+      'WHERE li.media_id = m.id AND li.removed_at IS NULL AND li.server_id = $1'
+    );
+  });
+
+  it('leaves the lateral unscoped when no server filter was given', () => {
+    const query = render('episode', undefined);
+    expect(query).toContain('WHERE li.media_id = m.id AND li.removed_at IS NULL ORDER BY');
+  });
+
+  it('skips the lateral entirely for movies and shows', () => {
+    expect(render('movie', undefined)).not.toContain('li.parent_index');
+    expect(render('show', undefined)).not.toContain('li.parent_index');
   });
 });
