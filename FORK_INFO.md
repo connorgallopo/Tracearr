@@ -249,7 +249,7 @@ When merging or rebasing on source `main`, preserve the Dispatcharr overlay deli
 ### Latest upstream merge
 
 - Upstream `main` at `32c9d378` was merged into `develop` on September 10,
-  2026. This adds newsletters/email destinations, the emails workspace package,
+  2026 (merge commit `f97efbcb`). This adds newsletters/email destinations, the emails workspace package,
   split settings components, public Jellyfin/Emby addresses, Emby connection
   diagnostics, library-name sanitization, and resilient Tautulli page imports.
   Upstream migrations `0097`–`0102` remain unchanged in the upstream ledger;
@@ -262,8 +262,20 @@ When merging or rebasing on source `main`, preserve the Dispatcharr overlay deli
   Dispatcharr library exclusions remain intact. CI remains PR-only with no
   integration matrix, and release remains manual with the Helm push job disabled.
   Build shared, emails, and test-utils before server validation; local command
-  instructions were updated. Validation results are recorded below once complete.
+  instructions were updated. Full non-Docker CI passed with Node 24 and
+  pnpm 12.3.4: frozen install, lint, typecheck, translations, all five server
+  groups, web, coverage, and build. Server groups plus web passed 8,359 tests
+  with two skipped; emails passed another 49. Coverage passed 5,365 tests with
+  two skipped (66.62% statements, 60.83% branches, 72.91% functions, 67.69% lines).
+  Lint has 765 warnings (up from 754); new upstream settings/newsletter
+  diagnostics and existing warning classes are recorded in the warning reference.
+  Local stale incremental translation declarations required forced TypeScript
+  regeneration and replacement of the Turbo build artifact before typecheck
+  passed. Logs use `.tmp/github-ci-<job>-20260910-32c9.log`; final lint and
+  typecheck logs include `-final-` before the date.
   Docker integration, E2E, and Docker builds are omitted at the user's request.
+  Live-provider Dispatcharr manual smoke checks were not performed; automated
+  add/edit, auth, realtime/lifecycle, image and termination coverage passed.
 
 - Upstream `main` at `28b8c344` was merged into `develop` on September 10,
   2026 without textual conflicts. The watched-media API now scopes all results
