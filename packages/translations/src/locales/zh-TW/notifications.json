@@ -142,9 +142,7 @@
         "title": "已生成配對憑證",
         "message": "使用你的移動裝置掃描 QR 碼來進行配對"
       },
-      "displayNameUpdated": {
-        "title": "已更新顯示名稱"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "重置信任分數",
         "message_one": "{{count}} 個使用者重置為 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "無法新增伺服器",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "無法移除裝置",
       "deviceRenameFailed": "無法重新命名裝置",
       "sessionsRevokeFailed": "無法撤銷會話",
-      "displayNameUpdateFailed": "無法更新顯示名稱",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "無法重置信任分數",
       "routingUpdateFailed": "無法更新路由",
       "clipboardFailed": "無法複製到剪貼簿",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
