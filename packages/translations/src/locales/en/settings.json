@@ -772,7 +772,7 @@
           "none": "Cards render without posters."
         },
         "modePreviewHint": "Preview renders the current choice; set its Images toggle to Blocked to see the email without remote images.",
-        "hostedNeedsUrl": "No external URL is set, so posters will be attached instead. Set one under Access, Remote access to host them.",
+        "hostedNeedsUrl": "No external URL is set. Hosted posters need one before this can be saved: set it under Access, Remote access, or pick Attached.",
         "skipWhenEmpty": "Skip when nothing was added",
         "skipWhenEmptyHelp": "Nothing new means no email. On a newsletter covering several servers this is per group: people whose servers added nothing hear nothing, the rest still get theirs. A test send always renders."
       },
