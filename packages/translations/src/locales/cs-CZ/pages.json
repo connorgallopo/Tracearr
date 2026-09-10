@@ -111,7 +111,15 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
-    "title": ""
+    "title": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
+    "displayName": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNone": "",
+    "contactEmailNoLogin": ""
   },
   "history": {
     "title": "Historie",
@@ -210,7 +218,7 @@
       "quietest": "Nejvíce ticho:",
       "bingeHighlights": "Zvýraznění Binge",
       "bingeHighlightsDesc": "Zobrazí s nejintenzivnějším obrazcem",
-      "bingeSessions": "",
+      "bingeSessions": "binge relace",
       "noData": "Zatím žádná sledovaná data",
       "noDataDesc": "Analytika se zobrazí zde, jakmile bude obsah přehrán. Po nějaké aktivitě se vraťte zpět.",
       "failedToLoad": "Nepodařilo se načíst analýzu hodinek",
@@ -477,6 +485,7 @@
     },
     "builder": {
       "destinationDisabled": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
       "errors": {
@@ -718,7 +727,9 @@
         "serverUp": "",
         "pluginUpdateAvailable": "",
         "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": ""
+        "tracearrUpdateAvailable": "",
+        "newsletterSent": "",
+        "newsletterFailed": ""
       },
       "operators": {
         "eq": "",
@@ -1309,6 +1320,11 @@
         "description": "",
         "keywords": ""
       },
+      "newsletter-failed": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
       "no-4k-transcodes": {
         "name": "",
         "description": "",
@@ -1391,6 +1407,7 @@
         "library": "",
         "servers": "",
         "updates": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "control": ""
@@ -1460,6 +1477,14 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
           "description": "",
           "synonyms": ""
         }
@@ -1540,33 +1565,31 @@
       "showAll": "Zobrazit vše",
       "moreConnections": "+{{count}} další spojení",
       "connectingTo": "Připojuji se k {{name}}...",
+      "ownerOnly": "",
       "noAccountsLinked": "Žádné Plex účty nejsou propojeny",
       "noAccountsLinkedHint": "Propojte Plex účet pro přidání Plex serverů do Tracearr.",
       "linkPlexAccount": "Propojit účet Plex",
       "linkAnotherAccount": "Propojit další účet Plex",
       "linking": "Propojování...",
-      "accountsLinked_one": "{{count}} Plex účet propojen",
-      "accountsLinked_other": "{{count}} Plex účty propojeny",
-      "noAccountsLinkedShort": "Žádné Plex účty nebyly propojeny",
       "loginEnabled": "Přihlášení povoleno",
       "serversConnected_one": "{{count}} server připojen",
       "serversConnected_other": "{{count}} servery připojeny",
       "unlinkAccount": "Odpojit tento Plex účet",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Odstranit připojené servery jako první pro odpojení tohoto účtu",
-      "linkedAccounts": "Propojené Plex účty",
-      "linkedAccountsDesc": "",
-      "noAccountsYet": "Zatím nejsou propojeny žádné Plex účty.",
       "unlinkPlexAccount": "Odpojit Plex účet",
       "unlinkConfirm": "Opravdu chcete odpojit tento Plex účet? Nebudete moci přidat servery z tohoto účtu dokud jej znovu nepropojíte."
     },
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "webhookUrl": "",
@@ -1576,21 +1599,73 @@
         "topic": "",
         "authToken": "",
         "userKey": "",
-        "apiToken": ""
+        "apiToken": "",
+        "preset": "",
+        "host": "",
+        "port": "",
+        "security": "",
+        "username": "",
+        "password": "",
+        "fromName": "",
+        "fromAddress": "",
+        "to": "Recipients",
+        "replyTo": "",
+        "messagesPerSecond": "",
+        "messageStream": ""
+      },
+      "groups": {
+        "connection": "",
+        "sender": "",
+        "alerts": ""
       },
       "hints": {
-        "authTokenOptional": ""
+        "authTokenOptional": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpUsernameOptional": "",
+        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
+        "smtpRate": "",
+        "smtpMessageStream": "",
+        "smtpGmailUsername": "",
+        "smtpGmailPassword": "",
+        "smtpResendUsername": "",
+        "smtpResendPassword": "",
+        "smtpSendgridUsername": "",
+        "smtpSendgridPassword": "",
+        "smtpMailgunUsername": "",
+        "smtpMailgunPassword": "",
+        "smtpBrevoUsername": "",
+        "smtpBrevoPassword": "",
+        "smtpSesUsername": "",
+        "smtpSesPassword": "",
+        "smtpPostmarkUsername": "",
+        "smtpPostmarkPassword": ""
+      },
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "securityStarttls": "",
+        "securityTls": "",
+        "securityNone": "",
+        "presetCustom": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSes": "",
+        "presetMailgun": "",
+        "presetSendgrid": "",
+        "presetBrevo": "",
+        "presetGmail": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "discord": "",
         "jsonWebhook": "",
@@ -1598,11 +1673,16 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "email": "",
         "push": "",
         "webToast": ""
       },
       "usedBy": "",
       "usedBy_other": "",
+      "usedByNewsletters": "",
+      "usedByNewsletters_other": "",
+      "violationsOff": "",
+      "violationsOn": "",
       "webToastNote": ""
     },
     "jobs": {
@@ -1704,7 +1784,7 @@
   },
   "statsUsers": {
     "noActivity": "Zatím žádná aktivita",
-    "noActivityDesc": "",
+    "noActivityDesc": "Začněte streamovat, abyste zde viděli své nejlepší uživatele",
     "top3": "Horní 3",
     "runnersUp": "Runnery nahoru"
   },
