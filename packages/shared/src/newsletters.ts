@@ -279,6 +279,19 @@ export function resolveSenderName(senderName: string | null, scopedServerNames: 
   return scopedServerNames.length === 1 && only !== undefined ? only : 'Tracearr';
 }
 
+/** What one set of the newsletter's servers received: who, how much was trimmed to fit, how big, or that nothing was new there. */
+export interface NewsletterSendVariant {
+  key: string;
+  serverIds: string[];
+  serverNames: string[];
+  /** Deliverable recipients in this variant. */
+  recipientCount: number;
+  trimmed: NewsletterSectionCounts;
+  bytes: number;
+  /** Nothing new in the window for these servers: no snapshot, nobody in the variant was mailed. */
+  empty: boolean;
+}
+
 /** API shapes. Dates are ISO strings. */
 export interface NewsletterSendSummary {
   id: string;
@@ -292,6 +305,7 @@ export interface NewsletterSendSummary {
   startedAt: string | null;
   finishedAt: string | null;
   hasSnapshot: boolean;
+  variants: NewsletterSendVariant[];
 }
 
 export interface Newsletter {
@@ -323,6 +337,7 @@ export interface NewsletterSendRecipient {
   address: string;
   userId: string | null;
   status: NewsletterRecipientStatus;
+  variantKey: string;
   attempts: number;
   error: string | null;
   sentAt: string | null;

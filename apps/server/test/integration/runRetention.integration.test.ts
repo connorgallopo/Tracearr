@@ -16,7 +16,7 @@ import {
   createTestSession,
 } from '@tracearr/test-utils/factories';
 import type { AutomationKind, RunOutcome } from '@tracearr/shared';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '../../src/db/client.js';
 import {
   automations,
@@ -24,6 +24,7 @@ import {
   users,
   newsletters,
   newsletterSends,
+  newsletterSendSnapshots,
   emailSuppressions,
 } from '../../src/db/schema.js';
 import { processRunRetention } from '../../src/jobs/runRetentionQueue.js';
@@ -313,20 +314,26 @@ describe('newsletter send retention', () => {
       .insert(newsletterSends)
       .values({
         newsletterId,
-        viewToken: randomUUID().replaceAll('-', '') + randomUUID().slice(0, 11),
         trigger: 'schedule',
         windowStart: daysAgo(ageDays + 7),
         windowEnd: daysAgo(ageDays),
         itemCounts: {},
         outcome: opts.finished ? 'sent' : 'sending',
-        subject: 's',
-        html: opts.html,
-        text: opts.html === null ? null : 'text',
-        posters: opts.html === null ? {} : { m1: { serverId: 's', thumbPath: '/t', version: 'v' } },
         startedAt: daysAgo(ageDays),
         finishedAt: opts.finished ? daysAgo(ageDays) : null,
       })
       .returning({ id: newsletterSends.id });
+    if (opts.html !== null) {
+      await db.insert(newsletterSendSnapshots).values({
+        sendId: row!.id,
+        variantKey: 'v',
+        viewToken: randomUUID().replaceAll('-', '') + randomUUID().slice(0, 11),
+        subject: 's',
+        html: opts.html,
+        text: 'text',
+        posters: { m1: { serverId: 's', thumbPath: '/t', version: 'v' } },
+      });
+    }
     return row!.id;
   }
 
@@ -367,19 +374,20 @@ describe('newsletter send retention', () => {
     expect(result.newsletterSendsPurged).toBeGreaterThanOrEqual(1);
     expect(result.newsletterSnapshotsPruned).toBeGreaterThanOrEqual(1);
     const rows = await db
-      .select({
-        id: newsletterSends.id,
-        html: newsletterSends.html,
-        text: newsletterSends.text,
-        posters: newsletterSends.posters,
-      })
+      .select({ id: newsletterSends.id })
       .from(newsletterSends)
       .where(eq(newsletterSends.newsletterId, nl!.id));
-    const byId = new Map(rows.map((r) => [r.id, r]));
-    expect(byId.has(ancient)).toBe(false);
-    expect(byId.get(old)).toEqual({ id: old, html: null, text: null, posters: {} });
-    expect(byId.get(openOld)?.html).toBe('<p>x</p>');
-    expect(byId.get(young)?.html).toBe('<p>y</p>');
+    const ids = new Set(rows.map((r) => r.id));
+    expect(ids.has(ancient)).toBe(false);
+    expect(ids.has(old)).toBe(true);
+    const snapshots = await db
+      .select({ sendId: newsletterSendSnapshots.sendId, html: newsletterSendSnapshots.html })
+      .from(newsletterSendSnapshots)
+      .where(inArray(newsletterSendSnapshots.sendId, [ancient, old, openOld, young]));
+    expect(snapshots.sort((a, b) => a.html.localeCompare(b.html))).toEqual([
+      { sendId: openOld, html: '<p>x</p>' },
+      { sendId: young, html: '<p>y</p>' },
+    ]);
     const survivingSuppressions = await db
       .select({ sourceSendId: emailSuppressions.sourceSendId })
       .from(emailSuppressions)

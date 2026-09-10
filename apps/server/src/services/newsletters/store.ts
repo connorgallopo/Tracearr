@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, inArray, sql } from 'drizzle-orm';
 import type {
   CreateNewsletterInput,
   Newsletter,
@@ -7,12 +7,14 @@ import type {
   NewsletterSendRecipient,
   NewsletterSendSummary,
   NewsletterSendTrigger,
+  NewsletterSendVariant,
   UpdateNewsletterInput,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { isUniqueViolation } from '../../db/pg.js';
 import {
   newsletterSendRecipients,
+  newsletterSendSnapshots,
   newsletterSends,
   newsletters,
   servers,
@@ -22,6 +24,14 @@ import {
 export type NewsletterRow = typeof newsletters.$inferSelect;
 export type SendRow = typeof newsletterSends.$inferSelect;
 export type RecipientRow = typeof newsletterSendRecipients.$inferSelect;
+export type SnapshotRow = typeof newsletterSendSnapshots.$inferSelect;
+/** A send row plus whether any of its snapshots survive retention. */
+export type SendView = SendRow & { hasSnapshot: boolean };
+
+const sendColumns = {
+  ...getTableColumns(newsletterSends),
+  hasSnapshot: sql<boolean>`EXISTS (SELECT 1 FROM ${newsletterSendSnapshots} WHERE ${newsletterSendSnapshots.sendId} = ${newsletterSends.id})`,
+};
 
 const OPEN: NewsletterSendOutcome[] = ['rendering', 'sending'];
 const COUNTED: NewsletterSendTrigger[] = ['schedule', 'manual'];
@@ -143,9 +153,9 @@ export async function lastWatermark(newsletterId: string): Promise<Date | null> 
   return row?.end ? new Date(row.end) : null;
 }
 
-export async function lastSend(newsletterId: string): Promise<SendRow | null> {
+export async function lastSend(newsletterId: string): Promise<SendView | null> {
   const [row] = await db
-    .select()
+    .select(sendColumns)
     .from(newsletterSends)
     .where(eq(newsletterSends.newsletterId, newsletterId))
     .orderBy(desc(newsletterSends.startedAt))
@@ -156,17 +166,13 @@ export async function lastSend(newsletterId: string): Promise<SendRow | null> {
 export interface NewSend {
   newsletterId: string;
   destinationId: string | null;
-  viewToken: string;
   trigger: NewsletterSendTrigger;
   windowStart: Date;
   windowEnd: Date;
   itemCounts: Record<string, number>;
   outcome: NewsletterSendOutcome;
-  subject?: string;
   error?: string | null;
-  html?: string | null;
-  text?: string | null;
-  posters?: Record<string, PosterRef>;
+  variants?: NewsletterSendVariant[];
 }
 
 /** The partial unique index refuses a second open send; that surfaces as OpenSendConflict. */
@@ -186,9 +192,28 @@ export async function insertSend(values: NewSend): Promise<SendRow> {
   }
 }
 
+export interface NewSnapshot {
+  variantKey: string;
+  viewToken: string;
+  subject: string;
+  html: string;
+  text: string;
+  posters: Record<string, PosterRef>;
+}
+
+export async function insertSnapshots(sendId: string, rows: NewSnapshot[]): Promise<void> {
+  if (rows.length === 0) return;
+  await db.insert(newsletterSendSnapshots).values(rows.map((r) => ({ ...r, sendId })));
+}
+
 export async function insertRecipients(
   sendId: string,
-  rows: { address: string; userId: string | null; status: NewsletterRecipientStatus }[]
+  rows: {
+    address: string;
+    userId: string | null;
+    status: NewsletterRecipientStatus;
+    variantKey: string;
+  }[]
 ): Promise<RecipientRow[]> {
   const inserted: RecipientRow[] = [];
   for (let i = 0; i < rows.length; i += 500) {
@@ -234,6 +259,8 @@ export interface DeliveryContext {
   recipient: RecipientRow;
   send: SendRow;
   newsletter: NewsletterRow;
+  /** Null once retention pruned it, or when the recipient's variant never rendered. */
+  snapshot: SnapshotRow | null;
 }
 
 export async function loadDelivery(recipientId: string): Promise<DeliveryContext | null> {
@@ -251,7 +278,8 @@ export async function loadDelivery(recipientId: string): Promise<DeliveryContext
   if (!send) return null;
   const newsletter = await getNewsletter(send.newsletterId);
   if (!newsletter) return null;
-  return { recipient, send, newsletter };
+  const snapshot = await getSnapshot(send.id, recipient.variantKey);
+  return { recipient, send, newsletter, snapshot };
 }
 
 /** Records the attempt before the send goes out, so a lost reply is distinguishable from a lost connection. */
@@ -325,10 +353,10 @@ export async function listSends(
   newsletterId: string,
   page: number,
   pageSize: number
-): Promise<{ rows: SendRow[]; total: number }> {
+): Promise<{ rows: SendView[]; total: number }> {
   const [rows, [totalRow]] = await Promise.all([
     db
-      .select()
+      .select(sendColumns)
       .from(newsletterSends)
       .where(eq(newsletterSends.newsletterId, newsletterId))
       .orderBy(desc(newsletterSends.startedAt))
@@ -342,20 +370,34 @@ export async function listSends(
   return { rows, total: Number(totalRow?.total ?? 0) };
 }
 
-export async function getSend(sendId: string): Promise<SendRow | null> {
+export async function getSend(sendId: string): Promise<SendView | null> {
   const [row] = await db
-    .select()
+    .select(sendColumns)
     .from(newsletterSends)
     .where(eq(newsletterSends.id, sendId))
     .limit(1);
   return row ?? null;
 }
 
-export async function getSendByViewToken(token: string): Promise<SendRow | null> {
+export async function getSnapshot(sendId: string, variantKey: string): Promise<SnapshotRow | null> {
   const [row] = await db
     .select()
-    .from(newsletterSends)
-    .where(eq(newsletterSends.viewToken, token))
+    .from(newsletterSendSnapshots)
+    .where(
+      and(
+        eq(newsletterSendSnapshots.sendId, sendId),
+        eq(newsletterSendSnapshots.variantKey, variantKey)
+      )
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+export async function getSnapshotByViewToken(token: string): Promise<SnapshotRow | null> {
+  const [row] = await db
+    .select()
+    .from(newsletterSendSnapshots)
+    .where(eq(newsletterSendSnapshots.viewToken, token))
     .limit(1);
   return row ?? null;
 }
@@ -414,7 +456,7 @@ export async function loadServerLinks(serverIds: string[]): Promise<ServerLink[]
     : base.where(inArray(servers.id, serverIds)).orderBy(servers.name);
 }
 
-export function toSendSummary(row: SendRow): NewsletterSendSummary {
+export function toSendSummary(row: SendView): NewsletterSendSummary {
   return {
     id: row.id,
     trigger: row.trigger,
@@ -426,7 +468,8 @@ export function toSendSummary(row: SendRow): NewsletterSendSummary {
     error: row.error,
     startedAt: row.startedAt.toISOString(),
     finishedAt: row.finishedAt?.toISOString() ?? null,
-    hasSnapshot: row.html !== null,
+    hasSnapshot: row.hasSnapshot,
+    variants: row.variants,
   };
 }
 
@@ -436,6 +479,7 @@ export function toRecipient(row: RecipientRow): NewsletterSendRecipient {
     address: row.address,
     userId: row.userId,
     status: row.status,
+    variantKey: row.variantKey,
     attempts: row.attempts,
     error: row.error,
     sentAt: row.sentAt?.toISOString() ?? null,
@@ -444,7 +488,7 @@ export function toRecipient(row: RecipientRow): NewsletterSendRecipient {
 
 export function toPublicNewsletter(
   row: NewsletterRow,
-  last: SendRow | null,
+  last: SendView | null,
   nextRunAt: Date | null
 ): Newsletter {
   return {

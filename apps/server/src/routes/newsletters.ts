@@ -7,6 +7,7 @@ import {
   resolveSenderName,
   updateNewsletterSchema,
   uuidSchema,
+  variantKeySchema,
   NEWSLETTER_VIEW_TOKEN_LENGTH,
   type Newsletter,
   type NewsletterPreview,
@@ -32,14 +33,15 @@ import {
   logoRefFor,
   resolveImageMode,
 } from '../services/newsletters/render.js';
-import { digestForBrowser, snapshotForBrowser } from '../services/newsletters/snapshot.js';
+import { digestForBrowser } from '../services/newsletters/snapshot.js';
 import {
   createNewsletter,
   deleteNewsletter,
   findOpenSend,
   getNewsletter,
   getSend,
-  getSendByViewToken,
+  getSnapshot,
+  getSnapshotByViewToken,
   lastSend,
   lastWatermark,
   listNewsletters,
@@ -52,7 +54,7 @@ import {
   toSendSummary,
   updateNewsletter,
   type NewsletterRow,
-  type SendRow,
+  type SendView,
 } from '../services/newsletters/store.js';
 import { computeWindow } from '../services/newsletters/window.js';
 import { getDestination } from '../services/notifications/destinationStore.js';
@@ -70,6 +72,7 @@ const sendParams = z.object({ id: uuidSchema, sendId: uuidSchema });
 const viewParams = z.object({
   token: z.string().regex(new RegExp(`^[A-Za-z0-9_-]{${NEWSLETTER_VIEW_TOKEN_LENGTH}}$`)),
 });
+const htmlQuery = z.object({ variant: variantKeySchema.optional() });
 const NOT_AVAILABLE = page(
   'This newsletter is not available',
   '<p>The link is incomplete, or the newsletter has been removed.</p>'
@@ -98,7 +101,7 @@ async function publicOf(row: NewsletterRow): Promise<Newsletter> {
 }
 
 /** The send when it belongs to the newsletter; null otherwise, so callers reply notFound without leaking a cross-newsletter row. */
-async function ownedSend(newsletterId: string, sendId: string): Promise<SendRow | null> {
+async function ownedSend(newsletterId: string, sendId: string): Promise<SendView | null> {
   const send = await getSend(sendId);
   return send && send.newsletterId === newsletterId ? send : null;
 }
@@ -138,10 +141,9 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
 
   app.get('/view/:token', { config: { rateLimit: PUBLIC_RATE_LIMIT } }, async (request, reply) => {
     const params = viewParams.safeParse(request.params);
-    const send = params.success ? await getSendByViewToken(params.data.token) : null;
-    const html = send ? snapshotForBrowser(send) : null;
-    if (!html) return sendPublicPage(reply, 404, NOT_AVAILABLE);
-    return sendPublicPage(reply, 200, html, true);
+    const snapshot = params.success ? await getSnapshotByViewToken(params.data.token) : null;
+    if (!snapshot) return sendPublicPage(reply, 404, NOT_AVAILABLE);
+    return sendPublicPage(reply, 200, digestForBrowser(snapshot.html, snapshot.posters), true);
   });
 
   app.get('/:id', owner, async (request, reply) => {
@@ -322,11 +324,17 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
   app.get('/:id/sends/:sendId/html', owner, async (request, reply) => {
     const params = sendParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
+    const query = htmlQuery.safeParse(request.query);
+    if (!query.success) return reply.badRequest('Invalid variant');
     const send = await ownedSend(params.data.id, params.data.sendId);
     if (!send) return reply.notFound('Send not found');
-    const html = snapshotForBrowser(send);
-    if (!html) return reply.notFound('The snapshot has been pruned');
-    const body: NewsletterSendHtml = { subject: send.subject, html };
+    const key = query.data.variant ?? send.variants[0]?.key;
+    const snapshot = key === undefined ? null : await getSnapshot(send.id, key);
+    if (!snapshot) return reply.notFound('The snapshot has been pruned');
+    const body: NewsletterSendHtml = {
+      subject: snapshot.subject,
+      html: digestForBrowser(snapshot.html, snapshot.posters),
+    };
     return body;
   });
 
@@ -335,7 +343,7 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (!params.success) return reply.badRequest('Invalid id');
     const send = await ownedSend(params.data.id, params.data.sendId);
     if (!send) return reply.notFound('Send not found');
-    if (send.html === null)
+    if (!send.hasSnapshot)
       return reply.conflict('The snapshot for this send has been pruned; nothing can be resent');
     const ids = await resetFailedRecipients(send.id);
     const queued = await enqueueDeliveries(send.id, ids);

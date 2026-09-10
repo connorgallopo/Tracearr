@@ -30,6 +30,7 @@ const send: NewsletterSendSummary = {
   startedAt: '2026-09-02T07:00:00.000Z',
   finishedAt: '2026-09-02T07:01:00.000Z',
   hasSnapshot: true,
+  variants: [],
 };
 
 function renderHistory(

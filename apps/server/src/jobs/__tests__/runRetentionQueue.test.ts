@@ -210,17 +210,17 @@ describe('processRunRetention', () => {
   });
 
   describe('newsletter sends', () => {
-    it('purges closed sends after a year and clears closed snapshots after 90 days', async () => {
+    it('purges closed sends after a year and deletes closed snapshots after 90 days', async () => {
       const before = Date.now();
       const result = await processRunRetention();
       const queries = rendered();
       const purge = queries.find((q) => q.sql.startsWith('delete from newsletter_sends'));
-      const prune = queries.find((q) => q.sql.startsWith('update newsletter_sends'));
+      const prune = queries.find((q) => q.sql.startsWith('delete from newsletter_send_snapshots'));
       expect(purge?.sql).toBe(
         'delete from newsletter_sends where finished_at is not null and started_at < $1'
       );
       expect(prune?.sql).toBe(
-        "update newsletter_sends set html = null, text = null, posters = '{}'::jsonb where finished_at is not null and html is not null and started_at < $1"
+        'delete from newsletter_send_snapshots as ns using newsletter_sends as s where s.id = ns.send_id and s.finished_at is not null and s.started_at < $1'
       );
       const purgeCutoff = (purge!.params[0] as Date).getTime();
       const pruneCutoff = (prune!.params[0] as Date).getTime();

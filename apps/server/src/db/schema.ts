@@ -23,6 +23,7 @@ import {
   uniqueIndex,
   unique,
   check,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import {
@@ -39,6 +40,7 @@ import {
   type NewsletterSections,
   type NewsletterSendOutcome,
   type NewsletterSendTrigger,
+  type NewsletterSendVariant,
   type NewsletterWindow,
   type NotificationEventType,
   type RunOutcome,
@@ -852,7 +854,6 @@ export const newsletterSends = pgTable(
       .references(() => newsletters.id, { onDelete: 'cascade' }),
     // The transport at send time; no FK, so a deleted destination leaves history readable
     destinationId: uuid('destination_id'),
-    viewToken: text('view_token').notNull().unique(),
     trigger: text('trigger').notNull().$type<NewsletterSendTrigger>(),
     windowStart: timestamp('window_start', { withTimezone: true }).notNull(),
     windowEnd: timestamp('window_end', { withTimezone: true }).notNull(),
@@ -860,12 +861,8 @@ export const newsletterSends = pgTable(
     recipientCount: integer('recipient_count').notNull().default(0),
     outcome: text('outcome').notNull().default('rendering').$type<NewsletterSendOutcome>(),
     error: text('error'),
-    // The rendered subject; the newsletter's template can change after the send
-    subject: text('subject').notNull().default(''),
-    // Rendered once with poster:<cardId> refs; nulled by retention
-    html: text('html'),
-    text: text('text'),
-    posters: jsonb('posters').notNull().default({}).$type<Record<string, PosterRef>>(),
+    // One entry per set of servers some recipient belongs to
+    variants: jsonb('variants').notNull().default([]).$type<NewsletterSendVariant[]>(),
     startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
     finishedAt: timestamp('finished_at', { withTimezone: true }),
   },
@@ -878,6 +875,25 @@ export const newsletterSends = pgTable(
   ]
 );
 
+/** The rendered digest of one variant; the send's view link and delivery both read it. */
+export const newsletterSendSnapshots = pgTable(
+  'newsletter_send_snapshots',
+  {
+    sendId: uuid('send_id')
+      .notNull()
+      .references(() => newsletterSends.id, { onDelete: 'cascade' }),
+    variantKey: text('variant_key').notNull(),
+    viewToken: text('view_token').notNull().unique(),
+    // The rendered subject; the newsletter's template can change after the send
+    subject: text('subject').notNull(),
+    // Rendered once with poster:<cardId> refs; retention deletes the row
+    html: text('html').notNull(),
+    text: text('text').notNull(),
+    posters: jsonb('posters').notNull().default({}).$type<Record<string, PosterRef>>(),
+  },
+  (table) => [primaryKey({ columns: [table.sendId, table.variantKey] })]
+);
+
 export const newsletterSendRecipients = pgTable(
   'newsletter_send_recipients',
   {
@@ -887,6 +903,8 @@ export const newsletterSendRecipients = pgTable(
       .references(() => newsletterSends.id, { onDelete: 'cascade' }),
     address: text('address').notNull(),
     userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    // Which snapshot this person gets; retry-failed re-enqueues with it
+    variantKey: text('variant_key').notNull(),
     status: text('status').notNull().default('queued').$type<NewsletterRecipientStatus>(),
     attempts: integer('attempts').notNull().default(0),
     error: text('error'),

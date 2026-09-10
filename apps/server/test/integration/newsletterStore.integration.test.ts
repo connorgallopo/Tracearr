@@ -3,7 +3,7 @@
  * guards, markSendSending's rendering guard, beginAttempt, resetFailedRecipients,
  * lastWatermark's trigger and outcome filter, closeStaleSend's two branches and
  * their own compare-and-swap guards, queuedRecipientIds, deleteNewsletter, and
- * getSendByViewToken. Every tier but this one mocks the Drizzle chain, so only
+ * getSnapshotByViewToken. Every tier but this one mocks the Drizzle chain, so only
  * Postgres can prove any of these predicates.
  *
  * Run with: pnpm --filter @tracearr/server test:integration -- newsletterStore
@@ -12,7 +12,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { eq } from 'drizzle-orm';
 import type { NewsletterRecipientStatus, NewsletterSendOutcome } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
-import { newsletterSendRecipients, newsletterSends, newsletters } from '../../src/db/schema.js';
+import {
+  newsletterSendRecipients,
+  newsletterSendSnapshots,
+  newsletterSends,
+  newsletters,
+} from '../../src/db/schema.js';
 import {
   RENDERING_STALE_MS,
   SENDING_STALE_MS,
@@ -20,7 +25,7 @@ import {
   closeStaleSend,
   deleteNewsletter,
   finalizeSend,
-  getSendByViewToken,
+  getSnapshotByViewToken,
   lastWatermark,
   markSendSending,
   queuedRecipientIds,
@@ -30,8 +35,6 @@ import {
 
 const WINDOW_START = new Date('2026-08-26T00:00:00Z');
 const WINDOW_END = new Date('2026-09-02T00:00:00Z');
-
-let tokens = 0;
 
 async function seedNewsletter(name = 'Weekly') {
   const [row] = await db
@@ -65,12 +68,10 @@ async function seedSend(
     finishedAt: Date | null;
   }> = {}
 ): Promise<SendRow> {
-  tokens += 1;
   const [row] = await db
     .insert(newsletterSends)
     .values({
       newsletterId,
-      viewToken: `token-${tokens}`,
       trigger: over.trigger ?? 'manual',
       windowStart: WINDOW_START,
       windowEnd: over.windowEnd ?? WINDOW_END,
@@ -94,7 +95,7 @@ async function seedRecipients(
 ) {
   return db
     .insert(newsletterSendRecipients)
-    .values(rows.map((r) => ({ ...r, sendId })))
+    .values(rows.map((r) => ({ ...r, sendId, variantKey: 'v' })))
     .returning();
 }
 
@@ -393,13 +394,21 @@ describe('queuedRecipientIds', () => {
   });
 });
 
-describe('getSendByViewToken', () => {
-  it('finds a send by its view token and nothing by another', async () => {
+describe('getSnapshotByViewToken', () => {
+  it('finds a snapshot by its view token and nothing by another', async () => {
     const newsletter = await seedNewsletter();
     const send = await seedSend(newsletter.id, { outcome: 'sent' });
-    const found = await getSendByViewToken(send.viewToken);
-    expect(found?.id).toBe(send.id);
-    expect(await getSendByViewToken('no-such-token')).toBeNull();
+    await db.insert(newsletterSendSnapshots).values({
+      sendId: send.id,
+      variantKey: 'v',
+      viewToken: 'token-1',
+      subject: 's',
+      html: '<p>x</p>',
+      text: 'x',
+    });
+    const found = await getSnapshotByViewToken('token-1');
+    expect(found).toMatchObject({ sendId: send.id, variantKey: 'v', html: '<p>x</p>' });
+    expect(await getSnapshotByViewToken('no-such-token')).toBeNull();
   });
 });
 

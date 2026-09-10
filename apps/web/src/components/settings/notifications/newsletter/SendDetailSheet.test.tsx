@@ -32,12 +32,14 @@ const detail: NewsletterSendDetail = {
   startedAt: '2026-09-02T07:00:00.000Z',
   finishedAt: '2026-09-02T07:01:00.000Z',
   hasSnapshot: true,
+  variants: [],
   recipients: [
     {
       id: 'r-1',
       address: 'ann@x.com',
       userId: 'u1',
       status: 'sent',
+      variantKey: 'v',
       attempts: 1,
       error: null,
       sentAt: '2026-09-02T07:00:30.000Z',
@@ -47,6 +49,7 @@ const detail: NewsletterSendDetail = {
       address: 'bob@x.com',
       userId: null,
       status: 'failed',
+      variantKey: 'v',
       attempts: 3,
       error: 'Mailbox full',
       sentAt: null,

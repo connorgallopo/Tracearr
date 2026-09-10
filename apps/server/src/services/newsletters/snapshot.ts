@@ -5,7 +5,6 @@ import {
   VIEW_PLACEHOLDER,
   substitutePosterRefs,
 } from './render.js';
-import type { SendRow } from './store.js';
 
 function paragraphHolding(placeholder: string): RegExp {
   const literal = placeholder.replace(/[{}]/g, '\\$&');
@@ -25,9 +24,4 @@ export function digestForBrowser(html: string, posters: Record<string, PosterRef
     .replace(UNSUBSCRIBE_LINE, INERT_UNSUBSCRIBE)
     .replaceAll(VIEW_PLACEHOLDER, '#')
     .replaceAll(UNSUBSCRIBE_PLACEHOLDER, '#');
-}
-
-/** The stored snapshot, or null once it has been pruned. */
-export function snapshotForBrowser(send: Pick<SendRow, 'html' | 'posters'>): string | null {
-  return send.html === null ? null : digestForBrowser(send.html, send.posters);
 }

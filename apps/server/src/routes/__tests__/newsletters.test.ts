@@ -14,7 +14,8 @@ const store = vi.hoisted(() => ({
   lastSend: vi.fn(),
   listSends: vi.fn(),
   getSend: vi.fn(),
-  getSendByViewToken: vi.fn(),
+  getSnapshot: vi.fn(),
+  getSnapshotByViewToken: vi.fn(),
   listRecipients: vi.fn(),
   resetFailedRecipients: vi.fn(),
   loadServerLinks: vi.fn(),
@@ -79,13 +80,30 @@ const ID = '11111111-1111-4111-8111-111111111111';
 const DEST = '22222222-2222-4222-8222-222222222222';
 const SEND_ID = '5f0b3e3a-3f4e-4c46-9a5c-1d2f0d0f9d21';
 const TOKEN = 'a'.repeat(43);
-const snapshotSend = {
+const sentSend = {
   id: SEND_ID,
   newsletterId: ID,
+  outcome: 'sent',
+  hasSnapshot: true,
+  variants: [
+    {
+      key: 's1',
+      serverIds: ['s1'],
+      serverNames: ['Basement'],
+      recipientCount: 1,
+      trimmed: { movies: 0, shows: 0, albums: 0, mostWatched: 0 },
+      bytes: 100,
+      empty: false,
+    },
+  ],
+};
+const snapshot = {
+  sendId: SEND_ID,
+  variantKey: 's1',
   viewToken: TOKEN,
   subject: 'Weekly digest',
-  outcome: 'sent',
   html: '<p>Hi</p><img src="poster:m1" alt="Heat"><img src="cid:logo" alt="x"><p style="m"><a href="{{view_url}}">View in browser</a></p><p style="m"><a href="{{unsubscribe_url}}">Unsubscribe</a></p>',
+  text: 'Hi',
   posters: { m1: { serverId: 's1', thumbPath: '/t/1', version: 'v1' } },
 };
 const body = {
@@ -568,7 +586,7 @@ describe('newsletter routes', () => {
     store.getSend.mockResolvedValue({
       id: SEND_ID,
       newsletterId: ID,
-      html: '<p>x</p>',
+      hasSnapshot: true,
       outcome: 'partial',
     });
     store.resetFailedRecipients.mockResolvedValue(['r1', 'r2']);
@@ -582,7 +600,7 @@ describe('newsletter routes', () => {
     store.getSend.mockResolvedValue({
       id: SEND_ID,
       newsletterId: ID,
-      html: null,
+      hasSnapshot: false,
       outcome: 'partial',
     });
     expect(
@@ -671,11 +689,11 @@ describe('newsletter routes', () => {
 
 describe('public view', () => {
   it('serves the snapshot with relative images and inert footer lines', async () => {
-    store.getSendByViewToken.mockResolvedValue(snapshotSend);
+    store.getSnapshotByViewToken.mockResolvedValue(snapshot);
     const app = await build(null);
     const res = await app.inject({ method: 'GET', url: `/newsletters/view/${TOKEN}` });
     expect(res.statusCode).toBe(200);
-    expect(store.getSendByViewToken).toHaveBeenCalledWith(TOKEN);
+    expect(store.getSnapshotByViewToken).toHaveBeenCalledWith(TOKEN);
     expect(res.headers['content-type']).toContain('text/html');
     expect(res.headers['x-robots-tag']).toBe('noindex');
     expect(res.headers['cache-control']).toBe('private, no-store');
@@ -692,18 +710,17 @@ describe('public view', () => {
   });
 
   it('answers one 404 page for a malformed, unknown, or pruned token', async () => {
-    store.getSendByViewToken.mockResolvedValue(null);
+    store.getSnapshotByViewToken.mockResolvedValue(null);
     const app = await build(null);
     const malformed = await app.inject({ method: 'GET', url: '/newsletters/view/not-a-token' });
     const unknown = await app.inject({ method: 'GET', url: `/newsletters/view/${'b'.repeat(43)}` });
-    store.getSendByViewToken.mockResolvedValue({ ...snapshotSend, html: null });
-    const pruned = await app.inject({ method: 'GET', url: `/newsletters/view/${TOKEN}` });
-    for (const res of [malformed, unknown, pruned]) {
+    for (const res of [malformed, unknown]) {
       expect(res.statusCode).toBe(404);
       expect(res.body).toBe(malformed.body);
       expect(res.headers['x-robots-tag']).toBe('noindex');
     }
-    expect(store.getSendByViewToken).toHaveBeenCalledTimes(2);
+    expect(store.getSnapshotByViewToken).toHaveBeenCalledWith('b'.repeat(43));
+    expect(store.getSnapshotByViewToken).not.toHaveBeenCalledWith('not-a-token');
   });
 
   it('is rate limited and unauthenticated', async () => {
@@ -715,30 +732,48 @@ describe('public view', () => {
 });
 
 describe('send html', () => {
-  it('returns the subject and the browser snapshot to the owner', async () => {
-    store.getSend.mockResolvedValue(snapshotSend);
+  it('returns the first variant by default and the asked-for variant by key', async () => {
+    store.getSend.mockResolvedValue(sentSend);
+    store.getSnapshot.mockResolvedValue(snapshot);
     const app = await build(owner);
     const res = await app.inject({
       method: 'GET',
       url: `/newsletters/${ID}/sends/${SEND_ID}/html`,
     });
     expect(res.statusCode).toBe(200);
+    expect(store.getSnapshot).toHaveBeenCalledWith(SEND_ID, 's1');
     expect(res.json().subject).toBe('Weekly digest');
     expect(res.json().html).toContain('src="/api/v1/images/logo"');
     expect(res.json().html).not.toContain('{{');
+
+    const key = '11111111-1111-4111-8111-111111111111,22222222-2222-4222-8222-222222222222';
+    await app.inject({
+      method: 'GET',
+      url: `/newsletters/${ID}/sends/${SEND_ID}/html?variant=${encodeURIComponent(key)}`,
+    });
+    expect(store.getSnapshot).toHaveBeenLastCalledWith(SEND_ID, key);
   });
 
-  it('answers 404 when the snapshot is pruned or the send belongs elsewhere', async () => {
-    store.getSend.mockResolvedValue({ ...snapshotSend, html: null });
+  it('answers 404 when the snapshot is pruned or the send belongs elsewhere, and 400 for a malformed variant', async () => {
+    store.getSend.mockResolvedValue(sentSend);
+    store.getSnapshot.mockResolvedValue(null);
     const app = await build(owner);
     expect(
       (await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/${SEND_ID}/html` }))
         .statusCode
     ).toBe(404);
-    store.getSend.mockResolvedValue({ ...snapshotSend, newsletterId: randomUUID() });
+    store.getSend.mockResolvedValue({ ...sentSend, newsletterId: randomUUID() });
     expect(
       (await app.inject({ method: 'GET', url: `/newsletters/${ID}/sends/${SEND_ID}/html` }))
         .statusCode
     ).toBe(404);
+    expect(
+      (
+        await app.inject({
+          method: 'GET',
+          url: `/newsletters/${ID}/sends/${SEND_ID}/html?variant=nope`,
+        })
+      ).statusCode
+    ).toBe(400);
   });
 });

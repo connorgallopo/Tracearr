@@ -152,7 +152,6 @@ describe('recipient candidates', () => {
       .insert(newsletterSends)
       .values({
         newsletterId: row!.id,
-        viewToken: 'v'.repeat(43),
         trigger: 'schedule',
         windowStart: new Date('2026-08-26T00:00:00Z'),
         windowEnd: new Date('2026-09-02T00:00:00Z'),

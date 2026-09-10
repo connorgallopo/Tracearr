@@ -715,6 +715,13 @@
       "when": 1788820752155,
       "tag": "0101_true_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1789045379763,
+      "tag": "0102_newsletter_send_variants",
+      "breakpoints": true
     }
   ]
 }

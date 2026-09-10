@@ -10,6 +10,7 @@ import { db } from '../../src/db/client.js';
 import {
   emailSuppressions,
   newsletterSendRecipients,
+  newsletterSendSnapshots,
   newsletterSends,
   newsletters,
   users,
@@ -37,12 +38,11 @@ async function seedNewsletter(name = 'Weekly') {
   return row!;
 }
 
-async function insertSend(newsletterId: string, outcome: string, token: string) {
+async function insertSend(newsletterId: string, outcome: string) {
   return db
     .insert(newsletterSends)
     .values({
       newsletterId,
-      viewToken: token,
       trigger: 'manual',
       windowStart: new Date('2026-08-26T00:00:00Z'),
       windowEnd: new Date('2026-09-02T00:00:00Z'),
@@ -59,24 +59,24 @@ describe('newsletter tables', () => {
 
   it('refuses a second open send per newsletter but allows one after a finished send', async () => {
     const n = await seedNewsletter();
-    await insertSend(n.id, 'sending', 't1');
-    await expect(insertSend(n.id, 'rendering', 't2')).rejects.toMatchObject({
+    await insertSend(n.id, 'sending');
+    await expect(insertSend(n.id, 'rendering')).rejects.toMatchObject({
       cause: { code: '23505' },
     });
     await db
       .update(newsletterSends)
       .set({ outcome: 'sent' })
       .where(sql`newsletter_id = ${n.id}`);
-    const [second] = await insertSend(n.id, 'rendering', 't3');
+    const [second] = await insertSend(n.id, 'rendering');
     expect(second?.outcome).toBe('rendering');
   });
 
   it('cascades recipients with the send and keeps a suppression with its source nulled', async () => {
     const n = await seedNewsletter();
-    const [send] = await insertSend(n.id, 'sent', 't1');
+    const [send] = await insertSend(n.id, 'sent');
     await db
       .insert(newsletterSendRecipients)
-      .values({ sendId: send!.id, address: 'a@example.com' });
+      .values({ sendId: send!.id, address: 'a@example.com', variantKey: 'v' });
     await db
       .insert(emailSuppressions)
       .values({ address: 'a@example.com', reason: 'unsubscribed', sourceSendId: send!.id });
@@ -85,6 +85,18 @@ describe('newsletter tables', () => {
     expect(recipients).toHaveLength(0);
     const [supp] = await db.select().from(emailSuppressions);
     expect(supp).toMatchObject({ address: 'a@example.com', sourceSendId: null });
+  });
+
+  it('cascades snapshots with the send and refuses two snapshots for one variant', async () => {
+    const n = await seedNewsletter();
+    const [send] = await insertSend(n.id, 'sent');
+    const snapshot = { sendId: send!.id, variantKey: 'v', subject: 's', html: '<p/>', text: 'x' };
+    await db.insert(newsletterSendSnapshots).values({ ...snapshot, viewToken: 't1' });
+    await expect(
+      db.insert(newsletterSendSnapshots).values({ ...snapshot, viewToken: 't2' })
+    ).rejects.toMatchObject({ cause: { code: '23505' } });
+    await db.delete(newsletterSends).where(sql`id = ${send!.id}`);
+    expect(await db.select().from(newsletterSendSnapshots)).toEqual([]);
   });
 
   it('rejects mixed-case addresses in suppressions and contact emails', async () => {

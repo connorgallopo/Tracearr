@@ -99,32 +99,31 @@ async function posterAttachments(posters: Record<string, PosterRef>): Promise<Em
 export async function deliverRecipient(job: DeliveryJob): Promise<void> {
   const ctx = await loadDelivery(job.recipientId);
   if (!ctx || ctx.recipient.status !== 'queued' || ctx.send.outcome !== 'sending') return;
-  if (ctx.send.html === null || ctx.send.text === null) {
-    throw new UnrecoverableError('The send has no rendered snapshot');
-  }
+  const snapshot = ctx.snapshot;
+  if (!snapshot) throw new UnrecoverableError('The send has no rendered snapshot');
   const transport = await openTransport(ctx);
   const { externalUrl } = await getNetworkSettings();
   const base = externalUrl?.replace(/\/$/, '') ?? null;
   const links = base
     ? {
         unsubscribe: `${base}/api/v1/email/unsubscribe/${signUnsubscribeToken(ctx.recipient.id)}`,
-        view: `${base}/api/v1/newsletters/view/${ctx.send.viewToken}`,
+        view: `${base}/api/v1/newsletters/view/${snapshot.viewToken}`,
       }
     : null;
   if (
     !links &&
-    (ctx.send.html.includes(UNSUBSCRIBE_PLACEHOLDER) || ctx.send.html.includes(VIEW_PLACEHOLDER))
+    (snapshot.html.includes(UNSUBSCRIBE_PLACEHOLDER) || snapshot.html.includes(VIEW_PLACEHOLDER))
   ) {
     throw new UnrecoverableError('The external URL was removed after this send was rendered');
   }
 
   const mode = resolveImageMode(ctx.newsletter.imageMode, externalUrl);
-  let html = substitutePosterRefs(ctx.send.html, ctx.send.posters, mode, externalUrl);
-  let text = ctx.send.text;
+  let html = substitutePosterRefs(snapshot.html, snapshot.posters, mode, externalUrl);
+  let text = snapshot.text;
   const cid =
     mode === 'inline'
       ? Object.fromEntries(
-          Object.entries(ctx.send.posters).filter(([cardId]) => html.includes(`cid:${cardId}`))
+          Object.entries(snapshot.posters).filter(([cardId]) => html.includes(`cid:${cardId}`))
         )
       : {};
   if (links) {
@@ -177,7 +176,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
       },
       to: [ctx.recipient.address],
       ...(transport.config.replyTo ? { replyTo: transport.config.replyTo } : {}),
-      subject: ctx.send.subject,
+      subject: snapshot.subject,
       html,
       text,
       messageId,

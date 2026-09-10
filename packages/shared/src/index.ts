@@ -613,6 +613,7 @@ export type {
   UpdateNewsletterInput,
   Newsletter,
   NewsletterSendSummary,
+  NewsletterSendVariant,
   NewsletterSendRecipient,
   NewsletterSendDetail,
   NewsletterSendsPage,

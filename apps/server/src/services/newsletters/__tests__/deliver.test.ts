@@ -88,24 +88,24 @@ const ctx = () => ({
     sendId: 'send-1',
     address: 'a@x.com',
     userId: 'u1',
+    variantKey: 's1',
     status: 'queued',
     attempts: 0,
     error: null,
     messageId: null,
     sentAt: null,
   },
-  send: {
-    id: 'send-1',
-    newsletterId: 'n1',
-    destinationId: 'd1',
-    outcome: 'sending',
-    subject: 'x',
+  send: { id: 'send-1', newsletterId: 'n1', destinationId: 'd1', outcome: 'sending' },
+  newsletter: { id: 'n1', imageMode: 'auto' },
+  snapshot: {
+    sendId: 'send-1',
+    variantKey: 's1',
     viewToken: VIEW_TOKEN,
+    subject: 'x',
     html: '<img src="cid:logo"><p>Hi</p><img src="poster:m1" alt="Heat"><p><a href="{{view_url}}">View in browser</a></p><a href="{{unsubscribe_url}}">Unsubscribe</a>',
     text: 'Hi\nView [{{view_url}}]\nUnsubscribe [{{unsubscribe_url}}]',
     posters: { m1: { serverId: 's1', thumbPath: '/t', version: 'v1' } },
   },
-  newsletter: { id: 'n1', imageMode: 'auto' },
 });
 
 beforeEach(() => {
@@ -189,7 +189,7 @@ describe('deliverRecipient', () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
-      send: { ...ctx().send, html: '<p>Hi</p>', text: 'Hi' },
+      snapshot: { ...ctx().snapshot, html: '<p>Hi</p>', text: 'Hi' },
     });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });
     const mail = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
@@ -199,8 +199,8 @@ describe('deliverRecipient', () => {
   it('attaches no logo when the rendered snapshot never referenced cid:logo', async () => {
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
-      send: {
-        ...ctx().send,
+      snapshot: {
+        ...ctx().snapshot,
         html: '<p>Hi</p><img src="poster:m1" alt="Heat"><a href="{{unsubscribe_url}}">Unsubscribe</a>',
       },
     });
@@ -213,8 +213,8 @@ describe('deliverRecipient', () => {
     const withOrphan = ctx();
     store.loadDelivery.mockResolvedValue({
       ...withOrphan,
-      send: {
-        ...withOrphan.send,
+      snapshot: {
+        ...withOrphan.snapshot,
         posters: {
           m1: { serverId: 's1', thumbPath: '/t', version: 'v1' },
           w9: { serverId: 's1', thumbPath: '/watched', version: 'v2' },
@@ -271,8 +271,8 @@ describe('deliverRecipient', () => {
     );
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
-      send: {
-        ...ctx().send,
+      snapshot: {
+        ...ctx().snapshot,
         html: '<p><a href="{{view_url}}">View in browser</a></p>',
         text: 'View [{{view_url}}]',
       },
@@ -280,6 +280,15 @@ describe('deliverRecipient', () => {
     await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toThrow(
       'The external URL was removed after this send was rendered'
     );
+    expect(mockSendMail).not.toHaveBeenCalled();
+  });
+
+  it('throws unrecoverably when the recipient variant has no snapshot', async () => {
+    store.loadDelivery.mockResolvedValue({ ...ctx(), snapshot: null });
+    await expect(deliverRecipient({ sendId: 'send-1', recipientId: 'r1' })).rejects.toMatchObject({
+      name: 'UnrecoverableError',
+      message: 'The send has no rendered snapshot',
+    });
     expect(mockSendMail).not.toHaveBeenCalled();
   });
 
@@ -427,7 +436,11 @@ describe('deliverRecipient', () => {
   it('none image mode drops the poster image and attaches nothing', async () => {
     store.loadDelivery.mockResolvedValue({
       ...ctx(),
-      send: { ...ctx().send, html: '<p>Hi</p><img src="poster:m1" alt="Heat">', text: 'Hi' },
+      snapshot: {
+        ...ctx().snapshot,
+        html: '<p>Hi</p><img src="poster:m1" alt="Heat">',
+        text: 'Hi',
+      },
       newsletter: { id: 'n1', imageMode: 'none' },
     });
     await deliverRecipient({ sendId: 'send-1', recipientId: 'r1' });

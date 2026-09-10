@@ -1,4 +1,9 @@
-import { resolveSenderName, type NewsletterSendTrigger } from '@tracearr/shared';
+import {
+  resolveSenderName,
+  variantKey,
+  type NewsletterSendTrigger,
+  type NewsletterSendVariant,
+} from '@tracearr/shared';
 import { getDestination } from '../notifications/destinationStore.js';
 import { resolveEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
@@ -23,6 +28,7 @@ import {
   getNewsletter,
   insertRecipients,
   insertSend,
+  insertSnapshots,
   lastWatermark,
   loadServerLinks,
   markSendOutcome,
@@ -83,7 +89,6 @@ export async function runNewsletter(
   const base = {
     newsletterId,
     destinationId: newsletter.destinationId,
-    viewToken: newViewToken(),
     trigger,
     windowStart: window.start,
     windowEnd: window.end,
@@ -106,8 +111,6 @@ export async function runNewsletter(
         ...base,
         itemCounts: data.counts,
         outcome: 'skipped_empty',
-        html: null,
-        text: null,
       });
       return done({ outcome: 'skipped_empty', sendId: send.id, queuedRecipientIds: [] });
     }
@@ -177,6 +180,16 @@ export async function runNewsletter(
       { ...branding, senderName },
       { newsletterId, mode, externalUrl }
     );
+    const ids = servers.map((s) => s.id);
+    const variant: NewsletterSendVariant = {
+      key: variantKey(ids),
+      serverIds: ids,
+      serverNames: servers.map((s) => s.name),
+      recipientCount: deliverable.length,
+      trimmed: fit.trimmed,
+      bytes: fit.bytes,
+      empty: false,
+    };
     return {
       counts: data.counts,
       posters,
@@ -184,6 +197,7 @@ export async function runNewsletter(
       deliverable,
       subject,
       rendered: fit.rendered,
+      variant,
     };
   };
 
@@ -205,7 +219,7 @@ export async function runNewsletter(
     throw error;
   }
   if ('done' in ready) return ready.done;
-  const { counts, posters, recipients, deliverable, subject, rendered } = ready;
+  const { counts, posters, recipients, deliverable, subject, rendered, variant } = ready;
 
   let send;
   try {
@@ -213,10 +227,7 @@ export async function runNewsletter(
       ...base,
       itemCounts: counts,
       outcome: 'rendering',
-      subject,
-      html: rendered.html,
-      text: rendered.text,
-      posters,
+      variants: [variant],
     });
   } catch (error) {
     if (error instanceof OpenSendConflict) {
@@ -227,12 +238,23 @@ export async function runNewsletter(
   }
 
   try {
+    await insertSnapshots(send.id, [
+      {
+        variantKey: variant.key,
+        viewToken: newViewToken(),
+        subject,
+        html: rendered.html,
+        text: rendered.text,
+        posters,
+      },
+    ]);
     const rows = await insertRecipients(
       send.id,
       recipients.map((r) => ({
         address: r.address,
         userId: r.userId,
         status: r.suppressed ? 'suppressed' : 'queued',
+        variantKey: variant.key,
       }))
     );
     await markSendSending(send.id, deliverable.length);

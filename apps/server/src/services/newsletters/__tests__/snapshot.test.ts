@@ -5,7 +5,7 @@ vi.mock('../../imageProxy.js', () => ({
     `/api/v1/images/proxy?server=${o.serverId}&url=${encodeURIComponent(o.path)}&v=${o.version ?? ''}`,
 }));
 
-import { snapshotForBrowser } from '../snapshot.js';
+import { digestForBrowser } from '../snapshot.js';
 
 const html = [
   '<img src="cid:logo" alt="Movies">',
@@ -18,13 +18,9 @@ const html = [
 ].join('');
 const posters = { m1: { serverId: 's1', thumbPath: '/t/1', version: 'v1' } };
 
-describe('snapshotForBrowser', () => {
-  it('returns null without a snapshot', () => {
-    expect(snapshotForBrowser({ html: null, posters: {} })).toBeNull();
-  });
-
+describe('digestForBrowser', () => {
   it('rewrites posters and the logo to relative urls and neutralizes both footer lines', () => {
-    const out = snapshotForBrowser({ html, posters })!;
+    const out = digestForBrowser(html, posters);
     expect(out).toContain('src="/api/v1/images/logo"');
     expect(out).toContain('src="/api/v1/images/proxy?server=s1&url=%2Ft%2F1&v=v1"');
     expect(out).not.toContain('poster:');
@@ -40,6 +36,6 @@ describe('snapshotForBrowser', () => {
 
   it('leaves a snapshot without placeholders alone apart from the image rewrites', () => {
     const plain = '<p>Hi</p><p>Reply to this email to unsubscribe.</p>';
-    expect(snapshotForBrowser({ html: plain, posters: {} })).toBe(plain);
+    expect(digestForBrowser(plain, {})).toBe(plain);
   });
 });

@@ -9,6 +9,7 @@ const store = vi.hoisted(() => ({
   lastWatermark: vi.fn(),
   insertSend: vi.fn(),
   insertRecipients: vi.fn(),
+  insertSnapshots: vi.fn(),
   markSendSending: vi.fn(),
   markSendOutcome: vi.fn(),
   loadServerLinks: vi.fn(),
@@ -150,16 +151,32 @@ beforeEach(() => {
   });
 });
 
-function firstSend(): { subject?: string; html?: string; text?: string } {
+function firstSend(): Record<string, unknown> {
   const [first] = store.insertSend.mock.calls[0] ?? [];
   expect(first).toBeDefined();
-  return first as { subject?: string; html?: string; text?: string };
+  return first as Record<string, unknown>;
+}
+
+interface SnapshotArg {
+  variantKey: string;
+  viewToken: string;
+  subject: string;
+  html: string;
+  text: string;
+  posters: unknown;
+}
+
+function firstSnapshot(): SnapshotArg {
+  const [, rows] = store.insertSnapshots.mock.calls[0] ?? [];
+  const [first] = (rows ?? []) as SnapshotArg[];
+  expect(first).toBeDefined();
+  return first as SnapshotArg;
 }
 
 async function renderedHtml(): Promise<string> {
-  store.insertSend.mockClear();
+  store.insertSnapshots.mockClear();
   await runNewsletter(NEWSLETTER.id, 'schedule');
-  return String(firstSend().html);
+  return firstSnapshot().html;
 }
 
 describe('runNewsletter', () => {
@@ -170,22 +187,34 @@ describe('runNewsletter', () => {
     expect(send).toMatchObject({
       newsletterId: NEWSLETTER.id,
       destinationId: NEWSLETTER.destinationId,
-      viewToken: 'view-token',
       trigger: 'schedule',
       windowStart: new Date('2026-08-26T00:00:00Z'),
       outcome: 'rendering',
       itemCounts: ONE_MOVIE.counts,
+      variants: [
+        {
+          key: 's1',
+          serverIds: ['s1'],
+          serverNames: ['Basement'],
+          recipientCount: 1,
+          empty: false,
+        },
+      ],
+    });
+    expect(firstSnapshot()).toMatchObject({
+      variantKey: 's1',
+      viewToken: 'view-token',
       posters: { m1: { serverId: 's1', thumbPath: '/t', version: 'v1' } },
     });
-    expect(String(send.subject)).toMatch(/^What's new on Basement \(\w{3} \d{1,2}, \d{4}\) 1$/);
-    expect(String(send.html)).toContain('src="poster:m1"');
-    expect(String(send.html)).toContain('href="{{unsubscribe_url}}"');
-    expect(String(send.html)).toContain('href="{{view_url}}"');
-    expect(String(send.text)).toContain('{{unsubscribe_url}}');
-    expect(String(send.text)).toContain('{{view_url}}');
+    expect(firstSnapshot().subject).toMatch(/^What's new on Basement \(\w{3} \d{1,2}, \d{4}\) 1$/);
+    expect(firstSnapshot().html).toContain('src="poster:m1"');
+    expect(firstSnapshot().html).toContain('href="{{unsubscribe_url}}"');
+    expect(firstSnapshot().html).toContain('href="{{view_url}}"');
+    expect(firstSnapshot().text).toContain('{{unsubscribe_url}}');
+    expect(firstSnapshot().text).toContain('{{view_url}}');
     expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
-      { address: 'a@x.com', userId: 'u1', status: 'queued' },
-      { address: 'gone@x.com', userId: 'u2', status: 'suppressed' },
+      { address: 'a@x.com', userId: 'u1', status: 'queued', variantKey: 's1' },
+      { address: 'gone@x.com', userId: 'u2', status: 'suppressed', variantKey: 's1' },
     ]);
     expect(store.markSendSending).toHaveBeenCalledWith('send-1', 1);
     expect(mockAssemble).toHaveBeenCalledWith(NEWSLETTER, {
@@ -200,9 +229,7 @@ describe('runNewsletter', () => {
 
   it('renders the subject template with the server name, dates and item count', async () => {
     await runNewsletter(NEWSLETTER.id, 'manual');
-    expect(String(firstSend().html)).toMatch(
-      /What&#x27;s new on Basement \(\w{3} \d{1,2}, \d{4}\) 1/
-    );
+    expect(firstSnapshot().html).toMatch(/What&#x27;s new on Basement \(\w{3} \d{1,2}, \d{4}\) 1/);
   });
 
   it('renders through the branding block with the newsletter sender name in the subject and footer', async () => {
@@ -218,9 +245,9 @@ describe('runNewsletter', () => {
     store.getNewsletter.mockResolvedValue({ ...NEWSLETTER, senderName: 'Family Media' });
     await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(mockBranding).toHaveBeenCalledWith();
-    const send = firstSend();
-    expect(String(send.subject)).toMatch(/^What's new on Family Media \(\w{3} \d{1,2}, \d{4}\) 1$/);
-    const html = String(send.html);
+    const snapshot = firstSnapshot();
+    expect(snapshot.subject).toMatch(/^What's new on Family Media \(\w{3} \d{1,2}, \d{4}\) 1$/);
+    const html = snapshot.html;
     expect(html).toContain('#123456');
     expect(html).toContain('Sent by Tracearr for <!-- -->Family Media');
     expect(html).toContain('The house server');
@@ -233,7 +260,7 @@ describe('runNewsletter', () => {
       { id: 's2', name: 'Attic', type: 'jellyfin', url: 'http://jf', machineIdentifier: null },
     ]);
     await runNewsletter(NEWSLETTER.id, 'schedule');
-    expect(String(firstSend().subject)).toMatch(/^What's new on Tracearr /);
+    expect(firstSnapshot().subject).toMatch(/^What's new on Tracearr /);
   });
 
   it('emits the Tracearr media link only when the newsletter turns links on', async () => {
@@ -296,10 +323,8 @@ describe('runNewsletter', () => {
     mockAssemble.mockResolvedValue({ data: EMPTY, posters: {} });
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(result).toEqual({ outcome: 'skipped_empty', sendId: 'send-1', queuedRecipientIds: [] });
-    expect(store.insertSend.mock.calls[0]?.[0]).toMatchObject({
-      outcome: 'skipped_empty',
-      html: null,
-    });
+    expect(store.insertSend.mock.calls[0]?.[0]).toMatchObject({ outcome: 'skipped_empty' });
+    expect(store.insertSnapshots).not.toHaveBeenCalled();
     expect(store.insertRecipients).not.toHaveBeenCalled();
     expect(mockResolve).not.toHaveBeenCalled();
     expect(mockAnnounce).not.toHaveBeenCalled();
@@ -311,11 +336,11 @@ describe('runNewsletter', () => {
     expect(result.outcome).toBe('queued');
     expect(mockResolve).not.toHaveBeenCalled();
     expect(store.insertRecipients).toHaveBeenCalledWith('send-1', [
-      { address: 'me@example.com', userId: null, status: 'queued' },
+      { address: 'me@example.com', userId: null, status: 'queued', variantKey: 's1' },
     ]);
-    expect(String(firstSend().html)).toContain('Nothing new this period');
+    expect(firstSnapshot().html).toContain('Nothing new this period');
     // A test send reaches the owner's own address, not because they are a member of a scoped server.
-    expect(String(firstSend().html)).not.toContain('member of');
+    expect(firstSnapshot().html).not.toContain('member of');
   });
 
   it('fails with a recorded reason when the destination is missing, disabled, or needs re-entry', async () => {
@@ -369,7 +394,7 @@ describe('runNewsletter', () => {
   it('uses the reply line instead of a placeholder when there is no external url', async () => {
     mockSettings.mockResolvedValue({ externalUrl: null, trustProxy: false });
     await runNewsletter(NEWSLETTER.id, 'schedule');
-    const html = String(firstSend().html);
+    const html = firstSnapshot().html;
     expect(html).toContain('Reply to this email to unsubscribe');
     expect(html).not.toContain('{{unsubscribe_url}}');
     expect(html).not.toContain('{{view_url}}');
@@ -472,17 +497,13 @@ describe('runNewsletter', () => {
     });
     const result = await runNewsletter(NEWSLETTER.id, 'schedule');
     expect(result.outcome).toBe('queued');
-    const send = store.insertSend.mock.calls[0]?.[0] as {
-      html: string;
-      itemCounts: unknown;
-      posters: unknown;
-    };
-    expect(send.html).toContain('+11 more shows');
-    expect(send.html).toContain('src="poster:');
-    expect(deliveredBytes(send.html, posters, 'hosted', EXTERNAL_URL)).toBeLessThanOrEqual(
+    const snapshot = firstSnapshot();
+    expect(snapshot.html).toContain('+11 more shows');
+    expect(snapshot.html).toContain('src="poster:');
+    expect(deliveredBytes(snapshot.html, posters, 'hosted', EXTERNAL_URL)).toBeLessThanOrEqual(
       EMAIL_CLIP_FIT_BYTES
     );
-    expect(send.itemCounts).toEqual(data.counts);
-    expect(send.posters).toBe(posters);
+    expect(firstSend().itemCounts).toEqual(data.counts);
+    expect(snapshot.posters).toBe(posters);
   });
 });
