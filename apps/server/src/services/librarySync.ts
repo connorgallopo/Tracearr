@@ -46,7 +46,7 @@ import type { LibrarySyncProgress } from '@tracearr/shared';
 import { REDIS_KEYS, RESOLUTION_TIERS, LEGACY_VERSION_SENTINEL } from '@tracearr/shared';
 import { resolutionBucketPredicate, resolutionRankSql } from '../utils/resolutionBuckets.js';
 import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
-import { sanitizeTextArray, scrubStringFields } from '../utils/sanitizeText.js';
+import { sanitizeText, sanitizeTextArray, scrubStringFields } from '../utils/sanitizeText.js';
 import type { Redis } from 'ioredis';
 
 // Constants for batching and rate limiting.
@@ -437,7 +437,11 @@ export class LibrarySyncService {
       }
     }
 
-    await this.syncLibraryNames(serverId, libraries);
+    try {
+      await this.syncLibraryNames(serverId, libraries);
+    } catch (err) {
+      console.warn('[LibrarySync] Library name sync failed, continuing sync:', err);
+    }
 
     if (libraries.length > 0) {
       try {
@@ -2369,8 +2373,8 @@ export class LibrarySyncService {
         libraries.map((lib) => ({
           serverId,
           libraryId: lib.id,
-          name: lib.name,
-          mediaType: lib.type,
+          name: sanitizeText(lib.name),
+          mediaType: sanitizeText(lib.type),
         }))
       )
       .onConflictDoUpdate({
