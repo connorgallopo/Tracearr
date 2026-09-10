@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DESTINATION_KINDS,
   DESTINATION_TYPES,
+  EMAIL_SMTP_PRESETS,
   SUBSCRIBABLE_EVENTS,
   addressList,
   type CreateDestinationInput,
@@ -73,6 +74,27 @@ type GroupLabel = keyof PagesTranslations['settings']['destinations']['groups'];
 
 function isCreatable(kind: DestinationKind): kind is CreatableKind {
   return !DESTINATION_TYPES[kind].builtin;
+}
+
+const SMTP_PRESET_HINT_FIELDS = new Set(['username', 'password']);
+const EMAIL_SMTP_PRESET_IDS = new Set(Object.keys(EMAIL_SMTP_PRESETS));
+
+/** Resend, SendGrid etc. have a non-obvious username/password convention; the preset's own hint wins over the field's. */
+function resolveHint(
+  kind: DestinationKind | null,
+  field: DestinationFieldDescriptor,
+  presetValue: string | undefined
+): string | undefined {
+  if (
+    kind === 'email' &&
+    SMTP_PRESET_HINT_FIELDS.has(field.key) &&
+    presetValue &&
+    EMAIL_SMTP_PRESET_IDS.has(presetValue)
+  ) {
+    const preset = EMAIL_SMTP_PRESETS[presetValue as keyof typeof EMAIL_SMTP_PRESETS];
+    return field.key === 'username' ? preset.usernameHint : preset.passwordHint;
+  }
+  return field.hint;
 }
 
 const CREATABLE_KINDS = DESTINATION_KINDS.filter(isCreatable);
@@ -418,6 +440,7 @@ export function DestinationDialog({
                   const stored = keepsStoredSecret(field.key);
                   const missing = field.required && !isFilled(field);
                   const invalid = missing && showsError(field.key);
+                  const hint = resolveHint(kind, field, values['preset']);
                   const inputProps = {
                     id: inputId,
                     ref: setFieldRef(field.key),
@@ -474,9 +497,9 @@ export function DestinationDialog({
                       ) : (
                         <Input {...inputProps} />
                       )}
-                      {field.hint && !stored && (
+                      {hint && !stored && (
                         <FieldDescription>
-                          {t(`pages:settings.destinations.hints.${field.hint as FieldHint}`)}
+                          {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
                         </FieldDescription>
                       )}
                       {stored && (

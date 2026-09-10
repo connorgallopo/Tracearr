@@ -279,6 +279,16 @@ describe('email destination', () => {
     expect(parsed.success).toBe(false);
   });
 
+  it('accepts a message stream id and rejects one with spaces', () => {
+    expect(
+      destinationConfigSchema('email').safeParse({ ...valid, messageStream: 'broadcast' }).success
+    ).toBe(true);
+    expect(
+      destinationConfigSchema('email').safeParse({ ...valid, messageStream: 'no spaces here' })
+        .success
+    ).toBe(false);
+  });
+
   it('allows an empty reply-to and username', () => {
     const parsed = destinationConfigSchema('email').safeParse({
       ...valid,
@@ -317,6 +327,7 @@ describe('email destination', () => {
       ['username', 'connection'],
       ['password', 'connection'],
       ['messagesPerSecond', 'connection'],
+      ['messageStream', 'connection'],
       ['fromName', 'sender'],
       ['fromAddress', 'sender'],
       ['replyTo', 'sender'],

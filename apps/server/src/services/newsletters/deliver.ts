@@ -5,7 +5,11 @@ import type { PosterRef } from '../../db/schema.js';
 import { proxyImage } from '../imageProxy.js';
 import { getDestination, readConfig, rewrapConfig } from '../notifications/destinationStore.js';
 import type { EmailAttachment, EmailConfig } from '../notifications/destinations/email.js';
-import { describeSmtpError, getTransporter } from '../notifications/destinations/emailTransport.js';
+import {
+  describeSmtpError,
+  getTransporter,
+  smtpExtraHeaders,
+} from '../notifications/destinations/emailTransport.js';
 import { getEmailBranding } from '../notifications/emailBranding.js';
 import { readLogoPng } from '../notifications/emailLogo.js';
 import { getNetworkSettings } from '../settings.js';
@@ -154,6 +158,15 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
     : null;
   // RFC 8058 allows the one-click POST target over https only; an http external URL keeps the link and drops the header.
   const oneClick = base !== null && isHttpsUrl(base);
+  const headers = {
+    ...(listUnsubscribe
+      ? {
+          'List-Unsubscribe': listUnsubscribe,
+          ...(oneClick ? { 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } : {}),
+        }
+      : {}),
+    ...smtpExtraHeaders(transport.config),
+  };
 
   const domain = transport.config.fromAddress.split('@')[1] ?? 'tracearr.local';
   const messageId = `<${randomUUID()}@${domain}>`;
@@ -181,14 +194,7 @@ export async function deliverRecipient(job: DeliveryJob): Promise<void> {
       text,
       messageId,
       attachments,
-      ...(listUnsubscribe
-        ? {
-            headers: {
-              'List-Unsubscribe': listUnsubscribe,
-              ...(oneClick ? { 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } : {}),
-            },
-          }
-        : {}),
+      ...(Object.keys(headers).length ? { headers } : {}),
     });
   } catch (error) {
     if (mayHaveAccepted(error)) {

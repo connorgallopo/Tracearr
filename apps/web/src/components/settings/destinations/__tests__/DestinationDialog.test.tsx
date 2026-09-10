@@ -408,6 +408,24 @@ describe('email kind', () => {
     );
   });
 
+  it('shows the resend username hint after picking the preset, and the generic hint for custom', async () => {
+    const user = await openEmail();
+    expect(
+      screen.getByText('pages:settings.destinations.hints.smtpUsernameOptional')
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText(label('preset')));
+    await user.click(
+      screen.getByRole('option', { name: 'pages:settings.destinations.options.presetResend' })
+    );
+    expect(
+      screen.getByText('pages:settings.destinations.hints.smtpResendUsername')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('pages:settings.destinations.hints.smtpUsernameOptional')
+    ).not.toBeInTheDocument();
+  });
+
   it('saves the defaults as strings when no preset is picked', async () => {
     const user = await openEmail();
     await user.type(screen.getByLabelText(label('host')), 'smtp.example.com');

@@ -12,6 +12,7 @@ import {
   closeTransporter,
   describeSmtpError,
   getTransporter,
+  smtpExtraHeaders,
   transportOptions,
   type SmtpConfig,
 } from '../destinations/emailTransport.js';
@@ -46,9 +47,9 @@ describe('transportOptions', () => {
       maxMessages: 100,
       rateDelta: 1000,
       rateLimit: 3,
-      connectionTimeout: 10_000,
-      greetingTimeout: 10_000,
-      socketTimeout: 30_000,
+      connectionTimeout: 30_000,
+      greetingTimeout: 30_000,
+      socketTimeout: 120_000,
       auth: { user: 'user', pass: 'pw' },
     });
   });
@@ -117,6 +118,16 @@ describe('getTransporter', () => {
     expect((b as unknown as { close: ReturnType<typeof vi.fn> }).close).toHaveBeenCalledTimes(1);
     expect(getTransporter('dest-a', base)).not.toBe(a);
     expect(mockCreateTransport).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('smtpExtraHeaders', () => {
+  it('carries the message stream as X-PM-Message-Stream and omits it when blank', () => {
+    expect(smtpExtraHeaders({ messageStream: 'broadcast' })).toEqual({
+      'X-PM-Message-Stream': 'broadcast',
+    });
+    expect(smtpExtraHeaders({ messageStream: null })).toEqual({});
+    expect(smtpExtraHeaders({})).toEqual({});
   });
 });
 

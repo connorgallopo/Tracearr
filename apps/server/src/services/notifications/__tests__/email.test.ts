@@ -307,6 +307,17 @@ describe('emailType.deliver', () => {
     );
   });
 
+  it('carries the message stream header when configured and omits it otherwise', async () => {
+    const message = await render(mediaAdded);
+    await emailType.deliver(message, { ...config, messageStream: 'broadcast' }, deliverCtx);
+    expect(mockSendMail.mock.calls[0]?.[0]).toMatchObject({
+      headers: { 'X-PM-Message-Stream': 'broadcast' },
+    });
+
+    await emailType.deliver(message, config, deliverCtx);
+    expect(mockSendMail.mock.calls[1]?.[0]).not.toHaveProperty('headers');
+  });
+
   it('passes reply-to when set and falls back to Tracearr as the from name', async () => {
     const message = await render(mediaAdded);
     await emailType.deliver(

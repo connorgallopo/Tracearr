@@ -21,6 +21,7 @@ import {
   createTransporter,
   describeSmtpError,
   getTransporter,
+  smtpExtraHeaders,
   type SmtpConfig,
 } from './emailTransport.js';
 import { ownText, textOf } from './overrides.js';
@@ -36,6 +37,7 @@ export interface EmailConfig extends SmtpConfig {
   fromAddress: string;
   to?: string | null;
   replyTo?: string | null;
+  messageStream?: string | null;
 }
 
 export interface EmailAttachment {
@@ -259,6 +261,7 @@ async function send(
   config: EmailConfig,
   to: string[]
 ): Promise<void> {
+  const headers = smtpExtraHeaders(config);
   await transporter.sendMail({
     from: { name: config.fromName || 'Tracearr', address: config.fromAddress },
     to,
@@ -268,6 +271,7 @@ async function send(
     text: message.text,
     messageId: messageId(config.fromAddress),
     attachments: message.attachments,
+    ...(Object.keys(headers).length ? { headers } : {}),
   });
 }
 

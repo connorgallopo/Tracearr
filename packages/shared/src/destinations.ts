@@ -65,6 +65,9 @@ export interface DestinationFieldDescriptor {
   /** number only; validated on the string value, whole non-negative integers regardless of min */
   min?: number;
   max?: number;
+  /** text/secret only: overrides the default 2000-char max and adds a format check */
+  maxLength?: number;
+  pattern?: RegExp;
   /** select only: choosing a value also writes these sibling fields */
   presets?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   /** i18n key under pages:settings.destinations.groups; the dialog draws a separator where the group changes */
@@ -122,16 +125,67 @@ const text = (
 export const EMAIL_SECURITY = ['starttls', 'tls', 'none'] as const;
 export type EmailSecurity = (typeof EMAIL_SECURITY)[number];
 
-/** Host, port and security per provider; the dialog copies them into the sibling fields. */
+/** Host, port and security per provider; the dialog copies them into the sibling fields. usernameHint/passwordHint are i18n keys under pages:settings.destinations.hints, resolved by the dialog rather than copied into the form. */
 export const EMAIL_SMTP_PRESETS = {
-  postmark: { host: 'smtp.postmarkapp.com', port: '587', security: 'starttls' },
-  resend: { host: 'smtp.resend.com', port: '465', security: 'tls' },
-  ses: { host: 'email-smtp.us-east-1.amazonaws.com', port: '587', security: 'starttls' },
-  mailgun: { host: 'smtp.mailgun.org', port: '587', security: 'starttls' },
-  sendgrid: { host: 'smtp.sendgrid.net', port: '587', security: 'starttls' },
-  brevo: { host: 'smtp-relay.brevo.com', port: '587', security: 'starttls' },
-  gmail: { host: 'smtp.gmail.com', port: '587', security: 'starttls' },
-} as const satisfies Record<string, { host: string; port: string; security: EmailSecurity }>;
+  postmark: {
+    host: 'smtp.postmarkapp.com',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpPostmarkUsername',
+    passwordHint: 'smtpPostmarkPassword',
+  },
+  resend: {
+    host: 'smtp.resend.com',
+    port: '465',
+    security: 'tls',
+    usernameHint: 'smtpResendUsername',
+    passwordHint: 'smtpResendPassword',
+  },
+  ses: {
+    host: 'email-smtp.us-east-1.amazonaws.com',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpSesUsername',
+    passwordHint: 'smtpSesPassword',
+  },
+  mailgun: {
+    host: 'smtp.mailgun.org',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpMailgunUsername',
+    passwordHint: 'smtpMailgunPassword',
+  },
+  sendgrid: {
+    host: 'smtp.sendgrid.net',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpSendgridUsername',
+    passwordHint: 'smtpSendgridPassword',
+  },
+  brevo: {
+    host: 'smtp-relay.brevo.com',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpBrevoUsername',
+    passwordHint: 'smtpBrevoPassword',
+  },
+  gmail: {
+    host: 'smtp.gmail.com',
+    port: '587',
+    security: 'starttls',
+    usernameHint: 'smtpGmailUsername',
+    passwordHint: 'smtpGmailPassword',
+  },
+} as const satisfies Record<
+  string,
+  {
+    host: string;
+    port: string;
+    security: EmailSecurity;
+    usernameHint: string;
+    passwordHint: string;
+  }
+>;
 
 const select = (
   key: string,
@@ -288,6 +342,12 @@ export const DESTINATION_TYPES = {
         { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
         secret('password', 'password', false),
         number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
+        {
+          ...text('messageStream', 'messageStream', false),
+          hint: 'smtpMessageStream',
+          maxLength: 64,
+          pattern: /^[A-Za-z0-9-]*$/,
+        },
       ]),
       ...grouped('sender', [
         text('fromName', 'fromName', false, undefined, 'Tracearr'),
@@ -372,8 +432,19 @@ function fieldSchema(f: DestinationFieldDescriptor): z.ZodString {
       );
     }
     case 'text':
-    case 'secret':
-      return z.string().trim().max(2000);
+    case 'secret': {
+      const { pattern } = f;
+      const base = z
+        .string()
+        .trim()
+        .max(f.maxLength ?? 2000);
+      return pattern
+        ? base.refine(
+            blankOk((v) => pattern.test(v)),
+            'Invalid format'
+          )
+        : base;
+    }
   }
 }
 

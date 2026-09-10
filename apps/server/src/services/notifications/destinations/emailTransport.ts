@@ -26,9 +26,9 @@ export function transportOptions(config: SmtpConfig): SMTPPool.Options {
     maxMessages: 100,
     rateDelta: 1000,
     rateLimit: Number.isInteger(rate) && rate > 0 ? rate : DEFAULT_RATE,
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 30_000,
+    connectionTimeout: 30_000,
+    greetingTimeout: 30_000,
+    socketTimeout: 120_000,
     ...(config.username ? { auth: { user: config.username, pass: config.password ?? '' } } : {}),
   };
   switch (config.security) {
@@ -95,6 +95,15 @@ export function assertSafeSmtpHost(host: string, port: string): void {
     throw new Error('host must be a hostname or IP address without a scheme, port or path');
   }
   assertSafeProbeUrl(`http://${isIPv6 ? `[${host}]` : host}:${port}`);
+}
+
+export interface MessageStreamConfig {
+  messageStream?: string | null;
+}
+
+/** Both send paths build their sendMail input from this, so the Postmark stream header stays in one place. */
+export function smtpExtraHeaders(config: MessageStreamConfig): Record<string, string> {
+  return config.messageStream ? { 'X-PM-Message-Stream': config.messageStream } : {};
 }
 
 export function describeSmtpError(error: unknown, config: SmtpConfig): string {
