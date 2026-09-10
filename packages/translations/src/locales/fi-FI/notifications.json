@@ -142,9 +142,7 @@
         "title": "Pari Luotu",
         "message": "Skannaa QR-koodi mobiililaitteellasi, jotta voit muodostaa parin"
       },
-      "displayNameUpdated": {
-        "title": "Näytön Nimi Päivitetty"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Luottamus Pisteet Nollaa",
         "message_one": "{{count}} käyttäjän nollaus 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Palvelimen lisääminen epäonnistui",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Laitteen poistaminen epäonnistui",
       "deviceRenameFailed": "Laitteen uudelleennimeäminen epäonnistui",
       "sessionsRevokeFailed": "Istuntojen peruuttaminen epäonnistui",
-      "displayNameUpdateFailed": "Näytön nimeä ei voitu päivittää",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Luottamuspisteiden nollaaminen epäonnistui",
       "routingUpdateFailed": "Reitityksen päivitys epäonnistui",
       "clipboardFailed": "Kopiointi leikepöydälle epäonnistui",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
