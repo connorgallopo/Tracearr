@@ -39,6 +39,32 @@ const PAGE_SIZE = 5000; // Larger batches = fewer API calls (tested up to 10k, s
 const REQUEST_TIMEOUT_MS = 30000; // 30 seconds
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000; // Base delay, will be multiplied by attempt number
+const ERROR_BODY_MAX_CHARS = 500;
+
+export class TautulliApiError extends Error {
+  readonly status: number;
+  readonly body: string;
+
+  constructor(status: number, statusText: string, body: string) {
+    super(`Tautulli API error: ${status} ${statusText}${body ? ` - ${body}` : ''}`);
+    this.name = 'TautulliApiError';
+    this.status = status;
+    this.body = body;
+  }
+}
+
+export function isFatalImportError(err: unknown): boolean {
+  if (err instanceof TautulliApiError) return err.status === 401 || err.status === 403;
+  return err instanceof Error && err.message.startsWith('Invalid Tautulli API response');
+}
+
+async function readErrorBody(response: Response): Promise<string> {
+  try {
+    return (await response.text()).slice(0, ERROR_BODY_MAX_CHARS);
+  } catch {
+    return '';
+  }
+}
 
 // Resolve external IDs from Plex legacy agent guids; new-style plex:// guids carry no external ID.
 export function parseHistoryGuid(guid: string | null): {
@@ -384,7 +410,8 @@ export class TautulliService {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error(`Tautulli API error: ${response.status} ${response.statusText}`);
+          const body = (await readErrorBody(response)).replaceAll(this.apiKey, '[redacted]');
+          throw new TautulliApiError(response.status, response.statusText, body);
         }
 
         const json = await response.json();
@@ -414,8 +441,7 @@ export class TautulliService {
           lastError = new Error('Unknown error');
         }
 
-        // Don't retry on validation errors
-        if (lastError.message.includes('Invalid Tautulli API response')) {
+        if (isFatalImportError(lastError)) {
           throw lastError;
         }
 
@@ -668,6 +694,7 @@ export class TautulliService {
     let skipped = 0;
     let errors = 0;
     let page = 0;
+    const failedPages: number[] = [];
 
     // Throttle tracking for progress updates
     let lastProgressTime = Date.now();
@@ -695,7 +722,19 @@ export class TautulliService {
         geoCache = new Map();
       }
 
-      const { records: rawRecords } = await tautulli.getHistory(page * PAGE_SIZE, PAGE_SIZE);
+      let rawRecords: unknown[];
+      try {
+        ({ records: rawRecords } = await tautulli.getHistory(page * PAGE_SIZE, PAGE_SIZE));
+      } catch (err) {
+        if (isFatalImportError(err)) throw err;
+        console.warn(
+          `[Import] Page ${page + 1} of ${progress.totalPages} failed after retries, skipping:`,
+          err
+        );
+        failedPages.push(page + 1);
+        page++;
+        continue;
+      }
 
       // Track actual records fetched (may differ from API total if records changed)
       progress.fetchedRecords += rawRecords.length;
@@ -1254,6 +1293,9 @@ export class TautulliService {
     if (linkedSessions > 0) parts.push(`${linkedSessions} linked`);
     if (skipped > 0) parts.push(`${skipped} skipped`);
     if (errors > 0) parts.push(`${errors} errors`);
+    if (failedPages.length > 0) {
+      parts.push(`${failedPages.length} pages not fetched (${failedPages.join(', ')})`);
+    }
 
     let message = `Import complete: ${parts.join(', ')}`;
 
