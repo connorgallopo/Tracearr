@@ -142,9 +142,7 @@
         "title": "Par Token Genereret",
         "message": "Scan QR-koden med din mobile enhed for at parre"
       },
-      "displayNameUpdated": {
-        "title": "Vis Navn Opdateret"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Stol På Scores Nulstil",
         "message_one": "{{count}} bruger nulstillet til 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Mislykkedes at tilføje server",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Kunne ikke fjerne enheden",
       "deviceRenameFailed": "Kunne ikke omdøbe enhed",
       "sessionsRevokeFailed": "Mislykkedes at tilbagekalde sessioner",
-      "displayNameUpdateFailed": "Kunne ikke opdatere visningsnavn",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Mislykkedes at nulstille trust scores",
       "routingUpdateFailed": "Kunne ikke opdatere routing",
       "clipboardFailed": "Kunne ikke kopiere til udklipsholder",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
