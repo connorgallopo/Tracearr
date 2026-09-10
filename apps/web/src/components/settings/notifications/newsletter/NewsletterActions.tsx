@@ -123,7 +123,7 @@ export function NewsletterActions({
   ref,
 }: NewsletterActionsProps) {
   const { t, i18n } = useTranslation(['settings', 'common']);
-  // i18next's TFunction can't verify a key built from the section name at compile time.
+  // The two plural keys below exist as `_one`/`_other`, which the typed TFunction refuses as a base key.
   const translate = t as Translate;
   const { user } = useAuth();
   const preview = usePreviewNewsletter();
