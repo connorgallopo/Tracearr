@@ -142,9 +142,7 @@
         "title": "Pairing-Token generiert",
         "message": "Scannen Sie den QR-Code mit Ihrem Mobilgerät"
       },
-      "displayNameUpdated": {
-        "title": "Anzeigename aktualisiert"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Vertrauenswertung zurückgesetzt",
         "message_one": "{{count}} Benutzer auf 100 zurückgesetzt",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Server hinzufügen fehlgeschlagen",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Gerät entfernen fehlgeschlagen",
       "deviceRenameFailed": "Gerät umbenennen fehlgeschlagen",
       "sessionsRevokeFailed": "Sitzungen widerrufen fehlgeschlagen",
-      "displayNameUpdateFailed": "Anzeigename aktualisieren fehlgeschlagen",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Vertrauenswertung zurücksetzen fehlgeschlagen",
       "routingUpdateFailed": "Routing aktualisieren fehlgeschlagen",
       "clipboardFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
