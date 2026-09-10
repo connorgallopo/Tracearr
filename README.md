@@ -160,7 +160,7 @@ journalctl -u redis      # Cache logs
 ### Development Setup
 
 ```bash
-# Install dependencies (requires pnpm 10+, Node.js 22+)
+# Install dependencies (requires pnpm 12+, Node.js 22.22.2+)
 pnpm install
 
 # Start database services

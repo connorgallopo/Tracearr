@@ -239,14 +239,14 @@ describe('data-table column meta', () => {
     render(<Harness data={people} />);
 
     const [nameHeader, ageHeader] = screen.getAllByRole('columnheader');
-    expect(nameHeader).toHaveStyle({ width: '12rem' });
+    expect(nameHeader?.style.width).toBe('12rem');
     expect(nameHeader).toHaveClass('test-head');
     expect(ageHeader?.className).toContain('text-right');
     expect(ageHeader?.className).toContain('tabular-nums');
 
     const body = screen.getAllByRole('rowgroup')[1]!;
     const [nameCell, ageCell] = within(within(body).getAllByRole('row')[0]!).getAllByRole('cell');
-    expect(nameCell).toHaveStyle({ width: '12rem' });
+    expect(nameCell?.style.width).toBe('12rem');
     expect(nameCell?.className).toContain('hidden');
     expect(ageCell?.className).toContain('tabular-nums');
   });
