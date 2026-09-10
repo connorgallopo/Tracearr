@@ -15,7 +15,8 @@ function severityStyle(severity: EventEmailInput['severity']) {
     fontWeight: 600,
     color: '#ffffff',
     backgroundColor: colors[severity],
-    margin: '0 0 12px',
+    marginTop: 0,
+    marginBottom: '12px',
   };
 }
 
@@ -48,13 +49,13 @@ function MediaCardView({
         </Column>
       )}
       <Column style={{ verticalAlign: 'top', backgroundColor: colors.card, color: colors.text }}>
-        <Text style={{ ...paragraph, fontWeight: 600, margin: '0 0 4px' }}>
+        <Text style={{ ...paragraph, fontWeight: 600, marginBottom: '4px' }}>
           {media.headline}
           {media.year !== null && ` (${media.year})`}
         </Text>
         {media.subtitle && <Text style={{ ...muted, marginBottom: '8px' }}>{media.subtitle}</Text>}
         {media.qualityLines.map((line) => (
-          <Text key={line} style={{ ...paragraph, margin: '0 0 2px' }}>
+          <Text key={line} style={{ ...paragraph, marginBottom: '2px' }}>
             {line}
           </Text>
         ))}
@@ -79,7 +80,7 @@ function FactsCardView({ card: facts }: { card: Extract<EventCard, { kind: 'fact
   return (
     <>
       {facts.facts.map((fact) => (
-        <Text key={fact.label} style={{ ...paragraph, margin: '0 0 4px' }}>
+        <Text key={fact.label} style={{ ...paragraph, marginBottom: '4px' }}>
           <span style={{ color: colors.muted }}>{fact.label}: </span>
           {fact.value}
         </Text>

@@ -74,6 +74,7 @@ describe('renderTest', () => {
       ),
     ]);
     for (const out of outs) {
+      expect(out.html).not.toMatch(/;margin:[^;"]*;margin-top:/);
       const cells = out.html.match(/<td[^>]*>/g) ?? [];
       expect(cells.length).toBeGreaterThan(0);
       for (const cell of cells) {

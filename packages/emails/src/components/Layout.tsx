@@ -32,7 +32,8 @@ export function Layout({ preview, branding, logoRef, children, footer }: LayoutP
             display: 'inline-block',
             verticalAlign: 'middle',
             fontWeight: 600,
-            margin: 0,
+            marginTop: 0,
+            marginBottom: 0,
           }}
         >
           {branding.senderName}

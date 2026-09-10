@@ -4,7 +4,7 @@ import { colors, link, paragraph } from '../styles.js';
 import type { RichTextDoc, RichTextInline, RichTextParagraph } from '../types.js';
 
 const listStyle: CSSProperties = { margin: '0 0 12px', paddingLeft: '20px', color: colors.text };
-const itemParagraph: CSSProperties = { ...paragraph, margin: 0 };
+const itemParagraph: CSSProperties = { ...paragraph, marginTop: 0, marginBottom: 0 };
 
 /** The grammar admits https and mailto only; a stored href outside that renders as plain text rather than an anchor. */
 const SAFE_HREF = /^(https:|mailto:)/i;

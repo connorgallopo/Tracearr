@@ -47,20 +47,23 @@ export const card: CSSProperties = {
   padding: '16px',
 };
 
+/** Text styles use margin longhands only: react-email's Text keeps a margin shorthand and adds all four longhands beside it, which costs 40-odd bytes per paragraph. */
 export const muted: CSSProperties = {
   color: colors.muted,
   fontSize: '12px',
-  margin: '0',
+  marginTop: 0,
+  marginBottom: 0,
 };
 
 export const paragraph: CSSProperties = {
   color: colors.text,
   fontSize: '14px',
-  margin: '0 0 12px',
+  marginTop: 0,
+  marginBottom: '12px',
 };
 
 export function heading(accent: string): CSSProperties {
-  return { color: accent, fontSize: '20px', fontWeight: 600, margin: '0 0 8px' };
+  return { color: accent, fontSize: '20px', fontWeight: 600, marginTop: 0, marginBottom: '8px' };
 }
 
 export function link(accent: string): CSSProperties {

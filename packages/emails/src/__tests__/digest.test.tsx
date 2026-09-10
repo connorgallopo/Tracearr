@@ -929,10 +929,8 @@ describe('renderDigest', () => {
     'eight linked list items in both fields': { intro: heaviestList, outro: heaviestList },
   };
 
-  // Measured 2026-09-07 with @react-email/components 1.0.12: plex runs 113,246 B, plex list
-  // 112,948 B, jellyfin runs 114,672 B, jellyfin list 114,374 B, cid runs 103,770 B, cid list
-  // 103,472 B. The clip ceiling is asserted by apps/server/src/services/newsletters/__tests__/fit.test.ts
-  // against what delivery substitutes; this file only records that each variant renders.
+  // The clip ceiling is asserted by apps/server/src/services/newsletters/__tests__/fit.test.ts
+  // against what delivery substitutes; this block only records that each variant renders.
   it.each(
     Object.entries(VARIANTS).flatMap(([name, variant]) =>
       Object.entries(COPY).map(
@@ -942,6 +940,54 @@ describe('renderDigest', () => {
   )('renders every section at its cap with %s', async (_name, variant, copy) => {
     const out = await renderDigest(maxInput(variant, copy), branding);
     expect(Buffer.byteLength(out.html, 'utf8')).toBeGreaterThan(0);
+  });
+
+  /** Measured 2026-09-10 on maxInput with hosted jellyfin poster urls and nineteen linked runs in both copy fields: the whole document 114,654 B; a movie card 1,903 B, a show card 3,336 B, an artist card 1,679 B, a most-watched row 1,659 B. The ceilings sit about 4% above, so a regression the size of the margin shorthand (11 KB across the digest) or a button per card (300 B) fails here before the fit loop pays for it in titles. */
+  const HEAVIEST_CEILING = 119_000;
+  const CARD_CEILINGS = {
+    movies: 1_980,
+    shows: 3_470,
+    artists: 1_750,
+    mostWatched: 1_730,
+  } as const;
+
+  it('keeps the heaviest digest and each card kind under the byte ceilings without doubling any margin into longhands', async () => {
+    const full = maxInput(
+      VARIANTS['hosted urls over jellyfin image paths']!,
+      COPY['nineteen linked runs in both fields']
+    );
+    const bytes = async (input: DigestInput) =>
+      Buffer.byteLength((await renderDigest(input, branding)).html, 'utf8');
+    const whole = await bytes(full);
+    expect(whole).toBeLessThanOrEqual(HEAVIEST_CEILING);
+    expect(
+      whole - (await bytes({ ...full, movies: full.movies.slice(0, -1) }))
+    ).toBeLessThanOrEqual(CARD_CEILINGS.movies);
+    expect(whole - (await bytes({ ...full, shows: full.shows.slice(0, -1) }))).toBeLessThanOrEqual(
+      CARD_CEILINGS.shows
+    );
+    expect(
+      whole - (await bytes({ ...full, artists: full.artists.slice(0, -1) }))
+    ).toBeLessThanOrEqual(CARD_CEILINGS.artists);
+    expect(
+      whole - (await bytes({ ...full, mostWatched: full.mostWatched.slice(0, -1) }))
+    ).toBeLessThanOrEqual(CARD_CEILINGS.mostWatched);
+    const { html } = await renderDigest(full, branding);
+    expect(html).not.toMatch(/;margin:[^;"]*;margin-top:/);
+  });
+
+  it('gives every image width, height and alt so a blocked-images client keeps the layout', async () => {
+    const out = await renderDigest(
+      maxInput(VARIANTS['inline cid references']!, COPY['nineteen linked runs in both fields']),
+      branding
+    );
+    const imgs = out.html.match(/<img[^>]*>/g) ?? [];
+    expect(imgs).toHaveLength(47);
+    for (const img of imgs) {
+      expect(img).toMatch(/\balt="/);
+      expect(img).toMatch(/\bwidth="\d+"/);
+      expect(img).toMatch(/\bheight="\d+"/);
+    }
   });
 
   it('says how many items each section holds beyond its cards, singular when one', async () => {

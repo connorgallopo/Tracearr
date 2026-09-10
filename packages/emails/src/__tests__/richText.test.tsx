@@ -5,9 +5,9 @@ import type { RichTextDoc, RichTextInline } from '../types.js';
 
 const ACCENT = '#0ea0b3';
 const P_OPEN =
-  '<p style="font-size:14px;line-height:24px;color:#e6e8eb;margin:0 0 12px;margin-top:0;margin-right:0;margin-bottom:12px;margin-left:0">';
+  '<p style="font-size:14px;line-height:24px;color:#e6e8eb;margin-top:0;margin-bottom:12px">';
 const LI_P_OPEN =
-  '<p style="font-size:14px;line-height:24px;color:#e6e8eb;margin:0;margin-top:0;margin-bottom:0;margin-left:0;margin-right:0">';
+  '<p style="font-size:14px;line-height:24px;color:#e6e8eb;margin-top:0;margin-bottom:0">';
 const UL_OPEN = '<ul style="margin:0 0 12px;padding-left:20px;color:#e6e8eb">';
 const A_OPEN = (href: string) =>
   `<a href="${href}" style="color:#0ea0b3;text-decoration-line:none;text-decoration:underline" target="_blank">`;
