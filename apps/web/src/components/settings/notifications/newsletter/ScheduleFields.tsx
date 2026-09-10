@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
-import { dateLabel } from '@/components/settings/shared/dateLabel';
+import { zonedDateLabel } from '@/components/settings/shared/dateLabel';
 import { EditorCard } from './EditorCard';
 import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
@@ -48,7 +48,12 @@ export function ScheduleFields({
   mode,
   touch,
   nextRunAt,
-}: FieldsetProps & { nextRunAt?: string | null }) {
+  scheduleDirty,
+}: FieldsetProps & {
+  nextRunAt?: string | null;
+  /** The schedule or timezone differs from the saved row, so the saved next run no longer applies. */
+  scheduleDirty: boolean;
+}) {
   const { t, i18n } = useTranslation('settings');
   const { schedule } = state;
   const setSchedule = (next: NewsletterSchedule) => {
@@ -56,10 +61,20 @@ export function ScheduleFields({
     onChange({ schedule: next });
   };
 
+  const nextRun =
+    mode === 'create' || scheduleDirty
+      ? t('newsletters.editor.nextRunPending')
+      : nextRunAt
+        ? t('newsletters.editor.nextRun', {
+            when: zonedDateLabel(nextRunAt, state.timezone, i18n.language),
+            timezone: state.timezone,
+          })
+        : t('newsletters.noNextRun');
+
   return (
     <EditorCard title={t('newsletters.editor.schedule')}>
-      <div className="flex flex-wrap gap-4">
-        <Field className="w-44">
+      <div className="grid gap-4 @md/field-group:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
+        <Field>
           <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.scheduleKind}>
             {t('newsletters.editor.scheduleKind')}
           </FieldLabel>
@@ -85,7 +100,7 @@ export function ScheduleFields({
           </Select>
         </Field>
         {schedule.kind === 'weekly' && (
-          <Field className="w-44">
+          <Field>
             <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.dayOfWeek}>
               {t('newsletters.editor.dayOfWeek')}
             </FieldLabel>
@@ -110,7 +125,7 @@ export function ScheduleFields({
           </Field>
         )}
         {schedule.kind === 'monthly' && (
-          <Field className="w-44">
+          <Field>
             <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.dayOfMonth}>
               {t('newsletters.editor.dayOfMonth')}
             </FieldLabel>
@@ -132,10 +147,11 @@ export function ScheduleFields({
                 ))}
               </SelectContent>
             </Select>
+            <FieldDescription>{t('newsletters.editor.dayOfMonthHelp')}</FieldDescription>
           </Field>
         )}
         {schedule.kind !== 'cron' && (
-          <Field className="w-36">
+          <Field>
             <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.time}>
               {t('newsletters.editor.time')}
             </FieldLabel>
@@ -148,7 +164,7 @@ export function ScheduleFields({
             />
           </Field>
         )}
-        <Field className="w-full max-w-sm">
+        <Field>
           <FieldLabel id={`${NEWSLETTER_FIELD_IDS.timezone}-label`}>
             {t('newsletters.editor.timezone')}
           </FieldLabel>
@@ -161,6 +177,7 @@ export function ScheduleFields({
               onChange({ timezone });
             }}
           />
+          <FieldDescription>{t('newsletters.editor.timezoneHelp')}</FieldDescription>
           <FieldError>{errors.timezone}</FieldError>
         </Field>
       </div>
@@ -183,13 +200,7 @@ export function ScheduleFields({
         </Field>
       )}
       {schedule.kind !== 'cron' && <FieldError>{errors.schedule}</FieldError>}
-      {mode === 'edit' && (
-        <FieldDescription>
-          {nextRunAt
-            ? t('newsletters.editor.nextRun', { when: dateLabel(nextRunAt) })
-            : t('newsletters.noNextRun')}
-        </FieldDescription>
-      )}
+      <FieldDescription>{nextRun}</FieldDescription>
     </EditorCard>
   );
 }

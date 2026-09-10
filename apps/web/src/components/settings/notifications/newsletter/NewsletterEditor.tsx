@@ -27,6 +27,7 @@ import { ScheduleFields } from './ScheduleFields';
 import { SendHistory } from './SendHistory';
 import { useNewsletterSave } from './useNewsletterSave';
 import {
+  deepEqual,
   defaultFormState,
   firstInvalidField,
   focusTargetId,
@@ -184,6 +185,9 @@ function EditorForm({ seed: initialSeed, newsletter }: EditorFormProps) {
         touch={touch}
         touched={touched}
         nextRunAt={newsletter?.nextRunAt}
+        scheduleDirty={
+          !deepEqual(seed.schedule, state.schedule) || seed.timezone !== state.timezone
+        }
       />
       <ContentFields
         state={state}

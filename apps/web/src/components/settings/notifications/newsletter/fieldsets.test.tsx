@@ -95,9 +95,11 @@ describe('IdentityFields', () => {
 });
 
 describe('ScheduleFields', () => {
-  it('switches kinds and keeps the time, and cron replaces the clock with an expression', async () => {
+  const year = new Date().getFullYear();
+
+  it('switches kinds and keeps the time, explains the 28-day cap for monthly, and cron replaces the clock with an expression', async () => {
     const p = props();
-    const { rerender } = render(<ScheduleFields {...p} />);
+    const { rerender } = render(<ScheduleFields {...p} scheduleDirty={false} />);
     await userEvent.click(
       screen.getByRole('combobox', { name: 'newsletters.editor.scheduleKind' })
     );
@@ -105,10 +107,22 @@ describe('ScheduleFields', () => {
     expect(p.onChange).toHaveBeenCalledWith({
       schedule: { kind: 'monthly', dayOfMonth: 1, time: '09:00' },
     });
+    expect(p.touch).toHaveBeenCalledWith('schedule');
 
     rerender(
       <ScheduleFields
         {...p}
+        scheduleDirty
+        state={{ ...p.state, schedule: { kind: 'monthly', dayOfMonth: 1, time: '09:00' } }}
+      />
+    );
+    expect(screen.getByText('newsletters.editor.dayOfMonthHelp')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.timezoneHelp')).toBeInTheDocument();
+
+    rerender(
+      <ScheduleFields
+        {...p}
+        scheduleDirty
         state={{ ...p.state, schedule: { kind: 'cron', expression: '0 9 * * 1' } }}
       />
     );
@@ -118,9 +132,9 @@ describe('ScheduleFields', () => {
     expect(screen.getByText('newsletters.editor.dstNote')).toBeInTheDocument();
   });
 
-  it('changes the time and the weekday, and shows the next run in edit mode', async () => {
+  it('changes the time and the weekday', async () => {
     const p = props();
-    render(<ScheduleFields {...p} mode="edit" nextRunAt="2026-09-07T07:00:00.000Z" />);
+    render(<ScheduleFields {...p} scheduleDirty={false} />);
     const time = screen.getByLabelText('newsletters.editor.time');
     // A controlled time input reverts between keystrokes under a bare mock, so change the whole value at once.
     fireEvent.change(time, { target: { value: '18:30' } });
@@ -132,7 +146,34 @@ describe('ScheduleFields', () => {
     expect(p.onChange).toHaveBeenLastCalledWith({
       schedule: { kind: 'weekly', dayOfWeek: 5, time: '09:00' },
     });
-    expect(screen.getByText(/newsletters.editor.nextRun/)).toBeInTheDocument();
+  });
+
+  it('shows the next run in the newsletter zone for a saved schedule and says it is set on save otherwise', () => {
+    const p = props({ timezone: 'Europe/Berlin' });
+    const { rerender } = render(
+      <ScheduleFields
+        {...p}
+        mode="edit"
+        nextRunAt={`${year}-09-07T07:00:00.000Z`}
+        scheduleDirty={false}
+      />
+    );
+    expect(
+      screen.getByText(
+        'newsletters.editor.nextRun:{"when":"Sep 7, 9:00 AM","timezone":"Europe/Berlin"}'
+      )
+    ).toBeInTheDocument();
+
+    rerender(
+      <ScheduleFields {...p} mode="edit" nextRunAt={`${year}-09-07T07:00:00.000Z`} scheduleDirty />
+    );
+    expect(screen.getByText('newsletters.editor.nextRunPending')).toBeInTheDocument();
+
+    rerender(<ScheduleFields {...p} mode="create" scheduleDirty={false} />);
+    expect(screen.getByText('newsletters.editor.nextRunPending')).toBeInTheDocument();
+
+    rerender(<ScheduleFields {...p} mode="edit" nextRunAt={null} scheduleDirty={false} />);
+    expect(screen.getByText('newsletters.noNextRun')).toBeInTheDocument();
   });
 });
 
