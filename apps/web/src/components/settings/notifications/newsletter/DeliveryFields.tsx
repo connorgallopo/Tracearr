@@ -23,7 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { useDestinations, useSettings } from '@/hooks/queries';
 import { EditorCard } from './EditorCard';
-import { NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
+import { DELIVERY_CARD_ID, NEWSLETTER_FIELD_IDS, type FieldsetProps } from './newsletterForm';
 
 const NONE = '__none__';
 
@@ -40,7 +40,7 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
   const [addOpen, setAddOpen] = useState(false);
 
   return (
-    <EditorCard title={t('newsletters.editor.delivery.title')}>
+    <EditorCard id={DELIVERY_CARD_ID} title={t('newsletters.editor.delivery.title')}>
       <Field className="max-w-sm" data-invalid={errors.destinationId !== undefined}>
         <FieldLabel htmlFor={NEWSLETTER_FIELD_IDS.destination}>
           {t('newsletters.editor.delivery.destination')}

@@ -35,6 +35,7 @@ import { getAvatarUrl } from '@/components/users/utils';
 import { newsletterKeys, useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
 import type { Translate } from '../newsletterFormat';
+import { recipientsQueryId } from './ReadinessList';
 
 /** react-i18next's `t` overloads don't collapse to the plain `Translate` signature; this is the one cast. */
 function useTranslate(): { t: Translate; i18n: { language: string } } {
@@ -310,9 +311,8 @@ export function RecipientsPanel({
 }) {
   const { t, i18n } = useTranslate();
   const { members, extraAddresses, excludeUserIds } = recipients;
-  // With Members off the server has nothing to add: the list is the typed addresses.
   const { data, isLoading, isError, error, refetch } = useNewsletterRecipients(
-    members && newsletterId ? newsletterId : undefined
+    recipientsQueryId(recipients, newsletterId)
   );
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();

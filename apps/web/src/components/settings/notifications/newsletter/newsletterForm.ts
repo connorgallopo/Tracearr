@@ -58,6 +58,8 @@ export const NEWSLETTER_FIELD_IDS = {
 
 export const RECIPIENTS_CARD_ID = 'newsletter-recipients';
 
+export const DELIVERY_CARD_ID = 'newsletter-delivery';
+
 export interface ValidationMessages {
   required: string;
   maxLength: (max: number) => string;

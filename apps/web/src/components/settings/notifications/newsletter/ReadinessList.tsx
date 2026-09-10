@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils';
 import type { Translate } from '../newsletterFormat';
 import { EditorCard } from './EditorCard';
 import {
+  DELIVERY_CARD_ID,
   NEWSLETTER_FIELD_IDS,
   RECIPIENTS_CARD_ID,
   scopeMoved,
@@ -47,11 +48,11 @@ export const REMOTE_ACCESS_PATH = '/settings/access/remote';
 
 export type PrivateServerReason = 'noPublicUrl' | 'privatePublicUrl';
 
-export type ReadinessStatus = 'pass' | 'warn' | 'fail' | 'unknown' | 'info';
+export type ReadinessStatus = 'pass' | 'warn' | 'fail' | 'error' | 'unknown' | 'info';
 
-/** destination is unknown while the form names one the destinations query has not returned; externalUrl warns when set over http (the link works, one-click does not); a privateServer row exists per Jellyfin or Emby server whose URL members cannot reach. Narrowing per id keeps every `t()` key below a real, literal key. */
+/** Narrowing per id keeps every `t()` key below a literal one: externalUrl has no unknown state, destination has no warn. */
 export type ReadinessCheck =
-  | { id: 'destination'; status: 'pass' | 'fail' | 'unknown'; name: string | null }
+  | { id: 'destination'; status: 'pass' | 'fail' | 'error' | 'unknown'; name: string | null }
   | { id: 'externalUrl'; status: 'pass' | 'warn' | 'fail' }
   | { id: 'fromDomain'; status: 'pass' | 'fail' | 'unknown' }
   | { id: 'recipients'; status: 'pass' | 'fail' | 'unknown'; count: number }
@@ -62,11 +63,15 @@ export type ReadinessCheck =
 
 const SEVERITY: Record<ReadinessStatus, number> = {
   fail: 0,
+  error: 0,
   warn: 1,
   unknown: 2,
   pass: 3,
   info: 4,
 };
+
+const scrollToCard = (id: string) =>
+  document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
 
 const domainOf = (address: string | null | undefined): string | null => {
   if (!address || !address.includes('@')) return null;
@@ -81,7 +86,8 @@ export function recipientsState(
   if (!form.members)
     return { resolvable: extraRecipients(form.extraAddresses).length, known: true };
   if (!view) return { resolvable: 0, known: false };
-  return { resolvable: partitionRecipients(view, form.excludeUserIds).receive.length, known: true };
+  const { receive, included } = partitionRecipients(view, form.excludeUserIds);
+  return { resolvable: receive.length + included.length, known: true };
 }
 
 /** Only a saved newsletter with Members on has a member list to resolve; anything else has nothing to ask for. */
@@ -96,6 +102,7 @@ export function readinessChecks(input: {
   externalUrl: string | null;
   destinationId: string | null;
   destination: Destination | null;
+  destinationsError: boolean;
   recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
   variants: NewsletterVariantsView | undefined;
@@ -124,7 +131,13 @@ export function readinessChecks(input: {
   const checks: ReadinessCheck[] = [
     {
       id: 'destination',
-      status: !input.destinationId ? 'fail' : input.destination ? 'pass' : 'unknown',
+      status: !input.destinationId
+        ? 'fail'
+        : input.destination
+          ? 'pass'
+          : input.destinationsError
+            ? 'error'
+            : 'unknown',
       name: input.destination?.name ?? null,
     },
     {
@@ -158,6 +171,7 @@ const ICONS: Record<ReadinessStatus, LucideIcon> = {
   pass: CheckCircle2,
   warn: AlertTriangle,
   fail: XCircle,
+  error: XCircle,
   unknown: HelpCircle,
   info: Info,
 };
@@ -165,6 +179,7 @@ const TONES: Record<ReadinessStatus, string> = {
   pass: 'text-success',
   warn: 'text-warning',
   fail: 'text-destructive',
+  error: 'text-destructive',
   unknown: 'text-muted-foreground',
   info: 'text-muted-foreground',
 };
@@ -182,7 +197,7 @@ export function ReadinessList({
   const { t, i18n } = useTranslation('settings');
   const translate = t as Translate;
   const { data: settings } = useSettings();
-  const { data: destinations } = useDestinations();
+  const { data: destinations, isError: destinationsError } = useDestinations();
   const { data: servers } = useServers();
   const { data: view, isError: recipientsError } = useNewsletterRecipients(
     recipientsQueryId(state.recipients, newsletterId)
@@ -196,6 +211,7 @@ export function ReadinessList({
     externalUrl: settings?.externalUrl ?? null,
     destinationId: state.destinationId,
     destination,
+    destinationsError,
     recipients: { form: state.recipients, view },
     servers: inScope,
     variants,
@@ -203,13 +219,13 @@ export function ReadinessList({
   });
   const staleScope = scopeMoved(savedServerIds, state.scope.serverIds);
 
-  // Each branch calls `t()` with one literal key, so nothing here can drift to a key the translations don't have: a template built from `${check.id}${suffix}` can't express that externalUrl never has an 'unknown' state, but a switch on the discriminant can.
   const copyFor = (check: ReadinessCheck): ReactNode => {
     switch (check.id) {
       case 'destination':
         if (check.status === 'pass')
           return t('newsletters.editor.readiness.destination', { name: check.name ?? '' });
         if (check.status === 'unknown') return t('newsletters.editor.readiness.destinationUnknown');
+        if (check.status === 'error') return t('newsletters.editor.readiness.destinationError');
         return t('newsletters.editor.readiness.destinationFail');
       case 'externalUrl':
         if (check.status === 'pass') return t('newsletters.editor.readiness.externalUrl');
@@ -280,7 +296,11 @@ export function ReadinessList({
             variant="link"
             size="sm"
             className="h-auto p-0"
-            onClick={() => document.getElementById(NEWSLETTER_FIELD_IDS.destination)?.focus()}
+            onClick={() => {
+              const select = document.getElementById(NEWSLETTER_FIELD_IDS.destination);
+              if (select) select.focus();
+              else scrollToCard(DELIVERY_CARD_ID);
+            }}
           >
             {t('newsletters.editor.readiness.fixDestination')}
           </Button>
@@ -292,11 +312,7 @@ export function ReadinessList({
             variant="link"
             size="sm"
             className="h-auto p-0"
-            onClick={() =>
-              document
-                .getElementById(RECIPIENTS_CARD_ID)
-                ?.scrollIntoView({ block: 'start', behavior: 'smooth' })
-            }
+            onClick={() => scrollToCard(RECIPIENTS_CARD_ID)}
           >
             {t('newsletters.editor.readiness.fixRecipients')}
           </Button>

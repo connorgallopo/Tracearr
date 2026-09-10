@@ -555,6 +555,7 @@
       "previewVariant_other": "",
       "readiness": {
         "destination": "",
+        "destinationError": "",
         "destinationFail": "",
         "destinationUnknown": "",
         "dns": "",

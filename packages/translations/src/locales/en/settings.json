@@ -786,6 +786,7 @@
         "destination": "Sending through \"{{name}}\".",
         "destinationFail": "No email destination is set, so this newsletter cannot send.",
         "destinationUnknown": "Checking the email destination.",
+        "destinationError": "Could not load the email destinations. Reload the page.",
         "fixDestination": "Choose a destination",
         "fixRecipients": "Go to recipients",
         "fixExternalUrl": "Set the external URL",

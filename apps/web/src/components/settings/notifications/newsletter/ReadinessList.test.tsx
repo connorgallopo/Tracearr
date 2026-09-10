@@ -3,9 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { Destination, NewsletterRecipientsView, Settings } from '@tracearr/shared';
 import { defaultFormState } from './newsletterForm';
 import { ReadinessList, readinessChecks } from './ReadinessList';
+import { RecipientsPanel } from './RecipientsPanel';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -31,8 +33,15 @@ import {
   useSettings,
 } from '@/hooks/queries';
 
+let queryClient: QueryClient;
+
+/** RecipientsPanel reads the query cache directly, so anything that can render it needs a real client. */
 function Providers({ children }: { children: ReactNode }) {
-  return <MemoryRouter>{children}</MemoryRouter>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
+  );
 }
 
 const email = {
@@ -57,11 +66,13 @@ const settled = {
   externalUrl: 'https://tracearr.example.com',
   destinationId: 'd-1',
   destination: email,
+  destinationsError: false,
   servers: [],
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   vi.mocked(useDestinations).mockReturnValue({ data: [email] } as unknown as ReturnType<
     typeof useDestinations
   >);
@@ -310,6 +321,109 @@ describe('ReadinessList', () => {
       screen.getByRole('button', { name: 'newsletters.editor.readiness.fixDestination' })
     );
     expect(screen.getByLabelText('destination')).toHaveFocus();
+  });
+
+  it('scrolls the delivery card into view when there is no destination select to focus', async () => {
+    render(
+      <Providers>
+        <section id="newsletter-delivery" />
+        <ReadinessList
+          state={{ ...defaultFormState(), recipients: twoExtras }}
+          newsletterId={null}
+          savedServerIds={null}
+        />
+      </Providers>
+    );
+    const card = document.getElementById('newsletter-delivery')!;
+    const scroll = vi.spyOn(card, 'scrollIntoView');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'newsletters.editor.readiness.fixDestination' })
+    );
+    expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' });
+  });
+
+  it('says the destinations could not be loaded instead of checking them forever', () => {
+    vi.mocked(useDestinations).mockReturnValue({
+      data: undefined,
+      isError: true,
+    } as unknown as ReturnType<typeof useDestinations>);
+    render(
+      <Providers>
+        <ReadinessList
+          state={{ ...defaultFormState(), destinationId: 'd-1', recipients: twoExtras }}
+          newsletterId={null}
+          savedServerIds={null}
+        />
+      </Providers>
+    );
+    const first = screen.getAllByRole('listitem')[0];
+    expect(first).toHaveTextContent('newsletters.editor.readiness.destinationError');
+    expect(
+      screen.queryByText('newsletters.editor.readiness.destinationUnknown')
+    ).not.toBeInTheDocument();
+  });
+
+  it('counts a person included after save the same way the recipients card heads its list', () => {
+    const view: NewsletterRecipientsView = {
+      recipients: [
+        {
+          address: 'ann@x.com',
+          userId: 'u1',
+          serverUserId: 'su-1',
+          name: 'Ann',
+          suppressed: false,
+          username: 'ann',
+          serverId: 's1',
+          serverName: 'Home Plex',
+          serverIds: ['s1'],
+          thumbUrl: null,
+        },
+      ],
+      missing: [],
+      excluded: [
+        {
+          userId: 'u4',
+          serverUserId: 'su-4',
+          name: 'Dee',
+          username: 'dee',
+          serverId: 's1',
+          serverName: 'Home Plex',
+          serverIds: ['s1'],
+          thumbUrl: null,
+          reason: 'excluded',
+        },
+      ],
+    };
+    vi.mocked(useNewsletterRecipients).mockReturnValue({
+      data: view,
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    const recipients = { members: true as const, extraAddresses: [], excludeUserIds: [] };
+    render(
+      <Providers>
+        <ReadinessList
+          state={{ ...defaultFormState(), destinationId: 'd-1', recipients }}
+          newsletterId="n-1"
+          savedServerIds={[]}
+        />
+        <RecipientsPanel
+          newsletterId="n-1"
+          recipients={recipients}
+          onExclude={vi.fn()}
+          onInclude={vi.fn()}
+          servers={[{ id: 's1', name: 'Home Plex' }]}
+          staleScope={false}
+          onPreview={vi.fn()}
+        />
+      </Providers>
+    );
+    const rows = screen.getAllByRole('listitem').map((li) => li.textContent);
+    expect(rows).toContain('newsletters.editor.readiness.recipients:{"count":2}');
+    expect(
+      screen.getByText('newsletters.editor.recipients.willReceive:{"count":2}')
+    ).toBeInTheDocument();
   });
 
   it('offers the way to the recipients card and to remote access when those checks fail', async () => {
