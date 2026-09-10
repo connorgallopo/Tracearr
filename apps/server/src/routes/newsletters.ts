@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import {
   createNewsletterSchema,
+  newsletterPreviewDraftSchema,
   newsletterSendsQuerySchema,
   newsletterTestSendSchema,
   updateNewsletterSchema,
@@ -9,8 +10,6 @@ import {
   variantKeySchema,
   NEWSLETTER_VIEW_TOKEN_LENGTH,
   type Newsletter,
-  type NewsletterPreview,
-  type NewsletterPreviewVariant,
   type NewsletterRecipientsView,
   type NewsletterSendHtml,
   type NewsletterVariantsView,
@@ -24,6 +23,7 @@ import {
   removeNewsletterSchedule,
   upsertNewsletterSchedule,
 } from '../jobs/newsletterQueue.js';
+import { buildPreview } from '../services/newsletters/preview.js';
 import { resolveRecipients } from '../services/newsletters/recipients.js';
 import { digestForBrowser } from '../services/newsletters/snapshot.js';
 import {
@@ -48,15 +48,10 @@ import {
   type NewsletterRow,
   type SendView,
 } from '../services/newsletters/store.js';
-import {
-  assembleVariant,
-  renderVariant,
-  type VariantRenderContext,
-} from '../services/newsletters/variantRender.js';
+import { assembleVariant } from '../services/newsletters/variantRender.js';
 import { orderServers, planVariants } from '../services/newsletters/variants.js';
 import { computeWindow } from '../services/newsletters/window.js';
 import { getDestination } from '../services/notifications/destinationStore.js';
-import { resolveEmailBranding } from '../services/notifications/emailBranding.js';
 import { getNetworkSettings } from '../services/settings.js';
 import { firstIssueMessage } from '../utils/zod.js';
 import { PUBLIC_RATE_LIMIT, page, sendPublicPage } from './publicPage.js';
@@ -193,57 +188,23 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     return reply.code(204).send();
   });
 
+  app.post('/preview', owner, async (request, reply) => {
+    const parsed = newsletterPreviewDraftSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply.badRequest(`Invalid request body: ${firstIssueMessage(parsed.error)}`);
+    const problem = await validateReferences(parsed.data.newsletter);
+    if (problem) return reply.badRequest(problem);
+    const { newsletterId, newsletter } = parsed.data;
+    const watermark = newsletterId === undefined ? null : await lastWatermark(newsletterId);
+    return buildPreview({ ...newsletter, id: newsletterId ?? 'draft' }, watermark);
+  });
+
   app.post('/:id/preview', owner, async (request, reply) => {
     const params = idParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
     const row = await getNewsletter(params.data.id);
     if (!row) return reply.notFound('Newsletter not found');
-    const now = new Date();
-    const window = computeWindow(row.window, await lastWatermark(row.id), now);
-    const [{ externalUrl }, links, resolution, branding] = await Promise.all([
-      getNetworkSettings(),
-      loadServerLinks(row.scope.serverIds),
-      resolveRecipients(row),
-      resolveEmailBranding(),
-    ]);
-    const servers = orderServers(row.scope, links);
-    // Preview shows a member what a real send looks like, not a test send.
-    const ctx: VariantRenderContext = {
-      newsletter: row,
-      window,
-      externalUrl,
-      branding,
-      servers,
-      memberSend: true,
-    };
-    const rendered: NewsletterPreviewVariant[] = [];
-    for (const variant of planVariants(servers, resolution).variants) {
-      const { data, posters } = await assembleVariant(ctx, variant);
-      const out = await renderVariant(ctx, variant, data, posters);
-      rendered.push({
-        key: variant.key,
-        serverIds: variant.serverIds,
-        serverNames: variant.serverNames,
-        recipientCount: variant.recipients.filter((r) => !r.suppressed).length,
-        subject: out.subject,
-        html: digestForBrowser(out.fit.rendered.html, posters),
-        counts: data.counts,
-        trimmed: out.fit.trimmed,
-      });
-    }
-    const [union, ...rest] = rendered;
-    if (!union) throw new Error('planVariants always lists the union');
-    const suppressed = resolution.recipients.filter((r) => r.suppressed).length;
-    const preview: NewsletterPreview = {
-      window: { start: window.start.toISOString(), end: window.end.toISOString() },
-      recipients: {
-        resolved: resolution.recipients.length - suppressed,
-        missingEmail: resolution.missing.length,
-        suppressed,
-      },
-      variants: [union, ...rest],
-    };
-    return preview;
+    return buildPreview(row, await lastWatermark(row.id));
   });
 
   app.post('/:id/test', owner, async (request, reply) => {

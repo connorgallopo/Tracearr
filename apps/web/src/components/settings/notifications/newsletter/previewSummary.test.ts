@@ -6,7 +6,11 @@ const t = (key: string, vars?: Record<string, unknown>) =>
   vars ? `${key}:${JSON.stringify(vars)}` : key;
 
 const preview: NewsletterPreview = {
-  window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
+  window: {
+    start: '2026-08-28T00:00:00.000Z',
+    end: '2026-09-04T00:00:00.000Z',
+    fromWatermark: false,
+  },
   recipients: { resolved: 42, missingEmail: 2, suppressed: 1 },
   variants: [
     {

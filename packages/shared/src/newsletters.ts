@@ -213,6 +213,13 @@ export const newsletterTestSendSchema = z.strictObject({
   address,
   variantKey: variantKeySchema.optional(),
 });
+/** POST /newsletters/preview: the form as the create route would receive it, plus the saved row's id when editing so the window starts at its watermark. */
+export const newsletterPreviewDraftSchema = z.strictObject({
+  newsletterId: uuidSchema.optional(),
+  newsletter: createNewsletterSchema,
+});
+export type NewsletterPreviewDraftInput = z.infer<typeof newsletterPreviewDraftSchema>;
+
 export const emailSuppressionCreateSchema = z.strictObject({ address });
 export const newsletterSendsQuerySchema = paginationSchema;
 
@@ -426,7 +433,8 @@ export interface NewsletterPreviewVariant {
 }
 
 export interface NewsletterPreview {
-  window: { start: string; end: string };
+  /** fromWatermark is true when a since_last_send window started at the last counted send rather than the fallback days. */
+  window: { start: string; end: string; fromWatermark: boolean };
   recipients: { resolved: number; missingEmail: number; suppressed: number };
   /** The union of the newsletter's servers first, then one entry per set some recipient belongs to. */
   variants: [NewsletterPreviewVariant, ...NewsletterPreviewVariant[]];

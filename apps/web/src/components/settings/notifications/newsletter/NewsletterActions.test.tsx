@@ -28,7 +28,11 @@ import { useNewsletterVariants } from '@/hooks/queries';
 
 const newsletter = { id: 'n-1', name: 'Weekly', timezone: 'UTC' } as Newsletter;
 const preview: NewsletterPreview = {
-  window: { start: '2026-08-28T00:00:00.000Z', end: '2026-09-04T00:00:00.000Z' },
+  window: {
+    start: '2026-08-28T00:00:00.000Z',
+    end: '2026-09-04T00:00:00.000Z',
+    fromWatermark: false,
+  },
   recipients: { resolved: 3, missingEmail: 0, suppressed: 0 },
   variants: [
     {

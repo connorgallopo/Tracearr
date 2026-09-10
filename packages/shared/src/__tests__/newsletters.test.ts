@@ -11,6 +11,7 @@ import {
   emailSuppressionCreateSchema,
   needsSenderName,
   newsletterCron,
+  newsletterPreviewDraftSchema,
   newsletterScheduleSchema,
   newsletterTestSendSchema,
   resolveSenderName,
@@ -293,5 +294,30 @@ describe('variants', () => {
     expect(
       newsletterTestSendSchema.safeParse({ address: 'me@x.com', variantKey: 'nope' }).success
     ).toBe(false);
+  });
+});
+
+describe('newsletterPreviewDraftSchema', () => {
+  it('parses a create body with an optional newsletter id, applying the create defaults', () => {
+    const body = {
+      newsletter: {
+        name: 'Weekly',
+        schedule: { kind: 'weekly', dayOfWeek: 1, time: '09:00' },
+        timezone: 'UTC',
+      },
+    };
+    const parsed = newsletterPreviewDraftSchema.parse(body);
+    expect(parsed.newsletterId).toBeUndefined();
+    expect(parsed.newsletter.window).toEqual({ kind: 'since_last_send', fallbackDays: 7 });
+    expect(
+      newsletterPreviewDraftSchema.parse({
+        ...body,
+        newsletterId: '11111111-1111-4111-8111-111111111111',
+      }).newsletterId
+    ).toBe('11111111-1111-4111-8111-111111111111');
+    expect(newsletterPreviewDraftSchema.safeParse({ ...body, newsletterId: 'nope' }).success).toBe(
+      false
+    );
+    expect(newsletterPreviewDraftSchema.safeParse({ ...body, extra: 1 }).success).toBe(false);
   });
 });

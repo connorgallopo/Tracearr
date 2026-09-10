@@ -248,6 +248,7 @@ describe('newsletter routes', () => {
       ['PATCH', `/newsletters/${ID}`],
       ['DELETE', `/newsletters/${ID}`],
       ['POST', `/newsletters/${ID}/preview`],
+      ['POST', '/newsletters/preview'],
       ['GET', `/newsletters/${ID}/recipients`],
       ['GET', `/newsletters/${ID}/variants`],
       ['POST', `/newsletters/${ID}/test`],
@@ -845,6 +846,76 @@ describe('newsletter routes', () => {
     ]);
     for (const call of mockAssemble.mock.calls) expect(call[2]).toEqual({ posters: false });
     expect(mockBranding).not.toHaveBeenCalled();
+  });
+
+  it('preview from a draft body renders every variant the way a saved row does and writes no row', async () => {
+    twoServerScope();
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletter: { ...body, scope: { serverIds: [], libraries: [] } } },
+    });
+    expect(res.statusCode).toBe(200);
+    const json = res.json();
+    expect(json.recipients).toEqual({ resolved: 2, missingEmail: 0, suppressed: 1 });
+    expect(
+      json.variants.map((v: { key: string; recipientCount: number }) => [v.key, v.recipientCount])
+    ).toEqual([
+      [`${S1.id},${S2.id}`, 0],
+      [S1.id, 1],
+      [S2.id, 1],
+    ]);
+    expect(json.variants[1].html).toContain('Heat');
+    expect(json.window.fromWatermark).toBe(false);
+    expect(store.createNewsletter).not.toHaveBeenCalled();
+    expect(store.getNewsletter).not.toHaveBeenCalled();
+  });
+
+  it('preview from a draft starts at the saved row watermark when the id is given and at the fallback days without one', async () => {
+    twoServerScope();
+    const watermark = new Date(Date.now() - 2 * 86_400_000);
+    store.lastWatermark.mockResolvedValue(watermark);
+    const app = await build(owner);
+    const draft = { ...body, window: { kind: 'since_last_send', fallbackDays: 3 } };
+    const saved = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletterId: ID, newsletter: draft },
+    });
+    expect(saved.statusCode).toBe(200);
+    expect(store.lastWatermark).toHaveBeenCalledWith(ID);
+    expect(saved.json().window.start).toBe(watermark.toISOString());
+    expect(saved.json().window.fromWatermark).toBe(true);
+
+    const fresh = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletter: draft },
+    });
+    expect(fresh.statusCode).toBe(200);
+    const lookback = Date.now() - new Date(fresh.json().window.start).getTime();
+    expect(Math.abs(lookback - 3 * 86_400_000)).toBeLessThan(5_000);
+    expect(fresh.json().window.fromWatermark).toBe(false);
+  });
+
+  it('preview from a draft refuses a non-email destination and a bad body the way create does', async () => {
+    mockDestination.mockResolvedValue({ id: DEST, type: 'discord', enabled: true });
+    const app = await build(owner);
+    const wrongKind = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletter: body },
+    });
+    expect(wrongKind.statusCode).toBe(400);
+    expect(wrongKind.json().message).toBe('destinationId must name an email destination');
+    const bad = await app.inject({
+      method: 'POST',
+      url: '/newsletters/preview',
+      payload: { newsletter: { ...body, name: '' } },
+    });
+    expect(bad.statusCode).toBe(400);
+    expect(bad.json().message).toMatch(/^Invalid request body: /);
   });
 });
 
