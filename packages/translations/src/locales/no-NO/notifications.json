@@ -142,9 +142,7 @@
         "title": "Par Token generert",
         "message": "Skann QR-koden med din mobile enhet for å pare"
       },
-      "displayNameUpdated": {
-        "title": "Vis navn oppdatert"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Stol på resultater tilbakestilt",
         "message_one": "{{count}} bruker tilbakestiller til 100",
@@ -163,7 +161,17 @@
       },
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Klarte ikke å legge til server",
@@ -190,7 +198,7 @@
       "deviceRemoveFailed": "Kan ikke fjerne enheten",
       "deviceRenameFailed": "Kunne ikke gi enheten nytt navn",
       "sessionsRevokeFailed": "Kan ikke tilbakekalle økter",
-      "displayNameUpdateFailed": "Kunne ikke oppdatere visningsnavnet",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Kan ikke tilbakestille tillit poengsum",
       "routingUpdateFailed": "Kunne ikke oppdatere ruting",
       "clipboardFailed": "Kan ikke kopiere til utklippstavlen",
@@ -214,7 +222,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {
