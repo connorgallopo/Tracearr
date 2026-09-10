@@ -82,6 +82,7 @@ COPY --from=builder /app/packages/emails/dist ./packages/emails/dist
 
 # Database migrations
 COPY --from=builder /app/apps/server/src/db/migrations ./apps/server/src/db/migrations
+COPY --from=builder /app/assets/logo.png ./assets/logo.png
 
 # GeoIP database (if exists in build context)
 COPY data/GeoLite2-City.mmdb ./data/GeoLite2-City.mmdb
