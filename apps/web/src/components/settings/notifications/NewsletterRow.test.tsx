@@ -71,7 +71,8 @@ describe('NewsletterRow', () => {
     const row = screen.getByRole('listitem');
     expect(row).toHaveTextContent('Weekly');
     expect(row).toHaveTextContent('newsletters.schedule.inZone');
-    expect(row).toHaveTextContent('newsletters.nextRun');
+    expect(row).toHaveTextContent('newsletters.editor.nextRun');
+    expect(row).toHaveTextContent('9:00 AM","timezone":"Europe/Berlin"');
     expect(row).toHaveTextContent(
       'newsletters.lastSend:{"outcome":"newsletters.outcome.sent","count":42}'
     );

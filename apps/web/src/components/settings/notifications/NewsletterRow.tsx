@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Switch } from '@/components/ui/switch';
-import { dateLabel } from '@/components/settings/shared/dateLabel';
+import { zonedDateLabel } from '@/components/settings/shared/dateLabel';
 import { countsLine, outcomeVariant, scheduleSummary, type Translate } from './newsletterFormat';
 
 interface NewsletterRowProps {
@@ -61,7 +61,10 @@ export function NewsletterRow({
           {scheduleSummary(newsletter.schedule, newsletter.timezone, translate, i18n.language)}
           {' · '}
           {newsletter.nextRunAt
-            ? t('newsletters.nextRun', { when: dateLabel(newsletter.nextRunAt) })
+            ? t('newsletters.editor.nextRun', {
+                when: zonedDateLabel(newsletter.nextRunAt, newsletter.timezone, i18n.language),
+                timezone: newsletter.timezone,
+              })
             : t('newsletters.noNextRun')}
         </ItemDescription>
         {lastSend && (

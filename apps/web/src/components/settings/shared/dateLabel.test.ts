@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { zonedDateLabel } from './dateLabel';
 
 const year = new Date().getFullYear();
@@ -17,5 +17,14 @@ describe('zonedDateLabel', () => {
     expect(zonedDateLabel(`${year - 1}-01-05T12:00:00.000Z`, 'UTC', 'en-US')).toBe(
       `Jan 5, ${year - 1}, 12:00 PM`
     );
+  });
+
+  it('decides the year in the given zone, so a New Year instant reads as next year', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-01T12:00:00.000Z'));
+    expect(zonedDateLabel('2026-12-31T16:00:00.000Z', 'Asia/Tokyo', 'en-US')).toBe(
+      'Jan 1, 2027, 1:00 AM'
+    );
+    vi.useRealTimers();
   });
 });
