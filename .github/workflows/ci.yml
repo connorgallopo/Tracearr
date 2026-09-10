@@ -98,8 +98,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build dependencies (shared, test-utils)
-        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/test-utils
+      - name: Build dependencies (shared, emails, test-utils)
+        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/emails --filter=@tracearr/test-utils
 
       - name: Run ${{ matrix.group }} tests
         run: pnpm --filter @tracearr/server test:${{ matrix.group }}
@@ -221,8 +221,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build dependencies (shared, test-utils)
-        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/test-utils
+      - name: Build dependencies (shared, emails, test-utils)
+        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/emails --filter=@tracearr/test-utils
 
       - name: Run integration tests
         run: pnpm --filter @tracearr/server test:integration
@@ -264,8 +264,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build dependencies (shared, test-utils)
-        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/test-utils
+      - name: Build dependencies (shared, emails, test-utils)
+        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/emails --filter=@tracearr/test-utils
 
       - name: Run tests with coverage
         run: pnpm test:coverage

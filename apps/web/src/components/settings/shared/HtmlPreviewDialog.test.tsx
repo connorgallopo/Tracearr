@@ -13,7 +13,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 const html =
-  '<p>Hello</p><img src="/api/v1/images/proxy?a=1" alt="Heat"><img alt="x" src="cid:logo">';
+  '<p>Hello</p><img src="https://tracearr.example/api/v1/images/proxy?a=1" alt="Heat"><img alt="x" src="cid:logo">';
 
 describe('HtmlPreviewDialog', () => {
   it('renders the html in an empty-sandbox frame with a labelled subject, the meta block and the caller notice', () => {
