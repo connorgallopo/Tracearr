@@ -21,7 +21,7 @@ import { MessageFields } from './MessageFields';
 import { NewsletterActions, type NewsletterActionsHandle } from './NewsletterActions';
 import { NEWSLETTERS_PATH } from '../Newsletters';
 import { scheduleSummary, type Translate } from '../newsletterFormat';
-import { ReadinessList, recipientsQueryId, recipientsState } from './ReadinessList';
+import { ReadinessList, recipientsState } from './ReadinessList';
 import { RecipientsFields } from './RecipientsFields';
 import { ScheduleFields } from './ScheduleFields';
 import { SendHistory } from './SendHistory';
@@ -35,6 +35,7 @@ import {
   scopedServers,
   seedFromNewsletter,
   validateForm,
+  recipientsQueryId,
   visibleErrors,
   type NewsletterFormState,
   type RichTextErrors,

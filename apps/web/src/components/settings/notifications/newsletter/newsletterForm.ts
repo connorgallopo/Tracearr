@@ -6,6 +6,7 @@ import {
   needsSenderName,
   type CreateNewsletterInput,
   type Newsletter,
+  type NewsletterRecipients,
   type NewsletterScope,
   type UpdateNewsletterInput,
 } from '@tracearr/shared';
@@ -247,6 +248,14 @@ export function scopedServers<T extends { id: string }>(
 /** The form's servers no longer match the saved row's, so anything resolved from the saved row answers for the old ones. */
 export function scopeMoved(savedServerIds: string[] | null, serverIds: string[]): boolean {
   return savedServerIds !== null && !deepEqual(savedServerIds, serverIds);
+}
+
+/** Only a saved newsletter with Members on has a member list to resolve; anything else has nothing to ask for. */
+export function recipientsQueryId(
+  form: NewsletterRecipients,
+  newsletterId: string | null
+): string | undefined {
+  return form.members && newsletterId ? newsletterId : undefined;
 }
 
 export function prefillFromRouterState(state: unknown): Partial<NewsletterFormState> {

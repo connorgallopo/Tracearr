@@ -35,7 +35,7 @@ import { getAvatarUrl } from '@/components/users/utils';
 import { newsletterKeys, useNewsletterRecipients, useUpdateUserIdentity } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
 import type { Translate } from '../newsletterFormat';
-import { recipientsQueryId } from './ReadinessList';
+import { recipientsQueryId } from './newsletterForm';
 
 /** react-i18next's `t` overloads don't collapse to the plain `Translate` signature; this is the one cast. */
 function useTranslate(): { t: Translate; i18n: { language: string } } {

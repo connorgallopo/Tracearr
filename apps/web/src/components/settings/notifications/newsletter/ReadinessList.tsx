@@ -34,6 +34,7 @@ import {
   DELIVERY_CARD_ID,
   NEWSLETTER_FIELD_IDS,
   RECIPIENTS_CARD_ID,
+  recipientsQueryId,
   scopeMoved,
   scopedServers,
   type NewsletterFormState,
@@ -88,14 +89,6 @@ export function recipientsState(
   if (!view) return { resolvable: 0, known: false };
   const { receive, included } = partitionRecipients(view, form.excludeUserIds);
   return { resolvable: receive.length + included.length, known: true };
-}
-
-/** Only a saved newsletter with Members on has a member list to resolve; anything else has nothing to ask for. */
-export function recipientsQueryId(
-  form: NewsletterRecipients,
-  newsletterId: string | null
-): string | undefined {
-  return form.members && newsletterId ? newsletterId : undefined;
 }
 
 export function readinessChecks(input: {
