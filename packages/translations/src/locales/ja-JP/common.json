@@ -53,7 +53,8 @@
     "viewProfile": "プロフィールを表示",
     "viewOnGithub": "GitHubで見る",
     "later": "後で",
-    "previous": "前"
+    "previous": "前",
+    "reload": ""
   },
   "states": {
     "loading": "読み込み中...",
