@@ -673,6 +673,19 @@ describe('runNewsletter', () => {
     expect(firstSnapshot().html).not.toContain('member of');
   });
 
+  it('skips a newsletter whose scoped servers are all gone instead of digesting every server there is', async () => {
+    store.getNewsletter.mockResolvedValue({
+      ...NEWSLETTER,
+      scope: { serverIds: ['dead-1'], libraries: [] },
+    });
+    store.loadServerLinks.mockResolvedValue([]);
+    const result = await runNewsletter(NEWSLETTER.id, 'schedule');
+    expect(result).toEqual({ outcome: 'skipped_empty', sendId: 'send-1', queuedRecipientIds: [] });
+    expect(mockAssemble).not.toHaveBeenCalled();
+    expect(store.insertSnapshots).not.toHaveBeenCalled();
+    expect(store.insertRecipients).not.toHaveBeenCalled();
+  });
+
   it('assembles a variant with no library pairs on its servers as empty instead of every library there', async () => {
     twoServers();
     store.getNewsletter.mockResolvedValue({

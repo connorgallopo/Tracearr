@@ -106,11 +106,13 @@ export function testVariantPlan(
   return { variants: [variantFor(servers, ids, [recipient])], excluded: [] };
 }
 
-/** The scope one variant assembles with; null when the newsletter's library pairs name none of the variant's servers, so nothing there can match. */
+/** The scope one variant assembles with; null when nothing there can match: no servers at all, or none the newsletter's library pairs name. */
 export function variantScope(
   scope: NewsletterScope,
   serverIds: readonly string[]
 ): NewsletterScope | null {
+  // An empty serverIds reads as "every server" downstream, so a variant on no server has to stop here.
+  if (serverIds.length === 0) return null;
   if (scope.libraries.length === 0) return { serverIds: [...serverIds], libraries: [] };
   const libraries = scope.libraries.filter((l) => serverIds.includes(l.serverId));
   return libraries.length === 0 ? null : { serverIds: [...serverIds], libraries };

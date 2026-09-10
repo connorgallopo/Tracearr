@@ -102,6 +102,13 @@ describe('testVariantPlan', () => {
 });
 
 describe('variantScope', () => {
+  it('is null for a variant on no server, so a scope whose servers are all gone assembles nothing', () => {
+    expect(variantScope({ serverIds: [A], libraries: [] }, [])).toBeNull();
+    expect(
+      variantScope({ serverIds: [A], libraries: [{ serverId: A, libraryId: '1' }] }, [])
+    ).toBeNull();
+  });
+
   it('keeps only the pairs on the variant servers, and is null when the newsletter has pairs but none there', () => {
     const scope = { serverIds: [], libraries: [{ serverId: A, libraryId: '1' }] };
     expect(variantScope(scope, [A, B])).toEqual({
