@@ -25,8 +25,10 @@ import {
   closeStaleSend,
   deleteNewsletter,
   finalizeSend,
+  getSend,
   getSnapshotByViewToken,
   lastWatermark,
+  listSends,
   markSendSending,
   queuedRecipientIds,
   resetFailedRecipients,
@@ -409,6 +411,31 @@ describe('getSnapshotByViewToken', () => {
     const found = await getSnapshotByViewToken('token-1');
     expect(found).toMatchObject({ sendId: send.id, variantKey: 'v', html: '<p>x</p>' });
     expect(await getSnapshotByViewToken('no-such-token')).toBeNull();
+  });
+});
+
+describe('hasSnapshot', () => {
+  it('is true only for the send that still has a snapshot row', async () => {
+    const newsletter = await seedNewsletter();
+    const rendered = await seedSend(newsletter.id, { outcome: 'sent' });
+    const pruned = await seedSend(newsletter.id, { outcome: 'sent' });
+    await db.insert(newsletterSendSnapshots).values({
+      sendId: rendered.id,
+      variantKey: 'v',
+      viewToken: 'token-2',
+      subject: 's',
+      html: '<p>x</p>',
+      text: 'x',
+    });
+    expect((await getSend(rendered.id))?.hasSnapshot).toBe(true);
+    expect((await getSend(pruned.id))?.hasSnapshot).toBe(false);
+    const listed = await listSends(newsletter.id, 1, 10);
+    expect(new Map(listed.rows.map((r) => [r.id, r.hasSnapshot]))).toEqual(
+      new Map([
+        [rendered.id, true],
+        [pruned.id, false],
+      ])
+    );
   });
 });
 
