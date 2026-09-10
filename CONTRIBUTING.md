@@ -36,12 +36,14 @@ Tracearr is a monorepo using pnpm workspaces and Turborepo:
 
 ```
 apps/
+  e2e/          # Playwright end-to-end suite
   server/       # Fastify + Drizzle ORM + BullMQ + Socket.io
   web/          # React 19 + Vite + Tailwind + shadcn/ui
 packages/
+  emails/       # React Email templates the server renders
   shared/       # Types, Zod schemas, constants
-  translations/ # i18n
   test-utils/   # Test factories and mocks
+  translations/ # i18n
 ```
 
 ## Development Setup
@@ -63,7 +65,7 @@ Every PR:
 
 - Links the issue or discussion labelled `planned` or `help wanted`.
 - Stays inside the scope agreed there. A PR that grows past it is sent back to be split.
-- Passes CI (`pnpm typecheck && pnpm lint && pnpm test:unit`).
+- Passes CI. Locally that is `pnpm lint && pnpm typecheck && pnpm test`; CI also runs the integration tier, the web tests, and the e2e suite.
 - Fills in the PR template as-is. Replacing it with your tool's default output counts as not filling it in.
 - Includes screenshots for UI changes.
 - Comes with tests. New behavior needs tests; a bug fix needs a regression test unless the PR says why one isn't practical.
@@ -110,9 +112,10 @@ The human-shaped version gets the same treatment: someone pointed an AI at somet
 ## Testing
 
 ```bash
-pnpm test:unit       # Unit tests (fast, run these often)
-pnpm test            # All tests (unit, services, routes, security)
-pnpm test:integration # Integration tests (requires running DB/Redis)
+pnpm test:unit        # Unit tests (fast, run these often)
+pnpm test             # Every mocked tier: unit, services, routes, auth, security
+pnpm test:integration # Real TimescaleDB and Redis (pnpm docker:up first)
+pnpm test:e2e         # Playwright; starts server and web itself, needs docker/docker-compose.test.yml up
 ```
 
 New behavior needs tests. A bug fix needs a regression test unless the PR says why one isn't practical.
@@ -122,7 +125,7 @@ New behavior needs tests. A bug fix needs a regression test unless the PR says w
 - React Query for server state
 - PascalCase for components (`UserProfile.tsx`), camelCase for utils (`sessionService.ts`)
 
-The project uses ESLint and Prettier. Run `pnpm lint` and `pnpm format` before committing.
+Linting is oxlint (type-aware, one pass over every workspace) and formatting is Prettier. Run `pnpm lint` and `pnpm format` before committing.
 
 ## Questions
 
