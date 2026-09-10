@@ -179,12 +179,21 @@ importers:
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.62.1
+      '@tracearr/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@types/pg':
         specifier: ^8.20.0
         version: 8.23.1
+      ioredis:
+        specifier: ^5.11.1
+        version: 5.11.1(supports-color@7.2.0)
       pg:
         specifier: ^8.22.0
         version: 8.23.0
+      sharp:
+        specifier: ^0.35.4
+        version: 0.35.4(@types/node@24.13.3)
 
   apps/server:
     dependencies:

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { databaseNameFromUrl, REQUIRED_DB_NAME } from './env';
+import { databaseNameFromUrl, requiredDatabaseName } from './env';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -11,8 +11,9 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
  * seed writes into is exactly what the app itself would produce.
  */
 export function runMigrations(databaseUrl: string): void {
-  if (databaseNameFromUrl(databaseUrl) !== REQUIRED_DB_NAME) {
-    throw new Error(`Refusing to migrate a database that isn't "${REQUIRED_DB_NAME}"`);
+  const required = requiredDatabaseName();
+  if (databaseNameFromUrl(databaseUrl) !== required) {
+    throw new Error(`Refusing to migrate a database that isn't "${required}"`);
   }
   const result = spawnSync('pnpm', ['--filter', '@tracearr/server', 'db:migrate'], {
     cwd: REPO_ROOT,
@@ -20,6 +21,6 @@ export function runMigrations(databaseUrl: string): void {
     stdio: 'inherit',
   });
   if (result.status !== 0) {
-    throw new Error(`Migration against ${REQUIRED_DB_NAME} failed (exit ${result.status})`);
+    throw new Error(`Migration against ${required} failed (exit ${result.status})`);
   }
 }

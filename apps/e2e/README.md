@@ -12,7 +12,7 @@ The E2E tests require a running TimescaleDB (PostgreSQL) and Redis instance. The
 docker compose -f docker/docker-compose.test.yml up -d
 ```
 
-This starts TimescaleDB on port 5433 and Redis on port 6380. If your services run on different ports, override them with `E2E_DATABASE_URL` and `E2E_REDIS_URL` (see [Configuration](#configuration)) - but the target database name must always be `tracearr_e2e`; the seed refuses to run against anything else (see [Media browse seed](#media-browse-seed)).
+This starts TimescaleDB on port 5433 and Redis on port 6380. If your services run on different ports, override them with `E2E_DATABASE_URL` and `E2E_REDIS_URL` (see [Configuration](#configuration)) - but the target database name must always be the one the run selected - `tracearr_e2e`, or `tracearr_showcase` under `SHOWCASE=1`; the seed refuses to run against anything else (see [Media browse seed](#media-browse-seed)).
 
 ### Browser
 
@@ -52,12 +52,14 @@ pnpm --filter @tracearr/e2e test:e2e:media
 
 Environment variables are loaded from the root `.env` file. The following can be overridden:
 
-| Variable           | Default                                              | Description                                       |
-| ------------------ | ---------------------------------------------------- | ------------------------------------------------- |
-| `E2E_DATABASE_URL` | `postgresql://test:test@localhost:5433/tracearr_e2e` | Database connection - name must be `tracearr_e2e` |
-| `E2E_REDIS_URL`    | `redis://localhost:6380`                             | Redis connection                                  |
-| `E2E_REDIS_PREFIX` | `trr_e2e_`                                           | Redis key prefix, isolates this run's keys        |
-| `CLAIM_CODE`       | `tracearr-e2e-test-claim-code`                       | Claim code for first-time setup gate              |
+| Variable           | Default                                              | Description                                   |
+| ------------------ | ---------------------------------------------------- | --------------------------------------------- |
+| `E2E_DATABASE_URL` | `postgresql://test:test@localhost:5433/tracearr_e2e` | Database connection - name must match the run |
+| `E2E_REDIS_URL`    | `redis://localhost:6380`                             | Redis connection                              |
+| `E2E_REDIS_PREFIX` | `trr_e2e_`                                           | Redis key prefix, isolates this run's keys    |
+| `CLAIM_CODE`       | `tracearr-e2e-test-claim-code`                       | Claim code for first-time setup gate          |
+| `SHOWCASE`         | unset                                                | Set to `1` for the screenshot run (see below) |
+| `SHOWCASE_OUT`     | `showcase/out`                                       | Where the captured images are written         |
 
 ## Test Structure
 
@@ -105,6 +107,37 @@ docker exec docker-timescale-test-1 psql -U test -d postgres -c 'CREATE DATABASE
 
 Then just run `pnpm --filter @tracearr/e2e test:e2e:media` - migrations and seeding happen
 automatically.
+
+## Showcase captures
+
+The screenshots the website and the README use come from this workspace too. Instead of
+photographing a real install, `showcase/` fills a database of its own with a fake cast - three
+servers, thirteen people, a 110-title library, ninety days of watch history, automations with
+runs, and a sent newsletter - and Playwright captures the UI against it.
+
+Posters and title metadata are exported once from a real install:
+
+```bash
+node apps/e2e/showcase/exportFromDev.mjs
+```
+
+That writes the git-ignored `showcase/assets/` (`titles.json` plus `posters/<n>.webp`), which the
+seed and the local asset server read. Then:
+
+```bash
+pnpm --filter @tracearr/e2e showcase
+```
+
+Images land in `showcase/out/` as webp, one per capture; `SHOWCASE_OUT=/abs/dir` sends them
+somewhere else.
+
+`SHOWCASE=1` moves every default in `seed/env.ts`, `seed/prepareDatabase.mjs` and
+`playwright.config.ts` from `tracearr_e2e` to `tracearr_showcase` and the Redis prefix from
+`trr_e2e_` to `trr_showcase_`, and the guard then accepts only that name - the normal suite and the
+showcase can never write to each other's database, and neither can reach the dev stack on
+5432/6379. `globalSetup.ts` skips `seedCore` when the flag is set; `showcase/seed.ts` seeds
+everything itself, including the automations, which it materializes from the built-in templates the
+server writes at boot (so the database needs one server boot before the first capture run).
 
 ## Auth State
 
