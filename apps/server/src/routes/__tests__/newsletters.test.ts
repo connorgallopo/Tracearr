@@ -915,6 +915,21 @@ describe('send html', () => {
     expect(store.getSnapshot).toHaveBeenLastCalledWith(SEND_ID, key);
   });
 
+  it('reaches the empty-keyed snapshot the migration wrote for a send with no variants', async () => {
+    store.getSend.mockResolvedValue({ ...sentSend, variants: [] });
+    store.getSnapshot.mockImplementation(async (_sendId: string, key: string) =>
+      key === '' ? { ...snapshot, variantKey: '' } : null
+    );
+    const app = await build(owner);
+    const res = await app.inject({
+      method: 'GET',
+      url: `/newsletters/${ID}/sends/${SEND_ID}/html`,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().subject).toBe('Weekly digest');
+    expect(res.json().html).toContain('src="/api/v1/images/logo"');
+  });
+
   it('answers 404 when the snapshot is pruned or the send belongs elsewhere, and 400 for a malformed variant', async () => {
     store.getSend.mockResolvedValue(sentSend);
     store.getSnapshot.mockResolvedValue(null);

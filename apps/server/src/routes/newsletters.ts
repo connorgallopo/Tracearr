@@ -353,8 +353,9 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (!query.success) return reply.badRequest('Invalid variant');
     const send = await ownedSend(params.data.id, params.data.sendId);
     if (!send) return reply.notFound('Send not found');
-    const key = query.data.variant ?? send.variants[0]?.key;
-    const snapshot = key === undefined ? null : await getSnapshot(send.id, key);
+    // A send backfilled with no variants keeps its snapshot under the empty key.
+    const key = query.data.variant ?? send.variants[0]?.key ?? '';
+    const snapshot = await getSnapshot(send.id, key);
     if (!snapshot) return reply.notFound('The snapshot has been pruned');
     const body: NewsletterSendHtml = {
       subject: snapshot.subject,
