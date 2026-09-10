@@ -349,6 +349,25 @@ describe('NowPlayingCard ffmpeg speed display', () => {
     expect(screen.getAllByText('--:--')).toHaveLength(2);
   });
 
+  it.each(['movie', 'episode', 'live', 'track'] as const)(
+    'contains the complete %s artwork',
+    (mediaType) => {
+      const { container } = render(
+        <NowPlayingCard
+          session={makeSession({
+            mediaType,
+            thumbPath: '/Items/art/Images/Primary',
+            server: { id: 'server-1', name: 'Jellyfin', type: 'jellyfin' },
+          })}
+        />
+      );
+      const poster = container.querySelector('img[src*="images/proxy"]');
+      expect(poster).toHaveClass('object-contain');
+      expect(poster).not.toHaveClass('object-cover');
+      expect(poster?.getAttribute('src')).toContain('&artwork=2');
+    }
+  );
+
   it('proxies absolute Dispatcharr live channel logos for card artwork', () => {
     const absoluteThumbUrl =
       'https://dispatcharr.example.com/api/channels/logos/4671/cache/?ts=123#ignored';
@@ -366,7 +385,7 @@ describe('NowPlayingCard ffmpeg speed display', () => {
     const poster = container.querySelector('img[alt="Dispatch News"]');
     expect(poster).toBeTruthy();
     expect(poster?.getAttribute('src')).toBe(
-      '/api/v1/images/proxy?server=server-1&url=https%3A%2F%2Fdispatcharr.example.com%2Fapi%2Fchannels%2Flogos%2F4671%2Fcache%2F%3Fts%3D123%23ignored&width=360&height=540'
+      '/api/v1/images/proxy?server=server-1&url=https%3A%2F%2Fdispatcharr.example.com%2Fapi%2Fchannels%2Flogos%2F4671%2Fcache%2F%3Fts%3D123%23ignored&width=360&height=540&artwork=2'
     );
   });
 });

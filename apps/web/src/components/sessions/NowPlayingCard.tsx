@@ -120,21 +120,21 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
       ? session.totalDurationMs - estimatedProgressMs
       : null;
 
-  // Build poster URL using image proxy
+  // Keep the shared server cache key, but refresh browser copies from before
+  // the one-time uncropped-artwork cache migration.
   const posterUrl = session.thumbPath
     ? imageProxyUrl(
         session.serverId,
         session.thumbPath,
         POSTER_IMAGE_SIZE.width,
         POSTER_IMAGE_SIZE.height
-      )
+      ) + '&artwork=2'
     : null;
 
   // User avatar URL (proxied for Jellyfin/Emby)
   const avatarUrl = getAvatarUrl(session.serverId, session.user.thumbUrl, 28) ?? undefined;
 
   const isPaused = session.state === 'paused';
-  const isSquareArt = session.mediaType === 'track' || session.mediaType === 'live';
   const dispatcharrLiveSpeed =
     !isDispatcharrCatchup &&
     session.server.type === 'dispatcharr' &&
@@ -173,7 +173,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
               <img
                 src={posterUrl}
                 alt={title}
-                className={cn('h-full w-full', isSquareArt ? 'object-contain' : 'object-cover')}
+                className="h-full w-full object-contain"
                 loading="lazy"
               />
             ) : (

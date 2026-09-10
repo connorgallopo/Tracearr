@@ -220,6 +220,40 @@ describe('proxyImage cache-miss pipeline', () => {
     fetchSpy.mockRestore();
   });
 
+  it.each(['jellyfin', 'emby', 'plex'])(
+    'preserves wide and tall poster artwork for %s',
+    async (type) => {
+      const updates = mockUpdateChain();
+      let persisted = 0;
+      mockSelectChain([{ id: 'server-1', type, url: 'http://localhost:8096', token: 'token' }]);
+      for (const [width, height] of [
+        [800, 200],
+        [200, 800],
+        [360, 540],
+      ] as const) {
+        const input = await sharp({
+          create: { width, height, channels: 4, background: '#ff000080' },
+        })
+          .png()
+          .toBuffer();
+        fetchSpy.mockImplementation(async () => new Response(input, { status: 200 }));
+        const result = await proxyImage({
+          serverId: randomUUID(),
+          imagePath: '/Items/art/Images/Primary',
+          width: 360,
+          height: 540,
+        });
+        const meta = await sharp(result.data).metadata();
+        expect((meta.width ?? 0) / (meta.height ?? 1)).toBeCloseTo(width / height, 2);
+        expect(meta.width).toBeLessThanOrEqual(360);
+        expect(meta.height).toBeLessThanOrEqual(540);
+        expect(meta.hasAlpha).toBe(true);
+        persisted++;
+        await vi.waitFor(() => expect(updates.set).toHaveBeenCalledTimes(persisted));
+      }
+    }
+  );
+
   it('writes atomically: tmp path named after the pid, written before the rename into place', async () => {
     mockSelectChain([
       { id: 'server-1', type: 'plex', url: 'http://localhost:32400', token: 'token' },
@@ -565,6 +599,31 @@ describe('buildUpstreamRequest', () => {
     url: 'http://media:1234/',
     token: 'tok123',
   };
+
+  it('fetches the Plex source for uncropped posters without the fill transcoder', () => {
+    const server = { ...baseServer, type: 'plex' } as never;
+    const { imageUrl } = buildUpstreamRequest(server, '/library/metadata/1/thumb/2', {
+      width: 360,
+      height: 540,
+      preserveAspectRatio: true,
+    });
+    expect(new URL(imageUrl).pathname).toBe('/library/metadata/1/thumb/2');
+  });
+
+  it.each(['jellyfin', 'emby'])(
+    'bounds both dimensions without cropping for %s posters',
+    (type) => {
+      const server = { ...baseServer, type } as never;
+      const { imageUrl } = buildUpstreamRequest(server, '/Items/abc/Images/Primary', {
+        width: 360,
+        height: 540,
+        preserveAspectRatio: true,
+      });
+      const url = new URL(imageUrl);
+      expect(url.searchParams.get('maxWidth')).toBe('360');
+      expect(url.searchParams.get('maxHeight')).toBe('540');
+    }
+  );
 
   it('plex without resize appends the token to the raw path', () => {
     const server = { ...baseServer, type: 'plex' } as never;

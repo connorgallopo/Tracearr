@@ -146,6 +146,21 @@ Server routes and services:
   when refactoring the shared image-proxy request builder; preserve URL
   normalization and `fit: inside` while retaining upstream cache/LQIP behavior
   for other server types.
+- Uncropped Dashboard artwork is a permanent, intentional fork behavior,
+  not a temporary workaround:
+  preserve it when merging upstream image-proxy or Dashboard changes.
+  Dashboard artwork uses `object-contain` for every media type. Shared
+  poster cache entries preserve the full image with Sharp `fit: inside` for
+  every provider; avatars/art retain their prior sizing behavior. Jellyfin/Emby
+  thumbnails constrain both dimensions, while Plex posters use the source
+  image to avoid fill-transcoder cropping. Cache keys and the cache directory
+  are unchanged. Startup removes recognized cached WebP files once, before
+  serving requests, then writes `.uncropped-artwork-v1` in the image-cache
+  directory. Later starts retain the regenerated files. Dashboard URLs append
+  `artwork=2` only to refresh browser caches; this is not a server cache variant.
+  Validated with Node 24 / pnpm 12.3.4: services (3,347 passed, one skipped),
+  web (1,224 passed with two workers), typecheck, lint (754 warnings, unchanged),
+  and build. Docker and live-provider manual smoke checks were not run.
 - `apps/server/src/routes/public.ts` and `apps/server/src/routes/public.openapi.ts` expose Dispatcharr-aware live media fields in public API responses.
 - Dashboard daily stats keep `todayPlays`, `todaySessions`, and `watchTimeHours` as VOD-only metrics, add `tvSessions`, `tvChannels`, and `tvWatchTimeHours` for `mediaType === 'live'`, and count `activeUsersToday` across all media types so Dispatcharr Live TV/catch-up activity is no longer invisible on the homepage.
 - Dispatcharr Server Resources are supplied by the separate `Dispatcharr-Metrics` v1 plugin. The plugin broadcasts sanitized `tracearr_server_stats` schema version `1` messages on the existing authenticated `updates` WebSocket; Tracearr accepts only finite timestamps and 0–100 utilization values. `process*` samples describe the complete Docker `web` container cgroup (including FFmpeg and cache-backed memory), not the host. If Docker has no explicit memory limit, the container memory percentage uses host-visible `MemTotal` as denominator, matching Docker Stats' no-limit behavior. `host*` samples are true host-wide CPU and memory utilization via Dispatcharr's bundled `psutil`, constrained to `0.00–100.00%`; they include every process visible to the host. The same plugin publishes `tracearr_bandwidth_stats` schema version `1` aggregate one-second samples (`lanBytes` and `wanBytes`) for the dashboard Bandwidth card; Tracearr retains 156 samples. A zero-valued sample is valid and shows the card; missing or invalid fields do not. Username/password authentication is required to keep the Dispatcharr WebSocket; API-key mode remains REST-only and has no resource or bandwidth samples. v1 supports Docker AIO and modular `web` deployments only; bare-metal/systemd is intentionally unsupported.
@@ -380,6 +395,13 @@ General merge rules:
 
 High-conflict areas to review manually:
 
+- `apps/server/src/services/imageProxy.ts`, `imageCacheMigration.ts`, startup
+  wiring in `apps/server/src/index.ts`, and web `NowPlayingCard.tsx`: preserve
+  full poster images for all providers, the shared cache, the one-time cleanup
+  marker, and the browser refresh marker. Do not restore upstream poster
+  `cover` resizing or limit `object-contain` to Live TV/music. Keep the existing
+  image-proxy, cache-migration, and NowPlayingCard regression tests. An upstream
+  replacement is acceptable only if it preserves this behavior end to end.
 - Shared server type definitions and schemas.
 - Drizzle migrations and `servers` table shape.
 - `apps/server/src/routes/servers.ts`.

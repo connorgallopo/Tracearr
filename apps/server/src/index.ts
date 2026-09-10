@@ -62,6 +62,8 @@ import { settingsRoutes } from './routes/settings.js';
 import { importRoutes } from './routes/import.js';
 import { imageRoutes } from './routes/images.js';
 import { startImageCacheSweepTimer, stopImageCacheSweep } from './services/imageCacheSweep.js';
+import { IMAGE_CACHE_DIR } from './services/imageProxy.js';
+import { migrateImageCache } from './services/imageCacheMigration.js';
 import { debugRoutes } from './routes/debug.js';
 import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
@@ -1401,6 +1403,12 @@ function startRecoveryLoop(app: FastifyInstance, intervalMs: number = RECOVERY_I
 
 async function start() {
   try {
+    const removedImages = await migrateImageCache(IMAGE_CACHE_DIR);
+    if (removedImages > 0) {
+      console.info(
+        `Image cache migration removed ${removedImages} cropped images; they will be fetched again on demand.`
+      );
+    }
     // Initialize claim code for first-time setup security
     initializeClaimCode();
 
