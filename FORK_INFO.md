@@ -158,6 +158,9 @@ Server routes and services:
   serving requests, then writes `.uncropped-artwork-v1` in the image-cache
   directory. Later starts retain the regenerated files. Dashboard URLs append
   `artwork=2` only to refresh browser caches; this is not a server cache variant.
+  The artwork container is transparent when an image exists, exposing the
+  card's blurred backdrop in letterbox/pillarbox space; it keeps `bg-muted`
+  only for the missing-image server-icon placeholder.
   Validated with Node 24 / pnpm 12.3.4: services (3,347 passed, one skipped),
   web (1,224 passed with two workers), typecheck, lint (754 warnings, unchanged),
   and build. Docker and live-provider manual smoke checks were not run.
@@ -399,7 +402,9 @@ High-conflict areas to review manually:
   wiring in `apps/server/src/index.ts`, and web `NowPlayingCard.tsx`: preserve
   full poster images for all providers, the shared cache, the one-time cleanup
   marker, and the browser refresh marker. Do not restore upstream poster
-  `cover` resizing or limit `object-contain` to Live TV/music. Keep the existing
+  `cover` resizing or limit `object-contain` to Live TV/music. Preserve the
+  transparent artwork container for real images and the `bg-muted` missing-image
+  placeholder. Keep the existing
   image-proxy, cache-migration, and NowPlayingCard regression tests. An upstream
   replacement is acceptable only if it preserves this behavior end to end.
 - Shared server type definitions and schemas.

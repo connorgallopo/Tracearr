@@ -362,11 +362,18 @@ describe('NowPlayingCard ffmpeg speed display', () => {
         />
       );
       const poster = container.querySelector('img[src*="images/proxy"]');
+      expect(screen.getByTestId('card-artwork')).not.toHaveClass('bg-muted');
       expect(poster).toHaveClass('object-contain');
       expect(poster).not.toHaveClass('object-cover');
       expect(poster?.getAttribute('src')).toContain('&artwork=2');
     }
   );
+
+  it('keeps the gray artwork placeholder when no image exists', () => {
+    render(<NowPlayingCard session={makeSession({ thumbPath: null })} />);
+
+    expect(screen.getByTestId('card-artwork')).toHaveClass('bg-muted');
+  });
 
   it('proxies absolute Dispatcharr live channel logos for card artwork', () => {
     const absoluteThumbUrl =

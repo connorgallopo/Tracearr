@@ -168,7 +168,13 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
         {/* Content */}
         <div className="relative flex gap-4 p-4">
           {/* Poster */}
-          <div className="bg-muted relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg shadow-lg">
+          <div
+            data-testid="card-artwork"
+            className={cn(
+              'relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg shadow-lg',
+              !posterUrl && 'bg-muted'
+            )}
+          >
             {posterUrl ? (
               <img
                 src={posterUrl}
