@@ -27,6 +27,7 @@ export function useUserRequests(
     queryKey: [...REQUESTS_KEY, 'user', id, opts.scope ?? 'account', opts.page, opts.pageSize],
     queryFn: () => api.users.requests(id, opts),
     enabled: !!id,
+    placeholderData: (prev) => prev,
   });
 }
 
