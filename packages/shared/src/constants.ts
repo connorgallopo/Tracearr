@@ -45,6 +45,7 @@ export const WS_EVENTS = {
   SERVER_CONNECTION: 'server:connection',
   NOTIFICATION_TOAST: 'notification:toast',
   DESTINATIONS_CHANGED: 'destinations:changed',
+  REQUESTS_CHANGED: 'requests:changed',
   SERVERS_CHANGED: 'servers:changed',
 } as const;
 

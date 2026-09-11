@@ -852,3 +852,29 @@ export {
   memberFacingUrl,
   type MediaServerItemLinkInput,
 } from './mediaServerLinks.js';
+
+// Request tracking (Seerr)
+export {
+  REQUEST_SERVICE_TYPES,
+  MEDIA_REQUEST_STATUSES,
+  testRequestServiceSchema,
+  createRequestServiceSchema,
+  updateRequestServiceSchema,
+  userRequestsQuerySchema,
+  type RequestServiceType,
+  type MediaRequestStatus,
+  type MediaRequestMediaType,
+  type RequestSeason,
+  type RequestCounts,
+  type RequestService,
+  type RequestServiceProbeResult,
+  type RequestRequester,
+  type MediaRequestEntry,
+  type UserRequestEntry,
+  type UserRequestsSummary,
+  type UserRequestsResponse,
+  type TestRequestServiceInput,
+  type CreateRequestServiceInput,
+  type UpdateRequestServiceInput,
+  type UserRequestsQuery,
+} from './requests.js';
