@@ -151,6 +151,12 @@ import {
   shutdownInactivityCheckQueue,
 } from './jobs/inactivityCheckQueue.js';
 import {
+  initRequestSyncQueue,
+  startRequestSyncWorker,
+  scheduleRequestSync,
+  shutdownRequestSyncQueue,
+} from './jobs/requestSyncQueue.js';
+import {
   initBackupQueue,
   startBackupWorker,
   scheduleBackupJob,
@@ -618,6 +624,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownImagePrecacheQueue();
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
+    await shutdownRequestSyncQueue();
     await shutdownBackupQueue();
     await shutdownNewsletterQueues();
     closeAllTransporters();
@@ -995,6 +1002,17 @@ async function initializeServices(app: FastifyInstance) {
     // Don't throw - inactivity checks are non-critical
   }
 
+  try {
+    initRequestSyncQueue(redisUrl, app.redis, pubSubService.publish.bind(pubSubService));
+    startRequestSyncWorker();
+    scheduleRequestSync().catch((err) => {
+      app.log.error({ err }, 'Failed to schedule request sync');
+    });
+    app.log.info('Request sync queue initialized');
+  } catch (err) {
+    app.log.error({ err }, 'Failed to initialize request sync queue');
+  }
+
   // Initialize backup queue (scheduled backups)
   try {
     initBackupQueue(redisUrl);
@@ -1217,6 +1235,9 @@ async function initializePostListen(app: FastifyInstance) {
         case WS_EVENTS.DESTINATIONS_CHANGED:
           invalidateDestinationsCache();
           broadcastToSessions('destinations:changed');
+          break;
+        case WS_EVENTS.REQUESTS_CHANGED:
+          broadcastToSessions('requests:changed', data as { serviceId: string });
           break;
         case WS_EVENTS.SERVERS_CHANGED:
           invalidateServersCache();

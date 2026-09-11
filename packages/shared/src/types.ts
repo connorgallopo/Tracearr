@@ -1130,6 +1130,7 @@ export interface ServerToClientEvents {
   'notification:toast': (data: NotificationToast) => void;
   'destinations:changed': () => void;
   'servers:changed': () => void;
+  'requests:changed': (data: { serviceId: string }) => void;
 }
 
 export interface ClientToServerEvents {

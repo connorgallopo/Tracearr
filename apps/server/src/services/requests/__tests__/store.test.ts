@@ -90,7 +90,7 @@ describe('request service store', () => {
   });
 
   it('encrypts the api key on create and never stores it in plain text', async () => {
-    chain.returning.mockImplementationOnce(() => Promise.resolve([makeRow()]));
+    chain.returning.mockResolvedValueOnce([makeRow()]);
     await createRequestService({
       serverId: 'srv-1',
       type: 'seerr',
