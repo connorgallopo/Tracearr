@@ -1,2 +1,2 @@
-export { RequestServicesManager } from './RequestServicesManager';
+export { RequestServiceLine } from './RequestServiceLine';
 export { LinkDialog } from './LinkDialog';

@@ -32,11 +32,12 @@ export function useUserRequests(
 }
 
 /** Non-owners get a 403, so a retry loop would be pure noise. */
-export function useRequestServices() {
+export function useRequestServices(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: [...REQUESTS_KEY, 'services'],
     queryFn: api.requestServices.list,
     retry: false,
+    enabled: options?.enabled ?? true,
   });
 }
 

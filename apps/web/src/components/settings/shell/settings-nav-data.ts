@@ -30,7 +30,6 @@ export const settingsNav: SettingsGroup[] = [
       { nameKey: 'nav.sections.connections', href: '/settings/servers/connections' },
       { nameKey: 'nav.sections.posters', href: '/settings/servers/posters' },
       { nameKey: 'nav.sections.plexAccounts', href: '/settings/servers/plex-accounts' },
-      { nameKey: 'nav.sections.requests', href: '/settings/servers/requests' },
     ],
   },
   {

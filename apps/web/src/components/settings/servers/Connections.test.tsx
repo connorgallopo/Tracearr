@@ -97,6 +97,7 @@ const invalidateQueries = vi.fn();
 vi.mock('@/hooks/queries', () => ({
   useDeleteServer: vi.fn(() => ({ mutate: deleteMutate, isPending: false })),
   useReorderServers: vi.fn(() => ({ mutate: reorderMutate, isPending: false })),
+  useRequestServices: vi.fn(() => ({ data: [] })),
   useServers: vi.fn(),
   useSyncServer: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
   useUpdateServer: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
