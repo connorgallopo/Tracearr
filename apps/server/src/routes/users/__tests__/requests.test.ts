@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
-import type { AuthUser, UserRequestsResponse } from '@tracearr/shared';
+import type { AuthUser, UserRequestEntry, UserRequestsResponse } from '@tracearr/shared';
 
 vi.mock('../../../db/client.js', () => ({ db: {} }));
 
@@ -29,6 +29,21 @@ const authUser: AuthUser = {
   username: 'viewer',
   role: 'admin',
   serverIds: [SERVER_ID],
+};
+
+const entry: UserRequestEntry = {
+  id: 'req-1',
+  serverId: SERVER_ID,
+  status: 'completed',
+  requestedAt: '2026-01-01T00:00:00.000Z',
+  availableAt: '2026-01-01T00:00:05.000Z',
+  waitMs: 5000,
+  deletedAt: null,
+  seasons: null,
+  is4k: false,
+  isAutoRequest: false,
+  watchedState: 'partial',
+  media: { mediaId: null, title: 'X', year: 2020, mediaType: 'movie' },
 };
 
 const emptyResponse: UserRequestsResponse = {
@@ -106,9 +121,26 @@ describe('User Requests Route', () => {
     expect(response.statusCode).toBe(200);
     expect(listUserRequests).toHaveBeenCalledWith({
       serverUserIds: [SERVER_USER_ID],
+      serverIds: [SERVER_ID],
       page: 3,
       pageSize: 20,
     });
+  });
+
+  it('returns the watched state the read layer resolved', async () => {
+    vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
+      serverUser: { id: SERVER_USER_ID, serverId: SERVER_ID, userId: authUser.userId },
+      ids: [SERVER_USER_ID],
+    });
+    vi.mocked(listUserRequests).mockResolvedValue({ ...emptyResponse, data: [entry], total: 1 });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/users/${SERVER_USER_ID}/requests`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json().data[0].watchedState).toBe('partial');
   });
 
   it('expands to every account of the identity under scope=identity', async () => {
@@ -131,6 +163,7 @@ describe('User Requests Route', () => {
     );
     expect(listUserRequests).toHaveBeenCalledWith({
       serverUserIds: [SERVER_USER_ID, OTHER_SERVER_USER_ID],
+      serverIds: [SERVER_ID],
       page: 1,
       pageSize: 5,
     });

@@ -7,6 +7,7 @@
 import { userIdParamSchema, userRequestsQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { listUserRequests } from '../../services/requests/reads.js';
+import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { resolveIdentityScopedServerUserIds } from './queries.js';
 import type { FastifyPluginAsync } from 'fastify';
 
@@ -41,6 +42,7 @@ export const requestsRoutes: FastifyPluginAsync = async (app) => {
 
     return listUserRequests({
       serverUserIds: scoped.ids,
+      serverIds: resolveServerIds(request.user, undefined, undefined),
       page: query.data.page,
       pageSize: query.data.pageSize,
     });

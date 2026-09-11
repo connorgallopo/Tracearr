@@ -58,6 +58,12 @@ const mediaIdParamSchema = z.object({ id: uuidSchema });
 // no other query params (detail, children, stats, platforms).
 const mediaScopeQuerySchema = z.object({ serverIds: serverIdsQuerySchema });
 
+// The routes that also accept an explicit serverId to narrow within that scope.
+const mediaServerQuerySchema = z.object({
+  serverId: uuidSchema.optional(),
+  serverIds: serverIdsQuerySchema,
+});
+
 function mediaCacheKey(id: string, segment: string, serverIds: string[] | undefined): string {
   const scope = serverIds !== undefined ? [...serverIds].sort().join(',') : 'all';
   return REDIS_KEYS.LIBRARY_MEDIA_DETAIL(`${id}:${segment}:${scope}`);
@@ -334,10 +340,8 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     if (!params.success) return reply.badRequest('Invalid media id');
     const { id } = params.data;
 
-    const querySchema = z.object({
+    const querySchema = mediaServerQuerySchema.extend({
       window: z.enum(['all_time', 'last_30', 'last_7']).default('all_time'),
-      serverId: uuidSchema.optional(),
-      serverIds: serverIdsQuerySchema,
     });
     const query = querySchema.safeParse(request.query);
     if (!query.success) return reply.badRequest('Invalid query parameters');
@@ -375,11 +379,7 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const params = mediaIdParamSchema.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid media id');
 
-    const querySchema = z.object({
-      serverId: uuidSchema.optional(),
-      serverIds: serverIdsQuerySchema,
-    });
-    const query = querySchema.safeParse(request.query);
+    const query = mediaServerQuerySchema.safeParse(request.query);
     if (!query.success) return reply.badRequest('Invalid query parameters');
 
     const resolvedIds = resolveServerIds(request.user, query.data.serverId, query.data.serverIds);

@@ -175,13 +175,6 @@ async function fetchShowWatchedRows(
   return result.rows as unknown as ShowWatchedRow[];
 }
 
-/**
- * Resolves per-media watched state for a page of movies and shows, alias-aware
- * (merged duplicates share state) and scoped to a server set and/or a single
- * identity's lens. lensUserId === null aggregates across every identity: the
- * `su.user_id = lensUserId` filter short-circuits via the leading OR IS NULL,
- * which is equivalent to a semi-join across all users for this BOOL_OR/COUNT shape.
- */
 /** showId -> count of episodes currently in the library, the denominator every show watched probe uses. */
 export async function fetchEpisodeCounts(
   showIds: string[],
@@ -204,6 +197,13 @@ export async function fetchEpisodeCounts(
   return result;
 }
 
+/**
+ * Resolves per-media watched state for a page of movies and shows, alias-aware
+ * (merged duplicates share state) and scoped to a server set and/or a single
+ * identity's lens. lensUserId === null aggregates across every identity: the
+ * `su.user_id = lensUserId` filter short-circuits via the leading OR IS NULL,
+ * which is equivalent to a semi-join across all users for this BOOL_OR/COUNT shape.
+ */
 export async function resolveWatchedStates(
   args: WatchedProbeArgs
 ): Promise<Map<string, WatchedState>> {

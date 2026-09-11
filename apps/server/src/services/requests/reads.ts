@@ -79,6 +79,14 @@ interface WatchedLensRow {
   lensUserId: string | null;
 }
 
+function mediaIdsOf(rows: WatchedLensRow[], kind: MediaRequestMediaType): string[] {
+  return [
+    ...new Set(
+      rows.filter((r) => r.mediaType === kind).flatMap((r) => (r.mediaId ? [r.mediaId] : []))
+    ),
+  ];
+}
+
 /**
  * One probe per requester identity, over the distinct media in that group.
  * A request with no matched media or no matched requester has nothing to lens
@@ -100,22 +108,33 @@ async function watchedStatesFor(
     byLens.set(row.lensUserId, bucket);
   }
 
-  for (const [lensUserId, bucket] of byLens) {
-    const mediaIds = (kind: MediaRequestMediaType): string[] => [
-      ...new Set(
-        bucket.filter((r) => r.mediaType === kind).flatMap((r) => (r.mediaId ? [r.mediaId] : []))
-      ),
-    ];
-    const movieIds = mediaIds('movie');
-    const showIds = mediaIds('show');
-    const episodeCounts = await fetchEpisodeCounts(showIds, serverIds);
-    const states = await resolveWatchedStates({
-      movieIds,
-      showIds,
-      serverIds,
-      lensUserId,
-      episodeCounts,
-    });
+  if (byLens.size === 0) return out;
+
+  const buckets = [...byLens];
+  // The episode denominator does not vary by requester, so it is one query for
+  // every lens rather than one per bucket.
+  const episodeCounts = await fetchEpisodeCounts(
+    mediaIdsOf(
+      buckets.flatMap(([, bucket]) => bucket),
+      'show'
+    ),
+    serverIds
+  );
+
+  const probed = await Promise.all(
+    buckets.map(async ([lensUserId, bucket]) => ({
+      bucket,
+      states: await resolveWatchedStates({
+        movieIds: mediaIdsOf(bucket, 'movie'),
+        showIds: mediaIdsOf(bucket, 'show'),
+        serverIds,
+        lensUserId,
+        episodeCounts,
+      }),
+    }))
+  );
+
+  for (const { bucket, states } of probed) {
     for (const row of bucket) {
       out.set(row.id, (row.mediaId ? states.get(row.mediaId) : undefined) ?? 'unwatched');
     }
@@ -232,12 +251,13 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
 
 export interface ListUserRequestsArgs {
   serverUserIds: string[];
+  serverIds: string[] | undefined;
   page: number;
   pageSize: number;
 }
 
 export async function listUserRequests(args: ListUserRequestsArgs): Promise<UserRequestsResponse> {
-  const { serverUserIds, page, pageSize } = args;
+  const { serverUserIds, serverIds, page, pageSize } = args;
   if (serverUserIds.length === 0) {
     return { data: [], total: 0, page, pageSize, summary: EMPTY_SUMMARY };
   }
@@ -310,7 +330,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
   const completedIds = new Set(completed.map((row) => row.id));
   const states = await watchedStatesFor(
     [...completed, ...pageLensRows.filter((row) => !completedIds.has(row.id))],
-    undefined
+    serverIds
   );
 
   const summaryRow = (summaryResult.rows as unknown as UserSummarySqlRow[])[0];

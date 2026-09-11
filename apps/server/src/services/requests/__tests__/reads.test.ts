@@ -122,6 +122,28 @@ describe('listMediaRequests', () => {
       thumb: null,
     });
     expect(watched.resolveWatchedStates).not.toHaveBeenCalled();
+    expect(watched.fetchEpisodeCounts).not.toHaveBeenCalled();
+  });
+
+  it('asks for the episode denominator once for every requester', async () => {
+    const otherShowId = 'bbbbbbbb-1111-4111-8111-111111111111';
+    mockDb.execute.mockResolvedValue({
+      rows: [
+        mediaRow(),
+        mediaRow({
+          id: 'req-2',
+          media_id: otherShowId,
+          server_user_id: '99999999-9999-4999-8999-999999999999',
+          lens_user_id: '88888888-8888-4888-8888-888888888888',
+        }),
+      ],
+    });
+
+    await listMediaRequests({ scope: showScope(), serverIds: [SERVER_ID] });
+
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledTimes(1);
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID, otherShowId], [SERVER_ID]);
+    expect(watched.resolveWatchedStates).toHaveBeenCalledTimes(2);
   });
 
   it('lenses a matched requester and computes the wait', async () => {
@@ -182,6 +204,7 @@ describe('listUserRequests', () => {
 
     const result = await listUserRequests({
       serverUserIds: [SERVER_USER_ID],
+      serverIds: undefined,
       page: 2,
       pageSize: 5,
     });
@@ -222,6 +245,7 @@ describe('listUserRequests', () => {
 
     const result = await listUserRequests({
       serverUserIds: [SERVER_USER_ID],
+      serverIds: undefined,
       page: 1,
       pageSize: 5,
     });
@@ -250,6 +274,7 @@ describe('listUserRequests', () => {
 
     const result = await listUserRequests({
       serverUserIds: [SERVER_USER_ID],
+      serverIds: undefined,
       page: 1,
       pageSize: 5,
     });
@@ -257,8 +282,36 @@ describe('listUserRequests', () => {
     expect(result.summary.neverWatched).toBe(2);
   });
 
+  it('probes watched state through the server scope it was handed', async () => {
+    mockDb.execute
+      .mockResolvedValueOnce({
+        rows: [{ ...mediaRow(), title: 'X', year: 2020 }],
+      })
+      .mockResolvedValueOnce({ rows: [summaryRow()] })
+      .mockResolvedValueOnce({ rows: [] });
+    watched.resolveWatchedStates.mockResolvedValue(new Map([[SHOW_ID, 'partial']]));
+
+    const result = await listUserRequests({
+      serverUserIds: [SERVER_USER_ID],
+      serverIds: [SERVER_ID],
+      page: 1,
+      pageSize: 5,
+    });
+
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID], [SERVER_ID]);
+    expect(watched.resolveWatchedStates).toHaveBeenCalledWith(
+      expect.objectContaining({ serverIds: [SERVER_ID] })
+    );
+    expect(result.data[0]?.watchedState).toBe('partial');
+  });
+
   it('returns an empty page without querying when the identity has no accounts', async () => {
-    const result = await listUserRequests({ serverUserIds: [], page: 1, pageSize: 5 });
+    const result = await listUserRequests({
+      serverUserIds: [],
+      serverIds: undefined,
+      page: 1,
+      pageSize: 5,
+    });
 
     expect(result).toEqual({
       data: [],
