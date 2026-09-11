@@ -2184,7 +2184,8 @@
     },
     "mediaPanel": {
       "title": "Requests",
-      "loadError": "Couldn't load requests"
+      "loadError": "Couldn't load requests",
+      "empty": "No requests for this title"
     },
     "userCard": {
       "title": "Requests",
