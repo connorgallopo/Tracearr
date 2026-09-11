@@ -10,6 +10,7 @@ const { mockDb, store, resolution } = vi.hoisted(() => ({
     recordSyncResult: vi.fn(),
     markRequestServiceReencrypt: vi.fn(),
     publishRequestsChanged: vi.fn(),
+    remoteIdsWithStoredTitle: vi.fn(),
   },
   resolution: { resolveRequests: vi.fn() },
 }));
@@ -113,6 +114,7 @@ describe('runRequestSync', () => {
     vi.clearAllMocks();
     upserts = [];
     store.readApiKey.mockReturnValue({ ok: true, apiKey: 'k' });
+    store.remoteIdsWithStoredTitle.mockResolvedValue(new Set());
     resolution.resolveRequests.mockResolvedValue(new Map());
     mockDb.execute.mockImplementation(async (query: { queryChunks?: unknown[] }) => {
       upserts.push(query);
@@ -185,6 +187,21 @@ describe('runRequestSync', () => {
     expect(sqlText.toLowerCase()).not.toContain('deleted_at');
   });
 
+  it('does not soft-delete when the full walk returns fewer rows than the service counts', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    const c = client([
+      [request(1, '2026-09-03T00:00:00.000Z'), request(2, '2026-09-03T00:00:00.000Z')],
+    ]);
+    c.requestCount = vi.fn(async () => ({ ...counts, total: 3 }));
+
+    const result = await runRequestSync('svc', 'full', { clientFor: () => c });
+
+    expect(result.upserted).toBe(2);
+    expect(result.markedDeleted).toBe(0);
+    const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
+    expect(sqlText).not.toContain('UPDATE media_requests');
+  });
+
   it('takes titles from matched media and looks up only unresolved rows', async () => {
     store.getRequestService.mockResolvedValue(serviceRow());
     resolution.resolveRequests.mockResolvedValue(
@@ -198,6 +215,19 @@ describe('runRequestSync', () => {
     await runRequestSync('svc', 'full', { clientFor: () => c });
     expect(movie).toHaveBeenCalledTimes(1);
     expect(movie).toHaveBeenCalledWith(1002);
+  });
+
+  it('leaves the title lookups alone on a second run over rows that already stored one', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    const movie = vi.fn(async () => ({ title: 'Remote Title', year: 2024 }));
+    const c = client([[request(1, '2026-09-03T00:00:00.000Z')]], { movie });
+
+    await runRequestSync('svc', 'full', { clientFor: () => c });
+    expect(movie).toHaveBeenCalledTimes(1);
+
+    store.remoteIdsWithStoredTitle.mockResolvedValue(new Set([1]));
+    await runRequestSync('svc', 'full', { clientFor: () => c });
+    expect(movie).toHaveBeenCalledTimes(1);
   });
 
   it('marks the service for re-entry when the key no longer decrypts', async () => {

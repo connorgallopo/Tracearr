@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uuidSchema } from './schemas.js';
 import type { WatchedState } from './types.js';
 
 export const REQUEST_SERVICE_TYPES = ['seerr'] as const;
@@ -125,7 +126,7 @@ export const testRequestServiceSchema = z.strictObject({
 });
 
 export const createRequestServiceSchema = z.strictObject({
-  serverId: z.string().uuid(),
+  serverId: uuidSchema,
   url: urlField,
   apiKey: apiKeyField,
   name: z.string().trim().min(1).max(100).optional(),

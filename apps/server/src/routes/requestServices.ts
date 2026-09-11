@@ -5,7 +5,11 @@ import {
   type RequestServiceProbeResult,
 } from '@tracearr/shared';
 import { isUniqueViolation } from '../db/pg.js';
-import { enqueueRequestSync, scheduleRequestSync } from '../jobs/requestSyncQueue.js';
+import {
+  enqueueRequestSync,
+  isRequestSyncActive,
+  scheduleRequestSync,
+} from '../jobs/requestSyncQueue.js';
 import { probeSeerr, SeerrProbeError } from '../services/requests/probe.js';
 import { SeerrApiError } from '../services/requests/seerrClient.js';
 import { findServerById } from '../services/requests/serverLookup.js';
@@ -144,11 +148,10 @@ export async function requestServiceRoutes(app: FastifyInstance): Promise<void> 
   app.post<{ Params: { id: string } }>('/:id/sync', owner, async (request, reply) => {
     const current = await getRequestService(request.params.id);
     if (!current) return reply.notFound('Request service not found');
-    try {
-      const jobId = await enqueueRequestSync(current.id, 'full');
-      return reply.code(202).send({ jobId });
-    } catch (error) {
-      return reply.conflict(error instanceof Error ? error.message : 'Sync already running');
+    if (await isRequestSyncActive(current.id)) {
+      return reply.conflict('A sync is already in progress for this service');
     }
+    const jobId = await enqueueRequestSync(current.id, 'full');
+    return reply.code(202).send({ jobId });
   });
 }

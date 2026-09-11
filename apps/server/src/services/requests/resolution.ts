@@ -115,7 +115,6 @@ async function requesters(
 }
 
 export async function resolveRequests(
-  _serviceId: string,
   serverId: string,
   serverType: 'plex' | 'jellyfin' | 'emby',
   rows: ResolutionInput[]

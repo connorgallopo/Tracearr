@@ -52,7 +52,7 @@ describe('resolveRequests', () => {
       requester: [{ key: '1577033', id: 'su-1' }],
     });
 
-    const result = await resolveRequests('svc', 'srv', 'plex', [
+    const result = await resolveRequests('srv', 'plex', [
       {
         remoteId: 1,
         mediaType: 'movie',
@@ -101,7 +101,7 @@ describe('resolveRequests', () => {
     routeByQuery({
       ratingKey: [{ rating_key: '206250', media_id: 'm-9', title: 'Late', year: 2026 }],
     });
-    const result = await resolveRequests('svc', 'srv', 'plex', [
+    const result = await resolveRequests('srv', 'plex', [
       {
         remoteId: 7,
         mediaType: 'movie',
@@ -120,7 +120,7 @@ describe('resolveRequests', () => {
     routeByQuery({
       requester: [{ key: 'jf-abc', id: 'su-7' }],
     });
-    const result = await resolveRequests('svc', 'srv', 'jellyfin', [
+    const result = await resolveRequests('srv', 'jellyfin', [
       {
         remoteId: 1,
         mediaType: 'movie',
@@ -136,7 +136,7 @@ describe('resolveRequests', () => {
 
   it('skips a lookup entirely when its id set is empty', async () => {
     routeByQuery();
-    await resolveRequests('svc', 'srv', 'plex', [
+    await resolveRequests('srv', 'plex', [
       {
         remoteId: 1,
         mediaType: 'movie',

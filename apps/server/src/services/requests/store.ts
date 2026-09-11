@@ -1,4 +1,4 @@
-import { eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { WS_EVENTS, type RequestService, type RequestServiceType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { mediaRequests, requestServices } from '../../db/schema.js';
@@ -136,6 +136,15 @@ export async function recordSyncResult(
     .update(requestServices)
     .set({ ...patch, updatedAt: new Date() })
     .where(eq(requestServices.id, id));
+}
+
+/** Rows that already carry a title need no Seerr lookup: the upsert keeps the stored one. */
+export async function remoteIdsWithStoredTitle(serviceId: string): Promise<Set<number>> {
+  const rows = await db
+    .select({ remoteId: mediaRequests.remoteId })
+    .from(mediaRequests)
+    .where(and(eq(mediaRequests.serviceId, serviceId), isNotNull(mediaRequests.title)));
+  return new Set(rows.map((row) => row.remoteId));
 }
 
 export async function requestCountsByService(): Promise<Map<string, RequestService['counts']>> {

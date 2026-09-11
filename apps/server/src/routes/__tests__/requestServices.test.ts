@@ -43,11 +43,16 @@ vi.mock('../../services/requests/serverLookup.js', () => ({ findServerById: vi.f
 
 vi.mock('../../jobs/requestSyncQueue.js', () => ({
   enqueueRequestSync: vi.fn(),
+  isRequestSyncActive: vi.fn(),
   scheduleRequestSync: vi.fn(),
 }));
 
 import { isUniqueViolation } from '../../db/pg.js';
-import { enqueueRequestSync, scheduleRequestSync } from '../../jobs/requestSyncQueue.js';
+import {
+  enqueueRequestSync,
+  isRequestSyncActive,
+  scheduleRequestSync,
+} from '../../jobs/requestSyncQueue.js';
 import { probeSeerr, SeerrProbeError } from '../../services/requests/probe.js';
 import { findServerById } from '../../services/requests/serverLookup.js';
 import {
@@ -140,6 +145,7 @@ describe('Request Service Routes', () => {
     });
     vi.mocked(probeSeerr).mockResolvedValue(makeProbe());
     vi.mocked(enqueueRequestSync).mockResolvedValue('job-1');
+    vi.mocked(isRequestSyncActive).mockResolvedValue(false);
     vi.mocked(scheduleRequestSync).mockResolvedValue(undefined);
     vi.mocked(readApiKey).mockReturnValue({ ok: true, apiKey: 'stored-key' });
   });
@@ -389,9 +395,7 @@ describe('Request Service Routes', () => {
     it('409s while a sync is already running', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getRequestService).mockResolvedValue(makeRow());
-      vi.mocked(enqueueRequestSync).mockRejectedValue(
-        new Error('A sync is already in progress for this service')
-      );
+      vi.mocked(isRequestSyncActive).mockResolvedValue(true);
 
       const response = await app.inject({
         method: 'POST',
@@ -400,6 +404,22 @@ describe('Request Service Routes', () => {
 
       expect(response.statusCode).toBe(409);
       expect(response.json().message).toBe('A sync is already in progress for this service');
+      expect(enqueueRequestSync).not.toHaveBeenCalled();
+    });
+
+    it('500s when the queue cannot take the job', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getRequestService).mockResolvedValue(makeRow());
+      vi.mocked(enqueueRequestSync).mockRejectedValue(
+        new Error('Request sync queue not initialized')
+      );
+
+      const response = await app.inject({
+        method: 'POST',
+        url: `/request-services/${SERVICE_ID}/sync`,
+      });
+
+      expect(response.statusCode).toBe(500);
     });
   });
 });

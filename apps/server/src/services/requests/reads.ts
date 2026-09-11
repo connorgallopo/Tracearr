@@ -18,6 +18,7 @@ import type {
   WatchedState,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { mapWithConcurrency } from '../../utils/concurrency.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { fetchEpisodeCounts, resolveWatchedStates } from '../library/mediaWatchedService.js';
@@ -26,6 +27,9 @@ import type { SQL } from 'drizzle-orm';
 
 /** Bounds the never-watched scan so a heavy requester cannot turn a page into a full-history probe. */
 const NEVER_WATCHED_SCAN_LIMIT = 500;
+
+/** Bounds the per-requester probes so a title with many requesters cannot fan out one query per identity at once. */
+const WATCHED_PROBE_CONCURRENCY = 4;
 
 const EMPTY_SUMMARY: UserRequestsResponse['summary'] = {
   total: 0,
@@ -121,8 +125,10 @@ async function watchedStatesFor(
     serverIds
   );
 
-  const probed = await Promise.all(
-    buckets.map(async ([lensUserId, bucket]) => ({
+  const probed = await mapWithConcurrency(
+    buckets,
+    WATCHED_PROBE_CONCURRENCY,
+    async ([lensUserId, bucket]) => ({
       bucket,
       states: await resolveWatchedStates({
         movieIds: mediaIdsOf(bucket, 'movie'),
@@ -131,7 +137,7 @@ async function watchedStatesFor(
         lensUserId,
         episodeCounts,
       }),
-    }))
+    })
   );
 
   for (const { bucket, states } of probed) {

@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
+import { mapWithConcurrency } from '../../utils/concurrency.js';
 import { createLogger } from '../../utils/logger.js';
 import { mapSeerrRequest, type MappedRequest } from './mapping.js';
 import { resolveRequests, type Resolved } from './resolution.js';
@@ -16,6 +17,7 @@ import {
   publishRequestsChanged,
   readApiKey,
   recordSyncResult,
+  remoteIdsWithStoredTitle,
   type RequestServiceRow,
 } from './store.js';
 
@@ -80,21 +82,16 @@ async function lookupTitles(
 ): Promise<Map<number, SeerrTitleLookup>> {
   const out = new Map<number, SeerrTitleLookup>();
   const pending = [...new Map(rows.map((r) => [r.remoteMediaId, r])).values()];
-  let index = 0;
-  const worker = async () => {
-    while (index < pending.length) {
-      const row = pending[index++];
-      if (!row || row.tmdbId == null) continue;
-      try {
-        const hit =
-          row.mediaType === 'movie' ? await client.movie(row.tmdbId) : await client.tv(row.tmdbId);
-        out.set(row.remoteMediaId, hit);
-      } catch (error) {
-        logger.warn('title lookup failed', { remoteMediaId: row.remoteMediaId, error });
-      }
+  await mapWithConcurrency(pending, LOOKUP_CONCURRENCY, async (row) => {
+    if (row.tmdbId == null) return;
+    try {
+      const hit =
+        row.mediaType === 'movie' ? await client.movie(row.tmdbId) : await client.tv(row.tmdbId);
+      out.set(row.remoteMediaId, hit);
+    } catch (error) {
+      logger.warn('title lookup failed', { remoteMediaId: row.remoteMediaId, error });
     }
-  };
-  await Promise.all(Array.from({ length: Math.min(LOOKUP_CONCURRENCY, pending.length) }, worker));
+  });
   return out;
 }
 
@@ -160,11 +157,14 @@ async function upsertAll(
   remote: SeerrRequest[]
 ): Promise<number> {
   const serverType = (await serverTypeById(row.serverId)) ?? 'plex';
+  const alreadyTitled = await remoteIdsWithStoredTitle(row.id);
   let upserted = 0;
   for (let i = 0; i < remote.length; i += PAGE_SIZE) {
     const mapped = remote.slice(i, i + PAGE_SIZE).map(mapSeerrRequest);
-    const resolved = await resolveRequests(row.id, row.serverId, serverType, mapped);
-    const unresolved = mapped.filter((r) => !resolved.get(r.remoteId)?.title);
+    const resolved = await resolveRequests(row.serverId, serverType, mapped);
+    const unresolved = mapped.filter(
+      (r) => !resolved.get(r.remoteId)?.title && !alreadyTitled.has(r.remoteId)
+    );
     const titles = await lookupTitles(client, unresolved);
     await upsertBatch(row.id, mapped, resolved, titles);
     upserted += mapped.length;
@@ -200,9 +200,11 @@ export async function runRequestSync(
 
     const remote = await fetchRows(client, mode, row.syncCursor);
     const upserted = await upsertAll(row, client, remote);
-    // A transient empty first page must not wipe every request the service still has upstream.
+    // A walk shorter than the service's own count means rows were missed: the
+    // result window shifted under the paging, or the first page came back
+    // empty. Those rows are still upstream, so the cleanup pass waits.
     const markedDeleted =
-      mode === 'full' && !(remote.length === 0 && counts.total > 0)
+      mode === 'full' && remote.length >= counts.total
         ? await markMissingDeleted(
             row.id,
             remote.map((r) => r.id)
