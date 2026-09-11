@@ -46,10 +46,17 @@ const { chain, mockPublish } = vi.hoisted(() => {
 vi.mock('../../../db/client.js', () => ({ db: chain }));
 vi.mock('../../cache.js', () => ({ getPubSubService: () => ({ publish: mockPublish }) }));
 vi.mock('../../notifications/destinationCrypto.js', () => ({
-  encryptConfig: vi.fn((config: Record<string, unknown>) => `enc:${JSON.stringify(config)}`),
+  encryptConfig: vi.fn(
+    (config: Record<string, unknown>) =>
+      `enc:${Buffer.from(JSON.stringify(config)).toString('base64')}`
+  ),
   decryptConfig: vi.fn((blob: string) =>
     blob.startsWith('enc:')
-      ? { ok: true, config: JSON.parse(blob.slice(4)), rewrap: false }
+      ? {
+          ok: true,
+          config: JSON.parse(Buffer.from(blob.slice(4), 'base64').toString()),
+          rewrap: false,
+        }
       : { ok: false, reason: 'no-key' }
   ),
 }));
@@ -68,7 +75,7 @@ function makeRow(overrides: Partial<RequestServiceRow> = {}): RequestServiceRow 
     type: 'seerr',
     name: 'Beckon Requests',
     url: 'http://seerr.local:5055',
-    config: 'enc:{"apiKey":"k"}',
+    config: 'enc:eyJhcGlLZXkiOiJrIn0=',
     configStatus: 'ok',
     enabled: true,
     remoteServerId: 'abc',
@@ -101,8 +108,8 @@ describe('request service store', () => {
       version: 'develop-4fc2',
     });
     const values = chain.values.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(values.config).toBe('enc:{"apiKey":"k"}');
-    expect(JSON.stringify(values)).not.toContain('"apiKey":"k"');
+    expect(values.config).toBe('enc:eyJhcGlLZXkiOiJrIn0=');
+    expect(values.config).not.toContain('apiKey');
     expect(mockPublish).toHaveBeenCalledWith('requests:changed', { serviceId: 'svc-1' });
   });
 

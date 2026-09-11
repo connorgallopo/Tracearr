@@ -9,23 +9,48 @@ function rows(list: Record<string, unknown>[]) {
   return { rows: list };
 }
 
+function sqlTextOf(query: unknown): string {
+  return JSON.stringify(query);
+}
+
+/**
+ * Dispatches by which table/predicate the query targets instead of a fixed
+ * call order: `resolveRequests` skips a lookup entirely when its id set is
+ * empty, so the four queries are not always issued, and in what order.
+ */
+function routeByQuery(
+  routes: {
+    movie?: Record<string, unknown>[];
+    show?: Record<string, unknown>[];
+    ratingKey?: Record<string, unknown>[];
+    requester?: Record<string, unknown>[];
+  } = {}
+) {
+  mockExecute.mockImplementation(async (query: unknown) => {
+    const text = sqlTextOf(query);
+    if (text.includes("media_type = 'movie'")) return rows(routes.movie ?? []);
+    if (text.includes("media_type = 'show'")) return rows(routes.show ?? []);
+    if (text.includes('library_items')) return rows(routes.ratingKey ?? []);
+    if (text.includes('server_users')) return rows(routes.requester ?? []);
+    throw new Error(`unexpected query: ${text}`);
+  });
+}
+
 describe('resolveRequests', () => {
-  beforeEach(() => mockExecute.mockReset());
+  beforeEach(() => {
+    mockExecute.mockReset();
+  });
 
   it('matches movies by tmdb, shows by tvdb, and requesters by plex account id on plex', async () => {
-    mockExecute
-      .mockResolvedValueOnce(
-        rows([
-          { tmdb_id: 10, tvdb_id: null, media_type: 'movie', id: 'm-1', title: 'Dune', year: 2021 },
-        ])
-      )
-      .mockResolvedValueOnce(
-        rows([
-          { tmdb_id: 20, tvdb_id: 200, media_type: 'show', id: 'm-2', title: 'Korra', year: 2012 },
-        ])
-      )
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(rows([{ key: '1577033', id: 'su-1' }]));
+    routeByQuery({
+      movie: [
+        { tmdb_id: 10, tvdb_id: null, media_type: 'movie', id: 'm-1', title: 'Dune', year: 2021 },
+      ],
+      show: [
+        { tmdb_id: 20, tvdb_id: 200, media_type: 'show', id: 'm-2', title: 'Korra', year: 2012 },
+      ],
+      requester: [{ key: '1577033', id: 'su-1' }],
+    });
 
     const result = await resolveRequests('svc', 'srv', 'plex', [
       {
@@ -73,13 +98,9 @@ describe('resolveRequests', () => {
   });
 
   it('falls back to the rating key on the linked server', async () => {
-    mockExecute
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(
-        rows([{ rating_key: '206250', media_id: 'm-9', title: 'Late', year: 2026 }])
-      )
-      .mockResolvedValueOnce(rows([]));
+    routeByQuery({
+      ratingKey: [{ rating_key: '206250', media_id: 'm-9', title: 'Late', year: 2026 }],
+    });
     const result = await resolveRequests('svc', 'srv', 'plex', [
       {
         remoteId: 7,
@@ -96,11 +117,9 @@ describe('resolveRequests', () => {
   });
 
   it('matches requesters by external id on jellyfin and emby', async () => {
-    mockExecute
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(rows([]))
-      .mockResolvedValueOnce(rows([{ key: 'jf-abc', id: 'su-7' }]));
+    routeByQuery({
+      requester: [{ key: 'jf-abc', id: 'su-7' }],
+    });
     const result = await resolveRequests('svc', 'srv', 'jellyfin', [
       {
         remoteId: 1,
@@ -113,5 +132,21 @@ describe('resolveRequests', () => {
       },
     ]);
     expect(result.get(1)?.serverUserId).toBe('su-7');
+  });
+
+  it('skips a lookup entirely when its id set is empty', async () => {
+    routeByQuery();
+    await resolveRequests('svc', 'srv', 'plex', [
+      {
+        remoteId: 1,
+        mediaType: 'movie',
+        tmdbId: null,
+        tvdbId: null,
+        ratingKey: null,
+        remotePlexId: null,
+        remoteJellyfinUserId: null,
+      },
+    ]);
+    expect(mockExecute).not.toHaveBeenCalled();
   });
 });

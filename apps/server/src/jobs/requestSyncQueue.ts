@@ -1,5 +1,4 @@
 import { Queue, Worker, type ConnectionOptions, type Job } from 'bullmq';
-import type { Redis } from 'ioredis';
 import { TIME_MS } from '@tracearr/shared';
 import { runRequestSync, type SyncMode } from '../services/requests/sync.js';
 import { listRequestServices } from '../services/requests/store.js';
@@ -18,11 +17,7 @@ let connectionOptions: ConnectionOptions | null = null;
 let queue: Queue<RequestSyncJobData> | null = null;
 let worker: Worker<RequestSyncJobData> | null = null;
 
-export function initRequestSyncQueue(
-  redisUrl: string,
-  _redis: Redis,
-  _publishFn: (event: string, data: unknown) => Promise<void>
-): void {
+export function initRequestSyncQueue(redisUrl: string): void {
   if (queue) return;
   connectionOptions = queueConnectionOptions(redisUrl);
   queue = new Queue<RequestSyncJobData>(QUEUE_NAME, {

@@ -68,13 +68,7 @@ async function fetchRows(
       }
       rows.push(row);
     }
-    const shortPage = mode === 'incremental' && result.results.length < PAGE_SIZE;
-    if (
-      reachedCursor ||
-      shortPage ||
-      result.results.length === 0 ||
-      page + 1 >= result.pageInfo.pages
-    )
+    if (reachedCursor || result.results.length < PAGE_SIZE || page + 1 >= result.pageInfo.pages)
       break;
   }
   return rows;
@@ -155,7 +149,7 @@ async function markMissingDeleted(serviceId: string, seenRemoteIds: number[]): P
   const result = await db.execute(sql`
     UPDATE media_requests SET deleted_at = now(), updated_at = now()
     WHERE service_id = ${serviceId} AND deleted_at IS NULL
-      AND NOT (remote_id = ANY(${seenRemoteIds}::int[]))
+      AND NOT (remote_id = ANY(${sql.param(seenRemoteIds)}::int[]))
   `);
   return result.rowCount ?? 0;
 }
@@ -206,8 +200,9 @@ export async function runRequestSync(
 
     const remote = await fetchRows(client, mode, row.syncCursor);
     const upserted = await upsertAll(row, client, remote);
+    // A transient empty first page must not wipe every request the service still has upstream.
     const markedDeleted =
-      mode === 'full'
+      mode === 'full' && !(remote.length === 0 && counts.total > 0)
         ? await markMissingDeleted(
             row.id,
             remote.map((r) => r.id)

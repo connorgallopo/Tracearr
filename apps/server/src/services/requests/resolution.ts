@@ -36,9 +36,10 @@ function uniqueStrings(values: (string | null | undefined)[]): string[] {
 
 async function moviesByTmdb(ids: number[]): Promise<Map<number, MediaHit>> {
   const out = new Map<number, MediaHit>();
+  if (ids.length === 0) return out;
   const result = await db.execute(sql`
     SELECT tmdb_id, id, title, year FROM media
-    WHERE media_type = 'movie' AND merged_into_id IS NULL AND tmdb_id = ANY(${ids}::int[])
+    WHERE media_type = 'movie' AND merged_into_id IS NULL AND tmdb_id = ANY(${sql.param(ids)}::int[])
   `);
   for (const row of result.rows as {
     tmdb_id: number;
@@ -57,10 +58,11 @@ async function showsByIds(
 ): Promise<{ byTvdb: Map<number, MediaHit>; byTmdb: Map<number, MediaHit> }> {
   const byTvdb = new Map<number, MediaHit>();
   const byTmdb = new Map<number, MediaHit>();
+  if (tvdbIds.length === 0 && tmdbIds.length === 0) return { byTvdb, byTmdb };
   const result = await db.execute(sql`
     SELECT tmdb_id, tvdb_id, id, title, year FROM media
     WHERE media_type = 'show' AND merged_into_id IS NULL
-      AND (tvdb_id = ANY(${tvdbIds}::int[]) OR tmdb_id = ANY(${tmdbIds}::int[]))
+      AND (tvdb_id = ANY(${sql.param(tvdbIds)}::int[]) OR tmdb_id = ANY(${sql.param(tmdbIds)}::int[]))
   `);
   for (const row of result.rows as {
     tmdb_id: number | null;
@@ -78,11 +80,12 @@ async function showsByIds(
 
 async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string, MediaHit>> {
   const out = new Map<string, MediaHit>();
+  if (keys.length === 0) return out;
   const result = await db.execute(sql`
     SELECT li.rating_key, m.id AS media_id, m.title, m.year
     FROM library_items li
     JOIN media m ON m.id = COALESCE((SELECT merged_into_id FROM media WHERE id = li.media_id), li.media_id)
-    WHERE li.server_id = ${serverId} AND li.rating_key = ANY(${keys}::text[])
+    WHERE li.server_id = ${serverId} AND li.rating_key = ANY(${sql.param(keys)}::text[])
   `);
   for (const row of result.rows as {
     rating_key: string;
@@ -101,10 +104,11 @@ async function requesters(
   keys: string[]
 ): Promise<Map<string, string>> {
   const out = new Map<string, string>();
+  if (keys.length === 0) return out;
   const column = serverType === 'plex' ? sql`plex_account_id` : sql`external_id`;
   const result = await db.execute(sql`
     SELECT ${column} AS key, id FROM server_users
-    WHERE server_id = ${serverId} AND ${column} = ANY(${keys}::text[])
+    WHERE server_id = ${serverId} AND ${column} = ANY(${sql.param(keys)}::text[])
   `);
   for (const row of result.rows as { key: string; id: string }[]) out.set(row.key, row.id);
   return out;

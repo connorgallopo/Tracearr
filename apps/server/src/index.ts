@@ -1005,7 +1005,7 @@ async function initializeServices(app: FastifyInstance) {
   }
 
   try {
-    initRequestSyncQueue(redisUrl, app.redis, pubSubService.publish.bind(pubSubService));
+    initRequestSyncQueue(redisUrl);
     startRequestSyncWorker();
     scheduleRequestSync().catch((err) => {
       app.log.error({ err }, 'Failed to schedule request sync');

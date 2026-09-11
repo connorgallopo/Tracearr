@@ -21,7 +21,7 @@ vi.mock('../serverLookup.js', () => ({
   serverTypeById: vi.fn(async () => 'plex'),
 }));
 
-import { runRequestSync } from '../sync.js';
+import { PAGE_SIZE, runRequestSync } from '../sync.js';
 
 const counts = {
   total: 1,
@@ -156,13 +156,17 @@ describe('runRequestSync', () => {
 
   it('full mode walks every page and marks missing rows deleted without hard deletes', async () => {
     store.getRequestService.mockResolvedValue(serviceRow());
-    const c = client([
-      [request(1, '2026-09-03T00:00:00.000Z')],
-      [request(2, '2026-09-02T00:00:00.000Z')],
-    ]);
+    // A full-size first page mirrors the real API's contract: a page shorter than
+    // requested means no more data, so the fixture must fill it to prove paging
+    // continues past a genuinely full page.
+    const page0 = Array.from({ length: PAGE_SIZE }, (_, i) =>
+      request(i + 1, '2026-09-03T00:00:00.000Z')
+    );
+    const page1 = [request(PAGE_SIZE + 1, '2026-09-02T00:00:00.000Z')];
+    const c = client([page0, page1]);
     const result = await runRequestSync('svc', 'full', { clientFor: () => c });
     expect(c.requestsPage).toHaveBeenCalledTimes(2);
-    expect(result.upserted).toBe(2);
+    expect(result.upserted).toBe(PAGE_SIZE + 1);
     const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
     expect(sqlText).toContain('deleted_at');
     expect(sqlText.toLowerCase()).not.toContain('delete from');
@@ -170,6 +174,15 @@ describe('runRequestSync', () => {
       'svc',
       expect.objectContaining({ lastFullSyncAt: expect.any(Date) })
     );
+  });
+
+  it('does not soft-delete every request when a full sync fetches zero rows but the service still reports requests', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    const c = client([]);
+    const result = await runRequestSync('svc', 'full', { clientFor: () => c });
+    expect(result.markedDeleted).toBe(0);
+    const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
+    expect(sqlText.toLowerCase()).not.toContain('deleted_at');
   });
 
   it('takes titles from matched media and looks up only unresolved rows', async () => {
