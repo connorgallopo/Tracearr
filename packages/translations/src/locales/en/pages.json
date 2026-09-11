@@ -2146,5 +2146,60 @@
       "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
       "loadError": "Couldn't load the catalog"
     }
+  },
+  "requests": {
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined",
+      "failed": "Failed",
+      "completed": "Available",
+      "deleted": "Removed"
+    },
+    "columns": {
+      "requester": "Requested by",
+      "title": "Title",
+      "status": "Status",
+      "requested": "Requested",
+      "wait": "Wait",
+      "seasons": "Seasons",
+      "watched": "Watched"
+    },
+    "wait": {
+      "pending": "still waiting",
+      "declined": "declined",
+      "landed": "landed {{duration}} later",
+      "sameMinute": "landed within a minute"
+    },
+    "seasons": {
+      "all": "All seasons",
+      "item": "S{{number}}"
+    },
+    "flags": {
+      "fourK": "4K request",
+      "auto": "Auto-requested from a watchlist"
+    },
+    "hero": {
+      "line": "Requested by {{name}} · {{date}} · {{tail}}"
+    },
+    "mediaPanel": {
+      "title": "Requests",
+      "loadError": "Couldn't load requests",
+      "empty": "No requests for this title"
+    },
+    "userCard": {
+      "title": "Requests",
+      "loadError": "Couldn't load requests",
+      "viewAll": "View all ({{count}} more)",
+      "showLess": "Show less",
+      "summary": {
+        "requests": "Requests",
+        "medianWait": "median wait {{duration}}",
+        "approvalRate": "Approval rate",
+        "neverWatched": "Never watched"
+      },
+      "empty": "No requests yet"
+    },
+    "unattributed": "Not on this server"
   }
 }
