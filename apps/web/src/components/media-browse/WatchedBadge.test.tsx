@@ -40,7 +40,8 @@ describe('WatchedBadge', () => {
     );
     const badge = container.firstElementChild;
     expect(badge).toHaveStyle({
-      background: 'conic-gradient(hsl(var(--warning)) 0 62%, hsl(var(--muted)) 62% 100%)',
+      background:
+        'conic-gradient(hsl(var(--warning)) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)',
     });
   });
 
@@ -50,7 +51,8 @@ describe('WatchedBadge', () => {
     );
     const badge = container.firstElementChild;
     expect(badge).toHaveStyle({
-      background: 'conic-gradient(hsl(var(--success)) 0 62%, hsl(var(--muted)) 62% 100%)',
+      background:
+        'conic-gradient(hsl(var(--success)) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)',
     });
   });
 

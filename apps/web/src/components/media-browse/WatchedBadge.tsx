@@ -78,7 +78,7 @@ export function WatchedBadge({ watchedState, watchedStateSelf, className }: Watc
           className
         )}
         style={{
-          background: `conic-gradient(hsl(var(${tone})) 0 62%, hsl(var(--muted)) 62% 100%)`,
+          background: `conic-gradient(hsl(var(${tone})) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)`,
         }}
       >
         <span className="sr-only">{t('media.posterCard.watchedState.partial')}</span>
