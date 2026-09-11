@@ -56,7 +56,9 @@ export function Connections() {
   const { refetch: refetchUser, user } = useAuth();
   const { serverConnectionStatuses } = useSocket();
   const isOwner = user?.role === 'owner';
-  const { data: requestServices } = useRequestServices({ enabled: isOwner });
+  const { data: requestServices, isLoading: requestServicesLoading } = useRequestServices({
+    enabled: isOwner,
+  });
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -275,7 +277,7 @@ export function Connections() {
                   isSyncing={syncServer.isPending && syncServer.variables === server.id}
                   isDraggable={isOwner}
                   requestService={
-                    isOwner
+                    isOwner && !requestServicesLoading
                       ? { service: requestServices?.find((s) => s.serverId === server.id) }
                       : undefined
                   }

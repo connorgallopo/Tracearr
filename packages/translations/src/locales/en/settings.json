@@ -979,6 +979,8 @@
       "apiKey": "API key",
       "apiKeyHint": "Seerr → Settings → General → API key",
       "apiKeyKeep": "Leave empty to keep the current key",
+      "showKey": "Show API key",
+      "hideKey": "Hide API key",
       "test": "Test",
       "testing": "Testing…",
       "save": "Save",

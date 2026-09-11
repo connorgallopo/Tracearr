@@ -177,14 +177,14 @@ export function RequestServiceLine({
       {service.lastSyncError !== null && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <p className="text-destructive line-clamp-1 text-xs">
+            <button type="button" className="text-destructive line-clamp-1 text-left text-xs">
               {service.lastSyncAt === null
                 ? t('requests.lastErrorNoTime', { error: service.lastSyncError })
                 : t('requests.lastError', {
                     ago: safeFormatDistanceToNow(service.lastSyncAt),
                     error: service.lastSyncError,
                   })}
-            </p>
+            </button>
           </TooltipTrigger>
           <TooltipContent>{service.lastSyncError}</TooltipContent>
         </Tooltip>
@@ -217,7 +217,9 @@ function VersionText({ version }: { version: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="text-muted-foreground">{short}</span>
+        <button type="button" className="text-muted-foreground">
+          {short}
+        </button>
       </TooltipTrigger>
       <TooltipContent>{version}</TooltipContent>
     </Tooltip>

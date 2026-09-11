@@ -139,7 +139,9 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
                 <InputGroupButton
                   size="icon-xs"
                   tabIndex={-1}
-                  aria-label={keyVisible ? 'Hide password' : 'Show password'}
+                  aria-label={
+                    keyVisible ? t('requests.dialog.hideKey') : t('requests.dialog.showKey')
+                  }
                   onClick={() => setKeyVisible((visible) => !visible)}
                 >
                   {keyVisible ? <EyeOff /> : <Eye />}
