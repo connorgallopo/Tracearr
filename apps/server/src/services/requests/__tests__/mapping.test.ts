@@ -82,6 +82,14 @@ describe('mapSeerrRequest', () => {
     expect(Object.keys(mapped)).not.toContain('email');
   });
 
+  it('falls back to the jellyfin item id when seerr sends no plex rating key', () => {
+    const mapped = mapSeerrRequest({
+      ...base,
+      media: { ...base.media, ratingKey: null, jellyfinMediaId: 'a1b2c3d4e5f6' },
+    });
+    expect(mapped.ratingKey).toBe('a1b2c3d4e5f6');
+  });
+
   it('stores null seasons for movies', () => {
     expect(mapSeerrRequest({ ...base, type: 'movie', seasons: [] }).seasons).toBeNull();
   });

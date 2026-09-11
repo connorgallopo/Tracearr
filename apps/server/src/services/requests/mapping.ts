@@ -71,7 +71,7 @@ export function mapSeerrRequest(row: SeerrRequest): MappedRequest {
     tmdbId: row.media.tmdbId ?? null,
     tvdbId: row.media.tvdbId ?? null,
     imdbId: row.media.imdbId ?? null,
-    ratingKey: row.media.ratingKey ?? null,
+    ratingKey: row.media.ratingKey ?? row.media.jellyfinMediaId ?? null,
     remoteUserId: row.requestedBy.id,
     remoteUsername: row.requestedBy.displayName,
     remotePlexId: row.requestedBy.plexId != null ? String(row.requestedBy.plexId) : null,
