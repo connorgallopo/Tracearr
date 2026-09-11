@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import type { RequestService, RequestServiceProbeResult, Server } from '@tracearr/shared';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,6 +21,9 @@ import {
   useTestRequestService,
   useUpdateRequestService,
 } from '@/hooks/queries';
+import { shortVersion } from './requestServiceFormat';
+
+const TEST_RESULT_ID = 'request-service-test-result';
 
 interface LinkDialogProps {
   open: boolean;
@@ -98,7 +102,7 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
               ? t('requests.dialog.titleEdit')
               : t('requests.dialog.titleLink', { server: server.name })}
           </DialogTitle>
-          <DialogDescription>{t('nav.descriptions.requests')}</DialogDescription>
+          <DialogDescription>{t('requests.dialog.description')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
@@ -110,6 +114,7 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
               onChange={(event) => setUrl(event.target.value)}
               placeholder="https://seerr.example.com"
               autoComplete="off"
+              aria-describedby={TEST_RESULT_ID}
             />
           </Field>
 
@@ -120,26 +125,44 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
               autoComplete="off"
+              aria-describedby={TEST_RESULT_ID}
             />
             <FieldDescription>
               {existing ? t('requests.dialog.apiKeyKeep') : t('requests.dialog.apiKeyHint')}
             </FieldDescription>
           </Field>
 
-          <TestResult server={server} servers={servers} tested={tested} matchedHere={matchedHere} />
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={runTest}
+                disabled={!trimmedUrl || !trimmedKey || testService.isPending}
+              >
+                {testService.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {testService.isPending ? t('requests.dialog.testing') : t('requests.dialog.test')}
+              </Button>
+            </div>
+            <output id={TEST_RESULT_ID} aria-live="polite" className="block">
+              <TestResult
+                server={server}
+                servers={servers}
+                tested={tested}
+                matchedHere={matchedHere}
+              />
+            </output>
+          </div>
         </div>
 
         <DialogFooter>
+          {needsTest && !proven && (
+            <span className="text-muted-foreground self-center text-xs">
+              {t('requests.dialog.saveHint')}
+            </span>
+          )}
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('common:actions.cancel')}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={runTest}
-            disabled={!trimmedUrl || !trimmedKey || testService.isPending}
-          >
-            {testService.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {testService.isPending ? t('requests.dialog.testing') : t('requests.dialog.test')}
           </Button>
           <Button onClick={save} disabled={!canSave}>
             {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -177,7 +200,7 @@ function TestResult({
       <p className="text-success text-sm">
         {t('requests.dialog.match', {
           title: tested.result.applicationTitle,
-          version: tested.result.version,
+          version: shortVersion(tested.result.version),
           type: capitalise(tested.result.mediaServerType),
           server: server.name,
         })}
@@ -188,19 +211,20 @@ function TestResult({
   const other = servers?.find((candidate) => candidate.id === tested.result?.matchedServerId);
 
   return (
-    <p className="text-destructive text-sm">
-      {[
-        t('requests.dialog.mismatch'),
-        t('requests.dialog.mismatchIds', {
+    <Alert variant="destructive">
+      <AlertTitle>
+        {other
+          ? t('requests.dialog.mismatchOther', { other: other.name })
+          : t('requests.dialog.mismatch')}
+      </AlertTitle>
+      <AlertDescription>
+        {t('requests.dialog.mismatchIds', {
           remote: tested.result.remoteServerId,
           server: server.name,
           local: server.machineIdentifier ?? '—',
-        }),
-        other ? t('requests.dialog.mismatchOther', { other: other.name }) : null,
-      ]
-        .filter((line) => line !== null)
-        .join(' ')}
-    </p>
+        })}
+      </AlertDescription>
+    </Alert>
   );
 }
 

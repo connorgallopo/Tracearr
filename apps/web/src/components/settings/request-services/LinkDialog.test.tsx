@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { RequestService, RequestServiceProbeResult, Server } from '@tracearr/shared';
 
@@ -108,6 +108,7 @@ describe('LinkDialog', () => {
 
     const save = screen.getByRole('button', { name: 'requests.dialog.save' });
     expect(save).toBeDisabled();
+    expect(screen.getByText('requests.dialog.saveHint')).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('requests.dialog.url'), 'https://seerr.example.com');
     await user.type(screen.getByLabelText('requests.dialog.apiKey'), 'key-1');
@@ -115,9 +116,36 @@ describe('LinkDialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'requests.dialog.test' }));
     expect(save).toBeEnabled();
+    expect(screen.queryByText('requests.dialog.saveHint')).not.toBeInTheDocument();
 
     await user.type(screen.getByLabelText('requests.dialog.url'), '/extra');
     expect(save).toBeDisabled();
+  });
+
+  it('sits the test button with the fields rather than in the footer', () => {
+    renderDialog();
+
+    expect(
+      screen
+        .getByRole('button', { name: 'requests.dialog.test' })
+        .closest('[data-slot=dialog-footer]')
+    ).toBeNull();
+  });
+
+  it('announces the test result and points both fields at it', () => {
+    renderDialog();
+
+    const region = screen.getByRole('status');
+    expect(region).toHaveAttribute('id', 'request-service-test-result');
+    expect(region).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByLabelText('requests.dialog.url')).toHaveAttribute(
+      'aria-describedby',
+      'request-service-test-result'
+    );
+    expect(screen.getByLabelText('requests.dialog.apiKey')).toHaveAttribute(
+      'aria-describedby',
+      'request-service-test-result'
+    );
   });
 
   it('creates the link with the tested url and key', async () => {
@@ -135,7 +163,7 @@ describe('LinkDialog', () => {
     );
   });
 
-  it('names both ids and the server it does match on a mismatch', async () => {
+  it('leads the mismatch alert with the server it does match and demotes the ids', async () => {
     const user = userEvent.setup();
     mockTest(probe({ matchedServerId: 'srv-2', remoteServerId: 'remote-zzz' }));
     renderDialog();
@@ -144,10 +172,12 @@ describe('LinkDialog', () => {
     await user.type(screen.getByLabelText('requests.dialog.apiKey'), 'key-1');
     await user.click(screen.getByRole('button', { name: 'requests.dialog.test' }));
 
-    expect(screen.getByText(/requests.dialog.mismatch\b/)).toBeInTheDocument();
-    expect(screen.getByText(/remote-zzz/)).toBeInTheDocument();
-    expect(screen.getByText(/local-abc/)).toBeInTheDocument();
-    expect(screen.getByText(/Jellyfin/)).toBeInTheDocument();
+    const alert = screen.getByRole('alert');
+    expect(
+      within(alert).getByText('requests.dialog.mismatchOther:{"other":"Jellyfin"}')
+    ).toBeInTheDocument();
+    expect(alert).toHaveTextContent(/remote-zzz/);
+    expect(alert).toHaveTextContent(/local-abc/);
     expect(screen.getByRole('button', { name: 'requests.dialog.save' })).toBeDisabled();
   });
 
