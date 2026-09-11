@@ -177,4 +177,24 @@ describe('RequestsTable', () => {
     );
     expect(container.querySelector('.bg-success, .bg-warning')).not.toBeInTheDocument();
   });
+
+  it('makes the 4K and auto-request flag tooltip triggers keyboard focusable', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[makeMediaEntry({ is4k: true, isAutoRequest: true })]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    const fourK = screen.getByLabelText('4K request');
+    expect(fourK).toHaveAttribute('tabIndex', '0');
+    fourK.focus();
+    expect(fourK).toHaveFocus();
+
+    const auto = screen.getByLabelText('Auto-requested from a watchlist');
+    expect(auto).toHaveAttribute('tabIndex', '0');
+  });
 });

@@ -61,10 +61,9 @@ function RequestFlags({ is4k, isAutoRequest }: { is4k: boolean; isAutoRequest: b
         {is4k && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <Sparkles
-                className="text-muted-foreground size-3.5"
-                aria-label={t('requests.flags.fourK')}
-              />
+              <span tabIndex={0} aria-label={t('requests.flags.fourK')} className="inline-flex">
+                <Sparkles aria-hidden="true" className="text-muted-foreground size-3.5" />
+              </span>
             </TooltipTrigger>
             <TooltipContent>{t('requests.flags.fourK')}</TooltipContent>
           </Tooltip>
@@ -72,10 +71,9 @@ function RequestFlags({ is4k, isAutoRequest }: { is4k: boolean; isAutoRequest: b
         {isAutoRequest && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <ListPlus
-                className="text-muted-foreground size-3.5"
-                aria-label={t('requests.flags.auto')}
-              />
+              <span tabIndex={0} aria-label={t('requests.flags.auto')} className="inline-flex">
+                <ListPlus aria-hidden="true" className="text-muted-foreground size-3.5" />
+              </span>
             </TooltipTrigger>
             <TooltipContent>{t('requests.flags.auto')}</TooltipContent>
           </Tooltip>
@@ -116,7 +114,7 @@ function UserLeadingCell({ row }: { row: UserRequestEntry }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Icon className="text-muted-foreground size-4 shrink-0" />
+      <Icon aria-hidden="true" className="text-muted-foreground size-4 shrink-0" />
       {row.media.mediaId !== null ? (
         <Link to={`/media/${row.media.mediaId}`} className="truncate font-medium hover:underline">
           {title}
