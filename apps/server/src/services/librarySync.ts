@@ -118,6 +118,13 @@ const COUNT_MISMATCH_RATIO = 0.01;
 /** Music-type library sections: their server totalCount spans a different item universe than we store, so the undercount check is skipped for them. */
 const MUSIC_LIBRARY_TYPES = new Set(['music', 'artist']);
 
+/**
+ * Bump when the listing query changes shape. A library stamped with an older
+ * version gets one forced full scan, so items the old query left out come back
+ * without anyone running a manual sync.
+ */
+const LIBRARY_SCAN_VERSION = 1;
+
 // Auto-handoff throttles for the compressed-history identity backfill. The
 // probe decompress-scans all compressed history when it comes back false (the
 // steady state - media_id is in neither segmentby nor orderby), so it must
@@ -569,7 +576,11 @@ export class LibrarySyncService {
     const isMusicLibrary = MUSIC_LIBRARY_TYPES.has(libraryType.toLowerCase());
 
     // Fetch total count first
-    const { totalCount } = await client.getLibraryItems(libraryId, { offset: 0, limit: 1 });
+    const { totalCount } = await client.getLibraryItems(libraryId, {
+      offset: 0,
+      limit: 1,
+      libraryType,
+    });
 
     // Load sync state from Redis
     const syncState = await this.getSyncState(serverId, libraryId);
@@ -605,7 +616,9 @@ export class LibrarySyncService {
     const fullScanDue =
       syncState.lastFullScanAt !== null &&
       Date.now() - syncState.lastFullScanAt.getTime() >= FULL_SCAN_MAX_AGE_MS;
-    const forceFullScan = triggeredBy === 'manual' || fullScanDue || overcountMismatch;
+    const scanQueryChanged = syncState.scanVersion !== LIBRARY_SCAN_VERSION;
+    const forceFullScan =
+      triggeredBy === 'manual' || fullScanDue || overcountMismatch || scanQueryChanged;
 
     const isIncremental =
       syncState.lastSyncedAt !== null &&
@@ -630,9 +643,11 @@ export class LibrarySyncService {
             ? `local active count exceeds server total (local ${localActiveCount} vs server ${totalCount})`
             : forceFullScan && triggeredBy === 'manual'
               ? 'manual trigger'
-              : forceFullScan
-                ? `periodic full scan (last full scan ${fullScanAgeHours}h ago)`
-                : 'unknown';
+              : scanQueryChanged
+                ? 'listing query changed since the last full scan'
+                : forceFullScan
+                  ? `periodic full scan (last full scan ${fullScanAgeHours}h ago)`
+                  : 'unknown';
       console.log(`[LibrarySync] Full sync for ${libraryName}: ${reason}`);
     }
 
@@ -660,7 +675,8 @@ export class LibrarySyncService {
       try {
         const { items: newItems, totalCount: incrementalCount } = await client.getLibraryItemsSince(
           libraryId,
-          syncState.lastSyncedAt!
+          syncState.lastSyncedAt!,
+          { libraryType }
         );
 
         // Check for new episodes/tracks independently — new episodes can arrive
@@ -866,6 +882,7 @@ export class LibrarySyncService {
       const { items, rawCount } = await client.getLibraryItems(libraryId, {
         offset,
         limit: BATCH_SIZE,
+        libraryType,
       });
 
       // A page that's all extras parses to zero items even though the server page
@@ -1120,7 +1137,11 @@ export class LibrarySyncService {
 
     // Calculate delta
     const addedKeys = [...currentKeys].filter((k) => !previousKeys.has(k));
-    const removedKeys = [...previousKeys].filter((k) => !currentKeys.has(k));
+    const removedKeys = await this.confirmRemovals(
+      client,
+      { id: libraryId, name: libraryName, type: libraryType },
+      [...previousKeys].filter((k) => !currentKeys.has(k))
+    );
 
     // Mark removed items (delete from database)
     if (removedKeys.length > 0) {
@@ -1239,6 +1260,7 @@ export class LibrarySyncService {
     lastItemCount: number | null;
     lastFullScanAt: Date | null;
     acceptedShortfall: number;
+    scanVersion: number | null;
   }> {
     if (!redisClient)
       return {
@@ -1246,13 +1268,15 @@ export class LibrarySyncService {
         lastItemCount: null,
         lastFullScanAt: null,
         acceptedShortfall: 0,
+        scanVersion: null,
       };
 
-    const [lastStr, countStr, fullScanStr, shortfallStr] = await Promise.all([
+    const [lastStr, countStr, fullScanStr, shortfallStr, scanVersionStr] = await Promise.all([
       redisClient.get(REDIS_KEYS.LIBRARY_SYNC_LAST(serverId, libraryId)),
       redisClient.get(REDIS_KEYS.LIBRARY_SYNC_COUNT(serverId, libraryId)),
       redisClient.get(REDIS_KEYS.LIBRARY_SYNC_FULL_SCAN_AT(serverId, libraryId)),
       redisClient.get(REDIS_KEYS.LIBRARY_SYNC_SHORTFALL(serverId, libraryId)),
+      redisClient.get(REDIS_KEYS.LIBRARY_SYNC_SCAN_VERSION(serverId, libraryId)),
     ]);
 
     return {
@@ -1260,6 +1284,7 @@ export class LibrarySyncService {
       lastItemCount: countStr ? parseInt(countStr, 10) : null,
       lastFullScanAt: fullScanStr ? new Date(fullScanStr) : null,
       acceptedShortfall: shortfallStr ? parseInt(shortfallStr, 10) : 0,
+      scanVersion: scanVersionStr ? parseInt(scanVersionStr, 10) : null,
     };
   }
 
@@ -1299,6 +1324,12 @@ export class LibrarySyncService {
       redisClient.set(
         REDIS_KEYS.LIBRARY_SYNC_FULL_SCAN_AT(serverId, libraryId),
         lastFullScanAt.toISOString(),
+        'EX',
+        SYNC_STATE_TTL
+      ),
+      redisClient.set(
+        REDIS_KEYS.LIBRARY_SYNC_SCAN_VERSION(serverId, libraryId),
+        String(LIBRARY_SCAN_VERSION),
         'EX',
         SYNC_STATE_TTL
       ),
@@ -2155,6 +2186,37 @@ export class LibrarySyncService {
       );
 
     return new Set(rows.map((r) => r.ratingKey));
+  }
+
+  /**
+   * A listing can leave out items the server still has (Jellyfin 12 folded
+   * collection members into their box set), so every key the scan did not see
+   * is checked by id before it is tombstoned. When the check itself fails the
+   * items stay until the next scan.
+   */
+  private async confirmRemovals(
+    client: ReturnType<typeof createMediaServerClient>,
+    library: { id: string; name: string; type: string },
+    missingKeys: string[]
+  ): Promise<string[]> {
+    if (missingKeys.length === 0 || !client.findExistingRatingKeys) return missingKeys;
+
+    let stillPresent: Set<string>;
+    try {
+      stillPresent = await client.findExistingRatingKeys(missingKeys, library);
+    } catch (err) {
+      console.warn(
+        `[LibrarySync] ${library.name}: could not confirm ${missingKeys.length} removals, keeping the items until the next scan:`,
+        err
+      );
+      return [];
+    }
+    if (stillPresent.size > 0) {
+      console.warn(
+        `[LibrarySync] ${library.name}: listing left out ${stillPresent.size} of ${missingKeys.length} missing items the server still has - keeping them`
+      );
+    }
+    return missingKeys.filter((k) => !stillPresent.has(k));
   }
 
   /**

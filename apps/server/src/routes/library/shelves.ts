@@ -198,10 +198,11 @@ interface ValueCandidate {
 
 /**
  * Top-SHELF_LIMIT canonical titles of one type by plays within the window,
- * tiebreak viewers desc then watch_time desc. Candidates ranked from the
+ * tiebreak viewers desc then watch_time desc. Candidates come from the
  * windowed value_rollup CTE first, then a single detail lookup batches the
  * display fields for just those candidates (mirrors the catalog page-query
- * candidate/detail split).
+ * candidate/detail split). Ranks are numbered after the detail lookup, which
+ * drops candidates with no active library copy.
  */
 async function fetchMostPopular(
   type: 'movie' | 'show',
@@ -250,16 +251,16 @@ async function fetchMostPopular(
   );
 
   const result: CachedMostPopularRow[] = [];
-  candidates.forEach((candidate, index) => {
+  for (const candidate of candidates) {
     const detail = detailById.get(candidate.canonicalId);
-    if (!detail) return;
+    if (!detail) continue;
     result.push({
       ...toShelfRowBase(detail),
       plays: candidate.plays,
       viewers: candidate.viewers,
-      rank: index + 1,
+      rank: result.length + 1,
     });
-  });
+  }
   return result;
 }
 

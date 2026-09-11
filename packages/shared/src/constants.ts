@@ -214,6 +214,9 @@ export const REDIS_KEYS = {
   // Accepted structural shortfall from the last full scan - see COUNT_MISMATCH_* in librarySync.ts
   LIBRARY_SYNC_SHORTFALL: (serverId: string, libraryId: string) =>
     `${_redisPrefix}tracearr:library:sync:shortfall:${serverId}:${libraryId}`,
+  // Shape of the listing query the last full scan used - see LIBRARY_SCAN_VERSION in librarySync.ts
+  LIBRARY_SYNC_SCAN_VERSION: (serverId: string, libraryId: string) =>
+    `${_redisPrefix}tracearr:library:sync:scanversion:${serverId}:${libraryId}`,
   // Image precache watermark state (per server, not per library - the precache
   // job walks library_items scoped only by server)
   LIBRARY_PRECACHE_WATERMARK: (serverId: string) =>

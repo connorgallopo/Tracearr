@@ -483,7 +483,8 @@ export interface IMediaServerClient {
    * with quality metadata and external IDs when available.
    *
    * @param libraryId - The library identifier
-   * @param options - Pagination options
+   * @param options - Pagination options; libraryType lets the client narrow the
+   *   listing to the item types that library holds
    * @returns Promise with items array and total count for pagination. rawCount, when
    *   present, is the page's item count before any client-side filtering (e.g. extras) -
    *   callers should use it instead of items.length to decide whether pagination is
@@ -495,8 +496,19 @@ export interface IMediaServerClient {
     options?: {
       offset?: number;
       limit?: number;
+      libraryType?: string;
     }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number }>;
+
+  /**
+   * Which of the given rating keys the server still has as items of this
+   * library. Optional - the full scan uses it to confirm that an item missing
+   * from the listing is gone before tombstoning it.
+   */
+  findExistingRatingKeys?(
+    ratingKeys: string[],
+    library: { id: string; type: string }
+  ): Promise<Set<string>>;
 
   /**
    * Get all leaf items (episodes) from a library with pagination support
@@ -529,7 +541,7 @@ export interface IMediaServerClient {
   getLibraryItemsSince?(
     libraryId: string,
     since: Date,
-    options?: { offset?: number; limit?: number }
+    options?: { offset?: number; limit?: number; libraryType?: string }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
 
   /**

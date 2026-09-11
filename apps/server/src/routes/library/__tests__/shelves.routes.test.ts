@@ -312,6 +312,35 @@ describe('GET /library/shelves', () => {
     expect(body.meta).toEqual({ movies: 5, shows: 2, totalFileSize: 1000 });
   });
 
+  it('numbers popular ranks after dropping candidates with no active copy', async () => {
+    const redis = createSpyRedis();
+    app = await buildTestApp(createOwnerUser(), redis);
+    const goneId = randomUUID();
+    const movieId = randomUUID();
+
+    dbExecute.mockImplementation(((query: unknown) => {
+      const { text } = renderQuery(query);
+      if (isMostPopularCandidates(text) && isMovieGuard(text)) {
+        return Promise.resolve({
+          rows: [
+            { canonical_id: goneId, plays: '9', viewers: '3' },
+            { canonical_id: movieId, plays: '5', viewers: '2' },
+          ],
+        });
+      }
+      if (isDetailQuery(text) && text.includes(movieId)) {
+        return Promise.resolve({ rows: [rawShelfRow({ id: movieId, media_type: 'movie' })] });
+      }
+      return Promise.resolve({ rows: [] });
+    }) as never);
+
+    const response = await app.inject({ method: 'GET', url: '/library/shelves' });
+    expect(response.statusCode).toBe(200);
+    const body: ShelvesResponse = response.json();
+
+    expect(body.mostPopularMovies.map((row) => [row.mediaId, row.rank])).toEqual([[movieId, 1]]);
+  });
+
   it('caches the computed response per (scope, period) and serves it back verbatim on a hit', async () => {
     const redis = createSpyRedis();
     const owner = createOwnerUser();

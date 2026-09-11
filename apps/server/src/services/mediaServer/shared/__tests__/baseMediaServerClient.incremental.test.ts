@@ -80,9 +80,20 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       await client.getLibraryItemsSince('lib-1', new Date());
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
-      expect(calledUrl).toContain(
-        'IncludeItemTypes=Movie%2CSeries%2CMusicArtist%2CMusicAlbum%2CAudio'
-      );
+      expect(calledUrl).toContain('IncludeItemTypes=Movie%2CSeries%2CMusicAlbum%2CAudio');
+    });
+
+    it('narrows IncludeItemTypes to the library type and keeps collection members listed', async () => {
+      mockFetchJson.mockResolvedValue(makeItemsResponse());
+
+      const client = makeClient();
+      await client.getLibraryItemsSince('lib-1', new Date(), { libraryType: 'movies' });
+      await client.getLibraryItemsSince('lib-2', new Date(), { libraryType: 'music' });
+
+      const [moviesUrl, musicUrl] = mockFetchJson.mock.calls.map((call) => call[0] as string);
+      expect(moviesUrl).toContain('IncludeItemTypes=Movie&');
+      expect(moviesUrl).toContain('CollapseBoxSetItems=false');
+      expect(musicUrl).toContain('IncludeItemTypes=MusicArtist%2CMusicAlbum%2CAudio');
     });
 
     it('includes IsMissing=false', async () => {
@@ -370,6 +381,55 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       expect(mockFetchJson).toHaveBeenCalledTimes(3);
       const secondUrl = mockFetchJson.mock.calls[1]?.[0] as string;
       expect(secondUrl).toContain('StartIndex=200');
+    });
+  });
+
+  describe('getLibraryItems', () => {
+    it('lists only the library type and keeps collection members listed', async () => {
+      mockFetchJson.mockResolvedValue(makeItemsResponse());
+
+      const client = makeClient();
+      await client.getLibraryItems('lib-1', { offset: 0, limit: 200, libraryType: 'tvshows' });
+
+      const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
+      expect(calledUrl).toContain('IncludeItemTypes=Series&');
+      expect(calledUrl).toContain('CollapseBoxSetItems=false');
+    });
+  });
+
+  describe('findExistingRatingKeys', () => {
+    it('returns the ids the server still has, dropping virtual items', async () => {
+      mockFetchJson.mockResolvedValue({
+        Items: [
+          { Id: 'a', LocationType: 'FileSystem' },
+          { Id: 'b', LocationType: 'Virtual' },
+        ],
+      });
+
+      const client = makeClient();
+      const existing = await client.findExistingRatingKeys(['a', 'b', 'c'], {
+        id: 'lib-1',
+        type: 'tvshows',
+      });
+
+      expect([...existing]).toEqual(['a']);
+      const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
+      expect(calledUrl).toContain('Ids=a%2Cb%2Cc');
+      expect(calledUrl).toContain('IncludeItemTypes=Series%2CSeason%2CEpisode');
+      expect(calledUrl).toContain('IsMissing=false');
+    });
+
+    it('looks ids up in batches of 100 without dropping any', async () => {
+      mockFetchJson.mockResolvedValue({ Items: [] });
+      const keys = Array.from({ length: 150 }, (_, i) => String(i));
+
+      const client = makeClient();
+      await client.findExistingRatingKeys(keys, { id: 'lib-1', type: 'movies' });
+
+      const sentIds = mockFetchJson.mock.calls.map((call) =>
+        new URL(call[0] as string).searchParams.get('Ids')?.split(',')
+      );
+      expect(sentIds).toEqual([keys.slice(0, 100), keys.slice(100)]);
     });
   });
 });
