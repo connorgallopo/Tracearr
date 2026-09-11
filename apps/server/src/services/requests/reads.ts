@@ -41,9 +41,9 @@ interface RequestBaseRow {
   media_id: string | null;
   media_type: MediaRequestMediaType;
   status: MediaRequestStatus;
-  requested_at: Date;
-  available_at: Date | null;
-  deleted_at: Date | null;
+  requested_at: Date | string;
+  available_at: Date | string | null;
+  deleted_at: Date | string | null;
   seasons: RequestSeason[] | null;
   is_4k: boolean;
   is_auto_request: boolean;
@@ -123,8 +123,13 @@ async function watchedStatesFor(
   return out;
 }
 
+/** node-postgres hands raw-query timestamps back as strings, the same coercion the v2 history rows do. */
+function at(value: Date | string): Date {
+  return value instanceof Date ? value : new Date(value);
+}
+
 function waitMs(row: RequestBaseRow): number | null {
-  return row.available_at ? row.available_at.getTime() - row.requested_at.getTime() : null;
+  return row.available_at ? at(row.available_at).getTime() - at(row.requested_at).getTime() : null;
 }
 
 function toLensRow(row: RequestBaseRow): WatchedLensRow {
@@ -141,10 +146,10 @@ function baseEntry(row: RequestBaseRow, watchedState: WatchedState) {
     id: row.id,
     serverId: row.server_id,
     status: row.status,
-    requestedAt: row.requested_at.toISOString(),
-    availableAt: row.available_at?.toISOString() ?? null,
+    requestedAt: at(row.requested_at).toISOString(),
+    availableAt: row.available_at ? at(row.available_at).toISOString() : null,
     waitMs: waitMs(row),
-    deletedAt: row.deleted_at?.toISOString() ?? null,
+    deletedAt: row.deleted_at ? at(row.deleted_at).toISOString() : null,
     seasons: row.seasons,
     is4k: row.is_4k,
     isAutoRequest: row.is_auto_request,
