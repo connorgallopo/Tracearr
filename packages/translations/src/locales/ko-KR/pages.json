@@ -2146,5 +2146,60 @@
       "emptyAnchored": "카탈로그를 불러올 수 없습니다.",
       "loadError": "카탈로그를 불러올 수 없습니다."
     }
+  },
+  "requests": {
+    "status": {
+      "pending": "",
+      "approved": "",
+      "declined": "",
+      "failed": "",
+      "completed": "",
+      "deleted": ""
+    },
+    "columns": {
+      "requester": "",
+      "title": "",
+      "status": "",
+      "requested": "",
+      "wait": "",
+      "seasons": "",
+      "watched": ""
+    },
+    "wait": {
+      "pending": "",
+      "declined": "",
+      "landed": "",
+      "sameMinute": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "flags": {
+      "fourK": "",
+      "auto": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "title": "",
+      "loadError": "",
+      "empty": ""
+    },
+    "userCard": {
+      "title": "",
+      "loadError": "",
+      "viewAll": "",
+      "showLess": "",
+      "summary": {
+        "requests": "",
+        "medianWait": "",
+        "approvalRate": "",
+        "neverWatched": ""
+      },
+      "empty": ""
+    },
+    "unattributed": ""
   }
 }
