@@ -2,13 +2,27 @@
  * E2E database/redis targets. Defaults point at the isolated 5433 test
  * container (docker/docker-compose.test.yml), never the live dev stack on
  * 5432/6379 - overridable for CI via E2E_DATABASE_URL / E2E_REDIS_URL.
+ *
+ * SHOWCASE=1 moves every default onto its own database and redis prefix, so
+ * the screenshot run (showcase/seed.ts) and the normal suite never share
+ * state; the guard below accepts exactly the name the flag selects.
  */
 
-export const REQUIRED_DB_NAME = 'tracearr_e2e';
+export const E2E_DB_NAME = 'tracearr_e2e';
+export const SHOWCASE_DB_NAME = 'tracearr_showcase';
+
+export function isShowcase(): boolean {
+  return (process.env.SHOWCASE ?? '') !== '';
+}
+
+export function requiredDatabaseName(): string {
+  return isShowcase() ? SHOWCASE_DB_NAME : E2E_DB_NAME;
+}
 
 export function e2eDatabaseUrl(): string {
   return (
-    process.env.E2E_DATABASE_URL ?? `postgresql://test:test@localhost:5433/${REQUIRED_DB_NAME}`
+    process.env.E2E_DATABASE_URL ??
+    `postgresql://test:test@localhost:5433/${requiredDatabaseName()}`
   );
 }
 
@@ -17,7 +31,7 @@ export function e2eRedisUrl(): string {
 }
 
 export function e2eRedisPrefix(): string {
-  return process.env.E2E_REDIS_PREFIX ?? 'trr_e2e_';
+  return process.env.E2E_REDIS_PREFIX ?? (isShowcase() ? 'trr_showcase_' : 'trr_e2e_');
 }
 
 /**

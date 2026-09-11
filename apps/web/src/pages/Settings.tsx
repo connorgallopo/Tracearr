@@ -44,6 +44,10 @@ export function Settings() {
             <Route path="servers/connections" element={<Connections />} />
             <Route path="servers/posters" element={<PosterSource />} />
             <Route path="servers/plex-accounts" element={<PlexAccounts />} />
+            <Route
+              path="servers/requests"
+              element={<Navigate to="/settings/servers/connections" replace />}
+            />
 
             <Route path="notifications/destinations" element={<Destinations />} />
             <Route path="notifications/newsletters" element={<Newsletters />} />

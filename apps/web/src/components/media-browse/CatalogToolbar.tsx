@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useTranslation } from 'react-i18next';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import type { GenreRow, LibraryOption, WatchedState } from '@tracearr/shared';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { MediaTypeToggle } from '@/components/media-browse/MediaTypeToggle';
 import { stableSerialize, type CatalogSort } from '@/hooks/queries';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { formatBytes } from '@/lib/formatters';
@@ -667,28 +667,7 @@ export function CatalogToolbar({
       aria-label={t('media.grid.toolbar.ariaLabel')}
     >
       <div className="flex flex-wrap items-center gap-2.5">
-        <ToggleGroup
-          type="single"
-          value={type}
-          onValueChange={(value) => value && onTypeChange(value as 'movie' | 'show')}
-          variant="outline"
-          aria-label={t('media.grid.toolbar.typeLabel')}
-        >
-          <ToggleGroupItem
-            value="movie"
-            aria-label={t('media.grid.toolbar.moviesToggle')}
-            className="data-[state=on]:bg-primary/15 data-[state=on]:text-primary"
-          >
-            {t('media.grid.toolbar.moviesToggle')}
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="show"
-            aria-label={t('media.grid.toolbar.showsToggle')}
-            className="data-[state=on]:bg-primary/15 data-[state=on]:text-primary"
-          >
-            {t('media.grid.toolbar.showsToggle')}
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <MediaTypeToggle value={type} onChange={onTypeChange} />
 
         <div className="relative max-w-[240px] min-w-[160px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />

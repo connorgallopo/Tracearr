@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserRequestsCard } from '@/components/requests/UserRequestsCard';
 import { TrustScoreBadge } from '@/components/users/TrustScoreBadge';
 import { UserLocationsCard } from '@/components/users/UserLocationsCard';
 import { UserDevicesCard } from '@/components/users/UserDevicesCard';
@@ -774,6 +775,8 @@ export function UserDetail() {
           </CardContent>
         </Card>
       )}
+
+      <UserRequestsCard serverUserId={effectiveId!} scope={identityScope} />
 
       {/* Locations and Devices */}
       <div className="grid gap-6 lg:grid-cols-2">

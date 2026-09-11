@@ -852,5 +852,29 @@ describe('Destination Routes', () => {
       expect(response.json()).toEqual({ success: false, error: 'connection refused' });
       expect(response.body).not.toContain('secret');
     });
+
+    it('logs the code and message of the underlying failure, never the whole error', async () => {
+      app = await buildTestApp(ownerUser);
+      const warn = vi.spyOn(app.log, 'warn');
+      const cause = Object.assign(new Error('self-signed certificate'), {
+        code: 'ESOCKET',
+        cert: { issuer: 'bridge' },
+      });
+      mockTest.mockRejectedValue(new Error('TLS failed for bridge:1025', { cause }));
+
+      await app.inject({
+        method: 'POST',
+        url: '/destinations/test',
+        payload: {
+          type: 'discord',
+          config: { webhookUrl: 'https://discord.com/api/webhooks/1/secret' },
+        },
+      });
+
+      expect(warn).toHaveBeenCalledWith(
+        { code: 'ESOCKET', message: 'self-signed certificate' },
+        'discord destination test failed'
+      );
+    });
   });
 });

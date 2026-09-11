@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import { e2eDatabaseUrl, e2eRedisPrefix, e2eRedisUrl } from './seed/env';
 
 // Load root .env file (won't override existing env vars)
 try {
@@ -14,11 +15,11 @@ const isCI = !!process.env.CI;
 process.env.CLAIM_CODE ??= 'tracearr-e2e-test-claim-code';
 
 // Isolated test-container database/redis, never the live dev stack on
-// 5432/6379 - see apps/e2e/seed/env.ts and README.md "Media browse seed".
-const E2E_DATABASE_URL =
-  process.env.E2E_DATABASE_URL ?? 'postgresql://test:test@localhost:5433/tracearr_e2e';
-const E2E_REDIS_URL = process.env.E2E_REDIS_URL ?? 'redis://localhost:6380';
-const E2E_REDIS_PREFIX = process.env.E2E_REDIS_PREFIX ?? 'trr_e2e_';
+// 5432/6379, and a database of its own under SHOWCASE=1 - see
+// apps/e2e/seed/env.ts and README.md "Media browse seed".
+const E2E_DATABASE_URL = e2eDatabaseUrl();
+const E2E_REDIS_URL = e2eRedisUrl();
+const E2E_REDIS_PREFIX = e2eRedisPrefix();
 
 export default defineConfig({
   testDir: './tests',
@@ -48,7 +49,7 @@ export default defineConfig({
         storageState: path.resolve(import.meta.dirname, '.auth/user.json'),
       },
       dependencies: ['setup'],
-      testIgnore: /media-browse\.spec\.ts/,
+      testIgnore: [/media-browse\.spec\.ts/, /showcase\.capture\.ts/],
     },
     {
       // Links the real signed-in owner (created by the 'setup' project) to a
@@ -67,6 +68,18 @@ export default defineConfig({
       testMatch: /media-browse\.spec\.ts/,
       dependencies: ['setup', 'media-seed'],
     },
+    {
+      // Screenshot run, not a test: only ever invoked by the `showcase`
+      // script, which sets SHOWCASE=1 and so points every default at
+      // tracearr_showcase. See showcase/seed.ts and README.md.
+      name: 'showcase',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: path.resolve(import.meta.dirname, '.auth/user.json'),
+      },
+      testMatch: /showcase\.capture\.ts/,
+      dependencies: ['setup'],
+    },
   ],
 
   webServer: [
@@ -82,6 +95,7 @@ export default defineConfig({
       reuseExistingServer: !isCI,
       timeout: 60_000,
       env: {
+        E2E_DATABASE_URL,
         DATABASE_URL: E2E_DATABASE_URL,
         REDIS_URL: E2E_REDIS_URL,
         REDIS_PREFIX: E2E_REDIS_PREFIX,

@@ -68,6 +68,7 @@ import { debugRoutes } from './routes/debug.js';
 import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
 import { destinationRoutes } from './routes/destinations.js';
+import { requestServiceRoutes } from './routes/requestServices.js';
 import { newsletterRoutes } from './routes/newsletters.js';
 import { emailRoutes } from './routes/email.js';
 import { versionRoutes } from './routes/version.js';
@@ -155,6 +156,12 @@ import {
   scheduleInactivityChecks,
   shutdownInactivityCheckQueue,
 } from './jobs/inactivityCheckQueue.js';
+import {
+  initRequestSyncQueue,
+  startRequestSyncWorker,
+  scheduleRequestSync,
+  shutdownRequestSyncQueue,
+} from './jobs/requestSyncQueue.js';
 import {
   initBackupQueue,
   startBackupWorker,
@@ -507,6 +514,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(statsRoutes, { prefix: `${API_BASE_PATH}/stats` });
   await app.register(settingsRoutes, { prefix: `${API_BASE_PATH}/settings` });
   await app.register(destinationRoutes, { prefix: `${API_BASE_PATH}/destinations` });
+  await app.register(requestServiceRoutes, { prefix: `${API_BASE_PATH}/request-services` });
   await app.register(newsletterRoutes, { prefix: `${API_BASE_PATH}/newsletters` });
   await app.register(emailRoutes, { prefix: `${API_BASE_PATH}/email` });
   await app.register(importRoutes, { prefix: `${API_BASE_PATH}/import` });
@@ -625,6 +633,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownImagePrecacheQueue();
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
+    await shutdownRequestSyncQueue();
     await shutdownBackupQueue();
     await shutdownNewsletterQueues();
     closeAllTransporters();
@@ -1001,6 +1010,17 @@ async function initializeServices(app: FastifyInstance) {
     // Don't throw - inactivity checks are non-critical
   }
 
+  try {
+    initRequestSyncQueue(redisUrl);
+    startRequestSyncWorker();
+    scheduleRequestSync().catch((err) => {
+      app.log.error({ err }, 'Failed to schedule request sync');
+    });
+    app.log.info('Request sync queue initialized');
+  } catch (err) {
+    app.log.error({ err }, 'Failed to initialize request sync queue');
+  }
+
   // Initialize backup queue (scheduled backups)
   try {
     initBackupQueue(redisUrl);
@@ -1224,6 +1244,9 @@ async function initializePostListen(app: FastifyInstance) {
         case WS_EVENTS.DESTINATIONS_CHANGED:
           invalidateDestinationsCache();
           broadcastToSessions('destinations:changed');
+          break;
+        case WS_EVENTS.REQUESTS_CHANGED:
+          broadcastToSessions('requests:changed', data as { serviceId: string });
           break;
         case WS_EVENTS.SERVERS_CHANGED:
           invalidateServersCache();

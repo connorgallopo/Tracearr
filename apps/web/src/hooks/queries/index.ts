@@ -131,6 +131,19 @@ export {
   useTestUnsavedDestination,
 } from './useDestinations';
 
+// Request hooks
+export {
+  REQUESTS_KEY,
+  useMediaRequests,
+  useUserRequests,
+  useRequestServices,
+  useTestRequestService,
+  useCreateRequestService,
+  useUpdateRequestService,
+  useDeleteRequestService,
+  useSyncRequestService,
+} from './useRequests';
+
 // Newsletter hooks
 export {
   NEWSLETTERS_KEY,

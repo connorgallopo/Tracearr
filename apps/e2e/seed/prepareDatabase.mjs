@@ -8,14 +8,14 @@
  * doesn't exist yet on a fresh checkout. Plain JS, not TypeScript, so it
  * needs no loader to run via a bare `node` invocation from the shell
  * command string - constants here intentionally mirror seed/env.ts (kept in
- * sync by hand; there are only three of them).
+ * sync by hand; there are only four of them, SHOWCASE included).
  */
 import pg from 'pg';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-const REQUIRED_DB_NAME = 'tracearr_e2e';
+const REQUIRED_DB_NAME = (process.env.SHOWCASE ?? '') !== '' ? 'tracearr_showcase' : 'tracearr_e2e';
 const databaseUrl =
   process.env.E2E_DATABASE_URL ?? `postgresql://test:test@localhost:5433/${REQUIRED_DB_NAME}`;
 

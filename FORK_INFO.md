@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `32c9d378`
-- Last shared upstream commit found during inspection: `28b8c344`
-- Latest upstream commit merged into the current working tree: `32c9d378`
+- Source branch/SHA inspected: `main` at `03f3248a`
+- Last shared upstream commit found during inspection: `32c9d378`
+- Latest upstream commit merged into the current working tree: `03f3248a`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,35 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `03f3248a` was merged into `develop` on September 11,
+  2026. This adds Seerr request tracking, per-server linking, media/user request
+  panels, Plex genre refresh, Jellyfin 12 collection-aware library listings,
+  removal confirmation, and the showcase capture tools. Upstream migration
+  `0103_luxuriant_wolfpack` remains unchanged in the upstream ledger; the
+  Dispatcharr overlay remains separate. Media-detail conflict resolution keeps
+  `mediaLibraryServerIds` for every query, including the new requests query.
+  Seerr server lookups and Connections exclude Dispatcharr, which has no media
+  catalog or Seerr integration; Dispatcharr remains available for sessions,
+  history, auth edits, and realtime. Focused regression tests cover the Seerr
+  eligibility boundary and mixed-server media query scope. Ukrainian locales
+  retain upstream translations and fork-owned keys. The showcase active-session
+  fixture supplies the fork's `progressUpdatedAt` from its sampled `lastSeenAt`.
+  Dashboard artwork/cache markers, Dispatcharr leader ownership, library-sync
+  exclusions, and fork distribution policies remain intact. E2E dependency
+  builds now include emails; `AGENTS.md` mirrors that upstream CI correction.
+  Full non-Docker CI passed with Node 24 / pnpm 12.3.4: frozen install,
+  lint, typecheck, translations, unit/services/routes/auth/security, web,
+  coverage, and build. Server groups plus web passed 8,549 tests with two
+  skipped; emails passed 49. Coverage passed 5,460 with two skipped
+  (66.86% statements, 61.10% branches, 73.02% functions, 67.95% lines).
+  Lint has 766 warnings (one above the previous merge); runtime diagnostics
+  remain within existing message classes. Typecheck passed after supplying
+  the missing showcase progress timestamp. Logs use
+  `.tmp/github-ci-<job>-20260911-03f3.log`, with successful final lint and
+  typecheck logs using `-final-` before the date. Docker integration and E2E are
+  explicitly omitted at the user's request. Live-provider manual smoke checks
+  and Docker image builds are not covered by this local run.
 
 - Upstream `main` at `32c9d378` was merged into `develop` on September 10,
   2026 (merge commit `f97efbcb`). This adds newsletters/email destinations, the emails workspace package,

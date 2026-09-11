@@ -33,6 +33,7 @@ import { useMaintenanceMode } from './useMaintenanceMode';
 import { toast } from 'sonner';
 import { useDestinations } from './queries';
 import { DESTINATIONS_KEY } from './queries/useDestinations';
+import { REQUESTS_KEY } from './queries/useRequests';
 import { RUNS_KEY } from './queries/useRuns';
 import { api } from '@/lib/api';
 
@@ -300,6 +301,10 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     // Any instance's destination write lands here, including the toast preferences read above.
     newSocket.on(WS_EVENTS.DESTINATIONS_CHANGED, () => {
       void queryClient.invalidateQueries({ queryKey: DESTINATIONS_KEY });
+    });
+
+    newSocket.on(WS_EVENTS.REQUESTS_CHANGED, () => {
+      void queryClient.invalidateQueries({ queryKey: REQUESTS_KEY });
     });
 
     // A server added, renamed, reordered or removed anywhere; the builder's

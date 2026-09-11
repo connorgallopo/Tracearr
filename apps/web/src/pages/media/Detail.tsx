@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { format } from 'date-fns';
+import type { MediaRequestEntry } from '@tracearr/shared';
 import { ApiError } from '@/lib/api';
 import {
   useMediaDetail,
@@ -13,6 +14,7 @@ import {
   useMediaPlatforms,
   useMediaHistory,
   useSession,
+  useMediaRequests,
   findCachedMediaStub,
 } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
@@ -23,6 +25,7 @@ import { KpiStrip } from '@/components/media-browse/KpiStrip';
 import { WatchersTable } from '@/components/media-browse/WatchersTable';
 import { SeasonHeatPanel } from '@/components/media-browse/SeasonHeatPanel';
 import { PlatformPanel } from '@/components/media-browse/PlatformPanel';
+import { MediaRequestsPanel } from '@/components/requests/MediaRequestsPanel';
 import { InlineErrorState } from '@/components/library/ErrorState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -327,6 +330,18 @@ export function MediaDetail() {
   const seasonHeatQuery = useSeasonHeat(id, mediaLibraryServerIds, isShow);
   const platformsQuery = useMediaPlatforms(id, mediaLibraryServerIds);
   const historyQuery = useMediaHistory(id, mediaLibraryServerIds);
+  const requestsQuery = useMediaRequests(id, mediaLibraryServerIds);
+
+  // requestedAt is a fixed-width UTC ISO string from the API, so comparing the
+  // strings orders them chronologically.
+  const primaryRequest = useMemo(() => {
+    const live = (requestsQuery.data?.data ?? []).filter((entry) => entry.deletedAt === null);
+    return live.reduce<MediaRequestEntry | null>(
+      (earliest, entry) =>
+        earliest === null || entry.requestedAt < earliest.requestedAt ? entry : earliest,
+      null
+    );
+  }, [requestsQuery.data]);
 
   const notFoundStatus =
     detailQuery.error instanceof ApiError &&
@@ -348,6 +363,7 @@ export function MediaDetail() {
         isError={detailQuery.isError}
         onRetry={() => void detailQuery.refetch()}
         serverById={serverById}
+        request={primaryRequest}
         onFullHistoryClick={() => {
           historyRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }}
@@ -360,6 +376,15 @@ export function MediaDetail() {
         onRetry={() => void detailQuery.refetch()}
         serverById={serverById}
       />
+
+      {mediaType !== 'episode' && (
+        <MediaRequestsPanel
+          rows={requestsQuery.data?.data}
+          isLoading={requestsQuery.isLoading}
+          isError={requestsQuery.isError}
+          onRetry={() => void requestsQuery.refetch()}
+        />
+      )}
 
       <KpiStrip
         mediaType={mediaType}

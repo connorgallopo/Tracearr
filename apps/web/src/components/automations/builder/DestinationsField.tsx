@@ -15,7 +15,6 @@ import { DestinationDialog } from '@/components/settings/destinations/Destinatio
 import { iconFor } from '@/components/settings/destinations/destinationIcons';
 import { useDestinations } from '@/hooks/queries/useDestinations';
 import { cn } from '@/lib/utils';
-import { SELECTED_TOGGLE } from './selection';
 
 interface DestinationsFieldProps {
   value: string[];
@@ -93,11 +92,7 @@ export function DestinationsField({ value, onChange, label, labelledBy }: Destin
                 <ToggleGroupItem
                   key={row.id}
                   value={row.id}
-                  className={cn(
-                    'rounded-full',
-                    SELECTED_TOGGLE,
-                    (!row.enabled || quiet) && 'opacity-60'
-                  )}
+                  className={cn('rounded-full', (!row.enabled || quiet) && 'opacity-60')}
                 >
                   {picked ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
                   {row.name}

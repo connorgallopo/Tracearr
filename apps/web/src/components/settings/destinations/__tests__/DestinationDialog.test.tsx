@@ -381,6 +381,42 @@ describe('email kind', () => {
     expect(screen.getByLabelText(label('fromAddress'))).toHaveAttribute('type', 'email');
   });
 
+  it('renders certificate verification as a switch that starts on and saves false once flipped', async () => {
+    const user = await openEmail();
+    const verify = screen.getByLabelText(label('verifyCertificate'));
+    expect(verify).toHaveAttribute('role', 'switch');
+    expect(verify).toBeChecked();
+    expect(
+      screen.getByText('pages:settings.destinations.hints.smtpVerifyCertificate')
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(label('host')), 'bridge.local');
+    await user.type(screen.getByLabelText(label('fromAddress')), 'plex@example.com');
+    await user.click(verify);
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ verifyCertificate: 'false' }),
+      })
+    );
+  });
+
+  it('shows the switch on for a stored row that predates the setting', () => {
+    render(
+      <DestinationDialog
+        open
+        onOpenChange={vi.fn()}
+        mode="edit"
+        destination={destination({
+          type: 'email',
+          config: { host: 'smtp.example.com', port: '587', security: 'starttls' },
+          secretsSet: [],
+        })}
+      />
+    );
+    expect(screen.getByLabelText(label('verifyCertificate'))).toBeChecked();
+  });
+
   it('copies host, port and security from a preset and saves them as strings', async () => {
     const user = await openEmail();
     await user.click(screen.getByLabelText(label('preset')));

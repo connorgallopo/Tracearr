@@ -10,6 +10,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/components/settings/request-services', () => ({
+  RequestServiceLine: () => <div>request service line</div>,
+}));
+
 vi.mock('@dnd-kit/sortable', () => ({
   useSortable: () => ({
     attributes: {},
@@ -87,6 +91,14 @@ describe('ServerRow', () => {
 
     const trigger = screen.getByRole('button', { name: 'servers.realtimeError' });
     expect(trigger).toHaveClass('text-warning');
+  });
+
+  it('carries the Seerr line only for callers that pass one', () => {
+    renderRow();
+    expect(screen.queryByText('request service line')).not.toBeInTheDocument();
+
+    renderRow({ requestService: { service: undefined } });
+    expect(screen.getByText('request service line')).toBeInTheDocument();
   });
 
   it('says nothing about realtime for a Plex server', () => {

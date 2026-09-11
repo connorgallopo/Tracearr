@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLibraryItemsResponse } from '../parser.js';
+import { parseLibraryItemsResponse, parseRatingKeys } from '../parser.js';
 
 function musicResponse(items: Array<Record<string, unknown>>) {
   return { MediaContainer: { Metadata: items } };
@@ -62,5 +62,37 @@ describe('parseLibraryItemsResponse - music', () => {
     expect(item!.musicBrainzId).toBe('album-mbid');
     expect(item!.parentTitle).toBe('Boards of Canada');
     expect(item!.parentRatingKey).toBe('10');
+  });
+});
+
+describe('parseRatingKeys', () => {
+  it('lists the rating keys a batched metadata lookup returned for the section', () => {
+    expect(
+      parseRatingKeys(
+        musicResponse([
+          { ratingKey: '100', librarySectionID: 3 },
+          { ratingKey: 200, librarySectionID: 3 },
+          { ratingKey: '300' },
+          {},
+        ]),
+        '3'
+      )
+    ).toEqual(['100', '200', '300']);
+  });
+
+  it('leaves out trashed items and items that moved to another section', () => {
+    expect(
+      parseRatingKeys(
+        musicResponse([
+          { ratingKey: '100', librarySectionID: 3, deletedAt: 1700000000 },
+          { ratingKey: '200', librarySectionID: 4 },
+        ]),
+        '3'
+      )
+    ).toEqual([]);
+  });
+
+  it('is empty for a container without metadata', () => {
+    expect(parseRatingKeys({ MediaContainer: {} }, '3')).toEqual([]);
   });
 });

@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { initI18n } from '@tracearr/translations';
-import type { MediaAvailabilityEntry } from '@tracearr/shared';
+import type { MediaAvailabilityEntry, MediaRequestEntry } from '@tracearr/shared';
 import { DetailHero, hexToHslTriple, type HeroServerLookupEntry } from './DetailHero';
 import type { MediaDetailData, MediaDetailStub } from '@/hooks/queries';
 
@@ -82,6 +82,31 @@ function fullDetail(overrides: Partial<MediaDetailData> = {}): MediaDetailData {
     posterVersion: null,
     dominantColor: null,
     servers: [],
+    ...overrides,
+  };
+}
+
+function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntry {
+  return {
+    id: 'req-1',
+    serverId: 'srv-plex',
+    status: 'completed',
+    requestedAt: '2026-01-08T12:00:00.000Z',
+    availableAt: '2026-01-08T12:02:00.000Z',
+    waitMs: 2 * 60 * 1000,
+    deletedAt: null,
+    seasons: null,
+    is4k: false,
+    isAutoRequest: false,
+    watchedState: 'unwatched',
+    requester: {
+      serverUserId: 'su-1',
+      userId: 'u-1',
+      serverId: 'srv-plex',
+      username: 'agelwarg',
+      identityName: 'Alice',
+      thumb: null,
+    },
     ...overrides,
   };
 }
@@ -245,5 +270,36 @@ describe('DetailHero', () => {
 
     screen.getByRole('button', { name: /Try again/ }).click();
     expect(onRetry).toHaveBeenCalled();
+  });
+
+  it('renders the request line naming the requester when a request is passed', () => {
+    renderHero({ data: fullDetail(), stub, request: requestEntry() });
+
+    expect(screen.getByText(/Requested by Alice/)).toBeInTheDocument();
+  });
+
+  it('falls back to the server username when the requester has no identity name', () => {
+    renderHero({
+      data: fullDetail(),
+      stub,
+      request: requestEntry({
+        requester: {
+          serverUserId: 'su-1',
+          userId: null,
+          serverId: 'srv-plex',
+          username: 'agelwarg',
+          identityName: null,
+          thumb: null,
+        },
+      }),
+    });
+
+    expect(screen.getByText(/Requested by agelwarg/)).toBeInTheDocument();
+  });
+
+  it('renders no request line without a request', () => {
+    renderHero({ data: fullDetail(), stub });
+
+    expect(screen.queryByText(/Requested by/)).not.toBeInTheDocument();
   });
 });

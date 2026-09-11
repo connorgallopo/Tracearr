@@ -40,6 +40,7 @@ import { useSocket } from '@/hooks/useSocket';
 import {
   useDeleteServer,
   useReorderServers,
+  useRequestServices,
   useServers,
   useSyncServer,
   useUpdateServer,
@@ -55,6 +56,10 @@ export function Connections() {
   const queryClient = useQueryClient();
   const { refetch: refetchUser, user } = useAuth();
   const { serverConnectionStatuses } = useSocket();
+  const isOwner = user?.role === 'owner';
+  const { data: requestServices, isLoading: requestServicesLoading } = useRequestServices({
+    enabled: isOwner,
+  });
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -79,8 +84,6 @@ export function Connections() {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
-
-  const isOwner = user?.role === 'owner';
 
   useEffect(() => {
     if (user && !isOwner && serverType === 'plex') {
@@ -297,8 +300,13 @@ export function Connections() {
                   onSync={() => syncServer.mutate(server.id)}
                   onDelete={() => setDeleteId(server.id)}
                   onEdit={() => setEditServer(server)}
-                  isSyncing={syncServer.isPending}
+                  isSyncing={syncServer.isPending && syncServer.variables === server.id}
                   isDraggable={isOwner}
+                  requestService={
+                    isOwner && server.type !== 'dispatcharr' && !requestServicesLoading
+                      ? { service: requestServices?.find((s) => s.serverId === server.id) }
+                      : undefined
+                  }
                 />
               ))}
             </ItemGroup>

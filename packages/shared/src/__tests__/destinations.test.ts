@@ -166,6 +166,14 @@ describe('configSchemaForFields', () => {
     { key: 'from', label: 'from', input: 'email', required: true, secret: false },
     { key: 'cc', label: 'cc', input: 'email', required: false, secret: false },
     { key: 'to', label: 'to', input: 'emails', required: true, secret: false },
+    {
+      key: 'verify',
+      label: 'verify',
+      input: 'toggle',
+      required: false,
+      secret: false,
+      default: 'true',
+    },
   ];
   const schema = configSchemaForFields(fields);
 
@@ -173,8 +181,16 @@ describe('configSchemaForFields', () => {
     const parsed = schema.safeParse({ from: 'a@example.com', to: 'b@example.com, c@example.org' });
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
-    expect(parsed.data).toMatchObject({ mode: 'a', port: '587' });
+    expect(parsed.data).toMatchObject({ mode: 'a', port: '587', verify: 'true' });
     expect(parsed.data.port).toBe('587');
+  });
+
+  it('keeps a toggle as the string true or false', () => {
+    const parse = (verify: string) =>
+      schema.safeParse({ from: 'a@example.com', to: 'b@example.com', verify });
+    expect(parse('false').data?.verify).toBe('false');
+    expect(parse('true').success).toBe(true);
+    expect(parse('yes').success).toBe(false);
   });
 
   it.each([
@@ -262,6 +278,7 @@ describe('email destination', () => {
     expect(parsed.data).toMatchObject({
       port: '587',
       security: 'starttls',
+      verifyCertificate: 'true',
       fromName: 'Tracearr',
       preset: 'custom',
       messagesPerSecond: '2',
@@ -324,6 +341,7 @@ describe('email destination', () => {
       ['host', 'connection'],
       ['port', 'connection'],
       ['security', 'connection'],
+      ['verifyCertificate', 'connection'],
       ['username', 'connection'],
       ['password', 'connection'],
       ['messagesPerSecond', 'connection'],

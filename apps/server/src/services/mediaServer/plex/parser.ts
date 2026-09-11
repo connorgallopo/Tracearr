@@ -1711,3 +1711,34 @@ export function parseLibraryItemsResponse(data: unknown): MediaLibraryItem[] {
   const metadata = container?.MediaContainer?.Metadata;
   return parseArray(metadata, (item) => parseLibraryItem(item as Record<string, unknown>));
 }
+
+/**
+ * Rating keys from a batched /library/metadata/{keys} response that still
+ * belong to the section. Items in Plex's trash keep resolving by key with
+ * deletedAt set, and an item moved to another section answers with that
+ * section's id; neither counts as present here.
+ */
+export function parseRatingKeys(data: unknown, sectionId: string): string[] {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const keys: string[] = [];
+  for (const raw of container?.MediaContainer?.Metadata ?? []) {
+    const item = raw as Record<string, unknown>;
+    const key = parseString(item.ratingKey);
+    if (key === '' || item.deletedAt != null) continue;
+    if (item.librarySectionID != null && String(item.librarySectionID) !== sectionId) continue;
+    keys.push(key);
+  }
+  return keys;
+}
+
+/** Full genre lists keyed by ratingKey, from a batched /library/metadata/{keys} response. */
+export function parseGenresByRatingKey(data: unknown): Map<string, string[]> {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const genres = new Map<string, string[]>();
+  for (const raw of container?.MediaContainer?.Metadata ?? []) {
+    const item = raw as Record<string, unknown>;
+    const tags = parseGenres(item.Genre as Array<{ tag?: string }> | undefined);
+    if (tags) genres.set(parseString(item.ratingKey), tags);
+  }
+  return genres;
+}

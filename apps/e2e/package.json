@@ -10,11 +10,15 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:e2e:media": "playwright test --project=setup --project=media-seed --project=media-browse",
+    "showcase": "SHOWCASE=1 playwright test --project=setup --project=showcase",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
+    "@tracearr/shared": "workspace:*",
     "@types/pg": "^8.20.0",
-    "pg": "^8.22.0"
+    "ioredis": "^5.11.1",
+    "pg": "^8.22.0",
+    "sharp": "^0.35.4"
   }
 }

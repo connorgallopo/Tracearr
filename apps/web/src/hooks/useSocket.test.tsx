@@ -60,6 +60,7 @@ vi.mock('@/lib/api', () => ({
 import { WS_EVENTS } from '@tracearr/shared';
 import { toast } from 'sonner';
 import { DESTINATIONS_KEY } from './queries/useDestinations';
+import { REQUESTS_KEY } from './queries/useRequests';
 import { RUNS_KEY } from './queries/useRuns';
 import { SocketProvider, useSocket } from './useSocket';
 
@@ -204,6 +205,13 @@ describe('SocketProvider', () => {
     fire(WS_EVENTS.DESTINATIONS_CHANGED);
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: DESTINATIONS_KEY });
+  });
+
+  it('refetches requests when another instance changes one', () => {
+    const { invalidate } = setup();
+    fire(WS_EVENTS.REQUESTS_CHANGED);
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: REQUESTS_KEY });
   });
 
   it('refetches servers and filter options when a server changes', () => {
