@@ -83,6 +83,14 @@ describe('UserRequestsCard', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders nothing while the first fetch is still in flight', () => {
+    mockQuery(undefined, { isLoading: true });
+
+    const { container } = renderCard();
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('asks for the first five rows under the identity scope', () => {
     mockQuery(response(3, 3));
 
@@ -117,6 +125,14 @@ describe('UserRequestsCard', () => {
       pageSize: 50,
     });
     expect(screen.getByRole('button', { name: 'Show less' })).toBeInTheDocument();
+  });
+
+  it('offers only what expanding shows once the total passes the expanded page size', () => {
+    mockQuery(response(80, 5));
+
+    renderCard();
+
+    expect(screen.getByRole('button', { name: 'View all (45 more)' })).toBeInTheDocument();
   });
 
   it('keeps the card up with an inline error when the fetch fails', () => {

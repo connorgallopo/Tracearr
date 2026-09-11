@@ -331,6 +331,8 @@ export function MediaDetail() {
   const historyQuery = useMediaHistory(id, selectedServerIds);
   const requestsQuery = useMediaRequests(id, selectedServerIds);
 
+  // requestedAt is a fixed-width UTC ISO string from the API, so comparing the
+  // strings orders them chronologically.
   const primaryRequest = useMemo(() => {
     const live = (requestsQuery.data?.data ?? []).filter((entry) => entry.deletedAt === null);
     return live.reduce<MediaRequestEntry | null>(

@@ -61,9 +61,9 @@ function RequestFlags({ is4k, isAutoRequest }: { is4k: boolean; isAutoRequest: b
         {is4k && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span tabIndex={0} aria-label={t('requests.flags.fourK')} className="inline-flex">
+              <button type="button" aria-label={t('requests.flags.fourK')} className="inline-flex">
                 <Sparkles aria-hidden="true" className="text-muted-foreground size-3.5" />
-              </span>
+              </button>
             </TooltipTrigger>
             <TooltipContent>{t('requests.flags.fourK')}</TooltipContent>
           </Tooltip>
@@ -71,9 +71,9 @@ function RequestFlags({ is4k, isAutoRequest }: { is4k: boolean; isAutoRequest: b
         {isAutoRequest && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span tabIndex={0} aria-label={t('requests.flags.auto')} className="inline-flex">
+              <button type="button" aria-label={t('requests.flags.auto')} className="inline-flex">
                 <ListPlus aria-hidden="true" className="text-muted-foreground size-3.5" />
-              </span>
+              </button>
             </TooltipTrigger>
             <TooltipContent>{t('requests.flags.auto')}</TooltipContent>
           </Tooltip>
@@ -90,7 +90,9 @@ function MediaLeadingCell({ row }: { row: MediaRequestEntry }) {
   if (requester.serverUserId === null) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-muted-foreground">{t('requests.unattributed')}</span>
+        <span className="text-muted-foreground truncate">
+          {requester.username ?? t('requests.unattributed')}
+        </span>
         <RequestFlags is4k={row.is4k} isAutoRequest={row.isAutoRequest} />
       </div>
     );

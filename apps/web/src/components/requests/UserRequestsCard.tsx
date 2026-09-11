@@ -24,9 +24,9 @@ export function UserRequestsCard({ serverUserId, scope }: UserRequestsCardProps)
     pageSize: expanded ? EXPANDED_PAGE_SIZE : INITIAL_PAGE_SIZE,
   });
 
-  if (data && data.total === 0) return null;
+  if (isLoading || (data && data.total === 0)) return null;
 
-  const remaining = (data?.total ?? 0) - INITIAL_PAGE_SIZE;
+  const remaining = Math.min(data?.total ?? 0, EXPANDED_PAGE_SIZE) - INITIAL_PAGE_SIZE;
 
   return (
     <Card>

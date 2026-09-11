@@ -2173,7 +2173,7 @@
     },
     "seasons": {
       "all": "All seasons",
-      "list": "S{{list}}"
+      "item": "S{{number}}"
     },
     "flags": {
       "fourK": "4K request",

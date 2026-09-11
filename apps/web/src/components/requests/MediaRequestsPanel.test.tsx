@@ -59,6 +59,11 @@ describe('MediaRequestsPanel', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders nothing while the first fetch is still in flight', () => {
+    const { container } = renderPanel({ rows: undefined, isLoading: true });
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders the heading and a row per request', () => {
     renderPanel({ rows: [makeEntry(), makeEntry({ id: 'r2' })] });
 

@@ -130,6 +130,14 @@ describe('RequestServicesManager', () => {
     expect(screen.getByText(/connect ECONNREFUSED/)).toBeInTheDocument();
   });
 
+  it('leaves the time out of the failure line when the service has never synced', () => {
+    mockQueries([service({ lastSyncAt: null, lastSyncError: 'connect ECONNREFUSED' })]);
+
+    render(<RequestServicesManager />);
+
+    expect(screen.getByText(/requests.lastErrorNoTime/)).toBeInTheDocument();
+  });
+
   it('flips the enabled switch through the update mutation', async () => {
     render(<RequestServicesManager />);
 

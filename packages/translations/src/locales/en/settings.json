@@ -961,12 +961,17 @@
     "neverSynced": "Not synced yet",
     "syncing": "Syncing…",
     "counts": {
-      "requests": "{{count}} requests",
-      "unmatchedMedia": "{{count}} titles unmatched",
-      "unmatchedUsers": "{{count}} users unmatched"
+      "requests_one": "{{count}} request",
+      "requests_other": "{{count}} requests",
+      "unmatchedMedia_one": "{{count}} title unmatched",
+      "unmatchedMedia_other": "{{count}} titles unmatched",
+      "unmatchedUsers_one": "{{count}} user unmatched",
+      "unmatchedUsers_other": "{{count}} users unmatched"
     },
     "needsKey": "Needs API key",
+    "enabledFor": "Sync requests from {{server}}",
     "lastError": "Last sync failed {{ago}}: {{error}}",
+    "lastErrorNoTime": "Last sync failed: {{error}}",
     "dialog": {
       "titleLink": "Link Seerr to {{server}}",
       "titleEdit": "Edit Seerr link",

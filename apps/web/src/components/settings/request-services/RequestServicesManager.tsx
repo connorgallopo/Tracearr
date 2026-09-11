@@ -122,16 +122,18 @@ export function RequestServicesManager() {
                         })}
                       </Badge>
                       {service.configStatus === 'reencrypt' && (
-                        <Badge variant="warning">{t('requests.needsKey')}</Badge>
+                        <Badge variant="destructive">{t('requests.needsKey')}</Badge>
                       )}
                     </div>
 
                     {service.lastSyncError !== null && (
                       <p className="text-destructive text-xs">
-                        {t('requests.lastError', {
-                          ago: safeFormatDistanceToNow(service.lastSyncAt),
-                          error: service.lastSyncError,
-                        })}
+                        {service.lastSyncAt === null
+                          ? t('requests.lastErrorNoTime', { error: service.lastSyncError })
+                          : t('requests.lastError', {
+                              ago: safeFormatDistanceToNow(service.lastSyncAt),
+                              error: service.lastSyncError,
+                            })}
                       </p>
                     )}
                   </>
@@ -147,7 +149,7 @@ export function RequestServicesManager() {
                   <>
                     <Switch
                       checked={service.enabled}
-                      aria-label={t('common:states.enabled')}
+                      aria-label={t('requests.enabledFor', { server: server.name })}
                       onCheckedChange={(enabled) =>
                         updateService.mutate({ id: service.id, data: { enabled } })
                       }

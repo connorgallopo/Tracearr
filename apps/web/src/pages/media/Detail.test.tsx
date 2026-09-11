@@ -93,7 +93,7 @@ function pendingQuery(overrides: Record<string, unknown> = {}) {
   } as never;
 }
 
-function requestEntry(): MediaRequestEntry {
+function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntry {
   return {
     id: 'req-1',
     serverId: 'srv-1',
@@ -114,6 +114,7 @@ function requestEntry(): MediaRequestEntry {
       identityName: 'Alice',
       thumb: null,
     },
+    ...overrides,
   };
 }
 
@@ -536,6 +537,39 @@ describe('MediaDetail page', () => {
 
     expect(mockUseMediaRequests).toHaveBeenCalledWith('media-1', ['srv-1']);
     expect(screen.getByRole('heading', { name: 'requests.mediaPanel.title' })).toBeInTheDocument();
+  });
+
+  it('names the earliest request that is still live in the hero line', () => {
+    mockUseMediaDetail.mockReturnValue(detailQuery('movie'));
+    mockUseMediaRequests.mockReturnValue(
+      pendingQuery({
+        isLoading: false,
+        data: {
+          data: [
+            requestEntry({
+              id: 'req-removed',
+              requestedAt: '2026-01-02T12:00:00.000Z',
+              deletedAt: '2026-01-20T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Removed Rita' },
+            }),
+            requestEntry({
+              id: 'req-later',
+              requestedAt: '2026-01-20T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Later Leo' },
+            }),
+            requestEntry({
+              id: 'req-earliest',
+              requestedAt: '2026-01-05T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Earliest Eve' },
+            }),
+          ],
+        },
+      })
+    );
+
+    renderPage();
+
+    expect(screen.getByText(/"name":"Earliest Eve"/)).toBeInTheDocument();
   });
 
   it('drops the requests panel on an episode, where the request belongs to the show', () => {

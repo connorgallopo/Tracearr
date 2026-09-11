@@ -189,12 +189,36 @@ describe('RequestsTable', () => {
         emptyTitle="No requests"
       />
     );
-    const fourK = screen.getByLabelText('4K request');
-    expect(fourK).toHaveAttribute('tabIndex', '0');
+    const fourK = screen.getByRole('button', { name: '4K request' });
     fourK.focus();
     expect(fourK).toHaveFocus();
 
-    const auto = screen.getByLabelText('Auto-requested from a watchlist');
-    expect(auto).toHaveAttribute('tabIndex', '0');
+    expect(screen.getByRole('button', { name: 'Auto-requested from a watchlist' })).toBeVisible();
+  });
+
+  it('keeps the Seerr username on the leading cell when the requester is not on this server', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[
+          makeMediaEntry({
+            requester: {
+              serverUserId: null,
+              userId: null,
+              serverId: 's1',
+              username: 'localbob',
+              identityName: null,
+              thumb: null,
+            },
+          }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByText('localbob')).toBeInTheDocument();
+    expect(screen.queryByText('Not on this server')).not.toBeInTheDocument();
   });
 });

@@ -12,7 +12,7 @@ interface MediaRequestsPanelProps {
 export function MediaRequestsPanel({ rows, isLoading, isError, onRetry }: MediaRequestsPanelProps) {
   const { t } = useTranslation('pages');
 
-  if (!isLoading && !isError && (rows === undefined || rows.length === 0)) return null;
+  if (!isError && (rows === undefined || rows.length === 0)) return null;
 
   return (
     <section

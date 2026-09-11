@@ -24,11 +24,11 @@ export function formatWait(
 export function formatSeasons(seasons: RequestSeason[] | null, t: Translate): string | null {
   if (seasons === null) return null;
   if (seasons.length === 0) return t('requests.seasons.all');
-  const list = seasons
+  return seasons
     .map((season) => season.seasonNumber)
     .sort((a, b) => a - b)
+    .map((number) => t('requests.seasons.item', { number }))
     .join(', ');
-  return t('requests.seasons.list', { list });
 }
 
 export function heroRequestLine(

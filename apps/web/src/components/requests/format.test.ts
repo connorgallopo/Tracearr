@@ -45,7 +45,7 @@ describe('formatSeasons', () => {
     expect(formatSeasons([], t)).toBe('requests.seasons.all');
   });
 
-  it('lists season numbers sorted and comma joined', () => {
+  it('prefixes every season number and joins them sorted', () => {
     expect(
       formatSeasons(
         [
@@ -54,7 +54,7 @@ describe('formatSeasons', () => {
         ],
         t
       )
-    ).toBe('requests.seasons.list:{"list":"1, 3"}');
+    ).toBe('requests.seasons.item:{"number":1}, requests.seasons.item:{"number":3}');
   });
 });
 
