@@ -43,6 +43,10 @@ import {
   type NewsletterSendVariant,
   type NewsletterWindow,
   type NotificationEventType,
+  type RequestCounts,
+  type RequestServiceType,
+  type MediaRequestStatus,
+  type RequestSeason,
   type RunOutcome,
   type TEMPLATE_GROUPS,
   type TemplateDefinition,
@@ -813,6 +817,81 @@ export const destinations = pgTable(
     uniqueIndex('destinations_builtin_type_uidx')
       .on(table.type)
       .where(sql`${table.builtin} = true`),
+  ]
+);
+
+export const requestServices = pgTable(
+  'request_services',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    serverId: uuid('server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    type: varchar('type', { length: 20 }).notNull().$type<RequestServiceType>(),
+    name: text('name').notNull(),
+    url: text('url').notNull(),
+    config: text('config'),
+    configStatus: varchar('config_status', { length: 20 })
+      .notNull()
+      .default('ok')
+      .$type<'ok' | 'reencrypt'>(),
+    enabled: boolean('enabled').notNull().default(true),
+    remoteServerId: text('remote_server_id').notNull(),
+    version: text('version'),
+    syncCursor: timestamp('sync_cursor', { withTimezone: true }),
+    lastCounts: jsonb('last_counts').$type<RequestCounts>(),
+    lastSyncAt: timestamp('last_sync_at', { withTimezone: true }),
+    lastFullSyncAt: timestamp('last_full_sync_at', { withTimezone: true }),
+    lastSyncError: text('last_sync_error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('request_services_server_unique').on(table.serverId)]
+);
+
+export const mediaRequests = pgTable(
+  'media_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    serviceId: uuid('service_id')
+      .notNull()
+      .references(() => requestServices.id, { onDelete: 'cascade' }),
+    remoteId: integer('remote_id').notNull(),
+    remoteMediaId: integer('remote_media_id').notNull(),
+    mediaType: varchar('media_type', { length: 10 }).notNull().$type<'movie' | 'show'>(),
+    title: text('title'),
+    year: integer('year'),
+    tmdbId: integer('tmdb_id'),
+    tvdbId: integer('tvdb_id'),
+    imdbId: varchar('imdb_id', { length: 20 }),
+    ratingKey: varchar('rating_key', { length: 255 }),
+    // Same convention as libraryItems.mediaId: media rows merge-fold, so no FK
+    mediaId: uuid('media_id'),
+    serverUserId: uuid('server_user_id').references(() => serverUsers.id, {
+      onDelete: 'set null',
+    }),
+    remoteUserId: integer('remote_user_id').notNull(),
+    remoteUsername: text('remote_username').notNull(),
+    remotePlexId: varchar('remote_plex_id', { length: 64 }),
+    remoteJellyfinUserId: varchar('remote_jellyfin_user_id', { length: 64 }),
+    status: varchar('status', { length: 20 }).notNull().$type<MediaRequestStatus>(),
+    seasons: jsonb('seasons').$type<RequestSeason[]>(),
+    is4k: boolean('is_4k').notNull().default(false),
+    isAutoRequest: boolean('is_auto_request').notNull().default(false),
+    requestedAt: timestamp('requested_at', { withTimezone: true }).notNull(),
+    availableAt: timestamp('available_at', { withTimezone: true }),
+    remoteUpdatedAt: timestamp('remote_updated_at', { withTimezone: true }).notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    syncedAt: timestamp('synced_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('media_requests_service_remote_unique').on(table.serviceId, table.remoteId),
+    index('media_requests_media_idx').on(table.mediaId),
+    index('media_requests_server_user_idx').on(table.serverUserId),
+    index('media_requests_requested_at_idx').on(table.requestedAt),
+    index('media_requests_service_updated_idx').on(table.serviceId, table.remoteUpdatedAt),
   ]
 );
 
