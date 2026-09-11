@@ -948,5 +948,57 @@
       "empty": "",
       "other": ""
     }
+  },
+  "requests": {
+    "label": "",
+    "link": "",
+    "unlink": "",
+    "syncNow": "",
+    "enable": "",
+    "disable": "",
+    "paused": "",
+    "menuLabel": "",
+    "syncedAgo": "",
+    "neverSynced": "",
+    "counts": {
+      "requests_one": "",
+      "requests_other": "",
+      "unmatchedMedia_one": "",
+      "unmatchedMedia_other": "",
+      "unmatchedUsers_one": "",
+      "unmatchedUsers_other": ""
+    },
+    "needsKey": "",
+    "lastError": "",
+    "lastErrorNoTime": "",
+    "dialog": {
+      "titleLink": "",
+      "titleEdit": "",
+      "description": "",
+      "url": "",
+      "apiKey": "",
+      "apiKeyHint": "",
+      "apiKeyKeep": "",
+      "showKey": "",
+      "hideKey": "",
+      "test": "",
+      "testing": "",
+      "save": "",
+      "saveHint": "",
+      "match": "",
+      "mismatch": "",
+      "mismatchIds": "",
+      "mismatchOther": ""
+    },
+    "confirmUnlink": {
+      "title": "",
+      "body": ""
+    },
+    "toast": {
+      "saved": "",
+      "removed": "",
+      "syncStarted": "",
+      "failed": ""
+    }
   }
 }
