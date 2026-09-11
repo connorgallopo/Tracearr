@@ -122,14 +122,14 @@ describe('LinkDialog', () => {
     expect(save).toBeDisabled();
   });
 
-  it('sits the test button with the fields rather than in the footer', () => {
+  it('sits the test button in the api key field rather than the footer', () => {
     renderDialog();
 
-    expect(
-      screen
-        .getByRole('button', { name: 'requests.dialog.test' })
-        .closest('[data-slot=dialog-footer]')
-    ).toBeNull();
+    const test = screen.getByRole('button', { name: 'requests.dialog.test' });
+    expect(test.closest('[data-slot=dialog-footer]')).toBeNull();
+    expect(test.closest('[data-slot=input-group]')).toContainElement(
+      screen.getByLabelText('requests.dialog.apiKey')
+    );
   });
 
   it('announces the test result and points both fields at it', () => {

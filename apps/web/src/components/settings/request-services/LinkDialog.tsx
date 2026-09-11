@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import type { RequestService, RequestServiceProbeResult, Server } from '@tracearr/shared';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,12 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import {
   useCreateRequestService,
   useServers,
@@ -44,6 +49,7 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
   const { t } = useTranslation(['settings', 'common']);
   const [url, setUrl] = useState(existing?.url ?? '');
   const [apiKey, setApiKey] = useState('');
+  const [keyVisible, setKeyVisible] = useState(false);
   const [tested, setTested] = useState<TestState | null>(null);
   const { data: servers } = useServers();
   const testService = useTestRequestService();
@@ -120,39 +126,46 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
 
           <Field>
             <FieldLabel htmlFor="request-service-key">{t('requests.dialog.apiKey')}</FieldLabel>
-            <PasswordInput
-              id="request-service-key"
-              value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
-              autoComplete="off"
-              aria-describedby={TEST_RESULT_ID}
-            />
+            <InputGroup>
+              <InputGroupInput
+                id="request-service-key"
+                type={keyVisible ? 'text' : 'password'}
+                value={apiKey}
+                onChange={(event) => setApiKey(event.target.value)}
+                autoComplete="off"
+                aria-describedby={TEST_RESULT_ID}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
+                  size="icon-xs"
+                  tabIndex={-1}
+                  aria-label={keyVisible ? 'Hide password' : 'Show password'}
+                  onClick={() => setKeyVisible((visible) => !visible)}
+                >
+                  {keyVisible ? <EyeOff /> : <Eye />}
+                </InputGroupButton>
+                <InputGroupButton
+                  onClick={runTest}
+                  disabled={!trimmedUrl || !trimmedKey || testService.isPending}
+                >
+                  {testService.isPending && <Loader2 className="animate-spin" />}
+                  {testService.isPending ? t('requests.dialog.testing') : t('requests.dialog.test')}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
             <FieldDescription>
               {existing ? t('requests.dialog.apiKeyKeep') : t('requests.dialog.apiKeyHint')}
             </FieldDescription>
           </Field>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={runTest}
-                disabled={!trimmedUrl || !trimmedKey || testService.isPending}
-              >
-                {testService.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                {testService.isPending ? t('requests.dialog.testing') : t('requests.dialog.test')}
-              </Button>
-            </div>
-            <output id={TEST_RESULT_ID} aria-live="polite" className="block">
-              <TestResult
-                server={server}
-                servers={servers}
-                tested={tested}
-                matchedHere={matchedHere}
-              />
-            </output>
-          </div>
+          <output id={TEST_RESULT_ID} aria-live="polite" className="block">
+            <TestResult
+              server={server}
+              servers={servers}
+              tested={tested}
+              matchedHere={matchedHere}
+            />
+          </output>
         </div>
 
         <DialogFooter>

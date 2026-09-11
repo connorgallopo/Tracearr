@@ -951,7 +951,7 @@
   },
   "requests": {
     "label": "Requests",
-    "link": "Link a Seerr",
+    "link": "Link Seerr",
     "unlink": "Unlink",
     "syncNow": "Sync now",
     "enable": "Enable sync",
