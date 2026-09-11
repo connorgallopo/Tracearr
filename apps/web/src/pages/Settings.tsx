@@ -11,6 +11,7 @@ import { Api } from '@/components/settings/data/Api';
 import { Connections } from '@/components/settings/servers/Connections';
 import { PosterSource } from '@/components/settings/servers/PosterSource';
 import { PlexAccounts } from '@/components/settings/servers/PlexAccounts';
+import { Requests } from '@/components/settings/servers/Requests';
 import { Guest } from '@/components/settings/access/Guest';
 import { MobileDevices } from '@/components/settings/access/MobileDevices';
 import { RemoteAccess } from '@/components/settings/access/RemoteAccess';
@@ -44,6 +45,7 @@ export function Settings() {
             <Route path="servers/connections" element={<Connections />} />
             <Route path="servers/posters" element={<PosterSource />} />
             <Route path="servers/plex-accounts" element={<PlexAccounts />} />
+            <Route path="servers/requests" element={<Requests />} />
 
             <Route path="notifications/destinations" element={<Destinations />} />
             <Route path="notifications/newsletters" element={<Newsletters />} />

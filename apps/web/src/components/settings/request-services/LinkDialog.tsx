@@ -1,0 +1,209 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
+import type { RequestService, RequestServiceProbeResult, Server } from '@tracearr/shared';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import {
+  useCreateRequestService,
+  useServers,
+  useTestRequestService,
+  useUpdateRequestService,
+} from '@/hooks/queries';
+
+interface LinkDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  server: Server;
+  existing?: RequestService;
+}
+
+/** The inputs a probe ran against, so an edit after the fact invalidates the result. */
+interface TestState {
+  url: string;
+  apiKey: string;
+  result: RequestServiceProbeResult | null;
+  error: string | null;
+}
+
+export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogProps) {
+  const { t } = useTranslation(['settings', 'common']);
+  const [url, setUrl] = useState(existing?.url ?? '');
+  const [apiKey, setApiKey] = useState('');
+  const [tested, setTested] = useState<TestState | null>(null);
+  const { data: servers } = useServers();
+  const testService = useTestRequestService();
+  const createService = useCreateRequestService();
+  const updateService = useUpdateRequestService();
+
+  const trimmedUrl = url.trim();
+  const trimmedKey = apiKey.trim();
+  const matchedHere = tested?.result?.matchedServerId === server.id;
+  const sameInputs = tested !== null && tested.url === trimmedUrl && tested.apiKey === trimmedKey;
+  const proven = matchedHere && sameInputs;
+
+  // A blank key in edit mode means "keep the stored one", and the stored one
+  // never reaches the browser, so there is nothing left to probe with.
+  const needsTest = existing === undefined || trimmedKey !== '';
+  const dirty =
+    existing === undefined
+      ? trimmedUrl !== '' && trimmedKey !== ''
+      : trimmedUrl !== existing.url || trimmedKey !== '';
+  const isSaving = createService.isPending || updateService.isPending;
+  const canSave = dirty && (proven || !needsTest) && !isSaving;
+
+  const runTest = () => {
+    testService.mutate(
+      { url: trimmedUrl, apiKey: trimmedKey },
+      {
+        onSuccess: (result) =>
+          setTested({ url: trimmedUrl, apiKey: trimmedKey, result, error: null }),
+        onError: (error) =>
+          setTested({ url: trimmedUrl, apiKey: trimmedKey, result: null, error: error.message }),
+      }
+    );
+  };
+
+  const save = () => {
+    const close = { onSuccess: () => onOpenChange(false) };
+    if (existing) {
+      updateService.mutate(
+        {
+          id: existing.id,
+          data: { url: trimmedUrl, ...(trimmedKey ? { apiKey: trimmedKey } : {}) },
+        },
+        close
+      );
+      return;
+    }
+    createService.mutate({ serverId: server.id, url: trimmedUrl, apiKey: trimmedKey }, close);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {existing
+              ? t('requests.dialog.titleEdit')
+              : t('requests.dialog.titleLink', { server: server.name })}
+          </DialogTitle>
+          <DialogDescription>{t('nav.descriptions.requests')}</DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-4">
+          <Field>
+            <FieldLabel htmlFor="request-service-url">{t('requests.dialog.url')}</FieldLabel>
+            <Input
+              id="request-service-url"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              placeholder="https://seerr.example.com"
+              autoComplete="off"
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="request-service-key">{t('requests.dialog.apiKey')}</FieldLabel>
+            <PasswordInput
+              id="request-service-key"
+              value={apiKey}
+              onChange={(event) => setApiKey(event.target.value)}
+              autoComplete="off"
+            />
+            <FieldDescription>
+              {existing ? t('requests.dialog.apiKeyKeep') : t('requests.dialog.apiKeyHint')}
+            </FieldDescription>
+          </Field>
+
+          <TestResult server={server} servers={servers} tested={tested} matchedHere={matchedHere} />
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t('common:actions.cancel')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={runTest}
+            disabled={!trimmedUrl || !trimmedKey || testService.isPending}
+          >
+            {testService.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {testService.isPending ? t('requests.dialog.testing') : t('requests.dialog.test')}
+          </Button>
+          <Button onClick={save} disabled={!canSave}>
+            {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t('requests.dialog.save')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TestResult({
+  server,
+  servers,
+  tested,
+  matchedHere,
+}: {
+  server: Server;
+  servers: Server[] | undefined;
+  tested: TestState | null;
+  matchedHere: boolean;
+}) {
+  const { t } = useTranslation('settings');
+
+  if (tested === null) return null;
+
+  if (tested.error !== null) {
+    return <p className="text-destructive text-sm">{tested.error}</p>;
+  }
+
+  if (tested.result === null) return null;
+
+  if (matchedHere) {
+    return (
+      <p className="text-success text-sm">
+        {t('requests.dialog.match', {
+          title: tested.result.applicationTitle,
+          version: tested.result.version,
+          type: capitalise(tested.result.mediaServerType),
+          server: server.name,
+        })}
+      </p>
+    );
+  }
+
+  const other = servers?.find((candidate) => candidate.id === tested.result?.matchedServerId);
+
+  return (
+    <p className="text-destructive text-sm">
+      {[
+        t('requests.dialog.mismatch'),
+        t('requests.dialog.mismatchIds', {
+          remote: tested.result.remoteServerId,
+          server: server.name,
+          local: server.machineIdentifier ?? '—',
+        }),
+        other ? t('requests.dialog.mismatchOther', { other: other.name }) : null,
+      ]
+        .filter((line) => line !== null)
+        .join(' ')}
+    </p>
+  );
+}
+
+function capitalise(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
