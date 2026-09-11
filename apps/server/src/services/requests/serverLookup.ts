@@ -21,3 +21,14 @@ export async function serverTypeById(id: string): Promise<'plex' | 'jellyfin' | 
     .limit(1);
   return rows[0]?.type ?? null;
 }
+
+export async function findServerById(
+  id: string
+): Promise<{ id: string; name: string; machineIdentifier: string | null } | null> {
+  const rows = await db
+    .select({ id: servers.id, name: servers.name, machineIdentifier: servers.machineIdentifier })
+    .from(servers)
+    .where(eq(servers.id, id))
+    .limit(1);
+  return rows[0] ?? null;
+}
