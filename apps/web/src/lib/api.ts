@@ -49,6 +49,13 @@ import type {
   DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
+  RequestService,
+  RequestServiceProbeResult,
+  MediaRequestEntry,
+  UserRequestsResponse,
+  TestRequestServiceInput,
+  CreateRequestServiceInput,
+  UpdateRequestServiceInput,
   Newsletter,
   CreateNewsletterInput,
   UpdateNewsletterInput,
@@ -817,6 +824,13 @@ class ApiClient {
     mergeSuggestions: async () => {
       const response = await this.request<{ data: MergeSuggestion[] }>('/users/merge-suggestions');
       return response.data;
+    },
+    requests: (id: string, opts: { scope?: 'identity'; page: number; pageSize: number }) => {
+      const searchParams = new URLSearchParams();
+      if (opts.scope) searchParams.set('scope', opts.scope);
+      searchParams.set('page', String(opts.page));
+      searchParams.set('pageSize', String(opts.pageSize));
+      return this.request<UserRequestsResponse>(`/users/${id}/requests?${searchParams.toString()}`);
     },
   };
 
@@ -1734,6 +1748,17 @@ class ApiClient {
           `/library/media/${id}/watchers?${searchParams.toString()}`
         );
       },
+      requests: (id: string, serverIds?: string[]) => {
+        const searchParams = new URLSearchParams();
+        if (serverIds?.length) {
+          for (const serverId of serverIds) {
+            searchParams.append('serverIds', serverId);
+          }
+        }
+        return this.request<{ data: MediaRequestEntry[] }>(
+          `/library/media/${id}/requests?${searchParams.toString()}`
+        );
+      },
       history: (id: string, cursor?: string, pageSize?: number, serverIds?: string[]) => {
         const searchParams = new URLSearchParams();
         if (cursor) searchParams.set('cursor', cursor);
@@ -1810,6 +1835,28 @@ class ApiClient {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+  };
+
+  requestServices = {
+    list: () => this.request<RequestService[]>('/request-services'),
+    test: (data: TestRequestServiceInput) =>
+      this.request<RequestServiceProbeResult>('/request-services/test', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    create: (data: CreateRequestServiceInput) =>
+      this.request<RequestService>('/request-services', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: UpdateRequestServiceInput) =>
+      this.request<RequestService>(`/request-services/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: string) => this.request<void>(`/request-services/${id}`, { method: 'DELETE' }),
+    sync: (id: string) =>
+      this.request<{ jobId: string }>(`/request-services/${id}/sync`, { method: 'POST' }),
   };
 
   // Newsletters

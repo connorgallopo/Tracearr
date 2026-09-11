@@ -27,7 +27,8 @@
       "import": "Import",
       "backup": "Backup",
       "jobs": "Jobs",
-      "api": "API"
+      "api": "API",
+      "requests": "Requests"
     },
     "descriptions": {
       "appearance": "Theme and accent color, stored in this browser.",
@@ -45,7 +46,8 @@
       "jobs": "Maintenance tasks you can run on demand.",
       "api": "The public API key, its rate limit and what counts as watched.",
       "newsletters": "Recently added titles, emailed to a server's members on a schedule.",
-      "email": "Branding for every email Tracearr sends, and the addresses that opted out."
+      "email": "Branding for every email Tracearr sends, and the addresses that opted out.",
+      "requests": "Link a Seerr to each server to see who requested what."
     }
   },
   "general": {
@@ -947,6 +949,49 @@
       "search": "Search timezones",
       "empty": "No timezone matches",
       "other": "Other"
+    }
+  },
+  "requests": {
+    "notLinked": "No request service linked",
+    "link": "Link Seerr",
+    "edit": "Edit",
+    "unlink": "Unlink",
+    "syncNow": "Sync now",
+    "syncedAgo": "Synced {{ago}}",
+    "neverSynced": "Not synced yet",
+    "syncing": "Syncing…",
+    "counts": {
+      "requests": "{{count}} requests",
+      "unmatchedMedia": "{{count}} titles unmatched",
+      "unmatchedUsers": "{{count}} users unmatched"
+    },
+    "needsKey": "Needs API key",
+    "lastError": "Last sync failed {{ago}}: {{error}}",
+    "dialog": {
+      "titleLink": "Link Seerr to {{server}}",
+      "titleEdit": "Edit Seerr link",
+      "url": "Seerr URL",
+      "apiKey": "API key",
+      "apiKeyHint": "Seerr → Settings → General → API key",
+      "apiKeyKeep": "Leave empty to keep the current key",
+      "test": "Test",
+      "testing": "Testing…",
+      "save": "Save",
+      "match": "{{title}} · Seerr {{version}} · {{type}} · this is {{server}}",
+      "mismatch": "This Seerr is connected to a different server.",
+      "mismatchIds": "Seerr reports {{remote}}; {{server}} is {{local}}.",
+      "mismatchOther": "It matches {{other}}."
+    },
+    "confirmUnlink": {
+      "title": "Unlink Seerr?",
+      "body": "Mirrored request history for {{server}} will be deleted."
+    },
+    "ownerOnly": "Only the owner can manage request services.",
+    "toast": {
+      "saved": "Request service saved",
+      "removed": "Request service removed",
+      "syncStarted": "Sync started",
+      "failed": "Request service action failed: {{error}}"
     }
   }
 }
