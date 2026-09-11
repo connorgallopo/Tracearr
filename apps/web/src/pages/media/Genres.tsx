@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Tags } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/library/ErrorState';
 import { LibraryEmptyState } from '@/components/library/LibraryEmptyState';
@@ -17,6 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TopListChart } from '@/components/charts/TopListChart';
+import { MediaTypeToggle } from '@/components/media-browse/MediaTypeToggle';
 import { useGenres } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
 import { formatNumber, formatWatchTime } from '@/components/ui/stat-card';
@@ -96,35 +96,10 @@ export function MediaGenres() {
     );
   }
 
-  const typeToggle = (
-    <ToggleGroup
-      type="single"
-      value={type}
-      onValueChange={(value) => value && setType(value as 'movie' | 'show')}
-      variant="outline"
-      aria-label={t('media.grid.toolbar.typeLabel')}
-    >
-      <ToggleGroupItem
-        value="movie"
-        aria-label={t('media.grid.toolbar.moviesToggle')}
-        className="data-[state=on]:bg-primary/15 data-[state=on]:text-primary"
-      >
-        {t('media.grid.toolbar.moviesToggle')}
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        value="show"
-        aria-label={t('media.grid.toolbar.showsToggle')}
-        className="data-[state=on]:bg-primary/15 data-[state=on]:text-primary"
-      >
-        {t('media.grid.toolbar.showsToggle')}
-      </ToggleGroupItem>
-    </ToggleGroup>
-  );
-
   return (
     <div className="space-y-6">
       {header}
-      {typeToggle}
+      <MediaTypeToggle value={type} onChange={setType} />
 
       {isLoading ? (
         <div className="space-y-6" data-testid="genres-skeleton">

@@ -22,9 +22,6 @@ interface TimeRangePickerProps {
   className?: string;
 }
 
-// one selected-state language across every segmented control in the app
-const SELECTED = 'data-[state=on]:bg-primary/15 data-[state=on]:text-primary';
-
 const PRESETS: { value: TimeRangePeriod; label: string }[] = [
   { value: 'week', label: '7d' },
   { value: 'month', label: '30d' },
@@ -79,14 +76,14 @@ export function TimeRangePicker({ value, onChange, className }: TimeRangePickerP
       className={className}
     >
       {PRESETS.map((preset) => (
-        <ToggleGroupItem key={preset.value} value={preset.value} className={SELECTED}>
+        <ToggleGroupItem key={preset.value} value={preset.value}>
           {preset.label}
         </ToggleGroupItem>
       ))}
 
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <ToggleGroupItem value="custom" className={SELECTED}>
+          <ToggleGroupItem value="custom">
             <CalendarIcon />
             {value.period === 'custom' ? formatDateRange() : 'Custom'}
           </ToggleGroupItem>

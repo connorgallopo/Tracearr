@@ -12,7 +12,6 @@ import {
   type TriggerParamPatch,
 } from './builderReducer';
 import { RowActions, RowIssues } from './RowActions';
-import { SELECTED_TOGGLE } from './selection';
 import type { RowProps } from './useRowKeyboard';
 import type { BuilderIssue } from './validation';
 
@@ -49,12 +48,10 @@ function TriggerTitle({
             if (measure === 'current' || measure === 'total') setParam({ measure });
           }}
         >
-          <ToggleGroupItem value="current" className={SELECTED_TOGGLE}>
+          <ToggleGroupItem value="current">
             {t('automations.builder.heldFor.current')}
           </ToggleGroupItem>
-          <ToggleGroupItem value="total" className={SELECTED_TOGGLE}>
-            {t('automations.builder.heldFor.total')}
-          </ToggleGroupItem>
+          <ToggleGroupItem value="total">{t('automations.builder.heldFor.total')}</ToggleGroupItem>
         </ToggleGroup>
       </>
     );

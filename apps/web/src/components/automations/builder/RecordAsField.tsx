@@ -12,7 +12,6 @@ import {
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { SEVERITIES, severityLabel } from '@/lib/automations';
 import { nodeDomId, type BuilderDispatch } from './builderReducer';
-import { SELECTED_TOGGLE } from './selection';
 import { StepFooterField } from './StepFooterField';
 import { BUILDER_SECTIONS } from './validation';
 
@@ -46,7 +45,7 @@ export function RecordAsField({ kind, severity, dispatch }: RecordAsFieldProps) 
               }}
             >
               {AUTOMATION_KINDS.map((option) => (
-                <ToggleGroupItem key={option} value={option} className={SELECTED_TOGGLE}>
+                <ToggleGroupItem key={option} value={option}>
                   {t(`automations.builder.recordAs.${option}`)}
                 </ToggleGroupItem>
               ))}
