@@ -21,6 +21,20 @@ export function watchedByRequester(watchedStateSelf: WatchedState | undefined): 
   return watchedStateSelf === 'watched';
 }
 
+/**
+ * A background conic-gradient is not clipped to the border radius by Firefox
+ * once an ancestor is transformed (the hovered poster card), so the pie is an
+ * SVG arc instead. The slice is a fixed 62%: a glyph for "partly watched",
+ * not a progress meter.
+ */
+const PARTIAL_FRACTION = 0.62;
+const PARTIAL_ARC = (() => {
+  const angle = PARTIAL_FRACTION * 2 * Math.PI;
+  const x = (1 + Math.sin(angle)).toFixed(3);
+  const y = (1 - Math.cos(angle)).toFixed(3);
+  return `M1 1 L1 0 A1 1 0 ${PARTIAL_FRACTION > 0.5 ? 1 : 0} 1 ${x} ${y} Z`;
+})();
+
 type WatchedLabelKey =
   | 'media.posterCard.watchedState.watched'
   | 'media.posterCard.watchedState.watchedByYou'
@@ -74,13 +88,14 @@ export function WatchedBadge({ watchedState, watchedStateSelf, className }: Watc
     return (
       <span
         className={cn(
-          'border-background/55 inline-flex size-[18px] rounded-full border-2',
+          'border-background/55 inline-flex size-[18px] overflow-hidden rounded-full border-2',
           className
         )}
-        style={{
-          background: `conic-gradient(hsl(var(${tone})) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)`,
-        }}
       >
+        <svg viewBox="0 0 2 2" className="size-full" aria-hidden="true">
+          <circle cx="1" cy="1" r="1" fill="hsl(var(--muted-foreground) / 0.6)" />
+          <path d={PARTIAL_ARC} fill={`hsl(var(${tone}))`} />
+        </svg>
         <span className="sr-only">{t('media.posterCard.watchedState.partial')}</span>
       </span>
     );

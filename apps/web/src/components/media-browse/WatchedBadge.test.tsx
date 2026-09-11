@@ -18,9 +18,8 @@ describe('WatchedBadge', () => {
     const { container } = render(<WatchedBadge watchedState="partial" />);
     expect(screen.getByText('Partially watched')).toHaveClass('sr-only');
     expect(screen.queryByText('Watched')).not.toBeInTheDocument();
-    // The partial glyph is a conic-gradient pie, not the watched state's
-    // check icon.
-    expect(container.querySelector('svg')).toBeNull();
+    expect(container.querySelector('.lucide-check')).toBeNull();
+    expect(container.querySelector('svg path')).not.toBeNull();
   });
 
   it('renders visually distinct markup for watched vs partial (never the same badge)', () => {
@@ -38,22 +37,14 @@ describe('WatchedBadge', () => {
     const { container } = render(
       <WatchedBadge watchedState="partial" watchedStateSelf="unwatched" />
     );
-    const badge = container.firstElementChild;
-    expect(badge).toHaveStyle({
-      background:
-        'conic-gradient(hsl(var(--warning)) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)',
-    });
+    expect(container.querySelector('path')).toHaveAttribute('fill', 'hsl(var(--warning))');
   });
 
   it('renders the partial pie in the success tone when the requester is mid-watch themselves', () => {
     const { container } = render(
       <WatchedBadge watchedState="partial" watchedStateSelf="partial" />
     );
-    const badge = container.firstElementChild;
-    expect(badge).toHaveStyle({
-      background:
-        'conic-gradient(hsl(var(--success)) 0 62%, hsl(var(--muted-foreground) / 0.6) 62% 100%)',
-    });
+    expect(container.querySelector('path')).toHaveAttribute('fill', 'hsl(var(--success))');
   });
 
   it('renders the success/green tone with a "watched by you" label when the requester watched it', () => {
