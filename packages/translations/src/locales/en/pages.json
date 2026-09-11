@@ -1604,6 +1604,7 @@
         "host": "SMTP host",
         "port": "Port",
         "security": "Security",
+        "verifyCertificate": "Verify certificate",
         "username": "Username",
         "password": "Password",
         "fromName": "From name",
@@ -1621,6 +1622,7 @@
       "hints": {
         "authTokenOptional": "Optional for public topics",
         "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
+        "smtpVerifyCertificate": "Checks the mail server's TLS certificate against a trusted authority. Turn it off only for a server with a self-signed certificate, such as a local bridge: anyone on the path between Tracearr and the mail server can then intercept the connection.",
         "smtpUsernameOptional": "Leave blank when the server needs no login",
         "smtpTo": "Alerts sent to this destination go to these addresses. Newsletters ignore this list and pick their own recipients, so you can leave it blank.",
         "smtpRate": "Per Tracearr instance; stay under your provider's limit",
