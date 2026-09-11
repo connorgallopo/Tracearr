@@ -59,7 +59,10 @@ import { resolutionBucketPredicate, resolutionRankSql } from '../../utils/resolu
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { normalizeTitle } from '../../services/library/mediaMatchKey.js';
-import { resolveWatchedStates } from '../../services/library/mediaWatchedService.js';
+import {
+  fetchEpisodeCounts,
+  resolveWatchedStates,
+} from '../../services/library/mediaWatchedService.js';
 import { buildProxyUrl, posterVersionFor } from '../../services/imageProxy.js';
 import { getSetting } from '../../services/settings.js';
 import type { DateRange } from '../stats/utils.js';
@@ -803,27 +806,6 @@ export function buildLetterBuckets(counts: Map<string, number>): CatalogLetterBu
     letter,
     count: counts.get(letter) ?? 0,
   }));
-}
-
-export async function fetchEpisodeCounts(
-  showIds: string[],
-  serverIds: string[] | undefined
-): Promise<Map<string, number>> {
-  const result = new Map<string, number>();
-  if (showIds.length === 0) return result;
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
-  const rows = await db.execute(sql`
-    SELECT m.show_media_id AS show_id, COUNT(*) FILTER (WHERE m.media_type = 'episode')::int AS episode_count
-    FROM media m
-    WHERE m.show_media_id = ANY(${uuidArraySql(showIds)})
-      AND m.media_type = 'episode'
-      AND EXISTS (SELECT 1 FROM library_items li WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi})
-    GROUP BY m.show_media_id
-  `);
-  for (const row of rows.rows as unknown as { show_id: string; episode_count: number }[]) {
-    result.set(row.show_id, row.episode_count);
-  }
-  return result;
 }
 
 async function fetchPageEngagement(

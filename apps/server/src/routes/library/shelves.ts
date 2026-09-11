@@ -29,12 +29,14 @@ import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFi
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import {
   buildValueRollupCte,
-  fetchEpisodeCounts,
   pickBestResolution,
   buildCatalogPageQuery,
   buildPosterOrderFragment,
 } from './catalog.js';
-import { resolveWatchedStates } from '../../services/library/mediaWatchedService.js';
+import {
+  fetchEpisodeCounts,
+  resolveWatchedStates,
+} from '../../services/library/mediaWatchedService.js';
 import { buildProxyUrl, posterVersionFor } from '../../services/imageProxy.js';
 import { getSetting } from '../../services/settings.js';
 import { resolveDateRange, type DateRange } from '../stats/utils.js';

@@ -33,6 +33,7 @@ import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { decodeCursor } from '../../utils/cursor.js';
 import { cursorPage, cursorPaginationSchema } from '../publicV2/shared.js';
 import { resolveMediaAliases } from '../../services/library/mediaResolutionService.js';
+import { listMediaRequests } from '../../services/requests/reads.js';
 import {
   buildMediaScope,
   getAvailability,
@@ -363,6 +364,32 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     };
     await app.redis.setex(cacheKey, CACHE_TTL.LIBRARY_MEDIA_DETAIL, JSON.stringify(response));
     return response;
+  });
+
+  /**
+   * GET /media/:id/requests - Seerr requests for this title, scoped to
+   * accessible servers. Never cached: the socket event that tells the client
+   * to refetch would otherwise land on a stale copy for the rest of the TTL.
+   */
+  app.get('/media/:id/requests', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const params = mediaIdParamSchema.safeParse(request.params);
+    if (!params.success) return reply.badRequest('Invalid media id');
+
+    const querySchema = z.object({
+      serverId: uuidSchema.optional(),
+      serverIds: serverIdsQuerySchema,
+    });
+    const query = querySchema.safeParse(request.query);
+    if (!query.success) return reply.badRequest('Invalid query parameters');
+
+    const resolvedIds = resolveServerIds(request.user, query.data.serverId, query.data.serverIds);
+    const canonical = await resolveCanonicalMediaByRef(params.data.id);
+    if (!canonical) return reply.notFound();
+    if (canonical.mediaType === 'episode') return { data: [] };
+    const scope = await buildMediaScope(canonical);
+    if (!scope) return reply.notFound();
+
+    return { data: await listMediaRequests({ scope, serverIds: resolvedIds }) };
   });
 
   /**

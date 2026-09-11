@@ -182,6 +182,28 @@ async function fetchShowWatchedRows(
  * `su.user_id = lensUserId` filter short-circuits via the leading OR IS NULL,
  * which is equivalent to a semi-join across all users for this BOOL_OR/COUNT shape.
  */
+/** showId -> count of episodes currently in the library, the denominator every show watched probe uses. */
+export async function fetchEpisodeCounts(
+  showIds: string[],
+  serverIds: string[] | undefined
+): Promise<Map<string, number>> {
+  const result = new Map<string, number>();
+  if (showIds.length === 0) return result;
+  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const rows = await db.execute(sql`
+    SELECT m.show_media_id AS show_id, COUNT(*) FILTER (WHERE m.media_type = 'episode')::int AS episode_count
+    FROM media m
+    WHERE m.show_media_id = ANY(${uuidArraySql(showIds)})
+      AND m.media_type = 'episode'
+      AND EXISTS (SELECT 1 FROM library_items li WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi})
+    GROUP BY m.show_media_id
+  `);
+  for (const row of rows.rows as unknown as { show_id: string; episode_count: number }[]) {
+    result.set(row.show_id, row.episode_count);
+  }
+  return result;
+}
+
 export async function resolveWatchedStates(
   args: WatchedProbeArgs
 ): Promise<Map<string, WatchedState>> {
