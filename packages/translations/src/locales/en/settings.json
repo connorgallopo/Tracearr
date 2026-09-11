@@ -948,5 +948,57 @@
       "empty": "No timezone matches",
       "other": "Other"
     }
+  },
+  "requests": {
+    "label": "Requests",
+    "link": "Link Seerr",
+    "unlink": "Unlink",
+    "syncNow": "Sync now",
+    "enable": "Enable sync",
+    "disable": "Disable sync",
+    "paused": "Paused",
+    "menuLabel": "Seerr actions for {{server}}",
+    "syncedAgo": "Synced {{ago}}",
+    "neverSynced": "Not synced yet",
+    "counts": {
+      "requests_one": "{{count}} request",
+      "requests_other": "{{count}} requests",
+      "unmatchedMedia_one": "{{count}} unmatched title",
+      "unmatchedMedia_other": "{{count}} unmatched titles",
+      "unmatchedUsers_one": "{{count}} unmatched user",
+      "unmatchedUsers_other": "{{count}} unmatched users"
+    },
+    "needsKey": "Needs API key",
+    "lastError": "Last sync failed {{ago}}: {{error}}",
+    "lastErrorNoTime": "Last sync failed: {{error}}",
+    "dialog": {
+      "titleLink": "Link Seerr to {{server}}",
+      "titleEdit": "Edit Seerr link",
+      "description": "Tracearr reads request history from this Seerr. Nothing is written back.",
+      "url": "Seerr URL",
+      "apiKey": "API key",
+      "apiKeyHint": "Seerr → Settings → General → API key",
+      "apiKeyKeep": "Leave empty to keep the current key",
+      "showKey": "Show API key",
+      "hideKey": "Hide API key",
+      "test": "Test",
+      "testing": "Testing…",
+      "save": "Save",
+      "saveHint": "Test the connection before saving",
+      "match": "{{title}} · Seerr {{version}} · {{type}} · this is {{server}}",
+      "mismatch": "This Seerr is connected to a different server.",
+      "mismatchIds": "Seerr reports {{remote}}; {{server}} is {{local}}.",
+      "mismatchOther": "It matches {{other}}."
+    },
+    "confirmUnlink": {
+      "title": "Unlink Seerr?",
+      "body": "Mirrored request history for {{server}} will be deleted."
+    },
+    "toast": {
+      "saved": "Request service saved",
+      "removed": "Request service removed",
+      "syncStarted": "Sync started",
+      "failed": "Request service action failed: {{error}}"
+    }
   }
 }
