@@ -1711,3 +1711,15 @@ export function parseLibraryItemsResponse(data: unknown): MediaLibraryItem[] {
   const metadata = container?.MediaContainer?.Metadata;
   return parseArray(metadata, (item) => parseLibraryItem(item as Record<string, unknown>));
 }
+
+/** Full genre lists keyed by ratingKey, from a batched /library/metadata/{keys} response. */
+export function parseGenresByRatingKey(data: unknown): Map<string, string[]> {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const genres = new Map<string, string[]>();
+  for (const raw of container?.MediaContainer?.Metadata ?? []) {
+    const item = raw as Record<string, unknown>;
+    const tags = parseGenres(item.Genre as Array<{ tag?: string }> | undefined);
+    if (tags) genres.set(parseString(item.ratingKey), tags);
+  }
+  return genres;
+}

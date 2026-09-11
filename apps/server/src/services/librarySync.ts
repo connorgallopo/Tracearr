@@ -46,7 +46,7 @@ import type { LibrarySyncProgress } from '@tracearr/shared';
 import { REDIS_KEYS, RESOLUTION_TIERS, LEGACY_VERSION_SENTINEL } from '@tracearr/shared';
 import { resolutionBucketPredicate, resolutionRankSql } from '../utils/resolutionBuckets.js';
 import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
-import { sanitizeText, sanitizeTextArray, scrubStringFields } from '../utils/sanitizeText.js';
+import { sanitizeText, scrubStringFields } from '../utils/sanitizeText.js';
 import type { Redis } from 'ioredis';
 
 // Constants for batching and rate limiting.
@@ -207,14 +207,6 @@ export type OnProgressCallback = (progress: LibrarySyncProgress) => void;
  */
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/** Bind a genre list as one param; drizzle expands a raw array into a record that cannot cast to text[] */
-function toPgTextArrayLiteral(values: string[]): string {
-  const escaped = sanitizeTextArray(values).map(
-    (v) => `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
-  );
-  return `{${escaped.join(',')}}`;
 }
 
 /**
@@ -1689,19 +1681,26 @@ export class LibrarySyncService {
       });
     }
 
-    const genreRows = uniqueItems
-      .filter((i) => i.genres?.length && mediaIdByRatingKey.get(i.ratingKey))
-      .map((i) => ({ id: mediaIdByRatingKey.get(i.ratingKey)!, genres: i.genres! }));
-    if (genreRows.length > 0) {
-      const values = sql.join(
-        genreRows.map((r) => sql`(${r.id}::uuid, ${toPgTextArrayLiteral(r.genres)}::text[])`),
-        sql`, `
-      );
-      // m.genres IS NULL writes once so disagreeing servers don't thrash the row
+    const genreMediaIds = new Set(
+      uniqueItems
+        .filter((i) => i.genres?.length)
+        .map((i) => mediaIdByRatingKey.get(i.ratingKey))
+        .filter((id): id is string => !!id)
+    );
+    if (genreMediaIds.size > 0) {
+      // Rebuilt from every server's active copy so an edit on the server lands.
+      // Servers that disagree settle on the longest list, then the lowest
+      // server id, so they never take turns overwriting the row.
+      const ids = `{${[...genreMediaIds].join(',')}}`;
       await db.execute(sql`
-        UPDATE media m SET genres = v.genres, updated_at = now()
-        FROM (VALUES ${values}) AS v(id, genres)
-        WHERE m.id = v.id AND m.genres IS NULL
+        UPDATE media m SET genres = best.genres, updated_at = now()
+        FROM (
+          SELECT DISTINCT ON (media_id) media_id, genres
+          FROM library_items
+          WHERE removed_at IS NULL AND cardinality(genres) > 0 AND media_id = ANY(${ids}::uuid[])
+          ORDER BY media_id, cardinality(genres) DESC, server_id, id
+        ) best
+        WHERE m.id = best.media_id AND m.genres IS DISTINCT FROM best.genres
       `);
     }
 
