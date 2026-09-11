@@ -441,6 +441,32 @@ export function DestinationDialog({
                   const missing = field.required && !isFilled(field);
                   const invalid = missing && showsError(field.key);
                   const hint = resolveHint(kind, field, values['preset']);
+
+                  if (field.input === 'toggle') {
+                    return (
+                      <Field key={field.key} orientation="horizontal">
+                        <FieldContent>
+                          <FieldLabel htmlFor={inputId}>
+                            {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
+                          </FieldLabel>
+                          {hint && (
+                            <FieldDescription>
+                              {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
+                            </FieldDescription>
+                          )}
+                        </FieldContent>
+                        <Switch
+                          id={inputId}
+                          ref={setFieldRef(field.key)}
+                          checked={(values[field.key] ?? field.default) !== 'false'}
+                          onCheckedChange={(checked) =>
+                            setFieldValue(field.key, checked ? 'true' : 'false')
+                          }
+                        />
+                      </Field>
+                    );
+                  }
+
                   const inputProps = {
                     id: inputId,
                     ref: setFieldRef(field.key),

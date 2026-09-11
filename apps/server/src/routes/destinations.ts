@@ -68,6 +68,13 @@ function assertSafeUrls(kind: DestinationKind, config: Record<string, unknown>):
   }
 }
 
+/** Code and message only: a TLS altname error carries the whole peer certificate, and the config holds secrets. */
+function testFailure(error: unknown): { code?: string; message: string } {
+  const failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;
+  if (!(failure instanceof Error)) return { message: String(failure) };
+  return { code: (failure as { code?: string }).code, message: failure.message };
+}
+
 const unsavedTestSchema = z.strictObject({
   type: createDestinationSchema.shape.type,
   config: z.record(z.string(), z.unknown()),
@@ -90,6 +97,7 @@ export async function destinationRoutes(app: FastifyInstance): Promise<void> {
       });
       return report?.sentTo ? { success: true, sentTo: report.sentTo } : { success: true };
     } catch (error) {
+      reply.log.warn(testFailure(error), `${kind} destination test failed`);
       const message = (error instanceof Error ? error.message : 'Test failed').slice(0, 500);
       return reply.code(502).send({ success: false, error: message });
     }

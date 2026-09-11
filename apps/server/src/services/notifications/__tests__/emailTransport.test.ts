@@ -67,6 +67,17 @@ describe('transportOptions', () => {
     });
   });
 
+  it('skips certificate verification only when the setting is explicitly off', () => {
+    const off = { tls: { rejectUnauthorized: false } };
+    expect(transportOptions({ ...base, verifyCertificate: 'false' })).toMatchObject(off);
+    expect(
+      transportOptions({ ...base, security: 'tls', port: '465', verifyCertificate: 'false' })
+    ).toMatchObject(off);
+    expect(transportOptions({ ...base, verifyCertificate: 'true' })).not.toHaveProperty('tls');
+    expect(transportOptions({ ...base, verifyCertificate: null })).not.toHaveProperty('tls');
+    expect(transportOptions(base)).not.toHaveProperty('tls');
+  });
+
   it('omits auth without a username and defaults the rate to 2', () => {
     const opts = transportOptions({
       ...base,
@@ -92,6 +103,14 @@ describe('getTransporter', () => {
     );
     expect(mockCreateTransport).toHaveBeenLastCalledWith(
       expect.objectContaining({ auth: { user: 'user', pass: 'rotated' } })
+    );
+  });
+
+  it('rebuilds the pool when certificate verification is toggled', () => {
+    const first = getTransporter('dest-1', base);
+    expect(getTransporter('dest-1', { ...base, verifyCertificate: 'false' })).not.toBe(first);
+    expect(mockCreateTransport).toHaveBeenLastCalledWith(
+      expect.objectContaining({ tls: { rejectUnauthorized: false } })
     );
   });
 
@@ -158,8 +177,25 @@ describe('describeSmtpError', () => {
       'Could not connect to smtp.example.com:587'
     );
     expect(describeSmtpError(Object.assign(new Error('x'), { code: 'ESOCKET' }), base)).toBe(
-      'TLS failed for smtp.example.com:587; check the security setting'
+      'TLS failed for smtp.example.com:587: x; check the security setting'
     );
     expect(describeSmtpError(new Error('boom'), base)).toBe('boom');
+  });
+
+  it('strips the root CA advice from a certificate failure and points at the verify setting', () => {
+    const selfSigned = Object.assign(
+      new Error(
+        'self-signed certificate; if the root CA is installed locally, try running Node.js with --use-system-ca'
+      ),
+      { code: 'ESOCKET' }
+    );
+    expect(describeSmtpError(selfSigned, base)).toBe(
+      'TLS failed for smtp.example.com:587: self-signed certificate; turn off Verify certificate for this destination if you trust the server'
+    );
+    const mismatch = Object.assign(
+      new Error("Hostname/IP does not match certificate's altnames: Host: x. is not cert's CN: y"),
+      { code: 'ESOCKET' }
+    );
+    expect(describeSmtpError(mismatch, base)).toMatch(/altnames.*turn off Verify certificate/);
   });
 });

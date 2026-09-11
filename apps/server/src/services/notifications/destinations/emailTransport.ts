@@ -9,12 +9,16 @@ export interface SmtpConfig {
   host: string;
   port: string;
   security: EmailSecurity;
+  /** 'false' skips certificate verification; anything else, including a missing key on an older row, verifies */
+  verifyCertificate?: string | null;
   username?: string | null;
   password?: string | null;
   messagesPerSecond?: string | null;
 }
 
 const DEFAULT_RATE = 2;
+const VERIFY_CERTIFICATE_LABEL = 'Verify certificate';
+const ROOT_CA_ADVICE = /; if the root CA is installed locally.*$/s;
 
 export function transportOptions(config: SmtpConfig): SMTPPool.Options {
   const rate = Number(config.messagesPerSecond);
@@ -31,11 +35,12 @@ export function transportOptions(config: SmtpConfig): SMTPPool.Options {
     socketTimeout: 120_000,
     ...(config.username ? { auth: { user: config.username, pass: config.password ?? '' } } : {}),
   };
+  const trust = config.verifyCertificate === 'false' ? { tls: { rejectUnauthorized: false } } : {};
   switch (config.security) {
     case 'tls':
-      return { ...base, secure: true };
+      return { ...base, secure: true, ...trust };
     case 'starttls':
-      return { ...base, secure: false, requireTLS: true };
+      return { ...base, secure: false, requireTLS: true, ...trust };
     case 'none':
       return { ...base, secure: false, ignoreTLS: true };
   }
@@ -54,6 +59,7 @@ function configHash(config: SmtpConfig): string {
         config.host,
         config.port,
         config.security,
+        config.verifyCertificate ?? '',
         config.username ?? '',
         config.password ?? '',
         config.messagesPerSecond ?? '',
@@ -117,8 +123,15 @@ export function describeSmtpError(error: unknown, config: SmtpConfig): string {
     case 'ETIMEDOUT':
     case 'EDNS':
       return `Could not connect to ${config.host}:${config.port}`;
-    case 'ESOCKET':
-      return `TLS failed for ${config.host}:${config.port}; check the security setting`;
+    case 'ESOCKET': {
+      const reason = (error instanceof Error ? error.message : '')
+        .replace(ROOT_CA_ADVICE, '')
+        .trim();
+      const advice = /certificate|altnames/i.test(reason)
+        ? `turn off ${VERIFY_CERTIFICATE_LABEL} for this destination if you trust the server`
+        : 'check the security setting';
+      return `TLS failed for ${config.host}:${config.port}${reason ? `: ${reason}` : ''}; ${advice}`;
+    }
     default:
       return error instanceof Error ? error.message : 'SMTP error';
   }

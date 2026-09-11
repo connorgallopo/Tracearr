@@ -52,7 +52,8 @@ export interface DestinationFieldDescriptor {
   key: string;
   /** i18n key under pages:settings.destinations.fields */
   label: string;
-  input: 'text' | 'url' | 'secret' | 'select' | 'number' | 'email' | 'emails';
+  /** toggle stores 'true' or 'false' so the config blob stays all strings; absent reads as the default */
+  input: 'text' | 'url' | 'secret' | 'select' | 'number' | 'email' | 'emails' | 'toggle';
   required: boolean;
   /** Masked on read, kept on omit; every url is secret because webhook urls embed credentials */
   secret: boolean;
@@ -249,6 +250,20 @@ const emails = (
   placeholder,
   hint,
 });
+const toggle = (
+  key: string,
+  label: string,
+  def: 'true' | 'false',
+  hint: string
+): DestinationFieldDescriptor => ({
+  key,
+  label,
+  input: 'toggle',
+  required: false,
+  secret: false,
+  default: def,
+  hint,
+});
 const grouped = (
   group: string,
   fields: readonly DestinationFieldDescriptor[]
@@ -339,6 +354,7 @@ export const DESTINATION_TYPES = {
         text('host', 'host', true, 'smtp.example.com'),
         number('port', 'port', '587', 1, 65535),
         select('security', 'security', SECURITY_OPTIONS, 'starttls'),
+        toggle('verifyCertificate', 'verifyCertificate', 'true', 'smtpVerifyCertificate'),
         { ...text('username', 'username', false), hint: 'smtpUsernameOptional' },
         secret('password', 'password', false),
         number('messagesPerSecond', 'messagesPerSecond', '2', 1, 50, 'smtpRate'),
@@ -431,6 +447,11 @@ function fieldSchema(f: DestinationFieldDescriptor): z.ZodString {
         'Must be one of the listed options'
       );
     }
+    case 'toggle':
+      return z.string().refine(
+        blankOk((v) => v === 'true' || v === 'false'),
+        'Must be true or false'
+      );
     case 'text':
     case 'secret': {
       const { pattern } = f;
