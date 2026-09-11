@@ -2197,7 +2197,8 @@
         "medianWait": "median wait {{duration}}",
         "approvalRate": "Approval rate",
         "neverWatched": "Never watched"
-      }
+      },
+      "empty": "No requests yet"
     },
     "unattributed": "Not on this server"
   }
