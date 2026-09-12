@@ -44,7 +44,7 @@
     "@tiptap/react": "3.31.3",
     "@tracearr/shared": "workspace:*",
     "@tracearr/translations": "workspace:*",
-    "better-auth": "1.6.30",
+    "better-auth": "1.7.2",
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
