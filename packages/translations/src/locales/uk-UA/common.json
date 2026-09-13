@@ -191,7 +191,8 @@
     "selectAllOnPage": "Вибрати все на сторінці",
     "selectRow": "Виберіть рядок",
     "pageOf": "Сторінка {{page}} з {{total}}",
-    "pagination": ""
+    "pagination": "",
+    "goToPage": ""
   },
   "filters": {
     "clearAll": "Очистити все",
