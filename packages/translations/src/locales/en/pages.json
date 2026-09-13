@@ -2166,10 +2166,8 @@
       "watched": "Watched"
     },
     "wait": {
-      "pending": "still waiting",
-      "declined": "declined",
-      "landed": "landed {{duration}} later",
-      "sameMinute": "landed within a minute"
+      "pending": "waiting",
+      "declined": "declined"
     },
     "seasons": {
       "all": "All seasons",
@@ -2200,6 +2198,63 @@
       },
       "empty": "No requests yet"
     },
-    "unattributed": "Not on this server"
+    "unattributed": "Not on this server",
+    "watched": {
+      "byRequester": "Watched by the requester",
+      "byOthers": "Watched by someone else"
+    },
+    "page": {
+      "title": "Requests",
+      "description": "What people asked for, what landed, and whether they ever played it.",
+      "failedToLoad": "Couldn't load request analytics",
+      "notConfigured": "No Seerr linked",
+      "notConfiguredDescription": "Link a Seerr instance to a server and this page fills in after the first sync.",
+      "linkSeerr": "Link Seerr",
+      "kpi": {
+        "requested": "Requested",
+        "landedOf": "{{count}} landed",
+        "watched": "Watched",
+        "neverPlayed": "Never played",
+        "ofLanded": "{{share}} of landed",
+        "onDisk": "{{size}} on disk"
+      }
+    },
+    "funnel": {
+      "title": "Where requests end up",
+      "description": "Watched means someone got through 85% of it, the same bar the library pages use. A request has to land and be matched to a title before Tracearr can measure that.",
+      "requested": "Requested",
+      "landed": "Landed",
+      "watched": "Watched",
+      "share": "{{count}} of {{total}} requests",
+      "empty": "No requests yet"
+    },
+    "unplayed": {
+      "title": "Landed and never played",
+      "description": "Downloaded because someone asked, and no account on these servers has pressed play even once.",
+      "emptyTitle": "Everything that landed got played",
+      "emptyDescription": "Nothing here is holding disk for no reason."
+    },
+    "outcomes": {
+      "title": "Title",
+      "requester": "Requested by",
+      "wait": "Wait",
+      "requested": "Requested",
+      "onDisk": "On disk",
+      "untitled": "Untitled",
+      "failedToLoad": "Couldn't load these requests"
+    },
+    "followThrough": {
+      "title": "Requesters",
+      "description": "Who asks for what, whether they watch it through, and whether anyone else does.",
+      "person": "Person",
+      "asked": "Asked",
+      "landed": "Landed",
+      "watched": "Watched",
+      "watchedByOthers": "Watched by others",
+      "medianWait": "Median wait",
+      "emptyTitle": "No requesters yet",
+      "emptyDescription": "Requests appear here once a linked Seerr has synced.",
+      "failedToLoad": "Couldn’t load requesters"
+    }
   }
 }
