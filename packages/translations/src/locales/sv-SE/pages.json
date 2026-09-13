@@ -2167,9 +2167,7 @@
     },
     "wait": {
       "pending": "",
-      "declined": "",
-      "landed": "",
-      "sameMinute": ""
+      "declined": ""
     },
     "seasons": {
       "all": "",
@@ -2200,6 +2198,63 @@
       },
       "empty": ""
     },
-    "unattributed": ""
+    "unattributed": "",
+    "watched": {
+      "byRequester": "",
+      "byOthers": ""
+    },
+    "page": {
+      "title": "",
+      "description": "",
+      "failedToLoad": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "linkSeerr": "",
+      "kpi": {
+        "requested": "",
+        "landedOf": "",
+        "watched": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": ""
+      }
+    },
+    "funnel": {
+      "title": "",
+      "description": "",
+      "requested": "",
+      "landed": "",
+      "watched": "",
+      "share": "",
+      "empty": ""
+    },
+    "unplayed": {
+      "title": "",
+      "description": "",
+      "emptyTitle": "",
+      "emptyDescription": ""
+    },
+    "outcomes": {
+      "title": "",
+      "requester": "",
+      "wait": "",
+      "requested": "",
+      "onDisk": "",
+      "untitled": "",
+      "failedToLoad": ""
+    },
+    "followThrough": {
+      "title": "",
+      "description": "",
+      "person": "",
+      "asked": "",
+      "landed": "",
+      "watched": "",
+      "watchedByOthers": "",
+      "medianWait": "",
+      "emptyTitle": "",
+      "emptyDescription": "",
+      "failedToLoad": ""
+    }
   }
 }
