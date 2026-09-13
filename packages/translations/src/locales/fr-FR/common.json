@@ -191,7 +191,8 @@
     "selectAllOnPage": "Tout sélectionner sur la page",
     "selectRow": "Sélectionner la ligne",
     "pageOf": "Page {{page}} sur {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "goToPage": ""
   },
   "filters": {
     "clearAll": "Tout effacer",
