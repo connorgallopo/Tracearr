@@ -159,6 +159,8 @@
       "serverUserSplit": {
         "title": "Account split into a separate user"
       },
+      "mergeSuggestionDismissed": "Marked as not the same person",
+      "mergeSuggestionRestored": "Suggestion restored",
       "destinationSaved": "Destination saved",
       "destinationDeleted": "Destination deleted",
       "destinationTestSent": "Test notification sent",
@@ -215,6 +217,8 @@
       "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
       "userMergeFailed": "Failed to merge users",
       "serverUserSplitFailed": "Failed to split account",
+      "mergeSuggestionDismissFailed": "Could not dismiss the suggestion",
+      "mergeSuggestionRestoreFailed": "Could not restore the suggestion",
       "invalidClaimCode": {
         "title": "Invalid claim code",
         "message": "Please check the server logs"
