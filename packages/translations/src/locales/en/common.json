@@ -191,7 +191,8 @@
     "selectAllOnPage": "Select all on page",
     "selectRow": "Select row",
     "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "goToPage": "Go to page {{page}}"
   },
   "filters": {
     "clearAll": "Clear all",
