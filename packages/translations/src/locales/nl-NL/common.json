@@ -67,8 +67,6 @@
     "alert_other": "{{count}} waarschuwingen",
     "automation_one": "{{count}} automatisering",
     "automation_other": "{{count}} automatiseringen",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} apparaat",
     "device_other": "{{count}} apparaten",
     "error_one": "{{count}} fout",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} gebruiker bijgewerkt",
     "usersUpdated_other": "{{count}} gebruikers bijgewerkt",
     "violation_one": "{{count}} overtreding",
-    "violation_other": "{{count}} overtredingen"
+    "violation_other": "{{count}} overtredingen",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} dag",
@@ -225,7 +225,7 @@
   "messages": {
     "noChangesDetected": "Geen wijzigingen gevonden"
   },
-  "or": "of",
+  "or": "",
   "periods": {
     "byDay": "Per dag",
     "byHour": "Per uur",
@@ -302,6 +302,7 @@
     "success": "Geslaagd"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "Pagina {{page}} van {{total}}",
     "pagination": "Paginering",
     "selectAllOnPage": "Alles selecteren op pagina",

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "العمل قيد التشغيل مسبقاً",
       "jobLoadFailed": "فشل تحميل مهام الصيانة",
       "jobStartFailed": "فشل في بدء المهمة",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "فشل في تعطيل الوصول إلى الجوال",
       "mobileAccessEnableFailed": "فشل في تمكين الوصول إلى الجوال",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "تم تسجيل الدخول بنجاح",
         "title": "نجاح"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "تم إلغاء جميع الجلسات المتنقلة",
         "title": "تم تعطيل الوصول إلى الجوال"

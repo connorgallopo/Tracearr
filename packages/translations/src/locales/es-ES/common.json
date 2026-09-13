@@ -67,8 +67,6 @@
     "alert_other": "{{count}} alertas",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} dispositivo",
     "device_other": "{{count}} dispositivos",
     "error_one": "",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} usuario actualizado",
     "usersUpdated_other": "{{count}} usuarios actualizados",
     "violation_one": "{{count}} infracción",
-    "violation_other": "{{count}} infracción"
+    "violation_other": "{{count}} infracción",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} día",
@@ -302,6 +302,7 @@
     "success": "Éxito"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "Seleccionar todos en la página",

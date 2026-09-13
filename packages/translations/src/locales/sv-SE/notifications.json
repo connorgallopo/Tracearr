@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Jobbet körs redan",
       "jobLoadFailed": "Det gick inte att ladda underhållsjobb",
       "jobStartFailed": "Det gick inte att starta jobbet",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Det gick inte att inaktivera mobilåtkomst",
       "mobileAccessEnableFailed": "Det gick inte att aktivera mobilåtkomst",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Inloggningen lyckades",
         "title": "Klart"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Alla mobila sessioner har återkallats",
         "title": "Mobil åtkomst inaktiverad"

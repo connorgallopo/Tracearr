@@ -109,8 +109,7 @@ src/
 ├── mobile.ts         # Mobile entry
 └── locales/
     ├── en/           # English (source of truth)
-    ├── <locale>/     # Crowdin-managed translations
-    └── _template/    # Reference layout for a locale folder
+    └── <locale>/     # Crowdin-managed translations
 ```
 
 Licensed under AGPL-3.0-only. Source lives in the [Tracearr monorepo](https://github.com/connorgallopo/Tracearr) under `packages/translations`.

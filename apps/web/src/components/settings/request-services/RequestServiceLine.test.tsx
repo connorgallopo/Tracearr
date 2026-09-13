@@ -110,17 +110,10 @@ describe('RequestServiceLine', () => {
     expect(screen.getByText('requests.counts.requests:{"count":42}')).toBeInTheDocument();
   });
 
-  it('says nothing about unmatched rows when there are none', () => {
-    renderLine(service({ counts: { requests: 42, unmatchedMedia: 0, unmatchedUsers: 0 } }));
+  it('never shows the unmatched counts, whatever they are', () => {
+    renderLine(service({ counts: { requests: 42, unmatchedMedia: 9, unmatchedUsers: 4 } }));
 
     expect(screen.queryByText(/unmatched/)).not.toBeInTheDocument();
-  });
-
-  it('puts unmatched rows on the warning token', () => {
-    renderLine(service());
-
-    expect(screen.getByText(/unmatchedMedia/)).toHaveClass('text-warning');
-    expect(screen.getByText(/unmatchedUsers/)).toHaveClass('text-warning');
   });
 
   it('shortens a branch build to its channel', () => {

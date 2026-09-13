@@ -111,24 +111,6 @@ export function RequestServiceLine({
           {t('requests.counts.requests', { count: service.counts.requests })}
         </span>
 
-        {service.counts.unmatchedMedia > 0 && (
-          <>
-            <Dot />
-            <span className="text-warning">
-              {t('requests.counts.unmatchedMedia', { count: service.counts.unmatchedMedia })}
-            </span>
-          </>
-        )}
-
-        {service.counts.unmatchedUsers > 0 && (
-          <>
-            <Dot />
-            <span className="text-warning">
-              {t('requests.counts.unmatchedUsers', { count: service.counts.unmatchedUsers })}
-            </span>
-          </>
-        )}
-
         {!service.enabled && (
           <>
             <Dot />

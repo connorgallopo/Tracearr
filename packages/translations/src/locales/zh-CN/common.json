@@ -67,8 +67,6 @@
     "alert_other": "{{count}} 条警报",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} 已选",
     "device_other": "{{count}} 已选",
     "error_one": "{{count}}错误",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}}用户已更新",
     "usersUpdated_other": "{{count}}用户已更新",
     "violation_one": "{{count}}违反",
-    "violation_other": "{{count}}违反"
+    "violation_other": "{{count}}违反",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} 天",
@@ -302,6 +302,7 @@
     "success": "成功"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "选择页面上的所有内容",

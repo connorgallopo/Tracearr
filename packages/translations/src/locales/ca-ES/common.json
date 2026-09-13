@@ -67,8 +67,6 @@
     "alert_other": "{{count}} alertes",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} dispositiu",
     "device_other": "{{count}} dispositius",
     "error_one": "",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} usuari actualitzat",
     "usersUpdated_other": "{{count}} usuaris actualitzats",
     "violation_one": "{{count}} incompliment",
-    "violation_other": "{{count}} incompliments"
+    "violation_other": "{{count}} incompliments",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} dia",
@@ -160,7 +160,7 @@
     "content": "Contingut",
     "created": "Creat",
     "data": "Dades",
-    "date": "Data",
+    "date": "",
     "days": "dies",
     "device": "Dispositiu",
     "deviceId": "ID del dispositiu",
@@ -302,6 +302,7 @@
     "success": "Realitzat amb èxit"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "Selecciona-ho tot a la pàgina",

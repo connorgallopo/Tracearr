@@ -133,6 +133,8 @@ interface DestinationDialogProps {
   destination?: Destination;
   /** Seeds the kind on open and skips the kind grid. */
   initialKind?: DestinationKind;
+  /** Opened from a newsletter: alert recipients and the violation switch stay out of the form. */
+  purpose?: 'newsletter';
   onCreated?: (destination: Destination) => void;
 }
 
@@ -142,6 +144,7 @@ export function DestinationDialog({
   mode,
   destination,
   initialKind,
+  purpose,
   onCreated,
 }: DestinationDialogProps) {
   const { t } = useTranslation(['pages', 'common']);
@@ -345,21 +348,29 @@ export function DestinationDialog({
     }
   };
 
+  const forNewsletter = purpose === 'newsletter';
+
   const title =
     mode === 'create'
-      ? t('pages:settings.destinations.add')
+      ? t(
+          forNewsletter
+            ? 'pages:settings.destinations.newsletterTitle'
+            : 'pages:settings.destinations.add'
+        )
       : `${t('common:actions.edit')} ${destination?.name ?? ''}`.trim();
+
+  const description = forNewsletter
+    ? t('pages:settings.destinations.newsletterDescription')
+    : kind === 'email'
+      ? t('pages:settings.destinations.emailDescription')
+      : t('pages:settings.destinations.description');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[min(72dvh,40rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="gap-1 px-6 pt-5 pr-12 pb-3 text-left">
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            {kind === 'email'
-              ? t('pages:settings.destinations.emailDescription')
-              : t('pages:settings.destinations.description')}
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <div className="@container/kind-grid min-h-0 flex-1 overflow-y-auto px-6 py-4">
@@ -415,153 +426,166 @@ export function DestinationDialog({
                 />
               </Field>
 
-              <Field orientation="horizontal">
-                <FieldContent>
-                  <FieldLabel htmlFor="destination-violations">
-                    {t('pages:settings.destinations.receiveViolations')}
-                  </FieldLabel>
-                  <FieldDescription>
-                    {alertListBlank
-                      ? t('pages:settings.destinations.receiveViolationsNeedsRecipients')
-                      : t('pages:settings.destinations.receiveViolationsHint')}
-                  </FieldDescription>
-                </FieldContent>
-                <Switch
-                  id="destination-violations"
-                  checked={receivesViolations}
-                  disabled={alertListBlank}
-                  onCheckedChange={toggleViolations}
-                />
-              </Field>
+              {!forNewsletter && (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="destination-violations">
+                      {t('pages:settings.destinations.receiveViolations')}
+                    </FieldLabel>
+                    <FieldDescription>
+                      {alertListBlank
+                        ? t('pages:settings.destinations.receiveViolationsNeedsRecipients')
+                        : t('pages:settings.destinations.receiveViolationsHint')}
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="destination-violations"
+                    checked={receivesViolations}
+                    disabled={alertListBlank}
+                    onCheckedChange={toggleViolations}
+                  />
+                </Field>
+              )}
 
-              {fieldSections(descriptor.fields).map((section) => {
-                const fieldEls = section.fields.map((field) => {
-                  const inputId = `destination-${field.key}`;
-                  const stored = keepsStoredSecret(field.key);
-                  const missing = field.required && !isFilled(field);
-                  const invalid = missing && showsError(field.key);
-                  const hint = resolveHint(kind, field, values['preset']);
+              {fieldSections(descriptor.fields)
+                .filter((section) => !forNewsletter || section.group !== 'alerts')
+                .map((section) => {
+                  const fieldEls = section.fields.map((field) => {
+                    const inputId = `destination-${field.key}`;
+                    const stored = keepsStoredSecret(field.key);
+                    const missing = field.required && !isFilled(field);
+                    const invalid = missing && showsError(field.key);
+                    const hint = resolveHint(kind, field, values['preset']);
 
-                  if (field.input === 'toggle') {
+                    if (field.input === 'toggle') {
+                      return (
+                        <Field key={field.key} orientation="horizontal">
+                          <FieldContent>
+                            <FieldLabel htmlFor={inputId}>
+                              {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
+                            </FieldLabel>
+                            {hint && (
+                              <FieldDescription>
+                                {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
+                              </FieldDescription>
+                            )}
+                          </FieldContent>
+                          <Switch
+                            id={inputId}
+                            ref={setFieldRef(field.key)}
+                            checked={(values[field.key] ?? field.default) !== 'false'}
+                            onCheckedChange={(checked) =>
+                              setFieldValue(field.key, checked ? 'true' : 'false')
+                            }
+                          />
+                        </Field>
+                      );
+                    }
+
+                    const inputProps = {
+                      id: inputId,
+                      ref: setFieldRef(field.key),
+                      placeholder: stored
+                        ? t('pages:settings.destinations.secretSet')
+                        : field.placeholder,
+                      value: values[field.key] ?? '',
+                      onChange: (e: ChangeEvent<HTMLInputElement>) =>
+                        setFieldValue(field.key, e.target.value),
+                      onBlur: () => touch(field.key),
+                      'aria-invalid': invalid,
+                    };
+
                     return (
-                      <Field key={field.key} orientation="horizontal">
-                        <FieldContent>
-                          <FieldLabel htmlFor={inputId}>
-                            {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
-                          </FieldLabel>
-                          {hint && (
-                            <FieldDescription>
-                              {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
-                            </FieldDescription>
-                          )}
-                        </FieldContent>
-                        <Switch
-                          id={inputId}
-                          ref={setFieldRef(field.key)}
-                          checked={(values[field.key] ?? field.default) !== 'false'}
-                          onCheckedChange={(checked) =>
-                            setFieldValue(field.key, checked ? 'true' : 'false')
-                          }
-                        />
+                      <Field key={field.key} data-invalid={invalid}>
+                        <FieldLabel htmlFor={inputId}>
+                          {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
+                          {field.required && <span className="text-destructive ml-1">*</span>}
+                        </FieldLabel>
+                        {field.input === 'secret' ? (
+                          <PasswordInput {...inputProps} />
+                        ) : field.input === 'select' ? (
+                          <Select
+                            value={values[field.key] ?? ''}
+                            onValueChange={(value) => selectValue(field, value)}
+                          >
+                            <SelectTrigger
+                              id={inputId}
+                              aria-invalid={invalid}
+                              ref={setFieldRef(field.key)}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(field.options ?? []).map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {t(
+                                    `pages:settings.destinations.options.${option.label as OptionLabel}`
+                                  )}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : field.input === 'number' ? (
+                          <Input
+                            {...inputProps}
+                            type="number"
+                            inputMode="numeric"
+                            min={field.min}
+                            max={field.max}
+                          />
+                        ) : field.input === 'email' ? (
+                          <Input {...inputProps} type="email" autoComplete="off" />
+                        ) : (
+                          <Input {...inputProps} />
+                        )}
+                        {hint && !stored && (
+                          <FieldDescription>
+                            {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
+                          </FieldDescription>
+                        )}
+                        {stored && (
+                          <FieldDescription>
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0"
+                              onClick={() => clearSecret(field.key)}
+                            >
+                              {t('pages:settings.destinations.clearSecret')}
+                            </Button>
+                          </FieldDescription>
+                        )}
+                        {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
                       </Field>
                     );
+                  });
+
+                  if (section.group === undefined) {
+                    return <Fragment key={section.fields[0]?.key}>{fieldEls}</Fragment>;
                   }
 
-                  const inputProps = {
-                    id: inputId,
-                    ref: setFieldRef(field.key),
-                    placeholder: stored
-                      ? t('pages:settings.destinations.secretSet')
-                      : field.placeholder,
-                    value: values[field.key] ?? '',
-                    onChange: (e: ChangeEvent<HTMLInputElement>) =>
-                      setFieldValue(field.key, e.target.value),
-                    onBlur: () => touch(field.key),
-                    'aria-invalid': invalid,
-                  };
-
                   return (
-                    <Field key={field.key} data-invalid={invalid}>
-                      <FieldLabel htmlFor={inputId}>
-                        {t(`pages:settings.destinations.fields.${field.label as FieldLabel}`)}
-                        {field.required && <span className="text-destructive ml-1">*</span>}
-                      </FieldLabel>
-                      {field.input === 'secret' ? (
-                        <PasswordInput {...inputProps} />
-                      ) : field.input === 'select' ? (
-                        <Select
-                          value={values[field.key] ?? ''}
-                          onValueChange={(value) => selectValue(field, value)}
-                        >
-                          <SelectTrigger
-                            id={inputId}
-                            aria-invalid={invalid}
-                            ref={setFieldRef(field.key)}
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(field.options ?? []).map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {t(
-                                  `pages:settings.destinations.options.${option.label as OptionLabel}`
-                                )}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : field.input === 'number' ? (
-                        <Input
-                          {...inputProps}
-                          type="number"
-                          inputMode="numeric"
-                          min={field.min}
-                          max={field.max}
-                        />
-                      ) : field.input === 'email' ? (
-                        <Input {...inputProps} type="email" autoComplete="off" />
-                      ) : (
-                        <Input {...inputProps} />
-                      )}
-                      {hint && !stored && (
-                        <FieldDescription>
-                          {t(`pages:settings.destinations.hints.${hint as FieldHint}`)}
-                        </FieldDescription>
-                      )}
-                      {stored && (
-                        <FieldDescription>
-                          <Button
-                            type="button"
-                            variant="link"
-                            size="sm"
-                            className="h-auto p-0"
-                            onClick={() => clearSecret(field.key)}
-                          >
-                            {t('pages:settings.destinations.clearSecret')}
-                          </Button>
-                        </FieldDescription>
-                      )}
-                      {invalid && <FieldError>{t('common:validation.required')}</FieldError>}
-                    </Field>
+                    <Fragment key={section.group}>
+                      <FieldSeparator role="presentation" />
+                      <FieldSet className="gap-4">
+                        <FieldLegend variant="label">
+                          {t(`pages:settings.destinations.groups.${section.group as GroupLabel}`)}
+                        </FieldLegend>
+                        {fieldEls}
+                      </FieldSet>
+                    </Fragment>
                   );
-                });
+                })}
 
-                if (section.group === undefined) {
-                  return <Fragment key={section.fields[0]?.key}>{fieldEls}</Fragment>;
-                }
-
-                return (
-                  <Fragment key={section.group}>
-                    <FieldSeparator role="presentation" />
-                    <FieldSet className="gap-4">
-                      <FieldLegend variant="label">
-                        {t(`pages:settings.destinations.groups.${section.group as GroupLabel}`)}
-                      </FieldLegend>
-                      {fieldEls}
-                    </FieldSet>
-                  </Fragment>
-                );
-              })}
+              {forNewsletter && (
+                <>
+                  <FieldSeparator role="presentation" />
+                  <FieldDescription>
+                    {t('pages:settings.destinations.newsletterAlertsNote')}
+                  </FieldDescription>
+                </>
+              )}
 
               {error && (
                 <Alert variant="destructive">

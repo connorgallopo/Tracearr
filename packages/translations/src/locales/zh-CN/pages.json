@@ -286,6 +286,7 @@
         "unfinished": ""
       },
       "newDestination": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "noMatches": "",
       "picker": {
@@ -346,8 +347,7 @@
         "helper": "",
         "or": "",
         "title": ""
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": "",
-        "notifications": ""
+        "updates": ""
       },
       "suggested": "",
       "triggers": {
@@ -400,6 +400,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -445,14 +453,6 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -608,6 +608,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "",
         "serverDown": "",
         "serverUp": "",
@@ -619,9 +621,7 @@
         "sessionStarted": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": ""
       },
       "unbound": {
         "account": "",
@@ -1109,6 +1109,11 @@
         "keywords": "",
         "name": ""
       },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
       "no-4k-transcodes": {
         "description": "",
         "keywords": "",
@@ -1168,11 +1173,6 @@
         "description": "",
         "keywords": "",
         "name": ""
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "",
@@ -1208,15 +1208,13 @@
     "bandwidth": "带宽",
     "noActiveStreams": "没有活动流",
     "nowPlaying": "正在播放",
-    "plays": "播放",
     "serverResources": "服务器资源",
     "streamLocations": "流媒体位置",
     "streamsAppearHere": "当用户开始观看时活跃的流将出现在这里",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "观看时长"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "",
@@ -1486,7 +1484,7 @@
     "signInHeading": "登录到您的帐户",
     "signupFailed": "注册失败",
     "tagline": "Tracearr - 流访问管理",
-    "title": "Tracearr",
+    "title": "",
     "username": "用户名",
     "usernameOrEmail": "用户名或电子邮件",
     "usernamePlaceholder": "你的名字",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "电影"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "{{date}}添加",
       "moreServers": "",
@@ -1828,7 +1825,8 @@
     },
     "shows": {
       "title": "剧集"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "您查找的页面不存在或已移至别处。",
@@ -1839,36 +1837,155 @@
     "authComplete": "身份验证完成",
     "windowWillClose": "此窗口将自动关闭..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "apiToken": "",
         "apiUrl": "",
         "authToken": "",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
+        "messageStream": "",
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
         "serverUrl": "",
+        "to": "",
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": "",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
-        "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": ""
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "apprise": "",
         "discord": "",
+        "email": "",
         "gotify": "",
         "jsonWebhook": "",
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": "",
-        "email": "Email"
+        "webToast": ""
       },
       "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": ""
     },
     "jobs": {
       "lastRun": "上次运行",
@@ -1961,8 +2073,6 @@
       "updating": "更新中……"
     },
     "plex": {
-      "accountsLinked_one": "{{count}} 个 Plex 账户已链接",
-      "accountsLinked_other": "{{count}} 个 Plex 账户已链接",
       "connectingTo": "正在连接到{{name}}……",
       "connectionError": {
         "dns": "DNS错误",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "隐藏已过滤",
       "linkAnotherAccount": "链接另一个Plex账户",
       "linkPlexAccount": "链接Plex账户",
-      "linkedAccounts": "链接的Plex账户",
-      "linkedAccountsDesc": "",
       "linking": "正在连接……",
       "local": "本地",
       "loginEnabled": "登录已启用",
@@ -1991,11 +2099,10 @@
       "moreConnections": "+{{count}} 个更多连接",
       "noAccountsLinked": "没有关联的Plex账户",
       "noAccountsLinkedHint": "链接Plex帐户以添加Plex服务器到Trackerr。",
-      "noAccountsLinkedShort": "没有连接的 Plex账户",
-      "noAccountsYet": "尚无Plex帐户链接。",
       "noReachableConnections": "没有可用的连接",
       "noServersFound": "找不到Plex服务器",
       "noServersFoundHint": "请确保您拥有至少一个Plex服务器",
+      "ownerOnly": "",
       "reauthorizeAccount": "",
       "recommended": "已推荐",
       "remote": "远程",
@@ -2005,8 +2112,7 @@
       "showAll": "显示全部",
       "unlinkAccount": "取消链接此Plex账户",
       "unlinkConfirm": "您确定要取消链接此Plex帐户吗？在您再次链接之前，您将无法从此帐户添加服务器。",
-      "unlinkPlexAccount": "取消链接Plex账户",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "取消链接Plex账户"
     }
   },
   "statsBandwidth": {
@@ -2045,6 +2151,14 @@
     "allServers": "所有服务器",
     "backToUsers": "返回用户",
     "byRule": "按 / 规则",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "已链接的社交网络",
     "manual": "手动",
     "noTerminationsFound": "此用户没有流终止。",
@@ -2062,36 +2176,44 @@
     "unknownRule": "未知规则",
     "userInfo": "用户信息",
     "userNotFound": "用户未找到",
-    "violations": "违规",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": "违规"
   },
   "users": {
     "filterHasAccessTo": "有访问权限",
     "filterHasAccessToHint": "在选择的每个服务器上显示活跃账户的用户。",
     "filterHasAccessToPlaceholder": "任何服务器",
-    "mergeConfirm": "合并",
-    "mergeDialogDescription": "每个服务器帐户、会话和从重复移动到主页的违反行为。重复身份将被删除。",
-    "mergeDialogTitle": "合并用户",
-    "mergePickPrimary": "选择主身份",
-    "mergePrimaryBadge": "主要",
-    "mergePrimaryForced": "此帐户可以登录，所以它必须保持原始状态。",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "这些账户已经属于同一用户",
-    "mergeSameServerAcknowledge": "我理解相同的服务器历史合并无法恢复",
-    "mergeSameServerDialogDescription": "这个合并永久合并了同一个服务器上的两个帐户。它不能撤消。",
-    "mergeSameServerFallbackName": "此服务器",
-    "mergeSameServerWarning": "两个身份都已经在同一个服务器上有一个账户。 合并将永久合并其会话历史、违规和信任等级分到服务器上的单个账户。 此操作无法撤消，此后分割账户将不会恢复原来的两个账户。",
-    "mergeSameServerWarningTitle": "该操作不可逆",
     "mergeSelectAllActive": "清除选中的全部选项，然后只选择两个用户进行合并",
     "mergeSelectTwo": "只选择两个要合并的用户",
     "mergeServerAccountRemoved": "已删除",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "合并用户",
+    "mergeWhatHappens": "",
     "noUsersFound": "未找到用户。",
     "resetTrustScore": "重置信任分数",
     "resetTrustScoreConfirm": "您确定要重置信任分数为100吗？此操作不能撤消。",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "选择所有{{count}}个用户",
     "serversColumn": "服务器",
     "showRemoved": "显示已删除",
-    "suggestionsDescription": "这些身份看起来像是服务器上的同一个人。如果它们相匹配，请审查并合并。",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "无法加载合并建议",
     "suggestionsMatchEmail": "相同的邮件",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "相同的用户名",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "审查",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "可能重复的用户",
     "title": "用户"
   },

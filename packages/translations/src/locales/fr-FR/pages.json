@@ -55,7 +55,7 @@
           }
         },
         "hint": "Jellyfin et Emby uniquement. Plex ne prend en charge que les messages lorsque vous tuez un flux.",
-        "label": "Message Client",
+        "label": "",
         "ran": "Mettre un message sur le lecteur"
       },
       "send": {
@@ -76,7 +76,7 @@
             "label": "Quantité"
           },
           "mode": {
-            "label": "Mode"
+            "label": ""
           },
           "value": {
             "label": "Valeur"
@@ -255,10 +255,10 @@
       "heldFor": {
         "current": "cette fois",
         "measureLabel": "Compté",
-        "minutesLabel": "Minutes",
+        "minutesLabel": "",
         "prefix": "Un flux a été mis en pause pour",
         "total": "au total",
-        "unit": "minutes"
+        "unit": ""
       },
       "inactiveFor": {
         "daysLabel": "Jours",
@@ -286,6 +286,7 @@
         "unfinished": "Affiche ce que cela ferait une fois l'automation terminée."
       },
       "newDestination": "Nouvelle destination",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "Aucune destination pour le moment. Ajoutez-en une pour envoyer des notifications.",
       "noMatches": "Aucune correspondance",
       "picker": {
@@ -346,8 +347,7 @@
         "helper": "Chacun de ces éléments démarre. Au moins un est requis.",
         "or": "ou",
         "title": "Quand..."
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": "",
-        "notifications": ""
+        "updates": ""
       },
       "suggested": "",
       "triggers": {
@@ -400,6 +400,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -445,14 +453,6 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -509,8 +509,8 @@
       "duration": {
         "days_one": "{{count}} jour",
         "days_other": "{{count}} jours",
-        "minutes_one": "{{count}} minute",
-        "minutes_other": "{{count}} minutes"
+        "minutes_one": "",
+        "minutes_other": ""
       },
       "fields": {
         "account_age_days": "l'âge du compte",
@@ -608,6 +608,8 @@
         "accountTrustChanged": "changement de score de confiance d'un compte",
         "mediaAdded": "média ajouté",
         "mediaUpgraded": "média mis à jour",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "une mise à jour du plugin est disponible",
         "serverDown": "un serveur est en panne",
         "serverUp": "un serveur est de retour",
@@ -619,9 +621,7 @@
         "sessionStarted": "un flux commence",
         "sessionStopped": "un flux s'arrête",
         "sessionTranscodeChanged": "le transcodage démarre ou s'arrête",
-        "tracearrUpdateAvailable": "une mise à jour Tracearr est disponible",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": "une mise à jour Tracearr est disponible"
       },
       "unbound": {
         "account": "un compte sélectionné",
@@ -1109,6 +1109,11 @@
         "keywords": "",
         "name": ""
       },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
       "no-4k-transcodes": {
         "description": "",
         "keywords": "",
@@ -1168,11 +1173,6 @@
         "description": "",
         "keywords": "",
         "name": ""
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "",
@@ -1208,15 +1208,13 @@
     "bandwidth": "Bande passante",
     "noActiveStreams": "Aucune lecture en cours",
     "nowPlaying": "Lecture en cours",
-    "plays": "Lectures",
     "serverResources": "Ressources du serveur",
     "streamLocations": "Emplacements des lectures",
     "streamsAppearHere": "Les lectures actives apparaîtront ici lorsque les utilisateurs commenceront à regarder",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "Temps de visionnage"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "",
@@ -1383,7 +1381,7 @@
     },
     "storage": {
       "avgHoursPerGB": "heure moyenne/Go",
-      "colCopies": "Copies",
+      "colCopies": "",
       "colMatchType": "Type de correspondance",
       "colRecoverable": "Espace récupérable",
       "colTitle": "Titre",
@@ -1391,7 +1389,7 @@
       "confidenceHigh": "Élevée",
       "confidenceLow": "Faible",
       "confidenceMedium": "Moyenne",
-      "contentROI": "Content ROI",
+      "contentROI": "",
       "contentROIDesc": "Regarder la valeur par coût de stockage",
       "days": "jours",
       "description": "Consommation de stockage, prédictions et optimisation",
@@ -1486,7 +1484,7 @@
     "signInHeading": "Connectez-vous à votre compte",
     "signupFailed": "Échec de l'inscription",
     "tagline": "Tracearr - Gestion d'accès aux lectures",
-    "title": "Tracearr",
+    "title": "",
     "username": "Nom d'utilisateur",
     "usernameOrEmail": "Nom d'utilisateur ou email",
     "usernamePlaceholder": "votrenomdutilisateur",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "Films"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "Ajouté {{date}}",
       "moreServers": "",
@@ -1828,7 +1825,8 @@
     },
     "shows": {
       "title": "Séries"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "La page que vous cherchez n'existe pas ou a été déplacée.",
@@ -1839,36 +1837,155 @@
     "authComplete": "Authentification terminée",
     "windowWillClose": "Cette fenêtre se fermera automatiquement..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "apiToken": "",
         "apiUrl": "",
         "authToken": "",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
+        "messageStream": "",
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
         "serverUrl": "",
+        "to": "",
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": "",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
-        "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": ""
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "apprise": "",
         "discord": "",
+        "email": "",
         "gotify": "",
         "jsonWebhook": "",
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": "",
-        "email": "Email"
+        "webToast": ""
       },
       "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": ""
     },
     "jobs": {
       "lastRun": "Dernier lancement",
@@ -1961,8 +2073,6 @@
       "updating": "Mise à jour en cours..."
     },
     "plex": {
-      "accountsLinked_one": "{{count}} compte Plex lié",
-      "accountsLinked_other": "{{count}} comptes Plex liés",
       "connectingTo": "Connexion à {{name}} en cours...",
       "connectionError": {
         "dns": "Erreur DNS",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "Masquer les éléments filtrés",
       "linkAnotherAccount": "Lier un autre compte Plex",
       "linkPlexAccount": "Lier un compte Plex",
-      "linkedAccounts": "Comptes Plex liés",
-      "linkedAccountsDesc": "",
       "linking": "Liaison en cours...",
       "local": "",
       "loginEnabled": "Connexion activée",
@@ -1991,11 +2099,10 @@
       "moreConnections": "Plus de {{count}} connexions supplémentaires",
       "noAccountsLinked": "Aucun compte Plex lié pour le moment",
       "noAccountsLinkedHint": "Liez un compte Plex pour ajouter des serveurs Plex à Tracearr.",
-      "noAccountsLinkedShort": "Aucun compte Plex lié",
-      "noAccountsYet": "Aucun compte Plex lié pour le moment.",
       "noReachableConnections": "Aucune connexion accessible",
       "noServersFound": "Aucun serveur Plex trouvé",
       "noServersFoundHint": "Assurez-vous d'être propriétaire d'au moins un serveur Plex",
+      "ownerOnly": "",
       "reauthorizeAccount": "",
       "recommended": "Recommandé",
       "remote": "Distant",
@@ -2005,8 +2112,7 @@
       "showAll": "Tout afficher",
       "unlinkAccount": "Dissocier ce compte Plex",
       "unlinkConfirm": "Êtes-vous sûr de vouloir dissocier ce compte Plex ? Vous ne pourrez plus ajouter de serveurs depuis ce compte tant que vous ne l’aurez pas associé à nouveau.",
-      "unlinkPlexAccount": "Dissocier le compte Plex",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "Dissocier le compte Plex"
     }
   },
   "statsBandwidth": {
@@ -2045,13 +2151,21 @@
     "allServers": "Tous les serveurs",
     "backToUsers": "Retour aux utilisateurs",
     "byRule": "Par / Règle",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "Comptes liés",
     "manual": "Manuel",
     "noTerminationsFound": "Aucune interruption de lecture pour cet utilisateur.",
     "noViolationsFound": "Aucune violation pour cet utilisateur.",
     "overallTrust": "Confiance globale",
     "serverScope": "Serveur",
-    "sessions": "Sessions",
+    "sessions": "",
     "splitAccount": "Séparer en un utilisateur distinct",
     "splitConfirmDescription": "Détachez ce compte serveur pour en faire un utilisateur distinct. Son historique de surveillance et ses infractions seront transférés avec lui.",
     "splitConfirmLoading": "Séparation en cours...",
@@ -2062,36 +2176,44 @@
     "unknownRule": "Règle inconnue",
     "userInfo": "Informations de l'utilisateur",
     "userNotFound": "Utilisateur introuvable",
-    "violations": "Violations",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": ""
   },
   "users": {
     "filterHasAccessTo": "A accès à",
     "filterHasAccessToHint": "Affiche les personnes ayant un compte actif sur chaque serveur sélectionné.",
     "filterHasAccessToPlaceholder": "N’importe quel serveur",
-    "mergeConfirm": "Fusionner",
-    "mergeDialogDescription": "Chaque compte serveur, session et infraction du serveur secondaire est transféré vers le serveur principal. L'identité dupliquée est supprimée.",
-    "mergeDialogTitle": "Fusionner les utilisateurs",
-    "mergePickPrimary": "Choisir l'identité principale",
-    "mergePrimaryBadge": "Principal",
-    "mergePrimaryForced": "Ce compte permet de se connecter ; il doit donc rester le compte principal.",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "Ces comptes appartiennent déjà au même utilisateur",
-    "mergeSameServerAcknowledge": "Je comprends que la fusion de l'historique sur un même serveur ne peut pas être annulée",
-    "mergeSameServerDialogDescription": "Cette fusion regroupe définitivement les deux comptes sur le même serveur. Elle est irréversible.",
-    "mergeSameServerFallbackName": "ce serveur",
-    "mergeSameServerWarning": "Ces deux identités disposent déjà d'un compte sur le même serveur. La fusion entraînera la combinaison définitive de leur historique de session, de leurs infractions et de leur score de confiance en un seul compte sur ce serveur. Cette opération est irréversible, et la séparation ultérieure du compte ne permettra pas de rétablir les deux comptes d'origine.",
-    "mergeSameServerWarningTitle": "Cette action est irréversible",
     "mergeSelectAllActive": "Désélectionnez tous les éléments et choisissez exactement deux utilisateurs à fusionner",
     "mergeSelectTwo": "Sélectionnez exactement deux utilisateurs à fusionner",
     "mergeServerAccountRemoved": "Supprimé",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "Fusionner les utilisateurs",
+    "mergeWhatHappens": "",
     "noUsersFound": "Aucun utilisateur trouvé.",
     "resetTrustScore": "Réinitialiser le score de confiance",
     "resetTrustScoreConfirm": "Êtes-vous sûr de vouloir réinitialiser le score de confiance à 100 ? Cette action est irréversible.",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "Sélectionner les {{count}} utilisateurs",
     "serversColumn": "Serveurs",
     "showRemoved": "Afficher les utilisateurs supprimés",
-    "suggestionsDescription": "Ces identités semblent correspondre à la même personne sur l'ensemble des serveurs. Vérifiez-les et fusionnez-les si elles correspondent.",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "Impossible de charger les suggestions de fusion",
     "suggestionsMatchEmail": "Même adresse email",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "Nom d'utilisateur identique",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "Vérification",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "Utilisateurs potentiellement en double",
     "title": "Utilisateurs"
   },
@@ -2133,7 +2273,7 @@
       "relatedSessions": "{{count}} sessions liées",
       "relatedSessions_one": "{{count}} session liée",
       "relatedSessions_other": "{{count}} sessions liées",
-      "sessions": "Sessions",
+      "sessions": "",
       "threshold": "Seuil",
       "timestamps": "Horodatage",
       "trigger": "Déclencheur",
@@ -2154,7 +2294,7 @@
     "personFilterError": "Échec du chargement de la personne",
     "personFilterPlaceholder": "Filtrer par personne",
     "selectAllViolations": "Sélectionner les {{count}} violations correspondant aux filtres",
-    "title": "Violations",
+    "title": "",
     "tryAdjustingFilters": "Essayez d'ajuster vos filtres"
   }
 }

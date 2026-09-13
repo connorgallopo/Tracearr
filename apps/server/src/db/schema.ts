@@ -1089,6 +1089,9 @@ export const userMergeAudits = pgTable(
       email: string | null;
       thumbnail: string | null;
       role: string;
+      // Absent on audits written before merges carried the contact email
+      contactEmail?: string | null;
+      contactEmailCarried?: boolean;
     }>(),
     // Which plex_accounts / mobile_sessions / mobile_tokens rows repointIdentityRows
     // moved off the source identity during this merge, so a later split can move
@@ -1107,6 +1110,25 @@ export const userMergeAudits = pgTable(
     index('user_merge_audits_target_idx').on(table.targetUserId),
     index('user_merge_audits_created_at_idx').on(table.createdAt),
   ]
+);
+
+export const dismissalKindEnum = ['merge_suggestion'] as const;
+
+// Something the owner told the app to stop raising. subjectKey is shaped by kind
+// (merge_suggestion: "lowerUserId:higherUserId") and has no FK, so whatever deletes
+// the rows it names has to delete the dismissal too.
+export const dismissals = pgTable(
+  'dismissals',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    kind: text('kind').notNull().$type<(typeof dismissalKindEnum)[number]>(),
+    subjectKey: text('subject_key').notNull(),
+    dismissedByUserId: uuid('dismissed_by_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('dismissals_kind_subject_unique').on(table.kind, table.subjectKey)]
 );
 
 // Unit system enum for display preferences

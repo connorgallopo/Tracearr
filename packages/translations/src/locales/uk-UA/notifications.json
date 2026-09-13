@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Завдання вже виконується",
       "jobLoadFailed": "Не вдалося завантажити завдання технічного обслуговування",
       "jobStartFailed": "Не вдалося розпочати роботу",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Не вдалося вимкнути доступ до мережі",
       "mobileAccessEnableFailed": "Не вдалося увімкнути доступ до мобільного зв'язку",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Успішно ввійшли",
         "title": "Успішно"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Усі мобільні сеанси були відкликані",
         "title": "Мобільний доступ вимкнено"

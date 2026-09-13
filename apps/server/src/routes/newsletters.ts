@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createNewsletterSchema,
   newsletterPreviewDraftSchema,
+  newsletterRecipientsDraftSchema,
   newsletterSendsQuerySchema,
   newsletterTestSendSchema,
   updateNewsletterSchema,
@@ -201,6 +202,17 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     return buildPreview({ ...newsletter, id: newsletterId ?? 'draft' }, watermark);
   });
 
+  app.post('/recipients', owner, async (request, reply) => {
+    const parsed = newsletterRecipientsDraftSchema.safeParse(request.body);
+    if (!parsed.success)
+      return reply.badRequest(`Invalid request body: ${firstIssueMessage(parsed.error)}`);
+    const { newsletterId, ...draft } = parsed.data;
+    if (newsletterId !== undefined && !(await getNewsletter(newsletterId)))
+      return reply.notFound('Newsletter not found');
+    const view: NewsletterRecipientsView = await resolveRecipients(draft, newsletterId);
+    return view;
+  });
+
   app.post('/:id/preview', owner, async (request, reply) => {
     const params = idParams.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid id');
@@ -243,15 +255,6 @@ export async function newsletterRoutes(app: FastifyInstance): Promise<void> {
     if (await findOpenSend(row.id)) return reply.conflict('A send is already in progress');
     const jobId = await enqueueNewsletterRun({ newsletterId: row.id, trigger: 'manual' });
     return reply.code(202).send({ queued: true, jobId });
-  });
-
-  app.get('/:id/recipients', owner, async (request, reply) => {
-    const params = idParams.safeParse(request.params);
-    if (!params.success) return reply.badRequest('Invalid id');
-    const row = await getNewsletter(params.data.id);
-    if (!row) return reply.notFound('Newsletter not found');
-    const view: NewsletterRecipientsView = await resolveRecipients(row);
-    return view;
   });
 
   app.get('/:id/variants', owner, async (request, reply) => {

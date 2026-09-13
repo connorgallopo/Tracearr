@@ -69,6 +69,7 @@ import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
 import { destinationRoutes } from './routes/destinations.js';
 import { requestServiceRoutes } from './routes/requestServices.js';
+import { requestRoutes } from './routes/requests.js';
 import { newsletterRoutes } from './routes/newsletters.js';
 import { emailRoutes } from './routes/email.js';
 import { versionRoutes } from './routes/version.js';
@@ -515,6 +516,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(settingsRoutes, { prefix: `${API_BASE_PATH}/settings` });
   await app.register(destinationRoutes, { prefix: `${API_BASE_PATH}/destinations` });
   await app.register(requestServiceRoutes, { prefix: `${API_BASE_PATH}/request-services` });
+  await app.register(requestRoutes, { prefix: `${API_BASE_PATH}/requests` });
   await app.register(newsletterRoutes, { prefix: `${API_BASE_PATH}/newsletters` });
   await app.register(emailRoutes, { prefix: `${API_BASE_PATH}/email` });
   await app.register(importRoutes, { prefix: `${API_BASE_PATH}/import` });

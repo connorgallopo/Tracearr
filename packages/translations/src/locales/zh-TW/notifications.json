@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "任務已在運行",
       "jobLoadFailed": "無法加載維護任務",
       "jobStartFailed": "無法啟動任務",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "無法停用移動裝置存取",
       "mobileAccessEnableFailed": "無法啟用移動裝置存取",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "成功登入",
         "title": ""
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "已撤銷所有移動裝置的會話",
         "title": "已停用移動裝置存取"

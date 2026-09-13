@@ -32,6 +32,8 @@ const member = (address: string, serverIds: string[]): ResolvedRecipient => ({
   username: null,
   serverName: '',
   thumbUrl: null,
+  newSinceLastSend: false,
+  addressFromUsername: false,
 });
 const extra = (address: string): ResolvedRecipient => ({
   ...member(address, []),

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Job kører allerede",
       "jobLoadFailed": "Kunne ikke indlæse vedligeholdelsesjob",
       "jobStartFailed": "Mislykkedes at starte job",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Mislykkedes at deaktivere mobiladgang",
       "mobileAccessEnableFailed": "Mislykkedes at aktivere mobil adgang",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Logget ind",
         "title": "Succes"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Alle mobilsessioner er blevet tilbagekaldt",
         "title": "Mobil Adgang Deaktiveret"

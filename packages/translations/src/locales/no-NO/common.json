@@ -44,7 +44,7 @@
     "signOut": "Logg ut",
     "signUp": "Registrer deg",
     "sort": "Sorter",
-    "submit": "Send",
+    "submit": "",
     "sync": "Synkronisering",
     "terminate": "Avslutt",
     "test": "Prøve",
@@ -67,8 +67,6 @@
     "alert_other": "",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "",
     "device_other": "",
     "error_one": "{{count}} feil",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} bruker oppdatert",
     "usersUpdated_other": "{{count}} brukere oppdatert",
     "violation_one": "{{count}} brudd",
-    "violation_other": "{{count}} brudd"
+    "violation_other": "{{count}} brudd",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} dag",
@@ -302,6 +302,7 @@
     "success": "Vellykket"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "Velg alle på siden",

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Η εργασία εκτελείται ήδη",
       "jobLoadFailed": "Αποτυχία φόρτωσης εργασιών συντήρησης",
       "jobStartFailed": "Αποτυχία έναρξης εργασίας",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Αποτυχία απενεργοποίησης πρόσβασης για κινητά",
       "mobileAccessEnableFailed": "Αποτυχία ενεργοποίησης πρόσβασης για κινητά",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Επιτυχής σύνδεση",
         "title": "Επιτυχία"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί",
         "title": "Απενεργοποιημένη Πρόσβαση Κινητού"

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "ジョブは既に実行されています",
       "jobLoadFailed": "メンテナンスジョブの読み込みに失敗しました",
       "jobStartFailed": "ジョブの開始に失敗しました",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "モバイルアクセスを無効にできませんでした",
       "mobileAccessEnableFailed": "モバイルアクセスを有効にできませんでした",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "ログインに成功しました",
         "title": "成功"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "すべてのモバイルセッションが取り消されました",
         "title": "モバイルアクセスは無効です"

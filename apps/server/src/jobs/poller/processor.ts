@@ -11,6 +11,7 @@ import {
   POLLER_CONFIG,
   POLLING_INTERVALS,
   SESSION_LIMITS,
+  usernameAsEmail,
   type ActiveSession,
   type EngineAutomation,
   type Session,
@@ -950,6 +951,7 @@ export async function processServerSessions(
             .set({
               username: processed.username,
               thumbUrl: processed.userThumb || existingServerUser.thumbUrl,
+              ...(server.type === 'plex' ? {} : { email: usernameAsEmail(processed.username) }),
               updatedAt: new Date(),
             })
             .where(eq(serverUsers.id, existingServerUser.id));
@@ -997,6 +999,7 @@ export async function processServerSessions(
               serverId: server.id,
               externalId: u.externalId,
               username: u.username,
+              email: server.type === 'plex' ? null : usernameAsEmail(u.username),
               thumbUrl: u.thumbUrl,
             }))
           )

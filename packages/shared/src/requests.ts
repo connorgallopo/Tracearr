@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuidSchema } from './schemas.js';
+import { serverIdsQuerySchema, uuidSchema } from './schemas.js';
 import type { WatchedState } from './types.js';
 
 export const REQUEST_SERVICE_TYPES = ['seerr'] as const;
@@ -80,7 +80,10 @@ interface RequestEntryBase {
   seasons: RequestSeason[] | null;
   is4k: boolean;
   isAutoRequest: boolean;
+  /** Has any account on the scoped servers watched the title. */
   watchedState: WatchedState;
+  /** Has the requester watched it, over the seasons they asked for. */
+  watchedStateRequester: WatchedState;
 }
 
 export interface MediaRequestEntry extends RequestEntryBase {
@@ -140,6 +143,93 @@ export const updateRequestServiceSchema = z.strictObject({
   enabled: z.boolean().optional(),
 });
 
+export interface RequestOutcomeRow {
+  id: string;
+  mediaId: string | null;
+  mediaType: MediaRequestMediaType;
+  title: string | null;
+  year: number | null;
+  requestedAt: string;
+  availableAt: string | null;
+  waitMs: number | null;
+  seasons: RequestSeason[] | null;
+  fileSizeBytes: number;
+  requester: RequestRequester;
+}
+
+export const REQUEST_UNPLAYED_SORTS = ['fileSizeBytes', 'waitMs', 'requestedAt', 'title'] as const;
+export type RequestUnplayedSort = (typeof REQUEST_UNPLAYED_SORTS)[number];
+
+export const REQUESTER_SORTS = [
+  'watchedByOthers',
+  'requested',
+  'landed',
+  'watched',
+  'medianWaitMs',
+  'name',
+] as const;
+export type RequesterSort = (typeof REQUESTER_SORTS)[number];
+
+export interface RequesterFollowThrough {
+  requester: RequestRequester;
+  requested: number;
+  landed: number;
+  watched: number;
+  watchedByOthers: number;
+  medianWaitMs: number | null;
+}
+
+export interface RequestsFunnel {
+  requested: number;
+  landed: number;
+  watched: number;
+}
+
+export interface RequestsAnalyticsResponse {
+  funnel: RequestsFunnel;
+  unplayed: { count: number; bytes: number };
+  requesterCount: number;
+}
+
+export interface RequestsUnplayedResponse {
+  data: RequestOutcomeRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface RequestersResponse {
+  data: RequesterFollowThrough[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface RequestsStatus {
+  configured: boolean;
+}
+
+export const requestsAnalyticsQuerySchema = z.object({
+  serverIds: serverIdsQuerySchema,
+});
+
+const requestsPageFields = {
+  serverIds: serverIdsQuerySchema,
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
+};
+
+export const requestsUnplayedQuerySchema = z.object({
+  ...requestsPageFields,
+  sortBy: z.enum(REQUEST_UNPLAYED_SORTS).default('fileSizeBytes'),
+});
+
+export const requestersQuerySchema = z.object({
+  ...requestsPageFields,
+  sortBy: z.enum(REQUESTER_SORTS).default('watched'),
+});
+
 export const userRequestsQuerySchema = z.object({
   scope: z.enum(['identity']).optional(),
   page: z.coerce.number().int().min(1).default(1),
@@ -150,3 +240,6 @@ export type TestRequestServiceInput = z.infer<typeof testRequestServiceSchema>;
 export type CreateRequestServiceInput = z.infer<typeof createRequestServiceSchema>;
 export type UpdateRequestServiceInput = z.infer<typeof updateRequestServiceSchema>;
 export type UserRequestsQuery = z.infer<typeof userRequestsQuerySchema>;
+export type RequestsAnalyticsQuery = z.infer<typeof requestsAnalyticsQuerySchema>;
+export type RequestsUnplayedQuery = z.infer<typeof requestsUnplayedQuerySchema>;
+export type RequestersQuery = z.infer<typeof requestersQuerySchema>;

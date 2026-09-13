@@ -102,6 +102,8 @@ export function testVariantPlan(
     username: null,
     serverName: null,
     thumbUrl: null,
+    newSinceLastSend: false,
+    addressFromUsername: false,
   };
   return { variants: [variantFor(servers, ids, [recipient])], excluded: [] };
 }

@@ -981,6 +981,7 @@ export function Debug() {
                       />
                     </DataTableViewport>
                     <DataTablePager
+                      variant="footer"
                       {...snapshotsPager}
                       labels={{
                         navigation: t('common:table.pagination'),

@@ -24,6 +24,7 @@ const c = (over: Partial<RecipientCandidate>): RecipientCandidate => ({
   contactEmail: null,
   identityEmail: null,
   accountEmails: [],
+  accountEmailsFromUsernames: false,
   blocked: null,
   ...over,
 });
@@ -73,6 +74,8 @@ describe('mergeRecipients', () => {
         serverName: 'Server One',
         serverIds: ['s1'],
         thumbUrl: null,
+        newSinceLastSend: false,
+        addressFromUsername: false,
       },
     ]);
     expect(missing).toEqual([
@@ -113,6 +116,8 @@ describe('mergeRecipients', () => {
         serverName: 'Server One',
         serverIds: ['s1'],
         thumbUrl: null,
+        newSinceLastSend: false,
+        addressFromUsername: false,
       },
     ]);
     expect(missing).toEqual([]);
@@ -219,6 +224,8 @@ describe('mergeRecipients', () => {
         serverName: 'Server One',
         serverIds: ['s1'],
         thumbUrl: null,
+        newSinceLastSend: false,
+        addressFromUsername: false,
       },
       {
         address: 'extra@x.com',
@@ -231,6 +238,8 @@ describe('mergeRecipients', () => {
         serverName: null,
         serverIds: [],
         thumbUrl: null,
+        newSinceLastSend: false,
+        addressFromUsername: false,
       },
     ]);
   });
@@ -253,6 +262,8 @@ describe('mergeRecipients', () => {
         serverName: null,
         serverIds: [],
         thumbUrl: null,
+        newSinceLastSend: false,
+        addressFromUsername: false,
       },
     ]);
     expect(missing).toEqual([]);
@@ -268,6 +279,41 @@ describe('mergeRecipients', () => {
     expect(recipients.map((r) => [r.address, r.serverIds])).toEqual([
       ['both@x.com', ['s1', 's2']],
       ['extra@x.com', []],
+    ]);
+  });
+
+  it('gives the identity kept for a shared address the servers of the one dropped', () => {
+    const { recipients } = mergeRecipients(
+      [
+        c({ userId: 'u1', accountEmails: ['same@x.com'], serverIds: ['s1'] }),
+        c({ userId: 'u2', accountEmails: ['same@x.com'], serverIds: ['s2', 's1'] }),
+      ],
+      [],
+      new Set()
+    );
+    expect(recipients.map((r) => [r.userId, r.serverIds])).toEqual([['u1', ['s1', 's2']]]);
+  });
+
+  it('marks an address as a username only when no contact, identity or Plex email came first', () => {
+    const { recipients } = mergeRecipients(
+      [
+        c({ userId: 'u1', accountEmails: ['jf@x.com'], accountEmailsFromUsernames: true }),
+        c({
+          userId: 'u2',
+          contactEmail: 'c@x.com',
+          accountEmails: ['jf2@x.com'],
+          accountEmailsFromUsernames: true,
+        }),
+        c({ userId: 'u3', accountEmails: ['plex@x.com'] }),
+      ],
+      [{ address: 'extra@x.com' }],
+      new Set()
+    );
+    expect(recipients.map((r) => [r.address, r.addressFromUsername])).toEqual([
+      ['jf@x.com', true],
+      ['c@x.com', false],
+      ['plex@x.com', false],
+      ['extra@x.com', false],
     ]);
   });
 });
@@ -302,6 +348,8 @@ describe('resolveRecipients', () => {
           serverName: null,
           serverIds: [],
           thumbUrl: null,
+          newSinceLastSend: false,
+          addressFromUsername: false,
         },
         {
           address: 'new@x.com',
@@ -314,6 +362,8 @@ describe('resolveRecipients', () => {
           serverName: null,
           serverIds: [],
           thumbUrl: null,
+          newSinceLastSend: false,
+          addressFromUsername: false,
         },
       ],
       missing: [],

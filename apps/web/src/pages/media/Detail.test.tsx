@@ -106,6 +106,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
     is4k: false,
     isAutoRequest: false,
     watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
     requester: {
       serverUserId: 'su-1',
       userId: 'u-1',

@@ -67,8 +67,6 @@
     "alert_other": "알림 {{count}}개",
     "automation_one": "자동화 {{count}}개",
     "automation_other": "자동화 {{count}}개",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "기기 {{count}}대",
     "device_other": "기기 {{count}}대",
     "error_one": "오류 {{count}}개",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "사용자 {{count}}명 업데이트됨",
     "usersUpdated_other": "사용자 {{count}}명 업데이트됨",
     "violation_one": "위반 {{count}}건",
-    "violation_other": "위반 {{count}}건"
+    "violation_other": "위반 {{count}}건",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}}일",
@@ -219,7 +219,7 @@
     "photo": "사진",
     "track": "트랙",
     "track_plural": "트랙",
-    "tv": "TV",
+    "tv": "",
     "tvShows": "TV 프로그램"
   },
   "messages": {
@@ -270,9 +270,9 @@
     "some": "서버 {{count}}개 중 {{total}}개"
   },
   "servers": {
-    "emby": "Emby",
-    "jellyfin": "Jellyfin",
-    "plex": "Plex"
+    "emby": "",
+    "jellyfin": "",
+    "plex": ""
   },
   "severity": {
     "high": "높음",
@@ -302,6 +302,7 @@
     "success": "성공"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "{{page}}페이지 중 {{total}}페이지",
     "pagination": "페이지 이동",
     "selectAllOnPage": "이 페이지의 항목 모두 선택",
@@ -328,10 +329,10 @@
     "untrusted": "신뢰하지 않음"
   },
   "units": {
-    "km": "km",
-    "kmh": "km/h",
-    "mi": "mi",
-    "mph": "mph"
+    "km": "",
+    "kmh": "",
+    "mi": "",
+    "mph": ""
   },
   "validation": {
     "invalidEmail": "올바른 이메일 주소를 입력하세요",

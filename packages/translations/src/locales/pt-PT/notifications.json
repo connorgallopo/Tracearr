@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Trabalho já em execução",
       "jobLoadFailed": "Falha ao carregar trabalhos de manutenção",
       "jobStartFailed": "Falha ao iniciar o trabalho",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Falha ao desativar o acesso móvel",
       "mobileAccessEnableFailed": "Falha ao habilitar o acesso móvel",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Sessão iniciada com sucesso",
         "title": "Sucesso"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Todas as sessões móveis foram revogadas",
         "title": "Acesso móvel desativado"

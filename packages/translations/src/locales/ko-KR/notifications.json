@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "작업이 이미 실행 중입니다",
       "jobLoadFailed": "유지관리 작업을 불러오지 못했습니다",
       "jobStartFailed": "작업을 시작하지 못했습니다",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "모바일 접근을 비활성화하지 못했습니다",
       "mobileAccessEnableFailed": "모바일 접근을 활성화하지 못했습니다",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "로그인되었습니다",
         "title": "성공"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "모든 모바일 세션이 취소되었습니다",
         "title": "모바일 접근 비활성화됨"

@@ -19,8 +19,8 @@
     "noApiKey": "생성된 API 키가 없습니다. 엔드포인트를 테스트하려면 설정에서 키를 만드세요",
     "specLoadError": "API 사양을 불러오지 못했습니다. API 키를 확인하고 다시 시도하세요.",
     "versionSwitcherLabel": "API 문서 버전",
-    "versionV1": "API v1",
-    "versionV2": "API v2"
+    "versionV1": "",
+    "versionV2": ""
   },
   "automations": {
     "actions": {
@@ -286,6 +286,7 @@
         "unfinished": "자동화가 완료되면 어떤 작업이 수행되는지 보여줍니다."
       },
       "newDestination": "새로운 알림 대상",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "아직 알림 대상이 없습니다. 알림을 보내려면 하나를 추가하세요.",
       "noMatches": "일치하는 항목 없음",
       "picker": {
@@ -346,8 +347,7 @@
         "helper": "이 중 하나가 시작됩니다. 하나 이상이 필요합니다.",
         "or": "또는",
         "title": "언제…"
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "계정",
         "control": "만약… 그렇다면",
         "library": "라이브러리",
+        "notifications": "",
         "notify": "알림",
         "policy": "조치를 취하세요",
         "servers": "서버",
         "sessions": "세션",
-        "updates": "업데이트",
-        "notifications": ""
+        "updates": "업데이트"
       },
       "suggested": "제안",
       "triggers": {
@@ -402,6 +402,14 @@
         "mediaUpgraded": {
           "description": "이미 있던 라이브러리 항목의 품질이 변경됩니다.",
           "synonyms": "업그레이드, 품질, 교체, 재다중화, 4K, 해상도"
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
+          "description": "",
+          "synonyms": ""
         },
         "pluginUpdateAvailable": {
           "description": "서버에 설치된 Tracearr 플러그인의 새 릴리스가 있습니다.",
@@ -447,14 +455,6 @@
         "tracearrUpdateAvailable": {
           "description": "Tracearr의 새 릴리스가 있습니다.",
           "synonyms": "업그레이드, 버전, 릴리스, 자체"
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
-          "description": "",
-          "synonyms": ""
         }
       }
     },
@@ -608,6 +608,8 @@
         "accountTrustChanged": "계정의 신뢰 점수가 변경됩니다.",
         "mediaAdded": "미디어가 추가되었습니다",
         "mediaUpgraded": "미디어가 업그레이드되었습니다",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "플러그인 업데이트가 가능합니다",
         "serverDown": "서버가 오프라인이 됨",
         "serverUp": "서버가 다시 온라인이 됨",
@@ -619,9 +621,7 @@
         "sessionStarted": "스트림이 시작된다",
         "sessionStopped": "스트림이 중지됨",
         "sessionTranscodeChanged": "트랜스코딩 시작 또는 중지",
-        "tracearrUpdateAvailable": "같지 않음",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": "같지 않음"
       },
       "unbound": {
         "account": "선택한 계정",
@@ -915,9 +915,9 @@
         "helper": "검토 후 목록에서 활성화하세요.",
         "label": "처음에는 일시중지"
       },
-      "placeholder": "tracearr1.…",
+      "placeholder": "",
       "raw": "JSON 표시",
-      "reviewDescription": "tracearr1.…",
+      "reviewDescription": "",
       "source": "공유 자동화는 docs.tracearr.com/templates에 나열되어 있습니다.",
       "submit": "추가",
       "title": "공유 코드 붙여넣기",
@@ -948,13 +948,13 @@
       "not_in": "포함"
     },
     "options": {
-      "1080p": "1080p",
-      "1440p": "1440p",
-      "480p": "480p",
+      "1080p": "",
+      "1440p": "",
+      "480p": "",
       "4K": "4K(2160p)",
-      "720p": "720p",
-      "8K": "8K",
-      "SD": "SD",
+      "720p": "",
+      "8K": "",
+      "SD": "",
       "android": "안드로이드",
       "androidtv": "안드로이드 TV",
       "audio": "오디오",
@@ -962,11 +962,11 @@
       "desktop": "데스크탑",
       "dolby vision": "돌비 비전",
       "episode": "TV 에피소드",
-      "hdr": "HDR",
-      "hdr10": "HDR10",
-      "hdr10+": "HDR10+",
-      "hlg": "HLG",
-      "ios": "iOS",
+      "hdr": "",
+      "hdr10": "",
+      "hdr10+": "",
+      "hlg": "",
+      "ios": "",
       "libraryItemType": {
         "album": "앨범",
         "artist": "아티스트",
@@ -979,19 +979,19 @@
       },
       "linux": "리눅스",
       "live": "라이브 TV",
-      "macos": "macOS",
+      "macos": "",
       "mobile": "모바일",
       "movie": "영화",
       "neither": "둘 다 아님(직접 플레이)",
       "photo": "사진",
       "roku": "로쿠",
-      "sdr": "SDR",
+      "sdr": "",
       "tablet": "태블릿",
       "tizen": "타이젠",
       "track": "음악",
       "trailer": "예고편",
-      "tv": "TV",
-      "tvos": "tvOS",
+      "tv": "",
+      "tvos": "",
       "unknown": "알 수 없음",
       "video": "비디오",
       "video_or_audio": "비디오 또는 오디오",
@@ -1009,7 +1009,7 @@
     "recordsOnly": "기록만 실행됨",
     "retentionInvalid": "정수(1일 이상)를 입력하거나 비워 두세요.",
     "retentionLabel": "다음 기간 동안 계속 실행",
-    "retentionPlaceholder": "{{days}}",
+    "retentionPlaceholder": "",
     "scope": {
       "account": "계정",
       "crossServer": "서버 간",
@@ -1061,7 +1061,7 @@
       "updatedBody": "아래 답변을 검토한 후 업데이트하세요.",
       "updatedTitle": "지금",
       "upgradeFailed": "업데이트할 수 없습니다. 다시 시도해 보세요.",
-      "version": "v{{version}}"
+      "version": ""
     },
     "templates": {
       "account-inactivity": {
@@ -1108,6 +1108,11 @@
         "description": "본 적이 없는 장치에서 계정이 처음 스트리밍될 때 대상에게 알립니다.",
         "keywords": "장치 새 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 불일치 이메일 웹훅",
         "name": "새 장치"
+      },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
       },
       "no-4k-transcodes": {
         "description": "4K 소스 비디오를 트랜스코딩하는 스트림을 중지합니다.",
@@ -1168,11 +1173,6 @@
         "description": "계정의 신뢰 점수가 변경되면 대상에게 알립니다.",
         "keywords": "신뢰 점수 평판 페널티 조정됨 불일치 알림 이메일 웹훅",
         "name": "신뢰 점수가 변경됨"
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "이 자동화",
@@ -1192,11 +1192,11 @@
     "tryAdjustingFilters": "필터를 조정해보세요.",
     "units": {
       "days": "일",
-      "gb": "GB",
+      "gb": "",
       "hours": "시간",
-      "km": "km",
-      "kmh": "km/h",
-      "mbps": "Mbps",
+      "km": "",
+      "kmh": "",
+      "mbps": "",
       "minutes": "분",
       "seconds": "초"
     },
@@ -1208,15 +1208,13 @@
     "bandwidth": "대역폭",
     "noActiveStreams": "활성 스트림이 없습니다",
     "nowPlaying": "현재 재생 중",
-    "plays": "재생",
     "serverResources": "서버 리소스",
     "streamLocations": "스트림 위치",
     "streamsAppearHere": "사용자가 시청을 시작하면 활성 스트림이 여기에 표시됩니다",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "시청 시간"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "모든 자동화 및 실행 삭제",
@@ -1231,7 +1229,7 @@
     "clearUsers": "사용자 목록 비우기",
     "clearViolations": "위반 기록 비우기",
     "clickLoadToView": "스냅샷을 확인하려면 \"불러오기\"를 클릭하세요",
-    "cpu": "CPU",
+    "cpu": "",
     "database": "데이터베이스",
     "databaseDesc": "데이터베이스 크기와 테이블 통계",
     "deleteAllSuspicious": "의심 항목 전체 삭제",
@@ -1277,7 +1275,7 @@
     "deviceHealthDesc": "기기 유형별 직접 재생 비율",
     "directPlayHigh": "80% 이상 직접 재생",
     "directPlayLow": "50% 미만",
-    "directPlayMid": "50-79%",
+    "directPlayMid": "",
     "directPlayRate": "직접 재생 비율",
     "legend": "범례:",
     "noDeviceDataPeriod": "이 기간에는 기기 데이터가 없습니다",
@@ -1468,7 +1466,7 @@
     "createAccountFailed": "계정을 만들지 못했습니다",
     "createAccountHeading": "시작하려면 계정을 만드세요",
     "displayNamePlaceholder": "표시 이름을 입력하세요",
-    "emailPlaceholder": "your@email.com",
+    "emailPlaceholder": "",
     "enterClaimCode": "클레임 코드 입력",
     "identifierPlaceholder": "사용자 이름 또는 이메일 주소",
     "invalidCredentials": "사용자 이름, 이메일 또는 비밀번호가 올바르지 않습니다",
@@ -1486,7 +1484,7 @@
     "signInHeading": "계정에 로그인하세요",
     "signupFailed": "가입에 실패했습니다",
     "tagline": "Tracearr - 스트림 접근 관리",
-    "title": "Tracearr",
+    "title": "",
     "username": "사용자 이름",
     "usernameOrEmail": "사용자 이름 또는 이메일",
     "usernamePlaceholder": "사용자 이름",
@@ -1707,7 +1705,7 @@
         "genreAll": "모든 장르",
         "genreLabel": "장르",
         "hdrAll": "모두",
-        "hdrChip": "HDR",
+        "hdrChip": "",
         "hdrLabel": "다이내믹 레인지",
         "hdrOnly": "HDR 전용",
         "libraryAll": "모든 라이브러리",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "영화"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "{{date}} 추가됨",
       "moreServers": "+{{count}}개 이상",
@@ -1806,7 +1803,7 @@
       "playsCompact_other": "{{compact}} 플레이",
       "plays_one": "{{count}}회 재생",
       "plays_other": "{{count}}회 재생",
-      "rankChip": "#{{rank}}",
+      "rankChip": "",
       "rankSuffix": ", {{rank}}위",
       "tileLabel": {
         "added": "추가됨",
@@ -1814,7 +1811,7 @@
         "resolution": "해상도",
         "viewers": "시청자"
       },
-      "versionsChip": "{{count}}×",
+      "versionsChip": "",
       "versions_one": "{{count}} 버전",
       "versions_other": "{{count}} 버전",
       "viewers_one": "시청자 {{count}}명",
@@ -1828,47 +1825,167 @@
     },
     "shows": {
       "title": "TV 프로그램"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "찾으시는 페이지가 없거나 이동되었습니다.",
     "heading": "페이지를 찾을 수 없습니다",
-    "title": "404"
+    "title": ""
   },
   "plexCallback": {
     "authComplete": "인증 완료",
     "windowWillClose": "이 창은 자동으로 닫힙니다..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "알림 대상 추가",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "내장",
       "clearSecret": "지우기",
       "delete": "삭제",
       "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
       "description": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
+      "emailDescription": "",
       "empty": "아직 알림 대상이 없습니다.",
       "fields": {
         "apiToken": "API 토큰",
-        "apiUrl": "API URL",
+        "apiUrl": "",
         "authToken": "인증 토큰",
-        "serverUrl": "서버 URL",
-        "topic": "주제",
-        "url": "URL",
-        "userKey": "사용자 키",
-        "webhookUrl": "웹훅 URL",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
         "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
+        "serverUrl": "서버 URL",
+        "to": "",
+        "topic": "주제",
+        "url": "",
+        "userKey": "사용자 키",
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": "웹훅 URL"
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "공개 주제의 경우 선택사항",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
       "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
       "receiveViolations": "위반사항 수신",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "설정(유지하려면 비워두세요)",
+      "rowActions": "",
       "secretSet": "설정(유지하려면 비워두세요)",
       "test": "테스트",
       "testHint": "테스트를 위해 먼저 저장하세요.",
-      "testNeedsForm": "Discord",
-      "title": "알림 대상",
+      "testNeedsForm": "",
       "types": {
-        "apprise": "Apprise",
-        "discord": "Discord",
-        "gotify": "Gotify",
+        "apprise": "",
+        "discord": "",
+        "email": "",
+        "gotify": "",
         "jsonWebhook": "웹훅(JSON)",
-        "ntfy": "ntfy",
+        "ntfy": "",
         "push": "모바일 푸시",
-        "pushover": "Pushover",
-        "webToast": "브라우저 알림",
-        "email": "Email"
+        "pushover": "",
+        "webToast": "브라우저 알림"
       },
       "usedBy": "{{count}}개의 자동화에서 사용됨",
-      "usedBy_other": "{{count}}개의 자동화에서 사용됨",
-      "webToastNote": "이 브라우저에 알림이 표시됩니다.",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "{{count}}개의 자동화에서 사용됨",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": "이 브라우저에 알림이 표시됩니다."
     },
     "jobs": {
       "lastRun": "마지막 실행",
@@ -1961,12 +2073,10 @@
       "updating": "업데이트 중..."
     },
     "plex": {
-      "accountsLinked_one": "Plex 계정 {{count}}개 연결됨",
-      "accountsLinked_other": "Plex 계정 {{count}}개 연결됨",
       "connectingTo": "{{name}}에 연결 중...",
       "connectionError": {
         "dns": "DNS 오류",
-        "http": "HTTP {{status}}",
+        "http": "",
         "refused": "연결 거부됨",
         "reset": "연결이 재설정됨",
         "timeout": "시간 초과",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "필터링된 항목 숨기기",
       "linkAnotherAccount": "다른 Plex 계정 연결",
       "linkPlexAccount": "Plex 계정 연결",
-      "linkedAccounts": "연결된 Plex 계정",
-      "linkedAccountsDesc": "",
       "linking": "연결 중...",
       "local": "로컬",
       "loginEnabled": "로그인 활성화됨",
@@ -1991,11 +2099,10 @@
       "moreConnections": "연결 {{count}}개 더 보기",
       "noAccountsLinked": "연결된 Plex 계정이 없습니다",
       "noAccountsLinkedHint": "Tracearr에 Plex 서버를 추가하려면 Plex 계정을 연결하세요.",
-      "noAccountsLinkedShort": "연결된 Plex 계정 없음",
-      "noAccountsYet": "아직 연결된 Plex 계정이 없습니다.",
       "noReachableConnections": "연결 가능한 항목이 없습니다",
       "noServersFound": "Plex 서버를 찾을 수 없습니다",
       "noServersFoundHint": "소유한 Plex 서버가 하나 이상 있는지 확인하세요",
+      "ownerOnly": "",
       "reauthorizeAccount": "이 Plex 계정 다시 인증",
       "recommended": "권장",
       "remote": "원격",
@@ -2005,8 +2112,7 @@
       "showAll": "모두 보기",
       "unlinkAccount": "이 Plex 계정 연결 해제",
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다.",
-      "unlinkPlexAccount": "Plex 계정 연결 해제",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "Plex 계정 연결 해제"
     }
   },
   "statsBandwidth": {
@@ -2045,6 +2151,14 @@
     "allServers": "모든 서버",
     "backToUsers": "사용자로 돌아가기",
     "byRule": "처리자 / 규칙",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "연결된 계정",
     "manual": "수동",
     "noTerminationsFound": "이 사용자의 스트림 종료 기록이 없습니다.",
@@ -2062,36 +2176,44 @@
     "unknownRule": "알 수 없는 규칙",
     "userInfo": "사용자 정보",
     "userNotFound": "사용자를 찾을 수 없습니다",
-    "violations": "위반 내역",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": "위반 내역"
   },
   "users": {
     "filterHasAccessTo": "액세스 가능",
     "filterHasAccessToHint": "선택한 모든 서버에서 활성 계정을 가진 사람을 표시합니다.",
     "filterHasAccessToPlaceholder": "모든 서버",
-    "mergeConfirm": "통합",
-    "mergeDialogDescription": "중복 사용자의 모든 서버 계정, 세션, 위반 기록을 대표 사용자로 옮긴 뒤 중복 사용자를 삭제합니다.",
-    "mergeDialogTitle": "사용자 병합",
-    "mergePickPrimary": "대표 사용자를 선택하세요",
-    "mergePrimaryBadge": "대표",
-    "mergePrimaryForced": "이 계정은 로그인할 수 있으므로 대표 사용자로 유지해야 합니다.",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "이 계정은 이미 동일한 사용자에게 속해 있습니다.",
-    "mergeSameServerAcknowledge": "같은 서버의 기록을 합치면 되돌릴 수 없음을 이해했습니다",
-    "mergeSameServerDialogDescription": "이 병합은 동일한 서버의 두 계정을 영구적으로 결합합니다. 이 작업은 취소할 수 없습니다.",
-    "mergeSameServerFallbackName": "이 서버",
-    "mergeSameServerWarning": "두 ID 모두 이미 동일한 서버에 계정을 가지고 있습니다. 병합하면 세션 기록, 위반 및 신뢰 점수가 해당 서버의 단일 계정에 영구적으로 결합됩니다. 이 작업은 취소할 수 없으며 나중에 계정을 분할해도 원래 두 계정이 복원되지 않습니다.",
-    "mergeSameServerWarningTitle": "이 작업은 되돌릴 수 없습니다.",
     "mergeSelectAllActive": "전체 선택을 해제하고 통합할 사용자 두 명만 선택하세요",
     "mergeSelectTwo": "통합할 사용자 두 명만 선택하세요",
     "mergeServerAccountRemoved": "삭제됨",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "사용자 병합",
+    "mergeWhatHappens": "",
     "noUsersFound": "사용자를 찾을 수 없습니다.",
     "resetTrustScore": "신뢰 점수 초기화",
     "resetTrustScoreConfirm": "신뢰 점수를 100으로 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "사용자 {{count}}명 모두 선택",
     "serversColumn": "서버",
     "showRemoved": "삭제된 사용자 표시",
-    "suggestionsDescription": "여러 서버에서 같은 사람으로 보이는 사용자입니다. 내용을 확인한 뒤 일치하면 통합하세요.",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "통합 제안을 불러오지 못했습니다",
     "suggestionsMatchEmail": "이메일이 같음",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "사용자 이름이 같음",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "확인",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "중복 가능성이 있는 사용자",
     "title": "사용자"
   },

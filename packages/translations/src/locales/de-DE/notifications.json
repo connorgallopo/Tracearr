@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Aufgabe läuft bereits",
       "jobLoadFailed": "Wartungsaufgaben laden fehlgeschlagen",
       "jobStartFailed": "Aufgabe starten fehlgeschlagen",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Mobilen Zugriff deaktivieren fehlgeschlagen",
       "mobileAccessEnableFailed": "Mobilen Zugriff aktivieren fehlgeschlagen",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Erfolgreich angemeldet",
         "title": "Erfolg"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Alle mobilen Sitzungen wurden widerrufen",
         "title": "Mobiler Zugriff deaktiviert"

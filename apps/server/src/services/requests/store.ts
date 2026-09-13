@@ -23,6 +23,15 @@ export async function listRequestServices(): Promise<RequestServiceRow[]> {
   return db.select().from(requestServices).orderBy(requestServices.createdAt, requestServices.id);
 }
 
+export async function anyRequestServiceEnabled(): Promise<boolean> {
+  const rows = await db
+    .select({ id: requestServices.id })
+    .from(requestServices)
+    .where(eq(requestServices.enabled, true))
+    .limit(1);
+  return rows.length > 0;
+}
+
 export async function getRequestService(id: string): Promise<RequestServiceRow | null> {
   const rows = await db.select().from(requestServices).where(eq(requestServices.id, id)).limit(1);
   return rows[0] ?? null;

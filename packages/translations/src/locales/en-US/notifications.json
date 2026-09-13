@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Job already running",
       "jobLoadFailed": "Failed to load maintenance jobs",
       "jobStartFailed": "Failed to start job",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Failed to disable mobile access",
       "mobileAccessEnableFailed": "Failed to enable mobile access",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Logged in successfully",
         "title": "Success"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "All mobile sessions have been revoked",
         "title": "Mobile Access Disabled"

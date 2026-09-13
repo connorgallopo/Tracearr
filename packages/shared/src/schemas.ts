@@ -320,6 +320,11 @@ export const mergeUsersBodySchema = z.object({
 export type MergeUsersBody = z.infer<typeof mergeUsersBodySchema>;
 
 export const mergeUserParamSchema = z.object({ id: uuidSchema });
+
+export const mergeSuggestionDismissalSchema = z
+  .object({ userIds: z.tuple([uuidSchema, uuidSchema]) })
+  .refine(({ userIds: [a, b] }) => a !== b, 'userIds must name two different identities');
+export const mergeSuggestionPairParamSchema = z.object({ userA: uuidSchema, userB: uuidSchema });
 export const splitServerUserParamSchema = z.object({ id: uuidSchema });
 
 export const USER_SORT_FIELDS = ['username', 'trustScore', 'joinedAt', 'lastActivityAt'] as const;

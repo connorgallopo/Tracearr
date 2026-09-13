@@ -18,6 +18,7 @@ vi.mock('@/lib/api', async () => {
         test: vi.fn(),
         send: vi.fn(),
         retryFailed: vi.fn(),
+        recipients: vi.fn(),
       },
     },
     ApiError,
@@ -43,6 +44,7 @@ import {
   pollWhileOpen,
   useDeleteNewsletter,
   useDuplicateNewsletter,
+  useNewsletterRecipients,
   useRetryFailedSend,
   useTestNewsletter,
   useUpdateNewsletter,
@@ -106,7 +108,24 @@ describe('polling', () => {
     expect(newsletterKeys.detail('n-1')).toEqual(['newsletters', 'n-1']);
     expect(newsletterKeys.sends('n-1', 2)).toEqual(['newsletters', 'n-1', 'sends', 2]);
     expect(newsletterKeys.sendsAll('n-1')).toEqual(['newsletters', 'n-1', 'sends']);
-    expect(newsletterKeys.recipients('n-1')).toEqual(['newsletters', 'n-1', 'recipients']);
+    expect(newsletterKeys.recipients(null)).toEqual(['newsletters', 'recipients', null]);
+  });
+});
+
+describe('useNewsletterRecipients', () => {
+  it('posts the draft it is handed and asks nothing for a null draft', async () => {
+    const view = { recipients: [], missing: [], excluded: [] };
+    vi.mocked(api.newsletters.recipients).mockResolvedValue(view);
+    const draft = { newsletterId: 'n-1', scope: source.scope, recipients: source.recipients };
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { result } = renderHook(() => useNewsletterRecipients(draft), {
+      wrapper: wrapper(client),
+    });
+    await waitFor(() => expect(result.current.data).toEqual(view));
+    expect(api.newsletters.recipients).toHaveBeenCalledWith(draft);
+
+    renderHook(() => useNewsletterRecipients(null), { wrapper: wrapper(client) });
+    expect(api.newsletters.recipients).toHaveBeenCalledTimes(1);
   });
 });
 

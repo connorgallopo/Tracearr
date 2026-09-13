@@ -67,8 +67,6 @@
     "alert_other": "",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "",
     "device_other": "",
     "error_one": "{{count}} erro",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} utilizador atualizado",
     "usersUpdated_other": "{{count}} utilizadores atualizados",
     "violation_one": "{{count}} violação",
-    "violation_other": "{{count}} violações"
+    "violation_other": "{{count}} violações",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} dia",
@@ -160,7 +160,7 @@
     "content": "Conteúdo",
     "created": "",
     "data": "Dado",
-    "date": "Data",
+    "date": "",
     "days": "",
     "device": "Dispositivo",
     "deviceId": "",
@@ -302,6 +302,7 @@
     "success": "Sucesso"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "",

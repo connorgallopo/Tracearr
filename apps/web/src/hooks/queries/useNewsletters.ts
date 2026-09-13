@@ -1,13 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type {
   CreateNewsletterInput,
   Newsletter,
   NewsletterPreviewDraftInput,
+  NewsletterRecipientsDraftInput,
   NewsletterSendSummary,
   UpdateNewsletterInput,
 } from '@tracearr/shared';
 import { toast } from 'sonner';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { api, ApiError } from '@/lib/api';
 
 export const NEWSLETTERS_KEY = ['newsletters'];
@@ -16,7 +18,11 @@ export const newsletterKeys = {
   detail: (id: string) => [...NEWSLETTERS_KEY, id],
   sendsAll: (id: string) => [...NEWSLETTERS_KEY, id, 'sends'],
   sends: (id: string, page: number) => [...NEWSLETTERS_KEY, id, 'sends', page],
-  recipients: (id: string) => [...NEWSLETTERS_KEY, id, 'recipients'],
+  recipients: (draft: NewsletterRecipientsDraftInput | null) => [
+    ...NEWSLETTERS_KEY,
+    'recipients',
+    draft,
+  ],
   variants: (id: string) => [...NEWSLETTERS_KEY, id, 'variants'],
 };
 
@@ -69,14 +75,19 @@ export function useNewsletter(id: string | undefined) {
   });
 }
 
-export function useNewsletterRecipients(id: string | undefined) {
+export const RECIPIENTS_SETTLE_MS = 400;
+
+/** Who the form as it stands would reach. A changed draft settles before it is posted and the last answer stays up meanwhile, so pass the same object while nothing changed or every render restarts the wait. */
+export function useNewsletterRecipients(draft: NewsletterRecipientsDraftInput | null) {
+  const settled = useDebouncedValue(draft, RECIPIENTS_SETTLE_MS);
   return useQuery({
-    queryKey: newsletterKeys.recipients(id ?? ''),
+    queryKey: newsletterKeys.recipients(settled),
     queryFn: () => {
-      if (!id) throw new Error('newsletter id required');
-      return api.newsletters.recipients(id);
+      if (!settled) throw new Error('recipients draft required');
+      return api.newsletters.recipients(settled);
     },
-    enabled: !!id,
+    enabled: settled !== null,
+    placeholderData: keepPreviousData,
     staleTime: 30_000,
     retry: false,
   });

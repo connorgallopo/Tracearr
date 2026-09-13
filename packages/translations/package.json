@@ -25,9 +25,7 @@
   },
   "files": [
     "dist",
-    "src",
-    "!src/locales/_template",
-    "!dist/locales/_template"
+    "src"
   ],
   "publishConfig": {
     "access": "public"
@@ -35,7 +33,7 @@
   "scripts": {
     "build": "tsc && node scripts/copy-locales.js",
     "prepublishOnly": "pnpm build",
-    "dev": "tsc --watch",
+    "dev": "tsc --watch --tsBuildInfoFile dev.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo",
     "check": "tsx scripts/check-translations.ts",

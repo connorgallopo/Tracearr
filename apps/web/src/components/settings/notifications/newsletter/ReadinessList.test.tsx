@@ -1,10 +1,13 @@
-import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { Destination, NewsletterRecipientsView, Settings } from '@tracearr/shared';
+import type {
+  Destination,
+  NewsletterRecipientsView,
+  NewsletterResolvedRecipient,
+  Settings,
+} from '@tracearr/shared';
 import { defaultFormState } from './newsletterForm';
 import { ReadinessList, readinessChecks } from './ReadinessList';
 import { RecipientsPanel } from './RecipientsPanel';
@@ -23,7 +26,6 @@ vi.mock('@/hooks/queries', () => ({
   useServers: vi.fn(),
   useNewsletterVariants: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
-  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 import {
   useDestinations,
@@ -33,17 +35,6 @@ import {
   useSettings,
 } from '@/hooks/queries';
 
-let queryClient: QueryClient;
-
-/** RecipientsPanel reads the query cache directly, so anything that can render it needs a real client. */
-function Providers({ children }: { children: ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
-    </QueryClientProvider>
-  );
-}
-
 const email = {
   id: 'd-1',
   name: 'Postmark',
@@ -52,13 +43,35 @@ const email = {
   config: { fromAddress: 'news@example.com', username: 'apikey@example.com' },
 } as unknown as Destination;
 
+const member = (userId: string, suppressed = false): NewsletterResolvedRecipient => ({
+  address: `${userId}@x.com`,
+  userId,
+  serverUserId: `su-${userId}`,
+  name: userId,
+  suppressed,
+  username: userId,
+  serverId: 's1',
+  serverName: 'Home Plex',
+  serverIds: ['s1'],
+  thumbUrl: null,
+  newSinceLastSend: false,
+  addressFromUsername: false,
+});
+
+const listed = (count: number): NewsletterRecipientsView => ({
+  recipients: Array.from({ length: count }, (_, i) => member(`u${i}`)),
+  missing: [],
+  excluded: [],
+});
+
 const twoExtras = {
   members: false as const,
   extraAddresses: [{ address: 'a@x.com' }, { address: 'b@x.com' }],
   excludeUserIds: [],
 };
 const noExtras = { members: false as const, extraAddresses: [], excludeUserIds: [] };
-const membersUnresolved = { members: true as const, extraAddresses: [], excludeUserIds: [] };
+
+const resolvedTwo = { empty: false, view: listed(2) };
 
 const settled = {
   variants: undefined,
@@ -70,19 +83,28 @@ const settled = {
   servers: [],
 };
 
+function mockRecipients(
+  data: NewsletterRecipientsView | undefined,
+  over: Record<string, unknown> = {}
+) {
+  vi.mocked(useNewsletterRecipients).mockReturnValue({
+    data,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+    ...over,
+  } as unknown as ReturnType<typeof useNewsletterRecipients>);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
-  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   vi.mocked(useDestinations).mockReturnValue({ data: [email] } as unknown as ReturnType<
     typeof useDestinations
   >);
   vi.mocked(useSettings).mockReturnValue({
     data: { externalUrl: 'https://tracearr.example.com' } as Settings,
   } as unknown as ReturnType<typeof useSettings>);
-  vi.mocked(useNewsletterRecipients).mockReturnValue({
-    data: undefined,
-    isLoading: false,
-  } as unknown as ReturnType<typeof useNewsletterRecipients>);
+  mockRecipients(listed(2));
   vi.mocked(useServers).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useServers>);
   vi.mocked(useNewsletterVariants).mockReturnValue({
     data: undefined,
@@ -92,7 +114,7 @@ beforeEach(() => {
 
 describe('readinessChecks', () => {
   it('evaluates every check, puts failures first, then warnings, then unknowns', () => {
-    const good = readinessChecks({ ...settled, recipients: { form: twoExtras, view: undefined } });
+    const good = readinessChecks({ ...settled, recipients: resolvedTwo });
     expect(good.map((c) => [c.id, c.status])).toEqual([
       ['destination', 'pass'],
       ['externalUrl', 'pass'],
@@ -108,7 +130,7 @@ describe('readinessChecks', () => {
         ...email,
         config: { fromAddress: 'news@example.com', username: 'bot@other.com' },
       } as unknown as Destination,
-      recipients: { form: membersUnresolved, view: undefined },
+      recipients: { empty: false, view: undefined },
     });
     expect(bad.map((c) => [c.id, c.status])).toEqual([
       ['externalUrl', 'fail'],
@@ -125,7 +147,7 @@ describe('readinessChecks', () => {
         ...email,
         config: { fromAddress: 'news@example.com', username: 'apikey' },
       } as unknown as Destination,
-      recipients: { form: noExtras, view: undefined },
+      recipients: { empty: true, view: undefined },
       servers: [
         { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096', publicUrl: null },
         { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400', publicUrl: null },
@@ -149,13 +171,13 @@ describe('readinessChecks', () => {
       ...settled,
       destinationId: null,
       destination: null,
-      recipients: { form: twoExtras, view: undefined },
+      recipients: resolvedTwo,
     });
     expect(none[0]).toEqual({ id: 'destination', status: 'fail', name: null });
     const loading = readinessChecks({
       ...settled,
       destination: null,
-      recipients: { form: twoExtras, view: undefined },
+      recipients: resolvedTwo,
     });
     expect(loading.find((c) => c.id === 'destination')).toEqual({
       id: 'destination',
@@ -165,57 +187,33 @@ describe('readinessChecks', () => {
     expect(loading.find((c) => c.id === 'fromDomain')?.status).toBe('unknown');
   });
 
-  it('agrees with the panel: members off with no extras resolves to zero, and an unsaved exclusion drops the count', () => {
-    const recipientsCheck = (checks: ReturnType<typeof readinessChecks>) =>
-      checks.find((c) => c.id === 'recipients');
+  it('counts only who is mailed: nobody for a form that reaches nobody, and never the suppressed', () => {
+    const recipientsCheck = (recipients: Parameters<typeof readinessChecks>[0]['recipients']) =>
+      readinessChecks({ ...settled, recipients }).find((c) => c.id === 'recipients');
 
+    expect(recipientsCheck({ empty: true, view: listed(2) })).toEqual({
+      id: 'recipients',
+      status: 'fail',
+      count: 0,
+    });
     expect(
-      recipientsCheck(
-        readinessChecks({ ...settled, recipients: { form: noExtras, view: undefined } })
-      )
-    ).toEqual({ id: 'recipients', status: 'fail', count: 0 });
-
-    const view: NewsletterRecipientsView = {
-      recipients: [
-        {
-          address: 'ann@x.com',
-          userId: 'u1',
-          serverUserId: 'su-1',
-          name: 'Ann',
-          suppressed: false,
-          username: 'ann',
-          serverId: 's1',
-          serverName: 'Home Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-        },
-      ],
-      missing: [],
-      excluded: [],
-    };
-    expect(
-      recipientsCheck(
-        readinessChecks({
-          ...settled,
-          recipients: { form: { members: true, extraAddresses: [], excludeUserIds: [] }, view },
-        })
-      )
+      recipientsCheck({
+        empty: false,
+        view: { recipients: [member('u1'), member('u2', true)], missing: [], excluded: [] },
+      })
     ).toEqual({ id: 'recipients', status: 'pass', count: 1 });
-
     expect(
-      recipientsCheck(
-        readinessChecks({
-          ...settled,
-          recipients: { form: { members: true, extraAddresses: [], excludeUserIds: ['u1'] }, view },
-        })
-      )
+      recipientsCheck({
+        empty: false,
+        view: { recipients: [member('u2', true)], missing: [], excluded: [] },
+      })
     ).toEqual({ id: 'recipients', status: 'fail', count: 0 });
   });
 
   it('names the reason a Jellyfin or Emby server has no member link and skips the ones that do', () => {
     const rows = readinessChecks({
       ...settled,
-      recipients: { form: twoExtras, view: undefined },
+      recipients: resolvedTwo,
       servers: [
         { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096', publicUrl: null },
         {
@@ -262,17 +260,13 @@ describe('readinessChecks', () => {
         },
       ],
     };
-    const rows = readinessChecks({
-      ...settled,
-      recipients: { form: twoExtras, view: undefined },
-      variants: view,
-    });
+    const rows = readinessChecks({ ...settled, recipients: resolvedTwo, variants: view });
     expect(rows.filter((c) => c.id === 'emptyVariant')).toEqual([
       { id: 'emptyVariant', status: 'warn', servers: ['Attic'] },
     ]);
     const single = readinessChecks({
       ...settled,
-      recipients: { form: twoExtras, view: undefined },
+      recipients: resolvedTwo,
       variants: { ...view, variants: [{ ...view.variants[1]! }] },
     });
     expect(single.some((c) => c.id === 'emptyVariant')).toBe(false);
@@ -282,13 +276,12 @@ describe('readinessChecks', () => {
 describe('ReadinessList', () => {
   it('renders one row per check, names the destination, counts the recipients, and links the docs', () => {
     render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1', recipients: twoExtras }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const rows = screen.getAllByRole('listitem').map((li) => li.textContent);
     expect(rows).toEqual([
@@ -306,14 +299,13 @@ describe('ReadinessList', () => {
 
   it('puts a missing destination first with a button that focuses the select', async () => {
     render(
-      <Providers>
+      <MemoryRouter>
         <input id="newsletter-destination" aria-label="destination" />
         <ReadinessList
           state={{ ...defaultFormState(), recipients: twoExtras }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const first = screen.getAllByRole('listitem')[0];
     expect(first).toHaveTextContent('newsletters.editor.readiness.destinationFail');
@@ -325,14 +317,13 @@ describe('ReadinessList', () => {
 
   it('scrolls the delivery card into view when there is no destination select to focus', async () => {
     render(
-      <Providers>
+      <MemoryRouter>
         <section id="newsletter-delivery" />
         <ReadinessList
           state={{ ...defaultFormState(), recipients: twoExtras }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const card = document.getElementById('newsletter-delivery')!;
     const scroll = vi.spyOn(card, 'scrollIntoView');
@@ -348,13 +339,12 @@ describe('ReadinessList', () => {
       isError: true,
     } as unknown as ReturnType<typeof useDestinations>);
     render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1', recipients: twoExtras }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const first = screen.getAllByRole('listitem')[0];
     expect(first).toHaveTextContent('newsletters.editor.readiness.destinationError');
@@ -363,66 +353,26 @@ describe('ReadinessList', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('counts a person included after save the same way the recipients card heads its list', () => {
-    const view: NewsletterRecipientsView = {
-      recipients: [
-        {
-          address: 'ann@x.com',
-          userId: 'u1',
-          serverUserId: 'su-1',
-          name: 'Ann',
-          suppressed: false,
-          username: 'ann',
-          serverId: 's1',
-          serverName: 'Home Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-        },
-      ],
-      missing: [],
-      excluded: [
-        {
-          userId: 'u4',
-          serverUserId: 'su-4',
-          name: 'Dee',
-          username: 'dee',
-          serverId: 's1',
-          serverName: 'Home Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-          reason: 'excluded',
-        },
-      ],
-    };
-    vi.mocked(useNewsletterRecipients).mockReturnValue({
-      data: view,
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    } as unknown as ReturnType<typeof useNewsletterRecipients>);
-    const recipients = { members: true as const, extraAddresses: [], excludeUserIds: [] };
+  it('counts the same people the recipients card says will receive', () => {
+    mockRecipients({ recipients: [member('u1'), member('u2', true)], missing: [], excluded: [] });
+    const state = { ...defaultFormState(), destinationId: 'd-1' };
     render(
-      <Providers>
-        <ReadinessList
-          state={{ ...defaultFormState(), destinationId: 'd-1', recipients }}
-          newsletterId="n-1"
-          savedServerIds={[]}
-        />
+      <MemoryRouter>
+        <ReadinessList state={state} newsletterId="n-1" />
         <RecipientsPanel
+          form={state}
           newsletterId="n-1"
-          recipients={recipients}
+          savedExcludeUserIds={[]}
+          servers={[{ id: 's1', name: 'Home Plex' }]}
           onExclude={vi.fn()}
           onInclude={vi.fn()}
-          servers={[{ id: 's1', name: 'Home Plex' }]}
-          staleScope={false}
-          onPreview={vi.fn()}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const rows = screen.getAllByRole('listitem').map((li) => li.textContent);
-    expect(rows).toContain('newsletters.editor.readiness.recipients:{"count":2}');
+    expect(rows).toContain('newsletters.editor.readiness.recipients:{"count":1}');
     expect(
-      screen.getByText('newsletters.editor.recipients.willReceive:{"count":2}')
+      screen.getByText(/newsletters\.editor\.recipients\.willReceive:\{"count":1\}/)
     ).toBeInTheDocument();
   });
 
@@ -431,14 +381,13 @@ describe('ReadinessList', () => {
       data: { externalUrl: null } as Settings,
     } as unknown as ReturnType<typeof useSettings>);
     render(
-      <Providers>
+      <MemoryRouter>
         <section id="newsletter-recipients" />
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1', recipients: noExtras }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const card = document.getElementById('newsletter-recipients')!;
     const scroll = vi.spyOn(card, 'scrollIntoView');
@@ -472,7 +421,7 @@ describe('ReadinessList', () => {
       ],
     } as unknown as ReturnType<typeof useServers>);
     render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{
             ...defaultFormState(),
@@ -480,9 +429,8 @@ describe('ReadinessList', () => {
             scope: { serverIds: ['s-2'], libraries: [] },
           }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     const rows = screen.getAllByRole('listitem').map((li) => li.textContent);
     expect(rows).toContain(
@@ -494,38 +442,33 @@ describe('ReadinessList', () => {
     ).toHaveAttribute('href', '/settings/servers/connections');
   });
 
-  it('says recipients are unknown until saved, and failed to load in edit mode', () => {
+  it('says it is checking the recipients of an unsaved form, and that they failed to load', () => {
+    mockRecipients(undefined, { isLoading: true });
     const { unmount } = render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1' }}
           newsletterId={null}
-          savedServerIds={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
-    expect(screen.getByText('newsletters.editor.readiness.recipientsUnknown')).toBeInTheDocument();
+    expect(screen.getByText('newsletters.editor.readiness.recipientsChecking')).toBeInTheDocument();
     unmount();
 
-    vi.mocked(useNewsletterRecipients).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+    mockRecipients(undefined, { isError: true });
     render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1' }}
-          newsletterId="n-1"
-          savedServerIds={[]}
+          newsletterId={null}
         />
-      </Providers>
+      </MemoryRouter>
     );
     expect(
       screen.getByText('newsletters.editor.readiness.recipientsLoadFailed')
     ).toBeInTheDocument();
     expect(
-      screen.queryByText('newsletters.editor.readiness.recipientsUnknown')
+      screen.queryByText('newsletters.editor.readiness.recipientsChecking')
     ).not.toBeInTheDocument();
   });
 
@@ -535,28 +478,23 @@ describe('ReadinessList', () => {
       isError: true,
     } as unknown as ReturnType<typeof useNewsletterVariants>);
     render(
-      <Providers>
-        <ReadinessList
-          state={{ ...defaultFormState(), destinationId: 'd-1' }}
-          newsletterId="n-1"
-          savedServerIds={[]}
-        />
-      </Providers>
+      <MemoryRouter>
+        <ReadinessList state={{ ...defaultFormState(), destinationId: 'd-1' }} newsletterId="n-1" />
+      </MemoryRouter>
     );
     expect(screen.getByText('newsletters.editor.readiness.variantsLoadFailed')).toBeInTheDocument();
   });
 
-  it('never asks the server for recipients when Members is off, and fails readiness with nothing typed', () => {
+  it('never asks the server for recipients when nobody could receive, and fails readiness', () => {
     render(
-      <Providers>
+      <MemoryRouter>
         <ReadinessList
           state={{ ...defaultFormState(), destinationId: 'd-1', recipients: noExtras }}
           newsletterId="n-1"
-          savedServerIds={[]}
         />
-      </Providers>
+      </MemoryRouter>
     );
-    expect(useNewsletterRecipients).toHaveBeenCalledWith(undefined);
+    expect(useNewsletterRecipients).toHaveBeenCalledWith(null);
     expect(screen.getByText('newsletters.editor.readiness.recipientsFail')).toBeInTheDocument();
   });
 
@@ -585,48 +523,13 @@ describe('ReadinessList', () => {
       },
     } as unknown as ReturnType<typeof useNewsletterVariants>);
     render(
-      <Providers>
-        <ReadinessList
-          state={{ ...defaultFormState(), destinationId: 'd-1' }}
-          newsletterId="n-1"
-          savedServerIds={[]}
-        />
-      </Providers>
+      <MemoryRouter>
+        <ReadinessList state={{ ...defaultFormState(), destinationId: 'd-1' }} newsletterId="n-1" />
+      </MemoryRouter>
     );
     expect(useNewsletterVariants).toHaveBeenCalledWith('n-1');
     expect(
       screen.getByText('newsletters.editor.readiness.emptyVariant:{"servers":"Basement"}')
     ).toBeInTheDocument();
-  });
-
-  it('says the rows reflect the saved servers once the scope moves', () => {
-    const { rerender } = render(
-      <Providers>
-        <ReadinessList
-          state={{
-            ...defaultFormState(),
-            destinationId: 'd-1',
-            scope: { serverIds: ['s-2'], libraries: [] },
-          }}
-          newsletterId="n-1"
-          savedServerIds={['s-1']}
-        />
-      </Providers>
-    );
-    expect(screen.getByText('newsletters.editor.readiness.staleScope')).toBeInTheDocument();
-    rerender(
-      <Providers>
-        <ReadinessList
-          state={{
-            ...defaultFormState(),
-            destinationId: 'd-1',
-            scope: { serverIds: ['s-2'], libraries: [] },
-          }}
-          newsletterId="n-1"
-          savedServerIds={['s-2']}
-        />
-      </Providers>
-    );
-    expect(screen.queryByText('newsletters.editor.readiness.staleScope')).not.toBeInTheDocument();
   });
 });

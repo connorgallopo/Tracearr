@@ -5,17 +5,10 @@ import { useNewsletterSave } from './useNewsletterSave';
 
 const create = vi.fn();
 const update = vi.fn();
-const invalidate = vi.fn();
 vi.mock('@/hooks/queries', () => ({
   useCreateNewsletter: () => ({ mutate: create, isPending: false }),
   useUpdateNewsletter: () => ({ mutate: update, isPending: false }),
-  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
-vi.mock('@tanstack/react-query', async () => {
-  const actual =
-    await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
-  return { ...actual, useQueryClient: () => ({ invalidateQueries: invalidate }) };
-});
 
 const seed: NewsletterFormState = { ...defaultFormState(), name: 'Weekly', timezone: 'UTC' };
 
@@ -49,7 +42,7 @@ describe('useNewsletterSave', () => {
     expect(onSaved).toHaveBeenCalledWith({ id: 'n-9' }, state);
   });
 
-  it('patches only the keys that differ and refreshes the recipients view', () => {
+  it('patches only the keys that differ', () => {
     const onSaved = vi.fn();
     const state = { ...seed, name: 'Renamed', links: { tracearr: true } };
     update.mockImplementation(
@@ -64,7 +57,6 @@ describe('useNewsletterSave', () => {
       { id: 'n-1', data: { name: 'Renamed', links: { tracearr: true } } },
       expect.anything()
     );
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['newsletters', 'n-1', 'recipients'] });
     expect(onSaved).toHaveBeenCalledWith({ id: 'n-1' }, state);
   });
 

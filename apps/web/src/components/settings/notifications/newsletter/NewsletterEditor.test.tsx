@@ -34,7 +34,6 @@ vi.mock('@/hooks/queries', () => ({
   usePreviewDraftNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   useTestNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
   useSendNewsletter: () => ({ mutate: vi.fn(), isPending: false }),
-  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 vi.mock('@/components/ui/rich-text-field', () => ({
   RichTextField: ({

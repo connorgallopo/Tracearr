@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,8 +27,11 @@ vi.mock('@/hooks/useSocket', () => ({
   useSocket: () => ({ serverConnectionStatuses: new Map(), isConnected: false }),
 }));
 
+const { seerr } = vi.hoisted(() => ({ seerr: { configured: false } }));
+
 vi.mock('@/hooks/queries', () => ({
   useVersion: () => ({ data: undefined, isLoading: true }),
+  useRequestsConfigured: () => ({ data: seerr }),
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -55,6 +58,23 @@ function renderSidebar(initialPath = '/media') {
 }
 
 describe('AppSidebar navigation', () => {
+  beforeEach(() => {
+    seerr.configured = false;
+  });
+
+  it('hides the Requests entry until a Seerr is linked', () => {
+    renderSidebar();
+
+    expect(screen.queryByText('requests')).not.toBeInTheDocument();
+  });
+
+  it('shows the Requests entry once a Seerr is linked', () => {
+    seerr.configured = true;
+    renderSidebar();
+
+    expect(screen.getByText('requests')).toBeInTheDocument();
+  });
+
   it('renders the Media group with Overview/Browse/Genres and the moved library entries', () => {
     renderSidebar();
 

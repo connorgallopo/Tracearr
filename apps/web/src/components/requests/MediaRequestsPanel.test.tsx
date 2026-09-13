@@ -22,6 +22,7 @@ function makeEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntr
     is4k: false,
     isAutoRequest: false,
     watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
     requester: {
       serverUserId: 'u1',
       userId: 'u1',

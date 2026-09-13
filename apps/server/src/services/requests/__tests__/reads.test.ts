@@ -94,7 +94,7 @@ describe('listMediaRequests', () => {
     expect(renderSql(mockDb.execute.mock.calls[0]![0] as SQL).params).toContain(SERVER_ID);
   });
 
-  it('leaves an unmatched requester unwatched without probing', async () => {
+  it('still reports the anyone grain for an unmatched requester, but never a requester grain', async () => {
     mockDb.execute.mockResolvedValue({
       rows: [
         mediaRow({
@@ -109,10 +109,13 @@ describe('listMediaRequests', () => {
       ],
     });
 
+    watched.resolveWatchedStates.mockResolvedValue(new Map([[SHOW_ID, 'watched']]));
+
     const entries = await listMediaRequests({ scope: showScope(), serverIds: undefined });
 
     expect(entries).toHaveLength(1);
-    expect(entries[0]?.watchedState).toBe('unwatched');
+    expect(entries[0]?.watchedState).toBe('watched');
+    expect(entries[0]?.watchedStateRequester).toBe('unwatched');
     expect(entries[0]?.requester).toEqual({
       serverUserId: null,
       userId: null,
@@ -121,8 +124,10 @@ describe('listMediaRequests', () => {
       identityName: null,
       thumb: null,
     });
-    expect(watched.resolveWatchedStates).not.toHaveBeenCalled();
-    expect(watched.fetchEpisodeCounts).not.toHaveBeenCalled();
+    expect(watched.resolveWatchedStates).toHaveBeenCalledTimes(1);
+    expect(watched.resolveWatchedStates).toHaveBeenCalledWith(
+      expect.objectContaining({ lensUserId: null })
+    );
   });
 
   it('asks for the episode denominator once for every requester', async () => {
@@ -142,8 +147,30 @@ describe('listMediaRequests', () => {
     await listMediaRequests({ scope: showScope(), serverIds: [SERVER_ID] });
 
     expect(watched.fetchEpisodeCounts).toHaveBeenCalledTimes(1);
-    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID, otherShowId], [SERVER_ID]);
-    expect(watched.resolveWatchedStates).toHaveBeenCalledTimes(2);
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith(
+      [SHOW_ID, otherShowId],
+      [SERVER_ID],
+      [2]
+    );
+    expect(watched.resolveWatchedStates).toHaveBeenCalledTimes(3);
+  });
+
+  it('never shares a probe between requests that asked for different seasons', async () => {
+    mockDb.execute.mockResolvedValue({
+      rows: [
+        mediaRow(),
+        mediaRow({ id: 'req-s5', seasons: [{ seasonNumber: 5, status: 'completed' }] }),
+      ],
+    });
+
+    await listMediaRequests({ scope: showScope(), serverIds: [SERVER_ID] });
+
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledTimes(2);
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID], [SERVER_ID], [2]);
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID], [SERVER_ID], [5]);
+    expect(watched.resolveWatchedStates).toHaveBeenCalledWith(
+      expect.objectContaining({ seasons: [5] })
+    );
   });
 
   it('lenses a matched requester and computes the wait', async () => {
@@ -298,7 +325,7 @@ describe('listUserRequests', () => {
       pageSize: 5,
     });
 
-    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID], [SERVER_ID]);
+    expect(watched.fetchEpisodeCounts).toHaveBeenCalledWith([SHOW_ID], [SERVER_ID], [2]);
     expect(watched.resolveWatchedStates).toHaveBeenCalledWith(
       expect.objectContaining({ serverIds: [SERVER_ID] })
     );

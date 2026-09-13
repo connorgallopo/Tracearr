@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Työ on jo käynnissä",
       "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
       "jobStartFailed": "Työn aloittaminen epäonnistui",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Mobiiliyhteyden käyttöoikeuden poistaminen käytöstä epäonnistui",
       "mobileAccessEnableFailed": "Mobiiliyhteyden käyttöoikeuden käyttöönotto epäonnistui",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Kirjautunut onnistuneesti",
         "title": "Onnistui"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Kaikki mobiiliistunnot on peruutettu",
         "title": "Mobiilikäyttö Pois Käytöstä"

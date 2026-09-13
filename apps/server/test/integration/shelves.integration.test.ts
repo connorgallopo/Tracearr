@@ -218,6 +218,7 @@ interface SeedSessionOptions {
   mediaType?: 'movie' | 'episode';
   durationMs: number;
   startedAt?: Date;
+  watched?: boolean;
 }
 
 async function seedSession(opts: SeedSessionOptions): Promise<void> {
@@ -234,7 +235,7 @@ async function seedSession(opts: SeedSessionOptions): Promise<void> {
     durationMs: opts.durationMs,
     totalDurationMs: Math.max(opts.durationMs, 7_200_000),
     progressMs: opts.durationMs,
-    watched: opts.durationMs >= 120_000,
+    watched: opts.watched ?? opts.durationMs >= 120_000,
     startedAt,
     stoppedAt: startedAt,
   });
@@ -712,6 +713,58 @@ describe('shelves command center endpoint against a real database', () => {
     for (const row of body.deadWeight) expect(row.watchedState).toBe('unwatched');
   });
 
+  it('deadWeight uses the same play test as the watched badge: an abandoned open is not a play', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const { app } = await buildApp(ownerFor());
+
+    const abandoned = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'dw-abandoned',
+      title: 'Dead Weight Abandoned',
+      year: 2008,
+      tmdbId: 903_010,
+      addedAt: new Date(Date.now() - 90 * DAY_MS),
+      fileSize: 5_000_000,
+    });
+    await seedSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaId: abandoned,
+      ratingKey: 'dw-abandoned',
+      durationMs: 30_000,
+      startedAt: new Date(Date.now() - 80 * DAY_MS),
+    });
+
+    const shortFinish = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'dw-short-finish',
+      title: 'Dead Weight Short Finish',
+      year: 2009,
+      tmdbId: 903_011,
+      addedAt: new Date(Date.now() - 90 * DAY_MS),
+      fileSize: 6_000_000,
+    });
+    await seedSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaId: shortFinish,
+      ratingKey: 'dw-short-finish',
+      durationMs: 30_000,
+      watched: true,
+      startedAt: new Date(Date.now() - 80 * DAY_MS),
+    });
+
+    await refreshPlaysAggregate();
+
+    const { statusCode, body } = await fetchShelves(app, '?period=day');
+    expect(statusCode).toBe(200);
+    const deadIds = body.deadWeight.map((r) => r.mediaId);
+    expect(deadIds).toContain(abandoned);
+    expect(deadIds).not.toContain(shortFinish);
+  });
+
   it('reports a null addedAt (not an empty string) for a dead-weight title with no latest_added_at', async () => {
     const server = await createTestServer({ type: 'plex' });
     const { app } = await buildApp(ownerFor());
@@ -733,7 +786,7 @@ describe('shelves command center endpoint against a real database', () => {
     expect(row!.addedAt).toBeNull();
   });
 
-  it('never serves a v1-shaped cached payload under the legacy key as a v5 response', async () => {
+  it('never serves a v1-shaped cached payload under the legacy key as a current response', async () => {
     const server = await createTestServer({ type: 'plex' });
     const { app, redis } = await buildApp(ownerFor());
 
@@ -757,14 +810,14 @@ describe('shelves command center endpoint against a real database', () => {
     expect(body.kpis).toBeDefined();
     expect(body.recentlyAddedMovies.map((r) => r.title)).toContain('V1 Cache Movie');
 
-    const v5Key = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+    const versionedKey = buildLibraryCacheKey(
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'month',
       undefined,
       'auto:dw1'
     );
-    expect(await redis.get(v5Key)).not.toBeNull();
+    expect(await redis.get(versionedKey)).not.toBeNull();
     // The legacy key is untouched - proves the route never read or wrote it.
     expect(await redis.get(legacyKey)).not.toBeNull();
   });
@@ -782,21 +835,21 @@ describe('shelves command center endpoint against a real database', () => {
     });
 
     const weekKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'week',
       undefined,
       'auto:dw1'
     );
     const weekKeyDw0 = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'week',
       undefined,
       'auto:dw0'
     );
     const yearKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'year',
       undefined,
@@ -1436,7 +1489,7 @@ describe('shelves preferred poster source', () => {
     expect(autoRow.posterUrl).toContain(`v=${autoRow.posterVersion}`);
 
     const autoKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'year',
       undefined,
@@ -1449,7 +1502,7 @@ describe('shelves preferred poster source', () => {
     // back server B's already-cached poster.
     await setSetting('preferredPosterServerId', serverA.id);
     const preferredKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
       'all',
       'year',
       undefined,
@@ -1475,7 +1528,7 @@ describe('shelves cache invalidation on library sync', () => {
 
   it('a sync invalidates the versioned cached shelves key', async () => {
     initLibrarySyncQueue(process.env.REDIS_URL ?? 'redis://localhost:6380');
-    const key = buildLibraryCacheKey(`${REDIS_KEYS.LIBRARY_SHELVES}:v6`, 'all', 'month');
+    const key = buildLibraryCacheKey(`${REDIS_KEYS.LIBRARY_SHELVES}:v7`, 'all', 'month');
     const { getRedis } = await import('../../src/lib/redisShared.js');
     const redis = getRedis();
     await redis.set(key, JSON.stringify({ marker: true }));

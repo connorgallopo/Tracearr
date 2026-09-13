@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Newsletter, NewsletterPreview } from '@tracearr/shared';
 import { defaultFormState, type NewsletterFormState } from './newsletterForm';
-import { NewsletterActions, type NewsletterActionsHandle } from './NewsletterActions';
+import { NewsletterActions } from './NewsletterActions';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -32,7 +31,6 @@ import { useNewsletterVariants } from '@/hooks/queries';
 
 const newsletter = { id: 'n-1', name: 'Weekly', timezone: 'UTC' } as Newsletter;
 const state: NewsletterFormState = { ...defaultFormState(), name: 'Weekly', timezone: 'UTC' };
-const refuse = vi.fn();
 const preview: NewsletterPreview = {
   window: {
     start: '2026-08-28T00:00:00.000Z',
@@ -81,14 +79,7 @@ const emptyUnion: NewsletterPreview = {
 
 function renderActions(over: Partial<Parameters<typeof NewsletterActions>[0]> = {}) {
   return render(
-    <NewsletterActions
-      newsletter={newsletter}
-      state={state}
-      dirty={false}
-      valid
-      onRefuse={refuse}
-      {...over}
-    />
+    <NewsletterActions newsletter={newsletter} state={state} dirty={false} valid {...over} />
   );
 }
 
@@ -162,16 +153,6 @@ describe('NewsletterActions', () => {
     expect(button).toBeDisabled();
     await userEvent.hover(button.parentElement as HTMLElement);
     expect(await screen.findByRole('tooltip')).toHaveTextContent('newsletters.editor.fixFirst');
-  });
-
-  it('hands an invalid form back to the page instead of previewing it', async () => {
-    const ref = createRef<NewsletterActionsHandle>();
-    renderActions({ valid: false, ref });
-    ref.current?.openPreview();
-    expect(previewMutate).not.toHaveBeenCalled();
-    expect(previewDraftMutate).not.toHaveBeenCalled();
-    expect(screen.queryByTitle('newsletters.editor.preview.title')).not.toBeInTheDocument();
-    expect(refuse).toHaveBeenCalled();
   });
 
   it('disables Send test and Send now while dirty, with the save-first reason, and sends nothing', async () => {

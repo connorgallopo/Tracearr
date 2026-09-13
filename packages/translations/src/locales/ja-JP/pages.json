@@ -286,6 +286,7 @@
         "unfinished": ""
       },
       "newDestination": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "noMatches": "",
       "picker": {
@@ -346,8 +347,7 @@
         "helper": "",
         "or": "",
         "title": ""
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": "",
-        "notifications": ""
+        "updates": ""
       },
       "suggested": "",
       "triggers": {
@@ -400,6 +400,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -445,14 +453,6 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -608,6 +608,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "",
         "serverDown": "",
         "serverUp": "",
@@ -619,9 +621,7 @@
         "sessionStarted": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": ""
       },
       "unbound": {
         "account": "",
@@ -1109,6 +1109,11 @@
         "keywords": "",
         "name": ""
       },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
       "no-4k-transcodes": {
         "description": "",
         "keywords": "",
@@ -1168,11 +1173,6 @@
         "description": "",
         "keywords": "",
         "name": ""
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "",
@@ -1208,15 +1208,13 @@
     "bandwidth": "",
     "noActiveStreams": "有効なストリームがありません",
     "nowPlaying": "再生中",
-    "plays": "再生",
     "serverResources": "サーバーリソース",
     "streamLocations": "ストリームの場所",
     "streamsAppearHere": "ユーザーが視聴を開始すると、アクティブなストリームがここに表示されます",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "ウォッチ時間"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "映画"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "{{date}}に追加",
       "moreServers": "",
@@ -1828,7 +1825,8 @@
     },
     "shows": {
       "title": "番組"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "お探しのページは存在しないか、移動されていません。",
@@ -1839,36 +1837,155 @@
     "authComplete": "認証完了",
     "windowWillClose": "このウィンドウは自動的に閉じます..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "apiToken": "",
         "apiUrl": "",
         "authToken": "",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
+        "messageStream": "",
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
         "serverUrl": "",
+        "to": "",
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": "",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
-        "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": ""
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "apprise": "",
         "discord": "",
+        "email": "",
         "gotify": "",
         "jsonWebhook": "",
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": "",
-        "email": "Email"
+        "webToast": ""
       },
       "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": ""
     },
     "jobs": {
       "lastRun": "最終実行",
@@ -1961,8 +2073,6 @@
       "updating": "更新中..."
     },
     "plex": {
-      "accountsLinked_one": "{{count}} プレックスアカウントがリンクされました",
-      "accountsLinked_other": "{{count}} プレックスアカウントがリンクされています",
       "connectingTo": "{{name}} に接続中...",
       "connectionError": {
         "dns": "",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "フィルターを隠す",
       "linkAnotherAccount": "別のプレックスアカウントにリンク",
       "linkPlexAccount": "プレックスアカウントをリンク",
-      "linkedAccounts": "リンクされたプレックスアカウント",
-      "linkedAccountsDesc": "",
       "linking": "リンクしています...",
       "local": "ローカル",
       "loginEnabled": "ログインが有効です",
@@ -1991,11 +2099,10 @@
       "moreConnections": "+{{count}} 他のコネクション",
       "noAccountsLinked": "プレックスアカウントがリンクされていません",
       "noAccountsLinkedHint": "Plexアカウントをリンクして、PlexサーバーをTracearrに追加します。",
-      "noAccountsLinkedShort": "プレックスアカウントがリンクされていません",
-      "noAccountsYet": "プレックスアカウントはまだリンクされていません。",
       "noReachableConnections": "接続可能な接続がありません",
       "noServersFound": "プレックスサーバーが見つかりません",
       "noServersFoundHint": "Plexサーバーを少なくとも1つ所有していることを確認してください",
+      "ownerOnly": "",
       "reauthorizeAccount": "",
       "recommended": "",
       "remote": "リモート",
@@ -2005,8 +2112,7 @@
       "showAll": "すべて表示",
       "unlinkAccount": "このプレックスアカウントの連携を解除する",
       "unlinkConfirm": "このプレックスアカウントのリンクを解除してもよろしいですか？再度リンクするまで、このアカウントからサーバーを追加することはできません。",
-      "unlinkPlexAccount": "プレックスアカウントのリンクを解除",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "プレックスアカウントのリンクを解除"
     }
   },
   "statsBandwidth": {
@@ -2045,6 +2151,14 @@
     "allServers": "",
     "backToUsers": "ユーザーに戻る",
     "byRule": "",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "",
     "manual": "マニュアル",
     "noTerminationsFound": "このユーザーに対する配信終了はありません。",
@@ -2062,36 +2176,44 @@
     "unknownRule": "不明なルール",
     "userInfo": "ユーザー情報",
     "userNotFound": "ユーザーが見つかりません",
-    "violations": "違反",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": "違反"
   },
   "users": {
     "filterHasAccessTo": "",
     "filterHasAccessToHint": "",
     "filterHasAccessToPlaceholder": "",
-    "mergeConfirm": "",
-    "mergeDialogDescription": "",
-    "mergeDialogTitle": "",
-    "mergePickPrimary": "",
-    "mergePrimaryBadge": "",
-    "mergePrimaryForced": "",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "",
-    "mergeSameServerAcknowledge": "",
-    "mergeSameServerDialogDescription": "",
-    "mergeSameServerFallbackName": "",
-    "mergeSameServerWarning": "",
-    "mergeSameServerWarningTitle": "",
     "mergeSelectAllActive": "",
     "mergeSelectTwo": "",
     "mergeServerAccountRemoved": "",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "",
+    "mergeWhatHappens": "",
     "noUsersFound": "ユーザーが見つかりませんでした。",
     "resetTrustScore": "信頼スコアをリセット",
     "resetTrustScoreConfirm": "信頼度を100にリセットしてもよろしいですか？この操作は元に戻せません。",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "すべての {{count}} ユーザーを選択",
     "serversColumn": "",
     "showRemoved": "",
-    "suggestionsDescription": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "",
     "suggestionsMatchEmail": "",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "",
     "title": "ユーザー"
   },

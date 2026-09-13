@@ -604,6 +604,7 @@ export function ViolationDetail() {
                 />
               </DataTableViewport>
               <DataTablePager
+                variant="footer"
                 {...sessionsPager}
                 labels={{
                   navigation: t('common:table.pagination'),

@@ -38,7 +38,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = path.resolve(__dirname, '..');
 const LOCALES_DIR = path.join(PKG_ROOT, 'src', 'locales');
 const BASE_LANG = 'en';
-const SKIP_DIRS = new Set(['_template', BASE_LANG]);
+const SKIP_DIRS = new Set([BASE_LANG]);
 
 const REPO_ROOT = execFileSync('git', ['rev-parse', '--show-toplevel'], {
   cwd: PKG_ROOT,

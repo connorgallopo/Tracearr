@@ -219,6 +219,7 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
           />
         </DataTableViewport>
         <DataTablePager
+          variant="footer"
           {...pager}
           labels={{
             navigation: t('common:table.pagination'),

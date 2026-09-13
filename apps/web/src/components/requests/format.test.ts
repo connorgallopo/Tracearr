@@ -24,15 +24,18 @@ describe('formatWait', () => {
     expect(formatWait(null, 'approved', t)).toBe('requests.wait.pending');
   });
 
-  it('reads as landed within a minute under 60 seconds', () => {
-    expect(formatWait(59_000, 'completed', t)).toBe('requests.wait.sameMinute');
+  it('reads as under a minute below 60 seconds', () => {
+    expect(formatWait(59_000, 'completed', t)).toBe('<1m');
   });
 
-  it('reads as landed with the formatted duration at 60 seconds and up', () => {
-    expect(formatWait(60_000, 'completed', t)).toBe('requests.wait.landed:{"duration":"1m"}');
-    expect(formatWait(3 * 60 * 60 * 1000 + 5 * 60 * 1000, 'completed', t)).toBe(
-      'requests.wait.landed:{"duration":"3h 5m"}'
-    );
+  it('gives a bare span rather than a sentence', () => {
+    expect(formatWait(60_000, 'completed', t)).toBe('1m');
+    expect(formatWait(3 * 60 * 60 * 1000 + 5 * 60 * 1000, 'completed', t)).toBe('3h 5m');
+  });
+
+  it('rolls hours up into days once a wait passes a day', () => {
+    expect(formatWait(3708 * 60 * 60 * 1000 + 54 * 60 * 1000, 'completed', t)).toBe('154d 12h');
+    expect(formatWait(48 * 60 * 60 * 1000, 'completed', t)).toBe('2d');
   });
 });
 
@@ -71,6 +74,7 @@ function makeEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntr
     is4k: false,
     isAutoRequest: false,
     watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
     requester: {
       serverUserId: 'u1',
       userId: 'u1',
@@ -88,9 +92,7 @@ describe('heroRequestLine', () => {
     const entry = makeEntry();
     const line = heroRequestLine(entry, 'Alice', t, 'MMM d, yyyy');
     const date = format(new Date(entry.requestedAt), 'MMM d, yyyy');
-    expect(line).toBe(
-      `requests.hero.line:{"name":"Alice","date":"${date}","tail":"requests.wait.landed:{\\"duration\\":\\"24h 0m\\"}"}`
-    );
+    expect(line).toBe(`requests.hero.line:{"name":"Alice","date":"${date}","tail":"1d"}`);
   });
 
   it('fills the declined tail for a declined request', () => {

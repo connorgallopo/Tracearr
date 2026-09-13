@@ -15,7 +15,6 @@ import {
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, plexAccounts } from '../db/schema.js';
-// Token encryption removed - tokens now stored in plain text (DB is localhost-only)
 import {
   PlexClient,
   JellyfinClient,
@@ -776,85 +775,6 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         : { bandwidthSamples: [], bandwidthAccounts: [], bandwidthDevices: [] }),
       fetchedAt: new Date().toISOString(),
     };
-  });
-
-  /**
-   * GET /servers/:id/image/* - Proxy images from Plex/Jellyfin servers
-   * This endpoint fetches images without exposing server tokens to the client
-   *
-   * For Plex: /servers/:id/image/library/metadata/123/thumb/456
-   * For Jellyfin: /servers/:id/image/Items/123/Images/Primary?tag=abc
-   *
-   * Note: Accepts auth via header OR query param (?token=xxx) since browser
-   * <img> tags don't send Authorization headers
-   */
-  app.get('/:id/image/*', async (request, reply) => {
-    // Custom auth: try header first, fall back to query param for <img> tags
-    const queryToken = (request.query as { token?: string }).token;
-    if (queryToken) {
-      // Manually set authorization header for jwtVerify to work
-      request.headers.authorization = `Bearer ${queryToken}`;
-    }
-
-    // Shared guard rather than a bare jwtVerify: it also enforces the
-    // post-restore revocation timestamp and the mobile device blacklist.
-    await app.authenticate(request, reply);
-    if (reply.sent) return;
-
-    const { id } = request.params as { id: string; '*': string };
-    const imagePath = (request.params as { '*': string })['*'];
-
-    if (!imagePath) {
-      return reply.badRequest('Image path is required');
-    }
-
-    // Get server with token
-    const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
-
-    const server = serverRows[0];
-    if (!server) {
-      return reply.notFound('Server not found');
-    }
-
-    const baseUrl = server.url.replace(/\/$/, '');
-    const token = server.token;
-
-    try {
-      let imageUrl: string;
-      let headers: Record<string, string>;
-
-      if (server.type === 'plex') {
-        // Plex uses X-Plex-Token query param
-        const separator = imagePath.includes('?') ? '&' : '?';
-        imageUrl = `${baseUrl}/${imagePath}${separator}X-Plex-Token=${token}`;
-        headers = { Accept: 'image/*' };
-      } else {
-        imageUrl = `${baseUrl}/${imagePath}`;
-        const authValue = `MediaBrowser Client="Tracearr", Device="Tracearr Server", DeviceId="tracearr-server", Version="1.0.0", Token="${token}"`;
-        const authHeaderName =
-          server.type === 'jellyfin' ? 'Authorization' : 'X-Emby-Authorization';
-        headers = {
-          [authHeaderName]: authValue,
-          Accept: 'image/*',
-        };
-      }
-
-      const response = await fetch(imageUrl, { headers });
-
-      if (!response.ok) {
-        return await reply.notFound('Image not found');
-      }
-
-      const contentType = response.headers.get('content-type') ?? 'image/jpeg';
-      const buffer = await response.arrayBuffer();
-
-      reply.header('Content-Type', contentType);
-      reply.header('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
-      return await reply.send(Buffer.from(buffer));
-    } catch (error) {
-      app.log.error({ err: error, serverId: id, imagePath }, 'Failed to fetch image from server');
-      return reply.internalServerError('Failed to fetch image');
-    }
   });
 
   /**

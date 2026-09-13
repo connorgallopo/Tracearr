@@ -50,10 +50,21 @@ const CELL_PADDING: Record<DataTableDensity, string> = {
   compact: 'px-3 py-1.5',
 };
 
+/**
+ * `w-auto` is load-bearing: with the default `w-full` the width is over-constrained,
+ * so the browser drops the negative right margin and the table bleeds left only.
+ */
 const FLUSH_OFFSET: Record<DataTableDensity, string> = {
-  comfortable: '-mx-4 -mb-4',
-  default: '-mx-4 -mb-3',
-  compact: '-mx-3 -mb-1.5',
+  comfortable: 'w-auto -mx-4 -mb-4',
+  default: 'w-auto -mx-4 -mb-3',
+  compact: 'w-auto -mx-3 -mb-1.5',
+};
+
+/** Cancels FLUSH_OFFSET's bottom pull so a footer pager butts against the last row. */
+export const FLUSH_FOOTER_OFFSET: Record<DataTableDensity, string> = {
+  comfortable: '-mx-4 mt-4 px-4',
+  default: '-mx-4 mt-3 px-4',
+  compact: '-mx-3 mt-1.5 px-3',
 };
 
 const HEADER_TEXT: Record<DataTableHeaderVariant, string | undefined> = {
@@ -80,6 +91,10 @@ interface DataTableRootProps {
   headerVariant?: DataTableHeaderVariant;
   className?: string;
   children: ReactNode;
+}
+
+export function useDataTableChrome(): DataTableChrome {
+  return use(ChromeContext);
 }
 
 /** Draws no frame: every call site already sits inside a Card. */

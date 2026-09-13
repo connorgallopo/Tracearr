@@ -31,6 +31,7 @@ import { Automations } from '@/pages/Automations';
 import { AutomationBuilderPage } from '@/pages/AutomationBuilderPage';
 import { AutomationDetail } from '@/pages/AutomationDetail';
 import { Violations } from '@/pages/Violations';
+import { Requests } from '@/pages/Requests';
 import { ViolationDetail } from '@/pages/ViolationDetail';
 import { History } from '@/pages/History';
 import { Settings } from '@/pages/Settings';
@@ -109,6 +110,7 @@ export const appRoutes = (
         <Route path="automations/:id/edit" element={<AutomationBuilderPage />} />
         <Route path="violations" element={<Violations />} />
         <Route path="violations/:id" element={<ViolationDetail />} />
+        <Route path="requests" element={<Requests />} />
         <Route path="settings/*" element={<Settings />} />
         <Route
           path="api-docs"

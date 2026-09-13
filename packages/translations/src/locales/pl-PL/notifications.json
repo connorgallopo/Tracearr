@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Zadanie jest już uruchomione",
       "jobLoadFailed": "Nie udało się załadować zadań konserwacyjnych",
       "jobStartFailed": "Nie udało się uruchomić zadania",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Nie udało się wyłączyć dostępu mobilnego",
       "mobileAccessEnableFailed": "Nie udało się włączyć dostępu mobilnego",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Zalogowano pomyślnie",
         "title": "Powodzenie"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Wszystkie sesje mobilne zostały anulowane",
         "title": "Dostęp mobilny wyłączony"

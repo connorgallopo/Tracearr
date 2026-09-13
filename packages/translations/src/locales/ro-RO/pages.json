@@ -134,7 +134,7 @@
     "allStatuses": "",
     "bind": {
       "accountLabel": "",
-      "activeLabel": "Active",
+      "activeLabel": "",
       "anyServer": "",
       "back": "",
       "created": "",
@@ -245,7 +245,7 @@
         "variableUnavailable": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
+        "problems_one": "",
         "problems_other": "",
         "ready": "",
         "remaining_one": "",
@@ -286,6 +286,7 @@
         "unfinished": ""
       },
       "newDestination": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "noMatches": "",
       "picker": {
@@ -318,14 +319,14 @@
         "accountPlaceholder": "",
         "enforceAcrossServers": "",
         "enforceAcrossServersDescription": "",
-        "global": "Global",
+        "global": "",
         "label": "",
         "noServers": "",
         "person": "",
         "personHelper": "",
         "personLabel": "",
         "personPlaceholder": "",
-        "server": "Specific server",
+        "server": "",
         "serverLabel": "",
         "serverPlaceholder": ""
       },
@@ -346,8 +347,7 @@
         "helper": "",
         "or": "",
         "title": ""
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": "",
-        "notifications": ""
+        "updates": ""
       },
       "suggested": "",
       "triggers": {
@@ -400,6 +400,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -445,14 +453,6 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -608,6 +608,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "",
         "serverDown": "",
         "serverUp": "",
@@ -619,9 +621,7 @@
         "sessionStarted": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": ""
       },
       "unbound": {
         "account": "",
@@ -1109,6 +1109,11 @@
         "keywords": "",
         "name": ""
       },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
       "no-4k-transcodes": {
         "description": "",
         "keywords": "",
@@ -1168,11 +1173,6 @@
         "description": "",
         "keywords": "",
         "name": ""
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "",
@@ -1208,15 +1208,13 @@
     "bandwidth": "Lățimea benzii",
     "noActiveStreams": "Nici un flux activ",
     "nowPlaying": "Acum se redă",
-    "plays": "Jocuri",
     "serverResources": "Resurse server",
     "streamLocations": "Locații stream",
     "streamsAppearHere": "Fluxurile active vor apărea aici atunci când utilizatorii încep să vizioneze",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "Timp de urmărire"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "",
@@ -1395,7 +1393,7 @@
       "contentROIDesc": "Vizionează valoarea pe cost de stocare",
       "days": "zile",
       "description": "Utilizare stocare, predicții și optimizare",
-      "duplicates": "Duplicate",
+      "duplicates": "",
       "duplicatesFailed": "",
       "duplicatesSubtitle": "",
       "duplicatesTitle": "",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "Filme"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "Adăugat {{date}}",
       "moreServers": "",
@@ -1828,7 +1825,8 @@
     },
     "shows": {
       "title": "Seriale"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "Pagina pe care o cauţi nu există sau a fost mutată.",
@@ -1839,36 +1837,155 @@
     "authComplete": "Autentificare completă",
     "windowWillClose": "Această fereastră se va închide automat..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "apiToken": "",
         "apiUrl": "",
         "authToken": "",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
+        "messageStream": "",
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
         "serverUrl": "",
+        "to": "",
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": "",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
-        "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": ""
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "apprise": "",
         "discord": "",
+        "email": "",
         "gotify": "",
         "jsonWebhook": "",
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": "",
-        "email": "Email"
+        "webToast": ""
       },
       "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": ""
     },
     "jobs": {
       "lastRun": "Ultima execuție",
@@ -1961,8 +2073,6 @@
       "updating": "Actualizare..."
     },
     "plex": {
-      "accountsLinked_one": "{{count}} Plex cont asociat",
-      "accountsLinked_other": "{{count}} Plex conturi legate",
       "connectingTo": "Conectare la {{name}}...",
       "connectionError": {
         "dns": "",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "Ascunde filtrate",
       "linkAnotherAccount": "Leagă un alt cont Plex",
       "linkPlexAccount": "Asociază contul Plex",
-      "linkedAccounts": "Conturi Plex asociate",
-      "linkedAccountsDesc": "",
       "linking": "Conectare...",
       "local": "",
       "loginEnabled": "Autentificare activată",
@@ -1991,11 +2099,10 @@
       "moreConnections": "+{{count}} mai multe conexiuni",
       "noAccountsLinked": "Niciun cont Plex legat",
       "noAccountsLinkedHint": "Leagă un cont Plex pentru a adăuga servere Plex la Tracearr.",
-      "noAccountsLinkedShort": "Niciun cont Plex legat",
-      "noAccountsYet": "Nici un cont Plex încă asociat.",
       "noReachableConnections": "Nu sunt conexiuni accesibile",
       "noServersFound": "Niciun server de Plex găsit",
       "noServersFoundHint": "Asigură-te că deții cel puțin un server Plex",
+      "ownerOnly": "",
       "reauthorizeAccount": "",
       "recommended": "Recomandat",
       "remote": "Distanta",
@@ -2005,8 +2112,7 @@
       "showAll": "Arată toate",
       "unlinkAccount": "Deconectați acest cont Plex",
       "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou.",
-      "unlinkPlexAccount": "Deconectează contul Plex",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "Deconectează contul Plex"
     }
   },
   "statsBandwidth": {
@@ -2045,6 +2151,14 @@
     "allServers": "",
     "backToUsers": "Înapoi la Utilizatori",
     "byRule": "De / Regulă",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "",
     "manual": "",
     "noTerminationsFound": "Nici o terminare de flux pentru acest utilizator.",
@@ -2062,36 +2176,44 @@
     "unknownRule": "Regulă necunoscută",
     "userInfo": "Informaţii utilizator",
     "userNotFound": "Utilizator negăsit",
-    "violations": "Incalcari",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": "Incalcari"
   },
   "users": {
     "filterHasAccessTo": "",
     "filterHasAccessToHint": "",
     "filterHasAccessToPlaceholder": "",
-    "mergeConfirm": "",
-    "mergeDialogDescription": "",
-    "mergeDialogTitle": "",
-    "mergePickPrimary": "",
-    "mergePrimaryBadge": "",
-    "mergePrimaryForced": "",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "",
-    "mergeSameServerAcknowledge": "",
-    "mergeSameServerDialogDescription": "",
-    "mergeSameServerFallbackName": "",
-    "mergeSameServerWarning": "",
-    "mergeSameServerWarningTitle": "",
     "mergeSelectAllActive": "",
     "mergeSelectTwo": "",
     "mergeServerAccountRemoved": "",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "",
+    "mergeWhatHappens": "",
     "noUsersFound": "Niciun utilizator găsit.",
     "resetTrustScore": "Resetează scorul de încredere",
     "resetTrustScoreConfirm": "Ești sigur că vrei să resetezi scorul de încredere la 100? Această acțiune nu poate fi anulată.",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "Selectați toți utilizatorii {{count}}",
     "serversColumn": "",
     "showRemoved": "",
-    "suggestionsDescription": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "",
     "suggestionsMatchEmail": "",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "",
     "title": "Utilizatori"
   },

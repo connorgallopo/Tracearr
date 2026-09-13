@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Job già in esecuzione",
       "jobLoadFailed": "Impossibile caricare i lavori di manutenzione",
       "jobStartFailed": "Impossibile avviare il processo",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Impossibile disattivare l'accesso mobile",
       "mobileAccessEnableFailed": "Impossibile abilitare l'accesso mobile",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Accesso effettuato con successo",
         "title": "Successo"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Tutte le sessioni mobili sono state revocate",
         "title": "Accesso Mobile Disabilitato"

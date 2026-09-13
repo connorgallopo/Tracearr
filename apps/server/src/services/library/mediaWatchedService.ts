@@ -18,6 +18,16 @@ export interface WatchedProbeArgs {
   lensUserId: string | null;
   /** showId -> known episode count, supplied by the caller. */
   episodeCounts: Map<string, number>;
+  /**
+   * Season numbers to restrict shows to; undefined or empty means every season.
+   * episodeCounts must be built with the same restriction.
+   */
+  seasons?: number[];
+}
+
+function seasonFragment(seasons: number[] | undefined): SQL {
+  if (!seasons || seasons.length === 0) return sql``;
+  return sql`AND li.parent_index = ANY(${sql.param(seasons)}::int[])`;
 }
 
 interface MovieWatchedRow {
@@ -140,11 +150,23 @@ async function fetchMovieWatchedRows(
 async function fetchShowWatchedRows(
   showIds: string[],
   serverIds: string[] | undefined,
-  lensUserId: string | null
+  lensUserId: string | null,
+  seasons: number[] | undefined
 ): Promise<ShowWatchedRow[]> {
   const aliasCte = buildAliasMapCte(showIds);
   const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const seasonFilter = seasonFragment(seasons);
+  // Unfiltered, SUM(plays) spans the whole show and a watched season 1 reads as
+  // a partial season 2.
+  const playsFilter =
+    !seasons || seasons.length === 0
+      ? sql``
+      : sql`FILTER (WHERE EXISTS (
+          SELECT 1 FROM library_items li
+          WHERE li.media_id = p.media_id AND li.removed_at IS NULL
+            ${serverFragmentLi} ${seasonFilter}
+        ))`;
   // Same LATERAL/OFFSET 0 shape as the movie probe, keyed on show_media_id.
   // eps_watched stays a single COUNT(DISTINCT) over every alias row's plays
   // rather than a per-any_id count summed afterward, since a per-any_id sum
@@ -157,10 +179,11 @@ async function fetchShowWatchedRows(
              WHERE p.any_watched
                AND EXISTS (
                  SELECT 1 FROM library_items li
-                 WHERE li.media_id = p.media_id AND li.removed_at IS NULL ${serverFragmentLi}
+                 WHERE li.media_id = p.media_id AND li.removed_at IS NULL
+                   ${serverFragmentLi} ${seasonFilter}
                )
            )::int AS eps_watched,
-           COALESCE(SUM(p.plays), 0) > 0 AS has_plays
+           COALESCE(SUM(p.plays) ${playsFilter}, 0) > 0 AS has_plays
     FROM alias_map a
     CROSS JOIN LATERAL (
       SELECT p2.media_id, p2.any_watched, p2.plays, p2.server_user_id, p2.server_id
@@ -178,17 +201,19 @@ async function fetchShowWatchedRows(
 /** showId -> count of episodes currently in the library, the denominator every show watched probe uses. */
 export async function fetchEpisodeCounts(
   showIds: string[],
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  seasons?: number[]
 ): Promise<Map<string, number>> {
   const result = new Map<string, number>();
   if (showIds.length === 0) return result;
   const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const seasonFilter = seasonFragment(seasons);
   const rows = await db.execute(sql`
     SELECT m.show_media_id AS show_id, COUNT(*) FILTER (WHERE m.media_type = 'episode')::int AS episode_count
     FROM media m
     WHERE m.show_media_id = ANY(${uuidArraySql(showIds)})
       AND m.media_type = 'episode'
-      AND EXISTS (SELECT 1 FROM library_items li WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi})
+      AND EXISTS (SELECT 1 FROM library_items li WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi} ${seasonFilter})
     GROUP BY m.show_media_id
   `);
   for (const row of rows.rows as unknown as { show_id: string; episode_count: number }[]) {
@@ -207,7 +232,7 @@ export async function fetchEpisodeCounts(
 export async function resolveWatchedStates(
   args: WatchedProbeArgs
 ): Promise<Map<string, WatchedState>> {
-  const { movieIds, showIds, serverIds, lensUserId, episodeCounts } = args;
+  const { movieIds, showIds, serverIds, lensUserId, episodeCounts, seasons } = args;
   const result = new Map<string, WatchedState>();
 
   if (movieIds.length > 0) {
@@ -218,7 +243,7 @@ export async function resolveWatchedStates(
   }
 
   if (showIds.length > 0) {
-    const rows = await fetchShowWatchedRows(showIds, serverIds, lensUserId);
+    const rows = await fetchShowWatchedRows(showIds, serverIds, lensUserId, seasons);
     for (const [id, state] of mapShowWatchedRows(showIds, rows, episodeCounts)) {
       result.set(id, state);
     }

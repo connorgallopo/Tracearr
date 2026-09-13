@@ -12,20 +12,12 @@ import {
 import {
   memberFacingUrl,
   type Destination,
-  type NewsletterRecipients,
   type NewsletterRecipientsView,
   type NewsletterVariantsView,
   type Server,
 } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
-import { FieldDescription } from '@/components/ui/field';
-import {
-  useDestinations,
-  useNewsletterRecipients,
-  useNewsletterVariants,
-  useServers,
-  useSettings,
-} from '@/hooks/queries';
+import { useDestinations, useNewsletterVariants, useServers, useSettings } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
 import { cn } from '@/lib/utils';
 import type { Translate } from '../newsletterFormat';
@@ -34,12 +26,11 @@ import {
   DELIVERY_CARD_ID,
   NEWSLETTER_FIELD_IDS,
   RECIPIENTS_CARD_ID,
-  recipientsQueryId,
-  scopeMoved,
   scopedServers,
   type NewsletterFormState,
 } from './newsletterForm';
-import { extraRecipients, partitionRecipients } from './RecipientsPanel';
+import { partitionRecipients } from './recipientsView';
+import { useRecipientsView } from './useRecipientsView';
 
 export const DNS_DOCS_URL = 'https://docs.tracearr.com/configuration/email#spf-dkim-and-dmarc';
 
@@ -79,16 +70,14 @@ const domainOf = (address: string | null | undefined): string | null => {
   return address.slice(address.lastIndexOf('@') + 1).toLowerCase();
 };
 
-/** Members off is always known client-side; members on is known once the saved view resolves. */
+/** A form that could reach nobody is known without asking; anything else waits for the view. */
 export function recipientsState(
-  form: NewsletterRecipients,
+  empty: boolean,
   view: NewsletterRecipientsView | undefined
 ): { resolvable: number; known: boolean } {
-  if (!form.members)
-    return { resolvable: extraRecipients(form.extraAddresses).length, known: true };
+  if (empty) return { resolvable: 0, known: true };
   if (!view) return { resolvable: 0, known: false };
-  const { receive, included } = partitionRecipients(view, form.excludeUserIds);
-  return { resolvable: receive.length + included.length, known: true };
+  return { resolvable: partitionRecipients(view).receive.length, known: true };
 }
 
 export function readinessChecks(input: {
@@ -96,14 +85,14 @@ export function readinessChecks(input: {
   destinationId: string | null;
   destination: Destination | null;
   destinationsError: boolean;
-  recipients: { form: NewsletterRecipients; view: NewsletterRecipientsView | undefined };
+  recipients: { empty: boolean; view: NewsletterRecipientsView | undefined };
   servers: Pick<Server, 'name' | 'type' | 'url' | 'publicUrl'>[];
   variants: NewsletterVariantsView | undefined;
   variantsError: boolean;
 }): ReadinessCheck[] {
   const from = domainOf(input.destination?.config?.['fromAddress']);
   const user = domainOf(input.destination?.config?.['username']);
-  const recipients = recipientsState(input.recipients.form, input.recipients.view);
+  const recipients = recipientsState(input.recipients.empty, input.recipients.view);
   const privateServers: ReadinessCheck[] = input.servers
     .filter((s) => s.type !== 'plex' && memberFacingUrl(s) === null)
     .map((s) => ({
@@ -180,21 +169,17 @@ const TONES: Record<ReadinessStatus, string> = {
 export function ReadinessList({
   state,
   newsletterId,
-  savedServerIds,
 }: {
   state: NewsletterFormState;
   newsletterId: string | null;
-  /** The saved row's `scope.serverIds`, or null before the first save; the recipient rows read the saved row. */
-  savedServerIds: string[] | null;
 }) {
   const { t, i18n } = useTranslation('settings');
   const translate = t as Translate;
   const { data: settings } = useSettings();
   const { data: destinations, isError: destinationsError } = useDestinations();
   const { data: servers } = useServers();
-  const { data: view, isError: recipientsError } = useNewsletterRecipients(
-    recipientsQueryId(state.recipients, newsletterId)
-  );
+  const { query: recipientsQuery, empty } = useRecipientsView(state, newsletterId);
+  const { data: view, isError: recipientsError } = recipientsQuery;
   const { data: variants, isError: variantsError } = useNewsletterVariants(
     newsletterId ?? undefined
   );
@@ -205,12 +190,11 @@ export function ReadinessList({
     destinationId: state.destinationId,
     destination,
     destinationsError,
-    recipients: { form: state.recipients, view },
+    recipients: { empty, view },
     servers: inScope,
     variants,
     variantsError,
   });
-  const staleScope = scopeMoved(savedServerIds, state.scope.serverIds);
 
   const copyFor = (check: ReadinessCheck): ReactNode => {
     switch (check.id) {
@@ -232,10 +216,9 @@ export function ReadinessList({
         if (check.status === 'pass')
           return translate('newsletters.editor.readiness.recipients', { count: check.count });
         if (check.status === 'fail') return t('newsletters.editor.readiness.recipientsFail');
-        // A saved newsletter whose recipients failed to load says so; an unsaved one has nothing to query yet, so it says recipients are unknown until save.
-        return newsletterId !== null && recipientsError
+        return recipientsError
           ? t('newsletters.editor.readiness.recipientsLoadFailed')
-          : t('newsletters.editor.readiness.recipientsUnknown');
+          : t('newsletters.editor.readiness.recipientsChecking');
       case 'privateServer': {
         const link = (
           <Link to={SERVER_SETTINGS_PATH} className="underline underline-offset-4">
@@ -326,9 +309,6 @@ export function ReadinessList({
       title={t('newsletters.editor.readiness.title')}
       description={t('newsletters.editor.readiness.intro')}
     >
-      {staleScope && (
-        <FieldDescription>{t('newsletters.editor.readiness.staleScope')}</FieldDescription>
-      )}
       <ul className="flex flex-col gap-2">
         {checks.map((check) => {
           const Icon = ICONS[check.status];

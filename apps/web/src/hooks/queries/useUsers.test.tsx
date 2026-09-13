@@ -9,6 +9,8 @@ vi.mock('@/lib/api', () => ({
     users: {
       list: vi.fn(),
       merge: vi.fn(),
+      dismissMergeSuggestion: vi.fn(),
+      restoreMergeSuggestion: vi.fn(),
     },
   },
 }));
@@ -26,10 +28,17 @@ vi.mock('react-i18next', () => ({
 
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
-import { useMergeUsers, useUsers } from './useUsers';
+import {
+  useDismissMergeSuggestion,
+  useMergeUsers,
+  useRestoreMergeSuggestion,
+  useUsers,
+} from './useUsers';
 
 const mockList = vi.mocked(api.users.list);
 const mockMerge = vi.mocked(api.users.merge);
+const mockDismiss = vi.mocked(api.users.dismissMergeSuggestion);
+const mockRestore = vi.mocked(api.users.restoreMergeSuggestion);
 const mockToastSuccess = vi.mocked(toast.success);
 const mockToastError = vi.mocked(toast.error);
 
@@ -127,5 +136,46 @@ describe('useMergeUsers', () => {
     expect(invalidatedKeys).toEqual(
       expect.arrayContaining([['users'], ['stats'], ['sessions'], ['violations']])
     );
+  });
+});
+
+describe('merge suggestion dismissals', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('dismisses the pair and refreshes both suggestion lists', async () => {
+    mockDismiss.mockResolvedValueOnce(undefined);
+
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const invalidateSpy = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(() => useDismissMergeSuggestion(), { wrapper: wrapper(client) });
+
+    result.current.mutate(['user-a', 'user-b']);
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(mockDismiss).toHaveBeenCalledWith(['user-a', 'user-b']);
+    expect(invalidateSpy.mock.calls.map((call) => call[0]?.queryKey)).toContainEqual([
+      'users',
+      'merge-suggestions',
+    ]);
+    expect(mockToastSuccess).toHaveBeenCalledWith('toast.success.mergeSuggestionDismissed');
+  });
+
+  it('restores the pair by both ids and shows an error toast when that fails', async () => {
+    mockRestore.mockRejectedValueOnce(new Error('gone'));
+
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { result } = renderHook(() => useRestoreMergeSuggestion(), { wrapper: wrapper(client) });
+
+    result.current.mutate(['user-a', 'user-b']);
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mockRestore).toHaveBeenCalledWith('user-a', 'user-b');
+    expect(mockToastError).toHaveBeenCalledWith('toast.error.mergeSuggestionRestoreFailed', {
+      description: 'gone',
+    });
   });
 });

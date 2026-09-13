@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `03f3248a`
-- Last shared upstream commit found during inspection: `32c9d378`
-- Latest upstream commit merged into the current working tree: `03f3248a`
+- Source branch/SHA inspected: `main` at `fc7a0603`
+- Last shared upstream commit found during inspection: `03f3248a`
+- Latest upstream commit merged into the current working tree: `fc7a0603`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,30 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `fc7a0603` was merged into `develop` on September 13,
+  2026. This adds request analytics and requested-season watched lenses,
+  newsletter recipient management, richer user merges and dismissed suggestions,
+  and scheduled library-server user refresh. Migration `0104_numerous_miek`
+  remains unchanged in the upstream ledger; the Dispatcharr ledger is separate.
+  Auth conflicts adopt upstream cookie-based Jellyfin/Emby connection responses
+  (`{ serverId }`) without issuing owner tokens. The retired token-in-query
+  `/servers/:id/image/*` route stays removed; the shared image proxy, uncropped
+  Dashboard artwork and both cache markers remain intact. Dispatcharr add/edit,
+  credentials, leader-owned realtime, library and Seerr exclusions are preserved.
+  Locale reconciliation uses upstream values and only the fork-owned English
+  key delta, avoiding restoration of obsolete localized keys. The obsolete
+  `_template` directory is removed as upstream now relies on Crowdin.
+  Full non-Docker CI passed with Node 24 / pnpm 12.3.4: frozen install,
+  lint, typecheck, translations, unit/services/routes/auth/security, web,
+  coverage and build. Server groups plus web passed 8,592 tests with two
+  skipped; coverage passed 5,485 with two skipped (66.87% statements,
+  61.05% branches, 72.87% functions, 67.95% lines). Lint has 755 warnings,
+  down from 766; runtime warnings remain in existing message classes.
+  Logs use `.tmp/github-ci-<job>-20260913-fc7a.log`; the final locale check
+  uses `translations-final`. Docker integration and E2E were omitted at the
+  user's request. Docker builds and live-provider manual smoke checks were
+  not performed.
 
 - Upstream `main` at `03f3248a` was merged into `develop` on September 11,
   2026. This adds Seerr request tracking, per-server linking, media/user request

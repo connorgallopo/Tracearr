@@ -162,6 +162,7 @@ export function DeliveryFields({ state, onChange, errors, mode, touch, touched }
           onOpenChange={setAddOpen}
           mode="create"
           initialKind="email"
+          purpose="newsletter"
           onCreated={(created) => onChange({ destinationId: created.id })}
         />
       )}

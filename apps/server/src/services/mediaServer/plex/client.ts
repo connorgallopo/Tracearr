@@ -907,17 +907,14 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       Accept: 'application/xml',
     };
 
-    try {
-      const xml = await fetchText(
-        `${PLEX_TV_BASE}/api/servers/${machineIdentifier}/shared_servers`,
-        { headers, service: 'plex.tv' }
-      );
+    // Throws rather than returning an empty map: user sync marks every account
+    // missing from the result as removed, so an empty map would remove them all.
+    const xml = await fetchText(`${PLEX_TV_BASE}/api/servers/${machineIdentifier}/shared_servers`, {
+      headers,
+      service: 'plex.tv',
+    });
 
-      return parseSharedServersXml(xml);
-    } catch {
-      // Return empty map if endpoint fails
-      return new Map();
-    }
+    return parseSharedServersXml(xml);
   }
 
   /**

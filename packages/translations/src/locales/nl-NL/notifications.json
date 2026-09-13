@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Taak wordt al uitgevoerd",
       "jobLoadFailed": "Onderhoudstaken laden mislukt",
       "jobStartFailed": "Taak starten mislukt",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Mobiele toegang uitschakelen mislukt",
       "mobileAccessEnableFailed": "Mobiele toegang inschakelen mislukt",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Succesvol aangemeld",
         "title": "Geslaagd"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Alle mobiele sessies zijn ingetrokken",
         "title": "Mobiele toegang uitgeschakeld"

@@ -249,7 +249,7 @@ describe('newsletter routes', () => {
       ['DELETE', `/newsletters/${ID}`],
       ['POST', `/newsletters/${ID}/preview`],
       ['POST', '/newsletters/preview'],
-      ['GET', `/newsletters/${ID}/recipients`],
+      ['POST', '/newsletters/recipients'],
       ['GET', `/newsletters/${ID}/variants`],
       ['POST', `/newsletters/${ID}/test`],
       ['POST', `/newsletters/${ID}/send`],
@@ -434,80 +434,6 @@ describe('newsletter routes', () => {
     });
     expect(links.statusCode).toBe(400);
     expect(store.updateNewsletter).not.toHaveBeenCalled();
-  });
-
-  it('lists who the next send reaches, who has no address, and who is excluded', async () => {
-    const app = await build(owner);
-    const view = {
-      recipients: [
-        {
-          address: 'a@x.com',
-          userId: 'u1',
-          serverUserId: 'su-1',
-          name: 'One',
-          suppressed: false,
-          username: 'one',
-          serverId: 's1',
-          serverName: 'Basement Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-        },
-        {
-          address: 'extra@x.com',
-          userId: null,
-          serverUserId: null,
-          name: 'Extra',
-          suppressed: false,
-          username: null,
-          serverId: null,
-          serverName: null,
-          serverIds: [],
-          thumbUrl: null,
-        },
-      ],
-      missing: [
-        {
-          userId: 'u2',
-          serverUserId: 'su-2',
-          name: 'Two',
-          username: 'two',
-          serverId: 's1',
-          serverName: 'Basement Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-        },
-      ],
-      excluded: [
-        {
-          userId: 'u3',
-          serverUserId: 'su-3',
-          name: null,
-          username: 'three',
-          serverId: 's1',
-          serverName: 'Basement Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-          reason: 'excluded',
-        },
-      ],
-    };
-    mockResolve.mockResolvedValue(view);
-    const res = await app.inject({ method: 'GET', url: `/newsletters/${ID}/recipients` });
-    expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual(view);
-    const [member, extra] = res.json().recipients;
-    expect(member).toMatchObject({ username: 'one', serverName: 'Basement Plex' });
-    expect(extra).toMatchObject({
-      username: null,
-      serverId: null,
-      serverName: null,
-      thumbUrl: null,
-    });
-    expect(mockResolve).toHaveBeenCalledWith(row);
-    store.getNewsletter.mockResolvedValueOnce(null);
-    expect(
-      (await app.inject({ method: 'GET', url: `/newsletters/${ID}/recipients` })).statusCode
-    ).toBe(404);
   });
 
   it('refuses to delete while a send is open, otherwise deletes and drops the scheduler', async () => {
@@ -921,6 +847,53 @@ describe('newsletter routes', () => {
     });
     expect(res.statusCode).toBe(404);
     expect(store.lastWatermark).not.toHaveBeenCalled();
+  });
+
+  it('recipients from a draft resolve the unsaved scope and recipients, mark new members only for a saved id, and refuse a whole newsletter body', async () => {
+    const view = { recipients: [], missing: [], excluded: [] };
+    mockResolve.mockResolvedValue(view);
+    const app = await build(owner);
+    const scope = { serverIds: [], libraries: [] };
+    const recipients = {
+      members: false,
+      extraAddresses: [{ address: 'kid@x.com' }],
+      excludeUserIds: [],
+    };
+    const fresh = await app.inject({
+      method: 'POST',
+      url: '/newsletters/recipients',
+      payload: { scope, recipients },
+    });
+    expect(fresh.statusCode).toBe(200);
+    expect(fresh.json()).toEqual(view);
+    expect(mockResolve).toHaveBeenLastCalledWith(
+      expect.objectContaining({ recipients }),
+      undefined
+    );
+    expect(store.getNewsletter).not.toHaveBeenCalled();
+
+    const saved = await app.inject({
+      method: 'POST',
+      url: '/newsletters/recipients',
+      payload: { newsletterId: ID, scope, recipients },
+    });
+    expect(saved.statusCode).toBe(200);
+    expect(mockResolve).toHaveBeenLastCalledWith(expect.objectContaining({ recipients }), ID);
+
+    store.getNewsletter.mockResolvedValueOnce(null);
+    const missing = await app.inject({
+      method: 'POST',
+      url: '/newsletters/recipients',
+      payload: { newsletterId: ID, scope, recipients },
+    });
+    expect(missing.statusCode).toBe(404);
+    const wholeNewsletter = await app.inject({
+      method: 'POST',
+      url: '/newsletters/recipients',
+      payload: { newsletter: { ...body, recipients } },
+    });
+    expect(wholeNewsletter.statusCode).toBe(400);
+    expect(mockResolve).toHaveBeenCalledTimes(2);
   });
 
   it('preview from a draft refuses a non-email destination and a bad body the way create does', async () => {

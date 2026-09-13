@@ -54,6 +54,7 @@ function AddEmailDestinationButton() {
           onOpenChange={setOpen}
           mode="create"
           initialKind="email"
+          purpose="newsletter"
           onCreated={(created) =>
             void navigate(`${NEWSLETTERS_PATH}/new`, { state: { destinationId: created.id } })
           }

@@ -236,6 +236,10 @@ export interface MergeSuggestionIdentity {
   email: string | null;
   role: UserRole;
   loginCapable: boolean;
+  /** Latest activity across every account the identity has; null before any. */
+  lastActivityAt: string | null;
+  /** Sessions across every account the identity has. */
+  sessionCount: number;
   serverUsers: {
     id: string;
     serverId: string;
@@ -251,7 +255,15 @@ export interface MergeSuggestion {
   matchValue: string;
   users: [MergeSuggestionIdentity, MergeSuggestionIdentity];
   requiredTargetUserId: string | null;
+  /** The identity a merge keeps unless the owner swaps: `rankMergeTarget` over the pair, so it is requiredTargetUserId whenever that is set. */
+  suggestedTargetUserId: string;
   wouldCombineSameServer: boolean;
+}
+
+/** A pair the owner marked as not the same person; it is not suggested again until restored. */
+export interface DismissedMergeSuggestion {
+  users: [MergeSuggestionIdentity, MergeSuggestionIdentity];
+  dismissedAt: string;
 }
 
 export interface SetupStatus {

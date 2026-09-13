@@ -286,6 +286,7 @@
         "unfinished": ""
       },
       "newDestination": "",
+      "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "noMatches": "",
       "picker": {
@@ -346,8 +347,7 @@
         "helper": "",
         "or": "",
         "title": ""
-      },
-      "noAlertRecipientsTooltip": ""
+      }
     },
     "catalog": {
       "actions": {
@@ -373,12 +373,12 @@
         "accounts": "",
         "control": "",
         "library": "",
+        "notifications": "",
         "notify": "",
         "policy": "",
         "servers": "",
         "sessions": "",
-        "updates": "",
-        "notifications": ""
+        "updates": ""
       },
       "suggested": "",
       "triggers": {
@@ -400,6 +400,14 @@
           "synonyms": ""
         },
         "mediaUpgraded": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterFailed": {
+          "description": "",
+          "synonyms": ""
+        },
+        "newsletterSent": {
           "description": "",
           "synonyms": ""
         },
@@ -445,14 +453,6 @@
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
-        },
-        "newsletterSent": {
           "description": "",
           "synonyms": ""
         }
@@ -608,6 +608,8 @@
         "accountTrustChanged": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
+        "newsletterFailed": "",
+        "newsletterSent": "",
         "pluginUpdateAvailable": "",
         "serverDown": "",
         "serverUp": "",
@@ -619,9 +621,7 @@
         "sessionStarted": "",
         "sessionStopped": "",
         "sessionTranscodeChanged": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterFailed": "",
-        "newsletterSent": ""
+        "tracearrUpdateAvailable": ""
       },
       "unbound": {
         "account": "",
@@ -1109,6 +1109,11 @@
         "keywords": "",
         "name": ""
       },
+      "newsletter-failed": {
+        "description": "",
+        "keywords": "",
+        "name": ""
+      },
       "no-4k-transcodes": {
         "description": "",
         "keywords": "",
@@ -1168,11 +1173,6 @@
         "description": "",
         "keywords": "",
         "name": ""
-      },
-      "newsletter-failed": {
-        "description": "",
-        "keywords": "",
-        "name": ""
       }
     },
     "thisAutomation": "",
@@ -1208,15 +1208,13 @@
     "bandwidth": "Εύρος Ζώνης",
     "noActiveStreams": "Δεν υπάρχουν ενεργές ροές",
     "nowPlaying": "Παίζει Τώρα",
-    "plays": "Παίζει",
     "serverResources": "Πόροι Διακομιστή",
     "streamLocations": "Τοποθεσίες Ροής",
     "streamsAppearHere": "Οι ενεργές ροές θα εμφανιστούν εδώ όταν οι χρήστες αρχίσουν να παρακολουθούν",
-    "tvSessions": "",
-    "tvWatchTime": "",
     "vodPlays": "",
     "vodWatchTime": "",
-    "watchTime": "Ώρα Παρακολούθησης"
+    "tvSessions": "",
+    "tvWatchTime": ""
   },
   "debug": {
     "clearAutomations": "",
@@ -1797,7 +1795,6 @@
     "movies": {
       "title": "Ταινίες"
     },
-    "noLibraryServers": "",
     "posterCard": {
       "addedLabel": "Προστέθηκε {{date}}",
       "moreServers": "",
@@ -1828,7 +1825,8 @@
     },
     "shows": {
       "title": "Σειρές"
-    }
+    },
+    "noLibraryServers": ""
   },
   "notFound": {
     "description": "Η σελίδα που ψάχνετε δεν υπάρχει ή έχει μετακινηθεί.",
@@ -1839,36 +1837,155 @@
     "authComplete": "Η πιστοποίηση ολοκληρώθηκε",
     "windowWillClose": "Αυτό το παράθυρο θα κλείσει αυτόματα..."
   },
+  "requests": {
+    "columns": {
+      "requested": "",
+      "requester": "",
+      "seasons": "",
+      "status": "",
+      "title": "",
+      "wait": "",
+      "watched": ""
+    },
+    "flags": {
+      "auto": "",
+      "fourK": ""
+    },
+    "followThrough": {
+      "asked": "",
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "failedToLoad": "",
+      "landed": "",
+      "medianWait": "",
+      "person": "",
+      "title": "",
+      "watched": "",
+      "watchedByOthers": ""
+    },
+    "funnel": {
+      "description": "",
+      "empty": "",
+      "landed": "",
+      "requested": "",
+      "share": "",
+      "title": "",
+      "watched": ""
+    },
+    "hero": {
+      "line": ""
+    },
+    "mediaPanel": {
+      "empty": "",
+      "loadError": "",
+      "title": ""
+    },
+    "outcomes": {
+      "failedToLoad": "",
+      "onDisk": "",
+      "requested": "",
+      "requester": "",
+      "title": "",
+      "untitled": "",
+      "wait": ""
+    },
+    "page": {
+      "description": "",
+      "failedToLoad": "",
+      "kpi": {
+        "landedOf": "",
+        "neverPlayed": "",
+        "ofLanded": "",
+        "onDisk": "",
+        "requested": "",
+        "watched": ""
+      },
+      "linkSeerr": "",
+      "notConfigured": "",
+      "notConfiguredDescription": "",
+      "title": ""
+    },
+    "seasons": {
+      "all": "",
+      "item": ""
+    },
+    "status": {
+      "approved": "",
+      "completed": "",
+      "declined": "",
+      "deleted": "",
+      "failed": "",
+      "pending": ""
+    },
+    "unattributed": "",
+    "unplayed": {
+      "description": "",
+      "emptyDescription": "",
+      "emptyTitle": "",
+      "title": ""
+    },
+    "userCard": {
+      "empty": "",
+      "loadError": "",
+      "showLess": "",
+      "summary": {
+        "approvalRate": "",
+        "medianWait": "",
+        "neverWatched": "",
+        "requests": ""
+      },
+      "title": "",
+      "viewAll": ""
+    },
+    "wait": {
+      "declined": "",
+      "pending": ""
+    },
+    "watched": {
+      "byOthers": "",
+      "byRequester": ""
+    }
+  },
   "settings": {
     "destinations": {
       "add": "",
+      "alertsGoTo": "",
+      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "delete": "",
       "deleteConfirm": "",
       "description": "",
+      "emailDescription": "",
       "empty": "",
       "fields": {
         "apiToken": "",
         "apiUrl": "",
         "authToken": "",
+        "fromAddress": "",
+        "fromName": "",
+        "host": "",
+        "messageStream": "",
+        "messagesPerSecond": "",
+        "password": "",
+        "port": "",
+        "preset": "",
+        "replyTo": "",
+        "security": "",
         "serverUrl": "",
+        "to": "",
         "topic": "",
         "url": "",
         "userKey": "",
-        "webhookUrl": "",
-        "fromAddress": "From address",
-        "fromName": "From name",
-        "host": "SMTP host",
-        "messageStream": "",
-        "messagesPerSecond": "Messages per second",
-        "password": "Password",
-        "port": "Port",
-        "preset": "Provider",
-        "replyTo": "Reply-to",
-        "security": "Security",
-        "to": "Recipients",
-        "username": "Username"
+        "username": "",
+        "verifyCertificate": "",
+        "webhookUrl": ""
+      },
+      "groups": {
+        "alerts": "",
+        "connection": "",
+        "sender": ""
       },
       "hints": {
         "authTokenOptional": "",
@@ -1881,70 +1998,65 @@
         "smtpMessageStream": "",
         "smtpPostmarkPassword": "",
         "smtpPostmarkUsername": "",
-        "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
-        "smtpRate": "Per Tracearr instance; stay under your provider's limit",
+        "smtpPreset": "",
+        "smtpRate": "",
         "smtpResendPassword": "",
         "smtpResendUsername": "",
         "smtpSendgridPassword": "",
         "smtpSendgridUsername": "",
         "smtpSesPassword": "",
         "smtpSesUsername": "",
-        "smtpTo": "Comma-separated addresses that receive alerts from this destination",
-        "smtpUsernameOptional": "Leave blank when the server needs no login"
+        "smtpTo": "",
+        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": ""
+      },
+      "newsletterAlertsNote": "",
+      "newsletterDescription": "",
+      "newsletterTitle": "",
+      "newslettersOnly": "",
+      "noAlertRecipients": "",
+      "options": {
+        "presetBrevo": "",
+        "presetCustom": "",
+        "presetGmail": "",
+        "presetMailgun": "",
+        "presetPostmark": "",
+        "presetResend": "",
+        "presetSendgrid": "",
+        "presetSes": "",
+        "securityNone": "",
+        "securityStarttls": "",
+        "securityTls": ""
       },
       "ownerOnly": "",
       "pushNote": "",
       "receiveViolations": "",
       "receiveViolationsHint": "",
+      "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
+      "rowActions": "",
       "secretSet": "",
       "test": "",
       "testHint": "",
       "testNeedsForm": "",
-      "title": "",
       "types": {
         "apprise": "",
         "discord": "",
+        "email": "",
         "gotify": "",
         "jsonWebhook": "",
         "ntfy": "",
         "push": "",
         "pushover": "",
-        "webToast": "",
-        "email": "Email"
+        "webToast": ""
       },
       "usedBy": "",
-      "usedBy_other": "",
-      "webToastNote": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "emailDescription": "",
-      "groups": {
-        "alerts": "",
-        "connection": "",
-        "sender": ""
-      },
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
-      "options": {
-        "presetBrevo": "Brevo",
-        "presetCustom": "Custom",
-        "presetGmail": "Gmail",
-        "presetMailgun": "Mailgun",
-        "presetPostmark": "Postmark",
-        "presetResend": "Resend",
-        "presetSendgrid": "SendGrid",
-        "presetSes": "Amazon SES",
-        "securityNone": "None (plain text, port 25)",
-        "securityStarttls": "STARTTLS (usually port 587)",
-        "securityTls": "TLS (usually port 465)"
-      },
-      "receiveViolationsNeedsRecipients": "",
-      "rowActions": "",
       "usedByNewsletters": "",
       "usedByNewsletters_other": "",
+      "usedBy_other": "",
       "violationsOff": "",
-      "violationsOn": ""
+      "violationsOn": "",
+      "webToastNote": ""
     },
     "jobs": {
       "lastRun": "Τελευταία εκτέλεση",
@@ -1961,8 +2073,6 @@
       "updating": "Ενημέρωση..."
     },
     "plex": {
-      "accountsLinked_one": "Συνδεδεμένος λογαριασμός {{count}} Plex",
-      "accountsLinked_other": "Συνδεδεμένοι λογαριασμοί {{count}} Plex",
       "connectingTo": "",
       "connectionError": {
         "dns": "",
@@ -1982,8 +2092,6 @@
       "hideFiltered": "Απόκρυψη φιλτραρισμένων",
       "linkAnotherAccount": "Σύνδεση Άλλου Λογαριασμού Plex",
       "linkPlexAccount": "Σύνδεση Λογαριασμού Plex",
-      "linkedAccounts": "Συνδεδεμένοι Λογαριασμοί Plex",
-      "linkedAccountsDesc": "",
       "linking": "Σύνδεση...",
       "local": "Τοπικό",
       "loginEnabled": "Ενεργοποίηση Σύνδεσης",
@@ -1991,11 +2099,10 @@
       "moreConnections": "",
       "noAccountsLinked": "Κανένας Λογαριασμός Plex Συνδεδεμένος",
       "noAccountsLinkedHint": "Συνδέστε έναν λογαριασμό Plex για να προσθέσετε διακομιστές Plex στο Tracearr.",
-      "noAccountsLinkedShort": "Δεν υπάρχουν συνδεδεμένοι λογαριασμοί Plex",
-      "noAccountsYet": "Δεν έχουν συνδεθεί λογαριασμοί Plex ακόμα.",
       "noReachableConnections": "Δεν υπάρχουν προσβάσιμες συνδέσεις",
       "noServersFound": "Δεν βρέθηκαν διακομιστές Plex",
       "noServersFoundHint": "Βεβαιωθείτε ότι έχετε στην κατοχή σας τουλάχιστον έναν διακομιστή Plex",
+      "ownerOnly": "",
       "reauthorizeAccount": "",
       "recommended": "Προτεινόμενο",
       "remote": "Απομακρυσμένο",
@@ -2005,8 +2112,7 @@
       "showAll": "Εμφάνιση όλων",
       "unlinkAccount": "Αποσύνδεση αυτού του λογαριασμού Plex",
       "unlinkConfirm": "Είστε βέβαιοι ότι θέλετε να αποσυνδέσετε αυτό το λογαριασμό Plex? Δεν θα είστε σε θέση να προσθέσετε διακομιστές από αυτό το λογαριασμό μέχρι να τον συνδέσετε ξανά.",
-      "unlinkPlexAccount": "Αποσύνδεση Λογαριασμού Plex",
-      "ownerOnly": ""
+      "unlinkPlexAccount": "Αποσύνδεση Λογαριασμού Plex"
     }
   },
   "statsBandwidth": {
@@ -2045,6 +2151,14 @@
     "allServers": "",
     "backToUsers": "Πίσω στους χρήστες",
     "byRule": "Από / Κανόνα",
+    "contactEmail": "",
+    "contactEmailHelp": "",
+    "contactEmailLabel": "",
+    "contactEmailNoLogin": "",
+    "contactEmailNone": "",
+    "displayName": "",
+    "editIdentity": "",
+    "editIdentityDescription": "",
     "linkedAccounts": "",
     "manual": "Χειροκίνητα",
     "noTerminationsFound": "Δεν υπάρχουν τερματισμοί ροής για αυτόν το χρήστη.",
@@ -2062,36 +2176,44 @@
     "unknownRule": "Άγνωστος κανόνας",
     "userInfo": "Πληροφορίες Χρήστη",
     "userNotFound": "Ο χρήστης δεν βρέθηκε",
-    "violations": "Παραβάσεις",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNoLogin": "",
-    "contactEmailNone": "",
-    "displayName": "",
-    "editIdentity": "",
-    "editIdentityDescription": ""
+    "violations": "Παραβάσεις"
   },
   "users": {
     "filterHasAccessTo": "",
     "filterHasAccessToHint": "",
     "filterHasAccessToPlaceholder": "",
-    "mergeConfirm": "",
-    "mergeDialogDescription": "",
-    "mergeDialogTitle": "",
-    "mergePickPrimary": "",
-    "mergePrimaryBadge": "",
-    "mergePrimaryForced": "",
+    "mergeCarriesOver": "",
+    "mergeConfirmInto": "",
+    "mergeDeleted": "",
+    "mergeFoldIn": "",
+    "mergeIrreversibleAcknowledge": "",
+    "mergeIrreversibleBody": "",
+    "mergeIrreversibleTitle": "",
+    "mergeKeep": "",
+    "mergeLastActive": "",
+    "mergeMoreServers": "",
+    "mergeMovesNoCount": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "mergeNeverActive": "",
+    "mergeReasonEmail": "",
+    "mergeReasonEmailUsername": "",
+    "mergeReasonUsername": "",
+    "mergeRequired": "",
+    "mergeRulesKept": "",
     "mergeSameIdentity": "",
-    "mergeSameServerAcknowledge": "",
-    "mergeSameServerDialogDescription": "",
-    "mergeSameServerFallbackName": "",
-    "mergeSameServerWarning": "",
-    "mergeSameServerWarningTitle": "",
     "mergeSelectAllActive": "",
     "mergeSelectTwo": "",
     "mergeServerAccountRemoved": "",
+    "mergeServerLabel": "",
+    "mergeServerUnknown": "",
+    "mergeSessions_one": "",
+    "mergeSessions_other": "",
+    "mergeSwap": "",
+    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "",
     "mergeUsers": "",
+    "mergeWhatHappens": "",
     "noUsersFound": "Δεν βρέθηκαν χρήστες.",
     "resetTrustScore": "Επαναφορά Βαθμού Εμπιστοσύνης",
     "resetTrustScoreConfirm": "Είστε βέβαιοι ότι θέλετε να επαναφέρετε το σκορ εμπιστοσύνης στο 100? Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
@@ -2101,11 +2223,29 @@
     "selectAllUsers": "Επιλογή όλων των {{count}} χρηστών",
     "serversColumn": "",
     "showRemoved": "",
-    "suggestionsDescription": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsDismissed": "",
+    "suggestionsDismissedAt": "",
+    "suggestionsDismissedPair": "",
+    "suggestionsEmpty": "",
     "suggestionsError": "",
     "suggestionsMatchEmail": "",
+    "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "",
+    "suggestionsNotSame": "",
+    "suggestionsPairEmail": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsername": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsername": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": "",
+    "suggestionsRestore": "",
     "suggestionsReview": "",
+    "suggestionsSheetDescription": "",
     "suggestionsTitle": "",
     "title": "Χρήστες"
   },

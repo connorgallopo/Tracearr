@@ -257,8 +257,8 @@ describe('Plex Auth Routes', () => {
   let app: FastifyInstance;
 
   // Re-establish default mock implementations after each reset. These are
-  // depended on by multiple suites (PlexClient instance method, generateTokens
-  // server-id lookup, fire-and-forget background sync) — hoisting them here
+  // depended on by multiple suites (PlexClient instance method, getAllServerIds
+  // lookup, fire-and-forget background sync) — hoisting them here
   // keeps the resetAllMocks pattern free of order-dependent leaks across
   // describes.
   beforeEach(() => {

@@ -159,12 +159,57 @@ export function useBulkResetTrust() {
   });
 }
 
+// The dismissed list sits under this prefix, so one invalidation refreshes both.
+const MERGE_SUGGESTIONS_KEY = ['users', 'merge-suggestions'] as const;
+
 export function useMergeSuggestions(enabled: boolean) {
   return useQuery({
-    queryKey: ['users', 'merge-suggestions'],
+    queryKey: MERGE_SUGGESTIONS_KEY,
     queryFn: () => api.users.mergeSuggestions(),
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDismissedMergeSuggestions(enabled: boolean) {
+  return useQuery({
+    queryKey: [...MERGE_SUGGESTIONS_KEY, 'dismissed'],
+    queryFn: () => api.users.dismissedMergeSuggestions(),
+    enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDismissMergeSuggestion() {
+  const { t } = useTranslation('notifications');
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userIds: [string, string]) => api.users.dismissMergeSuggestion(userIds),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MERGE_SUGGESTIONS_KEY });
+      toast.success(t('toast.success.mergeSuggestionDismissed'));
+    },
+    onError: (error: Error) => {
+      toast.error(t('toast.error.mergeSuggestionDismissFailed'), { description: error.message });
+    },
+  });
+}
+
+export function useRestoreMergeSuggestion() {
+  const { t } = useTranslation('notifications');
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ([userA, userB]: [string, string]) =>
+      api.users.restoreMergeSuggestion(userA, userB),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MERGE_SUGGESTIONS_KEY });
+      toast.success(t('toast.success.mergeSuggestionRestored'));
+    },
+    onError: (error: Error) => {
+      toast.error(t('toast.error.mergeSuggestionRestoreFailed'), { description: error.message });
+    },
   });
 }
 

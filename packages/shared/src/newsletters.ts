@@ -220,6 +220,14 @@ export const newsletterPreviewDraftSchema = z.strictObject({
 });
 export type NewsletterPreviewDraftInput = z.infer<typeof newsletterPreviewDraftSchema>;
 
+/** POST /newsletters/recipients: only the scope and the recipients decide who is listed; the saved row's id marks members its last send missed. */
+export const newsletterRecipientsDraftSchema = z.strictObject({
+  newsletterId: uuidSchema.optional(),
+  scope: newsletterScopeSchema,
+  recipients: newsletterRecipientsSchema,
+});
+export type NewsletterRecipientsDraftInput = z.infer<typeof newsletterRecipientsDraftSchema>;
+
 export const emailSuppressionCreateSchema = z.strictObject({ address });
 export const newsletterSendsQuerySchema = paginationSchema;
 
@@ -394,9 +402,13 @@ export interface NewsletterResolvedRecipient {
   thumbUrl: string | null;
   /** Every scoped server the person has an account on; empty for an extra address. */
   serverIds: string[];
+  /** A member the newsletter's last delivered send did not reach; false before the first send and for extra addresses. */
+  newSinceLastSend: boolean;
+  /** The address is a Jellyfin or Emby username, used because the person has no contact, identity or Plex email. */
+  addressFromUsername: boolean;
 }
 
-/** GET /newsletters/:id/recipients: who the next send reaches, who has no address, and who the owner excluded. */
+/** POST /newsletters/recipients: who the next send reaches, who has no address, and who the owner excluded. */
 export interface NewsletterRecipientsView {
   recipients: NewsletterResolvedRecipient[];
   missing: NewsletterRecipientPerson[];

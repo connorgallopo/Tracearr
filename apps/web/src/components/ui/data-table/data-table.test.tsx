@@ -12,7 +12,7 @@ import {
   type DataTableDensity,
   type DataTableHeaderVariant,
 } from './data-table';
-import { DataTablePager } from './data-table-pager';
+import { DataTablePager, pageSlots } from './data-table-pager';
 import { useDataTable, type UseDataTableOptions } from './use-data-table';
 import type { DataTableInstance } from './features';
 
@@ -207,11 +207,44 @@ describe('data-table pagination controls', () => {
     expect(rowNames()).toEqual(['Charlie', 'Alpha']);
   });
 
+  it('jumps straight to a numbered page', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn<(page: number) => void>();
+    render(
+      <Harness data={people} pageSize={2} page={3} pageCount={9} onPageChange={onPageChange} />
+    );
+
+    await user.click(screen.getByRole('button', { name: '9' }));
+    expect(onPageChange).toHaveBeenCalledWith(9);
+  });
+
+  it('marks the page you are on', () => {
+    render(<Harness data={people} pageSize={2} page={3} pageCount={9} onPageChange={vi.fn()} />);
+
+    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: '4' })).not.toHaveAttribute('aria-current');
+  });
+
   it('disables the edges of the range', () => {
     render(<Harness data={people} pageSize={2} page={1} pageCount={2} onPageChange={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+  });
+});
+
+describe('pageSlots', () => {
+  it('lists every page while they still fit', () => {
+    expect(pageSlots(3, 7)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it('keeps the first, the last and the neighbours of the current page', () => {
+    expect(pageSlots(6, 14)).toEqual([1, 'gap', 5, 6, 7, 'gap', 14]);
+  });
+
+  it('drops the gap that would stand in for a single page', () => {
+    expect(pageSlots(2, 14)).toEqual([1, 2, 3, 'gap', 14]);
+    expect(pageSlots(13, 14)).toEqual([1, 'gap', 12, 13, 14]);
   });
 });
 

@@ -24,6 +24,7 @@ export type {
   ServerUserSplitResult,
   MergeSuggestionIdentity,
   MergeSuggestion,
+  DismissedMergeSuggestion,
   // Session
   SessionState,
   MediaType,
@@ -449,6 +450,8 @@ export {
   identityScopedPaginationSchema,
   mergeUsersBodySchema,
   mergeUserParamSchema,
+  mergeSuggestionDismissalSchema,
+  mergeSuggestionPairParamSchema,
   splitServerUserParamSchema,
   USER_SORT_FIELDS,
   userRosterFilterSchema,
@@ -582,6 +585,7 @@ export {
   updateNewsletterSchema,
   newsletterTestSendSchema,
   newsletterPreviewDraftSchema,
+  newsletterRecipientsDraftSchema,
   emailSuppressionCreateSchema,
   newsletterSendsQuerySchema,
   newsletterCron,
@@ -628,6 +632,7 @@ export type {
   EmailSuppression,
   NewsletterPreview,
   NewsletterPreviewDraftInput,
+  NewsletterRecipientsDraftInput,
   NewsletterPreviewVariant,
   NewsletterVariantsView,
   NewsletterSectionCounts,
@@ -635,6 +640,11 @@ export type {
   EmailBrandingSettings,
   NewsletterSendHtml,
 } from './newsletters.js';
+
+// User merge
+export { rankMergeTarget, type MergeRankInput } from './merge.js';
+
+export { isEmailAddress, usernameAsEmail } from './emailAddress.js';
 
 // Rich text for newsletter intro and outro
 export {
@@ -864,6 +874,11 @@ export {
   createRequestServiceSchema,
   updateRequestServiceSchema,
   userRequestsQuerySchema,
+  requestsAnalyticsQuerySchema,
+  requestsUnplayedQuerySchema,
+  requestersQuerySchema,
+  REQUEST_UNPLAYED_SORTS,
+  REQUESTER_SORTS,
   type RequestServiceType,
   type MediaRequestStatus,
   type MediaRequestMediaType,
@@ -880,4 +895,16 @@ export {
   type CreateRequestServiceInput,
   type UpdateRequestServiceInput,
   type UserRequestsQuery,
+  type RequestOutcomeRow,
+  type RequestUnplayedSort,
+  type RequesterSort,
+  type RequesterFollowThrough,
+  type RequestsUnplayedResponse,
+  type RequestersResponse,
+  type RequestsUnplayedQuery,
+  type RequestersQuery,
+  type RequestsFunnel,
+  type RequestsAnalyticsResponse,
+  type RequestsStatus,
+  type RequestsAnalyticsQuery,
 } from './requests.js';

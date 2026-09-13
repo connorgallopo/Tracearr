@@ -24,7 +24,7 @@ import { NavRunningTasks } from './NavRunningTasks';
 import { NavUser } from './NavUser';
 import { navigation, isNavItemActive, type NavItem } from './nav-data';
 import { UpdateDialog } from './UpdateDialog';
-import { useVersion } from '@/hooks/queries';
+import { useRequestsConfigured, useVersion } from '@/hooks/queries';
 import { useSocket } from '@/hooks/useSocket';
 import { cn } from '@/lib/utils';
 
@@ -124,6 +124,7 @@ function VersionDisplay() {
 export function AppSidebar() {
   const { t } = useTranslation('nav');
   const { state, isMobile } = useSidebar();
+  const seerrConfigured = useRequestsConfigured().data?.configured ?? false;
   // The mobile sheet is always full width, so `state` (which tracks the desktop
   // panel) would hide the wordmark inside an open sheet.
   const expanded = isMobile || state === 'expanded';
@@ -149,9 +150,11 @@ export function AppSidebar() {
             <SidebarGroupLabel>{t(section.labelKey)}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => (
-                  <NavMenuItem key={item.href} item={item} />
-                ))}
+                {section.items
+                  .filter((item) => seerrConfigured || item.requiresSeerr === undefined)
+                  .map((item) => (
+                    <NavMenuItem key={item.href} item={item} />
+                  ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

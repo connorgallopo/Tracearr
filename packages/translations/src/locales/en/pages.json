@@ -41,17 +41,17 @@
   },
   "dashboard": {
     "alerts": "Alerts",
-    "vodPlays": "VOD Plays",
-    "vodWatchTime": "VOD Watch Time",
-    "tvSessions": "TV Sessions",
-    "tvWatchTime": "TV Watch Time",
     "activeUsers": "Active Users",
     "nowPlaying": "Now Playing",
     "streamLocations": "Stream Locations",
     "serverResources": "Server Resources",
     "bandwidth": "Bandwidth",
     "noActiveStreams": "No active streams",
-    "streamsAppearHere": "Active streams will appear here when users start watching"
+    "streamsAppearHere": "Active streams will appear here when users start watching",
+    "vodPlays": "VOD Plays",
+    "vodWatchTime": "VOD Watch Time",
+    "tvSessions": "TV Sessions",
+    "tvWatchTime": "TV Watch Time"
   },
   "users": {
     "title": "Users",
@@ -65,26 +65,60 @@
     "resetTrustScoreTitle_other": "Reset Trust Score for {{count}} Users",
     "resetTrustScoreConfirm": "Are you sure you want to reset the trust score to 100? This action cannot be undone.",
     "mergeUsers": "Merge users",
-    "mergeDialogTitle": "Merge users",
-    "mergeDialogDescription": "Every server account, session, and violation from the duplicate moves to the primary. The duplicate identity is deleted.",
-    "mergePickPrimary": "Choose the primary identity",
-    "mergePrimaryBadge": "Primary",
-    "mergePrimaryForced": "This account can log in, so it must stay the primary.",
-    "mergeSameServerWarningTitle": "This action is irreversible",
-    "mergeSameServerDialogDescription": "This merge permanently combines both accounts on the same server. It cannot be undone.",
-    "mergeSameServerWarning": "Both identities already have an account on the same server. Merging will permanently combine their session history, violations, and trust score into a single account on that server. This cannot be undone, and splitting the account afterward will not restore the original two accounts.",
-    "mergeSameServerAcknowledge": "I understand the same-server history combine cannot be undone",
-    "mergeSameServerFallbackName": "this server",
+    "mergeTitleSuggestion": "Are these the same person?",
+    "mergeTitleBulk": "Merge these users?",
+    "mergeReasonEmail": "Both have the email {{value}} on their server accounts.",
+    "mergeReasonEmailUsername": "Both use {{value}} as a username or account email.",
+    "mergeReasonUsername": "Both use the username {{value}}.",
+    "mergeKeep": "Keep",
+    "mergeFoldIn": "Fold in, then deleted",
+    "mergeSwap": "Swap which one is kept",
+    "mergeRequired": "{{name}} can sign in to Tracearr, so {{name}} is kept.",
+    "mergeLastActive": "Last active {{relative}}",
+    "mergeNeverActive": "Never active",
+    "mergeSessions_one": "{{count}} session",
+    "mergeSessions_other": "{{count}} sessions",
+    "mergeMoreServers": "+{{count}}",
+    "mergeWhatHappens": "What happens",
+    "mergeMoves_one": "{{foldName}}'s server accounts and {{count}} session move to {{keepName}}.",
+    "mergeMoves_other": "{{foldName}}'s server accounts and {{count}} sessions move to {{keepName}}.",
+    "mergeMovesNoCount": "{{foldName}}'s server accounts and sessions move to {{keepName}}.",
+    "mergeCarriesOver": "Their contact email, newsletter exclusions and Seerr requests carry over.",
+    "mergeDeleted": "{{foldName}} is deleted. You can split an account back out from {{keepName}}'s page.",
+    "mergeRulesKept": "Per-server rules with the same name keep {{keepName}}'s version.",
+    "mergeIrreversibleTitle": "This cannot be undone",
+    "mergeIrreversibleBody": "Both have an account on the same server. Those two accounts become one, with their sessions, violations and trust score combined. Splitting later does not bring the second account back.",
+    "mergeServerLabel": "Server",
+    "mergeServerUnknown": "Unknown server",
+    "mergeIrreversibleAcknowledge": "I understand the two accounts on this server cannot be separated again",
     "mergeServerAccountRemoved": "Removed",
-    "mergeConfirm": "Merge",
+    "mergeConfirmInto": "Merge into {{keepName}}",
     "mergeSelectTwo": "Select exactly two users to merge",
     "mergeSameIdentity": "These accounts already belong to the same user",
     "mergeSelectAllActive": "Clear the select-all selection and pick exactly two users to merge",
     "suggestionsTitle": "Possible duplicate users",
-    "suggestionsDescription": "These identities look like the same person across servers. Review and merge them if they match.",
+    "suggestionsCount_one": "{{count}} possible duplicate user",
+    "suggestionsCount_other": "{{count}} possible duplicate users",
+    "suggestionsPairEmail": "{{first}} and {{second}} share an email",
+    "suggestionsPairEmailMore_one": "{{first}} and {{second}} share an email, plus {{count}} more",
+    "suggestionsPairEmailMore_other": "{{first}} and {{second}} share an email, plus {{count}} more",
+    "suggestionsPairEmailUsername": "{{first}} and {{second}} use the same address as a username or account email",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} and {{second}} use the same address as a username or account email, plus {{count}} more",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} and {{second}} use the same address as a username or account email, plus {{count}} more",
+    "suggestionsPairUsername": "{{first}} and {{second}} share a username",
+    "suggestionsPairUsernameMore_one": "{{first}} and {{second}} share a username, plus {{count}} more",
+    "suggestionsPairUsernameMore_other": "{{first}} and {{second}} share a username, plus {{count}} more",
+    "suggestionsSheetDescription": "Merging keeps one user and deletes the other. A pair marked as not the same person stops showing up until you restore it.",
     "suggestionsReview": "Review",
+    "suggestionsNotSame": "Not the same person",
     "suggestionsMatchEmail": "Same email",
+    "suggestionsMatchEmailUsername": "Both use {{value}} as a username or account email",
     "suggestionsMatchUsername": "Same username",
+    "suggestionsEmpty": "Nothing left to review.",
+    "suggestionsDismissed": "Dismissed ({{count}})",
+    "suggestionsDismissedPair": "{{first}} and {{second}}",
+    "suggestionsDismissedAt": "Dismissed {{relative}}",
+    "suggestionsRestore": "Restore",
     "suggestionsError": "Could not load merge suggestions",
     "filterHasAccessTo": "Has access to",
     "filterHasAccessToPlaceholder": "Any server",
@@ -1626,7 +1660,7 @@
         "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
         "smtpVerifyCertificate": "Checks the mail server's TLS certificate against a trusted authority. Turn it off only for a server with a self-signed certificate, such as a local bridge: anyone on the path between Tracearr and the mail server can then intercept the connection.",
         "smtpUsernameOptional": "Leave blank when the server needs no login",
-        "smtpTo": "Alerts sent to this destination go to these addresses. Newsletters ignore this list and pick their own recipients, so you can leave it blank.",
+        "smtpTo": "Alerts go out as one email with every address here in To. Leave it blank if this server only sends newsletters.",
         "smtpRate": "Per Tracearr instance; stay under your provider's limit",
         "smtpMessageStream": "Postmark only: the stream ID to send through, for example broadcast. Leave blank elsewhere.",
         "smtpGmailUsername": "Your full Gmail address. Gmail sends from this address whatever the sender address says, and personal accounts stop near 500 recipients a day.",
@@ -1644,6 +1678,9 @@
         "smtpPostmarkUsername": "Your Server API token.",
         "smtpPostmarkPassword": "The same Server API token, or a stream token's secret."
       },
+      "newsletterAlertsNote": "Newsletter recipients are set on the newsletter itself. To send alerts through this server too, edit it later under Destinations.",
+      "newsletterDescription": "Tracearr sends newsletters through this SMTP server.",
+      "newsletterTitle": "Add email server",
       "newslettersOnly": "Newsletters only",
       "noAlertRecipients": "No alert recipients",
       "options": {
@@ -1854,7 +1891,6 @@
     "logExplorerUnavailable": "Log explorer is only available in Docker environments"
   },
   "media": {
-    "noLibraryServers": "No media library available.",
     "landing": {
       "title": "Media",
       "lens": {
@@ -2148,7 +2184,8 @@
       "emptySearch": "No titles match \"{{query}}\"",
       "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
       "loadError": "Couldn't load the catalog"
-    }
+    },
+    "noLibraryServers": "No media library available."
   },
   "requests": {
     "status": {
@@ -2169,10 +2206,8 @@
       "watched": "Watched"
     },
     "wait": {
-      "pending": "still waiting",
-      "declined": "declined",
-      "landed": "landed {{duration}} later",
-      "sameMinute": "landed within a minute"
+      "pending": "waiting",
+      "declined": "declined"
     },
     "seasons": {
       "all": "All seasons",
@@ -2203,6 +2238,63 @@
       },
       "empty": "No requests yet"
     },
-    "unattributed": "Not on this server"
+    "unattributed": "Not on this server",
+    "watched": {
+      "byRequester": "Watched by the requester",
+      "byOthers": "Watched by someone else"
+    },
+    "page": {
+      "title": "Requests",
+      "description": "What people asked for, what landed, and whether they ever played it.",
+      "failedToLoad": "Couldn't load request analytics",
+      "notConfigured": "No Seerr linked",
+      "notConfiguredDescription": "Link a Seerr instance to a server and this page fills in after the first sync.",
+      "linkSeerr": "Link Seerr",
+      "kpi": {
+        "requested": "Requested",
+        "landedOf": "{{count}} landed",
+        "watched": "Watched",
+        "neverPlayed": "Never played",
+        "ofLanded": "{{share}} of landed",
+        "onDisk": "{{size}} on disk"
+      }
+    },
+    "funnel": {
+      "title": "Where requests end up",
+      "description": "Watched means someone got through 85% of it, the same bar the library pages use. A request has to land and be matched to a title before Tracearr can measure that.",
+      "requested": "Requested",
+      "landed": "Landed",
+      "watched": "Watched",
+      "share": "{{count}} of {{total}} requests",
+      "empty": "No requests yet"
+    },
+    "unplayed": {
+      "title": "Landed and never played",
+      "description": "Downloaded because someone asked, and no account on these servers has pressed play even once.",
+      "emptyTitle": "Everything that landed got played",
+      "emptyDescription": "Nothing here is holding disk for no reason."
+    },
+    "outcomes": {
+      "title": "Title",
+      "requester": "Requested by",
+      "wait": "Wait",
+      "requested": "Requested",
+      "onDisk": "On disk",
+      "untitled": "Untitled",
+      "failedToLoad": "Couldn't load these requests"
+    },
+    "followThrough": {
+      "title": "Requesters",
+      "description": "Who asks for what, whether they watch it through, and whether anyone else does.",
+      "person": "Person",
+      "asked": "Asked",
+      "landed": "Landed",
+      "watched": "Watched",
+      "watchedByOthers": "Watched by others",
+      "medianWait": "Median wait",
+      "emptyTitle": "No requesters yet",
+      "emptyDescription": "Requests appear here once a linked Seerr has synced.",
+      "failedToLoad": "Couldn’t load requesters"
+    }
   }
 }

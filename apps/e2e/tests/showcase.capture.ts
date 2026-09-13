@@ -62,14 +62,6 @@ async function postJson<T>(api: APIRequestContext, url: string, data: unknown): 
   return (await response.json()) as T;
 }
 
-async function getJson<T>(api: APIRequestContext, url: string): Promise<T> {
-  const response = await api.get(url);
-  if (!response.ok()) {
-    throw new Error(`GET ${url} returned ${response.status()}: ${await response.text()}`);
-  }
-  return (await response.json()) as T;
-}
-
 async function seedEmail(api: APIRequestContext, client: pg.Client, now: Date): Promise<void> {
   const email = await postJson<Destination>(api, '/api/v1/destinations', {
     name: 'Postmark',
@@ -92,7 +84,7 @@ async function seedEmail(api: APIRequestContext, client: pg.Client, now: Date): 
     config: { webhookUrl: 'https://discord.com/api/webhooks/1234567890/showcase' },
   });
 
-  const newsletter = await postJson<Newsletter>(api, '/api/v1/newsletters', {
+  const newsletterInput = {
     name: "What's new this week",
     destinationId: email.id,
     schedule: { kind: 'weekly', dayOfWeek: 5, time: '18:00' },
@@ -110,7 +102,8 @@ async function seedEmail(api: APIRequestContext, client: pg.Client, now: Date): 
     recipients: { members: true, extraAddresses: [], excludeUserIds: [] },
     imageMode: 'auto',
     links: { tracearr: true },
-  });
+  };
+  const newsletter = await postJson<Newsletter>(api, '/api/v1/newsletters', newsletterInput);
   newsletterId = newsletter.id;
 
   const preview = await postJson<NewsletterPreview>(
@@ -121,10 +114,11 @@ async function seedEmail(api: APIRequestContext, client: pg.Client, now: Date): 
   const [union] = preview.variants;
   digestHtml = union.html;
 
-  const view = await getJson<NewsletterRecipientsView>(
-    api,
-    `/api/v1/newsletters/${newsletter.id}/recipients`
-  );
+  const view = await postJson<NewsletterRecipientsView>(api, '/api/v1/newsletters/recipients', {
+    newsletterId: newsletter.id,
+    scope: newsletterInput.scope,
+    recipients: newsletterInput.recipients,
+  });
 
   automationIds = await seedAutomations(client, ids, { discord: discord.id, email: email.id });
 

@@ -67,8 +67,6 @@
     "alert_other": "",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "",
     "device_other": "",
     "error_one": "",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "",
     "usersUpdated_other": "",
     "violation_one": "",
-    "violation_other": ""
+    "violation_other": "",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "",
@@ -302,6 +302,7 @@
     "success": "Siker"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "",

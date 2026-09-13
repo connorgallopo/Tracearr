@@ -1,6 +1,5 @@
 import type {
   Server,
-  User,
   UserRole,
   ServerUserWithIdentity,
   ServerUserDetail,
@@ -50,6 +49,12 @@ import type {
   CreateDestinationInput,
   UpdateDestinationInput,
   RequestService,
+  RequestsAnalyticsResponse,
+  RequestersQuery,
+  RequestersResponse,
+  RequestsStatus,
+  RequestsUnplayedQuery,
+  RequestsUnplayedResponse,
   RequestServiceProbeResult,
   MediaRequestEntry,
   UserRequestsResponse,
@@ -61,6 +66,7 @@ import type {
   UpdateNewsletterInput,
   NewsletterPreview,
   NewsletterPreviewDraftInput,
+  NewsletterRecipientsDraftInput,
   NewsletterRecipientsView,
   NewsletterVariantsView,
   NewsletterSendsPage,
@@ -113,6 +119,7 @@ import type {
   // Cross-server user merging types
   UserMergeResult,
   MergeSuggestion,
+  DismissedMergeSuggestion,
   ServerUserSplitResult,
   UserSortField,
   UserRosterFilters,
@@ -657,11 +664,7 @@ class ApiClient {
       apiKey: string;
       publicUrl?: string;
     }) =>
-      this.request<{
-        accessToken: string;
-        refreshToken: string;
-        user: User;
-      }>('/auth/jellyfin/connect-api-key', {
+      this.request<{ serverId: string }>('/auth/jellyfin/connect-api-key', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -673,11 +676,7 @@ class ApiClient {
       apiKey: string;
       publicUrl?: string;
     }) =>
-      this.request<{
-        accessToken: string;
-        refreshToken: string;
-        user: User;
-      }>('/auth/emby/connect-api-key', {
+      this.request<{ serverId: string }>('/auth/emby/connect-api-key', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -848,6 +847,21 @@ class ApiClient {
       const response = await this.request<{ data: MergeSuggestion[] }>('/users/merge-suggestions');
       return response.data;
     },
+    dismissedMergeSuggestions: async () => {
+      const response = await this.request<{ data: DismissedMergeSuggestion[] }>(
+        '/users/merge-suggestions/dismissed'
+      );
+      return response.data;
+    },
+    dismissMergeSuggestion: (userIds: [string, string]) =>
+      this.request<void>('/users/merge-suggestions/dismissals', {
+        method: 'POST',
+        body: JSON.stringify({ userIds }),
+      }),
+    restoreMergeSuggestion: (userA: string, userB: string) =>
+      this.request<void>(`/users/merge-suggestions/dismissals/${userA}/${userB}`, {
+        method: 'DELETE',
+      }),
     requests: (id: string, opts: { scope?: 'identity'; page: number; pageSize: number }) => {
       const searchParams = new URLSearchParams();
       if (opts.scope) searchParams.set('scope', opts.scope);
@@ -1882,6 +1896,26 @@ class ApiClient {
       this.request<{ jobId: string }>(`/request-services/${id}/sync`, { method: 'POST' }),
   };
 
+  requests = {
+    status: () => this.request<RequestsStatus>('/requests/status'),
+    analytics: (serverIds?: string[]) => {
+      const query = listSearchParams({ serverIds });
+      return this.request<RequestsAnalyticsResponse>(
+        `/requests/analytics${query ? `?${query}` : ''}`
+      );
+    },
+    unplayed: (params: Partial<RequestsUnplayedQuery> & { serverIds?: string[] }) => {
+      const query = listSearchParams(params);
+      return this.request<RequestsUnplayedResponse>(
+        `/requests/unplayed${query ? `?${query}` : ''}`
+      );
+    },
+    requesters: (params: Partial<RequestersQuery> & { serverIds?: string[] }) => {
+      const query = listSearchParams(params);
+      return this.request<RequestersResponse>(`/requests/requesters${query ? `?${query}` : ''}`);
+    },
+  };
+
   // Newsletters
   newsletters = {
     list: () => this.request<Newsletter[]>('/newsletters'),
@@ -1902,8 +1936,11 @@ class ApiClient {
         body: JSON.stringify(body),
       }),
     variants: (id: string) => this.request<NewsletterVariantsView>(`/newsletters/${id}/variants`),
-    recipients: (id: string) =>
-      this.request<NewsletterRecipientsView>(`/newsletters/${id}/recipients`),
+    recipients: (body: NewsletterRecipientsDraftInput) =>
+      this.request<NewsletterRecipientsView>('/newsletters/recipients', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
     test: (id: string, address: string, variantKey?: string) =>
       this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/test`, {
         method: 'POST',

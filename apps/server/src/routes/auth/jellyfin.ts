@@ -11,8 +11,6 @@ import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { invalidateServersCache } from '../../jobs/poller/database.js';
 import { JellyfinClient } from '../../services/mediaServer/index.js';
-// Token encryption removed - tokens now stored in plain text (DB is localhost-only)
-import { generateTokens } from './utils.js';
 import { syncServer } from '../../services/sync.js';
 
 export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
@@ -111,8 +109,7 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
             app.log.error({ err: error, serverId }, 'Auto-sync failed for Jellyfin server');
           });
 
-        // Return updated tokens with new server access
-        return await generateTokens(app, authUser.userId, authUser.username, authUser.role);
+        return { serverId };
       } catch (error: unknown) {
         app.log.error({ err: error }, 'Jellyfin connect-api-key failed');
         return reply.internalServerError('Failed to connect Jellyfin server');

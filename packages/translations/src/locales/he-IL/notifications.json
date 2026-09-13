@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "",
       "jobLoadFailed": "",
       "jobStartFailed": "",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "",
       "mobileAccessEnableFailed": "",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "",
         "title": ""
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "",
         "title": ""

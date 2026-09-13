@@ -6,7 +6,6 @@ import { formatDuration } from '@/lib/formatters';
 export type Translate = (key: string, vars?: Record<string, unknown>) => string;
 
 const DECLINED_STATUSES: MediaRequestStatus[] = ['declined', 'failed'];
-const SAME_MINUTE_MS = 60 * 1000;
 
 export function formatWait(
   waitMs: number | null,
@@ -15,10 +14,7 @@ export function formatWait(
 ): string {
   if (DECLINED_STATUSES.includes(status)) return t('requests.wait.declined');
   if (waitMs === null) return t('requests.wait.pending');
-  if (waitMs < SAME_MINUTE_MS) return t('requests.wait.sameMinute');
-  return t('requests.wait.landed', {
-    duration: formatDuration(waitMs, { style: 'compactShort' }),
-  });
+  return formatDuration(waitMs, { style: 'compactDays' });
 }
 
 export function formatSeasons(seasons: RequestSeason[] | null, t: Translate): string | null {

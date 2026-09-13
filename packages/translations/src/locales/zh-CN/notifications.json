@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "任务已在运行",
       "jobLoadFailed": "加载维护任务失败",
       "jobStartFailed": "启动任务失败",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "禁用移动访问失败",
       "mobileAccessEnableFailed": "启用移动访问失败",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "登录成功",
         "title": "成功"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "所有移动会话已被撤销",
         "title": "移动访问已禁用"

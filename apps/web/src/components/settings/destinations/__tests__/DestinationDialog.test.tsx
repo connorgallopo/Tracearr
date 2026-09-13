@@ -39,6 +39,8 @@ const testUnsavedAsync = vi.fn();
 
 const CONFIGURABLE = DESTINATION_KINDS.filter((kind) => !DESTINATION_TYPES[kind].builtin);
 
+const label = (key: string) => new RegExp(`pages:settings\\.destinations\\.fields\\.${key}\\b`);
+
 function destination(overrides: Partial<Destination> = {}): Destination {
   return {
     id: 'dest-1',
@@ -368,8 +370,6 @@ describe('email kind', () => {
     return user;
   }
 
-  const label = (key: string) => new RegExp(`pages:settings\\.destinations\\.fields\\.${key}\\b`);
-
   it('renders a provider select, a numeric port and address inputs', async () => {
     await openEmail();
     expect(screen.getByLabelText(label('preset'))).toHaveAttribute('role', 'combobox');
@@ -587,6 +587,48 @@ describe('email kind', () => {
     expect(screen.getByText('pages:settings.destinations.emailDescription')).toBeInTheDocument();
   });
 
+  it('leaves alerts out when opened for a newsletter and saves the same blank alert list', async () => {
+    const user = userEvent.setup();
+    render(
+      <DestinationDialog
+        open
+        onOpenChange={vi.fn()}
+        mode="create"
+        initialKind="email"
+        purpose="newsletter"
+      />
+    );
+
+    expect(screen.getByText('pages:settings.destinations.newsletterTitle')).toBeInTheDocument();
+    expect(
+      screen.getByText('pages:settings.destinations.newsletterDescription')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('pages:settings.destinations.newsletterAlertsNote')
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(label('to'))).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('pages:settings.destinations.receiveViolations')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByText(/pages:settings\.destinations\.groups\./).map((el) => el.textContent)
+    ).toEqual([
+      'pages:settings.destinations.groups.connection',
+      'pages:settings.destinations.groups.sender',
+    ]);
+
+    await user.type(screen.getByLabelText(label('host')), 'smtp.example.com');
+    await user.type(screen.getByLabelText(label('fromAddress')), 'plex@example.com');
+    await user.click(screen.getByRole('button', { name: 'common:actions.save' }));
+    expect(createAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'email',
+        events: [],
+        config: expect.objectContaining({ to: '' }),
+      })
+    );
+  });
+
   it('ignores initialKind in edit mode and keeps the edited destination kind', () => {
     render(
       <DestinationDialog
@@ -604,8 +646,6 @@ describe('email kind', () => {
 });
 
 describe('DestinationDialog layout and error gating', () => {
-  const label = (key: string) => new RegExp(`pages:settings\\.destinations\\.fields\\.${key}\\b`);
-
   it('opens quiet and only marks a required field once it is left blank', async () => {
     const user = userEvent.setup();
     renderCreate();

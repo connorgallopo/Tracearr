@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { Clock, Crown, Merge, RotateCcw, User as UserIcon } from 'lucide-react';
-import type { MergeSuggestion, ServerUserWithIdentity, UserSortField } from '@tracearr/shared';
+import type { ServerUserWithIdentity, UserSortField } from '@tracearr/shared';
 import {
   MERGE_SAME_SERVER_CONFIRMATION_REQUIRED,
   USER_SORT_FIELDS,
@@ -33,15 +33,18 @@ import {
 } from '@/components/ui/filters';
 import { ErrorState } from '@/components/library/ErrorState';
 import { ServerColumnCell } from '@/components/server';
-import { MergeSuggestionsBanner } from '@/components/users/MergeSuggestionsBanner';
-import { MergeUsersDialog, type MergeCandidate } from '@/components/users/MergeUsersDialog';
+import { MergeSuggestionsCallout } from '@/components/users/MergeSuggestionsCallout';
+import { MergeUsersDialog } from '@/components/users/MergeUsersDialog';
 import { RemovedBadge } from '@/components/users/RemovedBadge';
 import { TrustScoreBadge } from '@/components/users/TrustScoreBadge';
 import { UserCell } from '@/components/users/UserCell';
 import { getIdentityServers } from '@/components/users/identityServerPills';
 import {
   deriveMergeActionState,
-  findOverlappingServerName,
+  mergeRequestFromRows,
+  mergeRequestFromSuggestion,
+  withSameServerCombine,
+  type MergeRequest,
 } from '@/components/users/mergeSelection';
 import { useBulkResetTrust, useMergeUsers, useUsers } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
@@ -96,12 +99,7 @@ export function Users() {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'username', desc: false }]);
   const [resetTrustConfirmOpen, setResetTrustConfirmOpen] = useState(false);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
-  const [mergeCandidates, setMergeCandidates] = useState<[MergeCandidate, MergeCandidate] | null>(
-    null
-  );
-  const [mergeRequiredTarget, setMergeRequiredTarget] = useState<string | null>(null);
-  const [mergeSameServerWarning, setMergeSameServerWarning] = useState(false);
-  const [mergeSameServerName, setMergeSameServerName] = useState<string | null>(null);
+  const [mergeRequest, setMergeRequest] = useState<MergeRequest | null>(null);
 
   const serverOptions = useMemo(
     () => servers.map((server) => ({ value: server.id, label: server.name })),
@@ -365,28 +363,6 @@ export function Users() {
     });
   };
 
-  const toMergeCandidate = (row: ServerUserWithIdentity): MergeCandidate => ({
-    userId: row.userId,
-    displayName: `${row.identityName ?? row.username} (${row.serverName})`,
-    username: row.username,
-    // Server-computed: role alone misses a linked Plex or auth account, and the
-    // dialog would then offer a direction the server rejects.
-    loginCapable: row.loginCapable ?? false,
-    serverUsers: getIdentityServers(row.identityServers, {
-      id: row.serverId,
-      name: row.serverName,
-      serverUserId: row.id,
-      removedAt: row.removedAt ? row.removedAt.toISOString() : null,
-    }).map((server) => ({
-      id: server.serverUserId ?? (server.id === row.serverId ? row.id : server.id),
-      serverId: server.id,
-      serverName: server.name,
-      removedAt:
-        server.removedAt ??
-        (server.id === row.serverId && row.removedAt ? row.removedAt.toISOString() : null),
-    })),
-  });
-
   const mergeSelectionState = deriveMergeActionState(selectedRows, selectAllMode);
   const mergeActionTitle = mergeSelectionState.reasonKey
     ? t(mergeSelectionState.reasonKey)
@@ -406,34 +382,14 @@ export function Users() {
         // Sentinel from a same-server combine the client didn't predict - escalate
         // to the destructive confirmation instead of a toast.
         if (error.message === MERGE_SAME_SERVER_CONFIRMATION_REQUIRED) {
-          setMergeSameServerWarning(true);
+          setMergeRequest((current) => current && withSameServerCombine(current));
         }
       },
     });
   };
 
-  const handleReviewSuggestion = (suggestion: MergeSuggestion) => {
-    const [firstUser, secondUser] = suggestion.users;
-    const toCandidate = (identity: MergeSuggestion['users'][number]): MergeCandidate => ({
-      userId: identity.userId,
-      displayName: identity.name ?? identity.username,
-      username: identity.username,
-      loginCapable: identity.loginCapable,
-      serverUsers: identity.serverUsers.map((su) => ({
-        id: su.id,
-        serverId: su.serverId,
-        serverName: su.serverName,
-        removedAt: su.removedAt,
-      })),
-    });
-    const overlappingServerName = suggestion.wouldCombineSameServer
-      ? findOverlappingServerName(firstUser.serverUsers, secondUser.serverUsers)
-      : null;
-
-    setMergeCandidates([toCandidate(firstUser), toCandidate(secondUser)]);
-    setMergeRequiredTarget(suggestion.requiredTargetUserId);
-    setMergeSameServerWarning(suggestion.wouldCombineSameServer);
-    setMergeSameServerName(overlappingServerName);
+  const openMergeDialog = (request: MergeRequest) => {
+    setMergeRequest(request);
     setMergeDialogOpen(true);
   };
 
@@ -469,14 +425,7 @@ export function Users() {
                 toast.error(t('pages:users.mergeSameIdentity'));
                 return;
               }
-              const a = toMergeCandidate(first);
-              const b = toMergeCandidate(second);
-              const sameServer = first.serverId === second.serverId;
-              setMergeCandidates([a, b]);
-              setMergeRequiredTarget(a.loginCapable ? a.userId : b.loginCapable ? b.userId : null);
-              setMergeSameServerWarning(sameServer);
-              setMergeSameServerName(sameServer ? first.serverName : null);
-              setMergeDialogOpen(true);
+              openMergeDialog(mergeRequestFromRows(first, second));
             },
             isLoading: mergeUsersMutation.isPending,
           },
@@ -491,7 +440,11 @@ export function Users() {
         <p className="text-muted-foreground text-sm">{t('common:count.user', { count: total })}</p>
       </div>
 
-      {isOwner && <MergeSuggestionsBanner onReview={handleReviewSuggestion} />}
+      {isOwner && (
+        <MergeSuggestionsCallout
+          onReview={(suggestion) => openMergeDialog(mergeRequestFromSuggestion(suggestion))}
+        />
+      )}
 
       <Card>
         <CardContent className="space-y-4">
@@ -545,12 +498,14 @@ export function Users() {
                   />
                 </DataTableViewport>
                 <DataTablePager
+                  variant="footer"
                   {...pager}
                   labels={{
                     navigation: t('common:table.pagination'),
                     status: t('common:table.pageOf', { page: pager.page, total: pager.pageCount }),
                     previous: t('common:actions.previous'),
                     next: t('common:actions.next'),
+                    goToPage: t('common:table.goToPage'),
                   }}
                 />
               </DataTableRoot>
@@ -577,29 +532,15 @@ export function Users() {
         isLoading={bulkResetTrust.isPending}
       />
 
-      {mergeCandidates &&
-        (mergeSameServerWarning ? (
-          <MergeUsersDialog
-            open={mergeDialogOpen}
-            onOpenChange={setMergeDialogOpen}
-            candidates={mergeCandidates}
-            requiredTargetUserId={mergeRequiredTarget}
-            isLoading={mergeUsersMutation.isPending}
-            sameServerWarning
-            sameServerName={mergeSameServerName ?? ''}
-            onConfirm={handleMergeConfirm}
-          />
-        ) : (
-          <MergeUsersDialog
-            open={mergeDialogOpen}
-            onOpenChange={setMergeDialogOpen}
-            candidates={mergeCandidates}
-            requiredTargetUserId={mergeRequiredTarget}
-            isLoading={mergeUsersMutation.isPending}
-            sameServerWarning={false}
-            onConfirm={handleMergeConfirm}
-          />
-        ))}
+      {mergeRequest && (
+        <MergeUsersDialog
+          {...mergeRequest}
+          open={mergeDialogOpen}
+          onOpenChange={setMergeDialogOpen}
+          isLoading={mergeUsersMutation.isPending}
+          onConfirm={handleMergeConfirm}
+        />
+      )}
     </div>
   );
 }

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Вакансия уже запущена",
       "jobLoadFailed": "Не удалось загрузить задания по техническому обслуживанию",
       "jobStartFailed": "Не удалось запустить задание",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Не удалось отключить мобильный доступ",
       "mobileAccessEnableFailed": "Не удалось включить мобильный доступ",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Вход выполнен успешно",
         "title": "Успешно"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Все мобильные сессии были отозваны",
         "title": "Мобильный доступ отключен"

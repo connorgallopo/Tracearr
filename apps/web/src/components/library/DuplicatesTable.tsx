@@ -211,11 +211,13 @@ export function DuplicatesTable({
         canNext={page < totalPages}
         onPrevious={() => onPageChange(page - 1)}
         onNext={() => onPageChange(page + 1)}
+        onPage={onPageChange}
         labels={{
           navigation: t('common:table.pagination'),
           status: t('common:table.pageOf', { page, total: totalPages }),
           previous: t('common:actions.previous'),
           next: t('common:actions.next'),
+          goToPage: t('common:table.goToPage'),
         }}
         className="px-2"
       />

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Tâche déjà en cours d'exécution",
       "jobLoadFailed": "Échec du chargement des tâches de maintenance",
       "jobStartFailed": "Échec de démarrage de la tâche",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Échec de la désactivation de l'accès mobile",
       "mobileAccessEnableFailed": "Échec de l'activation de l'accès mobile",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Connecté avec succès",
         "title": "Succès"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Toutes les sessions mobiles ont été révoquées",
         "title": "Accès mobile désactivé"

@@ -1,10 +1,6 @@
 /**
  * Read queries behind the two request surfaces: a media item's requesters and
  * one identity's request history. Neither talks to Seerr.
- *
- * `watchedState` reuses the library's own probe so a request row and the
- * poster badge above it never disagree. The probe is identity-grained, so the
- * rows are grouped by requester identity and probed once per group.
  */
 
 import { sql } from 'drizzle-orm';
@@ -15,21 +11,21 @@ import type {
   RequestSeason,
   UserRequestEntry,
   UserRequestsResponse,
-  WatchedState,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { mapWithConcurrency } from '../../utils/concurrency.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
-import { fetchEpisodeCounts, resolveWatchedStates } from '../library/mediaWatchedService.js';
+import {
+  UNWATCHED_LENSES,
+  watchedStatesFor,
+  type RequestWatchedLenses,
+  type WatchedLensRow,
+} from './watchedLenses.js';
 import type { MediaScope } from '../library/mediaDetailService.js';
 import type { SQL } from 'drizzle-orm';
 
 /** Bounds the never-watched scan so a heavy requester cannot turn a page into a full-history probe. */
 const NEVER_WATCHED_SCAN_LIMIT = 500;
-
-/** Bounds the per-requester probes so a title with many requesters cannot fan out one query per identity at once. */
-const WATCHED_PROBE_CONCURRENCY = 4;
 
 const EMPTY_SUMMARY: UserRequestsResponse['summary'] = {
   total: 0,
@@ -76,78 +72,6 @@ interface UserSummarySqlRow {
   median_wait_ms: number | null;
 }
 
-interface WatchedLensRow {
-  id: string;
-  mediaId: string | null;
-  mediaType: MediaRequestMediaType;
-  lensUserId: string | null;
-}
-
-function mediaIdsOf(rows: WatchedLensRow[], kind: MediaRequestMediaType): string[] {
-  return [
-    ...new Set(
-      rows.filter((r) => r.mediaType === kind).flatMap((r) => (r.mediaId ? [r.mediaId] : []))
-    ),
-  ];
-}
-
-/**
- * One probe per requester identity, over the distinct media in that group.
- * A request with no matched media or no matched requester has nothing to lens
- * and stays unwatched.
- */
-async function watchedStatesFor(
-  rows: WatchedLensRow[],
-  serverIds: string[] | undefined
-): Promise<Map<string, WatchedState>> {
-  const out = new Map<string, WatchedState>();
-  const byLens = new Map<string, WatchedLensRow[]>();
-  for (const row of rows) {
-    if (!row.mediaId || !row.lensUserId) {
-      out.set(row.id, 'unwatched');
-      continue;
-    }
-    const bucket = byLens.get(row.lensUserId) ?? [];
-    bucket.push(row);
-    byLens.set(row.lensUserId, bucket);
-  }
-
-  if (byLens.size === 0) return out;
-
-  const buckets = [...byLens];
-  // The episode denominator does not vary by requester, so it is one query for
-  // every lens rather than one per bucket.
-  const episodeCounts = await fetchEpisodeCounts(
-    mediaIdsOf(
-      buckets.flatMap(([, bucket]) => bucket),
-      'show'
-    ),
-    serverIds
-  );
-
-  const probed = await mapWithConcurrency(
-    buckets,
-    WATCHED_PROBE_CONCURRENCY,
-    async ([lensUserId, bucket]) => ({
-      bucket,
-      states: await resolveWatchedStates({
-        movieIds: mediaIdsOf(bucket, 'movie'),
-        showIds: mediaIdsOf(bucket, 'show'),
-        serverIds,
-        lensUserId,
-        episodeCounts,
-      }),
-    })
-  );
-
-  for (const { bucket, states } of probed) {
-    for (const row of bucket) {
-      out.set(row.id, (row.mediaId ? states.get(row.mediaId) : undefined) ?? 'unwatched');
-    }
-  }
-  return out;
-}
-
 /** node-postgres hands raw-query timestamps back as strings, the same coercion the v2 history rows do. */
 function at(value: Date | string): Date {
   return value instanceof Date ? value : new Date(value);
@@ -163,10 +87,11 @@ function toLensRow(row: RequestBaseRow): WatchedLensRow {
     mediaId: row.media_id,
     mediaType: row.media_type,
     lensUserId: row.lens_user_id,
+    seasons: row.seasons,
   };
 }
 
-function baseEntry(row: RequestBaseRow, watchedState: WatchedState) {
+function baseEntry(row: RequestBaseRow, lenses: RequestWatchedLenses) {
   return {
     id: row.id,
     serverId: row.server_id,
@@ -178,7 +103,8 @@ function baseEntry(row: RequestBaseRow, watchedState: WatchedState) {
     seasons: row.seasons,
     is4k: row.is_4k,
     isAutoRequest: row.is_auto_request,
-    watchedState,
+    watchedState: lenses.anyone,
+    watchedStateRequester: lenses.requester,
   };
 }
 
@@ -234,7 +160,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
   const states = await watchedStatesFor(rows.map(toLensRow), serverIds);
 
   return rows.map((row) => ({
-    ...baseEntry(row, states.get(row.id) ?? 'unwatched'),
+    ...baseEntry(row, states.get(row.id) ?? UNWATCHED_LENSES),
     requester: row.server_user_id
       ? {
           serverUserId: row.server_user_id,
@@ -308,7 +234,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
       WHERE ${scoped}
     `),
     db.execute(sql`
-      SELECT mr.id, mr.media_id, mr.media_type, su.user_id AS lens_user_id
+      SELECT mr.id, mr.media_id, mr.media_type, mr.seasons, su.user_id AS lens_user_id
       FROM media_requests mr
       JOIN server_users su ON su.id = mr.server_user_id
       WHERE ${scoped} AND mr.status = 'completed'
@@ -324,12 +250,14 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
       media_id: string | null;
       media_type: MediaRequestMediaType;
       lens_user_id: string | null;
+      seasons: RequestSeason[] | null;
     }[]
   ).map((row) => ({
     id: row.id,
     mediaId: row.media_id,
     mediaType: row.media_type,
     lensUserId: row.lens_user_id,
+    seasons: row.seasons,
   }));
 
   const pageLensRows = rows.map(toLensRow);
@@ -346,12 +274,12 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
     total: summaryRow?.total ?? 0,
     approvalRate: decided > 0 ? (summaryRow?.approved_or_completed ?? 0) / decided : null,
     completed: summaryRow?.completed ?? 0,
-    neverWatched: completed.filter((row) => states.get(row.id) === 'unwatched').length,
+    neverWatched: completed.filter((row) => states.get(row.id)?.requester !== 'watched').length,
     medianWaitMs: medianWaitMs == null ? null : Number(medianWaitMs),
   };
 
   const data: UserRequestEntry[] = rows.map((row) => ({
-    ...baseEntry(row, states.get(row.id) ?? 'unwatched'),
+    ...baseEntry(row, states.get(row.id) ?? UNWATCHED_LENSES),
     media: {
       mediaId: row.media_id,
       title: row.title,

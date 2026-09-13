@@ -153,6 +153,29 @@ export async function lastWatermark(newsletterId: string): Promise<Date | null> 
   return row?.end ? new Date(row.end) : null;
 }
 
+/** The members the latest send the watermark counts was addressed to; null before one exists or when it holds no recipient rows. */
+export async function lastDeliveredUserIds(newsletterId: string): Promise<Set<string> | null> {
+  const [send] = await db
+    .select({ id: newsletterSends.id })
+    .from(newsletterSends)
+    .where(
+      and(
+        eq(newsletterSends.newsletterId, newsletterId),
+        inArray(newsletterSends.trigger, COUNTED),
+        inArray(newsletterSends.outcome, WATERMARK)
+      )
+    )
+    .orderBy(desc(newsletterSends.startedAt))
+    .limit(1);
+  if (!send) return null;
+  const rows = await db
+    .select({ userId: newsletterSendRecipients.userId })
+    .from(newsletterSendRecipients)
+    .where(eq(newsletterSendRecipients.sendId, send.id));
+  if (rows.length === 0) return null;
+  return new Set(rows.flatMap((r) => (r.userId ? [r.userId] : [])));
+}
+
 export async function lastSend(newsletterId: string): Promise<SendView | null> {
   const [row] = await db
     .select(sendColumns)

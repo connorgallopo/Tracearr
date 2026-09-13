@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Pracovní pozice již běží",
       "jobLoadFailed": "Nepodařilo se načíst úlohy údržby",
       "jobStartFailed": "Nepodařilo se spustit zakázku",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Nepodařilo se zakázat mobilní přístup",
       "mobileAccessEnableFailed": "Nepodařilo se povolit mobilní přístup",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Přihlášení proběhlo úspěšně",
         "title": "Úspěšně"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Všechny relace v mobilu byly zrušeny",
         "title": "Mobilní přístup zakázán"

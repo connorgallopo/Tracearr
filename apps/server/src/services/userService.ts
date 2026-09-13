@@ -13,7 +13,7 @@
 
 import { eq, and, sql, inArray, isNull, type SQL } from 'drizzle-orm';
 import type { MediaUser } from './mediaServer/index.js';
-import type { UserRole } from '@tracearr/shared';
+import { usernameAsEmail, type UserRole } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import {
   users,
@@ -747,11 +747,14 @@ export async function syncUserFromMediaServer(
 
   // For Jellyfin/Emby: original flow using externalId
   const existing = await getServerUserByExternalId(serverId, mediaUser.id);
+  // Account level only: the identity lookup and users.email below keep the raw
+  // value, so a username never becomes a login email or links two people.
+  const accountEmail = mediaUser.email ?? usernameAsEmail(mediaUser.username);
 
   if (existing) {
     const updatePayload: Parameters<typeof updateServerUser>[1] = {
       username: mediaUser.username,
-      email: mediaUser.email ?? null,
+      email: accountEmail,
       thumbUrl: mediaUser.thumb ?? null,
       isServerAdmin: mediaUser.isAdmin,
     };
@@ -822,7 +825,7 @@ export async function syncUserFromMediaServer(
         serverId,
         externalId: mediaUser.id,
         username: mediaUser.username,
-        email: mediaUser.email ?? null,
+        email: accountEmail,
         thumbUrl: mediaUser.thumb ?? null,
         isServerAdmin: mediaUser.isAdmin,
         joinedAt: mediaUser.joinedAt ?? null,

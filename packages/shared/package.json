@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "pnpm build",
-    "dev": "tsc --watch",
+    "dev": "tsc --watch --tsBuildInfoFile dev.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

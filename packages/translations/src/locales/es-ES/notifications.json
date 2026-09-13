@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Trabajo ya en ejecución",
       "jobLoadFailed": "Error al cargar los trabajos de mantenimiento",
       "jobStartFailed": "Error al iniciar el trabajo",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Error al deshabilitar el acceso móvil",
       "mobileAccessEnableFailed": "No se pudo habilitar el acceso móvil",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Sesión iniciada correctamente",
         "title": "Correcto"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Todas las sesiones móviles han sido revocadas",
         "title": "Acceso móvil deshabilitado"

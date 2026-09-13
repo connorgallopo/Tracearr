@@ -1,6 +1,5 @@
-import { useQueryClient } from '@tanstack/react-query';
 import type { Newsletter } from '@tracearr/shared';
-import { newsletterKeys, useCreateNewsletter, useUpdateNewsletter } from '@/hooks/queries';
+import { useCreateNewsletter, useUpdateNewsletter } from '@/hooks/queries';
 import { deepEqual, diffPatch, type NewsletterFormState } from './newsletterForm';
 
 interface UseNewsletterSaveArgs {
@@ -19,7 +18,6 @@ export function useNewsletterSave({
   valid,
   onSaved,
 }: UseNewsletterSaveArgs) {
-  const queryClient = useQueryClient();
   const create = useCreateNewsletter();
   const update = useUpdateNewsletter();
   const dirty = !deepEqual(seed, state);
@@ -34,12 +32,7 @@ export function useNewsletterSave({
     }
     update.mutate(
       { id: newsletterId, data: diffPatch(seed, saved) },
-      {
-        onSuccess: (row) => {
-          void queryClient.invalidateQueries({ queryKey: newsletterKeys.recipients(newsletterId) });
-          onSaved(row, saved);
-        },
-      }
+      { onSuccess: (row) => onSaved(row, saved) }
     );
   };
 

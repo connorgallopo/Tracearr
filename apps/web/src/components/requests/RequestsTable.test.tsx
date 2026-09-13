@@ -26,6 +26,7 @@ function makeMediaEntry(overrides: Partial<MediaRequestEntry> = {}): MediaReques
     is4k: false,
     isAutoRequest: false,
     watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
     requester: {
       serverUserId: 'u1',
       userId: 'u1',
@@ -51,6 +52,7 @@ function makeUserEntry(overrides: Partial<UserRequestEntry> = {}): UserRequestEn
     is4k: false,
     isAutoRequest: false,
     watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
     media: { mediaId: 'm1', title: 'Arrival', year: 2016, mediaType: 'movie' },
     ...overrides,
   };
@@ -150,18 +152,48 @@ describe('RequestsTable', () => {
     expect(screen.queryByRole('link', { name: 'Old Title' })).not.toBeInTheDocument();
   });
 
-  it('renders the watched badge with the by-you accessible name for a self watch', () => {
-    renderTable(
+  it('names the requester, not the viewer, when the requester watched it', () => {
+    const { container } = renderTable(
       <RequestsTable
         subject="media"
-        rows={[makeMediaEntry({ status: 'completed', watchedState: 'watched' })]}
+        rows={[
+          makeMediaEntry({
+            status: 'completed',
+            watchedState: 'watched',
+            watchedStateRequester: 'watched',
+          }),
+        ]}
         isLoading={false}
         isError={false}
         onRetry={vi.fn()}
         emptyTitle="No requests"
       />
     );
-    expect(screen.getByText('Watched by you')).toBeInTheDocument();
+    expect(screen.getByText('Watched by the requester')).toBeInTheDocument();
+    expect(screen.queryByText('Watched by you')).not.toBeInTheDocument();
+    expect(container.querySelector('.bg-success')).toBeInTheDocument();
+  });
+
+  it('uses the household tone when someone else watched it and the requester did not', () => {
+    const { container } = renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[
+          makeMediaEntry({
+            status: 'completed',
+            watchedState: 'watched',
+            watchedStateRequester: 'unwatched',
+          }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByText('Watched by someone else')).toBeInTheDocument();
+    expect(container.querySelector('.bg-warning')).toBeInTheDocument();
+    expect(container.querySelector('.bg-success')).not.toBeInTheDocument();
   });
 
   it('renders no watched badge for an unwatched row', () => {

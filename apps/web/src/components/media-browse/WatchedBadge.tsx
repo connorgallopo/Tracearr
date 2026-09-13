@@ -6,10 +6,13 @@ import { cn } from '@/lib/utils';
 interface WatchedBadgeProps {
   /** Anyone-grain: has any user watched this. */
   watchedState: WatchedState;
-  /** Requester-grain: has the signed-in admin personally watched this.
-   * Omitted on shelf cards (all-users aggregate, no per-viewer state), which
-   * falls back to the single-tone "someone watched this" rendering below. */
+  /** The grain that earns the solid tone: the viewer's own on the catalog, the
+   * requester's on the requests tables. Omitted on shelf cards (all-users
+   * aggregate, no per-viewer state), which falls back to the single-tone
+   * "someone watched this" rendering below. */
   watchedStateSelf?: WatchedState;
+  /** Overrides the accessible name, which otherwise assumes the viewer grain. */
+  label?: string;
   className?: string;
 }
 
@@ -63,7 +66,12 @@ export function watchedLabelKey(watchedStateSelf: WatchedState | undefined): Wat
  * Green wins whenever both are true. Teal was tried for the self tone and
  * reads as green at 18px, which hid the split entirely.
  */
-export function WatchedBadge({ watchedState, watchedStateSelf, className }: WatchedBadgeProps) {
+export function WatchedBadge({
+  watchedState,
+  watchedStateSelf,
+  label,
+  className,
+}: WatchedBadgeProps) {
   const { t } = useTranslation('pages');
 
   if (watchedState === 'watched') {
@@ -77,7 +85,7 @@ export function WatchedBadge({ watchedState, watchedStateSelf, className }: Watc
         )}
       >
         <Check aria-hidden="true" className="h-3 w-3" strokeWidth={3} />
-        <span className="sr-only">{t(watchedLabelKey(watchedStateSelf))}</span>
+        <span className="sr-only">{label ?? t(watchedLabelKey(watchedStateSelf))}</span>
       </span>
     );
   }

@@ -43,6 +43,7 @@ const entry: UserRequestEntry = {
   is4k: false,
   isAutoRequest: false,
   watchedState: 'partial',
+  watchedStateRequester: 'partial',
   media: { mediaId: null, title: 'X', year: 2020, mediaType: 'movie' },
 };
 

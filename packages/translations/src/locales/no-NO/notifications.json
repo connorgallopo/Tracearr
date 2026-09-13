@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Jobb kjører allerede",
       "jobLoadFailed": "Kunne ikke laste vedlikeholdsjobber",
       "jobStartFailed": "Kan ikke starte jobb",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Kunne ikke deaktivere mobiltilgang",
       "mobileAccessEnableFailed": "Kunne ikke aktivere mobiltilgang",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Innlogging vellykket",
         "title": "Vellykket"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Alle mobiløkter har blitt trukket tilbake",
         "title": "Mobiltilgang deaktivert"

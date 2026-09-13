@@ -67,8 +67,6 @@
     "alert_other": "",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "",
     "device_other": "",
     "error_one": "{{count}} fejl",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} bruger opdateret",
     "usersUpdated_other": "{{count}} brugere opdateret",
     "violation_one": "{{count}} overtrædelse",
-    "violation_other": "{{count}} overtrædelser"
+    "violation_other": "{{count}} overtrædelser",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} dag",
@@ -302,6 +302,7 @@
     "success": "Succes"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "Vælg alle på siden",

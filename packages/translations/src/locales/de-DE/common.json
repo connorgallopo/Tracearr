@@ -67,8 +67,6 @@
     "alert_other": "{{count}} Warnungen",
     "automation_one": "",
     "automation_other": "",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} Gerät",
     "device_other": "{{count}} Geräte",
     "error_one": "{{count}} Fehler",
@@ -96,7 +94,9 @@
     "usersUpdated_one": "{{count}} Benutzer aktualisiert",
     "usersUpdated_other": "{{count}} Benutzer aktualisiert",
     "violation_one": "{{count}} Verstoß",
-    "violation_other": "{{count}} Verstöße"
+    "violation_other": "{{count}} Verstöße",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} Tag",
@@ -166,7 +166,7 @@
     "deviceId": "Geräte ID",
     "disabled": "Deaktiviert",
     "duration": "Dauer",
-    "filters": "Filter",
+    "filters": "",
     "ipAddress": "IP-Adresse",
     "items": "Artikel",
     "joined": "Beigetreten",
@@ -302,6 +302,7 @@
     "success": "Erfolgreich"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "",
     "pagination": "",
     "selectAllOnPage": "Seite komplett auswählen",

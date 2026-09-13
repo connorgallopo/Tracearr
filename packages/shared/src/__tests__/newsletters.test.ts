@@ -12,6 +12,7 @@ import {
   needsSenderName,
   newsletterCron,
   newsletterPreviewDraftSchema,
+  newsletterRecipientsDraftSchema,
   newsletterScheduleSchema,
   newsletterTestSendSchema,
   resolveSenderName,
@@ -319,5 +320,26 @@ describe('newsletterPreviewDraftSchema', () => {
       false
     );
     expect(newsletterPreviewDraftSchema.safeParse({ ...body, extra: 1 }).success).toBe(false);
+  });
+});
+
+describe('newsletterRecipientsDraftSchema', () => {
+  it('takes the scope and the recipients with an optional newsletter id, and nothing else', () => {
+    const body = {
+      scope: { serverIds: ['11111111-1111-4111-8111-111111111111'] },
+      recipients: { members: true },
+    };
+    const parsed = newsletterRecipientsDraftSchema.parse(body);
+    expect(parsed.scope.libraries).toEqual([]);
+    expect(parsed.recipients).toEqual({ members: true, extraAddresses: [], excludeUserIds: [] });
+    expect(
+      newsletterRecipientsDraftSchema.safeParse({
+        ...body,
+        newsletterId: '22222222-2222-4222-8222-222222222222',
+      }).success
+    ).toBe(true);
+    expect(newsletterRecipientsDraftSchema.safeParse({ ...body, name: 'Weekly' }).success).toBe(
+      false
+    );
   });
 });

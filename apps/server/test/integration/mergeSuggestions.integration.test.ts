@@ -10,10 +10,21 @@ import {
   createTestUser,
   createTestServer,
   createTestServerUser,
+  createTestSession,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
 import { authAccounts } from '../../src/db/schema.js';
-import { getMergeSuggestions, mergeUsers } from '../../src/services/mergeService.js';
+import {
+  dismissMergeSuggestion,
+  getDismissedMergeSuggestions,
+  getMergeSuggestions,
+  mergeUsers,
+  restoreMergeSuggestion,
+} from '../../src/services/mergeService.js';
+import {
+  recomputeIdentityAggregates,
+  syncUserFromMediaServer,
+} from '../../src/services/userService.js';
 
 describe('getMergeSuggestions', () => {
   it('suggests identities whose server accounts share a normalized email', async () => {
@@ -52,6 +63,8 @@ describe('getMergeSuggestions', () => {
       email: userA.email,
       role: userA.role,
       loginCapable: false,
+      lastActivityAt: null,
+      sessionCount: 0,
       serverUsers: [
         {
           id: suA.id,
@@ -70,6 +83,8 @@ describe('getMergeSuggestions', () => {
       email: userB.email,
       role: userB.role,
       loginCapable: false,
+      lastActivityAt: null,
+      sessionCount: 0,
       serverUsers: [
         {
           id: suB.id,
@@ -81,6 +96,33 @@ describe('getMergeSuggestions', () => {
         },
       ],
     });
+  });
+
+  it('pairs a Plex owner with an Emby account whose username is their email, keeping the owner', async () => {
+    const plex = await createTestServer({ type: 'plex' });
+    const emby = await createTestServer({ type: 'emby' });
+    const owner = await createTestUser({ role: 'owner' });
+    await createTestServerUser({
+      userId: owner.id,
+      serverId: plex.id,
+      username: 'Gallapagos',
+      email: 'owner-pair@example.com',
+    });
+    const synced = await syncUserFromMediaServer(emby.id, {
+      id: `emby-${randomUUID()}`,
+      username: 'Owner-Pair@Example.com',
+      isAdmin: true,
+    });
+
+    const match = (await getMergeSuggestions()).find(
+      (s) => s.matchValue === 'owner-pair@example.com'
+    );
+
+    expect(synced?.user.email).toBeNull();
+    expect(match?.matchType).toBe('email');
+    expect(match?.users.map((u) => u.userId).sort()).toEqual([owner.id, synced!.user.id].sort());
+    expect(match?.requiredTargetUserId).toBe(owner.id);
+    expect(match?.suggestedTargetUserId).toBe(owner.id);
   });
 
   it('suggests exact-username matches and forces a login-capable side as target', async () => {
@@ -287,5 +329,63 @@ describe('getMergeSuggestions', () => {
     expect(matches).toHaveLength(1);
     expect(matches[0]!.matchType).toBe('username');
     expect(matches[0]!.matchValue).toBe('aaa-ida');
+  });
+
+  it('hides a dismissed pair, lists it as dismissed, and brings it back on restore in either order', async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const userA = await createTestUser({ role: 'member' });
+    const userB = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: userA.id, serverId: serverA.id, email: 'jo@example.com' });
+    await createTestServerUser({ userId: userB.id, serverId: serverB.id, email: 'jo@example.com' });
+
+    await dismissMergeSuggestion([userB.id, userA.id], owner.id);
+    await dismissMergeSuggestion([userA.id, userB.id], owner.id);
+
+    const hidden = await getMergeSuggestions();
+    expect(hidden.find((s) => s.matchValue === 'jo@example.com')).toBeUndefined();
+    const dismissed = await getDismissedMergeSuggestions();
+    expect(dismissed).toHaveLength(1);
+    expect(dismissed[0]!.users.map((u) => u.userId).sort()).toEqual([userA.id, userB.id].sort());
+
+    await restoreMergeSuggestion(userA.id, userB.id);
+
+    const restored = await getMergeSuggestions();
+    expect(restored.find((s) => s.matchValue === 'jo@example.com')).toBeDefined();
+    expect(await getDismissedMergeSuggestions()).toEqual([]);
+  });
+
+  it('suggests the live account over a removed one with more activity, and reports activity and sessions', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const removedIdentity = await createTestUser({ role: 'member' });
+    const liveIdentity = await createTestUser({ role: 'member' });
+    const removedSu = await createTestServerUser({
+      userId: removedIdentity.id,
+      serverId: server.id,
+      email: 'kim@example.com',
+      removedAt: new Date('2026-08-01T00:00:00Z'),
+      lastActivityAt: new Date('2026-07-30T00:00:00Z'),
+    });
+    await createTestServerUser({
+      userId: liveIdentity.id,
+      serverId: server.id,
+      email: 'kim@example.com',
+    });
+    await createTestSession({ serverId: server.id, serverUserId: removedSu.id });
+    await createTestSession({ serverId: server.id, serverUserId: removedSu.id });
+    await recomputeIdentityAggregates(removedIdentity.id);
+
+    const suggestions = await getMergeSuggestions();
+    const match = suggestions.find((s) => s.matchValue === 'kim@example.com');
+
+    expect(match?.suggestedTargetUserId).toBe(liveIdentity.id);
+    const removedSide = match!.users.find((u) => u.userId === removedIdentity.id);
+    const liveSide = match!.users.find((u) => u.userId === liveIdentity.id);
+    expect(removedSide).toMatchObject({
+      lastActivityAt: '2026-07-30T00:00:00.000Z',
+      sessionCount: 2,
+    });
+    expect(liveSide).toMatchObject({ lastActivityAt: null, sessionCount: 0 });
   });
 });

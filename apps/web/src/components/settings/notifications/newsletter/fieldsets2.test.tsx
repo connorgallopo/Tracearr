@@ -22,13 +22,11 @@ vi.mock('@/hooks/queries', () => ({
   useNewsletterRecipients: vi.fn(),
   useServers: vi.fn(),
   useUpdateUserIdentity: () => ({ mutate: vi.fn(), isPending: false }),
-  newsletterKeys: { recipients: (id: string) => ['newsletters', id, 'recipients'] },
 }));
 import { useDestinations, useNewsletterRecipients, useServers, useSettings } from '@/hooks/queries';
 
 let queryClient: QueryClient;
 
-/** RecipientsPanel reads the query cache directly, so anything that can render it needs a real client. */
 function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -52,6 +50,17 @@ const discord = {
   config: {},
 } as unknown as Destination;
 
+const dee = {
+  userId: 'u4',
+  serverUserId: 'su-4',
+  name: 'Dee',
+  username: 'dee',
+  serverId: 's1',
+  serverName: 'Home Plex',
+  serverIds: ['s1'],
+  thumbUrl: null,
+};
+
 function props(over: Partial<NewsletterFormState> = {}) {
   const onChange = vi.fn();
   return {
@@ -64,6 +73,15 @@ function props(over: Partial<NewsletterFormState> = {}) {
   };
 }
 
+function mockRecipients(data: NewsletterRecipientsView | undefined) {
+  vi.mocked(useNewsletterRecipients).mockReturnValue({
+    data,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as unknown as ReturnType<typeof useNewsletterRecipients>);
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -73,19 +91,16 @@ beforeEach(() => {
   vi.mocked(useSettings).mockReturnValue({
     data: { externalUrl: 'https://tracearr.example.com' } as Settings,
   } as unknown as ReturnType<typeof useSettings>);
-  vi.mocked(useNewsletterRecipients).mockReturnValue({
-    data: undefined,
-    isLoading: false,
-  } as unknown as ReturnType<typeof useNewsletterRecipients>);
+  mockRecipients(undefined);
   vi.mocked(useServers).mockReturnValue({ data: [] } as unknown as ReturnType<typeof useServers>);
 });
 
 describe('RecipientsFields', () => {
-  it('toggles members and edits extra addresses row by row', async () => {
+  it('toggles members, keeps extra addresses folded away until opened, and edits a row', async () => {
     const p = props();
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
+        <RecipientsFields {...p} newsletterId={null} savedExcludeUserIds={[]} />
       </Providers>
     );
     await userEvent.click(
@@ -96,20 +111,19 @@ describe('RecipientsFields', () => {
     });
     expect(p.touch).toHaveBeenCalledWith('recipients');
 
-    await userEvent.click(
-      screen.getByRole('button', { name: 'newsletters.editor.recipients.addAddress' })
-    );
-    expect(p.onChange).toHaveBeenCalledWith({
-      recipients: { ...p.state.recipients, extraAddresses: [{ address: '' }] },
+    const trigger = screen.getByRole('button', {
+      name: 'newsletters.editor.recipients.extraTrigger:{"count":0}',
     });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(trigger);
+    expect(screen.getByText('newsletters.editor.recipients.extraHelp')).toBeInTheDocument();
 
     rerender(
       <Providers>
         <RecipientsFields
           {...p}
           newsletterId={null}
-          savedServerIds={null}
-          onPreview={vi.fn()}
+          savedExcludeUserIds={[]}
           state={{
             ...p.state,
             recipients: { ...p.state.recipients, extraAddresses: [{ address: 'nope' }] },
@@ -133,13 +147,60 @@ describe('RecipientsFields', () => {
     });
   });
 
+  it('adds pasted addresses once each, skips ones already listed, and flags a bad one at once', async () => {
+    const listed = { members: true, extraAddresses: [{ address: 'A@x.com' }], excludeUserIds: [] };
+    const p = props({ recipients: listed });
+    const { rerender } = render(
+      <Providers>
+        <RecipientsFields {...p} newsletterId={null} savedExcludeUserIds={[]} />
+      </Providers>
+    );
+    const box = screen.getByRole('textbox', {
+      name: 'newsletters.editor.recipients.pasteAddresses',
+    });
+    await userEvent.type(box, 'a@x.com{enter}b@x.com, b@x.com{enter}nope');
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.add' }));
+    const added = [{ address: 'A@x.com' }, { address: 'b@x.com' }, { address: 'nope' }];
+    expect(p.onChange).toHaveBeenLastCalledWith({
+      recipients: { ...listed, extraAddresses: added },
+    });
+    expect(box).toHaveValue('');
+
+    rerender(
+      <Providers>
+        <RecipientsFields
+          {...p}
+          newsletterId={null}
+          savedExcludeUserIds={[]}
+          state={{ ...p.state, recipients: { ...listed, extraAddresses: added } }}
+        />
+      </Providers>
+    );
+    expect(screen.getAllByText('newsletters.editor.recipients.badAddress')).toHaveLength(1);
+  });
+
+  it('opens extra addresses when the form reports a recipients error', () => {
+    const p = props();
+    render(
+      <Providers>
+        <RecipientsFields
+          {...p}
+          errors={{ recipients: 'Too many addresses' }}
+          newsletterId={null}
+          savedExcludeUserIds={[]}
+        />
+      </Providers>
+    );
+    expect(screen.getByText('Too many addresses')).toBeInTheDocument();
+  });
+
   it('calls an address bad only once the field has been left', async () => {
     const p = props({
       recipients: { members: true, extraAddresses: [{ address: '' }], excludeUserIds: [] },
     });
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
+        <RecipientsFields {...p} newsletterId={null} savedExcludeUserIds={[]} />
       </Providers>
     );
     const input = screen.getByLabelText('newsletters.editor.recipients.addressLabel:{"n":1}');
@@ -149,8 +210,7 @@ describe('RecipientsFields', () => {
         <RecipientsFields
           {...p}
           newsletterId={null}
-          savedServerIds={null}
-          onPreview={vi.fn()}
+          savedExcludeUserIds={[]}
           state={{
             ...p.state,
             recipients: { ...p.state.recipients, extraAddresses: [{ address: 'someone@' }] },
@@ -176,7 +236,7 @@ describe('RecipientsFields', () => {
     });
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId={null} savedServerIds={null} onPreview={vi.fn()} />
+        <RecipientsFields {...p} newsletterId={null} savedExcludeUserIds={[]} />
       </Providers>
     );
     const second = screen.getByDisplayValue('b@x.com');
@@ -191,8 +251,7 @@ describe('RecipientsFields', () => {
         <RecipientsFields
           {...p}
           newsletterId={null}
-          savedServerIds={null}
-          onPreview={vi.fn()}
+          savedExcludeUserIds={[]}
           state={{
             ...p.state,
             recipients: { ...p.state.recipients, extraAddresses: [{ address: 'b@x.com' }] },
@@ -203,91 +262,45 @@ describe('RecipientsFields', () => {
     expect(screen.getByDisplayValue('b@x.com')).toBe(second);
   });
 
-  it('names the chosen servers in the members help, says what an extra address gets, and flags a moved scope', () => {
+  it('names the chosen servers in the members help', () => {
     vi.mocked(useServers).mockReturnValue({
       data: [
         { id: 's-1', name: 'Basement' },
         { id: 's-2', name: 'Attic' },
       ],
     } as unknown as ReturnType<typeof useServers>);
-    vi.mocked(useNewsletterRecipients).mockReturnValue({
-      data: {
-        recipients: [
-          {
-            address: 'ann@x.com',
-            userId: 'u1',
-            serverUserId: 'su-1',
-            name: 'Ann',
-            suppressed: false,
-            username: 'ann',
-            serverId: 's-1',
-            serverName: 'Basement',
-            serverIds: ['s-1'],
-            thumbUrl: null,
-          },
-        ],
-        missing: [],
-        excluded: [],
-      },
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    } as unknown as ReturnType<typeof useNewsletterRecipients>);
     const p = props({ scope: { serverIds: ['s-2'], libraries: [] } });
-    const { rerender } = render(
+    render(
       <Providers>
-        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={['s-1']} onPreview={vi.fn()} />
+        <RecipientsFields {...p} newsletterId="n-1" savedExcludeUserIds={[]} />
       </Providers>
     );
     expect(
       screen.getByText('newsletters.editor.recipients.membersHelp:{"servers":"Attic"}')
     ).toBeInTheDocument();
     expect(screen.getByText('newsletters.editor.recipients.ownerNote')).toBeInTheDocument();
-    expect(
-      screen.getByText('newsletters.editor.recipients.extraAddressesHelp')
-    ).toBeInTheDocument();
-    expect(screen.getByText('newsletters.editor.recipients.staleScope')).toBeInTheDocument();
-
-    rerender(
-      <Providers>
-        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={['s-2']} onPreview={vi.fn()} />
-      </Providers>
-    );
-    expect(screen.queryByText('newsletters.editor.recipients.staleScope')).not.toBeInTheDocument();
   });
 
-  it('excludes, includes, and excludes a person again, patching recipients each time', async () => {
-    const view: NewsletterRecipientsView = {
-      recipients: [],
-      missing: [],
-      excluded: [
+  it('excludes a person and includes them back, patching recipients each time', async () => {
+    mockRecipients({
+      recipients: [
         {
-          userId: 'u4',
-          serverUserId: 'su-4',
-          name: 'Dee',
-          username: 'dee',
-          serverId: 's1',
-          serverName: 'Home Plex',
-          serverIds: ['s1'],
-          thumbUrl: null,
-          reason: 'excluded',
+          ...dee,
+          address: 'dee@x.com',
+          suppressed: false,
+          newSinceLastSend: true,
+          addressFromUsername: false,
         },
       ],
-    };
-    vi.mocked(useNewsletterRecipients).mockReturnValue({
-      data: view,
-      isLoading: false,
-      isError: false,
-      refetch: vi.fn(),
-    } as unknown as ReturnType<typeof useNewsletterRecipients>);
+      missing: [],
+      excluded: [],
+    });
     const p = props();
     const { rerender } = render(
       <Providers>
-        <RecipientsFields {...p} newsletterId="n-1" savedServerIds={[]} onPreview={vi.fn()} />
+        <RecipientsFields {...p} newsletterId="n-1" savedExcludeUserIds={[]} />
       </Providers>
     );
-
-    // Dee starts server-excluded but not locally excluded, so her "included after save" bucket must offer the same Exclude action a normal recipient gets.
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
     );
@@ -295,45 +308,25 @@ describe('RecipientsFields', () => {
       recipients: { ...p.state.recipients, excludeUserIds: ['u4'] },
     });
 
+    mockRecipients({ recipients: [], missing: [], excluded: [{ ...dee, reason: 'excluded' }] });
     rerender(
       <Providers>
         <RecipientsFields
           {...p}
           newsletterId="n-1"
-          savedServerIds={[]}
-          onPreview={vi.fn()}
+          savedExcludeUserIds={[]}
           state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: ['u4'] } }}
         />
       </Providers>
     );
-    await userEvent.click(
-      screen.getByRole('button', {
-        name: 'newsletters.editor.recipients.excludedCount:{"count":1}',
-      })
+    expect(screen.getByRole('listitem', { name: 'Dee' })).toHaveTextContent(
+      'newsletters.editor.recipients.excludedAfterSave'
     );
     await userEvent.click(
       screen.getByRole('button', { name: 'newsletters.editor.recipients.include:{"name":"Dee"}' })
     );
     expect(p.onChange).toHaveBeenLastCalledWith({
       recipients: { ...p.state.recipients, excludeUserIds: [] },
-    });
-
-    rerender(
-      <Providers>
-        <RecipientsFields
-          {...p}
-          newsletterId="n-1"
-          savedServerIds={[]}
-          onPreview={vi.fn()}
-          state={{ ...p.state, recipients: { ...p.state.recipients, excludeUserIds: [] } }}
-        />
-      </Providers>
-    );
-    await userEvent.click(
-      screen.getByRole('button', { name: 'newsletters.editor.recipients.exclude:{"name":"Dee"}' })
-    );
-    expect(p.onChange).toHaveBeenLastCalledWith({
-      recipients: { ...p.state.recipients, excludeUserIds: ['u4'] },
     });
   });
 });

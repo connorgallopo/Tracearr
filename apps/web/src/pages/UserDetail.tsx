@@ -848,6 +848,7 @@ export function UserDetail() {
               />
             </DataTableViewport>
             <DataTablePager
+              variant="footer"
               {...violationsPager}
               labels={{
                 navigation: t('common:table.pagination'),
@@ -888,6 +889,7 @@ export function UserDetail() {
               />
             </DataTableViewport>
             <DataTablePager
+              variant="footer"
               {...terminationsPager}
               labels={{
                 navigation: t('common:table.pagination'),

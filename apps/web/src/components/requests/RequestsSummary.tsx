@@ -21,7 +21,7 @@ export function RequestsSummary({ summary }: RequestsSummaryProps) {
         {summary.medianWaitMs !== null && (
           <p className="text-muted-foreground mt-1 text-xs">
             {t('requests.userCard.summary.medianWait', {
-              duration: formatDuration(summary.medianWaitMs, { style: 'compactShort' }),
+              duration: formatDuration(summary.medianWaitMs, { style: 'compactDays' }),
             })}
           </p>
         )}

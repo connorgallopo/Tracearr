@@ -323,6 +323,14 @@ describe('PlexClient Static Methods', () => {
   it('should have getAllUsersWithLibraries static method', () => {
     expect(typeof PlexClient.getAllUsersWithLibraries).toBe('function');
   });
+
+  it('rejects when plex.tv fails to list shared servers, since an empty list reads as nobody having access', async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response('busy', { status: 503 }));
+    await expect(PlexClient.getSharedServerUsers('token', 'machine-1')).rejects.toThrow();
+    fetchSpy.mockRestore();
+  });
 });
 
 describe('JellyfinClient Static Methods', () => {

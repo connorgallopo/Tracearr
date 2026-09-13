@@ -67,8 +67,6 @@
     "alert_other": "{{count}} alertes",
     "automation_one": "Automatisation {{count}}",
     "automation_other": "{{count}} automatisations",
-    "channel_one": "",
-    "channel_other": "",
     "device_one": "{{count}} appareil",
     "device_other": "{{count}} appareils",
     "error_one": "{{count}} erreur",
@@ -85,8 +83,8 @@
     "selected_other": "{{count}} sélectionnés",
     "server_one": "{{count}} serveur",
     "server_other": "{{count}} serveurs",
-    "session_one": "{{count}} session",
-    "session_other": "{{count}} sessions",
+    "session_one": "",
+    "session_other": "",
     "stream_one": "{{count}} lecture",
     "stream_other": "{{count}} lectures",
     "user_one": "{{count}} utilisateur",
@@ -96,15 +94,17 @@
     "usersUpdated_one": "{{count}} utilisateur mis à jour",
     "usersUpdated_other": "{{count}} utilisateurs mis à jour",
     "violation_one": "Violation {{count}}",
-    "violation_other": "Violations {{count}}"
+    "violation_other": "Violations {{count}}",
+    "channel_one": "",
+    "channel_other": ""
   },
   "duration": {
     "day_one": "{{count}} jour",
     "day_other": "{{count}} jours",
     "hour_one": "{{count}} heure",
     "hour_other": "{{count}} heures",
-    "minute_one": "{{count}} minute",
-    "minute_other": "{{count}} minutes",
+    "minute_one": "",
+    "minute_other": "",
     "second_one": "{{count}} seconde",
     "second_other": "{{count}} secondes"
   },
@@ -152,7 +152,7 @@
     "remove": "Supprimer le filtre {{label}}"
   },
   "labels": {
-    "actions": "Actions",
+    "actions": "",
     "active": "Actif",
     "activeStreams": "Lectures actives",
     "apiKey": "Clé API",
@@ -160,7 +160,7 @@
     "content": "Contenu",
     "created": "Créé",
     "data": "Donnée",
-    "date": "Date",
+    "date": "",
     "days": "jours",
     "device": "Appareil",
     "deviceId": "ID de l'appareil",
@@ -188,22 +188,22 @@
     "recentSessions": "Sessions récentes",
     "resolution": "Résolution",
     "rule": "Règle",
-    "segments": "segments",
+    "segments": "",
     "server": "Serveur",
     "serverOwner": "Propriétaire du serveur",
     "sessionDetails": "Détails de la session",
-    "sessions": "Sessions",
+    "sessions": "",
     "severity": "Gravité",
     "size": "Taille",
     "started": "Démarré",
     "status": "État",
     "stopped": "Arrêté",
     "streamDetails": "Détails de la diffusion",
-    "total": "total",
+    "total": "",
     "totalSessions": "Nombre total de sessions",
     "transcodeReason": "Raison du transcodage",
     "trustScore": "Score de confiance",
-    "type": "Type",
+    "type": "",
     "unknown": "Inconnu",
     "user": "Utilisateur",
     "watchTime": "Temps de visionnage",
@@ -216,7 +216,7 @@
     "movie": "Film",
     "movie_plural": "Films",
     "music": "Musique",
-    "photo": "Photo",
+    "photo": "",
     "track": "Piste",
     "track_plural": "Pistes",
     "tv": "Télévision",
@@ -270,9 +270,9 @@
     "some": "{{count}} des serveurs {{total}}"
   },
   "servers": {
-    "emby": "Emby",
-    "jellyfin": "Jellyfin",
-    "plex": "Plex"
+    "emby": "",
+    "jellyfin": "",
+    "plex": ""
   },
   "severity": {
     "high": "Élevée",
@@ -302,8 +302,9 @@
     "success": "Succès"
   },
   "table": {
+    "goToPage": "",
     "pageOf": "Page {{page}} sur {{total}}",
-    "pagination": "Pagination",
+    "pagination": "",
     "selectAllOnPage": "Tout sélectionner sur la page",
     "selectRow": "Sélectionner la ligne"
   },
@@ -329,7 +330,7 @@
   },
   "units": {
     "km": "kilomètres",
-    "kmh": "km/h",
+    "kmh": "",
     "mi": "mile(s)",
     "mph": "mile/h"
   },

@@ -49,6 +49,7 @@ interface RequestRowCommon {
   waitMs: number | null;
   seasons: RequestSeason[] | null;
   watchedState: MediaRequestEntry['watchedState'];
+  watchedStateRequester: MediaRequestEntry['watchedStateRequester'];
 }
 
 function RequestFlags({ is4k, isAutoRequest }: { is4k: boolean; isAutoRequest: boolean }) {
@@ -153,7 +154,15 @@ function RequestDataRow({
       </TableCell>
       <TableCell className="text-muted-foreground">{seasons ?? '—'}</TableCell>
       <TableCell>
-        <WatchedBadge watchedState={row.watchedState} watchedStateSelf={row.watchedState} />
+        <WatchedBadge
+          watchedState={row.watchedState}
+          watchedStateSelf={row.watchedStateRequester}
+          label={t(
+            row.watchedStateRequester === 'watched'
+              ? 'requests.watched.byRequester'
+              : 'requests.watched.byOthers'
+          )}
+        />
       </TableCell>
     </TableRow>
   );

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isEmailAddress } from './emailAddress.js';
 import type { NotificationEventType, ViolationSeverity } from './types.js';
 
 export const DESTINATION_KINDS = [
@@ -370,9 +371,7 @@ export const DESTINATION_TYPES = {
         email('fromAddress', 'fromAddress', true, 'tracearr@example.com'),
         email('replyTo', 'replyTo', false),
       ]),
-      ...grouped('alerts', [
-        emails('to', 'to', false, 'you@example.com, admin@example.com', 'smtpTo'),
-      ]),
+      ...grouped('alerts', [emails('to', 'to', false, 'you@example.com', 'smtpTo')]),
     ],
   },
   push: {
@@ -398,12 +397,6 @@ const httpUrl = z
   .trim()
   .refine((v) => /^https?:\/\/\S+$/i.test(v), 'Must be an http(s) URL');
 
-const address = z.email();
-
-function isAddress(value: string): boolean {
-  return address.safeParse(value).success;
-}
-
 export function addressList(value: string): string[] {
   return value
     .split(',')
@@ -419,14 +412,14 @@ function fieldSchema(f: DestinationFieldDescriptor): z.ZodString {
     case 'url':
       return httpUrl;
     case 'email':
-      return z.string().trim().max(254).refine(blankOk(isAddress), 'Must be an email address');
+      return z.string().trim().max(254).refine(blankOk(isEmailAddress), 'Must be an email address');
     case 'emails':
       return z
         .string()
         .trim()
         .max(2000)
         .refine(
-          blankOk((v) => addressList(v).length > 0 && addressList(v).every(isAddress)),
+          blankOk((v) => addressList(v).length > 0 && addressList(v).every(isEmailAddress)),
           'Must be one or more comma-separated email addresses'
         );
     case 'number': {

@@ -74,6 +74,8 @@
       "jobAlreadyRunning": "Job ruleaza deja",
       "jobLoadFailed": "Încărcarea lucrărilor de întreținere a eșuat",
       "jobStartFailed": "Pornirea jobului a eșuat",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "mobileAccessDisableFailed": "Dezactivarea accesului mobil a eșuat",
       "mobileAccessEnableFailed": "Activarea accesului mobil a eșuat",
       "newsletterDeleteFailed": "",
@@ -174,6 +176,8 @@
         "message": "Conectat cu succes",
         "title": "Succes"
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "mobileAccessDisabled": {
         "message": "Toate sesiunile mobile au fost revocate",
         "title": "Acces mobil dezactivat"
