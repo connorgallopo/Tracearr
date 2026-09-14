@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Găsiţi acest lucru în Panoul de control Jellyfin → Chei API",
     "apiKeyHelpEmby": "Găseşte acest lucru în Emby Server → Chei API",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Serverul meu Plex",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Sau faceţi clic pe Actualizare mai jos pentru a salva doar schimbarea numelui.",
