@@ -6,9 +6,7 @@
   "activity": "Aktywność",
   "library": "Biblioteka",
   "users": "Użytkownicy",
-  "automations": "",
   "violations": "Naruszenia",
-  "requests": "",
   "alerts": "Powiadomienia",
   "settings": "Ustawienia",
   "overview": "Przegląd",
@@ -22,12 +20,5 @@
   "accessControl": "Kontrola dostępu",
   "media": "Multimedia",
   "mediaBrowse": "Przeglądaj",
-  "mediaGenres": "Gatunki",
-  "session": "",
-  "user": "",
-  "violation": "",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "mediaGenres": "Gatunki"
 }
