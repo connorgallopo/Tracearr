@@ -125,7 +125,7 @@
     "mph": "milă"
   },
   "labels": {
-    "date": "",
+    "date": "Data",
     "user": "Utilizator",
     "content": "Conținut",
     "platform": "Platformă",
@@ -168,7 +168,7 @@
     "sessions": "Sesiuni",
     "apiKey": "Cheie API",
     "rank": "Clasament",
-    "data": "",
+    "data": "Date",
     "size": "Dimensiune",
     "items": "Articole",
     "name": "Nume",
@@ -310,7 +310,7 @@
     "second_one": "{{count}} secundă",
     "second_other": "{{count}} secunde",
     "minute_one": "{{count}} minut",
-    "minute_other": "",
+    "minute_other": "{{count}} minute",
     "hour_one": "{{count}} oră",
     "hour_other": "{{count}} ore",
     "day_one": "",
