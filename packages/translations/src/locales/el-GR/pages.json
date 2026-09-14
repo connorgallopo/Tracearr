@@ -252,7 +252,7 @@
       "quietest": "Δυσπιστεί:",
       "bingeHighlights": "Στιγμιότυπα Binge",
       "bingeHighlightsDesc": "Εμφανίζεται με τα πιο εντατικά μοτίβα προβολής",
-      "bingeSessions": "",
+      "bingeSessions": "συνεδρίες binge",
       "noData": "Δεν υπάρχουν δεδομένα παρακολούθησης ακόμα",
       "noDataDesc": "Τα αναλυτικά στοιχεία παρακολούθησης θα εμφανιστούν εδώ μόλις εμφανιστεί το περιεχόμενο. Ελέγξτε πίσω μετά από κάποια δραστηριότητα προβολής.",
       "failedToLoad": "Αποτυχία φόρτωσης ανάλυσης ρολογιού",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Καμία δραστηριότητα ακόμα",
-    "noActivityDesc": "",
+    "noActivityDesc": "Ξεκινήστε να κάνετε streaming για να δείτε τους κορυφαίους χρήστες σας εδώ",
     "top3": "Κορυφή 3",
     "runnersUp": "Επάνω Δρομείς"
   },
