@@ -1,6 +1,6 @@
 {
   "login": {
-    "title": "",
+    "title": "Tracearr",
     "tagline": "Tracearr - Gestion d'accès aux lectures",
     "createAccountHeading": "Créez votre compte pour démarrer",
     "signInHeading": "Connectez-vous à votre compte",
@@ -127,8 +127,8 @@
     "userNotFound": "Utilisateur introuvable",
     "userInfo": "Informations de l'utilisateur",
     "statistics": "Statistiques",
-    "sessions": "",
-    "violations": "",
+    "sessions": "Sessions",
+    "violations": "Violations",
     "terminationHistory": "Historique des interruptions",
     "noViolationsFound": "Aucune violation pour cet utilisateur.",
     "noTerminationsFound": "Aucune interruption de lecture pour cet utilisateur.",
@@ -214,7 +214,7 @@
       "confidenceLow": "Faible",
       "zeroGrowth": "0 Go/mois",
       "predictions": "Prédictions",
-      "contentROI": "",
+      "contentROI": "Content ROI",
       "contentROIDesc": "Regarder la valeur par coût de stockage",
       "avgHoursPerGB": "heure moyenne/Go",
       "insufficientData": "Données insuffisantes",
@@ -231,7 +231,7 @@
       "noDuplicatesDesc": "Aucun titre avec plus d'un fichier physique détecté.",
       "colTitle": "Titre",
       "colMatchType": "Type de correspondance",
-      "colCopies": "",
+      "colCopies": "Copies",
       "colRecoverable": "Espace récupérable",
       "sameServer": "Même serveur",
       "mirror": "Miroir"
@@ -252,7 +252,7 @@
       "quietest": "Silencieux:",
       "bingeHighlights": "Surbrillances du Binge",
       "bingeHighlightsDesc": "Montre avec les modèles de visualisation les plus intenses",
-      "bingeSessions": "",
+      "bingeSessions": "sessions de binge",
       "noData": "Aucune donnée de surveillance pour le moment",
       "noDataDesc": "Les analytiques de la montre apparaîtront ici une fois que le contenu a été lu. Revenez après une certaine activité de visualisation.",
       "failedToLoad": "Impossible de charger l'analytique de la montre",
@@ -330,7 +330,7 @@
     "streamQuality": "Qualité de lecture"
   },
   "violations": {
-    "title": "",
+    "title": "Violations",
     "tryAdjustingFilters": "Essayez d'ajuster vos filtres",
     "selectAllViolations": "Sélectionner les {{count}} violations correspondant aux filtres",
     "dismissViolation": "Ignorer la violation",
@@ -354,7 +354,7 @@
       "notFound": "Violation introuvable",
       "violationDetails": "Détails de la violation",
       "userInfo": "Utilisateur",
-      "sessions": "",
+      "sessions": "Sessions",
       "noSessions": "Aucune session associée à cette violation",
       "trigger": "Déclencheur",
       "map": "Emplacements de la session",
@@ -394,7 +394,7 @@
         "description": "Ajuster, définir ou réinitialiser le score de confiance",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Mode"
           },
           "amount": {
             "label": "Quantité",
@@ -427,7 +427,7 @@
         "ran": "Le flux a été arrêté"
       },
       "message_client": {
-        "label": "",
+        "label": "Message Client",
         "description": "Envoyer un message au lecteur multimédia",
         "hint": "Jellyfin et Emby uniquement. Plex ne prend en charge que les messages lorsque vous tuez un flux.",
         "fields": {
@@ -643,8 +643,8 @@
       },
       "heldFor": {
         "prefix": "Un flux a été mis en pause pour",
-        "minutesLabel": "",
-        "unit": "",
+        "minutesLabel": "Minutes",
+        "unit": "minutes",
         "measureLabel": "Compté",
         "current": "cette fois",
         "total": "au total"
@@ -739,8 +739,8 @@
       "otherwise": "Sinon",
       "appliesTo": "S'applique à {{name}}",
       "duration": {
-        "minutes_one": "",
-        "minutes_other": "",
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes",
         "days_one": "{{count}} jour",
         "days_other": "{{count}} jours"
       },
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Pas encore d'activité",
-    "noActivityDesc": "",
+    "noActivityDesc": "Commencez à diffuser pour voir vos meilleurs utilisateurs ici",
     "top3": "",
     "runnersUp": "Finalistes vers le haut"
   },
