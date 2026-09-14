@@ -252,7 +252,7 @@
       "quietest": "Kysely:",
       "bingeHighlights": "Bingen Yksityiskohdat",
       "bingeHighlightsDesc": "Näyttää intensiivisimmällä katselumallilla",
-      "bingeSessions": "",
+      "bingeSessions": "binge istuntoja",
       "noData": "Ei vielä kellon tietoja",
       "noDataDesc": "Katsella analytiikka ilmestyy tänne, kun sisältöä on toistettava. Tarkista sen jälkeen, kun olet tarkastellut toimintoja.",
       "failedToLoad": "Kellon analytiikan lataaminen epäonnistui",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
-    "noActivityDesc": "",
+    "noActivityDesc": "Aloita streaming nähdäksesi alkuun käyttäjät täällä",
     "top3": "",
     "runnersUp": "Juoksijat Ylös"
   },
