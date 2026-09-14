@@ -252,7 +252,7 @@
       "quietest": "Тихий тест:",
       "bingeHighlights": "Отметины на Бинге",
       "bingeHighlightsDesc": "Показывает с самыми интенсивными шаблонами просмотра",
-      "bingeSessions": "",
+      "bingeSessions": "стыковочные сессии",
       "noData": "Нет данных для просмотра",
       "noDataDesc": "Статистика наблюдения будет отображаться здесь после воспроизведения содержимого. Возвращайтесь после некоторых действий просмотра.",
       "failedToLoad": "Не удалось загрузить аналитику",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Нет активности",
-    "noActivityDesc": "",
+    "noActivityDesc": "Начните поток, чтобы увидеть ваших топ пользователей здесь",
     "top3": "Топ 3",
     "runnersUp": "Бегуны вверх"
   },
