@@ -252,7 +252,7 @@
       "quietest": "هادئ:",
       "bingeHighlights": "أضواء Binge",
       "bingeHighlightsDesc": "يظهر مع أنماط العرض الأكثر كثافة",
-      "bingeSessions": "",
+      "bingeSessions": "جلسات باينج",
       "noData": "لا توجد بيانات مشاهدة بعد",
       "noDataDesc": "سوف تظهر تحليلات المشاهدة هنا بمجرد تشغيل المحتوى. تحقق مرة أخرى بعد بعض نشاط المشاهدة.",
       "failedToLoad": "فشل تحميل تحليلات الساعة",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "لا يوجد نشاط بعد",
-    "noActivityDesc": "",
+    "noActivityDesc": "ابدأ البث لرؤية أعلى المستخدمين هنا",
     "top3": "أفضل 3",
     "runnersUp": "تشغيل أعلى"
   },
