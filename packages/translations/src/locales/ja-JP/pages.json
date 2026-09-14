@@ -252,7 +252,7 @@
       "quietest": "",
       "bingeHighlights": "Bingeハイライト",
       "bingeHighlightsDesc": "最も集中的な表示パターンで表示",
-      "bingeSessions": "",
+      "bingeSessions": "bingeセッション",
       "noData": "ウォッチデータがまだありません",
       "noDataDesc": "コンテンツが再生されると、ウォッチ解析がここに表示されます。いくつかの閲覧後に再度ご確認ください。",
       "failedToLoad": "ウォッチ解析の読み込みに失敗しました",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "アクティビティはまだありません",
-    "noActivityDesc": "",
+    "noActivityDesc": "あなたのトップユーザーをここで見るためにストリーミングを開始します",
     "top3": "トップ 3",
     "runnersUp": "Runner Up"
   },
