@@ -73,11 +73,11 @@
     "themeSystem": "",
     "application": "Applikation",
     "applicationDesc": "Konfigurera grundläggande programinställningar",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Välj hur avstånd och hastigheter visas",
     "sessionSync": "Sessions synkronisering",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Aktivera sessionsspårning för dina mediaservrar",
     "syncInterval": "Synkronisera intervall",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Omröstningsfrekvens för Jellyfin/Emby (5-300 sekunder)",
     "syncIntervalSuffix": "sek",
     "plexSseNote": "Plex använder Server-Sent Events (SSE) för nästan omedelbara uppdateringar — ingen omröstning behövs.",
     "jellyfinPollingNote": "Jellyfin/Emby avfrågas vid intervallet ovan.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "Skräddarsydd VPN",
-    "description": "",
+    "description": "Få tillgång till Tracearr säkert på ditt Tailscale nätverk utan portvidarebefordran.",
     "notAvailable": "Tailscale binary hittades inte. Denna funktion är endast tillgänglig när du kör den officiella Docker-bilden.",
     "disabledDescription": "Aktivera Tailscale för att sätta Tracearr på din privata tailnet. Ingen portvidarebefordran eller omvänd proxy krävs.",
     "hostnameLabel": "Enhetens värdnamn",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Underhåll Jobb",
-    "description": "",
+    "description": "Hantera bakgrundsuppgifter som håller dina data korrekta och optimerade.",
     "normalization": "Normalisering",
     "backfill": "Återfyllning",
     "cleanup": "Rensa",
@@ -348,7 +348,7 @@
     "title": "Åtkomstkontroll",
     "description": "Konfigurera vem som kan komma åt Tracearr",
     "allowGuestAccess": "Tillåt gäståtkomst",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "När den är inaktiverad, kan endast serverägaren logga in på Tracearr",
     "singleOwnerNote": "Obs: När gäståtkomst är inaktiverad kan endast serverägaren logga in. Alla andra användare kommer att se ett meddelande \"Åtkomst nekad\"."
   },
   "import": {
