@@ -119,10 +119,10 @@
     "byHour": "시간별"
   },
   "units": {
-    "km": "",
-    "mi": "",
-    "kmh": "",
-    "mph": ""
+    "km": "km",
+    "mi": "mi",
+    "kmh": "km/h",
+    "mph": "mph"
   },
   "labels": {
     "date": "날짜",
@@ -216,14 +216,14 @@
     "track_plural": "트랙",
     "liveTV": "라이브 TV",
     "photo": "사진",
-    "tv": "",
+    "tv": "TV",
     "tvShows": "TV 프로그램",
     "music": "음악"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "필수 입력 항목입니다",
