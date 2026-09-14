@@ -73,11 +73,11 @@
     "themeSystem": "",
     "application": "Anvendelse",
     "applicationDesc": "Konfigurer grundlæggende programindstillinger",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Vælg hvordan afstande og hastigheder vises",
     "sessionSync": "Synkronisering Af Session",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Aktivér sessionsporing for dine medieservere",
     "syncInterval": "Synkroniser Interval",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Afstemningsfrekvens for Jellyfin/Emby (5-300 sekunder)",
     "syncIntervalSuffix": "sek",
     "plexSseNote": "Plex bruger Server-Sendt Begivenheder (SSE) til næsten øjeblikkelige opdateringer — ingen meningsmåling nødvendig.",
     "jellyfinPollingNote": "Jellyfin/Emby er pollet med ovenstående interval.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "Skræddersy VPN",
-    "description": "",
+    "description": "Få sikker adgang til Tracearr på dit Tailscale netværk uden portvideresendelse.",
     "notAvailable": "Tailscale binær ikke fundet. Denne funktion er kun tilgængelig ved kørsel af det officielle Docker-billede.",
     "disabledDescription": "Aktiver Tailscale for at sætte Tracearr på din private tailnet. Ingen portvideresendelse eller omvendt proxy kræves.",
     "hostnameLabel": "Enhedens Værtsnavn",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Vedligeholdelse Job",
-    "description": "",
+    "description": "Administrer baggrundsopgaver, der holder dine data nøjagtige og optimerede.",
     "normalization": "Normalisering",
     "backfill": "",
     "cleanup": "Oprydning",
@@ -348,7 +348,7 @@
     "title": "Adgangskontrol",
     "description": "Konfigurere, hvem der kan tilgå Tracearr",
     "allowGuestAccess": "Tillad Gæst Adgang",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Når deaktiveret, kan kun serverejeren logge ind på Tracearr",
     "singleOwnerNote": "Bemærk: Når gæsteadgang er deaktiveret, kan kun serverejeren logge ind. Alle andre brugere vil se en \"Adgang nægtet\" besked."
   },
   "import": {
