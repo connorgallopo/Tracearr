@@ -6,9 +6,7 @@
   "activity": "Δραστηριότητα",
   "library": "Βιβλιοθήκη",
   "users": "Χρήστες",
-  "automations": "",
   "violations": "Παραβάσεις",
-  "requests": "",
   "alerts": "Ειδοποιήσεις",
   "settings": "Ρυθμίσεις",
   "overview": "Επισκόπηση",
@@ -22,12 +20,5 @@
   "accessControl": "Έλεγχος Πρόσβασης",
   "media": "Πολυμέσα",
   "mediaBrowse": "Περιήγηση",
-  "mediaGenres": "Είδη",
-  "session": "",
-  "user": "",
-  "violation": "",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "mediaGenres": "Είδη"
 }
