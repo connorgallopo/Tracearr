@@ -252,7 +252,7 @@
       "quietest": "Más tranquilo:",
       "bingeHighlights": "Destacados Binge",
       "bingeHighlightsDesc": "Muestra con los patrones de visualización más intensivos",
-      "bingeSessions": "",
+      "bingeSessions": "sesiones de binge",
       "noData": "Aún no hay datos de reloj",
       "noDataDesc": "Ver análisis aparecerán aquí una vez que el contenido haya sido reproducido. Vuelva a comprobar después de alguna actividad de visualización.",
       "failedToLoad": "Error al cargar análisis de reloj",
@@ -456,7 +456,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "",
       "emptyDescription": "",
@@ -490,7 +490,7 @@
     "bind": {
       "nameHelper": "",
       "namePlaceholder": "",
-      "activeLabel": "",
+      "activeLabel": "Active",
       "back": "",
       "submit": "",
       "submitting": "",
@@ -559,7 +559,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Aún no hay actividad",
-    "noActivityDesc": "",
+    "noActivityDesc": "Empieza a transmitir para ver tus mejores usuarios aquí",
     "top3": "",
     "runnersUp": "Ejecutar arriba"
   },
