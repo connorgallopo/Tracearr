@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Jellyfin 대시보드 > API 키에서 찾을 수 있습니다",
     "apiKeyHelpEmby": "Emby 서버 > API 키에서 찾을 수 있습니다",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "내 Plex 서버",
     "plexServerUrlPlaceholder": "http://192.168.1.100:32400",
     "updateHint": "또는 아래 업데이트를 클릭해 이름 변경만 저장하세요.",
