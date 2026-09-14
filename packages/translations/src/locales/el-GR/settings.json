@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Βρείτε αυτό σε Jellyfin Dashboard → API Keys",
     "apiKeyHelpEmby": "Βρείτε αυτό σε διακομιστή Emby → Κλειδιά API",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Ο Διακομιστής Plex Μου",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Ή κάντε κλικ στην επιλογή Ενημέρωση παρακάτω για να αποθηκεύσετε μόνο την αλλαγή ονόματος.",
