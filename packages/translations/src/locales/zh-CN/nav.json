@@ -6,9 +6,8 @@
   "activity": "活动",
   "library": "媒体库",
   "users": "用户",
-  "automations": "",
+  "automations": "自动化",
   "violations": "违规",
-  "requests": "",
   "alerts": "警告",
   "settings": "设置",
   "overview": "概览",
@@ -26,8 +25,8 @@
   "session": "会话",
   "user": "用户",
   "violation": "违反",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "monitor": "监控",
+  "manage": "管理",
+  "userStats": "按用户",
+  "toggleSidebar": "切换导航"
 }
