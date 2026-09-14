@@ -6,9 +6,7 @@
   "activity": "Активність",
   "library": "Бібліотека",
   "users": "Користувачі",
-  "automations": "",
   "violations": "Порушення",
-  "requests": "",
   "alerts": "Попередження",
   "settings": "Налаштування",
   "overview": "Огляд",
@@ -23,11 +21,6 @@
   "media": "Медіа",
   "mediaBrowse": "Огляд",
   "mediaGenres": "Жанри",
-  "session": "",
   "user": "Користувач",
-  "violation": "Порушення",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "violation": "Порушення"
 }
