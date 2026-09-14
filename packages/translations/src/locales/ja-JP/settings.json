@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Jellyfinダッシュボードで検索 → APIキー",
     "apiKeyHelpEmby": "Emby Server → API キーで検索",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "私のプレックスサーバー",
     "plexServerUrlPlaceholder": "",
     "updateHint": "または、下のformat@@0をクリックして、名前の変更だけを保存します。",
