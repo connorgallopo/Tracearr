@@ -73,11 +73,11 @@
     "themeSystem": "Systém",
     "application": "Žádost",
     "applicationDesc": "Konfigurace základního nastavení aplikace",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Zvolte, jak jsou zobrazeny vzdálenosti a rychlosti",
     "sessionSync": "Synchronizace relace",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Povolit sledování relací pro mediální servery",
     "syncInterval": "Interval synchronizace",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Frekvence dotazování pro Jellyfin/Emby (5–300 sekund)",
     "syncIntervalSuffix": "sekunda",
     "plexSseNote": "Plex používá události serveru (SSE) pro téměř okamžité aktualizace – není potřeba žádné ankety.",
     "jellyfinPollingNote": "Jellyfin/Emby jsou dotazovány na výše uvedeném intervalu.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "Měřítko VPN",
-    "description": "",
+    "description": "Získejte bezpečný přístup k Tracearru ve vaší Tailscale síti bez přesměrování portu.",
     "notAvailable": "Binární soubor ve stupních nenalezen. Tato funkce je dostupná pouze při spuštění oficiálního Dockeru.",
     "disabledDescription": "Povolte ailscale pro vložení Tracearr do vašeho soukromého tailnetu. Není vyžadován žádný port pro přesměrování nebo reverzní proxy",
     "hostnameLabel": "Název hostitele zařízení",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Údržba pracovních míst",
-    "description": "",
+    "description": "Spravujte úkoly na pozadí, které udržují vaše data přesná a optimalizovaná.",
     "normalization": "Normalizace",
     "backfill": "Zpětné doplnění",
     "cleanup": "Vyčistit",
@@ -348,7 +348,7 @@
     "title": "Kontrola přístupu",
     "description": "Konfigurace, kdo má přístup k Tracearru",
     "allowGuestAccess": "Povolit přístup k hostům",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Pokud je zakázáno, do Tracearr se může přihlásit pouze vlastník serveru",
     "singleOwnerNote": "Poznámka: Pokud je přístup hosta zakázán, může se přihlásit pouze majitel serveru. Všichni ostatní uživatelé uvidí zprávu \"Přístup odepřen\"."
   },
   "import": {
