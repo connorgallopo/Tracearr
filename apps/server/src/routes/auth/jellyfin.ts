@@ -45,7 +45,7 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
             return await reply.serviceUnavailable(adminCheck.message);
           }
           if (adminCheck.code === JellyfinClient.AdminVerifyError.INVALID_KEY) {
-            return await reply.unauthorized(adminCheck.message);
+            return await reply.badRequest(adminCheck.message);
           }
           return await reply.forbidden(adminCheck.message);
         }

@@ -28,6 +28,7 @@ import { getCacheService } from '../services/cache.js';
 import { enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
 import { supportsMediaLibrary } from '@tracearr/shared';
 import { publishServersChanged } from '../jobs/poller/database.js';
+import { readServerIdentity } from '../services/serverIdentity.js';
 import { buildServerAccessCondition } from '../utils/serverFiltering.js';
 
 function getDispatcharrAuthMode(token?: string | null): 'token' | 'credentials' {
@@ -86,7 +87,7 @@ async function verifyServerAccess(params: {
           adminCheck.code === JellyfinClient.AdminVerifyError.CONNECTION_FAILED
             ? 503
             : adminCheck.code === JellyfinClient.AdminVerifyError.INVALID_KEY
-              ? 401
+              ? 400
               : 403,
         message: adminCheck.message,
       };
@@ -104,7 +105,7 @@ async function verifyServerAccess(params: {
             adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED
               ? 503
               : adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY
-                ? 401
+                ? 400
                 : 403,
           message: adminCheck.message,
         };
@@ -220,7 +221,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       if (!accessCheck.ok) {
         if (accessCheck.statusCode === 503)
           return await reply.serviceUnavailable(accessCheck.message);
-        if (accessCheck.statusCode === 401) return await reply.unauthorized(accessCheck.message);
+        if (accessCheck.statusCode === 400) return await reply.badRequest(accessCheck.message);
         return await reply.forbidden(accessCheck.message);
       }
 
@@ -322,9 +323,9 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
   });
 
   /**
-   * PATCH /servers/:id - Update server name and/or URL
-   * Accepts optional name and/or url; at least one is required.
-   * When url is provided, verifies the new URL is reachable with existing token before updating.
+   * PATCH /servers/:id - Update a server's name, URL, color, public address or API key
+   * At least one is required. A URL or API key change is verified against the server, and
+   * refused when it reaches a different server than the one the row belongs to.
    *
    * For Plex servers with clientIdentifier:
    * - Validates that the clientIdentifier matches the server's machineIdentifier
@@ -352,6 +353,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       ignoreAnonymousStreams: newIgnoreAnonymousStreams,
       color: newColor,
       publicUrl: newPublicUrl,
+      apiKey: newApiKey,
     } = body.data;
     const newUrl = bodyUrl !== undefined ? bodyUrl.replace(/\/$/, '') : undefined;
     const authUser = request.user;
@@ -383,25 +385,36 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
             username: newUsername,
             password: newPassword,
           })
-        : server.token;
+        : (newApiKey ?? server.token);
 
     if (authChanged && !normalizedToken) {
       return reply.badRequest('Dispatcharr update requires a complete token or username+password');
     }
     const verifiedToken = normalizedToken ?? undefined;
+    if (server.type === 'dispatcharr' && newApiKey !== undefined) {
+      return reply.badRequest(
+        'Dispatcharr authentication uses token or username+password, not apiKey'
+      );
+    }
 
     if (server.type === 'plex' && newPublicUrl !== undefined) {
       return reply.badRequest(PUBLIC_URL_PLEX_MESSAGE);
     }
-    const same = <T>(value: T | undefined, current: T): boolean =>
-      value === undefined || value === current;
+
+    if (server.type === 'plex' && newApiKey !== undefined) {
+      return reply.badRequest('Plex servers sign in through plex.tv and have no API key to change');
+    }
+
+    const same = <T>(next: T | undefined, current: T): boolean =>
+      next === undefined || next === current;
     if (
       !authChanged &&
       same(newName, server.name) &&
       same(newUrl, server.url) &&
       same(newColor, server.color) &&
       same(newPublicUrl, server.publicUrl) &&
-      same(newIgnoreAnonymousStreams, server.ignoreAnonymousStreams)
+      same(newIgnoreAnonymousStreams, server.ignoreAnonymousStreams) &&
+      same(newApiKey, server.token)
     ) {
       return {
         id: server.id,
@@ -418,7 +431,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       };
     }
 
-    if ((newUrl !== undefined && server.url !== newUrl) || authChanged) {
+    const urlChanging = newUrl !== undefined && server.url !== newUrl;
+    const keyChanging = newApiKey !== undefined && server.token !== newApiKey;
+    let backfilledIdentity: string | undefined;
+
+    if (urlChanging || keyChanging || authChanged) {
       if (
         server.type === 'plex' &&
         clientIdentifier &&
@@ -439,7 +456,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         if (!accessCheck.ok) {
           if (accessCheck.statusCode === 503)
             return await reply.serviceUnavailable(accessCheck.message);
-          if (accessCheck.statusCode === 401) return await reply.unauthorized(accessCheck.message);
+          if (accessCheck.statusCode === 400) return await reply.badRequest(accessCheck.message);
           return await reply.forbidden(accessCheck.message);
         }
       } catch (error) {
@@ -451,6 +468,39 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
           'Failed to connect to server with updated configuration. Please verify the settings.'
         );
       }
+
+      // Dispatcharr does not expose a stable server identity; retain its verified auth flow.
+      if (server.type !== 'dispatcharr') {
+        const expectedIdentity =
+          server.machineIdentifier ?? (await readServerIdentity(server).catch(() => null));
+        if (!expectedIdentity) {
+          return reply.badRequest(
+            'Tracearr has no record of which server this is and cannot reach it with the saved address and key, so it cannot confirm the change points at the same server.'
+          );
+        }
+
+        const reachedIdentity = await readServerIdentity({
+          id,
+          type: server.type,
+          url: effectiveUrl,
+          token: verifiedToken as string,
+        }).catch((error: unknown) => {
+          app.log.error(
+            { err: error, serverId: id, url: effectiveUrl },
+            'Failed to read server identity'
+          );
+          return null;
+        });
+        if (reachedIdentity === null) {
+          return reply.badRequest('Could not read which server answers at that address.');
+        }
+        if (reachedIdentity !== expectedIdentity) {
+          return reply.badRequest(
+            'That address or API key reaches a different server. A server can only be pointed at itself.'
+          );
+        }
+        if (!server.machineIdentifier) backfilledIdentity = expectedIdentity;
+      }
     }
 
     // Build update object
@@ -461,8 +511,10 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       ignoreAnonymousStreams?: boolean;
       color?: string | null;
       publicUrl?: string | null;
+      machineIdentifier?: string;
       updatedAt: Date;
     } = { updatedAt: new Date() };
+    if (backfilledIdentity !== undefined) updatePayload.machineIdentifier = backfilledIdentity;
     if (newName !== undefined) updatePayload.name = newName;
     if (newUrl !== undefined) updatePayload.url = newUrl;
     if (authChanged) updatePayload.token = normalizedToken;
@@ -471,6 +523,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
     if (newColor !== undefined) updatePayload.color = newColor;
     if (newPublicUrl !== undefined) updatePayload.publicUrl = newPublicUrl;
+    if (newApiKey !== undefined) updatePayload.token = newApiKey;
 
     const updated = await db
       .update(servers)
@@ -498,6 +551,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       (newName !== undefined && newName !== server.name) ||
       (newUrl !== undefined && newUrl !== server.url) ||
       authChanged ||
+      keyChanging ||
       (newIgnoreAnonymousStreams !== undefined &&
         newIgnoreAnonymousStreams !== server.ignoreAnonymousStreams);
     await publishServersChanged();
@@ -506,7 +560,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       if (newUrl !== undefined) {
         app.log.info({ serverId: id, oldUrl: server.url, newUrl }, 'Server URL updated');
       }
-      if (authChanged) {
+      if (authChanged || keyChanging) {
         app.log.info({ serverId: id }, 'Server authentication updated');
       }
       // The leader compares connector-owned fields with the database row and

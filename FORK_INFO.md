@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `fc7a0603`
-- Last shared upstream commit found during inspection: `03f3248a`
-- Latest upstream commit merged into the current working tree: `fc7a0603`
+- Source branch/SHA inspected: `main` at `9d2e17ab`
+- Last shared upstream commit found during inspection: `fc7a0603`
+- Latest upstream commit merged into the current working tree: `9d2e17ab`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,37 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `9d2e17ab` was merged into `develop` on September 14,
+  2026. Jellyfin/Emby API keys can now be edited, and Plex/Jellyfin/Emby URL
+  or key changes must reach the saved server identity. Dispatcharr does not
+  expose `getServerIdentity`, so its URL and credential edits retain the
+  existing admin-access verification without the unsupported identity check.
+  The generic `apiKey` field is rejected for Dispatcharr; its token and complete
+  username/password modes remain separate in the schema, route, hooks and UI.
+  All connector changes still reconcile on the Redis leader. Invalid
+  Jellyfin/Emby keys return HTTP 400 rather than 401 in both connection routes
+  and the fork's shared access helper, preserving the logged-in browser session.
+  Crowdin locale order and the removal of redundant `en-US` are retained,
+  applying only the intentional English fork key delta to upstream locales.
+  Upstream removes translation `composite` mode to prevent stale declarations.
+  The new form's missing `servers.apiKeyKeepCurrent` source string is supplied
+  with empty non-English placeholders, restoring typed translation coverage.
+  Requests navigation and dependency updates are retained; migrations,
+  Dispatcharr lifecycle, uncropped artwork and fork CI/release policy are unchanged.
+  Full non-Docker CI passed with Node 24 / pnpm 12.3.4 and a 4 GB Node heap:
+  frozen install, lint, typecheck, translations, unit/services/routes/auth/
+  security, web, coverage and build. Server groups plus web passed 8,599 tests
+  with two skipped; coverage passed 5,491 with two skipped (66.87% statements,
+  61.05% branches, 72.88% functions, 67.95% lines). Lint remains at 755 warnings;
+  timestamp/PID-normalized warning classes match September 13 for every job.
+  Initial lint/typecheck/routes failures exposed a duplicated test import and
+  the missing translation above; all affected full jobs passed after repair.
+  Logs use `.tmp/github-ci-<job>-20260914-9d2e.log`, with final dependency,
+  lint/typecheck/translations/routes logs using `-final-` before the date.
+  Docker integration and E2E were omitted at the user's request. Docker image
+  builds and live-provider manual smoke checks were not performed; automated
+  Dispatcharr auth/settings, lifecycle, images and termination coverage passed.
 
 - Upstream `main` at `fc7a0603` was merged into `develop` on September 13,
   2026. This adds request analytics and requested-season watched lenses,

@@ -154,7 +154,7 @@
     "scanQrCode": "QR-Code scannen"
   },
   "serverSelector": {
-    "servers": "",
+    "servers": "Server",
     "selectServers": "Server auswählen",
     "serversSelected": "{{selected}} von {{total}} Servern ausgewählt",
     "allServers": ""

@@ -710,6 +710,7 @@ class ApiClient {
         ignoreAnonymousStreams?: boolean;
         publicUrl?: string | null;
         color?: string | null;
+        apiKey?: string;
       }
     ) =>
       this.request<Server>(`/servers/${id}`, {

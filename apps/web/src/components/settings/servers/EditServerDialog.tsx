@@ -38,6 +38,7 @@ export interface ServerPatch {
   username?: string;
   password?: string;
   ignoreAnonymousStreams?: boolean;
+  apiKey?: string;
 }
 
 export function EditServerDialog({
@@ -57,6 +58,7 @@ export function EditServerDialog({
   const [editName, setEditName] = useState('');
   const [manualUrl, setManualUrl] = useState('');
   const [manualPublicUrl, setManualPublicUrl] = useState('');
+  const [editApiKey, setEditApiKey] = useState('');
   const [editColor, setEditColor] = useState<string>(SERVER_COLOR_OPTIONS[3]?.hex ?? '#3B82F6');
   const [seededServer, setSeededServer] = useState<Server | null>(null);
   const isPlexServer = server?.type === 'plex';
@@ -81,6 +83,7 @@ export function EditServerDialog({
         mode: server.dispatcharrAuthMode ?? 'token',
         ignoreAnonymousStreams: server.ignoreAnonymousStreams ?? true,
       });
+      setEditApiKey('');
       const otherColors = servers.filter((s) => s.id !== server.id).map((s) => s.color);
       setEditColor(server.color ?? pickServerColor(server.type, otherColors));
     }
@@ -105,11 +108,14 @@ export function EditServerDialog({
     (dispatcharr.mode === 'token'
       ? Boolean(dispatcharr.token.trim())
       : Boolean(dispatcharr.username.trim()) && Boolean(dispatcharr.password));
+  const hasApiKeyChange =
+    server && !isPlexServer && !isDispatcharr ? editApiKey.trim().length > 0 : false;
   const canSave =
     (hasNameChange ||
       hasUrlChange ||
       hasPublicUrlChange ||
       hasColorChange ||
+      hasApiKeyChange ||
       hasAuthChange ||
       hasAnonymousChange) &&
     authValid &&
@@ -191,16 +197,34 @@ export function EditServerDialog({
                 />
               </Field>
               {!isDispatcharr && (
-                <Field>
-                  <FieldLabel htmlFor="edit-public-url">{t('servers.publicUrl')}</FieldLabel>
-                  <Input
-                    id="edit-public-url"
-                    value={manualPublicUrl}
-                    onChange={(e) => setManualPublicUrl(e.target.value)}
-                    placeholder="https://jellyfin.example.com"
-                  />
-                  <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
-                </Field>
+                <>
+                  <Field>
+                    <FieldLabel htmlFor="edit-public-url">{t('servers.publicUrl')}</FieldLabel>
+                    <Input
+                      id="edit-public-url"
+                      value={manualPublicUrl}
+                      onChange={(e) => setManualPublicUrl(e.target.value)}
+                      placeholder="https://jellyfin.example.com"
+                    />
+                    <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="edit-api-key">{t('common:labels.apiKey')}</FieldLabel>
+                    <Input
+                      id="edit-api-key"
+                      type="password"
+                      autoComplete="off"
+                      value={editApiKey}
+                      onChange={(e) => setEditApiKey(e.target.value)}
+                      placeholder={t('servers.apiKeyKeepCurrent')}
+                    />
+                    <FieldDescription>
+                      {server.type === 'jellyfin'
+                        ? t('servers.apiKeyHelpJellyfin')
+                        : t('servers.apiKeyHelpEmby')}
+                    </FieldDescription>
+                  </Field>
+                </>
               )}
             </>
           )}
@@ -241,6 +265,7 @@ export function EditServerDialog({
                     ? { token: dispatcharr.token.trim() }
                     : { username: dispatcharr.username.trim(), password: dispatcharr.password }
                   : {}),
+                apiKey: hasApiKeyChange ? editApiKey.trim() : undefined,
               });
             }}
           >

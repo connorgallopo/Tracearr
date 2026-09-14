@@ -92,6 +92,10 @@ vi.mock('../../services/serverLiveStats.js', () => ({
   getServerLiveStats: vi.fn(),
 }));
 
+vi.mock('../../services/serverIdentity.js', () => ({
+  readServerIdentity: vi.fn(),
+}));
+
 // Import mocked modules
 import { db } from '../../db/client.js';
 import {
@@ -103,6 +107,7 @@ import {
 import { sseManager } from '../../services/sseManager.js';
 import { getServerLiveStats, getServerResourceStats } from '../../services/serverLiveStats.js';
 import { syncServer } from '../../services/sync.js';
+import { readServerIdentity } from '../../services/serverIdentity.js';
 import { serverRoutes } from '../servers.js';
 
 // Mock global fetch for image proxy tests
@@ -731,7 +736,7 @@ describe('Server Routes', () => {
       expect(response.json().message).toContain('admin');
     });
 
-    it('returns 401 when Jellyfin rejects the API key', async () => {
+    it('returns 400 when Jellyfin rejects the API key', async () => {
       app = await buildTestApp(ownerUser);
 
       mockDbSelectLimit([]);
@@ -752,7 +757,7 @@ describe('Server Routes', () => {
         },
       });
 
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('rejected');
     });
 
@@ -781,7 +786,7 @@ describe('Server Routes', () => {
       expect(response.json().message).toContain('Cannot reach');
     });
 
-    it('returns 401 when Emby rejects the API key', async () => {
+    it('returns 400 when Emby rejects the API key', async () => {
       app = await buildTestApp(ownerUser);
 
       mockDbSelectLimit([]);
@@ -802,7 +807,7 @@ describe('Server Routes', () => {
         },
       });
 
-      expect(response.statusCode).toBe(401);
+      expect(response.statusCode).toBe(400);
       expect(response.json().message).toContain('rejected');
     });
 
@@ -915,6 +920,168 @@ describe('Server Routes', () => {
       expect(plex.json().message).toBe('Public address applies to Jellyfin and Emby servers only');
     });
 
+    it('checks a new Jellyfin API key against the saved URL and server before storing it', async () => {
+      app = await buildTestApp(ownerUser);
+      const jellyfin = {
+        ...mockServer,
+        type: 'jellyfin' as const,
+        url: 'http://192.168.1.20:8096',
+        token: 'old-key',
+        machineIdentifier: 'jf-1',
+      };
+      vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue({ success: true });
+      vi.mocked(readServerIdentity).mockResolvedValue('jf-1');
+      mockDbSelectLimit([jellyfin]);
+      const update = mockDbUpdateReturning([jellyfin]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${jellyfin.id}`,
+        payload: { apiKey: ' new-key ' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(JellyfinClient.verifyServerAdmin).toHaveBeenCalledWith(
+        'new-key',
+        'http://192.168.1.20:8096'
+      );
+      expect(readServerIdentity).toHaveBeenCalledWith(
+        expect.objectContaining({ url: 'http://192.168.1.20:8096', token: 'new-key' })
+      );
+      expect(update.set).toHaveBeenCalledWith({ token: 'new-key', updatedAt: expect.any(Date) });
+      expect(sseManager.refresh).toHaveBeenCalled();
+    });
+
+    it('verifies a new URL and key as a pair and records the identity it confirmed', async () => {
+      app = await buildTestApp(ownerUser);
+      const jellyfin = {
+        ...mockServer,
+        type: 'jellyfin' as const,
+        url: 'http://192.168.1.20:8096',
+        token: 'old-key',
+        machineIdentifier: null,
+      };
+      vi.mocked(JellyfinClient.verifyServerAdmin).mockResolvedValue({ success: true });
+      vi.mocked(readServerIdentity).mockResolvedValueOnce('jf-1').mockResolvedValueOnce('jf-1');
+      mockDbSelectLimit([jellyfin]);
+      const update = mockDbUpdateReturning([jellyfin]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${jellyfin.id}`,
+        payload: { url: 'http://new-host:8096', apiKey: 'new-key' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(JellyfinClient.verifyServerAdmin).toHaveBeenCalledWith(
+        'new-key',
+        'http://new-host:8096'
+      );
+      expect(readServerIdentity).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ url: 'http://192.168.1.20:8096', token: 'old-key' })
+      );
+      expect(readServerIdentity).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ url: 'http://new-host:8096', token: 'new-key' })
+      );
+      expect(update.set).toHaveBeenCalledWith({
+        url: 'http://new-host:8096',
+        token: 'new-key',
+        machineIdentifier: 'jf-1',
+        updatedAt: expect.any(Date),
+      });
+    });
+
+    it('refuses a URL or key that reaches a different server, or a server it cannot identify', async () => {
+      app = await buildTestApp(ownerUser);
+      const emby = {
+        ...mockServer,
+        type: 'emby' as const,
+        url: 'http://192.168.1.30:8096',
+        token: 'old-key',
+        machineIdentifier: 'emby-1',
+      };
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({ success: true });
+
+      mockDbSelectLimit([emby]);
+      vi.mocked(readServerIdentity).mockResolvedValueOnce('emby-2');
+      const elsewhere = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${emby.id}`,
+        payload: { url: 'http://192.168.1.31:8096', apiKey: 'other-key' },
+      });
+      expect(elsewhere.statusCode).toBe(400);
+      expect(elsewhere.json().message).toContain('different server');
+
+      mockDbSelectLimit([{ ...emby, machineIdentifier: null }]);
+      vi.mocked(readServerIdentity).mockRejectedValueOnce(new Error('401'));
+      const unknown = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${emby.id}`,
+        payload: { apiKey: 'new-key' },
+      });
+      expect(unknown.statusCode).toBe(400);
+      expect(unknown.json().message).toContain('no record of which server');
+
+      expect(db.update).not.toHaveBeenCalled();
+    });
+
+    it('treats the saved key sent again as no change', async () => {
+      app = await buildTestApp(ownerUser);
+      const jellyfin = { ...mockServer, type: 'jellyfin' as const, token: 'same-key' };
+      mockDbSelectLimit([jellyfin]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${jellyfin.id}`,
+        payload: { apiKey: 'same-key' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(JellyfinClient.verifyServerAdmin).not.toHaveBeenCalled();
+      expect(db.update).not.toHaveBeenCalled();
+    });
+
+    it('keeps the old Emby key when the new one is refused, and refuses a key on Plex', async () => {
+      app = await buildTestApp(ownerUser);
+      const emby = {
+        ...mockServer,
+        type: 'emby' as const,
+        url: 'http://192.168.1.30:8096',
+        token: 'old-key',
+      };
+      vi.mocked(EmbyClient.verifyServerAdmin).mockResolvedValue({
+        success: false,
+        code: 'INVALID_KEY',
+        message: 'Invalid API key',
+      });
+      mockDbSelectLimit([emby]);
+      vi.mocked(db.update).mockClear();
+
+      const refused = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${emby.id}`,
+        payload: { apiKey: 'bad-key' },
+      });
+      expect(refused.statusCode).toBe(400);
+      expect(db.update).not.toHaveBeenCalled();
+
+      mockDbSelectLimit([mockServer]);
+      const plex = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${mockServer.id}`,
+        payload: { apiKey: 'any-key' },
+      });
+      expect(plex.statusCode).toBe(400);
+      expect(plex.json().message).toBe(
+        'Plex servers sign in through plex.tv and have no API key to change'
+      );
+      expect(PlexClient.verifyServerAdmin).not.toHaveBeenCalled();
+      expect(readServerIdentity).not.toHaveBeenCalled();
+      expect(db.update).not.toHaveBeenCalled();
+    });
+
     it('rejects when neither name nor url provided', async () => {
       app = await buildTestApp(ownerUser);
 
@@ -999,6 +1166,7 @@ describe('Server Routes', () => {
         'http://dispatcharr.local:9191'
       );
       expect(response.json().dispatcharrAuthMode).toBe('credentials');
+      expect(readServerIdentity).not.toHaveBeenCalled();
       expect(response.json()).not.toHaveProperty('token');
       expect(sseManager.removeServer).not.toHaveBeenCalled();
       expect(sseManager.refresh).toHaveBeenCalled();
@@ -1028,6 +1196,22 @@ describe('Server Routes', () => {
 
       expect(response.statusCode).toBe(503);
       expect(db.update).not.toHaveBeenCalled();
+      expect(sseManager.refresh).not.toHaveBeenCalled();
+    });
+
+    it('rejects generic API-key edits on Dispatcharr without changing its credentials', async () => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ ...mockServer, type: 'dispatcharr' as const }]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${mockServer.id}`,
+        payload: { apiKey: 'replacement-key' },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(db.update).not.toHaveBeenCalled();
+      expect(DispatcharrClient.verifyServerAdmin).not.toHaveBeenCalled();
       expect(sseManager.refresh).not.toHaveBeenCalled();
     });
 

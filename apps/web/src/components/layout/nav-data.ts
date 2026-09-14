@@ -64,6 +64,7 @@ export const navigation: NavSection[] = [
       { nameKey: 'quality', href: '/library/quality', icon: Sparkles },
       { nameKey: 'storage', href: '/library/storage', icon: HardDrive },
       { nameKey: 'watch', href: '/library/watch', icon: Eye },
+      { nameKey: 'requests', href: '/requests', icon: Inbox, requiresSeerr: true },
     ],
   },
   {
@@ -72,7 +73,6 @@ export const navigation: NavSection[] = [
       { nameKey: 'users', href: '/users', icon: Users },
       { nameKey: 'automations', href: '/automations', icon: Workflow },
       { nameKey: 'violations', href: '/violations', icon: AlertTriangle },
-      { nameKey: 'requests', href: '/requests', icon: Inbox, requiresSeerr: true },
       { nameKey: 'settings', href: '/settings', icon: Settings },
     ],
   },

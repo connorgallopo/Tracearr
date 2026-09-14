@@ -162,6 +162,7 @@
     "serverUrlHelp": "Direct URL to your Jellyfin or Emby server. Use IP:port for best reliability.",
     "serverNamePlaceholder": "My Media Server",
     "apiKeyPlaceholder": "Enter your API key",
+    "apiKeyKeepCurrent": "Leave empty to keep the current key",
     "apiKeyHelp": "Found in your media server's dashboard under API Keys or Advanced settings.",
     "connecting": "Connecting...",
     "connectServer": "Connect Server",

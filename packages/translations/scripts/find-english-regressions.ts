@@ -26,7 +26,6 @@
  *   pnpm check:english --locale=de-DE
  *   pnpm check:english --json=report.json
  *   pnpm check:english --show=regression,recoverable,stale
- *   pnpm check:english --include-en-us   # en-US is English on purpose
  */
 
 import { execFileSync } from 'node:child_process';
@@ -55,7 +54,6 @@ const argValue = (name: string): string | undefined =>
     .join('=');
 const onlyLocale = argValue('locale');
 const jsonOut = argValue('json');
-const includeEnUs = args.includes('--include-en-us');
 const show = new Set((argValue('show') ?? 'regression').split(',').filter(Boolean));
 
 interface TranslationObject {
@@ -305,7 +303,6 @@ const locales = fs
   .filter((d) => d.isDirectory() && !SKIP_DIRS.has(d.name))
   .map((d) => d.name)
   .filter((l) => (onlyLocale ? l === onlyLocale : true))
-  .filter((l) => (includeEnUs ? true : l !== 'en-US'))
   .sort();
 
 // ---- English corpus ----

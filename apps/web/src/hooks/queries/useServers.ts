@@ -81,6 +81,7 @@ export function useUpdateServer() {
       ignoreAnonymousStreams,
       color,
       publicUrl,
+      apiKey,
     }: {
       id: string;
       name?: string;
@@ -92,6 +93,7 @@ export function useUpdateServer() {
       ignoreAnonymousStreams?: boolean;
       color?: string | null;
       publicUrl?: string | null;
+      apiKey?: string;
     }) =>
       api.servers.update(id, {
         name,
@@ -103,6 +105,7 @@ export function useUpdateServer() {
         ignoreAnonymousStreams,
         color,
         publicUrl,
+        apiKey,
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });

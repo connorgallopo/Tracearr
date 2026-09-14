@@ -33,7 +33,7 @@
   "scripts": {
     "build": "tsc && node scripts/copy-locales.js",
     "prepublishOnly": "pnpm build",
-    "dev": "tsc --watch --tsBuildInfoFile dev.tsbuildinfo",
+    "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo",
     "check": "tsx scripts/check-translations.ts",

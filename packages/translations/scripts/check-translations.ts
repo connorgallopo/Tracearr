@@ -11,7 +11,7 @@
  *   pnpm check                  # Check all languages against en
  *   pnpm check --strict         # Also report extra keys
  *   pnpm check --lang=de-DE     # Check only German
- *   pnpm check --fix            # Add absent keys as empty placeholders
+ *   pnpm check --fix            # Add absent keys as empty placeholders, in en key order
  *   pnpm check --fix --dry-run  # Preview fixes without writing files
  */
 
@@ -38,6 +38,7 @@ interface CheckResult {
 interface FixResult {
   filesCreated: string[];
   keysAdded: { file: string; count: number }[];
+  filesReordered: string[];
 }
 
 function getAllKeys(obj: TranslationObject, prefix = ''): string[] {
@@ -94,20 +95,33 @@ function setValueAtPath(
   current[parts[parts.length - 1]] = value;
 }
 
-function sortObjectKeys(obj: TranslationObject): TranslationObject {
-  const sorted: TranslationObject = {};
-  const keys = Object.keys(obj).sort();
-
-  for (const key of keys) {
+/**
+ * Crowdin exports every locale in the en file's key order, so writing any other order
+ * turns each sync into a rewrite of the whole file. Keys en lacks stay after the rest.
+ */
+function orderLikeBase(obj: TranslationObject, base: TranslationObject): TranslationObject {
+  const ordered: TranslationObject = {};
+  const place = (key: string) => {
     const value = obj[key];
-    if (typeof value === 'object' && value !== null) {
-      sorted[key] = sortObjectKeys(value as TranslationObject);
-    } else {
-      sorted[key] = value;
-    }
+    const baseValue = base[key];
+    ordered[key] =
+      typeof value === 'object' && value !== null
+        ? orderLikeBase(value, typeof baseValue === 'object' && baseValue !== null ? baseValue : {})
+        : value;
+  };
+
+  for (const key of Object.keys(base)) {
+    if (key in obj) place(key);
+  }
+  for (const key of Object.keys(obj)) {
+    if (!(key in ordered)) place(key);
   }
 
-  return sorted;
+  return ordered;
+}
+
+function serialize(translations: TranslationObject, base: TranslationObject): string {
+  return JSON.stringify(orderLikeBase(translations, base), null, 2) + '\n';
 }
 
 function getLanguages(): string[] {
@@ -148,10 +162,8 @@ function loadTranslations(lang: string, namespace: string): TranslationObject | 
   }
 }
 
-function saveTranslations(lang: string, namespace: string, translations: TranslationObject): void {
-  const filePath = path.join(LOCALES_DIR, lang, `${namespace}.json`);
-  const content = JSON.stringify(sortObjectKeys(translations), null, 2) + '\n';
-  fs.writeFileSync(filePath, content, 'utf-8');
+function saveTranslations(lang: string, namespace: string, content: string): void {
+  fs.writeFileSync(path.join(LOCALES_DIR, lang, `${namespace}.json`), content, 'utf-8');
 }
 
 function checkLanguage(targetLang: string, strict: boolean): CheckResult {
@@ -223,6 +235,7 @@ function fixLanguage(targetLang: string, dryRun: boolean): FixResult {
   const result: FixResult = {
     filesCreated: [],
     keysAdded: [],
+    filesReordered: [],
   };
 
   const baseNamespaces = getNamespaceFiles(BASE_LANG);
@@ -269,12 +282,19 @@ function fixLanguage(targetLang: string, dryRun: boolean): FixResult {
       }
     }
 
-    if (
-      targetTranslations &&
-      (isNewFile || result.keysAdded.some((k) => k.file === `${namespace}.json`))
-    ) {
-      if (!dryRun) {
-        saveTranslations(targetLang, namespace, targetTranslations);
+    if (targetTranslations) {
+      const file = `${namespace}.json`;
+      const content = serialize(targetTranslations, baseTranslations);
+      const keysAdded = isNewFile || result.keysAdded.some((k) => k.file === file);
+      const current = isNewFile
+        ? null
+        : fs.readFileSync(path.join(LOCALES_DIR, targetLang, file), 'utf-8');
+
+      if (keysAdded || content !== current) {
+        if (!keysAdded) result.filesReordered.push(file);
+        if (!dryRun) {
+          saveTranslations(targetLang, namespace, content);
+        }
       }
     }
   }
@@ -282,7 +302,7 @@ function fixLanguage(targetLang: string, dryRun: boolean): FixResult {
   return result;
 }
 
-function printResult(lang: string, result: CheckResult): boolean {
+function printResult(result: CheckResult): boolean {
   let hasIssues = false;
 
   if (result.missingFiles.length > 0) {
@@ -317,7 +337,7 @@ function printResult(lang: string, result: CheckResult): boolean {
   return hasIssues;
 }
 
-function printFixResult(lang: string, result: FixResult, dryRun: boolean): void {
+function printFixResult(result: FixResult, dryRun: boolean): void {
   const prefix = dryRun ? '(dry-run) ' : '';
 
   if (result.filesCreated.length > 0) {
@@ -334,7 +354,18 @@ function printFixResult(lang: string, result: FixResult, dryRun: boolean): void 
     }
   }
 
-  if (result.filesCreated.length === 0 && result.keysAdded.length === 0) {
+  if (result.filesReordered.length > 0) {
+    console.log(`\n  ${prefix}Reordered to match ${BASE_LANG}:`);
+    for (const file of result.filesReordered) {
+      console.log(`    ~ ${file}`);
+    }
+  }
+
+  if (
+    result.filesCreated.length === 0 &&
+    result.keysAdded.length === 0 &&
+    result.filesReordered.length === 0
+  ) {
     console.log(`\n  Nothing to fix - all translations complete!`);
   }
 }
@@ -379,19 +410,21 @@ function main() {
       console.log('='.repeat(50));
 
       const result = fixLanguage(lang, dryRun);
-      printFixResult(lang, result, dryRun);
+      printFixResult(result, dryRun);
 
       totalFixed +=
-        result.filesCreated.length + result.keysAdded.reduce((sum, { count }) => sum + count, 0);
+        result.filesCreated.length +
+        result.filesReordered.length +
+        result.keysAdded.reduce((sum, { count }) => sum + count, 0);
     }
 
     console.log(`\n${'='.repeat(50)}`);
     if (totalFixed > 0) {
       if (dryRun) {
-        console.log(`\x1b[33mWould fix ${totalFixed} missing translation(s)\x1b[0m`);
+        console.log(`\x1b[33mWould apply ${totalFixed} fix(es)\x1b[0m`);
         console.log(`Run without --dry-run to apply changes`);
       } else {
-        console.log(`\x1b[32mFixed ${totalFixed} missing translation(s)\x1b[0m`);
+        console.log(`\x1b[32mApplied ${totalFixed} fix(es)\x1b[0m`);
       }
     } else {
       console.log(`\x1b[32mAll translations were already complete!\x1b[0m`);
@@ -420,7 +453,7 @@ function main() {
     console.log('='.repeat(50));
 
     const result = checkLanguage(lang, strict);
-    const hasIssues = printResult(lang, result);
+    const hasIssues = printResult(result);
 
     const missingCount =
       result.missingFiles.length +

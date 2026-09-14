@@ -37,7 +37,7 @@ services:
 
   # Dev-only SMTP sink: point an email destination at 127.0.0.1:1025 (security none) and read the inbox at http://localhost:8025.
   mailpit:
-    image: axllent/mailpit:v1.31.0
+    image: axllent/mailpit:v1.31.1@sha256:98b916bd3c8d61f7633a52d3ea2f58d00620cb01ca57ab59edde68c347a95365
     ports:
       - '127.0.0.1:1025:1025'
       - '127.0.0.1:8025:8025'

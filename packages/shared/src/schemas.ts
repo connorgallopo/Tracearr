@@ -232,6 +232,7 @@ export const updateServerSchema = z
       .optional()
       .nullable(),
     publicUrl: publicUrlSchema.optional(),
+    apiKey: z.string().trim().min(1).optional(),
   })
   .superRefine((data, ctx) => {
     const hasToken = data.token !== undefined;
@@ -266,12 +267,13 @@ export const updateServerSchema = z
       data.username === undefined &&
       data.password === undefined &&
       data.publicUrl === undefined &&
+      data.apiKey === undefined &&
       data.ignoreAnonymousStreams === undefined
     ) {
       ctx.addIssue({
         code: 'custom',
         message:
-          'At least one of name, url, color, publicUrl, token, username, password, or ignoreAnonymousStreams is required',
+          'At least one of name, url, color, publicUrl, apiKey, token, username, password, or ignoreAnonymousStreams is required',
       });
     }
   });
