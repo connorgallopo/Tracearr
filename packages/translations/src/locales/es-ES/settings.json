@@ -73,11 +73,11 @@
     "themeSystem": "Sistema",
     "application": "Aplicación",
     "applicationDesc": "Configurar los ajustes básicos de la aplicación",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Elegir cómo se muestran las distancias y velocidades",
     "sessionSync": "Sincronización de sesión",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Habilitar el seguimiento de sesiones para sus servidores multimedia",
     "syncInterval": "Intervalo de sincronización",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Frecuencia de sondeo para Jellyfin/Emby (5-300 segundos)",
     "syncIntervalSuffix": "seg",
     "plexSseNote": "Plex utiliza Eventos Server-Sent (SSE) para actualizaciones casi instantáneas — no se necesitan encuestas.",
     "jellyfinPollingNote": "Jellyfin/Emby son encuestas en el intervalo de arriba.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "",
-    "description": "",
+    "description": "Accede a Tracearr de forma segura en tu red Tailscale sin necesidad de abrir puertos.",
     "notAvailable": "Binario de Tailscale no encontrado. Esta función solo está disponible con la imagen Docker oficial.",
     "disabledDescription": "Activa Tailscale para añadir Tracearr a tu tailnet privada. Sin necesidad de abrir puertos ni configurar proxy inverso.",
     "hostnameLabel": "Nombre de host del dispositivo",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Trabajos de Mantenimiento",
-    "description": "",
+    "description": "Administre las tareas de fondo que mantienen sus datos precisos y optimizados.",
     "normalization": "Normalización",
     "backfill": "Retroceso",
     "cleanup": "Limpieza",
@@ -348,7 +348,7 @@
     "title": "Control de acceso",
     "description": "Configurar quién puede acceder a Tracearr",
     "allowGuestAccess": "Permitir acceso al invitado",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Cuando está desactivado, sólo el propietario del servidor puede iniciar sesión en Tracearr",
     "singleOwnerNote": "Nota: Cuando el acceso invitado está deshabilitado, sólo el propietario del servidor puede iniciar sesión. Todos los demás usuarios verán un mensaje \"Acceso denegado\"."
   },
   "import": {
