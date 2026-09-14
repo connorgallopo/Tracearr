@@ -252,7 +252,7 @@
       "quietest": "Silenzioso:",
       "bingeHighlights": "",
       "bingeHighlightsDesc": "Mostra con i motivi di visualizzazione più intensivi",
-      "bingeSessions": "",
+      "bingeSessions": "sessioni di binge",
       "noData": "Ancora nessun dato dell'orologio",
       "noDataDesc": "Guarda l'analytics apparirà qui una volta che il contenuto è stato riprodotto. Riprova dopo qualche attività di visualizzazione.",
       "failedToLoad": "Impossibile caricare l'analisi dell'orologio",
@@ -558,7 +558,7 @@
       "clearSelection": "",
       "selectedCount": "",
       "scope": {
-        "label": "",
+        "label": "Scope",
         "global": "",
         "server": "",
         "account": "",
@@ -710,7 +710,7 @@
       "user_attributes": "",
       "device_client": "",
       "network_location": "",
-      "scope": "",
+      "scope": "Scope",
       "media": ""
     },
     "createAutomation": "",
@@ -915,7 +915,7 @@
       "carries": "",
       "copyCode": "",
       "copyJson": "",
-      "authorLabel": "",
+      "authorLabel": "Made by",
       "authorPlaceholder": "",
       "authorHelper": "",
       "save": "",
@@ -1109,7 +1109,7 @@
       "check": "",
       "checking": "",
       "valid": "",
-      "madeBy": "",
+      "madeBy": "Made by {{author}}",
       "codeShort": "",
       "paused": {
         "label": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Ancora nessuna attività",
-    "noActivityDesc": "",
+    "noActivityDesc": "Inizia lo streaming per vedere i tuoi migliori utenti qui",
     "top3": "",
     "runnersUp": "Corridori Su"
   },
