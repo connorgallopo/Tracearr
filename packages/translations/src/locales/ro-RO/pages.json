@@ -200,7 +200,7 @@
       "description": "Utilizare stocare, predicții și optimizare",
       "totalStorage": "Stocare totală",
       "growthRate": "Rata de creştere",
-      "duplicates": "",
+      "duplicates": "Duplicate",
       "groups": "grupuri",
       "recoverable": "recuperabil",
       "staleContent": "Conținut vechi",
@@ -252,7 +252,7 @@
       "quietest": "Liniște:",
       "bingeHighlights": "Evidențieri ale bătăliei",
       "bingeHighlightsDesc": "Arată cu cele mai intensive modele de vizualizare",
-      "bingeSessions": "",
+      "bingeSessions": "sesiuni bursiere",
       "noData": "Nu există date de vizionare",
       "noDataDesc": "Vizionați datele analitice vor apărea aici odată ce conținutul a fost redat. Verificați din nou după o activitate de vizualizare.",
       "failedToLoad": "Încărcarea datelor analitice a eșuat",
@@ -490,7 +490,7 @@
     "bind": {
       "nameHelper": "",
       "namePlaceholder": "",
-      "activeLabel": "",
+      "activeLabel": "Active",
       "back": "",
       "submit": "",
       "submitting": "",
@@ -559,8 +559,8 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
-        "server": "",
+        "global": "Global",
+        "server": "Specific server",
         "account": "",
         "person": "",
         "serverLabel": "",
@@ -676,7 +676,7 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
+        "problems_one": "{{count}} problem",
         "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Nicio activitate încă",
-    "noActivityDesc": "",
+    "noActivityDesc": "Începe streaming-ul pentru a vedea utilizatorii de top aici",
     "top3": "",
     "runnersUp": "Alergători sus"
   },
