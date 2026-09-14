@@ -73,11 +73,11 @@
     "themeSystem": "Система",
     "application": "Приложение",
     "applicationDesc": "Настройка базовых параметров приложения",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Выберите, как отображаются расстояния и скорости",
     "sessionSync": "Синхронизация сессий",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Включить отслеживание сессий для ваших медиа серверов",
     "syncInterval": "Интервал синхронизации",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Частота опроса для Jellyfin/Emby (5-300 секунд)",
     "syncIntervalSuffix": "сек",
     "plexSseNote": "Plex использует Server-Sent Events (SSE) для быстрых обновлений — опрос не требуется.",
     "jellyfinPollingNote": "Jellyfin/Emby опрошены с интервалом выше.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "VPN-чешуя",
-    "description": "",
+    "description": "Безопасный доступ к Tracearr в сети Tailscale без перенаправления портов.",
     "notAvailable": "Бинарный файл Tailscale не найден. Эта функция доступна только при запуске официального образа Docker.",
     "disabledDescription": "Включите Tailscale для того, чтобы Tracearr использовал ваш частный адаптер. Пересылка портов или обратный прокси не требуется.",
     "hostnameLabel": "Имя устройства",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Задания по обслуживанию",
-    "description": "",
+    "description": "Управление фоновыми задачами, которые сохраняют ваши данные точными и оптимизированными.",
     "normalization": "Нормализация",
     "backfill": "Заполнение",
     "cleanup": "Очистить",
@@ -348,7 +348,7 @@
     "title": "Контроль доступа",
     "description": "Настройте кто может получить доступ к Tracearr",
     "allowGuestAccess": "Разрешить гостевой доступ",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Когда отключено, только владелец сервера может войти в Tracearr",
     "singleOwnerNote": "Примечание: Если гостевой доступ отключен, авторизоваться могут только владелец сервера. Все другие пользователи увидят сообщение \"Отказано в доступе\"."
   },
   "import": {
