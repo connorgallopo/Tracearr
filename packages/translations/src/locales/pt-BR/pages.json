@@ -17,7 +17,7 @@
     "usernamePlaceholder": "",
     "emailPlaceholder": "",
     "displayNamePlaceholder": "",
-    "passwordPlaceholder": "",
+    "passwordPlaceholder": "Your password",
     "yourPasswordPlaceholder": "",
     "setupNote": "",
     "localDisabledHint": "",
@@ -252,7 +252,7 @@
       "quietest": "",
       "bingeHighlights": "Destaques do Binge",
       "bingeHighlightsDesc": "Mostra com os padrões de visualização mais intensos",
-      "bingeSessions": "",
+      "bingeSessions": "sessões mais curtas",
       "noData": "Ainda não há dados do relógio",
       "noDataDesc": "O analytics aparecerá aqui uma vez que o conteúdo foi reproduzido. Verifique novamente após alguma atividade de visualização.",
       "failedToLoad": "Falha ao carregar a análise do relógio",
@@ -456,7 +456,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "",
       "emptyDescription": "",
@@ -559,7 +559,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -1298,7 +1298,7 @@
       "after": "",
       "review": "",
       "save": "",
-      "customize": "",
+      "customize": "Customize",
       "customizeTitle": "",
       "customizeConfirm": "",
       "customizeConfirmAction": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Nenhuma atividade ainda",
-    "noActivityDesc": "",
+    "noActivityDesc": "Comece o streaming para ver seus melhores usuários aqui",
     "top3": "",
     "runnersUp": "Runners Acima"
   },
