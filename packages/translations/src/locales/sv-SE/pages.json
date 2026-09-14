@@ -252,7 +252,7 @@
       "quietest": "Tyst:",
       "bingeHighlights": "Binge Höjdpunkter",
       "bingeHighlightsDesc": "Visar med de mest intensiva visningsmönstren",
-      "bingeSessions": "",
+      "bingeSessions": "binge sessioner",
       "noData": "Inga klockdata ännu",
       "noDataDesc": "Titta på analyser visas här när innehållet har spelats. Kom tillbaka efter viss visningsaktivitet.",
       "failedToLoad": "Det gick inte att läsa in analytics",
@@ -559,7 +559,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -676,8 +676,8 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
+        "problems_one": "{{count}} problem",
+        "problems_other": "{{count}} problems",
         "remaining_one": "",
         "remaining_other": "",
         "ready": "",
@@ -883,7 +883,7 @@
       "noRuns": ""
     },
     "disable": "",
-    "editAutomation": "",
+    "editAutomation": "Edit Automation",
     "effects": {
       "title": "",
       "kill": "",
@@ -1144,7 +1144,7 @@
       "builtinMatch": ""
     },
     "kind": {
-      "policy": "",
+      "policy": "Policy",
       "notification": ""
     },
     "kindColumn": "",
@@ -1443,7 +1443,7 @@
         "updates": "",
         "notifications": "",
         "notify": "",
-        "policy": "",
+        "policy": "Policy",
         "control": ""
       },
       "suggested": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet ännu",
-    "noActivityDesc": "",
+    "noActivityDesc": "Börja strömma för att se dina toppanvändare här",
     "top3": "Topp 3",
     "runnersUp": "Löpare upp"
   },
