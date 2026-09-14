@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "在 Jellyfin 仪表盘查找这个看板 → API 密钥",
     "apiKeyHelpEmby": "在 Emby Server -> API 密钥中查找这个内容",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "我的Plex服务器",
     "plexServerUrlPlaceholder": "http://192.168.1/100:32400",
     "updateHint": "或者点击下面的更新，只保存名称更改。",
