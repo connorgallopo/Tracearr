@@ -1,6 +1,6 @@
 {
   "login": {
-    "title": "",
+    "title": "Tracearr",
     "tagline": "Tracearr - 流访问管理",
     "createAccountHeading": "开始创建你的账户",
     "signInHeading": "登录到您的帐户",
@@ -252,7 +252,7 @@
       "quietest": "安静：",
       "bingeHighlights": "Binge 高光",
       "bingeHighlightsDesc": "显示最密集视图模式",
-      "bingeSessions": "",
+      "bingeSessions": "Binge 会话",
       "noData": "尚无观察数据",
       "noDataDesc": "一旦播放了内容后，观察分析将会显示在这里。请在查看某些活动后再查看。",
       "failedToLoad": "加载监视分析失败",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "尚无活动",
-    "noActivityDesc": "",
+    "noActivityDesc": "开始串流以在这里查看您的顶级用户",
     "top3": "顶部3",
     "runnersUp": "向上运行者"
   },
