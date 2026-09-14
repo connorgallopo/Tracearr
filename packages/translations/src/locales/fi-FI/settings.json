@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Etsi tämä sivulta Jellyfin-kojelauta → API-avaimet",
     "apiKeyHelpEmby": "Etsi tämä Emby Server → API Avaimet",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Oma Plex Palvelin",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Tai klikkaa Päivitä alla tallentaaksesi vain nimen muutoksen.",
