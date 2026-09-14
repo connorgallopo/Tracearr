@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "ابحث عن هذا في لوحة تحكم جليفين → مفاتيح API",
     "apiKeyHelpEmby": "العثور على هذا في خادم Emby → API مفاتيح",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "خادم Plex الخاص بي",
     "plexServerUrlPlaceholder": "",
     "updateHint": "أو انقر فوق التحديث أدناه لحفظ تغيير الاسم فقط.",
