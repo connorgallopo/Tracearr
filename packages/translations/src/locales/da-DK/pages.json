@@ -252,7 +252,7 @@
       "quietest": "Rolig:",
       "bingeHighlights": "Binge Markeringer",
       "bingeHighlightsDesc": "Viser med de mest intensive visningsmønstre",
-      "bingeSessions": "",
+      "bingeSessions": "binge sessioner",
       "noData": "Ingen overvågningsdata endnu",
       "noDataDesc": "Se analytics vises her, når indholdet er blevet spillet. Tjek tilbage efter nogle visningsaktiviteter.",
       "failedToLoad": "Kunne ikke indlæse overvågningsanalyse",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Ingen aktivitet endnu",
-    "noActivityDesc": "",
+    "noActivityDesc": "Start streaming for at se dine bedste brugere her",
     "top3": "",
     "runnersUp": "Løbere Op"
   },
