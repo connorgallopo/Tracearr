@@ -252,7 +252,7 @@
       "quietest": "Nejvíce ticho:",
       "bingeHighlights": "Zvýraznění Binge",
       "bingeHighlightsDesc": "Zobrazí s nejintenzivnějším obrazcem",
-      "bingeSessions": "",
+      "bingeSessions": "binge relace",
       "noData": "Zatím žádná sledovaná data",
       "noDataDesc": "Analytika se zobrazí zde, jakmile bude obsah přehrán. Po nějaké aktivitě se vraťte zpět.",
       "failedToLoad": "Nepodařilo se načíst analýzu hodinek",
@@ -506,7 +506,7 @@
       "destinationsLabel": "",
       "required": "",
       "needs": {
-        "title": ""
+        "title": "Fill in"
       },
       "helper": {
         "killMessage": "",
@@ -559,7 +559,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -915,7 +915,7 @@
       "carries": "",
       "copyCode": "",
       "copyJson": "",
-      "authorLabel": "",
+      "authorLabel": "Made by",
       "authorPlaceholder": "",
       "authorHelper": "",
       "save": "",
@@ -1109,7 +1109,7 @@
       "check": "",
       "checking": "",
       "valid": "",
-      "madeBy": "",
+      "madeBy": "Made by {{author}}",
       "codeShort": "",
       "paused": {
         "label": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Zatím žádná aktivita",
-    "noActivityDesc": "",
+    "noActivityDesc": "Začněte streamovat, abyste zde viděli své nejlepší uživatele",
     "top3": "Horní 3",
     "runnersUp": "Runnery nahoru"
   },
