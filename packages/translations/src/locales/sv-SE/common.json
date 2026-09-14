@@ -150,7 +150,7 @@
     "type": "Typ",
     "reason": "Anledning",
     "actions": "Åtgärder",
-    "filters": "",
+    "filters": "Filter",
     "trustScore": "Lita på poäng",
     "lastActivity": "Senaste aktivitet",
     "serverOwner": "Serverns ägare",
