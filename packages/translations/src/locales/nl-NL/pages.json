@@ -252,7 +252,7 @@
       "quietest": "Stiltesten:",
       "bingeHighlights": "Rand accentueringen",
       "bingeHighlightsDesc": "Toont de meest intensieve kijkpatronen",
-      "bingeSessions": "",
+      "bingeSessions": "buik sessies",
       "noData": "Nog geen controlegegevens",
       "noDataDesc": "Horlogeanalytics zullen hier verschijnen zodra de inhoud is afgespeeld. Kom terug na sommige activiteiten te bekijken.",
       "failedToLoad": "Fout bij het laden van horloge analytics",
@@ -456,7 +456,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "Nog geen uitvoeringen",
       "emptyDescription": "",
@@ -558,7 +558,7 @@
       "clearSelection": "Selectie wissen",
       "selectedCount": "{{count}} geselecteerd",
       "scope": {
-        "label": "",
+        "label": "Scope",
         "global": "",
         "server": "",
         "account": "",
@@ -576,7 +576,7 @@
       },
       "conditions": {
         "addGroup": "",
-        "fieldPlaceholder": "",
+        "fieldPlaceholder": "Select field",
         "windowPrefix": "",
         "windowUnit": "uren",
         "uniqueDevices": "Unieke apparaten",
@@ -593,7 +593,7 @@
         "optional": "optioneel",
         "helper": "Controles die eerst moeten worden uitgevoerd. Leeg betekent dat het elke keer wordt uitgevoerd.",
         "emptyLine": "",
-        "all": "",
+        "all": "all of these",
         "any": "",
         "allHint": "",
         "anyHint": "",
@@ -639,7 +639,7 @@
         "emptyDescription": "",
         "emptyAction": "Kies wat het start",
         "add": "",
-        "or": ""
+        "or": "of"
       },
       "heldFor": {
         "prefix": "Een stream is gepauzeerd voor",
@@ -710,13 +710,13 @@
       "user_attributes": "",
       "device_client": "",
       "network_location": "",
-      "scope": "",
+      "scope": "Scope",
       "media": ""
     },
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
+    "deleteAutomation_one": "Delete {{count}} Automation",
     "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
@@ -734,7 +734,7 @@
       "allOf": "alles van:",
       "anyOf": "een van:",
       "joinAll": "en",
-      "joinAny": "",
+      "joinAny": "of",
       "then": "dan {{text}}",
       "otherwise": "Anders",
       "appliesTo": "Van toepassing op {{name}}",
@@ -883,7 +883,7 @@
       "noRuns": "Nog geen uitvoeringen"
     },
     "disable": "Uitschakelen",
-    "editAutomation": "",
+    "editAutomation": "Edit Automation",
     "effects": {
       "title": "",
       "kill": "Kan een stream die speelt stoppen.",
@@ -1144,7 +1144,7 @@
       "builtinMatch": ""
     },
     "kind": {
-      "policy": "",
+      "policy": "Policy",
       "notification": ""
     },
     "kindColumn": "",
@@ -1298,7 +1298,7 @@
       "after": "",
       "review": "",
       "save": "",
-      "customize": "",
+      "customize": "Customize",
       "customizeTitle": "",
       "customizeConfirm": "",
       "customizeConfirmAction": "",
@@ -1433,7 +1433,7 @@
       "gb": "",
       "seconds": ""
     },
-    "updateAutomation": "",
+    "updateAutomation": "Update Automation",
     "catalog": {
       "groups": {
         "sessions": "",
@@ -1443,7 +1443,7 @@
         "updates": "",
         "notifications": "",
         "notify": "",
-        "policy": "",
+        "policy": "Policy",
         "control": ""
       },
       "suggested": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "Optioneel voor openbare onderwerpen",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Nog geen activiteit",
-    "noActivityDesc": "",
+    "noActivityDesc": "Start met streamen om je top gebruikers hier te zien",
     "top3": "",
     "runnersUp": "Runners Omhoog"
   },
