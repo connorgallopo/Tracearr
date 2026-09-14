@@ -332,7 +332,7 @@
     "unsavedChanges": "Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je wilt weggaan?"
   },
   "beta": "bèta",
-  "or": "",
+  "or": "of",
   "serverSelector": {
     "all": "Alle servers",
     "some": "{{count}} van {{total}} servers",
