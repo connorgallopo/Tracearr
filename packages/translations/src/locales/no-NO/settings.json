@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Finn dette i Jellyfin Dashboard → API-nøkler",
     "apiKeyHelpEmby": "Finn denne i Emby Server → API Nøkler",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Min Plex server",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Eller klikk Oppdater nedenfor for å bare lagre navnendring.",
