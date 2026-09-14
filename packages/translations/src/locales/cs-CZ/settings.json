@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Najít to v Jellyfin Dashboard → API klíče",
     "apiKeyHelpEmby": "Najdi to v Emby Server → API klíče",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Můj Plex server",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Nebo klepněte na tlačítko Aktualizovat pro uložení pouze změny názvu.",
