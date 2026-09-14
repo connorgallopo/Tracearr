@@ -252,7 +252,7 @@
       "quietest": "Ruhe:",
       "bingeHighlights": "Scharnier-Highlights",
       "bingeHighlightsDesc": "Zeigt mit den intensivsten Ansichtsmustern",
-      "bingeSessions": "",
+      "bingeSessions": "binge Sitzungen",
       "noData": "Noch keine Beobachtungsdaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Beobachtungsanalyse",
@@ -456,7 +456,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "",
       "emptyDescription": "",
@@ -558,8 +558,8 @@
       "clearSelection": "",
       "selectedCount": "",
       "scope": {
-        "label": "",
-        "global": "",
+        "label": "Scope",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -710,7 +710,7 @@
       "user_attributes": "",
       "device_client": "",
       "network_location": "",
-      "scope": "",
+      "scope": "Scope",
       "media": ""
     },
     "createAutomation": "",
@@ -883,7 +883,7 @@
       "noRuns": ""
     },
     "disable": "",
-    "editAutomation": "",
+    "editAutomation": "Edit Automation",
     "effects": {
       "title": "",
       "kill": "",
@@ -1110,7 +1110,7 @@
       "checking": "",
       "valid": "",
       "madeBy": "",
-      "codeShort": "",
+      "codeShort": "code {{fingerprint}}",
       "paused": {
         "label": "",
         "helper": ""
@@ -1144,11 +1144,11 @@
       "builtinMatch": ""
     },
     "kind": {
-      "policy": "",
+      "policy": "Policy",
       "notification": ""
     },
     "kindColumn": "",
-    "name": "",
+    "name": "Automation Name",
     "newAutomation": "",
     "namePlaceholder": "",
     "nameInvalid": "",
@@ -1433,7 +1433,7 @@
       "gb": "",
       "seconds": ""
     },
-    "updateAutomation": "",
+    "updateAutomation": "Update Automation",
     "catalog": {
       "groups": {
         "sessions": "",
@@ -1443,7 +1443,7 @@
         "updates": "",
         "notifications": "",
         "notify": "",
-        "policy": "",
+        "policy": "Policy",
         "control": ""
       },
       "suggested": "",
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Noch keine Aktivität",
-    "noActivityDesc": "",
+    "noActivityDesc": "Starte Streaming, um deine Top-Nutzer hier zu sehen",
     "top3": "Oben 3",
     "runnersUp": "Läufer oben"
   },
