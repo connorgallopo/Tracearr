@@ -73,11 +73,11 @@
     "themeSystem": "SISTEMA",
     "application": "Solicitação",
     "applicationDesc": "Configurar configurações básicas do aplicativo",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Escolha como as distâncias e velocidades são exibidas",
     "sessionSync": "Sincronização de sessão",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Ativar o rastreamento de sessão para seus servidores de mídia",
     "syncInterval": "Intervalo de sincronização",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Frequência de votação para Jellyfin/Emby (5-300 segundos)",
     "syncIntervalSuffix": "seg.",
     "plexSseNote": "Plex usa eventos enviados pelo servidor (SSE) para atualizações instantâneas — não é necessário fazer consultas.",
     "jellyfinPollingNote": "Jellyfin/Emby são pesquisados no intervalo acima.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "VPN de escala proporcional",
-    "description": "",
+    "description": "Acesse o Tracearr com segurança na sua rede Tailscale sem encaminhamento de porta.",
     "notAvailable": "binário de escala não encontrado. Este recurso só está disponível ao executar a imagem oficial do Docker.",
     "disabledDescription": "Habilite a Escala Caudal para colocar o Tracearr na sua rede personalizada privada. Sem necessidade de encaminhamento de porta ou proxy reverso.",
     "hostnameLabel": "Hostname do dispositivo",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Trabalhos em Manutenção",
-    "description": "",
+    "description": "Gerenciar tarefas em segundo plano que mantêm seus dados precisos e otimizados.",
     "normalization": "Normalização",
     "backfill": "Preenchimento",
     "cleanup": "Limpar",
@@ -348,7 +348,7 @@
     "title": "Controle de Acesso",
     "description": "Configurar quem pode acessar Tracearr",
     "allowGuestAccess": "Permitir Acesso de Visitante",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Quando desativado, somente o proprietário do servidor pode se conectar ao Tracearr",
     "singleOwnerNote": "Nota: Quando o acesso de convidados está desativado, somente o dono do servidor pode fazer o login. Todos os outros usuários verão uma mensagem de \"Acesso negado\""
   },
   "import": {
