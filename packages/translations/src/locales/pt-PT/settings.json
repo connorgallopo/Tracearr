@@ -185,7 +185,6 @@
     "publicUrlHint": "",
     "apiKeyHelpJellyfin": "Encontre isto no Painel de Jellyfin → Chaves API",
     "apiKeyHelpEmby": "Encontre isso no Servidor Emby → Chaves API",
-    "apiKeyKeepCurrent": "",
     "plexServerPlaceholder": "Meu servidor Plex",
     "plexServerUrlPlaceholder": "",
     "updateHint": "Ou clique em Atualizar abaixo para salvar apenas a alteração de nome.",
