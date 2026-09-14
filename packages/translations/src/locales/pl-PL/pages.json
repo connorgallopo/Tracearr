@@ -252,7 +252,7 @@
       "quietest": "Cichy test:",
       "bingeHighlights": "Podkreślenia Binge",
       "bingeHighlightsDesc": "Pokazuje z najbardziej intensywnymi wzorcami oglądania",
-      "bingeSessions": "",
+      "bingeSessions": "sesje binge",
       "noData": "Brak danych zegarka",
       "noDataDesc": "Oglądaj analizy pojawią się tutaj, gdy zawartość zostanie odtworzona. Sprawdź ponownie po aktywności przeglądania.",
       "failedToLoad": "Nie udało się załadować analizy zegarka",
@@ -456,7 +456,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "",
       "emptyDescription": "",
@@ -676,7 +676,7 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
+        "problems_one": "{{count}} problem",
         "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
@@ -915,7 +915,7 @@
       "carries": "",
       "copyCode": "",
       "copyJson": "",
-      "authorLabel": "",
+      "authorLabel": "Made by",
       "authorPlaceholder": "",
       "authorHelper": "",
       "save": "",
@@ -1109,7 +1109,7 @@
       "check": "",
       "checking": "",
       "valid": "",
-      "madeBy": "",
+      "madeBy": "Made by {{author}}",
       "codeShort": "",
       "paused": {
         "label": "",
@@ -1144,7 +1144,7 @@
       "builtinMatch": ""
     },
     "kind": {
-      "policy": "",
+      "policy": "Policy",
       "notification": ""
     },
     "kindColumn": "",
@@ -1443,8 +1443,8 @@
         "updates": "",
         "notifications": "",
         "notify": "",
-        "policy": "",
-        "control": ""
+        "policy": "Policy",
+        "control": "Control flow"
       },
       "suggested": "",
       "triggers": {
@@ -1643,7 +1643,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1655,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -1823,7 +1823,7 @@
   },
   "statsUsers": {
     "noActivity": "Brak aktywności",
-    "noActivityDesc": "",
+    "noActivityDesc": "Rozpocznij przesyłanie strumieniowe, aby zobaczyć tutaj najlepszych użytkowników",
     "top3": "",
     "runnersUp": "Robotnicy w górę"
   },
