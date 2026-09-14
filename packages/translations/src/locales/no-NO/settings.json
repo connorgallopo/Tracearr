@@ -73,11 +73,11 @@
     "themeSystem": "Systemadministrasjon",
     "application": "Applikasjon",
     "applicationDesc": "Konfigurer grunnleggende programinnstillinger",
-    "unitSystemDesc": "",
+    "unitSystemDesc": "Velg hvordan avstander og hastigheter vises",
     "sessionSync": "Synkronisering av økt",
-    "sessionSyncDesc": "",
+    "sessionSyncDesc": "Aktiver øktsporing for medieserver",
     "syncInterval": "Synkroniser intervall",
-    "syncIntervalDesc": "",
+    "syncIntervalDesc": "Poleringsfrekvens for Jellyfin/Emby (5-300 sekunder)",
     "syncIntervalSuffix": "sek",
     "plexSseNote": "Plex bruker Server-Sendte hendelser (SSE) for nær-instante oppdateringer - ingen polling nødvendig.",
     "jellyfinPollingNote": "Jellyfin/Emby er polert i intervallet ovenfor.",
@@ -277,7 +277,7 @@
   },
   "tailscale": {
     "title": "Skala VPN",
-    "description": "",
+    "description": "Tilgang til Tracearr trygt på e-postnettverket ditt uten port videresending.",
     "notAvailable": "Fant ikke denne funksjonen bare tilgjengelig ved kjøring av det offisielle Docker-bildet.",
     "disabledDescription": "Aktiver Skala for å sette Tracearr på ditt private tailnet. Ingen port videresending eller revers-proxy er nødvendig.",
     "hostnameLabel": "Enhetens vertsnavn",
@@ -314,7 +314,7 @@
   },
   "jobs": {
     "title": "Vedlikeholdsjobber",
-    "description": "",
+    "description": "Administrer bakgrunnsoppgaver som holder dataene dine nøyaktig og optimalisert.",
     "normalization": "Normalisering",
     "backfill": "Bakoverfyll",
     "cleanup": "Opprydding",
@@ -348,7 +348,7 @@
     "title": "Kontroll av tilgang",
     "description": "Konfigurer hvem som har tilgang til Tracearr",
     "allowGuestAccess": "Tillat gjestetilgang",
-    "allowGuestAccessDesc": "",
+    "allowGuestAccessDesc": "Når deaktivert, kan kun servereieren logge inn til Tracearr",
     "singleOwnerNote": "Merk: Når gjestetilgang er deaktivert, kan kun servereieren logge på. Alle andre brukere vil se en \"Tilgang nektet\" melding."
   },
   "import": {
