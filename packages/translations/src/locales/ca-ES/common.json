@@ -84,7 +84,9 @@
     "stopped": "Aturat",
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió en directe",
-    "transcode": "Transcodificació"
+    "transcode": "Transcodificació",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Reduïda",
