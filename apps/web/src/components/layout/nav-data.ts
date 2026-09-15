@@ -16,6 +16,7 @@ import {
   Eye,
   LayoutGrid,
   Tags,
+  Inbox,
 } from 'lucide-react';
 import type { NavKey } from '@tracearr/translations';
 
@@ -23,6 +24,7 @@ export interface NavItem {
   nameKey: NavKey;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  requiresSeerr?: true;
 }
 
 export interface NavSection {
@@ -62,6 +64,7 @@ export const navigation: NavSection[] = [
       { nameKey: 'quality', href: '/library/quality', icon: Sparkles },
       { nameKey: 'storage', href: '/library/storage', icon: HardDrive },
       { nameKey: 'watch', href: '/library/watch', icon: Eye },
+      { nameKey: 'requests', href: '/requests', icon: Inbox, requiresSeerr: true },
     ],
   },
   {

@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "date": "2026-08-05",
+  "headline": "Media library, one identity per title, and public API v2",
+  "upgradeWarning": "Back up before upgrading. The database migrates heavily; a 1.5 backup restores cleanly on 2.0",
+  "highlights": [
+    {
+      "title": "Media section",
+      "body": "Browse the whole library as a poster wall with an A to Z rail and filters for library, resolution, HDR, size on disk, and watched. Detail pages list every copy of a title with per-file quality, library, and size, with genre, storage, and watch pages alongside."
+    },
+    {
+      "title": "One identity per title",
+      "body": "The same movie on two servers is one row everywhere: stats, leaderboards, and history. Seasons and music get identities too, and wrongly split titles heal themselves."
+    },
+    {
+      "title": "Every file counted",
+      "body": "Every version of a title is tracked: 4K and 1080p copies, duplicate libraries, mirrored files counted once. Storage totals add up, duplicates catches same-server copies, sessions record which version played, and 1440p and 8K no longer count as SD."
+    },
+    {
+      "title": "Public API v2",
+      "body": "Bearer tokens, rate limits, and OpenAPI docs served in the app, built so tools that use Tautulli can use Tracearr instead."
+    }
+  ],
+  "changes": [
+    { "type": "new", "text": "Plex library changes sync in seconds through server events" },
+    {
+      "type": "new",
+      "text": "the mobile app picks All, one server, or any subset from any tab, and it sticks across restarts"
+    },
+    {
+      "type": "improved",
+      "text": "mobile navigation uses native tabs that stay put on detail screens, and a server sheet replaces the drawer"
+    },
+    { "type": "improved", "text": "mobile controls work with screen readers" },
+    {
+      "type": "improved",
+      "text": "upgrades show migration progress, and a bad migration can't boot-loop the server"
+    },
+    { "type": "improved", "text": "first sync is much faster" },
+    { "type": "fix", "text": "closed a silent gap in sharing detection on polled servers" },
+    { "type": "fix", "text": "stale content and ROI stop double counting merged titles" },
+    { "type": "fix", "text": "servers reached over Tailscale connect again on iOS" },
+    { "type": "fix", "text": "the mobile stream map follows the dark theme on both platforms" },
+    { "type": "note", "text": "counts may shift after upgrade as versions and identities settle" },
+    {
+      "type": "note",
+      "text": "overall trust scores show a person's worst account, and violation totals count again"
+    }
+  ]
+}

@@ -1,23 +1,12 @@
 /**
  * Version Check Queue Tests
  *
- * Tests the version comparison and parsing functions:
- * - parseVersion: Parse semantic version strings with prerelease support
- * - isPrerelease: Detect if a version is a prerelease
- * - getBaseVersion: Get base version without prerelease suffix
- * - compareVersions: Compare two semantic versions
- * - isNewerVersion: Check if one version is newer than another
- * - fetchGitHubReleases: Rate-limit error handling
- * - processVersionCheck: Cooldown guard and rate-limit recovery
+ * Tests findBestUpdateForPrerelease, collectUpgradeWarnings, fetchGitHubReleases
+ * rate-limit handling, and processVersionCheck's cooldown guard.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  parseVersion,
-  isPrerelease,
-  getBaseVersion,
-  compareVersions,
-  isNewerVersion,
   findBestUpdateForPrerelease,
   fetchGitHubReleases,
   GitHubRateLimitError,
@@ -27,6 +16,7 @@ import {
   processVersionCheck,
   initVersionCheckQueue,
   scheduleVersionChecks,
+  collectUpgradeWarnings,
   type GitHubRelease,
 } from '../versionCheckQueue.js';
 
@@ -73,279 +63,6 @@ vi.mock('../../utils/buildInfo.js', () => ({
   getCurrentCommit: vi.fn(),
   getBuildDate: vi.fn(),
 }));
-
-describe('parseVersion', () => {
-  describe('stable versions', () => {
-    it('should parse simple version', () => {
-      const v = parseVersion('1.3.9');
-      expect(v.major).toBe(1);
-      expect(v.minor).toBe(3);
-      expect(v.patch).toBe(9);
-      expect(v.isPrerelease).toBe(false);
-      expect(v.prerelease).toBeNull();
-      expect(v.prereleaseNum).toBeNull();
-    });
-
-    it('should parse version with v prefix', () => {
-      const v = parseVersion('v1.3.9');
-      expect(v.major).toBe(1);
-      expect(v.minor).toBe(3);
-      expect(v.patch).toBe(9);
-      expect(v.isPrerelease).toBe(false);
-    });
-
-    it('should parse version with zeros', () => {
-      const v = parseVersion('0.0.1');
-      expect(v.major).toBe(0);
-      expect(v.minor).toBe(0);
-      expect(v.patch).toBe(1);
-    });
-  });
-
-  describe('prerelease versions', () => {
-    it('should parse beta version with number', () => {
-      const v = parseVersion('1.3.9-beta.3');
-      expect(v.major).toBe(1);
-      expect(v.minor).toBe(3);
-      expect(v.patch).toBe(9);
-      expect(v.isPrerelease).toBe(true);
-      expect(v.prerelease).toBe('beta');
-      expect(v.prereleaseNum).toBe(3);
-    });
-
-    it('should parse alpha version', () => {
-      const v = parseVersion('v2.0.0-alpha.1');
-      expect(v.major).toBe(2);
-      expect(v.minor).toBe(0);
-      expect(v.patch).toBe(0);
-      expect(v.isPrerelease).toBe(true);
-      expect(v.prerelease).toBe('alpha');
-      expect(v.prereleaseNum).toBe(1);
-    });
-
-    it('should parse rc version', () => {
-      const v = parseVersion('1.4.0-rc.2');
-      expect(v.major).toBe(1);
-      expect(v.minor).toBe(4);
-      expect(v.patch).toBe(0);
-      expect(v.isPrerelease).toBe(true);
-      expect(v.prerelease).toBe('rc');
-      expect(v.prereleaseNum).toBe(2);
-    });
-
-    it('should handle double-digit prerelease numbers', () => {
-      const v = parseVersion('1.3.9-beta.10');
-      expect(v.prereleaseNum).toBe(10);
-    });
-  });
-
-  describe('malformed versions', () => {
-    it('should return zeros for empty string', () => {
-      const v = parseVersion('');
-      expect(v.major).toBe(0);
-      expect(v.minor).toBe(0);
-      expect(v.patch).toBe(0);
-    });
-
-    it('should return zeros for invalid format', () => {
-      const v = parseVersion('not-a-version');
-      expect(v.major).toBe(0);
-      expect(v.minor).toBe(0);
-      expect(v.patch).toBe(0);
-    });
-  });
-});
-
-describe('isPrerelease', () => {
-  it('should return false for stable versions', () => {
-    expect(isPrerelease('1.3.9')).toBe(false);
-    expect(isPrerelease('v1.3.9')).toBe(false);
-    expect(isPrerelease('0.0.1')).toBe(false);
-  });
-
-  it('should return true for beta versions', () => {
-    expect(isPrerelease('1.3.9-beta.1')).toBe(true);
-    expect(isPrerelease('v1.4.0-beta.3')).toBe(true);
-  });
-
-  it('should return true for alpha versions', () => {
-    expect(isPrerelease('2.0.0-alpha.1')).toBe(true);
-  });
-
-  it('should return true for rc versions', () => {
-    expect(isPrerelease('1.4.0-rc.1')).toBe(true);
-  });
-
-  it('should return true for other prerelease types', () => {
-    expect(isPrerelease('1.0.0-dev.1')).toBe(true);
-    expect(isPrerelease('1.0.0-canary.5')).toBe(true);
-    expect(isPrerelease('1.0.0-next.2')).toBe(true);
-  });
-});
-
-describe('getBaseVersion', () => {
-  it('should return same version for stable', () => {
-    expect(getBaseVersion('1.3.9')).toBe('1.3.9');
-    expect(getBaseVersion('v1.3.9')).toBe('1.3.9');
-  });
-
-  it('should strip prerelease suffix', () => {
-    expect(getBaseVersion('1.3.9-beta.3')).toBe('1.3.9');
-    expect(getBaseVersion('v1.4.0-beta.10')).toBe('1.4.0');
-    expect(getBaseVersion('2.0.0-alpha.1')).toBe('2.0.0');
-  });
-});
-
-describe('compareVersions', () => {
-  describe('stable version comparisons', () => {
-    it('should return 0 for equal versions', () => {
-      expect(compareVersions('1.3.9', '1.3.9')).toBe(0);
-      expect(compareVersions('v1.3.9', '1.3.9')).toBe(0);
-    });
-
-    it('should compare major versions', () => {
-      expect(compareVersions('2.0.0', '1.0.0')).toBe(1);
-      expect(compareVersions('1.0.0', '2.0.0')).toBe(-1);
-    });
-
-    it('should compare minor versions', () => {
-      expect(compareVersions('1.4.0', '1.3.0')).toBe(1);
-      expect(compareVersions('1.3.0', '1.4.0')).toBe(-1);
-    });
-
-    it('should compare patch versions', () => {
-      expect(compareVersions('1.3.10', '1.3.9')).toBe(1);
-      expect(compareVersions('1.3.9', '1.3.10')).toBe(-1);
-    });
-  });
-
-  describe('prerelease vs stable', () => {
-    it('should rank stable higher than prerelease of same base', () => {
-      // 1.3.9 (stable) > 1.3.9-beta.99
-      expect(compareVersions('1.3.9', '1.3.9-beta.99')).toBe(1);
-      expect(compareVersions('1.3.9-beta.99', '1.3.9')).toBe(-1);
-    });
-
-    it('should rank higher base version prerelease over lower stable', () => {
-      // 1.4.0-beta.1 > 1.3.9 (higher major.minor)
-      expect(compareVersions('1.4.0-beta.1', '1.3.9')).toBe(1);
-      expect(compareVersions('1.3.9', '1.4.0-beta.1')).toBe(-1);
-    });
-  });
-
-  describe('prerelease comparisons', () => {
-    it('should compare same prerelease type by number', () => {
-      expect(compareVersions('1.3.9-beta.2', '1.3.9-beta.1')).toBe(1);
-      expect(compareVersions('1.3.9-beta.1', '1.3.9-beta.2')).toBe(-1);
-      expect(compareVersions('1.3.9-beta.10', '1.3.9-beta.9')).toBe(1);
-    });
-
-    it('should compare different prerelease types', () => {
-      // alpha < beta < rc
-      expect(compareVersions('1.3.9-beta.1', '1.3.9-alpha.1')).toBe(1);
-      expect(compareVersions('1.3.9-rc.1', '1.3.9-beta.1')).toBe(1);
-      expect(compareVersions('1.3.9-alpha.1', '1.3.9-beta.1')).toBe(-1);
-    });
-
-    it('should return 0 for equal prereleases', () => {
-      expect(compareVersions('1.3.9-beta.3', '1.3.9-beta.3')).toBe(0);
-    });
-  });
-});
-
-describe('isNewerVersion', () => {
-  describe('stable to stable', () => {
-    it('should detect newer major version', () => {
-      expect(isNewerVersion('2.0.0', '1.9.9')).toBe(true);
-      expect(isNewerVersion('1.9.9', '2.0.0')).toBe(false);
-    });
-
-    it('should detect newer minor version', () => {
-      expect(isNewerVersion('1.4.0', '1.3.9')).toBe(true);
-      expect(isNewerVersion('1.3.9', '1.4.0')).toBe(false);
-    });
-
-    it('should detect newer patch version', () => {
-      expect(isNewerVersion('1.3.10', '1.3.9')).toBe(true);
-      expect(isNewerVersion('1.3.9', '1.3.10')).toBe(false);
-    });
-
-    it('should return false for same version', () => {
-      expect(isNewerVersion('1.3.9', '1.3.9')).toBe(false);
-    });
-  });
-
-  describe('beta to beta', () => {
-    it('should detect newer beta of same base', () => {
-      expect(isNewerVersion('1.3.9-beta.2', '1.3.9-beta.1')).toBe(true);
-      expect(isNewerVersion('1.3.9-beta.1', '1.3.9-beta.2')).toBe(false);
-    });
-
-    it('should handle double-digit beta numbers', () => {
-      expect(isNewerVersion('1.3.9-beta.10', '1.3.9-beta.9')).toBe(true);
-      expect(isNewerVersion('1.3.9-beta.9', '1.3.9-beta.10')).toBe(false);
-    });
-
-    it('should return false for same beta', () => {
-      expect(isNewerVersion('1.3.9-beta.3', '1.3.9-beta.3')).toBe(false);
-    });
-  });
-
-  describe('beta to stable transitions', () => {
-    it('should detect stable release of same base as newer', () => {
-      // User on 1.3.9-beta.4, stable 1.3.9 released
-      expect(isNewerVersion('1.3.9', '1.3.9-beta.4')).toBe(true);
-      expect(isNewerVersion('1.3.9', '1.3.9-beta.99')).toBe(true);
-    });
-
-    it('should not consider beta newer than same stable', () => {
-      expect(isNewerVersion('1.3.9-beta.4', '1.3.9')).toBe(false);
-    });
-  });
-
-  describe('cross-version comparisons', () => {
-    it('should detect higher version beta as newer than lower stable', () => {
-      // User on 1.3.9 stable, 1.4.0-beta.1 released (but they are on stable channel)
-      // This would only show if they explicitly opt into beta
-      expect(isNewerVersion('1.4.0-beta.1', '1.3.9')).toBe(true);
-    });
-
-    it('should not show lower stable as update to higher beta', () => {
-      // User on 1.4.0-beta.3, latest stable is 1.3.9
-      // Should NOT show 1.3.9 as an update (they are already ahead)
-      expect(isNewerVersion('1.3.9', '1.4.0-beta.3')).toBe(false);
-    });
-
-    it('should show same-line stable as update to beta', () => {
-      // User on 1.4.0-beta.3, stable 1.4.0 released
-      expect(isNewerVersion('1.4.0', '1.4.0-beta.3')).toBe(true);
-    });
-  });
-
-  describe('real-world scenarios', () => {
-    it('scenario: beta.1 user sees beta.2', () => {
-      expect(isNewerVersion('v1.3.9-beta.2', 'v1.3.9-beta.1')).toBe(true);
-    });
-
-    it('scenario: beta.4 user sees stable 1.3.9', () => {
-      expect(isNewerVersion('v1.3.9', 'v1.3.9-beta.4')).toBe(true);
-    });
-
-    it('scenario: 1.4.0-beta.3 user sees 1.4.0 stable', () => {
-      expect(isNewerVersion('v1.4.0', 'v1.4.0-beta.3')).toBe(true);
-    });
-
-    it('scenario: 1.4.0-beta.3 user sees 1.4.0-beta.4', () => {
-      expect(isNewerVersion('v1.4.0-beta.4', 'v1.4.0-beta.3')).toBe(true);
-    });
-
-    it('scenario: stable 1.3.9 user does not see 1.4.0-beta.1 (stable channel)', () => {
-      // This is handled by the fetch logic, not version comparison
-      // But if compared directly, beta IS newer
-      expect(isNewerVersion('v1.4.0-beta.1', 'v1.3.9')).toBe(true);
-    });
-  });
-});
 
 // Helper to create mock GitHub releases
 function mockRelease(tag: string, prerelease: boolean, draft = false): GitHubRelease {
@@ -572,7 +289,11 @@ function makeJob(force?: boolean) {
 
 describe('processVersionCheck', () => {
   beforeEach(() => {
-    mockFetch.mockReset();
+    mockFetch.mockReset().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockResolvedValue([]),
+    });
     sharedRedis.exists.mockReset();
     sharedRedis.set.mockReset().mockResolvedValue('OK');
     mockDispatchTracearrUpdate.mockClear();
@@ -604,7 +325,7 @@ describe('processVersionCheck', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: vi.fn().mockResolvedValue([mockRelease('v1.5.0-r1', true)]),
+      json: vi.fn().mockResolvedValue([mockRelease('v1.4.0-r1', true)]),
     });
     await processVersionCheck(makeJob(true));
     expect(mockFetch).toHaveBeenCalledTimes(2);
@@ -701,6 +422,50 @@ describe('processVersionCheck', () => {
     });
   });
 
+  it('limits fork upgrade warnings to its upstream base when upstream is ahead', async () => {
+    sharedRedis.exists.mockResolvedValue(0);
+    const releases = ['1.5.0', '1.6.0'].map((version) => ({
+      ...mockRelease(`v${version}`, false),
+      assets: [
+        { name: 'release-notes.json', browser_download_url: `https://example.test/${version}` },
+      ],
+    }));
+    mockFetch.mockImplementation(async (url: string) => ({
+      ok: true,
+      status: 200,
+      json: async () => {
+        if (url.includes('d4rk-4lchemy')) return [mockRelease('v1.5.0-r2', true)];
+        if (url.endsWith('/releases/latest')) return releases[1];
+        if (url.includes('/releases?')) return releases;
+        const version = url.split('/').at(-1);
+        return {
+          version,
+          date: '2026-01-01',
+          headline: 'Release',
+          upgradeWarning: `Warning ${version}`,
+          changes: [{ type: 'fix', text: 'Fix' }],
+        };
+      },
+    }));
+
+    await processVersionCheck(makeJob(false));
+
+    const cached = (source: string) => {
+      const write = sharedRedis.set.mock.calls.find(([key]) =>
+        String(key).endsWith(`version:latest:${source}`)
+      );
+      return JSON.parse(String(write?.[1]));
+    };
+    expect(cached('fork').upgradeWarnings).toEqual([{ version: '1.5.0', text: 'Warning 1.5.0' }]);
+    expect(cached('upstream').upgradeWarnings).toEqual([
+      { version: '1.6.0', text: 'Warning 1.6.0' },
+      { version: '1.5.0', text: 'Warning 1.5.0' },
+    ]);
+    expect(mockDispatchTracearrUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ latest: '1.5.0-r2' })
+    );
+  });
+
   it('dispatches nothing when the release is not newer', async () => {
     sharedRedis.exists.mockResolvedValue(0);
     mockFetch.mockResolvedValue({
@@ -741,5 +506,119 @@ describe('scheduleVersionChecks', () => {
     await scheduleVersionChecks();
 
     expect(queue.removeJobScheduler).toHaveBeenCalledWith('version-check-repeatable');
+  });
+});
+
+describe('collectUpgradeWarnings', () => {
+  const release = (tag: string, withAsset: boolean, prerelease = false): GitHubRelease => ({
+    tag_name: tag,
+    html_url: `https://github.com/test/releases/tag/${tag}`,
+    published_at: '2026-01-01T00:00:00Z',
+    name: tag,
+    body: null,
+    prerelease,
+    draft: false,
+    assets: withAsset
+      ? [
+          {
+            name: 'release-notes.json',
+            browser_download_url: `https://example.test/${tag}/release-notes.json`,
+          },
+        ]
+      : [],
+  });
+
+  const notes = (version: string, upgradeWarning?: string) => ({
+    ok: true,
+    status: 200,
+    json: vi.fn().mockResolvedValue({
+      version,
+      date: '2026-01-01',
+      ...(version.endsWith('.0') && !version.includes('-') ? { headline: 'Headline' } : {}),
+      ...(upgradeWarning ? { upgradeWarning } : {}),
+      changes: [{ type: 'fix', text: 'a fix' }],
+    }),
+  });
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it('collects warnings between current and target, newest first', async () => {
+    mockFetch.mockImplementation((url: string) =>
+      Promise.resolve(
+        url.includes('/v2.3.0/')
+          ? notes('2.3.0', 'back up first')
+          : notes('2.2.0', 'update the plugin')
+      )
+    );
+
+    const warnings = await collectUpgradeWarnings('2.1.0', '2.3.0', [
+      release('v2.1.0', true),
+      release('v2.2.0', true),
+      release('v2.3.0', true),
+      release('v2.4.0', true),
+    ]);
+
+    expect(warnings).toEqual([
+      { version: '2.3.0', text: 'back up first' },
+      { version: '2.2.0', text: 'update the plugin' },
+    ]);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('skips releases without the asset and prereleases when the target is stable', async () => {
+    mockFetch.mockResolvedValue(notes('2.3.0', 'back up first'));
+
+    const warnings = await collectUpgradeWarnings('2.2.3', '2.3.0', [
+      release('v2.3.0-beta.1', true, true),
+      release('v2.2.4', false),
+      release('v2.3.0', true),
+    ]);
+
+    expect(warnings).toEqual([{ version: '2.3.0', text: 'back up first' }]);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps going when one download fails', async () => {
+    mockFetch
+      .mockRejectedValueOnce(new Error('socket hang up'))
+      .mockResolvedValueOnce(notes('2.2.0', 'update the plugin'));
+
+    const warnings = await collectUpgradeWarnings('2.1.0', '2.3.0', [
+      release('v2.3.0', true),
+      release('v2.2.0', true),
+    ]);
+
+    expect(warnings).toEqual([{ version: '2.2.0', text: 'update the plugin' }]);
+  });
+
+  it('fetches a shared beta asset once and skips older betas with the same base version', async () => {
+    mockFetch.mockResolvedValue(notes('2.3.0', 'back up first'));
+
+    const warnings = await collectUpgradeWarnings('2.2.3', '2.3.0-beta.6', [
+      release('v2.3.0-beta.6', true, true),
+      release('v2.3.0-beta.5', true, true),
+      release('v2.3.0-beta.4', true, true),
+    ]);
+
+    expect(warnings).toEqual([{ version: '2.3.0', text: 'back up first' }]);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps checking older betas of the same base version until a warning is found', async () => {
+    mockFetch
+      .mockResolvedValueOnce(notes('2.3.0'))
+      .mockResolvedValueOnce(notes('2.3.0', 'back up first'))
+      .mockResolvedValueOnce(notes('2.3.0', 'older text'));
+
+    const warnings = await collectUpgradeWarnings('2.2.3', '2.3.0-beta.6', [
+      release('v2.3.0-beta.6', true, true),
+      release('v2.3.0-beta.5', true, true),
+      release('v2.3.0-beta.4', true, true),
+    ]);
+
+    expect(warnings).toEqual([{ version: '2.3.0', text: 'back up first' }]);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 });

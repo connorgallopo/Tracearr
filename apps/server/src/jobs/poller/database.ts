@@ -18,6 +18,7 @@ import {
   sessions,
   automations,
   servers,
+  serverUserExternalAliases,
   serverUsers,
   terminationLogs,
   libraryItems,
@@ -298,7 +299,22 @@ export async function getServerUserIdByExternalId(
     .where(and(eq(serverUsers.serverId, serverId), eq(serverUsers.externalId, externalId)))
     .limit(1);
 
-  return rows[0]?.id ?? null;
+  if (rows[0]) return rows[0].id;
+
+  // A folded external id still belongs to the surviving account, so the
+  // caller's foreign-row check must not treat its events as a stranger's.
+  const aliased = await db
+    .select({ id: serverUserExternalAliases.serverUserId })
+    .from(serverUserExternalAliases)
+    .where(
+      and(
+        eq(serverUserExternalAliases.serverId, serverId),
+        eq(serverUserExternalAliases.externalId, externalId)
+      )
+    )
+    .limit(1);
+
+  return aliased[0]?.id ?? null;
 }
 
 /**

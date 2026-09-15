@@ -149,6 +149,11 @@ vi.mock('../../services/automations/events/dispatcher.js', () => ({
   dispatch: (...args: unknown[]) => mockDispatch(...args),
   subscribe: vi.fn(),
 }));
+const mockDispatchSessionFirstSeen = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+vi.mock('../../services/automations/events/producers.js', () => ({
+  dispatchServerHealthById: vi.fn(),
+  dispatchSessionFirstSeen: mockDispatchSessionFirstSeen,
+}));
 vi.mock('../../services/automations/events/contextAssembly.js', () => ({
   loadEvaluationContext: vi.fn().mockResolvedValue(null),
   assembleEvaluationInputs: vi.fn().mockResolvedValue({
@@ -248,6 +253,8 @@ describe('SSE Processor - Concurrent Session Creation', () => {
     expect(setPendingSessionSpy).toHaveBeenCalledTimes(1);
 
     expect(mockEnqueueNotification).not.toHaveBeenCalled();
+    // Only the lock winner announces first sight; the loser must not double-fire.
+    expect(mockDispatchSessionFirstSeen).toHaveBeenCalledTimes(1);
 
     const pendingKeys = await cacheService.getAllPendingSessionKeys();
     expect(pendingKeys).toHaveLength(1);

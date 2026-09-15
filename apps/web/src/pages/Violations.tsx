@@ -672,7 +672,7 @@ export function Violations() {
               )}
 
               <DataTableRoot density="default">
-                <DataTableViewport>
+                <DataTableViewport flush>
                   <DataTableHeader table={table} />
                   <DataTableBody
                     table={table}
@@ -706,6 +706,7 @@ export function Violations() {
                   />
                 </DataTableViewport>
                 <DataTablePager
+                  variant="footer"
                   {...pager}
                   labels={{
                     navigation: t('common:table.pagination'),
@@ -715,6 +716,7 @@ export function Violations() {
                     }),
                     previous: t('common:actions.previous'),
                     next: t('common:actions.next'),
+                    goToPage: t('common:table.goToPage'),
                   }}
                 />
               </DataTableRoot>

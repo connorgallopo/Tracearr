@@ -33,6 +33,7 @@ const destination: Destination = {
   config: { webhookUrl: null },
   secretsSet: ['webhookUrl'],
   referencedByAutomationCount: 0,
+  referencedByNewsletterCount: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -179,7 +180,7 @@ describe('AutomationBuilder', () => {
     const user = userEvent.setup();
     renderBuilder();
 
-    await addTrigger(user, /play is pressed/);
+    await addTrigger(user, /Playback confirmed/);
 
     expect(await screen.findByRole('button', { name: /When a stream starts/ })).toBeInTheDocument();
   });
@@ -190,7 +191,7 @@ describe('AutomationBuilder', () => {
 
     expect(screen.getByText('2 left to finish')).toBeInTheDocument();
 
-    await addTrigger(user, /play is pressed/);
+    await addTrigger(user, /Playback confirmed/);
     await user.type(screen.getByLabelText('Name'), 'Nightly sweep');
 
     await waitFor(() => expect(screen.getByText('Ready to save')).toBeInTheDocument());
@@ -214,7 +215,7 @@ describe('AutomationBuilder', () => {
     const user = userEvent.setup();
     renderBuilder();
 
-    await addTrigger(user, /play is pressed/);
+    await addTrigger(user, /Playback confirmed/);
     await user.type(screen.getByLabelText('Name'), 'Nightly sweep');
     await user.click(screen.getByRole('radio', { name: 'One account' }));
 
@@ -392,7 +393,7 @@ describe('AutomationBuilder', () => {
     const user = userEvent.setup();
     renderBuilder();
 
-    await addTrigger(user, /play is pressed/);
+    await addTrigger(user, /Playback confirmed/);
     await user.type(screen.getByLabelText('Name'), 'Nightly sweep');
     await user.click(screen.getByRole('button', { name: 'Create automation' }));
 

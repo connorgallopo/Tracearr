@@ -1,6 +1,5 @@
 import type {
   Server,
-  User,
   UserRole,
   ServerUserWithIdentity,
   ServerUserDetail,
@@ -46,8 +45,35 @@ import type {
   ReauthorizePlexAccountResponse,
   Destination,
   DestinationKind,
+  DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
+  RequestService,
+  RequestsAnalyticsResponse,
+  RequestersQuery,
+  RequestersResponse,
+  RequestsStatus,
+  RequestsUnplayedQuery,
+  RequestsUnplayedResponse,
+  RequestServiceProbeResult,
+  MediaRequestEntry,
+  UserRequestsResponse,
+  TestRequestServiceInput,
+  CreateRequestServiceInput,
+  UpdateRequestServiceInput,
+  Newsletter,
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+  NewsletterPreview,
+  NewsletterPreviewDraftInput,
+  NewsletterRecipientsDraftInput,
+  NewsletterRecipientsView,
+  NewsletterVariantsView,
+  NewsletterSendsPage,
+  NewsletterSendDetail,
+  NewsletterSendHtml,
+  EmailBrandingSettings,
+  EmailSuppression,
   HistorySessionResponse,
   HistoryFilterOptions,
   AutomationFilterOptions,
@@ -55,6 +81,7 @@ import type {
   HistoryAggregatesQueryInput,
   HistoryAggregates,
   VersionInfo,
+  WhatsNewState,
   EngagementStats,
   ShowStatsResponse,
   SetupStatus,
@@ -93,6 +120,7 @@ import type {
   // Cross-server user merging types
   UserMergeResult,
   MergeSuggestion,
+  DismissedMergeSuggestion,
   ServerUserSplitResult,
   UserSortField,
   UserRosterFilters,
@@ -631,23 +659,25 @@ class ApiClient {
       }),
 
     // Jellyfin server connection with API key (requires auth)
-    connectJellyfinWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
-      this.request<{
-        accessToken: string;
-        refreshToken: string;
-        user: User;
-      }>('/auth/jellyfin/connect-api-key', {
+    connectJellyfinWithApiKey: (data: {
+      serverUrl: string;
+      serverName: string;
+      apiKey: string;
+      publicUrl?: string;
+    }) =>
+      this.request<{ serverId: string }>('/auth/jellyfin/connect-api-key', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     // Emby server connection with API key (requires auth)
-    connectEmbyWithApiKey: (data: { serverUrl: string; serverName: string; apiKey: string }) =>
-      this.request<{
-        accessToken: string;
-        refreshToken: string;
-        user: User;
-      }>('/auth/emby/connect-api-key', {
+    connectEmbyWithApiKey: (data: {
+      serverUrl: string;
+      serverName: string;
+      apiKey: string;
+      publicUrl?: string;
+    }) =>
+      this.request<{ serverId: string }>('/auth/emby/connect-api-key', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -667,6 +697,7 @@ class ApiClient {
       username?: string;
       password?: string;
       ignoreAnonymousStreams?: boolean;
+      publicUrl?: string;
     }) => this.request<Server>('/servers', { method: 'POST', body: JSON.stringify(data) }),
     update: (
       id: string,
@@ -678,7 +709,9 @@ class ApiClient {
         username?: string;
         password?: string;
         ignoreAnonymousStreams?: boolean;
+        publicUrl?: string | null;
         color?: string | null;
+        apiKey?: string;
       }
     ) =>
       this.request<Server>(`/servers/${id}`, {
@@ -759,11 +792,11 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify(data),
       }),
-    updateIdentity: (id: string, data: { name: string | null }) =>
-      this.request<{ success: boolean; name: string | null }>(`/users/${id}/identity`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      }),
+    updateIdentity: (id: string, data: { name?: string | null; contactEmail?: string | null }) =>
+      this.request<{ success: boolean; name: string | null; contactEmail: string | null }>(
+        `/users/${id}/identity`,
+        { method: 'PATCH', body: JSON.stringify(data) }
+      ),
     sessions: (id: string, params?: { page?: number; pageSize?: number; scope?: 'identity' }) => {
       const query = new URLSearchParams(params as Record<string, string>).toString();
       return this.request<PaginatedResponse<Session>>(`/users/${id}/sessions?${query}`);
@@ -815,6 +848,28 @@ class ApiClient {
     mergeSuggestions: async () => {
       const response = await this.request<{ data: MergeSuggestion[] }>('/users/merge-suggestions');
       return response.data;
+    },
+    dismissedMergeSuggestions: async () => {
+      const response = await this.request<{ data: DismissedMergeSuggestion[] }>(
+        '/users/merge-suggestions/dismissed'
+      );
+      return response.data;
+    },
+    dismissMergeSuggestion: (userIds: [string, string]) =>
+      this.request<void>('/users/merge-suggestions/dismissals', {
+        method: 'POST',
+        body: JSON.stringify({ userIds }),
+      }),
+    restoreMergeSuggestion: (userA: string, userB: string) =>
+      this.request<void>(`/users/merge-suggestions/dismissals/${userA}/${userB}`, {
+        method: 'DELETE',
+      }),
+    requests: (id: string, opts: { scope?: 'identity'; page: number; pageSize: number }) => {
+      const searchParams = new URLSearchParams();
+      if (opts.scope) searchParams.set('scope', opts.scope);
+      searchParams.set('page', String(opts.page));
+      searchParams.set('pageSize', String(opts.pageSize));
+      return this.request<UserRequestsResponse>(`/users/${id}/requests?${searchParams.toString()}`);
     },
   };
 
@@ -1732,6 +1787,17 @@ class ApiClient {
           `/library/media/${id}/watchers?${searchParams.toString()}`
         );
       },
+      requests: (id: string, serverIds?: string[]) => {
+        const searchParams = new URLSearchParams();
+        if (serverIds?.length) {
+          for (const serverId of serverIds) {
+            searchParams.append('serverIds', serverId);
+          }
+        }
+        return this.request<{ data: MediaRequestEntry[] }>(
+          `/library/media/${id}/requests?${searchParams.toString()}`
+        );
+      },
       history: (id: string, cursor?: string, pageSize?: number, serverIds?: string[]) => {
         const searchParams = new URLSearchParams();
         if (cursor) searchParams.set('cursor', cursor);
@@ -1785,6 +1851,11 @@ class ApiClient {
     getImageCache: () => this.request<ImageCacheStatus>('/settings/image-cache'),
   };
 
+  map = {
+    getBasemapStatus: () =>
+      this.request<{ installed: boolean; path: string }>('/map/basemap/status'),
+  };
+
   // Notification destinations
   destinations = {
     list: () => this.request<Destination[]>('/destinations'),
@@ -1797,13 +1868,121 @@ class ApiClient {
       }),
     remove: (id: string) => this.request<void>(`/destinations/${id}`, { method: 'DELETE' }),
     test: (id: string) =>
-      this.request<{ success: boolean; error?: string }>(`/destinations/${id}/test`, {
-        method: 'POST',
-      }),
+      this.request<DestinationTestResult>(`/destinations/${id}/test`, { method: 'POST' }),
     testUnsaved: (data: { type: DestinationKind; config: Record<string, unknown> }) =>
-      this.request<{ success: boolean; error?: string }>('/destinations/test', {
+      this.request<DestinationTestResult>('/destinations/test', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+  };
+
+  requestServices = {
+    list: () => this.request<RequestService[]>('/request-services'),
+    test: (data: TestRequestServiceInput) =>
+      this.request<RequestServiceProbeResult>('/request-services/test', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    create: (data: CreateRequestServiceInput) =>
+      this.request<RequestService>('/request-services', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: UpdateRequestServiceInput) =>
+      this.request<RequestService>(`/request-services/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: string) => this.request<void>(`/request-services/${id}`, { method: 'DELETE' }),
+    sync: (id: string) =>
+      this.request<{ jobId: string }>(`/request-services/${id}/sync`, { method: 'POST' }),
+  };
+
+  requests = {
+    status: () => this.request<RequestsStatus>('/requests/status'),
+    analytics: (serverIds?: string[]) => {
+      const query = listSearchParams({ serverIds });
+      return this.request<RequestsAnalyticsResponse>(
+        `/requests/analytics${query ? `?${query}` : ''}`
+      );
+    },
+    unplayed: (params: Partial<RequestsUnplayedQuery> & { serverIds?: string[] }) => {
+      const query = listSearchParams(params);
+      return this.request<RequestsUnplayedResponse>(
+        `/requests/unplayed${query ? `?${query}` : ''}`
+      );
+    },
+    requesters: (params: Partial<RequestersQuery> & { serverIds?: string[] }) => {
+      const query = listSearchParams(params);
+      return this.request<RequestersResponse>(`/requests/requesters${query ? `?${query}` : ''}`);
+    },
+  };
+
+  // Newsletters
+  newsletters = {
+    list: () => this.request<Newsletter[]>('/newsletters'),
+    get: (id: string) => this.request<Newsletter>(`/newsletters/${id}`),
+    create: (data: CreateNewsletterInput) =>
+      this.request<Newsletter>('/newsletters', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: UpdateNewsletterInput) =>
+      this.request<Newsletter>(`/newsletters/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: string) => this.request<void>(`/newsletters/${id}`, { method: 'DELETE' }),
+    preview: (id: string) =>
+      this.request<NewsletterPreview>(`/newsletters/${id}/preview`, { method: 'POST' }),
+    previewDraft: (body: NewsletterPreviewDraftInput) =>
+      this.request<NewsletterPreview>('/newsletters/preview', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    variants: (id: string) => this.request<NewsletterVariantsView>(`/newsletters/${id}/variants`),
+    recipients: (body: NewsletterRecipientsDraftInput) =>
+      this.request<NewsletterRecipientsView>('/newsletters/recipients', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    test: (id: string, address: string, variantKey?: string) =>
+      this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/test`, {
+        method: 'POST',
+        body: JSON.stringify(variantKey === undefined ? { address } : { address, variantKey }),
+      }),
+    send: (id: string) =>
+      this.request<{ queued: boolean; jobId: string }>(`/newsletters/${id}/send`, {
+        method: 'POST',
+      }),
+    sends: (id: string, page: number) =>
+      this.request<NewsletterSendsPage>(`/newsletters/${id}/sends?page=${page}&pageSize=20`),
+    sendDetail: (id: string, sendId: string) =>
+      this.request<NewsletterSendDetail>(`/newsletters/${id}/sends/${sendId}`),
+    sendHtml: (id: string, sendId: string, variantKey?: string) =>
+      this.request<NewsletterSendHtml>(
+        `/newsletters/${id}/sends/${sendId}/html${variantKey === undefined ? '' : `?variant=${encodeURIComponent(variantKey)}`}`
+      ),
+    retryFailed: (id: string, sendId: string) =>
+      this.request<{ queued: number }>(`/newsletters/${id}/sends/${sendId}/retry-failed`, {
+        method: 'POST',
+      }),
+  };
+
+  // Email branding and the suppression list
+  email = {
+    branding: () => this.request<EmailBrandingSettings>('/email/branding'),
+    saveBranding: (data: EmailBrandingSettings) =>
+      this.request<EmailBrandingSettings>('/email/branding', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    suppressions: () => this.request<EmailSuppression[]>('/email/suppressions'),
+    addSuppression: (address: string) =>
+      this.request<{ address: string }>('/email/suppressions', {
+        method: 'POST',
+        body: JSON.stringify({ address }),
+      }),
+    removeSuppression: (address: string) =>
+      this.request<void>(`/email/suppressions/${encodeURIComponent(address)}`, {
+        method: 'DELETE',
       }),
   };
 
@@ -2126,6 +2305,12 @@ class ApiClient {
     get: () => this.request<VersionInfo>('/version'),
     check: () =>
       this.request<{ message: string }>('/version/check', { method: 'POST', body: '{}' }),
+  };
+
+  // What's new dialog (owner only)
+  whatsNew = {
+    get: () => this.request<WhatsNewState>('/whats-new'),
+    dismiss: () => this.request<void>('/whats-new/dismiss', { method: 'POST', body: '{}' }),
   };
 
   // Tailscale VPN

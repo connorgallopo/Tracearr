@@ -5,7 +5,7 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { VersionInfo } from '@tracearr/shared';
+import { isNewerVersion, isPrerelease, type VersionInfo } from '@tracearr/shared';
 import {
   getCurrentVersion,
   getCurrentTag,
@@ -15,8 +15,6 @@ import {
   getCachedLatestVersion,
   getCachedLatestForkRelease,
   compareForkVersions,
-  isNewerVersion,
-  isPrerelease,
   forceVersionCheck,
 } from '../jobs/versionCheckQueue.js';
 
@@ -45,7 +43,8 @@ export const versionRoutes: FastifyPluginAsync = async (app) => {
       buildInfo.forkVersion &&
       compareForkVersions(forkData.forkVersion, buildInfo.forkVersion) > 0
     );
-    const upstreamUpdateAvailable = !!upstreamData && isNewerVersion(upstreamData.version, currentVersion);
+    const upstreamUpdateAvailable =
+      !!upstreamData && isNewerVersion(upstreamData.version, currentVersion);
     const latestFork = forkData
       ? {
           version: forkData.forkVersion,
@@ -58,6 +57,9 @@ export const versionRoutes: FastifyPluginAsync = async (app) => {
           isPrerelease: forkData.isPrerelease,
           releaseName: forkData.releaseName,
           releaseNotes: forkData.releaseNotes,
+          upgradeWarnings: forkData.upgradeWarnings.filter((w) =>
+            isNewerVersion(w.version, currentVersion)
+          ),
         }
       : null;
     const latestUpstream = upstreamData
@@ -69,6 +71,9 @@ export const versionRoutes: FastifyPluginAsync = async (app) => {
           isPrerelease: upstreamData.isPrerelease,
           releaseName: upstreamData.releaseName,
           releaseNotes: upstreamData.releaseNotes,
+          upgradeWarnings: upstreamData.upgradeWarnings.filter((w) =>
+            isNewerVersion(w.version, currentVersion)
+          ),
         }
       : null;
     let recommended: VersionInfo['recommended'];
@@ -103,7 +108,8 @@ export const versionRoutes: FastifyPluginAsync = async (app) => {
         updateAvailable: upstreamUpdateAvailable,
       },
       recommended,
-      lastChecked: [forkData?.checkedAt, upstreamData?.checkedAt].filter(Boolean).sort().at(-1) ?? null,
+      lastChecked:
+        [forkData?.checkedAt, upstreamData?.checkedAt].filter(Boolean).sort().at(-1) ?? null,
     };
   });
 

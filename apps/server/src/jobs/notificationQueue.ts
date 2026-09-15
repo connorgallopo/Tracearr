@@ -228,6 +228,11 @@ function dedupeKey(
       tail = `${event.type}-${event.payload.serverUserId}-${automation}${bucket}`;
       break;
     }
+    case 'newsletter_send': {
+      // The default arm keys on the install, which would collapse two newsletters into one job.
+      tail = `${event.type}-${event.payload.sendId}-${automation}${bucket}`;
+      break;
+    }
     default: {
       // The tracearr release is about the install, not a server.
       const serverId = 'serverId' in event.payload ? event.payload.serverId : 'install';
@@ -326,7 +331,7 @@ async function processJob(job: Job<NotificationJob>): Promise<void> {
   const rendered = await type.render(event, opened.config, { destination: ref, source });
   await type.deliver(rendered, opened.config, {
     destination: ref,
-    signal: AbortSignal.timeout(DELIVER_TIMEOUT_MS),
+    signal: AbortSignal.timeout(type.deliverTimeoutMs ?? DELIVER_TIMEOUT_MS),
   });
 }
 

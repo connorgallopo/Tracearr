@@ -85,6 +85,42 @@ describe('userService integration tests', () => {
       expect(updateResult.created).toBe(false);
       expect(updateResult.serverUser.username).toBe('updatedname');
     });
+
+    it('stores a Jellyfin or Emby username that is an email as the account email only', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({
+          name: 'Integration Jellyfin',
+          type: 'jellyfin',
+          url: 'http://localhost:8096',
+          token: 'encrypted-test-token',
+        })
+        .returning();
+      const emailId = `ext-${randomUUID().slice(0, 8)}`;
+      const plainId = `ext-${randomUUID().slice(0, 8)}`;
+
+      const created = await syncUserFromMediaServer(jellyfin!.id, {
+        id: emailId,
+        username: 'Mixed.Case@Example.com',
+        isAdmin: false,
+      });
+      const plain = await syncUserFromMediaServer(jellyfin!.id, {
+        id: plainId,
+        username: 'no-email-here',
+        isAdmin: false,
+      });
+      const renamed = await syncUserFromMediaServer(jellyfin!.id, {
+        id: plainId,
+        username: 'renamed@example.com',
+        isAdmin: false,
+      });
+
+      expect(created.serverUser.email).toBe('mixed.case@example.com');
+      expect(created.user.email).toBeNull();
+      expect(plain.serverUser.email).toBeNull();
+      expect(renamed.serverUser.email).toBe('renamed@example.com');
+      expect(renamed.user.email).toBeNull();
+    });
   });
 
   describe('batchSyncUsersFromMediaServer', () => {

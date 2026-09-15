@@ -14,6 +14,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { eq } from 'drizzle-orm';
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
+import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
 import {
   createTestUser,
   createTestServer,
@@ -48,20 +49,54 @@ import {
   automations,
   authAccounts,
   authSessions,
+  mediaRequests,
+  newsletters,
+  newsletterSendRecipients,
+  newsletterSends,
+  requestServices,
   userMergeAudits,
   terminationLogs,
+  dismissals,
 } from '../../src/db/schema.js';
 import {
+  dismissMergeSuggestion,
   mergeUsers,
   splitServerUser,
   MergeDirectionError,
   MergeValidationError,
   SameServerCombineNotConfirmedError,
 } from '../../src/services/mergeService.js';
+import { resolveRecipients } from '../../src/services/newsletters/recipients.js';
 
 /** The list envelope reports total and pageSize; the page count derives from them. */
 function pageCount(body: { meta: { pageSize: number; total: number } }): number {
   return Math.ceil(body.meta.total / body.meta.pageSize);
+}
+
+async function newsletterExcluding(name: string, excludeUserIds: string[]): Promise<string> {
+  const [row] = await db
+    .insert(newsletters)
+    .values({
+      name,
+      schedule: { kind: 'daily', time: '08:00' },
+      timezone: 'UTC',
+      window: { kind: 'fixed', days: 7 },
+      scope: { serverIds: [], libraries: [] },
+      sections: DEFAULT_NEWSLETTER_SECTIONS,
+      subject: 's',
+      recipients: { members: true, extraAddresses: [], excludeUserIds },
+    })
+    .returning({ id: newsletters.id });
+  return row!.id;
+}
+
+async function excludedFrom(newsletterId: string): Promise<string[] | undefined> {
+  const [row] = await db.select().from(newsletters).where(eq(newsletters.id, newsletterId));
+  return row?.recipients.excludeUserIds;
+}
+
+async function setContactEmail(userId: string, contactEmail: string): Promise<void> {
+  await db.update(users).set({ contactEmail }).where(eq(users.id, userId));
 }
 
 describe('mergeUsers', () => {
@@ -73,7 +108,7 @@ describe('mergeUsers', () => {
     const target = await createTestUser({ role: 'member', email: 'bob@example.com' });
     const source = await createTestUser({ role: 'member', email: null });
 
-    const targetSu = await createTestServerUser({
+    await createTestServerUser({
       userId: target.id,
       serverId: serverA.id,
       trustScore: 90,
@@ -200,6 +235,31 @@ describe('mergeUsers', () => {
       name: 'Geo lock',
       serverUserId: sourceSu.id,
     });
+    const [requestService] = await db
+      .insert(requestServices)
+      .values({
+        serverId: server.id,
+        type: 'seerr',
+        name: 'Combine Seerr',
+        url: 'http://seerr.combine.test',
+        remoteServerId: 'combine-machine',
+      })
+      .returning();
+    const [sourceRequest] = await db
+      .insert(mediaRequests)
+      .values({
+        serviceId: requestService!.id,
+        remoteId: 1,
+        remoteMediaId: 1,
+        mediaType: 'movie',
+        serverUserId: sourceSu.id,
+        remoteUserId: 1,
+        remoteUsername: 'dupe',
+        status: 'completed',
+        requestedAt: new Date('2026-08-01T00:00:00Z'),
+        remoteUpdatedAt: new Date('2026-08-01T00:00:00Z'),
+      })
+      .returning();
 
     const result = await mergeUsers(source.id, target.id, admin.id, {
       confirmSameServerCombine: true,
@@ -218,6 +278,11 @@ describe('mergeUsers', () => {
       .from(sessions)
       .where(eq(sessions.serverUserId, targetSu.id));
     expect(combinedSessions).toHaveLength(3);
+    const [carriedRequest] = await db
+      .select()
+      .from(mediaRequests)
+      .where(eq(mediaRequests.id, sourceRequest!.id));
+    expect(carriedRequest?.serverUserId).toBe(targetSu.id);
 
     // Primary metadata and trust kept
     const [combinedSu] = await db.select().from(serverUsers).where(eq(serverUsers.id, targetSu.id));
@@ -343,6 +408,118 @@ describe('mergeUsers', () => {
     expect(authAccountRow).toBeDefined();
   });
 
+  it('moves a newsletter exclusion onto the target, and keeps one entry when both were excluded', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    const bystander = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    const sourceOnly = await newsletterExcluding('Source only', [bystander.id, source.id]);
+    const both = await newsletterExcluding('Both', [source.id, bystander.id, target.id]);
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    expect(await excludedFrom(sourceOnly)).toEqual([bystander.id, target.id]);
+    expect(await excludedFrom(both)).toEqual([target.id, bystander.id]);
+  });
+
+  it('deletes merge suggestion dismissals naming the source and keeps the rest', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    const bystander = await createTestUser({ role: 'member' });
+    const other = await createTestUser({ role: 'member' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    await dismissMergeSuggestion([source.id, bystander.id], admin.id);
+    await dismissMergeSuggestion([other.id, source.id], admin.id);
+    await dismissMergeSuggestion([target.id, bystander.id], admin.id);
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const remaining = await db.select({ subjectKey: dismissals.subjectKey }).from(dismissals);
+    expect(remaining.map((r) => r.subjectKey)).toEqual([
+      [target.id, bystander.id].sort().join(':'),
+    ]);
+  });
+
+  it('credits the target with newsletter sends that reached the source, so the merged person is not new since the last send', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    const newsletterId = await newsletterExcluding('Reached', []);
+    const [send] = await db
+      .insert(newsletterSends)
+      .values({
+        newsletterId,
+        trigger: 'manual',
+        outcome: 'sent',
+        windowStart: new Date('2026-08-26T00:00:00Z'),
+        windowEnd: new Date('2026-09-02T00:00:00Z'),
+      })
+      .returning();
+    await db.insert(newsletterSendRecipients).values({
+      sendId: send!.id,
+      address: 'source@example.com',
+      userId: source.id,
+      variantKey: '',
+      status: 'sent',
+    });
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const [newsletter] = await db
+      .select()
+      .from(newsletters)
+      .where(eq(newsletters.id, newsletterId));
+    const { recipients } = await resolveRecipients(newsletter!, newsletterId);
+    expect(recipients.find((r) => r.userId === target.id)).toMatchObject({
+      newSinceLastSend: false,
+    });
+  });
+
+  it('carries the source contact email onto a target that has none', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    await setContactEmail(source.id, 'source-contact@example.com');
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const [survivor] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(survivor?.contactEmail).toBe('source-contact@example.com');
+  });
+
+  it('keeps the target contact email over the source one', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    await setContactEmail(target.id, 'target-contact@example.com');
+    await setContactEmail(source.id, 'source-contact@example.com');
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const [survivor] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(survivor?.contactEmail).toBe('target-contact@example.com');
+  });
+
   it('rejects merging an identity into itself', async () => {
     const admin = await createTestUser({ role: 'owner' });
     const user = await createTestUser({ role: 'member' });
@@ -394,10 +571,45 @@ describe('splitServerUser', () => {
     expect(audit?.undoneAt).not.toBeNull();
   });
 
-  it('falls back to server user fields when no audit record covers the server user', async () => {
+  it('leaves a newsletter exclusion the merge moved on the surviving identity', async () => {
     const admin = await createTestUser({ role: 'owner' });
     const serverA = await createTestServer({ type: 'plex' });
     const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    const sourceSu = await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    const newsletterId = await newsletterExcluding('Weekly', [source.id]);
+
+    await mergeUsers(source.id, target.id, admin.id);
+    await splitServerUser(sourceSu.id, admin.id);
+
+    expect(await excludedFrom(newsletterId)).toEqual([target.id]);
+  });
+
+  it('restores the source contact email and takes back the copy the target was given', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: serverA.id });
+    const sourceSu = await createTestServerUser({ userId: source.id, serverId: serverB.id });
+    await setContactEmail(source.id, 'source-contact@example.com');
+
+    await mergeUsers(source.id, target.id, admin.id);
+    const { newUserId } = await splitServerUser(sourceSu.id, admin.id);
+
+    const [restored] = await db.select().from(users).where(eq(users.id, newUserId));
+    expect(restored?.contactEmail).toBe('source-contact@example.com');
+    const [survivor] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(survivor?.contactEmail).toBeNull();
+  });
+
+  it('falls back to server user fields when no audit record covers the server user', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const serverA = await createTestServer({ type: 'plex' });
+    const serverB = await createTestServer({ type: 'plex' });
     const identity = await createTestUser({ role: 'member' });
     await createTestServerUser({ userId: identity.id, serverId: serverA.id });
     const su = await createTestServerUser({
@@ -413,6 +625,26 @@ describe('splitServerUser', () => {
     expect(restored?.username).toBe('never-merged');
     expect(restored?.email).toBe('never-merged@example.com');
     expect(restored?.role).toBe('member');
+  });
+
+  it('does not restore a Jellyfin or Emby account email, which is its username, as the identity email', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const emby = await createTestServer({ type: 'emby' });
+    const identity = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: identity.id, serverId: plex.id });
+    const su = await createTestServerUser({
+      userId: identity.id,
+      serverId: emby.id,
+      username: 'split-leak@example.com',
+      email: 'split-leak@example.com',
+    });
+
+    const result = await splitServerUser(su.id, admin.id);
+
+    const [restored] = await db.select().from(users).where(eq(users.id, result.newUserId));
+    expect(restored?.username).toBe('split-leak@example.com');
+    expect(restored?.email).toBeNull();
   });
 
   it('refuses to split the only server account of an identity', async () => {
@@ -1056,7 +1288,7 @@ describe('GET /users dedup + includeRemoved + access scoping', () => {
       serverId: serverA.id,
       lastActivityAt: new Date('2026-06-01T00:00:00Z'),
     });
-    const sourceSu = await createTestServerUser({
+    await createTestServerUser({
       userId: source.id,
       serverId: serverB.id,
       lastActivityAt: new Date('2026-06-02T00:00:00Z'),
@@ -1175,7 +1407,7 @@ describe('GET /users serverIds (multi-select)', () => {
   });
 
   it('never widens beyond a non-owner viewer accessible servers when serverIds requests more', async () => {
-    const admin = await createTestUser({ role: 'owner' });
+    await createTestUser({ role: 'owner' });
     const serverA = await createTestServer({ type: 'plex' });
     const serverB = await createTestServer({ type: 'jellyfin' });
     const identityA = await createTestUser({ role: 'member' });

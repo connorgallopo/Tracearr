@@ -12,7 +12,7 @@ import {
   type DataTableDensity,
   type DataTableHeaderVariant,
 } from './data-table';
-import { DataTablePager } from './data-table-pager';
+import { DataTablePager, pageSlots } from './data-table-pager';
 import { useDataTable, type UseDataTableOptions } from './use-data-table';
 import type { DataTableInstance } from './features';
 
@@ -72,6 +72,7 @@ interface HarnessProps extends Omit<UseDataTableOptions<Person>, 'columns' | 'ge
   isLoading?: boolean;
   density?: DataTableDensity;
   headerVariant?: DataTableHeaderVariant;
+  flush?: boolean;
   /** Swaps in the column holding a button, the shape an interactive cell takes. */
   withAction?: boolean;
 }
@@ -81,6 +82,7 @@ function Harness({
   isLoading,
   density,
   headerVariant,
+  flush,
   withAction,
   ...options
 }: HarnessProps) {
@@ -92,7 +94,7 @@ function Harness({
 
   return (
     <DataTableRoot density={density} headerVariant={headerVariant}>
-      <DataTableViewport>
+      <DataTableViewport flush={flush}>
         <DataTableHeader table={table} />
         <DataTableBody
           table={table}
@@ -205,11 +207,44 @@ describe('data-table pagination controls', () => {
     expect(rowNames()).toEqual(['Charlie', 'Alpha']);
   });
 
+  it('jumps straight to a numbered page', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn<(page: number) => void>();
+    render(
+      <Harness data={people} pageSize={2} page={3} pageCount={9} onPageChange={onPageChange} />
+    );
+
+    await user.click(screen.getByRole('button', { name: '9' }));
+    expect(onPageChange).toHaveBeenCalledWith(9);
+  });
+
+  it('marks the page you are on', () => {
+    render(<Harness data={people} pageSize={2} page={3} pageCount={9} onPageChange={vi.fn()} />);
+
+    expect(screen.getByRole('button', { name: '3' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: '4' })).not.toHaveAttribute('aria-current');
+  });
+
   it('disables the edges of the range', () => {
     render(<Harness data={people} pageSize={2} page={1} pageCount={2} onPageChange={vi.fn()} />);
 
     expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+  });
+});
+
+describe('pageSlots', () => {
+  it('lists every page while they still fit', () => {
+    expect(pageSlots(3, 7)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it('keeps the first, the last and the neighbours of the current page', () => {
+    expect(pageSlots(6, 14)).toEqual([1, 'gap', 5, 6, 7, 'gap', 14]);
+  });
+
+  it('drops the gap that would stand in for a single page', () => {
+    expect(pageSlots(2, 14)).toEqual([1, 2, 3, 'gap', 14]);
+    expect(pageSlots(13, 14)).toEqual([1, 'gap', 12, 13, 14]);
   });
 });
 
@@ -237,14 +272,14 @@ describe('data-table column meta', () => {
     render(<Harness data={people} />);
 
     const [nameHeader, ageHeader] = screen.getAllByRole('columnheader');
-    expect(nameHeader).toHaveStyle({ width: '12rem' });
+    expect(nameHeader?.style.width).toBe('12rem');
     expect(nameHeader).toHaveClass('test-head');
     expect(ageHeader?.className).toContain('text-right');
     expect(ageHeader?.className).toContain('tabular-nums');
 
     const body = screen.getAllByRole('rowgroup')[1]!;
     const [nameCell, ageCell] = within(within(body).getAllByRole('row')[0]!).getAllByRole('cell');
-    expect(nameCell).toHaveStyle({ width: '12rem' });
+    expect(nameCell?.style.width).toBe('12rem');
     expect(nameCell?.className).toContain('hidden');
     expect(ageCell?.className).toContain('tabular-nums');
   });
@@ -483,5 +518,23 @@ describe('data-table chrome', () => {
   it('leaves the header scale alone by default', () => {
     render(<Harness data={people} />);
     expect(screen.getAllByRole('columnheader')[0]!.className).not.toContain('text-[10.5px]');
+  });
+
+  it.each([
+    ['comfortable' as const, '-mx-4 -mb-4'],
+    ['default' as const, '-mx-4 -mb-3'],
+    ['compact' as const, '-mx-3 -mb-1.5'],
+  ])('cancels %s cell padding when the viewport is flush', (density, expected) => {
+    const { container } = render(<Harness data={people} density={density} flush />);
+    const viewport = container.querySelector('[data-slot="data-table-viewport"]')!;
+    for (const offset of expected.split(' ')) {
+      expect(viewport.className).toContain(offset);
+    }
+  });
+
+  it('leaves the viewport unshifted by default', () => {
+    const { container } = render(<Harness data={people} density="compact" />);
+    const viewport = container.querySelector('[data-slot="data-table-viewport"]')!;
+    expect(viewport.className).not.toContain('-mx-3');
   });
 });

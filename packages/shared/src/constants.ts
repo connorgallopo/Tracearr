@@ -45,6 +45,7 @@ export const WS_EVENTS = {
   SERVER_CONNECTION: 'server:connection',
   NOTIFICATION_TOAST: 'notification:toast',
   DESTINATIONS_CHANGED: 'destinations:changed',
+  REQUESTS_CHANGED: 'requests:changed',
   SERVERS_CHANGED: 'servers:changed',
 } as const;
 
@@ -185,6 +186,9 @@ export const REDIS_KEYS = {
   get LIBRARY_SHELVES() {
     return `${_redisPrefix}tracearr:library:shelves`;
   },
+  get REQUESTS_ANALYTICS() {
+    return `${_redisPrefix}tracearr:requests:analytics`;
+  },
   get LIBRARY_GENRES() {
     return `${_redisPrefix}tracearr:library:genres`;
   },
@@ -225,6 +229,9 @@ export const REDIS_KEYS = {
   // Accepted structural shortfall from the last full scan - see COUNT_MISMATCH_* in librarySync.ts
   LIBRARY_SYNC_SHORTFALL: (serverId: string, libraryId: string) =>
     `${_redisPrefix}tracearr:library:sync:shortfall:${serverId}:${libraryId}`,
+  // Shape of the listing query the last full scan used - see LIBRARY_SCAN_VERSION in librarySync.ts
+  LIBRARY_SYNC_SCAN_VERSION: (serverId: string, libraryId: string) =>
+    `${_redisPrefix}tracearr:library:sync:scanversion:${serverId}:${libraryId}`,
   // Image precache watermark state (per server, not per library - the precache
   // job walks library_items scoped only by server)
   LIBRARY_PRECACHE_WATERMARK: (serverId: string) =>
@@ -237,7 +244,6 @@ export const REDIS_KEYS = {
   IMAGE_CACHE_TALLY: `${_redisPrefix}tracearr:image-cache:tally`,
   IMAGE_CACHE_DISK_LIMITED: `${_redisPrefix}tracearr:image-cache:disk-limited`,
   // Auth tokens
-  REFRESH_TOKEN: (hash: string) => `${_redisPrefix}tracearr:refresh:${hash}`,
   PLEX_TEMP_TOKEN: (token: string) => `${_redisPrefix}tracearr:plex_temp:${token}`,
   MOBILE_REFRESH_TOKEN: (hash: string) => `${_redisPrefix}tracearr:mobile_refresh:${hash}`,
   MOBILE_BLACKLISTED_TOKEN: (deviceId: string) =>
@@ -284,6 +290,11 @@ export const REDIS_KEYS = {
   // Public API v2 per-media stats/watchers responses
   PUBLIC_MEDIA_STATS: (cacheKey: string) =>
     `${_redisPrefix}tracearr:public:media-stats:${cacheKey}`,
+  // Ordered candidate list behind /watched-media. Its aggregate is O(the whole
+  // cagg) and the keyset predicate reads MAX()/BOOL_OR(), so it can only run
+  // after the group - paging it directly would re-aggregate everything per page.
+  PUBLIC_WATCHED_MEDIA: (cacheKey: string) =>
+    `${_redisPrefix}tracearr:public:watched-media:v1:${cacheKey}`,
 };
 
 // Cache TTLs in seconds
@@ -320,6 +331,7 @@ export const CACHE_TTL = {
   LIBRARY_CODECS: 300, // 5 minutes
   LIBRARY_RESOLUTION: 300, // 5 minutes
   LIBRARY_SHELVES: 300, // 5 minutes
+  REQUESTS_ANALYTICS: 300, // 5 minutes - the request sync runs far less often
   LIBRARY_GENRES: 3600, // 1 hour
   LIBRARY_CATALOG_LETTERS: 300, // 5 minutes, matches LIBRARY_SHELVES freshness
   LIBRARY_LIBRARIES: 300, // 5 minutes - library list changes only on sync

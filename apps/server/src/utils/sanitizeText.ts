@@ -10,6 +10,17 @@ export function sanitizeText<T extends string | null | undefined>(value: T): T {
   return value.replaceAll('\u0000', '').replace(UNPAIRED_SURROGATE, '\uFFFD') as T;
 }
 
+export function sanitizeTextArray<T extends readonly unknown[]>(values: T): T {
+  let changed = false;
+  const out = values.map((val) => {
+    if (typeof val !== 'string') return val;
+    const scrubbed = sanitizeText(val);
+    if (scrubbed !== val) changed = true;
+    return scrubbed;
+  });
+  return changed ? (out as unknown as T) : values;
+}
+
 export function scrubStringFields<T extends Record<string, unknown>>(record: T): T {
   let changed = false;
   const out: Record<string, unknown> = {};
@@ -17,6 +28,10 @@ export function scrubStringFields<T extends Record<string, unknown>>(record: T):
     const val = record[key];
     if (typeof val === 'string') {
       const scrubbed = sanitizeText(val);
+      if (scrubbed !== val) changed = true;
+      out[key] = scrubbed;
+    } else if (Array.isArray(val)) {
+      const scrubbed = sanitizeTextArray(val);
       if (scrubbed !== val) changed = true;
       out[key] = scrubbed;
     } else {

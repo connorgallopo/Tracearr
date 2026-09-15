@@ -142,9 +142,7 @@
         "title": "",
         "message": ""
       },
-      "displayNameUpdated": {
-        "title": ""
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "",
         "message_one": "",
@@ -161,9 +159,21 @@
       "serverUserSplit": {
         "title": ""
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "",
@@ -190,7 +200,7 @@
       "deviceRemoveFailed": "",
       "deviceRenameFailed": "",
       "sessionsRevokeFailed": "",
-      "displayNameUpdateFailed": "",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "",
       "routingUpdateFailed": "",
       "clipboardFailed": "",
@@ -207,6 +217,8 @@
       "plexDirectUrl": "",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "invalidClaimCode": {
         "title": "",
         "message": ""
@@ -214,7 +226,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {

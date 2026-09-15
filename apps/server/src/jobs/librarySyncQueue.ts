@@ -20,6 +20,7 @@ import { db } from '../db/client.js';
 import { getSetting, setSetting } from '../services/settings.js';
 import { servers } from '../db/schema.js';
 import { librarySyncService, initLibrarySyncRedis } from '../services/librarySync.js';
+import { syncServer } from '../services/sync.js';
 import { getPubSubService } from '../services/cache.js';
 import { enqueueMaintenanceJob, maybeEnqueueMaintenanceJob } from './maintenanceQueue.js';
 import { enqueueImagePrecache } from './imagePrecacheQueue.js';
@@ -232,6 +233,19 @@ export function startLibrarySyncWorker(): void {
       activeSyncs.set(serverId, true);
 
       try {
+        // Nothing else re-reads a server's user list, so the cron and boot runs
+        // refresh it. Event runs fire every 30s during a scan and are left out.
+        if (job.name.startsWith('auto-sync-') || job.name.startsWith('boot-sync-')) {
+          try {
+            const userSync = await syncServer(serverId, { syncUsers: true, syncLibraries: false });
+            if (userSync.errors.length > 0) {
+              console.warn(`[LibrarySync] User sync for server ${serverId}:`, userSync.errors);
+            }
+          } catch (err) {
+            console.error(`[LibrarySync] User sync failed for server ${serverId}:`, err);
+          }
+        }
+
         // Progress callback for WebSocket updates
         const onProgress = (progress: LibrarySyncProgress) => {
           // Update job progress percentage

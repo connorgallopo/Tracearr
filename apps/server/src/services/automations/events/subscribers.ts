@@ -92,6 +92,7 @@ function afterSignature(quality: MediaQuality): string {
 export function edgeKeyOf(event: ContextEvaluatingEvent, node: TriggerNode | null): string | null {
   switch (event.type) {
     case 'session.started':
+    case 'session.first_seen':
     case 'media.added':
     case 'account.new_device':
       return null;
@@ -120,6 +121,9 @@ export function edgeKeyOf(event: ContextEvaluatingEvent, node: TriggerNode | nul
       return event.latestVersion;
     case 'tracearr.update_available':
       return event.latest;
+    case 'newsletter.sent':
+    case 'newsletter.failed':
+      return event.sendId;
   }
 }
 
@@ -298,6 +302,12 @@ const SERVER_TRIGGERS = [
   'server.update_available',
 ] as const;
 
+const INSTALL_TRIGGERS = [
+  'tracearr.update_available',
+  'newsletter.sent',
+  'newsletter.failed',
+] as const;
+
 let registered = false;
 
 export function registerRuleSubscribers(): void {
@@ -305,6 +315,8 @@ export function registerRuleSubscribers(): void {
   registered = true;
 
   subscribe('session.started', 'session-rules', sessionRules(undefined, true));
+  // Fresh too: the pending id was minted moments ago, so nothing can contend it.
+  subscribe('session.first_seen', 'session-rules', sessionRules(undefined, true));
   subscribe('session.stopped', 'session-rules', sessionRules());
   subscribe('session.transcode_changed', 'session-rules', sessionRules({ transcodeReEval: true }));
   subscribe('session.paused', 'session-rules', sessionRules({ pauseReEval: true }));
@@ -335,10 +347,12 @@ export function registerRuleSubscribers(): void {
       });
     });
   }
-  subscribe('tracearr.update_available', 'install-rules', async (event, inputs, opts) => {
-    if (!inputs) return;
-    return runRulePipeline(event, inputs, opts, { kind: 'install' });
-  });
+  for (const trigger of INSTALL_TRIGGERS) {
+    subscribe(trigger, 'install-rules', async (event, inputs, opts) => {
+      if (!inputs) return;
+      return runRulePipeline(event, inputs, opts, { kind: 'install' });
+    });
+  }
 }
 
 export function resetRuleSubscribersForTests(): void {

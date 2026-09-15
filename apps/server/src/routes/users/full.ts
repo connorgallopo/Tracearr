@@ -88,6 +88,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           createdAt: serverUsers.createdAt,
           updatedAt: serverUsers.updatedAt,
           identityName: users.name,
+          identityContactEmail: users.contactEmail,
           role: users.role,
           identityAggregateTrustScore: users.aggregateTrustScore,
           identityTotalViolations: users.totalViolations,
@@ -403,8 +404,12 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
 
       const terminationsTotal = terminationsCountResult[0]?.count ?? 0;
 
-      const { identityAggregateTrustScore, identityTotalViolations, ...serverUserFields } =
-        serverUser;
+      const {
+        identityAggregateTrustScore,
+        identityTotalViolations,
+        identityContactEmail,
+        ...serverUserFields
+      } = serverUser;
 
       return {
         user: {
@@ -418,6 +423,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           userId: serverUser.userId,
           aggregateTrustScore: identityAggregateTrustScore,
           totalViolations: identityTotalViolations,
+          contactEmail: identityContactEmail,
           serverUsers: identityServerUserRows,
           stats: {
             totalSessions: identityStats?.totalSessions ?? 0,

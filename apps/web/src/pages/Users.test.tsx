@@ -8,13 +8,19 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-const { mockResetTrustMutate } = vi.hoisted(() => ({ mockResetTrustMutate: vi.fn() }));
+const { mockResetTrustMutate, mockMergeMutate } = vi.hoisted(() => ({
+  mockResetTrustMutate: vi.fn(),
+  mockMergeMutate: vi.fn(),
+}));
 
 vi.mock('@/hooks/queries', () => ({
   useUsers: vi.fn(),
   useBulkResetTrust: () => ({ mutate: mockResetTrustMutate, isPending: false }),
-  useMergeUsers: () => ({ mutate: vi.fn(), isPending: false }),
+  useMergeUsers: () => ({ mutate: mockMergeMutate, isPending: false }),
   useMergeSuggestions: () => ({ data: undefined, isLoading: false }),
+  useDismissedMergeSuggestions: () => ({ data: undefined }),
+  useDismissMergeSuggestion: () => ({ mutate: vi.fn(), isPending: false }),
+  useRestoreMergeSuggestion: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useServer', () => ({
@@ -181,6 +187,50 @@ describe('Users', () => {
           activeBefore: undefined,
         },
       },
+      expect.anything()
+    );
+  });
+
+  it('defaults a bulk merge to the live account over a more recently active removed one', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { role: 'owner' },
+    } as unknown as ReturnType<typeof useAuth>);
+    const carolRow = {
+      ...aliceRow,
+      id: 'su-2',
+      userId: 'u-2',
+      serverId: 'server-2',
+      serverName: 'Server Two',
+      username: 'carol',
+      identityName: 'Carol',
+      loginCapable: false,
+      identityLastActivityAt: '2025-01-01T00:00:00.000Z',
+      removedAt: '2025-01-02T00:00:00.000Z',
+    };
+    mockList([carolRow, { ...aliceRow, loginCapable: false }], 2);
+
+    renderUsers();
+
+    for (const index of [0, 1]) {
+      const rowCheckbox = screen.getAllByRole('checkbox', { name: 'common:table.selectRow' })[
+        index
+      ];
+      if (!rowCheckbox) throw new Error(`missing row checkbox ${index}`);
+      await userEvent.click(rowCheckbox);
+    }
+    const mergeButton = screen.getByRole('button', { name: 'pages:users.mergeUsers' });
+    expect(mergeButton).toBeEnabled();
+    await userEvent.click(mergeButton);
+
+    const dialog = await screen.findByRole('alertdialog');
+    const kept = within(dialog).getByRole('region', { name: 'pages:users.mergeKeep' });
+    expect(within(kept).getByText('Alice')).toBeInTheDocument();
+
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'pages:users.mergeConfirmInto' })
+    );
+    expect(mockMergeMutate).toHaveBeenCalledWith(
+      { sourceUserId: 'u-2', targetUserId: 'u-1', confirmSameServerCombine: false },
       expect.anything()
     );
   });

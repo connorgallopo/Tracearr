@@ -21,12 +21,18 @@ vi.mock('../../../services/mergeService.js', async (importActual) => {
     ...actual,
     mergeUsers: vi.fn(),
     getMergeSuggestions: vi.fn(),
+    getDismissedMergeSuggestions: vi.fn(),
+    dismissMergeSuggestion: vi.fn(),
+    restoreMergeSuggestion: vi.fn(),
   };
 });
 
 import {
   mergeUsers,
   getMergeSuggestions,
+  getDismissedMergeSuggestions,
+  dismissMergeSuggestion,
+  restoreMergeSuggestion,
   MergeDirectionError,
   SameServerCombineNotConfirmedError,
 } from '../../../services/mergeService.js';
@@ -34,6 +40,9 @@ import { mergeRoutes } from '../merge.js';
 
 const mockMergeUsers = vi.mocked(mergeUsers);
 const mockGetMergeSuggestions = vi.mocked(getMergeSuggestions);
+const mockGetDismissed = vi.mocked(getDismissedMergeSuggestions);
+const mockDismiss = vi.mocked(dismissMergeSuggestion);
+const mockRestore = vi.mocked(restoreMergeSuggestion);
 
 function createAuthUser(role: AuthUser['role']): AuthUser {
   return { userId: randomUUID(), username: 'tester', role, serverIds: [] };
@@ -150,5 +159,85 @@ describe('merge routes', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({ data: [] });
+  });
+
+  it('returns dismissed suggestions for an owner', async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    mockGetDismissed.mockResolvedValue([]);
+
+    const response = await app.inject({ method: 'GET', url: '/users/merge-suggestions/dismissed' });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ data: [] });
+  });
+
+  it('dismisses a pair on behalf of the owner', async () => {
+    const owner = createAuthUser('owner');
+    app = await buildTestApp(owner);
+    const userIds = [randomUUID(), randomUUID()];
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/users/merge-suggestions/dismissals',
+      payload: { userIds },
+    });
+
+    expect(response.statusCode).toBe(204);
+    expect(mockDismiss).toHaveBeenCalledWith(userIds, owner.userId);
+  });
+
+  it('rejects dismissing an identity paired with itself', async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    const id = randomUUID();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/users/merge-suggestions/dismissals',
+      payload: { userIds: [id, id] },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(mockDismiss).not.toHaveBeenCalled();
+  });
+
+  it('restores a dismissed pair from the path ids', async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    const userA = randomUUID();
+    const userB = randomUUID();
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: `/users/merge-suggestions/dismissals/${userA}/${userB}`,
+    });
+
+    expect(response.statusCode).toBe(204);
+    expect(mockRestore).toHaveBeenCalledWith(userA, userB);
+  });
+
+  it('rejects a restore with an invalid id', async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: `/users/merge-suggestions/dismissals/${randomUUID()}/not-a-uuid`,
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(mockRestore).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['GET', '/users/merge-suggestions/dismissed', undefined],
+    ['POST', '/users/merge-suggestions/dismissals', { userIds: [randomUUID(), randomUUID()] }],
+    ['DELETE', `/users/merge-suggestions/dismissals/${randomUUID()}/${randomUUID()}`, undefined],
+  ] as const)('rejects non-owners on %s %s', async (method, url, payload) => {
+    app = await buildTestApp(createAuthUser('viewer'));
+
+    const response = await app.inject({ method, url, payload });
+
+    expect(response.statusCode).toBe(403);
+    expect(mockGetDismissed).not.toHaveBeenCalled();
+    expect(mockDismiss).not.toHaveBeenCalled();
+    expect(mockRestore).not.toHaveBeenCalled();
   });
 });

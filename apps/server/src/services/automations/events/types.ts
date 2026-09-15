@@ -10,6 +10,7 @@ import type { sessions } from '../../../db/schema.js';
 import type { ActionResult } from '../executors/index.js';
 import type { MediaQuality, MediaSubject } from '../types.js';
 import type { ViolationInsertResult } from '../../../jobs/poller/violations.js';
+import type { NewsletterSendPayload } from '../../notifications/events.js';
 
 export type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type SessionRow = typeof sessions.$inferSelect;
@@ -55,6 +56,11 @@ interface SessionEventBase extends BaseEvent {
 
 export interface SessionStartedEvent extends SessionEventBase {
   type: 'session.started';
+}
+
+/** First sight of a new playback, before the confirmation delay persists it. */
+export interface SessionFirstSeenEvent extends SessionEventBase {
+  type: 'session.first_seen';
 }
 
 export interface SessionTranscodeChangedEvent extends SessionEventBase {
@@ -186,8 +192,17 @@ export interface TracearrUpdateEvent extends BaseEvent {
   releaseUrl: string;
 }
 
+export interface NewsletterSentEvent extends BaseEvent, NewsletterSendPayload {
+  type: 'newsletter.sent';
+}
+
+export interface NewsletterFailedEvent extends BaseEvent, NewsletterSendPayload {
+  type: 'newsletter.failed';
+}
+
 export type RuleEvent =
   | SessionStartedEvent
+  | SessionFirstSeenEvent
   | SessionTranscodeChangedEvent
   | SessionPausedEvent
   | SessionHeldForEvent
@@ -202,7 +217,9 @@ export type RuleEvent =
   | ServerUpEvent
   | PluginUpdateEvent
   | ServerUpdateEvent
-  | TracearrUpdateEvent;
+  | TracearrUpdateEvent
+  | NewsletterSentEvent
+  | NewsletterFailedEvent;
 
 /** Distributes over the event union by member, which keeps a Subscriber<T> assignable to Subscriber<TriggerType>. */
 export type EventOf<T extends TriggerType> = RuleEvent extends infer E

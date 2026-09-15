@@ -2,9 +2,9 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
     "tsconfig.base.json",
-    "tsconfig.eslint.json",
-    "eslint.config.js",
-    ".prettierrc"
+    ".prettierrc",
+    ".oxlintrc.json",
+    "release-notes/*.json"
   ],
   "tasks": {
     "build": {
@@ -15,16 +15,6 @@
     "dev": {
       "cache": false,
       "persistent": true
-    },
-    "lint": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "!**/*.md"],
-      "outputs": []
-    },
-    "lint:fix": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "!**/*.md"],
-      "outputs": []
     },
     "typecheck": {
       "dependsOn": ["^build"],

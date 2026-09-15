@@ -11,8 +11,8 @@
     "docker:up": "docker compose -f docker/docker-compose.dev.yml up -d --build",
     "docker:down": "docker compose -f docker/docker-compose.dev.yml down",
     "build": "turbo build",
-    "lint": "turbo lint",
-    "lint:fix": "turbo lint:fix",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\"",
     "typecheck": "turbo typecheck",
@@ -38,28 +38,24 @@
     "cli": "pnpm --filter @tracearr/server cli"
   },
   "devDependencies": {
-    "@eslint-react/eslint-plugin": "^5.18.6",
-    "@eslint/js": "^10.0.0",
     "@types/node": "^24.13.3",
-    "@types/react": "19.2.18",
+    "@types/react": "19.3.0",
     "@vitest/coverage-v8": "^4.1.5",
-    "eslint": "^10.0.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
+    "oxlint": "^1.80.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "shadcn": "^4.16.1",
     "turbo": "^2.10.11",
-    "typescript": "^6.0.0",
-    "typescript-eslint": "^8.56.1",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.5"
   },
-  "packageManager": "pnpm@11.11.0+sha512.4463f65fd80ed80d69bc1d4bf163ee94f605c7380fc318bb5b2ebe15f8cd12d49c51a4d59e951b401e764d3b6ca751cbf51bc50ed7001a6bcb4935e684c34882",
+  "packageManager": "pnpm@12.3.4+sha512.961aa41fb077da3a04a441d9f8e15ebc0c96da8ef710b2eb67bf9ee7cb0610eabd48f1fd85f51cffe73846785fa0f87c56a3a872a1d893f8446741b5cce45457",
   "engines": {
-    "node": ">=22.22.1",
-    "pnpm": ">=11.8.0"
+    "node": ">=22.22.2",
+    "pnpm": ">=12.0.0"
   }
 }

@@ -13,9 +13,16 @@
 
 import { eq, and, sql, inArray, isNull, type SQL } from 'drizzle-orm';
 import type { MediaUser } from './mediaServer/index.js';
-import type { UserRole } from '@tracearr/shared';
+import { usernameAsEmail, type UserRole } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { users, serverUsers, servers, sessions, automationRuns } from '../db/schema.js';
+import {
+  users,
+  serverUsers,
+  serverUserExternalAliases,
+  servers,
+  sessions,
+  automationRuns,
+} from '../db/schema.js';
 import { NotFoundError } from '../utils/errors.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
 
@@ -184,6 +191,12 @@ export async function createOwnerUser(data: {
   });
 }
 
+/** The column's CHECK requires lowercase, and an address that trims to nothing means no contact email. */
+function normalizeContactEmail(value: string | null | undefined): string | null | undefined {
+  if (value === undefined || value === null) return value;
+  return value.trim().toLowerCase() || null;
+}
+
 /**
  * Update user identity
  */
@@ -193,6 +206,7 @@ export async function updateUser(
     username: string;
     name: string | null;
     email: string | null;
+    contactEmail: string | null;
     thumbnail: string | null;
     passwordHash: string | null;
     plexAccountId: string | null;
@@ -203,6 +217,7 @@ export async function updateUser(
     .set({
       ...data,
       email: data.email?.toLowerCase() ?? data.email,
+      contactEmail: normalizeContactEmail(data.contactEmail),
       updatedAt: new Date(),
     })
     .where(eq(users.id, userId))
@@ -265,6 +280,28 @@ export async function getServerUserByExternalId(
     .where(and(eq(serverUsers.serverId, serverId), eq(serverUsers.externalId, externalId)))
     .limit(1);
   return rows[0] ?? null;
+}
+
+/**
+ * Whether a same-server merge folded this external id into another account.
+ *
+ * Deliberately separate from getServerUserByExternalId: sync uses that one to
+ * decide what to write, and resolving an alias there would overwrite the
+ * surviving account's username, email and plex linkage with the absorbed
+ * account's whenever both still exist on the media server.
+ */
+export async function isAliasedExternalId(serverId: string, externalId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: serverUserExternalAliases.id })
+    .from(serverUserExternalAliases)
+    .where(
+      and(
+        eq(serverUserExternalAliases.serverId, serverId),
+        eq(serverUserExternalAliases.externalId, externalId)
+      )
+    )
+    .limit(1);
+  return rows.length > 0;
 }
 
 /**
@@ -633,6 +670,12 @@ export async function syncUserFromMediaServer(
       return { serverUser: updated[0]!, user, created: false };
     }
 
+    // Already folded into another account by a same-server merge. Creating it
+    // again is what the alias table exists to prevent.
+    if (await isAliasedExternalId(serverId, mediaUser.id)) {
+      return null;
+    }
+
     // Create new Plex user
     // For shared users: plex.tv ID = local PMS ID, so use mediaUser.id for both
     // For owner (isAdmin): should already exist from OAuth, but handle edge case
@@ -704,11 +747,14 @@ export async function syncUserFromMediaServer(
 
   // For Jellyfin/Emby: original flow using externalId
   const existing = await getServerUserByExternalId(serverId, mediaUser.id);
+  // Account level only: the identity lookup and users.email below keep the raw
+  // value, so a username never becomes a login email or links two people.
+  const accountEmail = mediaUser.email ?? usernameAsEmail(mediaUser.username);
 
   if (existing) {
     const updatePayload: Parameters<typeof updateServerUser>[1] = {
       username: mediaUser.username,
-      email: mediaUser.email ?? null,
+      email: accountEmail,
       thumbUrl: mediaUser.thumb ?? null,
       isServerAdmin: mediaUser.isAdmin,
     };
@@ -727,6 +773,12 @@ export async function syncUserFromMediaServer(
 
     const user = await requireUserById(existing.userId);
     return { serverUser: updated, user, created: false };
+  }
+
+  // Already folded into another account by a same-server merge. Creating it
+  // again is what the alias table exists to prevent.
+  if (await isAliasedExternalId(serverId, mediaUser.id)) {
+    return null;
   }
 
   // Use transaction to prevent orphaned users if server user creation fails
@@ -773,7 +825,7 @@ export async function syncUserFromMediaServer(
         serverId,
         externalId: mediaUser.id,
         username: mediaUser.username,
-        email: mediaUser.email ?? null,
+        email: accountEmail,
         thumbUrl: mediaUser.thumb ?? null,
         isServerAdmin: mediaUser.isAdmin,
         joinedAt: mediaUser.joinedAt ?? null,

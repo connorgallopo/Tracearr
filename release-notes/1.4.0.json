@@ -1,0 +1,53 @@
+{
+  "version": "1.4.0",
+  "date": "2025-12-31",
+  "headline": "Engagement tracking and multiple Plex accounts",
+  "highlights": [
+    {
+      "title": "Engagement tracking",
+      "body": "Sessions roll up into plays: total watch time over content duration, so an episode watched in three sittings is one play and clicks under two minutes don't count. Each play lands in a tier from Abandoned to Rewatched, TV shows get a 0 to 100 binge score, and metrics refresh every 15 minutes."
+    },
+    {
+      "title": "Multiple Plex accounts",
+      "body": "Connect Plex servers from different Plex.tv accounts to one Tracearr. Adding a server tests each connection path and shows which ones work. Existing single-account installs migrate automatically."
+    },
+    {
+      "title": "Tablet layouts",
+      "body": "The mobile app works on tablets with side-by-side charts and multi-column stats, plus a violation detail screen that compares the streams involved."
+    },
+    {
+      "title": "Version display",
+      "body": "The sidebar shows the running version with a badge when an update is out. Clicking it shows the release notes and the docker command to update."
+    }
+  ],
+  "changes": [
+    {
+      "type": "new",
+      "text": "a plays vs. sessions chart shows how much interrupts inflate session counts"
+    },
+    { "type": "new", "text": "top content by plays and top shows by binge score" },
+    { "type": "new", "text": "completion rate shows how much of what gets started is finished" },
+    {
+      "type": "new",
+      "text": "`groupByDevice` option cuts device velocity false positives for VPN users"
+    },
+    {
+      "type": "improved",
+      "text": "relay connections are skipped, ignoring bandwidth-limited relay paths"
+    },
+    { "type": "improved", "text": "Jellystat import limit raised to 500MB" },
+    { "type": "fix", "text": "Emby user sync runs again" },
+    {
+      "type": "fix",
+      "text": "Android no longer asks you to log in again after restoring an app backup"
+    },
+    {
+      "type": "fix",
+      "text": "geo rules match country name variations like USA, United States, and US"
+    },
+    { "type": "fix", "text": "Tautulli resumed sessions import as one session" },
+    { "type": "fix", "text": "Plex login no longer shows a false connection failure from a race" },
+    { "type": "fix", "text": "Discord and custom webhook test buttons are back in Settings" },
+    { "type": "fix", "text": "duplicate violations no longer block database migrations" }
+  ]
+}

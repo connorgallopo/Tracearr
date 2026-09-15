@@ -13,4 +13,5 @@ export { WatchCountChart } from './WatchCountChart';
 export { CompletionDonutChart } from './CompletionDonutChart';
 export { HourlyDistributionChart } from './HourlyDistributionChart';
 export { MonthlyTrendChart } from './MonthlyTrendChart';
+export { RequestFunnelChart, type FunnelStage } from './RequestFunnelChart';
 export { ChartEmpty } from './ChartEmpty';

@@ -155,7 +155,7 @@ describe('ImportPasteStep', () => {
 
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent('This needs Tracearr 2.4.0 or newer.');
-    expect(alert).toHaveTextContent("This server runs 2.2.0.");
+    expect(alert).toHaveTextContent('This server runs 2.2.0.');
     expect(onChecked).not.toHaveBeenCalled();
   });
 

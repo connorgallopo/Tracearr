@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AppSidebar } from './AppSidebar';
 import { SiteHeader } from './SiteHeader';
 import { StatusBanners } from './StatusBanners';
+import { WhatsNewAutoOpen } from '@/components/whats-new/WhatsNewAutoOpen';
 
 export function Layout() {
   return (
@@ -12,6 +13,7 @@ export function Layout() {
       <SidebarInset>
         <SiteHeader />
         <StatusBanners />
+        <WhatsNewAutoOpen />
         <ScrollArea className="flex-1">
           <main className="p-6">
             <Outlet />

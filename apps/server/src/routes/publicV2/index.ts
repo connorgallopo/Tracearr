@@ -20,6 +20,7 @@ import { registerLibrariesRoutes } from './libraries.js';
 import { registerMediaRoutes } from './media.js';
 import { registerStreamsRoutes } from './streams.js';
 import { registerUsersRoutes } from './users.js';
+import { registerWatchedMediaRoutes } from './watchedMedia.js';
 
 export { cursorPage, cursorPaginationSchema, type CursorPage } from './shared.js';
 
@@ -96,4 +97,5 @@ export const publicV2Routes: FastifyPluginAsync = async (app) => {
   registerMediaRoutes(app, routeConfig);
   registerUsersRoutes(app, routeConfig);
   registerLibrariesRoutes(app, routeConfig);
+  registerWatchedMediaRoutes(app, routeConfig);
 };

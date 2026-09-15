@@ -21,7 +21,6 @@ import {
   type AutomationScope,
   type AutomationScopeMode,
 } from '@/lib/automations/scope';
-import { SELECTED_TOGGLE } from './selection';
 import { StepFooterField } from './StepFooterField';
 
 interface ScopeFieldProps {
@@ -89,7 +88,7 @@ export function ScopeField({
           className="flex-wrap"
         >
           {modes.map((mode) => (
-            <ToggleGroupItem key={mode} value={mode} className={SELECTED_TOGGLE}>
+            <ToggleGroupItem key={mode} value={mode}>
               {t(`automations.builder.scope.${mode}`)}
             </ToggleGroupItem>
           ))}

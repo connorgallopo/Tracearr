@@ -142,9 +142,7 @@
         "title": "Token de emparejamiento generado",
         "message": "Escanea el código QR con tu dispositivo móvil para emparejar"
       },
-      "displayNameUpdated": {
-        "title": "Nombre a mostrar actualizado"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Restablecer puntuaciones de confianza",
         "message_one": "Usuario {{count}} restablecido a 100",
@@ -161,9 +159,21 @@
       "serverUserSplit": {
         "title": ""
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Error al añadir el servidor",
@@ -190,7 +200,7 @@
       "deviceRemoveFailed": "Error al eliminar el dispositivo",
       "deviceRenameFailed": "Error al renombrar el dispositivo",
       "sessionsRevokeFailed": "Error al revocar las sesiones",
-      "displayNameUpdateFailed": "Error al actualizar el nombre mostrado",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Error al restablecer las puntuaciones de confianza",
       "routingUpdateFailed": "Error al actualizar la regla",
       "clipboardFailed": "Error al copiar al portapapeles",
@@ -207,6 +217,8 @@
       "plexDirectUrl": "Las URLs plex.direct son direcciones repetidas que no se pueden utilizar aquí. Por favor, utilice una dirección IP directa o nombre de host en su lugar.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "invalidClaimCode": {
         "title": "Código CLAIM no válido",
         "message": "Por favor, compruebe los registros del servidor"
@@ -214,7 +226,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {

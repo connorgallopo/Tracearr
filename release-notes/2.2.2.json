@@ -1,0 +1,10 @@
+{
+  "version": "2.2.2",
+  "date": "2026-08-28",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "map works over plain http again, fixing \"this.painter is undefined\""
+    }
+  ]
+}

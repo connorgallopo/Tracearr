@@ -24,11 +24,16 @@ import { db } from '../../src/db/client.js';
 import {
   users,
   serverUsers,
+  serverUserExternalAliases,
   mobileSessions,
   mobileTokens,
   userMergeAudits,
 } from '../../src/db/schema.js';
 import { mergeUsers, splitServerUser } from '../../src/services/mergeService.js';
+import {
+  getServerUserByExternalId,
+  syncUserFromMediaServer,
+} from '../../src/services/userService.js';
 
 describe('chained merges preserve the audit trail', () => {
   it('repoints an earlier audit onto the final target instead of letting it cascade-delete', async () => {
@@ -271,5 +276,125 @@ describe('backward compatibility with audits written before movedIdentityRowIds 
       .from(userMergeAudits)
       .where(eq(userMergeAudits.id, mergeResult.auditId));
     expect(audit?.undoneAt).not.toBeNull();
+  });
+});
+
+describe('a same-server combine keeps the absorbed external id resolvable', () => {
+  it('points the folded external id at the surviving account so playback cannot undo the merge', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'plex' });
+
+    const owner = await createTestUser({ role: 'owner', username: 'durzoau' });
+    const pollerIdentity = await createTestUser({ role: 'member', username: 'durzoau' });
+
+    const ownerAccount = await createTestServerUser({
+      userId: owner.id,
+      serverId: server.id,
+      externalId: '3328117',
+    });
+    // What the poller created because a real session reported external id 1.
+    const pollerAccount = await createTestServerUser({
+      userId: pollerIdentity.id,
+      serverId: server.id,
+      externalId: '1',
+    });
+
+    await mergeUsers(pollerIdentity.id, owner.id, admin.id, { confirmSameServerCombine: true });
+
+    const [absorbed] = await db
+      .select()
+      .from(serverUsers)
+      .where(eq(serverUsers.id, pollerAccount.id));
+    expect(absorbed).toBeUndefined();
+
+    const [alias] = await db
+      .select()
+      .from(serverUserExternalAliases)
+      .where(eq(serverUserExternalAliases.externalId, '1'));
+    expect(alias?.serverId).toBe(server.id);
+    expect(alias?.serverUserId).toBe(ownerAccount.id);
+
+    // The next session still reports 1. Without the alias this misses and the
+    // duplicate identity comes straight back.
+    const resolved = await getServerUserByExternalId(server.id, '1');
+    expect(resolved).toBeNull();
+
+    const [aliasTarget] = await db
+      .select()
+      .from(serverUsers)
+      .where(eq(serverUsers.id, alias!.serverUserId));
+    expect(aliasTarget?.userId).toBe(owner.id);
+  });
+
+  it('carries the alias forward when the surviving account is itself absorbed', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'plex' });
+
+    const first = await createTestUser({ role: 'member', username: 'chain-a' });
+    const second = await createTestUser({ role: 'member', username: 'chain-b' });
+    const final = await createTestUser({ role: 'owner', username: 'chain-c' });
+
+    await createTestServerUser({ userId: first.id, serverId: server.id, externalId: 'a' });
+    await createTestServerUser({ userId: second.id, serverId: server.id, externalId: 'b' });
+    const finalAccount = await createTestServerUser({
+      userId: final.id,
+      serverId: server.id,
+      externalId: 'c',
+    });
+
+    await mergeUsers(first.id, second.id, admin.id, { confirmSameServerCombine: true });
+    await mergeUsers(second.id, final.id, admin.id, { confirmSameServerCombine: true });
+
+    // Both folded ids have to end on the last surviving account, or the first
+    // merge's alias dangles at a row the second merge deleted.
+    const aliases = await db
+      .select()
+      .from(serverUserExternalAliases)
+      .where(eq(serverUserExternalAliases.serverId, server.id));
+    expect(aliases.map((a) => a.externalId).sort()).toEqual(['a', 'b']);
+    for (const alias of aliases) {
+      expect(alias.serverUserId).toBe(finalAccount.id);
+    }
+  });
+});
+
+describe('sync does not write an absorbed account over the one that survived it', () => {
+  it('skips a folded external id instead of recreating it or renaming the survivor', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'jellyfin' });
+
+    const owner = await createTestUser({ role: 'owner', username: 'john' });
+    const spare = await createTestUser({ role: 'member', username: 'john-4k' });
+
+    const survivor = await createTestServerUser({
+      userId: owner.id,
+      serverId: server.id,
+      externalId: 'jf-new',
+      username: 'john',
+    });
+    await createTestServerUser({
+      userId: spare.id,
+      serverId: server.id,
+      externalId: 'jf-old',
+      username: 'john-4k',
+    });
+
+    await mergeUsers(spare.id, owner.id, admin.id, { confirmSameServerCombine: true });
+
+    // Both accounts still exist on the media server, so sync keeps reporting
+    // the absorbed one every tick.
+    const result = await syncUserFromMediaServer(server.id, {
+      id: 'jf-old',
+      username: 'john-4k',
+      isAdmin: false,
+      isDisabled: false,
+    });
+    expect(result).toBeNull();
+
+    const [after] = await db.select().from(serverUsers).where(eq(serverUsers.id, survivor.id));
+    expect(after?.username).toBe('john');
+
+    const accounts = await db.select().from(serverUsers).where(eq(serverUsers.serverId, server.id));
+    expect(accounts).toHaveLength(1);
   });
 });

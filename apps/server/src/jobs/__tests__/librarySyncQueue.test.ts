@@ -29,6 +29,10 @@ vi.mock('../../services/librarySync.js', () => ({
   initLibrarySyncRedis: vi.fn(),
 }));
 
+vi.mock('../../services/sync.js', () => ({
+  syncServer: vi.fn(),
+}));
+
 const mockRedisScan = vi.fn();
 const mockRedisDel = vi.fn();
 const mockRedisQuit = vi.fn();
@@ -79,6 +83,7 @@ vi.mock('ioredis', () => ({
 
 import { Worker } from 'bullmq';
 import { librarySyncService } from '../../services/librarySync.js';
+import { syncServer } from '../../services/sync.js';
 import { enqueueImagePrecache } from '../imagePrecacheQueue.js';
 import { resolvePrecachePass } from '../precachePassPolicy.js';
 import {
@@ -454,6 +459,7 @@ describe('library sync worker - cache invalidation gating', () => {
     const processor = vi.mocked(Worker).mock.calls[0]![1] as (job: unknown) => Promise<unknown>;
     await processor({
       id: 'job-1',
+      name: 'event-sync-srv-1',
       data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
       updateProgress: vi.fn(),
     });
@@ -586,6 +592,7 @@ describe('library sync worker - precache pass stamps', () => {
     const processor = vi.mocked(Worker).mock.calls[0]![1] as (job: unknown) => Promise<unknown>;
     await processor({
       id: 'job-1',
+      name: 'event-sync-srv-1',
       data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
       updateProgress: vi.fn(),
     });
@@ -601,5 +608,60 @@ describe('library sync worker - precache pass stamps', () => {
   it('leaves the watermark where it is when a pass was already queued for the server', async () => {
     const commit = await runSyncWithPass(undefined);
     expect(commit).not.toHaveBeenCalled();
+  });
+});
+
+describe('library sync worker - user sync', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockRedisScan.mockResolvedValue(['0', []]);
+    mockRedisDel.mockResolvedValue(0);
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+    vi.mocked(librarySyncService.syncServer).mockResolvedValue([]);
+    vi.mocked(syncServer).mockResolvedValue({
+      usersAdded: 0,
+      usersUpdated: 1,
+      usersSkipped: 0,
+      usersRemoved: 0,
+      usersRestored: 0,
+      librariesSynced: 0,
+      errors: [],
+    });
+  });
+
+  async function runJob(name: string): Promise<unknown> {
+    startLibrarySyncWorker();
+    const processor = vi.mocked(Worker).mock.calls[0]![1] as (job: unknown) => Promise<unknown>;
+    return processor({
+      id: 'job-1',
+      name,
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      updateProgress: vi.fn(),
+    });
+  }
+
+  it.each(['auto-sync-srv-1', 'boot-sync-srv-1'])(
+    'syncs the server users, and only them, before the libraries on %s',
+    async (name) => {
+      await runJob(name);
+      expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: false });
+      expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(librarySyncService.syncServer).mock.invocationCallOrder[0]!
+      );
+    }
+  );
+
+  it.each(['event-sync-srv-1', 'manual-sync-srv-1'])('leaves users alone on %s', async (name) => {
+    await runJob(name);
+    expect(syncServer).not.toHaveBeenCalled();
+    expect(librarySyncService.syncServer).toHaveBeenCalled();
+  });
+
+  it('still syncs the libraries when the user sync throws', async () => {
+    vi.mocked(syncServer).mockRejectedValue(new Error('plex.tv unreachable'));
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    await expect(runJob('auto-sync-srv-1')).resolves.toMatchObject({ success: true });
+    expect(librarySyncService.syncServer).toHaveBeenCalled();
   });
 });

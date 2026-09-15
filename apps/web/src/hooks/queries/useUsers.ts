@@ -79,17 +79,22 @@ export function useUpdateUserIdentity() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string | null }) =>
-      api.users.updateIdentity(id, { name }),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name?: string | null; contactEmail?: string | null };
+    }) => api.users.updateIdentity(id, data),
     onSuccess: () => {
-      // A display name is shared across the whole identity, so every cached
+      // A name or contact email is shared across the whole identity, so every cached
       // full-detail view (any account anchor, any scope) needs a refetch.
       void queryClient.invalidateQueries({ queryKey: ['users', 'full'] });
       void queryClient.invalidateQueries({ queryKey: ['users', 'list'] });
-      toast.success(t('toast.success.displayNameUpdated.title'));
+      toast.success(t('toast.success.identityUpdated'));
     },
     onError: (error: Error) => {
-      toast.error(t('toast.error.displayNameUpdateFailed'), { description: error.message });
+      toast.error(t('toast.error.identityUpdateFailed'), { description: error.message });
     },
   });
 }
@@ -154,12 +159,57 @@ export function useBulkResetTrust() {
   });
 }
 
+// The dismissed list sits under this prefix, so one invalidation refreshes both.
+const MERGE_SUGGESTIONS_KEY = ['users', 'merge-suggestions'] as const;
+
 export function useMergeSuggestions(enabled: boolean) {
   return useQuery({
-    queryKey: ['users', 'merge-suggestions'],
+    queryKey: MERGE_SUGGESTIONS_KEY,
     queryFn: () => api.users.mergeSuggestions(),
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDismissedMergeSuggestions(enabled: boolean) {
+  return useQuery({
+    queryKey: [...MERGE_SUGGESTIONS_KEY, 'dismissed'],
+    queryFn: () => api.users.dismissedMergeSuggestions(),
+    enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useDismissMergeSuggestion() {
+  const { t } = useTranslation('notifications');
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userIds: [string, string]) => api.users.dismissMergeSuggestion(userIds),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MERGE_SUGGESTIONS_KEY });
+      toast.success(t('toast.success.mergeSuggestionDismissed'));
+    },
+    onError: (error: Error) => {
+      toast.error(t('toast.error.mergeSuggestionDismissFailed'), { description: error.message });
+    },
+  });
+}
+
+export function useRestoreMergeSuggestion() {
+  const { t } = useTranslation('notifications');
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ([userA, userB]: [string, string]) =>
+      api.users.restoreMergeSuggestion(userA, userB),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: MERGE_SUGGESTIONS_KEY });
+      toast.success(t('toast.success.mergeSuggestionRestored'));
+    },
+    onError: (error: Error) => {
+      toast.error(t('toast.error.mergeSuggestionRestoreFailed'), { description: error.message });
+    },
   });
 }
 

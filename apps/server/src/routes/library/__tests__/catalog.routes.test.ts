@@ -218,10 +218,54 @@ describe('buildCatalogPageQuery', () => {
     expect(text).toContain('li.file_size <=');
     expect(params).toContain(serverId);
     expect(params).toContain('lib-1');
-    expect(params).toContain(true);
     // GB inputs convert to bytes before binding (base-1024, matching formatBytes).
     expect(params).toContain(5 * 1024 ** 3);
     expect(params).toContain(50 * 1024 ** 3);
+  });
+
+  it('show filters route resolution, HDR and size through episode versions', () => {
+    const { sql, params } = renderSql(
+      buildCatalogPageQuery({
+        type: 'show',
+        sort: 'title',
+        offset: 0,
+        ...baseFilterParams,
+        resolution: '4k',
+        hdr: true,
+        sizeGbMin: 5,
+        sizeGbMax: 50,
+        pageSize: 60,
+      })
+    );
+    const text = normalize(sql);
+    expect(text).toContain('em.show_media_id = m.id');
+    expect(text).toContain("em.media_type = 'episode'");
+    expect(text).toContain('epi.server_id = li.server_id AND epi.library_id = li.library_id');
+    expect(text).toContain('COALESCE(SUM(v.file_size), 0)');
+    expect(text).toContain("v.video_dynamic_range IS NOT NULL AND v.video_dynamic_range <> 'sdr'");
+    // The container-item shapes must not survive on the show tab.
+    expect(text).not.toContain('li.file_size >=');
+    expect(text).not.toContain('liv.library_item_id');
+    expect(params).toContain(5 * 1024 ** 3);
+    expect(params).toContain(50 * 1024 ** 3);
+  });
+
+  it('show pages decorate copies with episode-derived resolution and size', () => {
+    const { sql } = renderSql(
+      buildCatalogPageQuery({
+        type: 'show',
+        sort: 'title',
+        offset: 0,
+        ...baseFilterParams,
+        pageSize: 60,
+      })
+    );
+    const text = normalize(sql);
+    expect(text).toContain("CASE WHEN p.media_type = 'show'");
+    expect(text).toContain('em.show_media_id = p.id');
+    expect(text).toContain('SUM(v.file_size)');
+    // No filters active, so the WHERE carries no episode joins.
+    expect(text).not.toContain('em.show_media_id = m.id');
   });
 
   it('scopes the servers/poster subqueries and EXISTS clause to a single server', () => {
@@ -345,7 +389,7 @@ describe('buildLetterCountsQuery', () => {
     );
     const text = normalize(sql);
     expect(text).toContain('= ANY(m.genres)');
-    expect(text).toContain('liv.library_item_id = li.id');
+    expect(text).toContain('em.show_media_id = m.id');
     expect(params).toEqual(expect.arrayContaining(['Drama', 'show']));
   });
 });
@@ -723,8 +767,9 @@ describe('GET /library/catalog', () => {
       .find(({ sql }) => isPageQuery(normalize(sql)));
     expect(pageCall).toBeDefined();
     expect(pageCall!.params).toEqual(
-      expect.arrayContaining([serverId, 'lib-1', true, 1 * 1024 ** 3, 20 * 1024 ** 3])
+      expect.arrayContaining([serverId, 'lib-1', 1 * 1024 ** 3, 20 * 1024 ** 3])
     );
+    expect(normalize(pageCall!.sql)).toContain("livh.video_dynamic_range <> 'sdr'");
   });
 
   it('a punctuation-only search binds no search param instead of an empty-string LIKE', async () => {

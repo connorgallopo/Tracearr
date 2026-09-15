@@ -1,0 +1,136 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "oxc",
+    "unicorn",
+    "import",
+    "promise",
+    "node",
+    "react",
+    "jsx-a11y"
+  ],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/.claude/**",
+    "**/.superpowers/**",
+    "**/.playwright-mcp/**"
+  ],
+  "rules": {
+    "typescript/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "inline-type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ],
+    "typescript/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }
+    ],
+    "typescript/require-await": "off",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/dot-notation": "off",
+    "typescript/no-unnecessary-condition": "off",
+    "typescript/no-base-to-string": "off",
+    "typescript/array-type": "off",
+    "typescript/prefer-regexp-exec": "off",
+    "typescript/no-inferrable-types": "off",
+    "typescript/non-nullable-type-assertion-style": "off",
+    "typescript/no-unnecessary-type-conversion": "off",
+    "typescript/no-unsafe-member-access": "warn",
+    "typescript/no-unsafe-call": "warn",
+    "typescript/no-unsafe-assignment": "warn",
+    "typescript/no-unsafe-argument": "warn",
+    "typescript/no-unsafe-return": "warn",
+    "typescript/no-explicit-any": "warn",
+    "typescript/no-non-null-assertion": "warn",
+    "typescript/return-await": "warn",
+    "typescript/use-unknown-in-catch-callback-variable": "warn",
+    "typescript/no-unnecessary-type-parameters": "warn",
+    "typescript/no-confusing-void-expression": "off",
+    "typescript/prefer-nullish-coalescing": "off",
+    "typescript/no-invalid-void-type": "off",
+    "typescript/no-deprecated": "warn",
+    "unicorn/no-thenable": "off",
+    "typescript/require-array-sort-compare": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.tsx", "**/*.jsx"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react/set-state-in-effect": "warn",
+        "react/set-state-in-render": "warn",
+        "react/refs": "warn",
+        "react/purity": "warn",
+        "react/immutability": "warn",
+        "react/error-boundaries": "warn",
+        "react/no-unstable-nested-components": [
+          "warn",
+          {
+            "allowAsProps": true
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/test/**/*.ts",
+        "**/__tests__/**/*.ts",
+        "**/__tests__/**/*.tsx",
+        "packages/test-utils/**/*.ts"
+      ],
+      "rules": {
+        "typescript/unbound-method": "off",
+        "typescript/no-non-null-assertion": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/no-explicit-any": "off",
+        "typescript/no-unnecessary-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["packages/shared/src/**/*.ts"],
+      "excludeFiles": ["packages/shared/src/**/__tests__/**"],
+      "rules": {
+        "eslint/no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["node:*"],
+                "message": "shared ships to browsers and React Native; keep node builtins out"
+              }
+            ]
+          }
+        ],
+        "eslint/no-restricted-globals": ["error", "Buffer", "process", "require", "__dirname"]
+      }
+    }
+  ]
+}

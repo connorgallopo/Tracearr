@@ -5,16 +5,11 @@
  * This solves CORS issues and allows resizing/caching of images.
  */
 
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { POSTER_IMAGE_SIZE } from '@tracearr/shared';
 import { posterVersionFor, proxyImage } from '../services/imageProxy.js';
-
-// Static Tracearr logo paths (check for custom logo first, then use default)
-const CUSTOM_LOGO_PATH = join(process.cwd(), 'data', 'logo.png');
-const ASSETS_LOGO_PATH = join(process.cwd(), 'assets', 'logo.png');
+import { readLogoPng } from '../services/notifications/emailLogo.js';
 
 // Fallback SVG logo if no PNG exists
 const FALLBACK_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
@@ -65,6 +60,12 @@ const proxyQuerySchema = z
   });
 
 export const imageRoutes: FastifyPluginAsync = async (app) => {
+  // Sandboxed previews (opaque origin) and hosted-mode mail clients both need
+  // these public images to bypass helmet's default same-origin CORP.
+  app.addHook('onSend', async (_request, reply) => {
+    reply.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  });
+
   /**
    * GET /images/proxy - Proxy an image from a media server
    *
@@ -175,29 +176,17 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
    * GET /images/logo - Get the Tracearr logo
    *
    * Returns a static Tracearr logo for use in push notifications (server up/down).
-   * Checks for custom logo at data/logo.png, then assets/logo.png, then SVG fallback.
+   * Checks for the owner's data/logo.png, then the bundled assets/logo.png, then the SVG fallback.
    *
    * No authentication required - logo is public.
    */
   app.get('/logo', async (_request, reply) => {
-    // Check for custom logo first (allows user customization)
-    if (existsSync(CUSTOM_LOGO_PATH)) {
-      const logo = readFileSync(CUSTOM_LOGO_PATH);
-      reply.header('Cache-Control', 'public, max-age=604800'); // 1 week
+    const png = readLogoPng();
+    reply.header('Cache-Control', 'public, max-age=604800');
+    if (png) {
       reply.header('Content-Type', 'image/png');
-      return reply.send(logo);
+      return reply.send(png);
     }
-
-    // Check for bundled logo in assets
-    if (existsSync(ASSETS_LOGO_PATH)) {
-      const logo = readFileSync(ASSETS_LOGO_PATH);
-      reply.header('Cache-Control', 'public, max-age=604800'); // 1 week
-      reply.header('Content-Type', 'image/png');
-      return reply.send(logo);
-    }
-
-    // Return fallback SVG logo
-    reply.header('Cache-Control', 'public, max-age=604800'); // 1 week
     reply.header('Content-Type', 'image/svg+xml');
     return reply.send(Buffer.from(FALLBACK_LOGO_SVG));
   });

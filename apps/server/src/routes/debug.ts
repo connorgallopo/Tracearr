@@ -32,6 +32,7 @@ import {
 import { getInactivityCheckQueueStats } from '../jobs/inactivityCheckQueue.js';
 import { invalidateAutomationsCache, invalidateServersCache } from '../jobs/poller/database.js';
 import { getBackupQueueStats } from '../jobs/backupQueue.js';
+import { getNewsletterQueueStats } from '../jobs/newsletterQueue.js';
 import { resetSettingsCache } from '../services/settings.js';
 import {
   invalidateDestinationsCache,
@@ -902,6 +903,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
       versionCheck,
       inactivityCheck,
       backup,
+      newsletters,
     ] = await Promise.all([
       getNotificationQueueStats(),
       getImportQueueStats(),
@@ -910,6 +912,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
       getVersionCheckQueueStats(),
       getInactivityCheckQueueStats(),
       getBackupQueueStats(),
+      getNewsletterQueueStats(),
     ]);
 
     return {
@@ -921,6 +924,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
         versionCheck,
         inactivityCheck,
         backup,
+        newsletters,
       },
       services: getAllServices(),
       timestamp: new Date().toISOString(),

@@ -142,7 +142,7 @@ export function ServerBandwidthChart({
         height: 180,
         backgroundColor: 'transparent',
         style: { fontFamily: 'inherit' },
-        spacing: [10, 10, 15, 10],
+        spacing: [0, 10, 15, 10],
         reflow: true,
       },
       title: { text: undefined },
@@ -246,7 +246,7 @@ export function ServerBandwidthChart({
   if (isLoading) {
     return (
       <Card>
-        <CardHeader className="pb-2">{cardTitle}</CardHeader>
+        <CardHeader>{cardTitle}</CardHeader>
         <CardContent>
           <ChartSkeleton height={180} />
         </CardContent>
@@ -257,7 +257,7 @@ export function ServerBandwidthChart({
   if (!hasData) {
     return (
       <Card>
-        <CardHeader className="pb-2">{cardTitle}</CardHeader>
+        <CardHeader>{cardTitle}</CardHeader>
         <CardContent>
           <ChartEmpty height={180} message="No data available" />
         </CardContent>
@@ -267,8 +267,8 @@ export function ServerBandwidthChart({
 
   return (
     <Card>
-      <CardHeader className="pb-2">{cardTitle}</CardHeader>
-      <CardContent className="pb-2">
+      <CardHeader>{cardTitle}</CardHeader>
+      <CardContent>
         <HighchartsReact
           ref={chartRef}
           highcharts={Highcharts}

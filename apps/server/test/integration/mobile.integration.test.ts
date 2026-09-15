@@ -25,7 +25,6 @@ import { setSetting, getSetting } from '../../src/services/settings.js';
 // Constants (matching mobile.ts)
 const TOKEN_EXPIRY_MINUTES = 15;
 const MOBILE_TOKEN_PREFIX = 'trr_mob_';
-const MOBILE_REFRESH_TTL = 90 * 24 * 60 * 60; // 90 days
 
 // Test helpers
 function hashToken(token: string): string {
@@ -579,7 +578,6 @@ describe('Mobile Authentication Integration Tests', () => {
 
   describe('POST /api/v1/mobile/refresh - Refresh JWT Token', () => {
     let validRefreshToken: string;
-    let mobileJwt: string;
 
     beforeEach(async () => {
       // Generate a pairing token and pair a device
@@ -603,7 +601,6 @@ describe('Mobile Authentication Integration Tests', () => {
 
       const pairBody = pairRes.json();
       validRefreshToken = pairBody.refreshToken;
-      mobileJwt = pairBody.accessToken;
     });
 
     it('returns the same token for better auth backed sessions', async () => {
@@ -643,7 +640,6 @@ describe('Mobile Authentication Integration Tests', () => {
 
       // Update for subsequent tests
       validRefreshToken = body.refreshToken;
-      mobileJwt = body.accessToken;
     });
 
     it('rotates the refresh token for legacy (non-Better-Auth) pairings', async () => {

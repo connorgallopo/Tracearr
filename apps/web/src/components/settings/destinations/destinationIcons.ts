@@ -2,6 +2,7 @@ import { DESTINATION_TYPES, type DestinationKind } from '@tracearr/shared';
 import {
   Bell,
   Globe,
+  Mail,
   MessageSquare,
   Share2,
   Smartphone,
@@ -16,6 +17,7 @@ const ICONS: Record<string, LucideIcon> = {
   Share2,
   Smartphone,
   Globe,
+  Mail,
 };
 
 export function iconFor(kind: DestinationKind): LucideIcon {

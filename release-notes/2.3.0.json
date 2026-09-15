@@ -1,0 +1,196 @@
+{
+  "version": "2.3.0",
+  "date": "2026-09-14",
+  "headline": "Seerr requests, newsletters, and email",
+  "highlights": [
+    {
+      "title": "Requests",
+      "body": "Link Seerr, Overseerr or Jellyseerr to a server and every title shows who requested it, when it landed, and whether the requester watched it. Media → Requests counts what landed, what got watched and what nobody has played, with its size on disk. Tracearr only reads from Seerr, every 15 minutes with a full pass nightly.",
+      "docs": "https://docs.tracearr.com/configuration/requests"
+    },
+    {
+      "title": "Newsletters",
+      "body": "A newsletter mails a server's members what was added over a window, on a schedule, with an optional most watched section. Each one carries an unsubscribe link and a view in browser link, and History lists every send per recipient with retry for the ones that failed. Links to Jellyfin and Emby items need the server's Public address.",
+      "docs": "https://docs.tracearr.com/configuration/email/newsletters"
+    },
+    {
+      "title": "Email",
+      "body": "One SMTP destination sends automation alerts and newsletters, with presets for seven providers. Logo, accent color, footer and postal address, plus the suppression list, are under Settings → Notifications → Email.",
+      "docs": "https://docs.tracearr.com/configuration/email"
+    }
+  ],
+  "changes": [
+    {
+      "type": "new",
+      "text": "Seerr, Overseerr or Jellyseerr request history on media and user detail, read-only",
+      "docs": "https://docs.tracearr.com/configuration/requests"
+    },
+    {
+      "type": "new",
+      "text": "a Requests page under Media tracks what landed and who watched what they asked for",
+      "docs": "https://docs.tracearr.com/configuration/requests#the-requests-page"
+    },
+    {
+      "type": "new",
+      "text": "newsletters mail members what was added and what got watched most",
+      "docs": "https://docs.tracearr.com/configuration/email/newsletters"
+    },
+    {
+      "type": "new",
+      "text": "a newsletter across several servers only lists the ones each member has an account on",
+      "docs": "https://docs.tracearr.com/configuration/email/recipients#one-email-per-set-of-servers"
+    },
+    {
+      "type": "new",
+      "text": "newsletters take a sender name, a rich-text intro and outro, and an opt-in Tracearr footer link"
+    },
+    {
+      "type": "new",
+      "text": "a digest trims itself under Gmail's 102 KB clip, and each trimmed section says how many it left out"
+    },
+    {
+      "type": "new",
+      "text": "newsletter posters can be attached, hosted from your external URL, or left out",
+      "docs": "https://docs.tracearr.com/configuration/email/newsletters#poster-images"
+    },
+    {
+      "type": "new",
+      "text": "a contact email on the user page, edited next to the name, is where that person's newsletters go",
+      "docs": "https://docs.tracearr.com/configuration/email/recipients#setting-a-contact-email"
+    },
+    {
+      "type": "new",
+      "text": "SMTP email destination with presets for Postmark, Resend, SES, Mailgun, SendGrid, Brevo and Gmail",
+      "docs": "https://docs.tracearr.com/configuration/email"
+    },
+    {
+      "type": "new",
+      "text": "a what's new dialog opens once after an update, and clicking the sidebar version reopens it"
+    },
+    {
+      "type": "new",
+      "text": "the update dialog lists anything to do before updating, like backing up or updating the SSE plugin"
+    },
+    {
+      "type": "new",
+      "text": "Manage recipients sheet to exclude members from a newsletter or add addresses",
+      "docs": "https://docs.tracearr.com/configuration/email/recipients#exclude-and-include"
+    },
+    {
+      "type": "new",
+      "text": "unsubscribe and view-in-browser links in every newsletter, and a History tab with retry",
+      "docs": "https://docs.tracearr.com/configuration/email/recipients#unsubscribing"
+    },
+    {
+      "type": "new",
+      "text": "email branding and a suppression list under Settings → Notifications → Email",
+      "docs": "https://docs.tracearr.com/configuration/email#branding"
+    },
+    {
+      "type": "new",
+      "text": "Verify certificate switch for self-signed mail servers like Protonmail Bridge"
+    },
+    {
+      "type": "new",
+      "text": "Jellyfin and Emby API keys can be changed in Edit Server",
+      "docs": "https://docs.tracearr.com/configuration/servers#changing-the-url-or-api-key"
+    },
+    {
+      "type": "new",
+      "text": "new trigger \"a stream is first seen\" fires before the thirty-second confirmation",
+      "docs": "https://docs.tracearr.com/configuration/automations#sessions"
+    },
+    {
+      "type": "new",
+      "text": "triggers for when a newsletter is sent or a send fails, plus a Newsletter failed template",
+      "docs": "https://docs.tracearr.com/configuration/automations#newsletters"
+    },
+    {
+      "type": "new",
+      "text": "Public address on Jellyfin and Emby servers so newsletter links open for members",
+      "docs": "https://docs.tracearr.com/getting-started/first-server#public-address"
+    },
+    {
+      "type": "improved",
+      "text": "Settings is five groups in a left column, and old paths redirect"
+    },
+    {
+      "type": "improved",
+      "text": "merge suggestions say why two users matched and can be dismissed"
+    },
+    {
+      "type": "improved",
+      "text": "a merge carries over contact email, newsletter exclusions and Seerr requests"
+    },
+    {
+      "type": "improved",
+      "text": "Jellyfin and Emby usernames that are email addresses count as the account email"
+    },
+    {
+      "type": "fix",
+      "text": "Jellyfin 12 movies in a collection no longer drop out of the library"
+    },
+    {
+      "type": "fix",
+      "text": "a failed Plex shared-users fetch no longer marks every user as removed"
+    },
+    {
+      "type": "fix",
+      "text": "a scan checks each missing item by id with the server before removing it"
+    },
+    { "type": "fix", "text": "Plex titles keep all their genres after the next full sync" },
+    {
+      "type": "fix",
+      "text": "Jellyfin 12 music artists no longer land under video libraries and stall snapshots"
+    },
+    { "type": "fix", "text": "Most popular ranks read 1 to 20 again" },
+    {
+      "type": "fix",
+      "text": "Dead Weight no longer skips titles someone opened but never watched"
+    },
+    {
+      "type": "fix",
+      "text": "a rejected Jellyfin or Emby API key shows an error instead of the login page"
+    },
+    {
+      "type": "fix",
+      "text": "series browse quality, HDR and size filters read the episodes"
+    },
+    { "type": "fix", "text": "the update check reads Jellyfin's two-part v12.0 version" },
+    {
+      "type": "fix",
+      "text": "the server version line no longer offers an older release as an update"
+    },
+    { "type": "fix", "text": "share codes work on beta builds" },
+    {
+      "type": "fix",
+      "text": "Emby admin check tells a down server, a bad key and a non-admin account apart"
+    },
+    {
+      "type": "fix",
+      "text": "Tautulli import skips a page that won't fetch instead of failing the run"
+    },
+    { "type": "fix", "text": "library sync survives a bad library name" },
+    {
+      "type": "fix",
+      "text": "the Browse grid fills the window and refits when a banner comes or goes"
+    },
+    {
+      "type": "security",
+      "text": "connecting a Jellyfin or Emby server no longer hands a login token to the browser"
+    },
+    {
+      "type": "note",
+      "text": "the first library sync after updating is a full scan on every server"
+    },
+    {
+      "type": "note",
+      "text": "an auth proxy must let `/api/v1/email/unsubscribe/*`, `/api/v1/newsletters/view/*` and `/api/v1/images/proxy` through",
+      "docs": "https://docs.tracearr.com/configuration/email/recipients#behind-a-reverse-proxy"
+    },
+    {
+      "type": "note",
+      "text": "Helm takes the container port from `tracearr.env.PORT`; compose examples treat PORT as the host port"
+    }
+  ]
+}

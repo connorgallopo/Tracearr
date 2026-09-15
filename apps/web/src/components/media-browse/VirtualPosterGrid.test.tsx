@@ -7,8 +7,10 @@ import {
   computeColumnCount,
   computeRowCount,
   computeCardWidth,
+  computeGridHeight,
   computeRowHeight,
   computeViewportInfo,
+  MIN_GRID_HEIGHT,
   VirtualPosterGrid,
   type VirtualPosterGridHandle,
 } from './VirtualPosterGrid';
@@ -66,6 +68,16 @@ describe('computeCardWidth / computeRowHeight', () => {
 
   it('row height is card width * 1.5 plus the 72px two-line-title footer plus the 16px row bottom padding', () => {
     expect(computeRowHeight(140)).toBe(140 * 1.5 + 72 + 16);
+  });
+});
+
+describe('computeGridHeight', () => {
+  it('fills the window below the grid top, less the page bottom padding', () => {
+    expect(computeGridHeight(1080, 169, 24)).toBe(887);
+  });
+
+  it('stops at MIN_GRID_HEIGHT on a short window', () => {
+    expect(computeGridHeight(640, 169, 24)).toBe(MIN_GRID_HEIGHT);
   });
 });
 

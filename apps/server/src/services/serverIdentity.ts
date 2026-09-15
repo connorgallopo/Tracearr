@@ -19,6 +19,19 @@ interface IdentifiableServer {
   machineIdentifier: string | null;
 }
 
+/** The identifier the server at this address reports for itself, or null when it reports none. */
+export async function readServerIdentity(
+  server: Omit<IdentifiableServer, 'machineIdentifier'>
+): Promise<string | null> {
+  const client = createMediaServerClient({
+    type: server.type,
+    url: server.url,
+    token: server.token,
+    id: server.id,
+  });
+  return client.getServerIdentity ? client.getServerIdentity() : null;
+}
+
 /**
  * Fetches and stores the identifier when missing. Never throws: a server that
  * is unreachable keeps a null identifier and gets retried on the next pass.
@@ -32,14 +45,7 @@ export async function ensureServerIdentifier(
   if (server.machineIdentifier) return server.machineIdentifier;
 
   try {
-    const client = createMediaServerClient({
-      type: server.type,
-      url: server.url,
-      token: server.token,
-      id: server.id,
-    });
-    if (!client.getServerIdentity) return null;
-    const identity = await client.getServerIdentity();
+    const identity = await readServerIdentity(server);
     if (!identity) return null;
 
     await db

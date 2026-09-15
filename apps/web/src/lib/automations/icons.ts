@@ -11,6 +11,7 @@ import {
   Clock,
   Globe,
   Library,
+  Mail,
   MapPin,
   MessageSquare,
   Monitor,
@@ -59,6 +60,7 @@ const TRIGGER_GROUP_ICONS = {
   library: Library,
   servers: Server,
   updates: ArrowUpFromLine,
+  notifications: Mail,
 } as const satisfies Record<(typeof TRIGGERS)[TriggerType]['group'], LucideIcon>;
 
 const ACTION_ICONS = {

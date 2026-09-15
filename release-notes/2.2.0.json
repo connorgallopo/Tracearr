@@ -1,0 +1,77 @@
+{
+  "version": "2.2.0",
+  "date": "2026-08-27",
+  "headline": "Automations, templates, share codes, and new maps",
+  "upgradeWarning": "Back up before upgrading. The first boot turns every rule into an automation, with no going back to 2.1",
+  "highlights": [
+    {
+      "title": "Automations",
+      "body": "Rules are automations now. Each one says what starts it: a stream event, an inactive account, a new device, a trust score change, a server going down or up, an update, or new media. The builder is one page (When, And only if, Then do) with a plain-words summary and a live check against what's playing."
+    },
+    {
+      "title": "Share codes",
+      "body": "Export any automation as a `tracearr1.` code and paste it into another Tracearr. Tokens, ids, and server names are stripped, and imports start paused after showing what the code does.",
+      "docs": "https://docs.tracearr.com/templates"
+    },
+    {
+      "title": "Media triggers",
+      "body": "Media added and media upgraded fire off library sync, ~30 s with Plex or the SSE plugin and next sync otherwise. Conditions on type, library, resolution, HDR, codec, audio, and file size. A library's first sync stays quiet."
+    },
+    {
+      "title": "Notifications",
+      "body": "Settings → Notifications is a list of destinations: Discord, a JSON webhook, ntfy, Gotify, Apprise, Pushover, mobile push and browser toasts. Add more than one of a kind and pick events for each. Existing Discord, webhook, ntfy and Pushover settings move over on first boot, and webhook URLs and tokens are encrypted in the database.",
+      "docs": "https://docs.tracearr.com/configuration/destinations"
+    }
+  ],
+  "changes": [
+    {
+      "type": "new",
+      "text": "Activity opens on what automations ran, missed or failed, and any run replays into the builder"
+    },
+    {
+      "type": "new",
+      "text": "twenty-one ready-made automations in a gallery, pick one and fill in the blanks"
+    },
+    {
+      "type": "new",
+      "text": "a linked Plex account can be reauthorized from Settings when its token stops working"
+    },
+    {
+      "type": "new",
+      "text": "three update switches in Settings → General: SSE plugin, media servers, Tracearr"
+    },
+    {
+      "type": "improved",
+      "text": "each destination subscription became an automation; fresh installs seed five"
+    },
+    {
+      "type": "improved",
+      "text": "poster cache keeps one copy per poster and stops evicting unchanged ones"
+    },
+    {
+      "type": "improved",
+      "text": "a failed notification retries three times before it parks in a dead-letter queue"
+    },
+    {
+      "type": "fix",
+      "text": "maps run fully local with GPU acceleration, replacing the provider that changed its licensing",
+      "refs": ["#1091"]
+    },
+    {
+      "type": "fix",
+      "text": "\"is\" on a list field accepts a single value, so old country rules save again"
+    },
+    { "type": "fix", "text": "deleting a destination used inside an if branch is refused" },
+    { "type": "fix", "text": "episode and track notifications name the show or artist" },
+    { "type": "fix", "text": "rule push notifications carry the poster and user avatar again" },
+    { "type": "fix", "text": "v2 rule violations reach mobile push again" },
+    {
+      "type": "security",
+      "text": "destination secrets are encrypted at rest with a key from `JWT_SECRET`, or `ENCRYPTION_KEY` if set"
+    },
+    {
+      "type": "note",
+      "text": "existing Discord, webhook, ntfy and Pushover settings move into destinations on first boot"
+    }
+  ]
+}

@@ -97,6 +97,24 @@ function DeviceIcon({ session, className }: { session: ActiveSession; className?
   return <Monitor className={className} />;
 }
 
+function PlaybackOverlay({ isPaused }: { isPaused: boolean }) {
+  return (
+    <div
+      data-testid="artwork-playback-overlay"
+      className={cn(
+        'absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 transition-opacity',
+        isPaused ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+      )}
+    >
+      {isPaused ? (
+        <Pause className="h-8 w-8 shrink-0 text-white" />
+      ) : (
+        <Play className="h-8 w-8 shrink-0 text-white" />
+      )}
+    </div>
+  );
+}
+
 export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   const { title, subtitle } = getCardMediaDisplay(session);
   const { user } = useAuth();
@@ -120,21 +138,21 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
       ? session.totalDurationMs - estimatedProgressMs
       : null;
 
-  // Build poster URL using image proxy
+  // Keep the shared server cache key, but refresh browser copies from before
+  // the one-time uncropped-artwork cache migration.
   const posterUrl = session.thumbPath
     ? imageProxyUrl(
         session.serverId,
         session.thumbPath,
         POSTER_IMAGE_SIZE.width,
         POSTER_IMAGE_SIZE.height
-      )
+      ) + '&artwork=2'
     : null;
 
   // User avatar URL (proxied for Jellyfin/Emby)
   const avatarUrl = getAvatarUrl(session.serverId, session.user.thumbUrl, 28) ?? undefined;
 
   const isPaused = session.state === 'paused';
-  const isSquareArt = session.mediaType === 'track' || session.mediaType === 'live';
   const dispatcharrLiveSpeed =
     !isDispatcharrCatchup &&
     session.server.type === 'dispatcharr' &&
@@ -168,33 +186,36 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
         {/* Content */}
         <div className="relative flex gap-4 p-4">
           {/* Poster */}
-          <div className="bg-muted relative h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg shadow-lg">
-            {posterUrl ? (
-              <img
-                src={posterUrl}
-                alt={title}
-                className={cn('h-full w-full', isSquareArt ? 'object-contain' : 'object-cover')}
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <Server className="text-muted-foreground h-8 w-8" />
-              </div>
+          <div
+            data-testid="card-artwork"
+            className={cn(
+              'relative h-28 w-20 flex-shrink-0',
+              !posterUrl && 'bg-muted overflow-hidden rounded-lg shadow-lg'
             )}
-
-            {/* Play/Pause indicator overlay */}
-            <div
-              className={cn(
-                'absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity',
-                isPaused ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              )}
-            >
-              {isPaused ? (
-                <Pause className="h-8 w-8 text-white" />
-              ) : (
-                <Play className="h-8 w-8 text-white" />
-              )}
-            </div>
+          >
+            {posterUrl ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                {/* The inner element takes the image's actual aspect ratio.
+                    Effects apply here rather than to the reserved poster slot. */}
+                <div className="relative max-h-full max-w-full overflow-visible">
+                  <img
+                    src={posterUrl}
+                    alt={title}
+                    className="block h-auto max-h-28 w-auto max-w-20 rounded-lg shadow-lg"
+                    loading="lazy"
+                  />
+                  {/* No overflow clipping: a tiny source must not crop the fixed-size control. */}
+                  <PlaybackOverlay isPaused={isPaused} />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex h-full w-full items-center justify-center">
+                  <Server className="text-muted-foreground h-8 w-8" />
+                </div>
+                <PlaybackOverlay isPaused={isPaused} />
+              </>
+            )}
           </div>
 
           {/* Info */}

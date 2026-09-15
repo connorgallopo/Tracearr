@@ -594,6 +594,72 @@ describe('parseLibraryItemsResponse', () => {
     expect(result[0]!.thumbPath).toBe('/Items/emby-item-1/Images/Primary');
   });
 
+  it('points a track thumbPath at its album so one cover caches once', () => {
+    const input = [
+      {
+        Id: 'track-1',
+        Name: 'Track One',
+        Type: 'Audio',
+        ImageTags: { Primary: 'pertrack1' },
+        AlbumId: 'album-9',
+        AlbumPrimaryImageTag: 'albumtag',
+      },
+      {
+        Id: 'track-2',
+        Name: 'Track Two',
+        Type: 'Audio',
+        ImageTags: { Primary: 'pertrack2' },
+        AlbumId: 'album-9',
+        AlbumPrimaryImageTag: 'albumtag',
+      },
+    ];
+
+    const result = parseLibraryItemsResponse(input);
+
+    expect(result[0]!.thumbPath).toBe('/Items/album-9/Images/Primary?tag=albumtag');
+    expect(result[1]!.thumbPath).toBe(result[0]!.thumbPath);
+  });
+
+  it('keeps a track on its own image when the album has no image of its own', () => {
+    const input = [
+      {
+        Id: 'track-3',
+        Name: 'Track',
+        Type: 'Audio',
+        ImageTags: { Primary: 'own3' },
+        AlbumId: 'album-9',
+      },
+    ];
+
+    const result = parseLibraryItemsResponse(input);
+
+    expect(result[0]!.thumbPath).toBe('/Items/track-3/Images/Primary?tag=own3');
+  });
+
+  it('keeps a track on its own image when it reports no album', () => {
+    const input = [{ Id: 'track-4', Name: 'Track', Type: 'Audio', ImageTags: { Primary: 'own' } }];
+
+    const result = parseLibraryItemsResponse(input);
+
+    expect(result[0]!.thumbPath).toBe('/Items/track-4/Images/Primary?tag=own');
+  });
+
+  it('leaves an episode on its own image', () => {
+    const input = [
+      {
+        Id: 'ep-1',
+        Name: 'Episode',
+        Type: 'Episode',
+        ImageTags: { Primary: 'eptag' },
+        AlbumId: 'should-be-ignored',
+      },
+    ];
+
+    const result = parseLibraryItemsResponse(input);
+
+    expect(result[0]!.thumbPath).toBe('/Items/ep-1/Images/Primary?tag=eptag');
+  });
+
   it('parses Genres array into genres', () => {
     const input = [
       {

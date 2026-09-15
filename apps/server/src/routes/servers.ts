@@ -10,11 +10,11 @@ import {
   reorderServersSchema,
   updateServerSchema,
   pickServerColor,
+  PUBLIC_URL_PLEX_MESSAGE,
   type ServerConnectionStatus,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, plexAccounts } from '../db/schema.js';
-// Token encryption removed - tokens now stored in plain text (DB is localhost-only)
 import {
   PlexClient,
   JellyfinClient,
@@ -28,6 +28,7 @@ import { getCacheService } from '../services/cache.js';
 import { enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
 import { supportsMediaLibrary } from '@tracearr/shared';
 import { publishServersChanged } from '../jobs/poller/database.js';
+import { readServerIdentity } from '../services/serverIdentity.js';
 import { buildServerAccessCondition } from '../utils/serverFiltering.js';
 
 function getDispatcharrAuthMode(token?: string | null): 'token' | 'credentials' {
@@ -86,7 +87,7 @@ async function verifyServerAccess(params: {
           adminCheck.code === JellyfinClient.AdminVerifyError.CONNECTION_FAILED
             ? 503
             : adminCheck.code === JellyfinClient.AdminVerifyError.INVALID_KEY
-              ? 401
+              ? 400
               : 403,
         message: adminCheck.message,
       };
@@ -95,13 +96,18 @@ async function verifyServerAccess(params: {
   }
 
   if (type === 'emby') {
-    const isAdmin = await EmbyClient.verifyServerAdmin(token, url);
-    return isAdmin
+    const adminCheck = await EmbyClient.verifyServerAdmin(token, url);
+    return adminCheck.success
       ? { ok: true }
       : {
           ok: false,
-          statusCode: 403,
-          message: 'Token does not have admin access to this Emby server',
+          statusCode:
+            adminCheck.code === EmbyClient.AdminVerifyError.CONNECTION_FAILED
+              ? 503
+              : adminCheck.code === EmbyClient.AdminVerifyError.INVALID_KEY
+                ? 400
+                : 403,
+          message: adminCheck.message,
         };
   }
 
@@ -131,6 +137,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         machineIdentifier: servers.machineIdentifier,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         displayOrder: servers.displayOrder,
@@ -179,10 +186,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
   app.post('/', { preHandler: [app.authenticate] }, async (request, reply) => {
     const body = createServerSchema.safeParse(request.body);
     if (!body.success) {
-      return reply.badRequest('Invalid request body');
+      return reply.badRequest(body.error.issues[0]?.message ?? 'Invalid request body');
     }
 
-    const { name, type, url, token, username, password, ignoreAnonymousStreams } = body.data;
+    const { name, type, url, token, username, password, ignoreAnonymousStreams, publicUrl } =
+      body.data;
     const authUser = request.user;
 
     // Only owners can add servers
@@ -213,7 +221,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       if (!accessCheck.ok) {
         if (accessCheck.statusCode === 503)
           return await reply.serviceUnavailable(accessCheck.message);
-        if (accessCheck.statusCode === 401) return await reply.unauthorized(accessCheck.message);
+        if (accessCheck.statusCode === 400) return await reply.badRequest(accessCheck.message);
         return await reply.forbidden(accessCheck.message);
       }
 
@@ -262,6 +270,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         url,
         token: normalizedToken,
         ignoreAnonymousStreams,
+        publicUrl: publicUrl ?? null,
         color,
         plexAccountId, // Links Plex servers to their owning account (undefined for non-Plex)
       })
@@ -271,6 +280,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         color: servers.color,
         createdAt: servers.createdAt,
@@ -313,9 +323,9 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
   });
 
   /**
-   * PATCH /servers/:id - Update server name and/or URL
-   * Accepts optional name and/or url; at least one is required.
-   * When url is provided, verifies the new URL is reachable with existing token before updating.
+   * PATCH /servers/:id - Update a server's name, URL, color, public address or API key
+   * At least one is required. A URL or API key change is verified against the server, and
+   * refused when it reaches a different server than the one the row belongs to.
    *
    * For Plex servers with clientIdentifier:
    * - Validates that the clientIdentifier matches the server's machineIdentifier
@@ -342,6 +352,8 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       password: newPassword,
       ignoreAnonymousStreams: newIgnoreAnonymousStreams,
       color: newColor,
+      publicUrl: newPublicUrl,
+      apiKey: newApiKey,
     } = body.data;
     const newUrl = bodyUrl !== undefined ? bodyUrl.replace(/\/$/, '') : undefined;
     const authUser = request.user;
@@ -373,96 +385,68 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
             username: newUsername,
             password: newPassword,
           })
-        : server.token;
+        : (newApiKey ?? server.token);
 
     if (authChanged && !normalizedToken) {
       return reply.badRequest('Dispatcharr update requires a complete token or username+password');
     }
     const verifiedToken = normalizedToken ?? undefined;
+    if (server.type === 'dispatcharr' && newApiKey !== undefined) {
+      return reply.badRequest(
+        'Dispatcharr authentication uses token or username+password, not apiKey'
+      );
+    }
 
-    // If only name is being updated, no URL verification needed
-    if (newUrl !== undefined) {
-      // Don't update if URL is the same (and no name change, or name is same)
-      if (
-        server.url === newUrl &&
-        (newName === undefined || server.name === newName) &&
-        !authChanged &&
-        newIgnoreAnonymousStreams === undefined &&
-        newColor === undefined
-      ) {
-        return {
-          id: server.id,
-          name: newName ?? server.name,
-          type: server.type,
-          url: server.url,
-          dispatcharrAuthMode:
-            server.type === 'dispatcharr' ? getDispatcharrAuthMode(server.token) : undefined,
-          ignoreAnonymousStreams: server.ignoreAnonymousStreams,
-          createdAt: server.createdAt,
-          updatedAt: server.updatedAt,
-        };
-      }
+    if (server.type === 'plex' && newPublicUrl !== undefined) {
+      return reply.badRequest(PUBLIC_URL_PLEX_MESSAGE);
+    }
 
-      // Only verify when the URL is actually changing
-      if (server.url !== newUrl || authChanged) {
-        // For Plex servers: Validate machineIdentifier if provided
-        if (server.type === 'plex' && clientIdentifier) {
-          if (server.machineIdentifier && server.machineIdentifier !== clientIdentifier) {
-            return reply.badRequest(
-              'Server mismatch: The selected connection belongs to a different server. ' +
-                'Please select a connection for the correct server.'
-            );
-          }
-        }
+    if (server.type === 'plex' && newApiKey !== undefined) {
+      return reply.badRequest('Plex servers sign in through plex.tv and have no API key to change');
+    }
 
-        // Verify the new URL/auth combination works
-        try {
-          const accessCheck = await verifyServerAccess({
-            type: server.type,
-            token: verifiedToken as string,
-            url: effectiveUrl,
-          });
-          if (!accessCheck.ok) {
-            if (accessCheck.statusCode === 503)
-              return await reply.serviceUnavailable(accessCheck.message);
-            if (accessCheck.statusCode === 401)
-              return await reply.unauthorized(accessCheck.message);
-            return await reply.forbidden(
-              server.type === 'emby' && accessCheck.message.includes('this Emby server')
-                ? 'Token does not have admin access at this URL'
-                : accessCheck.message
-            );
-          }
-        } catch (error) {
-          app.log.error(
-            { err: error, serverId: id, newUrl: effectiveUrl },
-            'Failed to verify updated server configuration'
-          );
-          return reply.badRequest(
-            'Failed to connect to server with updated configuration. Please verify the settings.'
-          );
-        }
-      }
-    } else if (
-      newName !== undefined &&
-      server.name === newName &&
+    const same = <T>(next: T | undefined, current: T): boolean =>
+      next === undefined || next === current;
+    if (
       !authChanged &&
-      newIgnoreAnonymousStreams === undefined &&
-      newColor === undefined
+      same(newName, server.name) &&
+      same(newUrl, server.url) &&
+      same(newColor, server.color) &&
+      same(newPublicUrl, server.publicUrl) &&
+      same(newIgnoreAnonymousStreams, server.ignoreAnonymousStreams) &&
+      same(newApiKey, server.token)
     ) {
-      // Name-only update but name unchanged
       return {
         id: server.id,
         name: server.name,
         type: server.type,
         url: server.url,
+        publicUrl: server.publicUrl,
+        color: server.color,
         dispatcharrAuthMode:
           server.type === 'dispatcharr' ? getDispatcharrAuthMode(server.token) : undefined,
         ignoreAnonymousStreams: server.ignoreAnonymousStreams,
         createdAt: server.createdAt,
         updatedAt: server.updatedAt,
       };
-    } else if (authChanged) {
+    }
+
+    const urlChanging = newUrl !== undefined && server.url !== newUrl;
+    const keyChanging = newApiKey !== undefined && server.token !== newApiKey;
+    let backfilledIdentity: string | undefined;
+
+    if (urlChanging || keyChanging || authChanged) {
+      if (
+        server.type === 'plex' &&
+        clientIdentifier &&
+        server.machineIdentifier &&
+        server.machineIdentifier !== clientIdentifier
+      ) {
+        return reply.badRequest(
+          'Server mismatch: The selected connection belongs to a different server. ' +
+            'Please select a connection for the correct server.'
+        );
+      }
       try {
         const accessCheck = await verifyServerAccess({
           type: server.type,
@@ -472,17 +456,50 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         if (!accessCheck.ok) {
           if (accessCheck.statusCode === 503)
             return await reply.serviceUnavailable(accessCheck.message);
-          if (accessCheck.statusCode === 401) return await reply.unauthorized(accessCheck.message);
+          if (accessCheck.statusCode === 400) return await reply.badRequest(accessCheck.message);
           return await reply.forbidden(accessCheck.message);
         }
       } catch (error) {
         app.log.error(
-          { err: error, serverId: id, url: effectiveUrl },
-          'Failed to verify updated server authentication'
+          { err: error, serverId: id, newUrl: effectiveUrl },
+          'Failed to verify updated server configuration'
         );
         return reply.badRequest(
           'Failed to connect to server with updated configuration. Please verify the settings.'
         );
+      }
+
+      // Dispatcharr does not expose a stable server identity; retain its verified auth flow.
+      if (server.type !== 'dispatcharr') {
+        const expectedIdentity =
+          server.machineIdentifier ?? (await readServerIdentity(server).catch(() => null));
+        if (!expectedIdentity) {
+          return reply.badRequest(
+            'Tracearr has no record of which server this is and cannot reach it with the saved address and key, so it cannot confirm the change points at the same server.'
+          );
+        }
+
+        const reachedIdentity = await readServerIdentity({
+          id,
+          type: server.type,
+          url: effectiveUrl,
+          token: verifiedToken as string,
+        }).catch((error: unknown) => {
+          app.log.error(
+            { err: error, serverId: id, url: effectiveUrl },
+            'Failed to read server identity'
+          );
+          return null;
+        });
+        if (reachedIdentity === null) {
+          return reply.badRequest('Could not read which server answers at that address.');
+        }
+        if (reachedIdentity !== expectedIdentity) {
+          return reply.badRequest(
+            'That address or API key reaches a different server. A server can only be pointed at itself.'
+          );
+        }
+        if (!server.machineIdentifier) backfilledIdentity = expectedIdentity;
       }
     }
 
@@ -493,8 +510,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       token?: string;
       ignoreAnonymousStreams?: boolean;
       color?: string | null;
+      publicUrl?: string | null;
+      machineIdentifier?: string;
       updatedAt: Date;
     } = { updatedAt: new Date() };
+    if (backfilledIdentity !== undefined) updatePayload.machineIdentifier = backfilledIdentity;
     if (newName !== undefined) updatePayload.name = newName;
     if (newUrl !== undefined) updatePayload.url = newUrl;
     if (authChanged) updatePayload.token = normalizedToken;
@@ -502,6 +522,8 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       updatePayload.ignoreAnonymousStreams = newIgnoreAnonymousStreams;
     }
     if (newColor !== undefined) updatePayload.color = newColor;
+    if (newPublicUrl !== undefined) updatePayload.publicUrl = newPublicUrl;
+    if (newApiKey !== undefined) updatePayload.token = newApiKey;
 
     const updated = await db
       .update(servers)
@@ -513,6 +535,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         type: servers.type,
         url: servers.url,
         token: servers.token,
+        publicUrl: servers.publicUrl,
         ignoreAnonymousStreams: servers.ignoreAnonymousStreams,
         color: servers.color,
         createdAt: servers.createdAt,
@@ -528,6 +551,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       (newName !== undefined && newName !== server.name) ||
       (newUrl !== undefined && newUrl !== server.url) ||
       authChanged ||
+      keyChanging ||
       (newIgnoreAnonymousStreams !== undefined &&
         newIgnoreAnonymousStreams !== server.ignoreAnonymousStreams);
     await publishServersChanged();
@@ -536,7 +560,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       if (newUrl !== undefined) {
         app.log.info({ serverId: id, oldUrl: server.url, newUrl }, 'Server URL updated');
       }
-      if (authChanged) {
+      if (authChanged || keyChanging) {
         app.log.info({ serverId: id }, 'Server authentication updated');
       }
       // The leader compares connector-owned fields with the database row and
@@ -805,85 +829,6 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         : { bandwidthSamples: [], bandwidthAccounts: [], bandwidthDevices: [] }),
       fetchedAt: new Date().toISOString(),
     };
-  });
-
-  /**
-   * GET /servers/:id/image/* - Proxy images from Plex/Jellyfin servers
-   * This endpoint fetches images without exposing server tokens to the client
-   *
-   * For Plex: /servers/:id/image/library/metadata/123/thumb/456
-   * For Jellyfin: /servers/:id/image/Items/123/Images/Primary?tag=abc
-   *
-   * Note: Accepts auth via header OR query param (?token=xxx) since browser
-   * <img> tags don't send Authorization headers
-   */
-  app.get('/:id/image/*', async (request, reply) => {
-    // Custom auth: try header first, fall back to query param for <img> tags
-    const queryToken = (request.query as { token?: string }).token;
-    if (queryToken) {
-      // Manually set authorization header for jwtVerify to work
-      request.headers.authorization = `Bearer ${queryToken}`;
-    }
-
-    // Shared guard rather than a bare jwtVerify: it also enforces the
-    // post-restore revocation timestamp and the mobile device blacklist.
-    await app.authenticate(request, reply);
-    if (reply.sent) return;
-
-    const { id } = request.params as { id: string; '*': string };
-    const imagePath = (request.params as { '*': string })['*'];
-
-    if (!imagePath) {
-      return reply.badRequest('Image path is required');
-    }
-
-    // Get server with token
-    const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
-
-    const server = serverRows[0];
-    if (!server) {
-      return reply.notFound('Server not found');
-    }
-
-    const baseUrl = server.url.replace(/\/$/, '');
-    const token = server.token;
-
-    try {
-      let imageUrl: string;
-      let headers: Record<string, string>;
-
-      if (server.type === 'plex') {
-        // Plex uses X-Plex-Token query param
-        const separator = imagePath.includes('?') ? '&' : '?';
-        imageUrl = `${baseUrl}/${imagePath}${separator}X-Plex-Token=${token}`;
-        headers = { Accept: 'image/*' };
-      } else {
-        imageUrl = `${baseUrl}/${imagePath}`;
-        const authValue = `MediaBrowser Client="Tracearr", Device="Tracearr Server", DeviceId="tracearr-server", Version="1.0.0", Token="${token}"`;
-        const authHeaderName =
-          server.type === 'jellyfin' ? 'Authorization' : 'X-Emby-Authorization';
-        headers = {
-          [authHeaderName]: authValue,
-          Accept: 'image/*',
-        };
-      }
-
-      const response = await fetch(imageUrl, { headers });
-
-      if (!response.ok) {
-        return await reply.notFound('Image not found');
-      }
-
-      const contentType = response.headers.get('content-type') ?? 'image/jpeg';
-      const buffer = await response.arrayBuffer();
-
-      reply.header('Content-Type', contentType);
-      reply.header('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
-      return await reply.send(Buffer.from(buffer));
-    } catch (error) {
-      app.log.error({ err: error, serverId: id, imagePath }, 'Failed to fetch image from server');
-      return reply.internalServerError('Failed to fetch image');
-    }
   });
 
   /**

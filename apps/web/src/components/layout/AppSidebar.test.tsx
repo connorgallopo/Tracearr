@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -27,8 +27,16 @@ vi.mock('@/hooks/useSocket', () => ({
   useSocket: () => ({ serverConnectionStatuses: new Map(), isConnected: false }),
 }));
 
+const { seerr, versionState, dismissMutate } = vi.hoisted(() => ({
+  seerr: { configured: false },
+  versionState: { data: undefined as unknown, isLoading: true },
+  dismissMutate: vi.fn(),
+}));
+
 vi.mock('@/hooks/queries', () => ({
-  useVersion: () => ({ data: undefined, isLoading: true }),
+  useVersion: () => versionState,
+  useRequestsConfigured: () => ({ data: seerr }),
+  useDismissWhatsNew: () => ({ mutate: dismissMutate }),
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -55,6 +63,26 @@ function renderSidebar(initialPath = '/media') {
 }
 
 describe('AppSidebar navigation', () => {
+  beforeEach(() => {
+    seerr.configured = false;
+    versionState.data = undefined;
+    versionState.isLoading = true;
+    dismissMutate.mockReset();
+  });
+
+  it('hides the Requests entry until a Seerr is linked', () => {
+    renderSidebar();
+
+    expect(screen.queryByText('requests')).not.toBeInTheDocument();
+  });
+
+  it('shows the Requests entry once a Seerr is linked', () => {
+    seerr.configured = true;
+    renderSidebar();
+
+    expect(screen.getByText('requests')).toBeInTheDocument();
+  });
+
   it('renders the Media group with Overview/Browse/Genres and the moved library entries', () => {
     renderSidebar();
 
@@ -99,5 +127,30 @@ describe('AppSidebar navigation', () => {
       'href',
       '/media/genres'
     );
+  });
+
+  it('opens the release notes when the version is clicked, and closing never writes anything', () => {
+    versionState.data = {
+      current: {
+        version: '2.2.3',
+        tag: 'v2.2.3',
+        commit: null,
+        buildDate: null,
+        isPrerelease: false,
+      },
+      fork: { latest: null, updateAvailable: false },
+      upstream: { latest: null, updateAvailable: false },
+      recommended: { kind: 'none' },
+      lastChecked: null,
+    };
+    versionState.isLoading = false;
+    renderSidebar();
+
+    fireEvent.click(screen.getByRole('button', { name: /v2\.2\.3/ }));
+    expect(screen.getByText('settings:whatsNew.title')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'common:actions.close' }));
+    expect(screen.queryByText('settings:whatsNew.title')).not.toBeInTheDocument();
+    expect(dismissMutate).not.toHaveBeenCalled();
   });
 });

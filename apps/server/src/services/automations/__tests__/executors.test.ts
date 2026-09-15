@@ -506,6 +506,36 @@ describe('Action Executor Registry', () => {
         });
       });
 
+      it('sends newsletter_send from an install context with the trigger fields as the payload', async () => {
+        const fields = {
+          newsletterId: 'n-1',
+          sendId: 'send-1',
+          name: 'Weekly',
+          outcome: 'failed' as const,
+          trigger: 'schedule' as const,
+          recipientCount: 0,
+          itemCounts: {},
+          error: 'No deliverable recipients',
+          windowStart: '2026-08-26T00:00:00.000Z',
+          windowEnd: '2026-09-02T00:00:00.000Z',
+          historyUrl: null,
+        };
+        const context: EvaluationContext = {
+          ...createMockContext({ rule: createMockRule({ kind: 'notification' }) }),
+          session: null,
+          serverUser: null,
+          server: null,
+          subjectKey: 'install',
+          activeSessions: [],
+          recentSessions: [],
+          trigger: { type: 'newsletter.failed', at: new Date(), ...fields },
+        };
+
+        await executeAction(context, { type: 'send', to: ['d1'] });
+
+        expect(enqueueCall().event).toEqual({ type: 'newsletter_send', payload: fields });
+      });
+
       it('sends media_upgraded from a media context, which has no account to fall back on', async () => {
         const quality = {
           resolution: '4k',

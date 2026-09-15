@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, ArrowRight, Terminal, Package, Sparkles } from 'lucide-react';
+import { ExternalLink, ArrowRight, Terminal, Package, Sparkles, TriangleAlert } from 'lucide-react';
 import type { VersionInfo } from '@tracearr/shared';
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -125,6 +126,22 @@ export function UpdateDialog({ open, onOpenChange, version }: UpdateDialogProps)
           {/* Release name if different from tag */}
           {latest.releaseName && latest.releaseName !== latest.tag && (
             <div className="text-sm font-medium">{latest.releaseName}</div>
+          )}
+
+          {latest.upgradeWarnings.length > 0 && (
+            <Alert variant="warning">
+              <TriangleAlert />
+              <AlertTitle>{t('settings:update.beforeUpdating')}</AlertTitle>
+              <AlertDescription>
+                <ul className="space-y-1">
+                  {latest.upgradeWarnings.map((warning) => (
+                    <li key={warning.version}>
+                      <span className="font-medium">v{warning.version}</span>: {warning.text}
+                    </li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
           )}
 
           {/* Release notes */}

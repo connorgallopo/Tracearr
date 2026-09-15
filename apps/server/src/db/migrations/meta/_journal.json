@@ -666,6 +666,76 @@
       "when": 1787376041186,
       "tag": "0094_true_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1787948145338,
+      "tag": "0095_lying_angel",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1787948145339,
+      "tag": "0096_repair_legacy_plex_owner_external_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1788391319666,
+      "tag": "0097_plain_leper_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1788405239693,
+      "tag": "0098_grey_bloodaxe",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1788552084249,
+      "tag": "0099_condemned_hex",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788782400000,
+      "tag": "0100_newsletter_scope_libraries",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788820752155,
+      "tag": "0101_true_lucky_pierre",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1789045379763,
+      "tag": "0102_newsletter_send_variants",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1789147880686,
+      "tag": "0103_luxuriant_wolfpack",
+      "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1789315640146,
+      "tag": "0104_numerous_miek",
+      "breakpoints": true
     }
   ]
 }

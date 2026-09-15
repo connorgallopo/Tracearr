@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { format } from 'date-fns';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import { buildMediaServerItemUrl } from '@tracearr/shared';
-import type { MediaAvailabilityEntry, ServerType } from '@tracearr/shared';
+import type { MediaAvailabilityEntry, MediaRequestEntry, ServerType } from '@tracearr/shared';
 import type { MediaDetailData, MediaDetailStub } from '@/hooks/queries';
 import { buildPosterSrc } from './PosterCard';
 import {
@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { InlineErrorState } from '@/components/library/ErrorState';
 import { Skeleton } from '@/components/ui/skeleton';
+import { heroRequestLine, type Translate } from '@/components/requests/format';
+import { BASE_URL } from '@/lib/basePath';
 import { cn } from '@/lib/utils';
 import { formatBytes } from '@/lib/formatters';
 
@@ -43,6 +45,13 @@ interface DetailHeroProps {
   onRetry: () => void;
   serverById: Map<string, HeroServerLookupEntry>;
   onFullHistoryClick: () => void;
+  request?: MediaRequestEntry | null;
+}
+
+function heroRequestText(request: MediaRequestEntry, t: Translate): string {
+  const { identityName, username } = request.requester;
+  const name = identityName ?? username ?? t('requests.unattributed');
+  return heroRequestLine(request, name, t, 'MMM d, yyyy');
 }
 
 /** Two-letter glyph, mirroring PosterCard's fallback treatment at hero scale. */
@@ -229,6 +238,7 @@ export function DetailHero({
   onRetry,
   serverById,
   onFullHistoryClick,
+  request,
 }: DetailHeroProps) {
   const { t } = useTranslation('pages');
 
@@ -416,6 +426,18 @@ export function DetailHero({
                     </p>
                   )}
                 </div>
+              )}
+
+              {request && (
+                <p className="text-muted-foreground mt-2 flex items-center gap-2 text-[12.5px]">
+                  <img
+                    src={`${BASE_URL}images/services/seerr.svg`}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-3.5 w-3.5"
+                  />
+                  <span>{heroRequestText(request, t as Translate)}</span>
+                </p>
               )}
 
               <div className="mt-4 flex flex-wrap gap-2">

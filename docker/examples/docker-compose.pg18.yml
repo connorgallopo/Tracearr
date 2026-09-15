@@ -19,7 +19,7 @@
 #   docker compose -f docker-compose.pg18.yml up -d
 #
 # OPTIONAL ENVIRONMENT VARIABLES:
-#   PORT=3000              # External port mapping
+#   PORT=3000              # Host port to publish on (the container always listens on 3000)
 #   TZ=America/New_York    # Timezone
 #   DB_PASSWORD=tracearr   # Database password
 #   LOG_LEVEL=info         # Log level (debug, info, warn, error)
@@ -32,7 +32,6 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
-      - PORT=3000
       - HOST=0.0.0.0
       - TZ=${TZ:-UTC}
       - DATABASE_URL=postgres://tracearr:${DB_PASSWORD:-tracearr}@timescale:5432/tracearr

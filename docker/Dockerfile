@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS builder
+FROM node:24-alpine3.23@sha256:838d276a37a1e42da2a5d01e0ecbb4401ca4147728f62ca2eba6d023a352f88f AS builder
 
 # Build arguments for version info
 ARG APP_VERSION=0.0.0
@@ -13,7 +13,7 @@ ARG APP_FORK_RELEASE_TAG=
 ARG APP_FORK_REPO=d4rk-4lchemy/Tracearr
 ARG APP_IMAGE_REPO=darkalchemy2137/distracearr
 
-RUN corepack enable && corepack prepare pnpm@11.11.0 --activate
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 WORKDIR /app
 
@@ -22,6 +22,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/server/package.json ./apps/server/
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/emails/package.json ./packages/emails/
 COPY packages/translations/package.json ./packages/translations/
 COPY packages/test-utils/package.json ./packages/test-utils/
 
@@ -35,7 +36,7 @@ COPY . .
 RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --filter=@tracearr/web
 
 # Production stage
-FROM node:24-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS runner
+FROM node:24-alpine3.23@sha256:838d276a37a1e42da2a5d01e0ecbb4401ca4147728f62ca2eba6d023a352f88f AS runner
 
 # Build arguments for version info (must redeclare in each stage)
 ARG APP_VERSION=0.0.0
@@ -49,7 +50,7 @@ ARG APP_FORK_RELEASE_TAG=
 ARG APP_FORK_REPO=d4rk-4lchemy/Tracearr
 ARG APP_IMAGE_REPO=darkalchemy2137/distracearr
 
-RUN corepack enable && corepack prepare pnpm@11.11.0 --activate
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
 
 # Tailscale VPN binary (userspace networking, no root required)
 RUN apk add --no-cache tailscale postgresql-client
@@ -93,9 +94,14 @@ COPY --from=builder /app/apps/web/dist ./apps/web/dist
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
+# Emails package
+COPY --from=builder /app/packages/emails/package.json ./packages/emails/
+COPY --from=builder /app/packages/emails/dist ./packages/emails/dist
+
 # Database migrations
 COPY --from=builder /app/apps/server/src/db/migrations ./apps/server/src/db/migrations
 COPY --from=builder /app/apps/server/src/db/fork-migrations ./apps/server/src/db/fork-migrations
+COPY --from=builder /app/assets/logo.png ./assets/logo.png
 
 # GeoIP database (if exists in build context)
 COPY data/GeoLite2-City.mmdb ./data/GeoLite2-City.mmdb

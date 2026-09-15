@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useMaintenanceMode } from '@/hooks/useMaintenanceMode';
 import { LayoutBanner } from './LayoutBanner';
 import { ServerHealthBanner } from './ServerHealthBanner';
+import { BasemapBanner } from './BasemapBanner';
 import { IpWarningBanner } from './IpWarningBanner';
 
 /** The strip of status banners under the header, in priority order. */
@@ -17,6 +18,7 @@ export function StatusBanners() {
   return (
     <>
       <ServerHealthBanner />
+      <BasemapBanner />
       <IpWarningBanner />
     </>
   );

@@ -53,7 +53,8 @@
     "viewProfile": "View Profile",
     "viewOnGithub": "View on GitHub",
     "later": "Later",
-    "previous": "Previous"
+    "previous": "Previous",
+    "reload": "Reload"
   },
   "states": {
     "loading": "Loading...",
@@ -190,7 +191,8 @@
     "selectAllOnPage": "Select all on page",
     "selectRow": "Select row",
     "pageOf": "Page {{page}} of {{total}}",
-    "pagination": "Pagination"
+    "pagination": "Pagination",
+    "goToPage": "Go to page {{page}}"
   },
   "filters": {
     "clearAll": "Clear all",

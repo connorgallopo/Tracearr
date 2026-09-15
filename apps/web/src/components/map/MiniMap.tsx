@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { StyleSpecification } from 'maplibre-gl';
 import { useTheme } from '@/components/theme-provider';
-import { buildBaseStyle, hsl } from './maplibre';
+import { buildBaseStyle, hsl, isWebglSupported } from './maplibre';
+import { MapUnavailable } from './MapUnavailable';
 import { useBasemapAvailable, useMapLang, useMapLibre, useResolvedDark } from './useMapLibre';
 
 export function MiniMap({ lat, lon }: { lat: number; lon: number }) {
@@ -49,7 +50,11 @@ export function MiniMap({ lat, lon }: { lat: number; lon: number }) {
 
   return (
     <div className="h-28 w-full overflow-hidden rounded-lg">
-      <div ref={containerRef} className="h-full w-full" />
+      {isWebglSupported() ? (
+        <div ref={containerRef} className="h-full w-full" />
+      ) : (
+        <MapUnavailable compact />
+      )}
     </div>
   );
 }

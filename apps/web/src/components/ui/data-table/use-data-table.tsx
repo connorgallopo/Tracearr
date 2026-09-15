@@ -43,6 +43,7 @@ export interface DataTablePagerState {
   canNext: boolean;
   onPrevious: () => void;
   onNext: () => void;
+  onPage: (page: number) => void;
 }
 
 export interface UseDataTableOptions<TData extends object> {
@@ -226,6 +227,10 @@ export function useDataTable<TData extends object>({
       },
       onNext: () => {
         if (currentPage < totalPages) handlePaginationChange({ pageIndex: currentPage, pageSize });
+      },
+      onPage: (page: number) => {
+        const target = Math.min(Math.max(page, 1), totalPages);
+        if (target !== currentPage) handlePaginationChange({ pageIndex: target - 1, pageSize });
       },
     }),
     [currentPage, totalPages, handlePaginationChange, pageSize]

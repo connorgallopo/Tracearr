@@ -175,7 +175,7 @@ function EvidenceGroupCard({
 
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader>
         <CardTitle className="flex items-center justify-between text-sm">
           <span className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -591,7 +591,7 @@ export function ViolationDetail() {
           </CardHeader>
           <CardContent>
             <DataTableRoot>
-              <DataTableViewport>
+              <DataTableViewport flush>
                 <DataTableHeader table={sessionsTable} />
                 <DataTableBody
                   table={sessionsTable}
@@ -604,6 +604,7 @@ export function ViolationDetail() {
                 />
               </DataTableViewport>
               <DataTablePager
+                variant="footer"
                 {...sessionsPager}
                 labels={{
                   navigation: t('common:table.pagination'),

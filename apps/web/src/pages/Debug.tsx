@@ -45,6 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ClientErrors } from '@/components/debug/ClientErrors';
 import { useVersion } from '@/hooks/queries';
 import { tokenStorage, api, BASE_URL } from '@/lib/api';
 import { debugFetch, debugRawFetch } from '@/lib/debugFetch';
@@ -869,7 +870,7 @@ export function Debug() {
         <TabsContent value="snapshots" className="space-y-6">
           {/* Snapshot Management */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
@@ -961,7 +962,7 @@ export function Debug() {
 
                   {/* Snapshot table */}
                   <DataTableRoot density="compact">
-                    <DataTableViewport>
+                    <DataTableViewport flush>
                       <DataTableHeader table={snapshotsTable} />
                       <DataTableBody
                         table={snapshotsTable}
@@ -980,6 +981,7 @@ export function Debug() {
                       />
                     </DataTableViewport>
                     <DataTablePager
+                      variant="footer"
                       {...snapshotsPager}
                       labels={{
                         navigation: t('common:table.pagination'),
@@ -1028,6 +1030,8 @@ export function Debug() {
         </TabsContent>
 
         <TabsContent value="logs" className="space-y-6">
+          <ClientErrors />
+
           {/* Log Explorer */}
           <Card>
             <CardHeader>

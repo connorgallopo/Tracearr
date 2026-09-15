@@ -11,6 +11,7 @@ import type {
   TriggerNode,
 } from './automations/index.js';
 import type { NotificationToast } from './destinations.js';
+import type { UpgradeWarning } from './releaseNotes.js';
 import type { statPeriodSchema } from './schemas.js';
 import type { z } from 'zod';
 
@@ -50,6 +51,8 @@ export interface Server {
   name: string;
   type: ServerType;
   url: string;
+  /** The address members open a Jellyfin or Emby server at; null for Plex, which links through app.plex.tv. */
+  publicUrl?: string | null;
   /** The media server's own id, used to build item deep links. */
   machineIdentifier?: string | null;
   dispatcharrAuthMode?: DispatcharrAuthMode;
@@ -164,6 +167,7 @@ export interface ServerUserFullDetail {
     userId: string;
     aggregateTrustScore: number;
     totalViolations: number;
+    contactEmail: string | null;
     serverUsers: {
       id: string;
       serverId: string;
@@ -233,6 +237,10 @@ export interface MergeSuggestionIdentity {
   email: string | null;
   role: UserRole;
   loginCapable: boolean;
+  /** Latest activity across every account the identity has; null before any. */
+  lastActivityAt: string | null;
+  /** Sessions across every account the identity has. */
+  sessionCount: number;
   serverUsers: {
     id: string;
     serverId: string;
@@ -248,7 +256,15 @@ export interface MergeSuggestion {
   matchValue: string;
   users: [MergeSuggestionIdentity, MergeSuggestionIdentity];
   requiredTargetUserId: string | null;
+  /** The identity a merge keeps unless the owner swaps: `rankMergeTarget` over the pair, so it is requiredTargetUserId whenever that is set. */
+  suggestedTargetUserId: string;
   wouldCombineSameServer: boolean;
+}
+
+/** A pair the owner marked as not the same person; it is not suggested again until restored. */
+export interface DismissedMergeSuggestion {
+  users: [MergeSuggestionIdentity, MergeSuggestionIdentity];
+  dismissedAt: string;
 }
 
 export interface SetupStatus {
@@ -1132,13 +1148,19 @@ export interface ServerToClientEvents {
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
   'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'tasks:updated': (tasks: RunningTask[]) => void;
-  'version:update': (data: { current: string; latest: string; releaseUrl: string; kind: 'fork-update' }) => void;
+  'version:update': (data: {
+    current: string;
+    latest: string;
+    releaseUrl: string;
+    kind: 'fork-update';
+  }) => void;
   'server:down': (data: { serverId: string; serverName: string }) => void;
   'server:up': (data: { serverId: string; serverName: string }) => void;
   'server:connection': (status: ServerConnectionStatus) => void;
   'notification:toast': (data: NotificationToast) => void;
   'destinations:changed': () => void;
   'servers:changed': () => void;
+  'requests:changed': (data: { serviceId: string }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -1380,7 +1402,8 @@ export type NotificationEventType =
   | 'media_added'
   | 'media_upgraded'
   | 'new_device'
-  | 'trust_score_changed';
+  | 'trust_score_changed'
+  | 'newsletter_send';
 
 // Notification preferences (per-device settings)
 export interface NotificationPreferences {
@@ -1979,18 +2002,20 @@ export interface VersionInfo {
       isPrerelease: boolean;
       releaseName: string | null;
       releaseNotes: string | null;
+      upgradeWarnings: UpgradeWarning[];
     } | null;
     updateAvailable: boolean;
   };
   upstream: {
     latest: {
-    version: string;
-    tag: string;
-    releaseUrl: string;
-    publishedAt: string;
-    isPrerelease: boolean; // Whether this update is a prerelease
-    releaseName: string | null; // Release title from GitHub
-    releaseNotes: string | null; // Release body/notes from GitHub (markdown)
+      version: string;
+      tag: string;
+      releaseUrl: string;
+      publishedAt: string;
+      isPrerelease: boolean; // Whether this update is a prerelease
+      releaseName: string | null; // Release title from GitHub
+      releaseNotes: string | null; // Release body/notes from GitHub (markdown)
+      upgradeWarnings: UpgradeWarning[];
     } | null;
     updateAvailable: boolean;
   };

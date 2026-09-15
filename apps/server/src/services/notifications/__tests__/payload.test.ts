@@ -329,6 +329,64 @@ describe('account events', () => {
   });
 });
 
+const newsletterSend = {
+  type: 'newsletter_send',
+  payload: {
+    newsletterId: 'n-1',
+    sendId: 'send-1',
+    name: 'Weekly',
+    outcome: 'failed',
+    trigger: 'schedule',
+    recipientCount: 0,
+    itemCounts: { movies: 3, shows: 1, episodes: 4, albums: 0, mostWatched: 0 },
+    error: 'The email destination is disabled',
+    windowStart: '2026-08-26T00:00:00.000Z',
+    windowEnd: '2026-09-02T00:00:00.000Z',
+    historyUrl: 'https://tracearr.example.com/settings/notifications/newsletters/n-1',
+  },
+} as const;
+
+describe('newsletter send', () => {
+  it('reads the outcome into the title, message and severity', () => {
+    const failed = PayloadBuilders.fromNewsletterSend(newsletterSend.payload);
+    expect(failed.event).toBe('newsletter_send');
+    expect(failed.title).toBe('Newsletter failed');
+    expect(failed.message).toBe('Weekly reached nobody: The email destination is disabled');
+    expect(failed.severity).toBe('high');
+    expect(failed.context).toEqual({ type: 'newsletter_send', ...newsletterSend.payload });
+
+    const sent = PayloadBuilders.fromNewsletterSend({
+      ...newsletterSend.payload,
+      outcome: 'sent',
+      recipientCount: 42,
+      error: null,
+    });
+    expect(sent.title).toBe('Newsletter sent');
+    expect(sent.message).toBe('Weekly went to 42 recipients');
+    expect(sent.severity).toBe('low');
+
+    const partial = PayloadBuilders.fromNewsletterSend({
+      ...newsletterSend.payload,
+      outcome: 'partial',
+      recipientCount: 42,
+      error: null,
+    });
+    expect(partial.title).toBe('Newsletter partly sent');
+    expect(partial.message).toBe('Weekly reached only part of its 42 recipients');
+    expect(partial.severity).toBe('warning');
+  });
+
+  it('renders the newsletter variables an override names', () => {
+    const payload = toNotificationPayload(
+      newsletterSend,
+      automation({
+        body: '{{newsletter.name}} {{newsletter.outcome}} {{newsletter.recipientCount}} [{{newsletter.error}}]',
+      })
+    );
+    expect(payload.message).toBe('Weekly failed 0 [The email destination is disabled]');
+  });
+});
+
 describe('media events', () => {
   it('names the item, the library and the server by default', () => {
     const added = toNotificationPayload({ type: 'media_added', payload: mediaPayload }, system);

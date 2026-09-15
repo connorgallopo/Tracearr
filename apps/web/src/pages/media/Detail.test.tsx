@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type * as ReactRouter from 'react-router';
+import type { MediaRequestEntry } from '@tracearr/shared';
 import { ApiError } from '@/lib/api';
 import { MediaDetail } from './Detail';
 
@@ -26,6 +27,7 @@ vi.mock('@/hooks/queries', () => ({
   useSeasonHeat: vi.fn(),
   useMediaPlatforms: vi.fn(),
   useMediaHistory: vi.fn(),
+  useMediaRequests: vi.fn(),
   useSession: vi.fn(),
   findCachedMediaStub: vi.fn(),
 }));
@@ -62,6 +64,7 @@ import {
   useSeasonHeat,
   useMediaPlatforms,
   useMediaHistory,
+  useMediaRequests,
   useSession,
   findCachedMediaStub,
 } from '@/hooks/queries';
@@ -74,6 +77,7 @@ const mockUseMediaWatchers = vi.mocked(useMediaWatchers);
 const mockUseSeasonHeat = vi.mocked(useSeasonHeat);
 const mockUseMediaPlatforms = vi.mocked(useMediaPlatforms);
 const mockUseMediaHistory = vi.mocked(useMediaHistory);
+const mockUseMediaRequests = vi.mocked(useMediaRequests);
 const mockUseSession = vi.mocked(useSession);
 const mockFindCachedMediaStub = vi.mocked(findCachedMediaStub);
 const mockUseServer = vi.mocked(useServer);
@@ -87,6 +91,52 @@ function pendingQuery(overrides: Record<string, unknown> = {}) {
     refetch: vi.fn(),
     ...overrides,
   } as never;
+}
+
+function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntry {
+  return {
+    id: 'req-1',
+    serverId: 'srv-1',
+    status: 'completed',
+    requestedAt: '2026-01-08T12:00:00.000Z',
+    availableAt: '2026-01-08T12:02:00.000Z',
+    waitMs: 120_000,
+    deletedAt: null,
+    seasons: null,
+    is4k: false,
+    isAutoRequest: false,
+    watchedState: 'unwatched',
+    watchedStateRequester: 'unwatched',
+    requester: {
+      serverUserId: 'su-1',
+      userId: 'u-1',
+      serverId: 'srv-1',
+      username: 'agelwarg',
+      identityName: 'Alice',
+      thumb: null,
+    },
+    ...overrides,
+  };
+}
+
+function detailQuery(mediaType: string) {
+  return pendingQuery({
+    isLoading: false,
+    data: {
+      id: 'media-1',
+      mediaType,
+      title: 'Arrival',
+      year: 2016,
+      genres: [],
+      availability: [],
+      seasonCount: null,
+      episodeCount: null,
+      posterUrl: null,
+      posterVersion: null,
+      dominantColor: null,
+      servers: [],
+    },
+  });
 }
 
 function renderPage() {
@@ -106,6 +156,7 @@ describe('MediaDetail page', () => {
     mockUseParams.mockReturnValue({ id: 'media-1' });
     mockUseServer.mockReturnValue({
       selectedServerIds: ['srv-1'],
+      mediaLibraryServerIds: ['srv-1'],
       servers: [
         {
           id: 'srv-1',
@@ -125,7 +176,21 @@ describe('MediaDetail page', () => {
     mockUseMediaHistory.mockReturnValue(
       pendingQuery({ hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() })
     );
+    mockUseMediaRequests.mockReturnValue(pendingQuery({ data: { data: [] }, isLoading: false }));
     mockUseSession.mockReturnValue(pendingQuery({ isLoading: false }));
+  });
+
+  it('scopes requests and media details to library servers in a mixed selection', () => {
+    mockUseServer.mockReturnValue({
+      ...mockUseServer(),
+      selectedServerIds: ['srv-1', 'dispatcharr-1'],
+      mediaLibraryServerIds: ['srv-1'],
+    });
+
+    renderPage();
+
+    expect(mockUseMediaRequests).toHaveBeenCalledWith('media-1', ['srv-1']);
+    expect(mockUseMediaDetail).toHaveBeenCalledWith('media-1', ['srv-1'], 'all', undefined);
   });
 
   it('renders a not-found state for an unknown/removed media id', () => {
@@ -475,5 +540,63 @@ describe('MediaDetail page', () => {
 
     expect(mockUseSeasonHeat).toHaveBeenCalledWith('media-1', ['srv-1'], false);
     expect(screen.queryByText('media.detail.seasons.title')).not.toBeInTheDocument();
+  });
+
+  it('shows the requests panel for a title that has requests', () => {
+    mockUseMediaDetail.mockReturnValue(detailQuery('movie'));
+    mockUseMediaRequests.mockReturnValue(
+      pendingQuery({ isLoading: false, data: { data: [requestEntry()] } })
+    );
+
+    renderPage();
+
+    expect(mockUseMediaRequests).toHaveBeenCalledWith('media-1', ['srv-1']);
+    expect(screen.getByRole('heading', { name: 'requests.mediaPanel.title' })).toBeInTheDocument();
+  });
+
+  it('names the earliest request that is still live in the hero line', () => {
+    mockUseMediaDetail.mockReturnValue(detailQuery('movie'));
+    mockUseMediaRequests.mockReturnValue(
+      pendingQuery({
+        isLoading: false,
+        data: {
+          data: [
+            requestEntry({
+              id: 'req-removed',
+              requestedAt: '2026-01-02T12:00:00.000Z',
+              deletedAt: '2026-01-20T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Removed Rita' },
+            }),
+            requestEntry({
+              id: 'req-later',
+              requestedAt: '2026-01-20T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Later Leo' },
+            }),
+            requestEntry({
+              id: 'req-earliest',
+              requestedAt: '2026-01-05T12:00:00.000Z',
+              requester: { ...requestEntry().requester, identityName: 'Earliest Eve' },
+            }),
+          ],
+        },
+      })
+    );
+
+    renderPage();
+
+    expect(screen.getByText(/"name":"Earliest Eve"/)).toBeInTheDocument();
+  });
+
+  it('drops the requests panel on an episode, where the request belongs to the show', () => {
+    mockUseMediaDetail.mockReturnValue(detailQuery('episode'));
+    mockUseMediaRequests.mockReturnValue(
+      pendingQuery({ isLoading: false, data: { data: [requestEntry()] } })
+    );
+
+    renderPage();
+
+    expect(
+      screen.queryByRole('heading', { name: 'requests.mediaPanel.title' })
+    ).not.toBeInTheDocument();
   });
 });

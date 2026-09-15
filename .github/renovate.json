@@ -1,57 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-  // best-practices includes recommended, action SHA pinning, npm cooldown, abandonment
-  // flags, docker digest pins, weekly lockfile maintenance, and dev-dep version pinning.
-  "extends": ["config:best-practices", "security:openssf-scorecard"],
+  // House style (schedule, cooldowns, automerge, commit format, Actions, Docker) lives
+  // in the shared preset. Only Tracearr-specific rules belong here.
+  //
+  // These rules are evaluated after the preset's, so a group declared here wins over a
+  // broader group there — that is how @types/react leaves "type definitions" and joins
+  // the React ecosystem group without any exclusion list.
+  "extends": ["github>Tracearr/renovate-config"],
 
-  // Lockfile already pins effective versions, so pinning in package.json is just noise.
-  "ignorePresets": [":pinDevDependencies"],
-
-  // Later syntax is deprecated upstream, cron only.
-  "timezone": "UTC",
-  "schedule": ["* 0-5 * * 1"],
-
-  "prConcurrentLimit": 10,
-  "prHourlyLimit": 0,
-
-  // behind-base-branch rebased every open PR on every push to main.
-  "rebaseWhen": "conflicted",
-
-  // The main ruleset has no required checks, so platform automerge would merge
-  // before CI. Renovate-side merge waits for green.
-  "platformAutomerge": false,
-
-  // CLAUDE.md: no commit prefixes, no emojis, no attribution.
-  "semanticCommits": "disabled",
-  "commitMessagePrefix": "",
-  "commitMessageAction": "Update",
-  "commitMessageTopic": "{{depName}}",
-  "commitMessageExtra": "to {{newVersion}}",
-
-  // One PR per major instead of jumping to latest.
-  "separateMultipleMajor": true,
-
-  "dependencyDashboard": true,
-  "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
-  "dependencyDashboardLabels": ["dependencies"],
-
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": ["security", "priority"]
-  },
-  "osvVulnerabilityAlerts": true,
-
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": ["* 0-5 * * 1"],
-    "commitMessageAction": "Refresh",
-    "commitMessageTopic": "pnpm lockfile"
-  },
   "postUpdateOptions": ["pnpmDedupe"],
-
-  // No global minimumReleaseAge: best-practices gives npm 3d, and a floor on
-  // Docker digests resets on every tag re-push so the group never clears.
 
   "packageRules": [
     // ----- hard blocks -----
@@ -62,16 +20,6 @@
       "matchUpdateTypes": ["major"],
       "enabled": false,
       "description": "Pin @types/node major to match Node 24 runtime in Dockerfiles"
-    },
-
-    // typescript-eslint peers typescript ">=4.8.4 <6.1.0" and the lint parser
-    // resolves the root copy. 6.1 is a minor, so blocking majors misses it, and
-    // typescript is a devDependency everywhere so it would automerge.
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": ["typescript"],
-      "allowedVersions": "<6.1.0",
-      "description": "typescript-eslint peers typescript below 6.1; the lint parser resolves the root copy"
     },
 
     // Postgres/TimescaleDB majors require a schema migration.
@@ -91,42 +39,6 @@
       "matchUpdateTypes": ["major"],
       "enabled": false,
       "description": "Redis and Valkey majors need a config review"
-    },
-
-    // Odd Node majors aren't LTS.
-    {
-      "matchManagers": ["dockerfile", "docker-compose"],
-      "matchPackageNames": ["node"],
-      "allowedVersions": "/^(20|22|24|26|28|30)\\./",
-      "description": "Even-numbered Node majors only"
-    },
-
-    // Lock to currently-supported macOS runners.
-    {
-      "matchManagers": ["github-actions"],
-      "matchDepTypes": ["github-runner"],
-      "matchPackageNames": ["macos"],
-      "allowedVersions": "/^(14|15)$/"
-    },
-
-    // ----- supply-chain hardening -----
-
-    // 7d cooldown for runtime deps. 3d for dev tooling is fine; prod gets longer
-    // after the axios npm attack. Only runtime deps split minor/patch: patch
-    // automerges, minor waits.
-    {
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["dependencies"],
-      "minimumReleaseAge": "7 days",
-      "separateMinorPatch": true,
-      "description": "Longer cooldown for runtime deps after axios March 2026"
-    },
-
-    // Actions automerge, so they keep the 3d cooldown.
-    {
-      "matchDatasources": ["github-tags"],
-      "minimumReleaseAge": "3 days",
-      "description": "3d cooldown for GitHub Actions"
     },
 
     // ----- ecosystem groups, minor + patch only -----
@@ -259,16 +171,15 @@
       "groupName": "Highcharts"
     },
 
+    // The stream map: MapLibre renders, pmtiles reads the bundled archive, and
+    // @protomaps/basemaps supplies the style. The archive and the style version have
+    // to agree, so they move together.
     {
       "matchManagers": ["npm"],
-      "matchPackageNames": [
-        "leaflet",
-        "react-leaflet",
-        "react-leaflet-heatmap-layer-v3",
-        "@types/leaflet"
-      ],
+      "matchPackageNames": ["maplibre-gl", "pmtiles", "@protomaps/basemaps", "@types/geojson"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "Leaflet"
+      "groupName": "Map stack",
+      "labels": ["dep-ui"]
     },
 
     // Only @playwright/test is installed.
@@ -295,40 +206,6 @@
       "groupName": "TypeScript tooling"
     },
 
-    // Unscoped typescript-eslint needs an exact-name entry. The @typescript-eslint/*
-    // glob doesn't catch it because * doesn't cross / in minimatch.
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": [
-        "eslint",
-        "eslint-*",
-        "@eslint/*",
-        "typescript-eslint",
-        "@typescript-eslint/*",
-        "prettier",
-        "prettier-*",
-        "husky",
-        "lint-staged"
-      ],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "Lint and format"
-    },
-
-    // @types that belong to a specific group above are excluded so this catch-all
-    // doesn't override them back out. * doesn't cross /, so exact names are needed.
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": [
-        "@types/*",
-        "!@types/react",
-        "!@types/react-dom",
-        "!@types/pg",
-        "!@types/leaflet"
-      ],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "type definitions"
-    },
-
     // ----- native modules: manual review on majors -----
     // bcrypt and sharp have rebuild risk.
     {
@@ -348,50 +225,13 @@
       "description": "Plex SSE listener: reconnect semantics matter"
     },
 
-    // ----- automerge -----
-
-    {
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": ["@types/*"],
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-
-    // Runtime patches only. Minors still need review.
-    {
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["dependencies"],
-      "matchUpdateTypes": ["patch"],
-      "automerge": true
-    },
-
-    {
-      "matchUpdateTypes": ["lockFileMaintenance"],
-      "automerge": true
-    },
-
     // ----- docker images -----
-
-    // Every docker-datasource image across managers, so one image bump is one PR.
-    // The Postgres/Timescale rule below overrides those out; this must stay first.
-    {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["minor", "patch", "digest"],
-      "groupName": "Docker images",
-      "labels": ["dep-docker"]
-    },
 
     // Postgres/Timescale bumps carry PG version and extension changes, so they
     // get their own group and wait for dashboard approval before a PR opens.
     // Digest-only rebuilds are gated too: these images never move without sign-off.
     // github-actions is matched so CI service containers don't slip into other groups.
+    // Overrides the preset's "Docker images" group, which is evaluated first.
     {
       "matchManagers": ["dockerfile", "docker-compose", "helm-values", "helmv3", "github-actions"],
       "matchPackageNames": ["postgres", "timescale/timescaledb", "timescale/timescaledb-ha"],
@@ -399,18 +239,6 @@
       "dependencyDashboardApproval": true,
       "groupName": "Postgres and TimescaleDB images",
       "labels": ["dep-docker", "dep-database"]
-    },
-
-    // ----- github actions -----
-    // Excludes docker so CI service containers stay in the group above; this rule
-    // runs later and would win. Action majors get reviewed by hand.
-    {
-      "matchManagers": ["github-actions"],
-      "matchDatasources": ["!docker"],
-      "matchUpdateTypes": ["minor", "patch", "digest"],
-      "groupName": "GitHub Actions",
-      "automerge": true,
-      "labels": ["dep-ci"]
     },
 
     // ----- helm chart -----
@@ -422,13 +250,6 @@
       "matchManagers": ["helm-values"],
       "matchPackageNames": ["ghcr.io/connorgallopo/tracearr"],
       "enabled": false
-    },
-
-    // Assign and tag all majors.
-    {
-      "matchUpdateTypes": ["major"],
-      "assignees": ["connorgallopo"],
-      "labels": ["dep-major"]
     }
   ]
 }

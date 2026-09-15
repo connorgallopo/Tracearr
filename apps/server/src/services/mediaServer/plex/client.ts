@@ -5,7 +5,13 @@
  * Provides a unified interface for session tracking, user management, and library access.
  */
 
-import { fetchJson, fetchText, plexHeaders, getPlexClientIdentifier } from '../../../utils/http.js';
+import {
+  fetchJson,
+  fetchText,
+  plexHeaders,
+  getPlexClientIdentifier,
+  HttpClientError,
+} from '../../../utils/http.js';
 import { assertSafeProbeUrl, SsrfBlockedError } from '../../../utils/ssrf.js';
 import type {
   IMediaServerClient,
@@ -30,6 +36,8 @@ import {
   parseStatisticsBandwidthResponse,
   parseMediaMetadataResponse,
   parseLibraryItemsResponse,
+  parseGenresByRatingKey,
+  parseRatingKeys,
   getTranscodingSessionRatingKeys,
   type PlexServerResource,
   type PlexStatisticsDataPoint,
@@ -38,6 +46,19 @@ import {
 } from './parser.js';
 
 const PLEX_TV_BASE = 'https://plex.tv';
+
+/** ratingKeys per /library/metadata request when filling in genres. */
+const METADATA_BATCH_SIZE = 100;
+
+/**
+ * Drops the per-item elements a genre lookup doesn't read; on a real server
+ * this cut a 40-movie batch from about 780 KB to 71 KB.
+ */
+const GENRE_LOOKUP_PARAMS = new URLSearchParams({
+  excludeElements:
+    'Media,Role,Director,Writer,Producer,Country,Guid,Rating,Image,UltraBlurColors,Location,Similar,Field',
+  excludeFields: 'summary,tagline',
+});
 
 /**
  * Plex Media Server client implementation
@@ -240,7 +261,7 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     const container = data as { MediaContainer?: { totalSize?: number } };
     const totalCount = container?.MediaContainer?.totalSize ?? 0;
 
-    const items = parseLibraryItemsResponse(data);
+    const items = await this.fillTruncatedGenres(parseLibraryItemsResponse(data));
 
     return { items, totalCount };
   }
@@ -255,7 +276,65 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     _options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
     const sinceUnix = Math.floor(since.getTime() / 1000);
-    return this.fetchItemsSortedByUpdatedAt(`/library/sections/${libraryId}/all`, sinceUnix);
+    const result = await this.fetchItemsSortedByUpdatedAt(
+      `/library/sections/${libraryId}/all`,
+      sinceUnix
+    );
+    return { ...result, items: await this.fillTruncatedGenres(result.items) };
+  }
+
+  /**
+   * Plex list endpoints return at most two Genre tags per item, whatever the
+   * item carries. /library/metadata has the full list and takes a
+   * comma-separated batch of ratingKeys, so only items that hit the cap are
+   * looked up again.
+   */
+  private async fillTruncatedGenres(items: MediaLibraryItem[]): Promise<MediaLibraryItem[]> {
+    const capped = items.filter((item) => (item.genres?.length ?? 0) >= 2);
+    const fullGenres = new Map<string, string[]>();
+
+    for (let start = 0; start < capped.length; start += METADATA_BATCH_SIZE) {
+      const ratingKeys = capped
+        .slice(start, start + METADATA_BATCH_SIZE)
+        .map((item) => item.ratingKey);
+      const data = await fetchJson<unknown>(
+        `${this.baseUrl}/library/metadata/${ratingKeys.join(',')}?${GENRE_LOOKUP_PARAMS}`,
+        { headers: this.buildHeaders(), service: 'plex', timeout: 30000 }
+      );
+      for (const [ratingKey, genres] of parseGenresByRatingKey(data)) {
+        fullGenres.set(ratingKey, genres);
+      }
+    }
+
+    return items.map((item) => {
+      const genres = fullGenres.get(item.ratingKey);
+      return genres ? { ...item, genres } : item;
+    });
+  }
+
+  /**
+   * Which of the given rating keys the section still has, from batched
+   * /library/metadata/{keys} lookups. A batch with no survivors answers 404.
+   */
+  async findExistingRatingKeys(
+    ratingKeys: string[],
+    library: { id: string; type: string }
+  ): Promise<Set<string>> {
+    const existing = new Set<string>();
+    for (let start = 0; start < ratingKeys.length; start += METADATA_BATCH_SIZE) {
+      const batch = ratingKeys.slice(start, start + METADATA_BATCH_SIZE);
+      try {
+        const data = await fetchJson<unknown>(
+          `${this.baseUrl}/library/metadata/${batch.join(',')}`,
+          { headers: this.buildHeaders(), service: 'plex', timeout: 30000 }
+        );
+        for (const key of parseRatingKeys(data, library.id)) existing.add(key);
+      } catch (err) {
+        if (err instanceof HttpClientError && err.statusCode === 404) continue;
+        throw err;
+      }
+    }
+    return existing;
   }
 
   /**
@@ -828,17 +907,14 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       Accept: 'application/xml',
     };
 
-    try {
-      const xml = await fetchText(
-        `${PLEX_TV_BASE}/api/servers/${machineIdentifier}/shared_servers`,
-        { headers, service: 'plex.tv' }
-      );
+    // Throws rather than returning an empty map: user sync marks every account
+    // missing from the result as removed, so an empty map would remove them all.
+    const xml = await fetchText(`${PLEX_TV_BASE}/api/servers/${machineIdentifier}/shared_servers`, {
+      headers,
+      service: 'plex.tv',
+    });
 
-      return parseSharedServersXml(xml);
-    } catch {
-      // Return empty map if endpoint fails
-      return new Map();
-    }
+    return parseSharedServersXml(xml);
   }
 
   /**

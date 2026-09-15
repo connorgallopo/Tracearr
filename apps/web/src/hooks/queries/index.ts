@@ -55,6 +55,9 @@ export {
   useUserTerminations,
   useBulkResetTrust,
   useMergeSuggestions,
+  useDismissedMergeSuggestions,
+  useDismissMergeSuggestion,
+  useRestoreMergeSuggestion,
   useMergeUsers,
   useSplitServerUser,
 } from './useUsers';
@@ -131,6 +134,56 @@ export {
   useTestUnsavedDestination,
 } from './useDestinations';
 
+// Request hooks
+export {
+  REQUESTS_KEY,
+  useMediaRequests,
+  useUserRequests,
+  useRequestsAnalytics,
+  useRequestsConfigured,
+  useRequestsUnplayed,
+  useRequesters,
+  useRequestServices,
+  useTestRequestService,
+  useCreateRequestService,
+  useUpdateRequestService,
+  useDeleteRequestService,
+  useSyncRequestService,
+} from './useRequests';
+
+// Newsletter hooks
+export {
+  NEWSLETTERS_KEY,
+  newsletterKeys,
+  useNewsletters,
+  useNewsletter,
+  useNewsletterRecipients,
+  useNewsletterVariants,
+  useNewsletterSends,
+  useNewsletterSend,
+  useCreateNewsletter,
+  useUpdateNewsletter,
+  useDeleteNewsletter,
+  useDuplicateNewsletter,
+  usePreviewNewsletter,
+  usePreviewDraftNewsletter,
+  useTestNewsletter,
+  useSendNewsletter,
+  useNewsletterSendHtml,
+  useRetryFailedSend,
+} from './useNewsletters';
+
+// Email branding and suppression hooks
+export {
+  EMAIL_BRANDING_KEY,
+  EMAIL_SUPPRESSIONS_KEY,
+  useEmailBranding,
+  useSaveEmailBranding,
+  useEmailSuppressions,
+  useAddSuppression,
+  useRemoveSuppression,
+} from './useEmail';
+
 // Mobile hooks
 export {
   useMobileConfig,
@@ -154,6 +207,9 @@ export {
 
 // Version hooks
 export { useVersion, useForceVersionCheck } from './useVersion';
+
+// What's new hooks
+export { WHATS_NEW_KEY, useWhatsNew, useDismissWhatsNew } from './useWhatsNew';
 
 // Library hooks
 export {

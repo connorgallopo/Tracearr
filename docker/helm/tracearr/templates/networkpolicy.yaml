@@ -14,7 +14,7 @@ spec:
   policyTypes: [Ingress, Egress]
   ingress:
     - ports:
-        - port: 3000
+        - port: {{ include "tracearr.containerPort" . }}
           protocol: TCP
   egress:
     - to:

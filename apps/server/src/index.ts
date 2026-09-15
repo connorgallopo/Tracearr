@@ -62,11 +62,18 @@ import { settingsRoutes } from './routes/settings.js';
 import { importRoutes } from './routes/import.js';
 import { imageRoutes } from './routes/images.js';
 import { startImageCacheSweepTimer, stopImageCacheSweep } from './services/imageCacheSweep.js';
+import { IMAGE_CACHE_DIR } from './services/imageProxy.js';
+import { migrateImageCache } from './services/imageCacheMigration.js';
 import { debugRoutes } from './routes/debug.js';
 import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
 import { destinationRoutes } from './routes/destinations.js';
+import { requestServiceRoutes } from './routes/requestServices.js';
+import { requestRoutes } from './routes/requests.js';
+import { newsletterRoutes } from './routes/newsletters.js';
+import { emailRoutes } from './routes/email.js';
 import { versionRoutes } from './routes/version.js';
+import { whatsNewRoutes } from './routes/whatsNew.js';
 import { maintenanceRoutes } from './routes/maintenance.js';
 import { mapRoutes } from './routes/map.js';
 import { publicRoutes } from './routes/public.js';
@@ -111,8 +118,10 @@ import {
   startNotificationWorker,
   shutdownNotificationQueue,
 } from './jobs/notificationQueue.js';
+import { closeAllTransporters } from './services/notifications/destinations/emailTransport.js';
 import { runAutomationModelMigration } from './services/automations/modelMigration.js';
 import { runSystemEventsMigration } from './services/automations/systemEventsMigration.js';
+import { seedWhatsNewLastSeen } from './services/whatsNew.js';
 import { seedBuiltinTemplates } from './services/automations/templates/seeder.js';
 import { initDestinationCrypto } from './services/notifications/destinationCrypto.js';
 import { invalidateDestinationsCache } from './services/notifications/destinationStore.js';
@@ -151,11 +160,24 @@ import {
   shutdownInactivityCheckQueue,
 } from './jobs/inactivityCheckQueue.js';
 import {
+  initRequestSyncQueue,
+  startRequestSyncWorker,
+  scheduleRequestSync,
+  shutdownRequestSyncQueue,
+} from './jobs/requestSyncQueue.js';
+import {
   initBackupQueue,
   startBackupWorker,
   scheduleBackupJob,
   shutdownBackupQueue,
 } from './jobs/backupQueue.js';
+import {
+  initNewsletterQueues,
+  startNewsletterWorkers,
+  resyncNewsletterSchedules,
+  shutdownNewsletterQueues,
+} from './jobs/newsletterQueue.js';
+import { listNewsletters } from './services/newsletters/store.js';
 import {
   initPlexTokenRefreshQueue,
   startPlexTokenRefreshWorker,
@@ -495,12 +517,17 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(statsRoutes, { prefix: `${API_BASE_PATH}/stats` });
   await app.register(settingsRoutes, { prefix: `${API_BASE_PATH}/settings` });
   await app.register(destinationRoutes, { prefix: `${API_BASE_PATH}/destinations` });
+  await app.register(requestServiceRoutes, { prefix: `${API_BASE_PATH}/request-services` });
+  await app.register(requestRoutes, { prefix: `${API_BASE_PATH}/requests` });
+  await app.register(newsletterRoutes, { prefix: `${API_BASE_PATH}/newsletters` });
+  await app.register(emailRoutes, { prefix: `${API_BASE_PATH}/email` });
   await app.register(importRoutes, { prefix: `${API_BASE_PATH}/import` });
   await app.register(imageRoutes, { prefix: `${API_BASE_PATH}/images` });
   await app.register(debugRoutes, { prefix: `${API_BASE_PATH}/debug` });
   await app.register(mobileRoutes, { prefix: `${API_BASE_PATH}/mobile` });
   await app.register(notificationPreferencesRoutes, { prefix: `${API_BASE_PATH}/notifications` });
   await app.register(versionRoutes, { prefix: `${API_BASE_PATH}/version` });
+  await app.register(whatsNewRoutes, { prefix: `${API_BASE_PATH}/whats-new` });
   await app.register(maintenanceRoutes, { prefix: `${API_BASE_PATH}/maintenance` });
   await app.register(mapRoutes, { prefix: `${API_BASE_PATH}/map` });
   await app.register(tailscaleRoutes, { prefix: `${API_BASE_PATH}/tailscale` });
@@ -556,12 +583,18 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
           }
           return reply.sendFile(assetPath);
         }
+        // A hashed chunk that no longer exists after an upgrade must 404; the HTML
+        // fallback would resolve as a module and break the import with a parse error.
+        if (assetPath?.startsWith('assets/')) {
+          return reply.code(404).send();
+        }
       }
 
       // SPA fallback — always inject <base> tag so relative asset paths (./assets/...)
       // resolve correctly on nested routes like /library/watch
       const baseHref = BASE_PATH ? `${BASE_PATH}/` : '/';
       const html = cachedIndexHtml.replace('<head>', `<head>\n    <base href="${baseHref}">`);
+      reply.header('Cache-Control', 'no-cache');
       return reply.type('text/html').send(html);
     });
 
@@ -605,7 +638,10 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
     await shutdownImagePrecacheQueue();
     await shutdownVersionCheckQueue();
     await shutdownInactivityCheckQueue();
+    await shutdownRequestSyncQueue();
     await shutdownBackupQueue();
+    await shutdownNewsletterQueues();
+    closeAllTransporters();
     await shutdownPlexTokenRefreshQueue();
     await shutdownRunRetentionQueue();
   });
@@ -847,6 +883,13 @@ async function initializeServices(app: FastifyInstance) {
   // those templates. Unwrapped too, or an install ends up with neither the checkbox nor the rule.
   await runSystemEventsMigration();
 
+  // Wrapped: a failed seed leaves the setting null, which shows nothing and retries next boot.
+  try {
+    await seedWhatsNewLastSeen();
+  } catch (err) {
+    app.log.warn({ err }, "Failed to seed what's-new last-seen version");
+  }
+
   try {
     await sweepDestinationConfigs();
   } catch (err) {
@@ -979,6 +1022,17 @@ async function initializeServices(app: FastifyInstance) {
     // Don't throw - inactivity checks are non-critical
   }
 
+  try {
+    initRequestSyncQueue(redisUrl);
+    startRequestSyncWorker();
+    scheduleRequestSync().catch((err) => {
+      app.log.error({ err }, 'Failed to schedule request sync');
+    });
+    app.log.info('Request sync queue initialized');
+  } catch (err) {
+    app.log.error({ err }, 'Failed to initialize request sync queue');
+  }
+
   // Initialize backup queue (scheduled backups)
   try {
     initBackupQueue(redisUrl);
@@ -992,6 +1046,15 @@ async function initializeServices(app: FastifyInstance) {
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize backup queue');
     // Don't throw - scheduled backups are non-critical
+  }
+
+  try {
+    initNewsletterQueues(redisUrl);
+    await resyncNewsletterSchedules(await listNewsletters());
+    startNewsletterWorkers();
+    app.log.info('Newsletter queues initialized');
+  } catch (error) {
+    app.log.error({ err: error }, 'Failed to initialize newsletter queues');
   }
 
   // Initialize run retention queue (daily purge of aged automation runs)
@@ -1194,6 +1257,9 @@ async function initializePostListen(app: FastifyInstance) {
           invalidateDestinationsCache();
           broadcastToSessions('destinations:changed');
           break;
+        case WS_EVENTS.REQUESTS_CHANGED:
+          broadcastToSessions('requests:changed', data as { serviceId: string });
+          break;
         case WS_EVENTS.SERVERS_CHANGED:
           invalidateServersCache();
           broadcastToSessions('servers:changed');
@@ -1395,6 +1461,12 @@ function startRecoveryLoop(app: FastifyInstance, intervalMs: number = RECOVERY_I
 
 async function start() {
   try {
+    const removedImages = await migrateImageCache(IMAGE_CACHE_DIR);
+    if (removedImages > 0) {
+      console.info(
+        `Image cache migration removed ${removedImages} cropped images; they will be fetched again on demand.`
+      );
+    }
     // Initialize claim code for first-time setup security
     initializeClaimCode();
 
@@ -1408,7 +1480,9 @@ async function start() {
         stopPoller();
         void stopConnectionBudget(app.redis);
         void tailscaleService.shutdown();
-        void shutdownNotificationQueue();
+        void Promise.all([shutdownNotificationQueue(), shutdownNewsletterQueues()]).finally(() =>
+          closeAllTransporters()
+        );
         void shutdownKillQueue();
         void shutdownImportQueue();
         void shutdownLibrarySyncQueue();
@@ -1460,11 +1534,14 @@ async function start() {
           shutdownVersionCheckQueue(),
           shutdownInactivityCheckQueue(),
           shutdownBackupQueue(),
+          shutdownNewsletterQueues(),
           shutdownPlexTokenRefreshQueue(),
           shutdownRunRetentionQueue(),
-        ]).catch((err) => {
-          app.log.error({ err }, 'Error shutting down queues during maintenance');
-        });
+        ])
+          .finally(() => closeAllTransporters())
+          .catch((err: unknown) => {
+            app.log.error({ err }, 'Error shutting down queues during maintenance');
+          });
 
         // Stop the DB health interval — initializeServices will recreate it on recovery.
         if (dbHealthInterval) {

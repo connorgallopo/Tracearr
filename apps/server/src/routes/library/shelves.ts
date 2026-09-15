@@ -29,12 +29,14 @@ import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFi
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import {
   buildValueRollupCte,
-  fetchEpisodeCounts,
   pickBestResolution,
   buildCatalogPageQuery,
   buildPosterOrderFragment,
 } from './catalog.js';
-import { resolveWatchedStates } from '../../services/library/mediaWatchedService.js';
+import {
+  fetchEpisodeCounts,
+  resolveWatchedStates,
+} from '../../services/library/mediaWatchedService.js';
 import { buildProxyUrl, posterVersionFor } from '../../services/imageProxy.js';
 import { getSetting } from '../../services/settings.js';
 import { resolveDateRange, type DateRange } from '../stats/utils.js';
@@ -196,10 +198,11 @@ interface ValueCandidate {
 
 /**
  * Top-SHELF_LIMIT canonical titles of one type by plays within the window,
- * tiebreak viewers desc then watch_time desc. Candidates ranked from the
+ * tiebreak viewers desc then watch_time desc. Candidates come from the
  * windowed value_rollup CTE first, then a single detail lookup batches the
  * display fields for just those candidates (mirrors the catalog page-query
- * candidate/detail split).
+ * candidate/detail split). Ranks are numbered after the detail lookup, which
+ * drops candidates with no active library copy.
  */
 async function fetchMostPopular(
   type: 'movie' | 'show',
@@ -248,16 +251,16 @@ async function fetchMostPopular(
   );
 
   const result: CachedMostPopularRow[] = [];
-  candidates.forEach((candidate, index) => {
+  for (const candidate of candidates) {
     const detail = detailById.get(candidate.canonicalId);
-    if (!detail) return;
+    if (!detail) continue;
     result.push({
       ...toShelfRowBase(detail),
       plays: candidate.plays,
       viewers: candidate.viewers,
-      rank: index + 1,
+      rank: result.length + 1,
     });
-  });
+  }
   return result;
 }
 
@@ -270,7 +273,9 @@ interface DeadWeightCandidate {
  * ALL never-watched canonical titles of one type (no LIMIT - the caller needs
  * an exact all-time count/size total, not just the display page), alias-aware
  * (a merged loser's plays exclude the canonical row) and, for shows,
- * episode-aware. No poster/servers lookup here - that's deferred to the
+ * episode-aware. user_media_plays_daily admits every session with a media_id,
+ * so the play test is the measures rather than row existence. No poster/servers
+ * lookup here - that's deferred to the
  * detail query for only the top DEAD_WEIGHT_LIMIT candidates, so this stays
  * one correlated subquery (file size) per row instead of three.
  */
@@ -294,11 +299,12 @@ async function fetchDeadWeightCandidatesForType(
         WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}
       )
       AND NOT EXISTS (
-        SELECT 1 FROM user_media_plays_daily p WHERE p.${mediaCol} = m.id ${serverFragmentSelf}
+        SELECT 1 FROM user_media_plays_daily p
+        WHERE p.${mediaCol} = m.id AND (p.plays > 0 OR p.any_watched) ${serverFragmentSelf}
         UNION ALL
         SELECT 1 FROM media loser
         JOIN user_media_plays_daily p2 ON p2.${mediaCol} = loser.id
-        WHERE loser.merged_into_id = m.id ${serverFragmentLoser}
+        WHERE loser.merged_into_id = m.id AND (p2.plays > 0 OR p2.any_watched) ${serverFragmentLoser}
       )
   `);
   return (result.rows as { canonical_id: string; total_file_size: string | number }[]).map(
@@ -658,7 +664,7 @@ export const libraryShelvesRoute: FastifyPluginAsync = async (app) => {
       // episode count instead of an unbounded per-copy count, so a v4-cached
       // payload's chip numbers are stale and must not be served as v5.
       const cacheKey = buildLibraryCacheKey(
-        `${REDIS_KEYS.LIBRARY_SHELVES}:v6`,
+        `${REDIS_KEYS.LIBRARY_SHELVES}:v7`,
         serverCacheKey,
         periodCacheKey,
         undefined,

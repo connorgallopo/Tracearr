@@ -5,7 +5,6 @@ import { Activity } from 'lucide-react';
 import type { Automation, AutomationRunSummary, RunOutcome } from '@tracearr/shared';
 import { contextOf, contextSupplies, listPageCount } from '@tracearr/shared';
 import { EvaluationsList } from '@/components/automations/EvaluationsList';
-import { SELECTED_TOGGLE } from '@/components/automations/builder/selection';
 import {
   createDataTableColumnHelper,
   DataTableBody,
@@ -180,7 +179,7 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
         }}
       >
         {OUTCOME_TABS.map((value) => (
-          <ToggleGroupItem key={value} value={value} className={SELECTED_TOGGLE}>
+          <ToggleGroupItem key={value} value={value}>
             {t(`pages:automations.activity.tabs.${value}`)}
             {counts && (
               <span className="text-muted-foreground text-xs tabular-nums">
@@ -192,7 +191,7 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
       </ToggleGroup>
 
       <DataTableRoot density="default">
-        <DataTableViewport>
+        <DataTableViewport flush>
           <DataTableHeader table={table} />
           <DataTableBody
             table={table}
@@ -220,6 +219,7 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
           />
         </DataTableViewport>
         <DataTablePager
+          variant="footer"
           {...pager}
           labels={{
             navigation: t('common:table.pagination'),

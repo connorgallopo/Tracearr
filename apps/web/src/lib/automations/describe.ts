@@ -96,6 +96,7 @@ export const SENTENCE_SECTIONS = {
 /** The camelCase translation key for each trigger type. */
 export const TRIGGER_KEYS = {
   'session.started': 'sessionStarted',
+  'session.first_seen': 'sessionFirstSeen',
   'session.stopped': 'sessionStopped',
   'session.transcode_changed': 'sessionTranscodeChanged',
   'session.paused': 'sessionPaused',
@@ -110,6 +111,8 @@ export const TRIGGER_KEYS = {
   'plugin.update_available': 'pluginUpdateAvailable',
   'server.update_available': 'serverUpdateAvailable',
   'tracearr.update_available': 'tracearrUpdateAvailable',
+  'newsletter.sent': 'newsletterSent',
+  'newsletter.failed': 'newsletterFailed',
 } as const satisfies Record<TriggerType, string>;
 
 /** Fields whose truth reads as a state, not as a comparison against `true`. */

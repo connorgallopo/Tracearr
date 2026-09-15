@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,6 +25,18 @@ export const ROW_FOOTER_HEIGHT = 72;
  * every row's real height, which compounds into a large scrollToIndex offset
  * error over hundreds of unmeasured rows on a deep jump. */
 export const ROW_BOTTOM_PADDING = 16;
+
+/** Below this the page scrolls instead of the grid shrinking further. */
+export const MIN_GRID_HEIGHT = 480;
+
+/** Viewport height left below the grid's top edge, minus the page's bottom padding, never under MIN_GRID_HEIGHT. */
+export function computeGridHeight(
+  viewportHeight: number,
+  gridTop: number,
+  bottomPadding: number
+): number {
+  return Math.max(MIN_GRID_HEIGHT, Math.floor(viewportHeight - gridTop - bottomPadding));
+}
 
 /** How long the container must sit still before its offset rides history.replaceState. */
 export const SCROLL_IDLE_MS = 200;
@@ -206,9 +219,9 @@ interface VirtualPosterGridProps {
  * no bidirectional paging, no prepend compensation - which page fetches is
  * entirely the parent's business, driven by onViewportChange.
  *
- * The container div height is fixed via CSS (viewport minus chrome) so the
- * ResizeObserver only reacts to width changes, never a height feedback loop
- * from the virtualizer's own total-size div.
+ * The container fills the window below its own top edge. That height comes
+ * from the grid's document offset and the window, never from the
+ * virtualizer's total-size div, so there is no height feedback loop.
  */
 export const VirtualPosterGrid = forwardRef<VirtualPosterGridHandle, VirtualPosterGridProps>(
   function VirtualPosterGrid(
@@ -229,6 +242,7 @@ export const VirtualPosterGrid = forwardRef<VirtualPosterGridHandle, VirtualPost
   ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerWidth, setContainerWidth] = useState(0);
+    const [containerHeight, setContainerHeight] = useState(MIN_GRID_HEIGHT);
     // The scrollRestore.key most recently seeked to; an unseen key always owes a fresh seek.
     const appliedScrollRestoreKeyRef = useRef<unknown>(SCROLL_RESTORE_UNSET);
     const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -248,6 +262,27 @@ export const VirtualPosterGrid = forwardRef<VirtualPosterGridHandle, VirtualPost
       setContainerWidth(el.clientWidth);
       hasMeasuredContainerRef.current = true;
       return () => observer.disconnect();
+    }, []);
+
+    // The toolbar wrapping, a status banner or a window resize all move the
+    // grid's top edge, and each of those resizes the body.
+    useLayoutEffect(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      const page = el.closest('main');
+      const fit = () => {
+        const gridTop = el.getBoundingClientRect().top + window.scrollY;
+        const bottomPadding = page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0;
+        setContainerHeight(computeGridHeight(window.innerHeight, gridTop, bottomPadding));
+      };
+      fit();
+      const observer = new ResizeObserver(fit);
+      observer.observe(document.body);
+      window.addEventListener('resize', fit);
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', fit);
+      };
     }, []);
 
     const columnCount = useMemo(() => computeColumnCount(containerWidth), [containerWidth]);
@@ -524,7 +559,7 @@ export const VirtualPosterGrid = forwardRef<VirtualPosterGridHandle, VirtualPost
           // the viewport (e.g. right after scrollToIndex) and silently snaps
           // the scroll position back, fighting a programmatic jump.
           className="scrollbar-thin overflow-x-hidden overflow-y-auto [overflow-anchor:none]"
-          style={{ height: 'clamp(480px, calc(100vh - 300px), 1400px)' }}
+          style={{ height: containerHeight }}
         >
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative', width: '100%' }}>
             {virtualItems.map((virtualRow) => {

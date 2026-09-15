@@ -19,10 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserRequestsCard } from '@/components/requests/UserRequestsCard';
 import { TrustScoreBadge } from '@/components/users/TrustScoreBadge';
 import { UserLocationsCard } from '@/components/users/UserLocationsCard';
 import { UserDevicesCard } from '@/components/users/UserDevicesCard';
-import { EditUserNameDialog } from '@/components/users/EditUserNameDialog';
+import { EditUserIdentityDialog } from '@/components/users/EditUserIdentityDialog';
+import { ContactEmailLine } from '@/components/users/ContactEmailLine';
 import { EditTrustScoreDialog } from '@/components/users/EditTrustScoreDialog';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
 import { HistoryTable } from '@/components/history/HistoryTable';
@@ -93,7 +95,7 @@ export function UserDetail() {
   const [sessionsPage, setSessionsPage] = useState(1);
   const [violationsPage, setViolationsPage] = useState(1);
   const [terminationsPage, setTerminationsPage] = useState(1);
-  const [isEditNameOpen, setIsEditNameOpen] = useState(false);
+  const [isEditIdentityOpen, setIsEditIdentityOpen] = useState(false);
   const [trustEditTarget, setTrustEditTarget] = useState<{
     id: string;
     username: string;
@@ -568,7 +570,8 @@ export function UserDetail() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => setIsEditNameOpen(true)}
+                        aria-label={t('userDetail.editIdentity')}
+                        onClick={() => setIsEditIdentityOpen(true)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -583,6 +586,11 @@ export function UserDetail() {
                     )}
                   </div>
                   <p className="text-muted-foreground text-sm">@{user.username}</p>
+                  <ContactEmailLine
+                    contactEmail={identity?.contactEmail ?? null}
+                    isOwner={isOwner}
+                    onEdit={() => setIsEditIdentityOpen(true)}
+                  />
                   {user.email && <p className="text-muted-foreground text-sm">{user.email}</p>}
                   <div className="flex items-center gap-4 pt-2">
                     <TrustScoreBadge
@@ -768,6 +776,8 @@ export function UserDetail() {
         </Card>
       )}
 
+      <UserRequestsCard serverUserId={effectiveId!} scope={identityScope} />
+
       {/* Locations and Devices */}
       <div className="grid gap-6 lg:grid-cols-2">
         <UserLocationsCard
@@ -823,7 +833,7 @@ export function UserDetail() {
         </CardHeader>
         <CardContent>
           <DataTableRoot>
-            <DataTableViewport>
+            <DataTableViewport flush>
               <DataTableHeader table={violationsTable} />
               <DataTableBody
                 table={violationsTable}
@@ -838,6 +848,7 @@ export function UserDetail() {
               />
             </DataTableViewport>
             <DataTablePager
+              variant="footer"
               {...violationsPager}
               labels={{
                 navigation: t('common:table.pagination'),
@@ -863,7 +874,7 @@ export function UserDetail() {
         </CardHeader>
         <CardContent>
           <DataTableRoot>
-            <DataTableViewport>
+            <DataTableViewport flush>
               <DataTableHeader table={terminationsTable} />
               <DataTableBody
                 table={terminationsTable}
@@ -878,6 +889,7 @@ export function UserDetail() {
               />
             </DataTableViewport>
             <DataTablePager
+              variant="footer"
               {...terminationsPager}
               labels={{
                 navigation: t('common:table.pagination'),
@@ -893,12 +905,12 @@ export function UserDetail() {
         </CardContent>
       </Card>
 
-      {/* Edit Display Name Dialog */}
-      <EditUserNameDialog
-        open={isEditNameOpen}
-        onOpenChange={setIsEditNameOpen}
+      <EditUserIdentityDialog
+        open={isEditIdentityOpen}
+        onOpenChange={setIsEditIdentityOpen}
         userId={id!}
         currentName={user.identityName}
+        currentContactEmail={identity?.contactEmail ?? null}
         username={user.username}
       />
 

@@ -84,7 +84,7 @@ export function MostWatchedSection({
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-medium">Most Watched</CardTitle>
           <Select value={period} onValueChange={(v) => handlePeriodChange(v as Period)}>

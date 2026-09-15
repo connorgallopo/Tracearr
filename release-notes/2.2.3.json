@@ -1,0 +1,17 @@
+{
+  "version": "2.2.3",
+  "date": "2026-08-30",
+  "changes": [
+    { "type": "new", "text": "browser errors show up on the Debug page" },
+    { "type": "new", "text": "banner when a volume is mounted over a bundled path" },
+    { "type": "improved", "text": "pages fail on their own instead of blanking the whole app" },
+    {
+      "type": "improved",
+      "text": "stale tabs reload after an upgrade instead of dying on a missing chunk"
+    },
+    { "type": "fix", "text": "merged users no longer split apart on the next stream" },
+    { "type": "fix", "text": "legacy Plex owner accounts repaired on first boot" },
+    { "type": "fix", "text": "music library sync no longer dies on null bytes in ID3 tags" },
+    { "type": "fix", "text": "map no longer takes the app down when the browser blocks WebGL" }
+  ]
+}

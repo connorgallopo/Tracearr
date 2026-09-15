@@ -35,6 +35,7 @@ const destination: Destination = {
   config: { webhookUrl: null },
   secretsSet: ['webhookUrl'],
   referencedByAutomationCount: 0,
+  referencedByNewsletterCount: 0,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -123,9 +124,7 @@ describe('TemplateBindingForm', () => {
   it('says what it will do to a person', () => {
     renderForm(KILL_PAUSED);
 
-    expect(
-      screen.getByText("Can stop a stream that is playing.")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Can stop a stream that is playing.')).toBeInTheDocument();
     expect(screen.getByText('Runs on every server.')).toBeInTheDocument();
   });
 
@@ -133,9 +132,7 @@ describe('TemplateBindingForm', () => {
     renderForm();
 
     expect(
-      screen.getByText(
-        'Only notifies. Never stops a stream or changes an account.'
-      )
+      screen.getByText('Only notifies. Never stops a stream or changes an account.')
     ).toBeInTheDocument();
   });
 
@@ -204,9 +201,7 @@ describe('TemplateBindingForm', () => {
   it('says when a viewer message is shown, since the sentence never mentions it', () => {
     renderForm(KILL_PAUSED);
 
-    expect(
-      screen.getByText('Shown on the player when the stream stops.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Shown on the player when the stream stops.')).toBeInTheDocument();
   });
 
   it('holds a missing destination back until the reader submits', async () => {

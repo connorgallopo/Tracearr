@@ -142,9 +142,7 @@
         "title": "Token Di Coppia Generato",
         "message": "Scansiona il codice QR con il tuo dispositivo mobile per abbinare"
       },
-      "displayNameUpdated": {
-        "title": "Nome Visualizzato Aggiornato"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Resetta Punteggi Di Fiducia",
         "message_one": "{{count}} utente resettato a 100",
@@ -161,9 +159,21 @@
       "serverUserSplit": {
         "title": ""
       },
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
       "destinationSaved": "",
       "destinationDeleted": "",
-      "destinationTestSent": ""
+      "destinationTestSent": "",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Impossibile aggiungere il server",
@@ -190,7 +200,7 @@
       "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
       "deviceRenameFailed": "Impossibile rinominare il dispositivo",
       "sessionsRevokeFailed": "Impossibile revocare le sessioni",
-      "displayNameUpdateFailed": "Aggiornamento del nome visualizzato non riuscito",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Impossibile ripristinare i punteggi di fiducia",
       "routingUpdateFailed": "Impossibile aggiornare il routing",
       "clipboardFailed": "Impossibile copiare negli appunti",
@@ -207,6 +217,8 @@
       "plexDirectUrl": "Gli URL plex.direct sono indirizzi relè che non possono essere utilizzati qui. Utilizza invece un indirizzo IP diretto o un nome host.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "invalidClaimCode": {
         "title": "Codice sinistro non valido",
         "message": "Controlla i log del server"
@@ -214,7 +226,19 @@
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "",
       "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationInUse": "",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {

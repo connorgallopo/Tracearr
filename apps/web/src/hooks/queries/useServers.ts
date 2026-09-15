@@ -34,8 +34,7 @@ export function useCreateServer() {
       username?: string;
       password?: string;
       ignoreAnonymousStreams?: boolean;
-    }) =>
-      api.servers.create(data),
+    }) => api.servers.create(data),
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });
       toast.success(t('toast.success.serverAdded.title'), {
@@ -81,6 +80,8 @@ export function useUpdateServer() {
       password,
       ignoreAnonymousStreams,
       color,
+      publicUrl,
+      apiKey,
     }: {
       id: string;
       name?: string;
@@ -91,6 +92,8 @@ export function useUpdateServer() {
       password?: string;
       ignoreAnonymousStreams?: boolean;
       color?: string | null;
+      publicUrl?: string | null;
+      apiKey?: string;
     }) =>
       api.servers.update(id, {
         name,
@@ -101,6 +104,8 @@ export function useUpdateServer() {
         password,
         ignoreAnonymousStreams,
         color,
+        publicUrl,
+        apiKey,
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });

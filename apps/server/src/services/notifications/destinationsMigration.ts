@@ -114,13 +114,14 @@ function routingFor(routing: RoutingRow[] | null, event: NotificationEventType):
 const capable = (kind: DestinationKind, events: NotificationEventType[]): NotificationEventType[] =>
   events.filter((e) => (DESTINATION_TYPES[kind].events as readonly string[]).includes(e));
 
-/** The events the pre-automation routing table knew; the update and media events post-date it. */
+/** The events the pre-automation routing table knew; the update, media and newsletter events post-date it. */
 const ROUTED_EVENTS: NotificationEventType[] = NOTIFICATION_EVENT_TYPES.filter(
   (e) =>
     e !== 'server_update_available' &&
     e !== 'tracearr_update_available' &&
     e !== 'media_added' &&
-    e !== 'media_upgraded'
+    e !== 'media_upgraded' &&
+    e !== 'newsletter_send'
 );
 
 export function planDestinationsMigration(input: PlanInput): Plan {

@@ -5,8 +5,9 @@ import type { LngLatLike, StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './map.css';
 import { useTranslation } from 'react-i18next';
+import { recordClientError } from '@/lib/clientErrors';
 import { useTheme } from '@/components/theme-provider';
-import { checkBasemap } from './maplibre';
+import { checkBasemap, isWebglSupported } from './maplibre';
 
 export function useResolvedDark(): boolean {
   const { theme } = useTheme();
@@ -59,7 +60,7 @@ export function useMapLibre(
   const hasStyle = style !== null;
 
   useEffect(() => {
-    if (!containerRef.current || !styleRef.current) return;
+    if (!containerRef.current || !styleRef.current || !isWebglSupported()) return;
     const m = new MLMap({
       container: containerRef.current,
       style: styleRef.current,
@@ -77,7 +78,11 @@ export function useMapLibre(
     }
     setMap(m);
     return () => {
-      m.remove();
+      try {
+        m.remove();
+      } catch (err) {
+        recordClientError('maplibre teardown', err);
+      }
       setMap(null);
     };
     // Created once when a style first exists; later styles apply via setStyle.

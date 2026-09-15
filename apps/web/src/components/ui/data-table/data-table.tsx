@@ -50,6 +50,23 @@ const CELL_PADDING: Record<DataTableDensity, string> = {
   compact: 'px-3 py-1.5',
 };
 
+/**
+ * `w-auto` is load-bearing: with the default `w-full` the width is over-constrained,
+ * so the browser drops the negative right margin and the table bleeds left only.
+ */
+const FLUSH_OFFSET: Record<DataTableDensity, string> = {
+  comfortable: 'w-auto -mx-4 -mb-4',
+  default: 'w-auto -mx-4 -mb-3',
+  compact: 'w-auto -mx-3 -mb-1.5',
+};
+
+/** Cancels FLUSH_OFFSET's bottom pull so a footer pager butts against the last row. */
+export const FLUSH_FOOTER_OFFSET: Record<DataTableDensity, string> = {
+  comfortable: '-mx-4 mt-4 px-4',
+  default: '-mx-4 mt-3 px-4',
+  compact: '-mx-3 mt-1.5 px-3',
+};
+
 const HEADER_TEXT: Record<DataTableHeaderVariant, string | undefined> = {
   default: undefined,
   micro: 'text-[10.5px] font-semibold tracking-[0.07em]',
@@ -76,6 +93,10 @@ interface DataTableRootProps {
   children: ReactNode;
 }
 
+export function useDataTableChrome(): DataTableChrome {
+  return use(ChromeContext);
+}
+
 /** Draws no frame: every call site already sits inside a Card. */
 export function DataTableRoot({
   density = 'default',
@@ -94,19 +115,32 @@ export function DataTableRoot({
 interface DataTableViewportProps {
   /** Clamps the height and scrolls inside the table instead of the page. */
   contained?: boolean;
+  /**
+   * Cancels the cell padding against the padding of a surrounding CardContent,
+   * so the first column lines up with the card title instead of sitting inset
+   * by one more gutter.
+   */
+  flush?: boolean;
   className?: string;
   children: ReactNode;
 }
 
 export function DataTableViewport({
   contained = false,
+  flush = false,
   className,
   children,
 }: DataTableViewportProps) {
+  const { density } = use(ChromeContext);
   return (
     <div
       data-slot="data-table-viewport"
-      className={cn('relative w-full overflow-auto', contained && 'scrollbar-thin', className)}
+      className={cn(
+        'relative w-full overflow-auto',
+        contained && 'scrollbar-thin',
+        flush && FLUSH_OFFSET[density],
+        className
+      )}
       style={contained ? { maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT } : undefined}
     >
       <table data-slot="table" className="w-full caption-bottom text-sm">

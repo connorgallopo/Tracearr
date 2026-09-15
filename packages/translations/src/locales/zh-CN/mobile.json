@@ -10,7 +10,7 @@
     "enterManually": "手动输入 URL 和令牌",
     "cameraPermissionRequired": "请授予相机权限以扫描二维码",
     "scanQrInstructions": "在您的 Tracearr 仪表盘中打开设置 -> 移动应用程序并扫描二维码",
-    "urlPlaceholder": "",
+    "urlPlaceholder": "https://tracearr.example.com",
     "tokenPlaceholder": "trr_mob_……",
     "missingToken": "缺失的令牌",
     "pleaseEnterToken": "请输入您的访问令牌"
@@ -43,13 +43,13 @@
     "configureNotifications": "配置推送通知偏好设置",
     "language": "语言",
     "community": "社区",
-    "discord": "",
+    "discord": "Discord",
     "joinCommunity": "加入社区",
     "docs": "文档",
     "readDocs": "阅读文档",
     "website": "网站",
     "visitWebsite": "访问tracearr.com",
-    "github": "",
+    "github": "GitHub",
     "viewSourceCode": "查看源代码",
     "sponsor": "支持者",
     "supportDevelopment": "支持发展",
@@ -125,7 +125,7 @@
     "violationNotFoundDesc": "更多设备。",
     "customRule": "自定义规则",
     "streamComparison": "串流比较",
-    "ips": ""
+    "ips": "IPs"
   },
   "alerts": {
     "done": "完成",
@@ -157,7 +157,7 @@
     "servers": "服务器",
     "selectServers": "选择服务器",
     "serversSelected": "已选择 {{selected}} 个服务器，共 {{total}} 个服务器",
-    "allServers": ""
+    "allServers": "所有服务器"
   },
   "reconnected": "已经重新连接",
   "actionsExecuted": "操作已执行",

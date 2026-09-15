@@ -24,6 +24,7 @@ export type {
   ServerUserSplitResult,
   MergeSuggestionIdentity,
   MergeSuggestion,
+  DismissedMergeSuggestion,
   // Session
   SessionState,
   MediaType,
@@ -297,11 +298,14 @@ export type {
 export type {
   DestinationKind,
   DestinationFieldDescriptor,
+  DestinationFieldOption,
   DestinationDescriptor,
   Destination,
+  DestinationTestResult,
   CreateDestinationInput,
   UpdateDestinationInput,
   NotificationToast,
+  EmailSecurity,
 } from './destinations.js';
 
 // Automation type exports
@@ -432,6 +436,9 @@ export {
   callbackSchema,
   // Server
   createServerSchema,
+  PUBLIC_URL_PLEX_MESSAGE,
+  apiKeyConnectSchema,
+  publicUrlSchema,
   serverIdParamSchema,
   reorderServersSchema,
   updateServerSchema,
@@ -443,6 +450,8 @@ export {
   identityScopedPaginationSchema,
   mergeUsersBodySchema,
   mergeUserParamSchema,
+  mergeSuggestionDismissalSchema,
+  mergeSuggestionPairParamSchema,
   splitServerUserParamSchema,
   USER_SORT_FIELDS,
   userRosterFilterSchema,
@@ -534,13 +543,129 @@ export {
   NOTIFICATION_EVENT_TYPES,
   SUBSCRIBABLE_EVENTS,
   destinationConfigSchema,
+  configSchemaForFields,
   notificationEventTypeSchema,
   createDestinationSchema,
   updateDestinationSchema,
+  EMAIL_SECURITY,
+  EMAIL_SMTP_PRESETS,
+  addressList,
 } from './destinations.js';
 
 // Schema input type exports
 export type { SubscribableEvent } from './destinations.js';
+
+// Newsletter constants, schemas and API shapes
+export {
+  NEWSLETTER_SECTION_MAX,
+  NEWSLETTER_MOST_WATCHED_MAX,
+  NEWSLETTER_SEASONS_PER_SHOW_MAX,
+  NEWSLETTER_WINDOW_MAX_DAYS,
+  NEWSLETTER_EXTRA_ADDRESSES_MAX,
+  NEWSLETTER_EXCLUDED_USERS_MAX,
+  NEWSLETTER_SENDER_NAME_MAX,
+  NEWSLETTER_SEND_TRIGGERS,
+  NEWSLETTER_SEND_OUTCOMES,
+  NEWSLETTER_RECIPIENT_STATUSES,
+  NEWSLETTER_IMAGE_MODES,
+  EMAIL_SUPPRESSION_REASONS,
+  DEFAULT_NEWSLETTER_SUBJECT,
+  DEFAULT_NEWSLETTER_SECTIONS,
+  cronExpressionSchema,
+  newsletterScheduleSchema,
+  newsletterWindowSchema,
+  newsletterSectionsSchema,
+  newsletterScopeSchema,
+  NEWSLETTER_SCOPE_LIBRARIES_MAX,
+  newsletterScopeLibrarySchema,
+  newsletterRecipientsSchema,
+  newsletterLinksSchema,
+  DEFAULT_NEWSLETTER_LINKS,
+  createNewsletterSchema,
+  updateNewsletterSchema,
+  newsletterTestSendSchema,
+  newsletterPreviewDraftSchema,
+  newsletterRecipientsDraftSchema,
+  emailSuppressionCreateSchema,
+  newsletterSendsQuerySchema,
+  newsletterCron,
+  resolveSenderName,
+  variantKey,
+  variantServerIds,
+  needsSenderName,
+  variantKeySchema,
+  EMAIL_LOGO_MODES,
+  emailBrandingSchema,
+  emailBrandingReadSchema,
+  DEFAULT_EMAIL_BRANDING,
+  NEWSLETTER_VIEW_TOKEN_LENGTH,
+  NEWSLETTER_SNAPSHOT_RETENTION_DAYS,
+  NEWSLETTER_SEND_RETENTION_DAYS,
+  NEWSLETTER_EXCLUDED_REASONS,
+} from './newsletters.js';
+export type {
+  NewsletterSendTrigger,
+  NewsletterSendOutcome,
+  NewsletterRecipientStatus,
+  NewsletterImageMode,
+  EmailSuppressionReason,
+  NewsletterSchedule,
+  NewsletterWindow,
+  NewsletterSections,
+  NewsletterScope,
+  NewsletterScopeLibrary,
+  NewsletterRecipients,
+  NewsletterLinks,
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+  Newsletter,
+  NewsletterSendSummary,
+  NewsletterSendVariant,
+  NewsletterSendRecipient,
+  NewsletterSendDetail,
+  NewsletterSendsPage,
+  NewsletterRecipientPerson,
+  NewsletterExcludedReason,
+  NewsletterExcludedPerson,
+  NewsletterResolvedRecipient,
+  NewsletterRecipientsView,
+  EmailSuppression,
+  NewsletterPreview,
+  NewsletterPreviewDraftInput,
+  NewsletterRecipientsDraftInput,
+  NewsletterPreviewVariant,
+  NewsletterVariantsView,
+  NewsletterSectionCounts,
+  EmailLogoMode,
+  EmailBrandingSettings,
+  NewsletterSendHtml,
+} from './newsletters.js';
+
+// User merge
+export { rankMergeTarget, type MergeRankInput } from './merge.js';
+
+export { isEmailAddress, usernameAsEmail } from './emailAddress.js';
+
+// Rich text for newsletter intro and outro
+export {
+  EMAIL_RICH_TEXT_MAX_CHARS,
+  EMAIL_RICH_TEXT_MAX_BLOCKS,
+  EMAIL_RICH_TEXT_MAX_LIST_ITEMS,
+  EMAIL_RICH_TEXT_MAX_MARKS,
+  EMAIL_RICH_TEXT_MAX_WEIGHT,
+  emailRichTextHrefSchema,
+  emailRichTextDocSchema,
+  emailRichTextLength,
+  emailRichTextWeight,
+  normalizeEmailRichText,
+} from './emailRichText.js';
+export type {
+  EmailRichTextDoc,
+  EmailRichTextBlock,
+  EmailRichTextParagraph,
+  EmailRichTextInline,
+  EmailRichTextMark,
+} from './emailRichText.js';
 
 export type {
   LoginInput,
@@ -734,4 +859,81 @@ export {
   type ServerScope,
 } from './serverScope.js';
 
-export { buildMediaServerItemUrl, type MediaServerItemLinkInput } from './mediaServerLinks.js';
+export {
+  buildMediaServerItemUrl,
+  isPubliclyRoutableUrl,
+  memberFacingUrl,
+  type MediaServerItemLinkInput,
+} from './mediaServerLinks.js';
+
+// Request tracking (Seerr)
+export {
+  REQUEST_SERVICE_TYPES,
+  MEDIA_REQUEST_STATUSES,
+  testRequestServiceSchema,
+  createRequestServiceSchema,
+  updateRequestServiceSchema,
+  userRequestsQuerySchema,
+  requestsAnalyticsQuerySchema,
+  requestsUnplayedQuerySchema,
+  requestersQuerySchema,
+  REQUEST_UNPLAYED_SORTS,
+  REQUESTER_SORTS,
+  type RequestServiceType,
+  type MediaRequestStatus,
+  type MediaRequestMediaType,
+  type RequestSeason,
+  type RequestCounts,
+  type RequestService,
+  type RequestServiceProbeResult,
+  type RequestRequester,
+  type MediaRequestEntry,
+  type UserRequestEntry,
+  type UserRequestsSummary,
+  type UserRequestsResponse,
+  type TestRequestServiceInput,
+  type CreateRequestServiceInput,
+  type UpdateRequestServiceInput,
+  type UserRequestsQuery,
+  type RequestOutcomeRow,
+  type RequestUnplayedSort,
+  type RequesterSort,
+  type RequesterFollowThrough,
+  type RequestsUnplayedResponse,
+  type RequestersResponse,
+  type RequestsUnplayedQuery,
+  type RequestersQuery,
+  type RequestsFunnel,
+  type RequestsAnalyticsResponse,
+  type RequestsStatus,
+  type RequestsAnalyticsQuery,
+} from './requests.js';
+
+// Release versions
+export {
+  normalizeVersion,
+  parseVersion,
+  isPrerelease,
+  getBaseVersion,
+  compareVersions,
+  isNewerVersion,
+  type ParsedVersion,
+} from './releaseVersion.js';
+
+// Release notes
+export {
+  RELEASE_CHANGE_TYPES,
+  WHATS_NEW_LEGACY,
+  releaseChangeSchema,
+  releaseHighlightSchema,
+  releaseNotesFileSchema,
+  isMinorRelease,
+  releaseTagIssues,
+  renderReleaseNotesMarkdown,
+  type ReleaseChangeType,
+  type ReleaseChange,
+  type ReleaseHighlight,
+  type ReleaseNotesFile,
+  type WhatsNewState,
+  type UpgradeWarning,
+} from './releaseNotes.js';

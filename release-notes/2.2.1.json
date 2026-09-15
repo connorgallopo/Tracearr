@@ -1,0 +1,5 @@
+{
+  "version": "2.2.1",
+  "date": "2026-08-27",
+  "changes": [{ "type": "fix", "text": "map assets are copied into the supervised image" }]
+}

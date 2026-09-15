@@ -3,6 +3,7 @@ import { getActiveAutomations } from '../../../jobs/poller/database.js';
 import { automationsLogger } from '../../../utils/logger.js';
 import { getPubSubService } from '../../cache.js';
 import {
+  assembleEvaluationInputs,
   installInputs,
   loadEvaluationContext,
   loadServerContext,
@@ -14,11 +15,13 @@ import type {
   AccountNewDeviceEvent,
   EvaluationInputs,
   EvaluationServer,
+  EvaluationServerUser,
   SessionStopReason,
   TriggerType,
 } from './types.js';
 import type { MediaQuality, MediaSubject } from '../types.js';
 import type { TrustMove } from '../../userService.js';
+import type { NewsletterSendPayload } from '../../notifications/events.js';
 
 /** The active automations when one of them listens for the trigger, else null: no listener, no context read. */
 async function listeningRules(trigger: TriggerType): Promise<EngineAutomation[] | null> {
@@ -94,6 +97,38 @@ export async function dispatchSessionStopped(
         durationMs,
       },
       context.inputs
+    );
+  });
+}
+
+/**
+ * First sight of a new playback: the session exists only as a pending cache entry, so
+ * listeners fire ahead of the confirmation delay. The id it carries is the one the
+ * confirmed row will keep; a phantom that never confirms leaves its runs behind.
+ */
+export async function dispatchSessionFirstSeen(args: {
+  session: Session;
+  server: EvaluationServer;
+  serverUser: EvaluationServerUser;
+  at: Date;
+}): Promise<void> {
+  await guarded('session.first_seen', async () => {
+    const rules = await listeningRules('session.first_seen');
+    if (!rules) return;
+    const inputs = await assembleEvaluationInputs({
+      rules,
+      server: args.server,
+      serverUser: args.serverUser,
+    });
+    await dispatch(
+      {
+        type: 'session.first_seen',
+        at: args.at,
+        server: args.server,
+        serverUser: args.serverUser,
+        session: args.session,
+      },
+      inputs
     );
   });
 }
@@ -271,5 +306,15 @@ export async function dispatchTracearrUpdate(args: {
       { type: 'tracearr.update_available', at: new Date(), ...args },
       installInputs(rules)
     );
+  });
+}
+
+/** A finished send announces itself once its outcome is written; which trigger fires follows the outcome. */
+export async function dispatchNewsletterSend(fields: NewsletterSendPayload): Promise<void> {
+  const trigger = fields.outcome === 'sent' ? 'newsletter.sent' : 'newsletter.failed';
+  await guarded(trigger, async () => {
+    const rules = await listeningRules(trigger);
+    if (!rules) return;
+    await dispatch({ type: trigger, at: new Date(), ...fields }, installInputs(rules));
   });
 }

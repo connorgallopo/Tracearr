@@ -1137,6 +1137,133 @@ registry.registerPath({
 // Document Generator
 // ============================================================================
 
+// ============================================================================
+// GET /watched-media
+// ============================================================================
+
+const WatchedStateEnum = z.enum(['watched', 'partial', 'unwatched']);
+
+const WatchedMediaQuery = z.object({
+  media_type: z.enum(['movie', 'show', 'episode']).openapi({
+    description:
+      'Which rollup to list. movie and episode key on the media itself; show rolls its ' +
+      'episodes up through show_media_id',
+  }),
+  user_id: z
+    .uuid()
+    .optional()
+    .openapi({
+      description:
+        'Scope every row to one identity, as on /history. Omit it and the response describes ' +
+        'the whole install. A title this identity never played is absent rather than returned ' +
+        'as unwatched, so watched_state, plays, last_watched_day and episodes_watched all ' +
+        'describe that identity alone. episode_count stays server-wide, so a scoped show is ' +
+        'watched once that identity has seen every episode present on the server',
+    }),
+  server_id: z.uuid().optional().openapi({ description: 'Filter to specific server' }),
+  min_state: z
+    .enum(['watched', 'partial'])
+    .default('watched')
+    .openapi({
+      description:
+        'Lowest state to include, at whatever grain user_id set. "partial" also returns ' +
+        'titles started but not finished',
+    }),
+  cursor: z.string().optional().openapi({ description: 'Opaque cursor from meta.nextCursor' }),
+  pageSize: z.coerce.number().int().positive().max(1000).default(100),
+});
+
+const WatchedMediaRecord = z
+  .object({
+    media_id: z.uuid().openapi({ description: 'Canonical media id; merge losers resolve to it' }),
+    media_type: z.string().openapi({ example: 'movie' }),
+    title: z.string().openapi({ example: 'Inception' }),
+    year: z.number().int().nullable().openapi({ example: 2010 }),
+    imdb_id: z.string().nullable().openapi({ example: 'tt1375666' }),
+    tmdb_id: z.number().int().nullable().openapi({ example: 27205 }),
+    tvdb_id: z.number().int().nullable(),
+    show_media_id: z
+      .uuid()
+      .nullable()
+      .openapi({ description: 'Episode rows only: the series this episode belongs to' }),
+    show_title: z.string().nullable(),
+    show_imdb_id: z.string().nullable(),
+    show_tmdb_id: z.number().int().nullable(),
+    show_tvdb_id: z.number().int().nullable().openapi({
+      description: "Episode rows only: the series' tvdb id, since tvdb_id is the episode's own",
+    }),
+    season_number: z
+      .number()
+      .int()
+      .nullable()
+      .openapi({
+        description:
+          'Episode rows only: season number. An episode carries a provider id of its own only ' +
+          'when the media server supplied one, so this and episode_number are the reliable way ' +
+          'to place an episode within show_tvdb_id',
+      }),
+    episode_number: z.number().int().nullable().openapi({
+      description: 'Episode rows only: episode number within the season',
+    }),
+    watched_state: WatchedStateEnum.openapi({
+      description:
+        'Watched or partial, for the user_id identity when one was given and across every ' +
+        'identity otherwise. Never unwatched: an unwatched title is simply absent',
+    }),
+    plays: z.number().int().openapi({ description: 'Plays at the same grain as watched_state' }),
+    last_watched_day: z.string().openapi({
+      description:
+        'Most recent UTC day with activity, YYYY-MM-DD (the rollup buckets by day). Filter on ' +
+        'this client-side for a recent-activity view',
+      example: '2026-08-30',
+    }),
+    episodes_watched: z
+      .number()
+      .int()
+      .nullable()
+      .openapi({ description: 'Show rows only: distinct episodes watched, at the same grain' }),
+    episode_count: z
+      .number()
+      .int()
+      .nullable()
+      .openapi({ description: 'Show rows only: episodes present on the server' }),
+  })
+  .openapi('WatchedMediaRecord');
+
+const WatchedMediaResponse = z
+  .object({ data: z.array(WatchedMediaRecord), meta: CursorMeta })
+  .openapi('WatchedMediaResponse');
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/v2/public/watched-media',
+  tags: ['Public API v2'],
+  summary: 'Watched media set',
+  description:
+    'The distinct set of media with recorded engagement, newest activity first, for matching ' +
+    'against an external library by tmdb/tvdb/imdb id. Absence from the result means ' +
+    'unwatched, so an unwatched title is never returned. A movie is watched once a play passed ' +
+    "this server's watch-completion threshold (85% of runtime by default, configurable per " +
+    'media type in Settings); a show is watched once every episode present on the server has ' +
+    'been. A show with no episodes on any server is treated as unwatched and omitted. ' +
+    'To distinguish "this person watched it" from "somebody else did", pull twice, once with ' +
+    'user_id and once without: the scoped result is always a subset of the unscoped one, and ' +
+    'the difference is what other people watched. The matching set is computed once per filter ' +
+    'combination and cached for 60 seconds, and every page of a walk reads that same snapshot. ' +
+    'Page until meta.nextCursor is null rather than until a short page: a title deleted mid-walk ' +
+    'is skipped, so a page can hold fewer than pageSize rows and still have pages after it.',
+  security: [{ bearerAuth: [] }],
+  request: { query: WatchedMediaQuery },
+  responses: {
+    200: {
+      description: 'Watched media retrieved',
+      content: { 'application/json': { schema: WatchedMediaResponse } },
+    },
+    400: { description: 'Invalid query parameters or cursor' },
+    ...AUTH_ERROR_RESPONSES,
+  },
+});
+
 export function generateOpenAPIDocumentV2(): unknown {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
@@ -1162,13 +1289,16 @@ Generate your API key in **Settings > General**.
 
 ## Pagination
 
-The history, users, and recently-added endpoints use cursor pagination via \`cursor\` and
-\`pageSize\` (max 100, default 25). Each paginated response carries a \`meta.nextCursor\` to
-fetch the following page. Streams and libraries return the full set in one response.
+The history, users, recently-added, and watched-media endpoints use cursor pagination via
+\`cursor\` and \`pageSize\`. Most cap pageSize at 100 with a default of 25; watched-media
+carries far smaller rows and allows up to 1000, defaulting to 100. Each paginated response
+carries a \`meta.nextCursor\` to fetch the following page. Streams and libraries return the
+full set in one response.
 
 ## Filtering
 
-History, streams, watchers, and recently-added accept \`server_id\` to filter by media server.
+History, streams, watchers, recently-added, and watched-media accept \`server_id\` to filter
+by media server.
       `.trim(),
       contact: {
         name: 'Tracearr',

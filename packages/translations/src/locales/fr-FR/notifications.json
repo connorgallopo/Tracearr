@@ -61,12 +61,12 @@
         "message": "Votre compte Plex a été déconnecté"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
+        "title": "Compte Plex réautorisé",
+        "message_one": "Serveur {{count}} reconnecté",
+        "message_other": "Les serveurs {{count}} ont été reconnectés",
+        "messageNoServers": "Jeton de compte mis à jour",
+        "partial": "Jeton mis à jour, mais {{names}} l'a toujours refusé",
+        "unmatched": "Jeton mis à jour, mais {{names}} n'a pas pu être ré-lié"
       },
       "agentAdded": {
         "title": "Agent ajouté",
@@ -85,16 +85,16 @@
         "message": "{{name}} terminé avec succès"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation créée",
+        "message": "L'automatisation a été créée avec succès"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation mise à jour",
+        "message": "L'automatisation a été mise à jour avec succès"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "Automatisation supprimée",
+        "message": "L'automatisation a été supprimée avec succès"
       },
       "streamTerminated": {
         "title": "Lecture interrompue",
@@ -142,9 +142,7 @@
         "title": "Jeton d'appairage généré",
         "message": "Scannez le code QR avec votre appareil mobile pour appairer"
       },
-      "displayNameUpdated": {
-        "title": "Nom d'affichage mis à jour"
-      },
+      "identityUpdated": "",
       "trustScoresReset": {
         "title": "Réinitialiser les scores de confiance",
         "message_one": "{{count}} utilisateur réinitialisé à 100",
@@ -156,14 +154,26 @@
       },
       "usersMerged": {
         "title": "Utilisateurs fusionnés",
-        "automationsKept": ""
+        "automationsKept": "La version de la cible est conservée : {{names}}"
       },
       "serverUserSplit": {
         "title": "Compte séparé en un utilisateur distinct"
       },
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": ""
+      "mergeSuggestionDismissed": "",
+      "mergeSuggestionRestored": "",
+      "destinationSaved": "Destination enregistrée",
+      "destinationDeleted": "Destination supprimée",
+      "destinationTestSent": "Notification de test envoyée",
+      "destinationTestSentTo": "",
+      "newsletterSaved": "",
+      "newsletterDeleted": "",
+      "newsletterDuplicated": "",
+      "newsletterTestQueued": "",
+      "newsletterSendQueued": "",
+      "newsletterRetryQueued": "",
+      "brandingSaved": "",
+      "suppressionAdded": "",
+      "suppressionRemoved": ""
     },
     "error": {
       "serverAddFailed": "Échec de l'ajout du serveur",
@@ -175,9 +185,9 @@
       "dismissFailed": "Échec de l'ignorance de la violation",
       "authFailed": "Échec de l'authentification",
       "webhookTestFailed": "Échec du test du webhook",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "Échec de la création de l'automatisation",
+      "automationUpdateFailed": "Échec de la mise à jour de l'automatisation",
+      "automationDeleteFailed": "Échec de la suppression de l'automatisation",
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
@@ -190,12 +200,12 @@
       "deviceRemoveFailed": "Échec de la suppression de l'appareil",
       "deviceRenameFailed": "Échec du renommage de l'appareil",
       "sessionsRevokeFailed": "Échec de la révocation des sessions",
-      "displayNameUpdateFailed": "Échec de la mise à jour du nom d'affichage",
+      "identityUpdateFailed": "",
       "trustScoresResetFailed": "Échec de la réinitialisation des scores de confiance",
       "routingUpdateFailed": "Échec de la mise à jour du routage",
       "clipboardFailed": "Échec de la copie dans le presse-papiers",
       "plexUnlinkFailed": "Échec de la dissociation du compte Plex",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "Échec de la réautorisation du compte Plex",
       "agentAddFailed": "Échec de l'ajout de l'agent",
       "agentUpdateFailed": "Échec de la mise à jour de l'agent",
       "agentRemoveFailed": "Échec de la suppression de l'agent",
@@ -207,14 +217,28 @@
       "plexDirectUrl": "Les URL plex.direct sont des adresses de relai qui ne peuvent pas être utilisées ici. Veuillez utiliser une adresse IP directe ou un nom d’hôte à la place.",
       "userMergeFailed": "Échec de la fusion des utilisateurs",
       "serverUserSplitFailed": "Échec de la séparation du compte",
+      "mergeSuggestionDismissFailed": "",
+      "mergeSuggestionRestoreFailed": "",
       "invalidClaimCode": {
         "title": "Code de réclamation invalide",
         "message": "Veuillez vérifier les journaux du serveur"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": ""
+      "destinationSaveFailed": "Impossible d'enregistrer la destination : {{error}}",
+      "destinationDeleteFailed": "Impossible de supprimer la destination : {{error}}",
+      "destinationTestFailed": "Test échoué : {{error}}",
+      "destinationInUse": "Toujours utilisé par : {{rules}}",
+      "destinationUsedByNewsletters": "",
+      "newsletterSaveFailed": "",
+      "newsletterDeleteFailed": "",
+      "newsletterDuplicateFailed": "",
+      "newsletterPreviewFailed": "",
+      "newsletterTestFailed": "",
+      "newsletterSendFailed": "",
+      "newsletterRetryFailed": "",
+      "newsletterSnapshotFailed": "",
+      "brandingSaveFailed": "",
+      "suppressionAddFailed": "",
+      "suppressionRemoveFailed": ""
     },
     "warning": {
       "jobFailed": {

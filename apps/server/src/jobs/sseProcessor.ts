@@ -15,7 +15,7 @@ import { SESSION_WRITE_RETRY, type PlexPlaySessionNotification } from '@tracearr
 import { and, eq, isNull } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client.js';
-import { servers, serverUsers, sessions, users } from '../db/schema.js';
+import { servers, serverUserExternalAliases, serverUsers, sessions, users } from '../db/schema.js';
 import { getGeoIPSettings } from '../routes/settings.js';
 import type { CacheService, PubSubService } from '../services/cache.js';
 import { createMediaServerClient } from '../services/mediaServer/index.js';
@@ -28,7 +28,10 @@ import {
   toRuleSession,
 } from '../services/automations/events/contextAssembly.js';
 import { dispatch } from '../services/automations/events/dispatcher.js';
-import { dispatchServerHealthById } from '../services/automations/events/producers.js';
+import {
+  dispatchServerHealthById,
+  dispatchSessionFirstSeen,
+} from '../services/automations/events/producers.js';
 import { registerService, unregisterService } from '../services/serviceTracker.js';
 import { getWatchedThreshold } from '../services/settings.js';
 import { sseManager } from '../services/sseManager.js';
@@ -992,6 +995,35 @@ async function fetchFullSession(
 }
 
 /**
+ * An external id a same-server merge folded into another account. Only hit
+ * when the direct lookup misses, so the common path stays one query.
+ */
+async function resolveAliasedServerUser(serverId: string, externalId: string) {
+  const rows = await db
+    .select({
+      id: serverUsers.id,
+      userId: serverUsers.userId,
+      username: serverUsers.username,
+      thumbUrl: serverUsers.thumbUrl,
+      identityName: users.name,
+      trustScore: serverUsers.trustScore,
+      lastActivityAt: serverUsers.lastActivityAt,
+      createdAt: serverUsers.createdAt,
+    })
+    .from(serverUserExternalAliases)
+    .innerJoin(serverUsers, eq(serverUserExternalAliases.serverUserId, serverUsers.id))
+    .innerJoin(users, eq(serverUsers.userId, users.id))
+    .where(
+      and(
+        eq(serverUserExternalAliases.serverId, serverId),
+        eq(serverUserExternalAliases.externalId, externalId)
+      )
+    )
+    .limit(1);
+  return rows[0];
+}
+
+/**
  * Create a new session from SSE event
  *
  * Redis-First Architecture:
@@ -1041,7 +1073,8 @@ async function createNewSession(
     )
     .limit(1);
 
-  const serverUserFromDb = serverUserRows[0];
+  const serverUserFromDb =
+    serverUserRows[0] ?? (await resolveAliasedServerUser(serverId, processed.externalUserId));
   if (!serverUserFromDb) {
     console.warn(`[SSEProcessor] Server user not found for ${processed.externalUserId}, skipping`);
     return;
@@ -1155,6 +1188,13 @@ async function createNewSession(
     await pubSubService.publish('session:started', activeSession);
   }
 
+  await dispatchSessionFirstSeen({
+    session: activeSession,
+    server: { id: srv.id, name: srv.name, type: srv.type },
+    serverUser: userDetail,
+    at: new Date(pendingData.startedAt),
+  });
+
   console.log(
     `[SSEProcessor] Created pending session for ${processed.mediaTitle} (awaiting 30s confirmation)`
   );
@@ -1252,6 +1292,15 @@ async function handleMediaChange(
   if (pubSubService) {
     await pubSubService.publish('session:started', activeSession);
   }
+
+  // Auto-play-next is a new playback too; it skips the pending phase, so first
+  // sight and confirmation announce at the same moment.
+  await dispatchSessionFirstSeen({
+    session: activeSession,
+    server: serverRef,
+    serverUser: { ...serverUser, identityServerUserIds },
+    at: insertedSession.startedAt,
+  });
 
   console.log(
     `[SSEProcessor] Media change created session ${insertedSession.id} for ${processed.mediaTitle}`

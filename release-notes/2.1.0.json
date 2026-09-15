@@ -1,0 +1,59 @@
+{
+  "version": "2.1.0",
+  "date": "2026-08-14",
+  "headline": "Live stats for every server and Playback Reporting imports",
+  "upgradeWarning": "Update the SSE plugin: Jellyfin and Emby CPU and RAM charts need Media-Server-SSE 0.4.0 or newer",
+  "highlights": [
+    {
+      "title": "Live server stats",
+      "body": "CPU and RAM charts work for Jellyfin and Emby. Pick several servers and they overlay on one chart, one line per server. Charts hold a real two-minute window, re-stamp servers with drifting clocks, and draw a gap when a server stops reporting instead of a flat line."
+    },
+    {
+      "title": "Playback Reporting imports",
+      "body": "Jellyfin and Emby watch history imports straight from the Playback Reporting plugin over the server connection you already have. Check Plugin shows how many records it holds first. Safe to run twice: rows already imported or tracked are skipped. Emby imports include IP locations and pause time."
+    }
+  ],
+  "changes": [
+    {
+      "type": "new",
+      "text": "Jellyfin and Emby streams show transcode progress and hardware acceleration details, like Plex"
+    },
+    {
+      "type": "improved",
+      "text": "posters are resized by the media server, cutting a typical fetch from hundreds of KB to dozens"
+    },
+    {
+      "type": "improved",
+      "text": "image processing is capped to one thread so cache warming doesn't take over a small box"
+    },
+    {
+      "type": "improved",
+      "text": "the dashboard rides the socket while connected, so extra tabs no longer multiply Plex API calls"
+    },
+    {
+      "type": "improved",
+      "text": "the full library scan runs at most once every 3.5 days per library"
+    },
+    {
+      "type": "fix",
+      "text": "clicking a user in a media item's watchers or history opens that user"
+    },
+    { "type": "fix", "text": "open on server opens the item instead of the server root" },
+    {
+      "type": "fix",
+      "text": "the admin recovery CLI finds owners with legacy mixed-case usernames"
+    },
+    {
+      "type": "fix",
+      "text": "Plex metadata refreshes no longer trigger a library sync every 30 seconds"
+    },
+    {
+      "type": "fix",
+      "text": "dominant color lookups are indexed, so poster cache warming no longer crawls"
+    },
+    {
+      "type": "note",
+      "text": "TimescaleDB extension updates at boot are opt in with `TIMESCALEDB_AUTO_UPDATE`"
+    }
+  ]
+}

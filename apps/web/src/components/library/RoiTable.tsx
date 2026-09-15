@@ -200,11 +200,13 @@ export function RoiTable({
         canNext={page < totalPages}
         onPrevious={() => onPageChange(page - 1)}
         onNext={() => onPageChange(page + 1)}
+        onPage={onPageChange}
         labels={{
           navigation: t('table.pagination'),
           status: t('table.pageOf', { page, total: totalPages }),
           previous: t('actions.previous'),
           next: t('actions.next'),
+          goToPage: t('table.goToPage'),
         }}
         className="px-2"
       />

@@ -51,8 +51,11 @@ describe('normalizeServerVersion', () => {
 
   it('rejects a version too short for the comparator to read', () => {
     expect(normalizeServerVersion('emby', '4')).toBeNull();
-    expect(normalizeServerVersion('jellyfin', 'v10.11')).toBeNull();
-    expect(normalizeServerVersion('plex', '1.43-cb3ebc72d')).toBeNull();
+  });
+
+  it('pads a two part version out to three', () => {
+    expect(normalizeServerVersion('jellyfin', 'v12.0')).toBe('12.0.0');
+    expect(normalizeServerVersion('plex', '1.43-cb3ebc72d')).toBe('1.43.0');
   });
 
   it('takes three and four part versions', () => {
@@ -74,6 +77,11 @@ describe('isNewerServerVersion', () => {
   it('compares Jellyfin tags against the version the server reports', () => {
     expect(isNewerServerVersion('jellyfin', 'v10.11.12', '10.11.11')).toBe(true);
     expect(isNewerServerVersion('jellyfin', 'v10.11.11', '10.11.11')).toBe(false);
+  });
+
+  it('reads the two part tag Jellyfin shipped 12.0 under', () => {
+    expect(isNewerServerVersion('jellyfin', 'v12.0', '10.11.11')).toBe(true);
+    expect(isNewerServerVersion('jellyfin', 'v12.0', '12.0.0')).toBe(false);
   });
 
   it('compares all four parts of an Emby version', () => {
@@ -103,9 +111,9 @@ describe('latestVersionFor', () => {
   });
 
   it('reads the Jellyfin release tag', async () => {
-    mockFetchJson.mockResolvedValue({ tag_name: 'v10.11.11' });
+    mockFetchJson.mockResolvedValue({ tag_name: 'v12.0' });
 
-    await expect(latestVersionFor('jellyfin')).resolves.toBe('10.11.11');
+    await expect(latestVersionFor('jellyfin')).resolves.toBe('12.0.0');
     expect(mockFetchJson).toHaveBeenCalledWith(
       'https://api.github.com/repos/jellyfin/jellyfin/releases/latest',
       expect.objectContaining({ timeout: 10_000, service: 'github' })

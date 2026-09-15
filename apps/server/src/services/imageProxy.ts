@@ -346,7 +346,7 @@ function assertSameOrigin(baseUrl: string, imagePath: string): void {
 export function buildUpstreamRequest(
   server: typeof servers.$inferSelect,
   imagePath: string,
-  resize?: { width: number; height: number }
+  resize?: { width: number; height: number; preserveAspectRatio?: boolean }
 ): { imageUrl: string; headers: Record<string, string> } {
   const baseUrl = server.url.replace(/\/$/, '');
 
@@ -367,7 +367,7 @@ export function buildUpstreamRequest(
 
   if (server.type === 'plex') {
     // Plex image URLs are relative paths like /library/metadata/123/thumb/456
-    if (resize) {
+    if (resize && !resize.preserveAspectRatio) {
       // Plex's photo transcoder resizes and caches server-side - a 240px
       // poster arrives as ~20KB instead of the multi-MB original. upscale=0
       // keeps small sources untouched; minSize=1 fills the requested box.
@@ -392,13 +392,15 @@ export function buildUpstreamRequest(
     headers['X-Emby-Token'] = server.token;
   }
   if (resize) {
-    // Both accept max-dimension params on image endpoints and cache the
-    // result. Constrain only the target's long axis so the cover crop below
-    // always has enough pixels where it matters; sharp still normalizes to
-    // the exact box, but it decodes a thumbnail instead of the original.
+    // Both accept max-dimension params and cache the result. Posters fit
+    // within both bounds without cropping. Other images retain the long-axis
+    // constraint so their cover resize has enough pixels.
     const separator = imagePath.includes('?') ? '&' : '?';
-    const dimension =
-      resize.height >= resize.width ? `maxHeight=${resize.height}` : `maxWidth=${resize.width}`;
+    const dimension = resize.preserveAspectRatio
+      ? `maxWidth=${resize.width}&maxHeight=${resize.height}`
+      : resize.height >= resize.width
+        ? `maxHeight=${resize.height}`
+        : `maxWidth=${resize.width}`;
     return {
       imageUrl: `${baseUrl}${imagePath}${separator}${dimension}&quality=90`,
       headers,
@@ -474,7 +476,11 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500.
     const candidates = [
-      buildUpstreamRequest(server, effectiveImagePath, { width, height }),
+      buildUpstreamRequest(server, effectiveImagePath, {
+        width,
+        height,
+        preserveAspectRatio: fallback === 'poster',
+      }),
       buildUpstreamRequest(server, effectiveImagePath),
     ];
     let imageBuffer: Buffer | null = null;
@@ -513,7 +519,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
 
     const resized = await sharp(imageBuffer)
       .resize(width, height, {
-        fit: server.type === 'dispatcharr' ? 'inside' : 'cover',
+        fit: fallback === 'poster' || server.type === 'dispatcharr' ? 'inside' : 'cover',
         position: 'center',
       })
       .webp({ quality: 80 })
