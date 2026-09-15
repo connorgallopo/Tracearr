@@ -84,7 +84,9 @@
     "stopped": "중지됨",
     "directPlay": "직접 재생",
     "directStream": "직접 재생",
-    "transcode": "트랜스코딩"
+    "transcode": "트랜스코딩",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "낮음",
