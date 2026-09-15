@@ -142,7 +142,7 @@
         "title": "配对令牌已生成",
         "message": "用您的移动设备扫描二维码进行配对"
       },
-      "identityUpdated": "",
+      "identityUpdated": "个人资料已更新",
       "trustScoresReset": {
         "title": "重置信任分数",
         "message_one": "{{count}}用户重置为100",
@@ -159,20 +159,20 @@
       "serverUserSplit": {
         "title": "账户拆分为单独用户"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
+      "mergeSuggestionDismissed": "标记为不是同一个人",
+      "mergeSuggestionRestored": "建议已恢复",
       "destinationSaved": "目标已保存",
       "destinationDeleted": "目标已删除",
       "destinationTestSent": "发送测试通知",
       "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
+      "newsletterSaved": "通讯已保存",
+      "newsletterDeleted": "通讯已删除",
+      "newsletterDuplicated": "通讯已复制",
       "newsletterTestQueued": "",
-      "newsletterSendQueued": "",
+      "newsletterSendQueued": "发送队列中",
       "newsletterRetryQueued": "",
-      "brandingSaved": "",
-      "suppressionAdded": "",
+      "brandingSaved": "邮件标记已保存",
+      "suppressionAdded": "地址添加到抑制列表",
       "suppressionRemoved": ""
     },
     "error": {
