@@ -84,7 +84,9 @@
     "stopped": "停止しました",
     "directPlay": "ダイレクトプレイ",
     "directStream": "ダイレクトストリーム",
-    "transcode": "トランスコード"
+    "transcode": "トランスコード",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "低い",
