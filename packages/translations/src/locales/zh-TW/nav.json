@@ -6,9 +6,7 @@
   "activity": "活動",
   "library": "媒體庫",
   "users": "使用者",
-  "automations": "",
   "violations": "違規",
-  "requests": "",
   "alerts": "警報",
   "settings": "設定",
   "overview": "總覽",
@@ -19,15 +17,5 @@
   "devices": "裝置",
   "bandwidth": "頻寬",
   "jobs": "任務",
-  "accessControl": "存取控制",
-  "media": "",
-  "mediaBrowse": "",
-  "mediaGenres": "",
-  "session": "",
-  "user": "",
-  "violation": "",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "accessControl": "存取控制"
 }
