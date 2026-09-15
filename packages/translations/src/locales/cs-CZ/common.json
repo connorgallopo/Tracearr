@@ -84,7 +84,9 @@
     "stopped": "Zastaveno",
     "directPlay": "Přímé přehrávání",
     "directStream": "Přímé vysílání",
-    "transcode": "Přeskóre"
+    "transcode": "Přeskóre",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Nízká",
