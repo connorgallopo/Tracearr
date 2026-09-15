@@ -84,7 +84,9 @@
     "stopped": "Остановлено",
     "directPlay": "Прямая игра",
     "directStream": "Прямой поток",
-    "transcode": "Перекодировать"
+    "transcode": "Перекодировать",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Низкий",
