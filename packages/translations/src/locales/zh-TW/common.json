@@ -84,7 +84,9 @@
     "stopped": "",
     "directPlay": "",
     "directStream": "",
-    "transcode": "轉碼"
+    "transcode": "轉碼",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "",
