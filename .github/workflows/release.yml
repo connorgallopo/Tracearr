@@ -166,11 +166,50 @@ jobs:
       - name: Run integration tests
         run: pnpm --filter @tracearr/server test:integration
 
+  release-notes:
+    name: Release Notes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter @tracearr/shared
+
+      - name: Build shared
+        run: pnpm --filter @tracearr/shared build
+
+      - name: Validate and render release notes
+        run: node .github/scripts/render-release-notes.mjs
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_NOTES_OUT_DIR: release-notes-out
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-notes
+          path: |
+            release-notes-out/release_notes.md
+            release-notes-out/release-notes.json
+          if-no-files-found: error
+
   # Determine if this is a prerelease (alpha, beta, rc, etc.)
   check-release-type:
     name: Check Release Type
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, test, test-integration]
+    needs: [lint-and-typecheck, test, test-integration, release-notes]
     outputs:
       prerelease: ${{ steps.check.outputs.prerelease }}
 
@@ -625,29 +664,24 @@ jobs:
       - name: Generate OpenAPI specs
         run: pnpm --filter @tracearr/server openapi:dump "$GITHUB_WORKSPACE"
 
-      - name: Get tag annotation
-        id: tag_info
-        run: |
-          # Use subject+body to exclude GPG/SSH signatures from signed tags
-          SUBJECT=$(git tag -l --format='%(contents:subject)' ${{ github.ref_name }})
-          BODY=$(git tag -l --format='%(contents:body)' ${{ github.ref_name }})
-          if [ -n "$BODY" ]; then
-            printf '%s\n\n%s\n' "$SUBJECT" "$BODY" > tag_message.txt
-          else
-            echo "$SUBJECT" > tag_message.txt
-          fi
+      - name: Download release notes
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-notes
+          path: release-notes-out
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           name: ${{ github.ref_name }}
-          body_path: tag_message.txt
+          body_path: release-notes-out/release_notes.md
           prerelease: ${{ needs.check-release-type.outputs.prerelease }}
           generate_release_notes: false
           fail_on_unmatched_files: true
           files: |
             openapi-v1.json
             openapi-v2.json
+            release-notes-out/release-notes.json
 
   announce-reddit:
     name: Post to Reddit
@@ -659,15 +693,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Get tag annotation
-        run: |
-          SUBJECT=$(git tag -l --format='%(contents:subject)' ${{ github.ref_name }})
-          BODY=$(git tag -l --format='%(contents:body)' ${{ github.ref_name }})
-          if [ -n "$BODY" ]; then
-            printf '%s\n\n%s\n' "$SUBJECT" "$BODY" > tag_message.txt
-          else
-            echo "$SUBJECT" > tag_message.txt
-          fi
+      - name: Download release notes
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-notes
+          path: release-notes-out
 
       - name: Post release to Reddit
         run: node .github/scripts/post-release-to-reddit.mjs
@@ -677,4 +707,4 @@ jobs:
           REDDIT_REFRESH_TOKEN: ${{ secrets.REDDIT_REFRESH_TOKEN }}
           RELEASE_TAG: ${{ github.ref_name }}
           TITLE_PREFIX: ${{ needs.check-release-type.outputs.prerelease == 'true' && 'Beta Release' || 'Release' }}
-          NOTES_FILE: tag_message.txt
+          NOTES_FILE: release-notes-out/release_notes.md

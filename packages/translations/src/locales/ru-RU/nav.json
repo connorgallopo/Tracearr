@@ -6,7 +6,9 @@
   "activity": "Активность",
   "library": "Библиотека",
   "users": "Пользователи",
+  "automations": "",
   "violations": "Нарушения",
+  "requests": "",
   "alerts": "Оповещения",
   "settings": "Настройки",
   "overview": "Общий обзор",
@@ -20,5 +22,12 @@
   "accessControl": "Контроль доступа",
   "media": "Медиа",
   "mediaBrowse": "Обзор",
-  "mediaGenres": "Жанры"
+  "mediaGenres": "Жанры",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }

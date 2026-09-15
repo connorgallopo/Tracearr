@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `9d2e17ab`
-- Last shared upstream commit found during inspection: `fc7a0603`
-- Latest upstream commit merged into the current working tree: `9d2e17ab`
+- Source branch/SHA inspected: `main` at `452cef79`
+- Last shared upstream commit found during inspection: `9d2e17ab`
+- Latest upstream commit merged into the current working tree: `452cef79`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,37 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `452cef79` (Tracearr 2.3.0) was merged into `develop`
+  on September 15, 2026. It adds bundled release notes, the owner's What's New
+  dialog, reopening notes from the sidebar, and upgrade warnings downloaded
+  from release assets. Shared semantic-version helpers replace the old queue
+  implementation; fork `vX.Y.Z-rN` comparison remains separate.
+  The version API retains `fork`, `upstream`, and `recommended`; both latest
+  payloads now include `upgradeWarnings`. Fork warnings are bounded by the
+  target fork's upstream base, so a newer upstream release does not put its
+  warnings on an older fork update. Old cached releases default to an empty
+  warning list, and the route removes warnings for already-installed versions.
+  What's New reads the installed upstream version and `upstream.latest`;
+  fork update badges, image repository, release URLs, cooldown, and fresh
+  startup-job IDs remain intact. Crowdin changes retain intentional fork keys.
+  The manual release workflow now validates and renders bundled release notes
+  and attaches `release-notes.json`; it remains manual-only with the Helm push
+  job disabled. PR CI structure and toolchain are unchanged. Upstream migrations,
+  the separate Dispatcharr migration ledger, auth/realtime/session behavior,
+  and permanent uncropped artwork/cache markers are unchanged.
+  Full non-Docker CI passed on its first run with Node 24 / pnpm 12.3.4,
+  `HUSKY=0`, and a 4 GB Node heap after clearing Turbo: frozen install,
+  lint, typecheck, translations, unit/services/routes/auth/security, web,
+  coverage and build. Server groups plus web passed 8,603 tests with two
+  skipped; the separate shared suite passed 360. Coverage passed 5,463 with
+  two skipped (66.86% statements, 61.01% branches, 72.90% functions,
+  67.95% lines). The release-note renderer also passed for `v2.3.0`.
+  Lint has 755 warnings; all jobs retain September 14 warning counts/classes.
+  Logs use `.tmp/github-ci-<job>-20260915-452c.log`; the overall runner exits
+  zero. Validation details are in `.tmp/github-ci-warning-reference.md`.
+  Docker integration and E2E are omitted at the user's request; Docker image
+  builds and live-provider manual smoke checks are not covered by this run.
 
 - Upstream `main` at `9d2e17ab` was merged into `develop` on September 14,
   2026. Jellyfin/Emby API keys can now be edited, and Plex/Jellyfin/Emby URL

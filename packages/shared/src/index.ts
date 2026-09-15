@@ -908,3 +908,32 @@ export {
   type RequestsStatus,
   type RequestsAnalyticsQuery,
 } from './requests.js';
+
+// Release versions
+export {
+  normalizeVersion,
+  parseVersion,
+  isPrerelease,
+  getBaseVersion,
+  compareVersions,
+  isNewerVersion,
+  type ParsedVersion,
+} from './releaseVersion.js';
+
+// Release notes
+export {
+  RELEASE_CHANGE_TYPES,
+  WHATS_NEW_LEGACY,
+  releaseChangeSchema,
+  releaseHighlightSchema,
+  releaseNotesFileSchema,
+  isMinorRelease,
+  releaseTagIssues,
+  renderReleaseNotesMarkdown,
+  type ReleaseChangeType,
+  type ReleaseChange,
+  type ReleaseHighlight,
+  type ReleaseNotesFile,
+  type WhatsNewState,
+  type UpgradeWarning,
+} from './releaseNotes.js';

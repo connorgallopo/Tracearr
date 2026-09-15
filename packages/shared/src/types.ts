@@ -11,6 +11,7 @@ import type {
   TriggerNode,
 } from './automations/index.js';
 import type { NotificationToast } from './destinations.js';
+import type { UpgradeWarning } from './releaseNotes.js';
 import type { statPeriodSchema } from './schemas.js';
 import type { z } from 'zod';
 
@@ -1147,7 +1148,12 @@ export interface ServerToClientEvents {
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
   'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'tasks:updated': (tasks: RunningTask[]) => void;
-  'version:update': (data: { current: string; latest: string; releaseUrl: string; kind: 'fork-update' }) => void;
+  'version:update': (data: {
+    current: string;
+    latest: string;
+    releaseUrl: string;
+    kind: 'fork-update';
+  }) => void;
   'server:down': (data: { serverId: string; serverName: string }) => void;
   'server:up': (data: { serverId: string; serverName: string }) => void;
   'server:connection': (status: ServerConnectionStatus) => void;
@@ -1996,18 +2002,20 @@ export interface VersionInfo {
       isPrerelease: boolean;
       releaseName: string | null;
       releaseNotes: string | null;
+      upgradeWarnings: UpgradeWarning[];
     } | null;
     updateAvailable: boolean;
   };
   upstream: {
     latest: {
-    version: string;
-    tag: string;
-    releaseUrl: string;
-    publishedAt: string;
-    isPrerelease: boolean; // Whether this update is a prerelease
-    releaseName: string | null; // Release title from GitHub
-    releaseNotes: string | null; // Release body/notes from GitHub (markdown)
+      version: string;
+      tag: string;
+      releaseUrl: string;
+      publishedAt: string;
+      isPrerelease: boolean; // Whether this update is a prerelease
+      releaseName: string | null; // Release title from GitHub
+      releaseNotes: string | null; // Release body/notes from GitHub (markdown)
+      upgradeWarnings: UpgradeWarning[];
     } | null;
     updateAvailable: boolean;
   };

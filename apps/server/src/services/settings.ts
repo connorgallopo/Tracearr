@@ -67,6 +67,9 @@ const INTERNAL_DEFAULTS = {
   plexClientIdentifier: null as string | null,
   // The owner's email branding block, validated by emailBrandingSchema on read and write.
   emailBranding: null as EmailBrandingSettings | null,
+  // Normalized version the owner last dismissed the what's-new dialog on; 'legacy' marks an
+  // install that predates the dialog. Seeded once at boot, so null only before first boot.
+  whatsNewLastSeenVersion: null as string | null,
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;

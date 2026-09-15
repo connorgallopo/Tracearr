@@ -1,11 +1,14 @@
 {
+  "dashboard": "",
   "map": "Karte",
   "history": "Verlauf",
   "stats": "Statistiken",
   "activity": "Aktivität",
   "library": "Mediathek",
   "users": "Benutzer",
+  "automations": "",
   "violations": "Verstöße",
+  "requests": "",
   "alerts": "Warnungen",
   "settings": "Einstellungen",
   "overview": "Übersicht",
@@ -18,5 +21,13 @@
   "jobs": "Aufträge",
   "accessControl": "Zugangskontrolle",
   "media": "Medien",
-  "mediaBrowse": "Durchsuchen"
+  "mediaBrowse": "Durchsuchen",
+  "mediaGenres": "",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }

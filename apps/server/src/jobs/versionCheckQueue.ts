@@ -9,7 +9,17 @@ import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
 import type { Redis } from 'ioredis';
 import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
-import { REDIS_KEYS, CACHE_TTL, WS_EVENTS } from '@tracearr/shared';
+import {
+  REDIS_KEYS,
+  CACHE_TTL,
+  WS_EVENTS,
+  compareVersions,
+  getBaseVersion,
+  isNewerVersion,
+  isPrerelease,
+  releaseNotesFileSchema,
+  type UpgradeWarning,
+} from '@tracearr/shared';
 import { getBuildInfo, getCurrentVersion } from '../utils/buildInfo.js';
 import { dispatchTracearrUpdate } from '../services/automations/events/producers.js';
 
@@ -32,14 +42,13 @@ export class GitHubRateLimitError extends Error {
 }
 
 // GitHub API configuration
-const UPSTREAM_API_LATEST_URL = 'https://api.github.com/repos/connorgallopo/Tracearr/releases/latest';
-const UPSTREAM_API_ALL_RELEASES_URL = 'https://api.github.com/repos/connorgallopo/Tracearr/releases';
+const UPSTREAM_API_LATEST_URL =
+  'https://api.github.com/repos/connorgallopo/Tracearr/releases/latest';
+const UPSTREAM_API_ALL_RELEASES_URL =
+  'https://api.github.com/repos/connorgallopo/Tracearr/releases';
 const UPSTREAM_RELEASES_URL = 'https://github.com/connorgallopo/Tracearr/releases';
 const FORK_API_ALL_RELEASES_URL = 'https://api.github.com/repos/d4rk-4lchemy/Tracearr/releases';
 const FORK_RELEASES_URL = 'https://github.com/d4rk-4lchemy/Tracearr/releases';
-
-// Prerelease identifier patterns (beta, alpha, rc, etc.)
-const PRERELEASE_PATTERN = /-(alpha|beta|rc|next|dev|canary)\.?\d*$/i;
 
 // Job types
 interface VersionCheckJobData {
@@ -57,6 +66,7 @@ export interface LatestVersionData {
   isPrerelease: boolean;
   releaseName: string | null;
   releaseNotes: string | null;
+  upgradeWarnings: UpgradeWarning[];
 }
 
 export interface LatestForkReleaseData extends LatestVersionData {
@@ -204,7 +214,11 @@ export async function scheduleVersionChecks(): Promise<void> {
   // previously completed BullMQ job, in which case BullMQ silently refuses to
   // enqueue it and a new cache namespace never gets populated after upgrade.
   // The cooldown key still prevents restart bursts from hammering GitHub.
-  await versionQueue.add('startup-check', { type: 'check' }, { jobId: `startup-check-${Date.now()}` });
+  await versionQueue.add(
+    'startup-check',
+    { type: 'check' },
+    { jobId: `startup-check-${Date.now()}` }
+  );
 
   console.log('Version checks scheduled (every 6 hours)');
 }
@@ -234,6 +248,7 @@ export interface GitHubRelease {
   body: string | null;
   prerelease: boolean;
   draft: boolean;
+  assets?: { name: string; browser_download_url: string }[];
 }
 
 /**
@@ -328,13 +343,22 @@ export function compareForkVersions(a: string, b: string): number {
   const parsedB = parseForkReleaseTag(b.startsWith('v') ? b : `v${b}`);
   if (!parsedA || !parsedB) return 0;
   const upstreamComparison = compareVersions(parsedA.upstreamVersion, parsedB.upstreamVersion);
-  return upstreamComparison || (parsedA.forkRevision > parsedB.forkRevision ? 1 : parsedA.forkRevision < parsedB.forkRevision ? -1 : 0);
+  return (
+    upstreamComparison ||
+    (parsedA.forkRevision > parsedB.forkRevision
+      ? 1
+      : parsedA.forkRevision < parsedB.forkRevision
+        ? -1
+        : 0)
+  );
 }
 
 export function findLatestForkRelease(releases: GitHubRelease[]): GitHubRelease | null {
-  return releases
-    .filter((release) => !release.draft && parseForkReleaseTag(release.tag_name))
-    .sort((a, b) => compareForkVersions(b.tag_name, a.tag_name))[0] ?? null;
+  return (
+    releases
+      .filter((release) => !release.draft && parseForkReleaseTag(release.tag_name))
+      .sort((a, b) => compareForkVersions(b.tag_name, a.tag_name))[0] ?? null
+  );
 }
 
 function toLatestData(release: GitHubRelease): LatestVersionData {
@@ -347,6 +371,7 @@ function toLatestData(release: GitHubRelease): LatestVersionData {
     isPrerelease: release.prerelease,
     releaseName: release.name || null,
     releaseNotes: release.body || null,
+    upgradeWarnings: [],
   };
 }
 
@@ -365,6 +390,58 @@ function toForkLatestData(release: GitHubRelease): LatestForkReleaseData {
     forkRevision: parsed.forkRevision,
     forkVersion: parsed.forkVersion,
   };
+}
+
+const RELEASE_NOTES_ASSET = 'release-notes.json';
+
+/**
+ * Reads the release-notes.json asset of every release after the installed version up to the
+ * target. Releases published before notes files existed have no asset and contribute nothing.
+ */
+export async function collectUpgradeWarnings(
+  currentVersion: string,
+  targetVersion: string,
+  releases: GitHubRelease[]
+): Promise<UpgradeWarning[]> {
+  const targetIsPrerelease = isPrerelease(targetVersion);
+  const between = releases
+    .filter(
+      (r) =>
+        !r.draft &&
+        (targetIsPrerelease || !r.prerelease) &&
+        compareVersions(r.tag_name, currentVersion) > 0 &&
+        compareVersions(r.tag_name, targetVersion) <= 0
+    )
+    .sort((a, b) => compareVersions(b.tag_name, a.tag_name));
+
+  const warnings: UpgradeWarning[] = [];
+  const collectedVersions = new Set<string>();
+  for (const release of between) {
+    if (collectedVersions.has(getBaseVersion(release.tag_name))) continue;
+    const asset = release.assets?.find((a) => a.name === RELEASE_NOTES_ASSET);
+    if (!asset) continue;
+    try {
+      const response = await fetch(asset.browser_download_url, {
+        headers: { 'User-Agent': 'Tracearr-Version-Check' },
+      });
+      if (!response.ok) {
+        console.warn(`Release notes for ${release.tag_name} returned ${response.status}`);
+        continue;
+      }
+      const parsed = releaseNotesFileSchema.safeParse(await response.json());
+      if (
+        parsed.success &&
+        parsed.data.upgradeWarning &&
+        !collectedVersions.has(parsed.data.version)
+      ) {
+        collectedVersions.add(parsed.data.version);
+        warnings.push({ version: parsed.data.version, text: parsed.data.upgradeWarning });
+      }
+    } catch (error) {
+      console.warn(`Could not read release notes for ${release.tag_name}:`, error);
+    }
+  }
+  return warnings;
 }
 
 /**
@@ -395,16 +472,17 @@ export async function processVersionCheck(job: Job<VersionCheckJobData>): Promis
     console.log(`Current version: ${currentVersion} (prerelease: ${currentIsPrerelease})`);
 
     let upstreamRelease: GitHubRelease | null = null;
+    let releases: GitHubRelease[] = [];
 
     if (currentIsPrerelease) {
-      // For prerelease users, fetch all releases to find the best update
-      const releases = await fetchGitHubReleases(`${UPSTREAM_API_ALL_RELEASES_URL}?per_page=30`);
+      const fetched = await fetchGitHubReleases(`${UPSTREAM_API_ALL_RELEASES_URL}?per_page=30`);
 
-      if (!releases || !Array.isArray(releases)) {
+      if (!fetched || !Array.isArray(fetched)) {
         console.log('No releases found or invalid response');
         return;
       }
 
+      releases = fetched;
       const valid = releases.filter((r) => !r.draft);
       upstreamRelease = valid.sort((a, b) => compareVersions(b.tag_name, a.tag_name))[0] ?? null;
     } else {
@@ -433,6 +511,30 @@ export async function processVersionCheck(job: Job<VersionCheckJobData>): Promis
     const latestUpstream = toLatestData(upstreamRelease);
     const latestFork = toForkLatestData(forkRelease);
 
+    // Both channels carry upstream migration warnings only up to their own target.
+    // A fork revision does not change the installed upstream version.
+    if (
+      releases.length === 0 &&
+      (isNewerVersion(latestUpstream.version, currentVersion) ||
+        isNewerVersion(latestFork.upstreamVersion, currentVersion))
+    ) {
+      try {
+        const fetched = await fetchGitHubReleases(`${UPSTREAM_API_ALL_RELEASES_URL}?per_page=30`);
+        if (Array.isArray(fetched)) releases = fetched;
+      } catch (error) {
+        console.warn('Could not fetch release list for upgrade warnings:', error);
+      }
+    }
+    latestUpstream.upgradeWarnings = await collectUpgradeWarnings(
+      currentVersion,
+      latestUpstream.version,
+      releases
+    );
+    latestFork.upgradeWarnings =
+      latestFork.upstreamVersion === latestUpstream.version
+        ? latestUpstream.upgradeWarnings
+        : await collectUpgradeWarnings(currentVersion, latestFork.upstreamVersion, releases);
+
     // Cache each source independently.
     await redisClient.set(
       REDIS_KEYS.VERSION_LATEST_UPSTREAM,
@@ -447,7 +549,9 @@ export async function processVersionCheck(job: Job<VersionCheckJobData>): Promis
       CACHE_TTL.VERSION_CHECK
     );
 
-    console.log(`Latest releases cached: fork ${latestFork.forkVersion}, upstream ${latestUpstream.version}`);
+    console.log(
+      `Latest releases cached: fork ${latestFork.forkVersion}, upstream ${latestUpstream.version}`
+    );
 
     // Set cooldown so restart bursts don't re-fetch immediately
     await redisClient.set(
@@ -460,8 +564,7 @@ export async function processVersionCheck(job: Job<VersionCheckJobData>): Promis
     // Check if update is available
     const currentForkVersion = getBuildInfo().forkVersion;
     const forkUpdateAvailable =
-      !!currentForkVersion &&
-      compareForkVersions(latestFork.forkVersion, currentForkVersion) > 0;
+      !!currentForkVersion && compareForkVersions(latestFork.forkVersion, currentForkVersion) > 0;
     if (forkUpdateAvailable) {
       // Broadcast update availability to connected clients
       if (pubSubPublish) {
@@ -532,6 +635,7 @@ async function getCachedVersion<T extends LatestVersionData>(key: string): Promi
       isPrerelease: data.isPrerelease ?? isPrerelease(data.tag),
       releaseName: data.releaseName ?? null,
       releaseNotes: data.releaseNotes ?? null,
+      upgradeWarnings: data.upgradeWarnings ?? [],
     } as T;
     return result;
   } catch {
@@ -545,123 +649,6 @@ export function getCachedLatestVersion(): Promise<LatestVersionData | null> {
 
 export function getCachedLatestForkRelease(): Promise<LatestForkReleaseData | null> {
   return getCachedVersion<LatestForkReleaseData>(REDIS_KEYS.VERSION_LATEST_FORK);
-}
-
-/**
- * Parsed semantic version with prerelease support
- */
-interface ParsedVersion {
-  major: number;
-  minor: number;
-  patch: number;
-  prerelease: string | null; // e.g., "beta", "alpha", "rc"
-  prereleaseNum: number | null; // e.g., 3 for "beta.3"
-  isPrerelease: boolean;
-}
-
-/**
- * Parse a semantic version string into components
- * Handles: 1.3.9, v1.3.9, 1.3.9-beta.3, v1.4.0-rc.1
- */
-export function parseVersion(version: string): ParsedVersion {
-  // Remove 'v' prefix
-  const v = version.replace(/^v/, '');
-
-  // Match: major.minor.patch(-prerelease.num)?
-  const match = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z]+)(?:\.(\d+))?)?$/);
-
-  if (!match) {
-    // Fallback for malformed versions
-    return {
-      major: 0,
-      minor: 0,
-      patch: 0,
-      prerelease: null,
-      prereleaseNum: null,
-      isPrerelease: false,
-    };
-  }
-
-  const [, major = '0', minor = '0', patch = '0', prerelease, prereleaseNum] = match;
-
-  return {
-    major: parseInt(major, 10),
-    minor: parseInt(minor, 10),
-    patch: parseInt(patch, 10),
-    prerelease: prerelease ?? null,
-    prereleaseNum: prereleaseNum ? parseInt(prereleaseNum, 10) : null,
-    isPrerelease: !!prerelease,
-  };
-}
-
-/**
- * Check if a version string represents a prerelease
- */
-export function isPrerelease(version: string): boolean {
-  return PRERELEASE_PATTERN.test(version.replace(/^v/, ''));
-}
-
-/**
- * Get the base version without prerelease suffix
- * e.g., "1.3.9-beta.3" -> "1.3.9"
- */
-export function getBaseVersion(version: string): string {
-  return version.replace(/^v/, '').replace(/-.*$/, '');
-}
-
-/**
- * Compare two semantic versions with full prerelease support
- * Returns: 1 if a > b, -1 if a < b, 0 if equal
- *
- * Ordering rules:
- * - Higher major/minor/patch wins
- * - Stable release > any prerelease of same base version (1.3.9 > 1.3.9-beta.99)
- * - Prerelease ordering: alpha < beta < rc (then by number)
- */
-export function compareVersions(a: string, b: string): number {
-  const vA = parseVersion(a);
-  const vB = parseVersion(b);
-
-  // Compare major.minor.patch
-  if (vA.major !== vB.major) return vA.major > vB.major ? 1 : -1;
-  if (vA.minor !== vB.minor) return vA.minor > vB.minor ? 1 : -1;
-  if (vA.patch !== vB.patch) return vA.patch > vB.patch ? 1 : -1;
-
-  // Same base version - check prerelease status
-  if (!vA.isPrerelease && !vB.isPrerelease) return 0; // Both stable
-  if (!vA.isPrerelease && vB.isPrerelease) return 1; // a is stable, b is prerelease
-  if (vA.isPrerelease && !vB.isPrerelease) return -1; // a is prerelease, b is stable
-
-  // Both are prereleases of same base version
-  const prereleaseOrder: Record<string, number> = {
-    dev: 0,
-    canary: 1,
-    alpha: 2,
-    beta: 3,
-    rc: 4,
-    next: 5,
-  };
-
-  const orderA = prereleaseOrder[vA.prerelease?.toLowerCase() ?? ''] ?? 3;
-  const orderB = prereleaseOrder[vB.prerelease?.toLowerCase() ?? ''] ?? 3;
-
-  if (orderA !== orderB) return orderA > orderB ? 1 : -1;
-
-  // Same prerelease type - compare numbers
-  const numA = vA.prereleaseNum ?? 0;
-  const numB = vB.prereleaseNum ?? 0;
-
-  if (numA !== numB) return numA > numB ? 1 : -1;
-
-  return 0;
-}
-
-/**
- * Compare two semantic versions
- * Returns true if latest > current
- */
-export function isNewerVersion(latest: string, current: string): boolean {
-  return compareVersions(latest, current) > 0;
 }
 
 /**

@@ -1,0 +1,48 @@
+{
+  "version": "1.5.0",
+  "date": "2026-07-14",
+  "headline": "New auth and merged users across servers",
+  "upgradeWarning": "Back up before upgrading. Auth and user data migrate, and downgrading to 1.4.x afterward is not supported",
+  "highlights": [
+    {
+      "title": "Auth",
+      "body": "Login is rebuilt: local username and password, Plex, and optional SSO through `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, and `OIDC_CLIENT_SECRET`. Web users log in once after upgrading; paired mobile devices stay paired. Behind a proxy that rewrites Host, forward X-Forwarded-Host or set `CORS_ORIGIN`."
+    },
+    {
+      "title": "Merge users across servers",
+      "body": "Merge the same person's accounts across servers into one identity. Suggestions surface likely matches, and merges split back apart, even chained ones. Merged people count once on the Users page, leaderboards, and unique viewers, and rules can target a person on all their servers."
+    }
+  ],
+  "changes": [
+    {
+      "type": "improved",
+      "text": "the history page is much faster and its pagination edge cases are gone"
+    },
+    {
+      "type": "improved",
+      "text": "resolution labels trust the server, and the jobs page can relabel old history"
+    },
+    { "type": "fix", "text": "sessions no longer duplicate when SSE and reconciliation race" },
+    { "type": "fix", "text": "the poller no longer overloads under heavy concurrent streams" },
+    { "type": "fix", "text": "user sorting works again" },
+    {
+      "type": "fix",
+      "text": "the mobile app recovers requests that stalled while it was in the background"
+    },
+    { "type": "fix", "text": "login reconnects after a database restore" },
+    { "type": "fix", "text": "specials keep their season zero" },
+    {
+      "type": "fix",
+      "text": "helm chart installs work again and the chart tracks the release version"
+    },
+    {
+      "type": "note",
+      "text": "Jellyfin credential login is gone; the docs site covers password reset"
+    },
+    { "type": "note", "text": "the app image runs Node 24 and the Redis image moved to v8" },
+    {
+      "type": "note",
+      "text": "update the Jellyfin and Emby SSE plugin for this release's SSE improvements"
+    }
+  ]
+}

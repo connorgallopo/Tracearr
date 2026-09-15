@@ -27,17 +27,17 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import { ZipArchive } from 'archiver';
 import { Open } from 'unzipper';
-import type { BackupListItem, BackupMetadata, BackupType } from '@tracearr/shared';
+import {
+  compareVersions,
+  type BackupListItem,
+  type BackupMetadata,
+  type BackupType,
+} from '@tracearr/shared';
 import { sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { sessions, users, servers, automations, libraryItems } from '../db/schema.js';
 
-import {
-  getCurrentVersion,
-  getCurrentCommit,
-  getCurrentTag,
-  compareVersions,
-} from '../jobs/versionCheckQueue.js';
+import { getCurrentVersion, getCurrentCommit, getCurrentTag } from '../jobs/versionCheckQueue.js';
 
 // ---------------------------------------------------------------------------
 // Helpers

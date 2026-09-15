@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpCircle } from 'lucide-react';
+import { normalizeVersion } from '@tracearr/shared';
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +25,11 @@ import { NavRunningTasks } from './NavRunningTasks';
 import { NavUser } from './NavUser';
 import { navigation, isNavItemActive, type NavItem } from './nav-data';
 import { UpdateDialog } from './UpdateDialog';
+import { WhatsNewDialog } from '@/components/whats-new/WhatsNewDialog';
 import { useRequestsConfigured, useVersion } from '@/hooks/queries';
 import { useSocket } from '@/hooks/useSocket';
 import { cn } from '@/lib/utils';
+import { RELEASE_NOTES, selectReopen, type WhatsNewSections } from '@/lib/releaseNotes';
 
 function NavMenuItem({ item }: { item: NavItem }) {
   const { setOpenMobile } = useSidebar();
@@ -49,10 +52,14 @@ function NavMenuItem({ item }: { item: NavItem }) {
 
 function VersionDisplay() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [reopenSections, setReopenSections] = useState<WhatsNewSections | null>(null);
   const { t } = useTranslation(['common', 'settings']);
   const { data: version, isLoading } = useVersion();
   const { serverConnectionStatuses } = useSocket();
   const navigate = useNavigate();
+
+  const runningVersion = version ? normalizeVersion(version.current.version) : null;
 
   const pluginUpdateAvailable = [...serverConnectionStatuses.values()].some(
     (s) => s.pluginUpdateAvailable
@@ -80,12 +87,21 @@ function VersionDisplay() {
   return (
     <>
       <div className="flex items-center justify-center gap-2 group-data-[collapsible=icon]:hidden">
-        <span className="text-muted-foreground text-xs">
+        <button
+          type="button"
+          onClick={() => {
+            if (runningVersion) setReopenSections(selectReopen(RELEASE_NOTES, runningVersion));
+            setNotesOpen(true);
+          }}
+          title={t('settings:whatsNew.openNotes')}
+          aria-label={`${t('settings:whatsNew.openNotes')}: ${displayVersion}`}
+          className="ring-sidebar-ring text-muted-foreground hover:text-foreground cursor-pointer text-xs outline-hidden transition-colors focus-visible:ring-2"
+        >
           {displayVersion}
           {version.current.isPrerelease && (
             <span className="text-muted-foreground/60 ml-1">({t('common:beta')})</span>
           )}
-        </span>
+        </button>
         {version.recommended.kind !== 'none' && (
           <Badge
             variant="secondary"
@@ -116,6 +132,18 @@ function VersionDisplay() {
 
       {version.recommended.kind !== 'none' && (
         <UpdateDialog open={dialogOpen} onOpenChange={setDialogOpen} version={version} />
+      )}
+
+      {reopenSections && runningVersion && (
+        <WhatsNewDialog
+          open={notesOpen}
+          onOpenChange={setNotesOpen}
+          mode="reopen"
+          sections={reopenSections}
+          runningVersion={runningVersion}
+          sinceVersion={null}
+          latestVersion={version.upstream.latest?.version ?? null}
+        />
       )}
     </>
   );

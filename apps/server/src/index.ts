@@ -73,6 +73,7 @@ import { requestRoutes } from './routes/requests.js';
 import { newsletterRoutes } from './routes/newsletters.js';
 import { emailRoutes } from './routes/email.js';
 import { versionRoutes } from './routes/version.js';
+import { whatsNewRoutes } from './routes/whatsNew.js';
 import { maintenanceRoutes } from './routes/maintenance.js';
 import { mapRoutes } from './routes/map.js';
 import { publicRoutes } from './routes/public.js';
@@ -120,6 +121,7 @@ import {
 import { closeAllTransporters } from './services/notifications/destinations/emailTransport.js';
 import { runAutomationModelMigration } from './services/automations/modelMigration.js';
 import { runSystemEventsMigration } from './services/automations/systemEventsMigration.js';
+import { seedWhatsNewLastSeen } from './services/whatsNew.js';
 import { seedBuiltinTemplates } from './services/automations/templates/seeder.js';
 import { initDestinationCrypto } from './services/notifications/destinationCrypto.js';
 import { invalidateDestinationsCache } from './services/notifications/destinationStore.js';
@@ -525,6 +527,7 @@ async function buildApp(options: { trustProxy?: boolean } = {}) {
   await app.register(mobileRoutes, { prefix: `${API_BASE_PATH}/mobile` });
   await app.register(notificationPreferencesRoutes, { prefix: `${API_BASE_PATH}/notifications` });
   await app.register(versionRoutes, { prefix: `${API_BASE_PATH}/version` });
+  await app.register(whatsNewRoutes, { prefix: `${API_BASE_PATH}/whats-new` });
   await app.register(maintenanceRoutes, { prefix: `${API_BASE_PATH}/maintenance` });
   await app.register(mapRoutes, { prefix: `${API_BASE_PATH}/map` });
   await app.register(tailscaleRoutes, { prefix: `${API_BASE_PATH}/tailscale` });
@@ -879,6 +882,13 @@ async function initializeServices(app: FastifyInstance) {
   // Needs the catalog it seeds: the destination subscriptions it converts become instances of
   // those templates. Unwrapped too, or an install ends up with neither the checkbox nor the rule.
   await runSystemEventsMigration();
+
+  // Wrapped: a failed seed leaves the setting null, which shows nothing and retries next boot.
+  try {
+    await seedWhatsNewLastSeen();
+  } catch (err) {
+    app.log.warn({ err }, "Failed to seed what's-new last-seen version");
+  }
 
   try {
     await sweepDestinationConfigs();

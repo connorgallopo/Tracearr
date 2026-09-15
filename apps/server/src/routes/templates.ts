@@ -8,8 +8,10 @@ import { z } from 'zod';
 import {
   ShareCodeError,
   assertShareDepth,
+  compareVersions,
   createAutomationSchema,
   fingerprintOf,
+  getBaseVersion,
   templateEnvelopeSchema,
   uuidSchema,
   type ShareCodeReason,
@@ -41,7 +43,6 @@ import {
 } from '../services/automations/templates/store.js';
 import { unknownDestinationIds } from '../services/notifications/destinationRefs.js';
 import { getCurrentVersion } from '../utils/buildInfo.js';
-import { compareVersions, getBaseVersion } from '../jobs/versionCheckQueue.js';
 import { firstIssueMessage } from '../utils/zod.js';
 
 const idParamSchema = z.object({ id: uuidSchema });

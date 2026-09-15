@@ -208,6 +208,9 @@ export {
 // Version hooks
 export { useVersion, useForceVersionCheck } from './useVersion';
 
+// What's new hooks
+export { WHATS_NEW_KEY, useWhatsNew, useDismissWhatsNew } from './useWhatsNew';
+
 // Library hooks
 export {
   useLibraryStats,

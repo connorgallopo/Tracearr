@@ -81,6 +81,7 @@ import type {
   HistoryAggregatesQueryInput,
   HistoryAggregates,
   VersionInfo,
+  WhatsNewState,
   EngagementStats,
   ShowStatsResponse,
   SetupStatus,
@@ -2304,6 +2305,12 @@ class ApiClient {
     get: () => this.request<VersionInfo>('/version'),
     check: () =>
       this.request<{ message: string }>('/version/check', { method: 'POST', body: '{}' }),
+  };
+
+  // What's new dialog (owner only)
+  whatsNew = {
+    get: () => this.request<WhatsNewState>('/whats-new'),
+    dismiss: () => this.request<void>('/whats-new/dismiss', { method: 'POST', body: '{}' }),
   };
 
   // Tailscale VPN
