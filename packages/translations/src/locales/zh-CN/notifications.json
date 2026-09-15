@@ -173,7 +173,7 @@
       "newsletterRetryQueued": "",
       "brandingSaved": "邮件标记已保存",
       "suppressionAdded": "地址添加到抑制列表",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "地址已从抑制列表中删除"
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
@@ -200,7 +200,7 @@
       "deviceRemoveFailed": "无法删除设备",
       "deviceRenameFailed": "无法重命名设备",
       "sessionsRevokeFailed": "撤销会话失败",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "无法更新配置文件",
       "trustScoresResetFailed": "重置信任分失败",
       "routingUpdateFailed": "更新路由失败",
       "clipboardFailed": "复制到剪贴板失败",
@@ -217,8 +217,8 @@
       "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
       "userMergeFailed": "合并用户失败",
       "serverUserSplitFailed": "分割帐户失败",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "mergeSuggestionDismissFailed": "无法取消建议",
+      "mergeSuggestionRestoreFailed": "无法还原建议",
       "invalidClaimCode": {
         "title": "无效的索赔码",
         "message": "请检查服务器日志"
