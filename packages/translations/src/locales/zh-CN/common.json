@@ -54,7 +54,7 @@
     "viewOnGithub": "在 GitHub 上查看",
     "later": "下一个",
     "previous": "上一个",
-    "reload": ""
+    "reload": "重载"
   },
   "states": {
     "loading": "加载中……",
@@ -192,7 +192,7 @@
     "selectRow": "选择行",
     "pageOf": "第 {{page}} 页，共 {{total}} 页",
     "pagination": "分页",
-    "goToPage": ""
+    "goToPage": "转到第 {{page}} 页"
   },
   "filters": {
     "clearAll": "清除所有",
