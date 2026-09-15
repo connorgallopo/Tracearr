@@ -84,7 +84,9 @@
     "stopped": "توقفت",
     "directPlay": "تشغيل مباشر",
     "directStream": "البث المباشر",
-    "transcode": "الكود"
+    "transcode": "الكود",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "منخفض",
