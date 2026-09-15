@@ -84,7 +84,9 @@
     "stopped": "Gestopt",
     "directPlay": "Direct afspelen",
     "directStream": "Direct streamen",
-    "transcode": "Transcoderen"
+    "transcode": "Transcoderen",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Laag",
