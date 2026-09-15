@@ -84,7 +84,9 @@
     "stopped": "Gestoppt",
     "directPlay": "",
     "directStream": "",
-    "transcode": "Transkodiere"
+    "transcode": "Transkodiere",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Niedrig",
