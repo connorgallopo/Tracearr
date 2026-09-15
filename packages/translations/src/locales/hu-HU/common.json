@@ -84,7 +84,9 @@
     "stopped": "Megállítva",
     "directPlay": "Közvetlen lejátszás",
     "directStream": "Közvetlen közvetítés",
-    "transcode": "Átkódolás"
+    "transcode": "Átkódolás",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Alacsony",
