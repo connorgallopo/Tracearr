@@ -84,7 +84,9 @@
     "stopped": "Зупинено",
     "directPlay": "Пряме відтворення",
     "directStream": "Прямий потік",
-    "transcode": "Перекодування"
+    "transcode": "Перекодування",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Низька",
