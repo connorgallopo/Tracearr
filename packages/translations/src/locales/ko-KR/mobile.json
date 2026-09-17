@@ -70,7 +70,11 @@
   },
   "resources": {
     "cpu": "CPU",
-    "ram": "RAM"
+    "ram": "RAM",
+    "item": "",
+    "noData": "",
+    "system": "",
+    "waiting": ""
   },
   "notifications": {
     "testSent": "테스트 전송됨",
@@ -98,11 +102,19 @@
     "criticalOverrideDescription": "심각도가 높은 위반은 방해 금지 시간에도 알림을 보냅니다",
     "rateLimitDescription": "전송 제한은 알림 과다 발송을 방지합니다. 현재 제한: 분당 {{perMinute}}개, 시간당 {{perHour}}개.",
     "sendTestNotification": "테스트 알림 보내기",
-    "testDescription": "푸시 알림이 정상적으로 작동하는지 확인합니다"
-  },
-  "dashboard": {
-    "today": "오늘",
-    "hrs": "시간"
+    "testDescription": "푸시 알림이 정상적으로 작동하는지 확인합니다",
+    "pushNotifications": "",
+    "ruleTypes": {
+      "accountInactivity": "",
+      "deviceVelocity": "",
+      "geoRestriction": "",
+      "impossibleTravel": "",
+      "simultaneousLocations": ""
+    },
+    "severityAll": "",
+    "severityHighOnly": "",
+    "severityWarningUp": "",
+    "violationTypes": ""
   },
   "session": {
     "streamTerminated": "스트림 종료됨",
@@ -117,30 +129,51 @@
     "moreDevices": "기기 {{count}}대 더 보기",
     "noViolations": "위반이 없습니다",
     "noTerminations": "스트림 종료 기록이 없습니다",
-    "trustLow": "낮음",
-    "trustMedium": "보통",
-    "trustHigh": "높음"
+    "lastSeen": "",
+    "terminatedBy": "",
+    "trustScoreConfirm": "",
+    "trustScoreRange": ""
   },
   "violation": {
     "violationNotFoundDesc": "이 위반은 해제되었거나 더 이상 사용할 수 없을 수 있습니다.",
-    "customRule": "사용자 지정 규칙",
-    "streamComparison": "스트림 비교",
     "ips": "IP"
   },
   "alerts": {
-    "done": "완료",
-    "clearFilters": "필터 지우기"
+    "clearFilters": "필터 지우기",
+    "acknowledgeAll": "",
+    "acknowledgeAllBody": "",
+    "acknowledgeAllBodySeverity": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "all": "",
+    "allClear": "",
+    "allServers": "",
+    "noAlertsRecorded": "",
+    "noMatches": "",
+    "pendingCount": ""
   },
   "history": {
-    "noHistoryFound": "기록이 없습니다",
     "adjustFilters": "필터를 조정해 보세요",
-    "historyWillAppear": "사용자가 스트리밍을 시작하면 세션 기록이 여기에 표시됩니다"
+    "historyWillAppear": "사용자가 스트리밍을 시작하면 세션 기록이 여기에 표시됩니다",
+    "filters": {
+      "clearCount": "",
+      "countries": "",
+      "filterBy": "",
+      "mediaType": "",
+      "noCountries": "",
+      "noPlatforms": "",
+      "noUsers": "",
+      "sectionSelected": ""
+    }
   },
   "users": {
     "owner": "소유자",
     "noUsers": "사용자 없음",
     "usersWillAppear": "미디어 서버와 동기화하면 사용자가 여기에 표시됩니다",
-    "noUsersMatch": "\"{{query}}\"와 일치하는 사용자가 없습니다"
+    "noUsersMatch": "\"{{query}}\"와 일치하는 사용자가 없습니다",
+    "joinedRelative": "",
+    "sortActive": "",
+    "sortTrust": ""
   },
   "activity": {
     "playsOverTime": "시간별 재생",
@@ -160,7 +193,6 @@
     "allServers": "모든 서버"
   },
   "reconnected": "다시 연결됨",
-  "actionsExecuted": "실행된 작업",
   "serverScope": {
     "single": "{{name}}만 표시 중"
   },
@@ -169,10 +201,70 @@
     "alerts": "알림",
     "alertsCount": "알림, 읽지 않음 {{count}}개",
     "settings": "설정",
-    "trustScore": "신뢰 점수 {{score}}"
+    "trustScore": "신뢰 점수 {{score}}",
+    "decreaseTrustScore": "",
+    "filtersActive": "",
+    "increaseTrustScore": "",
+    "sortAscending": "",
+    "sortDescending": ""
   },
   "map": {
     "noData": "위치 데이터가 없습니다",
     "unavailable": "지도를 사용할 수 없습니다"
+  },
+  "automations": {
+    "conditions_one": "",
+    "conditions_other": "",
+    "editOnWeb": "",
+    "emptyDescription": "",
+    "kind": {
+      "notification": "",
+      "policy": ""
+    },
+    "lastRun": "",
+    "truncated": "",
+    "turnOffFailed": "",
+    "turnOnFailed": "",
+    "unsupportedDescription": "",
+    "unsupportedTitle": "",
+    "versionCheckFailed": ""
+  },
+  "charts": {
+    "weekOf": ""
+  },
+  "push": {
+    "violationTitle": ""
+  },
+  "streamDetails": {
+    "bitrate": "",
+    "channels": "",
+    "codec": "",
+    "color": "",
+    "container": "",
+    "forced": "",
+    "format": "",
+    "framerate": "",
+    "hwDecode": "",
+    "hwEncode": "",
+    "mono": "",
+    "noDetails": "",
+    "notAvailable": "",
+    "profile": "",
+    "sampleRate": "",
+    "source": "",
+    "speed": "",
+    "stereo": "",
+    "stream": "",
+    "subtitles": "",
+    "throttled": "",
+    "transcodeDetails": ""
+  },
+  "widget": {
+    "asOf": "",
+    "serversDown_one": "",
+    "serversDown_other": "",
+    "signedOut": "",
+    "transcodes_one": "",
+    "transcodes_other": ""
   }
 }
