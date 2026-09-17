@@ -153,7 +153,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "",
@@ -163,7 +164,10 @@
     "showingAllResults": "",
     "deleteSession_one": "",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": ""
+    "deleteSessionsConfirm": "",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "",
@@ -1643,7 +1647,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1659,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
