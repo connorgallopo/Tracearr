@@ -70,7 +70,11 @@
   },
   "resources": {
     "cpu": "CPU",
-    "ram": "RAM"
+    "ram": "RAM",
+    "item": "",
+    "noData": "",
+    "system": "",
+    "waiting": ""
   },
   "notifications": {
     "testSent": "Test envoyé",
@@ -98,11 +102,19 @@
     "criticalOverrideDescription": "Les violations de gravité élevée continuent de déclencher des notifications pendant les heures silencieuses",
     "rateLimitDescription": "Les limites de débit empêchent le spam de notifications. Limites actuelles : {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Envoyer une notification de test",
-    "testDescription": "Vérifier que les notifications push fonctionnent correctement"
-  },
-  "dashboard": {
-    "today": "AUJOURD'HUI",
-    "hrs": "heures"
+    "testDescription": "Vérifier que les notifications push fonctionnent correctement",
+    "pushNotifications": "",
+    "ruleTypes": {
+      "accountInactivity": "",
+      "deviceVelocity": "",
+      "geoRestriction": "",
+      "impossibleTravel": "",
+      "simultaneousLocations": ""
+    },
+    "severityAll": "",
+    "severityHighOnly": "",
+    "severityWarningUp": "",
+    "violationTypes": ""
   },
   "session": {
     "streamTerminated": "Diffusion interrompue",
@@ -117,30 +129,51 @@
     "moreDevices": "+{{count}} appareils en plus",
     "noViolations": "Aucune violation",
     "noTerminations": "Aucune interruption de lecture",
-    "trustLow": "Basse",
-    "trustMedium": "Moyenne",
-    "trustHigh": "Élevée"
+    "lastSeen": "",
+    "terminatedBy": "",
+    "trustScoreConfirm": "",
+    "trustScoreRange": ""
   },
   "violation": {
     "violationNotFoundDesc": "Cette violation a peut-être été ignorée ou n'est plus disponible.",
-    "customRule": "Règle personnalisée",
-    "streamComparison": "Comparaison de diffusion",
     "ips": "IP"
   },
   "alerts": {
-    "done": "Terminé",
-    "clearFilters": "Effacer les filtres"
+    "clearFilters": "Effacer les filtres",
+    "acknowledgeAll": "",
+    "acknowledgeAllBody": "",
+    "acknowledgeAllBodySeverity": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "all": "",
+    "allClear": "",
+    "allServers": "",
+    "noAlertsRecorded": "",
+    "noMatches": "",
+    "pendingCount": ""
   },
   "history": {
-    "noHistoryFound": "Aucun historique trouvé",
     "adjustFilters": "Essayez d'ajuster vos filtres",
-    "historyWillAppear": "L'historique des sessions apparaîtra ici lorsque les utilisateurs commenceront à lancer des lectures"
+    "historyWillAppear": "L'historique des sessions apparaîtra ici lorsque les utilisateurs commenceront à lancer des lectures",
+    "filters": {
+      "clearCount": "",
+      "countries": "",
+      "filterBy": "",
+      "mediaType": "",
+      "noCountries": "",
+      "noPlatforms": "",
+      "noUsers": "",
+      "sectionSelected": ""
+    }
   },
   "users": {
     "owner": "Propriétaire",
     "noUsers": "Aucun utilisateur",
     "usersWillAppear": "Les utilisateurs apparaîtront ici après la synchronisation avec votre serveur multimédia",
-    "noUsersMatch": "Aucun utilisateur ne correspond à « {{query}} »"
+    "noUsersMatch": "Aucun utilisateur ne correspond à « {{query}} »",
+    "joinedRelative": "",
+    "sortActive": "",
+    "sortTrust": ""
   },
   "activity": {
     "playsOverTime": "Lectures au fil du temps",
@@ -160,7 +193,6 @@
     "allServers": "Tous les serveurs"
   },
   "reconnected": "Reconnecté",
-  "actionsExecuted": "Actions exécutées",
   "serverScope": {
     "single": "Affichage de {{name}} uniquement"
   },
@@ -169,10 +201,70 @@
     "alerts": "Alertes",
     "alertsCount": "{{count}} alertes non lues",
     "settings": "Paramètres",
-    "trustScore": "Score de confiance : {{score}}"
+    "trustScore": "Score de confiance : {{score}}",
+    "decreaseTrustScore": "",
+    "filtersActive": "",
+    "increaseTrustScore": "",
+    "sortAscending": "",
+    "sortDescending": ""
   },
   "map": {
     "noData": "Aucune donnée d'emplacement disponible",
     "unavailable": "Carte indisponible"
+  },
+  "automations": {
+    "conditions_one": "",
+    "conditions_other": "",
+    "editOnWeb": "",
+    "emptyDescription": "",
+    "kind": {
+      "notification": "",
+      "policy": ""
+    },
+    "lastRun": "",
+    "truncated": "",
+    "turnOffFailed": "",
+    "turnOnFailed": "",
+    "unsupportedDescription": "",
+    "unsupportedTitle": "",
+    "versionCheckFailed": ""
+  },
+  "charts": {
+    "weekOf": ""
+  },
+  "push": {
+    "violationTitle": ""
+  },
+  "streamDetails": {
+    "bitrate": "",
+    "channels": "",
+    "codec": "",
+    "color": "",
+    "container": "",
+    "forced": "",
+    "format": "",
+    "framerate": "",
+    "hwDecode": "",
+    "hwEncode": "",
+    "mono": "",
+    "noDetails": "",
+    "notAvailable": "",
+    "profile": "",
+    "sampleRate": "",
+    "source": "",
+    "speed": "",
+    "stereo": "",
+    "stream": "",
+    "subtitles": "",
+    "throttled": "",
+    "transcodeDetails": ""
+  },
+  "widget": {
+    "asOf": "",
+    "serversDown_one": "",
+    "serversDown_other": "",
+    "signedOut": "",
+    "transcodes_one": "",
+    "transcodes_other": ""
   }
 }
