@@ -86,7 +86,8 @@
     "directStream": "Прямой поток",
     "transcode": "Перекодировать",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "Низкий",
@@ -118,7 +119,12 @@
     "last30Days": "Последние 30 дней",
     "lastYear": "Прошлый год",
     "byDay": "По дням",
-    "byHour": "По часам"
+    "byHour": "По часам",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "км",
@@ -182,7 +188,8 @@
     "segments": "",
     "streamDetails": "",
     "transcodeReason": "",
-    "loadMore": ""
+    "loadMore": "",
+    "playback": ""
   },
   "search": {
     "placeholder": "Поиск...",
@@ -286,7 +293,11 @@
     "location_one": "",
     "location_other": "",
     "device_one": "",
-    "device_other": ""
+    "device_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "Изменения не обнаружены"
