@@ -424,7 +424,7 @@
     "serverTimezone": "服务器时区",
     "serverTimezoneHelp": "必须匹配在您的媒体服务器主机上配置的时区，而不是您的浏览器的时区。播放报告时间戳保存在本地服务器时间。",
     "importFullRange": "导入完整历史",
-    "importFullRangeHelp": "默认情况下，只存在于 Tracearr 最早跟踪的服务器会话的历史记录，所以已经记录的会话永远不会重复。 如果您的 Tracearr 历史存在空白，请启用此选项以导入插件的整个历史记录，不管重叠。纯文本仍然会被跳过。",
+    "importFullRangeHelp": "",
     "overlapSkipped": "",
     "duplicates": "",
     "skipOverlap": "重叠记录 - 时间戳属于此服务器已经追踪过的时间段内。启用全范围导入以包含它。",
