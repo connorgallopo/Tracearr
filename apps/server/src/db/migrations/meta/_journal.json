@@ -743,6 +743,13 @@
       "when": 1789486067959,
       "tag": "0105_breezy_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1789591729841,
+      "tag": "0106_smart_queen_noir",
+      "breakpoints": true
     }
   ]
 }

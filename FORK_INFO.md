@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `89202893`
-- Last shared upstream commit found during inspection: `452cef79`
-- Latest upstream commit merged into the current working tree: `89202893`
+- Source branch/SHA inspected: `main` at `b415b44e`
+- Last shared upstream commit found during inspection: `89202893`
+- Latest upstream commit merged into the current working tree: `b415b44e`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,36 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `b415b44e` was merged into `develop` on September 17,
+  2026. It adds Plex GUID library identity, imported-history linking and manual
+  duplicate cleanup, Jellystat JSONL/episode import improvements, tracking-time
+  cutoffs and runtime bounds, container-identity unlinking, and hidden progress
+  bars for sessions without a known duration. Migration `0106_smart_queen_noir`
+  is retained unchanged in the upstream ledger; the Dispatcharr ledger remains
+  separate. Server-route and library-sync conflicts combine upstream linking
+  hooks with Dispatcharr auth and library-capability guards; test mocks retain
+  both behaviors without duplicate SSE mocks. Duplicate cleanup explicitly
+  skips Dispatcharr, whose session keys have no supported history-import
+  format; a mixed-provider regression covers that boundary. Plex linking stays
+  Plex-only. Dispatcharr realtime/lifecycle, uncropped Dashboard artwork and
+  cache markers, two-channel version API and fork CI/release policy remain
+  intact. The upstream 2.4.0 release-note source and privacy policy are retained.
+  Full non-Docker CI passed with Node 24 / pnpm 12.3.4, `HUSKY=0` and a
+  4 GB Node heap after clearing Turbo: frozen install, lint, typecheck,
+  translations, unit/services/routes/auth/security, web, coverage and build.
+  Initial typecheck and services failures exposed the cleanup provider boundary
+  and queue mock mismatch above; all affected full jobs passed after repair.
+  Server groups plus web passed 8,775 tests with two skipped; shared passed 361.
+  Coverage passed 5,630 with two skipped (69.28% statements, 63.19% branches,
+  74.25% functions, 70.43% lines). Lint decreased from 755 to 754 warnings;
+  services/coverage each add three occurrences of existing warning classes.
+  Logs use `.tmp/github-ci-<job>-20260917-b415.log`; successful reruns are
+  `services-final`, `lint-recheck` and `typecheck-recheck`. See the local warning
+  reference for details. Docker integration, E2E and image builds were omitted
+  at the user's request; migration execution, database upgrade paths and
+  live-provider manual smoke checks remain unverified.
+
 
 - Upstream `main` at `89202893` was merged into `develop` on September 17,
   2026. Resolution classification now prioritizes pixels, with separate 8K,

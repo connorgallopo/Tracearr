@@ -1046,6 +1046,11 @@ export interface JellystatImportProgress {
   errorRecords: number;
   /** Number of media items enriched with metadata from Jellyfin */
   enrichedRecords: number;
+  uncheckedRecords?: number;
+  unlinkedEpisodeRecords?: number;
+  vetoedRecords?: number;
+  pluginUncheckedRecords?: number;
+  overlongRecords?: number;
   /** Current phase message */
   message: string;
   /** Present when status='waiting' - what this job is waiting for */
@@ -1061,6 +1066,11 @@ export interface JellystatImportResult {
   filtered: number;
   errors: number;
   enriched: number;
+  unchecked: number;
+  unlinkedEpisodes: number;
+  vetoed: number;
+  pluginUnchecked: number;
+  overlong: number;
   message: string;
   /** Details about users that were skipped (not found in Tracearr) */
   skippedUsers?: {
@@ -1094,6 +1104,8 @@ export interface PlaybackReportingImportProgress {
   overlapRecords: number;
   /** Skipped: theme songs, trailers, etc. */
   filteredRecords: number;
+  /** Skipped: recorded play time runs past the media runtime plus 60 s */
+  overlongRecords: number;
   errorRecords: number;
   enrichedRecords: number;
   message: string;
@@ -1108,6 +1120,7 @@ export interface PlaybackReportingImportResult {
   duplicates: number;
   overlap: number;
   filtered: number;
+  overlong: number;
   errors: number;
   enriched: number;
   message: string;
@@ -1777,7 +1790,9 @@ export type MaintenanceJobType =
   | 'cleanup_old_chunks'
   | 'full_aggregate_rebuild'
   | 'repair_corrupted_chunks'
-  | 'backfill_session_identity';
+  | 'backfill_session_identity'
+  | 'remove_import_duplicates'
+  | 'link_imported_history';
 
 export type MaintenanceJobStatus = 'idle' | 'waiting' | 'running' | 'complete' | 'error';
 

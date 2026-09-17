@@ -68,8 +68,9 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
           category: 'backfill',
           name: 'Fix Imported Session Progress',
           description:
-            'Run this if imported sessions from Tautulli show "0%" progress despite having watch time. ' +
-            'This recalculates progress values for sessions that were imported before this was fixed.',
+            'Run this if you imported Tautulli history before Tracearr 1.3.9 and those plays show no progress. ' +
+            'It estimates progress and length for plays that have neither, ' +
+            'and never changes a play that already has either value.',
         },
         {
           type: 'backfill_user_dates',
@@ -94,6 +95,14 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
           description:
             'Stamps canonical media identity onto history sessions by matching them to your library. ' +
             'Run this once after upgrading so older sessions link to the same media records as new ones.',
+        },
+        {
+          type: 'link_imported_history',
+          category: 'backfill',
+          name: 'Link Imported Plex History',
+          description:
+            'Run this if imported Tautulli plays do not show as watched or do not count in stats. ' +
+            'A play is linked only when it matches exactly one item in your library. Also runs after Plex library syncs, for up to 14 days after a Tautulli import.',
         },
         // Cleanup jobs - database maintenance and optimization
         {
@@ -120,6 +129,7 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
           description:
             'Drops old TimescaleDB chunks beyond the retention period (90 days). ' +
             'Run this if the automatic retention job fails with "out of shared memory" errors.',
+          destructive: true,
         },
         {
           type: 'repair_corrupted_chunks',
@@ -128,6 +138,18 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
           description:
             'Detects and repairs corrupted TimescaleDB compressed chunks. ' +
             'Run this if you see "pg_attribute catalog is missing" errors or if Library/Quality pages fail to load.',
+          destructive: true,
+        },
+        {
+          type: 'remove_import_duplicates',
+          category: 'cleanup',
+          name: 'Remove Imported Duplicates',
+          description:
+            'Run this if importing Tautulli, Jellystat or Playback Reporting history doubled plays and watch time for days Tracearr was already tracking. ' +
+            'It matches an imported play to a tracked play of the same item for the same user that started within two minutes, ' +
+            'and removes the import only when that is its only match and the tracked play already has its watched state, play and watch time. ' +
+            'Episode plays Jellystat recorded itself cannot be matched when they were imported before 2.4.0 or from a backup without jf_library_episodes, because the import stored the series instead of the episode.',
+          destructive: true,
         },
       ],
     };
@@ -162,6 +184,8 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
         'cleanup_old_chunks',
         'repair_corrupted_chunks',
         'backfill_session_identity',
+        'remove_import_duplicates',
+        'link_imported_history',
       ];
       if (!validTypes.includes(type as MaintenanceJobType)) {
         return reply.badRequest(`Invalid job type: ${type}`);

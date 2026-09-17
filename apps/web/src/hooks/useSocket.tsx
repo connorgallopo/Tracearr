@@ -393,6 +393,14 @@ export function SocketProvider({ children }: { children: ReactNode }) {
             // Affects user data
             void queryClient.invalidateQueries({ queryKey: ['users'] });
             break;
+          case 'backfill_session_identity':
+          case 'remove_import_duplicates':
+          case 'link_imported_history':
+            void queryClient.invalidateQueries({ queryKey: ['sessions'] });
+            void queryClient.invalidateQueries({ queryKey: ['stats'] });
+            void queryClient.invalidateQueries({ queryKey: ['library'] });
+            void queryClient.invalidateQueries({ queryKey: ['media'] });
+            break;
           default:
             // Unknown job type - invalidate common caches as fallback
             void queryClient.invalidateQueries({ queryKey: ['sessions'] });

@@ -96,3 +96,37 @@ describe('parseRatingKeys', () => {
     expect(parseRatingKeys({ MediaContainer: {} }, '3')).toEqual([]);
   });
 });
+
+describe('parseLibraryItemsResponse - plexGuid', () => {
+  it('normalizes the main guid attribute for a movie', () => {
+    const [item] = parseLibraryItemsResponse(
+      musicResponse([
+        {
+          ratingKey: '1',
+          title: 'The Shawshank Redemption',
+          type: 'movie',
+          addedAt: 1700000000,
+          guid: 'plex://movie/5d776b59ad5437001f79c6f8?lang=en',
+        },
+      ])
+    );
+
+    expect(item!.plexGuid).toBe('plex://movie/5d776b59ad5437001f79c6f8');
+  });
+
+  it('sets plexGuid to null for a legacy agent guid', () => {
+    const [item] = parseLibraryItemsResponse(
+      musicResponse([
+        {
+          ratingKey: '2',
+          title: 'The Shawshank Redemption',
+          type: 'movie',
+          addedAt: 1700000000,
+          guid: 'com.plexapp.agents.imdb://tt0111161?lang=en',
+        },
+      ])
+    );
+
+    expect(item!.plexGuid).toBeNull();
+  });
+});

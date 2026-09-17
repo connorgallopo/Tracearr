@@ -5,7 +5,8 @@
  * Includes batch loading for performance optimization and rule fetching.
  */
 
-import { eq, and, desc, gte, inArray, isNotNull, sql } from 'drizzle-orm';
+import { eq, and, or, desc, gte, inArray, isNull, isNotNull, notInArray, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import {
   TIME_MS,
   SESSION_LIMITS,
@@ -28,6 +29,14 @@ import { automationsLogger, createLogger } from '../../utils/logger.js';
 import { getPubSubService } from '../../services/cache.js';
 import { mapSessionRow } from './sessionMapper.js';
 
+/** Library item types that group playable items; a session is never linked to one. */
+export const CONTAINER_MEDIA_TYPES = ['show', 'season', 'artist', 'album'] as const;
+
+export const CONTAINER_MEDIA_TYPES_SQL = sql.join(
+  CONTAINER_MEDIA_TYPES.map((type) => sql`${type}`),
+  sql`, `
+);
+
 /** Canonical media identity for a library item, stamped onto sessions at insert. */
 export interface SessionIdentity {
   mediaId: string | null;
@@ -37,11 +46,14 @@ export interface SessionIdentity {
   tvdbId: number | null;
   parentRatingKey: string | null;
   grandparentRatingKey: string | null;
+  itemMediaType: string;
 }
 
 /**
  * Batch load canonical media identity for a set of rating keys on one server
- * (eliminates a per-session lookup in the polling loop).
+ * (eliminates a per-session lookup in the polling loop). Container items, and
+ * items whose media row is a container, are skipped, so a rating key that
+ * points at a show, season, artist or album resolves to nothing.
  *
  * @param serverId - Server the rating keys belong to
  * @param ratingKeys - Rating keys to resolve identity for
@@ -68,7 +80,14 @@ export async function batchGetLibraryItemIdentity(
     })
     .from(libraryItems)
     .leftJoin(media, eq(media.id, libraryItems.mediaId))
-    .where(and(eq(libraryItems.serverId, serverId), inArray(libraryItems.ratingKey, ratingKeys)));
+    .where(
+      and(
+        eq(libraryItems.serverId, serverId),
+        inArray(libraryItems.ratingKey, ratingKeys),
+        notInArray(libraryItems.mediaType, [...CONTAINER_MEDIA_TYPES]),
+        or(isNull(media.mediaType), notInArray(media.mediaType, [...CONTAINER_MEDIA_TYPES]))
+      )
+    );
 
   for (const r of rows) {
     result.set(r.ratingKey, {
@@ -79,7 +98,85 @@ export async function batchGetLibraryItemIdentity(
       tvdbId: r.tvdbId,
       parentRatingKey: r.parentRatingKey,
       grandparentRatingKey: r.grandparentRatingKey,
+      itemMediaType: r.itemMediaType,
     });
+  }
+
+  return result;
+}
+
+/** Canonical media identity resolved from a normalized Plex guid. */
+interface GuidMediaIdentity {
+  mediaId: string;
+  showMediaId: string | null;
+  imdbId: string | null;
+  tmdbId: number | null;
+  tvdbId: number | null;
+}
+
+/**
+ * Resolve canonical media identity for a batch of normalized Plex guids
+ * (used when a Tautulli record's rating key doesn't resolve, e.g. after a
+ * Plex re-key). A guid links only when it resolves to exactly one canonical
+ * id and both the library item and the canonical media row's type match the
+ * guid's own type; library items and their media row can disagree in type
+ * (see batchGetLibraryItemIdentity above), so both are checked. The identity
+ * comes from the canonical row, never from a merged-away row an item still
+ * points at.
+ *
+ * @param serverId - Server the guids belong to
+ * @param guids - Normalized guids with the media type each guid implies
+ * @returns Map of guid -> GuidMediaIdentity
+ */
+export async function batchResolveMediaByPlexGuid(
+  serverId: string,
+  guids: Array<{ guid: string; mediaType: 'movie' | 'episode' }>
+): Promise<Map<string, GuidMediaIdentity>> {
+  const result = new Map<string, GuidMediaIdentity>();
+  if (guids.length === 0) return result;
+
+  const mediaTypeByGuid = new Map(guids.map((g) => [g.guid, g.mediaType]));
+  const guidValues = [...mediaTypeByGuid.keys()];
+
+  const canonical = alias(media, 'canonical_media');
+  const rows = await db
+    .select({
+      plexGuid: libraryItems.plexGuid,
+      itemMediaType: libraryItems.mediaType,
+      canonicalId: canonical.id,
+      mediaType: canonical.mediaType,
+      showMediaId: canonical.showMediaId,
+      imdbId: canonical.imdbId,
+      tmdbId: canonical.tmdbId,
+      tvdbId: canonical.tvdbId,
+    })
+    .from(libraryItems)
+    .innerJoin(media, eq(media.id, libraryItems.mediaId))
+    .innerJoin(canonical, eq(canonical.id, sql`coalesce(${media.mergedIntoId}, ${media.id})`))
+    .where(and(eq(libraryItems.serverId, serverId), inArray(libraryItems.plexGuid, guidValues)));
+
+  const candidatesByGuid = new Map<string, Map<string, (typeof rows)[number]>>();
+  for (const r of rows) {
+    if (!r.plexGuid) continue;
+    const wantedType = mediaTypeByGuid.get(r.plexGuid);
+    if (!wantedType || r.itemMediaType !== wantedType || r.mediaType !== wantedType) continue;
+
+    const byId = candidatesByGuid.get(r.plexGuid) ?? new Map<string, (typeof rows)[number]>();
+    byId.set(r.canonicalId, r);
+    candidatesByGuid.set(r.plexGuid, byId);
+  }
+
+  for (const [guid, byId] of candidatesByGuid) {
+    if (byId.size !== 1) continue;
+    for (const r of byId.values()) {
+      result.set(guid, {
+        mediaId: r.canonicalId,
+        showMediaId: r.showMediaId,
+        imdbId: r.imdbId,
+        tmdbId: r.tmdbId,
+        tvdbId: r.tvdbId,
+      });
+    }
   }
 
   return result;

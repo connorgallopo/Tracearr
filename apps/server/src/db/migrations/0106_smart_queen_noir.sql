@@ -1,0 +1,2 @@
+ALTER TABLE "library_items" ADD COLUMN "plex_guid" varchar(255);--> statement-breakpoint
+CREATE INDEX "library_items_server_plex_guid_idx" ON "library_items" USING btree ("server_id","plex_guid") WHERE "library_items"."plex_guid" IS NOT NULL;

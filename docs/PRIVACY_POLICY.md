@@ -9,10 +9,10 @@ Tracearr is a mobile application designed to help you monitor and manage access 
 **The Short Version:**
 
 - Tracearr connects to YOUR self-hosted backend server
-- We don't collect, store, or sell your data
+- We never see your media server data, and we don't sell data about you
 - All data flows through infrastructure YOU control
-- We only use third-party services for essential app functionality (push notifications, and crash and performance reports)
-- No analytics, advertising, or tracking
+- We use a few third-party services: push notifications, crash and performance reports, and product analytics
+- No advertising, no ad identifiers, and nothing tied to your name or account
 
 ## How Tracearr Works
 
@@ -88,7 +88,7 @@ The app sends the following information back to YOUR backend server:
 
 ## Third-Party Services
 
-Tracearr uses minimal third-party services, and only for essential functionality:
+Tracearr uses a small number of third-party services:
 
 ### Expo Push Notification Service
 
@@ -104,14 +104,21 @@ When your backend triggers a notification, it sends the notification content to 
 **Data Shared**: App startup and screen load times, screen names with server-side IDs removed, crash and error details, app version, device model and OS version, battery, memory and network conditions, and network request counts and timings, which can include the hostname of your backend. Reports are tied to a random identifier for the app installation, not to your name, account, or media server data.
 **Privacy Policy**: [https://expo.dev/privacy](https://expo.dev/privacy)
 
+### PostHog
+
+**Purpose**: Product analytics and error reports, so we can see which parts of the app get used and fix what breaks
+**Data Shared**: Screen paths with route parameters stripped out, app lifecycle events (opened, backgrounded), uncaught errors, unhandled promise rejections, and messages the app logs at error level, plus app version and build number, device model, OS version, locale, timezone, and screen size. Reports are tied to a random identifier generated on your device for the app installation. We never call PostHog's identify API, so nothing connects this to a person, an account, or your media server data.
+**Region**: United States
+**Privacy Policy**: [https://posthog.com/privacy](https://posthog.com/privacy)
+
 ### Services We DO NOT Use
 
 Tracearr explicitly does **NOT** use:
 
-- Analytics platforms (no Firebase Analytics, Mixpanel, Google Analytics, etc.)
 - Advertising networks
+- Advertising identifiers (no IDFA, no Google Advertising ID)
 - Social media SDKs
-- User behavior tracking
+- Cross-app or cross-site tracking, and no data brokers
 
 ## Data Storage and Security
 
@@ -143,7 +150,7 @@ We provide the tools; you control the security posture.
 
 ### We Do Not Share Your Data
 
-Tracearr developers do not collect, access, or share your data with any third parties because we never receive your data in the first place.
+Your media server data is never shared with anyone, because we never receive it in the first place. The app usage and error reports described above go only to Expo and PostHog, who process them on our behalf and do not use them for their own purposes.
 
 ### Exceptions
 
@@ -165,7 +172,7 @@ Your self-hosted Tracearr backend may have its own data practices depending on h
 
 Tracearr is not directed at children under the age of 13, and we do not knowingly collect personal information from children under 13. The app is designed for server administrators and media library managers.
 
-If you believe a child under 13 has provided information through the app, please contact us at contact@tracearr.com, though we note again that we do not collect or store user data.
+If you believe a child under 13 has provided information through the app, please contact us at contact@tracearr.com. We hold no account or profile data that could identify them.
 
 ## Your Rights and Choices
 
@@ -212,6 +219,7 @@ The app itself does not transfer data internationally, except for:
 
 - Push notifications routed through Expo's infrastructure (which may involve international data transfer)
 - Crash and performance reports sent to EAS Observe
+- Product analytics and error reports sent to PostHog, which we use in its United States region
 
 ## Changes to This Privacy Policy
 
@@ -231,23 +239,24 @@ We encourage you to review this policy periodically.
 
 ## California Privacy Rights (CCPA)
 
-Under the California Consumer Privacy Act (CCPA), California residents have specific rights regarding their personal information. However, because Tracearr does not collect, store, or sell personal information, most CCPA provisions do not apply.
+Under the California Consumer Privacy Act (CCPA), California residents have specific rights regarding their personal information.
 
 For clarity:
 
-- We do not sell personal information
-- We do not collect personal information for business purposes
-- All data is stored on infrastructure you control
+- We do not sell or share personal information
+- We never receive your media server data, account details, or anything that identifies you by name
+- The app usage and error data described above is tied to a random per-installation identifier, not to you
+- All data from your media servers stays on infrastructure you control
 
 ## European Privacy Rights (GDPR)
 
-Under the General Data Protection Regulation (GDPR), European users have specific rights. However, because Tracearr operates as a client to your self-hosted infrastructure:
+Under the General Data Protection Regulation (GDPR), European users have specific rights. Tracearr sits on both sides of this, so the two cases are worth separating:
 
-- **Data Controller**: YOU are the data controller for any data processed by your backend
-- **Data Processor**: Tracearr (the app) acts as a data processor on your device only
-- **Our Role**: We are the app developers who provide software tools; we do not control or process your data
+- **Your media server data**: YOU are the data controller. It is processed by your backend, on infrastructure you control, and never reaches us.
+- **App usage and error data**: we are the controller for the limited data described above, and Expo and PostHog process it on our behalf. It is tied to a random per-installation identifier, not to you.
+- **Legal basis**: our legitimate interest in keeping the app working and fixing what breaks.
 
-For GDPR-related questions about data on your backend, you should consult your own data practices and legal obligations as the data controller.
+To have the app usage and error data for your installation deleted, email contact@tracearr.com. For questions about data on your backend, you should consult your own data practices and legal obligations as the data controller.
 
 ## Security Practices
 
@@ -277,7 +286,7 @@ If you have questions, concerns, or requests regarding this Privacy Policy or Tr
 
 **Response Time**: We aim to respond to privacy inquiries within 30 days.
 
-Please note: Because we do not collect or store user data, we may have limited ability to respond to data-specific requests. For questions about data stored on your self-hosted backend, please consult your backend's documentation.
+Please note: we hold nothing that identifies you by name, so for most requests there is little for us to look up. We can delete the app usage and error data for your installation on request. For questions about data stored on your self-hosted backend, please consult your backend's documentation.
 
 ## Acknowledgment
 
@@ -287,7 +296,7 @@ By using Tracearr, you acknowledge that:
 2. You understand that Tracearr connects to infrastructure YOU control
 3. You are responsible for the security and privacy practices of your self-hosted backend
 4. Tracearr developers do not have access to your data
-5. You consent to the minimal data practices described in this policy (push notification tokens, crash and performance reports, local storage)
+5. You consent to the minimal data practices described in this policy (push notification tokens, crash and performance reports, product analytics and error reports, local storage)
 
 ---
 

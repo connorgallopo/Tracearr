@@ -96,8 +96,13 @@ vi.mock('../../services/serverIdentity.js', () => ({
   readServerIdentity: vi.fn(),
 }));
 
+vi.mock('../../services/settings.js', () => ({
+  rearmImportedHistoryLink: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Import mocked modules
 import { db } from '../../db/client.js';
+import { rearmImportedHistoryLink } from '../../services/settings.js';
 import {
   PlexClient,
   JellyfinClient,
@@ -461,6 +466,7 @@ describe('Server Routes', () => {
       const body = response.json();
       expect(body.name).toBe('New Plex');
       expect(body.type).toBe('plex');
+      expect(rearmImportedHistoryLink).toHaveBeenCalledWith({ keepProviderPass: false });
     });
 
     it('creates a new Jellyfin server for owner', async () => {

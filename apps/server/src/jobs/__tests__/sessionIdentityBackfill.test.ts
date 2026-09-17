@@ -2,9 +2,10 @@
  * sessionIdentityBackfill tests
  *
  * Covers the widened repair pass: sessions that already have media_id but were
- * stamped before their media row's show_media_id existed. Both the fresh-stamp
- * query and the repair query run in the same transaction and their results
- * combine into a single updated/oldest result.
+ * stamped before their media row's show_media_id existed, and the unlink pass
+ * for sessions linked to a container (show, season, artist, album). All three
+ * passes run in the same transaction and their results combine into a single
+ * updated/oldest result.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -47,8 +48,22 @@ beforeEach(() => {
 const GUC_ABSENT = { rows: [] };
 const GUC_PRESENT = { rows: [{ '?column?': 1 }] };
 
+const CONTAINER_TYPES = ['show', 'season', 'artist', 'album'];
+
+/** The library_items EXISTS guard body, not the UPDATE's own WHERE */
+function guardBody(text: string | undefined): string | undefined {
+  return /FROM library_items li2?\b([\s\S]*?)\)\s*(?:ORDER BY|$)/.exec(text ?? '')?.[1];
+}
+
+async function renderBatchPasses(window?: { start: Date; end: Date }) {
+  const execute = mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }, { rows: [] }]);
+  await backfillSessionIdentityBatch(5000, window);
+  expect(execute).toHaveBeenCalledTimes(4);
+  return execute.mock.calls.slice(1).map((call) => renderSql(call[0] as SQL));
+}
+
 describe('backfillSessionIdentityBatch', () => {
-  it('combines the fresh-stamp and repair pass counts and picks the oldest across both', async () => {
+  it('combines the counts of every pass and picks the oldest across them', async () => {
     mockTransaction([
       GUC_ABSENT,
       {
@@ -58,31 +73,33 @@ describe('backfillSessionIdentityBatch', () => {
         ],
       },
       { rows: [{ started_at: '2023-12-01T00:00:00.000Z' }] },
+      { rows: [{ started_at: '2023-11-01T00:00:00.000Z' }] },
     ]);
 
     const result = await backfillSessionIdentityBatch(5000);
 
-    expect(result.updated).toBe(3);
-    expect(result.oldest).toEqual(new Date('2023-12-01T00:00:00.000Z'));
+    expect(result.updated).toBe(4);
+    expect(result.oldest).toEqual(new Date('2023-11-01T00:00:00.000Z'));
   });
 
-  it('runs both passes even when the fresh-stamp pass finds nothing to repair', async () => {
+  it('runs every pass even when the fresh-stamp pass finds nothing', async () => {
     const execute = mockTransaction([
       GUC_ABSENT,
       { rows: [] },
       { rows: [{ started_at: '2024-02-01T00:00:00.000Z' }] },
+      { rows: [] },
     ]);
 
     const result = await backfillSessionIdentityBatch(5000);
 
     expect(result.updated).toBe(1);
     expect(result.oldest).toEqual(new Date('2024-02-01T00:00:00.000Z'));
-    // GUC probe + fresh-stamp query + repair query, nothing else.
-    expect(execute).toHaveBeenCalledTimes(3);
+    // GUC probe + fresh-stamp, repair and unlink queries, nothing else.
+    expect(execute).toHaveBeenCalledTimes(4);
   });
 
-  it('returns zero updated and a null oldest when neither pass finds anything', async () => {
-    mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }]);
+  it('returns zero updated and a null oldest when no pass finds anything', async () => {
+    mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }, { rows: [] }]);
 
     const result = await backfillSessionIdentityBatch(5000);
 
@@ -93,44 +110,89 @@ describe('backfillSessionIdentityBatch', () => {
     // The field failure: a compressed month-chunk decompresses more tuples
     // than the 100k default for one batch, and without SET LOCAL the walk
     // fail-retries forever
-    const execute = mockTransaction([GUC_PRESENT, { rows: [] }, { rows: [] }, { rows: [] }]);
+    const execute = mockTransaction([
+      GUC_PRESENT,
+      { rows: [] },
+      { rows: [] },
+      { rows: [] },
+      { rows: [] },
+    ]);
 
     await backfillSessionIdentityBatch(5000);
 
-    expect(execute).toHaveBeenCalledTimes(4);
+    expect(execute).toHaveBeenCalledTimes(5);
     const setLocal = renderSql(execute.mock.calls[1]![0] as SQL).sql;
     expect(setLocal).toContain(
       'SET LOCAL timescaledb.max_tuples_decompressed_per_dml_transaction = 0'
     );
   });
+
+  it('refuses container library items in both the fresh-stamp update and its guard', async () => {
+    const [fresh] = await renderBatchPasses();
+    const [select, update] = fresh!.sql.split('UPDATE sessions s');
+
+    expect(guardBody(select)).toMatch(/li2\.media_type NOT IN \(\$\d+, \$\d+, \$\d+, \$\d+\)/);
+    expect(update).toMatch(/li\.media_type NOT IN \(\$\d+, \$\d+, \$\d+, \$\d+\)/);
+    expect(fresh!.params).toEqual(expect.arrayContaining(CONTAINER_TYPES));
+  });
+
+  it('refuses a library item whose media row is a container, in the update, guard and probe', async () => {
+    // The unlink pass keys on the media row's type, so a fresh stamp that only
+    // checked the library item's type could re-stamp what unlink just cleared.
+    const [fresh] = await renderBatchPasses();
+    const [select, update] = fresh!.sql.split('UPDATE sessions s');
+    const probeExecute = mockExecute({ rows: [{ stampable: false }] });
+    await hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'));
+    const [freshProbe] = renderSql(probeExecute.mock.calls[0]![0] as SQL).sql.split(
+      /\)\s*OR EXISTS/
+    );
+    const containerMedia = (alias: string) =>
+      new RegExp(
+        `JOIN media ${alias} ON ${alias}\\.id = li2?\\.media_id[\\s\\S]*${alias}\\.media_type NOT IN \\(\\$\\d+, \\$\\d+, \\$\\d+, \\$\\d+\\)`
+      );
+
+    expect(guardBody(select)).toMatch(containerMedia('m2'));
+    expect(update).toMatch(containerMedia('m'));
+    expect(guardBody(freshProbe)).toMatch(containerMedia('m'));
+  });
+
+  it('unlinks sessions stamped with a container media row', async () => {
+    const [, , unlink] = await renderBatchPasses();
+    const text = unlink!.sql.replace(/\s+/g, ' ');
+
+    expect(text).toContain('JOIN media m ON m.id = s.media_id');
+    expect(text).toMatch(/m\.media_type IN \(\$\d+, \$\d+, \$\d+, \$\d+\)/);
+    expect(unlink!.params).toEqual(expect.arrayContaining(CONTAINER_TYPES));
+    expect(text).toContain(
+      'SET media_id = NULL, show_media_id = NULL, imdb_id = NULL, tmdb_id = NULL, tvdb_id = NULL'
+    );
+    expect(text).toContain('RETURNING s.started_at');
+  });
 });
 
 describe('backfillSessionIdentityBatch windowing', () => {
-  it('applies started_at bounds to both passes when a window is given', async () => {
-    const execute = mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }]);
-
-    await backfillSessionIdentityBatch(5000, {
+  it('bounds both the batch select and the update target of every pass when a window is given', async () => {
+    const passes = await renderBatchPasses({
       start: new Date('2026-01-01T00:00:00.000Z'),
       end: new Date('2026-01-08T00:00:00.000Z'),
     });
 
-    // After the GUC probe: the fresh-stamp pass, then the show-link repair
-    // pass - each must carry both bounds, not just the union of the two.
-    expect(execute).toHaveBeenCalledTimes(3);
-    for (const call of execute.mock.calls.slice(1)) {
-      const { sql: text, params } = renderSql(call[0] as SQL);
-      expect(text).toContain('started_at >=');
-      expect(text).toContain('started_at <');
-      expect(params).toContain('2026-01-01T00:00:00.000Z');
-      expect(params).toContain('2026-01-08T00:00:00.000Z');
+    // Each pass must carry both bounds on its own, not just the union of the
+    // passes, and on the UPDATE target as well as the batch that feeds it.
+    expect(passes).toHaveLength(3);
+    for (const { sql: text, params } of passes) {
+      const [select, update] = text.split('UPDATE sessions s');
+      for (const part of [select, update]) {
+        expect(part).toMatch(/s\.started_at >= \$\d+::timestamptz/);
+        expect(part).toMatch(/s\.started_at < \$\d+::timestamptz/);
+      }
+      expect(params.filter((p) => p === '2026-01-01T00:00:00.000Z')).toHaveLength(2);
+      expect(params.filter((p) => p === '2026-01-08T00:00:00.000Z')).toHaveLength(2);
     }
   });
 
   it('omits the bounds when no window is given', async () => {
-    const execute = mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }]);
-    await backfillSessionIdentityBatch(5000);
-    for (const call of execute.mock.calls.slice(1)) {
-      const { sql: text } = renderSql(call[0] as SQL);
+    for (const { sql: text } of await renderBatchPasses()) {
       expect(text).not.toContain('started_at >=');
       expect(text).not.toContain('started_at <');
     }
@@ -138,54 +200,47 @@ describe('backfillSessionIdentityBatch windowing', () => {
 });
 
 describe('hasStampableSessionsBefore', () => {
-  it('returns true from the fresh-stamp probe without running the repair probe', async () => {
-    const execute = mockExecute({ rows: [{ '?column?': 1 }] });
+  it('answers from a single statement', async () => {
+    const execute = mockExecute({ rows: [{ stampable: true }] });
 
     await expect(hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'))).resolves.toBe(true);
     expect(execute).toHaveBeenCalledTimes(1);
+    expect(renderSql(execute.mock.calls[0]![0] as SQL).sql).toMatch(
+      /^\s*SELECT EXISTS \([\s\S]*\) OR EXISTS \([\s\S]*\) OR EXISTS \([\s\S]*\) AS stampable\s*$/
+    );
   });
 
-  it('falls through to the repair probe and returns true when only that one hits', async () => {
-    const execute = mockExecute({ rows: [] }, { rows: [{ '?column?': 1 }] });
-
-    await expect(hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'))).resolves.toBe(true);
-    expect(execute).toHaveBeenCalledTimes(2);
-  });
-
-  it('falls through to the repair probe and returns false when both are empty', async () => {
-    const execute = mockExecute({ rows: [] }, { rows: [] });
+  it('returns false when no probe finds work', async () => {
+    const execute = mockExecute({ rows: [{ stampable: false }] });
 
     await expect(hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'))).resolves.toBe(false);
-    expect(execute).toHaveBeenCalledTimes(2);
+    expect(execute).toHaveBeenCalledTimes(1);
   });
 
-  it('bounds both probes below the cutoff and caps them at one row', async () => {
-    const execute = mockExecute({ rows: [] }, { rows: [] });
+  it('bounds every probe below the cutoff', async () => {
+    const execute = mockExecute({ rows: [{ stampable: false }] });
 
     await hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'));
 
-    for (const call of execute.mock.calls) {
-      const { sql: text, params } = renderSql(call[0] as SQL);
-      expect(text).toContain('started_at <');
-      expect(text).toContain('LIMIT 1');
-      expect(params).toContain('2026-08-01T00:00:00.000Z');
+    const { sql: text, params } = renderSql(execute.mock.calls[0]![0] as SQL);
+    for (const probe of text.split(/\)\s*OR EXISTS/)) {
+      expect(probe).toMatch(/s\.started_at < \$\d+::timestamptz/);
     }
+    expect(params.filter((p) => p === '2026-08-01T00:00:00.000Z')).toHaveLength(3);
   });
 });
 
 describe('probe / batch predicate drift', () => {
   it('pins each probe predicate and keeps it in step with the batch query it mirrors', async () => {
-    const probeExecute = mockExecute({ rows: [] }, { rows: [] });
+    const probeExecute = mockExecute({ rows: [{ stampable: false }] });
     await hasStampableSessionsBefore(new Date('2026-08-01T00:00:00Z'));
-    const [freshProbe, repairProbe] = probeExecute.mock.calls.map(
-      (call) => renderSql(call[0] as SQL).sql
-    );
+    const [freshProbe, repairProbe, unlinkProbe] = renderSql(
+      probeExecute.mock.calls[0]![0] as SQL
+    ).sql.split(/\)\s*OR EXISTS/);
 
-    const batchExecute = mockTransaction([GUC_ABSENT, { rows: [] }, { rows: [] }]);
-    await backfillSessionIdentityBatch(5000);
-    const [freshBatch, repairBatch] = batchExecute.mock.calls
-      .slice(1)
-      .map((call) => renderSql(call[0] as SQL).sql);
+    const [freshBatch, repairBatch, unlinkBatch] = (await renderBatchPasses()).map(
+      (pass) => pass.sql
+    );
 
     // The probe answers "does the maintenance walk still have work below the
     // horizon", so it has to select exactly the rows the batch would stamp.
@@ -196,16 +251,21 @@ describe('probe / batch predicate drift', () => {
     for (const text of [freshProbe, freshBatch]) {
       expect(text).toContain('s.media_id IS NULL');
       expect(text).toContain('s.rating_key IS NOT NULL');
-      // The EXISTS guard is what keeps unresolvable rating keys from re-selecting
-      // forever. The batch also carries li.media_id IS NOT NULL in the UPDATE's
-      // own WHERE, so match inside the EXISTS body, not anywhere in the query.
-      const exists = /EXISTS\s*\(([\s\S]*?)\)/.exec(text ?? '')?.[1];
-      expect(exists).toMatch(/li2?\.media_id IS NOT NULL/);
+      // The EXISTS guard is what keeps unresolvable rating keys and container
+      // items from re-selecting forever. The batch repeats both predicates in
+      // the UPDATE's own WHERE, so match inside the guard, not anywhere.
+      const guard = guardBody(text);
+      expect(guard).toMatch(/li2?\.media_id IS NOT NULL/);
+      expect(guard).toMatch(/li2?\.media_type NOT IN \(\$\d+, \$\d+, \$\d+, \$\d+\)/);
     }
 
     for (const text of [repairProbe, repairBatch]) {
       expect(text).toContain('s.show_media_id IS NULL');
       expect(text).toContain('m.show_media_id IS NOT NULL');
+    }
+
+    for (const text of [unlinkProbe, unlinkBatch]) {
+      expect(text).toMatch(/JOIN media m ON m\.id = s\.media_id\s+WHERE m\.media_type IN \(/);
     }
   });
 });

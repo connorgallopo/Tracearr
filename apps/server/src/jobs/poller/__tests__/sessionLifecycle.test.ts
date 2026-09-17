@@ -826,6 +826,7 @@ describe('buildActiveSession identity passthrough', () => {
         tvdbId: 222,
         parentRatingKey: 'parent-1',
         grandparentRatingKey: 'grandparent-1',
+        itemMediaType: 'episode',
       },
     });
 

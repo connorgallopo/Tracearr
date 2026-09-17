@@ -32,12 +32,15 @@ vi.mock('../../db/schema.js', async (importOriginal) => {
 
 import {
   getGeoIPSettings,
+  getImportedHistoryLinkState,
   getSetting,
   getSettings,
   getWatchedThreshold,
+  getWatchedThresholds,
   resetSettingsCache,
   setSetting,
   setSettings,
+  watchedThresholdFor,
 } from '../settings.js';
 
 function mockSettingRow(value: unknown) {
@@ -201,5 +204,47 @@ describe('watched thresholds and public API rate limit', () => {
     await setSetting('watchedThresholdTv', 90);
 
     expect(await getWatchedThreshold('episode')).toBe(0.9);
+  });
+
+  it('loads all three thresholds at once and picks one by media type', async () => {
+    mockSettingRow(undefined);
+    await setSetting('watchedThresholdMusic', 70);
+
+    const thresholds = await getWatchedThresholds();
+
+    expect(thresholds).toEqual({ movie: 0.85, episode: 0.85, track: 0.7 });
+    expect(watchedThresholdFor(thresholds, 'track')).toBe(0.7);
+    expect(watchedThresholdFor(thresholds, 'episode')).toBe(0.85);
+    expect(watchedThresholdFor(thresholds, 'unknown')).toBe(0.85);
+  });
+});
+
+describe('imported history link state', () => {
+  const NOW = new Date('2026-09-17T12:00:00.000Z');
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetSettingsCache();
+    vi.useFakeTimers();
+    vi.setSystemTime(NOW);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('reads a stored state without armedAt, or no stored state, as armed now', async () => {
+    mockSettingRow({ state: 'pending', providerPassDoneServers: ['s1'], autoAttempts: 2 });
+    expect(await getImportedHistoryLinkState()).toEqual({
+      state: 'pending',
+      providerPassDoneServers: ['s1'],
+      autoAttempts: 2,
+      generation: 0,
+      armedAt: NOW.toISOString(),
+    });
+
+    resetSettingsCache();
+    mockSettingRow(undefined);
+    expect(await getImportedHistoryLinkState()).toMatchObject({ armedAt: NOW.toISOString() });
   });
 });

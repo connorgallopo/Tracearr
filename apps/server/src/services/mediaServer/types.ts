@@ -364,6 +364,9 @@ export interface MediaLibraryItem {
   /** MusicBrainz ID (track/album/artist only) */
   musicBrainzId?: string;
 
+  /** Normalized plex://movie/<id> or plex://episode/<id> guid (Plex only, see normalizePlexGuid) */
+  plexGuid?: string | null;
+
   /** Genre names */
   genres?: string[];
 

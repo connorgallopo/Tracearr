@@ -28,6 +28,7 @@ import {
   jellystatTranscodingInfoSchema,
 } from '@tracearr/shared';
 import type { JellystatPlaybackActivity } from '@tracearr/shared';
+import type { SessionIdentity } from '../../jobs/poller/database.js';
 
 // ============================================================================
 // TEST DATA - Jellystat backup structure
@@ -441,21 +442,21 @@ describe('jellystatBackupSchema', () => {
 describe('parseJellystatBackup', () => {
   it('should parse valid backup with activities', () => {
     const json = JSON.stringify(VALID_BACKUP_MULTIPLE);
-    const activities = parseJellystatBackup(json);
+    const { activities } = parseJellystatBackup(json);
     expect(activities).toHaveLength(3);
-    // parseJellystatBackup returns unknown[] for deferred validation
+    // activities stay unknown[] for deferred validation
     expect((activities[0] as Record<string, unknown>)?.Id).toBe(MOVIE_ACTIVITY.Id);
   });
 
   it('should return empty array for empty backup', () => {
     const json = JSON.stringify(EMPTY_BACKUP);
-    const activities = parseJellystatBackup(json);
+    const { activities } = parseJellystatBackup(json);
     expect(activities).toHaveLength(0);
   });
 
   it('should return empty array when jf_playback_activity is missing', () => {
     const json = JSON.stringify([{}]);
-    const activities = parseJellystatBackup(json);
+    const { activities } = parseJellystatBackup(json);
     expect(activities).toHaveLength(0);
   });
 
@@ -466,8 +467,152 @@ describe('parseJellystatBackup', () => {
   it('should throw on invalid backup structure', () => {
     const invalidBackup = { not: 'an array' };
     expect(() => parseJellystatBackup(JSON.stringify(invalidBackup))).toThrow(
-      /Invalid Jellystat backup format/
+      /Invalid Jellystat backup/
     );
+  });
+
+  it('returns null for excluded tables and drops malformed rows', () => {
+    const json = JSON.stringify([
+      { jf_playback_activity: [MOVIE_ACTIVITY] },
+      {
+        jf_library_items: [
+          {
+            Id: 'item-1',
+            Name: 'The Matrix',
+            ProductionYear: 1999,
+            archived: false,
+            Genres: ['Action'],
+            PrimaryImageHash: 'hash',
+          },
+          { Name: 'No Id', ProductionYear: 2000, archived: true },
+        ],
+      },
+      {
+        jf_library_episodes: [
+          {
+            Id: 'ep-1season-1',
+            EpisodeId: 'ep-1',
+            SeriesId: 'series-1',
+            SeasonId: 'season-1',
+            Name: 'Pilot',
+            SeriesName: 'Friends',
+            ParentIndexNumber: 1,
+            IndexNumber: 1,
+            archived: true,
+          },
+          { EpisodeId: 'ep-2', Name: 'Bad Index', IndexNumber: 'two', archived: false },
+        ],
+      },
+    ]);
+
+    const parsed = parseJellystatBackup(json);
+
+    expect(parsed.activities).toHaveLength(1);
+    expect(parsed.libraryItems).toEqual([
+      { Id: 'item-1', Name: 'The Matrix', ProductionYear: 1999, archived: false },
+    ]);
+    expect(parsed.libraryEpisodes).toEqual([
+      {
+        EpisodeId: 'ep-1',
+        SeriesId: 'series-1',
+        Name: 'Pilot',
+        SeriesName: 'Friends',
+        ParentIndexNumber: 1,
+        IndexNumber: 1,
+        archived: true,
+      },
+    ]);
+    expect(parsed.pluginRows).toBeNull();
+  });
+
+  it('parses a string plugin rowid into a number and drops a non-numeric one', () => {
+    const json = JSON.stringify([
+      {
+        jf_playback_reporting_plugin_data: [
+          { rowid: '42', ItemId: 'item-42', ItemName: 'Parasite', PlayDuration: '100' },
+          { rowid: 7, ItemId: 'item-7' },
+          { rowid: 'abc', ItemId: 'item-bad' },
+        ],
+      },
+    ]);
+
+    const { pluginRows, libraryItems, libraryEpisodes } = parseJellystatBackup(json);
+
+    expect(pluginRows).toEqual([
+      { rowid: 42, ItemId: 'item-42' },
+      { rowid: 7, ItemId: 'item-7' },
+    ]);
+    expect(libraryItems).toBeNull();
+    expect(libraryEpisodes).toBeNull();
+  });
+
+  function jsonl(lines: unknown[]): string {
+    return lines.map((line) => JSON.stringify(line)).join('\n') + '\n';
+  }
+
+  it('parses a JSONL backup into the same shape as the legacy array', () => {
+    const text = jsonl([
+      { type: 'table', table: 'jf_playback_activity' },
+      { type: 'row', table: 'jf_playback_activity', data: MOVIE_ACTIVITY },
+      { type: 'row', table: 'jf_playback_activity', data: EPISODE_ACTIVITY },
+      { type: 'table', table: 'jf_playback_reporting_plugin_data' },
+      {
+        type: 'row',
+        table: 'jf_playback_reporting_plugin_data',
+        data: { rowid: 7, ItemId: 'item-7' },
+      },
+    ]);
+
+    const parsed = parseJellystatBackup(text);
+
+    expect(parsed.activities).toHaveLength(2);
+    expect((parsed.activities[0] as Record<string, unknown>)?.Id).toBe(MOVIE_ACTIVITY.Id);
+    expect(parsed.pluginRows).toEqual([{ rowid: 7, ItemId: 'item-7' }]);
+  });
+
+  it('gives an empty list for a JSONL table with only a header and null for one the file lacks', () => {
+    const text = jsonl([
+      { type: 'table', table: 'jf_library_episodes' },
+      { type: 'table', table: 'jf_playback_activity' },
+      { type: 'row', table: 'jf_playback_activity', data: MOVIE_ACTIVITY },
+    ]);
+
+    const parsed = parseJellystatBackup(text);
+
+    expect(parsed.libraryEpisodes).toEqual([]);
+    expect(parsed.libraryItems).toBeNull();
+    expect(parsed.pluginRows).toBeNull();
+  });
+
+  it('ignores JSONL tables Tracearr does not read, blank lines and CRLF line ends', () => {
+    const text =
+      jsonl([
+        { type: 'table', table: 'jf_users' },
+        { type: 'row', table: 'jf_users', data: { Id: 'u1', Name: 'someone' } },
+      ]) +
+      '\r\n\r\n' +
+      jsonl([
+        { type: 'table', table: 'jf_playback_activity' },
+        { type: 'row', table: 'jf_playback_activity', data: MOVIE_ACTIVITY },
+      ]).replace(/\n/g, '\r\n');
+
+    expect(parseJellystatBackup(text).activities).toHaveLength(1);
+  });
+
+  it('names the line of a malformed JSONL record', () => {
+    const text =
+      jsonl([{ type: 'table', table: 'jf_playback_activity' }]) + '{"type":"row","table":\n';
+
+    expect(() => parseJellystatBackup(text)).toThrow(/line 2/);
+  });
+
+  it('rejects a JSONL row that arrives before its table header', () => {
+    const text = jsonl([
+      { type: 'table', table: 'jf_library_items' },
+      { type: 'row', table: 'jf_playback_activity', data: MOVIE_ACTIVITY },
+    ]);
+
+    expect(() => parseJellystatBackup(text)).toThrow(/line 2 .*jf_playback_activity/);
   });
 });
 
@@ -545,88 +690,25 @@ describe('transformActivityToSession', () => {
     });
   });
 
-  describe('tick conversions', () => {
-    it('should convert PositionTicks to progressMs', () => {
+  describe('runtime and progress', () => {
+    it('never stores a position: Jellystat records the first poll, not the last', () => {
       const session = transformActivityToSession(MOVIE_ACTIVITY, serverId, serverUserId, mockGeo);
-
-      // 72000000000 ticks / 10000 = 7200000 ms
-      expect(session.progressMs).toBe(7200000);
-    });
-
-    it('should convert RuntimeTicks to totalDurationMs', () => {
-      const session = transformActivityToSession(MOVIE_ACTIVITY, serverId, serverUserId, mockGeo);
-
-      // 81000000000 ticks / 10000 = 8100000 ms
-      expect(session.totalDurationMs).toBe(8100000);
-    });
-
-    it('should handle missing PlayState ticks', () => {
-      const session = transformActivityToSession(MINIMAL_ACTIVITY, serverId, serverUserId, mockGeo);
 
       expect(session.progressMs).toBeNull();
+    });
+
+    it('takes the runtime from enrichment', () => {
+      const session = transformActivityToSession(MOVIE_ACTIVITY, serverId, serverUserId, mockGeo, {
+        runtimeMs: 9_000_000,
+      });
+
+      expect(session.totalDurationMs).toBe(9_000_000);
+    });
+
+    it('leaves the runtime null without enrichment, whatever PlayState claims', () => {
+      const session = transformActivityToSession(MOVIE_ACTIVITY, serverId, serverUserId, mockGeo);
+
       expect(session.totalDurationMs).toBeNull();
-    });
-
-    it('should handle RuntimeTicks = 0 with no PercentComplete fallback', () => {
-      // ZERO_RUNTIME_ACTIVITY has RuntimeTicks: 0 and PercentComplete: 0
-      // Since both are 0, we can't determine the total duration
-      const session = transformActivityToSession(
-        ZERO_RUNTIME_ACTIVITY,
-        serverId,
-        serverUserId,
-        mockGeo
-      );
-
-      // RuntimeTicks: 0 and PercentComplete: 0 means unknown duration
-      expect(session.totalDurationMs).toBeNull();
-      // PositionTicks: 1093790 / 10000 = 109 ms
-      expect(session.progressMs).toBe(109);
-    });
-
-    it('should use PercentComplete to derive totalDurationMs when RuntimeTicks is 0', () => {
-      // Create activity with RuntimeTicks: 0 but valid PercentComplete
-      const activityWithPercent = {
-        ...ZERO_RUNTIME_ACTIVITY,
-        PlaybackDuration: '1800', // 30 minutes watched
-        PlayState: {
-          ...ZERO_RUNTIME_ACTIVITY.PlayState,
-          RuntimeTicks: 0,
-          PercentComplete: 50, // 50% means total is 60 minutes
-        },
-      };
-
-      const session = transformActivityToSession(
-        activityWithPercent,
-        serverId,
-        serverUserId,
-        mockGeo
-      );
-
-      // 1800s * 1000ms = 1800000ms watched, at 50% = 3600000ms total (60 min)
-      expect(session.totalDurationMs).toBe(3600000);
-    });
-
-    it('should use PercentComplete to derive totalDurationMs when RuntimeTicks is null', () => {
-      // Create activity with null RuntimeTicks but valid PercentComplete
-      const activityWithPercent = {
-        ...MINIMAL_ACTIVITY,
-        PlaybackDuration: '900', // 15 minutes watched
-        PlayState: {
-          PositionTicks: null,
-          RuntimeTicks: null,
-          PercentComplete: 25, // 25% means total is 60 minutes
-        },
-      };
-
-      const session = transformActivityToSession(
-        activityWithPercent,
-        serverId,
-        serverUserId,
-        mockGeo
-      );
-
-      // 900s * 1000ms = 900000ms watched, at 25% = 3600000ms total (60 min)
-      expect(session.totalDurationMs).toBe(3600000);
     });
   });
 
@@ -770,20 +852,49 @@ describe('transformActivityToSession', () => {
   });
 
   describe('watched status', () => {
-    it('should set watched from PlayState.Completed', () => {
-      const session = transformActivityToSession(MOVIE_ACTIVITY, serverId, serverUserId, mockGeo);
+    const thresholds = { movie: 0.85, episode: 0.85, track: 0.85 };
+
+    it('marks a play watched when it ran past the threshold of the runtime', () => {
+      const session = transformActivityToSession(
+        MOVIE_ACTIVITY,
+        serverId,
+        serverUserId,
+        mockGeo,
+        { runtimeMs: 8_100_000 },
+        undefined,
+        MOVIE_ACTIVITY.NowPlayingItemId,
+        thresholds
+      );
 
       expect(session.watched).toBe(true);
     });
 
-    it('should set watched to false when not completed', () => {
-      const session = transformActivityToSession(EPISODE_ACTIVITY, serverId, serverUserId, mockGeo);
+    it('leaves a play unwatched under the threshold', () => {
+      const session = transformActivityToSession(
+        MOVIE_ACTIVITY,
+        serverId,
+        serverUserId,
+        mockGeo,
+        { runtimeMs: 8_100_000 },
+        undefined,
+        MOVIE_ACTIVITY.NowPlayingItemId,
+        { ...thresholds, movie: 0.9 }
+      );
 
       expect(session.watched).toBe(false);
     });
 
-    it('should default watched to false when PlayState is null', () => {
-      const session = transformActivityToSession(MINIMAL_ACTIVITY, serverId, serverUserId, mockGeo);
+    it('never marks a play watched without a runtime, whatever PlayState claims', () => {
+      const session = transformActivityToSession(
+        MOVIE_ACTIVITY,
+        serverId,
+        serverUserId,
+        mockGeo,
+        undefined,
+        undefined,
+        MOVIE_ACTIVITY.NowPlayingItemId,
+        thresholds
+      );
 
       expect(session.watched).toBe(false);
     });
@@ -1473,12 +1584,19 @@ vi.mock('../../db/client.js', () => ({
 }));
 
 vi.mock('../../db/timescale.js', () => ({
+  checkAggregateNeedsRebuild: vi.fn().mockResolvedValue({ needsRebuild: false }),
   refreshAggregates: vi.fn().mockResolvedValue(undefined),
   uncapDecompressionForTx: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../../jobs/poller/database.js', () => ({
+  CONTAINER_MEDIA_TYPES: ['show', 'season', 'artist', 'album'],
   batchGetLibraryItemIdentity: vi.fn(async () => new Map()),
+}));
+
+vi.mock('../settings.js', async (importActual) => ({
+  ...(await importActual<typeof import('../settings.js')>()),
+  getWatchedThresholds: vi.fn().mockResolvedValue({ movie: 0.85, episode: 0.85, track: 0.85 }),
 }));
 
 // Shared mock for JellyfinClient.getItems - can be configured per test
@@ -1530,12 +1648,17 @@ function configureMockJellyfinClientError(error: Error) {
 
 describe('importJellystatBackup', () => {
   const serverId = 'server-uuid-1234';
+  // Later than every activity date the tests below use, so the cutoff itself
+  // never interferes unless a test sets it explicitly.
+  const SERVER_CREATED_AT = new Date('2030-01-01T00:00:00Z');
+
   const mockServer = {
     id: serverId,
     name: 'Test Jellyfin Server',
     type: 'jellyfin' as const,
     url: 'http://jellyfin.local:8096',
     token: 'test-token',
+    createdAt: SERVER_CREATED_AT,
   };
   const _mockEmbyServer = {
     ...mockServer,
@@ -1695,7 +1818,7 @@ describe('importJellystatBackup', () => {
       const result = await importJellystatBackup(serverId, JSON.stringify({ not: 'array' }), false);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Invalid Jellystat backup format');
+      expect(result.message).toContain('Invalid Jellystat backup');
     });
   });
 
@@ -2246,6 +2369,490 @@ describe('importJellystatBackup', () => {
       expect(userCounts).toContain(3); // Charlie
     });
   });
+
+  async function mockServerAndUsers(server: typeof mockServer) {
+    const { db } = await import('../../db/client.js');
+    let callCount = 0;
+    (db.select as ReturnType<typeof vi.fn>).mockImplementation(() => {
+      callCount++;
+      const mockLimit = vi.fn();
+      const mockWhere = vi.fn().mockReturnValue({ limit: mockLimit });
+      const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+
+      if (callCount === 1) {
+        mockLimit.mockResolvedValue([server]);
+      } else if (callCount === 2) {
+        mockWhere.mockResolvedValue([mockServerUser]);
+      } else {
+        mockWhere.mockResolvedValue([]);
+      }
+
+      return { from: mockFrom };
+    });
+  }
+
+  async function importAndCapture(sections: unknown[], enrichMedia = false) {
+    await mockServerAndUsers(mockServer);
+    const { db } = await import('../../db/client.js');
+    const inserted: Array<Record<string, unknown>> = [];
+    (db.insert as ReturnType<typeof vi.fn>).mockReturnValue({
+      values: vi.fn((rows: Array<Record<string, unknown>>) => {
+        inserted.push(...rows);
+        return Promise.resolve(undefined);
+      }),
+    });
+    const result = await importJellystatBackup(serverId, JSON.stringify(sections), enrichMedia);
+    return { result, inserted };
+  }
+
+  describe('import cutoff', () => {
+    const CUTOFF = new Date('2025-01-01T00:00:00Z');
+
+    function activity(
+      id: string,
+      activityDateInserted: string,
+      overrides: Record<string, unknown> = {}
+    ) {
+      return {
+        ...REAL_BACKUP_ACTIVITY_1,
+        Id: id,
+        PlaybackDuration: '0',
+        ActivityDateInserted: activityDateInserted,
+        ...overrides,
+      };
+    }
+
+    it('skips activities at or after the cutoff and imports the one before it', async () => {
+      await mockServerAndUsers({ ...mockServer, createdAt: CUTOFF });
+
+      const before = activity('before-1', '2024-12-31T23:00:00.000Z');
+      const at = activity('at-1', '2025-01-01T00:00:00.000Z');
+      const after = activity('after-1', '2025-01-01T01:00:00.000Z');
+
+      const backup = JSON.stringify([{ jf_playback_activity: [before, at, after] }]);
+      const result = await importJellystatBackup(serverId, backup, false);
+
+      expect(result.success).toBe(true);
+      expect(result.imported).toBe(1);
+      expect(result.skipped).toBe(2);
+    });
+
+    it('skips a plugin-origin activity 20 hours before the cutoff and keeps one 28 hours before', async () => {
+      await mockServerAndUsers({ ...mockServer, createdAt: CUTOFF });
+
+      const near = activity(
+        'plugin-near',
+        new Date(CUTOFF.getTime() - 20 * 60 * 60 * 1000).toISOString(),
+        { imported: true }
+      );
+      const far = activity(
+        'plugin-far',
+        new Date(CUTOFF.getTime() - 28 * 60 * 60 * 1000).toISOString(),
+        { imported: true }
+      );
+
+      const backup = JSON.stringify([{ jf_playback_activity: [near, far] }]);
+      const result = await importJellystatBackup(serverId, backup, false);
+
+      expect(result.success).toBe(true);
+      expect(result.imported).toBe(1);
+      expect(result.skipped).toBe(1);
+    });
+  });
+
+  describe('item ids and remap veto', () => {
+    const VETO_MESSAGE =
+      '1 play not linked because Jellystat may have moved it to a different title';
+    const UNCHECKED_MESSAGE =
+      '1 play could not be checked for moves to a different title because the backup left out library tables';
+    const EPISODES_MESSAGE =
+      '1 episode play not linked because the backup left out jf_library_episodes; importing it again will not link it';
+
+    const PARASITE = { Id: 'movie123456', Name: 'Parasite', ProductionYear: 2019, archived: false };
+    const PARASITE_1982 = {
+      Id: 'parasite-1982',
+      Name: 'Parasite',
+      ProductionYear: 1982,
+      archived: true,
+    };
+
+    function identity(overrides: Partial<SessionIdentity> = {}): SessionIdentity {
+      return {
+        mediaId: 'media-1',
+        showMediaId: null,
+        imdbId: 'tt6751668',
+        tmdbId: 496243,
+        tvdbId: null,
+        parentRatingKey: 'parent-1',
+        grandparentRatingKey: 'grandparent-1',
+        itemMediaType: 'movie',
+        ...overrides,
+      };
+    }
+
+    async function mockIdentities(identities: Record<string, SessionIdentity>) {
+      const { batchGetLibraryItemIdentity } = await import('../../jobs/poller/database.js');
+      vi.mocked(batchGetLibraryItemIdentity).mockImplementationOnce(async (_serverId, keys) => {
+        const found = new Map<string, SessionIdentity>();
+        for (const key of keys) {
+          const match = identities[key];
+          if (match) found.set(key, match);
+        }
+        return found;
+      });
+    }
+
+    const EPISODE_PLAY = {
+      ...REAL_BACKUP_ACTIVITY_1,
+      NowPlayingItemId: 'series-code-black',
+      EpisodeId: 'episode-pilot',
+    };
+    const CONCATENATED_PLAY = {
+      ...EPISODE_PLAY,
+      Id: '81',
+      imported: true,
+      NowPlayingItemId: 'episode-pilot',
+      SeasonId: 'season-1',
+      EpisodeId: 'episode-pilotseason-1',
+    };
+    const PILOT_EPISODE = {
+      EpisodeId: 'episode-pilot',
+      SeriesId: 'series-code-black',
+      Name: 'Pilot',
+      SeriesName: 'Code Black',
+      ParentIndexNumber: 1,
+      IndexNumber: 1,
+      archived: false,
+    };
+
+    it('stores an unresolved plugin ItemId as rating key, never NowPlayingItemId', async () => {
+      await mockIdentities({ 'remapped-id': identity() });
+
+      const { result, inserted } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            {
+              ...REAL_BACKUP_ACTIVITY_2,
+              Id: '42',
+              imported: true,
+              NowPlayingItemId: 'remapped-id',
+            },
+          ],
+        },
+        { jf_playback_reporting_plugin_data: [{ rowid: '42', ItemId: 'plugin-original' }] },
+      ]);
+
+      expect(result.imported).toBe(1);
+      expect(inserted[0]?.ratingKey).toBe('plugin-original');
+      expect(inserted[0]?.mediaId).toBeNull();
+    });
+
+    it('gives a vetoed row no enrichment fields', async () => {
+      configureMockJellyfinClient([
+        {
+          Id: 'movie123456',
+          ParentIndexNumber: 1,
+          IndexNumber: 2,
+          ProductionYear: 2019,
+          ImageTags: { Primary: 'def456' },
+        },
+      ]);
+
+      const { inserted } = await importAndCapture(
+        [
+          { jf_playback_activity: [REAL_BACKUP_ACTIVITY_2] },
+          { jf_library_items: [PARASITE, PARASITE_1982] },
+        ],
+        true
+      );
+
+      expect(inserted[0]).toMatchObject({
+        seasonNumber: null,
+        episodeNumber: null,
+        year: null,
+        thumbPath: null,
+      });
+    });
+
+    it('inserts a vetoed activity with null rating_key and identity', async () => {
+      await mockIdentities({ movie123456: identity() });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [REAL_BACKUP_ACTIVITY_2] },
+        { jf_library_items: [PARASITE, PARASITE_1982] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({
+        ratingKey: null,
+        mediaId: null,
+        showMediaId: null,
+        imdbId: null,
+        tmdbId: null,
+        tvdbId: null,
+        parentRatingKey: null,
+        grandparentRatingKey: null,
+        mediaTitle: 'Parasite',
+        externalSessionId: '1384',
+      });
+      expect(result.message).toContain(VETO_MESSAGE);
+    });
+
+    it('links an unchecked movie activity as today and counts it as unchecked', async () => {
+      await mockIdentities({ movie123456: identity() });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [REAL_BACKUP_ACTIVITY_2] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'movie123456', mediaId: 'media-1' });
+      expect(result.unchecked).toBe(1);
+      expect(result.message).toContain(UNCHECKED_MESSAGE);
+    });
+
+    it('pluralizes the counts it reports', async () => {
+      const { result } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            REAL_BACKUP_ACTIVITY_2,
+            { ...REAL_BACKUP_ACTIVITY_2, Id: '1385' },
+            EPISODE_PLAY,
+            { ...EPISODE_PLAY, Id: '1386' },
+            { ...EPISODE_PLAY, Id: '1387', imported: true, EpisodeId: 'episode-other' },
+            { ...EPISODE_PLAY, Id: '1388', imported: true, EpisodeId: 'episode-third' },
+          ],
+        },
+      ]);
+
+      expect(result.message).toContain(
+        '. 2 episode plays not linked because the backup left out jf_library_episodes; importing them again will not link them'
+      );
+      expect(result.message).toContain(
+        '. 2 plays could not be checked for moves to a different title because the backup left out library tables'
+      );
+      expect(result.message).toContain(
+        '. 2 episode plays from the Playback Reporting plugin not linked because the backup left out jf_playback_reporting_plugin_data'
+      );
+    });
+
+    it('counts an episode keyed on its series for a backup without jf_library_episodes apart from unchecked plays', async () => {
+      await mockIdentities({ 'episode-pilot': identity({ itemMediaType: 'episode' }) });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [EPISODE_PLAY] },
+        { jf_library_items: [] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'series-code-black', mediaId: null });
+      expect(result.unlinkedEpisodes).toBe(1);
+      expect(result.unchecked).toBe(0);
+      expect(result.message).toContain(EPISODES_MESSAGE);
+      expect(result.message).not.toContain('could not be checked');
+    });
+
+    it('falls back to NowPlayingItemId for a concatenated EpisodeId', async () => {
+      await mockIdentities({
+        'episode-pilot': identity({ mediaId: 'media-pilot', itemMediaType: 'episode' }),
+      });
+
+      const { inserted } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            {
+              ...EPISODE_PLAY,
+              Id: '77',
+              imported: true,
+              NowPlayingItemId: 'episode-pilot',
+              SeasonId: 'season-1',
+              EpisodeId: 'episode-pilotseason-1',
+            },
+          ],
+        },
+        { jf_library_items: [] },
+        { jf_library_episodes: [PILOT_EPISODE] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: 'media-pilot' });
+    });
+
+    it('links an untouched 045-era imported episode row with a null SeriesName', async () => {
+      await mockIdentities({
+        'episode-pilot': identity({ mediaId: 'media-pilot', itemMediaType: 'episode' }),
+      });
+
+      const { result, inserted } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            {
+              ...EPISODE_PLAY,
+              Id: '79',
+              imported: true,
+              NowPlayingItemId: 'episode-pilot',
+              NowPlayingItemName: 'Code Black - s01e01 - Pilot',
+              SeriesName: null,
+              SeasonId: 'season-1',
+              EpisodeId: 'episode-pilotseason-1',
+            },
+          ],
+        },
+        { jf_library_items: [] },
+        { jf_library_episodes: [PILOT_EPISODE] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: 'media-pilot' });
+      expect(result.message).not.toContain(VETO_MESSAGE);
+    });
+
+    it('keys a purged Emby-shaped concatenated row on the series id and leaves it unlinked', async () => {
+      await mockIdentities({ '12345': identity({ itemMediaType: 'episode' }) });
+
+      const { inserted } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            {
+              ...EPISODE_PLAY,
+              Id: '80',
+              imported: true,
+              NowPlayingItemId: '12',
+              SeasonId: '345',
+              EpisodeId: '12345',
+            },
+          ],
+        },
+        { jf_library_items: [] },
+        { jf_library_episodes: [] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: '12', mediaId: null });
+    });
+
+    it('links a concatenated imported row by NowPlayingItemId without jf_library_episodes', async () => {
+      await mockIdentities({
+        'episode-pilot': identity({ mediaId: 'media-pilot', itemMediaType: 'episode' }),
+      });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [CONCATENATED_PLAY] },
+        { jf_library_items: [] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: 'media-pilot' });
+      expect(result.message).toContain(UNCHECKED_MESSAGE);
+    });
+
+    it('links a concatenated imported row whose episode row was purged', async () => {
+      await mockIdentities({
+        'episode-pilot': identity({ mediaId: 'media-pilot', itemMediaType: 'episode' }),
+      });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [CONCATENATED_PLAY] },
+        { jf_library_items: [] },
+        { jf_library_episodes: [] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: 'media-pilot' });
+      expect(result.unchecked).toBe(0);
+    });
+
+    it('links a concatenated imported row from a backup with every library table and never counts it as unchecked', async () => {
+      await mockIdentities({
+        'episode-pilot': identity({ mediaId: 'media-pilot', itemMediaType: 'episode' }),
+      });
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [CONCATENATED_PLAY] },
+        {
+          jf_library_items: [
+            { Id: 'series-code-black', Name: 'Code Black', ProductionYear: 2015, archived: false },
+          ],
+        },
+        { jf_library_episodes: [PILOT_EPISODE] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: 'media-pilot' });
+      expect(result.unchecked).toBe(0);
+      expect(result.vetoed).toBe(0);
+      expect(result.message).not.toContain('could not be checked');
+    });
+
+    it('refuses a rewritten plugin-origin episode row without the plugin table and names the missing table', async () => {
+      const { result, inserted } = await importAndCapture([
+        {
+          jf_playback_activity: [
+            {
+              ...EPISODE_PLAY,
+              Id: '78',
+              imported: true,
+              NowPlayingItemId: 'series-code-black',
+              EpisodeId: 'episode-other',
+            },
+          ],
+        },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: null, mediaId: null });
+      expect(result.pluginUnchecked).toBe(1);
+      expect(result.vetoed).toBe(0);
+      expect(result.message).toContain(
+        '1 episode play from the Playback Reporting plugin not linked because the backup left out jf_playback_reporting_plugin_data'
+      );
+      expect(result.message).not.toContain(VETO_MESSAGE);
+      expect(result.message).not.toContain(UNCHECKED_MESSAGE);
+    });
+
+    it('leaves a series-keyed episode unlinked', async () => {
+      await mockIdentities({});
+
+      const { result, inserted } = await importAndCapture([
+        { jf_playback_activity: [EPISODE_PLAY] },
+        { jf_library_items: [] },
+        { jf_library_episodes: [PILOT_EPISODE] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'episode-pilot', mediaId: null });
+      expect(result.message).not.toContain(UNCHECKED_MESSAGE);
+    });
+
+    it('drops an EpisodeId that resolves to a non-episode from the fallback key', async () => {
+      await mockIdentities({ 'episode-pilot': identity({ itemMediaType: 'movie' }) });
+
+      const { inserted } = await importAndCapture([
+        { jf_playback_activity: [EPISODE_PLAY] },
+        { jf_library_items: [] },
+        { jf_library_episodes: [PILOT_EPISODE] },
+      ]);
+
+      expect(inserted[0]).toMatchObject({ ratingKey: 'series-code-black', mediaId: null });
+    });
+  });
+
+  describe('runtime bound', () => {
+    it('refuses a play past the runtime plus 60 s and keeps one exactly on it', async () => {
+      configureMockJellyfinClient([
+        { Id: MOVIE_ACTIVITY.NowPlayingItemId, Type: 'Movie', RunTimeTicks: 54_000_000_000 },
+      ]);
+
+      const { result, inserted } = await importAndCapture(
+        [
+          {
+            jf_playback_activity: [
+              { ...MOVIE_ACTIVITY, Id: '2001', PlaybackDuration: '5461' },
+              { ...MOVIE_ACTIVITY, Id: '2002', PlaybackDuration: '5460' },
+            ],
+          },
+        ],
+        true
+      );
+
+      expect(inserted.map((row) => row.sessionKey)).toEqual(['2002']);
+      expect(result.imported).toBe(1);
+      expect(result.skipped).toBe(1);
+      expect(result.overlong).toBe(1);
+      expect(result.message).toContain(
+        '1 play skipped because the recorded play time runs past the media runtime'
+      );
+    });
+  });
 });
 
 // ============================================================================
@@ -2254,8 +2861,7 @@ describe('importJellystatBackup', () => {
 
 describe('Media Enrichment', () => {
   it('should enrich episode with season and episode numbers', async () => {
-    // This is tested indirectly through importJellystatBackup
-    // The mock JellyfinClient returns enrichment data
+    configureMockJellyfinClient();
     const { db } = await import('../../db/client.js');
 
     const mockServer = {
@@ -2264,6 +2870,7 @@ describe('Media Enrichment', () => {
       type: 'jellyfin' as const,
       url: 'http://jellyfin.local:8096',
       token: 'test-token',
+      createdAt: new Date('2030-01-01T00:00:00Z'),
     };
 
     const mockServerUser = {
@@ -2332,6 +2939,7 @@ describe('Media Enrichment', () => {
       type: 'jellyfin' as const,
       url: 'http://jellyfin.local:8096',
       token: 'test-token',
+      createdAt: new Date('2030-01-01T00:00:00Z'),
     };
 
     const mockServerUser = {
@@ -2387,6 +2995,7 @@ describe('Theme Music Filtering', () => {
       type: 'jellyfin' as const,
       url: 'http://jellyfin.local:8096',
       token: 'test-token',
+      createdAt: new Date('2030-01-01T00:00:00Z'),
     };
 
     const mockServerUser = {
@@ -2465,6 +3074,7 @@ describe('Theme Music Filtering', () => {
       type: 'jellyfin' as const,
       url: 'http://jellyfin.local:8096',
       token: 'test-token',
+      createdAt: new Date('2030-01-01T00:00:00Z'),
     };
 
     const mockServerUser = {
@@ -2524,6 +3134,7 @@ describe('Theme Music Filtering', () => {
       type: 'jellyfin' as const,
       url: 'http://jellyfin.local:8096',
       token: 'test-token',
+      createdAt: new Date('2030-01-01T00:00:00Z'),
     };
 
     const mockServerUser = {

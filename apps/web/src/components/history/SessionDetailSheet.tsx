@@ -115,8 +115,8 @@ function getWatchTime(session: SessionWithDetails | ActiveSession): number | nul
 
 // Get progress percentage (playback position)
 // Uses progressMs (where in the video) not durationMs (how long watched)
-function getProgress(session: SessionWithDetails): number {
-  if (!session.totalDurationMs || session.totalDurationMs === 0) return 0;
+function getProgress(session: SessionWithDetails): number | null {
+  if (!session.totalDurationMs) return null;
   const progress = session.progressMs ?? 0;
   return Math.min(100, Math.round((progress / session.totalDurationMs) * 100));
 }
@@ -308,11 +308,12 @@ function SessionContent({ session }: { session: SessionWithDetails | ActiveSessi
             {secondary && (
               <div className="text-muted-foreground mt-0.5 truncate text-sm">{secondary}</div>
             )}
-            {/* Progress inline */}
-            <div className="mt-2 flex items-center gap-2">
-              <Progress value={progress} className="h-1.5 flex-1" />
-              <span className="text-muted-foreground w-8 text-xs">{progress}%</span>
-            </div>
+            {progress !== null && (
+              <div className="mt-2 flex items-center gap-2">
+                <Progress value={progress} className="h-1.5 flex-1" />
+                <span className="text-muted-foreground w-8 text-xs">{progress}%</span>
+              </div>
+            )}
           </div>
         </div>
 

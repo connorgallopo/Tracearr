@@ -29,6 +29,7 @@ import { enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
 import { supportsMediaLibrary } from '@tracearr/shared';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import { readServerIdentity } from '../services/serverIdentity.js';
+import { rearmImportedHistoryLink } from '../services/settings.js';
 import { buildServerAccessCondition } from '../utils/serverFiltering.js';
 
 function getDispatcharrAuthMode(token?: string | null): 'token' | 'credentials' {
@@ -293,6 +294,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
 
     await publishServersChanged();
+
+    if (server.type === 'plex') {
+      await rearmImportedHistoryLink({ keepProviderPass: false });
+    }
+
     // Auto-sync users and libraries in background
     syncServer(server.id, { syncUsers: true, syncLibraries: true })
       .then((result) => {

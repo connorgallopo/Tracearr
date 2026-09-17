@@ -55,6 +55,18 @@ vi.mock('../../jobs/maintenanceQueue.js', () => ({
   maybeEnqueueMaintenanceJob: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock('../settings.js', () => ({
+  getImportedHistoryLinkState: vi.fn(),
+  getSettings: vi.fn(),
+  setImportedHistoryLinkState: vi.fn(),
+}));
+
+vi.mock('../../jobs/importedHistoryLinking.js', () => ({
+  listPlexServers: vi.fn(),
+  MAX_AUTO_LINK_ATTEMPTS: 5,
+  AUTO_LINK_WINDOW_MS: 14 * 24 * 60 * 60 * 1000,
+}));
+
 // Only the compression-horizon probe is stubbed; the aggregate refresh paths stay
 // real so the db.execute assertions below still measure refresh behavior rather
 // than this one extra catalog read at the tail of every sync.
@@ -74,12 +86,20 @@ import {
   hasStampableSessionsBefore,
 } from '../../jobs/sessionIdentityBackfill.js';
 import { maybeEnqueueMaintenanceJob } from '../../jobs/maintenanceQueue.js';
+import { listPlexServers } from '../../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon } from '../../db/timescale.js';
+import {
+  getImportedHistoryLinkState,
+  getSettings,
+  setImportedHistoryLinkState,
+} from '../settings.js';
 import {
   LibrarySyncService,
   initLibrarySyncRedis,
   _resetAutoBackfillThrottleForTests,
+  _resetImportedHistoryLinkThrottleForTests,
   _resetReconcileThrottleForTests,
+  maybeEnqueueImportedHistoryLink,
 } from '../librarySync.js';
 import { MEDIA_BUFFER_CAP, flushMediaAnnounceRun } from '../library/mediaAnnounce.js';
 import type { MediaLibraryItem } from '../mediaServer/types.js';
@@ -89,6 +109,10 @@ import type { Redis } from 'ioredis';
 // ============================================================================
 // Test Data Factories
 // ============================================================================
+
+const LINK_DONE = { state: 'done', providerPassDoneServers: [], autoAttempts: 0, generation: 0 };
+const NO_TAUTULLI = { tautulliUrl: null, tautulliApiKey: null };
+const TAUTULLI = { tautulliUrl: 'http://tautulli.local:8181', tautulliApiKey: 'key' };
 
 function createMockServer(overrides: Record<string, unknown> = {}) {
   return {
@@ -371,7 +395,7 @@ function syncStateReads(lastSyncedAt: string, lastItemCount: string) {
     .mockResolvedValueOnce(lastItemCount)
     .mockResolvedValueOnce(null)
     .mockResolvedValueOnce(null)
-    .mockResolvedValueOnce('1');
+    .mockResolvedValueOnce('2');
 }
 
 /**
@@ -417,7 +441,11 @@ beforeEach(() => {
   // enqueues would otherwise gate the next one for hours. Reset keeps the
   // order-dependence out of it.
   _resetAutoBackfillThrottleForTests();
+  _resetImportedHistoryLinkThrottleForTests();
   _resetReconcileThrottleForTests();
+  vi.mocked(getImportedHistoryLinkState).mockResolvedValue(LINK_DONE as never);
+  vi.mocked(getSettings).mockResolvedValue(NO_TAUTULLI as never);
+  vi.mocked(listPlexServers).mockResolvedValue([]);
 });
 
 // clearAllMocks only clears call history, not implementations - restore db.execute so a test's override can't leak into the next.
@@ -743,6 +771,201 @@ describe('LibrarySyncService', () => {
       expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
     });
 
+    describe('imported history link hand-off', () => {
+      const noPendingSync = async () => false;
+
+      async function runPlexSync(
+        service: LibrarySyncService,
+        server: ReturnType<typeof createMockServer>
+      ) {
+        setupSelectForIncrementalTest(server);
+        mockSelectDistinctChain([[], []]);
+        mockInsertChain([{ id: randomUUID() }]);
+        mockDeleteChain();
+        mockTransaction();
+        mockMediaServerClient({
+          libraries: [createMockLibrary({ id: '1', name: 'Movies' })],
+          items: [createMockLibraryItem({ ratingKey: 'item-1' })],
+          totalCount: 1,
+        });
+        await service.syncServer(server.id);
+      }
+
+      afterEach(() => {
+        vi.mocked(getSessionsCompressionHorizon).mockResolvedValue(null);
+        vi.mocked(hasStampableSessionsBefore).mockResolvedValue(false);
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValue(null);
+      });
+
+      it('never enqueues the link job once it is done or out of automatic attempts', async () => {
+        vi.mocked(getSettings).mockResolvedValue(TAUTULLI as never);
+
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: [],
+          autoAttempts: 5,
+          generation: 0,
+        } as never);
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+
+        expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
+        expect(setImportedHistoryLinkState).not.toHaveBeenCalled();
+      });
+
+      it('marks linking done without enqueueing when Tautulli is not configured and every Plex server finished the provider pass', async () => {
+        const armedAt = new Date().toISOString();
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: ['plex-a', 'plex-b'],
+          autoAttempts: 2,
+          generation: 4,
+          armedAt,
+        } as never);
+        vi.mocked(listPlexServers).mockResolvedValue([
+          { id: 'plex-a', name: 'Home', machineIdentifier: null },
+          { id: 'plex-b', name: 'Office', machineIdentifier: null },
+        ]);
+
+        await maybeEnqueueImportedHistoryLink(false, noPendingSync);
+
+        expect(setImportedHistoryLinkState).toHaveBeenCalledWith(4, {
+          state: 'done',
+          providerPassDoneServers: ['plex-a', 'plex-b'],
+          autoAttempts: 0,
+          generation: 4,
+          armedAt,
+        });
+        expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
+      });
+
+      it('marks linking done for a Tautulli-less install even after the 14-day window has passed', async () => {
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: ['plex-a'],
+          autoAttempts: 0,
+          generation: 1,
+          armedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        } as never);
+        vi.mocked(listPlexServers).mockResolvedValue([
+          { id: 'plex-a', name: 'Home', machineIdentifier: null },
+        ]);
+
+        await maybeEnqueueImportedHistoryLink(false, noPendingSync);
+
+        expect(setImportedHistoryLinkState).toHaveBeenCalledWith(
+          1,
+          expect.objectContaining({ state: 'done' })
+        );
+        expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
+      });
+
+      it('waits without stamping its throttle while any Plex server has a library sync pending', async () => {
+        vi.mocked(getSettings).mockResolvedValue(TAUTULLI as never);
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: [],
+          autoAttempts: 0,
+          generation: 0,
+          armedAt: new Date().toISOString(),
+        } as never);
+        vi.mocked(listPlexServers).mockResolvedValue([
+          { id: 'plex-a', name: 'Home', machineIdentifier: null },
+          { id: 'plex-b', name: 'Office', machineIdentifier: null },
+        ]);
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValue('maintenance-job-1');
+
+        await maybeEnqueueImportedHistoryLink(true, async (serverId) => serverId === 'plex-b');
+        expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
+
+        await maybeEnqueueImportedHistoryLink(false, noPendingSync);
+        expect(maybeEnqueueMaintenanceJob).toHaveBeenCalledWith('link_imported_history', 'system', {
+          trigger: 'auto',
+        });
+      });
+
+      it('stops enqueueing 14 days after the last re-arm', async () => {
+        vi.mocked(getSettings).mockResolvedValue(TAUTULLI as never);
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValue('maintenance-job-1');
+        const armed = (days: number) =>
+          ({
+            state: 'pending',
+            providerPassDoneServers: [],
+            autoAttempts: 0,
+            generation: 0,
+            armedAt: new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString(),
+          }) as never;
+
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue(armed(14.5));
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        expect(maybeEnqueueMaintenanceJob).not.toHaveBeenCalled();
+
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue(armed(13.5));
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        expect(maybeEnqueueMaintenanceJob).toHaveBeenCalledTimes(1);
+      });
+
+      it('leaves its throttle unstamped when the maintenance queue refuses the job', async () => {
+        vi.mocked(getSettings).mockResolvedValue(TAUTULLI as never);
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: [],
+          autoAttempts: 0,
+          generation: 0,
+          armedAt: new Date().toISOString(),
+        } as never);
+        vi.mocked(listPlexServers).mockResolvedValue([
+          { id: 'plex-a', name: 'Home', machineIdentifier: null },
+        ]);
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValueOnce(null);
+
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValueOnce('maintenance-job-1');
+        await maybeEnqueueImportedHistoryLink(false, noPendingSync);
+
+        expect(maybeEnqueueMaintenanceJob).toHaveBeenCalledTimes(2);
+      });
+
+      it('enqueues the link job on its own throttle, leaving the identity backfill free to enqueue, and never from the sync tail', async () => {
+        const service = new LibrarySyncService();
+        const server = createMockServer();
+        vi.mocked(getSettings).mockResolvedValue(TAUTULLI as never);
+        vi.mocked(getImportedHistoryLinkState).mockResolvedValue({
+          state: 'pending',
+          providerPassDoneServers: [],
+          autoAttempts: 0,
+          generation: 0,
+          armedAt: new Date().toISOString(),
+        } as never);
+        vi.mocked(getSessionsCompressionHorizon).mockResolvedValue(
+          new Date('2026-07-01T00:00:00.000Z')
+        );
+        vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValue('maintenance-job-1');
+
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        expect(maybeEnqueueMaintenanceJob).toHaveBeenCalledWith('link_imported_history', 'system', {
+          trigger: 'auto',
+        });
+
+        await maybeEnqueueImportedHistoryLink(true, noPendingSync);
+        const linkEnqueues = () =>
+          vi
+            .mocked(maybeEnqueueMaintenanceJob)
+            .mock.calls.filter((c) => c[0] === 'link_imported_history');
+        expect(linkEnqueues()).toHaveLength(1);
+
+        _resetImportedHistoryLinkThrottleForTests();
+        vi.mocked(hasStampableSessionsBefore).mockResolvedValue(true);
+        await runPlexSync(service, server);
+
+        expect(maybeEnqueueMaintenanceJob).toHaveBeenCalledWith(
+          'backfill_session_identity',
+          'system'
+        );
+        expect(linkEnqueues()).toHaveLength(1);
+      });
+    });
+
     it('does not truncate a full scan when a page is all extras', async () => {
       const service = new LibrarySyncService();
       const mockServer = createMockServer();
@@ -987,6 +1210,31 @@ describe('LibrarySyncService', () => {
       };
       expect(conflictArgs.set).toHaveProperty('thumbPath');
       expect(conflictArgs.set).not.toHaveProperty('dominantColor');
+    });
+
+    it('writes plexGuid on insert and guards the conflict update with a plex_guid change', async () => {
+      const service = new LibrarySyncService();
+      const serverId = randomUUID();
+      const libraryId = '1';
+      const item = createMockLibraryItem({
+        ratingKey: 'guid-key',
+        plexGuid: 'plex://movie/5d776b59ad5437001f79c6f8',
+      });
+
+      const { insertChain } = mockTransaction();
+
+      await service.upsertItems(serverId, libraryId, [item]);
+
+      expect(insertChain.values).toHaveBeenCalledWith([
+        expect.objectContaining({ plexGuid: 'plex://movie/5d776b59ad5437001f79c6f8' }),
+      ]);
+
+      const conflictArgs = insertChain.onConflictDoUpdate.mock.calls[0]![0] as {
+        set: Record<string, unknown>;
+        setWhere: SQL;
+      };
+      expect(conflictArgs.set).toHaveProperty('plexGuid');
+      expect(renderSql(conflictArgs.setWhere).sql).toContain('plex_guid');
     });
 
     it('should collapse duplicate ratingKeys, keeping the last occurrence', async () => {

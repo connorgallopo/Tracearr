@@ -120,4 +120,153 @@ describe('session identity backfill', () => {
     );
     expect((rows[0] as { media_id: string | null }).media_id).toBeNull();
   });
+
+  it('does not stamp an episode session stored under a show rating key', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 81189,
+      title: 'Breaking Bad',
+      year: 2008,
+      serverId: server.id,
+      ratingKey: 'show-rk',
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'show-rk',
+      mediaType: 'show',
+      tvdbId: 81189,
+      mediaId: showId,
+    });
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: su.id,
+      mediaType: 'episode',
+      ratingKey: 'show-rk',
+    });
+
+    const { updated } = await backfillSessionIdentityBatch(1000);
+    expect(updated).toBe(0);
+
+    const { rows } = await db.execute(
+      sql`SELECT media_id FROM sessions WHERE server_id = ${server.id}`
+    );
+    expect((rows[0] as { media_id: string | null }).media_id).toBeNull();
+  });
+
+  it('unlinks a session linked to a show media row and keeps it unlinked', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 81189,
+      title: 'Breaking Bad',
+      year: 2008,
+      serverId: server.id,
+      ratingKey: 'show-rk',
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'show-rk',
+      mediaType: 'show',
+      tvdbId: 81189,
+      mediaId: showId,
+    });
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: su.id,
+      mediaType: 'episode',
+      ratingKey: 'show-rk',
+      mediaId: showId,
+      showMediaId: showId,
+      imdbId: 'tt0903747',
+      tmdbId: 1396,
+      tvdbId: 81189,
+    });
+
+    const first = await backfillSessionIdentityBatch(1000);
+    expect(first.updated).toBe(1);
+    const second = await backfillSessionIdentityBatch(1000);
+    expect(second.updated).toBe(0);
+
+    const { rows } = await db.execute(sql`
+      SELECT media_id, show_media_id, imdb_id, tmdb_id, tvdb_id
+      FROM sessions WHERE server_id = ${server.id}
+    `);
+    expect(rows[0]).toEqual({
+      media_id: null,
+      show_media_id: null,
+      imdb_id: null,
+      tmdb_id: null,
+      tvdb_id: null,
+    });
+  });
+
+  it('does not stamp a movie library item whose media row is a show', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 81189,
+      title: 'Breaking Bad',
+      year: 2008,
+      serverId: server.id,
+      ratingKey: 'reused-rk',
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'reused-rk',
+      mediaType: 'movie',
+      mediaId: showId,
+    });
+    await createTestSession({ serverId: server.id, serverUserId: su.id, ratingKey: 'reused-rk' });
+
+    await backfillSessionIdentityBatch(1000);
+    const second = await backfillSessionIdentityBatch(1000);
+    expect(second.updated).toBe(0);
+
+    const { rows } = await db.execute(
+      sql`SELECT media_id FROM sessions WHERE server_id = ${server.id}`
+    );
+    expect((rows[0] as { media_id: string | null }).media_id).toBeNull();
+  });
+
+  it('still stamps a Jellyfin unknown session played from a movie library item', async () => {
+    const server = await createTestServer({ type: 'jellyfin' });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const mediaId = await resolveMediaForItem({
+      mediaType: 'movie',
+      imdbId: 'tt0322259',
+      title: '2 Fast 2 Furious',
+      year: 2003,
+      serverId: server.id,
+      ratingKey: 'jf-movie',
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'jf-movie',
+      mediaType: 'movie',
+      imdbId: 'tt0322259',
+      mediaId,
+    });
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: su.id,
+      mediaType: 'unknown',
+      ratingKey: 'jf-movie',
+    });
+
+    const { updated } = await backfillSessionIdentityBatch(1000);
+    expect(updated).toBe(1);
+
+    const { rows } = await db.execute(
+      sql`SELECT media_id FROM sessions WHERE server_id = ${server.id}`
+    );
+    expect((rows[0] as { media_id: string | null }).media_id).toBe(mediaId);
+  });
 });

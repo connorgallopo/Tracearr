@@ -28,6 +28,80 @@ import {
   type TautulliHistoryRecord,
   type TautulliUserRecord,
 } from '../tautulli.js';
+import { getSettings, rearmImportedHistoryLink } from '../settings.js';
+import { db } from '../../db/client.js';
+import { refreshAggregates } from '../../db/timescale.js';
+import {
+  batchGetLibraryItemIdentity,
+  batchResolveMediaByPlexGuid,
+} from '../../jobs/poller/database.js';
+import {
+  createUserMapping,
+  flushInsertBatch,
+  flushUpdateBatch,
+  getServerTrackingStart,
+  queryExistingByExternalIds,
+  queryExistingByTimeKeys,
+  type ExistingSession,
+} from '../import/index.js';
+import { queryChain } from '../../test/helpers.js';
+import type * as ImportModule from '../import/index.js';
+
+vi.mock('../geoip.js', () => ({
+  geoipService: {
+    lookup: vi.fn(() => ({
+      city: null,
+      region: null,
+      country: null,
+      countryCode: null,
+      continent: null,
+      postal: null,
+      lat: null,
+      lon: null,
+    })),
+  },
+}));
+
+vi.mock('../geoasn.js', () => ({
+  geoasnService: { lookup: vi.fn(() => ({ number: null, organization: null })) },
+}));
+
+vi.mock('../../db/client.js', () => ({
+  db: { execute: vi.fn(), select: vi.fn(), update: vi.fn() },
+}));
+
+vi.mock('../../db/timescale.js', () => ({
+  refreshAggregates: vi.fn().mockResolvedValue(undefined),
+  checkAggregateNeedsRebuild: vi.fn().mockResolvedValue({ needsRebuild: false }),
+  uncapDecompressionForTx: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../jobs/maintenanceQueue.js', () => ({
+  enqueueMaintenanceJob: vi.fn().mockResolvedValue('job-1'),
+}));
+
+vi.mock('../../jobs/poller/database.js', () => ({
+  batchGetLibraryItemIdentity: vi.fn(async () => new Map()),
+  batchResolveMediaByPlexGuid: vi.fn(async () => new Map()),
+}));
+
+vi.mock('../settings.js', () => ({
+  getSettings: vi.fn(),
+  rearmImportedHistoryLink: vi.fn(),
+}));
+
+vi.mock('../import/index.js', async (importActual) => {
+  const actual = await importActual<typeof ImportModule>();
+  return {
+    ...actual,
+    createUserMapping: vi.fn(),
+    queryExistingByExternalIds: vi.fn(),
+    queryExistingByTimeKeys: vi.fn(),
+    flushInsertBatch: vi.fn(),
+    flushUpdateBatch: vi.fn(),
+    getServerTrackingStart: vi.fn(),
+  };
+});
 
 // ============================================================================
 // REAL API TEST DATA (captured from actual Tautulli instance)
@@ -503,6 +577,130 @@ describe('TautulliService.getHistory failures', () => {
     expect((err as TautulliApiError).body).toContain('[redacted]');
     expect((err as TautulliApiError).body).not.toContain('super-secret-key');
     expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('TautulliService.getGuidsByRatingKey', () => {
+  let mockFetch: ReturnType<typeof vi.fn>;
+
+  function historyRow(overrides: Record<string, unknown>) {
+    return {
+      rating_key: 101,
+      live: 0,
+      media_type: 'episode',
+      guid: 'plex://episode/aaa?lang=en',
+      reference_id: 7001,
+      ...overrides,
+    };
+  }
+
+  function respondWith(rows: unknown[], extra: { result?: string; recordsFiltered?: number } = {}) {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        response: {
+          result: extra.result ?? 'success',
+          message: null,
+          data: {
+            recordsFiltered: extra.recordsFiltered ?? rows.length,
+            recordsTotal: 9000,
+            data: rows,
+            draw: 1,
+            filter_duration: '0 secs',
+            total_duration: '0 secs',
+          },
+        },
+      }),
+    });
+  }
+
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    global.fetch = mockFetch as typeof global.fetch;
+  });
+
+  it('asks get_history once for every key, ungrouped and without current activity', async () => {
+    respondWith([]);
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    await service.getGuidsByRatingKey(['101', '202', '303']);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const params = new URL(String(mockFetch.mock.calls[0]?.[0])).searchParams;
+    expect(params.get('cmd')).toBe('get_history');
+    expect(params.get('rating_key')).toBe('101,202,303');
+    expect(params.get('grouping')).toBe('0');
+    expect(params.get('include_activity')).toBe('0');
+    expect(params.get('length')).toBe('100000');
+  });
+
+  it('drops live rows and rows that are not movies or episodes, guids and reference ids alike', async () => {
+    respondWith([
+      historyRow({ rating_key: 101 }),
+      historyRow({ rating_key: 101, live: 1, guid: 'plex://episode/live', reference_id: 7002 }),
+      historyRow({
+        rating_key: 101,
+        media_type: 'track',
+        guid: 'plex://track/ccc',
+        reference_id: 7003,
+      }),
+      historyRow({
+        rating_key: 202,
+        media_type: 'movie',
+        guid: 'plex://movie/bbb',
+        reference_id: 7004,
+      }),
+    ]);
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    const history = await service.getGuidsByRatingKey(['101', '202']);
+
+    expect(history).toEqual(
+      new Map([
+        [
+          '101',
+          { guids: new Set(['plex://episode/aaa?lang=en']), referenceIds: new Set(['7001']) },
+        ],
+        ['202', { guids: new Set(['plex://movie/bbb']), referenceIds: new Set(['7004']) }],
+      ])
+    );
+  });
+
+  it('keeps only rows whose own rating key was asked for', async () => {
+    respondWith([
+      historyRow({ rating_key: 101 }),
+      historyRow({ rating_key: 555, guid: 'plex://episode/parent-match' }),
+    ]);
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    const history = await service.getGuidsByRatingKey(['101']);
+
+    expect([...(history?.keys() ?? [])]).toEqual(['101']);
+    expect(history?.get('101')?.guids).toEqual(new Set(['plex://episode/aaa?lang=en']));
+  });
+
+  it('returns both guids for a key whose rows carry two', async () => {
+    respondWith([
+      historyRow({ rating_key: 101 }),
+      historyRow({ rating_key: '101', guid: 'plex://episode/zzz', reference_id: 7005 }),
+    ]);
+
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+    const history = await service.getGuidsByRatingKey(['101']);
+
+    expect(history?.get('101')?.guids).toEqual(
+      new Set(['plex://episode/aaa?lang=en', 'plex://episode/zzz'])
+    );
+  });
+
+  it('returns null on an error result and when fewer rows came back than matched', async () => {
+    const service = new TautulliService('http://localhost:8181', 'api-key');
+
+    respondWith([historyRow({})], { result: 'error' });
+    await expect(service.getGuidsByRatingKey(['101'])).resolves.toBeNull();
+
+    respondWith([historyRow({})], { recordsFiltered: 2 });
+    await expect(service.getGuidsByRatingKey(['101'])).resolves.toBeNull();
   });
 });
 
@@ -1994,5 +2192,524 @@ describe('Change Detection Logic', () => {
     };
 
     expect(hasChanges(existing, record)).toBe(false);
+  });
+});
+
+// ============================================================================
+// IMPORT CUTOFF TESTS
+// ============================================================================
+
+describe('TautulliService.importHistory cutoff and safe updates', () => {
+  const SERVER_ID = 'server-uuid-1234';
+  const SERVER_USER_ID = 'server-user-uuid-1';
+  const CUTOFF = new Date('2025-01-01T00:00:00Z');
+  const PMS_ID = 'pms-1';
+
+  let mockFetch: ReturnType<typeof vi.fn>;
+
+  function jsonResponse(body: unknown) {
+    return { ok: true, json: async () => body };
+  }
+
+  function mockTautulliFetch(historyRecords: unknown[], total: number) {
+    return vi.fn(async (url: string) => {
+      const parsed = new URL(url);
+      const cmd = parsed.searchParams.get('cmd');
+
+      if (cmd === 'arnold') return jsonResponse({ response: { result: 'success' } });
+      if (cmd === 'get_server_info') {
+        return jsonResponse({ response: { result: 'success', data: { pms_identifier: PMS_ID } } });
+      }
+      if (cmd === 'get_users') {
+        return jsonResponse({ response: { result: 'success', message: null, data: [] } });
+      }
+      if (cmd === 'get_history') {
+        const start = Number(parsed.searchParams.get('start') ?? 0);
+        const length = Number(parsed.searchParams.get('length') ?? historyRecords.length);
+        return jsonResponse({
+          response: {
+            result: 'success',
+            message: null,
+            data: {
+              recordsFiltered: total,
+              recordsTotal: total,
+              data: historyRecords.slice(start, start + length),
+              draw: 1,
+              filter_duration: '0 secs',
+              total_duration: '0 secs',
+            },
+          },
+        });
+      }
+      throw new Error(`Unexpected Tautulli cmd in test: ${cmd}`);
+    });
+  }
+
+  function makeRecord(overrides: Partial<TautulliHistoryRecord> = {}): TautulliHistoryRecord {
+    return { ...REAL_MOVIE_RECORD, ...overrides };
+  }
+
+  function makeExisting(overrides: Partial<ExistingSession> = {}): ExistingSession {
+    return {
+      id: 'existing-id',
+      externalSessionId: null,
+      ratingKey: null,
+      startedAt: null,
+      serverUserId: SERVER_USER_ID,
+      totalDurationMs: null,
+      stoppedAt: new Date(0),
+      durationMs: 0,
+      pausedDurationMs: 0,
+      watched: false,
+      sourceVideoCodec: null,
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    vi.mocked(getSettings).mockResolvedValue({
+      tautulliUrl: 'http://localhost:8181',
+      tautulliApiKey: 'test-key',
+    } as Awaited<ReturnType<typeof getSettings>>);
+    vi.mocked(createUserMapping).mockResolvedValue(
+      new Map([[String(REAL_MOVIE_RECORD.user_id), SERVER_USER_ID]])
+    );
+    vi.mocked(getServerTrackingStart).mockResolvedValue(CUTOFF);
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: PMS_ID }]));
+    vi.mocked(queryExistingByExternalIds).mockResolvedValue(new Map());
+    vi.mocked(queryExistingByTimeKeys).mockResolvedValue(new Map());
+    vi.mocked(flushInsertBatch).mockResolvedValue(0);
+    vi.mocked(flushUpdateBatch).mockResolvedValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('passes grouping=1 on get_history requests', async () => {
+    mockFetch = mockTautulliFetch([], 0);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    const historyCall = mockFetch.mock.calls.find((call: unknown[]) =>
+      String(call[0]).includes('cmd=get_history')
+    );
+    expect(historyCall?.[0]).toContain('grouping=1');
+  });
+
+  it('aborts with an error result when the server has no tracking cutoff', async () => {
+    vi.mocked(getServerTrackingStart).mockResolvedValue(null);
+    mockFetch = mockTautulliFetch([], 0);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('cutoff');
+  });
+
+  it('skips records at or after the cutoff before they reach dedup, and imports the one before it', async () => {
+    const cutoffSec = Math.floor(CUTOFF.getTime() / 1000);
+    const before = makeRecord({ reference_id: 1, started: cutoffSec - 3600 });
+    const at = makeRecord({ reference_id: 2, started: cutoffSec });
+    const after = makeRecord({ reference_id: 3, started: cutoffSec + 3600 });
+
+    mockFetch = mockTautulliFetch([before, at, after], 3);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    // If dedup were reached for these, the mismatched stoppedAt below would register as an update.
+    vi.mocked(queryExistingByExternalIds).mockResolvedValue(
+      new Map([
+        [
+          '2',
+          makeExisting({
+            id: 'existing-2',
+            externalSessionId: '2',
+            startedAt: new Date(at.started * 1000),
+          }),
+        ],
+        [
+          '3',
+          makeExisting({
+            id: 'existing-3',
+            externalSessionId: '3',
+            startedAt: new Date(after.started * 1000),
+          }),
+        ],
+      ])
+    );
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(result.imported).toBe(1);
+    expect(result.updated).toBe(0);
+    expect(result.skipped).toBe(2);
+    expect(result.message).toBe(
+      'Import complete: 1 new, 2 skipped (2 started after this server was added to Tracearr)'
+    );
+  });
+
+  it('re-arms imported history linking and clears the provider pass list when the import completes', async () => {
+    mockFetch = mockTautulliFetch([makeRecord({ reference_id: 1 })], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(rearmImportedHistoryLink).toHaveBeenCalledWith({ keepProviderPass: false });
+  });
+
+  it('re-arms imported history linking when an import that already inserted rows fails fatally', async () => {
+    const started = Math.floor(CUTOFF.getTime() / 1000) - 3600;
+    const pages = mockTautulliFetch([makeRecord({ reference_id: 1, started })], 5001);
+    mockFetch = vi.fn(async (url: string) =>
+      new URL(url).searchParams.get('start') === '5000'
+        ? new Response('Unauthorized', { status: 401, statusText: 'Unauthorized' })
+        : pages(url)
+    );
+    global.fetch = mockFetch as typeof global.fetch;
+
+    await expect(TautulliService.importHistory(SERVER_ID)).rejects.toMatchObject({ status: 401 });
+
+    expect(rearmImportedHistoryLink).toHaveBeenCalledWith({ keepProviderPass: false });
+  });
+
+  it('re-arms imported history linking when flushing a batch of counted rows throws', async () => {
+    const started = Math.floor(CUTOFF.getTime() / 1000) - 3600;
+    mockFetch = mockTautulliFetch([makeRecord({ reference_id: 1, started })], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+    vi.mocked(flushInsertBatch).mockRejectedValue(new Error('connection reset'));
+
+    await expect(TautulliService.importHistory(SERVER_ID)).rejects.toThrow('connection reset');
+
+    expect(rearmImportedHistoryLink).toHaveBeenCalledWith({ keepProviderPass: false });
+  });
+
+  it('does not update an existingByRef record whose recorded start differs from the stored start', async () => {
+    const cutoffSec = Math.floor(CUTOFF.getTime() / 1000);
+    const record = makeRecord({ reference_id: 42, started: cutoffSec - 3600, duration: 100 });
+
+    mockFetch = mockTautulliFetch([record], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    vi.mocked(queryExistingByExternalIds).mockResolvedValue(
+      new Map([
+        [
+          '42',
+          makeExisting({
+            id: 'existing-42',
+            externalSessionId: '42',
+            startedAt: new Date((record.started - 999) * 1000),
+          }),
+        ],
+      ])
+    );
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.updated).toBe(0);
+    expect(result.skipped).toBe(1);
+    expect(flushUpdateBatch).not.toHaveBeenCalled();
+  });
+
+  it('refreshes aggregates over a bounded range when a page contains only updates', async () => {
+    const cutoffSec = Math.floor(CUTOFF.getTime() / 1000);
+    const record = makeRecord({
+      reference_id: 7,
+      started: cutoffSec - 3600,
+      duration: 200,
+      watched_status: 1,
+    });
+
+    mockFetch = mockTautulliFetch([record], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    vi.mocked(queryExistingByExternalIds).mockResolvedValue(
+      new Map([
+        [
+          '7',
+          makeExisting({
+            id: 'existing-7',
+            externalSessionId: '7',
+            startedAt: new Date(record.started * 1000),
+          }),
+        ],
+      ])
+    );
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.updated).toBe(1);
+    expect(result.imported).toBe(0);
+    const startedAt = new Date(record.started * 1000);
+    expect(refreshAggregates).toHaveBeenCalledWith({
+      startTime: new Date(startedAt.getTime() - 24 * 60 * 60 * 1000),
+      endTime: new Date(startedAt.getTime() + 24 * 60 * 60 * 1000),
+    });
+  });
+});
+
+describe('TautulliService.importHistory Plex guid fallback', () => {
+  const SERVER_ID = 'server-uuid-1234';
+  const SERVER_USER_ID = 'server-user-uuid-1';
+  const CUTOFF = new Date('2025-01-01T00:00:00Z');
+  const PMS_ID = 'pms-1';
+
+  function jsonResponse(body: unknown) {
+    return { ok: true, json: async () => body };
+  }
+
+  function mockTautulliFetch(historyRecords: unknown[]): ReturnType<typeof vi.fn> {
+    return vi.fn(async (url: string) => {
+      const parsed = new URL(url);
+      const cmd = parsed.searchParams.get('cmd');
+
+      if (cmd === 'arnold') return jsonResponse({ response: { result: 'success' } });
+      if (cmd === 'get_server_info') {
+        return jsonResponse({ response: { result: 'success', data: { pms_identifier: PMS_ID } } });
+      }
+      if (cmd === 'get_users') {
+        return jsonResponse({ response: { result: 'success', message: null, data: [] } });
+      }
+      if (cmd === 'get_history') {
+        return jsonResponse({
+          response: {
+            result: 'success',
+            message: null,
+            data: {
+              recordsFiltered: historyRecords.length,
+              recordsTotal: historyRecords.length,
+              data: historyRecords,
+              draw: 1,
+              filter_duration: '0 secs',
+              total_duration: '0 secs',
+            },
+          },
+        });
+      }
+      throw new Error(`Unexpected Tautulli cmd in test: ${cmd}`);
+    });
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    vi.mocked(getSettings).mockResolvedValue({
+      tautulliUrl: 'http://localhost:8181',
+      tautulliApiKey: 'test-key',
+    } as Awaited<ReturnType<typeof getSettings>>);
+    vi.mocked(createUserMapping).mockResolvedValue(
+      new Map([[String(REAL_MOVIE_RECORD.user_id), SERVER_USER_ID]])
+    );
+    vi.mocked(getServerTrackingStart).mockResolvedValue(CUTOFF);
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: PMS_ID }]));
+    vi.mocked(queryExistingByExternalIds).mockResolvedValue(new Map());
+    vi.mocked(queryExistingByTimeKeys).mockResolvedValue(new Map());
+    vi.mocked(flushInsertBatch).mockResolvedValue(0);
+    vi.mocked(flushUpdateBatch).mockResolvedValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('links an unknown rating key by guid when it resolves to exactly one canonical media', async () => {
+    const guid = REAL_MOVIE_RECORD.guid ?? '';
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+    vi.mocked(batchResolveMediaByPlexGuid).mockResolvedValue(
+      new Map([
+        [
+          guid,
+          { mediaId: 'media-1', showMediaId: null, imdbId: 'tt999', tmdbId: 42, tvdbId: null },
+        ],
+      ])
+    );
+
+    let inserted: Array<Record<string, unknown>> | undefined;
+    vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+      inserted = [...(batch as Array<Record<string, unknown>>)];
+      return batch.length;
+    });
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(batchResolveMediaByPlexGuid).toHaveBeenCalledWith(SERVER_ID, [
+      { guid, mediaType: 'movie' },
+    ]);
+    expect(inserted?.[0]).toMatchObject({
+      mediaId: 'media-1',
+      imdbId: 'tt999',
+      tmdbId: 42,
+      tvdbId: null,
+    });
+  });
+
+  it.each([
+    { tracearr: 'pms-other', label: 'Tautulli monitors a different Plex server' },
+    { tracearr: null, label: 'the server row has no machine identifier' },
+  ])('never falls back to guid when $label', async ({ tracearr }) => {
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: tracearr }]));
+    let inserted: Array<Record<string, unknown>> | undefined;
+    vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+      inserted = [...(batch as Array<Record<string, unknown>>)];
+      return batch.length;
+    });
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(batchResolveMediaByPlexGuid).not.toHaveBeenCalled();
+    expect(inserted?.[0]).toMatchObject({ mediaId: null });
+  });
+
+  it('imports without a guid lookup when Tautulli server info fails', async () => {
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    const history = mockTautulliFetch([record]) as unknown as typeof global.fetch;
+    global.fetch = vi.fn(async (url: string) =>
+      new URL(url).searchParams.get('cmd') === 'get_server_info'
+        ? jsonResponse({ unexpected: true })
+        : history(url)
+    ) as typeof global.fetch;
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(result.imported).toBe(1);
+    expect(batchResolveMediaByPlexGuid).not.toHaveBeenCalled();
+  });
+
+  it('still links by rating key when Tautulli monitors a different Plex server', async () => {
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: 'pms-other' }]));
+    vi.mocked(batchGetLibraryItemIdentity).mockResolvedValueOnce(
+      new Map([
+        [
+          String(REAL_MOVIE_RECORD.rating_key),
+          {
+            mediaId: 'media-by-key',
+            showMediaId: null,
+            imdbId: 'tt555',
+            tmdbId: null,
+            tvdbId: null,
+            parentRatingKey: null,
+            grandparentRatingKey: null,
+            itemMediaType: 'movie',
+          },
+        ],
+      ])
+    );
+    let inserted: Array<Record<string, unknown>> | undefined;
+    vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+      inserted = [...(batch as Array<Record<string, unknown>>)];
+      return batch.length;
+    });
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(batchResolveMediaByPlexGuid).not.toHaveBeenCalled();
+    expect(inserted?.[0]).toMatchObject({ mediaId: 'media-by-key', imdbId: 'tt555' });
+  });
+
+  it('does not fall back to guid when the rating key resolved a row with no mediaId yet', async () => {
+    const ratingKeyStr = String(REAL_MOVIE_RECORD.rating_key);
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+    vi.mocked(batchGetLibraryItemIdentity).mockResolvedValue(
+      new Map([
+        [
+          ratingKeyStr,
+          {
+            mediaId: null,
+            showMediaId: null,
+            imdbId: 'tt777',
+            tmdbId: null,
+            tvdbId: null,
+            parentRatingKey: null,
+            grandparentRatingKey: null,
+            itemMediaType: 'movie',
+          },
+        ],
+      ])
+    );
+    // A guid resolution would be available if the helper were consulted; it must not be.
+    vi.mocked(batchResolveMediaByPlexGuid).mockResolvedValue(
+      new Map([
+        [
+          record.guid ?? '',
+          { mediaId: 'media-1', showMediaId: null, imdbId: 'tt999', tmdbId: 42, tvdbId: null },
+        ],
+      ])
+    );
+    let inserted: Array<Record<string, unknown>> | undefined;
+    vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+      inserted = [...(batch as Array<Record<string, unknown>>)];
+      return batch.length;
+    });
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(batchResolveMediaByPlexGuid).toHaveBeenCalledWith(SERVER_ID, []);
+    expect(inserted?.[0]).toMatchObject({ mediaId: null, imdbId: 'tt777' });
+  });
+
+  it('leaves media_id null when the guid resolves to more than one canonical media', async () => {
+    const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+    // batchResolveMediaByPlexGuid omits a guid entirely once it resolves to more than one id.
+    vi.mocked(batchResolveMediaByPlexGuid).mockResolvedValue(new Map());
+    let inserted: Array<Record<string, unknown>> | undefined;
+    vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+      inserted = [...(batch as Array<Record<string, unknown>>)];
+      return batch.length;
+    });
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(inserted?.[0]).toMatchObject({ mediaId: null });
+  });
+
+  it('never sends a plex://show/ guid or a legacy agent guid to the helper', async () => {
+    const showGuidRecord = {
+      ...REAL_MOVIE_RECORD,
+      reference_id: 501,
+      guid: 'plex://show/5d7768324de0ee001fccac77',
+      started: Math.floor(CUTOFF.getTime() / 1000) - 3600,
+    };
+    const legacyGuidRecord = {
+      ...REAL_MOVIE_RECORD,
+      reference_id: 502,
+      guid: 'com.plexapp.agents.imdb://tt0322259?lang=en',
+      started: Math.floor(CUTOFF.getTime() / 1000) - 3600,
+    };
+    global.fetch = mockTautulliFetch([showGuidRecord, legacyGuidRecord]) as typeof global.fetch;
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(batchResolveMediaByPlexGuid).toHaveBeenCalledWith(SERVER_ID, []);
+  });
+
+  it('never sends a movie record whose guid is a plex://episode/ guid to the helper', async () => {
+    const record = {
+      ...REAL_MOVIE_RECORD,
+      guid: 'plex://episode/5e8338265161b50041c98783',
+      started: Math.floor(CUTOFF.getTime() / 1000) - 3600,
+    };
+    global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+
+    await TautulliService.importHistory(SERVER_ID);
+
+    expect(batchResolveMediaByPlexGuid).toHaveBeenCalledWith(SERVER_ID, []);
   });
 });

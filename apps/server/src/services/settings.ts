@@ -48,8 +48,20 @@ const PUBLIC_DEFAULTS: Settings = {
   preferredPosterServerId: null,
 };
 
+export interface ImportedHistoryLinkState {
+  /** 'done' stops the automatic run after Plex library syncs until something re-arms it */
+  state: 'pending' | 'done';
+  /** Servers whose provider-id pass has finished since the last re-arm */
+  providerPassDoneServers: string[];
+  autoAttempts: number;
+  /** Bumped by every re-arm, so a link job that read an older one cannot write over it */
+  generation: number;
+  /** ISO time of the last re-arm; automatic runs stop a fixed time after it */
+  armedAt: string;
+}
+
 /**
- * Internal-only settings — not exposed in the public Settings API.
+ * Internal-only settings, not exposed in the public Settings API.
  * Add new internal keys here; types, defaults, and filtering are all derived.
  */
 const INTERNAL_DEFAULTS = {
@@ -70,6 +82,13 @@ const INTERNAL_DEFAULTS = {
   // Normalized version the owner last dismissed the what's-new dialog on; 'legacy' marks an
   // install that predates the dialog. Seeded once at boot, so null only before first boot.
   whatsNewLastSeenVersion: null as string | null,
+  // Re-armed by saving Tautulli settings, completing a Tautulli import and adding a Plex server.
+  importedHistoryLink: {
+    state: 'pending',
+    providerPassDoneServers: [],
+    autoAttempts: 0,
+    generation: 0,
+  } as Omit<ImportedHistoryLinkState, 'armedAt'> & { armedAt?: string },
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;
@@ -189,6 +208,65 @@ export async function setSetting<K extends SettingKey>(
   cacheSetting(key, value);
 }
 
+const LINK_GENERATION = sql`COALESCE((${settings.value}->>'generation')::int, 0)`;
+
+/**
+ * The link state with defaults filled in, so a row written before `generation`
+ * existed reads as 0 and one written before `armedAt` existed reads as armed now.
+ */
+export async function getImportedHistoryLinkState(): Promise<ImportedHistoryLinkState> {
+  return {
+    ...INTERNAL_DEFAULTS.importedHistoryLink,
+    armedAt: new Date().toISOString(),
+    ...(await getSetting('importedHistoryLink')),
+  };
+}
+
+/** Re-arm imported history linking and bump its generation in one statement. */
+export async function rearmImportedHistoryLink(options: {
+  keepProviderPass: boolean;
+}): Promise<void> {
+  const armedAt = new Date().toISOString();
+  const reset: Partial<ImportedHistoryLinkState> = { state: 'pending', autoAttempts: 0, armedAt };
+  if (!options.keepProviderPass) reset.providerPassDoneServers = [];
+  const [row] = await db
+    .insert(settings)
+    .values({
+      name: 'importedHistoryLink',
+      value: { ...INTERNAL_DEFAULTS.importedHistoryLink, generation: 1, armedAt },
+    })
+    .onConflictDoUpdate({
+      target: settings.name,
+      set: {
+        value: sql`${settings.value} || ${JSON.stringify(reset)}::jsonb || jsonb_build_object('generation', ${LINK_GENERATION} + 1)`,
+      },
+    })
+    .returning({ value: settings.value });
+  if (row) cacheSetting('importedHistoryLink', row.value as ImportedHistoryLinkState);
+}
+
+/** Write the link state only while the stored generation is still `generation`. */
+export async function setImportedHistoryLinkState(
+  generation: number,
+  value: ImportedHistoryLinkState
+): Promise<boolean> {
+  const rows = await db
+    .insert(settings)
+    .values({ name: 'importedHistoryLink', value })
+    .onConflictDoUpdate({
+      target: settings.name,
+      set: { value },
+      setWhere: sql`${LINK_GENERATION} = ${generation}`,
+    })
+    .returning({ value: settings.value });
+  if (rows.length === 0) {
+    settingsCache.delete('importedHistoryLink');
+    return false;
+  }
+  cacheSetting('importedHistoryLink', value);
+  return true;
+}
+
 // ============================================================================
 // Typed getter functions (used by internal consumers)
 // ============================================================================
@@ -218,6 +296,28 @@ export async function getWatchedThreshold(mediaType: string): Promise<number> {
         : 'watchedThresholdMovie';
   const pct = await getSetting(key);
   return Math.min(100, Math.max(1, pct)) / 100;
+}
+
+export interface WatchedThresholds {
+  movie: number;
+  episode: number;
+  track: number;
+}
+
+export async function getWatchedThresholds(): Promise<WatchedThresholds> {
+  return {
+    movie: await getWatchedThreshold('movie'),
+    episode: await getWatchedThreshold('episode'),
+    track: await getWatchedThreshold('track'),
+  };
+}
+
+export function watchedThresholdFor(thresholds: WatchedThresholds, mediaType: string): number {
+  return mediaType === 'episode'
+    ? thresholds.episode
+    : mediaType === 'track'
+      ? thresholds.track
+      : thresholds.movie;
 }
 
 export async function getNetworkSettings(): Promise<{

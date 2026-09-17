@@ -1074,14 +1074,31 @@ export async function getCompressedSessionChunkRanges(): Promise<ChunkTimeRange[
     WHERE hypertable_name = 'sessions' AND is_compressed = true
     ORDER BY range_end DESC
   `);
+  return toChunkTimeRanges(result.rows);
+}
+
+/**
+ * Time ranges of every sessions chunk, compressed or not, newest first. Empty
+ * when TimescaleDB is absent.
+ */
+export async function getSessionChunkRanges(): Promise<ChunkTimeRange[]> {
+  if (!(await isTimescaleInstalled())) return [];
+  const result = await db.execute(sql`
+    SELECT range_start, range_end
+    FROM timescaledb_information.chunks
+    WHERE hypertable_name = 'sessions'
+    ORDER BY range_end DESC
+  `);
+  return toChunkTimeRanges(result.rows);
+}
+
+function toChunkTimeRanges(rows: unknown[]): ChunkTimeRange[] {
   // node-postgres parses timestamptz to Date, but a raw execute can hand back
   // either depending on the driver path - new Date() accepts both.
-  return (result.rows as Array<{ range_start: string | Date; range_end: string | Date }>).map(
-    (r) => ({
-      start: new Date(r.range_start),
-      end: new Date(r.range_end),
-    })
-  );
+  return (rows as Array<{ range_start: string | Date; range_end: string | Date }>).map((r) => ({
+    start: new Date(r.range_start),
+    end: new Date(r.range_end),
+  }));
 }
 
 /**

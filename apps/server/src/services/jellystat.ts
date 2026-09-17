@@ -1,11 +1,11 @@
 /**
  * Jellystat Backup Import Service
  *
- * Parses Jellystat backup JSON files and imports historical watch data
+ * Parses Jellystat backup files (legacy JSON or 1.1.12 JSONL) and imports historical watch data
  * into Tracearr's sessions table.
  *
  * Key features:
- * - File-based import (JSON upload from Jellystat backup)
+ * - File-based import (JSON or JSONL upload from Jellystat backup)
  * - Optional media enrichment via Jellyfin /Items API
  * - GeoIP lookup for IP addresses
  * - Progress tracking via WebSocket
@@ -14,7 +14,10 @@
 import type {
   JellystatImportProgress,
   JellystatImportResult,
+  JellystatLibraryEpisode,
+  JellystatLibraryItem,
   JellystatPlaybackActivity,
+  JellystatPluginRow,
   SourceAudioDetails,
   SourceVideoDetails,
   StreamAudioDetails,
@@ -22,8 +25,15 @@ import type {
   SubtitleInfo,
   TranscodeInfo,
 } from '@tracearr/shared';
-import { jellystatBackupSchema } from '@tracearr/shared';
+import {
+  jellystatBackupLineSchema,
+  jellystatBackupSchema,
+  jellystatLibraryEpisodeSchema,
+  jellystatLibraryItemSchema,
+  jellystatPluginRowSchema,
+} from '@tracearr/shared';
 import { eq } from 'drizzle-orm';
+import type { z } from 'zod';
 import { db } from '../db/client.js';
 import { servers, sessions } from '../db/schema.js';
 import {
@@ -44,6 +54,7 @@ import {
   createSimpleProgressPublisher,
   createSkippedUserTracker,
   createUserMapping,
+  exceedsRuntime,
   fetchMediaEnrichment,
   flushInsertBatch,
   type MediaEnrichment,
@@ -51,16 +62,27 @@ import {
   type ExistingSession,
   type TimeBounds,
 } from './import/index.js';
+import {
+  buildJellystatRemapIndex,
+  chooseJellystatItemKey,
+  isImportedEpisodeRowRewritten,
+  isRemapVetoed,
+  resolveJellystatItemKey,
+} from './import/jellystatRemapVeto.js';
 import { EmbyClient } from './mediaServer/emby/client.js';
 import { JellyfinClient } from './mediaServer/jellyfin/client.js';
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
+import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
 
 const BATCH_SIZE = 500;
 const DEDUP_BATCH_SIZE = 5000;
 const ENRICHMENT_BATCH_SIZE = 200;
 const PROGRESS_THROTTLE_MS = 2000;
 const PROGRESS_RECORD_INTERVAL = 500;
-const TICKS_TO_MS = 10000; // 100ns ticks to ms
+// Plugin-origin rows (imported === true) carry ActivityDateInserted in the
+// plugin's database timezone, so the true UTC start is only known to within
+// this margin around it.
+const PLUGIN_ORIGIN_UNCERTAINTY_MS = 27 * 60 * 60 * 1000;
 
 // parsePlayMethod moved to utils/transcodeNormalizer.ts as parseJellystatPlayMethod
 
@@ -258,24 +280,134 @@ export function extractJellystatStreamDetails(
   return result;
 }
 
+interface ParsedJellystatBackup {
+  activities: unknown[];
+  libraryItems: JellystatLibraryItem[] | null;
+  libraryEpisodes: JellystatLibraryEpisode[] | null;
+  pluginRows: JellystatPluginRow[] | null;
+}
+
 /**
- * Parse and validate Jellystat backup file structure
- * Returns raw activity records - individual records are validated during import
+ * Keep only the rows of a table that parse, as slim records. Returns null when
+ * the backup excluded the table.
  */
-export function parseJellystatBackup(jsonString: string): unknown[] {
-  const data: unknown = JSON.parse(jsonString);
-  const parsed = jellystatBackupSchema.safeParse(data);
+function projectBackupTable<Schema extends z.ZodType>(
+  rows: unknown[] | undefined,
+  schema: Schema,
+  table: string
+): z.output<Schema>[] | null {
+  if (!rows) return null;
+  const records: z.output<Schema>[] = [];
+  let malformed = 0;
+  for (const row of rows) {
+    const parsed = schema.safeParse(row);
+    if (parsed.success) records.push(parsed.data);
+    else malformed++;
+  }
+  if (malformed > 0) {
+    console.warn(`[Jellystat] Skipped ${malformed} malformed ${table} rows during parsing`);
+  }
+  return records;
+}
+
+/**
+ * Tables of a JSONL backup, keyed by table name. Jellystat's own restore
+ * refuses a row whose table is not the last header, so this does too. The
+ * text is walked in place: a split into lines would hold a second copy of
+ * an upload that can be 500 MB.
+ */
+function readJsonlTables(text: string): Map<string, unknown[]> {
+  const tables = new Map<string, unknown[]>();
+  let currentTable: string | null = null;
+  let lineNumber = 0;
+  let offset = 0;
+  while (offset < text.length) {
+    const newline = text.indexOf('\n', offset);
+    const end = newline === -1 ? text.length : newline;
+    const line = text.slice(offset, end).trim();
+    offset = end + 1;
+    lineNumber++;
+    if (!line) continue;
+
+    let record: unknown;
+    try {
+      record = JSON.parse(line);
+    } catch {
+      throw new Error(`Invalid Jellystat backup: line ${lineNumber} is not valid JSON`);
+    }
+    const parsed = jellystatBackupLineSchema.safeParse(record);
+    if (!parsed.success) {
+      throw new Error(`Invalid Jellystat backup: line ${lineNumber} is not a table or row record`);
+    }
+
+    if (parsed.data.type === 'table') {
+      currentTable = parsed.data.table;
+      if (!tables.has(currentTable)) tables.set(currentTable, []);
+      continue;
+    }
+    const rows = currentTable === null ? undefined : tables.get(currentTable);
+    if (!rows || parsed.data.table !== currentTable) {
+      throw new Error(
+        `Invalid Jellystat backup: line ${lineNumber} holds a ${parsed.data.table} row before that table's header`
+      );
+    }
+    rows.push(parsed.data.data);
+  }
+  return tables;
+}
+
+/**
+ * Parse and validate a Jellystat backup, either the legacy JSON array or the
+ * JSONL Jellystat 1.1.12 writes, told apart by the first character.
+ * Returns raw activity records (validated individually during import) and the
+ * library and plugin tables as slim records, each null when the backup left it out
+ */
+export function parseJellystatBackup(text: string): ParsedJellystatBackup {
+  const root: unknown = /^\s*\{/.test(text)
+    ? [Object.fromEntries(readJsonlTables(text))]
+    : JSON.parse(text);
+  const parsed = jellystatBackupSchema.safeParse(root);
 
   if (!parsed.success) {
     throw new Error(`Invalid Jellystat backup format: ${parsed.error.message}`);
   }
 
-  // Find the section containing playback activity (position varies in backup files)
-  const playbackSection = parsed.data.find(
-    (section): section is { jf_playback_activity: unknown[] } => 'jf_playback_activity' in section
-  );
-  const activities = playbackSection?.jf_playback_activity ?? [];
-  return activities;
+  // Each table sits in its own section, and their order varies between backup files
+  const sections = parsed.data;
+  const findTable = <K extends keyof (typeof sections)[number]>(key: K) =>
+    sections.find((section) => section[key] !== undefined)?.[key];
+
+  return {
+    activities: findTable('jf_playback_activity') ?? [],
+    libraryItems: projectBackupTable(
+      findTable('jf_library_items'),
+      jellystatLibraryItemSchema,
+      'jf_library_items'
+    ),
+    libraryEpisodes: projectBackupTable(
+      findTable('jf_library_episodes'),
+      jellystatLibraryEpisodeSchema,
+      'jf_library_episodes'
+    ),
+    pluginRows: projectBackupTable(
+      findTable('jf_playback_reporting_plugin_data'),
+      jellystatPluginRowSchema,
+      'jf_playback_reporting_plugin_data'
+    ),
+  };
+}
+
+/**
+ * Compute the playback start from ActivityDateInserted (the end time) and duration.
+ */
+function computeActivityStartedAt(activity: JellystatPlaybackActivity): Date {
+  const durationSeconds =
+    typeof activity.PlaybackDuration === 'string'
+      ? parseInt(activity.PlaybackDuration, 10)
+      : activity.PlaybackDuration;
+  const durationMs = isNaN(durationSeconds) ? 0 : durationSeconds * 1000;
+
+  return new Date(new Date(activity.ActivityDateInserted).getTime() - durationMs);
 }
 
 /**
@@ -287,40 +419,15 @@ export function transformActivityToSession(
   serverUserId: string,
   geo: ReturnType<typeof geoipService.lookup>,
   enrichment?: MediaEnrichment,
-  identity?: SessionIdentity
+  identity?: SessionIdentity,
+  ratingKey: string | null = activity.NowPlayingItemId,
+  thresholds?: WatchedThresholds
 ): typeof sessions.$inferInsert {
-  const durationSeconds =
-    typeof activity.PlaybackDuration === 'string'
-      ? parseInt(activity.PlaybackDuration, 10)
-      : activity.PlaybackDuration;
-  const durationMs = isNaN(durationSeconds) ? 0 : durationSeconds * 1000;
-
   const stoppedAt = new Date(activity.ActivityDateInserted);
-  const startedAt = new Date(stoppedAt.getTime() - durationMs);
+  const startedAt = computeActivityStartedAt(activity);
+  const durationMs = stoppedAt.getTime() - startedAt.getTime();
 
-  // != null handles 0 correctly
-  const positionMs =
-    activity.PlayState?.PositionTicks != null
-      ? Math.floor(activity.PlayState.PositionTicks / TICKS_TO_MS)
-      : null;
-
-  // Get PercentComplete from PlayState (available via looseObject but not typed)
-  const playStateAny = activity.PlayState;
-  const percentComplete =
-    typeof playStateAny?.PercentComplete === 'number' ? playStateAny.PercentComplete : null;
-
-  // Calculate totalDurationMs, preferring RuntimeTicks but falling back to PercentComplete
-  // When RuntimeTicks is missing/zero, derive total from: durationMs * 100 / percentComplete
-  let totalDurationMs: number | null = null;
-  if (activity.PlayState?.RuntimeTicks != null && activity.PlayState.RuntimeTicks > 0) {
-    // Primary: use RuntimeTicks directly
-    totalDurationMs = Math.floor(activity.PlayState.RuntimeTicks / TICKS_TO_MS);
-  } else if (percentComplete != null && percentComplete > 0 && durationMs > 0) {
-    // Fallback: derive from PercentComplete (like Tautulli import does)
-    // e.g., if 50% watched and watched 1000ms, total = 2000ms
-    totalDurationMs = Math.round((durationMs * 100) / percentComplete);
-  }
-  // If both are unavailable, totalDurationMs stays null
+  const totalDurationMs = enrichment?.runtimeMs ?? null;
 
   // Detect media type - prefer enrichment data from media server API when available
   // Uses shared parseMediaType for consistency with live session polling
@@ -339,6 +446,11 @@ export function transformActivityToSession(
       mediaType = !hasVideoStream && hasAudioStream ? 'track' : 'movie';
     }
   }
+
+  const watched =
+    thresholds != null &&
+    totalDurationMs != null &&
+    durationMs >= totalDurationMs * watchedThresholdFor(thresholds, mediaType);
 
   // Extract TranscodingInfo for DirectStream vs DirectPlay detection
   // Jellystat exports "DirectStream" for what Emby shows as "DirectPlay"
@@ -372,7 +484,7 @@ export function transformActivityToSession(
     serverUserId,
     sessionKey: activity.Id,
     plexSessionId: null,
-    ratingKey: activity.NowPlayingItemId,
+    ratingKey,
     externalSessionId: activity.Id,
     referenceId: null,
     parentRatingKey: identity?.parentRatingKey ?? null,
@@ -401,9 +513,9 @@ export function transformActivityToSession(
     stoppedAt,
     durationMs,
     totalDurationMs,
-    progressMs: positionMs,
+    progressMs: null,
     pausedDurationMs: 0,
-    watched: activity.PlayState?.Completed ?? false,
+    watched,
     forceStopped: false,
     shortSession: durationMs < 120000,
     ipAddress: extractIpFromEndpoint(activity.RemoteEndPoint),
@@ -482,7 +594,13 @@ export async function importJellystatBackup(
     progress.message = 'Parsing Jellystat backup file...';
     publishProgress(progress);
 
-    const rawActivities = parseJellystatBackup(backupJson);
+    const {
+      activities: rawActivities,
+      libraryItems,
+      libraryEpisodes,
+      pluginRows,
+    } = parseJellystatBackup(backupJson);
+    const remapIndex = buildJellystatRemapIndex(libraryItems, libraryEpisodes, pluginRows);
     progress.totalRecords = rawActivities.length;
     progress.message = `Parsed ${rawActivities.length} records from backup`;
     publishProgress(progress);
@@ -499,6 +617,11 @@ export async function importJellystatBackup(
         filtered: 0,
         errors: 0,
         enriched: 0,
+        unchecked: 0,
+        unlinkedEpisodes: 0,
+        vetoed: 0,
+        pluginUnchecked: 0,
+        overlong: 0,
         message: 'No playback activity records found in backup',
       };
     }
@@ -537,7 +660,10 @@ export async function importJellystatBackup(
       throw new Error(`Jellystat import only supports Jellyfin/Emby servers, got: ${server.type}`);
     }
 
+    const cutoff = server.createdAt;
+
     const userMap = await createUserMapping(serverId);
+    const thresholds = await getWatchedThresholds();
     const enrichmentMap = new Map<string, MediaEnrichment>();
 
     if (enrichMedia) {
@@ -545,7 +671,9 @@ export async function importJellystatBackup(
       progress.message = 'Fetching media metadata from Jellyfin...';
       publishProgress(progress);
 
-      const uniqueMediaIds = [...new Set(activities.map((a) => a.NowPlayingItemId))];
+      const uniqueMediaIds = [
+        ...new Set(activities.flatMap((a) => chooseJellystatItemKey(a, remapIndex).candidates)),
+      ];
       console.log(`[Jellystat] Enriching ${uniqueMediaIds.length} unique media items`);
 
       const clientConfig = {
@@ -590,6 +718,11 @@ export async function importJellystatBackup(
     let skipped = 0;
     let filtered = 0;
     let errors = 0;
+    let unchecked = 0;
+    let unlinkedEpisodes = 0;
+    let vetoed = 0;
+    let pluginUnchecked = 0;
+    let overlong = 0;
 
     const skippedUserTracker = createSkippedUserTracker();
 
@@ -616,7 +749,9 @@ export async function importJellystatBackup(
         existingMap = await queryExistingByExternalIds(serverId, chunkIds, chunkTimeBounds);
       }
 
-      const chunkRatingKeys = [...new Set(chunk.map((a) => a.NowPlayingItemId).filter(Boolean))];
+      const chunkRatingKeys = [
+        ...new Set(chunk.flatMap((a) => chooseJellystatItemKey(a, remapIndex).candidates)),
+      ].filter(Boolean);
       const identityByRatingKey = await batchGetLibraryItemIdentity(serverId, chunkRatingKeys);
 
       const insertBatch: (typeof sessions.$inferInsert)[] = [];
@@ -636,6 +771,19 @@ export async function importJellystatBackup(
 
           // Check if this is a duplicate we've already handled in this import
           if (insertedInThisImport.has(activity.Id)) {
+            skipped++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          // Tracearr already tracks anything at or after the server's cutoff.
+          // Plugin-origin rows store ActivityDateInserted in the plugin's own database
+          // timezone, so their real start is only known to within PLUGIN_ORIGIN_UNCERTAINTY_MS.
+          const isPluginOrigin = (activity as Record<string, unknown>).imported === true;
+          const cutoffCheckTime = isPluginOrigin
+            ? new Date(activity.ActivityDateInserted).getTime() + PLUGIN_ORIGIN_UNCERTAINTY_MS
+            : computeActivityStartedAt(activity).getTime();
+          if (cutoffCheckTime >= cutoff.getTime()) {
             skipped++;
             progress.skippedRecords++;
             continue;
@@ -701,7 +849,15 @@ export async function importJellystatBackup(
             geoCache.set(ipAddress, geo);
           }
 
-          const enrichment = enrichmentMap.get(activity.NowPlayingItemId);
+          const keyChoice = chooseJellystatItemKey(activity, remapIndex);
+          const { ratingKey, identity } = resolveJellystatItemKey(keyChoice, identityByRatingKey);
+          const rewrittenPluginRow = isImportedEpisodeRowRewritten(activity, keyChoice);
+          const isVetoed =
+            rewrittenPluginRow ||
+            (keyChoice.source === 'native' &&
+              keyChoice.checked &&
+              isRemapVetoed(activity, ratingKey, Boolean(activity.EpisodeId), remapIndex));
+          const enrichment = isVetoed ? undefined : enrichmentMap.get(ratingKey);
 
           // Skip theme songs, theme videos, trailers, etc.
           if (enrichment?.filtered) {
@@ -712,16 +868,42 @@ export async function importJellystatBackup(
             continue;
           }
 
-          const identity = identityByRatingKey.get(activity.NowPlayingItemId);
+          const playedMs =
+            new Date(activity.ActivityDateInserted).getTime() -
+            computeActivityStartedAt(activity).getTime();
+          if (exceedsRuntime(playedMs, enrichment?.runtimeMs)) {
+            overlong++;
+            progress.overlongRecords = overlong;
+            progress.skippedRecords++;
+            skipped++;
+            continue;
+          }
+
           const sessionData = transformActivityToSession(
             activity,
             serverId,
             serverUserId,
             geo,
             enrichment,
-            identity
+            isVetoed ? undefined : identity,
+            isVetoed ? null : ratingKey,
+            thresholds
           );
           insertBatch.push(sessionData);
+
+          if (rewrittenPluginRow && pluginRows === null) {
+            pluginUnchecked++;
+            progress.pluginUncheckedRecords = pluginUnchecked;
+          } else if (isVetoed) {
+            vetoed++;
+            progress.vetoedRecords = vetoed;
+          } else if (keyChoice.episodeIdDropped && !identity) {
+            unlinkedEpisodes++;
+            progress.unlinkedEpisodeRecords = unlinkedEpisodes;
+          } else if (!keyChoice.checked) {
+            unchecked++;
+            progress.uncheckedRecords = unchecked;
+          }
 
           // Track date range for bounded aggregate refresh
           if (sessionData.startedAt) {
@@ -817,6 +999,22 @@ export async function importJellystatBackup(
     if (enrichMedia && enrichmentMap.size > 0) {
       message += `, ${enrichmentMap.size} media items enriched`;
     }
+    const plays = (count: number) => (count === 1 ? 'play' : 'plays');
+    if (unlinkedEpisodes > 0) {
+      message += `. ${unlinkedEpisodes} episode ${plays(unlinkedEpisodes)} not linked because the backup left out jf_library_episodes; importing ${unlinkedEpisodes === 1 ? 'it' : 'them'} again will not link ${unlinkedEpisodes === 1 ? 'it' : 'them'}`;
+    }
+    if (unchecked > 0) {
+      message += `. ${unchecked} ${plays(unchecked)} could not be checked for moves to a different title because the backup left out library tables`;
+    }
+    if (pluginUnchecked > 0) {
+      message += `. ${pluginUnchecked} episode ${plays(pluginUnchecked)} from the Playback Reporting plugin not linked because the backup left out jf_playback_reporting_plugin_data`;
+    }
+    if (vetoed > 0) {
+      message += `. ${vetoed} ${plays(vetoed)} not linked because Jellystat may have moved ${vetoed === 1 ? 'it' : 'them'} to a different title`;
+    }
+    if (overlong > 0) {
+      message += `. ${overlong} ${plays(overlong)} skipped because the recorded play time runs past the media runtime`;
+    }
 
     const skippedUsersWarning = skippedUserTracker.formatWarning();
     if (skippedUsersWarning) {
@@ -841,6 +1039,11 @@ export async function importJellystatBackup(
       filtered,
       errors,
       enriched: enrichmentMap.size,
+      unchecked,
+      unlinkedEpisodes,
+      vetoed,
+      pluginUnchecked,
+      overlong,
       message,
       skippedUsers:
         skippedUserTracker.size > 0
@@ -867,6 +1070,11 @@ export async function importJellystatBackup(
       filtered: progress.filteredRecords,
       errors: progress.errorRecords,
       enriched: progress.enrichedRecords,
+      unchecked: progress.uncheckedRecords ?? 0,
+      unlinkedEpisodes: progress.unlinkedEpisodeRecords ?? 0,
+      vetoed: progress.vetoedRecords ?? 0,
+      pluginUnchecked: progress.pluginUncheckedRecords ?? 0,
+      overlong: progress.overlongRecords ?? 0,
       message: `Import failed: ${errorMessage}`,
     };
   }

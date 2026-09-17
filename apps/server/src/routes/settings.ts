@@ -10,7 +10,7 @@ import { db } from '../db/client.js';
 import { users, sessions } from '../db/schema.js';
 import { geoipService } from '../services/geoip.js';
 import { getImageCacheStatus } from '../services/imageCacheSweep.js';
-import { getAllSettings, setSettings } from '../services/settings.js';
+import { getAllSettings, rearmImportedHistoryLink, setSettings } from '../services/settings.js';
 
 // Re-export service getters so existing import paths still work
 export {
@@ -74,6 +74,9 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     }
 
     await setSettings(updates);
+    if (updates.tautulliUrl !== undefined || updates.tautulliApiKey !== undefined) {
+      await rearmImportedHistoryLink({ keepProviderPass: true });
+    }
 
     // Return updated settings with masks
     return getAllSettings();

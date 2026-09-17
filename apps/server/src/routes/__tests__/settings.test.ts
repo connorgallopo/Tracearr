@@ -18,6 +18,7 @@ vi.mock('../../services/settings.js', () => ({
   setSettings: vi.fn(),
   getSettings: vi.fn(),
   getSetting: vi.fn(),
+  rearmImportedHistoryLink: vi.fn(),
   getPollerSettings: vi.fn(),
   getGeoIPSettings: vi.fn(),
   getNetworkSettings: vi.fn(),
@@ -45,7 +46,7 @@ vi.mock('../../services/geoip.js', () => ({
   },
 }));
 
-import { getAllSettings, setSettings } from '../../services/settings.js';
+import { getAllSettings, rearmImportedHistoryLink, setSettings } from '../../services/settings.js';
 import { getImageCacheStatus } from '../../services/imageCacheSweep.js';
 import { settingsRoutes } from '../settings.js';
 
@@ -240,6 +241,23 @@ describe('Settings Routes', () => {
       expect(setSettings).toHaveBeenCalledWith({ allowGuestAccess: true });
       const body = response.json();
       expect(body.allowGuestAccess).toBe(true);
+    });
+
+    it('re-arms imported history linking when Tautulli settings are saved', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: '/settings',
+        payload: { tautulliUrl: 'http://tautulli.local:8181', tautulliApiKey: 'new-key' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(setSettings).toHaveBeenCalledWith({
+        tautulliUrl: 'http://tautulli.local:8181',
+        tautulliApiKey: 'new-key',
+      });
+      expect(rearmImportedHistoryLink).toHaveBeenCalledWith({ keepProviderPass: true });
     });
 
     it('strips provider keys instead of persisting them', async () => {

@@ -1,0 +1,50 @@
+{
+  "version": "2.4.0",
+  "date": "2026-09-16",
+  "changes": [
+    {
+      "type": "new",
+      "text": "Link Imported Plex History links unmatched Tautulli imports so their plays and watched state count"
+    },
+    {
+      "type": "fix",
+      "text": "Tautulli, Jellystat and Playback Reporting imports skip plays that started at or after the server was added"
+    },
+    {
+      "type": "fix",
+      "text": "plays that were linked to a whole show, season, artist or album instead of the item played are unlinked"
+    },
+    {
+      "type": "new",
+      "text": "run Remove Imported Duplicates in Settings → Jobs if an import doubled plays; imports that add watch data are kept"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports link episode plays to the episode; plays Jellystat may have moved to a different title stay unlinked"
+    },
+    {
+      "type": "fix",
+      "text": "Jellystat backups in the JSONL format that Jellystat 1.1.12 writes can be imported"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports take the media runtime from Jellyfin and no longer store a position Jellystat never measured"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports count as watched when the play ran past the watched threshold of the media runtime"
+    },
+    {
+      "type": "fix",
+      "text": "Jellystat and Playback Reporting imports skip plays whose recorded play time runs past the media runtime"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat import says when plugin plays need the Playback Reporting Plugin Data table to link"
+    },
+    {
+      "type": "note",
+      "text": "the first library sync after upgrading rescans every Plex library in full once"
+    }
+  ]
+}

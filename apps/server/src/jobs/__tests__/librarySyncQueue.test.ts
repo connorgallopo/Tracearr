@@ -6,7 +6,9 @@ vi.mock('../../serverState.js', () => ({
 
 const { mockDbServers } = vi.hoisted(() => ({
   mockDbServers: vi.fn(
-    async (): Promise<Array<{ id: string; name: string; type: 'plex' | 'dispatcharr' }>> => []
+    async (): Promise<
+      Array<{ id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' | 'dispatcharr' }>
+    > => []
   ),
 }));
 
@@ -17,7 +19,7 @@ vi.mock('../../db/client.js', () => ({
         const result = mockDbServers();
         return {
           then: result.then.bind(result),
-          where: () => ({ limit: () => result }),
+          where: () => ({ then: result.then.bind(result), limit: () => result }),
         };
       },
     }),
@@ -27,6 +29,7 @@ vi.mock('../../db/client.js', () => ({
 vi.mock('../../services/librarySync.js', () => ({
   librarySyncService: { syncServer: vi.fn() },
   initLibrarySyncRedis: vi.fn(),
+  maybeEnqueueImportedHistoryLink: vi.fn(),
 }));
 
 vi.mock('../../services/sync.js', () => ({
@@ -82,7 +85,7 @@ vi.mock('ioredis', () => ({
 }));
 
 import { Worker } from 'bullmq';
-import { librarySyncService } from '../../services/librarySync.js';
+import { librarySyncService, maybeEnqueueImportedHistoryLink } from '../../services/librarySync.js';
 import { syncServer } from '../../services/sync.js';
 import { enqueueImagePrecache } from '../imagePrecacheQueue.js';
 import { resolvePrecachePass } from '../precachePassPolicy.js';
@@ -91,6 +94,7 @@ import {
   enqueueLibrarySync,
   enqueueLibrarySyncFromEvent,
   getAllActiveLibrarySyncs,
+  hasPendingLibrarySync,
   scheduleAutoSync,
   shutdownLibrarySyncQueue,
   startLibrarySyncWorker,
@@ -428,6 +432,32 @@ describe('getAllActiveLibrarySyncs', () => {
   });
 });
 
+describe('hasPendingLibrarySync', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+  });
+
+  it('counts an active or waiting job for the server, never a delayed scheduler placeholder or another server', async () => {
+    mockQueueGetJobs.mockImplementation(async (states: string[]) =>
+      states.includes('delayed') ? [schedulerJob('srv-1')] : [plainJob('srv-2')]
+    );
+    expect(await hasPendingLibrarySync('srv-1')).toBe(false);
+    expect(await hasPendingLibrarySync('srv-2')).toBe(true);
+
+    mockQueueGetJobs.mockImplementation(async (states: string[]) =>
+      states.includes('delayed') ? [plainJob('srv-1')] : []
+    );
+    expect(await hasPendingLibrarySync('srv-1')).toBe(true);
+  });
+
+  it('counts as pending when the queue is not initialized', async () => {
+    await shutdownLibrarySyncQueue();
+    expect(await hasPendingLibrarySync('srv-1')).toBe(true);
+  });
+});
+
 function fakeSyncResult(overrides: Partial<SyncResult> = {}): SyncResult {
   return {
     serverId: 'srv-1',
@@ -663,5 +693,47 @@ describe('library sync worker - user sync', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     await expect(runJob('auto-sync-srv-1')).resolves.toMatchObject({ success: true });
     expect(librarySyncService.syncServer).toHaveBeenCalled();
+  });
+});
+
+describe('library sync worker - imported history link hand-off', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+  });
+
+  /** Fires the worker's completed handler for a finished sync of a server of `type`. */
+  async function complete(
+    type: 'plex' | 'jellyfin' | 'emby' | 'dispatcharr',
+    returnvalue: unknown
+  ) {
+    mockDbServers.mockResolvedValue([{ id: 'srv-1', name: 'Test Server', type }]);
+    startLibrarySyncWorker();
+    const worker = vi.mocked(Worker).mock.results[0]!.value as { on: ReturnType<typeof vi.fn> };
+    const onCompleted = worker.on.mock.calls.find((c) => c[0] === 'completed')![1] as (
+      job: unknown
+    ) => void;
+    onCompleted({
+      id: 'job-1',
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue,
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+
+  it('hands a completed Plex sync off, saying whether it added items', async () => {
+    await complete('plex', { success: true, results: [fakeSyncResult({ itemsAdded: 2 })] });
+    expect(maybeEnqueueImportedHistoryLink).toHaveBeenCalledWith(true, hasPendingLibrarySync);
+  });
+
+  it('hands off nothing for a non-Plex server or a skipped job', async () => {
+    await complete('jellyfin', { success: true, results: [fakeSyncResult({ itemsAdded: 2 })] });
+    await shutdownLibrarySyncQueue();
+    vi.mocked(Worker).mockClear();
+    initLibrarySyncQueue('redis://localhost:6379');
+    await complete('plex', { skipped: true, reason: 'sync already in progress' });
+    expect(maybeEnqueueImportedHistoryLink).not.toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { sql, type SQLWrapper } from 'drizzle-orm';
 
 const mockDbSelect = vi.fn();
 
@@ -32,6 +33,9 @@ vi.mock('../../../utils/logger.js', () => ({
 }));
 
 import {
+  CONTAINER_MEDIA_TYPES,
+  batchGetLibraryItemIdentity,
+  batchResolveMediaByPlexGuid,
   defaultRecentSessionWindowHours,
   getActiveAutomations,
   invalidateAutomationsCache,
@@ -39,6 +43,7 @@ import {
   maxWindowHoursFromAutomations,
 } from '../database.js';
 import { evaluateRuleAsync } from '../../../services/automations/engine.js';
+import { queryChain, renderCall, renderedJoins, renderSql } from '../../../test/helpers.js';
 import type { EngineAutomation } from '@tracearr/shared';
 import type { EvaluationContext } from '../../../services/automations/types.js';
 
@@ -277,5 +282,129 @@ describe('maxWindowHoursFromAutomations', () => {
 
   it('caps at 168 hours', () => {
     expect(maxWindowHoursFromAutomations([windowedRule(500)])).toBe(168);
+  });
+});
+
+describe('batchGetLibraryItemIdentity', () => {
+  it('never resolves identity from a container library item', async () => {
+    const chain = queryChain(vi.fn, []);
+    mockDbSelect.mockReturnValue(chain);
+
+    await batchGetLibraryItemIdentity('server-1', ['rk-1']);
+
+    const { text, params } = renderCall(chain);
+    expect(text).toMatch(/library_items\.media_type not in \(\$\d+, \$\d+, \$\d+, \$\d+\)/);
+    expect(CONTAINER_MEDIA_TYPES).toEqual(['show', 'season', 'artist', 'album']);
+    expect(params).toEqual(expect.arrayContaining([...CONTAINER_MEDIA_TYPES]));
+  });
+
+  it('never resolves identity from a container media row, keeping items with no media row', async () => {
+    const chain = queryChain(vi.fn, []);
+    mockDbSelect.mockReturnValue(chain);
+
+    await batchGetLibraryItemIdentity('server-1', ['rk-1']);
+
+    const { text } = renderCall(chain);
+    expect(text).toMatch(
+      /\(media\.media_type is null or media\.media_type not in \(\$\d+, \$\d+, \$\d+, \$\d+\)\)/
+    );
+  });
+});
+
+describe('batchResolveMediaByPlexGuid', () => {
+  function row(overrides: Record<string, unknown> = {}) {
+    return {
+      plexGuid: 'plex://movie/abc',
+      itemMediaType: 'movie',
+      canonicalId: 'media-1',
+      mediaType: 'movie',
+      showMediaId: null,
+      imdbId: 'tt123',
+      tmdbId: 1,
+      tvdbId: null,
+      ...overrides,
+    };
+  }
+
+  it('links a guid whose library item and canonical media both match the requested type', async () => {
+    mockDbSelect.mockReturnValue(queryChain(vi.fn, [row()]));
+
+    const result = await batchResolveMediaByPlexGuid('server-1', [
+      { guid: 'plex://movie/abc', mediaType: 'movie' },
+    ]);
+
+    expect(result.get('plex://movie/abc')).toEqual({
+      mediaId: 'media-1',
+      showMediaId: null,
+      imdbId: 'tt123',
+      tmdbId: 1,
+      tvdbId: null,
+    });
+  });
+
+  it('leaves a guid unresolved when it matches two distinct canonical ids', async () => {
+    mockDbSelect.mockReturnValue(
+      queryChain(vi.fn, [row({ canonicalId: 'media-1' }), row({ canonicalId: 'media-2' })])
+    );
+
+    const result = await batchResolveMediaByPlexGuid('server-1', [
+      { guid: 'plex://movie/abc', mediaType: 'movie' },
+    ]);
+
+    expect(result.has('plex://movie/abc')).toBe(false);
+  });
+
+  it('excludes a candidate whose canonical media_type disagrees with its library item, per the Task 2 finding that the two can differ', async () => {
+    mockDbSelect.mockReturnValue(
+      queryChain(vi.fn, [
+        row({ canonicalId: 'media-1' }),
+        row({ canonicalId: 'media-2', itemMediaType: 'movie', mediaType: 'episode' }),
+      ])
+    );
+
+    const result = await batchResolveMediaByPlexGuid('server-1', [
+      { guid: 'plex://movie/abc', mediaType: 'movie' },
+    ]);
+
+    expect(result.get('plex://movie/abc')?.mediaId).toBe('media-1');
+  });
+
+  it('reads the identity and media type from the canonical row a merged-away media row folds into', async () => {
+    const chain = queryChain(vi.fn, []);
+    mockDbSelect.mockReturnValue(chain);
+
+    await batchResolveMediaByPlexGuid('server-1', [
+      { guid: 'plex://movie/abc', mediaType: 'movie' },
+    ]);
+
+    expect(renderedJoins(chain)).toEqual([
+      'media.id = library_items.media_id',
+      'canonical_media.id = coalesce(media.merged_into_id, media.id)',
+    ]);
+    const selected = mockDbSelect.mock.calls[0]?.[0] as Record<string, SQLWrapper>;
+    for (const field of ['canonicalId', 'mediaType', 'showMediaId', 'imdbId', 'tmdbId', 'tvdbId']) {
+      expect(renderSql(sql`${selected[field]}`).sql).toMatch(/^canonical_media\./);
+    }
+  });
+
+  it('queries by server_id and the guid list', async () => {
+    const chain = queryChain(vi.fn, []);
+    mockDbSelect.mockReturnValue(chain);
+
+    await batchResolveMediaByPlexGuid('server-1', [
+      { guid: 'plex://movie/abc', mediaType: 'movie' },
+    ]);
+
+    const { text, params } = renderCall(chain);
+    expect(text).toMatch(/library_items\.server_id = \$\d+/);
+    expect(text).toMatch(/library_items\.plex_guid in \(\$\d+\)/);
+    expect(params).toEqual(expect.arrayContaining(['server-1', 'plex://movie/abc']));
+  });
+
+  it('returns an empty map without querying when there are no guids', async () => {
+    const result = await batchResolveMediaByPlexGuid('server-1', []);
+
+    expect(result.size).toBe(0);
+    expect(mockDbSelect).not.toHaveBeenCalled();
   });
 });

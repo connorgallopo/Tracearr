@@ -99,4 +99,18 @@ describe('Import', () => {
       .find((alert) => alert?.getAttribute('data-variant') === 'warning');
     expect(jellystatNotice).toHaveAttribute('data-variant', 'warning');
   });
+
+  it('accepts a Jellystat .jsonl backup as well as .json and asks for a full backup', () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [{ id: 'jf-1', name: 'Jelly', type: 'jellyfin' }],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
+
+    const { container } = renderImport();
+
+    const input = container.querySelector('input[type="file"][accept]');
+    expect(input).toHaveAttribute('accept', '.json,.jsonl');
+    expect(screen.getByText('import.exportFullBackupHint')).toBeInTheDocument();
+    expect(screen.getByText('import.exportFullBackupHelp')).toBeInTheDocument();
+  });
 });

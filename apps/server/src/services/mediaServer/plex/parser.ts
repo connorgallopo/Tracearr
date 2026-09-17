@@ -16,6 +16,7 @@ import {
   findSelectedElement,
 } from '../../../utils/parsing.js';
 import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
+import { normalizePlexGuid } from '../../../utils/plexGuid.js';
 import type {
   MediaSession,
   MediaUser,
@@ -1662,6 +1663,9 @@ function parseLibraryItem(item: Record<string, unknown>): MediaLibraryItem {
 
     // External IDs
     ...externalIds,
+
+    // Main guid attribute (NOT the Guid array), normalized for cross-server linking
+    plexGuid: normalizePlexGuid(parseOptionalString(item.guid))?.guid ?? null,
 
     genres: parseGenres(item.Genre as Array<{ tag?: string }> | undefined),
 

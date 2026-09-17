@@ -13,13 +13,18 @@ import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
 import { getRedisPrefix, LEGACY_VERSION_SENTINEL, supportsMediaLibrary } from '@tracearr/shared';
 import { Redis } from 'ioredis';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { WS_EVENTS, REDIS_KEYS } from '@tracearr/shared';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { getSetting, setSetting } from '../services/settings.js';
 import { servers } from '../db/schema.js';
-import { librarySyncService, initLibrarySyncRedis } from '../services/librarySync.js';
+import {
+  librarySyncService,
+  initLibrarySyncRedis,
+  maybeEnqueueImportedHistoryLink,
+  type SyncResult,
+} from '../services/librarySync.js';
 import { syncServer } from '../services/sync.js';
 import { getPubSubService } from '../services/cache.js';
 import { enqueueMaintenanceJob, maybeEnqueueMaintenanceJob } from './maintenanceQueue.js';
@@ -365,6 +370,7 @@ export function startLibrarySyncWorker(): void {
       void checkAndTriggerSnapshotBackfill();
     }
     void stampVersionsBackfillComplete();
+    void handOffImportedHistoryLink(job);
   });
 
   console.log('Library sync worker started');
@@ -393,6 +399,27 @@ export function startLibrarySyncWorker(): void {
  * chase the snapshot normalization until its marker lands.
  */
 let normalizationConfirmed = false;
+
+/**
+ * BullMQ emits `completed` only after moving the job out of `active`, so the
+ * link job's readiness check never finds the sync that handed it off.
+ */
+async function handOffImportedHistoryLink(job: Job<LibrarySyncJobData>): Promise<void> {
+  try {
+    const [server] = await db
+      .select({ type: servers.type })
+      .from(servers)
+      .where(eq(servers.id, job.data.serverId));
+    if (server?.type !== 'plex') return;
+    const results = (job.returnvalue as { results?: SyncResult[] } | undefined)?.results ?? [];
+    await maybeEnqueueImportedHistoryLink(
+      results.some((r) => r.itemsAdded > 0),
+      hasPendingLibrarySync
+    );
+  } catch (error) {
+    console.error('[LibrarySync] Imported history link hand-off failed:', error);
+  }
+}
 
 async function stampVersionsBackfillComplete(): Promise<void> {
   try {
@@ -689,6 +716,25 @@ export async function enqueueLibrarySync(serverId: string, userId?: string): Pro
 }
 
 /**
+ * True when a library sync for the server is active, waiting or delayed, and
+ * when the queue is not initialized, since nothing then says there is none. A
+ * job SCHEDULER's parked delayed job (id "repeat:...") is a placeholder for
+ * the next cron slot - possibly hours out - not pending work, so it does not
+ * count. Scheduler jobs that reached waiting/active ARE real work and do.
+ */
+export async function hasPendingLibrarySync(serverId: string): Promise<boolean> {
+  if (!librarySyncQueue) return true;
+  const [runningJobs, delayedJobs] = await Promise.all([
+    librarySyncQueue.getJobs(['active', 'waiting']),
+    librarySyncQueue.getJobs(['delayed']),
+  ]);
+  return (
+    runningJobs.some((job) => job.data.serverId === serverId) ||
+    delayedJobs.some((job) => job.data.serverId === serverId && !isSchedulerJob(job))
+  );
+}
+
+/**
  * Enqueue a targeted sync triggered by a real-time library event (Plex SSE or
  * the Jellyfin/Emby plugin SSE). Uses triggeredBy 'scheduled' so the incremental
  * path stays eligible - unlike a manual sync, an event doesn't warrant forcing
@@ -703,18 +749,8 @@ export async function enqueueLibrarySyncFromEvent(serverId: string): Promise<voi
   if (!librarySyncQueue) return;
 
   // One pending sync per server is all that's ever needed: a sync job reads
-  // the server's current state when it runs. But a job SCHEDULER's parked
-  // delayed job (id "repeat:...") is a placeholder for the next cron slot -
-  // possibly hours out - not pending work, so it must not suppress event
-  // syncs. Scheduler jobs that reached waiting/active ARE real work and do.
-  const [runningJobs, delayedJobs] = await Promise.all([
-    librarySyncQueue.getJobs(['active', 'waiting']),
-    librarySyncQueue.getJobs(['delayed']),
-  ]);
-  const covered =
-    runningJobs.some((job) => job.data.serverId === serverId) ||
-    delayedJobs.some((job) => job.data.serverId === serverId && !isSchedulerJob(job));
-  if (covered) return;
+  // the server's current state when it runs.
+  if (await hasPendingLibrarySync(serverId)) return;
 
   const bucket = Math.floor(Date.now() / EVENT_SYNC_JOB_BUCKET_MS);
   await librarySyncQueue.add(

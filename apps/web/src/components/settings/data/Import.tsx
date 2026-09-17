@@ -403,7 +403,7 @@ function JellystatImportSection({
 
         <div className="ml-8 space-y-4">
           <FileDropzone
-            accept=".json"
+            accept=".json,.jsonl"
             maxSize={500 * 1024 * 1024}
             onFileSelect={handleFileSelect}
             selectedFile={selectedFile}
@@ -411,8 +411,8 @@ function JellystatImportSection({
           />
           <Alert>
             <Info />
-            <AlertTitle>{t('import.exportBackupHint')}</AlertTitle>
-            <AlertDescription>{t('import.exportBackupHelp')}</AlertDescription>
+            <AlertTitle>{t('import.exportFullBackupHint')}</AlertTitle>
+            <AlertDescription>{t('import.exportFullBackupHelp')}</AlertDescription>
           </Alert>
         </div>
       </div>
@@ -661,6 +661,7 @@ export function Import() {
               unknownUserRecords: 0,
               overlapRecords: 0,
               filteredRecords: 0,
+              overlongRecords: 0,
               errorRecords: 0,
               enrichedRecords: 0,
               message:
@@ -826,7 +827,8 @@ export function Import() {
   };
 
   const handleFileSelect = (file: File | null) => {
-    if (file && !file.name.endsWith('.json')) {
+    const name = file?.name.toLowerCase() ?? '';
+    if (file && !name.endsWith('.json') && !name.endsWith('.jsonl')) {
       setJellystatProgress({
         status: 'error',
         totalRecords: 0,
@@ -836,7 +838,7 @@ export function Import() {
         errorRecords: 0,
         filteredRecords: 0,
         enrichedRecords: 0,
-        message: t('import.pleaseSelectJsonFile'),
+        message: t('import.pleaseSelectBackupFile'),
       });
       return;
     }
@@ -907,6 +909,7 @@ export function Import() {
       unknownUserRecords: 0,
       overlapRecords: 0,
       filteredRecords: 0,
+      overlongRecords: 0,
       errorRecords: 0,
       enrichedRecords: 0,
       message: t('import.startingImport'),
@@ -936,6 +939,7 @@ export function Import() {
         unknownUserRecords: 0,
         overlapRecords: 0,
         filteredRecords: 0,
+        overlongRecords: 0,
         errorRecords: 0,
         enrichedRecords: 0,
         message: err instanceof Error ? err.message : 'Import failed',

@@ -29,9 +29,9 @@ import type {
   MaintenanceJobType,
 } from '@tracearr/shared';
 import { WS_EVENTS, classifyByDimensions, RESOLUTION_TIERS } from '@tracearr/shared';
-import { sql, isNotNull, or, and, eq } from 'drizzle-orm';
+import { sql, isNotNull, isNull, inArray, or, and, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { sessions, serverUsers } from '../db/schema.js';
+import { servers, sessions, serverUsers } from '../db/schema.js';
 import { normalizeClient, normalizePlatformName } from '../utils/platformNormalizer.js';
 import {
   bucketMembershipColumns,
@@ -53,6 +53,12 @@ import {
   type FailedRefreshBatch,
 } from '../db/timescale.js';
 import { runSessionIdentityBackfillWalk } from './sessionIdentityBackfill.js';
+import { runImportDuplicateCleanupWalk } from './importDuplicateCleanup.js';
+import {
+  importedHistoryLinkDeps,
+  runImportedHistoryLinkingWalk,
+  type ImportedHistoryLinkDeps,
+} from './importedHistoryLinking.js';
 import {
   INVALID_SNAPSHOT_CONDITION,
   VALID_LIBRARY_ITEM_CONDITION,
@@ -86,6 +92,8 @@ function getMaintenanceJobDescription(type: MaintenanceJobType): string {
     full_aggregate_rebuild: 'Full aggregate rebuild',
     repair_corrupted_chunks: 'Corrupted chunks repair',
     backfill_session_identity: 'Media identity backfill',
+    remove_import_duplicates: 'Import duplicate cleanup',
+    link_imported_history: 'Imported history linking',
   };
   return descriptions[type] || type;
 }
@@ -97,6 +105,8 @@ export interface MaintenanceJobData {
   options?: {
     /** For rebuild_timescale_views: refresh all historical data (slow but complete) */
     fullRefresh?: boolean;
+    /** For link_imported_history: 'auto' when a library sync enqueued it; missing means manual */
+    trigger?: 'manual' | 'auto';
   };
 }
 
@@ -361,6 +371,10 @@ async function processMaintenanceJob(job: Job<MaintenanceJobData>): Promise<Main
       return processRepairCorruptedChunksJob(job);
     case 'backfill_session_identity':
       return processBackfillSessionIdentityJob(job);
+    case 'remove_import_duplicates':
+      return runImportDuplicateCleanup(job);
+    case 'link_imported_history':
+      return runImportedHistoryLinking(job, await importedHistoryLinkDeps(job.data.options));
     default:
       throw new Error(`Unknown maintenance job type: ${job.data.type}`);
   }
@@ -818,11 +832,12 @@ async function processNormalizeCountriesJob(
 /**
  * Fix imported sessions with missing progress data
  *
- * Recalculates progressMs and totalDurationMs for sessions imported from Tautulli
- * that have durationMs but null progress values. Uses the externalSessionId to
- * identify imported sessions.
+ * Tautulli imports made before Tracearr 1.3.9 wrote null for both progressMs and
+ * totalDurationMs. This estimates both for those rows. A row that already has either
+ * value keeps it: Jellystat imports store the runtime from the media server with no
+ * progress, and an estimate must never replace it.
  */
-async function processFixImportedProgressJob(
+export async function processFixImportedProgressJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
   const startTime = Date.now();
@@ -850,20 +865,21 @@ async function processFixImportedProgressJob(
   };
 
   try {
-    // Count sessions that:
-    // - Have an externalSessionId (indicating they came from import)
-    // - Have durationMs set
-    // - Have null progressMs or null totalDurationMs
+    const missingBoth = and(isNull(sessions.progressMs), isNull(sessions.totalDurationMs));
+    const whereCondition = and(
+      isNotNull(sessions.externalSessionId),
+      isNotNull(sessions.durationMs),
+      missingBoth,
+      inArray(
+        sessions.serverId,
+        db.select({ id: servers.id }).from(servers).where(eq(servers.type, 'plex'))
+      )
+    );
+
     const [countResult] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(sessions)
-      .where(
-        and(
-          isNotNull(sessions.externalSessionId),
-          isNotNull(sessions.durationMs),
-          or(sql`${sessions.progressMs} IS NULL`, sql`${sessions.totalDurationMs} IS NULL`)
-        )
-      );
+      .where(whereCondition);
 
     const totalRecords = countResult?.count ?? 0;
     activeJobProgress.totalRecords = totalRecords;
@@ -896,18 +912,10 @@ async function processFixImportedProgressJob(
     while (totalProcessed < totalRecords) {
       // Fetch batch of sessions
       // Use cursor-based pagination (id > lastId) to ensure we process each record exactly once
-      const whereCondition = and(
-        isNotNull(sessions.externalSessionId),
-        isNotNull(sessions.durationMs),
-        or(sql`${sessions.progressMs} IS NULL`, sql`${sessions.totalDurationMs} IS NULL`)
-      );
-
       const batch = await db
         .select({
           id: sessions.id,
           durationMs: sessions.durationMs,
-          progressMs: sessions.progressMs,
-          totalDurationMs: sessions.totalDurationMs,
           watched: sessions.watched,
           mediaType: sessions.mediaType,
         })
@@ -936,9 +944,9 @@ async function processFixImportedProgressJob(
             continue;
           }
 
-          // Calculate totalDurationMs based on watched status
+          // Estimate totalDurationMs from watched status
           // If watched = true, assume they completed ~85% (typical watch threshold)
-          // If watched = false, we don't know - skip these to avoid showing 100%
+          // If watched = false, use the median length for the media type, or the watch time if longer
           // Note: This is a best-effort fix for legacy Tautulli imports
           let totalDurationMs: number;
           let progressMs: number;
@@ -963,12 +971,6 @@ async function processFixImportedProgressJob(
             progressMs = durationMs;
           }
 
-          // Check if update is actually needed
-          if (session.progressMs === progressMs && session.totalDurationMs === totalDurationMs) {
-            totalSkipped++;
-            continue;
-          }
-
           updates.push({
             id: session.id,
             progressMs,
@@ -984,14 +986,16 @@ async function processFixImportedProgressJob(
       if (updates.length > 0) {
         for (const update of updates) {
           try {
-            await db
+            const written = await db
               .update(sessions)
               .set({
                 progressMs: update.progressMs,
                 totalDurationMs: update.totalDurationMs,
               })
-              .where(eq(sessions.id, update.id));
-            totalUpdated++;
+              .where(and(eq(sessions.id, update.id), missingBoth))
+              .returning({ id: sessions.id });
+            if (written.length > 0) totalUpdated++;
+            else totalSkipped++;
           } catch (error) {
             console.error(`[Maintenance] Error updating session ${update.id}:`, error);
             totalErrors++;
@@ -1186,19 +1190,106 @@ export async function processRebuildTimescaleViewsJob(
 async function processBackfillSessionIdentityJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
+  return runSessionMaintenanceWalk(job, {
+    type: 'backfill_session_identity',
+    startMessage: 'Backfilling media identity onto history sessions...',
+    progressMessage: (total) => `Stamped identity onto ${total.toLocaleString()} sessions...`,
+    completeMessage: (total) =>
+      `Completed! Stamped identity onto ${total.toLocaleString()} sessions`,
+    resultMessage: (total) => `Stamped identity onto ${total} sessions`,
+    failurePrefix: 'Identity backfill skipped',
+    walk: async (onBatch, onCommit) => ({
+      ...(await runSessionIdentityBackfillWalk({
+        batchSize: 5000,
+        getCompressedRanges: getCompressedSessionChunkRanges,
+        onBatch,
+        onCommit,
+      })),
+      details: '',
+    }),
+  });
+}
+
+/**
+ * Delete imported sessions that duplicate a tracked play without losing anything.
+ * Manual only: never enqueued automatically.
+ */
+export async function runImportDuplicateCleanup(
+  job: Job<MaintenanceJobData>
+): Promise<MaintenanceJobResult> {
+  return runSessionMaintenanceWalk(job, {
+    type: 'remove_import_duplicates',
+    startMessage: 'Looking for imported sessions that duplicate tracked history...',
+    progressMessage: (total) => `Checked ${total.toLocaleString()} duplicate pairs...`,
+    completeMessage: (_total, details) => `Completed! ${details}`,
+    resultMessage: (_total, details) => details,
+    failurePrefix: 'Import duplicate cleanup skipped',
+    walk: (onBatch, onCommit) => runImportDuplicateCleanupWalk({ onBatch, onCommit }),
+  });
+}
+
+/**
+ * Link orphaned imported Plex sessions to canonical media by provider id and by
+ * the Plex guid Tautulli recorded. Runs from Settings > Jobs and after Plex
+ * library syncs until its link state is done.
+ */
+export async function runImportedHistoryLinking(
+  job: Job<MaintenanceJobData>,
+  deps: ImportedHistoryLinkDeps
+): Promise<MaintenanceJobResult> {
+  return runSessionMaintenanceWalk(job, {
+    type: 'link_imported_history',
+    startMessage: 'Linking imported Plex history to library media...',
+    progressMessage: (total) => `Linked ${total.toLocaleString()} imported plays...`,
+    completeMessage: (_total, details) => `Completed! ${details}`,
+    resultMessage: (_total, details) => details,
+    failurePrefix: 'Imported history linking skipped',
+    walk: (onBatch, onCommit) => runImportedHistoryLinkingWalk({ ...deps, onBatch, onCommit }),
+  });
+}
+
+/**
+ * Shared tail of the maintenance jobs that walk the sessions hypertable: runs
+ * the walk with sessions compression paused, publishes progress and extends
+ * the job lock after every batch, refreshes the continuous aggregates from the
+ * earliest committed started_at, and fails the job if any range or refresh
+ * batch was skipped.
+ *
+ * The walk reports each committed batch's oldest started_at through onCommit,
+ * so a walk that throws after committing still gets its refresh before the
+ * job fails. Only a lost lock skips it: another worker may already own the job.
+ */
+export async function runSessionMaintenanceWalk(
+  job: Job<MaintenanceJobData>,
+  opts: {
+    type: MaintenanceJobType;
+    startMessage: string;
+    progressMessage: (total: number) => string;
+    completeMessage: (total: number, details: string) => string;
+    resultMessage: (total: number, details: string) => string;
+    failurePrefix: string;
+    walk: (
+      onBatch: (total: number) => Promise<void>,
+      onCommit: (oldest: Date | null) => void
+    ) => Promise<{
+      total: number;
+      failedRanges: string[];
+      details: string;
+    }>;
+  }
+): Promise<MaintenanceJobResult> {
   const startTime = Date.now();
   const pubSubService = getPubSubService();
-  const BATCH = 5000;
 
   activeJobProgress = {
-    type: 'backfill_session_identity',
+    type: opts.type,
     status: 'running',
     totalRecords: 0,
     processedRecords: 0,
     updatedRecords: 0,
     skippedRecords: 0,
     errorRecords: 0,
-    message: 'Backfilling media identity onto history sessions...',
+    message: opts.startMessage,
     startedAt: new Date().toISOString(),
   };
 
@@ -1208,75 +1299,106 @@ async function processBackfillSessionIdentityJob(
     }
   };
 
-  try {
-    await publishProgress();
+  let lastLockExtension = Date.now();
+  let lockLost = false;
+  let earliest: Date | null = null;
 
-    let lastLockExtension = Date.now();
+  const extendLock = async () => {
+    try {
+      await extendJobLock(job);
+    } catch (err) {
+      lockLost = true;
+      throw err;
+    }
+  };
 
-    // Ordering is load-bearing: the chunk list must be read AFTER compression is
-    // paused, or a chunk compressed in between would land in pass 1's unbounded window.
-    const { total, earliest, failedRanges } = await withSessionsCompressionPaused(() =>
-      runSessionIdentityBackfillWalk({
-        batchSize: BATCH,
-        getCompressedRanges: getCompressedSessionChunkRanges,
-        onBatch: async (runningTotal) => {
-          if (activeJobProgress) {
-            activeJobProgress.processedRecords = runningTotal;
-            activeJobProgress.updatedRecords = runningTotal;
-            activeJobProgress.message = `Stamped identity onto ${runningTotal.toLocaleString()} sessions...`;
-            await publishProgress();
-          }
-          await job.updateProgress(runningTotal);
+  const refreshFrom = async (start: Date): Promise<string[]> => {
+    // A full-history walk hands back a multi-year window, so refresh it in
+    // batches rather than one CALL per aggregate that would outlive the job
+    // lock. safeFullRefreshAggregate's onProgress is sync-typed, so a
+    // lock-loss rejection can't be awaited in place - capture it and rethrow
+    // once the loop returns (same shape as processRebuildTimescaleViewsJob).
+    let lockLostMessage: string | null = null;
+    const refreshEnd = new Date();
+    // Catalog-driven, not the static aggregate list: getTimescaleStatus reads
+    // the continuous-aggregate catalog filtered to the sessions hypertable, so
+    // this skips cleanly on plain postgres and never refreshes aggregates that
+    // don't exist or belong to library_snapshots (the job only writes sessions
+    // rows). It's the same call the stats routes and the health tick gate on.
+    const timescale = await getTimescaleStatus();
+    const aggregates = timescale.extensionInstalled ? timescale.continuousAggregates : [];
+    const refreshFailures: FailedRefreshBatch[] = [];
+
+    for (const aggregate of aggregates) {
+      // Bail the moment the lock is gone - refreshing the remaining aggregates
+      // would be minutes of work another worker may already be redoing.
+      if (lockLostMessage) break;
+      const failures = await safeFullRefreshAggregate(aggregate, start, refreshEnd, {
+        onProgress: () => {
           if (Date.now() - lastLockExtension > LOCK_EXTENSION_INTERVAL) {
-            await extendJobLock(job);
+            extendLock().catch((err: unknown) => {
+              lockLostMessage = err instanceof Error ? err.message : String(err);
+            });
             lastLockExtension = Date.now();
           }
         },
-      })
-    );
+      });
+      refreshFailures.push(...failures);
+    }
 
-    const allFailures = [...failedRanges];
+    if (lockLostMessage) {
+      throw new Error(lockLostMessage);
+    }
+    return refreshFailures.map((f) => `refresh ${f.aggregate} [${f.startDate} → ${f.endDate}]`);
+  };
 
-    if (earliest) {
-      // A full-history walk hands back a multi-year window, so refresh it in
-      // batches rather than one CALL per aggregate that would outlive the job
-      // lock. safeFullRefreshAggregate's onProgress is sync-typed, so a
-      // lock-loss rejection can't be awaited in place - capture it and rethrow
-      // once the loop returns (same shape as processRebuildTimescaleViewsJob).
-      let lockLostMessage: string | null = null;
-      const refreshEnd = new Date();
-      // Catalog-driven, not the static aggregate list: getTimescaleStatus reads
-      // the continuous-aggregate catalog filtered to the sessions hypertable, so
-      // this skips cleanly on plain postgres and never refreshes aggregates that
-      // don't exist or belong to library_snapshots (the job only writes sessions
-      // rows). It's the same call the stats routes and the health tick gate on.
-      const timescale = await getTimescaleStatus();
-      const aggregates = timescale.extensionInstalled ? timescale.continuousAggregates : [];
-      const refreshFailures: FailedRefreshBatch[] = [];
+  try {
+    await publishProgress();
 
-      for (const aggregate of aggregates) {
-        // Bail the moment the lock is gone - refreshing the remaining aggregates
-        // would be minutes of work another worker may already be redoing.
-        if (lockLostMessage) break;
-        const failures = await safeFullRefreshAggregate(aggregate, earliest, refreshEnd, {
-          onProgress: () => {
+    let walked: Awaited<ReturnType<typeof opts.walk>>;
+    try {
+      // Ordering is load-bearing: the walk must read its chunk list inside the
+      // pause, or a chunk compressed in between would escape its window bounds.
+      walked = await withSessionsCompressionPaused(() =>
+        opts.walk(
+          async (runningTotal) => {
+            if (activeJobProgress) {
+              activeJobProgress.processedRecords = runningTotal;
+              activeJobProgress.updatedRecords = runningTotal;
+              activeJobProgress.message = opts.progressMessage(runningTotal);
+              await publishProgress();
+            }
+            await job.updateProgress(runningTotal);
             if (Date.now() - lastLockExtension > LOCK_EXTENSION_INTERVAL) {
-              extendJobLock(job).catch((err: unknown) => {
-                lockLostMessage = err instanceof Error ? err.message : String(err);
-              });
+              await extendLock();
               lastLockExtension = Date.now();
             }
           },
-        });
-        refreshFailures.push(...failures);
-      }
-
-      if (lockLostMessage) {
-        throw new Error(lockLostMessage);
-      }
-      allFailures.push(
-        ...refreshFailures.map((f) => `refresh ${f.aggregate} [${f.startDate} → ${f.endDate}]`)
+          (oldest) => {
+            if (oldest && (!earliest || oldest < earliest)) earliest = oldest;
+          }
+        )
       );
+    } catch (walkError) {
+      if (earliest && !lockLost) {
+        try {
+          const refreshFailures = await refreshFrom(earliest);
+          if (refreshFailures.length > 0) {
+            console.error(
+              `[${opts.type}] Refresh after the failed walk skipped: ${refreshFailures.join(', ')}`
+            );
+          }
+        } catch (refreshError) {
+          console.error(`[${opts.type}] Refresh after the failed walk failed:`, refreshError);
+        }
+      }
+      throw walkError;
+    }
+    const { total, failedRanges, details } = walked;
+
+    const allFailures = [...failedRanges];
+    if (earliest) {
+      allFailures.push(...(await refreshFrom(earliest)));
     }
 
     // Fail-closed like every other handler in this file: skipped ranges and
@@ -1286,14 +1408,14 @@ async function processBackfillSessionIdentityJob(
       const shown = allFailures.slice(0, 5).join(', ');
       const more = allFailures.length > 5 ? ` … and ${allFailures.length - 5} more` : '';
       throw new Error(
-        `Identity backfill skipped ${allFailures.length} range(s)/refresh batch(es): ${shown}${more}`
+        `${opts.failurePrefix} ${allFailures.length} range(s)/refresh batch(es): ${shown}${more}`
       );
     }
 
     const durationMs = Date.now() - startTime;
     if (activeJobProgress) {
       activeJobProgress.status = 'complete';
-      activeJobProgress.message = `Completed! Stamped identity onto ${total.toLocaleString()} sessions in ${Math.round(durationMs / 1000)}s`;
+      activeJobProgress.message = `${opts.completeMessage(total, details)} in ${Math.round(durationMs / 1000)}s`;
       activeJobProgress.completedAt = new Date().toISOString();
       await publishProgress();
       activeJobProgress = null;
@@ -1301,13 +1423,13 @@ async function processBackfillSessionIdentityJob(
 
     return {
       success: true,
-      type: 'backfill_session_identity',
+      type: opts.type,
       processed: total,
       updated: total,
       skipped: 0,
       errors: 0,
       durationMs,
-      message: `Stamped identity onto ${total} sessions`,
+      message: opts.resultMessage(total, details),
     };
   } catch (error) {
     if (activeJobProgress) {
@@ -3040,6 +3162,7 @@ export async function getMaintenanceJobHistory(limit: number = 10): Promise<
     createdAt: number;
     finishedAt?: number;
     result?: MaintenanceJobResult;
+    trigger: 'manual' | 'auto';
   }>
 > {
   if (!maintenanceQueue) {
@@ -3055,6 +3178,8 @@ export async function getMaintenanceJobHistory(limit: number = 10): Promise<
     createdAt: job.timestamp ?? 0,
     finishedAt: job.finishedOn,
     result: job.returnvalue as MaintenanceJobResult | undefined,
+    trigger:
+      job.data.userId === 'system' || job.data.options?.trigger === 'auto' ? 'auto' : 'manual',
   }));
 }
 
