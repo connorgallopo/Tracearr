@@ -70,7 +70,11 @@
   },
   "resources": {
     "cpu": "",
-    "ram": ""
+    "ram": "",
+    "item": "",
+    "noData": "",
+    "system": "",
+    "waiting": ""
   },
   "notifications": {
     "testSent": "Test verzonden",
@@ -98,11 +102,19 @@
     "criticalOverrideDescription": "Ernstige overtredingen worden ook tijdens rustige uren nog gemeld",
     "rateLimitDescription": "Snelheidslimieten voorkomen spam met meldingen. Huidige limieten: {{perMinute}}/min, {{perHour}}/uur.",
     "sendTestNotification": "Stuur Test Notificatie",
-    "testDescription": "Controleer of pushmeldingen correct werken"
-  },
-  "dashboard": {
-    "today": "VANDAAG",
-    "hrs": "uren"
+    "testDescription": "Controleer of pushmeldingen correct werken",
+    "pushNotifications": "",
+    "ruleTypes": {
+      "accountInactivity": "",
+      "deviceVelocity": "",
+      "geoRestriction": "",
+      "impossibleTravel": "",
+      "simultaneousLocations": ""
+    },
+    "severityAll": "",
+    "severityHighOnly": "",
+    "severityWarningUp": "",
+    "violationTypes": ""
   },
   "session": {
     "streamTerminated": "Stream Beëindigd",
@@ -117,30 +129,51 @@
     "moreDevices": "+{{count}} meer apparaten",
     "noViolations": "Geen overtredingen",
     "noTerminations": "Geen stream stops",
-    "trustLow": "Laag",
-    "trustMedium": "",
-    "trustHigh": "Hoog"
+    "lastSeen": "",
+    "terminatedBy": "",
+    "trustScoreConfirm": "",
+    "trustScoreRange": ""
   },
   "violation": {
     "violationNotFoundDesc": "Deze overtreding is mogelijk afgewezen of niet langer beschikbaar.",
-    "customRule": "Aangepaste regel",
-    "streamComparison": "Stream Vergelijking",
     "ips": ""
   },
   "alerts": {
-    "done": "Klaar",
-    "clearFilters": "Filters opschonen"
+    "clearFilters": "Filters opschonen",
+    "acknowledgeAll": "",
+    "acknowledgeAllBody": "",
+    "acknowledgeAllBodySeverity": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "all": "",
+    "allClear": "",
+    "allServers": "",
+    "noAlertsRecorded": "",
+    "noMatches": "",
+    "pendingCount": ""
   },
   "history": {
-    "noHistoryFound": "Geen historie gevonden",
     "adjustFilters": "Probeer je filters aan te passen",
-    "historyWillAppear": "De sessiegeschiedenis verschijnt hier zodra gebruikers beginnen met streamen"
+    "historyWillAppear": "De sessiegeschiedenis verschijnt hier zodra gebruikers beginnen met streamen",
+    "filters": {
+      "clearCount": "",
+      "countries": "",
+      "filterBy": "",
+      "mediaType": "",
+      "noCountries": "",
+      "noPlatforms": "",
+      "noUsers": "",
+      "sectionSelected": ""
+    }
   },
   "users": {
     "owner": "Eigenaar",
     "noUsers": "Geen Gebruikers",
     "usersWillAppear": "Gebruikers verschijnen hier nadat de synchronisatie met uw mediaserver is voltooid",
-    "noUsersMatch": "Geen gebruikers overeengekomen met \"{{query}}\""
+    "noUsersMatch": "Geen gebruikers overeengekomen met \"{{query}}\"",
+    "joinedRelative": "",
+    "sortActive": "",
+    "sortTrust": ""
   },
   "activity": {
     "playsOverTime": "Weergaven over tijd",
@@ -160,7 +193,6 @@
     "allServers": "Alle servers"
   },
   "reconnected": "Opnieuw verbonden",
-  "actionsExecuted": "Acties uitgevoerd",
   "serverScope": {
     "single": "Alleen {{name}} weergeven"
   },
@@ -169,10 +201,70 @@
     "alerts": "Waarschuwingen",
     "alertsCount": "Waarschuwingen, {{count}} ongelezen",
     "settings": "Instellingen",
-    "trustScore": ""
+    "trustScore": "",
+    "decreaseTrustScore": "",
+    "filtersActive": "",
+    "increaseTrustScore": "",
+    "sortAscending": "",
+    "sortDescending": ""
   },
   "map": {
     "noData": "Geen locatiegegevens beschikbaar",
     "unavailable": "Kaart niet beschikbaar"
+  },
+  "automations": {
+    "conditions_one": "",
+    "conditions_other": "",
+    "editOnWeb": "",
+    "emptyDescription": "",
+    "kind": {
+      "notification": "",
+      "policy": ""
+    },
+    "lastRun": "",
+    "truncated": "",
+    "turnOffFailed": "",
+    "turnOnFailed": "",
+    "unsupportedDescription": "",
+    "unsupportedTitle": "",
+    "versionCheckFailed": ""
+  },
+  "charts": {
+    "weekOf": ""
+  },
+  "push": {
+    "violationTitle": ""
+  },
+  "streamDetails": {
+    "bitrate": "",
+    "channels": "",
+    "codec": "",
+    "color": "",
+    "container": "",
+    "forced": "",
+    "format": "",
+    "framerate": "",
+    "hwDecode": "",
+    "hwEncode": "",
+    "mono": "",
+    "noDetails": "",
+    "notAvailable": "",
+    "profile": "",
+    "sampleRate": "",
+    "source": "",
+    "speed": "",
+    "stereo": "",
+    "stream": "",
+    "subtitles": "",
+    "throttled": "",
+    "transcodeDetails": ""
+  },
+  "widget": {
+    "asOf": "",
+    "serversDown_one": "",
+    "serversDown_other": "",
+    "signedOut": "",
+    "transcodes_one": "",
+    "transcodes_other": ""
   }
 }
