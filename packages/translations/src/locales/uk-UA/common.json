@@ -86,7 +86,8 @@
     "directStream": "Прямий потік",
     "transcode": "Перекодування",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "Низька",
@@ -118,7 +119,12 @@
     "last30Days": "Останні 30 днів",
     "lastYear": "Останній рік",
     "byDay": "За день",
-    "byHour": "За годину"
+    "byHour": "За годину",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "км",
@@ -182,7 +188,8 @@
     "segments": "",
     "streamDetails": "",
     "transcodeReason": "",
-    "loadMore": "Завантажити більше"
+    "loadMore": "Завантажити більше",
+    "playback": ""
   },
   "search": {
     "placeholder": "Пошук...",
@@ -286,7 +293,11 @@
     "location_one": "",
     "location_other": "",
     "device_one": "",
-    "device_other": ""
+    "device_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "Змін не виявлено"
