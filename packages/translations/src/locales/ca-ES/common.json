@@ -86,7 +86,8 @@
     "directStream": "Transmissió en directe",
     "transcode": "Transcodificació",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "Reduïda",
@@ -118,7 +119,12 @@
     "last30Days": "Darrers 30 dies",
     "lastYear": "Darrer any",
     "byDay": "Per dia",
-    "byHour": "Per hora"
+    "byHour": "Per hora",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "",
@@ -127,7 +133,7 @@
     "mph": ""
   },
   "labels": {
-    "date": "",
+    "date": "Data",
     "user": "Usuari",
     "content": "Contingut",
     "platform": "Plataforma",
@@ -182,7 +188,8 @@
     "segments": "",
     "streamDetails": "Detalls de la transmissió",
     "transcodeReason": "Raó per a la transcodificació",
-    "loadMore": "Veure més"
+    "loadMore": "Veure més",
+    "playback": ""
   },
   "search": {
     "placeholder": "Cerca...",
@@ -286,7 +293,11 @@
     "location_one": "{{count}} ubicació",
     "location_other": "{{count}} ubicacions",
     "device_one": "{{count}} dispositiu",
-    "device_other": "{{count}} dispositius"
+    "device_other": "{{count}} dispositius",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "No s'han detectat canvis"
