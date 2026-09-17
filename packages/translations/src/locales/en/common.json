@@ -86,7 +86,8 @@
     "directStream": "Direct Stream",
     "transcode": "Transcode",
     "hwTranscode": "HW Transcode",
-    "burnIn": "Burn-in"
+    "burnIn": "Burn-in",
+    "watched": "Watched"
   },
   "severity": {
     "low": "Low",
@@ -118,7 +119,12 @@
     "last30Days": "Last 30 Days",
     "lastYear": "Last Year",
     "byDay": "By Day",
-    "byHour": "By Hour"
+    "byHour": "By Hour",
+    "short7Days": "7d",
+    "short30Days": "30d",
+    "shortYear": "1y",
+    "shortAll": "All",
+    "timeRange": "Time range"
   },
   "units": {
     "km": "km",
@@ -182,7 +188,8 @@
     "segments": "segments",
     "streamDetails": "Stream Details",
     "transcodeReason": "Transcode Reason",
-    "loadMore": "Load More"
+    "loadMore": "Load More",
+    "playback": "Playback"
   },
   "search": {
     "placeholder": "Search...",
@@ -286,7 +293,11 @@
     "location_one": "{{count}} location",
     "location_other": "{{count}} locations",
     "device_one": "{{count}} device",
-    "device_other": "{{count}} devices"
+    "device_other": "{{count}} devices",
+    "play_one": "{{count}} play",
+    "play_other": "{{count}} plays",
+    "segment_one": "{{count}} segment",
+    "segment_other": "{{count}} segments"
   },
   "messages": {
     "noChangesDetected": "No changes detected"
