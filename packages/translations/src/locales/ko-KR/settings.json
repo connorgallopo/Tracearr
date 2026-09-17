@@ -424,7 +424,7 @@
     "serverTimezone": "서버 시간대",
     "serverTimezoneHelp": "브라우저가 아닌 미디어 서버 호스트에 설정된 시간대와 일치해야 합니다. Playback Reporting의 타임스탬프는 서버 현지 시간으로 저장됩니다.",
     "importFullRange": "전체 기록 가져오기",
-    "importFullRangeHelp": "기본적으로 Tracearr가 이 서버에서 처음 기록한 세션보다 오래된 기록만 가져오므로 이미 기록된 세션이 중복되지 않습니다. Tracearr 기록에 누락된 구간이 있다면 이 옵션을 켜서 겹치는 기간과 관계없이 플러그인의 전체 기록을 가져오세요. 완전히 동일한 항목은 계속 건너뜁니다.",
+    "importFullRangeHelp": "",
     "overlapSkipped": "기간이 겹쳐 {{count}}개 건너뜀",
     "duplicates": "중복 {{count}}개 건너뜀",
     "skipOverlap": "기간이 겹치는 기록 - 타임스탬프가 Tracearr에서 이미 추적 중인 기간에 포함됩니다. 포함하려면 전체 기록 가져오기를 켜세요.",
