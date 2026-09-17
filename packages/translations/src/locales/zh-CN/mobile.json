@@ -70,7 +70,11 @@
   },
   "resources": {
     "cpu": "处理器",
-    "ram": "内存"
+    "ram": "内存",
+    "item": "",
+    "noData": "",
+    "system": "",
+    "waiting": ""
   },
   "notifications": {
     "testSent": "测试发送",
@@ -98,11 +102,19 @@
     "criticalOverrideDescription": "在静音时间内仍然有高严重性犯规通知",
     "rateLimitDescription": "速率限制防止通知垃圾邮件。当前限制：{{perMinute}}/分钟，{{perHour}}/小时。",
     "sendTestNotification": "发送测试通知",
-    "testDescription": "验证推送通知是否正常工作"
-  },
-  "dashboard": {
-    "today": "今天",
-    "hrs": "小时"
+    "testDescription": "验证推送通知是否正常工作",
+    "pushNotifications": "",
+    "ruleTypes": {
+      "accountInactivity": "",
+      "deviceVelocity": "",
+      "geoRestriction": "",
+      "impossibleTravel": "",
+      "simultaneousLocations": ""
+    },
+    "severityAll": "",
+    "severityHighOnly": "",
+    "severityWarningUp": "",
+    "violationTypes": ""
   },
   "session": {
     "streamTerminated": "流已终止",
@@ -117,30 +129,51 @@
     "moreDevices": "{{count}}",
     "noViolations": "没有违反行为",
     "noTerminations": "没有流终止",
-    "trustLow": "低",
-    "trustMedium": "中等",
-    "trustHigh": "高"
+    "lastSeen": "",
+    "terminatedBy": "",
+    "trustScoreConfirm": "",
+    "trustScoreRange": ""
   },
   "violation": {
     "violationNotFoundDesc": "更多设备。",
-    "customRule": "自定义规则",
-    "streamComparison": "串流比较",
     "ips": "IPs"
   },
   "alerts": {
-    "done": "完成",
-    "clearFilters": "清除筛选"
+    "clearFilters": "清除筛选",
+    "acknowledgeAll": "",
+    "acknowledgeAllBody": "",
+    "acknowledgeAllBodySeverity": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "all": "",
+    "allClear": "",
+    "allServers": "",
+    "noAlertsRecorded": "",
+    "noMatches": "",
+    "pendingCount": ""
   },
   "history": {
-    "noHistoryFound": "没有历史记录",
     "adjustFilters": "尝试调整筛选条件",
-    "historyWillAppear": "一旦用户开始串流，会话历史将出现在这里"
+    "historyWillAppear": "一旦用户开始串流，会话历史将出现在这里",
+    "filters": {
+      "clearCount": "",
+      "countries": "",
+      "filterBy": "",
+      "mediaType": "",
+      "noCountries": "",
+      "noPlatforms": "",
+      "noUsers": "",
+      "sectionSelected": ""
+    }
   },
   "users": {
     "owner": "所有者",
     "noUsers": "暂无用户",
     "usersWillAppear": "用户将在与您的媒体服务器同步后显示在这里",
-    "noUsersMatch": "没有匹配的用户{{query}}"
+    "noUsersMatch": "没有匹配的用户{{query}}",
+    "joinedRelative": "",
+    "sortActive": "",
+    "sortTrust": ""
   },
   "activity": {
     "playsOverTime": "一段时间后播放",
@@ -160,7 +193,6 @@
     "allServers": "所有服务器"
   },
   "reconnected": "已经重新连接",
-  "actionsExecuted": "操作已执行",
   "serverScope": {
     "single": "仅显示{{name}}"
   },
@@ -169,10 +201,70 @@
     "alerts": "警告",
     "alertsCount": "提醒，{{count}} 条未读",
     "settings": "设置",
-    "trustScore": "信任分数{{score}}"
+    "trustScore": "信任分数{{score}}",
+    "decreaseTrustScore": "",
+    "filtersActive": "",
+    "increaseTrustScore": "",
+    "sortAscending": "",
+    "sortDescending": ""
   },
   "map": {
     "noData": "无可用位置数据",
     "unavailable": "地图不可用"
+  },
+  "automations": {
+    "conditions_one": "",
+    "conditions_other": "",
+    "editOnWeb": "",
+    "emptyDescription": "",
+    "kind": {
+      "notification": "",
+      "policy": ""
+    },
+    "lastRun": "",
+    "truncated": "",
+    "turnOffFailed": "",
+    "turnOnFailed": "",
+    "unsupportedDescription": "",
+    "unsupportedTitle": "",
+    "versionCheckFailed": ""
+  },
+  "charts": {
+    "weekOf": ""
+  },
+  "push": {
+    "violationTitle": ""
+  },
+  "streamDetails": {
+    "bitrate": "",
+    "channels": "",
+    "codec": "",
+    "color": "",
+    "container": "",
+    "forced": "",
+    "format": "",
+    "framerate": "",
+    "hwDecode": "",
+    "hwEncode": "",
+    "mono": "",
+    "noDetails": "",
+    "notAvailable": "",
+    "profile": "",
+    "sampleRate": "",
+    "source": "",
+    "speed": "",
+    "stereo": "",
+    "stream": "",
+    "subtitles": "",
+    "throttled": "",
+    "transcodeDetails": ""
+  },
+  "widget": {
+    "asOf": "",
+    "serversDown_one": "",
+    "serversDown_other": "",
+    "signedOut": "",
+    "transcodes_one": "",
+    "transcodes_other": ""
   }
 }
