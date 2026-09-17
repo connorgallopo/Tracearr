@@ -424,7 +424,7 @@
     "serverTimezone": "Server Timezone",
     "serverTimezoneHelp": "Must match the timezone configured on your media server host, not your browser's timezone. Playback Reporting timestamps are stored in local server time.",
     "importFullRange": "Import full history",
-    "importFullRangeHelp": "By default only history older than Tracearr's earliest tracked session for this server is imported, so sessions Tracearr already recorded are never duplicated. Enable this to import the plugin's entire history regardless of overlap, if your Tracearr history has gaps. Exact duplicates are still skipped.",
+    "importFullRangeHelp": "Plays that started after this server was added to Tracearr are never imported. By default the import also stops at the earliest play Tracearr already has for this server, for example from a Jellystat import. Enable this to import everything from before the server was added. Exact duplicates are still skipped.",
     "overlapSkipped": "{{count}} skipped as overlap",
     "duplicates": "{{count}} duplicates skipped",
     "skipOverlap": "Overlapping record - the timestamp falls inside the period Tracearr already tracks for this server. Enable full-range import to include it.",
