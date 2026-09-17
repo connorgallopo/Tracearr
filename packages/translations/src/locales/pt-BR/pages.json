@@ -153,7 +153,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "",
@@ -163,7 +164,10 @@
     "showingAllResults": "",
     "deleteSession_one": "",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": "Are you sure you want to delete {{count}} session(s)? This action cannot be undone."
+    "deleteSessionsConfirm": "Are you sure you want to delete {{count}} session(s)? This action cannot be undone.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "",
