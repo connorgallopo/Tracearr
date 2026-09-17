@@ -86,7 +86,8 @@
     "directStream": "Direct streamen",
     "transcode": "Transcoderen",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "Laag",
@@ -118,7 +119,12 @@
     "last30Days": "Afgelopen 30 dagen",
     "lastYear": "Afgelopen jaar",
     "byDay": "Per dag",
-    "byHour": "Per uur"
+    "byHour": "Per uur",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "",
@@ -182,7 +188,8 @@
     "segments": "segmenten",
     "streamDetails": "Steam Details",
     "transcodeReason": "Transcode Reden",
-    "loadMore": "Laad Meer"
+    "loadMore": "Laad Meer",
+    "playback": ""
   },
   "search": {
     "placeholder": "Zoeken...",
@@ -286,7 +293,11 @@
     "location_one": "{{count}} locatie",
     "location_other": "{{count}} locaties",
     "device_one": "{{count}} apparaat",
-    "device_other": "{{count}} apparaten"
+    "device_other": "{{count}} apparaten",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "Geen wijzigingen gevonden"
