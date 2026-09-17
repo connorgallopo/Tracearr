@@ -19,28 +19,18 @@ import {
   REDIS_KEYS,
   CACHE_TTL,
   libraryStatsQuerySchema,
+  RESOLUTION_BUCKETS,
   type LibraryStatsQueryInput,
+  type LibraryStatsResponse,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { hasVersionInBucket } from '../../utils/resolutionBuckets.js';
+import {
+  perResolutionBucket,
+  readResolutionCounts,
+  versionBucketFlagsJoin,
+} from '../../utils/resolutionBuckets.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, dedupedStorageBytesSql } from './utils.js';
-
-/** Library stats response shape */
-interface LibraryStatsResponse {
-  totalItems: number;
-  totalSizeBytes: string;
-  movieCount: number;
-  episodeCount: number;
-  showCount: number;
-  qualityBreakdown: {
-    count4k: number;
-    count1080p: number;
-    count720p: number;
-    countSd: number;
-  };
-  asOf: string | null;
-}
 
 export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
   /**
@@ -109,10 +99,7 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
               ls.movie_count,
               ls.episode_count,
               ls.show_count,
-              ls.count_4k,
-              ls.count_1080p,
-              ls.count_720p,
-              ls.count_sd,
+              ${perResolutionBucket((bucket) => `ls.count_${bucket}`)},
               ls.snapshot_time
             FROM library_snapshots ls
             WHERE 1=1
@@ -126,10 +113,7 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
             COALESCE(SUM(movie_count), 0)::int AS movie_count,
             COALESCE(SUM(episode_count), 0)::int AS episode_count,
             COALESCE(SUM(show_count), 0)::int AS show_count,
-            COALESCE(SUM(count_4k), 0)::int AS count_4k,
-            COALESCE(SUM(count_1080p), 0)::int AS count_1080p,
-            COALESCE(SUM(count_720p), 0)::int AS count_720p,
-            COALESCE(SUM(count_sd), 0)::int AS count_sd,
+            ${perResolutionBucket((bucket) => `COALESCE(SUM(count_${bucket}), 0)::int AS count_${bucket}`)},
             MAX(snapshot_time) AS as_of
           FROM latest_snapshots
         `);
@@ -141,10 +125,6 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
               movie_count: number;
               episode_count: number;
               show_count: number;
-              count_4k: number;
-              count_1080p: number;
-              count_720p: number;
-              count_sd: number;
               as_of: string | null;
             }
           | undefined;
@@ -155,12 +135,7 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
           movieCount: row?.movie_count ?? 0,
           episodeCount: row?.episode_count ?? 0,
           showCount: row?.show_count ?? 0,
-          qualityBreakdown: {
-            count4k: row?.count_4k ?? 0,
-            count1080p: row?.count_1080p ?? 0,
-            count720p: row?.count_720p ?? 0,
-            countSd: row?.count_sd ?? 0,
-          },
+          qualityBreakdown: readResolutionCounts(row),
           asOf: row?.as_of ?? null,
         };
       } else {
@@ -177,12 +152,16 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
             COUNT(DISTINCT CASE WHEN li.media_type = 'movie' THEN ${matchKey} END)::int AS movie_count,
             COUNT(DISTINCT CASE WHEN li.media_type = 'episode' THEN ${matchKey} END)::int AS episode_count,
             COUNT(DISTINCT CASE WHEN li.media_type = 'show' THEN ${matchKey} END)::int AS show_count,
-            COUNT(CASE WHEN (li.file_size > 0 OR li.media_type IN ('show', 'season')) AND ${hasVersionInBucket('li.id', '4k')} THEN 1 END)::int AS count_4k,
-            COUNT(CASE WHEN (li.file_size > 0 OR li.media_type IN ('show', 'season')) AND ${hasVersionInBucket('li.id', '1080p')} THEN 1 END)::int AS count_1080p,
-            COUNT(CASE WHEN (li.file_size > 0 OR li.media_type IN ('show', 'season')) AND ${hasVersionInBucket('li.id', '720p')} THEN 1 END)::int AS count_720p,
-            COUNT(CASE WHEN (li.file_size > 0 OR li.media_type IN ('show', 'season')) AND ${hasVersionInBucket('li.id', 'sd')} THEN 1 END)::int AS count_sd,
+            ${sql.join(
+              RESOLUTION_BUCKETS.map(
+                (bucket) =>
+                  sql`COUNT(CASE WHEN (li.file_size > 0 OR li.media_type IN ('show', 'season')) AND ${sql.raw(`vb.has_${bucket}`)} THEN 1 END)::int AS ${sql.raw(`count_${bucket}`)}`
+              ),
+              sql`, `
+            )},
             MAX(li.updated_at)::text AS as_of
           FROM library_items li
+          ${versionBucketFlagsJoin('li.id')}
           WHERE 1=1
             AND li.removed_at IS NULL
             ${serverFilter}
@@ -196,10 +175,6 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
               movie_count: number;
               episode_count: number;
               show_count: number;
-              count_4k: number;
-              count_1080p: number;
-              count_720p: number;
-              count_sd: number;
               as_of: string | null;
             }
           | undefined;
@@ -210,12 +185,7 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
           movieCount: row?.movie_count ?? 0,
           episodeCount: row?.episode_count ?? 0,
           showCount: row?.show_count ?? 0,
-          qualityBreakdown: {
-            count4k: row?.count_4k ?? 0,
-            count1080p: row?.count_1080p ?? 0,
-            count720p: row?.count_720p ?? 0,
-            countSd: row?.count_sd ?? 0,
-          },
+          qualityBreakdown: readResolutionCounts(row),
           asOf: row?.as_of ?? null,
         };
       }

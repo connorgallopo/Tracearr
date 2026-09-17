@@ -84,7 +84,9 @@
     "stopped": "Stoppet",
     "directPlay": "Direkte spill",
     "directStream": "Direkte strøm",
-    "transcode": "Transkode"
+    "transcode": "Transkode",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Lav",

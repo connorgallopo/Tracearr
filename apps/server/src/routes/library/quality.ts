@@ -1,10 +1,7 @@
 /**
  * Library Quality Evolution Route
  *
- * GET /quality - Quality distribution over time from library_items
- *
- * Uses library_items.video_resolution and created_at for accurate quality tracking
- * based on when items were actually added to the media server.
+ * GET /quality - Quality distribution over time from library_stats_daily
  *
  * Supports filtering by media type:
  * - 'all': All video content (movies + TV)
@@ -20,34 +17,16 @@ import {
   TIME_MS,
   libraryQualityQuerySchema,
   type LibraryQualityQueryInput,
+  type QualityDataPoint,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { perResolutionBucket, readResolutionCounts } from '../../utils/resolutionBuckets.js';
 import {
   validateServerAccess,
   resolveServerIds,
   buildMultiServerFragment,
 } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
-
-/** Single data point in quality timeline */
-interface QualityDataPoint {
-  day: string;
-  totalItems: number;
-  // Absolute counts
-  count4k: number;
-  count1080p: number;
-  count720p: number;
-  countSd: number;
-  // Percentages
-  pct4k: number;
-  pct1080p: number;
-  pct720p: number;
-  pctSd: number;
-  // Codec counts
-  hevcCount: number;
-  h264Count: number;
-  av1Count: number;
-}
 
 /** Library quality evolution response */
 interface LibraryQualityResponse {
@@ -189,10 +168,7 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
           SELECT
             lsd.day,
             lsd.total_items,
-            lsd.count_4k,
-            lsd.count_1080p,
-            lsd.count_720p,
-            lsd.count_sd
+            ${perResolutionBucket((bucket) => `lsd.count_${bucket}`)}
           FROM library_stats_daily lsd
           WHERE lsd.day >= ${effectiveStartDate.toISOString()}::date
             AND lsd.day <= ${endDate.toISOString()}::date
@@ -204,10 +180,7 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
           SELECT
             fl.day::date AS day,
             COALESCE(SUM(fl.total_items), 0)::int AS total_items,
-            COALESCE(SUM(fl.count_4k), 0)::int AS count_4k,
-            COALESCE(SUM(fl.count_1080p), 0)::int AS count_1080p,
-            COALESCE(SUM(fl.count_720p), 0)::int AS count_720p,
-            COALESCE(SUM(fl.count_sd), 0)::int AS count_sd
+            ${perResolutionBucket((bucket) => `COALESCE(SUM(fl.count_${bucket}), 0)::int AS count_${bucket}`)}
           FROM filtered_libraries fl
           GROUP BY fl.day::date
         ),
@@ -220,72 +193,37 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
               SELECT total_items FROM daily_stats dst2
               WHERE dst2.day < ds.day ORDER BY dst2.day DESC LIMIT 1
             ), 0)::int AS total_items,
-            COALESCE(dst.count_4k, (
-              SELECT count_4k FROM daily_stats dst2
+            ${perResolutionBucket(
+              (bucket) => `COALESCE(dst.count_${bucket}, (
+              SELECT count_${bucket} FROM daily_stats dst2
               WHERE dst2.day < ds.day ORDER BY dst2.day DESC LIMIT 1
-            ), 0)::int AS count_4k,
-            COALESCE(dst.count_1080p, (
-              SELECT count_1080p FROM daily_stats dst2
-              WHERE dst2.day < ds.day ORDER BY dst2.day DESC LIMIT 1
-            ), 0)::int AS count_1080p,
-            COALESCE(dst.count_720p, (
-              SELECT count_720p FROM daily_stats dst2
-              WHERE dst2.day < ds.day ORDER BY dst2.day DESC LIMIT 1
-            ), 0)::int AS count_720p,
-            COALESCE(dst.count_sd, (
-              SELECT count_sd FROM daily_stats dst2
-              WHERE dst2.day < ds.day ORDER BY dst2.day DESC LIMIT 1
-            ), 0)::int AS count_sd
+            ), 0)::int AS count_${bucket}`
+            )}
           FROM date_series ds
           LEFT JOIN daily_stats dst ON dst.day = ds.day
         )
         SELECT
           fd.day::text,
           fd.total_items,
-          fd.count_4k,
-          fd.count_1080p,
-          fd.count_720p,
-          fd.count_sd
+          ${perResolutionBucket((bucket) => `fd.count_${bucket}`)}
         FROM filled_data fd
         ORDER BY fd.day ASC
       `);
 
-      const rows = result.rows as Array<{
-        day: string;
-        total_items: number;
-        count_4k: number;
-        count_1080p: number;
-        count_720p: number;
-        count_sd: number;
-      }>;
-
-      // Calculate percentages in application code
-      // totalItems = sum of all quality tiers (we filter out music libraries in the query)
-      const data: QualityDataPoint[] = rows.map((row) => {
-        // Buckets are overlapping (a 4K+1080p title counts in both), so the
-        // denominator is the real title count, not the bucket sum, and
-        // percentages describe "share of titles having this tier".
-        const total = row.total_items || 1; // Avoid division by zero
-        return {
-          day: row.day,
-          totalItems: row.total_items,
-          // Absolute counts
-          count4k: row.count_4k,
-          count1080p: row.count_1080p,
-          count720p: row.count_720p,
-          countSd: row.count_sd,
-          // Percentages (rounded to 2 decimal places)
-          pct4k: Math.round((row.count_4k / total) * 10000) / 100,
-          pct1080p: Math.round((row.count_1080p / total) * 10000) / 100,
-          pct720p: Math.round((row.count_720p / total) * 10000) / 100,
-          pctSd: Math.round((row.count_sd / total) * 10000) / 100,
+      // Buckets are overlapping (a 4K+1080p title counts in both), so a day's
+      // title count is total_items, never the bucket sum
+      const data: QualityDataPoint[] = (result.rows as Array<Record<string, unknown>>).map(
+        (row) => ({
+          day: String(row.day),
+          totalItems: Number(row.total_items),
+          counts: readResolutionCounts(row),
           // Codec counts not available per-library (set to 0)
           // Codec distribution is shown separately in CodecDistributionSection
           hevcCount: 0,
           h264Count: 0,
           av1Count: 0,
-        };
-      });
+        })
+      );
 
       const response: LibraryQualityResponse = {
         period,

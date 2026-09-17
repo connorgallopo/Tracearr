@@ -13,7 +13,10 @@
  * - Rules engine (for resolution-based conditions)
  */
 
-import { normalizeResolution as normalizeResolutionShared } from '@tracearr/shared';
+import {
+  normalizeResolution as normalizeResolutionShared,
+  type ResolutionLabel,
+} from '@tracearr/shared';
 
 export interface ResolutionInput {
   /** Resolution string from API (e.g., "1080", "1080p", "4k", "sd") */
@@ -24,27 +27,8 @@ export interface ResolutionInput {
   height?: number;
 }
 
-/**
- * Normalize video resolution to a display-friendly label.
- *
- * Priority: server-provided resolution label over width/height dimensions.
- * Tautulli displays Plex's own `videoResolution` verbatim rather than
- * recomputing it from pixels - Plex already accounts for scan type and
- * aspect ratio server-side, so trust it over a recomputation that can land a
- * few pixels short of a clean cutoff (e.g. 1916 wide vs. the 1920 cutoff).
- * Dimensions are only the fallback when no label is available (Jellyfin/Emby,
- * or a Plex transcode session where only source pixels survive).
- *
- * @param input - Resolution data from media server
- * @returns Normalized resolution string (e.g., "4K", "1080p", "720p", "SD") or null
- *
- * @example
- * normalizeResolution({ resolution: '1080', width: 1916, height: 1036 }) // "1080p" (label wins)
- * normalizeResolution({ width: 1920, height: 800 })      // "1080p" (widescreen 2.40:1)
- * normalizeResolution({ width: 1440, height: 1080 })     // "1080p" (4:3 aspect ratio)
- * normalizeResolution({ resolution: '1080p' })           // "1080p"
- */
-export function normalizeResolution(input: ResolutionInput): string | null {
+/** Dimensions win; the server's label only fills in when a payload carries none. */
+export function normalizeResolution(input: ResolutionInput): ResolutionLabel | null {
   const { resolution, width, height } = input;
   return normalizeResolutionShared({ label: resolution, width, height });
 }

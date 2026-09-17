@@ -84,7 +84,9 @@
     "stopped": "Oprit",
     "directPlay": "Redare directă",
     "directStream": "direct stream",
-    "transcode": "Transcodare"
+    "transcode": "Transcodare",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "scazut",

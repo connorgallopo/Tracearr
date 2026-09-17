@@ -176,7 +176,9 @@ export function DuplicatesTable({
                                             version.resolution
                                               ? formatMediaTech(version.resolution)
                                               : null,
-                                            version.videoCodec,
+                                            version.videoCodec
+                                              ? formatMediaTech(version.videoCodec)
+                                              : null,
                                           ]
                                             .filter(Boolean)
                                             .join(' · ') || '—'}

@@ -4,6 +4,7 @@
  */
 
 import { lazy, memo, Suspense, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -41,6 +42,7 @@ import {
 import { cn, getCountryName, getMediaDisplay } from '@/lib/utils';
 import { imageProxyUrl } from '@/lib/api';
 import { formatDuration } from '@/lib/formatters';
+import { PLAYBACK_DECISION_LABEL_KEYS, playbackDecision } from '@/lib/playbackDecision';
 import { getAvatarUrl } from '@/components/users/utils';
 import { StreamDetailsPanel } from './StreamDetailsPanel';
 
@@ -215,6 +217,7 @@ function SegmentTable({
 
 // Inner content component - keeps state hooks and derived values together
 function SessionContent({ session }: { session: SessionWithDetails | ActiveSession }) {
+  const { t } = useTranslation();
   const [locationOpen, setLocationOpen] = useState(false);
   const [segmentsOpen, setSegmentsOpen] = useState(false);
 
@@ -548,7 +551,7 @@ function SessionContent({ session }: { session: SessionWithDetails | ActiveSessi
                         <TooltipTrigger asChild>
                           <span className="flex items-center gap-1">
                             <TranscodeIcon className="h-3 w-3" />
-                            Transcode
+                            {t(PLAYBACK_DECISION_LABEL_KEYS.transcode)}
                           </span>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs text-left">
@@ -559,7 +562,7 @@ function SessionContent({ session }: { session: SessionWithDetails | ActiveSessi
                   ) : (
                     <>
                       <TranscodeIcon className="h-3 w-3" />
-                      Transcode
+                      {t(PLAYBACK_DECISION_LABEL_KEYS.transcode)}
                     </>
                   )}
                 </Badge>
@@ -569,9 +572,7 @@ function SessionContent({ session }: { session: SessionWithDetails | ActiveSessi
             return (
               <Badge variant="success" className="gap-1 text-xs">
                 <MonitorPlay className="h-3 w-3" />
-                {session.videoDecision === 'copy' || session.audioDecision === 'copy'
-                  ? 'Direct Stream'
-                  : 'Direct Play'}
+                {t(PLAYBACK_DECISION_LABEL_KEYS[playbackDecision(session)])}
               </Badge>
             );
           })()}

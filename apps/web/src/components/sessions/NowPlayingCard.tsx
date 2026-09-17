@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Monitor,
   MonitorPlay,
@@ -20,6 +21,7 @@ import { Progress } from '@/components/ui/progress';
 import { cn, formatLocationCompact } from '@/lib/utils';
 import { imageProxyUrl } from '@/lib/api';
 import { formatDuration } from '@/lib/formatters';
+import { PLAYBACK_DECISION_LABEL_KEYS, playbackDecision } from '@/lib/playbackDecision';
 import { useEstimatedProgress } from '@/hooks/useEstimatedProgress';
 import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
@@ -118,6 +120,7 @@ function PlaybackOverlay({ isPaused }: { isPaused: boolean }) {
 export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   const { title, subtitle } = getCardMediaDisplay(session);
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { isMultiServer } = useServer();
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
 
@@ -254,13 +257,9 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                     session.isTranscode &&
                     !!(session.transcodeInfo?.hwEncoding || session.transcodeInfo?.hwDecoding);
 
-                  const label = session.isTranscode
-                    ? isHwTranscode
-                      ? 'HW Transcode'
-                      : 'Transcode'
-                    : session.videoDecision === 'copy' || session.audioDecision === 'copy'
-                      ? 'Direct Stream'
-                      : 'Direct Play';
+                  const label = isHwTranscode
+                    ? t('playback.hwTranscode')
+                    : t(PLAYBACK_DECISION_LABEL_KEYS[playbackDecision(session)]);
 
                   const icon = session.isTranscode ? (
                     isHwTranscode ? (

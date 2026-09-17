@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
-import type { GenreRow, LibraryOption, WatchedState } from '@tracearr/shared';
+import {
+  RESOLUTION_LABELS,
+  type GenreRow,
+  type LibraryOption,
+  type WatchedState,
+} from '@tracearr/shared';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +52,6 @@ export interface PersistedGridFilters {
 }
 
 export const DEFAULT_GRID_FILTERS: PersistedGridFilters = { sort: 'title' };
-export const RESOLUTION_OPTIONS = ['4K', '1080p', '720p', 'SD'] as const;
 const SORT_OPTIONS: CatalogSort[] = ['title', 'added', 'year', 'plays', 'watch_time', 'viewers'];
 const WATCHED_OPTIONS: WatchedState[] = ['unwatched', 'partial', 'watched'];
 
@@ -455,7 +459,7 @@ export function CatalogToolbar({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={ALL_SENTINEL}>{t('media.grid.toolbar.resolutionAll')}</SelectItem>
-            {RESOLUTION_OPTIONS.map((resolution) => (
+            {RESOLUTION_LABELS.map((resolution) => (
               <SelectItem key={resolution} value={resolution}>
                 {resolution}
               </SelectItem>

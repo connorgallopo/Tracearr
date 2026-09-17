@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Effective Date: December 2025**
+**Effective Date: September 2026**
 
 ## Introduction
 
@@ -11,8 +11,8 @@ Tracearr is a mobile application designed to help you monitor and manage access 
 - Tracearr connects to YOUR self-hosted backend server
 - We don't collect, store, or sell your data
 - All data flows through infrastructure YOU control
-- We only use third-party services for essential app functionality (push notifications)
-- No analytics, tracking, or telemetry sent to us or third parties
+- We only use third-party services for essential app functionality (push notifications, and crash and performance reports)
+- No analytics, advertising, or tracking
 
 ## How Tracearr Works
 
@@ -98,16 +98,20 @@ Tracearr uses minimal third-party services, and only for essential functionality
 
 When your backend triggers a notification, it sends the notification content to Expo's service, which delivers it to your device. Expo may temporarily store notification data for delivery purposes.
 
+### EAS Observe
+
+**Purpose**: Crash and performance reports, so we can find and fix problems in the app
+**Data Shared**: App startup and screen load times, screen names with server-side IDs removed, crash and error details, app version, device model and OS version, battery, memory and network conditions, and network request counts and timings, which can include the hostname of your backend. Reports are tied to a random identifier for the app installation, not to your name, account, or media server data.
+**Privacy Policy**: [https://expo.dev/privacy](https://expo.dev/privacy)
+
 ### Services We DO NOT Use
 
 Tracearr explicitly does **NOT** use:
 
 - Analytics platforms (no Firebase Analytics, Mixpanel, Google Analytics, etc.)
-- Crash reporting services (no Sentry, Crashlytics, etc.)
 - Advertising networks
 - Social media SDKs
 - User behavior tracking
-- Telemetry collection
 
 ## Data Storage and Security
 
@@ -161,7 +165,7 @@ Your self-hosted Tracearr backend may have its own data practices depending on h
 
 Tracearr is not directed at children under the age of 13, and we do not knowingly collect personal information from children under 13. The app is designed for server administrators and media library managers.
 
-If you believe a child under 13 has provided information through the app, please contact us at privacy@tracearr.dev, though we note again that we do not collect or store user data.
+If you believe a child under 13 has provided information through the app, please contact us at contact@tracearr.com, though we note again that we do not collect or store user data.
 
 ## Your Rights and Choices
 
@@ -207,6 +211,7 @@ Because Tracearr connects to YOUR infrastructure, data location is determined by
 The app itself does not transfer data internationally, except for:
 
 - Push notifications routed through Expo's infrastructure (which may involve international data transfer)
+- Crash and performance reports sent to EAS Observe
 
 ## Changes to This Privacy Policy
 
@@ -253,7 +258,7 @@ While we implement reasonable security measures in the app's design, we cannot g
 - You are responsible for protecting your authentication credentials
 - You should use strong passwords and enable two-factor authentication if supported
 
-If you discover a security vulnerability in the Tracearr app, please report it to privacy@tracearr.dev.
+If you discover a security vulnerability in the Tracearr app, please report it to security@tracearr.com.
 
 ## Open Source Transparency
 
@@ -268,7 +273,7 @@ Tracearr is committed to transparency. You can:
 
 If you have questions, concerns, or requests regarding this Privacy Policy or Tracearr's privacy practices:
 
-**Email**: privacy@tracearr.dev
+**Email**: contact@tracearr.com
 
 **Response Time**: We aim to respond to privacy inquiries within 30 days.
 
@@ -282,10 +287,10 @@ By using Tracearr, you acknowledge that:
 2. You understand that Tracearr connects to infrastructure YOU control
 3. You are responsible for the security and privacy practices of your self-hosted backend
 4. Tracearr developers do not have access to your data
-5. You consent to the minimal data practices described in this policy (push notification tokens, local storage)
+5. You consent to the minimal data practices described in this policy (push notification tokens, crash and performance reports, local storage)
 
 ---
 
-**Last Updated**: December 2025
+**Last Updated**: September 2026
 
-This privacy policy is designed to be transparent and comprehensive. If you have suggestions for improving clarity or addressing additional privacy concerns, please contact us at privacy@tracearr.dev.
+This privacy policy is designed to be transparent and comprehensive. If you have suggestions for improving clarity or addressing additional privacy concerns, please contact us at contact@tracearr.com.

@@ -511,8 +511,7 @@ const MediaAvailability = z
       .openapi({
         description:
           "The best version's resolution as a lowercase token (8k, 4k, 1440p, 1080p, 720p, " +
-          '480p, sd; unrecognized server labels pass through verbatim). Null on show rows, ' +
-          'which carry no file of their own',
+          '480p, sd). Null on show rows, which carry no file of their own',
         example: '4k',
       }),
     file_size: z

@@ -2,7 +2,11 @@
  * Shared constants for Tracearr
  */
 
-import { classifyByDimensions, type ResolutionLabel } from './resolution.js';
+import {
+  classifyByDimensions,
+  normalizeResolutionLabel,
+  type ResolutionLabel,
+} from './resolution.js';
 
 export { IDENTITY_AWARE_CONDITION_FIELDS } from './automations/conditions.js';
 
@@ -618,15 +622,6 @@ export function formatBitrate(kbps: number | null | undefined): string {
  * Keys are lowercase, values are proper display casing.
  */
 const MEDIA_TECH_DISPLAY: Record<string, string> = {
-  // Resolution
-  '4k': '4K',
-  '2k': '2K',
-  uhd: 'UHD',
-  sd: 'SD',
-  hd: 'HD',
-  '1080p': '1080p',
-  '720p': '720p',
-  '480p': '480p',
   // Dynamic range
   sdr: 'SDR',
   hdr: 'HDR',
@@ -714,21 +709,11 @@ const MEDIA_TECH_DISPLAY: Record<string, string> = {
   cc: 'CC',
 };
 
-/**
- * Format a media tech string (resolution, codec, dynamic range) for display.
- * Uses a lookup map for known values, falls back to uppercase for unknown.
- *
- * @param value - Tech string (e.g., "4k", "hevc", "truehd", "dolby vision")
- * @returns Formatted string with proper casing
- *
- * @example
- * formatMediaTech("4k")           // "4K"
- * formatMediaTech("hevc")         // "HEVC"
- * formatMediaTech("truehd")       // "TrueHD"
- * formatMediaTech("dolby vision") // "Dolby Vision"
- */
+/** Display casing for a resolution, codec or dynamic range; a resolution comes back as its tier name. */
 export function formatMediaTech(value: string | null | undefined): string {
   if (!value) return 'Unknown';
+  const tier = normalizeResolutionLabel(value);
+  if (tier) return tier;
   const lower = value.toLowerCase().trim();
   return MEDIA_TECH_DISPLAY[lower] ?? value.toUpperCase();
 }

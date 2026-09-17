@@ -84,7 +84,9 @@
     "stopped": "Διακόπηκε",
     "directPlay": "Άμεση Αναπαραγωγή",
     "directStream": "Άμεση Ροή",
-    "transcode": "Μετατροπή"
+    "transcode": "Μετατροπή",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Χαμηλή",

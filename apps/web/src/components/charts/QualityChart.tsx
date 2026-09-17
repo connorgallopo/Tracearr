@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { ChartSkeleton } from '@/components/ui/skeleton';
+import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import { ChartEmpty } from './ChartEmpty';
 
 interface QualityData {
@@ -27,6 +29,7 @@ const COLORS = {
 };
 
 export function QualityChart({ data, isLoading, height = 250 }: QualityChartProps) {
+  const { t } = useTranslation();
   const options = useMemo<Highcharts.Options>(() => {
     if (!data || data.total === 0) {
       return {};
@@ -83,17 +86,17 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
           name: 'Quality',
           data: [
             {
-              name: 'Direct Play',
+              name: t(PLAYBACK_DECISION_LABEL_KEYS.directplay),
               y: data.directPlay,
               color: COLORS.directPlay,
             },
             {
-              name: 'Direct Stream',
+              name: t(PLAYBACK_DECISION_LABEL_KEYS.copy),
               y: data.directStream,
               color: COLORS.directStream,
             },
             {
-              name: 'Transcode',
+              name: t(PLAYBACK_DECISION_LABEL_KEYS.transcode),
               y: data.transcode,
               color: COLORS.transcode,
             },
@@ -120,7 +123,7 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
         ],
       },
     };
-  }, [data, height]);
+  }, [data, height, t]);
 
   if (isLoading) {
     return <ChartSkeleton height={height} />;

@@ -287,7 +287,7 @@ export type {
   CodecEntry,
   CodecBreakdown,
   LibraryCodecsResponse,
-  ResolutionEntry,
+  ResolutionCounts,
   ResolutionBreakdown,
   LibraryResolutionResponse,
   LibraryOption,
@@ -830,6 +830,8 @@ export type { ListMeta, ListResponse } from './listQuery.js';
 // Resolution classification
 export {
   RESOLUTION_TIERS,
+  RESOLUTION_LABELS,
+  RESOLUTION_BUCKETS,
   classifyByDimensions,
   normalizeResolutionLabel,
   resolutionTierRank,

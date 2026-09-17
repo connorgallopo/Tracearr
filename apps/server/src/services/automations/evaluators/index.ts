@@ -60,23 +60,22 @@ function calculateDistanceKm(
 /**
  * Get normalized resolution from dimensions using the standard normalizer.
  * Returns 'unknown' if dimensions are missing.
- *
- * The rule condition vocabulary (VideoResolution) tops out at "4K"; the
- * shared classifier can now also return "1440p"/"8K", so fold those into
- * "4K" here rather than widening the rule-facing enum.
  */
 function getResolution(width: number | null, height: number | null): VideoResolution {
-  const result = normalizeResolution({ width: width ?? undefined, height: height ?? undefined });
-  if (result === '1440p' || result === '8K') return '4K';
-  return (result as VideoResolution) ?? 'unknown';
+  return (
+    normalizeResolution({ width: width ?? undefined, height: height ?? undefined }) ?? 'unknown'
+  );
 }
 
 /**
- * Convert resolution string to numeric value for comparison.
+ * Convert resolution string to numeric value for comparison. Line counts, not
+ * tier ranks: a numeric condition value is a height.
  */
 function resolutionToNumber(resolution: VideoResolution): number {
   const map: Record<VideoResolution, number> = {
+    '8K': 4320,
     '4K': 2160,
+    '1440p': 1440,
     '1080p': 1080,
     '720p': 720,
     '480p': 480,

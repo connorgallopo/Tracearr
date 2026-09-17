@@ -2,12 +2,15 @@
  * Stream Details Panel - displays source vs stream codec information
  */
 
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Video, AudioLines, Subtitles, Cpu, ChevronDown, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import {
   formatBitrate,
   formatMediaTech,
@@ -20,7 +23,6 @@ import {
   type SubtitleInfo,
   type ServerType,
 } from '@tracearr/shared';
-import { useState } from 'react';
 
 interface StreamDetailsPanelProps {
   // Scalar codec fields
@@ -83,22 +85,25 @@ function formatFramerate(framerate: string | number | null | undefined): string 
   return numeric % 1 === 0 ? numeric.toFixed(0) : numeric.toFixed(1);
 }
 
-// Get decision badge variant and label
+type DecisionLabelKey =
+  | (typeof PLAYBACK_DECISION_LABEL_KEYS)[keyof typeof PLAYBACK_DECISION_LABEL_KEYS]
+  | 'playback.burnIn';
+
 function getDecisionBadge(decision: string | null): {
   variant: 'success' | 'warning' | 'secondary';
-  label: string;
+  labelKey: DecisionLabelKey | null;
 } {
   switch (decision) {
     case 'directplay':
-      return { variant: 'success', label: 'Direct Play' };
+      return { variant: 'success', labelKey: PLAYBACK_DECISION_LABEL_KEYS.directplay };
     case 'copy':
-      return { variant: 'success', label: 'Direct Stream' };
+      return { variant: 'success', labelKey: PLAYBACK_DECISION_LABEL_KEYS.copy };
     case 'transcode':
-      return { variant: 'warning', label: 'Transcode' };
+      return { variant: 'warning', labelKey: PLAYBACK_DECISION_LABEL_KEYS.transcode };
     case 'burn':
-      return { variant: 'warning', label: 'Burn-in' };
+      return { variant: 'warning', labelKey: 'playback.burnIn' };
     default:
-      return { variant: 'secondary', label: '—' };
+      return { variant: 'secondary', labelKey: null };
   }
 }
 
@@ -234,7 +239,12 @@ export function StreamDetailsPanel({
   bitrate,
   serverType,
 }: StreamDetailsPanelProps) {
+  const { t } = useTranslation();
   const [transcodeOpen, setTranscodeOpen] = useState(false);
+  const decisionBadge = (decision: string | null) => {
+    const { variant, labelKey } = getDecisionBadge(decision);
+    return { variant, label: labelKey ? t(labelKey) : '—' };
+  };
 
   // Check if we have any stream details to show
   const hasVideoDetails = sourceVideoCodec || streamVideoCodec || sourceVideoWidth;
@@ -252,8 +262,8 @@ export function StreamDetailsPanel({
     );
   }
 
-  const videoBadge = getDecisionBadge(videoDecision);
-  const audioBadge = getDecisionBadge(audioDecision);
+  const videoBadge = decisionBadge(videoDecision);
+  const audioBadge = decisionBadge(audioDecision);
   const transcodeReasons = transcodeInfo?.reasons ?? [];
   const videoTranscodeReasons = filterTranscodeReasons(transcodeReasons, 'video');
   const audioTranscodeReasons = filterTranscodeReasons(transcodeReasons, 'audio');
@@ -457,11 +467,8 @@ export function StreamDetailsPanel({
             title="Subtitles"
             badge={
               subtitleInfo?.decision ? (
-                <Badge
-                  variant={getDecisionBadge(subtitleInfo.decision).variant}
-                  className="text-xs"
-                >
-                  {getDecisionBadge(subtitleInfo.decision).label}
+                <Badge variant={decisionBadge(subtitleInfo.decision).variant} className="text-xs">
+                  {decisionBadge(subtitleInfo.decision).label}
                 </Badge>
               ) : undefined
             }

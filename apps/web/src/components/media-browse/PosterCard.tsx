@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
-  normalizeResolutionLabel,
+  formatMediaTech,
   resolutionTierRank,
   POSTER_IMAGE_SIZE,
   type WatchedState,
@@ -84,11 +84,6 @@ function distinctResolutions(servers: { videoResolution?: string | null }[]): st
     if (server.videoResolution) known.add(server.videoResolution);
   }
   return [...known].sort((a, b) => (resolutionTierRank(b) ?? 0) - (resolutionTierRank(a) ?? 0));
-}
-
-/** Display casing for a stored resolution label (e.g. '4k' -> '4K', '1080p' unchanged) - matches the Resolution filter's own option labels. */
-export function formatResolutionLabel(resolution: string): string {
-  return normalizeResolutionLabel(resolution) ?? resolution;
 }
 
 interface PosterCardProps {
@@ -174,7 +169,7 @@ export function PosterCard({
     fileCount > dedupeServersById(servers).length || versionsResolutions.length === 2;
   const versionsChipLabel =
     versionsResolutions.length === 2
-      ? versionsResolutions.map(formatResolutionLabel).join(' · ')
+      ? versionsResolutions.map(formatMediaTech).join(' · ')
       : t('media.posterCard.versionsChip', { count: fileCount });
   const versionsSuffix = showVersionsChip
     ? `, ${t('media.posterCard.versions', { count: fileCount })}`

@@ -97,11 +97,13 @@ describe('overlapping facets and mirror-deduped totals', () => {
     expect(response.statusCode).toBe(200);
     const body = response.json<LibraryResolutionResponse>();
 
-    expect(body.movies.count4k).toBe(1);
-    expect(body.movies.count1080p).toBe(1);
-    expect(body.movies.count720p).toBe(1);
+    expect(body.movies.counts['4k']).toBe(1);
+    expect(body.movies.counts['1080p']).toBe(1);
+    expect(body.movies.counts['720p']).toBe(1);
     // Two titles, three bucket memberships: overlap by design
-    expect(body.movies.count4k + body.movies.count1080p + body.movies.count720p).toBe(3);
+    expect(
+      body.movies.counts['4k'] + body.movies.counts['1080p'] + body.movies.counts['720p']
+    ).toBe(3);
   });
 
   it('stats total dedupes the same physical file across servers and counts buckets via versions', async () => {
@@ -157,7 +159,7 @@ describe('overlapping facets and mirror-deduped totals', () => {
 
     expect(body.totalItems).toBe(1);
     expect(Number(body.totalSizeBytes)).toBe(5_000_000_000);
-    expect(body.qualityBreakdown.count4k).toBe(2);
+    expect(body.qualityBreakdown['4k']).toBe(2);
   });
 });
 

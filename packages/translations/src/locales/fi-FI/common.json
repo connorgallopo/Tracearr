@@ -84,7 +84,9 @@
     "stopped": "Pysäytetty",
     "directPlay": "Suora Toisto",
     "directStream": "Suora Lähetys",
-    "transcode": "Transkoodaus"
+    "transcode": "Transkoodaus",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Matala",

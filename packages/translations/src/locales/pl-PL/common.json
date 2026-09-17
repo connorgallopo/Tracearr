@@ -84,7 +84,9 @@
     "stopped": "Zatrzymano",
     "directPlay": "Bezpośrednie odtwarzanie",
     "directStream": "Bezpośredni strumień",
-    "transcode": "Transkodowanie"
+    "transcode": "Transkodowanie",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Niskie",

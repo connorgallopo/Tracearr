@@ -40,7 +40,7 @@ import type {
   BandwidthDevice,
   BandwidthSample,
 } from '@tracearr/shared';
-import { normalizeResolutionLabel, normalizeDynamicRange } from '@tracearr/shared';
+import { normalizeResolution, normalizeDynamicRange } from '@tracearr/shared';
 import { calculateProgress } from '../shared/parserUtils.js';
 import { extractPlexLiveTvMetadata, extractPlexMusicMetadata } from './plexUtils.js';
 
@@ -1532,14 +1532,13 @@ function parseGenres(genre: Array<{ tag?: string }> | undefined): string[] | und
   return tags.length > 0 ? tags : undefined;
 }
 
-/**
- * Normalize video resolution string
- * Plex returns "4k", "1080", "720", "480", "sd"
- * Normalize to consistent format with 'p' suffix for numeric resolutions
- */
-function normalizeVideoResolution(resolution: string | undefined): string | undefined {
-  const normalized = normalizeResolutionLabel(resolution);
-  return normalized ? normalized.toLowerCase() : undefined;
+/** Plex labels 2160x1080 "2k", so a version's tier comes from its pixels; stored lowercase. */
+function versionResolution(media: Record<string, unknown>): string | undefined {
+  return normalizeResolution({
+    label: parseOptionalString(media.videoResolution),
+    width: parseOptionalNumber(media.width),
+    height: parseOptionalNumber(media.height),
+  })?.toLowerCase();
 }
 
 /**
@@ -1589,7 +1588,7 @@ function parseLibraryItem(item: Record<string, unknown>): MediaLibraryItem {
       // Media.id is always present in practice; the index form only guards
       // malformed payloads so a version is never silently dropped
       serverVersionKey: media.id != null ? String(media.id) : `idx:${index}`,
-      videoResolution: normalizeVideoResolution(parseOptionalString(media.videoResolution)),
+      videoResolution: versionResolution(media),
       videoDynamicRange:
         normalizeDynamicRange(parseOptionalString(media.videoDynamicRange)) ?? undefined,
       videoCodec: parseOptionalString(media.videoCodec)?.toUpperCase(),

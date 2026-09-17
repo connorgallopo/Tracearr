@@ -33,7 +33,11 @@ import { sql, isNotNull, or, and, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { sessions, serverUsers } from '../db/schema.js';
 import { normalizeClient, normalizePlatformName } from '../utils/platformNormalizer.js';
-import { resolutionBucketPredicate, resolutionRankSql } from '../utils/resolutionBuckets.js';
+import {
+  bucketMembershipColumns,
+  perResolutionBucket,
+  resolutionRankSql,
+} from '../utils/resolutionBuckets.js';
 import { getCacheService, getPubSubService } from '../services/cache.js';
 import { getSetting, setSetting } from '../services/settings.js';
 import { recomputeAllIdentityDates } from '../services/userService.js';
@@ -1971,10 +1975,7 @@ export async function processBackfillLibrarySnapshotsJob(
               season_count int,
               show_count int,
               music_count int,
-              count_4k int,
-              count_1080p int,
-              count_720p int,
-              count_sd int,
+              ${perResolutionBucket((bucket) => `count_${bucket} int`)},
               hevc_count int,
               h264_count int,
               av1_count int,
@@ -1998,10 +1999,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 DATE(li.created_at) AS day,
                 li.file_size,
                 li.media_type,
-                BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '4k')}) AS has_4k,
-                BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '1080p')}) AS has_1080p,
-                BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '720p')}) AS has_720p,
-                BOOL_OR(${resolutionBucketPredicate('v.video_resolution', 'sd')}) AS has_sd,
+                ${bucketMembershipColumns('v.video_resolution')},
                 BOOL_OR(${resolutionRankSql('v.video_resolution')} >= ${HIGH_QUALITY_RANK}) AS high_quality,
                 BOOL_OR(v.video_codec IN ('hevc', 'h265', 'x265', 'HEVC', 'H265', 'X265')) AS has_hevc,
                 BOOL_OR(v.video_codec IN ('h264', 'avc', 'x264', 'H264', 'AVC', 'X264')) AS has_h264,
@@ -2026,10 +2024,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 COUNT(*) FILTER (WHERE media_type = 'season') AS seasons,
                 COUNT(*) FILTER (WHERE media_type = 'show') AS shows,
                 COUNT(*) FILTER (WHERE media_type IN ('artist', 'album', 'track')) AS music,
-                COUNT(*) FILTER (WHERE has_4k) AS c4k,
-                COUNT(*) FILTER (WHERE has_1080p) AS c1080p,
-                COUNT(*) FILTER (WHERE has_720p) AS c720p,
-                COUNT(*) FILTER (WHERE has_sd) AS csd,
+                ${perResolutionBucket((bucket) => `COUNT(*) FILTER (WHERE has_${bucket}) AS count_${bucket}`)},
                 COUNT(*) FILTER (WHERE has_hevc) AS hevc,
                 COUNT(*) FILTER (WHERE has_h264) AS h264,
                 COUNT(*) FILTER (WHERE has_av1) AS av1,
@@ -2051,8 +2046,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 COALESCE(da.movies, 0) AS movies, COALESCE(da.episodes, 0) AS episodes,
                 COALESCE(da.seasons, 0) AS seasons, COALESCE(da.shows, 0) AS shows,
                 COALESCE(da.music, 0) AS music,
-                COALESCE(da.c4k, 0) AS c4k, COALESCE(da.c1080p, 0) AS c1080p,
-                COALESCE(da.c720p, 0) AS c720p, COALESCE(da.csd, 0) AS csd,
+                ${perResolutionBucket((bucket) => `COALESCE(da.count_${bucket}, 0) AS count_${bucket}`)},
                 COALESCE(da.hevc, 0) AS hevc, COALESCE(da.h264, 0) AS h264,
                 COALESCE(da.av1, 0) AS av1,
                 COALESCE(da.chq, 0) AS chq, COALESCE(da.vcnt, 0) AS vcnt
@@ -2070,10 +2064,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 SUM(seasons) OVER w AS season_count,
                 SUM(shows) OVER w AS show_count,
                 SUM(music) OVER w AS music_count,
-                SUM(c4k) OVER w AS count_4k,
-                SUM(c1080p) OVER w AS count_1080p,
-                SUM(c720p) OVER w AS count_720p,
-                SUM(csd) OVER w AS count_sd,
+                ${perResolutionBucket((bucket) => `SUM(count_${bucket}) OVER w AS count_${bucket}`)},
                 SUM(hevc) OVER w AS hevc_count,
                 SUM(h264) OVER w AS h264_count,
                 SUM(av1) OVER w AS av1_count,
@@ -2091,10 +2082,7 @@ export async function processBackfillLibrarySnapshotsJob(
               season_count::int,
               show_count::int,
               music_count::int,
-              count_4k::int,
-              count_1080p::int,
-              count_720p::int,
-              count_sd::int,
+              ${perResolutionBucket((bucket) => `count_${bucket}::int`)},
               hevc_count::int,
               h264_count::int,
               av1_count::int,
@@ -2132,7 +2120,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 server_id, library_id, snapshot_time,
                 item_count, total_size,
                 movie_count, episode_count, season_count, show_count, music_count,
-                count_4k, count_1080p, count_720p, count_sd,
+                ${perResolutionBucket((bucket) => `count_${bucket}`)},
                 hevc_count, h264_count, av1_count,
                 count_high_quality, version_count
               )
@@ -2147,10 +2135,7 @@ export async function processBackfillLibrarySnapshotsJob(
                 bc.season_count,
                 bc.show_count,
                 bc.music_count,
-                bc.count_4k,
-                bc.count_1080p,
-                bc.count_720p,
-                bc.count_sd,
+                ${perResolutionBucket((bucket) => `bc.count_${bucket}`)},
                 bc.hevc_count,
                 bc.h264_count,
                 bc.av1_count,

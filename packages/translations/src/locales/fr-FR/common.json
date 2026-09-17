@@ -84,7 +84,9 @@
     "stopped": "Arrêté",
     "directPlay": "Lecture directe",
     "directStream": "Flux direct",
-    "transcode": "Transcodage"
+    "transcode": "Transcodage",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Faible",

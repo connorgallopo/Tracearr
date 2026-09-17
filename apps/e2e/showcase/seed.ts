@@ -1328,9 +1328,9 @@ async function seedSnapshots(client: Client, now: Date): Promise<void> {
   await client.query(
     `INSERT INTO library_snapshots
        (server_id, library_id, snapshot_time, item_count, total_size, movie_count,
-        episode_count, season_count, show_count, music_count, count_4k, count_1080p,
-        count_720p, count_sd, hevc_count, h264_count, av1_count, count_high_quality,
-        version_count)
+        episode_count, season_count, show_count, music_count, count_8k, count_4k,
+        count_1440p, count_1080p, count_720p, count_480p, count_sd, hevc_count,
+        h264_count, av1_count, count_high_quality, version_count)
      SELECT li.server_id, li.library_id, d.day,
             count(*), coalesce(sum(li.file_size), 0),
             count(*) FILTER (WHERE li.media_type = 'movie'),
@@ -1338,15 +1338,18 @@ async function seedSnapshots(client: Client, now: Date): Promise<void> {
             count(*) FILTER (WHERE li.media_type = 'season'),
             count(*) FILTER (WHERE li.media_type = 'show'),
             0,
+            count(*) FILTER (WHERE li.video_resolution = '8k'),
             count(*) FILTER (WHERE li.video_resolution = '4k'),
+            count(*) FILTER (WHERE li.video_resolution = '1440p'),
             count(*) FILTER (WHERE li.video_resolution = '1080p'),
             count(*) FILTER (WHERE li.video_resolution = '720p'),
+            count(*) FILTER (WHERE li.video_resolution = '480p'),
             count(*) FILTER (WHERE li.video_resolution IS NOT NULL
-                             AND li.video_resolution NOT IN ('4k', '1080p', '720p')),
+                             AND li.video_resolution NOT IN ('8k', '4k', '1440p', '1080p', '720p', '480p')),
             count(*) FILTER (WHERE li.video_codec = 'hevc'),
             count(*) FILTER (WHERE li.video_codec = 'h264'),
             0,
-            count(*) FILTER (WHERE li.video_resolution IN ('4k', '1080p')),
+            count(*) FILTER (WHERE li.video_resolution IN ('8k', '4k', '1440p', '1080p')),
             count(*) FILTER (WHERE li.file_size IS NOT NULL)
        FROM generate_series(
               date_trunc('day', $1::timestamptz) - interval '89 days',

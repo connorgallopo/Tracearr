@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { format } from 'date-fns';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { buildMediaServerItemUrl } from '@tracearr/shared';
+import { buildMediaServerItemUrl, formatMediaTech } from '@tracearr/shared';
 import type { MediaAvailabilityEntry, MediaRequestEntry, ServerType } from '@tracearr/shared';
 import type { MediaDetailData, MediaDetailStub } from '@/hooks/queries';
 import { buildPosterSrc } from './PosterCard';
@@ -376,21 +376,23 @@ export function DetailHero({
                             t('media.detail.hero.availability.added', {
                               date: format(new Date(entry.replaces.addedAt), 'MMM d, yyyy'),
                             }),
-                            entry.replaces.videoResolution,
+                            entry.replaces.videoResolution
+                              ? formatMediaTech(entry.replaces.videoResolution)
+                              : null,
                             entry.replaces.fileSize != null
                               ? formatBytes(entry.replaces.fileSize, 1, { minUnit: 'GB' })
                               : null,
                             t('media.detail.hero.availability.replaced', {
                               date: format(new Date(entry.replaces.removedAt), 'MMM d, yyyy'),
                             }),
-                            entry.videoResolution,
+                            entry.videoResolution ? formatMediaTech(entry.videoResolution) : null,
                             entry.fileSize != null
                               ? formatBytes(entry.fileSize, 1, { minUnit: 'GB' })
                               : null,
                           ])
                         : joinMeta([
                             dateText,
-                            entry.videoResolution,
+                            entry.videoResolution ? formatMediaTech(entry.videoResolution) : null,
                             entry.fileSize != null
                               ? formatBytes(entry.fileSize, 1, { minUnit: 'GB' })
                               : null,

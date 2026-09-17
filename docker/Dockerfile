@@ -13,7 +13,9 @@ ARG APP_FORK_RELEASE_TAG=
 ARG APP_FORK_REPO=d4rk-4lchemy/Tracearr
 ARG APP_IMAGE_REPO=darkalchemy2137/distracearr
 
-RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
+# pnpm's install script is what puts its native binary in place. corepack never runs it,
+# and npm 12 blocks it unless allowed, so both leave pnpm's shebang-less fallback shim instead.
+RUN npm install -g --allow-scripts=pnpm pnpm@12.3.4
 
 WORKDIR /app
 
@@ -50,7 +52,7 @@ ARG APP_FORK_RELEASE_TAG=
 ARG APP_FORK_REPO=d4rk-4lchemy/Tracearr
 ARG APP_IMAGE_REPO=darkalchemy2137/distracearr
 
-RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
+RUN npm install -g --allow-scripts=pnpm pnpm@12.3.4
 
 # Tailscale VPN binary (userspace networking, no root required)
 RUN apk add --no-cache tailscale postgresql-client

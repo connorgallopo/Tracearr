@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DYNAMIC_RANGE_TOKENS } from '../dynamicRange.js';
-import { RESOLUTION_TIERS } from '../resolution.js';
+import { RESOLUTION_LABELS } from '../resolution.js';
 import { contextSupplies, type TriggerContext } from './triggers.js';
 
 // Operators
@@ -70,7 +70,16 @@ export const conditionFieldSchema = z.union([
 ]);
 
 // Enums
-export const videoResolutionSchema = z.enum(['4K', '1080p', '720p', '480p', 'SD', 'unknown']);
+export const videoResolutionSchema = z.enum([
+  '8K',
+  '4K',
+  '1440p',
+  '1080p',
+  '720p',
+  '480p',
+  'SD',
+  'unknown',
+]);
 export const deviceTypeSchema = z.enum(['mobile', 'tablet', 'tv', 'desktop', 'browser', 'unknown']);
 export const platformSchema = z.enum([
   'ios',
@@ -104,8 +113,6 @@ export const libraryItemTypeSchema = z.enum([
   'track',
   'photo',
 ]);
-const RESOLUTION_LABELS = Object.keys(RESOLUTION_TIERS);
-
 // Condition value
 export const conditionValueSchema = z.union([
   z.string(),

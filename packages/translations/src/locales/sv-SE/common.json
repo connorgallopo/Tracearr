@@ -84,7 +84,9 @@
     "stopped": "Stoppad",
     "directPlay": "Spela direkt",
     "directStream": "Direkt Stream",
-    "transcode": "Omkoda"
+    "transcode": "Omkoda",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Låg",

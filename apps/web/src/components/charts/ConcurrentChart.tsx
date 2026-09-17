@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { getHour12 } from '@/lib/timeFormat';
 import { ChartSkeleton } from '@/components/ui/skeleton';
+import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import { ChartEmpty } from './ChartEmpty';
 import { parseChartDate } from './chartUtils';
 
@@ -27,6 +29,7 @@ export function ConcurrentChart({
   height = 250,
   period = 'month',
 }: ConcurrentChartProps) {
+  const { t } = useTranslation();
   const options = useMemo<Highcharts.Options>(() => {
     if (!data || data.length === 0) {
       return {};
@@ -157,7 +160,7 @@ export function ConcurrentChart({
       series: [
         {
           type: 'area',
-          name: 'Direct Play',
+          name: t(PLAYBACK_DECISION_LABEL_KEYS.directplay),
           data: data.map((d, i) => [timestamps[i] ?? 0, d.direct]),
           color: 'hsl(var(--chart-2))',
           fillColor: {
@@ -170,7 +173,7 @@ export function ConcurrentChart({
         },
         {
           type: 'area',
-          name: 'Direct Stream',
+          name: t(PLAYBACK_DECISION_LABEL_KEYS.copy),
           data: data.map((d, i) => [timestamps[i] ?? 0, d.directStream]),
           color: 'hsl(210, 76%, 50%)',
           fillColor: {
@@ -183,7 +186,7 @@ export function ConcurrentChart({
         },
         {
           type: 'area',
-          name: 'Transcode',
+          name: t(PLAYBACK_DECISION_LABEL_KEYS.transcode),
           data: data.map((d, i) => [timestamps[i] ?? 0, d.transcode]),
           color: 'hsl(var(--chart-4))',
           fillColor: {
@@ -228,7 +231,7 @@ export function ConcurrentChart({
         ],
       },
     };
-  }, [data, height, period]);
+  }, [data, height, period, t]);
 
   if (isLoading) {
     return <ChartSkeleton height={height} />;

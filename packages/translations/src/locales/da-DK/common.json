@@ -84,7 +84,9 @@
     "stopped": "Stoppet",
     "directPlay": "Direkte Afspil",
     "directStream": "Direkte Stream",
-    "transcode": ""
+    "transcode": "",
+    "hwTranscode": "",
+    "burnIn": ""
   },
   "severity": {
     "low": "Lav",

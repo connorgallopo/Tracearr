@@ -231,7 +231,7 @@ describe('DetailHero', () => {
     renderHero({ data: fullDetail({ availability }) });
 
     const caption = screen.getByText(
-      'added Aug 6, 2026 · 1080p · 1.8 GB · replaced Aug 13, 2026 · 4k · 4.9 GB'
+      'added Aug 6, 2026 · 1080p · 1.8 GB · replaced Aug 13, 2026 · 4K · 4.9 GB'
     );
     expect(caption).not.toHaveClass('line-through');
   });

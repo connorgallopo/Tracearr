@@ -26,9 +26,9 @@ interface CopiesPanelProps {
 
 const MAX_RESOLUTIONS_SHOWN = 3;
 
-/** "4k · 1080p" from the rollup, capped at three entries then "+N". */
+/** "4K · 1080p" from the rollup, capped at three entries then "+N". */
 function formatResolutionSet(resolutions: string[]): string {
-  const shown = resolutions.slice(0, MAX_RESOLUTIONS_SHOWN).join(' · ');
+  const shown = resolutions.slice(0, MAX_RESOLUTIONS_SHOWN).map(formatMediaTech).join(' · ');
   const extra = resolutions.length - MAX_RESOLUTIONS_SHOWN;
   return extra > 0 ? `${shown} +${extra}` : shown;
 }
@@ -104,7 +104,9 @@ export function CopiesPanel({
                 const quality =
                   entry.episodeResolutions && entry.episodeResolutions.length > 0
                     ? formatResolutionSet(entry.episodeResolutions)
-                    : entry.videoResolution;
+                    : entry.videoResolution
+                      ? formatMediaTech(entry.videoResolution)
+                      : null;
                 const sizeBytes = entry.fileSize ?? entry.episodeFileSize;
                 const mainRow = (
                   <TableRow key={`${entry.serverId}-${entry.libraryId}-${entry.ratingKey}`}>
@@ -151,9 +153,9 @@ export function CopiesPanel({
                           <TableCell className="text-muted-foreground text-xs">
                             {[
                               version.resolution ? formatMediaTech(version.resolution) : null,
-                              version.videoCodec,
+                              version.videoCodec ? formatMediaTech(version.videoCodec) : null,
                               version.dynamicRange && version.dynamicRange !== 'sdr'
-                                ? version.dynamicRange.toUpperCase()
+                                ? formatMediaTech(version.dynamicRange)
                                 : null,
                             ]
                               .filter(Boolean)

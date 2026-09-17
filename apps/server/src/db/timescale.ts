@@ -47,8 +47,10 @@ import { PRIMARY_MEDIA_TYPES_SQL_LITERAL } from '../constants/mediaTypes.js';
  *       repairs a legacy plex owner. Every per-user aggregate groups by
  *       server_user_id, so buckets materialized before the repair still credit
  *       the deleted account.
+ * - 16: Added count_8k, count_1440p and count_480p to library_stats_daily and
+ *       content_quality_daily; every resolution tier has its own bucket.
  */
-export const AGGREGATE_SCHEMA_VERSION = 15;
+export const AGGREGATE_SCHEMA_VERSION = 16;
 
 /** Config for a continuous aggregate view */
 interface AggregateDefinition {
@@ -189,9 +191,12 @@ function getAggregateDefinitions(): AggregateDefinition[] {
           MAX(episode_count) AS episode_count,
           MAX(show_count) AS show_count,
           MAX(music_count) AS music_count,
+          MAX(count_8k) AS count_8k,
           MAX(count_4k) AS count_4k,
+          MAX(count_1440p) AS count_1440p,
           MAX(count_1080p) AS count_1080p,
           MAX(count_720p) AS count_720p,
+          MAX(count_480p) AS count_480p,
           MAX(count_sd) AS count_sd,
           MAX(count_high_quality) AS count_high_quality,
           MAX(version_count) AS version_count
@@ -217,9 +222,12 @@ function getAggregateDefinitions(): AggregateDefinition[] {
           time_bucket('1 day', snapshot_time) AS day,
           server_id,
           MAX(item_count) AS total_items,
+          MAX(count_8k) AS count_8k,
           MAX(count_4k) AS count_4k,
+          MAX(count_1440p) AS count_1440p,
           MAX(count_1080p) AS count_1080p,
           MAX(count_720p) AS count_720p,
+          MAX(count_480p) AS count_480p,
           MAX(count_sd) AS count_sd,
           MAX(hevc_count) AS hevc_count,
           MAX(h264_count) AS h264_count,

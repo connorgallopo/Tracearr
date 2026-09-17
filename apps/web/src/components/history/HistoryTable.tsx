@@ -4,6 +4,7 @@
  */
 
 import { forwardRef, useRef, useEffect, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Link } from 'react-router';
 import {
@@ -31,6 +32,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, formatLocationCompact, getCountryName, getMediaDisplay } from '@/lib/utils';
+import { PLAYBACK_DECISION_LABEL_KEYS, playbackDecision } from '@/lib/playbackDecision';
 import { formatDuration } from '@/lib/formatters';
 import { getAvatarUrl } from '@/components/users/utils';
 import type { SessionWithDetails, SessionState, MediaType, EngagementTier } from '@tracearr/shared';
@@ -219,6 +221,7 @@ export const HistoryTableRow = memo(
       });
       const progress = getProgress(session);
       const colorMap = useServerColorMap();
+      const { t } = useTranslation();
       const serverColor = isMultiServer ? (colorMap.get(session.serverId) ?? null) : null;
       const accentStyle = serverColor
         ? { ...style, boxShadow: `inset 3px 0 0 0 ${serverColor}` }
@@ -405,7 +408,7 @@ export const HistoryTableRow = memo(
                   return (
                     <Badge variant="warning" className="gap-1 text-xs">
                       {isHwTranscode ? <Cpu className="h-3 w-3" /> : <Zap className="h-3 w-3" />}
-                      Transcode
+                      {t(PLAYBACK_DECISION_LABEL_KEYS.transcode)}
                     </Badge>
                   );
                 }
@@ -413,9 +416,7 @@ export const HistoryTableRow = memo(
                 return (
                   <Badge variant="success" className="gap-1 text-xs">
                     <MonitorPlay className="h-3 w-3" />
-                    {session.videoDecision === 'copy' || session.audioDecision === 'copy'
-                      ? 'Direct Stream'
-                      : 'Direct Play'}
+                    {t(PLAYBACK_DECISION_LABEL_KEYS[playbackDecision(session)])}
                   </Badge>
                 );
               })()}

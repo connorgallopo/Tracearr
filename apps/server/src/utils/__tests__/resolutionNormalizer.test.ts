@@ -67,9 +67,9 @@ describe('normalizeResolution', () => {
       expect(normalizeResolution({ resolution: 'SD' })).toBe('SD');
     });
 
-    it('should add p suffix to numeric-only values', () => {
-      expect(normalizeResolution({ resolution: '576' })).toBe('576p');
-      expect(normalizeResolution({ resolution: '540' })).toBe('540p');
+    it('should classify numeric-only values by height', () => {
+      expect(normalizeResolution({ resolution: '576' })).toBe('480p');
+      expect(normalizeResolution({ resolution: '540' })).toBe('480p');
     });
 
     it('should use resolution string when no dimensions available', () => {
@@ -78,17 +78,15 @@ describe('normalizeResolution', () => {
     });
   });
 
-  describe('label takes precedence over dimensions (Issue #798)', () => {
-    it('should trust the server label even when it is present alongside dimensions', () => {
-      // Root cause of Issue #798: a 1916x1036 file is genuinely 1080p, but the
-      // old width>=1920 cutoff missed it by 4px and downgraded it to 720p.
-      // Plex's own label should always win.
+  describe('dimensions take precedence over the label (Issue #1185)', () => {
+    it('should classify near-cutoff files by their pixels (Issue #798)', () => {
       expect(normalizeResolution({ resolution: '1080', width: 1916, height: 1036 })).toBe('1080p');
     });
 
-    it('should never let dimensions recompute a label the server already gave', () => {
-      expect(normalizeResolution({ resolution: '720', width: 1920, height: 800 })).toBe('720p');
-      expect(normalizeResolution({ resolution: '4k', width: 640, height: 480 })).toBe('4K');
+    it('should let dimensions override a label that disagrees', () => {
+      expect(normalizeResolution({ resolution: '2k', width: 2160, height: 1080 })).toBe('1080p');
+      expect(normalizeResolution({ resolution: '720', width: 1920, height: 800 })).toBe('1080p');
+      expect(normalizeResolution({ resolution: '4k', width: 640, height: 480 })).toBe('480p');
     });
 
     it('should fall back to dimensions when no label is present', () => {

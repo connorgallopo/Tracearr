@@ -1688,9 +1688,12 @@ export const librarySnapshots = pgTable(
     musicCount: integer('music_count').notNull().default(0),
 
     // Resolution breakdown
+    count8k: integer('count_8k').notNull().default(0),
     count4k: integer('count_4k').notNull().default(0),
+    count1440p: integer('count_1440p').notNull().default(0),
     count1080p: integer('count_1080p').notNull().default(0),
     count720p: integer('count_720p').notNull().default(0),
+    count480p: integer('count_480p').notNull().default(0),
     countSd: integer('count_sd').notNull().default(0),
 
     // Codec breakdown

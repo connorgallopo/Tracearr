@@ -7,24 +7,29 @@
 
 import { sql, type SQL } from 'drizzle-orm';
 import {
+  RESOLUTION_BUCKETS,
   resolutionBucketSpellings,
   resolutionAboveSdSpellings,
   resolutionSpellingRanks,
   type ResolutionBucket,
+  type ResolutionCounts,
 } from '@tracearr/shared';
 
 const quoteList = (values: string[]): string => values.map((v) => `'${v}'`).join(', ');
 
-const IN_LIST: Record<Exclude<ResolutionBucket, 'sd'>, string> = {
-  '4k': quoteList(resolutionBucketSpellings('4k')),
-  '1080p': quoteList(resolutionBucketSpellings('1080p')),
-  '720p': quoteList(resolutionBucketSpellings('720p')),
-};
+type AboveSdBucket = Exclude<ResolutionBucket, 'sd'>;
+
+const IN_LIST = Object.fromEntries(
+  RESOLUTION_BUCKETS.filter((bucket): bucket is AboveSdBucket => bucket !== 'sd').map((bucket) => [
+    bucket,
+    quoteList(resolutionBucketSpellings(bucket)),
+  ])
+) as Record<AboveSdBucket, string>;
 
 const ABOVE_SD_LIST = quoteList(resolutionAboveSdSpellings());
 
 /**
- * Predicate for membership in one of the four snapshot buckets.
+ * Predicate for membership in one of the snapshot buckets.
  *
  * @param column - Trusted column expression, e.g. 'video_resolution' or
  *   'li.video_resolution'. Interpolated raw; never pass user input.
@@ -45,25 +50,51 @@ export function resolutionBucketPredicate(
   return sql`${col} IN (${sql.raw(IN_LIST[bucket])})`;
 }
 
+/** Bucket names are fixed identifiers, so the fragments can go in raw. */
+export function perResolutionBucket(fragment: (bucket: ResolutionBucket) => string): SQL {
+  return sql.raw(RESOLUTION_BUCKETS.map(fragment).join(', '));
+}
+
+/** `BOOL_OR(...) AS has_<bucket>` for every bucket, for an item rollup's SELECT list. */
+export function bucketMembershipColumns(
+  versionColumn: string,
+  opts?: { includeNullAsSd?: boolean }
+): SQL {
+  return sql.join(
+    RESOLUTION_BUCKETS.map(
+      (bucket) =>
+        sql`BOOL_OR(${resolutionBucketPredicate(versionColumn, bucket, opts)}) AS ${sql.raw(`has_${bucket}`)}`
+    ),
+    sql`, `
+  );
+}
+
 /**
- * EXISTS predicate: the item has at least one active version in the bucket.
- * Overlapping by construction, so a 4K+1080p title satisfies both buckets and
- * bucket counts no longer sum to the item total.
+ * Joins `vb.has_<bucket>` flags onto each item, reading its active versions
+ * once however many buckets there are (a per-bucket EXISTS costs one index
+ * probe per bucket). A 4K+1080p title carries both flags; an item with no
+ * versions gets NULL flags, which count as false.
  *
  * @param itemIdColumn - Trusted column expression for the library_items id,
  *   e.g. 'library_items.id' or 'li.id'. Interpolated raw; never user input.
  */
-export function hasVersionInBucket(
+export function versionBucketFlagsJoin(
   itemIdColumn: string,
-  bucket: ResolutionBucket,
   opts?: { includeNullAsSd?: boolean }
 ): SQL {
-  return sql`EXISTS (
-    SELECT 1 FROM library_item_versions liv
+  return sql`LEFT JOIN LATERAL (
+    SELECT ${bucketMembershipColumns('liv.video_resolution', opts)}
+    FROM library_item_versions liv
     WHERE liv.library_item_id = ${sql.raw(itemIdColumn)}
       AND liv.removed_at IS NULL
-      AND ${resolutionBucketPredicate('liv.video_resolution', bucket, opts)}
-  )`;
+  ) vb ON true`;
+}
+
+/** Reads `count_<bucket>` columns off a result row; a missing row or column reads as zero. */
+export function readResolutionCounts(row: Record<string, unknown> | undefined): ResolutionCounts {
+  return Object.fromEntries(
+    RESOLUTION_BUCKETS.map((bucket) => [bucket, Number(row?.[`count_${bucket}`] ?? 0)])
+  ) as ResolutionCounts;
 }
 
 const RANK_CASE_ARMS = resolutionSpellingRanks()

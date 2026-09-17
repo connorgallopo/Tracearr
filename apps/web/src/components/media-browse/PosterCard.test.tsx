@@ -3,7 +3,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { initI18n } from '@tracearr/translations';
-import { PosterCard, buildPosterSrc, formatResolutionLabel } from './PosterCard';
+import { PosterCard, buildPosterSrc } from './PosterCard';
 
 beforeAll(async () => {
   await initI18n({ lng: 'en' });
@@ -340,22 +340,6 @@ describe('PosterCard', () => {
   it('falls back to the plain "Watched" suffix when watchedStateSelf is not supplied (shelf cards)', () => {
     renderCard({ watchedState: 'watched', watchedStateSelf: undefined });
     expect(screen.getByRole('link', { name: 'The Matrix (1999), Watched' })).toBeInTheDocument();
-  });
-});
-
-describe('formatResolutionLabel', () => {
-  it('uppercases 4k and sd to match the Resolution filter options', () => {
-    expect(formatResolutionLabel('4k')).toBe('4K');
-    expect(formatResolutionLabel('sd')).toBe('SD');
-  });
-
-  it('leaves already-canonical labels unchanged', () => {
-    expect(formatResolutionLabel('1080p')).toBe('1080p');
-    expect(formatResolutionLabel('720p')).toBe('720p');
-  });
-
-  it('falls back to the raw value for anything unrecognized', () => {
-    expect(formatResolutionLabel('weird')).toBe('weird');
   });
 });
 

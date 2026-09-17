@@ -49,7 +49,12 @@ import {
   LEGACY_VERSION_SENTINEL,
   supportsMediaLibrary,
 } from '@tracearr/shared';
-import { resolutionBucketPredicate, resolutionRankSql } from '../utils/resolutionBuckets.js';
+import {
+  bucketMembershipColumns,
+  perResolutionBucket,
+  readResolutionCounts,
+  resolutionRankSql,
+} from '../utils/resolutionBuckets.js';
 import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
 import { sanitizeText, scrubStringFields } from '../utils/sanitizeText.js';
 import type { Redis } from 'ioredis';
@@ -184,9 +189,12 @@ interface SnapshotStats {
   seasonCount: number;
   showCount: number;
   musicCount: number;
+  count8k: number;
   count4k: number;
+  count1440p: number;
   count1080p: number;
   count720p: number;
+  count480p: number;
   countSd: number;
   hevcCount: number;
   h264Count: number;
@@ -1899,9 +1907,12 @@ export class LibrarySyncService {
         seasonCount: librarySnapshots.seasonCount,
         showCount: librarySnapshots.showCount,
         musicCount: librarySnapshots.musicCount,
+        count8k: librarySnapshots.count8k,
         count4k: librarySnapshots.count4k,
+        count1440p: librarySnapshots.count1440p,
         count1080p: librarySnapshots.count1080p,
         count720p: librarySnapshots.count720p,
+        count480p: librarySnapshots.count480p,
         countSd: librarySnapshots.countSd,
         hevcCount: librarySnapshots.hevcCount,
         h264Count: librarySnapshots.h264Count,
@@ -1971,10 +1982,7 @@ export class LibrarySyncService {
           li.id,
           li.file_size,
           li.media_type,
-          BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '4k')}) AS has_4k,
-          BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '1080p')}) AS has_1080p,
-          BOOL_OR(${resolutionBucketPredicate('v.video_resolution', '720p')}) AS has_720p,
-          BOOL_OR(${resolutionBucketPredicate('v.video_resolution', 'sd')}) AS has_sd,
+          ${bucketMembershipColumns('v.video_resolution')},
           BOOL_OR(${resolutionRankSql('v.video_resolution')} >= ${RESOLUTION_TIERS['1080p']}) AS high_quality,
           BOOL_OR(v.video_codec IN ('hevc', 'h265', 'x265', 'HEVC', 'H265', 'X265')) AS has_hevc,
           BOOL_OR(v.video_codec IN ('h264', 'avc', 'x264', 'H264', 'AVC', 'X264')) AS has_h264,
@@ -1996,10 +2004,7 @@ export class LibrarySyncService {
         COUNT(*) FILTER (WHERE media_type = 'season')::int AS season_count,
         COUNT(*) FILTER (WHERE media_type = 'show')::int AS show_count,
         COUNT(*) FILTER (WHERE file_size > 0 AND media_type IN ('artist', 'album', 'track'))::int AS music_count,
-        COUNT(*) FILTER (WHERE file_size > 0 AND has_4k)::int AS count_4k,
-        COUNT(*) FILTER (WHERE file_size > 0 AND has_1080p)::int AS count_1080p,
-        COUNT(*) FILTER (WHERE file_size > 0 AND has_720p)::int AS count_720p,
-        COUNT(*) FILTER (WHERE file_size > 0 AND has_sd)::int AS count_sd,
+        ${perResolutionBucket((bucket) => `COUNT(*) FILTER (WHERE file_size > 0 AND has_${bucket})::int AS count_${bucket}`)},
         COUNT(*) FILTER (WHERE file_size > 0 AND high_quality)::int AS count_high_quality,
         COUNT(*) FILTER (WHERE file_size > 0 AND has_hevc)::int AS hevc_count,
         COUNT(*) FILTER (WHERE file_size > 0 AND has_h264)::int AS h264_count,
@@ -2017,10 +2022,6 @@ export class LibrarySyncService {
           season_count: number;
           show_count: number;
           music_count: number;
-          count_4k: number;
-          count_1080p: number;
-          count_720p: number;
-          count_sd: number;
           count_high_quality: number;
           hevc_count: number;
           h264_count: number;
@@ -2029,6 +2030,7 @@ export class LibrarySyncService {
         }
       | undefined;
     if (!row) return null;
+    const counts = readResolutionCounts(row);
 
     return this.writeSnapshot(serverId, libraryId, {
       itemCount: row.item_count,
@@ -2038,10 +2040,13 @@ export class LibrarySyncService {
       seasonCount: row.season_count,
       showCount: row.show_count,
       musicCount: row.music_count,
-      count4k: row.count_4k,
-      count1080p: row.count_1080p,
-      count720p: row.count_720p,
-      countSd: row.count_sd,
+      count8k: counts['8k'],
+      count4k: counts['4k'],
+      count1440p: counts['1440p'],
+      count1080p: counts['1080p'],
+      count720p: counts['720p'],
+      count480p: counts['480p'],
+      countSd: counts.sd,
       hevcCount: row.hevc_count,
       h264Count: row.h264_count,
       av1Count: row.av1_count,
@@ -2106,9 +2111,12 @@ export class LibrarySyncService {
         seasonCount: latest.seasonCount,
         showCount: latest.showCount,
         musicCount: latest.musicCount,
+        count8k: latest.count8k,
         count4k: latest.count4k,
+        count1440p: latest.count1440p,
         count1080p: latest.count1080p,
         count720p: latest.count720p,
+        count480p: latest.count480p,
         countSd: latest.countSd,
         hevcCount: latest.hevcCount,
         h264Count: latest.h264Count,

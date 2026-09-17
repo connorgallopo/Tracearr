@@ -249,7 +249,7 @@ describe('rebuildSnapshotFromDb aggregates in SQL', () => {
     });
   });
 
-  it('folds sd labels, tallies media types, and excludes size-less items', async () => {
+  it('buckets 480p on its own, tallies media types, and excludes size-less items', async () => {
     // The full-scan path aggregates snapshots from these rows too, so this
     // pins the scenarios the old in-memory builder's unit tests covered
     const server = await createTestServer({ type: 'plex' });
@@ -292,7 +292,7 @@ describe('rebuildSnapshotFromDb aggregates in SQL', () => {
 
     const row = await db.execute(sql`
       SELECT item_count, total_size::text, movie_count, episode_count, season_count,
-             show_count, music_count, count_sd, count_1080p, count_4k,
+             show_count, music_count, count_sd, count_480p, count_1080p, count_4k,
              av1_count, h264_count, hevc_count, version_count
       FROM library_snapshots WHERE id = ${snapshot!.id}
     `);
@@ -306,8 +306,8 @@ describe('rebuildSnapshotFromDb aggregates in SQL', () => {
       season_count: 1,
       show_count: 1,
       music_count: 1,
-      // 480p folds into sd
-      count_sd: 1,
+      count_sd: 0,
+      count_480p: 1,
       count_1080p: 1,
       count_4k: 0,
       av1_count: 1,

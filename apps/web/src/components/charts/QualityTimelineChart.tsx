@@ -1,20 +1,12 @@
 import { useMemo } from 'react';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
-import type { LibraryQualityResponse } from '@tracearr/shared';
+import { BarChart3 } from 'lucide-react';
+import { RESOLUTION_LABELS, resolutionBucket, type LibraryQualityResponse } from '@tracearr/shared';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { BarChart3 } from 'lucide-react';
+import { RESOLUTION_COLORS } from '@/lib/resolutionColors';
 import { parseChartDate } from './chartUtils';
-
-// Quality-based colors: higher quality = cooler/more vibrant colors
-// Visual hierarchy helps users quickly see quality distribution
-const QUALITY_COLORS = {
-  '4K': '#10b981', // Emerald green - premium/best
-  '1080p': '#3b82f6', // Blue - good quality
-  '720p': '#f59e0b', // Amber - acceptable
-  SD: '#ef4444', // Red - needs upgrade
-};
 
 interface QualityTimelineChartProps {
   data: LibraryQualityResponse | undefined;
@@ -30,6 +22,12 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
     }
 
     const totalByDay = new Map(data.data.map((d) => [parseChartDate(d.day), d.totalItems]));
+    const countOf = (label: (typeof RESOLUTION_LABELS)[number], d: (typeof data.data)[number]) =>
+      d.counts[resolutionBucket(label) ?? 'sd'];
+    // Worst tier first so the legend and stacking read upward; a tier nobody has stays off the chart
+    const shownLabels = [...RESOLUTION_LABELS]
+      .reverse()
+      .filter((label) => data.data.some((d) => countOf(label, d) > 0));
 
     return {
       chart: {
@@ -156,32 +154,12 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
           return html;
         },
       },
-      series: [
-        {
-          type: 'line',
-          name: 'SD',
-          data: data.data.map((d) => [parseChartDate(d.day), d.countSd]),
-          color: QUALITY_COLORS['SD'],
-        },
-        {
-          type: 'line',
-          name: '720p',
-          data: data.data.map((d) => [parseChartDate(d.day), d.count720p]),
-          color: QUALITY_COLORS['720p'],
-        },
-        {
-          type: 'line',
-          name: '1080p',
-          data: data.data.map((d) => [parseChartDate(d.day), d.count1080p]),
-          color: QUALITY_COLORS['1080p'],
-        },
-        {
-          type: 'line',
-          name: '4K',
-          data: data.data.map((d) => [parseChartDate(d.day), d.count4k]),
-          color: QUALITY_COLORS['4K'],
-        },
-      ],
+      series: shownLabels.map((label) => ({
+        type: 'line' as const,
+        name: label,
+        data: data.data.map((d) => [parseChartDate(d.day), countOf(label, d)]),
+        color: RESOLUTION_COLORS[label],
+      })),
       responsive: {
         rules: [
           {

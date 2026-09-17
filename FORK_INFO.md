@@ -7,9 +7,9 @@ This file documents the local fork overlay so future upstream updates can preser
 - Fork working tree: `/home/dev/work/Tracearr`
 - Fork branch: `develop`
 - Source repository checkout: `/tmp/Tracearr`
-- Source branch/SHA inspected: `main` at `452cef79`
-- Last shared upstream commit found during inspection: `9d2e17ab`
-- Latest upstream commit merged into the current working tree: `452cef79`
+- Source branch/SHA inspected: `main` at `89202893`
+- Last shared upstream commit found during inspection: `452cef79`
+- Latest upstream commit merged into the current working tree: `89202893`
 - Temporary comparison ref used locally: `source-tmp/main`
 
 Useful commands for re-checking this later:
@@ -247,6 +247,35 @@ Dispatcharr differs from the original supported media servers in several ways:
 When merging or rebasing on source `main`, preserve the Dispatcharr overlay deliberately instead of treating it as incidental drift.
 
 ### Latest upstream merge
+
+- Upstream `main` at `89202893` was merged into `develop` on September 17,
+  2026. Resolution classification now prioritizes pixels, with separate 8K,
+  1440p and 480p library buckets, shared display casing and translated playback
+  labels. Migration `0105_breezy_wind_dancer` is unchanged in the upstream
+  ledger; aggregate schema version 16 adds the corresponding snapshot columns.
+  The Dispatcharr migration ledger remains separate. The library-sync import
+  conflict retains `supportsMediaLibrary()` and its Dispatcharr exclusion;
+  the concurrent-chart conflict combines upstream translations with the fork's
+  existing timestamp fallback. Dispatcharr session/catch-up presentation,
+  History column widths, permanent uncropped artwork and both cache markers
+  remain intact. Dockerfiles retain fork metadata and fork-migration copies
+  while adopting upstream's npm installation of pnpm. Fork PR-only CI and
+  manual-only releases are unchanged. Upstream privacy-policy updates are
+  retained.
+  Full non-Docker CI passed on its first run with Node 24 / pnpm 12.3.4,
+  `HUSKY=0` and a 4 GB Node heap after clearing Turbo: frozen install, lint,
+  typecheck, translations, unit/services/routes/auth/security, web, coverage
+  and build. Server groups plus web passed 8,605 tests with two skipped;
+  shared passed another 360. Coverage passed 5,468 with two skipped
+  (66.85% statements, 61.01% branches, 72.83% functions, 67.93% lines).
+  Lint retains 755 warnings; all jobs retain September 15 warning counts and
+  normalized message classes. Automated Dispatcharr auth/settings, lifecycle,
+  images and termination coverage passed. Details are recorded in
+  `.tmp/github-ci-warning-reference.md`; logs use
+  `.tmp/github-ci-<job>-20260917-8920.log`. Docker integration,
+  E2E and image builds are omitted at the user's request, so migration execution
+  and database upgrade paths are not validated by this run. Live-provider
+  Dispatcharr manual smoke checks are not covered by this local run.
 
 - Upstream `main` at `452cef79` (Tracearr 2.3.0) was merged into `develop`
   on September 15, 2026. It adds bundled release notes, the owner's What's New
