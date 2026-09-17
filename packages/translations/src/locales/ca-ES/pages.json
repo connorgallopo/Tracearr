@@ -153,7 +153,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": "Ubicacions"
   },
   "history": {
     "title": "Històric",
@@ -163,7 +164,10 @@
     "showingAllResults": "",
     "deleteSession_one": "",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": ""
+    "deleteSessionsConfirm": "",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "",
@@ -456,7 +460,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Error"
       },
       "empty": "",
       "emptyDescription": "",
@@ -559,7 +563,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "",
+        "global": "Global",
         "server": "",
         "account": "",
         "person": "",
@@ -1643,7 +1647,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1655,7 +1659,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
