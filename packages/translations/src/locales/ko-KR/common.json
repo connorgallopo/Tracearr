@@ -86,7 +86,8 @@
     "directStream": "직접 재생",
     "transcode": "트랜스코딩",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "낮음",
@@ -118,7 +119,12 @@
     "last30Days": "최근 30일",
     "lastYear": "작년",
     "byDay": "일별",
-    "byHour": "시간별"
+    "byHour": "시간별",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "km",
@@ -182,7 +188,8 @@
     "segments": "구간",
     "streamDetails": "스트림 상세",
     "transcodeReason": "트랜스코딩 사유",
-    "loadMore": "더 불러오기"
+    "loadMore": "더 불러오기",
+    "playback": ""
   },
   "search": {
     "placeholder": "검색...",
@@ -286,7 +293,11 @@
     "location_one": "위치 {{count}}곳",
     "location_other": "위치 {{count}}곳",
     "device_one": "기기 {{count}}대",
-    "device_other": "기기 {{count}}대"
+    "device_other": "기기 {{count}}대",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "변경된 내용이 없습니다"
