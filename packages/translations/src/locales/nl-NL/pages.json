@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Geschiedenis",
@@ -165,7 +166,10 @@
     "showingAllResults": "Alle {{total}} resultaten weergegeven",
     "deleteSession_one": "{{count}} sessie verwijderen",
     "deleteSession_other": "{{count}} sessies verwijderen",
-    "deleteSessionsConfirm": "Weet je zeker dat je wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    "deleteSessionsConfirm": "Weet je zeker dat je wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliotheek",

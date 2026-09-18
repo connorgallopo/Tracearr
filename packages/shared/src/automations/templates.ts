@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { compareVersions } from '../releaseVersion.js';
 import { CONDITION_FIELD_LABELS } from '../violations.js';
 import {
   ifActionSchema,
@@ -10,6 +11,7 @@ import {
 } from './actions.js';
 import {
   CONDITION_FIELDS,
+  CONDITION_VALUE_INTRODUCED_IN,
   conditionFieldSchema,
   conditionGroupSchema,
   conditionSchema,
@@ -17,7 +19,7 @@ import {
   automationConditionsSchema,
 } from './conditions.js';
 import { createAutomationSchema } from './definition.js';
-import { triggerNodeSchema } from './triggers.js';
+import { TRIGGER_INTRODUCED_IN, triggerNodeSchema } from './triggers.js';
 import type { Action, LeafAction } from './actions.js';
 import type {
   Condition,
@@ -44,6 +46,7 @@ export const TEMPLATE_GROUPS = [
   'housekeeping',
 ] as const;
 export const TEMPLATE_SCHEMA_VERSION = 1;
+/** The release templates shipped in, and the least any template needs. */
 export const TEMPLATE_MIN_SERVER_VERSION = '2.2.0';
 
 const inputBase = {
@@ -455,6 +458,36 @@ function checkIntegrity(
       });
     }
   });
+}
+
+/**
+ * The oldest server release that runs the template as written: the newest release
+ * among the triggers and condition values it uses, never below the floor. A
+ * placeholder counts through its input's default, which an import prefills.
+ */
+export function templateMinServerVersion(template: {
+  inputs: TemplateInput[];
+  definition: TemplateDefinition;
+}): string {
+  const byKey = new Map(template.inputs.map((input) => [input.key, input]));
+  const needed = template.definition.triggers.map((trigger) => TRIGGER_INTRODUCED_IN[trigger.type]);
+
+  for (const visit of slotsOf(template.definition)) {
+    const introducedIn = visit.field && CONDITION_VALUE_INTRODUCED_IN[visit.field];
+    if (!introducedIn) continue;
+    const key = placeholderKey(visit.value);
+    const input = key === undefined ? undefined : byKey.get(key);
+    const value = key === undefined ? visit.value : input && 'default' in input && input.default;
+    for (const entry of [value].flat()) {
+      if (typeof entry === 'string') needed.push(introducedIn[entry]);
+    }
+  }
+
+  return needed.reduce<string>(
+    (highest, version) =>
+      version !== undefined && compareVersions(version, highest) > 0 ? version : highest,
+    TEMPLATE_MIN_SERVER_VERSION
+  );
 }
 
 export const templateEnvelopeSchema = envelopeFieldsSchema.superRefine(checkIntegrity);

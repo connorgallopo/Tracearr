@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Ιστορικό",
@@ -165,7 +166,10 @@
     "showingAllResults": "",
     "deleteSession_one": "",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": "Είστε βέβαιοι ότι θέλετε να διαγράψετε? Αυτή η ενέργεια δεν μπορεί να αναιρεθεί."
+    "deleteSessionsConfirm": "Είστε βέβαιοι ότι θέλετε να διαγράψετε? Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Βιβλιοθήκη",

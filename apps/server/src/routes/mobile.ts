@@ -63,6 +63,9 @@ function isBetaMode(): boolean {
   return process.env.MOBILE_BETA_MODE === 'true';
 }
 
+// No instance name setting exists; a media server's name must not stand in for it.
+const INSTANCE_NAME = 'Tracearr';
+
 // Limits
 const MAX_PAIRED_DEVICES = 5;
 const MAX_PENDING_TOKENS = 3;
@@ -224,10 +227,6 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       .where(and(gt(mobileTokens.expiresAt, new Date()), isNull(mobileTokens.usedAt)));
     const pendingTokens = pendingTokensResult[0]?.count ?? 0;
 
-    // Get server name
-    const serverRow = await db.select({ name: servers.name }).from(servers).limit(1);
-    const serverName = serverRow[0]?.name || 'Tracearr';
-
     const sessions: MobileSession[] = sessionsRows.map((s) => ({
       id: s.id,
       deviceName: s.deviceName,
@@ -241,7 +240,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     const config: MobileConfig = {
       isEnabled,
       sessions,
-      serverName,
+      serverName: INSTANCE_NAME,
       pendingTokens,
       maxDevices: MAX_PAIRED_DEVICES,
     };
@@ -264,9 +263,6 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
 
     // Get current state for response
     const sessionsRows = await db.select().from(mobileSessions);
-    const serverRow = await db.select({ name: servers.name }).from(servers).limit(1);
-    const serverName = serverRow[0]?.name || 'Tracearr';
-
     const sessions: MobileSession[] = sessionsRows.map((s) => ({
       id: s.id,
       deviceName: s.deviceName,
@@ -280,7 +276,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
     const config: MobileConfig = {
       isEnabled: true,
       sessions,
-      serverName,
+      serverName: INSTANCE_NAME,
       pendingTokens: 0,
       maxDevices: MAX_PAIRED_DEVICES,
     };
@@ -686,14 +682,11 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         const owner = ownerRow[0]!;
 
         // Get all server IDs for the JWT
-        const allServers = await tx
-          .select({ id: servers.id, name: servers.name, type: servers.type })
-          .from(servers);
+        const allServers = await tx.select({ id: servers.id, type: servers.type }).from(servers);
         const serverIds = allServers.map((s) => s.id);
 
         // Get primary server info for the response (first server)
         const primaryServer = allServers[0];
-        const serverName = primaryServer?.name || 'Tracearr';
         const serverId = primaryServer?.id || '';
         const serverType = primaryServer?.type || 'plex';
 
@@ -753,7 +746,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
           accessToken: baSession.token,
           refreshToken: baSession.token,
           owner: { id: owner.id, username: owner.username },
-          serverName,
+          serverName: INSTANCE_NAME,
           serverId,
           serverType,
           serverIds,

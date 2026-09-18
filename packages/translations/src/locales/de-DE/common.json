@@ -86,7 +86,8 @@
     "directStream": "",
     "transcode": "Transkodiere",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "Niedrig",
@@ -118,7 +119,12 @@
     "last30Days": "Letzten 30 Tage",
     "lastYear": "Letzte Jahr",
     "byDay": "Nach Tag",
-    "byHour": "Nach Stunde"
+    "byHour": "Nach Stunde",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "",
@@ -182,7 +188,8 @@
     "segments": "Segmente",
     "streamDetails": "Streamdetails",
     "transcodeReason": "Transkodierungsgrund",
-    "loadMore": "Mehr laden"
+    "loadMore": "Mehr laden",
+    "playback": ""
   },
   "search": {
     "placeholder": "Suchen...",
@@ -288,7 +295,11 @@
     "device_one": "{{count}} Gerät",
     "device_other": "{{count}} Geräte",
     "channel_one": "",
-    "channel_other": ""
+    "channel_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "Keine Änderungen erkannt"

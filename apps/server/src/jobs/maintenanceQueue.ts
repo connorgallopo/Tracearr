@@ -1198,6 +1198,7 @@ async function processBackfillSessionIdentityJob(
       `Completed! Stamped identity onto ${total.toLocaleString()} sessions`,
     resultMessage: (total) => `Stamped identity onto ${total} sessions`,
     failurePrefix: 'Identity backfill skipped',
+    totalCountsUpdates: true,
     walk: async (onBatch, onCommit) => ({
       ...(await runSessionIdentityBackfillWalk({
         batchSize: 5000,
@@ -1224,6 +1225,7 @@ export async function runImportDuplicateCleanup(
     completeMessage: (_total, details) => `Completed! ${details}`,
     resultMessage: (_total, details) => details,
     failurePrefix: 'Import duplicate cleanup skipped',
+    totalCountsUpdates: false,
     walk: (onBatch, onCommit) => runImportDuplicateCleanupWalk({ onBatch, onCommit }),
   });
 }
@@ -1244,6 +1246,7 @@ export async function runImportedHistoryLinking(
     completeMessage: (_total, details) => `Completed! ${details}`,
     resultMessage: (_total, details) => details,
     failurePrefix: 'Imported history linking skipped',
+    totalCountsUpdates: true,
     walk: (onBatch, onCommit) => runImportedHistoryLinkingWalk({ ...deps, onBatch, onCommit }),
   });
 }
@@ -1268,6 +1271,8 @@ export async function runSessionMaintenanceWalk(
     completeMessage: (total: number, details: string) => string;
     resultMessage: (total: number, details: string) => string;
     failurePrefix: string;
+    /** False when the running total counts rows looked at, not rows changed. */
+    totalCountsUpdates: boolean;
     walk: (
       onBatch: (total: number) => Promise<void>,
       onCommit: (oldest: Date | null) => void
@@ -1364,7 +1369,7 @@ export async function runSessionMaintenanceWalk(
           async (runningTotal) => {
             if (activeJobProgress) {
               activeJobProgress.processedRecords = runningTotal;
-              activeJobProgress.updatedRecords = runningTotal;
+              if (opts.totalCountsUpdates) activeJobProgress.updatedRecords = runningTotal;
               activeJobProgress.message = opts.progressMessage(runningTotal);
               await publishProgress();
             }

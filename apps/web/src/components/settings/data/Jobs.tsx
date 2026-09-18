@@ -477,15 +477,23 @@ export function Jobs() {
                     <div className="w-full space-y-3 border-t pt-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">{progress.message}</span>
-                        <span className="font-medium tabular-nums">{getProgressPercent()}%</span>
+                        {progress.totalRecords > 0 && (
+                          <span className="font-medium tabular-nums">{getProgressPercent()}%</span>
+                        )}
                       </div>
-                      <Progress value={getProgressPercent()} className="h-1.5" />
+                      {progress.totalRecords > 0 ? (
+                        <Progress value={getProgressPercent()} className="h-1.5" />
+                      ) : (
+                        <Progress value={100} className="h-1.5 animate-pulse" />
+                      )}
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
                         <span className="text-muted-foreground">
                           <span className="text-foreground font-medium">
                             {progress.processedRecords.toLocaleString()}
                           </span>{' '}
-                          / {progress.totalRecords.toLocaleString()} {t('jobs.processed')}
+                          {progress.totalRecords > 0 &&
+                            `/ ${progress.totalRecords.toLocaleString()} `}
+                          {t('jobs.processed')}
                         </span>
                         {progress.updatedRecords > 0 && (
                           <span className="text-muted-foreground">

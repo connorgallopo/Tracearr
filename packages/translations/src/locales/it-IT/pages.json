@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Storico",
@@ -165,7 +166,10 @@
     "showingAllResults": "Mostrando tutti i risultati {{total}}",
     "deleteSession_one": "Elimina Sessione {{count}}",
     "deleteSession_other": "Elimina Sessioni {{count}}",
-    "deleteSessionsConfirm": "Sei sicuro di voler eliminare? Questa azione non può essere annullata."
+    "deleteSessionsConfirm": "Sei sicuro di voler eliminare? Questa azione non può essere annullata.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Libreria",

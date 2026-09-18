@@ -7,7 +7,7 @@
  */
 
 import type { Redis } from 'ioredis';
-import { REDIS_KEYS } from '@tracearr/shared';
+import { CACHE_TTL, REDIS_KEYS } from '@tracearr/shared';
 
 /**
  * Result of a rate limit check
@@ -169,6 +169,22 @@ export class PushRateLimiter {
       resetMinuteIn: minuteTTL > 0 ? minuteTTL : 60,
       resetHourIn: hourTTL > 0 ? hourTTL : 3600,
     };
+  }
+
+  /**
+   * Claim a device's silent sessions sync. False while an earlier claim is
+   * still inside the window, so a busy server cannot spend the background
+   * push budget iOS gives the app.
+   */
+  async claimSessionsSync(mobileSessionId: string): Promise<boolean> {
+    const claimed = await this.redis.set(
+      REDIS_KEYS.PUSH_SESSIONS_SYNC(mobileSessionId),
+      '1',
+      'EX',
+      CACHE_TTL.PUSH_SESSIONS_SYNC,
+      'NX'
+    );
+    return claimed === 'OK';
   }
 
   /**

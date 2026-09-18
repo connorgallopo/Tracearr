@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Històric",
@@ -165,7 +166,10 @@
     "showingAllResults": "",
     "deleteSession_one": "",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": ""
+    "deleteSessionsConfirm": "",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "",

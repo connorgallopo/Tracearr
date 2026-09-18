@@ -5,11 +5,11 @@
 
 import {
   AUTOMATION_NAME_MAX,
-  TEMPLATE_MIN_SERVER_VERSION,
   TEMPLATE_SCHEMA_VERSION,
   fingerprintOf,
   liftAutomation,
   templateEnvelopeSchema,
+  templateMinServerVersion,
   type TEMPLATE_GROUPS,
   type TemplateEnvelope,
 } from '@tracearr/shared';
@@ -81,7 +81,7 @@ export function exportEnvelope(
     group: context.group ?? (automation.kind === 'notification' ? 'notifications' : 'policies'),
     kind: automation.kind,
     ...(context.author === undefined ? {} : { author: context.author }),
-    minServerVersion: TEMPLATE_MIN_SERVER_VERSION,
+    minServerVersion: templateMinServerVersion(lifted),
     inputs: lifted.inputs,
     definition: lifted.definition,
     fingerprint: fingerprintOf(lifted, sha256Hex),

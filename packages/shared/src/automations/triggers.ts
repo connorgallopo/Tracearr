@@ -155,6 +155,13 @@ export const TRIGGERS = {
 >;
 
 export type TriggerType = keyof typeof TRIGGERS;
+
+/** The release that first shipped a trigger; one not listed has been there since 2.2.0. */
+export const TRIGGER_INTRODUCED_IN: Partial<Record<TriggerType, string>> = {
+  'session.first_seen': '2.3.0',
+  'newsletter.sent': '2.3.0',
+  'newsletter.failed': '2.3.0',
+};
 export const TRIGGER_TYPES = Object.keys(TRIGGERS) as TriggerType[];
 
 /** Triggers a violation is never about: nobody did anything wrong by picking up a new phone. */

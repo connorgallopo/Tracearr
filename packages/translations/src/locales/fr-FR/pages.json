@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historique",
@@ -165,7 +166,10 @@
     "showingAllResults": "Affichage des {{total}} résultats",
     "deleteSession_one": "Supprimer {{count}} session",
     "deleteSession_other": "Supprimer les {{count}} sessions",
-    "deleteSessionsConfirm": "Êtes-vous sûr de vouloir supprimer ceci ? Cette action est irréversible."
+    "deleteSessionsConfirm": "Êtes-vous sûr de vouloir supprimer ceci ? Cette action est irréversible.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliothèque",

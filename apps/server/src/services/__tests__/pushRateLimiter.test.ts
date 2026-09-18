@@ -10,8 +10,9 @@
  * Uses a mock Redis that simulates Lua script execution.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { Redis } from 'ioredis';
+import { REDIS_KEYS } from '@tracearr/shared';
 import {
   PushRateLimiter,
   initPushRateLimiter,
@@ -32,6 +33,7 @@ function createMockRedis(): Redis & {
 } {
   const store = new Map<string, string>();
   const ttls = new Map<string, number>();
+  const expiries = new Map<string, number>();
 
   return {
     store,
@@ -85,6 +87,15 @@ function createMockRedis(): Redis & {
         return [1, minuteCount, hourCount, ttls.get(minuteKey)!, ttls.get(hourKey)!, 0];
       }
     ),
+
+    // SET key value EX seconds NX, the only form the limiter uses
+    set: vi.fn(async (key: string, value: string, _ex: 'EX', seconds: number, _nx: 'NX') => {
+      const expiresAt = expiries.get(key);
+      if (expiresAt !== undefined && expiresAt > Date.now()) return null;
+      store.set(key, value);
+      expiries.set(key, Date.now() + seconds * 1000);
+      return 'OK';
+    }),
 
     get: vi.fn(async (key: string) => store.get(key) ?? null),
 
@@ -243,6 +254,34 @@ describe('PushRateLimiter', () => {
       expect(status.remainingHour).toBe(30);
       expect(status.resetMinuteIn).toBe(60);
       expect(status.resetHourIn).toBe(3600);
+    });
+  });
+
+  describe('claimSessionsSync', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('allows the first claim, blocks the next inside the window and allows again after it', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-17T12:00:00.000Z'));
+
+      expect(await rateLimiter.claimSessionsSync('session-1')).toBe(true);
+
+      vi.advanceTimersByTime(19 * 60 * 1000);
+      expect(await rateLimiter.claimSessionsSync('session-1')).toBe(false);
+      expect(await rateLimiter.claimSessionsSync('session-2')).toBe(true);
+
+      vi.advanceTimersByTime(60 * 1000);
+      expect(await rateLimiter.claimSessionsSync('session-1')).toBe(true);
+
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        REDIS_KEYS.PUSH_SESSIONS_SYNC('session-1'),
+        '1',
+        'EX',
+        1200,
+        'NX'
+      );
     });
   });
 

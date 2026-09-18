@@ -1,10 +1,55 @@
 {
   "version": "2.4.0",
-  "date": "2026-09-16",
+  "date": "2026-09-17",
+  "headline": "Housekeeping and mobile",
+  "highlights": [
+    {
+      "title": "Imported history",
+      "body": "Link Imported Plex History links Tautulli plays that never matched a library item, so their plays and watched state count. Remove Imported Duplicates deletes an imported play only when a tracked play already records the same thing. Both are under Settings → Data → Jobs. Jellystat's JSONL backups import, and every importer skips plays that started after the server was added to Tracearr.",
+      "docs": "https://docs.tracearr.com/getting-started/import"
+    },
+    {
+      "title": "Resolution",
+      "body": "Resolution comes from pixel dimensions on every server, and 8K, 1440p and 480p have their own buckets in library quality charts, catalog filters and automation conditions. Library counts shift after upgrading: 1440p and 8K titles leave 4K, and 480p titles leave SD. Plex libraries rescan in full once to pick this up."
+    },
+    {
+      "title": "Mobile",
+      "body": "The iOS home screen widget refreshes when a stream starts or stops, at most every 20 minutes. Pairing shows Tracearr as the instance name instead of the first media server's name.",
+      "docs": "https://docs.tracearr.com/configuration/mobile"
+    }
+  ],
   "changes": [
     {
       "type": "new",
       "text": "Link Imported Plex History links unmatched Tautulli imports so their plays and watched state count"
+    },
+    {
+      "type": "new",
+      "text": "run Remove Imported Duplicates in Settings → Data → Jobs if an import doubled plays"
+    },
+    {
+      "type": "improved",
+      "text": "resolution comes from pixel dimensions, and 8K, 1440p and 480p have their own buckets"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports link episode plays to the episode; plays Jellystat may have moved to a different title stay unlinked"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports take the runtime from the media server, so plays past the watched threshold count as watched"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat imports no longer store a playback position Jellystat never measured"
+    },
+    {
+      "type": "improved",
+      "text": "Jellystat import says when plugin plays need the Playback Reporting Plugin Data table to link"
+    },
+    {
+      "type": "improved",
+      "text": "the iOS home screen widget is refreshed when a stream starts or stops, at most every 20 minutes"
     },
     {
       "type": "fix",
@@ -12,39 +57,52 @@
     },
     {
       "type": "fix",
-      "text": "plays that were linked to a whole show, season, artist or album instead of the item played are unlinked"
-    },
-    {
-      "type": "new",
-      "text": "run Remove Imported Duplicates in Settings → Jobs if an import doubled plays; imports that add watch data are kept"
-    },
-    {
-      "type": "improved",
-      "text": "Jellystat imports link episode plays to the episode; plays Jellystat may have moved to a different title stay unlinked"
-    },
-    {
-      "type": "fix",
-      "text": "Jellystat backups in the JSONL format that Jellystat 1.1.12 writes can be imported"
-    },
-    {
-      "type": "improved",
-      "text": "Jellystat imports take the media runtime from Jellyfin and no longer store a position Jellystat never measured"
-    },
-    {
-      "type": "improved",
-      "text": "Jellystat imports count as watched when the play ran past the watched threshold of the media runtime"
-    },
-    {
-      "type": "fix",
       "text": "Jellystat and Playback Reporting imports skip plays whose recorded play time runs past the media runtime"
     },
     {
-      "type": "improved",
-      "text": "Jellystat import says when plugin plays need the Playback Reporting Plugin Data table to link"
+      "type": "fix",
+      "text": "Jellystat's newer JSONL backups can be imported",
+      "docs": "https://docs.tracearr.com/getting-started/import"
+    },
+    {
+      "type": "fix",
+      "text": "large Jellystat backups use far less memory to import and no longer sit in Redis while they wait"
+    },
+    {
+      "type": "fix",
+      "text": "the Map page zooms to where plays are instead of stretching to one far-off play, and fills the window on desktop"
+    },
+    {
+      "type": "fix",
+      "text": "plays that were linked to a whole show, season, artist or album instead of the item played are unlinked"
+    },
+    {
+      "type": "fix",
+      "text": "acknowledging violations in bulk leaves ones already acknowledged alone and counts only the rest"
+    },
+    {
+      "type": "fix",
+      "text": "pairing the mobile app shows Tracearr as the instance name instead of the first media server's name"
+    },
+    {
+      "type": "fix",
+      "text": "templates that use a newsletter or first-seen trigger, or 1440p/8K values, state the server version they need"
+    },
+    {
+      "type": "note",
+      "text": "after upgrading, stats rebuild in the background and show only the last 7 days until that finishes"
     },
     {
       "type": "note",
       "text": "the first library sync after upgrading rescans every Plex library in full once"
+    },
+    {
+      "type": "note",
+      "text": "library resolution counts shift after upgrading; quality history keeps the old buckets for earlier days"
+    },
+    {
+      "type": "note",
+      "text": "automation conditions with resolution equals 4K no longer match 8K or 1440p; at least conditions are unaffected"
     }
   ]
 }

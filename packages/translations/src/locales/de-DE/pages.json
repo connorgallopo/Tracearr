@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historie",
@@ -165,7 +166,10 @@
     "showingAllResults": "Alle {{total}} Resultate anzeigen",
     "deleteSession_one": "Lösche {{count}} Session",
     "deleteSession_other": "Lösche {{count}} Sessions",
-    "deleteSessionsConfirm": "Möchten Sie wirklich {{count}} Sitzungen löschen? Diese Aktion kann nicht rückgängig gemacht werden.."
+    "deleteSessionsConfirm": "Möchten Sie wirklich {{count}} Sitzungen löschen? Diese Aktion kann nicht rückgängig gemacht werden..",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliothek",

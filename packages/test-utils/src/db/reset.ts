@@ -28,6 +28,9 @@ const ROOT_TABLES = [
   'servers',
   'users',
   'settings',
+  'destinations',
+  'newsletters',
+  'email_suppressions',
 ];
 
 let cachedTables: string[] | null = null;

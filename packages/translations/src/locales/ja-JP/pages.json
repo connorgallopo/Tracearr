@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "沿革",
@@ -165,7 +166,10 @@
     "showingAllResults": "すべての {{total}} 結果を表示",
     "deleteSession_one": "{{count}} セッションを削除",
     "deleteSession_other": "{{count}} セッションを削除",
-    "deleteSessionsConfirm": "本当に削除しますか？この操作は元に戻せません。"
+    "deleteSessionsConfirm": "本当に削除しますか？この操作は元に戻せません。",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "ライブラリ",

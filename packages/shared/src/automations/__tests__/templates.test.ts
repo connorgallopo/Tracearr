@@ -9,6 +9,7 @@ import {
   liftAutomation,
   materializeTemplate,
   templateEnvelopeSchema,
+  templateMinServerVersion,
 } from '../index.js';
 import * as entry from '../../index.js';
 import type { TemplateSlot } from '../index.js';
@@ -300,11 +301,82 @@ describe('lift and materialize', () => {
   });
 });
 
+describe('templateMinServerVersion', () => {
+  const withTriggers = (...types: string[]) =>
+    ({
+      ...streamStarted,
+      triggers: types.map((type, index) => ({ id: id(10 + index), type, enabled: true })),
+    }) as TemplateDefinition;
+  const resolutionCondition = (value: unknown) =>
+    ({
+      ...streamStarted,
+      conditions: {
+        groups: [
+          {
+            id: id(20),
+            conditions: [{ id: id(21), field: 'source_resolution', operator: 'in', value }],
+          },
+        ],
+      },
+    }) as TemplateDefinition;
+  const inputs = [serverInput, toInput] as TemplateInput[];
+
+  it('is the floor for a definition that uses nothing newer', () => {
+    expect(templateMinServerVersion({ inputs, definition: withTriggers('session.started') })).toBe(
+      TEMPLATE_MIN_SERVER_VERSION
+    );
+  });
+
+  it.each(['newsletter.failed', 'newsletter.sent', 'session.first_seen'])(
+    'is 2.3.0 for the %s trigger',
+    (type) => {
+      expect(templateMinServerVersion({ inputs, definition: withTriggers(type) })).toBe('2.3.0');
+    }
+  );
+
+  it('is 2.4.0 for a resolution value older servers rank as nothing', () => {
+    expect(templateMinServerVersion({ inputs, definition: resolutionCondition(['4K']) })).toBe(
+      TEMPLATE_MIN_SERVER_VERSION
+    );
+    expect(
+      templateMinServerVersion({ inputs, definition: resolutionCondition(['4K', '1440p']) })
+    ).toBe('2.4.0');
+  });
+
+  it('reads a placeholder through the default of the input it names', () => {
+    const resolution = {
+      key: 'resolution',
+      kind: 'field_value',
+      field: 'source_resolution',
+      label: 'Resolution',
+      required: true,
+      default: ['8K'],
+    } as TemplateInput;
+
+    expect(
+      templateMinServerVersion({
+        inputs: [...inputs, resolution],
+        definition: resolutionCondition({ $input: 'resolution' }),
+      })
+    ).toBe('2.4.0');
+  });
+
+  it('takes the highest when several apply', () => {
+    const definition = {
+      ...resolutionCondition(['8K']),
+      triggers: withTriggers('session.started', 'session.first_seen').triggers,
+    };
+
+    expect(templateMinServerVersion({ inputs, definition })).toBe('2.4.0');
+  });
+});
+
 const ENTRY_EXPORTS = [
   'TEMPLATE_GROUPS',
   'templateEnvelopeSchema',
   'TEMPLATE_SCHEMA_VERSION',
   'TEMPLATE_MIN_SERVER_VERSION',
+  'templateMinServerVersion',
   'canonicalJson',
   'fingerprintOf',
   'materializeTemplate',

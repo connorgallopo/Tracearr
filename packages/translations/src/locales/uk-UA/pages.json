@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Історія",
@@ -165,7 +166,10 @@
     "showingAllResults": "Показано всі {{total}} результати",
     "deleteSession_one": "Видалити {{count}} сеанс",
     "deleteSession_other": "Видалити {{count}} сеансів",
-    "deleteSessionsConfirm": "Ви впевнені, що хочете видалити? Цю дію не можна скасувати."
+    "deleteSessionsConfirm": "Ви впевнені, що хочете видалити? Цю дію не можна скасувати.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Бібліотека",

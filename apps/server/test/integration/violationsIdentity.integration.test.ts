@@ -163,6 +163,60 @@ describe('POST /violations/bulk/acknowledge - person filter', () => {
   });
 });
 
+describe('POST /violations/bulk/acknowledge - already acknowledged rows', () => {
+  it('keeps the earlier acknowledgedAt and counts only the rows it stamped, by selectAll or by id', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'plex' });
+    const person = await createTestUser({ role: 'member' });
+    const su = await createTestServerUser({ userId: person.id, serverId: server.id });
+    const rule = await createConcurrentStreamsAutomation(2);
+    const [earlier, pending] = await Promise.all(
+      [1, 2].map(async () => {
+        const session = await createTestSession({ serverId: server.id, serverUserId: su.id });
+        return createTestRun({ automationId: rule.id, serverUserId: su.id, sessionId: session.id });
+      })
+    );
+    if (!earlier || !pending) throw new Error('runs were not created');
+    const acknowledgedAt = new Date('2026-01-02T03:04:05.000Z');
+    await db
+      .update(automationRuns)
+      .set({ acknowledgedAt })
+      .where(eq(automationRuns.id, earlier.id));
+
+    const app = await buildApp({
+      userId: admin.id,
+      username: 'owner',
+      role: 'owner',
+      serverIds: [],
+    });
+    const bySelectAll = await app.inject({
+      method: 'POST',
+      url: '/violations/bulk/acknowledge',
+      payload: { selectAll: true },
+    });
+    const byIds = await app.inject({
+      method: 'POST',
+      url: '/violations/bulk/acknowledge',
+      payload: { ids: [earlier.id, pending.id] },
+    });
+    await app.close();
+
+    expect(bySelectAll.json()).toEqual({ success: true, acknowledged: 1 });
+    expect(byIds.json()).toEqual({ success: true, acknowledged: 0 });
+
+    const [earlierRow] = await db
+      .select()
+      .from(automationRuns)
+      .where(eq(automationRuns.id, earlier.id));
+    const [pendingRow] = await db
+      .select()
+      .from(automationRuns)
+      .where(eq(automationRuns.id, pending.id));
+    expect(earlierRow?.acknowledgedAt).toEqual(acknowledgedAt);
+    expect(pendingRow?.acknowledgedAt).not.toBeNull();
+  });
+});
+
 describe('DELETE /violations/bulk - person filter', () => {
   it('selectAll scoped to a person filter dismisses only that person, leaving another person untouched', async () => {
     const admin = await createTestUser({ role: 'owner' });

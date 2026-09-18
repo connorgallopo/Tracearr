@@ -43,6 +43,19 @@ describe('SessionDetailSheet', () => {
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
+  it('shows no progress percentage for a play with a total but no position', () => {
+    renderSheet({ progressMs: null, totalDurationMs: 5_400_000 });
+
+    expect(screen.queryByText(/^\d+%$/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
+  it('shows 0% for a play whose position is a measured 0', () => {
+    renderSheet({ progressMs: 0, totalDurationMs: 5_400_000 });
+
+    expect(screen.getByText('0%')).toBeInTheDocument();
+  });
+
   it('shows the progress percentage when the play has a total', () => {
     renderSheet({ progressMs: 2_700_000, totalDurationMs: 5_400_000 });
 

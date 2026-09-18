@@ -40,8 +40,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TimeRangePicker, type TimeRangeValue } from '@/components/ui/time-range-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { HistoryFilters } from '@/hooks/queries/useHistory';
-import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
-import type { HistoryFilterOptions } from '@tracearr/shared';
+import { PLAYBACK_DECISION_LABEL_KEYS, type HistoryFilterOptions } from '@tracearr/shared';
 
 // Column definitions for visibility toggle
 export const HISTORY_COLUMNS = [

@@ -195,7 +195,7 @@ import { startConnectionBudget, stopConnectionBudget } from './services/connecti
 import { initPushRateLimiter } from './services/pushRateLimiter.js';
 import { initializeV2Rules } from './services/automations/v2Integration.js';
 import { rehydratePauseWakes, stopPauseWakes } from './services/automations/wakes/pauseWakes.js';
-import { processPushReceipts } from './services/pushNotification.js';
+import { processPushReceipts, pushNotificationService } from './services/pushNotification.js';
 import { cleanupMobileTokens } from './jobs/cleanupMobileTokens.js';
 import { db, checkDatabaseConnection } from './db/client.js';
 import { migrationFolders } from './db/migrationPaths.js';
@@ -1201,6 +1201,12 @@ async function initializePostListen(app: FastifyInstance) {
     }
   });
 
+  const wakeMobileWidgets = () => {
+    pushNotificationService.triggerSessionsSync().catch((err: unknown) => {
+      app.log.error({ err }, 'Silent sessions sync push failed');
+    });
+  };
+
   wsSubscriber.on('message', (_channel: string, message: string) => {
     try {
       const { event, data } = JSON.parse(message) as {
@@ -1213,9 +1219,11 @@ async function initializePostListen(app: FastifyInstance) {
       switch (event) {
         case WS_EVENTS.SESSION_STARTED:
           broadcastToSessions('session:started', data as ActiveSession);
+          wakeMobileWidgets();
           break;
         case WS_EVENTS.SESSION_STOPPED:
           broadcastToSessions('session:stopped', data as string);
+          wakeMobileWidgets();
           break;
         case WS_EVENTS.SESSION_UPDATED:
           broadcastToSessions('session:updated', data as ActiveSession);

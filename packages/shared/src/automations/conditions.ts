@@ -80,6 +80,10 @@ export const videoResolutionSchema = z.enum([
   'SD',
   'unknown',
 ]);
+// A server older than the release listed accepts the value, then ranks it as 0 and folds
+// the stream's own 1440p or 8K into 4K, so the condition matches the wrong streams.
+const RESOLUTION_INTRODUCED_IN = { '8K': '2.4.0', '1440p': '2.4.0' };
+
 export const deviceTypeSchema = z.enum(['mobile', 'tablet', 'tv', 'desktop', 'browser', 'unknown']);
 export const platformSchema = z.enum([
   'ios',
@@ -527,6 +531,14 @@ export const CONDITION_FIELDS: Record<ConditionField, ConditionFieldDescriptor> 
     flags: {},
     identityAware: false,
   },
+};
+
+/** Values a field gained after 2.2.0, by the release that first evaluates them. */
+export const CONDITION_VALUE_INTRODUCED_IN: Partial<
+  Record<ConditionField, Record<string, string>>
+> = {
+  source_resolution: RESOLUTION_INTRODUCED_IN,
+  output_resolution: RESOLUTION_INTRODUCED_IN,
 };
 
 // Fields whose evaluators aggregate across every server_user id of the same identity.

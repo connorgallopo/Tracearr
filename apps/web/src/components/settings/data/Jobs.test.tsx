@@ -172,6 +172,31 @@ describe('Jobs', () => {
     expect(screen.queryByText('jobs.deletesData')).not.toBeInTheDocument();
   });
 
+  it('shows a count with no total or percent while a job that reports no total runs', async () => {
+    withJobs([destructiveJob]);
+    vi.mocked(api.maintenance.getProgress).mockResolvedValue({
+      progress: {
+        type: 'remove_import_duplicates',
+        status: 'running',
+        totalRecords: 0,
+        processedRecords: 88,
+        updatedRecords: 0,
+        skippedRecords: 0,
+        errorRecords: 0,
+        message: 'Checked 88 duplicate pairs...',
+      },
+    } as never);
+    const user = userEvent.setup();
+    render(<Jobs />);
+    await user.click(await screen.findByRole('tab', { name: /jobs.cleanup/ }));
+
+    expect(await screen.findByText('Checked 88 duplicate pairs...')).toBeInTheDocument();
+    expect(screen.getByText('88')).toBeInTheDocument();
+    expect(screen.queryByText(/\/ 0/)).not.toBeInTheDocument();
+    expect(screen.queryByText('0%')).not.toBeInTheDocument();
+    expect(screen.queryByText('jobs.updated')).not.toBeInTheDocument();
+  });
+
   it('marks an automatic history run with a badge', async () => {
     withHistory([automaticRun]);
 

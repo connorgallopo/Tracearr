@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historik",
@@ -165,7 +166,10 @@
     "showingAllResults": "Visar alla {{total}} resultat",
     "deleteSession_one": "Ta bort {{count}} session",
     "deleteSession_other": "Ta bort {{count}} sessioner",
-    "deleteSessionsConfirm": "Är du säker på att du vill ta bort? Denna åtgärd kan inte ångras."
+    "deleteSessionsConfirm": "Är du säker på att du vill ta bort? Denna åtgärd kan inte ångras.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliotek",

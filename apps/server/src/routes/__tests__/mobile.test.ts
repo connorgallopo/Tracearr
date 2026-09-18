@@ -322,18 +322,11 @@ describe('Mobile Routes', () => {
           return {
             from: vi.fn().mockResolvedValue(mockSessions),
           } as never;
-        } else if (selectCallCount === 2) {
+        } else {
           // Pending tokens count
           return {
             from: vi.fn().mockReturnValue({
               where: vi.fn().mockResolvedValue([{ count: 1 }]),
-            }),
-          } as never;
-        } else {
-          // Server name query
-          return {
-            from: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{ name: 'MyServer' }]),
             }),
           } as never;
         }
@@ -348,7 +341,7 @@ describe('Mobile Routes', () => {
       const body = response.json();
       expect(body.isEnabled).toBe(true);
       expect(body.sessions).toHaveLength(2);
-      expect(body.serverName).toBe('MyServer');
+      expect(body.serverName).toBe('Tracearr');
       expect(body.pendingTokens).toBe(1);
       expect(body.maxDevices).toBe(5);
     });
@@ -377,16 +370,10 @@ describe('Mobile Routes', () => {
         selectCallCount++;
         if (selectCallCount === 1) {
           return { from: vi.fn().mockResolvedValue([]) } as never;
-        } else if (selectCallCount === 2) {
-          return {
-            from: vi.fn().mockReturnValue({
-              where: vi.fn().mockResolvedValue([{ count: 0 }]),
-            }),
-          } as never;
         } else {
           return {
             from: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{ name: 'Tracearr' }]),
+              where: vi.fn().mockResolvedValue([{ count: 0 }]),
             }),
           } as never;
         }
@@ -410,19 +397,7 @@ describe('Mobile Routes', () => {
 
       vi.mocked(setSetting).mockResolvedValue(undefined);
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        if (selectCallCount === 1) {
-          return { from: vi.fn().mockResolvedValue([]) } as never;
-        } else {
-          return {
-            from: vi.fn().mockReturnValue({
-              limit: vi.fn().mockResolvedValue([{ name: 'MyServer' }]),
-            }),
-          } as never;
-        }
-      });
+      vi.mocked(db.select).mockReturnValue({ from: vi.fn().mockResolvedValue([]) } as never);
 
       const response = await app.inject({
         method: 'POST',
@@ -981,9 +956,9 @@ describe('Mobile Routes', () => {
             txSelectCallCount++;
             // Call 1: mobileTokens lookup with .where().for().limit()
             // Call 2: users lookup with .where().limit()
-            // Call 3: servers lookup (id, name, type) - awaited directly, no .where() or .limit()
+            // Call 3: servers lookup (id, type) - awaited directly, no .where() or .limit()
             if (txSelectCallCount === 3) {
-              // tx.select({ id, name, type }).from(servers) - awaited directly
+              // tx.select({ id, type }).from(servers) - awaited directly
               return {
                 from: vi
                   .fn()
@@ -1028,7 +1003,7 @@ describe('Mobile Routes', () => {
       expect(body.accessToken).toBe('ba-session-token');
       expect(body.refreshToken).toBe('ba-session-token');
       expect(body.server.id).toBe(mockServerId);
-      expect(body.server.name).toBe('MyServer');
+      expect(body.server.name).toBe('Tracearr');
       expect(body.server.type).toBe('plex');
       expect(body.user.role).toBe('owner');
     });

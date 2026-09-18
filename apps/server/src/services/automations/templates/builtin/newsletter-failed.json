@@ -5,7 +5,7 @@
   "description": "Tell a destination when a newsletter send fails or reaches only part of its list.",
   "group": "notifications",
   "kind": "notification",
-  "minServerVersion": "2.2.0",
+  "minServerVersion": "2.3.0",
   "inputs": [
     {
       "key": "to",

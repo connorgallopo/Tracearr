@@ -101,7 +101,8 @@ interface PickedLink {
 /**
  * Select the rows to link read-only, then write only those rows. A compressed
  * chunk is decompressed for writing only when the window has something to
- * link, and the UPDATE target repeats the bounds and orphan predicates.
+ * link, and the UPDATE target repeats the bounds and orphan predicates. A
+ * provider id the match lacks never blanks the one the row already has.
  */
 async function linkPicked(
   serverId: string,
@@ -118,7 +119,9 @@ async function linkPicked(
     const updated = await tx.execute(sql`
       UPDATE sessions s
       SET media_id = p.media_id, show_media_id = p.show_media_id,
-        imdb_id = p.imdb_id, tmdb_id = p.tmdb_id, tvdb_id = p.tvdb_id
+        imdb_id = COALESCE(p.imdb_id, s.imdb_id),
+        tmdb_id = COALESCE(p.tmdb_id, s.tmdb_id),
+        tvdb_id = COALESCE(p.tvdb_id, s.tvdb_id)
       FROM unnest(
         ${sql.param(picked.map((r) => r.id))}::uuid[],
         ${sql.param(picked.map((r) => r.started_at))}::timestamptz[],
@@ -204,8 +207,8 @@ async function linkOrphanSessionsBatch(
  * Link orphan movie sessions that carry an IMDb or TMDB id to the one
  * canonical movie reachable through this server's library items by that id.
  * A row is skipped when either id matches more than one canonical movie, the
- * two ids match different ones, or the match carries an id that contradicts
- * one the row already has. All five identity columns come from the match.
+ * two ids match different ones, or the match carries an imdb, tmdb or tvdb id
+ * that contradicts one the row already has.
  */
 async function linkOrphanMoviesByProviderIdBatch(
   serverId: string,
@@ -219,7 +222,8 @@ async function linkOrphanMoviesByProviderIdBatch(
     window,
     sql`
       WITH orphan AS (
-        SELECT o.id, o.started_at, o.rating_key, o.external_session_id, o.imdb_id, o.tmdb_id
+        SELECT o.id, o.started_at, o.rating_key, o.external_session_id,
+          o.imdb_id, o.tmdb_id, o.tvdb_id
         FROM sessions o
         WHERE ${sessionBounds('o', serverId, cutoff, window)}
           AND o.media_type = 'movie'
@@ -255,6 +259,7 @@ async function linkOrphanMoviesByProviderIdBatch(
         AND (bi.media_id IS NULL OR bt.media_id IS NULL OR bi.media_id = bt.media_id)
         AND (o.imdb_id IS NULL OR c.imdb_id IS NULL OR c.imdb_id = o.imdb_id)
         AND (o.tmdb_id IS NULL OR c.tmdb_id IS NULL OR c.tmdb_id = o.tmdb_id)
+        AND (o.tvdb_id IS NULL OR c.tvdb_id IS NULL OR c.tvdb_id = o.tvdb_id)
       LIMIT ${limit}
     `,
     sql`s.media_type = 'movie'`

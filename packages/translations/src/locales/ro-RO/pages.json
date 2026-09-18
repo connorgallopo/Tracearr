@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Istoric",
@@ -165,7 +166,10 @@
     "showingAllResults": "Arată toate rezultatele {{total}}",
     "deleteSession_one": "Șterge {{count}} Sesiune",
     "deleteSession_other": "Șterge {{count}} Sesiuni",
-    "deleteSessionsConfirm": "Sunteţi sigur că doriţi să ştergeţi? Această acţiune nu poate fi anulată."
+    "deleteSessionsConfirm": "Sunteţi sigur că doriţi să ştergeţi? Această acţiune nu poate fi anulată.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliotecă",

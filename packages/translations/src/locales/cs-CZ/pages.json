@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historie",
@@ -165,7 +166,10 @@
     "showingAllResults": "Zobrazení všech {{total}} výsledků",
     "deleteSession_one": "Odstranit {{count}} relaci",
     "deleteSession_other": "Odstranit {{count}} relace",
-    "deleteSessionsConfirm": "Jste si jisti, že chcete odstranit? Tuto akci nelze vrátit zpět."
+    "deleteSessionsConfirm": "Jste si jisti, že chcete odstranit? Tuto akci nelze vrátit zpět.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Knihovna",

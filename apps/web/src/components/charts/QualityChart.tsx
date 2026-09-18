@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
+import { PLAYBACK_DECISION_LABEL_KEYS } from '@tracearr/shared';
 import { ChartSkeleton } from '@/components/ui/skeleton';
-import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import { ChartEmpty } from './ChartEmpty';
 
 interface QualityData {

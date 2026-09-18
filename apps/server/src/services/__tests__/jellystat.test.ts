@@ -16,6 +16,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Import production functions for testing
 import {
   parseJellystatBackup,
+  readJsonlTables,
   transformActivityToSession,
   importJellystatBackup,
 } from '../jellystat.js';
@@ -597,6 +598,39 @@ describe('parseJellystatBackup', () => {
       ]).replace(/\n/g, '\r\n');
 
     expect(parseJellystatBackup(text).activities).toHaveLength(1);
+  });
+
+  it('keeps no rows for a table the import does not read, but still refuses its row before its header', () => {
+    const tables = readJsonlTables(
+      jsonl([
+        { type: 'table', table: 'jf_item_info' },
+        { type: 'row', table: 'jf_item_info', data: { Id: 'info-1' } },
+        { type: 'table', table: 'jf_playback_activity' },
+        { type: 'row', table: 'jf_playback_activity', data: MOVIE_ACTIVITY },
+      ])
+    );
+
+    expect(tables.get('jf_item_info')).toEqual([]);
+    expect(tables.get('jf_playback_activity')).toHaveLength(1);
+
+    const outOfOrder = jsonl([
+      { type: 'table', table: 'jf_playback_activity' },
+      { type: 'row', table: 'jf_item_info', data: { Id: 'info-1' } },
+    ]);
+    expect(() => parseJellystatBackup(outOfOrder)).toThrow(/line 2 .*jf_item_info/);
+  });
+
+  it('refuses a JSONL row whose data is not an object, with its line number', () => {
+    for (const data of [null, 'text', 7, [MOVIE_ACTIVITY]]) {
+      const text = jsonl([
+        { type: 'table', table: 'jf_playback_activity' },
+        { type: 'row', table: 'jf_playback_activity', data },
+      ]);
+
+      expect(() => parseJellystatBackup(text)).toThrow(
+        'Invalid Jellystat backup: line 2 is not a table or row record'
+      );
+    }
   });
 
   it('names the line of a malformed JSONL record', () => {

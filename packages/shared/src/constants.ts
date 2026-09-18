@@ -120,6 +120,9 @@ export const REDIS_KEYS = {
   // Notification rate limiting (sliding window counters)
   PUSH_RATE_MINUTE: (sessionId: string) => `${_redisPrefix}tracearr:push:rate:minute:${sessionId}`,
   PUSH_RATE_HOUR: (sessionId: string) => `${_redisPrefix}tracearr:push:rate:hour:${sessionId}`,
+  // Held for CACHE_TTL.PUSH_SESSIONS_SYNC after a device is sent a silent sessions sync
+  PUSH_SESSIONS_SYNC: (sessionId: string) =>
+    `${_redisPrefix}tracearr:push:sync:sessions:${sessionId}`,
   // Location stats filter caching (includes serverIds hash for proper scoping)
   LOCATION_FILTERS: (userId: string, serverIds: string[]) => {
     // Sort and hash serverIds for stable cache key
@@ -341,6 +344,8 @@ export const CACHE_TTL = {
   LIBRARY_LIBRARIES: 300, // 5 minutes - library list changes only on sync
   LIBRARY_MEDIA_DETAIL: 60, // 1 minute, matches PUBLIC_MEDIA_STATS freshness
   MOBILE_LAST_SEEN: 300, // 5 minutes - throttle for device activity updates
+  // 20 minutes: iOS budgets an app two or three background pushes an hour
+  PUSH_SESSIONS_SYNC: 1200,
   // Filter options (dropdown values change infrequently)
   FILTER_OPTIONS: 120, // 2 minutes
   PLEX_GEOIP: 86400,

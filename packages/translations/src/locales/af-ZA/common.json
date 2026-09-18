@@ -86,7 +86,8 @@
     "directStream": "",
     "transcode": "",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "",
@@ -118,7 +119,12 @@
     "last30Days": "",
     "lastYear": "",
     "byDay": "",
-    "byHour": ""
+    "byHour": "",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "",
@@ -182,7 +188,8 @@
     "segments": "",
     "streamDetails": "",
     "transcodeReason": "",
-    "loadMore": ""
+    "loadMore": "",
+    "playback": ""
   },
   "search": {
     "placeholder": "",
@@ -288,7 +295,11 @@
     "device_one": "",
     "device_other": "",
     "channel_one": "",
-    "channel_other": ""
+    "channel_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": ""

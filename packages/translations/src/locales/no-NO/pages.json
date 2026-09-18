@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historikk",
@@ -165,7 +166,10 @@
     "showingAllResults": "Viser alle {{total}} resultater",
     "deleteSession_one": "Slett {{count}} sesjon",
     "deleteSession_other": "Slett {{count}} Økter",
-    "deleteSessionsConfirm": "Er du sikker på at du vil slette? Denne handlingen kan ikke angres."
+    "deleteSessionsConfirm": "Er du sikker på at du vil slette? Denne handlingen kan ikke angres.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Bibliotek",

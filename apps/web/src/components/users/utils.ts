@@ -1,6 +1,7 @@
 /**
  * Shared utilities for user components
  */
+import { trustLevel, type TrustLevel } from '@tracearr/shared';
 import { imageProxyUrl } from '@/lib/api';
 
 /**
@@ -19,22 +20,30 @@ export function getAvatarUrl(
   return imageProxyUrl(serverId, thumbUrl, size, size, 'avatar');
 }
 
+const TRUST_LEVEL_TEXT_CLASSES: Record<TrustLevel, string> = {
+  trusted: 'text-green-500',
+  caution: 'text-yellow-500',
+  untrusted: 'text-red-500',
+};
+
+const TRUST_LEVEL_BG_CLASSES: Record<TrustLevel, string> = {
+  trusted: 'bg-green-500/20',
+  caution: 'bg-yellow-500/20',
+  untrusted: 'bg-red-500/20',
+};
+
 /**
  * Get text color class based on trust score
  */
 export function getTrustScoreColor(score: number): string {
-  if (score >= 80) return 'text-green-500';
-  if (score >= 50) return 'text-yellow-500';
-  return 'text-red-500';
+  return TRUST_LEVEL_TEXT_CLASSES[trustLevel(score)];
 }
 
 /**
  * Get background color class based on trust score
  */
 export function getTrustScoreBg(score: number): string {
-  if (score >= 80) return 'bg-green-500/20';
-  if (score >= 50) return 'bg-yellow-500/20';
-  return 'bg-red-500/20';
+  return TRUST_LEVEL_BG_CLASSES[trustLevel(score)];
 }
 
 /**

@@ -155,7 +155,8 @@
     "contactEmailHelp": "Where newsletters go. It grants no login and never matches a synced account.",
     "contactEmailLabel": "Newsletter address:",
     "contactEmailNone": "none set",
-    "contactEmailNoLogin": "Grants no login."
+    "contactEmailNoLogin": "Grants no login.",
+    "locations": "Locations"
   },
   "history": {
     "title": "History",
@@ -165,7 +166,10 @@
     "showingAllResults": "Showing all {{total}} results",
     "deleteSession_one": "Delete {{count}} Session",
     "deleteSession_other": "Delete {{count}} Sessions",
-    "deleteSessionsConfirm": "Are you sure you want to delete? This action cannot be undone."
+    "deleteSessionsConfirm": "Are you sure you want to delete? This action cannot be undone.",
+    "totalPlays": "Total Plays",
+    "uniqueTitles": "Unique Titles",
+    "uniqueUsers": "Unique Users"
   },
   "library": {
     "title": "Library",

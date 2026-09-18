@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "التاريخ",
@@ -165,7 +166,10 @@
     "showingAllResults": "عرض جميع النتائج {{total}}",
     "deleteSession_one": "حذف جلسة {{count}}",
     "deleteSession_other": "حذف جلسه {{count}}",
-    "deleteSessionsConfirm": "هل أنت متأكد من أنك تريد الحذف؟ لا يمكن التراجع عن هذا الإجراء."
+    "deleteSessionsConfirm": "هل أنت متأكد من أنك تريد الحذف؟ لا يمكن التراجع عن هذا الإجراء.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "المكتبة",

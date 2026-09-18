@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "История",
@@ -165,7 +166,10 @@
     "showingAllResults": "Показаны все результаты {{total}}",
     "deleteSession_one": "Удалить сеанс {{count}}",
     "deleteSession_other": "Удалить сеансы {{count}}",
-    "deleteSessionsConfirm": "Вы уверены, что хотите удалить? Это действие нельзя отменить."
+    "deleteSessionsConfirm": "Вы уверены, что хотите удалить? Это действие нельзя отменить.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Библиотека",

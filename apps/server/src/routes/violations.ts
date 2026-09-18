@@ -869,8 +869,7 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       return { success: true, acknowledged: 0 };
     }
 
-    // Verify access to all violations. Filtering dismissed rows here keeps
-    // them out of accessibleIds so the acknowledged count stays honest.
+    // Verify access to all violations
     const accessibleViolations = await db
       .select({
         id: automationRuns.id,
@@ -889,13 +888,21 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       return { success: true, acknowledged: 0 };
     }
 
-    // Bulk update
-    await db
+    // Rows already acknowledged keep their original acknowledgedAt, whichever
+    // way the ids were chosen, and the count is the rows this request stamped.
+    const stamped = await db
       .update(automationRuns)
       .set({ acknowledgedAt: new Date() })
-      .where(and(inArray(automationRuns.id, accessibleIds), isNull(automationRuns.dismissedAt)));
+      .where(
+        and(
+          inArray(automationRuns.id, accessibleIds),
+          isNull(automationRuns.dismissedAt),
+          isNull(automationRuns.acknowledgedAt)
+        )
+      )
+      .returning({ id: automationRuns.id });
 
-    return { success: true, acknowledged: accessibleIds.length };
+    return { success: true, acknowledged: stamped.length };
   });
 
   /**

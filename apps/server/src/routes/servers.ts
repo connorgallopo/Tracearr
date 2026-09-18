@@ -30,7 +30,7 @@ import { supportsMediaLibrary } from '@tracearr/shared';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import { readServerIdentity } from '../services/serverIdentity.js';
 import { rearmImportedHistoryLink } from '../services/settings.js';
-import { buildServerAccessCondition } from '../utils/serverFiltering.js';
+import { buildServerAccessCondition, hasServerAccess } from '../utils/serverFiltering.js';
 
 function getDispatcharrAuthMode(token?: string | null): 'token' | 'credentials' {
   return token && DispatcharrClient.isCredentialToken(token) ? 'credentials' : 'token';
@@ -766,7 +766,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
   /**
    * GET /servers/:id/statistics - Get server resource statistics (CPU, RAM)
    * On-demand endpoint for dashboard - data is not stored
-   * Currently only supported for Plex servers (undocumented /statistics/resources endpoint)
+   * Plex only (undocumented /statistics/resources endpoint). /live-stats covers every server type.
    */
   app.get('/:id/statistics', { preHandler: [app.authenticate] }, async (request, reply) => {
     const params = serverIdParamSchema.safeParse(request.params);
@@ -776,6 +776,10 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
 
     const { id } = params.data;
 
+    if (!hasServerAccess(request.user, id)) {
+      return reply.forbidden('You do not have access to this server');
+    }
+
     // Get server with token
     const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
 
@@ -784,7 +788,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       return reply.notFound('Server not found');
     }
 
-    // Only Plex is supported for now (Jellyfin/Emby don't have equivalent endpoint)
+    // Reads Plex's own statistics endpoint; Jellyfin and Emby are served by /live-stats
     if (server.type !== 'plex') {
       return reply.badRequest('Server statistics are only available for Plex servers');
     }
@@ -813,6 +817,10 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const { id } = params.data;
+
+    if (!hasServerAccess(request.user, id)) {
+      return reply.forbidden('You do not have access to this server');
+    }
 
     const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
 

@@ -26,7 +26,6 @@ import type {
   TranscodeInfo,
 } from '@tracearr/shared';
 import {
-  jellystatBackupLineSchema,
   jellystatBackupSchema,
   jellystatLibraryEpisodeSchema,
   jellystatLibraryItemSchema,
@@ -310,13 +309,22 @@ function projectBackupTable<Schema extends z.ZodType>(
   return records;
 }
 
+const READ_TABLES: ReadonlySet<string> = new Set(Object.keys(jellystatBackupSchema.element.shape));
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 /**
  * Tables of a JSONL backup, keyed by table name. Jellystat's own restore
  * refuses a row whose table is not the last header, so this does too. The
  * text is walked in place: a split into lines would hold a second copy of
- * an upload that can be 500 MB.
+ * an upload that can be 500 MB. Rows are kept as JSON.parse built them, and
+ * only for the tables the import reads; every other table keeps its header
+ * and an empty list, since a backup's largest tables are ones Tracearr never
+ * reads and the whole result stays on the heap for the length of the import.
  */
-function readJsonlTables(text: string): Map<string, unknown[]> {
+export function readJsonlTables(text: string): Map<string, unknown[]> {
   const tables = new Map<string, unknown[]>();
   let currentTable: string | null = null;
   let lineNumber = 0;
@@ -335,23 +343,24 @@ function readJsonlTables(text: string): Map<string, unknown[]> {
     } catch {
       throw new Error(`Invalid Jellystat backup: line ${lineNumber} is not valid JSON`);
     }
-    const parsed = jellystatBackupLineSchema.safeParse(record);
-    if (!parsed.success) {
+    const isHeader = isPlainObject(record) && record.type === 'table';
+    const isRow = isPlainObject(record) && record.type === 'row' && isPlainObject(record.data);
+    if (!isPlainObject(record) || typeof record.table !== 'string' || !(isHeader || isRow)) {
       throw new Error(`Invalid Jellystat backup: line ${lineNumber} is not a table or row record`);
     }
 
-    if (parsed.data.type === 'table') {
-      currentTable = parsed.data.table;
+    if (isHeader) {
+      currentTable = record.table;
       if (!tables.has(currentTable)) tables.set(currentTable, []);
       continue;
     }
     const rows = currentTable === null ? undefined : tables.get(currentTable);
-    if (!rows || parsed.data.table !== currentTable) {
+    if (!rows || record.table !== currentTable) {
       throw new Error(
-        `Invalid Jellystat backup: line ${lineNumber} holds a ${parsed.data.table} row before that table's header`
+        `Invalid Jellystat backup: line ${lineNumber} holds a ${record.table} row before that table's header`
       );
     }
-    rows.push(parsed.data.data);
+    if (READ_TABLES.has(currentTable)) rows.push(record.data);
   }
   return tables;
 }

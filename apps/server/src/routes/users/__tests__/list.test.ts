@@ -327,14 +327,15 @@ describe('GET /users', () => {
     await app.close();
   });
 
-  it('returns the list envelope and the server-computed login capability', async () => {
+  it('returns the list envelope, ISO 8601 timestamps and the server-computed login capability', async () => {
     const authUser = owner();
     app = await buildTestApp(authUser);
     const userId = randomUUID();
     const serverUserId = randomUUID();
     const serverId = randomUUID();
-    const joinedAt = new Date('2023-01-05T00:00:00.000Z');
-    const activeAt = new Date('2024-06-02T00:00:00.000Z');
+    // db.execute hands timestamptz back as Postgres text
+    const joinedAt = '2023-01-05 00:00:00+00';
+    const activeAt = '2024-06-02 14:29:35.04+00';
 
     mockExecute
       .mockResolvedValueOnce({
@@ -397,8 +398,12 @@ describe('GET /users', () => {
       identityTrustScore: 72,
       trustScore: 80,
       loginCapable: true,
-      identityJoinedAt: joinedAt.toISOString(),
-      identityLastActivityAt: activeAt.toISOString(),
+      joinedAt: '2023-01-05T00:00:00.000Z',
+      lastActivityAt: '2024-06-02T14:29:35.040Z',
+      removedAt: null,
+      updatedAt: '2024-06-02T14:29:35.040Z',
+      identityJoinedAt: '2023-01-05T00:00:00.000Z',
+      identityLastActivityAt: '2024-06-02T14:29:35.040Z',
     });
     expect(body.data[0].identityServers).toEqual([
       { id: serverId, name: 'Plex', serverUserId, removedAt: null },

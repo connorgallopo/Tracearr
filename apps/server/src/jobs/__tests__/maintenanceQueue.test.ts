@@ -45,6 +45,7 @@ import {
   getMaintenanceJobHistory,
   initMaintenanceQueue,
   runSessionMaintenanceWalk,
+  getMaintenanceProgress,
   type MaintenanceJobData,
 } from '../maintenanceQueue.js';
 
@@ -59,7 +60,10 @@ function job(): Job<MaintenanceJobData> {
   } as unknown as Job<MaintenanceJobData>;
 }
 
-function run(walk: Parameters<typeof runSessionMaintenanceWalk>[1]['walk']) {
+function run(
+  walk: Parameters<typeof runSessionMaintenanceWalk>[1]['walk'],
+  totalCountsUpdates = true
+) {
   return runSessionMaintenanceWalk(job(), {
     type: 'link_imported_history',
     startMessage: 'start',
@@ -67,6 +71,7 @@ function run(walk: Parameters<typeof runSessionMaintenanceWalk>[1]['walk']) {
     completeMessage: (_total, details) => details,
     resultMessage: (_total, details) => details,
     failurePrefix: 'skipped',
+    totalCountsUpdates,
     walk,
   });
 }
@@ -115,6 +120,20 @@ describe('runSessionMaintenanceWalk', () => {
 
     await expect(result).rejects.toThrow('Lost lock for job walk-job');
     expect(safeFullRefreshAggregate).not.toHaveBeenCalled();
+  });
+
+  it('reports the running total as updated only for a walk that says it counts updates', async () => {
+    const seen: (number | undefined)[] = [];
+    const walk: Parameters<typeof run>[0] = async (onBatch) => {
+      await onBatch(88);
+      seen.push(getMaintenanceProgress()?.updatedRecords);
+      return { total: 88, failedRanges: [], details: '' };
+    };
+
+    await run(walk, false);
+    await run(walk, true);
+
+    expect(seen).toEqual([0, 88]);
   });
 });
 

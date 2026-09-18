@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "Historia",
@@ -165,7 +166,10 @@
     "showingAllResults": "Näytetään kaikki {{total}} tulokset",
     "deleteSession_one": "Poista {{count}} Istunto",
     "deleteSession_other": "",
-    "deleteSessionsConfirm": "Oletko varma, että haluat poistaa? Tätä toimintoa ei voi peruuttaa."
+    "deleteSessionsConfirm": "Oletko varma, että haluat poistaa? Tätä toimintoa ei voi peruuttaa.",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "Kirjasto",

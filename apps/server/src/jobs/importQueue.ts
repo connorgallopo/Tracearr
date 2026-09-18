@@ -11,7 +11,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
+import { Queue, UnrecoverableError, Worker, type Job, type ConnectionOptions } from 'bullmq';
 import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
 import type {
@@ -24,6 +24,13 @@ import type {
 } from '@tracearr/shared';
 import { TautulliService } from '../services/tautulli.js';
 import { importJellystatBackup } from '../services/jellystat.js';
+import {
+  JellystatUploadMissingError,
+  clearJellystatUploads,
+  readJellystatUpload,
+  removeJellystatUpload,
+  sweepJellystatUploads,
+} from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { getPubSubService } from '../services/cache.js';
 import { extendJobLock } from './lockUtils.js';
@@ -50,7 +57,8 @@ export interface JellystatImportJobData {
   type: 'jellystat';
   serverId: string;
   userId: string; // Audit trail - who initiated the import
-  backupJson: string; // Jellystat backup file contents
+  backupPath?: string; // Uploaded backup on disk, see services/import/jellystatUpload.ts
+  backupJson?: string; // Jobs queued before 2.4.0 carry the file contents instead of a path
   enrichMedia: boolean; // Whether to enrich with metadata from Jellyfin/Emby
   updateStreamDetails?: boolean; // Whether to update existing records with stream/transcode data
 }
@@ -326,6 +334,24 @@ export function startImportWorker(): void {
       });
   }
 
+  if (importQueue) {
+    importQueue
+      .getJobs(['active', 'waiting', 'delayed', 'paused', 'prioritized'])
+      .then((jobs) =>
+        sweepJellystatUploads(
+          new Set(
+            jobs.flatMap((j) => (j.data.type === 'jellystat' ? [j.data.backupPath ?? ''] : []))
+          )
+        )
+      )
+      .then((removed) => {
+        if (removed > 0) console.log(`[Import] Removed ${removed} orphaned Jellystat upload(s)`);
+      })
+      .catch((err) => {
+        console.warn('[Import] Failed to sweep Jellystat uploads:', err);
+      });
+  }
+
   importWorker = new Worker<ImportJobData>(
     QUEUE_NAME,
     async (job: Job<ImportJobData>) => {
@@ -446,10 +472,19 @@ export function startImportWorker(): void {
     activeImportProgress = null;
   });
 
+  importWorker.on('completed', (job) => {
+    if (job.data.type === 'jellystat') void removeJellystatUpload(job.data.backupPath);
+  });
+
   // Handle job failures - notify frontend and move to DLQ if retries exhausted
   importWorker.on('failed', (job, error) => {
     if (!job) return;
     activeImportProgress = null;
+
+    const exhausted = job.attemptsMade >= (job.opts.attempts || 3);
+    if (job.data.type === 'jellystat' && (exhausted || error instanceof UnrecoverableError)) {
+      void removeJellystatUpload(job.data.backupPath);
+    }
 
     // Always notify frontend of failure
     const pubSubService = getPubSubService();
@@ -460,7 +495,7 @@ export function startImportWorker(): void {
       });
     }
 
-    if (job.attemptsMade >= (job.opts.attempts || 3)) {
+    if (exhausted) {
       console.error(`[Import] Job ${job.id} exhausted retries, moving to DLQ:`, error);
       if (dlqQueue) {
         void dlqQueue.add(`dlq-${job.data.type}`, job.data, {
@@ -593,8 +628,16 @@ async function processTautulliImportJob(
 async function processJellystatImportJob(
   job: Job<JellystatImportJobData>
 ): Promise<JellystatImportResult> {
-  const { serverId, backupJson, enrichMedia, updateStreamDetails } = job.data;
+  const { serverId, enrichMedia, updateStreamDetails } = job.data;
   const pubSubService = getPubSubService();
+
+  let backupJson: string;
+  try {
+    backupJson = job.data.backupJson ?? (await readJellystatUpload(job.data.backupPath ?? ''));
+  } catch (error) {
+    if (error instanceof JellystatUploadMissingError) throw new UnrecoverableError(error.message);
+    throw error;
+  }
 
   // Run the actual import
   const result = await importJellystatBackup(
@@ -772,6 +815,7 @@ export async function cancelImport(jobId: string): Promise<boolean> {
   // Active jobs need worker-level cancellation (not implemented in Phase 1)
   if (state === 'waiting' || state === 'delayed') {
     await job.remove();
+    if (job.data.type === 'jellystat') await removeJellystatUpload(job.data.backupPath);
     console.log(`[Import] Cancelled job ${jobId}`);
     return true;
   }
@@ -833,7 +877,7 @@ export async function getActiveJellystatImportForServer(serverId: string): Promi
 export async function enqueueJellystatImport(
   serverId: string,
   userId: string,
-  backupJson: string,
+  backupPath: string,
   enrichMedia: boolean = true,
   updateStreamDetails: boolean = false
 ): Promise<string> {
@@ -852,7 +896,7 @@ export async function enqueueJellystatImport(
     type: 'jellystat',
     serverId,
     userId,
-    backupJson,
+    backupPath,
     enrichMedia,
     updateStreamDetails,
   });
@@ -1000,6 +1044,7 @@ export async function obliterateImportQueue(): Promise<{ success: boolean }> {
     if (dlqQueue) {
       await dlqQueue.obliterate({ force: true });
     }
+    await clearJellystatUploads();
     activeImportProgress = null;
     console.log('[Import] Queue obliterated');
     return { success: true };

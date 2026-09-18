@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "历史记录",
@@ -165,7 +166,10 @@
     "showingAllResults": "显示所有{{total}}个结果",
     "deleteSession_one": "删除{{count}}个会话",
     "deleteSession_other": "删除{{count}}个会话",
-    "deleteSessionsConfirm": "您确定要删除吗？此操作无法撤销。"
+    "deleteSessionsConfirm": "您确定要删除吗？此操作无法撤销。",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "媒体库",

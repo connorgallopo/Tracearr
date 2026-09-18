@@ -86,7 +86,8 @@
     "directStream": "直接串流",
     "transcode": "转码",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "低",
@@ -118,7 +119,12 @@
     "last30Days": "最近 30 天",
     "lastYear": "去年",
     "byDay": "按天",
-    "byHour": "按小时"
+    "byHour": "按小时",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "千米",
@@ -182,7 +188,8 @@
     "segments": "段数",
     "streamDetails": "流详情",
     "transcodeReason": "转码原因",
-    "loadMore": "载入更多"
+    "loadMore": "载入更多",
+    "playback": ""
   },
   "search": {
     "placeholder": "搜索……",
@@ -288,7 +295,11 @@
     "device_one": "{{count}} 已选",
     "device_other": "{{count}} 已选",
     "channel_one": "",
-    "channel_other": ""
+    "channel_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "未检测到更改"

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import type { LocationStats } from '@tracearr/shared';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
+import type { FitPoint } from './autoFitBounds';
 import { MapUnavailable } from './MapUnavailable';
 import {
   buildBaseStyle,
@@ -133,8 +134,8 @@ export function StreamMap({
   const webglOk = isWebglSupported();
   const map = useMapLibre(containerRef, style);
 
-  const points = useMemo<[number, number][]>(
-    () => locations.filter((l) => l.lat && l.lon).map((l) => [l.lon, l.lat]),
+  const points = useMemo<FitPoint[]>(
+    () => locations.filter((l) => l.lat && l.lon).map((l) => [l.lon, l.lat, l.count]),
     [locations]
   );
   useAutoFit(map, points, { maxZoom: 8, filterKey, isLoading, suspend: popup !== null });

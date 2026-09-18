@@ -52,6 +52,7 @@ import {
   recomputeIdentityAggregates,
 } from '../../services/userService.js';
 import { isLoginCapable } from '../../services/mergeService.js';
+import { parseDateString } from '../../utils/parsing.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { PLAY_COUNT } from '../../constants/index.js';
 
@@ -260,6 +261,8 @@ export function buildUserRosterAccountIdQuery(roster: UserRosterSql): SQL {
   `;
 }
 
+// db.execute skips Drizzle's column mapping, so timestamptz arrives as Postgres text
+// ('2026-09-17 14:29:35.04+00'), not a Date.
 interface RosterPageRow {
   userId: string;
   identityName: string | null;
@@ -267,8 +270,8 @@ interface RosterPageRow {
   passwordHash: string | null;
   identityPlexAccountId: string | null;
   identityTrustScore: number;
-  identityJoinedAt: Date | null;
-  identityLastActivityAt: Date | null;
+  identityJoinedAt: string | null;
+  identityLastActivityAt: string | null;
   plexAccountCount: number;
   authAccountCount: number;
   id: string;
@@ -280,10 +283,10 @@ interface RosterPageRow {
   thumbUrl: string | null;
   isServerAdmin: boolean;
   trustScore: number;
-  joinedAt: Date | null;
-  lastActivityAt: Date | null;
-  removedAt: Date | null;
-  updatedAt: Date;
+  joinedAt: string | null;
+  lastActivityAt: string | null;
+  removedAt: string | null;
+  updatedAt: string;
 }
 
 interface IdentityServer {
@@ -305,15 +308,15 @@ interface UserRosterRow {
   thumbUrl: string | null;
   isServerAdmin: boolean;
   trustScore: number;
-  joinedAt: Date | null;
-  lastActivityAt: Date | null;
-  removedAt: Date | null;
-  updatedAt: Date;
+  joinedAt: string | null;
+  lastActivityAt: string | null;
+  removedAt: string | null;
+  updatedAt: string;
   identityName: string | null;
   role: UserRole;
   identityTrustScore: number;
-  identityJoinedAt: Date | null;
-  identityLastActivityAt: Date | null;
+  identityJoinedAt: string | null;
+  identityLastActivityAt: string | null;
   loginCapable: boolean;
   identityServers: IdentityServer[];
 }
@@ -402,17 +405,17 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
       thumbUrl: row.thumbUrl,
       isServerAdmin: row.isServerAdmin,
       trustScore: row.trustScore,
-      joinedAt: row.joinedAt,
-      lastActivityAt: row.lastActivityAt,
-      removedAt: row.removedAt,
-      updatedAt: row.updatedAt,
+      joinedAt: parseDateString(row.joinedAt),
+      lastActivityAt: parseDateString(row.lastActivityAt),
+      removedAt: parseDateString(row.removedAt),
+      updatedAt: new Date(row.updatedAt).toISOString(),
       identityName: row.identityName,
       role: row.role,
       // The person's overall trust across all their server accounts,
       // distinct from `trustScore` (this representative account's own score).
       identityTrustScore: row.identityTrustScore,
-      identityJoinedAt: row.identityJoinedAt,
-      identityLastActivityAt: row.identityLastActivityAt,
+      identityJoinedAt: parseDateString(row.identityJoinedAt),
+      identityLastActivityAt: parseDateString(row.identityLastActivityAt),
       // Wider than canLogin(role); the merge dialog picks its direction from
       // this, and deriving it client-side from role alone picks the wrong one.
       loginCapable: isLoginCapable({
@@ -430,7 +433,7 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
           id: row.serverId,
           name: row.serverName,
           serverUserId: row.id,
-          removedAt: row.removedAt ? new Date(row.removedAt).toISOString() : null,
+          removedAt: parseDateString(row.removedAt),
         },
       ],
     }));

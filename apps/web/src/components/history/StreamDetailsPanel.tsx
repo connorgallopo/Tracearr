@@ -10,8 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import {
+  PLAYBACK_DECISION_LABEL_KEYS,
   formatBitrate,
   formatMediaTech,
   formatResolutionDisplay,

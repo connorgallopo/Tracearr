@@ -50,6 +50,18 @@ interface MediaDisplayFields {
 }
 
 /**
+ * Playback position as a percentage of the length. Null when either is
+ * unknown: an import can carry a length with no position, and that is not 0%.
+ */
+export function getSessionProgress(session: {
+  progressMs: number | null;
+  totalDurationMs: number | null;
+}): number | null {
+  if (!session.totalDurationMs || session.progressMs == null) return null;
+  return Math.min(100, Math.round((session.progressMs / session.totalDurationMs) * 100));
+}
+
+/**
  * Get display title for media (handles TV shows vs movies vs music)
  * Formats media information consistently across the application.
  *

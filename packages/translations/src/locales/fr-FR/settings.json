@@ -424,7 +424,7 @@
     "serverTimezone": "Fuseau horaire du serveur",
     "serverTimezoneHelp": "Doit correspondre au fuseau horaire configuré sur l'hôte de votre serveur multimédia, et non au fuseau horaire de votre navigateur. Les horodatages des rapports de lecture sont stockés à l'heure du serveur local.",
     "importFullRange": "Importer l'historique complet",
-    "importFullRangeHelp": "Par défaut, seul l'historique plus ancien que la première session tracée de Tracearr pour ce serveur est importé, de sorte que les sessions que Tracearr déjà enregistrées ne sont jamais dupliquées. Activez cette option pour importer l'historique entier du plugin, indépendamment du chevauchement, si votre historique Tracearr a des lacunes. Les doublons exacts sont toujours ignorés.",
+    "importFullRangeHelp": "",
     "overlapSkipped": "{{count}} ont été ignorés car ils se chevauchaient",
     "duplicates": "Les doublons {{count}} ont été ignorés",
     "skipOverlap": "Recouvrement de l'enregistrement - l'horodatage tombe dans la période que Tracearr suit déjà pour ce serveur. Activez l'importation complète pour l'inclure.",

@@ -900,14 +900,6 @@ export const jellystatBackupSchema = z.array(
   })
 );
 
-/**
- * One line of the JSONL backup Jellystat 1.1.12 writes: a table header, then that table's rows
- */
-export const jellystatBackupLineSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('table'), table: z.string() }),
-  z.object({ type: z.literal('row'), table: z.string(), data: z.record(z.string(), z.unknown()) }),
-]);
-
 const jellystatNullableInt = z
   .number()
   .int()
@@ -1302,7 +1294,6 @@ export type JellystatPlayState = z.infer<typeof jellystatPlayStateSchema>;
 export type JellystatTranscodingInfo = z.infer<typeof jellystatTranscodingInfoSchema>;
 export type JellystatPlaybackActivity = z.infer<typeof jellystatPlaybackActivitySchema>;
 export type JellystatBackup = z.infer<typeof jellystatBackupSchema>;
-export type JellystatBackupLine = z.infer<typeof jellystatBackupLineSchema>;
 export type JellystatLibraryItem = z.infer<typeof jellystatLibraryItemSchema>;
 export type JellystatLibraryEpisode = z.infer<typeof jellystatLibraryEpisodeSchema>;
 export type JellystatPluginRow = z.infer<typeof jellystatPluginRowSchema>;

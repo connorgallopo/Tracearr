@@ -86,7 +86,8 @@
     "directStream": "البث المباشر",
     "transcode": "الكود",
     "hwTranscode": "",
-    "burnIn": ""
+    "burnIn": "",
+    "watched": ""
   },
   "severity": {
     "low": "منخفض",
@@ -118,7 +119,12 @@
     "last30Days": "آخر 30 يوم",
     "lastYear": "السنة الماضية",
     "byDay": "حسب اليوم",
-    "byHour": "بواسطة ساعة"
+    "byHour": "بواسطة ساعة",
+    "short7Days": "",
+    "short30Days": "",
+    "shortYear": "",
+    "shortAll": "",
+    "timeRange": ""
   },
   "units": {
     "km": "كيلومتر",
@@ -182,7 +188,8 @@
     "segments": "",
     "streamDetails": "",
     "transcodeReason": "",
-    "loadMore": ""
+    "loadMore": "",
+    "playback": ""
   },
   "search": {
     "placeholder": "بحث...",
@@ -288,7 +295,11 @@
     "device_one": "",
     "device_other": "",
     "channel_one": "",
-    "channel_other": ""
+    "channel_other": "",
+    "play_one": "",
+    "play_other": "",
+    "segment_one": "",
+    "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "لم يتم اكتشاف أي تغييرات"

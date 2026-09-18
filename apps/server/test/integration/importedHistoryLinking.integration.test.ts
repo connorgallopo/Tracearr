@@ -341,6 +341,65 @@ describe('link_imported_history on a compressed chunk', { timeout: 120_000 }, ()
     });
   });
 
+  it('keeps the provider ids an import already had when the matched movie lacks them', async () => {
+    const server = await plexServerWithSyncedLibrary('lib-movies');
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+
+    const [mediaRow] = await db
+      .insert(media)
+      .values({
+        mediaType: 'movie',
+        matchKey: `movie:linking-keeps-ids:${server.id}`,
+        title: 'The Matrix',
+        normalizedTitle: 'the matrix',
+        year: 1999,
+        tmdbId: 603,
+      })
+      .returning({ id: media.id });
+    const mediaId = mediaRow!.id;
+    await createTestLibraryItem({
+      serverId: server.id,
+      libraryId: 'lib-movies',
+      ratingKey: 'rk-new',
+      mediaId,
+      fileSize: 1000,
+    });
+    await getRedis().set(REDIS_KEYS.LIBRARY_SYNC_SCAN_VERSION(server.id, 'lib-movies'), '2');
+
+    const importStart = new Date(Date.now() - 10 * DAY_MS);
+    const imported = await createTestSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      state: 'stopped',
+      sessionKey: 'tautulli-603',
+      externalSessionId: '603',
+      ratingKey: 'rk-old',
+      imdbId: 'tt0133093',
+      tmdbId: 603,
+      tvdbId: 169,
+      startedAt: importStart,
+      stoppedAt: new Date(importStart.getTime() + 40 * MIN_MS),
+      durationMs: 40 * MIN_MS,
+    });
+
+    await runImportedHistoryLinking(fakeJob(), {
+      tautulli: null,
+      trigger: 'manual',
+      hasPendingLibrarySync: async () => false,
+    });
+
+    const result = await db.execute(
+      sql`SELECT media_id, imdb_id, tmdb_id, tvdb_id FROM sessions WHERE id = ${imported.id}::uuid`
+    );
+    expect(result.rows[0]).toEqual({
+      media_id: mediaId,
+      imdb_id: 'tt0133093',
+      tmdb_id: 603,
+      tvdb_id: 169,
+    });
+  });
+
   it('drops its state write when a re-arm with identical values lands mid-run', async () => {
     await plexServerWithSyncedLibrary('lib-movies');
     await rearmImportedHistoryLink({ keepProviderPass: false });

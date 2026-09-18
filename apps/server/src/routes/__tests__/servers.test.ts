@@ -1530,6 +1530,17 @@ describe('Server Routes', () => {
   });
 
   describe('GET /servers/:id/statistics', () => {
+    it('returns 403 for a server the caller cannot see', async () => {
+      app = await buildTestApp(viewerUser);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: `/servers/${mockServer.id}/statistics`,
+      });
+
+      expect(response.statusCode).toBe(403);
+    });
+
     it('returns 404 for non-existent server', async () => {
       app = await buildTestApp(ownerUser);
 
@@ -1668,8 +1679,21 @@ describe('Server Routes', () => {
       expect(response.statusCode).toBe(400);
     });
 
-    it('strips per-account bandwidth detail for non-owner callers', async () => {
+    it('returns 403 for a server the caller cannot see', async () => {
       app = await buildTestApp(viewerUser);
+      vi.mocked(getServerLiveStats).mockClear();
+
+      const response = await app.inject({
+        method: 'GET',
+        url: `/servers/${mockServer.id}/live-stats`,
+      });
+
+      expect(response.statusCode).toBe(403);
+      expect(getServerLiveStats).not.toHaveBeenCalled();
+    });
+
+    it('strips per-account bandwidth detail for non-owner callers', async () => {
+      app = await buildTestApp({ ...viewerUser, serverIds: [mockServer.id] });
       mockDbSelectLimit([mockServer]);
       vi.mocked(getServerLiveStats).mockResolvedValue({
         statistics: [],

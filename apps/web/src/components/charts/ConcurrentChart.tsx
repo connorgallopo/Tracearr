@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
+import { PLAYBACK_DECISION_LABEL_KEYS } from '@tracearr/shared';
 import { getHour12 } from '@/lib/timeFormat';
 import { ChartSkeleton } from '@/components/ui/skeleton';
-import { PLAYBACK_DECISION_LABEL_KEYS } from '@/lib/playbackDecision';
 import { ChartEmpty } from './ChartEmpty';
 import { parseChartDate } from './chartUtils';
 

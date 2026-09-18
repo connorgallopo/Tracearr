@@ -155,7 +155,8 @@
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
-    "contactEmailNoLogin": ""
+    "contactEmailNoLogin": "",
+    "locations": ""
   },
   "history": {
     "title": "歷史紀錄",
@@ -165,7 +166,10 @@
     "showingAllResults": "顯示全部 {{total}} 個結果",
     "deleteSession_one": "刪除 {{count}} 個會話",
     "deleteSession_other": "刪除 {{count}} 個會話",
-    "deleteSessionsConfirm": "您確定要刪除嗎？此操作無法撤銷。"
+    "deleteSessionsConfirm": "您確定要刪除嗎？此操作無法撤銷。",
+    "totalPlays": "",
+    "uniqueTitles": "",
+    "uniqueUsers": ""
   },
   "library": {
     "title": "媒體庫",

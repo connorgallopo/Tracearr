@@ -7,11 +7,11 @@
 import { createHash } from 'node:crypto';
 import { describe, it, expect } from 'vitest';
 import {
-  TEMPLATE_MIN_SERVER_VERSION,
   createAutomationSchema,
   fingerprintOf,
   materializeTemplate,
   templateEnvelopeSchema,
+  templateMinServerVersion,
   type TemplateEnvelope,
   type TemplateInput,
 } from '@tracearr/shared';
@@ -83,7 +83,7 @@ describe('builtin template envelopes', () => {
       expect(templateEnvelopeSchema.safeParse(envelope).success).toBe(true);
       expect(envelope.fingerprint).toBe(fingerprintOf(envelope, sha256Hex));
       expect(envelope.schemaVersion).toBe(1);
-      expect(envelope.minServerVersion).toBe(TEMPLATE_MIN_SERVER_VERSION);
+      expect(envelope.minServerVersion).toBe(templateMinServerVersion(envelope));
     }
   });
 

@@ -1320,7 +1320,7 @@ describe('bulk selectAll scope', () => {
     vi.mocked((db as any).select)
       .mockReturnValueOnce(seedChain)
       .mockReturnValueOnce(queryChain(vi.fn, [{ id: violationId, serverId }]));
-    vi.mocked((db as any).update).mockReturnValue(queryChain(vi.fn, []));
+    vi.mocked((db as any).update).mockReturnValue(queryChain(vi.fn, [{ id: violationId }]));
 
     const response = await app.inject({
       method: 'POST',
@@ -1341,6 +1341,39 @@ describe('bulk selectAll scope', () => {
     expect(seed.params).toContain('2024-03-01T00:00:00.000Z');
     expect(seed.params).toContain('2024-03-16T00:00:00.000Z');
   });
+
+  it.each([
+    ['selectAll with no acknowledged filter', { selectAll: true }],
+    ['an explicit id list', { ids: [randomUUID(), randomUUID()] }],
+  ])(
+    'POST /bulk/acknowledge leaves acknowledged rows alone for %s and counts the rest',
+    async (_label, payload) => {
+      app = await buildTestApp(createOwnerUser());
+      const pendingId = randomUUID();
+      const acknowledgedId = randomUUID();
+      const serverId = randomUUID();
+      const matched = [
+        { id: pendingId, serverId },
+        { id: acknowledgedId, serverId },
+      ];
+
+      vi.mocked((db as any).select).mockReturnValue(queryChain(vi.fn, matched));
+      const updateChain = queryChain(vi.fn, [{ id: pendingId }]);
+      vi.mocked((db as any).update).mockReturnValue(updateChain);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/violations/bulk/acknowledge',
+        payload,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ success: true, acknowledged: 1 });
+      expect(renderCall(updateChain, 'where').text).toContain(
+        'automation_runs.acknowledged_at is null'
+      );
+    }
+  );
 
   it('DELETE /bulk seeds only the filtered rows, so trust is not reversed wholesale', async () => {
     app = await buildTestApp(createOwnerUser());
