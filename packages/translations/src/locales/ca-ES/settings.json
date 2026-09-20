@@ -16,7 +16,7 @@
       "locale": "Configuració regional i unitats",
       "behavior": "Comportament",
       "connections": "Connexions",
-      "posters": "Font dels cartells",
+      "posters": "Font dels pòsters",
       "plexAccounts": "Comptes de Plex",
       "destinations": "Destinacions",
       "newsletters": "Butlletins",
@@ -122,19 +122,19 @@
       "serverDesc": "Compara la versió que executa cada servidor de Plex, Jellyfin i Emby amb l'última que en publiquen els seus creadors."
     },
     "imageCache": {
-      "title": "Memòria cau de cartells",
-      "description": "Una còpia de cada cartell, desada al disc fins que el cartell canvia. No se n'elimina res per fer lloc: quan queda poc espai al disc, la memòria cau deixa de créixer i ho indica.",
+      "title": "Memòria cau de pòsters",
+      "description": "Una còpia de cada pòster, desada al disc fins que el pòster canvia. No se n'elimina res per fer lloc: quan queda poc espai al disc, la memòria cau deixa de créixer i ho indica.",
       "size": "Al disc",
       "files": "Fitxers",
       "need": "Necessitat estimada",
-      "needHint": "{{count}} cartells × 18 KB",
+      "needHint": "{{count}} pòsters × 18 KB",
       "free": "Espai lliure al disc",
       "freeOf": "de {{total}}",
       "floor": "Manté lliure",
       "ceiling": "Límit màxim",
       "lastSweep": "Última neteja",
       "never": "encara no",
-      "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de cartells no són a la memòria cau.",
+      "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de pòsters no són a la memòria cau.",
       "loadError": "No s'ha pogut carregar l'estat de la memòria cau."
     }
   },
@@ -217,13 +217,13 @@
       "issueMalfunctioned": "El servidor informa que el connector no s'ha pogut carregar. Normalment això se soluciona actualitzant el connector o el servidor multimèdia."
     },
     "posterSource": {
-      "title": "Preferències dels cartells",
-      "titleDesc": "Trieu el cartell de quin servidor es mostra quan un títol existeix a més d'un servidor",
-      "label": "Font de cartells preferida",
-      "description": "Quan un títol és a més d'un servidor, es fa servir el cartell d'aquest servidor. Si no en té cap, es fa servir el de la còpia afegida més recentment.",
+      "title": "Preferències dels pòsters",
+      "titleDesc": "Trieu el pòster de quin servidor es mostra quan un títol existeix a més d'un servidor",
+      "label": "Font de pòsters preferida",
+      "description": "Quan un títol és a més d'un servidor, es fa servir el pòster d'aquest servidor. Si no en té cap, es fa servir el de la còpia afegida més recentment.",
       "automatic": "Automàtic (el més recent)",
-      "emptyHint": "Afegiu un servidor per triar una font de cartells preferida.",
-      "ownerOnly": "Només el propietari pot triar la font de cartells preferida."
+      "emptyHint": "Afegiu un servidor per triar una font de pòsters preferida.",
+      "ownerOnly": "Només el propietari pot triar la font de pòsters preferida."
     },
     "version": {
       "installed": "Versió {{version}}",
@@ -812,19 +812,19 @@
         "destinationHelp": "El compte SMTP pel qual s'envia. No determina qui el rep.",
         "pickDestination": "Trieu una destinació",
         "noDestination": "Cap",
-        "imageMode": "Imatges dels cartells",
+        "imageMode": "Imatges dels pòsters",
         "modes": {
           "hosted": "Allotjades",
           "inline": "Adjuntades",
-          "none": "Sense cartells"
+          "none": "Sense pòsters"
         },
         "modeHelp": {
           "hosted": "Es carreguen des d'aquest Tracearr mitjançant l'URL extern; l'URL ha de ser accessible des d'internet públic, i el proveïdor de correu de cada destinatari el veu.",
           "inline": "S'adjunten al correu. Tots els clients les mostren, i el correu és més gran, de manera que el límit de mida retalla més títols.",
-          "none": "Les targetes es mostren sense cartells."
+          "none": "Les targetes es mostren sense pòsters."
         },
         "modePreviewHint": "La vista prèvia mostra l'opció actual; poseu el commutador «Imatges» a «Blocades» per veure el correu sense imatges remotes.",
-        "hostedNeedsUrl": "No hi ha cap URL extern definit. Els cartells allotjats en necessiten un abans de poder desar això: definiu-lo a Accés → Accés remot, o trieu «Adjuntades».",
+        "hostedNeedsUrl": "No hi ha cap URL extern definit. Els pòsters allotjats en necessiten un abans de poder desar això: definiu-lo a Accés → Accés remot, o trieu «Adjuntades».",
         "skipWhenEmpty": "Omet quan no s'hagi afegit res",
         "skipWhenEmptyHelp": "Si no hi ha res nou, no s'envia cap correu. En un butlletí que abasta diversos servidors, això és per grup: qui tingui servidors on no s'ha afegit res no rep res, i la resta sí que reben el seu. Un enviament de prova sempre es genera."
       },
@@ -842,8 +842,8 @@
         "fixDestination": "Tria una destinació",
         "fixRecipients": "Ves als destinataris",
         "fixExternalUrl": "Defineix l'URL extern",
-        "externalUrl": "L'URL extern està definit; els cartells allotjats, la visualització al navegador i els enllaços a Tracearr funcionen.",
-        "externalUrlFail": "Sense URL extern: els cartells allotjats, la visualització al navegador i els enllaços a Tracearr queden desactivats.",
+        "externalUrl": "L'URL extern està definit; els pòsters allotjats, la visualització al navegador i els enllaços a Tracearr funcionen.",
+        "externalUrlFail": "Sense URL extern: els pòsters allotjats, la visualització al navegador i els enllaços a Tracearr queden desactivats.",
         "externalUrlNotHttps": "L'URL extern està definit amb http: els membres reben un enllaç per cancel·lar la subscripció, però la cancel·lació amb un sol clic necessita https.",
         "noPublicUrl": "Els enllaços als elements de {{server}} s'ometen perquè no té cap adreça pública.",
         "privatePublicUrl": "Els enllaços als elements de {{server}} s'ometen perquè la seva adreça pública és privada.",
