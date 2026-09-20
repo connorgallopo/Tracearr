@@ -1,6 +1,6 @@
 {
   "login": {
-    "title": "",
+    "title": "Tracearr",
     "tagline": "Tracearr - Gestió d'accés a les reproduccions",
     "createAccountHeading": "Creeu el vostre compte per a començar",
     "signInHeading": "Inicieu sessió al vostre compte",
@@ -10,18 +10,18 @@
     "waitingForPlex": "S'està esperant l'autorització de Plex...",
     "completeInPopup": "Completeu l'inici de sessió a la finestra emergent",
     "reopenPlexLogin": "Torneu a obrir l'inici de sessió de Plex",
-    "continueWith": "",
-    "usernameOrEmail": "",
-    "identifierPlaceholder": "",
-    "username": "",
-    "usernamePlaceholder": "",
+    "continueWith": "Continua amb {{provider}}",
+    "usernameOrEmail": "Nom d'usuari o correu electrònic",
+    "identifierPlaceholder": "Nom d'usuari o adreça electrònica",
+    "username": "Nom d'usuari",
+    "usernamePlaceholder": "yourusername",
     "emailPlaceholder": "elvostrecorreu@email.com",
     "displayNamePlaceholder": "Trieu un nom de visualització",
     "passwordPlaceholder": "Ha de tenir com a mínim 8 caràcters",
     "yourPasswordPlaceholder": "La teva contrasenya",
     "setupNote": "Després de crear el vostre compte, podreu afegir els vostres servidors Plex o Jellyfin des de la configuració.",
-    "localDisabledHint": "",
-    "oidcError": "",
+    "localDisabledHint": "L'inici de sessió local està deshabilitat en aquesta instància. Demaneu a un administrador que executi `enable-local-login` des de la CLI de Tracearr per tornar-lo a habilitar.",
+    "oidcError": "L'inici de sessió únic ha fallat. Torneu-ho a provar o utilitzeu un altre mètode d'inici de sessió.",
     "accountCreated": "Compte creat correctament!",
     "connectedTo": "Connectat a {{name}}",
     "plexAuthFailed": "L'autenticació amb Plex ha fallat",
@@ -170,10 +170,10 @@
     "uniqueUsers": ""
   },
   "library": {
-    "title": "",
+    "title": "Biblioteca",
     "description": "",
-    "topMovies": "",
-    "topShows": "",
+    "topMovies": "Pel·lícules més vistes",
+    "topShows": "Sèries més vistes",
     "noMoviePlays": "",
     "noShowPlays": "",
     "overview": {
@@ -201,66 +201,66 @@
     },
     "storage": {
       "title": "Emmagatzematge",
-      "description": "",
+      "description": "Ús de l'emmagatzematge, prediccions i optimització",
       "totalStorage": "Emmagatzematge total",
-      "growthRate": "",
+      "growthRate": "Taxa de creixement",
       "duplicates": "Duplicats",
-      "groups": "",
-      "recoverable": "",
-      "staleContent": "",
-      "staleContentDesc": "",
-      "items": "",
-      "unused": "",
-      "storageTrend": "",
+      "groups": "grups",
+      "recoverable": "recuperable",
+      "staleContent": "Contingut obsolet",
+      "staleContentDesc": "Contingut que podria ser candidat a l'eliminació",
+      "items": "elements",
+      "unused": "sense utilitzar",
+      "storageTrend": "Tendència de l'emmagatzematge",
       "confidence": "",
       "confidenceHigh": "",
-      "confidenceMedium": "",
+      "confidenceMedium": "Mitjana",
       "confidenceLow": "",
-      "zeroGrowth": "",
-      "predictions": "",
-      "contentROI": "",
-      "contentROIDesc": "",
+      "zeroGrowth": "0 GB/mes",
+      "predictions": "Prediccions",
+      "contentROI": "ROI del contingut",
+      "contentROIDesc": "Valor de visionament per cost d'emmagatzematge",
       "avgHoursPerGB": "",
-      "insufficientData": "",
+      "insufficientData": "Dades insuficients",
       "of": "de",
       "days": "dies",
-      "failedToLoad": "",
-      "failedToLoadDesc": "",
-      "duplicatesTitle": "",
-      "duplicatesSubtitle": "",
-      "growthPreChangeover": "",
-      "loadingDuplicates": "",
-      "duplicatesFailed": "",
-      "noDuplicatesTitle": "",
-      "noDuplicatesDesc": "",
+      "failedToLoad": "No s'han pogut carregar les dades d'emmagatzematge",
+      "failedToLoadDesc": "No s'han pogut obtenir les dades d'emmagatzematge. Torneu-ho a provar.",
+      "duplicatesTitle": "Duplicats",
+      "duplicatesSubtitle": "Títols emmagatzemats en més d'un fitxer físic, entre servidors, biblioteques i versions",
+      "growthPreChangeover": "basat en l'històric anterior a l'actualització",
+      "loadingDuplicates": "S'estan carregant els duplicats...",
+      "duplicatesFailed": "No s'han pogut carregar els duplicats",
+      "noDuplicatesTitle": "No s'ha trobat cap duplicat",
+      "noDuplicatesDesc": "No s'ha detectat cap títol amb més d'un fitxer físic.",
       "colTitle": "",
       "colMatchType": "",
       "colCopies": "",
       "colRecoverable": "",
-      "sameServer": "",
-      "mirror": ""
+      "sameServer": "Mateix servidor",
+      "mirror": "Rèplica"
     },
     "watch": {
-      "title": "",
-      "description": "",
-      "watched": "",
-      "percentWatched": "",
-      "totalWatchTime": "",
-      "avgPerItem": "",
-      "completed": "",
-      "peakHour": "",
-      "viewingHours": "",
-      "peak": "",
-      "monthlyTrends": "",
-      "busiest": "",
-      "quietest": "",
-      "bingeHighlights": "",
-      "bingeHighlightsDesc": "",
-      "bingeSessions": "",
-      "noData": "",
-      "noDataDesc": "",
-      "failedToLoad": "",
-      "failedToLoadDesc": ""
+      "title": "Analítiques de visionament",
+      "description": "Comportament de visionament i interacció amb el contingut",
+      "watched": "Vist",
+      "percentWatched": "% vist",
+      "totalWatchTime": "Temps total de visionament",
+      "avgPerItem": "mitjana per element",
+      "completed": "Completat",
+      "peakHour": "Hora punta",
+      "viewingHours": "Hores de visionament",
+      "peak": "Màxim:",
+      "monthlyTrends": "Tendències mensuals",
+      "busiest": "Amb més activitat:",
+      "quietest": "Amb menys activitat:",
+      "bingeHighlights": "Destacats de marató",
+      "bingeHighlightsDesc": "Sèries amb els patrons de visionament més intensius",
+      "bingeSessions": "Sessions de marató",
+      "noData": "Encara no hi ha dades de visionament",
+      "noDataDesc": "Les analítiques de visionament apareixeran aquí un cop s'hagi reproduït contingut. Torneu a consultar-ho després d'una mica d'activitat de visionament.",
+      "failedToLoad": "No s'han pogut carregar les analítiques de visionament",
+      "failedToLoadDesc": "No s'han pogut obtenir les dades de visionament."
     },
     "emptyState": {
       "checkingStatus": "",
@@ -313,25 +313,25 @@
       }
     },
     "versionsBackfill": {
-      "banner": "",
-      "action": "",
-      "syncFailed": "",
-      "syncStarted": ""
+      "banner": "Encara s'estan recollint les dades de versions de fitxer d'aquest servidor. Executeu una sincronització de la biblioteca per acabar.",
+      "action": "Sincronitza ara",
+      "syncFailed": "La sincronització no s'ha pogut iniciar en {{count}} servidor(s). Comproveu els vostres permisos i l'estat del servidor.",
+      "syncStarted": "S'ha iniciat la sincronització de la biblioteca."
     }
   },
   "activity": {
     "title": "Activitat",
-    "description": "",
-    "playsOverTime": "",
-    "concurrentStreams": "",
-    "engagementBreakdown": "",
-    "howUsersEngage": "",
-    "playsVsSessions": "",
-    "playsVsSessionsDesc": "",
-    "activityByDayOfWeek": "",
-    "activityByHourOfDay": "",
+    "description": "Tendències de reproducció, patrons i comportament de transmissió",
+    "playsOverTime": "Reproduccions al llarg del temps",
+    "concurrentStreams": "Transmissions simultànies",
+    "engagementBreakdown": "Desglossament de la interacció",
+    "howUsersEngage": "Com interactuen els usuaris amb el contingut",
+    "playsVsSessions": "Reproduccions vs. sessions",
+    "playsVsSessionsDesc": "Només visionats complets: compta una reproducció quan el temps total de visualització cobreix tota la durada d'un contingut",
+    "activityByDayOfWeek": "Activitat per dia de la setmana",
+    "activityByHourOfDay": "Activitat per hora del dia",
     "platforms": "Plataformes",
-    "streamQuality": ""
+    "streamQuality": "Qualitat de la transmissió"
   },
   "violations": {
     "title": "Incompliments",
@@ -384,145 +384,145 @@
   "automations": {
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "Envia una notificació",
+        "description": "Envia a una o més destinacions",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps mínim entre notificacions"
           }
         },
-        "ran": ""
+        "ran": "S'ha enviat una notificació"
       },
       "trust": {
-        "label": "",
-        "description": "",
+        "label": "Puntuació de confiança",
+        "description": "Ajusta, estableix o restableix la puntuació de confiança",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Mode"
           },
           "amount": {
-            "label": "",
-            "description": ""
+            "label": "Quantitat",
+            "description": "Positiu per augmentar-la, negatiu per reduir-la"
           },
           "value": {
-            "label": ""
+            "label": "Valor"
           }
         },
-        "ran": ""
+        "ran": "S'ha canviat la puntuació de confiança"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "Finalitza la transmissió",
+        "description": "Finalitza la transmissió activa",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Temps mínim entre finalitzacions per al mateix usuari"
           },
           "delay_seconds": {
-            "label": "",
-            "description": ""
+            "label": "Període de manteniment",
+            "description": "Espera aquests segons i després finalitza la transmissió només si l'automatització encara hi coincideix. Amb 0 es finalitza just després d'una comprovació final."
           },
           "target": {
-            "description": ""
+            "description": "Quines sessions cal finalitzar"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Missatge opcional"
           }
         },
-        "ran": ""
+        "ran": "S'ha aturat la transmissió"
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "Envia un missatge al client",
+        "description": "Envia un missatge al reproductor multimèdia",
+        "hint": "Només Jellyfin i Emby. Plex només admet missatges quan es finalitza una transmissió.",
         "fields": {
           "target": {
-            "description": ""
+            "description": "A quines sessions cal enviar el missatge"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Missatge que es mostrarà…"
           }
         },
-        "ran": ""
+        "ran": "S'ha mostrat un missatge al reproductor"
       }
     },
     "activity": {
-      "title": "",
-      "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "title": "Activitat",
+      "description": "Què ha fet aquesta automatització, dels més recents als més antics. Les execucions es conserven durant {{days}} dies.",
+      "outcome": "Resultat",
+      "who": "Qui",
+      "where": "On",
+      "playing": "S'està reproduint",
+      "from": "Origen",
+      "summary": "Resum",
+      "started": "Iniciat",
+      "finished": "Finalitzat",
+      "noSummary": "Sense notes",
       "outcomes": {
-        "completed": "",
-        "stopped_by_condition": "",
+        "completed": "Executada",
+        "stopped_by_condition": "Sense coincidència",
         "error": "Error"
       },
-      "empty": "",
-      "emptyDescription": "",
-      "runTitle": "",
-      "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "empty": "Encara no hi ha cap execució",
+      "emptyDescription": "Les execucions es llisten aquí quan un activador hi coincideix.",
+      "runTitle": "Execució",
+      "runLoading": "S'està carregant l'execució",
+      "triggeredBy": "Activat per {{trigger}}",
+      "unknownStep": "Pas no reconegut",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "all": "Tot",
+        "completed": "Executades",
+        "stopped_by_condition": "Sense coincidència",
+        "error": "S'ha produït un error"
       },
-      "group": "",
+      "group": "Grup {{number}}",
       "branch": {
-        "then": "",
-        "else": ""
+        "then": "S'han seguit els passos de «Si»",
+        "else": "S'han seguit els passos de «Si no»"
       },
-      "whyBranch": "",
-      "openInEditor": "",
-      "tabsLabel": "",
-      "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
-      "item": "",
-      "recordedViolation": ""
+      "whyBranch": "Què ha llegit",
+      "openInEditor": "Obre-ho al constructor amb aquesta execució",
+      "tabsLabel": "Filtra per resultat",
+      "emptyRan": "Encara no hi ha hagut cap coincidència",
+      "emptyRanDescription_one": "S'ha executat {{count}} comprovació i no hi ha hagut coincidència.",
+      "emptyRanDescription_other": "S'han executat {{count}} comprovacions i no hi ha hagut coincidència.",
+      "item": "Element",
+      "recordedViolation": "S'ha registrat un incompliment"
     },
-    "allKinds": "",
-    "allStatuses": "",
-    "allSeverities": "",
+    "allKinds": "Tots els tipus",
+    "allStatuses": "Tots els estats",
+    "allSeverities": "Totes les severitats",
     "bind": {
-      "nameHelper": "",
-      "namePlaceholder": "",
-      "activeLabel": "",
-      "back": "",
-      "submit": "",
-      "submitting": "",
-      "customize": "",
+      "nameHelper": "El nom que apareix a la llista d'automatitzacions.",
+      "namePlaceholder": "Un nom per a aquesta automatització",
+      "activeLabel": "Activa'l ara",
+      "back": "Torna",
+      "submit": "Utilitza-ho",
+      "submitting": "S'està configurant…",
+      "customize": "Obre-ho al constructor",
       "doors": {
-        "helper": ""
+        "helper": "«Utilitza-ho» manté els passos tal com són; les respostes de dalt es poden canviar més endavant. «Obre-ho al constructor» fa que tots els passos siguin editables i trenca el vincle amb l'automatització predefinida."
       },
-      "anyServer": "",
-      "serverHelper": "",
-      "serverLabel": "",
-      "accountLabel": "",
-      "personLabel": "",
-      "destinationsLabel": "",
-      "required": "",
+      "anyServer": "Qualsevol servidor",
+      "serverHelper": "«Qualsevol servidor» vol dir tots.",
+      "serverLabel": "Quin servidor",
+      "accountLabel": "Quin compte",
+      "personLabel": "Quina persona",
+      "destinationsLabel": "Envia a",
+      "required": "Trieu-ne almenys un.",
       "needs": {
-        "title": ""
+        "title": "Què necessita"
       },
       "helper": {
-        "killMessage": "",
-        "clientMessage": ""
+        "killMessage": "Es mostra al reproductor quan s'atura la transmissió.",
+        "clientMessage": "Es mostra al reproductor mentre continua la reproducció."
       },
-      "noInputs": "",
-      "failed": "",
-      "created": "",
-      "createdOff": ""
+      "noInputs": "No hi ha res per emplenar.",
+      "failed": "No s'ha pogut configurar. Torneu-ho a provar.",
+      "created": "{{name}} està configurada i en funcionament.",
+      "createdOff": "S'ha creat {{name}} i està desactivada. Activeu-la des de la llista."
     },
     "builder": {
-      "destinationDisabled": "",
+      "destinationDisabled": "Destinació desactivada",
       "noAlertRecipientsTooltip": "",
       "noDestinations": "",
       "newDestination": "",
@@ -532,18 +532,18 @@
         "scopeIncomplete": "",
         "triggerRequired": "",
         "policyNeedsSubject": "",
-        "fieldUnavailable": "",
+        "fieldUnavailable": "Aquesta comprovació no està disponible per a tots els activadors d'aquí",
         "operatorInvalid": "",
         "valueInvalid": "",
-        "actionUnavailable": "",
+        "actionUnavailable": "Aquests activadors no proporcionen el que necessita aquesta acció",
         "variableUnavailable": "",
-        "minutesRange": "",
-        "daysRange": "",
-        "measureInvalid": "",
-        "fieldNotAvailableFor": "",
+        "minutesRange": "Entre {{min}} i {{max}} minuts",
+        "daysRange": "Entre {{min}} i {{max}} dies",
+        "measureInvalid": "Trieu com es compten els minuts",
+        "fieldNotAvailableFor": "No disponible per a: {{triggers}}",
         "trustAmountRange": "",
         "trustValueRange": "",
-        "messageRequired": "",
+        "messageRequired": "Escriviu el missatge que s'ha de mostrar",
         "tooLong": ""
       },
       "recordAs": {
@@ -554,12 +554,12 @@
         "notificationDescription": ""
       },
       "severityLabel": "",
-      "activeLabel": "",
+      "activeLabel": "Actiu",
       "saving": "",
       "selectPlaceholder": "",
       "searchPlaceholder": "",
       "noMatches": "",
-      "clearSelection": "",
+      "clearSelection": "Neteja la selecció",
       "selectedCount": "",
       "scope": {
         "label": "",
@@ -579,62 +579,62 @@
         "enforceAcrossServersDescription": ""
       },
       "conditions": {
-        "addGroup": "",
-        "fieldPlaceholder": "",
-        "windowPrefix": "",
-        "windowUnit": "",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "allDeviceTypes": "",
-        "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
-        "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
-        "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
-        "canNeverPass": "",
-        "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "addGroup": "Afegeix un conjunt de comprovacions a part",
+        "fieldPlaceholder": "Trieu què voleu comprovar",
+        "windowPrefix": "en",
+        "windowUnit": "h",
+        "uniqueDevices": "Dispositius únics",
+        "uniqueDevicesHint": "Només compta les sessions de dispositius físics diferents.",
+        "uniqueIps": "IP úniques",
+        "uniqueIpsHint": "Només compta les sessions d'adreces IP diferents, de manera que les transmissions de la mateixa llar no es compten.",
+        "allDeviceTypes": "Tots els tipus de dispositiu",
+        "deviceTypesHint": "Només compta les transmissions dels tipus de dispositiu seleccionats. Si es deixa buit, compta tots els dispositius.",
+        "yes": "Sí",
+        "no": "No",
+        "recentlySeen": "Vist recentment",
+        "allCountries": "Tots els països",
+        "sectionTitle": "I només si…",
+        "optional": "opcional",
+        "helper": "Comprovacions que s'han de complir primer. Si es deixa buit, s'executa cada vegada.",
+        "emptyLine": "Cap comprovació addicional. Això s'executa cada vegada.",
+        "all": "i",
+        "any": "o",
+        "allHint": "i: totes les comprovacions s'han de complir",
+        "anyHint": "o: n'hi ha prou que se'n compleixi una",
+        "matchLabel": "Uneix aquestes comprovacions amb",
+        "fieldLabel": "Què cal comprovar",
+        "operatorLabel": "És",
+        "valueLabel": "Valor",
+        "canNeverPass": "Això no es pot complir mai. L'activador ja s'activa a {{threshold}}.",
+        "noFields": "No hi ha cap comprovació disponible per a aquests activadors. Afegiu primer un activador de transmissió o de compte.",
+        "groupSeparator": "i també",
+        "addAnother": "Afegeix una comprovació",
+        "addFirst": "Afegeix una comprovació",
+        "removeGroup": "Elimina aquest conjunt de comprovacions"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
-        "confirmRemoveDescription": "",
-        "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "add": "Afegeix una altra acció",
+        "sectionTitle": "Després fes…",
+        "ifTitle": "Si…",
+        "helper": "S'executen en ordre, de dalt a baix.",
+        "emptyTitle": "Què ha de passar?",
+        "emptyDescription": "Envieu una notificació, atureu la transmissió, canvieu una puntuació de confiança o executeu passos només quan es compleixi una comprovació addicional.",
+        "emptyAction": "Trieu què passa",
+        "moveUp": "Mou {{name}} amunt",
+        "moveDown": "Mou {{name}} avall",
+        "menu": "Més opcions per a {{name}}",
+        "branchName": "aquesta branca",
+        "confirmRemoveTitle": "Voleu eliminar aquesta acció?",
+        "confirmRemoveDescription": "Deixarà de passar quan es desi.",
+        "policyNote": "Una branca no decideix si això es marca; ho fa la secció «I només si…».",
+        "branchThen": "Fes això",
+        "branchElse": "Si no",
+        "branchElseEmpty": "Res. L'automatització continua.",
+        "ifNothing": "encara no s'ha triat res",
+        "ifAddCheck": "Afegeix una altra comprovació",
+        "addBranch": "Afegeix un pas",
+        "expandBranch": "Mostra els passos d'aquesta branca",
+        "collapseBranch": "Amaga els passos d'aquesta branca"
       },
       "when": {
         "title": "",
@@ -717,36 +717,36 @@
       "scope": "",
       "media": ""
     },
-    "createAutomation": "",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "Crea una automatització",
+    "customAutomation": "Automatització personalitzada",
+    "deleteAutomationConfirm": "Segur que voleu eliminar aquesta automatització? Aquesta acció no es pot desfer.",
+    "deleteAutomation_one": "Elimina l'automatització",
+    "deleteAutomation_other": "Elimina {{count}} automatitzacions",
+    "deleteAutomationsConfirm": "Segur que ho voleu eliminar? Aquesta acció no es pot desfer.",
     "describe": {
-      "more_one": "",
-      "more_other": "",
-      "noValues": "",
-      "includesSameDevice": "",
+      "more_one": "+{{count}} més",
+      "more_other": "+{{count}} més",
+      "noValues": "(cap)",
+      "includesSameDevice": "inclou el mateix dispositiu",
       "uniqueIps": "",
-      "deviceTypesOnly": "",
+      "deviceTypesOnly": "només {{types}}",
       "when": "",
-      "or": "",
-      "nothing": "",
-      "onlyWhen": "",
-      "andAlso": "",
-      "allOf": "",
-      "anyOf": "",
-      "joinAll": "",
-      "joinAny": "",
-      "then": "",
-      "otherwise": "",
-      "appliesTo": "",
+      "or": "o {{text}}",
+      "nothing": "encara res",
+      "onlyWhen": "i només si",
+      "andAlso": "i també",
+      "allOf": "totes aquestes:",
+      "anyOf": "qualsevol d'aquestes:",
+      "joinAll": "i",
+      "joinAny": "o",
+      "then": "llavors {{text}}",
+      "otherwise": "Altrament",
+      "appliesTo": "S'aplica a {{name}}",
       "duration": {
-        "minutes_one": "",
-        "minutes_other": "",
-        "days_one": "",
-        "days_other": ""
+        "minutes_one": "{{count}} minut",
+        "minutes_other": "{{count}} minuts",
+        "days_one": "{{count}} dia",
+        "days_other": "{{count}} dies"
       },
       "triggers": {
         "sessionStarted": "",
@@ -756,11 +756,11 @@
         "sessionPaused": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
-        "accountInactiveFor": "",
-        "accountNewDevice": "",
-        "accountTrustChanged": "",
-        "mediaAdded": "",
-        "mediaUpgraded": "",
+        "accountInactiveFor": "un compte fa {{duration}} que està inactiu",
+        "accountNewDevice": "un compte reprodueix des d'un dispositiu nou",
+        "accountTrustChanged": "canvia la puntuació de confiança d'un compte",
+        "mediaAdded": "s'afegeix contingut multimèdia",
+        "mediaUpgraded": "es millora contingut multimèdia",
         "serverDown": "",
         "serverUp": "",
         "pluginUpdateAvailable": "",
@@ -770,98 +770,98 @@
         "newsletterFailed": ""
       },
       "operators": {
-        "eq": "",
-        "neq": "",
-        "gt": "",
-        "gte": "",
-        "lt": "",
-        "lte": "",
-        "in": "",
-        "not_in": "",
-        "contains": "",
-        "not_contains": ""
+        "eq": "és",
+        "neq": "no és",
+        "gt": "és superior a",
+        "gte": "és com a mínim",
+        "lt": "és inferior a",
+        "lte": "és com a màxim",
+        "in": "és un d'aquests",
+        "not_in": "no és cap d'aquests",
+        "contains": "conté",
+        "not_contains": "no conté"
       },
       "fields": {
-        "concurrent_streams": "",
-        "active_session_distance_km": "",
-        "travel_speed_kmh": "",
-        "unique_ips_in_window": "",
-        "unique_devices_in_window": "",
-        "inactive_days": "",
-        "current_pause_minutes": "",
-        "total_pause_minutes": "",
-        "source_resolution": "",
-        "output_resolution": "",
-        "is_transcoding": "",
-        "is_transcode_downgrade": "",
-        "source_bitrate_mbps": "",
-        "user_id": "",
-        "trust_score": "",
-        "account_age_days": "",
-        "device_type": "",
-        "client_name": "",
-        "platform": "",
-        "is_local_network": "",
-        "country": "",
-        "ip_in_range": "",
-        "server_id": "",
-        "media_type": "",
-        "library_item_type": "",
-        "library_name": "",
-        "resolution_after": "",
-        "dynamic_range_after": "",
-        "video_codec_after": "",
-        "audio_channels_after": "",
-        "file_size_after": ""
+        "concurrent_streams": "el nombre de transmissions",
+        "active_session_distance_km": "la distància entre transmissions",
+        "travel_speed_kmh": "la velocitat de desplaçament",
+        "unique_ips_in_window": "el nombre d'adreces IP",
+        "unique_devices_in_window": "el nombre de dispositius",
+        "inactive_days": "el temps des de l'última transmissió",
+        "current_pause_minutes": "la pausa actual",
+        "total_pause_minutes": "el temps de pausa total",
+        "source_resolution": "la resolució de la font",
+        "output_resolution": "la resolució de sortida",
+        "is_transcoding": "la transcodificació",
+        "is_transcode_downgrade": "la reducció de qualitat",
+        "source_bitrate_mbps": "la taxa de bits de la font",
+        "user_id": "l'usuari",
+        "trust_score": "la puntuació de confiança",
+        "account_age_days": "l'antiguitat del compte",
+        "device_type": "el tipus de dispositiu",
+        "client_name": "el reproductor",
+        "platform": "la plataforma",
+        "is_local_network": "la xarxa local",
+        "country": "el país",
+        "ip_in_range": "l'adreça IP",
+        "server_id": "el servidor",
+        "media_type": "el tipus de contingut",
+        "library_item_type": "el tipus d'element",
+        "library_name": "la biblioteca",
+        "resolution_after": "la resolució",
+        "dynamic_range_after": "el rang dinàmic",
+        "video_codec_after": "el còdec de vídeo",
+        "audio_channels_after": "els canals d'àudio",
+        "file_size_after": "la mida del fitxer"
       },
       "states": {
         "is_local_network": {
-          "yes": "",
-          "no": ""
+          "yes": "l'usuari és a la xarxa local",
+          "no": "l'usuari no és a la xarxa local"
         },
         "is_transcode_downgrade": {
-          "yes": "",
-          "no": ""
+          "yes": "la transmissió té una reducció de qualitat",
+          "no": "la transmissió no té cap reducció de qualitat"
         },
         "is_transcoding": {
           "video": {
-            "yes": "",
-            "no": ""
+            "yes": "la transmissió transcodifica el vídeo",
+            "no": "la transmissió no transcodifica el vídeo"
           },
           "audio": {
-            "yes": "",
-            "no": ""
+            "yes": "la transmissió transcodifica l'àudio",
+            "no": "la transmissió no transcodifica l'àudio"
           },
           "video_or_audio": {
-            "yes": "",
-            "no": ""
+            "yes": "la transmissió transcodifica",
+            "no": "la transmissió no transcodifica"
           },
           "neither": {
-            "yes": "",
-            "no": ""
+            "yes": "la transmissió no transcodifica",
+            "no": "la transmissió transcodifica"
           }
         }
       },
       "actions": {
-        "if": "",
-        "flagIt": "",
-        "doNothing": "",
-        "send": "",
-        "sendAnywhere": "",
-        "kill_stream": "",
-        "message_client": "",
-        "trustUp": "",
-        "trustDown": "",
-        "trustAdjust": "",
-        "trustSet": "",
-        "trustReset": ""
+        "if": "si",
+        "flagIt": "Marcar-ho",
+        "doNothing": "no fer res",
+        "send": "enviar a {{destinations}}",
+        "sendAnywhere": "enviar una notificació",
+        "kill_stream": "aturar la transmissió",
+        "message_client": "enviar un missatge al reproductor",
+        "trustUp": "augmentar la confiança en {{amount}}",
+        "trustDown": "reduir la confiança en {{amount}}",
+        "trustAdjust": "ajustar la confiança en {{amount}}",
+        "trustSet": "fixar la confiança a {{value}}",
+        "trustReset": "restablir la confiança"
       },
       "scope": {
-        "server": "",
-        "account": "",
-        "person": ""
+        "server": "un servidor",
+        "account": "un compte",
+        "person": "una persona"
       },
-      "sameDeviceInput": "",
+      "sameDeviceInput": "mateix dispositiu: {{input}}",
       "uniqueIpsInput": "",
       "unbound": {
         "server": "",
@@ -1161,109 +1161,109 @@
     "thisAutomation": "",
     "cooldownLabel": "",
     "cooldownInvalid": "",
-    "retentionLabel": "",
-    "retentionPlaceholder": "",
-    "retentionInvalid": "",
+    "retentionLabel": "Conserva les execucions durant",
+    "retentionPlaceholder": "{{days}}",
+    "retentionInvalid": "Introduïu un nombre enter de dies, com a mínim 1, o deixeu-ho buit.",
     "noAutomationsFound": "",
     "operators": {
       "eq": "",
-      "neq": "",
+      "neq": "no és igual a",
       "gt": "",
-      "gte": "",
-      "lt": "",
-      "lte": "",
-      "in": "",
-      "not_in": "",
+      "gte": "com a mínim",
+      "lt": "menys de",
+      "lte": "com a màxim",
+      "in": "és un de",
+      "not_in": "no és un de",
       "contains": "",
-      "not_contains": ""
+      "not_contains": "no conté"
     },
     "options": {
-      "4K": "",
-      "1080p": "",
-      "720p": "",
-      "480p": "",
-      "SD": "",
-      "unknown": "",
-      "mobile": "",
-      "tablet": "",
-      "tv": "",
-      "desktop": "",
-      "browser": "",
-      "ios": "",
-      "android": "",
-      "windows": "",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
-      "tizen": "",
-      "movie": "",
-      "episode": "",
-      "track": "",
-      "photo": "",
-      "live": "",
-      "trailer": "",
-      "video": "",
-      "audio": "",
-      "video_or_audio": "",
-      "neither": "",
-      "8K": "",
-      "1440p": "",
-      "sdr": "",
-      "hdr": "",
-      "hdr10": "",
-      "hdr10+": "",
-      "hlg": "",
-      "dolby vision": "",
+      "4K": "4K (2160p)",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "Desconegut",
+      "mobile": "Mòbil",
+      "tablet": "Tauleta",
+      "tv": "TV",
+      "desktop": "Escriptori",
+      "browser": "Navegador",
+      "ios": "iOS",
+      "android": "Android",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
+      "tizen": "Tizen",
+      "movie": "Pel·lícula",
+      "episode": "Episodi de TV",
+      "track": "Música",
+      "photo": "Foto",
+      "live": "TV en directe",
+      "trailer": "Tràiler",
+      "video": "Vídeo",
+      "audio": "Àudio",
+      "video_or_audio": "Vídeo o àudio",
+      "neither": "Cap (Reproducció directa)",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "Dolby Vision",
       "libraryItemType": {
-        "movie": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "artist": "",
-        "album": "",
-        "track": "",
-        "photo": ""
+        "movie": "Pel·lícula",
+        "show": "Sèrie",
+        "season": "Temporada",
+        "episode": "Episodi",
+        "artist": "Artista",
+        "album": "Àlbum",
+        "track": "Pista",
+        "photo": "Foto"
       }
     },
     "provenance": {
-      "builtin": "",
-      "imported": "",
-      "importedBy": "",
-      "saved": "",
-      "customized": "",
-      "customizedFromRemoved": ""
+      "builtin": "Integrada · {{name}} {{version}}",
+      "imported": "Importada d'un codi de compartició el {{date}} · {{name}} {{version}}",
+      "importedBy": "Importada d'un codi de compartició per {{author}} el {{date}} · {{name}} {{version}}",
+      "saved": "Desada aquí des de {{name}} el {{date}} · {{version}}",
+      "customized": "Personalitzada a partir de {{name}}",
+      "customizedFromRemoved": "Personalitzada a partir d'una automatització predefinida que després s'ha eliminat"
     },
-    "recordsOnly": "",
+    "recordsOnly": "Només registra les execucions",
     "scope": {
-      "global": "",
-      "person": "",
-      "account": "",
-      "crossServer": ""
+      "global": "Global",
+      "person": "Persona",
+      "account": "Compte",
+      "crossServer": "Entre servidors"
     },
-    "searchPlaceholder": "",
+    "searchPlaceholder": "Cerca automatitzacions…",
     "sessionTargets": {
       "triggering": {
-        "label": "",
-        "tooltip": ""
+        "label": "Sessió desencadenant",
+        "tooltip": "Només la sessió que ha activat aquesta automatització"
       },
       "oldest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Sessió més antiga",
+        "tooltip": "La sessió activa de l'usuari que fa més temps que dura"
       },
       "newest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Sessió més recent",
+        "tooltip": "La sessió que l'usuari ha iniciat més recentment"
       },
       "all_except_one": {
-        "label": "",
-        "tooltip": ""
+        "label": "Totes excepte una (conserva la més antiga)",
+        "tooltip": "Totes les sessions excepte la més antiga, de manera que l'usuari es queda amb una sola transmissió"
       },
       "all_user": {
-        "label": "",
-        "tooltip": ""
+        "label": "Totes les sessions de l'usuari",
+        "tooltip": "Totes les sessions actives d'aquest usuari"
       }
     },
     "configFields": {
@@ -1289,114 +1289,114 @@
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "Reduïda",
+      "warning": "Avís",
+      "high": "Alta"
     },
     "template": {
-      "version": "",
-      "updateAvailable": "",
-      "updatedTitle": "",
-      "updatedBody": "",
-      "before": "",
-      "after": "",
-      "review": "",
-      "save": "",
-      "customize": "",
-      "customizeTitle": "",
-      "customizeConfirm": "",
-      "customizeConfirmAction": "",
-      "customizeFirst": "",
-      "customizeFailed": "",
-      "upgradeFailed": "",
-      "gone": "",
-      "doorsHelper": ""
+      "version": "v{{version}}",
+      "updateAvailable": "Hi ha una actualització disponible",
+      "updatedTitle": "L'automatització predefinida ara és a la v{{version}}",
+      "updatedBody": "Reviseu les respostes següents i després actualitzeu.",
+      "before": "Ara",
+      "after": "Després de l'actualització",
+      "review": "Revisa-ho i actualitza",
+      "save": "Desa els canvis",
+      "customize": "Obre-ho al constructor",
+      "customizeTitle": "Voleu obrir-ho al constructor?",
+      "customizeConfirm": "Si l'obriu al constructor, aquesta automatització passa a ser independent: tots els passos es poden editar i deixa de rebre actualitzacions de la predefinida. Aquesta acció no es pot desfer.",
+      "customizeConfirmAction": "Obre-ho al constructor",
+      "customizeFirst": "Aquesta automatització segueix una de predefinida. Obriu-la primer al constructor.",
+      "customizeFailed": "No s'ha pogut obrir al constructor.",
+      "upgradeFailed": "No s'ha pogut actualitzar. Torneu-ho a provar.",
+      "gone": "L'automatització predefinida a partir de la qual es va crear ja no és en aquest servidor.",
+      "doorsHelper": "Els passos provenen de l'automatització predefinida i són fixos. «Obre-ho al constructor» fa que tots els passos es puguin editar i trenca l'enllaç."
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Compte inactiu",
+        "description": "Genera un incompliment quan un compte no s'utilitza durant més dies dels que permeteu.",
+        "keywords": "inactiu adormit sense ús obsolet neteja inactivitat compte"
       },
       "concurrent-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Massa transmissions alhora",
+        "description": "Genera un incompliment quan un compte reprodueix més transmissions alhora de les que permeteu.",
+        "keywords": "límit topall concurrent simultani compartició massa transmissions"
       },
       "device-velocity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Moltes IP en un període",
+        "description": "Genera un incompliment quan un compte transmet des de més adreces IP en un període de les que permeteu.",
+        "keywords": "adreces ip vpn compartició dispositius període"
       },
       "geo-restriction": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Països blocats",
+        "description": "Genera un incompliment quan una transmissió prové d'un país que bloqueu.",
+        "keywords": "país geo vpn estranger regió bloqueig viatge"
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Desplaçament impossible",
+        "description": "Genera un incompliment quan dues sessions són més lluny l'una de l'altra del que ningú podria recórrer entre elles.",
+        "keywords": "vpn viatge velocitat distància ubicació compartició"
       },
       "kill-paused-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Atura les transmissions en pausa",
+        "description": "Atura una transmissió que ha estat en pausa més minuts dels que permeteu.",
+        "keywords": "pausa inactiu afk atura finalitza allibera"
       },
       "media-added": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Multimèdia nou afegit",
+        "description": "Avisa una destinació quan un element de la biblioteca apareix per primera vegada.",
+        "keywords": "nou biblioteca pel·lícula episodi afegit importació notifica discord correu webhook"
       },
       "media-upgraded": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Multimèdia millorat",
+        "description": "Avisa una destinació quan un element de la biblioteca canvia de qualitat.",
+        "keywords": "millora qualitat remux 4k resolució substituït notifica discord correu webhook"
       },
       "new-device": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Dispositiu nou",
+        "description": "Avisa una destinació la primera vegada que un compte transmet des d'un dispositiu que no heu vist mai.",
+        "keywords": "dispositiu nou desconegut no reconegut telèfon inici de sessió compartició notifica discord correu webhook"
       },
       "newsletter-failed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Ha fallat el butlletí",
+        "description": "Avisa una destinació quan un enviament de butlletí falla o només arriba a una part de la llista.",
+        "keywords": "butlletí resum correu ha fallat parcial rebot notifica"
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Sense transcodificacions 4K",
+        "description": "Atura una transmissió que transcodifica vídeo d'origen 4K.",
+        "keywords": "4k transcodificació qualitat cpu amplada de banda atura"
       },
       "paused-too-long": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "En pausa massa temps",
+        "description": "Avisa una destinació quan una transmissió està en pausa més minuts dels que permeteu.",
+        "keywords": "pausa inactiu afk encallat abandonat notifica discord correu webhook"
       },
       "plugin-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Actualització del connector de Tracearr",
+        "description": "Avisa una destinació quan un servidor té un connector de Tracearr més nou per instal·lar.",
+        "keywords": "connector actualització millora versió llançament notifica discord correu webhook"
       },
       "server-down": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Servidor caigut",
+        "description": "Avisa una destinació quan un servidor multimèdia deixa de respondre.",
+        "keywords": "fora de línia interrupció inaccessible caigut notifica discord correu webhook"
       },
       "server-up": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Servidor recuperat",
+        "description": "Avisa una destinació quan un servidor multimèdia torna a respondre.",
+        "keywords": "en línia recuperat restaurat torna a estar actiu notifica discord correu webhook"
       },
       "server-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Actualització del servidor multimèdia",
+        "description": "Avisa una destinació quan un servidor multimèdia té una actualització disponible.",
+        "keywords": "actualització millora versió llançament plex jellyfin emby notifica discord"
       },
       "simultaneous-locations": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Dos llocs alhora",
+        "description": "Genera un incompliment quan un mateix compte transmet des de dos llocs allunyats alhora.",
+        "keywords": "distància ubicació compartició vpn dos llocs alhora"
       },
       "stream-ended": {
         "name": "",
@@ -1619,38 +1619,38 @@
       "unlinkConfirm": ""
     },
     "destinations": {
-      "add": "",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
-      "builtinNote": "",
-      "clearSecret": "",
-      "delete": "",
-      "deleteConfirm": "",
-      "description": "",
-      "emailDescription": "",
-      "empty": "",
+      "add": "Afegeix una destinació",
+      "alertsGoTo": "Les alertes van a {{count}} adreça",
+      "alertsGoTo_other": "Les alertes van a {{count}} adreces",
+      "builtinNote": "Integrat",
+      "clearSecret": "Neteja",
+      "delete": "Suprimeix",
+      "deleteConfirm": "Voleu suprimir {{name}}? Les automatitzacions i els butlletins que l'utilitzen s'aturaran fins que s'actualitzin.",
+      "description": "On van les notificacions. Afegiu-ne tantes com vulgueu; les automatitzacions poden enviar a qualsevol d'elles.",
+      "emailDescription": "Tracearr envia el correu a través d'aquest servidor SMTP. Els butlletins trien els seus propis destinataris; les alertes de les automatitzacions van a les adreces següents.",
+      "empty": "Encara no hi ha cap destinació.",
       "fields": {
         "webhookUrl": "",
         "url": "",
         "serverUrl": "",
-        "apiUrl": "",
+        "apiUrl": "URL de l'API",
         "topic": "",
-        "authToken": "",
+        "authToken": "Testimoni d'autenticació",
         "userKey": "",
-        "apiToken": "",
-        "preset": "",
-        "host": "",
-        "port": "",
+        "apiToken": "Testimoni d'API",
+        "preset": "Proveïdor",
+        "host": "Amfitrió SMTP",
+        "port": "Port",
         "security": "",
         "verifyCertificate": "",
         "username": "",
-        "password": "",
-        "fromName": "",
-        "fromAddress": "",
+        "password": "Contrasenya",
+        "fromName": "Nom del remitent",
+        "fromAddress": "Adreça del remitent",
         "to": "Recipients",
         "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "messagesPerSecond": "Missatges per segon",
+        "messageStream": "Flux de missatges"
       },
       "groups": {
         "connection": "",
@@ -1744,43 +1744,43 @@
     }
   },
   "maintenance": {
-    "startingTitle": "",
-    "interruptionTitle": "",
-    "startingDescription": "",
-    "interruptionDescription": "",
-    "unreachable": "",
-    "restoreTitle": "",
-    "restoreFailed": "",
+    "startingTitle": "Tracearr s'està iniciant...",
+    "interruptionTitle": "Interrupció del servei",
+    "startingDescription": "El servidor està esperant que els serveis de rerefons estiguin disponibles. Aquesta pàgina s'actualitzarà automàticament quan tot estigui a punt.",
+    "interruptionDescription": "Un o més serveis de rerefons han deixat d'estar disponibles. Aquesta pàgina s'actualitzarà automàticament quan es restableixi la connectivitat.",
+    "unreachable": "Ara mateix no es pot contactar amb el servidor de Tracearr. Les actualitzacions en directe estan en pausa i es reprendran soles.",
+    "restoreTitle": "S'està restaurant des de la còpia de seguretat...",
+    "restoreFailed": "La restauració ha fallat",
     "restorePhase": {
-      "validating": "",
-      "creating_restore_point": "",
-      "shutting_down": "",
-      "restoring_database": "",
-      "running_migrations": "",
-      "rebuilding_aggregates": "",
-      "restarting": "",
-      "complete": ""
+      "validating": "S'està validant la còpia de seguretat",
+      "creating_restore_point": "S'està creant el punt de restauració",
+      "shutting_down": "S'estan aturant els serveis",
+      "restoring_database": "S'està restaurant la base de dades",
+      "running_migrations": "S'estan executant les migracions",
+      "rebuilding_aggregates": "S'estan reconstruint els agregats",
+      "restarting": "S'estan reiniciant els serveis",
+      "complete": "Restauració completada"
     },
     "initStep": {
-      "migrations": "",
-      "timescale": "",
-      "services": ""
+      "migrations": "S'estan aplicant les migracions de la base de dades",
+      "timescale": "S'està preparant TimescaleDB (pot trigar una estona després d'una actualització)",
+      "services": "S'estan iniciant els serveis"
     },
-    "doNotRestart": ""
+    "doNotRestart": "No reinicieu ni atureu el servidor mentre s'executa. Si ho interrompeu, la base de dades pot quedar actualitzada a mitges."
   },
   "map": {
-    "allUsers": "",
-    "allTypes": "",
-    "heatmap": "",
-    "circles": "",
-    "streams": "",
-    "locations": "",
-    "allActivity": "",
-    "basemapMissing": "",
-    "webglUnavailable": "",
-    "webglHint": "",
-    "basemapShadowed": "",
-    "badMounts": ""
+    "allUsers": "Tots els usuaris",
+    "allTypes": "Tots els tipus",
+    "heatmap": "Mapa de calor",
+    "circles": "Cercles",
+    "streams": "transmissions",
+    "locations": "ubicacions",
+    "allActivity": "Tota l'activitat",
+    "basemapMissing": "El mapa base no està instal·lat",
+    "webglUnavailable": "WebGL està deshabilitat en aquest navegador",
+    "webglHint": "El mapa necessita WebGL. Habiliteu-lo per a aquest lloc a la configuració del navegador.",
+    "basemapShadowed": "Falta el mapa base a {{path}}. Tracearr l'inclou dins la imatge, de manera que un volum muntat sobre aquest directori l'està ocultant. Per conservar la memòria cau de cartells, munteu /app/data/image-cache en lloc de /app/data.",
+    "badMounts": "S'han detectat muntatges de volum incorrectes: no es garanteix el funcionament."
   },
   "devices": {
     "title": "",
@@ -1836,13 +1836,13 @@
     "windowWillClose": ""
   },
   "apiDocs": {
-    "backToSettings": "",
-    "apiKeyAutoLoaded": "",
-    "noApiKey": "",
-    "versionSwitcherLabel": "",
-    "versionV1": "",
-    "versionV2": "",
-    "specLoadError": ""
+    "backToSettings": "Torna a la configuració",
+    "apiKeyAutoLoaded": "Clau d'API carregada automàticament",
+    "noApiKey": "No s'ha generat cap clau d'API: creeu-ne una a Configuració per provar els punts finals",
+    "versionSwitcherLabel": "Versió de la documentació de l'API",
+    "versionV1": "API v1",
+    "versionV2": "API v2",
+    "specLoadError": "No s'ha pogut carregar l'especificació de l'API. Comproveu la clau d'API i torneu-ho a provar."
   },
   "debug": {
     "title": "",
@@ -1975,7 +1975,7 @@
     "detail": {
       "title": "Detalls multimèdia",
       "breadcrumb": {
-        "ariaLabel": ""
+        "ariaLabel": "Ruta de navegació"
       },
       "notFound": {
         "title": "",
@@ -2080,15 +2080,15 @@
       },
       "copies": {
         "title": "",
-        "loadError": "",
+        "loadError": "No s'han pogut carregar les còpies",
         "unknownLibrary": "",
         "columns": {
-          "server": "",
-          "library": "",
-          "quality": "",
-          "episodes": "",
-          "size": "",
-          "added": ""
+          "server": "Servidor",
+          "library": "Biblioteca",
+          "quality": "Qualitat",
+          "episodes": "Episodis",
+          "size": "Mida",
+          "added": "Afegit"
         },
         "versionLabel": ""
       }
@@ -2190,12 +2190,12 @@
   },
   "requests": {
     "status": {
-      "pending": "",
-      "approved": "",
-      "declined": "",
-      "failed": "",
-      "completed": "",
-      "deleted": ""
+      "pending": "Pendent",
+      "approved": "Aprovada",
+      "declined": "Rebutjada",
+      "failed": "S'ha produït un error",
+      "completed": "Disponible",
+      "deleted": "Eliminada"
     },
     "columns": {
       "requester": "",
@@ -2207,12 +2207,12 @@
       "watched": ""
     },
     "wait": {
-      "pending": "",
-      "declined": ""
+      "pending": "en espera",
+      "declined": "rebutjada"
     },
     "seasons": {
-      "all": "",
-      "item": ""
+      "all": "Totes les temporades",
+      "item": "T{{number}}"
     },
     "flags": {
       "fourK": "",
@@ -2227,29 +2227,29 @@
       "empty": ""
     },
     "userCard": {
-      "title": "",
-      "loadError": "",
-      "viewAll": "",
-      "showLess": "",
+      "title": "Sol·licituds",
+      "loadError": "No s'han pogut carregar les sol·licituds",
+      "viewAll": "Mostra-ho tot ({{count}} més)",
+      "showLess": "Mostra'n menys",
       "summary": {
-        "requests": "",
-        "medianWait": "",
-        "approvalRate": "",
-        "neverWatched": ""
+        "requests": "Sol·licituds",
+        "medianWait": "espera mediana {{duration}}",
+        "approvalRate": "Taxa d'aprovació",
+        "neverWatched": "Mai vist"
       },
-      "empty": ""
+      "empty": "Encara no hi ha cap sol·licitud"
     },
-    "unattributed": "",
+    "unattributed": "No és en aquest servidor",
     "watched": {
-      "byRequester": "",
-      "byOthers": ""
+      "byRequester": "Vist per qui ho va sol·licitar",
+      "byOthers": "Vist per una altra persona"
     },
     "page": {
-      "title": "",
+      "title": "Sol·licituds",
       "description": "",
       "failedToLoad": "",
-      "notConfigured": "",
-      "notConfiguredDescription": "",
+      "notConfigured": "Cap Seerr enllaçat",
+      "notConfiguredDescription": "Enllaceu una instància de Seerr a un servidor i aquesta pàgina s'omplirà després de la primera sincronització.",
       "linkSeerr": "",
       "kpi": {
         "requested": "",
@@ -2270,10 +2270,10 @@
       "empty": ""
     },
     "unplayed": {
-      "title": "",
-      "description": "",
-      "emptyTitle": "",
-      "emptyDescription": ""
+      "title": "Ha arribat i no s'ha reproduït mai",
+      "description": "S'ha baixat perquè algú ho va demanar i cap compte d'aquests servidors no n'ha iniciat mai la reproducció.",
+      "emptyTitle": "Tot el que ha arribat s'ha reproduït",
+      "emptyDescription": "Aquí no hi ha res que ocupi disc sense motiu."
     },
     "outcomes": {
       "title": "",
