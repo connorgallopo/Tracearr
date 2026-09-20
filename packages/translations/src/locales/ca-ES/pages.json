@@ -1779,7 +1779,7 @@
     "basemapMissing": "El mapa base no està instal·lat",
     "webglUnavailable": "WebGL està deshabilitat en aquest navegador",
     "webglHint": "El mapa necessita WebGL. Habiliteu-lo per a aquest lloc a la configuració del navegador.",
-    "basemapShadowed": "Falta el mapa base a {{path}}. Tracearr l'inclou dins la imatge, de manera que un volum muntat sobre aquest directori l'està ocultant. Per conservar la memòria cau de cartells, munteu /app/data/image-cache en lloc de /app/data.",
+    "basemapShadowed": "Falta el mapa base a {{path}}. Tracearr l'inclou dins la imatge, de manera que un volum muntat sobre aquest directori l'està ocultant. Per conservar la memòria cau de pòsters, munteu /app/data/image-cache en lloc de /app/data.",
     "badMounts": "S'han detectat muntatges de volum incorrectes: no es garanteix el funcionament."
   },
   "devices": {
@@ -1928,7 +1928,7 @@
         "summary": "{{count}} títols mai vistos · {{size}}",
         "empty": "No hi ha res per recuperar: tot el que teniu a la biblioteca s'ha vist",
         "columns": {
-          "poster": "Cartell",
+          "poster": "Pòster",
           "title": "Títol",
           "size": "Mida",
           "added": "Afegit",
