@@ -133,12 +133,9 @@
       "floor": "Keeps free",
       "ceiling": "Ceiling",
       "lastSweep": "Last sweep",
-      "swept": "Removed last sweep",
-      "freed": "Freed last sweep",
       "never": "not yet",
       "diskLimited": "Disk-limited since {{since}}: about {{shortfall}} of posters are not cached.",
-      "loadError": "Could not load the cache status.",
-      "notPersisting": "The poster cache is not surviving restarts. Mount a volume at the cache directory, or every poster is downloaded again after each container recreate."
+      "loadError": "Could not load the cache status."
     }
   },
   "servers": {
@@ -475,7 +472,6 @@
     "changeCount_other": "{{count}} changes",
     "series": "Tracearr {{series}}",
     "docs": "Docs",
-    "source": "GitHub",
     "empty": "No release notes are bundled with this version.",
     "types": {
       "new": "New",
