@@ -958,6 +958,8 @@
         "url": "Una imatge en un URL"
       },
       "logoUrl": "URL del logotip",
+      "systemTitle": "",
+      "systemTitleHelp": "",
       "accent": "Color d'accent",
       "accentPicker": "Trieu el color d'accent",
       "footerText": "Text del peu",
