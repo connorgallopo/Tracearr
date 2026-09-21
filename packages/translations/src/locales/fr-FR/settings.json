@@ -133,12 +133,9 @@
       "floor": "Garde libre",
       "ceiling": "Plafond",
       "lastSweep": "Dernier balayage",
-      "swept": "",
-      "freed": "",
       "never": "pas encore",
       "diskLimited": "Disque limité depuis {{since}}: environ {{shortfall}} d'affiches ne sont pas mis en cache.",
-      "loadError": "Impossible de charger le statut du cache.",
-      "notPersisting": ""
+      "loadError": "Impossible de charger le statut du cache."
     }
   },
   "servers": {
@@ -475,7 +472,6 @@
     "changeCount_other": "{{count}} modifications",
     "series": "Tracearr {{series}}",
     "docs": "Documentation",
-    "source": "",
     "empty": "Aucune note de version n'est fournie avec cette version.",
     "types": {
       "new": "Nouveau",
