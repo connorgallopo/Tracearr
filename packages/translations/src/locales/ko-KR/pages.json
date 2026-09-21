@@ -234,11 +234,15 @@
       "noDuplicatesTitle": "중복된 항목이 없습니다.",
       "noDuplicatesDesc": "실제 파일이 2개 이상인 콘텐츠가 없습니다.",
       "colTitle": "제목",
+      "colType": "",
       "colMatchType": "일치 유형",
       "colCopies": "사본",
       "colRecoverable": "확보 가능 공간",
       "sameServer": "같은 서버",
-      "mirror": "미러"
+      "mirror": "미러",
+      "missingOnServer": "",
+      "missingOnServerHint": "",
+      "copyPath": ""
     },
     "watch": {
       "title": "시청 분석",
@@ -792,6 +796,8 @@
         "total_pause_minutes": "총 일시 정지 시간",
         "source_resolution": "소스 해상도",
         "output_resolution": "출력 해상도",
+        "source_dynamic_range": "",
+        "source_video_codec": "",
         "is_transcoding": "트랜스코딩",
         "is_transcode_downgrade": "다운그레이드",
         "source_bitrate_mbps": "소스 비트레이트",
@@ -806,6 +812,8 @@
         "ip_in_range": "서버",
         "server_id": "서버",
         "media_type": "미디어 유형",
+        "season_number": "",
+        "episode_number": "",
         "library_item_type": "항목 종류",
         "library_name": "라이브러리",
         "resolution_after": "해상도",
@@ -977,6 +985,14 @@
         "label": "출력 해상도",
         "description": "트랜스코딩되거나 전달된 해상도"
       },
+      "source_dynamic_range": {
+        "label": "",
+        "description": ""
+      },
+      "source_video_codec": {
+        "label": "",
+        "description": ""
+      },
       "is_transcoding": {
         "label": "트랜스코딩 여부",
         "description": "비디오 또는 오디오 스트림이 트랜스코딩되고 있는지 여부"
@@ -1037,6 +1053,14 @@
       "media_type": {
         "label": "미디어 유형",
         "description": "콘텐츠 유형"
+      },
+      "season_number": {
+        "label": "",
+        "description": ""
+      },
+      "episode_number": {
+        "label": "",
+        "description": ""
       },
       "library_item_type": {
         "label": "항목 유형",
@@ -1902,11 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "최근 추가된 영화",
         "recentlyAddedShows": "최근 추가된 프로그램",
+        "recentlyUpdated": "",
         "mostPopularMovies": "가장 인기 있는 영화",
         "mostPopularShows": "가장 인기 있는 프로그램",
         "emptyRecentlyAdded": "서버 전체에서 중복 제거",
+        "emptyRecentlyUpdated": "",
         "emptyMostPopular": "서버 전체에서 중복 제거",
         "captionRecentlyAdded": "서버 전체에서 중복 제거",
+        "captionRecentlyUpdated": "",
         "captionMostPopular": {
           "day": "오늘",
           "week": "지난 7일",
@@ -1919,6 +1946,8 @@
       "card": {
         "newEpisodes_one": "새 에피소드 {{count}}개",
         "newEpisodes_other": "새 에피소드 {{count}}개",
+        "replacedEpisodes_one": "",
+        "replacedEpisodes_other": "",
         "addedAgo": "{{date}} 추가됨",
         "addedCompactAgo": "{{age}} 전에 추가됨",
         "newEpisodesChip": "{{count}} 신규"
