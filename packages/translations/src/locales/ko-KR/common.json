@@ -85,9 +85,9 @@
     "directPlay": "직접 재생",
     "directStream": "직접 재생",
     "transcode": "트랜스코딩",
-    "hwTranscode": "",
+    "hwTranscode": "하드웨어 트랜스코딩",
     "burnIn": "",
-    "watched": ""
+    "watched": "시청 완료"
   },
   "severity": {
     "low": "낮음",
@@ -120,11 +120,11 @@
     "lastYear": "작년",
     "byDay": "일별",
     "byHour": "시간별",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
-    "shortAll": "",
-    "timeRange": ""
+    "short7Days": "7일",
+    "short30Days": "30일",
+    "shortYear": "1년",
+    "shortAll": "전체",
+    "timeRange": "시간 범위"
   },
   "units": {
     "km": "km",
@@ -189,7 +189,7 @@
     "streamDetails": "스트림 상세",
     "transcodeReason": "트랜스코딩 사유",
     "loadMore": "더 불러오기",
-    "playback": ""
+    "playback": "재생"
   },
   "search": {
     "placeholder": "검색...",
@@ -201,7 +201,7 @@
     "selectRow": "행 선택",
     "pageOf": "{{page}}페이지 중 {{total}}페이지",
     "pagination": "페이지 이동",
-    "goToPage": ""
+    "goToPage": "{{page}} 페이지로 이동"
   },
   "filters": {
     "clearAll": "모두 지우기",
@@ -294,10 +294,10 @@
     "location_other": "위치 {{count}}곳",
     "device_one": "기기 {{count}}대",
     "device_other": "기기 {{count}}대",
-    "play_one": "",
-    "play_other": "",
-    "segment_one": "",
-    "segment_other": ""
+    "play_one": "{{count}}회 재생",
+    "play_other": "{{count}}회 재생",
+    "segment_one": "{{count}}초",
+    "segment_other": "{{count}}초"
   },
   "messages": {
     "noChangesDetected": "변경된 내용이 없습니다"
