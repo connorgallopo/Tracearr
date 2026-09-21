@@ -133,9 +133,12 @@
       "floor": "",
       "ceiling": "",
       "lastSweep": "",
+      "swept": "",
+      "freed": "",
       "never": "",
       "diskLimited": "",
-      "loadError": ""
+      "loadError": "",
+      "notPersisting": ""
     }
   },
   "servers": {
@@ -472,6 +475,7 @@
     "changeCount_other": "",
     "series": "",
     "docs": "",
+    "source": "",
     "empty": "",
     "types": {
       "new": "",
