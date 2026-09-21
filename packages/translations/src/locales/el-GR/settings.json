@@ -958,6 +958,8 @@
         "url": ""
       },
       "logoUrl": "",
+      "systemTitle": "",
+      "systemTitleHelp": "",
       "accent": "",
       "accentPicker": "",
       "footerText": "",
