@@ -133,9 +133,12 @@
       "floor": "확보할 여유 공간",
       "ceiling": "최대 한도",
       "lastSweep": "마지막 정리",
+      "swept": "",
+      "freed": "",
       "never": "아직 없음",
       "diskLimited": "{{since}}부터 디스크 공간 부족: 포스터 약 {{shortfall}}개가 캐시되지 않았습니다.",
-      "loadError": "캐시 상태를 불러오지 못했습니다."
+      "loadError": "캐시 상태를 불러오지 못했습니다.",
+      "notPersisting": ""
     }
   },
   "servers": {
@@ -472,6 +475,7 @@
     "changeCount_other": "",
     "series": "",
     "docs": "",
+    "source": "",
     "empty": "",
     "types": {
       "new": "",
