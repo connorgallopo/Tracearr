@@ -127,7 +127,7 @@
       "size": "On disk",
       "files": "Files",
       "need": "Estimated need",
-      "needHint": "{{count}} posters × 18 KB",
+      "needHint": "{{count}} posters × {{size}}",
       "free": "Free disk",
       "freeOf": "of {{total}}",
       "floor": "Keeps free",
