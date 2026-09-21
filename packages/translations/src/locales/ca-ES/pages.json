@@ -234,11 +234,15 @@
       "noDuplicatesTitle": "No s'ha trobat cap duplicat",
       "noDuplicatesDesc": "No s'ha detectat cap títol amb més d'un fitxer físic.",
       "colTitle": "Títol",
+      "colType": "",
       "colMatchType": "Tipus de coincidència",
       "colCopies": "Còpies",
       "colRecoverable": "Espai recuperable",
       "sameServer": "Mateix servidor",
-      "mirror": "Rèplica"
+      "mirror": "Rèplica",
+      "missingOnServer": "",
+      "missingOnServerHint": "",
+      "copyPath": ""
     },
     "watch": {
       "title": "Analítiques de visionament",
@@ -792,6 +796,8 @@
         "total_pause_minutes": "el temps de pausa total",
         "source_resolution": "la resolució de la font",
         "output_resolution": "la resolució de sortida",
+        "source_dynamic_range": "",
+        "source_video_codec": "",
         "is_transcoding": "la transcodificació",
         "is_transcode_downgrade": "la reducció de qualitat",
         "source_bitrate_mbps": "la taxa de bits de la font",
@@ -806,6 +812,8 @@
         "ip_in_range": "l'adreça IP",
         "server_id": "el servidor",
         "media_type": "el tipus de contingut",
+        "season_number": "",
+        "episode_number": "",
         "library_item_type": "el tipus d'element",
         "library_name": "la biblioteca",
         "resolution_after": "la resolució",
@@ -977,6 +985,14 @@
         "label": "Resolució de sortida",
         "description": "Resolució transcodificada o lliurada"
       },
+      "source_dynamic_range": {
+        "label": "",
+        "description": ""
+      },
+      "source_video_codec": {
+        "label": "",
+        "description": ""
+      },
       "is_transcoding": {
         "label": "S'està transcodificant",
         "description": "Si s'estan transcodificant les transmissions de vídeo o d'àudio"
@@ -1037,6 +1053,14 @@
       "media_type": {
         "label": "Tipus de multimèdia",
         "description": "Tipus de contingut"
+      },
+      "season_number": {
+        "label": "",
+        "description": ""
+      },
+      "episode_number": {
+        "label": "",
+        "description": ""
       },
       "library_item_type": {
         "label": "Tipus d'element",
@@ -1902,11 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "Pel·lícules afegides recentment",
         "recentlyAddedShows": "Sèries afegides recentment",
+        "recentlyUpdated": "",
         "mostPopularMovies": "Pel·lícules més populars",
         "mostPopularShows": "Sèries més populars",
         "emptyRecentlyAdded": "No s'ha afegit res en aquest període",
+        "emptyRecentlyUpdated": "",
         "emptyMostPopular": "Cap reproducció en aquest període",
         "captionRecentlyAdded": "sense duplicats entre servidors",
+        "captionRecentlyUpdated": "",
         "captionMostPopular": {
           "day": "avui",
           "week": "darrers 7 dies",
@@ -1919,6 +1946,8 @@
       "card": {
         "newEpisodes_one": "{{count}} episodi nou",
         "newEpisodes_other": "{{count}} episodis nous",
+        "replacedEpisodes_one": "",
+        "replacedEpisodes_other": "",
         "addedAgo": "afegit {{date}}",
         "addedCompactAgo": "afegit fa {{age}}",
         "newEpisodesChip": "{{count}} de nous"
