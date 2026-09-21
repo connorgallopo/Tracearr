@@ -234,11 +234,15 @@
       "noDuplicatesTitle": "",
       "noDuplicatesDesc": "",
       "colTitle": "",
+      "colType": "",
       "colMatchType": "",
       "colCopies": "",
       "colRecoverable": "",
       "sameServer": "",
-      "mirror": ""
+      "mirror": "",
+      "missingOnServer": "",
+      "missingOnServerHint": "",
+      "copyPath": ""
     },
     "watch": {
       "title": "",
@@ -792,6 +796,8 @@
         "total_pause_minutes": "",
         "source_resolution": "",
         "output_resolution": "",
+        "source_dynamic_range": "",
+        "source_video_codec": "",
         "is_transcoding": "",
         "is_transcode_downgrade": "",
         "source_bitrate_mbps": "",
@@ -806,6 +812,8 @@
         "ip_in_range": "",
         "server_id": "",
         "media_type": "",
+        "season_number": "",
+        "episode_number": "",
         "library_item_type": "",
         "library_name": "",
         "resolution_after": "",
@@ -977,6 +985,14 @@
         "label": "",
         "description": ""
       },
+      "source_dynamic_range": {
+        "label": "",
+        "description": ""
+      },
+      "source_video_codec": {
+        "label": "",
+        "description": ""
+      },
       "is_transcoding": {
         "label": "",
         "description": ""
@@ -1035,6 +1051,14 @@
         "placeholder": ""
       },
       "media_type": {
+        "label": "",
+        "description": ""
+      },
+      "season_number": {
+        "label": "",
+        "description": ""
+      },
+      "episode_number": {
         "label": "",
         "description": ""
       },
@@ -1902,11 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "",
         "recentlyAddedShows": "",
+        "recentlyUpdated": "",
         "mostPopularMovies": "",
         "mostPopularShows": "",
         "emptyRecentlyAdded": "",
+        "emptyRecentlyUpdated": "",
         "emptyMostPopular": "",
         "captionRecentlyAdded": "",
+        "captionRecentlyUpdated": "",
         "captionMostPopular": {
           "day": "",
           "week": "",
@@ -1919,6 +1946,8 @@
       "card": {
         "newEpisodes_one": "{{count}} 集新內容",
         "newEpisodes_other": "{{count}} 集新內容",
+        "replacedEpisodes_one": "",
+        "replacedEpisodes_other": "",
         "addedAgo": "{{date}}新增",
         "addedCompactAgo": "",
         "newEpisodesChip": ""
