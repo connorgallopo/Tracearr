@@ -54,11 +54,11 @@
     "viewOnGithub": "Mostra al GitHub",
     "later": "Més tard",
     "previous": "Anterior",
-    "reload": ""
+    "reload": "Torna a carregar"
   },
   "states": {
     "loading": "S'està carregant...",
-    "error": "",
+    "error": "Error",
     "success": "Realitzat amb èxit",
     "failed": "S'ha produït un error",
     "pending": "Pendent",
@@ -85,9 +85,9 @@
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió en directe",
     "transcode": "Transcodificació",
-    "hwTranscode": "",
-    "burnIn": "",
-    "watched": ""
+    "hwTranscode": "Transcodificació HW",
+    "burnIn": "Incrustació",
+    "watched": "Vist"
   },
   "severity": {
     "low": "Reduïda",
@@ -95,16 +95,16 @@
     "high": "Alta"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "De confiança",
+    "caution": "Precaució",
+    "untrusted": "No fiable"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "Tasques en execució",
+    "running": "En execució",
+    "waiting": "En espera",
+    "queued": "En cua",
+    "startedAgo": "Iniciada {{time}}"
   },
   "time": {
     "now": "Ara",
@@ -120,20 +120,20 @@
     "lastYear": "Darrer any",
     "byDay": "Per dia",
     "byHour": "Per hora",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
-    "shortAll": "",
-    "timeRange": ""
+    "short7Days": "7d",
+    "short30Days": "30d",
+    "shortYear": "1a",
+    "shortAll": "Tot",
+    "timeRange": "Interval de temps"
   },
   "units": {
-    "km": "",
-    "mi": "",
-    "kmh": "",
-    "mph": ""
+    "km": "km",
+    "mi": "mi",
+    "kmh": "km/h",
+    "mph": "mph"
   },
   "labels": {
-    "date": "",
+    "date": "Data",
     "user": "Usuari",
     "content": "Contingut",
     "platform": "Plataforma",
@@ -173,7 +173,7 @@
     "activeStreams": "Transmissions actives",
     "days": "dies",
     "totalSessions": "Sessions totals",
-    "sessions": "",
+    "sessions": "Sessions",
     "apiKey": "Clau d'API",
     "rank": "Classificació",
     "data": "Dades",
@@ -183,13 +183,13 @@
     "product": "Producte",
     "deviceId": "ID del dispositiu",
     "created": "Creat",
-    "total": "",
+    "total": "total",
     "mediaLength": "Mida dels fitxers",
-    "segments": "",
+    "segments": "segments",
     "streamDetails": "Detalls de la transmissió",
     "transcodeReason": "Raó per a la transcodificació",
     "loadMore": "Veure més",
-    "playback": ""
+    "playback": "Reproducció"
   },
   "search": {
     "placeholder": "Cerca...",
@@ -199,22 +199,22 @@
   "table": {
     "selectAllOnPage": "Selecciona-ho tot a la pàgina",
     "selectRow": "Selecciona la fila",
-    "pageOf": "",
-    "pagination": "",
-    "goToPage": ""
+    "pageOf": "Pàgina {{page}} de {{total}}",
+    "pagination": "Paginació",
+    "goToPage": "Ves a la pàgina {{page}}"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "Neteja-ho tot",
+    "done": "Fet",
+    "remove": "Suprimeix el filtre {{label}}",
+    "clearSearch": "Neteja la cerca",
+    "anyDate": "Qualsevol data",
+    "dateAfter": "Després de {{date}}",
+    "dateBefore": "Abans de {{date}}",
+    "dateBetween": "De {{from}} a {{to}}",
+    "clearDates": "Neteja l'interval de dates",
+    "clearStartDate": "Neteja la data d'inici",
+    "clearEndDate": "Neteja la data de fi"
   },
   "media": {
     "movie": "Pel·lícula",
@@ -225,14 +225,14 @@
     "track_plural": "Pistes",
     "liveTV": "TV en directe",
     "photo": "Foto",
-    "tv": "",
+    "tv": "TV",
     "tvShows": "Sèries",
     "music": "Música"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "Aquest camp és obligatori",
@@ -265,13 +265,13 @@
     "user_one": "{{count}} usuari",
     "user_other": "{{count}} usuaris",
     "session_one": "{{count}} sessió",
-    "session_other": "",
+    "session_other": "{{count}} sessions",
     "stream_one": "{{count}} flux",
     "stream_other": "{{count}} fluxos",
     "server_one": "{{count}} servidor",
     "server_other": "{{count}} servidors",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} automatització",
+    "automation_other": "{{count}} automatitzacions",
     "violation_one": "{{count}} incompliment",
     "violation_other": "{{count}} incompliments",
     "item_one": "{{count}} element",
@@ -286,18 +286,18 @@
     "usersUpdated_other": "{{count}} usuaris actualitzats",
     "library_one": "{{count}} biblioteca",
     "library_other": "{{count}} biblioteques",
-    "error_one": "",
-    "error_other": "",
+    "error_one": "{{count}} error",
+    "error_other": "{{count}} errors",
     "alert_one": "{{count}} alerta",
     "alert_other": "{{count}} alertes",
     "location_one": "{{count}} ubicació",
     "location_other": "{{count}} ubicacions",
     "device_one": "{{count}} dispositiu",
     "device_other": "{{count}} dispositius",
-    "play_one": "",
-    "play_other": "",
-    "segment_one": "",
-    "segment_other": ""
+    "play_one": "{{count}} reproducció",
+    "play_other": "{{count}} reproduccions",
+    "segment_one": "{{count}} segment",
+    "segment_other": "{{count}} segments"
   },
   "messages": {
     "noChangesDetected": "No s'han detectat canvis"
@@ -344,12 +344,12 @@
     "deleteMessage": "Estàs segur que vols eliminar aquest element? Aquesta acció és irreversible.",
     "unsavedChanges": "Teniu canvis no desats. Esteu segur que voleu marxar?"
   },
-  "beta": "",
+  "beta": "beta",
   "or": "o",
   "serverSelector": {
-    "all": "",
-    "some": "",
-    "search": "",
-    "noMatches": ""
+    "all": "Tots els servidors",
+    "some": "{{count}} de {{total}} servidors",
+    "search": "Cerca servidors...",
+    "noMatches": "No s'ha trobat cap servidor"
   }
 }
