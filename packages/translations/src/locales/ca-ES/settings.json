@@ -133,9 +133,12 @@
       "floor": "Manté lliure",
       "ceiling": "Límit màxim",
       "lastSweep": "Última neteja",
+      "swept": "",
+      "freed": "",
       "never": "encara no",
       "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de pòsters no són a la memòria cau.",
-      "loadError": "No s'ha pogut carregar l'estat de la memòria cau."
+      "loadError": "No s'ha pogut carregar l'estat de la memòria cau.",
+      "notPersisting": ""
     }
   },
   "servers": {
@@ -472,6 +475,7 @@
     "changeCount_other": "{{count}} canvis",
     "series": "Tracearr {{series}}",
     "docs": "Documentació",
+    "source": "",
     "empty": "Aquesta versió no inclou notes de la versió.",
     "types": {
       "new": "Novetat",
