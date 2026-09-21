@@ -133,12 +133,9 @@
       "floor": "保持闲置",
       "ceiling": "极限",
       "lastSweep": "上次扫描",
-      "swept": "",
-      "freed": "",
       "never": "尚未完成",
       "diskLimited": "",
-      "loadError": "无法加载缓存状态。",
-      "notPersisting": ""
+      "loadError": "无法加载缓存状态。"
     }
   },
   "servers": {
@@ -475,7 +472,6 @@
     "changeCount_other": "",
     "series": "",
     "docs": "",
-    "source": "",
     "empty": "",
     "types": {
       "new": "",
