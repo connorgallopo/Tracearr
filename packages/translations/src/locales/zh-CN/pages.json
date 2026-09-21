@@ -234,11 +234,15 @@
       "noDuplicatesTitle": "没有找到重复的记录",
       "noDuplicatesDesc": "未检测到多于一个物理文件的标题。",
       "colTitle": "标题",
+      "colType": "",
       "colMatchType": "匹配类型",
       "colCopies": "份数",
       "colRecoverable": "可恢复的空间",
       "sameServer": "同一服务器",
-      "mirror": "镜像"
+      "mirror": "镜像",
+      "missingOnServer": "",
+      "missingOnServerHint": "",
+      "copyPath": ""
     },
     "watch": {
       "title": "观察分析",
@@ -792,6 +796,8 @@
         "total_pause_minutes": "",
         "source_resolution": "",
         "output_resolution": "",
+        "source_dynamic_range": "",
+        "source_video_codec": "",
         "is_transcoding": "",
         "is_transcode_downgrade": "",
         "source_bitrate_mbps": "",
@@ -806,6 +812,8 @@
         "ip_in_range": "",
         "server_id": "",
         "media_type": "",
+        "season_number": "",
+        "episode_number": "",
         "library_item_type": "",
         "library_name": "",
         "resolution_after": "",
@@ -977,6 +985,14 @@
         "label": "",
         "description": ""
       },
+      "source_dynamic_range": {
+        "label": "",
+        "description": ""
+      },
+      "source_video_codec": {
+        "label": "",
+        "description": ""
+      },
       "is_transcoding": {
         "label": "",
         "description": ""
@@ -1035,6 +1051,14 @@
         "placeholder": ""
       },
       "media_type": {
+        "label": "",
+        "description": ""
+      },
+      "season_number": {
+        "label": "",
+        "description": ""
+      },
+      "episode_number": {
         "label": "",
         "description": ""
       },
@@ -1902,11 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "最近添加的电影",
         "recentlyAddedShows": "最近添加的剧集",
+        "recentlyUpdated": "",
         "mostPopularMovies": "最受欢迎的电影",
         "mostPopularShows": "最受欢迎的剧集",
         "emptyRecentlyAdded": "这段时间里没有添加任何内容",
+        "emptyRecentlyUpdated": "",
         "emptyMostPopular": "这段时间内没有播放",
         "captionRecentlyAdded": "跨服务器支持",
+        "captionRecentlyUpdated": "",
         "captionMostPopular": {
           "day": "今天",
           "week": "最近 7 天",
@@ -1919,6 +1946,8 @@
       "card": {
         "newEpisodes_one": "{{count}} 集新内容",
         "newEpisodes_other": "{{count}} 集新内容",
+        "replacedEpisodes_one": "",
+        "replacedEpisodes_other": "",
         "addedAgo": "{{date}}添加",
         "addedCompactAgo": "",
         "newEpisodesChip": ""
