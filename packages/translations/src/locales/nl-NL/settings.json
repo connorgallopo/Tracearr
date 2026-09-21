@@ -133,12 +133,9 @@
       "floor": "Houd vrij",
       "ceiling": "Plafond",
       "lastSweep": "Laatste schoonmaak",
-      "swept": "",
-      "freed": "",
       "never": "nog niet",
       "diskLimited": "Disk gelimiteerd sinds {{since}}: ongeveer {{shortfall}} posters worden niet gecached.",
-      "loadError": "Kon de cache-status niet laden.",
-      "notPersisting": ""
+      "loadError": "Kon de cache-status niet laden."
     }
   },
   "servers": {
@@ -475,7 +472,6 @@
     "changeCount_other": "",
     "series": "",
     "docs": "",
-    "source": "",
     "empty": "",
     "types": {
       "new": "",
