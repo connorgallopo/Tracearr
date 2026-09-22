@@ -86,7 +86,7 @@
     "directStream": "직접 재생",
     "transcode": "트랜스코딩",
     "hwTranscode": "하드웨어 트랜스코딩",
-    "burnIn": "",
+    "burnIn": "번인",
     "watched": "시청 완료"
   },
   "severity": {
