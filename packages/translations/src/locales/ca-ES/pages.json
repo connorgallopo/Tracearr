@@ -234,15 +234,15 @@
       "noDuplicatesTitle": "No s'ha trobat cap duplicat",
       "noDuplicatesDesc": "No s'ha detectat cap títol amb més d'un fitxer físic.",
       "colTitle": "Títol",
-      "colType": "",
+      "colType": "Tipus",
       "colMatchType": "Tipus de coincidència",
       "colCopies": "Còpies",
       "colRecoverable": "Espai recuperable",
       "sameServer": "Mateix servidor",
       "mirror": "Rèplica",
-      "missingOnServer": "",
-      "missingOnServerHint": "",
-      "copyPath": ""
+      "missingOnServer": "Falta al servidor",
+      "missingOnServerHint": "El servidor encara mostra aquest fitxer, però no el troba al disc. A Plex, buideu la paperera de la biblioteca per netejar-ho.",
+      "copyPath": "Copia el camí del fitxer"
     },
     "watch": {
       "title": "Analítiques de visionament",
@@ -796,8 +796,8 @@
         "total_pause_minutes": "el temps de pausa total",
         "source_resolution": "la resolució de la font",
         "output_resolution": "la resolució de sortida",
-        "source_dynamic_range": "",
-        "source_video_codec": "",
+        "source_dynamic_range": "el rang dinàmic de la font",
+        "source_video_codec": "el còdec de vídeo de la font",
         "is_transcoding": "la transcodificació",
         "is_transcode_downgrade": "la reducció de qualitat",
         "source_bitrate_mbps": "la taxa de bits de la font",
@@ -812,8 +812,8 @@
         "ip_in_range": "l'adreça IP",
         "server_id": "el servidor",
         "media_type": "el tipus de contingut",
-        "season_number": "",
-        "episode_number": "",
+        "season_number": "el número de temporada",
+        "episode_number": "el número d'episodi",
         "library_item_type": "el tipus d'element",
         "library_name": "la biblioteca",
         "resolution_after": "la resolució",
@@ -986,12 +986,12 @@
         "description": "Resolució transcodificada o lliurada"
       },
       "source_dynamic_range": {
-        "label": "",
-        "description": ""
+        "label": "Rang dinàmic de la font",
+        "description": "Format HDR del fitxer que s'està reproduint; el valor desconegut no coincideix mai, ni tan sols amb \"no és\""
       },
       "source_video_codec": {
-        "label": "",
-        "description": ""
+        "label": "Còdec de vídeo de la font",
+        "description": "Còdec de vídeo del fitxer que s'està reproduint, com ara HEVC o AV1"
       },
       "is_transcoding": {
         "label": "S'està transcodificant",
@@ -1055,12 +1055,12 @@
         "description": "Tipus de contingut"
       },
       "season_number": {
-        "label": "",
-        "description": ""
+        "label": "Número de temporada",
+        "description": "Temporada a què pertany l'episodi; res que no sigui un episodi no coincideix mai"
       },
       "episode_number": {
-        "label": "",
-        "description": ""
+        "label": "Número d'episodi",
+        "description": "Episodi dins de la seva temporada; res que no sigui un episodi no coincideix mai"
       },
       "library_item_type": {
         "label": "Tipus d'element",
@@ -1926,14 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "Pel·lícules afegides recentment",
         "recentlyAddedShows": "Sèries afegides recentment",
-        "recentlyUpdated": "",
+        "recentlyUpdated": "Actualitzats recentment",
         "mostPopularMovies": "Pel·lícules més populars",
         "mostPopularShows": "Sèries més populars",
         "emptyRecentlyAdded": "No s'ha afegit res en aquest període",
-        "emptyRecentlyUpdated": "",
+        "emptyRecentlyUpdated": "No s'ha substituït res en aquest període",
         "emptyMostPopular": "Cap reproducció en aquest període",
         "captionRecentlyAdded": "sense duplicats entre servidors",
-        "captionRecentlyUpdated": "",
+        "captionRecentlyUpdated": "una còpia millor ha substituït la que hi havia",
         "captionMostPopular": {
           "day": "avui",
           "week": "darrers 7 dies",
@@ -1946,8 +1946,8 @@
       "card": {
         "newEpisodes_one": "{{count}} episodi nou",
         "newEpisodes_other": "{{count}} episodis nous",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
+        "replacedEpisodes_one": "{{count}} episodi substituït",
+        "replacedEpisodes_other": "{{count}} episodis substituïts",
         "addedAgo": "afegit {{date}}",
         "addedCompactAgo": "afegit fa {{age}}",
         "newEpisodesChip": "{{count}} de nous"
