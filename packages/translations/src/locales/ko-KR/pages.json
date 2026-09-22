@@ -63,60 +63,60 @@
     "resetTrustScoreTitle_other": "사용자 {{count}}명의 신뢰 점수 초기화",
     "resetTrustScoreConfirm": "신뢰 점수를 100으로 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
     "mergeUsers": "사용자 병합",
-    "mergeTitleSuggestion": "",
-    "mergeTitleBulk": "",
-    "mergeReasonEmail": "",
-    "mergeReasonEmailUsername": "",
-    "mergeReasonUsername": "",
-    "mergeKeep": "",
-    "mergeFoldIn": "",
-    "mergeSwap": "",
-    "mergeRequired": "",
-    "mergeLastActive": "",
-    "mergeNeverActive": "",
-    "mergeSessions_one": "",
-    "mergeSessions_other": "",
-    "mergeMoreServers": "",
-    "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
-    "mergeMovesNoCount": "",
-    "mergeCarriesOver": "",
-    "mergeDeleted": "",
-    "mergeRulesKept": "",
-    "mergeIrreversibleTitle": "",
-    "mergeIrreversibleBody": "",
-    "mergeServerLabel": "",
-    "mergeServerUnknown": "",
-    "mergeIrreversibleAcknowledge": "",
+    "mergeTitleSuggestion": "두 사용자가 동일인인가요?",
+    "mergeTitleBulk": "이 사용자들을 병합할까요?",
+    "mergeReasonEmail": "두 사용자 모두 서버 계정에 {{value}} 이메일을 사용합니다.",
+    "mergeReasonEmailUsername": "두 사용자 모두 {{value}}을(를) 사용자 이름 또는 계정 이메일로 사용합니다.",
+    "mergeReasonUsername": "두 사용자 모두 {{value}} 사용자 이름을 사용합니다.",
+    "mergeKeep": "유지",
+    "mergeFoldIn": "병합 후 삭제됨",
+    "mergeSwap": "유지할 사용자 바꾸기",
+    "mergeRequired": "{{name}} 사용자는 Tracearr에 로그인할 수 있으므로 유지됩니다.",
+    "mergeLastActive": "마지막 활동: {{relative}}",
+    "mergeNeverActive": "활동 기록 없음",
+    "mergeSessions_one": "세션 {{count}}개",
+    "mergeSessions_other": "세션 {{count}}개",
+    "mergeMoreServers": "+{{count}}",
+    "mergeWhatHappens": "병합 결과",
+    "mergeMoves_one": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
+    "mergeMoves_other": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
+    "mergeMovesNoCount": "{{foldName}}의 서버 계정과 세션이 {{keepName}}에게 이전됩니다.",
+    "mergeCarriesOver": "연락처 이메일, 뉴스레터 제외 설정, Seerr 요청도 함께 이전됩니다.",
+    "mergeDeleted": "{{foldName}} 사용자는 삭제됩니다. {{keepName}} 페이지에서 계정을 다시 분리할 수 있습니다.",
+    "mergeRulesKept": "이름이 같은 서버별 규칙은 {{keepName}}의 버전을 유지합니다.",
+    "mergeIrreversibleTitle": "이 작업은 되돌릴 수 없습니다.",
+    "mergeIrreversibleBody": "두 사용자 모두 같은 서버에 계정이 있습니다. 두 계정은 하나로 합쳐지고 세션, 위반 사항, 신뢰 점수도 통합됩니다. 나중에 분리해도 두 번째 계정은 복원되지 않습니다.",
+    "mergeServerLabel": "서버",
+    "mergeServerUnknown": "알 수 없는 서버",
+    "mergeIrreversibleAcknowledge": "이 서버의 두 계정은 다시 분리할 수 없음을 이해했습니다.",
     "mergeServerAccountRemoved": "삭제됨",
-    "mergeConfirmInto": "",
+    "mergeConfirmInto": "{{keepName}}에 병합",
     "mergeSelectTwo": "통합할 사용자 두 명만 선택하세요",
     "mergeSameIdentity": "이 계정은 이미 동일한 사용자에게 속해 있습니다.",
     "mergeSelectAllActive": "전체 선택을 해제하고 통합할 사용자 두 명만 선택하세요",
     "suggestionsTitle": "중복 가능성이 있는 사용자",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
-    "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
-    "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
-    "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
-    "suggestionsSheetDescription": "",
+    "suggestionsCount_one": "중복 가능 사용자 {{count}}명",
+    "suggestionsCount_other": "중복 가능 사용자 {{count}}명",
+    "suggestionsPairEmail": "{{first}}와(과) {{second}}의 이메일이 같습니다.",
+    "suggestionsPairEmailMore_one": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairEmailMore_other": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairEmailUsername": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용합니다.",
+    "suggestionsPairEmailUsernameMore_one": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairEmailUsernameMore_other": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairUsername": "{{first}}와(과) {{second}}의 사용자 이름이 같습니다.",
+    "suggestionsPairUsernameMore_one": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairUsernameMore_other": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsSheetDescription": "병합하면 한 사용자는 유지되고 다른 사용자는 삭제됩니다. 동일인이 아니라고 표시한 사용자 쌍은 복원할 때까지 더 이상 표시되지 않습니다.",
     "suggestionsReview": "확인",
-    "suggestionsNotSame": "",
+    "suggestionsNotSame": "동일인이 아님",
     "suggestionsMatchEmail": "이메일이 같음",
-    "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchEmailUsername": "두 사용자 모두 {{value}}을(를) 사용자 이름 또는 계정 이메일로 사용합니다.",
     "suggestionsMatchUsername": "사용자 이름이 같음",
-    "suggestionsEmpty": "",
-    "suggestionsDismissed": "",
-    "suggestionsDismissedPair": "",
-    "suggestionsDismissedAt": "",
-    "suggestionsRestore": "",
+    "suggestionsEmpty": "검토할 항목이 없습니다.",
+    "suggestionsDismissed": "숨김 ({{count}})",
+    "suggestionsDismissedPair": "{{first}}와(과) {{second}}",
+    "suggestionsDismissedAt": "{{relative}}에 숨김",
+    "suggestionsRestore": "복원",
     "suggestionsError": "통합 제안을 불러오지 못했습니다",
     "filterHasAccessTo": "액세스 가능",
     "filterHasAccessToPlaceholder": "모든 서버",
@@ -146,15 +146,15 @@
     "serverScope": "서버",
     "allServers": "모든 서버",
     "title": "사용자 세부정보",
-    "editIdentity": "",
-    "editIdentityDescription": "",
-    "displayName": "",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNone": "",
-    "contactEmailNoLogin": "",
-    "locations": ""
+    "editIdentity": "이름 및 연락처 이메일 편집",
+    "editIdentityDescription": "두 정보는 모든 위치에서 이 사용자에게 적용됩니다. @{{username}}을 표시하려면 이름을 비워 두세요.",
+    "displayName": "표시 이름",
+    "contactEmail": "연락처 이메일",
+    "contactEmailHelp": "뉴스레터를 받을 주소입니다. 로그인 권한을 부여하지 않으며 동기화된 계정과 일치시키는 데 사용되지 않습니다.",
+    "contactEmailLabel": "뉴스레터 주소:",
+    "contactEmailNone": "설정되지 않음",
+    "contactEmailNoLogin": "로그인 권한 없음",
+    "locations": "위치"
   },
   "history": {
     "title": "기록",
@@ -165,9 +165,9 @@
     "deleteSession_one": "세션 {{count}}개 삭제",
     "deleteSession_other": "세션 {{count}}개 삭제",
     "deleteSessionsConfirm": "정말 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
-    "totalPlays": "",
-    "uniqueTitles": "",
-    "uniqueUsers": ""
+    "totalPlays": "총 재생 수",
+    "uniqueTitles": "고유 제목 수",
+    "uniqueUsers": "고유 사용자 수"
   },
   "library": {
     "title": "라이브러리",
@@ -234,15 +234,15 @@
       "noDuplicatesTitle": "중복된 항목이 없습니다.",
       "noDuplicatesDesc": "실제 파일이 2개 이상인 콘텐츠가 없습니다.",
       "colTitle": "제목",
-      "colType": "",
+      "colType": "유형",
       "colMatchType": "일치 유형",
       "colCopies": "사본",
       "colRecoverable": "확보 가능 공간",
       "sameServer": "같은 서버",
       "mirror": "미러",
-      "missingOnServer": "",
-      "missingOnServerHint": "",
-      "copyPath": ""
+      "missingOnServer": "서버에서 누락됨",
+      "missingOnServerHint": "서버에는 이 파일이 등록되어 있지만 디스크에서 찾을 수 없습니다. Plex에서는 라이브러리 휴지통을 비워 제거하세요.",
+      "copyPath": "파일 경로 복사"
     },
     "watch": {
       "title": "시청 분석",
@@ -527,7 +527,7 @@
     },
     "builder": {
       "destinationDisabled": "비활성화된 알림 대상",
-      "noAlertRecipientsTooltip": "",
+      "noAlertRecipientsTooltip": "이 대상에는 알림 수신자가 없어 알림이 전송되지 않습니다.",
       "noDestinations": "아직 알림 대상이 없습니다. 알림을 보내려면 하나를 추가하세요.",
       "newDestination": "새로운 알림 대상",
       "errors": {
@@ -770,8 +770,8 @@
         "pluginUpdateAvailable": "플러그인 업데이트가 가능합니다",
         "serverUpdateAvailable": "서버 업데이트가 가능합니다",
         "tracearrUpdateAvailable": "같지 않음",
-        "newsletterSent": "",
-        "newsletterFailed": ""
+        "newsletterSent": "뉴스레터가 발송될 때",
+        "newsletterFailed": "뉴스레터 발송이 실패할 때"
       },
       "operators": {
         "eq": "같음",
@@ -796,8 +796,8 @@
         "total_pause_minutes": "총 일시 정지 시간",
         "source_resolution": "소스 해상도",
         "output_resolution": "출력 해상도",
-        "source_dynamic_range": "",
-        "source_video_codec": "",
+        "source_dynamic_range": "원본 다이내믹 레인지",
+        "source_video_codec": "원본 비디오 코덱",
         "is_transcoding": "트랜스코딩",
         "is_transcode_downgrade": "다운그레이드",
         "source_bitrate_mbps": "소스 비트레이트",
@@ -812,8 +812,8 @@
         "ip_in_range": "서버",
         "server_id": "서버",
         "media_type": "미디어 유형",
-        "season_number": "",
-        "episode_number": "",
+        "season_number": "시즌 번호",
+        "episode_number": "에피소드 번호",
         "library_item_type": "항목 종류",
         "library_name": "라이브러리",
         "resolution_after": "해상도",
@@ -986,12 +986,12 @@
         "description": "트랜스코딩되거나 전달된 해상도"
       },
       "source_dynamic_range": {
-        "label": "",
-        "description": ""
+        "label": "원본 다이내믹 레인지",
+        "description": "재생 중인 파일의 HDR 형식입니다. 알 수 없음은 '아님' 조건에서도 일치하지 않습니다."
       },
       "source_video_codec": {
-        "label": "",
-        "description": ""
+        "label": "원본 비디오 코덱",
+        "description": "재생 중인 파일의 비디오 코덱(예: HEVC, AV1)"
       },
       "is_transcoding": {
         "label": "트랜스코딩 여부",
@@ -1055,12 +1055,12 @@
         "description": "콘텐츠 유형"
       },
       "season_number": {
-        "label": "",
-        "description": ""
+        "label": "시즌 번호",
+        "description": "에피소드가 속한 시즌입니다. 에피소드가 아닌 항목은 일치하지 않습니다."
       },
       "episode_number": {
-        "label": "",
-        "description": ""
+        "label": "에피소드 번호",
+        "description": "시즌 내 에피소드 번호입니다. 에피소드가 아닌 항목은 일치하지 않습니다."
       },
       "library_item_type": {
         "label": "항목 유형",
@@ -1383,9 +1383,9 @@
         "keywords": "장치 새 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 불일치 이메일 웹훅"
       },
       "newsletter-failed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "뉴스레터 발송 실패",
+        "description": "뉴스레터 발송이 실패하거나 일부 수신자에게만 도달하면 대상에 알립니다.",
+        "keywords": "뉴스레터 요약 이메일 실패 일부 반송 알림"
       },
       "no-4k-transcodes": {
         "name": "4K 트랜스코드 없음",
@@ -1469,7 +1469,7 @@
         "library": "라이브러리",
         "servers": "서버",
         "updates": "업데이트",
-        "notifications": "",
+        "notifications": "뉴스레터",
         "notify": "알림",
         "policy": "조치를 취하세요",
         "control": "만약… 그렇다면"
@@ -1543,12 +1543,12 @@
           "synonyms": "업그레이드, 버전, 릴리스, 자체"
         },
         "newsletterSent": {
-          "description": "",
-          "synonyms": ""
+          "description": "예약 또는 수동 뉴스레터가 목록의 모든 수신자에게 도달했습니다.",
+          "synonyms": "뉴스레터, 요약, 이메일, 전달됨"
         },
         "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
+          "description": "뉴스레터가 아무에게도 도달하지 않았거나 일부 수신자에게만 도달했습니다.",
+          "synonyms": "뉴스레터, 요약, 이메일, 반송, 일부, 오류"
         }
       },
       "actions": {
@@ -1627,7 +1627,7 @@
       "showAll": "모두 보기",
       "moreConnections": "연결 {{count}}개 더 보기",
       "connectingTo": "{{name}}에 연결 중...",
-      "ownerOnly": "",
+      "ownerOnly": "소유자만 연결된 Plex 계정을 관리할 수 있습니다.",
       "noAccountsLinked": "연결된 Plex 계정이 없습니다",
       "noAccountsLinkedHint": "Tracearr에 Plex 서버를 추가하려면 Plex 계정을 연결하세요.",
       "linkPlexAccount": "Plex 계정 연결",
@@ -1644,14 +1644,14 @@
     },
     "destinations": {
       "add": "알림 대상 추가",
-      "alertsGoTo": "",
-      "alertsGoTo_other": "",
+      "alertsGoTo": "알림 수신 주소 {{count}}개",
+      "alertsGoTo_other": "알림 수신 주소 {{count}}개",
       "builtinNote": "내장",
       "clearSecret": "지우기",
       "delete": "삭제",
       "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
       "description": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
-      "emailDescription": "",
+      "emailDescription": "Tracearr는 이 SMTP 서버를 통해 메일을 보냅니다. 뉴스레터마다 수신자를 선택하며, 자동화 알림은 아래 주소로 전송됩니다.",
       "empty": "아직 알림 대상이 없습니다.",
       "fields": {
         "webhookUrl": "웹훅 URL",
@@ -1662,73 +1662,73 @@
         "authToken": "인증 토큰",
         "userKey": "사용자 키",
         "apiToken": "API 토큰",
-        "preset": "",
-        "host": "",
-        "port": "",
-        "security": "",
-        "verifyCertificate": "",
-        "username": "",
-        "password": "",
-        "fromName": "",
-        "fromAddress": "",
+        "preset": "제공업체",
+        "host": "SMTP 호스트",
+        "port": "포트",
+        "security": "보안",
+        "verifyCertificate": "인증서 확인",
+        "username": "사용자 이름",
+        "password": "비밀번호",
+        "fromName": "발신자 이름",
+        "fromAddress": "발신자 주소",
         "to": "Recipients",
-        "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "replyTo": "회신 주소",
+        "messagesPerSecond": "초당 메시지 수",
+        "messageStream": "메시지 스트림"
       },
       "groups": {
-        "connection": "",
-        "sender": "",
-        "alerts": ""
+        "connection": "연결",
+        "sender": "발신자",
+        "alerts": "알림"
       },
       "hints": {
         "authTokenOptional": "공개 주제의 경우 선택사항",
         "smtpPreset": "Fills the host, port and security for common providers",
-        "smtpVerifyCertificate": "",
-        "smtpUsernameOptional": "",
-        "smtpTo": "",
-        "smtpRate": "",
-        "smtpMessageStream": "",
-        "smtpGmailUsername": "",
-        "smtpGmailPassword": "",
-        "smtpResendUsername": "",
-        "smtpResendPassword": "",
-        "smtpSendgridUsername": "",
-        "smtpSendgridPassword": "",
-        "smtpMailgunUsername": "",
-        "smtpMailgunPassword": "",
-        "smtpBrevoUsername": "",
-        "smtpBrevoPassword": "",
-        "smtpSesUsername": "",
-        "smtpSesPassword": "",
-        "smtpPostmarkUsername": "",
-        "smtpPostmarkPassword": ""
+        "smtpVerifyCertificate": "메일 서버의 TLS 인증서를 신뢰할 수 있는 인증 기관과 대조해 확인합니다. 로컬 브리지처럼 자체 서명 인증서를 사용하는 서버에서만 끄세요. 이 기능을 끄면 Tracearr와 메일 서버 사이의 경로에 있는 누군가가 연결을 가로챌 수 있습니다.",
+        "smtpUsernameOptional": "서버에 로그인이 필요하지 않으면 비워 두세요.",
+        "smtpTo": "여기에 있는 모든 주소를 받는 사람으로 넣어 하나의 이메일로 알림을 보냅니다. 이 서버에서 뉴스레터만 보낼 경우 비워 두세요.",
+        "smtpRate": "Tracearr 인스턴스별 설정입니다. 제공업체의 한도 미만으로 설정하세요.",
+        "smtpMessageStream": "Postmark 전용: 발송에 사용할 스트림 ID입니다(예: broadcast). 다른 제공업체에서는 비워 두세요.",
+        "smtpGmailUsername": "전체 Gmail 주소를 입력하세요. Gmail은 발신자 주소 설정과 관계없이 이 주소로 발송하며, 개인 계정은 하루 약 500명의 수신자에서 제한됩니다.",
+        "smtpGmailPassword": "Google 계정 > 보안 > 2단계 인증 > 앱 비밀번호에서 만든 앱 비밀번호를 입력하세요. 계정 비밀번호는 사용할 수 없습니다.",
+        "smtpResendUsername": "resend를 정확히 입력하세요.",
+        "smtpResendPassword": "Resend API 키를 입력하세요. 먼저 Resend에서 발신 도메인을 인증해야 합니다.",
+        "smtpSendgridUsername": "apikey를 정확히 입력하세요.",
+        "smtpSendgridPassword": "SendGrid API 키를 입력하세요.",
+        "smtpMailgunUsername": "Mailgun 로그인 정보가 아닌 postmaster@yourdomain 형식의 주소를 입력하세요.",
+        "smtpMailgunPassword": "해당 도메인 설정의 SMTP 비밀번호를 입력하세요. 샌드박스 도메인은 승인된 수신자에게만 발송할 수 있습니다.",
+        "smtpBrevoUsername": "Brevo 로그인 이메일을 입력하세요.",
+        "smtpBrevoPassword": "API 키가 아닌 SMTP & API > SMTP에서 만든 SMTP 키를 입력하세요.",
+        "smtpSesUsername": "IAM 액세스 키가 아닌 SES 콘솔의 SMTP 사용자 이름을 입력하세요. 호스트에 리전을 포함하세요.",
+        "smtpSesPassword": "SES 콘솔의 SMTP 비밀번호를 입력하세요. 샌드박스 계정은 인증된 주소로만 하루 200개의 메시지를 보낼 수 있습니다.",
+        "smtpPostmarkUsername": "서버 API 토큰을 입력하세요.",
+        "smtpPostmarkPassword": "동일한 서버 API 토큰 또는 스트림 토큰의 비밀 값을 입력하세요."
       },
-      "newsletterAlertsNote": "",
-      "newsletterDescription": "",
-      "newsletterTitle": "",
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
+      "newsletterAlertsNote": "뉴스레터 수신자는 뉴스레터에서 설정합니다. 이 서버를 통해 알림도 보내려면 나중에 대상 메뉴에서 편집하세요.",
+      "newsletterDescription": "Tracearr는 이 SMTP 서버를 통해 뉴스레터를 보냅니다.",
+      "newsletterTitle": "이메일 서버 추가",
+      "newslettersOnly": "뉴스레터 전용",
+      "noAlertRecipients": "알림 수신자 없음",
       "options": {
-        "securityStarttls": "",
-        "securityTls": "",
-        "securityNone": "",
-        "presetCustom": "",
-        "presetPostmark": "",
-        "presetResend": "",
-        "presetSes": "",
-        "presetMailgun": "",
-        "presetSendgrid": "",
-        "presetBrevo": "",
-        "presetGmail": ""
+        "securityStarttls": "STARTTLS(일반적으로 포트 587)",
+        "securityTls": "TLS(일반적으로 포트 465)",
+        "securityNone": "없음(평문, 포트 25)",
+        "presetCustom": "사용자 지정",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
       "ownerOnly": "소유자만 알림 대상을 관리할 수 있습니다.",
       "pushNote": "페어링된 모바일 장치로 전달됩니다. 각 장치는 자체 알림 설정을 필터링합니다.",
       "receiveViolations": "위반사항 수신",
-      "receiveViolationsHint": "",
-      "receiveViolationsNeedsRecipients": "",
+      "receiveViolationsHint": "모든 위반 사항을 이 대상으로 보냅니다.",
+      "receiveViolationsNeedsRecipients": "위반 사항을 보내려면 알림 수신자를 추가하세요.",
       "reencrypt": "설정(유지하려면 비워두세요)",
-      "rowActions": "",
+      "rowActions": "대상 작업",
       "secretSet": "설정(유지하려면 비워두세요)",
       "test": "테스트",
       "testHint": "테스트를 위해 먼저 저장하세요.",
@@ -1740,16 +1740,16 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
-        "email": "",
+        "email": "이메일",
         "push": "모바일 푸시",
         "webToast": "브라우저 알림"
       },
       "usedBy": "{{count}}개의 자동화에서 사용됨",
       "usedBy_other": "{{count}}개의 자동화에서 사용됨",
-      "usedByNewsletters": "",
-      "usedByNewsletters_other": "",
-      "violationsOff": "",
-      "violationsOn": "",
+      "usedByNewsletters": "뉴스레터 {{count}}개에서 사용 중",
+      "usedByNewsletters_other": "뉴스레터 {{count}}개에서 사용 중",
+      "violationsOff": "위반 알림 꺼짐",
+      "violationsOn": "위반 알림 켜짐",
       "webToastNote": "이 브라우저에 알림이 표시됩니다."
     },
     "jobs": {
@@ -1926,14 +1926,14 @@
       "shelves": {
         "recentlyAddedMovies": "최근 추가된 영화",
         "recentlyAddedShows": "최근 추가된 프로그램",
-        "recentlyUpdated": "",
+        "recentlyUpdated": "최근 업데이트",
         "mostPopularMovies": "가장 인기 있는 영화",
         "mostPopularShows": "가장 인기 있는 프로그램",
         "emptyRecentlyAdded": "서버 전체에서 중복 제거",
-        "emptyRecentlyUpdated": "",
+        "emptyRecentlyUpdated": "이 기간에는 교체된 항목이 없습니다.",
         "emptyMostPopular": "서버 전체에서 중복 제거",
         "captionRecentlyAdded": "서버 전체에서 중복 제거",
-        "captionRecentlyUpdated": "",
+        "captionRecentlyUpdated": "더 나은 버전으로 교체됨",
         "captionMostPopular": {
           "day": "오늘",
           "week": "지난 7일",
@@ -1946,8 +1946,8 @@
       "card": {
         "newEpisodes_one": "새 에피소드 {{count}}개",
         "newEpisodes_other": "새 에피소드 {{count}}개",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
+        "replacedEpisodes_one": "에피소드 {{count}}개 교체됨",
+        "replacedEpisodes_other": "에피소드 {{count}}개 교체됨",
         "addedAgo": "{{date}} 추가됨",
         "addedCompactAgo": "{{age}} 전에 추가됨",
         "newEpisodesChip": "{{count}} 신규"
@@ -2219,112 +2219,112 @@
   },
   "requests": {
     "status": {
-      "pending": "",
-      "approved": "",
-      "declined": "",
-      "failed": "",
-      "completed": "",
-      "deleted": ""
+      "pending": "대기 중",
+      "approved": "승인됨",
+      "declined": "거부됨",
+      "failed": "실패",
+      "completed": "이용 가능",
+      "deleted": "제거됨"
     },
     "columns": {
-      "requester": "",
-      "title": "",
-      "status": "",
-      "requested": "",
-      "wait": "",
-      "seasons": "",
-      "watched": ""
+      "requester": "요청자",
+      "title": "제목",
+      "status": "상태",
+      "requested": "요청일",
+      "wait": "대기 시간",
+      "seasons": "시즌",
+      "watched": "시청 여부"
     },
     "wait": {
-      "pending": "",
-      "declined": ""
+      "pending": "대기 중",
+      "declined": "거부됨"
     },
     "seasons": {
-      "all": "",
-      "item": ""
+      "all": "모든 시즌",
+      "item": "시즌 {{number}}"
     },
     "flags": {
-      "fourK": "",
-      "auto": ""
+      "fourK": "4K 요청",
+      "auto": "관심 목록에서 자동 요청됨"
     },
     "hero": {
-      "line": ""
+      "line": "요청자: {{name}} · {{date}} · {{tail}}"
     },
     "mediaPanel": {
-      "title": "",
-      "loadError": "",
-      "empty": ""
+      "title": "요청",
+      "loadError": "요청을 불러오지 못했습니다.",
+      "empty": "이 제목에 대한 요청이 없습니다."
     },
     "userCard": {
-      "title": "",
-      "loadError": "",
-      "viewAll": "",
-      "showLess": "",
+      "title": "요청",
+      "loadError": "요청을 불러오지 못했습니다.",
+      "viewAll": "모두 보기(추가 {{count}}개)",
+      "showLess": "간단히 보기",
       "summary": {
-        "requests": "",
-        "medianWait": "",
-        "approvalRate": "",
-        "neverWatched": ""
+        "requests": "요청",
+        "medianWait": "대기 시간 중앙값 {{duration}}",
+        "approvalRate": "승인율",
+        "neverWatched": "시청 기록 없음"
       },
-      "empty": ""
+      "empty": "아직 요청이 없습니다."
     },
-    "unattributed": "",
+    "unattributed": "이 서버에 없음",
     "watched": {
-      "byRequester": "",
-      "byOthers": ""
+      "byRequester": "요청자가 시청함",
+      "byOthers": "다른 사용자가 시청함"
     },
     "page": {
-      "title": "",
-      "description": "",
-      "failedToLoad": "",
-      "notConfigured": "",
-      "notConfiguredDescription": "",
-      "linkSeerr": "",
+      "title": "요청",
+      "description": "사용자가 요청한 콘텐츠, 추가 여부, 실제 재생 여부를 확인합니다.",
+      "failedToLoad": "요청 분석을 불러오지 못했습니다.",
+      "notConfigured": "연결된 Seerr 없음",
+      "notConfiguredDescription": "Seerr 인스턴스를 서버에 연결하면 첫 동기화 후 이 페이지에 데이터가 표시됩니다.",
+      "linkSeerr": "Seerr 연결",
       "kpi": {
-        "requested": "",
-        "landedOf": "",
-        "watched": "",
-        "neverPlayed": "",
-        "ofLanded": "",
-        "onDisk": ""
+        "requested": "요청됨",
+        "landedOf": "{{count}}개 추가됨",
+        "watched": "시청함",
+        "neverPlayed": "재생 기록 없음",
+        "ofLanded": "추가된 항목 중 {{share}}",
+        "onDisk": "디스크 사용량 {{size}}"
       }
     },
     "funnel": {
-      "title": "",
-      "description": "",
-      "requested": "",
-      "landed": "",
-      "watched": "",
-      "share": "",
-      "empty": ""
+      "title": "요청 결과",
+      "description": "'시청함'은 라이브러리 페이지와 동일하게 콘텐츠의 85% 이상을 재생한 경우를 의미합니다. Tracearr에서 이를 측정하려면 요청한 콘텐츠가 추가되고 제목과 일치해야 합니다.",
+      "requested": "요청됨",
+      "landed": "추가됨",
+      "watched": "시청함",
+      "share": "총 {{total}}건의 요청 중 {{count}}건",
+      "empty": "아직 요청이 없습니다."
     },
     "unplayed": {
-      "title": "",
-      "description": "",
-      "emptyTitle": "",
-      "emptyDescription": ""
+      "title": "추가되었지만 재생되지 않음",
+      "description": "사용자 요청으로 다운로드되었지만 이 서버의 어떤 계정도 한 번도 재생하지 않았습니다.",
+      "emptyTitle": "추가된 모든 콘텐츠가 재생되었습니다.",
+      "emptyDescription": "불필요하게 디스크 공간을 차지하는 항목이 없습니다."
     },
     "outcomes": {
-      "title": "",
-      "requester": "",
-      "wait": "",
-      "requested": "",
-      "onDisk": "",
-      "untitled": "",
-      "failedToLoad": ""
+      "title": "제목",
+      "requester": "요청자",
+      "wait": "대기 시간",
+      "requested": "요청일",
+      "onDisk": "디스크에 있음",
+      "untitled": "제목 없음",
+      "failedToLoad": "이 요청을 불러오지 못했습니다."
     },
     "followThrough": {
-      "title": "",
-      "description": "",
-      "person": "",
-      "asked": "",
-      "landed": "",
-      "watched": "",
-      "watchedByOthers": "",
-      "medianWait": "",
-      "emptyTitle": "",
-      "emptyDescription": "",
-      "failedToLoad": ""
+      "title": "요청자",
+      "description": "누가 무엇을 요청하는지, 요청자가 끝까지 시청하는지, 다른 사용자도 시청하는지 확인합니다.",
+      "person": "사용자",
+      "asked": "요청 수",
+      "landed": "추가됨",
+      "watched": "시청함",
+      "watchedByOthers": "다른 사용자가 시청함",
+      "medianWait": "대기 시간 중앙값",
+      "emptyTitle": "아직 요청자가 없습니다.",
+      "emptyDescription": "연결된 Seerr가 동기화되면 요청이 여기에 표시됩니다.",
+      "failedToLoad": "요청자를 불러오지 못했습니다."
     }
   }
 }
