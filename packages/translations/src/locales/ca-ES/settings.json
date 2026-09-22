@@ -133,12 +133,12 @@
       "floor": "Manté lliure",
       "ceiling": "Límit màxim",
       "lastSweep": "Última neteja",
-      "swept": "",
-      "freed": "",
+      "swept": "Eliminats a l'última neteja",
+      "freed": "Alliberat a l'última neteja",
       "never": "encara no",
       "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de pòsters no són a la memòria cau.",
       "loadError": "No s'ha pogut carregar l'estat de la memòria cau.",
-      "notPersisting": ""
+      "notPersisting": "La memòria cau de pòsters no sobreviu als reinicis. Munteu un volum al directori de la memòria cau; si no, cada pòster es torna a baixar cada vegada que es recrea el contenidor."
     }
   },
   "servers": {
@@ -475,7 +475,7 @@
     "changeCount_other": "{{count}} canvis",
     "series": "Tracearr {{series}}",
     "docs": "Documentació",
-    "source": "",
+    "source": "GitHub",
     "empty": "Aquesta versió no inclou notes de la versió.",
     "types": {
       "new": "Novetat",
@@ -962,8 +962,8 @@
         "url": "Una imatge en un URL"
       },
       "logoUrl": "URL del logotip",
-      "systemTitle": "",
-      "systemTitleHelp": "",
+      "systemTitle": "Títol del sistema",
+      "systemTitleHelp": "Es mostra al costat del logotip a la part superior de cada correu, per exemple \"Tracearr for Emby\". Deixeu-ho en blanc per fer servir el nom del servidor o del butlletí.",
       "accent": "Color d'accent",
       "accentPicker": "Trieu el color d'accent",
       "footerText": "Text del peu",
