@@ -142,7 +142,7 @@
         "title": "페어링 토큰 생성됨",
         "message": "모바일 기기로 QR 코드를 스캔해 페어링하세요"
       },
-      "identityUpdated": "",
+      "identityUpdated": "프로필이 업데이트되었습니다.",
       "trustScoresReset": {
         "title": "신뢰 점수 초기화됨",
         "message_one": "사용자 {{count}}명의 점수가 100으로 초기화되었습니다",
@@ -159,21 +159,21 @@
       "serverUserSplit": {
         "title": "계정을 별도 사용자로 분리했습니다"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
+      "mergeSuggestionDismissed": "동일인이 아님으로 표시했습니다.",
+      "mergeSuggestionRestored": "제안을 복원했습니다.",
       "destinationSaved": "알림 대상이 저장되었습니다",
       "destinationDeleted": "알림 대상이 삭제되었습니다",
       "destinationTestSent": "테스트 알림을 보냈습니다",
-      "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
-      "newsletterTestQueued": "",
-      "newsletterSendQueued": "",
-      "newsletterRetryQueued": "",
-      "brandingSaved": "",
-      "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "destinationTestSentTo": "{{address}} 주소로 테스트를 보냈습니다.",
+      "newsletterSaved": "뉴스레터를 저장했습니다.",
+      "newsletterDeleted": "뉴스레터를 삭제했습니다.",
+      "newsletterDuplicated": "뉴스레터를 복제했습니다.",
+      "newsletterTestQueued": "{{address}} 주소로 보낼 테스트를 대기열에 추가했습니다.",
+      "newsletterSendQueued": "발송을 대기열에 추가했습니다.",
+      "newsletterRetryQueued": "수신자 {{count}}명에게 재시도 중입니다.",
+      "brandingSaved": "이메일 브랜딩을 저장했습니다.",
+      "suppressionAdded": "주소를 발송 제외 목록에 추가했습니다.",
+      "suppressionRemoved": "주소를 발송 제외 목록에서 제거했습니다."
     },
     "error": {
       "serverAddFailed": "서버를 추가하지 못했습니다",
@@ -200,7 +200,7 @@
       "deviceRemoveFailed": "기기를 제거하지 못했습니다",
       "deviceRenameFailed": "기기 이름을 바꾸지 못했습니다",
       "sessionsRevokeFailed": "세션을 취소하지 못했습니다",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "프로필을 업데이트하지 못했습니다.",
       "trustScoresResetFailed": "신뢰 점수를 초기화하지 못했습니다",
       "routingUpdateFailed": "라우팅을 업데이트하지 못했습니다",
       "clipboardFailed": "클립보드에 복사하지 못했습니다",
@@ -217,8 +217,8 @@
       "plexDirectUrl": "plex.direct URL은 릴레이 주소라서 여기에서 사용할 수 없습니다. 직접 연결되는 IP 주소나 호스트 이름을 사용하세요.",
       "userMergeFailed": "사용자를 통합하지 못했습니다",
       "serverUserSplitFailed": "계정을 분리하지 못했습니다",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "mergeSuggestionDismissFailed": "제안을 숨기지 못했습니다.",
+      "mergeSuggestionRestoreFailed": "제안을 복원하지 못했습니다.",
       "invalidClaimCode": {
         "title": "클레임 코드가 올바르지 않습니다",
         "message": "서버 로그를 확인하세요"
@@ -227,18 +227,18 @@
       "destinationDeleteFailed": "알림 대상을 삭제하지 못했습니다: {{error}}",
       "destinationTestFailed": "테스트에 실패했습니다: {{error}}",
       "destinationInUse": "다음 규칙에서 아직 사용 중입니다: {{rules}}",
-      "destinationUsedByNewsletters": "",
-      "newsletterSaveFailed": "",
-      "newsletterDeleteFailed": "",
-      "newsletterDuplicateFailed": "",
-      "newsletterPreviewFailed": "",
-      "newsletterTestFailed": "",
-      "newsletterSendFailed": "",
-      "newsletterRetryFailed": "",
-      "newsletterSnapshotFailed": "",
-      "brandingSaveFailed": "",
-      "suppressionAddFailed": "",
-      "suppressionRemoveFailed": ""
+      "destinationUsedByNewsletters": "{{names}} 뉴스레터에서 아직 사용 중입니다.",
+      "newsletterSaveFailed": "뉴스레터를 저장하지 못했습니다: {{error}}",
+      "newsletterDeleteFailed": "뉴스레터를 삭제하지 못했습니다: {{error}}",
+      "newsletterDuplicateFailed": "뉴스레터를 복제하지 못했습니다: {{error}}",
+      "newsletterPreviewFailed": "미리보기를 생성하지 못했습니다: {{error}}",
+      "newsletterTestFailed": "테스트를 대기열에 추가하지 못했습니다: {{error}}",
+      "newsletterSendFailed": "발송을 대기열에 추가하지 못했습니다: {{error}}",
+      "newsletterRetryFailed": "실패한 수신자에게 다시 시도하지 못했습니다: {{error}}",
+      "newsletterSnapshotFailed": "스냅샷을 불러오지 못했습니다: {{error}}",
+      "brandingSaveFailed": "이메일 브랜딩을 저장하지 못했습니다: {{error}}",
+      "suppressionAddFailed": "주소를 추가하지 못했습니다: {{error}}",
+      "suppressionRemoveFailed": "주소를 제거하지 못했습니다: {{error}}"
     },
     "warning": {
       "jobFailed": {
