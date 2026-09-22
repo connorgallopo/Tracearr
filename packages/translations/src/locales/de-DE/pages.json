@@ -101,8 +101,8 @@
     "suggestionsPairEmailMore_one": "",
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
     "suggestionsPairUsername": "",
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_other": "",
@@ -154,7 +154,7 @@
     "contactEmailLabel": "",
     "contactEmailNone": "",
     "contactEmailNoLogin": "",
-    "locations": ""
+    "locations": "Standorte"
   },
   "history": {
     "title": "Historie",
