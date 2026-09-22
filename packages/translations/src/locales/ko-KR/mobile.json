@@ -72,7 +72,7 @@
     "cpu": "CPU",
     "ram": "RAM",
     "item": "리소스 데이터",
-    "noData": "",
+    "noData": "리소스 데이터 없음",
     "system": "시스템",
     "waiting": "서버 통계를 기다리는 중..."
   },
@@ -132,7 +132,7 @@
     "lastSeen": "마지막으로 확인된 {{relative}}",
     "terminatedBy": "작성자: @{{username}}",
     "trustScoreConfirm": "@{{username}}의 신뢰 점수를 {{score}}(으)로 설정하시겠습니까?",
-    "trustScoreRange": ""
+    "trustScoreRange": "@{{username}}의 신뢰 점수(0~100)"
   },
   "violation": {
     "violationNotFoundDesc": "이 위반은 해제되었거나 더 이상 사용할 수 없을 수 있습니다.",
@@ -140,30 +140,30 @@
   },
   "alerts": {
     "clearFilters": "필터 지우기",
-    "acknowledgeAll": "",
-    "acknowledgeAllBody": "",
-    "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
-    "all": "",
-    "allClear": "",
-    "allServers": "",
-    "noAlertsRecorded": "",
-    "noMatches": "",
-    "pendingCount": ""
+    "acknowledgeAll": "모두 확인 처리",
+    "acknowledgeAllBody": "{{servers}}의 대기 중인 모든 알림을 확인 처리합니다. 이 작업은 되돌릴 수 없습니다.",
+    "acknowledgeAllBodySeverity": "{{servers}}에서 심각도가 {{severity}}인 대기 중 알림을 모두 확인 처리합니다. 이 작업은 되돌릴 수 없습니다.",
+    "acknowledgeAllTitle_one": "알림 {{count}}개를 확인 처리할까요?",
+    "acknowledgeAllTitle_other": "알림 {{count}}개를 확인 처리할까요?",
+    "all": "전체",
+    "allClear": "이상 없음",
+    "allServers": "모든 서버",
+    "noAlertsRecorded": "아직 기록된 알림이 없습니다.",
+    "noMatches": "일치하는 알림이 없습니다.",
+    "pendingCount": "대기 중 {{count}}개"
   },
   "history": {
     "adjustFilters": "필터를 조정해 보세요",
     "historyWillAppear": "사용자가 스트리밍을 시작하면 세션 기록이 여기에 표시됩니다",
     "filters": {
-      "clearCount": "",
-      "countries": "",
-      "filterBy": "",
-      "mediaType": "",
-      "noCountries": "",
-      "noPlatforms": "",
-      "noUsers": "",
-      "sectionSelected": ""
+      "clearCount": "지우기 ({{count}})",
+      "countries": "국가",
+      "filterBy": "필터 기준",
+      "mediaType": "미디어 유형",
+      "noCountries": "사용 가능한 국가가 없습니다.",
+      "noPlatforms": "사용 가능한 플랫폼이 없습니다.",
+      "noUsers": "사용 가능한 사용자가 없습니다.",
+      "sectionSelected": "{{section}}, {{count}}개 선택됨"
     }
   },
   "users": {
@@ -171,9 +171,9 @@
     "noUsers": "사용자 없음",
     "usersWillAppear": "미디어 서버와 동기화하면 사용자가 여기에 표시됩니다",
     "noUsersMatch": "\"{{query}}\"와 일치하는 사용자가 없습니다",
-    "joinedRelative": "",
-    "sortActive": "",
-    "sortTrust": ""
+    "joinedRelative": "{{relative}}에 가입",
+    "sortActive": "활동",
+    "sortTrust": "신뢰도"
   },
   "activity": {
     "playsOverTime": "시간별 재생",
@@ -202,69 +202,69 @@
     "alertsCount": "알림, 읽지 않음 {{count}}개",
     "settings": "설정",
     "trustScore": "신뢰 점수 {{score}}",
-    "decreaseTrustScore": "",
-    "filtersActive": "",
-    "increaseTrustScore": "",
-    "sortAscending": "",
-    "sortDescending": ""
+    "decreaseTrustScore": "신뢰 점수 낮추기",
+    "filtersActive": "활성 필터 {{count}}개",
+    "increaseTrustScore": "신뢰 점수 높이기",
+    "sortAscending": "오름차순으로 정렬됨. 탭하여 반대로 정렬",
+    "sortDescending": "내림차순으로 정렬됨. 탭하여 반대로 정렬"
   },
   "map": {
     "noData": "위치 데이터가 없습니다",
     "unavailable": "지도를 사용할 수 없습니다"
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
-    "editOnWeb": "",
-    "emptyDescription": "",
+    "conditions_one": "조건 {{count}}개",
+    "conditions_other": "조건 {{count}}개",
+    "editOnWeb": "자동화는 Tracearr 웹 앱에서 만들고 편집합니다.",
+    "emptyDescription": "Tracearr 웹 앱에서 자동화를 만들면 여기에 표시됩니다.",
     "kind": {
-      "notification": "",
-      "policy": ""
+      "notification": "알림",
+      "policy": "정책"
     },
-    "lastRun": "",
-    "truncated": "",
-    "turnOffFailed": "",
-    "turnOnFailed": "",
-    "unsupportedDescription": "",
-    "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "lastRun": "마지막 실행: {{when}}",
+    "truncated": "총 {{total}}개 자동화 중 처음 {{shown}}개를 표시합니다. 나머지는 Tracearr 웹 앱에서 확인할 수 있습니다.",
+    "turnOffFailed": "끄지 못했습니다. 아직 켜져 있습니다.",
+    "turnOnFailed": "켜지 못했습니다. 아직 꺼져 있습니다.",
+    "unsupportedDescription": "이 서버에서 보고한 버전은 {{version}}입니다. 자동화와 실행 내역을 보려면 Tracearr를 업데이트하세요.",
+    "unsupportedTitle": "자동화를 사용하려면 서버 2.2 이상이 필요합니다.",
+    "versionCheckFailed": "서버 버전을 확인하지 못했습니다."
   },
   "charts": {
-    "weekOf": ""
+    "weekOf": "{{date}} 주간"
   },
   "push": {
-    "violationTitle": ""
+    "violationTitle": "{{severity}} 위반"
   },
   "streamDetails": {
-    "bitrate": "",
-    "channels": "",
-    "codec": "",
-    "color": "",
-    "container": "",
-    "forced": "",
-    "format": "",
-    "framerate": "",
-    "hwDecode": "",
-    "hwEncode": "",
-    "mono": "",
-    "noDetails": "",
-    "notAvailable": "",
-    "profile": "",
-    "sampleRate": "",
-    "source": "",
-    "speed": "",
-    "stereo": "",
-    "stream": "",
-    "subtitles": "",
-    "throttled": "",
-    "transcodeDetails": ""
+    "bitrate": "비트레이트",
+    "channels": "채널",
+    "codec": "코덱",
+    "color": "색상",
+    "container": "컨테이너",
+    "forced": "강제",
+    "format": "형식:",
+    "framerate": "프레임 속도",
+    "hwDecode": "하드웨어 디코딩",
+    "hwEncode": "하드웨어 인코딩",
+    "mono": "모노",
+    "noDetails": "상세 스트림 정보가 없습니다.",
+    "notAvailable": "해당 없음",
+    "profile": "프로필",
+    "sampleRate": "샘플링 레이트",
+    "source": "소스",
+    "speed": "속도",
+    "stereo": "스테레오",
+    "stream": "스트림",
+    "subtitles": "자막",
+    "throttled": "제한됨",
+    "transcodeDetails": "트랜스코딩 세부 정보"
   },
   "widget": {
-    "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
-    "signedOut": "",
-    "transcodes_one": "",
-    "transcodes_other": ""
+    "asOf": "{{time}} 기준",
+    "serversDown_one": "서버 {{count}}대 오프라인",
+    "serversDown_other": "서버 {{count}}대 오프라인",
+    "signedOut": "서버를 연결하려면 Tracearr를 여세요.",
+    "transcodes_one": "트랜스코딩 {{count}}개",
+    "transcodes_other": "트랜스코딩 {{count}}개"
   }
 }
