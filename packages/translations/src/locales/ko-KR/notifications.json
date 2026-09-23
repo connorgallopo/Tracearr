@@ -109,9 +109,9 @@
         "message": "서버가 성공적으로 업데이트되었습니다"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "서버 위치 저장",
+        "queued": "과거 로컬 세션이 백그라운드에서 업데이트되고 있습니다.",
+        "waiting": "현재 작업이 완료되면 과거 로컬 세션이 업데이트됩니다."
       },
       "syncCompletedWithErrors": {
         "title": "오류가 있는 동기화 완료"
@@ -196,7 +196,7 @@
       "streamTerminateFailed": "스트림을 종료하지 못했습니다",
       "serverUrlUpdateFailed": "서버 URL을 업데이트하지 못했습니다",
       "serverUpdateFailed": "서버를 업데이트하지 못했습니다",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "서버 위치를 저장할 수 없습니다",
       "serverReorderFailed": "서버 순서를 바꾸지 못했습니다",
       "sessionsDeleteFailed": "세션을 삭제하지 못했습니다",
       "apiKeyGenerateFailed": "API 키를 생성하지 못했습니다",
