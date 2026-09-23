@@ -108,6 +108,11 @@
         "title": "Server Opdateret",
         "message": "Serveren er blevet opdateret"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synkronisering fuldført med fejl"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Kunne ikke afslutte stream",
       "serverUrlUpdateFailed": "Kunne ikke opdatere server-URL",
       "serverUpdateFailed": "Mislykkedes at opdatere server",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Kunne ikke omarrangere servere",
       "sessionsDeleteFailed": "Kunne ikke slette sessioner",
       "apiKeyGenerateFailed": "Kunne ikke generere API-nøgle",
