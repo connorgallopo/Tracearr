@@ -108,6 +108,11 @@
         "title": "Server Updated",
         "message": "The server has been updated successfully"
       },
+      "serverLocationSaved": {
+        "title": "Server location saved",
+        "queued": "Past local sessions are being updated in the background.",
+        "waiting": "Past local sessions will update once the current job finishes."
+      },
       "syncCompletedWithErrors": {
         "title": "Sync Completed with Errors"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Failed to terminate stream",
       "serverUrlUpdateFailed": "Failed to update server URL",
       "serverUpdateFailed": "Failed to update server",
+      "serverLocationSaveFailed": "Could not save the server location",
       "serverReorderFailed": "Failed to reorder servers",
       "sessionsDeleteFailed": "Failed to delete sessions",
       "apiKeyGenerateFailed": "Failed to generate API key",
