@@ -108,6 +108,11 @@
         "title": "서버 업데이트됨",
         "message": "서버가 성공적으로 업데이트되었습니다"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "오류가 있는 동기화 완료"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "스트림을 종료하지 못했습니다",
       "serverUrlUpdateFailed": "서버 URL을 업데이트하지 못했습니다",
       "serverUpdateFailed": "서버를 업데이트하지 못했습니다",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "서버 순서를 바꾸지 못했습니다",
       "sessionsDeleteFailed": "세션을 삭제하지 못했습니다",
       "apiKeyGenerateFailed": "API 키를 생성하지 못했습니다",
