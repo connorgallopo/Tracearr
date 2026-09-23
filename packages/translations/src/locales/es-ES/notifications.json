@@ -108,6 +108,11 @@
         "title": "Servidor Actualizado",
         "message": "El servidor ha sido actualizado correctamente"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Sincronización Completada con errores"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Error al terminar la reproducción",
       "serverUrlUpdateFailed": "Error al actualizar la URL del servidor",
       "serverUpdateFailed": "Error al actualizar el servidor",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Error al reordenar servidores",
       "sessionsDeleteFailed": "Error al eliminar las sesiones",
       "apiKeyGenerateFailed": "No se pudo generar la clave API",
