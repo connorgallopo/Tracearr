@@ -108,6 +108,11 @@
         "title": "已更新伺服器",
         "message": "已成功更新伺服器"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "同步完成，但出現錯誤"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "無法終止串流",
       "serverUrlUpdateFailed": "無法更新伺服器網址",
       "serverUpdateFailed": "無法更新伺服器",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "無法重新排序伺服器",
       "sessionsDeleteFailed": "無法刪除會話",
       "apiKeyGenerateFailed": "無法生成 API 金鑰",
