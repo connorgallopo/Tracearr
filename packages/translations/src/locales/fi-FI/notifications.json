@@ -108,6 +108,11 @@
         "title": "Palvelin Päivitetty",
         "message": "Palvelin on päivitetty onnistuneesti"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synkronointi suoritettu virheiden kanssa"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Virran lopettaminen epäonnistui",
       "serverUrlUpdateFailed": "Palvelimen URL-osoitteen päivitys epäonnistui",
       "serverUpdateFailed": "Palvelimen päivitys epäonnistui",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Palvelimien uudelleenjärjestäminen epäonnistui",
       "sessionsDeleteFailed": "Istuntojen poistaminen epäonnistui",
       "apiKeyGenerateFailed": "API-avaimen luonti epäonnistui",
