@@ -138,6 +138,7 @@
     "content": "コンテンツ",
     "platform": "プラットフォーム",
     "location": "場所",
+    "local": "",
     "ipAddress": "IP アドレス",
     "quality": "品質",
     "duration": "期間",
