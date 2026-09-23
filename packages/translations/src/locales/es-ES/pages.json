@@ -154,7 +154,7 @@
     "contactEmailLabel": "",
     "contactEmailNone": "",
     "contactEmailNoLogin": "",
-    "locations": ""
+    "locations": "Ubicaciones"
   },
   "history": {
     "title": "Historial",
@@ -464,7 +464,7 @@
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": "Error"
+        "error": ""
       },
       "empty": "",
       "emptyDescription": "",
@@ -498,7 +498,7 @@
     "bind": {
       "nameHelper": "",
       "namePlaceholder": "",
-      "activeLabel": "Active",
+      "activeLabel": "",
       "back": "",
       "submit": "",
       "submitting": "",
@@ -567,7 +567,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "Global",
+        "global": "",
         "server": "",
         "account": "",
         "person": "",
@@ -1671,7 +1671,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "Recipients",
+        "to": "",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
