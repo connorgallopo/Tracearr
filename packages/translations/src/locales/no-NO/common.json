@@ -138,6 +138,7 @@
     "content": "Innhold",
     "platform": "Plattform",
     "location": "Sted",
+    "local": "",
     "ipAddress": "IP Adresse",
     "quality": "Kvalitet",
     "duration": "Varighet",
