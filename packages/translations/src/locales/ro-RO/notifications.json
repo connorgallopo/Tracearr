@@ -108,6 +108,11 @@
         "title": "Server actualizat",
         "message": "Serverul a fost actualizat cu succes"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Sincronizare terminată cu erori"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Nu s-a putut termina transmisiunea",
       "serverUrlUpdateFailed": "Actualizarea adresei serverului a eșuat",
       "serverUpdateFailed": "Actualizarea serverului a eșuat",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Reordonarea serverelor a eșuat",
       "sessionsDeleteFailed": "Ștergerea sesiunilor a eșuat",
       "apiKeyGenerateFailed": "Generarea cheii API a eșuat",
