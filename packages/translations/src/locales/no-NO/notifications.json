@@ -108,6 +108,11 @@
         "title": "Serveren er oppdatert",
         "message": "Serveren er blitt oppdatert"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synkronisering fullført med feil"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Kan ikke avslutte strømmen",
       "serverUrlUpdateFailed": "Klarte ikke å oppdatere nettadressen til serveren",
       "serverUpdateFailed": "Kunne ikke oppdatere serveren",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Kan ikke flytte servere",
       "sessionsDeleteFailed": "Kunne ikke slette økter",
       "apiKeyGenerateFailed": "Kunne ikke generere API-nøkkel",
