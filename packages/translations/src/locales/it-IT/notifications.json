@@ -108,6 +108,11 @@
         "title": "Server Aggiornato",
         "message": "Il server è stato aggiornato con successo"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Sincronizzazione completata con errori"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Terminazione dello stream non riuscita",
       "serverUrlUpdateFailed": "Impossibile aggiornare l'URL del server",
       "serverUpdateFailed": "Aggiornamento del server non riuscito",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Riordino server non riuscito",
       "sessionsDeleteFailed": "Impossibile eliminare le sessioni",
       "apiKeyGenerateFailed": "Impossibile generare la chiave API",
