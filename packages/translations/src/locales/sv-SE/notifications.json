@@ -108,6 +108,11 @@
         "title": "Servern uppdaterad",
         "message": "Servern har uppdaterats"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synkronisering slutförd med fel"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Det gick inte att avsluta strömmen",
       "serverUrlUpdateFailed": "Det gick inte att uppdatera server-URL",
       "serverUpdateFailed": "Det gick inte att uppdatera servern",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Det gick inte att ordna om servrar",
       "sessionsDeleteFailed": "Misslyckades att ta bort sessioner",
       "apiKeyGenerateFailed": "Det gick inte att generera API-nyckel",
