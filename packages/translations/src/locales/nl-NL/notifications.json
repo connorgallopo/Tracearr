@@ -108,6 +108,11 @@
         "title": "Server bijgewerkt",
         "message": "De server is succesvol bijgewerkt"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synchroniseren voltooid met fouten"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Stream afbreken mislukt",
       "serverUrlUpdateFailed": "Server-URL bijwerken mislukt",
       "serverUpdateFailed": "Server bijwerken mislukt",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Servers herschikken mislukt",
       "sessionsDeleteFailed": "Sessies verwijderen mislukt",
       "apiKeyGenerateFailed": "API-sleutel genereren mislukt",
