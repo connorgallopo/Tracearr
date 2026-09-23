@@ -138,6 +138,7 @@
     "content": "محتوى",
     "platform": "المنصة",
     "location": "الموقع",
+    "local": "",
     "ipAddress": "عنوان IP",
     "quality": "الجودة",
     "duration": "المدة",
