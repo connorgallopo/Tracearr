@@ -108,6 +108,11 @@
         "title": "Ο Διακομιστής Ενημερώθηκε",
         "message": "Ο διακομιστής έχει ενημερωθεί με επιτυχία"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Ο συγχρονισμός ολοκληρώθηκε με σφάλματα"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Αποτυχία τερματισμού ροής",
       "serverUrlUpdateFailed": "Αποτυχία ενημέρωσης του διακομιστή URL",
       "serverUpdateFailed": "Αποτυχία ενημέρωσης διακομιστή",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Απέτυχε η αναδιάταξη διακομιστών",
       "sessionsDeleteFailed": "Αποτυχία διαγραφής συνεδριών",
       "apiKeyGenerateFailed": "Αποτυχία δημιουργίας κλειδιού API",
