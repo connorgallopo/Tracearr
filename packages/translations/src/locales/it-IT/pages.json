@@ -154,7 +154,7 @@
     "contactEmailLabel": "",
     "contactEmailNone": "",
     "contactEmailNoLogin": "",
-    "locations": ""
+    "locations": "Posizioni"
   },
   "history": {
     "title": "Storico",
@@ -566,7 +566,7 @@
       "clearSelection": "",
       "selectedCount": "",
       "scope": {
-        "label": "Scope",
+        "label": "",
         "global": "",
         "server": "",
         "account": "",
@@ -718,7 +718,7 @@
       "user_attributes": "",
       "device_client": "",
       "network_location": "",
-      "scope": "Scope",
+      "scope": "",
       "media": ""
     },
     "createAutomation": "",
@@ -927,7 +927,7 @@
       "carries": "",
       "copyCode": "",
       "copyJson": "",
-      "authorLabel": "Made by",
+      "authorLabel": "",
       "authorPlaceholder": "",
       "authorHelper": "",
       "save": "",
@@ -1671,7 +1671,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "Recipients",
+        "to": "",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
