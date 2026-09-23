@@ -108,6 +108,11 @@
         "title": "Сервер оновлено",
         "message": "Сервер успішно оновлено"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Синхронізація завершена з помилками"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Не вдалося завершити потік",
       "serverUrlUpdateFailed": "Не вдалося оновити URL-адресу сервера",
       "serverUpdateFailed": "Не вдалося оновити сервер",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Не вдалося змінити порядок серверів",
       "sessionsDeleteFailed": "Не вдалося видалити сеанси",
       "apiKeyGenerateFailed": "Не вдалося згенерувати ключ API",
