@@ -138,6 +138,7 @@
     "content": "Inhoud",
     "platform": "",
     "location": "Locatie",
+    "local": "",
     "ipAddress": "IP-adres",
     "quality": "Kwaliteit",
     "duration": "Duur",
