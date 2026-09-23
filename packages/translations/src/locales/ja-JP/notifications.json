@@ -108,6 +108,11 @@
         "title": "サーバー更新",
         "message": ""
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "同期がエラーと共に完了しました"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "配信の終了に失敗しました",
       "serverUrlUpdateFailed": "サーバー URL の更新に失敗しました",
       "serverUpdateFailed": "サーバーの更新に失敗しました",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "サーバーの順序を変更できませんでした",
       "sessionsDeleteFailed": "セッションの削除に失敗しました",
       "apiKeyGenerateFailed": "API キーの生成に失敗しました",
