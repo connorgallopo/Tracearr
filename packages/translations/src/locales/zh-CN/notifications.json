@@ -108,6 +108,11 @@
         "title": "服务器更新",
         "message": "该服务器被成功删除"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "同步完成时发生错误"
       },
@@ -142,7 +147,7 @@
         "title": "配对令牌已生成",
         "message": "用您的移动设备扫描二维码进行配对"
       },
-      "identityUpdated": "",
+      "identityUpdated": "个人资料已更新",
       "trustScoresReset": {
         "title": "重置信任分数",
         "message_one": "{{count}}用户重置为100",
@@ -159,21 +164,21 @@
       "serverUserSplit": {
         "title": "账户拆分为单独用户"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
+      "mergeSuggestionDismissed": "标记为不是同一个人",
+      "mergeSuggestionRestored": "建议已恢复",
       "destinationSaved": "目标已保存",
       "destinationDeleted": "目标已删除",
       "destinationTestSent": "发送测试通知",
       "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
+      "newsletterSaved": "通讯已保存",
+      "newsletterDeleted": "通讯已删除",
+      "newsletterDuplicated": "通讯已复制",
       "newsletterTestQueued": "",
-      "newsletterSendQueued": "",
+      "newsletterSendQueued": "发送队列中",
       "newsletterRetryQueued": "",
-      "brandingSaved": "",
-      "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "brandingSaved": "邮件标记已保存",
+      "suppressionAdded": "地址添加到抑制列表",
+      "suppressionRemoved": "地址已从抑制列表中删除"
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "终止流失败",
       "serverUrlUpdateFailed": "无法更新服务器 URL",
       "serverUpdateFailed": "更新服务器失败",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "服务器重新排序失败",
       "sessionsDeleteFailed": "删除会话失败",
       "apiKeyGenerateFailed": "API 密钥重置失败",
@@ -200,7 +206,7 @@
       "deviceRemoveFailed": "无法删除设备",
       "deviceRenameFailed": "无法重命名设备",
       "sessionsRevokeFailed": "撤销会话失败",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "无法更新配置文件",
       "trustScoresResetFailed": "重置信任分失败",
       "routingUpdateFailed": "更新路由失败",
       "clipboardFailed": "复制到剪贴板失败",
@@ -217,8 +223,8 @@
       "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
       "userMergeFailed": "合并用户失败",
       "serverUserSplitFailed": "分割帐户失败",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "mergeSuggestionDismissFailed": "无法取消建议",
+      "mergeSuggestionRestoreFailed": "无法还原建议",
       "invalidClaimCode": {
         "title": "无效的索赔码",
         "message": "请检查服务器日志"
