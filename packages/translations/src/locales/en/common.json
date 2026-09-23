@@ -138,6 +138,7 @@
     "content": "Content",
     "platform": "Platform",
     "location": "Location",
+    "local": "Local",
     "ipAddress": "IP Address",
     "quality": "Quality",
     "duration": "Duration",
