@@ -108,6 +108,11 @@
         "title": "Server aktualizován",
         "message": "Server byl úspěšně aktualizován"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synchronizace dokončena s chybami"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Ukončení vysílání se nezdařilo",
       "serverUrlUpdateFailed": "Aktualizace URL serveru se nezdařila",
       "serverUpdateFailed": "Nepodařilo se aktualizovat server",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Změna pořadí serverů se nezdařila",
       "sessionsDeleteFailed": "Nepodařilo se odstranit relace",
       "apiKeyGenerateFailed": "Generování API klíče se nezdařilo",
