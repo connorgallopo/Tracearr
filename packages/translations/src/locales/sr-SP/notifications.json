@@ -108,6 +108,11 @@
         "title": "",
         "message": ""
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": ""
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "",
       "serverUrlUpdateFailed": "",
       "serverUpdateFailed": "",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "",
       "sessionsDeleteFailed": "",
       "apiKeyGenerateFailed": "",
