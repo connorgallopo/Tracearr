@@ -108,6 +108,11 @@
         "title": "تم تحديث الخادم",
         "message": "تم تحديث الخادم بنجاح"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "اكتمل المزامنة مع الأخطاء"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "فشل في إنهاء البث",
       "serverUrlUpdateFailed": "فشل تحديث رابط الخادم",
       "serverUpdateFailed": "فشل تحديث الخادم",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "فشل في إعادة ترتيب الخوادم",
       "sessionsDeleteFailed": "فشل في حذف الجلسات",
       "apiKeyGenerateFailed": "فشل في إنشاء مفتاح API",
