@@ -54,7 +54,7 @@
     "viewOnGithub": "Auf GitHub anschauen",
     "later": "Später",
     "previous": "Vorherige",
-    "reload": ""
+    "reload": "Neu laden"
   },
   "states": {
     "loading": "Laden...",
@@ -82,10 +82,10 @@
     "playing": "Läuft",
     "paused": "Pausiert",
     "stopped": "Gestoppt",
-    "directPlay": "",
-    "directStream": "",
+    "directPlay": "Direkte Wiedergabe",
+    "directStream": "Direkter Stream",
     "transcode": "Transkodiere",
-    "hwTranscode": "",
+    "hwTranscode": "HW Transkodierung",
     "burnIn": "",
     "watched": ""
   },
@@ -95,16 +95,16 @@
     "high": "Hoch"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "Vertrauenswürdig",
+    "caution": "Achtung",
+    "untrusted": "Nicht vertrauenswürdig"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "Laufende Aufgaben",
+    "running": "Laufend",
+    "waiting": "wartend",
+    "queued": "In der Warteschlange",
+    "startedAgo": "Gestartet um {{time}}"
   },
   "time": {
     "now": "Jetzt",
@@ -127,10 +127,10 @@
     "timeRange": ""
   },
   "units": {
-    "km": "",
-    "mi": "",
-    "kmh": "",
-    "mph": ""
+    "km": "km",
+    "mi": "mi",
+    "kmh": "km/h",
+    "mph": "mph"
   },
   "labels": {
     "date": "Datum",
@@ -174,7 +174,7 @@
     "days": "Tage",
     "totalSessions": "Gesamte Sitzungen",
     "sessions": "Sitzungen",
-    "apiKey": "",
+    "apiKey": "API-Schlüssel",
     "rank": "Rang",
     "data": "Daten",
     "size": "Größe",
@@ -199,40 +199,40 @@
   "table": {
     "selectAllOnPage": "Seite komplett auswählen",
     "selectRow": "Zeile auswählen",
-    "pageOf": "",
-    "pagination": "",
-    "goToPage": ""
+    "pageOf": "Seite {{page}} von {{total}}",
+    "pagination": "Seitennavigation",
+    "goToPage": "Gehe zur Seite {{page}}"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "Alle löschen",
+    "done": "Fertig",
+    "remove": "{{label}} Filter entfernen",
+    "clearSearch": "Suche zurücksetzen",
+    "anyDate": "Beliebiges Datum",
+    "dateAfter": "Nach dem {{date}}",
+    "dateBefore": "Vor dem {{date}}",
+    "dateBetween": "{{from}} bis {{to}}",
+    "clearDates": "Datumsbereich zurücksetzen",
+    "clearStartDate": "Startdatum zurücksetzen",
+    "clearEndDate": "Enddatum zurücksetzen"
   },
   "media": {
-    "movie": "",
+    "movie": "Film",
     "movie_plural": "Filme",
-    "episode": "",
+    "episode": "Folge",
     "episode_plural": "Episoden",
-    "track": "",
-    "track_plural": "",
-    "liveTV": "",
+    "track": "Track",
+    "track_plural": "Tracks",
+    "liveTV": "Live-TV",
     "photo": "Foto",
     "tv": "TM",
     "tvShows": "TV Serien",
     "music": "Musik"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "Erforderlich",
@@ -270,8 +270,8 @@
     "stream_other": "{{count}} Streams",
     "server_one": "{{count}} Server",
     "server_other": "{{count}} Server",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} Automation",
+    "automation_other": "{{count}} Automationen",
     "violation_one": "{{count}} Verstoß",
     "violation_other": "{{count}} Verstöße",
     "item_one": "{{count}} Eintrag",
@@ -344,11 +344,11 @@
     "deleteMessage": "Wirklich löschen? Dieser Vorgang ist unwiderruflich.",
     "unsavedChanges": "Ungespeicherte Änderungen gehen verloren. Fortfahren?"
   },
-  "beta": "",
+  "beta": "Beta",
   "or": "oder",
   "serverSelector": {
-    "all": "",
-    "some": "",
+    "all": "Alle Server",
+    "some": "{{count}} von {{total}} Servern",
     "search": "",
     "noMatches": ""
   }
