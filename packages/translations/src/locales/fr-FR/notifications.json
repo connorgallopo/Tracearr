@@ -109,9 +109,9 @@
         "message": "Le serveur a été mis à jour avec succès"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "Emplacement du serveur enregistré",
+        "queued": "Les anciennes sessions locales sont en cours de mise à jour en arrière-plan.",
+        "waiting": "Les sessions locales passées seront mises à jour une fois la tâche en cours terminée."
       },
       "syncCompletedWithErrors": {
         "title": "Synchronisation terminée avec des erreurs"
@@ -196,7 +196,7 @@
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "Impossible de sauvegarder l'emplacement du serveur",
       "serverReorderFailed": "Échec de la réorganisation des serveurs",
       "sessionsDeleteFailed": "Échec de la suppression des sessions",
       "apiKeyGenerateFailed": "Échec de la génération de la clé API",
