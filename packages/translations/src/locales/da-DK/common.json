@@ -138,6 +138,7 @@
     "content": "Indhold",
     "platform": "",
     "location": "Placering",
+    "local": "",
     "ipAddress": "Ip Adresse",
     "quality": "Kvalitet",
     "duration": "Varighed",
