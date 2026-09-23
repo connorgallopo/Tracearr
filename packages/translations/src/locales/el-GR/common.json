@@ -138,6 +138,7 @@
     "content": "Περιεχόμενο",
     "platform": "Πλατφόρμα",
     "location": "Τοποθεσία",
+    "local": "",
     "ipAddress": "Διεύθυνση IP",
     "quality": "Ποιότητα",
     "duration": "Διάρκεια",
