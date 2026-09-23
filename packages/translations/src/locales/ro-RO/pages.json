@@ -154,7 +154,7 @@
     "contactEmailLabel": "",
     "contactEmailNone": "",
     "contactEmailNoLogin": "",
-    "locations": ""
+    "locations": "Locații"
   },
   "history": {
     "title": "Istoric",
@@ -498,7 +498,7 @@
     "bind": {
       "nameHelper": "",
       "namePlaceholder": "",
-      "activeLabel": "Active",
+      "activeLabel": "",
       "back": "",
       "submit": "",
       "submitting": "",
@@ -567,8 +567,8 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "Global",
-        "server": "Specific server",
+        "global": "",
+        "server": "",
         "account": "",
         "person": "",
         "serverLabel": "",
@@ -684,7 +684,7 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
+        "problems_one": "",
         "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
@@ -1671,7 +1671,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "Recipients",
+        "to": "",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
