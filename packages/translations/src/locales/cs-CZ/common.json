@@ -138,6 +138,7 @@
     "content": "Obsah",
     "platform": "Platforma",
     "location": "Poloha",
+    "local": "",
     "ipAddress": "IP adresa",
     "quality": "Kvalita",
     "duration": "Doba trvání",
