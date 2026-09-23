@@ -138,6 +138,7 @@
     "content": "Контент",
     "platform": "Платформа",
     "location": "Розташування",
+    "local": "",
     "ipAddress": "IP-адреса",
     "quality": "Якість",
     "duration": "Тривалість",
