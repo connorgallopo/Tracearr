@@ -108,6 +108,11 @@
         "title": "Serveur mis à jour",
         "message": "Le serveur a été mis à jour avec succès"
       },
+      "serverLocationSaved": {
+        "title": "",
+        "queued": "",
+        "waiting": ""
+      },
       "syncCompletedWithErrors": {
         "title": "Synchronisation terminée avec des erreurs"
       },
@@ -191,6 +196,7 @@
       "streamTerminateFailed": "Échec de l'arrêt de la lecture",
       "serverUrlUpdateFailed": "Échec de la mise à jour de l'URL du serveur",
       "serverUpdateFailed": "Échec de la mise à jour du serveur",
+      "serverLocationSaveFailed": "",
       "serverReorderFailed": "Échec de la réorganisation des serveurs",
       "sessionsDeleteFailed": "Échec de la suppression des sessions",
       "apiKeyGenerateFailed": "Échec de la génération de la clé API",
