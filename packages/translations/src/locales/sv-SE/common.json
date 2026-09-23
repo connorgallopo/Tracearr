@@ -138,6 +138,7 @@
     "content": "Innehåll",
     "platform": "Plattform",
     "location": "Plats",
+    "local": "",
     "ipAddress": "IP-adress",
     "quality": "Kvalitet",
     "duration": "Varaktighet",
