@@ -138,6 +138,7 @@
     "content": "Sisältö",
     "platform": "Alusta",
     "location": "Sijainti",
+    "local": "",
     "ipAddress": "Ip Osoite",
     "quality": "Laatu",
     "duration": "Kesto",
