@@ -2248,7 +2248,9 @@
       "auto": ""
     },
     "hero": {
-      "line": ""
+      "line": "",
+      "landed": "",
+      "waiting": ""
     },
     "mediaPanel": {
       "title": "",
