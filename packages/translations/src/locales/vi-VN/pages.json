@@ -1671,7 +1671,7 @@
         "password": "",
         "fromName": "",
         "fromAddress": "",
-        "to": "",
+        "to": "Recipients",
         "replyTo": "",
         "messagesPerSecond": "",
         "messageStream": ""
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "",
-        "smtpPreset": "",
+        "smtpPreset": "Fills the host, port and security for common providers",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
         "smtpTo": "",
@@ -2248,7 +2248,9 @@
       "auto": ""
     },
     "hero": {
-      "line": ""
+      "line": "",
+      "landed": "",
+      "waiting": ""
     },
     "mediaPanel": {
       "title": "",
