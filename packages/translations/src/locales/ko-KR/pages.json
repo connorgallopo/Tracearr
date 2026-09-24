@@ -2248,7 +2248,9 @@
       "auto": "관심 목록에서 자동 요청됨"
     },
     "hero": {
-      "line": "요청자: {{name}} · {{date}} · {{tail}}"
+      "line": "요청자: {{name}} · {{date}} · {{tail}}",
+      "landed": "",
+      "waiting": ""
     },
     "mediaPanel": {
       "title": "요청",
