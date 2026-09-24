@@ -2248,7 +2248,9 @@
       "auto": "Sol·licitat automàticament des d'una llista de seguiment"
     },
     "hero": {
-      "line": "Sol·licitat per {{name}} · {{date}} · {{tail}}"
+      "line": "Sol·licitat per {{name}} · {{date}} · {{tail}}",
+      "landed": "",
+      "waiting": ""
     },
     "mediaPanel": {
       "title": "Sol·licituds",
