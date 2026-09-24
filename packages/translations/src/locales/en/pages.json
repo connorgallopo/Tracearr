@@ -2248,7 +2248,9 @@
       "auto": "Auto-requested from a watchlist"
     },
     "hero": {
-      "line": "Requested by {{name}} · {{date}} · {{tail}}"
+      "line": "Requested by {{name}} · {{date}} · {{tail}}",
+      "landed": "landed {{wait}} later",
+      "waiting": "still waiting"
     },
     "mediaPanel": {
       "title": "Requests",
