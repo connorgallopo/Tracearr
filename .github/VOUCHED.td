@@ -16,4 +16,5 @@ durzo
 -nullable-eth AI Slop PR - Contributing guide ignored
 -pilascat ai submission
 -ramonskie Contributing guide completely ignored
+spartacusiam Quality bug report, history of detailed high quality reports
 -tottencam AI slop bug report - fictional issue
