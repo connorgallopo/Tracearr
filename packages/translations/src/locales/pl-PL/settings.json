@@ -18,7 +18,7 @@
       "connections": "Połączenia",
       "posters": "Źródło plakatów",
       "plexAccounts": "Konta Plex",
-      "destinations": "",
+      "destinations": "Miejsca docelowe",
       "newsletters": "Newslettery",
       "email": "Adres e-mail",
       "guest": "Dostęp dla gości",
@@ -34,18 +34,18 @@
       "locale": "Język, zegar i jednostki używane w panelu administracyjnym.",
       "behavior": "Jak często Tracearr odpytuje twoje serwery i co jest przechowywane w pamięci podręcznej.",
       "connections": "Serwery multimedialne, z których Tracearr odczytuje sesje i biblioteki.",
-      "posters": "",
-      "plexAccounts": "",
-      "destinations": "",
-      "guest": "",
+      "posters": "Serwer, którego plakat ma pierwszeństwo, gdy tytuł istnieje na więcej niż jednym serwerze.",
+      "plexAccounts": "Konta Plex.tv, które Tracearr wykorzystuje do odkrywania i autoryzacji serwerów.",
+      "destinations": "Gdzie przekazywane są powiadomienia i streszczenia.",
+      "guest": "To, co mogą zobaczyć wylogowani użytkownicy i goście.",
       "mobile": "Urządzenia sparowane z aplikacją mobilną Tracearr.",
       "remote": "Jak ludzie spoza Twojej sieci łączą się z tą instancją.",
       "import": "Przenieś historię oglądania z Tautulli, Jellystat lub Raportowania o odtwarzaniu.",
       "backup": "Zrzuty bazy danych i konfiguracji.",
       "jobs": "Zadania konserwacyjne, które możesz uruchomić na żądanie.",
       "api": "Klucz publiczny API, jego limit częstotliwości i co liczy się jako obejrzane.",
-      "newsletters": "",
-      "email": ""
+      "newsletters": "Ostatnio dodane tytuły, cyklicznie wysyłane do członków serwera.",
+      "email": "Branding dla każdego e-maila oraz adresy, które zrezygnowały."
     }
   },
   "general": {
@@ -108,7 +108,7 @@
     "watchedThresholdTv": "Próg obejrzenia odcinka TV",
     "watchedThresholdTvDesc": "Procent odcinka, który musi być obejrzany, zanim zostanie oznaczony jako zakończony.",
     "watchedThresholdMusic": "Próg wysłuchania utworu",
-    "watchedThresholdMusicDesc": "",
+    "watchedThresholdMusicDesc": "Procent utworu, który musi być odtworzony, zanim zostanie oznaczony jako zakończony.",
     "watchedThresholdSuffix": "%",
     "apiRateLimit": "Limit częstotliwości API",
     "apiRateLimitDesc": "Maksymalna liczba publicznych żądań API na minutę na klucz. Wymaga ponownego uruchomienia.",
@@ -131,7 +131,7 @@
       "free": "Dostępne miejsce na dysku",
       "freeOf": "z {{total}}",
       "floor": "Utrzymuj wolne",
-      "ceiling": "",
+      "ceiling": "Limit",
       "lastSweep": "Ostatni proces czyszczenia",
       "swept": "Usunięto podczas ostatniego czyszczenia",
       "freed": "Zwolniono podczas ostatniego czyszczenia",
@@ -185,7 +185,7 @@
     "serverUrlHelpJellyfin": "Adres URL, na którym Twój serwer Jellyfin jest dostępny",
     "serverUrlHelpEmby": "Adres URL, w którym Twój serwer Emby jest dostępny",
     "publicUrl": "Adres publiczny",
-    "publicUrlHint": "",
+    "publicUrlHint": "Adres, którego użytkownicy używają do osiągnięcia tego serwera. Używane w odnośnikach w newsletterze.",
     "apiKeyHelpJellyfin": "Znajdź to w Panelu Jellyfin → Klucze API",
     "apiKeyHelpEmby": "Znajdź to na serwerze Emby → Klucze API",
     "apiKeyKeepCurrent": "Pozostaw puste, aby zachować bieżący klucz",
@@ -197,7 +197,7 @@
     "realtimeActive": "Aktualizacje w czasie rzeczywistym aktywne",
     "pollingMode": "Odpytywanie",
     "setupRealtime": "Skonfiguruj aktualizacje w czasie rzeczywistym",
-    "realtimeError": "",
+    "realtimeError": "Błąd synchronizacji w czasie rzeczywistym",
     "checkingConnection": "Sprawdzanie połączenia…",
     "pluginVersion": "wtyczka v{{version}}",
     "pluginUpdateAvailable": "Dostępna aktualizacja wtyczki",
@@ -236,17 +236,17 @@
       "autoDetectNote": "Uruchom ponownie Jellyfin lub Emby po zainstalowaniu wtyczki; ponowne uruchomienie jest wymagane. Tracearr nie wymaga ponownego uruchomienia i wybierze wtyczkę automatycznie.",
       "close": "Zamknij",
       "issueBlocked": "",
-      "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueRestartRequired": "Wtyczka jest zainstalowana, ale serwer multimediów potrzebuje restartu, zanim się aktywuje.",
+      "issueMalfunctioned": "Serwer melduje, że wtyczka nie została załadowana poprawnie. Aktualizacja wtyczki lub serwera multimediów zwykle pomaga."
     },
     "posterSource": {
       "title": "Ustawienia plakatów",
-      "titleDesc": "",
+      "titleDesc": "Wybierz, który plakat jest wyświetlany, gdy tytuł istnieje na więcej niż jednym serwerze",
       "label": "Preferowane źródło plakatów",
-      "description": "",
+      "description": "Kiedy tytuł jest na więcej niż jednym serwerze, użyj plakatu z tego serwera. Jeśli go nie posiada, wrócimy do ostatnio dodanej kopii.",
       "automatic": "Automatyczne (najnowsze)",
       "emptyHint": "Dodaj serwer, aby wybrać preferowane źródło plakatów.",
-      "ownerOnly": ""
+      "ownerOnly": "Tylko właściciel może wybrać preferowane źródło plakatów."
     },
     "version": {
       "installed": "Wersja {{version}}",
@@ -323,7 +323,7 @@
     "unknownError": "Wystąpił nieznany błąd.",
     "disableConfirmTitle": "Wyłączyć skalę?",
     "disableConfirmDescription": "Spowoduje to odłączenie Tracearr od sieci ogonowej. Możesz ponownie włączyć bez ponownej autoryzacji.",
-    "resetConfirmTitle": "",
+    "resetConfirmTitle": "Zresetować Tailscale?",
     "resetConfirmDescription": "Spowoduje to odłączenie Tracearr od sieci ogonowej i usunięcie tożsamości urządzenia. Będziesz musiał ponownie autoryzować jeśli włączysz ją ponownie.",
     "toast": {
       "disabled": "Skala ogona została wyłączona.",
@@ -414,7 +414,7 @@
     "selectJellyfinServer": "Wybierz serwer Jellyfin lub Emby",
     "uploadJellystatBackup": "Prześlij kopię zapasową Jellystat",
     "exportFullBackupHint": "Eksportuj kopię zapasową z Jellystat",
-    "exportFullBackupHelp": "",
+    "exportFullBackupHelp": "W Jellystat przejdź do Ustawienia → Kopia zapasowa i zachowaj każdą wybraną tabelę, a następnie uruchom zadanie kopii zapasowej Jellystat z Ustawienia → Zadania i pobierz . plik syn lub .jsonl. Tracearr importuje Aktywność, Bibliotekę, Odcinki i Dane Wtyczki Raportowanie Odtwarzania; kopia zapasowa bez tych danych importuje mniejszą liczbę odtworzeń.",
     "importOptions": "Opcje importu",
     "enrichMetadata": "Wzbogacanie metadanych mediów (zalecane)",
     "enrichMetadataHelp": "Pobiera dodatkowe metadane z serwera multimedialnego dla zaimportowanych sesji.",
@@ -442,15 +442,15 @@
     "playbackReportingDesc": "Importuj historię bezpośrednio z wtyczki Raportowanie odtwarzania zainstalowanej na serwerze Jellyfin lub Emby. Eksport pliku nie jest wymagany.",
     "checkPlugin": "Sprawdź wtyczkę",
     "checkingPlugin": "Sprawdzanie...",
-    "pluginFound": "",
-    "pluginNotInstalled": "",
+    "pluginFound": "Znaleziono wtyczkę: rekordy {{records}} od {{oldestDate}} do {{newestDate}}",
+    "pluginNotInstalled": "Wtyczka Raportowanie odtwarzania nie jest zainstalowana na tym serwerze lub Tracearr nie może się z nią skontaktować. Zainstaluj ją z katalogu wtyczek serwera, aby rozpocząć monitorowanie historii lub użyj importu Jellystat poniżej.",
     "serverTimezone": "Strefa czasowa serwera",
     "serverTimezoneHelp": "Musi być zgodna ze strefą czasową skonfigurowaną na serwerze multimedialnym, a nie ze strefą czasową przeglądarki. Znaczniki czasu odtwarzania są przechowywane w czasie serwera lokalnego.",
     "importFullRange": "Importuj pełną historię",
     "importFullRangeHelp": "",
     "overlapSkipped": "{{count}} pominięto jako nakładające się",
     "duplicates": "{{count}} duplikatów pominiętych",
-    "skipOverlap": "",
+    "skipOverlap": "Nakładający się wpis — znacznik czasu przypada w okresie, który ten serwer już śledzi. Włącz import w pełnym zasięgu, aby go uwzględnić.",
     "skipDuplicatePlugin": "Zduplikowany rekord - został już zaimportowany bezpośrednio lub dotarł wcześniej poprzez import Jellystat tych samych danych wtyczki."
   },
   "plex": {
@@ -502,7 +502,7 @@
       "improved": "Ulepszono",
       "fix": "Naprawiono",
       "security": "Bezpieczeństwo",
-      "note": ""
+      "note": "Uwaga"
     }
   },
   "serverHealth": {
@@ -610,7 +610,7 @@
     "schedule": {
       "daily": "Codziennie o {{time}}",
       "weekly": "Co tydzień w {{day}} o {{time}}",
-      "monthly": "",
+      "monthly": "Co miesiąc w dniu {{day}} o {{time}}",
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}}, {{timezone}}"
     },
@@ -696,7 +696,7 @@
         "fixedAfter": "za każdym razem",
         "fixedLabel": ""
       },
-      "windowMax": "",
+      "windowMax": "Nigdy więcej niż 31 dni, niezależnie od tego, co to powie.",
       "days": "dni",
       "servers": "Serwery",
       "allServers": "Wszystkie serwery",
