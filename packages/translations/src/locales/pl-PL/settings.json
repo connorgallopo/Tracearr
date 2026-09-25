@@ -32,7 +32,7 @@
     "descriptions": {
       "appearance": "Motyw i kolor akcentu, przechowywane w tej przeglądarce.",
       "locale": "Język, zegar i jednostki używane w panelu administracyjnym.",
-      "behavior": "",
+      "behavior": "Jak często Tracearr odpytuje twoje serwery i co jest przechowywane w pamięci podręcznej.",
       "connections": "Serwery multimedialne, z których Tracearr odczytuje sesje i biblioteki.",
       "posters": "",
       "plexAccounts": "",
