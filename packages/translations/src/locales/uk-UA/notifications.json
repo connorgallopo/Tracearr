@@ -61,7 +61,7 @@
         "message": "Ваш обліковий запис Plex відключено"
       },
       "plexAccountReauthorized": {
-        "title": "",
+        "title": "Обліковий запис Plex повторно авторизовано",
         "message_one": "",
         "message_other": "",
         "messageNoServers": "",
@@ -147,7 +147,7 @@
         "title": "Згенерований парний токен",
         "message": "Відскануйте QR-код мобільним пристроєм для підключення"
       },
-      "identityUpdated": "",
+      "identityUpdated": "Профіль оновлено",
       "trustScoresReset": {
         "title": "Довіряти кільця скинуті",
         "message_one": "Користувача {{count}} скинуто до 100",
@@ -158,7 +158,7 @@
         "message": "Ви можете зараз продовжити установку"
       },
       "usersMerged": {
-        "title": "",
+        "title": "Користувачі об’єднані",
         "automationsKept": ""
       },
       "serverUserSplit": {
