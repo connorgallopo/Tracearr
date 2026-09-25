@@ -2249,8 +2249,8 @@
     },
     "hero": {
       "line": "Sol·licitat per {{name}} · {{date}} · {{tail}}",
-      "landed": "",
-      "waiting": ""
+      "landed": "va arribar {{wait}} més tard",
+      "waiting": "encara en espera"
     },
     "mediaPanel": {
       "title": "Sol·licituds",
