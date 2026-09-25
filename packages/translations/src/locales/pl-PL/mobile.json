@@ -10,10 +10,10 @@
     "enterManually": "Wprowadź adres URL i token ręcznie",
     "cameraPermissionRequired": "Wymagane uprawnienie do kamery, aby skanować kody QR",
     "scanQrInstructions": "Otwórz Ustawienia → Aplikacja mobilna w panelu Tracearr i zeskanuj kod QR",
-    "urlPlaceholder": "",
-    "tokenPlaceholder": "",
-    "missingToken": "",
-    "pleaseEnterToken": ""
+    "urlPlaceholder": "https://tracearr.example.com",
+    "tokenPlaceholder": "trr_mob_...",
+    "missingToken": "Brakujący token",
+    "pleaseEnterToken": "Wprowadź swój kod parowania"
   },
   "errors": {
     "missingFields": "Brakujące pola",
@@ -22,7 +22,7 @@
     "serverUrlMustStartWith": "Adres URL serwera musi zaczynać się od http:// lub https://",
     "pleaseEnterValidUrl": "Wprowadź prawidłowy adres URL serwera",
     "pairingFailed": "Parowanie nieudane",
-    "unableToPair": "",
+    "unableToPair": "Nie można sparować z serwerem",
     "invalidQrCode": "Kod QR jest nieprawidłowy",
     "invalidQrCodeMissingData": "Nieprawidłowy kod QR: brakuje danych parowania",
     "invalidQrCodeFormat": "Nieprawidłowy format kodu QR. Wygeneruj nowy kod.",
@@ -32,38 +32,38 @@
     "tooManyPairingAttempts": "Zbyt wiele prób parowania. Poczekaj kilka minut.",
     "invalidOrExpiredToken": "Token parowania jest nieprawidłowy lub wygasł.",
     "invalidPairingRequest": "Niepoprawna prośba o parowanie. Sprawdź token.",
-    "errorDetails": "",
+    "errorDetails": "Szczegóły błędu:",
     "componentStack": "",
-    "connectionLost": "",
-    "failedToLoadSession": ""
+    "connectionLost": "Utracono połączenie",
+    "failedToLoadSession": "Nie udało się załadować sesji"
   },
   "settings": {
     "preferences": "Ustawienia",
-    "notifications": "",
-    "configureNotifications": "",
-    "language": "",
+    "notifications": "Powiadomienia",
+    "configureNotifications": "Skonfiguruj preferencje powiadomień push",
+    "language": "Język",
     "community": "Społeczność",
-    "discord": "",
+    "discord": "Discord",
     "joinCommunity": "Dołącz do społeczności",
-    "docs": "",
-    "readDocs": "",
-    "website": "",
-    "visitWebsite": "",
-    "github": "",
+    "docs": "Dokumentacja",
+    "readDocs": "Przeczytaj dokumentację",
+    "website": "Strona WWW",
+    "visitWebsite": "Odwiedź tracearr.com",
+    "github": "GitHub",
     "viewSourceCode": "Pokaż kod źródłowy",
-    "sponsor": "",
-    "supportDevelopment": "",
+    "sponsor": "Zostań sponsorem",
+    "supportDevelopment": "Wesprzyj rozwój",
     "account": "Konto",
-    "disconnect": "",
+    "disconnect": "Rozłącz",
     "disconnectServer": "Rozłącz serwer",
     "disconnectConfirm": "Czy na pewno chcesz odłączyć się od \"{{serverName}}\"? Będziesz musiał sparować ponownie, aby użyć aplikacji.",
     "disconnectConfirmGeneric": "Czy jesteś pewien, że chcesz się rozłączyć? Będziesz musiał sparować ponownie, aby używać aplikacji.",
     "currentlyConnected": "Obecnie połączono z {{serverName}}",
-    "version": "",
+    "version": "Wersja {{version}}",
     "build": ""
   },
   "navigation": {
-    "home": "",
+    "home": "Strona główna",
     "selectServer": "Wybierz serwer",
     "server": "Serwer",
     "navigation": "Nawigacja"
@@ -71,10 +71,10 @@
   "resources": {
     "cpu": "Procesor",
     "ram": "Pamięć RAM",
-    "item": "",
-    "noData": "",
-    "system": "",
-    "waiting": ""
+    "item": "dane zasobu",
+    "noData": "Brak danych zasobu",
+    "system": "System",
+    "waiting": "Oczekiwanie na statystyki serwera..."
   },
   "notifications": {
     "testSent": "Test wysłany",
@@ -82,52 +82,52 @@
     "failedToSendTest": "Nie udało się wysłać powiadomienia testowego",
     "loadingPreferences": "Ładowanie ustawień...",
     "unableToLoadPreferences": "Nie można załadować ustawień",
-    "receiveAlerts": "",
-    "ruleViolationTriggered": "",
-    "newPlaybackBegan": "",
-    "playbackEnded": "",
-    "exceededStreamLimit": "",
-    "newDeviceDetected": "",
-    "trustScoreDegraded": "",
-    "serverUnreachable": "",
-    "serverBackOnline": "",
-    "allViolationTypes": "",
+    "receiveAlerts": "Otrzymuj powiadomienia na tym urządzeniu",
+    "ruleViolationTriggered": "Naruszenia reguł",
+    "newPlaybackBegan": "Rozpoczęto nowe odtwarzanie",
+    "playbackEnded": "Odtwarzanie zakończone",
+    "exceededStreamLimit": "Użytkownik przekroczył limit strumieni",
+    "newDeviceDetected": "Wykryto nowe urządzenie użytkownika",
+    "trustScoreDegraded": "Poziom zaufania użytkownika uległ pogorszeniu",
+    "serverUnreachable": "Serwer mediów nieosiągalny",
+    "serverBackOnline": "Serwer mediów jest ponownie dostępny",
+    "allViolationTypes": "Wszystkie rodzaje naruszeń",
     "notifyForEveryRule": "",
     "severityDescription": "",
     "quietHoursDescription": "",
-    "startTime": "",
-    "endTime": "",
-    "to": "",
-    "timezoneLabel": "",
+    "startTime": "Czas rozpoczęcia",
+    "endTime": "Czas zakończenia",
+    "to": "do",
+    "timezoneLabel": "Strefa czasowa: {{timezone}}",
     "criticalOverrideDescription": "",
-    "rateLimitDescription": "",
-    "sendTestNotification": "",
-    "testDescription": "",
-    "pushNotifications": "",
+    "rateLimitDescription": "Limity częstotliwości zapobiegają spamowi powiadomień. Obecne limity: {{perMinute}}/min, {{perHour}}/h.",
+    "sendTestNotification": "Wyślij powiadomienie testowe",
+    "testDescription": "Sprawdź, czy powiadomienia wysyłane działają poprawnie",
+    "pushNotifications": "Powiadomienia Push",
     "ruleTypes": {
       "accountInactivity": "",
       "deviceVelocity": "",
-      "geoRestriction": "",
-      "impossibleTravel": "",
-      "simultaneousLocations": ""
+      "geoRestriction": "Ograniczenie geograficzne",
+      "impossibleTravel": "Niemożliwa podróż",
+      "simultaneousLocations": "Jednoczesne Lokalizacje"
     },
-    "severityAll": "",
-    "severityHighOnly": "",
-    "severityWarningUp": "",
-    "violationTypes": ""
+    "severityAll": "Wszystkie",
+    "severityHighOnly": "Tylko wysokie",
+    "severityWarningUp": "Ostrzeżenie+",
+    "violationTypes": "Rodzaje naruszeń"
   },
   "session": {
-    "streamTerminated": "",
-    "sessionStopped": "",
-    "failedToTerminate": ""
+    "streamTerminated": "Strumień przerwany",
+    "sessionStopped": "Sesja odtwarzania została wstrzymana.",
+    "failedToTerminate": "Nie udało się zakończyć"
   },
   "userDetail": {
-    "userMayBeRemoved": "",
-    "noLocationsRecorded": "",
-    "noDevicesRecorded": "",
-    "moreLocations": "",
-    "moreDevices": "",
-    "noViolations": "",
+    "userMayBeRemoved": "Ten użytkownik mógł zostać usunięty.",
+    "noLocationsRecorded": "Brak zarejestrowanych lokalizacji",
+    "noDevicesRecorded": "Brak zarejestrowanych urządzeń",
+    "moreLocations": "+{{count}} więcej lokalizacji",
+    "moreDevices": "+{{count}} więcej urządzeń",
+    "noViolations": "Brak naruszeń",
     "noTerminations": "",
     "lastSeen": "",
     "terminatedBy": "",
@@ -136,10 +136,10 @@
   },
   "violation": {
     "violationNotFoundDesc": "",
-    "ips": ""
+    "ips": "Adresy IP"
   },
   "alerts": {
-    "clearFilters": "",
+    "clearFilters": "Oczyścić filtry",
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
@@ -157,69 +157,69 @@
     "historyWillAppear": "",
     "filters": {
       "clearCount": "",
-      "countries": "",
-      "filterBy": "",
-      "mediaType": "",
-      "noCountries": "",
-      "noPlatforms": "",
-      "noUsers": "",
+      "countries": "Kraje",
+      "filterBy": "Filtruj według",
+      "mediaType": "Typ mediów",
+      "noCountries": "Brak dostępnych krajów",
+      "noPlatforms": "Brak dostępnych platform",
+      "noUsers": "Brak dostępnych użytkowników",
       "sectionSelected": ""
     }
   },
   "users": {
-    "owner": "",
-    "noUsers": "",
-    "usersWillAppear": "",
-    "noUsersMatch": "",
-    "joinedRelative": "",
-    "sortActive": "",
-    "sortTrust": ""
+    "owner": "Właściciel",
+    "noUsers": "Brak użytkowników",
+    "usersWillAppear": "Użytkownicy pojawią się tutaj po synchronizacji z Twoim serwerem multimediów",
+    "noUsersMatch": "Brak użytkowników pasujących do \"{{query}}\"",
+    "joinedRelative": "Dołączył {{relative}}",
+    "sortActive": "Aktywny",
+    "sortTrust": "Zaufanie"
   },
   "activity": {
     "playsOverTime": "Odtwarzanie w czasie",
     "concurrentStreams": "Równoległe Transmisje",
     "platforms": "Platformy",
-    "playbackQuality": ""
+    "playbackQuality": "Jakość odtwarzania"
   },
   "unauthenticated": {
-    "connectionLost": "",
-    "accessRevoked": "",
-    "scanQrCode": ""
+    "connectionLost": "Utracono połączenie",
+    "accessRevoked": "Twój dostęp do {{serverName}} został cofnięty. Poproś właściciela serwera o nowy kod parowania.",
+    "scanQrCode": "Zeskanuj kod QR"
   },
   "serverSelector": {
-    "servers": "",
-    "selectServers": "",
-    "serversSelected": "",
-    "allServers": ""
+    "servers": "Serwery",
+    "selectServers": "Wybierz serwery",
+    "serversSelected": "Wybrano {{selected}} z {{total}} serwerów",
+    "allServers": "Wszystkie serwery"
   },
-  "reconnected": "",
+  "reconnected": "Połączono ponownie",
   "serverScope": {
-    "single": ""
+    "single": "Wyświetlanie tylko {{name}}"
   },
   "a11y": {
-    "selectServer": "",
-    "alerts": "",
-    "alertsCount": "",
-    "settings": "",
-    "trustScore": "",
-    "decreaseTrustScore": "",
-    "filtersActive": "",
-    "increaseTrustScore": "",
-    "sortAscending": "",
-    "sortDescending": ""
+    "selectServer": "Wybierz serwer",
+    "alerts": "Powiadomienia",
+    "alertsCount": "Powiadomienia, {{count}} nieprzeczytane",
+    "settings": "Ustawienia",
+    "trustScore": "Poziom zaufania {{score}}",
+    "decreaseTrustScore": "Zmniejsz poziom zaufania",
+    "filtersActive": "Filtry, {{count}} aktywne",
+    "increaseTrustScore": "Zwiększ poziom zaufania",
+    "sortAscending": "Sortowane rosnące, stuknij, aby odwrócić",
+    "sortDescending": "Sortuj malejąco, stuknij, aby odwrócić"
   },
   "map": {
-    "noData": "",
-    "unavailable": ""
+    "noData": "Brak danych o lokalizacji",
+    "unavailable": "Mapa jest niedostępna"
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
+    "conditions_one": "{{count}} warunek",
+    "conditions_other": "{{count}} warunki",
     "editOnWeb": "",
-    "emptyDescription": "",
+    "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawiają się tutaj.",
     "kind": {
-      "notification": "",
-      "policy": ""
+      "notification": "Powiadomienia",
+      "policy": "Zasady"
     },
     "lastRun": "",
     "truncated": "",
