@@ -87,7 +87,7 @@
     "transcode": "Перекодування",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "Переглянуто"
   },
   "severity": {
     "low": "Низька",
@@ -138,7 +138,7 @@
     "content": "Контент",
     "platform": "Платформа",
     "location": "Розташування",
-    "local": "",
+    "local": "Локально",
     "ipAddress": "IP-адреса",
     "quality": "Якість",
     "duration": "Тривалість",
@@ -184,13 +184,13 @@
     "product": "",
     "deviceId": "",
     "created": "Створено",
-    "total": "",
+    "total": "всього",
     "mediaLength": "",
     "segments": "",
-    "streamDetails": "",
+    "streamDetails": "Деталі трансляції",
     "transcodeReason": "",
     "loadMore": "Завантажити більше",
-    "playback": ""
+    "playback": "Відтворення"
   },
   "search": {
     "placeholder": "Пошук...",
@@ -202,20 +202,20 @@
     "selectRow": "Виберіть рядок",
     "pageOf": "Сторінка {{page}} з {{total}}",
     "pagination": "",
-    "goToPage": ""
+    "goToPage": "Перейти на сторінку {{page}}"
   },
   "filters": {
     "clearAll": "Очистити все",
     "done": "Готово",
     "remove": "",
     "clearSearch": "Очистити пошук",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
+    "anyDate": "Будь-яка дата",
+    "dateAfter": "Після {{date}}",
+    "dateBefore": "До {{date}}",
+    "dateBetween": "{{from}} до {{to}}",
     "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearStartDate": "Очистити дату початку",
+    "clearEndDate": "Очистити кінцеву дату"
   },
   "media": {
     "movie": "Фільм",
@@ -271,8 +271,8 @@
     "stream_other": "{{count}} потоки",
     "server_one": "{{count}} сервер",
     "server_other": "{{count}} сервери",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} автоматизація",
+    "automation_other": "{{count}} автоматизації",
     "violation_one": "{{count}} порушення",
     "violation_other": "{{count}} порушень",
     "item_one": "{{count}} елемент",
@@ -293,8 +293,8 @@
     "alert_other": "",
     "location_one": "",
     "location_other": "",
-    "device_one": "",
-    "device_other": "",
+    "device_one": "{{count}} пристрій",
+    "device_other": "{{count}} пристрої",
     "play_one": "",
     "play_other": "",
     "segment_one": "",
@@ -348,8 +348,8 @@
   "beta": "бета",
   "or": "або",
   "serverSelector": {
-    "all": "",
-    "some": "",
+    "all": "Всі сервери",
+    "some": "{{count}} з {{total}} серверів",
     "search": "",
     "noMatches": ""
   }
