@@ -15,6 +15,7 @@ durzo
 -ionbazan - Contributing guide not read or followed
 -nullable-eth AI Slop PR - Contributing guide ignored
 -pilascat ai submission
+-prueckls AI slop feature requests
 -ramonskie Contributing guide completely ignored
 spartacusiam Quality bug report, history of detailed high quality reports
 -tottencam AI slop bug report - fictional issue
