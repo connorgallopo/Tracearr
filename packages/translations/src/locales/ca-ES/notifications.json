@@ -109,9 +109,9 @@
         "message": "El servidor s'ha actualitzat correctament"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "S'ha desat la ubicació del servidor",
+        "queued": "S'estan actualitzant les sessions locals anteriors en segon pla.",
+        "waiting": "Les sessions locals anteriors s'actualitzaran quan acabi la tasca actual."
       },
       "syncCompletedWithErrors": {
         "title": "Sincronització completada amb errors"
@@ -196,7 +196,7 @@
       "streamTerminateFailed": "No s'ha pogut finalitzar la transmissió",
       "serverUrlUpdateFailed": "No s'ha pogut actualitzar l'URL del servidor",
       "serverUpdateFailed": "No s'ha pogut actualitzar el servidor",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "No s'ha pogut desar la ubicació del servidor",
       "serverReorderFailed": "No s'han pogut reordenar els servidors",
       "sessionsDeleteFailed": "No s'han pogut suprimir les sessions",
       "apiKeyGenerateFailed": "No s'ha pogut generar la clau d'API",
