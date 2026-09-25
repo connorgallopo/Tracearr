@@ -86,7 +86,7 @@
     "directStream": "Bezpośredni strumień",
     "transcode": "Transkodowanie",
     "hwTranscode": "Transkodowanie sprzętowe",
-    "burnIn": "",
+    "burnIn": "Wypalanie",
     "watched": "Obejrzane"
   },
   "severity": {
@@ -95,9 +95,9 @@
     "high": "Wysoki"
   },
   "trust": {
-    "trusted": "",
+    "trusted": "Zaufany",
     "caution": "Uwaga",
-    "untrusted": ""
+    "untrusted": "Niezaufany"
   },
   "tasks": {
     "title": "Uruchomione zadania",
@@ -289,8 +289,8 @@
     "library_other": "{{count}} biblioteki",
     "error_one": "{{count}} błąd",
     "error_other": "{{count}} błędy",
-    "alert_one": "{{count}} alert",
-    "alert_other": "{{count}} alertów",
+    "alert_one": "{{count}} powiadomienie",
+    "alert_other": "{{count}} powiadomień",
     "location_one": "{{count}} lokalizacja",
     "location_other": "{{count}} lokalizacji",
     "device_one": "{{count}} urządzenie",
