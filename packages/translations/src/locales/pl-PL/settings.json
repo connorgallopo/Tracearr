@@ -831,9 +831,9 @@
         "emptyDescription": ""
       },
       "delivery": {
-        "title": "",
+        "title": "Wysyłka",
         "destination": "",
-        "destinationHelp": "",
+        "destinationHelp": "Konto SMTP używane do wysyłki. Nie decyduje o tym, kto je odbiera.",
         "pickDestination": "",
         "noDestination": "Brak",
         "imageMode": "Plakaty",
