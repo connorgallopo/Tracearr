@@ -85,9 +85,9 @@
     "directPlay": "直接播放",
     "directStream": "直接串流",
     "transcode": "转码",
-    "hwTranscode": "",
+    "hwTranscode": "硬件转码",
     "burnIn": "",
-    "watched": ""
+    "watched": "已观看"
   },
   "severity": {
     "low": "低",
@@ -120,9 +120,9 @@
     "lastYear": "去年",
     "byDay": "按天",
     "byHour": "按小时",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
+    "short7Days": "7天",
+    "short30Days": "30天",
+    "shortYear": "1年",
     "shortAll": "",
     "timeRange": ""
   },
@@ -296,7 +296,7 @@
     "device_one": "{{count}} 已选",
     "device_other": "{{count}} 已选",
     "play_one": "",
-    "play_other": "",
+    "play_other": "{{count}} 次播放",
     "segment_one": "",
     "segment_other": ""
   },
