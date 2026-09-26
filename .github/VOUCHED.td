@@ -14,6 +14,7 @@ durzo
 -iokernel Slop PR, did not follow contributing guide.
 -ionbazan - Contributing guide not read or followed
 -nullable-eth AI Slop PR - Contributing guide ignored
+pelluch
 -pilascat ai submission
 -prueckls AI slop feature requests
 -ramonskie Contributing guide completely ignored
