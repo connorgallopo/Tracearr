@@ -110,12 +110,12 @@
     "suggestionsReview": "审查",
     "suggestionsNotSame": "不是同一个人",
     "suggestionsMatchEmail": "相同的邮件",
-    "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchEmailUsername": "两者都使用 {{value}} 作为用户名或账户邮箱",
     "suggestionsMatchUsername": "相同的用户名",
     "suggestionsEmpty": "没有待处理的发现。",
-    "suggestionsDismissed": "",
-    "suggestionsDismissedPair": "",
-    "suggestionsDismissedAt": "",
+    "suggestionsDismissed": "已忽略 ({{count}})",
+    "suggestionsDismissedPair": "{{first}} 和 {{second}}",
+    "suggestionsDismissedAt": "已忽略 {{relative}}",
     "suggestionsRestore": "还原",
     "suggestionsError": "无法加载合并建议",
     "filterHasAccessTo": "有访问权限",
@@ -541,7 +541,7 @@
         "valueInvalid": "此值不适合检查",
         "actionUnavailable": "这些触发器不提供此操作所需的内容",
         "variableUnavailable": "消息指名的不是每个触发器都在这里提供",
-        "minutesRange": "",
+        "minutesRange": "{{min}} 至 {{max}} 分钟之间",
         "daysRange": "",
         "measureInvalid": "选择如何计算分钟",
         "fieldNotAvailableFor": "",
@@ -651,8 +651,8 @@
       },
       "heldFor": {
         "prefix": "",
-        "minutesLabel": "",
-        "unit": "",
+        "minutesLabel": "分钟",
+        "unit": "分钟",
         "measureLabel": "",
         "current": "",
         "total": ""
@@ -747,8 +747,8 @@
       "otherwise": "",
       "appliesTo": "",
       "duration": {
-        "minutes_one": "",
-        "minutes_other": "",
+        "minutes_one": "{{count}} 分钟",
+        "minutes_other": "{{count}} 分钟",
         "days_one": "",
         "days_other": ""
       },
@@ -854,7 +854,7 @@
         "if": "",
         "flagIt": "",
         "doNothing": "",
-        "send": "",
+        "send": "发送至 {{destinations}}",
         "sendAnywhere": "",
         "kill_stream": "",
         "message_client": "",
@@ -1379,7 +1379,7 @@
       },
       "new-device": {
         "name": "",
-        "description": "",
+        "description": "当一个账户首次从你未见过的设备进行流媒体播放时，告诉你。",
         "keywords": ""
       },
       "newsletter-failed": {
@@ -1507,7 +1507,7 @@
           "synonyms": ""
         },
         "accountNewDevice": {
-          "description": "",
+          "description": "首次从设备上进行流媒体传输。",
           "synonyms": ""
         },
         "accountTrustChanged": {
@@ -1949,7 +1949,7 @@
         "replacedEpisodes_one": "",
         "replacedEpisodes_other": "",
         "addedAgo": "{{date}}添加",
-        "addedCompactAgo": "",
+        "addedCompactAgo": "{{age}}前添加",
         "newEpisodesChip": ""
       },
       "deadWeight": {
@@ -2058,7 +2058,7 @@
         "title": "观看者",
         "loadError": "无法加载观看者",
         "empty": "目前还没有人看到这一点。",
-        "lastWatchedAgo": "",
+        "lastWatchedAgo": "{{age}} 以前",
         "completionLabel": "",
         "columns": {
           "user": "用户",
