@@ -489,8 +489,8 @@
       "emptyRan": "",
       "emptyRanDescription_one": "",
       "emptyRanDescription_other": "",
-      "item": "",
-      "recordedViolation": ""
+      "item": "Element",
+      "recordedViolation": "Zarejestrowano naruszenie"
     },
     "allKinds": "Wszystkie rodzaje",
     "allStatuses": "Wszystkie statusy",
@@ -537,8 +537,8 @@
         "triggerRequired": "",
         "policyNeedsSubject": "Naruszenia dotyczą osoby, więc wymaga to strumienia lub zdarzenia konta.",
         "fieldUnavailable": "",
-        "operatorInvalid": "",
-        "valueInvalid": "",
+        "operatorInvalid": "To porównanie nie pasuje do warunku",
+        "valueInvalid": "Ta wartość nie pasuje do warunku",
         "actionUnavailable": "",
         "variableUnavailable": "",
         "minutesRange": "Między {{min}} a {{max}} minut",
@@ -1507,47 +1507,47 @@
           "synonyms": ""
         },
         "accountNewDevice": {
-          "description": "",
+          "description": "Konto strumieniuje z danego urządzenia po raz pierwszy.",
           "synonyms": ""
         },
         "accountTrustChanged": {
-          "description": "",
+          "description": "Zmienia się poziom zaufania konta, niezależnie od tego, czy automatycznie, czy administrator go zmienił.",
           "synonyms": ""
         },
         "mediaAdded": {
-          "description": "",
+          "description": "Pozycja biblioteki po raz pierwszy pojawia się na serwerze.",
           "synonyms": ""
         },
         "mediaUpgraded": {
-          "description": "",
+          "description": "Element biblioteki, który już tam był, zmienia jakość.",
           "synonyms": "ulepszenie, jakość, zastąpiona, remux, 4k, rozdzielczość"
         },
         "serverDown": {
-          "description": "",
+          "description": "Serwer multimediów przestaje odpowiadać.",
           "synonyms": ""
         },
         "serverUp": {
-          "description": "",
+          "description": "Serwer mediów odpowie ponownie.",
           "synonyms": ""
         },
         "pluginUpdateAvailable": {
-          "description": "",
+          "description": "Wtyczka Tracearr na serwerze ma nowszą wersję.",
           "synonyms": ""
         },
         "serverUpdateAvailable": {
-          "description": "",
+          "description": "Serwer mediów ma dostępną aktualizację.",
           "synonyms": ""
         },
         "tracearrUpdateAvailable": {
-          "description": "",
+          "description": "Tracearr posiada aktualizację.",
           "synonyms": ""
         },
         "newsletterSent": {
-          "description": "",
+          "description": "Zaplanowany lub ręczny newsletter dotarł do wszystkich na liście.",
           "synonyms": ""
         },
         "newsletterFailed": {
-          "description": "",
+          "description": "Newsletter nie dotarł do nikogo lub tylko do części jego odbiorców.",
           "synonyms": ""
         }
       },
@@ -1565,25 +1565,25 @@
           "synonyms": ""
         },
         "if": {
-          "label": "",
-          "description": "",
+          "label": "Jeżeli... w przeciwnym wypadku...",
+          "description": "Wykonaj pewne kroki tylko wtedy, gdy warunek jest spełniony.",
           "synonyms": ""
         }
       }
     },
     "filters": {
-      "source": "",
-      "allSources": "",
+      "source": "Skąd pochodzi",
+      "allSources": "Gdziekolwiek",
       "sources": {
-        "builtin": "",
-        "import": "",
-        "local": "",
-        "own": ""
+        "builtin": "Wbudowana",
+        "import": "Zaimportowana",
+        "local": "Zapisana tutaj",
+        "own": "Zbudowana w konstruktorze"
       },
-      "trigger": "",
-      "allTriggers": ""
+      "trigger": "Co ją wywołuje",
+      "allTriggers": "Wszystkie wyzwalacze"
     },
-    "openGallery": ""
+    "openGallery": "Otwórz galerię"
   },
   "terminateStream": {
     "title": "Zakończ transmisję",
@@ -1595,7 +1595,7 @@
     "killStream": "Zabij transmisje"
   },
   "notFound": {
-    "title": "",
+    "title": "404",
     "heading": "Strona nie znaleziona",
     "description": "Strona, której szukasz, nie istnieje lub została przeniesiona."
   },
@@ -1612,10 +1612,10 @@
       "recommended": "Polecane",
       "customUrl": "Niestandardowy adres URL",
       "connectionError": {
-        "timeout": "",
-        "dns": "",
-        "refused": "",
-        "unreachable": "",
+        "timeout": "Przekroczono limit czasu",
+        "dns": "Błąd DNS",
+        "refused": "Połączenie odrzucone",
+        "unreachable": "Host nieosiągalny",
         "reset": "",
         "tls": "",
         "http": "",
@@ -1669,23 +1669,23 @@
         "verifyCertificate": "",
         "username": "",
         "password": "",
-        "fromName": "",
-        "fromAddress": "",
-        "to": "",
-        "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "fromName": "Nazwa nadawcy",
+        "fromAddress": "Adres nadawcy",
+        "to": "Odbiorcy powiadomień",
+        "replyTo": "Odpowiedź do",
+        "messagesPerSecond": "Wiadomości na sekundę",
+        "messageStream": "Strumień wiadomości"
       },
       "groups": {
-        "connection": "",
-        "sender": "",
-        "alerts": ""
+        "connection": "Połączenie",
+        "sender": "Nadawca",
+        "alerts": "Powiadomienia"
       },
       "hints": {
-        "authTokenOptional": "",
+        "authTokenOptional": "Opcjonalnie w przypadku tematów publicznych",
         "smtpPreset": "",
-        "smtpVerifyCertificate": "",
-        "smtpUsernameOptional": "",
+        "smtpVerifyCertificate": "Sprawdza certyfikat TLS serwera poczty z zaufanym organem. Wyłącz tylko dla serwera z samodzielnie podpisanym certyfikatem, na przykład lokalny most: każdy na drodze między Tracearr a serwerem pocztowym może przechwycić połączenie.",
+        "smtpUsernameOptional": "Pozostaw puste, gdy serwer nie wymaga logowania",
         "smtpTo": "",
         "smtpRate": "",
         "smtpMessageStream": "",
@@ -1694,38 +1694,38 @@
         "smtpResendUsername": "",
         "smtpResendPassword": "",
         "smtpSendgridUsername": "",
-        "smtpSendgridPassword": "",
-        "smtpMailgunUsername": "",
-        "smtpMailgunPassword": "",
-        "smtpBrevoUsername": "",
-        "smtpBrevoPassword": "",
-        "smtpSesUsername": "",
-        "smtpSesPassword": "",
+        "smtpSendgridPassword": "Twój klucz API SendGrid.",
+        "smtpMailgunUsername": "postmaster@yourdomain, nie twój login Mailgun.",
+        "smtpMailgunPassword": "Hasło SMTP z ustawień tej domeny. Domena sandbox dociera tylko do autoryzowanych odbiorców.",
+        "smtpBrevoUsername": "Twój adres e-mail do logowania Brevo.",
+        "smtpBrevoPassword": "Klucz SMTP z SMTP i API > SMTP, a nie klucz API.",
+        "smtpSesUsername": "Nazwa użytkownika SMTP z konsoli SES, a nie klucz dostępu IAM. Umieść swój region w nazwie hosta.",
+        "smtpSesPassword": "Hasło SMTP z konsoli SES. Konta Sandbox wysyłają 200 wiadomości dziennie tylko na zweryfikowane adresy.",
         "smtpPostmarkUsername": "",
         "smtpPostmarkPassword": ""
       },
       "newsletterAlertsNote": "",
-      "newsletterDescription": "",
-      "newsletterTitle": "",
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
+      "newsletterDescription": "Tracearr wysyła newslettery przez ten serwer SMTP.",
+      "newsletterTitle": "Dodaj serwer poczty e-mail",
+      "newslettersOnly": "Tylko newslettery",
+      "noAlertRecipients": "Brak odbiorców powiadomień",
       "options": {
-        "securityStarttls": "",
-        "securityTls": "",
-        "securityNone": "",
-        "presetCustom": "",
-        "presetPostmark": "",
-        "presetResend": "",
-        "presetSes": "",
-        "presetMailgun": "",
-        "presetSendgrid": "",
-        "presetBrevo": "",
-        "presetGmail": ""
+        "securityStarttls": "STARTTLS (zwykle port 587)",
+        "securityTls": "TLS (zwykle port 465)",
+        "securityNone": "Brak (zwykły tekst, port 25)",
+        "presetCustom": "Niestandardowy",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
-      "ownerOnly": "",
-      "pushNote": "",
-      "receiveViolations": "",
-      "receiveViolationsHint": "",
+      "ownerOnly": "Tylko właściciel może zarządzać o miejscami docelowymi powiadomień.",
+      "pushNote": "Dostarczane na sparowane urządzenia mobilne; każde urządzenie filtruje we własnych ustawieniach powiadomień.",
+      "receiveViolations": "Otrzymuj naruszenia",
+      "receiveViolationsHint": "Wyślij każde naruszenie do tego miejsca docelowego.",
       "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
       "rowActions": "",
@@ -1816,9 +1816,9 @@
     "uniqueDevices": "Unikalne urządzenia",
     "uniqueCodecs": "Unikalne kodeki",
     "deviceHealth": "Zdrowie urządzenia",
-    "deviceHealthDesc": "",
+    "deviceHealthDesc": "Częstotliwość bezpośredniego odtwarzania według typu urządzenia.",
     "transcodeHotspots": "Transkoduj spoty",
-    "transcodeHotspotsDesc": "",
+    "transcodeHotspotsDesc": "Najczęstsze kombinacje powodujące transkodowanie.",
     "deviceAndCodec": "Urządzenie + Kodek",
     "transcodes": "Transkodowanie",
     "pctOfTotal": "% całości",
@@ -1828,15 +1828,15 @@
     "noDeviceDataPeriod": "Brak danych urządzenia w tym okresie",
     "legend": "Legenda:",
     "directPlayHigh": "≥80% bezpośrednia",
-    "directPlayMid": "",
-    "directPlayLow": "",
+    "directPlayMid": "50-79%",
+    "directPlayLow": "<50%",
     "topTranscodingUsers": "Najlepsi użytkownicy transkodowania",
-    "topTranscodingUsersDesc": "",
+    "topTranscodingUsersDesc": "Użytkownicy powodujący najwięcej transkodowań na serwerze.",
     "noTranscodingUsers": "Nie znaleziono użytkowników transkodowania"
   },
   "statsBandwidth": {
     "title": "Przepustowość",
-    "description": "",
+    "description": "Zużycie pasma strumieniowego i analiza przepływności.",
     "dataTransferred": "Dane przeniesione",
     "avgBitrate": "Średnia przepływność",
     "avgBitrateMbps": "Średnia przepływność (Mbps)",
@@ -1844,15 +1844,15 @@
     "totalWatchTime": "Całkowity czas oglądania",
     "uniqueUsers": "Unikalni użytkownicy",
     "dailyUsage": "Dzienne użycie przepustowości",
-    "dailyUsageDesc": "",
+    "dailyUsageDesc": "Średni bitrate i liczba sesji w czasie.",
     "topUsers": "Najwięcej użytkowników przepustowości",
-    "topUsersDesc": "",
+    "topUsersDesc": "Użytkownicy zużywający największą przepustowość.",
     "noData": "Brak dostępnych danych o przepustowości"
   },
   "statsUsers": {
     "noActivity": "Brak aktywności",
     "noActivityDesc": "Rozpocznij przesyłanie strumieniowe, aby zobaczyć tutaj najlepszych użytkowników",
-    "top3": "",
+    "top3": "Top 3",
     "runnersUp": "Robotnicy w górę"
   },
   "plexCallback": {
@@ -1863,14 +1863,14 @@
     "backToSettings": "Powrót do ustawień",
     "apiKeyAutoLoaded": "Klucz API automatycznie załadowany",
     "noApiKey": "Nie wygenerowano klucza API - utwórz go w Ustawieniach, aby przetestować punkty końcowe",
-    "versionSwitcherLabel": "",
-    "versionV1": "",
-    "versionV2": "",
-    "specLoadError": ""
+    "versionSwitcherLabel": "Wersja dokumentacji API",
+    "versionV1": "API v1",
+    "versionV2": "API v2",
+    "specLoadError": "Nie udało się załadować specyfikacji API. Sprawdź swój klucz API i spróbuj ponownie."
   },
   "debug": {
     "title": "Narzędzia debugowania",
-    "description": "",
+    "description": "Narzędzia administracyjne do rozwiązywania problemów i zarządzania danymi.",
     "overview": "Przegląd",
     "librarySnapshots": "Zrzuty biblioteki",
     "tasks": "Zadania",
@@ -1884,7 +1884,7 @@
     "memory": "Pamięć",
     "uptime": "Czas pracy",
     "database": "Baza danych",
-    "databaseDesc": "",
+    "databaseDesc": "Rozmiar bazy danych i statystyki tabel.",
     "totalSize": "Całkowity rozmiar",
     "maintenance": "Konserwacja",
     "destructiveActions": "Akcje niszczycielskie",
@@ -1894,8 +1894,8 @@
     "clearQueryCache": "Wyczyść pamięć podręczną zapytania",
     "clearMobileDevices": "Wyczyść urządzenia mobilne",
     "clearViolations": "Wyczyść naruszenia",
-    "clearAutomations": "",
-    "clearAutomationsConfirm": "",
+    "clearAutomations": "Usuń wszystkie automatyzacje i ich wywołania",
+    "clearAutomationsConfirm": "Usunąć wszystkie automatyzacje wraz z ich wywołaniami?",
     "clearTerminationLogs": "Wyczyść dzienniki zakończenia",
     "clearLibraryCache": "Usuń pamięć podręczną biblioteki",
     "clearSessions": "Wyczyść sesje",
@@ -1910,7 +1910,7 @@
     "deleteSelected": "Usuń zaznaczone",
     "deleteAllSuspicious": "Usuń Wszystko Podejrzane",
     "suspicious": "Podejrzany",
-    "ok": "",
+    "ok": "OK",
     "selected": "zaznaczone",
     "snapshots": "",
     "of": "z",
@@ -1925,32 +1925,32 @@
       },
       "shelves": {
         "recentlyAddedMovies": "Ostatnio dodane filmy",
-        "recentlyAddedShows": "",
-        "recentlyUpdated": "",
+        "recentlyAddedShows": "Ostatnio dodane seriale",
+        "recentlyUpdated": "Ostatnio zaktualizowane",
         "mostPopularMovies": "Najpopularniejsze filmy",
-        "mostPopularShows": "",
-        "emptyRecentlyAdded": "",
-        "emptyRecentlyUpdated": "",
-        "emptyMostPopular": "",
+        "mostPopularShows": "Najpopularniejsze seriale",
+        "emptyRecentlyAdded": "Nie dodano niczego w tym okresie",
+        "emptyRecentlyUpdated": "Niczego nie zastąpiono w tym okresie",
+        "emptyMostPopular": "Brak odtworzeń w tym okresie",
         "captionRecentlyAdded": "",
-        "captionRecentlyUpdated": "",
+        "captionRecentlyUpdated": "lepsza kopia zastąpiła tę tutaj",
         "captionMostPopular": {
-          "day": "",
-          "week": "",
-          "month": "",
-          "year": "",
-          "all": "",
-          "custom": ""
+          "day": "dzisiaj",
+          "week": "ostatnie 7 dni",
+          "month": "ostatnie 30 dni",
+          "year": "ostatnie 12 miesięcy",
+          "all": "od początku",
+          "custom": "wybrany zakres dat"
         }
       },
       "card": {
         "newEpisodes_one": "{{count}} nowy odcinek",
         "newEpisodes_other": "{{count}} nowych odcinków",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
+        "replacedEpisodes_one": "{{count}} odcinek zastąpiony",
+        "replacedEpisodes_other": "{{count}} odcinków zastąpionych",
         "addedAgo": "dodano {{date}}",
-        "addedCompactAgo": "",
-        "newEpisodesChip": ""
+        "addedCompactAgo": "dodano {{age}} temu",
+        "newEpisodesChip": "{{count}} nowych"
       },
       "deadWeight": {
         "title": "Zbędna zawartość",
@@ -1966,7 +1966,7 @@
         "viewAll": "Zobacz wszystkie",
         "viewAllTooltip": "Wkrótce"
       },
-      "loadError": ""
+      "loadError": "Nie można załadować biblioteki multimediów"
     },
     "movies": {
       "title": "Filmy"
@@ -1980,8 +1980,8 @@
       "chart": {
         "title": "Odtworzenia według gatunku",
         "valueLabel": "Odtworzenia",
-        "itemCount_one": "",
-        "itemCount_other": "",
+        "itemCount_one": "{{count}} tytuł",
+        "itemCount_other": "{{count}} tytułów",
         "ariaLabel": "Wykres słupkowy odtworzeń według gatunku, posortowany od najwyższego do najniższego. Pełne zestawienie dostępne jest w tabeli poniżej."
       },
       "table": {
@@ -1993,28 +1993,28 @@
           "watchTime": "Czas oglądania"
         },
         "browseMovies": "Przeglądaj filmy z gatunku {{genre}}",
-        "browseShows": ""
+        "browseShows": "Przeglądaj seriale w gatunku {{genre}}"
       },
       "empty": {
-        "title": "",
-        "description": ""
+        "title": "Nie znaleziono jeszcze gatunków",
+        "description": "Gatunki pochodzą z synchronizacji metadanych serwerów multimedialnych. Sprawdź ponownie po zakończeniu następnej synchronizacji."
       },
-      "loadError": ""
+      "loadError": "Nie udało się załadować gatunków"
     },
     "detail": {
       "title": "Szczegóły multimediów",
       "breadcrumb": {
-        "ariaLabel": ""
+        "ariaLabel": "Menu okruszkowe"
       },
       "notFound": {
-        "title": "",
-        "message": "",
-        "backLink": ""
+        "title": "Nie znaleziono multimediów",
+        "message": "Ten tytuł nie istnieje lub nie masz do niego dostępu.",
+        "backLink": "Powrót do mediów"
       },
       "hero": {
-        "loadError": "",
+        "loadError": "Nie można załadować tego tytułu",
         "meta": {
-          "seasons_one": "",
+          "seasons_one": "{{count}} sezon",
           "seasons_other": "",
           "episodes_one": "",
           "episodes_other": ""
@@ -2096,30 +2096,30 @@
       "history": {
         "title": "",
         "loadError": "",
-        "empty": "",
-        "watched": "",
-        "notWatched": "",
+        "empty": "Nie zarejestrowano jeszcze żadnych odtworzeń",
+        "watched": "Obejrzane",
+        "notWatched": "Nie ukończono",
         "columns": {
-          "date": "",
-          "user": "",
-          "content": "",
-          "server": "",
-          "duration": ""
+          "date": "Data",
+          "user": "Użytkownik",
+          "content": "Zawartość",
+          "server": "Serwer",
+          "duration": "Czas trwania"
         }
       },
       "copies": {
-        "title": "",
-        "loadError": "",
-        "unknownLibrary": "",
+        "title": "Kopie",
+        "loadError": "Nie udało się załadować kopii",
+        "unknownLibrary": "Nieznana biblioteka",
         "columns": {
-          "server": "",
-          "library": "",
-          "quality": "",
-          "episodes": "",
-          "size": "",
-          "added": ""
+          "server": "Serwer",
+          "library": "Biblioteka",
+          "quality": "Jakość",
+          "episodes": "Odcinki",
+          "size": "Rozmiar",
+          "added": "Dodano"
         },
-        "versionLabel": ""
+        "versionLabel": "Plik {{index}}"
       }
     },
     "posterCard": {
@@ -2140,28 +2140,28 @@
         "added": "dodano",
         "plays": "odtworzenia",
         "viewers": "widzowie",
-        "resolution": ""
+        "resolution": "rozdzielczość"
       },
-      "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
-      "versionsChip": "",
-      "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "rankChip": "#{{rank}}",
+      "playsCompact_one": "{{compact}} odtworzenie",
+      "playsCompact_other": "{{compact}} odtworzeń",
+      "versionsChip": "{{count}}×",
+      "versions_one": "{{count}} wersja",
+      "versions_other": "{{count}} wersje",
+      "moreServers": "+{{count}} więcej"
     },
     "grid": {
       "toolbar": {
         "ariaLabel": "Filtry i sortowanie",
-        "typeLabel": "",
+        "typeLabel": "Rodzaj mediów",
         "moviesToggle": "Filmy",
         "showsToggle": "Seriale",
         "searchPlaceholder": "Szukaj tytułów…",
         "searchLabel": "Szukaj tytułów",
-        "removeFilter": "",
+        "removeFilter": "Usuń filtr {{label}}",
         "filtersLabel": "Filtry",
-        "filtersSheetTitle": "",
-        "done": "",
+        "filtersSheetTitle": "Filtry",
+        "done": "Gotowe",
         "watchedLabel": "Obejrzane",
         "watched": {
           "all": "Wszystkie",
@@ -2169,13 +2169,13 @@
           "partial": "Częściowo obejrzane",
           "unwatched": "Nieobejrzane"
         },
-        "unwatchedByLens": "",
+        "unwatchedByLens": "Nieobejrzane przez {{name}}",
         "resolutionLabel": "Rozdzielczość",
         "resolutionAll": "Dowolna rozdzielczość",
         "hdrLabel": "Zakres dynamiczny",
         "hdrAll": "Dowolny",
-        "hdrOnly": "",
-        "hdrChip": "",
+        "hdrOnly": "Tylko HDR",
+        "hdrChip": "HDR",
         "genreLabel": "Gatunek",
         "genreAll": "Dowolny gatunek",
         "serverLabel": "Serwer",
@@ -2186,10 +2186,10 @@
         "yearToLabel": "Do roku",
         "sizeGbMinLabel": "Min. rozmiar (GB)",
         "sizeGbMaxLabel": "Maks. rozmiar (GB)",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "sizeChipAtLeast": "≥ {{min}} GB",
+        "sizeChipAtMost": "≤ {{max}} GB",
+        "sizeChipRange": "{{min}}–{{max}} GB",
+        "sortLabel": "Sortuj",
         "sort": {
           "title": "Tytuł A–Z",
           "added": "Ostatnio dodane",
@@ -2198,22 +2198,22 @@
           "watch_time": "Czas oglądania",
           "viewers": "Widzowie"
         },
-        "count": "",
-        "countTotal_one": "",
-        "countTotal_other": ""
+        "count": "{{loaded}} z {{total}} tytułów · {{size}}",
+        "countTotal_one": "{{count}} tytuł · {{size}}",
+        "countTotal_other": "{{count}} tytułów · {{size}}"
       },
       "scrubber": {
-        "label": "",
-        "current": ""
+        "label": "Przejdź do litery",
+        "current": "Litera {{letter}}"
       },
-      "loaderError": "",
-      "retry": "",
-      "clearJumpAction": "",
-      "showingFrom": "",
-      "showAll": "",
-      "emptyFilter": "",
-      "emptySearch": "",
-      "emptyAnchored": "",
+      "loaderError": "Nie udało się załadować więcej tytułów",
+      "retry": "Ponów próbę",
+      "clearJumpAction": "Wyczyść",
+      "showingFrom": "Wyświetlanie od {{letter}}",
+      "showAll": "Pokaż wszystkie",
+      "emptyFilter": "Brak tytułów pasujących do tych filtrów",
+      "emptySearch": "Brak tytułów pasujących do \"{{query}}\"",
+      "emptyAnchored": "Nic na lub po \"{{letter}}\" pod tymi filtrami",
       "loadError": ""
     }
   },
