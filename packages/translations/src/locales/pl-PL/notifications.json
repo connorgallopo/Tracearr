@@ -61,12 +61,12 @@
         "message": "Twoje konto Plex zostało odłączone"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "message_one": "",
-        "message_other": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": ""
+        "title": "Konto Plex ponownie autoryzowane",
+        "message_one": "{{count}} serwer połączony ponownie",
+        "message_other": "{{count}} serwery połączone ponownie",
+        "messageNoServers": "Token konta zaktualizowany",
+        "partial": "Token został zaktualizowany, ale {{names}} nadal go odrzucił",
+        "unmatched": "Token został zaktualizowany, ale {{names}} nie mógł zostać ponownie połączony"
       },
       "agentAdded": {
         "title": "Dodano agenta",
@@ -85,16 +85,16 @@
         "message": "{{name}} zakończono pomyślnie"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "Automatyzacja została utworzona",
+        "message": "Automatyzacja została utworzona pomyślnie"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "Zaktualizowano automatyzację",
+        "message": "Automatyzacja została pomyślnie zaktualizowana"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "Automatyzacja usunięta",
+        "message": "Automatyzacja została pomyślnie usunięta"
       },
       "streamTerminated": {
         "title": "Transmisja zakończona",
@@ -109,9 +109,9 @@
         "message": "Serwer został pomyślnie zaktualizowany"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "Zapisano lokalizację serwera",
+        "queued": "Wcześniejsze lokalne sesje są aktualizowane w tle.",
+        "waiting": "Przeszłe lokalne sesje zostaną zaktualizowane po zakończeniu bieżącego zadania."
       },
       "syncCompletedWithErrors": {
         "title": "Synchronizacja zakończona z błędami"
@@ -147,7 +147,7 @@
         "title": "Wygenerowano token parowania",
         "message": "Zeskanuj kod QR za pomocą urządzenia mobilnego, aby sparować"
       },
-      "identityUpdated": "",
+      "identityUpdated": "Profil zaktualizowany",
       "trustScoresReset": {
         "title": "Zresetuj wyniki zaufania",
         "message_one": "{{count}} użytkownik zresetowany do 100",
@@ -158,27 +158,27 @@
         "message": "Możesz kontynuować konfigurację"
       },
       "usersMerged": {
-        "title": "",
-        "automationsKept": ""
+        "title": "Użytkownicy zostali scaleni",
+        "automationsKept": "Zachowano wersję docelową: {{names}}"
       },
       "serverUserSplit": {
-        "title": ""
+        "title": "Konto podzielone na osobnych użytkowników"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": "",
-      "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
-      "newsletterTestQueued": "",
-      "newsletterSendQueued": "",
-      "newsletterRetryQueued": "",
-      "brandingSaved": "",
-      "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "mergeSuggestionDismissed": "Oznaczono jako inne osoby",
+      "mergeSuggestionRestored": "Sugestia przywrócona",
+      "destinationSaved": "Miejsce docelowe zapisane",
+      "destinationDeleted": "Miejsce docelowe usunięte",
+      "destinationTestSent": "Wysłano testowe powiadomienie",
+      "destinationTestSentTo": "Wysłano testowe powiadomienie do {{address}}",
+      "newsletterSaved": "Newsletter zapisany",
+      "newsletterDeleted": "Newsletter usunięty",
+      "newsletterDuplicated": "Newsletter zduplikowany",
+      "newsletterTestQueued": "Test w kolejce do {{address}}",
+      "newsletterSendQueued": "Wyślij w kolejce",
+      "newsletterRetryQueued": "Ponawianie próby do {{count}} odbiorców",
+      "brandingSaved": "Branding e-mail zapisany",
+      "suppressionAdded": "Adres dodany do listy wyciszenia",
+      "suppressionRemoved": "Adres usunięty z listy wyciszenia"
     },
     "error": {
       "serverAddFailed": "Nie udało się dodać serwera",
@@ -190,13 +190,13 @@
       "dismissFailed": "Nie udało się odrzucić naruszenia",
       "authFailed": "Uwierzytelnianie nie powiodło się",
       "webhookTestFailed": "Test webhooka nie powiódł się",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "Nie udało się utworzyć automatyzacji",
+      "automationUpdateFailed": "Nie udało się zaktualizować automatyzacji",
+      "automationDeleteFailed": "Nie udało się usunąć automatyzacji",
       "streamTerminateFailed": "Nie udało się zakończyć streamu",
       "serverUrlUpdateFailed": "Nie udało się zaktualizować URL serwera",
       "serverUpdateFailed": "Nie udało się zaktualizować serwera",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "Nie udało się zapisać lokalizacji serwera",
       "serverReorderFailed": "Nie udało się zmienić kolejności serwerów",
       "sessionsDeleteFailed": "Nie udało się usunąć sesji",
       "apiKeyGenerateFailed": "Nie udało się wygenerować klucza API",
@@ -206,12 +206,12 @@
       "deviceRemoveFailed": "Nie udało się usunąć urządzenia",
       "deviceRenameFailed": "Nie udało się zmienić nazwy urządzenia",
       "sessionsRevokeFailed": "Nie udało się anulować sesji",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "Nie udało się zaktualizować profilu",
       "trustScoresResetFailed": "Nie udało się zresetować punktów zaufania",
       "routingUpdateFailed": "Nie udało się zaktualizować trasy",
       "clipboardFailed": "Nie udało się skopiować do schowka",
       "plexUnlinkFailed": "Nie udało się odłączyć konta Plex",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "Nie udało się ponownie autoryzować konta Plex",
       "agentAddFailed": "Nie udało się dodać agenta",
       "agentUpdateFailed": "Nie udało się zaktualizować agenta",
       "agentRemoveFailed": "Nie udało się usunąć agenta",
@@ -221,30 +221,30 @@
       "jobLoadFailed": "Nie udało się załadować zadań konserwacyjnych",
       "invalidUrl": "Nieprawidłowy adres URL",
       "plexDirectUrl": "plex.direct adresy URL są adresami, które nie mogą być tutaj użyte. Użyj bezpośredniego adresu IP lub nazwy hosta.",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "userMergeFailed": "Nie udało się scalić użytkowników",
+      "serverUserSplitFailed": "Nie udało się rozdzielić użytkowników",
+      "mergeSuggestionDismissFailed": "Nie udało się odrzucić sugestii",
+      "mergeSuggestionRestoreFailed": "Nie udało się przywrócić sugestii",
       "invalidClaimCode": {
         "title": "Niepoprawny kod żądania",
         "message": "Proszę sprawdzić logi serwera"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": "",
-      "destinationUsedByNewsletters": "",
-      "newsletterSaveFailed": "",
-      "newsletterDeleteFailed": "",
-      "newsletterDuplicateFailed": "",
-      "newsletterPreviewFailed": "",
-      "newsletterTestFailed": "",
-      "newsletterSendFailed": "",
-      "newsletterRetryFailed": "",
-      "newsletterSnapshotFailed": "",
-      "brandingSaveFailed": "",
-      "suppressionAddFailed": "",
-      "suppressionRemoveFailed": ""
+      "destinationSaveFailed": "Nie udało się zapisać miejsca docelowego: {{error}}",
+      "destinationDeleteFailed": "Nie udało się usunąć miejsca docelowego: {{error}}",
+      "destinationTestFailed": "Test zakończony niepowodzeniem: {{error}}",
+      "destinationInUse": "Nadal używane przez: {{rules}}",
+      "destinationUsedByNewsletters": "Nadal używane przez newslettery: {{names}}",
+      "newsletterSaveFailed": "Nie udało się zapisać newslettera: {{error}}",
+      "newsletterDeleteFailed": "Nie udało się usunąć newslettera: {{error}}",
+      "newsletterDuplicateFailed": "Nie udało się zduplikować newslettera: {{error}}",
+      "newsletterPreviewFailed": "Nie udało się wygenerować podglądu: {{error}}",
+      "newsletterTestFailed": "Nie udało się dodać testu do kolejki: {{error}}",
+      "newsletterSendFailed": "Nie udało się dodać wysyłki do kolejki: {{error}}",
+      "newsletterRetryFailed": "Ponowna próba wysyłki zakończona niepowodzeniem: {{error}}",
+      "newsletterSnapshotFailed": "Nie udało się załadować zrzutu: {{error}}",
+      "brandingSaveFailed": "Nie udało się zapisać brandingu: {{error}}",
+      "suppressionAddFailed": "Nie udało się dodać adresu: {{error}}",
+      "suppressionRemoveFailed": "Nie udało się usunąć adresu: {{error}}"
     },
     "warning": {
       "jobFailed": {
