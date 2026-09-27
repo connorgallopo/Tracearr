@@ -92,8 +92,8 @@
     "serverUnreachable": "Serwer mediów nieosiągalny",
     "serverBackOnline": "Serwer mediów jest ponownie dostępny",
     "allViolationTypes": "Wszystkie rodzaje naruszeń",
-    "notifyForEveryRule": "",
-    "severityDescription": "",
+    "notifyForEveryRule": "Powiadamiaj dla każdego typu reguły",
+    "severityDescription": "Powiadamiaj tylko o naruszeniach na tym poziomie lub wyżej",
     "quietHoursDescription": "",
     "startTime": "Czas rozpoczęcia",
     "endTime": "Czas zakończenia",
@@ -105,7 +105,7 @@
     "testDescription": "Sprawdź, czy powiadomienia wysyłane działają poprawnie",
     "pushNotifications": "Powiadomienia Push",
     "ruleTypes": {
-      "accountInactivity": "",
+      "accountInactivity": "Nieaktywność konta",
       "deviceVelocity": "",
       "geoRestriction": "Ograniczenie geograficzne",
       "impossibleTravel": "Niemożliwa podróż",
@@ -128,42 +128,42 @@
     "moreLocations": "+{{count}} więcej lokalizacji",
     "moreDevices": "+{{count}} więcej urządzeń",
     "noViolations": "Brak naruszeń",
-    "noTerminations": "",
-    "lastSeen": "",
-    "terminatedBy": "",
-    "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "noTerminations": "Brak zakończenia strumienia",
+    "lastSeen": "Ostatnio widziany {{relative}}",
+    "terminatedBy": "Przez @{{username}}",
+    "trustScoreConfirm": "Ustawić wynik zaufania dla @{{username}} na {{score}}?",
+    "trustScoreRange": "Wynik zaufania dla @{{username}}, od 0 do 100."
   },
   "violation": {
-    "violationNotFoundDesc": "",
+    "violationNotFoundDesc": "To naruszenie mogło zostać odrzucone lub nie jest już dostępne.",
     "ips": "Adresy IP"
   },
   "alerts": {
     "clearFilters": "Oczyścić filtry",
-    "acknowledgeAll": "",
+    "acknowledgeAll": "Potwierdź wszystkie",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_other": "",
-    "all": "",
+    "all": "Wszystkie",
     "allClear": "",
-    "allServers": "",
+    "allServers": "wszystkie serwery",
     "noAlertsRecorded": "",
-    "noMatches": "",
-    "pendingCount": ""
+    "noMatches": "Brak pasujących alertów",
+    "pendingCount": "{{count}} oczekujących"
   },
   "history": {
     "adjustFilters": "",
     "historyWillAppear": "",
     "filters": {
-      "clearCount": "",
+      "clearCount": "Wyczyść ({{count}})",
       "countries": "Kraje",
       "filterBy": "Filtruj według",
       "mediaType": "Typ mediów",
       "noCountries": "Brak dostępnych krajów",
       "noPlatforms": "Brak dostępnych platform",
       "noUsers": "Brak dostępnych użytkowników",
-      "sectionSelected": ""
+      "sectionSelected": "{{section}}, {{count}} wybranych"
     }
   },
   "users": {
@@ -221,7 +221,7 @@
       "notification": "Powiadomienia",
       "policy": "Zasady"
     },
-    "lastRun": "",
+    "lastRun": "Ostatnie uruchomienie {{when}}",
     "truncated": "",
     "turnOffFailed": "",
     "turnOnFailed": "",
