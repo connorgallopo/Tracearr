@@ -812,7 +812,7 @@
         "fromUsername": "od użytkownika",
         "extraAddress": "Dodatkowy adres",
         "suppressed": "Wyciszony",
-        "suppressedHelp": "",
+        "suppressedHelp": "Adresy te zostały wypisane lub wyciszone ręcznie; zostaną pominięte podczas wysyłki.",
         "exclude": "Wyklucz {{name}} z tego newslettera",
         "excludeAction": "Wyklucz",
         "include": "Uwzględnij {{name}} ponownie",
@@ -871,7 +871,7 @@
         "externalUrlNotHttps": "Zewnętrzny adres URL używa http: członkowie otrzymują link do rezygnacji, ale rezygnacja jednym kliknięciem wymaga https.",
         "noPublicUrl": "Linki do elementów dla {{server}} nie są dostępne, ponieważ nie posiada adresu publicznego.",
         "privatePublicUrl": "Linki do elementów dla {{server}} nie są dostępne, ponieważ jego adres publiczny jest prywatny.",
-        "emptyVariant": "",
+        "emptyVariant": "Użytkownicy wyłącznie {{servers}} nie otrzymają kolejnego newslettera, ponieważ {{servers}} nie dodał żadnych tytułów w wybranym okresie.",
         "variantsLoadFailed": "Nie można załadować liczby wariantów.",
         "serverSettingsLink": "Otwórz ustawienia serwera",
         "fromDomain": "Adres nadawcy odpowiada domenie konta SMTP.",
@@ -930,8 +930,8 @@
         "previewing": "Decydowanie, kto co otrzyma...",
         "summary": "Wyślij do {{count}} adresatów: {{counts}} dodanych między {{start}} a {{end}}. Każda osoba otrzymuje własną kopię i widzi tylko swój własny adres.",
         "nobody": "Żaden z {{missing}} członków nie posiada adresu, więc nie ma nic do wysłania.",
-        "trimmed_one": "",
-        "trimmed_other": "",
+        "trimmed_one": "{{count}} element został przedstawiony jako \"+N więcej\", aby utrzymać wiadomość e-mail poniżej 102 KB, powyżej których Gmail ją przycina.",
+        "trimmed_other": "{{count}} elementów zostało przedstawionych jako \"+N więcej\", aby utrzymać wiadomość e-mail poniżej 102 KB, powyżej których Gmail ją przycina.",
         "confirm": "Wyślij",
         "sending": "Wysyłanie"
       }
@@ -949,7 +949,7 @@
       "recipients": "{{count}} odbiorców",
       "recipientsEmpty": "Odbiorcy pojawią się po rozpoczęciu wysyłania.",
       "finished": "Zakończono {{when}}",
-      "open": "",
+      "open": "Otwórz wysyłkę z {{when}}",
       "page": "Strona {{page}} z {{pages}}",
       "sendTitle": "Wyślij",
       "status": {
