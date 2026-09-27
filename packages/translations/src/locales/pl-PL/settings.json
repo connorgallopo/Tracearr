@@ -847,7 +847,7 @@
           "inline": "Załączone do wiadomości e-mail. Każdy klient je wyświetla, ale e-mail jest większy, więc limit rozmiaru przycina więcej tytułów.",
           "none": "Elementy będą wyświetlone bez plakatów."
         },
-        "modePreviewHint": "",
+        "modePreviewHint": "Podgląd korzysta z powyższych ustawień; wybierz brak plakatów, by zobaczyć wiadomość bez zdalnych obrazków.",
         "hostedNeedsUrl": "Nie ustawiono zewnętrznego adresu URL. Hostowane plakaty wymagają go by zapisać zmiany: ustaw je w trybie Dostępu, zdalnego dostępu lub wybierz jako załączniki.",
         "skipWhenEmpty": "Pomiń, gdy nic nie zostało dodane",
         "skipWhenEmptyHelp": "Brak nowości oznacza brak wiadomości e-mail. W newsletterze obejmującym kilka serwerów jest to każda grupa: osoby, których serwery nic nie słyszą, a reszta nadal ich otrzymuje. Testowa wysyłka zawsze je wyświetla."
@@ -916,7 +916,7 @@
         "imagesOn": "Wyświetlane",
         "imagesBlocked": "Zablokowane",
         "imagesBlockedNote": "Wiele klientów blokuje zdalne obrazy, dopóki czytelnik na nie zezwoli.",
-        "linksNote": ""
+        "linksNote": "Linki do anulowania subskrypcji i widoku w przeglądarce są generowane dla każdego odbiorcy osobno podczas wysyłki wiadomości e-mail, więc nie są aktywne w tym podglądzie."
       },
       "test": {
         "title": "Wyślij test",
@@ -966,7 +966,7 @@
       "variantEmpty": "Nie ma nic nowego dla tych serwerów; nikt w tej grupie nie został powiadomiony.",
       "openVariantSnapshot": "Otwórz zrzut dla {{servers}}",
       "snapshotTitle": "Wysłano kopię",
-      "pruned": "",
+      "pruned": "Historia jest czyszczona po 90 dniach; podgląd i ponowna wysyłka nie jest możliwa po tym czasie.",
       "retryFailed": "Ponowna próba się nie powiodła"
     }
   },
@@ -1066,7 +1066,7 @@
     },
     "confirmUnlink": {
       "title": "Odłączyć Seerr?",
-      "body": ""
+      "body": "Kopia historii prósb dla {{server}} zostanie usunięta."
     },
     "toast": {
       "saved": "Usługa próśb została zapisana",
