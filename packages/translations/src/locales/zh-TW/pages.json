@@ -158,7 +158,7 @@
   },
   "history": {
     "title": "歷史紀錄",
-    "description": "使用強大的篩選功能瀏覽所有串流會話",
+    "description": "",
     "loadingMore": "正在載入更多內容……",
     "scrollForMore": "向下滾動查看更多",
     "showingAllResults": "顯示全部 {{total}} 個結果",
@@ -171,7 +171,7 @@
   },
   "library": {
     "title": "媒體庫",
-    "description": "伺服器上的熱門電影和劇集",
+    "description": "",
     "topMovies": "熱門電影",
     "topShows": "熱門電視節目",
     "noMoviePlays": "此期間沒有電影播放",
@@ -325,7 +325,7 @@
   },
   "activity": {
     "title": "活動",
-    "description": "播放趨勢、模式和串流行為",
+    "description": "",
     "playsOverTime": "一段時間後播放",
     "concurrentStreams": "並行串流",
     "engagementBreakdown": "參與度分析",
