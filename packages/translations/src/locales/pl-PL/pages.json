@@ -85,7 +85,7 @@
     "mergeDeleted": "",
     "mergeRulesKept": "Reguły dla serwera o tej samej nazwie zachowują wersję {{keepName}}.",
     "mergeIrreversibleTitle": "Tej operacji nie można cofnąć",
-    "mergeIrreversibleBody": "",
+    "mergeIrreversibleBody": "Oba mają konto na tym samym serwerze. Łącząc te konta, ich sesje, naruszenia i wynik zaufania zostaną również połączone. Rozdzielenie ich później nie przywraca drugiego konta.",
     "mergeServerLabel": "Serwer",
     "mergeServerUnknown": "Nieznany serwer",
     "mergeIrreversibleAcknowledge": "Rozumiem, że dwa konta na tym serwerze nie mogą być ponownie oddzielone",
@@ -106,7 +106,7 @@
     "suggestionsPairUsername": "{{first}} i {{second}} współdzielą nazwę użytkownika",
     "suggestionsPairUsernameMore_one": "{{first}} i {{second}} współdzielą nazwę użytkownika, oraz {{count}} więcej",
     "suggestionsPairUsernameMore_other": "{{first}} i {{second}} współdzielą nazwę użytkownika, oraz {{count}} więcej",
-    "suggestionsSheetDescription": "",
+    "suggestionsSheetDescription": "Scalanie zachowuje jednego użytkownika i usuwa drugiego. Para oznaczona jako nie ta sama osoba przestaje pojawiać się, dopóki go nie przywrócisz.",
     "suggestionsReview": "Przejrzyj",
     "suggestionsNotSame": "To nie ta sama osoba",
     "suggestionsMatchEmail": "Ten sam adres e-mail",
@@ -120,7 +120,7 @@
     "suggestionsError": "Nie można załadować sugestii scalania",
     "filterHasAccessTo": "Ma dostęp do",
     "filterHasAccessToPlaceholder": "Dowolny serwer",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "Pokazuje osoby z aktywnym kontem na każdym wybranym serwerze."
   },
   "userDetail": {
     "backToUsers": "Powrót do użytkowników",
@@ -139,14 +139,14 @@
     "linkedAccounts": "Połączone konta",
     "splitAccount": "Podziel na osobnych użytkowników",
     "splitConfirmTitle": "Podziel konto serwera",
-    "splitConfirmDescription": "",
+    "splitConfirmDescription": "Odłącz to konto serwera i utwórz osobnego użytkownika. Historia oglądania i naruszenia zostaną przeniesione.",
     "splitConfirmLoading": "Dzielenie...",
     "acrossAllServers": "Na wszystkich powiązanych kontach:",
     "overallTrust": "Zaufanie ogółem",
     "serverScope": "Serwer",
     "allServers": "Wszystkie serwery",
     "title": "Szczegóły użytkownika",
-    "editIdentity": "",
+    "editIdentity": "Edytuj nazwę i adres e-mail kontaktowy",
     "editIdentityDescription": "",
     "displayName": "Wyświetlana nazwa",
     "contactEmail": "E-mail kontaktowy",
@@ -201,7 +201,7 @@
     },
     "storage": {
       "title": "Przestrzeń",
-      "description": "Wykorzystanie pamięci, prognozy i optymalizacja.",
+      "description": "Wykorzystanie pamięci, przewidywania i optymalizacja.",
       "totalStorage": "Całkowita pamięć",
       "growthRate": "Wskaźnik wzrostu",
       "duplicates": "Duplikaty",
@@ -219,7 +219,7 @@
       "zeroGrowth": "0 GB/miesiąc",
       "predictions": "Przewidywania",
       "contentROI": "ROI treści",
-      "contentROIDesc": "Wartość treści na koszt przechowywania.",
+      "contentROIDesc": "Wartość treści w stosunku do kosztu przechowywania.",
       "avgHoursPerGB": "średnia godzina/GB",
       "insufficientData": "Niewystarczające dane",
       "of": "z",
@@ -227,11 +227,11 @@
       "failedToLoad": "Nie udało się załadować danych magazynowych",
       "failedToLoadDesc": "Nie można pobrać danych pamięci. Spróbuj ponownie.",
       "duplicatesTitle": "Duplikaty",
-      "duplicatesSubtitle": "",
+      "duplicatesSubtitle": "Tytuły przechowywane w więcej niż jednym fizycznym pliku, na wszystkich serwerach, bibliotekach i wersjach.",
       "growthPreChangeover": "",
-      "loadingDuplicates": "",
+      "loadingDuplicates": "Ładowanie duplikatów...",
       "duplicatesFailed": "Nie udało się załadować duplikatów",
-      "noDuplicatesTitle": "Nie znalezniono duplikatów",
+      "noDuplicatesTitle": "Nie znaleziono duplikatów",
       "noDuplicatesDesc": "Brak tytułów z więcej niż jednym fizycznym plikiem.",
       "colTitle": "Tytuł",
       "colType": "Rodzaj",
@@ -278,7 +278,7 @@
       "generateHistory": "",
       "starting": "",
       "syncInProgress": {
-        "title": "",
+        "title": "Trwa synchronizacja biblioteki...",
         "body": ""
       },
       "notSynced": {
@@ -289,7 +289,7 @@
         "title": "Brak filmów ani seriali",
         "body": "Ta biblioteka jest zsynchronizowana, ale nie posiada jeszcze żadnych filmów ani seriali."
       },
-      "syncNow": "",
+      "syncNow": "Synchronizuj teraz",
       "syncing": "Synchronizowanie...",
       "notSyncedShort": "Jeszcze nie zsynchronizowano",
       "backfillRunning": {
@@ -300,26 +300,26 @@
       },
       "multiServer": {
         "title": "Niektóre biblioteki wymagają uwagi",
-        "body": "",
+        "body": "Synchronizuj serwery poniżej, aby zobaczyć statystyki wszystkich bibliotek.",
         "needsBackfillIntro": ""
       },
       "toast": {
-        "noServerSelected": "",
-        "syncStartedTitle": "",
-        "syncStartedDesc": "",
-        "syncFailedTitle": "",
-        "genericRetry": "",
-        "backfillStartedTitle": "",
-        "backfillStartedDesc": "",
-        "backfillFailedTitle": "",
-        "backfillCompleteTitle": "",
+        "noServerSelected": "Nie wybrano żadnego serwera",
+        "syncStartedTitle": "Rozpoczęto synchronizację biblioteki",
+        "syncStartedDesc": "Może to potrwać kilka minut, w zależności od wielkości biblioteki.",
+        "syncFailedTitle": "Nie udało się rozpocząć synchronizacji",
+        "genericRetry": "Proszę spróbować ponownie.",
+        "backfillStartedTitle": "Uzupełnianie rozpoczęte",
+        "backfillStartedDesc": "Trwa generowanie zrzutów historycznych.",
+        "backfillFailedTitle": "Nie udało się uruchomić wypełniania kopii zapasowej",
+        "backfillCompleteTitle": "Uzupełnianie zakończone",
         "backfillErrorTitle": ""
       }
     },
     "versionsBackfill": {
       "banner": "",
-      "action": "",
-      "syncFailed": "",
+      "action": "Synchronizuj teraz",
+      "syncFailed": "Synchronizacja nie powiodła się na {{count}} serwerach. Sprawdź swoje uprawnienia i status serwera.",
       "syncStarted": ""
     }
   },
@@ -402,21 +402,21 @@
         "description": "",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Tryb"
           },
           "amount": {
             "label": "",
             "description": ""
           },
           "value": {
-            "label": ""
+            "label": "Wartość"
           }
         },
         "ran": ""
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "Przerwij transmisję",
+        "description": "Przerwij aktywną transmisję",
         "fields": {
           "cooldown_minutes": {
             "description": ""
@@ -426,59 +426,59 @@
             "description": ""
           },
           "target": {
-            "description": ""
+            "description": "Sesje do zakończenia"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Wiadomość (opcjonalnie)"
           }
         },
-        "ran": ""
+        "ran": "Zatrzymano strumień"
       },
       "message_client": {
-        "label": "",
-        "description": "",
+        "label": "Wiadomość do klienta",
+        "description": "Wyślij wiadomość do odtwarzacza multimediów",
         "hint": "",
         "fields": {
           "target": {
-            "description": ""
+            "description": "Sesje do wysłania wiadomości"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Wiadomość do wyświetlenia…"
           }
         },
-        "ran": ""
+        "ran": "Wiadomość wysłana do odtwarzacza"
       }
     },
     "activity": {
-      "title": "",
+      "title": "Aktywność",
       "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
+      "outcome": "Wynik",
+      "who": "Kto",
+      "where": "Gdzie",
       "playing": "",
       "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "summary": "Podsumowanie",
+      "started": "Rozpoczęto",
+      "finished": "Zakończono",
+      "noSummary": "Brak uwag",
       "outcomes": {
-        "completed": "",
+        "completed": "Wykonano",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Niepowodzenie"
       },
       "empty": "",
       "emptyDescription": "",
-      "runTitle": "",
+      "runTitle": "Uruchom",
       "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "triggeredBy": "Wywołane przez {{trigger}}",
+      "unknownStep": "Nieznany krok",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "all": "Wszystkie",
+        "completed": "Uruchomione",
+        "stopped_by_condition": "Brak wyników",
+        "error": "Niepowodzenie"
       },
-      "group": "",
+      "group": "Grupa {{number}}",
       "branch": {
         "then": "",
         "else": ""
@@ -1953,18 +1953,18 @@
         "newEpisodesChip": ""
       },
       "deadWeight": {
-        "title": "",
-        "summary": "",
-        "empty": "",
+        "title": "Zbędna zawartość",
+        "summary": "{{count}} nieobejrzanych tytułów · {{size}}",
+        "empty": "Brak treści do odzyskania — wszystko w Twojej bibliotece zostało obejrzane",
         "columns": {
-          "poster": "",
-          "title": "",
-          "size": "",
-          "added": "",
-          "servers": ""
+          "poster": "Plakat",
+          "title": "Tytuł",
+          "size": "Rozmiar",
+          "added": "Dodano",
+          "servers": "Serwery"
         },
-        "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAll": "Zobacz wszystkie",
+        "viewAllTooltip": "Wkrótce"
       },
       "loadError": ""
     },
@@ -1976,21 +1976,21 @@
     },
     "genres": {
       "title": "Gatunki",
-      "subtitle": "",
+      "subtitle": "Odtworzenia i czas oglądania według gatunku, na wszystkich widocznych serwerach.",
       "chart": {
-        "title": "",
-        "valueLabel": "",
+        "title": "Odtworzenia według gatunku",
+        "valueLabel": "Odtworzenia",
         "itemCount_one": "",
         "itemCount_other": "",
-        "ariaLabel": ""
+        "ariaLabel": "Wykres słupkowy odtworzeń według gatunku, posortowany od najwyższego do najniższego. Pełne zestawienie dostępne jest w tabeli poniżej."
       },
       "table": {
-        "title": "",
+        "title": "Zestawienie według gatunku",
         "columns": {
-          "genre": "",
+          "genre": "Gatunek",
           "items": "Pozycje",
-          "plays": "",
-          "watchTime": ""
+          "plays": "Odtworzenia",
+          "watchTime": "Czas oglądania"
         },
         "browseMovies": "Przeglądaj filmy z gatunku {{genre}}",
         "browseShows": ""
@@ -2033,8 +2033,8 @@
         }
       },
       "kpis": {
-        "ariaLabel": "",
-        "loadError": "",
+        "ariaLabel": "Statystyki oglądalności",
+        "loadError": "Nie udało się załadować statystyk oglądalności",
         "completionLoadError": "",
         "plays": {
           "label": "",
@@ -2162,41 +2162,41 @@
         "filtersLabel": "Filtry",
         "filtersSheetTitle": "",
         "done": "",
-        "watchedLabel": "",
+        "watchedLabel": "Obejrzane",
         "watched": {
-          "all": "",
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "all": "Wszystkie",
+          "watched": "Obejrzane",
+          "partial": "Częściowo obejrzane",
+          "unwatched": "Nieobejrzane"
         },
         "unwatchedByLens": "",
-        "resolutionLabel": "",
-        "resolutionAll": "",
-        "hdrLabel": "",
-        "hdrAll": "",
+        "resolutionLabel": "Rozdzielczość",
+        "resolutionAll": "Dowolna rozdzielczość",
+        "hdrLabel": "Zakres dynamiczny",
+        "hdrAll": "Dowolny",
         "hdrOnly": "",
         "hdrChip": "",
-        "genreLabel": "",
+        "genreLabel": "Gatunek",
         "genreAll": "Dowolny gatunek",
-        "serverLabel": "",
-        "serverAll": "",
-        "libraryLabel": "",
-        "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
-        "sizeGbMinLabel": "",
-        "sizeGbMaxLabel": "",
+        "serverLabel": "Serwer",
+        "serverAll": "Dowolny serwer",
+        "libraryLabel": "Biblioteka",
+        "libraryAll": "Dowolna biblioteka",
+        "yearFromLabel": "Od roku",
+        "yearToLabel": "Do roku",
+        "sizeGbMinLabel": "Min. rozmiar (GB)",
+        "sizeGbMaxLabel": "Maks. rozmiar (GB)",
         "sizeChipAtLeast": "",
         "sizeChipAtMost": "",
         "sizeChipRange": "",
         "sortLabel": "",
         "sort": {
           "title": "Tytuł A–Z",
-          "added": "",
-          "year": "",
-          "plays": "",
-          "watch_time": "",
-          "viewers": ""
+          "added": "Ostatnio dodane",
+          "year": "Rok",
+          "plays": "Odtworzenia",
+          "watch_time": "Czas oglądania",
+          "viewers": "Widzowie"
         },
         "count": "",
         "countTotal_one": "",
@@ -2219,51 +2219,51 @@
   },
   "requests": {
     "status": {
-      "pending": "",
-      "approved": "",
-      "declined": "",
-      "failed": "",
-      "completed": "",
-      "deleted": ""
+      "pending": "Oczekująca",
+      "approved": "Zatwierdzona",
+      "declined": "Odrzucona",
+      "failed": "Nieudana",
+      "completed": "Dostępna",
+      "deleted": "Usunięta"
     },
     "columns": {
-      "requester": "",
-      "title": "",
-      "status": "",
-      "requested": "",
-      "wait": "",
-      "seasons": "",
-      "watched": ""
+      "requester": "Zamówione przez",
+      "title": "Tytuł",
+      "status": "Status",
+      "requested": "Zamówione",
+      "wait": "Czas oczekiwania",
+      "seasons": "Sezony",
+      "watched": "Obejrzane"
     },
     "wait": {
       "pending": "",
-      "declined": ""
+      "declined": "odrzucono"
     },
     "seasons": {
-      "all": "",
+      "all": "Wszystkie sezony",
       "item": ""
     },
     "flags": {
       "fourK": "Prośba 4K",
-      "auto": ""
+      "auto": "Automatycznie zamówione z listy obserwowanych"
     },
     "hero": {
-      "line": "",
+      "line": "Zamówione przez {{name}} · {{date}} · {{tail}}",
       "landed": "",
       "waiting": ""
     },
     "mediaPanel": {
-      "title": "",
-      "loadError": "",
-      "empty": ""
+      "title": "Prośby",
+      "loadError": "Nie udało się załadować próśb",
+      "empty": "Brak próśb dla tego tytułu"
     },
     "userCard": {
-      "title": "",
-      "loadError": "",
-      "viewAll": "",
-      "showLess": "",
+      "title": "Prośby",
+      "loadError": "Nie udało się załadować próśb",
+      "viewAll": "Zobacz wszystkie (jeszcze {{count}})",
+      "showLess": "Pokaż mniej",
       "summary": {
-        "requests": "",
+        "requests": "Prośby",
         "medianWait": "mediana oczekiwania {{duration}}",
         "approvalRate": "Współczynnik zatwierdzenia",
         "neverWatched": "Nigdy nie obejrzano"
@@ -2276,57 +2276,57 @@
       "byOthers": ""
     },
     "page": {
-      "title": "",
-      "description": "",
-      "failedToLoad": "",
-      "notConfigured": "",
-      "notConfiguredDescription": "",
-      "linkSeerr": "",
+      "title": "Prośby",
+      "description": "Czego prosili użytkownicy, co trafiło do biblioteki i czy ktokolwiek to odtworzył.",
+      "failedToLoad": "Nie udało się załadować analityki próśb",
+      "notConfigured": "Brak połączonego Seerr",
+      "notConfiguredDescription": "Połącz instancję Seerr z serwerem, a strona wypełni się po pierwszej synchronizacji.",
+      "linkSeerr": "Połącz Seerr",
       "kpi": {
-        "requested": "",
-        "landedOf": "",
-        "watched": "",
-        "neverPlayed": "",
-        "ofLanded": "",
-        "onDisk": ""
+        "requested": "Złożonych próśb",
+        "landedOf": "{{count}} trafiło do biblioteki",
+        "watched": "Obejrzanych",
+        "neverPlayed": "Nigdy nieodtworzone",
+        "ofLanded": "{{share}} z tych w bibliotece",
+        "onDisk": "{{size}} na dysku"
       }
     },
     "funnel": {
-      "title": "",
-      "description": "",
-      "requested": "",
-      "landed": "",
-      "watched": "",
-      "share": "",
-      "empty": ""
+      "title": "Gdzie trafiają prośby",
+      "description": "Obejrzane oznacza, że ktoś dotarł do 85% treści — tak samo jak na stronach biblioteki. Prośba musi trafić do biblioteki i zostać dopasowana do tytułu, zanim Tracearr będzie mógł to zmierzyć.",
+      "requested": "Złożone",
+      "landed": "W bibliotece",
+      "watched": "Obejrzane",
+      "share": "{{count}} z {{total}} próśb",
+      "empty": "Brak próśb"
     },
     "unplayed": {
-      "title": "",
-      "description": "",
-      "emptyTitle": "",
-      "emptyDescription": ""
+      "title": "W bibliotece i nigdy nieodtworzone",
+      "description": "Pobrane na czyjąś prośbę, a żadne konto na tych serwerach nigdy nie nacisnęło odtwarzania.",
+      "emptyTitle": "Wszystko, co trafiło do biblioteki, zostało odtworzone",
+      "emptyDescription": "Nic tutaj nie zajmuje miejsca bez powodu."
     },
     "outcomes": {
-      "title": "",
-      "requester": "",
-      "wait": "",
-      "requested": "",
-      "onDisk": "",
-      "untitled": "",
-      "failedToLoad": ""
+      "title": "Tytuł",
+      "requester": "Zamówione przez",
+      "wait": "Czas oczekiwania",
+      "requested": "Zamówione",
+      "onDisk": "Na dysku",
+      "untitled": "Bez tytułu",
+      "failedToLoad": "Nie udało się załadować tych próśb"
     },
     "followThrough": {
-      "title": "",
-      "description": "",
-      "person": "",
-      "asked": "",
-      "landed": "",
-      "watched": "",
-      "watchedByOthers": "",
-      "medianWait": "",
-      "emptyTitle": "",
-      "emptyDescription": "",
-      "failedToLoad": ""
+      "title": "Zamawiający",
+      "description": "Kto co zamawia, czy sam ogląda do końca i czy robią to inni.",
+      "person": "Osoba",
+      "asked": "Zamówionych",
+      "landed": "W bibliotece",
+      "watched": "Obejrzanych",
+      "watchedByOthers": "Obejrzane przez innych",
+      "medianWait": "Mediana oczekiwania",
+      "emptyTitle": "Brak zamawiających",
+      "emptyDescription": "Prośby pojawią się tutaj po synchronizacji z połączonym Seerr.",
+      "failedToLoad": "Nie udało się załadować zamawiających"
     }
   }
 }
