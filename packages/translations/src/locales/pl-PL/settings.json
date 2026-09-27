@@ -8,7 +8,7 @@
       "general": "Ogólne",
       "servers": "Serwery",
       "notifications": "Powiadomienia",
-      "access": "Uzyskaj dostęp",
+      "access": "Dostęp",
       "data": "Dane i API"
     },
     "sections": {
@@ -20,7 +20,7 @@
       "plexAccounts": "Konta Plex",
       "destinations": "Miejsca docelowe",
       "newsletters": "Newslettery",
-      "email": "Adres e-mail",
+      "email": "Wiadomości e-mail",
       "guest": "Dostęp dla gości",
       "mobile": "Urządzenia mobilne",
       "remote": "Zdalny dostęp",
@@ -115,7 +115,7 @@
     "apiRateLimitSuffix": "/min",
     "updateChecks": {
       "title": "Sprawdzanie aktualizacji",
-      "description": "",
+      "description": "Tracearr sprawdza aktualizacje co sześć godzin. Powiadomienia zostaną wysłane poprzez wszystkie automatyzacje nasłuchujące tego zdarzenia.",
       "plugin": "Wtyczka czasu rzeczywistego",
       "pluginDesc": "Sprawdzaj nowe wersje wtyczki Tracearr, z której Jellyfin i Emby korzystają do raportowania o strumieniowaniu.",
       "server": "Serwery mediów",
@@ -123,7 +123,7 @@
     },
     "imageCache": {
       "title": "Pamięć podręczna plakatów",
-      "description": "",
+      "description": "Jeden egzemplarz każdego plakatu, przechowywany na dysku do czasu zmiany plakatu. Nic tu nie jest automatycznie usuwane, by zwolnić miejsce; kiedy miejsce na dysku się kończy, pamięć podręczna przestaje rosnąć i komunikuje o tym fakcie.",
       "size": "Na dysku",
       "files": "Plików",
       "need": "Szacunkowe zapotrzebowanie",
@@ -447,7 +447,7 @@
     "serverTimezone": "Strefa czasowa serwera",
     "serverTimezoneHelp": "Musi być zgodna ze strefą czasową skonfigurowaną na serwerze multimedialnym, a nie ze strefą czasową przeglądarki. Znaczniki czasu odtwarzania są przechowywane w czasie serwera lokalnego.",
     "importFullRange": "Importuj pełną historię",
-    "importFullRangeHelp": "",
+    "importFullRangeHelp": "Odtwarzania rozpoczęte po dodaniu tego serwera do Tracearr nie są importowane. Domyślnie import zatrzymuje się również na najwcześniejszym strumieniowaniu, jakie Tracearr posiada dla tego serwera, na przykład z importu Jellystat. Włącz tę funkcję, aby importować wszystko przed dodaniem serwera. Idealne duplikaty nadal zostaną pominięte.",
     "overlapSkipped": "{{count}} pominięto jako nakładające się",
     "duplicates": "{{count}} duplikatów pominiętych",
     "skipOverlap": "Nakładający się wpis — znacznik czasu przypada w okresie, który ten serwer już śledzi. Włącz import w pełnym zasięgu, aby go uwzględnić.",
@@ -680,7 +680,7 @@
       "nextRun": "Następne uruchomienie {{when}} ({{timezone}})",
       "nextRunPending": "Następne uruchomienie jest ustawione po zapisaniu.",
       "content": "Zawartość",
-      "windowKind": "Pokrywa",
+      "windowKind": "Zakres",
       "windows": {
         "since_last_send": "Wszystko od ostatniego e-maila",
         "fixed": "Stała liczba dni"
@@ -737,7 +737,7 @@
           "music": "Muzyka, do {{count}} albumów",
           "mostWatched": "Najczęściej oglądane, {{count}} najczęściej odtwarzanych"
         },
-        "musicHelp": "",
+        "musicHelp": "Liczona w albumach, współdzielona między artystami w kolejności, w jakiej zostały dodane.",
         "mostWatchedHelp": "Najczęściej odtwarzane media w wybranym przedziale czasowym, wraz z liczbą odtworzeń, niezależnie od tego, czy zostały dodane niedawno. Wszystkie pozostałe sekcje wyświetlają ostatnio dodane media."
       },
       "message": "Wiadomość",
@@ -803,7 +803,7 @@
         "includeSelected": "Uwzględnij wybrane",
         "noMatches": "Nikt nie pasuje do wyszukiwania.",
         "groupsNote": "Osoby na różnych serwerach otrzymują różne e-maile. Każda z poniższych grup widzi tylko to, co zostało dodane do wybranych serwerów.",
-        "noAddressHelp": "",
+        "noAddressHelp": "Nie znaleziono adresów dla tych osób: nie znaleziono adresu e-mail do kontaktu, nie posiadają adresu e-mail z Tracearr ani z ich kont serwera mediów. Jellyfin i Emby również ich nie zwracają, więc ich konta liczą się tylko wtedy, gdy sama nazwa użytkownika jest adresem e-mail. Dodaj adres e-mail do kontaktu pobieżnej, a zostanie natychmiast zapisany.",
         "contactEmailFor": "E-mail kontaktowy dla {{name}}",
         "saveEmail": "Zapisz e-mail kontaktowy dla {{name}}",
         "openUserPage": "Otwórz stronę {{name}}",
@@ -845,7 +845,7 @@
         "modeHelp": {
           "hosted": "Ładowane z tej instancji Tracearr przez zewnętrzny adres URL; adres URL musi być dostępny z publicznego Internetu, by dostawca poczty odbiorcy go widział.",
           "inline": "Załączone do wiadomości e-mail. Każdy klient je wyświetla, ale e-mail jest większy, więc limit rozmiaru przycina więcej tytułów.",
-          "none": ""
+          "none": "Elementy będą wyświetlone bez plakatów."
         },
         "modePreviewHint": "",
         "hostedNeedsUrl": "Nie ustawiono zewnętrznego adresu URL. Hostowane plakaty wymagają go by zapisać zmiany: ustaw je w trybie Dostępu, zdalnego dostępu lub wybierz jako załączniki.",
@@ -853,7 +853,7 @@
         "skipWhenEmptyHelp": "Brak nowości oznacza brak wiadomości e-mail. W newsletterze obejmującym kilka serwerów jest to każda grupa: osoby, których serwery nic nie słyszą, a reszta nadal ich otrzymuje. Testowa wysyłka zawsze je wyświetla."
       },
       "links": {
-        "tracearr": "",
+        "tracearr": "Linkuj tytuły do Tracearr",
         "tracearrNote": "Interfejs Tracearr jest aktualnie tylko dla administratorów, więc użytkownicy zobaczą stronę logowania; łącze do serwera multimediów pozostaje niezależnie od tego."
       },
       "readiness": {
