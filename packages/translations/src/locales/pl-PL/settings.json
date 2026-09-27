@@ -119,7 +119,7 @@
       "plugin": "Wtyczka czasu rzeczywistego",
       "pluginDesc": "Sprawdzaj nowe wersje wtyczki Tracearr, z której Jellyfin i Emby korzystają do raportowania o strumieniowaniu.",
       "server": "Serwery mediów",
-      "serverDesc": ""
+      "serverDesc": "Porównaj wersję każdego serwera Plex, Jellyfin i Emby z najnowszymi dostępnymi wersjami."
     },
     "imageCache": {
       "title": "Pamięć podręczna plakatów",
@@ -235,7 +235,7 @@
       "openReleases": "Otwórz stronę wydań",
       "autoDetectNote": "Uruchom ponownie Jellyfin lub Emby po zainstalowaniu wtyczki; ponowne uruchomienie jest wymagane. Tracearr nie wymaga ponownego uruchomienia i wybierze wtyczkę automatycznie.",
       "close": "Zamknij",
-      "issueBlocked": "",
+      "issueBlocked": "Serwer zgłasza wtyczkę jako zainstalowaną i aktywną, ale Tracearr otrzymuje błąd 404. Odwrotne proxy blokujące ścieżkę to najczęstsza przyczyna.",
       "issueRestartRequired": "Wtyczka jest zainstalowana, ale serwer multimediów potrzebuje restartu, zanim się aktywuje.",
       "issueMalfunctioned": "Serwer melduje, że wtyczka nie została załadowana poprawnie. Aktualizacja wtyczki lub serwera multimediów zwykle pomaga."
     },
@@ -599,7 +599,7 @@
     "emptyDescription": "Newsletter informuje e-mailem członków serwera o tym, co zostało ostatnio dodane.",
     "noDestinationTitle": "Newsletter wymaga konfiguracji e-mail",
     "noDestinationDescription": "Miejsce docelowe e-mail to konfiguracja serwera SMTP używana do wysyłki newsletterów, więc wymaga tylko danych serwera i nadawcy. Każdy newsletter dociera do wszystkich osób na serwerach, które wybierasz automatycznie, oraz do dodatkowych adresów, które podasz.",
-    "noDestinationHint": "Brak konfiguracji e-mail.",
+    "noDestinationHint": "Brak miejsc docelowych e-mail.",
     "addEmailDestination": "Dodaj konfigurację e-mail",
     "enabled": "Włączone",
     "rowActions": "Akcje newslettera",
@@ -818,7 +818,7 @@
         "include": "Uwzględnij {{name}} ponownie",
         "includeAction": "Uwzględnij",
         "excludedHelp": "Te osoby pozostają poza tym newsletterem, dopóki nie dodasz ich ponownie. Nie wpływa to na inne newslettery.",
-        "notIncludableHelp": "",
+        "notIncludableHelp": "{{count}} więcej nie może zostać uwzględnionych, ponieważ są zbanowani, oczekujący lub nie są na wybranym serwerze.",
         "excludedAfterSave": "Wykluczeni po zapisaniu",
         "includedAfterSave": "Uwzględnieni po zapisaniu",
         "reasons": {
@@ -848,22 +848,22 @@
           "none": ""
         },
         "modePreviewHint": "",
-        "hostedNeedsUrl": "",
-        "skipWhenEmpty": "",
-        "skipWhenEmptyHelp": ""
+        "hostedNeedsUrl": "Nie ustawiono zewnętrznego adresu URL. Hostowane plakaty wymagają go by zapisać zmiany: ustaw je w trybie Dostępu, zdalnego dostępu lub wybierz jako załączniki.",
+        "skipWhenEmpty": "Pomiń, gdy nic nie zostało dodane",
+        "skipWhenEmptyHelp": "Brak nowości oznacza brak wiadomości e-mail. W newsletterze obejmującym kilka serwerów jest to każda grupa: osoby, których serwery nic nie słyszą, a reszta nadal ich otrzymuje. Testowa wysyłka zawsze je wyświetla."
       },
       "links": {
         "tracearr": "",
-        "tracearrNote": ""
+        "tracearrNote": "Interfejs Tracearr jest aktualnie tylko dla administratorów, więc użytkownicy zobaczą stronę logowania; łącze do serwera multimediów pozostaje niezależnie od tego."
       },
       "readiness": {
         "title": "Zanim wyślesz",
         "intro": "To nie blokuje zapisu. Wpływają jednak na to, czy wysyłka się powiedzie.",
         "destination": "Wysyłanie poprzez \"{{name}}\".",
-        "destinationFail": "",
-        "destinationUnknown": "",
-        "destinationError": "",
-        "fixDestination": "",
+        "destinationFail": "Nie ustawiono miejsca docelowego, więc ten newsletter nie może zostać wysyłany.",
+        "destinationUnknown": "Sprawdzanie miejsca docelowego.",
+        "destinationError": "Nie można załadować miejsc docelowych. Odśwież stronę.",
+        "fixDestination": "Wybierz miejsce docelowe",
         "fixRecipients": "Przejdź do odbiorców",
         "fixExternalUrl": "Ustaw zewnętrzny adres URL",
         "externalUrl": "Zewnętrzny adres URL jest ustawiony; plakaty, widok przeglądarki i linki Tracearr działają.",
@@ -872,29 +872,29 @@
         "noPublicUrl": "Linki do elementów dla {{server}} nie są dostępne, ponieważ nie posiada adresu publicznego.",
         "privatePublicUrl": "Linki do elementów dla {{server}} nie są dostępne, ponieważ jego adres publiczny jest prywatny.",
         "emptyVariant": "",
-        "variantsLoadFailed": "",
+        "variantsLoadFailed": "Nie można załadować liczby wariantów.",
         "serverSettingsLink": "Otwórz ustawienia serwera",
         "fromDomain": "Adres nadawcy odpowiada domenie konta SMTP.",
         "fromDomainFail": "Adres nadawcy i nazwa użytkownika SMTP znajdują się w różnych domenach; niektórzy dostawcy tego nie akceptują.",
-        "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
-        "recipientsFail": "",
-        "recipientsChecking": "",
-        "recipientsLoadFailed": "",
-        "dns": "",
-        "dnsLink": ""
+        "fromDomainUnknown": "Wybierz miejsce docelowe, aby sprawdzić jego adres nadawcy.",
+        "recipients_one": "{{count}} odbiorca z adresem.",
+        "recipients_other": "{{count}} odbiorców z adresami.",
+        "recipientsFail": "Nikt nie posiada jeszcze adresu.",
+        "recipientsChecking": "Sprawdzanie, kto otrzymuje ten newsletter.",
+        "recipientsLoadFailed": "Nie można załadować odbiorców.",
+        "dns": "Powodzenie wysyłki zależy od rekordów SPF, DKIM i DMARC dla domeny wysyłania.",
+        "dnsLink": "Dowiedz się, jak je ustawić"
       },
       "actions": {
         "preview": "Podgląd",
         "test": "Test wysyłki",
         "send": "Wyślij teraz",
         "more": "Więcej opcji wysyłania",
-        "testHint": "",
-        "sendHint": ""
+        "testHint": "Wysyła jedną kopię na jeden adres i nie zmienia zakresu czasu.",
+        "sendHint": "Wysyła do wszystkich teraz i przesuwa zakres czasu do przodu, tak samo jak zaplanowana wysyłka."
       },
       "preview": {
-        "variants": "",
+        "variants": "Kto patrzy",
         "variantTab": "{{count}} na {{servers}}",
         "title": "Podgląd",
         "draft": "Podgląd niezapisanych zmian",
@@ -927,9 +927,9 @@
       },
       "send": {
         "title": "Wysłać teraz {{name}}?",
-        "previewing": "",
-        "summary": "",
-        "nobody": "",
+        "previewing": "Decydowanie, kto co otrzyma...",
+        "summary": "Wyślij do {{count}} adresatów: {{counts}} dodanych między {{start}} a {{end}}. Każda osoba otrzymuje własną kopię i widzi tylko swój własny adres.",
+        "nobody": "Żaden z {{missing}} członków nie posiada adresu, więc nie ma nic do wysłania.",
         "trimmed_one": "",
         "trimmed_other": "",
         "confirm": "Wyślij",
@@ -971,7 +971,7 @@
     }
   },
   "email": {
-    "ownerOnly": "",
+    "ownerOnly": "Tylko właściciel może zarządzać brandingiem e-mail i listą wyciszeń.",
     "branding": {
       "title": "Branding",
       "description": "Używane w każdej wiadomości e-mail wysyłanej przez Tracearr: alerty i newslettery.",
@@ -997,7 +997,7 @@
     },
     "suppressions": {
       "title": "Wypisane adresy",
-      "globalNote": "",
+      "globalNote": "Wyciszenie ma charakter globalny: wypisuje adres z każdego newslettera dla tej instalacji.",
       "empty": "Brak wyciszonych adresów",
       "emptyDescription": "Anulowane subskrypcje lądują tu automatycznie; dodaj adres ręcznie, by wypisać go ze wszystkich list.",
       "add": "Dodaj adres",
