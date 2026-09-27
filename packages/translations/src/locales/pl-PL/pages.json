@@ -151,14 +151,14 @@
     "displayName": "Wyświetlana nazwa",
     "contactEmail": "E-mail kontaktowy",
     "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNone": "",
+    "contactEmailLabel": "Adres newslettera:",
+    "contactEmailNone": "nie ustawiono",
     "contactEmailNoLogin": "Nie udziela dostępu do logowania.",
     "locations": "Lokalizacje"
   },
   "history": {
     "title": "Historia",
-    "description": "",
+    "description": "Przeglądaj wszystkie sesje transmisji z potężnym filtrowaniem.",
     "loadingMore": "Ładuję więcej...",
     "scrollForMore": "Przewiń, aby zobaczyć więcej",
     "showingAllResults": "Wyświetlanie wszystkich {{total}} wyników",
@@ -219,14 +219,14 @@
       "zeroGrowth": "0 GB/miesiąc",
       "predictions": "Przewidywania",
       "contentROI": "ROI treści",
-      "contentROIDesc": "",
+      "contentROIDesc": "Wartość treści na koszt przechowywania.",
       "avgHoursPerGB": "średnia godzina/GB",
       "insufficientData": "Niewystarczające dane",
       "of": "z",
       "days": "dni",
       "failedToLoad": "Nie udało się załadować danych magazynowych",
       "failedToLoadDesc": "Nie można pobrać danych pamięci. Spróbuj ponownie.",
-      "duplicatesTitle": "",
+      "duplicatesTitle": "Duplikaty",
       "duplicatesSubtitle": "",
       "growthPreChangeover": "",
       "loadingDuplicates": "",
@@ -240,7 +240,7 @@
       "colRecoverable": "Odzyskiwalne miejsce",
       "sameServer": "Ten sam serwer",
       "mirror": "Mirror",
-      "missingOnServer": "",
+      "missingOnServer": "Brakujące na serwerze",
       "missingOnServerHint": "",
       "copyPath": "Kopiuj ścieżkę pliku"
     },
@@ -286,20 +286,20 @@
         "body": ""
       },
       "noMedia": {
-        "title": "",
-        "body": ""
+        "title": "Brak filmów ani seriali",
+        "body": "Ta biblioteka jest zsynchronizowana, ale nie posiada jeszcze żadnych filmów ani seriali."
       },
       "syncNow": "",
-      "syncing": "",
-      "notSyncedShort": "",
+      "syncing": "Synchronizowanie...",
+      "notSyncedShort": "Jeszcze nie zsynchronizowano",
       "backfillRunning": {
-        "title": "",
+        "title": "Generowanie danych historycznych...",
         "fallbackBody": "",
-        "progress": "",
+        "progress": "{{processed}} z {{total}} bibliotek",
         "snapshotsSuffix": ""
       },
       "multiServer": {
-        "title": "",
+        "title": "Niektóre biblioteki wymagają uwagi",
         "body": "",
         "needsBackfillIntro": ""
       },
@@ -1069,7 +1069,7 @@
       "library_name": {
         "label": "",
         "description": "",
-        "placeholder": ""
+        "placeholder": "Filmy"
       },
       "resolution_after": {
         "label": "",
@@ -1202,7 +1202,7 @@
       "not_contains": ""
     },
     "options": {
-      "4K": "",
+      "4K": "4K (2160p)",
       "1080p": "",
       "720p": "",
       "480p": "",
@@ -1375,7 +1375,7 @@
       "media-upgraded": {
         "name": "",
         "description": "",
-        "keywords": ""
+        "keywords": "ulepsz jakość remux 4k rozdzielczość zastąpiła powiadomienie e-mail Discord"
       },
       "new-device": {
         "name": "",
@@ -1388,9 +1388,9 @@
         "keywords": ""
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Zakaz transkodowania 4K",
+        "description": "Zatrzymaj strumień, który transkodowuje wideo źródłowe 4K.",
+        "keywords": "Zatrzymanie przepustowości procesora 4k trancode"
       },
       "paused-too-long": {
         "name": "",
@@ -1520,7 +1520,7 @@
         },
         "mediaUpgraded": {
           "description": "",
-          "synonyms": ""
+          "synonyms": "ulepszenie, jakość, zastąpiona, remux, 4k, rozdzielczość"
         },
         "serverDown": {
           "description": "",
@@ -1924,10 +1924,10 @@
         "allUsers": "Wszyscy użytkownicy"
       },
       "shelves": {
-        "recentlyAddedMovies": "",
+        "recentlyAddedMovies": "Ostatnio dodane filmy",
         "recentlyAddedShows": "",
         "recentlyUpdated": "",
-        "mostPopularMovies": "",
+        "mostPopularMovies": "Najpopularniejsze filmy",
         "mostPopularShows": "",
         "emptyRecentlyAdded": "",
         "emptyRecentlyUpdated": "",
@@ -1988,11 +1988,11 @@
         "title": "",
         "columns": {
           "genre": "",
-          "items": "",
+          "items": "Pozycje",
           "plays": "",
           "watchTime": ""
         },
-        "browseMovies": "",
+        "browseMovies": "Przeglądaj filmy z gatunku {{genre}}",
         "browseShows": ""
       },
       "empty": {
@@ -2133,8 +2133,8 @@
       "watchedState": {
         "watched": "Obejrzane",
         "partial": "Częściowo obejrzane",
-        "watchedByOthers": "",
-        "watchedByYou": ""
+        "watchedByOthers": "Obejrzane przez innych",
+        "watchedByYou": "Obejrzane przez Ciebie"
       },
       "tileLabel": {
         "added": "dodano",
@@ -2152,14 +2152,14 @@
     },
     "grid": {
       "toolbar": {
-        "ariaLabel": "",
+        "ariaLabel": "Filtry i sortowanie",
         "typeLabel": "",
-        "moviesToggle": "",
-        "showsToggle": "",
-        "searchPlaceholder": "",
-        "searchLabel": "",
+        "moviesToggle": "Filmy",
+        "showsToggle": "Seriale",
+        "searchPlaceholder": "Szukaj tytułów…",
+        "searchLabel": "Szukaj tytułów",
         "removeFilter": "",
-        "filtersLabel": "",
+        "filtersLabel": "Filtry",
         "filtersSheetTitle": "",
         "done": "",
         "watchedLabel": "",
@@ -2177,7 +2177,7 @@
         "hdrOnly": "",
         "hdrChip": "",
         "genreLabel": "",
-        "genreAll": "",
+        "genreAll": "Dowolny gatunek",
         "serverLabel": "",
         "serverAll": "",
         "libraryLabel": "",
@@ -2191,7 +2191,7 @@
         "sizeChipRange": "",
         "sortLabel": "",
         "sort": {
-          "title": "",
+          "title": "Tytuł A–Z",
           "added": "",
           "year": "",
           "plays": "",
@@ -2244,7 +2244,7 @@
       "item": ""
     },
     "flags": {
-      "fourK": "",
+      "fourK": "Prośba 4K",
       "auto": ""
     },
     "hero": {
