@@ -13,6 +13,7 @@ durzo
 -hstorey219 AI generated bug report. Duplicated bug report
 -iokernel Slop PR, did not follow contributing guide.
 -ionbazan - Contributing guide not read or followed
+-mafyuh Slop bug report
 -nullable-eth AI Slop PR - Contributing guide ignored
 pelluch
 -pilascat ai submission
