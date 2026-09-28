@@ -974,7 +974,7 @@
     "ownerOnly": "Tylko właściciel może zarządzać brandingiem e-mail i listą wyciszeń.",
     "branding": {
       "title": "Branding",
-      "description": "Używane w każdej wiadomości e-mail wysyłanej przez Tracearr: alerty i newslettery.",
+      "description": "Używane w każdej wiadomości e-mail wysyłanej przez Tracearr: powiadomienia i newslettery.",
       "logo": {
         "label": "Logo",
         "tracearr": "Tracearr",
