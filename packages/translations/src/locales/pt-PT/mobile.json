@@ -47,33 +47,33 @@
     "joinCommunity": "Junte-se à comunidade",
     "docs": "",
     "readDocs": "",
-    "website": "",
-    "visitWebsite": "",
-    "github": "",
+    "website": "Site",
+    "visitWebsite": "Visita tracearr.com",
+    "github": "Github",
     "viewSourceCode": "Ver código-fonte",
-    "sponsor": "",
-    "supportDevelopment": "",
+    "sponsor": "Patrocinador",
+    "supportDevelopment": "Apoia o desenvolvimento",
     "account": "conta",
-    "disconnect": "",
+    "disconnect": "Desconectar",
     "disconnectServer": "Desconectar servidor",
     "disconnectConfirm": "Tem certeza que deseja desconectar do \"{{serverName}}\"? Você precisará parear novamente para usar o aplicativo.",
     "disconnectConfirmGeneric": "Tem certeza que deseja desconectar? Você precisará parear novamente para usar o aplicativo.",
     "currentlyConnected": "Conectado atualmente a {{serverName}}",
-    "version": "",
-    "build": ""
+    "version": "Versão {{version}}",
+    "build": "Build {{build}}"
   },
   "navigation": {
-    "home": "",
+    "home": "Início",
     "selectServer": "Selecionar servidor",
     "server": "Servidor",
-    "navigation": ""
+    "navigation": "Navegação"
   },
   "resources": {
     "cpu": "cpu",
-    "ram": "",
+    "ram": "RAM",
     "item": "",
     "noData": "",
-    "system": "",
+    "system": "Sistema",
     "waiting": ""
   },
   "notifications": {
