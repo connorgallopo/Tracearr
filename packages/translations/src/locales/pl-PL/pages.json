@@ -451,7 +451,7 @@
     },
     "activity": {
       "title": "Aktywność",
-      "description": "",
+      "description": "Co zostało wykonane przez tę automatyzację. Lista przechowuje wykonania przez {{days}} dni.",
       "outcome": "Wynik",
       "who": "Kto",
       "where": "Gdzie",
@@ -467,7 +467,7 @@
         "error": "Niepowodzenie"
       },
       "empty": "Brak uruchomień",
-      "emptyDescription": "",
+      "emptyDescription": "Wykonania zostaną tu wyświetlone, gdy jedno z pasujących zdarzeń je wywoła.",
       "runTitle": "Uruchom",
       "runLoading": "Ładowanie uruchomienia",
       "triggeredBy": "Wywołane przez {{trigger}}",
@@ -487,8 +487,8 @@
       "openInEditor": "Otwórz w konstruktorze z tym uruchomieniem",
       "tabsLabel": "Filtruj wg wyniku",
       "emptyRan": "Nic nie zostało jeszcze dopasowane",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
+      "emptyRanDescription_one": "Sprawdzono {{count}} warunek bez dopasowania.",
+      "emptyRanDescription_other": "Sprawdzono {{count}} warunków bez dopasowania.",
       "item": "Element",
       "recordedViolation": "Zarejestrowano naruszenie"
     },
@@ -584,7 +584,7 @@
       },
       "conditions": {
         "addGroup": "Dodaj oddzielny zestaw warunków",
-        "fieldPlaceholder": "Wybierz coś do sprawdzenia",
+        "fieldPlaceholder": "Wybierz warunki do sprawdzenia",
         "windowPrefix": "w",
         "windowUnit": "godz.",
         "uniqueDevices": "Unikalne urządzenia",
@@ -605,12 +605,12 @@
         "any": "lub",
         "allHint": "i: każdy warunek musi być spełniony",
         "anyHint": "lub: wystarczy spełnienie jednego warunku",
-        "matchLabel": "",
+        "matchLabel": "Połącz te warunki przy użyciu",
         "fieldLabel": "Co sprawdzić",
         "operatorLabel": "Czy to",
         "valueLabel": "Wartość",
-        "canNeverPass": "",
-        "noFields": "",
+        "canNeverPass": "Ten warunek nie może być spełniony. Wyzwalacz jest już aktywowany przy {{threshold}}.",
+        "noFields": "Brak dostępnych warunków dla tych zdarzeń. Dodaj najpierw zdarzenie strumienia lub konta.",
         "groupSeparator": "a także",
         "addAnother": "Dodaj warunek",
         "addFirst": "Dodaj warunek",
@@ -646,7 +646,7 @@
         "emptyTitle": "Co powinno to wywołać?",
         "emptyDescription": "Rozpoczęcie strumieniowania, brak odpowiedzi serwera, nieaktywność konta.",
         "emptyAction": "Wybierz, co powoduje wywołanie",
-        "add": "Dodaj kolejny wyzwalacz",
+        "add": "Dodaj kolejne zdarzenie",
         "or": "lub"
       },
       "heldFor": {
@@ -686,8 +686,8 @@
       "footer": {
         "problems_one": "{{count}} do naprawienia",
         "problems_other": "{{count}} do naprawienia",
-        "remaining_one": "",
-        "remaining_other": "",
+        "remaining_one": "{{count}} pozostał do ukończenia",
+        "remaining_other": "{{count}} pozostało do ukończenia",
         "ready": "Gotowe do zapisania",
         "search": "by szukać"
       },
@@ -698,10 +698,10 @@
       "liveCheck": {
         "title": "Teraz na serwerach",
         "checking": "Sprawdzam, co teraz gra…",
-        "empty": "",
+        "empty": "Obecnie nic się nie jest odtwarzane; nie ma z czym porównać.",
         "failed": "Nie można połączyć się z serwerami do sprawdzenia.",
         "footnote": "Czasy odnowienia i obsłużone sesje nie są symulowane.",
-        "expand": "",
+        "expand": "Pokaż, co pasuje dla {{name}}",
         "passed": "",
         "notPassed": "",
         "actual": "teraz {{value}}",
