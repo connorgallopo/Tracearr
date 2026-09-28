@@ -32,7 +32,7 @@
     "sort": "Ordenar",
     "clear": "Limpar",
     "apply": "Aplicar",
-    "reset": "",
+    "reset": "Redefinir",
     "select": "Selecionar",
     "selectAll": "Selecionar Todos",
     "deselectAll": "Desmarcar Todos",
@@ -54,7 +54,7 @@
     "viewOnGithub": "Ver no GitHub",
     "later": "Mais tarde",
     "previous": "Anterior",
-    "reload": ""
+    "reload": "Recarregar"
   },
   "states": {
     "loading": "Carregandochar@@0",
@@ -85,9 +85,9 @@
     "directPlay": "Reprodução direta",
     "directStream": "Transmissão Direta",
     "transcode": "Transcodificar",
-    "hwTranscode": "",
+    "hwTranscode": "Transcodificação por Hardware",
     "burnIn": "",
-    "watched": ""
+    "watched": "Visto"
   },
   "severity": {
     "low": "baixa",
@@ -95,16 +95,16 @@
     "high": "alta"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "Confiável",
+    "caution": "Atenção",
+    "untrusted": "Não confiável"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "Tarefas em execução",
+    "running": "Em execução",
+    "waiting": "Em espera",
+    "queued": "Em fila",
+    "startedAgo": "Iniciado a {{time}}"
   },
   "time": {
     "now": "agora",
@@ -120,16 +120,16 @@
     "lastYear": "Ano passado",
     "byDay": "Por Dia",
     "byHour": "Por hora",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
-    "shortAll": "",
-    "timeRange": ""
+    "short7Days": "7d",
+    "short30Days": "30d",
+    "shortYear": "1a",
+    "shortAll": "Sempre",
+    "timeRange": "Intervalo de Tempo"
   },
   "units": {
     "km": "KM",
     "mi": "milhas",
-    "kmh": "",
+    "kmh": "km/h",
     "mph": "mi/h"
   },
   "labels": {
@@ -138,7 +138,7 @@
     "content": "Conteúdo",
     "platform": "Plataforma",
     "location": "Local:",
-    "local": "",
+    "local": "Local",
     "ipAddress": "Endereço IP",
     "quality": "Qualidade",
     "duration": "Duração",
@@ -182,15 +182,15 @@
     "items": "itens",
     "name": "Nome:",
     "product": "",
-    "deviceId": "",
-    "created": "",
-    "total": "",
-    "mediaLength": "",
-    "segments": "",
+    "deviceId": "ID do Dispositivo",
+    "created": "Criado",
+    "total": "total",
+    "mediaLength": "Duração da Mídia",
+    "segments": "Segmentos",
     "streamDetails": "Detalhes da transmissão",
     "transcodeReason": "Motivo da conversão",
-    "loadMore": "",
-    "playback": ""
+    "loadMore": "Carregar Mais",
+    "playback": "Playback"
   },
   "search": {
     "placeholder": "Buscar...",
@@ -200,22 +200,22 @@
   "table": {
     "selectAllOnPage": "Selecionar tudo na página",
     "selectRow": "Selecione a linha",
-    "pageOf": "",
-    "pagination": "",
-    "goToPage": ""
+    "pageOf": "Página {{page}} de {{total}}",
+    "pagination": "Paginação",
+    "goToPage": "Ir para a página {{page}}"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "Limpar tudo",
+    "done": "Concluído",
+    "remove": "Remover filtro {{label}}",
+    "clearSearch": "Limpar pesquisa",
+    "anyDate": "Qualquer data",
+    "dateAfter": "Após {{date}}",
+    "dateBefore": "Antes {{date}}",
+    "dateBetween": "{{from}} para {{to}}",
+    "clearDates": "Limpar intervalo de datas",
+    "clearStartDate": "Limpar data de início",
+    "clearEndDate": "Limpar data de fim"
   },
   "media": {
     "movie": "Filme",
@@ -231,9 +231,9 @@
     "music": "Música"
   },
   "servers": {
-    "plex": "",
-    "jellyfin": "",
-    "emby": ""
+    "plex": "Plex",
+    "jellyfin": "Jellyfin",
+    "emby": "Emby"
   },
   "validation": {
     "required": "Este campo é obrigatório",
@@ -267,18 +267,18 @@
     "user_other": "Usuários {{count}}",
     "session_one": "Sessão {{count}}",
     "session_other": "Sessões {{count}}",
-    "stream_one": "",
-    "stream_other": "",
+    "stream_one": "{{count}} stream",
+    "stream_other": "{{count}} streams",
     "server_one": "Servidor {{count}}",
     "server_other": "Servidores {{count}}",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} automação",
+    "automation_other": "{{count}} automações",
     "violation_one": "Violação do {{count}}",
     "violation_other": "Violações de {{count}}",
     "item_one": "Itens de {{count}}",
     "item_other": "Itens de {{count}}",
     "result_one": "Resultado em {{count}}",
-    "result_other": "",
+    "result_other": "{{count}} resultados",
     "selected_one": "{{count}} selecionado",
     "selected_other": "{{count}} selecionado",
     "usersAdded_one": "Usuário {{count}} adicionado",
