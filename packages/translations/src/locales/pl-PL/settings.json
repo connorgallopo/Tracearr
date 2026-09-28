@@ -36,7 +36,7 @@
       "connections": "Serwery multimedialne, z których Tracearr odczytuje sesje i biblioteki.",
       "posters": "Serwer, którego plakat ma pierwszeństwo, gdy tytuł istnieje na więcej niż jednym serwerze.",
       "plexAccounts": "Konta Plex.tv, które Tracearr wykorzystuje do odkrywania i autoryzacji serwerów.",
-      "destinations": "Gdzie przekazywane są powiadomienia i streszczenia.",
+      "destinations": "Gdzie przekazywane są powiadomienia i newslettery.",
       "guest": "To, co mogą zobaczyć wylogowani użytkownicy i goście.",
       "mobile": "Urządzenia sparowane z aplikacją mobilną Tracearr.",
       "remote": "Jak ludzie spoza Twojej sieci łączą się z tą instancją.",
