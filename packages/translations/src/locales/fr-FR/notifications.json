@@ -147,7 +147,7 @@
         "title": "Jeton d'appairage généré",
         "message": "Scannez le code QR avec votre appareil mobile pour appairer"
       },
-      "identityUpdated": "",
+      "identityUpdated": "Profil mis à jour",
       "trustScoresReset": {
         "title": "Réinitialiser les scores de confiance",
         "message_one": "{{count}} utilisateur réinitialisé à 100",
@@ -164,15 +164,15 @@
       "serverUserSplit": {
         "title": "Compte séparé en un utilisateur distinct"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
+      "mergeSuggestionDismissed": "Marqué comme personne différente",
+      "mergeSuggestionRestored": "Suggestion restaurée",
       "destinationSaved": "Destination enregistrée",
       "destinationDeleted": "Destination supprimée",
       "destinationTestSent": "Notification de test envoyée",
-      "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
+      "destinationTestSentTo": "Test envoyé à {{address}}",
+      "newsletterSaved": "Newsletter enregistrée",
+      "newsletterDeleted": "Newsletter supprimée",
+      "newsletterDuplicated": "Newsletter dupliquée",
       "newsletterTestQueued": "",
       "newsletterSendQueued": "",
       "newsletterRetryQueued": "",
