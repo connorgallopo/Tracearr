@@ -69,20 +69,20 @@
     "mergeReasonEmailUsername": "Oboje używają {{value}} jako nazwy użytkownika lub adresu e-mail konta.",
     "mergeReasonUsername": "Oboje używają nazwy użytkownika {{value}}.",
     "mergeKeep": "Zachowaj",
-    "mergeFoldIn": "",
+    "mergeFoldIn": "Zwiń i usuń",
     "mergeSwap": "Zamień który jest zachowany",
     "mergeRequired": "{{name}} może zalogować się do Tracearr, więc {{name}} jest zachowany.",
     "mergeLastActive": "Ostatnio aktywny {{relative}}",
-    "mergeNeverActive": "Nigdy aktywny",
+    "mergeNeverActive": "Nigdy nie aktywny",
     "mergeSessions_one": "{{count}} sesja",
     "mergeSessions_other": "{{count}} sesji",
     "mergeMoreServers": "+{{count}}",
-    "mergeWhatHappens": "Co się dzieje",
+    "mergeWhatHappens": "Co się stanie",
     "mergeMoves_one": "Konta serwera {{foldName}} i sesja {{count}} przenoszą się do {{keepName}}.",
     "mergeMoves_other": "Konta serwera {{foldName}} i sesje {{count}} przenoszą się do {{keepName}}.",
     "mergeMovesNoCount": "Konta i sesje serwera {{foldName}} przenoszą się do {{keepName}}.",
     "mergeCarriesOver": "Ich adres e-mail, wykluczenia z newslettera i prośby Seerr zostaną przeniesione.",
-    "mergeDeleted": "",
+    "mergeDeleted": "{{foldName}} został usunięty. Możesz ponownie podzielić konto na stronie {{keepName}}.",
     "mergeRulesKept": "Reguły dla serwera o tej samej nazwie zachowują wersję {{keepName}}.",
     "mergeIrreversibleTitle": "Tej operacji nie można cofnąć",
     "mergeIrreversibleBody": "Oba mają konto na tym samym serwerze. Łącząc te konta, ich sesje, naruszenia i wynik zaufania zostaną również połączone. Rozdzielenie ich później nie przywraca drugiego konta.",
@@ -165,7 +165,7 @@
     "deleteSession_one": "Usuń {{count}} Sesję",
     "deleteSession_other": "Usuń {{count}} Sesje",
     "deleteSessionsConfirm": "Czy na pewno chcesz to usunąć? Tej akcji nie można cofnąć.",
-    "totalPlays": "",
+    "totalPlays": "Całkowita liczba odtworzeń",
     "uniqueTitles": "Unikalne tytuły",
     "uniqueUsers": "Unikalni użytkownicy"
   },
@@ -228,7 +228,7 @@
       "failedToLoadDesc": "Nie można pobrać danych pamięci. Spróbuj ponownie.",
       "duplicatesTitle": "Duplikaty",
       "duplicatesSubtitle": "Tytuły przechowywane w więcej niż jednym fizycznym pliku, na wszystkich serwerach, bibliotekach i wersjach.",
-      "growthPreChangeover": "",
+      "growthPreChangeover": "na podstawie historii sprzed aktualizacji",
       "loadingDuplicates": "Ładowanie duplikatów...",
       "duplicatesFailed": "Nie udało się załadować duplikatów",
       "noDuplicatesTitle": "Nie znaleziono duplikatów",
@@ -241,12 +241,12 @@
       "sameServer": "Ten sam serwer",
       "mirror": "Mirror",
       "missingOnServer": "Brakujące na serwerze",
-      "missingOnServerHint": "",
+      "missingOnServerHint": "Serwer nadal wyświetla ten plik, ale nie może go znaleźć na dysku. Opróżnij kosz biblioteki w Plex, aby to naprawić.",
       "copyPath": "Kopiuj ścieżkę pliku"
     },
     "watch": {
       "title": "Obejrzyj Analitykę",
-      "description": "",
+      "description": "Zachowania związane z oglądaniem i interakcja z treścią.",
       "watched": "Obejrzane",
       "percentWatched": "% obejrzanych",
       "totalWatchTime": "Całkowity czas oglądania",
@@ -256,7 +256,7 @@
       "viewingHours": "Przeglądanie godzin",
       "peak": "Szczyt:",
       "monthlyTrends": "Miesięczne trendy",
-      "busiest": "",
+      "busiest": "Najbardziej oblegane:",
       "quietest": "Cichy test:",
       "bingeHighlights": "Podkreślenia Binge",
       "bingeHighlightsDesc": "Seriale z najbardziej intensywnymi wzorcami oglądania.",
@@ -270,8 +270,8 @@
       "checkingStatus": "Sprawdzanie stanu biblioteki...",
       "backfillAvailable": {
         "title": "Dostępne dane historyczne",
-        "bodyWithDays": "",
-        "bodyGeneric": "Wygeneruj historyczne zrzuty, aby zobaczyć trendy biblioteki w czasie.",
+        "bodyWithDays": "Twoja biblioteka posiada {{days}} dni historii. Wygeneruj migawki, by zobaczyć trendy na wykresach.",
+        "bodyGeneric": "Wygeneruj historyczne migawki, aby zobaczyć trendy biblioteki w czasie.",
         "syncRunningTitle": "Synchronizacja biblioteki w toku...",
         "syncRunningBody": "Generowanie danych historycznych rozpocznie się automatycznie po zakończeniu synchronizacji."
       },
@@ -294,9 +294,9 @@
       "notSyncedShort": "Jeszcze nie zsynchronizowano",
       "backfillRunning": {
         "title": "Generowanie danych historycznych...",
-        "fallbackBody": "Tworzenie zrzutów z historii biblioteki. Może to potrwać kilka minut.",
+        "fallbackBody": "Tworzenie migawek z historii biblioteki. Może to potrwać kilka minut.",
         "progress": "{{processed}} z {{total}} bibliotek",
-        "snapshotsSuffix": " ({{count}} zrzutów)"
+        "snapshotsSuffix": " ({{count}} migawek)"
       },
       "multiServer": {
         "title": "Niektóre biblioteki wymagają uwagi",
@@ -310,7 +310,7 @@
         "syncFailedTitle": "Nie udało się rozpocząć synchronizacji",
         "genericRetry": "Proszę spróbować ponownie.",
         "backfillStartedTitle": "Uzupełnianie rozpoczęte",
-        "backfillStartedDesc": "Trwa generowanie zrzutów historycznych.",
+        "backfillStartedDesc": "Trwa generowanie migawek historycznych.",
         "backfillFailedTitle": "Nie udało się uruchomić wypełniania kopii zapasowej",
         "backfillCompleteTitle": "Uzupełnianie zakończone",
         "backfillErrorTitle": "Uzupełnianie nie powiodło się"
@@ -486,7 +486,7 @@
       "whyBranch": "Co przeczytano",
       "openInEditor": "Otwórz w konstruktorze z tym uruchomieniem",
       "tabsLabel": "Filtruj wg wyniku",
-      "emptyRan": "",
+      "emptyRan": "Nic nie zostało jeszcze dopasowane",
       "emptyRanDescription_one": "",
       "emptyRanDescription_other": "",
       "item": "Element",
@@ -514,7 +514,7 @@
       "destinationsLabel": "Wyślij do",
       "required": "Wybierz co najmniej jeden.",
       "needs": {
-        "title": ""
+        "title": "Co jest wymagane"
       },
       "helper": {
         "killMessage": "Wyświetlane na odtwarzaczu po zatrzymaniu transmisji.",
@@ -534,7 +534,7 @@
         "sendNeedsDestination": "Wybierz co najmniej jedno miejsce docelowe",
         "nameRequired": "Nadaj nazwę tej automatyzacji",
         "scopeIncomplete": "Wybierz, kogo to dotyczy",
-        "triggerRequired": "",
+        "triggerRequired": "Dodaj lub włącz co najmniej jeden wyzwalacz",
         "policyNeedsSubject": "Naruszenia dotyczą osoby, więc wymaga to strumienia lub zdarzenia konta.",
         "fieldUnavailable": "",
         "operatorInvalid": "To porównanie nie pasuje do warunku",
@@ -551,11 +551,11 @@
         "tooLong": "Nie więcej niż {{max}} znaków"
       },
       "recordAs": {
-        "label": "",
+        "label": "Kiedy zostanie wykonana, zapisz ją jako",
         "policy": "Naruszenie",
-        "policyDescription": "",
+        "policyDescription": "Zarejestrowane w naruszeniach.",
         "notification": "Powiadomienie",
-        "notificationDescription": ""
+        "notificationDescription": "Zarejestrowane w aktywności; nigdy nie dochodzi do naruszenia."
       },
       "severityLabel": "Jak poważne?",
       "activeLabel": "Aktywna",
@@ -606,7 +606,7 @@
         "allHint": "i: każdy warunek musi być spełniony",
         "anyHint": "lub: wystarczy spełnienie jednego warunku",
         "matchLabel": "",
-        "fieldLabel": "",
+        "fieldLabel": "Co sprawdzić",
         "operatorLabel": "Czy to",
         "valueLabel": "Wartość",
         "canNeverPass": "",
@@ -704,7 +704,7 @@
         "expand": "",
         "passed": "",
         "notPassed": "",
-        "actual": "",
+        "actual": "teraz {{value}}",
         "unfinished": "Pokazuje, co automatyzacja zrobi po ukończeniu konfiguracji.",
         "paused": "",
         "sampleTitle": "",
@@ -716,9 +716,9 @@
       "session_behavior": "Zachowanie Sesji",
       "stream_quality": "Jakość transmisji",
       "user_attributes": "Atrybuty użytkownika",
-      "device_client": "",
-      "network_location": "",
-      "scope": "",
+      "device_client": "Urządzenie i klient",
+      "network_location": "Sieć i Lokalizacja",
+      "scope": "Kto i gdzie",
       "media": "Multimedia"
     },
     "createAutomation": "Utwórz automatyzację",
@@ -1064,7 +1064,7 @@
       },
       "library_item_type": {
         "label": "Typ elementu",
-        "description": ""
+        "description": "Jaki to rodzaj elementu biblioteki"
       },
       "library_name": {
         "label": "Biblioteka",
@@ -1161,13 +1161,13 @@
         "truncated": "Ten kod wygląda na przycięty.",
         "truncatedHint": "Skopiuj cały kod i wklej go ponownie; niektóre aplikacje czatu dzielą długie kody na osobne wiersze.",
         "tooNew": "Wymaga Tracearr {{required}} lub nowszego.",
-        "tooNewHint": "",
-        "tooMany": "",
-        "tooManyHint": "",
-        "rejected": "",
-        "rejectedHint": ""
+        "tooNewHint": "Ten serwer działa w wersji {{current}}. Zaktualizuj Tracearr, a następnie wklej ponownie.",
+        "tooMany": "To jest mnóstwo kodów w ciągu minuty.",
+        "tooManyHint": "Poczekaj chwilę, a następnie sprawdź ponownie.",
+        "rejected": "Tracearr nie mógł tego odczytać.",
+        "rejectedHint": "Może on pochodzić z innego narzędzia lub być edytowany ręcznie."
       },
-      "source": "",
+      "source": "Udostępnione automaty można znaleźć na docs.tracearr.com/templates.",
       "validCaveat": "",
       "builtinMatch": "To jest {{name}}, jedna z automatyzacji dostarczonych wraz z Tracearr."
     },
@@ -1333,23 +1333,23 @@
       "customizeFirst": "",
       "customizeFailed": "Nie udało się otworzyć w konstruktorze.",
       "upgradeFailed": "Nie udało się zaktualizować. Spróbuj ponownie.",
-      "gone": "",
-      "doorsHelper": ""
+      "gone": "Gotowa automatyzacja, z której zbudowano tę, nie jest już na tym serwerze.",
+      "doorsHelper": "Kroki pochodzą z gotowej automatyzacji i nie są edytowalne. Otwarcie w konstruktorze pozwoli na edycję każdego kroku i usuwa powiązanie."
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
+        "name": "Konto niektywne",
+        "description": "Zgłoś naruszenie, gdy konto będzie nieużywane przez określoną liczbę dni.",
         "keywords": ""
       },
       "concurrent-streams": {
-        "name": "",
-        "description": "",
+        "name": "Zbyt wiele strumieni na raz",
+        "description": "Zgłoś naruszenie, gdy konto odtwarza więcej strumieni na raz, niż na to pozwalasz.",
         "keywords": ""
       },
       "device-velocity": {
-        "name": "",
-        "description": "",
+        "name": "Wiele adresów IP w czasie",
+        "description": "Zgłasza naruszenie, gdy konto strumieniuje z większej liczby adresów IP w wybranym okresie, niż na to pozwalasz.",
         "keywords": ""
       },
       "geo-restriction": {
@@ -1443,20 +1443,20 @@
         "keywords": ""
       },
       "trust-score-changed": {
-        "name": "",
-        "description": "",
+        "name": "Zmienił się poziom zaufania",
+        "description": "Powiadom miejsce docelowe, gdy zmieni się poziom zaufania konta.",
         "keywords": ""
       }
     },
-    "title": "",
-    "toggleAutomation": "",
+    "title": "Automatyzacje",
+    "toggleAutomation": "Włącz lub wyłącz {{name}}",
     "tryAdjustingFilters": "",
     "units": {
-      "km": "",
-      "kmh": "",
-      "mbps": "",
-      "days": "",
-      "minutes": "",
+      "km": "km",
+      "kmh": "km/h",
+      "mbps": "Mb/s",
+      "days": "dni",
+      "minutes": "minut",
       "hours": "godzin",
       "gb": "GB",
       "seconds": "sekund"
@@ -1645,30 +1645,30 @@
     "destinations": {
       "add": "Dodaj miejsce docelowe",
       "alertsGoTo": "Powiadomienia są kierowane na {{count}} adres",
-      "alertsGoTo_other": "",
-      "builtinNote": "",
-      "clearSecret": "",
-      "delete": "",
-      "deleteConfirm": "",
-      "description": "",
-      "emailDescription": "",
-      "empty": "",
+      "alertsGoTo_other": "Powiadomienia są kierowane do {{count}} adresów",
+      "builtinNote": "Wbudowane",
+      "clearSecret": "Wyczyść",
+      "delete": "Usuń",
+      "deleteConfirm": "Usunąć {{name}}? Automatyzacje i newslettery, które jej używają, przestaną działać, dopóki nie zostaną zaktualizowane.",
+      "description": "Miejsca docelowe dla powiadomień. Dodaj ich tyle, ile chcesz, a automatyzacje mogą wysyłać do dowolnego z nich.",
+      "emailDescription": "Tracearr wysyła wiadomości e-mail, korzystając z tego serwera SMTP. Newslettery wybierają własnych odbiorców; powiadomienia z automatyzacji są kierowane do adresów poniżej.",
+      "empty": "Brak miejsc docelowych.",
       "fields": {
-        "webhookUrl": "",
-        "url": "",
-        "serverUrl": "",
-        "apiUrl": "",
-        "topic": "",
-        "authToken": "",
-        "userKey": "",
-        "apiToken": "",
-        "preset": "",
-        "host": "",
-        "port": "",
-        "security": "",
-        "verifyCertificate": "",
-        "username": "",
-        "password": "",
+        "webhookUrl": "Adres URL webhooka",
+        "url": "Adres URL",
+        "serverUrl": "Adres URL serwera",
+        "apiUrl": "Adres URL interfejsu API",
+        "topic": "Temat",
+        "authToken": "Token uwierzytelniający",
+        "userKey": "Klucz użytkownika",
+        "apiToken": "Token API",
+        "preset": "Dostawca",
+        "host": "Nazwa hosta STMP",
+        "port": "Port",
+        "security": "Bezpieczeństwo",
+        "verifyCertificate": "Weryfikacja certyfikatu",
+        "username": "Nazwa użytkownika",
+        "password": "Hasło",
         "fromName": "Nazwa nadawcy",
         "fromAddress": "Adres nadawcy",
         "to": "Odbiorcy powiadomień",
@@ -1683,17 +1683,17 @@
       },
       "hints": {
         "authTokenOptional": "Opcjonalnie w przypadku tematów publicznych",
-        "smtpPreset": "",
+        "smtpPreset": "Wypełnia host, port i bezpieczeństwo dla wybranych dostawców. Amazon SES i Mailgun EU wymagają regionu w nazwie hosta.",
         "smtpVerifyCertificate": "Sprawdza certyfikat TLS serwera poczty z zaufanym organem. Wyłącz tylko dla serwera z samodzielnie podpisanym certyfikatem, na przykład lokalny most: każdy na drodze między Tracearr a serwerem pocztowym może przechwycić połączenie.",
         "smtpUsernameOptional": "Pozostaw puste, gdy serwer nie wymaga logowania",
-        "smtpTo": "",
-        "smtpRate": "",
-        "smtpMessageStream": "",
-        "smtpGmailUsername": "",
-        "smtpGmailPassword": "",
-        "smtpResendUsername": "",
-        "smtpResendPassword": "",
-        "smtpSendgridUsername": "",
+        "smtpTo": "Powiadomienia są wysyłane jako jeden e-mail z tymi adresatami. Pozostaw puste, jeśli ten serwer wysyła tylko newslettery.",
+        "smtpRate": "Na instancję Tracearr; utrzymuj go poniżej limitu dostawcy",
+        "smtpMessageStream": "Tylko dla Postmark: ID strumienia do wysłania, na przykład broadcast. W przeciwnym wypadku, pozostaw puste.",
+        "smtpGmailUsername": "Twój pełny adres Gmail. Gmail wysyła z tego adresu bez względu na adres nadawcy. Konta osobiste mają limit około 500 odbiorców dziennie.",
+        "smtpGmailPassword": "Hasło aplikacji z konta Google> Zabezpieczenie > 2-etapowa Weryfikacja > Hasła aplikacji. Hasło do konta jest odrzucone.",
+        "smtpResendUsername": "Słowo \"resend\", dosłownie.",
+        "smtpResendPassword": "Twój klucz API Resend. Domena nadawcy musi najpierw zostać zweryfikowana w Resend.",
+        "smtpSendgridUsername": "Słowo „apikey”, dosłownie.",
         "smtpSendgridPassword": "Twój klucz API SendGrid.",
         "smtpMailgunUsername": "postmaster@yourdomain, nie twój login Mailgun.",
         "smtpMailgunPassword": "Hasło SMTP z ustawień tej domeny. Domena sandbox dociera tylko do autoryzowanych odbiorców.",
@@ -1701,8 +1701,8 @@
         "smtpBrevoPassword": "Klucz SMTP z SMTP i API > SMTP, a nie klucz API.",
         "smtpSesUsername": "Nazwa użytkownika SMTP z konsoli SES, a nie klucz dostępu IAM. Umieść swój region w nazwie hosta.",
         "smtpSesPassword": "Hasło SMTP z konsoli SES. Konta Sandbox wysyłają 200 wiadomości dziennie tylko na zweryfikowane adresy.",
-        "smtpPostmarkUsername": "",
-        "smtpPostmarkPassword": ""
+        "smtpPostmarkUsername": "Twój token API serwera.",
+        "smtpPostmarkPassword": "Ten sam token API serwera lub tajny token strumieniowy."
       },
       "newsletterAlertsNote": "",
       "newsletterDescription": "Tracearr wysyła newslettery przez ten serwer SMTP.",
@@ -1726,13 +1726,13 @@
       "pushNote": "Dostarczane na sparowane urządzenia mobilne; każde urządzenie filtruje we własnych ustawieniach powiadomień.",
       "receiveViolations": "Otrzymuj naruszenia",
       "receiveViolationsHint": "Wyślij każde naruszenie do tego miejsca docelowego.",
-      "receiveViolationsNeedsRecipients": "",
-      "reencrypt": "",
-      "rowActions": "",
-      "secretSet": "",
+      "receiveViolationsNeedsRecipients": "Dodaj odbiorców powiadomień, aby wysłać informacje o naruszeniach",
+      "reencrypt": "Wprowadź ponownie sekret tego miejsca docelowego",
+      "rowActions": "Akcje miejsc docelowych",
+      "secretSet": "Ustaw (pozostaw puste, aby zachować)",
       "test": "Testuj",
-      "testHint": "",
-      "testNeedsForm": "",
+      "testHint": "Zapisz zmiany, by przetestować",
+      "testNeedsForm": "Wypełnij wymagane pola, by przetestować",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "Webhook (JSON)",
@@ -1912,7 +1912,7 @@
     "suspicious": "Podejrzany",
     "ok": "OK",
     "selected": "zaznaczone",
-    "snapshots": "",
+    "snapshots": "migawki",
     "of": "z",
     "logExplorerUnavailable": "Eksplorator dzienników jest dostępny tylko w środowiskach dokujących"
   },
@@ -2021,69 +2021,69 @@
         },
         "availability": {
           "added": "dodano {{date}}",
-          "addedRemoved": "",
-          "replaced": ""
+          "addedRemoved": "dodano {{added}} - usunięto {{removed}}",
+          "replaced": "zastąpiono {{date}}"
         },
         "removedEverywhere": {
-          "caption": ""
+          "caption": "Nie jest już dostępne na żadnym połączonym serwerze"
         },
         "actions": {
-          "fullHistory": "",
-          "openOnServer": ""
+          "fullHistory": "Pełna historia",
+          "openOnServer": "Otwórz na serwerze"
         }
       },
       "kpis": {
         "ariaLabel": "Statystyki oglądalności",
         "loadError": "Nie udało się załadować statystyk oglądalności",
-        "completionLoadError": "",
+        "completionLoadError": "Nie można załadować ukończeń",
         "plays": {
-          "label": "",
-          "caption": ""
+          "label": "Całkowita liczba odtworzeń",
+          "caption": "odtworzenia, wykluczając krótkie sesje"
         },
         "watchTime": {
-          "label": "",
-          "detail": ""
+          "label": "Czas oglądania",
+          "detail": "+{{hours}}h w ciągu ostatnich 30 dni"
         },
         "viewers": {
-          "label": "",
-          "detail": ""
+          "label": "Widzowie",
+          "detail": "na wszystkich serwerach"
         },
         "completion": {
-          "label": "",
-          "detail": "",
-          "detailMovie": ""
+          "label": "Średnie ukończenie",
+          "detail": "{{finished}} z {{total}} ukończyło wszystkie odcinki",
+          "detailMovie": "{{finished}} z {{total}} obejrzało do końca"
         }
       },
       "watchers": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "lastWatchedAgo": "",
-        "completionLabel": "",
+        "title": "Oglądający",
+        "loadError": "Nie udało się załadować oglądających",
+        "empty": "Nikt jeszcze tego nie obejrzał.",
+        "lastWatchedAgo": "{{age}} temu",
+        "completionLabel": "{{percent}}% ukończono",
         "columns": {
-          "user": "",
-          "plays": "",
-          "episodes": "",
-          "completion": "",
-          "lastWatched": ""
+          "user": "Użytkownik",
+          "plays": "Odtworzenia",
+          "episodes": "Odcinki",
+          "completion": "Ukończenie",
+          "lastWatched": "Ostatnio obejrzane"
         }
       },
       "seasons": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "title": "Sezony",
+        "loadError": "Nie udało się załadować danych o sezonach",
+        "empty": "Brak danych o sezonach",
+        "episodeCount_one": "{{count}} odcinek",
+        "episodeCount_other": "{{count}} odcinków",
+        "watchedPct": "{{percent}}% obejrzano",
+        "stripSummary": "{{season}}: {{percent}}% obejrzano",
         "episodeLabel": {
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "watched": "{{code}}: obejrzano",
+          "partial": "{{code}}: częściowo obejrzano",
+          "unwatched": "{{code}}: nieobejrzany"
         }
       },
       "platforms": {
-        "title": "",
+        "title": "Platformy",
         "loadError": "Nie udało się załadować podziału na platformy",
         "empty": "Brak danych o platformach",
         "unknown": "Nieznana",
@@ -2249,7 +2249,7 @@
     },
     "hero": {
       "line": "Zamówione przez {{name}} · {{date}} · {{tail}}",
-      "landed": "",
+      "landed": "wyładował {{wait}} później",
       "waiting": "nadal czekają"
     },
     "mediaPanel": {
