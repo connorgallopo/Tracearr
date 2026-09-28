@@ -33,7 +33,7 @@
     "invalidOrExpiredToken": "Token parowania jest nieprawidłowy lub wygasł.",
     "invalidPairingRequest": "Niepoprawna prośba o parowanie. Sprawdź token.",
     "errorDetails": "Szczegóły błędu:",
-    "componentStack": "",
+    "componentStack": "Stos komponentów:",
     "connectionLost": "Utracono połączenie",
     "failedToLoadSession": "Nie udało się załadować sesji"
   },
@@ -60,7 +60,7 @@
     "disconnectConfirmGeneric": "Czy jesteś pewien, że chcesz się rozłączyć? Będziesz musiał sparować ponownie, aby używać aplikacji.",
     "currentlyConnected": "Obecnie połączono z {{serverName}}",
     "version": "Wersja {{version}}",
-    "build": ""
+    "build": "Wersja {{build}}"
   },
   "navigation": {
     "home": "Strona główna",
@@ -94,19 +94,19 @@
     "allViolationTypes": "Wszystkie rodzaje naruszeń",
     "notifyForEveryRule": "Powiadamiaj dla każdego typu reguły",
     "severityDescription": "Powiadamiaj tylko o naruszeniach na tym poziomie lub wyżej",
-    "quietHoursDescription": "",
+    "quietHoursDescription": "Wstrzymaj niekrytyczne powiadomienia w trakcie wybranych godzin",
     "startTime": "Czas rozpoczęcia",
     "endTime": "Czas zakończenia",
     "to": "do",
     "timezoneLabel": "Strefa czasowa: {{timezone}}",
-    "criticalOverrideDescription": "",
+    "criticalOverrideDescription": "Naruszenia o wysokim poziomie nadal wysyłają powiadomienia w godzinach ciszy",
     "rateLimitDescription": "Limity częstotliwości zapobiegają spamowi powiadomień. Obecne limity: {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Wyślij powiadomienie testowe",
     "testDescription": "Sprawdź, czy powiadomienia wysyłane działają poprawnie",
     "pushNotifications": "Powiadomienia Push",
     "ruleTypes": {
       "accountInactivity": "Nieaktywność konta",
-      "deviceVelocity": "",
+      "deviceVelocity": "Prędkość urządzenia",
       "geoRestriction": "Ograniczenie geograficzne",
       "impossibleTravel": "Niemożliwa podróż",
       "simultaneousLocations": "Jednoczesne Lokalizacje"
@@ -141,20 +141,20 @@
   "alerts": {
     "clearFilters": "Oczyścić filtry",
     "acknowledgeAll": "Potwierdź wszystkie",
-    "acknowledgeAllBody": "",
-    "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
+    "acknowledgeAllBody": "Każde oczekujące powiadomienie na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
+    "acknowledgeAllBodySeverity": "Każde oczekujące powiadomienie o poziomie {{severity}} na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
+    "acknowledgeAllTitle_one": "Potwierdzić {{count}} powiadomienie?",
+    "acknowledgeAllTitle_other": "Potwierdzić {{count}} powiadomień?",
     "all": "Wszystkie",
-    "allClear": "",
+    "allClear": "Wszystko wyczyszczone",
     "allServers": "wszystkie serwery",
-    "noAlertsRecorded": "",
+    "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
     "noMatches": "Brak pasujących alertów",
     "pendingCount": "{{count}} oczekujących"
   },
   "history": {
-    "adjustFilters": "",
-    "historyWillAppear": "",
+    "adjustFilters": "Spróbuj dostosować swoje filtry",
+    "historyWillAppear": "Historia sesji pojawi się tutaj, gdy użytkownicy rozpoczną strumieniowanie",
     "filters": {
       "clearCount": "Wyczyść ({{count}})",
       "countries": "Kraje",
@@ -215,56 +215,56 @@
   "automations": {
     "conditions_one": "{{count}} warunek",
     "conditions_other": "{{count}} warunki",
-    "editOnWeb": "",
+    "editOnWeb": "Automatyzacje mogą być tworzone i edytowane w aplikacji Web Tracearr.",
     "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawiają się tutaj.",
     "kind": {
       "notification": "Powiadomienia",
       "policy": "Zasady"
     },
     "lastRun": "Ostatnie uruchomienie {{when}}",
-    "truncated": "",
-    "turnOffFailed": "",
-    "turnOnFailed": "",
-    "unsupportedDescription": "",
-    "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "truncated": "Wyświetlono pierwsze {{shown}} z {{total}} automatyzacji. Pozostałe są dostępne w aplikacji Web Tracearr.",
+    "turnOffFailed": "Nie udało się wyłączyć. Nadal jest włączona.",
+    "turnOnFailed": "Nie udało się włączyć. Nadal jest wyłączona.",
+    "unsupportedDescription": "Ten serwer zgłasza wersję {{version}}. Zaktualizuj Tracearr, aby zobaczyć automatyzacje i ich wykonania.",
+    "unsupportedTitle": "Automatyzacje wymagają serwera 2.2 lub nowszego",
+    "versionCheckFailed": "Nie udało się sprawdzić wersji serwera"
   },
   "charts": {
-    "weekOf": ""
+    "weekOf": "Tydzień {{date}}"
   },
   "push": {
-    "violationTitle": ""
+    "violationTitle": "{{severity}} Naruszenie"
   },
   "streamDetails": {
-    "bitrate": "",
-    "channels": "",
-    "codec": "",
-    "color": "",
-    "container": "",
-    "forced": "",
-    "format": "",
-    "framerate": "",
-    "hwDecode": "",
-    "hwEncode": "",
-    "mono": "",
-    "noDetails": "",
-    "notAvailable": "",
-    "profile": "",
-    "sampleRate": "",
-    "source": "",
-    "speed": "",
-    "stereo": "",
-    "stream": "",
-    "subtitles": "",
-    "throttled": "",
-    "transcodeDetails": ""
+    "bitrate": "Przepływność (bitrate)",
+    "channels": "Kanały",
+    "codec": "Kodek",
+    "color": "Kolor",
+    "container": "Kontener",
+    "forced": "Wymuszone",
+    "format": "Format:",
+    "framerate": "Liczba klatek na sekundę",
+    "hwDecode": "Dekodowanie HW",
+    "hwEncode": "Kodowanie HW",
+    "mono": "Mono",
+    "noDetails": "Brak szczegółowych informacji dotyczących strumienia",
+    "notAvailable": "Nd.",
+    "profile": "Profil",
+    "sampleRate": "Częstotliwość próbkowania",
+    "source": "Źródło",
+    "speed": "Prędkość",
+    "stereo": "Stereo",
+    "stream": "Strumień",
+    "subtitles": "Napisy",
+    "throttled": "ograniczony",
+    "transcodeDetails": "Szczegóły transkodowania"
   },
   "widget": {
-    "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
-    "signedOut": "",
-    "transcodes_one": "",
-    "transcodes_other": ""
+    "asOf": "zaktualizowano {{time}}",
+    "serversDown_one": "{{count}} serwer nieaktywny",
+    "serversDown_other": "{{count}} serwety nieaktywne",
+    "signedOut": "Otwórz Tracearr, aby sparować serwer.",
+    "transcodes_one": "{{count}} transkodowanie",
+    "transcodes_other": "{{count}} transkodowań"
   }
 }
