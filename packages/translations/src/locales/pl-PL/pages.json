@@ -85,7 +85,7 @@
     "mergeDeleted": "{{foldName}} został usunięty. Możesz ponownie podzielić konto na stronie {{keepName}}.",
     "mergeRulesKept": "Reguły dla serwera o tej samej nazwie zachowują wersję {{keepName}}.",
     "mergeIrreversibleTitle": "Tej operacji nie można cofnąć",
-    "mergeIrreversibleBody": "Oba mają konto na tym samym serwerze. Łącząc te konta, ich sesje, naruszenia i wynik zaufania zostaną również połączone. Rozdzielenie ich później nie przywraca drugiego konta.",
+    "mergeIrreversibleBody": "Oba mają konto na tym samym serwerze. Łącząc te konta, ich sesje, naruszenia i poziom zaufania zostaną również połączone. Rozdzielenie ich później nie przywraca drugiego konta.",
     "mergeServerLabel": "Serwer",
     "mergeServerUnknown": "Nieznany serwer",
     "mergeIrreversibleAcknowledge": "Rozumiem, że dwa konta na tym serwerze nie mogą być ponownie oddzielone",
@@ -398,8 +398,8 @@
         "ran": "Wysłano powiadomienie"
       },
       "trust": {
-        "label": "Wynik zaufania",
-        "description": "Dostosuj, ustaw lub zresetuj wynik zaufania",
+        "label": "Poziom zaufania",
+        "description": "Dostosuj, ustaw lub zresetuj poziom zaufania",
         "fields": {
           "mode": {
             "label": "Tryb"
@@ -412,7 +412,7 @@
             "label": "Wartość"
           }
         },
-        "ran": "Zmieniono wynik zaufania"
+        "ran": "Zmieniono poziom zaufania"
       },
       "kill_stream": {
         "label": "Przerwij transmisję",
@@ -622,7 +622,7 @@
         "ifTitle": "Jeśli…",
         "helper": "Wykonują się kolejno, od góry do dołu.",
         "emptyTitle": "Co powinno się wydarzyć?",
-        "emptyDescription": "Wyślij powiadomienie, zatrzymaj transmisję, zmień wynik zaufania lub wykonaj kroki tylko gdy dodatkowy warunek jest spełniony.",
+        "emptyDescription": "Wyślij powiadomienie, zatrzymaj transmisję, zmień poziom zaufania lub wykonaj kroki, tylko gdy dodatkowy warunek jest spełniony.",
         "emptyAction": "Wybierz akcję",
         "moveUp": "Przenieś {{name}} wyżej",
         "moveDown": "Przenieś {{name}} niżej",
@@ -762,7 +762,7 @@
         "sessionHeldForTotal": "strumień został wstrzymany w sumie przez {{duration}}",
         "accountInactiveFor": "konto jest nieaktywne przez {{duration}}",
         "accountNewDevice": "konto odtwarza z nowego urządzenia",
-        "accountTrustChanged": "zmiana wyniku zaufania konta",
+        "accountTrustChanged": "zmiana poziomu zaufania konta",
         "mediaAdded": "media zostały dodane",
         "mediaUpgraded": "ulepszono jakość medium",
         "serverDown": "serwer zostaje wyłączony",
@@ -802,7 +802,7 @@
         "is_transcode_downgrade": "obniżenie jakości",
         "source_bitrate_mbps": "źródłowy bitrate",
         "user_id": "użytkownik",
-        "trust_score": "wynik zaufania",
+        "trust_score": "poziom zaufania",
         "account_age_days": "wiek konta",
         "device_type": "typ urządzenia",
         "client_name": "odtwarzacz",
