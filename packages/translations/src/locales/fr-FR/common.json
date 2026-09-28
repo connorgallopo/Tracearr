@@ -120,9 +120,9 @@
     "lastYear": "L'année dernière",
     "byDay": "Par jour",
     "byHour": "Par heure",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
+    "short7Days": "7 j",
+    "short30Days": "30 j",
+    "shortYear": "1 a",
     "shortAll": "",
     "timeRange": ""
   },
