@@ -131,8 +131,8 @@
     "noTerminations": "Brak zakończenia strumienia",
     "lastSeen": "Ostatnio widziany {{relative}}",
     "terminatedBy": "Przez @{{username}}",
-    "trustScoreConfirm": "Ustawić wynik zaufania dla @{{username}} na {{score}}?",
-    "trustScoreRange": "Wynik zaufania dla @{{username}}, od 0 do 100."
+    "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
+    "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100."
   },
   "violation": {
     "violationNotFoundDesc": "To naruszenie mogło zostać odrzucone lub nie jest już dostępne.",
@@ -149,7 +149,7 @@
     "allClear": "Wszystko wyczyszczone",
     "allServers": "wszystkie serwery",
     "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
-    "noMatches": "Brak pasujących alertów",
+    "noMatches": "Brak pasujących powiadomień",
     "pendingCount": "{{count}} oczekujących"
   },
   "history": {
