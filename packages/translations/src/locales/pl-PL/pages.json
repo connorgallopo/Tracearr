@@ -500,11 +500,11 @@
       "namePlaceholder": "Nazwa dla tej automatyzacji",
       "activeLabel": "Włącz teraz",
       "back": "Powrót",
-      "submit": "Użyj",
+      "submit": "Użyj szablonu",
       "submitting": "Konfigurowanie…",
       "customize": "Otwórz w konstruktorze",
       "doors": {
-        "helper": ""
+        "helper": "\"Użyj szablonu\" tworzy kroki na podstawie schematu; odpowiedzi na powyższe pytania mogą zostać zmienione później. Po otwarciu w konstruktorze każdy z kroków może być edytowany, ale przerywa powiązanie z wbudowaną automatyzacją."
       },
       "anyServer": "Dowolny serwer",
       "serverHelper": "Dowolny serwer oznacza wszystkie z nich.",
@@ -536,11 +536,11 @@
         "scopeIncomplete": "Wybierz, kogo to dotyczy",
         "triggerRequired": "Dodaj lub włącz co najmniej jeden wyzwalacz",
         "policyNeedsSubject": "Naruszenia dotyczą osoby, więc wymaga to strumienia lub zdarzenia konta.",
-        "fieldUnavailable": "",
+        "fieldUnavailable": "Ten warunek nie jest dostępny dla żadnego ze zdarzeń",
         "operatorInvalid": "To porównanie nie pasuje do warunku",
         "valueInvalid": "Ta wartość nie pasuje do warunku",
-        "actionUnavailable": "",
-        "variableUnavailable": "",
+        "actionUnavailable": "Te zdarzenia nie dostarczają wymaganych informacji dla tej akcji",
+        "variableUnavailable": "Wiadomość zawiera parametry, które nie są dostarczany przez niektóre ze zdarzeń",
         "minutesRange": "Między {{min}} a {{max}} minut",
         "daysRange": "Między {{min}} a {{max}} dni",
         "measureInvalid": "Wybierz sposób liczenia minut",
@@ -577,7 +577,7 @@
         "accountPlaceholder": "Wybierz konto",
         "personLabel": "Osoba",
         "personPlaceholder": "Wybierz osobę",
-        "personHelper": "",
+        "personHelper": "Dopasuje tę osobę na każdym serwerze, na którym ma konto.",
         "noServers": "Brak połączonych serwerów.",
         "enforceAcrossServers": "Działaj na strumieniach na którymkolwiek z serwerów",
         "enforceAcrossServersDescription": "Działa na sesjach danej osoby na którymkolwiek z jej serwerów, nie tylko tym, które ją wyzwalały. Domyślnie wyłączone."
@@ -597,7 +597,7 @@
         "no": "Nie",
         "recentlySeen": "Ostatnio widziany",
         "allCountries": "Wszystkie kraje",
-        "sectionTitle": "I tylko jeśli…",
+        "sectionTitle": "I tylko wtedy, gdy…",
         "optional": "opcjonalne",
         "helper": "Warunki, które muszą być spełnione wcześniej. Brak oznacza uruchamianie za każdym razem.",
         "emptyLine": "Brak dodatkowych warunków. Uruchamia się za każdym razem.",
@@ -618,7 +618,7 @@
       },
       "actions": {
         "add": "Dodaj kolejną akcję",
-        "sectionTitle": "Następnie…",
+        "sectionTitle": "Wtedy…",
         "ifTitle": "Jeśli…",
         "helper": "Wykonują się kolejno, od góry do dołu.",
         "emptyTitle": "Co powinno się wydarzyć?",
@@ -630,7 +630,7 @@
         "branchName": "ta gałąź",
         "confirmRemoveTitle": "Usunąć tę akcję?",
         "confirmRemoveDescription": "Przestanie działać po zapisaniu.",
-        "policyNote": "",
+        "policyNote": "Gałąź nie decyduje, czy jest to oznaczone, w przeciwieństwie do sekcji \"I tylko wtedy, gdy…\".",
         "branchThen": "Zrób to",
         "branchElse": "W przeciwnym razie",
         "branchElseEmpty": "Nic. Automatyzacja działa dalej.",
@@ -653,7 +653,7 @@
         "prefix": "Strumień wstrzymany przez",
         "minutesLabel": "Minut",
         "unit": "minut",
-        "measureLabel": "",
+        "measureLabel": "Zliczony",
         "current": "tym razem",
         "total": "w sumie"
       },
@@ -700,16 +700,16 @@
         "checking": "Sprawdzam, co teraz gra…",
         "empty": "Obecnie nic się nie jest odtwarzane; nie ma z czym porównać.",
         "failed": "Nie można połączyć się z serwerami do sprawdzenia.",
-        "footnote": "Czasy odnowienia i obsłużone sesje nie są symulowane.",
+        "footnote": "Okresy karencji i już obsłużone sesje nie są symulowane.",
         "expand": "Pokaż, co pasuje dla {{name}}",
-        "passed": "",
-        "notPassed": "",
+        "passed": "Spełniony",
+        "notPassed": "Niespełniony",
         "actual": "teraz {{value}}",
         "unfinished": "Pokazuje, co automatyzacja zrobi po ukończeniu konfiguracji.",
-        "paused": "",
-        "sampleTitle": "",
-        "sampleGone": "",
-        "backToLive": ""
+        "paused": "Wstrzymane podczas zapisu",
+        "sampleTitle": "Co zostałoby zrobione dla tego wykonania",
+        "sampleGone": "Sesja ta nie jest już zarejestrowana; nie ma z czym porównać.",
+        "backToLive": "Powrót do tego, co teraz odtwarzane"
       }
     },
     "categories": {
@@ -737,13 +737,13 @@
       "when": "Kiedy {{text}}",
       "or": "lub {{text}}",
       "nothing": "na razie pusto",
-      "onlyWhen": "i tylko jeśli",
+      "onlyWhen": "i tylko wtedy, gdy",
       "andAlso": "a także",
       "allOf": "wszystkie z:",
       "anyOf": "którekolwiek z:",
       "joinAll": "oraz",
       "joinAny": "lub",
-      "then": "następnie {{text}}",
+      "then": "wtedy {{text}}",
       "otherwise": "W przeciwnym razie",
       "appliesTo": "Dotyczy {{name}}",
       "duration": {
@@ -753,7 +753,7 @@
         "days_other": "{{count}} dni"
       },
       "triggers": {
-        "sessionStarted": "strumień zaczyna się",
+        "sessionStarted": "rozpoczyna się strumieniowanie",
         "sessionFirstSeen": "strumień widziany po raz pierwszy",
         "sessionStopped": "strumień jest zatrzymany",
         "sessionTranscodeChanged": "transkodowanie rozpoczyna się lub zatrzymuje",
@@ -915,16 +915,16 @@
     "evaluations": {
       "disclosure": "Dopasowania, które nie rozpoczęły działania ({{total}})",
       "reasons": {
-        "cooldown_active": "",
-        "edge_replayed": "",
-        "gate_blocked": "",
+        "cooldown_active": "Okres karencji był aktywny",
+        "edge_replayed": "Ta sama krawędź jest już obsługiwana",
+        "gate_blocked": "Otwarte wykonanie już to pokrywa",
         "trigger_filter_failed": "Próg wyzwalania nie został osiągnięty"
       }
     },
     "export": {
       "title": "Udostępnij tę automatyzację",
       "description": "Kod, który można wkleić na innej instancji Tracearr.",
-      "carries": "",
+      "carries": "Kod zawiera tylko kroki. Miejsca docelowe, serwery i konta nie są uwzględnione; odbiorca kodu konfiguruje je samodzielnie.",
       "copyCode": "Skopiuj kod udostępniania",
       "copyJson": "Skopiuj JSON",
       "authorLabel": "Autor",
@@ -940,7 +940,7 @@
       "groupHelper": "Wybierz, w której sekcji galerii znajdzie się ta automatyzacja.",
       "gallery": {
         "trigger": "Umieść w galerii społeczności",
-        "body": ""
+        "body": "Galeria na docs.tracearr.com/templates zawiera automatyzacje udostępnione przez społeczność. Dodanie nowej wiąże się z otwarciem Pull Request dla Tracearr/Automation-templates z JSON poniżej. Tracearr nie wyświetla tej galerii."
       },
       "openRepository": "Otwórz repozytorium"
     },
@@ -1168,7 +1168,7 @@
         "rejectedHint": "Może on pochodzić z innego narzędzia lub być edytowany ręcznie."
       },
       "source": "Udostępnione automaty można znaleźć na docs.tracearr.com/templates.",
-      "validCaveat": "",
+      "validCaveat": "Kod nie mówi o tym, kto go napisał, ani czy jest bezpieczny. Kroki znajdują się poniżej.",
       "builtinMatch": "To jest {{name}}, jedna z automatyzacji dostarczonych wraz z Tracearr."
     },
     "kind": {
@@ -1185,7 +1185,7 @@
     "thisAutomation": "Ta automatyzacja",
     "cooldownLabel": "Co najwyżej raz na",
     "cooldownInvalid": "Wprowadź całkowitą liczbę minut, 0 lub więcej, lub zostaw puste.",
-    "retentionLabel": "",
+    "retentionLabel": "Zachowaj historię wykonań przez",
     "retentionPlaceholder": "{{days}}",
     "retentionInvalid": "Wprowadź całkowitą liczbę dni, co najmniej 1, lub zostaw puste.",
     "noAutomationsFound": "Nie znaleziono automatyzacji",
@@ -1260,7 +1260,7 @@
       "customized": "Dostosowana z {{name}}",
       "customizedFromRemoved": "Dostosowana z gotowej automatyzacji, która została od tego czasu usunięta"
     },
-    "recordsOnly": "",
+    "recordsOnly": "Tylko zapisuje informacje o wykonaniach",
     "scope": {
       "global": "Globalnie",
       "person": "Osoba",
@@ -1292,7 +1292,7 @@
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": ""
+        "label": "Okres karencji"
       },
       "target": {
         "label": "Cel"
@@ -1330,7 +1330,7 @@
       "customizeTitle": "Otworzyć to w konstruktorze?",
       "customizeConfirm": "Otwarcie go w konstruktorze sprawia, że automatyzacja staje się niezależna: każdy krok jest edytowalny i nie otrzymuje już fabrycznych aktualizacji. Tej operacji nie można cofnąć.",
       "customizeConfirmAction": "Otwórz w konstruktorze",
-      "customizeFirst": "",
+      "customizeFirst": "Ta automatyzacja śledzi zmiany z wbudowanej automatyzacji. Otwórz ją najpierw w konstruktorze.",
       "customizeFailed": "Nie udało się otworzyć w konstruktorze.",
       "upgradeFailed": "Nie udało się zaktualizować. Spróbuj ponownie.",
       "gone": "Gotowa automatyzacja, z której zbudowano tę, nie jest już na tym serwerze.",
@@ -1340,17 +1340,17 @@
       "account-inactivity": {
         "name": "Konto niektywne",
         "description": "Zgłoś naruszenie, gdy konto będzie nieużywane przez określoną liczbę dni.",
-        "keywords": ""
+        "keywords": "bezczynne nieużywane nieużywane nieaktywne konto czyszczenia"
       },
       "concurrent-streams": {
         "name": "Zbyt wiele strumieni na raz",
         "description": "Zgłoś naruszenie, gdy konto odtwarza więcej strumieni na raz, niż na to pozwalasz.",
-        "keywords": ""
+        "keywords": "limit limit równoczesnego udostępniania zbyt wielu strumieni"
       },
       "device-velocity": {
         "name": "Wiele adresów IP w czasie",
         "description": "Zgłasza naruszenie, gdy konto strumieniuje z większej liczby adresów IP w wybranym okresie, niż na to pozwalasz.",
-        "keywords": ""
+        "keywords": "ip adresy vpn udostępnianie urządzenia okno okres"
       },
       "geo-restriction": {
         "name": "Zablokowane kraje",
@@ -1360,17 +1360,17 @@
       "impossible-travel": {
         "name": "Niemożliwa podróż",
         "description": "Zgłoś naruszenie, gdy dwie sesje znajdują dalej, niż ktokolwiek mógłby podróżować między nimi.",
-        "keywords": ""
+        "keywords": "vpn współużytkowanie prędkości podróży na odległość"
       },
       "kill-paused-streams": {
         "name": "Zatrzymaj wstrzymane strumienie",
         "description": "Zatrzymaj strumień, który jest wstrzymany przez ustaloną liczbę minut.",
-        "keywords": ""
+        "keywords": "pauza wstrzymanie nieaktywność afk zatrzymanie"
       },
       "media-added": {
         "name": "Dodano nowe multimedia",
         "description": "Poinformuj miejsca docelowe o nowo dodanych elementach w bibliotece.",
-        "keywords": ""
+        "keywords": "nowy biblioteka film odcinek dodany import powiadomienie discord email webhook"
       },
       "media-upgraded": {
         "name": "Media ulepszone",
@@ -1380,12 +1380,12 @@
       "new-device": {
         "name": "Nowe urządzenie",
         "description": "Powiadom miejsce docelowe o strumieniowaniu z nowego urządzenia.",
-        "keywords": ""
+        "keywords": "urządzenie nowe nieznane nirozpoznane telefon współdzielenie logowania powiadomienie discort email webhook"
       },
       "newsletter-failed": {
         "name": "Wysyłka newslettera się nie udała",
         "description": "Poinformuj miejsca docelowe o problemach z wysyłką newslettera lub gdy wysyłka powiedzie się tylko częściowo.",
-        "keywords": ""
+        "keywords": "newsletter biuletyn email błąd częściowy zwrotka powiadomienie"
       },
       "no-4k-transcodes": {
         "name": "Zakaz transkodowania 4K",
@@ -1395,27 +1395,27 @@
       "paused-too-long": {
         "name": "Wstrzymano zbyt długo",
         "description": "Poinformuj miejsce docelowe o strumieniu, który jest wstrzymany dłużej, niż na to pozwalasz.",
-        "keywords": ""
+        "keywords": "wstrzymanie bezczynny utknięte afk porzucone powiadomienie discord email e-mail webhook"
       },
       "plugin-update": {
         "name": "Aktualizacja wtyczki Tracearr",
         "description": "Powiadom miejsce docelowe, gdy serwer ma nowszą wtyczkę Tracearr gotową do instalacji.",
-        "keywords": ""
+        "keywords": "plugin wtyczka aktualizacja wersja wydanie release powiadomienie discord e-mail email webhook"
       },
       "server-down": {
         "name": "Serwer nieaktywny",
         "description": "Powiadom miejsce docelowe, gdy serwer mediów przestanie odpowiadać.",
-        "keywords": ""
+        "keywords": "offline awaria nieosiągalny down powiadomienie discord email e-mail webhook"
       },
       "server-up": {
         "name": "Serwer ponownie dostępny",
         "description": "Powiadom miejsce docelowe, gdy serwer multimediów odpowie ponownie.",
-        "keywords": ""
+        "keywords": "online przywrócony z powrotem powiadomienie discord e-mail email webhook"
       },
       "server-update": {
         "name": "Aktualizacja serwera multimediów",
         "description": "Powiadom miejsce docelowe, gdy serwer multimedialny ma dostępną aktualizację.",
-        "keywords": ""
+        "keywords": "aktualizacja wersja wydanie release plex jellyfin emby powiadomienie discord"
       },
       "simultaneous-locations": {
         "name": "Dwa miejsca na raz",
@@ -1425,32 +1425,32 @@
       "stream-ended": {
         "name": "Strumień zakończony",
         "description": "Powiadom miejsce docelowe za każdym razem, gdy strumień się zatrzyma.",
-        "keywords": ""
+        "keywords": "zatrzymanie koniec odtwarzanie powiadomienie discord e-mail email webhook"
       },
       "stream-started": {
         "name": "Strumień rozpoczęty",
         "description": "Powiadom miejsce docelowe za każdym razem, gdy rozpoczyna się strumień.",
-        "keywords": ""
+        "keywords": "odtwarzanie oglądanie rozpoczęte start powiadomienie discord e-mail email webhook"
       },
       "tracearr-update": {
         "name": "Aktualizacja Tracearr",
         "description": "Powiadom miejsce docelowe, gdy nowa wersja Tracearr jest dostępna.",
-        "keywords": ""
+        "keywords": "aktualizacja wersja wydanie release tracearr powiadomienie discord e-mail email webhook"
       },
       "transcode-started": {
         "name": "Strumień transkoduje",
         "description": "Powiedz miejscu docelowym, gdy strumień transkuje wideo lub audio.",
-        "keywords": ""
+        "keywords": "transkodowanie konwersja cpu direct play odtwarzanie bezpośrednie jakość powiadomienie discord e-mail email webhook"
       },
       "trust-score-changed": {
         "name": "Zmienił się poziom zaufania",
         "description": "Powiadom miejsce docelowe, gdy zmieni się poziom zaufania konta.",
-        "keywords": ""
+        "keywords": "poziom wynik zaufania kara zmiana powiadomienie discord e-mail email webhook"
       }
     },
     "title": "Automatyzacje",
     "toggleAutomation": "Włącz lub wyłącz {{name}}",
-    "tryAdjustingFilters": "",
+    "tryAdjustingFilters": "Spróbuj dostosować swoje filtry.",
     "units": {
       "km": "km",
       "kmh": "km/h",
@@ -1472,25 +1472,25 @@
         "notifications": "Newslettery",
         "notify": "Powiadom",
         "policy": "Podejmij działanie",
-        "control": "Jeśli… wtedy"
+        "control": "Jeżeli… wtedy"
       },
       "suggested": "Sugerowane",
       "triggers": {
         "sessionStarted": {
-          "description": "",
+          "description": "Odtwarzanie jest potwierdzone około 30 sekund po rozpoczęciu.",
           "synonyms": "odtwarzanie, oglądanie, rozpoczęcie, uruchamianie, przeglądanie"
         },
         "sessionFirstSeen": {
-          "description": "",
-          "synonyms": ""
+          "description": "Natychmiast po rozpoczęciu strumieniowania, bez oczekiwania na potwierdzenie. Niektóre nigdy nie zostają potwierdzone.",
+          "synonyms": "odtwarzanie, natychmiast, wczesne, webhook"
         },
         "sessionStopped": {
           "description": "Odtwarzanie kończy się z jakiegokolwiek powodu.",
-          "synonyms": ""
+          "synonyms": "koniec, zakończenie, wyjdź, zamknij"
         },
         "sessionTranscodeChanged": {
           "description": "Serwer przełącza strumień pomiędzy bezpośrednim odtwarzaniem i transkodowaniem.",
-          "synonyms": ""
+          "synonyms": "transkodowanie, konwersja, odtwarzanie bezpośrednie, cpu"
         },
         "sessionPaused": {
           "description": "W momencie wstrzymania streamu.",
@@ -1499,24 +1499,24 @@
         "sessionHeldFor": {
           "label": "Strumieniowanie wstrzymane",
           "description": "Strumień został wstrzymany dłużej niż ustawiona liczba minut.",
-          "synonyms": ""
+          "synonyms": "pauza, bezczynna, porzucona, utknięta, afk"
         },
         "accountInactiveFor": {
           "label": "Konto nieaktywne",
           "description": "Konto nie oglądało nic przez określoną liczbę dni.",
-          "synonyms": ""
+          "synonyms": "nieaktywny, uśpiony, nieużywany, czyszczenie"
         },
         "accountNewDevice": {
           "description": "Konto strumieniuje z danego urządzenia po raz pierwszy.",
-          "synonyms": ""
+          "synonyms": "urządzenie, nowe, nieznane, nierozpoznane, telefon, logowanie, udostępnianie, współdzielenie, sharing"
         },
         "accountTrustChanged": {
           "description": "Zmienia się poziom zaufania konta, niezależnie od tego, czy automatycznie, czy administrator go zmienił.",
-          "synonyms": ""
+          "synonyms": "zaufanie, poziom, wynik, reputacja, kara, korekta"
         },
         "mediaAdded": {
           "description": "Pozycja biblioteki po raz pierwszy pojawia się na serwerze.",
-          "synonyms": ""
+          "synonyms": "nowy, dodany, biblioteka, film, odcinek, import"
         },
         "mediaUpgraded": {
           "description": "Element biblioteki, który już tam był, zmienia jakość.",
@@ -1524,45 +1524,45 @@
         },
         "serverDown": {
           "description": "Serwer multimediów przestaje odpowiadać.",
-          "synonyms": ""
+          "synonyms": "nieosiągalny, offline, awaria, down"
         },
         "serverUp": {
           "description": "Serwer mediów odpowie ponownie.",
-          "synonyms": ""
+          "synonyms": "online, przywrócony, z powrotem"
         },
         "pluginUpdateAvailable": {
           "description": "Wtyczka Tracearr na serwerze ma nowszą wersję.",
-          "synonyms": ""
+          "synonyms": "plugin, wtyczka, aktualizacja, wersja, wydanie"
         },
         "serverUpdateAvailable": {
           "description": "Serwer mediów ma dostępną aktualizację.",
-          "synonyms": ""
+          "synonyms": "aktualizacja, wersja, wydanie, łatka"
         },
         "tracearrUpdateAvailable": {
           "description": "Tracearr posiada aktualizację.",
-          "synonyms": ""
+          "synonyms": "aktualizacja, wersja, wydanie, tracearr"
         },
         "newsletterSent": {
           "description": "Zaplanowany lub ręczny newsletter dotarł do wszystkich na liście.",
-          "synonyms": ""
+          "synonyms": "newsletter, biuletyn, e-mail, email, dostarczony"
         },
         "newsletterFailed": {
           "description": "Newsletter nie dotarł do nikogo lub tylko do części jego odbiorców.",
-          "synonyms": ""
+          "synonyms": "newsletter, biuletyn, e-mail, email, odbicie, częściowy, błąd"
         }
       },
       "actions": {
         "send": {
-          "synonyms": ""
+          "synonyms": "powiadomienie, alert, discord, e-mail, webhook, push"
         },
         "trust": {
-          "synonyms": ""
+          "synonyms": "wynik, poziom, zaufanie, reputacja, kara, nagroda"
         },
         "kill_stream": {
-          "synonyms": ""
+          "synonyms": "zatrzymaj, zabij, przerwij, zakończ odtwarzanie, stop"
         },
         "message_client": {
-          "synonyms": ""
+          "synonyms": "ostrzeż, powiedz, powiadom, na ekranie"
         },
         "if": {
           "label": "Jeżeli... w przeciwnym wypadku...",
@@ -1704,7 +1704,7 @@
         "smtpPostmarkUsername": "Twój token API serwera.",
         "smtpPostmarkPassword": "Ten sam token API serwera lub tajny token strumieniowy."
       },
-      "newsletterAlertsNote": "",
+      "newsletterAlertsNote": "Odbiorcy newslettera są konfigurowani w samym newsletterze. Aby wysyłać powiadomienia również za pośrednictwem tego serwera, edytuj go później w miejscach docelowych.",
       "newsletterDescription": "Tracearr wysyła newslettery przez ten serwer SMTP.",
       "newsletterTitle": "Dodaj serwer poczty e-mail",
       "newslettersOnly": "Tylko newslettery",
@@ -1932,7 +1932,7 @@
         "emptyRecentlyAdded": "Nie dodano niczego w tym okresie",
         "emptyRecentlyUpdated": "Niczego nie zastąpiono w tym okresie",
         "emptyMostPopular": "Brak odtworzeń w tym okresie",
-        "captionRecentlyAdded": "",
+        "captionRecentlyAdded": "scalone ze wszystkich serwerów",
         "captionRecentlyUpdated": "lepsza kopia zastąpiła tę tutaj",
         "captionMostPopular": {
           "day": "dzisiaj",
