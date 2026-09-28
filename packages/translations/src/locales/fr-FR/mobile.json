@@ -73,7 +73,7 @@
     "ram": "RAM",
     "item": "",
     "noData": "",
-    "system": "",
+    "system": "Système",
     "waiting": ""
   },
   "notifications": {
@@ -130,7 +130,7 @@
     "noViolations": "Aucune violation",
     "noTerminations": "Aucune interruption de lecture",
     "lastSeen": "",
-    "terminatedBy": "",
+    "terminatedBy": "Par @{{username}}",
     "trustScoreConfirm": "",
     "trustScoreRange": ""
   },
@@ -157,12 +157,12 @@
     "historyWillAppear": "L'historique des sessions apparaîtra ici lorsque les utilisateurs commenceront à lancer des lectures",
     "filters": {
       "clearCount": "",
-      "countries": "",
-      "filterBy": "",
-      "mediaType": "",
-      "noCountries": "",
-      "noPlatforms": "",
-      "noUsers": "",
+      "countries": "Pays",
+      "filterBy": "Filtrer par",
+      "mediaType": "Type de média",
+      "noCountries": "Aucun pays disponible",
+      "noPlatforms": "Aucune plateforme disponible",
+      "noUsers": "Aucun utilisateur disponible",
       "sectionSelected": ""
     }
   },
@@ -218,7 +218,7 @@
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
-      "notification": "",
+      "notification": "Notification",
       "policy": ""
     },
     "lastRun": "",
@@ -242,29 +242,29 @@
     "color": "",
     "container": "",
     "forced": "",
-    "format": "",
+    "format": "Format :",
     "framerate": "",
     "hwDecode": "",
     "hwEncode": "",
     "mono": "",
     "noDetails": "",
     "notAvailable": "",
-    "profile": "",
+    "profile": "Profil",
     "sampleRate": "",
-    "source": "",
-    "speed": "",
-    "stereo": "",
+    "source": "Source",
+    "speed": "Vitesse",
+    "stereo": "Stéréo",
     "stream": "",
-    "subtitles": "",
+    "subtitles": "Sous-titres",
     "throttled": "",
-    "transcodeDetails": ""
+    "transcodeDetails": "Détails du transcodage"
   },
   "widget": {
     "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
+    "serversDown_one": "{{count}} serveur hors ligne",
+    "serversDown_other": "{{count}} serveurs hors ligne",
     "signedOut": "",
-    "transcodes_one": "",
-    "transcodes_other": ""
+    "transcodes_one": "{{count}} transcodage",
+    "transcodes_other": "{{count}} transcodages"
   }
 }
