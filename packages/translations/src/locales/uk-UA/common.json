@@ -351,6 +351,6 @@
     "all": "Всі сервери",
     "some": "{{count}} з {{total}} серверів",
     "search": "",
-    "noMatches": ""
+    "noMatches": "Серверів не знайдено"
   }
 }
