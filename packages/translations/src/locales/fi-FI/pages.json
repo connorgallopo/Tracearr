@@ -53,11 +53,8 @@
     "title": "Käyttäjät",
     "showRemoved": "",
     "noUsersFound": "Käyttäjiä ei löytynyt.",
-    "selectAllUsers_other": "Valitse kaikki {{count}} käyttäjää",
     "serversColumn": "",
     "resetTrustScore": "Nollaa Trust Pisteet",
-    "resetTrustScoreTitle_one": "Nollaa Trust-pisteet käyttäjälle {{count}}",
-    "resetTrustScoreTitle_other": "",
     "resetTrustScoreConfirm": "Oletko varma, että haluat palauttaa luottamuspisteen 100:aan? Tätä toimintoa ei voi peruuttaa.",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -115,7 +102,21 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_one": "",
+    "selectAllUsers_other": "Valitse kaikki {{count}} käyttäjää",
+    "resetTrustScoreTitle_one": "Nollaa Trust-pisteet käyttäjälle {{count}}",
+    "resetTrustScoreTitle_other": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "Takaisin käyttäjiin",
@@ -283,7 +284,9 @@
       "backfillRunning": {
         "title": "",
         "fallbackBody": "",
-        "progress": ""
+        "progress": "",
+        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_other": ""
       },
       "multiServer": {
         "title": "",
@@ -306,7 +309,9 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_one": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -326,11 +331,8 @@
   "violations": {
     "title": "Rikkomukset",
     "tryAdjustingFilters": "Yritä muuttaa suodattimia",
-    "selectAllViolations_other": "Valitse kaikki {{count}} rikkomistapausta vastaavat suodattimet",
     "dismissViolation": "Hylkää Rikkominen",
     "dismissViolationConfirm": "Oletko varma, että haluat hylätä tämän rikkomuksen? Tämä poistaa sen rikkomuslokista pysyvästi.",
-    "dismissViolation_one": "Hylkää {{count}} Väkivalta",
-    "dismissViolation_other": "Hylkää {{count}} Rikkomuksia",
     "dismissViolationsConfirm": "Oletko varma, että haluat erottaa? Tämä poistaa ne rikkomuslokista pysyvästi ja palauttaa niihin liittyvät luottamuspisteet.",
     "noViolationsFound": "Rikkomuksia ei löytynyt",
     "noViolationsRecorded": "Rikkomuksia ei ole vielä tallennettu.",
@@ -367,7 +369,13 @@
       "actual": "Todellinen",
       "relatedSessions_one": "{{count}} liittyvä istunto",
       "relatedSessions_other": "{{count}} aiheeseen liittyvää istuntoa"
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_other": "Valitse kaikki {{count}} rikkomistapausta vastaavat suodattimet",
+    "dismissViolations_one": "Hylkää {{count}} Väkivalta",
+    "dismissViolations_other": "Hylkää {{count}} Rikkomuksia",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -471,10 +479,10 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -666,12 +674,12 @@
         "placeholderAction": ""
       },
       "footer": {
+        "ready": "",
+        "search": "",
         "problems_one": "",
         "problems_other": "",
         "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -692,7 +700,9 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -706,12 +716,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -865,16 +871,18 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_one": "",
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
+      "noRuns": "",
       "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1565,7 +1573,9 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "Lopeta Lähetys",
@@ -1598,10 +1608,8 @@
         "unknown": ""
       },
       "connectionsReachable": "",
-      "connectionsAvailable_other": "{{count}} yhteyttä saatavilla",
       "hideFiltered": "Piilota suodatettu",
       "showAll": "Näytä kaikki",
-      "moreConnections_other": "+{{count}} lisää yhteyksiä",
       "connectingTo": "Yhdistetään {{name}} tiedostoon...",
       "ownerOnly": "",
       "noAccountsLinked": "Ei Ole Ole Yhdistetty Plex Tilejä",
@@ -1610,17 +1618,20 @@
       "linkAnotherAccount": "Linkitä Toinen Plex -tili",
       "linking": "Yhdistetään...",
       "loginEnabled": "Kirjautuminen Käytössä",
-      "serversConnected_one": "{{count}} palvelin yhdistetty",
-      "serversConnected_other": "{{count}} palvelinta yhdistetty",
       "unlinkAccount": "Poista yhteys Plex tiliin",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Poista yhdistetyt palvelimet ensin poistaaksesi linkitys tähän tiliin",
       "unlinkPlexAccount": "Irroita Plex Tili",
-      "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen."
+      "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen.",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_other": "{{count}} yhteyttä saatavilla",
+      "moreConnections_one": "",
+      "moreConnections_other": "+{{count}} lisää yhteyksiä",
+      "serversConnected_one": "{{count}} palvelin yhdistetty",
+      "serversConnected_other": "{{count}} palvelinta yhdistetty"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1718,11 +1729,15 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_one": "",
+      "alertsGoTo_other": "",
+      "usedBy_one": "",
+      "usedBy_other": "",
+      "usedByNewsletters_one": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "Suorita Nyt",
@@ -1802,7 +1817,9 @@
     "directPlayLow": "",
     "topTranscodingUsers": "Eniten Transkoodataan Käyttäjiä",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "Transkoodauksen käyttäjiä ei löytynyt"
+    "noTranscodingUsers": "Transkoodauksen käyttäjiä ei löytynyt",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "Kaistanleveys",
@@ -1911,12 +1928,14 @@
         }
       },
       "card": {
+        "addedAgo": "lisätty {{date}}",
+        "addedCompactAgo": "",
         "newEpisodes_one": "{{count}} uusi jakso",
         "newEpisodes_other": "{{count}} uutta jaksoa",
         "replacedEpisodes_one": "",
         "replacedEpisodes_other": "",
-        "addedAgo": "lisätty {{date}}",
-        "addedCompactAgo": ""
+        "newEpisodesChip_one": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1928,7 +1947,9 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_one": "",
+        "summary_other": ""
       },
       "loadError": ""
     },
@@ -1944,9 +1965,9 @@
       "chart": {
         "title": "",
         "valueLabel": "",
+        "ariaLabel": "",
         "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -2034,15 +2055,15 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_one": "",
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2080,8 +2101,6 @@
       "rankSuffix": ", sija {{rank}}",
       "onServers": "Palvelimilla {{servers}}",
       "addedLabel": "Lisätty {{date}}",
-      "viewers_one": "{{count}} katsoja",
-      "viewers_other": "{{count}} katsojaa",
       "watchedState": {
         "watched": "Katsottu",
         "partial": "Osittain katsottu",
@@ -2095,12 +2114,14 @@
         "resolution": ""
       },
       "rankChip": "",
+      "versionsChip": "",
+      "moreServers": "",
+      "viewers_one": "{{count}} katsoja",
+      "viewers_other": "{{count}} katsojaa",
       "playsCompact_one": "",
       "playsCompact_other": "",
-      "versionsChip": "",
       "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2237,7 +2258,9 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_one": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
