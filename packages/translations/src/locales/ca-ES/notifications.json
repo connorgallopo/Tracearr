@@ -49,11 +49,11 @@
       },
       "plexAccountReauthorized": {
         "title": "Compte de Plex reautoritzat",
-        "message_one": "{{count}} servidor reconnectat",
-        "message_other": "{{count}} servidors reconnectats",
         "messageNoServers": "S'ha actualitzat el testimoni del compte",
         "partial": "S'ha actualitzat el testimoni, però {{names}} l'han rebutjat igualment",
-        "unmatched": "S'ha actualitzat el testimoni, però {{names}} no s'han pogut tornar a enllaçar"
+        "unmatched": "S'ha actualitzat el testimoni, però {{names}} no s'han pogut tornar a enllaçar",
+        "message_one": "{{count}} servidor reconnectat",
+        "message_other": "{{count}} servidors reconnectats"
       },
       "jobCompleted": {
         "title": "Tasca completada"
@@ -149,10 +149,11 @@
       "newsletterDuplicated": "Butlletí duplicat",
       "newsletterTestQueued": "S'ha posat la prova a la cua cap a {{address}}",
       "newsletterSendQueued": "Enviament posat a la cua",
-      "newsletterRetryQueued_other": "S'està reintentant amb {{count}} destinataris",
       "brandingSaved": "S'ha desat la imatge de marca del correu",
       "suppressionAdded": "S'ha afegit l'adreça a la llista de supressió",
-      "suppressionRemoved": "S'ha tret l'adreça de la llista de supressió"
+      "suppressionRemoved": "S'ha tret l'adreça de la llista de supressió",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_other": "S'està reintentant amb {{count}} destinataris"
     },
     "error": {
       "serverAddFailed": "No s'ha pogut afegir el servidor",
