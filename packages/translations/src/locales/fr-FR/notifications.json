@@ -49,11 +49,11 @@
       },
       "plexAccountReauthorized": {
         "title": "Compte Plex réautorisé",
-        "message_one": "Serveur {{count}} reconnecté",
-        "message_other": "Les serveurs {{count}} ont été reconnectés",
         "messageNoServers": "Jeton de compte mis à jour",
         "partial": "Jeton mis à jour, mais {{names}} l'a toujours refusé",
-        "unmatched": "Jeton mis à jour, mais {{names}} n'a pas pu être ré-lié"
+        "unmatched": "Jeton mis à jour, mais {{names}} n'a pas pu être ré-lié",
+        "message_one": "Serveur {{count}} reconnecté",
+        "message_other": "Les serveurs {{count}} ont été reconnectés"
       },
       "jobCompleted": {
         "title": "Tâche terminée"
@@ -151,7 +151,9 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Échec de l'ajout du serveur",
