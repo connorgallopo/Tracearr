@@ -1671,7 +1671,7 @@
         "password": "비밀번호",
         "fromName": "발신자 이름",
         "fromAddress": "발신자 주소",
-        "to": "Recipients",
+        "to": "",
         "replyTo": "회신 주소",
         "messagesPerSecond": "초당 메시지 수",
         "messageStream": "메시지 스트림"
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "공개 주제의 경우 선택사항",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "",
         "smtpVerifyCertificate": "메일 서버의 TLS 인증서를 신뢰할 수 있는 인증 기관과 대조해 확인합니다. 로컬 브리지처럼 자체 서명 인증서를 사용하는 서버에서만 끄세요. 이 기능을 끄면 Tracearr와 메일 서버 사이의 경로에 있는 누군가가 연결을 가로챌 수 있습니다.",
         "smtpUsernameOptional": "서버에 로그인이 필요하지 않으면 비워 두세요.",
         "smtpTo": "여기에 있는 모든 주소를 받는 사람으로 넣어 하나의 이메일로 알림을 보냅니다. 이 서버에서 뉴스레터만 보낼 경우 비워 두세요.",
