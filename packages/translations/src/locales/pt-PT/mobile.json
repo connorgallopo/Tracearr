@@ -49,7 +49,7 @@
     "readDocs": "",
     "website": "Site",
     "visitWebsite": "Visita tracearr.com",
-    "github": "Github",
+    "github": "GitHub",
     "viewSourceCode": "Ver código-fonte",
     "sponsor": "Patrocinador",
     "supportDevelopment": "Apoia o desenvolvimento",
@@ -60,7 +60,7 @@
     "disconnectConfirmGeneric": "Tem certeza que deseja desconectar? Você precisará parear novamente para usar o aplicativo.",
     "currentlyConnected": "Conectado atualmente a {{serverName}}",
     "version": "Versão {{version}}",
-    "build": "Build {{build}}"
+    "build": "Compilação {{build}}"
   },
   "navigation": {
     "home": "Início",
