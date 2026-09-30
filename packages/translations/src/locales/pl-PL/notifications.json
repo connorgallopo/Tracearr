@@ -174,7 +174,7 @@
       "newsletterDeleted": "Newsletter usunięty",
       "newsletterDuplicated": "Newsletter zduplikowany",
       "newsletterTestQueued": "Test w kolejce do {{address}}",
-      "newsletterSendQueued": "Wyślij w kolejce",
+      "newsletterSendQueued": "Wysyłka dodana do kolejki",
       "newsletterRetryQueued": "Ponawianie próby do {{count}} odbiorców",
       "brandingSaved": "Branding e-mail zapisany",
       "suppressionAdded": "Adres dodany do listy wyciszenia",
@@ -222,7 +222,7 @@
       "invalidUrl": "Nieprawidłowy adres URL",
       "plexDirectUrl": "plex.direct adresy URL są adresami, które nie mogą być tutaj użyte. Użyj bezpośredniego adresu IP lub nazwy hosta.",
       "userMergeFailed": "Nie udało się scalić użytkowników",
-      "serverUserSplitFailed": "Nie udało się rozdzielić użytkowników",
+      "serverUserSplitFailed": "Nie udało się rozdzielić konta",
       "mergeSuggestionDismissFailed": "Nie udało się odrzucić sugestii",
       "mergeSuggestionRestoreFailed": "Nie udało się przywrócić sugestii",
       "invalidClaimCode": {
