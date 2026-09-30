@@ -132,7 +132,9 @@
       "never": "",
       "diskLimited": "",
       "loadError": "",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_one": "",
+      "needHint_other": ""
     }
   },
   "servers": {
@@ -253,7 +255,6 @@
     "enableMobileAccess": "Mobiler Zugriff aktivieren",
     "enabling": "Aktivieren...",
     "devicesConnected": "{{current}} von {{max}} Geräten verbunden",
-    "pendingTokens_other": "{{count}} ausstehende Paar Token",
     "addDevice": "Gerät hinzufügen",
     "disableMobileAccess": "Mobilzugriff deaktivieren",
     "revokeAllSessions": "Alle widerrufen",
@@ -276,7 +277,9 @@
     "removeDeviceConfirm": "Sind Sie sicher, dass Sie {{deviceName}}entfernen möchten? Dieses Gerät muss erneut paaren, um sich neu zu verbinden.",
     "externalUrlBanner": "Reverse-Proxy oder Fernzugriff verwenden? Setze deinen",
     "externalUrlBannerLink": "Externe URL",
-    "externalUrlBannerSuffix": "damit sich die mobile App mit Ihrem Server verbinden kann."
+    "externalUrlBannerSuffix": "damit sich die mobile App mit Ihrem Server verbinden kann.",
+    "pendingTokens_one": "",
+    "pendingTokens_other": "{{count}} ausstehende Paar Token"
   },
   "tailscale": {
     "title": "",
@@ -404,7 +407,11 @@
     "importFullRange": "",
     "importFullRangeHelp": "",
     "skipOverlap": "",
-    "skipDuplicatePlugin": ""
+    "skipDuplicatePlugin": "",
+    "overlapSkipped_one": "",
+    "overlapSkipped_other": "",
+    "duplicates_one": "",
+    "duplicates_other": ""
   },
   "plex": {
     "signInWithPlex": "Mit Plex anmelden",
@@ -441,8 +448,6 @@
     "earlier": "",
     "installedBadge": "",
     "latestBadge": "",
-    "changeCount_one": "",
-    "changeCount_other": "",
     "series": "",
     "docs": "",
     "source": "",
@@ -453,10 +458,13 @@
       "fix": "",
       "security": "",
       "note": ""
-    }
+    },
+    "changeCount_one": "",
+    "changeCount_other": ""
   },
   "serverHealth": {
     "unreachable": "{{serverName}} ist unerreichbar",
+    "multipleUnreachable_one": "",
     "multipleUnreachable_other": "{{count}} Server nicht erreichbar {{serverNames}}"
   },
   "ipWarning": {
@@ -637,7 +645,11 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_one": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_one": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -671,14 +683,24 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_one": "",
+          "movies_other": "",
+          "shows_one": "",
+          "shows_other": "",
+          "seasons_one": "",
+          "seasons_other": "",
+          "music_one": "",
+          "music_other": "",
+          "mostWatched_one": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -757,7 +779,15 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_one": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_one": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -806,13 +836,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_one": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -858,11 +888,21 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_one": "",
+        "summary_other": "",
+        "trimmed_one": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_one": "",
+      "serversSelected_other": "",
+      "librariesSelected_one": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_one": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -893,7 +933,11 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_one": "",
+      "recipients_other": "",
+      "attempts_one": "",
+      "attempts_other": ""
     }
   },
   "email": {
