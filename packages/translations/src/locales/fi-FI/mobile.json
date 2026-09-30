@@ -176,8 +176,8 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "Soittaa Ajan Yli",
-    "concurrentStreams": "Samanaikaiset Streamit",
+    "playsOverTime": "Toistot ajan mittaan",
+    "concurrentStreams": "Samanaikaiset suoratoistot",
     "platforms": "Alustat",
     "playbackQuality": ""
   },
