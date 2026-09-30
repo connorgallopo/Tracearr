@@ -113,14 +113,20 @@
     "userMayBeRemoved": "Ten użytkownik mógł zostać usunięty.",
     "noLocationsRecorded": "Brak zarejestrowanych lokalizacji",
     "noDevicesRecorded": "Brak zarejestrowanych urządzeń",
-    "moreLocations_other": "+{{count}} więcej lokalizacji",
-    "moreDevices_other": "+{{count}} więcej urządzeń",
     "noViolations": "Brak naruszeń",
     "noTerminations": "Brak przerwanych strumieni",
     "lastSeen": "Ostatnio widziany {{relative}}",
     "terminatedBy": "Przez @{{username}}",
     "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
-    "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100."
+    "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100.",
+    "moreLocations_one": "",
+    "moreLocations_few": "",
+    "moreLocations_many": "",
+    "moreLocations_other": "+{{count}} więcej lokalizacji",
+    "moreDevices_one": "",
+    "moreDevices_few": "",
+    "moreDevices_many": "",
+    "moreDevices_other": "+{{count}} więcej urządzeń"
   },
   "violation": {
     "violationNotFoundDesc": "To naruszenie mogło zostać odrzucone lub nie jest już dostępne.",
@@ -131,13 +137,18 @@
     "acknowledgeAll": "Potwierdź wszystkie",
     "acknowledgeAllBody": "Każde oczekujące powiadomienie na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
     "acknowledgeAllBodySeverity": "Każde oczekujące powiadomienie o poziomie {{severity}} na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
-    "acknowledgeAllTitle_one": "Potwierdzić {{count}} powiadomienie?",
-    "acknowledgeAllTitle_other": "Potwierdzić {{count}} powiadomień?",
     "all": "Wszystkie",
     "allClear": "Wszystko wyczyszczone",
     "allServers": "wszystkie serwery",
     "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
     "noMatches": "Brak pasujących powiadomień",
+    "acknowledgeAllTitle_one": "Potwierdzić {{count}} powiadomienie?",
+    "acknowledgeAllTitle_few": "",
+    "acknowledgeAllTitle_many": "",
+    "acknowledgeAllTitle_other": "Potwierdzić {{count}} powiadomień?",
+    "pendingCount_one": "",
+    "pendingCount_few": "",
+    "pendingCount_many": "",
     "pendingCount_other": "{{count}} oczekujących"
   },
   "history": {
@@ -151,6 +162,9 @@
       "noCountries": "Brak dostępnych krajów",
       "noPlatforms": "Brak dostępnych platform",
       "noUsers": "Brak dostępnych użytkowników",
+      "sectionSelected_one": "",
+      "sectionSelected_few": "",
+      "sectionSelected_many": "",
       "sectionSelected_other": "{{section}}, {{count}} wybranych"
     }
   },
@@ -184,22 +198,26 @@
   "a11y": {
     "selectServer": "Wybierz serwer",
     "alerts": "Powiadomienia",
-    "alertsCount_other": "Powiadomienia, {{count}} nieprzeczytane",
     "settings": "Ustawienia",
     "trustScore": "Poziom zaufania {{score}}",
     "decreaseTrustScore": "Zmniejsz poziom zaufania",
-    "filtersActive_other": "Filtry, {{count}} aktywne",
     "increaseTrustScore": "Zwiększ poziom zaufania",
     "sortAscending": "Posortowano rosnąco, stuknij, aby odwrócić",
-    "sortDescending": "Posortowano malejąco, stuknij, aby odwrócić"
+    "sortDescending": "Posortowano malejąco, stuknij, aby odwrócić",
+    "alertsCount_one": "",
+    "alertsCount_few": "",
+    "alertsCount_many": "",
+    "alertsCount_other": "Powiadomienia, {{count}} nieprzeczytane",
+    "filtersActive_one": "",
+    "filtersActive_few": "",
+    "filtersActive_many": "",
+    "filtersActive_other": "Filtry, {{count}} aktywne"
   },
   "map": {
     "noData": "Brak danych o lokalizacji",
     "unavailable": "Mapa jest niedostępna"
   },
   "automations": {
-    "conditions_one": "{{count}} warunek",
-    "conditions_other": "{{count}} warunki",
     "editOnWeb": "Automatyzacje mogą być tworzone i edytowane w aplikacji Web Tracearr.",
     "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawią się tutaj.",
     "kind": {
@@ -212,7 +230,11 @@
     "turnOnFailed": "Nie udało się włączyć. Nadal jest wyłączona.",
     "unsupportedDescription": "Ten serwer zgłasza wersję {{version}}. Zaktualizuj Tracearr, aby zobaczyć automatyzacje i ich wykonania.",
     "unsupportedTitle": "Automatyzacje wymagają serwera 2.2 lub nowszego",
-    "versionCheckFailed": "Nie udało się sprawdzić wersji serwera"
+    "versionCheckFailed": "Nie udało się sprawdzić wersji serwera",
+    "conditions_one": "{{count}} warunek",
+    "conditions_few": "",
+    "conditions_many": "",
+    "conditions_other": "{{count}} warunki"
   },
   "charts": {
     "weekOf": "Tydzień {{date}}"
@@ -246,10 +268,14 @@
   },
   "widget": {
     "asOf": "zaktualizowano {{time}}",
-    "serversDown_one": "{{count}} serwer nieaktywny",
-    "serversDown_other": "{{count}} serwery nieaktywne",
     "signedOut": "Otwórz Tracearr, aby sparować serwer.",
+    "serversDown_one": "{{count}} serwer nieaktywny",
+    "serversDown_few": "",
+    "serversDown_many": "",
+    "serversDown_other": "{{count}} serwery nieaktywne",
     "transcodes_one": "{{count}} transkodowanie",
+    "transcodes_few": "",
+    "transcodes_many": "",
     "transcodes_other": "{{count}} transkodowań"
   }
 }
