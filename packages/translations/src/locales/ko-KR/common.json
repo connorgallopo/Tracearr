@@ -203,48 +203,29 @@
     "connectionFailed": "연결에 실패했습니다"
   },
   "count": {
-    "user_one": "사용자 {{count}}명",
     "user_other": "사용자 {{count}}명",
-    "session_one": "세션 {{count}}개",
     "session_other": "세션 {{count}}개",
-    "stream_one": "스트림 {{count}}개",
     "stream_other": "스트림 {{count}}개",
-    "server_one": "서버 {{count}}대",
     "server_other": "서버 {{count}}대",
-    "automation_one": "자동화 {{count}}개",
     "automation_other": "자동화 {{count}}개",
-    "violation_one": "위반 {{count}}건",
     "violation_other": "위반 {{count}}건",
-    "usersAdded_one": "사용자 {{count}}명 추가됨",
     "usersAdded_other": "사용자 {{count}}명 추가됨",
-    "usersUpdated_one": "사용자 {{count}}명 업데이트됨",
     "usersUpdated_other": "사용자 {{count}}명 업데이트됨",
-    "library_one": "라이브러리 {{count}}개",
     "library_other": "라이브러리 {{count}}개",
-    "error_one": "오류 {{count}}개",
     "error_other": "오류 {{count}}개",
-    "alert_one": "알림 {{count}}개",
     "alert_other": "알림 {{count}}개",
-    "location_one": "위치 {{count}}곳",
     "location_other": "위치 {{count}}곳",
-    "device_one": "기기 {{count}}대",
     "device_other": "기기 {{count}}대",
-    "play_one": "{{count}}회 재생",
     "play_other": "{{count}}회 재생",
-    "segment_one": "{{count}}초",
     "segment_other": "{{count}}초"
   },
   "messages": {
     "noChangesDetected": "변경된 내용이 없습니다"
   },
   "duration": {
-    "second_one": "{{count}}초",
     "second_other": "{{count}}초",
-    "minute_one": "{{count}}분",
     "minute_other": "{{count}}분",
-    "hour_one": "{{count}}시간",
     "hour_other": "{{count}}시간",
-    "day_one": "{{count}}일",
     "day_other": "{{count}}일"
   },
   "empty": {
