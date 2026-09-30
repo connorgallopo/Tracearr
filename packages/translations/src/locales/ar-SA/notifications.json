@@ -49,11 +49,15 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_zero": "",
+        "message_one": "",
+        "message_two": "",
+        "message_few": "",
+        "message_many": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "اكتمل العمل"
@@ -92,17 +96,29 @@
       },
       "sessionsDeleted": {
         "title": "الجلسات المحذوفة",
+        "message_zero": "",
         "message_one": "تم حذف جلسة {{count}}",
+        "message_two": "",
+        "message_few": "",
+        "message_many": "",
         "message_other": ""
       },
       "violationsAcknowledged": {
         "title": "الانتهاكات المعترف بها",
+        "message_zero": "",
         "message_one": "",
+        "message_two": "",
+        "message_few": "",
+        "message_many": "",
         "message_other": "تم الاعتراف بانتهاكات {{count}}"
       },
       "violationsDismissed": {
         "title": "تم إلغاء الانتهاكات",
+        "message_zero": "",
         "message_one": "رفض المخالفة {{count}}",
+        "message_two": "",
+        "message_few": "",
+        "message_many": "",
         "message_other": "تم رفض انتهاكات {{count}}"
       },
       "apiKeyGenerated": {
@@ -124,7 +140,11 @@
       "identityUpdated": "",
       "trustScoresReset": {
         "title": "إعادة تعيين نقاط الثقة",
+        "message_zero": "",
         "message_one": "",
+        "message_two": "",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} إعادة تعيين المستخدمين إلى 100"
       },
       "claimCodeValidated": {
@@ -151,7 +171,13 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_zero": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_two": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_many": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "فشل في إضافة الخادم",
