@@ -1,14 +1,11 @@
 {
-  "dashboard": "",
   "map": "Mappa",
   "history": "Storico",
   "stats": "Statistiche",
   "activity": "Attività",
   "library": "Libreria",
   "users": "Utenti",
-  "automations": "",
   "violations": "Violazioni",
-  "requests": "",
   "alerts": "Avvisi",
   "settings": "Impostazioni",
   "overview": "Panoramica",
@@ -20,14 +17,6 @@
   "bandwidth": "Larghezza Di Banda",
   "jobs": "Lavori",
   "accessControl": "Controllo Accesso",
-  "media": "",
   "mediaBrowse": "Esplora",
-  "mediaGenres": "Generi",
-  "session": "",
-  "user": "",
-  "violation": "",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "mediaGenres": "Generi"
 }
