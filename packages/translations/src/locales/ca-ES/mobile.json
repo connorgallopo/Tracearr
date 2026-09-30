@@ -113,14 +113,16 @@
     "userMayBeRemoved": "Pot ser que aquest usuari s'hagi eliminat.",
     "noLocationsRecorded": "No hi ha cap ubicació registrada",
     "noDevicesRecorded": "No hi ha cap dispositiu registrat",
-    "moreLocations_other": "+{{count}} ubicacions més",
-    "moreDevices_other": "+{{count}} dispositius més",
     "noViolations": "Cap incompliment",
     "noTerminations": "Cap transmissió finalitzada",
     "lastSeen": "Vist per últim cop {{relative}}",
     "terminatedBy": "Per @{{username}}",
     "trustScoreConfirm": "Voleu establir la puntuació de confiança de @{{username}} a {{score}}?",
-    "trustScoreRange": "Puntuació de confiança de @{{username}}, de 0 a 100."
+    "trustScoreRange": "Puntuació de confiança de @{{username}}, de 0 a 100.",
+    "moreLocations_one": "",
+    "moreLocations_other": "+{{count}} ubicacions més",
+    "moreDevices_one": "",
+    "moreDevices_other": "+{{count}} dispositius més"
   },
   "violation": {
     "violationNotFoundDesc": "Pot ser que aquest incompliment s'hagi descartat o ja no estigui disponible.",
@@ -131,13 +133,14 @@
     "acknowledgeAll": "Confirma-ho tot",
     "acknowledgeAllBody": "Totes les alertes pendents de {{servers}} es marcaran com a confirmades. Aquesta acció és irreversible.",
     "acknowledgeAllBodySeverity": "Totes les alertes pendents de severitat {{severity}} de {{servers}} es marcaran com a confirmades. Aquesta acció és irreversible.",
-    "acknowledgeAllTitle_one": "Voleu confirmar {{count}} alerta?",
-    "acknowledgeAllTitle_other": "Voleu confirmar {{count}} alertes?",
     "all": "Totes",
     "allClear": "Tot en ordre",
     "allServers": "tots els servidors",
     "noAlertsRecorded": "Encara no s'ha registrat cap alerta.",
     "noMatches": "Cap alerta coincident",
+    "acknowledgeAllTitle_one": "Voleu confirmar {{count}} alerta?",
+    "acknowledgeAllTitle_other": "Voleu confirmar {{count}} alertes?",
+    "pendingCount_one": "",
     "pendingCount_other": "{{count}} pendents"
   },
   "history": {
@@ -151,6 +154,7 @@
       "noCountries": "No hi ha cap país disponible",
       "noPlatforms": "No hi ha cap plataforma disponible",
       "noUsers": "No hi ha cap usuari disponible",
+      "sectionSelected_one": "",
       "sectionSelected_other": "{{section}}, {{count}} seleccionats"
     }
   },
@@ -184,22 +188,22 @@
   "a11y": {
     "selectServer": "Selecciona el servidor",
     "alerts": "Alertes",
-    "alertsCount_other": "Alertes, {{count}} sense llegir",
     "settings": "Configuració",
     "trustScore": "Puntuació de confiança {{score}}",
     "decreaseTrustScore": "Disminueix la puntuació de confiança",
-    "filtersActive_other": "Filtres, {{count}} actius",
     "increaseTrustScore": "Augmenta la puntuació de confiança",
     "sortAscending": "Ordenat de manera ascendent, toqueu per invertir",
-    "sortDescending": "Ordenat de manera descendent, toqueu per invertir"
+    "sortDescending": "Ordenat de manera descendent, toqueu per invertir",
+    "alertsCount_one": "",
+    "alertsCount_other": "Alertes, {{count}} sense llegir",
+    "filtersActive_one": "",
+    "filtersActive_other": "Filtres, {{count}} actius"
   },
   "map": {
     "noData": "No hi ha dades de localització disponibles",
     "unavailable": "Mapa no disponible"
   },
   "automations": {
-    "conditions_one": "{{count}} condició",
-    "conditions_other": "{{count}} condicions",
     "editOnWeb": "Les automatitzacions es creen i s'editen a l'aplicació web de Tracearr.",
     "emptyDescription": "Creeu automatitzacions a l'aplicació web de Tracearr i apareixeran aquí.",
     "kind": {
@@ -212,7 +216,9 @@
     "turnOnFailed": "No s'ha pogut activar. Continua desactivada.",
     "unsupportedDescription": "Aquest servidor informa de la versió {{version}}. Actualitzeu Tracearr per veure les automatitzacions i què han executat.",
     "unsupportedTitle": "Les automatitzacions necessiten el servidor 2.2 o superior",
-    "versionCheckFailed": "No s'ha pogut comprovar la versió del servidor"
+    "versionCheckFailed": "No s'ha pogut comprovar la versió del servidor",
+    "conditions_one": "{{count}} condició",
+    "conditions_other": "{{count}} condicions"
   },
   "charts": {
     "weekOf": "Setmana del {{date}}"
@@ -246,9 +252,9 @@
   },
   "widget": {
     "asOf": "actualitzat a les {{time}}",
+    "signedOut": "Obriu Tracearr per aparellar un servidor.",
     "serversDown_one": "{{count}} servidor caigut",
     "serversDown_other": "{{count}} servidors caiguts",
-    "signedOut": "Obriu Tracearr per aparellar un servidor.",
     "transcodes_one": "{{count}} transcodificació",
     "transcodes_other": "{{count}} transcodificacions"
   }
