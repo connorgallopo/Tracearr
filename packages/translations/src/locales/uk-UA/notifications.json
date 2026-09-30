@@ -49,11 +49,13 @@
       },
       "plexAccountReauthorized": {
         "title": "Обліковий запис Plex повторно авторизовано",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_one": "",
+        "message_few": "",
+        "message_many": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "Завдання завершене"
@@ -93,16 +95,22 @@
       "sessionsDeleted": {
         "title": "Сеанси видалено",
         "message_one": "{{count}} сеанс видалено",
+        "message_few": "",
+        "message_many": "",
         "message_other": "Видалено {{count}} сеансів"
       },
       "violationsAcknowledged": {
         "title": "Порушення підтверджено",
         "message_one": "{{count}} порушення підтверджено",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} порушення підтвердженні"
       },
       "violationsDismissed": {
         "title": "Порушення відхилено",
         "message_one": "{{count}} порушення відхилено",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} порушення відхилені"
       },
       "apiKeyGenerated": {
@@ -125,6 +133,8 @@
       "trustScoresReset": {
         "title": "Довіряти кільця скинуті",
         "message_one": "Користувача {{count}} скинуто до 100",
+        "message_few": "",
+        "message_many": "",
         "message_other": "Змінено на 100 користувачів {{count}}"
       },
       "claimCodeValidated": {
@@ -151,7 +161,11 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_many": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Не вдалося додати сервер",
