@@ -277,7 +277,7 @@ describe('Violations', () => {
 
     const dialog = await screen.findByRole('alertdialog');
     await user.click(
-      within(dialog).getByRole('button', { name: 'pages:violations.dismissViolation' })
+      within(dialog).getByRole('button', { name: 'pages:violations.dismissViolations' })
     );
 
     expect(bulkDismissMutate).toHaveBeenCalledWith(
