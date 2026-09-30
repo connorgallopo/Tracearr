@@ -49,11 +49,10 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "作業完了"
@@ -92,17 +91,14 @@
       },
       "sessionsDeleted": {
         "title": "削除されたセッション",
-        "message_one": "{{count}} セッションが削除されました",
         "message_other": "{{count}} セッションが削除されました"
       },
       "violationsAcknowledged": {
         "title": "違反が認められました",
-        "message_one": "{{count}} 違反が承認されました",
         "message_other": "{{count}} 違反が承認されました"
       },
       "violationsDismissed": {
         "title": "違反が解雇されました",
-        "message_one": "{{count}} 違反が解除されました",
         "message_other": "{{count}} 違反が解除されました"
       },
       "apiKeyGenerated": {
@@ -124,7 +120,6 @@
       "identityUpdated": "",
       "trustScoresReset": {
         "title": "信頼スコアをリセット",
-        "message_one": "{{count}} ユーザーを 100 にリセットしました",
         "message_other": "{{count}} ユーザーが 100 にリセットされました"
       },
       "claimCodeValidated": {
@@ -151,7 +146,8 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "サーバーの追加に失敗しました",
