@@ -53,11 +53,8 @@
     "title": "Usuarios",
     "showRemoved": "",
     "noUsersFound": "No se han encontrado usuarios.",
-    "selectAllUsers_other": "Seleccionar todos los usuarios de {{count}}",
     "serversColumn": "",
     "resetTrustScore": "Restablecer puntuación de confianza",
-    "resetTrustScoreTitle_one": "Restablecer la puntuación de confianza para el usuario {{count}}",
-    "resetTrustScoreTitle_other": "Restablecer la puntuación de confianza para el usuario {{count}}",
     "resetTrustScoreConfirm": "¿Está seguro de que desea restablecer la puntuación de confianza a 100? Esta acción no se puede deshacer.",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -115,7 +102,21 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_one": "",
+    "selectAllUsers_other": "Seleccionar todos los usuarios de {{count}}",
+    "resetTrustScoreTitle_one": "Restablecer la puntuación de confianza para el usuario {{count}}",
+    "resetTrustScoreTitle_other": "Restablecer la puntuación de confianza para el usuario {{count}}",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "Volver a Usuarios",
@@ -284,6 +285,7 @@
         "title": "Generando datos históricos...",
         "fallbackBody": "Creando instantáneas a partir del historial de la biblioteca. Esto puede tardar unos minutos.",
         "progress": "{{processed}} de {{total}} bibliotecas",
+        "snapshotsSuffix_one": "",
         "snapshotsSuffix_other": " ({{count}} instantáneas)"
       },
       "multiServer": {
@@ -307,7 +309,9 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_one": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -327,11 +331,8 @@
   "violations": {
     "title": "Infracciones",
     "tryAdjustingFilters": "Intente ajustar sus filtros.",
-    "selectAllViolations_other": "Filtras por las infracciones de {{count}}",
     "dismissViolation": "Descartar Infracción",
     "dismissViolationConfirm": "¿Está seguro que desea descartar esta infracción? Esto la eliminará del registro de infracciones permanentemente.",
-    "dismissViolation_one": "Descartar infracción de {{count}}",
-    "dismissViolation_other": "Descartar infracción de {{count}}",
     "dismissViolationsConfirm": "¿Está seguro que desea eliminar? Esto los eliminará del registro de infracciones permanentemente y restaurará las puntuaciones de confianza asociadas.",
     "noViolationsFound": "No se encontraron infracciones",
     "noViolationsRecorded": "Todavía no se han registrado infracciones.",
@@ -368,7 +369,13 @@
       "actual": "",
       "relatedSessions_one": "Sesión relacionada con {{count}}",
       "relatedSessions_other": ""
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_other": "Filtras por las infracciones de {{count}}",
+    "dismissViolations_one": "Descartar infracción de {{count}}",
+    "dismissViolations_other": "Descartar infracción de {{count}}",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -472,10 +479,10 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -667,12 +674,12 @@
         "placeholderAction": ""
       },
       "footer": {
+        "ready": "",
+        "search": "",
         "problems_one": "",
         "problems_other": "",
         "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -693,7 +700,9 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -707,12 +716,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -866,16 +871,18 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_one": "",
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
+      "noRuns": "",
       "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1566,7 +1573,9 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "Terminar Reproducción",
@@ -1599,10 +1608,8 @@
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} de {{total}} conexiones permitidas",
-      "connectionsAvailable_other": "{{count}} conexiones disponibles",
       "hideFiltered": "Ocultar filtrados",
       "showAll": "Mostrar todo",
-      "moreConnections_other": "+{{count}} más conexiones",
       "connectingTo": "Conectando a {{name}}...",
       "ownerOnly": "",
       "noAccountsLinked": "No hay cuentas Plex vinculadas",
@@ -1611,17 +1618,20 @@
       "linkAnotherAccount": "Vincular otra cuenta de Plex",
       "linking": "Vinculando...",
       "loginEnabled": "Inicio de sesión activado",
-      "serversConnected_one": "{{count}} servidor conectado",
-      "serversConnected_other": "{{count}} servidores conectados",
       "unlinkAccount": "Desvincular esta cuenta de Plex",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Eliminar los servidores conectados primero para desvincular esta cuenta",
       "unlinkPlexAccount": "Desvincular cuenta de Plex",
-      "unlinkConfirm": "¿Estás seguro de que quieres desvincular esta cuenta de Plex? No podrás añadir servidores de esta cuenta hasta que la vincules de nuevo."
+      "unlinkConfirm": "¿Estás seguro de que quieres desvincular esta cuenta de Plex? No podrás añadir servidores de esta cuenta hasta que la vincules de nuevo.",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_other": "{{count}} conexiones disponibles",
+      "moreConnections_one": "",
+      "moreConnections_other": "+{{count}} más conexiones",
+      "serversConnected_one": "{{count}} servidor conectado",
+      "serversConnected_other": "{{count}} servidores conectados"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1719,11 +1729,15 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_one": "",
+      "alertsGoTo_other": "",
+      "usedBy_one": "",
+      "usedBy_other": "",
+      "usedByNewsletters_one": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "Ejecutar ahora",
@@ -1803,7 +1817,9 @@
     "directPlayLow": "",
     "topTranscodingUsers": "Mejores usuarios de transcodificación",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "No se encontraron usuarios de transcodificación"
+    "noTranscodingUsers": "No se encontraron usuarios de transcodificación",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "Ancho de banda",
@@ -1912,12 +1928,13 @@
         }
       },
       "card": {
+        "addedAgo": "añadido {{date}}",
+        "addedCompactAgo": "añadido hace {{age}}",
         "newEpisodes_one": "{{count}} episodio nuevo",
         "newEpisodes_other": "{{count}} episodios nuevos",
         "replacedEpisodes_one": "",
         "replacedEpisodes_other": "",
-        "addedAgo": "añadido {{date}}",
-        "addedCompactAgo": "añadido hace {{age}}",
+        "newEpisodesChip_one": "",
         "newEpisodesChip_other": "{{count}} nuevo"
       },
       "deadWeight": {
@@ -1930,7 +1947,9 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_one": "",
+        "summary_other": ""
       },
       "loadError": "No se pudo cargar tu biblioteca multimedia"
     },
@@ -1946,9 +1965,9 @@
       "chart": {
         "title": "",
         "valueLabel": "",
+        "ariaLabel": "",
         "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -2036,15 +2055,15 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_one": "",
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2082,8 +2101,6 @@
       "rankSuffix": ", puesto {{rank}}",
       "onServers": "En {{servers}}",
       "addedLabel": "Añadido {{date}}",
-      "viewers_one": "{{count}} espectador",
-      "viewers_other": "{{count}} espectadores",
       "watchedState": {
         "watched": "Visto",
         "partial": "Visto parcialmente",
@@ -2097,12 +2114,14 @@
         "resolution": "resolución"
       },
       "rankChip": "",
+      "versionsChip": "",
+      "moreServers": "",
+      "viewers_one": "{{count}} espectador",
+      "viewers_other": "{{count}} espectadores",
       "playsCompact_one": "{{compact}} reproducción",
       "playsCompact_other": "{{compact}} reproducciones",
-      "versionsChip": "",
       "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2239,7 +2258,9 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_one": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
