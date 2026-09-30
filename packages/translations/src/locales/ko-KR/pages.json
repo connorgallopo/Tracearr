@@ -53,11 +53,8 @@
     "title": "사용자",
     "showRemoved": "삭제된 사용자 표시",
     "noUsersFound": "사용자를 찾을 수 없습니다.",
-    "selectAllUsers_other": "사용자 {{count}}명 모두 선택",
     "serversColumn": "서버",
     "resetTrustScore": "신뢰 점수 초기화",
-    "resetTrustScoreTitle_one": "사용자 {{count}}명의 신뢰 점수 초기화",
-    "resetTrustScoreTitle_other": "사용자 {{count}}명의 신뢰 점수 초기화",
     "resetTrustScoreConfirm": "신뢰 점수를 100으로 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
     "mergeUsers": "사용자 병합",
     "mergeTitleSuggestion": "두 사용자가 동일인인가요?",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "활동 기록 없음",
     "mergeMoreServers": "+{{count}}",
     "mergeWhatHappens": "병합 결과",
-    "mergeMoves_one": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
-    "mergeMoves_other": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
     "mergeMovesNoCount": "{{foldName}}의 서버 계정과 세션이 {{keepName}}에게 이전됩니다.",
     "mergeCarriesOver": "연락처 이메일, 뉴스레터 제외 설정, Seerr 요청도 함께 이전됩니다.",
     "mergeDeleted": "{{foldName}} 사용자는 삭제됩니다. {{keepName}} 페이지에서 계정을 다시 분리할 수 있습니다.",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "이 계정은 이미 동일한 사용자에게 속해 있습니다.",
     "mergeSelectAllActive": "전체 선택을 해제하고 통합할 사용자 두 명만 선택하세요",
     "suggestionsTitle": "중복 가능성이 있는 사용자",
-    "suggestionsCount_one": "중복 가능 사용자 {{count}}명",
-    "suggestionsCount_other": "중복 가능 사용자 {{count}}명",
     "suggestionsPairEmail": "{{first}}와(과) {{second}}의 이메일이 같습니다.",
-    "suggestionsPairEmailMore_one": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
-    "suggestionsPairEmailMore_other": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
     "suggestionsPairEmailUsername": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용합니다.",
-    "suggestionsPairEmailUsernameMore_one": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
-    "suggestionsPairEmailUsernameMore_other": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
     "suggestionsPairUsername": "{{first}}와(과) {{second}}의 사용자 이름이 같습니다.",
-    "suggestionsPairUsernameMore_one": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다.",
-    "suggestionsPairUsernameMore_other": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다.",
     "suggestionsSheetDescription": "병합하면 한 사용자는 유지되고 다른 사용자는 삭제됩니다. 동일인이 아니라고 표시한 사용자 쌍은 복원할 때까지 더 이상 표시되지 않습니다.",
     "suggestionsReview": "확인",
     "suggestionsNotSame": "동일인이 아님",
@@ -115,7 +102,14 @@
     "suggestionsError": "통합 제안을 불러오지 못했습니다",
     "filterHasAccessTo": "액세스 가능",
     "filterHasAccessToPlaceholder": "모든 서버",
-    "filterHasAccessToHint": "선택한 모든 서버에서 활성 계정을 가진 사람을 표시합니다."
+    "filterHasAccessToHint": "선택한 모든 서버에서 활성 계정을 가진 사람을 표시합니다.",
+    "selectAllUsers_other": "사용자 {{count}}명 모두 선택",
+    "resetTrustScoreTitle_other": "사용자 {{count}}명의 신뢰 점수 초기화",
+    "mergeMoves_other": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
+    "suggestionsCount_other": "중복 가능 사용자 {{count}}명",
+    "suggestionsPairEmailMore_other": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairEmailUsernameMore_other": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
+    "suggestionsPairUsernameMore_other": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다."
   },
   "userDetail": {
     "backToUsers": "사용자로 돌아가기",
@@ -307,8 +301,8 @@
     "versionsBackfill": {
       "banner": "이 서버에 대한 파일 버전 데이터가 아직 수집되고 있습니다. 완료하려면 라이브러리 동기화를 실행하세요.",
       "action": "지금 동기화",
-      "syncFailed_other": "{{count}}개의 서버에서 동기화를 시작하지 못했습니다. 권한과 서버 상태를 확인하세요.",
-      "syncStarted": "라이브러리 동기화가 시작되었습니다."
+      "syncStarted": "라이브러리 동기화가 시작되었습니다.",
+      "syncFailed_other": "{{count}}개의 서버에서 동기화를 시작하지 못했습니다. 권한과 서버 상태를 확인하세요."
     }
   },
   "activity": {
@@ -328,11 +322,8 @@
   "violations": {
     "title": "위반 내역",
     "tryAdjustingFilters": "필터를 조정해 보세요",
-    "selectAllViolations_other": "필터와 일치하는 위반 {{count}}건 모두 선택",
     "dismissViolation": "위반 해제",
     "dismissViolationConfirm": "이 위반을 해제할까요? 위반 로그에서 영구적으로 제거됩니다.",
-    "dismissViolation_one": "위반 {{count}}건 해제",
-    "dismissViolation_other": "위반 {{count}}건 해제",
     "dismissViolationsConfirm": "정말 해제할까요? 위반 로그에서 영구적으로 제거되고 관련 신뢰 점수가 복원됩니다.",
     "noViolationsFound": "위반을 찾을 수 없습니다",
     "noViolationsRecorded": "아직 기록된 위반이 없습니다.",
@@ -341,7 +332,6 @@
     "allRules": "모든 규칙",
     "filterPeople": "사용자",
     "allPeople": "모든 사용자",
-    "peopleSelectedCount_other": "{{count}}명",
     "personFilterPlaceholder": "사용자별 필터",
     "personFilterEmpty": "일치하는 사용자가 없습니다.",
     "personFilterError": "알림 보내기",
@@ -368,9 +358,11 @@
       "conditionGroup": "조건 그룹 {{index}}",
       "matched": "{{matched}}/{{total}} 일치",
       "actual": "실제 값",
-      "relatedSessions_one": "관련 세션 {{count}}개",
       "relatedSessions_other": "관련 세션 {{count}}개"
-    }
+    },
+    "selectAllViolations_other": "필터와 일치하는 위반 {{count}}건 모두 선택",
+    "dismissViolations_other": "위반 {{count}}건 해제",
+    "peopleSelectedCount_other": "{{count}}명"
   },
   "automations": {
     "actions": {
@@ -474,10 +466,9 @@
       "openInEditor": "이 실행으로 빌더에서 열기",
       "tabsLabel": "결과로 필터링",
       "emptyRan": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
-      "emptyRanDescription_one": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
-      "emptyRanDescription_other": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다.",
       "item": "항목",
-      "recordedViolation": "위반을 기록했습니다."
+      "recordedViolation": "위반을 기록했습니다.",
+      "emptyRanDescription_other": "{{count}}개의 검사가 실행되었지만 일치하지 않았습니다."
     },
     "allKinds": "모든 종류",
     "allStatuses": "모든 상태",
@@ -550,7 +541,6 @@
       "searchPlaceholder": "검색…",
       "noMatches": "일치하는 항목 없음",
       "clearSelection": "선택 취소",
-      "selectedCount_other": "{{count}}개 선택됨",
       "scope": {
         "label": "하나의 서버",
         "global": "모두",
@@ -670,12 +660,10 @@
         "placeholderAction": "실행할 작업"
       },
       "footer": {
-        "problems_one": "고쳐야 할 항목 {{count}}개",
-        "problems_other": "수정할 사항 {{count}}개",
-        "remaining_one": "완료까지 {{count}} 남았습니다",
-        "remaining_other": "완료까지 {{count}} 남았습니다",
         "ready": "저장 준비 완료",
-        "search": "검색"
+        "search": "검색",
+        "problems_other": "수정할 사항 {{count}}개",
+        "remaining_other": "완료까지 {{count}} 남았습니다"
       },
       "leave": {
         "title": "저장하지 않고 나가시겠습니까?",
@@ -696,7 +684,8 @@
         "sampleTitle": "지금 재생 중인 항목으로 돌아가기",
         "sampleGone": "해당 세션은 더 이상 기록에 남지 않습니다. 확인할 것이 없습니다.",
         "backToLive": "지금 재생 중인 항목으로 돌아가기"
-      }
+      },
+      "selectedCount_other": "{{count}}개 선택됨"
     },
     "categories": {
       "session_behavior": "세션 동작",
@@ -710,12 +699,8 @@
     "createAutomation": "자동화 생성",
     "customAutomation": "맞춤형 자동화",
     "deleteAutomationConfirm": "이 자동화를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
-    "deleteAutomation_one": "자동화 삭제",
-    "deleteAutomation_other": "자동화 {{count}}개 삭제",
     "deleteAutomationsConfirm": "삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
     "describe": {
-      "more_one": "+{{count}}개 이상",
-      "more_other": "+{{count}}개 이상",
       "noValues": "(없음)",
       "includesSameDevice": "동일한 장치가 포함되어 있습니다",
       "uniqueIps": "고유한 IP",
@@ -733,9 +718,7 @@
       "otherwise": "그렇지 않으면",
       "appliesTo": "{{count}}분",
       "duration": {
-        "minutes_one": "{{count}}분",
         "minutes_other": "{{count}}분",
-        "days_one": "{{count}}일",
         "days_other": "{{count}}일"
       },
       "triggers": {
@@ -869,16 +852,16 @@
         "text": "선택한 메시지",
         "boolean": "선택한 설정",
         "listed": "선택한 사용자"
-      }
+      },
+      "more_other": "+{{count}}개 이상"
     },
     "description": "",
     "detail": {
       "notFound": "자동화를 찾을 수 없습니다",
       "title": "자동화",
       "unsaved": "저장되지 않은 변경사항",
-      "runsLine_one": "1회 실행 · 마지막 실행 {{when}}",
-      "runsLine_other": "{{count}}번 실행 · 마지막 실행 {{when}}",
-      "noRuns": "아직 실행 없음"
+      "noRuns": "아직 실행 없음",
+      "runsLine_other": "{{count}}번 실행 · 마지막 실행 {{when}}"
     },
     "disable": "비활성화",
     "editAutomation": "자동화 편집",
@@ -1569,7 +1552,8 @@
       "trigger": "무엇이 시작하는가",
       "allTriggers": "모든 트리거"
     },
-    "openGallery": "갤러리 열기"
+    "openGallery": "갤러리 열기",
+    "deleteAutomation_other": "자동화 {{count}}개 삭제"
   },
   "terminateStream": {
     "title": "스트림 종료",
@@ -1602,10 +1586,8 @@
         "unknown": "연결 실패"
       },
       "connectionsReachable": "전체 {{total}}개 중 {{reachable}}개 연결 가능",
-      "connectionsAvailable_other": "사용 가능한 연결 {{count}}개",
       "hideFiltered": "필터링된 항목 숨기기",
       "showAll": "모두 보기",
-      "moreConnections_other": "연결 {{count}}개 더 보기",
       "connectingTo": "{{name}}에 연결 중...",
       "ownerOnly": "소유자만 연결된 Plex 계정을 관리할 수 있습니다.",
       "noAccountsLinked": "연결된 Plex 계정이 없습니다",
@@ -1614,17 +1596,17 @@
       "linkAnotherAccount": "다른 Plex 계정 연결",
       "linking": "연결 중...",
       "loginEnabled": "로그인 활성화됨",
-      "serversConnected_one": "서버 {{count}}대 연결됨",
-      "serversConnected_other": "서버 {{count}}대 연결됨",
       "unlinkAccount": "이 Plex 계정 연결 해제",
       "reauthorizeAccount": "이 Plex 계정 다시 인증",
       "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
       "unlinkPlexAccount": "Plex 계정 연결 해제",
-      "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다."
+      "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다.",
+      "connectionsAvailable_other": "사용 가능한 연결 {{count}}개",
+      "moreConnections_other": "연결 {{count}}개 더 보기",
+      "serversConnected_other": "서버 {{count}}대 연결됨"
     },
     "destinations": {
       "add": "알림 대상 추가",
-      "alertsGoTo_other": "알림 수신 주소 {{count}}개",
       "builtinNote": "내장",
       "clearSecret": "지우기",
       "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
@@ -1722,11 +1704,12 @@
         "push": "모바일 푸시",
         "webToast": "브라우저 알림"
       },
-      "usedBy_other": "{{count}}개의 자동화에서 사용됨",
-      "usedByNewsletters_other": "뉴스레터 {{count}}개에서 사용 중",
       "violationsOff": "위반 알림 꺼짐",
       "violationsOn": "위반 알림 켜짐",
-      "webToastNote": "이 브라우저에 알림이 표시됩니다."
+      "webToastNote": "이 브라우저에 알림이 표시됩니다.",
+      "alertsGoTo_other": "알림 수신 주소 {{count}}개",
+      "usedBy_other": "{{count}}개의 자동화에서 사용됨",
+      "usedByNewsletters_other": "뉴스레터 {{count}}개에서 사용 중"
     },
     "jobs": {
       "runNow": "지금 실행",
@@ -1785,7 +1768,6 @@
     "title": "기기 호환성",
     "description": "",
     "analyzedSessions": "분석된 세션",
-    "analyzedSessionsTooltip_other": "최소 {{count}}개의 세션과 알려진 코덱이 포함된 장치 + 코덱 조합의 세션입니다. 코덱 정보가 없는 드문 조합과 세션은 계산되지 않습니다.",
     "directPlayRate": "직접 재생 비율",
     "videoAndAudio": "",
     "uniqueDevices": "고유 기기",
@@ -1807,7 +1789,8 @@
     "directPlayLow": "50% 미만",
     "topTranscodingUsers": "트랜스코딩 상위 사용자",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "트랜스코딩 사용자를 찾을 수 없습니다"
+    "noTranscodingUsers": "트랜스코딩 사용자를 찾을 수 없습니다",
+    "analyzedSessionsTooltip_other": "최소 {{count}}개의 세션과 알려진 코덱이 포함된 장치 + 코덱 조합의 세션입니다. 코덱 정보가 없는 드문 조합과 세션은 계산되지 않습니다."
   },
   "statsBandwidth": {
     "title": "대역폭",
@@ -1916,17 +1899,14 @@
         }
       },
       "card": {
-        "newEpisodes_one": "새 에피소드 {{count}}개",
-        "newEpisodes_other": "새 에피소드 {{count}}개",
-        "replacedEpisodes_one": "에피소드 {{count}}개 교체됨",
-        "replacedEpisodes_other": "에피소드 {{count}}개 교체됨",
         "addedAgo": "{{date}} 추가됨",
         "addedCompactAgo": "{{age}} 전에 추가됨",
+        "newEpisodes_other": "새 에피소드 {{count}}개",
+        "replacedEpisodes_other": "에피소드 {{count}}개 교체됨",
         "newEpisodesChip_other": "{{count}} 신규"
       },
       "deadWeight": {
         "title": "장기 미시청 콘텐츠",
-        "summary_other": "시청하지 않은 타이틀 {{count}}개 · {{size}}",
         "empty": "정리할 항목이 없습니다. 라이브러리의 모든 항목에 시청 기록이 있습니다.",
         "columns": {
           "poster": "포스터",
@@ -1935,7 +1915,8 @@
           "servers": "서버"
         },
         "viewAll": "모두 보기",
-        "viewAllTooltip": "곧 출시 예정"
+        "viewAllTooltip": "곧 출시 예정",
+        "summary_other": "시청하지 않은 타이틀 {{count}}개 · {{size}}"
       },
       "loadError": "영화"
     },
@@ -1951,9 +1932,8 @@
       "chart": {
         "title": "장르별 재생 수",
         "valueLabel": "재생 수",
-        "itemCount_one": "콘텐츠 {{count}}개",
-        "itemCount_other": "콘텐츠 {{count}}개",
-        "ariaLabel": "장르별 재생 막대 차트로, 가장 높은 것에서 가장 낮은 것으로 정렬됩니다. 전체 분석 내용은 아래 표에서 확인할 수 있습니다."
+        "ariaLabel": "장르별 재생 막대 차트로, 가장 높은 것에서 가장 낮은 것으로 정렬됩니다. 전체 분석 내용은 아래 표에서 확인할 수 있습니다.",
+        "itemCount_other": "콘텐츠 {{count}}개"
       },
       "table": {
         "title": "장르별 분류",
@@ -1984,9 +1964,7 @@
       "hero": {
         "loadError": "{{count}} 시즌",
         "meta": {
-          "seasons_one": "{{count}} 시즌",
           "seasons_other": "{{count}} 시즌",
-          "episodes_one": "{{count}}개의 에피소드",
           "episodes_other": "{{count}}개의 에피소드"
         },
         "availability": {
@@ -2041,15 +2019,14 @@
         "title": "시즌",
         "loadError": "{{count}}개의 에피소드",
         "empty": "{{count}}개의 에피소드",
-        "episodeCount_one": "{{count}}개의 에피소드",
-        "episodeCount_other": "{{count}}개의 에피소드",
         "watchedPct": "{{percent}}% 시청함",
         "stripSummary": "{{season}}: {{percent}}% 시청",
         "episodeLabel": {
           "watched": "{{code}}: 시청함",
           "partial": "{{code}}: 부분적으로 시청함",
           "unwatched": "{{code}}: 시청하지 않음"
-        }
+        },
+        "episodeCount_other": "{{count}}개의 에피소드"
       },
       "platforms": {
         "title": "플랫폼",
@@ -2087,8 +2064,6 @@
       "rankSuffix": ", {{rank}}위",
       "onServers": "{{servers}}에서 이용 가능",
       "addedLabel": "{{date}} 추가됨",
-      "viewers_one": "시청자 {{count}}명",
-      "viewers_other": "시청자 {{count}}명",
       "watchedState": {
         "watched": "시청함",
         "partial": "일부 시청함",
@@ -2102,12 +2077,11 @@
         "resolution": "해상도"
       },
       "rankChip": "#{{rank}}",
-      "playsCompact_one": "{{compact}} 플레이",
-      "playsCompact_other": "{{compact}} 플레이",
       "versionsChip": "{{count}}×",
-      "versions_one": "{{count}} 버전",
-      "versions_other": "{{count}} 버전",
-      "moreServers": "+{{count}}개 이상"
+      "moreServers": "+{{count}}개 이상",
+      "viewers_other": "시청자 {{count}}명",
+      "playsCompact_other": "{{compact}} 플레이",
+      "versions_other": "{{count}} 버전"
     },
     "grid": {
       "toolbar": {
@@ -2157,7 +2131,6 @@
           "viewers": "시청자"
         },
         "count": "전체 {{total}}개 중 {{loaded}}개 · {{size}}",
-        "countTotal_one": "콘텐츠 {{count}}개 · {{size}}",
         "countTotal_other": "콘텐츠 {{count}}개 · {{size}}"
       },
       "scrubber": {
@@ -2241,11 +2214,11 @@
       "linkSeerr": "Seerr 연결",
       "kpi": {
         "requested": "요청됨",
-        "landedOf_other": "{{count}}개 추가됨",
         "watched": "시청함",
         "neverPlayed": "재생 기록 없음",
         "ofLanded": "추가된 항목 중 {{share}}",
-        "onDisk": "디스크 사용량 {{size}}"
+        "onDisk": "디스크 사용량 {{size}}",
+        "landedOf_other": "{{count}}개 추가됨"
       }
     },
     "funnel": {
