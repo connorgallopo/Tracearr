@@ -49,11 +49,13 @@
       },
       "plexAccountReauthorized": {
         "title": "Konto Plex ponownie autoryzowane",
-        "message_one": "{{count}} serwer połączony ponownie",
-        "message_other": "{{count}} serwery połączone ponownie",
         "messageNoServers": "Token konta zaktualizowany",
         "partial": "Token został zaktualizowany, ale {{names}} nadal go odrzucił",
-        "unmatched": "Token został zaktualizowany, ale {{names}} nie mógł zostać ponownie połączony"
+        "unmatched": "Token został zaktualizowany, ale {{names}} nie mógł zostać ponownie połączony",
+        "message_one": "{{count}} serwer połączony ponownie",
+        "message_few": "",
+        "message_many": "",
+        "message_other": "{{count}} serwery połączone ponownie"
       },
       "jobCompleted": {
         "title": "Zadanie zakończone"
@@ -93,16 +95,22 @@
       "sessionsDeleted": {
         "title": "Sesje usunięte",
         "message_one": "{{count}} sesja usunięta",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} sesje usunięta"
       },
       "violationsAcknowledged": {
         "title": "Naruszenia potwierdzone",
         "message_one": "{{count}} naruszenie potwierdzone",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} naruszenia potwierdzone"
       },
       "violationsDismissed": {
         "title": "Naruszenia odrzucono",
         "message_one": "{{count}} naruszenie odrzucono",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} naruszenia odrzucono"
       },
       "apiKeyGenerated": {
@@ -125,6 +133,8 @@
       "trustScoresReset": {
         "title": "Zresetuj wyniki zaufania",
         "message_one": "{{count}} użytkownik zresetowany do 100",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} użytkownicy zresetowani do 100"
       },
       "claimCodeValidated": {
@@ -149,10 +159,13 @@
       "newsletterDuplicated": "Newsletter zduplikowany",
       "newsletterTestQueued": "Test w kolejce do {{address}}",
       "newsletterSendQueued": "Wysyłka dodana do kolejki",
-      "newsletterRetryQueued_other": "Ponawianie próby do {{count}} odbiorców",
       "brandingSaved": "Branding e-mail zapisany",
       "suppressionAdded": "Adres dodany do listy wyciszenia",
-      "suppressionRemoved": "Adres usunięty z listy wyciszenia"
+      "suppressionRemoved": "Adres usunięty z listy wyciszenia",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_many": "",
+      "newsletterRetryQueued_other": "Ponawianie próby do {{count}} odbiorców"
     },
     "error": {
       "serverAddFailed": "Nie udało się dodać serwera",
