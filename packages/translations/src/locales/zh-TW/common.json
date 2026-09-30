@@ -203,48 +203,29 @@
     "connectionFailed": "連接失敗"
   },
   "count": {
-    "user_one": "{{count}} 個使用者",
     "user_other": "{{count}} 個使用者",
-    "session_one": "{{count}} 個會話",
     "session_other": "{{count}} 個會話",
-    "stream_one": "{{count}} 個串流",
     "stream_other": "{{count}} 個串流",
-    "server_one": "{{count}} 個伺服器",
     "server_other": "{{count}} 個伺服器",
-    "automation_one": "",
     "automation_other": "",
-    "violation_one": "{{count}} 項違規",
     "violation_other": "{{count}} 項違規",
-    "usersAdded_one": "{{count}} 個使用者已新增",
     "usersAdded_other": "{{count}} 個使用者已新增",
-    "usersUpdated_one": "{{count}} 個使用者已更新",
     "usersUpdated_other": "{{count}} 個使用者已更新",
-    "library_one": "{{count}} 個媒體庫",
     "library_other": "{{count}} 個媒體庫",
-    "error_one": "{{count}} 個錯誤",
     "error_other": "{{count}} 個錯誤",
-    "alert_one": "",
     "alert_other": "",
-    "location_one": "",
     "location_other": "",
-    "device_one": "",
     "device_other": "",
-    "play_one": "",
     "play_other": "",
-    "segment_one": "",
     "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "未偵測到變更"
   },
   "duration": {
-    "second_one": "",
     "second_other": "",
-    "minute_one": "{{count}} 分鐘",
     "minute_other": "{{count}} 分鐘",
-    "hour_one": "{{count}} 小時",
     "hour_other": "{{count}} 小時",
-    "day_one": "",
     "day_other": ""
   },
   "empty": {
