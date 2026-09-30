@@ -203,48 +203,29 @@
     "connectionFailed": "接続に失敗しました"
   },
   "count": {
-    "user_one": "{{count}} ユーザー",
     "user_other": "{{count}} ユーザー",
-    "session_one": "{{count}} セッション",
     "session_other": "{{count}} セッション",
-    "stream_one": "{{count}} ストリーム",
     "stream_other": "",
-    "server_one": "{{count}} サーバー",
     "server_other": "{{count}} サーバー",
-    "automation_one": "",
     "automation_other": "",
-    "violation_one": "{{count}} 違反",
     "violation_other": "{{count}} 違反",
-    "usersAdded_one": "{{count}} ユーザーが追加されました",
     "usersAdded_other": "{{count}} ユーザーが追加されました",
-    "usersUpdated_one": "{{count}} ユーザーが更新されました",
     "usersUpdated_other": "{{count}} ユーザーが更新されました",
-    "library_one": "{{count}} ライブラリ",
     "library_other": "{{count}} ライブラリ",
-    "error_one": "{{count}} エラー",
     "error_other": "{{count}} エラー",
-    "alert_one": "",
     "alert_other": "",
-    "location_one": "",
     "location_other": "",
-    "device_one": "",
     "device_other": "",
-    "play_one": "{{count}} 回再生",
     "play_other": "{{count}} 回再生",
-    "segment_one": "",
     "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "変更は検出されませんでした"
   },
   "duration": {
-    "second_one": "{{count}} 秒",
     "second_other": "{{count}} 秒",
-    "minute_one": "",
     "minute_other": "",
-    "hour_one": "{{count}} 時間",
     "hour_other": "",
-    "day_one": "{{count}} 日",
     "day_other": "{{count}} 日"
   },
   "empty": {
