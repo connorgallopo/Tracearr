@@ -203,48 +203,29 @@
     "connectionFailed": "连接失败"
   },
   "count": {
-    "user_one": "{{count}} 个用户",
     "user_other": "{{count}} 个用户",
-    "session_one": "{{count}}会话",
     "session_other": "{{count}}会话",
-    "stream_one": "{{count}}流",
     "stream_other": "{{count}}流",
-    "server_one": "{{count}}服务器",
     "server_other": "{{count}}服务器",
-    "automation_one": "{{count}} 个自动化",
     "automation_other": "{{count}} 个自动化",
-    "violation_one": "{{count}}违反",
     "violation_other": "{{count}}违反",
-    "usersAdded_one": "{{count}}用户已添加",
     "usersAdded_other": "{{count}}用户已添加",
-    "usersUpdated_one": "{{count}}用户已更新",
     "usersUpdated_other": "{{count}}用户已更新",
-    "library_one": "{{count}}媒体",
     "library_other": "{{count}}媒体库",
-    "error_one": "{{count}}错误",
     "error_other": "{{count}}错误",
-    "alert_one": "{{count}} 警报",
     "alert_other": "{{count}} 条警报",
-    "location_one": "{{count}}违反",
     "location_other": "{{count}}条违反",
-    "device_one": "{{count}} 已选",
     "device_other": "{{count}} 已选",
-    "play_one": "{{count}} 次播放",
     "play_other": "{{count}} 次播放",
-    "segment_one": "",
     "segment_other": ""
   },
   "messages": {
     "noChangesDetected": "未检测到更改"
   },
   "duration": {
-    "second_one": "{{count}} 秒",
     "second_other": "{{count}} 秒",
-    "minute_one": "{{count}} 分钟",
     "minute_other": "{{count}} 分钟",
-    "hour_one": "{{count}} 小时",
     "hour_other": "{{count}} 小时",
-    "day_one": "{{count}} 天",
     "day_other": "{{count}} 天"
   },
   "empty": {
