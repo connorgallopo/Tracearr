@@ -6,7 +6,9 @@
   "activity": "Aktivitet",
   "library": "Bibliotek",
   "users": "Brukere",
+  "automations": "",
   "violations": "Brudd",
+  "requests": "",
   "alerts": "Varsler",
   "settings": "Innstillinger",
   "overview": "Oversikt",
@@ -18,5 +20,12 @@
   "jobs": "Jobber",
   "media": "Medier",
   "mediaBrowse": "Bla gjennom",
-  "mediaGenres": "Sjangre"
+  "mediaGenres": "Sjangre",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }
