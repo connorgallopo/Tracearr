@@ -567,7 +567,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "Global",
+        "global": "Herkes",
         "server": "",
         "account": "",
         "person": "",
@@ -684,7 +684,7 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "{{count}} problem",
+        "problems_one": "{{count}} düzeltilecek sorun",
         "problems_other": "",
         "remaining_one": "",
         "remaining_other": "",
