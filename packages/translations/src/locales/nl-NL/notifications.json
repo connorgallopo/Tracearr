@@ -49,11 +49,11 @@
       },
       "plexAccountReauthorized": {
         "title": "Plex account opnieuw geautoriseerd",
-        "message_one": "{{count}} server opnieuw verbonden",
-        "message_other": "{{count}} servers hebben opnieuw verbinding gemaakt",
         "messageNoServers": "Accounttoken bijgewerkt",
         "partial": "Token bijgewerkt, maar {{names}} weigerde het nog steeds",
-        "unmatched": "Token bijgewerkt, maar {{names}} kon niet opnieuw gekoppeld worden"
+        "unmatched": "Token bijgewerkt, maar {{names}} kon niet opnieuw gekoppeld worden",
+        "message_one": "{{count}} server opnieuw verbonden",
+        "message_other": "{{count}} servers hebben opnieuw verbinding gemaakt"
       },
       "jobCompleted": {
         "title": "Taak voltooid"
@@ -151,7 +151,9 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Server toevoegen mislukt",
