@@ -49,11 +49,10 @@
       },
       "plexAccountReauthorized": {
         "title": "Plex账户已重新授权",
-        "message_one": "{{count}} 服务器已连接",
-        "message_other": "{{count}} 台服务器已连接",
         "messageNoServers": "帐户令牌已更新",
         "partial": "Token已更新，但{{names}}仍拒绝了它",
-        "unmatched": "令牌已更新，但 {{names}} 无法重新链接"
+        "unmatched": "令牌已更新，但 {{names}} 无法重新链接",
+        "message_other": "{{count}} 台服务器已连接"
       },
       "jobCompleted": {
         "title": "任务已完成"
@@ -92,17 +91,14 @@
       },
       "sessionsDeleted": {
         "title": "会话已删除",
-        "message_one": "{{count}}会话已删除",
         "message_other": "{{count}}会话已删除"
       },
       "violationsAcknowledged": {
         "title": "确认违规行为",
-        "message_one": "{{count}}确认违规行为",
         "message_other": "{{count}}确认违规行为"
       },
       "violationsDismissed": {
         "title": "违规情况已清除",
-        "message_one": "{{count}}违规情况已清除",
         "message_other": "{{count}}违规情况已清除"
       },
       "apiKeyGenerated": {
@@ -124,7 +120,6 @@
       "identityUpdated": "个人资料已更新",
       "trustScoresReset": {
         "title": "重置信任分数",
-        "message_one": "{{count}}用户重置为100",
         "message_other": "{{count}}用户重置为100"
       },
       "claimCodeValidated": {
@@ -151,7 +146,8 @@
       "newsletterSendQueued": "发送队列中",
       "brandingSaved": "邮件标记已保存",
       "suppressionAdded": "地址添加到抑制列表",
-      "suppressionRemoved": "地址已从抑制列表中删除"
+      "suppressionRemoved": "地址已从抑制列表中删除",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
