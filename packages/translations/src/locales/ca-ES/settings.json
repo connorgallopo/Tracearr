@@ -122,7 +122,6 @@
       "size": "Al disc",
       "files": "Fitxers",
       "need": "Necessitat estimada",
-      "needHint_other": "{{count}} pòsters × {{size}}",
       "free": "Espai lliure al disc",
       "freeOf": "de {{total}}",
       "floor": "Manté lliure",
@@ -133,7 +132,9 @@
       "never": "encara no",
       "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de pòsters no són a la memòria cau.",
       "loadError": "No s'ha pogut carregar l'estat de la memòria cau.",
-      "notPersisting": "La memòria cau de pòsters no sobreviu als reinicis. Munteu un volum al directori de la memòria cau; si no, cada pòster es torna a baixar cada vegada que es recrea el contenidor."
+      "notPersisting": "La memòria cau de pòsters no sobreviu als reinicis. Munteu un volum al directori de la memòria cau; si no, cada pòster es torna a baixar cada vegada que es recrea el contenidor.",
+      "needHint_one": "",
+      "needHint_other": "{{count}} pòsters × {{size}}"
     }
   },
   "servers": {
@@ -254,7 +255,6 @@
     "enableMobileAccess": "Habilita l'accés mòbil",
     "enabling": "S'està habilitant...",
     "devicesConnected": "{{current}} de {{max}} dispositius connectats",
-    "pendingTokens_other": "{{count}} testimonis d'aparellament pendents",
     "addDevice": "Afegeix un dispositiu",
     "disableMobileAccess": "Deshabilita l'accés mòbil",
     "revokeAllSessions": "Revoca-ho tot",
@@ -277,7 +277,9 @@
     "removeDeviceConfirm": "Segur que voleu eliminar {{deviceName}}? Aquest dispositiu s'haurà de tornar a aparellar per connectar-s'hi de nou.",
     "externalUrlBanner": "Feu servir un proxy invers o hi accediu de manera remota? Configureu el vostre",
     "externalUrlBannerLink": "URL extern",
-    "externalUrlBannerSuffix": "perquè l'aplicació mòbil es pugui connectar al servidor."
+    "externalUrlBannerSuffix": "perquè l'aplicació mòbil es pugui connectar al servidor.",
+    "pendingTokens_one": "",
+    "pendingTokens_other": "{{count}} testimonis d'aparellament pendents"
   },
   "tailscale": {
     "title": "VPN de Tailscale",
@@ -404,10 +406,12 @@
     "serverTimezoneHelp": "Ha de coincidir amb el fus horari configurat a la màquina del servidor multimèdia, no amb el del navegador. Les marques de temps de Playback Reporting es desen en l'hora local del servidor.",
     "importFullRange": "Importa tot l'històric",
     "importFullRangeHelp": "Les reproduccions que van començar després d'afegir aquest servidor a Tracearr no s'importen mai. Per defecte, la importació també s'atura a la reproducció més antiga que Tracearr ja té d'aquest servidor, per exemple d'una importació de Jellystat. Activeu això per importar-ho tot d'abans que s'afegís el servidor. Els duplicats exactes se segueixen ometent.",
-    "overlapSkipped_other": "{{count}} omesos per solapament",
-    "duplicates_other": "{{count}} duplicats omesos",
     "skipOverlap": "Registre solapat: la marca de temps cau dins del període que Tracearr ja registra per a aquest servidor. Activeu la importació de tot l'històric per incloure'l.",
-    "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector."
+    "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector.",
+    "overlapSkipped_one": "",
+    "overlapSkipped_other": "{{count}} omesos per solapament",
+    "duplicates_one": "",
+    "duplicates_other": "{{count}} duplicats omesos"
   },
   "plex": {
     "signInWithPlex": "Inicia la sessió amb Plex",
@@ -444,8 +448,6 @@
     "earlier": "Versions anteriors",
     "installedBadge": "Instal·lada",
     "latestBadge": "Última",
-    "changeCount_one": "{{count}} canvi",
-    "changeCount_other": "{{count}} canvis",
     "series": "Tracearr {{series}}",
     "docs": "Documentació",
     "source": "GitHub",
@@ -456,10 +458,13 @@
       "fix": "Correcció",
       "security": "Seguretat",
       "note": "Nota"
-    }
+    },
+    "changeCount_one": "{{count}} canvi",
+    "changeCount_other": "{{count}} canvis"
   },
   "serverHealth": {
     "unreachable": "No es pot connectar amb {{serverName}}",
+    "multipleUnreachable_one": "",
     "multipleUnreachable_other": "No es pot connectar amb {{count}} servidors: {{serverNames}}"
   },
   "ipWarning": {
@@ -639,9 +644,11 @@
       },
       "windowSentence": {
         "fallback": "El primer correu mira enrere",
-        "fallbackLabel_other": "El primer correu mira enrere {{count}} dies.",
         "fixed": "Mira enrere",
         "fixedAfter": "cada vegada",
+        "fallbackLabel_one": "",
+        "fallbackLabel_other": "El primer correu mira enrere {{count}} dies.",
+        "fixedLabel_one": "",
         "fixedLabel_other": "Mira enrere {{count}} dies cada vegada."
       },
       "windowMax": "Mai més de 31 dies, digui el que digui això.",
@@ -650,14 +657,12 @@
       "allServers": "Tots els servidors",
       "searchServers": "Cerca servidors",
       "noServers": "Cap servidor no coincideix",
-      "serversSelected_other": "{{count}} servidors",
       "variantsNote": "Això tria tant els títols com les persones: només el reben els membres que tenen un compte en aquests servidors. Qui en tingui a diversos rep un sol correu que els abasta tots.",
       "serversHelp": "Només el reben els membres que tenen un compte en aquest servidor.",
       "libraries": "Biblioteques",
       "allLibraries": "Totes les biblioteques",
       "searchLibraries": "Cerca biblioteques",
       "noLibraries": "Cap biblioteca no coincideix",
-      "librariesSelected_other": "{{count}} biblioteques",
       "librariesHelp": "Restringeix què llista el correu. No canvia qui el rep.",
       "clear": "Neteja",
       "unknownLibrary": "Biblioteca desconeguda",
@@ -679,10 +684,15 @@
           "mostPlayed": "més reproduïts"
         },
         "labels": {
+          "movies_one": "",
           "movies_other": "Pel·lícules, fins a {{count}} pel·lícules",
+          "shows_one": "",
           "shows_other": "Sèries, fins a {{count}} sèries",
+          "seasons_one": "",
           "seasons_other": "Sèries, {{count}} temporades de cadascuna",
+          "music_one": "",
           "music_other": "Música, fins a {{count}} àlbums",
+          "mostWatched_one": "",
           "mostWatched_other": "El més vist, els {{count}} més reproduïts"
         },
         "musicHelp": "Es compta en àlbums, repartits entre artistes segons l'ordre en què es van afegir.",
@@ -691,9 +701,6 @@
       "message": "Missatge",
       "senderName": "Nom del remitent",
       "senderNameHelp": "El nom que surt a la línia «De» i al final del correu. Deixeu-ho buit per fer servir {{name}}.",
-      "senderNameRequiredMulti_other": "Aquest butlletí abasta {{count}} servidors, de manera que no hi ha un únic nom de servidor per signar-lo. Trieu un nom.",
-      "previewVariant_one": "{{count}} persona amb un compte a {{servers}}",
-      "previewVariant_other": "{{count}} persones amb un compte a {{servers}}",
       "variantHeading": "{{count}} amb un compte a {{servers}}",
       "subject": "Assumpte",
       "subjectHelp": "Aquests se substitueixen quan es construeix el correu:",
@@ -728,10 +735,8 @@
         "loadFailed": "No s'han pogut carregar els destinataris.",
         "willReceive": "El rebran {{count}}",
         "excludedCount": "Exclosos {{count}}",
-        "notIncludable_other": "{{count}} no es poden incloure",
         "noAddress": "Sense adreça electrònica {{count}}",
         "suppressedCount": "Suprimits {{count}}",
-        "joinedSinceLastSend_other": "{{count}} s'han afegit des de l'últim enviament",
         "newSinceLastSend": "Nous des de l'últim enviament",
         "manage": "Gestiona els destinataris ({{count}})",
         "manageHelp": "«Exclou» i «Inclou» canvien el formulari. No es desa res fins que premeu «Desa».",
@@ -746,7 +751,6 @@
         },
         "selectAll": "Selecciona els {{count}}",
         "selectPerson": "Selecciona {{name}}",
-        "selectedCount_other": "{{count}} seleccionat",
         "excludeSelected": "Exclou els seleccionats",
         "includeSelected": "Inclou els seleccionats",
         "noMatches": "Aquí no hi ha ningú que coincideixi amb la cerca.",
@@ -766,7 +770,6 @@
         "include": "Torna a incloure {{name}}",
         "includeAction": "Inclou",
         "excludedHelp": "Aquestes persones queden fora d'aquest butlletí fins que les hi torneu a incloure. Els altres butlletins no en queden afectats.",
-        "notIncludableHelp_other": "Hi ha {{count}} persones més que no es poden incloure perquè estan bandejades, pendents o no són en cap servidor dels triats.",
         "excludedAfterSave": "S'exclourà en desar",
         "includedAfterSave": "S'inclourà en desar",
         "reasons": {
@@ -776,7 +779,15 @@
           "noServer": "No és a cap servidor dels triats"
         },
         "emptyTitle": "Ningú no rebrà aquest butlletí",
-        "emptyDescription": "Activeu «Tothom dels servidors triats» o afegiu una adreça a sota."
+        "emptyDescription": "Activeu «Tothom dels servidors triats» o afegiu una adreça a sota.",
+        "notIncludable_one": "",
+        "notIncludable_other": "{{count}} no es poden incloure",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_other": "{{count}} s'han afegit des de l'últim enviament",
+        "selectedCount_one": "",
+        "selectedCount_other": "{{count}} seleccionat",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_other": "Hi ha {{count}} persones més que no es poden incloure perquè estan bandejades, pendents o no són en cap servidor dels triats."
       },
       "delivery": {
         "title": "Lliurament",
@@ -825,13 +836,13 @@
         "fromDomain": "L'adreça del remitent coincideix amb el domini del compte SMTP.",
         "fromDomainFail": "L'adreça del remitent i el nom d'usuari SMTP són de dominis diferents; alguns proveïdors no ho accepten.",
         "fromDomainUnknown": "Trieu una destinació per comprovar-ne l'adreça del remitent.",
-        "recipients_one": "{{count}} destinatari es resol en una adreça.",
-        "recipients_other": "{{count}} destinataris es resolen en una adreça.",
         "recipientsFail": "Encara no hi ha ningú que es resolgui en una adreça.",
         "recipientsChecking": "S'està comprovant qui rep aquest butlletí.",
         "recipientsLoadFailed": "No s'han pogut carregar els destinataris.",
         "dns": "La capacitat de lliurament depèn dels registres SPF, DKIM i DMARC del domini emissor.",
-        "dnsLink": "Llegeix com configurar-los"
+        "dnsLink": "Llegeix com configurar-los",
+        "recipients_one": "{{count}} destinatari es resol en una adreça.",
+        "recipients_other": "{{count}} destinataris es resolen en una adreça."
       },
       "actions": {
         "preview": "Vista prèvia",
@@ -876,13 +887,22 @@
       "send": {
         "title": "Voleu enviar {{name}} ara?",
         "previewing": "S'està calculant qui rep què...",
-        "summary_other": "S'enviarà a {{count}} destinataris: {{counts}} afegits entre {{start}} i {{end}}. Cada persona rep la seva pròpia còpia i només veu la seva adreça.",
         "nobody": "No hi ha ningú que es resolgui en una adreça ({{missing}} membres no en tenen), de manera que no hi ha res per enviar.",
-        "trimmed_one": "{{count}} element es reté com a línia +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla.",
-        "trimmed_other": "{{count}} elements es retenen com a línies +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla.",
         "confirm": "Envia",
-        "sending": "S'està enviant"
-      }
+        "sending": "S'està enviant",
+        "summary_one": "",
+        "summary_other": "S'enviarà a {{count}} destinataris: {{counts}} afegits entre {{start}} i {{end}}. Cada persona rep la seva pròpia còpia i només veu la seva adreça.",
+        "trimmed_one": "{{count}} element es reté com a línia +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla.",
+        "trimmed_other": "{{count}} elements es retenen com a línies +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla."
+      },
+      "serversSelected_one": "",
+      "serversSelected_other": "{{count}} servidors",
+      "librariesSelected_one": "",
+      "librariesSelected_other": "{{count}} biblioteques",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_other": "Aquest butlletí abasta {{count}} servidors, de manera que no hi ha un únic nom de servidor per signar-lo. Trieu un nom.",
+      "previewVariant_one": "{{count}} persona amb un compte a {{servers}}",
+      "previewVariant_other": "{{count}} persones amb un compte a {{servers}}"
     },
     "history": {
       "empty": "Encara no hi ha cap enviament",
@@ -894,7 +914,6 @@
         "test": "Prova"
       },
       "window": "Del {{start}} al {{end}}",
-      "recipients_other": "{{count}} destinataris",
       "recipientsEmpty": "Els destinataris apareixen quan comença l'enviament.",
       "finished": "Acabat {{when}}",
       "open": "Obre l'enviament de {{when}}",
@@ -907,7 +926,6 @@
         "suppressed": "Suprimit",
         "unknown": "Desconegut"
       },
-      "attempts_other": "{{count}} intents",
       "unknownHelp": "El servidor ha deixat de respondre després que el missatge sortís; no es torna a intentar mai automàticament.",
       "openSnapshot": "Obre la instantània",
       "variant": "Membres de {{servers}}",
@@ -915,7 +933,11 @@
       "openVariantSnapshot": "Obre la instantània de {{servers}}",
       "snapshotTitle": "Còpia enviada",
       "pruned": "La instantània s'ha esporgat al cap de 90 dies; no es pot visualitzar ni reenviar res.",
-      "retryFailed": "Torna a intentar els enviaments fallits"
+      "retryFailed": "Torna a intentar els enviaments fallits",
+      "recipients_one": "",
+      "recipients_other": "{{count}} destinataris",
+      "attempts_one": "",
+      "attempts_other": "{{count}} intents"
     }
   },
   "email": {
