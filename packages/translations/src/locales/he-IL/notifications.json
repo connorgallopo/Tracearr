@@ -49,11 +49,12 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_one": "",
+        "message_two": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": ""
@@ -93,16 +94,19 @@
       "sessionsDeleted": {
         "title": "",
         "message_one": "",
+        "message_two": "",
         "message_other": ""
       },
       "violationsAcknowledged": {
         "title": "",
         "message_one": "",
+        "message_two": "",
         "message_other": ""
       },
       "violationsDismissed": {
         "title": "",
         "message_one": "",
+        "message_two": "",
         "message_other": ""
       },
       "apiKeyGenerated": {
@@ -125,6 +129,7 @@
       "trustScoresReset": {
         "title": "",
         "message_one": "",
+        "message_two": "",
         "message_other": ""
       },
       "claimCodeValidated": {
@@ -151,7 +156,10 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_two": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "",
