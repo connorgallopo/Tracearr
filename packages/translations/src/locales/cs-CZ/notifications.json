@@ -49,11 +49,13 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_one": "",
+        "message_few": "",
+        "message_many": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "Úloha dokončena"
@@ -93,16 +95,22 @@
       "sessionsDeleted": {
         "title": "Relace odstraněny",
         "message_one": "{{count}} relace smazána",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} relace smazány"
       },
       "violationsAcknowledged": {
         "title": "Potvrzeno porušení",
         "message_one": "{{count}} porušení potvrzeno",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} porušení potvrzeno"
       },
       "violationsDismissed": {
         "title": "Porušení odmítnuto",
         "message_one": "{{count}} porušení zamítnuto",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} potlačení odmítnuto"
       },
       "apiKeyGenerated": {
@@ -125,6 +133,8 @@
       "trustScoresReset": {
         "title": "Resetování důvěryhodných skóre",
         "message_one": "Uživatel {{count}} byl resetován na 100",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} uživatelé resetovali na 100"
       },
       "claimCodeValidated": {
@@ -151,7 +161,11 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_many": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Nepodařilo se přidat server",
