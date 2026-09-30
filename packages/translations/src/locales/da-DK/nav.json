@@ -6,9 +6,7 @@
   "activity": "Aktivitet",
   "library": "Bibliotek",
   "users": "Brugere",
-  "automations": "",
   "violations": "Overtrædelser",
-  "requests": "",
   "alerts": "Advarsler",
   "settings": "Indstillinger",
   "overview": "Oversigt",
@@ -18,16 +16,8 @@
   "performance": "Ydeevne",
   "devices": "Enheder",
   "bandwidth": "Båndbredde",
-  "jobs": "",
   "accessControl": "Adgangskontrol",
   "media": "Medier",
   "mediaBrowse": "Gennemse",
-  "mediaGenres": "Genrer",
-  "session": "",
-  "user": "",
-  "violation": "",
-  "monitor": "",
-  "manage": "",
-  "userStats": "",
-  "toggleSidebar": ""
+  "mediaGenres": "Genrer"
 }
