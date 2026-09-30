@@ -132,7 +132,9 @@
       "never": "nog niet",
       "diskLimited": "Disk gelimiteerd sinds {{since}}: ongeveer {{shortfall}} posters worden niet gecached.",
       "loadError": "Kon de cache-status niet laden.",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_one": "",
+      "needHint_other": ""
     }
   },
   "servers": {
@@ -253,7 +255,6 @@
     "enableMobileAccess": "Inschakelen mobiele toegang",
     "enabling": "Inschakelen...",
     "devicesConnected": "{{current}} van {{max}} apparaten verbonden",
-    "pendingTokens_other": "{{count}} hangende paar tokens",
     "addDevice": "Apparaat toevoegen",
     "disableMobileAccess": "Uitschakelen mobiele toegang",
     "revokeAllSessions": "Alles intrekken",
@@ -276,7 +277,9 @@
     "removeDeviceConfirm": "Weet u zeker dat u {{deviceName}}wilt verwijderen? Dit apparaat zal opnieuw moeten koppelen om opnieuw te verbinden.",
     "externalUrlBanner": "Een reverse proxy gebruiken of toegang op afstand krijgen? Stel je in",
     "externalUrlBannerLink": "Externe URL",
-    "externalUrlBannerSuffix": "zodat de mobiele app verbinding kan maken met uw server."
+    "externalUrlBannerSuffix": "zodat de mobiele app verbinding kan maken met uw server.",
+    "pendingTokens_one": "",
+    "pendingTokens_other": "{{count}} hangende paar tokens"
   },
   "tailscale": {
     "title": "",
@@ -403,10 +406,12 @@
     "serverTimezoneHelp": "De tijdzone moet overeenkomen met de tijdzone die is geconfigureerd op uw mediaserver, niet met de tijdzone van uw browser. De tijdstempels voor afspeelrapportage worden opgeslagen in de lokale servertijd.",
     "importFullRange": "Importeer volledige historie",
     "importFullRangeHelp": "",
-    "overlapSkipped_other": "{{count}} overgeslagen vanwege overlapping",
-    "duplicates_other": "{{count}} duplicaten overgeslagen",
     "skipOverlap": "Overlappende record - de tijdstempel valt binnen de periode die Tracearr al bijhoudt voor deze server. Schakel 'volledige bereikimport' in om deze mee te nemen.",
-    "skipDuplicatePlugin": "Dubbele record - reeds rechtstreeks geïmporteerd of eerder binnengekomen via een Jellystat import van dezelfde plugingegevens."
+    "skipDuplicatePlugin": "Dubbele record - reeds rechtstreeks geïmporteerd of eerder binnengekomen via een Jellystat import van dezelfde plugingegevens.",
+    "overlapSkipped_one": "",
+    "overlapSkipped_other": "{{count}} overgeslagen vanwege overlapping",
+    "duplicates_one": "",
+    "duplicates_other": "{{count}} duplicaten overgeslagen"
   },
   "plex": {
     "signInWithPlex": "Aanmelden met Plex",
@@ -443,8 +448,6 @@
     "earlier": "",
     "installedBadge": "",
     "latestBadge": "",
-    "changeCount_one": "",
-    "changeCount_other": "",
     "series": "",
     "docs": "",
     "source": "",
@@ -455,10 +458,13 @@
       "fix": "",
       "security": "",
       "note": ""
-    }
+    },
+    "changeCount_one": "",
+    "changeCount_other": ""
   },
   "serverHealth": {
     "unreachable": "{{serverName}} is onbereikbaar",
+    "multipleUnreachable_one": "",
     "multipleUnreachable_other": "{{count}} servers onbereikbaar: {{serverNames}}"
   },
   "ipWarning": {
@@ -639,7 +645,11 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_one": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_one": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -673,14 +683,24 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_one": "",
+          "movies_other": "",
+          "shows_one": "",
+          "shows_other": "",
+          "seasons_one": "",
+          "seasons_other": "",
+          "music_one": "",
+          "music_other": "",
+          "mostWatched_one": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -759,7 +779,15 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_one": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_one": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -808,13 +836,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_one": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -860,11 +888,21 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_one": "",
+        "summary_other": "",
+        "trimmed_one": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_one": "",
+      "serversSelected_other": "",
+      "librariesSelected_one": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_one": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -895,7 +933,11 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_one": "",
+      "recipients_other": "",
+      "attempts_one": "",
+      "attempts_other": ""
     }
   },
   "email": {
