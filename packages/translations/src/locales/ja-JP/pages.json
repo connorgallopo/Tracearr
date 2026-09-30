@@ -53,11 +53,8 @@
     "title": "ユーザー",
     "showRemoved": "",
     "noUsersFound": "ユーザーが見つかりませんでした。",
-    "selectAllUsers_other": "すべての {{count}} ユーザーを選択",
     "serversColumn": "",
     "resetTrustScore": "信頼スコアをリセット",
-    "resetTrustScoreTitle_one": "{{count}} ユーザーのトラストスコアをリセット",
-    "resetTrustScoreTitle_other": "{{count}} ユーザーのトラストスコアをリセット",
     "resetTrustScoreConfirm": "信頼度を100にリセットしてもよろしいですか？この操作は元に戻せません。",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -115,7 +102,14 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_other": "すべての {{count}} ユーザーを選択",
+    "resetTrustScoreTitle_other": "{{count}} ユーザーのトラストスコアをリセット",
+    "mergeMoves_other": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "ユーザーに戻る",
@@ -283,7 +277,8 @@
       "backfillRunning": {
         "title": "",
         "fallbackBody": "",
-        "progress": ""
+        "progress": "",
+        "snapshotsSuffix_other": ""
       },
       "multiServer": {
         "title": "",
@@ -306,7 +301,8 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -326,11 +322,8 @@
   "violations": {
     "title": "違反",
     "tryAdjustingFilters": "フィルターを調整してみてください",
-    "selectAllViolations_other": "すべての {{count}} 違反マッチングフィルターを選択",
     "dismissViolation": "違反を却下する",
     "dismissViolationConfirm": "この違反を却下してもよろしいですか？違反ログから完全に削除されます。",
-    "dismissViolation_one": "{{count}} 違反を却下する",
-    "dismissViolation_other": "{{count}} 違反を却下する",
     "dismissViolationsConfirm": "本当に却下しますか？これにより違反ログから削除され、関連する信頼スコアが復元されます。",
     "noViolationsFound": "違反は見つかりませんでした",
     "noViolationsRecorded": "違反は記録されていません。",
@@ -365,9 +358,11 @@
       "conditionGroup": "条件グループ {{index}}",
       "matched": "{{matched}}/{{total}} が一致しました",
       "actual": "実際：",
-      "relatedSessions_one": "{{count}} 関連セッション",
       "relatedSessions_other": "{{count}} 関連セッション"
-    }
+    },
+    "selectAllViolations_other": "すべての {{count}} 違反マッチングフィルターを選択",
+    "dismissViolations_other": "{{count}} 違反を却下する",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -471,10 +466,9 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -666,12 +660,10 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": "",
         "ready": "",
-        "search": ""
+        "search": "",
+        "problems_other": "",
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -692,7 +684,8 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -706,12 +699,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -729,9 +718,7 @@
       "otherwise": "",
       "appliesTo": "",
       "duration": {
-        "minutes_one": "",
         "minutes_other": "",
-        "days_one": "",
         "days_other": ""
       },
       "triggers": {
@@ -865,16 +852,16 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
-      "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "noRuns": "",
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1565,7 +1552,8 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "配信を終了",
@@ -1598,10 +1586,8 @@
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} / {{total}} コネクションに到達可能",
-      "connectionsAvailable_other": "{{count}} コネクションが利用可能です",
       "hideFiltered": "フィルターを隠す",
       "showAll": "すべて表示",
-      "moreConnections_other": "+{{count}} 他のコネクション",
       "connectingTo": "{{name}} に接続中...",
       "ownerOnly": "",
       "noAccountsLinked": "プレックスアカウントがリンクされていません",
@@ -1610,17 +1596,17 @@
       "linkAnotherAccount": "別のプレックスアカウントにリンク",
       "linking": "リンクしています...",
       "loginEnabled": "ログインが有効です",
-      "serversConnected_one": "{{count}} サーバーが接続されました",
-      "serversConnected_other": "{{count}} サーバーが接続されました",
       "unlinkAccount": "このプレックスアカウントの連携を解除する",
       "reauthorizeAccount": "",
       "deleteServersFirst": "このアカウントの連携を解除するには、最初に接続されているサーバーを削除してください",
       "unlinkPlexAccount": "プレックスアカウントのリンクを解除",
-      "unlinkConfirm": "このプレックスアカウントのリンクを解除してもよろしいですか？再度リンクするまで、このアカウントからサーバーを追加することはできません。"
+      "unlinkConfirm": "このプレックスアカウントのリンクを解除してもよろしいですか？再度リンクするまで、このアカウントからサーバーを追加することはできません。",
+      "connectionsAvailable_other": "{{count}} コネクションが利用可能です",
+      "moreConnections_other": "+{{count}} 他のコネクション",
+      "serversConnected_other": "{{count}} サーバーが接続されました"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1718,11 +1704,12 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_other": "",
+      "usedBy_other": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "今すぐ実行",
@@ -1802,7 +1789,8 @@
     "directPlayLow": "",
     "topTranscodingUsers": "トップトランスコーディングユーザー",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "トランスコーディングユーザーが見つかりません"
+    "noTranscodingUsers": "トランスコーディングユーザーが見つかりません",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "",
@@ -1911,12 +1899,11 @@
         }
       },
       "card": {
-        "newEpisodes_one": "新しいエピソード {{count}} 件",
-        "newEpisodes_other": "新しいエピソード {{count}} 件",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
         "addedAgo": "{{date}}に追加",
-        "addedCompactAgo": ""
+        "addedCompactAgo": "",
+        "newEpisodes_other": "新しいエピソード {{count}} 件",
+        "replacedEpisodes_other": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1928,7 +1915,8 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_other": ""
       },
       "loadError": ""
     },
@@ -1944,9 +1932,8 @@
       "chart": {
         "title": "",
         "valueLabel": "",
-        "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "ariaLabel": "",
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -1977,9 +1964,7 @@
       "hero": {
         "loadError": "",
         "meta": {
-          "seasons_one": "",
           "seasons_other": "",
-          "episodes_one": "",
           "episodes_other": ""
         },
         "availability": {
@@ -2034,15 +2019,14 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2080,8 +2064,6 @@
       "rankSuffix": "、{{rank}}位",
       "onServers": "{{servers}}で利用可能",
       "addedLabel": "{{date}}に追加",
-      "viewers_one": "{{count}} 人が視聴",
-      "viewers_other": "{{count}} 人が視聴",
       "watchedState": {
         "watched": "視聴済み",
         "partial": "一部視聴済み",
@@ -2095,12 +2077,11 @@
         "resolution": ""
       },
       "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
       "versionsChip": "",
-      "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "moreServers": "",
+      "viewers_other": "{{count}} 人が視聴",
+      "playsCompact_other": "",
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2150,7 +2131,6 @@
           "viewers": ""
         },
         "count": "",
-        "countTotal_one": "",
         "countTotal_other": ""
       },
       "scrubber": {
@@ -2237,7 +2217,8 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
