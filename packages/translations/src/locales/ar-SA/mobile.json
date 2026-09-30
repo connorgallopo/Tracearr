@@ -118,7 +118,19 @@
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "trustScoreRange": "",
+    "moreLocations_zero": "",
+    "moreLocations_one": "",
+    "moreLocations_two": "",
+    "moreLocations_few": "",
+    "moreLocations_many": "",
+    "moreLocations_other": "",
+    "moreDevices_zero": "",
+    "moreDevices_one": "",
+    "moreDevices_two": "",
+    "moreDevices_few": "",
+    "moreDevices_many": "",
+    "moreDevices_other": ""
   },
   "violation": {
     "violationNotFoundDesc": "",
@@ -129,13 +141,23 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
     "all": "",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
-    "noMatches": ""
+    "noMatches": "",
+    "acknowledgeAllTitle_zero": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_two": "",
+    "acknowledgeAllTitle_few": "",
+    "acknowledgeAllTitle_many": "",
+    "acknowledgeAllTitle_other": "",
+    "pendingCount_zero": "",
+    "pendingCount_one": "",
+    "pendingCount_two": "",
+    "pendingCount_few": "",
+    "pendingCount_many": "",
+    "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "",
@@ -147,7 +169,13 @@
       "mediaType": "",
       "noCountries": "",
       "noPlatforms": "",
-      "noUsers": ""
+      "noUsers": "",
+      "sectionSelected_zero": "",
+      "sectionSelected_one": "",
+      "sectionSelected_two": "",
+      "sectionSelected_few": "",
+      "sectionSelected_many": "",
+      "sectionSelected_other": ""
     }
   },
   "users": {
@@ -185,15 +213,25 @@
     "decreaseTrustScore": "",
     "increaseTrustScore": "",
     "sortAscending": "",
-    "sortDescending": ""
+    "sortDescending": "",
+    "alertsCount_zero": "",
+    "alertsCount_one": "",
+    "alertsCount_two": "",
+    "alertsCount_few": "",
+    "alertsCount_many": "",
+    "alertsCount_other": "",
+    "filtersActive_zero": "",
+    "filtersActive_one": "",
+    "filtersActive_two": "",
+    "filtersActive_few": "",
+    "filtersActive_many": "",
+    "filtersActive_other": ""
   },
   "map": {
     "noData": "",
     "unavailable": ""
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
@@ -206,7 +244,13 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "versionCheckFailed": "",
+    "conditions_zero": "",
+    "conditions_one": "",
+    "conditions_two": "",
+    "conditions_few": "",
+    "conditions_many": "",
+    "conditions_other": ""
   },
   "charts": {
     "weekOf": ""
@@ -240,10 +284,18 @@
   },
   "widget": {
     "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
     "signedOut": "",
+    "serversDown_zero": "",
+    "serversDown_one": "",
+    "serversDown_two": "",
+    "serversDown_few": "",
+    "serversDown_many": "",
+    "serversDown_other": "",
+    "transcodes_zero": "",
     "transcodes_one": "",
+    "transcodes_two": "",
+    "transcodes_few": "",
+    "transcodes_many": "",
     "transcodes_other": ""
   }
 }
