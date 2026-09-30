@@ -49,11 +49,10 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "任務已完成"
@@ -92,17 +91,14 @@
       },
       "sessionsDeleted": {
         "title": "已刪除會話",
-        "message_one": "已刪除 {{count}} 個會話",
         "message_other": "已刪除 {{count}} 個會話"
       },
       "violationsAcknowledged": {
         "title": "已確認違規行為",
-        "message_one": "{{count}} 個已確認的違規行為",
         "message_other": "{{count}} 個已確認的違規行為"
       },
       "violationsDismissed": {
         "title": "已撤銷違規",
-        "message_one": "已撤銷 {{count}} 個違規",
         "message_other": "已撤銷 {{count}} 個違規"
       },
       "apiKeyGenerated": {
@@ -124,7 +120,6 @@
       "identityUpdated": "",
       "trustScoresReset": {
         "title": "重置信任分數",
-        "message_one": "{{count}} 個使用者重置為 100",
         "message_other": "{{count}} 個使用者重置為 100"
       },
       "claimCodeValidated": {
@@ -151,7 +146,8 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "無法新增伺服器",
