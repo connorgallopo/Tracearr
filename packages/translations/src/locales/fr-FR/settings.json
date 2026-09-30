@@ -122,7 +122,6 @@
       "size": "Sur le disque",
       "files": "Fichiers",
       "need": "Besoin estimé",
-      "needHint_other": "{{count}} affiches × {{size}}",
       "free": "Disque libre",
       "freeOf": "sur {{total}}",
       "floor": "Garde libre",
@@ -133,7 +132,9 @@
       "never": "pas encore",
       "diskLimited": "Disque limité depuis {{since}}: environ {{shortfall}} d'affiches ne sont pas mis en cache.",
       "loadError": "Impossible de charger le statut du cache.",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_one": "",
+      "needHint_other": "{{count}} affiches × {{size}}"
     }
   },
   "servers": {
@@ -254,7 +255,6 @@
     "enableMobileAccess": "Activer l'accès mobile",
     "enabling": "Activation...",
     "devicesConnected": "{{current}} des appareils {{max}} connectés",
-    "pendingTokens_other": "{{count}} token en attente",
     "addDevice": "Ajouter un appareil",
     "disableMobileAccess": "Désactiver l'accès mobile",
     "revokeAllSessions": "Révoquer tout",
@@ -277,7 +277,9 @@
     "removeDeviceConfirm": "Êtes-vous sûr de vouloir supprimer {{deviceName}}? Cet appareil devra être relié à nouveau pour se reconnecter.",
     "externalUrlBanner": "Utiliser un proxy inversé ou accéder à distance ? Définissez votre",
     "externalUrlBannerLink": "URL externe",
-    "externalUrlBannerSuffix": "pour que l'application mobile puisse se connecter à votre serveur."
+    "externalUrlBannerSuffix": "pour que l'application mobile puisse se connecter à votre serveur.",
+    "pendingTokens_one": "",
+    "pendingTokens_other": "{{count}} token en attente"
   },
   "tailscale": {
     "title": "VPN Tailscale",
@@ -404,10 +406,12 @@
     "serverTimezoneHelp": "Doit correspondre au fuseau horaire configuré sur l'hôte de votre serveur multimédia, et non au fuseau horaire de votre navigateur. Les horodatages des rapports de lecture sont stockés à l'heure du serveur local.",
     "importFullRange": "Importer l'historique complet",
     "importFullRangeHelp": "",
-    "overlapSkipped_other": "{{count}} ont été ignorés car ils se chevauchaient",
-    "duplicates_other": "Les doublons {{count}} ont été ignorés",
     "skipOverlap": "Recouvrement de l'enregistrement - l'horodatage tombe dans la période que Tracearr suit déjà pour ce serveur. Activez l'importation complète pour l'inclure.",
-    "skipDuplicatePlugin": "Enregistrement en double - déjà importé directement ou arrivé plus tôt via une importation Jellystat des mêmes données de plugin."
+    "skipDuplicatePlugin": "Enregistrement en double - déjà importé directement ou arrivé plus tôt via une importation Jellystat des mêmes données de plugin.",
+    "overlapSkipped_one": "",
+    "overlapSkipped_other": "{{count}} ont été ignorés car ils se chevauchaient",
+    "duplicates_one": "",
+    "duplicates_other": "Les doublons {{count}} ont été ignorés"
   },
   "plex": {
     "signInWithPlex": "Se connecter avec Plex",
@@ -444,8 +448,6 @@
     "earlier": "Versions antérieures",
     "installedBadge": "Installée",
     "latestBadge": "Derniers",
-    "changeCount_one": "{{count}} modification",
-    "changeCount_other": "{{count}} modifications",
     "series": "Tracearr {{series}}",
     "docs": "Documentation",
     "source": "",
@@ -456,10 +458,13 @@
       "fix": "Corriger",
       "security": "Sécurité",
       "note": "Note"
-    }
+    },
+    "changeCount_one": "{{count}} modification",
+    "changeCount_other": "{{count}} modifications"
   },
   "serverHealth": {
     "unreachable": "{{serverName}} est inaccessible",
+    "multipleUnreachable_one": "",
     "multipleUnreachable_other": "{{count}} serveurs injoignables : {{serverNames}}"
   },
   "ipWarning": {
@@ -640,7 +645,11 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_one": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_one": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -674,14 +683,24 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_one": "",
+          "movies_other": "",
+          "shows_one": "",
+          "shows_other": "",
+          "seasons_one": "",
+          "seasons_other": "",
+          "music_one": "",
+          "music_other": "",
+          "mostWatched_one": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -760,7 +779,15 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_one": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_one": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -809,13 +836,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_one": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -861,11 +888,21 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_one": "",
+        "summary_other": "",
+        "trimmed_one": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_one": "",
+      "serversSelected_other": "",
+      "librariesSelected_one": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_one": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -896,7 +933,11 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_one": "",
+      "recipients_other": "",
+      "attempts_one": "",
+      "attempts_other": ""
     }
   },
   "email": {
