@@ -49,11 +49,12 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_one": "",
+        "message_few": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "Lucrare Finalizată"
@@ -93,16 +94,19 @@
       "sessionsDeleted": {
         "title": "Sesiuni șterse",
         "message_one": "{{count}} sesiune ștearsă",
+        "message_few": "",
         "message_other": "{{count}} sesiuni șterse"
       },
       "violationsAcknowledged": {
         "title": "Încălcări cunoscute",
         "message_one": "{{count}} încălcare recunoscută",
+        "message_few": "",
         "message_other": "{{count}} încălcări recunoscute"
       },
       "violationsDismissed": {
         "title": "Incalcari respinse",
         "message_one": "{{count}} încălcare respinsă",
+        "message_few": "",
         "message_other": "{{count}} încălcări respinse"
       },
       "apiKeyGenerated": {
@@ -125,6 +129,7 @@
       "trustScoresReset": {
         "title": "Resetarea scorurilor de încredere",
         "message_one": "{{count}} utilizator resetează la 100",
+        "message_few": "",
         "message_other": "{{count}} utilizatori resetați la 100"
       },
       "claimCodeValidated": {
@@ -151,7 +156,10 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Adăugarea serverului a eșuat",
