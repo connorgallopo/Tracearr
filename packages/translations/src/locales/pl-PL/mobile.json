@@ -13,7 +13,7 @@
     "urlPlaceholder": "https://tracearr.example.com",
     "tokenPlaceholder": "trr_mob_...",
     "missingToken": "Brakujący token",
-    "pleaseEnterToken": "Wprowadź swój kod parowania"
+    "pleaseEnterToken": "Wprowadź swój token dostępu"
   },
   "errors": {
     "missingFields": "Brakujące pola",
@@ -60,7 +60,7 @@
     "disconnectConfirmGeneric": "Czy jesteś pewien, że chcesz się rozłączyć? Będziesz musiał sparować ponownie, aby używać aplikacji.",
     "currentlyConnected": "Obecnie połączono z {{serverName}}",
     "version": "Wersja {{version}}",
-    "build": "Wersja {{build}}"
+    "build": "Kompilacja {{build}}"
   },
   "navigation": {
     "home": "Strona główna",
@@ -83,7 +83,7 @@
     "loadingPreferences": "Ładowanie ustawień...",
     "unableToLoadPreferences": "Nie można załadować ustawień",
     "receiveAlerts": "Otrzymuj powiadomienia na tym urządzeniu",
-    "ruleViolationTriggered": "Naruszenia reguł",
+    "ruleViolationTriggered": "Wykryto naruszenie reguły",
     "newPlaybackBegan": "Rozpoczęto nowe odtwarzanie",
     "playbackEnded": "Odtwarzanie zakończone",
     "exceededStreamLimit": "Użytkownik przekroczył limit strumieni",
@@ -99,17 +99,17 @@
     "endTime": "Czas zakończenia",
     "to": "do",
     "timezoneLabel": "Strefa czasowa: {{timezone}}",
-    "criticalOverrideDescription": "Naruszenia o wysokim poziomie nadal wysyłają powiadomienia w godzinach ciszy",
+    "criticalOverrideDescription": "Naruszenia o wysokim poziomie ważności nadal wysyłają powiadomienia w godzinach ciszy",
     "rateLimitDescription": "Limity częstotliwości zapobiegają spamowi powiadomień. Obecne limity: {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Wyślij powiadomienie testowe",
-    "testDescription": "Sprawdź, czy powiadomienia wysyłane działają poprawnie",
-    "pushNotifications": "Powiadomienia Push",
+    "testDescription": "Sprawdź, czy powiadomienia push działają poprawnie",
+    "pushNotifications": "Powiadomienia push",
     "ruleTypes": {
       "accountInactivity": "Nieaktywność konta",
       "deviceVelocity": "Prędkość urządzenia",
       "geoRestriction": "Ograniczenie geograficzne",
       "impossibleTravel": "Niemożliwa podróż",
-      "simultaneousLocations": "Jednoczesne Lokalizacje"
+      "simultaneousLocations": "Jednoczesne lokalizacje"
     },
     "severityAll": "Wszystkie",
     "severityHighOnly": "Tylko wysokie",
@@ -118,7 +118,7 @@
   },
   "session": {
     "streamTerminated": "Strumień przerwany",
-    "sessionStopped": "Sesja odtwarzania została wstrzymana.",
+    "sessionStopped": "Sesja odtwarzania została zatrzymana.",
     "failedToTerminate": "Nie udało się zakończyć"
   },
   "userDetail": {
@@ -128,7 +128,7 @@
     "moreLocations": "+{{count}} więcej lokalizacji",
     "moreDevices": "+{{count}} więcej urządzeń",
     "noViolations": "Brak naruszeń",
-    "noTerminations": "Brak zakończenia strumienia",
+    "noTerminations": "Brak przerwanych strumieni",
     "lastSeen": "Ostatnio widziany {{relative}}",
     "terminatedBy": "Przez @{{username}}",
     "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
@@ -139,7 +139,7 @@
     "ips": "Adresy IP"
   },
   "alerts": {
-    "clearFilters": "Oczyścić filtry",
+    "clearFilters": "Wyczyść filtry",
     "acknowledgeAll": "Potwierdź wszystkie",
     "acknowledgeAllBody": "Każde oczekujące powiadomienie na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
     "acknowledgeAllBodySeverity": "Każde oczekujące powiadomienie o poziomie {{severity}} na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
@@ -205,8 +205,8 @@
     "decreaseTrustScore": "Zmniejsz poziom zaufania",
     "filtersActive": "Filtry, {{count}} aktywne",
     "increaseTrustScore": "Zwiększ poziom zaufania",
-    "sortAscending": "Sortowane rosnące, stuknij, aby odwrócić",
-    "sortDescending": "Sortuj malejąco, stuknij, aby odwrócić"
+    "sortAscending": "Posortowano rosnąco, stuknij, aby odwrócić",
+    "sortDescending": "Posortowano malejąco, stuknij, aby odwrócić"
   },
   "map": {
     "noData": "Brak danych o lokalizacji",
@@ -216,7 +216,7 @@
     "conditions_one": "{{count}} warunek",
     "conditions_other": "{{count}} warunki",
     "editOnWeb": "Automatyzacje mogą być tworzone i edytowane w aplikacji Web Tracearr.",
-    "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawiają się tutaj.",
+    "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawią się tutaj.",
     "kind": {
       "notification": "Powiadomienia",
       "policy": "Zasady"
@@ -233,7 +233,7 @@
     "weekOf": "Tydzień {{date}}"
   },
   "push": {
-    "violationTitle": "{{severity}} Naruszenie"
+    "violationTitle": "Naruszenie: {{severity}}"
   },
   "streamDetails": {
     "bitrate": "Przepływność (bitrate)",
@@ -262,7 +262,7 @@
   "widget": {
     "asOf": "zaktualizowano {{time}}",
     "serversDown_one": "{{count}} serwer nieaktywny",
-    "serversDown_other": "{{count}} serwety nieaktywne",
+    "serversDown_other": "{{count}} serwery nieaktywne",
     "signedOut": "Otwórz Tracearr, aby sparować serwer.",
     "transcodes_one": "{{count}} transkodowanie",
     "transcodes_other": "{{count}} transkodowań"
