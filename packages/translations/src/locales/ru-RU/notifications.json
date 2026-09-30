@@ -49,11 +49,13 @@
       },
       "plexAccountReauthorized": {
         "title": "",
-        "message_one": "",
-        "message_other": "",
         "messageNoServers": "",
         "partial": "",
-        "unmatched": ""
+        "unmatched": "",
+        "message_one": "",
+        "message_few": "",
+        "message_many": "",
+        "message_other": ""
       },
       "jobCompleted": {
         "title": "Вакансия выполнена"
@@ -93,16 +95,22 @@
       "sessionsDeleted": {
         "title": "Сессии удалены",
         "message_one": "{{count}} сессия удалена",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} сеансов удалено"
       },
       "violationsAcknowledged": {
         "title": "Признанные нарушения",
         "message_one": "Нарушение {{count}} признано",
+        "message_few": "",
+        "message_many": "",
         "message_other": "Признанные нарушения {{count}}"
       },
       "violationsDismissed": {
         "title": "Нарушения прекращены",
         "message_one": "Нарушение {{count}} отклонено",
+        "message_few": "",
+        "message_many": "",
         "message_other": "Убрано нарушений {{count}}"
       },
       "apiKeyGenerated": {
@@ -125,6 +133,8 @@
       "trustScoresReset": {
         "title": "Сброс баллов доверия",
         "message_one": "Пользователь {{count}} сброшен на 100",
+        "message_few": "",
+        "message_many": "",
         "message_other": "{{count}} пользователей сброшены на 100"
       },
       "claimCodeValidated": {
@@ -151,7 +161,11 @@
       "newsletterSendQueued": "",
       "brandingSaved": "",
       "suppressionAdded": "",
-      "suppressionRemoved": ""
+      "suppressionRemoved": "",
+      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_few": "",
+      "newsletterRetryQueued_many": "",
+      "newsletterRetryQueued_other": ""
     },
     "error": {
       "serverAddFailed": "Не удалось добавить сервер",
