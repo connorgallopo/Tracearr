@@ -104,7 +104,7 @@
     "running": "Em execução",
     "waiting": "Em espera",
     "queued": "Em fila",
-    "startedAgo": "Iniciado a {{time}}"
+    "startedAgo": "Iniciado {{time}}"
   },
   "time": {
     "now": "agora",
@@ -185,12 +185,12 @@
     "deviceId": "ID do Dispositivo",
     "created": "Criado",
     "total": "total",
-    "mediaLength": "Duração da Mídia",
-    "segments": "Segmentos",
+    "mediaLength": "Duração do conteúdo",
+    "segments": "segmentos",
     "streamDetails": "Detalhes da transmissão",
     "transcodeReason": "Motivo da conversão",
     "loadMore": "Carregar Mais",
-    "playback": "Playback"
+    "playback": "Reprodução"
   },
   "search": {
     "placeholder": "Buscar...",
@@ -211,8 +211,8 @@
     "clearSearch": "Limpar pesquisa",
     "anyDate": "Qualquer data",
     "dateAfter": "Após {{date}}",
-    "dateBefore": "Antes {{date}}",
-    "dateBetween": "{{from}} para {{to}}",
+    "dateBefore": "Antes de {{date}}",
+    "dateBetween": "{{from}} a {{to}}",
     "clearDates": "Limpar intervalo de datas",
     "clearStartDate": "Limpar data de início",
     "clearEndDate": "Limpar data de fim"
@@ -267,8 +267,8 @@
     "user_other": "Usuários {{count}}",
     "session_one": "Sessão {{count}}",
     "session_other": "Sessões {{count}}",
-    "stream_one": "{{count}} stream",
-    "stream_other": "{{count}} streams",
+    "stream_one": "{{count}} transmissão",
+    "stream_other": "{{count}} transmissões",
     "server_one": "Servidor {{count}}",
     "server_other": "Servidores {{count}}",
     "automation_one": "{{count}} automação",
