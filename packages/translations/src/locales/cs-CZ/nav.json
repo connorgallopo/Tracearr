@@ -6,7 +6,9 @@
   "activity": "Aktivita",
   "library": "Knihovna",
   "users": "Uživatelé",
+  "automations": "",
   "violations": "Porušování",
+  "requests": "",
   "alerts": "Výstrahy",
   "settings": "Nastavení",
   "overview": "Přehled",
@@ -18,5 +20,12 @@
   "jobs": "Pracovní místa",
   "media": "Média",
   "mediaBrowse": "Procházet",
-  "mediaGenres": "Žánry"
+  "mediaGenres": "Žánry",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }
