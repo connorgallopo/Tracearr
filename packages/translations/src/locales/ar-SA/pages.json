@@ -53,11 +53,8 @@
     "title": "المستخدمون",
     "showRemoved": "",
     "noUsersFound": "لم يتم العثور على مستخدمين.",
-    "selectAllUsers_other": "حدد جميع المستخدمين {{count}}",
     "serversColumn": "",
     "resetTrustScore": "إعادة تعيين نقاط الثقة",
-    "resetTrustScoreTitle_one": "إعادة تعيين درجة الثقة للمستخدم {{count}}",
-    "resetTrustScoreTitle_other": "إعادة تعيين درجة الثقة للمستخدمين {{count}}",
     "resetTrustScoreConfirm": "هل أنت متأكد من أنك تريد إعادة تعيين نقاط الثقة إلى 100؟ لا يمكن التراجع عن هذا الإجراء.",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -115,7 +102,49 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_zero": "",
+    "selectAllUsers_one": "",
+    "selectAllUsers_two": "",
+    "selectAllUsers_few": "",
+    "selectAllUsers_many": "",
+    "selectAllUsers_other": "حدد جميع المستخدمين {{count}}",
+    "resetTrustScoreTitle_zero": "",
+    "resetTrustScoreTitle_one": "إعادة تعيين درجة الثقة للمستخدم {{count}}",
+    "resetTrustScoreTitle_two": "",
+    "resetTrustScoreTitle_few": "",
+    "resetTrustScoreTitle_many": "",
+    "resetTrustScoreTitle_other": "إعادة تعيين درجة الثقة للمستخدمين {{count}}",
+    "mergeMoves_zero": "",
+    "mergeMoves_one": "",
+    "mergeMoves_two": "",
+    "mergeMoves_few": "",
+    "mergeMoves_many": "",
+    "mergeMoves_other": "",
+    "suggestionsCount_zero": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_two": "",
+    "suggestionsCount_few": "",
+    "suggestionsCount_many": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_zero": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_two": "",
+    "suggestionsPairEmailMore_few": "",
+    "suggestionsPairEmailMore_many": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_zero": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_two": "",
+    "suggestionsPairEmailUsernameMore_few": "",
+    "suggestionsPairEmailUsernameMore_many": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_zero": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_two": "",
+    "suggestionsPairUsernameMore_few": "",
+    "suggestionsPairUsernameMore_many": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "العودة إلى المستخدمين",
@@ -283,7 +312,13 @@
       "backfillRunning": {
         "title": "",
         "fallbackBody": "",
-        "progress": ""
+        "progress": "",
+        "snapshotsSuffix_zero": "",
+        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_two": "",
+        "snapshotsSuffix_few": "",
+        "snapshotsSuffix_many": "",
+        "snapshotsSuffix_other": ""
       },
       "multiServer": {
         "title": "",
@@ -306,7 +341,13 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_zero": "",
+      "syncFailed_one": "",
+      "syncFailed_two": "",
+      "syncFailed_few": "",
+      "syncFailed_many": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -326,11 +367,8 @@
   "violations": {
     "title": "المخالفات",
     "tryAdjustingFilters": "حاول ضبط الفلاتر الخاصة بك",
-    "selectAllViolations_other": "حدد جميع الخروقات {{count}} المطابقة للفلاتر",
     "dismissViolation": "نبذ الانتهاك",
     "dismissViolationConfirm": "هل أنت متأكد من أنك تريد رفض هذا الانتهاك؟ سيؤدي هذا إلى إزالته من سجل الانتهاكات بشكل دائم.",
-    "dismissViolation_one": "رفض انتهاك {{count}}",
-    "dismissViolation_other": "تجاهل الانتهاكات {{count}}",
     "dismissViolationsConfirm": "هل أنت متأكد من رغبتك في الرفض؟ سيؤدي هذا إلى إزالتهم من سجل الانتهاكات بشكل دائم واستعادة نقاط الثقة المرتبطة بها.",
     "noViolationsFound": "لم يتم العثور على أي انتهاكات",
     "noViolationsRecorded": "ولم تسجل أي انتهاكات حتى الآن.",
@@ -365,9 +403,31 @@
       "conditionGroup": "مجموعة الشروط {{index}}",
       "matched": "{{matched}}/{{total}} مطابقة",
       "actual": "فعلي",
+      "relatedSessions_zero": "",
       "relatedSessions_one": "",
+      "relatedSessions_two": "",
+      "relatedSessions_few": "",
+      "relatedSessions_many": "",
       "relatedSessions_other": ""
-    }
+    },
+    "selectAllViolations_zero": "",
+    "selectAllViolations_one": "",
+    "selectAllViolations_two": "",
+    "selectAllViolations_few": "",
+    "selectAllViolations_many": "",
+    "selectAllViolations_other": "حدد جميع الخروقات {{count}} المطابقة للفلاتر",
+    "dismissViolations_zero": "",
+    "dismissViolations_one": "رفض انتهاك {{count}}",
+    "dismissViolations_two": "",
+    "dismissViolations_few": "",
+    "dismissViolations_many": "",
+    "dismissViolations_other": "تجاهل الانتهاكات {{count}}",
+    "peopleSelectedCount_zero": "",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_two": "",
+    "peopleSelectedCount_few": "",
+    "peopleSelectedCount_many": "",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -471,10 +531,14 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_zero": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_two": "",
+      "emptyRanDescription_few": "",
+      "emptyRanDescription_many": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -666,12 +730,20 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": "",
         "ready": "",
-        "search": ""
+        "search": "",
+        "problems_zero": "",
+        "problems_one": "",
+        "problems_two": "",
+        "problems_few": "",
+        "problems_many": "",
+        "problems_other": "",
+        "remaining_zero": "",
+        "remaining_one": "",
+        "remaining_two": "",
+        "remaining_few": "",
+        "remaining_many": "",
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -692,7 +764,13 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_zero": "",
+      "selectedCount_one": "",
+      "selectedCount_two": "",
+      "selectedCount_few": "",
+      "selectedCount_many": "",
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -706,12 +784,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -729,9 +803,17 @@
       "otherwise": "",
       "appliesTo": "",
       "duration": {
+        "minutes_zero": "",
         "minutes_one": "",
+        "minutes_two": "",
+        "minutes_few": "",
+        "minutes_many": "",
         "minutes_other": "",
+        "days_zero": "",
         "days_one": "",
+        "days_two": "",
+        "days_few": "",
+        "days_many": "",
         "days_other": ""
       },
       "triggers": {
@@ -865,16 +947,26 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_zero": "",
+      "more_one": "",
+      "more_two": "",
+      "more_few": "",
+      "more_many": "",
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
+      "noRuns": "",
+      "runsLine_zero": "",
       "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "runsLine_two": "",
+      "runsLine_few": "",
+      "runsLine_many": "",
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1565,7 +1657,13 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_zero": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_two": "",
+    "deleteAutomation_few": "",
+    "deleteAutomation_many": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "إنهاء البث",
@@ -1598,10 +1696,8 @@
         "unknown": ""
       },
       "connectionsReachable": "",
-      "connectionsAvailable_other": "تتوفر اتصالات {{count}}",
       "hideFiltered": "إخفاء الفلتر",
       "showAll": "إظهار الكل",
-      "moreConnections_other": "+{{count}} المزيد من الاتصالات",
       "connectingTo": "جاري الاتصال بـ {{name}}...",
       "ownerOnly": "",
       "noAccountsLinked": "لا توجد حسابات Plex مرتبطة",
@@ -1610,17 +1706,32 @@
       "linkAnotherAccount": "ربط حساب Plex آخر",
       "linking": "ربط...",
       "loginEnabled": "تسجيل الدخول مفعل",
-      "serversConnected_one": "",
-      "serversConnected_other": "متصل بخوادم {{count}}",
       "unlinkAccount": "إلغاء ربط حساب Plex هذا",
       "reauthorizeAccount": "",
       "deleteServersFirst": "حذف الخوادم المتصلة أولاً لإلغاء ربط هذا الحساب",
       "unlinkPlexAccount": "إلغاء ربط حساب Plex",
-      "unlinkConfirm": "هل أنت متأكد من أنك تريد إلغاء ربط حساب Plex هذا؟ لن تتمكن من إضافة خوادم من هذا الحساب حتى تقوم بربطه مرة أخرى."
+      "unlinkConfirm": "هل أنت متأكد من أنك تريد إلغاء ربط حساب Plex هذا؟ لن تتمكن من إضافة خوادم من هذا الحساب حتى تقوم بربطه مرة أخرى.",
+      "connectionsAvailable_zero": "",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_two": "",
+      "connectionsAvailable_few": "",
+      "connectionsAvailable_many": "",
+      "connectionsAvailable_other": "تتوفر اتصالات {{count}}",
+      "moreConnections_zero": "",
+      "moreConnections_one": "",
+      "moreConnections_two": "",
+      "moreConnections_few": "",
+      "moreConnections_many": "",
+      "moreConnections_other": "+{{count}} المزيد من الاتصالات",
+      "serversConnected_zero": "",
+      "serversConnected_one": "",
+      "serversConnected_two": "",
+      "serversConnected_few": "",
+      "serversConnected_many": "",
+      "serversConnected_other": "متصل بخوادم {{count}}"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1718,11 +1829,27 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_zero": "",
+      "alertsGoTo_one": "",
+      "alertsGoTo_two": "",
+      "alertsGoTo_few": "",
+      "alertsGoTo_many": "",
+      "alertsGoTo_other": "",
+      "usedBy_zero": "",
+      "usedBy_one": "",
+      "usedBy_two": "",
+      "usedBy_few": "",
+      "usedBy_many": "",
+      "usedBy_other": "",
+      "usedByNewsletters_zero": "",
+      "usedByNewsletters_one": "",
+      "usedByNewsletters_two": "",
+      "usedByNewsletters_few": "",
+      "usedByNewsletters_many": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "تشغيل الآن",
@@ -1802,7 +1929,13 @@
     "directPlayLow": "",
     "topTranscodingUsers": "أعلى المستخدمين المترجمين",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "لم يتم العثور على مستخدمين ترميز"
+    "noTranscodingUsers": "لم يتم العثور على مستخدمين ترميز",
+    "analyzedSessionsTooltip_zero": "",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_two": "",
+    "analyzedSessionsTooltip_few": "",
+    "analyzedSessionsTooltip_many": "",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "عرض التردد",
@@ -1911,12 +2044,26 @@
         }
       },
       "card": {
-        "newEpisodes_one": "{{count}} حلقة جديدة",
-        "newEpisodes_other": "{{count}} حلقات جديدة",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
         "addedAgo": "أُضيف {{date}}",
-        "addedCompactAgo": ""
+        "addedCompactAgo": "",
+        "newEpisodes_zero": "",
+        "newEpisodes_one": "{{count}} حلقة جديدة",
+        "newEpisodes_two": "",
+        "newEpisodes_few": "",
+        "newEpisodes_many": "",
+        "newEpisodes_other": "{{count}} حلقات جديدة",
+        "replacedEpisodes_zero": "",
+        "replacedEpisodes_one": "",
+        "replacedEpisodes_two": "",
+        "replacedEpisodes_few": "",
+        "replacedEpisodes_many": "",
+        "replacedEpisodes_other": "",
+        "newEpisodesChip_zero": "",
+        "newEpisodesChip_one": "",
+        "newEpisodesChip_two": "",
+        "newEpisodesChip_few": "",
+        "newEpisodesChip_many": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1928,7 +2075,13 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_zero": "",
+        "summary_one": "",
+        "summary_two": "",
+        "summary_few": "",
+        "summary_many": "",
+        "summary_other": ""
       },
       "loadError": ""
     },
@@ -1944,9 +2097,13 @@
       "chart": {
         "title": "",
         "valueLabel": "",
+        "ariaLabel": "",
+        "itemCount_zero": "",
         "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "itemCount_two": "",
+        "itemCount_few": "",
+        "itemCount_many": "",
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -1977,9 +2134,17 @@
       "hero": {
         "loadError": "",
         "meta": {
+          "seasons_zero": "",
           "seasons_one": "",
+          "seasons_two": "",
+          "seasons_few": "",
+          "seasons_many": "",
           "seasons_other": "",
+          "episodes_zero": "",
           "episodes_one": "",
+          "episodes_two": "",
+          "episodes_few": "",
+          "episodes_many": "",
           "episodes_other": ""
         },
         "availability": {
@@ -2034,15 +2199,19 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_zero": "",
+        "episodeCount_one": "",
+        "episodeCount_two": "",
+        "episodeCount_few": "",
+        "episodeCount_many": "",
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2080,8 +2249,6 @@
       "rankSuffix": "، الترتيب {{rank}}",
       "onServers": "على {{servers}}",
       "addedLabel": "أُضيف {{date}}",
-      "viewers_one": "{{count}} مشاهد",
-      "viewers_other": "{{count}} مشاهدين",
       "watchedState": {
         "watched": "تمت المشاهدة",
         "partial": "مشاهدة جزئية",
@@ -2095,12 +2262,26 @@
         "resolution": ""
       },
       "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
       "versionsChip": "",
+      "moreServers": "",
+      "viewers_zero": "",
+      "viewers_one": "{{count}} مشاهد",
+      "viewers_two": "",
+      "viewers_few": "",
+      "viewers_many": "",
+      "viewers_other": "{{count}} مشاهدين",
+      "playsCompact_zero": "",
+      "playsCompact_one": "",
+      "playsCompact_two": "",
+      "playsCompact_few": "",
+      "playsCompact_many": "",
+      "playsCompact_other": "",
+      "versions_zero": "",
       "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "versions_two": "",
+      "versions_few": "",
+      "versions_many": "",
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2150,7 +2331,11 @@
           "viewers": ""
         },
         "count": "",
+        "countTotal_zero": "",
         "countTotal_one": "",
+        "countTotal_two": "",
+        "countTotal_few": "",
+        "countTotal_many": "",
         "countTotal_other": ""
       },
       "scrubber": {
@@ -2237,7 +2422,13 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_zero": "",
+        "landedOf_one": "",
+        "landedOf_two": "",
+        "landedOf_few": "",
+        "landedOf_many": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
