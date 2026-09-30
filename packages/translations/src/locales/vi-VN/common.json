@@ -203,48 +203,29 @@
     "connectionFailed": ""
   },
   "count": {
-    "user_one": "",
     "user_other": "",
-    "session_one": "",
     "session_other": "",
-    "stream_one": "",
     "stream_other": "",
-    "server_one": "",
     "server_other": "",
-    "automation_one": "",
     "automation_other": "",
-    "violation_one": "",
     "violation_other": "",
-    "usersAdded_one": "",
     "usersAdded_other": "",
-    "usersUpdated_one": "",
     "usersUpdated_other": "",
-    "library_one": "",
     "library_other": "",
-    "error_one": "",
     "error_other": "",
-    "alert_one": "",
     "alert_other": "",
-    "location_one": "",
     "location_other": "",
-    "device_one": "",
     "device_other": "",
-    "play_one": "{{count}} lượt phát",
     "play_other": "{{count}} lượt phát",
-    "segment_one": "",
     "segment_other": ""
   },
   "messages": {
     "noChangesDetected": ""
   },
   "duration": {
-    "second_one": "",
     "second_other": "",
-    "minute_one": "",
     "minute_other": "",
-    "hour_one": "",
     "hour_other": "",
-    "day_one": "",
     "day_other": ""
   },
   "empty": {
