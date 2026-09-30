@@ -176,8 +176,8 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "Грати з часом",
-    "concurrentStreams": "Конактуальні потоки",
+    "playsOverTime": "Відтворення з плином часу",
+    "concurrentStreams": "Одночасні потоки",
     "platforms": "Платформи",
     "playbackQuality": ""
   },
