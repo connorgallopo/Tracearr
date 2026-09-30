@@ -118,7 +118,9 @@
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "trustScoreRange": "",
+    "moreLocations_other": "",
+    "moreDevices_other": ""
   },
   "violation": {
     "violationNotFoundDesc": "",
@@ -129,13 +131,13 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
     "all": "",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
-    "noMatches": ""
+    "noMatches": "",
+    "acknowledgeAllTitle_other": "",
+    "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "",
@@ -147,7 +149,8 @@
       "mediaType": "",
       "noCountries": "",
       "noPlatforms": "",
-      "noUsers": ""
+      "noUsers": "",
+      "sectionSelected_other": ""
     }
   },
   "users": {
@@ -185,15 +188,15 @@
     "decreaseTrustScore": "",
     "increaseTrustScore": "",
     "sortAscending": "",
-    "sortDescending": ""
+    "sortDescending": "",
+    "alertsCount_other": "",
+    "filtersActive_other": ""
   },
   "map": {
     "noData": "",
     "unavailable": ""
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
@@ -206,7 +209,8 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "versionCheckFailed": "",
+    "conditions_other": ""
   },
   "charts": {
     "weekOf": ""
@@ -240,10 +244,8 @@
   },
   "widget": {
     "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
     "signedOut": "",
-    "transcodes_one": "",
+    "serversDown_other": "",
     "transcodes_other": ""
   }
 }
