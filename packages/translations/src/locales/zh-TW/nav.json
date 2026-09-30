@@ -6,7 +6,9 @@
   "activity": "活動",
   "library": "媒體庫",
   "users": "使用者",
+  "automations": "",
   "violations": "違規",
+  "requests": "",
   "alerts": "警報",
   "settings": "設定",
   "overview": "總覽",
@@ -15,5 +17,15 @@
   "watch": "觀看分析",
   "devices": "裝置",
   "bandwidth": "頻寬",
-  "jobs": "任務"
+  "jobs": "任務",
+  "media": "",
+  "mediaBrowse": "",
+  "mediaGenres": "",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }
