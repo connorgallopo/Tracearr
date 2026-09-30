@@ -53,11 +53,8 @@
     "title": "用户",
     "showRemoved": "显示已删除",
     "noUsersFound": "未找到用户。",
-    "selectAllUsers_other": "选择所有{{count}}个用户",
     "serversColumn": "服务器",
     "resetTrustScore": "重置信任分数",
-    "resetTrustScoreTitle_one": "重置{{count}}个用户的信任分数",
-    "resetTrustScoreTitle_other": "重置{{count}}个用户的信任分数",
     "resetTrustScoreConfirm": "您确定要重置信任分数为100吗？此操作不能撤消。",
     "mergeUsers": "合并用户",
     "mergeTitleSuggestion": "这些人是否是同一人？",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "从未激活",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "这些账户已经属于同一用户",
     "mergeSelectAllActive": "清除选中的全部选项，然后只选择两个用户进行合并",
     "suggestionsTitle": "可能重复的用户",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "合并时保留一个用户并删除另一个用户。一对被标记为不是同一个人停止显示直到你还原。",
     "suggestionsReview": "审查",
     "suggestionsNotSame": "不是同一个人",
@@ -115,7 +102,14 @@
     "suggestionsError": "无法加载合并建议",
     "filterHasAccessTo": "有访问权限",
     "filterHasAccessToPlaceholder": "任何服务器",
-    "filterHasAccessToHint": "在选择的每个服务器上显示活跃账户的用户。"
+    "filterHasAccessToHint": "在选择的每个服务器上显示活跃账户的用户。",
+    "selectAllUsers_other": "选择所有{{count}}个用户",
+    "resetTrustScoreTitle_other": "重置{{count}}个用户的信任分数",
+    "mergeMoves_other": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "返回用户",
@@ -307,8 +301,8 @@
     "versionsBackfill": {
       "banner": "正在为此服务器收集文件版本数据。运行库同步完成。",
       "action": "立即同步",
-      "syncFailed_other": "在 {{count}} 台服务器上同步启动失败(s),请检查您的权限和服务器状态。",
-      "syncStarted": "库同步开始。"
+      "syncStarted": "库同步开始。",
+      "syncFailed_other": "在 {{count}} 台服务器上同步启动失败(s),请检查您的权限和服务器状态。"
     }
   },
   "activity": {
@@ -328,11 +322,8 @@
   "violations": {
     "title": "违规",
     "tryAdjustingFilters": "尝试调整筛选条件",
-    "selectAllViolations_other": "选择所有符合筛选条件的{{count}}个违规项",
     "dismissViolation": "消除违约行为",
     "dismissViolationConfirm": "你确定你想要清除这个违反？这将永久从违反日志中移除。",
-    "dismissViolation_one": "清除 {{count}} 违规",
-    "dismissViolation_other": "清除 {{count}} 违规",
     "dismissViolationsConfirm": "您确定要删除吗？这将永久从违反日志中删除它们并恢复相关的信任分数。",
     "noViolationsFound": "未发现任何违规行为",
     "noViolationsRecorded": "尚未记录任何违反行为。",
@@ -341,7 +332,6 @@
     "allRules": "所有规则",
     "filterPeople": "人员",
     "allPeople": "所有人",
-    "peopleSelectedCount_other": "{{count}} 人",
     "personFilterPlaceholder": "按人筛选",
     "personFilterEmpty": "没有找到匹配的人",
     "personFilterError": "加载会话失败",
@@ -368,9 +358,11 @@
       "conditionGroup": "条件组{{index}}",
       "matched": "{{matched}}{{total}}匹配",
       "actual": "实际的",
-      "relatedSessions_one": "{{count}}相关会话",
       "relatedSessions_other": "{{count}}相关会话"
-    }
+    },
+    "selectAllViolations_other": "选择所有符合筛选条件的{{count}}个违规项",
+    "dismissViolations_other": "清除 {{count}} 违规",
+    "peopleSelectedCount_other": "{{count}} 人"
   },
   "automations": {
     "actions": {
@@ -474,10 +466,9 @@
       "openInEditor": "以此运行在生成器中打开",
       "tabsLabel": "按结果过滤",
       "emptyRan": "还没有匹配的内容",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "项目",
-      "recordedViolation": "记录违反行为"
+      "recordedViolation": "记录违反行为",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "所有类型",
     "allStatuses": "所有状态",
@@ -669,12 +660,10 @@
         "placeholderAction": ""
       },
       "footer": {
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": "",
         "ready": "",
-        "search": ""
+        "search": "",
+        "problems_other": "",
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -695,7 +684,8 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -709,12 +699,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -732,9 +718,7 @@
       "otherwise": "",
       "appliesTo": "",
       "duration": {
-        "minutes_one": "{{count}} 分钟",
         "minutes_other": "{{count}} 分钟",
-        "days_one": "",
         "days_other": ""
       },
       "triggers": {
@@ -868,16 +852,16 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
-      "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "noRuns": "",
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1568,7 +1552,8 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "终止流",
@@ -1601,10 +1586,8 @@
         "unknown": "连接失败"
       },
       "connectionsReachable": "{{reachable}} 个 {{total}} 个连接可达",
-      "connectionsAvailable_other": "{{count}} 个可用连接",
       "hideFiltered": "隐藏已过滤",
       "showAll": "显示全部",
-      "moreConnections_other": "+{{count}} 个更多连接",
       "connectingTo": "正在连接到{{name}}……",
       "ownerOnly": "",
       "noAccountsLinked": "没有关联的Plex账户",
@@ -1613,17 +1596,17 @@
       "linkAnotherAccount": "链接另一个Plex账户",
       "linking": "正在连接……",
       "loginEnabled": "登录已启用",
-      "serversConnected_one": "{{count}} 服务器已连接",
-      "serversConnected_other": "{{count}} 台服务器已连接",
       "unlinkAccount": "取消链接此Plex账户",
       "reauthorizeAccount": "",
       "deleteServersFirst": "先删除已连接的服务器来取消此帐户",
       "unlinkPlexAccount": "取消链接Plex账户",
-      "unlinkConfirm": "您确定要取消链接此Plex帐户吗？在您再次链接之前，您将无法从此帐户添加服务器。"
+      "unlinkConfirm": "您确定要取消链接此Plex帐户吗？在您再次链接之前，您将无法从此帐户添加服务器。",
+      "connectionsAvailable_other": "{{count}} 个可用连接",
+      "moreConnections_other": "+{{count}} 个更多连接",
+      "serversConnected_other": "{{count}} 台服务器已连接"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1721,11 +1704,12 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_other": "",
+      "usedBy_other": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "现在运行",
@@ -1805,7 +1789,8 @@
     "directPlayLow": "",
     "topTranscodingUsers": "热门转码用户",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "未找到转码用户"
+    "noTranscodingUsers": "未找到转码用户",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "带宽",
@@ -1914,12 +1899,11 @@
         }
       },
       "card": {
-        "newEpisodes_one": "{{count}} 集新内容",
-        "newEpisodes_other": "{{count}} 集新内容",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
         "addedAgo": "{{date}}添加",
-        "addedCompactAgo": "{{age}}前添加"
+        "addedCompactAgo": "{{age}}前添加",
+        "newEpisodes_other": "{{count}} 集新内容",
+        "replacedEpisodes_other": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1931,7 +1915,8 @@
           "servers": "服务器"
         },
         "viewAll": "查看全部",
-        "viewAllTooltip": "即将呈现"
+        "viewAllTooltip": "即将呈现",
+        "summary_other": ""
       },
       "loadError": "无法加载您的媒体库"
     },
@@ -1947,9 +1932,8 @@
       "chart": {
         "title": "按流派播",
         "valueLabel": "播放",
-        "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": "按性别排列的游戏条形图，排序最高至最低。完整的细目见下表。"
+        "ariaLabel": "按性别排列的游戏条形图，排序最高至最低。完整的细目见下表。",
+        "itemCount_other": ""
       },
       "table": {
         "title": "流派分类",
@@ -1980,9 +1964,7 @@
       "hero": {
         "loadError": "无法加载更多标题",
         "meta": {
-          "seasons_one": "",
           "seasons_other": "",
-          "episodes_one": "",
           "episodes_other": ""
         },
         "availability": {
@@ -2037,15 +2019,14 @@
         "title": "季",
         "loadError": "无法加载季数据",
         "empty": "暂无季数据",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "平台",
@@ -2083,8 +2064,6 @@
       "rankSuffix": "，排名第 {{rank}} 位",
       "onServers": "可在 {{servers}} 观看",
       "addedLabel": "{{date}}添加",
-      "viewers_one": "{{count}} 位观众",
-      "viewers_other": "{{count}} 位观众",
       "watchedState": {
         "watched": "已观看",
         "partial": "部分观看",
@@ -2098,12 +2077,11 @@
         "resolution": "分辨率"
       },
       "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
       "versionsChip": "",
-      "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "moreServers": "",
+      "viewers_other": "{{count}} 位观众",
+      "playsCompact_other": "",
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2153,7 +2131,6 @@
           "viewers": "观看人数"
         },
         "count": "",
-        "countTotal_one": "",
         "countTotal_other": ""
       },
       "scrubber": {
@@ -2240,7 +2217,8 @@
         "watched": "已观看",
         "neverPlayed": "从未播放过",
         "ofLanded": "",
-        "onDisk": "{{size}}在磁盘上"
+        "onDisk": "{{size}}在磁盘上",
+        "landedOf_other": ""
       }
     },
     "funnel": {
