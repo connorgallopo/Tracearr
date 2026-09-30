@@ -113,14 +113,16 @@
     "userMayBeRemoved": "Cet utilisateur a peut-être été supprimé.",
     "noLocationsRecorded": "Aucun emplacement enregistré",
     "noDevicesRecorded": "Aucun appareil enregistré",
-    "moreLocations_other": "+{{count}} emplacements en plus",
-    "moreDevices_other": "+{{count}} appareils en plus",
     "noViolations": "Aucune violation",
     "noTerminations": "Aucune interruption de lecture",
     "lastSeen": "",
     "terminatedBy": "Par @{{username}}",
     "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "trustScoreRange": "",
+    "moreLocations_one": "",
+    "moreLocations_other": "+{{count}} emplacements en plus",
+    "moreDevices_one": "",
+    "moreDevices_other": "+{{count}} appareils en plus"
   },
   "violation": {
     "violationNotFoundDesc": "Cette violation a peut-être été ignorée ou n'est plus disponible.",
@@ -131,13 +133,15 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
     "all": "",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
-    "noMatches": ""
+    "noMatches": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "pendingCount_one": "",
+    "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "Essayez d'ajuster vos filtres",
@@ -149,7 +153,9 @@
       "mediaType": "Type de média",
       "noCountries": "Aucun pays disponible",
       "noPlatforms": "Aucune plateforme disponible",
-      "noUsers": "Aucun utilisateur disponible"
+      "noUsers": "Aucun utilisateur disponible",
+      "sectionSelected_one": "",
+      "sectionSelected_other": ""
     }
   },
   "users": {
@@ -182,21 +188,22 @@
   "a11y": {
     "selectServer": "Sélectionner le serveur",
     "alerts": "Alertes",
-    "alertsCount_other": "{{count}} alertes non lues",
     "settings": "Paramètres",
     "trustScore": "Score de confiance : {{score}}",
     "decreaseTrustScore": "",
     "increaseTrustScore": "",
     "sortAscending": "",
-    "sortDescending": ""
+    "sortDescending": "",
+    "alertsCount_one": "",
+    "alertsCount_other": "{{count}} alertes non lues",
+    "filtersActive_one": "",
+    "filtersActive_other": ""
   },
   "map": {
     "noData": "Aucune donnée d'emplacement disponible",
     "unavailable": "Carte indisponible"
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
@@ -209,7 +216,9 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "versionCheckFailed": "",
+    "conditions_one": "",
+    "conditions_other": ""
   },
   "charts": {
     "weekOf": ""
@@ -243,9 +252,9 @@
   },
   "widget": {
     "asOf": "",
+    "signedOut": "",
     "serversDown_one": "{{count}} serveur hors ligne",
     "serversDown_other": "{{count}} serveurs hors ligne",
-    "signedOut": "",
     "transcodes_one": "{{count}} transcodage",
     "transcodes_other": "{{count}} transcodages"
   }
