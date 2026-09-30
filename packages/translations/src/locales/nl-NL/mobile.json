@@ -113,14 +113,16 @@
     "userMayBeRemoved": "Deze gebruiker is mogelijk verwijderd.",
     "noLocationsRecorded": "Geen locaties geregistreerd",
     "noDevicesRecorded": "Geen apparaten geregistreerd",
-    "moreLocations_other": "+{{count}} meer locaties",
-    "moreDevices_other": "+{{count}} meer apparaten",
     "noViolations": "Geen overtredingen",
     "noTerminations": "Geen stream stops",
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "trustScoreRange": "",
+    "moreLocations_one": "",
+    "moreLocations_other": "+{{count}} meer locaties",
+    "moreDevices_one": "",
+    "moreDevices_other": "+{{count}} meer apparaten"
   },
   "violation": {
     "violationNotFoundDesc": "Deze overtreding is mogelijk afgewezen of niet langer beschikbaar.",
@@ -131,13 +133,15 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
     "all": "",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
-    "noMatches": ""
+    "noMatches": "",
+    "acknowledgeAllTitle_one": "",
+    "acknowledgeAllTitle_other": "",
+    "pendingCount_one": "",
+    "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "Probeer je filters aan te passen",
@@ -149,7 +153,9 @@
       "mediaType": "",
       "noCountries": "",
       "noPlatforms": "",
-      "noUsers": ""
+      "noUsers": "",
+      "sectionSelected_one": "",
+      "sectionSelected_other": ""
     }
   },
   "users": {
@@ -182,21 +188,22 @@
   "a11y": {
     "selectServer": "Selecteer server",
     "alerts": "Waarschuwingen",
-    "alertsCount_other": "Waarschuwingen, {{count}} ongelezen",
     "settings": "Instellingen",
     "trustScore": "",
     "decreaseTrustScore": "",
     "increaseTrustScore": "",
     "sortAscending": "",
-    "sortDescending": ""
+    "sortDescending": "",
+    "alertsCount_one": "",
+    "alertsCount_other": "Waarschuwingen, {{count}} ongelezen",
+    "filtersActive_one": "",
+    "filtersActive_other": ""
   },
   "map": {
     "noData": "Geen locatiegegevens beschikbaar",
     "unavailable": "Kaart niet beschikbaar"
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
@@ -209,7 +216,9 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "versionCheckFailed": "",
+    "conditions_one": "",
+    "conditions_other": ""
   },
   "charts": {
     "weekOf": ""
@@ -243,9 +252,9 @@
   },
   "widget": {
     "asOf": "",
+    "signedOut": "",
     "serversDown_one": "",
     "serversDown_other": "",
-    "signedOut": "",
     "transcodes_one": "",
     "transcodes_other": ""
   }
