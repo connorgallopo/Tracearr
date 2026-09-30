@@ -53,11 +53,8 @@
     "title": "Usuaris",
     "showRemoved": "Mostra els eliminats",
     "noUsersFound": "No s'ha trobat cap usuari.",
-    "selectAllUsers_other": "Selecciona els {{count}} usuaris",
     "serversColumn": "Servidors",
     "resetTrustScore": "Restableix la puntuació de confiança",
-    "resetTrustScoreTitle_one": "Restableix la puntuació de confiança de {{count}} usuari",
-    "resetTrustScoreTitle_other": "Restableix la puntuació de confiança de {{count}} usuaris",
     "resetTrustScoreConfirm": "Segur que voleu restablir la puntuació de confiança a 100? Aquesta acció no es pot desfer.",
     "mergeUsers": "Fusiona els usuaris",
     "mergeTitleSuggestion": "Són la mateixa persona?",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "Mai no ha estat actiu",
     "mergeMoreServers": "+{{count}}",
     "mergeWhatHappens": "Què passa",
-    "mergeMoves_one": "Els comptes de servidor i {{count}} sessió de {{foldName}} es traslladen a {{keepName}}.",
-    "mergeMoves_other": "Els comptes de servidor i {{count}} sessions de {{foldName}} es traslladen a {{keepName}}.",
     "mergeMovesNoCount": "Els comptes de servidor i les sessions de {{foldName}} es traslladen a {{keepName}}.",
     "mergeCarriesOver": "El seu correu de contacte, les exclusions de butlletins i les sol·licituds de Seerr es conserven.",
     "mergeDeleted": "{{foldName}} s'elimina. Podeu tornar a separar un compte des de la pàgina de {{keepName}}.",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "Aquests comptes ja pertanyen al mateix usuari",
     "mergeSelectAllActive": "Esborreu la selecció de tots i trieu exactament dos usuaris per fusionar",
     "suggestionsTitle": "Possibles usuaris duplicats",
-    "suggestionsCount_one": "{{count}} possible usuari duplicat",
-    "suggestionsCount_other": "{{count}} possibles usuaris duplicats",
     "suggestionsPairEmail": "{{first}} i {{second}} comparteixen un correu",
-    "suggestionsPairEmailMore_one": "{{first}} i {{second}} comparteixen un correu, i {{count}} més",
-    "suggestionsPairEmailMore_other": "{{first}} i {{second}} comparteixen un correu, i {{count}} més",
     "suggestionsPairEmailUsername": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte",
-    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
-    "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
     "suggestionsPairUsername": "{{first}} i {{second}} comparteixen un nom d'usuari",
-    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
-    "suggestionsPairUsernameMore_other": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
     "suggestionsSheetDescription": "En fusionar, es manté un usuari i s'elimina l'altre. Una parella marcada com que no és la mateixa persona deixa d'aparèixer fins que la restaureu.",
     "suggestionsReview": "Revisa",
     "suggestionsNotSame": "No són la mateixa persona",
@@ -115,7 +102,21 @@
     "suggestionsError": "No s'han pogut carregar els suggeriments de fusió",
     "filterHasAccessTo": "Té accés a",
     "filterHasAccessToPlaceholder": "Qualsevol servidor",
-    "filterHasAccessToHint": "Mostra les persones amb un compte actiu a tots els servidors seleccionats."
+    "filterHasAccessToHint": "Mostra les persones amb un compte actiu a tots els servidors seleccionats.",
+    "selectAllUsers_one": "",
+    "selectAllUsers_other": "Selecciona els {{count}} usuaris",
+    "resetTrustScoreTitle_one": "Restableix la puntuació de confiança de {{count}} usuari",
+    "resetTrustScoreTitle_other": "Restableix la puntuació de confiança de {{count}} usuaris",
+    "mergeMoves_one": "Els comptes de servidor i {{count}} sessió de {{foldName}} es traslladen a {{keepName}}.",
+    "mergeMoves_other": "Els comptes de servidor i {{count}} sessions de {{foldName}} es traslladen a {{keepName}}.",
+    "suggestionsCount_one": "{{count}} possible usuari duplicat",
+    "suggestionsCount_other": "{{count}} possibles usuaris duplicats",
+    "suggestionsPairEmailMore_one": "{{first}} i {{second}} comparteixen un correu, i {{count}} més",
+    "suggestionsPairEmailMore_other": "{{first}} i {{second}} comparteixen un correu, i {{count}} més",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
+    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
+    "suggestionsPairUsernameMore_other": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més"
   },
   "userDetail": {
     "backToUsers": "Torna als usuaris",
@@ -284,6 +285,7 @@
         "title": "S'estan generant dades històriques...",
         "fallbackBody": "S'estan creant instantànies a partir de l'historial de la biblioteca. Pot trigar uns quants minuts.",
         "progress": "{{processed}} de {{total}} biblioteques",
+        "snapshotsSuffix_one": "",
         "snapshotsSuffix_other": " ({{count}} instantànies)"
       },
       "multiServer": {
@@ -307,8 +309,9 @@
     "versionsBackfill": {
       "banner": "Encara s'estan recollint les dades de versions de fitxer d'aquest servidor. Executeu una sincronització de la biblioteca per acabar.",
       "action": "Sincronitza ara",
-      "syncFailed_other": "La sincronització no s'ha pogut iniciar en {{count}} servidor(s). Comproveu els vostres permisos i l'estat del servidor.",
-      "syncStarted": "S'ha iniciat la sincronització de la biblioteca."
+      "syncStarted": "S'ha iniciat la sincronització de la biblioteca.",
+      "syncFailed_one": "",
+      "syncFailed_other": "La sincronització no s'ha pogut iniciar en {{count}} servidor(s). Comproveu els vostres permisos i l'estat del servidor."
     }
   },
   "activity": {
@@ -328,11 +331,8 @@
   "violations": {
     "title": "Incompliments",
     "tryAdjustingFilters": "Proveu d'ajustar els vostres filtres",
-    "selectAllViolations_other": "Seleccioneu tots els filtres d'incompliments de {{count}}",
     "dismissViolation": "Descarta l'incompliment",
     "dismissViolationConfirm": "Segur que voleu descartar aquest incompliment? Això l'eliminarà permanentment del registre d'incompliments.",
-    "dismissViolation_one": "Descarta {{count}} incompliment",
-    "dismissViolation_other": "Descarta {{count}} incompliments",
     "dismissViolationsConfirm": "Segur que els voleu descartar? Això els eliminarà permanentment del registre d'incompliments i restaurarà les puntuacions de confiança associades.",
     "noViolationsFound": "No s'ha trobat cap incompliment",
     "noViolationsRecorded": "Encara no s'ha registrat cap incompliment.",
@@ -341,7 +341,6 @@
     "allRules": "Totes les regles",
     "filterPeople": "Persones",
     "allPeople": "Totes les persones",
-    "peopleSelectedCount_other": "{{count}} persones",
     "personFilterPlaceholder": "Filtra per persona",
     "personFilterEmpty": "No s'ha trobat cap persona coincident",
     "personFilterError": "No s'han pogut carregar les persones",
@@ -370,7 +369,13 @@
       "actual": "Real",
       "relatedSessions_one": "{{count}} sessió relacionada",
       "relatedSessions_other": "{{count}} sessions relacionades"
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_other": "Seleccioneu tots els filtres d'incompliments de {{count}}",
+    "dismissViolations_one": "Descarta {{count}} incompliment",
+    "dismissViolations_other": "Descarta {{count}} incompliments",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_other": "{{count}} persones"
   },
   "automations": {
     "actions": {
@@ -474,10 +479,10 @@
       "openInEditor": "Obre-ho al constructor amb aquesta execució",
       "tabsLabel": "Filtra per resultat",
       "emptyRan": "Encara no hi ha hagut cap coincidència",
-      "emptyRanDescription_one": "S'ha executat {{count}} comprovació i no hi ha hagut coincidència.",
-      "emptyRanDescription_other": "S'han executat {{count}} comprovacions i no hi ha hagut coincidència.",
       "item": "Element",
-      "recordedViolation": "S'ha registrat un incompliment"
+      "recordedViolation": "S'ha registrat un incompliment",
+      "emptyRanDescription_one": "S'ha executat {{count}} comprovació i no hi ha hagut coincidència.",
+      "emptyRanDescription_other": "S'han executat {{count}} comprovacions i no hi ha hagut coincidència."
     },
     "allKinds": "Tots els tipus",
     "allStatuses": "Tots els estats",
@@ -550,7 +555,6 @@
       "searchPlaceholder": "Cerca…",
       "noMatches": "Cap coincidència",
       "clearSelection": "Neteja la selecció",
-      "selectedCount_other": "{{count}} seleccionats",
       "scope": {
         "label": "A qui s'aplica",
         "global": "Global",
@@ -670,12 +674,12 @@
         "placeholderAction": "fes alguna cosa"
       },
       "footer": {
+        "ready": "A punt per desar",
+        "search": "per cercar",
         "problems_one": "{{count}} cosa per corregir",
         "problems_other": "{{count}} coses per corregir",
         "remaining_one": "En queda {{count}} per acabar",
-        "remaining_other": "En queden {{count}} per acabar",
-        "ready": "A punt per desar",
-        "search": "per cercar"
+        "remaining_other": "En queden {{count}} per acabar"
       },
       "leave": {
         "title": "Voleu sortir sense desar?",
@@ -696,7 +700,9 @@
         "sampleTitle": "Què faria això en aquella execució",
         "sampleGone": "Aquesta sessió ja no consta al registre; no hi ha res per comprovar.",
         "backToLive": "Torna al que s'està reproduint ara"
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_other": "{{count}} seleccionats"
     },
     "categories": {
       "session_behavior": "Comportament de la sessió",
@@ -710,12 +716,8 @@
     "createAutomation": "Crea una automatització",
     "customAutomation": "Automatització personalitzada",
     "deleteAutomationConfirm": "Segur que voleu eliminar aquesta automatització? Aquesta acció no es pot desfer.",
-    "deleteAutomation_one": "Elimina l'automatització",
-    "deleteAutomation_other": "Elimina {{count}} automatitzacions",
     "deleteAutomationsConfirm": "Segur que ho voleu eliminar? Aquesta acció no es pot desfer.",
     "describe": {
-      "more_one": "+{{count}} més",
-      "more_other": "+{{count}} més",
       "noValues": "(cap)",
       "includesSameDevice": "inclou el mateix dispositiu",
       "uniqueIps": "IP úniques",
@@ -869,16 +871,18 @@
         "text": "un missatge triat",
         "boolean": "un paràmetre triat",
         "listed": "els triats"
-      }
+      },
+      "more_one": "+{{count}} més",
+      "more_other": "+{{count}} més"
     },
     "description": "Les automatitzacions vigilen els vostres servidors i actuen quan es compleixen les seves condicions.",
     "detail": {
       "notFound": "No s'ha trobat l'automatització",
       "title": "Automatització",
       "unsaved": "Canvis sense desar",
+      "noRuns": "Encara no hi ha cap execució",
       "runsLine_one": "1 execució · darrera execució {{when}}",
-      "runsLine_other": "{{count}} execucions · darrera execució {{when}}",
-      "noRuns": "Encara no hi ha cap execució"
+      "runsLine_other": "{{count}} execucions · darrera execució {{when}}"
     },
     "disable": "Deshabilita",
     "editAutomation": "Edita l'automatització",
@@ -1569,7 +1573,9 @@
       "trigger": "Què les inicia",
       "allTriggers": "Tots els activadors"
     },
-    "openGallery": "Obre la galeria"
+    "openGallery": "Obre la galeria",
+    "deleteAutomation_one": "Elimina l'automatització",
+    "deleteAutomation_other": "Elimina {{count}} automatitzacions"
   },
   "terminateStream": {
     "title": "Finalitza la transmissió",
@@ -1602,10 +1608,8 @@
         "unknown": "Ha fallat la connexió"
       },
       "connectionsReachable": "{{reachable}} de {{total}} connexions accessibles",
-      "connectionsAvailable_other": "{{count}} connexions disponibles",
       "hideFiltered": "Amaga els filtrats",
       "showAll": "Mostra-ho tot",
-      "moreConnections_other": "+{{count}} connexions més",
       "connectingTo": "S'està connectant a {{name}}...",
       "ownerOnly": "Només el propietari pot gestionar els comptes de Plex enllaçats.",
       "noAccountsLinked": "No hi ha cap compte de Plex enllaçat",
@@ -1614,17 +1618,20 @@
       "linkAnotherAccount": "Enllaça un altre compte de Plex",
       "linking": "S'està enllaçant...",
       "loginEnabled": "Inici de sessió habilitat",
-      "serversConnected_one": "{{count}} servidor connectat",
-      "serversConnected_other": "{{count}} servidors connectats",
       "unlinkAccount": "Desenllaça aquest compte de Plex",
       "reauthorizeAccount": "Torna a autoritzar aquest compte de Plex",
       "deleteServersFirst": "Elimineu primer els servidors connectats per desenllaçar aquest compte",
       "unlinkPlexAccount": "Desenllaça el compte de Plex",
-      "unlinkConfirm": "Segur que voleu desenllaçar aquest compte de Plex? No podreu afegir servidors d'aquest compte fins que el torneu a enllaçar."
+      "unlinkConfirm": "Segur que voleu desenllaçar aquest compte de Plex? No podreu afegir servidors d'aquest compte fins que el torneu a enllaçar.",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_other": "{{count}} connexions disponibles",
+      "moreConnections_one": "",
+      "moreConnections_other": "+{{count}} connexions més",
+      "serversConnected_one": "{{count}} servidor connectat",
+      "serversConnected_other": "{{count}} servidors connectats"
     },
     "destinations": {
       "add": "Afegeix una destinació",
-      "alertsGoTo_other": "Les alertes van a {{count}} adreces",
       "builtinNote": "Integrat",
       "clearSecret": "Neteja",
       "deleteConfirm": "Voleu suprimir {{name}}? Les automatitzacions i els butlletins que l'utilitzen s'aturaran fins que s'actualitzin.",
@@ -1722,11 +1729,15 @@
         "push": "Push mòbil",
         "webToast": "Notificacions emergents del navegador"
       },
-      "usedBy_other": "Utilitzada per {{count}} automatitzacions",
-      "usedByNewsletters_other": "Utilitzada per {{count}} butlletins",
       "violationsOff": "Incompliments desactivats",
       "violationsOn": "Incompliments activats",
-      "webToastNote": "Notificacions emergents en aquest navegador."
+      "webToastNote": "Notificacions emergents en aquest navegador.",
+      "alertsGoTo_one": "Les alertes van a {{count}} adreça",
+      "alertsGoTo_other": "Les alertes van a {{count}} adreces",
+      "usedBy_one": "Utilitzada per {{count}} automatització",
+      "usedBy_other": "Utilitzada per {{count}} automatitzacions",
+      "usedByNewsletters_one": "Utilitzada per {{count}} butlletí",
+      "usedByNewsletters_other": "Utilitzada per {{count}} butlletins"
     },
     "jobs": {
       "runNow": "Executa ara",
@@ -1785,7 +1796,6 @@
     "title": "Compatibilitat de dispositius",
     "description": "Vegeu quins dispositius fan reproducció directa i quins transcodifiquen cada còdec.",
     "analyzedSessions": "Sessions analitzades",
-    "analyzedSessionsTooltip_other": "Sessions en combinacions de dispositiu + còdec amb un mínim de {{count}} sessions i un còdec conegut. Les combinacions poc freqüents i les sessions sense informació de còdec no es compten.",
     "directPlayRate": "Taxa de reproducció directa",
     "videoAndAudio": "Vídeo + àudio",
     "uniqueDevices": "Dispositius únics",
@@ -1807,7 +1817,9 @@
     "directPlayLow": "<50 %",
     "topTranscodingUsers": "Usuaris amb més transcodificacions",
     "topTranscodingUsersDesc": "Usuaris que provoquen més transcodificacions al servidor.",
-    "noTranscodingUsers": "No s'ha trobat cap usuari que transcodifiqui"
+    "noTranscodingUsers": "No s'ha trobat cap usuari que transcodifiqui",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_other": "Sessions en combinacions de dispositiu + còdec amb un mínim de {{count}} sessions i un còdec conegut. Les combinacions poc freqüents i les sessions sense informació de còdec no es compten."
   },
   "statsBandwidth": {
     "title": "Amplada de banda",
@@ -1916,17 +1928,17 @@
         }
       },
       "card": {
+        "addedAgo": "afegit {{date}}",
+        "addedCompactAgo": "afegit fa {{age}}",
         "newEpisodes_one": "{{count}} episodi nou",
         "newEpisodes_other": "{{count}} episodis nous",
         "replacedEpisodes_one": "{{count}} episodi substituït",
         "replacedEpisodes_other": "{{count}} episodis substituïts",
-        "addedAgo": "afegit {{date}}",
-        "addedCompactAgo": "afegit fa {{age}}",
+        "newEpisodesChip_one": "",
         "newEpisodesChip_other": "{{count}} de nous"
       },
       "deadWeight": {
         "title": "Pes mort",
-        "summary_other": "{{count}} títols mai vistos · {{size}}",
         "empty": "No hi ha res per recuperar: tot el que teniu a la biblioteca s'ha vist",
         "columns": {
           "poster": "Pòster",
@@ -1935,7 +1947,9 @@
           "servers": "Servidors"
         },
         "viewAll": "Mostra-ho tot",
-        "viewAllTooltip": "Properament"
+        "viewAllTooltip": "Properament",
+        "summary_one": "",
+        "summary_other": "{{count}} títols mai vistos · {{size}}"
       },
       "loadError": "No s'ha pogut carregar la vostra biblioteca multimèdia"
     },
@@ -1951,9 +1965,9 @@
       "chart": {
         "title": "Reproduccions per gènere",
         "valueLabel": "Reproduccions",
+        "ariaLabel": "Gràfic de barres de reproduccions per gènere, ordenat de més a menys. El desglossament complet és a la taula de sota.",
         "itemCount_one": "{{count}} títol",
-        "itemCount_other": "{{count}} títols",
-        "ariaLabel": "Gràfic de barres de reproduccions per gènere, ordenat de més a menys. El desglossament complet és a la taula de sota."
+        "itemCount_other": "{{count}} títols"
       },
       "table": {
         "title": "Desglossament per gènere",
@@ -2041,15 +2055,15 @@
         "title": "Temporades",
         "loadError": "No s'han pogut carregar les dades de temporades",
         "empty": "Encara no hi ha dades de temporades",
-        "episodeCount_one": "{{count}} episodi",
-        "episodeCount_other": "{{count}} episodis",
         "watchedPct": "{{percent}}% vist",
         "stripSummary": "{{season}}: {{percent}}% vist",
         "episodeLabel": {
           "watched": "{{code}}: vist",
           "partial": "{{code}}: vist parcialment",
           "unwatched": "{{code}}: sense veure"
-        }
+        },
+        "episodeCount_one": "{{count}} episodi",
+        "episodeCount_other": "{{count}} episodis"
       },
       "platforms": {
         "title": "Plataformes",
@@ -2087,8 +2101,6 @@
       "rankSuffix": ", posició {{rank}}",
       "onServers": "A {{servers}}",
       "addedLabel": "Afegit {{date}}",
-      "viewers_one": "{{count}} espectador",
-      "viewers_other": "{{count}} espectadors",
       "watchedState": {
         "watched": "Vist",
         "partial": "Vist parcialment",
@@ -2102,12 +2114,14 @@
         "resolution": "resolució"
       },
       "rankChip": "#{{rank}}",
+      "versionsChip": "{{count}}×",
+      "moreServers": "+{{count}} més",
+      "viewers_one": "{{count}} espectador",
+      "viewers_other": "{{count}} espectadors",
       "playsCompact_one": "{{compact}} reproducció",
       "playsCompact_other": "{{compact}} reproduccions",
-      "versionsChip": "{{count}}×",
       "versions_one": "{{count}} versió",
-      "versions_other": "{{count}} versions",
-      "moreServers": "+{{count}} més"
+      "versions_other": "{{count}} versions"
     },
     "grid": {
       "toolbar": {
@@ -2241,11 +2255,12 @@
       "linkSeerr": "Enllaça Seerr",
       "kpi": {
         "requested": "Sol·licitats",
-        "landedOf_other": "{{count}} arribats",
         "watched": "Vist",
         "neverPlayed": "Mai reproduït",
         "ofLanded": "{{share}} dels arribats",
-        "onDisk": "{{size}} al disc"
+        "onDisk": "{{size}} al disc",
+        "landedOf_one": "",
+        "landedOf_other": "{{count}} arribats"
       }
     },
     "funnel": {
