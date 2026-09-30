@@ -6,7 +6,9 @@
   "activity": "Toiminta",
   "library": "Kirjasto",
   "users": "Käyttäjät",
+  "automations": "",
   "violations": "Rikkomukset",
+  "requests": "",
   "alerts": "Ilmoitukset",
   "settings": "Asetukset",
   "overview": "Yleiskatsaus",
@@ -16,6 +18,14 @@
   "devices": "Laitteet",
   "bandwidth": "Kaistanleveys",
   "jobs": "Työt",
+  "media": "",
   "mediaBrowse": "Selaa",
-  "mediaGenres": "Genret"
+  "mediaGenres": "Genret",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }
