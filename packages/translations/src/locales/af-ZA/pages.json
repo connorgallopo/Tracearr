@@ -55,8 +55,6 @@
     "noUsersFound": "",
     "serversColumn": "",
     "resetTrustScore": "",
-    "resetTrustScoreTitle_one": "",
-    "resetTrustScoreTitle_other": "",
     "resetTrustScoreConfirm": "",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -72,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -89,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -114,7 +102,21 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_one": "",
+    "selectAllUsers_other": "",
+    "resetTrustScoreTitle_one": "",
+    "resetTrustScoreTitle_other": "",
+    "mergeMoves_one": "",
+    "mergeMoves_other": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "",
@@ -282,7 +284,9 @@
       "backfillRunning": {
         "title": "",
         "fallbackBody": "",
-        "progress": ""
+        "progress": "",
+        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_other": ""
       },
       "multiServer": {
         "title": "",
@@ -305,7 +309,9 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_one": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -327,8 +333,6 @@
     "tryAdjustingFilters": "",
     "dismissViolation": "",
     "dismissViolationConfirm": "",
-    "dismissViolation_one": "",
-    "dismissViolation_other": "",
     "dismissViolationsConfirm": "",
     "noViolationsFound": "",
     "noViolationsRecorded": "",
@@ -365,7 +369,13 @@
       "actual": "",
       "relatedSessions_one": "",
       "relatedSessions_other": ""
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_other": "",
+    "dismissViolations_one": "",
+    "dismissViolations_other": "",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -469,10 +479,10 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -664,12 +674,12 @@
         "placeholderAction": ""
       },
       "footer": {
+        "ready": "",
+        "search": "",
         "problems_one": "",
         "problems_other": "",
         "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -690,7 +700,9 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -704,12 +716,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -863,16 +871,18 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_one": "",
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
+      "noRuns": "",
       "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1563,7 +1573,9 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "",
@@ -1606,17 +1618,20 @@
       "linkAnotherAccount": "",
       "linking": "",
       "loginEnabled": "",
-      "serversConnected_one": "",
-      "serversConnected_other": "",
       "unlinkAccount": "",
       "reauthorizeAccount": "",
       "deleteServersFirst": "",
       "unlinkPlexAccount": "",
-      "unlinkConfirm": ""
+      "unlinkConfirm": "",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_other": "",
+      "moreConnections_one": "",
+      "moreConnections_other": "",
+      "serversConnected_one": "",
+      "serversConnected_other": ""
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1714,11 +1729,15 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_one": "",
+      "alertsGoTo_other": "",
+      "usedBy_one": "",
+      "usedBy_other": "",
+      "usedByNewsletters_one": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "",
@@ -1798,7 +1817,9 @@
     "directPlayLow": "",
     "topTranscodingUsers": "",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": ""
+    "noTranscodingUsers": "",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "",
@@ -1907,12 +1928,14 @@
         }
       },
       "card": {
+        "addedAgo": "bygevoeg {{date}}",
+        "addedCompactAgo": "",
         "newEpisodes_one": "{{count}} nuwe episode",
         "newEpisodes_other": "{{count}} nuwe episodes",
         "replacedEpisodes_one": "",
         "replacedEpisodes_other": "",
-        "addedAgo": "bygevoeg {{date}}",
-        "addedCompactAgo": ""
+        "newEpisodesChip_one": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1924,7 +1947,9 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_one": "",
+        "summary_other": ""
       },
       "loadError": ""
     },
@@ -1940,9 +1965,9 @@
       "chart": {
         "title": "",
         "valueLabel": "",
+        "ariaLabel": "",
         "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -2030,15 +2055,15 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_one": "",
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2076,8 +2101,6 @@
       "rankSuffix": ", rang {{rank}}",
       "onServers": "Op {{servers}}",
       "addedLabel": "Bygevoeg {{date}}",
-      "viewers_one": "{{count}} kyker",
-      "viewers_other": "{{count}} kykers",
       "watchedState": {
         "watched": "Gekyk",
         "partial": "Gedeeltelik gekyk",
@@ -2091,12 +2114,14 @@
         "resolution": ""
       },
       "rankChip": "",
+      "versionsChip": "",
+      "moreServers": "",
+      "viewers_one": "{{count}} kyker",
+      "viewers_other": "{{count}} kykers",
       "playsCompact_one": "",
       "playsCompact_other": "",
-      "versionsChip": "",
       "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2233,7 +2258,9 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_one": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
