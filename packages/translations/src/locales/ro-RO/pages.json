@@ -53,11 +53,8 @@
     "title": "Utilizatori",
     "showRemoved": "",
     "noUsersFound": "Niciun utilizator găsit.",
-    "selectAllUsers_other": "Selectați toți utilizatorii {{count}}",
     "serversColumn": "",
     "resetTrustScore": "Resetează scorul de încredere",
-    "resetTrustScoreTitle_one": "Resetează scorul de încredere pentru utilizatorul {{count}}",
-    "resetTrustScoreTitle_other": "Resetați scorul de încredere pentru {{count}} Utilizatori",
     "resetTrustScoreConfirm": "Ești sigur că vrei să resetezi scorul de încredere la 100? Această acțiune nu poate fi anulată.",
     "mergeUsers": "",
     "mergeTitleSuggestion": "",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "",
     "mergeMoreServers": "",
     "mergeWhatHappens": "",
-    "mergeMoves_one": "",
-    "mergeMoves_other": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
     "suggestionsTitle": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
     "suggestionsPairEmail": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsername": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsername": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
@@ -115,7 +102,28 @@
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": ""
+    "filterHasAccessToHint": "",
+    "selectAllUsers_one": "",
+    "selectAllUsers_few": "",
+    "selectAllUsers_other": "Selectați toți utilizatorii {{count}}",
+    "resetTrustScoreTitle_one": "Resetează scorul de încredere pentru utilizatorul {{count}}",
+    "resetTrustScoreTitle_few": "",
+    "resetTrustScoreTitle_other": "Resetați scorul de încredere pentru {{count}} Utilizatori",
+    "mergeMoves_one": "",
+    "mergeMoves_few": "",
+    "mergeMoves_other": "",
+    "suggestionsCount_one": "",
+    "suggestionsCount_few": "",
+    "suggestionsCount_other": "",
+    "suggestionsPairEmailMore_one": "",
+    "suggestionsPairEmailMore_few": "",
+    "suggestionsPairEmailMore_other": "",
+    "suggestionsPairEmailUsernameMore_one": "",
+    "suggestionsPairEmailUsernameMore_few": "",
+    "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairUsernameMore_one": "",
+    "suggestionsPairUsernameMore_few": "",
+    "suggestionsPairUsernameMore_other": ""
   },
   "userDetail": {
     "backToUsers": "Înapoi la Utilizatori",
@@ -283,7 +291,10 @@
       "backfillRunning": {
         "title": "",
         "fallbackBody": "",
-        "progress": ""
+        "progress": "",
+        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_few": "",
+        "snapshotsSuffix_other": ""
       },
       "multiServer": {
         "title": "",
@@ -306,7 +317,10 @@
     "versionsBackfill": {
       "banner": "",
       "action": "",
-      "syncStarted": ""
+      "syncStarted": "",
+      "syncFailed_one": "",
+      "syncFailed_few": "",
+      "syncFailed_other": ""
     }
   },
   "activity": {
@@ -326,11 +340,8 @@
   "violations": {
     "title": "Incalcari",
     "tryAdjustingFilters": "Încercați să ajustați filtrele",
-    "selectAllViolations_other": "Selectați toate filtrele de încălcare {{count}}",
     "dismissViolation": "Respinge Încălcarea",
     "dismissViolationConfirm": "Sigur doriți să respingeți această încălcare? Acest lucru îl va elimina definitiv din jurnalul de încălcare a normelor.",
-    "dismissViolation_one": "Respinge {{count}} Încălcare",
-    "dismissViolation_other": "Respinge {{count}} Încălcări",
     "dismissViolationsConfirm": "Sigur doriți să respingeți? Acest lucru le va elimina din jurnalul de încălcare permanent și va restabili scorurile de încredere asociate.",
     "noViolationsFound": "Nicio încălcare găsită",
     "noViolationsRecorded": "Nu au fost înregistrate încă încălcări ale legii.",
@@ -366,8 +377,18 @@
       "matched": "{{matched}}/{{total}} corespondență",
       "actual": "Actuală",
       "relatedSessions_one": "{{count}} sesiune legată de",
+      "relatedSessions_few": "",
       "relatedSessions_other": "{{count}} sesiuni asociate"
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_few": "",
+    "selectAllViolations_other": "Selectați toate filtrele de încălcare {{count}}",
+    "dismissViolations_one": "Respinge {{count}} Încălcare",
+    "dismissViolations_few": "",
+    "dismissViolations_other": "Respinge {{count}} Încălcări",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_few": "",
+    "peopleSelectedCount_other": ""
   },
   "automations": {
     "actions": {
@@ -471,10 +492,11 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_other": "",
       "item": "",
-      "recordedViolation": ""
+      "recordedViolation": "",
+      "emptyRanDescription_one": "",
+      "emptyRanDescription_few": "",
+      "emptyRanDescription_other": ""
     },
     "allKinds": "",
     "allStatuses": "",
@@ -666,12 +688,14 @@
         "placeholderAction": ""
       },
       "footer": {
+        "ready": "",
+        "search": "",
         "problems_one": "",
+        "problems_few": "",
         "problems_other": "",
         "remaining_one": "",
-        "remaining_other": "",
-        "ready": "",
-        "search": ""
+        "remaining_few": "",
+        "remaining_other": ""
       },
       "leave": {
         "title": "",
@@ -692,7 +716,10 @@
         "sampleTitle": "",
         "sampleGone": "",
         "backToLive": ""
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_few": "",
+      "selectedCount_other": ""
     },
     "categories": {
       "session_behavior": "",
@@ -706,12 +733,8 @@
     "createAutomation": "",
     "customAutomation": "",
     "deleteAutomationConfirm": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_other": "",
     "deleteAutomationsConfirm": "",
     "describe": {
-      "more_one": "",
-      "more_other": "",
       "noValues": "",
       "includesSameDevice": "",
       "uniqueIps": "",
@@ -730,8 +753,10 @@
       "appliesTo": "",
       "duration": {
         "minutes_one": "",
+        "minutes_few": "",
         "minutes_other": "",
         "days_one": "",
+        "days_few": "",
         "days_other": ""
       },
       "triggers": {
@@ -865,16 +890,20 @@
         "text": "",
         "boolean": "",
         "listed": ""
-      }
+      },
+      "more_one": "",
+      "more_few": "",
+      "more_other": ""
     },
     "description": "",
     "detail": {
       "notFound": "",
       "title": "",
       "unsaved": "",
+      "noRuns": "",
       "runsLine_one": "",
-      "runsLine_other": "",
-      "noRuns": ""
+      "runsLine_few": "",
+      "runsLine_other": ""
     },
     "disable": "",
     "editAutomation": "",
@@ -1565,7 +1594,10 @@
       "trigger": "",
       "allTriggers": ""
     },
-    "openGallery": ""
+    "openGallery": "",
+    "deleteAutomation_one": "",
+    "deleteAutomation_few": "",
+    "deleteAutomation_other": ""
   },
   "terminateStream": {
     "title": "Terminare stream",
@@ -1598,10 +1630,8 @@
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} de {{total}} conexiuni accesibile",
-      "connectionsAvailable_other": "{{count}} conexiuni disponibile",
       "hideFiltered": "Ascunde filtrate",
       "showAll": "Arată toate",
-      "moreConnections_other": "+{{count}} mai multe conexiuni",
       "connectingTo": "Conectare la {{name}}...",
       "ownerOnly": "",
       "noAccountsLinked": "Niciun cont Plex legat",
@@ -1610,17 +1640,23 @@
       "linkAnotherAccount": "Leagă un alt cont Plex",
       "linking": "Conectare...",
       "loginEnabled": "Autentificare activată",
-      "serversConnected_one": "{{count}} server conectat",
-      "serversConnected_other": "{{count}} servere conectate",
       "unlinkAccount": "Deconectați acest cont Plex",
       "reauthorizeAccount": "",
       "deleteServersFirst": "Șterge mai întâi serverele conectate pentru a deconecta acest cont",
       "unlinkPlexAccount": "Deconectează contul Plex",
-      "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou."
+      "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou.",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_few": "",
+      "connectionsAvailable_other": "{{count}} conexiuni disponibile",
+      "moreConnections_one": "",
+      "moreConnections_few": "",
+      "moreConnections_other": "+{{count}} mai multe conexiuni",
+      "serversConnected_one": "{{count}} server conectat",
+      "serversConnected_few": "",
+      "serversConnected_other": "{{count}} servere conectate"
     },
     "destinations": {
       "add": "",
-      "alertsGoTo_other": "",
       "builtinNote": "",
       "clearSecret": "",
       "deleteConfirm": "",
@@ -1718,11 +1754,18 @@
         "push": "",
         "webToast": ""
       },
-      "usedBy_other": "",
-      "usedByNewsletters_other": "",
       "violationsOff": "",
       "violationsOn": "",
-      "webToastNote": ""
+      "webToastNote": "",
+      "alertsGoTo_one": "",
+      "alertsGoTo_few": "",
+      "alertsGoTo_other": "",
+      "usedBy_one": "",
+      "usedBy_few": "",
+      "usedBy_other": "",
+      "usedByNewsletters_one": "",
+      "usedByNewsletters_few": "",
+      "usedByNewsletters_other": ""
     },
     "jobs": {
       "runNow": "Rulează acum",
@@ -1802,7 +1845,10 @@
     "directPlayLow": "",
     "topTranscodingUsers": "Top utilizatori de Transcodare",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "Niciun utilizator de transcodare găsit"
+    "noTranscodingUsers": "Niciun utilizator de transcodare găsit",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_few": "",
+    "analyzedSessionsTooltip_other": ""
   },
   "statsBandwidth": {
     "title": "Lățimea benzii",
@@ -1911,12 +1957,17 @@
         }
       },
       "card": {
+        "addedAgo": "adăugat {{date}}",
+        "addedCompactAgo": "",
         "newEpisodes_one": "{{count}} episod nou",
+        "newEpisodes_few": "",
         "newEpisodes_other": "{{count}} episoade noi",
         "replacedEpisodes_one": "",
+        "replacedEpisodes_few": "",
         "replacedEpisodes_other": "",
-        "addedAgo": "adăugat {{date}}",
-        "addedCompactAgo": ""
+        "newEpisodesChip_one": "",
+        "newEpisodesChip_few": "",
+        "newEpisodesChip_other": ""
       },
       "deadWeight": {
         "title": "",
@@ -1928,7 +1979,10 @@
           "servers": ""
         },
         "viewAll": "",
-        "viewAllTooltip": ""
+        "viewAllTooltip": "",
+        "summary_one": "",
+        "summary_few": "",
+        "summary_other": ""
       },
       "loadError": ""
     },
@@ -1944,9 +1998,10 @@
       "chart": {
         "title": "",
         "valueLabel": "",
+        "ariaLabel": "",
         "itemCount_one": "",
-        "itemCount_other": "",
-        "ariaLabel": ""
+        "itemCount_few": "",
+        "itemCount_other": ""
       },
       "table": {
         "title": "",
@@ -1978,8 +2033,10 @@
         "loadError": "",
         "meta": {
           "seasons_one": "",
+          "seasons_few": "",
           "seasons_other": "",
           "episodes_one": "",
+          "episodes_few": "",
           "episodes_other": ""
         },
         "availability": {
@@ -2034,15 +2091,16 @@
         "title": "",
         "loadError": "",
         "empty": "",
-        "episodeCount_one": "",
-        "episodeCount_other": "",
         "watchedPct": "",
         "stripSummary": "",
         "episodeLabel": {
           "watched": "",
           "partial": "",
           "unwatched": ""
-        }
+        },
+        "episodeCount_one": "",
+        "episodeCount_few": "",
+        "episodeCount_other": ""
       },
       "platforms": {
         "title": "",
@@ -2080,8 +2138,6 @@
       "rankSuffix": ", locul {{rank}}",
       "onServers": "Pe {{servers}}",
       "addedLabel": "Adăugat {{date}}",
-      "viewers_one": "{{count}} spectator",
-      "viewers_other": "{{count}} spectatori",
       "watchedState": {
         "watched": "Vizionat",
         "partial": "Vizionat parțial",
@@ -2095,12 +2151,17 @@
         "resolution": ""
       },
       "rankChip": "",
-      "playsCompact_one": "",
-      "playsCompact_other": "",
       "versionsChip": "",
+      "moreServers": "",
+      "viewers_one": "{{count}} spectator",
+      "viewers_few": "",
+      "viewers_other": "{{count}} spectatori",
+      "playsCompact_one": "",
+      "playsCompact_few": "",
+      "playsCompact_other": "",
       "versions_one": "",
-      "versions_other": "",
-      "moreServers": ""
+      "versions_few": "",
+      "versions_other": ""
     },
     "grid": {
       "toolbar": {
@@ -2151,6 +2212,7 @@
         },
         "count": "",
         "countTotal_one": "",
+        "countTotal_few": "",
         "countTotal_other": ""
       },
       "scrubber": {
@@ -2237,7 +2299,10 @@
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
-        "onDisk": ""
+        "onDisk": "",
+        "landedOf_one": "",
+        "landedOf_few": "",
+        "landedOf_other": ""
       }
     },
     "funnel": {
