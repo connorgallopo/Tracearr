@@ -6,7 +6,9 @@
   "activity": "Atividade",
   "library": "Biblioteca",
   "users": "Utilizadores",
+  "automations": "",
   "violations": "Violações",
+  "requests": "",
   "alerts": "Atenção",
   "settings": "Confirgurações",
   "overview": "Geral",
@@ -16,6 +18,14 @@
   "devices": "Dispositivos",
   "bandwidth": "Banda",
   "jobs": "Empregos",
+  "media": "",
   "mediaBrowse": "Navegar",
-  "mediaGenres": "Géneros"
+  "mediaGenres": "Géneros",
+  "session": "",
+  "user": "",
+  "violation": "",
+  "monitor": "",
+  "manage": "",
+  "userStats": "",
+  "toggleSidebar": ""
 }
