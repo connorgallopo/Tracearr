@@ -113,14 +113,14 @@
     "userMayBeRemoved": "该用户可能已被删除。",
     "noLocationsRecorded": "没有记录的位置",
     "noDevicesRecorded": "没有任何设备记录",
-    "moreLocations_other": "+{{count}} 个更多连接",
-    "moreDevices_other": "{{count}}",
     "noViolations": "没有违反行为",
     "noTerminations": "没有流终止",
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
-    "trustScoreRange": ""
+    "trustScoreRange": "",
+    "moreLocations_other": "+{{count}} 个更多连接",
+    "moreDevices_other": "{{count}}"
   },
   "violation": {
     "violationNotFoundDesc": "更多设备。",
@@ -131,13 +131,13 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
     "all": "",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
-    "noMatches": ""
+    "noMatches": "",
+    "acknowledgeAllTitle_other": "",
+    "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "尝试调整筛选条件",
@@ -149,7 +149,8 @@
       "mediaType": "",
       "noCountries": "",
       "noPlatforms": "",
-      "noUsers": ""
+      "noUsers": "",
+      "sectionSelected_other": ""
     }
   },
   "users": {
@@ -182,21 +183,20 @@
   "a11y": {
     "selectServer": "选择服务器",
     "alerts": "警告",
-    "alertsCount_other": "提醒，{{count}} 条未读",
     "settings": "设置",
     "trustScore": "信任分数{{score}}",
     "decreaseTrustScore": "",
     "increaseTrustScore": "",
     "sortAscending": "",
-    "sortDescending": ""
+    "sortDescending": "",
+    "alertsCount_other": "提醒，{{count}} 条未读",
+    "filtersActive_other": ""
   },
   "map": {
     "noData": "无可用位置数据",
     "unavailable": "地图不可用"
   },
   "automations": {
-    "conditions_one": "",
-    "conditions_other": "",
     "editOnWeb": "",
     "emptyDescription": "",
     "kind": {
@@ -209,7 +209,8 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": ""
+    "versionCheckFailed": "",
+    "conditions_other": ""
   },
   "charts": {
     "weekOf": ""
@@ -243,10 +244,8 @@
   },
   "widget": {
     "asOf": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
     "signedOut": "",
-    "transcodes_one": "",
+    "serversDown_other": "",
     "transcodes_other": ""
   }
 }
