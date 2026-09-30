@@ -1379,7 +1379,7 @@
       },
       "new-device": {
         "name": "新设备",
-        "description": "当一个账户首次从你未见过的设备进行流媒体播放时，告诉你。",
+        "description": "当某个账户首次从你未见过的设备播放时，通知目标。",
         "keywords": "设备 新的 未知 未识别 手机 登录 分享 通知 Discord 邮件 Webhook"
       },
       "newsletter-failed": {
@@ -1507,8 +1507,8 @@
           "synonyms": ""
         },
         "accountNewDevice": {
-          "description": "首次从设备上进行流媒体传输。",
-          "synonyms": "设备，新的，未知，未识别，电话，登录，共享"
+          "description": "某个账户首次从某台设备进行流媒体播放。",
+          "synonyms": "设备, 新的, 未知, 未识别, 电话, 登录, 共享"
         },
         "accountTrustChanged": {
           "description": "",
