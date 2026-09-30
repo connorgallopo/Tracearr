@@ -49,11 +49,10 @@
       },
       "plexAccountReauthorized": {
         "title": "Plex 계정 재인증 완료",
-        "message_one": "서버 {{count}}대가 다시 연결되었습니다",
-        "message_other": "서버 {{count}}대가 다시 연결되었습니다",
         "messageNoServers": "계정 토큰이 업데이트되었습니다",
         "partial": "토큰을 업데이트했지만 {{names}}에서 아직 거부되었습니다",
-        "unmatched": "토큰은 업데이트됐지만 {{names}} 계정은 다시 연결하지 못했습니다"
+        "unmatched": "토큰은 업데이트됐지만 {{names}} 계정은 다시 연결하지 못했습니다",
+        "message_other": "서버 {{count}}대가 다시 연결되었습니다"
       },
       "jobCompleted": {
         "title": "작업 완료"
@@ -92,17 +91,14 @@
       },
       "sessionsDeleted": {
         "title": "세션 삭제됨",
-        "message_one": "세션 {{count}}개가 삭제되었습니다",
         "message_other": "세션 {{count}}개가 삭제되었습니다"
       },
       "violationsAcknowledged": {
         "title": "위반 확인됨",
-        "message_one": "위반 {{count}}건이 확인되었습니다",
         "message_other": "위반 {{count}}건이 확인되었습니다"
       },
       "violationsDismissed": {
         "title": "위반 해제됨",
-        "message_one": "위반 {{count}}건이 해제되었습니다",
         "message_other": "위반 {{count}}건이 해제되었습니다"
       },
       "apiKeyGenerated": {
@@ -124,7 +120,6 @@
       "identityUpdated": "프로필이 업데이트되었습니다.",
       "trustScoresReset": {
         "title": "신뢰 점수 초기화됨",
-        "message_one": "사용자 {{count}}명의 점수가 100으로 초기화되었습니다",
         "message_other": "사용자 {{count}}명의 점수가 100으로 초기화되었습니다"
       },
       "claimCodeValidated": {
@@ -149,10 +144,10 @@
       "newsletterDuplicated": "뉴스레터를 복제했습니다.",
       "newsletterTestQueued": "{{address}} 주소로 보낼 테스트를 대기열에 추가했습니다.",
       "newsletterSendQueued": "발송을 대기열에 추가했습니다.",
-      "newsletterRetryQueued_other": "수신자 {{count}}명에게 재시도 중입니다.",
       "brandingSaved": "이메일 브랜딩을 저장했습니다.",
       "suppressionAdded": "주소를 발송 제외 목록에 추가했습니다.",
-      "suppressionRemoved": "주소를 발송 제외 목록에서 제거했습니다."
+      "suppressionRemoved": "주소를 발송 제외 목록에서 제거했습니다.",
+      "newsletterRetryQueued_other": "수신자 {{count}}명에게 재시도 중입니다."
     },
     "error": {
       "serverAddFailed": "서버를 추가하지 못했습니다",
