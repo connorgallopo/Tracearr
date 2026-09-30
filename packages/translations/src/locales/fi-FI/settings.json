@@ -132,7 +132,9 @@
       "never": "",
       "diskLimited": "",
       "loadError": "",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_one": "",
+      "needHint_other": ""
     }
   },
   "servers": {
@@ -253,7 +255,6 @@
     "enableMobileAccess": "Ota Mobiilikäyttö Käyttöön",
     "enabling": "Poistetaan...",
     "devicesConnected": "",
-    "pendingTokens_other": "{{count}} odottaa parinumeroa",
     "addDevice": "Lisää Laite",
     "disableMobileAccess": "Poista Mobiilikäyttö Käytöstä",
     "revokeAllSessions": "Peruuta Kaikki",
@@ -276,7 +277,9 @@
     "removeDeviceConfirm": "Oletko varma, että haluat poistaa {{deviceName}}? Tämän laitteen on muodostettava pari, jotta yhteys muodostetaan uudelleen.",
     "externalUrlBanner": "Käytetäänkö käänteistä välityspalvelinta vai etäännyttä? Aseta sinun",
     "externalUrlBannerLink": "Ulkoinen URL",
-    "externalUrlBannerSuffix": "jotta mobiilisovellus voi muodostaa yhteyden palvelimellesi."
+    "externalUrlBannerSuffix": "jotta mobiilisovellus voi muodostaa yhteyden palvelimellesi.",
+    "pendingTokens_one": "",
+    "pendingTokens_other": "{{count}} odottaa parinumeroa"
   },
   "tailscale": {
     "title": "",
@@ -404,7 +407,11 @@
     "importFullRange": "",
     "importFullRangeHelp": "",
     "skipOverlap": "",
-    "skipDuplicatePlugin": ""
+    "skipDuplicatePlugin": "",
+    "overlapSkipped_one": "",
+    "overlapSkipped_other": "",
+    "duplicates_one": "",
+    "duplicates_other": ""
   },
   "plex": {
     "signInWithPlex": "Kirjaudu sisään Plexillä",
@@ -441,8 +448,6 @@
     "earlier": "",
     "installedBadge": "",
     "latestBadge": "",
-    "changeCount_one": "",
-    "changeCount_other": "",
     "series": "",
     "docs": "",
     "source": "",
@@ -453,10 +458,14 @@
       "fix": "",
       "security": "",
       "note": ""
-    }
+    },
+    "changeCount_one": "",
+    "changeCount_other": ""
   },
   "serverHealth": {
-    "unreachable": "{{serverName}} ei ole tavoitettavissa"
+    "unreachable": "{{serverName}} ei ole tavoitettavissa",
+    "multipleUnreachable_one": "",
+    "multipleUnreachable_other": ""
   },
   "ipWarning": {
     "message": "Kaikki käyttäjät näyttävät käyttävän samaa IP-osoitetta tai paikallisia verkko-osoitteita. Tämä saattaa vaikuttaa sääntöpohjaiseen sijainti- tai IP-osoitteiden logiikkaan.",
@@ -636,7 +645,11 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_one": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_one": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -670,14 +683,24 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_one": "",
+          "movies_other": "",
+          "shows_one": "",
+          "shows_other": "",
+          "seasons_one": "",
+          "seasons_other": "",
+          "music_one": "",
+          "music_other": "",
+          "mostWatched_one": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -756,7 +779,15 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_one": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_one": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -805,13 +836,13 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_one": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -857,11 +888,21 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_one": "",
+        "summary_other": "",
+        "trimmed_one": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_one": "",
+      "serversSelected_other": "",
+      "librariesSelected_one": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_one": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -892,7 +933,11 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_one": "",
+      "recipients_other": "",
+      "attempts_one": "",
+      "attempts_other": ""
     }
   },
   "email": {
