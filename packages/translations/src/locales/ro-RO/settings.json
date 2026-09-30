@@ -132,7 +132,10 @@
       "never": "",
       "diskLimited": "",
       "loadError": "",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_one": "",
+      "needHint_few": "",
+      "needHint_other": ""
     }
   },
   "servers": {
@@ -253,7 +256,6 @@
     "enableMobileAccess": "Activare acces mobil",
     "enabling": "Activare...",
     "devicesConnected": "{{current}} de {{max}} dispozitive conectate",
-    "pendingTokens_other": "{{count}} tokeni pereche în așteptare",
     "addDevice": "Adaugă dispozitiv",
     "disableMobileAccess": "Dezactivare acces mobil",
     "revokeAllSessions": "Revocă tot",
@@ -276,7 +278,10 @@
     "removeDeviceConfirm": "Sigur doriți să eliminați {{deviceName}}? Acest dispozitiv va trebui să se asocieze din nou pentru a se reconecta.",
     "externalUrlBanner": "Folosind un proxy invers sau accesând de la distanță? Setează-ți",
     "externalUrlBannerLink": "URL extern",
-    "externalUrlBannerSuffix": "astfel încât aplicația mobilă să se poată conecta la server."
+    "externalUrlBannerSuffix": "astfel încât aplicația mobilă să se poată conecta la server.",
+    "pendingTokens_one": "",
+    "pendingTokens_few": "",
+    "pendingTokens_other": "{{count}} tokeni pereche în așteptare"
   },
   "tailscale": {
     "title": "VPN la scară largă",
@@ -404,7 +409,13 @@
     "importFullRange": "",
     "importFullRangeHelp": "",
     "skipOverlap": "",
-    "skipDuplicatePlugin": ""
+    "skipDuplicatePlugin": "",
+    "overlapSkipped_one": "",
+    "overlapSkipped_few": "",
+    "overlapSkipped_other": "",
+    "duplicates_one": "",
+    "duplicates_few": "",
+    "duplicates_other": ""
   },
   "plex": {
     "signInWithPlex": "Autentificare cu Plex",
@@ -441,8 +452,6 @@
     "earlier": "",
     "installedBadge": "",
     "latestBadge": "",
-    "changeCount_one": "",
-    "changeCount_other": "",
     "series": "",
     "docs": "",
     "source": "",
@@ -453,10 +462,15 @@
       "fix": "",
       "security": "",
       "note": ""
-    }
+    },
+    "changeCount_one": "",
+    "changeCount_few": "",
+    "changeCount_other": ""
   },
   "serverHealth": {
     "unreachable": "{{serverName}} este inaccesibil",
+    "multipleUnreachable_one": "",
+    "multipleUnreachable_few": "",
     "multipleUnreachable_other": "{{count}} servere inaccesibile: {{serverNames}}"
   },
   "ipWarning": {
@@ -574,12 +588,16 @@
     },
     "counts": {
       "movies_one": "",
+      "movies_few": "",
       "movies_other": "",
       "shows_one": "",
+      "shows_few": "",
       "shows_other": "",
       "albums_one": "",
+      "albums_few": "",
       "albums_other": "",
       "watched_one": "",
+      "watched_few": "",
       "watched_other": ""
     },
     "copyOf": "",
@@ -637,7 +655,13 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_one": "",
+        "fallbackLabel_few": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_one": "",
+        "fixedLabel_few": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -671,14 +695,29 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_one": "",
+          "movies_few": "",
+          "movies_other": "",
+          "shows_one": "",
+          "shows_few": "",
+          "shows_other": "",
+          "seasons_one": "",
+          "seasons_few": "",
+          "seasons_other": "",
+          "music_one": "",
+          "music_few": "",
+          "music_other": "",
+          "mostWatched_one": "",
+          "mostWatched_few": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -757,7 +796,19 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_one": "",
+        "notIncludable_few": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_few": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_one": "",
+        "selectedCount_few": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_one": "",
+        "notIncludableHelp_few": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -806,13 +857,14 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_one": "",
+        "recipients_few": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -858,11 +910,27 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_one": "",
+        "summary_few": "",
+        "summary_other": "",
+        "trimmed_one": "",
+        "trimmed_few": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_one": "",
+      "serversSelected_few": "",
+      "serversSelected_other": "",
+      "librariesSelected_one": "",
+      "librariesSelected_few": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_few": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_one": "",
+      "previewVariant_few": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -893,7 +961,13 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_one": "",
+      "recipients_few": "",
+      "recipients_other": "",
+      "attempts_one": "",
+      "attempts_few": "",
+      "attempts_other": ""
     }
   },
   "email": {
@@ -962,10 +1036,13 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
+      "requests_few": "",
       "requests_other": "",
       "unmatchedMedia_one": "",
+      "unmatchedMedia_few": "",
       "unmatchedMedia_other": "",
       "unmatchedUsers_one": "",
+      "unmatchedUsers_few": "",
       "unmatchedUsers_other": ""
     },
     "needsKey": "",
