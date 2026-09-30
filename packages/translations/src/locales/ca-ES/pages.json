@@ -1671,7 +1671,7 @@
         "password": "Contrasenya",
         "fromName": "Nom del remitent",
         "fromAddress": "Adreça del remitent",
-        "to": "Recipients",
+        "to": "",
         "replyTo": "Respondre a",
         "messagesPerSecond": "Missatges per segon",
         "messageStream": "Flux de missatges"
@@ -1683,7 +1683,7 @@
       },
       "hints": {
         "authTokenOptional": "Opcional per als temes públics",
-        "smtpPreset": "Fills the host, port and security for common providers",
+        "smtpPreset": "",
         "smtpVerifyCertificate": "Comprova el certificat TLS del servidor de correu amb una autoritat de confiança. Desactiveu-ho només per a un servidor amb un certificat autosignat, com ara un pont local: llavors qualsevol que sigui al camí entre Tracearr i el servidor de correu pot interceptar la connexió.",
         "smtpUsernameOptional": "Deixeu-ho en blanc si el servidor no necessita cap inici de sessió",
         "smtpTo": "Les alertes s'envien en un sol correu amb totes les adreces d'aquí al camp «Per a». Deixeu-ho en blanc si aquest servidor només envia butlletins.",
