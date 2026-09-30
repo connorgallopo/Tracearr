@@ -53,11 +53,8 @@
     "title": "Użytkownicy",
     "showRemoved": "Pokaż usunięte",
     "noUsersFound": "Nie znaleziono użytkowników.",
-    "selectAllUsers_other": "Zaznacz wszystkich {{count}} użytkowników",
     "serversColumn": "Serwery",
     "resetTrustScore": "Zresetuj wynik zaufania",
-    "resetTrustScoreTitle_one": "Zresetuj wynik zaufania dla {{count}} Użytkownika",
-    "resetTrustScoreTitle_other": "Zresetuj wynik zaufania dla {{count}} Użytkowników",
     "resetTrustScoreConfirm": "Czy na pewno chcesz zresetować wynik zaufania do 100? Tej akcji nie można cofnąć.",
     "mergeUsers": "Scal użytkowników",
     "mergeTitleSuggestion": "Czy to ta sama osoba?",
@@ -73,8 +70,6 @@
     "mergeNeverActive": "Nigdy nie był aktywny",
     "mergeMoreServers": "+{{count}}",
     "mergeWhatHappens": "Co się stanie",
-    "mergeMoves_one": "Konta serwera {{foldName}} i {{count}} sesja przenoszą się do {{keepName}}.",
-    "mergeMoves_other": "Konta serwera {{foldName}} i {{count}} sesji przenoszą się do {{keepName}}.",
     "mergeMovesNoCount": "Konta i sesje serwera {{foldName}} przenoszą się do {{keepName}}.",
     "mergeCarriesOver": "Ich adres e-mail, wykluczenia z newslettera i prośby Seerr zostaną przeniesione.",
     "mergeDeleted": "{{foldName}} zostanie usunięty. Możesz później ponownie wydzielić konto na stronie {{keepName}}.",
@@ -90,17 +85,9 @@
     "mergeSameIdentity": "Te konta należą już do tego samego użytkownika",
     "mergeSelectAllActive": "Wyczyść zaznaczone i wybierz dokładnie dwóch użytkowników, by ich scalić",
     "suggestionsTitle": "Możliwe duplikaty użytkowników",
-    "suggestionsCount_one": "{{count}} możliwy duplikat użytkownika",
-    "suggestionsCount_other": "{{count}} możliwych zduplikowanych użytkowników",
     "suggestionsPairEmail": "{{first}} i {{second}} współdzielą adres e-mail",
-    "suggestionsPairEmailMore_one": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
-    "suggestionsPairEmailMore_other": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
     "suggestionsPairEmailUsername": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta",
-    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
-    "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
     "suggestionsPairUsername": "{{first}} i {{second}} współdzielą nazwę użytkownika",
-    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
-    "suggestionsPairUsernameMore_other": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
     "suggestionsSheetDescription": "Scalanie zachowuje jednego użytkownika i usuwa drugiego. Para oznaczona jako nie ta sama osoba przestaje się pojawiać, dopóki jej nie przywrócisz.",
     "suggestionsReview": "Przejrzyj",
     "suggestionsNotSame": "To nie ta sama osoba",
@@ -115,7 +102,35 @@
     "suggestionsError": "Nie można załadować sugestii scalania",
     "filterHasAccessTo": "Ma dostęp do",
     "filterHasAccessToPlaceholder": "Dowolny serwer",
-    "filterHasAccessToHint": "Pokazuje osoby z aktywnym kontem na każdym wybranym serwerze."
+    "filterHasAccessToHint": "Pokazuje osoby z aktywnym kontem na każdym wybranym serwerze.",
+    "selectAllUsers_one": "",
+    "selectAllUsers_few": "",
+    "selectAllUsers_many": "",
+    "selectAllUsers_other": "Zaznacz wszystkich {{count}} użytkowników",
+    "resetTrustScoreTitle_one": "Zresetuj wynik zaufania dla {{count}} Użytkownika",
+    "resetTrustScoreTitle_few": "",
+    "resetTrustScoreTitle_many": "",
+    "resetTrustScoreTitle_other": "Zresetuj wynik zaufania dla {{count}} Użytkowników",
+    "mergeMoves_one": "Konta serwera {{foldName}} i {{count}} sesja przenoszą się do {{keepName}}.",
+    "mergeMoves_few": "",
+    "mergeMoves_many": "",
+    "mergeMoves_other": "Konta serwera {{foldName}} i {{count}} sesji przenoszą się do {{keepName}}.",
+    "suggestionsCount_one": "{{count}} możliwy duplikat użytkownika",
+    "suggestionsCount_few": "",
+    "suggestionsCount_many": "",
+    "suggestionsCount_other": "{{count}} możliwych zduplikowanych użytkowników",
+    "suggestionsPairEmailMore_one": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
+    "suggestionsPairEmailMore_few": "",
+    "suggestionsPairEmailMore_many": "",
+    "suggestionsPairEmailMore_other": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
+    "suggestionsPairEmailUsernameMore_few": "",
+    "suggestionsPairEmailUsernameMore_many": "",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
+    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
+    "suggestionsPairUsernameMore_few": "",
+    "suggestionsPairUsernameMore_many": "",
+    "suggestionsPairUsernameMore_other": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej"
   },
   "userDetail": {
     "backToUsers": "Powrót do użytkowników",
@@ -284,6 +299,9 @@
         "title": "Generowanie danych historycznych...",
         "fallbackBody": "Tworzenie migawek z historii biblioteki. Może to potrwać kilka minut.",
         "progress": "{{processed}} z {{total}} bibliotek",
+        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_few": "",
+        "snapshotsSuffix_many": "",
         "snapshotsSuffix_other": " ({{count}} migawek)"
       },
       "multiServer": {
@@ -307,8 +325,11 @@
     "versionsBackfill": {
       "banner": "Dane o wersjach plików są nadal zbierane dla tego serwera. Zsynchronizuj bibliotekę, aby ukończyć ten proces.",
       "action": "Synchronizuj teraz",
-      "syncFailed_other": "Nie udało się uruchomić synchronizacji na serwerach ({{count}}). Sprawdź swoje uprawnienia i status serwera.",
-      "syncStarted": "Synchronizacja biblioteki została rozpoczęta."
+      "syncStarted": "Synchronizacja biblioteki została rozpoczęta.",
+      "syncFailed_one": "",
+      "syncFailed_few": "",
+      "syncFailed_many": "",
+      "syncFailed_other": "Nie udało się uruchomić synchronizacji na serwerach ({{count}}). Sprawdź swoje uprawnienia i status serwera."
     }
   },
   "activity": {
@@ -328,11 +349,8 @@
   "violations": {
     "title": "Naruszenia",
     "tryAdjustingFilters": "Spróbuj dostosować swoje filtry",
-    "selectAllViolations_other": "Wybierz wszystkie {{count}} naruszenia pasujące do filtrów",
     "dismissViolation": "Odrzuć Naruszenie",
     "dismissViolationConfirm": "Czy na pewno chcesz odrzucić to naruszenie? To spowoduje trwałe usunięcie go z dziennika naruszeń.",
-    "dismissViolation_one": "Odrzuć {{count}} Naruszenie",
-    "dismissViolation_other": "Odrzuć {{count}} Naruszenia",
     "dismissViolationsConfirm": "Czy na pewno chcesz odrzucić? Spowoduje to trwałe usunięcie ich z dziennika naruszeń i przywrócenie powiązanych wyników zaufania.",
     "noViolationsFound": "Nie znaleziono naruszeń",
     "noViolationsRecorded": "Nie odnotowano jeszcze żadnych naruszeń.",
@@ -341,7 +359,6 @@
     "allRules": "Wszystkie reguły",
     "filterPeople": "Osoby",
     "allPeople": "Wszystkie osoby",
-    "peopleSelectedCount_other": "{{count}} osób",
     "personFilterPlaceholder": "Filtruj wg osób",
     "personFilterEmpty": "Nie znaleziono pasujących użytkowników",
     "personFilterError": "Nie udało się załadować osób",
@@ -369,8 +386,22 @@
       "matched": "{{matched}}/{{total}} dopasowane",
       "actual": "Rzeczywisty",
       "relatedSessions_one": "Sesja związana z {{count}}",
+      "relatedSessions_few": "",
+      "relatedSessions_many": "",
       "relatedSessions_other": "{{count}} sesji powiązanych"
-    }
+    },
+    "selectAllViolations_one": "",
+    "selectAllViolations_few": "",
+    "selectAllViolations_many": "",
+    "selectAllViolations_other": "Wybierz wszystkie {{count}} naruszenia pasujące do filtrów",
+    "dismissViolations_one": "Odrzuć {{count}} Naruszenie",
+    "dismissViolations_few": "",
+    "dismissViolations_many": "",
+    "dismissViolations_other": "Odrzuć {{count}} Naruszenia",
+    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_few": "",
+    "peopleSelectedCount_many": "",
+    "peopleSelectedCount_other": "{{count}} osób"
   },
   "automations": {
     "actions": {
@@ -474,10 +505,12 @@
       "openInEditor": "Otwórz w konstruktorze z tym uruchomieniem",
       "tabsLabel": "Filtruj wg wyniku",
       "emptyRan": "Nic nie zostało jeszcze dopasowane",
-      "emptyRanDescription_one": "Sprawdzono {{count}} warunek bez dopasowania.",
-      "emptyRanDescription_other": "Sprawdzono {{count}} warunków bez dopasowania.",
       "item": "Element",
-      "recordedViolation": "Zarejestrowano naruszenie"
+      "recordedViolation": "Zarejestrowano naruszenie",
+      "emptyRanDescription_one": "Sprawdzono {{count}} warunek bez dopasowania.",
+      "emptyRanDescription_few": "",
+      "emptyRanDescription_many": "",
+      "emptyRanDescription_other": "Sprawdzono {{count}} warunków bez dopasowania."
     },
     "allKinds": "Wszystkie rodzaje",
     "allStatuses": "Wszystkie statusy",
@@ -550,7 +583,6 @@
       "searchPlaceholder": "Szukaj…",
       "noMatches": "Brak wyników",
       "clearSelection": "Wyczyść zaznaczenie",
-      "selectedCount_other": "Zaznaczono: {{count}}",
       "scope": {
         "label": "Kogo dotyczy",
         "global": "Wszyscy",
@@ -670,12 +702,16 @@
         "placeholderAction": "zrób coś"
       },
       "footer": {
+        "ready": "Gotowe do zapisania",
+        "search": "by szukać",
         "problems_one": "{{count}} do naprawienia",
+        "problems_few": "",
+        "problems_many": "",
         "problems_other": "{{count}} do naprawienia",
         "remaining_one": "{{count}} pozostał do ukończenia",
-        "remaining_other": "{{count}} pozostało do ukończenia",
-        "ready": "Gotowe do zapisania",
-        "search": "by szukać"
+        "remaining_few": "",
+        "remaining_many": "",
+        "remaining_other": "{{count}} pozostało do ukończenia"
       },
       "leave": {
         "title": "Opuścić bez zapisywania?",
@@ -696,7 +732,11 @@
         "sampleTitle": "Co zostałoby zrobione dla tego wykonania",
         "sampleGone": "Sesja ta nie jest już zarejestrowana; nie ma z czym porównać.",
         "backToLive": "Powrót do tego, co jest teraz odtwarzane"
-      }
+      },
+      "selectedCount_one": "",
+      "selectedCount_few": "",
+      "selectedCount_many": "",
+      "selectedCount_other": "Zaznaczono: {{count}}"
     },
     "categories": {
       "session_behavior": "Zachowanie sesji",
@@ -710,12 +750,8 @@
     "createAutomation": "Utwórz automatyzację",
     "customAutomation": "Własna automatyzacja",
     "deleteAutomationConfirm": "Czy na pewno chcesz usunąć tę automatyzację? Tej czynności nie można cofnąć.",
-    "deleteAutomation_one": "Usuń automatyzację",
-    "deleteAutomation_other": "Usuń {{count}} automatyzacji",
     "deleteAutomationsConfirm": "Czy na pewno chcesz usunąć? Tej akcji nie można cofnąć.",
     "describe": {
-      "more_one": "+{{count}} więcej",
-      "more_other": "+{{count}} więcej",
       "noValues": "(brak)",
       "includesSameDevice": "zawiera to samo urządzenie",
       "uniqueIps": "unikalne adresy IP",
@@ -734,8 +770,12 @@
       "appliesTo": "Dotyczy {{name}}",
       "duration": {
         "minutes_one": "{{count}} minuta",
+        "minutes_few": "",
+        "minutes_many": "",
         "minutes_other": "{{count}} minut",
         "days_one": "{{count}} dzień",
+        "days_few": "",
+        "days_many": "",
         "days_other": "{{count}} dni"
       },
       "triggers": {
@@ -869,16 +909,22 @@
         "text": "wybrana wiadomość",
         "boolean": "wybrane ustawienie",
         "listed": "wybranych"
-      }
+      },
+      "more_one": "+{{count}} więcej",
+      "more_few": "",
+      "more_many": "",
+      "more_other": "+{{count}} więcej"
     },
     "description": "Automatyzacje śledzą Twoje serwery i uruchamiają się, gdy ich warunki zostają spełnione.",
     "detail": {
       "notFound": "Nie znaleziono automatyzacji",
       "title": "Automatyzacja",
       "unsaved": "Niezapisane zmiany",
+      "noRuns": "Brak uruchomień",
       "runsLine_one": "1 uruchomienie · ostatnio {{when}}",
-      "runsLine_other": "{{count}} uruchomień · ostatni raz {{when}}",
-      "noRuns": "Brak uruchomień"
+      "runsLine_few": "",
+      "runsLine_many": "",
+      "runsLine_other": "{{count}} uruchomień · ostatni raz {{when}}"
     },
     "disable": "Wyłącz",
     "editAutomation": "Edytuj automatyzację",
@@ -1569,7 +1615,11 @@
       "trigger": "Co ją wywołuje",
       "allTriggers": "Wszystkie wyzwalacze"
     },
-    "openGallery": "Otwórz galerię"
+    "openGallery": "Otwórz galerię",
+    "deleteAutomation_one": "Usuń automatyzację",
+    "deleteAutomation_few": "",
+    "deleteAutomation_many": "",
+    "deleteAutomation_other": "Usuń {{count}} automatyzacji"
   },
   "terminateStream": {
     "title": "Zakończ transmisję",
@@ -1602,10 +1652,8 @@
         "unknown": "Połączenie nieudane"
       },
       "connectionsReachable": "{{reachable}} z {{total}} połączeń osiągalnych",
-      "connectionsAvailable_other": "{{count}} dostępne połączenia",
       "hideFiltered": "Ukryj przefiltrowane",
       "showAll": "Pokaż wszystkie",
-      "moreConnections_other": "+{{count}} więcej połączeń",
       "connectingTo": "Łączenie z {{name}}...",
       "ownerOnly": "Tylko właściciel może zarządzać powiązanymi kontami Plex.",
       "noAccountsLinked": "Brak powiązanych kont Plex",
@@ -1614,17 +1662,26 @@
       "linkAnotherAccount": "Połącz kolejne konto Plex",
       "linking": "Łączenie...",
       "loginEnabled": "Logowanie włączone",
-      "serversConnected_one": "{{count}} Serwer połączony",
-      "serversConnected_other": "{{count}} Serwery połączony",
       "unlinkAccount": "Odłącz to konto Plex",
       "reauthorizeAccount": "Ponownie autoryzuj to konto Plex",
       "deleteServersFirst": "Usuń połączone serwery, aby odłączyć to konto",
       "unlinkPlexAccount": "Rozłącz konto Plex",
-      "unlinkConfirm": "Czy na pewno chcesz odłączyć to konto Plex? Nie będziesz mógł dodawać serwerów z tego konta, dopóki nie połączysz ich ponownie."
+      "unlinkConfirm": "Czy na pewno chcesz odłączyć to konto Plex? Nie będziesz mógł dodawać serwerów z tego konta, dopóki nie połączysz ich ponownie.",
+      "connectionsAvailable_one": "",
+      "connectionsAvailable_few": "",
+      "connectionsAvailable_many": "",
+      "connectionsAvailable_other": "{{count}} dostępne połączenia",
+      "moreConnections_one": "",
+      "moreConnections_few": "",
+      "moreConnections_many": "",
+      "moreConnections_other": "+{{count}} więcej połączeń",
+      "serversConnected_one": "{{count}} Serwer połączony",
+      "serversConnected_few": "",
+      "serversConnected_many": "",
+      "serversConnected_other": "{{count}} Serwery połączony"
     },
     "destinations": {
       "add": "Dodaj miejsce docelowe",
-      "alertsGoTo_other": "Powiadomienia są kierowane do {{count}} adresów",
       "builtinNote": "Wbudowane",
       "clearSecret": "Wyczyść",
       "deleteConfirm": "Usunąć {{name}}? Automatyzacje i newslettery, które go używają, przestaną działać, dopóki nie zostaną zaktualizowane.",
@@ -1722,11 +1779,21 @@
         "push": "Push mobilny",
         "webToast": "Powiadomienia w przeglądarce"
       },
-      "usedBy_other": "Używane przez {{count}} automatyzacji",
-      "usedByNewsletters_other": "Używane przez {{count}} newsletterów",
       "violationsOff": "Naruszenia wyłączone",
       "violationsOn": "Naruszenia włączone",
-      "webToastNote": "Powiadomienia w tej przeglądarce."
+      "webToastNote": "Powiadomienia w tej przeglądarce.",
+      "alertsGoTo_one": "Powiadomienia są kierowane na {{count}} adres",
+      "alertsGoTo_few": "",
+      "alertsGoTo_many": "",
+      "alertsGoTo_other": "Powiadomienia są kierowane do {{count}} adresów",
+      "usedBy_one": "Używane przez {{count}} automatyzację",
+      "usedBy_few": "",
+      "usedBy_many": "",
+      "usedBy_other": "Używane przez {{count}} automatyzacji",
+      "usedByNewsletters_one": "Używane przez {{count}} newsletter",
+      "usedByNewsletters_few": "",
+      "usedByNewsletters_many": "",
+      "usedByNewsletters_other": "Używane przez {{count}} newsletterów"
     },
     "jobs": {
       "runNow": "Uruchom teraz",
@@ -1785,7 +1852,6 @@
     "title": "Kompatybilność urządzenia",
     "description": "Zobacz, które urządzenia bezpośrednio odtwarzają, a które transkodują każdy z kodeków.",
     "analyzedSessions": "Analizowane sesje",
-    "analyzedSessionsTooltip_other": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesjami i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę.",
     "directPlayRate": "Bezpośrednia szybkość odtwarzania",
     "videoAndAudio": "Obraz i dźwięk",
     "uniqueDevices": "Unikalne urządzenia",
@@ -1807,7 +1873,11 @@
     "directPlayLow": "<50%",
     "topTranscodingUsers": "Najlepsi użytkownicy transkodowania",
     "topTranscodingUsersDesc": "Użytkownicy powodujący najwięcej transkodowań na serwerze.",
-    "noTranscodingUsers": "Nie znaleziono użytkowników transkodowania"
+    "noTranscodingUsers": "Nie znaleziono użytkowników transkodowania",
+    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_few": "",
+    "analyzedSessionsTooltip_many": "",
+    "analyzedSessionsTooltip_other": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesjami i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę."
   },
   "statsBandwidth": {
     "title": "Przepustowość",
@@ -1916,17 +1986,23 @@
         }
       },
       "card": {
-        "newEpisodes_one": "{{count}} nowy odcinek",
-        "newEpisodes_other": "{{count}} nowych odcinków",
-        "replacedEpisodes_one": "{{count}} odcinek zastąpiony",
-        "replacedEpisodes_other": "{{count}} odcinków zastąpionych",
         "addedAgo": "dodano {{date}}",
         "addedCompactAgo": "dodano {{age}} temu",
+        "newEpisodes_one": "{{count}} nowy odcinek",
+        "newEpisodes_few": "",
+        "newEpisodes_many": "",
+        "newEpisodes_other": "{{count}} nowych odcinków",
+        "replacedEpisodes_one": "{{count}} odcinek zastąpiony",
+        "replacedEpisodes_few": "",
+        "replacedEpisodes_many": "",
+        "replacedEpisodes_other": "{{count}} odcinków zastąpionych",
+        "newEpisodesChip_one": "",
+        "newEpisodesChip_few": "",
+        "newEpisodesChip_many": "",
         "newEpisodesChip_other": "{{count}} nowych"
       },
       "deadWeight": {
         "title": "Zbędna zawartość",
-        "summary_other": "{{count}} nieobejrzanych tytułów · {{size}}",
         "empty": "Brak treści do odzyskania — wszystko w Twojej bibliotece zostało obejrzane",
         "columns": {
           "poster": "Plakat",
@@ -1935,7 +2011,11 @@
           "servers": "Serwery"
         },
         "viewAll": "Zobacz wszystkie",
-        "viewAllTooltip": "Wkrótce"
+        "viewAllTooltip": "Wkrótce",
+        "summary_one": "",
+        "summary_few": "",
+        "summary_many": "",
+        "summary_other": "{{count}} nieobejrzanych tytułów · {{size}}"
       },
       "loadError": "Nie można załadować biblioteki multimediów"
     },
@@ -1951,9 +2031,11 @@
       "chart": {
         "title": "Odtworzenia według gatunku",
         "valueLabel": "Odtworzenia",
+        "ariaLabel": "Wykres słupkowy odtworzeń według gatunku, posortowany od najwyższego do najniższego. Pełne zestawienie dostępne jest w tabeli poniżej.",
         "itemCount_one": "{{count}} tytuł",
-        "itemCount_other": "{{count}} tytułów",
-        "ariaLabel": "Wykres słupkowy odtworzeń według gatunku, posortowany od najwyższego do najniższego. Pełne zestawienie dostępne jest w tabeli poniżej."
+        "itemCount_few": "",
+        "itemCount_many": "",
+        "itemCount_other": "{{count}} tytułów"
       },
       "table": {
         "title": "Zestawienie według gatunku",
@@ -1985,8 +2067,12 @@
         "loadError": "Nie można załadować tego tytułu",
         "meta": {
           "seasons_one": "{{count}} sezon",
+          "seasons_few": "",
+          "seasons_many": "",
           "seasons_other": "{{count}} sezonów",
           "episodes_one": "{{count}} odcinek",
+          "episodes_few": "",
+          "episodes_many": "",
           "episodes_other": "{{count}} odcinków"
         },
         "availability": {
@@ -2041,15 +2127,17 @@
         "title": "Sezony",
         "loadError": "Nie udało się załadować danych o sezonach",
         "empty": "Brak danych o sezonach",
-        "episodeCount_one": "{{count}} odcinek",
-        "episodeCount_other": "{{count}} odcinków",
         "watchedPct": "{{percent}}% obejrzano",
         "stripSummary": "{{season}}: {{percent}}% obejrzano",
         "episodeLabel": {
           "watched": "{{code}}: obejrzano",
           "partial": "{{code}}: częściowo obejrzano",
           "unwatched": "{{code}}: nieobejrzany"
-        }
+        },
+        "episodeCount_one": "{{count}} odcinek",
+        "episodeCount_few": "",
+        "episodeCount_many": "",
+        "episodeCount_other": "{{count}} odcinków"
       },
       "platforms": {
         "title": "Platformy",
@@ -2087,8 +2175,6 @@
       "rankSuffix": ", pozycja {{rank}}",
       "onServers": "Na {{servers}}",
       "addedLabel": "Dodano {{date}}",
-      "viewers_one": "{{count}} widz",
-      "viewers_other": "{{count}} widzów",
       "watchedState": {
         "watched": "Obejrzane",
         "partial": "Częściowo obejrzane",
@@ -2102,12 +2188,20 @@
         "resolution": "rozdzielczość"
       },
       "rankChip": "#{{rank}}",
-      "playsCompact_one": "{{compact}} odtworzenie",
-      "playsCompact_other": "{{compact}} odtworzeń",
       "versionsChip": "{{count}}×",
+      "moreServers": "+{{count}} więcej",
+      "viewers_one": "{{count}} widz",
+      "viewers_few": "",
+      "viewers_many": "",
+      "viewers_other": "{{count}} widzów",
+      "playsCompact_one": "{{compact}} odtworzenie",
+      "playsCompact_few": "",
+      "playsCompact_many": "",
+      "playsCompact_other": "{{compact}} odtworzeń",
       "versions_one": "{{count}} wersja",
-      "versions_other": "{{count}} wersji",
-      "moreServers": "+{{count}} więcej"
+      "versions_few": "",
+      "versions_many": "",
+      "versions_other": "{{count}} wersji"
     },
     "grid": {
       "toolbar": {
@@ -2158,6 +2252,8 @@
         },
         "count": "{{loaded}} z {{total}} tytułów · {{size}}",
         "countTotal_one": "{{count}} tytuł · {{size}}",
+        "countTotal_few": "",
+        "countTotal_many": "",
         "countTotal_other": "{{count}} tytułów · {{size}}"
       },
       "scrubber": {
@@ -2241,11 +2337,14 @@
       "linkSeerr": "Połącz Seerr",
       "kpi": {
         "requested": "Złożonych próśb",
-        "landedOf_other": "{{count}} trafiło do biblioteki",
         "watched": "Obejrzanych",
         "neverPlayed": "Nigdy nieodtworzone",
         "ofLanded": "{{share}} z tych w bibliotece",
-        "onDisk": "{{size}} na dysku"
+        "onDisk": "{{size}} na dysku",
+        "landedOf_one": "",
+        "landedOf_few": "",
+        "landedOf_many": "",
+        "landedOf_other": "{{count}} trafiło do biblioteki"
       }
     },
     "funnel": {
