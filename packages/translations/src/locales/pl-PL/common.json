@@ -104,7 +104,7 @@
     "running": "W trakcie",
     "waiting": "Oczekiwanie",
     "queued": "W kolejce",
-    "startedAgo": "Rozpoczęto {{time}} temu"
+    "startedAgo": "Rozpoczęto {{time}}"
   },
   "time": {
     "now": "Teraz",
