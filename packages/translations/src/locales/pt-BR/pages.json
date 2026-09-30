@@ -260,7 +260,7 @@
       "quietest": "",
       "bingeHighlights": "Destaques do Binge",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "sessões mais curtas",
+      "bingeSessions": "Sessões de maratona",
       "noData": "Ainda não há dados do relógio",
       "noDataDesc": "O analytics aparecerá aqui uma vez que o conteúdo foi reproduzido. Verifique novamente após alguma atividade de visualização.",
       "failedToLoad": "Falha ao carregar a análise do relógio",
@@ -567,7 +567,7 @@
       "selectedCount": "",
       "scope": {
         "label": "",
-        "global": "Global",
+        "global": "Todos",
         "server": "",
         "account": "",
         "person": "",
@@ -1851,7 +1851,7 @@
   },
   "statsUsers": {
     "noActivity": "Nenhuma atividade ainda",
-    "noActivityDesc": "Comece o streaming para ver seus melhores usuários aqui",
+    "noActivityDesc": "Comece o streaming para ver seus melhores usuários aqui.",
     "top3": "",
     "runnersUp": "Runners Acima"
   },
