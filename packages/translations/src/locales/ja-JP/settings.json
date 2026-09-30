@@ -132,7 +132,8 @@
       "never": "",
       "diskLimited": "",
       "loadError": "",
-      "notPersisting": ""
+      "notPersisting": "",
+      "needHint_other": ""
     }
   },
   "servers": {
@@ -253,7 +254,6 @@
     "enableMobileAccess": "モバイルアクセスを有効にする",
     "enabling": "有効化中...",
     "devicesConnected": "{{current}} / {{max}} デバイスが接続されました",
-    "pendingTokens_other": "{{count}} ペアトークン保留中",
     "addDevice": "デバイスを追加",
     "disableMobileAccess": "モバイルアクセスを無効にする",
     "revokeAllSessions": "すべて取り消し",
@@ -276,7 +276,8 @@
     "removeDeviceConfirm": "{{deviceName}}を削除してもよろしいですか？このデバイスは再接続するために再度ペアリングする必要があります。",
     "externalUrlBanner": "リバースプロキシを使用したり、リモートでアクセスしたりしますか？",
     "externalUrlBannerLink": "外部 URL",
-    "externalUrlBannerSuffix": "モバイルアプリがサーバーに接続できるようになります"
+    "externalUrlBannerSuffix": "モバイルアプリがサーバーに接続できるようになります",
+    "pendingTokens_other": "{{count}} ペアトークン保留中"
   },
   "tailscale": {
     "title": "",
@@ -404,7 +405,9 @@
     "importFullRange": "",
     "importFullRangeHelp": "",
     "skipOverlap": "",
-    "skipDuplicatePlugin": ""
+    "skipDuplicatePlugin": "",
+    "overlapSkipped_other": "",
+    "duplicates_other": ""
   },
   "plex": {
     "signInWithPlex": "プレックスでサインイン",
@@ -441,8 +444,6 @@
     "earlier": "",
     "installedBadge": "",
     "latestBadge": "",
-    "changeCount_one": "",
-    "changeCount_other": "",
     "series": "",
     "docs": "",
     "source": "",
@@ -453,7 +454,8 @@
       "fix": "",
       "security": "",
       "note": ""
-    }
+    },
+    "changeCount_other": ""
   },
   "serverHealth": {
     "unreachable": "{{serverName}} に到達できません",
@@ -573,13 +575,9 @@
       "skipped_empty": ""
     },
     "counts": {
-      "movies_one": "",
       "movies_other": "",
-      "shows_one": "",
       "shows_other": "",
-      "albums_one": "",
       "albums_other": "",
-      "watched_one": "",
       "watched_other": ""
     },
     "copyOf": "",
@@ -637,7 +635,9 @@
       "windowSentence": {
         "fallback": "",
         "fixed": "",
-        "fixedAfter": ""
+        "fixedAfter": "",
+        "fallbackLabel_other": "",
+        "fixedLabel_other": ""
       },
       "windowMax": "",
       "days": "",
@@ -671,14 +671,19 @@
           "albums": "",
           "mostPlayed": ""
         },
+        "labels": {
+          "movies_other": "",
+          "shows_other": "",
+          "seasons_other": "",
+          "music_other": "",
+          "mostWatched_other": ""
+        },
         "musicHelp": "",
         "mostWatchedHelp": ""
       },
       "message": "",
       "senderName": "",
       "senderNameHelp": "",
-      "previewVariant_one": "",
-      "previewVariant_other": "",
       "variantHeading": "",
       "subject": "",
       "subjectHelp": "",
@@ -757,7 +762,11 @@
           "noServer": ""
         },
         "emptyTitle": "",
-        "emptyDescription": ""
+        "emptyDescription": "",
+        "notIncludable_other": "",
+        "joinedSinceLastSend_other": "",
+        "selectedCount_other": "",
+        "notIncludableHelp_other": ""
       },
       "delivery": {
         "title": "",
@@ -806,13 +815,12 @@
         "fromDomain": "",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
-        "recipients_one": "",
-        "recipients_other": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": ""
+        "dnsLink": "",
+        "recipients_other": ""
       },
       "actions": {
         "preview": "",
@@ -858,11 +866,15 @@
         "title": "",
         "previewing": "",
         "nobody": "",
-        "trimmed_one": "",
-        "trimmed_other": "",
         "confirm": "",
-        "sending": ""
-      }
+        "sending": "",
+        "summary_other": "",
+        "trimmed_other": ""
+      },
+      "serversSelected_other": "",
+      "librariesSelected_other": "",
+      "senderNameRequiredMulti_other": "",
+      "previewVariant_other": ""
     },
     "history": {
       "empty": "",
@@ -893,7 +905,9 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": ""
+      "retryFailed": "",
+      "recipients_other": "",
+      "attempts_other": ""
     }
   },
   "email": {
@@ -961,11 +975,8 @@
     "syncedAgo": "",
     "neverSynced": "",
     "counts": {
-      "requests_one": "",
       "requests_other": "",
-      "unmatchedMedia_one": "",
       "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
       "unmatchedUsers_other": ""
     },
     "needsKey": "",
