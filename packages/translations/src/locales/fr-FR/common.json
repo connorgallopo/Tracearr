@@ -86,7 +86,7 @@
     "directStream": "Flux direct",
     "transcode": "Transcodage",
     "hwTranscode": "",
-    "burnIn": "",
+    "burnIn": "Incrustation",
     "watched": ""
   },
   "severity": {
