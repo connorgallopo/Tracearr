@@ -264,6 +264,7 @@
     "all": "Alle Server",
     "some": "{{count}} von {{total}} Servern",
     "search": "",
-    "noMatches": ""
+    "noMatches": "",
+    "historical": ""
   }
 }
