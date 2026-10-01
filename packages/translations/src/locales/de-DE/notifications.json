@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server synchronisiert"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Einstellungen aktualisiert",
         "message": "Einstellungen wurden gespeichert"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Server hinzufügen fehlgeschlagen",
       "serverRemoveFailed": "Server entfernen fehlgeschlagen",
       "serverSyncFailed": "Server-Synchronisation fehlgeschlagen",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Einstellungen aktualisieren fehlgeschlagen",
       "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
       "acknowledgeFailed": "Verstoß bestätigen fehlgeschlagen",
