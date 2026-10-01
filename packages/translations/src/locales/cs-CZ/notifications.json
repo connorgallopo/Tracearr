@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server synchronizován"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Nastavení aktualizováno",
         "message": "Vaše nastavení bylo uloženo"
@@ -171,6 +179,7 @@
       "serverAddFailed": "Nepodařilo se přidat server",
       "serverRemoveFailed": "Nepodařilo se odstranit server",
       "serverSyncFailed": "Synchronizace serveru se nezdařila",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Aktualizace nastavení se nezdařila",
       "copyFailed": "Nelze zkopírovat do schránky",
       "acknowledgeFailed": "Nepodařilo se potvrdit porušení",
