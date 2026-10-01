@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "مزامنة الخادم"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "تم تحديث الإعدادات",
         "message": "تم حفظ الإعدادات الخاصة بك"
@@ -183,6 +191,7 @@
       "serverAddFailed": "فشل في إضافة الخادم",
       "serverRemoveFailed": "فشل في إزالة الخادم",
       "serverSyncFailed": "فشل في مزامنة الخادم",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "فشل تحديث الإعدادات",
       "copyFailed": "تعذر النسخ إلى الحافظة",
       "acknowledgeFailed": "فشل في الإقرار بالانتهاك",
