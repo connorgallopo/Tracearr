@@ -119,7 +119,7 @@
     "terminatedBy": "Przez @{{username}}",
     "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
     "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100.",
-    "moreLocations_one": "",
+    "moreLocations_one": "+{{count}} inna lokalizacja",
     "moreLocations_few": "",
     "moreLocations_many": "",
     "moreLocations_other": "+{{count}} więcej lokalizacji",
