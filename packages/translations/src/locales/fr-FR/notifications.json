@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Serveur synchronisé"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Réglages mis à jour",
         "message": "Vos réglages ont été sauvegardés"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Échec de l'ajout du serveur",
       "serverRemoveFailed": "Échec de la suppression du serveur",
       "serverSyncFailed": "Échec de la synchronisation du serveur",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Échec de la mise à jour des réglages",
       "copyFailed": "Impossible de copier dans le presse-papiers",
       "acknowledgeFailed": "Échec de la reconnaissance de la violation",
