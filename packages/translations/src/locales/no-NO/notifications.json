@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Synkronisert server"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Innstillinger oppdatert",
         "message": "Dine lagret innstillinger har blitt"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Klarte ikke å legge til server",
       "serverRemoveFailed": "Kan ikke fjerne serveren",
       "serverSyncFailed": "Kan ikke synkronisere serveren",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
       "copyFailed": "Kunne ikke kopiere til utklippstavlen",
       "acknowledgeFailed": "Mislyktes i å anerkjenne brudd",
