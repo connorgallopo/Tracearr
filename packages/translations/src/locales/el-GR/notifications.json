@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Συγχρονισμός Διακομιστή"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Οι Ρυθμίσεις Ενημερώθηκαν",
         "message": "Οι ρυθμίσεις σας έχουν αποθηκευτεί"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Αποτυχία προσθήκης διακομιστή",
       "serverRemoveFailed": "Αποτυχία κατάργησης διακομιστή",
       "serverSyncFailed": "Αποτυχία συγχρονισμού διακομιστή",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Αποτυχία ενημέρωσης των ρυθμίσεων",
       "copyFailed": "Αδυναμία αντιγραφής στο πρόχειρο",
       "acknowledgeFailed": "Αποτυχία αναγνώρισης παραβίασης",
