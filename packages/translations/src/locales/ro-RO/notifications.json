@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server sincronizat"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Setări actualizate",
         "message": "Setările au fost salvate"
@@ -165,6 +173,7 @@
       "serverAddFailed": "Adăugarea serverului a eșuat",
       "serverRemoveFailed": "Ștergerea serverului a eșuat",
       "serverSyncFailed": "Sincronizarea serverului a eșuat",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Actualizarea setărilor a eșuat",
       "copyFailed": "Nu s-a putut copia în clipboard",
       "acknowledgeFailed": "Nu s-a putut recunoaște încălcarea",
