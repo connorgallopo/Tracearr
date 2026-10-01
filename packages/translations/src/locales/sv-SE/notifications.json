@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Servern synkroniserad"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Inställningar uppdaterade",
         "message": "Dina inställningar har sparats"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Det gick inte att lägga till server",
       "serverRemoveFailed": "Det gick inte att ta bort servern",
       "serverSyncFailed": "Det gick inte att synkronisera servern",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
       "copyFailed": "Kunde inte kopiera till urklipp",
       "acknowledgeFailed": "Misslyckades att erkänna brott",
