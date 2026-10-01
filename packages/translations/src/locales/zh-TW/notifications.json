@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "已同步伺服器"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "已更新設定",
         "message": "已儲存你的設定"
@@ -153,6 +161,7 @@
       "serverAddFailed": "無法新增伺服器",
       "serverRemoveFailed": "無法移除伺服器",
       "serverSyncFailed": "無法同步伺服器",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "無法更新設定",
       "copyFailed": "無法複製到剪貼簿",
       "acknowledgeFailed": "無法辨識違規行為",
