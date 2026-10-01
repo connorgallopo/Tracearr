@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Serwer zsynchronizowany"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Zaktualizowano ustawienia",
         "message": "Ustawienia zostały zapisane"
@@ -171,6 +179,7 @@
       "serverAddFailed": "Nie udało się dodać serwera",
       "serverRemoveFailed": "Nie udało się usunąć serwera",
       "serverSyncFailed": "Nie udało się zsynchronizować serwera",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Nie udało się zaktualizować ustawień",
       "copyFailed": "Nie można skopiować do schowka",
       "acknowledgeFailed": "Nieudane potwierdzenie naruszenia",
