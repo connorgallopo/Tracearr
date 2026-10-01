@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server gesynchroniseerd"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Instellingen bijgewerkt",
         "message": "Je instellingen zijn opgeslagen"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Server toevoegen mislukt",
       "serverRemoveFailed": "Server verwijderen mislukt",
       "serverSyncFailed": "Server synchroniseren mislukt",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Instellingen bijwerken mislukt",
       "copyFailed": "Kopiëren naar klembord mislukt",
       "acknowledgeFailed": "Overtreding bevestigen mislukt",
