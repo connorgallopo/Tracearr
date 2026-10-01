@@ -245,6 +245,7 @@
     "all": "所有服务器",
     "some": "共 {{total}} 台服务器中的 {{count}} 台",
     "search": "搜索服务器中……",
-    "noMatches": "未找到服务器"
+    "noMatches": "未找到服务器",
+    "historical": ""
   }
 }
