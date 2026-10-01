@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Servidor sincronizado"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Ajustes Actualizados.",
         "message": "Su configuración ha sido guardada."
@@ -159,6 +167,7 @@
       "serverAddFailed": "Error al añadir el servidor",
       "serverRemoveFailed": "Error al eliminar el servidor",
       "serverSyncFailed": "Error al sincronizar el servidor",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Error al actualizar ajustes",
       "copyFailed": "No se ha podido copiar en el portapapeles",
       "acknowledgeFailed": "Fallo al reconocer infracción",
