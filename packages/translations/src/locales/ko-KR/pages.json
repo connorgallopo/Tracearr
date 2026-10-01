@@ -365,6 +365,112 @@
     "peopleSelectedCount_other": "{{count}}명"
   },
   "automations": {
+    "message": {
+      "heading": "",
+      "defaultText": "",
+      "title": "",
+      "body": "",
+      "blankHint": "",
+      "insertVariable": "",
+      "searchVariables": "",
+      "noVariables": "",
+      "preview": "",
+      "previewDefault": "",
+      "previewCount": "",
+      "unitChars": "",
+      "unitBytes": "",
+      "addedByTracearr": "",
+      "plainTab": ""
+    },
+    "priorities": {
+      "automatic": "",
+      "lowest": "",
+      "low": "",
+      "normal": "",
+      "high": "",
+      "urgent": ""
+    },
+    "variableGroups": {
+      "account": "",
+      "stream": "",
+      "server": "",
+      "media": "",
+      "device": "",
+      "trust": "",
+      "newsletter": "",
+      "event": ""
+    },
+    "variables": {
+      "user": {
+        "username": "",
+        "identityName": ""
+      },
+      "session": {
+        "mediaTitle": "",
+        "mediaType": "",
+        "sourceDynamicRange": "",
+        "sourceVideoCodec": "",
+        "seasonNumber": "",
+        "episodeNumber": "",
+        "name": ""
+      },
+      "server": {
+        "name": "",
+        "type": ""
+      },
+      "device": {
+        "name": "",
+        "platform": "",
+        "product": "",
+        "location": ""
+      },
+      "trust": {
+        "previous": "",
+        "new": "",
+        "reason": ""
+      },
+      "media": {
+        "title": "",
+        "name": "",
+        "show": "",
+        "season": "",
+        "episode": "",
+        "episodeCount": "",
+        "type": "",
+        "year": "",
+        "library": "",
+        "server": "",
+        "from": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        },
+        "to": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        }
+      },
+      "newsletter": {
+        "name": "",
+        "outcome": "",
+        "recipientCount": "",
+        "error": ""
+      },
+      "durationMinutes": "",
+      "minutes": "",
+      "days": "",
+      "installedVersion": "",
+      "latestVersion": "",
+      "downloadUrl": "",
+      "releaseUrl": ""
+    },
     "actions": {
       "send": {
         "label": "알림 보내기",
@@ -372,6 +478,9 @@
         "fields": {
           "cooldown_minutes": {
             "description": "알림 간 최소 시간"
+          },
+          "priority": {
+            "description": ""
           }
         },
         "ran": "알림을 보냈습니다"
@@ -525,7 +634,16 @@
         "trustAmountRange": "표시할 메시지를 입력하세요.",
         "trustValueRange": "표시할 메시지를 입력하세요.",
         "messageRequired": "표시할 메시지를 입력하세요.",
-        "tooLong": "최대 {{max}}자"
+        "tooLong": "최대 {{max}}자",
+        "template": {
+          "unclosed": "",
+          "invalidOutput": "",
+          "invalidTag": "",
+          "unexpectedElse": "",
+          "unexpectedEndif": "",
+          "missingEndif": ""
+        },
+        "templateVariable": ""
       },
       "recordAs": {
         "label": "위반 목록에 기록되며 확인 처리할 수 있습니다.",
@@ -1262,6 +1380,9 @@
     "configFields": {
       "cooldown_minutes": {
         "label": "쿨다운"
+      },
+      "priority": {
+        "label": ""
       },
       "target": {
         "label": "대상"
