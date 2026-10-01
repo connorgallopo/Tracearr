@@ -378,6 +378,102 @@
     }
   },
   "automations": {
+    "message": {
+      "heading": "Message",
+      "defaultText": "Default text",
+      "title": "Title",
+      "body": "Body",
+      "blankHint": "Leave blank to use each destination's default text",
+      "insertVariable": "Insert variable",
+      "searchVariables": "Search variables",
+      "noVariables": "No variables match",
+      "preview": "Preview",
+      "previewDefault": "Default text",
+      "previewCount": "{{used}} of {{max}} {{unit}}",
+      "unitChars": "characters",
+      "unitBytes": "bytes",
+      "addedByTracearr": "Tracearr adds the fields and card below this text",
+      "plainTab": "Text"
+    },
+    "priorities": {
+      "automatic": "Automatic",
+      "lowest": "Lowest",
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "variableGroups": {
+      "account": "Account",
+      "stream": "Stream",
+      "server": "Server",
+      "media": "Media",
+      "device": "Device",
+      "trust": "Trust",
+      "newsletter": "Newsletter",
+      "event": "Event"
+    },
+    "variables": {
+      "user": { "username": "Account username", "identityName": "Person's name" },
+      "session": {
+        "mediaTitle": "Title playing",
+        "mediaType": "Media type",
+        "sourceDynamicRange": "Source dynamic range",
+        "sourceVideoCodec": "Source video codec",
+        "seasonNumber": "Season number",
+        "episodeNumber": "Episode number",
+        "name": "Show and episode, or title"
+      },
+      "server": { "name": "Server name", "type": "Server type" },
+      "device": {
+        "name": "Device name",
+        "platform": "Platform",
+        "product": "App",
+        "location": "Location"
+      },
+      "trust": { "previous": "Previous score", "new": "New score", "reason": "Reason" },
+      "media": {
+        "title": "Item title",
+        "name": "Show and episode, or title",
+        "show": "Show",
+        "season": "Season",
+        "episode": "Episode",
+        "episodeCount": "Episodes added",
+        "type": "Media type",
+        "year": "Year",
+        "library": "Library",
+        "server": "Server",
+        "from": {
+          "resolution": "Old resolution",
+          "dynamicRange": "Old dynamic range",
+          "videoCodec": "Old video codec",
+          "audioCodec": "Old audio codec",
+          "audioChannels": "Old audio channels",
+          "fileSize": "Old file size"
+        },
+        "to": {
+          "resolution": "New resolution",
+          "dynamicRange": "New dynamic range",
+          "videoCodec": "New video codec",
+          "audioCodec": "New audio codec",
+          "audioChannels": "New audio channels",
+          "fileSize": "New file size"
+        }
+      },
+      "newsletter": {
+        "name": "Newsletter",
+        "outcome": "Outcome",
+        "recipientCount": "Recipients",
+        "error": "Error"
+      },
+      "durationMinutes": "Minutes watched",
+      "minutes": "Minutes",
+      "days": "Days inactive",
+      "installedVersion": "Installed version",
+      "latestVersion": "Latest version",
+      "downloadUrl": "Download link",
+      "releaseUrl": "Release notes link"
+    },
     "actions": {
       "send": {
         "label": "Send Notification",
@@ -385,6 +481,9 @@
         "fields": {
           "cooldown_minutes": {
             "description": "Minimum time between notifications"
+          },
+          "priority": {
+            "description": "Used by Pushover, Gotify and ntfy"
           }
         },
         "ran": "Sent a notification"
@@ -539,7 +638,16 @@
         "trustAmountRange": "Trust changes by between -100 and 100 points",
         "trustValueRange": "Trust score is between 0 and 100",
         "messageRequired": "Type the message to show",
-        "tooLong": "At most {{max}} characters"
+        "tooLong": "At most {{max}} characters",
+        "template": {
+          "unclosed": "A {{open}} on line {{line}} is never closed",
+          "invalidOutput": "Line {{line}} has something other than a variable inside {{braces}}",
+          "invalidTag": "Line {{line}} has a tag other than if, else or endif",
+          "unexpectedElse": "The else on line {{line}} has no if to belong to",
+          "unexpectedEndif": "The endif on line {{line}} has no if to close",
+          "missingEndif": "The if on line {{line}} needs an endif"
+        },
+        "templateVariable": "{{name}} isn't available for every trigger here"
       },
       "recordAs": {
         "label": "When this runs, record it as",
@@ -1285,6 +1393,9 @@
     "configFields": {
       "cooldown_minutes": {
         "label": "Cooldown"
+      },
+      "priority": {
+        "label": "Priority"
       },
       "target": {
         "label": "Target"
