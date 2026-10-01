@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "服务器同步"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "设置已更新",
         "message": "您的设置已保存"
@@ -153,6 +161,7 @@
       "serverAddFailed": "添加服务器失败",
       "serverRemoveFailed": "删除服务器失败",
       "serverSyncFailed": "同步服务器失败",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "更新设置失败",
       "copyFailed": "无法复制到剪贴板",
       "acknowledgeFailed": "无法识别违反行为",
