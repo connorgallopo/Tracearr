@@ -264,6 +264,7 @@
     "all": "All servers",
     "some": "{{count}} of {{total}} servers",
     "search": "Search servers...",
-    "noMatches": "No servers found"
+    "noMatches": "No servers found",
+    "historical": "Historical"
   }
 }
