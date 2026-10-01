@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server Synced"
       },
+      "serverMarkedHistorical": {
+        "title": "Server marked historical",
+        "message": "Tracearr no longer contacts {{name}}. Its history stays."
+      },
+      "serverResumed": {
+        "title": "Server resumed",
+        "message": "Tracearr is contacting {{name}} again."
+      },
       "settingsUpdated": {
         "title": "Settings Updated",
         "message": "Your settings have been saved"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Failed to add server",
       "serverRemoveFailed": "Failed to remove server",
       "serverSyncFailed": "Failed to sync server",
+      "serverHistoricalFailed": "Failed to change the server's status",
       "settingsUpdateFailed": "Failed to update settings",
       "copyFailed": "Could not copy to clipboard",
       "acknowledgeFailed": "Failed to acknowledge violation",
