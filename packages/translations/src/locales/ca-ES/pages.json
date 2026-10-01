@@ -378,6 +378,112 @@
     "peopleSelectedCount_other": "{{count}} persones"
   },
   "automations": {
+    "message": {
+      "heading": "",
+      "defaultText": "",
+      "title": "",
+      "body": "",
+      "blankHint": "",
+      "insertVariable": "",
+      "searchVariables": "",
+      "noVariables": "",
+      "preview": "",
+      "previewDefault": "",
+      "previewCount": "",
+      "unitChars": "",
+      "unitBytes": "",
+      "addedByTracearr": "",
+      "plainTab": ""
+    },
+    "priorities": {
+      "automatic": "",
+      "lowest": "",
+      "low": "",
+      "normal": "",
+      "high": "",
+      "urgent": ""
+    },
+    "variableGroups": {
+      "account": "",
+      "stream": "",
+      "server": "",
+      "media": "",
+      "device": "",
+      "trust": "",
+      "newsletter": "",
+      "event": ""
+    },
+    "variables": {
+      "user": {
+        "username": "",
+        "identityName": ""
+      },
+      "session": {
+        "mediaTitle": "",
+        "mediaType": "",
+        "sourceDynamicRange": "",
+        "sourceVideoCodec": "",
+        "seasonNumber": "",
+        "episodeNumber": "",
+        "name": ""
+      },
+      "server": {
+        "name": "",
+        "type": ""
+      },
+      "device": {
+        "name": "",
+        "platform": "",
+        "product": "",
+        "location": ""
+      },
+      "trust": {
+        "previous": "",
+        "new": "",
+        "reason": ""
+      },
+      "media": {
+        "title": "",
+        "name": "",
+        "show": "",
+        "season": "",
+        "episode": "",
+        "episodeCount": "",
+        "type": "",
+        "year": "",
+        "library": "",
+        "server": "",
+        "from": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        },
+        "to": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        }
+      },
+      "newsletter": {
+        "name": "",
+        "outcome": "",
+        "recipientCount": "",
+        "error": ""
+      },
+      "durationMinutes": "",
+      "minutes": "",
+      "days": "",
+      "installedVersion": "",
+      "latestVersion": "",
+      "downloadUrl": "",
+      "releaseUrl": ""
+    },
     "actions": {
       "send": {
         "label": "Envia una notificació",
@@ -385,6 +491,9 @@
         "fields": {
           "cooldown_minutes": {
             "description": "Temps mínim entre notificacions"
+          },
+          "priority": {
+            "description": ""
           }
         },
         "ran": "S'ha enviat una notificació"
@@ -539,7 +648,16 @@
         "trustAmountRange": "La confiança canvia entre -100 i 100 punts",
         "trustValueRange": "La puntuació de confiança va de 0 a 100",
         "messageRequired": "Escriviu el missatge que s'ha de mostrar",
-        "tooLong": "Com a màxim {{max}} caràcters"
+        "tooLong": "Com a màxim {{max}} caràcters",
+        "template": {
+          "unclosed": "",
+          "invalidOutput": "",
+          "invalidTag": "",
+          "unexpectedElse": "",
+          "unexpectedEndif": "",
+          "missingEndif": ""
+        },
+        "templateVariable": ""
       },
       "recordAs": {
         "label": "Quan això s'executi, registra-ho com a",
@@ -1283,6 +1401,9 @@
     "configFields": {
       "cooldown_minutes": {
         "label": "Temps d'espera"
+      },
+      "priority": {
+        "label": ""
       },
       "target": {
         "label": "Objectiu"
