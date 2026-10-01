@@ -264,6 +264,7 @@
     "all": "Tots els servidors",
     "some": "{{count}} de {{total}} servidors",
     "search": "Cerca servidors...",
-    "noMatches": "No s'ha trobat cap servidor"
+    "noMatches": "No s'ha trobat cap servidor",
+    "historical": ""
   }
 }
