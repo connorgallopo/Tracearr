@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Palvelin Synkronoitu"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Asetukset Päivitetty",
         "message": "Asetuksesi on tallennettu"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Palvelimen lisääminen epäonnistui",
       "serverRemoveFailed": "Palvelimen poistaminen epäonnistui",
       "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
       "copyFailed": "Ei voitu kopioida leikepöydälle",
       "acknowledgeFailed": "Rikkomuksen hyväksyminen epäonnistui",
