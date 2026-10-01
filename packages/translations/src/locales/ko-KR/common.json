@@ -245,6 +245,7 @@
     "all": "모든 서버",
     "some": "서버 {{count}}개 중 {{total}}개",
     "search": "서버 검색...",
-    "noMatches": "서버를 찾지 못했습니다"
+    "noMatches": "서버를 찾지 못했습니다",
+    "historical": ""
   }
 }
