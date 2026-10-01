@@ -264,6 +264,7 @@
     "all": "Alle servers",
     "some": "{{count}} van {{total}} servers",
     "search": "Zoek servers...",
-    "noMatches": "Geen servers gevonden"
+    "noMatches": "Geen servers gevonden",
+    "historical": ""
   }
 }
