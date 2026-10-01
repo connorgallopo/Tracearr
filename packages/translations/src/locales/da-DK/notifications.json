@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server Synkroniseret"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Indstillinger Opdateret",
         "message": "Dine indstillinger er blevet gemt"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Mislykkedes at tilføje server",
       "serverRemoveFailed": "Mislykkedes at fjerne server",
       "serverSyncFailed": "Synkronisering af server mislykkedes",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke opdatere indstillinger",
       "copyFailed": "Kunne ikke kopiere til udklipsholder",
       "acknowledgeFailed": "Mislykkedes at anerkende overtrædelse",
