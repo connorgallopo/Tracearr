@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "サーバー同期済み"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "設定が更新されました",
         "message": "設定が保存されました"
@@ -153,6 +161,7 @@
       "serverAddFailed": "サーバーの追加に失敗しました",
       "serverRemoveFailed": "サーバーの削除に失敗しました",
       "serverSyncFailed": "サーバーの同期に失敗しました",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "設定の更新に失敗しました",
       "copyFailed": "クリップボードにコピーできませんでした",
       "acknowledgeFailed": "違反を認められませんでした",
