@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "서버 동기화됨"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "설정 저장됨",
         "message": "설정이 저장되었습니다"
@@ -153,6 +161,7 @@
       "serverAddFailed": "서버를 추가하지 못했습니다",
       "serverRemoveFailed": "서버를 제거하지 못했습니다",
       "serverSyncFailed": "서버를 동기화하지 못했습니다",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "설정을 업데이트하지 못했습니다",
       "copyFailed": "클립보드에 복사하지 못했습니다",
       "acknowledgeFailed": "위반을 확인 처리하지 못했습니다",
