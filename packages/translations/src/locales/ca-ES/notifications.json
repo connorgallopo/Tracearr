@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Servidor sincronitzat"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Configuració actualitzada",
         "message": "S'ha desat la configuració"
@@ -159,6 +167,7 @@
       "serverAddFailed": "No s'ha pogut afegir el servidor",
       "serverRemoveFailed": "No s'ha pogut suprimir el servidor",
       "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
       "copyFailed": "No s'ha pogut copiar al porta-retalls",
       "acknowledgeFailed": "No s'ha pogut confirmar l'incompliment",
