@@ -378,6 +378,112 @@
     "peopleSelectedCount_other": "{{count}} personne"
   },
   "automations": {
+    "message": {
+      "heading": "",
+      "defaultText": "",
+      "title": "",
+      "body": "",
+      "blankHint": "",
+      "insertVariable": "",
+      "searchVariables": "",
+      "noVariables": "",
+      "preview": "",
+      "previewDefault": "",
+      "previewCount": "",
+      "unitChars": "",
+      "unitBytes": "",
+      "addedByTracearr": "",
+      "plainTab": ""
+    },
+    "priorities": {
+      "automatic": "",
+      "lowest": "",
+      "low": "",
+      "normal": "",
+      "high": "",
+      "urgent": ""
+    },
+    "variableGroups": {
+      "account": "",
+      "stream": "",
+      "server": "",
+      "media": "",
+      "device": "",
+      "trust": "",
+      "newsletter": "",
+      "event": ""
+    },
+    "variables": {
+      "user": {
+        "username": "",
+        "identityName": ""
+      },
+      "session": {
+        "mediaTitle": "",
+        "mediaType": "",
+        "sourceDynamicRange": "",
+        "sourceVideoCodec": "",
+        "seasonNumber": "",
+        "episodeNumber": "",
+        "name": ""
+      },
+      "server": {
+        "name": "",
+        "type": ""
+      },
+      "device": {
+        "name": "",
+        "platform": "",
+        "product": "",
+        "location": ""
+      },
+      "trust": {
+        "previous": "",
+        "new": "",
+        "reason": ""
+      },
+      "media": {
+        "title": "",
+        "name": "",
+        "show": "",
+        "season": "",
+        "episode": "",
+        "episodeCount": "",
+        "type": "",
+        "year": "",
+        "library": "",
+        "server": "",
+        "from": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        },
+        "to": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        }
+      },
+      "newsletter": {
+        "name": "",
+        "outcome": "",
+        "recipientCount": "",
+        "error": ""
+      },
+      "durationMinutes": "",
+      "minutes": "",
+      "days": "",
+      "installedVersion": "",
+      "latestVersion": "",
+      "downloadUrl": "",
+      "releaseUrl": ""
+    },
     "actions": {
       "send": {
         "label": "Envoyer une notification",
@@ -385,6 +491,9 @@
         "fields": {
           "cooldown_minutes": {
             "description": "Temps minimum entre les notifications"
+          },
+          "priority": {
+            "description": ""
           }
         },
         "ran": "Envoyer une notification"
@@ -539,7 +648,16 @@
         "trustAmountRange": "Faire confiance aux changements de -100 à 100 points",
         "trustValueRange": "Le score de confiance est compris entre 0 et 100",
         "messageRequired": "Tapez le message à afficher",
-        "tooLong": "Au maximum {{max}} caractères"
+        "tooLong": "Au maximum {{max}} caractères",
+        "template": {
+          "unclosed": "",
+          "invalidOutput": "",
+          "invalidTag": "",
+          "unexpectedElse": "",
+          "unexpectedEndif": "",
+          "missingEndif": ""
+        },
+        "templateVariable": ""
       },
       "recordAs": {
         "label": "Lorsque cela s'exécute, enregistrez-le comme",
@@ -1282,6 +1400,9 @@
     },
     "configFields": {
       "cooldown_minutes": {
+        "label": ""
+      },
+      "priority": {
         "label": ""
       },
       "target": {
