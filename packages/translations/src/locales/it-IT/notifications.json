@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Server Sincronizzato"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Impostazioni Aggiornate",
         "message": "Le tue impostazioni sono state salvate"
@@ -159,6 +167,7 @@
       "serverAddFailed": "Impossibile aggiungere il server",
       "serverRemoveFailed": "Impossibile rimuovere il server",
       "serverSyncFailed": "Sincronizzazione del server non riuscita",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
       "copyFailed": "Impossibile copiare negli appunti",
       "acknowledgeFailed": "Impossibile riconoscere la violazione",
