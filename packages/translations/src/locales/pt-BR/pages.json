@@ -378,12 +378,121 @@
     "peopleSelectedCount_other": ""
   },
   "automations": {
+    "message": {
+      "heading": "",
+      "defaultText": "",
+      "title": "",
+      "body": "",
+      "blankHint": "",
+      "insertVariable": "",
+      "searchVariables": "",
+      "noVariables": "",
+      "preview": "",
+      "previewDefault": "",
+      "previewCount": "",
+      "unitChars": "",
+      "unitBytes": "",
+      "addedByTracearr": "",
+      "plainTab": ""
+    },
+    "priorities": {
+      "automatic": "",
+      "lowest": "",
+      "low": "",
+      "normal": "",
+      "high": "",
+      "urgent": ""
+    },
+    "variableGroups": {
+      "account": "",
+      "stream": "",
+      "server": "",
+      "media": "",
+      "device": "",
+      "trust": "",
+      "newsletter": "",
+      "event": ""
+    },
+    "variables": {
+      "user": {
+        "username": "",
+        "identityName": ""
+      },
+      "session": {
+        "mediaTitle": "",
+        "mediaType": "",
+        "sourceDynamicRange": "",
+        "sourceVideoCodec": "",
+        "seasonNumber": "",
+        "episodeNumber": "",
+        "name": ""
+      },
+      "server": {
+        "name": "",
+        "type": ""
+      },
+      "device": {
+        "name": "",
+        "platform": "",
+        "product": "",
+        "location": ""
+      },
+      "trust": {
+        "previous": "",
+        "new": "",
+        "reason": ""
+      },
+      "media": {
+        "title": "",
+        "name": "",
+        "show": "",
+        "season": "",
+        "episode": "",
+        "episodeCount": "",
+        "type": "",
+        "year": "",
+        "library": "",
+        "server": "",
+        "from": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        },
+        "to": {
+          "resolution": "",
+          "dynamicRange": "",
+          "videoCodec": "",
+          "audioCodec": "",
+          "audioChannels": "",
+          "fileSize": ""
+        }
+      },
+      "newsletter": {
+        "name": "",
+        "outcome": "",
+        "recipientCount": "",
+        "error": ""
+      },
+      "durationMinutes": "",
+      "minutes": "",
+      "days": "",
+      "installedVersion": "",
+      "latestVersion": "",
+      "downloadUrl": "",
+      "releaseUrl": ""
+    },
     "actions": {
       "send": {
         "label": "",
         "description": "",
         "fields": {
           "cooldown_minutes": {
+            "description": ""
+          },
+          "priority": {
             "description": ""
           }
         },
@@ -539,7 +648,16 @@
         "trustAmountRange": "",
         "trustValueRange": "",
         "messageRequired": "",
-        "tooLong": ""
+        "tooLong": "",
+        "template": {
+          "unclosed": "",
+          "invalidOutput": "",
+          "invalidTag": "",
+          "unexpectedElse": "",
+          "unexpectedEndif": "",
+          "missingEndif": ""
+        },
+        "templateVariable": ""
       },
       "recordAs": {
         "label": "",
@@ -1282,6 +1400,9 @@
     },
     "configFields": {
       "cooldown_minutes": {
+        "label": ""
+      },
+      "priority": {
         "label": ""
       },
       "target": {
