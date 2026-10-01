@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": "Сервер синхронізовано"
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "Налаштування оновлено",
         "message": "Ваші налаштування збережено"
@@ -171,6 +179,7 @@
       "serverAddFailed": "Не вдалося додати сервер",
       "serverRemoveFailed": "Не вдалося видалити сервер",
       "serverSyncFailed": "Не вдалося синхронізувати сервер",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Не вдалося оновити налаштування",
       "copyFailed": "Не вдалося скопіювати в буфер обміну",
       "acknowledgeFailed": "Не вдалося підтвердити порушення",
