@@ -12,6 +12,14 @@
       "serverSynced": {
         "title": ""
       },
+      "serverMarkedHistorical": {
+        "title": "",
+        "message": ""
+      },
+      "serverResumed": {
+        "title": "",
+        "message": ""
+      },
       "settingsUpdated": {
         "title": "",
         "message": ""
@@ -165,6 +173,7 @@
       "serverAddFailed": "",
       "serverRemoveFailed": "",
       "serverSyncFailed": "",
+      "serverHistoricalFailed": "",
       "settingsUpdateFailed": "",
       "copyFailed": "",
       "acknowledgeFailed": "",
