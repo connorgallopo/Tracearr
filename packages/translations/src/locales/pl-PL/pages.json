@@ -103,9 +103,9 @@
     "filterHasAccessTo": "Ma dostęp do",
     "filterHasAccessToPlaceholder": "Dowolny serwer",
     "filterHasAccessToHint": "Pokazuje osoby z aktywnym kontem na każdym wybranym serwerze.",
-    "selectAllUsers_one": "",
-    "selectAllUsers_few": "Zaznacz wszystkich {{count}} użytowników",
-    "selectAllUsers_many": "Zaznacz wszystkich {{count}} użytowników",
+    "selectAllUsers_one": "Zaznacz {{count}} użytkownika",
+    "selectAllUsers_few": "Zaznacz wszystkich {{count}} użytkowników",
+    "selectAllUsers_many": "Zaznacz wszystkich {{count}} użytkowników",
     "selectAllUsers_other": "Zaznacz wszystkich {{count}} użytkowników",
     "resetTrustScoreTitle_one": "Zresetuj wynik zaufania dla {{count}} Użytkownika",
     "resetTrustScoreTitle_few": "Zresetuj wynik zaufania dla {{count}} Użytkowników",
@@ -326,9 +326,9 @@
       "banner": "Dane o wersjach plików są nadal zbierane dla tego serwera. Zsynchronizuj bibliotekę, aby ukończyć ten proces.",
       "action": "Synchronizuj teraz",
       "syncStarted": "Synchronizacja biblioteki została rozpoczęta.",
-      "syncFailed_one": "",
-      "syncFailed_few": "",
-      "syncFailed_many": "",
+      "syncFailed_one": "Nie udało się uruchomić synchronizacji na {{count}} serwerze. Sprawdź swoje uprawnienia i status serwera.",
+      "syncFailed_few": "Nie udało się uruchomić synchronizacji na {{count}} serwerach. Sprawdź swoje uprawnienia i status serwerów.",
+      "syncFailed_many": "Nie udało się uruchomić synchronizacji na {{count}} serwerach. Sprawdź swoje uprawnienia i status serwerów.",
       "syncFailed_other": "Nie udało się uruchomić synchronizacji na serwerach ({{count}}). Sprawdź swoje uprawnienia i status serwera."
     }
   },
@@ -386,129 +386,129 @@
       "matched": "{{matched}}/{{total}} dopasowane",
       "actual": "Rzeczywisty",
       "relatedSessions_one": "Sesja związana z {{count}}",
-      "relatedSessions_few": "",
-      "relatedSessions_many": "",
+      "relatedSessions_few": "{{count}} powiązane sesje",
+      "relatedSessions_many": "{{count}} powiązanych sesji",
       "relatedSessions_other": "{{count}} sesji powiązanych"
     },
-    "selectAllViolations_one": "",
-    "selectAllViolations_few": "",
-    "selectAllViolations_many": "",
+    "selectAllViolations_one": "Zaznacz {{count}} naruszenie pasujące do filtrów",
+    "selectAllViolations_few": "Zaznacz {{count}} naruszenia pasujące do filtrów",
+    "selectAllViolations_many": "Zaznacz {{count}} naruszeń pasujących do filtrów",
     "selectAllViolations_other": "Wybierz wszystkie {{count}} naruszenia pasujące do filtrów",
     "dismissViolations_one": "Odrzuć {{count}} Naruszenie",
-    "dismissViolations_few": "",
-    "dismissViolations_many": "",
+    "dismissViolations_few": "Odrzuć {{count}} Naruszenia",
+    "dismissViolations_many": "Odrzuć {{count}} Naruszeń",
     "dismissViolations_other": "Odrzuć {{count}} Naruszenia",
-    "peopleSelectedCount_one": "",
-    "peopleSelectedCount_few": "",
-    "peopleSelectedCount_many": "",
+    "peopleSelectedCount_one": "{{count}} osoba",
+    "peopleSelectedCount_few": "{{count}} osoby",
+    "peopleSelectedCount_many": "{{count}} osób",
     "peopleSelectedCount_other": "{{count}} osób"
   },
   "automations": {
     "message": {
-      "heading": "",
-      "defaultText": "",
-      "title": "",
-      "body": "",
-      "blankHint": "",
-      "insertVariable": "",
-      "searchVariables": "",
-      "noVariables": "",
-      "preview": "",
-      "previewDefault": "",
-      "previewCount": "",
-      "unitChars": "",
-      "unitBytes": "",
-      "addedByTracearr": "",
-      "plainTab": ""
+      "heading": "Wiadomość",
+      "defaultText": "Tekst domyślny",
+      "title": "Tytuł",
+      "body": "Treść",
+      "blankHint": "Pozostaw puste, aby użyć domyślnego tekstu każdego miejsca docelowego",
+      "insertVariable": "Wstaw zmienną",
+      "searchVariables": "Szukaj zmiennych",
+      "noVariables": "Brak pasujących zmiennych",
+      "preview": "Podgląd",
+      "previewDefault": "Tekst domyślny",
+      "previewCount": "{{used}} z {{max}} {{unit}}",
+      "unitChars": "znaków",
+      "unitBytes": "bajtów",
+      "addedByTracearr": "Tracearr dodaje pola i karty poniżej tego tekstu",
+      "plainTab": "Tekst"
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "Automatyczny",
+      "lowest": "Najniższy",
+      "low": "Niski",
+      "normal": "Normalny",
+      "high": "Wysoki",
+      "urgent": "Pilny"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
-      "trust": "",
-      "newsletter": "",
-      "event": ""
+      "account": "Konto",
+      "stream": "Strumień",
+      "server": "Serwer",
+      "media": "Multimedia",
+      "device": "Urządzenie",
+      "trust": "Zaufanie",
+      "newsletter": "Newsletter",
+      "event": "Zdarzenie"
     },
     "variables": {
       "user": {
-        "username": "",
-        "identityName": ""
+        "username": "Nazwa użytkownika",
+        "identityName": "Imię i nazwisko"
       },
       "session": {
-        "mediaTitle": "",
-        "mediaType": "",
-        "sourceDynamicRange": "",
-        "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
-        "name": ""
+        "mediaTitle": "Odtwarzany tytuł",
+        "mediaType": "Rodzaj mediów",
+        "sourceDynamicRange": "Zakres dynamiczny źródła",
+        "sourceVideoCodec": "Źródłowy kodek wideo",
+        "seasonNumber": "Numer sezonu",
+        "episodeNumber": "Numer odcinka",
+        "name": "Serial z nazwą odcinka lub tytuł"
       },
       "server": {
-        "name": "",
-        "type": ""
+        "name": "Nazwa servera",
+        "type": "Typ serwera"
       },
       "device": {
-        "name": "",
-        "platform": "",
-        "product": "",
-        "location": ""
+        "name": "Nazwa urządzenia",
+        "platform": "Platforma",
+        "product": "Aplikacja",
+        "location": "Lokalizacja"
       },
       "trust": {
-        "previous": "",
-        "new": "",
-        "reason": ""
+        "previous": "Poprzedni poziom",
+        "new": "Nowy poziom",
+        "reason": "Powód"
       },
       "media": {
-        "title": "",
-        "name": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "episodeCount": "",
-        "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "title": "Tytuł pozycji",
+        "name": "Serial z nazwą odcinka lub tytuł",
+        "show": "Serial",
+        "season": "Sezon",
+        "episode": "Odcinek",
+        "episodeCount": "Dodane odcinki",
+        "type": "Rodzaj mediów",
+        "year": "Rok",
+        "library": "Biblioteka",
+        "server": "Serwer",
         "from": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Poprzednia rozdzielczość",
+          "dynamicRange": "Poprzedni zasięg dynamiczny",
+          "videoCodec": "Poprzedni kodek wideo",
+          "audioCodec": "Poprzedni kodek audio",
+          "audioChannels": "Poprzednie kanały dźwiękowe",
+          "fileSize": "Poprzedni rozmiar pliku"
         },
         "to": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Nowa rozdzielczość",
+          "dynamicRange": "Nowy zakres dynamiczny",
+          "videoCodec": "Nowy kodek wideo",
+          "audioCodec": "Nowy kodek audio",
+          "audioChannels": "Nowe kanały dźwiękowe",
+          "fileSize": "Nowy rozmiar pliku"
         }
       },
       "newsletter": {
-        "name": "",
-        "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "name": "Newsletter",
+        "outcome": "Wynik",
+        "recipientCount": "Odbiorcy",
+        "error": "Błąd"
       },
-      "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
-      "releaseUrl": ""
+      "durationMinutes": "Minuty obejrzane",
+      "minutes": "Minut",
+      "days": "Dni nieaktywności",
+      "installedVersion": "Zainstalowana wersja",
+      "latestVersion": "Najnowsza wersja",
+      "downloadUrl": "Link do pobrania",
+      "releaseUrl": "Link do notatek wydania"
     },
     "actions": {
       "send": {
@@ -519,7 +519,7 @@
             "description": "Minimalny czas pomiędzy powiadomieniami"
           },
           "priority": {
-            "description": ""
+            "description": "Używane przez Pushover, Gotify i ntfy"
           }
         },
         "ran": "Wysłano powiadomienie"
@@ -617,8 +617,8 @@
       "item": "Element",
       "recordedViolation": "Zarejestrowano naruszenie",
       "emptyRanDescription_one": "Sprawdzono {{count}} warunek bez dopasowania.",
-      "emptyRanDescription_few": "",
-      "emptyRanDescription_many": "",
+      "emptyRanDescription_few": "Sprawdzono {{count}} warunki bez dopasowania.",
+      "emptyRanDescription_many": "Sprawdzono {{count}} warunków bez dopasowania.",
       "emptyRanDescription_other": "Sprawdzono {{count}} warunków bez dopasowania."
     },
     "allKinds": "Wszystkie rodzaje",
@@ -678,14 +678,14 @@
         "messageRequired": "Wpisz wiadomość do wyświetlenia",
         "tooLong": "Nie więcej niż {{max}} znaków",
         "template": {
-          "unclosed": "",
-          "invalidOutput": "",
-          "invalidTag": "",
-          "unexpectedElse": "",
-          "unexpectedEndif": "",
-          "missingEndif": ""
+          "unclosed": "Instrukcja {{open}} w wierszu {{line}} nigdy nie jest zamknięta",
+          "invalidOutput": "Wiersz {{line}} ma coś innego niż zmienna wewnątrz {{braces}}",
+          "invalidTag": "Wiersz {{line}} ma inny tag niż if, else lub endif",
+          "unexpectedElse": "Instrukcja else w wierszu {{line}} nie posiada odpowiadającej instrukcji if",
+          "unexpectedEndif": "Instrukcja endif w linii {{line}} nie posiada instrukcji if do zamknięcia",
+          "missingEndif": "Instrukcja if w linii {{line}} nie posiada zamykającej instrukcji endif"
         },
-        "templateVariable": ""
+        "templateVariable": "{{name}} nie jest dostępne dla każdego wyzwalacza"
       },
       "recordAs": {
         "label": "Kiedy zostanie wykonana, zapisz ją jako",
@@ -823,12 +823,12 @@
         "ready": "Gotowe do zapisania",
         "search": "by szukać",
         "problems_one": "{{count}} do naprawienia",
-        "problems_few": "",
-        "problems_many": "",
+        "problems_few": "{{count}} problemy",
+        "problems_many": "{{count}} problemów",
         "problems_other": "{{count}} do naprawienia",
         "remaining_one": "{{count}} pozostał do ukończenia",
-        "remaining_few": "",
-        "remaining_many": "",
+        "remaining_few": "{{count}} pozostały do ukończenia",
+        "remaining_many": "{{count}} pozostało do ukończenia",
         "remaining_other": "{{count}} pozostało do ukończenia"
       },
       "leave": {
@@ -851,9 +851,9 @@
         "sampleGone": "Sesja ta nie jest już zarejestrowana; nie ma z czym porównać.",
         "backToLive": "Powrót do tego, co jest teraz odtwarzane"
       },
-      "selectedCount_one": "",
-      "selectedCount_few": "",
-      "selectedCount_many": "",
+      "selectedCount_one": "{{count}} zaznaczony",
+      "selectedCount_few": "{{count}} zaznaczone",
+      "selectedCount_many": "{{count}} zaznaczonych",
       "selectedCount_other": "Zaznaczono: {{count}}"
     },
     "categories": {
@@ -888,12 +888,12 @@
       "appliesTo": "Dotyczy {{name}}",
       "duration": {
         "minutes_one": "{{count}} minuta",
-        "minutes_few": "",
-        "minutes_many": "",
+        "minutes_few": "{{count}} minuty",
+        "minutes_many": "{{count}} minut",
         "minutes_other": "{{count}} minut",
         "days_one": "{{count}} dzień",
-        "days_few": "",
-        "days_many": "",
+        "days_few": "{{count}} dni",
+        "days_many": "{{count}} dni",
         "days_other": "{{count}} dni"
       },
       "triggers": {
@@ -1029,8 +1029,8 @@
         "listed": "wybranych"
       },
       "more_one": "+{{count}} więcej",
-      "more_few": "",
-      "more_many": "",
+      "more_few": "+{{count}} więcej",
+      "more_many": "+{{count}} więcej",
       "more_other": "+{{count}} więcej"
     },
     "description": "Automatyzacje śledzą Twoje serwery i uruchamiają się, gdy ich warunki zostają spełnione.",
@@ -1040,8 +1040,8 @@
       "unsaved": "Niezapisane zmiany",
       "noRuns": "Brak uruchomień",
       "runsLine_one": "1 uruchomienie · ostatnio {{when}}",
-      "runsLine_few": "",
-      "runsLine_many": "",
+      "runsLine_few": "{{count}} uruchomienia · ostatnio {{when}}",
+      "runsLine_many": "{{count}} uruchomień · ostatnio {{when}}",
       "runsLine_other": "{{count}} uruchomień · ostatni raz {{when}}"
     },
     "disable": "Wyłącz",
@@ -1445,7 +1445,7 @@
         "label": "Okres karencji"
       },
       "priority": {
-        "label": ""
+        "label": "Priorytet"
       },
       "target": {
         "label": "Cel"
@@ -1738,8 +1738,8 @@
     },
     "openGallery": "Otwórz galerię",
     "deleteAutomation_one": "Usuń automatyzację",
-    "deleteAutomation_few": "",
-    "deleteAutomation_many": "",
+    "deleteAutomation_few": "Usuń {{count}} automatyzacje",
+    "deleteAutomation_many": "Usuń {{count}} automatyzacji",
     "deleteAutomation_other": "Usuń {{count}} automatyzacji"
   },
   "terminateStream": {
@@ -1788,17 +1788,17 @@
       "deleteServersFirst": "Usuń połączone serwery, aby odłączyć to konto",
       "unlinkPlexAccount": "Rozłącz konto Plex",
       "unlinkConfirm": "Czy na pewno chcesz odłączyć to konto Plex? Nie będziesz mógł dodawać serwerów z tego konta, dopóki nie połączysz ich ponownie.",
-      "connectionsAvailable_one": "",
-      "connectionsAvailable_few": "",
-      "connectionsAvailable_many": "",
+      "connectionsAvailable_one": "{{count}} dostępne połączenie",
+      "connectionsAvailable_few": "{{count}} dostępne połączenia",
+      "connectionsAvailable_many": "{{count}} dostępnych połączeń",
       "connectionsAvailable_other": "{{count}} dostępne połączenia",
-      "moreConnections_one": "",
-      "moreConnections_few": "",
-      "moreConnections_many": "",
+      "moreConnections_one": "+{{count}} połączenie więcej",
+      "moreConnections_few": "+{{count}} połączenia więcej",
+      "moreConnections_many": "+{{count}} połączeń więcej",
       "moreConnections_other": "+{{count}} więcej połączeń",
       "serversConnected_one": "{{count}} Serwer połączony",
-      "serversConnected_few": "",
-      "serversConnected_many": "",
+      "serversConnected_few": "{{count}} serwery połączone",
+      "serversConnected_many": "{{count}} serwerów połączonych",
       "serversConnected_other": "{{count}} Serwery połączony"
     },
     "destinations": {
@@ -1904,16 +1904,16 @@
       "violationsOn": "Naruszenia włączone",
       "webToastNote": "Powiadomienia w tej przeglądarce.",
       "alertsGoTo_one": "Powiadomienia są kierowane na {{count}} adres",
-      "alertsGoTo_few": "",
-      "alertsGoTo_many": "",
+      "alertsGoTo_few": "Powiadomienia są kierowane na {{count}} adresy",
+      "alertsGoTo_many": "Powiadomienia są kierowane na {{count}} adresów",
       "alertsGoTo_other": "Powiadomienia są kierowane do {{count}} adresów",
       "usedBy_one": "Używane przez {{count}} automatyzację",
-      "usedBy_few": "",
-      "usedBy_many": "",
+      "usedBy_few": "Używane przez {{count}} automatyzacje",
+      "usedBy_many": "Używane przez {{count}} automatyzacji",
       "usedBy_other": "Używane przez {{count}} automatyzacji",
       "usedByNewsletters_one": "Używane przez {{count}} newsletter",
-      "usedByNewsletters_few": "",
-      "usedByNewsletters_many": "",
+      "usedByNewsletters_few": "Używane przez {{count}} newslettery",
+      "usedByNewsletters_many": "Używane przez {{count}} newsletterów",
       "usedByNewsletters_other": "Używane przez {{count}} newsletterów"
     },
     "jobs": {
@@ -1995,9 +1995,9 @@
     "topTranscodingUsers": "Najlepsi użytkownicy transkodowania",
     "topTranscodingUsersDesc": "Użytkownicy powodujący najwięcej transkodowań na serwerze.",
     "noTranscodingUsers": "Nie znaleziono użytkowników transkodowania",
-    "analyzedSessionsTooltip_one": "",
-    "analyzedSessionsTooltip_few": "",
-    "analyzedSessionsTooltip_many": "",
+    "analyzedSessionsTooltip_one": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesją i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę.",
+    "analyzedSessionsTooltip_few": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesjami i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę.",
+    "analyzedSessionsTooltip_many": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesjami i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę.",
     "analyzedSessionsTooltip_other": "Sesje w kombinacjach urządzenie + kodek z co najmniej {{count}} sesjami i znanym kodekiem. Rzadkie kombinacje i sesje bez informacji o kodeku nie są brane pod uwagę."
   },
   "statsBandwidth": {
@@ -2110,16 +2110,16 @@
         "addedAgo": "dodano {{date}}",
         "addedCompactAgo": "dodano {{age}} temu",
         "newEpisodes_one": "{{count}} nowy odcinek",
-        "newEpisodes_few": "",
-        "newEpisodes_many": "",
+        "newEpisodes_few": "{{count}} nowe odcinki",
+        "newEpisodes_many": "{{count}} nowych odcinków",
         "newEpisodes_other": "{{count}} nowych odcinków",
         "replacedEpisodes_one": "{{count}} odcinek zastąpiony",
-        "replacedEpisodes_few": "",
-        "replacedEpisodes_many": "",
+        "replacedEpisodes_few": "{{count}} odcineki zastąpione",
+        "replacedEpisodes_many": "{{count}} odcinków zastąpionych",
         "replacedEpisodes_other": "{{count}} odcinków zastąpionych",
-        "newEpisodesChip_one": "",
-        "newEpisodesChip_few": "",
-        "newEpisodesChip_many": "",
+        "newEpisodesChip_one": "{{count}} nowy",
+        "newEpisodesChip_few": "{{count}} nowe",
+        "newEpisodesChip_many": "{{count}} nowych",
         "newEpisodesChip_other": "{{count}} nowych"
       },
       "deadWeight": {
@@ -2133,9 +2133,9 @@
         },
         "viewAll": "Zobacz wszystkie",
         "viewAllTooltip": "Wkrótce",
-        "summary_one": "",
-        "summary_few": "",
-        "summary_many": "",
+        "summary_one": "{{count}} nieobejrzany tytuł · {{size}}",
+        "summary_few": "{{count}} nieobejrzane tytuły · {{size}}",
+        "summary_many": "{{count}} nieobejrzanych tytułów · {{size}}",
         "summary_other": "{{count}} nieobejrzanych tytułów · {{size}}"
       },
       "loadError": "Nie można załadować biblioteki multimediów"
@@ -2154,8 +2154,8 @@
         "valueLabel": "Odtworzenia",
         "ariaLabel": "Wykres słupkowy odtworzeń według gatunku, posortowany od najwyższego do najniższego. Pełne zestawienie dostępne jest w tabeli poniżej.",
         "itemCount_one": "{{count}} tytuł",
-        "itemCount_few": "",
-        "itemCount_many": "",
+        "itemCount_few": "{{count}} tytuły",
+        "itemCount_many": "{{count}} tytułów",
         "itemCount_other": "{{count}} tytułów"
       },
       "table": {
@@ -2188,12 +2188,12 @@
         "loadError": "Nie można załadować tego tytułu",
         "meta": {
           "seasons_one": "{{count}} sezon",
-          "seasons_few": "",
-          "seasons_many": "",
+          "seasons_few": "{{count}} sezony",
+          "seasons_many": "{{count}} sezonów",
           "seasons_other": "{{count}} sezonów",
           "episodes_one": "{{count}} odcinek",
-          "episodes_few": "",
-          "episodes_many": "",
+          "episodes_few": "{{count}} odcinki",
+          "episodes_many": "{{count}} odcinków",
           "episodes_other": "{{count}} odcinków"
         },
         "availability": {
@@ -2256,8 +2256,8 @@
           "unwatched": "{{code}}: nieobejrzany"
         },
         "episodeCount_one": "{{count}} odcinek",
-        "episodeCount_few": "",
-        "episodeCount_many": "",
+        "episodeCount_few": "{{count}} odcinki",
+        "episodeCount_many": "{{count}} odcinków",
         "episodeCount_other": "{{count}} odcinków"
       },
       "platforms": {
@@ -2312,16 +2312,16 @@
       "versionsChip": "{{count}}×",
       "moreServers": "+{{count}} więcej",
       "viewers_one": "{{count}} widz",
-      "viewers_few": "",
-      "viewers_many": "",
+      "viewers_few": "{{count}} widzowie",
+      "viewers_many": "{{count}} widzów",
       "viewers_other": "{{count}} widzów",
       "playsCompact_one": "{{compact}} odtworzenie",
-      "playsCompact_few": "",
-      "playsCompact_many": "",
+      "playsCompact_few": "{{compact}} odtworzenia",
+      "playsCompact_many": "{{compact}} odtworzeń",
       "playsCompact_other": "{{compact}} odtworzeń",
       "versions_one": "{{count}} wersja",
-      "versions_few": "",
-      "versions_many": "",
+      "versions_few": "{{count}} wersje",
+      "versions_many": "{{count}} wersji",
       "versions_other": "{{count}} wersji"
     },
     "grid": {
@@ -2373,8 +2373,8 @@
         },
         "count": "{{loaded}} z {{total}} tytułów · {{size}}",
         "countTotal_one": "{{count}} tytuł · {{size}}",
-        "countTotal_few": "",
-        "countTotal_many": "",
+        "countTotal_few": "{{count}} tytuły · {{size}}",
+        "countTotal_many": "{{count}} tytułów · {{size}}",
         "countTotal_other": "{{count}} tytułów · {{size}}"
       },
       "scrubber": {
@@ -2462,9 +2462,9 @@
         "neverPlayed": "Nigdy nieodtworzone",
         "ofLanded": "{{share}} z tych w bibliotece",
         "onDisk": "{{size}} na dysku",
-        "landedOf_one": "",
-        "landedOf_few": "",
-        "landedOf_many": "",
+        "landedOf_one": "{{count}} trafił do biblioteki",
+        "landedOf_few": "{{count}} trafiły do biblioteki",
+        "landedOf_many": "{{count}} trafiło do biblioteki",
         "landedOf_other": "{{count}} trafiło do biblioteki"
       }
     },
