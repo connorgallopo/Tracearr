@@ -60,6 +60,7 @@
   "playback": {
     "playing": "",
     "paused": "已暫停",
+    "buffering": "",
     "stopped": "",
     "directPlay": "",
     "directStream": "",
