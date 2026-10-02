@@ -64,6 +64,7 @@
     "stopped": "Oprit",
     "directPlay": "Redare directă",
     "directStream": "Stream direct",
+    "audioTranscode": "",
     "transcode": "Transcodare",
     "hwTranscode": "",
     "burnIn": "",
