@@ -25,19 +25,19 @@
         "message": "設定が保存されました"
       },
       "violationAcknowledged": {
-        "title": "違反が認められました",
-        "message": "違反が認められたとしてマークされています"
+        "title": "違反を承認しました",
+        "message": "違反を承認済みにしました"
       },
       "violationDismissed": {
-        "title": "違反が解除されました",
-        "message": "違反が解除されました"
+        "title": "違反を却下しました",
+        "message": "違反を却下しました"
       },
       "deviceRemoved": {
         "title": "デバイスが削除されました",
         "message": "デバイスが切断されました"
       },
       "deviceRenamed": {
-        "title": "端末名を変更しました",
+        "title": "デバイス名を変更しました",
         "message": "デバイス名が更新されました"
       },
       "sessionsRevoked": {
@@ -48,12 +48,12 @@
         "message": "ログインに成功しました"
       },
       "plexAccountLinked": {
-        "title": "プレックスアカウントがリンクされています",
-        "message": "プレックスアカウントからサーバーを追加できるようになりました"
+        "title": "Plexアカウントがリンクされています",
+        "message": "Plexアカウントからサーバーを追加できるようになりました"
       },
       "plexAccountUnlinked": {
-        "title": "プレックスアカウントのリンクが解除されました",
-        "message": "プレックスアカウントが切断されました"
+        "title": "Plexアカウントのリンクが解除されました",
+        "message": "Plexアカウントが切断されました"
       },
       "plexAccountReauthorized": {
         "title": "",
@@ -78,7 +78,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "配信が終了しました",
+        "title": "ストリームを終了しました",
         "message": "再生セッションが停止されました"
       },
       "serverUrlUpdated": {
@@ -102,12 +102,12 @@
         "message_other": "{{count}} セッションが削除されました"
       },
       "violationsAcknowledged": {
-        "title": "違反が認められました",
+        "title": "違反を承認しました",
         "message_other": "{{count}} 違反が承認されました"
       },
       "violationsDismissed": {
-        "title": "違反が解雇されました",
-        "message_other": "{{count}} 違反が解除されました"
+        "title": "違反を却下しました",
+        "message_other": "{{count}} 件の違反を却下しました"
       },
       "apiKeyGenerated": {
         "title": "APIキーを生成しました",
@@ -123,11 +123,11 @@
       },
       "pairTokenGenerated": {
         "title": "ペアトークンが生成されました",
-        "message": "モバイル端末でQRコードをスキャンしてペアリングします"
+        "message": "モバイルデバイスでQRコードをスキャンしてペアリングします"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "信頼スコアをリセット",
+        "title": "信頼スコアをリセットしました",
         "message_other": "{{count}} ユーザーが 100 にリセットされました"
       },
       "claimCodeValidated": {
@@ -164,13 +164,13 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "設定の更新に失敗しました",
       "copyFailed": "クリップボードにコピーできませんでした",
-      "acknowledgeFailed": "違反を認められませんでした",
-      "dismissFailed": "違反を解除できませんでした",
+      "acknowledgeFailed": "違反の承認に失敗しました",
+      "dismissFailed": "違反を却下できませんでした",
       "authFailed": "認証に失敗しました",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
       "automationDeleteFailed": "",
-      "streamTerminateFailed": "配信の終了に失敗しました",
+      "streamTerminateFailed": "ストリームの終了に失敗しました",
       "serverUrlUpdateFailed": "サーバー URL の更新に失敗しました",
       "serverUpdateFailed": "サーバーの更新に失敗しました",
       "serverLocationSaveFailed": "",
@@ -181,11 +181,11 @@
       "mobileAccessDisableFailed": "モバイルアクセスを無効にできませんでした",
       "pairTokenGenerateFailed": "ペアトークンの生成に失敗しました",
       "deviceRemoveFailed": "デバイスの削除に失敗しました",
-      "deviceRenameFailed": "端末の名前を変更できませんでした",
+      "deviceRenameFailed": "デバイス名を変更できませんでした",
       "sessionsRevokeFailed": "セッションの取り消しに失敗しました",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "信頼度のリセットに失敗しました",
-      "plexUnlinkFailed": "プレックスアカウントのリンクを解除できませんでした",
+      "trustScoresResetFailed": "信頼スコアのリセットに失敗しました",
+      "plexUnlinkFailed": "Plexアカウントのリンクを解除できませんでした",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "ジョブは既に実行されています",
       "jobStartFailed": "ジョブの開始に失敗しました",
@@ -236,15 +236,15 @@
   "settings": {
     "allSeverity": "すべて（低、警告、高）",
     "warningAndHigh": "警告と高のみ",
-    "highOnly": "深刻度が高いのみ",
+    "highOnly": "重大度「高」のみ",
     "rateLimit": "現在のレート制限ステータス",
     "perMinute": "1分あたり",
     "perHour": "1時間あたり",
     "enablePushNotifications": "プッシュ通知を有効にする",
     "notificationEvents": "通知イベント",
     "violationDetected": "違反が検出されました",
-    "streamStarted": "配信開始",
-    "streamStopped": "配信を停止しました",
+    "streamStarted": "ストリーム開始",
+    "streamStopped": "ストリーム停止",
     "concurrentStreams": "同時ストリーム",
     "newDevice": "新しいデバイス",
     "trustScoreChanged": "",
