@@ -1,7 +1,7 @@
 {
   "login": {
     "title": "Tracearr",
-    "tagline": "Tracearr - Gestió d'accés a les reproduccions",
+    "tagline": "Tracearr - Gestió d'accés a les transmissions",
     "createAccountHeading": "Creeu el vostre compte per a començar",
     "signInHeading": "Inicieu sessió al vostre compte",
     "createAccountDescription": "Creeu un compte per gestionar els vostres servidors multimèdia",
@@ -40,7 +40,7 @@
   "dashboard": {
     "alerts": "Alertes",
     "plays": "Reproduccions",
-    "watchTime": "Temps de reproducció",
+    "watchTime": "Temps de visionament",
     "activeUsers": "Usuaris actius",
     "nowPlaying": "Reproduint",
     "streamLocations": "Ubicacions de les transmissions",
@@ -322,7 +322,7 @@
     "engagementBreakdown": "Desglossament de la interacció",
     "howUsersEngage": "Com interactuen els usuaris amb el contingut",
     "playsVsSessions": "Reproduccions vs. sessions",
-    "playsVsSessionsDesc": "Només visionats complets: compta una reproducció quan el temps total de visualització cobreix tota la durada d'un contingut",
+    "playsVsSessionsDesc": "Només visionats complets: compta una reproducció quan el temps total de visionament cobreix tota la durada d'un contingut",
     "activityByDayOfWeek": "Activitat per dia de la setmana",
     "activityByHourOfDay": "Activitat per hora del dia",
     "platforms": "Plataformes",
@@ -351,7 +351,7 @@
       "userInfo": "Usuari",
       "sessions": "Sessions",
       "noSessions": "No hi ha cap sessió associada amb aquest incompliment",
-      "trigger": "Disparador",
+      "trigger": "Activador",
       "map": "Ubicacions de les sessions",
       "actions": "Accions dutes a terme",
       "timestamps": "Marca de temps",
@@ -371,7 +371,7 @@
       "relatedSessions_other": "{{count}} sessions relacionades"
     },
     "selectAllViolations_one": "",
-    "selectAllViolations_other": "Seleccioneu tots els filtres d'incompliments de {{count}}",
+    "selectAllViolations_other": "Seleccioneu els {{count}} incompliments que coincideixen amb els filtres",
     "dismissViolations_one": "Descarta {{count}} incompliment",
     "dismissViolations_other": "Descarta {{count}} incompliments",
     "peopleSelectedCount_one": "",
@@ -1392,7 +1392,7 @@
     "searchPlaceholder": "Cerca automatitzacions…",
     "sessionTargets": {
       "triggering": {
-        "label": "Sessió desencadenant",
+        "label": "Sessió activadora",
         "tooltip": "Només la sessió que ha activat aquesta automatització"
       },
       "oldest": {
@@ -1755,7 +1755,7 @@
       "loginEnabled": "Inici de sessió habilitat",
       "unlinkAccount": "Desenllaça aquest compte de Plex",
       "reauthorizeAccount": "Torna a autoritzar aquest compte de Plex",
-      "deleteServersFirst": "Primer elimineu els servidors actius connectats a través d'aquest compte o marqueu-los com a històrics",
+      "deleteServersFirst": "Primer elimineu els servidors actius connectats a través d'aquest compte o marqueu-los com a arxivats",
       "unlinkPlexAccount": "Desenllaça el compte de Plex",
       "unlinkConfirm": "Segur que voleu desenllaçar aquest compte de Plex? No podreu afegir servidors d'aquest compte fins que el torneu a enllaçar.",
       "connectionsAvailable_one": "",
@@ -2096,7 +2096,7 @@
     },
     "genres": {
       "title": "Gèneres",
-      "subtitle": "Reproduccions i temps de visualització per gènere, a tots els servidors visibles.",
+      "subtitle": "Reproduccions i temps de visionament per gènere, a tots els servidors visibles.",
       "chart": {
         "title": "Reproduccions per gènere",
         "valueLabel": "Reproduccions",
@@ -2109,7 +2109,7 @@
         "columns": {
           "genre": "Gènere",
           "plays": "Reproduccions",
-          "watchTime": "Temps de visualització"
+          "watchTime": "Temps de visionament"
         },
         "browseMovies": "Explora les pel·lícules de {{genre}}",
         "browseShows": "Explora les sèries de {{genre}}"
@@ -2160,7 +2160,7 @@
           "caption": "cadenes de represa, sessions curtes excloses"
         },
         "watchTime": {
-          "label": "Temps de visualització",
+          "label": "Temps de visionament",
           "detail": "+{{hours}} h els darrers 30 dies"
         },
         "viewers": {
@@ -2207,7 +2207,7 @@
         "unknown": "Desconegut",
         "columns": {
           "plays": "Reproduccions",
-          "watchTime": "Temps de visualització"
+          "watchTime": "Temps de visionament"
         }
       },
       "history": {
@@ -2306,7 +2306,7 @@
           "added": "Afegit recentment",
           "year": "Any",
           "plays": "Reproduccions",
-          "watch_time": "Temps de visualització",
+          "watch_time": "Temps de visionament",
           "viewers": "Espectadors"
         },
         "count": "{{loaded}} de {{total}} títols · {{size}}",
