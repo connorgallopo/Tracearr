@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Lejátszás",
     "paused": "Szünetelteve",
+    "buffering": "",
     "stopped": "Megállítva",
     "directPlay": "Közvetlen lejátszás",
     "directStream": "Közvetlen közvetítés",
