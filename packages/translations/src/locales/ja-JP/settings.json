@@ -352,7 +352,7 @@
   },
   "accessControl": {
     "allowGuestAccess": "ゲストアクセスを許可する",
-    "allowGuestAccessDesc": "無効にすると、サーバの所有者のみが Tracear にログインできます。",
+    "allowGuestAccessDesc": "無効にすると、サーバの所有者のみが Tracearr にログインできます。",
     "singleOwnerNote": "注: ゲストアクセスが無効になっている場合、サーバーの所有者のみがサインインできます。他のすべてのユーザーには「アクセス拒否」メッセージが表示されます。"
   },
   "import": {
@@ -368,7 +368,7 @@
     "targetServer": "",
     "selectPlexServer": "プレックス サーバーを選択",
     "overwriteFriendlyNames": "Tautulli名で既存のフレンドリー名を上書きする",
-    "overwriteFriendlyNamesHelp": "Tracearの既存のID名はTautulliのフレンドリ名に置き換えられます。",
+    "overwriteFriendlyNamesHelp": "Tracearrの既存のID名はTautulliのフレンドリ名に置き換えられます。",
     "includeStreamDetails": "詳細なストリームデータ（コーデック、ビットレート、解像度）",
     "includeStreamDetailsHelp": "追加のストリーム情報をインポートします。インポート時間が大幅に増加する可能性があります。",
     "importing": "インポート中...",
@@ -393,10 +393,10 @@
     "plex": "プレックス (Tautulli)",
     "jellyfinEmby": "",
     "apiKeyPlaceholder": "Tautulli APIキー",
-    "skipUserNotFoundPlex": "ユーザが見つかりません — プレックスのユーザが Tracear に存在しません。すべてのユーザを追加するには、まずサーバを同期してください。",
+    "skipUserNotFoundPlex": "ユーザが見つかりません — Plex のユーザが Tracearr に存在しません。すべてのユーザを追加するには、まずサーバを同期してください。",
     "skipDuplicate": "重複セッション — セッションは以前にインポートされていました。",
     "skipInProgress": "進行中セッション — 参照IDのないアクティブ/不完全なセッションはスキップされます。",
-    "skipUserNotFoundJellyfin": "ユーザが見つかりません — Jellyfin/Emby ユーザが Tracear に存在しません。すべてのユーザを追加するには、まずサーバを同期してください。",
+    "skipUserNotFoundJellyfin": "ユーザが見つかりません — Jellyfin/Emby ユーザが Tracearr に存在しません。すべてのユーザを追加するには、まずサーバを同期してください。",
     "skipSyncHint": "多くのレコードがスキップされている場合は、設定 → サーバーで最近同期したことを確認してください。",
     "importInProgressPercent": "インポート中 ({{percent}}%完了) ...",
     "importInProgressGeneric": "インポート中...",
