@@ -259,7 +259,7 @@
     "downloadOnAppStore": "Last ned fra App Store",
     "externalUrlRequired": "En ekstern URL må være konfigurert i generelle innstillinger for mobiltilkobling til å fungere.",
     "mobileAccessDisabled": "Mobiltilgang deaktivert",
-    "mobileAccessDisabledDesc": "Gi mobiltilgang til å gjøre det mulig for Track-mobilappen å koble til serveren din.",
+    "mobileAccessDisabledDesc": "Aktiver mobiltilgang slik at Tracearr-mobilappen kan koble til serveren din.",
     "enableMobileAccess": "Aktiver mobiltilgang",
     "enabling": "Aktiverer...",
     "devicesConnected": "{{current}} av {{max}} enheter tilkoblet",
