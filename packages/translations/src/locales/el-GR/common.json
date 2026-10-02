@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Αναπαραγωγή",
     "paused": "Παύση",
+    "buffering": "",
     "stopped": "Διακόπηκε",
     "directPlay": "Άμεση Αναπαραγωγή",
     "directStream": "Άμεση Ροή",
