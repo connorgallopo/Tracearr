@@ -42,7 +42,7 @@
     "plays": "Weergaven",
     "watchTime": "Kijktijd",
     "activeUsers": "Actieve gebruikers",
-    "nowPlaying": "Nu afspelen",
+    "nowPlaying": "Speelt nu",
     "streamLocations": "Streamlocaties",
     "serverResources": "Serverbronnen",
     "bandwidth": "Bandbreedte",
@@ -131,11 +131,11 @@
     "byRule": "Door / Regel",
     "manual": "Handmatig",
     "unknownRule": "Onbekende regel",
-    "adjustTrustScore": "Pas Trust Score aan",
+    "adjustTrustScore": "Vertrouwensscore aanpassen",
     "linkedAccounts": "Gekoppelde accounts",
     "splitAccount": "Gesplitst in afzonderlijke gebruiker",
     "splitConfirmTitle": "Gesplitst serveraccount",
-    "splitConfirmDescription": "Koppel dit serveraccount los van de server en maak er een eigen gebruikersaccount van. De kijkgeschiedenis en overtredingen worden dan automatisch overgezet.",
+    "splitConfirmDescription": "Maak van dit serveraccount een aparte gebruiker. De kijkgeschiedenis en overtredingen gaan mee.",
     "splitConfirmLoading": "Splitsen...",
     "acrossAllServers": "Voor alle gekoppelde accounts:",
     "overallTrust": "Algemeen vertrouwen",
@@ -234,11 +234,11 @@
       "copyPath": ""
     },
     "watch": {
-      "title": "Bekijk Analytics",
+      "title": "Kijkanalyse",
       "description": "",
       "watched": "Bekeken",
       "percentWatched": "% bekeken",
-      "totalWatchTime": "Totale wachttijd",
+      "totalWatchTime": "Totale kijktijd",
       "avgPerItem": "gem. per artikel",
       "completed": "Voltooid",
       "peakHour": "Piek uur",
@@ -247,20 +247,20 @@
       "monthlyTrends": "Maandelijkse rends",
       "busiest": "",
       "quietest": "Stiltesten:",
-      "bingeHighlights": "Rand accentueringen",
+      "bingeHighlights": "Hoogtepunten kijkmarathons",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "buik sessies",
-      "noData": "Nog geen controlegegevens",
-      "noDataDesc": "Horlogeanalytics zullen hier verschijnen zodra de inhoud is afgespeeld. Kom terug na sommige activiteiten te bekijken.",
-      "failedToLoad": "Fout bij het laden van horloge analytics",
-      "failedToLoadDesc": "Kan horloge gegevens niet ophalen."
+      "bingeSessions": "Kijkmarathons",
+      "noData": "Nog geen kijkgegevens",
+      "noDataDesc": "Kijkanalyse verschijnt hier zodra er content is afgespeeld. Kom terug na wat kijkactiviteit.",
+      "failedToLoad": "Kijkanalyse laden mislukt",
+      "failedToLoadDesc": "Kan kijkgegevens niet ophalen."
     },
     "emptyState": {
       "checkingStatus": "De bibliotheekstatus controleren...",
       "backfillAvailable": {
         "title": "Historische gegevens beschikbaar",
-        "bodyWithDays": "Je bibliotheek heeft {{days}} dagen aan geschiedenis. Genereer momentopnamen om trends in grafieken te bekijken.",
-        "bodyGeneric": "Genereer historische momentopnamen om bibliotheektrends door de tijd heen te bekijken.",
+        "bodyWithDays": "Je bibliotheek heeft {{days}} dagen aan geschiedenis. Genereer snapshots om trends in grafieken te bekijken.",
+        "bodyGeneric": "Genereer historische snapshots om bibliotheektrends door de tijd heen te bekijken.",
         "syncRunningTitle": "Bibliotheeksynchronisatie bezig...",
         "syncRunningBody": "Het genereren van historische gegevens start automatisch zodra de synchronisatie is voltooid."
       },
@@ -299,7 +299,7 @@
         "syncStartedDesc": "Dit kan een paar minuten duren, afhankelijk van de grootte van de bibliotheek.",
         "syncFailedTitle": "Synchronisatie starten is mislukt",
         "genericRetry": "Probeer opnieuw.",
-        "backfillStartedTitle": "Aanvulling gestart",
+        "backfillStartedTitle": "Backfill gestart",
         "backfillStartedDesc": "Er worden historische snapshots gegenereerd.",
         "backfillFailedTitle": "Het starten van de backfill is mislukt",
         "backfillCompleteTitle": "Backfill compleet",
@@ -322,7 +322,7 @@
     "engagementBreakdown": "Overzicht betrokkenheid",
     "howUsersEngage": "Hoe gebruikers met inhoud omgaan",
     "playsVsSessions": "Weergaven vs. sessies",
-    "playsVsSessionsDesc": "Alleen volledig voltooide afleveringen tellen mee — een aflevering telt als de totale kijktijd de volledige speelduur van de content beslaat",
+    "playsVsSessionsDesc": "Alleen volledig bekeken: een weergave telt pas als de totale kijktijd de volledige speelduur van de content dekt",
     "activityByDayOfWeek": "Activiteit per weekdag",
     "activityByHourOfDay": "Activiteit per uur",
     "platforms": "",
@@ -351,7 +351,7 @@
       "userInfo": "Gebruiker",
       "sessions": "Sessies",
       "noSessions": "Geen sessies geassocieerd met deze overtreding",
-      "trigger": "Activator",
+      "trigger": "Trigger",
       "map": "Sessielocaties",
       "actions": "Ondernomen acties",
       "timestamps": "Tijdstempels",
@@ -513,7 +513,7 @@
       },
       "trust": {
         "label": "Vertrouwensscore",
-        "description": "Pas aan, zet aan, of reset de trust score",
+        "description": "Vertrouwensscore aanpassen, instellen of herstellen",
         "fields": {
           "mode": {
             "label": "Modus"
@@ -526,14 +526,14 @@
             "label": "Waarde"
           }
         },
-        "ran": "De trustscore is gewijzigd"
+        "ran": "De vertrouwensscore is gewijzigd"
       },
       "kill_stream": {
         "label": "Stream afbreken",
-        "description": "Beëindig de actieve stream",
+        "description": "Breek de actieve stream af",
         "fields": {
           "cooldown_minutes": {
-            "description": "Minimale tijd tussen terminaties voor dezelfde gebruiker"
+            "description": "Minimale tijd tussen afgebroken streams voor dezelfde gebruiker"
           },
           "delay_seconds": {
             "label": "Window vasthouden",
@@ -702,7 +702,7 @@
         "noServers": "Nog geen servers verbonden.",
         "historicalNote": "",
         "enforceAcrossServers": "",
-        "enforceAcrossServersDescription": "Activeert op een van zijn servers, niet alleen op de sessies die dit hebben veroorzaakt. Standaard uitgeschakeld."
+        "enforceAcrossServersDescription": "Werkt op de sessies van deze persoon op al diens servers, niet alleen op de server die dit triggerde. Standaard uitgeschakeld."
       },
       "conditions": {
         "addGroup": "",
@@ -1021,9 +1021,9 @@
     "effects": {
       "title": "",
       "kill": "Kan een stream die speelt stoppen.",
-      "trust": "Verandert vertrouwen scores.",
+      "trust": "Wijzigt vertrouwensscores.",
       "message": "Plaats een bericht op de speler.",
-      "violation": "Voegt een schending toe op tegen de betreffende persoon.",
+      "violation": "Registreert een overtreding voor de betreffende persoon.",
       "tellsOnly": "Alleen meldingen. Stopt nooit een stream of wijzigt een account.",
       "allServers": "Werkt op elke server tenzij er een wordt gekozen.",
       "everyServer": "Werkt op elke server.",
@@ -1931,7 +1931,7 @@
     "title": "Compatibiliteit van apparaat",
     "description": "",
     "analyzedSessions": "Geanalyseerde sessies",
-    "directPlayRate": "Directe Speelsnelheid",
+    "directPlayRate": "Percentage direct afspelen",
     "videoAndAudio": "",
     "uniqueDevices": "Unieke apparaten",
     "uniqueCodecs": "Unieke Codecs",
@@ -1944,15 +1944,15 @@
     "pctOfTotal": "% van totaal",
     "noTranscodeHotspots": "Geen transcodeer hotspots",
     "compatibilityMatrix": "Compatibiliteit matrix",
-    "compatibilityMatrixDesc": "Directe afspeelsnelheden per apparaat en video codec. Gesorteerd op sessie volume.",
+    "compatibilityMatrixDesc": "Percentage direct afspelen per apparaat en videocodec. Gesorteerd op aantal sessies.",
     "noDeviceDataPeriod": "Geen apparaatgegevens in deze periode",
     "legend": "Legenda:",
     "directPlayHigh": "Code.org 80% Direct",
     "directPlayMid": "",
     "directPlayLow": "",
-    "topTranscodingUsers": "Top Transcoding Gebruikers",
+    "topTranscodingUsers": "Gebruikers die het meest transcoderen",
     "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "Geen transcoding gebruikers gevonden",
+    "noTranscodingUsers": "Geen gebruikers met transcodering gevonden",
     "analyzedSessionsTooltip_one": "",
     "analyzedSessionsTooltip_other": "Sessies in apparaat- + codeccombinaties met ten minste {{count}} sessies en een bekende codec. Zeldzame combinaties en sessies zonder codec-informatie worden niet meegeteld."
   },
@@ -1963,7 +1963,7 @@
     "avgBitrate": "Gem. bitrate",
     "avgBitrateMbps": "Gem. bitrate (Mbps)",
     "peakBitrate": "Piek: {{value}} Mbps",
-    "totalWatchTime": "Totale wachttijd",
+    "totalWatchTime": "Totale kijktijd",
     "uniqueUsers": "Unieke gebruikers",
     "dailyUsage": "Dagelijks bandbreedte gebruik",
     "dailyUsageDesc": "",
@@ -2012,7 +2012,7 @@
     "obliterateAllJobs": "Vernietigen van alle taken",
     "clearQueryCache": "Query Cache wissen",
     "clearMobileDevices": "Wis mobiele apparaten",
-    "clearViolations": "Duidelijke overtredingen",
+    "clearViolations": "Overtredingen wissen",
     "clearAutomations": "",
     "clearAutomationsConfirm": "",
     "clearTerminationLogs": "Beëindigingslogboeken wissen",
@@ -2024,7 +2024,7 @@
     "manageSnapshots": "Beheer snapshots van de bibliotheek voor Storage Trend en Quality Evolution charts",
     "suspiciousOnly": "Enkel verdachte",
     "load": "Belasting",
-    "noSuspiciousSnapshots": "Geen verdachte momentopnamen gevonden",
+    "noSuspiciousSnapshots": "Geen verdachte snapshots gevonden",
     "clickLoadToView": "Klik op \"Laden\" om snapshots te bekijken",
     "deleteSelected": "Geselecteerde verwijderen",
     "deleteAllSuspicious": "Verwijder alle verdachte",
@@ -2050,7 +2050,7 @@
         "mostPopularShows": "Meest Populaire Series",
         "emptyRecentlyAdded": "Niks toegevoegd in deze periode",
         "emptyRecentlyUpdated": "",
-        "emptyMostPopular": "Geen afspeelmomenten in deze periode",
+        "emptyMostPopular": "Geen weergaven in deze periode",
         "captionRecentlyAdded": "gededupliceerd over servers",
         "captionRecentlyUpdated": "",
         "captionMostPopular": {
@@ -2098,9 +2098,9 @@
       "title": "",
       "subtitle": "Afspeel- en kijktijd per genre, op alle weergegeven servers.",
       "chart": {
-        "title": "Afspeelmomenten per genre",
-        "valueLabel": "Afspeelmomenten",
-        "ariaLabel": "Staafdiagram van toneelstukken per genre, gesorteerd van hoog naar laag. De volledige uitsplitsing is te vinden in de tabel hieronder.",
+        "title": "Weergaven per genre",
+        "valueLabel": "Weergaven",
+        "ariaLabel": "Staafdiagram van weergaven per genre, gesorteerd van hoog naar laag. Het volledige overzicht staat in de tabel hieronder.",
         "itemCount_one": "{{count}} titel",
         "itemCount_other": "{{count}} titels"
       },
@@ -2108,7 +2108,7 @@
         "title": "Genre indeling",
         "columns": {
           "genre": "",
-          "plays": "Afspeelmomenten",
+          "plays": "Weergaven",
           "watchTime": "Kijktijd"
         },
         "browseMovies": "Blader door {{genre}} films",
@@ -2156,7 +2156,7 @@
         "loadError": "Kan kijk statistieken niet laden",
         "completionLoadError": "Voltooiing kon niet worden geladen",
         "plays": {
-          "label": "Plays, alle tijden",
+          "label": "Weergaven, totaal",
           "caption": "hervatting van de sessieketens, korte sessies uitgezonderd"
         },
         "watchTime": {
@@ -2180,7 +2180,7 @@
         "lastWatchedAgo": "{{age}} geleden",
         "completionLabel": "{{percent}}% compleet",
         "columns": {
-          "plays": "Gespeeld",
+          "plays": "Weergaven",
           "episodes": "Afleveringen",
           "completion": "Voltooiing",
           "lastWatched": "Laatst bekeken"
@@ -2206,14 +2206,14 @@
         "empty": "Er zijn nog geen platformgegevens beschikbaar",
         "unknown": "Onbekend",
         "columns": {
-          "plays": "Afgespeeld",
+          "plays": "Weergaven",
           "watchTime": "Kijktijd"
         }
       },
       "history": {
         "title": "Historie",
         "loadError": "Geschiedenis kon niet worden geladen",
-        "empty": "Geen afspeelmomenten opgenomen",
+        "empty": "Nog geen weergaven geregistreerd",
         "watched": "Bekeken",
         "notWatched": "Nog niet afgemaakt",
         "columns": {
@@ -2244,7 +2244,7 @@
       },
       "tileLabel": {
         "added": "toegevoegd",
-        "plays": "afspelingen",
+        "plays": "weergaven",
         "viewers": "kijkers",
         "resolution": ""
       },
@@ -2305,7 +2305,7 @@
           "title": "Titel A-Z",
           "added": "Recent toegevoegd",
           "year": "Jaar",
-          "plays": "Afgespeeld",
+          "plays": "Weergaven",
           "watch_time": "Kijktijd",
           "viewers": "Kijkers"
         },
