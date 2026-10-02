@@ -54,8 +54,8 @@
     "connecting": "Conectandochar@@0",
     "connected": "Conectado",
     "saving": "Salvando...",
-    "dismissing": "Dispensando...",
-    "acknowledging": "Reconhecendo..."
+    "dismissing": "A descartar...",
+    "acknowledging": "A reconhecer..."
   },
   "playback": {
     "playing": "Reproduzindo",
@@ -64,7 +64,7 @@
     "stopped": "Parado",
     "directPlay": "Reprodução direta",
     "directStream": "Transmissão Direta",
-    "transcode": "Transcodificar",
+    "transcode": "Transcodificação",
     "hwTranscode": "Transcodificação por Hardware",
     "burnIn": "",
     "watched": "Visto"
@@ -104,7 +104,7 @@
   },
   "labels": {
     "date": "Encontro",
-    "user": "Usuário",
+    "user": "Utilizador",
     "content": "Conteúdo",
     "platform": "Plataforma",
     "location": "Local:",
@@ -131,7 +131,7 @@
     "lastActivity": "Última atividade",
     "serverOwner": "Proprietário do servidor",
     "resolution": "Resolução:",
-    "watchTime": "Tempo de Observação",
+    "watchTime": "Tempo de visualização",
     "pausedTime": "Tempo pausado",
     "sessionDetails": "Detalhes da sessão",
     "recentSessions": "Sessões Recentes",
@@ -149,13 +149,13 @@
     "total": "total",
     "mediaLength": "Duração do conteúdo",
     "streamDetails": "Detalhes da transmissão",
-    "transcodeReason": "Motivo da conversão",
+    "transcodeReason": "Motivo da transcodificação",
     "loadMore": "Carregar Mais",
     "playback": "Reprodução"
   },
   "search": {
-    "searchUsers": "Procurar usuários...",
-    "searchTitles": "Pesquisar títulos, usuários..."
+    "searchUsers": "Pesquisar utilizadores...",
+    "searchTitles": "Pesquisar títulos, utilizadores..."
   },
   "table": {
     "selectAllOnPage": "Selecionar tudo na página",
@@ -204,24 +204,24 @@
     "connectionFailed": "Conexão falhou"
   },
   "count": {
-    "user_one": "Usuário {{count}}",
-    "user_other": "Usuários {{count}}",
-    "session_one": "Sessão {{count}}",
-    "session_other": "Sessões {{count}}",
+    "user_one": "{{count}} utilizador",
+    "user_other": "{{count}} utilizadores",
+    "session_one": "{{count}} sessão",
+    "session_other": "{{count}} sessões",
     "stream_one": "{{count}} transmissão",
     "stream_other": "{{count}} transmissões",
-    "server_one": "Servidor {{count}}",
-    "server_other": "Servidores {{count}}",
+    "server_one": "{{count}} servidor",
+    "server_other": "{{count}} servidores",
     "automation_one": "{{count}} automação",
     "automation_other": "{{count}} automações",
-    "violation_one": "Violação do {{count}}",
-    "violation_other": "Violações de {{count}}",
-    "usersAdded_one": "Usuário {{count}} adicionado",
-    "usersAdded_other": "Usuários {{count}} adicionados",
-    "usersUpdated_one": "Usuário {{count}} atualizado",
-    "usersUpdated_other": "Usuários {{count}} atualizados",
-    "library_one": "Biblioteca {{count}}",
-    "library_other": "Bibliotecas do {{count}}",
+    "violation_one": "{{count}} violação",
+    "violation_other": "{{count}} violações",
+    "usersAdded_one": "{{count}} utilizador adicionado",
+    "usersAdded_other": "{{count}} utilizadores adicionados",
+    "usersUpdated_one": "{{count}} utilizador atualizado",
+    "usersUpdated_other": "{{count}} utilizadores atualizados",
+    "library_one": "{{count}} biblioteca",
+    "library_other": "{{count}} bibliotecas",
     "error_one": "Erro {{count}}",
     "error_other": "Erros {{count}}",
     "alert_one": "",
@@ -251,10 +251,10 @@
   "empty": {
     "noResults": "Nenhum resultado encontrado",
     "noData": "Não há dados disponíveis",
-    "noDeviceData": "Nenhum dispositivo disponível",
+    "noDeviceData": "Sem dados de dispositivos disponíveis",
     "noJobHistory": "Nenhum histórico de trabalhos ainda",
     "noSessionsFound": "Nenhuma sessão encontrada",
-    "noUserData": "Sem dados de usuário disponíveis"
+    "noUserData": "Sem dados de utilizador disponíveis"
   },
   "confirmations": {
     "unsavedChanges": "Você tem alterações não salvas. Tem certeza que deseja sair?"
