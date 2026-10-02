@@ -25,8 +25,8 @@
         "message": "Setările au fost salvate"
       },
       "violationAcknowledged": {
-        "title": "Încălcarea este cunoscută",
-        "message": "Încălcarea a fost marcată ca fiind recunoscută"
+        "title": "Încălcare confirmată",
+        "message": "Încălcarea a fost marcată ca confirmată"
       },
       "violationDismissed": {
         "title": "Încălcare respinsă",
@@ -80,7 +80,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "Stream oprit",
+        "title": "Stream terminat",
         "message": "Sesiunea de redare a fost oprită"
       },
       "serverUrlUpdated": {
@@ -106,13 +106,13 @@
         "message_other": "{{count}} sesiuni șterse"
       },
       "violationsAcknowledged": {
-        "title": "Încălcări cunoscute",
-        "message_one": "{{count}} încălcare recunoscută",
+        "title": "Încălcări confirmate",
+        "message_one": "{{count}} încălcare confirmată",
         "message_few": "",
-        "message_other": "{{count}} încălcări recunoscute"
+        "message_other": "{{count}} încălcări confirmate"
       },
       "violationsDismissed": {
-        "title": "Incalcari respinse",
+        "title": "Încălcări respinse",
         "message_one": "{{count}} încălcare respinsă",
         "message_few": "",
         "message_other": "{{count}} încălcări respinse"
@@ -130,7 +130,7 @@
         "message": "Toate sesiunile mobile au fost revocate"
       },
       "pairTokenGenerated": {
-        "title": "Token pereche generat",
+        "title": "Token de asociere generat",
         "message": "Scanați codul QR cu dispozitivul dvs. mobil pentru a se asocia"
       },
       "identityUpdated": "",
@@ -176,13 +176,13 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Actualizarea setărilor a eșuat",
       "copyFailed": "Nu s-a putut copia în clipboard",
-      "acknowledgeFailed": "Nu s-a putut recunoaște încălcarea",
+      "acknowledgeFailed": "Nu s-a putut confirma încălcarea",
       "dismissFailed": "Eroare la respingerea încălcării",
       "authFailed": "Autentificare eșuată",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
       "automationDeleteFailed": "",
-      "streamTerminateFailed": "Nu s-a putut termina transmisiunea",
+      "streamTerminateFailed": "Nu s-a putut termina stream-ul",
       "serverUrlUpdateFailed": "Actualizarea adresei serverului a eșuat",
       "serverUpdateFailed": "Actualizarea serverului a eșuat",
       "serverLocationSaveFailed": "",
@@ -191,7 +191,7 @@
       "apiKeyGenerateFailed": "Generarea cheii API a eșuat",
       "mobileAccessEnableFailed": "Activarea accesului mobil a eșuat",
       "mobileAccessDisableFailed": "Dezactivarea accesului mobil a eșuat",
-      "pairTokenGenerateFailed": "Generarea token-ului de pereche a eșuat",
+      "pairTokenGenerateFailed": "Generarea tokenului de asociere a eșuat",
       "deviceRemoveFailed": "Ștergerea dispozitivului a eșuat",
       "deviceRenameFailed": "Eroare la redenumirea dispozitivului",
       "sessionsRevokeFailed": "Eroare la revocarea sesiunilor",
@@ -255,7 +255,7 @@
     "enablePushNotifications": "Activează notificările push",
     "notificationEvents": "Evenimente de notificare",
     "violationDetected": "Încălcare detectată",
-    "streamStarted": "Flux pornit",
+    "streamStarted": "Stream pornit",
     "streamStopped": "Stream oprit",
     "concurrentStreams": "Stream-uri Concurente",
     "newDevice": "Dispozitiv nou",
