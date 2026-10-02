@@ -64,6 +64,7 @@
     "stopped": "Зупинено",
     "directPlay": "Пряме відтворення",
     "directStream": "Прямий потік",
+    "audioTranscode": "",
     "transcode": "Перекодування",
     "hwTranscode": "",
     "burnIn": "",
