@@ -26,7 +26,7 @@ jobs:
       # setup rather than the node action: a container action can't expose its
       # exit code, and the whole point here is telling exit 1 from exit 2.
       - name: Install Snyk CLI
-        uses: snyk/actions/setup@12140f4059e244892ae643824a95459a102120dd # master
+        uses: snyk/actions/setup@b075801f26076be9bb50521154cafab73f44da0c # master
 
       # Snyk is the detection half. Its database carries findings with no live
       # GHSA and no OSV entry, which is exactly what Renovate's
@@ -60,6 +60,6 @@ jobs:
       # No snyk monitor here: the SCM integration already tracks this repo, and
       # a CLI monitor would create a second Target rather than join it.
       - name: Upload SARIF to code scanning
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:
           sarif_file: snyk.sarif
