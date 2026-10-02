@@ -393,11 +393,7 @@
       "previewCut": "",
       "previewPriority": "",
       "previewEscapeHint": "",
-      "webhookNotSent": "",
-      "unitChars": "",
-      "unitBytes": "",
-      "addedByTracearr": "",
-      "plainTab": ""
+      "webhookNotSent": ""
     },
     "priorities": {
       "automatic": "",
@@ -2247,6 +2243,10 @@
         "hdrAll": "모두",
         "hdrOnly": "HDR 전용",
         "hdrChip": "HDR",
+        "atmosLabel": "",
+        "atmosAll": "",
+        "atmosOnly": "",
+        "atmosChip": "",
         "genreLabel": "장르",
         "genreAll": "모든 장르",
         "serverLabel": "서버",
