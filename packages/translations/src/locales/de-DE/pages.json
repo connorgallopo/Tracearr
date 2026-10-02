@@ -1,7 +1,7 @@
 {
   "login": {
     "title": "",
-    "tagline": "Stream-Zugriffsverwaltung",
+    "tagline": "Tracearr - Stream-Zugriffsverwaltung",
     "createAccountHeading": "Erstellen Sie Ihr Konto, um starten",
     "signInHeading": "Melden Sie sich in Ihrem Konto an",
     "createAccountDescription": "Erstellen Sie ein Konto, um Ihre Medienserver zu verwalten",
@@ -1755,7 +1755,7 @@
       "loginEnabled": "Anmeldung aktiviert",
       "unlinkAccount": "Dieses Plex-Konto trennen",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Verbundene Server zuerst löschen, um dieses Konto zu trennen",
+      "deleteServersFirst": "Zuerst die über dieses Konto verbundenen aktiven Server löschen oder als historisch markieren",
       "unlinkPlexAccount": "Plex-Konto trennen",
       "unlinkConfirm": "Möchten Sie dieses Plex-Konto wirklich trennen? Sie können erst dann wieder Server von diesem Konto hinzufügen, wenn Sie es erneut verknüpfen.",
       "connectionsAvailable_one": "",
