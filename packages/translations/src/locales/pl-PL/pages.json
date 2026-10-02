@@ -958,7 +958,7 @@
         "source_video_codec": "źródłowy kodek wideo",
         "is_transcoding": "transkodowanie",
         "is_transcode_downgrade": "obniżenie jakości",
-        "is_subtitle_burn_in": "",
+        "is_subtitle_burn_in": "wypalanie napisów",
         "source_bitrate_mbps": "źródłowy bitrate",
         "user_id": "użytkownik",
         "trust_score": "wynik zaufania",
