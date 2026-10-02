@@ -1755,7 +1755,7 @@
       "loginEnabled": "Aanmelden ingeschakeld",
       "unlinkAccount": "Dit Plex-account ontkoppelen",
       "reauthorizeAccount": "Autoriseer dit Plex account opnieuw",
-      "deleteServersFirst": "Verwijder verbonden servers eerst om dit account te ontkoppelen",
+      "deleteServersFirst": "Verwijder eerst de actieve servers die via dit account zijn verbonden, of markeer ze als historisch",
       "unlinkPlexAccount": "Plex-account ontkoppelen",
       "unlinkConfirm": "Weet je zeker dat je dit Plex-account wilt ontkoppelen? Je kunt geen servers van dit account meer toevoegen totdat je opnieuw koppelt.",
       "connectionsAvailable_one": "",
