@@ -126,12 +126,12 @@
         "message": "Όλες οι συνεδρίες για κινητά έχουν ανακληθεί"
       },
       "pairTokenGenerated": {
-        "title": "Ζεύγος Διακριτικού Δημιουργείται",
+        "title": "Το Διακριτικό Σύζευξης Δημιουργήθηκε",
         "message": "Σαρώστε τον κωδικό QR με την κινητή συσκευή σας για σύζευξη"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Επαναφορά Βαθμών Εμπιστοσύνης",
+        "title": "Οι Βαθμολογίες Εμπιστοσύνης Επαναφέρθηκαν",
         "message_one": "Επαναφορά του {{count}} χρήστη στο 100",
         "message_other": ""
       },
@@ -185,7 +185,7 @@
       "apiKeyGenerateFailed": "Αποτυχία δημιουργίας κλειδιού API",
       "mobileAccessEnableFailed": "Αποτυχία ενεργοποίησης πρόσβασης για κινητά",
       "mobileAccessDisableFailed": "Αποτυχία απενεργοποίησης πρόσβασης για κινητά",
-      "pairTokenGenerateFailed": "Αποτυχία δημιουργίας διακριτικού ζεύγους",
+      "pairTokenGenerateFailed": "Αποτυχία δημιουργίας διακριτικού σύζευξης",
       "deviceRemoveFailed": "Αποτυχία κατάργησης συσκευής",
       "deviceRenameFailed": "Αποτυχία μετονομασίας συσκευής",
       "sessionsRevokeFailed": "Αποτυχία ανάκλησης συνεδριών",
@@ -254,8 +254,8 @@
     "concurrentStreams": "Ταυτόχρονες Ροές",
     "newDevice": "Νέα Συσκευή",
     "trustScoreChanged": "Αλλαγή Βαθμολογίας Εμπιστοσύνης",
-    "serverDown": "Διακομιστής Κάτω",
-    "serverUp": "Εξυπηρετητής Επάνω",
+    "serverDown": "Διακομιστής εκτός λειτουργίας",
+    "serverUp": "Διακομιστής σε λειτουργία",
     "minimumSeverity": "Ελάχιστη Σοβαρότητα",
     "quietHours": "Ώρες Ησυχίας",
     "enableQuietHours": "Ενεργοποίηση Ώρες Ησυχίας",
