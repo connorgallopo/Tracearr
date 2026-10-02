@@ -64,6 +64,7 @@
     "stopped": "Zatrzymano",
     "directPlay": "Bezpośrednie odtwarzanie",
     "directStream": "Bezpośredni strumień",
+    "audioTranscode": "Transkodowanie dźwięku",
     "transcode": "Transkodowanie",
     "hwTranscode": "Transkodowanie sprzętowe",
     "burnIn": "Wypalanie",
@@ -201,7 +202,7 @@
     "somethingWentWrong": "Coś poszło nie tak",
     "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
     "failedToLoad": "Nie udało się załadować {{item}}",
-    "connectionFailed": "Połączenie nieudane"
+    "connectionFailed": "Nie udało się połączyć"
   },
   "count": {
     "user_one": "{{count}} użytkownik",
