@@ -9,8 +9,8 @@
     "enterManually": "Syötä URL ja tunniste manuaalisesti",
     "cameraPermissionRequired": "Kameran käyttöoikeus vaaditaan QR-koodien skannaamiseen",
     "scanQrInstructions": "Avaa asetukset → Mobiilisovellus Tracearr kojelaudalla ja skannaa QR-koodi",
-    "urlPlaceholder": "",
-    "tokenPlaceholder": "",
+    "urlPlaceholder": "https://tracearr.example.com",
+    "tokenPlaceholder": "trr_mob_...",
     "missingToken": "Puuttuva käyttöoikeustunniste",
     "pleaseEnterToken": "Ole hyvä ja syötä käyttöoikeustunniste"
   },
@@ -119,10 +119,10 @@
     "terminatedBy": "Tekijä: @{{username}}",
     "trustScoreConfirm": "Aseta luottopisteytys käyttäjälle @{{username}} arvoon {{score}}?",
     "trustScoreRange": "Luottopisteytys käyttäjälle @{{username}}, 0 - 100.",
-    "moreLocations_one": "",
-    "moreLocations_other": "",
-    "moreDevices_one": "",
-    "moreDevices_other": ""
+    "moreLocations_one": "+{{count}} sijainti lisää",
+    "moreLocations_other": "+{{count}} sijaintia lisää",
+    "moreDevices_one": "+{{count}} laite lisää",
+    "moreDevices_other": "+{{count}} laitetta lisää"
   },
   "violation": {
     "violationNotFoundDesc": "Tämä rikkomus on saatettu hylätä tai sitä ei enää ole saatavilla.",
@@ -138,10 +138,10 @@
     "allServers": "Kaikki palvelimet",
     "noAlertsRecorded": "Ilmoituksia ei ole vielä tallennettu.",
     "noMatches": "Ei vastaavia ilmoituksia",
-    "acknowledgeAllTitle_one": "",
-    "acknowledgeAllTitle_other": "",
-    "pendingCount_one": "",
-    "pendingCount_other": ""
+    "acknowledgeAllTitle_one": "Hyväksy {{count}} hälytys?",
+    "acknowledgeAllTitle_other": "Kuittaa {{count}} hälytystä?",
+    "pendingCount_one": "{{count}} odottaa",
+    "pendingCount_other": "{{count}} odottaa"
   },
   "history": {
     "adjustFilters": "Kokeile muokata suodattimia",
@@ -154,8 +154,8 @@
       "noCountries": "Maita ei saatavilla",
       "noPlatforms": "Alustoja ei saatavilla",
       "noUsers": "Käyttäjiä ei saatavilla",
-      "sectionSelected_one": "",
-      "sectionSelected_other": ""
+      "sectionSelected_one": "{{section}}, {{count}} valittuna",
+      "sectionSelected_other": "{{section}}, {{count}} valittuna"
     }
   },
   "users": {
@@ -181,7 +181,7 @@
   "serverSelector": {
     "servers": "Palvelimet",
     "selectServers": "Valitse palvelimet",
-    "serversSelected": "",
+    "serversSelected": "{{selected}} / {{total}} palvelimista valittuna",
     "allServers": "Kaikki palvelimet"
   },
   "reconnected": "Yhdistetty uudelleen",
@@ -194,10 +194,10 @@
     "increaseTrustScore": "Lisää luottamuspisteitä",
     "sortAscending": "Lajiteltu nousevasti, napauta kääntääksesi",
     "sortDescending": "Lajiteltu laskevasti, napauta kääntääksesi",
-    "alertsCount_one": "",
-    "alertsCount_other": "",
-    "filtersActive_one": "",
-    "filtersActive_other": ""
+    "alertsCount_one": "Ilmoitukset, {{count}} lukematta",
+    "alertsCount_other": "Ilmoitukset, {{count}} lukematta",
+    "filtersActive_one": "Suodattimet, {{count}} aktiivisena",
+    "filtersActive_other": "Suodattimet, {{count}} aktiivisena"
   },
   "map": {
     "noData": "Sijaintitietoja ei saatavilla",
@@ -217,45 +217,45 @@
     "unsupportedDescription": "Tämä palvelin raportoi version {{version}}. Päivitä Tracearr nähdäksesi automaatiot ja mitä ajettiin.",
     "unsupportedTitle": "Automaatiot tarvitsevat palvelimen 2.2 tai uudemman",
     "versionCheckFailed": "Palvelimen versiota ei voitu tarkistaa",
-    "conditions_one": "",
-    "conditions_other": ""
+    "conditions_one": "{{count}} ehto",
+    "conditions_other": "{{count}} ehtoa"
   },
   "charts": {
-    "weekOf": ""
+    "weekOf": "{{date}} viikon aikana"
   },
   "push": {
     "violationTitle": "{{severity}} Rike"
   },
   "streamDetails": {
-    "bitrate": "",
-    "channels": "",
-    "codec": "",
-    "color": "",
-    "container": "",
-    "forced": "",
-    "format": "",
-    "framerate": "",
-    "hwDecode": "",
-    "hwEncode": "",
-    "mono": "",
+    "bitrate": "Bittinopeus",
+    "channels": "Kanavat",
+    "codec": "Koodekki",
+    "color": "Väri",
+    "container": "Kontti",
+    "forced": "Pakotettu",
+    "format": "Formaatti:",
+    "framerate": "Kuvataajuus",
+    "hwDecode": "HW-purku",
+    "hwEncode": "HW-koodaus",
+    "mono": "Mono",
     "noDetails": "Yksityiskohtaisia tietoja streamista ei ole saatavilla",
-    "notAvailable": "",
+    "notAvailable": "Ei saatavilla",
     "profile": "Profiili",
     "sampleRate": "Näytteenottotaajuus",
     "source": "Lähde",
     "speed": "Nopeus",
-    "stereo": "",
-    "stream": "",
+    "stereo": "Stereo",
+    "stream": "Striimi",
     "subtitles": "Tekstitykset",
-    "throttled": "",
-    "transcodeDetails": ""
+    "throttled": "rajoitettu",
+    "transcodeDetails": "Transkoodauksen tiedot"
   },
   "widget": {
-    "asOf": "",
-    "signedOut": "",
-    "serversDown_one": "",
-    "serversDown_other": "",
-    "transcodes_one": "",
-    "transcodes_other": ""
+    "asOf": "{{time}} alkaen",
+    "signedOut": "Avaa Tracearr parittaaksesi palvelimen.",
+    "serversDown_one": "{{count}} palvelin alhaalla",
+    "serversDown_other": "{{count}} palvelinta alhaalla",
+    "transcodes_one": "{{count}} transkoodaus",
+    "transcodes_other": "{{count}} transkoodausta"
   }
 }
