@@ -18,7 +18,7 @@
     "continue": "Pokračovat",
     "back": "Zpět",
     "next": "Další",
-    "acknowledge": "Přijmout",
+    "acknowledge": "Potvrdit",
     "dismiss": "Odmítnout",
     "terminate": "Ukončit",
     "search": "Hledat",
@@ -54,8 +54,8 @@
     "connecting": "Připojování...",
     "connected": "Připojeno",
     "saving": "Ukládání...",
-    "dismissing": "Odstraňování...",
-    "acknowledging": "Přijímání..."
+    "dismissing": "Odmítání...",
+    "acknowledging": "Potvrzování..."
   },
   "playback": {
     "playing": "Přehrává se",
@@ -63,8 +63,8 @@
     "buffering": "",
     "stopped": "Zastaveno",
     "directPlay": "Přímé přehrávání",
-    "directStream": "Přímé vysílání",
-    "transcode": "Přeskóre",
+    "directStream": "Přímé streamování",
+    "transcode": "Překódování",
     "hwTranscode": "",
     "burnIn": "",
     "watched": ""
@@ -127,7 +127,7 @@
     "type": "Typ",
     "reason": "Důvod",
     "filters": "Filtry",
-    "trustScore": "Důvěřovat skóre",
+    "trustScore": "Skóre důvěryhodnosti",
     "lastActivity": "Poslední aktivita",
     "serverOwner": "Vlastník serveru",
     "resolution": "Rozlišení",
@@ -155,7 +155,7 @@
   },
   "search": {
     "searchUsers": "Hledat uživatele...",
-    "searchTitles": "Hledat titulky, uživatele..."
+    "searchTitles": "Hledat tituly, uživatele..."
   },
   "table": {
     "selectAllOnPage": "Vybrat vše na stránce",
