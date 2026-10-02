@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Läuft",
     "paused": "Pausiert",
+    "buffering": "",
     "stopped": "Gestoppt",
     "directPlay": "Direkte Wiedergabe",
     "directStream": "Direkter Stream",
