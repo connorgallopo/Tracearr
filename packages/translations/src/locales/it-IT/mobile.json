@@ -168,8 +168,8 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "Riproduce Nel Tempo",
-    "concurrentStreams": "Flussi Concorrenti",
+    "playsOverTime": "Riproduzioni Nel Tempo",
+    "concurrentStreams": "Stream Simultanei",
     "platforms": "Piattaforme",
     "playbackQuality": ""
   },
