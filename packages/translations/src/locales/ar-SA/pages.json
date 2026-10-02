@@ -1843,7 +1843,7 @@
       "loginEnabled": "تسجيل الدخول مفعل",
       "unlinkAccount": "إلغاء ربط حساب Plex هذا",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "حذف الخوادم المتصلة أولاً لإلغاء ربط هذا الحساب",
+      "deleteServersFirst": "احذف أولاً الخوادم النشطة المتصلة عبر هذا الحساب، أو ضع عليها علامة «تاريخي»",
       "unlinkPlexAccount": "إلغاء ربط حساب Plex",
       "unlinkConfirm": "هل أنت متأكد من أنك تريد إلغاء ربط حساب Plex هذا؟ لن تتمكن من إضافة خوادم من هذا الحساب حتى تقوم بربطه مرة أخرى.",
       "connectionsAvailable_zero": "",
