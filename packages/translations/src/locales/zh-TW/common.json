@@ -55,7 +55,7 @@
     "connected": "已連接",
     "saving": "正在儲存……",
     "dismissing": "忽略……",
-    "acknowledging": "確認……"
+    "acknowledging": "正在確認……"
   },
   "playback": {
     "playing": "",
@@ -118,7 +118,7 @@
     "stopped": "",
     "joined": "",
     "server": "伺服器",
-    "device": "設備",
+    "device": "裝置",
     "player": "",
     "unknown": "未知",
     "never": "從不",
@@ -232,7 +232,7 @@
   "empty": {
     "noResults": "未找到結果",
     "noData": "沒有可用的資料",
-    "noDeviceData": "没有可用的設備數據",
+    "noDeviceData": "沒有可用的裝置資料",
     "noJobHistory": "還沒有任務紀錄",
     "noSessionsFound": "未找到會話",
     "noUserData": ""
