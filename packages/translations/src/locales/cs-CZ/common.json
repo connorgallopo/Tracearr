@@ -64,6 +64,7 @@
     "stopped": "Zastaveno",
     "directPlay": "Přímé přehrávání",
     "directStream": "Přímé streamování",
+    "audioTranscode": "",
     "transcode": "Překódování",
     "hwTranscode": "",
     "burnIn": "",
