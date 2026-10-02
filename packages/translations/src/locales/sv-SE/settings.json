@@ -472,6 +472,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} kan inte nås",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_other": "{{count}} servrar onåbara: {{serverNames}}"
   },
