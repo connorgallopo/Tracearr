@@ -406,11 +406,7 @@
       "previewCut": "",
       "previewPriority": "",
       "previewEscapeHint": "",
-      "webhookNotSent": "",
-      "unitChars": "",
-      "unitBytes": "",
-      "addedByTracearr": "",
-      "plainTab": ""
+      "webhookNotSent": ""
     },
     "priorities": {
       "automatic": "",
@@ -2287,6 +2283,10 @@
         "hdrAll": "Qualsevol",
         "hdrOnly": "Només HDR",
         "hdrChip": "HDR",
+        "atmosLabel": "",
+        "atmosAll": "",
+        "atmosOnly": "",
+        "atmosChip": "",
         "genreLabel": "Gènere",
         "genreAll": "Qualsevol gènere",
         "serverLabel": "Servidor",
