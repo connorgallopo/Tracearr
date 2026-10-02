@@ -482,6 +482,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} недоступен",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_few": "",
     "multipleUnreachable_many": "",
