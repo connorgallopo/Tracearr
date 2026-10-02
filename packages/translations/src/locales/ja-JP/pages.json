@@ -1733,7 +1733,7 @@
       "loginEnabled": "ログインが有効です",
       "unlinkAccount": "このプレックスアカウントの連携を解除する",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "このアカウントの連携を解除するには、最初に接続されているサーバーを削除してください",
+      "deleteServersFirst": "先に、このアカウント経由で接続している稼働中のサーバーを削除するか、履歴として扱うよう設定してください",
       "unlinkPlexAccount": "プレックスアカウントのリンクを解除",
       "unlinkConfirm": "このプレックスアカウントのリンクを解除してもよろしいですか？再度リンクするまで、このアカウントからサーバーを追加することはできません。",
       "connectionsAvailable_other": "{{count}} コネクションが利用可能です",
