@@ -104,7 +104,7 @@
         "message_other": "{{count}} sessioner slettet"
       },
       "violationsAcknowledged": {
-        "title": "Overtrædelser Kendt",
+        "title": "Overtrædelser anerkendt",
         "message_one": "{{count}} overtrædelse anerkendt",
         "message_other": "{{count}} overtrædelser anerkendt"
       },
@@ -126,12 +126,12 @@
         "message": "Alle mobilsessioner er blevet tilbagekaldt"
       },
       "pairTokenGenerated": {
-        "title": "Par Token Genereret",
+        "title": "Parringstoken genereret",
         "message": "Scan QR-koden med din mobile enhed for at parre"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Stol På Scores Nulstil",
+        "title": "Tillidsscorer nulstillet",
         "message_one": "{{count}} bruger nulstillet til 100",
         "message_other": "{{count}} brugere nulstillet til 100"
       },
@@ -185,12 +185,12 @@
       "apiKeyGenerateFailed": "Kunne ikke generere API-nøgle",
       "mobileAccessEnableFailed": "Mislykkedes at aktivere mobil adgang",
       "mobileAccessDisableFailed": "Mislykkedes at deaktivere mobiladgang",
-      "pairTokenGenerateFailed": "Kunne ikke generere par token",
+      "pairTokenGenerateFailed": "Kunne ikke generere parringstoken",
       "deviceRemoveFailed": "Kunne ikke fjerne enheden",
       "deviceRenameFailed": "Kunne ikke omdøbe enhed",
       "sessionsRevokeFailed": "Mislykkedes at tilbagekalde sessioner",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "Mislykkedes at nulstille trust scores",
+      "trustScoresResetFailed": "Kunne ikke nulstille tillidsscorer",
       "plexUnlinkFailed": "Kunne ikke frakoble Plex konto",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Job kører allerede",
@@ -242,7 +242,7 @@
   "settings": {
     "allSeverity": "Alle (lav, Advarsel, Høj)",
     "warningAndHigh": "Kun advarsel og høj",
-    "highOnly": "Kun høj sværhedsgrad",
+    "highOnly": "Kun høj alvorlighed",
     "rateLimit": "Nuværende Rate Limit Status",
     "perMinute": "Pr. Minut",
     "perHour": "Pr. Time",
@@ -253,7 +253,7 @@
     "streamStopped": "Stream Stoppet",
     "concurrentStreams": "Samtidige Streams",
     "newDevice": "Ny Enhed",
-    "trustScoreChanged": "Tillid Score Ændret",
+    "trustScoreChanged": "Tillidsscore ændret",
     "serverDown": "Server Ned",
     "serverUp": "Server Op",
     "minimumSeverity": "Minimum Alvorlighed",
