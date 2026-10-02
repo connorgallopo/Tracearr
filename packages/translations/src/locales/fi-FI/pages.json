@@ -1755,7 +1755,7 @@
       "loginEnabled": "Kirjautuminen Käytössä",
       "unlinkAccount": "Poista yhteys Plex tiliin",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Poista yhdistetyt palvelimet ensin poistaaksesi linkitys tähän tiliin",
+      "deleteServersFirst": "Poista ensin tämän tilin kautta yhdistetyt aktiiviset palvelimet tai merkitse ne historiallisiksi",
       "unlinkPlexAccount": "Irroita Plex Tili",
       "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen.",
       "connectionsAvailable_one": "",
