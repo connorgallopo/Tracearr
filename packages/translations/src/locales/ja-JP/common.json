@@ -54,7 +54,7 @@
     "connecting": "接続中...",
     "connected": "接続しました",
     "saving": "保存中...",
-    "dismissing": "削除中...",
+    "dismissing": "却下中...",
     "acknowledging": "承認中..."
   },
   "playback": {
@@ -62,7 +62,7 @@
     "paused": "一時停止",
     "buffering": "",
     "stopped": "停止しました",
-    "directPlay": "ダイレクトプレイ",
+    "directPlay": "ダイレクト再生",
     "directStream": "ダイレクトストリーム",
     "transcode": "トランスコード",
     "hwTranscode": "",
@@ -131,7 +131,7 @@
     "lastActivity": "前回のアクティビティ",
     "serverOwner": "サーバー所有者",
     "resolution": "解像度",
-    "watchTime": "ウォッチ時間",
+    "watchTime": "視聴時間",
     "pausedTime": "一時停止時間",
     "sessionDetails": "セッションの詳細",
     "recentSessions": "最近のセッション",
