@@ -126,12 +126,12 @@
         "message": "Alle mobilen Sitzungen wurden widerrufen"
       },
       "pairTokenGenerated": {
-        "title": "Pairing-Token generiert",
+        "title": "Kopplungs-Token generiert",
         "message": "Scannen Sie den QR-Code mit Ihrem Mobilgerät"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Vertrauenswertung zurückgesetzt",
+        "title": "Vertrauenswerte zurückgesetzt",
         "message_one": "{{count}} Benutzer auf 100 zurückgesetzt",
         "message_other": "{{count}} Benutzer auf 100 zurückgesetzt"
       },
@@ -185,12 +185,12 @@
       "apiKeyGenerateFailed": "API-Schlüssel generieren fehlgeschlagen",
       "mobileAccessEnableFailed": "Mobilen Zugriff aktivieren fehlgeschlagen",
       "mobileAccessDisableFailed": "Mobilen Zugriff deaktivieren fehlgeschlagen",
-      "pairTokenGenerateFailed": "Pairing-Token generieren fehlgeschlagen",
+      "pairTokenGenerateFailed": "Kopplungs-Token konnte nicht generiert werden",
       "deviceRemoveFailed": "Gerät entfernen fehlgeschlagen",
       "deviceRenameFailed": "Gerät umbenennen fehlgeschlagen",
       "sessionsRevokeFailed": "Sitzungen widerrufen fehlgeschlagen",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "Vertrauenswertung zurücksetzen fehlgeschlagen",
+      "trustScoresResetFailed": "Vertrauenswerte konnten nicht zurückgesetzt werden",
       "plexUnlinkFailed": "Plex-Konto trennen fehlgeschlagen",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Aufgabe läuft bereits",
@@ -254,8 +254,8 @@
     "concurrentStreams": "Gleichzeitige Streams",
     "newDevice": "Neues Gerät",
     "trustScoreChanged": "Vertrauenswert geändert",
-    "serverDown": "Server aus",
-    "serverUp": "Server an",
+    "serverDown": "Server nicht erreichbar",
+    "serverUp": "Server wieder erreichbar",
     "minimumSeverity": "Mindestschweregrad",
     "quietHours": "Ruhezeiten",
     "enableQuietHours": "Erlaube Ruhezeiten",
