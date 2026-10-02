@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Toistetaan",
     "paused": "Keskeytetty",
+    "buffering": "",
     "stopped": "Pysäytetty",
     "directPlay": "Suora Toisto",
     "directStream": "Suora Lähetys",
