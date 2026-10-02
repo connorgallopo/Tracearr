@@ -18,8 +18,8 @@
     "continue": "Fortfahren",
     "back": "Zurück",
     "next": "Weiter",
-    "acknowledge": "OK",
-    "dismiss": "Schließen",
+    "acknowledge": "Bestätigen",
+    "dismiss": "Verwerfen",
     "terminate": "Beenden",
     "search": "Suchen",
     "sort": "Sortieren",
@@ -54,8 +54,8 @@
     "connecting": "Verbinden...",
     "connected": "Verbunden",
     "saving": "Speichern...",
-    "dismissing": "Schließen...",
-    "acknowledging": "Bestätigt..."
+    "dismissing": "Wird verworfen...",
+    "acknowledging": "Wird bestätigt..."
   },
   "playback": {
     "playing": "Läuft",
@@ -64,7 +64,7 @@
     "stopped": "Gestoppt",
     "directPlay": "Direkte Wiedergabe",
     "directStream": "Direkter Stream",
-    "transcode": "Transkodiere",
+    "transcode": "Transkodierung",
     "hwTranscode": "HW Transkodierung",
     "burnIn": "",
     "watched": ""
