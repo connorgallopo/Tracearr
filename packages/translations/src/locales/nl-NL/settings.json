@@ -269,7 +269,7 @@
     "pairNewDevice": "Nieuw apparaat koppelen",
     "pairNewDeviceDesc": "Scan de QR-code met de Tracearr app of voer de token handmatig in.",
     "expiresIn": "Verloopt in {{time}}",
-    "oneTimePairToken": "Eenmalige Paar Token",
+    "oneTimePairToken": "Eenmalige koppeltoken",
     "copyToken": "Kopieer token",
     "tokenExpiryNote": "Deze token verloopt in 5 minuten en kan slechts één keer worden gebruikt.",
     "done": "Voltooid",
@@ -287,7 +287,7 @@
     "externalUrlBannerLink": "Externe URL",
     "externalUrlBannerSuffix": "zodat de mobiele app verbinding kan maken met uw server.",
     "pendingTokens_one": "",
-    "pendingTokens_other": "{{count}} hangende paar tokens"
+    "pendingTokens_other": "{{count}} openstaande koppeltokens"
   },
   "tailscale": {
     "title": "",
@@ -376,7 +376,7 @@
     "importing": "Importeren...",
     "startImport": "Importeren starten",
     "howItWorks": "Hoe de import werkt",
-    "howItWorksDesc": "Tracearr zal alle historische horloge gegevens uit je bron importeren. Dit kan een tijdje duren, afhankelijk van de grootte van je bibliotheek.",
+    "howItWorksDesc": "Tracearr importeert alle historische kijkgegevens uit je bron. Dit kan even duren, afhankelijk van de grootte van je bibliotheek.",
     "recordsMayBeSkipped": "Records kunnen worden overgeslagen als:",
     "selectTargetServer": "Selecteer een doelserver",
     "selectJellyfinServer": "Selecteer een Jellyfin of Emby server",
