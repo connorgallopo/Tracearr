@@ -25,12 +25,12 @@
         "message": "您的设置已保存"
       },
       "violationAcknowledged": {
-        "title": "确认违约行为",
-        "message": "违法行为已被标记为已确认"
+        "title": "违规已确认",
+        "message": "违规已标记为已确认"
       },
       "violationDismissed": {
-        "title": "丢弃的违规行为",
-        "message": "违法行为已被拒绝"
+        "title": "违规已忽略",
+        "message": "违规已被忽略"
       },
       "deviceRemoved": {
         "title": "设备已移除",
@@ -67,15 +67,15 @@
       },
       "automationCreated": {
         "title": "自动化操作已创建",
-        "message": "已成功创建规则"
+        "message": "已成功创建自动化"
       },
       "automationUpdated": {
         "title": "已更新自动化",
-        "message": "规则已成功更新"
+        "message": "已成功更新自动化"
       },
       "automationDeleted": {
         "title": "自动化操作已删除",
-        "message": "规则已成功删除"
+        "message": "已成功删除自动化"
       },
       "streamTerminated": {
         "title": "流已终止",
@@ -103,11 +103,11 @@
       },
       "violationsAcknowledged": {
         "title": "确认违规行为",
-        "message_other": "{{count}}确认违规行为"
+        "message_other": "已确认 {{count}} 条违规"
       },
       "violationsDismissed": {
-        "title": "违规情况已清除",
-        "message_other": "{{count}}违规情况已清除"
+        "title": "违规已忽略",
+        "message_other": "已忽略 {{count}} 条违规"
       },
       "apiKeyGenerated": {
         "title": "已生成API密钥",
@@ -164,8 +164,8 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "更新设置失败",
       "copyFailed": "无法复制到剪贴板",
-      "acknowledgeFailed": "无法识别违反行为",
-      "dismissFailed": "未能删除违规行为",
+      "acknowledgeFailed": "确认违规失败",
+      "dismissFailed": "忽略违规失败",
       "authFailed": "验证失败",
       "automationCreateFailed": "无法创建自动化",
       "automationUpdateFailed": "无法更新自动化",
@@ -184,7 +184,7 @@
       "deviceRenameFailed": "无法重命名设备",
       "sessionsRevokeFailed": "撤销会话失败",
       "identityUpdateFailed": "无法更新配置文件",
-      "trustScoresResetFailed": "重置信任分失败",
+      "trustScoresResetFailed": "重置信任分数失败",
       "plexUnlinkFailed": "取消链接Plex帐户失败",
       "plexReauthorizeFailed": "取消链接Plex帐户失败",
       "jobAlreadyRunning": "任务已在运行",
@@ -194,7 +194,7 @@
       "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
       "userMergeFailed": "合并用户失败",
       "serverUserSplitFailed": "分割帐户失败",
-      "mergeSuggestionDismissFailed": "无法取消建议",
+      "mergeSuggestionDismissFailed": "无法忽略该建议",
       "mergeSuggestionRestoreFailed": "无法还原建议",
       "invalidClaimCode": {
         "title": "无效的索赔码",
@@ -234,7 +234,7 @@
     }
   },
   "settings": {
-    "allSeverity": "所有(下, 警告, 高)",
+    "allSeverity": "全部（低、警告、高）",
     "warningAndHigh": "仅警告和高",
     "highOnly": "仅限高严重度",
     "rateLimit": "当前速率限制状态",
@@ -245,12 +245,12 @@
     "violationDetected": "检测到违规事件",
     "streamStarted": "流开始",
     "streamStopped": "流停止",
-    "concurrentStreams": "同步流",
+    "concurrentStreams": "并发流",
     "newDevice": "新设备",
-    "trustScoreChanged": "信任得分已更改",
+    "trustScoreChanged": "信任分数已更改",
     "serverDown": "服务器关闭",
     "serverUp": "服务器已启动",
-    "minimumSeverity": "最小的严重级别",
+    "minimumSeverity": "最低严重程度",
     "quietHours": "安静时段",
     "enableQuietHours": "启用安静时间",
     "overrideForCritical": "覆盖临界值",
