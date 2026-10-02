@@ -207,11 +207,11 @@
     "alertsCount_one": "Powiadomienia, {{count}} nieprzeczytane",
     "alertsCount_few": "Powiadomienia, {{count}} nieprzeczytane",
     "alertsCount_many": "Powiadomienia, {{count}} nieprzeczytanych",
-    "alertsCount_other": "Powiadomienia, {{count}} nieprzeczytane",
+    "alertsCount_other": "Powiadomienia, {{count}} nieprzeczytanych",
     "filtersActive_one": "Filtry, {{count}} aktywny",
     "filtersActive_few": "Filtry, {{count}} aktywne",
     "filtersActive_many": "Filtry, {{count}} aktywnych",
-    "filtersActive_other": "Filtry, {{count}} aktywne"
+    "filtersActive_other": "Filtry, {{count}} aktywnych"
   },
   "map": {
     "noData": "Brak danych o lokalizacji",
@@ -234,7 +234,7 @@
     "conditions_one": "{{count}} warunek",
     "conditions_few": "{{count}} warunki",
     "conditions_many": "{{count}} warunków",
-    "conditions_other": "{{count}} warunki"
+    "conditions_other": "{{count}} warunków"
   },
   "charts": {
     "weekOf": "Tydzień {{date}}"
@@ -272,7 +272,7 @@
     "serversDown_one": "{{count}} serwer nieaktywny",
     "serversDown_few": "{{count}} serwery nieaktywne",
     "serversDown_many": "{{count}} serwerów nieaktywnych",
-    "serversDown_other": "{{count}} serwery nieaktywne",
+    "serversDown_other": "{{count}} serwerów nieaktywnych",
     "transcodes_one": "{{count}} transkodowanie",
     "transcodes_few": "{{count}} transkodowania",
     "transcodes_many": "{{count}} transkodowań",
