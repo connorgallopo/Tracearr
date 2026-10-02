@@ -64,7 +64,7 @@
     "stopped": "Pysäytetty",
     "directPlay": "Suora Toisto",
     "directStream": "Suora striimaus",
-    "audioTranscode": "",
+    "audioTranscode": "Äänen transkoodaus",
     "transcode": "Transkoodaus",
     "hwTranscode": "HW-transkoodaus",
     "burnIn": "Kuvaan poltettu",
