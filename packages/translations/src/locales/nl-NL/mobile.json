@@ -71,7 +71,7 @@
     "failedToSendTest": "Versturen testmelding mislukt",
     "loadingPreferences": "Voorkeuren laden...",
     "unableToLoadPreferences": "Voorkeuren laden mislukt",
-    "receiveAlerts": "Ontvang meldingen op dit apparaat",
+    "receiveAlerts": "Ontvang waarschuwingen op dit apparaat",
     "ruleViolationTriggered": "Regelovertreding geactiveerd",
     "newPlaybackBegan": "Afspelen is begonnen",
     "playbackEnded": "Afspelen beëindigd",
@@ -105,7 +105,7 @@
     "violationTypes": ""
   },
   "session": {
-    "streamTerminated": "Stream Beëindigd",
+    "streamTerminated": "Stream afgebroken",
     "sessionStopped": "De afspeelsessie is gestopt.",
     "failedToTerminate": "Het beëindigen is mislukt"
   },
@@ -114,7 +114,7 @@
     "noLocationsRecorded": "Geen locaties geregistreerd",
     "noDevicesRecorded": "Geen apparaten geregistreerd",
     "noViolations": "Geen overtredingen",
-    "noTerminations": "Geen stream stops",
+    "noTerminations": "Geen afgebroken streams",
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
@@ -125,7 +125,7 @@
     "moreDevices_other": "+{{count}} meer apparaten"
   },
   "violation": {
-    "violationNotFoundDesc": "Deze overtreding is mogelijk afgewezen of niet langer beschikbaar.",
+    "violationNotFoundDesc": "Deze overtreding is mogelijk genegeerd of niet langer beschikbaar.",
     "ips": ""
   },
   "alerts": {
@@ -175,7 +175,7 @@
   },
   "unauthenticated": {
     "connectionLost": "Verbinding Verbroken",
-    "accessRevoked": "Uw toegang tot {{serverName}} is ingetrokken. Vraag de serverbeheerder om een ​​nieuwe koppelingscode.",
+    "accessRevoked": "Je toegang tot {{serverName}} is ingetrokken. Vraag de servereigenaar om een nieuwe koppelcode.",
     "scanQrCode": ""
   },
   "serverSelector": {
