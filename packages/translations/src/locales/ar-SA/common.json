@@ -64,6 +64,7 @@
     "stopped": "توقفت",
     "directPlay": "تشغيل مباشر",
     "directStream": "البث المباشر",
+    "audioTranscode": "",
     "transcode": "تحويل الترميز",
     "hwTranscode": "",
     "burnIn": "",
