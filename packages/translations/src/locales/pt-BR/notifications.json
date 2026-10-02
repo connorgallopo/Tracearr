@@ -99,9 +99,9 @@
         "title": "Sincronização concluída com erros"
       },
       "sessionsDeleted": {
-        "title": "Sessões eliminadas",
-        "message_one": "{{count}} sessão eliminada",
-        "message_other": "{{count}} sessões eliminadas"
+        "title": "Sessões excluídas",
+        "message_one": "{{count}} sessão excluída",
+        "message_other": "{{count}} sessões excluídas"
       },
       "violationsAcknowledged": {
         "title": "Violações reconhecidas",
@@ -126,14 +126,14 @@
         "message": "Todas as sessões móveis foram revogadas"
       },
       "pairTokenGenerated": {
-        "title": "Token de emparelhamento gerado",
-        "message": "Digitalize o código QR com o seu dispositivo móvel"
+        "title": "Token de pareamento gerado",
+        "message": "Escaneie o código QR com seu dispositivo móvel para parear"
       },
       "identityUpdated": "",
       "trustScoresReset": {
         "title": "Pontuações de confiança redefinidas",
-        "message_one": "{{count}} utilizador redefinido para 100",
-        "message_other": "{{count}} utilizadores redefinidos para 100"
+        "message_one": "{{count}} usuário redefinido para 100",
+        "message_other": "{{count}} usuários redefinidos para 100"
       },
       "claimCodeValidated": {
         "title": "Recuperar código validado",
@@ -181,11 +181,11 @@
       "serverUpdateFailed": "Falha ao atualizar servidor",
       "serverLocationSaveFailed": "",
       "serverReorderFailed": "Falha ao reordenar servidores",
-      "sessionsDeleteFailed": "Falha ao eliminar sessões",
+      "sessionsDeleteFailed": "Falha ao excluir sessões",
       "apiKeyGenerateFailed": "Falha ao gerar chave API",
       "mobileAccessEnableFailed": "Falha ao ativar acesso móvel",
       "mobileAccessDisableFailed": "Falha ao desativar acesso móvel",
-      "pairTokenGenerateFailed": "Falha ao gerar token de emparelhamento",
+      "pairTokenGenerateFailed": "Falha ao gerar token de pareamento",
       "deviceRemoveFailed": "Falha ao remover dispositivo",
       "deviceRenameFailed": "Falha ao renomear dispositivo",
       "sessionsRevokeFailed": "Falha ao revogar sessões",
