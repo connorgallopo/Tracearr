@@ -45,7 +45,7 @@
       "jobs": "Zadania konserwacyjne, które możesz uruchomić na żądanie.",
       "api": "Klucz publiczny API, jego limit częstotliwości i co liczy się jako obejrzane.",
       "newsletters": "Ostatnio dodane tytuły, cyklicznie wysyłane do członków serwera.",
-      "email": "Branding dla każdego e-maila oraz adresy, które zrezygnowały."
+      "email": "Branding dla każdego e-maila wysyłanego przez Tracearr oraz adresy, które zrezygnowały."
     }
   },
   "general": {
@@ -197,7 +197,7 @@
     "resume": "Wznów",
     "moreActions": "Więcej działań",
     "markHistoricalTitle": "Oznaczyć {{name}} jako historyczny?",
-    "markHistoricalConfirm": "Tracearr przestaje łączyć się z tym serwerem. Jego historia, użytkownicy i biblioteki pozostają i możesz go wznowić w każdej chwili. Aktualnie odtwarzane strumieniowania na tym serwerze zostaną zakończone.",
+    "markHistoricalConfirm": "Tracearr przestaje łączyć się z tym serwerem. Jego historia, użytkownicy i biblioteki pozostają i możesz go wznowić w każdej chwili. Aktualnie odtwarzane strumienie na tym serwerze zostaną zakończone.",
     "resumeFirst": "Wznów najpierw, aby zmienić adres lub klucz API.",
     "location": {
       "title": "Lokalizacja",
@@ -370,7 +370,7 @@
     "apiKeyHelp": "Znaleziono w ustawieniach Tautulli → Interfejs Web → Klucz API.",
     "testing": "Testowanie...",
     "connectToTautulli": "Połącz z Tautulli",
-    "importHistory": "Historia importu",
+    "importHistory": "Importuj historię",
     "targetServer": "Serwer docelowy",
     "selectPlexServer": "Wybierz serwer Plex",
     "overwriteFriendlyNames": "Zastąp istniejące przyjazne nazwy nazwami Tautulli",
@@ -478,7 +478,7 @@
     "changeCount_one": "{{count}} zmiana",
     "changeCount_few": "{{count}} zmiany",
     "changeCount_many": "{{count}} zmian",
-    "changeCount_other": "{{count}} zmian(y)"
+    "changeCount_other": "{{count}} zmian"
   },
   "serverHealth": {
     "unreachable": "{{serverName}} jest nieosiągalny",
@@ -486,7 +486,7 @@
     "multipleUnreachable_one": "{{count}} serwer nieosiągalny: {{serverNames}}",
     "multipleUnreachable_few": "{{count}} serwery nieosiągalne: {{serverNames}}",
     "multipleUnreachable_many": "{{count}} serwerów nieosiągalnych: {{serverNames}}",
-    "multipleUnreachable_other": "{{count}} serwery nieosiągalne: {{serverNames}}"
+    "multipleUnreachable_other": "{{count}} serwerów nieosiągalnych: {{serverNames}}"
   },
   "ipWarning": {
     "message": "Wszyscy użytkownicy wydają się używać tego samego adresu IP lub IP sieci lokalnej. Może to mieć wpływ na logikę dla lokalizacji lub adresów IP opartą na regułach.",
@@ -617,7 +617,7 @@
       "watched_one": "{{count}} najczęściej oglądany",
       "watched_few": "{{count}} najczęściej oglądane",
       "watched_many": "{{count}} najczęściej oglądanych",
-      "watched_other": "{{count}} najczęściej oglądane"
+      "watched_other": "{{count}} najczęściej oglądanych"
     },
     "copyOf": "Kopia {{name}}",
     "richText": {
@@ -824,7 +824,7 @@
         "emptyTitle": "Nikt nie otrzyma tego newslettera",
         "emptyDescription": "Uwzględnij wszystkich na wybranych serwerach lub dodaj adresy poniżej.",
         "notIncludable_one": "{{count}} nie może zostać uwzględniony",
-        "notIncludable_few": "{{count}} nie może zostać uwzględnionych",
+        "notIncludable_few": "{{count}} nie mogą zostać uwzględnieni",
         "notIncludable_many": "{{count}} nie może zostać uwzględnionych",
         "notIncludable_other": "{{count}} nie może zostać uwzględnionych",
         "joinedSinceLastSend_one": "{{count}} odbiorca dołączył od ostatniej wysyłki",
@@ -834,9 +834,9 @@
         "selectedCount_one": "{{count}} zaznaczony",
         "selectedCount_few": "{{count}} zaznaczonych",
         "selectedCount_many": "{{count}} zaznaczonych",
-        "selectedCount_other": "{{count}} wybrane",
-        "notIncludableHelp_one": "{{count}} więcej nie może zostać uwzględnionych, ponieważ jest zbanowany, oczekujący lub nie jest na wybranym serwerze.",
-        "notIncludableHelp_few": "{{count}} więcej nie może zostać uwzględnionych, ponieważ są zbanowani, oczekujący lub nie są na wybranym serwerze.",
+        "selectedCount_other": "{{count}} wybranych",
+        "notIncludableHelp_one": "{{count}} więcej nie może zostać uwzględniony, ponieważ jest zbanowany, oczekujący lub nie jest na wybranym serwerze.",
+        "notIncludableHelp_few": "{{count}} więcej nie mogą zostać uwzględnieni, ponieważ są zbanowani, oczekujący lub nie są na wybranym serwerze.",
         "notIncludableHelp_many": "{{count}} więcej nie może zostać uwzględnionych, ponieważ są zbanowani, oczekujący lub nie są na wybranym serwerze.",
         "notIncludableHelp_other": "{{count}} więcej nie może zostać uwzględnionych, ponieważ są zbanowani, oczekujący lub nie są na wybranym serwerze."
       },
