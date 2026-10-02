@@ -54,7 +54,7 @@
     "connecting": "Σύνδεση...",
     "connected": "Συνδεδεμένο",
     "saving": "Αποθηκεύεται...",
-    "dismissing": "Απορρίφθηκε...",
+    "dismissing": "Απόρριψη...",
     "acknowledging": "Αναγνώριση..."
   },
   "playback": {
@@ -64,7 +64,7 @@
     "stopped": "Διακόπηκε",
     "directPlay": "Άμεση Αναπαραγωγή",
     "directStream": "Άμεση Ροή",
-    "transcode": "Μετατροπή",
+    "transcode": "Διακωδικοποίηση",
     "hwTranscode": "",
     "burnIn": "",
     "watched": ""
@@ -131,7 +131,7 @@
     "lastActivity": "Τελευταία Δραστηριότητα",
     "serverOwner": "Ιδιοκτήτης Διακομιστή",
     "resolution": "Ανάλυση",
-    "watchTime": "Ώρα Παρακολούθησης",
+    "watchTime": "Χρόνος Παρακολούθησης",
     "pausedTime": "Χρόνος Παύσης",
     "sessionDetails": "Λεπτομέρειες Συνεδρίας",
     "recentSessions": "Πρόσφατες Συνεδρίες",
