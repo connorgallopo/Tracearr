@@ -231,7 +231,7 @@
     "info": {
       "updateAvailable": {
         "title": "Päivitys Saatavilla",
-        "message": "Seuraa {{version}} on saatavilla"
+        "message": "Tracearr {{version}} on saatavilla"
       },
       "violationDetected": {
         "title": "Uusi Väkivalta: {{ruleName}}",
