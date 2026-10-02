@@ -60,6 +60,7 @@
   "playback": {
     "playing": "播放中",
     "paused": "已暂停",
+    "buffering": "",
     "stopped": "已停止",
     "directPlay": "直接播放",
     "directStream": "直接串流",
