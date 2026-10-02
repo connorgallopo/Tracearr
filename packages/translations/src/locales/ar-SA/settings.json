@@ -378,7 +378,7 @@
     "targetServer": "",
     "selectPlexServer": "حدد خادم Plex",
     "overwriteFriendlyNames": "الكتابة فوق الأسماء الصديقة الموجودة مع أسماء تاتوللي",
-    "overwriteFriendlyNamesHelp": "وستستعاض عن أسماء الهوية الموجودة في تريكير بالأسماء الصديقة من تاتولي.",
+    "overwriteFriendlyNamesHelp": "وستستعاض عن أسماء الهوية الموجودة في Tracearr بالأسماء الصديقة من Tautulli.",
     "includeStreamDetails": "تضمين بيانات البث التفصيلي (الترميزات، البت، الدقة)",
     "includeStreamDetailsHelp": "استيراد معلومات تدفق إضافية. قد تزيد من وقت الاستيراد بشكل كبير.",
     "importing": "استيراد...",
