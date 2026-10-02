@@ -29,8 +29,8 @@
         "message": "La violazione è stata contrassegnata come riconosciuta"
       },
       "violationDismissed": {
-        "title": "Violazione Respinta",
-        "message": "La violazione è stata respinta"
+        "title": "Violazione Ignorata",
+        "message": "La violazione è stata ignorata"
       },
       "deviceRemoved": {
         "title": "Dispositivo Rimosso",
@@ -109,9 +109,9 @@
         "message_other": ""
       },
       "violationsDismissed": {
-        "title": "Violazioni Rimosse",
-        "message_one": "{{count}} violazione licenziata",
-        "message_other": "{{count}} violazioni respinte"
+        "title": "Violazioni Ignorate",
+        "message_one": "{{count}} violazione ignorata",
+        "message_other": "{{count}} violazioni ignorate"
       },
       "apiKeyGenerated": {
         "title": "Chiave API Generata",
@@ -126,8 +126,8 @@
         "message": "Tutte le sessioni mobili sono state revocate"
       },
       "pairTokenGenerated": {
-        "title": "Token Di Coppia Generato",
-        "message": "Scansiona il codice QR con il tuo dispositivo mobile per abbinare"
+        "title": "Token Di Accoppiamento Generato",
+        "message": "Scansiona il codice QR con il tuo dispositivo mobile per accoppiarlo"
       },
       "identityUpdated": "",
       "trustScoresReset": {
@@ -171,7 +171,7 @@
       "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
       "copyFailed": "Impossibile copiare negli appunti",
       "acknowledgeFailed": "Impossibile riconoscere la violazione",
-      "dismissFailed": "Impossibile annullare la violazione",
+      "dismissFailed": "Impossibile ignorare la violazione",
       "authFailed": "Autenticazione non riuscita",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
@@ -185,7 +185,7 @@
       "apiKeyGenerateFailed": "Impossibile generare la chiave API",
       "mobileAccessEnableFailed": "Impossibile abilitare l'accesso mobile",
       "mobileAccessDisableFailed": "Impossibile disattivare l'accesso mobile",
-      "pairTokenGenerateFailed": "Impossibile generare il token della coppia",
+      "pairTokenGenerateFailed": "Impossibile generare il token di accoppiamento",
       "deviceRemoveFailed": "Impossibile rimuovere il dispositivo",
       "deviceRenameFailed": "Impossibile rinominare il dispositivo",
       "sessionsRevokeFailed": "Impossibile revocare le sessioni",
@@ -235,7 +235,7 @@
       },
       "violationDetected": {
         "title": "Nuova Violazione: {{ruleName}}",
-        "message": "{{user}} attivato {{ruleType}}"
+        "message": "{{user}} ha innescato {{ruleType}}"
       }
     }
   },
@@ -251,9 +251,9 @@
     "violationDetected": "Violazione Rilevata",
     "streamStarted": "Stream Iniziato",
     "streamStopped": "Stream Fermato",
-    "concurrentStreams": "Flussi Concorrenti",
+    "concurrentStreams": "Stream Simultanei",
     "newDevice": "Nuovo Dispositivo",
-    "trustScoreChanged": "Trust Punteggio Cambiato",
+    "trustScoreChanged": "Punteggio Di Fiducia Cambiato",
     "serverDown": "Server Giù",
     "serverUp": "Server Su",
     "minimumSeverity": "Gravità Minima",
