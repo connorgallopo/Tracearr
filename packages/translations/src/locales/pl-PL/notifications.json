@@ -52,7 +52,7 @@
         "message": "Teraz możesz dodać serwery z konta Plex"
       },
       "plexAccountUnlinked": {
-        "title": "Konto Plex niepowiązane",
+        "title": "Odłączono konto Plex",
         "message": "Twoje konto Plex zostało odłączone"
       },
       "plexAccountReauthorized": {
@@ -81,15 +81,15 @@
         "message": "Automatyzacja została pomyślnie usunięta"
       },
       "streamTerminated": {
-        "title": "Transmisja zakończona",
-        "message": "Sesja odtwarzania została wstrzymana"
+        "title": "Strumień przerwany",
+        "message": "Sesja odtwarzania została zatrzymana"
       },
       "serverUrlUpdated": {
         "title": "Adres URL serwera zaktualizowany",
         "message": "Adres URL serwera został pomyślnie zaktualizowany"
       },
       "serverUpdated": {
-        "title": "Zaktualizowano Serwer",
+        "title": "Zaktualizowano serwer",
         "message": "Serwer został pomyślnie zaktualizowany"
       },
       "serverLocationSaved": {
@@ -109,20 +109,20 @@
       },
       "violationsAcknowledged": {
         "title": "Naruszenia potwierdzone",
-        "message_one": "{{count}} naruszenie potwierdzone",
-        "message_few": "{{count}} naruszenia potwierdzone",
-        "message_many": "{{count}} naruszeń potwierdzonych",
-        "message_other": "{{count}} naruszeń potwierdzonych"
+        "message_one": "Potwierdzono {{count}} naruszenie",
+        "message_few": "Potwierdzono {{count}} naruszenia",
+        "message_many": "Potwierdzono {{count}} naruszeń",
+        "message_other": "Potwierdzono {{count}} naruszenia"
       },
       "violationsDismissed": {
-        "title": "Naruszenia odrzucono",
-        "message_one": "{{count}} naruszenie odrzucono",
+        "title": "Naruszenia odrzucone",
+        "message_one": "Odrzucono {{count}} naruszenie",
         "message_few": "Odrzucono {{count}} naruszenia",
         "message_many": "Odrzucono {{count}} naruszeń",
-        "message_other": "{{count}} naruszenia odrzucono"
+        "message_other": "Odrzucono {{count}} naruszenia"
       },
       "apiKeyGenerated": {
-        "title": "Wygenerowany klucz API",
+        "title": "Wygenerowano klucz API",
         "message": "Twój nowy klucz API jest gotowy do użycia"
       },
       "mobileAccessEnabled": {
@@ -131,7 +131,7 @@
       },
       "mobileAccessDisabled": {
         "title": "Dostęp mobilny wyłączony",
-        "message": "Wszystkie sesje mobilne zostały anulowane"
+        "message": "Wszystkie sesje mobilne zostały unieważnione"
       },
       "pairTokenGenerated": {
         "title": "Wygenerowano token parowania",
@@ -139,9 +139,9 @@
       },
       "identityUpdated": "Profil zaktualizowany",
       "trustScoresReset": {
-        "title": "Zresetuj wyniki zaufania",
+        "title": "Zresetowano wyniki zaufania",
         "message_one": "{{count}} użytkownik zresetowany do 100",
-        "message_few": "{{count}} użytkownicy zresetowani do 100",
+        "message_few": "{{count}} użytkowników zresetowanych do 100",
         "message_many": "{{count}} użytkowników zresetowanych do 100",
         "message_other": "{{count}} użytkowników zresetowanych do 100"
       },
@@ -151,10 +151,10 @@
       },
       "usersMerged": {
         "title": "Użytkownicy zostali scaleni",
-        "automationsKept": "Zachowano wersję docelową: {{names}}"
+        "automationsKept": "Zachowano wersję użytkownika docelowego dla: {{names}}"
       },
       "serverUserSplit": {
-        "title": "Konto podzielone na osobnych użytkowników"
+        "title": "Konto wydzielono jako osobnego użytkownika"
       },
       "mergeSuggestionDismissed": "Oznaczono jako inne osoby",
       "mergeSuggestionRestored": "Sugestia przywrócona",
@@ -182,13 +182,13 @@
       "serverHistoricalFailed": "Nie udało się zmienić statusu serwera",
       "settingsUpdateFailed": "Nie udało się zaktualizować ustawień",
       "copyFailed": "Nie można skopiować do schowka",
-      "acknowledgeFailed": "Nieudane potwierdzenie naruszenia",
+      "acknowledgeFailed": "Nie udało się potwierdzić naruszenia",
       "dismissFailed": "Nie udało się odrzucić naruszenia",
       "authFailed": "Uwierzytelnianie nie powiodło się",
       "automationCreateFailed": "Nie udało się utworzyć automatyzacji",
       "automationUpdateFailed": "Nie udało się zaktualizować automatyzacji",
       "automationDeleteFailed": "Nie udało się usunąć automatyzacji",
-      "streamTerminateFailed": "Nie udało się zakończyć streamu",
+      "streamTerminateFailed": "Nie udało się przerwać strumienia",
       "serverUrlUpdateFailed": "Nie udało się zaktualizować URL serwera",
       "serverUpdateFailed": "Nie udało się zaktualizować serwera",
       "serverLocationSaveFailed": "Nie udało się zapisać lokalizacji serwera",
@@ -200,22 +200,22 @@
       "pairTokenGenerateFailed": "Nie udało się wygenerować tokenu parowania",
       "deviceRemoveFailed": "Nie udało się usunąć urządzenia",
       "deviceRenameFailed": "Nie udało się zmienić nazwy urządzenia",
-      "sessionsRevokeFailed": "Nie udało się anulować sesji",
+      "sessionsRevokeFailed": "Nie udało się unieważnić sesji",
       "identityUpdateFailed": "Nie udało się zaktualizować profilu",
-      "trustScoresResetFailed": "Nie udało się zresetować punktów zaufania",
+      "trustScoresResetFailed": "Nie udało się zresetować wyników zaufania",
       "plexUnlinkFailed": "Nie udało się odłączyć konta Plex",
       "plexReauthorizeFailed": "Nie udało się ponownie autoryzować konta Plex",
       "jobAlreadyRunning": "Zadanie jest już uruchomione",
       "jobStartFailed": "Nie udało się uruchomić zadania",
       "jobLoadFailed": "Nie udało się załadować zadań konserwacyjnych",
       "invalidUrl": "Nieprawidłowy adres URL",
-      "plexDirectUrl": "plex.direct adresy URL są adresami, które nie mogą być tutaj użyte. Użyj bezpośredniego adresu IP lub nazwy hosta.",
+      "plexDirectUrl": "Adresy plex.direct to adresy przekaźnikowe (relay) i nie można ich tu użyć. Użyj bezpośredniego adresu IP lub nazwy hosta.",
       "userMergeFailed": "Nie udało się scalić użytkowników",
       "serverUserSplitFailed": "Nie udało się rozdzielić konta",
       "mergeSuggestionDismissFailed": "Nie udało się odrzucić sugestii",
       "mergeSuggestionRestoreFailed": "Nie udało się przywrócić sugestii",
       "invalidClaimCode": {
-        "title": "Niepoprawny kod żądania",
+        "title": "Nieprawidłowy kod aktywacyjny",
         "message": "Proszę sprawdzić logi serwera"
       },
       "destinationSaveFailed": "Nie udało się zapisać miejsca docelowego: {{error}}",
@@ -230,7 +230,7 @@
       "newsletterTestFailed": "Nie udało się dodać testu do kolejki: {{error}}",
       "newsletterSendFailed": "Nie udało się dodać wysyłki do kolejki: {{error}}",
       "newsletterRetryFailed": "Ponowna próba wysyłki zakończona niepowodzeniem: {{error}}",
-      "newsletterSnapshotFailed": "Nie udało się załadować zrzutu: {{error}}",
+      "newsletterSnapshotFailed": "Nie udało się załadować migawki: {{error}}",
       "brandingSaveFailed": "Nie udało się zapisać brandingu: {{error}}",
       "suppressionAddFailed": "Nie udało się dodać adresu: {{error}}",
       "suppressionRemoveFailed": "Nie udało się usunąć adresu: {{error}}"
@@ -247,28 +247,28 @@
       },
       "violationDetected": {
         "title": "Nowe naruszenie: {{ruleName}}",
-        "message": "{{user}} uruchomił {{ruleType}}"
+        "message": "Użytkownik {{user}} wywołał regułę {{ruleType}}"
       }
     }
   },
   "settings": {
     "allSeverity": "Wszystkie (Niskie, Ostrzeżenie, Wysokie)",
     "warningAndHigh": "Tylko ostrzeżenie i wysokie",
-    "highOnly": "Tylko o wysokim priorytecie",
+    "highOnly": "Tylko o wysokiej ważności",
     "rateLimit": "Aktualny status limitu zapytań",
     "perMinute": "Na minutę",
     "perHour": "Na godzinę",
     "enablePushNotifications": "Włącz powiadomienia push",
     "notificationEvents": "Powiadomienia o zdarzeniach",
     "violationDetected": "Wykryto naruszenie",
-    "streamStarted": "Transmisja Rozpoczęta",
-    "streamStopped": "Transmisja Wstrzymana",
-    "concurrentStreams": "Równoległe Transmisje",
-    "newDevice": "Nowe Urządzenie",
+    "streamStarted": "Strumień rozpoczęty",
+    "streamStopped": "Strumień zatrzymany",
+    "concurrentStreams": "Równoległe strumienie",
+    "newDevice": "Nowe urządzenie",
     "trustScoreChanged": "Zmieniono wynik zaufania",
-    "serverDown": "Serwer Nieaktywny",
-    "serverUp": "Serwer Aktywny",
-    "minimumSeverity": "Minimalna waga",
+    "serverDown": "Serwer nieaktywny",
+    "serverUp": "Serwer aktywny",
+    "minimumSeverity": "Minimalna ważność",
     "quietHours": "Godziny ciszy",
     "enableQuietHours": "Włącz godziny ciszy",
     "overrideForCritical": "Nadpisz dla krytycznych",
