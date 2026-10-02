@@ -60,6 +60,7 @@
   "playback": {
     "playing": "S'està reproduïnt",
     "paused": "En pausa",
+    "buffering": "",
     "stopped": "Aturat",
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió en directe",
