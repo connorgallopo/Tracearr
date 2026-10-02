@@ -920,6 +920,7 @@
         "source_video_codec": "el còdec de vídeo de la font",
         "is_transcoding": "la transcodificació",
         "is_transcode_downgrade": "la reducció de qualitat",
+        "is_subtitle_burn_in": "",
         "source_bitrate_mbps": "la taxa de bits de la font",
         "user_id": "l'usuari",
         "trust_score": "la puntuació de confiança",
@@ -950,6 +951,10 @@
         "is_transcode_downgrade": {
           "yes": "la transmissió té una reducció de qualitat",
           "no": "la transmissió no té cap reducció de qualitat"
+        },
+        "is_subtitle_burn_in": {
+          "yes": "",
+          "no": ""
         },
         "is_transcoding": {
           "video": {
@@ -1122,6 +1127,10 @@
       "is_transcode_downgrade": {
         "label": "Degradació per transcodificació",
         "description": "La resolució de sortida és inferior a la de la font"
+      },
+      "is_subtitle_burn_in": {
+        "label": "",
+        "description": ""
       },
       "source_bitrate_mbps": {
         "label": "Taxa de bits de la font",
