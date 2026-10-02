@@ -64,6 +64,7 @@
     "stopped": "Διακόπηκε",
     "directPlay": "Άμεση Αναπαραγωγή",
     "directStream": "Άμεση Ροή",
+    "audioTranscode": "",
     "transcode": "Διακωδικοποίηση",
     "hwTranscode": "",
     "burnIn": "",
