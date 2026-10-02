@@ -94,9 +94,9 @@
     "pushNotifications": "푸시 알림",
     "ruleTypes": {
       "accountInactivity": "계정 비활성",
-      "deviceVelocity": "장치 속도",
+      "deviceVelocity": "기기 속도",
       "geoRestriction": "지역 제한",
-      "impossibleTravel": "불가능 한 지역",
+      "impossibleTravel": "불가능한 이동",
       "simultaneousLocations": "동시 위치"
     },
     "severityAll": "모두",
@@ -244,7 +244,7 @@
   },
   "widget": {
     "asOf": "{{time}} 기준",
-    "signedOut": "서버를 연결하려면 Tracearr를 여세요.",
+    "signedOut": "서버와 페어링하려면 Tracearr를 여세요.",
     "serversDown_other": "서버 {{count}}대 오프라인",
     "transcodes_other": "트랜스코딩 {{count}}개"
   }
