@@ -467,6 +467,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} 無法連接",
+    "tokenRejected": "",
     "multipleUnreachable_other": "{{count}} 個伺服器無法連接：{{serverNames}}"
   },
   "ipWarning": {
