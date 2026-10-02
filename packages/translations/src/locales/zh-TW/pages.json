@@ -1733,7 +1733,7 @@
       "loginEnabled": "登入已啟用",
       "unlinkAccount": "取消連接此 Plex 帳號",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "先刪除已連接的伺服器才能取消連接此帳號",
+      "deleteServersFirst": "請先刪除透過此帳號連接的使用中伺服器，或將其標記為歷史伺服器",
       "unlinkPlexAccount": "取消連接 Plex 帳號",
       "unlinkConfirm": "您確定要取消連接此 Plex 帳號嗎？取消連接後，您將無法使用此帳號新增伺服器，直到您重新連接為止。",
       "connectionsAvailable_other": "{{count}} 個可以連接",
