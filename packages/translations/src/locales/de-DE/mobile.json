@@ -17,7 +17,7 @@
   "errors": {
     "invalidUrl": "Ungültige URL",
     "pleaseEnterValidUrl": "Bitte geben Sie eine gültige Server-URL ein",
-    "pairingFailed": "Pairing fehlgeschlagen",
+    "pairingFailed": "Kopplung fehlgeschlagen",
     "unableToPair": "Verbindung mit Server nicht möglich",
     "invalidQrCode": "Ungültiger QR Code",
     "invalidQrCodeMissingData": "Ungültiger QR-Code: Kopplungsdaten fehlen",
@@ -72,14 +72,14 @@
     "loadingPreferences": "Lade Einstellungen...",
     "unableToLoadPreferences": "Einstellungen konnten nicht geladen werden",
     "receiveAlerts": "Erhalte Warnungen auf diesem Gerät",
-    "ruleViolationTriggered": "Regelverletzung ausgelöst",
+    "ruleViolationTriggered": "Regelverstoß ausgelöst",
     "newPlaybackBegan": "Neue Wiedergabe gestartet",
     "playbackEnded": "Wiedergabe beendet",
     "newDeviceDetected": "Neues Gerät für Benutzer erkannt",
-    "trustScoreDegraded": "Benutzer-Vertrauens-Score verschlechtert",
+    "trustScoreDegraded": "Vertrauenswert des Benutzers gesunken",
     "serverUnreachable": "Medienserver nicht erreichbar",
     "serverBackOnline": "Medienserver wieder online",
-    "allViolationTypes": "Alle Verletzungstypen",
+    "allViolationTypes": "Alle Verstoßtypen",
     "notifyForEveryRule": "Für jeden Regeltyp benachrichtigen",
     "severityDescription": "Nur bei Verstößen auf oder über diesem Schweregrad benachrichtigen",
     "quietHoursDescription": "Unkritische Benachrichtigungen während der festgelegten Stunden anhalten",
@@ -114,7 +114,7 @@
     "noLocationsRecorded": "Keine Orte aufgezeichnet",
     "noDevicesRecorded": "Keine Geräte aufgezeichnet",
     "noViolations": "Keine Verstöße",
-    "noTerminations": "Keine Stream-Terminierungen",
+    "noTerminations": "Keine beendeten Streams",
     "lastSeen": "",
     "terminatedBy": "",
     "trustScoreConfirm": "",
@@ -125,7 +125,7 @@
     "moreDevices_other": "+{{count}} weitere Geräte"
   },
   "violation": {
-    "violationNotFoundDesc": "Dieser Verstoß wurde möglicherweise abgewiesen oder ist nicht mehr verfügbar.",
+    "violationNotFoundDesc": "Dieser Verstoß wurde möglicherweise verworfen oder ist nicht mehr verfügbar.",
     "ips": "IP-Adressen"
   },
   "alerts": {
@@ -175,7 +175,7 @@
   },
   "unauthenticated": {
     "connectionLost": "Verbindung abgebrochen",
-    "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Pairing Code.",
+    "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Kopplungscode.",
     "scanQrCode": "QR-Code scannen"
   },
   "serverSelector": {
