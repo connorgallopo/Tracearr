@@ -23,7 +23,7 @@
     "invalidQrCodeMissingData": "Virheellinen QR-koodi: puuttuvat pariutumistiedot",
     "invalidQrCodeFormat": "Virheellinen QR-koodin muoto. Ole hyvä ja luo uusi koodi.",
     "invalidQrCodeMissingUrl": "Virheellinen QR-koodi: puuttuva palvelimen URL",
-    "invalidQrCodeMissingToken": "Virheellinen QR-koodi: puuttuu pariliitos",
+    "invalidQrCodeMissingToken": "Virheellinen QR-koodi: paritustunnus puuttuu",
     "errorDetails": "Virheen lisätiedot:",
     "connectionLost": "Yhteys katkesi",
     "failedToLoadSession": "Istunnon lataus epäonnistui"
@@ -71,7 +71,7 @@
     "failedToSendTest": "Testi-ilmoituksen lähettäminen epäonnistui",
     "loadingPreferences": "Ladataan asetuksia...",
     "unableToLoadPreferences": "Asetuksia ei voi ladata",
-    "receiveAlerts": "Vastaanota ilmoituksia tähän laitteeseen",
+    "receiveAlerts": "Vastaanota hälytyksiä tähän laitteeseen",
     "ruleViolationTriggered": "Sääntörikkomus laukaistu",
     "newPlaybackBegan": "Uusi toisto aloitettu",
     "playbackEnded": "Toisto päättyi",
@@ -105,20 +105,20 @@
     "violationTypes": "Rikkomustyypit"
   },
   "session": {
-    "streamTerminated": "Striimi keskeytetty",
+    "streamTerminated": "Striimi lopetettu",
     "sessionStopped": "Toiston istunto on pysäytetty.",
-    "failedToTerminate": "Keskeytys epäonnistui"
+    "failedToTerminate": "Lopettaminen epäonnistui"
   },
   "userDetail": {
     "userMayBeRemoved": "Tämä käyttäjä on ehkä poistettu.",
     "noLocationsRecorded": "Ei tallennettuja sijainteja",
     "noDevicesRecorded": "Ei tallennettuja laitteita",
     "noViolations": "Ei rikkomuksia",
-    "noTerminations": "Ei striimien keskeytyksiä",
+    "noTerminations": "Ei lopetettuja striimejä",
     "lastSeen": "Viimeksi nähty {{relative}}",
     "terminatedBy": "Tekijä: @{{username}}",
-    "trustScoreConfirm": "Aseta luottopisteytys käyttäjälle @{{username}} arvoon {{score}}?",
-    "trustScoreRange": "Luottopisteytys käyttäjälle @{{username}}, 0 - 100.",
+    "trustScoreConfirm": "Asetetaanko käyttäjän @{{username}} luottamuspisteiksi {{score}}?",
+    "trustScoreRange": "Käyttäjän @{{username}} luottamuspisteet, 0 - 100.",
     "moreLocations_one": "+{{count}} sijainti lisää",
     "moreLocations_other": "+{{count}} sijaintia lisää",
     "moreDevices_one": "+{{count}} laite lisää",
@@ -131,14 +131,14 @@
   "alerts": {
     "clearFilters": "Tyhjennä suodattimet",
     "acknowledgeAll": "Kuittaa kaikki",
-    "acknowledgeAllBody": "Jokainen odottava ilmoitus palvelimella {{servers}} merkitään kuitatuksi. Tätä ei voi perua.",
-    "acknowledgeAllBodySeverity": "Jokainen odottava ilmoitus vakavuudella {{severity}} palvelimella {{servers}} merkitään kuitatuksi. Tätä ei voi perua.",
+    "acknowledgeAllBody": "Jokainen odottava hälytys palvelimella {{servers}} merkitään kuitatuksi. Tätä ei voi perua.",
+    "acknowledgeAllBodySeverity": "Jokainen odottava hälytys vakavuudella {{severity}} palvelimella {{servers}} merkitään kuitatuksi. Tätä ei voi perua.",
     "all": "Kaikki",
     "allClear": "Kaikki OK",
     "allServers": "Kaikki palvelimet",
-    "noAlertsRecorded": "Ilmoituksia ei ole vielä tallennettu.",
-    "noMatches": "Ei vastaavia ilmoituksia",
-    "acknowledgeAllTitle_one": "Hyväksy {{count}} hälytys?",
+    "noAlertsRecorded": "Hälytyksiä ei ole vielä tallennettu.",
+    "noMatches": "Ei vastaavia hälytyksiä",
+    "acknowledgeAllTitle_one": "Kuittaa {{count}} hälytys?",
     "acknowledgeAllTitle_other": "Kuittaa {{count}} hälytystä?",
     "pendingCount_one": "{{count}} odottaa",
     "pendingCount_other": "{{count}} odottaa"
@@ -169,7 +169,7 @@
   },
   "activity": {
     "playsOverTime": "Toistot ajan mittaan",
-    "concurrentStreams": "Samanaikaiset suoratoistot",
+    "concurrentStreams": "Samanaikaiset striimit",
     "platforms": "Alustat",
     "playbackQuality": "Toiston laatu"
   },
@@ -187,15 +187,15 @@
   "reconnected": "Yhdistetty uudelleen",
   "a11y": {
     "selectServer": "Valitse palvelin",
-    "alerts": "Ilmoitukset",
+    "alerts": "Hälytykset",
     "settings": "Asetukset",
-    "trustScore": "Luottopisteytys {{score}}",
+    "trustScore": "Luottamuspisteet {{score}}",
     "decreaseTrustScore": "Vähennä luottamuspisteitä",
     "increaseTrustScore": "Lisää luottamuspisteitä",
     "sortAscending": "Lajiteltu nousevasti, napauta kääntääksesi",
     "sortDescending": "Lajiteltu laskevasti, napauta kääntääksesi",
-    "alertsCount_one": "Ilmoitukset, {{count}} lukematta",
-    "alertsCount_other": "Ilmoitukset, {{count}} lukematta",
+    "alertsCount_one": "Hälytykset, {{count}} lukematta",
+    "alertsCount_other": "Hälytykset, {{count}} lukematta",
     "filtersActive_one": "Suodattimet, {{count}} aktiivisena",
     "filtersActive_other": "Suodattimet, {{count}} aktiivisena"
   },
@@ -224,7 +224,7 @@
     "weekOf": "{{date}} viikon aikana"
   },
   "push": {
-    "violationTitle": "{{severity}} Rike"
+    "violationTitle": "{{severity}} rikkomus"
   },
   "streamDetails": {
     "bitrate": "Bittinopeus",
