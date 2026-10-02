@@ -8,7 +8,7 @@
     "scanQrCodeInstead": "Escanear código QR ",
     "enterManually": "Introducir URL y token manualmente",
     "cameraPermissionRequired": "Se requiere permiso de cámara para escanear códigos QR",
-    "scanQrInstructions": "Abre Ajustes → Ve en la aplicación móvil a tu panel de seguimiento y escanea el código QR",
+    "scanQrInstructions": "Abre Ajustes → App móvil en tu panel de Tracearr y escanea el código QR",
     "urlPlaceholder": "",
     "tokenPlaceholder": "",
     "missingToken": "",
