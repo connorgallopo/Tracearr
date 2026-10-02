@@ -64,6 +64,7 @@
     "stopped": "Arrêté",
     "directPlay": "Lecture directe",
     "directStream": "Flux direct",
+    "audioTranscode": "",
     "transcode": "Transcodage",
     "hwTranscode": "",
     "burnIn": "Incrustation",
