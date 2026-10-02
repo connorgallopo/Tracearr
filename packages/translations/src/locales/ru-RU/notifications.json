@@ -26,10 +26,10 @@
       },
       "violationAcknowledged": {
         "title": "Подтверждено нарушение",
-        "message": "Нарушение было отмечено как признанное"
+        "message": "Нарушение отмечено как подтверждённое"
       },
       "violationDismissed": {
-        "title": "Нарушение прекращено",
+        "title": "Нарушение отклонено",
         "message": "Нарушение было отклонено"
       },
       "deviceRemoved": {
@@ -52,7 +52,7 @@
         "message": "Теперь вы можете добавить серверы из вашего аккаунта Plex"
       },
       "plexAccountUnlinked": {
-        "title": "Учетная запись Plex удалена",
+        "title": "Аккаунт Plex отвязан",
         "message": "Ваша учетная запись Plex была отключена"
       },
       "plexAccountReauthorized": {
@@ -105,21 +105,21 @@
         "message_one": "{{count}} сессия удалена",
         "message_few": "",
         "message_many": "",
-        "message_other": "{{count}} сеансов удалено"
+        "message_other": "{{count}} сессий удалено"
       },
       "violationsAcknowledged": {
-        "title": "Признанные нарушения",
-        "message_one": "Нарушение {{count}} признано",
+        "title": "Нарушения подтверждены",
+        "message_one": "Подтверждено нарушений: {{count}}",
         "message_few": "",
         "message_many": "",
-        "message_other": "Признанные нарушения {{count}}"
+        "message_other": "Подтверждено нарушений: {{count}}"
       },
       "violationsDismissed": {
-        "title": "Нарушения прекращены",
+        "title": "Нарушения отклонены",
         "message_one": "Нарушение {{count}} отклонено",
         "message_few": "",
         "message_many": "",
-        "message_other": "Убрано нарушений {{count}}"
+        "message_other": "Отклонено нарушений: {{count}}"
       },
       "apiKeyGenerated": {
         "title": "Ключ API создан",
@@ -134,7 +134,7 @@
         "message": "Все мобильные сессии были отозваны"
       },
       "pairTokenGenerated": {
-        "title": "Токен пара создан",
+        "title": "Токен сопряжения создан",
         "message": "Сканируйте QR-код вашим мобильным устройством для сопряжения"
       },
       "identityUpdated": "",
@@ -183,7 +183,7 @@
       "settingsUpdateFailed": "Не удалось обновить настройки",
       "copyFailed": "Не удалось скопировать в буфер обмена",
       "acknowledgeFailed": "Не удалось подтвердить нарушение",
-      "dismissFailed": "Не удалось уволить нарушение",
+      "dismissFailed": "Не удалось отклонить нарушение",
       "authFailed": "Аутентификация не удалась",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
@@ -197,7 +197,7 @@
       "apiKeyGenerateFailed": "Не удалось сгенерировать ключ API",
       "mobileAccessEnableFailed": "Не удалось включить мобильный доступ",
       "mobileAccessDisableFailed": "Не удалось отключить мобильный доступ",
-      "pairTokenGenerateFailed": "Не удалось сгенерировать токен пары",
+      "pairTokenGenerateFailed": "Не удалось сгенерировать токен сопряжения",
       "deviceRemoveFailed": "Не удалось удалить устройство",
       "deviceRenameFailed": "Не удалось переименовать устройство",
       "sessionsRevokeFailed": "Не удалось отозвать сессии",
@@ -254,7 +254,7 @@
   "settings": {
     "allSeverity": "Все (Ну, предупреждение, Высокое)",
     "warningAndHigh": "Только высокий уровень предупреждения",
-    "highOnly": "Только повышенная тяжесть",
+    "highOnly": "Только высокая серьёзность",
     "rateLimit": "Статус текущего лимита",
     "perMinute": "В минуту",
     "perHour": "За час",
@@ -265,9 +265,9 @@
     "streamStopped": "Поток остановлен",
     "concurrentStreams": "Одновременные потоки",
     "newDevice": "Новое устройство",
-    "trustScoreChanged": "Счет доверия изменен",
-    "serverDown": "Сервер выключен",
-    "serverUp": "Сервер выключен",
+    "trustScoreChanged": "Балл доверия изменён",
+    "serverDown": "Сервер недоступен",
+    "serverUp": "Сервер доступен",
     "minimumSeverity": "Минимальная Серьезность",
     "quietHours": "Тихие часы",
     "enableQuietHours": "Включить тихие часы",
