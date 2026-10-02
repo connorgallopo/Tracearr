@@ -247,7 +247,7 @@
   "mobile": {
     "title": "Mobil App",
     "pairDevice": "Par Enhed",
-    "generateToken": "Generer Par-Token",
+    "generateToken": "Generer parringstoken",
     "scanQrCode": "",
     "tokenExpires": "Token udløber i {{time}}",
     "lastSeen": "",
@@ -269,7 +269,7 @@
     "pairNewDevice": "Par Ny Enhed",
     "pairNewDeviceDesc": "Scan QR-koden med Tracearr mobil appen, eller skriv token manuelt.",
     "expiresIn": "Udløber i {{time}}",
-    "oneTimePairToken": "Engangspar Token",
+    "oneTimePairToken": "Engangsparringstoken",
     "copyToken": "Kopiér token",
     "tokenExpiryNote": "Dette token udløber om 5 minutter og kan kun bruges én gang.",
     "done": "Udført",
@@ -287,7 +287,7 @@
     "externalUrlBannerLink": "Ekstern URL",
     "externalUrlBannerSuffix": "så mobilappen kan oprette forbindelse til din server.",
     "pendingTokens_one": "",
-    "pendingTokens_other": "{{count}} afventende par tokens"
+    "pendingTokens_other": "{{count}} afventende parringstokens"
   },
   "tailscale": {
     "title": "Skræddersy VPN",
@@ -372,11 +372,11 @@
     "overwriteFriendlyNames": "Overskriv eksisterende venlige navne med Tautulli navne",
     "overwriteFriendlyNamesHelp": "Eksisterende identitetsnavne i Tracearr vil blive erstattet med de venlige navne fra Tautulli.",
     "includeStreamDetails": "Inkluder detaljerede stream data (codecs, bitrate, opløsning)",
-    "includeStreamDetailsHelp": "Import yderligere oplysninger om forsyningskilder Kan øge importtiden betydeligt.",
+    "includeStreamDetailsHelp": "Importerer flere oplysninger om streams. Kan øge importtiden betydeligt.",
     "importing": "Importerer...",
     "startImport": "",
     "howItWorks": "Sådan fungerer importen",
-    "howItWorksDesc": "Tracearr vil importere alle historiske overvågningsdata fra din kilde. Dette kan tage et stykke tid, afhængigt af størrelsen på dit bibliotek.",
+    "howItWorksDesc": "Tracearr importerer alle historiske visningsdata fra din kilde. Det kan tage et stykke tid afhængigt af størrelsen på dit bibliotek.",
     "recordsMayBeSkipped": "Registreringer kan springes over, hvis:",
     "selectTargetServer": "Vælg Målserver",
     "selectJellyfinServer": "Vælg en Jellyfin eller Emby server",
@@ -491,7 +491,7 @@
     "databaseSize": "Nuværende databasestørrelse: {{size}}",
     "freeSpace": "Sikkerhedskopiér mappefri plads: {{size}}",
     "lowDiskSpace": "Lav diskplads — sikkerhedskopier og genopretter kræver mindst to gange databasestørrelsen i ledig plads.",
-    "backupHistory": "Backup Historik",
+    "backupHistory": "Sikkerhedskopihistorik",
     "noBackups": "Ingen sikkerhedskopier endnu. Opret din første sikkerhedskopi ovenfor.",
     "version": "",
     "actions": "Handlinger",
@@ -544,15 +544,15 @@
       "tsVersionMismatch": "Backup blev oprettet med TimescaleDB {{backupVersion}} men denne server understøtter kun op til TimeDB {{serverVersion}}."
     },
     "toast": {
-      "backupCreated": "Backup oprettet",
+      "backupCreated": "Sikkerhedskopi oprettet",
       "backupCreateFailed": "Kunne ikke oprette sikkerhedskopi",
-      "backupUploaded": "Backup uploadet",
+      "backupUploaded": "Sikkerhedskopi uploadet",
       "backupUploadFailed": "Kunne ikke uploade sikkerhedskopi",
       "backupDeleted": "Sikkerhedskopi slettet",
       "backupDeleteFailed": "Kunne ikke slette sikkerhedskopi",
       "restoreStarted": "Gendannelse startet",
       "restoreStartFailed": "Kunne ikke starte gendannelse",
-      "scheduleSaved": "Backup tidsplan gemt",
+      "scheduleSaved": "Tidsplan for sikkerhedskopiering gemt",
       "scheduleError": "Kunne ikke gemme backup tidsplan"
     }
   },
