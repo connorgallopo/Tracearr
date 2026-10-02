@@ -64,6 +64,7 @@
     "stopped": "Megállítva",
     "directPlay": "Közvetlen lejátszás",
     "directStream": "Közvetlen közvetítés",
+    "audioTranscode": "",
     "transcode": "Átkódolás",
     "hwTranscode": "",
     "burnIn": "",
