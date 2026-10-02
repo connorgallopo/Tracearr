@@ -393,11 +393,7 @@
       "previewCut": "",
       "previewPriority": "",
       "previewEscapeHint": "",
-      "webhookNotSent": "",
-      "unitChars": "",
-      "unitBytes": "",
-      "addedByTracearr": "",
-      "plainTab": ""
+      "webhookNotSent": ""
     },
     "priorities": {
       "automatic": "",
@@ -2247,6 +2243,10 @@
         "hdrAll": "任何",
         "hdrOnly": "仅限HDR",
         "hdrChip": "",
+        "atmosLabel": "",
+        "atmosAll": "",
+        "atmosOnly": "",
+        "atmosChip": "",
         "genreLabel": "类型",
         "genreAll": "不限分类",
         "serverLabel": "服务器",
