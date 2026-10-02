@@ -64,6 +64,7 @@
     "stopped": "Aturat",
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió directa",
+    "audioTranscode": "",
     "transcode": "Transcodificació",
     "hwTranscode": "Transcodificació HW",
     "burnIn": "Incrustació",
