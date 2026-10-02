@@ -18,8 +18,8 @@
     "continue": "متابعة",
     "back": "الرجوع",
     "next": "التالي",
-    "acknowledge": "الاعتراف",
-    "dismiss": "تجاهل",
+    "acknowledge": "اعتراف",
+    "dismiss": "رفض",
     "terminate": "إنهاء",
     "search": "البحث",
     "sort": "فرز",
@@ -54,7 +54,7 @@
     "connecting": "جاري الاتصال...",
     "connected": "متصل",
     "saving": "حفظ...",
-    "dismissing": "الاستبعاد...",
+    "dismissing": "جارٍ الرفض...",
     "acknowledging": "اعتراف..."
   },
   "playback": {
@@ -64,7 +64,7 @@
     "stopped": "توقفت",
     "directPlay": "تشغيل مباشر",
     "directStream": "البث المباشر",
-    "transcode": "الكود",
+    "transcode": "تحويل الترميز",
     "hwTranscode": "",
     "burnIn": "",
     "watched": ""
