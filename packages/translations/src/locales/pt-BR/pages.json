@@ -1,7 +1,7 @@
 {
   "login": {
     "title": "",
-    "tagline": "Stream access management",
+    "tagline": "Tracearr - Gerenciamento de acesso a streams",
     "createAccountHeading": "",
     "signInHeading": "",
     "createAccountDescription": "",
@@ -1755,7 +1755,7 @@
       "loginEnabled": "Início de sessão ativado",
       "unlinkAccount": "Desassociar esta conta Plex",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Elimine primeiro os servidores ligados para desassociar esta conta",
+      "deleteServersFirst": "Primeiro exclua os servidores ativos conectados por esta conta ou marque-os como históricos",
       "unlinkPlexAccount": "Desassociar conta Plex",
       "unlinkConfirm": "Tem a certeza de que quer desassociar esta conta Plex? Não poderá adicionar servidores desta conta até a associar novamente.",
       "connectionsAvailable_one": "",
