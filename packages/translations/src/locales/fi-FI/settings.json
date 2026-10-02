@@ -841,32 +841,32 @@
         "privatePublicUrl": "",
         "emptyVariant": "",
         "variantsLoadFailed": "",
-        "serverSettingsLink": "",
-        "fromDomain": "",
+        "serverSettingsLink": "Avaa palvelimen asetukset",
+        "fromDomain": "Osoite vastaa SMTP-tilin verkkotunnusta.",
         "fromDomainFail": "",
         "fromDomainUnknown": "",
         "recipientsFail": "",
         "recipientsChecking": "",
         "recipientsLoadFailed": "",
         "dns": "",
-        "dnsLink": "",
+        "dnsLink": "Lue miten ne asetetaan",
         "recipients_one": "",
         "recipients_other": ""
       },
       "actions": {
-        "preview": "",
-        "test": "",
-        "send": "",
-        "more": "",
+        "preview": "Esikatselu",
+        "test": "Lähetä testi",
+        "send": "Lähetä nyt",
+        "more": "Lisää lähetysasetuksia",
         "testHint": "",
         "sendHint": ""
       },
       "preview": {
-        "variants": "",
+        "variants": "Kuka katselee",
         "variantTab": "",
-        "title": "",
-        "draft": "",
-        "subjectLabel": "",
+        "title": "Esikatselu",
+        "draft": "Tallentamattomien muutosten esikatselu",
+        "subjectLabel": "Aihe",
         "window": "",
         "windowSince": "",
         "countsListed": {
@@ -875,19 +875,19 @@
           "albums": ""
         },
         "recipients": "",
-        "width": "",
+        "width": "Leveys",
         "widths": {
-          "desktop": "",
-          "phone": ""
+          "desktop": "600 px",
+          "phone": "375 px"
         },
-        "images": "",
-        "imagesOn": "",
-        "imagesBlocked": "",
-        "imagesBlockedNote": "",
+        "images": "Kuvat",
+        "imagesOn": "Näytetään",
+        "imagesBlocked": "Estetty",
+        "imagesBlockedNote": "Monet asiakasohjelmat estävät etäkuvat kunnes lukija sallii ne.",
         "linksNote": ""
       },
       "test": {
-        "title": "",
+        "title": "Lähetä testi",
         "description": "",
         "variant": "",
         "address": "",
@@ -895,10 +895,10 @@
       },
       "send": {
         "title": "",
-        "previewing": "",
+        "previewing": "Selvittää, kuka saa mitäkin...",
         "nobody": "",
-        "confirm": "",
-        "sending": "",
+        "confirm": "Lähetä",
+        "sending": "Lähetetään",
         "summary_one": "",
         "summary_other": "",
         "trimmed_one": "",
@@ -914,26 +914,26 @@
       "previewVariant_other": ""
     },
     "history": {
-      "empty": "",
+      "empty": "Ei vielä lähetettyjä",
       "emptyDescription": "",
-      "loadFailed": "",
+      "loadFailed": "Lähetyshistoriaa ei voitu ladata.",
       "trigger": {
-        "schedule": "",
-        "manual": "",
-        "test": ""
+        "schedule": "Ajoitettu",
+        "manual": "Manuaalinen",
+        "test": "Testi"
       },
       "window": "",
       "recipientsEmpty": "",
-      "finished": "",
+      "finished": "Suoritettu {{when}}",
       "open": "",
       "page": "",
-      "sendTitle": "",
+      "sendTitle": "Lähetä",
       "status": {
-        "queued": "",
-        "sent": "",
-        "failed": "",
-        "suppressed": "",
-        "unknown": ""
+        "queued": "Jonossa",
+        "sent": "Lähetetty",
+        "failed": "Epäonnistunut",
+        "suppressed": "Rajoitettu",
+        "unknown": "Tuntematon"
       },
       "unknownHelp": "",
       "openSnapshot": "",
@@ -942,32 +942,32 @@
       "openVariantSnapshot": "",
       "snapshotTitle": "",
       "pruned": "",
-      "retryFailed": "",
+      "retryFailed": "Uudelleenyritys epäonnistui",
       "recipients_one": "",
       "recipients_other": "",
-      "attempts_one": "",
-      "attempts_other": ""
+      "attempts_one": "{{count}} yritys",
+      "attempts_other": "{{count}} yritystä"
     }
   },
   "email": {
     "ownerOnly": "",
     "branding": {
-      "title": "",
+      "title": "Brändäys",
       "description": "",
       "logo": {
-        "label": "",
-        "tracearr": "",
-        "none": "",
-        "url": ""
+        "label": "Logo",
+        "tracearr": "Tracearr",
+        "none": "Ei logoa",
+        "url": "Kuva URL-osoitteesta"
       },
-      "logoUrl": "",
-      "systemTitle": "",
+      "logoUrl": "Logon URL-osoite",
+      "systemTitle": "Järjestelmän nimi",
       "systemTitleHelp": "",
-      "accent": "",
-      "accentPicker": "",
-      "footerText": "",
+      "accent": "Korostusväri",
+      "accentPicker": "Valitse korostusväri",
+      "footerText": "Alatunnisteen teksti",
       "footerTextHelp": "",
-      "postalAddress": "",
+      "postalAddress": "Postiosoite",
       "postalAddressHelp": "",
       "mailto": "",
       "mailtoHelp": "",
@@ -979,49 +979,49 @@
       "globalNote": "",
       "empty": "",
       "emptyDescription": "",
-      "add": "",
+      "add": "Lisää osoite",
       "addTitle": "",
       "addDescription": "",
-      "address": "",
+      "address": "Sähköpostiosoite",
       "addConfirm": "",
       "reason": {
-        "unsubscribed": "",
-        "manual": ""
+        "unsubscribed": "Tilaus peruutettu",
+        "manual": "Lisätty käsin"
       },
       "openSource": "",
       "remove": "",
-      "removeTitle": "",
-      "removeDescription": ""
+      "removeTitle": "Poistetaanko tämä osoite?",
+      "removeDescription": "{{address}} vastaanottaa uutiskirjeitä uudelleen seuraavasta lähetyksestä."
     }
   },
   "shared": {
     "timezone": {
-      "placeholder": "",
-      "search": "",
-      "empty": "",
-      "other": ""
+      "placeholder": "Valitse aikavyöhyke",
+      "search": "Etsi aikavyöhykkeitä",
+      "empty": "Aikavyöhykkeen osumia ei löytynyt",
+      "other": "Muu"
     }
   },
   "requests": {
-    "label": "",
-    "link": "",
-    "unlink": "",
-    "syncNow": "",
-    "enable": "",
-    "disable": "",
-    "paused": "",
+    "label": "Pyynnöt",
+    "link": "Linkitä Seerr",
+    "unlink": "Poista linkitys",
+    "syncNow": "Synkronoi nyt",
+    "enable": "Ota synkronointi käyttöön",
+    "disable": "Poista synkronointi käytöstä",
+    "paused": "Pysäytetty",
     "menuLabel": "",
     "syncedAgo": "",
-    "neverSynced": "",
+    "neverSynced": "Ei vielä synkronoitu",
     "counts": {
-      "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
+      "requests_one": "{{count}} pyyntö",
+      "requests_other": "{{count}} pyyntöä",
+      "unmatchedMedia_one": "{{count}} sovittamaton nimike",
+      "unmatchedMedia_other": "{{count}} sovittamatonta nimikettä",
       "unmatchedUsers_one": "",
       "unmatchedUsers_other": ""
     },
-    "needsKey": "",
+    "needsKey": "Tarvitsee API-avaimen",
     "lastError": "",
     "lastErrorNoTime": "",
     "dialog": {
@@ -1029,28 +1029,28 @@
       "titleEdit": "",
       "description": "",
       "url": "",
-      "apiKey": "",
-      "apiKeyHint": "",
-      "apiKeyKeep": "",
-      "showKey": "",
-      "hideKey": "",
-      "test": "",
-      "testing": "",
-      "saveHint": "",
+      "apiKey": "API-avain",
+      "apiKeyHint": "Seerr → Asetukset → Yleiset → API-avain",
+      "apiKeyKeep": "Jätä tyhjäksi pitääksesi nykyisen avaimen",
+      "showKey": "Näytä API-avain",
+      "hideKey": "Piilota API-avain",
+      "test": "Testaa",
+      "testing": "Testataan",
+      "saveHint": "Kokeile yhteyttä ennen tallentamista",
       "match": "",
       "mismatch": "",
       "mismatchIds": "",
-      "mismatchOther": ""
+      "mismatchOther": "Se täsmää {{other}} kanssa."
     },
     "confirmUnlink": {
-      "title": "",
+      "title": "Poista Seerr-linkitys?",
       "body": ""
     },
     "toast": {
-      "saved": "",
-      "removed": "",
-      "syncStarted": "",
-      "failed": ""
+      "saved": "Pyyntöpalvelu tallennettu",
+      "removed": "Pyyntöpalvelu poistettu",
+      "syncStarted": "Synkronointi käynnistetty",
+      "failed": "Pyyntöpalvelutoiminto epäonnistui: {{error}}"
     }
   }
 }
