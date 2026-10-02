@@ -1755,7 +1755,7 @@
       "loginEnabled": "Innlogging aktivert",
       "unlinkAccount": "Frakoble denne Plex kontoen",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Slett tilkoblede servere først for å fjerne denne kontoen",
+      "deleteServersFirst": "Slett først de aktive serverne som er koblet til via denne kontoen, eller merk dem som historiske",
       "unlinkPlexAccount": "Koble fra Plex konto",
       "unlinkConfirm": "Er du sikker på at du vil koble fra denne Plex kontoen? Du kan ikke legge til servere fra denne kontoen frem til du kobler den til igjen.",
       "connectionsAvailable_one": "",
