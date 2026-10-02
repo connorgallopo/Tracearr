@@ -1755,7 +1755,7 @@
       "loginEnabled": "Inloggning aktiverad",
       "unlinkAccount": "Avlänka detta Plex-konto",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Ta bort anslutna servrar först för att avlänka detta konto",
+      "deleteServersFirst": "Ta först bort de aktiva servrarna som är anslutna via det här kontot, eller markera dem som historiska",
       "unlinkPlexAccount": "Avlänka Plex-konto",
       "unlinkConfirm": "Är du säker på att du vill avlänka detta Plex-konto? Du kommer inte att kunna lägga till servrar från detta konto förrän du länkar det igen.",
       "connectionsAvailable_one": "",
