@@ -1799,7 +1799,7 @@
       "loginEnabled": "Přihlášení povoleno",
       "unlinkAccount": "Odpojit tento Plex účet",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Odstranit připojené servery jako první pro odpojení tohoto účtu",
+      "deleteServersFirst": "Nejprve odstraňte aktivní servery připojené přes tento účet, nebo je označte jako historické",
       "unlinkPlexAccount": "Odpojit Plex účet",
       "unlinkConfirm": "Opravdu chcete odpojit tento Plex účet? Nebudete moci přidat servery z tohoto účtu dokud jej znovu nepropojíte.",
       "connectionsAvailable_one": "",
