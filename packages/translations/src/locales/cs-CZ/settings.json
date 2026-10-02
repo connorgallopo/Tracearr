@@ -249,17 +249,17 @@
   "mobile": {
     "title": "Mobilní aplikace",
     "pairDevice": "Párovat zařízení",
-    "generateToken": "Generovat token páru",
+    "generateToken": "Vygenerovat párovací token",
     "scanQrCode": "",
     "tokenExpires": "Token vyprší v {{time}}",
     "lastSeen": "",
     "connectedOn": "",
-    "noDevices": "Není připojeno žádné zařízení",
+    "noDevices": "Zatím není spárováno žádné zařízení",
     "noDevicesDesc": "",
     "revokeAll": "Zrušit všechny relace",
     "getOnGooglePlay": "Získat na Google Play",
     "downloadOnAppStore": "Stáhnout v App Store",
-    "externalUrlRequired": "Externí URL musí být nakonfigurována v Obecném nastavení pro mobilní párování do práce.",
+    "externalUrlRequired": "Aby mobilní párování fungovalo, musí být v obecném nastavení nakonfigurována externí URL.",
     "mobileAccessDisabled": "Mobilní přístup zakázán",
     "mobileAccessDisabledDesc": "Povolte mobilní přístup, aby se aplikace Tracearr mohla připojit k vašemu serveru.",
     "enableMobileAccess": "Povolit mobilní přístup",
@@ -271,7 +271,7 @@
     "pairNewDevice": "Párovat nové zařízení",
     "pairNewDeviceDesc": "Naskenujte QR kód pomocí mobilní aplikace Tracearr nebo zadejte token ručně.",
     "expiresIn": "Vyprší za {{time}}",
-    "oneTimePairToken": "Jednorázový párový token",
+    "oneTimePairToken": "Jednorázový párovací token",
     "copyToken": "Kopírovat token",
     "tokenExpiryNote": "Tento token vyprší za 5 minut a může být použit pouze jednou.",
     "done": "Hotovo",
@@ -291,7 +291,7 @@
     "pendingTokens_one": "",
     "pendingTokens_few": "",
     "pendingTokens_many": "",
-    "pendingTokens_other": "{{count}} čekající párové tokeny"
+    "pendingTokens_other": "{{count}} čekajících párovacích tokenů"
   },
   "tailscale": {
     "title": "Měřítko VPN",
@@ -359,7 +359,7 @@
   "accessControl": {
     "allowGuestAccess": "Povolit přístup k hostům",
     "allowGuestAccessDesc": "Pokud je zakázáno, do Tracearr se může přihlásit pouze vlastník serveru",
-    "singleOwnerNote": "Poznámka: Pokud je přístup hosta zakázán, může se přihlásit pouze majitel serveru. Všichni ostatní uživatelé uvidí zprávu \"Přístup odepřen\"."
+    "singleOwnerNote": "Poznámka: Pokud je přístup hosta zakázán, může se přihlásit pouze vlastník serveru. Všichni ostatní uživatelé uvidí zprávu \"Přístup odepřen\"."
   },
   "import": {
     "noServers": "Nejsou připojeny žádné servery",
@@ -376,7 +376,7 @@
     "overwriteFriendlyNames": "Přepsat existující přívětivé názvy s názvy Tautulli",
     "overwriteFriendlyNamesHelp": "Stávající jména identity v Tracearr budou nahrazena přátelskými názvy z Tautulli.",
     "includeStreamDetails": "Zahrnout podrobné streamové údaje (kodeky, bitrate, rozlišení)",
-    "includeStreamDetailsHelp": "Další informace o dovozu. Může výrazně zvýšit dobu dovozu.",
+    "includeStreamDetailsHelp": "Importuje další informace o streamu. Může výrazně prodloužit dobu importu.",
     "importing": "Importování...",
     "startImport": "Spustit import",
     "howItWorks": "Jak funguje import",
@@ -390,7 +390,7 @@
     "importOptions": "Možnosti importu",
     "enrichMetadata": "Přidělit mediální metadata (doporučeno)",
     "enrichMetadataHelp": "Načte další metadata z vašeho mediálního serveru pro importované relace.",
-    "updateExistingRecords": "Aktualizovat existující záznamy o datech vysílání",
+    "updateExistingRecords": "Aktualizovat existující záznamy podrobnostmi o streamu",
     "updateExistingRecordsHelp": "Dříve importované záznamy budou aktualizovány pomocí údajů o kvalitě streamu.",
     "pleaseEnterDetails": "Zadejte prosím URL adresu Tautulli a API klíč",
     "testingConnection": "Testování připojení...",
