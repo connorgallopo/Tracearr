@@ -18,8 +18,8 @@
     "continue": "Continua",
     "back": "Indietro",
     "next": "Avanti",
-    "acknowledge": "Conferma",
-    "dismiss": "Annulla",
+    "acknowledge": "Riconosci",
+    "dismiss": "Ignora",
     "terminate": "Termina",
     "search": "Cerca",
     "sort": "Ordina",
@@ -54,7 +54,7 @@
     "connecting": "Connessione...",
     "connected": "Connesso",
     "saving": "Salvataggio...",
-    "dismissing": "Annullamento...",
+    "dismissing": "Ignorando...",
     "acknowledging": "Riconoscimento..."
   },
   "playback": {
@@ -127,7 +127,7 @@
     "type": "Tipo",
     "reason": "Motivo",
     "filters": "Filtri",
-    "trustScore": "Punteggio Fiducia",
+    "trustScore": "Punteggio Di Fiducia",
     "lastActivity": "Ultima Attività",
     "serverOwner": "Proprietario del Server",
     "resolution": "Risoluzione",
