@@ -60,6 +60,7 @@
   "playback": {
     "playing": "تشغيل",
     "paused": "متوقف",
+    "buffering": "",
     "stopped": "توقفت",
     "directPlay": "تشغيل مباشر",
     "directStream": "البث المباشر",
