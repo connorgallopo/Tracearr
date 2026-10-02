@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Відтворюється",
     "paused": "Призупинено",
+    "buffering": "",
     "stopped": "Зупинено",
     "directPlay": "Пряме відтворення",
     "directStream": "Прямий потік",
