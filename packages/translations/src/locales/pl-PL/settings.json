@@ -482,7 +482,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} jest nieosiągalny",
-    "tokenRejected": "",
+    "tokenRejected": "{{serverName}} odrzucił token Tracearra",
     "multipleUnreachable_one": "{{count}} serwer nieosiągalny: {{serverNames}}",
     "multipleUnreachable_few": "{{count}} serwery nieosiągalne: {{serverNames}}",
     "multipleUnreachable_many": "{{count}} serwerów nieosiągalnych: {{serverNames}}",
