@@ -117,8 +117,8 @@
       "violationsDismissed": {
         "title": "Naruszenia odrzucono",
         "message_one": "{{count}} naruszenie odrzucono",
-        "message_few": "{{count}} naruszenia odrzucono",
-        "message_many": "{{count}} naruszeń odrzuconych",
+        "message_few": "Odrzucono {{count}} naruszenia",
+        "message_many": "Odrzucono {{count}} naruszeń",
         "message_other": "{{count}} naruszenia odrzucono"
       },
       "apiKeyGenerated": {
