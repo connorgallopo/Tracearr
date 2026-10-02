@@ -17,7 +17,7 @@
   "errors": {
     "invalidUrl": "Неверный URL",
     "pleaseEnterValidUrl": "Пожалуйста, введите действительный URL сервера",
-    "pairingFailed": "Не удалось связать",
+    "pairingFailed": "Сопряжение не удалось",
     "unableToPair": "",
     "invalidQrCode": "",
     "invalidQrCodeMissingData": "Неверный QR-код: отсутствуют данные сопряжения",
@@ -178,7 +178,7 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "Воспроизведения с течением времени",
+    "playsOverTime": "Просмотры с течением времени",
     "concurrentStreams": "Одновременные потоки",
     "platforms": "Платформы",
     "playbackQuality": ""
