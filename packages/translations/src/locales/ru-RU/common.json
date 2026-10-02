@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Играет",
     "paused": "Пауза",
+    "buffering": "",
     "stopped": "Остановлено",
     "directPlay": "Прямая игра",
     "directStream": "Прямой поток",
