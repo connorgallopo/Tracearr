@@ -855,14 +855,14 @@
       },
       "triggers": {
         "sessionStarted": "스트림이 시작된다",
-        "sessionFirstSeen": "트랜스코딩 시작 또는 중지",
+        "sessionFirstSeen": "스트림이 처음 감지됨",
         "sessionStopped": "스트림이 중지됨",
         "sessionTranscodeChanged": "트랜스코딩 시작 또는 중지",
         "sessionPaused": "스트림이 일시중지되었습니다.",
-        "sessionHeldFor": "스트림이 총 {{duration}} 동안 일시중지되었습니다.",
-        "sessionHeldForTotal": "계정이 새 기기에서 재생됩니다.",
+        "sessionHeldFor": "스트림이 {{duration}} 동안 일시중지됨",
+        "sessionHeldForTotal": "스트림이 총 {{duration}} 동안 일시중지됨",
         "accountInactiveFor": "계정이 {{duration}} 동안 비활성화되었습니다",
-        "accountNewDevice": "계정의 신뢰 점수가 변경됩니다.",
+        "accountNewDevice": "계정이 새 기기에서 재생함",
         "accountTrustChanged": "계정의 신뢰 점수가 변경됩니다.",
         "mediaAdded": "미디어가 추가되었습니다",
         "mediaUpgraded": "미디어가 업그레이드되었습니다",
@@ -870,7 +870,7 @@
         "serverUp": "서버가 다시 온라인이 됨",
         "pluginUpdateAvailable": "플러그인 업데이트가 가능합니다",
         "serverUpdateAvailable": "서버 업데이트가 가능합니다",
-        "tracearrUpdateAvailable": "같지 않음",
+        "tracearrUpdateAvailable": "Tracearr 업데이트가 가능합니다",
         "newsletterSent": "뉴스레터가 발송될 때",
         "newsletterFailed": "뉴스레터 발송이 실패할 때"
       },
@@ -1234,7 +1234,7 @@
       "description": "코드를 붙여넣으세요. 모든 것이 코드에 있습니다. Tracearr는 아무것도 가져오지 않습니다.",
       "reviewDescription": "tracearr1.…",
       "placeholder": "tracearr1.…",
-      "formatHint": "코드는 Tracearr1로 시작됩니다.",
+      "formatHint": "코드는 tracearr1로 시작합니다.",
       "check": "코드 확인",
       "checking": "읽는 중…",
       "valid": "Tracearr는 이 코드를 읽을 수 있습니다.",
@@ -1256,7 +1256,7 @@
       "raw": "JSON 표시",
       "errors": {
         "notACode": "Tracearr 공유 코드처럼 보이지 않습니다.",
-        "notACodeHint": "코드는 Tracearr1로 시작됩니다. JSON도 작동합니다.",
+        "notACodeHint": "코드는 tracearr1로 시작합니다. JSON도 사용할 수 있습니다.",
         "tooBig": "Tracearr 자동화라고 하기에는 너무 큽니다.",
         "tooBigHint": "코드는 최대 수천 자입니다.",
         "truncated": "이 코드는 잘린 것 같습니다.",
@@ -1539,7 +1539,7 @@
       "tracearr-update": {
         "name": "Tracearr 업데이트",
         "description": "새 Tracearr 릴리스가 나오면 알림 대상에 알립니다.",
-        "keywords": "업데이트 업그레이드 버전 릴리스 추적 알림 불일치 이메일 웹훅 알림"
+        "keywords": "업데이트 업그레이드 버전 릴리스 tracearr 알림 discord 이메일 웹훅"
       },
       "transcode-started": {
         "name": "스트림에서 비디오 또는 오디오 트랜스코딩이 시작되면 알림 대상에 알립니다.",
@@ -1733,7 +1733,7 @@
       "loginEnabled": "로그인 활성화됨",
       "unlinkAccount": "이 Plex 계정 연결 해제",
       "reauthorizeAccount": "이 Plex 계정 다시 인증",
-      "deleteServersFirst": "이 계정 연결을 해제하려면 먼저 연결된 서버를 삭제하세요",
+      "deleteServersFirst": "먼저 이 계정으로 연결된 활성 서버를 삭제하거나 기록 보관으로 표시하세요",
       "unlinkPlexAccount": "Plex 계정 연결 해제",
       "unlinkConfirm": "이 Plex 계정 연결을 해제할까요? 다시 연결하기 전까지 이 계정에서 서버를 추가할 수 없습니다.",
       "connectionsAvailable_other": "사용 가능한 연결 {{count}}개",
