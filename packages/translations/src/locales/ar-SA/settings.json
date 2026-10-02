@@ -492,6 +492,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} غير قابل للوصول",
+    "tokenRejected": "",
     "multipleUnreachable_zero": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_two": "",
