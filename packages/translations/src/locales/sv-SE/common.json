@@ -64,6 +64,7 @@
     "stopped": "Stoppad",
     "directPlay": "Direktuppspelning",
     "directStream": "Direktströmning",
+    "audioTranscode": "",
     "transcode": "Omkodning",
     "hwTranscode": "",
     "burnIn": "",
