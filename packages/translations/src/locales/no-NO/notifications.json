@@ -25,8 +25,8 @@
         "message": "Dine lagret innstillinger har blitt"
       },
       "violationAcknowledged": {
-        "title": "Brudd Anerkjent",
-        "message": "Anbruddet er markert som anerkjent"
+        "title": "Brudd bekreftet",
+        "message": "Bruddet er markert som bekreftet"
       },
       "violationDismissed": {
         "title": "Brudd Avvist",
@@ -104,14 +104,14 @@
         "message_other": "{{count}} økter slettet"
       },
       "violationsAcknowledged": {
-        "title": "Brudd Anvist",
-        "message_one": "{{count}} brudd godkjent",
-        "message_other": "{{count}} krenkelser godkjent"
+        "title": "Brudd bekreftet",
+        "message_one": "{{count}} brudd bekreftet",
+        "message_other": "{{count}} brudd bekreftet"
       },
       "violationsDismissed": {
         "title": "Brudd avvist",
         "message_one": "{{count}} brudd avvist",
-        "message_other": "{{count}} krenkelser avvist"
+        "message_other": "{{count}} brudd avvist"
       },
       "apiKeyGenerated": {
         "title": "API-nøkkel generert",
@@ -126,12 +126,12 @@
         "message": "Alle mobiløkter har blitt trukket tilbake"
       },
       "pairTokenGenerated": {
-        "title": "Par Token generert",
+        "title": "Sammenkoblingstoken generert",
         "message": "Skann QR-koden med din mobile enhet for å pare"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Stol på resultater tilbakestilt",
+        "title": "Tillitsscorer tilbakestilt",
         "message_one": "{{count}} bruker tilbakestiller til 100",
         "message_other": "{{count}} brukere tilbakestiller til 100"
       },
@@ -170,7 +170,7 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
       "copyFailed": "Kunne ikke kopiere til utklippstavlen",
-      "acknowledgeFailed": "Mislyktes i å anerkjenne brudd",
+      "acknowledgeFailed": "Kunne ikke bekrefte brudd",
       "dismissFailed": "Kunne ikke avvise brudd",
       "authFailed": "Godkjenning mislyktes",
       "automationCreateFailed": "",
@@ -185,12 +185,12 @@
       "apiKeyGenerateFailed": "Kunne ikke generere API-nøkkel",
       "mobileAccessEnableFailed": "Kunne ikke aktivere mobiltilgang",
       "mobileAccessDisableFailed": "Kunne ikke deaktivere mobiltilgang",
-      "pairTokenGenerateFailed": "Kunne ikke generere par token",
+      "pairTokenGenerateFailed": "Kunne ikke generere sammenkoblingstoken",
       "deviceRemoveFailed": "Kan ikke fjerne enheten",
       "deviceRenameFailed": "Kunne ikke gi enheten nytt navn",
       "sessionsRevokeFailed": "Kan ikke tilbakekalle økter",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "Kan ikke tilbakestille tillit poengsum",
+      "trustScoresResetFailed": "Kunne ikke tilbakestille tillitsscorer",
       "plexUnlinkFailed": "Klarte ikke koble fra Plex konto",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Jobb kjører allerede",
@@ -234,8 +234,8 @@
         "message": "Tracearr {{version}} er tilgjengelig"
       },
       "violationDetected": {
-        "title": "Ny Bruk: {{ruleName}}",
-        "message": "{{user}} har aktivert {{ruleType}}"
+        "title": "Nytt brudd: {{ruleName}}",
+        "message": "{{user}} utløste {{ruleType}}"
       }
     }
   },
@@ -253,7 +253,7 @@
     "streamStopped": "Strøm stoppet",
     "concurrentStreams": "Samtidige strømmer",
     "newDevice": "Ny enhet",
-    "trustScoreChanged": "Tillit score endret",
+    "trustScoreChanged": "Tillitsscore endret",
     "serverDown": "Server ned",
     "serverUp": "Server opp",
     "minimumSeverity": "Minimum Alvorlighetsgrad",
