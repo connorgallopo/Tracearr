@@ -901,6 +901,7 @@
         "source_video_codec": "원본 비디오 코덱",
         "is_transcoding": "트랜스코딩",
         "is_transcode_downgrade": "다운그레이드",
+        "is_subtitle_burn_in": "",
         "source_bitrate_mbps": "소스 비트레이트",
         "user_id": "사용자",
         "trust_score": "신뢰 점수",
@@ -931,6 +932,10 @@
         "is_transcode_downgrade": {
           "yes": "스트림이 다운그레이드되었습니다",
           "no": "스트림이 오디오를 트랜스코딩하고 있습니다."
+        },
+        "is_subtitle_burn_in": {
+          "yes": "",
+          "no": ""
         },
         "is_transcoding": {
           "video": {
@@ -1101,6 +1106,10 @@
       "is_transcode_downgrade": {
         "label": "트랜스코드 다운그레이드",
         "description": "출력 해상도가 소스보다 낮습니다."
+      },
+      "is_subtitle_burn_in": {
+        "label": "",
+        "description": ""
       },
       "source_bitrate_mbps": {
         "label": "소스 비트레이트",
