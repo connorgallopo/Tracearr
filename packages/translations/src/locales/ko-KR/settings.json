@@ -467,6 +467,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}}에 연결할 수 없습니다",
+    "tokenRejected": "",
     "multipleUnreachable_other": "{{count}}개 서버에 연결할 수 없습니다: {{serverNames}}"
   },
   "ipWarning": {
