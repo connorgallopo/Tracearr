@@ -25,8 +25,8 @@
         "message": "Dina inställningar har sparats"
       },
       "violationAcknowledged": {
-        "title": "Brott erkänt",
-        "message": "Brott har markerats som erkänt"
+        "title": "Överträdelse bekräftad",
+        "message": "Överträdelsen har markerats som bekräftad"
       },
       "violationDismissed": {
         "title": "Överträdelse avfärdad",
@@ -79,7 +79,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "Strömmen upphörde",
+        "title": "Strömmen avslutad",
         "message": "Uppspelningssessionen har stoppats"
       },
       "serverUrlUpdated": {
@@ -105,12 +105,12 @@
       },
       "violationsAcknowledged": {
         "title": "Överträdelser erkända",
-        "message_one": "{{count}} kränkning bekräftad",
-        "message_other": "{{count}} kränkningar erkända"
+        "message_one": "{{count}} överträdelse bekräftad",
+        "message_other": "{{count}} överträdelser bekräftade"
       },
       "violationsDismissed": {
         "title": "Överträdelser avfärdade",
-        "message_one": "{{count}} kränkning avfärdad",
+        "message_one": "{{count}} överträdelse avfärdad",
         "message_other": "{{count}} avfärdade överträdelser"
       },
       "apiKeyGenerated": {
@@ -126,12 +126,12 @@
         "message": "Alla mobila sessioner har återkallats"
       },
       "pairTokenGenerated": {
-        "title": "Par-token genererad",
+        "title": "Parkopplingstoken genererad",
         "message": "Skanna QR-koden med din mobila enhet för att koppla"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Lita på poäng Återställ",
+        "title": "Förtroendepoäng återställda",
         "message_one": "{{count}} användaråterställning till 100",
         "message_other": "{{count}} användare återställs till 100"
       },
@@ -170,8 +170,8 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
       "copyFailed": "Kunde inte kopiera till urklipp",
-      "acknowledgeFailed": "Misslyckades att erkänna brott",
-      "dismissFailed": "Misslyckades att avfärda brott",
+      "acknowledgeFailed": "Det gick inte att bekräfta överträdelsen",
+      "dismissFailed": "Det gick inte att avfärda överträdelsen",
       "authFailed": "Autentisering misslyckades",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
@@ -185,12 +185,12 @@
       "apiKeyGenerateFailed": "Det gick inte att generera API-nyckel",
       "mobileAccessEnableFailed": "Det gick inte att aktivera mobilåtkomst",
       "mobileAccessDisableFailed": "Det gick inte att inaktivera mobilåtkomst",
-      "pairTokenGenerateFailed": "Det gick inte att generera partoken",
+      "pairTokenGenerateFailed": "Det gick inte att generera parkopplingstoken",
       "deviceRemoveFailed": "Det gick inte att ta bort enheten",
       "deviceRenameFailed": "Det gick inte att byta namn på enheten",
       "sessionsRevokeFailed": "Det gick inte att återkalla sessioner",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "Det gick inte att återställa trust-poäng",
+      "trustScoresResetFailed": "Det gick inte att återställa förtroendepoäng",
       "plexUnlinkFailed": "Det gick inte att koppla bort Plex-kontot",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Jobbet körs redan",
@@ -242,7 +242,7 @@
   "settings": {
     "allSeverity": "Alla (låg, varning, hög)",
     "warningAndHigh": "Varning & Hög endast",
-    "highOnly": "Endast hög svårighetsgrad",
+    "highOnly": "Endast hög allvarlighetsgrad",
     "rateLimit": "Nuvarande hastighetsgräns status",
     "perMinute": "Per minut",
     "perHour": "Per timme",
@@ -250,13 +250,13 @@
     "notificationEvents": "Aviseringshändelser",
     "violationDetected": "Överträdelse upptäckt",
     "streamStarted": "Strömmen startad",
-    "streamStopped": "Stream stoppad",
+    "streamStopped": "Strömmen stoppad",
     "concurrentStreams": "Samtidiga strömmar",
     "newDevice": "Ny enhet",
-    "trustScoreChanged": "Tillit Poäng Ändrad",
+    "trustScoreChanged": "Förtroendepoäng ändrad",
     "serverDown": "Servern ner",
     "serverUp": "Servern upp",
-    "minimumSeverity": "Minsta svårighetsgrad",
+    "minimumSeverity": "Lägsta allvarlighetsgrad",
     "quietHours": "Tysta timmar",
     "enableQuietHours": "Aktivera tysta timmar",
     "overrideForCritical": "Åsidosätt för kritisk",
