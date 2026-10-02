@@ -54,7 +54,7 @@
     "connecting": "A ligar...",
     "connected": "Ligado",
     "saving": "A guardar...",
-    "dismissing": "A descartar...",
+    "dismissing": "Descartando...",
     "acknowledging": ""
   },
   "playback": {
@@ -104,7 +104,7 @@
   },
   "labels": {
     "date": "Data",
-    "user": "Utilizador",
+    "user": "Usuário",
     "content": "Conteúdo",
     "platform": "Plataforma",
     "location": "Localização",
@@ -204,8 +204,8 @@
     "connectionFailed": ""
   },
   "count": {
-    "user_one": "{{count}} utilizador",
-    "user_other": "{{count}} utilizadores",
+    "user_one": "{{count}} usuário",
+    "user_other": "{{count}} usuários",
     "session_one": "{{count}} sessão",
     "session_other": "{{count}} sessões",
     "stream_one": "{{count}} transmissão",
@@ -216,10 +216,10 @@
     "automation_other": "",
     "violation_one": "{{count}} violação",
     "violation_other": "{{count}} violações",
-    "usersAdded_one": "{{count}} utilizador adicionado",
-    "usersAdded_other": "{{count}} utilizadores adicionados",
-    "usersUpdated_one": "{{count}} utilizador atualizado",
-    "usersUpdated_other": "{{count}} utilizadores atualizados",
+    "usersAdded_one": "{{count}} usuário adicionado",
+    "usersAdded_other": "{{count}} usuários adicionados",
+    "usersUpdated_one": "{{count}} usuário atualizado",
+    "usersUpdated_other": "{{count}} usuários atualizados",
     "library_one": "{{count}} biblioteca",
     "library_other": "{{count}} bibliotecas",
     "error_one": "{{count}} erro",
