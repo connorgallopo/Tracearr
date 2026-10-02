@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Lecture en cours",
     "paused": "En pause",
+    "buffering": "",
     "stopped": "Arrêté",
     "directPlay": "Lecture directe",
     "directStream": "Flux direct",
