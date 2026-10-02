@@ -477,6 +477,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} este inaccesibil",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_few": "",
     "multipleUnreachable_other": "{{count}} servere inaccesibile: {{serverNames}}"
