@@ -26,7 +26,7 @@
       },
       "violationAcknowledged": {
         "title": "Порушення підтверджено",
-        "message": "Порушення було позначено як визнане"
+        "message": "Порушення позначено як підтверджене"
       },
       "violationDismissed": {
         "title": "Порушення відхилено",
@@ -81,7 +81,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "Потік припинено",
+        "title": "Потік завершено",
         "message": "Сеанс відтворення зупинено"
       },
       "serverUrlUpdated": {
@@ -134,12 +134,12 @@
         "message": "Усі мобільні сеанси були відкликані"
       },
       "pairTokenGenerated": {
-        "title": "Згенерований парний токен",
+        "title": "Токен парування згенеровано",
         "message": "Відскануйте QR-код мобільним пристроєм для підключення"
       },
       "identityUpdated": "Профіль оновлено",
       "trustScoresReset": {
-        "title": "Довіряти кільця скинуті",
+        "title": "Рейтинги довіри скинуто",
         "message_one": "Користувача {{count}} скинуто до 100",
         "message_few": "",
         "message_many": "",
@@ -197,13 +197,13 @@
       "apiKeyGenerateFailed": "Не вдалося згенерувати ключ API",
       "mobileAccessEnableFailed": "Не вдалося увімкнути доступ до мобільного зв'язку",
       "mobileAccessDisableFailed": "Не вдалося вимкнути доступ до мережі",
-      "pairTokenGenerateFailed": "Не вдалося створити токен пари",
+      "pairTokenGenerateFailed": "Не вдалося згенерувати токен парування",
       "deviceRemoveFailed": "Не вдалося видалити пристрій",
       "deviceRenameFailed": "Не вдалося перейменувати пристрій",
       "sessionsRevokeFailed": "Не вдалося скасувати сеанси",
       "identityUpdateFailed": "",
       "trustScoresResetFailed": "Не вдалося скинути рейтинг довіри",
-      "plexUnlinkFailed": "Не вдалося від'єднати акаунт Plex",
+      "plexUnlinkFailed": "Не вдалося від'єднати обліковий запис Plex",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Завдання вже виконується",
       "jobStartFailed": "Не вдалося розпочати роботу",
@@ -252,7 +252,7 @@
     }
   },
   "settings": {
-    "allSeverity": "Усі (за замовчуванням, попередження, висока)",
+    "allSeverity": "Усі (низька, попередження, висока)",
     "warningAndHigh": "Попередження і високі",
     "highOnly": "Лише високий рівень",
     "rateLimit": "Статус поточного ліміту частот",
@@ -261,9 +261,9 @@
     "enablePushNotifications": "Увімкнути push-сповіщення",
     "notificationEvents": "Події повідомлень",
     "violationDetected": "Виявлено порушення",
-    "streamStarted": "Трансляцію розпочато",
-    "streamStopped": "Трансляцію зупинено",
-    "concurrentStreams": "Конактуальні потоки",
+    "streamStarted": "Потік розпочато",
+    "streamStopped": "Потік зупинено",
+    "concurrentStreams": "Одночасні потоки",
     "newDevice": "Новий пристрій",
     "trustScoreChanged": "Змінено рейтинг довіри",
     "serverDown": "Сервер недоступний",
