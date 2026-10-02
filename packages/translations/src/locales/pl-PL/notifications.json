@@ -63,7 +63,7 @@
         "message_one": "{{count}} serwer połączony ponownie",
         "message_few": "{{count}} serwery połączone ponownie",
         "message_many": "{{count}} serwerów połączonych ponownie",
-        "message_other": "{{count}} serwery połączone ponownie"
+        "message_other": "{{count}} serwerów połączonych ponownie"
       },
       "jobCompleted": {
         "title": "Zadanie zakończone"
@@ -105,14 +105,14 @@
         "message_one": "{{count}} sesja usunięta",
         "message_few": "{{count}} sesje usunięte",
         "message_many": "{{count}} sesji usuniętych",
-        "message_other": "{{count}} sesje usunięta"
+        "message_other": "{{count}} sesji usuniętych"
       },
       "violationsAcknowledged": {
         "title": "Naruszenia potwierdzone",
         "message_one": "{{count}} naruszenie potwierdzone",
         "message_few": "{{count}} naruszenia potwierdzone",
         "message_many": "{{count}} naruszeń potwierdzonych",
-        "message_other": "{{count}} naruszenia potwierdzone"
+        "message_other": "{{count}} naruszeń potwierdzonych"
       },
       "violationsDismissed": {
         "title": "Naruszenia odrzucono",
@@ -143,7 +143,7 @@
         "message_one": "{{count}} użytkownik zresetowany do 100",
         "message_few": "{{count}} użytkownicy zresetowani do 100",
         "message_many": "{{count}} użytkowników zresetowanych do 100",
-        "message_other": "{{count}} użytkownicy zresetowani do 100"
+        "message_other": "{{count}} użytkowników zresetowanych do 100"
       },
       "claimCodeValidated": {
         "title": "Kod został poprawnie zweryfikowany",
