@@ -920,6 +920,7 @@
         "source_video_codec": "",
         "is_transcoding": "le transcodage",
         "is_transcode_downgrade": "le downgrade",
+        "is_subtitle_burn_in": "",
         "source_bitrate_mbps": "le débit source",
         "user_id": "l'utilisateur",
         "trust_score": "le score de confiance",
@@ -950,6 +951,10 @@
         "is_transcode_downgrade": {
           "yes": "le flux est rétrogradé",
           "no": "le flux n'est pas rétrogradé"
+        },
+        "is_subtitle_burn_in": {
+          "yes": "",
+          "no": ""
         },
         "is_transcoding": {
           "video": {
@@ -1120,6 +1125,10 @@
         "description": ""
       },
       "is_transcode_downgrade": {
+        "label": "",
+        "description": ""
+      },
+      "is_subtitle_burn_in": {
         "label": "",
         "description": ""
       },
