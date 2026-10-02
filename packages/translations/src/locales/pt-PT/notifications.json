@@ -29,8 +29,8 @@
         "message": "A violação foi marcada como reconhecida"
       },
       "violationDismissed": {
-        "title": "Violação dispensada",
-        "message": "A violação foi dispensada"
+        "title": "Violação descartada",
+        "message": "A violação foi descartada"
       },
       "deviceRemoved": {
         "title": "Dispositivo removido",
@@ -99,19 +99,19 @@
         "title": "Sincronização concluída com erros"
       },
       "sessionsDeleted": {
-        "title": "Sessões Excluídas",
-        "message_one": "Sessão {{count}} excluída",
-        "message_other": "{{count}} sessões excluídas"
+        "title": "Sessões eliminadas",
+        "message_one": "{{count}} sessão eliminada",
+        "message_other": "{{count}} sessões eliminadas"
       },
       "violationsAcknowledged": {
-        "title": "Violações Conhecidas",
-        "message_one": "Violação {{count}} reconhecida",
-        "message_other": "Violações {{count}} reconhecidas"
+        "title": "Violações reconhecidas",
+        "message_one": "{{count}} violação reconhecida",
+        "message_other": "{{count}} violações reconhecidas"
       },
       "violationsDismissed": {
-        "title": "Violações dispensadas",
-        "message_one": "Violação {{count}} dispensada",
-        "message_other": "Violações {{count}} dispensadas"
+        "title": "Violações descartadas",
+        "message_one": "{{count}} violação descartada",
+        "message_other": "{{count}} violações descartadas"
       },
       "apiKeyGenerated": {
         "title": "Chave de API Gerada",
@@ -126,14 +126,14 @@
         "message": "Todas as sessões móveis foram revogadas"
       },
       "pairTokenGenerated": {
-        "title": "Símbolo gerado em dupla",
-        "message": "Digitalize o código QR com o seu dispositivo móvel para parear"
+        "title": "Token de emparelhamento gerado",
+        "message": "Leia o código QR com o seu dispositivo móvel para emparelhar"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Pontos de confiança redefinidos",
-        "message_one": "Usuário {{count}} redefinido para 100",
-        "message_other": "Usuários {{count}} redefinidos para 100"
+        "title": "Pontuações de confiança repostas",
+        "message_one": "{{count}} utilizador reposto para 100",
+        "message_other": "{{count}} utilizadores repostos para 100"
       },
       "claimCodeValidated": {
         "title": "Recuperar código validado",
@@ -176,16 +176,16 @@
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
       "automationDeleteFailed": "",
-      "streamTerminateFailed": "Falha ao encerrar transmissão",
+      "streamTerminateFailed": "Falha ao terminar a transmissão",
       "serverUrlUpdateFailed": "Falha ao atualizar URL do servidor",
       "serverUpdateFailed": "Falha ao atualizar servidor",
       "serverLocationSaveFailed": "",
       "serverReorderFailed": "Falha ao reordenar servidores",
-      "sessionsDeleteFailed": "Falha ao excluir sessões",
+      "sessionsDeleteFailed": "Falha ao eliminar sessões",
       "apiKeyGenerateFailed": "Falha ao gerar chave de API",
       "mobileAccessEnableFailed": "Falha ao habilitar o acesso móvel",
       "mobileAccessDisableFailed": "Falha ao desativar o acesso móvel",
-      "pairTokenGenerateFailed": "Falha ao gerar token de par",
+      "pairTokenGenerateFailed": "Falha ao gerar token de emparelhamento",
       "deviceRemoveFailed": "Falha ao remover o dispositivo",
       "deviceRenameFailed": "Falha ao renomear dispositivo",
       "sessionsRevokeFailed": "Falha ao revogar sessões",
@@ -251,12 +251,12 @@
     "violationDetected": "Violação detectada",
     "streamStarted": "Transmissão Iniciada",
     "streamStopped": "Transmissão interrompida",
-    "concurrentStreams": "Fluxos simultâneos",
+    "concurrentStreams": "Transmissões simultâneas",
     "newDevice": "Novo Dispositivo",
     "trustScoreChanged": "Pontuação de confiança alterada",
-    "serverDown": "Servidor Abaixo",
-    "serverUp": "Servidor Up",
-    "minimumSeverity": "Gravidade Mínima",
+    "serverDown": "Servidor indisponível",
+    "serverUp": "Servidor disponível",
+    "minimumSeverity": "Severidade mínima",
     "quietHours": "Horas de tranquilidade",
     "enableQuietHours": "Habilitar Horas de Silêncio",
     "overrideForCritical": "Substituir para Crítico",
