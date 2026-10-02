@@ -29,7 +29,7 @@
     "failedToLoadSession": "Nie udało się załadować sesji"
   },
   "settings": {
-    "preferences": "Ustawienia",
+    "preferences": "Preferencje",
     "notifications": "Powiadomienia",
     "configureNotifications": "Skonfiguruj preferencje powiadomień push",
     "language": "Język",
@@ -100,7 +100,7 @@
       "simultaneousLocations": "Jednoczesne lokalizacje"
     },
     "severityAll": "Wszystkie",
-    "severityHighOnly": "Tylko wysokie",
+    "severityHighOnly": "Tylko wysoka",
     "severityWarningUp": "Ostrzeżenie+",
     "violationTypes": "Rodzaje naruszeń"
   },
@@ -115,7 +115,7 @@
     "noDevicesRecorded": "Brak zarejestrowanych urządzeń",
     "noViolations": "Brak naruszeń",
     "noTerminations": "Brak przerwanych strumieni",
-    "lastSeen": "Ostatnio widziany {{relative}}",
+    "lastSeen": "Ostatnio aktywny {{relative}}",
     "terminatedBy": "Przez @{{username}}",
     "trustScoreConfirm": "Ustawić wynik zaufania dla @{{username}} na {{score}}?",
     "trustScoreRange": "Wynik zaufania dla @{{username}}, od 0 do 100.",
@@ -267,7 +267,7 @@
     "transcodeDetails": "Szczegóły transkodowania"
   },
   "widget": {
-    "asOf": "zaktualizowano {{time}}",
+    "asOf": "stan na {{time}}",
     "signedOut": "Otwórz Tracearr, aby sparować serwer.",
     "serversDown_one": "{{count}} serwer nieaktywny",
     "serversDown_few": "{{count}} serwery nieaktywne",
