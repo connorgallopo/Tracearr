@@ -247,7 +247,7 @@
   "mobile": {
     "title": "Mobil app",
     "pairDevice": "Para ihop enhet",
-    "generateToken": "Generera partoken",
+    "generateToken": "Generera parkopplingstoken",
     "scanQrCode": "",
     "tokenExpires": "Token går ut i {{time}}",
     "lastSeen": "",
@@ -269,7 +269,7 @@
     "pairNewDevice": "Para ihop ny enhet",
     "pairNewDeviceDesc": "Skanna QR-koden med Tracearr mobilappen, eller ange token manuellt.",
     "expiresIn": "Förfaller i {{time}}",
-    "oneTimePairToken": "One-Time par-token",
+    "oneTimePairToken": "Engångstoken för parkoppling",
     "copyToken": "Kopiera token",
     "tokenExpiryNote": "Denna token löper ut om 5 minuter och kan bara användas en gång.",
     "done": "Klar",
@@ -287,7 +287,7 @@
     "externalUrlBannerLink": "Extern URL",
     "externalUrlBannerSuffix": "så att mobilappen kan ansluta till din server.",
     "pendingTokens_one": "",
-    "pendingTokens_other": "{{count}} väntande par-tokens"
+    "pendingTokens_other": "{{count}} väntande parkopplingstoken"
   },
   "tailscale": {
     "title": "Skräddarsydd VPN",
@@ -376,11 +376,11 @@
     "importing": "Importerar...",
     "startImport": "Starta import",
     "howItWorks": "Hur importen fungerar",
-    "howItWorksDesc": "Tracearr kommer att importera alla historiska klockdata från din källa. Detta kan ta ett tag beroende på storleken på ditt bibliotek.",
+    "howItWorksDesc": "Tracearr importerar alla historiska visningsdata från din källa. Det kan ta en stund beroende på hur stort ditt bibliotek är.",
     "recordsMayBeSkipped": "Poster kan hoppas över om:",
     "selectTargetServer": "Välj målserver",
     "selectJellyfinServer": "Välj en Jellyfin eller Emby server",
-    "uploadJellystatBackup": "Ladda upp Jellystat Backup",
+    "uploadJellystatBackup": "Ladda upp Jellystat-säkerhetskopia",
     "exportFullBackupHint": "",
     "exportFullBackupHelp": "",
     "importOptions": "Importera alternativ",
@@ -481,7 +481,7 @@
     "acknowledge": "Jag fattar"
   },
   "backup": {
-    "title": "Säkerhetskopiera",
+    "title": "Säkerhetskopiering",
     "backToBackups": "Tillbaka till säkerhetskopior",
     "description": "",
     "createBackup": "Skapa säkerhetskopia",
@@ -552,7 +552,7 @@
       "backupDeleteFailed": "Kunde inte ta bort säkerhetskopia",
       "restoreStarted": "Återställning startad",
       "restoreStartFailed": "Det gick inte att starta återställningen",
-      "scheduleSaved": "Säkerhetskopiera schema sparat",
+      "scheduleSaved": "Schema för säkerhetskopiering sparat",
       "scheduleError": "Det gick inte att spara säkerhetskopieringsschemat"
     }
   },
