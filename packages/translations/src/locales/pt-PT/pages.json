@@ -1755,7 +1755,7 @@
       "loginEnabled": "Login Ativado",
       "unlinkAccount": "Desvincular esta conta Plex",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Exclua os servidores conectados primeiro para desvincular esta conta",
+      "deleteServersFirst": "Primeiro elimine os servidores ativos ligados através desta conta ou marque-os como históricos",
       "unlinkPlexAccount": "Desvincular a conta Plex",
       "unlinkConfirm": "Tem certeza de que deseja desvincular esta conta Plex? Você não poderá adicionar servidores a partir desta conta até que você faça o link novamente.",
       "connectionsAvailable_one": "",
