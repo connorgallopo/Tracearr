@@ -467,6 +467,7 @@
   },
   "serverHealth": {
     "unreachable": "{{serverName}} 无法访问",
+    "tokenRejected": "",
     "multipleUnreachable_other": "{{count}} 服务器无法访问：{{serverNames}}"
   },
   "ipWarning": {
