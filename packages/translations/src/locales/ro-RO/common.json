@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Redare",
     "paused": "Pauză",
+    "buffering": "",
     "stopped": "Oprit",
     "directPlay": "Redare directă",
     "directStream": "direct stream",
