@@ -472,6 +472,7 @@
   },
   "serverHealth": {
     "unreachable": "No es pot connectar amb {{serverName}}",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_other": "No es pot connectar amb {{count}} servidors: {{serverNames}}"
   },
