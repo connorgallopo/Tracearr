@@ -2,7 +2,7 @@
   "pair": {
     "welcome": "Velkommen til Tracearr",
     "connectToServer": "Koble til server",
-    "enterServerDetails": "Skriv inn din tracker server URL og mobil tilgangstoken",
+    "enterServerDetails": "Skriv inn URL-en til Tracearr-serveren og mobiltilgangstokenet",
     "serverUrl": "URL til server",
     "accessToken": "Tilgang til kode",
     "scanQrCodeInstead": "Skann QR-koden i stedet",
