@@ -29,8 +29,8 @@
         "message": "وقد وُسم الانتهاك بأنه معترف به"
       },
       "violationDismissed": {
-        "title": "تم إلغاء الانتهاك",
-        "message": "تم رفض المخالفة"
+        "title": "تم رفض الانتهاك",
+        "message": "تم رفض الانتهاك"
       },
       "deviceRemoved": {
         "title": "تم حذف الجهاز",
@@ -83,7 +83,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "توقف البث",
+        "title": "تم إنهاء البث",
         "message": "تم إيقاف جلسة التشغيل"
       },
       "serverUrlUpdated": {
@@ -121,9 +121,9 @@
         "message_other": "تم الاعتراف بانتهاكات {{count}}"
       },
       "violationsDismissed": {
-        "title": "تم إلغاء الانتهاكات",
+        "title": "تم رفض الانتهاكات",
         "message_zero": "",
-        "message_one": "رفض المخالفة {{count}}",
+        "message_one": "تم رفض {{count}} انتهاك",
         "message_two": "",
         "message_few": "",
         "message_many": "",
@@ -153,7 +153,7 @@
         "message_two": "",
         "message_few": "",
         "message_many": "",
-        "message_other": "{{count}} إعادة تعيين المستخدمين إلى 100"
+        "message_other": "تمت إعادة تعيين {{count}} مستخدمين إلى 100"
       },
       "claimCodeValidated": {
         "title": "تم التحقق من صحة رمز المطالبة",
@@ -194,7 +194,7 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "فشل تحديث الإعدادات",
       "copyFailed": "تعذر النسخ إلى الحافظة",
-      "acknowledgeFailed": "فشل في الإقرار بالانتهاك",
+      "acknowledgeFailed": "فشل في الاعتراف بالانتهاك",
       "dismissFailed": "فشل في رفض الانتهاك",
       "authFailed": "فشل المصادقة",
       "automationCreateFailed": "",
@@ -209,7 +209,7 @@
       "apiKeyGenerateFailed": "فشل في إنشاء مفتاح API",
       "mobileAccessEnableFailed": "فشل في تمكين الوصول إلى الجوال",
       "mobileAccessDisableFailed": "فشل في تعطيل الوصول إلى الجوال",
-      "pairTokenGenerateFailed": "فشل في إنشاء الرمز المميز للزوج",
+      "pairTokenGenerateFailed": "فشل في إنشاء رمز الإقران",
       "deviceRemoveFailed": "فشل في إزالة الجهاز",
       "deviceRenameFailed": "فشل في إعادة تسمية الجهاز",
       "sessionsRevokeFailed": "فشل في إلغاء الجلسات",
@@ -266,7 +266,7 @@
   "settings": {
     "allSeverity": "الكل (منخفض، تحذير، عالي)",
     "warningAndHigh": "تحذير و ارتفاع فقط",
-    "highOnly": "شدة عالية فقط",
+    "highOnly": "الخطورة العالية فقط",
     "rateLimit": "حالة حد المعدل الحالي",
     "perMinute": "لكل دقيقة",
     "perHour": "لكل ساعة",
@@ -278,8 +278,8 @@
     "concurrentStreams": "البث المتزامن",
     "newDevice": "جهاز جديد",
     "trustScoreChanged": "تم تغيير نقاط الثقة",
-    "serverDown": "السيرفر أسفل",
-    "serverUp": "سيرفر لأعلى",
+    "serverDown": "الخادم متوقف",
+    "serverUp": "الخادم يعمل",
     "minimumSeverity": "أدنى درجة من الخطورة",
     "quietHours": "ساعات هادئة",
     "enableQuietHours": "تمكين ساعات الهدوء",
