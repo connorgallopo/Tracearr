@@ -38,12 +38,12 @@
     "claimCodeSecurityNote": "此安全措施确保只有授权的用户能够完成首次设置"
   },
   "dashboard": {
-    "alerts": "警告",
-    "plays": "播放",
+    "alerts": "警报",
+    "plays": "播放次数",
     "watchTime": "观看时长",
     "activeUsers": "活动用户",
     "nowPlaying": "正在播放",
-    "streamLocations": "流媒体位置",
+    "streamLocations": "流位置",
     "serverResources": "服务器资源",
     "bandwidth": "带宽",
     "noActiveStreams": "没有活动流",
@@ -125,10 +125,10 @@
     "manual": "手动",
     "unknownRule": "未知规则",
     "adjustTrustScore": "调整信任分数",
-    "linkedAccounts": "已链接的社交网络",
+    "linkedAccounts": "已关联的账户",
     "splitAccount": "拆分为单独用户",
     "splitConfirmTitle": "拆分服务器帐户",
-    "splitConfirmDescription": "将此服务器帐户分解为自己的用户。其观察历史和违反行为随它而移动。",
+    "splitConfirmDescription": "将此服务器账户拆分为独立用户。其观看历史和违规记录会一并移动。",
     "splitConfirmLoading": "拆分中……",
     "acrossAllServers": "贯穿所有关联的账户：",
     "overallTrust": "总体信任度",
@@ -139,7 +139,7 @@
     "editIdentityDescription": "",
     "displayName": "显示名称",
     "contactEmail": "联系邮箱",
-    "contactEmailHelp": "新闻通讯去哪里。它不允许登录，永远不匹配同步帐户。",
+    "contactEmailHelp": "通讯发送到此地址。它不授予登录权限，也不会与同步的账户匹配。",
     "contactEmailLabel": "通讯地址：",
     "contactEmailNone": "未设置",
     "contactEmailNoLogin": "不允许登录。",
@@ -165,7 +165,7 @@
       "totalItems": "项目总数",
       "shows": "剧集",
       "added": "已添加",
-      "libraryGrowth": "知识库增长",
+      "libraryGrowth": "媒体库增长",
       "failedToLoad": "加载库统计失败",
       "failedToLoadDesc": "无法获取库数据。请重试。",
       "thisPeriod": "此周期",
@@ -227,11 +227,11 @@
       "copyPath": ""
     },
     "watch": {
-      "title": "观察分析",
+      "title": "观看分析",
       "description": "",
       "watched": "观看了",
       "percentWatched": "%已观看",
-      "totalWatchTime": "总观察时间",
+      "totalWatchTime": "总观看时长",
       "avgPerItem": "每个项目avg",
       "completed": "已完成",
       "peakHour": "高峰小时",
@@ -240,13 +240,13 @@
       "monthlyTrends": "每月趋势",
       "busiest": "最重要的版本：",
       "quietest": "安静：",
-      "bingeHighlights": "Binge 高光",
+      "bingeHighlights": "追剧亮点",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Binge 会话",
-      "noData": "尚无观察数据",
-      "noDataDesc": "一旦播放了内容后，观察分析将会显示在这里。请在查看某些活动后再查看。",
-      "failedToLoad": "加载监视分析失败",
-      "failedToLoadDesc": "无法获取观察数据。"
+      "bingeSessions": "追剧会话",
+      "noData": "尚无观看数据",
+      "noDataDesc": "播放内容后，观看分析将显示在这里。有观看活动后再来查看。",
+      "failedToLoad": "加载观看分析失败",
+      "failedToLoadDesc": "无法获取观看数据。"
     },
     "emptyState": {
       "checkingStatus": "正在检查库状态……",
@@ -276,7 +276,7 @@
       "notSyncedShort": "尚未同步",
       "backfillRunning": {
         "title": "生成历史数据……",
-        "fallbackBody": "从知识库历史创建快照。这可能需要几分钟。",
+        "fallbackBody": "正在根据媒体库历史创建快照。这可能需要几分钟。",
         "progress": "{{processed}}/{{total}} 库",
         "snapshotsSuffix_other": " ({{count}} 个快照)"
       },
@@ -308,7 +308,7 @@
   "activity": {
     "title": "活动",
     "description": "",
-    "playsOverTime": "一段时间后播放",
+    "playsOverTime": "播放次数趋势",
     "concurrentStreams": "并发流",
     "engagementBreakdown": "参与度分析",
     "howUsersEngage": "用户如何参与内容",
@@ -317,16 +317,16 @@
     "activityByDayOfWeek": "每周活跃度",
     "activityByHourOfDay": "每小时活跃度",
     "platforms": "平台",
-    "streamQuality": "串流质量"
+    "streamQuality": "流质量"
   },
   "violations": {
     "title": "违规",
     "tryAdjustingFilters": "尝试调整筛选条件",
-    "dismissViolation": "消除违约行为",
-    "dismissViolationConfirm": "你确定你想要清除这个违反？这将永久从违反日志中移除。",
-    "dismissViolationsConfirm": "您确定要删除吗？这将永久从违反日志中删除它们并恢复相关的信任分数。",
+    "dismissViolation": "忽略违规",
+    "dismissViolationConfirm": "确定要忽略此违规吗？它将从违规日志中永久移除。",
+    "dismissViolationsConfirm": "确定要忽略吗？这将把它们从违规日志中永久移除，并恢复相关的信任分数。",
     "noViolationsFound": "未发现任何违规行为",
-    "noViolationsRecorded": "尚未记录任何违反行为。",
+    "noViolationsRecorded": "尚未记录任何违规。",
     "allSeverities": "所有严重程度",
     "allStatuses": "所有状态",
     "allRules": "所有规则",
@@ -341,13 +341,13 @@
       "violationDetails": "违规详情",
       "userInfo": "用户",
       "sessions": "会话",
-      "noSessions": "没有与此违法行为相关的会话",
+      "noSessions": "没有与此违规相关的会话",
       "trigger": "触发器",
       "map": "会话地点",
       "actions": "处理内容",
       "timestamps": "时间戳",
       "created": "创建时间",
-      "acknowledged": "明白",
+      "acknowledged": "已确认",
       "detected": "已探测",
       "inactivity": "无活动详情",
       "daysInactive": "非活动天数",
@@ -361,7 +361,7 @@
       "relatedSessions_other": "{{count}}相关会话"
     },
     "selectAllViolations_other": "选择所有符合筛选条件的{{count}}个违规项",
-    "dismissViolations_other": "清除 {{count}} 违规",
+    "dismissViolations_other": "忽略 {{count}} 条违规",
     "peopleSelectedCount_other": "{{count}} 人"
   },
   "automations": {
@@ -499,8 +499,8 @@
         "ran": "发送一个通知"
       },
       "trust": {
-        "label": "信任得分",
-        "description": "设置、设置或重置信任分数",
+        "label": "信任分数",
+        "description": "调整、设置或重置信任分数",
         "fields": {
           "mode": {
             "label": "模式"
@@ -516,7 +516,7 @@
         "ran": "更改信任分数"
       },
       "kill_stream": {
-        "label": "结束流",
+        "label": "终止流",
         "description": "终止活动流",
         "fields": {
           "cooldown_minutes": {
@@ -589,7 +589,7 @@
       "tabsLabel": "按结果过滤",
       "emptyRan": "还没有匹配的内容",
       "item": "项目",
-      "recordedViolation": "记录违反行为",
+      "recordedViolation": "记录了一条违规",
       "emptyRanDescription_other": ""
     },
     "allKinds": "所有类型",
@@ -626,15 +626,15 @@
     },
     "builder": {
       "destinationDisabled": "禁用目标",
-      "noAlertRecipientsTooltip": "此目的地没有警报收件人，因此警报将不会发送。",
-      "noDestinations": "尚无目的地。添加一个以发送通知。",
-      "newDestination": "新建目的地",
+      "noAlertRecipientsTooltip": "此目标没有警报收件人，因此不会发送警报。",
+      "noDestinations": "尚无目标。添加一个以发送通知。",
+      "newDestination": "新建目标",
       "errors": {
         "sendNeedsDestination": "选择至少一个目标",
         "nameRequired": "给这个自动化命名",
         "scopeIncomplete": "选择谁适用于",
         "triggerRequired": "添加开始的内容，或者切换返回的内容=",
-        "policyNeedsSubject": "违法行为是针对一个人的，所以这需要一个流或账户触发器。",
+        "policyNeedsSubject": "违规针对的是个人，因此需要流或账户触发器。",
         "fieldUnavailable": "此处并非每个触发器都可用此检查",
         "operatorInvalid": "此比较不适合检查",
         "valueInvalid": "此值不适合检查",
@@ -660,10 +660,10 @@
       },
       "recordAs": {
         "label": "当这个运行时，将它记录为",
-        "policy": "{}违反",
-        "policyDescription": "列出了侵犯人权的情况；可以肯定。",
-        "notification": "一个警告",
-        "notificationDescription": "在活动中录制；永远不会是违反行为。"
+        "policy": "一条违规",
+        "policyDescription": "列入违规记录，可以确认。",
+        "notification": "一条警报",
+        "notificationDescription": "记录在活动中，不会成为违规。"
       },
       "severityLabel": "多么严重？",
       "activeLabel": "活动",
@@ -1903,7 +1903,7 @@
     "title": "设备兼容性",
     "description": "",
     "analyzedSessions": "",
-    "directPlayRate": "直播速率",
+    "directPlayRate": "直接播放率",
     "videoAndAudio": "",
     "uniqueDevices": "唯一设备",
     "uniqueCodecs": "唯一编解码器",
@@ -1916,7 +1916,7 @@
     "pctOfTotal": "占总计",
     "noTranscodeHotspots": "无转码热点",
     "compatibilityMatrix": "兼容矩阵表",
-    "compatibilityMatrixDesc": "按设备和视频编解码器直接播放速率按会话音量排序。",
+    "compatibilityMatrixDesc": "按设备和视频编解码器统计的直接播放率，按会话数排序。",
     "noDeviceDataPeriod": "在此期间没有设备数据",
     "legend": "说明:",
     "directPlayHigh": "*80% direct",
@@ -1934,7 +1934,7 @@
     "avgBitrate": "平均比特率",
     "avgBitrateMbps": "平均比特率 (Mbps)",
     "peakBitrate": "高峰{{value}}Mbps",
-    "totalWatchTime": "总观察时间",
+    "totalWatchTime": "总观看时长",
     "uniqueUsers": "唯一用户",
     "dailyUsage": "每日带宽使用",
     "dailyUsageDesc": "",
@@ -1965,7 +1965,7 @@
     "title": "调试工具",
     "description": "",
     "overview": "概览",
-    "librarySnapshots": "书库快照",
+    "librarySnapshots": "媒体库快照",
     "tasks": "任务",
     "logs": "日志",
     "plexAccounts": "Plex账户",
@@ -2042,7 +2042,7 @@
       },
       "deadWeight": {
         "title": "",
-        "empty": "没有什么可以恢复 - 您的知识库中的一切都已被观看了",
+        "empty": "没有可回收的内容：媒体库中的所有内容都已被观看",
         "columns": {
           "poster": "海报",
           "title": "标题",
@@ -2065,7 +2065,7 @@
       "title": "类型",
       "subtitle": "视图中的每个服务器按类型播放和观看时间。",
       "chart": {
-        "title": "按流派播",
+        "title": "按类型统计的播放次数",
         "valueLabel": "播放",
         "ariaLabel": "按性别排列的游戏条形图，排序最高至最低。完整的细目见下表。",
         "itemCount_other": ""
@@ -2097,7 +2097,7 @@
         "backLink": "返回媒体"
       },
       "hero": {
-        "loadError": "无法加载更多标题",
+        "loadError": "无法加载此标题",
         "meta": {
           "seasons_other": "",
           "episodes_other": ""
@@ -2116,11 +2116,11 @@
         }
       },
       "kpis": {
-        "ariaLabel": "观察统计",
-        "loadError": "无法加载监视统计数据",
+        "ariaLabel": "观看统计",
+        "loadError": "无法加载观看统计数据",
         "completionLoadError": "无法加载完成",
         "plays": {
-          "label": "随时播放",
+          "label": "累计播放次数",
           "caption": "恢复链，排除短会话"
         },
         "watchTime": {
@@ -2362,7 +2362,7 @@
     },
     "funnel": {
       "title": "请求结束的地方",
-      "description": "观看意味着有人通过了其中的85%, 即媒体库页面使用的同一栏。 在Tracearr能够测量这一点之前，请求必须先着陆并与所有权相匹配。",
+      "description": "“已观看”表示有人看完了其 85%，与媒体库页面使用的标准相同。请求必须先完成并与某个标题匹配，Tracearr 才能衡量这一点。",
       "requested": "已请求",
       "landed": "已到达",
       "watched": "已观看",
