@@ -30,7 +30,7 @@
       },
       "violationDismissed": {
         "title": "Porušení odmítnuto",
-        "message": "Porušení bylo zamítnuto"
+        "message": "Porušení bylo odmítnuto"
       },
       "deviceRemoved": {
         "title": "Zařízení odstraněno",
@@ -116,10 +116,10 @@
       },
       "violationsDismissed": {
         "title": "Porušení odmítnuto",
-        "message_one": "{{count}} porušení zamítnuto",
+        "message_one": "{{count}} porušení odmítnuto",
         "message_few": "",
         "message_many": "",
-        "message_other": "{{count}} potlačení odmítnuto"
+        "message_other": "{{count}} porušení odmítnuto"
       },
       "apiKeyGenerated": {
         "title": "API klíč vygenerován",
@@ -134,12 +134,12 @@
         "message": "Všechny relace v mobilu byly zrušeny"
       },
       "pairTokenGenerated": {
-        "title": "Vygenerovaný token páru",
+        "title": "Párovací token vygenerován",
         "message": "Naskenujte QR kód pomocí vašeho mobilního zařízení pro párování"
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Resetování důvěryhodných skóre",
+        "title": "Skóre důvěryhodnosti resetováno",
         "message_one": "Uživatel {{count}} byl resetován na 100",
         "message_few": "",
         "message_many": "",
@@ -183,12 +183,12 @@
       "settingsUpdateFailed": "Aktualizace nastavení se nezdařila",
       "copyFailed": "Nelze zkopírovat do schránky",
       "acknowledgeFailed": "Nepodařilo se potvrdit porušení",
-      "dismissFailed": "Nepodařilo se zrušit porušení",
+      "dismissFailed": "Nepodařilo se odmítnout porušení",
       "authFailed": "Ověření se nezdařilo",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
       "automationDeleteFailed": "",
-      "streamTerminateFailed": "Ukončení vysílání se nezdařilo",
+      "streamTerminateFailed": "Ukončení streamu se nezdařilo",
       "serverUrlUpdateFailed": "Aktualizace URL serveru se nezdařila",
       "serverUpdateFailed": "Nepodařilo se aktualizovat server",
       "serverLocationSaveFailed": "",
@@ -197,12 +197,12 @@
       "apiKeyGenerateFailed": "Generování API klíče se nezdařilo",
       "mobileAccessEnableFailed": "Nepodařilo se povolit mobilní přístup",
       "mobileAccessDisableFailed": "Nepodařilo se zakázat mobilní přístup",
-      "pairTokenGenerateFailed": "Generování tokenu páru se nezdařilo",
+      "pairTokenGenerateFailed": "Generování párovacího tokenu se nezdařilo",
       "deviceRemoveFailed": "Odstranění zařízení se nezdařilo",
       "deviceRenameFailed": "Nepodařilo se přejmenovat zařízení",
       "sessionsRevokeFailed": "Nepodařilo se zrušit relace",
       "identityUpdateFailed": "",
-      "trustScoresResetFailed": "Obnovení důvěryhodnosti se nezdařilo",
+      "trustScoresResetFailed": "Resetování skóre důvěryhodnosti se nezdařilo",
       "plexUnlinkFailed": "Nepodařilo se odpojit Plex účet",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Pracovní pozice již běží",
@@ -246,7 +246,7 @@
         "message": "Tracearr {{version}} je k dispozici"
       },
       "violationDetected": {
-        "title": "Nové násilí: {{ruleName}}",
+        "title": "Nové porušení: {{ruleName}}",
         "message": "{{user}} spustil {{ruleType}}"
       }
     }
@@ -265,7 +265,7 @@
     "streamStopped": "Stream zastaven",
     "concurrentStreams": "Souběžné streamy",
     "newDevice": "Nové zařízení",
-    "trustScoreChanged": "Důvěra změněna skóre",
+    "trustScoreChanged": "Skóre důvěryhodnosti změněno",
     "serverDown": "Server dolů",
     "serverUp": "Server nahoru",
     "minimumSeverity": "Minimální závažnost",
