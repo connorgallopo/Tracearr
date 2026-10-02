@@ -303,6 +303,6 @@
     "some": "{{count}} z {{total}} serwerów",
     "search": "Szukaj serwerów...",
     "noMatches": "Nie znaleziono serwerów",
-    "historical": ""
+    "historical": "Historyczne"
   }
 }
