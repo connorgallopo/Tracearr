@@ -25,7 +25,7 @@
     "sort": "Järjestä",
     "clear": "Tyhjennä",
     "apply": "Käytä",
-    "reset": "",
+    "reset": "Palauta",
     "selectAll": "Valitse Kaikki",
     "deselectAll": "Poista Kaikki Valinnat",
     "export": "Vie",
@@ -38,7 +38,7 @@
     "viewOnGithub": "Näytä GitHubissa",
     "later": "Myöhemmin",
     "previous": "Edellinen",
-    "reload": ""
+    "reload": "Lataa uudelleen"
   },
   "states": {
     "loading": "Ladataan...",
@@ -46,7 +46,7 @@
     "success": "Onnistui",
     "failed": "Epäonnistui",
     "pending": "Odottaa",
-    "acknowledged": "Tunnettu",
+    "acknowledged": "Kuitattu",
     "active": "Aktiivinen",
     "inactive": "Passiivinen",
     "enabled": "Käytössä",
@@ -54,20 +54,20 @@
     "connecting": "Yhdistetään...",
     "connected": "Yhdistetty",
     "saving": "Tallennetaan...",
-    "dismissing": "Hylkää...",
-    "acknowledging": "Tunnustetaan..."
+    "dismissing": "Hylätään...",
+    "acknowledging": "Kuitataan..."
   },
   "playback": {
     "playing": "Toistetaan",
     "paused": "Keskeytetty",
-    "buffering": "",
+    "buffering": "Puskurointi",
     "stopped": "Pysäytetty",
     "directPlay": "Suora Toisto",
-    "directStream": "Suora Lähetys",
+    "directStream": "Suora striimaus",
     "transcode": "Transkoodaus",
-    "hwTranscode": "",
-    "burnIn": "",
-    "watched": ""
+    "hwTranscode": "HW-transkoodaus",
+    "burnIn": "Kuvaan poltettu",
+    "watched": "Katsottu"
   },
   "severity": {
     "low": "Matala",
@@ -75,16 +75,16 @@
     "high": "Korkea"
   },
   "trust": {
-    "trusted": "",
-    "caution": "",
-    "untrusted": ""
+    "trusted": "Luotettu",
+    "caution": "Huomio",
+    "untrusted": "Epäluotettava"
   },
   "tasks": {
-    "title": "",
-    "running": "",
-    "waiting": "",
-    "queued": "",
-    "startedAgo": ""
+    "title": "Käynnissä olevat tehtävät",
+    "running": "Käynnissä",
+    "waiting": "Odottaa",
+    "queued": "Jonossa",
+    "startedAgo": "Aloitettu {{time}}"
   },
   "time": {
     "today": "Tänään",
@@ -96,11 +96,11 @@
     "lastYear": "Viime Vuosi",
     "byDay": "Päivän Mukaan",
     "byHour": "Tunnin Mukaan",
-    "short7Days": "",
-    "short30Days": "",
-    "shortYear": "",
-    "shortAll": "",
-    "timeRange": ""
+    "short7Days": "7pv",
+    "short30Days": "30pv",
+    "shortYear": "1v",
+    "shortAll": "Kaikki",
+    "timeRange": "Aikaväli"
   },
   "labels": {
     "date": "Päivämäärä",
@@ -108,12 +108,12 @@
     "content": "Sisältö",
     "platform": "Alusta",
     "location": "Sijainti",
-    "local": "",
+    "local": "Paikallinen",
     "ipAddress": "Ip Osoite",
     "quality": "Laatu",
     "status": "Tila",
     "rule": "Sääntö",
-    "media": "",
+    "media": "Media",
     "started": "Aloitettu",
     "stopped": "Pysäytetty",
     "joined": "Liittynyt",
@@ -127,11 +127,11 @@
     "type": "Tyyppi",
     "reason": "Syy",
     "filters": "Suodattimet",
-    "trustScore": "Luottamus Pisteet",
+    "trustScore": "Luottamuspisteet",
     "lastActivity": "Viimeisin Toiminta",
     "serverOwner": "Palvelimen Omistaja",
     "resolution": "Resoluutio",
-    "watchTime": "Kellon Aika",
+    "watchTime": "Katseluaika",
     "pausedTime": "Keskeytetty Aika",
     "sessionDetails": "Istunnon Tiedot",
     "recentSessions": "Viimeisimmät Istunnot",
@@ -144,38 +144,38 @@
     "size": "Koko",
     "items": "Kohteet",
     "name": "Nimi",
-    "product": "",
-    "deviceId": "",
-    "total": "",
-    "mediaLength": "",
-    "streamDetails": "",
-    "transcodeReason": "",
-    "loadMore": "",
-    "playback": ""
+    "product": "Tuote",
+    "deviceId": "Laitteen ID",
+    "total": "yhteensä",
+    "mediaLength": "Median kesto",
+    "streamDetails": "Striimin tiedot",
+    "transcodeReason": "Transkoodauksen syy",
+    "loadMore": "Lataa lisää",
+    "playback": "Toisto"
   },
   "search": {
     "searchUsers": "Etsi käyttäjiä...",
-    "searchTitles": "Etsi otsikoita, käyttäjiä..."
+    "searchTitles": "Etsi nimikkeitä, käyttäjiä..."
   },
   "table": {
     "selectAllOnPage": "Valitse kaikki sivulla",
     "selectRow": "Valitse rivi",
-    "pageOf": "",
-    "pagination": "",
-    "goToPage": ""
+    "pageOf": "Sivu {{page}} / {{total}}",
+    "pagination": "Sivutus",
+    "goToPage": "Siirry sivulle {{page}}"
   },
   "filters": {
-    "clearAll": "",
-    "done": "",
-    "remove": "",
-    "clearSearch": "",
-    "anyDate": "",
-    "dateAfter": "",
-    "dateBefore": "",
-    "dateBetween": "",
-    "clearDates": "",
-    "clearStartDate": "",
-    "clearEndDate": ""
+    "clearAll": "Tyhjennä kaikki",
+    "done": "Valmis",
+    "remove": "Poista suodatin {{label}}",
+    "clearSearch": "Tyhjennä haku",
+    "anyDate": "Mikä tahansa päivämäärä",
+    "dateAfter": "{{date}} jälkeen",
+    "dateBefore": "Ennen {{date}}",
+    "dateBetween": "{{from}} - {{to}}",
+    "clearDates": "Tyhjennä päivämääräväli",
+    "clearStartDate": "Tyhjennä aloituspäivämäärä",
+    "clearEndDate": "Tyhjennä päättymispäivämäärä"
   },
   "media": {
     "movie": "Elokuva",
@@ -184,7 +184,7 @@
     "episode_plural": "Jaksot",
     "track": "Kappale",
     "track_plural": "Kappaleet",
-    "liveTV": "",
+    "liveTV": "Suora TV",
     "photo": "Kuva",
     "tv": "Televisio",
     "tvShows": "TV-ohjelmat",
@@ -192,7 +192,7 @@
   },
   "validation": {
     "required": "Tämä kenttä on pakollinen",
-    "maxLength": ""
+    "maxLength": "Enintään {{max}} merkkiä"
   },
   "errors": {
     "generic": "Tapahtui virhe",
@@ -212,8 +212,8 @@
     "stream_other": "{{count}} streamia",
     "server_one": "{{count}} palvelin",
     "server_other": "{{count}} palvelinta",
-    "automation_one": "",
-    "automation_other": "",
+    "automation_one": "{{count}} automaatio",
+    "automation_other": "{{count}} automaatiota",
     "violation_one": "{{count}} rikkomusta",
     "violation_other": "{{count}} rikkomusta",
     "usersAdded_one": "{{count}} käyttäjä lisätty",
@@ -224,16 +224,16 @@
     "library_other": "{{count}} kirjastoa",
     "error_one": "{{count}} virhe",
     "error_other": "{{count}} virhettä",
-    "alert_one": "",
-    "alert_other": "",
-    "location_one": "",
-    "location_other": "",
-    "device_one": "",
-    "device_other": "",
+    "alert_one": "{{count}} hälytys",
+    "alert_other": "{{count}} hälytystä",
+    "location_one": "{{count}} sijainti",
+    "location_other": "{{count}} sijaintia",
+    "device_one": "{{count}} laite",
+    "device_other": "{{count}} laitetta",
     "play_one": "{{count}} toisto",
     "play_other": "{{count}} toistoa",
-    "segment_one": "",
-    "segment_other": ""
+    "segment_one": "{{count}} segmentti",
+    "segment_other": "{{count}} segmenttiä"
   },
   "messages": {
     "noChangesDetected": "Muutoksia ei havaittu"
@@ -259,13 +259,13 @@
   "confirmations": {
     "unsavedChanges": "Sinulla on tallentamattomia muutoksia. Oletko varma, että haluat lähteä?"
   },
-  "beta": "",
+  "beta": "beta",
   "or": "tai",
   "serverSelector": {
-    "all": "",
-    "some": "",
-    "search": "",
-    "noMatches": "",
-    "historical": ""
+    "all": "Kaikki palvelimet",
+    "some": "{{count}} / {{total}} palvelimesta",
+    "search": "Etsi palvelimia...",
+    "noMatches": "Palvelimia ei löytynyt",
+    "historical": "Historiallinen"
   }
 }
