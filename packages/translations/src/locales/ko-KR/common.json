@@ -60,6 +60,7 @@
   "playback": {
     "playing": "재생 중",
     "paused": "일시정지됨",
+    "buffering": "",
     "stopped": "중지됨",
     "directPlay": "직접 재생",
     "directStream": "직접 재생",
