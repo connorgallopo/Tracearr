@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Spelar",
     "paused": "Pausad",
+    "buffering": "",
     "stopped": "Stoppad",
     "directPlay": "Spela direkt",
     "directStream": "Direkt Stream",
