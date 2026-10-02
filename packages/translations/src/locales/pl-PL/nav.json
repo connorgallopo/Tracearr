@@ -1,5 +1,5 @@
 {
-  "dashboard": "Panel administracyjny",
+  "dashboard": "Pulpit",
   "map": "Mapa",
   "history": "Historia",
   "stats": "Statystyki",
@@ -13,7 +13,7 @@
   "settings": "Ustawienia",
   "overview": "Przegląd",
   "quality": "Jakość",
-  "storage": "Przestrzeń",
+  "storage": "Miejsce na dysku",
   "watch": "Oglądalność",
   "devices": "Urządzenia",
   "bandwidth": "Przepustowość",
