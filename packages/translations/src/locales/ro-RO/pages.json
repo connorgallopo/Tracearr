@@ -1777,7 +1777,7 @@
       "loginEnabled": "Autentificare activată",
       "unlinkAccount": "Deconectați acest cont Plex",
       "reauthorizeAccount": "",
-      "deleteServersFirst": "Șterge mai întâi serverele conectate pentru a deconecta acest cont",
+      "deleteServersFirst": "Mai întâi șterge serverele active conectate prin acest cont sau marchează-le ca istorice",
       "unlinkPlexAccount": "Deconectează contul Plex",
       "unlinkConfirm": "Ești sigur că vrei să deconectezi acest cont Plex? Nu vei mai putea adăuga servere din acest cont până nu îl conectezi din nou.",
       "connectionsAvailable_one": "",
