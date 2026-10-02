@@ -64,6 +64,7 @@
     "stopped": "停止しました",
     "directPlay": "ダイレクト再生",
     "directStream": "ダイレクトストリーム",
+    "audioTranscode": "",
     "transcode": "トランスコード",
     "hwTranscode": "",
     "burnIn": "",
