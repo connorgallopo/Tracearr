@@ -90,7 +90,7 @@
     "apiDocs": "",
     "noApiKeyGenerated": "Geen API-sleutel gegenereerd",
     "copyToClipboard": "Kopiëren naar klembord",
-    "apiKeyReadAccess": "Uw API-sleutel geeft volledige leestoegang tot uw Tracear-gegevens.",
+    "apiKeyReadAccess": "Uw API-sleutel geeft volledige leestoegang tot uw Tracearr-gegevens.",
     "generateApiKeyPrompt": "Genereer een API-sleutel om externe integratie mogelijk te maken.",
     "regenerate": "Hergenereren",
     "generateKey": "Sleutel genereren",
