@@ -48,7 +48,7 @@
     "disconnect": "",
     "disconnectServer": "Deconectare server",
     "disconnectConfirm": "Ești sigur că vrei să te deconectezi de la \"{{serverName}}\"? Va trebui să asociezi din nou pentru a utiliza aplicația.",
-    "disconnectConfirmGeneric": "Sunteți sigur că doriți să vă deconectați? Va trebui să vă conectați din nou pentru a utiliza aplicația.",
+    "disconnectConfirmGeneric": "Sunteți sigur că doriți să vă deconectați? Va trebui să asociați din nou aplicația pentru a o utiliza.",
     "currentlyConnected": "Conectat în prezent la {{serverName}}",
     "version": "",
     "build": ""
@@ -173,7 +173,7 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "Joacă în timp",
+    "playsOverTime": "Vizionări în timp",
     "concurrentStreams": "Stream-uri Concurente",
     "platforms": "Platforme",
     "playbackQuality": ""
