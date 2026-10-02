@@ -1755,7 +1755,7 @@
       "loginEnabled": "Inici de sessió habilitat",
       "unlinkAccount": "Desenllaça aquest compte de Plex",
       "reauthorizeAccount": "Torna a autoritzar aquest compte de Plex",
-      "deleteServersFirst": "Elimineu primer els servidors connectats per desenllaçar aquest compte",
+      "deleteServersFirst": "Primer elimineu els servidors actius connectats a través d'aquest compte o marqueu-los com a històrics",
       "unlinkPlexAccount": "Desenllaça el compte de Plex",
       "unlinkConfirm": "Segur que voleu desenllaçar aquest compte de Plex? No podreu afegir servidors d'aquest compte fins que el torneu a enllaçar.",
       "connectionsAvailable_one": "",
