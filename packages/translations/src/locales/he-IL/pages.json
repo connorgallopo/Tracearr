@@ -419,11 +419,7 @@
       "previewCut": "",
       "previewPriority": "",
       "previewEscapeHint": "",
-      "webhookNotSent": "",
-      "unitChars": "",
-      "unitBytes": "",
-      "addedByTracearr": "",
-      "plainTab": ""
+      "webhookNotSent": ""
     },
     "priorities": {
       "automatic": "",
@@ -2327,6 +2323,10 @@
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "atmosLabel": "",
+        "atmosAll": "",
+        "atmosOnly": "",
+        "atmosChip": "",
         "genreLabel": "",
         "genreAll": "",
         "serverLabel": "",
