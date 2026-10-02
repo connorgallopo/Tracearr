@@ -64,6 +64,7 @@
     "stopped": "Fermato",
     "directPlay": "Riproduzione Diretta",
     "directStream": "Stream Diretto",
+    "audioTranscode": "",
     "transcode": "Transcodifica",
     "hwTranscode": "",
     "burnIn": "",
