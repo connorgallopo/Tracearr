@@ -119,13 +119,13 @@
     "terminatedBy": "Przez @{{username}}",
     "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
     "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100.",
-    "moreLocations_one": "",
-    "moreLocations_few": "",
-    "moreLocations_many": "",
+    "moreLocations_one": "+{{count}} inna lokalizacja",
+    "moreLocations_few": "+{{count}} inne lokalizacje",
+    "moreLocations_many": "+{{count}} innych lokalizacji",
     "moreLocations_other": "+{{count}} więcej lokalizacji",
-    "moreDevices_one": "",
-    "moreDevices_few": "",
-    "moreDevices_many": "",
+    "moreDevices_one": "+{{count}} inne urządzenie",
+    "moreDevices_few": "+{{count}} inne urządzenia",
+    "moreDevices_many": "+{{count}} innych urządzeń",
     "moreDevices_other": "+{{count}} więcej urządzeń"
   },
   "violation": {
@@ -143,12 +143,12 @@
     "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
     "noMatches": "Brak pasujących powiadomień",
     "acknowledgeAllTitle_one": "Potwierdzić {{count}} powiadomienie?",
-    "acknowledgeAllTitle_few": "",
-    "acknowledgeAllTitle_many": "",
+    "acknowledgeAllTitle_few": "Potwierdzić {{count}} powiadomienia?",
+    "acknowledgeAllTitle_many": "Potwierdzić {{count}} powiadomień?",
     "acknowledgeAllTitle_other": "Potwierdzić {{count}} powiadomień?",
-    "pendingCount_one": "",
-    "pendingCount_few": "",
-    "pendingCount_many": "",
+    "pendingCount_one": "{{count}} oczekujący",
+    "pendingCount_few": "{{count}} oczekujące",
+    "pendingCount_many": "{{count}} oczekujących",
     "pendingCount_other": "{{count}} oczekujących"
   },
   "history": {
@@ -162,9 +162,9 @@
       "noCountries": "Brak dostępnych krajów",
       "noPlatforms": "Brak dostępnych platform",
       "noUsers": "Brak dostępnych użytkowników",
-      "sectionSelected_one": "",
-      "sectionSelected_few": "",
-      "sectionSelected_many": "",
+      "sectionSelected_one": "{{section}}, {{count}} zaznaczony",
+      "sectionSelected_few": "{{section}}, {{count}} zaznaczone",
+      "sectionSelected_many": "{{section}}, {{count}} zaznaczonych",
       "sectionSelected_other": "{{section}}, {{count}} wybranych"
     }
   },
@@ -204,13 +204,13 @@
     "increaseTrustScore": "Zwiększ poziom zaufania",
     "sortAscending": "Posortowano rosnąco, stuknij, aby odwrócić",
     "sortDescending": "Posortowano malejąco, stuknij, aby odwrócić",
-    "alertsCount_one": "",
-    "alertsCount_few": "",
-    "alertsCount_many": "",
+    "alertsCount_one": "Powiadomienia, {{count}} nieprzeczytane",
+    "alertsCount_few": "Powiadomienia, {{count}} nieprzeczytane",
+    "alertsCount_many": "Powiadomienia, {{count}} nieprzeczytanych",
     "alertsCount_other": "Powiadomienia, {{count}} nieprzeczytane",
-    "filtersActive_one": "",
-    "filtersActive_few": "",
-    "filtersActive_many": "",
+    "filtersActive_one": "Filtry, {{count}} aktywny",
+    "filtersActive_few": "Filtry, {{count}} aktywne",
+    "filtersActive_many": "Filtry, {{count}} aktywnych",
     "filtersActive_other": "Filtry, {{count}} aktywne"
   },
   "map": {
@@ -232,8 +232,8 @@
     "unsupportedTitle": "Automatyzacje wymagają serwera 2.2 lub nowszego",
     "versionCheckFailed": "Nie udało się sprawdzić wersji serwera",
     "conditions_one": "{{count}} warunek",
-    "conditions_few": "",
-    "conditions_many": "",
+    "conditions_few": "{{count}} warunki",
+    "conditions_many": "{{count}} warunków",
     "conditions_other": "{{count}} warunki"
   },
   "charts": {
@@ -270,12 +270,12 @@
     "asOf": "zaktualizowano {{time}}",
     "signedOut": "Otwórz Tracearr, aby sparować serwer.",
     "serversDown_one": "{{count}} serwer nieaktywny",
-    "serversDown_few": "",
-    "serversDown_many": "",
+    "serversDown_few": "{{count}} serwery nieaktywne",
+    "serversDown_many": "{{count}} serwerów nieaktywnych",
     "serversDown_other": "{{count}} serwery nieaktywne",
     "transcodes_one": "{{count}} transkodowanie",
-    "transcodes_few": "",
-    "transcodes_many": "",
+    "transcodes_few": "{{count}} transkodowania",
+    "transcodes_many": "{{count}} transkodowań",
     "transcodes_other": "{{count}} transkodowań"
   }
 }
