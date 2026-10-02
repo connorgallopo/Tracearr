@@ -25,12 +25,12 @@
         "message": "Su configuración ha sido guardada."
       },
       "violationAcknowledged": {
-        "title": "Infracción de política reconocida",
+        "title": "Infracción reconocida",
         "message": "La infracción ha sido marcada como reconocida"
       },
       "violationDismissed": {
-        "title": "Infracción rechazada",
-        "message": "La infracción ha sido rechazada"
+        "title": "Infracción descartada",
+        "message": "La infracción ha sido descartada"
       },
       "deviceRemoved": {
         "title": "Dispositivo eliminado",
@@ -79,7 +79,7 @@
         "message": ""
       },
       "streamTerminated": {
-        "title": "Reproducción finalizada",
+        "title": "Reproducción terminada",
         "message": "Se detuvo la sesión de reproducción"
       },
       "serverUrlUpdated": {
@@ -100,8 +100,8 @@
       },
       "sessionsDeleted": {
         "title": "Sesiones eliminadas",
-        "message_one": "Sesión de {{count}} eliminada",
-        "message_other": "Sesión de {{count}} eliminada"
+        "message_one": "{{count}} sesión eliminada",
+        "message_other": "{{count}} sesiones eliminadas"
       },
       "violationsAcknowledged": {
         "title": "Infracción reconocidas",
@@ -109,7 +109,7 @@
         "message_other": "{{count}} infracciones reconocidas"
       },
       "violationsDismissed": {
-        "title": "Infracciones rechazadas",
+        "title": "Infracciones descartadas",
         "message_one": "{{count}} infracción descartada",
         "message_other": "{{count}} infracciones descartadas"
       },
@@ -131,9 +131,9 @@
       },
       "identityUpdated": "",
       "trustScoresReset": {
-        "title": "Restablecer puntuaciones de confianza",
-        "message_one": "Usuario {{count}} restablecido a 100",
-        "message_other": "Usuario {{count}} restablecido a 100"
+        "title": "Puntuaciones de confianza restablecidas",
+        "message_one": "{{count}} usuario restablecido a 100",
+        "message_other": "{{count}} usuarios restablecidos a 100"
       },
       "claimCodeValidated": {
         "title": "Código CLAIM validado",
@@ -251,7 +251,7 @@
     "violationDetected": "Infracción detectada",
     "streamStarted": "Reproducción iniciada",
     "streamStopped": "Reproducción detenida",
-    "concurrentStreams": "Reproducciones simultaneas",
+    "concurrentStreams": "Reproducciones simultáneas",
     "newDevice": "Nuevo dispositivo",
     "trustScoreChanged": "Puntuación de confianza modificada",
     "serverDown": "Servidor fuera de línea",
