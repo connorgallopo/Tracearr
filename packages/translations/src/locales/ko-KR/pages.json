@@ -255,7 +255,7 @@
         "bodyWithDays": "라이브러리에는 {{days}}일의 기록이 있습니다. 스냅샷을 생성하여 차트의 추세를 확인하세요.",
         "bodyGeneric": "시간 경과에 따른 라이브러리 추세를 확인하기 위해 기록 스냅샷을 생성합니다.",
         "syncRunningTitle": "라이브러리 동기화 진행 중...",
-        "syncRunningBody": "동기화가 완료되면 기록 데이터 생성이 자동으로 시작됩니다."
+        "syncRunningBody": "동기화가 완료되면 과거 데이터 생성이 자동으로 시작됩니다."
       },
       "generateHistory": "기록 생성",
       "starting": "시작 중...",
@@ -275,7 +275,7 @@
       "syncing": "동기화 중...",
       "notSyncedShort": "아직 동기화되지 않음",
       "backfillRunning": {
-        "title": "기록 데이터 생성 중...",
+        "title": "과거 데이터 생성 중...",
         "fallbackBody": "라이브러리 기록에서 스냅샷을 생성합니다. 이 작업은 몇 분 정도 걸릴 수 있습니다.",
         "progress": "라이브러리 {{processed}}개 중 {{total}}개",
         "snapshotsSuffix_other": "(스냅샷 {{count}}개)"
@@ -283,7 +283,7 @@
       "multiServer": {
         "title": "일부 라이브러리에는 주의가 필요합니다",
         "body": "결합된 라이브러리 통계를 보려면 아래 서버를 동기화하세요.",
-        "needsBackfillIntro": "다음 서버는 동기화되었지만 아직 기록 데이터가 없습니다."
+        "needsBackfillIntro": "다음 서버는 동기화되었지만 아직 과거 데이터가 없습니다."
       },
       "toast": {
         "noServerSelected": "서버를 선택하지 않았습니다.",
@@ -513,11 +513,11 @@
             "label": "값"
           }
         },
-        "ran": "스트리밍 종료"
+        "ran": "신뢰 점수를 변경했습니다"
       },
       "kill_stream": {
-        "label": "스트리밍 종료",
-        "description": "활성 스트리밍 종료",
+        "label": "스트림 종료",
+        "description": "활성 스트림 종료",
         "fields": {
           "cooldown_minutes": {
             "description": "동일한 사용자에 대한 종료 간 최소 시간"
@@ -621,31 +621,31 @@
       },
       "noInputs": "채울 내용이 없습니다.",
       "failed": "설정할 수 없습니다. 다시 시도해 보세요.",
-      "created": "비활성화된 알림 대상",
-      "createdOff": "비활성화된 알림 대상"
+      "created": "{{name}}이(가) 설정되어 실행 중입니다.",
+      "createdOff": "{{name}}이(가) 생성되었지만 꺼져 있습니다. 목록에서 켜세요."
     },
     "builder": {
-      "destinationDisabled": "비활성화된 알림 대상",
+      "destinationDisabled": "비활성화된 전송 대상",
       "noAlertRecipientsTooltip": "이 대상에는 알림 수신자가 없어 알림이 전송되지 않습니다.",
       "noDestinations": "아직 알림 대상이 없습니다. 알림을 보내려면 하나를 추가하세요.",
-      "newDestination": "새로운 알림 대상",
+      "newDestination": "새 전송 대상",
       "errors": {
-        "sendNeedsDestination": "적용 대상을 선택하세요.",
+        "sendNeedsDestination": "전송 대상을 하나 이상 선택하세요.",
         "nameRequired": "이 자동화에 이름을 지정하세요",
         "scopeIncomplete": "적용 대상을 선택하세요.",
-        "triggerRequired": "위반은 개인에 관한 것이므로 스트림 또는 계정 트리거가 필요합니다.",
+        "triggerRequired": "시작 트리거를 추가하거나 꺼진 트리거를 다시 켜세요",
         "policyNeedsSubject": "위반은 개인에 관한 것이므로 스트림 또는 계정 트리거가 필요합니다.",
-        "fieldUnavailable": "이 비교 방식은 검사 항목과 맞지 않습니다.",
+        "fieldUnavailable": "이 검사는 여기 있는 일부 트리거에서 사용할 수 없습니다",
         "operatorInvalid": "이 값은 검사 항목과 맞지 않습니다.",
         "valueInvalid": "이 값은 검사 항목과 맞지 않습니다.",
-        "actionUnavailable": "일부 트리거에서 이 메시지 변수를 제공하지 않습니다.",
+        "actionUnavailable": "이 트리거들은 이 작업에 필요한 정보를 제공하지 않습니다",
         "variableUnavailable": "일부 트리거에서 이 메시지 변수를 제공하지 않습니다.",
         "minutesRange": "{{min}}분에서 {{max}}분 사이",
         "daysRange": "{{min}}에서 {{max}}일 사이",
         "measureInvalid": "신뢰도는 -100에서 100포인트 사이로 변경됩니다.",
         "fieldNotAvailableFor": "사용할 수 없음: {{triggers}}",
-        "trustAmountRange": "표시할 메시지를 입력하세요.",
-        "trustValueRange": "표시할 메시지를 입력하세요.",
+        "trustAmountRange": "신뢰 점수 변경 폭은 -100에서 100점 사이입니다",
+        "trustValueRange": "신뢰 점수는 0에서 100 사이입니다",
         "messageRequired": "표시할 메시지를 입력하세요.",
         "tooLong": "최대 {{max}}자",
         "template": {
@@ -662,7 +662,7 @@
         "label": "위반 목록에 기록되며 확인 처리할 수 있습니다.",
         "policy": "위반",
         "policyDescription": "위반 목록에 기록되며 확인 처리할 수 있습니다.",
-        "notification": "경고",
+        "notification": "알림",
         "notificationDescription": "활동 기록에만 남고 위반으로 처리되지 않습니다."
       },
       "severityLabel": "얼마나 심각합니까?",
@@ -695,7 +695,7 @@
         "fieldPlaceholder": "확인할 항목을 선택하세요.",
         "windowPrefix": "안으로",
         "windowUnit": "시간",
-        "uniqueDevices": "고유 장치",
+        "uniqueDevices": "고유 기기",
         "uniqueDevicesHint": "다른 물리적 장치의 세션만 계산합니다.",
         "uniqueIps": "고유 IP",
         "uniqueIpsHint": "다른 IP 주소의 세션만 계산하므로 동일 가구 스트림은 계산되지 않습니다.",
@@ -821,9 +821,9 @@
     },
     "categories": {
       "session_behavior": "세션 동작",
-      "stream_quality": "스트리밍 품질",
+      "stream_quality": "스트림 품질",
       "user_attributes": "사용자 속성",
-      "device_client": "장치 및 클라이언트",
+      "device_client": "기기 및 클라이언트",
       "network_location": "네트워크 및 위치",
       "scope": "누구와 어디서",
       "media": "미디어"
@@ -887,7 +887,7 @@
         "not_contains": "포함하지 않습니다"
       },
       "fields": {
-        "concurrent_streams": "스트리밍 수",
+        "concurrent_streams": "스트림 수",
         "active_session_distance_km": "세션 간 거리",
         "travel_speed_kmh": "이동 속도",
         "unique_ips_in_window": "마지막 스트림 이후의 시간",
@@ -957,7 +957,7 @@
         "doNothing": "아무 작업도 하지 않음",
         "send": "{{destinations}}에 알림 보내기",
         "sendAnywhere": "알림 보내기",
-        "kill_stream": "스트리밍 종료",
+        "kill_stream": "스트림 종료",
         "message_client": "플레이어에 메시지 보내기",
         "trustUp": "신뢰 점수 {{amount}} 올리기",
         "trustDown": "신뢰 점수 {{amount}} 내리기",
@@ -1008,7 +1008,7 @@
       "everyServer": "모든 서버에서 실행됩니다.",
       "oneServer": "{{server}}에서만 실행됩니다."
     },
-    "emptyTitle": "미리 준비된 자동화를 골라 필요한 값만 채우세요.",
+    "emptyTitle": "아직 자동화가 없습니다",
     "emptyDescription": "미리 준비된 자동화를 골라 필요한 값만 채우세요.",
     "emptySeeAll": "{{count}}개 모두 보기",
     "emptySeeAllLoading": "모두 보기",
@@ -1047,7 +1047,7 @@
     },
     "fields": {
       "concurrent_streams": {
-        "label": "동시 스트리밍",
+        "label": "동시 스트림",
         "description": "동일한 사용자의 활성 스트리밍 수"
       },
       "active_session_distance_km": {
@@ -1113,14 +1113,14 @@
       },
       "trust_score": {
         "label": "신뢰 점수",
-        "description": "계정 생성 이후 일수"
+        "description": "사용자의 신뢰 점수(0~100)"
       },
       "account_age_days": {
         "label": "계정 연령",
         "description": "계정 생성 이후 일수"
       },
       "device_type": {
-        "label": "장치 유형",
+        "label": "기기 유형",
         "description": "사용된 장치 유형"
       },
       "client_name": {
@@ -1209,7 +1209,7 @@
       "builtin": "내장",
       "kind": {
         "policy": "위반",
-        "notification": "경고"
+        "notification": "알림"
       },
       "paste": {
         "title": "공유 코드 붙여넣기",
@@ -1274,7 +1274,7 @@
     },
     "kind": {
       "policy": "위반",
-      "notification": "경고"
+      "notification": "알림"
     },
     "kindColumn": "종류",
     "name": "이름",
@@ -1333,7 +1333,7 @@
       "video": "비디오",
       "audio": "오디오",
       "video_or_audio": "비디오 또는 오디오",
-      "neither": "둘 다 아님(직접 플레이)",
+      "neither": "둘 다 아님(다이렉트 재생)",
       "8K": "8K",
       "1440p": "1440p",
       "sdr": "SDR",
@@ -1447,7 +1447,7 @@
         "keywords": "유휴 휴면 미사용 오래된 정리 비활성 계정"
       },
       "concurrent-streams": {
-        "name": "한 번에 너무 많은 스트리밍이 발생함",
+        "name": "동시 스트림이 너무 많음",
         "description": "허용된 것보다 계정이 한 번에 더 많은 스트리밍을 재생하면 위반이 발생합니다.",
         "keywords": "제한 한도 동시 동시 공유 너무 많은 스트리밍"
       },
@@ -1459,15 +1459,15 @@
       "geo-restriction": {
         "name": "차단된 국가",
         "description": "차단한 국가에서 스트리밍하면 위반으로 기록합니다.",
-        "keywords": "불가능한 여행"
+        "keywords": "국가 지역 vpn 해외 차단 이동"
       },
       "impossible-travel": {
-        "name": "불가능한 여행",
+        "name": "불가능한 이동",
         "description": "두 세션의 위치가 한 사용자가 이동할 수 없는 거리만큼 떨어져 있으면 위반으로 기록합니다.",
-        "keywords": "일시중지된 스트리밍 중지"
+        "keywords": "vpn 이동 속도 거리 위치 공유"
       },
       "kill-paused-streams": {
-        "name": "일시중지된 스트리밍 중지",
+        "name": "일시중지된 스트림 중지",
         "description": "허용된 시간(분)이 지나 일시 중지된 스트리밍을 중지하세요.",
         "keywords": "일시 중지 유휴 afk 중지 종료 종료 회수"
       },
@@ -1482,9 +1482,9 @@
         "keywords": "업그레이드 품질 remux 4k 해상도 교체 알림 discord 이메일 webhook"
       },
       "new-device": {
-        "name": "새 장치",
+        "name": "새 기기",
         "description": "본 적이 없는 장치에서 계정이 처음 스트리밍될 때 대상에게 알립니다.",
-        "keywords": "장치 새 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 불일치 이메일 웹훅"
+        "keywords": "기기 신규 알 수 없음 인식할 수 없음 전화 로그인 공유 알림 discord 이메일 웹훅"
       },
       "newsletter-failed": {
         "name": "뉴스레터 발송 실패",
@@ -1527,12 +1527,12 @@
         "keywords": "거리 위치 공유 VPN 두 곳을 동시에 공유"
       },
       "stream-ended": {
-        "name": "스트리밍 종료됨",
+        "name": "스트림 종료됨",
         "description": "스트리밍이 끝날 때마다 알림 대상에 알립니다.",
         "keywords": "중지 끝 재생 완료 알림 불일치 이메일 웹훅"
       },
       "stream-started": {
-        "name": "스트리밍이 시작되었습니다.",
+        "name": "스트림 시작됨",
         "description": "스트리밍이 시작될 때마다 알림 대상에 알립니다.",
         "keywords": "재생 시청 시작 보기 시작 알림 불일치 이메일 웹훅"
       },
@@ -1542,9 +1542,9 @@
         "keywords": "업데이트 업그레이드 버전 릴리스 tracearr 알림 discord 이메일 웹훅"
       },
       "transcode-started": {
-        "name": "스트림에서 비디오 또는 오디오 트랜스코딩이 시작되면 알림 대상에 알립니다.",
+        "name": "스트림 트랜스코딩 중",
         "description": "스트림에서 비디오 또는 오디오 트랜스코딩이 시작되면 알림 대상에 알립니다.",
-        "keywords": "신뢰 점수가 변경됨"
+        "keywords": "트랜스코딩 변환 cpu 다이렉트 재생 품질 알림 discord 이메일 webhook"
       },
       "trust-score-changed": {
         "name": "신뢰 점수가 변경됨",
@@ -1593,8 +1593,8 @@
           "synonyms": "끝내다, 끝내다, 그만두다, 닫다"
         },
         "sessionTranscodeChanged": {
-          "description": "서버는 직접 재생과 트랜스코딩 간에 스트림을 전환합니다.",
-          "synonyms": "스트림이 일시중지되는 순간입니다."
+          "description": "서버가 스트림을 다이렉트 재생과 트랜스코딩 사이에서 전환합니다.",
+          "synonyms": "트랜스코딩, 변환, 다이렉트 재생, cpu"
         },
         "sessionPaused": {
           "description": "스트림이 일시중지되는 순간입니다.",
@@ -1657,7 +1657,7 @@
       },
       "actions": {
         "send": {
-          "synonyms": "알림, 경고, 불일치, 이메일, 웹훅, 푸시"
+          "synonyms": "알림, 경고, discord, 이메일, 웹훅, 푸시"
         },
         "trust": {
           "synonyms": "점수, 평판, 처벌, 보상"
@@ -1741,13 +1741,13 @@
       "serversConnected_other": "서버 {{count}}대 연결됨"
     },
     "destinations": {
-      "add": "알림 대상 추가",
+      "add": "전송 대상 추가",
       "builtinNote": "내장",
       "clearSecret": "지우기",
       "deleteConfirm": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
       "description": "알림을 보낼 대상을 추가합니다. 원하는 만큼 추가한 뒤 자동화에서 선택할 수 있습니다.",
       "emailDescription": "Tracearr는 이 SMTP 서버를 통해 메일을 보냅니다. 뉴스레터마다 수신자를 선택하며, 자동화 알림은 아래 주소로 전송됩니다.",
-      "empty": "아직 알림 대상이 없습니다.",
+      "empty": "아직 전송 대상이 없습니다.",
       "fields": {
         "webhookUrl": "웹훅 URL",
         "url": "URL",
@@ -1903,7 +1903,7 @@
     "title": "기기 호환성",
     "description": "",
     "analyzedSessions": "분석된 세션",
-    "directPlayRate": "직접 재생 비율",
+    "directPlayRate": "다이렉트 재생 비율",
     "videoAndAudio": "",
     "uniqueDevices": "고유 기기",
     "uniqueCodecs": "고유 코덱",
@@ -1916,7 +1916,7 @@
     "pctOfTotal": "전체 대비 %",
     "noTranscodeHotspots": "트랜스코딩 집중 구간이 없습니다",
     "compatibilityMatrix": "호환성 매트릭스",
-    "compatibilityMatrixDesc": "기기와 비디오 코덱별 직접 재생 비율입니다. 세션 수 기준으로 정렬됩니다.",
+    "compatibilityMatrixDesc": "기기와 비디오 코덱별 다이렉트 재생 비율입니다. 세션 수 기준으로 정렬됩니다.",
     "noDeviceDataPeriod": "이 기간에는 기기 데이터가 없습니다",
     "legend": "범례:",
     "directPlayHigh": "80% 이상 직접 재생",
@@ -2021,7 +2021,7 @@
         "mostPopularShows": "가장 인기 있는 프로그램",
         "emptyRecentlyAdded": "서버 전체에서 중복 제거",
         "emptyRecentlyUpdated": "이 기간에는 교체된 항목이 없습니다.",
-        "emptyMostPopular": "서버 전체에서 중복 제거",
+        "emptyMostPopular": "이 기간에 재생이 없습니다",
         "captionRecentlyAdded": "서버 전체에서 중복 제거",
         "captionRecentlyUpdated": "더 나은 버전으로 교체됨",
         "captionMostPopular": {
@@ -2097,7 +2097,7 @@
         "backLink": "미디어로 돌아가기"
       },
       "hero": {
-        "loadError": "{{count}} 시즌",
+        "loadError": "이 콘텐츠를 불러오지 못했습니다",
         "meta": {
           "seasons_other": "{{count}} 시즌",
           "episodes_other": "{{count}}개의 에피소드"
@@ -2116,11 +2116,11 @@
         }
       },
       "kpis": {
-        "ariaLabel": "통계 보기",
+        "ariaLabel": "시청 통계",
         "loadError": "시계 통계를 불러올 수 없습니다.",
         "completionLoadError": "시청 시간",
         "plays": {
-          "label": "시청 시간",
+          "label": "전체 기간 재생 수",
           "caption": "재개 체인, 짧은 세션 제외"
         },
         "watchTime": {
@@ -2176,7 +2176,7 @@
       "history": {
         "title": "기록",
         "loadError": "아직 재생 기록이 없습니다.",
-        "empty": "완료되지 않음",
+        "empty": "아직 재생 기록이 없습니다",
         "watched": "시청함",
         "notWatched": "완료되지 않음",
         "columns": {
@@ -2215,7 +2215,7 @@
       "versionsChip": "{{count}}×",
       "moreServers": "+{{count}}개 이상",
       "viewers_other": "시청자 {{count}}명",
-      "playsCompact_other": "{{compact}} 플레이",
+      "playsCompact_other": "{{compact}}회 재생",
       "versions_other": "{{count}} 버전"
     },
     "grid": {
@@ -2276,13 +2276,13 @@
         "label": "문자로 이동",
         "current": "현재 {{letter}}"
       },
-      "loaderError": "다시 시도",
+      "loaderError": "콘텐츠를 더 불러오지 못했습니다",
       "retry": "다시 시도",
       "clearJumpAction": "지우기",
       "showingFrom": "{{letter}}에서 표시 중",
       "showAll": "모두 표시",
       "emptyFilter": "\"{{query}}\"와(와) 일치하는 제목이 없습니다.",
-      "emptySearch": "카탈로그를 불러올 수 없습니다.",
+      "emptySearch": "\"{{query}}\"와 일치하는 콘텐츠가 없습니다",
       "emptyAnchored": "카탈로그를 불러올 수 없습니다.",
       "loadError": "카탈로그를 불러올 수 없습니다."
     }
