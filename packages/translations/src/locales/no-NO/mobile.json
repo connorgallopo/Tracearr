@@ -47,15 +47,15 @@
     "account": "Konto",
     "disconnect": "",
     "disconnectServer": "Koble fra server",
-    "disconnectConfirm": "Er du sikker på at du vil koble fra \"{{serverName}}\"? Du må parre igjen for å bruke appen.",
-    "disconnectConfirmGeneric": "Er du sikker på at du vil koble fra? Du må parre deg igjen for å bruke appen.",
+    "disconnectConfirm": "Er du sikker på at du vil koble fra «{{serverName}}»? Du må koble sammen på nytt for å bruke appen.",
+    "disconnectConfirmGeneric": "Er du sikker på at du vil koble fra? Du må koble sammen på nytt for å bruke appen.",
     "currentlyConnected": "Foreløpig koblet til {{serverName}}",
     "version": "",
     "build": ""
   },
   "navigation": {
     "selectServer": "Velg Server",
-    "server": "Tjener"
+    "server": "Server"
   },
   "resources": {
     "cpu": "Prosessor",
