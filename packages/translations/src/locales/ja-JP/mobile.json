@@ -163,7 +163,7 @@
     "sortTrust": ""
   },
   "activity": {
-    "playsOverTime": "再生時間",
+    "playsOverTime": "再生回数の推移",
     "concurrentStreams": "同時ストリーム",
     "platforms": "プラットフォーム",
     "playbackQuality": ""
