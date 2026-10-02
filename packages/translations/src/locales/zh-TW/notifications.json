@@ -29,12 +29,12 @@
         "message": "違規行為已被標記為已確認"
       },
       "violationDismissed": {
-        "title": "違規撤銷",
-        "message": "違規行為已被撤銷"
+        "title": "已忽略違規",
+        "message": "違規已被忽略"
       },
       "deviceRemoved": {
         "title": "已移除裝置",
-        "message": "設備已中斷連接"
+        "message": "裝置已中斷連線"
       },
       "deviceRenamed": {
         "title": "已重新命名裝置",
@@ -106,8 +106,8 @@
         "message_other": "{{count}} 個已確認的違規行為"
       },
       "violationsDismissed": {
-        "title": "已撤銷違規",
-        "message_other": "已撤銷 {{count}} 個違規"
+        "title": "已忽略違規",
+        "message_other": "已忽略 {{count}} 個違規"
       },
       "apiKeyGenerated": {
         "title": "已生成 API 密鑰",
@@ -123,7 +123,7 @@
       },
       "pairTokenGenerated": {
         "title": "已生成配對憑證",
-        "message": "使用你的移動裝置掃描 QR 碼來進行配對"
+        "message": "使用你的行動裝置掃描 QR 碼來進行配對"
       },
       "identityUpdated": "",
       "trustScoresReset": {
@@ -164,8 +164,8 @@
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "無法更新設定",
       "copyFailed": "無法複製到剪貼簿",
-      "acknowledgeFailed": "無法辨識違規行為",
-      "dismissFailed": "無法排除違規",
+      "acknowledgeFailed": "無法確認違規",
+      "dismissFailed": "無法忽略違規",
       "authFailed": "認證失敗",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
@@ -250,7 +250,7 @@
     "trustScoreChanged": "信任分數已更改",
     "serverDown": "伺服器離線",
     "serverUp": "伺服器上線",
-    "minimumSeverity": "最小的嚴重程度",
+    "minimumSeverity": "最低嚴重度",
     "quietHours": "勿擾時段",
     "enableQuietHours": "啟用勿擾時段",
     "overrideForCritical": "覆蓋臨界值",
