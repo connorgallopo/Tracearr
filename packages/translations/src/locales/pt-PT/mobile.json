@@ -17,7 +17,7 @@
   "errors": {
     "invalidUrl": "URL inválida",
     "pleaseEnterValidUrl": "Por favor, insira uma URL de servidor válida",
-    "pairingFailed": "Falha no pareamento",
+    "pairingFailed": "Falha no emparelhamento",
     "unableToPair": "",
     "invalidQrCode": "",
     "invalidQrCodeMissingData": "Código QR inválido: falta dados de emparelhamento",
@@ -47,8 +47,8 @@
     "account": "conta",
     "disconnect": "Desconectar",
     "disconnectServer": "Desconectar servidor",
-    "disconnectConfirm": "Tem certeza que deseja desconectar do \"{{serverName}}\"? Você precisará parear novamente para usar o aplicativo.",
-    "disconnectConfirmGeneric": "Tem certeza que deseja desconectar? Você precisará parear novamente para usar o aplicativo.",
+    "disconnectConfirm": "Tem a certeza de que pretende desligar de \"{{serverName}}\"? Terá de emparelhar novamente para utilizar a aplicação.",
+    "disconnectConfirmGeneric": "Tem a certeza de que pretende desligar? Terá de emparelhar novamente para utilizar a aplicação.",
     "currentlyConnected": "Conectado atualmente a {{serverName}}",
     "version": "Versão {{version}}",
     "build": "Compilação {{build}}"
@@ -169,7 +169,7 @@
   },
   "activity": {
     "playsOverTime": "Reproduções ao longo do tempo",
-    "concurrentStreams": "Fluxos simultâneos",
+    "concurrentStreams": "Transmissões simultâneas",
     "platforms": "Plataformas",
     "playbackQuality": ""
   },
