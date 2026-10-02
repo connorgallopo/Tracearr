@@ -472,6 +472,7 @@
   },
   "serverHealth": {
     "unreachable": "Το {{serverName}} δεν είναι προσβάσιμο",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_other": "{{count}} διακομιστές απρόσιτοι: {{serverNames}}"
   },
