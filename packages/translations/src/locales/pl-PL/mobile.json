@@ -11,7 +11,7 @@
     "scanQrInstructions": "Otwórz Ustawienia → Aplikacja mobilna w panelu Tracearr i zeskanuj kod QR",
     "urlPlaceholder": "https://tracearr.example.com",
     "tokenPlaceholder": "trr_mob_...",
-    "missingToken": "Brakujący token",
+    "missingToken": "Brak tokenu",
     "pleaseEnterToken": "Wprowadź swój token dostępu"
   },
   "errors": {
@@ -22,8 +22,8 @@
     "invalidQrCode": "Kod QR jest nieprawidłowy",
     "invalidQrCodeMissingData": "Nieprawidłowy kod QR: brakuje danych parowania",
     "invalidQrCodeFormat": "Nieprawidłowy format kodu QR. Wygeneruj nowy kod.",
-    "invalidQrCodeMissingUrl": "Nieprawidłowy kod QR: brakujący adres URL serwera",
-    "invalidQrCodeMissingToken": "Nieprawidłowy kod QR brakujący token parowania",
+    "invalidQrCodeMissingUrl": "Nieprawidłowy kod QR: brak adresu URL serwera",
+    "invalidQrCodeMissingToken": "Nieprawidłowy kod QR: brak tokenu parowania",
     "errorDetails": "Szczegóły błędu:",
     "connectionLost": "Utracono połączenie",
     "failedToLoadSession": "Nie udało się załadować sesji"
@@ -47,8 +47,8 @@
     "account": "Konto",
     "disconnect": "Rozłącz",
     "disconnectServer": "Rozłącz serwer",
-    "disconnectConfirm": "Czy na pewno chcesz odłączyć się od \"{{serverName}}\"? Będziesz musiał sparować ponownie, aby użyć aplikacji.",
-    "disconnectConfirmGeneric": "Czy jesteś pewien, że chcesz się rozłączyć? Będziesz musiał sparować ponownie, aby używać aplikacji.",
+    "disconnectConfirm": "Czy na pewno chcesz rozłączyć się z „{{serverName}}”? Aby korzystać z aplikacji, trzeba będzie sparować ją ponownie.",
+    "disconnectConfirmGeneric": "Czy na pewno chcesz się rozłączyć? Aby korzystać z aplikacji, trzeba będzie sparować ją ponownie.",
     "currentlyConnected": "Obecnie połączono z {{serverName}}",
     "version": "Wersja {{version}}",
     "build": "Kompilacja {{build}}"
@@ -76,7 +76,7 @@
     "newPlaybackBegan": "Rozpoczęto nowe odtwarzanie",
     "playbackEnded": "Odtwarzanie zakończone",
     "newDeviceDetected": "Wykryto nowe urządzenie użytkownika",
-    "trustScoreDegraded": "Poziom zaufania użytkownika uległ pogorszeniu",
+    "trustScoreDegraded": "Wynik zaufania użytkownika spadł",
     "serverUnreachable": "Serwer mediów nieosiągalny",
     "serverBackOnline": "Serwer mediów jest ponownie dostępny",
     "allViolationTypes": "Wszystkie rodzaje naruszeń",
@@ -107,7 +107,7 @@
   "session": {
     "streamTerminated": "Strumień przerwany",
     "sessionStopped": "Sesja odtwarzania została zatrzymana.",
-    "failedToTerminate": "Nie udało się zakończyć"
+    "failedToTerminate": "Nie udało się przerwać"
   },
   "userDetail": {
     "userMayBeRemoved": "Ten użytkownik mógł zostać usunięty.",
@@ -117,8 +117,8 @@
     "noTerminations": "Brak przerwanych strumieni",
     "lastSeen": "Ostatnio widziany {{relative}}",
     "terminatedBy": "Przez @{{username}}",
-    "trustScoreConfirm": "Ustawić poziom zaufania dla @{{username}} na {{score}}?",
-    "trustScoreRange": "Poziom zaufania dla @{{username}}, od 0 do 100.",
+    "trustScoreConfirm": "Ustawić wynik zaufania dla @{{username}} na {{score}}?",
+    "trustScoreRange": "Wynik zaufania dla @{{username}}, od 0 do 100.",
     "moreLocations_one": "+{{count}} inna lokalizacja",
     "moreLocations_few": "+{{count}} inne lokalizacje",
     "moreLocations_many": "+{{count}} innych lokalizacji",
@@ -138,7 +138,7 @@
     "acknowledgeAllBody": "Każde oczekujące powiadomienie na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
     "acknowledgeAllBodySeverity": "Każde oczekujące powiadomienie o poziomie {{severity}} na {{servers}} zostanie oznaczone jako potwierdzone. Tej operacji nie można cofnąć.",
     "all": "Wszystkie",
-    "allClear": "Wszystko wyczyszczone",
+    "allClear": "Brak nowych powiadomień",
     "allServers": "wszystkie serwery",
     "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
     "noMatches": "Brak pasujących powiadomień",
@@ -146,7 +146,7 @@
     "acknowledgeAllTitle_few": "Potwierdzić {{count}} powiadomienia?",
     "acknowledgeAllTitle_many": "Potwierdzić {{count}} powiadomień?",
     "acknowledgeAllTitle_other": "Potwierdzić {{count}} powiadomień?",
-    "pendingCount_one": "{{count}} oczekujący",
+    "pendingCount_one": "{{count}} oczekujące",
     "pendingCount_few": "{{count}} oczekujące",
     "pendingCount_many": "{{count}} oczekujących",
     "pendingCount_other": "{{count}} oczekujących"
@@ -173,13 +173,13 @@
     "noUsers": "Brak użytkowników",
     "usersWillAppear": "Użytkownicy pojawią się tutaj po synchronizacji z Twoim serwerem multimediów",
     "noUsersMatch": "Brak użytkowników pasujących do \"{{query}}\"",
-    "joinedRelative": "Dołączył {{relative}}",
-    "sortActive": "Aktywny",
+    "joinedRelative": "Dołączono {{relative}}",
+    "sortActive": "Aktywność",
     "sortTrust": "Zaufanie"
   },
   "activity": {
-    "playsOverTime": "Odtwarzanie w czasie",
-    "concurrentStreams": "Równoległe Transmisje",
+    "playsOverTime": "Odtworzenia w czasie",
+    "concurrentStreams": "Równoległe strumienie",
     "platforms": "Platformy",
     "playbackQuality": "Jakość odtwarzania"
   },
@@ -199,9 +199,9 @@
     "selectServer": "Wybierz serwer",
     "alerts": "Powiadomienia",
     "settings": "Ustawienia",
-    "trustScore": "Poziom zaufania {{score}}",
-    "decreaseTrustScore": "Zmniejsz poziom zaufania",
-    "increaseTrustScore": "Zwiększ poziom zaufania",
+    "trustScore": "Wynik zaufania {{score}}",
+    "decreaseTrustScore": "Zmniejsz wynik zaufania",
+    "increaseTrustScore": "Zwiększ wynik zaufania",
     "sortAscending": "Posortowano rosnąco, stuknij, aby odwrócić",
     "sortDescending": "Posortowano malejąco, stuknij, aby odwrócić",
     "alertsCount_one": "Powiadomienia, {{count}} nieprzeczytane",
@@ -218,14 +218,14 @@
     "unavailable": "Mapa jest niedostępna"
   },
   "automations": {
-    "editOnWeb": "Automatyzacje mogą być tworzone i edytowane w aplikacji Web Tracearr.",
+    "editOnWeb": "Automatyzacje tworzy się i edytuje w aplikacji internetowej Tracearr.",
     "emptyDescription": "Utwórz automatyzacje w aplikacji internetowej Tracearr, a pojawią się tutaj.",
     "kind": {
-      "notification": "Powiadomienia",
-      "policy": "Zasady"
+      "notification": "Powiadomienie",
+      "policy": "Zasada"
     },
     "lastRun": "Ostatnie uruchomienie {{when}}",
-    "truncated": "Wyświetlono pierwsze {{shown}} z {{total}} automatyzacji. Pozostałe są dostępne w aplikacji Web Tracearr.",
+    "truncated": "Wyświetlono pierwsze {{shown}} z {{total}} automatyzacji. Pozostałe są dostępne w aplikacji internetowej Tracearr.",
     "turnOffFailed": "Nie udało się wyłączyć. Nadal jest włączona.",
     "turnOnFailed": "Nie udało się włączyć. Nadal jest wyłączona.",
     "unsupportedDescription": "Ten serwer zgłasza wersję {{version}}. Zaktualizuj Tracearr, aby zobaczyć automatyzacje i ich wykonania.",
@@ -237,7 +237,7 @@
     "conditions_other": "{{count}} warunków"
   },
   "charts": {
-    "weekOf": "Tydzień {{date}}"
+    "weekOf": "Tydzień od {{date}}"
   },
   "push": {
     "violationTitle": "Naruszenie: {{severity}}"
