@@ -148,8 +148,8 @@
     "deviceId": "Apparaat ID",
     "total": "totaal",
     "mediaLength": "Media lengte",
-    "streamDetails": "Steam Details",
-    "transcodeReason": "Transcode Reden",
+    "streamDetails": "Streamdetails",
+    "transcodeReason": "Reden voor transcoderen",
     "loadMore": "Laad Meer",
     "playback": ""
   },
