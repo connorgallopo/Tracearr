@@ -477,6 +477,7 @@
   },
   "serverHealth": {
     "unreachable": "",
+    "tokenRejected": "",
     "multipleUnreachable_one": "",
     "multipleUnreachable_few": "",
     "multipleUnreachable_other": ""
