@@ -55,7 +55,7 @@
     "connected": "Підключено",
     "saving": "Збереження...",
     "dismissing": "Відхилення...",
-    "acknowledging": "Підтверджено..."
+    "acknowledging": "Підтвердження..."
   },
   "playback": {
     "playing": "Відтворюється",
@@ -136,7 +136,7 @@
     "sessionDetails": "Деталі сеансу",
     "recentSessions": "Нещодавні сеанси",
     "days": "днів",
-    "totalSessions": "Всього сесій",
+    "totalSessions": "Всього сеансів",
     "sessions": "Сеанси",
     "apiKey": "Ключ API",
     "rank": "Ранг",
@@ -148,7 +148,7 @@
     "deviceId": "",
     "total": "всього",
     "mediaLength": "",
-    "streamDetails": "Деталі трансляції",
+    "streamDetails": "Деталі потоку",
     "transcodeReason": "",
     "loadMore": "Завантажити більше",
     "playback": "Відтворення"
@@ -256,10 +256,10 @@
     "device_few": "",
     "device_many": "",
     "device_other": "{{count}} пристрої",
-    "play_one": "{{count}} перегляд",
+    "play_one": "{{count}} відтворення",
     "play_few": "",
     "play_many": "",
-    "play_other": "{{count}} переглядів",
+    "play_other": "{{count}} відтворень",
     "segment_one": "",
     "segment_few": "",
     "segment_many": "",
