@@ -60,6 +60,7 @@
   "playback": {
     "playing": "Přehrává se",
     "paused": "Pozastaveno",
+    "buffering": "",
     "stopped": "Zastaveno",
     "directPlay": "Přímé přehrávání",
     "directStream": "Přímé vysílání",
