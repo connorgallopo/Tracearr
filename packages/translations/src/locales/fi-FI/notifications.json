@@ -29,7 +29,7 @@
         "message": "Rikkomus on merkitty kuitatuksi"
       },
       "violationDismissed": {
-        "title": "Rikkomus Hylätty",
+        "title": "Rikkomus hylätty",
         "message": "Rikkomus on hylätty"
       },
       "deviceRemoved": {
@@ -110,7 +110,7 @@
       },
       "violationsDismissed": {
         "title": "Rikkomukset Hylätty",
-        "message_one": "{{count}} rikkomusta hylätty",
+        "message_one": "{{count}} rikkomus hylätty",
         "message_other": "{{count}} rikkomusta hylätty"
       },
       "apiKeyGenerated": {
@@ -132,11 +132,11 @@
       "identityUpdated": "Profiili päivitetty",
       "trustScoresReset": {
         "title": "Luottamuspisteet nollattu",
-        "message_one": "{{count}} käyttäjän nollaus 100",
-        "message_other": "{{count}} käyttäjää nollattu 100 käyttäjäksi"
+        "message_one": "{{count}} käyttäjän luottamuspisteet palautettu arvoon 100",
+        "message_other": "{{count}} käyttäjän luottamuspisteet palautettu arvoon 100"
       },
       "claimCodeValidated": {
-        "title": "Lunasta koodi vahvistettu",
+        "title": "Lunastuskoodi vahvistettu",
         "message": "Voit nyt jatkaa asetuksia"
       },
       "usersMerged": {
@@ -203,7 +203,7 @@
       "mergeSuggestionDismissFailed": "Ehdotusta ei voitu hylätä",
       "mergeSuggestionRestoreFailed": "Ehdotusta ei voitu palauttaa",
       "invalidClaimCode": {
-        "title": "Virheellinen korvauskoodi",
+        "title": "Virheellinen lunastuskoodi",
         "message": "Ole hyvä ja tarkista palvelimen lokit"
       },
       "destinationSaveFailed": "Kohteen tallennus epäonnistui: {{error}}",
@@ -251,7 +251,7 @@
     "violationDetected": "Rikkomus havaittu",
     "streamStarted": "Striimi aloitettu",
     "streamStopped": "Striimi pysäytetty",
-    "concurrentStreams": "Samanaikaiset Streamit",
+    "concurrentStreams": "Samanaikaiset striimit",
     "newDevice": "Uusi Laite",
     "trustScoreChanged": "Luottamuspisteet muutettu",
     "serverDown": "Palvelin Alas",
