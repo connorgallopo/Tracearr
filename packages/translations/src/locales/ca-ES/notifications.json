@@ -13,12 +13,12 @@
         "title": "Servidor sincronitzat"
       },
       "serverMarkedHistorical": {
-        "title": "",
-        "message": ""
+        "title": "Servidor marcat com a històric",
+        "message": "Tracearr ja no contacta amb {{name}}. L'historial es conserva."
       },
       "serverResumed": {
-        "title": "",
-        "message": ""
+        "title": "Servidor représ",
+        "message": "Tracearr torna a contactar amb {{name}}."
       },
       "settingsUpdated": {
         "title": "Configuració actualitzada",
@@ -160,14 +160,14 @@
       "brandingSaved": "S'ha desat la imatge de marca del correu",
       "suppressionAdded": "S'ha afegit l'adreça a la llista de supressió",
       "suppressionRemoved": "S'ha tret l'adreça de la llista de supressió",
-      "newsletterRetryQueued_one": "",
+      "newsletterRetryQueued_one": "S'està reintentant amb {{count}} destinatari",
       "newsletterRetryQueued_other": "S'està reintentant amb {{count}} destinataris"
     },
     "error": {
       "serverAddFailed": "No s'ha pogut afegir el servidor",
       "serverRemoveFailed": "No s'ha pogut suprimir el servidor",
       "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
-      "serverHistoricalFailed": "",
+      "serverHistoricalFailed": "No s'ha pogut canviar l'estat del servidor",
       "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
       "copyFailed": "No s'ha pogut copiar al porta-retalls",
       "acknowledgeFailed": "No s'ha pogut confirmar l'incompliment",
