@@ -201,7 +201,19 @@
       "qualityEvolution": "Изменения Качества",
       "all": "Все",
       "failedToLoad": "Не удалось загрузить данные качества",
-      "failedToLoadDesc": "Не удалось получить данные о качестве. Пожалуйста, попробуйте еще раз."
+      "failedToLoadDesc": "Не удалось получить данные о качестве. Пожалуйста, попробуйте еще раз.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_few": "",
+        "movieCount_many": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_few": "",
+        "episodeCount_many": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Хранилище",
@@ -2368,10 +2380,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",
