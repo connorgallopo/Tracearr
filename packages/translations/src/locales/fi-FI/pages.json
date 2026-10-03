@@ -338,13 +338,13 @@
     "noViolationsRecorded": "Rikkomuksia ei ole vielä tallennettu.",
     "allSeverities": "Kaikki Vakavuudet",
     "allStatuses": "Kaikki Tilat",
-    "allRules": "",
-    "filterPeople": "",
-    "allPeople": "",
-    "personFilterPlaceholder": "",
-    "personFilterEmpty": "",
-    "personFilterError": "",
-    "filterByPerson": "",
+    "allRules": "Kaikki säännöt",
+    "filterPeople": "Ihmiset",
+    "allPeople": "Kaikki ihmiset",
+    "personFilterPlaceholder": "Suodata henkilön mukaan",
+    "personFilterEmpty": "Vastaavia henkilöitä ei löytynyt",
+    "personFilterError": "Henkilöiden lataaminen epäonnistui",
+    "filterByPerson": "Suodata rikkomukset tämän henkilön mukaan",
     "detail": {
       "notFound": "Rikkomusta ei löytynyt",
       "violationDetails": "Rikkomuksen Tiedot",
@@ -374,163 +374,163 @@
     "selectAllViolations_other": "Valitse kaikki {{count}} rikkomistapausta vastaavat suodattimet",
     "dismissViolations_one": "Hylkää {{count}} rikkomus",
     "dismissViolations_other": "Hylkää {{count}} Rikkomuksia",
-    "peopleSelectedCount_one": "",
-    "peopleSelectedCount_other": ""
+    "peopleSelectedCount_one": "{{count}} henkilö",
+    "peopleSelectedCount_other": "{{count}} henkilöä"
   },
   "automations": {
     "message": {
-      "heading": "",
+      "heading": "Viesti",
       "defaultText": "",
-      "title": "",
-      "body": "",
+      "title": "Otsikko",
+      "body": "Viesti",
       "blankHint": "",
-      "insertVariable": "",
-      "searchVariables": "",
+      "insertVariable": "Lisää muuttuja",
+      "searchVariables": "Hae muuttujia",
       "noVariables": "",
-      "preview": "",
+      "preview": "Esikatselu",
       "previewSamples": "",
-      "previewDefault": "",
+      "previewDefault": "Tracearrin oletus tälle tapahtumalle",
       "previewDefaultHint": "",
       "previewPickDestination": "",
-      "fieldTitle": "",
-      "fieldMessage": "",
-      "fieldSubject": "",
-      "fieldHeading": "",
-      "fieldEmbedTitle": "",
-      "fieldDescription": "",
+      "fieldTitle": "Otsikko",
+      "fieldMessage": "Viesti",
+      "fieldSubject": "Aihe",
+      "fieldHeading": "Otsikko (sama kuin aihe)",
+      "fieldEmbedTitle": "Upota otsikko",
+      "fieldDescription": "Kuvaus",
       "addedDiscord": "",
       "addedEmail": "",
       "addedPushSubtitle": "",
-      "previewCount": "",
-      "previewCountBytes": "",
+      "previewCount": "{{used, number}} / {{max, number}}",
+      "previewCountBytes": "{{used, number}} / {{max, number}} bytes",
       "previewCut": "",
-      "previewPriority": "",
+      "previewPriority": "Prioriteetti: {{priority}}",
       "previewEscapeHint": "",
       "webhookNotSent": ""
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "Automaattinen",
+      "lowest": "Matalin",
+      "low": "Matala",
+      "normal": "Normaali",
+      "high": "Korkea",
+      "urgent": "Kiireellinen"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
-      "trust": "",
-      "newsletter": "",
-      "event": ""
+      "account": "Tili",
+      "stream": "Striimi",
+      "server": "Palvelin",
+      "media": "Media",
+      "device": "Laite",
+      "trust": "Luottamus",
+      "newsletter": "Uutiskirje",
+      "event": "Tapahtuma"
     },
     "variables": {
       "user": {
-        "username": "",
-        "identityName": ""
+        "username": "Tilin käyttäjätunnus",
+        "identityName": "Henkilön nimi"
       },
       "session": {
-        "mediaTitle": "",
-        "mediaType": "",
-        "sourceDynamicRange": "",
-        "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
-        "name": ""
+        "mediaTitle": "Toistonimike",
+        "mediaType": "Median tyyppi",
+        "sourceDynamicRange": "Lähteen dynaaminen alue",
+        "sourceVideoCodec": "Lähteen koodekki",
+        "seasonNumber": "Kauden numero",
+        "episodeNumber": "Jakson numero",
+        "name": "Sarja ja jakso, tai nimike"
       },
       "server": {
-        "name": "",
-        "type": ""
+        "name": "Palvelimen Nimi",
+        "type": "Palvelintyyppi"
       },
       "device": {
-        "name": "",
-        "platform": "",
-        "product": "",
-        "location": ""
+        "name": "Laitteen nimi",
+        "platform": "Alusta",
+        "product": "Sovellus",
+        "location": "Sijainti"
       },
       "trust": {
-        "previous": "",
-        "new": "",
-        "reason": ""
+        "previous": "Edellinen pistemäärä",
+        "new": "Uusi pistemäärä",
+        "reason": "Syy"
       },
       "media": {
-        "title": "",
-        "name": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "episodeCount": "",
-        "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "title": "Kohteen nimi",
+        "name": "Sarja ja jakso, tai nimike",
+        "show": "Sarja",
+        "season": "Kausi ",
+        "episode": "Jakso",
+        "episodeCount": "Jaksoja lisätty",
+        "type": "Median tyyppi",
+        "year": "Vuosi",
+        "library": "Kirjasto",
+        "server": "Palvelin",
         "from": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Vanha resoluutio",
+          "dynamicRange": "Vanha dynaaminen alue",
+          "videoCodec": "Vanha videokoodekki",
+          "audioCodec": "Vanha äänikoodekki",
+          "audioChannels": "Vanhat äänikanavat",
+          "fileSize": "Vanha tiedostokoko"
         },
         "to": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Uusi resoluutio",
+          "dynamicRange": "Uusi dynaaminen alue",
+          "videoCodec": "Uusi videokoodekki",
+          "audioCodec": "Uusi äänikoodekki",
+          "audioChannels": "Uudet äänikanavat",
+          "fileSize": "Uusi tiedostokoko"
         }
       },
       "newsletter": {
-        "name": "",
-        "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "name": "Uutiskirje",
+        "outcome": "Lopputulos",
+        "recipientCount": "Vastaanottajat",
+        "error": "Virhe"
       },
-      "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
-      "releaseUrl": ""
+      "durationMinutes": "Minuuttia katsottu",
+      "minutes": "Minuuttia",
+      "days": "Päivää passiivisena",
+      "installedVersion": "Asennettu versio",
+      "latestVersion": "Viimeisin versio",
+      "downloadUrl": "Latauslinkki",
+      "releaseUrl": "Linkki julkaisutietoihin"
     },
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "Lähetä ilmoitus",
+        "description": "Lähetä yhteen tai useampaan kohteeseen",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Vähimmäisaika ilmoitusten välillä"
           },
           "priority": {
             "description": ""
           }
         },
-        "ran": ""
+        "ran": "Ilmoitus lähetettiin"
       },
       "trust": {
-        "label": "",
+        "label": "Luottamuspisteet",
         "description": "",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Tila"
           },
           "amount": {
-            "label": "",
+            "label": "Määrä",
             "description": ""
           },
           "value": {
-            "label": ""
+            "label": "Arvo"
           }
         },
-        "ran": ""
+        "ran": "Muutettiin luottamuspisteitä"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "Tapa striimi",
+        "description": "Lopeta aktiivinen striimi",
         "fields": {
           "cooldown_minutes": {
             "description": ""
@@ -543,10 +543,10 @@
             "description": ""
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Valinnainen viesti"
           }
         },
-        "ran": ""
+        "ran": "Striimi pysäytettiin"
       },
       "message_client": {
         "label": "",
@@ -566,28 +566,28 @@
     "activity": {
       "title": "",
       "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "outcome": "Lopputulos",
+      "who": "Kuka",
+      "where": "Missä",
+      "playing": "Toistetaan",
+      "from": "Mistä",
+      "summary": "Yhteenveto",
+      "started": "Käynnistettiin",
+      "finished": "Päätettiin",
+      "noSummary": "Ei muistiinpanoja",
       "outcomes": {
         "completed": "",
         "stopped_by_condition": "",
-        "error": ""
+        "error": "Epäonnistui"
       },
-      "empty": "",
+      "empty": "Ei vielä ajoja",
       "emptyDescription": "",
       "runTitle": "",
       "runLoading": "",
       "triggeredBy": "",
       "unknownStep": "",
       "tabs": {
-        "all": "",
+        "all": "Kaikki",
         "completed": "",
         "stopped_by_condition": "",
         "error": ""
@@ -599,16 +599,16 @@
       },
       "whyBranch": "",
       "openInEditor": "",
-      "tabsLabel": "",
+      "tabsLabel": "Suodata lopputuloksen mukaan",
       "emptyRan": "",
-      "item": "",
+      "item": "Kohde",
       "recordedViolation": "",
       "emptyRanDescription_one": "",
       "emptyRanDescription_other": ""
     },
-    "allKinds": "",
-    "allStatuses": "",
-    "allSeverities": "",
+    "allKinds": "Kaikki tyypit",
+    "allStatuses": "Kaikki tilat",
+    "allSeverities": "Kaikki vakavuusasteet",
     "bind": {
       "nameHelper": "",
       "namePlaceholder": "",
@@ -688,134 +688,134 @@
       "clearSelection": "",
       "scope": {
         "label": "",
-        "global": "",
-        "server": "",
-        "account": "",
-        "person": "",
-        "serverLabel": "",
-        "serverPlaceholder": "",
-        "accountLabel": "",
-        "accountPlaceholder": "",
-        "personLabel": "",
-        "personPlaceholder": "",
+        "global": "Kaikki",
+        "server": "Yksi palvelin",
+        "account": "Yksi tili",
+        "person": "Yksi henkilö",
+        "serverLabel": "Palvelin",
+        "serverPlaceholder": "Valitse palvelin",
+        "accountLabel": "Tili",
+        "accountPlaceholder": "Valitse tili",
+        "personLabel": "Henkilö",
+        "personPlaceholder": "Valitse henkilö",
         "personHelper": "",
-        "noServers": "",
+        "noServers": "Palvelimia ei ole vielä yhdistetty.",
         "historicalNote": "",
         "enforceAcrossServers": "",
         "enforceAcrossServersDescription": ""
       },
       "conditions": {
-        "addGroup": "",
-        "fieldPlaceholder": "",
+        "addGroup": "Lisää erillinen joukko tarkastuksia",
+        "fieldPlaceholder": "Valitse jotain tarkistettavaksi",
         "windowPrefix": "",
-        "windowUnit": "",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
+        "windowUnit": "tuntia",
+        "uniqueDevices": "Yksilölliset laitteet",
+        "uniqueDevicesHint": "Laskee vain istuntoja eri fyysisistä laitteista.",
+        "uniqueIps": "Yksilölliset IP-osoitteet",
         "uniqueIpsHint": "",
-        "allDeviceTypes": "",
+        "allDeviceTypes": "Kaikki laitetyypit",
         "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "recentlySeen": "Nähty viimeaikoina",
+        "allCountries": "Kaikki maat",
+        "sectionTitle": "Ja vain, jos…",
+        "optional": "vapaaehtoinen",
         "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
+        "emptyLine": "Ei ylimääräisiä tarkastuksia. Tämä ajetaan joka kerta",
+        "all": "ja",
+        "any": "tai",
+        "allHint": "ja: jokaisen tarkistuksen on läpäistävä",
+        "anyHint": "tai: mikä tahansa tarkistus riittää",
         "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
+        "fieldLabel": "Mitä tarkistetaan",
+        "operatorLabel": "Onko se",
+        "valueLabel": "Arvo",
         "canNeverPass": "",
         "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "groupSeparator": "ja myös",
+        "addAnother": "Lisää tarkistus",
+        "addFirst": "Lisää tarkistus",
+        "removeGroup": "Poista tämä tarkistusjoukko"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
+        "add": "➕ Lisää toinen toiminto",
+        "sectionTitle": "Sitten suorita...",
+        "ifTitle": "Jos…",
+        "helper": "Nämä suoritetaan järjestyksessä, alhaalta ylöspäin.",
+        "emptyTitle": "Mitä pitäisi tapahtua?",
         "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
+        "emptyAction": "Valitse, mitä tapahtuu",
+        "moveUp": "Siirrä {{name}} ylös",
+        "moveDown": "Siirrä {{name}} alas",
+        "menu": "Enemmän: {{name}}",
+        "branchName": "tämä haara",
+        "confirmRemoveTitle": "Poistetaanko tämä toiminto?",
         "confirmRemoveDescription": "",
         "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "branchThen": "Tee näin",
+        "branchElse": "Muutoin",
+        "branchElseEmpty": "Ei mitään. Automaatio jatkuu.",
+        "ifNothing": "mitään ei ole poimittu vielä",
+        "ifAddCheck": "Lisää toinen tarkistus",
+        "addBranch": "Lisää vaihe",
+        "expandBranch": "Näytä tämän haaran vaiheet",
+        "collapseBranch": "Piilota tämän haaran vaiheet"
       },
       "when": {
-        "title": "",
+        "title": "Milloin…",
         "helper": "",
-        "emptyTitle": "",
+        "emptyTitle": "Minkä pitäisi aloittaa tämä?",
         "emptyDescription": "",
-        "emptyAction": "",
-        "add": "",
-        "or": ""
+        "emptyAction": "Valitse, mikä aloittaa sen",
+        "add": "Lisää toinen käynnistin",
+        "or": "tai"
       },
       "heldFor": {
-        "prefix": "",
-        "minutesLabel": "",
-        "unit": "",
-        "measureLabel": "",
-        "current": "",
-        "total": ""
+        "prefix": "Striimi on ollut keskeytettynä",
+        "minutesLabel": "Minuuttia",
+        "unit": "minuuttia",
+        "measureLabel": "Laskettu",
+        "current": "tällä kertaa",
+        "total": "yhteensä"
       },
       "inactiveFor": {
-        "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "prefix": "Tili on ollut käyttämätön",
+        "daysLabel": "Päivää",
+        "unit": "päivää"
       },
       "rows": {
-        "toggle": "",
-        "remove": "",
-        "skipped": "",
-        "toggleHint": "",
-        "removeHint": "",
-        "expandHint": "",
-        "moveHint": ""
+        "toggle": "Sisällytä {{name}}",
+        "remove": "Poista {{name}}",
+        "skipped": "Ohitettu",
+        "toggleHint": "ohita",
+        "removeHint": "poista",
+        "expandHint": "avaa",
+        "moveHint": "järjestä uudelleen"
       },
       "picker": {
-        "searchPlaceholder": "",
-        "empty": "",
-        "navigate": "",
-        "select": "",
-        "close": ""
+        "searchPlaceholder": "Etsi, tai kuvaile mitä pitäisi tapahtua",
+        "empty": "Mikään ei vastaa tuota.",
+        "navigate": "siirrä",
+        "select": "valitse",
+        "close": "sulje"
       },
       "sentence": {
-        "label": "",
-        "placeholderTrigger": "",
-        "placeholderAction": ""
+        "label": "Selkeästi sanottuna",
+        "placeholderTrigger": "jotain tapahtuu",
+        "placeholderAction": "tee jotakin"
       },
       "footer": {
-        "ready": "",
-        "search": "",
-        "problems_one": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_other": ""
+        "ready": "Valmis tallennettavaksi",
+        "search": "hakuun",
+        "problems_one": "{{count}} asia korjattavana",
+        "problems_other": "{{count}} asiaa korjattavana",
+        "remaining_one": "{{count}} jäljellä",
+        "remaining_other": "{{count}} jäljellä"
       },
       "leave": {
-        "title": "",
-        "confirm": ""
+        "title": "Poistu tallentamatta?",
+        "confirm": "Poistu"
       },
       "liveCheck": {
         "title": "",
