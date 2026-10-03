@@ -187,7 +187,15 @@
       "qualityEvolution": "Kvalitetsevolution",
       "all": "Alle",
       "failedToLoad": "Kunne ikke indlæse kvalitetsdata",
-      "failedToLoadDesc": "Kunne ikke hente kvalitetsdata. Prøv venligst igen."
+      "failedToLoadDesc": "Kunne ikke hente kvalitetsdata. Prøv venligst igen.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Lagerplads",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",
