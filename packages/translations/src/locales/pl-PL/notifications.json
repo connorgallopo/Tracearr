@@ -29,7 +29,7 @@
         "message": "Naruszenie zostało oznaczone jako potwierdzone"
       },
       "violationDismissed": {
-        "title": "Naruszenie zostało odrzucone",
+        "title": "Odrzucono naruszenie",
         "message": "Naruszenie zostało odrzucone"
       },
       "deviceRemoved": {
@@ -58,8 +58,8 @@
       "plexAccountReauthorized": {
         "title": "Konto Plex ponownie autoryzowane",
         "messageNoServers": "Token konta zaktualizowany",
-        "partial": "Token został zaktualizowany, ale {{names}} nadal go odrzucił",
-        "unmatched": "Token został zaktualizowany, ale {{names}} nie mógł zostać ponownie połączony",
+        "partial": "Token zaktualizowany, ale nadal odrzucany przez: {{names}}",
+        "unmatched": "Token zaktualizowany, ale nie udało się ponownie powiązać: {{names}}",
         "message_one": "{{count}} serwer połączony ponownie",
         "message_few": "{{count}} serwery połączone ponownie",
         "message_many": "{{count}} serwerów połączonych ponownie",
@@ -69,7 +69,7 @@
         "title": "Zadanie zakończone"
       },
       "automationCreated": {
-        "title": "Automatyzacja została utworzona",
+        "title": "Utworzono automatyzację",
         "message": "Automatyzacja została utworzona pomyślnie"
       },
       "automationUpdated": {
@@ -95,7 +95,7 @@
       "serverLocationSaved": {
         "title": "Zapisano lokalizację serwera",
         "queued": "Wcześniejsze lokalne sesje są aktualizowane w tle.",
-        "waiting": "Przeszłe lokalne sesje zostaną zaktualizowane po zakończeniu bieżącego zadania."
+        "waiting": "Wcześniejsze lokalne sesje zostaną zaktualizowane po zakończeniu bieżącego zadania."
       },
       "syncCompletedWithErrors": {
         "title": "Synchronizacja zakończona z błędami"
@@ -146,7 +146,7 @@
         "message_other": "{{count}} użytkowników zresetowanych do 100"
       },
       "claimCodeValidated": {
-        "title": "Kod został poprawnie zweryfikowany",
+        "title": "Kod aktywacyjny zweryfikowany",
         "message": "Możesz kontynuować konfigurację"
       },
       "usersMerged": {
@@ -156,23 +156,23 @@
       "serverUserSplit": {
         "title": "Konto wydzielono jako osobnego użytkownika"
       },
-      "mergeSuggestionDismissed": "Oznaczono jako inne osoby",
+      "mergeSuggestionDismissed": "Oznaczono jako różne osoby",
       "mergeSuggestionRestored": "Sugestia przywrócona",
       "destinationSaved": "Miejsce docelowe zapisane",
       "destinationDeleted": "Miejsce docelowe usunięte",
       "destinationTestSent": "Wysłano testowe powiadomienie",
-      "destinationTestSentTo": "Wysłano testowe powiadomienie do {{address}}",
+      "destinationTestSentTo": "Wysłano testowe powiadomienie na adres {{address}}",
       "newsletterSaved": "Newsletter zapisany",
       "newsletterDeleted": "Newsletter usunięty",
       "newsletterDuplicated": "Newsletter zduplikowany",
-      "newsletterTestQueued": "Test w kolejce do {{address}}",
+      "newsletterTestQueued": "Test na adres {{address}} dodany do kolejki",
       "newsletterSendQueued": "Wysyłka dodana do kolejki",
       "brandingSaved": "Zapisano wygląd wiadomości e-mail",
       "suppressionAdded": "Adres dodany do listy wyciszenia",
       "suppressionRemoved": "Adres usunięty z listy wyciszenia",
-      "newsletterRetryQueued_one": "Ponawianie próby do {{count}} odbiorcy",
-      "newsletterRetryQueued_few": "Ponawianie próby do {{count}} odbiorców",
-      "newsletterRetryQueued_many": "Ponawianie próby do {{count}} odbiorców",
+      "newsletterRetryQueued_one": "Ponawianie wysyłki do {{count}} odbiorcy",
+      "newsletterRetryQueued_few": "Ponawianie wysyłki do {{count}} odbiorców",
+      "newsletterRetryQueued_many": "Ponawianie wysyłki do {{count}} odbiorców",
       "newsletterRetryQueued_other": "Ponawianie próby do {{count}} odbiorców"
     },
     "error": {
@@ -181,7 +181,7 @@
       "serverSyncFailed": "Nie udało się zsynchronizować serwera",
       "serverHistoricalFailed": "Nie udało się zmienić statusu serwera",
       "settingsUpdateFailed": "Nie udało się zaktualizować ustawień",
-      "copyFailed": "Nie można skopiować do schowka",
+      "copyFailed": "Nie udało się skopiować do schowka",
       "acknowledgeFailed": "Nie udało się potwierdzić naruszenia",
       "dismissFailed": "Nie udało się odrzucić naruszenia",
       "authFailed": "Uwierzytelnianie nie powiodło się",
@@ -189,7 +189,7 @@
       "automationUpdateFailed": "Nie udało się zaktualizować automatyzacji",
       "automationDeleteFailed": "Nie udało się usunąć automatyzacji",
       "streamTerminateFailed": "Nie udało się przerwać strumienia",
-      "serverUrlUpdateFailed": "Nie udało się zaktualizować URL serwera",
+      "serverUrlUpdateFailed": "Nie udało się zaktualizować adresu URL serwera",
       "serverUpdateFailed": "Nie udało się zaktualizować serwera",
       "serverLocationSaveFailed": "Nie udało się zapisać lokalizacji serwera",
       "serverReorderFailed": "Nie udało się zmienić kolejności serwerów",
@@ -211,12 +211,12 @@
       "invalidUrl": "Nieprawidłowy adres URL",
       "plexDirectUrl": "Adresy plex.direct to adresy przekaźnikowe (relay) i nie można ich tu użyć. Użyj bezpośredniego adresu IP lub nazwy hosta.",
       "userMergeFailed": "Nie udało się scalić użytkowników",
-      "serverUserSplitFailed": "Nie udało się rozdzielić konta",
+      "serverUserSplitFailed": "Nie udało się wydzielić konta",
       "mergeSuggestionDismissFailed": "Nie udało się odrzucić sugestii",
       "mergeSuggestionRestoreFailed": "Nie udało się przywrócić sugestii",
       "invalidClaimCode": {
         "title": "Nieprawidłowy kod aktywacyjny",
-        "message": "Proszę sprawdzić logi serwera"
+        "message": "Sprawdź logi serwera"
       },
       "destinationSaveFailed": "Nie udało się zapisać miejsca docelowego: {{error}}",
       "destinationDeleteFailed": "Nie udało się usunąć miejsca docelowego: {{error}}",
@@ -242,7 +242,7 @@
     },
     "info": {
       "updateAvailable": {
-        "title": "Aktualizacja dostępna",
+        "title": "Dostępna aktualizacja",
         "message": "Tracearr {{version}} jest dostępny"
       },
       "violationDetected": {
@@ -252,10 +252,10 @@
     }
   },
   "settings": {
-    "allSeverity": "Wszystkie (Niskie, Ostrzeżenie, Wysokie)",
-    "warningAndHigh": "Tylko ostrzeżenie i wysokie",
+    "allSeverity": "Wszystkie (Niska, Ostrzeżenie, Wysoka)",
+    "warningAndHigh": "Tylko ostrzeżenie i wysoka",
     "highOnly": "Tylko o wysokiej ważności",
-    "rateLimit": "Aktualny status limitu zapytań",
+    "rateLimit": "Aktualny stan limitu częstotliwości",
     "perMinute": "Na minutę",
     "perHour": "Na godzinę",
     "enablePushNotifications": "Włącz powiadomienia push",
@@ -271,7 +271,7 @@
     "minimumSeverity": "Minimalna ważność",
     "quietHours": "Godziny ciszy",
     "enableQuietHours": "Włącz godziny ciszy",
-    "overrideForCritical": "Nadpisz dla krytycznych",
-    "rateLimiting": "Ograniczanie liczby żądań"
+    "overrideForCritical": "Nie stosuj do krytycznych",
+    "rateLimiting": "Ograniczanie częstotliwości"
   }
 }
