@@ -133,7 +133,7 @@
       "diskLimited": "Limitat pel disc des de {{since}}: uns {{shortfall}} de pòsters no són a la memòria cau.",
       "loadError": "No s'ha pogut carregar l'estat de la memòria cau.",
       "notPersisting": "La memòria cau de pòsters no sobreviu als reinicis. Munteu un volum al directori de la memòria cau; si no, cada pòster es torna a baixar cada vegada que es recrea el contenidor.",
-      "needHint_one": "",
+      "needHint_one": "{{count}} pòster × {{size}}",
       "needHint_other": "{{count}} pòsters × {{size}}"
     }
   },
@@ -189,14 +189,14 @@
     "checkingConnection": "S'està comprovant la connexió…",
     "pluginVersion": "connector v{{version}}",
     "pluginUpdateAvailable": "Hi ha una actualització del connector",
-    "historical": "",
-    "historicalSince": "",
-    "markHistorical": "",
-    "resume": "",
-    "moreActions": "",
-    "markHistoricalTitle": "",
-    "markHistoricalConfirm": "",
-    "resumeFirst": "",
+    "historical": "Històric",
+    "historicalSince": "Històric des de {{date}}",
+    "markHistorical": "Marca com a històric",
+    "resume": "Reprèn",
+    "moreActions": "Més accions",
+    "markHistoricalTitle": "Voleu marcar {{name}} com a històric?",
+    "markHistoricalConfirm": "Tracearr deixarà de contactar amb aquest servidor. L'historial, els usuaris i les biblioteques es conserven, i el podeu reprendre en qualsevol moment. Les transmissions que s'hi estiguin reproduint ara mateix s'acabaran.",
+    "resumeFirst": "Reprengueu-lo primer per canviar l'adreça o la clau d'API.",
     "location": {
       "title": "Ubicació",
       "description": "Opcional. Situa al mapa les sessions de la xarxa local d'aquest servidor. No es consulta res en línia; ho establiu aquí.",
@@ -222,7 +222,7 @@
       "jellyfinDescription": "Instal·leu el connector Tracearr SSE per rebre actualitzacions de sessió instantànies sense haver d'esperar el sondeig següent.",
       "embyDescription": "Instal·leu el connector Tracearr SSE per rebre actualitzacions de sessió instantànies sense haver d'esperar el sondeig següent.",
       "jellyfinUpdateDescription": "Hi ha una versió més recent del connector. Obriu el tauler de Jellyfin, aneu a Plugins i Catalog, actualitzeu Tracearr SSE i reinicieu Jellyfin.",
-      "embyUpdateDescription": "",
+      "embyUpdateDescription": "Hi ha una versió més recent del connector. Obriu el tauler d'Emby, aneu a Plugins i Catalog, actualitzeu Tracearr SSE i reinicieu Emby.",
       "repositoryUrl": "URL del repositori",
       "copyUrl": "Copia l'URL",
       "jellyfinRepoUrl": "https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json",
@@ -286,7 +286,7 @@
     "externalUrlBanner": "Feu servir un proxy invers o hi accediu de manera remota? Configureu el vostre",
     "externalUrlBannerLink": "URL extern",
     "externalUrlBannerSuffix": "perquè l'aplicació mòbil es pugui connectar al servidor.",
-    "pendingTokens_one": "",
+    "pendingTokens_one": "{{count}} testimoni d'aparellament pendent",
     "pendingTokens_other": "{{count}} testimonis d'aparellament pendents"
   },
   "tailscale": {
@@ -416,9 +416,9 @@
     "importFullRangeHelp": "Les reproduccions que van començar després d'afegir aquest servidor a Tracearr no s'importen mai. Per defecte, la importació també s'atura a la reproducció més antiga que Tracearr ja té d'aquest servidor, per exemple d'una importació de Jellystat. Activeu això per importar-ho tot d'abans que s'afegís el servidor. Els duplicats exactes se segueixen ometent.",
     "skipOverlap": "Registre solapat: la marca de temps cau dins del període que Tracearr ja registra per a aquest servidor. Activeu la importació de tot l'històric per incloure'l.",
     "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector.",
-    "overlapSkipped_one": "",
+    "overlapSkipped_one": "{{count}} omès per solapament",
     "overlapSkipped_other": "{{count}} omesos per solapament",
-    "duplicates_one": "",
+    "duplicates_one": "{{count}} duplicat omès",
     "duplicates_other": "{{count}} duplicats omesos"
   },
   "plex": {
@@ -472,8 +472,8 @@
   },
   "serverHealth": {
     "unreachable": "No es pot connectar amb {{serverName}}",
-    "tokenRejected": "",
-    "multipleUnreachable_one": "",
+    "tokenRejected": "{{serverName}} ha rebutjat el testimoni de Tracearr",
+    "multipleUnreachable_one": "No es pot connectar amb {{count}} servidor: {{serverNames}}",
     "multipleUnreachable_other": "No es pot connectar amb {{count}} servidors: {{serverNames}}"
   },
   "ipWarning": {
@@ -655,9 +655,9 @@
         "fallback": "El primer correu mira enrere",
         "fixed": "Mira enrere",
         "fixedAfter": "cada vegada",
-        "fallbackLabel_one": "",
+        "fallbackLabel_one": "El primer correu mira enrere {{count}} dia.",
         "fallbackLabel_other": "El primer correu mira enrere {{count}} dies.",
-        "fixedLabel_one": "",
+        "fixedLabel_one": "Mira enrere {{count}} dia cada vegada.",
         "fixedLabel_other": "Mira enrere {{count}} dies cada vegada."
       },
       "windowMax": "Mai més de 31 dies, digui el que digui això.",
@@ -693,15 +693,15 @@
           "mostPlayed": "més reproduïts"
         },
         "labels": {
-          "movies_one": "",
+          "movies_one": "Pel·lícules, fins a {{count}} pel·lícula",
           "movies_other": "Pel·lícules, fins a {{count}} pel·lícules",
-          "shows_one": "",
+          "shows_one": "Sèries, fins a {{count}} sèrie",
           "shows_other": "Sèries, fins a {{count}} sèries",
-          "seasons_one": "",
+          "seasons_one": "Sèries, {{count}} temporada de cadascuna",
           "seasons_other": "Sèries, {{count}} temporades de cadascuna",
-          "music_one": "",
+          "music_one": "Música, fins a {{count}} àlbum",
           "music_other": "Música, fins a {{count}} àlbums",
-          "mostWatched_one": "",
+          "mostWatched_one": "El més vist, el {{count}} més reproduït",
           "mostWatched_other": "El més vist, els {{count}} més reproduïts"
         },
         "musicHelp": "Es compta en àlbums, repartits entre artistes segons l'ordre en què es van afegir.",
@@ -789,13 +789,13 @@
         },
         "emptyTitle": "Ningú no rebrà aquest butlletí",
         "emptyDescription": "Activeu «Tothom dels servidors triats» o afegiu una adreça a sota.",
-        "notIncludable_one": "",
+        "notIncludable_one": "{{count}} no es pot incloure",
         "notIncludable_other": "{{count}} no es poden incloure",
-        "joinedSinceLastSend_one": "",
+        "joinedSinceLastSend_one": "{{count}} s'ha afegit des de l'últim enviament",
         "joinedSinceLastSend_other": "{{count}} s'han afegit des de l'últim enviament",
-        "selectedCount_one": "",
+        "selectedCount_one": "{{count}} seleccionat",
         "selectedCount_other": "{{count}} seleccionat",
-        "notIncludableHelp_one": "",
+        "notIncludableHelp_one": "Hi ha {{count}} persona més que no es pot incloure perquè està bandejada, pendent o no és en cap servidor dels triats.",
         "notIncludableHelp_other": "Hi ha {{count}} persones més que no es poden incloure perquè estan bandejades, pendents o no són en cap servidor dels triats."
       },
       "delivery": {
@@ -899,16 +899,16 @@
         "nobody": "No hi ha ningú que es resolgui en una adreça ({{missing}} membres no en tenen), de manera que no hi ha res per enviar.",
         "confirm": "Envia",
         "sending": "S'està enviant",
-        "summary_one": "",
+        "summary_one": "S'enviarà a {{count}} destinatari: {{counts}} afegits entre {{start}} i {{end}}. Cada persona rep la seva pròpia còpia i només veu la seva adreça.",
         "summary_other": "S'enviarà a {{count}} destinataris: {{counts}} afegits entre {{start}} i {{end}}. Cada persona rep la seva pròpia còpia i només veu la seva adreça.",
         "trimmed_one": "{{count}} element es reté com a línia +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla.",
         "trimmed_other": "{{count}} elements es retenen com a línies +N més perquè el correu no passi dels 102 KB a partir dels quals Gmail el talla."
       },
-      "serversSelected_one": "",
+      "serversSelected_one": "{{count}} servidor",
       "serversSelected_other": "{{count}} servidors",
-      "librariesSelected_one": "",
+      "librariesSelected_one": "{{count}} biblioteca",
       "librariesSelected_other": "{{count}} biblioteques",
-      "senderNameRequiredMulti_one": "",
+      "senderNameRequiredMulti_one": "Aquest butlletí abasta {{count}} servidors, de manera que no hi ha un únic nom de servidor per signar-lo. Trieu un nom.",
       "senderNameRequiredMulti_other": "Aquest butlletí abasta {{count}} servidors, de manera que no hi ha un únic nom de servidor per signar-lo. Trieu un nom.",
       "previewVariant_one": "{{count}} persona amb un compte a {{servers}}",
       "previewVariant_other": "{{count}} persones amb un compte a {{servers}}"
@@ -943,9 +943,9 @@
       "snapshotTitle": "Còpia enviada",
       "pruned": "La instantània s'ha esporgat al cap de 90 dies; no es pot visualitzar ni reenviar res.",
       "retryFailed": "Torna a intentar els enviaments fallits",
-      "recipients_one": "",
+      "recipients_one": "{{count}} destinatari",
       "recipients_other": "{{count}} destinataris",
-      "attempts_one": "",
+      "attempts_one": "{{count}} intent",
       "attempts_other": "{{count}} intents"
     }
   },
