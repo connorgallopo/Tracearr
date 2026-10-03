@@ -48,7 +48,7 @@
     "pending": "Oczekuje",
     "acknowledged": "Potwierdzone",
     "active": "Aktywne",
-    "inactive": "Nieaktywny",
+    "inactive": "Nieaktywne",
     "enabled": "Włączone",
     "disabled": "Wyłączone",
     "connecting": "Łączenie...",
@@ -71,9 +71,9 @@
     "watched": "Obejrzane"
   },
   "severity": {
-    "low": "Niskie",
+    "low": "Niska",
     "warning": "Ostrzeżenie",
-    "high": "Wysokie"
+    "high": "Wysoka"
   },
   "trust": {
     "trusted": "Zaufany",
@@ -100,7 +100,7 @@
     "short7Days": "7 dni",
     "short30Days": "30 dni",
     "shortYear": "1 rok",
-    "shortAll": "Wszystkie",
+    "shortAll": "Wszystko",
     "timeRange": "Zakres czasu"
   },
   "labels": {
@@ -133,7 +133,7 @@
     "serverOwner": "Właściciel serwera",
     "resolution": "Rozdzielczość",
     "watchTime": "Czas oglądania",
-    "pausedTime": "Czas pauzy",
+    "pausedTime": "Czas wstrzymania",
     "sessionDetails": "Szczegóły sesji",
     "recentSessions": "Ostatnie sesje",
     "days": "dni",
@@ -148,7 +148,7 @@
     "product": "Produkt",
     "deviceId": "ID urządzenia",
     "total": "łącznie",
-    "mediaLength": "Długość mediów",
+    "mediaLength": "Długość multimediów",
     "streamDetails": "Szczegóły strumienia",
     "transcodeReason": "Powód transkodowania",
     "loadMore": "Załaduj więcej",
@@ -159,8 +159,8 @@
     "searchTitles": "Szukaj tytułów, użytkowników..."
   },
   "table": {
-    "selectAllOnPage": "Wybierz wszystko na stronie",
-    "selectRow": "Wybierz wiersz",
+    "selectAllOnPage": "Zaznacz wszystko na stronie",
+    "selectRow": "Zaznacz wiersz",
     "pageOf": "Strona {{page}} z {{total}}",
     "pagination": "Paginacja",
     "goToPage": "Przejdź do strony {{page}}"
@@ -173,7 +173,7 @@
     "anyDate": "Dowolna data",
     "dateAfter": "Po {{date}}",
     "dateBefore": "Przed {{date}}",
-    "dateBetween": "{{from}} do {{to}}",
+    "dateBetween": "{{from}} – {{to}}",
     "clearDates": "Wyczyść zakres dat",
     "clearStartDate": "Wyczyść datę rozpoczęcia",
     "clearEndDate": "Wyczyść datę zakończenia"
@@ -291,7 +291,7 @@
     "noResults": "Brak wyników",
     "noData": "Brak dostępnych danych",
     "noDeviceData": "Brak danych urządzenia",
-    "noJobHistory": "Brak historii operacji",
+    "noJobHistory": "Brak historii zadań",
     "noSessionsFound": "Nie znaleziono sesji",
     "noUserData": "Brak dostępnych danych użytkownika"
   },
