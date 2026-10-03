@@ -187,7 +187,15 @@
       "qualityEvolution": "Kwaliteit evolutie",
       "all": "Allemaal",
       "failedToLoad": "Laden van kwaliteitsgegevens mislukt",
-      "failedToLoadDesc": "Kwaliteitsgegevens kunnen niet worden opgehaald. Probeer het opnieuw."
+      "failedToLoadDesc": "Kwaliteitsgegevens kunnen niet worden opgehaald. Probeer het opnieuw.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Opslag",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",
