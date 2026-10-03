@@ -1036,9 +1036,9 @@
     },
     "emptyTitle": "",
     "emptyDescription": "",
-    "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "enable": "",
+    "emptySeeAll": "Näytä kaikki {{count}}",
+    "emptySeeAllLoading": "Näytä kaikki",
+    "enable": "Ota käyttöön",
     "evaluations": {
       "disclosure": "",
       "reasons": {
@@ -1052,76 +1052,76 @@
       "title": "",
       "description": "",
       "carries": "",
-      "copyCode": "",
-      "copyJson": "",
-      "authorLabel": "",
-      "authorPlaceholder": "",
+      "copyCode": "Kopioi jaon koodi",
+      "copyJson": "Kopioi JSON",
+      "authorLabel": "Tekijä",
+      "authorPlaceholder": "Nimi",
       "authorHelper": "",
       "save": "",
       "saved": "",
-      "saveFailed": "",
-      "failed": "",
+      "saveFailed": "Ei voitu tallentaa.",
+      "failed": "Koodia ei voitu luoda.",
       "saveHelper": "",
-      "authorInCode": "",
-      "groupLabel": "",
+      "authorInCode": "Koodi sisältää tekijän nimen.",
+      "groupLabel": "Osio",
       "groupHelper": "",
       "gallery": {
-        "trigger": "",
+        "trigger": "Laita tämä yhteisön galleriaan",
         "body": ""
       },
-      "openRepository": ""
+      "openRepository": "Avaa tietovarasto"
     },
     "fields": {
       "concurrent_streams": {
-        "label": "",
-        "description": ""
+        "label": "Samanaikaiset striimit",
+        "description": "Aktiivisten striimien määrä samalta käyttäjältä"
       },
       "active_session_distance_km": {
-        "label": "",
-        "description": ""
+        "label": "Välimatka istuntojen välillä",
+        "description": "Samanaikaisen istunnon välinen välimatka"
       },
       "travel_speed_kmh": {
-        "label": "",
-        "description": ""
+        "label": "Matkustusnopeus",
+        "description": "Laskettu matkustusnopeus sijaintien välillä"
       },
       "unique_ips_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Yksilölliset IP-osoitteet aikaikkunassa",
+        "description": "Yksilöllisten IP-osoitteiden määrä aikaikkunassa"
       },
       "unique_devices_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Yksilölliset laitteet aikaikkunassa",
+        "description": "Yksilöllisten laitteiden määrä aikaikkunassa"
       },
       "inactive_days": {
-        "label": "",
-        "description": ""
+        "label": "Päivää passiivisena",
+        "description": "Päivää viimeisestä toiminnasta"
       },
       "current_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "Nykyinen tauon kesto",
+        "description": "Kuinka kauan istunto on ollut yhtäjaksoisesti tauolla"
       },
       "total_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "Tauon kesto yhteensä",
+        "description": "Kertynyt taukoaika yhteensä kaikkien taukojen/jatkojen aikana"
       },
       "source_resolution": {
-        "label": "",
-        "description": ""
+        "label": "Lähteen resoluutio",
+        "description": "Alkuperäinen median resoluutio"
       },
       "output_resolution": {
-        "label": "",
-        "description": ""
+        "label": "Ulostulon resoluutio",
+        "description": "Transkoodattu tai toimitettu resoluutio"
       },
       "source_dynamic_range": {
-        "label": "",
+        "label": "Lähde dynaaminen alue",
         "description": ""
       },
       "source_video_codec": {
-        "label": "",
+        "label": "Lähteen videokoodekki",
         "description": ""
       },
       "is_transcoding": {
-        "label": "",
+        "label": "Transkoodaa",
         "description": ""
       },
       "is_transcode_downgrade": {
@@ -1129,172 +1129,172 @@
         "description": ""
       },
       "is_subtitle_burn_in": {
-        "label": "",
+        "label": "Tekstityksen poltto",
         "description": ""
       },
       "source_bitrate_mbps": {
-        "label": "",
-        "description": ""
+        "label": "Lähteen bittinopeus",
+        "description": "Alkuperäinen bittinopeus"
       },
       "user_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Käyttäjä",
+        "description": "Tietyt käyttäjät tilin mukaan",
+        "placeholder": "Valitse käyttäjät…"
       },
       "trust_score": {
-        "label": "",
-        "description": ""
+        "label": "Luottamuspisteet",
+        "description": "Käyttäjän luottamuspisteet, 0 - 100"
       },
       "account_age_days": {
-        "label": "",
-        "description": ""
+        "label": "Tilin ikä",
+        "description": "Päivää tilin luomisesta"
       },
       "device_type": {
-        "label": "",
-        "description": ""
+        "label": "Laitteen tyyppi",
+        "description": "Käytetyn laitteen tyyppi"
       },
       "client_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Asiakasohjelma/Soitin",
+        "description": "Mediasoittimen sovellus",
+        "placeholder": "esim. Plex iOS:lle"
       },
       "platform": {
-        "label": "",
-        "description": ""
+        "label": "Alusta/käyttöjärjestelmä",
+        "description": "Käyttöjärjestelmä"
       },
       "is_local_network": {
-        "label": "",
-        "description": ""
+        "label": "Lähiverkko",
+        "description": "Striimataan paikallisesta verkosta"
       },
       "country": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Maa",
+        "description": "Maantieteellinen maa",
+        "placeholder": "Valitse maat…"
       },
       "ip_in_range": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "IP-alue",
+        "description": "IP-osoite CIDR-alueella, IPv4 tai IPv6",
+        "placeholder": "esim. 192.168.1.0/24 tai 2001:db8:abcd:7800::/64"
       },
       "server_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Palvelin",
+        "description": "Tietty mediapalvelin",
+        "placeholder": "Valitse palvelimet…"
       },
       "media_type": {
-        "label": "",
-        "description": ""
+        "label": "Median tyyppi",
+        "description": "Sisällön tyyppi"
       },
       "season_number": {
-        "label": "",
+        "label": "Kauden numero",
         "description": ""
       },
       "episode_number": {
-        "label": "",
+        "label": "Jakson numero",
         "description": ""
       },
       "library_item_type": {
-        "label": "",
+        "label": "Kohteen tyyppi",
         "description": ""
       },
       "library_name": {
-        "label": "",
+        "label": "Kirjasto",
         "description": "",
-        "placeholder": ""
+        "placeholder": "Elokuvat"
       },
       "resolution_after": {
-        "label": "",
+        "label": "Resoluutio",
         "description": ""
       },
       "dynamic_range_after": {
-        "label": "",
+        "label": "Dynaaminen alue",
         "description": ""
       },
       "video_codec_after": {
-        "label": "",
+        "label": "Videokoodekki",
         "description": ""
       },
       "audio_channels_after": {
-        "label": "",
+        "label": "Äänikanavat",
         "description": ""
       },
       "file_size_after": {
-        "label": "",
+        "label": "Tiedoston koko",
         "description": ""
       }
     },
     "gallery": {
-      "title": "",
+      "title": "Uusi automaatio",
       "description": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
+      "searchPlaceholder": "Etsi",
+      "noMatches": "Mikään ei täsmää “{{query}}”.",
       "noMatchesHint": "",
       "group": {
-        "notifications": "",
-        "server_health": "",
-        "policies": "",
-        "housekeeping": "",
-        "other": ""
+        "notifications": "Ilmoitukset",
+        "server_health": "Palvelimen kunto",
+        "policies": "Rajoitukset ja säännöt",
+        "housekeeping": "Ylläpito",
+        "other": "Muita tapoja aloittaa"
       },
-      "builtin": "",
+      "builtin": "Sisäänrakennettu",
       "kind": {
-        "policy": "",
-        "notification": ""
+        "policy": "Rikkomus",
+        "notification": "Hälytys"
       },
       "paste": {
         "title": "",
         "description": ""
       },
       "scratch": {
-        "title": "",
-        "description": ""
+        "title": "Aloittaa alusta",
+        "description": "Luo vaiheittain"
       },
-      "failed": "",
-      "retry": "",
-      "missing": "",
+      "failed": "Valmiita automaatioita ei voitu ladata.",
+      "retry": "Yritä uudelleen",
+      "missing": "Tuo valmis automaatio ei ole tällä palvelimella.",
       "hint": {
-        "move": "",
-        "use": "",
-        "close": ""
+        "move": "siirrä",
+        "use": "käytä",
+        "close": "sulje"
       },
-      "loading": ""
+      "loading": "Ladataan…"
     },
     "import": {
-      "title": "",
+      "title": "Liitä jakokoodi",
       "description": "",
       "reviewDescription": "",
-      "placeholder": "",
-      "formatHint": "",
-      "check": "",
-      "checking": "",
-      "valid": "",
+      "placeholder": "tracearr1.…",
+      "formatHint": "Koodi alkaa sanalla tracearr1.",
+      "check": "Tarkista",
+      "checking": "Luetaan…",
+      "valid": "Tracearr voi lukea tämän koodin.",
       "madeBy": "",
       "codeShort": "",
       "paused": {
-        "label": "",
+        "label": "Aloita keskeytettynä",
         "helper": ""
       },
-      "submit": "",
-      "adding": "",
-      "existing": "",
-      "existingUse": "",
+      "submit": "Lisää",
+      "adding": "Lisätään…",
+      "existing": "Tallennettu jo nimellä {{name}}.",
+      "existingUse": "Käytä",
       "collision": {
-        "title": "",
-        "add": "",
-        "replace": ""
+        "title": "Eri automaatio nimellä {{name}} on jo olemassa.",
+        "add": "Pidä molemmat",
+        "replace": "Korvaa minun"
       },
-      "raw": "",
+      "raw": "Näytä JSON",
       "errors": {
-        "notACode": "",
-        "notACodeHint": "",
-        "tooBig": "",
-        "tooBigHint": "",
-        "truncated": "",
+        "notACode": "Tuo ei näytä Tracearr-jakokoodilta.",
+        "notACodeHint": "Koodi alkaa sanalla tracearr1. JSON toimii myös.",
+        "tooBig": "Tuo on liian suuri ollakseen Tracearr automaatio.",
+        "tooBigHint": "Koodit ovat korkeintaan muutaman tuhannen merkin pituisia.",
+        "truncated": "Tämä koodi näyttää katkaisulta.",
         "truncatedHint": "",
-        "tooNew": "",
+        "tooNew": "Tämä tarvitsee Tracearr-version {{required}} tai uudemman.",
         "tooNewHint": "",
-        "tooMany": "",
-        "tooManyHint": "",
+        "tooMany": "Tuo on paljon koodeja minuutissa.",
+        "tooManyHint": "Odota hetki ja tarkista sitten uudelleen.",
         "rejected": "",
         "rejectedHint": ""
       },
