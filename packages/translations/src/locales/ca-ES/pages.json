@@ -311,7 +311,7 @@
       "action": "Sincronitza ara",
       "syncStarted": "S'ha iniciat la sincronització de la biblioteca.",
       "syncFailed_one": "La sincronització no s'ha pogut iniciar en {{count}} servidor. Comproveu els vostres permisos i l'estat del servidor.",
-      "syncFailed_other": "La sincronització no s'ha pogut iniciar en {{count}} servidor(s). Comproveu els vostres permisos i l'estat del servidor."
+      "syncFailed_other": "La sincronització no s'ha pogut iniciar en {{count}} servidors. Comproveu els vostres permisos i l'estat del servidor."
     }
   },
   "activity": {
@@ -396,16 +396,16 @@
       "fieldMessage": "Missatge",
       "fieldSubject": "Assumpte",
       "fieldHeading": "Capçalera (igual que l'assumpte)",
-      "fieldEmbedTitle": "Títol de l'embed",
+      "fieldEmbedTitle": "Títol de la incrustació",
       "fieldDescription": "Descripció",
-      "addedDiscord": "Ho afegeix Tracearr, segons l'esdeveniment: un color, camps com ara Usuari, Multimèdia i Reproductor i, en els esdeveniments multimèdia, un pòster i un peu de pàgina. La descripció es pot escurçar si els camps són llargs.",
+      "addedDiscord": "Ho afegeix Tracearr, segons l'esdeveniment: un color, camps com ara User, Media i Player i, en els esdeveniments multimèdia, un pòster i un peu de pàgina. La descripció es pot escurçar si els camps són llargs.",
       "addedEmail": "Ho afegeix Tracearr: una etiqueta de severitat, els detalls de l'esdeveniment, l'hora d'enviament i un enllaç a Tracearr",
       "addedPushSubtitle": "Subtítol que Tracearr hi posa en la majoria d'esdeveniments",
       "previewCount": "{{used, number}} / {{max, number}}",
       "previewCountBytes": "{{used, number}} / {{max, number}} bytes",
       "previewCut": "retallat perquè hi càpiga",
       "previewPriority": "Prioritat: {{priority}}",
-      "previewEscapeHint": "Inclou els caràcters d'escapament de Discord",
+      "previewEscapeHint": "El recompte inclou els caràcters d'escapament de Discord",
       "webhookNotSent": "No s'envia. La càrrega útil porta les dades pròpies de l'esdeveniment."
     },
     "priorities": {
@@ -700,7 +700,7 @@
         "personPlaceholder": "Selecciona la persona",
         "personHelper": "Coincideix amb aquesta persona a tots els servidors on tingui un compte.",
         "noServers": "Encara no hi ha cap servidor connectat.",
-        "historicalNote": "Aquest servidor és històric. Els activadors que el necessiten actiu, com els esdeveniments de transmissió, de servidor i d'actualització, no s'activaran fins que es reprengui.",
+        "historicalNote": "Aquest servidor està arxivat. Els activadors que el necessiten actiu, com els esdeveniments de transmissió, de servidor i d'actualització, no s'activaran fins que es reprengui.",
         "enforceAcrossServers": "Actua sobre les seves transmissions en qualsevol dels seus servidors",
         "enforceAcrossServersDescription": "Actua sobre les sessions de la persona en qualsevol dels seus servidors, no només en el que ho ha activat. Desactivat per defecte."
       },
