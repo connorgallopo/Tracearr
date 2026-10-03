@@ -59,7 +59,7 @@
     "mergeUsers": "Scal użytkowników",
     "mergeTitleSuggestion": "Czy to ta sama osoba?",
     "mergeTitleBulk": "Scalić tych użytkowników?",
-    "mergeReasonEmail": "Oboje mają e-mail {{value}} na swoich kontach serwera.",
+    "mergeReasonEmail": "Oboje mają adres e-mail {{value}} na swoich kontach serwerowych.",
     "mergeReasonEmailUsername": "Oboje używają {{value}} jako nazwy użytkownika lub adresu e-mail konta.",
     "mergeReasonUsername": "Oboje używają nazwy użytkownika {{value}}.",
     "mergeKeep": "Zachowaj",
@@ -73,9 +73,9 @@
     "mergeMovesNoCount": "Konta serwerowe i sesje użytkownika {{foldName}} zostaną przeniesione do {{keepName}}.",
     "mergeCarriesOver": "E-mail kontaktowy, wykluczenia z newsletterów i prośby Seerr tej osoby zostaną przeniesione.",
     "mergeDeleted": "{{foldName}} zostanie usunięty. Możesz później ponownie wydzielić konto na stronie {{keepName}}.",
-    "mergeRulesKept": "Reguły dla poszczególnych serwerów o tej samej nazwie zachowają wersję {{keepName}}.",
+    "mergeRulesKept": "Jeśli reguły dla poszczególnych serwerów mają tę samą nazwę, zostanie zachowana wersja użytkownika {{keepName}}.",
     "mergeIrreversibleTitle": "Tej operacji nie można cofnąć",
-    "mergeIrreversibleBody": "Oboje mają konto na tym samym serwerze. Te dwa konta staną się jednym, a ich sesje, naruszenia i wyniki zaufania zostaną połączone. Później wydzielenie nie przywróci drugiego konta.",
+    "mergeIrreversibleBody": "Oboje mają konto na tym samym serwerze. Te dwa konta staną się jednym, a ich sesje, naruszenia i wyniki zaufania zostaną połączone. Późniejsze wydzielenie nie przywróci drugiego konta.",
     "mergeServerLabel": "Serwer",
     "mergeServerUnknown": "Nieznany serwer",
     "mergeIrreversibleAcknowledge": "Rozumiem, że tych dwóch kont na tym serwerze nie będzie można ponownie rozdzielić",
@@ -92,7 +92,7 @@
     "suggestionsReview": "Przejrzyj",
     "suggestionsNotSame": "To nie ta sama osoba",
     "suggestionsMatchEmail": "Ten sam adres e-mail",
-    "suggestionsMatchEmailUsername": "Oboje używają {{value}} jako nazwy użytkownika lub adresu e-mail",
+    "suggestionsMatchEmailUsername": "Oboje używają {{value}} jako nazwy użytkownika lub adresu e-mail konta",
     "suggestionsMatchUsername": "Ta sama nazwa użytkownika",
     "suggestionsEmpty": "Nie pozostało nic do przejrzenia.",
     "suggestionsDismissed": "Odrzucono ({{count}})",
@@ -116,20 +116,20 @@
     "mergeMoves_many": "Konta serwerowe użytkownika {{foldName}} i {{count}} sesji zostaną przeniesione do {{keepName}}.",
     "mergeMoves_other": "Konta serwerowe użytkownika {{foldName}} i {{count}} sesji zostaną przeniesione do {{keepName}}.",
     "suggestionsCount_one": "{{count}} możliwy duplikat użytkownika",
-    "suggestionsCount_few": "{{count}} możliwych zduplikowanych użytkowników",
-    "suggestionsCount_many": "{{count}} możliwych zduplikowanych użytkowników",
+    "suggestionsCount_few": "{{count}} możliwe duplikaty użytkowników",
+    "suggestionsCount_many": "{{count}} możliwych duplikatów użytkowników",
     "suggestionsCount_other": "{{count}} możliwych zduplikowanych użytkowników",
-    "suggestionsPairEmailMore_one": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
-    "suggestionsPairEmailMore_few": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
-    "suggestionsPairEmailMore_many": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
+    "suggestionsPairEmailMore_one": "{{first}} i {{second}} współdzielą adres e-mail, i jeszcze {{count}}",
+    "suggestionsPairEmailMore_few": "{{first}} i {{second}} współdzielą adres e-mail, i jeszcze {{count}}",
+    "suggestionsPairEmailMore_many": "{{first}} i {{second}} współdzielą adres e-mail, i jeszcze {{count}}",
     "suggestionsPairEmailMore_other": "{{first}} i {{second}} współdzielą adres e-mail, a także {{count}} więcej",
-    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
-    "suggestionsPairEmailUsernameMore_few": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
-    "suggestionsPairEmailUsernameMore_many": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, i jeszcze {{count}}",
+    "suggestionsPairEmailUsernameMore_few": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, i jeszcze {{count}}",
+    "suggestionsPairEmailUsernameMore_many": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, i jeszcze {{count}}",
     "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} używają tego samego adresu jako nazwy użytkownika lub adresu e-mail konta, a także {{count}} więcej",
-    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
-    "suggestionsPairUsernameMore_few": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
-    "suggestionsPairUsernameMore_many": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
+    "suggestionsPairUsernameMore_one": "{{first}} i {{second}} współdzielą nazwę użytkownika, i jeszcze {{count}}",
+    "suggestionsPairUsernameMore_few": "{{first}} i {{second}} współdzielą nazwę użytkownika, i jeszcze {{count}}",
+    "suggestionsPairUsernameMore_many": "{{first}} i {{second}} współdzielą nazwę użytkownika, i jeszcze {{count}}",
     "suggestionsPairUsernameMore_other": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej"
   },
   "userDetail": {
@@ -424,7 +424,7 @@
       "fieldHeading": "Nagłówek (taki sam jak temat)",
       "fieldEmbedTitle": "Tytuł osadzenia",
       "fieldDescription": "Opis",
-      "addedDiscord": "Dodane przez Tracearr, w zależności od zdarzenia: kolor, pola takie jak Użytkownik, Media i Odtwarzacz oraz plakat i stopka dla zdarzeń dotyczących mediów. Opis może zostać skrócony, gdy pola są zbyt długie.",
+      "addedDiscord": "Dodane przez Tracearr, w zależności od zdarzenia: kolor, pola takie jak Użytkownik, Multimedia i Odtwarzacz oraz plakat i stopka dla zdarzeń dotyczących multimediów. Opis może zostać skrócony, gdy pola są zbyt długie.",
       "addedEmail": "Dodane przez Tracearr: etykieta ważności, szczegóły zdarzenia, czas wysłania i link do Tracearr",
       "addedPushSubtitle": "Podtytuł ustawiany przez Tracearr dla większości zdarzeń",
       "previewCount": "{{used, number}} / {{max, number}}",
@@ -459,7 +459,7 @@
       },
       "session": {
         "mediaTitle": "Odtwarzany tytuł",
-        "mediaType": "Rodzaj mediów",
+        "mediaType": "Typ multimediów",
         "sourceDynamicRange": "Zakres dynamiczny źródła",
         "sourceVideoCodec": "Źródłowy kodek wideo",
         "seasonNumber": "Numer sezonu",
@@ -488,7 +488,7 @@
         "season": "Sezon",
         "episode": "Odcinek",
         "episodeCount": "Dodane odcinki",
-        "type": "Rodzaj mediów",
+        "type": "Typ multimediów",
         "year": "Rok",
         "library": "Biblioteka",
         "server": "Serwer",
@@ -691,7 +691,7 @@
         "messageRequired": "Wpisz wiadomość do wyświetlenia",
         "tooLong": "Nie więcej niż {{max}} znaków",
         "template": {
-          "unclosed": "Instrukcja {{open}} w wierszu {{line}} nigdy nie jest zamknięta",
+          "unclosed": "Otwarcie {{open}} w wierszu {{line}} nie zostało zamknięte",
           "invalidOutput": "W wierszu {{line}} wewnątrz {{braces}} znajduje się coś innego niż zmienna",
           "invalidTag": "W wierszu {{line}} znajduje się tag inny niż if, else lub endif",
           "unexpectedElse": "Instrukcja else w wierszu {{line}} nie posiada odpowiadającej instrukcji if",
@@ -934,9 +934,9 @@
       "operators": {
         "eq": "jest",
         "neq": "nie jest",
-        "gt": "jest większe niż",
+        "gt": "jest powyżej",
         "gte": "jest co najmniej",
-        "lt": "jest mniejsze niż",
+        "lt": "jest poniżej",
         "lte": "jest co najwyżej",
         "in": "jest jednym z",
         "not_in": "nie jest jednym z",
@@ -991,8 +991,8 @@
           "no": "jakość strumienia nie jest obniżona"
         },
         "is_subtitle_burn_in": {
-          "yes": "",
-          "no": ""
+          "yes": "napisy są wypalane w obrazie",
+          "no": "napisy nie są wypalane w obrazie"
         },
         "is_transcoding": {
           "video": {
@@ -1171,8 +1171,8 @@
         "description": "Rozdzielczość wyjściowa jest mniejsza niż źródłowa"
       },
       "is_subtitle_burn_in": {
-        "label": "",
-        "description": ""
+        "label": "Wypalanie napisów",
+        "description": "Napisy są wypalane w obrazie, co wymusza transkodowanie wideo"
       },
       "source_bitrate_mbps": {
         "label": "Bitrate źródła",
@@ -1308,13 +1308,13 @@
       "placeholder": "tracearr1.…",
       "formatHint": "Kod zaczyna się od tracearr1.",
       "check": "Sprawdź",
-      "checking": "Odczytywanie...",
+      "checking": "Odczytywanie…",
       "valid": "Tracearr może odczytać ten kod.",
       "madeBy": "Autor: {{author}} (według kodu)",
       "codeShort": "Kod {{fingerprint}}",
       "paused": {
         "label": "Dodaj jako wstrzymaną",
-        "helper": "Włącz ją z listy po sprawdzeniu."
+        "helper": "Włącz ją na liście po sprawdzeniu."
       },
       "submit": "Dodaj",
       "adding": "Dodawanie…",
@@ -1351,10 +1351,10 @@
     "kindColumn": "Rodzaj",
     "name": "Nazwa",
     "newAutomation": "Nowa automatyzacja",
-    "namePlaceholder": "Nazwa dla tej automatyzacji",
+    "namePlaceholder": "Nazwa tej automatyzacji",
     "nameInvalid": "Nadaj jej nazwę.",
     "descriptionLabel": "Opis",
-    "descriptionPlaceholder": "Opisz, co to robi",
+    "descriptionPlaceholder": "Do czego to służy",
     "thisAutomation": "Ta automatyzacja",
     "cooldownLabel": "Co najwyżej raz na",
     "cooldownInvalid": "Wprowadź całkowitą liczbę minut, 0 lub więcej, lub zostaw puste.",
@@ -1429,7 +1429,7 @@
       "builtin": "Wbudowana · {{name}} {{version}}",
       "imported": "Zaimportowano z kodu udostępniania {{date}} · {{name}} {{version}}",
       "importedBy": "Zaimportowano {{date}} z kodu udostępniania autorstwa {{author}} · {{name}} {{version}}",
-      "saved": "Zapisano tutaj z {{name}} {{date}} · {{version}}",
+      "saved": "Zapisano tutaj {{date}} na podstawie {{name}} · {{version}}",
       "customized": "Dostosowana na podstawie {{name}}",
       "customizedFromRemoved": "Dostosowana na podstawie gotowej automatyzacji, która została już usunięta"
     },
@@ -1444,7 +1444,7 @@
     "sessionTargets": {
       "triggering": {
         "label": "Sesja wyzwalająca",
-        "tooltip": "Tylko sesja, która wywołała tę automatyzację"
+        "tooltip": "Tylko sesja, która wyzwoliła tę automatyzację"
       },
       "oldest": {
         "label": "Najstarsza sesja",
@@ -1460,7 +1460,7 @@
       },
       "all_user": {
         "label": "Wszystkie sesje użytkownika",
-        "tooltip": "Wszystkie aktywne sesje dla tego użytkownika"
+        "tooltip": "Wszystkie aktywne sesje tego użytkownika"
       }
     },
     "configFields": {
@@ -1479,7 +1479,7 @@
     },
     "trustModes": {
       "adjust": {
-        "label": "Dostosuj o wartość"
+        "label": "Zmień o wartość"
       },
       "set": {
         "label": "Ustaw na wartość"
@@ -1546,7 +1546,7 @@
       "media-added": {
         "name": "Dodano nowe multimedia",
         "description": "Powiadom miejsce docelowe, gdy element biblioteki pojawi się po raz pierwszy.",
-        "keywords": "nowy biblioteka film odcinek dodany import powiadomienie discord email webhook"
+        "keywords": "nowy biblioteka film odcinek dodany import powiadomienie discord e-mail email webhook"
       },
       "media-upgraded": {
         "name": "Ulepszono multimedia",
@@ -1561,7 +1561,7 @@
       "newsletter-failed": {
         "name": "Nieudana wysyłka newslettera",
         "description": "Powiadom miejsce docelowe, gdy wysyłka newslettera się nie powiedzie lub dotrze tylko do części listy.",
-        "keywords": "newsletter biuletyn email błąd częściowy zwrotka powiadomienie"
+        "keywords": "newsletter biuletyn e-mail email błąd częściowy zwrotka powiadomienie"
       },
       "no-4k-transcodes": {
         "name": "Zakaz transkodowania 4K",
@@ -1569,8 +1569,8 @@
         "keywords": "4k transkodowanie jakość procesor cpu przepustowość zatrzymanie"
       },
       "paused-too-long": {
-        "name": "Wstrzymano zbyt długo",
-        "description": "Poinformuj miejsce docelowe o strumieniu, który jest wstrzymany dłużej, niż na to pozwalasz.",
+        "name": "Zbyt długie wstrzymanie",
+        "description": "Powiadom miejsce docelowe, gdy strumień jest wstrzymany dłużej, niż na to pozwalasz.",
         "keywords": "wstrzymanie bezczynny utknięte afk porzucone powiadomienie discord email e-mail webhook"
       },
       "plugin-update": {
@@ -1616,7 +1616,7 @@
       "transcode-started": {
         "name": "Strumień jest transkodowany",
         "description": "Powiadom miejsce docelowe, gdy strumień transkoduje wideo lub audio.",
-        "keywords": "transkodowanie konwersja cpu direct play odtwarzanie bezpośrednie jakość powiadomienie discord e-mail email webhook"
+        "keywords": "transkodowanie konwersja cpu direct play bezpośrednie odtwarzanie jakość powiadomienie discord e-mail email webhook"
       },
       "trust-score-changed": {
         "name": "Zmienił się wynik zaufania",
@@ -1648,13 +1648,13 @@
         "notifications": "Newslettery",
         "notify": "Powiadom",
         "policy": "Podejmij działanie",
-        "control": "Jeśli… wtedy"
+        "control": "Jeśli… to"
       },
       "suggested": "Sugerowane",
       "triggers": {
         "sessionStarted": {
           "description": "Odtwarzanie potwierdzone, około 30 sekund po wykryciu.",
-          "synonyms": "odtwarzanie, oglądanie, rozpoczęcie, uruchamianie, przeglądanie"
+          "synonyms": "odtwarzanie, oglądanie, rozpoczęcie, start, uruchomienie"
         },
         "sessionFirstSeen": {
           "description": "Natychmiast po wykryciu strumienia, przed opóźnieniem potwierdzenia. Niektóre nigdy nie zostają potwierdzone.",
@@ -1662,28 +1662,28 @@
         },
         "sessionStopped": {
           "description": "Odtwarzanie kończy się z jakiegokolwiek powodu.",
-          "synonyms": "koniec, zakończenie, wyjdź, zamknij"
+          "synonyms": "koniec, zakończenie, wyjście, zamknięcie"
         },
         "sessionTranscodeChanged": {
-          "description": "Serwer przełącza strumień pomiędzy bezpośrednim odtwarzaniem i transkodowaniem.",
-          "synonyms": "transkodowanie, konwersja, odtwarzanie bezpośrednie, cpu"
+          "description": "Serwer przełącza strumień między bezpośrednim odtwarzaniem a transkodowaniem.",
+          "synonyms": "transkodowanie, konwersja, bezpośrednie odtwarzanie, cpu"
         },
         "sessionPaused": {
           "description": "W momencie wstrzymania strumienia.",
-          "synonyms": "pauza, wstrzymaj, bezczynność"
+          "synonyms": "pauza, wstrzymanie, bezczynność"
         },
         "sessionHeldFor": {
           "label": "Strumień jest wstrzymany",
           "description": "Strumień jest wstrzymany dłużej niż ustawiona liczba minut.",
-          "synonyms": "pauza, bezczynna, porzucona, utknięta, afk"
+          "synonyms": "pauza, bezczynny, porzucony, zawieszony, afk"
         },
         "accountInactiveFor": {
           "label": "Konto przestaje być aktywne",
-          "description": "Konto nie oglądało nic przez określoną liczbę dni.",
+          "description": "Konto niczego nie oglądało przez ustawioną liczbę dni.",
           "synonyms": "nieaktywny, uśpiony, nieużywany, czyszczenie"
         },
         "accountNewDevice": {
-          "description": "Konto strumieniuje z danego urządzenia po raz pierwszy.",
+          "description": "Konto po raz pierwszy odtwarza z danego urządzenia.",
           "synonyms": "urządzenie, nowe, nieznane, nierozpoznane, telefon, logowanie, udostępnianie, współdzielenie, sharing"
         },
         "accountTrustChanged": {
@@ -1719,11 +1719,11 @@
           "synonyms": "aktualizacja, wersja, wydanie, tracearr"
         },
         "newsletterSent": {
-          "description": "Zaplanowany lub ręczny newsletter dotarł do wszystkich na liście.",
+          "description": "Zaplanowany lub wysłany ręcznie newsletter dotarł do wszystkich na liście.",
           "synonyms": "newsletter, biuletyn, e-mail, email, dostarczony"
         },
         "newsletterFailed": {
-          "description": "Newsletter nie dotarł do nikogo lub tylko do części jego odbiorców.",
+          "description": "Newsletter nie dotarł do nikogo lub dotarł tylko do części listy.",
           "synonyms": "newsletter, biuletyn, e-mail, email, odbicie, częściowy, błąd"
         }
       },
@@ -1777,7 +1777,7 @@
     "plex": {
       "noServersFound": "Nie znaleziono serwerów Plex",
       "noServersFoundHint": "Upewnij się, że posiadasz przynajmniej jeden serwer Plex",
-      "noReachableConnections": "Brak dostępnych połączeń",
+      "noReachableConnections": "Brak osiągalnych połączeń",
       "local": "Lokalne",
       "remote": "Zdalne",
       "custom": "Niestandardowe",
@@ -1796,7 +1796,7 @@
         "unknown": "Nie udało się połączyć"
       },
       "connectionsReachable": "Osiągalne połączenia: {{reachable}} z {{total}}",
-      "hideFiltered": "Ukryj przefiltrowane",
+      "hideFiltered": "Ukryj odfiltrowane",
       "showAll": "Pokaż wszystkie",
       "connectingTo": "Łączenie z {{name}}...",
       "ownerOnly": "Tylko właściciel może zarządzać powiązanymi kontami Plex.",
@@ -1828,9 +1828,9 @@
       "add": "Dodaj miejsce docelowe",
       "builtinNote": "Wbudowane",
       "clearSecret": "Wyczyść",
-      "deleteConfirm": "Usunąć {{name}}? Automatyzacje i newslettery, które go używają, przestaną działać, dopóki nie zostaną zaktualizowane.",
+      "deleteConfirm": "Usunąć {{name}}? Automatyzacje i newslettery, które go używają, nie będą działać, dopóki nie zostaną zaktualizowane.",
       "description": "Gdzie trafiają powiadomienia. Dodaj dowolnie wiele – automatyzacje mogą wysyłać do każdego z nich.",
-      "emailDescription": "Tracearr wysyła wiadomości e-mail, korzystając z tego serwera SMTP. Newslettery wybierają własnych odbiorców; powiadomienia z automatyzacji są kierowane do adresów poniżej.",
+      "emailDescription": "Tracearr wysyła wiadomości e-mail, korzystając z tego serwera SMTP. Newslettery wybierają własnych odbiorców; powiadomienia z automatyzacji są kierowane na poniższe adresy.",
       "empty": "Brak miejsc docelowych.",
       "fields": {
         "webhookUrl": "Adres URL webhooka",
@@ -1844,7 +1844,7 @@
         "preset": "Dostawca",
         "host": "Host SMTP",
         "port": "Port",
-        "security": "Bezpieczeństwo",
+        "security": "Zabezpieczenia",
         "verifyCertificate": "Weryfikuj certyfikat",
         "username": "Nazwa użytkownika",
         "password": "Hasło",
@@ -1877,9 +1877,9 @@
         "smtpMailgunUsername": "postmaster@twojadomena, a nie login do Mailgun.",
         "smtpMailgunPassword": "Hasło SMTP z ustawień tej domeny. Domena sandbox dociera tylko do autoryzowanych odbiorców.",
         "smtpBrevoUsername": "Twój adres e-mail do logowania Brevo.",
-        "smtpBrevoPassword": "Klucz SMTP z SMTP i API > SMTP, a nie klucz API.",
+        "smtpBrevoPassword": "Klucz SMTP z SMTP & API > SMTP, a nie klucz API.",
         "smtpSesUsername": "Nazwa użytkownika SMTP z konsoli SES, a nie klucz dostępu IAM. Umieść swój region w nazwie hosta.",
-        "smtpSesPassword": "Hasło SMTP z konsoli SES. Konta Sandbox wysyłają 200 wiadomości dziennie tylko na zweryfikowane adresy.",
+        "smtpSesPassword": "Hasło SMTP z konsoli SES. Konta sandbox wysyłają 200 wiadomości dziennie tylko na zweryfikowane adresy.",
         "smtpPostmarkUsername": "Twój token API serwera.",
         "smtpPostmarkPassword": "Ten sam token API serwera lub sekret tokena strumienia."
       },
@@ -1891,7 +1891,7 @@
       "options": {
         "securityStarttls": "STARTTLS (zwykle port 587)",
         "securityTls": "TLS (zwykle port 465)",
-        "securityNone": "Brak (zwykły tekst, port 25)",
+        "securityNone": "Brak (tekst jawny, port 25)",
         "presetCustom": "Niestandardowy",
         "presetPostmark": "Postmark",
         "presetResend": "Resend",
@@ -1907,11 +1907,11 @@
       "receiveViolationsHint": "Wysyłaj każde naruszenie do tego miejsca docelowego.",
       "receiveViolationsNeedsRecipients": "Dodaj odbiorców powiadomień, aby wysyłać tu naruszenia",
       "reencrypt": "Wprowadź ponownie sekret tego miejsca docelowego",
-      "rowActions": "Akcje miejsc docelowych",
-      "secretSet": "Ustaw (pozostaw puste, aby zachować)",
+      "rowActions": "Akcje miejsca docelowego",
+      "secretSet": "Ustawiono (pozostaw puste, aby zachować)",
       "test": "Testuj",
       "testHint": "Najpierw zapisz, aby przetestować",
-      "testNeedsForm": "Wypełnij wymagane pola, by przetestować",
+      "testNeedsForm": "Wypełnij wymagane pola, aby przetestować",
       "types": {
         "discord": "Discord",
         "jsonWebhook": "Webhook (JSON)",
@@ -1990,7 +1990,7 @@
     "basemapMissing": "Mapa bazowa nie jest zainstalowana",
     "webglUnavailable": "WebGL jest wyłączony w tej przeglądarce",
     "webglHint": "Mapa wymaga WebGL. Włącz go dla tej witryny w ustawieniach przeglądarki.",
-    "badMounts": "Wykryto nieprawidłowo zamontowane woluminy — poprawne działanie nie jest gwarantowane."
+    "badMounts": "Wykryto nieprawidłowo zamontowane woluminy – poprawne działanie nie jest gwarantowane."
   },
   "devices": {
     "title": "Kompatybilność urządzeń",
@@ -2008,9 +2008,9 @@
     "transcodes": "Transkodowania",
     "pctOfTotal": "% całości",
     "noTranscodeHotspots": "Brak hotspotów transkodowania",
-    "compatibilityMatrix": "Matryca zgodności",
+    "compatibilityMatrix": "Macierz kompatybilności",
     "compatibilityMatrixDesc": "Wskaźnik bezpośredniego odtwarzania według urządzenia i kodeka wideo. Sortowane według liczby sesji.",
-    "noDeviceDataPeriod": "Brak danych urządzenia w tym okresie",
+    "noDeviceDataPeriod": "Brak danych o urządzeniach w tym okresie",
     "legend": "Legenda:",
     "directPlayHigh": "≥80% bezpośrednio",
     "directPlayMid": "50-79%",
@@ -2040,7 +2040,7 @@
   },
   "statsUsers": {
     "noActivity": "Brak aktywności",
-    "noActivityDesc": "Rozpocznij odtwarzanie, aby zobaczyć tutaj najaktywniejszych użytkowników",
+    "noActivityDesc": "Rozpocznij odtwarzanie, aby zobaczyć tutaj najaktywniejszych użytkowników.",
     "top3": "Top 3",
     "runnersUp": "Kolejne miejsca"
   },
@@ -2092,10 +2092,10 @@
     "suspiciousOnly": "Tylko podejrzane",
     "load": "Załaduj",
     "noSuspiciousSnapshots": "Nie znaleziono podejrzanych migawek",
-    "clickLoadToView": "Kliknij \"Załaduj\", aby wyświetlić migawki",
+    "clickLoadToView": "Kliknij „Załaduj”, aby wyświetlić migawki",
     "deleteSelected": "Usuń zaznaczone",
     "deleteAllSuspicious": "Usuń wszystkie podejrzane",
-    "suspicious": "Podejrzany",
+    "suspicious": "Podejrzana",
     "ok": "OK",
     "selected": "zaznaczone",
     "snapshots": "migawki",
@@ -2161,7 +2161,7 @@
         "summary_many": "{{count}} nieobejrzanych tytułów · {{size}}",
         "summary_other": "{{count}} nieobejrzanych tytułów · {{size}}"
       },
-      "loadError": "Nie można załadować biblioteki multimediów"
+      "loadError": "Nie udało się załadować biblioteki multimediów"
     },
     "movies": {
       "title": "Filmy"
@@ -2193,7 +2193,7 @@
       },
       "empty": {
         "title": "Nie znaleziono jeszcze gatunków",
-        "description": "Gatunki pochodzą z synchronizacji metadanych serwerów multimedialnych. Sprawdź ponownie po zakończeniu następnej synchronizacji."
+        "description": "Gatunki pochodzą z synchronizacji metadanych serwerów multimediów. Sprawdź ponownie po zakończeniu następnej synchronizacji."
       },
       "loadError": "Nie udało się załadować gatunków"
     },
@@ -2208,7 +2208,7 @@
         "backLink": "Powrót do multimediów"
       },
       "hero": {
-        "loadError": "Nie można załadować tego tytułu",
+        "loadError": "Nie udało się załadować tego tytułu",
         "meta": {
           "seasons_one": "{{count}} sezon",
           "seasons_few": "{{count}} sezony",
@@ -2264,7 +2264,7 @@
           "plays": "Odtworzenia",
           "episodes": "Odcinki",
           "completion": "Ukończenie",
-          "lastWatched": "Ostatnio obejrzane"
+          "lastWatched": "Ostatnio oglądano"
         }
       },
       "seasons": {
@@ -2276,7 +2276,7 @@
         "episodeLabel": {
           "watched": "{{code}}: obejrzano",
           "partial": "{{code}}: częściowo obejrzano",
-          "unwatched": "{{code}}: nieobejrzany"
+          "unwatched": "{{code}}: nie obejrzano"
         },
         "episodeCount_one": "{{count}} odcinek",
         "episodeCount_few": "{{count}} odcinki",
@@ -2298,7 +2298,7 @@
         "loadError": "Nie udało się załadować historii",
         "empty": "Nie zarejestrowano jeszcze żadnych odtworzeń",
         "watched": "Obejrzane",
-        "notWatched": "Nie ukończono",
+        "notWatched": "Nieukończone",
         "columns": {
           "duration": "Czas trwania"
         }
@@ -2350,7 +2350,7 @@
     "grid": {
       "toolbar": {
         "ariaLabel": "Filtry i sortowanie",
-        "typeLabel": "Rodzaj mediów",
+        "typeLabel": "Typ multimediów",
         "moviesToggle": "Filmy",
         "showsToggle": "Seriale",
         "searchPlaceholder": "Szukaj tytułów…",
@@ -2437,7 +2437,7 @@
       "watched": "Obejrzane"
     },
     "wait": {
-      "pending": "oczekujące",
+      "pending": "oczekuje",
       "declined": "odrzucono"
     },
     "seasons": {
@@ -2478,7 +2478,7 @@
     },
     "page": {
       "title": "Prośby",
-      "description": "O co prosili użytkownicy, co trafiło do biblioteki i czy ktokolwiek to odtworzył.",
+      "description": "O co prosili użytkownicy, co trafiło do biblioteki i czy w ogóle to odtworzyli.",
       "failedToLoad": "Nie udało się załadować analityki próśb",
       "notConfigured": "Brak powiązanego Seerr",
       "notConfiguredDescription": "Powiąż instancję Seerr z serwerem, a strona wypełni się po pierwszej synchronizacji.",
