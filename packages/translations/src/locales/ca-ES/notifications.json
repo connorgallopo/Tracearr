@@ -13,7 +13,7 @@
         "title": "Servidor sincronitzat"
       },
       "serverMarkedHistorical": {
-        "title": "Servidor marcat com a històric",
+        "title": "Servidor marcat com a arxivat",
         "message": "Tracearr ja no contacta amb {{name}}. L'historial es conserva."
       },
       "serverResumed": {
@@ -136,7 +136,7 @@
         "message_other": "{{count}} usuaris restablerts a 100"
       },
       "claimCodeValidated": {
-        "title": "Codi de reclamació validat",
+        "title": "Codi de vinculació validat",
         "message": "Ja podeu continuar amb la configuració inicial"
       },
       "usersMerged": {
@@ -203,7 +203,7 @@
       "mergeSuggestionDismissFailed": "No s'ha pogut descartar el suggeriment",
       "mergeSuggestionRestoreFailed": "No s'ha pogut restaurar el suggeriment",
       "invalidClaimCode": {
-        "title": "El codi de reclamació no és vàlid",
+        "title": "El codi de vinculació no és vàlid",
         "message": "Comproveu els registres del servidor"
       },
       "destinationSaveFailed": "No s'ha pogut desar la destinació: {{error}}",
