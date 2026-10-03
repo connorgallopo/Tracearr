@@ -180,7 +180,13 @@
       "qualityEvolution": "质量进化",
       "all": "所有的",
       "failedToLoad": "加载质量数据失败",
-      "failedToLoadDesc": "无法获取质量数据。请重试。"
+      "failedToLoadDesc": "无法获取质量数据。请重试。",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_other": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "存储",
@@ -2248,10 +2254,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "分辨率",
         "resolutionAll": "任何分辨率",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "动态范围",
         "hdrAll": "任何",
         "hdrOnly": "仅限HDR",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

@@ -187,7 +187,15 @@
       "qualityEvolution": "Laadun Kehitys",
       "all": "Kaikki",
       "failedToLoad": "Laadun tietojen lataaminen epäonnistui",
-      "failedToLoadDesc": "Laadukasta tietoa ei voitu noutaa. Yritä uudelleen."
+      "failedToLoadDesc": "Laadukasta tietoa ei voitu noutaa. Yritä uudelleen.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Tallennustila",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

@@ -187,7 +187,15 @@
       "qualityEvolution": "Evoluzione Qualità",
       "all": "Tutti",
       "failedToLoad": "Impossibile caricare i dati di qualità",
-      "failedToLoadDesc": "Impossibile recuperare i dati di qualità. Riprova."
+      "failedToLoadDesc": "Impossibile recuperare i dati di qualità. Riprova.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Archiviazione",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

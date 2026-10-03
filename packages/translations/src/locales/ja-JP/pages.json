@@ -180,7 +180,13 @@
       "qualityEvolution": "品質の進化",
       "all": "すべて",
       "failedToLoad": "品質データの読み込みに失敗しました",
-      "failedToLoadDesc": "品質データを取得できませんでした。もう一度やり直してください。"
+      "failedToLoadDesc": "品質データを取得できませんでした。もう一度やり直してください。",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_other": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "ストレージ",
@@ -2248,10 +2254,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

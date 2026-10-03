@@ -187,7 +187,15 @@
       "qualityEvolution": "Evolució de la qualitat",
       "all": "Tot",
       "failedToLoad": "No s'han pogut carregar les dades de qualitat",
-      "failedToLoadDesc": "No s'han pogut obtenir les dades de qualitat. Torneu-ho a provar."
+      "failedToLoadDesc": "No s'han pogut obtenir les dades de qualitat. Torneu-ho a provar.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Emmagatzematge",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "Sense veure per {{name}}",
         "resolutionLabel": "Resolució",
         "resolutionAll": "Qualsevol resolució",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "Interval dinàmic",
         "hdrAll": "Qualsevol",
         "hdrOnly": "Només HDR",
         "hdrChip": "HDR",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "Àudio",
         "atmosAll": "Qualsevol",
         "atmosOnly": "Només Dolby Atmos",

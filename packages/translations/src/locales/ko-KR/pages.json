@@ -180,7 +180,13 @@
       "qualityEvolution": "품질 변화",
       "all": "전체",
       "failedToLoad": "품질 데이터를 불러오지 못했습니다",
-      "failedToLoadDesc": "품질 데이터를 가져오지 못했습니다. 다시 시도해 주세요."
+      "failedToLoadDesc": "품질 데이터를 가져오지 못했습니다. 다시 시도해 주세요.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_other": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "저장 공간",
@@ -2248,10 +2254,16 @@
         "unwatchedByLens": "{{name}}님이 시청하지 않음",
         "resolutionLabel": "해상도",
         "resolutionAll": "모든 해상도",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "다이내믹 레인지",
         "hdrAll": "모두",
         "hdrOnly": "HDR 전용",
         "hdrChip": "HDR",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

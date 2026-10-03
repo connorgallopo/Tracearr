@@ -201,7 +201,19 @@
       "qualityEvolution": "Ewolucja jakości",
       "all": "Wszystkie",
       "failedToLoad": "Nie udało się załadować danych o jakości",
-      "failedToLoadDesc": "Nie udało się pobrać danych o jakości. Spróbuj ponownie."
+      "failedToLoadDesc": "Nie udało się pobrać danych o jakości. Spróbuj ponownie.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_few": "",
+        "movieCount_many": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_few": "",
+        "episodeCount_many": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Miejsce na dysku",
@@ -2368,10 +2380,16 @@
         "unwatchedByLens": "Nieobejrzane przez {{name}}",
         "resolutionLabel": "Rozdzielczość",
         "resolutionAll": "Dowolna rozdzielczość",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "Zakres dynamiczny",
         "hdrAll": "Dowolny",
         "hdrOnly": "Tylko HDR",
         "hdrChip": "HDR",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "Dźwięk",
         "atmosAll": "Dowolny",
         "atmosOnly": "Tylko Dolby Atmos",

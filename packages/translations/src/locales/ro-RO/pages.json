@@ -194,7 +194,17 @@
       "qualityEvolution": "Evoluția calității",
       "all": "Toate",
       "failedToLoad": "Încărcarea datelor de calitate nu a reușit",
-      "failedToLoadDesc": "Datele de calitate nu au putut fi preluate. Vă rugăm să încercați din nou."
+      "failedToLoadDesc": "Datele de calitate nu au putut fi preluate. Vă rugăm să încercați din nou.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_few": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_few": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Depozitare",
@@ -2328,10 +2338,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

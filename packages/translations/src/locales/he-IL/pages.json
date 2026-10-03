@@ -194,7 +194,17 @@
       "qualityEvolution": "",
       "all": "",
       "failedToLoad": "",
-      "failedToLoadDesc": ""
+      "failedToLoadDesc": "",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_two": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_two": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "",
@@ -2328,10 +2338,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

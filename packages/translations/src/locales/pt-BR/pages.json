@@ -187,7 +187,15 @@
       "qualityEvolution": "Evolução da Qualidade",
       "all": "TODOS",
       "failedToLoad": "Falha ao carregar dados de qualidade",
-      "failedToLoadDesc": "Não foi possível obter dados de qualidade. Por favor, tente novamente."
+      "failedToLoadDesc": "Não foi possível obter dados de qualidade. Por favor, tente novamente.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",

@@ -187,7 +187,15 @@
       "qualityEvolution": "Ποιοτική Εξέλιξη",
       "all": "Όλα",
       "failedToLoad": "Αποτυχία φόρτωσης ποιοτικών δεδομένων",
-      "failedToLoadDesc": "Δεν ήταν δυνατή η λήψη δεδομένων ποιότητας. Παρακαλώ προσπαθήστε ξανά."
+      "failedToLoadDesc": "Δεν ήταν δυνατή η λήψη δεδομένων ποιότητας. Παρακαλώ προσπαθήστε ξανά.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Αποθήκευση",
@@ -2288,10 +2296,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",
