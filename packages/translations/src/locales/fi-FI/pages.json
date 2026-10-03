@@ -1,7 +1,7 @@
 {
   "login": {
     "title": "Tracearr",
-    "tagline": "Tracearr - Stream access Management",
+    "tagline": "Tracearr - Striimien käytön hallinta",
     "createAccountHeading": "Luo tilisi päästäksesi alkuun",
     "signInHeading": "Kirjaudu sisään tilillesi",
     "createAccountDescription": "Luo tili hallitaksesi mediapalvelimia",
@@ -11,7 +11,7 @@
     "completeInPopup": "Suorita sisäänkirjautuminen ponnahdusikkunassa",
     "reopenPlexLogin": "Avaa Plex Kirjaudu Uudelleen",
     "continueWith": "Jatka {{provider}}-tilillä",
-    "usernameOrEmail": "Käyttäjätunnus tai Sähköposti",
+    "usernameOrEmail": "Käyttäjätunnus tai sähköposti",
     "identifierPlaceholder": "Käyttäjätunnus tai sähköpostiosoite",
     "username": "Käyttäjätunnus",
     "usernamePlaceholder": "käyttäjätunnuksesi",
@@ -20,8 +20,8 @@
     "passwordPlaceholder": "Vähintään 8 merkkiä",
     "yourPasswordPlaceholder": "Salasanasi",
     "setupNote": "Kun olet luonut tilin, voit lisätä Plex tai Jellyfin palvelimet Asetuksista.",
-    "localDisabledHint": "Paikallinen sisäänkirjautuminen on poistettu käytöstä tässä tapauksessa. Pyydä ylläpitäjää suorittamaan `enable-local-login` Tracearr CLI:stä ottaaksesi sen uudelleen käyttöön.",
-    "oidcError": "Single sign-on epäonnistui. Yritä uudelleen tai käytä toista kirjautumismenetelmää.",
+    "localDisabledHint": "Paikallinen sisäänkirjautuminen on poistettu käytöstä tässä Tracearr-asennuksessa. Pyydä ylläpitäjää suorittamaan `enable-local-login` Tracearr CLI:ssä, jotta se otetaan uudelleen käyttöön.",
+    "oidcError": "Kertakirjautuminen epäonnistui. Yritä uudelleen tai käytä toista kirjautumismenetelmää.",
     "accountCreated": "Tili luotiin onnistuneesti!",
     "connectedTo": "Yhdistetty {{name}}",
     "plexAuthFailed": "Plex todennus epäonnistui",
@@ -29,12 +29,12 @@
     "serverConnectFailed": "Yhteyden muodostaminen palvelimeen epäonnistui",
     "createAccountFailed": "Tiliä ei voitu luoda",
     "invalidCredentials": "Virheellinen sähköpostiosoite tai salasana",
-    "claimCodeRequired": "Ensi aikainen määritys vaatii korvauskoodin.",
-    "enterClaimCode": "Syötä Lunastuskoodi",
+    "claimCodeRequired": "Ensimmäinen määritys vaatii lunastuskoodin",
+    "enterClaimCode": "Syötä lunastuskoodi",
     "claimCodeDescription": "Tarkista palvelimen lokitiedot saadaksesi vaaditun koodin, jotta voit jatkaa asetuksia",
-    "claimCodeLabel": "Lunasta Koodi",
+    "claimCodeLabel": "Lunastuskoodi",
     "claimCodeHint": "Lunastuskoodi on painettu palvelimen lokiin, kun kontti käynnistyy",
-    "validateClaimCode": "Validoi Claim-koodi",
+    "validateClaimCode": "Vahvista lunastuskoodi",
     "claimCodeSecurityNote": "Tämä turvatoimenpide varmistaa, että vain valtuutetut käyttäjät voivat suorittaa ensimmäisen asennuksen"
   },
   "dashboard": {
@@ -46,8 +46,8 @@
     "streamLocations": "Striimien sijainnit",
     "serverResources": "Palvelimen Resurssit",
     "bandwidth": "Kaistanleveys",
-    "noActiveStreams": "Ei aktiivisia streameja",
-    "streamsAppearHere": "Aktiiviset streamit näkyvät täällä, kun käyttäjät alkavat katsella"
+    "noActiveStreams": "Ei aktiivisia striimejä",
+    "streamsAppearHere": "Aktiiviset striimit näkyvät täällä, kun käyttäjät alkavat katsella"
   },
   "users": {
     "title": "Käyttäjät",
@@ -89,12 +89,12 @@
     "suggestionsPairEmailUsername": "",
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
-    "suggestionsReview": "Tarkistus",
+    "suggestionsReview": "Tarkista",
     "suggestionsNotSame": "Ei sama henkilö",
     "suggestionsMatchEmail": "Sama sähköpostiosoite",
     "suggestionsMatchEmailUsername": "Molemmat käyttävät käyttäjätunnuksena {{value}} tai tilin sähköpostiosoitteena",
     "suggestionsMatchUsername": "Sama käyttäjänimi",
-    "suggestionsEmpty": "Mitään ei jäänyt tarkistettavaksi",
+    "suggestionsEmpty": "Mitään ei jäänyt tarkistettavaksi.",
     "suggestionsDismissed": "",
     "suggestionsDismissedPair": "",
     "suggestionsDismissedAt": "",
@@ -222,13 +222,13 @@
       "loadingDuplicates": "Ladataan kaksoiskappaleita...",
       "duplicatesFailed": "Kaksoiskappaleiden lataaminen epäonnistui",
       "noDuplicatesTitle": "Kaksoiskappaleita ei löytynyt",
-      "noDuplicatesDesc": "Ei havaittuja nimikkeitä, joissa olisi useampi kuin yksi fyysinen tiedosto",
+      "noDuplicatesDesc": "Ei havaittuja nimikkeitä, joissa olisi useampi kuin yksi fyysinen tiedosto.",
       "colTitle": "Nimike",
       "colMatchType": "Vastaavuustyyppi",
       "colCopies": "Kopiot",
-      "colRecoverable": "Palautettavissa oleva tila",
+      "colRecoverable": "Vapautettavissa oleva tila",
       "sameServer": "Sama palvelin",
-      "mirror": "Peilikuva",
+      "mirror": "Peilikopio",
       "missingOnServer": "Puuttuu palvelimelta",
       "missingOnServerHint": "",
       "copyPath": "Kopioi tiedostopolku"
@@ -276,7 +276,7 @@
       },
       "noMedia": {
         "title": "Ei vielä elokuvia tai ohjelmia",
-        "body": "Tämä kirjasto on synkronoitu, mutta sillä ei ole vielä elokuvia tai näytelmiä."
+        "body": "Tämä kirjasto on synkronoitu, mutta siinä ei ole vielä elokuvia tai ohjelmia."
       },
       "syncNow": "Synkronoi nyt",
       "syncing": "Synkronoidaan...",
@@ -318,7 +318,7 @@
     "title": "Toiminta",
     "description": "",
     "playsOverTime": "Toistot ajan mittaan",
-    "concurrentStreams": "Samanaikaiset Streamit",
+    "concurrentStreams": "Samanaikaiset striimit",
     "engagementBreakdown": "Sitoumusten Erittely",
     "howUsersEngage": "Miten käyttäjät sitoutuvat sisältöön",
     "playsVsSessions": "Toistot vs. istunnot",
@@ -396,13 +396,13 @@
       "fieldMessage": "Viesti",
       "fieldSubject": "Aihe",
       "fieldHeading": "Otsikko (sama kuin aihe)",
-      "fieldEmbedTitle": "Upota otsikko",
+      "fieldEmbedTitle": "Upotuksen otsikko",
       "fieldDescription": "Kuvaus",
       "addedDiscord": "",
       "addedEmail": "",
       "addedPushSubtitle": "",
       "previewCount": "{{used, number}} / {{max, number}}",
-      "previewCountBytes": "{{used, number}} / {{max, number}} bytes",
+      "previewCountBytes": "{{used, number}} / {{max, number}} tavua",
       "previewCut": "",
       "previewPriority": "Prioriteetti: {{priority}}",
       "previewEscapeHint": "",
@@ -432,16 +432,16 @@
         "identityName": "Henkilön nimi"
       },
       "session": {
-        "mediaTitle": "Toistonimike",
+        "mediaTitle": "Toistettava nimike",
         "mediaType": "Median tyyppi",
         "sourceDynamicRange": "Lähteen dynaaminen alue",
-        "sourceVideoCodec": "Lähteen koodekki",
+        "sourceVideoCodec": "Lähteen videokoodekki",
         "seasonNumber": "Kauden numero",
         "episodeNumber": "Jakson numero",
         "name": "Sarja ja jakso, tai nimike"
       },
       "server": {
-        "name": "Palvelimen Nimi",
+        "name": "Palvelimen nimi",
         "type": "Palvelintyyppi"
       },
       "device": {
@@ -459,7 +459,7 @@
         "title": "Kohteen nimi",
         "name": "Sarja ja jakso, tai nimike",
         "show": "Sarja",
-        "season": "Kausi ",
+        "season": "Kausi",
         "episode": "Jakso",
         "episodeCount": "Jaksoja lisätty",
         "type": "Median tyyppi",
@@ -529,7 +529,7 @@
         "ran": "Muutettiin luottamuspisteitä"
       },
       "kill_stream": {
-        "label": "Tapa striimi",
+        "label": "Lopeta striimi",
         "description": "Lopeta aktiivinen striimi",
         "fields": {
           "cooldown_minutes": {
@@ -572,8 +572,8 @@
       "playing": "Toistetaan",
       "from": "Mistä",
       "summary": "Yhteenveto",
-      "started": "Käynnistettiin",
-      "finished": "Päätettiin",
+      "started": "Alkoi",
+      "finished": "Päättyi",
       "noSummary": "Ei muistiinpanoja",
       "outcomes": {
         "completed": "",
@@ -717,12 +717,12 @@
         "deviceTypesHint": "",
         "yes": "Kyllä",
         "no": "Ei",
-        "recentlySeen": "Nähty viimeaikoina",
+        "recentlySeen": "Nähty viime aikoina",
         "allCountries": "Kaikki maat",
         "sectionTitle": "Ja vain, jos…",
         "optional": "vapaaehtoinen",
         "helper": "",
-        "emptyLine": "Ei ylimääräisiä tarkastuksia. Tämä ajetaan joka kerta",
+        "emptyLine": "Ei ylimääräisiä tarkastuksia. Tämä ajetaan joka kerta.",
         "all": "ja",
         "any": "tai",
         "allHint": "ja: jokaisen tarkistuksen on läpäistävä",
@@ -739,16 +739,16 @@
         "removeGroup": "Poista tämä tarkistusjoukko"
       },
       "actions": {
-        "add": "➕ Lisää toinen toiminto",
-        "sectionTitle": "Sitten suorita...",
+        "add": "Lisää toinen toiminto",
+        "sectionTitle": "Sitten suorita…",
         "ifTitle": "Jos…",
-        "helper": "Nämä suoritetaan järjestyksessä, alhaalta ylöspäin.",
+        "helper": "Nämä suoritetaan järjestyksessä, ylhäältä alaspäin.",
         "emptyTitle": "Mitä pitäisi tapahtua?",
         "emptyDescription": "",
         "emptyAction": "Valitse, mitä tapahtuu",
         "moveUp": "Siirrä {{name}} ylös",
         "moveDown": "Siirrä {{name}} alas",
-        "menu": "Enemmän: {{name}}",
+        "menu": "Lisää toimintoja: {{name}}",
         "branchName": "tämä haara",
         "confirmRemoveTitle": "Poistetaanko tämä toiminto?",
         "confirmRemoveDescription": "",
@@ -763,12 +763,12 @@
         "collapseBranch": "Piilota tämän haaran vaiheet"
       },
       "when": {
-        "title": "Milloin…",
+        "title": "Kun…",
         "helper": "",
         "emptyTitle": "Minkä pitäisi aloittaa tämä?",
         "emptyDescription": "",
         "emptyAction": "Valitse, mikä aloittaa sen",
-        "add": "Lisää toinen käynnistin",
+        "add": "Lisää toinen laukaisin",
         "or": "tai"
       },
       "heldFor": {
@@ -794,7 +794,7 @@
         "moveHint": "järjestä uudelleen"
       },
       "picker": {
-        "searchPlaceholder": "Etsi, tai kuvaile mitä pitäisi tapahtua",
+        "searchPlaceholder": "Etsi tai kuvaile, mitä pitäisi tapahtua",
         "empty": "Mikään ei vastaa tuota.",
         "navigate": "siirrä",
         "select": "valitse",
@@ -1078,7 +1078,7 @@
       },
       "active_session_distance_km": {
         "label": "Välimatka istuntojen välillä",
-        "description": "Samanaikaisen istunnon välinen välimatka"
+        "description": "Samanaikaisten istuntojen välinen välimatka"
       },
       "travel_speed_kmh": {
         "label": "Matkustusnopeus",
@@ -1113,7 +1113,7 @@
         "description": "Transkoodattu tai toimitettu resoluutio"
       },
       "source_dynamic_range": {
-        "label": "Lähde dynaaminen alue",
+        "label": "Lähteen dynaaminen alue",
         "description": ""
       },
       "source_video_codec": {
@@ -1227,7 +1227,7 @@
       "title": "Uusi automaatio",
       "description": "",
       "searchPlaceholder": "Etsi",
-      "noMatches": "Mikään ei täsmää “{{query}}”.",
+      "noMatches": "Mikään ei vastaa hakua “{{query}}”.",
       "noMatchesHint": "",
       "group": {
         "notifications": "Ilmoitukset",
@@ -1246,8 +1246,8 @@
         "description": ""
       },
       "scratch": {
-        "title": "Aloittaa alusta",
-        "description": "Luo vaiheittain"
+        "title": "Aloita alusta",
+        "description": "Luo vaiheittain."
       },
       "failed": "Valmiita automaatioita ei voitu ladata.",
       "retry": "Yritä uudelleen",
@@ -1281,15 +1281,15 @@
       "collision": {
         "title": "Eri automaatio nimellä {{name}} on jo olemassa.",
         "add": "Pidä molemmat",
-        "replace": "Korvaa minun"
+        "replace": "Korvaa omani"
       },
       "raw": "Näytä JSON",
       "errors": {
         "notACode": "Tuo ei näytä Tracearr-jakokoodilta.",
         "notACodeHint": "Koodi alkaa sanalla tracearr1. JSON toimii myös.",
-        "tooBig": "Tuo on liian suuri ollakseen Tracearr automaatio.",
+        "tooBig": "Tuo on liian suuri ollakseen Tracearr-automaatio.",
         "tooBigHint": "Koodit ovat korkeintaan muutaman tuhannen merkin pituisia.",
-        "truncated": "Tämä koodi näyttää katkaisulta.",
+        "truncated": "Tämä koodi näyttää katkaistulta.",
         "truncatedHint": "",
         "tooNew": "Tämä tarvitsee Tracearr-version {{required}} tai uudemman.",
         "tooNewHint": "",
@@ -1982,7 +1982,7 @@
   },
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
-    "noActivityDesc": "Aloita streaming nähdäksesi alkuun käyttäjät täällä",
+    "noActivityDesc": "Aloita striimaus nähdäksesi aktiivisimmat käyttäjät täällä",
     "top3": "",
     "runnersUp": "Juoksijat Ylös"
   },
