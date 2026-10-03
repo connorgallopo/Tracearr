@@ -267,6 +267,6 @@
     "some": "{{count}} de {{total}} servidors",
     "search": "Cerca servidors...",
     "noMatches": "No s'ha trobat cap servidor",
-    "historical": "Històric"
+    "historical": "Arxivat"
   }
 }
