@@ -119,9 +119,9 @@
     "terminatedBy": "Per @{{username}}",
     "trustScoreConfirm": "Voleu establir la puntuació de confiança de @{{username}} a {{score}}?",
     "trustScoreRange": "Puntuació de confiança de @{{username}}, de 0 a 100.",
-    "moreLocations_one": "",
+    "moreLocations_one": "+{{count}} ubicació més",
     "moreLocations_other": "+{{count}} ubicacions més",
-    "moreDevices_one": "",
+    "moreDevices_one": "+{{count}} dispositiu més",
     "moreDevices_other": "+{{count}} dispositius més"
   },
   "violation": {
@@ -140,7 +140,7 @@
     "noMatches": "Cap alerta coincident",
     "acknowledgeAllTitle_one": "Voleu confirmar {{count}} alerta?",
     "acknowledgeAllTitle_other": "Voleu confirmar {{count}} alertes?",
-    "pendingCount_one": "",
+    "pendingCount_one": "{{count}} pendent",
     "pendingCount_other": "{{count}} pendents"
   },
   "history": {
@@ -154,7 +154,7 @@
       "noCountries": "No hi ha cap país disponible",
       "noPlatforms": "No hi ha cap plataforma disponible",
       "noUsers": "No hi ha cap usuari disponible",
-      "sectionSelected_one": "",
+      "sectionSelected_one": "{{section}}, {{count}} seleccionat",
       "sectionSelected_other": "{{section}}, {{count}} seleccionats"
     }
   },
@@ -194,9 +194,9 @@
     "increaseTrustScore": "Augmenta la puntuació de confiança",
     "sortAscending": "Ordenat de manera ascendent, toqueu per invertir",
     "sortDescending": "Ordenat de manera descendent, toqueu per invertir",
-    "alertsCount_one": "",
+    "alertsCount_one": "Alertes, {{count}} sense llegir",
     "alertsCount_other": "Alertes, {{count}} sense llegir",
-    "filtersActive_one": "",
+    "filtersActive_one": "Filtres, {{count}} actiu",
     "filtersActive_other": "Filtres, {{count}} actius"
   },
   "map": {
