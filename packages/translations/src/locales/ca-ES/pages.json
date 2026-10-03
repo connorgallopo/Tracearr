@@ -103,7 +103,7 @@
     "filterHasAccessTo": "Té accés a",
     "filterHasAccessToPlaceholder": "Qualsevol servidor",
     "filterHasAccessToHint": "Mostra les persones amb un compte actiu a tots els servidors seleccionats.",
-    "selectAllUsers_one": "",
+    "selectAllUsers_one": "Selecciona {{count}} usuari",
     "selectAllUsers_other": "Selecciona els {{count}} usuaris",
     "resetTrustScoreTitle_one": "Restableix la puntuació de confiança de {{count}} usuari",
     "resetTrustScoreTitle_other": "Restableix la puntuació de confiança de {{count}} usuaris",
@@ -285,7 +285,7 @@
         "title": "S'estan generant dades històriques...",
         "fallbackBody": "S'estan creant instantànies a partir de l'historial de la biblioteca. Pot trigar uns quants minuts.",
         "progress": "{{processed}} de {{total}} biblioteques",
-        "snapshotsSuffix_one": "",
+        "snapshotsSuffix_one": " ({{count}} instantània)",
         "snapshotsSuffix_other": " ({{count}} instantànies)"
       },
       "multiServer": {
@@ -310,7 +310,7 @@
       "banner": "Encara s'estan recollint les dades de versions de fitxer d'aquest servidor. Executeu una sincronització de la biblioteca per acabar.",
       "action": "Sincronitza ara",
       "syncStarted": "S'ha iniciat la sincronització de la biblioteca.",
-      "syncFailed_one": "",
+      "syncFailed_one": "La sincronització no s'ha pogut iniciar en {{count}} servidor. Comproveu els vostres permisos i l'estat del servidor.",
       "syncFailed_other": "La sincronització no s'ha pogut iniciar en {{count}} servidor(s). Comproveu els vostres permisos i l'estat del servidor."
     }
   },
@@ -370,132 +370,132 @@
       "relatedSessions_one": "{{count}} sessió relacionada",
       "relatedSessions_other": "{{count}} sessions relacionades"
     },
-    "selectAllViolations_one": "",
+    "selectAllViolations_one": "Seleccioneu {{count}} incompliment que coincideix amb els filtres",
     "selectAllViolations_other": "Seleccioneu els {{count}} incompliments que coincideixen amb els filtres",
     "dismissViolations_one": "Descarta {{count}} incompliment",
     "dismissViolations_other": "Descarta {{count}} incompliments",
-    "peopleSelectedCount_one": "",
+    "peopleSelectedCount_one": "{{count}} persona",
     "peopleSelectedCount_other": "{{count}} persones"
   },
   "automations": {
     "message": {
-      "heading": "",
-      "defaultText": "",
-      "title": "",
-      "body": "",
-      "blankHint": "",
-      "insertVariable": "",
-      "searchVariables": "",
-      "noVariables": "",
-      "preview": "",
-      "previewSamples": "",
-      "previewDefault": "",
-      "previewDefaultHint": "",
-      "previewPickDestination": "",
-      "fieldTitle": "",
-      "fieldMessage": "",
-      "fieldSubject": "",
-      "fieldHeading": "",
-      "fieldEmbedTitle": "",
-      "fieldDescription": "",
-      "addedDiscord": "",
-      "addedEmail": "",
-      "addedPushSubtitle": "",
-      "previewCount": "",
-      "previewCountBytes": "",
-      "previewCut": "",
-      "previewPriority": "",
-      "previewEscapeHint": "",
-      "webhookNotSent": ""
+      "heading": "Missatge",
+      "defaultText": "Text per defecte",
+      "title": "Títol",
+      "body": "Missatge",
+      "blankHint": "Deixeu-ho en blanc per fer servir el text per defecte de cada destinació",
+      "insertVariable": "Insereix una variable",
+      "searchVariables": "Cerca variables",
+      "noVariables": "Cap variable coincideix",
+      "preview": "Vista prèvia",
+      "previewSamples": "Es mostra amb valors d'exemple, per exemple {{user}} com a usuari",
+      "previewDefault": "Text per defecte de Tracearr per a aquest esdeveniment",
+      "previewDefaultHint": "El text depèn de l'esdeveniment i de la destinació",
+      "previewPickDestination": "Trieu una destinació per veure com es mostra a cadascuna",
+      "fieldTitle": "Títol",
+      "fieldMessage": "Missatge",
+      "fieldSubject": "Assumpte",
+      "fieldHeading": "Capçalera (igual que l'assumpte)",
+      "fieldEmbedTitle": "Títol de l'embed",
+      "fieldDescription": "Descripció",
+      "addedDiscord": "Ho afegeix Tracearr, segons l'esdeveniment: un color, camps com ara Usuari, Multimèdia i Reproductor i, en els esdeveniments multimèdia, un pòster i un peu de pàgina. La descripció es pot escurçar si els camps són llargs.",
+      "addedEmail": "Ho afegeix Tracearr: una etiqueta de severitat, els detalls de l'esdeveniment, l'hora d'enviament i un enllaç a Tracearr",
+      "addedPushSubtitle": "Subtítol que Tracearr hi posa en la majoria d'esdeveniments",
+      "previewCount": "{{used, number}} / {{max, number}}",
+      "previewCountBytes": "{{used, number}} / {{max, number}} bytes",
+      "previewCut": "retallat perquè hi càpiga",
+      "previewPriority": "Prioritat: {{priority}}",
+      "previewEscapeHint": "Inclou els caràcters d'escapament de Discord",
+      "webhookNotSent": "No s'envia. La càrrega útil porta les dades pròpies de l'esdeveniment."
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "Automàtica",
+      "lowest": "Mínima",
+      "low": "Baixa",
+      "normal": "Normal",
+      "high": "Alta",
+      "urgent": "Urgent"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
-      "trust": "",
-      "newsletter": "",
-      "event": ""
+      "account": "Compte",
+      "stream": "Transmissió",
+      "server": "Servidor",
+      "media": "Multimèdia",
+      "device": "Dispositiu",
+      "trust": "Confiança",
+      "newsletter": "Butlletí",
+      "event": "Esdeveniment"
     },
     "variables": {
       "user": {
-        "username": "",
-        "identityName": ""
+        "username": "Nom d'usuari del compte",
+        "identityName": "Nom de la persona"
       },
       "session": {
-        "mediaTitle": "",
-        "mediaType": "",
-        "sourceDynamicRange": "",
-        "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
-        "name": ""
+        "mediaTitle": "Títol en reproducció",
+        "mediaType": "Tipus de multimèdia",
+        "sourceDynamicRange": "Rang dinàmic de la font",
+        "sourceVideoCodec": "Còdec de vídeo de la font",
+        "seasonNumber": "Número de temporada",
+        "episodeNumber": "Número d'episodi",
+        "name": "Sèrie i episodi, o títol"
       },
       "server": {
-        "name": "",
-        "type": ""
+        "name": "Nom del servidor",
+        "type": "Tipus de servidor"
       },
       "device": {
-        "name": "",
-        "platform": "",
-        "product": "",
-        "location": ""
+        "name": "Nom del dispositiu",
+        "platform": "Plataforma",
+        "product": "Aplicació",
+        "location": "Ubicació"
       },
       "trust": {
-        "previous": "",
-        "new": "",
-        "reason": ""
+        "previous": "Puntuació anterior",
+        "new": "Puntuació nova",
+        "reason": "Motiu"
       },
       "media": {
-        "title": "",
-        "name": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "episodeCount": "",
-        "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "title": "Títol de l'element",
+        "name": "Sèrie i episodi, o títol",
+        "show": "Sèrie",
+        "season": "Temporada",
+        "episode": "Episodi",
+        "episodeCount": "Episodis afegits",
+        "type": "Tipus de multimèdia",
+        "year": "Any",
+        "library": "Biblioteca",
+        "server": "Servidor",
         "from": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Resolució anterior",
+          "dynamicRange": "Rang dinàmic anterior",
+          "videoCodec": "Còdec de vídeo anterior",
+          "audioCodec": "Còdec d'àudio anterior",
+          "audioChannels": "Canals d'àudio anteriors",
+          "fileSize": "Mida del fitxer anterior"
         },
         "to": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Resolució nova",
+          "dynamicRange": "Rang dinàmic nou",
+          "videoCodec": "Còdec de vídeo nou",
+          "audioCodec": "Còdec d'àudio nou",
+          "audioChannels": "Canals d'àudio nous",
+          "fileSize": "Mida del fitxer nova"
         }
       },
       "newsletter": {
-        "name": "",
-        "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "name": "Butlletí",
+        "outcome": "Resultat",
+        "recipientCount": "Destinataris",
+        "error": "Error"
       },
-      "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
-      "releaseUrl": ""
+      "durationMinutes": "Minuts vistos",
+      "minutes": "Minuts",
+      "days": "Dies d'inactivitat",
+      "installedVersion": "Versió instal·lada",
+      "latestVersion": "Última versió",
+      "downloadUrl": "Enllaç de baixada",
+      "releaseUrl": "Enllaç a les notes de la versió"
     },
     "actions": {
       "send": {
@@ -506,7 +506,7 @@
             "description": "Temps mínim entre notificacions"
           },
           "priority": {
-            "description": ""
+            "description": "L'utilitzen Pushover, Gotify i ntfy"
           }
         },
         "ran": "S'ha enviat una notificació"
@@ -663,14 +663,14 @@
         "messageRequired": "Escriviu el missatge que s'ha de mostrar",
         "tooLong": "Com a màxim {{max}} caràcters",
         "template": {
-          "unclosed": "",
-          "invalidOutput": "",
-          "invalidTag": "",
-          "unexpectedElse": "",
-          "unexpectedEndif": "",
-          "missingEndif": ""
+          "unclosed": "Un {{open}} de la línia {{line}} no es tanca mai",
+          "invalidOutput": "La línia {{line}} té alguna cosa que no és una variable dins de {{braces}}",
+          "invalidTag": "La línia {{line}} té una etiqueta que no és if, else ni endif",
+          "unexpectedElse": "L'else de la línia {{line}} no té cap if al qual pertànyer",
+          "unexpectedEndif": "L'endif de la línia {{line}} no té cap if per tancar",
+          "missingEndif": "L'if de la línia {{line}} necessita un endif"
         },
-        "templateVariable": ""
+        "templateVariable": "{{name}} no està disponible per a tots els activadors d'aquí"
       },
       "recordAs": {
         "label": "Quan això s'executi, registra-ho com a",
@@ -700,7 +700,7 @@
         "personPlaceholder": "Selecciona la persona",
         "personHelper": "Coincideix amb aquesta persona a tots els servidors on tingui un compte.",
         "noServers": "Encara no hi ha cap servidor connectat.",
-        "historicalNote": "",
+        "historicalNote": "Aquest servidor és històric. Els activadors que el necessiten actiu, com els esdeveniments de transmissió, de servidor i d'actualització, no s'activaran fins que es reprengui.",
         "enforceAcrossServers": "Actua sobre les seves transmissions en qualsevol dels seus servidors",
         "enforceAcrossServersDescription": "Actua sobre les sessions de la persona en qualsevol dels seus servidors, no només en el que ho ha activat. Desactivat per defecte."
       },
@@ -833,7 +833,7 @@
         "sampleGone": "Aquesta sessió ja no consta al registre; no hi ha res per comprovar.",
         "backToLive": "Torna al que s'està reproduint ara"
       },
-      "selectedCount_one": "",
+      "selectedCount_one": "{{count}} seleccionat",
       "selectedCount_other": "{{count}} seleccionats"
     },
     "categories": {
@@ -920,7 +920,7 @@
         "source_video_codec": "el còdec de vídeo de la font",
         "is_transcoding": "la transcodificació",
         "is_transcode_downgrade": "la reducció de qualitat",
-        "is_subtitle_burn_in": "",
+        "is_subtitle_burn_in": "la incrustació de subtítols",
         "source_bitrate_mbps": "la taxa de bits de la font",
         "user_id": "l'usuari",
         "trust_score": "la puntuació de confiança",
@@ -953,8 +953,8 @@
           "no": "la transmissió no té cap reducció de qualitat"
         },
         "is_subtitle_burn_in": {
-          "yes": "",
-          "no": ""
+          "yes": "els subtítols estan incrustats al vídeo",
+          "no": "els subtítols no estan incrustats al vídeo"
         },
         "is_transcoding": {
           "video": {
@@ -1129,8 +1129,8 @@
         "description": "La resolució de sortida és inferior a la de la font"
       },
       "is_subtitle_burn_in": {
-        "label": "",
-        "description": ""
+        "label": "Incrustació de subtítols",
+        "description": "Els subtítols s'incrusten al vídeo, cosa que força una transcodificació del vídeo"
       },
       "source_bitrate_mbps": {
         "label": "Taxa de bits de la font",
@@ -1426,7 +1426,7 @@
         "label": "Temps d'espera"
       },
       "priority": {
-        "label": ""
+        "label": "Prioritat"
       },
       "target": {
         "label": "Objectiu"
@@ -1767,9 +1767,9 @@
       "deleteServersFirst": "Primer elimineu els servidors actius connectats a través d'aquest compte o marqueu-los com a arxivats",
       "unlinkPlexAccount": "Desenllaça el compte de Plex",
       "unlinkConfirm": "Segur que voleu desenllaçar aquest compte de Plex? No podreu afegir servidors d'aquest compte fins que el torneu a enllaçar.",
-      "connectionsAvailable_one": "",
+      "connectionsAvailable_one": "{{count}} connexió disponible",
       "connectionsAvailable_other": "{{count}} connexions disponibles",
-      "moreConnections_one": "",
+      "moreConnections_one": "+{{count}} connexió més",
       "moreConnections_other": "+{{count}} connexions més",
       "serversConnected_one": "{{count}} servidor connectat",
       "serversConnected_other": "{{count}} servidors connectats"
@@ -1800,7 +1800,7 @@
         "password": "Contrasenya",
         "fromName": "Nom del remitent",
         "fromAddress": "Adreça del remitent",
-        "to": "",
+        "to": "Destinataris de les alertes",
         "replyTo": "Respondre a",
         "messagesPerSecond": "Missatges per segon",
         "messageStream": "Flux de missatges"
@@ -1812,7 +1812,7 @@
       },
       "hints": {
         "authTokenOptional": "Opcional per als temes públics",
-        "smtpPreset": "",
+        "smtpPreset": "Emplena l'amfitrió, el port i la seguretat dels proveïdors habituals. Per a Amazon SES i Mailgun EU, cal afegir la regió a l'amfitrió.",
         "smtpVerifyCertificate": "Comprova el certificat TLS del servidor de correu amb una autoritat de confiança. Desactiveu-ho només per a un servidor amb un certificat autosignat, com ara un pont local: llavors qualsevol que sigui al camí entre Tracearr i el servidor de correu pot interceptar la connexió.",
         "smtpUsernameOptional": "Deixeu-ho en blanc si el servidor no necessita cap inici de sessió",
         "smtpTo": "Les alertes s'envien en un sol correu amb totes les adreces d'aquí al camp «Per a». Deixeu-ho en blanc si aquest servidor només envia butlletins.",
@@ -1962,7 +1962,7 @@
     "topTranscodingUsers": "Usuaris amb més transcodificacions",
     "topTranscodingUsersDesc": "Usuaris que provoquen més transcodificacions al servidor.",
     "noTranscodingUsers": "No s'ha trobat cap usuari que transcodifiqui",
-    "analyzedSessionsTooltip_one": "",
+    "analyzedSessionsTooltip_one": "Sessions en combinacions de dispositiu + còdec amb un mínim de {{count}} sessió i un còdec conegut. Les combinacions poc freqüents i les sessions sense informació de còdec no es compten.",
     "analyzedSessionsTooltip_other": "Sessions en combinacions de dispositiu + còdec amb un mínim de {{count}} sessions i un còdec conegut. Les combinacions poc freqüents i les sessions sense informació de còdec no es compten."
   },
   "statsBandwidth": {
@@ -2078,7 +2078,7 @@
         "newEpisodes_other": "{{count}} episodis nous",
         "replacedEpisodes_one": "{{count}} episodi substituït",
         "replacedEpisodes_other": "{{count}} episodis substituïts",
-        "newEpisodesChip_one": "",
+        "newEpisodesChip_one": "{{count}} nou",
         "newEpisodesChip_other": "{{count}} de nous"
       },
       "deadWeight": {
@@ -2092,7 +2092,7 @@
         },
         "viewAll": "Mostra-ho tot",
         "viewAllTooltip": "Properament",
-        "summary_one": "",
+        "summary_one": "{{count}} títol mai vist · {{size}}",
         "summary_other": "{{count}} títols mai vistos · {{size}}"
       },
       "loadError": "No s'ha pogut carregar la vostra biblioteca multimèdia"
@@ -2292,10 +2292,10 @@
         "hdrAll": "Qualsevol",
         "hdrOnly": "Només HDR",
         "hdrChip": "HDR",
-        "atmosLabel": "",
-        "atmosAll": "",
-        "atmosOnly": "",
-        "atmosChip": "",
+        "atmosLabel": "Àudio",
+        "atmosAll": "Qualsevol",
+        "atmosOnly": "Només Dolby Atmos",
+        "atmosChip": "Atmos",
         "genreLabel": "Gènere",
         "genreAll": "Qualsevol gènere",
         "serverLabel": "Servidor",
@@ -2407,7 +2407,7 @@
         "neverPlayed": "Mai reproduït",
         "ofLanded": "{{share}} dels arribats",
         "onDisk": "{{size}} al disc",
-        "landedOf_one": "",
+        "landedOf_one": "{{count}} arribat",
         "landedOf_other": "{{count}} arribats"
       }
     },
