@@ -60,11 +60,11 @@
   "playback": {
     "playing": "S'està reproduïnt",
     "paused": "En pausa",
-    "buffering": "",
+    "buffering": "Emmagatzemant a la memòria intermèdia",
     "stopped": "Aturat",
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió directa",
-    "audioTranscode": "",
+    "audioTranscode": "Transcodificació d'àudio",
     "transcode": "Transcodificació",
     "hwTranscode": "Transcodificació HW",
     "burnIn": "Incrustació",
@@ -267,6 +267,6 @@
     "some": "{{count}} de {{total}} servidors",
     "search": "Cerca servidors...",
     "noMatches": "No s'ha trobat cap servidor",
-    "historical": ""
+    "historical": "Històric"
   }
 }
