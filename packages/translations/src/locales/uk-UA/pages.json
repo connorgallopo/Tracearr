@@ -201,7 +201,19 @@
       "qualityEvolution": "Еволюція якості",
       "all": "Всі",
       "failedToLoad": "Не вдалося завантажити дані про якість",
-      "failedToLoadDesc": "Не вдалося отримати дані про якість. Спробуйте ще раз."
+      "failedToLoadDesc": "Не вдалося отримати дані про якість. Спробуйте ще раз.",
+      "codecBrowse": {
+        "movies": "",
+        "shows": "",
+        "movieCount_one": "",
+        "movieCount_few": "",
+        "movieCount_many": "",
+        "movieCount_other": "",
+        "episodeCount_one": "",
+        "episodeCount_few": "",
+        "episodeCount_many": "",
+        "episodeCount_other": ""
+      }
     },
     "storage": {
       "title": "Сховище",
@@ -2368,10 +2380,16 @@
         "unwatchedByLens": "",
         "resolutionLabel": "",
         "resolutionAll": "",
+        "videoCodecLabel": "",
+        "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
         "hdrChip": "",
+        "audioCodecLabel": "",
+        "audioCodecAll": "",
+        "audioChannelsLabel": "",
+        "audioChannelsAll": "",
         "atmosLabel": "",
         "atmosAll": "",
         "atmosOnly": "",
