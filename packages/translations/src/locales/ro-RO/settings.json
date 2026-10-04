@@ -272,7 +272,7 @@
     "expiresIn": "Expiră în {{time}}",
     "oneTimePairToken": "Token de asociere unic",
     "copyToken": "Copiază simbolul",
-    "tokenExpiryNote": "Acest token expiră în 5 minute și poate fi utilizat o singură dată.",
+    "tokenExpiryNote": "",
     "done": "Terminat",
     "disableMobileAccessConfirm": "Aceasta va deconecta toate dispozitivele mobile şi va revoca toate sesiunile. Puteţi reactiva accesul la mobil mai târziu.",
     "disable": "Dezactivează",
