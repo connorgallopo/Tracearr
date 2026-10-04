@@ -271,7 +271,7 @@
     "expiresIn": "Läuft ab in {{time}}",
     "oneTimePairToken": "Einmaliges Kopplungs-Token",
     "copyToken": "Token kopieren",
-    "tokenExpiryNote": "Dieses Token läuft in 5 Minuten ab und kann nur einmal verwendet werden.",
+    "tokenExpiryNote": "",
     "done": "Fertig",
     "disableMobileAccessConfirm": "Dadurch werden alle mobilen Geräte getrennt und alle Sitzungen widerrufen. Sie können den mobilen Zugriff später wieder aktivieren.",
     "disable": "Deaktivieren",
