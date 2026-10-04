@@ -271,7 +271,7 @@
     "expiresIn": "Förfaller i {{time}}",
     "oneTimePairToken": "Engångstoken för parkoppling",
     "copyToken": "Kopiera token",
-    "tokenExpiryNote": "Denna token löper ut om 5 minuter och kan bara användas en gång.",
+    "tokenExpiryNote": "",
     "done": "Klar",
     "disableMobileAccessConfirm": "Detta kommer att koppla från alla mobila enheter och återkalla alla sessioner. Du kan återaktivera mobil åtkomst senare.",
     "disable": "Inaktivera",
