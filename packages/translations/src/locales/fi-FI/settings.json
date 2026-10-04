@@ -413,9 +413,9 @@
     "serverTimezone": "Palvelimen aikavyöhyke",
     "serverTimezoneHelp": "Täytyy sovittaa yhteen mediapalvelimen isännän aikavyöhykkeen kanssa , ei selaimesi aikavyöhykeen. Toiston raportointiaikaleimat on tallennettu paikallisen palvelimen aikaan.",
     "importFullRange": "Tuo koko historia",
-    "importFullRangeHelp": "",
-    "skipOverlap": "",
-    "skipDuplicatePlugin": "",
+    "importFullRangeHelp": "Toistot, jotka aloitettiin ennen tämän palvelimen lisäämistä Tracearriin jätetään tuomatta. Oletusarvoisesti tuonnit päättyvät aikaisimpaan toistoon, jonka Tracearr näkee tällä palvelimella, esimerkiksi Jellystat-tuonnista. Aktivoi tämä tuodaksesi kaiken ennen palvelimen lisäämistä. Täydelliset kaksoiskappaleet ohitetaan.",
+    "skipOverlap": "Päällekäinen tieto - aikaleima osuu ajalle, jota Tracearr jo seuraa tällä palvelimella. Aktivoi laaja-alainen tuonti sen sisällyttämiseen.",
+    "skipDuplicatePlugin": "Kaksoiskappale - kertaalleen tuotu tai jo aikaisemmin tullut Jellystat-liitännäisen kautta.",
     "overlapSkipped_one": "{{count}} ohitettu päällekkäisyytenä",
     "overlapSkipped_other": "{{count}} ohitettu päällekkäisyyksinä",
     "duplicates_one": "{{count}} kaksoiskappale ohitettu",
@@ -540,7 +540,7 @@
       "complete": "Palautus suoritettu onnistuneesti. Sivu päivittyy pian.",
       "failed": "Palautus epäonnistui",
       "cannotRestore": "Palautus edellyttää PostgreSQL superuser oikeuksia. Varmista, että tietokannan käyttäjällä on pääkäyttäjän oikeudet ja yritä uudelleen.",
-      "pgVersionMismatch": "",
+      "pgVersionMismatch": "Varmuuskopio luotiin PostgreSQL versiolla {{backupVersion}}, mutta tämä palvelin käyttää PostgreSQL vesiota {{serverVersion}}.  Tietokantavedoksen palauttaminen uudemmasta PostgreSQL-versiosta ei ole tuettu.",
       "tsVersionMismatch": "Varmuuskopio luotiin TimescaleDB-versiolla {{backupVersion}}, mutta tämä palvelin tukee enintään versiota {{serverVersion}}."
     },
     "toast": {
@@ -562,7 +562,7 @@
     "empty": "Ei vielä uutiskirjeitä",
     "emptyDescription": "Uutiskije ilmoittaa sähköpostilla palvelimen jäsenille, mitä viimeksi lisättiin. ",
     "noDestinationTitle": "Uutiskirjeet tarvitsevat sähköpostin määränpään",
-    "noDestinationDescription": "",
+    "noDestinationDescription": "Sähköpostin määränpää on SMTP-palvelin, jonka kautta uutiskirjeet lähetetään, joten se tarvitsee vain palvelimen ja lähettäjän tiedot. Jokainen uutiskirje tavoittaa automaatiisesti kaikki, jotka on jaettu valitsemillasi palvelimilla ja minkä tahansa lisäosoitteen lisäät.",
     "noDestinationHint": "Ei vielä sähköpostin kohdetta.",
     "addEmailDestination": "Lisää sähköpostin kohde",
     "rowActions": "Uutiskirjeiden toiminnot",
@@ -684,7 +684,7 @@
         "legend": "Osiot",
         "description": "",
         "upTo": "enintään",
-        "the": "",
+        "the": "tietty",
         "units": {
           "movies": "elokuvat",
           "shows": "sarjat",
@@ -705,19 +705,19 @@
           "mostWatched_other": "Katsotuimmat {{count}} eniten toistettua"
         },
         "musicHelp": "Laskettu albumeissa, jaettuna artistien kesken siinä järjestyksessä, missö ne lisättiin.",
-        "mostWatchedHelp": ""
+        "mostWatchedHelp": "Jäsenet, jotka toistivat eniten laskettuja toistoja aikaikkunassa, uusia tai ei. Jokainen muu osia listaa mitä lisättiin."
       },
       "message": "Viesti",
       "senderName": "Lähettäjän nimi",
-      "senderNameHelp": "",
-      "variantHeading": "",
+      "senderNameHelp": "Mistä-nimi sekä sähköpostin lopussa. Jätä tyhjäksi käyttääksesi {{name}}.",
+      "variantHeading": "{{count}}, jolla tili palvelimella {{servers}}",
       "subject": "Aihe",
       "subjectHelp": "Nämä korvataan, kun sähköposti muodostetaan:",
       "placeholders": {
-        "server_name": "",
+        "server_name": "Ylläoleva \"Mistä\" nimi",
         "start_date": "aikaikkunan ensimmäinen päivä",
         "end_date": "päivä, jona sähköposti lähtee",
-        "item_count": ""
+        "item_count": "elokuvia, jaksoja ja albumeita lisätty, laskentaan sarjojen sijasta jaksoja"
       },
       "intro": "Esittely",
       "introPlaceholder": "Muutama sana yläreunassa, ensimmäisen osan yläpuolella",
@@ -734,7 +734,7 @@
         "membersHelp": "",
         "ownerNote": "",
         "extraTrigger": "Lisää käyttäjiä, joilla ei ole tiliä ({{count}})",
-        "extraHelp": "",
+        "extraHelp": "Jollekin, joka ei ole palvelimillasi. Jokainen, jolle jaettu valituilla palvelimilla on jo yllä olevassa luettelossa.",
         "pasteAddresses": "Liitä osoitteita, yksi riviä kohti tai erotettuna pilkulla",
         "addressLabel": "Osoite {{n}}",
         "nameLabel": "Nimi {{n}}",
@@ -859,7 +859,7 @@
         "send": "Lähetä nyt",
         "more": "Lisää lähetysasetuksia",
         "testHint": "",
-        "sendHint": ""
+        "sendHint": "Lähettää sähköpostia kaikille nyt ja siirtää aikaikkunaa eteenpäin. Samalla tavalla kuin ajoitettu tehtävä."
       },
       "preview": {
         "variants": "Kuka katselee",
@@ -868,13 +868,13 @@
         "draft": "Tallentamattomien muutosten esikatselu",
         "subjectLabel": "Aihe",
         "window": "Lisätty välillä {{start}} - {{end}}",
-        "windowSince": "",
+        "windowSince": "Lisätty sitten viimekertaisen sähköpostin, {{start}} - {{end}}",
         "countsListed": {
           "movies": "{{listed}} / {{found}} elokuvista",
           "shows": "{{listed}} / {{found}} sarjoista",
           "albums": "{{listed}} / {{found}} albumeista"
         },
-        "recipients": "",
+        "recipients": "{{resolved}} henkilöt saavat tämän uutiskirjeen kaikkien versioiden yli. Ei osoitetta: {{missing}}. Tilauksen peruuttaneet: {{suppressed}}.",
         "width": "Leveys",
         "widths": {
           "desktop": "600 px",
@@ -884,23 +884,23 @@
         "imagesOn": "Näytetään",
         "imagesBlocked": "Estetty",
         "imagesBlockedNote": "Monet asiakasohjelmat estävät etäkuvat kunnes lukija sallii ne.",
-        "linksNote": ""
+        "linksNote": "Tilauksen peruutus ja selaimessa nähtävät linkit täytetään vastaanottajaa kohden, kun sähköposti lähetetään, joten ne eivät tee mitään täällä."
       },
       "test": {
         "title": "Lähetä testi",
-        "description": "",
-        "variant": "",
+        "description": "Renderöi nykyisen aikaikkunan ja lähettää sen yhteen osoitteeseen, jättäen huomiotta vaimennuslistan.",
+        "variant": "Lähetä versio",
         "address": "Lähetä osoitteeseen",
         "send": "Lähetä testi"
       },
       "send": {
         "title": "Lähetetäänkö {{name}} nyt?",
         "previewing": "Selvittää, kuka saa mitäkin...",
-        "nobody": "",
+        "nobody": "Ei ketään osoitteessa ({{missing}} jäsentä ei ole), joten mitään ei ole lähetetty.",
         "confirm": "Lähetä",
         "sending": "Lähetetään",
-        "summary_one": "",
-        "summary_other": "",
+        "summary_one": "Lähetä {{count}} vastaanottajalle: {{counts}} lisätty välillä {{start}} - {{end}}. Jokainen saa oman kopionsa ja näkee vain oman osoitteensa.",
+        "summary_other": "Lähetä {{count}} vastaanottajalle: {{counts}} lisätty välillä {{start}} - {{end}}. Jokainen saa oman kopionsa ja näkee vain oman osoitteensa.",
         "trimmed_one": "",
         "trimmed_other": ""
       },
@@ -908,8 +908,8 @@
       "serversSelected_other": "{{count}} palvelinta",
       "librariesSelected_one": "{{count}} kirjasto",
       "librariesSelected_other": "{{count}} kirjastoa",
-      "senderNameRequiredMulti_one": "",
-      "senderNameRequiredMulti_other": "",
+      "senderNameRequiredMulti_one": "Tämä uutiskirje kattaa {{count}} palvelimet, joten sen allekirjoittamiseen ei ole yhtään palvelimen nimeä. Valitse nimi.",
+      "senderNameRequiredMulti_other": "Tämä uutiskirje kattaa {{count}} palvelimet, joten sen allekirjoittamiseen ei ole yhtään palvelimen nimeä. Valitse nimi.",
       "previewVariant_one": "{{count}} henkilö, jolla on tili palvelimella {{servers}}",
       "previewVariant_other": "{{count}} henkilöä, joilla on tili palvelimella"
     },
