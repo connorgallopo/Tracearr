@@ -175,8 +175,15 @@
   },
   "unauthenticated": {
     "connectionLost": "Connection Lost",
-    "accessRevoked": "Your access to {{serverName}} was revoked. Ask the server owner for a new pairing code.",
+    "accessRevoked": "{{serverName}} no longer accepts this device. Pair it again with a new code from the web app.",
+    "deviceRemoved": "This device was removed from {{serverName}}. Pair it again with a new code from the web app.",
+    "expired": "{{serverName}} signed this device out after 30 days without use. Pair it again with a new code from the web app.",
     "scanQrCode": "Scan QR Code"
+  },
+  "clientTooOld": {
+    "title": "Update Tracearr",
+    "body": "{{serverName}} needs a newer version of the Tracearr app.",
+    "update": "Update"
   },
   "serverSelector": {
     "servers": "Servers",
