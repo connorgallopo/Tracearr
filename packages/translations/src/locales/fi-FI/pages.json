@@ -1276,11 +1276,11 @@
       "check": "Tarkista",
       "checking": "Luetaan…",
       "valid": "Tracearr voi lukea tämän koodin.",
-      "madeBy": "",
-      "codeShort": "",
+      "madeBy": "Tekijä: {{author}}, kuten koodissa on kirjoitettuna",
+      "codeShort": "Koodi {{fingerprint}}",
       "paused": {
         "label": "Aloita keskeytettynä",
-        "helper": ""
+        "helper": "Ota se käyttöön listasta tarkistuksen jälkeen."
       },
       "submit": "Lisää",
       "adding": "Lisätään…",
@@ -1300,11 +1300,11 @@
         "truncated": "Tämä koodi näyttää katkaistulta.",
         "truncatedHint": "",
         "tooNew": "Tämä tarvitsee Tracearr-version {{required}} tai uudemman.",
-        "tooNewHint": "",
+        "tooNewHint": "Tämä palvelin käyttää {{current}}. Päivitä Tracearr, liitä sitten uudelleen.",
         "tooMany": "Tuo on paljon koodeja minuutissa.",
         "tooManyHint": "Odota hetki ja tarkista sitten uudelleen.",
-        "rejected": "",
-        "rejectedHint": ""
+        "rejected": "Tracearr ei voinut lukea tätä.",
+        "rejectedHint": "Se voi olla peräisin eri työkalusta tai on muokattu käsin."
       },
       "source": "",
       "validCaveat": "",
@@ -1355,203 +1355,203 @@
       "ios": "iOS",
       "android": "Android",
       "windows": "Windows",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
-      "tizen": "",
-      "movie": "",
-      "episode": "",
-      "track": "",
-      "photo": "",
-      "live": "",
-      "trailer": "",
-      "video": "",
-      "audio": "",
-      "video_or_audio": "",
-      "neither": "",
-      "8K": "",
-      "1440p": "",
-      "sdr": "",
-      "hdr": "",
-      "hdr10": "",
-      "hdr10+": "",
-      "hlg": "",
-      "dolby vision": "",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
+      "tizen": "Tizen",
+      "movie": "Elokuva",
+      "episode": "TV-jakso",
+      "track": "Musiikki",
+      "photo": "Valokuva",
+      "live": "Suora TV",
+      "trailer": "Traileri",
+      "video": "Video",
+      "audio": "Ääni",
+      "video_or_audio": "Video tai ääni",
+      "neither": "Ei kumpikaan (Suoratoisto)",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "Dolby Vision",
       "libraryItemType": {
-        "movie": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "artist": "",
-        "album": "",
-        "track": "",
-        "photo": ""
+        "movie": "Elokuva",
+        "show": "Sarja",
+        "season": "Kausi",
+        "episode": "Jakso",
+        "artist": "Artisti",
+        "album": "Albumi",
+        "track": "Kappale",
+        "photo": "Valokuva"
       }
     },
     "provenance": {
-      "builtin": "",
-      "imported": "",
-      "importedBy": "",
-      "saved": "",
-      "customized": "",
-      "customizedFromRemoved": ""
+      "builtin": "Sisäänrakennettu · {{name}} {{version}}",
+      "imported": "Tuotu jakokoodilla {{date}} · {{name}} {{version}}",
+      "importedBy": "Tuotu {{author}}:n jakokoodilla {{date}} · {{name}} {{version}}",
+      "saved": "Tallennettu täältä kohteesta {{name}} {{date}} · {{version}}",
+      "customized": "Mukautettu kohteesta {{name}}",
+      "customizedFromRemoved": "Mukautettu käyttövalmiista automaatiosta, joka on sittemmin poistettu"
     },
-    "recordsOnly": "",
+    "recordsOnly": "Vain tietojenkeruuajot",
     "scope": {
-      "global": "",
-      "person": "",
-      "account": "",
-      "crossServer": ""
+      "global": "Yleinen",
+      "person": "Henkilö",
+      "account": "Tili",
+      "crossServer": "Palvelinten välinen"
     },
-    "searchPlaceholder": "",
+    "searchPlaceholder": "Hae automaatioita…",
     "sessionTargets": {
       "triggering": {
-        "label": "",
-        "tooltip": ""
+        "label": "Laukaiseva istunto",
+        "tooltip": "Vain istunto, joka laukaisi tämän automaation"
       },
       "oldest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Vanhin istunto",
+        "tooltip": "Käyttäjän pisin aktiivinen istunto"
       },
       "newest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Uusin istunto",
+        "tooltip": "Käyttäjän viimeisin aloitettu istunto"
       },
       "all_except_one": {
-        "label": "",
+        "label": "Kaikki paitsi yksi (pidä vanhin)",
         "tooltip": ""
       },
       "all_user": {
-        "label": "",
-        "tooltip": ""
+        "label": "Kaikki käyttäjäistunnot",
+        "tooltip": "Tämän käyttäjän jokainen aktiivinen istunto"
       }
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": ""
+        "label": "Jäähy"
       },
       "priority": {
-        "label": ""
+        "label": "Prioriteetti"
       },
       "target": {
-        "label": ""
+        "label": "Kohde"
       },
       "message": {
-        "label": ""
+        "label": "Viesti"
       }
     },
     "trustModes": {
       "adjust": {
-        "label": ""
+        "label": "Säädä määrän mukaan"
       },
       "set": {
-        "label": ""
+        "label": "Aseta arvoon"
       },
       "reset": {
-        "label": ""
+        "label": "Palauta oletus (100)"
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "Matala",
+      "warning": "Varoitus",
+      "high": "Korkea"
     },
     "template": {
-      "version": "",
-      "updateAvailable": "",
-      "updatedTitle": "",
-      "updatedBody": "",
-      "before": "",
-      "after": "",
-      "review": "",
-      "save": "",
-      "customize": "",
-      "customizeTitle": "",
-      "customizeConfirm": "",
-      "customizeConfirmAction": "",
-      "customizeFirst": "",
-      "customizeFailed": "",
-      "upgradeFailed": "",
-      "gone": "",
-      "doorsHelper": ""
+      "version": "v{{version}}",
+      "updateAvailable": "Päivitys on saatavilla",
+      "updatedTitle": "Käyttövalmis automaatio on nyt v{{version}}",
+      "updatedBody": "Tarkista alla olevat vastaukset ja päivitä sitten.",
+      "before": "Nyt",
+      "after": "Päivityksen jälkeen",
+      "review": "Tarkista ja päivitä",
+      "save": "Tallenna muutokset",
+      "customize": "Avaa rakentajassa",
+      "customizeTitle": "Avataanko tämä rakentajassa?",
+      "customizeConfirm": "Sen avaaminen rakentajassa tekee tästä automaatiosta riippumattoman: jokainen vaihe on muokattavissa, eikä se saa enää päivityksiä käyttövalmiilta automaatiolta. Tätä ei voi perua.",
+      "customizeConfirmAction": "Avaa rakentajassa",
+      "customizeFirst": "Tämä automaatio seuraa käyttövalmista automaatiota. Avaa se ensin rakentajassa.",
+      "customizeFailed": "Sitä ei voitu avata rakentajassa.",
+      "upgradeFailed": "Päivitys epäonnistui. Yritä uudelleen.",
+      "gone": "Käyttövalmis automaatio, josta tämä rakennettiin, ei ole enää tällä palvelimella.",
+      "doorsHelper": "Vaiheet tulevat käyttövalmiista automaatiosta ja ne ovat kiinteitä. Avaaminen rakentajassa tekee jokaisesta vaiheesta muokattavan ja poistaa linkityksen."
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
+        "name": "Passiivinen tili",
         "description": "",
         "keywords": ""
       },
       "concurrent-streams": {
-        "name": "",
+        "name": "Liian monta striimiä kerralla",
         "description": "",
         "keywords": ""
       },
       "device-velocity": {
-        "name": "",
+        "name": "Useita IP-osoitteita aikaikkunassa",
         "description": "",
         "keywords": ""
       },
       "geo-restriction": {
-        "name": "",
+        "name": "Estetyt maat",
         "description": "",
         "keywords": ""
       },
       "impossible-travel": {
-        "name": "",
+        "name": "Mahdoton matkustus",
         "description": "",
         "keywords": ""
       },
       "kill-paused-streams": {
-        "name": "",
+        "name": "Lopeta pysäytetyt striimit",
         "description": "",
         "keywords": ""
       },
       "media-added": {
-        "name": "",
+        "name": "Uutta mediaa lisätty",
         "description": "",
         "keywords": ""
       },
       "media-upgraded": {
-        "name": "",
+        "name": "Mediaa päivitetty",
         "description": "",
         "keywords": ""
       },
       "new-device": {
-        "name": "",
+        "name": "Uusi laite",
         "description": "",
         "keywords": ""
       },
       "newsletter-failed": {
-        "name": "",
+        "name": "Uutiskirje epäonnistui",
         "description": "",
         "keywords": ""
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
+        "name": "Ei 4K-transkoodauksia",
+        "description": "Pysäytä striimi, joka transkoodaa 4K-lähdevideota.",
         "keywords": ""
       },
       "paused-too-long": {
-        "name": "",
+        "name": "Keskeytetty liian pitkäksi aikaa",
         "description": "",
         "keywords": ""
       },
       "plugin-update": {
-        "name": "",
+        "name": "Tracearr-liitännäispäivitys",
         "description": "",
         "keywords": ""
       },
       "server-down": {
-        "name": "",
-        "description": "",
+        "name": "Palvelin on alhaalla",
+        "description": "Kerro määränpäälle, kun mediapalvelin lakkaa vastaamasta.",
         "keywords": ""
       },
       "server-up": {
-        "name": "",
-        "description": "",
+        "name": "Palvelin jälleen ylhäällä",
+        "description": "Kerro määränpäälle, kun mediapalvelin jälleen vastaa.",
         "keywords": ""
       },
       "server-update": {
@@ -1570,53 +1570,53 @@
         "keywords": ""
       },
       "stream-started": {
-        "name": "",
+        "name": "Striimi aloitettu",
         "description": "",
         "keywords": ""
       },
       "tracearr-update": {
-        "name": "",
-        "description": "",
+        "name": "Tracearr-päivitys",
+        "description": "Kerro kohteelle, kun uusi Tracearr-julkaisu on ilmestynyt.",
         "keywords": ""
       },
       "transcode-started": {
-        "name": "",
+        "name": "Striimi transkoodaa",
         "description": "",
         "keywords": ""
       },
       "trust-score-changed": {
-        "name": "",
+        "name": "Luottamuspisteet muuttuneet",
         "description": "",
         "keywords": ""
       }
     },
-    "title": "",
-    "toggleAutomation": "",
-    "tryAdjustingFilters": "",
+    "title": "Automaatiot",
+    "toggleAutomation": "Ota {{name}} käyttöön tai pois käytöstä",
+    "tryAdjustingFilters": "Kokeile muokata suodattimia.",
     "units": {
-      "km": "",
-      "kmh": "",
-      "mbps": "",
-      "days": "",
-      "minutes": "",
-      "hours": "",
-      "gb": "",
-      "seconds": ""
+      "km": "km",
+      "kmh": "km/h",
+      "mbps": "Mbps",
+      "days": "päivää",
+      "minutes": "minuuttia",
+      "hours": "tuntia",
+      "gb": "GB",
+      "seconds": "sekuntia"
     },
-    "updateAutomation": "",
+    "updateAutomation": "Tallenna muutokset",
     "catalog": {
       "groups": {
-        "sessions": "",
-        "accounts": "",
-        "library": "",
-        "servers": "",
-        "updates": "",
-        "notifications": "",
-        "notify": "",
-        "policy": "",
-        "control": ""
+        "sessions": "Istunnot",
+        "accounts": "Tilit",
+        "library": "Kirjasto",
+        "servers": "Palvelimet",
+        "updates": "Päivitykset",
+        "notifications": "Uutiskirjeet",
+        "notify": "Ilmoita",
+        "policy": "Tee toimenpiteitä",
+        "control": "Jos… sitten"
       },
-      "suggested": "",
+      "suggested": "Ehdotettu",
       "triggers": {
         "sessionStarted": {
           "description": "",
@@ -1665,11 +1665,11 @@
           "synonyms": ""
         },
         "serverDown": {
-          "description": "",
+          "description": "Mediapalvelin lopettaa vastaamasta.",
           "synonyms": ""
         },
         "serverUp": {
-          "description": "",
+          "description": "Mediapalvelin vastaa jälleen.",
           "synonyms": ""
         },
         "pluginUpdateAvailable": {
@@ -1707,25 +1707,25 @@
           "synonyms": ""
         },
         "if": {
-          "label": "",
+          "label": "Jos… muuten…",
           "description": "",
           "synonyms": ""
         }
       }
     },
     "filters": {
-      "source": "",
-      "allSources": "",
+      "source": "Mistä se oli peräisin",
+      "allSources": "Missä tahansa",
       "sources": {
-        "builtin": "",
-        "import": "",
-        "local": "",
-        "own": ""
+        "builtin": "Sisäänrakennettu",
+        "import": "Tuotu",
+        "local": "Tallennettu tänne",
+        "own": "Rakennettu rakentajassa"
       },
-      "trigger": "",
-      "allTriggers": ""
+      "trigger": "Mikä aloittaa sen",
+      "allTriggers": "Kaikki käynnistimet"
     },
-    "openGallery": "",
+    "openGallery": "Avaa galleria",
     "deleteAutomation_one": "Poista automaatio",
     "deleteAutomation_other": "Poista {{count}} automaatioita"
   },
@@ -1744,26 +1744,26 @@
       "noReachableConnections": "Ei saavutettavissa olevia yhteyksiä",
       "local": "Paikallinen",
       "remote": "Etä",
-      "custom": "",
+      "custom": "Mukautettu",
       "secure": "Turvallinen",
       "mayNotConnect": "Ei voi yhdistää",
       "recommended": "Suositeltu",
       "customUrl": "Mukautettu URL",
       "connectionError": {
-        "timeout": "",
-        "dns": "",
-        "refused": "",
-        "unreachable": "",
-        "reset": "",
-        "tls": "",
-        "http": "",
-        "unknown": ""
+        "timeout": "Aikakatkaistu",
+        "dns": "DNS-virhe",
+        "refused": "Yhteys hylättiin",
+        "unreachable": "Isäntä ei tavoitettavissa",
+        "reset": "Yhteys resetoitiin",
+        "tls": "TLS-virhe",
+        "http": "HTTP {{status}}",
+        "unknown": "Yhteys epäonnistui"
       },
-      "connectionsReachable": "",
+      "connectionsReachable": "{{reachable}} / {{total}} yhteyttä tavoitettavissa",
       "hideFiltered": "Piilota suodatettu",
       "showAll": "Näytä kaikki",
       "connectingTo": "Yhdistetään {{name}} tiedostoon...",
-      "ownerOnly": "",
+      "ownerOnly": "Vain omistaja voi hallita linkitettyjä Plex-tilejä.",
       "noAccountsLinked": "Plex-tilejä ei ole yhdistetty",
       "noAccountsLinkedHint": "Yhdistä Plex tili lisätäksesi Plex palvelimet Tracearriin.",
       "linkPlexAccount": "Linkitä Plex Tili",
@@ -1771,58 +1771,58 @@
       "linking": "Yhdistetään...",
       "loginEnabled": "Kirjautuminen Käytössä",
       "unlinkAccount": "Poista yhteys Plex tiliin",
-      "reauthorizeAccount": "",
+      "reauthorizeAccount": "Uudelleenvaltuuta tämä Plex-tili",
       "deleteServersFirst": "Poista ensin tämän tilin kautta yhdistetyt aktiiviset palvelimet tai merkitse ne historiallisiksi",
       "unlinkPlexAccount": "Irroita Plex Tili",
       "unlinkConfirm": "Oletko varma, että haluat poistaa yhteyden tähän Plex tiliin? Et voi lisätä palvelimia tältä tililtä ennen kuin linkität sen uudelleen.",
-      "connectionsAvailable_one": "",
+      "connectionsAvailable_one": "{{count}} yhteys saatavilla",
       "connectionsAvailable_other": "{{count}} yhteyttä saatavilla",
-      "moreConnections_one": "",
+      "moreConnections_one": "+{{count}} yhteys lisää",
       "moreConnections_other": "+{{count}} lisää yhteyksiä",
       "serversConnected_one": "{{count}} palvelin yhdistetty",
       "serversConnected_other": "{{count}} palvelinta yhdistetty"
     },
     "destinations": {
-      "add": "",
-      "builtinNote": "",
-      "clearSecret": "",
+      "add": "Lisää kohde",
+      "builtinNote": "Sisäänrakennettu",
+      "clearSecret": "Tyhjennä",
       "deleteConfirm": "",
       "description": "",
       "emailDescription": "",
-      "empty": "",
+      "empty": "Ei vielä kohteita.",
       "fields": {
-        "webhookUrl": "",
-        "url": "",
-        "serverUrl": "",
-        "apiUrl": "",
-        "topic": "",
-        "authToken": "",
-        "userKey": "",
-        "apiToken": "",
-        "preset": "",
-        "host": "",
-        "port": "",
-        "security": "",
-        "verifyCertificate": "",
-        "username": "",
-        "password": "",
-        "fromName": "",
-        "fromAddress": "",
-        "to": "",
-        "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "webhookUrl": "Webhookin URL-osoite",
+        "url": "URL-osoite",
+        "serverUrl": "Palvelimen URL-osoite",
+        "apiUrl": "API:n URL-osoite",
+        "topic": "Aihe",
+        "authToken": "Todentamistunnus",
+        "userKey": "Käyttäjän avain",
+        "apiToken": "API-tunnus",
+        "preset": "Tarjoaja",
+        "host": "SMTP-isäntä",
+        "port": "Portti",
+        "security": "Turvallisuus",
+        "verifyCertificate": "Tarkista sertifikaatti",
+        "username": "Käyttäjätunnus",
+        "password": "Salasana",
+        "fromName": "Lähettäjän nimi",
+        "fromAddress": "Lähettäjän osoite",
+        "to": "Hälytysten vastaanottajat",
+        "replyTo": "Vastausosoite",
+        "messagesPerSecond": "Viestejä sekunnissa",
+        "messageStream": "Viestistriimi"
       },
       "groups": {
-        "connection": "",
-        "sender": "",
-        "alerts": ""
+        "connection": "Yhteys",
+        "sender": "Lähettäjä",
+        "alerts": "Hälytykset"
       },
       "hints": {
-        "authTokenOptional": "",
+        "authTokenOptional": "Valinnainen julkisiin aiheisiin",
         "smtpPreset": "",
         "smtpVerifyCertificate": "",
-        "smtpUsernameOptional": "",
+        "smtpUsernameOptional": "Jätä tyhjäksi, kun palvelin ei tarvitse sisäänkirjautumista",
         "smtpTo": "",
         "smtpRate": "",
         "smtpMessageStream": "",
@@ -1830,66 +1830,66 @@
         "smtpGmailPassword": "",
         "smtpResendUsername": "",
         "smtpResendPassword": "",
-        "smtpSendgridUsername": "",
-        "smtpSendgridPassword": "",
-        "smtpMailgunUsername": "",
+        "smtpSendgridUsername": "Sana apikey, tarkalleen.",
+        "smtpSendgridPassword": "SendGrid API -avaimesi.",
+        "smtpMailgunUsername": "postmaster@yourdomain, ei Mailgun -kirjautumistunnuksesi.",
         "smtpMailgunPassword": "",
-        "smtpBrevoUsername": "",
+        "smtpBrevoUsername": "Brevo -kirjautumissähköpostisi.",
         "smtpBrevoPassword": "",
         "smtpSesUsername": "",
         "smtpSesPassword": "",
-        "smtpPostmarkUsername": "",
+        "smtpPostmarkUsername": "Palvelimesi API-tunniste.",
         "smtpPostmarkPassword": ""
       },
       "newsletterAlertsNote": "",
       "newsletterDescription": "",
-      "newsletterTitle": "",
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
+      "newsletterTitle": "Lisää sähköpostipalvelin",
+      "newslettersOnly": "Vain uutiskirjeet",
+      "noAlertRecipients": "Ei hälytysten vastaanottajia",
       "options": {
-        "securityStarttls": "",
-        "securityTls": "",
-        "securityNone": "",
-        "presetCustom": "",
-        "presetPostmark": "",
-        "presetResend": "",
-        "presetSes": "",
-        "presetMailgun": "",
-        "presetSendgrid": "",
-        "presetBrevo": "",
-        "presetGmail": ""
+        "securityStarttls": "STARTTLS (tavallisesti portti 587)",
+        "securityTls": "TLS (tavallisesti portti 465)",
+        "securityNone": "Ei mitään (pelkkää tekstiä, portti 25)",
+        "presetCustom": "Mukautettu",
+        "presetPostmark": "Postimerkki",
+        "presetResend": "Lähetä uudelleen",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
-      "ownerOnly": "",
+      "ownerOnly": "Vain omistaja voi hallita ilmoituskohteita.",
       "pushNote": "",
-      "receiveViolations": "",
-      "receiveViolationsHint": "",
+      "receiveViolations": "Vastaanota rikkomusilmoituksia",
+      "receiveViolationsHint": "Lähetä kaikki rikkomusilmoitukset tähän kohteeseen.",
       "receiveViolationsNeedsRecipients": "",
       "reencrypt": "",
       "rowActions": "",
       "secretSet": "",
-      "test": "",
-      "testHint": "",
-      "testNeedsForm": "",
+      "test": "Testi",
+      "testHint": "Tallenna ensin testataksesi",
+      "testNeedsForm": "Täytä vaaditut kentät testataksesi",
       "types": {
-        "discord": "",
-        "jsonWebhook": "",
-        "ntfy": "",
-        "gotify": "",
-        "apprise": "",
-        "pushover": "",
-        "email": "",
-        "push": "",
-        "webToast": ""
+        "discord": "Discord",
+        "jsonWebhook": "Webhook (JSON)",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "email": "Sähköposti",
+        "push": "Mobiili push-ilmoitus",
+        "webToast": "Selaimen toastit"
       },
-      "violationsOff": "",
-      "violationsOn": "",
-      "webToastNote": "",
-      "alertsGoTo_one": "",
-      "alertsGoTo_other": "",
-      "usedBy_one": "",
-      "usedBy_other": "",
-      "usedByNewsletters_one": "",
-      "usedByNewsletters_other": ""
+      "violationsOff": "Rikkomukset pois",
+      "violationsOn": "Rikkomukset päälle",
+      "webToastNote": "Toastit tässä selaimessa.",
+      "alertsGoTo_one": "Hälytykset menevät {{count}} osoitteeseen",
+      "alertsGoTo_other": "Hälytykset menevät {{count}} osoitteeseen",
+      "usedBy_one": "{{count}} automaatio käyttää",
+      "usedBy_other": "{{count}} automaatiota käyttää",
+      "usedByNewsletters_one": "{{count}} uutiskirje käyttää",
+      "usedByNewsletters_other": "{{count}} uutiskirjettä käyttää"
     },
     "jobs": {
       "runNow": "Suorita Nyt",
@@ -1911,7 +1911,7 @@
     "interruptionTitle": "Palvelun keskeytyminen",
     "startingDescription": "Palvelin odottaa taustaosan palvelujen tulevan saataville. Tämä sivu päivittyy automaattisesti, kun kaikki on valmis.",
     "interruptionDescription": "Yksi tai useampi taustaosan palvelu ei ole käytettävissä. Tämä sivu päivittyy automaattisesti, kun yhteys palautetaan.",
-    "unreachable": "",
+    "unreachable": "Ei saada yhteyttä Tracearr-palvelimeen juuri nyt. Live-päivitykset on keskeytetty ja jatkavat itsestään.",
     "restoreTitle": "Palautetaan varmuuskopiosta...",
     "restoreFailed": "Palautus epäonnistui",
     "restorePhase": {
@@ -1922,14 +1922,14 @@
       "running_migrations": "Siirtymien kulku",
       "rebuilding_aggregates": "aggregaattien uudelleenrakentaminen",
       "restarting": "Palvelujen uudelleenkäynnistäminen",
-      "complete": ""
+      "complete": "Palautus suoritettu"
     },
     "initStep": {
-      "migrations": "",
-      "timescale": "",
-      "services": ""
+      "migrations": "Toteutetaan tietokannan siirtoja",
+      "timescale": "Valmistellaan TimescaleDB:tä (tämä voi kestää jonkin aikaa päivityksen jälkeen)",
+      "services": "Käynnistetään palveluja"
     },
-    "doNotRestart": ""
+    "doNotRestart": "Älä pysäytä tai käynnistä palvelinta uudelleen tämän ajamisen aikana. Keskeyttäminen voi jättää tietokannan puoliksi päivitetyksi."
   },
   "map": {
     "allUsers": "Kaikki käyttäjät",
@@ -1939,21 +1939,21 @@
     "streams": "striimit",
     "locations": "sijainnit",
     "allActivity": "Kaikki toiminnot",
-    "basemapMissing": "",
-    "webglUnavailable": "",
-    "webglHint": "",
-    "badMounts": ""
+    "basemapMissing": "Basemap ei ole asennettu",
+    "webglUnavailable": "WebGL on poistettu käytöstä tässä selaimessa",
+    "webglHint": "Kartta tarvitsee WebGL:n. Ota se käyttöön selaimesi asetuksista.",
+    "badMounts": "Vääriä \"volume mounts\" -arvoja havaittu — toiminnallisuutta ei voida taata."
   },
   "devices": {
     "title": "Laitteen Yhteensopivuus",
-    "description": "",
-    "analyzedSessions": "",
+    "description": "Katso, mitkä laitteet suoratoistavat vs transkoodaavat minkäkin koodekin.",
+    "analyzedSessions": "Analysoidut istunnot",
     "directPlayRate": "Suoran toiston osuus",
-    "videoAndAudio": "",
+    "videoAndAudio": "Video + Ääni",
     "uniqueDevices": "Yksilölliset Laitteet",
     "uniqueCodecs": "Yksilölliset Koodekit",
     "deviceHealth": "Laitteen Terveys",
-    "deviceHealthDesc": "",
+    "deviceHealthDesc": "Suoratoistojen määrä laitteen tyypin mukaan.",
     "transcodeHotspots": "Transkoodauksen hotspotit",
     "transcodeHotspotsDesc": "",
     "deviceAndCodec": "Laite + Koodi",
@@ -1965,10 +1965,10 @@
     "noDeviceDataPeriod": "Laitteen tietoja ei ole tänä aikana",
     "legend": "Selite:",
     "directPlayHigh": "≥80 % Suora",
-    "directPlayMid": "",
-    "directPlayLow": "",
+    "directPlayMid": "50-79%",
+    "directPlayLow": "<50%",
     "topTranscodingUsers": "Eniten transkoodaavat käyttäjät",
-    "topTranscodingUsersDesc": "",
+    "topTranscodingUsersDesc": "Käyttäjät, jotka aiheuttavat eniten transkoodauksia palvelimellasi.",
     "noTranscodingUsers": "Transkoodauksen käyttäjiä ei löytynyt",
     "analyzedSessionsTooltip_one": "",
     "analyzedSessionsTooltip_other": ""
@@ -1991,7 +1991,7 @@
   "statsUsers": {
     "noActivity": "Ei vielä aktiviteettia",
     "noActivityDesc": "Aloita striimaus nähdäksesi aktiivisimmat käyttäjät täällä",
-    "top3": "",
+    "top3": "Ylin 3",
     "runnersUp": "Juoksijat Ylös"
   },
   "plexCallback": {
@@ -2002,14 +2002,14 @@
     "backToSettings": "Takaisin asetuksiin",
     "apiKeyAutoLoaded": "API-avain ladattu automaattisesti",
     "noApiKey": "API-avainta ei luotu - luo se Asetuksissa päätepisteiden testaamiseksi",
-    "versionSwitcherLabel": "",
-    "versionV1": "",
-    "versionV2": "",
-    "specLoadError": ""
+    "versionSwitcherLabel": "API dokumentaation versio",
+    "versionV1": "API v1",
+    "versionV2": "API v2",
+    "specLoadError": "API-määritystä ei voitu ladata. Tarkista API-avain ja yritä uudelleen."
   },
   "debug": {
     "title": "Työkalujen Vianetsintä",
-    "description": "",
+    "description": "Vianmäärityksen ja tiedonhallinnan hallinnolliset työkalut.",
     "overview": "Yleiskatsaus",
     "librarySnapshots": "Kirjaston tilannekuvat",
     "tasks": "Tehtävät",
@@ -2020,7 +2020,7 @@
     "environment": "Ympäristö",
     "systemInformation": "Järjestelmän Tiedot",
     "database": "Tietokanta",
-    "databaseDesc": "",
+    "databaseDesc": "Tietokannan koko ja taulukkotilastot.",
     "totalSize": "Koko Yhteensä",
     "maintenance": "Huolto",
     "destructiveActions": "Tuhottavat Toimet",
@@ -2030,7 +2030,7 @@
     "clearQueryCache": "Tyhjennä Kyselyvälimuisti",
     "clearMobileDevices": "Tyhjennä Mobiililaitteet",
     "clearViolations": "Tyhjennä Rikkomukset",
-    "clearAutomations": "",
+    "clearAutomations": "Poista kaikki automaatiot ja ajot",
     "clearAutomationsConfirm": "",
     "clearTerminationLogs": "Tyhjennä Lopetuslokit",
     "clearLibraryCache": "Tyhjennä Kirjaston Välimuisti",
@@ -2048,60 +2048,60 @@
     "suspicious": "Epäilyttävä",
     "ok": "Ok",
     "selected": "valittu",
-    "snapshots": "",
+    "snapshots": "tilannekuva(t)",
     "of": "jostakin",
     "logExplorerUnavailable": "Loki Explorer on saatavilla vain Docker ympäristöissä"
   },
   "media": {
     "landing": {
-      "title": "",
+      "title": "Media",
       "lens": {
         "label": "Näytä käyttäjänä",
         "allUsers": "Kaikki käyttäjät"
       },
       "shelves": {
-        "recentlyAddedMovies": "",
-        "recentlyAddedShows": "",
-        "recentlyUpdated": "",
-        "mostPopularMovies": "",
-        "mostPopularShows": "",
-        "emptyRecentlyAdded": "",
-        "emptyRecentlyUpdated": "",
-        "emptyMostPopular": "",
-        "captionRecentlyAdded": "",
-        "captionRecentlyUpdated": "",
+        "recentlyAddedMovies": "Hiljattain lisätyt elokuvat",
+        "recentlyAddedShows": "Hiljattain lisätyt sarjat",
+        "recentlyUpdated": "Hiljattain päivitetyt",
+        "mostPopularMovies": "Suosituimmat elokuvat",
+        "mostPopularShows": "Suosituimmat sarjat",
+        "emptyRecentlyAdded": "Mitään ei lisätty tällä jaksolla",
+        "emptyRecentlyUpdated": "Mitään ei korvattu tällä jaksolla",
+        "emptyMostPopular": "Ei toistoja tällä jaksolla",
+        "captionRecentlyAdded": "deduplikoitu palvelinten kesken",
+        "captionRecentlyUpdated": "parempi versio korvasi tämän",
         "captionMostPopular": {
-          "day": "",
-          "week": "",
-          "month": "",
-          "year": "",
-          "all": "",
-          "custom": ""
+          "day": "tänään",
+          "week": "viimeiset 7 Päivää",
+          "month": "viimeiset 30 Päivää",
+          "year": "viimeiset 12 kuukautta",
+          "all": "koko ajalta",
+          "custom": "valittu päivämääräväli"
         }
       },
       "card": {
         "addedAgo": "lisätty {{date}}",
-        "addedCompactAgo": "",
+        "addedCompactAgo": "lisätty {{age}} sitten",
         "newEpisodes_one": "{{count}} uusi jakso",
         "newEpisodes_other": "{{count}} uutta jaksoa",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_other": "",
-        "newEpisodesChip_one": "",
-        "newEpisodesChip_other": ""
+        "replacedEpisodes_one": "{{count}} jakso korvattu",
+        "replacedEpisodes_other": "{{count}} jaksoa korvattu",
+        "newEpisodesChip_one": "{{count}} uusi",
+        "newEpisodesChip_other": "{{count}} uutta"
       },
       "deadWeight": {
-        "title": "",
-        "empty": "",
+        "title": "Kuollut paino",
+        "empty": "Ei mitään palautettavaa - kaikkea kirjastossa on katsottu",
         "columns": {
-          "poster": "",
+          "poster": "Juliste",
           "title": "",
           "added": "",
           "servers": ""
         },
         "viewAll": "",
         "viewAllTooltip": "",
-        "summary_one": "",
-        "summary_other": ""
+        "summary_one": "{{count}} ei koskaan katsottu · {{size}}",
+        "summary_other": "{{count}} ei koskaan katsottu · {{size}}"
       },
       "loadError": ""
     },
