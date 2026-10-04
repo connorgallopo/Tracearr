@@ -171,7 +171,14 @@
   "unauthenticated": {
     "connectionLost": "연결 끊김",
     "accessRevoked": "{{serverName}} 접근 권한이 취소되었습니다. 서버 소유자에게 새 페어링 코드를 요청하세요.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "QR 코드 스캔"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "서버",
