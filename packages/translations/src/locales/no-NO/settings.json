@@ -271,7 +271,7 @@
     "expiresIn": "Utløper i {{time}}",
     "oneTimePairToken": "Engangstoken for sammenkobling",
     "copyToken": "Kopier token",
-    "tokenExpiryNote": "Denne koden utløper om 5 minutter og kan bare brukes en gang.",
+    "tokenExpiryNote": "",
     "done": "Ferdig",
     "disableMobileAccessConfirm": "Dette vil koble fra alle mobile enheter og tilbakekalle alle økter. Du kan reaktivere mobil-tilgang senere.",
     "disable": "Deaktiver",
