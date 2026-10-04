@@ -271,7 +271,7 @@
     "expiresIn": "Expire dans {{time}}",
     "oneTimePairToken": "Jeton d'appairage à usage unique",
     "copyToken": "Copier le jeton",
-    "tokenExpiryNote": "Ce jeton expire dans 5 minutes et ne peut être utilisé qu'une seule fois.",
+    "tokenExpiryNote": "",
     "done": "Fait",
     "disableMobileAccessConfirm": "Ceci va déconnecter tous les appareils mobiles et révoquer toutes les sessions. Vous pourrez réactiver l'accès mobile plus tard.",
     "disable": "Désactiver",
