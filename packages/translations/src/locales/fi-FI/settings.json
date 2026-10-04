@@ -112,13 +112,13 @@
       "title": "Päivitysten tarkistus",
       "description": "Tracearr etsii uusia julkaisuja kuuden tunnin välein. Ilmoitukset tulevat miltä tahansa automaatiolta, mikä tarkkailee päivityksiä.",
       "plugin": "Reaaliaikainen liitännäinen",
-      "pluginDesc": "",
+      "pluginDesc": "Tarkista, onko uutta Tracearr-liitännäistä saatavilla Jellyfin- ja Emby palvelimillesi.",
       "server": "Mediapalvelimet",
-      "serverDesc": ""
+      "serverDesc": "Vertaile, mitä versiota kukin Plex-, Jellyfin- ja Emby-palvelin käyttää, verratuna niiden uusimpiin julkaisuihin."
     },
     "imageCache": {
       "title": "Julisteiden välimuisti",
-      "description": "",
+      "description": "Yksi kopio jokaisesta julisteesta pidetään levyllä kunnes juliste muuttuu. Mitään ei poisteta tilan lisäämiseksi; kun levytilaa on vähän jäljellä, välimuistiin tallentaminen pysähtyy ja siitä ilmoitetaan.",
       "size": "Levyllä",
       "files": "Tiedostot",
       "need": "Arvioitu tarve",
@@ -130,9 +130,9 @@
       "swept": "Poistettu viimeisimmässä siivouksessa",
       "freed": "Vapautettu viimeisimmässä siivouksessa",
       "never": "ei vielä",
-      "diskLimited": "",
+      "diskLimited": "Levytila rajoitettu sitten {{since}}: noin {{shortfall}} julisteista ei ole tallennettuna välimuistiin.",
       "loadError": "Välimuistin tilaa ei voitu ladata.",
-      "notPersisting": "",
+      "notPersisting": "Julisteiden välimuisti ei selviä uudelleenkäynnistyksistä. Ota levyasema käyttöön välimuistin hakemistolle, tai jokainen juliste ladataan uudelleen jokaisen kontin uudelleenluonnin jälkeen.",
       "needHint_one": "{{count}} juliste × {{size}}",
       "needHint_other": "{{count}} julistetta × {{size}}"
     }
@@ -195,7 +195,7 @@
     "resume": "Jatka seurantaa",
     "moreActions": "Lisää toimintoja",
     "markHistoricalTitle": "Merkitäänkö {{name}} historialliseksi?",
-    "markHistoricalConfirm": "",
+    "markHistoricalConfirm": "Tracearr lopettaa ottamasta yhteyttä tähän palvelimeen. Sen historia, käyttäjät ja kirjastot pysyvät ja voit jatkaa milloin tahansa. Parhaillaan käynnissä olevat striimit lopetetaan.",
     "resumeFirst": "Jatka ensin vaihtaaksesi osoitteen tai API-avaimen.",
     "location": {
       "title": "Sijainti",
@@ -652,8 +652,8 @@
         "fixed": ""
       },
       "windowSentence": {
-        "fallback": "",
-        "fixed": "",
+        "fallback": "Ensimmäinen sähköposti katsoo taaksepäin",
+        "fixed": "Historian tarkastelu",
         "fixedAfter": "joka kerta",
         "fallbackLabel_one": "Ensimmäinen sähköposti näyttää takaisin {{count}} päivän.",
         "fallbackLabel_other": "Ensimmäinen sähköposti näyttää takaisin {{count}} päivää.",
