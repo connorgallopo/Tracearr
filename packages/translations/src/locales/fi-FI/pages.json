@@ -63,9 +63,9 @@
     "mergeReasonEmailUsername": "Molemmat käyttävät käyttäjätunnuksenaan {{value}} tai tili-sähköpostiosoitteenaan.",
     "mergeReasonUsername": "Molemmat käyttävät käyttäjätunnusta {{value}}.",
     "mergeKeep": "Säilytä",
-    "mergeFoldIn": "",
+    "mergeFoldIn": "Supistettu, sitten poistettu",
     "mergeSwap": "Vaihda sitä, joka säilytetään",
-    "mergeRequired": "",
+    "mergeRequired": "{{name}} pystyy kirjautumaan Tracearriin, joten {{name}} säilytetään.",
     "mergeLastActive": "Viimeksi nähty {{relative}}",
     "mergeNeverActive": "Ei koskaan aktiivinen",
     "mergeMoreServers": "+{{count}}",
@@ -83,9 +83,9 @@
     "mergeConfirmInto": "Yhdistä -> {{keepName}}",
     "mergeSelectTwo": "Valitse täsmälleen kaksi käyttäjää yhdistettäväksi",
     "mergeSameIdentity": "Nämä tilit kuuluvat jo samalle käyttäjälle",
-    "mergeSelectAllActive": "",
+    "mergeSelectAllActive": "Poista \"Valitse kaikki\" -valinta ja valitse täsmälleen kaksi käyttäjää yhdistääksesi ne",
     "suggestionsTitle": "Mahdolliset päällekkäiset käyttäjät",
-    "suggestionsPairEmail": "",
+    "suggestionsPairEmail": "{{first}} ja {{second}} jakavat saman sähköpostiosoitteen",
     "suggestionsPairEmailUsername": "",
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
@@ -95,9 +95,9 @@
     "suggestionsMatchEmailUsername": "Molemmat käyttävät käyttäjätunnuksena {{value}} tai tilin sähköpostiosoitteena",
     "suggestionsMatchUsername": "Sama käyttäjänimi",
     "suggestionsEmpty": "Mitään ei jäänyt tarkistettavaksi.",
-    "suggestionsDismissed": "",
-    "suggestionsDismissedPair": "",
-    "suggestionsDismissedAt": "",
+    "suggestionsDismissed": "Hylätyt ({{count}})",
+    "suggestionsDismissedPair": "{{first}} ja {{second}}",
+    "suggestionsDismissedAt": "Hylätty {{relative}}",
     "suggestionsRestore": "Palauta",
     "suggestionsError": "Yhdistämisehdotuksia ei voitu ladata",
     "filterHasAccessTo": "On pääsy",
@@ -109,10 +109,10 @@
     "resetTrustScoreTitle_other": "Nollaa luottamuspisteet {{count}} käyttäjältä",
     "mergeMoves_one": "",
     "mergeMoves_other": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_other": "",
+    "suggestionsCount_one": "{{count}} mahdollinen kaksinkertainen käyttäjä",
+    "suggestionsCount_other": "{{count}} mahdollista kaksinkertaista käyttäjää",
+    "suggestionsPairEmailMore_one": "{{first}} ja {{second}} jakavat saman sähköpostiosoitteen, sekä {{count}} lisää",
+    "suggestionsPairEmailMore_other": "{{first}} ja {{second}} jakavat saman sähköpostiosoitteen, sekä {{count}} lisää",
     "suggestionsPairEmailUsernameMore_one": "",
     "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsernameMore_one": "",
@@ -135,7 +135,7 @@
     "linkedAccounts": "Linkitetyt tilit",
     "splitAccount": "Jaa erilliseksi käyttäjäksi",
     "splitConfirmTitle": "Jaa palvelimen tili",
-    "splitConfirmDescription": "",
+    "splitConfirmDescription": "Irrota tämä palvelintili omaksi käyttäjäkseen. Sen katseluhistoria ja rikkomukset siirtyvät mukana.",
     "splitConfirmLoading": "Jaetaan...",
     "acrossAllServers": "Kaikissa linkitetyissä tileissä:",
     "overallTrust": "Yleinen luottamus",
@@ -143,13 +143,13 @@
     "allServers": "Kaikki palvelimet",
     "title": "Käyttäjän tiedot",
     "editIdentity": "Muokkaa nimeä ja yhteyssähköpostia",
-    "editIdentityDescription": "",
+    "editIdentityDescription": "Molemmat koskevat tätä henkilöä kaikkialla. Jätä nimi tyhjäksi näyttääksesi @{{username}}.",
     "displayName": "Näyttönimi",
     "contactEmail": "Yhteyssähköposti",
-    "contactEmailHelp": "",
+    "contactEmailHelp": "Johon uutiskirjeet menevät. Se ei salli kirjautumista eikä koskaan vastaa synkronoitua tiliä.",
     "contactEmailLabel": "Uutiskirjeen osoite:",
     "contactEmailNone": "ei asetettu",
-    "contactEmailNoLogin": "",
+    "contactEmailNoLogin": "Kirjautumista ei sallita.",
     "locations": "Sijainnit"
   },
   "history": {
@@ -189,12 +189,12 @@
       "failedToLoad": "Laadun tietojen lataaminen epäonnistui",
       "failedToLoadDesc": "Laadukasta tietoa ei voitu noutaa. Yritä uudelleen.",
       "codecBrowse": {
-        "movies": "",
-        "shows": "",
-        "movieCount_one": "",
-        "movieCount_other": "",
-        "episodeCount_one": "",
-        "episodeCount_other": ""
+        "movies": "Selaa elokuvia",
+        "shows": "Selaa TV-ohjelmia",
+        "movieCount_one": "{{count}} elokuva",
+        "movieCount_other": "{{count}} elokuvaa",
+        "episodeCount_one": "{{count}} jakso",
+        "episodeCount_other": "{{count}} jaksoa"
       }
     },
     "storage": {
@@ -217,7 +217,7 @@
       "zeroGrowth": "0 GB/kk",
       "predictions": "Ennusteet",
       "contentROI": "Sisällön kannattavuus (ROI)",
-      "contentROIDesc": "",
+      "contentROIDesc": "Katseluarvo / tilavaatimus (ROI)",
       "avgHoursPerGB": "avg tuntia/GB",
       "insufficientData": "Riittämättömät tiedot",
       "of": "jostakin",
@@ -226,7 +226,7 @@
       "failedToLoadDesc": "Tallennustietoja ei voitu noutaa. Yritä uudelleen.",
       "duplicatesTitle": "Kaksoiskappaleet",
       "duplicatesSubtitle": "",
-      "growthPreChangeover": "",
+      "growthPreChangeover": "perustuu päivitystä edeltävään historiaan",
       "loadingDuplicates": "Ladataan kaksoiskappaleita...",
       "duplicatesFailed": "Kaksoiskappaleiden lataaminen epäonnistui",
       "noDuplicatesTitle": "Kaksoiskappaleita ei löytynyt",
@@ -317,14 +317,14 @@
     "versionsBackfill": {
       "banner": "Tiedostoversiotietoja kerätään yhä tälle palvelimelle. Suorita kirjaston synkronointi viimeistelläksesi.",
       "action": "",
-      "syncStarted": "",
+      "syncStarted": "Kirjaston synkronointi aloitettu.",
       "syncFailed_one": "",
       "syncFailed_other": ""
     }
   },
   "activity": {
     "title": "Toiminta",
-    "description": "",
+    "description": "Toistotrendit, tavat ja striimauskäyttäytyminen.",
     "playsOverTime": "Toistot ajan mittaan",
     "concurrentStreams": "Samanaikaiset striimit",
     "engagementBreakdown": "Sitoumusten Erittely",
@@ -373,12 +373,12 @@
       "neverActive": "Ei koskaan aktiivinen",
       "conditionEvidence": "Ehdon todisteet",
       "conditionGroup": "Ehtoryhmä {{index}}",
-      "matched": "",
+      "matched": "{{matched}} / {{total}} täsmää",
       "actual": "Todellinen",
       "relatedSessions_one": "{{count}} liittyvä istunto",
       "relatedSessions_other": "{{count}} aiheeseen liittyvää istuntoa"
     },
-    "selectAllViolations_one": "",
+    "selectAllViolations_one": "Valitse {{count}} rikkomistapausta vastaava suodatin",
     "selectAllViolations_other": "Valitse kaikki {{count}} rikkomistapausta vastaavat suodattimet",
     "dismissViolations_one": "Hylkää {{count}} rikkomus",
     "dismissViolations_other": "Hylkää {{count}} Rikkomuksia",
@@ -388,17 +388,17 @@
   "automations": {
     "message": {
       "heading": "Viesti",
-      "defaultText": "",
+      "defaultText": "Oletusteksti",
       "title": "Otsikko",
       "body": "Viesti",
-      "blankHint": "",
+      "blankHint": "Jätä tyhjäksi käyttääksesi kunkin kohteen oletustekstiä",
       "insertVariable": "Lisää muuttuja",
       "searchVariables": "Hae muuttujia",
-      "noVariables": "",
+      "noVariables": "Yksikään muuttuja ei täsmää",
       "preview": "Esikatselu",
-      "previewSamples": "",
+      "previewSamples": "Näytetään esimerkkiarvoilla, esimerkiksi {{user}} käyttäjänä",
       "previewDefault": "Tracearrin oletus tälle tapahtumalle",
-      "previewDefaultHint": "",
+      "previewDefaultHint": "Sanamuoto määräytyy tapahtuman ja kohteen mukaan.",
       "previewPickDestination": "",
       "fieldTitle": "Otsikko",
       "fieldMessage": "Viesti",
@@ -411,9 +411,9 @@
       "addedPushSubtitle": "",
       "previewCount": "{{used, number}} / {{max, number}}",
       "previewCountBytes": "{{used, number}} / {{max, number}} tavua",
-      "previewCut": "",
+      "previewCut": "leikkaa sopivaksi",
       "previewPriority": "Prioriteetti: {{priority}}",
-      "previewEscapeHint": "",
+      "previewEscapeHint": "Laskee Discordin pakomerkit",
       "webhookNotSent": ""
     },
     "priorities": {
@@ -514,21 +514,21 @@
             "description": "Vähimmäisaika ilmoitusten välillä"
           },
           "priority": {
-            "description": ""
+            "description": "Käytetään Pushoverissa, Gotifyssa ja ntfy:ssä"
           }
         },
         "ran": "Ilmoitus lähetettiin"
       },
       "trust": {
         "label": "Luottamuspisteet",
-        "description": "",
+        "description": "Tarkista, aseta tai nollaa luottamuspisteet",
         "fields": {
           "mode": {
             "label": "Tila"
           },
           "amount": {
             "label": "Määrä",
-            "description": ""
+            "description": "Positiivinen nostaaksesi, negatiivinen laskeaksesi"
           },
           "value": {
             "label": "Arvo"
@@ -541,14 +541,14 @@
         "description": "Lopeta aktiivinen striimi",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Minimi aika keskeytysten välillä samalle käyttäjälle"
           },
           "delay_seconds": {
             "label": "",
             "description": ""
           },
           "target": {
-            "description": ""
+            "description": "Mitkä istunnot lopetetaan"
           },
           "message": {
             "placeholder": "Valinnainen viesti"
@@ -557,9 +557,9 @@
         "ran": "Striimi pysäytettiin"
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "Lähetä viesti asiakasohjelmaan",
+        "description": "Lähetä viesti mediasoittimelle",
+        "hint": "Vain Jellyfin ja Emby. Plex tukee viestejä vain, kun tapat streamin.",
         "fields": {
           "target": {
             "description": ""
@@ -584,33 +584,33 @@
       "finished": "Päättyi",
       "noSummary": "Ei muistiinpanoja",
       "outcomes": {
-        "completed": "",
-        "stopped_by_condition": "",
+        "completed": "Ajettu",
+        "stopped_by_condition": "Ei osumia",
         "error": "Epäonnistui"
       },
       "empty": "Ei vielä ajoja",
-      "emptyDescription": "",
-      "runTitle": "",
-      "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "emptyDescription": "Ajot listataan tässä, kun laukaisuehto täsmää.",
+      "runTitle": "Ajo",
+      "runLoading": "Ladataan ajoa",
+      "triggeredBy": "{{trigger}} mukaan laukaistu",
+      "unknownStep": "Tunnistamaton vaihe",
       "tabs": {
         "all": "Kaikki",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "completed": "Ajettu",
+        "stopped_by_condition": "Ei osumia",
+        "error": "Epäonnistui"
       },
-      "group": "",
+      "group": "Ryhmä {{number}}",
       "branch": {
-        "then": "",
-        "else": ""
+        "then": "Otti vaiheet 'jos'",
+        "else": "Otti vaiheet 'muuten'"
       },
-      "whyBranch": "",
-      "openInEditor": "",
+      "whyBranch": "Mitä se luki",
+      "openInEditor": "Avaa rakentajassa tällä ajolla",
       "tabsLabel": "Suodata lopputuloksen mukaan",
-      "emptyRan": "",
+      "emptyRan": "Mikään ei ole vielä täsmännyt",
       "item": "Kohde",
-      "recordedViolation": "",
+      "recordedViolation": "Rikkomus kirjattu",
       "emptyRanDescription_one": "",
       "emptyRanDescription_other": ""
     },
@@ -618,46 +618,46 @@
     "allStatuses": "Kaikki tilat",
     "allSeverities": "Kaikki vakavuusasteet",
     "bind": {
-      "nameHelper": "",
-      "namePlaceholder": "",
-      "activeLabel": "",
-      "submit": "",
-      "submitting": "",
-      "customize": "",
+      "nameHelper": "Nimi automaatiolistalla",
+      "namePlaceholder": "Nimi tälle automaatiolle",
+      "activeLabel": "Ota käyttöön nyt",
+      "submit": "Käytä tätä",
+      "submitting": "Otetaan käyttöön...",
+      "customize": "Avaa rakentajassa",
       "doors": {
         "helper": ""
       },
-      "anyServer": "",
-      "serverHelper": "",
-      "serverLabel": "",
-      "accountLabel": "",
-      "personLabel": "",
-      "destinationsLabel": "",
-      "required": "",
+      "anyServer": "Mikä tahansa palvelin",
+      "serverHelper": "Mikä tahansa palvelin tarkoittaa niitä kaikkia.",
+      "serverLabel": "Mikä palvelin",
+      "accountLabel": "Mikä tili",
+      "personLabel": "Kuka henkilö",
+      "destinationsLabel": "Lähetä osoitteeseen",
+      "required": "Valitse ainakin yksi.",
       "needs": {
-        "title": ""
+        "title": "Mitä se tarvitsee"
       },
       "helper": {
-        "killMessage": "",
-        "clientMessage": ""
+        "killMessage": "Näytetään soittimessa, kun striimi pysähtyy.",
+        "clientMessage": "Näytetään soittimessa, kun se jatkaa toistoa."
       },
-      "noInputs": "",
-      "failed": "",
-      "created": "",
-      "createdOff": ""
+      "noInputs": "Ei mitään täytettävää",
+      "failed": "Ei voitu asettaa. Yritä uudelleen.",
+      "created": "{{name}} on asetettu ja käynnissä.",
+      "createdOff": "{{name}} luotiin ja on pois päältä. Ota se käyttöön luettelosta."
     },
     "builder": {
-      "destinationDisabled": "",
-      "noAlertRecipientsTooltip": "",
-      "noDestinations": "",
-      "newDestination": "",
+      "destinationDisabled": "Käytöstä poistettu kohde",
+      "noAlertRecipientsTooltip": "Tällä kohteella ei ole varoituksen vastaanottajia, joten hälytyksiä ei lähetetä.",
+      "noDestinations": "Ei vielä kohteita. Lisää sellainen lähettääksesi ilmoituksia.",
+      "newDestination": "Uusi kohde",
       "errors": {
-        "sendNeedsDestination": "",
-        "nameRequired": "",
-        "scopeIncomplete": "",
-        "triggerRequired": "",
-        "policyNeedsSubject": "",
-        "fieldUnavailable": "",
+        "sendNeedsDestination": "Valitse ainakin yksi kohde",
+        "nameRequired": "Anna tälle automaatiolle nimi",
+        "scopeIncomplete": "Valitse ketä tämä koskee",
+        "triggerRequired": "Lisää mikä aloittaa tämän, tai vaihda yksi takaisin päälle",
+        "policyNeedsSubject": "Rikkomukset koskevat henkilöä, joten tämä tarvitsee striimin tai tilin käynnistimen.",
+        "fieldUnavailable": "Tämä tarkistus ei ole käytettävissä jokaiselle käynnistimelle täällä",
         "operatorInvalid": "",
         "valueInvalid": "",
         "actionUnavailable": "",
