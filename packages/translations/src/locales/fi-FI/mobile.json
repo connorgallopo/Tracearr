@@ -176,7 +176,14 @@
   "unauthenticated": {
     "connectionLost": "Yhteys katkesi",
     "accessRevoked": "Sinun käyttöoikeutesi {{serverName}} on kumottu. Kysy palvelimen omistajalta uutta parikoodia.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "Skannaa QR-koodi"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "Palvelimet",
