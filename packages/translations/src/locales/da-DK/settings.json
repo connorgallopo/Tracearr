@@ -271,7 +271,7 @@
     "expiresIn": "Udløber i {{time}}",
     "oneTimePairToken": "Engangsparringstoken",
     "copyToken": "Kopiér token",
-    "tokenExpiryNote": "Dette token udløber om 5 minutter og kan kun bruges én gang.",
+    "tokenExpiryNote": "",
     "done": "Udført",
     "disableMobileAccessConfirm": "Dette vil afbryde alle mobile enheder og tilbagekalde alle sessioner. Du kan genaktivere mobil adgang senere.",
     "disable": "Deaktivér",
