@@ -2094,16 +2094,16 @@
         "empty": "Ei mitään palautettavaa - kaikkea kirjastossa on katsottu",
         "columns": {
           "poster": "Juliste",
-          "title": "",
-          "added": "",
-          "servers": ""
+          "title": "Nimike",
+          "added": "Lisätty",
+          "servers": "Palvelimet"
         },
-        "viewAll": "",
-        "viewAllTooltip": "",
+        "viewAll": "Näytä kaikki",
+        "viewAllTooltip": "Tulossa pian",
         "summary_one": "{{count}} ei koskaan katsottu · {{size}}",
         "summary_other": "{{count}} ei koskaan katsottu · {{size}}"
       },
-      "loadError": ""
+      "loadError": "Mediakirjastoa ei voitu ladata"
     },
     "movies": {
       "title": "Elokuvat"
@@ -2115,27 +2115,27 @@
       "title": "Genret",
       "subtitle": "",
       "chart": {
-        "title": "",
-        "valueLabel": "",
+        "title": "Toistokerrat tyylilajin mukaan",
+        "valueLabel": "Toistoja",
         "ariaLabel": "",
-        "itemCount_one": "",
-        "itemCount_other": ""
+        "itemCount_one": "{{count}} nimike",
+        "itemCount_other": "{{count}} nimekettä"
       },
       "table": {
-        "title": "",
+        "title": "Tyylilajien jakautuminen",
         "columns": {
-          "genre": "",
-          "plays": "",
-          "watchTime": ""
+          "genre": "Tyylilaji",
+          "plays": "Toistoja",
+          "watchTime": "Katseluaika"
         },
-        "browseMovies": "",
-        "browseShows": ""
+        "browseMovies": "Selaa elokuvia tyylilajissa {{genre}}",
+        "browseShows": "Selaa sarjoja tyylilajissa {{genre}}"
       },
       "empty": {
-        "title": "",
-        "description": ""
+        "title": "Tyylilajeja ei ole vielä tallennettu",
+        "description": "Tyylilajit tulevat mediapalvelimen metatietojen synkronoinnista. Tarkista uudelleen seuraavan synkronoinnin jälkeen."
       },
-      "loadError": ""
+      "loadError": "Tyylilajeja ei voitu ladata"
     },
     "detail": {
       "title": "Median tiedot",
@@ -2143,46 +2143,46 @@
         "ariaLabel": ""
       },
       "notFound": {
-        "title": "",
+        "title": "Mediaa ei löytynyt",
         "message": "",
-        "backLink": ""
+        "backLink": "Takaisin mediaan"
       },
       "hero": {
-        "loadError": "",
+        "loadError": "Nimikettä ei voitu ladata",
         "meta": {
-          "seasons_one": "",
-          "seasons_other": "",
-          "episodes_one": "",
-          "episodes_other": ""
+          "seasons_one": "{{count}} kausi",
+          "seasons_other": "{{count}} kautta",
+          "episodes_one": "{{count}} jakso",
+          "episodes_other": "{{count}} jaksoa"
         },
         "availability": {
-          "added": "",
-          "addedRemoved": "",
-          "replaced": ""
+          "added": "lisätty {{date}}",
+          "addedRemoved": "lisätty {{added}} – poistettu {{removed}}",
+          "replaced": "korvattu {{date}}"
         },
         "removedEverywhere": {
-          "caption": ""
+          "caption": "Ei enää käytettävissä millään liitetyllä palvelimella"
         },
         "actions": {
-          "fullHistory": "",
-          "openOnServer": ""
+          "fullHistory": "Koko historia",
+          "openOnServer": "Avaa palvelimella"
         }
       },
       "kpis": {
-        "ariaLabel": "",
-        "loadError": "",
+        "ariaLabel": "Toistotilastot",
+        "loadError": "Toistotilastoja ei voitu ladata",
         "completionLoadError": "",
         "plays": {
           "label": "",
           "caption": ""
         },
         "watchTime": {
-          "label": "",
+          "label": "Katseluaika",
           "detail": ""
         },
         "viewers": {
-          "label": "",
-          "detail": ""
+          "label": "Katsojat",
+          "detail": "kaikkien palvelimien välillä"
         },
         "completion": {
           "label": "",
@@ -2191,62 +2191,62 @@
         }
       },
       "watchers": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "lastWatchedAgo": "",
-        "completionLabel": "",
+        "title": "Katsojat",
+        "loadError": "Katsojia ei voitu ladata",
+        "empty": "Kukaan ei ole vielä katsonut tätä.",
+        "lastWatchedAgo": "{{age}} sitten",
+        "completionLabel": "{{percent}}% valmiina",
         "columns": {
-          "plays": "",
-          "episodes": "",
+          "plays": "Toistot",
+          "episodes": "Jaksot",
           "completion": "",
-          "lastWatched": ""
+          "lastWatched": "Viimeksi katsottu"
         }
       },
       "seasons": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "title": "Kaudet",
+        "loadError": "Kausitietoja ei voitu ladata",
+        "empty": "Ei vielä kausitietoja",
+        "watchedPct": "{{percent}}% katsottu",
+        "stripSummary": "{{season}}: {{percent}}% katsottu",
         "episodeLabel": {
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "watched": "{{code}}: katsottu",
+          "partial": "{{code}}: osittain katsottu",
+          "unwatched": "{{code}}: katsomatta"
         },
-        "episodeCount_one": "",
-        "episodeCount_other": ""
+        "episodeCount_one": "{{count}} jakso",
+        "episodeCount_other": "{{count}} jaksoa"
       },
       "platforms": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "unknown": "",
+        "title": "Alustat",
+        "loadError": "Alustan erittelyä ei voitu ladata",
+        "empty": "Ei vielä alustatietoja",
+        "unknown": "Tuntematon",
         "columns": {
-          "plays": "",
-          "watchTime": ""
+          "plays": "Toistot",
+          "watchTime": "Katseluaika"
         }
       },
       "history": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "watched": "",
-        "notWatched": "",
+        "title": "Historia",
+        "loadError": "Historiatietoja ei voitu ladata",
+        "empty": "Ei vielä tallennettuja toistoja",
+        "watched": "Katsottu",
+        "notWatched": "Keskeneräinen",
         "columns": {
-          "duration": ""
+          "duration": "Kesto"
         }
       },
       "copies": {
-        "title": "",
-        "loadError": "",
-        "unknownLibrary": "",
+        "title": "Kopiot",
+        "loadError": "Kopioiden lataaminen epäonnistui",
+        "unknownLibrary": "Tuntematon kirjasto",
         "columns": {
-          "library": "",
-          "episodes": "",
-          "added": ""
+          "library": "Kirjasto",
+          "episodes": "Jaksot",
+          "added": "Lisätty"
         },
-        "versionLabel": ""
+        "versionLabel": "Tiedosto {{index}}"
       }
     },
     "posterCard": {
@@ -2256,16 +2256,16 @@
       "watchedState": {
         "watched": "Katsottu",
         "partial": "Osittain katsottu",
-        "watchedByOthers": "",
-        "watchedByYou": ""
+        "watchedByOthers": "Muiden katselemat",
+        "watchedByYou": "Sinä katselit"
       },
       "tileLabel": {
         "added": "lisätty",
         "plays": "toistot",
         "viewers": "katsojat",
-        "resolution": ""
+        "resolution": "resoluutio"
       },
-      "rankChip": "",
+      "rankChip": "#{{rank}}",
       "versionsChip": "",
       "moreServers": "",
       "viewers_one": "{{count}} katsoja",
@@ -2299,66 +2299,66 @@
         "videoCodecLabel": "",
         "videoCodecAll": "",
         "hdrLabel": "",
-        "hdrAll": "",
-        "hdrOnly": "",
-        "hdrChip": "",
-        "audioCodecLabel": "",
-        "audioCodecAll": "",
-        "audioChannelsLabel": "",
-        "audioChannelsAll": "",
-        "atmosLabel": "",
-        "atmosAll": "",
-        "atmosOnly": "",
-        "atmosChip": "",
-        "genreLabel": "",
-        "genreAll": "",
-        "serverLabel": "",
-        "serverAll": "",
-        "libraryLabel": "",
-        "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
-        "sizeGbMinLabel": "",
-        "sizeGbMaxLabel": "",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "hdrAll": "Mikä tahansa",
+        "hdrOnly": "Vain HDR",
+        "hdrChip": "HDR",
+        "audioCodecLabel": "Äänikoodekki",
+        "audioCodecAll": "Mikä tahansa äänikoodekki",
+        "audioChannelsLabel": "Äänikanavat",
+        "audioChannelsAll": "Mikä tahansa kanavien asettelu",
+        "atmosLabel": "Ääni",
+        "atmosAll": "Mikä tahansa",
+        "atmosOnly": "Vain Dolby Atmos",
+        "atmosChip": "Atmos",
+        "genreLabel": "Tyylilaji",
+        "genreAll": "Mikä tahansa tyylilaji",
+        "serverLabel": "Palvelin",
+        "serverAll": "Mikä tahansa palvelin",
+        "libraryLabel": "Kirjasto",
+        "libraryAll": "Mikä tahansa kirjasto",
+        "yearFromLabel": "Vuodesta",
+        "yearToLabel": "Vuoteen",
+        "sizeGbMinLabel": "Minimikoko (GB)",
+        "sizeGbMaxLabel": "Maksimikoko (GB)",
+        "sizeChipAtLeast": "≥ {{min}} Gt",
+        "sizeChipAtMost": "≤ {{max}} Gt",
+        "sizeChipRange": "{{min}}–{{max}} GB",
+        "sortLabel": "Järjestä",
         "sort": {
-          "title": "",
-          "added": "",
-          "year": "",
-          "plays": "",
-          "watch_time": "",
-          "viewers": ""
+          "title": "Nimike A–Ö",
+          "added": "Hiljattain lisätty",
+          "year": "Vuosi",
+          "plays": "Toistot",
+          "watch_time": "Katseluaika",
+          "viewers": "Katsojat"
         },
-        "count": "",
-        "countTotal_one": "",
-        "countTotal_other": ""
+        "count": "{{loaded}} / {{total}} nimikkeestä · {{size}}",
+        "countTotal_one": "{{count}} nimike · {{size}}",
+        "countTotal_other": "{{count}} nimikettä · {{size}}"
       },
       "scrubber": {
-        "label": "",
-        "current": ""
+        "label": "Siirry kirjaimeen",
+        "current": "Kirjain{{letter}}"
       },
-      "loaderError": "",
-      "retry": "",
-      "clearJumpAction": "",
-      "showingFrom": "",
-      "showAll": "",
-      "emptyFilter": "",
+      "loaderError": "Uusia nimikkeitä ei voitu ladata",
+      "retry": "Yritä uudelleen",
+      "clearJumpAction": "Tyhjennä",
+      "showingFrom": "Näytetään kirjaimesta {{letter}}",
+      "showAll": "Näytä kaikki",
+      "emptyFilter": "Näitä suodattimia vastaavia nimikkeitä ei löytynyt",
       "emptySearch": "",
       "emptyAnchored": "",
-      "loadError": ""
+      "loadError": "Katalogia ei voitu ladata"
     }
   },
   "requests": {
     "status": {
-      "pending": "",
-      "approved": "",
-      "declined": "",
-      "failed": "",
-      "completed": "",
-      "deleted": ""
+      "pending": "Vireillä",
+      "approved": "Hyväksytty",
+      "declined": "Hylätty",
+      "failed": "Epäonnistunut",
+      "completed": "Saatavilla",
+      "deleted": "Poistettu"
     },
     "columns": {
       "requester": "",
