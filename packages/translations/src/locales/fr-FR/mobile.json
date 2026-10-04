@@ -176,7 +176,14 @@
   "unauthenticated": {
     "connectionLost": "Connexion perdue",
     "accessRevoked": "Votre accès à {{serverName}} a été révoqué. Demandez un nouveau code d'appairage au propriétaire du serveur.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "Scanner le code QR"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "Serveurs",
