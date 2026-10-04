@@ -176,7 +176,14 @@
   "unauthenticated": {
     "connectionLost": "Verbindung abgebrochen",
     "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Kopplungscode.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "QR-Code scannen"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "Server",
