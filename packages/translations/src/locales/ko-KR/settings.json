@@ -270,7 +270,7 @@
     "expiresIn": "만료까지 {{time}}",
     "oneTimePairToken": "일회용 페어링 토큰",
     "copyToken": "토큰 복사",
-    "tokenExpiryNote": "이 토큰은 5분 후 만료되며 한 번만 사용할 수 있습니다.",
+    "tokenExpiryNote": "",
     "done": "완료",
     "disableMobileAccessConfirm": "모든 모바일 기기의 연결이 끊기고 모든 세션이 취소됩니다. 나중에 모바일 접근을 다시 활성화할 수 있습니다.",
     "disable": "비활성화",
