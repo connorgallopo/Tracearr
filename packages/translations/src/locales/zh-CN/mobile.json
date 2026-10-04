@@ -171,7 +171,14 @@
   "unauthenticated": {
     "connectionLost": "连接丢失",
     "accessRevoked": "您对 {{serverName}} 的访问权限已被撤销。请向服务器所有者索取新的配对码。",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "扫描二维码"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "服务器",
