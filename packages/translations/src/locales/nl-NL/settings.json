@@ -271,7 +271,7 @@
     "expiresIn": "Verloopt in {{time}}",
     "oneTimePairToken": "Eenmalige koppeltoken",
     "copyToken": "Kopieer token",
-    "tokenExpiryNote": "Deze token verloopt in 5 minuten en kan slechts één keer worden gebruikt.",
+    "tokenExpiryNote": "",
     "done": "Voltooid",
     "disableMobileAccessConfirm": "Dit zal alle mobiele apparaten verbreken en alle sessies intrekken. U kunt de mobiele toegang later opnieuw instellen.",
     "disable": "Uitschakelen",
