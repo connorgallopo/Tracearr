@@ -186,7 +186,14 @@
   "unauthenticated": {
     "connectionLost": "Utracono połączenie",
     "accessRevoked": "Twój dostęp do {{serverName}} został cofnięty. Poproś właściciela serwera o nowy kod parowania.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "Zeskanuj kod QR"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "Serwery",
