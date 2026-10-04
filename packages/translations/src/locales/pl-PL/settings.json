@@ -273,7 +273,7 @@
     "expiresIn": "Wygasa za {{time}}",
     "oneTimePairToken": "Jednorazowy token parowania",
     "copyToken": "Kopiuj token",
-    "tokenExpiryNote": "Ten token wygasa za 5 minut i może być użyty tylko raz.",
+    "tokenExpiryNote": "",
     "done": "Gotowe",
     "disableMobileAccessConfirm": "Spowoduje to rozłączenie wszystkich urządzeń mobilnych i unieważnienie wszystkich sesji. Możesz ponownie włączyć dostęp mobilny później.",
     "disable": "Wyłącz",
