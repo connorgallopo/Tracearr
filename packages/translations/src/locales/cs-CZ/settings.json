@@ -273,7 +273,7 @@
     "expiresIn": "Vyprší za {{time}}",
     "oneTimePairToken": "Jednorázový párovací token",
     "copyToken": "Kopírovat token",
-    "tokenExpiryNote": "Tento token vyprší za 5 minut a může být použit pouze jednou.",
+    "tokenExpiryNote": "",
     "done": "Hotovo",
     "disableMobileAccessConfirm": "Toto odpojí všechna mobilní zařízení a zruší všechny relace. Mobilní přístup můžete znovu aktivovat později.",
     "disable": "Zakázat",
