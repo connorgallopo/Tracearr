@@ -271,7 +271,7 @@
     "expiresIn": "Scade in {{time}}",
     "oneTimePairToken": "Token Di Accoppiamento Monouso",
     "copyToken": "Copia token",
-    "tokenExpiryNote": "Questo token scade in 5 minuti e può essere utilizzato solo una volta.",
+    "tokenExpiryNote": "",
     "done": "Fatto",
     "disableMobileAccessConfirm": "Questo disconnette tutti i dispositivi mobili e revocerà tutte le sessioni. È possibile riattivare l'accesso mobile in un secondo momento.",
     "disable": "Disabilita",
