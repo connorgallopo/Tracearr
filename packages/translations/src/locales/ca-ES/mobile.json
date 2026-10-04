@@ -176,7 +176,14 @@
   "unauthenticated": {
     "connectionLost": "S'ha perdut la connexió",
     "accessRevoked": "S'ha revocat el vostre accés a {{serverName}}. Demaneu un codi d'aparellament nou al propietari del servidor.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": "Escaneja el codi QR"
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "Servidors",
