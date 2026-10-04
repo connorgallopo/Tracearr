@@ -270,7 +270,7 @@
     "expiresIn": "{{time}} で期限切れ",
     "oneTimePairToken": "ワンタイムペアトークン",
     "copyToken": "トークンをコピー",
-    "tokenExpiryNote": "このトークンは5分後に有効期限が切れ、一度だけ使用できます。",
+    "tokenExpiryNote": "",
     "done": "完了",
     "disableMobileAccessConfirm": "これにより、すべてのモバイルデバイスが切断され、すべてのセッションが取り消されます。あとでモバイルアクセスを再度有効にすることができます。",
     "disable": "無効",
