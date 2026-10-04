@@ -273,7 +273,7 @@
     "expiresIn": "Expires in {{time}}",
     "oneTimePairToken": "One-Time Pair Token",
     "copyToken": "Copy token",
-    "tokenExpiryNote": "This token expires in 5 minutes and can only be used once.",
+    "tokenExpiryNote": "This token expires in 15 minutes and can only be used once.",
     "done": "Done",
     "disableMobileAccessConfirm": "This will disconnect all mobile devices and revoke all sessions. You can re-enable mobile access later.",
     "disable": "Disable",
