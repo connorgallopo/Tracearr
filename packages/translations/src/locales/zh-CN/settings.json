@@ -270,7 +270,7 @@
     "expiresIn": "过期时间{{time}}",
     "oneTimePairToken": "一次性配对令牌",
     "copyToken": "复制令牌",
-    "tokenExpiryNote": "此令牌在5分钟后过期，只能使用一次。",
+    "tokenExpiryNote": "",
     "done": "完成",
     "disableMobileAccessConfirm": "这将断开所有移动设备并撤销所有会话。您可以稍后重新启用移动访问。",
     "disable": "禁用",
