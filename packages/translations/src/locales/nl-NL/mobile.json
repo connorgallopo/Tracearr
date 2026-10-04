@@ -176,7 +176,14 @@
   "unauthenticated": {
     "connectionLost": "Verbinding Verbroken",
     "accessRevoked": "Je toegang tot {{serverName}} is ingetrokken. Vraag de servereigenaar om een nieuwe koppelcode.",
+    "deviceRemoved": "",
+    "expired": "",
     "scanQrCode": ""
+  },
+  "clientTooOld": {
+    "title": "",
+    "body": "",
+    "update": ""
   },
   "serverSelector": {
     "servers": "",
