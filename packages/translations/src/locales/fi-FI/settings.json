@@ -580,7 +580,7 @@
     "nextRun": "Seuraava ajo {{when}}",
     "noNextRun": "Ei ajastettu",
     "neverSent": "Ei koskaan lähetetty",
-    "lastSend": "",
+    "lastSend": "Lopputulos {{outcome}} - {{count}}",
     "outcome": {
       "rendering": "Renderöinti",
       "sending": "Lähetetään",
@@ -621,7 +621,7 @@
       "name": "Nimi",
       "nameHelp": "Vain sinä näet tämän. Se nimeää uutiskirjeen tässä luettelossa ja lähetettyjen historiassa.",
       "turnOnNow": "Ota käyttöön nyt",
-      "enabledHelp": "",
+      "enabledHelp": "Tämän ollessa päällä, seuraava ajastettu ajo lähettää sähköpostia kaikille Vastaanottajat-listan jäsenille. Pois päältä tarkoittaa, että ajastettua tehtävää ei suoriteta; \"Lähetä nyt\" toimii silti.",
       "schedule": "Aikataulu",
       "scheduleKind": "Toistuvat",
       "kinds": {
@@ -638,7 +638,7 @@
       "timezoneHelp": "Asettaa lähetysajan ja päivämäärän, joka on asetettu aiheeseen ja sähköpostiin.",
       "cron": "Lauseke",
       "cronHint": "Viisi kenttää: minuutti, tunti, kuukauden päivä, kuukausi, viikonpäivä.",
-      "dstNote": "",
+      "dstNote": "Aika kesäajan siirtymän aikana juoksee, kunnes kello saavuttaa seuraavan kelvollisen minuutin.",
       "nextRun": "Seuraava ajo {{when}} ({{timezone}})",
       "nextRunPending": "Seuraava ajo asetetaan, kun tallennat.",
       "content": "Sisältö",
@@ -648,8 +648,8 @@
         "fixed": "Kiinteä määrä päiviä"
       },
       "windowHelp": {
-        "since_last_send": "",
-        "fixed": ""
+        "since_last_send": "Jatkaa siitä, mihin aikaisempi sähköposti päättyi, joten mitään ei listata kahteen kertaan. Testilähetys tai ylihypätty viikko ei siirrä merkintää, joten mitään ei menetetä. \"Lähetä nyt\" siirtää.",
+        "fixed": "Tarkastelee aina saman määrän päiviä taaksepäin, kun ajo suoritetaan, joten sinä aikana kahteen kertaan lisätty nimike listataan kaksi kertaa."
       },
       "windowSentence": {
         "fallback": "Ensimmäinen sähköposti katsoo taaksepäin",
@@ -666,7 +666,7 @@
       "allServers": "Kaikki palvelimet",
       "searchServers": "Etsi palvelimia",
       "noServers": "Yksikään palvelin ei täsmää",
-      "variantsNote": "",
+      "variantsNote": "Tämä poimii sekä nimikkeet, että henkilöt: vain näillä palvelimilla tilin omaavat jäsenet saavat uutiskirjeen. Usealla palvelimella olevat saavat vain yhden sähköpostin, joka kattaa kaiken.",
       "serversHelp": "Vain jäsenet, joilla on tili tällä palvelimella, saavat sen.",
       "libraries": "Kirjastot",
       "allLibraries": "Kaikki kirjastot",
@@ -682,7 +682,7 @@
         "music": "Musiikki",
         "mostWatched": "Katsotuimmat",
         "legend": "Osiot",
-        "description": "",
+        "description": "Sähköposti listaa, mitä lisättiin aikaikkunassa näihin rajoihin asti. Kaikki rajan ylittävät ja trimmatut (pysymään alle 102 KB kokoisena, johon Gmail leikkaa sen) muuntuvat \"+N more\" -riviksi.",
         "upTo": "enintään",
         "the": "tietty",
         "units": {
@@ -731,8 +731,8 @@
       "recipients": {
         "title": "Vastaanottajat",
         "members": "Kaikki valituilla palvelimilla",
-        "membersHelp": "",
-        "ownerNote": "",
+        "membersHelp": "Kaikki, jotka on jaettu {{servers}} on jo mukana. Jokainen henkilö saa viestin yhteyssähköpostiinsa, mikäli olet asettanut sellaisen, muuten viesti menee heidän Tracearr- tai media-palvelin tilillään olevaan osoitteeseen. Jokainen saa oman kopionsa ja näkee vain oman osoitteensa.",
+        "ownerNote": "Jos sinulla on tili jollakin näistä palvelimista, jotka olet mukana. Avaa \"Hallitse vastaanottajia\" sulkeaksesi itsesi pois.",
         "extraTrigger": "Lisää käyttäjiä, joilla ei ole tiliä ({{count}})",
         "extraHelp": "Jollekin, joka ei ole palvelimillasi. Jokainen, jolle jaettu valituilla palvelimilla on jo yllä olevassa luettelossa.",
         "pasteAddresses": "Liitä osoitteita, yksi riviä kohti tai erotettuna pilkulla",
@@ -763,8 +763,8 @@
         "excludeSelected": "Rajaa valitut ulos",
         "includeSelected": "Sisällytä valitut",
         "noMatches": "Kukaan tässä ei täsmää hakuun.",
-        "groupsNote": "",
-        "noAddressHelp": "",
+        "groupsNote": "Henkilöt eri palvelimilla saavat eri sähköpostit. Jokainen ryhmä alla näkee vain mitä lisättiin nimetyille palvelimille.",
+        "noAddressHelp": "Näille henkilöille ei löytynyt mitään: ei yhteyssähköpostia, ei Tracearr-sähköpostia, eikä mitään heidän mediapalvelintileiltään. Jellyfin ja Emby eivät koskaan lähetä sellaista, joten niiden tilit lasketaan vain, kun käyttäjätunnus on sähköpostiosoite. Lisää yhteystieto tähän ja se tallentuu heti.",
         "contactEmailFor": "Sähköpostiosoite käyttäjälle {{name}}",
         "saveEmail": "Tallenna sähköpostiosoite käyttäjälle {{name}}",
         "openUserPage": "Avaa jäsenen {{name}} sivu",
@@ -795,13 +795,13 @@
         "joinedSinceLastSend_other": "{{count}} liittyi edellisen lähetyksen jälkeen",
         "selectedCount_one": "{{count}} valittu",
         "selectedCount_other": "{{count}} valittu",
-        "notIncludableHelp_one": "",
-        "notIncludableHelp_other": ""
+        "notIncludableHelp_one": "{{count}} lisää ei voida sisällyttää mukaan, koska ne ovat käyttökiellossa, odottavia tai eivät ole valitulla palvelimella.",
+        "notIncludableHelp_other": "{{count}} lisää ei voida sisällyttää mukaan, koska ne ovat käyttökiellossa, odottavia tai eivät ole valitulla palvelimella."
       },
       "delivery": {
         "title": "Toimitus",
         "destination": "Sähköpostikohde",
-        "destinationHelp": "",
+        "destinationHelp": "SMTP-tili, jonka kautta tämä lähetetään läpi. Se ei päätä, kuka vastaanottaa sen.",
         "pickDestination": "Valitse kohde",
         "noDestination": "Ei mitään",
         "imageMode": "Julisteet",
@@ -811,18 +811,18 @@
           "none": "Ei julisteita"
         },
         "modeHelp": {
-          "hosted": "",
-          "inline": "",
+          "hosted": "Ladattu tästä Tracearrista ulkoisen URL-osoitteen kautta; URL-osoitteen täytyy olla saavutettavista julkisesta verkosta ja jokaisen vastaanottajan sähköpostitarjoajan täytyy nähdä se.",
+          "inline": "Liitettynä sähköpostiin. Kaikki asiakasohjelmat näyttävät sen ja sähköposti on suurempi, joten kokorajoitus leikkaa lisää nimikkeitä pois.",
           "none": "Kortit renderöidään ilman julisteita."
         },
-        "modePreviewHint": "",
-        "hostedNeedsUrl": "",
+        "modePreviewHint": "Esikatselu renderöi nykyisen valinnan; aseta sen \"Kuvat\"-valinta asentoon \"Estä\" nähdäksesi sähköposti ilman ulkoisilla palvelimilla olevia kuvia.",
+        "hostedNeedsUrl": "Mitään ulkoista URL-osoitetta ei ole asetettu. Ulkoistetut julisteet tarvitsevat sellaisen, ennen kuin tämä voidaan tallentaa: aseta se \"Käyttöoikeudet -> Etäkäyttö\" tai valitse \"Liitetty\".",
         "skipWhenEmpty": "Ohita, kun ei ole lisätty mitään",
-        "skipWhenEmptyHelp": ""
+        "skipWhenEmptyHelp": "Ei uutta tarkoittaa ei lähetettyä sähköpostia. Uutiskirjeissä, jotka kattavat useita palvelimia tämä on ryhmäkohtainen: henkilöt, joiden palvelimet eivät lisänneet mitäät eivät saa mitään. Loput saavat silti omansa. Testilähetys renderöi joka kerta."
       },
       "links": {
         "tracearr": "Linkitä nimikkeet Tracearriin",
-        "tracearrNote": ""
+        "tracearrNote": "Tracearr UI on tällä hetkellä vain ylläpitäjille, joten jäsenet päätyvät kirjautumissivulle; media-palvelimen linkki pysyy joka tapauksessa."
       },
       "readiness": {
         "title": "Ennen lähettämistä",
