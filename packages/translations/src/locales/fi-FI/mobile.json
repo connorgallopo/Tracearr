@@ -175,7 +175,7 @@
   },
   "unauthenticated": {
     "connectionLost": "Yhteys katkesi",
-    "accessRevoked": "Sinun käyttöoikeutesi {{serverName}} on kumottu. Kysy palvelimen omistajalta uutta parikoodia.",
+    "accessRevoked": "Käyttöoikeutesi palvelimella {{serverName}} on kumottu. Parita se uudelleen verkkosovelluksesta saatavalla uudella koodilla.",
     "deviceRemoved": "Tämä laite poistettiin palvelimelta {{serverName}}. Parita se uudelleen verkkosovelluksesta saatavalla uudella koodilla.",
     "expired": "Palvelin {{serverName}} kirjasi tämän laitteen ulos 30 päivän käyttämättömyyden jälkeen. Parita se uudelleen verkkosovelluksesta saatavalla uudella koodilla.",
     "scanQrCode": "Skannaa QR-koodi"
