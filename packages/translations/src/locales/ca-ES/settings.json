@@ -271,7 +271,7 @@
     "expiresIn": "Caduca d'aquí a {{time}}",
     "oneTimePairToken": "Testimoni d'aparellament d'un sol ús",
     "copyToken": "Copia el testimoni",
-    "tokenExpiryNote": "",
+    "tokenExpiryNote": "Aquest testimoni caduca en 15 minuts i només es pot fer servir una vegada.",
     "done": "Fet",
     "disableMobileAccessConfirm": "Això desconnectarà tots els dispositius mòbils i revocarà totes les sessions. Podeu tornar a habilitar l'accés mòbil més endavant.",
     "disable": "Deshabilita",
