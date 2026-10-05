@@ -182,7 +182,7 @@
   },
   "clientTooOld": {
     "title": "Päivitä Tracearr",
-    "body": "Palvelin {{serverName}} tarvitsee uudemman Tracearr-version",
+    "body": "Palvelin {{serverName}} tarvitsee uudemman Tracearr-version.",
     "update": "Päivitä"
   },
   "serverSelector": {
