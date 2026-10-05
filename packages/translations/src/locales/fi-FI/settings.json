@@ -271,7 +271,7 @@
     "expiresIn": "Vanhenee {{time}}",
     "oneTimePairToken": "Kertakäyttöinen paritustunnus",
     "copyToken": "Kopioi tunnus",
-    "tokenExpiryNote": "",
+    "tokenExpiryNote": "Tämä tunnus vanhenee 15 minuutissa ja sitä voidaan käyttää vain kerran.",
     "done": "Valmis",
     "disableMobileAccessConfirm": "Tämä poistaa yhteyden kaikista mobiililaitteista ja peruuttaa kaikki istunnot. Voit ottaa mobiiliyhteyden käyttöön myöhemmin.",
     "disable": "Poista Käytöstä",
