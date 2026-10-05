@@ -175,15 +175,15 @@
   },
   "unauthenticated": {
     "connectionLost": "S'ha perdut la connexió",
-    "accessRevoked": "S'ha revocat el vostre accés a {{serverName}}. Demaneu un codi d'aparellament nou al propietari del servidor.",
-    "deviceRemoved": "",
-    "expired": "",
+    "accessRevoked": "{{serverName}} ja no accepta aquest dispositiu. Torneu-lo a aparellar amb un codi nou des de l'aplicació web.",
+    "deviceRemoved": "Aquest dispositiu s'ha eliminat de {{serverName}}. Torneu-lo a aparellar amb un codi nou des de l'aplicació web.",
+    "expired": "{{serverName}} ha tancat la sessió d'aquest dispositiu després de 30 dies sense ús. Torneu-lo a aparellar amb un codi nou des de l'aplicació web.",
     "scanQrCode": "Escaneja el codi QR"
   },
   "clientTooOld": {
-    "title": "",
-    "body": "",
-    "update": ""
+    "title": "Actualitza Tracearr",
+    "body": "{{serverName}} necessita una versió més recent de l'aplicació Tracearr.",
+    "update": "Actualitza"
   },
   "serverSelector": {
     "servers": "Servidors",
