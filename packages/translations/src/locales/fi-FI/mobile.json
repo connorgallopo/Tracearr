@@ -176,14 +176,14 @@
   "unauthenticated": {
     "connectionLost": "Yhteys katkesi",
     "accessRevoked": "Sinun käyttöoikeutesi {{serverName}} on kumottu. Kysy palvelimen omistajalta uutta parikoodia.",
-    "deviceRemoved": "",
-    "expired": "",
+    "deviceRemoved": "Tämä laite poistettiin palvelimelta {{serverName}}. Parita se uudelleen verkkosovelluksesta saatavalla uudella koodilla.",
+    "expired": "Palvelin {{serverName}} kirjasi tämän laitteen ulos 30 päivän käyttämättömyyden jälkeen. Parita se uudelleen verkkosovelluksesta saatavalla uudella koodilla.",
     "scanQrCode": "Skannaa QR-koodi"
   },
   "clientTooOld": {
-    "title": "",
-    "body": "",
-    "update": ""
+    "title": "Päivitä Tracearr",
+    "body": "Palvelin {{serverName}} tarvitsee uudemman Tracearr-version",
+    "update": "Päivitä"
   },
   "serverSelector": {
     "servers": "Palvelimet",
