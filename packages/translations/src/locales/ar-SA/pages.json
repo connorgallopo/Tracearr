@@ -2126,7 +2126,6 @@
     "backToSettings": "العودة إلى الإعدادات",
     "apiKeyAutoLoaded": "مفتاح API التحميل التلقائي",
     "noApiKey": "لم يتم إنشاء مفتاح API - إنشاء واحد في الإعدادات لاختبار نقاط النهاية",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
