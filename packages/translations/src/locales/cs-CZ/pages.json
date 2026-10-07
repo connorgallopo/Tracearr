@@ -2064,7 +2064,6 @@
     "backToSettings": "Zpět do nastavení",
     "apiKeyAutoLoaded": "Automaticky načtený klíč API",
     "noApiKey": "Nebyl vygenerován žádný API klíč - vytvořte jej v nastavení pro testování koncových bodů",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
