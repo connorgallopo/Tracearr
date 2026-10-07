@@ -2064,7 +2064,6 @@
     "backToSettings": "Повернутися до налаштувань",
     "apiKeyAutoLoaded": "API ключ автоматично завантажено",
     "noApiKey": "Немає згенерованого ключа API - створіть його в налаштуваннях для тестування кінцевих точок",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
