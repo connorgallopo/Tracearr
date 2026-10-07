@@ -1992,9 +1992,8 @@
     "backToSettings": "Back to Settings",
     "apiKeyAutoLoaded": "API key auto-loaded",
     "noApiKey": "No API key generated - create one in Settings to test endpoints",
-    "versionSwitcherLabel": "API documentation version",
-    "versionV1": "API v1",
-    "versionV2": "API v2",
+    "versionV1": "v1",
+    "versionV2": "v2 (current)",
     "specLoadError": "Failed to load the API specification. Check your API key and try again."
   },
   "debug": {
