@@ -1971,7 +1971,6 @@
     "backToSettings": "設定に戻る",
     "apiKeyAutoLoaded": "APIキーが自動的に読み込まれました",
     "noApiKey": "APIキーが生成されていません - エンドポイントをテストするための設定を作成します",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
