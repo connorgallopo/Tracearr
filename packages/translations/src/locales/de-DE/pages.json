@@ -2002,7 +2002,6 @@
     "backToSettings": "Zurück zu den Einstellungen",
     "apiKeyAutoLoaded": "API-Schlüssel automatisch geladen",
     "noApiKey": "Kein API-Schlüssel generiert - Erstellen Sie einen in den Einstellungen um Endpunkte zu testen",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
