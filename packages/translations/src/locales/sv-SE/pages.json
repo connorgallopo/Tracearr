@@ -2002,7 +2002,6 @@
     "backToSettings": "Tillbaka till inställningar",
     "apiKeyAutoLoaded": "API-nyckel auto-laddad",
     "noApiKey": "Ingen API-nyckel genererad - skapa en i Inställningar för att testa slutpunkter",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
