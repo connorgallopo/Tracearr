@@ -2002,8 +2002,8 @@
     "backToSettings": "Torna a la configuració",
     "apiKeyAutoLoaded": "Clau d'API carregada automàticament",
     "noApiKey": "No s'ha generat cap clau d'API: creeu-ne una a Configuració per provar els punts finals",
-    "versionV1": "",
-    "versionV2": "",
+    "versionV1": "v1",
+    "versionV2": "v2 (actual)",
     "specLoadError": "No s'ha pogut carregar l'especificació de l'API. Comproveu la clau d'API i torneu-ho a provar."
   },
   "debug": {
