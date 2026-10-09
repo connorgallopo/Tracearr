@@ -2,8 +2,8 @@ apiVersion: v2
 name: tracearr
 description: Media server monitoring for Plex, Jellyfin, and Emby
 type: application
-version: 2.7.0
-appVersion: "2.7.0"
+version: 2.7.1
+appVersion: "2.7.1"
 home: https://github.com/connorgallopo/Tracearr
 sources:
   - https://github.com/connorgallopo/Tracearr
