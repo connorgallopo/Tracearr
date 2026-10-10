@@ -2064,9 +2064,8 @@
     "backToSettings": "Powrót do ustawień",
     "apiKeyAutoLoaded": "Klucz API automatycznie załadowany",
     "noApiKey": "Nie wygenerowano klucza API – utwórz go w Ustawieniach, aby testować endpointy",
-    "versionSwitcherLabel": "Wersja dokumentacji API",
-    "versionV1": "API v1",
-    "versionV2": "API v2",
+    "versionV1": "v1",
+    "versionV2": "v2 (aktualna)",
     "specLoadError": "Nie udało się załadować specyfikacji API. Sprawdź swój klucz API i spróbuj ponownie."
   },
   "debug": {

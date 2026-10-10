@@ -1971,7 +1971,6 @@
     "backToSettings": "返回设置",
     "apiKeyAutoLoaded": "API 密钥自动加载",
     "noApiKey": "没有生成 API 密钥 - 在设置中创建一个测试端点",
-    "versionSwitcherLabel": "API 文档版本",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": "无法加载 API 规格。请检查您的 API 密钥然后重试。"

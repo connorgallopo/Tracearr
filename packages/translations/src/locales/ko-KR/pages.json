@@ -1971,9 +1971,8 @@
     "backToSettings": "설정으로 돌아가기",
     "apiKeyAutoLoaded": "API 키가 자동으로 불러와졌습니다",
     "noApiKey": "생성된 API 키가 없습니다. 엔드포인트를 테스트하려면 설정에서 키를 만드세요",
-    "versionSwitcherLabel": "API 문서 버전",
-    "versionV1": "API v1",
-    "versionV2": "API v2",
+    "versionV1": "",
+    "versionV2": "",
     "specLoadError": "API 사양을 불러오지 못했습니다. API 키를 확인하고 다시 시도하세요."
   },
   "debug": {

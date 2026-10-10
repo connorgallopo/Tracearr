@@ -2002,7 +2002,6 @@
     "backToSettings": "Tilbage til Indstillinger",
     "apiKeyAutoLoaded": "API-nøgle auto-indlæst",
     "noApiKey": "Ingen API-nøgle genereret - opret en i Indstillinger for at teste endepunkter",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""

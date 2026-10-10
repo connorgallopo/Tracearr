@@ -2002,7 +2002,6 @@
     "backToSettings": "Volver a Ajustes",
     "apiKeyAutoLoaded": "Clave de API autocargada",
     "noApiKey": "Ninguna clave API generada - cree una en Ajustes para probar los extremos",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""

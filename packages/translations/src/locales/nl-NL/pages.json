@@ -2002,7 +2002,6 @@
     "backToSettings": "Terug naar Instellingen",
     "apiKeyAutoLoaded": "API-sleutel automatisch geladen",
     "noApiKey": "Geen API-sleutel gegenereerd - maak er één in Instellingen om eindpunten te testen",
-    "versionSwitcherLabel": "API documentatieversie",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": "Het laden van de API specificatie is mislukt. Controleer de API sleutel en probeer het opnieuw."

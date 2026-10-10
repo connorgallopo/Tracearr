@@ -2002,7 +2002,6 @@
     "backToSettings": "Retour aux paramètres",
     "apiKeyAutoLoaded": "Clé API chargée automatiquement",
     "noApiKey": "Aucune clé API générée - créez une clé dans les paramètres pour tester les terminaux",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""

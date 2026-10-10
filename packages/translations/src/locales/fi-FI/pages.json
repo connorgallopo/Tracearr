@@ -2002,9 +2002,8 @@
     "backToSettings": "Takaisin asetuksiin",
     "apiKeyAutoLoaded": "API-avain ladattu automaattisesti",
     "noApiKey": "API-avainta ei luotu - luo se Asetuksissa päätepisteiden testaamiseksi",
-    "versionSwitcherLabel": "API-dokumentaation versio",
-    "versionV1": "API v1",
-    "versionV2": "API v2",
+    "versionV1": "",
+    "versionV2": "",
     "specLoadError": "API-määritystä ei voitu ladata. Tarkista API-avain ja yritä uudelleen."
   },
   "debug": {

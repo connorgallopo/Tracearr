@@ -2002,7 +2002,6 @@
     "backToSettings": "Voltar às Configurações",
     "apiKeyAutoLoaded": "Chave de API carregada automaticamente",
     "noApiKey": "Não há chave de API gerada - crie uma nas Configurações para testar os endpoints",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""

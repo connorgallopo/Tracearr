@@ -2064,7 +2064,6 @@
     "backToSettings": "Вернуться к настройкам",
     "apiKeyAutoLoaded": "API ключ автоматически загружен",
     "noApiKey": "Нет API ключа - создайте его в Настройках для тестирования конечных точек",
-    "versionSwitcherLabel": "",
     "versionV1": "",
     "versionV2": "",
     "specLoadError": ""
