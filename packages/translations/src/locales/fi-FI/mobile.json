@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "Erittäin vakavat rikkomukset silti ilmoitetaan hiljaisena aikana",
     "rateLimitDescription": "Rajoitukset estävät ilmoitustulvaa. Nykyiset rajat:  {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Lähetä testi-ilmoitus",
-    "testDescription": "Vahvista, että push-ilmoitukset toimivat oikein",
+    "testReach": "",
     "pushNotifications": "Push-ilmoitukset",
     "ruleTypes": {
       "accountInactivity": "Tilin passiivisuus",
@@ -102,7 +102,18 @@
     "severityAll": "Kaikki",
     "severityHighOnly": "Vain korkeat",
     "severityWarningUp": "Varoitus+",
-    "violationTypes": "Rikkomustyypit"
+    "violationTypes": "Rikkomustyypit",
+    "backgroundRefreshOff": "",
+    "permissionOff": "",
+    "openSettings": "",
+    "tokenMissing": "",
+    "destinationOff": "",
+    "everyViolationSent": "",
+    "noViolationSender": "",
+    "noAutomationSends": "",
+    "eventsFooter": "",
+    "sentByAutomations_one": "",
+    "sentByAutomations_other": ""
   },
   "session": {
     "streamTerminated": "Striimi lopetettu",
