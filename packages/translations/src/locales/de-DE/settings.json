@@ -98,7 +98,7 @@
     "regenerateApiKeyDesc": "Dies wird Ihren aktuellen API-Schlüssel ungültig machen. Jede Integration, die den alten Schlüssel verwendet, wird nicht mehr funktionieren.",
     "publicApiSettings": "",
     "publicApiSettingsDesc": "",
-    "watchedThresholdMovie": "",
+    "watchedThresholdMovie": "Schwellwert für Film gesehen",
     "watchedThresholdMovieDesc": "",
     "watchedThresholdTv": "",
     "watchedThresholdTvDesc": "",
