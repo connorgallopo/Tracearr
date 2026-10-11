@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "Les violations de gravité élevée continuent de déclencher des notifications pendant les heures silencieuses",
     "rateLimitDescription": "Les limites de débit empêchent le spam de notifications. Limites actuelles : {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Envoyer une notification de test",
-    "testDescription": "Vérifier que les notifications push fonctionnent correctement",
+    "testReach": "",
     "pushNotifications": "",
     "ruleTypes": {
       "accountInactivity": "",
@@ -102,7 +102,18 @@
     "severityAll": "",
     "severityHighOnly": "",
     "severityWarningUp": "",
-    "violationTypes": ""
+    "violationTypes": "",
+    "backgroundRefreshOff": "",
+    "permissionOff": "",
+    "openSettings": "",
+    "tokenMissing": "",
+    "destinationOff": "",
+    "everyViolationSent": "",
+    "noViolationSender": "",
+    "noAutomationSends": "",
+    "eventsFooter": "",
+    "sentByAutomations_one": "",
+    "sentByAutomations_other": ""
   },
   "session": {
     "streamTerminated": "Lecture interrompue",
