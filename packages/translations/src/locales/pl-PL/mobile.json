@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "Naruszenia o wysokim poziomie ważności nadal wysyłają powiadomienia w godzinach ciszy",
     "rateLimitDescription": "Limity częstotliwości zapobiegają spamowi powiadomień. Obecne limity: {{perMinute}}/min, {{perHour}}/h.",
     "sendTestNotification": "Wyślij powiadomienie testowe",
-    "testDescription": "Sprawdź, czy powiadomienia push działają poprawnie",
+    "testReach": "",
     "pushNotifications": "Powiadomienia push",
     "ruleTypes": {
       "accountInactivity": "Nieaktywność konta",
@@ -102,7 +102,20 @@
     "severityAll": "Wszystkie",
     "severityHighOnly": "Tylko wysoka",
     "severityWarningUp": "Ostrzeżenie+",
-    "violationTypes": "Rodzaje naruszeń"
+    "violationTypes": "Rodzaje naruszeń",
+    "backgroundRefreshOff": "",
+    "permissionOff": "",
+    "openSettings": "",
+    "tokenMissing": "",
+    "destinationOff": "",
+    "everyViolationSent": "",
+    "noViolationSender": "",
+    "noAutomationSends": "",
+    "eventsFooter": "",
+    "sentByAutomations_one": "",
+    "sentByAutomations_few": "",
+    "sentByAutomations_many": "",
+    "sentByAutomations_other": ""
   },
   "session": {
     "streamTerminated": "Strumień przerwany",
