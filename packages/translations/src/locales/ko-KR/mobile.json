@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "심각도가 높은 위반은 방해 금지 시간에도 알림을 보냅니다",
     "rateLimitDescription": "전송 제한은 알림 과다 발송을 방지합니다. 현재 제한: 분당 {{perMinute}}개, 시간당 {{perHour}}개.",
     "sendTestNotification": "테스트 알림 보내기",
-    "testDescription": "푸시 알림이 정상적으로 작동하는지 확인합니다",
+    "testReach": "",
     "pushNotifications": "푸시 알림",
     "ruleTypes": {
       "accountInactivity": "계정 비활성",
@@ -102,7 +102,17 @@
     "severityAll": "모두",
     "severityHighOnly": "높음만",
     "severityWarningUp": "경고+",
-    "violationTypes": "위반 유형"
+    "violationTypes": "위반 유형",
+    "backgroundRefreshOff": "",
+    "permissionOff": "",
+    "openSettings": "",
+    "tokenMissing": "",
+    "destinationOff": "",
+    "everyViolationSent": "",
+    "noViolationSender": "",
+    "noAutomationSends": "",
+    "eventsFooter": "",
+    "sentByAutomations_other": ""
   },
   "session": {
     "streamTerminated": "스트림 종료됨",
