@@ -207,7 +207,7 @@
         "message": "Bitte überprüfen Sie die Server Logs"
       },
       "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
+      "destinationDeleteFailed": "Fehler beim Löschen des Ziels: {{error}}",
       "destinationTestFailed": "",
       "destinationInUse": "",
       "destinationUsedByNewsletters": "",
