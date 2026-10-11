@@ -267,6 +267,6 @@
     "some": "{{count}} von {{total}} Servern",
     "search": "",
     "noMatches": "",
-    "historical": ""
+    "historical": "historisch"
   }
 }
