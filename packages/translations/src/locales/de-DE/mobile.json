@@ -152,7 +152,7 @@
       "filterBy": "",
       "mediaType": "",
       "noCountries": "",
-      "noPlatforms": "",
+      "noPlatforms": "Keine Plattformen verfügbar",
       "noUsers": "",
       "sectionSelected_one": "",
       "sectionSelected_other": ""
@@ -247,7 +247,7 @@
     "mono": "",
     "noDetails": "",
     "notAvailable": "",
-    "profile": "",
+    "profile": "Profil",
     "sampleRate": "",
     "source": "",
     "speed": "",
@@ -263,6 +263,6 @@
     "serversDown_one": "",
     "serversDown_other": "",
     "transcodes_one": "",
-    "transcodes_other": ""
+    "transcodes_other": "{{count}} Transcodes"
   }
 }
