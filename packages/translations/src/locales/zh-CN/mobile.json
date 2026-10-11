@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "高严重程度的违规在免打扰时段仍会通知",
     "rateLimitDescription": "速率限制防止通知垃圾邮件。当前限制：{{perMinute}}/分钟，{{perHour}}/小时。",
     "sendTestNotification": "发送测试通知",
-    "testDescription": "验证推送通知是否正常工作",
+    "testReach": "",
     "pushNotifications": "",
     "ruleTypes": {
       "accountInactivity": "",
@@ -102,7 +102,17 @@
     "severityAll": "",
     "severityHighOnly": "",
     "severityWarningUp": "",
-    "violationTypes": ""
+    "violationTypes": "",
+    "backgroundRefreshOff": "",
+    "permissionOff": "",
+    "openSettings": "",
+    "tokenMissing": "",
+    "destinationOff": "",
+    "everyViolationSent": "",
+    "noViolationSender": "",
+    "noAutomationSends": "",
+    "eventsFooter": "",
+    "sentByAutomations_other": ""
   },
   "session": {
     "streamTerminated": "流已终止",
