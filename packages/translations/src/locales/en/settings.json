@@ -21,7 +21,7 @@
       "destinations": "Destinations",
       "newsletters": "Newsletters",
       "email": "Email",
-      "memberLogin": "Sign-in",
+      "guest": "Guest access",
       "mobile": "Mobile devices",
       "remote": "Remote access",
       "import": "Import",
@@ -37,7 +37,7 @@
       "posters": "Which server's artwork wins when a title exists on more than one.",
       "plexAccounts": "Plex.tv accounts Tracearr uses to discover and authorize servers.",
       "destinations": "Where notifications and digests are delivered.",
-      "memberLogin": "Who can sign in to Tracearr, and how.",
+      "guest": "What signed-out and guest visitors can see.",
       "mobile": "Devices paired to the Tracearr mobile app.",
       "remote": "How people outside your network reach this instance.",
       "import": "Bring watch history in from Tautulli, Jellystat or Playback Reporting.",
@@ -352,24 +352,10 @@
     "automatic": "Automatic",
     "startJob": "Start Job"
   },
-  "memberLogin": {
-    "serverActivity": "Show members anonymous server activity",
-    "serverActivityDesc": "Counts of other streams and plays, never names, titles, or locations.",
-    "noServers": "No servers yet.",
-    "addServer": "Add one under Connections",
-    "serversLoadFailed": "Could not load servers.",
-    "signIn": {
-      "title": "Sign-in methods",
-      "local": "Username and password",
-      "localDesc": "The owner always, and admins with a Tracearr password when they are allowed to sign in.",
-      "oidc": "Single sign-on",
-      "oidcDesc": "The owner, and admins and members who are allowed to sign in, through your identity provider.",
-      "plex": "Owner's Plex account",
-      "plexDesc": "Lets the owner sign in with their own Plex account.",
-      "media": "Let admins and members sign in",
-      "mediaDesc": "The default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page.",
-      "servers": "Where people can use their Plex, Jellyfin or Emby account. Someone allowed on their user page can use any server they have an account on."
-    }
+  "accessControl": {
+    "allowGuestAccess": "Allow Guest Access",
+    "allowGuestAccessDesc": "When disabled, only the server owner can log in to Tracearr.",
+    "singleOwnerNote": "Note: When guest access is disabled, only the server owner can sign in. All other users will see an \"Access Denied\" message."
   },
   "import": {
     "noServers": "No Servers Connected",
