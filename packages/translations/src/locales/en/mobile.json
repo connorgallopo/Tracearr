@@ -90,7 +90,7 @@
     "criticalOverrideDescription": "High-severity violations still notify during quiet hours",
     "rateLimitDescription": "Rate limits prevent notification spam. Current limits: {{perMinute}}/min, {{perHour}}/hour.",
     "sendTestNotification": "Send Test Notification",
-    "testDescription": "Verify that push notifications are working correctly",
+    "testReach": "Checks that your server can reach this phone. It skips automations, the switches above and quiet hours.",
     "pushNotifications": "Push Notifications",
     "ruleTypes": {
       "accountInactivity": "Account Inactivity",
@@ -102,7 +102,18 @@
     "severityAll": "All",
     "severityHighOnly": "High only",
     "severityWarningUp": "Warning+",
-    "violationTypes": "Violation Types"
+    "violationTypes": "Violation Types",
+    "backgroundRefreshOff": "Background App Refresh is off for Tracearr. Silent pushes cannot update the widget until it is on.",
+    "permissionOff": "Notifications are turned off for Tracearr in this phone's settings, so nothing can be shown.",
+    "openSettings": "Open Settings",
+    "tokenMissing": "Your server has no push token for this device yet. The app registers again each time it opens.",
+    "destinationOff": "The Mobile push destination is switched off on your server. Turn it on in the web dashboard under Settings, Notifications, Destinations.",
+    "everyViolationSent": "Every violation is sent to Mobile push",
+    "sentByAutomations_one": "Sent by {{count}} automation",
+    "sentByAutomations_other": "Sent by {{count}} automations",
+    "noViolationSender": "Receive violations is off for Mobile push",
+    "noAutomationSends": "No automation sends this to Mobile push",
+    "eventsFooter": "Your server pushes an event when an automation sends it to the Mobile push destination. These switches choose which of those this device shows. Automations are set up in the web dashboard."
   },
   "session": {
     "streamTerminated": "Stream Terminated",
