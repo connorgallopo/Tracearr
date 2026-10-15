@@ -900,6 +900,53 @@ describe('Plex Live TV Parser', () => {
     expect(session.live?.channelTitle).toBe('ESPN');
   });
 
+  it('keeps the show and its poster for a live episode', () => {
+    // An XMLTV guide's episode carries its picture only on the show:
+    // Plex sends grandparentThumb (often an absolute URL) and no thumb.
+    const rawSession = {
+      sessionKey: 'live-episode',
+      ratingKey: '38389',
+      title: 'Observation',
+      type: 'episode',
+      live: '1',
+      grandparentTitle: 'Alien: Earth',
+      grandparentThumb: 'https://guide.example.com/api/programs/abc/artwork/poster',
+      parentIndex: 1,
+      index: 4,
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('live');
+    expect(session.media.thumbPath).toBeUndefined();
+    expect(session.episode?.showTitle).toBe('Alien: Earth');
+    expect(session.episode?.seasonNumber).toBe(1);
+    expect(session.episode?.episodeNumber).toBe(4);
+    expect(session.episode?.showThumbPath).toBe(
+      'https://guide.example.com/api/programs/abc/artwork/poster'
+    );
+  });
+
+  it('leaves episode metadata off a live movie', () => {
+    const rawSession = {
+      sessionKey: 'live-movie',
+      title: 'Coherence',
+      type: 'movie',
+      live: '1',
+      thumb: '/library/metadata/38389/thumb/1792036612',
+      User: {},
+      Player: {},
+    };
+
+    const session = parseSession(rawSession);
+
+    expect(session.media.type).toBe('live');
+    expect(session.episode).toBeUndefined();
+    expect(session.media.thumbPath).toBe('/library/metadata/38389/thumb/1792036612');
+  });
+
   it('should not set live metadata when live flag is not "1"', () => {
     const rawSession = {
       sessionKey: 'not-live',

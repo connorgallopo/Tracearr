@@ -848,8 +848,13 @@ export function parseSession(
     plexSessionId: parseOptionalString(sessionInfo.id),
   };
 
-  // Add episode-specific metadata if this is an episode
-  if (mediaType === 'episode') {
+  // Add episode-specific metadata if this is an episode. A Live TV episode keeps
+  // it too: an XMLTV guide's episode has no picture of its own (Plex puts it on
+  // the show, as grandparentThumb), so the show poster is all there is to show.
+  const isEpisode =
+    mediaType === 'episode' ||
+    (mediaType === 'live' && parseString(item.type).toLowerCase() === 'episode');
+  if (isEpisode) {
     session.episode = {
       showTitle: parseString(item.grandparentTitle),
       showId: parseOptionalString(item.grandparentRatingKey),

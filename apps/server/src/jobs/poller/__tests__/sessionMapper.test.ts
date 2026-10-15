@@ -271,6 +271,39 @@ describe('sessionMapper', () => {
         expect(result.thumbPath).toBe('/media/thumb.jpg');
       });
 
+      it('falls back to the show poster for a live episode with no picture of its own', () => {
+        const session = createBaseMediaSession({
+          media: { title: 'Observation', type: 'live', durationMs: 0 },
+          episode: {
+            showTitle: 'Alien: Earth',
+            seasonNumber: 1,
+            episodeNumber: 4,
+            showThumbPath: 'https://guide.example.com/api/programs/abc/artwork/poster',
+          },
+        });
+
+        const result = mapMediaSession(session, 'plex');
+
+        expect(result.thumbPath).toBe('https://guide.example.com/api/programs/abc/artwork/poster');
+        expect(result.grandparentTitle).toBe('Alien: Earth');
+      });
+
+      it("prefers a live episode's own picture over its show poster", () => {
+        const session = createBaseMediaSession({
+          media: { title: 'Live', type: 'live', durationMs: 0, thumbPath: '/media/thumb.jpg' },
+          episode: {
+            showTitle: 'Show',
+            seasonNumber: 1,
+            episodeNumber: 1,
+            showThumbPath: '/show/poster.jpg',
+          },
+        });
+
+        const result = mapMediaSession(session, 'plex');
+
+        expect(result.thumbPath).toBe('/media/thumb.jpg');
+      });
+
       it('should use media thumbPath for movies', () => {
         const session = createBaseMediaSession({
           media: {
