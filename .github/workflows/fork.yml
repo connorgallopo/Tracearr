@@ -66,6 +66,10 @@ jobs:
     if: github.repository == 'oliviacpu/Tracearr' && startsWith(github.ref, 'refs/tags/oliviacpu-')
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # One image build at a time, so the newest-tag check and the :latest retag never race another build.
+    concurrency:
+      group: fork-image
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: write
