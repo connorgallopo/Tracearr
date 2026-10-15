@@ -365,11 +365,102 @@ function assertCanonicalImagePath(baseUrl: string, imagePath: string): void {
   }
 }
 
+/**
+ * Plex's photo transcoder resizes and caches server-side - a 240px poster
+ * arrives as ~20KB instead of the multi-MB original. upscale=0 keeps small
+ * sources untouched; minSize=1 fills the requested box.
+ */
+function plexTranscodeUrl(
+  baseUrl: string,
+  token: string,
+  imagePath: string,
+  size: { width: number; height: number }
+): string {
+  const params = new URLSearchParams({
+    width: String(size.width),
+    height: String(size.height),
+    minSize: '1',
+    upscale: '0',
+    url: imagePath,
+    'X-Plex-Token': token,
+  });
+  return `${baseUrl}/photo/:/transcode?${params.toString()}`;
+}
+
 const IMAGE_PATH_ALLOWLIST: Record<(typeof servers.$inferSelect)['type'], RegExp> = {
   plex: /^\/library\/metadata\/[^/?#]+\/thumb\/[^/?#]+$/,
   jellyfin: /^\/(Items|Users)\/[^/?#]+\/Images\/Primary(\?tag=[^&#]+)?$/,
   emby: /^\/(Items|Users)\/[^/?#]+\/Images\/Primary(\?tag=[^&#]+)?$/,
 };
+
+// Parsed EXTERNAL_IMAGE_ORIGINS, re-read whenever the variable's text changes.
+let externalOrigins: { raw: string; origins: Set<string> } | null = null;
+
+/**
+ * Origins whose absolute image URLs a Plex server may fetch for Tracearr:
+ * EXTERNAL_IMAGE_ORIGINS, a comma-separated list such as the public address of
+ * an XMLTV guide's pictures. Plex hands those URLs over as they are (a Live TV
+ * episode's grandparentThumb, for one). Empty by default, which allows none.
+ */
+function externalImageOrigins(): Set<string> {
+  const raw = process.env.EXTERNAL_IMAGE_ORIGINS ?? '';
+  if (externalOrigins?.raw === raw) return externalOrigins.origins;
+  const origins = new Set<string>();
+  for (const entry of raw.split(',')) {
+    const value = entry.trim();
+    if (!value) continue;
+    let url: URL | null = null;
+    try {
+      url = new URL(value);
+    } catch {
+      url = null;
+    }
+    if (
+      url &&
+      (url.protocol === 'http:' || url.protocol === 'https:') &&
+      !url.username &&
+      !url.password
+    ) {
+      origins.add(url.origin);
+    } else {
+      console.warn(
+        `[ImageProxy] Ignoring EXTERNAL_IMAGE_ORIGINS entry that is not an origin: ${value}`
+      );
+    }
+  }
+  externalOrigins = { raw, origins };
+  return origins;
+}
+
+function isAbsoluteHttpUrl(imagePath: string): boolean {
+  return /^https?:\/\//i.test(imagePath);
+}
+
+/**
+ * An absolute image URL is accepted only from a listed origin, in canonical
+ * form (it parses back to exactly itself), with no credentials, fragment or
+ * percent-encoding.
+ */
+function assertAllowedExternalImageUrl(imagePath: string): void {
+  if (imagePath.includes('\\') || imagePath.includes('\0') || imagePath.includes('%')) {
+    throw new SsrfBlockedError(`Image URL is not in canonical form: ${imagePath}`);
+  }
+  let url: URL;
+  try {
+    url = new URL(imagePath);
+  } catch {
+    throw new SsrfBlockedError(`Image URL is unparseable: ${imagePath}`);
+  }
+  if (url.href !== imagePath || url.hash) {
+    throw new SsrfBlockedError(`Image URL is not in canonical form: ${imagePath}`);
+  }
+  if (url.username || url.password) {
+    throw new SsrfBlockedError('Image URL carries credentials');
+  }
+  if (!externalImageOrigins().has(url.origin)) {
+    throw new SsrfBlockedError(`Image URL origin is not in EXTERNAL_IMAGE_ORIGINS: ${url.origin}`);
+  }
+}
 
 export function buildUpstreamRequest(
   server: typeof servers.$inferSelect,
@@ -378,6 +469,18 @@ export function buildUpstreamRequest(
 ): { imageUrl: string; headers: Record<string, string> } {
   const headers: Record<string, string> = { Accept: 'image/*' };
   const baseUrl = server.url.replace(/\/$/, '');
+
+  // An allowed outside picture is fetched by the Plex server's own photo
+  // transcoder, never by Tracearr: the request (and the token) only ever goes
+  // to the configured server, and Plex resizes and caches the result.
+  if (server.type === 'plex' && isAbsoluteHttpUrl(imagePath)) {
+    assertAllowedExternalImageUrl(imagePath);
+    assertSafeProbeUrl(baseUrl);
+    return {
+      imageUrl: plexTranscodeUrl(baseUrl, server.token, imagePath, resize ?? POSTER_IMAGE_SIZE),
+      headers,
+    };
+  }
 
   // Origin pinning makes the configured server the only reachable host, so one
   // check on the base URL covers every request shape built below.
@@ -390,18 +493,7 @@ export function buildUpstreamRequest(
   if (server.type === 'plex') {
     // Plex image URLs are relative paths like /library/metadata/123/thumb/456
     if (resize) {
-      // Plex's photo transcoder resizes and caches server-side - a 240px
-      // poster arrives as ~20KB instead of the multi-MB original. upscale=0
-      // keeps small sources untouched; minSize=1 fills the requested box.
-      const params = new URLSearchParams({
-        width: String(resize.width),
-        height: String(resize.height),
-        minSize: '1',
-        upscale: '0',
-        url: imagePath,
-        'X-Plex-Token': server.token,
-      });
-      return { imageUrl: `${baseUrl}/photo/:/transcode?${params.toString()}`, headers };
+      return { imageUrl: plexTranscodeUrl(baseUrl, server.token, imagePath, resize), headers };
     }
     const separator = imagePath.includes('?') ? '&' : '?';
     return { imageUrl: `${baseUrl}${imagePath}${separator}X-Plex-Token=${server.token}`, headers };
