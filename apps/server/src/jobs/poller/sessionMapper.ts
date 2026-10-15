@@ -110,6 +110,14 @@ export function pickStreamDetailFields<T extends StreamDetailFields>(
 }
 
 /**
+ * Season and episode numbers belong to an episode, a Live TV one included (its
+ * numbers come from the guide). Every other type stores none.
+ */
+export function keepsEpisodeNumbers(mediaType: ProcessedSession['mediaType']): boolean {
+  return mediaType === 'episode' || mediaType === 'live';
+}
+
+/**
  * The subset of Session that changes while a session is live and that
  * re-evaluation reads from the fresh poll/SSE payload rather than the stored row.
  */
@@ -119,8 +127,8 @@ export function pickLiveSessionFields(processed: ProcessedSession): Partial<Sess
     mediaType: processed.mediaType,
     mediaTitle: processed.mediaTitle,
     grandparentTitle: processed.grandparentTitle || null,
-    seasonNumber: processed.mediaType === 'episode' ? processed.seasonNumber : null,
-    episodeNumber: processed.mediaType === 'episode' ? processed.episodeNumber : null,
+    seasonNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.seasonNumber : null,
+    episodeNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.episodeNumber : null,
     year: processed.year || null,
     thumbPath: processed.thumbPath || null,
     totalDurationMs: processed.totalDurationMs || null,

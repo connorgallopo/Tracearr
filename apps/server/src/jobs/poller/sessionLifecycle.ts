@@ -34,7 +34,7 @@ import {
 } from '../../services/serverLocations.js';
 import { isLocalSession } from '../../utils/localSession.js';
 import { clearDbWriteTracking } from './dbWriteThrottle.js';
-import { pickStreamDetailFields } from './sessionMapper.js';
+import { keepsEpisodeNumbers, pickStreamDetailFields } from './sessionMapper.js';
 import {
   calculateStopDuration,
   checkWatchCompletion,
@@ -202,8 +202,8 @@ export function buildActiveSession(input: BuildActiveSessionInput): ActiveSessio
     mediaType: processed.mediaType,
     mediaTitle: processed.mediaTitle,
     grandparentTitle: processed.grandparentTitle || null,
-    seasonNumber: processed.mediaType === 'episode' ? processed.seasonNumber : null,
-    episodeNumber: processed.mediaType === 'episode' ? processed.episodeNumber : null,
+    seasonNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.seasonNumber : null,
+    episodeNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.episodeNumber : null,
     year: processed.year || null,
     thumbPath: processed.thumbPath || null,
     ratingKey: processed.ratingKey || null,
@@ -315,8 +315,8 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
     mediaType: processed.mediaType,
     mediaTitle: processed.mediaTitle,
     grandparentTitle: processed.grandparentTitle || null,
-    seasonNumber: processed.mediaType === 'episode' ? processed.seasonNumber : null,
-    episodeNumber: processed.mediaType === 'episode' ? processed.episodeNumber : null,
+    seasonNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.seasonNumber : null,
+    episodeNumber: keepsEpisodeNumbers(processed.mediaType) ? processed.episodeNumber : null,
     year: processed.year || null,
     thumbPath: processed.thumbPath || null,
     ratingKey: processed.ratingKey || null,
@@ -856,8 +856,12 @@ export async function createSessionWithRulesAtomic(
               mediaType: processed.mediaType,
               mediaTitle: processed.mediaTitle,
               grandparentTitle: processed.grandparentTitle || null,
-              seasonNumber: processed.mediaType === 'episode' ? processed.seasonNumber : null,
-              episodeNumber: processed.mediaType === 'episode' ? processed.episodeNumber : null,
+              seasonNumber: keepsEpisodeNumbers(processed.mediaType)
+                ? processed.seasonNumber
+                : null,
+              episodeNumber: keepsEpisodeNumbers(processed.mediaType)
+                ? processed.episodeNumber
+                : null,
               year: processed.year || null,
               thumbPath: processed.thumbPath || null,
               startedAt: new Date(),

@@ -885,3 +885,27 @@ describe('buildActiveSession identity passthrough', () => {
     expect(activeSession.grandparentRatingKey).toBeNull();
   });
 });
+
+describe('buildActiveSession episode numbers', () => {
+  it('keeps season and episode for a Live TV episode', async () => {
+    const { buildActiveSession } = await import('../sessionLifecycle.js');
+
+    const activeSession = buildActiveSession(
+      createMockBuildActiveSessionInput({ mediaType: 'live', seasonNumber: 1, episodeNumber: 4 })
+    );
+
+    expect(activeSession.seasonNumber).toBe(1);
+    expect(activeSession.episodeNumber).toBe(4);
+  });
+
+  it('drops them for a movie', async () => {
+    const { buildActiveSession } = await import('../sessionLifecycle.js');
+
+    const activeSession = buildActiveSession(
+      createMockBuildActiveSessionInput({ mediaType: 'movie', seasonNumber: 1, episodeNumber: 4 })
+    );
+
+    expect(activeSession.seasonNumber).toBeNull();
+    expect(activeSession.episodeNumber).toBeNull();
+  });
+});
