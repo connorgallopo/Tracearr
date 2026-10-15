@@ -74,4 +74,10 @@ describe('pickLiveSessionFields', () => {
     expect(live.seasonNumber).toBeNull();
     expect(live.episodeNumber).toBeNull();
   });
+
+  it('keeps season and episode for a Live TV episode', () => {
+    const live = pickLiveSessionFields({ ...processed, mediaType: 'live' });
+    expect(live.seasonNumber).toBe(2);
+    expect(live.episodeNumber).toBe(5);
+  });
 });

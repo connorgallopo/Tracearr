@@ -1,0 +1,115 @@
+name: Fork
+
+# This fork's only workflow. Upstream's workflows are removed here: they publish
+# upstream's images and releases, run its bots and need its secrets. Pull requests
+# and pushes to main run lint, typecheck and the server tests. An oliviacpu-* tag
+# runs the same checks, then builds docker/Dockerfile and pushes
+# ghcr.io/oliviacpu/tracearr:<tag> (linux/amd64). See FORK.md.
+
+on:
+  push:
+    branches: [main]
+    tags: ['oliviacpu-*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HUSKY: 0
+
+jobs:
+  check:
+    name: Lint, typecheck and server tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build test dependencies (shared, emails, test-utils)
+        run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/emails --filter=@tracearr/test-utils
+
+      - name: Server tests
+        run: |
+          set -euo pipefail
+          for group in unit services routes auth security; do
+            pnpm --filter @tracearr/server "test:$group"
+          done
+
+  image:
+    name: Image
+    needs: check
+    if: github.repository == 'oliviacpu/Tracearr' && startsWith(github.ref, 'refs/tags/oliviacpu-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      # The app compares APP_VERSION with upstream releases, so it keeps the
+      # upstream tag this build is based on; the fork tag goes in APP_TAG.
+      - name: Upstream version
+        id: version
+        run: echo "base=$(git describe --tags --abbrev=0 --match 'v*')" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch basemap
+        uses: ./.github/actions/fetch-basemap
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/oliviacpu/tracearr:${{ github.ref_name }}
+          build-args: |
+            APP_VERSION=${{ steps.version.outputs.base }}
+            APP_TAG=${{ github.ref_name }}
+            APP_COMMIT=${{ github.sha }}
+            APP_BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            CACHE_BUST=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.licenses=AGPL-3.0

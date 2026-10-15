@@ -221,6 +221,35 @@ describe('proxyImage cache-miss pipeline', () => {
     fetchSpy.mockRestore();
   });
 
+  it("fetches an allowed outside poster only through the Plex server's transcoder", async () => {
+    process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+    try {
+      mockSelectChain([
+        { id: 'server-1', type: 'plex', url: 'http://localhost:32400', token: 'token' },
+      ]);
+      const poster = 'https://guide.example.com/api/programs/abc/artwork/poster';
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: poster,
+        width: 360,
+        height: 540,
+        fallback: 'poster',
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      const fetched = new URL(String(fetchSpy.mock.calls[0]?.[0]));
+      expect(fetched.origin).toBe('http://localhost:32400');
+      expect(fetched.searchParams.get('url')).toBe(poster);
+      // The poster's cache entry is versioned by the outside URL's own fingerprint.
+      const renamedTo = String(vi.mocked(rename).mock.calls[0]?.[1]);
+      expect(renamedTo).toContain(`:v${posterVersionFor(poster)}.webp`);
+    } finally {
+      delete process.env.EXTERNAL_IMAGE_ORIGINS;
+    }
+  });
+
   it('returns the placeholder for a historical server without fetching', async () => {
     mockSelectChain([
       {
@@ -775,6 +804,100 @@ describe('buildUpstreamRequest', () => {
       expect(() => buildUpstreamRequest(server, '//evil.test/x')).toThrow(SsrfBlockedError);
     });
   });
+
+  describe('outside picture URLs (EXTERNAL_IMAGE_ORIGINS)', () => {
+    const plex = { ...baseServer, type: 'plex' } as never;
+    const poster = 'https://guide.example.com/api/programs/abc/artwork/poster';
+
+    afterEach(() => {
+      delete process.env.EXTERNAL_IMAGE_ORIGINS;
+    });
+
+    it('refuses every absolute URL when the variable is unset', () => {
+      expect(() => buildUpstreamRequest(plex, poster)).toThrow(SsrfBlockedError);
+      expect(() => buildUpstreamRequest(plex, poster, { width: 240, height: 360 })).toThrow(
+        SsrfBlockedError
+      );
+    });
+
+    it("fetches a listed origin's picture through the Plex server's photo transcoder", () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+      const { imageUrl } = buildUpstreamRequest(plex, poster, { width: 240, height: 360 });
+      const url = new URL(imageUrl);
+      expect(url.origin).toBe('http://media:1234');
+      expect(url.pathname).toBe('/photo/:/transcode');
+      expect(url.searchParams.get('url')).toBe(poster);
+      expect(url.searchParams.get('width')).toBe('240');
+      expect(url.searchParams.get('height')).toBe('360');
+      expect(url.searchParams.get('X-Plex-Token')).toBe('tok123');
+    });
+
+    it('always resizes, using the poster size when no size is given', () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+      const url = new URL(buildUpstreamRequest(plex, poster).imageUrl);
+      expect(url.pathname).toBe('/photo/:/transcode');
+      expect(url.searchParams.get('width')).toBe('360');
+      expect(url.searchParams.get('height')).toBe('540');
+    });
+
+    it('accepts a versioned picture and any origin in a comma-separated list', () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS =
+        ' https://other.example.org , https://guide.example.com ';
+      const versioned = 'https://guide.example.com/media/artwork/abc-poster.jpg?v=20261015041230';
+      const url = new URL(buildUpstreamRequest(plex, versioned).imageUrl);
+      expect(url.searchParams.get('url')).toBe(versioned);
+    });
+
+    it.each([
+      ['another origin', 'https://evil.example.com/x.jpg'],
+      ['a look-alike host', 'https://guide.example.com.evil.example/x.jpg'],
+      ['another scheme', 'http://guide.example.com/x.jpg'],
+      ['another port', 'https://guide.example.com:8443/x.jpg'],
+      ['credentials', 'https://user:pass@guide.example.com/x.jpg'],
+      ['an encoded path', 'https://guide.example.com/a/%2e%2e/x.jpg'],
+      ['a backslash', 'https://guide.example.com/a\\..\\x.jpg'],
+      ['a fragment', 'https://guide.example.com/x.jpg#y'],
+      ['a non-canonical host', 'https://GUIDE.example.com/x.jpg'],
+      ['a dot segment', 'https://guide.example.com/a/../x.jpg'],
+    ])('refuses %s', (_label, imagePath) => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+      expect(() => buildUpstreamRequest(plex, imagePath)).toThrow(SsrfBlockedError);
+    });
+
+    it('keeps refusing absolute URLs for Jellyfin and Emby', () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+      const jf = { ...baseServer, type: 'jellyfin' } as never;
+      const emby = { ...baseServer, type: 'emby' } as never;
+      expect(() => buildUpstreamRequest(jf, poster)).toThrow(SsrfBlockedError);
+      expect(() => buildUpstreamRequest(emby, poster)).toThrow(SsrfBlockedError);
+    });
+
+    it('ignores an entry that is not an origin', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'guide.example.com, ftp://guide.example.com';
+      expect(() => buildUpstreamRequest(plex, poster)).toThrow(SsrfBlockedError);
+      expect(warn).toHaveBeenCalledTimes(2);
+      warn.mockRestore();
+    });
+
+    it.each([
+      ['a path', 'https://guide.example.com/api'],
+      ['a query', 'https://guide.example.com/?a=1'],
+      ['a fragment', 'https://guide.example.com/#a'],
+      ['credentials', 'https://user:pass@guide.example.com'],
+    ])('ignores an entry with %s rather than allowing its whole host', (_label, entry) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      process.env.EXTERNAL_IMAGE_ORIGINS = entry;
+      expect(() => buildUpstreamRequest(plex, poster)).toThrow(SsrfBlockedError);
+      expect(warn).toHaveBeenCalledTimes(1);
+      warn.mockRestore();
+    });
+
+    it('accepts an origin written with a trailing slash', () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com/';
+      expect(() => buildUpstreamRequest(plex, poster)).not.toThrow();
+    });
+  });
 });
 
 describe('resizedOnly (background warms)', () => {
@@ -839,6 +962,24 @@ describe('resizedOnly (background warms)', () => {
     });
 
     expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('tries an outside picture once, since a retry would be the same transcoder request', async () => {
+    process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+    try {
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: 'https://guide.example.com/api/programs/abc/artwork/poster',
+        width: 360,
+        height: 540,
+        fallback: 'poster',
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(result.degraded).toBe(true);
+    } finally {
+      delete process.env.EXTERNAL_IMAGE_ORIGINS;
+    }
   });
 
   it('flags the placeholder as degraded rather than rejecting, since live requests share the promise', async () => {
