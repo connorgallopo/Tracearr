@@ -560,6 +560,13 @@ async function getServerRow(serverId: string): Promise<typeof servers.$inferSele
   return row ?? null;
 }
 
+// Statuses about the server rather than the image: a rejected token, a rate
+// limit, or a server that is restarting or behind a failing proxy. Every image
+// fails the same way until it recovers, so a warm pass backs off instead of
+// skipping each image for a day. A 500 stays the image's fault: Plex's photo
+// transcoder answers 500 for one image it can't serve.
+const SERVER_WIDE_STATUSES = new Set([401, 403, 407, 429, 502, 503, 504]);
+
 async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   const { serverId, imagePath, width, height, fallback, cachePath, shardDir, resizedOnly } = args;
 
@@ -601,7 +608,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
           redirect: 'manual',
           signal: AbortSignal.timeout(10000), // 10 second timeout
         });
-        serverAnswered = true;
+        if (!SERVER_WIDE_STATUSES.has(response.status)) serverAnswered = true;
 
         // Reject only clearly-non-image payloads (the Plex transcoder can
         // return an XML error page with a 200). Anything else - image/*,

@@ -1014,6 +1014,42 @@ describe('resizedOnly (background warms)', () => {
     expect(result.failure).toEqual({ reason: 'fetch failed', itemFault: false });
   });
 
+  it.each([401, 403, 429, 502, 503, 504])(
+    'blames the server, not the image, for an HTTP %i every image would get',
+    async (status) => {
+      fetchSpy.mockResolvedValue(new Response(null, { status }));
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/library/metadata/6/thumb/1',
+        width: 360,
+        height: 540,
+        fallback: 'poster',
+        resizedOnly: true,
+      });
+
+      expect(result.failure).toEqual({
+        reason: `HTTP ${status} (no content-type)`,
+        itemFault: false,
+      });
+    }
+  );
+
+  it('blames the image for a 404', async () => {
+    fetchSpy.mockResolvedValue(new Response(null, { status: 404 }));
+
+    const result = await proxyImage({
+      serverId: randomUUID(),
+      imagePath: '/library/metadata/7/thumb/1',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+      resizedOnly: true,
+    });
+
+    expect(result.failure).toEqual({ reason: 'HTTP 404 (no content-type)', itemFault: true });
+  });
+
   it('does not flag a successful fetch as degraded', async () => {
     const png = await sharp({
       create: { width: 8, height: 8, channels: 3, background: { r: 1, g: 2, b: 3 } },
