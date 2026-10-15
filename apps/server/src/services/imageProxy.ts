@@ -577,13 +577,16 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   const release = await acquireFetchSlot();
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
-    // other upstream failure, instead of escaping as a 500.
-    const candidates = resizedOnly
-      ? [buildUpstreamRequest(server, imagePath, { width, height })]
-      : [
-          buildUpstreamRequest(server, imagePath, { width, height }),
-          buildUpstreamRequest(server, imagePath),
-        ];
+    // other upstream failure, instead of escaping as a 500. An outside picture
+    // only ever goes through the transcoder, so a retry would repeat the same
+    // request and just double a failure's wait.
+    const candidates =
+      resizedOnly || isAbsoluteHttpUrl(imagePath)
+        ? [buildUpstreamRequest(server, imagePath, { width, height })]
+        : [
+            buildUpstreamRequest(server, imagePath, { width, height }),
+            buildUpstreamRequest(server, imagePath),
+          ];
     let imageBuffer: Buffer | null = null;
     let lastError: unknown = null;
     for (const { imageUrl, headers } of candidates) {

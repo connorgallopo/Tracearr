@@ -964,6 +964,24 @@ describe('resizedOnly (background warms)', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('tries an outside picture once, since a retry would be the same transcoder request', async () => {
+    process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com';
+    try {
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: 'https://guide.example.com/api/programs/abc/artwork/poster',
+        width: 360,
+        height: 540,
+        fallback: 'poster',
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(result.degraded).toBe(true);
+    } finally {
+      delete process.env.EXTERNAL_IMAGE_ORIGINS;
+    }
+  });
+
   it('flags the placeholder as degraded rather than rejecting, since live requests share the promise', async () => {
     const result = await proxyImage({
       serverId: randomUUID(),
