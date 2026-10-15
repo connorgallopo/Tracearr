@@ -245,6 +245,8 @@ describe('proxyImage cache-miss pipeline', () => {
       // The poster's cache entry is versioned by the outside URL's own fingerprint.
       const renamedTo = String(vi.mocked(rename).mock.calls[0]?.[1]);
       expect(renamedTo).toContain(`:v${posterVersionFor(poster)}.webp`);
+      // The fire-and-forget color write; drain it so it doesn't leak into the next test.
+      await vi.waitFor(() => expect(vi.mocked(db.update)).toHaveBeenCalledTimes(1));
     } finally {
       delete process.env.EXTERNAL_IMAGE_ORIGINS;
     }
