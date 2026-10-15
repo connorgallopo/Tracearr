@@ -90,6 +90,9 @@ interface ProxyResult {
   /** The upstream fetch failed and this is a placeholder. Background warms
    *  turn it into an error; live requests render it. */
   degraded?: boolean;
+  /** Why a degraded result failed. itemFault: the server answered (or the path was refused before
+   *  asking), so this one image is the problem rather than the server. */
+  failure?: { reason: string; itemFault: boolean };
 }
 
 /**
@@ -557,6 +560,13 @@ async function getServerRow(serverId: string): Promise<typeof servers.$inferSele
   return row ?? null;
 }
 
+// Statuses about the server rather than the image: a rejected token, a rate
+// limit, or a server that is restarting or behind a failing proxy. Every image
+// fails the same way until it recovers, so a warm pass backs off instead of
+// skipping each image for a day. A 500 stays the image's fault: Plex's photo
+// transcoder answers 500 for one image it can't serve.
+const SERVER_WIDE_STATUSES = new Set([401, 403, 407, 429, 502, 503, 504]);
+
 async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   const { serverId, imagePath, width, height, fallback, cachePath, shardDir, resizedOnly } = args;
 
@@ -575,6 +585,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   // multi-MB original). Fall back to the original path so a transcoder
   // hiccup degrades to the old behavior instead of a broken image.
   const release = await acquireFetchSlot();
+  let serverAnswered = false;
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500. An outside picture
@@ -597,6 +608,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
           redirect: 'manual',
           signal: AbortSignal.timeout(10000), // 10 second timeout
         });
+        if (!SERVER_WIDE_STATUSES.has(response.status)) serverAnswered = true;
 
         // Reject only clearly-non-image payloads (the Plex transcoder can
         // return an XML error page with a 200). Anything else - image/*,
@@ -639,7 +651,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
     void persistDominantColorIfNeeded(serverId, imagePath, resized);
 
     return { data: resized, contentType: 'image/webp', cached: false };
-  } catch {
+  } catch (err) {
     // Return fallback on any error, capped at a short cache lifetime so an
     // upstream blip (e.g. a Plex restart) can't pin "No Image" for a year.
     // Flagged degraded so a background warm can tell a dead transcoder from a
@@ -647,6 +659,10 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
     // coalesce onto this same promise and would get a 500 instead.
     return {
       degraded: true,
+      failure: {
+        reason: err instanceof Error ? err.message : String(err),
+        itemFault: serverAnswered || err instanceof SsrfBlockedError,
+      },
       data: getFallbackImage(fallback, width, height),
       contentType: 'image/svg+xml',
       cached: false,

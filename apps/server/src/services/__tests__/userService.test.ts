@@ -73,6 +73,7 @@ function createMockServerUser(overrides: Record<string, unknown> = {}) {
     email: null,
     thumbUrl: null,
     isServerAdmin: false,
+    libraryIds: null,
     trustScore: 100,
     createdAt: new Date(),
     updatedAt: new Date(),

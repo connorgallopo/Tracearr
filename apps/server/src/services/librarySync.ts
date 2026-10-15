@@ -883,6 +883,14 @@ export class LibrarySyncService {
           }
         }
 
+        const itemsRemoved = await this.retireReplacedCopies(
+          client,
+          serverId,
+          { id: libraryId, name: libraryName, type: libraryType },
+          allItems.map((item) => item.ratingKey),
+          touchedMediaIds
+        );
+
         // Post-sync undercount check, so ordinary growth isn't mistaken for a wrong tombstone.
         if (
           !isMusicLibrary &&
@@ -928,7 +936,7 @@ export class LibrarySyncService {
           libraryName,
           itemsProcessed: allItems.length,
           itemsAdded: allItems.length,
-          itemsRemoved: 0,
+          itemsRemoved,
           itemsSkipped: totalSkippedEmpty,
           snapshotId: snapshot?.id ?? null,
         };
@@ -2334,6 +2342,39 @@ export class LibrarySyncService {
       );
     }
     return missingKeys.filter((k) => !stillPresent.has(k));
+  }
+
+  /**
+   * A server that re-creates an item gives it a new id and leaves the library count alone, so an
+   * incremental sync adds the new copy and the old one would stay live until the next full scan. Other live copies of the media just synced are checked by id, as a
+   * full scan confirms removals, and retired once the server no longer has them.
+   */
+  private async retireReplacedCopies(
+    client: ReturnType<typeof createMediaServerClient>,
+    serverId: string,
+    library: { id: string; name: string; type: string },
+    syncedKeys: string[],
+    touchedMediaIds: Set<string>
+  ): Promise<number> {
+    if (syncedKeys.length === 0 || !client.findExistingRatingKeys) return 0;
+    const keys = JSON.stringify(syncedKeys);
+    const result = await db.execute(sql`
+      SELECT DISTINCT old.rating_key
+      FROM library_items synced
+      JOIN library_items old
+        ON old.server_id = synced.server_id AND old.library_id = synced.library_id
+        AND old.media_id = synced.media_id AND old.removed_at IS NULL
+      WHERE synced.server_id = ${serverId} AND synced.library_id = ${library.id}
+        AND synced.rating_key IN (SELECT jsonb_array_elements_text(${keys}::jsonb))
+        AND old.rating_key NOT IN (SELECT jsonb_array_elements_text(${keys}::jsonb))
+    `);
+    const candidates = (result.rows as { rating_key: string }[]).map((row) => row.rating_key);
+    const gone = await this.confirmRemovals(client, library, candidates);
+    await this.markItemsRemoved(serverId, library.id, gone, touchedMediaIds);
+    if (gone.length > 0) {
+      console.log(`[LibrarySync] ${library.name}: replaced copies retired: ${gone.length}`);
+    }
+    return gone.length;
   }
 
   /**

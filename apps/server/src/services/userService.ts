@@ -23,6 +23,7 @@ import {
   sessions,
   automationRuns,
 } from '../db/schema.js';
+import { clearScope } from '../lib/scope.js';
 import { NotFoundError } from '../utils/errors.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
 
@@ -495,6 +496,7 @@ export async function updateServerUser(
     isServerAdmin: boolean;
     isDisabled: boolean;
     lastActivityAt: Date | null;
+    libraryIds: string[] | null;
   }>
 ): Promise<ServerUser> {
   const rows = await db
@@ -620,6 +622,11 @@ export async function syncUserFromMediaServer(
   newlyDisabled: boolean;
 } | null> {
   const { isPlexServer = false } = options;
+  const libraryIds = mediaUser.sharedLibraries ? [...mediaUser.sharedLibraries].sort() : null;
+  // The member's scope carries their library access, so a change drops it and its cached answers.
+  const clearScopeOnLibraryChange = async (existing: ServerUser) => {
+    if (String(existing.libraryIds) !== String(libraryIds)) await clearScope(existing.userId);
+  };
 
   if (isPlexServer) {
     // For Plex: mediaUser.id is plex.tv ID
@@ -650,6 +657,7 @@ export async function syncUserFromMediaServer(
         email: mediaUser.email ?? null,
         thumbUrl: mediaUser.thumb ?? null,
         isServerAdmin: mediaUser.isAdmin,
+        libraryIds,
         plexAccountId: mediaUser.id, // Set plex.tv ID
         joinedAt: nextJoinedAt,
         updatedAt: new Date(),
@@ -671,6 +679,7 @@ export async function syncUserFromMediaServer(
       if (advancedActivity || nextJoinedAt?.getTime() !== existing.joinedAt?.getTime()) {
         await recomputeIdentityAggregates(existing.userId);
       }
+      await clearScopeOnLibraryChange(existing);
 
       const user = await requireUserById(existing.userId);
       return { serverUser: updated[0]!, user, created: false, newlyDisabled: false };
@@ -730,6 +739,7 @@ export async function syncUserFromMediaServer(
           email: mediaUser.email ?? null,
           thumbUrl: mediaUser.thumb ?? null,
           isServerAdmin: mediaUser.isAdmin,
+          libraryIds,
           joinedAt: mediaUser.joinedAt ?? null,
           lastActivityAt: mediaUser.lastActivityAt ?? null,
         })
@@ -763,6 +773,7 @@ export async function syncUserFromMediaServer(
       thumbUrl: mediaUser.thumb ?? null,
       isServerAdmin: mediaUser.isAdmin,
       isDisabled: mediaUser.isDisabled ?? false,
+      libraryIds,
     };
 
     const advancedActivity = advancedActivityAt(mediaUser.lastActivityAt, existing.lastActivityAt);
@@ -776,6 +787,7 @@ export async function syncUserFromMediaServer(
     if (advancedActivity) {
       await recomputeIdentityAggregates(existing.userId);
     }
+    await clearScopeOnLibraryChange(existing);
 
     const user = await requireUserById(existing.userId);
     return {
@@ -837,6 +849,7 @@ export async function syncUserFromMediaServer(
         thumbUrl: mediaUser.thumb ?? null,
         isServerAdmin: mediaUser.isAdmin,
         isDisabled: mediaUser.isDisabled ?? false,
+        libraryIds,
         joinedAt: mediaUser.joinedAt ?? null,
         lastActivityAt: mediaUser.lastActivityAt ?? null,
       })

@@ -21,7 +21,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
-import { memberCacheSegment, scopeFragment, type Scope } from '../../lib/scope.js';
+import { libraryFragment, memberCacheSegment, scopeFragment, type Scope } from '../../lib/scope.js';
 import { buildLibraryCacheKey } from './utils.js';
 
 const genresQuerySchema = z.object({
@@ -42,9 +42,10 @@ interface RawEngagementRow {
 
 async function fetchItemCounts(
   type: 'movie' | 'show',
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  scope: Scope
 ): Promise<Map<string, number>> {
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const result = await db.execute(sql`
     SELECT genre, COUNT(DISTINCT m.id)::bigint AS item_count
     FROM media m, unnest(m.genres) AS genre
@@ -118,7 +119,7 @@ async function computeGenres(
   scope: Scope
 ): Promise<GenreRow[]> {
   const [itemCounts, engagement] = await Promise.all([
-    fetchItemCounts(type, serverIds),
+    fetchItemCounts(type, serverIds, scope),
     fetchEngagement(type, serverIds, scope),
   ]);
 

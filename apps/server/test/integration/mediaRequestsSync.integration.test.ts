@@ -60,6 +60,7 @@ function countsFor(results: SeerrRequest[]): SeerrCounts {
 
 function fixtureClient(results: SeerrRequest[]): SeerrClientLike {
   return {
+    status: () => Promise.resolve({ version: '3.5.0' }),
     requestCount: () => Promise.resolve(countsFor(results)),
     requestsPage: () => Promise.resolve({ pageInfo: { pages: 1 }, results }),
     movie: () => Promise.resolve({ title: 'Fixture', year: 2020 }),

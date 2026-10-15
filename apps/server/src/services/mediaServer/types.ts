@@ -208,7 +208,7 @@ export interface MediaUser {
   isDisabled?: boolean;
   /** Plex-specific: whether this is a home/managed user */
   isHomeUser?: boolean;
-  /** Library IDs this user has access to (empty = all libraries) */
+  /** Library ids the account can open; undefined when it sees every library */
   sharedLibraries?: string[];
   /** Last login timestamp */
   lastLoginAt?: Date;
@@ -228,6 +228,8 @@ export interface MediaUser {
 export interface MediaLibrary {
   /** Library identifier */
   id: string;
+  /** Emby: folder Guid, the form Emby user policies list enabled folders in */
+  guid?: string;
   /** Library display name */
   name: string;
   /** Library type (movies, shows, music, photos, etc.) */

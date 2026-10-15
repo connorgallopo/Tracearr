@@ -261,7 +261,7 @@ describe('Run routes', () => {
         'servers.id = automation_runs.server_id',
         'server_users.id = automation_runs.server_user_id',
         'users.id = server_users.user_id',
-        'library_items.id = CASE WHEN automation_runs.subject_key LIKE $1 THEN substring(automation_runs.subject_key FROM $2)::uuid END',
+        'library_items.id = CASE WHEN automation_runs.subject_key LIKE $1 THEN substring(automation_runs.subject_key FROM $2::int)::uuid END',
         '(libraries.server_id = library_items.server_id and libraries.library_id = library_items.library_id)',
       ]);
     });

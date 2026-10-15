@@ -63,6 +63,7 @@ const baseFilterParams = {
   sizeGbMin: null,
   sizeGbMax: null,
   serverIds: undefined,
+  scope: 'all',
 } as const;
 
 describe('buildCatalogPageQuery', () => {
@@ -181,6 +182,7 @@ describe('buildCatalogPageQuery', () => {
         sizeGbMin: null,
         sizeGbMax: null,
         serverIds: undefined,
+        scope: 'all',
         pageSize: 60,
       })
     );
@@ -439,6 +441,7 @@ describe('buildLetterCountsQuery', () => {
         sizeGbMin: null,
         sizeGbMax: null,
         serverIds: undefined,
+        scope: 'all',
       })
     );
     const text = normalize(sql);

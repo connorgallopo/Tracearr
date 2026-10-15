@@ -20,7 +20,8 @@ import {
   type LibraryGrowthQueryInput,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { libraryCacheSegment, libraryFragment } from '../../lib/scope.js';
+import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
 
 /** Single data point in growth timeline (per media type, per server) */
@@ -89,7 +90,7 @@ export const libraryGrowthRoute: FastifyPluginAsync = async (app) => {
       const tz = timezone ?? 'UTC';
 
       const resolvedIds = resolveServerIds(authUser, serverId, serverIds);
-      const serverFilter = buildMultiServerFragment(resolvedIds, 'lsd.server_id');
+      const serverFilter = libraryFragment(resolvedIds, request.scope, 'lsd');
 
       // Optional library filter
       const libraryFilter = libraryId ? sql`AND lsd.library_id = ${libraryId}` : sql``;
@@ -98,7 +99,9 @@ export const libraryGrowthRoute: FastifyPluginAsync = async (app) => {
       const hasCustomRange = Boolean(rawStartDate && rawEndDate);
 
       // Build cache key - include sorted server IDs so order doesn't cause misses
-      const serverCacheKey = resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all';
+      const serverCacheKey =
+        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
+        libraryCacheSegment(request.scope);
       const periodCacheKey = hasCustomRange ? `custom:${rawStartDate}:${rawEndDate}` : period;
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_GROWTH,

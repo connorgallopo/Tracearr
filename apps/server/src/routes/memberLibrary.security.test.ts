@@ -263,6 +263,29 @@ describe('library analytics', () => {
 });
 
 describe('media detail for a member', () => {
+  it('is 404 for a title whose copies sit only in libraries the member cannot open', async () => {
+    fakeRedis.get.mockImplementation(async (key: string) =>
+      key === REDIS_KEYS.USER_SCOPE('u-member')
+        ? JSON.stringify({
+            serverUserIds: [OWN],
+            serverIds: [SERVER],
+            libraryIds: { [SERVER]: ['lib-1'] },
+          })
+        : null
+    );
+    vi.mocked(db.execute).mockResolvedValue({ rows: [{ hidden: true }] } as never);
+    await build(member);
+
+    for (const path of ['', '/children', '/season-heat']) {
+      const res = await app.inject({ method: 'GET', url: `/library/media/${MEDIA}${path}` });
+      expect(res.statusCode).toBe(404);
+    }
+    expect(
+      executed().some((q) => q.text.includes('NOT EXISTS') && q.params.includes('lib-1'))
+    ).toBe(true);
+    expect(getSeasonHeat).not.toHaveBeenCalled();
+  });
+
   it('limits the platforms panel to the member and caches it for them alone', async () => {
     await build(member);
 

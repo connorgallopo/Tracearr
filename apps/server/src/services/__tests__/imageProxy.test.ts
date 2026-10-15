@@ -245,6 +245,8 @@ describe('proxyImage cache-miss pipeline', () => {
       // The poster's cache entry is versioned by the outside URL's own fingerprint.
       const renamedTo = String(vi.mocked(rename).mock.calls[0]?.[1]);
       expect(renamedTo).toContain(`:v${posterVersionFor(poster)}.webp`);
+      // The fire-and-forget color write; drain it so it doesn't leak into the next test.
+      await vi.waitFor(() => expect(vi.mocked(db.update)).toHaveBeenCalledTimes(1));
     } finally {
       delete process.env.EXTERNAL_IMAGE_ORIGINS;
     }
@@ -994,6 +996,58 @@ describe('resizedOnly (background warms)', () => {
 
     expect(result.degraded).toBe(true);
     expect(result.contentType).toBe('image/svg+xml');
+    expect(result.failure).toEqual({ reason: 'HTTP 500 (no content-type)', itemFault: true });
+  });
+
+  it('blames the server, not the image, when it never answers', async () => {
+    fetchSpy.mockRejectedValue(new TypeError('fetch failed'));
+
+    const result = await proxyImage({
+      serverId: randomUUID(),
+      imagePath: '/library/metadata/5/thumb/1',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+      resizedOnly: true,
+    });
+
+    expect(result.failure).toEqual({ reason: 'fetch failed', itemFault: false });
+  });
+
+  it.each([401, 403, 429, 502, 503, 504])(
+    'blames the server, not the image, for an HTTP %i every image would get',
+    async (status) => {
+      fetchSpy.mockResolvedValue(new Response(null, { status }));
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/library/metadata/6/thumb/1',
+        width: 360,
+        height: 540,
+        fallback: 'poster',
+        resizedOnly: true,
+      });
+
+      expect(result.failure).toEqual({
+        reason: `HTTP ${status} (no content-type)`,
+        itemFault: false,
+      });
+    }
+  );
+
+  it('blames the image for a 404', async () => {
+    fetchSpy.mockResolvedValue(new Response(null, { status: 404 }));
+
+    const result = await proxyImage({
+      serverId: randomUUID(),
+      imagePath: '/library/metadata/7/thumb/1',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+      resizedOnly: true,
+    });
+
+    expect(result.failure).toEqual({ reason: 'HTTP 404 (no content-type)', itemFault: true });
   });
 
   it('does not flag a successful fetch as degraded', async () => {

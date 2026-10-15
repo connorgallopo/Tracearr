@@ -12,6 +12,7 @@ import {
   parseOptionalString,
   parseOptionalNumber,
   getNestedObject,
+  parseArray,
   parseDateString,
   extractIpFromEndpoint,
 } from '../../../utils/parsing.js';
@@ -267,6 +268,11 @@ export function parseUser(user: Record<string, unknown>): MediaUser {
     thumb: buildUserImagePath(userId, imageTag),
     isAdmin: parseBoolean(policy?.IsAdministrator),
     isDisabled: parseBoolean(policy?.IsDisabled),
+    // Folder ids, which sync maps onto library ids. A missing EnableAllFolders means every library.
+    sharedLibraries:
+      policy?.EnableAllFolders === false
+        ? parseArray(policy.EnabledFolders, (id) => parseString(id))
+        : undefined,
     lastLoginAt: user.LastLoginDate ? new Date(parseString(user.LastLoginDate)) : undefined,
     lastActivityAt: user.LastActivityDate
       ? new Date(parseString(user.LastActivityDate))
@@ -292,6 +298,7 @@ export function parseUsersResponse(users: unknown[]): MediaUser[] {
 export function parseLibrary(folder: Record<string, unknown>): MediaLibrary {
   return {
     id: parseString(folder.ItemId),
+    guid: parseOptionalString(folder.Guid),
     name: parseString(folder.Name),
     type: parseString(folder.CollectionType, 'unknown'),
     locations: Array.isArray(folder.Locations) ? (folder.Locations as string[]) : [],

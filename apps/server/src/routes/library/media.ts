@@ -33,6 +33,7 @@ import {
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import {
   assertInScope,
+  libraryCacheSegment,
   memberCacheSegment,
   seesServerActivity,
   type Scope,
@@ -53,6 +54,7 @@ import {
   getMediaWatchers,
   getPosterCopy,
   getSeasonHeat,
+  hiddenByLibraryLimit,
   resolveCanonicalMediaByRef,
   type AvailabilityRow,
   type MediaChildRow,
@@ -226,9 +228,16 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const resolvedIds = resolveServerIds(authUser, undefined, query.data.serverIds);
     const canonical = await resolveCanonicalMediaByRef(id);
     if (!canonical) return reply.notFound();
+    if (await hiddenByLibraryLimit(canonical.id, resolvedIds, request.scope)) {
+      return reply.notFound();
+    }
 
     // detail-v4: response gained the poster fields
-    const cacheKey = mediaCacheKey(canonical.id, 'detail-v4', resolvedIds);
+    const cacheKey = mediaCacheKey(
+      canonical.id,
+      `detail-v4${libraryCacheSegment(request.scope)}`,
+      resolvedIds
+    );
     const cached = await readCache<MediaDetailResponse>(app.redis, cacheKey);
     if (cached) return cached;
 
@@ -237,12 +246,14 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const { availability, seasonCount, episodeCount } = await getAvailability(
       canonical.id,
       canonical.mediaType,
-      resolvedIds
+      resolvedIds,
+      request.scope
     );
     const poster = await getPosterCopy(
       canonical.id,
       resolvedIds,
-      await getSetting('preferredPosterServerId')
+      await getSetting('preferredPosterServerId'),
+      request.scope
     );
     const posterVersion = poster ? posterVersionFor(poster.thumbPath) : null;
 
@@ -292,12 +303,19 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const resolvedIds = resolveServerIds(authUser, undefined, query.data.serverIds);
     const canonical = await resolveCanonicalMediaByRef(id);
     if (!canonical) return reply.notFound();
+    if (await hiddenByLibraryLimit(canonical.id, resolvedIds, request.scope)) {
+      return reply.notFound();
+    }
 
-    const cacheKey = mediaCacheKey(canonical.id, 'children', resolvedIds);
+    const cacheKey = mediaCacheKey(
+      canonical.id,
+      `children${libraryCacheSegment(request.scope)}`,
+      resolvedIds
+    );
     const cached = await readCache<MediaChildrenResponse>(app.redis, cacheKey);
     if (cached) return cached;
 
-    const rows = await getChildren(canonical, resolvedIds);
+    const rows = await getChildren(canonical, resolvedIds, request.scope);
     if (rows === null) return reply.notFound();
 
     const response: MediaChildrenResponse = { data: rows.map(toChildEntry) };
@@ -322,6 +340,9 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const resolvedIds = resolveServerIds(authUser, undefined, query.data.serverIds);
     const canonical = await resolveCanonicalMediaByRef(id);
     if (!canonical) return reply.notFound();
+    if (await hiddenByLibraryLimit(canonical.id, resolvedIds, request.scope)) {
+      return reply.notFound();
+    }
 
     // A member's heat is what they watched, not what anyone did.
     const lensUserId = request.scope === 'all' ? null : request.scope.userId;
@@ -333,7 +354,7 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const cached = await readCache<MediaSeasonHeatResponse>(app.redis, cacheKey);
     if (cached) return cached;
 
-    const rows = await getSeasonHeat(canonical, resolvedIds, lensUserId);
+    const rows = await getSeasonHeat(canonical, resolvedIds, lensUserId, request.scope);
     if (rows === null) return reply.notFound();
 
     const response: MediaSeasonHeatResponse = {

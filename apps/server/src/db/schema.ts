@@ -319,6 +319,8 @@ export const serverUsers = pgTable(
     // Server-specific permissions
     isServerAdmin: boolean('is_server_admin').notNull().default(false),
     isDisabled: boolean('is_disabled').notNull().default(false),
+    // Library ids (libraries.library_id) the account can open on the server; null = every library
+    libraryIds: text('library_ids').array(),
 
     // Per-server trust
     trustScore: integer('trust_score').notNull().default(100),

@@ -140,6 +140,7 @@ export async function markRequestServiceReencrypt(id: string): Promise<void> {
 export async function recordSyncResult(
   id: string,
   patch: {
+    version?: string;
     syncCursor?: Date | null;
     lastCounts?: RequestServiceRow['lastCounts'];
     lastSyncAt?: Date;

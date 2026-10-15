@@ -4,7 +4,8 @@ This is a personal fork of [connorgallopo/Tracearr](https://github.com/connorgal
 upstream release tag plus the patches below, built into its own image. Patches stay upstream-shaped (one change and
 its tests per commit) in case any of them is ever offered back.
 
-- **Base:** upstream `v2.8.0`.
+- **Base:** upstream `v2.8.3` (merged in 2026-10-15; the fork started from `v2.8.0`). To take a newer release, merge
+  its tag into a branch and open a pull request; the merge keeps the patches' history.
 - **Image:** `ghcr.io/oliviacpu/tracearr:<tag>`, built for linux/amd64 by `.github/workflows/fork.yml` when an
   `oliviacpu-*` tag is pushed, after lint, typecheck and the server tests pass. That workflow is the fork's only one:
   upstream's publish its images and releases, run its bots and need its secrets.

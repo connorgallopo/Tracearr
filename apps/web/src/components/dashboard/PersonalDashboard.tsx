@@ -39,6 +39,10 @@ const ALL_TIME: StatsTimeRange = { period: 'all' };
 const SHELF = 'w-fit min-w-0 max-w-full';
 const CARD = 'min-w-72 flex-1';
 
+function ActionsRow({ children }: { children: ReactNode }) {
+  return <div className="flex justify-end">{children}</div>;
+}
+
 function LastThirtyDays({
   serverIds,
   streak,
@@ -56,12 +60,17 @@ function LastThirtyDays({
   const current = useHistoryAggregates({ serverIds, self: true, ...windows.current });
   const previous = useHistoryAggregates({ serverIds, self: true, ...windows.previous });
 
+  // With no heading to ride, the toggle keeps a row of its own so the admin view stays reachable
+  const actionsRow = actions ? <ActionsRow>{actions}</ActionsRow> : null;
   if (current.isError) {
     return (
-      <InlineErrorState message={current.error.message} onRetry={() => void current.refetch()} />
+      <section className="space-y-3">
+        {actionsRow}
+        <InlineErrorState message={current.error.message} onRetry={() => void current.refetch()} />
+      </section>
     );
   }
-  if (current.data?.playCount === 0) return null;
+  if (current.data?.playCount === 0) return actionsRow;
 
   const totals = current.data;
   const before = previous.isPlaceholderData ? undefined : previous.data;
@@ -256,7 +265,7 @@ export function PersonalDashboard({ actions }: { actions?: ReactNode }) {
 
       {hasNoPlays ? (
         <>
-          {actions && !isStreaming && <div className="flex justify-end">{actions}</div>}
+          {actions && !isStreaming && <ActionsRow>{actions}</ActionsRow>}
           <Welcome />
         </>
       ) : (

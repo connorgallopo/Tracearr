@@ -58,7 +58,12 @@ import {
 import { db } from '../../db/client.js';
 import { resolutionBucketPredicate, resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
-import { seesServerActivity, type Scope } from '../../lib/scope.js';
+import {
+  libraryCacheSegment,
+  libraryFragment,
+  seesServerActivity,
+  type Scope,
+} from '../../lib/scope.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { normalizeTitle } from '../../services/library/mediaMatchKey.js';
 import {
@@ -172,6 +177,7 @@ export interface CatalogPageQueryParams {
   audioCodecs?: RawCodec[] | null;
   audioChannels?: RawCodec[] | null;
   serverIds: string[] | undefined;
+  scope: Scope;
   pageSize: number;
   preferredPosterServerId?: string | null;
 }
@@ -194,6 +200,7 @@ export interface CatalogTotalsQueryParams {
   audioCodecs?: RawCodec[] | null;
   audioChannels?: RawCodec[] | null;
   serverIds: string[] | undefined;
+  scope: Scope;
 }
 
 interface RawCatalogRow {
@@ -583,9 +590,9 @@ function withRowDecorations(pageCte: SQL, serverFragmentLi: SQL, posterOrderFrag
  * it's the only mode that can serve a letter jump into an arbitrary depth.
  */
 export function buildCatalogPageQuery(params: CatalogPageQueryParams): SQL {
-  const { type, sort, offset, serverIds, pageSize, preferredPosterServerId } = params;
+  const { type, sort, offset, serverIds, scope, pageSize, preferredPosterServerId } = params;
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const commonWhere = buildCommonWhere({ ...params, serverFragmentLi });
   const { body, needsRollup } = buildSortedBody({
     type,
@@ -610,12 +617,12 @@ export function buildCatalogPageQuery(params: CatalogPageQueryParams): SQL {
  * runs per matching row); callers cache the result, never run it per page.
  */
 export function buildCatalogTotalsQuery(params: CatalogTotalsQueryParams): SQL {
-  const { type, sort, serverIds } = params;
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const { type, sort, serverIds, scope } = params;
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   // The file-size subquery aliases library_items as li2, not li - it needs its
   // own fragment, or a server-scoped request 500s on a missing FROM-clause
   // entry for li.server_id.
-  const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
+  const serverFragmentLi2 = libraryFragment(serverIds, scope, 'li2');
   const commonWhere = buildCommonWhere({ ...params, serverFragmentLi });
   const sortGuard =
     sort === 'added'
@@ -724,6 +731,8 @@ export interface CatalogFilterParams {
   audioCodecs?: RawCodec[] | null;
   audioChannels?: RawCodec[] | null;
   serverIds: string[] | undefined;
+  /** Narrows a member's titles to the libraries their accounts can open */
+  scope: Scope;
 }
 
 /** Cache-key segment for every filter predicate, shared by the totals,
@@ -747,13 +756,14 @@ function filterKeyParts(params: CatalogFilterParams): (string | number)[] {
     params.videoCodecs ? `v:${params.videoCodecs.join(',')}` : '',
     params.audioCodecs ? `a:${params.audioCodecs.join(',')}` : '',
     params.audioChannels ? `c:${params.audioChannels.join(',')}` : '',
+    libraryCacheSegment(params.scope),
   ];
 }
 
 /** Per-letter counts straight from SQL, for the no-watched-filter path. */
 export function buildLetterCountsQuery(params: CatalogFilterParams): SQL {
-  const { type, serverIds } = params;
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const { type, serverIds, scope } = params;
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const commonWhere = buildCommonWhere({ ...params, serverFragmentLi });
   return sql`
     SELECT ${buildLetterBucketCase()} AS letter, COUNT(*)::int AS count
@@ -774,8 +784,8 @@ export function buildLetterCountsQuery(params: CatalogFilterParams): SQL {
 export function buildCatalogCandidatesQuery(
   params: CatalogFilterParams & { sort: CatalogSort }
 ): SQL {
-  const { type, sort, serverIds } = params;
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const { type, sort, serverIds, scope } = params;
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const commonWhere = buildCommonWhere({ ...params, serverFragmentLi });
   const { body, needsRollup } = buildSortedBody({
     type,
@@ -861,10 +871,11 @@ async function resolveWatchedStatesChunked(
  * renditions add up, shows roll up their episodes. */
 async function fetchTotalFileSizeForIds(
   ids: string[],
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  scope: Scope
 ): Promise<number> {
   if (ids.length === 0) return 0;
-  const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
+  const serverFragmentLi2 = libraryFragment(serverIds, scope, 'li2');
   let total = 0;
   // Chunked so the ARRAY literal stays bounded no matter the catalog size; a
   // media id appears in exactly one chunk (and a show's episodes key on that
@@ -931,7 +942,7 @@ async function computeWatchedCandidates(args: WatchedCandidatesArgs): Promise<Wa
   return {
     ids,
     letters: surviving.map((row) => row.letter),
-    totalFileSize: await fetchTotalFileSizeForIds(ids, args.serverIds),
+    totalFileSize: await fetchTotalFileSizeForIds(ids, args.serverIds, args.scope),
   };
 }
 
@@ -981,10 +992,11 @@ async function getWatchedCandidates(
 async function fetchRowsByIds(
   ids: string[],
   serverIds: string[] | undefined,
+  scope: Scope,
   preferredPosterServerId: string | null | undefined
 ): Promise<RawCatalogRow[]> {
   if (ids.length === 0) return [];
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const pageCte = sql`WITH page AS (
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.sort_title, m.latest_added_at
@@ -1053,7 +1065,8 @@ function toCatalogRow(
  * normalized, codec display names expanded to their raw stored values. */
 async function toFilterParams(
   data: z.infer<typeof catalogLettersQuerySchema>,
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  scope: Scope
 ): Promise<CatalogFilterParams> {
   const library = parseLibraryKey(data.libraryKey);
   const [videoCodecs, audioCodecs, audioChannels] = await Promise.all([
@@ -1080,6 +1093,7 @@ async function toFilterParams(
     audioCodecs,
     audioChannels,
     serverIds,
+    scope,
   };
 }
 
@@ -1134,7 +1148,7 @@ export const libraryCatalogRoute: FastifyPluginAsync = async (app) => {
       }
 
       const preferredPosterServerId = await getSetting('preferredPosterServerId');
-      const filterParams = await toFilterParams(query.data, resolvedIds);
+      const filterParams = await toFilterParams(query.data, resolvedIds, request.scope);
 
       let rows: RawCatalogRow[];
       let watchedStates: Map<string, WatchedState>;
@@ -1158,7 +1172,7 @@ export const libraryCatalogRoute: FastifyPluginAsync = async (app) => {
         totalFileSize = candidates.totalFileSize;
         const windowIds = candidates.ids.slice(offset, offset + pageSize);
         const [windowRows, selfEpisodeCounts] = await Promise.all([
-          fetchRowsByIds(windowIds, resolvedIds, preferredPosterServerId),
+          fetchRowsByIds(windowIds, resolvedIds, request.scope, preferredPosterServerId),
           type === 'show'
             ? fetchEpisodeCounts(windowIds, resolvedIds)
             : Promise.resolve(new Map<string, number>()),
@@ -1312,7 +1326,7 @@ export const libraryCatalogRoute: FastifyPluginAsync = async (app) => {
         return response;
       }
 
-      const filterParams = await toFilterParams(query.data, resolvedIds);
+      const filterParams = await toFilterParams(query.data, resolvedIds, request.scope);
 
       if (watched) {
         // Shares the exact cached candidate list the catalog windows slice,
@@ -1375,7 +1389,11 @@ export const libraryCatalogRoute: FastifyPluginAsync = async (app) => {
       }
       const { type, serverId, serverIds } = query.data;
       const resolvedIds = resolveServerIds(request.user, serverId, serverIds);
-      const response: CatalogCodecOptionsResponse = await fetchCodecOptions(type, resolvedIds);
+      const response: CatalogCodecOptionsResponse = await fetchCodecOptions(
+        type,
+        resolvedIds,
+        request.scope
+      );
       return response;
     }
   );

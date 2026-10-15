@@ -41,7 +41,12 @@ import {
 import { buildProxyUrl, posterVersionFor } from '../../services/imageProxy.js';
 import { reAddedPredicate } from '../../services/library/reAdded.js';
 import { getSetting } from '../../services/settings.js';
-import { seesServerActivity } from '../../lib/scope.js';
+import {
+  libraryCacheSegment,
+  libraryFragment,
+  seesServerActivity,
+  type Scope,
+} from '../../lib/scope.js';
 import { resolveDateRange, type DateRange } from '../stats/utils.js';
 import { buildLibraryCacheKey, mediaSizeSubquery, withComputeSingleFlight } from './utils.js';
 
@@ -119,10 +124,11 @@ export function toShelfRowBase(row: RawShelfRow): CachedShelfRow {
 /** Media whose newest live copy replaces one this server lost. */
 async function findReAddedMedia(
   mediaIds: string[],
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  scope: Scope
 ): Promise<Set<string>> {
   if (mediaIds.length === 0) return new Set();
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const result = await db.execute(sql`
     SELECT media_id FROM (
       SELECT DISTINCT ON (li.media_id) li.media_id, ${reAddedPredicate('li')} AS re_added
@@ -145,6 +151,7 @@ async function findReAddedMedia(
  */
 async function fetchRecentlyAddedMovies(
   serverIds: string[] | undefined,
+  scope: Scope,
   preferredPosterServerId: string | null
 ): Promise<{ added: CachedRecentlyAddedRow[]; updated: CachedRecentlyUpdatedRow[] }> {
   const movieQuery = buildCatalogPageQuery({
@@ -163,6 +170,7 @@ async function fetchRecentlyAddedMovies(
     sizeGbMin: null,
     sizeGbMax: null,
     serverIds,
+    scope,
     pageSize: MOVIE_CANDIDATE_LIMIT,
     preferredPosterServerId,
   });
@@ -170,7 +178,8 @@ async function fetchRecentlyAddedMovies(
   const candidates = movieResult.rows as unknown as RawShelfRow[];
   const reAdded = await findReAddedMedia(
     candidates.map((row) => row.id),
-    serverIds
+    serverIds,
+    scope
   );
 
   const added: CachedRecentlyAddedRow[] = [];
@@ -204,10 +213,11 @@ async function fetchRecentlyAddedMovies(
 async function fetchShowShelf(
   mode: 'added' | 'updated',
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange,
   preferredPosterServerId: string | null
 ): Promise<RawRecentlyAddedShowRow[]> {
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const episodeWindow = buildTimestampWindowCondition(sql`li.created_at`, dateRange);
   const qualifies =
@@ -248,10 +258,11 @@ async function fetchShowShelf(
 
 async function fetchRecentlyAddedShows(
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange,
   preferredPosterServerId: string | null
 ): Promise<CachedRecentlyAddedRow[]> {
-  const rows = await fetchShowShelf('added', serverIds, dateRange, preferredPosterServerId);
+  const rows = await fetchShowShelf('added', serverIds, scope, dateRange, preferredPosterServerId);
   return rows.map((row) => ({
     ...toShelfRowBase(row),
     newEpisodes: row.new_episodes,
@@ -261,10 +272,17 @@ async function fetchRecentlyAddedShows(
 
 async function fetchRecentlyUpdatedShows(
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange,
   preferredPosterServerId: string | null
 ): Promise<CachedRecentlyUpdatedRow[]> {
-  const rows = await fetchShowShelf('updated', serverIds, dateRange, preferredPosterServerId);
+  const rows = await fetchShowShelf(
+    'updated',
+    serverIds,
+    scope,
+    dateRange,
+    preferredPosterServerId
+  );
   return rows.map((row) => ({
     ...toShelfRowBase(row),
     replacedEpisodes: row.new_episodes,
@@ -290,6 +308,7 @@ interface ValueCandidate {
 async function fetchMostPopular(
   type: 'movie' | 'show',
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange,
   preferredPosterServerId: string | null
 ): Promise<CachedMostPopularRow[]> {
@@ -309,7 +328,7 @@ async function fetchMostPopular(
   if (candidates.length === 0) return [];
 
   const ids = candidates.map((c) => c.canonicalId);
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const detailResult = await db.execute(sql`
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.normalized_title, m.latest_added_at,
@@ -327,7 +346,7 @@ async function fetchMostPopular(
        ${posterOrderFragment} LIMIT 1) AS poster_copy
     FROM media m
     WHERE m.id = ANY(${uuidArraySql(ids)}) AND m.merged_into_id IS NULL
-      ${buildActiveItemFragment(sql`m.id`, serverIds)}
+      ${buildActiveItemFragment(sql`m.id`, serverIds, scope)}
   `);
   const detailById = new Map(
     (detailResult.rows as unknown as RawShelfRow[]).map((row) => [row.id, row])
@@ -364,11 +383,12 @@ interface DeadWeightCandidate {
  */
 async function fetchDeadWeightCandidatesForType(
   type: 'movie' | 'show',
-  serverIds: string[] | undefined
+  serverIds: string[] | undefined,
+  scope: Scope
 ): Promise<DeadWeightCandidate[]> {
   const mediaCol = type === 'movie' ? sql`media_id` : sql`show_media_id`;
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
-  const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
+  const serverFragmentLi2 = libraryFragment(serverIds, scope, 'li2');
   const serverFragmentSelf = buildMultiServerFragment(serverIds, 'p.server_id');
   const serverFragmentLoser = buildMultiServerFragment(serverIds, 'p2.server_id');
   const result = await db.execute(sql`
@@ -411,10 +431,11 @@ interface DeadWeightResult {
  */
 async function fetchDeadWeight(
   serverIds: string[] | undefined,
+  scope: Scope,
   preferredPosterServerId: string | null
 ): Promise<DeadWeightResult> {
-  const movies = await fetchDeadWeightCandidatesForType('movie', serverIds);
-  const shows = await fetchDeadWeightCandidatesForType('show', serverIds);
+  const movies = await fetchDeadWeightCandidatesForType('movie', serverIds, scope);
+  const shows = await fetchDeadWeightCandidatesForType('show', serverIds, scope);
   const all = [...movies, ...shows];
   const count = all.length;
   const totalBytes = all.reduce((sum, c) => sum + c.totalFileSize, 0);
@@ -426,7 +447,7 @@ async function fetchDeadWeight(
 
   const sizeById = new Map(top.map((c) => [c.canonicalId, c.totalFileSize]));
   const ids = top.map((c) => c.canonicalId);
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const detailResult = await db.execute(sql`
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.normalized_title, m.latest_added_at,
@@ -483,8 +504,12 @@ function buildTimestampWindowCondition(column: SQL, dateRange: DateRange): SQL {
  * detail, titlesTouched), so a title removed from the library can't inflate
  * either past totalTitles.
  */
-function buildActiveItemFragment(idColumn: SQL, serverIds: string[] | undefined): SQL {
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
+function buildActiveItemFragment(
+  idColumn: SQL,
+  serverIds: string[] | undefined,
+  scope: Scope
+): SQL {
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
   return sql`AND EXISTS (
     SELECT 1 FROM library_items li WHERE li.media_id = ${idColumn} AND li.removed_at IS NULL ${serverFragmentLi}
   )`;
@@ -506,11 +531,16 @@ interface WatchedAggregate {
  */
 async function fetchWatchedAggregate(
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange
 ): Promise<WatchedAggregate> {
   const movieCte = buildValueRollupCte('movie', serverIds, undefined, dateRange);
   const showCte = buildValueRollupCte('show', serverIds, undefined, dateRange);
-  const activeItemFragment = buildActiveItemFragment(sql`value_rollup.canonical_id`, serverIds);
+  const activeItemFragment = buildActiveItemFragment(
+    sql`value_rollup.canonical_id`,
+    serverIds,
+    scope
+  );
   const movieAgg = await db.execute(sql`
     WITH ${movieCte}
     SELECT COUNT(*) FILTER (WHERE plays > 0 ${activeItemFragment})::bigint AS titles_touched,
@@ -555,11 +585,12 @@ interface NewlyAddedKpi {
  */
 async function fetchNewlyAdded(
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange
 ): Promise<NewlyAddedKpi> {
   const windowFragment = buildTimestampWindowFragment(sql`li.created_at`, dateRange);
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
-  const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
+  const serverFragmentLi2 = libraryFragment(serverIds, scope, 'li2');
   const result = await db.execute(sql`
     WITH added_in_window AS (
       SELECT li.media_id AS canonical_id, m.media_type, MIN(li.created_at) AS added_at
@@ -599,9 +630,12 @@ async function fetchNewlyAdded(
 }
 
 /** Scope-wide, all-time header counts - independent of the requested window. */
-async function fetchMeta(serverIds: string[] | undefined): Promise<ShelvesResponse['meta']> {
-  const serverFragmentLi = buildMultiServerFragment(serverIds, 'li.server_id');
-  const serverFragmentLi2 = buildMultiServerFragment(serverIds, 'li2.server_id');
+async function fetchMeta(
+  serverIds: string[] | undefined,
+  scope: Scope
+): Promise<ShelvesResponse['meta']> {
+  const serverFragmentLi = libraryFragment(serverIds, scope, 'li');
+  const serverFragmentLi2 = libraryFragment(serverIds, scope, 'li2');
   const result = await db.execute(sql`
     SELECT
       COUNT(*) FILTER (WHERE m.media_type = 'movie')::bigint AS movies,
@@ -638,6 +672,7 @@ function withoutCounts(watchedStates: Map<string, WatchedState>) {
 
 async function computeShelves(
   serverIds: string[] | undefined,
+  scope: Scope,
   dateRange: DateRange,
   period: ShelvesResponse['period'],
   preferredPosterServerId: string | null,
@@ -654,12 +689,12 @@ async function computeShelves(
     mostPopularShows,
     deadWeight,
   ] = await Promise.all([
-    fetchRecentlyAddedMovies(serverIds, preferredPosterServerId),
-    fetchRecentlyAddedShows(serverIds, dateRange, preferredPosterServerId),
-    fetchRecentlyUpdatedShows(serverIds, dateRange, preferredPosterServerId),
-    fetchMostPopular('movie', serverIds, dateRange, preferredPosterServerId),
-    fetchMostPopular('show', serverIds, dateRange, preferredPosterServerId),
-    includeDeadWeight ? fetchDeadWeight(serverIds, preferredPosterServerId) : null,
+    fetchRecentlyAddedMovies(serverIds, scope, preferredPosterServerId),
+    fetchRecentlyAddedShows(serverIds, scope, dateRange, preferredPosterServerId),
+    fetchRecentlyUpdatedShows(serverIds, scope, dateRange, preferredPosterServerId),
+    fetchMostPopular('movie', serverIds, scope, dateRange, preferredPosterServerId),
+    fetchMostPopular('show', serverIds, scope, dateRange, preferredPosterServerId),
+    includeDeadWeight ? fetchDeadWeight(serverIds, scope, preferredPosterServerId) : null,
   ]);
   const recentlyAddedMovies = movies.added;
   // One row for both types, so the two lists interleave on when the copy landed
@@ -667,9 +702,9 @@ async function computeShelves(
     .sort((a, b) => (b.sortAt ?? '').localeCompare(a.sortAt ?? ''))
     .slice(0, SHELF_LIMIT);
   const [newlyAdded, watchedAgg, meta] = await Promise.all([
-    fetchNewlyAdded(serverIds, dateRange),
-    fetchWatchedAggregate(serverIds, dateRange),
-    fetchMeta(serverIds),
+    fetchNewlyAdded(serverIds, scope, dateRange),
+    fetchWatchedAggregate(serverIds, scope, dateRange),
+    fetchMeta(serverIds, scope),
   ]);
 
   const movieIds = new Set<string>();
@@ -800,7 +835,9 @@ export const libraryShelvesRoute: FastifyPluginAsync = async (app) => {
       // per shelf.
       const preferredPosterServerId = await getSetting('preferredPosterServerId');
 
-      const serverCacheKey = resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all';
+      const serverCacheKey =
+        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
+        libraryCacheSegment(request.scope);
       const periodCacheKey =
         period === 'custom'
           ? `custom:${dateRange.start?.toISOString() ?? 'none'}:${dateRange.end.toISOString()}`
@@ -848,6 +885,7 @@ export const libraryShelvesRoute: FastifyPluginAsync = async (app) => {
       const response = await computeShelvesSingleFlight(app.redis, cacheKey, async () => {
         const computed = await computeShelves(
           resolvedIds,
+          scope,
           dateRange,
           period,
           preferredPosterServerId,

@@ -865,6 +865,26 @@ describe('imagePrecacheQueue', () => {
       expect(result).toEqual({ skipped: true, reason: 'backing off' });
     });
 
+    it('skips an image the server answered for instead of backing the server off', async () => {
+      mockBatchQuery([makeItemRow('item-0')]);
+      mockQueueAdd.mockResolvedValue({ id: 'job-delayed' });
+      mockProxyImage.mockResolvedValue({
+        data: Buffer.from('<svg/>'),
+        contentType: 'image/svg+xml',
+        cached: false,
+        degraded: true,
+        failure: { reason: 'HTTP 500 (text/plain)', itemFault: true },
+      });
+
+      let result;
+      for (let i = 0; i <= FAILURE_BACKOFF_BATCHES; i++) {
+        result = await processImagePrecacheJob(makeJob({ serverId: 'server-1', cursor: null }));
+      }
+
+      expect(result).not.toEqual({ skipped: true, reason: 'backing off' });
+      expect(mockProxyImage).toHaveBeenCalledTimes(1);
+    });
+
     it('continues the batch and does not fail the job when one warm call throws', async () => {
       const rows = [makeItemRow('item-0'), makeItemRow('item-1')];
       mockBatchQuery(rows);

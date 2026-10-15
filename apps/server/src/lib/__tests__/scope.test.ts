@@ -19,6 +19,8 @@ import {
   assertInScope,
   clearScope,
   hasPermission,
+  libraryCacheSegment,
+  libraryFragment,
   loadScope,
   memberCacheSegment,
   scopeSessions,
@@ -57,12 +59,13 @@ describe('loadScope', () => {
 
   it('takes every non-removed account on every server, whatever its member login switch', async () => {
     const chain = queryChain(vi.fn, [
-      { id: 'su-1', serverId: 'srv-a' },
-      { id: 'su-2', serverId: 'srv-b' },
+      { id: 'su-1', serverId: 'srv-a', libraryIds: ['lib-1'] },
+      { id: 'su-2', serverId: 'srv-b', libraryIds: null },
     ]);
     vi.mocked(db.select).mockReturnValue(chain);
+    const limited = { ...member, libraryIds: { 'srv-a': ['lib-1'] } };
 
-    expect(await loadScope('u-1', 'member')).toEqual(member);
+    expect(await loadScope('u-1', 'member')).toEqual(limited);
 
     const { text, params } = renderCall(chain);
     expect(text).toBe('(server_users.user_id = $1 and server_users.removed_at is null)');
@@ -71,10 +74,28 @@ describe('loadScope', () => {
     expect(params).toEqual(['u-1']);
     expect(redis.set).toHaveBeenCalledWith(
       REDIS_KEYS.USER_SCOPE('u-1'),
-      JSON.stringify({ serverUserIds: member.serverUserIds, serverIds: member.serverIds }),
+      JSON.stringify(limited),
       'PX',
       ACCESS_CACHE_TTL_MS
     );
+  });
+
+  it('lets two accounts on one server open what either can', async () => {
+    vi.mocked(db.select).mockReturnValue(
+      queryChain(vi.fn, [
+        { id: 'su-1', serverId: 'srv-a', libraryIds: ['lib-2'] },
+        { id: 'su-2', serverId: 'srv-a', libraryIds: ['lib-1', 'lib-2'] },
+        { id: 'su-3', serverId: 'srv-b', libraryIds: ['lib-9'] },
+        { id: 'su-4', serverId: 'srv-b', libraryIds: null },
+      ])
+    );
+
+    expect(await loadScope('u-1', 'member')).toEqual({
+      userId: 'u-1',
+      serverUserIds: ['su-1', 'su-2', 'su-3', 'su-4'],
+      serverIds: ['srv-a', 'srv-b'],
+      libraryIds: { 'srv-a': ['lib-1', 'lib-2'] },
+    });
   });
 
   it('scopes a person with no live account to nothing', async () => {
@@ -84,7 +105,26 @@ describe('loadScope', () => {
       userId: 'u-1',
       serverUserIds: [],
       serverIds: [],
+      libraryIds: {},
     });
+  });
+});
+
+describe('libraryFragment', () => {
+  it('narrows a limited account to its libraries and keys its cache apart', () => {
+    const limited = { ...member, libraryIds: { 'srv-b': ['lib-2', 'lib-3'], 'srv-a': [] } };
+    const rendered = renderSql(libraryFragment(['srv-a', 'srv-b'], limited, 'li'));
+
+    expect(rendered.sql.replace(/\s+/g, ' ').trim()).toBe(
+      'AND li.server_id IN ($1, $2) AND (li.server_id <> $3::uuid OR li.library_id IN ($4, $5)) AND li.server_id <> $6::uuid'
+    );
+    expect(rendered.params).toEqual(['srv-a', 'srv-b', 'srv-b', 'lib-2', 'lib-3', 'srv-a']);
+    expect(renderSql(libraryFragment(['srv-a'], member, 'li')).sql.trim()).toBe(
+      'AND li.server_id = $1'
+    );
+    expect(libraryCacheSegment(limited)).toBe(':libs:srv-a=,srv-b=lib-2+lib-3');
+    expect(libraryCacheSegment(member)).toBe('');
+    expect(libraryCacheSegment('all')).toBe('');
   });
 });
 

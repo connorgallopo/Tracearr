@@ -7,7 +7,20 @@
  */
 
 import { alias } from 'drizzle-orm/pg-core';
-import { and, asc, desc, eq, inArray, isNull, like, lt, ne, or, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  like,
+  lt,
+  ne,
+  notInArray,
+  or,
+  sql,
+} from 'drizzle-orm';
 import {
   rankMergeTarget,
   type LoginAccess,
@@ -98,6 +111,13 @@ export function stricterLoginAccess(a: LoginAccess, b: LoginAccess): LoginAccess
   return strictness(stricter) === 2 ? 'block' : stricter;
 }
 
+/**
+ * Media server sign-in finds the person through their server account and then writes this row onto
+ * whoever owns it, so the row is no way in on its own and follows the account through a merge or
+ * split. A password or OIDC row is the lookup itself, so it still makes its identity login-capable.
+ */
+export const MEDIA_AUTH_PROVIDERS = ['plex', 'jellyfin', 'emby'];
+
 export function isLoginCapable(user: MergeIdentitySnapshot): boolean {
   return (
     user.role === 'owner' ||
@@ -168,7 +188,12 @@ async function loadIdentitySnapshot(tx: Tx, userId: string): Promise<MergeIdenti
   const [authAccountCountRow] = await tx
     .select({ count: sql<number>`count(*)::int` })
     .from(authAccounts)
-    .where(eq(authAccounts.userId, userId));
+    .where(
+      and(
+        eq(authAccounts.userId, userId),
+        notInArray(authAccounts.providerId, MEDIA_AUTH_PROVIDERS)
+      )
+    );
   return {
     id: user.id,
     role: user.role,
@@ -242,11 +267,22 @@ async function repointIdentityRows(
   // reverse: it records which admin manually triggered a termination, not an
   // attribute of the terminated account, so there is no source-identity row to
   // faithfully hand back. It stays on the target after both merge and split.
-  // Better Auth login rows (auth_accounts / auth_sessions) are deliberately
-  // never touched here. assertMergeDirection already proved the source owns
-  // zero auth_accounts rows, so there is nothing to repoint; its sessions are
-  // revoked (not moved) through internalAdapter in mergeUsers instead, since
-  // Better Auth has no primitive to re-key a session onto another user.
+  // assertMergeDirection already proved the source owns no password or OIDC
+  // row, so only media server rows are left, and they follow the server
+  // accounts that just moved. Moving them keeps each Jellyfin or Emby token
+  // where the next sign-in looks for it to log out, instead of stranding it.
+  // Not recorded for split: split moves them by the account they name. The
+  // source's sessions are revoked (not moved) through internalAdapter in
+  // mergeUsers, since Better Auth has no primitive to re-key a session.
+  await tx
+    .update(authAccounts)
+    .set({ userId: targetUserId, updatedAt: new Date() })
+    .where(
+      and(
+        eq(authAccounts.userId, sourceUserId),
+        inArray(authAccounts.providerId, MEDIA_AUTH_PROVIDERS)
+      )
+    );
   return {
     plexAccountIds: movedPlexAccounts.map((r) => r.id),
     mobileSessionIds: movedMobileSessions.map((r) => r.id),
@@ -451,15 +487,16 @@ export async function mergeUsers(
       );
     }
 
-    // The direction check above already proved the source owns zero
-    // auth_accounts rows. Revoke its Better Auth sessions before the first
+    // The direction check above already proved the source has no password or
+    // OIDC login, and its media server sign-in lands on the target once the
+    // accounts move. Revoke its Better Auth sessions before the first
     // destructive write below so a ghost Redis session cannot keep working
     // for up to 30 days after the source row is deleted (deleting the row by
     // SQL clears the DB session rows via cascade but never touches the Redis
     // secondary storage). This writes through Better Auth's own connection,
     // not this transaction: if the transaction later aborts, the worst case
-    // is a revoked session for a user who could not log in anyway (safe
-    // direction, fail-closed). It must stay after the confirmation guard
+    // is a revoked session that signing in again restores (safe direction,
+    // fail-closed). It must stay after the confirmation guard
     // above so a rejected merge leaves the source's sessions untouched.
     await (await getAuth().$context).internalAdapter.deleteUserSessions(sourceUserId);
 
@@ -728,6 +765,40 @@ export async function splitServerUser(
       .set({ userId: newUser!.id, updatedAt: new Date() })
       .where(eq(serverUsers.id, serverUserId));
 
+    // The sign-in rows that name this account go with it, so blocking the old identity later can
+    // never log out this person's Jellyfin or Emby token. A plex.tv account the old identity still
+    // has on another Plex server keeps its row there.
+    const [plexStillOnOld] = serverUser.plexAccountId
+      ? await tx
+          .select({ id: serverUsers.id })
+          .from(serverUsers)
+          .where(
+            and(
+              eq(serverUsers.userId, oldUserId),
+              eq(serverUsers.plexAccountId, serverUser.plexAccountId)
+            )
+          )
+          .limit(1)
+      : [];
+    const namesThisAccount = [
+      and(
+        inArray(authAccounts.providerId, ['jellyfin', 'emby']),
+        eq(authAccounts.accountId, `${serverUser.serverId}:${serverUser.externalId}`)
+      ),
+      ...(serverUser.plexAccountId && !plexStillOnOld
+        ? [
+            and(
+              eq(authAccounts.providerId, 'plex'),
+              eq(authAccounts.accountId, serverUser.plexAccountId)
+            ),
+          ]
+        : []),
+    ];
+    await tx
+      .update(authAccounts)
+      .set({ userId: newUser!.id, updatedAt: new Date() })
+      .where(and(eq(authAccounts.userId, oldUserId), or(...namesThisAccount)));
+
     if (audit) {
       // Move exactly the plex_accounts / mobile_sessions / mobile_tokens rows
       // this merge recorded as moved, back onto the restored identity. Older
@@ -942,7 +1013,12 @@ async function loadMergeIdentities(
     db
       .select({ userId: authAccounts.userId, count: sql<number>`count(*)::int` })
       .from(authAccounts)
-      .where(inArray(authAccounts.userId, userIds))
+      .where(
+        and(
+          inArray(authAccounts.userId, userIds),
+          notInArray(authAccounts.providerId, MEDIA_AUTH_PROVIDERS)
+        )
+      )
       .groupBy(authAccounts.userId),
     // All-time count, so there is no started_at bound to prune chunks with. The
     // daily_bandwidth_by_user aggregate would be cheaper but only exists when the
