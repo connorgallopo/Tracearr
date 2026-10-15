@@ -1,0 +1,10 @@
+{
+  "version": "2.8.2",
+  "date": "2026-10-14",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "an admin on the Personal dashboard can switch back to Admin when they played nothing in the last 30 days"
+    }
+  ]
+}

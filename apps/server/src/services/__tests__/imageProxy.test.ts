@@ -994,6 +994,22 @@ describe('resizedOnly (background warms)', () => {
 
     expect(result.degraded).toBe(true);
     expect(result.contentType).toBe('image/svg+xml');
+    expect(result.failure).toEqual({ reason: 'HTTP 500 (no content-type)', itemFault: true });
+  });
+
+  it('blames the server, not the image, when it never answers', async () => {
+    fetchSpy.mockRejectedValue(new TypeError('fetch failed'));
+
+    const result = await proxyImage({
+      serverId: randomUUID(),
+      imagePath: '/library/metadata/5/thumb/1',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+      resizedOnly: true,
+    });
+
+    expect(result.failure).toEqual({ reason: 'fetch failed', itemFault: false });
   });
 
   it('does not flag a successful fetch as degraded', async () => {

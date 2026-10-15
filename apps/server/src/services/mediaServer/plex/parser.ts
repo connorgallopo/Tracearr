@@ -1034,7 +1034,7 @@ export function parsePlexTvUser(
     isAdmin: parseBoolean(user.isAdmin),
     isDisabled: false,
     isHomeUser: parseBoolean(user.home) || parseBoolean(user.isHomeUser),
-    sharedLibraries: sharedLibraries ?? [],
+    sharedLibraries,
     // Plex.tv API returns joinedAt (Unix timestamp) for when user joined Plex
     joinedAt: parseUnixTimestamp(user.joinedAt) ?? parseUnixTimestamp(user.createdAt),
   };
@@ -1307,7 +1307,6 @@ export function parseXmlUser(userXml: string): MediaUser {
     thumb: extractXmlAttribute(userXml, 'thumb') || undefined,
     isAdmin: false,
     isHomeUser: extractXmlAttribute(userXml, 'home') === '1',
-    sharedLibraries: [],
     // Plex provides createdAt (account creation) - use as joinedAt
     joinedAt: parseXmlTimestamp(userXml, 'createdAt'),
   };
@@ -1326,8 +1325,8 @@ export function parseXmlUsersResponse(xml: string): MediaUser[] {
  */
 export function parseSharedServersXml(
   xml: string
-): Map<string, { serverToken: string; sharedLibraries: string[] }> {
-  const userMap = new Map<string, { serverToken: string; sharedLibraries: string[] }>();
+): Map<string, { serverToken: string; sharedLibraries?: string[] }> {
+  const userMap = new Map<string, { serverToken: string; sharedLibraries?: string[] }>();
   const serverMatches = Array.from(xml.matchAll(/<SharedServer[^>]*>[\s\S]*?<\/SharedServer>/g));
 
   for (const match of serverMatches) {
@@ -1335,11 +1334,14 @@ export function parseSharedServersXml(
     const userId = extractXmlAttribute(serverXml, 'userID');
     const serverToken = extractXmlAttribute(serverXml, 'accessToken');
 
-    // Get shared libraries - sections with shared="1"
-    const sectionMatches = Array.from(serverXml.matchAll(/<Section[^>]*shared="1"[^>]*>/g));
-    const sharedLibraries = sectionMatches
-      .map((sectionMatch) => extractXmlAttribute(sectionMatch[0], 'key'))
-      .filter((key): key is string => key !== '');
+    // allLibraries="1" also covers sections added after the share. Otherwise the sections with
+    // shared="1", by their local key.
+    const sharedLibraries =
+      extractXmlAttribute(serverXml, 'allLibraries') === '1'
+        ? undefined
+        : Array.from(serverXml.matchAll(/<Section[^>]*shared="1"[^>]*>/g))
+            .map((sectionMatch) => extractXmlAttribute(sectionMatch[0], 'key'))
+            .filter((key) => key !== '');
 
     if (userId) {
       userMap.set(userId, { serverToken, sharedLibraries });

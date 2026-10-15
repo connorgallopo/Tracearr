@@ -89,6 +89,7 @@ function client(
   extra: Partial<Record<'movie' | 'tv', (tmdbId: number) => Promise<SeerrTitleLookup>>> = {}
 ): SeerrClientLike {
   return {
+    status: vi.fn(async () => ({ version: '3.5.0' })),
     requestCount: vi.fn(async () => counts),
     requestsPage: vi.fn(async (skip: number, take: number) => {
       const index = skip / take;
@@ -251,6 +252,16 @@ describe('runRequestSync', () => {
     expect(store.recordSyncResult).toHaveBeenCalledWith(
       'svc',
       expect.objectContaining({ lastSyncError: expect.any(String) })
+    );
+  });
+
+  it('refreshes the stored version even when the counts match', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow({ lastCounts: counts, version: '3.4.1' }));
+    const c = client([]);
+    await runRequestSync('svc', 'incremental', { clientFor: () => c });
+    expect(store.recordSyncResult).toHaveBeenCalledWith(
+      'svc',
+      expect.objectContaining({ version: '3.5.0' })
     );
   });
 

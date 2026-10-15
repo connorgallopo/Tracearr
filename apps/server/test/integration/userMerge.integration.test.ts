@@ -460,6 +460,42 @@ describe('mergeUsers', () => {
     expect(authAccountRow).toBeDefined();
   });
 
+  it('merges two members who both signed in through their media server, and split hands the sign-in back', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const emby = await createTestServer({ type: 'emby' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    const targetSu = await createTestServerUser({ userId: target.id, serverId: plex.id });
+    await db
+      .update(serverUsers)
+      .set({ plexAccountId: 'plex-tv-1' })
+      .where(eq(serverUsers.id, targetSu.id));
+    const sourceSu = await createTestServerUser({ userId: source.id, serverId: emby.id });
+    const embyAccountId = `${emby.id}:${sourceSu.externalId}`;
+    await db.insert(authAccounts).values([
+      { id: randomUUID(), providerId: 'plex', accountId: 'plex-tv-1', userId: target.id },
+      { id: randomUUID(), providerId: 'emby', accountId: embyAccountId, userId: source.id },
+    ]);
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const ownerOf = async (accountId: string) =>
+      (
+        await db
+          .select({ userId: authAccounts.userId })
+          .from(authAccounts)
+          .where(eq(authAccounts.accountId, accountId))
+      )[0]?.userId;
+    expect(await ownerOf(embyAccountId)).toBe(target.id);
+    expect(await ownerOf('plex-tv-1')).toBe(target.id);
+
+    const { newUserId } = await splitServerUser(sourceSu.id, admin.id);
+
+    expect(await ownerOf(embyAccountId)).toBe(newUserId);
+    expect(await ownerOf('plex-tv-1')).toBe(target.id);
+  });
+
   it('moves a newsletter exclusion onto the target, and keeps one entry when both were excluded', async () => {
     const admin = await createTestUser({ role: 'owner' });
     const serverA = await createTestServer({ type: 'plex' });

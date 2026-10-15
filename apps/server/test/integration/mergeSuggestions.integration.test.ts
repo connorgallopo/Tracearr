@@ -257,6 +257,34 @@ describe('getMergeSuggestions', () => {
     expect(authedSide?.loginCapable).toBe(true);
   });
 
+  it('suggests two members who both signed in through their media server, either way round', async () => {
+    const plex = await createTestServer({ type: 'plex' });
+    const emby = await createTestServer({ type: 'emby' });
+    const onPlex = await createTestUser({ role: 'member' });
+    const onEmby = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: onPlex.id, serverId: plex.id, username: 'ivy' });
+    const embySu = await createTestServerUser({
+      userId: onEmby.id,
+      serverId: emby.id,
+      username: 'ivy',
+    });
+    await db.insert(authAccounts).values([
+      { id: randomUUID(), providerId: 'plex', accountId: 'plex-tv-ivy', userId: onPlex.id },
+      {
+        id: randomUUID(),
+        providerId: 'emby',
+        accountId: `${emby.id}:${embySu.externalId}`,
+        userId: onEmby.id,
+      },
+    ]);
+
+    const match = (await getMergeSuggestions()).find((s) => s.matchValue === 'ivy');
+
+    expect(match).toBeDefined();
+    expect(match!.requiredTargetUserId).toBeNull();
+    expect(match!.users.every((u) => !u.loginCapable)).toBe(true);
+  });
+
   it('includes a soft-removed server account matching a replacement on the same server', async () => {
     const server = await createTestServer({ type: 'plex' });
     const removedIdentity = await createTestUser({ role: 'member' });

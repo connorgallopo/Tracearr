@@ -27,6 +27,7 @@ import { getCacheService } from '../services/cache.js';
 import { markServerHistorical, resumeServer } from '../services/historicalServers.js';
 import { liveServerCondition, HISTORICAL_EDIT_MESSAGE } from '../services/liveServers.js';
 import { rebuildAutoSyncSchedules, enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
+import { installedVersionOf } from '../jobs/serverUpdateChecker.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import { readServerIdentity, sharesKnownUsers } from '../services/serverIdentity.js';
 import { getSetting, rearmImportedHistoryLink } from '../services/settings.js';
@@ -648,22 +649,23 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can sync servers');
     }
 
-    // Check server exists
     const serverRows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
-
-    if (serverRows.length === 0) {
+    const server = serverRows[0];
+    if (!server) {
       return reply.notFound('Server not found');
     }
-
-    if (serverRows[0]?.historicalAt) {
+    if (server.historicalAt) {
       return reply.conflict('Resume this server to sync it');
     }
 
     try {
       const result = await syncServer(id, { syncUsers: true, syncLibraries: true });
 
-      // Update server's updatedAt timestamp
-      await db.update(servers).set({ updatedAt: new Date() }).where(eq(servers.id, id));
+      const version = await installedVersionOf(server);
+      await db
+        .update(servers)
+        .set({ updatedAt: new Date(), ...(version ? { version } : {}) })
+        .where(eq(servers.id, id));
 
       // Also trigger full library sync (items/episodes) in background
       let librarySyncJobId: string | null = null;

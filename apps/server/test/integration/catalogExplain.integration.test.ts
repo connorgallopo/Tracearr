@@ -38,6 +38,7 @@ const NO_NEW_FILTERS = {
   hdr: false,
   sizeGbMin: null,
   sizeGbMax: null,
+  scope: 'all',
 } as const;
 
 interface PlanNode {
@@ -548,6 +549,7 @@ describe('catalog EXPLAIN gate at scale', () => {
         sizeGbMin: 1,
         sizeGbMax: 50,
         serverIds: undefined,
+        scope: 'all',
         pageSize: 60,
       });
       const hdrSizePlan = flattenPlan(await explainPlan(hdrSizeQuery));
@@ -571,6 +573,7 @@ describe('catalog EXPLAIN gate at scale', () => {
         sizeGbMin: null,
         sizeGbMax: null,
         serverIds: undefined,
+        scope: 'all',
         pageSize: 60,
       });
       const libraryFilteredPlan = flattenPlan(await explainPlan(libraryFilteredQuery));

@@ -25,7 +25,7 @@ const logger = createLogger('ServerUpdate');
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const INITIAL_DELAY_MS = 15_000;
 
-interface CheckedServer {
+export interface CheckedServer {
   id: string;
   name: string;
   type: ServerType;
@@ -45,7 +45,7 @@ export function _resetServerUpdateStateForTests(): void {
  * Both columns hold normalized versions, so everything downstream compares them as
  * strings. An unreachable or unparseable server keeps whatever the row already holds.
  */
-async function installedVersionOf(server: CheckedServer): Promise<string | null> {
+export async function installedVersionOf(server: CheckedServer): Promise<string | null> {
   let reported: string | null;
   try {
     const client = createMediaServerClient({

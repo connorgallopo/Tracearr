@@ -30,6 +30,7 @@ const LOOKUP_CONCURRENCY = 4;
 export type SyncMode = 'incremental' | 'full';
 
 export interface SeerrClientLike {
+  status(): Promise<{ version: string }>;
   requestCount(): Promise<SeerrCounts>;
   requestsPage(
     skip: number,
@@ -202,9 +203,9 @@ export async function runRequestSync(
     : new SeerrClient(row.url, key.apiKey);
   const startedAt = new Date();
   try {
-    const counts = await client.requestCount();
+    const [counts, { version }] = await Promise.all([client.requestCount(), client.status()]);
     if (mode === 'incremental' && sameCounts(row.lastCounts, counts)) {
-      await recordSyncResult(row.id, { lastSyncAt: startedAt, lastSyncError: null });
+      await recordSyncResult(row.id, { version, lastSyncAt: startedAt, lastSyncError: null });
       return { skipped: true, upserted: 0, markedDeleted: 0 };
     }
 
@@ -227,6 +228,7 @@ export async function runRequestSync(
     }, row.syncCursor);
 
     await recordSyncResult(row.id, {
+      version,
       syncCursor: newest,
       lastCounts: counts,
       lastSyncAt: startedAt,

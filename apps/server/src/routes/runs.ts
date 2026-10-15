@@ -58,9 +58,10 @@ const INSTALL_SUBJECT_KEY = 'install';
 
 /**
  * A media subject names its library item after the prefix; every other subject key
- * is an id of its own, so the cast only ever sees the media rows.
+ * is an id of its own, so the cast only ever sees the media rows. The offset is cast
+ * because Postgres types a bare parameter there as text and runs the regex substring().
  */
-const mediaSubjectId = sql`CASE WHEN ${automationRuns.subjectKey} LIKE ${`${MEDIA_SUBJECT_PREFIX}%`} THEN substring(${automationRuns.subjectKey} FROM ${MEDIA_SUBJECT_PREFIX.length + 1})::uuid END`;
+const mediaSubjectId = sql`CASE WHEN ${automationRuns.subjectKey} LIKE ${`${MEDIA_SUBJECT_PREFIX}%`} THEN substring(${automationRuns.subjectKey} FROM ${MEDIA_SUBJECT_PREFIX.length + 1}::int)::uuid END`;
 
 /** Everything the summary shape needs; the step log stays out by construction. */
 const runSummaryColumns = {

@@ -840,6 +840,24 @@ describe('Plex XML Parser', () => {
       expect(user200?.sharedLibraries).toEqual(['1']);
     });
 
+    it('leaves the library list off a share of every library', () => {
+      const xml = `
+        <MediaContainer>
+          <SharedServer id="1" userID="100" accessToken="token-100" allLibraries="1">
+            <Section key="1" title="Movies" shared="1" />
+          </SharedServer>
+          <SharedServer id="2" userID="200" accessToken="token-200" allLibraries="0">
+            <Section key="1" title="Movies" shared="0" />
+          </SharedServer>
+        </MediaContainer>
+      `;
+
+      const userMap = parseSharedServersXml(xml);
+
+      expect(userMap.get('100')?.sharedLibraries).toBeUndefined();
+      expect(userMap.get('200')?.sharedLibraries).toEqual([]);
+    });
+
     it('should return empty map for no shared servers', () => {
       const xml = '<MediaContainer></MediaContainer>';
       const userMap = parseSharedServersXml(xml);

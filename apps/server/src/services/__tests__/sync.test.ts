@@ -1,9 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-const { mockLimit, mockReturning, mockGetUsers } = vi.hoisted(() => ({
+const { mockLimit, mockReturning, mockGetUsers, mockGetLibraries } = vi.hoisted(() => ({
   mockLimit: vi.fn(),
   mockReturning: vi.fn(),
   mockGetUsers: vi.fn(),
+  mockGetLibraries: vi.fn(),
 }));
 
 vi.mock('../../db/client.js', () => ({
@@ -13,7 +14,7 @@ vi.mock('../../db/client.js', () => ({
   },
 }));
 vi.mock('../mediaServer/index.js', () => ({
-  createMediaServerClient: () => ({ getUsers: mockGetUsers }),
+  createMediaServerClient: () => ({ getUsers: mockGetUsers, getLibraries: mockGetLibraries }),
   PlexClient: class {},
 }));
 vi.mock('../userService.js', () => ({ syncUserFromMediaServer: vi.fn() }));
@@ -44,6 +45,7 @@ describe('syncServer revocation', () => {
     vi.clearAllMocks();
     mockLimit.mockResolvedValue([SERVER]);
     mockGetUsers.mockResolvedValue([{ id: 'ext-1' }, { id: 'ext-2' }]);
+    mockGetLibraries.mockResolvedValue([]);
   });
 
   it('revokes an account the sync just saw disabled', async () => {
@@ -76,5 +78,48 @@ describe('syncServer revocation', () => {
 
     expect(revokeSessionsForServerUsers).toHaveBeenCalledExactlyOnceWith([]);
     expect(clearScope).toHaveBeenCalledExactlyOnceWith('u-back');
+  });
+});
+
+describe('syncServer library access', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockLimit.mockResolvedValue([SERVER]);
+    mockReturning.mockResolvedValue([]);
+    vi.mocked(syncUserFromMediaServer).mockResolvedValue(synced('su-1', false));
+  });
+
+  it('names enabled folders by library id, matching Emby folders by Guid only', async () => {
+    mockGetLibraries.mockResolvedValue([
+      { id: '3', guid: 'cf6657dae4df49e59f5a67056f48200e', name: 'Movies', type: 'movies' },
+      { id: '63851', guid: '0ebdcea572eb4ab6b517d127bb0d54b8', name: 'TV', type: 'tvshows' },
+      { id: 'f137a2dd21bbc1b99aa5c0f6bf02a805', name: 'Films', type: 'movies' },
+    ]);
+    mockGetUsers.mockResolvedValue([
+      { id: 'emby', sharedLibraries: ['cf6657dae4df49e59f5a67056f48200e', '63851'] },
+      { id: 'jellyfin', sharedLibraries: ['f137a2dd21bbc1b99aa5c0f6bf02a805', 'deleted'] },
+      { id: 'everything' },
+    ]);
+
+    await syncServer('srv-1', { syncUsers: true, syncLibraries: false });
+
+    expect(
+      vi.mocked(syncUserFromMediaServer).mock.calls.map(([, user]) => user.sharedLibraries)
+    ).toEqual([['3'], ['f137a2dd21bbc1b99aa5c0f6bf02a805'], undefined]);
+  });
+
+  it('still syncs users when the library list fails, mapping limits to no libraries', async () => {
+    mockGetLibraries.mockRejectedValue(new Error('403'));
+    mockGetUsers.mockResolvedValue([
+      { id: 'limited', sharedLibraries: ['f137a2dd21bbc1b99aa5c0f6bf02a805'] },
+      { id: 'everything' },
+    ]);
+
+    const result = await syncServer('srv-1', { syncUsers: true, syncLibraries: false });
+
+    expect(result.errors).toEqual([]);
+    expect(
+      vi.mocked(syncUserFromMediaServer).mock.calls.map(([, user]) => user.sharedLibraries)
+    ).toEqual([[], undefined]);
   });
 });

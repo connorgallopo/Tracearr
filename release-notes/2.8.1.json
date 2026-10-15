@@ -1,0 +1,32 @@
+{
+  "version": "2.8.1",
+  "date": "2026-10-14",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "members only see the libraries their account on each media server can open",
+      "refs": ["#1319"]
+    },
+    {
+      "type": "fix",
+      "text": "automation history no longer fails to load when a run is about a library item",
+      "refs": ["#1318"]
+    },
+    {
+      "type": "fix",
+      "text": "an item the media server re-creates no longer shows twice until the next full scan"
+    },
+    {
+      "type": "fix",
+      "text": "poster cache warming skips images the server can't serve instead of backing off as if the server were down"
+    },
+    {
+      "type": "fix",
+      "text": "the Seerr card picks up a new Seerr version on the next sync instead of staying on the one it was added with"
+    },
+    {
+      "type": "fix",
+      "text": "syncing a Plex, Jellyfin or Emby server refreshes its shown version instead of waiting up to six hours"
+    }
+  ]
+}

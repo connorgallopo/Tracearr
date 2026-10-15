@@ -18,7 +18,8 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { compareNames } from '../../utils/collation.js';
-import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { libraryCacheSegment, libraryFragment, type Scope } from '../../lib/scope.js';
+import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
 
 const librariesQuerySchema = z.object({
@@ -34,8 +35,11 @@ interface RawLibraryRow {
   media_type: string;
 }
 
-async function fetchLibraries(serverIds: string[] | undefined): Promise<LibraryOption[]> {
-  const serverFragment = buildMultiServerFragment(serverIds, 'l.server_id');
+async function fetchLibraries(
+  serverIds: string[] | undefined,
+  scope: Scope
+): Promise<LibraryOption[]> {
+  const serverFragment = libraryFragment(serverIds, scope, 'l');
   const result = await db.execute(sql`
     SELECT l.server_id, s.name AS server_name, s.display_order AS server_display_order,
            l.library_id, l.name, l.media_type
@@ -78,7 +82,9 @@ export const libraryLibrariesRoute: FastifyPluginAsync = async (app) => {
       // Guard: server scope, fail-closed.
       const resolvedIds = resolveServerIds(authUser, undefined, query.data.serverIds);
 
-      const serverCacheKey = resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all';
+      const serverCacheKey =
+        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
+        libraryCacheSegment(request.scope);
       const cacheKey = buildLibraryCacheKey(REDIS_KEYS.LIBRARY_LIBRARIES, serverCacheKey);
 
       const cached = await app.redis.get(cacheKey);
@@ -90,7 +96,7 @@ export const libraryLibrariesRoute: FastifyPluginAsync = async (app) => {
         }
       }
 
-      const data = await fetchLibraries(resolvedIds);
+      const data = await fetchLibraries(resolvedIds, request.scope);
       const response: LibrariesResponse = { data };
       await app.redis.setex(cacheKey, CACHE_TTL.LIBRARY_LIBRARIES, JSON.stringify(response));
 

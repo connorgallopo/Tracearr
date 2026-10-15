@@ -388,6 +388,22 @@ export function createUserParsingTests(parsers: ParserFunctions, serverType: 'je
         expect(user.isAdmin).toBe(false);
         expect(user.isDisabled).toBe(false);
       });
+
+      it('lists the enabled folders only when the policy limits them', () => {
+        const limited = parsers.parseUser({
+          Id: 'limited',
+          Name: 'Limited',
+          Policy: { EnableAllFolders: false, EnabledFolders: ['f137a2dd', 'a656b907'] },
+        });
+        const everything = parsers.parseUser({
+          Id: 'everything',
+          Name: 'Everything',
+          Policy: { EnableAllFolders: true, EnabledFolders: [] },
+        });
+
+        expect(limited.sharedLibraries).toEqual(['f137a2dd', 'a656b907']);
+        expect(everything.sharedLibraries).toBeUndefined();
+      });
     });
 
     describe('parseUsersResponse', () => {

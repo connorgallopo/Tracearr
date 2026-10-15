@@ -55,7 +55,7 @@ import {
   updateUser,
   recomputeIdentityAggregates,
 } from '../../services/userService.js';
-import { isLoginCapable } from '../../services/mergeService.js';
+import { isLoginCapable, MEDIA_AUTH_PROVIDERS } from '../../services/mergeService.js';
 import { nonOwnerMayLogin } from '../../lib/authGuards.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../../lib/revoke.js';
 import { getSetting } from '../../services/settings.js';
@@ -226,7 +226,14 @@ export function buildUserRosterPageQuery(params: {
       u.first_joined_at AS "identityJoinedAt",
       u.last_activity_at AS "identityLastActivityAt",
       (SELECT count(*)::int FROM plex_accounts pa WHERE pa.user_id = u.id) AS "plexAccountCount",
-      (SELECT count(*)::int FROM auth_accounts aa WHERE aa.user_id = u.id) AS "authAccountCount",
+      (
+        SELECT count(*)::int FROM auth_accounts aa
+        WHERE aa.user_id = u.id
+          AND aa.provider_id NOT IN (${sql.join(
+            MEDIA_AUTH_PROVIDERS.map((p) => sql`${p}`),
+            sql`, `
+          )})
+      ) AS "authAccountCount",
       rep.id AS "id",
       rep.server_id AS "serverId",
       s.name AS "serverName",

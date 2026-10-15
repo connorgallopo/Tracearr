@@ -895,13 +895,8 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       service: 'plex.tv',
     });
 
-    return parsePlexTvUser(
-      {
-        ...user,
-        isAdmin: true,
-      },
-      [] // Owner has access to all libraries
-    );
+    // No library list: the owner opens every library
+    return parsePlexTvUser({ ...user, isAdmin: true });
   }
 
   /**
@@ -927,7 +922,7 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   static async getSharedServerUsers(
     token: string,
     machineIdentifier: string
-  ): Promise<Map<string, { serverToken: string; sharedLibraries: string[] }>> {
+  ): Promise<Map<string, { serverToken: string; sharedLibraries?: string[] }>> {
     const headers = {
       ...plexHeaders(token),
       Accept: 'application/xml',
@@ -963,7 +958,7 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       .filter((friend) => sharedServerMap.has(friend.id))
       .map((friend) => ({
         ...friend,
-        sharedLibraries: sharedServerMap.get(friend.id)?.sharedLibraries ?? [],
+        sharedLibraries: sharedServerMap.get(friend.id)?.sharedLibraries,
       }));
 
     // Owner always has access to all libraries

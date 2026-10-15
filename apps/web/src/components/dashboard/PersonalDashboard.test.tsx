@@ -195,6 +195,30 @@ describe('PersonalDashboard', () => {
     expect(screen.queryByText('dashboard.watchTime')).not.toBeInTheDocument();
   });
 
+  it('keeps the view toggle when the last 30 days are empty or fail to load', () => {
+    const page = () =>
+      render(
+        <MemoryRouter>
+          <PersonalDashboard actions={<button>toggle</button>} />
+        </MemoryRouter>
+      );
+    load();
+    vi.mocked(useHistoryAggregates).mockReturnValue(
+      query({ playCount: 0, totalWatchTimeMs: 0, uniqueContent: 0, uniqueUsers: 1 })
+    );
+    const { unmount } = page();
+    expect(screen.getByRole('button', { name: 'toggle' })).toBeInTheDocument();
+    unmount();
+
+    vi.mocked(useHistoryAggregates).mockReturnValue({
+      isError: true,
+      error: new Error('boom'),
+      refetch: vi.fn(),
+    } as never);
+    page();
+    expect(screen.getByRole('button', { name: 'toggle' })).toBeInTheDocument();
+  });
+
   it('shows no Now Playing section without streams, and the cards with one', () => {
     load();
     const { unmount } = renderPage();

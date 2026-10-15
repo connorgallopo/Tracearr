@@ -1,7 +1,7 @@
 /**
  * Row scope and role permissions. Owner and admin see every row; a member sees the rows of
  * their own non-removed server accounts, on every server they have one, whether or not that
- * server allows member login.
+ * server allows member login, and on each server only the libraries that account can open.
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
@@ -22,28 +22,60 @@ import { buildMultiServerFragment } from '../utils/serverFiltering.js';
 import { roles, type Action, type Resource } from './access.js';
 import { getRedis } from './redisShared.js';
 
-export type Scope = 'all' | { userId: string; serverUserIds: string[]; serverIds: string[] };
+export type Scope =
+  | 'all'
+  | {
+      userId: string;
+      serverUserIds: string[];
+      serverIds: string[];
+      /** Library ids per server, for the servers where the account can't open every library */
+      libraryIds?: Record<string, string[]>;
+    };
 
 // One window for every cached access fact: the server list in sessionResolver and the scope here.
 export const ACCESS_CACHE_TTL_MS = 30_000;
 
 /** The person's non-removed server accounts, whatever their role. */
-export function ownServerUsers(userId: string): Promise<{ id: string; serverId: string }[]> {
+export function ownServerUsers(
+  userId: string
+): Promise<{ id: string; serverId: string; libraryIds: string[] | null }[]> {
   return db
-    .select({ id: serverUsers.id, serverId: serverUsers.serverId })
+    .select({
+      id: serverUsers.id,
+      serverId: serverUsers.serverId,
+      libraryIds: serverUsers.libraryIds,
+    })
     .from(serverUsers)
     .where(and(eq(serverUsers.userId, userId), isNull(serverUsers.removedAt)));
+}
+
+function scopeOf(
+  userId: string,
+  rows: { id: string; serverId: string; libraryIds: string[] | null }[]
+): Exclude<Scope, 'all'> {
+  // A merge can leave one person two accounts on a server; what either opens counts.
+  const limits = new Map<string, string[] | null>();
+  for (const { serverId, libraryIds } of rows) {
+    const prev = limits.get(serverId);
+    limits.set(
+      serverId,
+      prev === null || !libraryIds ? null : [...new Set([...(prev ?? []), ...libraryIds])].sort()
+    );
+  }
+  return {
+    userId,
+    serverUserIds: rows.map((r) => r.id),
+    serverIds: [...limits.keys()],
+    libraryIds: Object.fromEntries(
+      [...limits].filter((entry): entry is [string, string[]] => entry[1] !== null)
+    ),
+  };
 }
 
 /** The viewer's own accounts as a row scope, for every role. A member's is their scope. */
 export async function ownScope(userId: string, scope: Scope): Promise<Exclude<Scope, 'all'>> {
   if (scope !== 'all') return scope;
-  const rows = await ownServerUsers(userId);
-  return {
-    userId,
-    serverUserIds: rows.map((r) => r.id),
-    serverIds: [...new Set(rows.map((r) => r.serverId))],
-  };
+  return scopeOf(userId, await ownServerUsers(userId));
 }
 
 /** request.scope, or the viewer's own accounts when the query asks for `self`. */
@@ -57,23 +89,10 @@ export async function loadScope(userId: string, role: UserRole): Promise<Scope> 
   if (isStaff(role)) return 'all';
   const key = REDIS_KEYS.USER_SCOPE(userId);
   const cached = await getRedis().get(key);
-  if (cached) {
-    const { serverUserIds, serverIds } = JSON.parse(cached) as {
-      serverUserIds: string[];
-      serverIds: string[];
-    };
-    return { userId, serverUserIds, serverIds };
-  }
-  const rows = await ownServerUsers(userId);
-  const serverUserIds = rows.map((r) => r.id);
-  const serverIds = [...new Set(rows.map((r) => r.serverId))];
-  await getRedis().set(
-    key,
-    JSON.stringify({ serverUserIds, serverIds }),
-    'PX',
-    ACCESS_CACHE_TTL_MS
-  );
-  return { userId, serverUserIds, serverIds };
+  if (cached) return { ...(JSON.parse(cached) as Exclude<Scope, 'all'>), userId };
+  const scope = scopeOf(userId, await ownServerUsers(userId));
+  await getRedis().set(key, JSON.stringify(scope), 'PX', ACCESS_CACHE_TTL_MS);
+  return scope;
 }
 
 // Every answer cached for one member carries memberCacheSegment, so the old scope's answers go
@@ -89,6 +108,35 @@ export async function clearScope(userId: string): Promise<void> {
 /** Appended to a cache key whose value depends on the caller's row scope. */
 export function memberCacheSegment(scope: Scope): string {
   return scope === 'all' ? '' : `:member:${scope.userId}`;
+}
+
+/**
+ * Server filter for a row aliased `alias` that has server_id and library_id columns, narrowed
+ * for a member to the libraries their account on each server can open.
+ */
+export function libraryFragment(serverIds: string[] | undefined, scope: Scope, alias: string): SQL {
+  const servers = buildMultiServerFragment(serverIds, `${alias}.server_id`);
+  if (scope === 'all' || !scope.libraryIds) return servers;
+  const serverCol = sql.raw(`${alias}.server_id`);
+  const libraryCol = sql.raw(`${alias}.library_id`);
+  const limits = Object.entries(scope.libraryIds).map(([serverId, ids]) =>
+    ids.length === 0
+      ? sql` AND ${serverCol} <> ${serverId}::uuid`
+      : sql` AND (${serverCol} <> ${serverId}::uuid OR ${libraryCol} IN (${sql.join(
+          ids.map((id) => sql`${id}`),
+          sql`, `
+        )}))`
+  );
+  return sql`${servers}${sql.join(limits)}`;
+}
+
+/** Appended to a cache key whose value depends on which libraries the caller can open. */
+export function libraryCacheSegment(scope: Scope): string {
+  if (scope === 'all' || !scope.libraryIds) return '';
+  const limits = Object.entries(scope.libraryIds)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([serverId, ids]) => `${serverId}=${ids.join('+')}`);
+  return limits.length === 0 ? '' : `:libs:${limits.join(',')}`;
 }
 
 /**

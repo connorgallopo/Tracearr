@@ -43,6 +43,39 @@ describe('library sync identity', () => {
     expect(rows[0]!.genres).toEqual(['Action', 'Crime']);
   });
 
+  it('retires an old copy the server replaced, and keeps one it still has', async () => {
+    const s1 = await createTestServer({ type: 'emby' });
+    await librarySyncService.upsertItems(s1.id, 'lib', [
+      makeItem({ ratingKey: 'old' }),
+      makeItem({ ratingKey: 'duplicate' }),
+      makeItem({ ratingKey: 'new' }),
+    ] as never);
+    const client = {
+      findExistingRatingKeys: async (keys: string[]) =>
+        new Set(keys.filter((key) => key === 'duplicate')),
+    };
+    const retire = (
+      librarySyncService as unknown as {
+        retireReplacedCopies: (...args: unknown[]) => Promise<number>;
+      }
+    ).retireReplacedCopies.bind(librarySyncService);
+
+    const retired = await retire(
+      client,
+      s1.id,
+      { id: 'lib', name: 'Movies', type: 'movie' },
+      ['new'],
+      new Set<string>()
+    );
+
+    const live = (await db.select().from(libraryItems))
+      .filter((row) => row.removedAt === null)
+      .map((row) => row.ratingKey)
+      .sort();
+    expect(retired).toBe(1);
+    expect(live).toEqual(['duplicate', 'new']);
+  });
+
   it('markItemsRemoved soft-deletes and re-upsert clears the tombstone', async () => {
     const s1 = await createTestServer({ type: 'plex' });
     await librarySyncService.upsertItems(s1.id, 'lib', [makeItem({})] as never);
