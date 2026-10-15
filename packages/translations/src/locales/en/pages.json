@@ -26,7 +26,6 @@
     "connectedTo": "Connected to {{name}}",
     "plexAuthFailed": "Plex authentication failed",
     "plexStartFailed": "Failed to start Plex login",
-    "plexExpired": "This Plex sign-in expired. Start it again.",
     "serverConnectFailed": "Failed to connect to server",
     "createAccountFailed": "Failed to create account",
     "invalidCredentials": "Invalid username, email, or password",
@@ -36,23 +35,7 @@
     "claimCodeLabel": "Claim Code",
     "claimCodeHint": "The claim code is printed in the server logs when the container starts",
     "validateClaimCode": "Validate Claim Code",
-    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup",
-    "member": {
-      "tabLocal": "Tracearr account",
-      "tabMember": "Media server",
-      "server": "Server",
-      "signingInTo": "Signing in to {{name}}",
-      "passwordHint": "Use the username and password for {{name}}.",
-      "quickConnectHint": "Open Jellyfin, go to Quick Connect, and enter this code.",
-      "waiting": "Waiting for approval",
-      "copyCode": "Copy code",
-      "usePassword": "Use password instead",
-      "useQuickConnect": "Use Quick Connect instead",
-      "codeExpired": "This code expired.",
-      "newCode": "New code",
-      "refused": "Sign-in is not available for this account.",
-      "notPermitted": "You are not permitted to sign in. Please contact the server owner."
-    }
+    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup"
   },
   "dashboard": {
     "alerts": "Alerts",
@@ -64,87 +47,7 @@
     "serverResources": "Server Resources",
     "bandwidth": "Bandwidth",
     "noActiveStreams": "No active streams",
-    "streamsAppearHere": "Active streams will appear here when users start watching",
-    "othersStreaming_one": "{{count}} other stream playing",
-    "othersStreaming_other": "{{count}} other streams playing",
-    "dayStreak": "Day streak",
-    "view": {
-      "label": "Dashboard view",
-      "admin": "Server",
-      "me": "Personal"
-    },
-    "me": {
-      "last30": "Last 30 days",
-      "vsPrior": "{{delta}} vs the 30 days before",
-      "streakDetail": "days in a row with a play",
-      "topTitles": "Your top titles",
-      "episodes_one": "{{count}} episode",
-      "episodes_other": "{{count}} episodes",
-      "welcome": {
-        "title": "Your dashboard fills in as you watch",
-        "description": "Plays, streaks and your top titles show up here a few minutes after you watch something.",
-        "browse": "Browse the library"
-      },
-      "requests": {
-        "title": "Your requests",
-        "availableThisWeek_one": "{{count}} became available this week",
-        "availableThisWeek_other": "{{count}} became available this week",
-        "requestedAgo": "Requested {{age}} ago",
-        "seeAll": "See all"
-      }
-    }
-  },
-  "yourStats": {
-    "titles": "Titles",
-    "howYouWatch": "How you watch",
-    "viewerType": {
-      "completionist": {
-        "label": "Completionist",
-        "desc": "You finish {{rate}}% of what you start."
-      },
-      "rewatcher": {
-        "label": "Rewatcher",
-        "desc": "You come back to your favorites."
-      },
-      "sampler": {
-        "label": "Explorer",
-        "desc": "You try a lot of things before settling on one."
-      },
-      "casual": {
-        "label": "Casual",
-        "desc": "You watch when the mood strikes."
-      }
-    },
-    "habits": "Your busiest day is {{day}}, and your busiest hour is {{hour}}.",
-    "seeActivity": "See activity",
-    "allTime": "All time",
-    "watchTime": "Watch time",
-    "span": {
-      "minutes_one": "{{count}} minute",
-      "minutes_other": "{{count}} minutes",
-      "hours_one": "{{count}} hour",
-      "hours_other": "{{count}} hours",
-      "days_one": "{{count}} day",
-      "days_other": "{{count}} days",
-      "weeks_one": "{{count}} week",
-      "weeks_other": "{{count}} weeks"
-    },
-    "longestStreak": "Longest streak",
-    "days_one": "{{count}} day",
-    "days_other": "{{count}} days",
-    "firstPlay": "First play",
-    "biggestBinge": "Biggest binge",
-    "bingeValue_one": "{{count}} episode of {{show}}",
-    "bingeValue_other": "{{count}} episodes of {{show}}",
-    "topGenres": "Top genres",
-    "allTimeCaption": "all time",
-    "tier": {
-      "watched": "Watched",
-      "engaged": "Engaged",
-      "sampled": "Sampled",
-      "abandoned": "Abandoned",
-      "rewatched": "Rewatched"
-    }
+    "streamsAppearHere": "Active streams will appear here when users start watching"
   },
   "users": {
     "title": "Users",
@@ -247,29 +150,7 @@
     "contactEmailLabel": "Newsletter address:",
     "contactEmailNone": "none set",
     "contactEmailNoLogin": "Grants no login.",
-    "locations": "Locations",
-    "access": {
-      "title": "Sign-in access",
-      "signIn": "Sign-in",
-      "signInAllow": "Allow",
-      "signInDefault": "Default",
-      "signInBlock": "Block",
-      "signInDefaultOn": "Default follows the global switch, which is on.",
-      "signInDefaultOff": "Default follows the global switch, which is off.",
-      "signInDefaultUnknown": "Default follows the global switch.",
-      "role": "Role",
-      "roleAdmin": "Admin",
-      "roleMember": "Member",
-      "roleHint": "Members see only their own activity. Admins see everyone's.",
-      "disabled": "This account can't sign in while it is disabled.",
-      "pending": "This account can't sign in while it is pending.",
-      "signIns": "Sign-ins",
-      "lastSignIn": "Last sign-in",
-      "never": "Never",
-      "viewAs": "View as",
-      "viewAsLabel": "View Tracearr as {{name}}",
-      "viewAsHint": "See Tracearr the way they do. It is read-only."
-    }
+    "locations": "Locations"
   },
   "history": {
     "title": "History",
@@ -281,6 +162,10 @@
   "library": {
     "title": "Library",
     "description": "Top movies and shows on your server.",
+    "topMovies": "Top Movies",
+    "topShows": "Top TV Shows",
+    "noMoviePlays": "No movie plays in this period",
+    "noShowPlays": "No TV show plays in this period",
     "overview": {
       "description": "Library health and growth metrics.",
       "lastUpdated": "Last updated:",
@@ -294,17 +179,7 @@
       "thisWeek": "this week",
       "thisMonth": "this month",
       "thisYear": "this year",
-      "serversNeedSync": "These servers need to sync:",
-      "memberDescription": "What's new on the server.",
-      "movieCount_one": "{{count}} movie",
-      "movieCount_other": "{{count}} movies",
-      "showCount_one": "{{count}} show",
-      "showCount_other": "{{count}} shows",
-      "notWatchedByYou": "Not watched by you",
-      "memberEmpty": {
-        "title": "Nothing here yet",
-        "description": "Movies and shows show up here once the server's library has synced."
-      }
+      "serversNeedSync": "These servers need to sync:"
     },
     "quality": {
       "title": "Quality",
@@ -454,7 +329,6 @@
     "concurrentStreams": "Concurrent Streams",
     "engagementBreakdown": "Engagement Breakdown",
     "howUsersEngage": "How users engage with content",
-    "howYouEngage": "How you engage with what you watch",
     "playsVsSessions": "Plays vs Sessions",
     "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
     "activityByDayOfWeek": "Activity by Day of Week",
@@ -2022,12 +1896,6 @@
       "updating": "Updating..."
     }
   },
-  "impersonation": {
-    "banner": "Viewing as {{name}}. Changes are turned off.",
-    "stop": "Stop",
-    "stopLabel": "Stop viewing as {{name}}",
-    "stopViewing": "Stop viewing"
-  },
   "maintenance": {
     "startingTitle": "Tracearr is starting up...",
     "interruptionTitle": "Service interruption",
@@ -2291,13 +2159,6 @@
       },
       "kpis": {
         "ariaLabel": "Watch statistics",
-        "yourPlays": "Your plays",
-        "yourWatchTime": "Your watch time",
-        "yourCompletion": "Your completion",
-        "lastWatched": "Last watched",
-        "episodesOf": "{{watched}} of {{total}} episodes",
-        "watchedByOthers_one": "Watched by {{count}} other person",
-        "watchedByOthers_other": "Watched by {{count}} others",
         "loadError": "Couldn't load watch statistics",
         "completionLoadError": "Couldn't load completion",
         "plays": {
