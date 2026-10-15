@@ -4,7 +4,7 @@ name: Fork
 # upstream's images and releases, run its bots and need its secrets. Pull requests
 # and pushes to main run lint, typecheck and the server tests. An oliviacpu-* tag
 # runs the same checks, then builds docker/Dockerfile and pushes
-# ghcr.io/oliviacpu/tracearr:<tag> (linux/amd64). See FORK.md.
+# ghcr.io/oliviacpu/tracearr:<tag> and :latest (linux/amd64). See FORK.md.
 
 on:
   push:
@@ -101,7 +101,10 @@ jobs:
           file: ./docker/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/oliviacpu/tracearr:${{ github.ref_name }}
+          # :latest is the newest tag build; the deployment runs it, so a tag is a release
+          tags: |
+            ghcr.io/oliviacpu/tracearr:${{ github.ref_name }}
+            ghcr.io/oliviacpu/tracearr:latest
           build-args: |
             APP_VERSION=${{ steps.version.outputs.base }}
             APP_TAG=${{ github.ref_name }}
