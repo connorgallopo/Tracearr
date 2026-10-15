@@ -4,7 +4,7 @@ name: Fork
 # upstream's images and releases, run its bots and need its secrets. Pull requests
 # and pushes to main run lint, typecheck and the server tests. An oliviacpu-* tag
 # runs the same checks, then builds docker/Dockerfile and pushes
-# ghcr.io/oliviacpu/tracearr:<tag> (linux/amd64). See FORK.md.
+# ghcr.io/oliviacpu/tracearr:<tag> and :latest (linux/amd64). See FORK.md.
 
 on:
   push:
@@ -66,6 +66,10 @@ jobs:
     if: github.repository == 'oliviacpu/Tracearr' && startsWith(github.ref, 'refs/tags/oliviacpu-')
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # One image build at a time, so the newest-tag check and the :latest retag never race another build.
+    concurrency:
+      group: fork-image
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: write
@@ -113,3 +117,17 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.version=${{ github.ref_name }}
             org.opencontainers.image.licenses=AGPL-3.0
+
+      # The deployment runs :latest, so a tag is a release. It moves to this build only if the tag is still the
+      # newest oliviacpu-* tag (version order) once the image is pushed, so an older tag's build, or a rerun of one,
+      # can't move it back however the runs overlap.
+      - name: Move latest
+        run: |
+          git fetch --quiet --force --tags origin
+          newest=$(git tag -l 'oliviacpu-*' --sort=-v:refname | head -n 1)
+          if [ "$newest" != "$GITHUB_REF_NAME" ]; then
+            echo "::notice::$GITHUB_REF_NAME is older than $newest, so :latest stays put"
+            exit 0
+          fi
+          docker buildx imagetools create --tag ghcr.io/oliviacpu/tracearr:latest \
+            "ghcr.io/oliviacpu/tracearr:${GITHUB_REF_NAME}"
