@@ -81,6 +81,21 @@ jobs:
         id: version
         run: echo "base=$(git describe --tags --abbrev=0 --match 'v*')" >> "$GITHUB_OUTPUT"
 
+      # :latest goes only on the newest oliviacpu-* tag (version order), so when two tag builds
+      # overlap, an older one finishing last can't move it back.
+      - name: Image tags
+        id: tags
+        run: |
+          git fetch --quiet --force --tags origin
+          newest=$(git tag -l 'oliviacpu-*' --sort=-v:refname | head -n 1)
+          tags="ghcr.io/oliviacpu/tracearr:${GITHUB_REF_NAME}"
+          if [ "$newest" = "$GITHUB_REF_NAME" ]; then
+            tags="$tags,ghcr.io/oliviacpu/tracearr:latest"
+          else
+            echo "::notice::$GITHUB_REF_NAME is older than $newest, so :latest stays put"
+          fi
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
+
       - name: Fetch basemap
         uses: ./.github/actions/fetch-basemap
 
@@ -102,9 +117,7 @@ jobs:
           platforms: linux/amd64
           push: true
           # :latest is the newest tag build; the deployment runs it, so a tag is a release
-          tags: |
-            ghcr.io/oliviacpu/tracearr:${{ github.ref_name }}
-            ghcr.io/oliviacpu/tracearr:latest
+          tags: ${{ steps.tags.outputs.tags }}
           build-args: |
             APP_VERSION=${{ steps.version.outputs.base }}
             APP_TAG=${{ github.ref_name }}
