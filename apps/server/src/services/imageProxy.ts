@@ -415,11 +415,12 @@ function externalImageOrigins(): Set<string> {
     } catch {
       url = null;
     }
+    // Only a bare origin counts: a path, query or credentials would read as a
+    // narrower grant than the whole host it would really allow.
     if (
       url &&
       (url.protocol === 'http:' || url.protocol === 'https:') &&
-      !url.username &&
-      !url.password
+      value.replace(/\/$/, '') === url.origin
     ) {
       origins.add(url.origin);
     } else {

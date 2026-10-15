@@ -879,6 +879,24 @@ describe('buildUpstreamRequest', () => {
       expect(warn).toHaveBeenCalledTimes(2);
       warn.mockRestore();
     });
+
+    it.each([
+      ['a path', 'https://guide.example.com/api'],
+      ['a query', 'https://guide.example.com/?a=1'],
+      ['a fragment', 'https://guide.example.com/#a'],
+      ['credentials', 'https://user:pass@guide.example.com'],
+    ])('ignores an entry with %s rather than allowing its whole host', (_label, entry) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      process.env.EXTERNAL_IMAGE_ORIGINS = entry;
+      expect(() => buildUpstreamRequest(plex, poster)).toThrow(SsrfBlockedError);
+      expect(warn).toHaveBeenCalledTimes(1);
+      warn.mockRestore();
+    });
+
+    it('accepts an origin written with a trailing slash', () => {
+      process.env.EXTERNAL_IMAGE_ORIGINS = 'https://guide.example.com/';
+      expect(() => buildUpstreamRequest(plex, poster)).not.toThrow();
+    });
   });
 });
 
