@@ -88,6 +88,18 @@ jobs:
       - name: Fetch basemap
         uses: ./.github/actions/fetch-basemap
 
+      # Upstream's release builds download fresh GeoLite2 databases from MaxMind with a license key this fork doesn't
+      # have, so the committed ones (often weeks old) would ship and put viewers in the wrong city. Take the databases
+      # from upstream's newest published image instead; the committed ones stay if that fails.
+      - name: GeoIP databases from upstream's image
+        continue-on-error: true
+        run: |
+          id=$(docker create ghcr.io/connorgallopo/tracearr:latest)
+          docker cp "$id:/app/data/GeoLite2-City.mmdb" data/GeoLite2-City.mmdb
+          docker cp "$id:/app/data/GeoLite2-ASN.mmdb" data/GeoLite2-ASN.mmdb
+          docker rm "$id" > /dev/null
+          ls -la data/GeoLite2-City.mmdb data/GeoLite2-ASN.mmdb
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
 

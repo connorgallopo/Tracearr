@@ -10,6 +10,9 @@ its tests per commit) in case any of them is ever offered back.
   for linux/amd64 by `.github/workflows/fork.yml` when an `oliviacpu-*` tag is pushed, after lint, typecheck and the
   server tests pass. So pushing a tag is releasing it. That workflow is the fork's only one:
   upstream's publish its images and releases, run its bots and need its secrets.
+- **GeoIP:** the build copies the GeoLite2 databases out of upstream's newest image. Upstream's own builds download them
+  from MaxMind with a license key the fork doesn't have, and the committed copies can be weeks old: the first fork image
+  put a viewer in the wrong city.
 - **Version:** the image reports the upstream base tag as its version, so the update check still compares against
   upstream releases. The fork tag is the build's `tag`.
 
