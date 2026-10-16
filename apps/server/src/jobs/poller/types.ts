@@ -47,6 +47,8 @@ export interface ServerWithToken {
   type: 'plex' | 'jellyfin';
   url: string;
   token: string;
+  /** Plex's machineIdentifier (the servers row carries it) */
+  machineIdentifier?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

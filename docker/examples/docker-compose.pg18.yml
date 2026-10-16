@@ -46,6 +46,9 @@ services:
       # - DATABASE_POOL_MAX=50  # Database connection pool size (default: 50)
       # Outside origins whose pictures Plex may fetch for Tracearr, such as an XMLTV guide's (Live TV show posters)
       - EXTERNAL_IMAGE_ORIGINS=${EXTERNAL_IMAGE_ORIGINS:-}
+      # A shared user's Live TV through an iptvtunerr proxy is filed under them (its -live-viewers list)
+      - IPTVTUNERR_LIVE_VIEWERS_URL=${IPTVTUNERR_LIVE_VIEWERS_URL:-}
+      - IPTVTUNERR_LIVE_VIEWERS_KEY=${IPTVTUNERR_LIVE_VIEWERS_KEY:-}
     depends_on:
       timescale:
         condition: service_healthy
