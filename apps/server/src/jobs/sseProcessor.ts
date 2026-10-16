@@ -74,6 +74,7 @@ import {
 } from './poller/stateTracker.js';
 import { PENDING_STOP_PERSIST_MIN_PROGRESS_MS, type PendingSessionData } from './poller/types.js';
 import { broadcastViolations } from './poller/violations.js';
+import { attributePlexLiveViewers, trackedPlaybackCheck } from '../services/proxyLiveViewers.js';
 
 const sseLogger = createLogger('SSEProcessor');
 
@@ -996,6 +997,24 @@ async function fetchFullSession(
     }
 
     const session = mapMediaSession(targetSession, server.type);
+    // Fork: a shared user's Live TV through the iptvtunerr proxy is listed under the owner
+    await attributePlexLiveViewers(
+      server,
+      [session],
+      trackedPlaybackCheck(
+        serverId,
+        async (sid, sessionKey) => (await cacheService?.getPendingSession(sid, sessionKey)) ?? null,
+        (sid, sessionKey) => findActiveSession({ serverId: sid, sessionKey }),
+        async (serverUserId) =>
+          (
+            await db
+              .select({ externalId: serverUsers.externalId, username: serverUsers.username })
+              .from(serverUsers)
+              .where(eq(serverUsers.id, serverUserId))
+              .limit(1)
+          )[0] ?? null
+      )
+    );
     // Stamp identity like the poller does or SSE session rows insert with null media columns
     if (session.ratingKey) {
       const identityMap = await batchGetLibraryItemIdentity(server.id, [session.ratingKey]);

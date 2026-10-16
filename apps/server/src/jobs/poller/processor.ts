@@ -106,6 +106,7 @@ import type {
 } from './types.js';
 import { excludeUncountableSessions } from './utils.js';
 import { broadcastViolations } from './violations.js';
+import { attributePlexLiveViewers, trackedPlaybackCheck } from '../../services/proxyLiveViewers.js';
 
 // ============================================================================
 // Module State
@@ -727,6 +728,25 @@ async function processServerSessions(
     sseManager.nudgeReconnect(server.id);
 
     const processedSessions = mediaSessions.map((s) => mapMediaSession(s, server.type));
+    // Fork: a shared user's Live TV through the iptvtunerr proxy is listed under the owner
+    await attributePlexLiveViewers(
+      server,
+      processedSessions,
+      trackedPlaybackCheck(
+        server.id,
+        async (serverId, sessionKey) =>
+          (await cacheService?.getPendingSession(serverId, sessionKey)) ?? null,
+        (serverId, sessionKey) => findActiveSession({ serverId, sessionKey }),
+        async (serverUserId) =>
+          (
+            await db
+              .select({ externalId: serverUsers.externalId, username: serverUsers.username })
+              .from(serverUsers)
+              .where(eq(serverUsers.id, serverUserId))
+              .limit(1)
+          )[0] ?? null
+      )
+    );
 
     // OPTIMIZATION: Early return if no active sessions from media server
     if (processedSessions.length === 0) {
