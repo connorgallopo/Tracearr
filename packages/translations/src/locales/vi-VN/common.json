@@ -68,7 +68,8 @@
     "transcode": "",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "",
@@ -133,6 +134,7 @@
     "serverOwner": "",
     "resolution": "",
     "watchTime": "",
+    "listenTime": "",
     "pausedTime": "",
     "sessionDetails": "",
     "recentSessions": "",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "",
@@ -185,6 +193,7 @@
     "episode_plural": "",
     "track": "",
     "track_plural": "",
+    "artist_plural": "",
     "liveTV": "",
     "photo": "",
     "tv": "",
@@ -207,6 +216,7 @@
   "count": {
     "user_other": "",
     "session_other": "",
+    "download_other": "",
     "stream_other": "",
     "server_other": "",
     "automation_other": "",
@@ -236,7 +246,9 @@
     "noDeviceData": "",
     "noJobHistory": "",
     "noSessionsFound": "",
-    "noUserData": ""
+    "noUserData": "",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": ""
