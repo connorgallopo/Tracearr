@@ -16,7 +16,7 @@
       "locale": "Locale & units",
       "behavior": "Behavior",
       "connections": "Connections",
-      "posters": "Poster source",
+      "posters": "Posters",
       "plexAccounts": "Plex accounts",
       "destinations": "Destinations",
       "newsletters": "Newsletters",
@@ -32,9 +32,9 @@
     "descriptions": {
       "appearance": "Theme and accent color, stored in this browser.",
       "locale": "Language, clock and units used across the dashboard.",
-      "behavior": "How often Tracearr polls your servers and what it caches.",
+      "behavior": "How often Tracearr polls your servers and checks for updates.",
       "connections": "Media servers Tracearr reads sessions and libraries from.",
-      "posters": "Which server's artwork wins when a title exists on more than one.",
+      "posters": "Which server's artwork wins when a title exists on more than one, whether posters are cached ahead of time, and what the cache holds.",
       "plexAccounts": "Plex.tv accounts Tracearr uses to discover and authorize servers.",
       "destinations": "Where notifications and digests are delivered.",
       "memberLogin": "Who can sign in to Tracearr, and how.",
@@ -229,14 +229,23 @@
       "autoDetectNote": "Restart Jellyfin or Emby after installing the plugin; the restart is required. Tracearr itself needs no restart and picks the plugin up automatically.",
       "issueBlocked": "The server reports the plugin as installed and active, but Tracearr gets a 404 from its endpoint. A reverse proxy blocking the path is the usual cause.",
       "issueRestartRequired": "The plugin is installed, but the media server needs a restart before it activates.",
-      "issueMalfunctioned": "The server reports the plugin failed to load. Updating the plugin or the media server usually clears this."
+      "issueMalfunctioned": "The server reports the plugin failed to load. Updating the plugin or the media server usually clears this.",
+      "jellyfinStep1": "In your Jellyfin dashboard, go to Plugins → Repositories.",
+      "jellyfinStep2": "Add a repository named <strong>Tracearr</strong> with the URL below.",
+      "jellyfinStep3": "Open the Catalog tab and install <strong>Tracearr SSE</strong>.",
+      "jellyfinStep4": "Restart Jellyfin, and Tracearr will detect it automatically.",
+      "embyStep1": "In your Emby dashboard, go to Plugins → Catalog.",
+      "embyStep2": "Find <strong>Tracearr SSE</strong> in the Notifications row and install it.",
+      "embyStep3": "Restart Emby, and Tracearr will detect it automatically."
     },
     "posterSource": {
       "label": "Preferred Poster Source",
       "description": "When a title is on more than one server, use this server's poster. If it doesn't have one, we'll fall back to the most recently added copy.",
       "automatic": "Automatic (most recent)",
       "emptyHint": "Add a server to choose a preferred poster source.",
-      "ownerOnly": "Only the owner can choose the preferred poster source."
+      "ownerOnly": "Only the owner can change poster settings.",
+      "precache": "Cache posters after library syncs",
+      "precacheDescription": "Fetches posters for new and changed titles after each sync, so Library pages don't wait on your media server. Off, a poster is cached the first time someone opens a page that shows it."
     },
     "version": {
       "installed": "Version {{version}}",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Mobile App",
-    "pairDevice": "Pair Device",
-    "generateToken": "Generate Pair Token",
-    "scanQrCode": "Scan QR Code",
-    "tokenExpires": "Token expires in {{time}}",
     "lastSeen": "Last seen {{when}}",
     "connectedOn": "Connected {{date}}",
     "noDevices": "No devices paired yet",
@@ -257,7 +261,6 @@
     "revokeAll": "Revoke All Sessions",
     "getOnGooglePlay": "Get it on Google Play",
     "downloadOnAppStore": "Download on the App Store",
-    "externalUrlRequired": "An external URL must be configured in General Settings for mobile pairing to work.",
     "mobileAccessDisabled": "Mobile Access Disabled",
     "mobileAccessDisabledDesc": "Enable mobile access to allow the Tracearr mobile app to connect to your server.",
     "enableMobileAccess": "Enable Mobile Access",
@@ -450,7 +453,14 @@
     "duplicates_one": "{{count}} duplicate skipped",
     "duplicates_other": "{{count}} duplicates skipped",
     "skipOverlap": "Overlapping record - the timestamp falls inside the period Tracearr already tracks for this server. Enable full-range import to include it.",
-    "skipDuplicatePlugin": "Duplicate record - already imported directly or arrived earlier via a Jellystat import of the same plugin data."
+    "skipDuplicatePlugin": "Duplicate record - already imported directly or arrived earlier via a Jellystat import of the same plugin data.",
+    "importFailed": "Import failed",
+    "dropzone": {
+      "dropHere": "Drop file here",
+      "dragOrClick": "Drag & drop or click to select",
+      "limit": "{{accept}} files up to {{size}}",
+      "removeFile": "Remove file"
+    }
   },
   "plex": {
     "signInWithPlex": "Sign in with Plex",
@@ -608,7 +618,6 @@
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}}, {{timezone}}"
     },
-    "nextRun": "Next run {{when}}",
     "noNextRun": "Not scheduled",
     "neverSent": "Never sent",
     "lastSend": "{{outcome}} to {{count}}",
@@ -1046,11 +1055,7 @@
     "neverSynced": "Not synced yet",
     "counts": {
       "requests_one": "{{count}} request",
-      "requests_other": "{{count}} requests",
-      "unmatchedMedia_one": "{{count}} unmatched title",
-      "unmatchedMedia_other": "{{count}} unmatched titles",
-      "unmatchedUsers_one": "{{count}} unmatched user",
-      "unmatchedUsers_other": "{{count}} unmatched users"
+      "requests_other": "{{count}} requests"
     },
     "needsKey": "Needs API key",
     "lastError": "Last sync failed {{ago}}: {{error}}",
