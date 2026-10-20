@@ -26,6 +26,7 @@
     "connectedTo": "{{name}}에 연결됨",
     "plexAuthFailed": "Plex 인증에 실패했습니다",
     "plexStartFailed": "Plex 로그인을 시작하지 못했습니다",
+    "plexExpired": "",
     "serverConnectFailed": "서버에 연결하지 못했습니다",
     "createAccountFailed": "계정을 만들지 못했습니다",
     "invalidCredentials": "사용자 이름, 이메일 또는 비밀번호가 올바르지 않습니다",
@@ -35,7 +36,23 @@
     "claimCodeLabel": "클레임 코드",
     "claimCodeHint": "컨테이너가 시작될 때 서버 로그에 클레임 코드가 출력됩니다",
     "validateClaimCode": "클레임 코드 확인",
-    "claimCodeSecurityNote": "이 보안 절차는 승인된 사용자만 초기 설정을 완료할 수 있도록 합니다"
+    "claimCodeSecurityNote": "이 보안 절차는 승인된 사용자만 초기 설정을 완료할 수 있도록 합니다",
+    "member": {
+      "tabLocal": "",
+      "tabMember": "",
+      "server": "",
+      "signingInTo": "",
+      "passwordHint": "",
+      "quickConnectHint": "",
+      "waiting": "",
+      "copyCode": "",
+      "usePassword": "",
+      "useQuickConnect": "",
+      "codeExpired": "",
+      "newCode": "",
+      "refused": "",
+      "notPermitted": ""
+    }
   },
   "dashboard": {
     "alerts": "알림",
@@ -47,13 +64,89 @@
     "serverResources": "서버 리소스",
     "bandwidth": "대역폭",
     "noActiveStreams": "활성 스트림이 없습니다",
-    "streamsAppearHere": "사용자가 시청을 시작하면 활성 스트림이 여기에 표시됩니다"
+    "streamsAppearHere": "사용자가 시청을 시작하면 활성 스트림이 여기에 표시됩니다",
+    "dayStreak": "",
+    "view": {
+      "label": "",
+      "admin": "",
+      "me": ""
+    },
+    "me": {
+      "last30": "",
+      "streakDetail": "",
+      "topTitles": "",
+      "welcome": {
+        "title": "",
+        "description": "",
+        "browse": ""
+      },
+      "requests": {
+        "title": "",
+        "requestedAgo": "",
+        "seeAll": "",
+        "availableThisWeek_other": ""
+      },
+      "episodes_other": ""
+    },
+    "resources": {
+      "system": "",
+      "perServer": "",
+      "average": ""
+    },
+    "unknownLocation": "",
+    "unknownQuality": "",
+    "othersStreaming_other": ""
+  },
+  "yourStats": {
+    "titles": "",
+    "howYouWatch": "",
+    "viewerType": {
+      "completionist": {
+        "label": "",
+        "desc": ""
+      },
+      "rewatcher": {
+        "label": "",
+        "desc": ""
+      },
+      "sampler": {
+        "label": "",
+        "desc": ""
+      },
+      "casual": {
+        "label": "",
+        "desc": ""
+      }
+    },
+    "habits": "",
+    "seeActivity": "",
+    "allTime": "",
+    "watchTime": "",
+    "span": {
+      "minutes_other": "",
+      "hours_other": "",
+      "days_other": "",
+      "weeks_other": ""
+    },
+    "longestStreak": "",
+    "firstPlay": "",
+    "biggestBinge": "",
+    "topGenres": "",
+    "allTimeCaption": "",
+    "tier": {
+      "watched": "",
+      "engaged": "",
+      "sampled": "",
+      "abandoned": "",
+      "rewatched": ""
+    },
+    "days_other": "",
+    "bingeValue_other": ""
   },
   "users": {
     "title": "사용자",
     "showRemoved": "삭제된 사용자 표시",
     "noUsersFound": "사용자를 찾을 수 없습니다.",
-    "serversColumn": "서버",
     "resetTrustScore": "신뢰 점수 초기화",
     "resetTrustScoreConfirm": "신뢰 점수를 100으로 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
     "mergeUsers": "사용자 병합",
@@ -103,19 +196,28 @@
     "filterHasAccessTo": "액세스 가능",
     "filterHasAccessToPlaceholder": "모든 서버",
     "filterHasAccessToHint": "선택한 모든 서버에서 활성 계정을 가진 사람을 표시합니다.",
+    "merged": "",
+    "filterRoleAll": "",
+    "filterSignInAll": "",
+    "filterPendingOnly": "",
+    "rowActions": "",
+    "menuOpenViolations": "",
+    "signInOn": "",
+    "signInOff": "",
+    "signedInAgo": "",
+    "neverSignedIn": "",
     "selectAllUsers_other": "사용자 {{count}}명 모두 선택",
     "resetTrustScoreTitle_other": "사용자 {{count}}명의 신뢰 점수 초기화",
     "mergeMoves_other": "{{foldName}}의 서버 계정과 세션 {{count}}개가 {{keepName}}에게 이전됩니다.",
     "suggestionsCount_other": "중복 가능 사용자 {{count}}명",
     "suggestionsPairEmailMore_other": "{{first}}와(과) {{second}}의 이메일이 같으며, 외 {{count}}명이 더 있습니다.",
     "suggestionsPairEmailUsernameMore_other": "{{first}}와(과) {{second}}가 같은 주소를 사용자 이름 또는 계정 이메일로 사용하며, 외 {{count}}명이 더 있습니다.",
-    "suggestionsPairUsernameMore_other": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다."
+    "suggestionsPairUsernameMore_other": "{{first}}와(과) {{second}}의 사용자 이름이 같으며, 외 {{count}}명이 더 있습니다.",
+    "pendingLink_other": ""
   },
   "userDetail": {
     "backToUsers": "사용자로 돌아가기",
     "userNotFound": "사용자를 찾을 수 없습니다",
-    "userInfo": "사용자 정보",
-    "statistics": "통계",
     "sessions": "세션",
     "violations": "위반 내역",
     "terminationHistory": "종료 기록",
@@ -143,24 +245,142 @@
     "contactEmailLabel": "뉴스레터 주소:",
     "contactEmailNone": "설정되지 않음",
     "contactEmailNoLogin": "로그인 권한 없음",
-    "locations": "위치"
+    "locations": "위치",
+    "access": {
+      "title": "",
+      "signIn": "",
+      "signInAllow": "",
+      "signInDefault": "",
+      "signInBlock": "",
+      "signInDefaultOn": "",
+      "signInDefaultOff": "",
+      "signInDefaultUnknown": "",
+      "role": "",
+      "roleAdmin": "",
+      "roleMember": "",
+      "roleHint": "",
+      "disabled": "",
+      "pending": "",
+      "signIns": "",
+      "lastSignIn": "",
+      "never": "",
+      "viewAs": "",
+      "viewAsLabel": "",
+      "viewAsHint": ""
+    },
+    "tabs": {
+      "access": "",
+      "downloads": ""
+    },
+    "cards": {
+      "vsPrior": "",
+      "perActiveDay": "",
+      "finished": "",
+      "abandoned": "",
+      "avgBitrate": "",
+      "daysActive": "",
+      "ofDays": "",
+      "streak": "",
+      "transcodes_other": ""
+    },
+    "overview": {
+      "playsOverTime": "",
+      "priorRange": "",
+      "serverAverage": "",
+      "byHour": "",
+      "peak": "",
+      "serverPeak": "",
+      "what": "",
+      "otherMedia": "",
+      "mostFinished": "",
+      "where": "",
+      "directPlayShare": "",
+      "localShare": "",
+      "viewAllDevices": "",
+      "allSessions": "",
+      "finishedCount_other": ""
+    },
+    "uniqueCount": "",
+    "unknownCity": "",
+    "unknownDevice": "",
+    "viewAllMore": "",
+    "adjustTrustScoreDesc": "",
+    "ipCount_other": ""
   },
   "history": {
     "title": "기록",
-    "description": "",
     "totalPlays": "총 재생 수",
     "uniqueTitles": "고유 제목 수",
-    "uniqueUsers": "고유 사용자 수"
+    "uniqueUsers": "고유 사용자 수",
+    "searchPlaceholder": "",
+    "columns": {
+      "duration": "",
+      "progress": ""
+    },
+    "location": {
+      "city": "",
+      "region": "",
+      "country": "",
+      "continent": "",
+      "postalCode": "",
+      "coordinates": "",
+      "asn": "",
+      "asnOrg": ""
+    },
+    "trailer": "",
+    "filters": {
+      "columns": "",
+      "countries": "국가",
+      "mediaType": "미디어 유형",
+      "types": "",
+      "network": "",
+      "remote": "",
+      "trailers": "",
+      "clearUsers": "",
+      "clearPlatforms": "",
+      "clearCountries": "",
+      "clearFilters": "",
+      "selected_other": ""
+    },
+    "detail": {
+      "watch": "",
+      "summary": "",
+      "segmentsShown_other": ""
+    },
+    "stream": {
+      "notAvailable": "",
+      "bitrateUnavailable": "",
+      "stereo": "",
+      "mono": "",
+      "noDetails": "",
+      "source": "",
+      "stream": "",
+      "container": "",
+      "bitrate": "",
+      "video": "",
+      "audio": "",
+      "subtitles": "",
+      "codec": "",
+      "framerate": "",
+      "hdr": "",
+      "profile": "",
+      "color": "",
+      "channels": "",
+      "language": "",
+      "sampleRate": "",
+      "format": "",
+      "forced": "",
+      "transcodeDetails": "",
+      "hwDecode": "",
+      "hwEncode": "",
+      "speed": "",
+      "throttled": "",
+      "channelCount_other": ""
+    }
   },
   "library": {
     "title": "라이브러리",
-    "description": "",
-    "topMovies": "인기 영화",
-    "topShows": "인기 TV 프로그램",
-    "noMoviePlays": "이 기간에 재생된 영화가 없습니다",
-    "noShowPlays": "이 기간에 재생된 TV 프로그램이 없습니다",
     "overview": {
-      "description": "",
       "lastUpdated": "마지막 업데이트:",
       "totalItems": "전체 항목",
       "shows": "프로그램",
@@ -172,11 +392,16 @@
       "thisWeek": "이번 주",
       "thisMonth": "이번 달",
       "thisYear": "올해",
-      "serversNeedSync": "다음 서버를 동기화해야 합니다."
+      "serversNeedSync": "다음 서버를 동기화해야 합니다.",
+      "notWatchedByYou": "",
+      "memberEmpty": {
+        "title": "",
+        "description": ""
+      },
+      "movieCount_other": "",
+      "showCount_other": ""
     },
     "quality": {
-      "title": "품질",
-      "description": "",
       "qualityEvolution": "품질 변화",
       "all": "전체",
       "failedToLoad": "품질 데이터를 불러오지 못했습니다",
@@ -186,20 +411,34 @@
         "shows": "",
         "movieCount_other": "",
         "episodeCount_other": ""
+      },
+      "codec": {
+        "title": "",
+        "moviesAndTv": "",
+        "videoCodecs": "",
+        "audioCodecs": "",
+        "audioChannels": "",
+        "noVideo": {
+          "title": "",
+          "description": ""
+        },
+        "noMusic": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "resolution": {
+        "tooltip": "",
+        "empty": "",
+        "itemCount_other": ""
       }
     },
     "storage": {
-      "title": "저장 공간",
-      "description": "",
       "totalStorage": "전체 저장 공간",
       "growthRate": "증가율",
       "duplicates": "중복 항목",
-      "groups": "그룹",
-      "recoverable": "회수 가능",
       "staleContent": "오래된 콘텐츠",
       "staleContentDesc": "",
-      "items": "항목",
-      "unused": "미사용",
       "storageTrend": "저장 공간 추세",
       "confidence": "신뢰도",
       "confidenceHigh": "높음",
@@ -211,8 +450,6 @@
       "contentROIDesc": "",
       "avgHoursPerGB": "GB당 평균 시간",
       "insufficientData": "데이터가 부족합니다",
-      "of": "/",
-      "days": "일",
       "failedToLoad": "저장 공간 데이터를 불러오지 못했습니다",
       "failedToLoadDesc": "저장 공간 데이터를 가져오지 못했습니다. 다시 시도해 주세요.",
       "duplicatesTitle": "중복",
@@ -230,15 +467,75 @@
       "mirror": "미러",
       "missingOnServer": "서버에서 누락됨",
       "missingOnServerHint": "서버에는 이 파일이 등록되어 있지만 디스크에서 찾을 수 없습니다. Plex에서는 라이브러리 휴지통을 비워 제거하세요.",
-      "copyPath": "파일 경로 복사"
+      "copyPath": "파일 경로 복사",
+      "libraries": {
+        "title": "",
+        "columns": {
+          "library": "",
+          "share": ""
+        },
+        "serverFailed": ""
+      },
+      "stale": {
+        "tabs": {
+          "neverWatched": "",
+          "stale": ""
+        },
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "columns": {
+          "staleFor": ""
+        },
+        "allTypes": "",
+        "threshold": {
+          "months3": "",
+          "months6": "",
+          "year1": "",
+          "years2": ""
+        },
+        "age": {
+          "yearsMonths": "",
+          "days_other": "",
+          "months_other": "",
+          "years_other": ""
+        }
+      },
+      "growthPerMonth": "",
+      "dataDaysProgress": "",
+      "recoverableSize": "",
+      "unusedSize": "",
+      "roi": {
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "columns": {
+          "hoursPerGb": "",
+          "value": ""
+        },
+        "category": {
+          "low": "",
+          "moderate": "",
+          "high": ""
+        },
+        "deletionSuggested": ""
+      },
+      "matchBadge": {
+        "exact": "",
+        "likely": "",
+        "possible": "",
+        "fuzzy": "",
+        "versions": "",
+        "label": ""
+      },
+      "groupCount_other": "",
+      "itemCount_other": ""
     },
     "watch": {
-      "title": "시청 분석",
-      "description": "",
       "watched": "시청됨",
-      "percentWatched": "% 시청",
       "totalWatchTime": "전체 시청 시간",
-      "avgPerItem": "항목당 평균",
       "completed": "완료됨",
       "peakHour": "피크 시간",
       "viewingHours": "시청 시간대",
@@ -252,7 +549,43 @@
       "noData": "아직 시청 데이터가 없습니다",
       "noDataDesc": "콘텐츠가 재생되면 시청 분석이 여기에 표시됩니다. 시청 활동이 생긴 뒤 다시 확인하세요.",
       "failedToLoad": "시청 분석을 불러오지 못했습니다",
-      "failedToLoadDesc": "시청 데이터를 가져오지 못했습니다."
+      "failedToLoadDesc": "시청 데이터를 가져오지 못했습니다.",
+      "mostWatched": "",
+      "binge": {
+        "columns": {
+          "show": "",
+          "servers": "",
+          "consecutive": "",
+          "bingeScore": "",
+          "maxPerDay": ""
+        },
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "tiers": {
+          "highlyAddictive": "",
+          "addictive": "",
+          "bingeable": "",
+          "casual": ""
+        }
+      },
+      "percentWatchedValue": "",
+      "avgPerItemValue": "",
+      "top": {
+        "movies": {
+          "empty": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "shows": {
+          "empty": {
+            "title": "",
+            "description": ""
+          }
+        }
+      }
     },
     "emptyState": {
       "checkingStatus": "라이브러리 상태를 확인하는 중...",
@@ -309,21 +642,78 @@
       "action": "지금 동기화",
       "syncStarted": "라이브러리 동기화가 시작되었습니다.",
       "syncFailed_other": "{{count}}개의 서버에서 동기화를 시작하지 못했습니다. 권한과 서버 상태를 확인하세요."
+    },
+    "charts": {
+      "storage": {
+        "historical": "",
+        "prediction": "",
+        "now": "",
+        "axis": "",
+        "range": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "qualityTimeline": {
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "titles_other": ""
+      },
+      "monthly": {
+        "watchCount": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "uniqueItems_other": ""
+      },
+      "growth": {
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "hourly": {
+        "watches": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "completion": {
+        "inProgress": "",
+        "notStarted": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "tooltip_other": ""
+      },
+      "watchesValue_other": ""
     }
   },
   "activity": {
-    "title": "활동",
-    "description": "",
     "playsOverTime": "시간별 재생",
     "concurrentStreams": "동시 스트림",
     "engagementBreakdown": "참여도 분석",
     "howUsersEngage": "사용자가 콘텐츠를 이용하는 방식",
+    "howYouEngage": "",
     "playsVsSessions": "재생 vs 세션",
     "playsVsSessionsDesc": "완전 재생만 집계합니다. 총 시청 시간이 콘텐츠 전체 길이를 채울 때 재생으로 계산합니다",
     "activityByDayOfWeek": "요일별 활동",
     "activityByHourOfDay": "시간대별 활동",
     "platforms": "플랫폼",
-    "streamQuality": "스트림 품질"
+    "streamQuality": "스트림 품질",
+    "noEngagementData": "",
+    "noPlatformData": "",
+    "noQualityData": "",
+    "noConcurrentData": "",
+    "peakConcurrent": "",
+    "tierItems_other": "",
+    "playsShare_other": ""
   },
   "violations": {
     "title": "위반 내역",
@@ -364,6 +754,7 @@
       "conditionGroup": "조건 그룹 {{index}}",
       "matched": "{{matched}}/{{total}} 일치",
       "actual": "실제 값",
+      "actionResults": "",
       "relatedSessions_other": "관련 세션 {{count}}개"
     },
     "selectAllViolations_other": "필터와 일치하는 위반 {{count}}건 모두 선택",
@@ -442,6 +833,12 @@
         "platform": "",
         "product": "",
         "location": ""
+      },
+      "download": {
+        "title": "",
+        "app": "",
+        "device": "",
+        "last24h": ""
       },
       "trust": {
         "previous": "",
@@ -870,6 +1267,7 @@
         "accountInactiveFor": "계정이 {{duration}} 동안 비활성화되었습니다",
         "accountNewDevice": "계정이 새 기기에서 재생함",
         "accountTrustChanged": "계정의 신뢰 점수가 변경됩니다.",
+        "accountMediaDownloaded": "",
         "mediaAdded": "미디어가 추가되었습니다",
         "mediaUpgraded": "미디어가 업그레이드되었습니다",
         "serverDown": "서버가 오프라인이 됨",
@@ -898,6 +1296,8 @@
         "travel_speed_kmh": "이동 속도",
         "unique_ips_in_window": "마지막 스트림 이후의 시간",
         "unique_devices_in_window": "장치 수",
+        "downloads_in_window": "",
+        "download_bytes_in_window": "",
         "inactive_days": "마지막 스트림 이후의 시간",
         "current_pause_minutes": "현재 일시중지",
         "total_pause_minutes": "총 일시 정지 시간",
@@ -1076,6 +1476,14 @@
       "unique_devices_in_window": {
         "label": "기간 내 고유 기기",
         "description": "해당 기간의 고유 장치 수"
+      },
+      "downloads_in_window": {
+        "label": "",
+        "description": ""
+      },
+      "download_bytes_in_window": {
+        "label": "",
+        "description": ""
       },
       "inactive_days": {
         "label": "비활성 일수",
@@ -1379,8 +1787,6 @@
     "recordsOnly": "기록만 실행됨",
     "scope": {
       "global": "전체",
-      "person": "사용자",
-      "account": "계정",
       "crossServer": "서버 간"
     },
     "searchPlaceholder": "자동화 검색…",
@@ -1470,6 +1876,11 @@
         "name": "짧은 기간에 여러 IP 사용",
         "description": "설정한 기간에 허용 개수보다 많은 IP 주소에서 스트리밍하면 위반으로 기록합니다.",
         "keywords": "차단된 국가"
+      },
+      "download-burst": {
+        "name": "",
+        "description": "",
+        "keywords": ""
       },
       "geo-restriction": {
         "name": "차단된 국가",
@@ -1633,6 +2044,10 @@
           "description": "자동화나 소유자가 계정의 신뢰 점수를 변경한 시점입니다.",
           "synonyms": "신뢰, 점수, 평판, 페널티, 조정됨"
         },
+        "accountMediaDownloaded": {
+          "description": "",
+          "synonyms": ""
+        },
         "mediaAdded": {
           "description": "라이브러리 항목이 처음으로 서버에 표시됩니다.",
           "synonyms": "신규, 추가됨, 라이브러리, 영화, 에피소드, 가져오기"
@@ -1772,6 +2187,9 @@
         "authToken": "인증 토큰",
         "userKey": "사용자 키",
         "apiToken": "API 토큰",
+        "botToken": "",
+        "chatId": "",
+        "topicId": "",
         "preset": "제공업체",
         "host": "SMTP 호스트",
         "port": "포트",
@@ -1793,6 +2211,7 @@
       },
       "hints": {
         "authTokenOptional": "공개 주제의 경우 선택사항",
+        "telegramTopic": "",
         "smtpPreset": "",
         "smtpVerifyCertificate": "메일 서버의 TLS 인증서를 신뢰할 수 있는 인증 기관과 대조해 확인합니다. 로컬 브리지처럼 자체 서명 인증서를 사용하는 서버에서만 끄세요. 이 기능을 끄면 Tracearr와 메일 서버 사이의 경로에 있는 누군가가 연결을 가로챌 수 있습니다.",
         "smtpUsernameOptional": "서버에 로그인이 필요하지 않으면 비워 두세요.",
@@ -1850,6 +2269,7 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "telegram": "",
         "email": "이메일",
         "push": "모바일 푸시",
         "webToast": "브라우저 알림"
@@ -1860,21 +2280,13 @@
       "alertsGoTo_other": "알림 수신 주소 {{count}}개",
       "usedBy_other": "{{count}}개의 자동화에서 사용됨",
       "usedByNewsletters_other": "뉴스레터 {{count}}개에서 사용 중"
-    },
-    "jobs": {
-      "runNow": "지금 실행",
-      "running": "실행 중...",
-      "lastRun": "마지막 실행",
-      "nextRun": "다음 실행",
-      "schedule": "일정"
-    },
-    "mobile": {
-      "editDisplayName": "표시 이름 수정",
-      "editDisplayNameDesc": "기기 목록에 표시되는 이름을 변경합니다",
-      "displayName": "표시 이름",
-      "displayNamePlaceholder": "예: 내 iPhone",
-      "updating": "업데이트 중..."
     }
+  },
+  "impersonation": {
+    "banner": "",
+    "stop": "",
+    "stopLabel": "",
+    "stopViewing": ""
   },
   "maintenance": {
     "startingTitle": "Tracearr가 시작 중입니다...",
@@ -1906,17 +2318,20 @@
     "allTypes": "모든 유형",
     "heatmap": "히트맵",
     "circles": "원형 표시",
+    "viewMode": "",
     "streams": "스트림",
     "locations": "위치",
     "allActivity": "모든 활동",
     "basemapMissing": "이 브라우저에서는 WebGL이 비활성화되어 있습니다",
     "webglUnavailable": "이 브라우저에서는 WebGL이 비활성화되어 있습니다",
     "webglHint": "지도에는 WebGL이 필요합니다. 브라우저 설정에서 이 사이트에 대해 활성화하세요.",
-    "badMounts": "잘못된 볼륨 마운트가 감지되었습니다. 기능이 보장되지 않습니다."
+    "badMounts": "잘못된 볼륨 마운트가 감지되었습니다. 기능이 보장되지 않습니다.",
+    "loadingData": "",
+    "noDataForFilters": "",
+    "totalStreams": "",
+    "streamCount_other": ""
   },
   "devices": {
-    "title": "기기 호환성",
-    "description": "",
     "analyzedSessions": "분석된 세션",
     "directPlayRate": "다이렉트 재생 비율",
     "videoAndAudio": "",
@@ -1937,14 +2352,22 @@
     "directPlayHigh": "80% 이상 직접 재생",
     "directPlayMid": "50-79%",
     "directPlayLow": "50% 미만",
-    "topTranscodingUsers": "트랜스코딩 상위 사용자",
-    "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "트랜스코딩 사용자를 찾을 수 없습니다",
     "analyzedSessionsTooltip_other": "최소 {{count}}개의 세션과 알려진 코덱이 포함된 장치 + 코덱 조합의 세션입니다. 코덱 정보가 없는 드문 조합과 세션은 계산되지 않습니다."
   },
+  "downloads": {
+    "dataDownloaded": "",
+    "peopleDownloading": "",
+    "mostDownloaded": "",
+    "unknownUser": "",
+    "appOnDevice": "",
+    "deliveredAs": "",
+    "deliveredAsFormat": "",
+    "deliveredAtBitrate": "",
+    "empty": "",
+    "panelTitle": "",
+    "requests_other": ""
+  },
   "statsBandwidth": {
-    "title": "대역폭",
-    "description": "",
     "dataTransferred": "전송된 데이터",
     "avgBitrate": "평균 비트레이트",
     "avgBitrateMbps": "평균 비트레이트(Mbps)",
@@ -1953,15 +2376,44 @@
     "uniqueUsers": "고유 사용자",
     "dailyUsage": "일별 대역폭 사용량",
     "dailyUsageDesc": "",
-    "topUsers": "대역폭 상위 사용자",
-    "topUsersDesc": "",
-    "noData": "사용 가능한 대역폭 데이터가 없습니다"
+    "noData": "사용 가능한 대역폭 데이터가 없습니다",
+    "topPeopleTitle": "",
+    "topPeopleCaption": ""
   },
   "statsUsers": {
     "noActivity": "아직 활동이 없습니다",
     "noActivityDesc": "스트리밍을 시작하면 상위 사용자가 여기에 표시됩니다",
-    "top3": "상위 3명",
-    "runnersUp": "그 외 상위"
+    "rankBy": "",
+    "rank": {
+      "hours": "",
+      "transcodes": "",
+      "requests": "",
+      "lastSeen": ""
+    },
+    "summary": {
+      "active": "",
+      "activeOf": "",
+      "topThreeShare": "",
+      "transcoderShare": "",
+      "transcodesOf": "",
+      "quiet": "",
+      "quietDays": ""
+    },
+    "columns": {
+      "person": "",
+      "requests": "",
+      "trend": ""
+    },
+    "requestsAllTime": "",
+    "linkTitle": {
+      "transcodes": "",
+      "requests": ""
+    },
+    "linkBody": {
+      "transcodes": "",
+      "requests": ""
+    },
+    "openPeople": ""
   },
   "plexCallback": {
     "authComplete": "인증 완료",
@@ -2018,21 +2470,60 @@
     "selected": "선택됨",
     "snapshots": "스냅샷(들)",
     "of": "/",
-    "logExplorerUnavailable": "로그 탐색기는 Docker 환경에서만 사용할 수 있습니다."
+    "logExplorerUnavailable": "로그 탐색기는 Docker 환경에서만 사용할 수 있습니다.",
+    "tasksTab": {
+      "loading": "",
+      "failedToLoad": "",
+      "jobQueues": "",
+      "jobQueuesDesc": "",
+      "description": "",
+      "schedule": "",
+      "completed": "",
+      "scheduled": "",
+      "processing": "",
+      "onDemand": "",
+      "notInitialized": "",
+      "backgroundServices": "",
+      "backgroundServicesDesc": "",
+      "interval": "",
+      "eventConnections": "",
+      "eventConnectionsDesc": "",
+      "every": "",
+      "eventDriven": "",
+      "queues": {
+        "notifications": "",
+        "notificationsDesc": "",
+        "imports": "",
+        "importsDesc": "",
+        "maintenance": "",
+        "maintenanceDesc": "",
+        "librarySync": "",
+        "librarySyncDesc": "",
+        "versionCheck": "",
+        "versionCheckDesc": "",
+        "inactivityCheck": "",
+        "inactivityCheckDesc": "",
+        "backup": "",
+        "backupDesc": ""
+      },
+      "dlq_other": ""
+    },
+    "clientErrors": {
+      "title": "",
+      "description": "",
+      "empty": ""
+    }
   },
   "media": {
     "landing": {
-      "title": "미디어",
-      "lens": {
-        "label": "다음 사용자로 보기",
-        "allUsers": "모든 사용자"
-      },
       "shelves": {
         "recentlyAddedMovies": "최근 추가된 영화",
         "recentlyAddedShows": "최근 추가된 프로그램",
         "recentlyUpdated": "최근 업데이트",
         "mostPopularMovies": "가장 인기 있는 영화",
         "mostPopularShows": "가장 인기 있는 프로그램",
+        "recentlyAddedAlbums": "",
+        "mostPlayedArtists": "",
         "emptyRecentlyAdded": "서버 전체에서 중복 제거",
         "emptyRecentlyUpdated": "이 기간에는 교체된 항목이 없습니다.",
         "emptyMostPopular": "이 기간에 재생이 없습니다",
@@ -2048,24 +2539,13 @@
         }
       },
       "card": {
-        "addedAgo": "{{date}} 추가됨",
         "addedCompactAgo": "{{age}} 전에 추가됨",
         "newEpisodes_other": "새 에피소드 {{count}}개",
         "replacedEpisodes_other": "에피소드 {{count}}개 교체됨",
         "newEpisodesChip_other": "{{count}} 신규"
       },
       "deadWeight": {
-        "title": "장기 미시청 콘텐츠",
-        "empty": "정리할 항목이 없습니다. 라이브러리의 모든 항목에 시청 기록이 있습니다.",
-        "columns": {
-          "poster": "포스터",
-          "title": "제목",
-          "added": "추가됨",
-          "servers": "서버"
-        },
-        "viewAll": "모두 보기",
-        "viewAllTooltip": "곧 출시 예정",
-        "summary_other": "시청하지 않은 타이틀 {{count}}개 · {{size}}"
+        "viewAll": "모두 보기"
       },
       "loadError": "영화"
     },
@@ -2076,12 +2556,24 @@
       "title": "TV 프로그램"
     },
     "genres": {
-      "title": "장르",
-      "subtitle": "표시되는 모든 서버에서 장르별 재생 및 시청 시간입니다.",
+      "cards": {
+        "withPlays": "",
+        "ofGenres": "",
+        "topFiveShare": "",
+        "largestRise": "",
+        "largestFall": ""
+      },
+      "share": {
+        "title": "",
+        "items": "",
+        "plays": "",
+        "sortGap": "",
+        "showAll": ""
+      },
+      "trends": {
+        "title": ""
+      },
       "chart": {
-        "title": "장르별 재생 수",
-        "valueLabel": "재생 수",
-        "ariaLabel": "장르별 재생 막대 차트로, 가장 높은 것에서 가장 낮은 것으로 정렬됩니다. 전체 분석 내용은 아래 표에서 확인할 수 있습니다.",
         "itemCount_other": "콘텐츠 {{count}}개"
       },
       "table": {
@@ -2089,16 +2581,25 @@
         "columns": {
           "genre": "장르",
           "plays": "재생 수",
-          "watchTime": "시청 시간"
-        },
-        "browseMovies": "{{genre}} 영화 찾아보기",
-        "browseShows": "{{genre}} 프로그램 찾아보기"
+          "watchTime": "시청 시간",
+          "topViewer": ""
+        }
       },
       "empty": {
         "title": "장르는 미디어 서버의 메타데이터 동기화에서 가져옵니다. 다음 동기화가 완료된 후 다시 확인하세요.",
         "description": "장르는 미디어 서버의 메타데이터 동기화에서 가져옵니다. 다음 동기화가 완료된 후 다시 확인하세요."
       },
-      "loadError": "탐색 경로"
+      "loadError": "탐색 경로",
+      "sheet": {
+        "description": "",
+        "whoPlays": "",
+        "ofCountedPlays": "",
+        "topTitles": "",
+        "topArtists": "",
+        "browse": "",
+        "allGenresPeak": "",
+        "artistCount_other": ""
+      }
     },
     "detail": {
       "title": "미디어 세부정보",
@@ -2107,8 +2608,7 @@
       },
       "notFound": {
         "title": "미디어를 찾을 수 없습니다",
-        "message": "이 제목은 존재하지 않거나 해당 제목에 액세스할 수 없습니다.",
-        "backLink": "미디어로 돌아가기"
+        "message": "이 제목은 존재하지 않거나 해당 제목에 액세스할 수 없습니다."
       },
       "hero": {
         "loadError": "이 콘텐츠를 불러오지 못했습니다",
@@ -2131,6 +2631,13 @@
       },
       "kpis": {
         "ariaLabel": "시청 통계",
+        "yourPlays": "",
+        "yourWatchTime": "",
+        "yourListenTime": "",
+        "yourCompletion": "",
+        "lastWatched": "",
+        "lastPlayed": "",
+        "episodesOf": "",
         "loadError": "시계 통계를 불러올 수 없습니다.",
         "completionLoadError": "시청 시간",
         "plays": {
@@ -2138,30 +2645,36 @@
           "caption": "재개 체인, 짧은 세션 제외"
         },
         "watchTime": {
-          "label": "시청 시간",
           "detail": "지난 30일 동안 +{{hours}}시간"
         },
         "viewers": {
           "label": "시청자",
+          "labelMusic": "",
           "detail": "모든 서버에서"
         },
         "completion": {
           "label": "평균 완료",
           "detail": "{{finished}} 중 {{total}}가 모든 에피소드를 완료했습니다.",
-          "detailMovie": "{{finished}} 중 {{total}} 시청 완료"
-        }
+          "detailMovie": "{{finished}} 중 {{total}} 시청 완료",
+          "detailMusic": ""
+        },
+        "watchedByOthers_other": "",
+        "playedByOthers_other": ""
       },
       "watchers": {
         "title": "시청자",
+        "titleMusic": "",
         "loadError": "아직 이 동영상을 시청한 사람이 없습니다.",
         "empty": "아직 이 동영상을 시청한 사람이 없습니다.",
+        "emptyMusic": "",
         "lastWatchedAgo": "{{age}} 전",
         "completionLabel": "{{percent}}% 완료",
         "columns": {
           "plays": "재생",
           "episodes": "에피소드",
           "completion": "완료",
-          "lastWatched": "마지막 시청"
+          "lastWatched": "마지막 시청",
+          "lastPlayed": ""
         }
       },
       "seasons": {
@@ -2177,21 +2690,35 @@
         },
         "episodeCount_other": "{{count}}개의 에피소드"
       },
+      "albums": {
+        "title": "",
+        "loadError": "",
+        "trackCount_other": ""
+      },
+      "album": {
+        "kind": "",
+        "loadError": "",
+        "finishedCaption": "",
+        "vsPrior30": "",
+        "tracksCaption": "",
+        "columns": {
+          "title": "",
+          "length": ""
+        }
+      },
       "platforms": {
         "title": "플랫폼",
         "loadError": "플랫폼 분석을 불러올 수 없습니다.",
         "empty": "플랫폼",
         "unknown": "알 수 없음",
         "columns": {
-          "plays": "재생",
-          "watchTime": "시청 시간"
+          "plays": "재생"
         }
       },
       "history": {
         "title": "기록",
         "loadError": "아직 재생 기록이 없습니다.",
         "empty": "아직 재생 기록이 없습니다",
-        "watched": "시청함",
         "notWatched": "완료되지 않음",
         "columns": {
           "duration": "재생 시간"
@@ -2219,25 +2746,15 @@
         "watchedByOthers": "다른 사람이 시청함",
         "watchedByYou": "내가 시청함"
       },
-      "tileLabel": {
-        "added": "추가됨",
-        "plays": "재생",
-        "viewers": "시청자",
-        "resolution": "해상도"
-      },
-      "rankChip": "#{{rank}}",
       "versionsChip": "{{count}}×",
       "moreServers": "+{{count}}개 이상",
       "viewers_other": "시청자 {{count}}명",
-      "playsCompact_other": "{{compact}}회 재생",
-      "versions_other": "{{count}} 버전"
+      "versions_other": "{{count}} 버전",
+      "albumCount_other": ""
     },
     "grid": {
       "toolbar": {
         "ariaLabel": "필터 및 정렬",
-        "typeLabel": "미디어 유형",
-        "moviesToggle": "영화",
-        "showsToggle": "제목 검색",
         "searchPlaceholder": "제목 검색…",
         "searchLabel": "제목 검색",
         "filtersLabel": "필터",
@@ -2297,13 +2814,8 @@
         "current": "현재 {{letter}}"
       },
       "loaderError": "콘텐츠를 더 불러오지 못했습니다",
-      "retry": "다시 시도",
-      "clearJumpAction": "지우기",
-      "showingFrom": "{{letter}}에서 표시 중",
-      "showAll": "모두 표시",
       "emptyFilter": "\"{{query}}\"와(와) 일치하는 제목이 없습니다.",
       "emptySearch": "\"{{query}}\"와 일치하는 콘텐츠가 없습니다",
-      "emptyAnchored": "카탈로그를 불러올 수 없습니다.",
       "loadError": "카탈로그를 불러올 수 없습니다."
     }
   },
@@ -2366,7 +2878,6 @@
     },
     "page": {
       "title": "요청",
-      "description": "사용자가 요청한 콘텐츠, 추가 여부, 실제 재생 여부를 확인합니다.",
       "failedToLoad": "요청 분석을 불러오지 못했습니다.",
       "notConfigured": "연결된 Seerr 없음",
       "notConfiguredDescription": "Seerr 인스턴스를 서버에 연결하면 첫 동기화 후 이 페이지에 데이터가 표시됩니다.",
@@ -2403,19 +2914,6 @@
       "onDisk": "디스크에 있음",
       "untitled": "제목 없음",
       "failedToLoad": "이 요청을 불러오지 못했습니다."
-    },
-    "followThrough": {
-      "title": "요청자",
-      "description": "누가 무엇을 요청하는지, 요청자가 끝까지 시청하는지, 다른 사용자도 시청하는지 확인합니다.",
-      "person": "사용자",
-      "asked": "요청 수",
-      "landed": "추가됨",
-      "watched": "시청함",
-      "watchedByOthers": "다른 사용자가 시청함",
-      "medianWait": "대기 시간 중앙값",
-      "emptyTitle": "아직 요청자가 없습니다.",
-      "emptyDescription": "연결된 Seerr가 동기화되면 요청이 여기에 표시됩니다.",
-      "failedToLoad": "요청자를 불러오지 못했습니다."
     }
   }
 }
