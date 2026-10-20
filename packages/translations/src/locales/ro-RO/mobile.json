@@ -152,6 +152,7 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_few": "",
     "acknowledgeAllTitle_other": "",
@@ -162,6 +163,7 @@
   "history": {
     "adjustFilters": "",
     "historyWillAppear": "",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "",
@@ -182,7 +184,8 @@
     "noUsersMatch": "",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "Vizionări în timp",
