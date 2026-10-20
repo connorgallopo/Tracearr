@@ -146,12 +146,14 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_other": "",
     "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "尝试调整筛选条件",
     "historyWillAppear": "一旦用户开始串流，会话历史将出现在这里",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "",
@@ -170,7 +172,8 @@
     "noUsersMatch": "没有匹配的用户{{query}}",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "播放次数趋势",
