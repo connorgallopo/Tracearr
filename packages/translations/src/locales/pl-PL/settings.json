@@ -231,14 +231,23 @@
       "autoDetectNote": "Uruchom ponownie Jellyfin lub Emby po zainstalowaniu wtyczki; ponowne uruchomienie jest wymagane. Tracearr nie wymaga ponownego uruchomienia i wykryje wtyczkę automatycznie.",
       "issueBlocked": "Serwer zgłasza wtyczkę jako zainstalowaną i aktywną, ale Tracearr dostaje błąd 404 z jej endpointu. Zwykle przyczyną jest reverse proxy blokujące tę ścieżkę.",
       "issueRestartRequired": "Wtyczka jest zainstalowana, ale zostanie aktywowana dopiero po ponownym uruchomieniu serwera multimediów.",
-      "issueMalfunctioned": "Serwer zgłasza, że nie udało się załadować wtyczki. Aktualizacja wtyczki lub serwera multimediów zwykle pomaga."
+      "issueMalfunctioned": "Serwer zgłasza, że nie udało się załadować wtyczki. Aktualizacja wtyczki lub serwera multimediów zwykle pomaga.",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "Preferowane źródło plakatów",
       "description": "Gdy tytuł jest na więcej niż jednym serwerze, używany jest plakat z tego serwera. Jeśli go nie ma, użyjemy ostatnio dodanej kopii.",
       "automatic": "Automatyczne (najnowsze)",
       "emptyHint": "Dodaj serwer, aby wybrać preferowane źródło plakatów.",
-      "ownerOnly": "Tylko właściciel może wybrać preferowane źródło plakatów."
+      "ownerOnly": "Tylko właściciel może wybrać preferowane źródło plakatów.",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "Wersja {{version}}",
@@ -247,11 +256,6 @@
     }
   },
   "mobile": {
-    "title": "Aplikacja mobilna",
-    "pairDevice": "Sparuj urządzenie",
-    "generateToken": "Wygeneruj token parowania",
-    "scanQrCode": "Zeskanuj kod QR",
-    "tokenExpires": "Token wygasa za {{time}}",
     "lastSeen": "Ostatnio aktywne {{when}}",
     "connectedOn": "Połączono {{date}}",
     "noDevices": "Brak sparowanych urządzeń",
@@ -259,7 +263,6 @@
     "revokeAll": "Unieważnij wszystkie sesje",
     "getOnGooglePlay": "Pobierz z Google Play",
     "downloadOnAppStore": "Pobierz w App Store",
-    "externalUrlRequired": "Aby parowanie mobilne działało, w ustawieniach ogólnych musi być skonfigurowany zewnętrzny adres URL.",
     "mobileAccessDisabled": "Dostęp mobilny wyłączony",
     "mobileAccessDisabledDesc": "Włącz dostęp mobilny, aby umożliwić aplikacji mobilnej Tracearr łączenie się z serwerem.",
     "enableMobileAccess": "Włącz dostęp mobilny",
@@ -451,6 +454,13 @@
     "importFullRangeHelp": "Odtworzenia rozpoczęte po dodaniu tego serwera do Tracearr nigdy nie są importowane. Domyślnie import zatrzymuje się również na najwcześniejszym odtworzeniu, jakie Tracearr posiada dla tego serwera, na przykład z importu Jellystat. Włącz tę funkcję, aby importować wszystko sprzed dodania serwera. Dokładne duplikaty nadal zostaną pominięte.",
     "skipOverlap": "Nakładający się rekord – znacznik czasu przypada w okresie, który Tracearr już śledzi dla tego serwera. Włącz import pełnej historii, aby go uwzględnić.",
     "skipDuplicatePlugin": "Zduplikowany rekord – został już zaimportowany bezpośrednio lub dotarł wcześniej poprzez import Jellystat tych samych danych wtyczki.",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "{{count}} pominięty jako nakładający się",
     "overlapSkipped_few": "{{count}} pominięte jako nakładające się",
     "overlapSkipped_many": "{{count}} pominiętych jako nakładające się",
@@ -620,7 +630,6 @@
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}}, {{timezone}}"
     },
-    "nextRun": "Następne uruchomienie {{when}}",
     "noNextRun": "Niezaplanowane",
     "neverSent": "Jeszcze nie wysłano",
     "lastSend": "{{outcome}} – odbiorców: {{count}}",
@@ -1108,15 +1117,7 @@
       "requests_one": "{{count}} prośba",
       "requests_few": "{{count}} prośby",
       "requests_many": "{{count}} próśb",
-      "requests_other": "{{count}} próśb",
-      "unmatchedMedia_one": "{{count}} niedopasowany tytuł",
-      "unmatchedMedia_few": "{{count}} niedopasowane tytuły",
-      "unmatchedMedia_many": "{{count}} niedopasowanych tytułów",
-      "unmatchedMedia_other": "{{count}} niedopasowanych tytułów",
-      "unmatchedUsers_one": "{{count}} niedopasowany użytkownik",
-      "unmatchedUsers_few": "{{count}} niedopasowanych użytkowników",
-      "unmatchedUsers_many": "{{count}} niedopasowanych użytkowników",
-      "unmatchedUsers_other": "{{count}} niedopasowanych użytkowników"
+      "requests_other": "{{count}} próśb"
     },
     "needsKey": "Wymaga klucza API",
     "lastError": "Ostatnia synchronizacja nie powiodła się {{ago}}: {{error}}",
