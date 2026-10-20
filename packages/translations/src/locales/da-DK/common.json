@@ -68,7 +68,8 @@
     "transcode": "",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Lav",
@@ -133,6 +134,7 @@
     "serverOwner": "Server Ejer",
     "resolution": "Opløsning",
     "watchTime": "Visningstid",
+    "listenTime": "",
     "pausedTime": "Pause Tid",
     "sessionDetails": "Session Detaljer",
     "recentSessions": "Seneste Sessioner",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Søg efter brugere...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episoder",
     "track": "Spor",
     "track_plural": "Spor",
+    "artist_plural": "",
     "liveTV": "",
     "photo": "Foto",
     "tv": "Tv",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} brugere",
     "session_one": "",
     "session_other": "{{count}} sessioner",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "",
     "stream_other": "",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "Ingen tilgængelige enhedsdata",
     "noJobHistory": "Ingen jobhistorik endnu",
     "noSessionsFound": "Ingen sessioner fundet",
-    "noUserData": "Ingen tilgængelige brugerdata"
+    "noUserData": "Ingen tilgængelige brugerdata",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Du har ugemte ændringer. Er du sikker på, at du vil forlade?"
