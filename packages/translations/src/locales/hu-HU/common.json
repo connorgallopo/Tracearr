@@ -68,7 +68,8 @@
     "transcode": "Átkódolás",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Alacsony",
@@ -133,6 +134,7 @@
     "serverOwner": "",
     "resolution": "",
     "watchTime": "",
+    "listenTime": "",
     "pausedTime": "",
     "sessionDetails": "",
     "recentSessions": "",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "",
@@ -185,6 +193,7 @@
     "episode_plural": "",
     "track": "",
     "track_plural": "",
+    "artist_plural": "",
     "liveTV": "",
     "photo": "",
     "tv": "",
@@ -209,6 +218,8 @@
     "user_other": "",
     "session_one": "",
     "session_other": "",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "",
     "stream_other": "",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "",
     "noJobHistory": "",
     "noSessionsFound": "",
-    "noUserData": ""
+    "noUserData": "",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": ""
