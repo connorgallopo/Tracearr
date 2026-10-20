@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Εφαρμογή Για Κινητά",
-    "pairDevice": "Σύζευξη Συσκευής",
-    "generateToken": "Δημιουργία Διακριτικού Σύζευξης",
-    "scanQrCode": "",
-    "tokenExpires": "Το διακριτικό λήγει σε {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Δεν υπάρχουν συνδεδεμένες συσκευές",
@@ -257,7 +261,6 @@
     "revokeAll": "Ανάκληση Όλων Των Συνεδριών",
     "getOnGooglePlay": "Αποκτήστε το στο Google Play",
     "downloadOnAppStore": "Λήψη από το App Store",
-    "externalUrlRequired": "Πρέπει να ρυθμιστεί μια εξωτερική διεύθυνση URL στις Γενικές ρυθμίσεις για να λειτουργήσει η σύζευξη κινητών συσκευών.",
     "mobileAccessDisabled": "Απενεργοποιημένη Πρόσβαση Κινητού",
     "mobileAccessDisabledDesc": "Ενεργοποιήστε την πρόσβαση στο κινητό για να επιτρέψετε στο Tracearr να συνδεθεί με το διακομιστή σας.",
     "enableMobileAccess": "Ενεργοποίηση Πρόσβασης Για Κινητά",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
