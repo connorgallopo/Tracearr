@@ -228,14 +228,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -244,11 +253,6 @@
     }
   },
   "mobile": {
-    "title": "モバイルアプリ",
-    "pairDevice": "デバイスをペアリングする",
-    "generateToken": "ペアトークンを生成する",
-    "scanQrCode": "",
-    "tokenExpires": "トークンの有効期限は {{time}} です。",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "まだペアリングされたデバイスはありません",
@@ -256,7 +260,6 @@
     "revokeAll": "すべてのセッションを取り消す",
     "getOnGooglePlay": "Google Playで入手",
     "downloadOnAppStore": "App Storeでダウンロード",
-    "externalUrlRequired": "モバイルペアリングを機能させるには、一般設定で外部 URL を設定する必要があります。",
     "mobileAccessDisabled": "モバイルアクセスは無効です",
     "mobileAccessDisabledDesc": "Tracearrモバイルアプリがあなたのサーバーに接続できるようにするには、モバイルアクセスを有効にします。",
     "enableMobileAccess": "モバイルアクセスを有効にする",
@@ -445,6 +448,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_other": "",
     "duplicates_other": ""
   },
@@ -602,7 +612,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1015,9 +1024,7 @@
     "syncedAgo": "",
     "neverSynced": "",
     "counts": {
-      "requests_other": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
