@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Mobil app",
-    "pairDevice": "Para ihop enhet",
-    "generateToken": "Generera parkopplingstoken",
-    "scanQrCode": "",
-    "tokenExpires": "Token går ut i {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Inga enheter anslutna",
@@ -257,7 +261,6 @@
     "revokeAll": "Återkalla alla sessioner",
     "getOnGooglePlay": "Hämta det på Google Play",
     "downloadOnAppStore": "Ladda ner på App Store",
-    "externalUrlRequired": "En extern URL måste konfigureras i allmänna inställningar för att mobilparkoppling ska fungera.",
     "mobileAccessDisabled": "Mobil åtkomst inaktiverad",
     "mobileAccessDisabledDesc": "Aktivera mobil åtkomst för att tillåta Tracearr mobilappen att ansluta till din server.",
     "enableMobileAccess": "Aktivera mobil åtkomst",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
