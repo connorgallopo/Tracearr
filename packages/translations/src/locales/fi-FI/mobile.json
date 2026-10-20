@@ -149,6 +149,7 @@
     "allServers": "Kaikki palvelimet",
     "noAlertsRecorded": "Hälytyksiä ei ole vielä tallennettu.",
     "noMatches": "Ei vastaavia hälytyksiä",
+    "selectAlert": "",
     "acknowledgeAllTitle_one": "Kuittaa {{count}} hälytys?",
     "acknowledgeAllTitle_other": "Kuittaa {{count}} hälytystä?",
     "pendingCount_one": "{{count}} odottaa",
@@ -157,6 +158,7 @@
   "history": {
     "adjustFilters": "Kokeile muokata suodattimia",
     "historyWillAppear": "Istuntohistoria ilmestyy tänne, kun käyttäjät alkavat suoratoistaa",
+    "selectSession": "",
     "filters": {
       "clearCount": "Tyhjennä ({{count}})",
       "countries": "Maat",
@@ -176,7 +178,8 @@
     "noUsersMatch": "Ei täsmääviä käyttäjiä \"{{query}}\"",
     "joinedRelative": "Liittynyt {{relative}}",
     "sortActive": "Aktiiviset",
-    "sortTrust": "Luottamus"
+    "sortTrust": "Luottamus",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "Toistot ajan mittaan",
