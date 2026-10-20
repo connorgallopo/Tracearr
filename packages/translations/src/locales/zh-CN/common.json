@@ -68,7 +68,8 @@
     "transcode": "转码",
     "hwTranscode": "硬件转码",
     "burnIn": "",
-    "watched": "已观看"
+    "watched": "已观看",
+    "played": ""
   },
   "severity": {
     "low": "低",
@@ -133,6 +134,7 @@
     "serverOwner": "服务器所有者",
     "resolution": "分辨率",
     "watchTime": "观看时长",
+    "listenTime": "",
     "pausedTime": "暂停时间",
     "sessionDetails": "会话详情",
     "recentSessions": "最近会话",
@@ -152,7 +154,13 @@
     "streamDetails": "流详情",
     "transcodeReason": "转码原因",
     "loadMore": "载入更多",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "搜索用户……",
@@ -185,6 +193,7 @@
     "episode_plural": "剧集",
     "track": "轨迹",
     "track_plural": "曲目",
+    "artist_plural": "",
     "liveTV": "电视直播",
     "photo": "照片",
     "tv": "电视机",
@@ -207,6 +216,7 @@
   "count": {
     "user_other": "{{count}} 个用户",
     "session_other": "{{count}}会话",
+    "download_other": "",
     "stream_other": "{{count}}流",
     "server_other": "{{count}}服务器",
     "automation_other": "{{count}} 个自动化",
@@ -236,7 +246,9 @@
     "noDeviceData": "无可用的设备数据",
     "noJobHistory": "尚无作业历史",
     "noSessionsFound": "未找到会话",
-    "noUserData": "没有可用的用户数据"
+    "noUserData": "没有可用的用户数据",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "有尚未保存的更改，确定要离开吗？"
