@@ -68,7 +68,8 @@
     "transcode": "트랜스코딩",
     "hwTranscode": "하드웨어 트랜스코딩",
     "burnIn": "번인",
-    "watched": "시청 완료"
+    "watched": "시청 완료",
+    "played": ""
   },
   "severity": {
     "low": "낮음",
@@ -133,6 +134,7 @@
     "serverOwner": "서버 소유자",
     "resolution": "해상도",
     "watchTime": "시청 시간",
+    "listenTime": "",
     "pausedTime": "일시정지 시간",
     "sessionDetails": "세션 상세",
     "recentSessions": "최근 세션",
@@ -152,7 +154,13 @@
     "streamDetails": "스트림 상세",
     "transcodeReason": "트랜스코딩 사유",
     "loadMore": "더 불러오기",
-    "playback": "재생"
+    "playback": "재생",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "사용자 검색...",
@@ -185,6 +193,7 @@
     "episode_plural": "에피소드",
     "track": "트랙",
     "track_plural": "트랙",
+    "artist_plural": "",
     "liveTV": "라이브 TV",
     "photo": "사진",
     "tv": "TV",
@@ -207,6 +216,7 @@
   "count": {
     "user_other": "사용자 {{count}}명",
     "session_other": "세션 {{count}}개",
+    "download_other": "",
     "stream_other": "스트림 {{count}}개",
     "server_other": "서버 {{count}}대",
     "automation_other": "자동화 {{count}}개",
@@ -236,7 +246,9 @@
     "noDeviceData": "기기 데이터가 없습니다",
     "noJobHistory": "아직 작업 기록이 없습니다",
     "noSessionsFound": "세션을 찾을 수 없습니다",
-    "noUserData": "사용자 데이터가 없습니다"
+    "noUserData": "사용자 데이터가 없습니다",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "저장하지 않은 변경 사항이 있습니다. 정말 나가시겠습니까?"
