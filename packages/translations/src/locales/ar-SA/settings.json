@@ -233,14 +233,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -249,11 +258,6 @@
     }
   },
   "mobile": {
-    "title": "تطبيق الجوال",
-    "pairDevice": "إقران جهاز",
-    "generateToken": "إنشاء رمز الاقتران",
-    "scanQrCode": "",
-    "tokenExpires": "تنتهي صلاحية الرمز المميز في {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "لا توجد أجهزة مقترنة بعد",
@@ -261,7 +265,6 @@
     "revokeAll": "إلغاء جميع الجلسات",
     "getOnGooglePlay": "احصل عليها على جوجل بلاي",
     "downloadOnAppStore": "تحميل على متجر التطبيقات",
-    "externalUrlRequired": "يجب تكوين عنوان URL خارجي في الإعدادات العامة للإقران بالجوال للعمل.",
     "mobileAccessDisabled": "تم تعطيل الوصول إلى الجوال",
     "mobileAccessDisabledDesc": "تمكين الوصول إلى الجوال للسماح لتطبيق Tracearr المحمول بالاتصال بالخادم الخاص بك.",
     "enableMobileAccess": "تمكين الوصول إلى الجوال",
@@ -455,6 +458,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_zero": "",
     "overlapSkipped_one": "",
     "overlapSkipped_two": "",
@@ -632,7 +642,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1170,19 +1179,7 @@
       "requests_two": "",
       "requests_few": "",
       "requests_many": "",
-      "requests_other": "",
-      "unmatchedMedia_zero": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_two": "",
-      "unmatchedMedia_few": "",
-      "unmatchedMedia_many": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_zero": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_two": "",
-      "unmatchedUsers_few": "",
-      "unmatchedUsers_many": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
