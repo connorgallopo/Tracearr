@@ -68,7 +68,8 @@
     "transcode": "Transcodage",
     "hwTranscode": "",
     "burnIn": "Incrustation",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Faible",
@@ -133,6 +134,7 @@
     "serverOwner": "Propriétaire du serveur",
     "resolution": "Résolution",
     "watchTime": "Temps de visionnage",
+    "listenTime": "",
     "pausedTime": "Temps de pause",
     "sessionDetails": "Détails de la session",
     "recentSessions": "Sessions récentes",
@@ -152,7 +154,13 @@
     "streamDetails": "Détails du flux",
     "transcodeReason": "Raison du transcodage",
     "loadMore": "Charger plus",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Rechercher des utilisateurs...",
@@ -185,6 +193,7 @@
     "episode_plural": "Épisodes",
     "track": "Piste",
     "track_plural": "Pistes",
+    "artist_plural": "",
     "liveTV": "TV en direct",
     "photo": "Photo",
     "tv": "Télévision",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} utilisateurs",
     "session_one": "{{count}} session",
     "session_other": "{{count}} sessions",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} flux",
     "stream_other": "{{count}} flux",
     "server_one": "{{count}} serveur",
@@ -255,7 +266,9 @@
     "noDeviceData": "Aucune donnée de l'appareil disponible",
     "noJobHistory": "Il n'y a pas encore d'historique de tâche",
     "noSessionsFound": "Aucune session trouvée",
-    "noUserData": "Aucune donnée utilisateur disponible"
+    "noUserData": "Aucune donnée utilisateur disponible",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter ?"
