@@ -149,6 +149,7 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_other": "",
     "pendingCount_one": "",
@@ -157,6 +158,7 @@
   "history": {
     "adjustFilters": "Probeer je filters aan te passen",
     "historyWillAppear": "De sessiegeschiedenis verschijnt hier zodra gebruikers beginnen met streamen",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "",
@@ -176,7 +178,8 @@
     "noUsersMatch": "Geen gebruikers overeengekomen met \"{{query}}\"",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "Weergaven over tijd",
