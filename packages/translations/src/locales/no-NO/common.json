@@ -68,7 +68,8 @@
     "transcode": "Transkoding",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Lav",
@@ -133,6 +134,7 @@
     "serverOwner": "Server eier",
     "resolution": "Oppløsning",
     "watchTime": "Visningstid",
+    "listenTime": "",
     "pausedTime": "Pauset tid",
     "sessionDetails": "Øktdetaljer",
     "recentSessions": "Siste økter",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Søk etter brukere...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episoder",
     "track": "Spor",
     "track_plural": "Spor",
+    "artist_plural": "",
     "liveTV": "Levende TV",
     "photo": "Bilde",
     "tv": "Tv",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} brukere",
     "session_one": "{{count}} økt",
     "session_other": "{{count}} økter",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} strøm",
     "stream_other": "{{count}} strømmer",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "Ingen enhetsdata tilgjengelig",
     "noJobHistory": "Ingen jobb-historikk ennå",
     "noSessionsFound": "Ingen økter funnet",
-    "noUserData": "Ingen brukerdata tilgjengelig"
+    "noUserData": "Ingen brukerdata tilgjengelig",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Du har ulagrede endringer. Er du sikker på at du vil forlate?"
