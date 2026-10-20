@@ -229,14 +229,23 @@
       "autoDetectNote": "Redémarrez Jellyfin ou Emby après l'installation du plugin ; le redémarrage est nécessaire. Tracearr lui-même n'a pas besoin de redémarrer et récupère automatiquement le plugin.",
       "issueBlocked": "Le serveur indique que le plugin est installé et actif, mais Tracearr renvoie une erreur 404 depuis son point de terminaison. La cause la plus courante est un proxy inverse qui bloque le chemin d'accès.",
       "issueRestartRequired": "Le plugin est installé, mais le serveur multimédia a besoin d'un redémarrage avant de l'activer.",
-      "issueMalfunctioned": "Le serveur signale que le chargement du plugin a échoué. La mise à jour du plugin ou du serveur multimédia permet généralement de résoudre ce problème."
+      "issueMalfunctioned": "Le serveur signale que le chargement du plugin a échoué. La mise à jour du plugin ou du serveur multimédia permet généralement de résoudre ce problème.",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "Source d'affiche préférée",
       "description": "Quand un titre est sur plusieurs serveurs, utilisez l'affiche de ce serveur. Si elle n'en a pas, nous reprendrons la dernière copie ajoutée.",
       "automatic": "Automatique (plus récent)",
       "emptyHint": "Ajouter un serveur pour choisir une source d'affiches préférée.",
-      "ownerOnly": "Seul le propriétaire peut choisir la source d'affiches préférée."
+      "ownerOnly": "Seul le propriétaire peut choisir la source d'affiches préférée.",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "Version {{version}}",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Application mobile",
-    "pairDevice": "Associer un appareil",
-    "generateToken": "Générer un jeton d'appairage",
-    "scanQrCode": "Scanner le code QR",
-    "tokenExpires": "Le jeton d'appairage expire dans {{time}}",
     "lastSeen": "Vu pour la dernière fois {{when}}",
     "connectedOn": "Connecté {{date}}",
     "noDevices": "Aucun appareil connecté",
@@ -257,7 +261,6 @@
     "revokeAll": "Révoquer toutes les sessions",
     "getOnGooglePlay": "Télécharger sur Google Play",
     "downloadOnAppStore": "Télécharger sur l'App Store",
-    "externalUrlRequired": "Une URL externe doit être configurée dans les paramètres généraux pour que l'appairage mobile fonctionne.",
     "mobileAccessDisabled": "Accès mobile désactivé",
     "mobileAccessDisabledDesc": "Activez l'accès mobile pour permettre à l'application mobile Tracearr de se connecter à votre serveur.",
     "enableMobileAccess": "Activer l'accès mobile",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "Recouvrement de l'enregistrement - l'horodatage tombe dans la période que Tracearr suit déjà pour ce serveur. Activez l'importation complète pour l'inclure.",
     "skipDuplicatePlugin": "Enregistrement en double - déjà importé directement ou arrivé plus tôt via une importation Jellystat des mêmes données de plugin.",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "{{count}} ont été ignorés car ils se chevauchaient",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
