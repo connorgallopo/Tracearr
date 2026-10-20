@@ -155,6 +155,7 @@
     "allServers": "wszystkich serwerach",
     "noAlertsRecorded": "Nie zarejestrowano jeszcze żadnych powiadomień.",
     "noMatches": "Brak pasujących powiadomień",
+    "selectAlert": "",
     "acknowledgeAllTitle_one": "Potwierdzić {{count}} powiadomienie?",
     "acknowledgeAllTitle_few": "Potwierdzić {{count}} powiadomienia?",
     "acknowledgeAllTitle_many": "Potwierdzić {{count}} powiadomień?",
@@ -167,6 +168,7 @@
   "history": {
     "adjustFilters": "Spróbuj zmienić filtry",
     "historyWillAppear": "Historia sesji pojawi się tutaj, gdy użytkownicy rozpoczną strumieniowanie",
+    "selectSession": "",
     "filters": {
       "clearCount": "Wyczyść ({{count}})",
       "countries": "Kraje",
@@ -188,7 +190,8 @@
     "noUsersMatch": "Brak użytkowników pasujących do „{{query}}”",
     "joinedRelative": "Dołączono {{relative}}",
     "sortActive": "Aktywność",
-    "sortTrust": "Zaufanie"
+    "sortTrust": "Zaufanie",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "Odtworzenia w czasie",
