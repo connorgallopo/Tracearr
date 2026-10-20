@@ -68,7 +68,8 @@
     "transcode": "トランスコード",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "低い",
@@ -133,6 +134,7 @@
     "serverOwner": "サーバー所有者",
     "resolution": "解像度",
     "watchTime": "視聴時間",
+    "listenTime": "",
     "pausedTime": "一時停止時間",
     "sessionDetails": "セッションの詳細",
     "recentSessions": "最近のセッション",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "ユーザーを検索...",
@@ -185,6 +193,7 @@
     "episode_plural": "エピソード",
     "track": "トラック",
     "track_plural": "トラック",
+    "artist_plural": "",
     "liveTV": "ライブテレビ",
     "photo": "写真",
     "tv": "テレビ",
@@ -207,6 +216,7 @@
   "count": {
     "user_other": "{{count}} ユーザー",
     "session_other": "{{count}} セッション",
+    "download_other": "",
     "stream_other": "",
     "server_other": "{{count}} サーバー",
     "automation_other": "",
@@ -236,7 +246,9 @@
     "noDeviceData": "利用可能なデバイス データがありません",
     "noJobHistory": "ジョブ履歴はまだありません",
     "noSessionsFound": "セッションが見つかりません",
-    "noUserData": "利用可能なユーザーデータがありません"
+    "noUserData": "利用可能なユーザーデータがありません",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "保存されていない変更があります。本当に退出しますか？"
