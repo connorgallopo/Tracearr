@@ -161,6 +161,7 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_zero": "",
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_two": "",
@@ -177,6 +178,7 @@
   "history": {
     "adjustFilters": "",
     "historyWillAppear": "",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "",
@@ -200,7 +202,8 @@
     "noUsersMatch": "",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "تشغيل عبر الوقت",
