@@ -455,7 +455,7 @@
       "dropHere": "Deixeu anar el fitxer aquí",
       "dragOrClick": "Arrossegueu i deixeu anar o feu clic per seleccionar",
       "limit": "Fitxers {{accept}} de fins a {{size}}",
-      "removeFile": "Suprimeix el fitxer"
+      "removeFile": "Treu el fitxer"
     },
     "overlapSkipped_one": "{{count}} omès per solapament",
     "overlapSkipped_other": "{{count}} omesos per solapament",
