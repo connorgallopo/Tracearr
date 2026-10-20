@@ -231,14 +231,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -247,11 +256,6 @@
     }
   },
   "mobile": {
-    "title": "Mobilní aplikace",
-    "pairDevice": "Párovat zařízení",
-    "generateToken": "Vygenerovat párovací token",
-    "scanQrCode": "",
-    "tokenExpires": "Token vyprší v {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Zatím není spárováno žádné zařízení",
@@ -259,7 +263,6 @@
     "revokeAll": "Zrušit všechny relace",
     "getOnGooglePlay": "Získat na Google Play",
     "downloadOnAppStore": "Stáhnout v App Store",
-    "externalUrlRequired": "Aby mobilní párování fungovalo, musí být v obecném nastavení nakonfigurována externí URL.",
     "mobileAccessDisabled": "Mobilní přístup zakázán",
     "mobileAccessDisabledDesc": "Povolte mobilní přístup, aby se aplikace Tracearr mohla připojit k vašemu serveru.",
     "enableMobileAccess": "Povolit mobilní přístup",
@@ -451,6 +454,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_few": "",
     "overlapSkipped_many": "",
@@ -620,7 +630,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1108,15 +1117,7 @@
       "requests_one": "",
       "requests_few": "",
       "requests_many": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_few": "",
-      "unmatchedMedia_many": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_few": "",
-      "unmatchedUsers_many": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
