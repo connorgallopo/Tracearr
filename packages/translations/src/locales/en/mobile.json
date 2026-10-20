@@ -152,11 +152,13 @@
     "noAlertsRecorded": "No alerts have been recorded yet.",
     "noMatches": "No matching alerts",
     "pendingCount_one": "{{count}} pending",
-    "pendingCount_other": "{{count}} pending"
+    "pendingCount_other": "{{count}} pending",
+    "selectAlert": "Select an alert"
   },
   "history": {
     "adjustFilters": "Try adjusting your filters",
     "historyWillAppear": "Session history will appear here once users start streaming",
+    "selectSession": "Select a session",
     "filters": {
       "clearCount": "Clear ({{count}})",
       "countries": "Countries",
@@ -176,7 +178,8 @@
     "noUsersMatch": "No users match \"{{query}}\"",
     "joinedRelative": "Joined {{relative}}",
     "sortActive": "Active",
-    "sortTrust": "Trust"
+    "sortTrust": "Trust",
+    "selectUser": "Select a user"
   },
   "activity": {
     "playsOverTime": "Plays Over Time",
