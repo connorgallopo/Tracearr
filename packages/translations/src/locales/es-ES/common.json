@@ -68,7 +68,8 @@
     "transcode": "Transcodificación",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Bajo",
@@ -133,6 +134,7 @@
     "serverOwner": "Propietario del servidor",
     "resolution": "Resolución",
     "watchTime": "Tiempo de visualización",
+    "listenTime": "",
     "pausedTime": "Tiempo de pausa",
     "sessionDetails": "Detalles de la sesión",
     "recentSessions": "Sesiones recientes",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Buscar usuarios...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episodios",
     "track": "Pista",
     "track_plural": "Pistas",
+    "artist_plural": "",
     "liveTV": "TV en directo",
     "photo": "Foto",
     "tv": "Tv",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} usuarios",
     "session_one": "{{count}} sesión",
     "session_other": "{{count}} sesiones",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} reproducción",
     "stream_other": "{{count}} reproducciones",
     "server_one": "Servidor {{count}}",
@@ -255,7 +266,9 @@
     "noDeviceData": "No hay datos de dispositivos disponibles",
     "noJobHistory": "Sin historial de trabajos",
     "noSessionsFound": "No se ha encontrado ninguna sesión",
-    "noUserData": "No hay datos de usuario disponibles"
+    "noUserData": "No hay datos de usuario disponibles",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Tienes cambios sin guardar. ¿Seguro que quieres salir?"
