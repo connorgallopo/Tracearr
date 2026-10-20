@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "App Mobile",
-    "pairDevice": "Accoppia Dispositivo",
-    "generateToken": "Genera Token Di Accoppiamento",
-    "scanQrCode": "",
-    "tokenExpires": "Il token scade in {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Nessun dispositivo connesso",
@@ -257,7 +261,6 @@
     "revokeAll": "Revoca Tutte Le Sessioni",
     "getOnGooglePlay": "Scaricalo su Google Play",
     "downloadOnAppStore": "Scarica su App Store",
-    "externalUrlRequired": "Un URL esterno deve essere configurato in Impostazioni Generali per l'accoppiamento mobile al lavoro.",
     "mobileAccessDisabled": "Accesso Mobile Disabilitato",
     "mobileAccessDisabledDesc": "Abilita l'accesso mobile per consentire all'app mobile Tracearr di connettersi al server.",
     "enableMobileAccess": "Abilita Accesso Mobile",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
