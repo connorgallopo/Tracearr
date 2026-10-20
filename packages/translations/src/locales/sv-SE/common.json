@@ -68,7 +68,8 @@
     "transcode": "Omkodning",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Låg",
@@ -133,6 +134,7 @@
     "serverOwner": "Serverns ägare",
     "resolution": "Upplösning",
     "watchTime": "Visningstid",
+    "listenTime": "",
     "pausedTime": "Pausad Tid",
     "sessionDetails": "Sessionsuppgifter",
     "recentSessions": "Senaste sessioner",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Sök användare...",
@@ -185,6 +193,7 @@
     "episode_plural": "Avsnitt",
     "track": "Spår",
     "track_plural": "Spår",
+    "artist_plural": "",
     "liveTV": "",
     "photo": "Foto",
     "tv": "",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} användare",
     "session_one": "",
     "session_other": "{{count}} sessioner",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} ström",
     "stream_other": "{{count}} strömmar",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "Inga enhetsdata tillgängliga",
     "noJobHistory": "Ingen jobbhistorik ännu",
     "noSessionsFound": "Inga sessioner hittades",
-    "noUserData": "Inga användardata tillgängliga"
+    "noUserData": "Inga användardata tillgängliga",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Du har osparade ändringar. Är du säker på att du vill lämna?"
