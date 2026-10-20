@@ -68,7 +68,8 @@
     "transcode": "Překódování",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Nízká",
@@ -133,6 +134,7 @@
     "serverOwner": "Vlastník serveru",
     "resolution": "Rozlišení",
     "watchTime": "Čas sledování",
+    "listenTime": "",
     "pausedTime": "Čas pozastavení",
     "sessionDetails": "Podrobnosti relace",
     "recentSessions": "Poslední relace",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Hledat uživatele...",
@@ -185,6 +193,7 @@
     "episode_plural": "Epizody",
     "track": "Stopa",
     "track_plural": "Skladby",
+    "artist_plural": "",
     "liveTV": "Živá televize",
     "photo": "Fotografie",
     "tv": "Telefon",
@@ -213,6 +222,10 @@
     "session_few": "",
     "session_many": "",
     "session_other": "{{count}} relace",
+    "download_one": "",
+    "download_few": "",
+    "download_many": "",
+    "download_other": "",
     "stream_one": "",
     "stream_few": "",
     "stream_many": "",
@@ -293,7 +306,9 @@
     "noDeviceData": "Žádná data zařízení nejsou k dispozici",
     "noJobHistory": "Zatím žádná historie pracovních míst",
     "noSessionsFound": "Nenalezeny žádné relace",
-    "noUserData": "Nejsou k dispozici žádná uživatelská data"
+    "noUserData": "Nejsou k dispozici žádná uživatelská data",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Máte neuložené změny. Jste si jisti, že chcete odejít?"
