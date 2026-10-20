@@ -228,14 +228,23 @@
       "autoDetectNote": "플러그인을 설치한 뒤 Jellyfin 또는 Emby를 반드시 다시 시작하세요. Tracearr는 다시 시작할 필요 없이 플러그인을 자동으로 감지합니다.",
       "issueBlocked": "서버에는 플러그인이 설치되어 활성화된 것으로 표시되지만, Tracearr가 엔드포인트에서 404 응답을 받았습니다. 보통 리버스 프록시가 해당 경로를 차단할 때 발생합니다.",
       "issueRestartRequired": "플러그인이 설치되었지만 활성화하려면 미디어 서버를 다시 시작해야 합니다.",
-      "issueMalfunctioned": "서버에서 플러그인을 불러오지 못했습니다. 플러그인이나 미디어 서버를 업데이트하면 대부분 해결됩니다."
+      "issueMalfunctioned": "서버에서 플러그인을 불러오지 못했습니다. 플러그인이나 미디어 서버를 업데이트하면 대부분 해결됩니다.",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "우선 포스터 출처",
       "description": "같은 콘텐츠가 여러 서버에 있으면 이 서버의 포스터를 사용합니다. 포스터가 없으면 가장 최근에 추가된 항목의 포스터를 사용합니다.",
       "automatic": "자동(가장 최근 항목)",
       "emptyHint": "우선 포스터 출처를 선택하려면 서버를 추가하세요.",
-      "ownerOnly": "소유자만 선호하는 포스터 소스를 선택할 수 있습니다."
+      "ownerOnly": "소유자만 선호하는 포스터 소스를 선택할 수 있습니다.",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "버전 {{version}}",
@@ -244,11 +253,6 @@
     }
   },
   "mobile": {
-    "title": "모바일 앱",
-    "pairDevice": "기기 페어링",
-    "generateToken": "페어링 토큰 생성",
-    "scanQrCode": "QR 코드 스캔",
-    "tokenExpires": "토큰 만료까지 {{time}}",
     "lastSeen": "마지막 접속: {{when}}",
     "connectedOn": "{{date}}에 연결됨",
     "noDevices": "페어링된 기기가 없습니다",
@@ -256,7 +260,6 @@
     "revokeAll": "모든 세션 취소",
     "getOnGooglePlay": "Google Play에서 받기",
     "downloadOnAppStore": "App Store에서 다운로드",
-    "externalUrlRequired": "모바일 페어링을 사용하려면 일반 설정에서 외부 URL을 구성해야 합니다.",
     "mobileAccessDisabled": "모바일 접근이 비활성화됨",
     "mobileAccessDisabledDesc": "Tracearr 모바일 앱이 서버에 연결할 수 있도록 모바일 접근을 활성화하세요.",
     "enableMobileAccess": "모바일 접근 활성화",
@@ -445,6 +448,13 @@
     "importFullRangeHelp": "이 서버를 Tracearr에 추가한 이후 시작된 재생 기록은 가져오지 않습니다. 기본적으로 가져오기는 Tracearr에 이미 있는 이 서버의 가장 이른 재생 기록(예: Jellystat에서 가져온 기록)에서도 중단됩니다. 서버 추가 이전의 모든 기록을 가져오려면 이 옵션을 켜세요. 정확히 중복되는 항목은 계속 건너뜁니다.",
     "skipOverlap": "기간이 겹치는 기록 - 타임스탬프가 Tracearr에서 이미 추적 중인 기간에 포함됩니다. 포함하려면 전체 기록 가져오기를 켜세요.",
     "skipDuplicatePlugin": "중복 기록 - 이미 직접 가져왔거나 같은 플러그인 데이터를 Jellystat에서 먼저 가져온 항목입니다.",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_other": "기간이 겹쳐 {{count}}개 건너뜀",
     "duplicates_other": "중복 {{count}}개 건너뜀"
   },
@@ -602,7 +612,6 @@
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}}, {{timezone}}"
     },
-    "nextRun": "다음 실행: {{when}}",
     "noNextRun": "예약되지 않음",
     "neverSent": "발송 기록 없음",
     "lastSend": "{{count}}명: {{outcome}}",
@@ -1015,9 +1024,7 @@
     "syncedAgo": "{{ago}}에 동기화됨",
     "neverSynced": "아직 동기화되지 않음",
     "counts": {
-      "requests_other": "요청 {{count}}건",
-      "unmatchedMedia_other": "일치하지 않는 제목 {{count}}개",
-      "unmatchedUsers_other": "일치하지 않는 사용자 {{count}}명"
+      "requests_other": "요청 {{count}}건"
     },
     "needsKey": "API 키 필요",
     "lastError": "마지막 동기화 실패({{ago}}): {{error}}",
