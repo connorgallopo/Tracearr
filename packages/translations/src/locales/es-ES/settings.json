@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "App Móvil",
-    "pairDevice": "Emparejar dispositivo",
-    "generateToken": "Generar Token",
-    "scanQrCode": "Escanear código QR",
-    "tokenExpires": "El token expira en {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "No hay dispositivos emparejados",
@@ -257,7 +261,6 @@
     "revokeAll": "Cerrar todas las sesiones",
     "getOnGooglePlay": "Consíguelo en Google Play",
     "downloadOnAppStore": "Descargar en la App Store",
-    "externalUrlRequired": "Una URL externa debe configurarse en la Configuración general para que funcione el emparejamiento móvil.",
     "mobileAccessDisabled": "Acceso móvil deshabilitado",
     "mobileAccessDisabledDesc": "Activa el acceso móvil para permitir que la aplicación móvil Tracearr se conecte a tu servidor.",
     "enableMobileAccess": "Activar acceso móvil",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
