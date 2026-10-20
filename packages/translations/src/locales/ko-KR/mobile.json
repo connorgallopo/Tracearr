@@ -146,12 +146,14 @@
     "allServers": "모든 서버",
     "noAlertsRecorded": "아직 기록된 알림이 없습니다.",
     "noMatches": "일치하는 알림이 없습니다.",
+    "selectAlert": "",
     "acknowledgeAllTitle_other": "알림 {{count}}개를 확인 처리할까요?",
     "pendingCount_other": "대기 중 {{count}}개"
   },
   "history": {
     "adjustFilters": "필터를 조정해 보세요",
     "historyWillAppear": "사용자가 스트리밍을 시작하면 세션 기록이 여기에 표시됩니다",
+    "selectSession": "",
     "filters": {
       "clearCount": "지우기 ({{count}})",
       "countries": "국가",
@@ -170,7 +172,8 @@
     "noUsersMatch": "\"{{query}}\"와 일치하는 사용자가 없습니다",
     "joinedRelative": "{{relative}}에 가입",
     "sortActive": "활동",
-    "sortTrust": "신뢰도"
+    "sortTrust": "신뢰도",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "시간별 재생",
