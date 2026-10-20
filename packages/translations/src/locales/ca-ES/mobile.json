@@ -149,7 +149,7 @@
     "allServers": "tots els servidors",
     "noAlertsRecorded": "Encara no s'ha registrat cap alerta.",
     "noMatches": "Cap alerta coincident",
-    "selectAlert": "",
+    "selectAlert": "Selecciona una alerta",
     "acknowledgeAllTitle_one": "Voleu confirmar {{count}} alerta?",
     "acknowledgeAllTitle_other": "Voleu confirmar {{count}} alertes?",
     "pendingCount_one": "{{count}} pendent",
@@ -158,7 +158,7 @@
   "history": {
     "adjustFilters": "Proveu d'ajustar els filtres",
     "historyWillAppear": "L'historial de sessions apareixerà aquí quan els usuaris comencin a reproduir contingut",
-    "selectSession": "",
+    "selectSession": "Seleccione una sessió",
     "filters": {
       "clearCount": "Neteja ({{count}})",
       "countries": "Països",
@@ -179,7 +179,7 @@
     "joinedRelative": "S'hi ha unit {{relative}}",
     "sortActive": "Actiu",
     "sortTrust": "Confiança",
-    "selectUser": ""
+    "selectUser": "Selecciona un usuari"
   },
   "activity": {
     "playsOverTime": "Reproduccions al llarg del temps",
