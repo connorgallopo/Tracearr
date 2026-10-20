@@ -229,14 +229,23 @@
       "autoDetectNote": "Reinicieu Jellyfin o Emby després d'instal·lar el connector; el reinici és obligatori. Tracearr no cal reiniciar-lo: detecta el connector automàticament.",
       "issueBlocked": "El servidor informa que el connector està instal·lat i actiu, però Tracearr rep un 404 del seu punt final. Normalment és perquè un proxy invers bloqueja el camí.",
       "issueRestartRequired": "El connector està instal·lat, però cal reiniciar el servidor multimèdia perquè s'activi.",
-      "issueMalfunctioned": "El servidor informa que el connector no s'ha pogut carregar. Normalment això se soluciona actualitzant el connector o el servidor multimèdia."
+      "issueMalfunctioned": "El servidor informa que el connector no s'ha pogut carregar. Normalment això se soluciona actualitzant el connector o el servidor multimèdia.",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "Font de pòsters preferida",
       "description": "Quan un títol és a més d'un servidor, es fa servir el pòster d'aquest servidor. Si no en té cap, es fa servir el de la còpia afegida més recentment.",
       "automatic": "Automàtic (el més recent)",
       "emptyHint": "Afegiu un servidor per triar una font de pòsters preferida.",
-      "ownerOnly": "Només el propietari pot triar la font de pòsters preferida."
+      "ownerOnly": "Només el propietari pot triar la font de pòsters preferida.",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "Versió {{version}}",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Aplicació mòbil",
-    "pairDevice": "Aparella un dispositiu",
-    "generateToken": "Genera un testimoni d'aparellament",
-    "scanQrCode": "Escaneja codi QR",
-    "tokenExpires": "El testimoni caduca en {{time}}",
     "lastSeen": "Vist per última vegada {{when}}",
     "connectedOn": "Connectat el {{date}}",
     "noDevices": "Encara no hi ha cap dispositiu aparellat",
@@ -257,7 +261,6 @@
     "revokeAll": "Tanca totes les sessions",
     "getOnGooglePlay": "Disponible a Google Play",
     "downloadOnAppStore": "Baixa-la a l'App Store",
-    "externalUrlRequired": "Cal configurar un URL extern a Configuració general perquè funcioni l'aparellament mòbil.",
     "mobileAccessDisabled": "Accés mòbil deshabilitat",
     "mobileAccessDisabledDesc": "Habiliteu l'accés mòbil perquè l'aplicació mòbil de Tracearr es pugui connectar al servidor.",
     "enableMobileAccess": "Habilita l'accés mòbil",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "Les reproduccions que van començar després d'afegir aquest servidor a Tracearr no s'importen mai. Per defecte, la importació també s'atura a la reproducció més antiga que Tracearr ja té d'aquest servidor, per exemple d'una importació de Jellystat. Activeu això per importar-ho tot d'abans que s'afegís el servidor. Els duplicats exactes se segueixen ometent.",
     "skipOverlap": "Registre solapat: la marca de temps cau dins del període que Tracearr ja registra per a aquest servidor. Activeu la importació de tot l'històric per incloure'l.",
     "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector.",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "{{count}} omès per solapament",
     "overlapSkipped_other": "{{count}} omesos per solapament",
     "duplicates_one": "{{count}} duplicat omès",
@@ -608,7 +618,6 @@
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}}, {{timezone}}"
     },
-    "nextRun": "Pròxima execució {{when}}",
     "noNextRun": "No programat",
     "neverSent": "No s'ha enviat mai",
     "lastSend": "{{outcome}} a {{count}}",
@@ -1046,11 +1055,7 @@
     "neverSynced": "Encara no s'ha sincronitzat",
     "counts": {
       "requests_one": "{{count}} sol·licitud",
-      "requests_other": "{{count}} sol·licituds",
-      "unmatchedMedia_one": "{{count}} títol sense coincidència",
-      "unmatchedMedia_other": "{{count}} títols sense coincidència",
-      "unmatchedUsers_one": "{{count}} usuari sense coincidència",
-      "unmatchedUsers_other": "{{count}} usuaris sense coincidència"
+      "requests_other": "{{count}} sol·licituds"
     },
     "needsKey": "Cal una clau d'API",
     "lastError": "L'última sincronització ha fallat {{ago}}: {{error}}",
