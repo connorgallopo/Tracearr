@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Aplicativo Móvel",
-    "pairDevice": "Emparelhar dispositivo",
-    "generateToken": "Gerar token de emparelhamento",
-    "scanQrCode": "",
-    "tokenExpires": "Token expira em {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Ainda não há dispositivos emparelhados",
@@ -257,7 +261,6 @@
     "revokeAll": "Revogar todas as sessões",
     "getOnGooglePlay": "Baixe no Google Play",
     "downloadOnAppStore": "Baixar na App Store",
-    "externalUrlRequired": "É necessário configurar uma URL externa nas Definições gerais para que o emparelhamento móvel funcione.",
     "mobileAccessDisabled": "Acesso móvel desativado",
     "mobileAccessDisabledDesc": "Ative o acesso móvel para permitir que o aplicativo móvel Tracearr conecte-se ao seu servidor.",
     "enableMobileAccess": "Habilitar acesso móvel",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
