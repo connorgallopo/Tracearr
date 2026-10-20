@@ -68,7 +68,8 @@
     "transcode": "Transcodificação",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Baixo",
@@ -133,6 +134,7 @@
     "serverOwner": "Proprietário do servidor",
     "resolution": "Resolução",
     "watchTime": "Tempo de visualização",
+    "listenTime": "",
     "pausedTime": "Tempo em pausa",
     "sessionDetails": "Detalhes da sessão",
     "recentSessions": "Sessões recentes",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "",
@@ -185,6 +193,7 @@
     "episode_plural": "Episódios",
     "track": "",
     "track_plural": "Acompanhamentos",
+    "artist_plural": "",
     "liveTV": "",
     "photo": "",
     "tv": "Televisão",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} usuários",
     "session_one": "{{count}} sessão",
     "session_other": "{{count}} sessões",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} transmissão",
     "stream_other": "{{count}} transmissões",
     "server_one": "{{count}} servidor",
@@ -255,7 +266,9 @@
     "noDeviceData": "Nenhum dado de dispositivo disponível",
     "noJobHistory": "Ainda sem histórico de tarefas",
     "noSessionsFound": "Nenhuma sessão encontrada",
-    "noUserData": "Sem dados de usuário disponíveis"
+    "noUserData": "Sem dados de usuário disponíveis",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Tem alterações não guardadas. Tem a certeza de que quer sair?"
