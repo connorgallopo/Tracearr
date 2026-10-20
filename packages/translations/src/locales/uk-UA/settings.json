@@ -231,14 +231,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -247,11 +256,6 @@
     }
   },
   "mobile": {
-    "title": "Мобільний додаток",
-    "pairDevice": "Підключити пристрій",
-    "generateToken": "Згенерувати токен парування",
-    "scanQrCode": "Проскануйте QR-код",
-    "tokenExpires": "Термін дії токена закінчується через {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Немає підключених пристроїв",
@@ -259,7 +263,6 @@
     "revokeAll": "Скасувати всі сеанси",
     "getOnGooglePlay": "Завантажте у Google Play",
     "downloadOnAppStore": "Завантажити з App Store",
-    "externalUrlRequired": "Для підключення мобільних пристроїв у загальних налаштуваннях має бути вказано зовнішню URL-адресу.",
     "mobileAccessDisabled": "Мобільний доступ вимкнено",
     "mobileAccessDisabledDesc": "Увімкніть мобільний доступ щоб дозволити мобільний додаток Tracearr підключатися до вашого сервера.",
     "enableMobileAccess": "Увімкнути мобільний доступ",
@@ -451,6 +454,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_few": "",
     "overlapSkipped_many": "",
@@ -620,7 +630,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1108,15 +1117,7 @@
       "requests_one": "",
       "requests_few": "",
       "requests_many": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_few": "",
-      "unmatchedMedia_many": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_few": "",
-      "unmatchedUsers_many": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
