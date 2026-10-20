@@ -230,13 +230,13 @@
       "issueBlocked": "El servidor informa que el connector està instal·lat i actiu, però Tracearr rep un 404 del seu punt final. Normalment és perquè un proxy invers bloqueja el camí.",
       "issueRestartRequired": "El connector està instal·lat, però cal reiniciar el servidor multimèdia perquè s'activi.",
       "issueMalfunctioned": "El servidor informa que el connector no s'ha pogut carregar. Normalment això se soluciona actualitzant el connector o el servidor multimèdia.",
-      "jellyfinStep1": "",
-      "jellyfinStep2": "",
-      "jellyfinStep3": "",
-      "jellyfinStep4": "",
-      "embyStep1": "",
-      "embyStep2": "",
-      "embyStep3": ""
+      "jellyfinStep1": "Al tauler de Jellyfin, aneu a Plugins → Repositories.",
+      "jellyfinStep2": "Afegiu un repositori anomenat <strong>Tracearr</strong> amb l'URL següent.",
+      "jellyfinStep3": "Obriu la pestanya Catalog i instal·leu <strong>Tracearr SSE</strong>.",
+      "jellyfinStep4": "Reinicieu Jellyfin i Tracearr el detectarà automàticament.",
+      "embyStep1": "Al tauler d'Emby, aneu a Plugins → Catalog.",
+      "embyStep2": "Cerqueu <strong>Tracearr SSE</strong> a la fila Notifications i instal·leu-lo.",
+      "embyStep3": "Reinicieu Emby i Tracearr el detectarà automàticament."
     },
     "posterSource": {
       "label": "Font de pòsters preferida",
@@ -244,8 +244,8 @@
       "automatic": "Automàtic (el més recent)",
       "emptyHint": "Afegiu un servidor per triar una font de pòsters preferida.",
       "ownerOnly": "Només el propietari pot triar la font de pòsters preferida.",
-      "precache": "",
-      "precacheDescription": ""
+      "precache": "Desa els pòsters a la memòria cau després de sincronitzar les biblioteques",
+      "precacheDescription": "Obté els pòsters dels títols nous i modificats després de cada sincronització, perquè les pàgines de la Biblioteca no hagin d'esperar el servidor multimèdia. Si està desactivat, cada pòster es desa a la memòria cau el primer cop que algú obre una pàgina que el mostra."
     },
     "version": {
       "installed": "Versió {{version}}",
@@ -450,12 +450,12 @@
     "importFullRangeHelp": "Les reproduccions que van començar després d'afegir aquest servidor a Tracearr no s'importen mai. Per defecte, la importació també s'atura a la reproducció més antiga que Tracearr ja té d'aquest servidor, per exemple d'una importació de Jellystat. Activeu això per importar-ho tot d'abans que s'afegís el servidor. Els duplicats exactes se segueixen ometent.",
     "skipOverlap": "Registre solapat: la marca de temps cau dins del període que Tracearr ja registra per a aquest servidor. Activeu la importació de tot l'històric per incloure'l.",
     "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector.",
-    "importFailed": "",
+    "importFailed": "La importació ha fallat",
     "dropzone": {
-      "dropHere": "",
-      "dragOrClick": "",
-      "limit": "",
-      "removeFile": ""
+      "dropHere": "Deixeu anar el fitxer aquí",
+      "dragOrClick": "Arrossegueu i deixeu anar o feu clic per seleccionar",
+      "limit": "Fitxers {{accept}} de fins a {{size}}",
+      "removeFile": "Suprimeix el fitxer"
     },
     "overlapSkipped_one": "{{count}} omès per solapament",
     "overlapSkipped_other": "{{count}} omesos per solapament",
