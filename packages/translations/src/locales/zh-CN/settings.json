@@ -228,14 +228,23 @@
       "autoDetectNote": "安装插件后重启 Jellyfin 或 Emby；必须重启。Tracearr 本身无需重启，会自动识别插件。",
       "issueBlocked": "服务器报告插件已安装和激活，但Tracearr 从端点获取404个。 通常原因是反向代理阻止路径。",
       "issueRestartRequired": "插件已安装，但媒体服务器需要重新启动才能激活。",
-      "issueMalfunctioned": "服务器报告插件加载失败。更新插件或媒体服务器通常清除它。"
+      "issueMalfunctioned": "服务器报告插件加载失败。更新插件或媒体服务器通常清除它。",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "首选海报来源",
       "description": "当一个标题在多个服务器上时，使用此服务器的海报。 如果没有，我们将回到最近添加的副本。",
       "automatic": "自动(最近一次)",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -244,11 +253,6 @@
     }
   },
   "mobile": {
-    "title": "移动 App",
-    "pairDevice": "设备配对",
-    "generateToken": "生成配对令牌",
-    "scanQrCode": "扫描二维码",
-    "tokenExpires": "令牌在...过期{{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "尚未配对任何设备",
@@ -256,7 +260,6 @@
     "revokeAll": "注销所有会话",
     "getOnGooglePlay": "在 Google Play 上获取",
     "downloadOnAppStore": "在 App Store 下载",
-    "externalUrlRequired": "必须在常规设置中配置外部URL才能使移动配对正常工作。",
     "mobileAccessDisabled": "移动访问已禁用",
     "mobileAccessDisabledDesc": "启用移动访问权限以允许 Tracearr 移动应用程序连接到您的服务器。",
     "enableMobileAccess": "启用移动访问权限",
@@ -445,6 +448,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "重叠记录 - 时间戳位于 Tracearr 已为此服务器跟踪的时间段内。启用全范围导入以包含它。",
     "skipDuplicatePlugin": "重复记录 - 已经直接导入或通过Jellstat导入相同的插件数据早期到达。",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_other": "",
     "duplicates_other": ""
   },
@@ -602,7 +612,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1015,9 +1024,7 @@
     "syncedAgo": "",
     "neverSynced": "",
     "counts": {
-      "requests_other": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
