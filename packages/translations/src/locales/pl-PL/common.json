@@ -68,7 +68,8 @@
     "transcode": "Transkodowanie",
     "hwTranscode": "Transkodowanie sprzętowe",
     "burnIn": "Wypalanie",
-    "watched": "Obejrzane"
+    "watched": "Obejrzane",
+    "played": ""
   },
   "severity": {
     "low": "Niska",
@@ -133,6 +134,7 @@
     "serverOwner": "Właściciel serwera",
     "resolution": "Rozdzielczość",
     "watchTime": "Czas oglądania",
+    "listenTime": "",
     "pausedTime": "Czas wstrzymania",
     "sessionDetails": "Szczegóły sesji",
     "recentSessions": "Ostatnie sesje",
@@ -152,7 +154,13 @@
     "streamDetails": "Szczegóły strumienia",
     "transcodeReason": "Powód transkodowania",
     "loadMore": "Załaduj więcej",
-    "playback": "Odtwarzanie"
+    "playback": "Odtwarzanie",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Szukaj użytkowników...",
@@ -185,6 +193,7 @@
     "episode_plural": "Odcinki",
     "track": "Utwór",
     "track_plural": "Utwory",
+    "artist_plural": "",
     "liveTV": "Telewizja na żywo",
     "photo": "Zdjęcie",
     "tv": "Seriale",
@@ -213,6 +222,10 @@
     "session_few": "{{count}} sesje",
     "session_many": "{{count}} sesji",
     "session_other": "{{count}} sesji",
+    "download_one": "",
+    "download_few": "",
+    "download_many": "",
+    "download_other": "",
     "stream_one": "{{count}} strumień",
     "stream_few": "{{count}} strumienie",
     "stream_many": "{{count}} strumieni",
@@ -293,7 +306,9 @@
     "noDeviceData": "Brak danych urządzenia",
     "noJobHistory": "Brak historii zadań",
     "noSessionsFound": "Nie znaleziono sesji",
-    "noUserData": "Brak dostępnych danych użytkownika"
+    "noUserData": "Brak dostępnych danych użytkownika",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?"
