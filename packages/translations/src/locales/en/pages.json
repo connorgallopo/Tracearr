@@ -26,6 +26,7 @@
     "connectedTo": "Connected to {{name}}",
     "plexAuthFailed": "Plex authentication failed",
     "plexStartFailed": "Failed to start Plex login",
+    "plexExpired": "This Plex sign-in expired. Start it again.",
     "serverConnectFailed": "Failed to connect to server",
     "createAccountFailed": "Failed to create account",
     "invalidCredentials": "Invalid username, email, or password",
@@ -35,7 +36,23 @@
     "claimCodeLabel": "Claim Code",
     "claimCodeHint": "The claim code is printed in the server logs when the container starts",
     "validateClaimCode": "Validate Claim Code",
-    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup"
+    "claimCodeSecurityNote": "This security measure ensures only authorized users can complete first-time setup",
+    "member": {
+      "tabLocal": "Tracearr account",
+      "tabMember": "Media server",
+      "server": "Server",
+      "signingInTo": "Signing in to {{name}}",
+      "passwordHint": "Use the username and password for {{name}}.",
+      "quickConnectHint": "Open Jellyfin, go to Quick Connect, and enter this code.",
+      "waiting": "Waiting for approval",
+      "copyCode": "Copy code",
+      "usePassword": "Use password instead",
+      "useQuickConnect": "Use Quick Connect instead",
+      "codeExpired": "This code expired.",
+      "newCode": "New code",
+      "refused": "Sign-in is not available for this account.",
+      "notPermitted": "You are not permitted to sign in. Please contact the server owner."
+    }
   },
   "dashboard": {
     "alerts": "Alerts",
@@ -47,7 +64,93 @@
     "serverResources": "Server Resources",
     "bandwidth": "Bandwidth",
     "noActiveStreams": "No active streams",
-    "streamsAppearHere": "Active streams will appear here when users start watching"
+    "streamsAppearHere": "Active streams will appear here when users start watching",
+    "othersStreaming_one": "{{count}} other stream playing",
+    "othersStreaming_other": "{{count}} other streams playing",
+    "dayStreak": "Day streak",
+    "view": {
+      "label": "Dashboard view",
+      "admin": "Server",
+      "me": "Personal"
+    },
+    "me": {
+      "last30": "Last 30 days",
+      "streakDetail": "days in a row with a play",
+      "topTitles": "Your top titles",
+      "episodes_one": "{{count}} episode",
+      "episodes_other": "{{count}} episodes",
+      "welcome": {
+        "title": "Your dashboard fills in as you watch",
+        "description": "Plays, streaks and your top titles show up here a few minutes after you watch something.",
+        "browse": "Browse the library"
+      },
+      "requests": {
+        "title": "Your requests",
+        "availableThisWeek_one": "{{count}} became available this week",
+        "availableThisWeek_other": "{{count}} became available this week",
+        "requestedAgo": "Requested {{age}} ago",
+        "seeAll": "See all"
+      }
+    },
+    "resources": {
+      "system": "System",
+      "perServer": "per server",
+      "average": "Avg:"
+    },
+    "unknownLocation": "Unknown location",
+    "unknownQuality": "Unknown quality"
+  },
+  "yourStats": {
+    "titles": "Titles",
+    "howYouWatch": "How you watch",
+    "viewerType": {
+      "completionist": {
+        "label": "Completionist",
+        "desc": "You finish {{rate}}% of what you start."
+      },
+      "rewatcher": {
+        "label": "Rewatcher",
+        "desc": "You come back to your favorites."
+      },
+      "sampler": {
+        "label": "Explorer",
+        "desc": "You try a lot of things before settling on one."
+      },
+      "casual": {
+        "label": "Casual",
+        "desc": "You watch when the mood strikes."
+      }
+    },
+    "habits": "Your busiest day is {{day}}, and your busiest hour is {{hour}}.",
+    "seeActivity": "See activity",
+    "allTime": "All time",
+    "watchTime": "Watch time",
+    "span": {
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "weeks_one": "{{count}} week",
+      "weeks_other": "{{count}} weeks"
+    },
+    "longestStreak": "Longest streak",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "firstPlay": "First play",
+    "biggestBinge": "Biggest binge",
+    "bingeValue_one": "{{count}} episode of {{show}}",
+    "bingeValue_other": "{{count}} episodes of {{show}}",
+    "topGenres": "Top genres",
+    "allTimeCaption": "all time",
+    "tier": {
+      "watched": "Watched",
+      "engaged": "Engaged",
+      "sampled": "Sampled",
+      "abandoned": "Abandoned",
+      "rewatched": "Rewatched"
+    }
   },
   "users": {
     "title": "Users",
@@ -55,7 +158,6 @@
     "noUsersFound": "No users found.",
     "selectAllUsers_one": "Select {{count}} user",
     "selectAllUsers_other": "Select all {{count}} users",
-    "serversColumn": "Servers",
     "resetTrustScore": "Reset Trust Score",
     "resetTrustScoreTitle_one": "Reset Trust Score for {{count}} User",
     "resetTrustScoreTitle_other": "Reset Trust Score for {{count}} Users",
@@ -116,13 +218,23 @@
     "suggestionsError": "Could not load merge suggestions",
     "filterHasAccessTo": "Has access to",
     "filterHasAccessToPlaceholder": "Any server",
-    "filterHasAccessToHint": "Shows people with an active account on every server selected."
+    "filterHasAccessToHint": "Shows people with an active account on every server selected.",
+    "pendingLink_one": "{{count}} pending",
+    "pendingLink_other": "{{count}} pending",
+    "merged": "Merged",
+    "filterRoleAll": "Any role",
+    "filterSignInAll": "Any sign-in",
+    "filterPendingOnly": "Has pending violations",
+    "rowActions": "Actions for {{name}}",
+    "menuOpenViolations": "Open in Violations",
+    "signInOn": "On",
+    "signInOff": "Off",
+    "signedInAgo": "signed in {{relative}}",
+    "neverSignedIn": "never signed in"
   },
   "userDetail": {
     "backToUsers": "Back to Users",
     "userNotFound": "User not found",
-    "userInfo": "User Info",
-    "statistics": "Statistics",
     "sessions": "Sessions",
     "violations": "Violations",
     "terminationHistory": "Termination History",
@@ -150,24 +262,148 @@
     "contactEmailLabel": "Newsletter address:",
     "contactEmailNone": "none set",
     "contactEmailNoLogin": "Grants no login.",
-    "locations": "Locations"
+    "locations": "Locations",
+    "access": {
+      "title": "Sign-in access",
+      "signIn": "Sign-in",
+      "signInAllow": "Allow",
+      "signInDefault": "Default",
+      "signInBlock": "Block",
+      "signInDefaultOn": "Default follows the global switch, which is on.",
+      "signInDefaultOff": "Default follows the global switch, which is off.",
+      "signInDefaultUnknown": "Default follows the global switch.",
+      "role": "Role",
+      "roleAdmin": "Admin",
+      "roleMember": "Member",
+      "roleHint": "Members see only their own activity. Admins see everyone's.",
+      "disabled": "This account can't sign in while it is disabled.",
+      "pending": "This account can't sign in while it is pending.",
+      "signIns": "Sign-ins",
+      "lastSignIn": "Last sign-in",
+      "never": "Never",
+      "viewAs": "View as",
+      "viewAsLabel": "View Tracearr as {{name}}",
+      "viewAsHint": "See Tracearr the way they do. It is read-only."
+    },
+    "tabs": {
+      "access": "Access",
+      "downloads": "Downloads"
+    },
+    "cards": {
+      "vsPrior": "vs prior",
+      "perActiveDay": "{{value}} per active day",
+      "finished": "Finished",
+      "abandoned": "{{value}}% abandoned",
+      "transcodes_one": "{{count}} transcode",
+      "transcodes_other": "{{count}} transcodes",
+      "avgBitrate": "{{value}} average",
+      "daysActive": "Days Active",
+      "ofDays": "of {{count}}",
+      "streak": "{{count}}-day streak"
+    },
+    "overview": {
+      "playsOverTime": "Plays Over Time",
+      "priorRange": "Prior range",
+      "serverAverage": "Server average per person",
+      "byHour": "Plays by hour of day",
+      "peak": "peak {{hour}}",
+      "serverPeak": "server peak {{hour}}",
+      "what": "What",
+      "otherMedia": "Other",
+      "mostFinished": "Most Finished",
+      "finishedCount_one": "{{count}} finished",
+      "finishedCount_other": "{{count}} finished",
+      "where": "Where and On What",
+      "directPlayShare": "{{value}}% direct play",
+      "localShare": "{{value}}% of sessions on the local network",
+      "viewAllDevices": "View all devices and locations",
+      "allSessions": "All sessions"
+    },
+    "uniqueCount": "{{count}} unique",
+    "unknownCity": "Unknown City",
+    "unknownDevice": "Unknown Device",
+    "ipCount_one": "{{count}} IP",
+    "ipCount_other": "{{count}} IPs",
+    "viewAllMore": "View All ({{count}} more)",
+    "adjustTrustScoreDesc": "Set the trust score for @{{username}}. Range: 0–100."
   },
   "history": {
     "title": "History",
-    "description": "Browse all streaming sessions with powerful filtering.",
     "totalPlays": "Total Plays",
     "uniqueTitles": "Unique Titles",
-    "uniqueUsers": "Unique Users"
+    "uniqueUsers": "Unique Users",
+    "searchPlaceholder": "Search titles, users, locations, IPs...",
+    "columns": {
+      "duration": "Duration",
+      "progress": "Progress"
+    },
+    "location": {
+      "city": "City",
+      "region": "Region",
+      "country": "Country",
+      "continent": "Continent",
+      "postalCode": "Postal Code",
+      "coordinates": "Coordinates",
+      "asn": "ASN",
+      "asnOrg": "ASN Org"
+    },
+    "trailer": "Trailer",
+    "filters": {
+      "columns": "Columns",
+      "countries": "Countries",
+      "mediaType": "Media Type",
+      "types": "Types",
+      "network": "Network",
+      "remote": "Remote",
+      "trailers": "Trailers",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "clearUsers": "Clear all users",
+      "clearPlatforms": "Clear all platforms",
+      "clearCountries": "Clear all countries",
+      "clearFilters": "Clear all filters"
+    },
+    "detail": {
+      "watch": "Watch",
+      "summary": "Summary",
+      "segmentsShown_one": "Showing {{shown}} of {{count}} segment",
+      "segmentsShown_other": "Showing {{shown}} of {{count}} segments"
+    },
+    "stream": {
+      "notAvailable": "N/A",
+      "bitrateUnavailable": "Jellyfin and Emby do not expose individual video and audio bitrates during transcoding. Only the total stream bitrate is available.",
+      "stereo": "Stereo",
+      "mono": "Mono",
+      "channelCount_one": "{{count}}ch",
+      "channelCount_other": "{{count}}ch",
+      "noDetails": "No detailed stream information available",
+      "source": "Source",
+      "stream": "Stream",
+      "container": "Container",
+      "bitrate": "Bitrate",
+      "video": "Video",
+      "audio": "Audio",
+      "subtitles": "Subtitles",
+      "codec": "Codec",
+      "framerate": "Framerate",
+      "hdr": "HDR",
+      "profile": "Profile",
+      "color": "Color",
+      "channels": "Channels",
+      "language": "Language",
+      "sampleRate": "Sample Rate",
+      "format": "Format",
+      "forced": "Forced",
+      "transcodeDetails": "Transcode Details",
+      "hwDecode": "HW Decode",
+      "hwEncode": "HW Encode",
+      "speed": "Speed",
+      "throttled": "(throttled)"
+    }
   },
   "library": {
     "title": "Library",
-    "description": "Top movies and shows on your server.",
-    "topMovies": "Top Movies",
-    "topShows": "Top TV Shows",
-    "noMoviePlays": "No movie plays in this period",
-    "noShowPlays": "No TV show plays in this period",
     "overview": {
-      "description": "Library health and growth metrics.",
       "lastUpdated": "Last updated:",
       "totalItems": "Total Items",
       "shows": "shows",
@@ -179,11 +415,18 @@
       "thisWeek": "this week",
       "thisMonth": "this month",
       "thisYear": "this year",
-      "serversNeedSync": "These servers need to sync:"
+      "serversNeedSync": "These servers need to sync:",
+      "movieCount_one": "{{count}} movie",
+      "movieCount_other": "{{count}} movies",
+      "showCount_one": "{{count}} show",
+      "showCount_other": "{{count}} shows",
+      "notWatchedByYou": "Not watched by you",
+      "memberEmpty": {
+        "title": "Nothing here yet",
+        "description": "Movies and shows show up here once the server's library has synced."
+      }
     },
     "quality": {
-      "title": "Quality",
-      "description": "Resolution and codec distribution.",
       "qualityEvolution": "Quality Evolution",
       "all": "All",
       "failedToLoad": "Failed to load quality data",
@@ -195,20 +438,35 @@
         "movieCount_other": "{{count}} movies",
         "episodeCount_one": "{{count}} episode",
         "episodeCount_other": "{{count}} episodes"
+      },
+      "codec": {
+        "title": "Codec Distribution",
+        "moviesAndTv": "Movies / TV",
+        "videoCodecs": "Video Codecs",
+        "audioCodecs": "Audio Codecs",
+        "audioChannels": "Audio Channels",
+        "noVideo": {
+          "title": "No video content",
+          "description": "Video codec data will appear once movies or TV shows are in your library."
+        },
+        "noMusic": {
+          "title": "No music content",
+          "description": "Music codec data will appear once music tracks are in your library."
+        }
+      },
+      "resolution": {
+        "tooltip": "<b>{{name}}</b>: {{value, number}} of {{total, number}} titles ({{percent}}%)",
+        "itemCount_one": "{{count, number}} item",
+        "itemCount_other": "{{count, number}} items",
+        "empty": "No {{type}} quality data available"
       }
     },
     "storage": {
-      "title": "Storage",
-      "description": "Storage usage, predictions, and optimization.",
       "totalStorage": "Total Storage",
       "growthRate": "Growth Rate",
       "duplicates": "Duplicates",
-      "groups": "groups",
-      "recoverable": "recoverable",
       "staleContent": "Stale Content",
       "staleContentDesc": "Content that may be candidates for removal.",
-      "items": "items",
-      "unused": "unused",
       "storageTrend": "Storage Trend",
       "confidence": "Confidence",
       "confidenceHigh": "High",
@@ -220,8 +478,6 @@
       "contentROIDesc": "Watch value per storage cost.",
       "avgHoursPerGB": "avg hours/GB",
       "insufficientData": "Insufficient data",
-      "of": "of",
-      "days": "days",
       "failedToLoad": "Failed to load storage data",
       "failedToLoadDesc": "Could not fetch storage data. Please try again.",
       "duplicatesTitle": "Duplicates",
@@ -239,15 +495,80 @@
       "mirror": "Mirror",
       "missingOnServer": "Missing on server",
       "missingOnServerHint": "The server still lists this file but cannot find it on disk. On Plex, empty the library trash to clear it.",
-      "copyPath": "Copy file path"
+      "copyPath": "Copy file path",
+      "libraries": {
+        "title": "Libraries",
+        "columns": {
+          "library": "Library",
+          "share": "Share"
+        },
+        "serverFailed": "Couldn't load libraries from {{servers}}"
+      },
+      "stale": {
+        "tabs": {
+          "neverWatched": "Never Watched ({{count}})",
+          "stale": "Stale Content ({{count}})"
+        },
+        "empty": {
+          "title": "No stale content",
+          "description": "All content in your library has been watched recently."
+        },
+        "columns": {
+          "staleFor": "Stale For"
+        },
+        "allTypes": "All Types",
+        "threshold": {
+          "months3": "Unwatched for 3+ months",
+          "months6": "Unwatched for 6+ months",
+          "year1": "Unwatched for 1+ year",
+          "years2": "Unwatched for 2+ years"
+        },
+        "age": {
+          "days_one": "{{count}} day",
+          "days_other": "{{count}} days",
+          "months_one": "{{count}} month",
+          "months_other": "{{count}} months",
+          "years_one": "{{count}} year",
+          "years_other": "{{count}} years",
+          "yearsMonths": "{{years}}y {{months}}m"
+        }
+      },
+      "growthPerMonth": "+{{size}}/mo",
+      "dataDaysProgress": "{{days}} of {{min}} days",
+      "groupCount_one": "{{count}} group",
+      "groupCount_other": "{{count}} groups",
+      "recoverableSize": "{{size}} recoverable",
+      "itemCount_one": "{{count}} item",
+      "itemCount_other": "{{count}} items",
+      "unusedSize": "{{size}} unused",
+      "roi": {
+        "empty": {
+          "title": "No ROI data available",
+          "description": "ROI analysis requires watch history data to calculate content value."
+        },
+        "columns": {
+          "hoursPerGb": "Hours/GB",
+          "value": "Value"
+        },
+        "category": {
+          "low": "Low Value",
+          "moderate": "Moderate",
+          "high": "High Value"
+        },
+        "deletionSuggested": "(deletion suggested)"
+      },
+      "matchBadge": {
+        "exact": "Exact",
+        "likely": "Likely",
+        "possible": "Possible",
+        "fuzzy": "Fuzzy",
+        "versions": "Versions",
+        "label": "{{confidence}} ({{match}})"
+      }
     },
     "watch": {
-      "title": "Watch Analytics",
-      "description": "Viewing behavior and content engagement.",
       "watched": "Watched",
-      "percentWatched": "% watched",
       "totalWatchTime": "Total Watch Time",
-      "avgPerItem": "avg per item",
       "completed": "Completed",
       "peakHour": "Peak Hour",
       "viewingHours": "Viewing Hours",
@@ -261,7 +582,43 @@
       "noData": "No watch data yet",
       "noDataDesc": "Watch analytics will appear here once content has been played. Check back after some viewing activity.",
       "failedToLoad": "Failed to load watch analytics",
-      "failedToLoadDesc": "Could not fetch watch data."
+      "failedToLoadDesc": "Could not fetch watch data.",
+      "mostWatched": "Most Watched",
+      "binge": {
+        "columns": {
+          "show": "Show",
+          "servers": "Servers",
+          "consecutive": "Consecutive",
+          "bingeScore": "Binge Score",
+          "maxPerDay": "Max/Day"
+        },
+        "empty": {
+          "title": "No binge patterns detected",
+          "description": "Watch multiple episodes in a row to see binge patterns."
+        },
+        "tiers": {
+          "highlyAddictive": "Highly Addictive",
+          "addictive": "Addictive",
+          "bingeable": "Bingeable",
+          "casual": "Casual Watch"
+        }
+      },
+      "percentWatchedValue": "{{pct}}% watched",
+      "avgPerItemValue": "{{value}} avg per item",
+      "top": {
+        "movies": {
+          "empty": {
+            "title": "No movie watch data",
+            "description": "Movie watch statistics will appear here once content has been played."
+          }
+        },
+        "shows": {
+          "empty": {
+            "title": "No TV show watch data",
+            "description": "TV show watch statistics will appear here once episodes have been played."
+          }
+        }
+      }
     },
     "emptyState": {
       "checkingStatus": "Checking library status...",
@@ -320,21 +677,84 @@
       "syncFailed_one": "Sync failed to start on {{count}} server. Check your permissions and server status.",
       "syncFailed_other": "Sync failed to start on {{count}} servers. Check your permissions and server status.",
       "syncStarted": "Library sync started."
+    },
+    "charts": {
+      "storage": {
+        "historical": "Historical",
+        "prediction": "Prediction",
+        "now": "Now",
+        "axis": "Storage ({{unit}})",
+        "range": "Range: {{low}} - {{high}} {{unit}}",
+        "empty": {
+          "title": "No storage data",
+          "description": "Storage history will appear here once available"
+        }
+      },
+      "qualityTimeline": {
+        "titles_one": "{{count, number}} title",
+        "titles_other": "{{count, number}} titles",
+        "empty": {
+          "title": "No quality data",
+          "description": "Quality evolution data will appear here once available"
+        }
+      },
+      "monthly": {
+        "watchCount": "Watch Count",
+        "uniqueItems_one": "Unique Items: {{count}}",
+        "uniqueItems_other": "Unique Items: {{count}}",
+        "empty": {
+          "title": "No monthly data",
+          "description": "Monthly watch trends will appear here once data is available"
+        }
+      },
+      "watchesValue_one": "Watches: {{count}}",
+      "watchesValue_other": "Watches: {{count}}",
+      "growth": {
+        "empty": {
+          "title": "No growth data",
+          "description": "Library growth data will appear here once available"
+        }
+      },
+      "hourly": {
+        "watches": "Watches",
+        "empty": {
+          "title": "No hourly data",
+          "description": "Watch distribution by hour will appear here once data is available"
+        }
+      },
+      "completion": {
+        "inProgress": "In Progress",
+        "notStarted": "Not Started",
+        "tooltip_one": "<b>{{count}}</b> item ({{percent}}%)",
+        "tooltip_other": "<b>{{count}}</b> items ({{percent}}%)",
+        "empty": {
+          "title": "No completion data",
+          "description": "Completion breakdown will appear here once watch data is available"
+        }
+      }
     }
   },
   "activity": {
-    "title": "Activity",
-    "description": "Play trends, patterns, and streaming behavior.",
     "playsOverTime": "Plays Over Time",
     "concurrentStreams": "Concurrent Streams",
     "engagementBreakdown": "Engagement Breakdown",
     "howUsersEngage": "How users engage with content",
+    "howYouEngage": "How you engage with what you watch",
     "playsVsSessions": "Plays vs Sessions",
     "playsVsSessionsDesc": "Full completions only — counts a play when total watch time covers a content's entire runtime",
     "activityByDayOfWeek": "Activity by Day of Week",
     "activityByHourOfDay": "Activity by Hour of Day",
     "platforms": "Platforms",
-    "streamQuality": "Stream Quality"
+    "streamQuality": "Stream Quality",
+    "noEngagementData": "No engagement data available",
+    "tierItems_one": "{{count}} item",
+    "tierItems_other": "{{count}} items",
+    "noPlatformData": "No platform data available",
+    "noQualityData": "No quality data available",
+    "noConcurrentData": "No concurrent stream data available",
+    "playsShare_one": "<b>{{count}}</b> play ({{percent}}%)",
+    "playsShare_other": "<b>{{count}}</b> plays ({{percent}}%)",
+    "peakConcurrent": "Peak Concurrent: {{value}}"
   },
   "violations": {
     "title": "Violations",
@@ -382,7 +802,8 @@
       "matched": "{{matched}}/{{total}} matched",
       "actual": "Actual",
       "relatedSessions_one": "{{count}} related session",
-      "relatedSessions_other": "{{count}} related sessions"
+      "relatedSessions_other": "{{count}} related sessions",
+      "actionResults": "Actions"
     }
   },
   "automations": {
@@ -435,7 +856,10 @@
       "event": "Event"
     },
     "variables": {
-      "user": { "username": "Account username", "identityName": "Person's name" },
+      "user": {
+        "username": "Account username",
+        "identityName": "Person's name"
+      },
       "session": {
         "mediaTitle": "Title playing",
         "mediaType": "Media type",
@@ -445,14 +869,27 @@
         "episodeNumber": "Episode number",
         "name": "Show and episode, or title"
       },
-      "server": { "name": "Server name", "type": "Server type" },
+      "server": {
+        "name": "Server name",
+        "type": "Server type"
+      },
       "device": {
         "name": "Device name",
         "platform": "Platform",
         "product": "App",
         "location": "Location"
       },
-      "trust": { "previous": "Previous score", "new": "New score", "reason": "Reason" },
+      "download": {
+        "title": "Downloaded title",
+        "app": "Downloading app",
+        "device": "Downloading device",
+        "last24h": "Downloads in the last 24 hours"
+      },
+      "trust": {
+        "previous": "Previous score",
+        "new": "New score",
+        "reason": "Reason"
+      },
       "media": {
         "title": "Item title",
         "name": "Show and episode, or title",
@@ -504,7 +941,7 @@
             "description": "Minimum time between notifications"
           },
           "priority": {
-            "description": "Used by Pushover, Gotify and ntfy"
+            "description": "Used by Pushover, Gotify, ntfy and Telegram"
           }
         },
         "ran": "Sent a notification"
@@ -885,6 +1322,7 @@
         "accountInactiveFor": "an account has been inactive for {{duration}}",
         "accountNewDevice": "an account plays from a new device",
         "accountTrustChanged": "an account's trust score changes",
+        "accountMediaDownloaded": "an account downloads media",
         "mediaAdded": "media is added",
         "mediaUpgraded": "media is upgraded",
         "serverDown": "a server goes down",
@@ -913,6 +1351,8 @@
         "travel_speed_kmh": "the travel speed",
         "unique_ips_in_window": "the number of IP addresses",
         "unique_devices_in_window": "the number of devices",
+        "downloads_in_window": "the number of downloads",
+        "download_bytes_in_window": "the data downloaded",
         "inactive_days": "the time since the last stream",
         "current_pause_minutes": "the current pause",
         "total_pause_minutes": "the total pause time",
@@ -1091,6 +1531,14 @@
       "unique_devices_in_window": {
         "label": "Unique Devices in Window",
         "description": "Number of unique devices in the time window"
+      },
+      "downloads_in_window": {
+        "label": "Downloads in Window",
+        "description": "Number of items downloaded in the time window"
+      },
+      "download_bytes_in_window": {
+        "label": "Downloaded Data in Window",
+        "description": "Gigabytes downloaded in the time window"
       },
       "inactive_days": {
         "label": "Days Inactive",
@@ -1394,8 +1842,6 @@
     "recordsOnly": "Records runs only",
     "scope": {
       "global": "Global",
-      "person": "Person",
-      "account": "Account",
       "crossServer": "Cross-server"
     },
     "searchPlaceholder": "Search automations…",
@@ -1485,6 +1931,11 @@
         "name": "Many IPs in a window",
         "description": "Raise a violation when an account streams from more IP addresses in a window than you allow.",
         "keywords": "ip addresses vpn sharing devices window"
+      },
+      "download-burst": {
+        "name": "Download burst",
+        "description": "Alert when one person downloads more items than you allow in a day.",
+        "keywords": "download offline sync hoarding burst limit"
       },
       "geo-restriction": {
         "name": "Blocked countries",
@@ -1648,6 +2099,10 @@
           "description": "An account's trust score changes, whether an automation or an owner moved it.",
           "synonyms": "trust, score, reputation, penalty, adjusted"
         },
+        "accountMediaDownloaded": {
+          "description": "An account downloads an item through the server's download endpoint, once per item.",
+          "synonyms": "download, offline, sync, save, hoarding"
+        },
         "mediaAdded": {
           "description": "A library item shows up on a server for the first time.",
           "synonyms": "new, added, library, movie, episode, import"
@@ -1791,6 +2246,9 @@
         "authToken": "Auth token",
         "userKey": "User key",
         "apiToken": "API token",
+        "botToken": "Bot token",
+        "chatId": "Chat ID",
+        "topicId": "Topic ID",
         "preset": "Provider",
         "host": "SMTP host",
         "port": "Port",
@@ -1812,6 +2270,7 @@
       },
       "hints": {
         "authTokenOptional": "Optional for public topics",
+        "telegramTopic": "Forum groups only. Leave blank for a normal chat or channel.",
         "smtpPreset": "Fills the host, port and security for common providers. Amazon SES and Mailgun EU need the region edited into the host.",
         "smtpVerifyCertificate": "Checks the mail server's TLS certificate against a trusted authority. Turn it off only for a server with a self-signed certificate, such as a local bridge: anyone on the path between Tracearr and the mail server can then intercept the connection.",
         "smtpUsernameOptional": "Leave blank when the server needs no login",
@@ -1869,6 +2328,7 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
+        "telegram": "Telegram",
         "email": "Email",
         "push": "Mobile push",
         "webToast": "Browser toasts"
@@ -1880,21 +2340,13 @@
       "violationsOff": "Violations off",
       "violationsOn": "Violations on",
       "webToastNote": "Toasts in this browser."
-    },
-    "jobs": {
-      "runNow": "Run Now",
-      "running": "Running...",
-      "lastRun": "Last run",
-      "nextRun": "Next run",
-      "schedule": "Schedule"
-    },
-    "mobile": {
-      "editDisplayName": "Edit Display Name",
-      "editDisplayNameDesc": "Change how this device appears in your device list",
-      "displayName": "Display Name",
-      "displayNamePlaceholder": "e.g., My iPhone",
-      "updating": "Updating..."
     }
+  },
+  "impersonation": {
+    "banner": "Viewing as {{name}}. Changes are turned off.",
+    "stop": "Stop",
+    "stopLabel": "Stop viewing as {{name}}",
+    "stopViewing": "Stop viewing"
   },
   "maintenance": {
     "startingTitle": "Tracearr is starting up...",
@@ -1926,17 +2378,21 @@
     "allTypes": "All types",
     "heatmap": "Heatmap",
     "circles": "Circles",
+    "viewMode": "Map view",
     "streams": "streams",
     "locations": "locations",
     "allActivity": "All activity",
     "basemapMissing": "Basemap not installed",
     "webglUnavailable": "WebGL is disabled in this browser",
     "webglHint": "The map needs WebGL. Enable it for this site in your browser settings.",
-    "badMounts": "Incorrect volume mounts detected — functionality is not guaranteed."
+    "badMounts": "Incorrect volume mounts detected — functionality is not guaranteed.",
+    "loadingData": "Loading map data...",
+    "noDataForFilters": "No location data for current filters",
+    "totalStreams": "Total streams",
+    "streamCount_one": "{{count, number}} stream",
+    "streamCount_other": "{{count, number}} streams"
   },
   "devices": {
-    "title": "Device Compatibility",
-    "description": "See which devices direct play vs transcode each codec.",
     "analyzedSessions": "Analyzed Sessions",
     "analyzedSessionsTooltip_one": "Sessions in device + codec combinations with at least {{count}} session and a known codec. Rare combinations and sessions with no codec info aren't counted.",
     "analyzedSessionsTooltip_other": "Sessions in device + codec combinations with at least {{count}} sessions and a known codec. Rare combinations and sessions with no codec info aren't counted.",
@@ -1958,14 +2414,23 @@
     "legend": "Legend:",
     "directPlayHigh": "≥80% Direct",
     "directPlayMid": "50-79%",
-    "directPlayLow": "<50%",
-    "topTranscodingUsers": "Top Transcoding Users",
-    "topTranscodingUsersDesc": "Users causing the most transcodes on your server.",
-    "noTranscodingUsers": "No transcoding users found"
+    "directPlayLow": "<50%"
+  },
+  "downloads": {
+    "dataDownloaded": "Data downloaded",
+    "peopleDownloading": "People downloading",
+    "mostDownloaded": "Most downloaded",
+    "unknownUser": "Unknown user",
+    "appOnDevice": "{{app}} on {{device}}",
+    "deliveredAs": "delivered as {{format}} at {{bitrate}}",
+    "deliveredAsFormat": "delivered as {{format}}",
+    "deliveredAtBitrate": "delivered at {{bitrate}}",
+    "requests_one": "({{count}} request)",
+    "requests_other": "({{count}} requests)",
+    "empty": "No downloads in this range. Downloads are items pulled through the server's download button or endpoint. Plex only reports them while Tracearr is connected.",
+    "panelTitle": "Downloads"
   },
   "statsBandwidth": {
-    "title": "Bandwidth",
-    "description": "Streaming bandwidth usage and bitrate analysis.",
     "dataTransferred": "Data Transferred",
     "avgBitrate": "Avg Bitrate",
     "avgBitrateMbps": "Avg Bitrate (Mbps)",
@@ -1974,15 +2439,44 @@
     "uniqueUsers": "Unique Users",
     "dailyUsage": "Daily Bandwidth Usage",
     "dailyUsageDesc": "Average bitrate and session count over time.",
-    "topUsers": "Top Bandwidth Users",
-    "topUsersDesc": "Users consuming the most bandwidth.",
-    "noData": "No bandwidth data available"
+    "noData": "No bandwidth data available",
+    "topPeopleTitle": "People by data",
+    "topPeopleCaption": "Top five in this range"
   },
   "statsUsers": {
     "noActivity": "No activity yet",
     "noActivityDesc": "Start streaming to see your top users here.",
-    "top3": "Top 3",
-    "runnersUp": "Runners Up"
+    "rankBy": "Rank by",
+    "rank": {
+      "hours": "Hours",
+      "transcodes": "Transcode share",
+      "requests": "Requests",
+      "lastSeen": "Last seen"
+    },
+    "summary": {
+      "active": "Active people",
+      "activeOf": "of {{total}}",
+      "topThreeShare": "Top three share",
+      "transcoderShare": "Top transcoder share",
+      "transcodesOf": "{{top}} of {{total}} transcodes",
+      "quiet": "Quiet people",
+      "quietDays": "{{days}} days or more"
+    },
+    "columns": {
+      "person": "Person",
+      "requests": "Requests",
+      "trend": "Trend"
+    },
+    "requestsAllTime": "All time, not limited to the selected range. Requested, then watched.",
+    "linkTitle": {
+      "transcodes": "People ranked by transcode share.",
+      "requests": "People ranked by requests."
+    },
+    "linkBody": {
+      "transcodes": "Every person, highest share first.",
+      "requests": "Every person, with how many of their requests were watched."
+    },
+    "openPeople": "Open people"
   },
   "plexCallback": {
     "authComplete": "Authentication complete",
@@ -2039,21 +2533,61 @@
     "selected": "selected",
     "snapshots": "snapshot(s)",
     "of": "of",
-    "logExplorerUnavailable": "Log explorer is only available in Docker environments"
+    "logExplorerUnavailable": "Log explorer is only available in Docker environments",
+    "tasksTab": {
+      "loading": "Loading tasks...",
+      "failedToLoad": "Failed to load task status",
+      "jobQueues": "Job Queues",
+      "jobQueuesDesc": "BullMQ background job processing queues",
+      "description": "Description",
+      "schedule": "Schedule",
+      "completed": "Completed",
+      "scheduled": "Scheduled",
+      "processing": "Processing",
+      "dlq_one": "DLQ: {{count}}",
+      "dlq_other": "DLQ: {{count}}",
+      "onDemand": "On demand",
+      "notInitialized": "Not initialized",
+      "backgroundServices": "Background Services",
+      "backgroundServicesDesc": "Interval-based and event-driven background services",
+      "interval": "Interval",
+      "eventConnections": "Event Connections",
+      "eventConnectionsDesc": "Open public API event connections (GET /api/v2/public/events) held by this process",
+      "every": "Every {{interval}}",
+      "eventDriven": "Event-driven",
+      "queues": {
+        "notifications": "Notifications",
+        "notificationsDesc": "Discord, webhooks, push",
+        "imports": "Imports",
+        "importsDesc": "Tautulli / Jellystat history",
+        "maintenance": "Maintenance",
+        "maintenanceDesc": "Data normalization & cleanup",
+        "librarySync": "Library Sync",
+        "librarySyncDesc": "Library metadata sync",
+        "versionCheck": "Version Check",
+        "versionCheckDesc": "GitHub release checking",
+        "inactivityCheck": "Inactivity Check",
+        "inactivityCheckDesc": "Account inactivity monitoring",
+        "backup": "Backup",
+        "backupDesc": "Scheduled database backups"
+      }
+    },
+    "clientErrors": {
+      "title": "Browser Errors",
+      "description": "Uncaught errors from this tab since it was loaded. Not persisted.",
+      "empty": "No errors captured"
+    }
   },
   "media": {
     "landing": {
-      "title": "Media",
-      "lens": {
-        "label": "Viewing as",
-        "allUsers": "All users"
-      },
       "shelves": {
         "recentlyAddedMovies": "Recently Added Movies",
         "recentlyAddedShows": "Recently Added Shows",
         "recentlyUpdated": "Recently Updated",
         "mostPopularMovies": "Most Popular Movies",
         "mostPopularShows": "Most Popular Shows",
+        "recentlyAddedAlbums": "Recently Added Albums",
+        "mostPlayedArtists": "Most Played Artists",
         "emptyRecentlyAdded": "Nothing added in this period",
         "emptyRecentlyUpdated": "Nothing replaced in this period",
         "emptyMostPopular": "No plays in this period",
@@ -2073,24 +2607,12 @@
         "newEpisodes_other": "{{count}} new episodes",
         "replacedEpisodes_one": "{{count}} episode replaced",
         "replacedEpisodes_other": "{{count}} episodes replaced",
-        "addedAgo": "added {{date}}",
         "addedCompactAgo": "added {{age}} ago",
         "newEpisodesChip_one": "{{count}} new",
         "newEpisodesChip_other": "{{count}} new"
       },
       "deadWeight": {
-        "title": "Dead Weight",
-        "summary_one": "{{count}} never-watched title · {{size}}",
-        "summary_other": "{{count}} never-watched titles · {{size}}",
-        "empty": "Nothing to reclaim - everything in your library has been watched",
-        "columns": {
-          "poster": "Poster",
-          "title": "Title",
-          "added": "Added",
-          "servers": "Servers"
-        },
-        "viewAll": "View all",
-        "viewAllTooltip": "Coming soon"
+        "viewAll": "View all"
       },
       "loadError": "Couldn't load your media library"
     },
@@ -2101,30 +2623,52 @@
       "title": "Shows"
     },
     "genres": {
-      "title": "Genres",
-      "subtitle": "Plays and watch time by genre, across every server in view.",
+      "cards": {
+        "withPlays": "Genres with plays",
+        "ofGenres": "of {{count}}",
+        "topFiveShare": "Top five share",
+        "largestRise": "Largest rise",
+        "largestFall": "Largest fall"
+      },
+      "share": {
+        "title": "Library share vs play share",
+        "items": "Share of items",
+        "plays": "Share of plays",
+        "sortGap": "Gap",
+        "showAll": "Show all {{count}}"
+      },
+      "trends": {
+        "title": "Trend by genre"
+      },
       "chart": {
-        "title": "Plays by genre",
-        "valueLabel": "Plays",
         "itemCount_one": "{{count}} title",
-        "itemCount_other": "{{count}} titles",
-        "ariaLabel": "Bar chart of plays by genre, sorted highest to lowest. The full breakdown is available in the table below."
+        "itemCount_other": "{{count}} titles"
       },
       "table": {
         "title": "Genre breakdown",
         "columns": {
           "genre": "Genre",
           "plays": "Plays",
-          "watchTime": "Watch time"
-        },
-        "browseMovies": "Browse {{genre}} movies",
-        "browseShows": "Browse {{genre}} shows"
+          "watchTime": "Watch time",
+          "topViewer": "Top viewer"
+        }
       },
       "empty": {
         "title": "No genres captured yet",
         "description": "Genres come from your media servers' metadata sync. Check back after the next sync completes."
       },
-      "loadError": "Couldn't load genres"
+      "loadError": "Couldn't load genres",
+      "sheet": {
+        "description": "Plays, viewers and titles for this genre in the selected range",
+        "whoPlays": "Who plays it",
+        "ofCountedPlays": "of counted plays",
+        "topTitles": "Top titles",
+        "topArtists": "Top artists",
+        "artistCount_one": "{{count}} artist",
+        "artistCount_other": "{{count}} artists",
+        "browse": "Browse this genre",
+        "allGenresPeak": "all genres peak {{hour}}"
+      }
     },
     "detail": {
       "title": "Media Details",
@@ -2133,8 +2677,7 @@
       },
       "notFound": {
         "title": "Media not found",
-        "message": "This title doesn't exist or you don't have access to it.",
-        "backLink": "Back to Media"
+        "message": "This title doesn't exist or you don't have access to it."
       },
       "hero": {
         "loadError": "Couldn't load this title",
@@ -2159,6 +2702,17 @@
       },
       "kpis": {
         "ariaLabel": "Watch statistics",
+        "yourPlays": "Your plays",
+        "yourWatchTime": "Your watch time",
+        "yourListenTime": "Your listen time",
+        "yourCompletion": "Your completion",
+        "lastWatched": "Last watched",
+        "lastPlayed": "Last played",
+        "episodesOf": "{{watched}} of {{total}} episodes",
+        "watchedByOthers_one": "Watched by {{count}} other person",
+        "watchedByOthers_other": "Watched by {{count}} others",
+        "playedByOthers_one": "Played by {{count}} other person",
+        "playedByOthers_other": "Played by {{count}} others",
         "loadError": "Couldn't load watch statistics",
         "completionLoadError": "Couldn't load completion",
         "plays": {
@@ -2166,30 +2720,34 @@
           "caption": "resume chains, short sessions excluded"
         },
         "watchTime": {
-          "label": "Watch time",
           "detail": "+{{hours}}h in the last 30 days"
         },
         "viewers": {
           "label": "Viewers",
+          "labelMusic": "Listeners",
           "detail": "across all servers"
         },
         "completion": {
           "label": "Avg completion",
           "detail": "{{finished}} of {{total}} finished every episode",
-          "detailMovie": "{{finished}} of {{total}} watched to completion"
+          "detailMovie": "{{finished}} of {{total}} watched to completion",
+          "detailMusic": "{{finished}} of {{total}} listened to the end"
         }
       },
       "watchers": {
         "title": "Watchers",
+        "titleMusic": "Listeners",
         "loadError": "Couldn't load watchers",
         "empty": "No one has watched this yet.",
+        "emptyMusic": "No one has played this yet.",
         "lastWatchedAgo": "{{age}} ago",
         "completionLabel": "{{percent}}% complete",
         "columns": {
           "plays": "Plays",
           "episodes": "Episodes",
           "completion": "Completion",
-          "lastWatched": "Last watched"
+          "lastWatched": "Last watched",
+          "lastPlayed": "Last played"
         }
       },
       "seasons": {
@@ -2206,21 +2764,36 @@
           "unwatched": "{{code}}: unwatched"
         }
       },
+      "albums": {
+        "title": "Albums",
+        "loadError": "Couldn't load albums",
+        "trackCount_one": "{{count}} track",
+        "trackCount_other": "{{count}} tracks"
+      },
+      "album": {
+        "kind": "Album",
+        "loadError": "Couldn't load this album",
+        "finishedCaption": "played to the end",
+        "vsPrior30": "vs prior 30 days",
+        "tracksCaption": "plays, all time",
+        "columns": {
+          "title": "Title",
+          "length": "Length"
+        }
+      },
       "platforms": {
         "title": "Platforms",
         "loadError": "Couldn't load platform breakdown",
         "empty": "No platform data yet",
         "unknown": "Unknown",
         "columns": {
-          "plays": "Plays",
-          "watchTime": "Watch time"
+          "plays": "Plays"
         }
       },
       "history": {
         "title": "History",
         "loadError": "Couldn't load history",
         "empty": "No plays recorded yet",
-        "watched": "Watched",
         "notWatched": "Not finished",
         "columns": {
           "duration": "Duration"
@@ -2250,26 +2823,16 @@
         "watchedByOthers": "Watched by others",
         "watchedByYou": "Watched by you"
       },
-      "tileLabel": {
-        "added": "added",
-        "plays": "plays",
-        "viewers": "viewers",
-        "resolution": "resolution"
-      },
-      "rankChip": "#{{rank}}",
-      "playsCompact_one": "{{compact}} play",
-      "playsCompact_other": "{{compact}} plays",
       "versionsChip": "{{count}}×",
       "versions_one": "{{count}} version",
       "versions_other": "{{count}} versions",
+      "albumCount_one": "{{count}} album",
+      "albumCount_other": "{{count}} albums",
       "moreServers": "+{{count}} more"
     },
     "grid": {
       "toolbar": {
         "ariaLabel": "Filters and sort",
-        "typeLabel": "Media type",
-        "moviesToggle": "Movies",
-        "showsToggle": "Shows",
         "searchPlaceholder": "Search titles…",
         "searchLabel": "Search titles",
         "filtersLabel": "Filters",
@@ -2330,13 +2893,8 @@
         "current": "Letter {{letter}}"
       },
       "loaderError": "Couldn't load more titles",
-      "retry": "Retry",
-      "clearJumpAction": "Clear",
-      "showingFrom": "Showing from {{letter}}",
-      "showAll": "Show all",
       "emptyFilter": "No titles match these filters",
       "emptySearch": "No titles match \"{{query}}\"",
-      "emptyAnchored": "Nothing at or after \"{{letter}}\" under these filters",
       "loadError": "Couldn't load the catalog"
     }
   },
@@ -2399,7 +2957,6 @@
     },
     "page": {
       "title": "Requests",
-      "description": "What people asked for, what landed, and whether they ever played it.",
       "failedToLoad": "Couldn't load request analytics",
       "notConfigured": "No Seerr linked",
       "notConfiguredDescription": "Link a Seerr instance to a server and this page fills in after the first sync.",
@@ -2437,19 +2994,6 @@
       "onDisk": "On disk",
       "untitled": "Untitled",
       "failedToLoad": "Couldn't load these requests"
-    },
-    "followThrough": {
-      "title": "Requesters",
-      "description": "Who asks for what, whether they watch it through, and whether anyone else does.",
-      "person": "Person",
-      "asked": "Asked",
-      "landed": "Landed",
-      "watched": "Watched",
-      "watchedByOthers": "Watched by others",
-      "medianWait": "Median wait",
-      "emptyTitle": "No requesters yet",
-      "emptyDescription": "Requests appear here once a linked Seerr has synced.",
-      "failedToLoad": "Couldn’t load requesters"
     }
   }
 }
