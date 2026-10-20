@@ -68,7 +68,8 @@
     "transcode": "轉碼",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "",
@@ -133,6 +134,7 @@
     "serverOwner": "伺服器擁有者",
     "resolution": "解析度",
     "watchTime": "觀看時間",
+    "listenTime": "",
     "pausedTime": "暫停時間",
     "sessionDetails": "會話詳情",
     "recentSessions": "最近會話",
@@ -152,7 +154,13 @@
     "streamDetails": "串流細節",
     "transcodeReason": "轉碼原因",
     "loadMore": "載入更多",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "搜尋使用者……",
@@ -185,6 +193,7 @@
     "episode_plural": "劇集",
     "track": "軌道",
     "track_plural": "音軌",
+    "artist_plural": "",
     "liveTV": "電視直播",
     "photo": "",
     "tv": "電視",
@@ -207,6 +216,7 @@
   "count": {
     "user_other": "{{count}} 個使用者",
     "session_other": "{{count}} 個會話",
+    "download_other": "",
     "stream_other": "{{count}} 個串流",
     "server_other": "{{count}} 個伺服器",
     "automation_other": "",
@@ -236,7 +246,9 @@
     "noDeviceData": "沒有可用的裝置資料",
     "noJobHistory": "還沒有任務紀錄",
     "noSessionsFound": "未找到會話",
-    "noUserData": ""
+    "noUserData": "",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "你有尚未儲存的變更，確定要離開嗎？"
