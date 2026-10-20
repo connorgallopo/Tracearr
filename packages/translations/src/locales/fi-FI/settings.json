@@ -229,14 +229,23 @@
       "autoDetectNote": "Käynnistä Jellyfin tai Emby uudelleen liitännäisen asennuksen jälkeen; uudelleenkäynnistys tarvitaan. Tracearr itsessään ei tarvitse uudelleenkäynnistystä ja poimii liitännäisen automaattisesti.",
       "issueBlocked": "Palvelin raportoi liitännäisen asennetuksi ja aktiiviseksi, mutta Tracearr saa 404:n sen päätepisteestä. Tavanomainen syy on käänteinen välityspalvelin, joka estää polun.",
       "issueRestartRequired": "Liitännäinen on asennettu, mutta mediapalvelin tarvitsee uudelleenkäynnistyksen ennen kuin se aktivoidaan.",
-      "issueMalfunctioned": "Palvelin ilmoittaa liitännäisen lataamisen epäonnistumisesta. Liitännäisen tai mediapalvelimen päivittäminen poistaa tämän yleensä."
+      "issueMalfunctioned": "Palvelin ilmoittaa liitännäisen lataamisen epäonnistumisesta. Liitännäisen tai mediapalvelimen päivittäminen poistaa tämän yleensä.",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "Ensisijainen julisteiden lähde",
       "description": "Kun nimike on useammalla kuin yhdellä palvelimella, käytä tämän palvelimen julistetta. Jos sillä ei ole sellaista, palaamme viimeisimpään lisättyyn kopioon.",
       "automatic": "Automaattinen (viimeisimmät)",
       "emptyHint": "Lisää palvelin valitaksesi halutun julistelähteen.",
-      "ownerOnly": "Vain omistaja voi valita halutun julistelähteen."
+      "ownerOnly": "Vain omistaja voi valita halutun julistelähteen.",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "Versio {{version}}",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Mobiili Sovellus",
-    "pairDevice": "Parita laite",
-    "generateToken": "Luo paritustunnus",
-    "scanQrCode": "Skannaa QR-koodi",
-    "tokenExpires": "Token vanhenee {{time}}",
     "lastSeen": "Viimeksi nähty {{when}}",
     "connectedOn": "Yhdistetty {{date}}",
     "noDevices": "Laitteita ei ole yhdistetty",
@@ -257,7 +261,6 @@
     "revokeAll": "Peruuta Kaikki Istunnot",
     "getOnGooglePlay": "Hanki se Google Playsta",
     "downloadOnAppStore": "Lataa App Storesta",
-    "externalUrlRequired": "Ulkoinen URL-osoite on konfiguroitava Yleiset asetukset, jotta mobiiliparitus toimisi.",
     "mobileAccessDisabled": "Mobiilikäyttö Pois Käytöstä",
     "mobileAccessDisabledDesc": "Ota mobiiliyhteys käyttöön, jotta Tracearr mobiilisovellus voi muodostaa yhteyden palvelimellesi.",
     "enableMobileAccess": "Ota Mobiilikäyttö Käyttöön",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "Toistoja, jotka alkoivat sen jälkeen, kun tämä palvelin lisättiin Tracearriin, ei koskaan tuoda. Oletuksena tuonti pysähtyy myös aikaisimpaan toistoon, joka Tracearrilla jo on tältä palvelimelta, esimerkiksi Jellystat-tuonnista. Ota tämä käyttöön tuodaksesi kaiken ajalta ennen palvelimen lisäämistä. Täsmälleen samat kaksoiskappaleet ohitetaan silti.",
     "skipOverlap": "Päällekkäinen tieto - aikaleima osuu ajanjaksolle, jota Tracearr jo seuraa tällä palvelimella. Ota koko historian tuonti käyttöön sisällyttääksesi sen.",
     "skipDuplicatePlugin": "Kaksoiskappale - tuotu jo suoraan tai saapunut aiemmin saman liitännäisdatan Jellystat-tuonnin kautta.",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "{{count}} ohitettu päällekkäisyytenä",
     "overlapSkipped_other": "{{count}} ohitettu päällekkäisyyksinä",
     "duplicates_one": "{{count}} kaksoiskappale ohitettu",
@@ -608,7 +618,6 @@
       "cron": "Cron {{expression}}",
       "inZone": "{{summary}} {{timezone}}"
     },
-    "nextRun": "Seuraava ajo {{when}}",
     "noNextRun": "Ei ajastettu",
     "neverSent": "Ei koskaan lähetetty",
     "lastSend": "{{outcome}}: {{count}}",
@@ -1046,11 +1055,7 @@
     "neverSynced": "Ei vielä synkronoitu",
     "counts": {
       "requests_one": "{{count}} pyyntö",
-      "requests_other": "{{count}} pyyntöä",
-      "unmatchedMedia_one": "{{count}} sovittamaton nimike",
-      "unmatchedMedia_other": "{{count}} sovittamatonta nimikettä",
-      "unmatchedUsers_one": "{{count}} sovittamaton käyttäjä",
-      "unmatchedUsers_other": "{{count}} sovittamatonta käyttäjää"
+      "requests_other": "{{count}} pyyntöä"
     },
     "needsKey": "Tarvitsee API-avaimen",
     "lastError": "Viimeisin synkronointi epäonnistui {{ago}}: {{error}}",
