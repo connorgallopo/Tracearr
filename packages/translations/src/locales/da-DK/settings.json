@@ -229,14 +229,23 @@
       "autoDetectNote": "",
       "issueBlocked": "",
       "issueRestartRequired": "",
-      "issueMalfunctioned": ""
+      "issueMalfunctioned": "",
+      "jellyfinStep1": "",
+      "jellyfinStep2": "",
+      "jellyfinStep3": "",
+      "jellyfinStep4": "",
+      "embyStep1": "",
+      "embyStep2": "",
+      "embyStep3": ""
     },
     "posterSource": {
       "label": "",
       "description": "",
       "automatic": "",
       "emptyHint": "",
-      "ownerOnly": ""
+      "ownerOnly": "",
+      "precache": "",
+      "precacheDescription": ""
     },
     "version": {
       "installed": "",
@@ -245,11 +254,6 @@
     }
   },
   "mobile": {
-    "title": "Mobil App",
-    "pairDevice": "Par Enhed",
-    "generateToken": "Generer parringstoken",
-    "scanQrCode": "",
-    "tokenExpires": "Token udløber i {{time}}",
     "lastSeen": "",
     "connectedOn": "",
     "noDevices": "Ingen enheder tilsluttet",
@@ -257,7 +261,6 @@
     "revokeAll": "Tilbagekald Alle Sessioner",
     "getOnGooglePlay": "Få det på Google Play",
     "downloadOnAppStore": "Download i App Store",
-    "externalUrlRequired": "En ekstern URL skal konfigureres i generelle indstillinger for at kunne arbejde med mobilparring.",
     "mobileAccessDisabled": "Mobil Adgang Deaktiveret",
     "mobileAccessDisabledDesc": "Aktiver mobil adgang for at tillade Tracearr mobil app at oprette forbindelse til din server.",
     "enableMobileAccess": "Aktiver Mobil Adgang",
@@ -447,6 +450,13 @@
     "importFullRangeHelp": "",
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
+    "importFailed": "",
+    "dropzone": {
+      "dropHere": "",
+      "dragOrClick": "",
+      "limit": "",
+      "removeFile": ""
+    },
     "overlapSkipped_one": "",
     "overlapSkipped_other": "",
     "duplicates_one": "",
@@ -608,7 +618,6 @@
       "cron": "",
       "inZone": ""
     },
-    "nextRun": "",
     "noNextRun": "",
     "neverSent": "",
     "lastSend": "",
@@ -1046,11 +1055,7 @@
     "neverSynced": "",
     "counts": {
       "requests_one": "",
-      "requests_other": "",
-      "unmatchedMedia_one": "",
-      "unmatchedMedia_other": "",
-      "unmatchedUsers_one": "",
-      "unmatchedUsers_other": ""
+      "requests_other": ""
     },
     "needsKey": "",
     "lastError": "",
