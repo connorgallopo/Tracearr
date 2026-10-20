@@ -146,12 +146,14 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_other": "",
     "pendingCount_other": ""
   },
   "history": {
     "adjustFilters": "",
     "historyWillAppear": "",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "",
@@ -170,7 +172,8 @@
     "noUsersMatch": "",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "",
