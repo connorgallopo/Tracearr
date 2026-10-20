@@ -68,7 +68,8 @@
     "transcode": "Перекодування",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": "Переглянуто"
+    "watched": "Переглянуто",
+    "played": ""
   },
   "severity": {
     "low": "Низька",
@@ -133,6 +134,7 @@
     "serverOwner": "Власник сервера",
     "resolution": "Роздільна здатність",
     "watchTime": "Час перегляду",
+    "listenTime": "",
     "pausedTime": "Час призупинення",
     "sessionDetails": "Деталі сеансу",
     "recentSessions": "Нещодавні сеанси",
@@ -152,7 +154,13 @@
     "streamDetails": "Деталі потоку",
     "transcodeReason": "",
     "loadMore": "Завантажити більше",
-    "playback": "Відтворення"
+    "playback": "Відтворення",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Пошук користувачів...",
@@ -185,6 +193,7 @@
     "episode_plural": "Епізоди",
     "track": "Трек",
     "track_plural": "Доріжки",
+    "artist_plural": "",
     "liveTV": "ТБ",
     "photo": "Фото",
     "tv": "ТВ",
@@ -213,6 +222,10 @@
     "session_few": "",
     "session_many": "",
     "session_other": "{{count}} сеансів",
+    "download_one": "",
+    "download_few": "",
+    "download_many": "",
+    "download_other": "",
     "stream_one": "{{count}} потік",
     "stream_few": "",
     "stream_many": "",
@@ -293,7 +306,9 @@
     "noDeviceData": "Немає даних про пристрій",
     "noJobHistory": "Ще немає історії роботи",
     "noSessionsFound": "Сеансів не знайдено",
-    "noUserData": "Немає даних користувача"
+    "noUserData": "Немає даних користувача",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "У вас є незбережені зміни. Ви впевнені, що хочете вийти?"
