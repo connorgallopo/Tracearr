@@ -68,7 +68,8 @@
     "transcode": "Transcoderen",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Laag",
@@ -133,6 +134,7 @@
     "serverOwner": "Servereigenaar",
     "resolution": "Resolutie",
     "watchTime": "Kijktijd",
+    "listenTime": "",
     "pausedTime": "Tijd op pauze",
     "sessionDetails": "Sessiedetails",
     "recentSessions": "Recente sessies",
@@ -152,7 +154,13 @@
     "streamDetails": "Streamdetails",
     "transcodeReason": "Reden voor transcoderen",
     "loadMore": "Laad Meer",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Gebruikers zoeken...",
@@ -185,6 +193,7 @@
     "episode_plural": "Afleveringen",
     "track": "Nummer",
     "track_plural": "Nummers",
+    "artist_plural": "",
     "liveTV": "Live-tv",
     "photo": "Foto",
     "tv": "Televisie",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} gebruikers",
     "session_one": "{{count}} sessie",
     "session_other": "{{count}} sessies",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "",
     "stream_other": "",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "Geen apparaatgegevens beschikbaar",
     "noJobHistory": "Nog geen takengeschiedenis",
     "noSessionsFound": "Geen sessies gevonden",
-    "noUserData": "Geen gebruikersgegevens beschikbaar"
+    "noUserData": "Geen gebruikersgegevens beschikbaar",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je wilt weggaan?"
