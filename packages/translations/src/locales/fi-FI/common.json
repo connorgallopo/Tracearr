@@ -68,7 +68,8 @@
     "transcode": "Transkoodaus",
     "hwTranscode": "HW-transkoodaus",
     "burnIn": "Kuvaan poltettu",
-    "watched": "Katsottu"
+    "watched": "Katsottu",
+    "played": ""
   },
   "severity": {
     "low": "Matala",
@@ -133,6 +134,7 @@
     "serverOwner": "Palvelimen Omistaja",
     "resolution": "Resoluutio",
     "watchTime": "Katseluaika",
+    "listenTime": "",
     "pausedTime": "Keskeytetty Aika",
     "sessionDetails": "Istunnon Tiedot",
     "recentSessions": "Viimeisimmät Istunnot",
@@ -152,7 +154,13 @@
     "streamDetails": "Striimin tiedot",
     "transcodeReason": "Transkoodauksen syy",
     "loadMore": "Lataa lisää",
-    "playback": "Toisto"
+    "playback": "Toisto",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Etsi käyttäjiä...",
@@ -185,6 +193,7 @@
     "episode_plural": "Jaksot",
     "track": "Kappale",
     "track_plural": "Kappaleet",
+    "artist_plural": "",
     "liveTV": "Suora TV",
     "photo": "Kuva",
     "tv": "Televisio",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} käyttäjää",
     "session_one": "{{count}} istunto",
     "session_other": "{{count}} istuntoa",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} striimi",
     "stream_other": "{{count}} striimiä",
     "server_one": "{{count}} palvelin",
@@ -255,7 +266,9 @@
     "noDeviceData": "Laitteen tietoja ei ole saatavilla",
     "noJobHistory": "Ei vielä työhistoriaa",
     "noSessionsFound": "Istuntoja ei löytynyt",
-    "noUserData": "Käyttäjän tietoja ei ole saatavilla"
+    "noUserData": "Käyttäjän tietoja ei ole saatavilla",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Sinulla on tallentamattomia muutoksia. Oletko varma, että haluat lähteä?"
