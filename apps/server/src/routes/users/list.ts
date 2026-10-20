@@ -29,6 +29,7 @@ import {
 import { db } from '../../db/client.js';
 import { isUniqueViolation } from '../../db/pg.js';
 import { serverUsers, sessions, servers, users } from '../../db/schema.js';
+import { membershipStatusFor } from '../../services/membership.js';
 import {
   hasServerAccess,
   buildServerAccessCondition,
@@ -734,9 +735,24 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
     const updated = await updateUser(serverUser.userId, {
       name: body.data.name,
       contactEmail: body.data.contactEmail,
+      membershipType: body.data.membershipType,
+      membershipExpirationDate: body.data.membershipExpirationDate,
+      membershipEnforcementPolicy: body.data.membershipEnforcementPolicy,
     });
 
-    return { success: true, name: updated.name, contactEmail: updated.contactEmail };
+    return {
+      success: true,
+      name: updated.name,
+      contactEmail: updated.contactEmail,
+      membershipType: updated.membershipType,
+      membershipStatus: membershipStatusFor(
+        updated.membershipType,
+        updated.membershipExpirationDate,
+        new Date().toISOString().slice(0, 10)
+      ),
+      membershipExpirationDate: updated.membershipExpirationDate,
+      membershipEnforcementPolicy: updated.membershipEnforcementPolicy,
+    };
   });
 
   /**

@@ -24,6 +24,7 @@ import { TrustScoreBadge } from '@/components/users/TrustScoreBadge';
 import { UserLocationsCard } from '@/components/users/UserLocationsCard';
 import { UserDevicesCard } from '@/components/users/UserDevicesCard';
 import { UserAccessControls } from '@/components/users/UserAccessControls';
+import { MembershipControls } from '@/components/users/MembershipControls';
 import { EditUserIdentityDialog } from '@/components/users/EditUserIdentityDialog';
 import { ContactEmailLine } from '@/components/users/ContactEmailLine';
 import { EditTrustScoreDialog } from '@/components/users/EditTrustScoreDialog';
@@ -724,6 +725,15 @@ export function UserDetail() {
 
       {isOwner && user.role !== 'owner' && (
         <UserAccessControls user={user} name={user.identityName ?? user.username} />
+      )}
+      {isOwner && user.role !== 'owner' && identity && (
+        <MembershipControls
+          serverUserId={user.id}
+          identityName={user.identityName ?? user.username}
+          identityType={identity.membershipType}
+          identityExpirationDate={identity.membershipExpirationDate}
+          identityPolicy={identity.membershipEnforcementPolicy}
+        />
       )}
 
       {/* Linked Accounts */}

@@ -38,6 +38,9 @@ import type {
   Settings,
   SettingsResponse,
   LoginMethods,
+  MembershipEnforcementPolicy,
+  MembershipStatus,
+  MembershipType,
   PaginatedResponse,
   MobileConfig,
   TerminationLogWithDetails,
@@ -836,7 +839,12 @@ class ApiClient {
       if (params?.scope) query.set('scope', params.scope);
       return this.request<ServerUserFullDetail>(`/users/${id}/full?${query.toString()}`);
     },
-    update: (id: string, data: { trustScore?: number }) =>
+    update: (
+      id: string,
+      data: {
+        trustScore?: number;
+      }
+    ) =>
       this.request<ServerUserWithIdentity>(`/users/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(data),
@@ -846,11 +854,25 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify(data),
       }),
-    updateIdentity: (id: string, data: { name?: string | null; contactEmail?: string | null }) =>
-      this.request<{ success: boolean; name: string | null; contactEmail: string | null }>(
-        `/users/${id}/identity`,
-        { method: 'PATCH', body: JSON.stringify(data) }
-      ),
+    updateIdentity: (
+      id: string,
+      data: {
+        name?: string | null;
+        contactEmail?: string | null;
+        membershipType?: MembershipType;
+        membershipExpirationDate?: string | null;
+        membershipEnforcementPolicy?: MembershipEnforcementPolicy | null;
+      }
+    ) =>
+      this.request<{
+        success: boolean;
+        name: string | null;
+        contactEmail: string | null;
+        membershipStatus: MembershipStatus;
+        membershipType: MembershipType;
+        membershipExpirationDate: string | null;
+        membershipEnforcementPolicy: MembershipEnforcementPolicy | null;
+      }>(`/users/${id}/identity`, { method: 'PATCH', body: JSON.stringify(data) }),
     sessions: (id: string, params?: { page?: number; pageSize?: number; scope?: 'identity' }) => {
       const query = new URLSearchParams(params as Record<string, string>).toString();
       return this.request<PaginatedResponse<Session>>(`/users/${id}/sessions?${query}`);

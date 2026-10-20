@@ -130,6 +130,7 @@ export const SLOT_KINDS = {
   window_hours: ['duration', 'number'],
   enabled: ['boolean'],
   exclude_same_device: ['boolean'],
+  skip_mobile_same_country: ['boolean'],
   exclude_same_ip: ['boolean'],
   message: ['text'],
   title: ['text'],
@@ -191,6 +192,7 @@ const templateConditionSchema = conditionSchema.extend({
     .extend({
       window_hours: optionalSlot(conditionParamsSchema.shape.window_hours),
       exclude_same_device: optionalSlot(conditionParamsSchema.shape.exclude_same_device),
+      skip_mobile_same_country: optionalSlot(conditionParamsSchema.shape.skip_mobile_same_country),
       exclude_same_ip: optionalSlot(conditionParamsSchema.shape.exclude_same_ip),
     })
     .optional(),

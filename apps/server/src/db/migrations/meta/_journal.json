@@ -813,6 +813,27 @@
       "when": 1791982194131,
       "tag": "0115_server_user_library_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1792099541032,
+      "tag": "0116_membership_enforcement",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1792158000000,
+      "tag": "0117_membership_automation_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1792166400000,
+      "tag": "0118_membership_type_date_status",
+      "breakpoints": true
     }
   ]
 }

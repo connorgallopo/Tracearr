@@ -9,6 +9,7 @@ import type {
 } from '@tracearr/shared';
 import type { EvaluatorResult, MediaQuality, SessionEvaluationContext } from '../types.js';
 import { synthesizeTriggers } from '../triggers.js';
+import { membershipEnforcementDue } from '../../membership.js';
 import {
   evaluatorRegistry,
   getResolution,
@@ -32,6 +33,9 @@ vi.mock('../../geoip.js', () => ({
       );
     },
   },
+}));
+vi.mock('../../membership.js', () => ({
+  membershipEnforcementDue: vi.fn().mockResolvedValue(true),
 }));
 
 // Reset mocks before each test
@@ -455,6 +459,69 @@ describe('Helper Functions', () => {
 });
 
 describe('Session Behavior Evaluators', () => {
+  describe('travel_speed_kmh mobile exception', () => {
+    async function travelResult(
+      params: Condition['params'],
+      currentCountry = 'US',
+      device = 'iPhone'
+    ): Promise<EvaluatorResult> {
+      const previousSession = createMockSession({
+        id: 'previous-session',
+        serverUserId: 'user-1',
+        deviceId: 'previous-device',
+        startedAt: new Date('2026-10-15T10:00:00Z'),
+        geoCountry: 'US',
+        geoLat: 40.7128,
+        geoLon: -74.006,
+      });
+      const currentSession = createMockSession({
+        id: 'current-session',
+        serverUserId: 'user-1',
+        deviceId: 'current-device',
+        device,
+        platform: 'iOS',
+        startedAt: new Date('2026-10-15T11:00:00Z'),
+        geoCountry: currentCountry,
+        geoLat: 34.0522,
+        geoLon: -118.2437,
+      });
+      const context = createTestContext({
+        session: currentSession,
+        serverUser: createMockServerUser({ id: 'user-1' }),
+        recentSessions: [previousSession, currentSession],
+      });
+      return await evaluatorRegistry.travel_speed_kmh(
+        context,
+        createCondition({
+          field: 'travel_speed_kmh',
+          operator: 'gt',
+          value: 500,
+          params,
+        })
+      );
+    }
+
+    it('skips a mobile session when current and previous countries match', async () => {
+      const result = await travelResult({ skip_mobile_same_country: true });
+      expect(result.matched).toBe(false);
+      expect(result.details).toMatchObject({ skipped: 'mobile_same_country', country: 'US' });
+    });
+
+    it('skips tablets but not TV clients', async () => {
+      expect((await travelResult({ skip_mobile_same_country: true }, 'US', 'iPad')).matched).toBe(
+        false
+      );
+      expect(
+        (await travelResult({ skip_mobile_same_country: true }, 'US', 'Android TV')).matched
+      ).toBe(true);
+    });
+
+    it('still detects impossible travel when the country changed or the exception is disabled', async () => {
+      expect((await travelResult({ skip_mobile_same_country: true }, 'CA')).matched).toBe(true);
+      expect((await travelResult({ skip_mobile_same_country: false })).matched).toBe(true);
+    });
+  });
+
   describe('concurrent_streams', () => {
     it('counts active sessions for user', async () => {
       const session1 = createMockSession({
@@ -2726,6 +2793,47 @@ describe('User Attribute Evaluators', () => {
           evaluator(ctx, createCondition({ field: 'account_age_days', operator: 'gte', value: 7 }))
         )
       ).toBe(true);
+    });
+  });
+
+  describe('membership_enforcement_due', () => {
+    it('delegates the session-start membership decision and compares it to the condition', async () => {
+      const base = createTestContext();
+      const ctx = createTestContext({
+        ...base,
+        trigger: {
+          type: 'session.started',
+          at: new Date(),
+          server: { id: base.server.id, name: base.server.name, type: base.server.type },
+          serverUser: {
+            id: base.serverUser.id,
+            userId: base.serverUser.userId,
+            username: base.serverUser.username,
+            thumbUrl: base.serverUser.thumbUrl,
+            identityName: base.serverUser.identityName ?? null,
+            trustScore: base.serverUser.trustScore,
+            lastActivityAt: base.serverUser.lastActivityAt,
+            createdAt: base.serverUser.createdAt,
+            identityServerUserIds: [],
+          },
+          session: base.session,
+        },
+      });
+
+      const result = await evaluatorRegistry.membership_enforcement_due(
+        ctx,
+        createCondition({ field: 'membership_enforcement_due', operator: 'eq', value: true })
+      );
+
+      expect(result.matched).toBe(true);
+      expect(result.actual).toBe(true);
+      expect(membershipEnforcementDue).toHaveBeenCalledWith(
+        base.session.id,
+        base.serverUser.userId,
+        base.session.startedAt,
+        true,
+        undefined
+      );
     });
   });
 });

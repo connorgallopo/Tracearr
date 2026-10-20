@@ -208,6 +208,9 @@ export async function updateUser(
     name: string | null;
     email: string | null;
     contactEmail: string | null;
+    membershipType: User['membershipType'];
+    membershipExpirationDate: string | null;
+    membershipEnforcementPolicy: User['membershipEnforcementPolicy'];
     thumbnail: string | null;
     passwordHash: string | null;
     plexAccountId: string | null;

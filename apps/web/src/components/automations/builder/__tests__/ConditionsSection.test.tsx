@@ -139,6 +139,41 @@ describe('ConditionsSection', () => {
     expect(screen.getByRole('option', { name: 'equals' })).toBeInTheDocument();
   });
 
+  it('shows and updates the same-country mobile exception for travel speed', async () => {
+    const user = userEvent.setup();
+    const { dispatch } = renderSection(
+      group([
+        condition({
+          id: 'c-1',
+          field: 'travel_speed_kmh',
+          operator: 'gt',
+          value: 500,
+          params: { exclude_same_device: true, skip_mobile_same_country: true },
+        }),
+      ])
+    );
+
+    const exception = screen.getByRole('checkbox', {
+      name: 'Skip mobile devices when the country is unchanged',
+    });
+    expect(exception).toBeChecked();
+
+    await user.click(exception);
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'setCondition',
+      id: 'c-1',
+      condition: {
+        id: 'c-1',
+        enabled: true,
+        field: 'travel_speed_kmh',
+        operator: 'gt',
+        value: 500,
+        params: { exclude_same_device: true, skip_mobile_same_country: false },
+      },
+    });
+  });
+
   it('leaves one value behind when a list field moves from is one of to equals', async () => {
     const user = userEvent.setup();
     const { dispatch } = renderSection(

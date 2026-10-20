@@ -22,6 +22,7 @@
       "newsletters": "Newsletters",
       "email": "Email",
       "memberLogin": "Sign-in",
+      "membership": "Membership",
       "mobile": "Mobile devices",
       "remote": "Remote access",
       "import": "Import",
@@ -45,7 +46,8 @@
       "jobs": "Maintenance tasks you can run on demand.",
       "api": "The public API key, its rate limit and what counts as watched.",
       "newsletters": "Recently added titles, emailed to a server's members on a schedule.",
-      "email": "Branding for every email Tracearr sends, and the addresses that opted out."
+      "email": "Branding for every email Tracearr sends, and the addresses that opted out.",
+      "membership": "Membership status and playback enforcement."
     }
   },
   "general": {
@@ -387,6 +389,18 @@
       "member": "Member",
       "backToDefault": "Back to default"
     }
+  },
+  "membership": {
+    "enabled": "Enable membership enforcement",
+    "enabledDesc": "Paid memberships without a current expiration date are active; lifetime and whitelisted memberships are always active.",
+    "defaultPolicy": "Default enforcement policy",
+    "message": "Termination message",
+    "messageDesc": "Shown to the user when the media server supports it.",
+    "killFirstDaily": "Kill first stream each day",
+    "killEveryPlay": "Kill every play",
+    "killEvery2": "Kill every other play",
+    "killEvery3": "Kill every third play",
+    "allowAll": "Allow all streams"
   },
   "import": {
     "noServers": "No Servers Connected",

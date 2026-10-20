@@ -15,7 +15,12 @@ import type { UpgradeWarning } from './releaseNotes.js';
 import type { ResolutionBucket } from './resolution.js';
 import type { statPeriodSchema } from './schemas.js';
 import type { z } from 'zod';
-import type { LOGIN_ACCESS } from './constants.js';
+import type {
+  LOGIN_ACCESS,
+  MEMBERSHIP_ENFORCEMENT_POLICIES,
+  MEMBERSHIP_STATUSES,
+  MEMBERSHIP_TYPES,
+} from './constants.js';
 
 // Can log in: owner always; admin and member as their loginAccess allows
 // Cannot log in: disabled, pending
@@ -99,9 +104,16 @@ export interface User {
   loginCount: number;
   aggregateTrustScore: number;
   totalViolations: number;
+  membershipType?: MembershipType;
+  membershipExpirationDate?: string | null;
+  membershipEnforcementPolicy?: MembershipEnforcementPolicy | null;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type MembershipStatus = (typeof MEMBERSHIP_STATUSES)[number];
+export type MembershipType = (typeof MEMBERSHIP_TYPES)[number];
+export type MembershipEnforcementPolicy = (typeof MEMBERSHIP_ENFORCEMENT_POLICIES)[number];
 
 // Server User types - Account on a specific media server
 export interface ServerUser {
@@ -191,6 +203,10 @@ export interface ServerUserFullDetail {
   user: ServerUserDetail;
   identity: {
     userId: string;
+    membershipStatus: MembershipStatus;
+    membershipType: MembershipType;
+    membershipExpirationDate: string | null;
+    membershipEnforcementPolicy: MembershipEnforcementPolicy | null;
     aggregateTrustScore: number;
     totalViolations: number;
     contactEmail: string | null;

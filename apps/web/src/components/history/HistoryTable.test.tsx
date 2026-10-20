@@ -79,6 +79,21 @@ describe('HistoryTable', () => {
     expect(screen.getByText('Abandoned')).toBeInTheDocument();
   });
 
+  it('lets long content titles shrink within the content column', () => {
+    renderTable({ mediaTitle: 'A very long media title that should not overlap the next column' });
+
+    const title = screen.getByText('A very long media title that should not overlap the next column');
+    expect(title.closest('span')).toHaveClass('min-w-0', 'flex-1', 'truncate');
+  });
+
+  it('keeps fixed-width columns from collapsing into each other on narrow screens', () => {
+    renderTable({ mediaTitle: 'Pilot' });
+
+    const table = screen.getByRole('table');
+    expect(table).toHaveClass('min-w-[1070px]', 'table-fixed');
+    expect(table.parentElement).toHaveClass('overflow-auto');
+  });
+
   it('links the show and the episode without opening the row', () => {
     const onSessionClick = vi.fn();
     renderTable(

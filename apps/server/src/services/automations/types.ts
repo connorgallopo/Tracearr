@@ -8,6 +8,7 @@ import type {
   Session,
   TriggerNode,
 } from '@tracearr/shared';
+import type { Executor } from '../../db/client.js';
 import type { ContextEvaluatingEvent } from './events/evaluate.js';
 
 /** The six library_items rollup columns a media trigger compares and renders. */
@@ -85,6 +86,8 @@ export interface EvaluationContext {
    *  Optional so contexts built before a lookup (or in old tests) fall back
    *  to single server_user behavior. */
   identityServerUserIds?: string[];
+  /** Transaction used when a membership condition runs during session creation. */
+  membershipExecutor?: Executor;
   /** Violation this match created, if any. Populated by callers that insert
    *  the violation before executing actions; kill_stream needs it to attribute
    *  the eventual queue outcome (killed/skipped/failed) back to the record. */

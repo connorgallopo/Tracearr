@@ -43,7 +43,12 @@ export const transcodingConditionValueSchema = z.enum([
   'neither',
 ]);
 
-export const userAttributeFieldSchema = z.enum(['user_id', 'trust_score', 'account_age_days']);
+export const userAttributeFieldSchema = z.enum([
+  'user_id',
+  'trust_score',
+  'account_age_days',
+  'membership_enforcement_due',
+]);
 
 export const deviceClientFieldSchema = z.enum(['device_type', 'client_name', 'platform']);
 
@@ -159,6 +164,7 @@ export const conditionSchema = z.object({
         .max(168, 'Window cannot exceed 168 hours (7 days)')
         .optional(),
       exclude_same_device: z.boolean().optional(),
+      skip_mobile_same_country: z.boolean().optional(),
       exclude_same_ip: z.boolean().optional(),
       count_device_types: z.array(deviceTypeSchema).optional(),
     })
@@ -229,6 +235,7 @@ export interface ConditionFieldDescriptor {
     excludeSameDevice?: true;
     excludeSameIp?: true;
     countDeviceTypes?: true;
+    skipMobileSameCountry?: true;
   };
   /** Aggregates across every account behind one person when the context carries them. */
   identityAware: boolean;
@@ -270,7 +277,7 @@ export const CONDITION_FIELDS: Record<ConditionField, ConditionFieldDescriptor> 
     unit: 'kmh',
     min: 0,
     step: 50,
-    flags: { excludeSameDevice: true },
+    flags: { excludeSameDevice: true, skipMobileSameCountry: true },
     identityAware: true,
   },
   unique_ips_in_window: {
@@ -427,6 +434,14 @@ export const CONDITION_FIELDS: Record<ConditionField, ConditionFieldDescriptor> 
     unit: 'days',
     min: 0,
     step: 1,
+    flags: {},
+    identityAware: false,
+  },
+  membership_enforcement_due: {
+    category: 'user_attributes',
+    requires: 'session',
+    operators: EQUALITY_OPERATORS,
+    valueType: 'boolean',
     flags: {},
     identityAware: false,
   },

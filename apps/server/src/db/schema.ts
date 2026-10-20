@@ -14,6 +14,7 @@ import {
   varchar,
   text,
   timestamp,
+  date,
   boolean,
   integer,
   bigint,
@@ -32,6 +33,8 @@ import {
   type EmailRichTextDoc,
   type EmailSuppressionReason,
   type LoginAccess,
+  type MembershipEnforcementPolicy,
+  type MembershipType,
   type MediaRequestStatus,
   type NewsletterImageMode,
   type NewsletterLinks,
@@ -208,6 +211,16 @@ export const users = pgTable(
     // database trigger exists)
     aggregateTrustScore: integer('aggregate_trust_score').notNull().default(100),
     totalViolations: integer('total_violations').notNull().default(0),
+    membershipType: varchar('membership_type', { length: 20 })
+      .notNull()
+      .$type<MembershipType>()
+      .default('normal'),
+    membershipExpirationDate: date('membership_expiration_date', { mode: 'string' }),
+    membershipEnforcementPolicy: varchar('membership_enforcement_policy', {
+      length: 32,
+    }).$type<MembershipEnforcementPolicy | null>(),
+    membershipPlayCount: integer('membership_play_count').notNull().default(0),
+    membershipLastAnnoyDate: date('membership_last_annoy_date', { mode: 'string' }),
 
     // Identity-level date rollups over ALL of the person's accounts, removed
     // ones included: removing an account does not un-happen its history. Trust
@@ -437,6 +450,7 @@ export const sessions = pgTable(
     // Session grouping for "resume where left off" tracking
     referenceId: uuid('reference_id'), // Links to first session in resume chain
     watched: boolean('watched').notNull().default(false), // True if user watched 85%+
+    membershipEnforcementDecision: boolean('membership_enforcement_decision'),
     forceStopped: boolean('force_stopped').notNull().default(false), // True if session was force-stopped due to inactivity
     shortSession: boolean('short_session').notNull().default(false), // True if session duration < MIN_PLAY_TIME_MS (120s)
     ipAddress: varchar('ip_address', { length: 45 }).notNull(),

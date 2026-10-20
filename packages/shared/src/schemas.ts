@@ -3,7 +3,12 @@
  */
 
 import { z } from 'zod';
-import { LOGIN_ACCESS, isValidTimezone } from './constants.js';
+import {
+  LOGIN_ACCESS,
+  MEMBERSHIP_ENFORCEMENT_POLICIES,
+  MEMBERSHIP_TYPES,
+  isValidTimezone,
+} from './constants.js';
 import { listDateBoundSchema, listSortSchema } from './listQuery.js';
 import { PLAYBACK_DECISIONS } from './playbackDecision.js';
 
@@ -289,15 +294,20 @@ export const updateUserAccessSchema = z.object({
   role: z.enum(['admin', 'member']).optional(),
 });
 
-export const updateUserIdentitySchema = z.object({
-  name: z.string().max(255).nullable().optional(),
-  contactEmail: z
-    .email()
-    .max(255)
-    .transform((v) => v.trim().toLowerCase())
-    .nullable()
-    .optional(),
-});
+export const updateUserIdentitySchema = z
+  .object({
+    name: z.string().max(255).nullable().optional(),
+    contactEmail: z
+      .email()
+      .max(255)
+      .transform((v) => v.trim().toLowerCase())
+      .nullable()
+      .optional(),
+    membershipType: z.enum(MEMBERSHIP_TYPES).optional(),
+    membershipExpirationDate: z.iso.date().nullable().optional(),
+    membershipEnforcementPolicy: z.enum(MEMBERSHIP_ENFORCEMENT_POLICIES).nullable().optional(),
+  })
+  .strict();
 
 export type UpdateUserIdentityInput = z.infer<typeof updateUserIdentitySchema>;
 
@@ -494,6 +504,7 @@ export const terminateSessionBodySchema = z.object({
 export const impossibleTravelParamsSchema = z.object({
   maxSpeedKmh: z.number().positive().default(500),
   ignoreVpnRanges: z.boolean().optional(),
+  skipMobileSameCountry: z.boolean().default(true),
 });
 
 export const simultaneousLocationsParamsSchema = z.object({

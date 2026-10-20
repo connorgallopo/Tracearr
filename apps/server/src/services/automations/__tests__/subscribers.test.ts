@@ -969,6 +969,32 @@ describe('session.transcode_changed pipeline', () => {
   });
 });
 
+describe('session.started pipeline', () => {
+  it('passes the caller transaction to membership condition evaluation', async () => {
+    const membershipRule = createConcurrentStreamsRule({
+      conditions: {
+        groups: [
+          {
+            conditions: [{ field: 'membership_enforcement_due', operator: 'eq', value: true }],
+          },
+        ],
+      },
+      triggers: [{ id: 'membership-trigger', type: 'session.started', enabled: true }],
+    });
+    const input = createTranscodeInput({ activeAutomations: [membershipRule] });
+
+    await runRulePipeline(
+      startedEvent(input),
+      inputsOf(input),
+      { tx: pipelineTx as never, deferActions: true },
+      { kind: 'session', sessionId: input.existingSession.id }
+    );
+
+    const [context] = mockEvaluateRulesAsync.mock.calls[0] as [Record<string, unknown>];
+    expect(context.membershipExecutor).toBe(pipelineTx);
+  });
+});
+
 describe('session.paused pipeline', () => {
   beforeEach(() => {
     mockRecordRun.mockResolvedValue(pauseViolation);

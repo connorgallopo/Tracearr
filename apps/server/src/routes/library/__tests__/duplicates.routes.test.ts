@@ -9,6 +9,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { SQL } from 'drizzle-orm';
+import { PgDialect } from 'drizzle-orm/pg-core';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
@@ -134,10 +136,14 @@ function mockQueries(opts: { groups?: unknown[]; items?: unknown[]; versions?: u
   }
 }
 
-async function requestDuplicates(app: FastifyInstance, extra = ''): Promise<DuplicatesResponse> {
+async function requestDuplicates(
+  app: FastifyInstance,
+  extra = '',
+  includeFuzzy = false
+): Promise<DuplicatesResponse> {
   const response = await app.inject({
     method: 'GET',
-    url: `/library/duplicates?includeFuzzy=false${extra}`,
+    url: `/library/duplicates?includeFuzzy=${includeFuzzy}${extra}`,
   });
   expect(response.statusCode).toBe(200);
   return response.json<DuplicatesResponse>();
@@ -237,6 +243,17 @@ describe('GET /library/duplicates', () => {
     expect(body.duplicates).toHaveLength(0);
     // No detail queries when there is no page to hydrate
     expect(vi.mocked(db.execute)).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses show identity when fuzzy matching episodes with the same episode title', async () => {
+    mockQueries({ groups: [] });
+
+    await requestDuplicates(app, '', true);
+
+    const query = vi.mocked(db.execute).mock.calls[0]?.[0] as SQL;
+    const { sql: queryText } = new PgDialect().sqlToQuery(query);
+    expect(queryText).toContain("a.grandparent_title || ' ' || a.title");
+    expect(queryText).toContain('similarity(a.grandparent_title, b.grandparent_title) >= 0.6');
   });
 
   it('refetches the summary when the requested page is past the end', async () => {

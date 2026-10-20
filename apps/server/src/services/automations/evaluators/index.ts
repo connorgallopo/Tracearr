@@ -20,6 +20,7 @@ import { LOCAL_NETWORK_COUNTRY, normalizeToCountryCode } from '../../../utils/co
 import { isLocalSession } from '../../../utils/localSession.js';
 import { normalizeResolution } from '../../../utils/resolutionNormalizer.js';
 import { geoipService } from '../../geoip.js';
+import { membershipEnforcementDue } from '../../membership.js';
 import { compare } from '../comparisons.js';
 import type {
   AccountConditionEvaluator,
@@ -359,6 +360,7 @@ const evaluateTravelSpeedKmh: ConditionEvaluator = (
   const { session, recentSessions } = context;
   const excludeSameDevice = condition.params?.exclude_same_device ?? true;
   const isIdentitySession = belongsToIdentity(context);
+  const skipMobileSameCountry = condition.params?.skip_mobile_same_country ?? true;
 
   // Get previous sessions for this user (excluding current session by reference)
   let previousSessions = recentSessions
@@ -385,6 +387,31 @@ const evaluateTravelSpeedKmh: ConditionEvaluator = (
     return {
       matched: compare(0, condition.operator, condition.value),
       actual: 0,
+    };
+  }
+
+  const currentDeviceType = normalizeDeviceType(
+    session.device,
+    session.platform,
+    session.product,
+    context.server.type === 'plex' ? null : session.playerName
+  );
+  const currentCountry = session.geoCountry ? normalizeToCountryCode(session.geoCountry) : null;
+  const previousCountry = previous.geoCountry ? normalizeToCountryCode(previous.geoCountry) : null;
+  if (
+    skipMobileSameCountry &&
+    (currentDeviceType === 'mobile' || currentDeviceType === 'tablet') &&
+    currentCountry &&
+    currentCountry === previousCountry
+  ) {
+    return {
+      matched: false,
+      actual: 0,
+      relatedSessionIds: [previous.id],
+      details: {
+        skipped: 'mobile_same_country',
+        country: currentCountry,
+      },
     };
   }
 
@@ -870,6 +897,20 @@ const evaluateAccountAgeDays: AccountConditionEvaluator = (
   };
 };
 
+const evaluateMembershipEnforcementDue: ConditionEvaluator = async (context, condition) => {
+  const shouldEnforce = await membershipEnforcementDue(
+    context.session.id,
+    context.serverUser.userId,
+    context.session.startedAt,
+    context.trigger?.type === 'session.started',
+    context.membershipExecutor
+  );
+  return {
+    matched: compare(shouldEnforce, condition.operator, condition.value),
+    actual: shouldEnforce,
+  };
+};
+
 // ============================================================================
 // Device/Client Evaluators
 // ============================================================================
@@ -1180,6 +1221,7 @@ export const evaluatorRegistry: Record<ConditionField, ConditionEvaluator> = {
   user_id: evaluateUserId,
   trust_score: evaluateTrustScore,
   account_age_days: evaluateAccountAgeDays,
+  membership_enforcement_due: evaluateMembershipEnforcementDue,
 
   // Device/client
   device_type: evaluateDeviceType,

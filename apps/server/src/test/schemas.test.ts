@@ -16,6 +16,8 @@ import {
   violationQuerySchema,
   violationIdParamSchema,
   terminateSessionBodySchema,
+  updateSettingsSchema,
+  updateUserIdentitySchema,
 } from '@tracearr/shared';
 import { randomUUID } from 'node:crypto';
 
@@ -25,6 +27,7 @@ describe('Rule Parameter Schemas', () => {
       const result = impossibleTravelParamsSchema.safeParse({
         maxSpeedKmh: 1000,
       });
+
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.maxSpeedKmh).toBe(1000);
@@ -36,6 +39,7 @@ describe('Rule Parameter Schemas', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.maxSpeedKmh).toBe(500);
+        expect(result.data.skipMobileSameCountry).toBe(true);
       }
     });
 
@@ -364,6 +368,27 @@ describe('Session Termination Schemas', () => {
       if (result.success) {
         expect(result.data.reason).toBeUndefined();
       }
+    });
+
+    describe('Membership schemas', () => {
+      it('accepts account type, expiry, and policy fields for identities only', () => {
+        expect(
+          updateUserIdentitySchema.safeParse({
+            membershipType: 'normal',
+            membershipExpirationDate: '2026-12-31',
+            membershipEnforcementPolicy: 'kill_every_2_plays',
+          }).success
+        ).toBe(true);
+        expect(updateUserIdentitySchema.safeParse({ membershipStatus: 'paid' }).success).toBe(
+          false
+        );
+      });
+
+      it('rejects invalid identity membership enums and dates', () => {
+        expect(
+          updateUserIdentitySchema.safeParse({ membershipExpirationDate: 'not-a-date' }).success
+        ).toBe(false);
+      });
     });
 
     it('should validate body with reason', () => {

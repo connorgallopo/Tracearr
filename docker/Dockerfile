@@ -84,8 +84,7 @@ COPY --from=builder --chown=tracearr:nodejs /app/assets/logo.png ./assets/logo.p
 RUN mkdir -p /app/data/image-cache /data/tracearr/image-cache /data/backup && \
     chown tracearr:nodejs /app/data/image-cache /data/tracearr /data/tracearr/image-cache /data/backup
 
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chmod=755 docker/entrypoint.sh /entrypoint.sh
 
 USER tracearr
 

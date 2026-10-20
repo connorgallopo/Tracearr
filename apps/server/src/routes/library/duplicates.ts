@@ -187,7 +187,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
       const runGroupQuery = async (offset: number) => {
         const result = await db.execute(sql`
           WITH scoped AS (
-            SELECT id, server_id, media_type, title, year,
+            SELECT id, server_id, media_type, title, grandparent_title, year,
                    imdb_id, tmdb_id, tvdb_id, file_size, video_resolution,
                    CASE
                      WHEN media_type = 'episode' AND parent_index IS NOT NULL AND item_index IS NOT NULL
@@ -204,7 +204,11 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             ${
               fuzzyEnabled
                 ? sql`
-            SELECT a.id AS item_a_id, b.id AS item_b_id, a.title AS title_a,
+            SELECT a.id AS item_a_id, b.id AS item_b_id,
+                   CASE WHEN a.media_type = 'episode'
+                     THEN a.grandparent_title || ' ' || a.title
+                     ELSE a.title
+                   END AS title_a,
                    a.episode_key AS episode_key_a,
                    ROUND(similarity(a.title, b.title) * 100)::int AS confidence
             FROM scoped a
@@ -215,6 +219,14 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             WHERE a.imdb_id IS NULL AND a.tmdb_id IS NULL AND a.tvdb_id IS NULL
               AND b.imdb_id IS NULL AND b.tmdb_id IS NULL AND b.tvdb_id IS NULL
               AND similarity(a.title, b.title) >= 0.6
+              AND (
+                a.media_type != 'episode'
+                OR (
+                  a.grandparent_title IS NOT NULL
+                  AND b.grandparent_title IS NOT NULL
+                  AND similarity(a.grandparent_title, b.grandparent_title) >= 0.6
+                )
+              )
             ORDER BY confidence DESC
             LIMIT 100`
                 : sql`

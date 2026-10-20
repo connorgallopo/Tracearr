@@ -13,6 +13,15 @@ export { IDENTITY_AWARE_CONDITION_FIELDS } from './automations/conditions.js';
 // Severity levels
 // A person's own sign-in access. default follows loginMethods.member; allow and block override it.
 export const LOGIN_ACCESS = ['default', 'allow', 'block'] as const;
+export const MEMBERSHIP_STATUSES = ['unpaid', 'paid', 'lifetime', 'whitelisted'] as const;
+export const MEMBERSHIP_TYPES = ['normal', 'lifetime', 'whitelisted'] as const;
+export const MEMBERSHIP_ENFORCEMENT_POLICIES = [
+  'kill_first_stream_daily',
+  'kill_every_play',
+  'kill_every_2_plays',
+  'kill_every_3_plays',
+  'allow_all',
+] as const;
 
 // Error codes on a refused sign-in. notPermitted is only ever sent after the media server, the
 // identity provider or a Tracearr password proved who the person is.

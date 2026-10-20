@@ -202,6 +202,7 @@ export function defaultParamsForField(field: ConditionField): {
   window_hours?: number;
   exclude_same_device?: boolean;
   exclude_same_ip?: boolean;
+  skip_mobile_same_country?: boolean;
 } {
   const { flags } = CONDITION_FIELDS[field];
   return {
@@ -209,5 +210,6 @@ export function defaultParamsForField(field: ConditionField): {
     ...(flags.excludeSameDevice ? { exclude_same_device: true } : {}),
     // Same-household viewing is legitimate, so this stays off unless asked for.
     ...(flags.excludeSameIp ? { exclude_same_ip: false } : {}),
+    ...(flags.skipMobileSameCountry ? { skip_mobile_same_country: true } : {}),
   };
 }

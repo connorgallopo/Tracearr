@@ -6,6 +6,8 @@ import {
   serverScopeFromIds,
   serverScopeKey,
   type UpdateUserAccessInput,
+  type MembershipEnforcementPolicy,
+  type MembershipType,
   type UserRosterFilters,
 } from '@tracearr/shared';
 import { api, type UserListParams } from '@/lib/api';
@@ -61,8 +63,15 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { trustScore?: number } }) =>
-      api.users.update(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: {
+        trustScore?: number;
+      };
+    }) => api.users.update(id, data),
     onSuccess: (data, variables) => {
       // Update user in cache
       queryClient.setQueryData(['users', 'detail', variables.id], data);
@@ -85,7 +94,13 @@ export function useUpdateUserIdentity() {
       data,
     }: {
       id: string;
-      data: { name?: string | null; contactEmail?: string | null };
+      data: {
+        name?: string | null;
+        contactEmail?: string | null;
+        membershipType?: MembershipType;
+        membershipExpirationDate?: string | null;
+        membershipEnforcementPolicy?: MembershipEnforcementPolicy | null;
+      };
     }) => api.users.updateIdentity(id, data),
     onSuccess: () => {
       // A name or contact email is shared across the whole identity, so every cached

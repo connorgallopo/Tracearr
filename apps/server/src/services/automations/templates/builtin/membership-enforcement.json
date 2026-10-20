@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "slug": "membership-enforcement",
+  "name": "Membership enforcement",
+  "description": "Stop streams when an identity's membership policy says enforcement is due.",
+  "group": "policies",
+  "kind": "policy",
+  "minServerVersion": "2.2.0",
+  "inputs": [
+    {
+      "key": "message",
+      "kind": "text",
+      "label": "Message shown to the viewer",
+      "required": false,
+      "default": "Your membership is inactive. Please contact the server administrator.",
+      "maxLength": 500
+    }
+  ],
+  "definition": {
+    "kind": "policy",
+    "severity": "warning",
+    "triggers": [
+      {
+        "id": "6f25b93e-8b5e-4b11-8b14-000000000101",
+        "type": "session.started",
+        "enabled": true
+      }
+    ],
+    "conditions": {
+      "groups": [
+        {
+          "id": "6f25b93e-8b5e-4b11-8b14-000000000102",
+          "enabled": true,
+          "conditions": [
+            {
+              "id": "6f25b93e-8b5e-4b11-8b14-000000000103",
+              "enabled": true,
+              "field": "membership_enforcement_due",
+              "operator": "eq",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "actions": {
+      "actions": [
+        {
+          "id": "6f25b93e-8b5e-4b11-8b14-000000000104",
+          "type": "kill_stream",
+          "enabled": true,
+          "message": {
+            "$input": "message"
+          }
+        }
+      ]
+    },
+    "scope": {}
+  },
+  "fingerprint": "f84c41197ca29d6ff9a91c2541d6687e2875b0e8ce4213452392f0d507f2d0c5"
+}

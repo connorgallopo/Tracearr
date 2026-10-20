@@ -36,6 +36,7 @@ import { PLAY_COUNT } from '../../constants/index.js';
 import { queryUserDevices, queryUserLocations, serverUserIdAnyFragment } from './queries.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { localSessionSql } from '../../utils/localSession.js';
+import { membershipStatusFor } from '../../services/membership.js';
 
 export const fullRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };
@@ -99,6 +100,9 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           loginCount: users.loginCount,
           identityAggregateTrustScore: users.aggregateTrustScore,
           identityTotalViolations: users.totalViolations,
+          identityMembershipType: users.membershipType,
+          identityMembershipExpirationDate: users.membershipExpirationDate,
+          identityMembershipEnforcementPolicy: users.membershipEnforcementPolicy,
         })
         .from(serverUsers)
         .innerJoin(servers, eq(serverUsers.serverId, servers.id))
@@ -388,6 +392,9 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
         identityAggregateTrustScore,
         identityTotalViolations,
         identityContactEmail,
+        identityMembershipType,
+        identityMembershipExpirationDate,
+        identityMembershipEnforcementPolicy,
         ...serverUserFields
       } = serverUser;
 
@@ -401,6 +408,14 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
         },
         identity: {
           userId: serverUser.userId,
+          membershipStatus: membershipStatusFor(
+            identityMembershipType,
+            identityMembershipExpirationDate,
+            new Date().toISOString().slice(0, 10)
+          ),
+          membershipType: identityMembershipType,
+          membershipExpirationDate: identityMembershipExpirationDate,
+          membershipEnforcementPolicy: identityMembershipEnforcementPolicy,
           aggregateTrustScore: identityAggregateTrustScore,
           totalViolations: identityTotalViolations,
           contactEmail: identityContactEmail,

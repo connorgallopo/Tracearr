@@ -28,6 +28,7 @@ const CONDITION_FIELD_LABELS: Record<ConditionField, string> = {
   user_id: 'User',
   trust_score: 'Trust Score',
   account_age_days: 'Account Age',
+  membership_enforcement_due: 'Membership enforcement due',
   device_type: 'Device Type',
   client_name: 'Client',
   platform: 'Platform',

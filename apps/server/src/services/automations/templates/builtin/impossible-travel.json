@@ -14,6 +14,13 @@
       "required": false,
       "default": 500,
       "min": 0
+    },
+    {
+      "key": "skipMobileSameCountry",
+      "kind": "boolean",
+      "label": "Skip mobile devices when the country is unchanged",
+      "required": false,
+      "default": true
     }
   ],
   "definition": {
@@ -41,7 +48,10 @@
                 "$input": "kmh"
               },
               "params": {
-                "exclude_same_device": true
+                "exclude_same_device": true,
+                "skip_mobile_same_country": {
+                  "$input": "skipMobileSameCountry"
+                }
               }
             }
           ]
@@ -53,5 +63,5 @@
     },
     "scope": {}
   },
-  "fingerprint": "8f5e6e23d061a3a3ec73d4ec9c46281b71b640a8197dd806fd675f76b6a5ca0c"
+  "fingerprint": "9a100b011c773130b6150df498e3a24e0c36c2a636dd7241f8a1ab946538c60f"
 }

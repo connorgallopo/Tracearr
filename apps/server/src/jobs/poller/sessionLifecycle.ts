@@ -971,11 +971,10 @@ export async function createSessionWithRulesAtomic(
 
       const actionResults = deferredActions ? await deferredActions() : [];
       if (newDevice) await dispatchNewDevice(newDevice.event, newDevice.inputs);
-      const wasTerminatedByRule = wasTriggeringSessionTargetedForKill(
+      let wasTerminatedByRule = wasTriggeringSessionTargetedForKill(
         actionResults,
         insertedSession.id
       );
-
       console.log(
         `[SessionLifecycle] Session started: ${processed.mediaType} "${processed.grandparentTitle ? `${processed.grandparentTitle} - ` : ''}${processed.mediaTitle}" by ${serverUser.username} on ${server.name} (${processed.playerName ?? 'unknown player'}, key ${processed.sessionKey})`
       );

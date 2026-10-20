@@ -19,6 +19,9 @@ export type {
   ViolationSummary,
   UserRole,
   LoginAccess,
+  MembershipStatus,
+  MembershipType,
+  MembershipEnforcementPolicy,
   AuthUser,
   SetupStatus,
   UserLocation,
@@ -794,6 +797,9 @@ export type {
 
 // Constant exports
 export {
+  MEMBERSHIP_STATUSES,
+  MEMBERSHIP_TYPES,
+  MEMBERSHIP_ENFORCEMENT_POLICIES,
   IDENTITY_AWARE_CONDITION_FIELDS,
   SEVERITY_LEVELS,
   getSeverityPriority,

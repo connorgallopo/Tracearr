@@ -141,6 +141,7 @@ export async function runRulePipeline(
 ): Promise<SubscriberResult> {
   const subjectKey = subjectKeyOf(scope);
   const { rules, baseContext } = triggerCandidates(event, inputs, subjectKey);
+  const evaluationContext = opts.tx ? { ...baseContext, membershipExecutor: opts.tx } : baseContext;
   const violations: ViolationInsertResult[] = [];
   const pending: PendingAct[] = [];
   const effects: Array<() => Promise<void>> = [];
@@ -177,7 +178,7 @@ export async function runRulePipeline(
   if (evaluable.length === 0) return { violations };
 
   const results = await evaluateRulesAsync(
-    baseContext,
+    evaluationContext,
     evaluable.map(({ rule }) => rule),
     { includeUnmatched: true }
   );

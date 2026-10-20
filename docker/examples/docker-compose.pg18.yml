@@ -27,6 +27,7 @@
 services:
   tracearr:
     image: ghcr.io/connorgallopo/tracearr:latest
+    pull_policy: never
     container_name: tracearr
     ports:
       - "${PORT:-3000}:3000"

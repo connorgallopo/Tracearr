@@ -61,6 +61,15 @@ export function ConditionParams({ condition, descriptor, onChange }: ConditionPa
         />
       )}
 
+      {descriptor.flags.skipMobileSameCountry && (
+        <ConditionToggle
+          label={t('automations.builder.conditions.skipMobileSameCountry')}
+          hint={t('automations.builder.conditions.skipMobileSameCountryHint')}
+          checked={condition.params?.skip_mobile_same_country ?? true}
+          onChange={(skip_mobile_same_country) => updateParams({ skip_mobile_same_country })}
+        />
+      )}
+
       {descriptor.flags.excludeSameIp && (
         <ConditionToggle
           label={t('automations.builder.conditions.uniqueIps')}

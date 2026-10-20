@@ -248,6 +248,30 @@
     "contactEmailNone": "none set",
     "contactEmailNoLogin": "Grants no login.",
     "locations": "Locations",
+    "membership": {
+      "title": "Membership",
+      "description": "Set the account type, paid-through date, and stream policy for {{name}}.",
+      "identityDefaults": "Identity defaults",
+      "accountType": "Account type",
+      "status": "Status",
+      "expirationDate": "Paid through",
+      "policy": "Enforcement policy",
+      "policyAppliesToUnpaid": "This policy applies only while the account status is Unpaid.",
+      "saveIdentity": "Save identity defaults",
+      "accountOverride": "Override identity membership for {{username}} ({{server}})",
+      "saveAccount": "Save account membership",
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "normal": "Normal",
+      "lifetime": "Lifetime",
+      "whitelisted": "Whitelisted",
+      "inherit": "Use inherited policy",
+      "killFirstDaily": "Kill first stream each day",
+      "killEveryPlay": "Kill every play",
+      "killEvery2": "Kill every other play",
+      "killEvery3": "Kill every third play",
+      "allowAll": "Allow all streams"
+    },
     "access": {
       "title": "Sign-in access",
       "signIn": "Sign-in",
@@ -837,6 +861,8 @@
         "windowUnit": "hrs",
         "uniqueDevices": "Unique devices",
         "uniqueDevicesHint": "Counts only sessions from different physical devices.",
+        "skipMobileSameCountry": "Skip mobile devices when the country is unchanged",
+        "skipMobileSameCountryHint": "Do not compare mobile or tablet sessions against previous sessions when both sessions are in the same country.",
         "uniqueIps": "Unique IPs",
         "uniqueIpsHint": "Counts only sessions from different IP addresses, so same-household streams are not counted.",
         "allDeviceTypes": "All device types",
@@ -1053,6 +1079,7 @@
         "user_id": "the user",
         "trust_score": "the trust score",
         "account_age_days": "the account age",
+        "membership_enforcement_due": "membership enforcement is due",
         "device_type": "the device type",
         "client_name": "the player",
         "platform": "the platform",
@@ -1274,6 +1301,10 @@
       "account_age_days": {
         "label": "Account Age",
         "description": "Days since account creation"
+      },
+      "membership_enforcement_due": {
+        "label": "Membership Enforcement",
+        "description": "Whether this identity's membership policy requires stopping this new stream"
       },
       "device_type": {
         "label": "Device Type",

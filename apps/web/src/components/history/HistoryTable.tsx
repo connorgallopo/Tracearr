@@ -288,7 +288,7 @@ export const HistoryTableRow = memo(
                 <MediaTypeIcon type={session.mediaType} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate font-medium">
+                    <span className="min-w-0 flex-1 truncate font-medium">
                       <MediaPageLink to={mediaLinks.title}>{primary}</MediaPageLink>
                     </span>
                     <EngagementTierBadge progress={progress} state={session.state} />
@@ -560,8 +560,7 @@ function SkeletonRow({
 const COLUMN_WIDTHS = {
   date: 'w-[140px]',
   user: 'w-[150px]',
-  // an explicit share, or fixed layout hands this column every spare pixel
-  content: 'w-[26%]',
+  content: 'w-[280px]',
   server: 'w-[150px]',
   platform: 'w-[130px]',
   location: 'w-[170px]',
@@ -626,7 +625,7 @@ export function HistoryTable({
         className="relative scrollbar-thin overflow-auto"
         style={{ maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT }}
       >
-        <table className="w-full caption-bottom text-sm">
+        <table className="w-full min-w-[1070px] table-fixed caption-bottom text-sm">
           <thead
             className="bg-card sticky top-0 z-10 [&_tr]:border-b"
             style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
@@ -681,7 +680,7 @@ export function HistoryTable({
         className="relative scrollbar-thin overflow-auto"
         style={{ maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT }}
       >
-        <table className="w-full caption-bottom text-sm">
+        <table className="w-full min-w-[1070px] table-fixed caption-bottom text-sm">
           <thead
             className="bg-card sticky top-0 z-10 [&_tr]:border-b"
             style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
@@ -740,7 +739,7 @@ export function HistoryTable({
       )}
       style={{ maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT }}
     >
-      <table className="w-full caption-bottom text-sm">
+      <table className="w-full min-w-[1070px] table-fixed caption-bottom text-sm">
         <thead
           className="bg-card sticky top-0 z-10 [&_tr]:border-b"
           style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
