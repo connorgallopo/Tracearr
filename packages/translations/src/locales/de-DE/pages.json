@@ -26,6 +26,7 @@
     "connectedTo": "Verbinden zu {{name}}",
     "plexAuthFailed": "Plex-Authentifizierung fehlgeschlagen",
     "plexStartFailed": "Plex-Anmeldung konnte nicht gestartet werden",
+    "plexExpired": "",
     "serverConnectFailed": "Verbindung zum Server fehlgeschlagen",
     "createAccountFailed": "Konto konnte nicht erstellt werden",
     "invalidCredentials": "Ungültige Email oder Password",
@@ -35,7 +36,23 @@
     "claimCodeLabel": "Bestätigungscode",
     "claimCodeHint": "Der beanspruchte Code wird im Serverprotokoll ausgegeben, wenn der Container startet",
     "validateClaimCode": "Bestätigungscode validieren",
-    "claimCodeSecurityNote": "Diese Sicherheitsmaßnahme stellt sicher, dass nur autorisierte Benutzer die Erstinstallation abschließen können"
+    "claimCodeSecurityNote": "Diese Sicherheitsmaßnahme stellt sicher, dass nur autorisierte Benutzer die Erstinstallation abschließen können",
+    "member": {
+      "tabLocal": "",
+      "tabMember": "",
+      "server": "",
+      "signingInTo": "",
+      "passwordHint": "",
+      "quickConnectHint": "",
+      "waiting": "",
+      "copyCode": "",
+      "usePassword": "",
+      "useQuickConnect": "",
+      "codeExpired": "",
+      "newCode": "",
+      "refused": "",
+      "notPermitted": ""
+    }
   },
   "dashboard": {
     "alerts": "Warnungen",
@@ -47,13 +64,98 @@
     "serverResources": "Server-Ressourcen",
     "bandwidth": "Bandbreite",
     "noActiveStreams": "Keine aktiven Streams",
-    "streamsAppearHere": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen"
+    "streamsAppearHere": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen",
+    "dayStreak": "",
+    "view": {
+      "label": "",
+      "admin": "",
+      "me": ""
+    },
+    "me": {
+      "last30": "",
+      "streakDetail": "",
+      "topTitles": "",
+      "welcome": {
+        "title": "",
+        "description": "",
+        "browse": ""
+      },
+      "requests": {
+        "title": "",
+        "requestedAgo": "",
+        "seeAll": "",
+        "availableThisWeek_one": "",
+        "availableThisWeek_other": ""
+      },
+      "episodes_one": "",
+      "episodes_other": ""
+    },
+    "resources": {
+      "system": "",
+      "perServer": "",
+      "average": ""
+    },
+    "unknownLocation": "",
+    "unknownQuality": "",
+    "othersStreaming_one": "",
+    "othersStreaming_other": ""
+  },
+  "yourStats": {
+    "titles": "",
+    "howYouWatch": "",
+    "viewerType": {
+      "completionist": {
+        "label": "",
+        "desc": ""
+      },
+      "rewatcher": {
+        "label": "",
+        "desc": ""
+      },
+      "sampler": {
+        "label": "",
+        "desc": ""
+      },
+      "casual": {
+        "label": "",
+        "desc": ""
+      }
+    },
+    "habits": "",
+    "seeActivity": "",
+    "allTime": "",
+    "watchTime": "",
+    "span": {
+      "minutes_one": "",
+      "minutes_other": "",
+      "hours_one": "",
+      "hours_other": "",
+      "days_one": "",
+      "days_other": "",
+      "weeks_one": "",
+      "weeks_other": ""
+    },
+    "longestStreak": "",
+    "firstPlay": "",
+    "biggestBinge": "",
+    "topGenres": "",
+    "allTimeCaption": "",
+    "tier": {
+      "watched": "",
+      "engaged": "",
+      "sampled": "",
+      "abandoned": "",
+      "rewatched": ""
+    },
+    "days_one": "",
+    "days_other": "",
+    "bingeValue_one": "",
+    "bingeValue_other": ""
   },
   "users": {
     "title": "Benutzer",
     "showRemoved": "",
     "noUsersFound": "Keine Benutzer gefunden.",
-    "serversColumn": "",
     "resetTrustScore": "Vertrauenswert zurücksetzen",
     "resetTrustScoreConfirm": "Möchten Sie den Vertrauenswert für {{count}} Benutzer wirklich auf 100 zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "mergeUsers": "",
@@ -103,6 +205,16 @@
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
     "filterHasAccessToHint": "",
+    "merged": "",
+    "filterRoleAll": "",
+    "filterSignInAll": "",
+    "filterPendingOnly": "",
+    "rowActions": "",
+    "menuOpenViolations": "",
+    "signInOn": "",
+    "signInOff": "",
+    "signedInAgo": "",
+    "neverSignedIn": "",
     "selectAllUsers_one": "",
     "selectAllUsers_other": "Alle {{count}} Benutzer auswählen",
     "resetTrustScoreTitle_one": "Vertrauenswert für {{count}} Benutzer zurücksetzen",
@@ -116,13 +228,13 @@
     "suggestionsPairEmailUsernameMore_one": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
     "suggestionsPairEmailUsernameMore_other": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
     "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_other": ""
+    "suggestionsPairUsernameMore_other": "",
+    "pendingLink_one": "",
+    "pendingLink_other": ""
   },
   "userDetail": {
     "backToUsers": "Zurück zu den Benutzern",
     "userNotFound": "Benutzer nicht gefunden",
-    "userInfo": "",
-    "statistics": "Statistiken",
     "sessions": "",
     "violations": "Verstöße",
     "terminationHistory": "Verlauf beendeter Streams",
@@ -150,24 +262,148 @@
     "contactEmailLabel": "",
     "contactEmailNone": "",
     "contactEmailNoLogin": "",
-    "locations": "Standorte"
+    "locations": "Standorte",
+    "access": {
+      "title": "",
+      "signIn": "",
+      "signInAllow": "",
+      "signInDefault": "",
+      "signInBlock": "",
+      "signInDefaultOn": "",
+      "signInDefaultOff": "",
+      "signInDefaultUnknown": "",
+      "role": "",
+      "roleAdmin": "",
+      "roleMember": "",
+      "roleHint": "",
+      "disabled": "",
+      "pending": "",
+      "signIns": "",
+      "lastSignIn": "",
+      "never": "",
+      "viewAs": "",
+      "viewAsLabel": "",
+      "viewAsHint": ""
+    },
+    "tabs": {
+      "access": "",
+      "downloads": ""
+    },
+    "cards": {
+      "vsPrior": "",
+      "perActiveDay": "",
+      "finished": "",
+      "abandoned": "",
+      "avgBitrate": "",
+      "daysActive": "",
+      "ofDays": "",
+      "streak": "",
+      "transcodes_one": "",
+      "transcodes_other": ""
+    },
+    "overview": {
+      "playsOverTime": "",
+      "priorRange": "",
+      "serverAverage": "",
+      "byHour": "",
+      "peak": "",
+      "serverPeak": "",
+      "what": "",
+      "otherMedia": "",
+      "mostFinished": "",
+      "where": "",
+      "directPlayShare": "",
+      "localShare": "",
+      "viewAllDevices": "",
+      "allSessions": "",
+      "finishedCount_one": "",
+      "finishedCount_other": ""
+    },
+    "uniqueCount": "",
+    "unknownCity": "",
+    "unknownDevice": "",
+    "viewAllMore": "",
+    "adjustTrustScoreDesc": "",
+    "ipCount_one": "",
+    "ipCount_other": ""
   },
   "history": {
     "title": "Historie",
-    "description": "",
     "totalPlays": "",
     "uniqueTitles": "",
-    "uniqueUsers": ""
+    "uniqueUsers": "",
+    "searchPlaceholder": "",
+    "columns": {
+      "duration": "",
+      "progress": ""
+    },
+    "location": {
+      "city": "",
+      "region": "",
+      "country": "",
+      "continent": "",
+      "postalCode": "",
+      "coordinates": "",
+      "asn": "",
+      "asnOrg": ""
+    },
+    "trailer": "",
+    "filters": {
+      "columns": "",
+      "countries": "",
+      "mediaType": "",
+      "types": "",
+      "network": "",
+      "remote": "",
+      "trailers": "",
+      "clearUsers": "",
+      "clearPlatforms": "",
+      "clearCountries": "",
+      "clearFilters": "",
+      "selected_one": "",
+      "selected_other": ""
+    },
+    "detail": {
+      "watch": "",
+      "summary": "",
+      "segmentsShown_one": "",
+      "segmentsShown_other": ""
+    },
+    "stream": {
+      "notAvailable": "",
+      "bitrateUnavailable": "",
+      "stereo": "",
+      "mono": "",
+      "noDetails": "",
+      "source": "",
+      "stream": "",
+      "container": "",
+      "bitrate": "",
+      "video": "",
+      "audio": "",
+      "subtitles": "",
+      "codec": "",
+      "framerate": "",
+      "hdr": "",
+      "profile": "",
+      "color": "",
+      "channels": "",
+      "language": "",
+      "sampleRate": "",
+      "format": "",
+      "forced": "",
+      "transcodeDetails": "",
+      "hwDecode": "",
+      "hwEncode": "",
+      "speed": "",
+      "throttled": "",
+      "channelCount_one": "",
+      "channelCount_other": ""
+    }
   },
   "library": {
     "title": "Bibliothek",
-    "description": "",
-    "topMovies": "Top Filme",
-    "topShows": "Top Serien",
-    "noMoviePlays": "In diesem Zeitraum werden keine Filme abgespielt.",
-    "noShowPlays": "In diesem Zeitraum werden keine Serien abgespielt.",
     "overview": {
-      "description": "",
       "lastUpdated": "Zuletzt aktualisiert:",
       "totalItems": "Gesamte Artikel",
       "shows": "zeigen",
@@ -179,11 +415,18 @@
       "thisWeek": "diese Woche",
       "thisMonth": "in diesem Monat",
       "thisYear": "in diesem Jahr",
-      "serversNeedSync": ""
+      "serversNeedSync": "",
+      "notWatchedByYou": "",
+      "memberEmpty": {
+        "title": "",
+        "description": ""
+      },
+      "movieCount_one": "",
+      "movieCount_other": "",
+      "showCount_one": "",
+      "showCount_other": ""
     },
     "quality": {
-      "title": "Qualität",
-      "description": "",
       "qualityEvolution": "Hochwertige Entwicklung",
       "all": "Alle",
       "failedToLoad": "Fehler beim Laden der Qualitätsdaten",
@@ -195,20 +438,35 @@
         "movieCount_other": "",
         "episodeCount_one": "",
         "episodeCount_other": ""
+      },
+      "codec": {
+        "title": "",
+        "moviesAndTv": "",
+        "videoCodecs": "",
+        "audioCodecs": "",
+        "audioChannels": "",
+        "noVideo": {
+          "title": "",
+          "description": ""
+        },
+        "noMusic": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "resolution": {
+        "tooltip": "",
+        "empty": "",
+        "itemCount_one": "",
+        "itemCount_other": ""
       }
     },
     "storage": {
-      "title": "Speicher",
-      "description": "",
       "totalStorage": "Gesamter Speicher",
       "growthRate": "Wachstumsrate",
       "duplicates": "Duplikate",
-      "groups": "gruppen",
-      "recoverable": "wiederherstellbar",
       "staleContent": "Veralteter Inhalt",
       "staleContentDesc": "",
-      "items": "gegenstände",
-      "unused": "ungenutzt",
       "storageTrend": "Speicher-Trend",
       "confidence": "Vertrauen",
       "confidenceHigh": "Hoch",
@@ -220,8 +478,6 @@
       "contentROIDesc": "",
       "avgHoursPerGB": "avg Stunden/GB",
       "insufficientData": "Unzureichende Daten",
-      "of": "von",
-      "days": "Tage",
       "failedToLoad": "Fehler beim Laden der Speicherdaten",
       "failedToLoadDesc": "Speicherdaten konnten nicht abgerufen werden. Bitte versuchen Sie es erneut.",
       "duplicatesTitle": "",
@@ -239,15 +495,80 @@
       "mirror": "",
       "missingOnServer": "",
       "missingOnServerHint": "",
-      "copyPath": ""
+      "copyPath": "",
+      "libraries": {
+        "title": "",
+        "columns": {
+          "library": "",
+          "share": ""
+        },
+        "serverFailed": ""
+      },
+      "stale": {
+        "tabs": {
+          "neverWatched": "",
+          "stale": ""
+        },
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "columns": {
+          "staleFor": ""
+        },
+        "allTypes": "",
+        "threshold": {
+          "months3": "",
+          "months6": "",
+          "year1": "",
+          "years2": ""
+        },
+        "age": {
+          "yearsMonths": "",
+          "days_one": "",
+          "days_other": "",
+          "months_one": "",
+          "months_other": "",
+          "years_one": "",
+          "years_other": ""
+        }
+      },
+      "growthPerMonth": "",
+      "dataDaysProgress": "",
+      "recoverableSize": "",
+      "unusedSize": "",
+      "roi": {
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "columns": {
+          "hoursPerGb": "",
+          "value": ""
+        },
+        "category": {
+          "low": "",
+          "moderate": "",
+          "high": ""
+        },
+        "deletionSuggested": ""
+      },
+      "matchBadge": {
+        "exact": "",
+        "likely": "",
+        "possible": "",
+        "fuzzy": "",
+        "versions": "",
+        "label": ""
+      },
+      "groupCount_one": "",
+      "groupCount_other": "",
+      "itemCount_one": "",
+      "itemCount_other": ""
     },
     "watch": {
-      "title": "Wiedergabeanalyse",
-      "description": "",
       "watched": "Gesehen",
-      "percentWatched": "% angesehen",
       "totalWatchTime": "Gesamte Wiedergabezeit",
-      "avgPerItem": "avg pro Artikel",
       "completed": "Abgeschlossen",
       "peakHour": "Spitzenstunde",
       "viewingHours": "Öffnungszeiten",
@@ -261,7 +582,43 @@
       "noData": "Noch keine Wiedergabedaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Wiedergabeanalyse",
-      "failedToLoadDesc": "Überwachungsdaten konnten nicht abgerufen werden."
+      "failedToLoadDesc": "Überwachungsdaten konnten nicht abgerufen werden.",
+      "mostWatched": "",
+      "binge": {
+        "columns": {
+          "show": "",
+          "servers": "",
+          "consecutive": "",
+          "bingeScore": "",
+          "maxPerDay": ""
+        },
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "tiers": {
+          "highlyAddictive": "",
+          "addictive": "",
+          "bingeable": "",
+          "casual": ""
+        }
+      },
+      "percentWatchedValue": "",
+      "avgPerItemValue": "",
+      "top": {
+        "movies": {
+          "empty": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "shows": {
+          "empty": {
+            "title": "",
+            "description": ""
+          }
+        }
+      }
     },
     "emptyState": {
       "checkingStatus": "Bibliotheksstatus wird geprüft...",
@@ -320,21 +677,84 @@
       "syncStarted": "",
       "syncFailed_one": "",
       "syncFailed_other": ""
+    },
+    "charts": {
+      "storage": {
+        "historical": "",
+        "prediction": "",
+        "now": "",
+        "axis": "",
+        "range": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "qualityTimeline": {
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "titles_one": "",
+        "titles_other": ""
+      },
+      "monthly": {
+        "watchCount": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "uniqueItems_one": "",
+        "uniqueItems_other": ""
+      },
+      "growth": {
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "hourly": {
+        "watches": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        }
+      },
+      "completion": {
+        "inProgress": "",
+        "notStarted": "",
+        "empty": {
+          "title": "",
+          "description": ""
+        },
+        "tooltip_one": "",
+        "tooltip_other": ""
+      },
+      "watchesValue_one": "",
+      "watchesValue_other": ""
     }
   },
   "activity": {
-    "title": "Aktivität",
-    "description": "",
     "playsOverTime": "Wiedergaben im Zeitverlauf",
     "concurrentStreams": "Gleichzeitige Streams",
     "engagementBreakdown": "Engagement-Aufschlüsselung",
     "howUsersEngage": "Wie Benutzer mit Inhalten interagieren",
+    "howYouEngage": "",
     "playsVsSessions": "Wiedergaben vs Sitzungen",
     "playsVsSessionsDesc": "Nur vollständige Wiedergaben: Eine Wiedergabe zählt, wenn die gesamte Wiedergabezeit die Laufzeit des Inhalts abdeckt.",
     "activityByDayOfWeek": "Aktivität nach Wochentag",
     "activityByHourOfDay": "Aktivität nach Tageszeit",
     "platforms": "Plattformen",
-    "streamQuality": "Stream Qualität"
+    "streamQuality": "Stream Qualität",
+    "noEngagementData": "",
+    "noPlatformData": "",
+    "noQualityData": "",
+    "noConcurrentData": "",
+    "peakConcurrent": "",
+    "tierItems_one": "",
+    "tierItems_other": "",
+    "playsShare_one": "",
+    "playsShare_other": ""
   },
   "violations": {
     "title": "Verstöße",
@@ -375,6 +795,7 @@
       "conditionGroup": "",
       "matched": "{{matched}}/{{total}} übereinstimmen",
       "actual": "Aktuell",
+      "actionResults": "",
       "relatedSessions_one": "{{count}} verwandte Sitzung",
       "relatedSessions_other": "{{count}} ähnliche Sitzungen"
     },
@@ -457,6 +878,12 @@
         "platform": "",
         "product": "",
         "location": ""
+      },
+      "download": {
+        "title": "",
+        "app": "",
+        "device": "",
+        "last24h": ""
       },
       "trust": {
         "previous": "",
@@ -891,6 +1318,7 @@
         "accountInactiveFor": "",
         "accountNewDevice": "",
         "accountTrustChanged": "",
+        "accountMediaDownloaded": "",
         "mediaAdded": "",
         "mediaUpgraded": "",
         "serverDown": "",
@@ -919,6 +1347,8 @@
         "travel_speed_kmh": "",
         "unique_ips_in_window": "",
         "unique_devices_in_window": "",
+        "downloads_in_window": "",
+        "download_bytes_in_window": "",
         "inactive_days": "",
         "current_pause_minutes": "",
         "total_pause_minutes": "",
@@ -1097,6 +1527,14 @@
         "description": ""
       },
       "unique_devices_in_window": {
+        "label": "",
+        "description": ""
+      },
+      "downloads_in_window": {
+        "label": "",
+        "description": ""
+      },
+      "download_bytes_in_window": {
         "label": "",
         "description": ""
       },
@@ -1402,8 +1840,6 @@
     "recordsOnly": "",
     "scope": {
       "global": "",
-      "person": "",
-      "account": "",
       "crossServer": ""
     },
     "searchPlaceholder": "",
@@ -1490,6 +1926,11 @@
         "keywords": ""
       },
       "device-velocity": {
+        "name": "",
+        "description": "",
+        "keywords": ""
+      },
+      "download-burst": {
         "name": "",
         "description": "",
         "keywords": ""
@@ -1656,6 +2097,10 @@
           "description": "",
           "synonyms": ""
         },
+        "accountMediaDownloaded": {
+          "description": "",
+          "synonyms": ""
+        },
         "mediaAdded": {
           "description": "",
           "synonyms": ""
@@ -1799,6 +2244,9 @@
         "authToken": "",
         "userKey": "",
         "apiToken": "",
+        "botToken": "",
+        "chatId": "",
+        "topicId": "",
         "preset": "",
         "host": "",
         "port": "",
@@ -1820,6 +2268,7 @@
       },
       "hints": {
         "authTokenOptional": "",
+        "telegramTopic": "",
         "smtpPreset": "",
         "smtpVerifyCertificate": "",
         "smtpUsernameOptional": "",
@@ -1877,6 +2326,7 @@
         "gotify": "",
         "apprise": "",
         "pushover": "",
+        "telegram": "",
         "email": "",
         "push": "",
         "webToast": ""
@@ -1890,21 +2340,13 @@
       "usedBy_other": "",
       "usedByNewsletters_one": "",
       "usedByNewsletters_other": ""
-    },
-    "jobs": {
-      "runNow": "Jetzt ausführen",
-      "running": "Läuft...",
-      "lastRun": "Letzter Lauf",
-      "nextRun": "Nächster Lauf",
-      "schedule": "Zeitplan"
-    },
-    "mobile": {
-      "editDisplayName": "Anzeigename bearbeiten",
-      "editDisplayNameDesc": "Ändern Sie, wie dieses Gerät in Ihrer Geräteliste angezeigt wird",
-      "displayName": "Anzeigename",
-      "displayNamePlaceholder": "z.B. Mein iPhone",
-      "updating": "Aktualisiere..."
     }
+  },
+  "impersonation": {
+    "banner": "",
+    "stop": "",
+    "stopLabel": "",
+    "stopViewing": ""
   },
   "maintenance": {
     "startingTitle": "Tracearr wird gestartet...",
@@ -1936,17 +2378,21 @@
     "allTypes": "Alle Typen",
     "heatmap": "",
     "circles": "Kreise",
+    "viewMode": "",
     "streams": "",
     "locations": "standorte",
     "allActivity": "Alle Aktivitäten",
     "basemapMissing": "",
     "webglUnavailable": "",
     "webglHint": "",
-    "badMounts": ""
+    "badMounts": "",
+    "loadingData": "",
+    "noDataForFilters": "",
+    "totalStreams": "",
+    "streamCount_one": "",
+    "streamCount_other": ""
   },
   "devices": {
-    "title": "Gerätekompatibilität",
-    "description": "",
     "analyzedSessions": "",
     "directPlayRate": "",
     "videoAndAudio": "",
@@ -1967,15 +2413,24 @@
     "directPlayHigh": "80 % direkt",
     "directPlayMid": "",
     "directPlayLow": "",
-    "topTranscodingUsers": "Benutzer mit den meisten Transkodierungen",
-    "topTranscodingUsersDesc": "",
-    "noTranscodingUsers": "Keine Benutzer mit Transkodierungen gefunden",
     "analyzedSessionsTooltip_one": "",
     "analyzedSessionsTooltip_other": ""
   },
+  "downloads": {
+    "dataDownloaded": "",
+    "peopleDownloading": "",
+    "mostDownloaded": "",
+    "unknownUser": "",
+    "appOnDevice": "",
+    "deliveredAs": "",
+    "deliveredAsFormat": "",
+    "deliveredAtBitrate": "",
+    "empty": "",
+    "panelTitle": "",
+    "requests_one": "",
+    "requests_other": ""
+  },
   "statsBandwidth": {
-    "title": "Bandbreite",
-    "description": "",
     "dataTransferred": "Daten übertragen",
     "avgBitrate": "Durchschnittliche Bitrate",
     "avgBitrateMbps": "Durchschnittliche Bitrate (Mbps)",
@@ -1984,15 +2439,44 @@
     "uniqueUsers": "Einzigartige Benutzer",
     "dailyUsage": "Tägliche Bandbreitennutzung",
     "dailyUsageDesc": "",
-    "topUsers": "Top Bandbreiten-Benutzer",
-    "topUsersDesc": "",
-    "noData": "Keine Bandbreitendaten verfügbar"
+    "noData": "Keine Bandbreitendaten verfügbar",
+    "topPeopleTitle": "",
+    "topPeopleCaption": ""
   },
   "statsUsers": {
     "noActivity": "Noch keine Aktivität",
     "noActivityDesc": "Starte Streaming, um deine Top-Benutzer hier zu sehen",
-    "top3": "Oben 3",
-    "runnersUp": "Läufer oben"
+    "rankBy": "",
+    "rank": {
+      "hours": "",
+      "transcodes": "",
+      "requests": "",
+      "lastSeen": ""
+    },
+    "summary": {
+      "active": "",
+      "activeOf": "",
+      "topThreeShare": "",
+      "transcoderShare": "",
+      "transcodesOf": "",
+      "quiet": "",
+      "quietDays": ""
+    },
+    "columns": {
+      "person": "",
+      "requests": "",
+      "trend": ""
+    },
+    "requestsAllTime": "",
+    "linkTitle": {
+      "transcodes": "",
+      "requests": ""
+    },
+    "linkBody": {
+      "transcodes": "",
+      "requests": ""
+    },
+    "openPeople": ""
   },
   "plexCallback": {
     "authComplete": "Authentifizierung abgeschlossen",
@@ -2049,21 +2533,61 @@
     "selected": "ausgewählt",
     "snapshots": "Snapshot(s)",
     "of": "von",
-    "logExplorerUnavailable": "Log-Explorer ist nur in Docker-Umgebungen verfügbar"
+    "logExplorerUnavailable": "Log-Explorer ist nur in Docker-Umgebungen verfügbar",
+    "tasksTab": {
+      "loading": "",
+      "failedToLoad": "",
+      "jobQueues": "",
+      "jobQueuesDesc": "",
+      "description": "",
+      "schedule": "",
+      "completed": "",
+      "scheduled": "",
+      "processing": "",
+      "onDemand": "",
+      "notInitialized": "",
+      "backgroundServices": "",
+      "backgroundServicesDesc": "",
+      "interval": "",
+      "eventConnections": "",
+      "eventConnectionsDesc": "",
+      "every": "",
+      "eventDriven": "",
+      "queues": {
+        "notifications": "",
+        "notificationsDesc": "",
+        "imports": "",
+        "importsDesc": "",
+        "maintenance": "",
+        "maintenanceDesc": "",
+        "librarySync": "",
+        "librarySyncDesc": "",
+        "versionCheck": "",
+        "versionCheckDesc": "",
+        "inactivityCheck": "",
+        "inactivityCheckDesc": "",
+        "backup": "",
+        "backupDesc": ""
+      },
+      "dlq_one": "",
+      "dlq_other": ""
+    },
+    "clientErrors": {
+      "title": "",
+      "description": "",
+      "empty": ""
+    }
   },
   "media": {
     "landing": {
-      "title": "Medien",
-      "lens": {
-        "label": "Ansicht als",
-        "allUsers": "Alle Benutzer"
-      },
       "shelves": {
         "recentlyAddedMovies": "",
         "recentlyAddedShows": "",
         "recentlyUpdated": "",
         "mostPopularMovies": "",
         "mostPopularShows": "",
+        "recentlyAddedAlbums": "",
+        "mostPlayedArtists": "",
         "emptyRecentlyAdded": "",
         "emptyRecentlyUpdated": "",
         "emptyMostPopular": "",
@@ -2079,7 +2603,6 @@
         }
       },
       "card": {
-        "addedAgo": "hinzugefügt {{date}}",
         "addedCompactAgo": "vor {{age}} hinzugefügt",
         "newEpisodes_one": "{{count}} neue Folge",
         "newEpisodes_other": "{{count}} neue Folgen",
@@ -2089,18 +2612,7 @@
         "newEpisodesChip_other": "{{count}} neu"
       },
       "deadWeight": {
-        "title": "",
-        "empty": "",
-        "columns": {
-          "poster": "",
-          "title": "",
-          "added": "",
-          "servers": ""
-        },
-        "viewAll": "",
-        "viewAllTooltip": "",
-        "summary_one": "",
-        "summary_other": ""
+        "viewAll": ""
       },
       "loadError": "Deine Mediathek konnte nicht geladen werden"
     },
@@ -2111,12 +2623,24 @@
       "title": "Serien"
     },
     "genres": {
-      "title": "",
-      "subtitle": "",
-      "chart": {
+      "cards": {
+        "withPlays": "",
+        "ofGenres": "",
+        "topFiveShare": "",
+        "largestRise": "",
+        "largestFall": ""
+      },
+      "share": {
         "title": "",
-        "valueLabel": "",
-        "ariaLabel": "",
+        "items": "",
+        "plays": "",
+        "sortGap": "",
+        "showAll": ""
+      },
+      "trends": {
+        "title": ""
+      },
+      "chart": {
         "itemCount_one": "",
         "itemCount_other": ""
       },
@@ -2125,16 +2649,26 @@
         "columns": {
           "genre": "",
           "plays": "",
-          "watchTime": ""
-        },
-        "browseMovies": "",
-        "browseShows": ""
+          "watchTime": "",
+          "topViewer": ""
+        }
       },
       "empty": {
         "title": "",
         "description": ""
       },
-      "loadError": ""
+      "loadError": "",
+      "sheet": {
+        "description": "",
+        "whoPlays": "",
+        "ofCountedPlays": "",
+        "topTitles": "",
+        "topArtists": "",
+        "browse": "",
+        "allGenresPeak": "",
+        "artistCount_one": "",
+        "artistCount_other": ""
+      }
     },
     "detail": {
       "title": "Medien-Details",
@@ -2143,8 +2677,7 @@
       },
       "notFound": {
         "title": "",
-        "message": "",
-        "backLink": ""
+        "message": ""
       },
       "hero": {
         "loadError": "",
@@ -2169,6 +2702,13 @@
       },
       "kpis": {
         "ariaLabel": "",
+        "yourPlays": "",
+        "yourWatchTime": "",
+        "yourListenTime": "",
+        "yourCompletion": "",
+        "lastWatched": "",
+        "lastPlayed": "",
+        "episodesOf": "",
         "loadError": "",
         "completionLoadError": "",
         "plays": {
@@ -2176,30 +2716,38 @@
           "caption": ""
         },
         "watchTime": {
-          "label": "",
           "detail": ""
         },
         "viewers": {
           "label": "",
+          "labelMusic": "",
           "detail": ""
         },
         "completion": {
           "label": "",
           "detail": "",
-          "detailMovie": ""
-        }
+          "detailMovie": "",
+          "detailMusic": ""
+        },
+        "watchedByOthers_one": "",
+        "watchedByOthers_other": "",
+        "playedByOthers_one": "",
+        "playedByOthers_other": ""
       },
       "watchers": {
         "title": "",
+        "titleMusic": "",
         "loadError": "",
         "empty": "",
+        "emptyMusic": "",
         "lastWatchedAgo": "",
         "completionLabel": "",
         "columns": {
           "plays": "",
           "episodes": "",
           "completion": "",
-          "lastWatched": ""
+          "lastWatched": "",
+          "lastPlayed": ""
         }
       },
       "seasons": {
@@ -2216,21 +2764,36 @@
         "episodeCount_one": "",
         "episodeCount_other": ""
       },
+      "albums": {
+        "title": "",
+        "loadError": "",
+        "trackCount_one": "",
+        "trackCount_other": ""
+      },
+      "album": {
+        "kind": "",
+        "loadError": "",
+        "finishedCaption": "",
+        "vsPrior30": "",
+        "tracksCaption": "",
+        "columns": {
+          "title": "",
+          "length": ""
+        }
+      },
       "platforms": {
         "title": "",
         "loadError": "",
         "empty": "",
         "unknown": "",
         "columns": {
-          "plays": "",
-          "watchTime": ""
+          "plays": ""
         }
       },
       "history": {
         "title": "",
         "loadError": "",
         "empty": "",
-        "watched": "",
         "notWatched": "",
         "columns": {
           "duration": ""
@@ -2258,28 +2821,18 @@
         "watchedByOthers": "",
         "watchedByYou": ""
       },
-      "tileLabel": {
-        "added": "Hinzugefügt",
-        "plays": "Wiedergaben",
-        "viewers": "Zuschauer",
-        "resolution": "Auflösung"
-      },
-      "rankChip": "",
       "versionsChip": "",
       "moreServers": "",
       "viewers_one": "{{count}} Zuschauer",
       "viewers_other": "{{count}} Zuschauer",
-      "playsCompact_one": "{{compact}} Wiedergabe",
-      "playsCompact_other": "{{compact}} Wiedergaben",
       "versions_one": "",
-      "versions_other": ""
+      "versions_other": "",
+      "albumCount_one": "",
+      "albumCount_other": ""
     },
     "grid": {
       "toolbar": {
         "ariaLabel": "",
-        "typeLabel": "",
-        "moviesToggle": "",
-        "showsToggle": "",
         "searchPlaceholder": "",
         "searchLabel": "",
         "filtersLabel": "",
@@ -2340,13 +2893,8 @@
         "current": ""
       },
       "loaderError": "",
-      "retry": "",
-      "clearJumpAction": "",
-      "showingFrom": "",
-      "showAll": "",
       "emptyFilter": "",
       "emptySearch": "",
-      "emptyAnchored": "",
       "loadError": ""
     }
   },
@@ -2409,7 +2957,6 @@
     },
     "page": {
       "title": "",
-      "description": "",
       "failedToLoad": "",
       "notConfigured": "",
       "notConfiguredDescription": "",
@@ -2446,19 +2993,6 @@
       "requested": "",
       "onDisk": "",
       "untitled": "",
-      "failedToLoad": ""
-    },
-    "followThrough": {
-      "title": "",
-      "description": "",
-      "person": "",
-      "asked": "",
-      "landed": "",
-      "watched": "",
-      "watchedByOthers": "",
-      "medianWait": "",
-      "emptyTitle": "",
-      "emptyDescription": "",
       "failedToLoad": ""
     }
   }
