@@ -68,7 +68,8 @@
     "transcode": "Transcode",
     "hwTranscode": "HW Transcode",
     "burnIn": "Burn-in",
-    "watched": "Watched"
+    "watched": "Watched",
+    "played": "Played"
   },
   "severity": {
     "low": "Low",
@@ -133,6 +134,7 @@
     "serverOwner": "Server Owner",
     "resolution": "Resolution",
     "watchTime": "Watch Time",
+    "listenTime": "Listen Time",
     "pausedTime": "Paused Time",
     "sessionDetails": "Session Details",
     "recentSessions": "Recent Sessions",
@@ -152,7 +154,13 @@
     "streamDetails": "Stream Details",
     "transcodeReason": "Transcode Reason",
     "loadMore": "Load More",
-    "playback": "Playback"
+    "playback": "Playback",
+    "plays": "Plays",
+    "weekOf": "Week of {{date}}",
+    "viewers": "Viewers",
+    "watchHours": "Watch Hours",
+    "completion": "Completion",
+    "serverLegend": "Server legend"
   },
   "search": {
     "searchUsers": "Search users...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episodes",
     "track": "Track",
     "track_plural": "Tracks",
+    "artist_plural": "Artists",
     "liveTV": "Live TV",
     "photo": "Photo",
     "tv": "TV",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} users",
     "session_one": "{{count}} session",
     "session_other": "{{count}} sessions",
+    "download_one": "{{count}} download",
+    "download_other": "{{count}} downloads",
     "stream_one": "{{count}} stream",
     "stream_other": "{{count}} streams",
     "server_one": "{{count}} server",
@@ -255,7 +266,9 @@
     "noDeviceData": "No device data available",
     "noJobHistory": "No job history yet",
     "noSessionsFound": "No sessions found",
-    "noUserData": "No user data available"
+    "noUserData": "No user data available",
+    "noPlayData": "No play data available",
+    "noLocationData": "No location data available"
   },
   "confirmations": {
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?"
