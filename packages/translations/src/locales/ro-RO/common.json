@@ -68,7 +68,8 @@
     "transcode": "Transcodare",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "scazut",
@@ -133,6 +134,7 @@
     "serverOwner": "Proprietarul serverului",
     "resolution": "Rezoluție",
     "watchTime": "Timp de vizionare",
+    "listenTime": "",
     "pausedTime": "Timp Pauzat",
     "sessionDetails": "Detalii sesiune",
     "recentSessions": "Sesiuni recente",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Caută utilizatori...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episoade",
     "track": "Urmărire",
     "track_plural": "Șenile",
+    "artist_plural": "",
     "liveTV": "TV în direct",
     "photo": "Fotografie",
     "tv": "Televizor",
@@ -211,6 +220,9 @@
     "session_one": "{{count}} sesiune",
     "session_few": "",
     "session_other": "{{count}} sesiuni",
+    "download_one": "",
+    "download_few": "",
+    "download_other": "",
     "stream_one": "{{count}} stream",
     "stream_few": "",
     "stream_other": "{{count}} stream-uri",
@@ -274,7 +286,9 @@
     "noDeviceData": "Nu sunt disponibile date despre dispozitiv",
     "noJobHistory": "Încă nu a fost înregistrată nicio sarcină",
     "noSessionsFound": "Nu s-au găsit sesiuni",
-    "noUserData": "Nu sunt disponibile date de utilizator"
+    "noUserData": "Nu sunt disponibile date de utilizator",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Aveți modificări nesalvate. Sunteți sigur că doriți să ieșiți?"
