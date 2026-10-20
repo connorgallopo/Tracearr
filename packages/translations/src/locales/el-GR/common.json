@@ -68,7 +68,8 @@
     "transcode": "Διακωδικοποίηση",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Χαμηλή",
@@ -133,6 +134,7 @@
     "serverOwner": "Ιδιοκτήτης Διακομιστή",
     "resolution": "Ανάλυση",
     "watchTime": "Χρόνος Παρακολούθησης",
+    "listenTime": "",
     "pausedTime": "Χρόνος Παύσης",
     "sessionDetails": "Λεπτομέρειες Συνεδρίας",
     "recentSessions": "Πρόσφατες Συνεδρίες",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Αναζήτηση χρηστη...",
@@ -185,6 +193,7 @@
     "episode_plural": "Επεισόδια",
     "track": "Κομμάτι",
     "track_plural": "Κομμάτια",
+    "artist_plural": "",
     "liveTV": "Ζωντανή Τηλεόραση",
     "photo": "Φωτογραφία",
     "tv": "Τηλεόραση",
@@ -209,6 +218,8 @@
     "user_other": "",
     "session_one": "",
     "session_other": "",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "",
     "stream_other": "",
     "server_one": "",
@@ -255,7 +266,9 @@
     "noDeviceData": "Δεν υπάρχουν διαθέσιμα δεδομένα συσκευής",
     "noJobHistory": "Δεν υπάρχει ιστορικό εργασιών ακόμα",
     "noSessionsFound": "Δεν βρέθηκαν συνεδρίες",
-    "noUserData": "Δεν υπάρχουν διαθέσιμα δεδομένα χρήστη"
+    "noUserData": "Δεν υπάρχουν διαθέσιμα δεδομένα χρήστη",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Έχετε μη αποθηκευμένες αλλαγές. Είστε σίγουροι ότι θέλετε να φύγετε?"
