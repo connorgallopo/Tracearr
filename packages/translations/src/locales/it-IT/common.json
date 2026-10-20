@@ -68,7 +68,8 @@
     "transcode": "Transcodifica",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Basso",
@@ -133,6 +134,7 @@
     "serverOwner": "Proprietario del Server",
     "resolution": "Risoluzione",
     "watchTime": "Tempo di Visione",
+    "listenTime": "",
     "pausedTime": "Tempo in Pausa",
     "sessionDetails": "Dettagli Sessione",
     "recentSessions": "Sessioni Recenti",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Cerca utenti...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episodi",
     "track": "Traccia",
     "track_plural": "Tracce",
+    "artist_plural": "",
     "liveTV": "TV in Diretta",
     "photo": "Foto",
     "tv": "",
@@ -209,6 +218,8 @@
     "user_other": "",
     "session_one": "",
     "session_other": "",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "",
     "stream_other": "",
     "server_one": "Server {{count}}",
@@ -255,7 +266,9 @@
     "noDeviceData": "Nessun dato del dispositivo disponibile",
     "noJobHistory": "Ancora nessuna cronologia dei lavori",
     "noSessionsFound": "Nessuna sessione trovata",
-    "noUserData": "Nessun dato utente disponibile"
+    "noUserData": "Nessun dato utente disponibile",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Alcune modifiche non sono state salvate. Vuoi davvero uscire?"
