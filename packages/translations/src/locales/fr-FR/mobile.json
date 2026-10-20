@@ -149,6 +149,7 @@
     "allServers": "",
     "noAlertsRecorded": "",
     "noMatches": "",
+    "selectAlert": "",
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_other": "",
     "pendingCount_one": "",
@@ -157,6 +158,7 @@
   "history": {
     "adjustFilters": "Essayez d'ajuster vos filtres",
     "historyWillAppear": "L'historique des sessions apparaîtra ici lorsque les utilisateurs commenceront à lancer des lectures",
+    "selectSession": "",
     "filters": {
       "clearCount": "",
       "countries": "Pays",
@@ -176,7 +178,8 @@
     "noUsersMatch": "Aucun utilisateur ne correspond à « {{query}} »",
     "joinedRelative": "",
     "sortActive": "",
-    "sortTrust": ""
+    "sortTrust": "",
+    "selectUser": ""
   },
   "activity": {
     "playsOverTime": "Lectures au fil du temps",
