@@ -16,7 +16,7 @@
       "locale": "Ustawienia regionalne",
       "behavior": "Zachowanie",
       "connections": "Połączenia",
-      "posters": "Źródło plakatów",
+      "posters": "Plakaty",
       "plexAccounts": "Konta Plex",
       "destinations": "Miejsca docelowe",
       "newsletters": "Newslettery",
@@ -232,13 +232,13 @@
       "issueBlocked": "Serwer zgłasza wtyczkę jako zainstalowaną i aktywną, ale Tracearr dostaje błąd 404 z jej endpointu. Zwykle przyczyną jest reverse proxy blokujące tę ścieżkę.",
       "issueRestartRequired": "Wtyczka jest zainstalowana, ale zostanie aktywowana dopiero po ponownym uruchomieniu serwera multimediów.",
       "issueMalfunctioned": "Serwer zgłasza, że nie udało się załadować wtyczki. Aktualizacja wtyczki lub serwera multimediów zwykle pomaga.",
-      "jellyfinStep1": "",
-      "jellyfinStep2": "",
-      "jellyfinStep3": "",
-      "jellyfinStep4": "",
-      "embyStep1": "",
-      "embyStep2": "",
-      "embyStep3": ""
+      "jellyfinStep1": "W ustawieniach Jellyfin przejdź do wtyczek → Repozytoria.",
+      "jellyfinStep2": "Dodaj repozytorium o nazwie <strong>Tracearr</strong> z poniższym adresem URL.",
+      "jellyfinStep3": "Otwórz zakładkę Katalog i zainstaluj <strong>Tracearr SSE</strong>.",
+      "jellyfinStep4": "Uruchom ponownie Jellyfin, a Tracearr automatycznie go wykryje.",
+      "embyStep1": "W Panelu Emby, przejdź do wtyczek → Katalog.",
+      "embyStep2": "Znajdź <strong>Tracearr SSE</strong> w wierszu Powiadomień i zainstaluj go.",
+      "embyStep3": "Uruchom ponownie Emby, a Tracearr automatycznie go wykryje."
     },
     "posterSource": {
       "label": "Preferowane źródło plakatów",
@@ -246,8 +246,8 @@
       "automatic": "Automatyczne (najnowsze)",
       "emptyHint": "Dodaj serwer, aby wybrać preferowane źródło plakatów.",
       "ownerOnly": "Tylko właściciel może wybrać preferowane źródło plakatów.",
-      "precache": "",
-      "precacheDescription": ""
+      "precache": "Buforowanie plakatów po synchronizacji biblioteki",
+      "precacheDescription": "Pobiera plakaty dla nowych i zmienionych tytułów po każdej synchronizacji, więc strony biblioteki nie czekają na serwer multimediów. Gdy wyłączone, plakaty są buforowane, gdy ktoś otwiera stronę, która je pokazuje."
     },
     "version": {
       "installed": "Wersja {{version}}",
@@ -454,12 +454,12 @@
     "importFullRangeHelp": "Odtworzenia rozpoczęte po dodaniu tego serwera do Tracearr nigdy nie są importowane. Domyślnie import zatrzymuje się również na najwcześniejszym odtworzeniu, jakie Tracearr posiada dla tego serwera, na przykład z importu Jellystat. Włącz tę funkcję, aby importować wszystko sprzed dodania serwera. Dokładne duplikaty nadal zostaną pominięte.",
     "skipOverlap": "Nakładający się rekord – znacznik czasu przypada w okresie, który Tracearr już śledzi dla tego serwera. Włącz import pełnej historii, aby go uwzględnić.",
     "skipDuplicatePlugin": "Zduplikowany rekord – został już zaimportowany bezpośrednio lub dotarł wcześniej poprzez import Jellystat tych samych danych wtyczki.",
-    "importFailed": "",
+    "importFailed": "Import nie powiódł się",
     "dropzone": {
-      "dropHere": "",
-      "dragOrClick": "",
-      "limit": "",
-      "removeFile": ""
+      "dropHere": "Upuść plik tutaj",
+      "dragOrClick": "Przeciągnij i upuść lub kliknij, aby wybrać",
+      "limit": "{{accept}} plików do {{size}}",
+      "removeFile": "Usuń plik"
     },
     "overlapSkipped_one": "{{count}} pominięty jako nakładający się",
     "overlapSkipped_few": "{{count}} pominięte jako nakładające się",
