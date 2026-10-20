@@ -26,7 +26,7 @@
     "connectedTo": "Connectat a {{name}}",
     "plexAuthFailed": "L'autenticació amb Plex ha fallat",
     "plexStartFailed": "No s'ha pogut iniciar la sessió de Plex",
-    "plexExpired": "",
+    "plexExpired": "Aquesta sessió de Plex ha caducat. Torna a iniciar-la.",
     "serverConnectFailed": "No s'ha pogut connectar al servidor",
     "createAccountFailed": "Ha fallat la creació del compte",
     "invalidCredentials": "Correu electrònic o contrasenya incorrectes",
@@ -38,20 +38,20 @@
     "validateClaimCode": "Valideu el codi de vinculació",
     "claimCodeSecurityNote": "Aquesta mesura de seguretat garanteix que només els usuaris autoritzats puguin completar la configuració inicial",
     "member": {
-      "tabLocal": "",
-      "tabMember": "",
-      "server": "",
-      "signingInTo": "",
-      "passwordHint": "",
-      "quickConnectHint": "",
-      "waiting": "",
-      "copyCode": "",
-      "usePassword": "",
-      "useQuickConnect": "",
-      "codeExpired": "",
-      "newCode": "",
-      "refused": "",
-      "notPermitted": ""
+      "tabLocal": "Compte de Tracearr",
+      "tabMember": "Servidor multimèdia",
+      "server": "Servidor",
+      "signingInTo": "Inicia sessió com a {{name}}",
+      "passwordHint": "Utilitzeu el nom d'usuari i la contrasenya de {{name}}.",
+      "quickConnectHint": "Obriu Jellyfin, aneu a Connexió ràpida i introduïu aquest codi.",
+      "waiting": "S'està esperant l'aprovació",
+      "copyCode": "Còpia el codi",
+      "usePassword": "Utilitza la contrasenya en comptes d'això",
+      "useQuickConnect": "Utilitza la Connexió ràpida en comptes d'això",
+      "codeExpired": "Aquest codi ha caducat.",
+      "newCode": "Nou codi",
+      "refused": "L'inici de sessió no està disponible per a aquest compte.",
+      "notPermitted": "No teniu permís per iniciar sessió. Si us plau, poseu-vos en contacte amb el propietari del servidor."
     }
   },
   "dashboard": {
@@ -65,78 +65,78 @@
     "bandwidth": "Amplada de banda",
     "noActiveStreams": "No hi ha cap transmissió activa",
     "streamsAppearHere": "Les transmissions actives apareixeran aquí quan els usuaris comencin a mirar contingut",
-    "dayStreak": "",
+    "dayStreak": "Ratxa de dies",
     "view": {
-      "label": "",
-      "admin": "",
-      "me": ""
+      "label": "Vista de tauler",
+      "admin": "Servidor",
+      "me": "Personal"
     },
     "me": {
-      "last30": "",
-      "streakDetail": "",
-      "topTitles": "",
+      "last30": "Els darrers 30 dies",
+      "streakDetail": "dies seguits amb una reproducció",
+      "topTitles": "Els vostres títols destacats",
       "welcome": {
-        "title": "",
-        "description": "",
-        "browse": ""
+        "title": "El tauler de control s'omple a mesura que aneu reproduint contingut",
+        "description": "Les reproduccions, les ratxes i els vostres títols destacats apareixen aquí uns minuts després que mireu alguna cosa.",
+        "browse": "Explora la biblioteca"
       },
       "requests": {
-        "title": "",
-        "requestedAgo": "",
-        "seeAll": "",
-        "availableThisWeek_one": "",
-        "availableThisWeek_other": ""
+        "title": "Les vostres sol·licituds",
+        "requestedAgo": "Sol·licitat fa {{age}}",
+        "seeAll": "Mostra-les totes",
+        "availableThisWeek_one": "{{count}} ha estat disponible aquesta setmana",
+        "availableThisWeek_other": "{{count}} han estat disponible aquesta setmana"
       },
-      "episodes_one": "",
-      "episodes_other": ""
+      "episodes_one": "{{count}} episodi",
+      "episodes_other": "{{count}} episodis"
     },
     "resources": {
-      "system": "",
-      "perServer": "",
-      "average": ""
+      "system": "Sistema",
+      "perServer": "per servidor",
+      "average": "Mtj:"
     },
-    "unknownLocation": "",
-    "unknownQuality": "",
+    "unknownLocation": "Ubicació desconeguda",
+    "unknownQuality": "Qualitat desconeguda",
     "othersStreaming_one": "",
     "othersStreaming_other": ""
   },
   "yourStats": {
-    "titles": "",
-    "howYouWatch": "",
+    "titles": "Títols",
+    "howYouWatch": "Com reproduïu",
     "viewerType": {
       "completionist": {
-        "label": "",
-        "desc": ""
+        "label": "Finalitzador",
+        "desc": "Acabeu el {{rate}}% del que comenceu."
       },
       "rewatcher": {
-        "label": "",
-        "desc": ""
+        "label": "Revisionador",
+        "desc": "Torneu als vostre preferits."
       },
       "sampler": {
-        "label": "",
-        "desc": ""
+        "label": "Explorador",
+        "desc": "Proveu moltes coses abans de decidir-vos per una."
       },
       "casual": {
-        "label": "",
-        "desc": ""
+        "label": "Ocasional",
+        "desc": "Mireu quan us ve de gust."
       }
     },
-    "habits": "",
-    "seeActivity": "",
-    "allTime": "",
-    "watchTime": "",
+    "habits": "El vostre dia de més activitat és {{day}}, i la vostra hora de més activitat és {{hour}}.",
+    "seeActivity": "Veure activitat",
+    "allTime": "De sempre",
+    "watchTime": "Temps de visualització",
     "span": {
-      "minutes_one": "",
-      "minutes_other": "",
-      "hours_one": "",
-      "hours_other": "",
-      "days_one": "",
-      "days_other": "",
-      "weeks_one": "",
-      "weeks_other": ""
+      "minutes_one": "{{count}} minut",
+      "minutes_other": "{{count}} minuts",
+      "hours_one": "{{count}} hora",
+      "hours_other": "{{count}} hores",
+      "days_one": "{{count}} dia",
+      "days_other": "{{count}} dies",
+      "weeks_one": "{{count}} setmana",
+      "weeks_other": "{{count}} setmanes"
     },
-    "longestStreak": "",
-    "firstPlay": "",
+    "longestStreak": "Ratxa més llarga",
+    "firstPlay": "Primera reproducció",
     "biggestBinge": "",
     "topGenres": "",
     "allTimeCaption": "",
@@ -147,8 +147,8 @@
       "abandoned": "",
       "rewatched": ""
     },
-    "days_one": "",
-    "days_other": "",
+    "days_one": "{{count}} dia",
+    "days_other": "{{count}} dies",
     "bingeValue_one": "",
     "bingeValue_other": ""
   },
