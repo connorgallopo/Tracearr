@@ -68,7 +68,8 @@
     "transcode": "Транскодирование",
     "hwTranscode": "",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Низкий",
@@ -133,6 +134,7 @@
     "serverOwner": "Владелец сервера",
     "resolution": "Разрешение",
     "watchTime": "Время просмотра",
+    "listenTime": "",
     "pausedTime": "Время приостановлено",
     "sessionDetails": "Детали сессии",
     "recentSessions": "Недавние сессии",
@@ -152,7 +154,13 @@
     "streamDetails": "",
     "transcodeReason": "",
     "loadMore": "",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Поиск пользователей...",
@@ -185,6 +193,7 @@
     "episode_plural": "Эпизоды",
     "track": "Трек",
     "track_plural": "Треки",
+    "artist_plural": "",
     "liveTV": "Прямое ТВ",
     "photo": "Фото",
     "tv": "ТВ",
@@ -213,6 +222,10 @@
     "session_few": "",
     "session_many": "",
     "session_other": "",
+    "download_one": "",
+    "download_few": "",
+    "download_many": "",
+    "download_other": "",
     "stream_one": "{{count}} поток",
     "stream_few": "",
     "stream_many": "",
@@ -293,7 +306,9 @@
     "noDeviceData": "Нет данных об устройстве",
     "noJobHistory": "Нет истории заданий",
     "noSessionsFound": "Сессий не найдено",
-    "noUserData": "Нет доступных данных пользователя"
+    "noUserData": "Нет доступных данных пользователя",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "У вас есть несохраненные изменения. Вы уверены, что хотите выйти?"
