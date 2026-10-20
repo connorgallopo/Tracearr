@@ -68,7 +68,8 @@
     "transcode": "Transcodificació",
     "hwTranscode": "Transcodificació HW",
     "burnIn": "Incrustació",
-    "watched": "Vist"
+    "watched": "Vist",
+    "played": ""
   },
   "severity": {
     "low": "Reduïda",
@@ -133,6 +134,7 @@
     "serverOwner": "Propietari del servidor",
     "resolution": "Resolució",
     "watchTime": "Temps de visionament",
+    "listenTime": "",
     "pausedTime": "Temps en pausa",
     "sessionDetails": "Detalls de la sessió",
     "recentSessions": "Sessions recents",
@@ -152,7 +154,13 @@
     "streamDetails": "Detalls de la transmissió",
     "transcodeReason": "Raó per a la transcodificació",
     "loadMore": "Veure més",
-    "playback": "Reproducció"
+    "playback": "Reproducció",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Cerca d'usuaris...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episodis",
     "track": "Pista",
     "track_plural": "Pistes",
+    "artist_plural": "",
     "liveTV": "TV en directe",
     "photo": "Foto",
     "tv": "TV",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} usuaris",
     "session_one": "{{count}} sessió",
     "session_other": "{{count}} sessions",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} transmissió",
     "stream_other": "{{count}} transmissions",
     "server_one": "{{count}} servidor",
@@ -255,7 +266,9 @@
     "noDeviceData": "No hi ha dades de dispositiu disponibles",
     "noJobHistory": "Encara no hi ha historial de tasques",
     "noSessionsFound": "No s'ha trobat cap sessió",
-    "noUserData": "No hi ha dades d'usuari disponibles"
+    "noUserData": "No hi ha dades d'usuari disponibles",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Teniu canvis no desats. Esteu segur que voleu marxar?"
