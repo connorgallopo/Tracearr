@@ -68,7 +68,8 @@
     "transcode": "Transkodierung",
     "hwTranscode": "HW Transkodierung",
     "burnIn": "",
-    "watched": ""
+    "watched": "",
+    "played": ""
   },
   "severity": {
     "low": "Niedrig",
@@ -133,6 +134,7 @@
     "serverOwner": "Server-Besitzer",
     "resolution": "Auflösung",
     "watchTime": "Wiedergabezeit",
+    "listenTime": "",
     "pausedTime": "Pausierte Zeit",
     "sessionDetails": "Sitzungsdetails",
     "recentSessions": "Letzte Sitzungen",
@@ -152,7 +154,13 @@
     "streamDetails": "Streamdetails",
     "transcodeReason": "Transkodierungsgrund",
     "loadMore": "Mehr laden",
-    "playback": ""
+    "playback": "",
+    "plays": "",
+    "weekOf": "",
+    "viewers": "",
+    "watchHours": "",
+    "completion": "",
+    "serverLegend": ""
   },
   "search": {
     "searchUsers": "Suche Benutzer...",
@@ -185,6 +193,7 @@
     "episode_plural": "Episoden",
     "track": "Track",
     "track_plural": "Tracks",
+    "artist_plural": "",
     "liveTV": "Live-TV",
     "photo": "Foto",
     "tv": "TM",
@@ -209,6 +218,8 @@
     "user_other": "{{count}} Benutzer",
     "session_one": "{{count}} Sitzung",
     "session_other": "{{count}} Sitzungen",
+    "download_one": "",
+    "download_other": "",
     "stream_one": "{{count}} Stream",
     "stream_other": "{{count}} Streams",
     "server_one": "{{count}} Server",
@@ -255,7 +266,9 @@
     "noDeviceData": "Keine Gerätedaten verfügbar",
     "noJobHistory": "Noch keine Aufgabenhistorie",
     "noSessionsFound": "Keine Sitzungen gefunden",
-    "noUserData": "Keine Benutzerdaten verfügbar"
+    "noUserData": "Keine Benutzerdaten verfügbar",
+    "noPlayData": "",
+    "noLocationData": ""
   },
   "confirmations": {
     "unsavedChanges": "Ungespeicherte Änderungen gehen verloren. Fortfahren?"
