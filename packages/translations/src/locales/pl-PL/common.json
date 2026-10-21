@@ -110,7 +110,7 @@
     "content": "Zawartość",
     "platform": "Platforma",
     "location": "Lokalizacja",
-    "local": "Lokalnie",
+    "local": "Lokalna",
     "ipAddress": "Adres IP",
     "quality": "Jakość",
     "status": "Stan",
@@ -196,7 +196,7 @@
     "artist_plural": "Wykonawcy",
     "liveTV": "Telewizja na żywo",
     "photo": "Zdjęcie",
-    "tv": "Seriale",
+    "tv": "Serial",
     "tvShows": "Seriale",
     "music": "Muzyka"
   },
