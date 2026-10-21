@@ -97,8 +97,8 @@
     },
     "unknownLocation": "Ubicació desconeguda",
     "unknownQuality": "Qualitat desconeguda",
-    "othersStreaming_one": "",
-    "othersStreaming_other": ""
+    "othersStreaming_one": "{{count}} altra transmissió en reproducció",
+    "othersStreaming_other": "{{count}} altres transmissions en reproducció"
   },
   "yourStats": {
     "titles": "Títols",
@@ -137,20 +137,20 @@
     },
     "longestStreak": "Ratxa més llarga",
     "firstPlay": "Primera reproducció",
-    "biggestBinge": "",
-    "topGenres": "",
-    "allTimeCaption": "",
+    "biggestBinge": "Marató més llarga",
+    "topGenres": "Gèneres principals",
+    "allTimeCaption": "de sempre",
     "tier": {
-      "watched": "",
-      "engaged": "",
-      "sampled": "",
-      "abandoned": "",
-      "rewatched": ""
+      "watched": "Vist",
+      "engaged": "Implicat",
+      "sampled": "Tastat",
+      "abandoned": "Abandonat",
+      "rewatched": "Revist"
     },
     "days_one": "{{count}} dia",
     "days_other": "{{count}} dies",
-    "bingeValue_one": "",
-    "bingeValue_other": ""
+    "bingeValue_one": "{{count}} episodi de {{show}}",
+    "bingeValue_other": "{{count}} episodis de {{show}}"
   },
   "users": {
     "title": "Usuaris",
@@ -205,16 +205,16 @@
     "filterHasAccessTo": "Té accés a",
     "filterHasAccessToPlaceholder": "Qualsevol servidor",
     "filterHasAccessToHint": "Mostra les persones amb un compte actiu a tots els servidors seleccionats.",
-    "merged": "",
-    "filterRoleAll": "",
-    "filterSignInAll": "",
-    "filterPendingOnly": "",
-    "rowActions": "",
-    "menuOpenViolations": "",
-    "signInOn": "",
-    "signInOff": "",
-    "signedInAgo": "",
-    "neverSignedIn": "",
+    "merged": "Fusionat",
+    "filterRoleAll": "Qualsevol rol",
+    "filterSignInAll": "Qualsevol inici de sessió",
+    "filterPendingOnly": "Amb incompliments pendents",
+    "rowActions": "Accions per a {{name}}",
+    "menuOpenViolations": "Obre a Incompliments",
+    "signInOn": "Activat",
+    "signInOff": "Desactivat",
+    "signedInAgo": "ha iniciat la sessió {{relative}}",
+    "neverSignedIn": "no ha iniciat mai la sessió",
     "selectAllUsers_one": "Selecciona {{count}} usuari",
     "selectAllUsers_other": "Selecciona els {{count}} usuaris",
     "resetTrustScoreTitle_one": "Restableix la puntuació de confiança de {{count}} usuari",
@@ -229,8 +229,8 @@
     "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
     "suggestionsPairUsernameMore_one": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
     "suggestionsPairUsernameMore_other": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
-    "pendingLink_one": "",
-    "pendingLink_other": ""
+    "pendingLink_one": "{{count}} pendent",
+    "pendingLink_other": "{{count}} pendents"
   },
   "userDetail": {
     "backToUsers": "Torna als usuaris",
@@ -264,141 +264,141 @@
     "contactEmailNoLogin": "No dona accés a cap inici de sessió.",
     "locations": "Ubicacions",
     "access": {
-      "title": "",
-      "signIn": "",
-      "signInAllow": "",
-      "signInDefault": "",
-      "signInBlock": "",
-      "signInDefaultOn": "",
-      "signInDefaultOff": "",
-      "signInDefaultUnknown": "",
-      "role": "",
-      "roleAdmin": "",
-      "roleMember": "",
-      "roleHint": "",
-      "disabled": "",
-      "pending": "",
-      "signIns": "",
-      "lastSignIn": "",
-      "never": "",
-      "viewAs": "",
-      "viewAsLabel": "",
-      "viewAsHint": ""
+      "title": "Accés per iniciar la sessió",
+      "signIn": "Inici de sessió",
+      "signInAllow": "Permet",
+      "signInDefault": "Per defecte",
+      "signInBlock": "Bloca",
+      "signInDefaultOn": "El valor per defecte segueix l'interruptor global, que està activat.",
+      "signInDefaultOff": "El valor per defecte segueix l'interruptor global, que està desactivat.",
+      "signInDefaultUnknown": "El valor per defecte segueix l'interruptor global.",
+      "role": "Rol",
+      "roleAdmin": "Administrador",
+      "roleMember": "Membre",
+      "roleHint": "Els membres només veuen la seva pròpia activitat. Els administradors veuen la de tothom.",
+      "disabled": "Aquest compte no pot iniciar la sessió mentre estigui desactivat.",
+      "pending": "Aquest compte no pot iniciar la sessió mentre estigui pendent.",
+      "signIns": "Inicis de sessió",
+      "lastSignIn": "Últim inici de sessió",
+      "never": "Mai",
+      "viewAs": "Visualitza com a",
+      "viewAsLabel": "Visualitza Tracearr com a {{name}}",
+      "viewAsHint": "Vegeu Tracearr tal com el veu aquesta persona. És només de lectura."
     },
     "tabs": {
-      "access": "",
-      "downloads": ""
+      "access": "Accés",
+      "downloads": "Baixades"
     },
     "cards": {
-      "vsPrior": "",
-      "perActiveDay": "",
-      "finished": "",
-      "abandoned": "",
-      "avgBitrate": "",
-      "daysActive": "",
-      "ofDays": "",
-      "streak": "",
-      "transcodes_one": "",
-      "transcodes_other": ""
+      "vsPrior": "respecte al període anterior",
+      "perActiveDay": "{{value}} per dia actiu",
+      "finished": "Finalitzat",
+      "abandoned": "{{value}}% abandonat",
+      "avgBitrate": "{{value}} de mitjana",
+      "daysActive": "Dies actius",
+      "ofDays": "de {{count}}",
+      "streak": "Ratxa de {{count}} dies",
+      "transcodes_one": "{{count}} transcodificació",
+      "transcodes_other": "{{count}} transcodificacions"
     },
     "overview": {
-      "playsOverTime": "",
-      "priorRange": "",
-      "serverAverage": "",
-      "byHour": "",
-      "peak": "",
-      "serverPeak": "",
-      "what": "",
-      "otherMedia": "",
-      "mostFinished": "",
-      "where": "",
-      "directPlayShare": "",
-      "localShare": "",
-      "viewAllDevices": "",
-      "allSessions": "",
-      "finishedCount_one": "",
-      "finishedCount_other": ""
+      "playsOverTime": "Reproduccions al llarg del temps",
+      "priorRange": "Interval anterior",
+      "serverAverage": "Mitjana del servidor per persona",
+      "byHour": "Reproduccions per hora del dia",
+      "peak": "pic a les {{hour}}",
+      "serverPeak": "pic del servidor a les {{hour}}",
+      "what": "Què",
+      "otherMedia": "Altres",
+      "mostFinished": "Més finalitzats",
+      "where": "On i amb què",
+      "directPlayShare": "{{value}}% de reproducció directa",
+      "localShare": "{{value}}% de les sessions a la xarxa local",
+      "viewAllDevices": "Mostra tots els dispositius i ubicacions",
+      "allSessions": "Totes les sessions",
+      "finishedCount_one": "{{count}} finalitzat",
+      "finishedCount_other": "{{count}} finalitzats"
     },
-    "uniqueCount": "",
-    "unknownCity": "",
-    "unknownDevice": "",
-    "viewAllMore": "",
-    "adjustTrustScoreDesc": "",
-    "ipCount_one": "",
-    "ipCount_other": ""
+    "uniqueCount": "{{count}} únics",
+    "unknownCity": "Ciutat desconeguda",
+    "unknownDevice": "Dispositiu desconegut",
+    "viewAllMore": "Mostra-ho tot ({{count}} més)",
+    "adjustTrustScoreDesc": "Establiu la puntuació de confiança de @{{username}}. Interval: 0–100.",
+    "ipCount_one": "{{count}} IP",
+    "ipCount_other": "{{count}} IP"
   },
   "history": {
     "title": "Històric",
     "totalPlays": "Reproduccions totals",
     "uniqueTitles": "Títols únics",
     "uniqueUsers": "Usuaris únics",
-    "searchPlaceholder": "",
+    "searchPlaceholder": "Cerca títols, usuaris, ubicacions, IP...",
     "columns": {
-      "duration": "",
-      "progress": ""
+      "duration": "Durada",
+      "progress": "Progrés"
     },
     "location": {
-      "city": "",
-      "region": "",
-      "country": "",
-      "continent": "",
-      "postalCode": "",
-      "coordinates": "",
-      "asn": "",
-      "asnOrg": ""
+      "city": "Ciutat",
+      "region": "Regió",
+      "country": "País",
+      "continent": "Continent",
+      "postalCode": "Codi postal",
+      "coordinates": "Coordenades",
+      "asn": "ASN",
+      "asnOrg": "Organització de l'ASN"
     },
-    "trailer": "",
+    "trailer": "Tràiler",
     "filters": {
-      "columns": "",
+      "columns": "Columnes",
       "countries": "Països",
       "mediaType": "Tipus de contingut",
-      "types": "",
-      "network": "",
-      "remote": "",
-      "trailers": "",
-      "clearUsers": "",
-      "clearPlatforms": "",
-      "clearCountries": "",
-      "clearFilters": "",
-      "selected_one": "",
-      "selected_other": ""
+      "types": "Tipus",
+      "network": "Xarxa",
+      "remote": "Remota",
+      "trailers": "Tràilers",
+      "clearUsers": "Treu tots els usuaris",
+      "clearPlatforms": "Treu totes les plataformes",
+      "clearCountries": "Treu tots els països",
+      "clearFilters": "Neteja tots els filtres",
+      "selected_one": "{{count}} seleccionat",
+      "selected_other": "{{count}} seleccionats"
     },
     "detail": {
-      "watch": "",
-      "summary": "",
-      "segmentsShown_one": "",
-      "segmentsShown_other": ""
+      "watch": "Visionament",
+      "summary": "Resum",
+      "segmentsShown_one": "Es mostra {{shown}} de {{count}} segment",
+      "segmentsShown_other": "Es mostren {{shown}} de {{count}} segments"
     },
     "stream": {
-      "notAvailable": "",
-      "bitrateUnavailable": "",
-      "stereo": "",
-      "mono": "",
-      "noDetails": "",
-      "source": "",
-      "stream": "",
-      "container": "",
-      "bitrate": "",
-      "video": "",
-      "audio": "",
-      "subtitles": "",
-      "codec": "",
-      "framerate": "",
-      "hdr": "",
-      "profile": "",
-      "color": "",
-      "channels": "",
-      "language": "",
-      "sampleRate": "",
-      "format": "",
-      "forced": "",
-      "transcodeDetails": "",
-      "hwDecode": "",
-      "hwEncode": "",
-      "speed": "",
-      "throttled": "",
-      "channelCount_one": "",
-      "channelCount_other": ""
+      "notAvailable": "N/D",
+      "bitrateUnavailable": "Jellyfin i Emby no proporcionen les taxes de bits individuals de vídeo i d'àudio durant la transcodificació. Només hi ha disponible la taxa de bits total de la transmissió.",
+      "stereo": "Estèreo",
+      "mono": "Mono",
+      "noDetails": "No hi ha informació detallada de la transmissió",
+      "source": "Font",
+      "stream": "Transmissió",
+      "container": "Contenidor",
+      "bitrate": "Taxa de bits",
+      "video": "Vídeo",
+      "audio": "Àudio",
+      "subtitles": "Subtítols",
+      "codec": "Còdec",
+      "framerate": "Fotogrames per segon",
+      "hdr": "HDR",
+      "profile": "Perfil",
+      "color": "Color",
+      "channels": "Canals",
+      "language": "Idioma",
+      "sampleRate": "Freqüència de mostreig",
+      "format": "Format",
+      "forced": "Forçat",
+      "transcodeDetails": "Detalls de la transcodificació",
+      "hwDecode": "Descodificació HW",
+      "hwEncode": "Codificació HW",
+      "speed": "Velocitat",
+      "throttled": "(limitada)",
+      "channelCount_one": "{{count}} canal",
+      "channelCount_other": "{{count}} canals"
     }
   },
   "library": {
@@ -416,15 +416,15 @@
       "thisMonth": "aquest mes",
       "thisYear": "aquest any",
       "serversNeedSync": "Aquests servidors s'han de sincronitzar:",
-      "notWatchedByYou": "",
+      "notWatchedByYou": "No vist per vós",
       "memberEmpty": {
-        "title": "",
-        "description": ""
+        "title": "Encara no hi ha res",
+        "description": "Les pel·lícules i les sèries apareixeran aquí quan s'hagi sincronitzat la biblioteca del servidor."
       },
-      "movieCount_one": "",
-      "movieCount_other": "",
-      "showCount_one": "",
-      "showCount_other": ""
+      "movieCount_one": "{{count}} pel·lícula",
+      "movieCount_other": "{{count}} pel·lícules",
+      "showCount_one": "{{count}} sèrie",
+      "showCount_other": "{{count}} sèries"
     },
     "quality": {
       "qualityEvolution": "Evolució de la qualitat",
@@ -440,25 +440,25 @@
         "episodeCount_other": "{{count}} episodis"
       },
       "codec": {
-        "title": "",
-        "moviesAndTv": "",
-        "videoCodecs": "",
-        "audioCodecs": "",
-        "audioChannels": "",
+        "title": "Distribució de còdecs",
+        "moviesAndTv": "Pel·lícules / TV",
+        "videoCodecs": "Còdecs de vídeo",
+        "audioCodecs": "Còdecs d'àudio",
+        "audioChannels": "Canals d'àudio",
         "noVideo": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha contingut de vídeo",
+          "description": "Les dades de còdecs de vídeo apareixeran quan hi hagi pel·lícules o sèries a la biblioteca."
         },
         "noMusic": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha contingut musical",
+          "description": "Les dades de còdecs de música apareixeran quan hi hagi pistes de música a la biblioteca."
         }
       },
       "resolution": {
-        "tooltip": "",
-        "empty": "",
-        "itemCount_one": "",
-        "itemCount_other": ""
+        "tooltip": "<b>{{name}}</b>: {{value, number}} de {{total, number}} títols ({{percent}}%)",
+        "empty": "No hi ha dades de qualitat de {{type}}",
+        "itemCount_one": "{{count, number}} element",
+        "itemCount_other": "{{count, number}} elements"
       }
     },
     "storage": {
@@ -497,74 +497,74 @@
       "missingOnServerHint": "El servidor encara mostra aquest fitxer, però no el troba al disc. A Plex, buideu la paperera de la biblioteca per netejar-ho.",
       "copyPath": "Copia el camí del fitxer",
       "libraries": {
-        "title": "",
+        "title": "Biblioteques",
         "columns": {
-          "library": "",
-          "share": ""
+          "library": "Biblioteca",
+          "share": "Proporció"
         },
-        "serverFailed": ""
+        "serverFailed": "No s'han pogut carregar les biblioteques de {{servers}}"
       },
       "stale": {
         "tabs": {
-          "neverWatched": "",
-          "stale": ""
+          "neverWatched": "Mai vistos ({{count}})",
+          "stale": "Contingut obsolet ({{count}})"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha contingut obsolet",
+          "description": "Tot el contingut de la biblioteca s'ha vist recentment."
         },
         "columns": {
-          "staleFor": ""
+          "staleFor": "Obsolet des de fa"
         },
-        "allTypes": "",
+        "allTypes": "Tots els tipus",
         "threshold": {
-          "months3": "",
-          "months6": "",
-          "year1": "",
-          "years2": ""
+          "months3": "Sense veure des de fa 3 mesos o més",
+          "months6": "Sense veure des de fa 6 mesos o més",
+          "year1": "Sense veure des de fa 1 any o més",
+          "years2": "Sense veure des de fa 2 anys o més"
         },
         "age": {
-          "yearsMonths": "",
-          "days_one": "",
-          "days_other": "",
-          "months_one": "",
-          "months_other": "",
-          "years_one": "",
-          "years_other": ""
+          "yearsMonths": "{{years}}a {{months}}m",
+          "days_one": "{{count}} dia",
+          "days_other": "{{count}} dies",
+          "months_one": "{{count}} mes",
+          "months_other": "{{count}} mesos",
+          "years_one": "{{count}} any",
+          "years_other": "{{count}} anys"
         }
       },
-      "growthPerMonth": "",
-      "dataDaysProgress": "",
-      "recoverableSize": "",
-      "unusedSize": "",
+      "growthPerMonth": "+{{size}}/mes",
+      "dataDaysProgress": "{{days}} de {{min}} dies",
+      "recoverableSize": "{{size}} recuperables",
+      "unusedSize": "{{size}} sense utilitzar",
       "roi": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades de ROI",
+          "description": "L'anàlisi del ROI necessita l'historial de visualitzacions per calcular el valor del contingut."
         },
         "columns": {
-          "hoursPerGb": "",
-          "value": ""
+          "hoursPerGb": "Hores/GB",
+          "value": "Valor"
         },
         "category": {
-          "low": "",
-          "moderate": "",
-          "high": ""
+          "low": "Valor baix",
+          "moderate": "Moderat",
+          "high": "Valor alt"
         },
-        "deletionSuggested": ""
+        "deletionSuggested": "(es recomana suprimir-lo)"
       },
       "matchBadge": {
-        "exact": "",
-        "likely": "",
-        "possible": "",
-        "fuzzy": "",
-        "versions": "",
-        "label": ""
+        "exact": "Exacta",
+        "likely": "Probable",
+        "possible": "Possible",
+        "fuzzy": "Aproximada",
+        "versions": "Versions",
+        "label": "{{confidence}} ({{match}})"
       },
-      "groupCount_one": "",
-      "groupCount_other": "",
-      "itemCount_one": "",
-      "itemCount_other": ""
+      "groupCount_one": "{{count}} grup",
+      "groupCount_other": "{{count}} grups",
+      "itemCount_one": "{{count}} element",
+      "itemCount_other": "{{count}} elements"
     },
     "watch": {
       "watched": "Vist",
@@ -583,39 +583,39 @@
       "noDataDesc": "Les analítiques de visionament apareixeran aquí un cop s'hagi reproduït contingut. Torneu a consultar-ho després d'una mica d'activitat de visionament.",
       "failedToLoad": "No s'han pogut carregar les analítiques de visionament",
       "failedToLoadDesc": "No s'han pogut obtenir les dades de visionament.",
-      "mostWatched": "",
+      "mostWatched": "El més vist",
       "binge": {
         "columns": {
-          "show": "",
-          "servers": "",
-          "consecutive": "",
-          "bingeScore": "",
-          "maxPerDay": ""
+          "show": "Sèrie",
+          "servers": "Servidors",
+          "consecutive": "Consecutius",
+          "bingeScore": "Puntuació de marató",
+          "maxPerDay": "Màx./dia"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No s'ha detectat cap patró de marató",
+          "description": "Mireu diversos episodis seguits per veure els patrons de marató."
         },
         "tiers": {
-          "highlyAddictive": "",
-          "addictive": "",
-          "bingeable": "",
-          "casual": ""
+          "highlyAddictive": "Molt addictiva",
+          "addictive": "Addictiva",
+          "bingeable": "Enganxosa",
+          "casual": "Visionament ocasional"
         }
       },
-      "percentWatchedValue": "",
-      "avgPerItemValue": "",
+      "percentWatchedValue": "{{pct}}% vist",
+      "avgPerItemValue": "{{value}} de mitjana per element",
       "top": {
         "movies": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "No hi ha dades de visualització de pel·lícules",
+            "description": "Les estadístiques de visualització de pel·lícules apareixeran aquí quan s'hagi reproduït contingut."
           }
         },
         "shows": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "No hi ha dades de visualització de sèries",
+            "description": "Les estadístiques de visualització de sèries apareixeran aquí quan s'hagin reproduït episodis."
           }
         }
       }
@@ -680,58 +680,58 @@
     },
     "charts": {
       "storage": {
-        "historical": "",
-        "prediction": "",
-        "now": "",
-        "axis": "",
-        "range": "",
+        "historical": "Històric",
+        "prediction": "Predicció",
+        "now": "Ara",
+        "axis": "Emmagatzematge ({{unit}})",
+        "range": "Interval: {{low}} - {{high}} {{unit}}",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades d'emmagatzematge",
+          "description": "L'historial d'emmagatzematge apareixerà aquí quan estigui disponible"
         }
       },
       "qualityTimeline": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades de qualitat",
+          "description": "Les dades d'evolució de la qualitat apareixeran aquí quan estiguin disponibles"
         },
-        "titles_one": "",
-        "titles_other": ""
+        "titles_one": "{{count, number}} títol",
+        "titles_other": "{{count, number}} títols"
       },
       "monthly": {
-        "watchCount": "",
+        "watchCount": "Visualitzacions",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades mensuals",
+          "description": "Les tendències mensuals de visualització apareixeran aquí quan hi hagi dades"
         },
-        "uniqueItems_one": "",
-        "uniqueItems_other": ""
+        "uniqueItems_one": "Elements únics: {{count}}",
+        "uniqueItems_other": "Elements únics: {{count}}"
       },
       "growth": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades de creixement",
+          "description": "Les dades de creixement de la biblioteca apareixeran aquí quan estiguin disponibles"
         }
       },
       "hourly": {
-        "watches": "",
+        "watches": "Visualitzacions",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades per hores",
+          "description": "La distribució de les visualitzacions per hora apareixerà aquí quan hi hagi dades"
         }
       },
       "completion": {
-        "inProgress": "",
-        "notStarted": "",
+        "inProgress": "En curs",
+        "notStarted": "Sense començar",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades de finalització",
+          "description": "El desglossament de la finalització apareixerà aquí quan hi hagi dades de visualització"
         },
-        "tooltip_one": "",
-        "tooltip_other": ""
+        "tooltip_one": "<b>{{count}}</b> element ({{percent}}%)",
+        "tooltip_other": "<b>{{count}}</b> elements ({{percent}}%)"
       },
-      "watchesValue_one": "",
-      "watchesValue_other": ""
+      "watchesValue_one": "Visualitzacions: {{count}}",
+      "watchesValue_other": "Visualitzacions: {{count}}"
     }
   },
   "activity": {
@@ -739,22 +739,22 @@
     "concurrentStreams": "Transmissions simultànies",
     "engagementBreakdown": "Desglossament de la interacció",
     "howUsersEngage": "Com interactuen els usuaris amb el contingut",
-    "howYouEngage": "",
+    "howYouEngage": "Com interactueu amb el que mireu",
     "playsVsSessions": "Reproduccions vs. sessions",
     "playsVsSessionsDesc": "Només visionats complets: compta una reproducció quan el temps total de visionament cobreix tota la durada d'un contingut",
     "activityByDayOfWeek": "Activitat per dia de la setmana",
     "activityByHourOfDay": "Activitat per hora del dia",
     "platforms": "Plataformes",
     "streamQuality": "Qualitat de la transmissió",
-    "noEngagementData": "",
-    "noPlatformData": "",
-    "noQualityData": "",
-    "noConcurrentData": "",
-    "peakConcurrent": "",
-    "tierItems_one": "",
-    "tierItems_other": "",
-    "playsShare_one": "",
-    "playsShare_other": ""
+    "noEngagementData": "No hi ha dades d'interacció",
+    "noPlatformData": "No hi ha dades de plataformes",
+    "noQualityData": "No hi ha dades de qualitat",
+    "noConcurrentData": "No hi ha dades de transmissions simultànies",
+    "peakConcurrent": "Màxim simultani: {{value}}",
+    "tierItems_one": "{{count}} element",
+    "tierItems_other": "{{count}} elements",
+    "playsShare_one": "<b>{{count}}</b> reproducció ({{percent}}%)",
+    "playsShare_other": "<b>{{count}}</b> reproduccions ({{percent}}%)"
   },
   "violations": {
     "title": "Incompliments",
@@ -795,7 +795,7 @@
       "conditionGroup": "Grup de condicions {{index}}",
       "matched": "{{matched}}/{{total}} coincidències",
       "actual": "Real",
-      "actionResults": "",
+      "actionResults": "Accions",
       "relatedSessions_one": "{{count}} sessió relacionada",
       "relatedSessions_other": "{{count}} sessions relacionades"
     },
@@ -880,10 +880,10 @@
         "location": "Ubicació"
       },
       "download": {
-        "title": "",
-        "app": "",
-        "device": "",
-        "last24h": ""
+        "title": "Títol baixat",
+        "app": "Aplicació de baixada",
+        "device": "Dispositiu de baixada",
+        "last24h": "Baixades de les últimes 24 hores"
       },
       "trust": {
         "previous": "Puntuació anterior",
@@ -941,7 +941,7 @@
             "description": "Temps mínim entre notificacions"
           },
           "priority": {
-            "description": ""
+            "description": "L'utilitzen Pushover, Gotify, ntfy i Telegram"
           }
         },
         "ran": "S'ha enviat una notificació"
@@ -1318,7 +1318,7 @@
         "accountInactiveFor": "un compte fa {{duration}} que està inactiu",
         "accountNewDevice": "un compte reprodueix des d'un dispositiu nou",
         "accountTrustChanged": "canvia la puntuació de confiança d'un compte",
-        "accountMediaDownloaded": "",
+        "accountMediaDownloaded": "un compte baixa contingut multimèdia",
         "mediaAdded": "s'afegeix contingut multimèdia",
         "mediaUpgraded": "es millora contingut multimèdia",
         "serverDown": "cau un servidor",
@@ -1347,8 +1347,8 @@
         "travel_speed_kmh": "la velocitat de desplaçament",
         "unique_ips_in_window": "el nombre d'adreces IP",
         "unique_devices_in_window": "el nombre de dispositius",
-        "downloads_in_window": "",
-        "download_bytes_in_window": "",
+        "downloads_in_window": "el nombre de baixades",
+        "download_bytes_in_window": "les dades baixades",
         "inactive_days": "el temps des de l'última transmissió",
         "current_pause_minutes": "la pausa actual",
         "total_pause_minutes": "el temps de pausa total",
@@ -1531,12 +1531,12 @@
         "description": "Nombre de dispositius únics en el període de temps"
       },
       "downloads_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Baixades al període",
+        "description": "Nombre d'elements baixats al període"
       },
       "download_bytes_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Dades baixades al període",
+        "description": "Gigabytes baixats al període"
       },
       "inactive_days": {
         "label": "Dies d'inactivitat",
@@ -1931,9 +1931,9 @@
         "keywords": "adreces ip vpn compartició dispositius període"
       },
       "download-burst": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Ràfega de baixades",
+        "description": "Avisa quan una persona baixa més elements dels que permeteu en un dia.",
+        "keywords": "baixada sense connexió sincronització acumulació ràfega límit"
       },
       "geo-restriction": {
         "name": "Països blocats",
@@ -2098,8 +2098,8 @@
           "synonyms": "confiança, puntuació, reputació, penalització, ajustat"
         },
         "accountMediaDownloaded": {
-          "description": "",
-          "synonyms": ""
+          "description": "Un compte baixa un element a través del punt final de baixada del servidor, un cop per element.",
+          "synonyms": "baixada, sense connexió, sincronització, desar, acumulació"
         },
         "mediaAdded": {
           "description": "Un element de la biblioteca apareix en un servidor per primera vegada.",
@@ -2244,9 +2244,9 @@
         "authToken": "Testimoni d'autenticació",
         "userKey": "Clau d'usuari",
         "apiToken": "Testimoni d'API",
-        "botToken": "",
-        "chatId": "",
-        "topicId": "",
+        "botToken": "Testimoni del bot",
+        "chatId": "ID del xat",
+        "topicId": "ID del tema",
         "preset": "Proveïdor",
         "host": "Amfitrió SMTP",
         "port": "Port",
@@ -2268,7 +2268,7 @@
       },
       "hints": {
         "authTokenOptional": "Opcional per als temes públics",
-        "telegramTopic": "",
+        "telegramTopic": "Només per a grups amb fòrums. Deixeu-ho en blanc per a un xat o un canal normal.",
         "smtpPreset": "Emplena l'amfitrió, el port i la seguretat dels proveïdors habituals. Per a Amazon SES i Mailgun EU, cal afegir la regió a l'amfitrió.",
         "smtpVerifyCertificate": "Comprova el certificat TLS del servidor de correu amb una autoritat de confiança. Desactiveu-ho només per a un servidor amb un certificat autosignat, com ara un pont local: llavors qualsevol que sigui al camí entre Tracearr i el servidor de correu pot interceptar la connexió.",
         "smtpUsernameOptional": "Deixeu-ho en blanc si el servidor no necessita cap inici de sessió",
@@ -2326,7 +2326,7 @@
         "gotify": "Gotify",
         "apprise": "Apprise",
         "pushover": "Pushover",
-        "telegram": "",
+        "telegram": "Telegram",
         "email": "Correu electrònic",
         "push": "Push mòbil",
         "webToast": "Notificacions emergents del navegador"
@@ -2343,10 +2343,10 @@
     }
   },
   "impersonation": {
-    "banner": "",
-    "stop": "",
-    "stopLabel": "",
-    "stopViewing": ""
+    "banner": "Visualització com a {{name}}. Els canvis estan desactivats.",
+    "stop": "Atura",
+    "stopLabel": "Deixa de visualitzar com a {{name}}",
+    "stopViewing": "Deixa de visualitzar"
   },
   "maintenance": {
     "startingTitle": "Tracearr s'està iniciant...",
@@ -2378,7 +2378,7 @@
     "allTypes": "Tots els tipus",
     "heatmap": "Mapa de calor",
     "circles": "Cercles",
-    "viewMode": "",
+    "viewMode": "Vista de mapa",
     "streams": "transmissions",
     "locations": "ubicacions",
     "allActivity": "Tota l'activitat",
@@ -2386,11 +2386,11 @@
     "webglUnavailable": "WebGL està deshabilitat en aquest navegador",
     "webglHint": "El mapa necessita WebGL. Habiliteu-lo per a aquest lloc a la configuració del navegador.",
     "badMounts": "S'han detectat muntatges de volum incorrectes: no es garanteix el funcionament.",
-    "loadingData": "",
-    "noDataForFilters": "",
-    "totalStreams": "",
-    "streamCount_one": "",
-    "streamCount_other": ""
+    "loadingData": "S'estan carregant les dades del mapa...",
+    "noDataForFilters": "No hi ha dades d'ubicació per als filtres actuals",
+    "totalStreams": "Transmissions totals",
+    "streamCount_one": "{{count, number}} transmissió",
+    "streamCount_other": "{{count, number}} transmissions"
   },
   "devices": {
     "analyzedSessions": "Sessions analitzades",
@@ -2417,18 +2417,18 @@
     "analyzedSessionsTooltip_other": "Sessions en combinacions de dispositiu + còdec amb un mínim de {{count}} sessions i un còdec conegut. Les combinacions poc freqüents i les sessions sense informació de còdec no es compten."
   },
   "downloads": {
-    "dataDownloaded": "",
-    "peopleDownloading": "",
-    "mostDownloaded": "",
-    "unknownUser": "",
-    "appOnDevice": "",
-    "deliveredAs": "",
-    "deliveredAsFormat": "",
-    "deliveredAtBitrate": "",
-    "empty": "",
-    "panelTitle": "",
-    "requests_one": "",
-    "requests_other": ""
+    "dataDownloaded": "Dades baixades",
+    "peopleDownloading": "Persones que baixen",
+    "mostDownloaded": "El més baixat",
+    "unknownUser": "Usuari desconegut",
+    "appOnDevice": "{{app}} a {{device}}",
+    "deliveredAs": "lliurat com a {{format}} a {{bitrate}}",
+    "deliveredAsFormat": "lliurat com a {{format}}",
+    "deliveredAtBitrate": "lliurat a {{bitrate}}",
+    "empty": "No hi ha baixades en aquest interval. Les baixades són elements obtinguts amb el botó o el punt final de baixada del servidor. Plex només les informa mentre Tracearr està connectat.",
+    "panelTitle": "Baixades",
+    "requests_one": "({{count}} sol·licitud)",
+    "requests_other": "({{count}} sol·licituds)"
   },
   "statsBandwidth": {
     "dataTransferred": "Dades transferides",
@@ -2440,43 +2440,43 @@
     "dailyUsage": "Ús diari d'amplada de banda",
     "dailyUsageDesc": "Taxa de bits mitjana i nombre de sessions al llarg del temps.",
     "noData": "No hi ha dades d'amplada de banda disponibles",
-    "topPeopleTitle": "",
-    "topPeopleCaption": ""
+    "topPeopleTitle": "Persones per dades",
+    "topPeopleCaption": "Les cinc primeres en aquest interval"
   },
   "statsUsers": {
     "noActivity": "Encara no hi ha activitat",
     "noActivityDesc": "Comenceu a transmetre per veure aquí els vostres usuaris principals.",
-    "rankBy": "",
+    "rankBy": "Classifica per",
     "rank": {
-      "hours": "",
-      "transcodes": "",
-      "requests": "",
-      "lastSeen": ""
+      "hours": "Hores",
+      "transcodes": "Proporció de transcodificació",
+      "requests": "Sol·licituds",
+      "lastSeen": "Darrera activitat"
     },
     "summary": {
-      "active": "",
-      "activeOf": "",
-      "topThreeShare": "",
-      "transcoderShare": "",
-      "transcodesOf": "",
-      "quiet": "",
-      "quietDays": ""
+      "active": "Persones actives",
+      "activeOf": "de {{total}}",
+      "topThreeShare": "Proporció de les tres primeres",
+      "transcoderShare": "Proporció de qui més transcodifica",
+      "transcodesOf": "{{top}} de {{total}} transcodificacions",
+      "quiet": "Persones inactives",
+      "quietDays": "{{days}} dies o més"
     },
     "columns": {
-      "person": "",
-      "requests": "",
-      "trend": ""
+      "person": "Persona",
+      "requests": "Sol·licituds",
+      "trend": "Tendència"
     },
-    "requestsAllTime": "",
+    "requestsAllTime": "Des de sempre, sense limitar-se a l'interval seleccionat. Sol·licitat i després vist.",
     "linkTitle": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "Persones classificades per proporció de transcodificació.",
+      "requests": "Persones classificades per sol·licituds."
     },
     "linkBody": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "Totes les persones, de la proporció més alta a la més baixa.",
+      "requests": "Totes les persones, amb quantes de les seves sol·licituds s'han vist."
     },
-    "openPeople": ""
+    "openPeople": "Obre Persones"
   },
   "plexCallback": {
     "authComplete": "Autenticació completada",
@@ -2535,47 +2535,47 @@
     "of": "de",
     "logExplorerUnavailable": "L'explorador de registres només està disponible en entorns Docker",
     "tasksTab": {
-      "loading": "",
-      "failedToLoad": "",
-      "jobQueues": "",
-      "jobQueuesDesc": "",
-      "description": "",
-      "schedule": "",
-      "completed": "",
-      "scheduled": "",
-      "processing": "",
-      "onDemand": "",
-      "notInitialized": "",
-      "backgroundServices": "",
-      "backgroundServicesDesc": "",
-      "interval": "",
-      "eventConnections": "",
-      "eventConnectionsDesc": "",
-      "every": "",
-      "eventDriven": "",
+      "loading": "S'estan carregant les tasques...",
+      "failedToLoad": "No s'ha pogut carregar l'estat de les tasques",
+      "jobQueues": "Cues de tasques",
+      "jobQueuesDesc": "Cues de processament de tasques en segon pla de BullMQ",
+      "description": "Descripció",
+      "schedule": "Programació",
+      "completed": "Completades",
+      "scheduled": "Programades",
+      "processing": "En procés",
+      "onDemand": "A demanda",
+      "notInitialized": "No inicialitzat",
+      "backgroundServices": "Serveis en segon pla",
+      "backgroundServicesDesc": "Serveis en segon pla basats en intervals i en esdeveniments",
+      "interval": "Interval",
+      "eventConnections": "Connexions d'esdeveniments",
+      "eventConnectionsDesc": "Connexions d'esdeveniments de l'API pública obertes (GET /api/v2/public/events) que manté aquest procés",
+      "every": "Cada {{interval}}",
+      "eventDriven": "Basat en esdeveniments",
       "queues": {
-        "notifications": "",
-        "notificationsDesc": "",
-        "imports": "",
-        "importsDesc": "",
-        "maintenance": "",
-        "maintenanceDesc": "",
-        "librarySync": "",
-        "librarySyncDesc": "",
-        "versionCheck": "",
-        "versionCheckDesc": "",
-        "inactivityCheck": "",
-        "inactivityCheckDesc": "",
-        "backup": "",
-        "backupDesc": ""
+        "notifications": "Notificacions",
+        "notificationsDesc": "Discord, webhooks, push",
+        "imports": "Importacions",
+        "importsDesc": "Historial de Tautulli / Jellystat",
+        "maintenance": "Manteniment",
+        "maintenanceDesc": "Normalització i neteja de dades",
+        "librarySync": "Sincronització de la biblioteca",
+        "librarySyncDesc": "Sincronització de les metadades de la biblioteca",
+        "versionCheck": "Comprovació de versions",
+        "versionCheckDesc": "Comprovació de versions a GitHub",
+        "inactivityCheck": "Comprovació d'inactivitat",
+        "inactivityCheckDesc": "Supervisió de la inactivitat dels comptes",
+        "backup": "Còpia de seguretat",
+        "backupDesc": "Còpies de seguretat programades de la base de dades"
       },
-      "dlq_one": "",
-      "dlq_other": ""
+      "dlq_one": "DLQ: {{count}}",
+      "dlq_other": "DLQ: {{count}}"
     },
     "clientErrors": {
-      "title": "",
-      "description": "",
-      "empty": ""
+      "title": "Errors del navegador",
+      "description": "Errors no capturats d'aquesta pestanya des que es va carregar. No es desen.",
+      "empty": "No s'ha capturat cap error"
     }
   },
   "media": {
@@ -2586,8 +2586,8 @@
         "recentlyUpdated": "Actualitzats recentment",
         "mostPopularMovies": "Pel·lícules més populars",
         "mostPopularShows": "Sèries més populars",
-        "recentlyAddedAlbums": "",
-        "mostPlayedArtists": "",
+        "recentlyAddedAlbums": "Àlbums afegits recentment",
+        "mostPlayedArtists": "Artistes més reproduïts",
         "emptyRecentlyAdded": "No s'ha afegit res en aquest període",
         "emptyRecentlyUpdated": "No s'ha substituït res en aquest període",
         "emptyMostPopular": "Cap reproducció en aquest període",
@@ -2624,21 +2624,21 @@
     },
     "genres": {
       "cards": {
-        "withPlays": "",
-        "ofGenres": "",
-        "topFiveShare": "",
-        "largestRise": "",
-        "largestFall": ""
+        "withPlays": "Gèneres amb reproduccions",
+        "ofGenres": "de {{count}}",
+        "topFiveShare": "Proporció dels cinc primers",
+        "largestRise": "Augment més gran",
+        "largestFall": "Descens més gran"
       },
       "share": {
-        "title": "",
-        "items": "",
-        "plays": "",
-        "sortGap": "",
-        "showAll": ""
+        "title": "Proporció a la biblioteca vs. proporció de reproduccions",
+        "items": "Proporció d'elements",
+        "plays": "Proporció de reproduccions",
+        "sortGap": "Diferència",
+        "showAll": "Mostra'ls tots ({{count}})"
       },
       "trends": {
-        "title": ""
+        "title": "Tendència per gènere"
       },
       "chart": {
         "itemCount_one": "{{count}} títol",
@@ -2650,7 +2650,7 @@
           "genre": "Gènere",
           "plays": "Reproduccions",
           "watchTime": "Temps de visionament",
-          "topViewer": ""
+          "topViewer": "Espectador principal"
         }
       },
       "empty": {
@@ -2659,15 +2659,15 @@
       },
       "loadError": "No s'han pogut carregar els gèneres",
       "sheet": {
-        "description": "",
-        "whoPlays": "",
-        "ofCountedPlays": "",
-        "topTitles": "",
-        "topArtists": "",
-        "browse": "",
-        "allGenresPeak": "",
-        "artistCount_one": "",
-        "artistCount_other": ""
+        "description": "Reproduccions, espectadors i títols d'aquest gènere a l'interval seleccionat",
+        "whoPlays": "Qui el reprodueix",
+        "ofCountedPlays": "de les reproduccions comptades",
+        "topTitles": "Títols principals",
+        "topArtists": "Artistes principals",
+        "browse": "Explora aquest gènere",
+        "allGenresPeak": "pic de tots els gèneres a les {{hour}}",
+        "artistCount_one": "{{count}} artista",
+        "artistCount_other": "{{count}} artistes"
       }
     },
     "detail": {
@@ -2702,13 +2702,13 @@
       },
       "kpis": {
         "ariaLabel": "Estadístiques de visualització",
-        "yourPlays": "",
-        "yourWatchTime": "",
-        "yourListenTime": "",
-        "yourCompletion": "",
-        "lastWatched": "",
-        "lastPlayed": "",
-        "episodesOf": "",
+        "yourPlays": "Les vostres reproduccions",
+        "yourWatchTime": "El vostre temps de visualització",
+        "yourListenTime": "El vostre temps d'escolta",
+        "yourCompletion": "La vostra finalització",
+        "lastWatched": "Darrera visualització",
+        "lastPlayed": "Darrera reproducció",
+        "episodesOf": "{{watched}} de {{total}} episodis",
         "loadError": "No s'han pogut carregar les estadístiques de visualització",
         "completionLoadError": "No s'ha pogut carregar la finalització",
         "plays": {
@@ -2720,26 +2720,26 @@
         },
         "viewers": {
           "label": "Espectadors",
-          "labelMusic": "",
+          "labelMusic": "Oients",
           "detail": "a tots els servidors"
         },
         "completion": {
           "label": "Finalització mitjana",
           "detail": "{{finished}} de {{total}} han acabat tots els episodis",
           "detailMovie": "{{finished}} de {{total}} l'han vista sencera",
-          "detailMusic": ""
+          "detailMusic": "{{finished}} de {{total}} l'han escoltat fins al final"
         },
-        "watchedByOthers_one": "",
-        "watchedByOthers_other": "",
-        "playedByOthers_one": "",
-        "playedByOthers_other": ""
+        "watchedByOthers_one": "Vist per {{count}} altra persona",
+        "watchedByOthers_other": "Vist per {{count}} persones més",
+        "playedByOthers_one": "Reproduït per {{count}} altra persona",
+        "playedByOthers_other": "Reproduït per {{count}} persones més"
       },
       "watchers": {
         "title": "Espectadors",
-        "titleMusic": "",
+        "titleMusic": "Oients",
         "loadError": "No s'han pogut carregar els espectadors",
         "empty": "Encara no ho ha vist ningú.",
-        "emptyMusic": "",
+        "emptyMusic": "Encara no l'ha reproduït ningú.",
         "lastWatchedAgo": "fa {{age}}",
         "completionLabel": "{{percent}}% completat",
         "columns": {
@@ -2747,7 +2747,7 @@
           "episodes": "Episodis",
           "completion": "Finalització",
           "lastWatched": "Darrera visualització",
-          "lastPlayed": ""
+          "lastPlayed": "Darrera reproducció"
         }
       },
       "seasons": {
@@ -2765,20 +2765,20 @@
         "episodeCount_other": "{{count}} episodis"
       },
       "albums": {
-        "title": "",
-        "loadError": "",
-        "trackCount_one": "",
-        "trackCount_other": ""
+        "title": "Àlbums",
+        "loadError": "No s'han pogut carregar els àlbums",
+        "trackCount_one": "{{count}} pista",
+        "trackCount_other": "{{count}} pistes"
       },
       "album": {
-        "kind": "",
-        "loadError": "",
-        "finishedCaption": "",
-        "vsPrior30": "",
-        "tracksCaption": "",
+        "kind": "Àlbum",
+        "loadError": "No s'ha pogut carregar aquest àlbum",
+        "finishedCaption": "reproduït fins al final",
+        "vsPrior30": "respecte als 30 dies anteriors",
+        "tracksCaption": "reproduccions, de sempre",
         "columns": {
-          "title": "",
-          "length": ""
+          "title": "Títol",
+          "length": "Durada"
         }
       },
       "platforms": {
@@ -2827,8 +2827,8 @@
       "viewers_other": "{{count}} espectadors",
       "versions_one": "{{count}} versió",
       "versions_other": "{{count}} versions",
-      "albumCount_one": "",
-      "albumCount_other": ""
+      "albumCount_one": "{{count}} àlbum",
+      "albumCount_other": "{{count}} àlbums"
     },
     "grid": {
       "toolbar": {
