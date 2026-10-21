@@ -48,10 +48,10 @@
       "copyCode": "Skopiuj kod",
       "usePassword": "Zamiast tego użyj hasła",
       "useQuickConnect": "Zamiast tego użyj Szybkiego Połączenia",
-      "codeExpired": "",
-      "newCode": "",
-      "refused": "",
-      "notPermitted": ""
+      "codeExpired": "Ten kod wygasł.",
+      "newCode": "Nowy kod",
+      "refused": "Logowanie nie jest dostępne dla tego konta.",
+      "notPermitted": "Nie masz uprawnień do logowania. Skontaktuj się z właścicielem serwera."
     }
   },
   "dashboard": {
@@ -65,10 +65,10 @@
     "bandwidth": "Przepustowość",
     "noActiveStreams": "Brak aktywnych strumieni",
     "streamsAppearHere": "Aktywne strumienie pojawią się tutaj, gdy użytkownicy zaczną oglądać",
-    "dayStreak": "",
+    "dayStreak": "Seria dni",
     "view": {
-      "label": "",
-      "admin": "",
+      "label": "Widok pulpitu",
+      "admin": "Serwer",
       "me": ""
     },
     "me": {
@@ -81,8 +81,8 @@
         "browse": ""
       },
       "requests": {
-        "title": "",
-        "requestedAgo": "",
+        "title": "Twoje prośby",
+        "requestedAgo": "Zażądano {{age}} temu",
         "seeAll": "Zobacz wszystkie",
         "availableThisWeek_one": "",
         "availableThisWeek_few": "",
@@ -96,15 +96,15 @@
     },
     "resources": {
       "system": "System",
-      "perServer": "",
-      "average": ""
+      "perServer": "na serwer",
+      "average": "Średnio:"
     },
-    "unknownLocation": "",
+    "unknownLocation": "Nieznana lokalizacja",
     "unknownQuality": "Nieznana jakość",
-    "othersStreaming_one": "",
-    "othersStreaming_few": "",
-    "othersStreaming_many": "",
-    "othersStreaming_other": ""
+    "othersStreaming_one": "{{count}} inny odtwarzany strumień",
+    "othersStreaming_few": "{{count}} inne odtwarzane strumienie",
+    "othersStreaming_many": "{{count}} innych odtwarzanych strumieni",
+    "othersStreaming_other": "{{count}} innych odtwarzanych strumieni"
   },
   "yourStats": {
     "titles": "Tytuły",
@@ -116,10 +116,10 @@
       },
       "rewatcher": {
         "label": "",
-        "desc": ""
+        "desc": "Lubisz wracać do swoich ulubionych tytułów."
       },
       "sampler": {
-        "label": "",
+        "label": "Odkrywca",
         "desc": ""
       },
       "casual": {
@@ -152,7 +152,7 @@
     "longestStreak": "Najdłuższa seria",
     "firstPlay": "Pierwsze odtworzenie",
     "biggestBinge": "",
-    "topGenres": "",
+    "topGenres": "Ulubione gatunki",
     "allTimeCaption": "od początku",
     "tier": {
       "watched": "Obejrzane",
@@ -223,9 +223,9 @@
     "filterHasAccessTo": "Ma dostęp do",
     "filterHasAccessToPlaceholder": "Dowolny serwer",
     "filterHasAccessToHint": "Pokazuje osoby z aktywnym kontem na każdym wybranym serwerze.",
-    "merged": "",
-    "filterRoleAll": "",
-    "filterSignInAll": "",
+    "merged": "Scaleni",
+    "filterRoleAll": "Dowolna rola",
+    "filterSignInAll": "Dowolne logowanie",
     "filterPendingOnly": "",
     "rowActions": "",
     "menuOpenViolations": "",
@@ -261,10 +261,10 @@
     "suggestionsPairUsernameMore_few": "{{first}} i {{second}} współdzielą nazwę użytkownika, i jeszcze {{count}}",
     "suggestionsPairUsernameMore_many": "{{first}} i {{second}} współdzielą nazwę użytkownika, i jeszcze {{count}}",
     "suggestionsPairUsernameMore_other": "{{first}} i {{second}} współdzielą nazwę użytkownika, a także {{count}} więcej",
-    "pendingLink_one": "",
-    "pendingLink_few": "",
-    "pendingLink_many": "",
-    "pendingLink_other": ""
+    "pendingLink_one": "{{count}} oczekujący",
+    "pendingLink_few": "{{count}} oczekujących",
+    "pendingLink_many": "{{count}} oczekujących",
+    "pendingLink_other": "{{count}} oczekujące"
   },
   "userDetail": {
     "backToUsers": "Powrót do użytkowników",
@@ -325,7 +325,7 @@
     },
     "cards": {
       "vsPrior": "",
-      "perActiveDay": "",
+      "perActiveDay": "{{value}} na aktywny dzień",
       "finished": "",
       "abandoned": "",
       "avgBitrate": "",
@@ -344,41 +344,41 @@
       "byHour": "",
       "peak": "",
       "serverPeak": "",
-      "what": "",
-      "otherMedia": "",
-      "mostFinished": "",
-      "where": "",
-      "directPlayShare": "",
-      "localShare": "",
-      "viewAllDevices": "",
-      "allSessions": "",
-      "finishedCount_one": "",
-      "finishedCount_few": "",
-      "finishedCount_many": "",
-      "finishedCount_other": ""
+      "what": "Co",
+      "otherMedia": "Inne",
+      "mostFinished": "Najwięcej ukończonych",
+      "where": "Gdzie i na czym",
+      "directPlayShare": "{{value}}% bezpośrednich odtworzeń",
+      "localShare": "{{value}}% sesji w sieci lokalnej",
+      "viewAllDevices": "Wyświetl wszystkie urządzenia i lokalizacje",
+      "allSessions": "Wszystkie sesje",
+      "finishedCount_one": "{{count}} ukończony",
+      "finishedCount_few": "{{count}} ukończone",
+      "finishedCount_many": "{{count}} ukończonych",
+      "finishedCount_other": "{{count}} ukończonego"
     },
     "uniqueCount": "",
-    "unknownCity": "",
-    "unknownDevice": "",
-    "viewAllMore": "",
-    "adjustTrustScoreDesc": "",
-    "ipCount_one": "",
-    "ipCount_few": "",
-    "ipCount_many": "",
-    "ipCount_other": ""
+    "unknownCity": "Nieznane miasto",
+    "unknownDevice": "Nieznane urządzenie",
+    "viewAllMore": "Zobacz wszystkie (jeszcze {{count}})",
+    "adjustTrustScoreDesc": "Ustaw wynik zaufania dla @{{username}}. Zakres: 0–100.",
+    "ipCount_one": "{{count}} adres IP",
+    "ipCount_few": "{{count}} adresy IP",
+    "ipCount_many": "{{count}} adresów IP",
+    "ipCount_other": "{{count}} adresu IP"
   },
   "history": {
     "title": "Historia",
     "totalPlays": "Całkowita liczba odtworzeń",
     "uniqueTitles": "Unikalne tytuły",
     "uniqueUsers": "Unikalni użytkownicy",
-    "searchPlaceholder": "",
+    "searchPlaceholder": "Szukaj tytułów, użytkowników, lokalizacji, adresów IP...",
     "columns": {
       "duration": "",
       "progress": ""
     },
     "location": {
-      "city": "",
+      "city": "Miasto",
       "region": "",
       "country": "",
       "continent": "",
