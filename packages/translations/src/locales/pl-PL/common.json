@@ -69,7 +69,7 @@
     "hwTranscode": "Transkodowanie sprzętowe",
     "burnIn": "Wypalanie",
     "watched": "Obejrzane",
-    "played": ""
+    "played": "Odtworzono"
   },
   "severity": {
     "low": "Niska",
@@ -134,7 +134,7 @@
     "serverOwner": "Właściciel serwera",
     "resolution": "Rozdzielczość",
     "watchTime": "Czas oglądania",
-    "listenTime": "",
+    "listenTime": "Czas słuchania",
     "pausedTime": "Czas wstrzymania",
     "sessionDetails": "Szczegóły sesji",
     "recentSessions": "Ostatnie sesje",
@@ -155,12 +155,12 @@
     "transcodeReason": "Powód transkodowania",
     "loadMore": "Załaduj więcej",
     "playback": "Odtwarzanie",
-    "plays": "",
-    "weekOf": "",
-    "viewers": "",
-    "watchHours": "",
-    "completion": "",
-    "serverLegend": ""
+    "plays": "Odtworzenia",
+    "weekOf": "Tydzień {{date}}",
+    "viewers": "Widzowie",
+    "watchHours": "Godziny oglądania",
+    "completion": "Ukończenie",
+    "serverLegend": "Legenda serwerów"
   },
   "search": {
     "searchUsers": "Szukaj użytkowników...",
@@ -193,7 +193,7 @@
     "episode_plural": "Odcinki",
     "track": "Utwór",
     "track_plural": "Utwory",
-    "artist_plural": "",
+    "artist_plural": "Wykonawcy",
     "liveTV": "Telewizja na żywo",
     "photo": "Zdjęcie",
     "tv": "Seriale",
@@ -222,10 +222,10 @@
     "session_few": "{{count}} sesje",
     "session_many": "{{count}} sesji",
     "session_other": "{{count}} sesji",
-    "download_one": "",
-    "download_few": "",
-    "download_many": "",
-    "download_other": "",
+    "download_one": "{{count}} pobranie",
+    "download_few": "{{count}} pobrania",
+    "download_many": "{{count}} pobrań",
+    "download_other": "{{count}} pobrania",
     "stream_one": "{{count}} strumień",
     "stream_few": "{{count}} strumienie",
     "stream_many": "{{count}} strumieni",
@@ -307,8 +307,8 @@
     "noJobHistory": "Brak historii zadań",
     "noSessionsFound": "Nie znaleziono sesji",
     "noUserData": "Brak dostępnych danych użytkownika",
-    "noPlayData": "",
-    "noLocationData": ""
+    "noPlayData": "Brak dostępnych danych odtwarzania",
+    "noLocationData": "Brak dostępnych danych o lokalizacji"
   },
   "confirmations": {
     "unsavedChanges": "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?"
