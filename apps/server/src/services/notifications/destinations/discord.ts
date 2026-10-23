@@ -466,6 +466,27 @@ async function buildMediaMessage(
     ctx.type === 'media_added'
       ? buildMediaAddedEmbed(payload, ctx, links)
       : buildMediaUpgradedEmbed(payload, ctx, links);
+  return withPoster(embed, poster);
+}
+
+/**
+ * A stream shows the poster its Now Playing card does: the session's thumb, which for a
+ * Live TV episode with no picture of its own is already the channel logo or the show's
+ * poster. An outside URL there is fetched only as the image proxy allows
+ * (EXTERNAL_IMAGE_ORIGINS, through the media server).
+ */
+async function buildSessionMessage(
+  payload: NotificationPayload,
+  ctx: SessionContext
+): Promise<DiscordMessage> {
+  const poster = await fetchPoster(ctx.session.serverId, ctx.session.thumbPath);
+  return withPoster(buildEmbed(payload), poster);
+}
+
+function withPoster(
+  embed: DiscordEmbed,
+  poster: { data: Buffer; contentType: string } | undefined
+): DiscordMessage {
   if (!poster) return { embed };
   const filename = posterFilename(poster.contentType);
   return { embed: { ...embed, thumbnail: { url: `attachment://${filename}` } }, poster };
@@ -498,12 +519,18 @@ export function fitEmbed(embed: DiscordEmbed): DiscordEmbed {
   return body ? { ...fitted, description: body } : fitted;
 }
 
-/** Media events fetch a poster and their links; everything else renders from the payload alone. */
+/**
+ * Media events fetch a poster and their links, streams their poster; everything else
+ * renders from the payload alone.
+ */
 async function buildMessage(payload: NotificationPayload): Promise<DiscordMessage> {
+  const { context } = payload;
   const message =
-    payload.context.type === 'media_added' || payload.context.type === 'media_upgraded'
-      ? await buildMediaMessage(payload, payload.context)
-      : { embed: buildEmbed(payload) };
+    context.type === 'media_added' || context.type === 'media_upgraded'
+      ? await buildMediaMessage(payload, context)
+      : context.type === 'stream_started' || context.type === 'stream_stopped'
+        ? await buildSessionMessage(payload, context)
+        : { embed: buildEmbed(payload) };
   return { ...message, embed: fitEmbed(message.embed) };
 }
 

@@ -621,6 +621,80 @@ describe('discordType media embeds', () => {
   });
 });
 
+describe('discordType stream posters', () => {
+  afterEach(() => {
+    mockProxyImage.mockResolvedValue({ data: Buffer.alloc(0), contentType: 'image/svg+xml' });
+  });
+
+  // How the poller stores a Live TV episode from an XMLTV guide: no picture of its own and
+  // no channel logo, so its thumb is the show's poster, an outside URL.
+  const showPoster = 'https://guide.example.com/media/artwork/abc-poster.jpg?v=1';
+  const live = createMockActiveSession({
+    serverId: 'server-1',
+    mediaType: 'live',
+    mediaTitle: 'Goats, Snakes, and Dogs',
+    grandparentTitle: 'Animal Control',
+    thumbPath: showPoster,
+    channelThumb: null,
+  });
+
+  it.each(['session_started', 'session_stopped'] as const)(
+    'attaches the show poster a Live TV episode falls back to on %s',
+    async (type) => {
+      mockProxyImage.mockResolvedValue({ data: Buffer.from('jpeg'), contentType: 'image/jpeg' });
+
+      const message = await discordType.render({ type, payload: live }, config, systemCtx);
+
+      expect(mockProxyImage).toHaveBeenCalledWith(
+        expect.objectContaining({ serverId: 'server-1', imagePath: showPoster })
+      );
+      expect(message.embed.thumbnail).toEqual({ url: 'attachment://poster.jpg' });
+      expect(message.poster?.contentType).toBe('image/jpeg');
+    }
+  );
+
+  it('attaches the poster of any other stream too', async () => {
+    mockProxyImage.mockResolvedValue({ data: Buffer.from('png'), contentType: 'image/png' });
+
+    const message = await discordType.render(
+      { type: 'session_started', payload: createMockActiveSession({ serverId: 'server-1' }) },
+      config,
+      systemCtx
+    );
+
+    expect(mockProxyImage).toHaveBeenCalledWith(
+      expect.objectContaining({ serverId: 'server-1', imagePath: '/library/metadata/123/thumb' })
+    );
+    expect(message.embed.thumbnail).toEqual({ url: 'attachment://poster.png' });
+  });
+
+  it('sends the stream without a picture when the image proxy refuses the poster', async () => {
+    mockProxyImage.mockRejectedValue(
+      new Error('Image URL origin is not in EXTERNAL_IMAGE_ORIGINS')
+    );
+
+    const message = await discordType.render(
+      { type: 'session_started', payload: live },
+      config,
+      systemCtx
+    );
+
+    expect(message.poster).toBeUndefined();
+    expect(message.embed.thumbnail).toBeUndefined();
+    expect(message.embed.title).toBe('Stream Started');
+  });
+
+  it('asks for no poster when the stream has no thumb', async () => {
+    await discordType.render(
+      { type: 'session_stopped', payload: { ...createMockActiveSession(), thumbPath: null } },
+      config,
+      systemCtx
+    );
+
+    expect(mockProxyImage).not.toHaveBeenCalled();
+  });
+});
+
 describe('discord text handling', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
