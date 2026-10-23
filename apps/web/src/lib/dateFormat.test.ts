@@ -1,6 +1,7 @@
 import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   browserTimeZone,
+  dateFormatChoices,
   formatClock,
   formatCompactAge,
   formatDate,
@@ -21,6 +22,7 @@ import {
   parseChartDate,
   resolveFormatLocale,
   safeFormatDate,
+  sampleDate,
   setDateRegion,
   setTimeFormat,
   setWeekStartPref,
@@ -94,6 +96,20 @@ describe('preferences', () => {
     setWeekStartPref(1);
     expect(getWeekStart()).toBe(1);
     expect(orderedWeekdays()).toEqual([1, 2, 3, 4, 5, 6, 0]);
+  });
+});
+
+describe('date format choices', () => {
+  it('lists each format once, previewing short and medium dates, apart from automatic', () => {
+    const samples = dateFormatChoices('en', 'auto').map((choice) => choice.sample);
+    expect(new Set(samples).size).toBe(samples.length);
+    expect(samples).not.toContain(sampleDate('en', 'auto'));
+    expect(samples).toContain('17/05/2026 · 17 May 2026');
+  });
+
+  it('keeps the saved region as its own row', () => {
+    expect(dateFormatChoices('en', 'NZ').map((choice) => choice.region)).toContain('NZ');
+    expect(dateFormatChoices('en', 'US').map((choice) => choice.region)).toContain('US');
   });
 });
 

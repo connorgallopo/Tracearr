@@ -17,17 +17,16 @@ vi.mock('@tracearr/translations', () => ({
 vi.mock('@/lib/dateFormat', () => ({
   getTimeFormat: () => '12h',
   setTimeFormat: vi.fn(),
-  DATE_REGIONS: ['DE', 'US'],
-  getDateRegion: () => 'auto',
+  getDateRegion: vi.fn(() => 'auto'),
   setDateRegion: vi.fn(),
   getWeekStartPref: () => 'auto',
   setWeekStartPref: vi.fn(),
   getFormatLocale: () => 'en-US',
-  sampleDate: (_language: string, region: string) =>
-    new Intl.DateTimeFormat(region === 'auto' ? 'en-US' : `en-${region}`, {
-      dateStyle: 'short',
-      timeZone: 'UTC',
-    }).format(Date.UTC(2026, 4, 17, 12)),
+  sampleDate: () => '5/17/26 · May 17, 2026',
+  dateFormatChoices: () => [
+    { region: 'DE', sample: '17/05/2026 · 17 May 2026' },
+    { region: 'GB', sample: '5/17/26 · May 17, 2026' },
+  ],
   localeFirstDay: () => 0,
   weekdayName: (day: number) =>
     ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day],
@@ -37,7 +36,7 @@ vi.mock('@/hooks/queries', () => ({ useSettings: vi.fn() }));
 vi.mock('@/hooks/useDebouncedSave', () => ({ useDebouncedSave: vi.fn(), TEXT_INPUT_DELAY: 1000 }));
 
 import { changeLanguage } from '@tracearr/translations';
-import { setTimeFormat, setDateRegion, setWeekStartPref } from '@/lib/dateFormat';
+import { getDateRegion, setTimeFormat, setDateRegion, setWeekStartPref } from '@/lib/dateFormat';
 import { useSettings } from '@/hooks/queries';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 
@@ -95,13 +94,25 @@ describe('Locale', () => {
     expect(setTimeFormat).toHaveBeenCalledWith('24h');
   });
 
-  it('stores the chosen date format country', async () => {
+  it('stores the chosen date format', async () => {
     render(<Locale />);
 
     await userEvent.click(screen.getByRole('combobox', { name: 'general.dateFormat' }));
-    await userEvent.click(screen.getByRole('option', { name: 'Germany (17/05/2026)' }));
+    await userEvent.click(screen.getByRole('option', { name: '17/05/2026 · 17 May 2026' }));
 
     expect(setDateRegion).toHaveBeenCalledWith('DE');
+  });
+
+  it('stores automatic over a saved country that prints the same format', async () => {
+    vi.mocked(getDateRegion).mockReturnValueOnce('GB');
+    render(<Locale />);
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'general.dateFormat' }));
+    await userEvent.click(
+      screen.getByRole('option', { name: 'general.automatic (5/17/26 · May 17, 2026)' })
+    );
+
+    expect(setDateRegion).toHaveBeenCalledWith('auto');
   });
 
   it('stores the chosen first day of the week', async () => {

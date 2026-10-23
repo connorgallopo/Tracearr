@@ -22,7 +22,7 @@ import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { useSettings } from '@/hooks/queries';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 import {
-  DATE_REGIONS,
+  dateFormatChoices,
   getDateRegion,
   getFormatLocale,
   getTimeFormat,
@@ -87,13 +87,14 @@ export function Locale() {
   const [timeFormat, setTimeFormatState] = useState<TimeFormat>(getTimeFormat);
   const [dateRegion, setDateRegionState] = useState<DateRegion>(getDateRegion);
   const [weekStart, setWeekStartState] = useState<WeekStartPref>(getWeekStartPref);
-  const regionOptions = useMemo(() => {
-    const regionNames = new Intl.DisplayNames([language], { type: 'region' });
-    return DATE_REGIONS.map((region) => ({
-      value: region,
-      label: `${regionNames.of(region) ?? region} (${sampleDate(language, region)})`,
-    })).sort((a, b) => a.label.localeCompare(b.label, language));
-  }, [language]);
+  const formatOptions = useMemo(
+    () =>
+      dateFormatChoices(language, dateRegion).map(({ region, sample }) => ({
+        value: region,
+        label: sample,
+      })),
+    [language, dateRegion]
+  );
   const autoFirstDay = localeFirstDay(getFormatLocale());
   const unitSystemField = useDebouncedSave('unitSystem', settings?.unitSystem);
 
@@ -161,7 +162,7 @@ export function Locale() {
               value: 'auto',
               label: `${t('general.automatic')} (${sampleDate(language, 'auto')})`,
             },
-            ...regionOptions,
+            ...formatOptions,
           ]}
         />
 
