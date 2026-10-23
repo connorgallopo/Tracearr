@@ -18,7 +18,7 @@ vi.mock('../enrich.js', async (importOriginal) => ({
 
 import { db } from '../../../db/client.js';
 import { enrichDownload, type DownloadEnrichment } from '../enrich.js';
-import { DOWNLOAD_COLLAPSE_MS, recordDownload, type DownloadSignal } from '../recorder.js';
+import { DOWNLOAD_COLLAPSE_MS, isTrack, recordDownload, type DownloadSignal } from '../recorder.js';
 
 const SERVER = '11111111-1111-4111-8111-111111111111';
 const USER = '22222222-2222-4222-8222-222222222222';
@@ -302,5 +302,18 @@ describe('recordDownload', () => {
       serverUserId: null,
       source: 'activity_log',
     });
+  });
+});
+
+describe('isTrack', () => {
+  it('is true only when the server has a track under the rating key', async () => {
+    const [found] = selects([{ id: 'lib-1' }]);
+    expect(await isTrack(SERVER, '29969')).toBe(true);
+    const where = renderCall(found, 'where');
+    expect(where.text).toContain('library_items.media_type =');
+    expect(where.params).toEqual([SERVER, '29969', 'track']);
+
+    selects([]);
+    expect(await isTrack(SERVER, '206208')).toBe(false);
   });
 });

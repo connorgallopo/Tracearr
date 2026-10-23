@@ -51,6 +51,22 @@ export async function matchLibraryItem(
   return rows.length === 1 && rows[0] ? rows[0] : null;
 }
 
+// Verified 2026-10-23: Plexamp fetches every track it queues with ?download=1, which Plex reports as a download
+export async function isTrack(serverId: string, ratingKey: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: libraryItems.id })
+    .from(libraryItems)
+    .where(
+      and(
+        eq(libraryItems.serverId, serverId),
+        eq(libraryItems.ratingKey, ratingKey),
+        eq(libraryItems.mediaType, 'track')
+      )
+    )
+    .limit(1);
+  return row !== undefined;
+}
+
 /** Matches the library item (ratingKey, else title on Emby), collapses into the newest row within DOWNLOAD_COLLAPSE_MS, else enriches, inserts and announces the new row. */
 export async function recordDownload(signal: DownloadSignal): Promise<RecordedDownload> {
   const [open] = await db

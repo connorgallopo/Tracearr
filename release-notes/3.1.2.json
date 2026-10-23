@@ -1,0 +1,15 @@
+{
+  "version": "3.1.2",
+  "date": "2026-10-23",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "Plexamp playback no longer records every queued track as a download or trips the Download burst policy",
+      "refs": ["#1367"]
+    },
+    {
+      "type": "note",
+      "text": "updating removes the Plex track downloads already recorded, including music downloaded on purpose"
+    }
+  ]
+}
