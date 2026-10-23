@@ -18,6 +18,7 @@ durzo
 -landski Nonsense AI bug slop
 -mafyuh Slop bug report
 -nullable-eth AI Slop PR - Contributing guide ignored
+-oliviacpu CONTRIBUTING guide completely ignored - AI Slop PR opened.
 pelluch
 -pilascat ai submission
 -prueckls AI slop feature requests
