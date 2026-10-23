@@ -11,6 +11,8 @@ import type { ActiveSession, ViolationWithDetails } from '@tracearr/shared';
 import type * as NotificationQueue from '../notificationQueue.js';
 import type { DestinationRow } from '../../services/notifications/destinationStore.js';
 import type { NotificationEvent } from '../../services/notifications/events.js';
+import { createMockActiveSession } from '../../test/fixtures.js';
+import { LIVE_TV_STOP_HOLD_MS } from '../../services/notifications/liveTvWatch.js';
 
 interface MockQueue {
   name: string;
@@ -57,6 +59,18 @@ const {
   mockRender: vi.fn(),
   mockDeliver: vi.fn(),
   mockGetServerUserDisplayNames: vi.fn(),
+}));
+
+// The viewer's recorded Live TV sessions and Redis, for the Live TV watch scenarios.
+const { liveRows, redisStore, dbSelect } = vi.hoisted(() => ({
+  liveRows: [] as Array<{
+    id: string;
+    startedAt: Date;
+    stoppedAt: Date | null;
+    durationMs: number | null;
+  }>,
+  redisStore: new Map<string, string>(),
+  dbSelect: vi.fn(),
 }));
 
 vi.mock('bullmq', async (importOriginal) => ({
@@ -112,6 +126,23 @@ vi.mock('../../services/notifications/destinationStore.js', () => ({
 
 vi.mock('../../services/notifications/destinations/registry.js', () => ({
   getDestinationType: mockGetDestinationType,
+}));
+
+vi.mock('../../db/client.js', () => {
+  const chain = {
+    from: () => chain,
+    where: () => chain,
+    orderBy: () => chain,
+    limit: () => Promise.resolve(liveRows.map((r) => ({ ...r }))),
+  };
+  return { db: { select: (...args: unknown[]) => (dbSelect(...args), chain) } };
+});
+
+vi.mock('../../lib/redisShared.js', () => ({
+  getRedis: () => ({
+    mget: (...keys: string[]) => Promise.resolve(keys.map((k) => redisStore.get(k) ?? null)),
+    set: (key: string, value: string) => Promise.resolve(void redisStore.set(key, value)),
+  }),
 }));
 
 vi.mock('../../services/userService.js', () => ({
@@ -748,5 +779,193 @@ describe('failure handler', () => {
     expect(dlq().add).toHaveBeenCalledWith('dlq-violation', expect.anything(), {
       jobId: 'dlq-job-7',
     });
+  });
+});
+
+describe('Live TV watches', () => {
+  // One viewer on one TV, on Tunarr channels through Plex Live TV: each guide programme is
+  // its own Plex session, a few seconds after the last one stopped.
+  const T0 = new Date('2026-10-23T13:22:53Z').getTime();
+  const at = (seconds: number): Date => new Date(T0 + seconds * 1000);
+
+  const programme = (
+    id: string,
+    title: string,
+    start: number,
+    stop: number | null = null,
+    over: Partial<ActiveSession> = {}
+  ): ActiveSession => ({
+    ...createMockActiveSession({
+      id,
+      serverId: 'srv-1',
+      serverUserId: 'su-1',
+      deviceId: '07C84928-1045-4D41-B639-C6652CA3E7C9',
+      mediaType: 'live',
+      mediaTitle: title,
+      startedAt: at(start),
+      ...over,
+    }),
+    stoppedAt: stop === null ? null : at(stop),
+    durationMs: stop === null ? null : (stop - start) * 1000,
+  });
+
+  /** What the poller records: the row appears when the session is confirmed, and is stopped later. */
+  const record = (s: ActiveSession): void => {
+    const row = {
+      id: s.id,
+      startedAt: s.startedAt,
+      stoppedAt: s.stoppedAt,
+      durationMs: s.durationMs,
+    };
+    const i = liveRows.findIndex((r) => r.id === s.id);
+    if (i === -1) liveRows.push(row);
+    else liveRows[i] = row;
+  };
+
+  let mod: QueueModule;
+  let jobs: Array<{ name: string; data: any; opts: { jobId?: string; delay?: number } }>;
+
+  const announce = async (event: NotificationEvent): Promise<number> => {
+    mainQueue().addBulk.mockClear();
+    const count = await mod.enqueueNotification(event, { to: ['d1'] });
+    const call = mainQueue().addBulk.mock.calls[0];
+    if (call) jobs.push(...(call[0] as typeof jobs));
+    return count;
+  };
+
+  const started = (s: ActiveSession) => announce({ type: 'session_started', payload: s });
+  const stopped = (s: ActiveSession) => announce({ type: 'session_stopped', payload: s });
+
+  /** The worker runs every job due, the way BullMQ hands it over: through JSON. */
+  const runJobs = async (): Promise<void> => {
+    const due = jobs.splice(0);
+    for (const [i, job] of due.entries()) {
+      await worker().processor({ id: `job-${i}`, data: JSON.parse(JSON.stringify(job.data)) });
+    }
+  };
+
+  /** The events that reached the destination, as it rendered them. */
+  const sent = (): Array<{ type: string; payload: ActiveSession }> =>
+    mockRender.mock.calls.map((c) => c[0] as { type: string; payload: ActiveSession });
+
+  beforeEach(async () => {
+    liveRows.length = 0;
+    redisStore.clear();
+    jobs = [];
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    mod = await loadInitializedQueue();
+    mod.startNotificationWorker();
+    mockGetDestination.mockResolvedValue(destination({ id: 'd1' }));
+  });
+
+  it('holds a Live TV stop and sends a movie stop at once', async () => {
+    const movie = createMockActiveSession({ mediaType: 'movie', deviceId: 'tv-1' });
+    await stopped(movie);
+    await stopped(programme('a', 'Whacketts', 0, 1015));
+
+    expect(jobs[0]?.opts.delay).toBeUndefined();
+    expect(jobs[0]?.data.liveTvHold).toBeUndefined();
+    expect(jobs[1]?.opts.delay).toBe(LIVE_TV_STOP_HOLD_MS);
+    expect(jobs[1]?.data.liveTvHold).toBe(true);
+    expect(dbSelect).not.toHaveBeenCalled();
+  });
+
+  it('sends a stopped movie immediately, as before', async () => {
+    const movie = createMockActiveSession({ mediaType: 'movie', deviceId: 'tv-1' });
+    await started(movie);
+    await stopped({ ...movie, stoppedAt: new Date(), durationMs: 5_400_000 });
+    await runJobs();
+
+    expect(sent().map((e) => e.type)).toEqual(['session_started', 'session_stopped']);
+    expect(sent()[1]?.payload.durationMs).toBe(5_400_000);
+  });
+
+  it('says nothing when the programme changes, and one Stream Ended with the whole watch when the viewer stops', async () => {
+    // Tune in: Whacketts starts and is announced.
+    const a = programme('a', 'Whacketts', 0);
+    record(a);
+    expect(await started(a)).toBe(1);
+
+    // The guide moves on: Whacketts stops, Goats, Snakes, and Dogs starts 4 seconds later.
+    const aStopped = programme('a', 'Whacketts', 0, 40);
+    record(aStopped);
+    await stopped(aStopped);
+    const b = programme('b', 'Goats, Snakes, and Dogs', 44);
+    record(b);
+    expect(await started(b)).toBe(0);
+
+    // The hold runs out with the next programme playing: no Stream Ended.
+    await runJobs();
+    expect(sent().map((e) => e.type)).toEqual(['session_started']);
+
+    // Tune out at the end of Goats, Snakes, and Dogs.
+    const bStopped = programme('b', 'Goats, Snakes, and Dogs', 44, 1400);
+    record(bStopped);
+    await stopped(bStopped);
+    await runJobs();
+
+    expect(sent().map((e) => e.type)).toEqual(['session_started', 'session_stopped']);
+    const ended = sent()[1]?.payload;
+    expect(ended?.mediaTitle).toBe('Goats, Snakes, and Dogs');
+    expect(ended?.durationMs).toBe((40 + 1356) * 1000);
+    expect(new Date(ended?.startedAt ?? 0).getTime()).toBe(T0);
+  });
+
+  it('treats changing channel on the same TV as the same watch', async () => {
+    const a = programme('a', 'Lexx', 0, 600, { channelTitle: 'Sci-Fi' });
+    record(a);
+    await stopped(a);
+    const b = programme('b', 'Harley Quinn', 620, null, { channelTitle: 'Cartoons' });
+    record(b);
+
+    expect(await started(b)).toBe(0);
+    await runJobs();
+    expect(sent()).toEqual([]);
+  });
+
+  it('folds a programme confirmed before the last one is seen stopping', async () => {
+    const a = programme('a', 'Whacketts', 0);
+    record(a);
+    const b = programme('b', 'Goats, Snakes, and Dogs', 40);
+    record(b);
+    expect(await started(b)).toBe(0);
+
+    const aStopped = programme('a', 'Whacketts', 0, 40);
+    record(aStopped);
+    await stopped(aStopped);
+    await runJobs();
+    expect(sent()).toEqual([]);
+  });
+
+  it('announces a new watch after more than the gap', async () => {
+    const a = programme('a', 'Whacketts', 0, 600);
+    record(a);
+    await stopped(a);
+    await runJobs();
+    const b = programme('b', 'Lexx', 600 + 91);
+    record(b);
+
+    expect(await started(b)).toBe(1);
+    await runJobs();
+    expect(sent().map((e) => [e.type, e.payload.durationMs])).toEqual([
+      ['session_stopped', 600_000],
+      ['session_started', null],
+    ]);
+  });
+
+  it('still sends a held stop that a restarted worker picks up', async () => {
+    const a = programme('a', 'Whacketts', 0, 600);
+    record(a);
+    await stopped(a);
+    const held = jobs.splice(0);
+
+    // A new process: nothing held in memory, only the delayed job Redis kept.
+    mod = await loadInitializedQueue();
+    mod.startNotificationWorker();
+    jobs = held;
+    await runJobs();
+
+    expect(sent().map((e) => e.type)).toEqual(['session_stopped']);
+    expect(sent()[0]?.payload.durationMs).toBe(600_000);
   });
 });

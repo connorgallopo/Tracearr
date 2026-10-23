@@ -11,6 +11,12 @@ import {
   type NotificationSource,
 } from '../services/notifications/events.js';
 import { DELIVER_TIMEOUT_MS } from '../services/notifications/destinations/fetch.js';
+import {
+  followsLiveTvWatch,
+  liveTvStartContinues,
+  LIVE_TV_STOP_HOLD_MS,
+  resolveHeldLiveTvStop,
+} from '../services/notifications/liveTvWatch.js';
 import { getDestinationType } from '../services/notifications/destinations/registry.js';
 import {
   findDestinationsForEvent,
@@ -26,6 +32,8 @@ export interface NotificationJob {
   destinationId: string;
   source: NotificationSource;
   event: NotificationEvent;
+  /** A Live TV stop held until the viewer's next programme would have started (liveTvWatch.ts). */
+  liveTvHold?: boolean;
 }
 
 const QUEUE_NAME = 'notifications-v2';
@@ -290,13 +298,28 @@ export async function enqueueNotification(
     : await findDestinationsForEvent(eventTypeOf(event));
   if (targets.length === 0) return 0;
 
+  // A Live TV programme change is not a new stream: its start stays quiet and a stop
+  // waits to see whether the watch carries on (liveTvWatch.ts).
+  if (event.type === 'session_started' && (await liveTvStartContinues(event.payload))) {
+    console.log(
+      `[Notifications] Live TV session ${event.payload.id} continues its viewer's watch; start not announced`
+    );
+    return 0;
+  }
+  const hold = event.type === 'session_stopped' && followsLiveTvWatch(event.payload);
+
   await resolveUserNames(event);
 
   await notificationQueue.addBulk(
     targets.map((d) => ({
       name: event.type,
-      data: { destinationId: d.id, source, event } satisfies NotificationJob,
-      opts: { jobId: dedupeKey(d.id, event, source) },
+      data: {
+        destinationId: d.id,
+        source,
+        event,
+        ...(hold && { liveTvHold: true }),
+      } satisfies NotificationJob,
+      opts: { jobId: dedupeKey(d.id, event, source), ...(hold && { delay: LIVE_TV_STOP_HOLD_MS }) },
     }))
   );
 
@@ -304,7 +327,8 @@ export async function enqueueNotification(
 }
 
 async function processJob(job: Job<NotificationJob>): Promise<void> {
-  const { destinationId, source, event } = job.data;
+  const { destinationId, source } = job.data;
+  let { event } = job.data;
   const destination = await getDestination(destinationId);
   if (!destination || !destination.enabled || destination.configStatus !== 'ok') {
     console.log(
@@ -320,6 +344,17 @@ async function processJob(job: Job<NotificationJob>): Promise<void> {
     return;
   }
   if (opened.rewrap) await rewrapConfig(destination.id, opened.config);
+
+  if (job.data.liveTvHold && event.type === 'session_stopped') {
+    const payload = await resolveHeldLiveTvStop(event.payload);
+    if (!payload) {
+      console.log(
+        `[Notifications] job ${job.id}: Live TV session ${event.payload.id} was a programme change; stop not announced`
+      );
+      return;
+    }
+    event = { ...event, payload };
+  }
 
   const type = getDestinationType(destination.type);
   const ref = { id: destination.id, name: destination.name };
