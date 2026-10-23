@@ -98,6 +98,42 @@ export function isPublicHttpsUrl(value: string): boolean {
   return url.protocol === 'https:' && url.hostname !== '' && !url.username && !url.password;
 }
 
+/** Query parameters that could carry a credential, which must never reach Discord. */
+const SECRET_PARAM = /token|key|auth|sig|secret|pass/i;
+
+/**
+ * A viewer's picture Discord may fetch itself: a public https URL (a Plex account's
+ * plex.tv avatar, say). Anything that could name the media server or the user's own
+ * network (a relative path, an IP literal, a single-label or local host) or carry a
+ * credential is refused, and the message goes without it.
+ */
+export function publicPictureUrl(value: string | null | undefined): string | null {
+  if (!value || !isPublicHttpsUrl(value)) return null;
+  const url = new URL(value);
+  const host = url.hostname.toLowerCase();
+  if (
+    !host.includes('.') ||
+    host.startsWith('[') ||
+    /^[\d.]+$/.test(host) ||
+    /\.(local|lan|home|internal|localdomain|home\.arpa)$/.test(host)
+  ) {
+    return null;
+  }
+  for (const name of url.searchParams.keys()) {
+    if (SECRET_PARAM.test(name)) return null;
+  }
+  return value;
+}
+
+/** The viewer as the embed's author, with their picture when it is one Discord may fetch. */
+function viewerAuthor(
+  name: string,
+  thumbUrl: string | null | undefined
+): Pick<DiscordEmbed, 'author'> {
+  const icon = publicPictureUrl(thumbUrl);
+  return icon ? { author: { name, icon_url: icon } } : {};
+}
+
 /** Discord picks the renderer off the extension, so the name has to match the bytes. */
 const POSTER_EXTENSIONS: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -116,7 +152,7 @@ export interface DiscordEmbed {
   description?: string;
   url?: string;
   color: number;
-  author?: { name: string };
+  author?: { name: string; icon_url?: string };
   fields?: DiscordField[];
   thumbnail?: { url: string };
   footer?: { text: string };
@@ -140,14 +176,17 @@ function buildViolationEmbed(payload: NotificationPayload, ctx: ViolationContext
 
   const text = textOf(payload, { title: payload.title, message: '' });
 
+  const userName = violation.user.identityName ?? violation.user.username;
+
   return {
+    ...viewerAuthor(userName, violation.user.thumbUrl),
     title: text.title,
     ...(text.message && { description: text.message }),
     color,
     fields: [
       {
         name: 'User',
-        value: violation.user.identityName ?? violation.user.username,
+        value: userName,
         inline: true,
       },
       {
@@ -207,6 +246,7 @@ function buildSessionStartedEmbed(payload: NotificationPayload, ctx: SessionCont
   const text = textOf(payload, { title: 'Stream Started', message: '' });
 
   return {
+    ...viewerAuthor(getUserDisplayName(session), session.user.thumbUrl),
     title: text.title,
     ...(text.message && { description: text.message }),
     color: 0x3498db, // Blue
@@ -241,6 +281,7 @@ function buildSessionStoppedEmbed(payload: NotificationPayload, ctx: SessionCont
   const text = textOf(payload, { title: 'Stream Ended', message: '' });
 
   return {
+    ...viewerAuthor(getUserDisplayName(session), session.user.thumbUrl),
     title: text.title,
     ...(text.message && { description: text.message }),
     color: 0x95a5a6, // Gray

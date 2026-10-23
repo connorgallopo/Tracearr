@@ -162,6 +162,55 @@ describe('discordType.render', () => {
     expect(embed.fields?.[3]?.value).toBe('1h 2m');
   });
 
+  const avatar = 'https://plex.tv/users/abc123/avatar?c=1700000000';
+  const withAvatar = (thumbUrl: string | null) =>
+    createMockActiveSession({
+      durationMs: 60_000,
+      user: { id: 'su-1', username: 'testuser', thumbUrl, identityName: 'Test User' },
+    });
+
+  it.each(['session_started', 'session_stopped'] as const)(
+    'names the viewer with their picture on %s',
+    async (type) => {
+      const embed = await render({ type, payload: withAvatar(avatar) });
+
+      expect(embed.author).toEqual({ name: 'Test User', icon_url: avatar });
+      expect(embed.fields?.[0]).toEqual({ name: 'User', value: 'Test User', inline: true });
+    }
+  );
+
+  it('names the viewer with their picture on a violation', async () => {
+    const embed = await render({
+      type: 'violation',
+      payload: { ...violation, user: { ...violation.user, thumbUrl: avatar } },
+    });
+
+    expect(embed.author).toEqual({ name: 'Test User', icon_url: avatar });
+  });
+
+  it.each([
+    [null],
+    ['/Users/abc/Images/Primary'],
+    ['http://plex.tv/users/abc/avatar'],
+    ['https://192.168.1.10:32400/photo/:/transcode?url=/x'],
+    ['https://plex.local:32400/library/metadata/1/thumb'],
+    ['https://media/users/abc/avatar'],
+    ['https://[::1]/avatar'],
+    ['https://plex.example.com/photo?X-Plex-Token=secret'],
+    ['https://jellyfin.example.com/Users/abc/Images/Primary?api_key=secret'],
+    ['https://user:pass@plex.tv/users/abc/avatar'],
+  ])('leaves the author off when the picture is %s', async (thumbUrl) => {
+    const started = await render({ type: 'session_started', payload: withAvatar(thumbUrl) });
+    const flagged = await render({
+      type: 'violation',
+      payload: { ...violation, user: { ...violation.user, thumbUrl } },
+    });
+
+    expect(started.author).toBeUndefined();
+    expect(flagged.author).toBeUndefined();
+    expect(JSON.stringify([started, flagged])).not.toMatch(/secret|192\.168|plex\.local/);
+  });
+
   it('builds the server down embed', async () => {
     const embed = await render({
       type: 'server_down',
