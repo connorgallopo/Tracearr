@@ -49,6 +49,9 @@ services:
       # A shared user's Live TV through an iptvtunerr proxy is filed under them (its -live-viewers list)
       - IPTVTUNERR_LIVE_VIEWERS_URL=${IPTVTUNERR_LIVE_VIEWERS_URL:-}
       - IPTVTUNERR_LIVE_VIEWERS_KEY=${IPTVTUNERR_LIVE_VIEWERS_KEY:-}
+      # The name and picture (a public https URL) Discord messages are posted under
+      - DISCORD_USERNAME=${DISCORD_USERNAME:-}
+      - DISCORD_AVATAR_URL=${DISCORD_AVATAR_URL:-}
     depends_on:
       timescale:
         condition: service_healthy

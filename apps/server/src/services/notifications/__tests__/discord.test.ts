@@ -211,6 +211,7 @@ describe('discordType.render', () => {
 describe('discordType.deliver', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it('posts the embed as a Tracearr webhook message', async () => {
@@ -233,6 +234,48 @@ describe('discordType.deliver', () => {
     expect(body.embeds).toHaveLength(1);
     expect(body.embeds[0]).toMatchObject({ title: 'Stream Started', color: 0x3498db });
     expect(typeof body.embeds[0].timestamp).toBe('string');
+  });
+
+  it('posts under DISCORD_USERNAME and DISCORD_AVATAR_URL when they are set', async () => {
+    vi.stubEnv('DISCORD_USERNAME', ' Statler & Waldorf ');
+    vi.stubEnv('DISCORD_AVATAR_URL', 'https://system.example.com/avatars/statler-waldorf.png');
+    const f = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', f);
+
+    await discordType.deliver({ embed: { title: 'Stream Started', color: 1 } }, config, deliverCtx);
+
+    const body = JSON.parse(f.mock.calls[0]?.[1].body);
+    expect(body.username).toBe('Statler & Waldorf');
+    expect(body.avatar_url).toBe('https://system.example.com/avatars/statler-waldorf.png');
+  });
+
+  it.each([
+    ['http://system.example.com/a.png'],
+    ['https://user:pass@system.example.com/a.png'],
+    ['not a url'],
+    ['/avatars/a.png'],
+  ])('keeps the Tracearr picture when DISCORD_AVATAR_URL is %s', async (avatar) => {
+    vi.stubEnv('DISCORD_AVATAR_URL', avatar);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const f = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', f);
+
+    await discordType.deliver({ embed: { title: 'Stream Started', color: 1 } }, config, deliverCtx);
+
+    const body = JSON.parse(f.mock.calls[0]?.[1].body);
+    expect(body.username).toBe('Tracearr');
+    expect(body.avatar_url).toContain('raw.githubusercontent.com');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('DISCORD_AVATAR_URL'));
+  });
+
+  it('cuts DISCORD_USERNAME to the 80 characters Discord accepts', async () => {
+    vi.stubEnv('DISCORD_USERNAME', 'x'.repeat(100));
+    const f = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', f);
+
+    await discordType.test(config, deliverCtx);
+
+    expect(JSON.parse(f.mock.calls[0]?.[1].body).username).toBe('x'.repeat(80));
   });
 
   it('throws when Discord rejects the webhook', async () => {

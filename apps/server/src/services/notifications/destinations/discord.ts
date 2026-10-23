@@ -54,6 +54,49 @@ export interface DiscordConfig {
  */
 const AVATAR_URL =
   'https://raw.githubusercontent.com/connorgallopo/Tracearr/main/apps/web/public/web-app-manifest-192x192-transparent.png';
+const USERNAME = 'Tracearr';
+/** Discord refuses a webhook username longer than this. */
+const USERNAME_MAX = 80;
+
+/**
+ * The name and picture the messages are posted under: DISCORD_USERNAME and
+ * DISCORD_AVATAR_URL, else Tracearr's own. The picture must be a public https URL
+ * Discord can fetch, with no credentials; anything else is ignored with a warning.
+ */
+export function discordSender(): { username: string; avatarUrl: string } {
+  const name = (process.env.DISCORD_USERNAME ?? '').trim();
+  return {
+    username: name ? [...name].slice(0, USERNAME_MAX).join('') : USERNAME,
+    avatarUrl: senderAvatar(),
+  };
+}
+
+// The refused DISCORD_AVATAR_URL last warned about, so a bad value warns once, not per message.
+let warnedAvatar: string | null = null;
+
+function senderAvatar(): string {
+  const avatar = (process.env.DISCORD_AVATAR_URL ?? '').trim();
+  if (!avatar) return AVATAR_URL;
+  if (isPublicHttpsUrl(avatar)) return avatar;
+  if (warnedAvatar !== avatar) {
+    warnedAvatar = avatar;
+    console.warn(
+      '[Discord] Ignoring DISCORD_AVATAR_URL: it is not an https URL without credentials'
+    );
+  }
+  return AVATAR_URL;
+}
+
+/** An https URL with a host and no credentials: something Discord itself can fetch. */
+export function isPublicHttpsUrl(value: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return false;
+  }
+  return url.protocol === 'https:' && url.hostname !== '' && !url.username && !url.password;
+}
 
 /** Discord picks the renderer off the extension, so the name has to match the bytes. */
 const POSTER_EXTENSIONS: Record<string, string> = {
@@ -465,9 +508,10 @@ async function post(
   ctx: DeliverContext
 ): Promise<void> {
   const filename = message.poster && posterFilename(message.poster.contentType);
+  const sender = discordSender();
   const payload = {
-    username: 'Tracearr',
-    avatar_url: AVATAR_URL,
+    username: sender.username,
+    avatar_url: sender.avatarUrl,
     allowed_mentions: { parse: [] },
     embeds: [{ ...message.embed, timestamp: new Date().toISOString() }],
     ...(filename && { attachments: [{ id: 0, filename }] }),
