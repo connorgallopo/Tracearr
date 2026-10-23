@@ -69,3 +69,59 @@ The proxy (with `-live-viewers`) knows which Plex account is behind each Live TV
 - Limit: because of that, if the proxy can't be reached when a session is first seen (the list fetch fails), that
   session stays under the owner.
 - Sessions recorded before this change stay under the owner.
+
+### Discord posts under a chosen name and picture
+
+Every Discord message came from "Tracearr" with the upstream repo's icon, whatever the deployment wanted to call it.
+
+- `DISCORD_USERNAME` and `DISCORD_AVATAR_URL` (unset by default, which keeps Tracearr's) set the webhook's name and
+  picture for every Discord destination. The picture must be an https URL with no credentials, since Discord fetches it
+  itself; anything else is ignored with one warning. A name is cut to the 80 characters Discord accepts. Both are
+  passed through by the example compose files and listed in `docker/.env.example`.
+
+### Discord stream and violation messages show the viewer's picture
+
+A stream or violation message named the viewer only in a field.
+
+- Stream started, stream ended and violation embeds name the viewer as the embed's author, with their account picture
+  as its icon, when that picture is a public https URL Discord can fetch itself (a Plex account's
+  `https://plex.tv/users/…/avatar`). A relative path (what Jellyfin and Emby store), an IP literal, a single-label or
+  local host name, credentials, or a query parameter whose name could carry a key or token leave the author off, as
+  before, so nothing about the media server reaches Discord (`discord.ts`).
+- Media added and media upgraded keep their own author, the automation's name.
+
+### Discord stream messages carry the poster
+
+Only media added and media upgraded messages uploaded a poster, so a stream message had no picture.
+
+- Stream started and stream ended embeds upload the session's poster, the one its Now Playing card shows. For a Live TV
+  episode from an XMLTV guide that is the channel logo, else the episode's picture, else the show's poster (the first
+  patch above), so Live TV messages get the guide's show poster.
+- An outside URL is fetched only as the image proxy allows (`EXTERNAL_IMAGE_ORIGINS`, through the Plex server's photo
+  transcoder); a refused or failed fetch sends the message without a picture, as before.
+
+### A Live TV programme change isn't a stream ending and another starting
+
+Plex starts a new Live TV session (new session key, new metadata) at every guide programme boundary, so someone
+watching one Tunarr channel got a "Stream Ended" and a "Stream Started" at every programme. Tracearr records each
+programme as its own session, and that stays: the history keeps what was on. The notifications follow the watch
+instead (`liveTvWatch.ts`, used by `notificationQueue.ts`).
+
+- A watch is one account's Live TV on one device (server, server user and device id). A Live TV session that starts
+  while another of the watch is playing, or at most 90 seconds after it stopped, continues it, and its start isn't
+  sent. Changing channel on the same device continues the watch too: it is the same viewer on the same TV, and Plex's
+  Live TV sessions from Tunarr don't carry the channel's name anyway.
+- A Live TV stop is queued as a delayed job and held 150 seconds: the 90-second gap, the 30 seconds before Tracearr
+  confirms and records a new session, and slack. When the hold is over it is sent only if no other session of the
+  watch ends later. So a watch sends one Stream Ended, about the programme it ended on, with the watch's first start
+  and the summed watch time of its programmes (pauses and the gaps between programmes left out).
+- The decisions are read from the sessions table when they're made, so a restart loses nothing: the held stop is a
+  BullMQ delayed job in Redis and runs when the worker is back, at once if it's overdue. A Stream Ended that went out
+  is remembered in Redis for two days (`fork:live-tv-ended:*`), so a programme whose start is decided after its watch's
+  end was already sent (Tracearr down across the boundary) is announced as a new watch rather than folded into one
+  that was reported.
+- A failed database read sends the start, or the stop unchanged, as before. Sessions without a device id and every
+  other media type are sent as before, at once; a movie started on the same device within the hold gets its own
+  messages, and the Live TV Stream Ended can then arrive after the movie's Stream Started.
+- It applies to every destination type and to automation sends: a Stream Ended automation sees the watch's summed
+  `durationMs` and first `startedAt`.
