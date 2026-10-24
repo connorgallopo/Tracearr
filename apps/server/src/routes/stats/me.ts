@@ -15,7 +15,8 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { ownScope, scopeFragment, type Scope } from '../../lib/scope.js';
-import { countedSessionSql, MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
+import { MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment, resolveServerIds } from '../../utils/serverFiltering.js';
 import { getSetting } from '../../services/settings.js';
 import {

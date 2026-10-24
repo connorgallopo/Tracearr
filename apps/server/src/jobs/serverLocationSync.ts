@@ -6,7 +6,7 @@ import { uncapDecompressionForTx } from '../db/timescale.js';
 import { geoipService } from '../services/geoip.js';
 import { locationRanges, type LocationRange } from '../services/serverLocationRanges.js';
 import { loadServerLocations } from '../services/serverLocations.js';
-import { localSessionSql } from '../utils/localSession.js';
+import { localSessionSql } from '../db/sessions/rules.js';
 import { uuidArraySql } from '../utils/sqlArrays.js';
 import {
   drainWindowsWithBisection,

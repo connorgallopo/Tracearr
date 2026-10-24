@@ -15,7 +15,7 @@ import {
 import { listDownloadRows } from '../../services/downloads/queries.js';
 import { buildServerAccessCondition, hasServerAccess } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 import { assertInScope, type Scope } from '../../lib/scope.js';
 
 // Accept either the default db or a transaction context

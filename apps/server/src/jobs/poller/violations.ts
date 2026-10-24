@@ -9,7 +9,7 @@ import type { RunFinishedEvent, ViolationWithDetails } from '@tracearr/shared';
 import { WS_EVENTS } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { servers, serverUsers, sessions, users } from '../../db/schema.js';
-import { sessionRowById } from '../../db/sessionRow.js';
+import { sessionRowById } from '../../db/sessions/row.js';
 import type { automationRuns } from '../../db/schema.js';
 import { publishRunFinished, runFinishedOf } from '../../services/automations/runRecorder.js';
 import type { PubSubService } from '../../services/cache.js';

@@ -28,11 +28,11 @@ import {
   type Scope,
 } from '../lib/scope.js';
 import {
-  countedSessionSql,
   PLAYS_MEDIA_TYPES,
   PLAYS_MEDIA_TYPE_SQL_FILTER,
   WATCH_AND_LISTEN_MS,
 } from '../constants/index.js';
+import { countedSessionSql } from '../db/sessions/rules.js';
 
 export interface GetDashboardStatsOptions {
   /** Server IDs to filter by. undefined = all servers */

@@ -24,11 +24,8 @@ import {
   type LibraryStatsResponse,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import {
-  perResolutionBucket,
-  readResolutionCounts,
-  versionBucketFlagsJoin,
-} from '../../utils/resolutionBuckets.js';
+import { latestSnapshotPerLibrary, type LatestSnapshotRow } from '../../db/librarySnapshots.js';
+import { readResolutionCounts, versionBucketFlagsJoin } from '../../utils/resolutionBuckets.js';
 import { libraryCacheSegment, libraryFragment } from '../../lib/scope.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, dedupedStorageBytesSql } from './utils.js';
@@ -94,52 +91,32 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
         const serverFilter = libraryFragment(resolvedIds, request.scope, 'ls');
         const libraryFilter = libraryId ? sql`AND ls.library_id = ${libraryId}` : sql``;
 
-        const result = await db.execute(sql`
-          WITH latest_snapshots AS (
-            SELECT DISTINCT ON (ls.server_id, ls.library_id)
-              ls.item_count,
-              ls.total_size,
-              ls.movie_count,
-              ls.episode_count,
-              ls.show_count,
-              ${perResolutionBucket((bucket) => `ls.count_${bucket}`)},
-              ls.snapshot_time
-            FROM library_snapshots ls
-            WHERE 1=1
-              ${serverFilter}
-              ${libraryFilter}
-            ORDER BY ls.server_id, ls.library_id, ls.snapshot_time DESC
-          )
-          SELECT
-            COALESCE(SUM(item_count), 0)::int AS total_items,
-            COALESCE(SUM(total_size), 0)::bigint AS total_size_bytes,
-            COALESCE(SUM(movie_count), 0)::int AS movie_count,
-            COALESCE(SUM(episode_count), 0)::int AS episode_count,
-            COALESCE(SUM(show_count), 0)::int AS show_count,
-            ${perResolutionBucket((bucket) => `COALESCE(SUM(count_${bucket}), 0)::int AS count_${bucket}`)},
-            MAX(snapshot_time) AS as_of
-          FROM latest_snapshots
-        `);
-
-        const row = result.rows[0] as
-          | {
-              total_items: number;
-              total_size_bytes: string;
-              movie_count: number;
-              episode_count: number;
-              show_count: number;
-              as_of: string | null;
-            }
-          | undefined;
+        const latest = await latestSnapshotPerLibrary({
+          serverFragment: serverFilter,
+          libraryFilter,
+        });
+        const sum = (pick: (row: LatestSnapshotRow) => number) =>
+          latest.reduce((total, row) => total + pick(row), 0);
 
         stats = {
-          totalItems: row?.total_items ?? 0,
+          totalItems: sum((r) => r.item_count),
           totalSizeBytes: dedupedBytes,
-          movieCount: row?.movie_count ?? 0,
-          episodeCount: row?.episode_count ?? 0,
-          showCount: row?.show_count ?? 0,
-          qualityBreakdown: readResolutionCounts(row),
-          asOf: row?.as_of ?? null,
+          movieCount: sum((r) => r.movie_count),
+          episodeCount: sum((r) => r.episode_count),
+          showCount: sum((r) => r.show_count),
+          qualityBreakdown: readResolutionCounts(
+            Object.fromEntries(
+              RESOLUTION_BUCKETS.map((bucket) => [
+                `count_${bucket}`,
+                sum((r) => r[`count_${bucket}`]),
+              ])
+            )
+          ),
+          asOf: latest.reduce<string | null>(
+            (max, r) =>
+              max === null || Date.parse(r.snapshot_time) > Date.parse(max) ? r.snapshot_time : max,
+            null
+          ),
         };
       } else {
         // Multi-server: deduplicate inventory via COUNT(DISTINCT matchKey)

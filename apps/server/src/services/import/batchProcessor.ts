@@ -12,7 +12,7 @@
 
 import { db } from '../../db/client.js';
 import { sessions } from '../../db/schema.js';
-import { storedSessionRowById } from '../../db/sessionRow.js';
+import { storedSessionRowById } from '../../db/sessions/row.js';
 import { uncapDecompressionForTx } from '../../db/timescale.js';
 import { resolveImportedPlays } from '../library/importedPlayIdentity.js';
 import { normalizeClient, normalizePlatformName } from '../../utils/platformNormalizer.js';

@@ -32,7 +32,7 @@ import {
 import { runSession, violationAliasConditions } from '../../services/automations/aliasFilter.js';
 import { hasServerAccess, buildServerAccessCondition } from '../../utils/serverFiltering.js';
 import { serverOrderBy } from '../../utils/serverOrder.js';
-import { PLAY_COUNT } from '../../constants/index.js';
+import { PLAY_COUNT } from '../../db/sessions/rules.js';
 import {
   queryTerminationHistory,
   queryUserDevices,
@@ -41,7 +41,7 @@ import {
   userHistoryWindow,
 } from './queries.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 
 export const fullRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };

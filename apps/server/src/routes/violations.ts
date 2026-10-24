@@ -47,7 +47,7 @@ import {
   resolveServerIds,
   buildMultiServerCondition,
 } from '../utils/serverFiltering.js';
-import { isLocalSession } from '../utils/localSession.js';
+import { isLocalSession } from '../db/sessions/rules.js';
 import { MAX_AUTOMATION_WINDOW_HOURS } from '../jobs/poller/database.js';
 import { assertInScope, scopeSessions, type Scope } from '../lib/scope.js';
 import { runSession, violationAliasConditions } from '../services/automations/aliasFilter.js';

@@ -8,7 +8,7 @@
 
 import { createHash } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, sql, inArray, type SQL } from 'drizzle-orm';
+import { eq, sql, type SQL } from 'drizzle-orm';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
 import {
@@ -34,7 +34,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { sessions, serverUsers, servers, users } from '../db/schema.js';
-import { readSessionRow } from '../db/sessionRow.js';
+import { readSessionRow, readSessionRows, sessionRowsWhere } from '../db/sessions/row.js';
 import {
   hasServerAccess,
   resolveServerIds,
@@ -43,7 +43,7 @@ import {
 import { representativeAccountOrderSql } from '../utils/representativeAccount.js';
 import { compareNames } from '../utils/collation.js';
 import { serverOrderBy } from '../utils/serverOrder.js';
-import { isLocalSession, localSessionSql } from '../utils/localSession.js';
+import { isLocalSession, localSessionSql } from '../db/sessions/rules.js';
 import { playbackDecisionSql, subtitleBurnInSql } from '../utils/playbackDecisionSql.js';
 import { terminateSession } from '../services/termination.js';
 import { getCacheService } from '../services/cache.js';
@@ -1764,27 +1764,21 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       return reply.badRequest('ids array is required');
     }
 
-    // Verify access to all sessions
-    const sessionDetails = await db
-      .select({
-        id: sessions.id,
-        serverId: sessions.serverId,
-      })
-      .from(sessions)
-      .where(inArray(sessions.id, body.ids));
+    const sessionDetails = await readSessionRows(body.ids, (where) =>
+      db
+        .select({ id: sessions.id, serverId: sessions.serverId, startedAt: sessions.startedAt })
+        .from(sessions)
+        .where(where)
+    );
 
-    // Filter to only accessible sessions
-    const accessibleIds = sessionDetails
-      .filter((s) => hasServerAccess(authUser, s.serverId))
-      .map((s) => s.id);
+    const accessibleRows = sessionDetails.filter((s) => hasServerAccess(authUser, s.serverId));
 
-    if (accessibleIds.length === 0) {
+    if (accessibleRows.length === 0) {
       return { success: true, deleted: 0 };
     }
 
-    // Bulk delete sessions
-    await db.delete(sessions).where(inArray(sessions.id, accessibleIds));
+    await db.delete(sessions).where(sessionRowsWhere(accessibleRows));
 
-    return { success: true, deleted: accessibleIds.length };
+    return { success: true, deleted: accessibleRows.length };
   });
 };

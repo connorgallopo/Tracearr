@@ -9,7 +9,7 @@ import { createRawPgClient, db, recreatePool } from './client.js';
 import { sql, type SQL } from 'drizzle-orm';
 import type pg from 'pg';
 import { PRIMARY_MEDIA_TYPES_SQL_LITERAL } from '../constants/mediaTypes.js';
-import { countedSession, countedSessionSql } from '../constants/sessions.js';
+import { countedSession, countedSessionSql } from './sessions/rules.js';
 
 /**
  * Schema version for continuous aggregate definitions.

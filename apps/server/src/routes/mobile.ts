@@ -46,7 +46,7 @@ import {
   sessions,
   authSessions,
 } from '../db/schema.js';
-import { readSessionRow } from '../db/sessionRow.js';
+import { readSessionRow } from '../db/sessions/row.js';
 import { getCacheService } from '../services/cache.js';
 import { getAuth } from '../lib/auth.js';
 import { hasPermission } from '../lib/scope.js';

@@ -33,7 +33,7 @@ export {
   createInsertBatchCollector,
   createUpdateBatchCollector,
 } from './batchProcessor.js';
-export { storedSessionRowById } from '../../db/sessionRow.js';
+export { storedSessionRowById } from '../../db/sessions/row.js';
 
 // Progress Tracking
 export {

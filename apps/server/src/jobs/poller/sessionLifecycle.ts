@@ -18,7 +18,7 @@ import {
 import { and, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { automationRuns, serverUsers, sessions, users } from '../../db/schema.js';
-import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessionRow.js';
+import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessions/row.js';
 import { toRuleSession } from '../../services/automations/events/contextAssembly.js';
 import { dispatch } from '../../services/automations/events/dispatcher.js';
 import { matchesTrigger } from '../../services/automations/events/evaluate.js';
@@ -33,7 +33,7 @@ import {
   type SessionGeo,
   withLocalFlag,
 } from '../../services/serverLocations.js';
-import { isLocalSession } from '../../utils/localSession.js';
+import { isLocalSession } from '../../db/sessions/rules.js';
 import { clearDbWriteTracking } from './dbWriteThrottle.js';
 import { pickStreamDetailFields } from './sessionMapper.js';
 import {

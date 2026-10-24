@@ -23,7 +23,7 @@ import {
   createTestSession,
   createTestLibraryItem,
 } from '@tracearr/test-utils/factories';
-import { countedSessionSql } from '../../src/constants/index.js';
+import { countedSessionSql } from '../../src/db/sessions/rules.js';
 import { db } from '../../src/db/client.js';
 import { users, media, sessions, libraryItems } from '../../src/db/schema.js';
 import authPlugin from '../../src/plugins/auth.js';

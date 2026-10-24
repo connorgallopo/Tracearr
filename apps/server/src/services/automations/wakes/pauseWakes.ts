@@ -2,7 +2,7 @@ import { and, eq, isNotNull, isNull } from 'drizzle-orm';
 import type { EngineAutomation } from '@tracearr/shared';
 import { db } from '../../../db/client.js';
 import { sessions } from '../../../db/schema.js';
-import { sessionRowById } from '../../../db/sessionRow.js';
+import { sessionRowById } from '../../../db/sessions/row.js';
 import { getActiveAutomations, onActiveAutomationsRefill } from '../../../jobs/poller/database.js';
 import { broadcastViolations } from '../../../jobs/poller/violations.js';
 import { automationsLogger } from '../../../utils/logger.js';

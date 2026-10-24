@@ -17,7 +17,7 @@ import { db } from '../client.js';
 import { servers } from '../schema.js';
 import { runServerLocationSyncWalk } from '../../jobs/serverLocationSync.js';
 import { getServerLocations, replaceServerLocations } from '../../services/serverLocations.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 import { compressSessionChunks } from '../../test/compressChunks.js';
 
 const DAY = 24 * 60 * 60 * 1000;

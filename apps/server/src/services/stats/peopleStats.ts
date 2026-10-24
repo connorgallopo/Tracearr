@@ -18,13 +18,13 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { serverUsers, servers } from '../../db/schema.js';
-import { countedSessionSql } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 import {
   buildMultiServerFragment,
   buildServerAccessCondition,
 } from '../../utils/serverFiltering.js';
 import { likePattern } from '../../utils/listQuery.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { serverUserIdAnyFragment } from '../../routes/users/queries.js';
 import { getBucketInterval } from '../../routes/stats/plays.js';

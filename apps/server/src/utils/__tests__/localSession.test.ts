@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { renderSql } from '../../test/helpers.js';
-import { isLocalSession, localSessionSql, type LocalSessionFields } from '../localSession.js';
+import {
+  isLocalSession,
+  localSessionSql,
+  type LocalSessionFields,
+} from '../../db/sessions/rules.js';
 
 function row(overrides: Partial<LocalSessionFields>): LocalSessionFields {
   return { isLocal: null, geoCountry: null, geoCity: null, geoLat: null, ...overrides };

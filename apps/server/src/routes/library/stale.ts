@@ -19,7 +19,7 @@ import {
   libraryStaleQuerySchema,
   type LibraryStaleQueryInput,
 } from '@tracearr/shared';
-import { countedSessionSql } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { resolutionRankSql } from '../../utils/resolutionBuckets.js';

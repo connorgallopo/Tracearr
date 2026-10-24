@@ -18,7 +18,7 @@ import {
 } from '@tracearr/shared';
 import { sql, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
-import { countedSessionSql } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { buildAvatarUrl, buildPosterUrl } from '../../services/imageProxy.js';
 import { encodeCursor } from '../../utils/cursor.js';

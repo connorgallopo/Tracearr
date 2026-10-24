@@ -36,7 +36,8 @@ import {
 import { and, desc, eq, gte, inArray, isNotNull, isNull, sql, type SQL } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
-import { PLAY_COUNT } from '../constants/index.js';
+import { readSessionRowOrActive } from '../db/sessions/row.js';
+import { PLAY_COUNT } from '../db/sessions/rules.js';
 import { db } from '../db/client.js';
 import {
   automations,
@@ -1003,17 +1004,20 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       const activeSession = activeSessions.find((s) => s.id === sessionId);
 
       if (!activeSession) {
-        const dbSession = await db
-          .select({ id: sessions.id, state: sessions.state })
-          .from(sessions)
-          .where(eq(sessions.id, sessionId))
-          .limit(1);
+        const dbSession = await readSessionRowOrActive(sessionId, null, (where) =>
+          db
+            .select({ id: sessions.id, state: sessions.state })
+            .from(sessions)
+            .where(where)
+            .limit(1)
+            .then((rows) => rows[0])
+        );
 
-        if (!dbSession[0]) {
+        if (!dbSession) {
           return reply.notFound('Session not found');
         }
 
-        if (dbSession[0].state === 'stopped') {
+        if (dbSession.state === 'stopped') {
           return reply.conflict('Session already stopped');
         }
 

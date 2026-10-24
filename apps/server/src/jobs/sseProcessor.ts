@@ -16,7 +16,11 @@ import { and, eq, isNull, type SQL } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client.js';
 import { servers, serverUserExternalAliases, serverUsers, sessions, users } from '../db/schema.js';
-import { ACTIVE_SESSION_CHUNK_BOUND_MS, readSessionRow, sessionRowById } from '../db/sessionRow.js';
+import {
+  ACTIVE_SESSION_CHUNK_BOUND_MS,
+  readSessionRow,
+  sessionRowById,
+} from '../db/sessions/row.js';
 import { getGeoIPSettings } from '../routes/settings.js';
 import type { CacheService, PubSubService } from '../services/cache.js';
 import { pollAllDownloads } from '../services/downloads/activityLogPoll.js';

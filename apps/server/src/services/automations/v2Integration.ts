@@ -10,7 +10,7 @@ import { sql } from 'drizzle-orm';
 import { REDIS_KEYS } from '@tracearr/shared';
 import { db, type Executor } from '../../db/client.js';
 import { ruleActionResults } from '../../db/schema.js';
-import { readSessionRow } from '../../db/sessionRow.js';
+import { readSessionRow } from '../../db/sessions/row.js';
 import { automationsLogger } from '../../utils/logger.js';
 import { applyTrustChange, type TrustChange } from '../userService.js';
 import { dispatchTrustChanged } from './events/producers.js';

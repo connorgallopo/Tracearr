@@ -24,7 +24,7 @@ import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { scopeSessionsRaw } from '../../lib/scope.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 import { resolveDateRange } from './utils.js';
 
 /**

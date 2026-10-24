@@ -12,7 +12,8 @@ import { db } from '../../db/client.js';
 import { resolveDateRange } from './utils.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { scopedServerFragment, viewScope } from '../../lib/scope.js';
-import { countedSessionSql, MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
+import { MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 
 export const contentRoutes: FastifyPluginAsync = async (app) => {
   const readStats = { preHandler: [app.requirePermission('stats', 'read')] };

@@ -10,10 +10,10 @@
 
 import { and, eq, isNull, sql, type SQL } from 'drizzle-orm';
 import type { WatchedState } from '@tracearr/shared';
-import { countedSessionSql } from '../../constants/index.js';
+import { countedSessionSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { media, servers } from '../../db/schema.js';
-import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { buildMultiServerFragment, serverIdCondition } from '../../utils/serverFiltering.js';
 import {
   libraryFragment,
   scopeFragment,
@@ -132,16 +132,6 @@ export function scopeSessionConditions(scope: MediaScope): SQL[] {
     return [sql`s.show_media_id IN (${idList(scope.aliases)})`];
   }
   return [sql`s.media_id IN (${idList(scope.aliases)})`];
-}
-
-/** Bare boolean condition (no leading AND) for use in a conditions[] array. */
-function buildServerAuthCondition(serverIds: string[] | undefined, columnRef: string): SQL | null {
-  if (serverIds === undefined) return null;
-  const col = sql.raw(columnRef);
-  if (serverIds.length === 0) return sql`false`;
-  if (serverIds.length === 1) return sql`${col} = ${serverIds[0]}`;
-  const ids = serverIds.map((id) => sql`${id}`);
-  return sql`${col} IN (${sql.join(ids, sql`, `)})`;
 }
 
 export interface AvailabilityRow {
@@ -928,7 +918,7 @@ export async function getMediaHistoryPage(
 ): Promise<Awaited<ReturnType<typeof runHistoryPage>>> {
   const { scope, pageSize, cursorValue, serverIds, rowScope } = args;
   const conditions = scopeSessionConditions(scope);
-  const authCondition = buildServerAuthCondition(serverIds, 's.server_id');
+  const authCondition = serverIdCondition(serverIds, 's.server_id');
   if (authCondition) conditions.push(authCondition);
   const ownRows = scopeSessionsRaw(rowScope, sql`s.server_user_id`);
   if (ownRows) conditions.push(ownRows);

@@ -1,5 +1,5 @@
 import { sql, type SQL } from 'drizzle-orm';
-import { countedSessionSql } from '../constants/index.js';
+import { countedSessionSql } from '../db/sessions/rules.js';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
 import { getSessionChunkRanges, uncapDecompressionForTx } from '../db/timescale.js';

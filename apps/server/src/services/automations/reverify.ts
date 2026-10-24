@@ -50,7 +50,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { automations } from '../../db/schema.js';
-import { readSessionRow } from '../../db/sessionRow.js';
+import { readSessionRow } from '../../db/sessions/row.js';
 import { getCacheService } from '../cache.js';
 import {
   batchGetIdentityServerUserIds,
@@ -65,7 +65,7 @@ import { gracePeriodSessionIds } from '../../jobs/poller/processor.js';
 import { buildRuleContextSessions } from './events/contextAssembly.js';
 import { terminateSession } from '../termination.js';
 import { automationsLogger } from '../../utils/logger.js';
-import { isLocalSession } from '../../utils/localSession.js';
+import { isLocalSession } from '../../db/sessions/rules.js';
 import { evaluateRulesAsync } from './engine.js';
 import type { EvaluationContext } from './types.js';
 

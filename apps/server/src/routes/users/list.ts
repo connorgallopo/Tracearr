@@ -62,7 +62,7 @@ import { getSetting } from '../../services/settings.js';
 import { disconnectUserSockets } from '../../websocket/index.js';
 import { parseDateString } from '../../utils/parsing.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
-import { PLAY_COUNT } from '../../constants/index.js';
+import { PLAY_COUNT } from '../../db/sessions/rules.js';
 import { VIOLATION_ALIAS_SQL } from '../../services/automations/aliasFilter.js';
 import { userHistoryWindow } from './queries.js';
 

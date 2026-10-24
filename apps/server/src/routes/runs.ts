@@ -33,7 +33,7 @@ import {
   sessions,
   users,
 } from '../db/schema.js';
-import { readSessionRow } from '../db/sessionRow.js';
+import { readSessionRow } from '../db/sessions/row.js';
 import {
   buildOrderBy,
   utcDayEnd,
@@ -42,7 +42,7 @@ import {
   type SortKey,
 } from '../utils/listQuery.js';
 import { buildMultiServerCondition, resolveServerIds } from '../utils/serverFiltering.js';
-import { isLocalSession } from '../utils/localSession.js';
+import { isLocalSession } from '../db/sessions/rules.js';
 import type { PgSelect } from 'drizzle-orm/pg-core';
 
 const runIdParamSchema = z.object({ id: uuidSchema });

@@ -9,8 +9,9 @@
  * 5. Report progress via callback for real-time updates
  */
 
-import { eq, and, inArray, notInArray, sql, gte, lt, desc, isNull } from 'drizzle-orm';
+import { eq, and, inArray, notInArray, sql, gte, lt, isNull } from 'drizzle-orm';
 import { db } from '../db/client.js';
+import { latestSnapshotFor } from '../db/librarySnapshots.js';
 import {
   servers,
   libraryItems,
@@ -2233,15 +2234,7 @@ export class LibrarySyncService {
 
     if (existing) return { id: existing.id };
 
-    // Find the most recent snapshot for this library
-    const [latest] = await db
-      .select()
-      .from(librarySnapshots)
-      .where(
-        and(eq(librarySnapshots.serverId, serverId), eq(librarySnapshots.libraryId, libraryId))
-      )
-      .orderBy(desc(librarySnapshots.snapshotTime))
-      .limit(1);
+    const latest = await latestSnapshotFor(serverId, libraryId);
 
     if (!latest) return null;
 

@@ -46,7 +46,7 @@ import { WS_EVENTS, resolutionDisplayName, RESOLUTION_TIERS } from '@tracearr/sh
 import { sql, isNotNull, isNull, inArray, or, and, eq, ne } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { servers, sessions, serverUsers } from '../db/schema.js';
-import { storedSessionRowById } from '../db/sessionRow.js';
+import { storedSessionRowById } from '../db/sessions/row.js';
 import { normalizeClient, normalizePlatformName } from '../utils/platformNormalizer.js';
 import {
   bucketMembershipColumns,

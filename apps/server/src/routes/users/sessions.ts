@@ -9,14 +9,14 @@ import { sql } from 'drizzle-orm';
 import { userIdParamSchema, identityScopedPaginationSchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { sessions } from '../../db/schema.js';
-import { PLAY_COUNT } from '../../constants/index.js';
+import { PLAY_COUNT } from '../../db/sessions/rules.js';
 import {
   resolveIdentityScopedServerUserIds,
   serverUserIdAnyFragment,
   userHistoryWindow,
 } from './queries.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
-import { localSessionSql } from '../../utils/localSession.js';
+import { localSessionSql } from '../../db/sessions/rules.js';
 
 export const sessionsRoutes: FastifyPluginAsync = async (app) => {
   const readSessions = { preHandler: [app.requirePermission('sessions', 'read')] };

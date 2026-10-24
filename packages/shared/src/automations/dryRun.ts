@@ -6,8 +6,11 @@ import type { TriggerType } from './triggers.js';
 
 export const dryRunRequestSchema = z.object({
   definition: createAutomationSchema,
-  /** One session to check instead of the live set; a run's session id, when it had one. */
-  sample: z.object({ sessionId: uuidSchema }).optional(),
+  /**
+   * One session to check instead of the live set; a run's session id, when it had one, and its
+   * start when known, which bounds the read.
+   */
+  sample: z.object({ sessionId: uuidSchema, startedAt: z.coerce.date().optional() }).optional(),
 });
 export type DryRunRequest = z.infer<typeof dryRunRequestSchema>;
 

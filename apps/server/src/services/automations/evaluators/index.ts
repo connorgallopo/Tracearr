@@ -17,7 +17,7 @@ import type {
 import { isIpInCidr, toNetworkKey, unmapIpv4Mapped } from '../../../utils/ip.js';
 import { automationsLogger } from '../../../utils/logger.js';
 import { LOCAL_NETWORK_COUNTRY, normalizeToCountryCode } from '../../../utils/country.js';
-import { isLocalSession } from '../../../utils/localSession.js';
+import { isLocalSession } from '../../../db/sessions/rules.js';
 import { normalizeResolution } from '../../../utils/resolutionNormalizer.js';
 import { countDownloads, sumDownloadBytes } from '../../downloads/queries.js';
 import { geoipService } from '../../geoip.js';

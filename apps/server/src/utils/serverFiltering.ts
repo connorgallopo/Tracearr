@@ -164,16 +164,28 @@ export function buildMultiServerCondition(
 }
 
 /**
+ * Bare predicate, no leading AND, for a raw column reference: undefined for every server,
+ * `false` for none, = or IN otherwise.
+ */
+export function serverIdCondition(
+  resolvedIds: string[] | undefined,
+  columnRef: string
+): SQL | undefined {
+  if (resolvedIds === undefined) return undefined;
+  const col = sql.raw(columnRef);
+  if (resolvedIds.length === 0) return sql`false`;
+  if (resolvedIds.length === 1) return sql`${col} = ${resolvedIds[0]}`;
+  const ids = resolvedIds.map((id) => sql`${id}`);
+  return sql`${col} IN (${sql.join(ids, sql`, `)})`;
+}
+
+/**
  * Raw SQL fragment version of multi-server filtering for template literal queries.
  */
 export function buildMultiServerFragment(
   resolvedIds: string[] | undefined,
   columnRef = 'server_id'
 ): SQL {
-  const col = sql.raw(columnRef);
-  if (resolvedIds === undefined) return sql``;
-  if (resolvedIds.length === 0) return sql`AND false`;
-  if (resolvedIds.length === 1) return sql`AND ${col} = ${resolvedIds[0]}`;
-  const ids = resolvedIds.map((id) => sql`${id}`);
-  return sql`AND ${col} IN (${sql.join(ids, sql`, `)})`;
+  const condition = serverIdCondition(resolvedIds, columnRef);
+  return condition ? sql`AND ${condition}` : sql``;
 }

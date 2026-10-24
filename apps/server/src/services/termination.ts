@@ -7,7 +7,7 @@
 
 import { db } from '../db/client.js';
 import { terminationLogs, sessions } from '../db/schema.js';
-import { readSessionRow, sessionRowById } from '../db/sessionRow.js';
+import { readSessionRow, sessionRowById } from '../db/sessions/row.js';
 import { createMediaServerClient } from './mediaServer/index.js';
 import { getCacheService, getPubSubService } from './cache.js';
 import { toRuleSession } from './automations/events/contextAssembly.js';

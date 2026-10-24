@@ -1,6 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../client.js', () => ({
@@ -8,26 +7,8 @@ vi.mock('../client.js', () => ({
 }));
 
 import { renderSql } from '../../test/helpers.js';
-import { sessionRowById, storedSessionRowById } from '../sessionRow.js';
-
-const SRC = fileURLToPath(new URL('../..', import.meta.url));
-
-function sourceFiles(): string[] {
-  return readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-    .map((path) => path.split('\\').join('/'))
-    .filter(
-      (path) =>
-        path.endsWith('.ts') &&
-        !path.endsWith('.test.ts') &&
-        !path.includes('__tests__/') &&
-        !path.startsWith('test/') &&
-        path !== 'db/sessionRow.ts'
-    );
-}
-
-function lineOf(text: string, index: number): number {
-  return text.slice(0, index).split('\n').length;
-}
+import { SERVER_SRC as SRC, lineOf, sourceFiles } from '../../test/sourceFiles.js';
+import { sessionRowById, sessionRowsWhere, storedSessionRowById } from '../sessions/row.js';
 
 const isoParams = (params: unknown[]) =>
   params.map((param) => (param instanceof Date ? param.toISOString() : param));
@@ -71,8 +52,14 @@ describe('sessionRowById', () => {
     ]);
   });
 
-  // inArray(sessions.id, ...) writes are out of scope: they act on a set the user picked
-  // (routes/sessions.ts bulk delete) with no started_at to bound by.
+  it('an empty row set matches nothing instead of binding an invalid start', () => {
+    const { sql, params } = renderSql(sessionRowsWhere([]));
+    expect(sql).toBe('false');
+    expect(params).toEqual([]);
+  });
+
+  // inArray(sessions.id, ...) writes are out of scope here; the bulk delete in routes/sessions.ts
+  // bounds its set through sessionRowsWhere.
   it('every drizzle write to sessions goes through sessionRowById or its stored variant', () => {
     const offenders: string[] = [];
     for (const path of sourceFiles()) {

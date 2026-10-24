@@ -24,7 +24,7 @@ import {
   type TrendBucket,
   type TrendPoint,
 } from '@tracearr/shared';
-import { countedSessionSql, playCountSql } from '../../constants/index.js';
+import { countedSessionSql, playCountSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, ceilToUtcDay, resolveLibraryWindow } from './utils.js';

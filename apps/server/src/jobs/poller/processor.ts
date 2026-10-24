@@ -27,7 +27,7 @@ import {
   sessions,
   users,
 } from '../../db/schema.js';
-import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessionRow.js';
+import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessions/row.js';
 import { getGeoIPSettings } from '../../routes/settings.js';
 import { isMaintenance } from '../../serverState.js';
 import { isLeader } from '../../services/leaderLease.js';
