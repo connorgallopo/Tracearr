@@ -16,6 +16,26 @@
       "text": "duplicate fuzzy matches below 90% show as Likely or Possible instead of Exact"
     },
     {
+      "type": "fix",
+      "text": "Stale Content shows the library name and counts plays on merged and re-added titles"
+    },
+    {
+      "type": "fix",
+      "text": "show stats completion rates and binge scores for a date range or a member no longer read low"
+    },
+    {
+      "type": "fix",
+      "text": "newsletter Most Watched no longer counts starts under two minutes as plays"
+    },
+    {
+      "type": "fix",
+      "text": "library status counts respect a member's library access"
+    },
+    {
+      "type": "fix",
+      "text": "Media Overview shelves show a show's total size and best resolution"
+    },
+    {
       "type": "improved",
       "text": "History opens faster on long watch histories, and its filter dropdowns stop re-querying on every visit"
     },

@@ -621,10 +621,11 @@ export const engagementRoutes: FastifyPluginAsync = async (app) => {
             SUM(total_session_count) AS total_sessions,
             MAX(content_duration_ms) AS content_duration_ms,
             CASE
-              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 1.5 THEN 'rewatched'
-              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 0.9 THEN 'finished'
-              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 0.7 THEN 'completed'
-              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 0.25 THEN 'engaged'
+              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 2.0 THEN 'rewatched'
+              WHEN COALESCE(MAX(max_progress_ms), 0) >= MAX(content_duration_ms) * 0.85 THEN 'watched'
+              WHEN SUM(watched_ms) >= MAX(content_duration_ms) * 0.85 THEN 'watched'
+              WHEN GREATEST(COALESCE(MAX(max_progress_ms), 0), SUM(watched_ms)) >= MAX(content_duration_ms) * 0.5 THEN 'engaged'
+              WHEN GREATEST(COALESCE(MAX(max_progress_ms), 0), SUM(watched_ms)) >= MAX(content_duration_ms) * 0.2 THEN 'sampled'
               WHEN SUM(valid_session_count) >= 1 THEN 'sampled'
               ELSE 'abandoned'
             END AS engagement_tier

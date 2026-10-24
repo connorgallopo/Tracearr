@@ -581,7 +581,39 @@ export function albumCountSql(artistIdCol: SQL, serverFragmentLi: SQL): SQL {
   )`;
 }
 
-/** Attaches the per-row servers json_agg, poster pick and, for artists, album count to a page CTE. */
+/**
+ * The per-row servers json_agg and poster pick for a media row aliased `rowAlias`. A show's
+ * copies carry no files, so its size and best resolution roll up its episodes.
+ */
+export function rowDecorationsSql(
+  rowAlias: string,
+  serverFragmentLi: SQL,
+  posterOrderFragment: SQL
+): SQL {
+  const row = sql.raw(rowAlias);
+  return sql`
+      (SELECT json_agg(json_build_object(
+          'serverId', li.server_id, 'addedAt', li.created_at,
+          'videoResolution', CASE WHEN ${row}.media_type = 'show' THEN (
+            SELECT v.video_resolution ${episodeVersionsScope(`${rowAlias}.id`)}
+              AND v.video_resolution IS NOT NULL
+            ORDER BY ${resolutionRankSql('v.video_resolution')} DESC LIMIT 1
+          ) ELSE li.video_resolution END,
+          'fileSize', CASE WHEN ${row}.media_type = 'show' THEN (
+            SELECT SUM(v.file_size) ${episodeVersionsScope(`${rowAlias}.id`)} AND v.file_size IS NOT NULL
+          ) ELSE li.file_size END,
+          'versionCount', li.version_count)
+          ORDER BY li.created_at DESC)
+       FROM library_items li
+       WHERE li.media_id = ${row}.id AND li.removed_at IS NULL ${serverFragmentLi}) AS servers,
+      (SELECT json_build_object('thumbPath', li.thumb_path, 'dominantColor', li.dominant_color,
+                                'serverId', li.server_id)
+       FROM library_items li
+       WHERE li.media_id = ${row}.id AND li.removed_at IS NULL AND li.thumb_path IS NOT NULL ${serverFragmentLi}
+       ${posterOrderFragment} LIMIT 1) AS poster_copy`;
+}
+
+/** Attaches the row decorations and, for artists, album count to a page CTE. */
 function withRowDecorations(
   type: LibraryMediaType,
   pageCte: SQL,
@@ -592,26 +624,7 @@ function withRowDecorations(
     type === 'artist' ? sql`, ${albumCountSql(sql`p.id`, serverFragmentLi)} AS album_count` : sql``;
   return sql`
     ${pageCte}
-    SELECT p.*,
-      (SELECT json_agg(json_build_object(
-          'serverId', li.server_id, 'addedAt', li.created_at,
-          'videoResolution', CASE WHEN p.media_type = 'show' THEN (
-            SELECT v.video_resolution ${episodeVersionsScope('p.id')}
-              AND v.video_resolution IS NOT NULL
-            ORDER BY ${resolutionRankSql('v.video_resolution')} DESC LIMIT 1
-          ) ELSE li.video_resolution END,
-          'fileSize', CASE WHEN p.media_type = 'show' THEN (
-            SELECT SUM(v.file_size) ${episodeVersionsScope('p.id')} AND v.file_size IS NOT NULL
-          ) ELSE li.file_size END,
-          'versionCount', li.version_count)
-          ORDER BY li.created_at DESC)
-       FROM library_items li
-       WHERE li.media_id = p.id AND li.removed_at IS NULL ${serverFragmentLi}) AS servers,
-      (SELECT json_build_object('thumbPath', li.thumb_path, 'dominantColor', li.dominant_color,
-                                'serverId', li.server_id)
-       FROM library_items li
-       WHERE li.media_id = p.id AND li.removed_at IS NULL AND li.thumb_path IS NOT NULL ${serverFragmentLi}
-       ${posterOrderFragment} LIMIT 1) AS poster_copy${albumCount}
+    SELECT p.*,${rowDecorationsSql('p', serverFragmentLi, posterOrderFragment)}${albumCount}
     FROM page p
   `;
 }

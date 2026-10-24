@@ -11,6 +11,8 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
+import type { SQL } from 'drizzle-orm';
+import { renderSql } from '../../../test/helpers.js';
 
 // Mock database before imports
 vi.mock('../../../db/client.js', () => ({
@@ -686,6 +688,19 @@ describe('Engagement Routes', () => {
 
       expect(response.statusCode).toBe(200);
       // Should query daily_content_engagement
+    });
+
+    it('grades dated show episodes with the same tiers as the all-time view', async () => {
+      app = await buildTestApp(createOwnerUser());
+      vi.mocked(db.execute).mockResolvedValueOnce({ rows: [] } as never);
+
+      const response = await app.inject({ method: 'GET', url: '/stats/shows?period=month' });
+
+      expect(response.statusCode).toBe(200);
+      const { sql } = renderSql(vi.mocked(db.execute).mock.calls[0]![0] as SQL);
+      expect(sql).toContain("* 0.85 THEN 'watched'");
+      expect(sql).not.toContain("'finished'");
+      expect(sql).not.toContain("'completed'");
     });
 
     it('should respect limit parameter', async () => {

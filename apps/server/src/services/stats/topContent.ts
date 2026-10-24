@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import type { NewsletterScopeLibrary } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { countedSessionSql, playCountSql } from '../../db/sessions/rules.js';
 import { libraryPairs } from '../newsletters/scopeSql.js';
 
 export interface TopWatchedRow {
@@ -41,7 +42,7 @@ function toRow(raw: RawRow): TopWatchedRow {
 }
 
 /**
- * Plays per title in a window, grouped by title across the scoped servers. Sessions carry
+ * Counted plays per title in a window, grouped by title across the scoped servers. Sessions carry
  * no library id, so a library scope joins library_items on server and rating key. The play
  * count groups by title alone, but server_id/rating_key/thumb_path come from one row (the
  * title's most recent session in scope) rather than three independent MAX()s, so a title
@@ -58,16 +59,16 @@ export async function topWatched(opts: TopWatchedOptions): Promise<{
     opts.libraries.length === 0
       ? sql``
       : sql`JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key AND (li.server_id, li.library_id) IN ${libraryPairs(opts.libraries)}`;
-  const range = sql`s.started_at >= ${opts.start} AND s.started_at < ${opts.end}`;
+  const countedInWindow = sql`s.started_at >= ${opts.start} AND s.started_at < ${opts.end} AND ${countedSessionSql('s')}`;
 
   const [movies, shows] = await Promise.all([
     db.execute(sql`
       WITH plays AS (
         SELECT s.media_title AS title, MAX(s.year) AS year,
-               COUNT(DISTINCT COALESCE(s.reference_id, s.id))::int AS plays
+               ${playCountSql('s')}::int AS plays
         FROM sessions s
         ${libraryJoin}
-        WHERE ${range} AND s.media_type = 'movie' ${serverFilter}
+        WHERE ${countedInWindow} AND s.media_type = 'movie' ${serverFilter}
         GROUP BY s.media_title
         ORDER BY plays DESC, lower(s.media_title) ASC
         LIMIT ${opts.limit}
@@ -77,7 +78,7 @@ export async function topWatched(opts: TopWatchedOptions): Promise<{
                s.server_id::text AS server_id, s.rating_key, s.thumb_path
         FROM sessions s
         ${libraryJoin}
-        WHERE ${range} AND s.media_type = 'movie' ${serverFilter}
+        WHERE ${countedInWindow} AND s.media_type = 'movie' ${serverFilter}
         ORDER BY s.media_title, s.started_at DESC
       )
       SELECT p.title, p.year, p.plays, l.server_id, l.rating_key, l.thumb_path
@@ -87,10 +88,10 @@ export async function topWatched(opts: TopWatchedOptions): Promise<{
     db.execute(sql`
       WITH plays AS (
         SELECT s.grandparent_title AS title, MAX(s.year) AS year,
-               COUNT(DISTINCT COALESCE(s.reference_id, s.id))::int AS plays
+               ${playCountSql('s')}::int AS plays
         FROM sessions s
         ${libraryJoin}
-        WHERE ${range} AND s.media_type = 'episode' AND s.grandparent_title IS NOT NULL ${serverFilter}
+        WHERE ${countedInWindow} AND s.media_type = 'episode' AND s.grandparent_title IS NOT NULL ${serverFilter}
         GROUP BY s.grandparent_title
         ORDER BY plays DESC, lower(s.grandparent_title) ASC
         LIMIT ${opts.limit}
@@ -100,7 +101,7 @@ export async function topWatched(opts: TopWatchedOptions): Promise<{
                s.server_id::text AS server_id, s.grandparent_rating_key AS rating_key, s.thumb_path
         FROM sessions s
         ${libraryJoin}
-        WHERE ${range} AND s.media_type = 'episode' AND s.grandparent_title IS NOT NULL ${serverFilter}
+        WHERE ${countedInWindow} AND s.media_type = 'episode' AND s.grandparent_title IS NOT NULL ${serverFilter}
         ORDER BY s.grandparent_title, s.started_at DESC
       )
       SELECT p.title, p.year, p.plays, l.server_id, l.rating_key, l.thumb_path

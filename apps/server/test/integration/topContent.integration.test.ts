@@ -1,11 +1,11 @@
 /**
  * topWatched used to pick server_id, rating_key, and thumb_path with three
  * independent MAX()s alongside the play count, so a title streamed on two
- * servers could mix identity columns from different sessions and point Task
- * 7's deep link at the wrong server. This proves the fix: those three columns
- * now come from one row, the title's most recent session inside the window.
+ * servers could mix identity columns from different sessions and point the
+ * newsletter's deep link at the wrong server. Those three columns now come
+ * from one row, the title's most recent counted session inside the window.
  *
- * Run with: pnpm --filter @tracearr/server test:integration -- topContent
+ * Run with: pnpm --filter @tracearr/server test:integration topContent
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { seedBasicOwner } from '@tracearr/test-utils';
@@ -23,14 +23,17 @@ const START = new Date('2026-08-26T00:00:00Z');
 const END = new Date('2026-09-02T00:00:00Z');
 const older = new Date('2026-08-28T00:00:00Z');
 const newer = new Date('2026-08-30T00:00:00Z');
+const HOUR = 3_600_000;
 
 describe('topWatched', () => {
   let serverAId: string;
   let serverBId: string;
+  let serverUserAId: string;
 
   beforeEach(async () => {
     const ownerA = await seedBasicOwner();
     serverAId = ownerA.serverId;
+    serverUserAId = ownerA.serverUserId;
 
     const serverB = await createTestServer({ type: 'jellyfin' });
     const userB = await createTestUser();
@@ -47,6 +50,7 @@ describe('topWatched', () => {
         thumbPath: '/thumb/a-1',
         startedAt: older,
         lastSeenAt: older,
+        durationMs: HOUR,
       }),
       // Newer play of the same title, on server B: this session should win
       // the identity columns, not an independent MAX() per column.
@@ -58,6 +62,7 @@ describe('topWatched', () => {
         thumbPath: '/thumb/b-9',
         startedAt: newer,
         lastSeenAt: newer,
+        durationMs: HOUR,
       }),
       // A second movie, only ever played on server A.
       buildSession({
@@ -68,6 +73,7 @@ describe('topWatched', () => {
         thumbPath: '/thumb/a-2',
         startedAt: older,
         lastSeenAt: older,
+        durationMs: HOUR,
       }),
     ]);
   });
@@ -142,5 +148,40 @@ describe('topWatched', () => {
         ratingKey: 'b-9',
       }),
     ]);
+  });
+
+  it('counts only plays that reach the counted threshold', async () => {
+    await db.insert(sessions).values([
+      buildSession({
+        serverId: serverAId,
+        serverUserId: serverUserAId,
+        mediaTitle: 'Solo Movie',
+        ratingKey: 'a-2',
+        startedAt: newer,
+        lastSeenAt: newer,
+        durationMs: 60_000,
+      }),
+      buildSession({
+        serverId: serverAId,
+        serverUserId: serverUserAId,
+        mediaTitle: 'Brief Movie',
+        ratingKey: 'a-3',
+        startedAt: newer,
+        lastSeenAt: newer,
+        durationMs: 60_000,
+      }),
+    ]);
+    const { movies } = await topWatched({
+      start: START,
+      end: END,
+      serverIds: [],
+      libraries: [],
+      limit: 10,
+    });
+    expect(movies.find((m) => m.title === 'Solo Movie')).toMatchObject({
+      plays: 1,
+      ratingKey: 'a-2',
+    });
+    expect(movies.find((m) => m.title === 'Brief Movie')).toBeUndefined();
   });
 });

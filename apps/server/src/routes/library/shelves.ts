@@ -38,6 +38,7 @@ import {
   buildCatalogPageQuery,
   buildPosterOrderFragment,
   posterFor,
+  rowDecorationsSql,
 } from './catalog.js';
 import {
   fetchEpisodeCounts,
@@ -235,18 +236,7 @@ async function fetchShowShelf(
     )
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.normalized_title, m.latest_added_at,
            ae.new_episodes, ae.added_at,
-      (SELECT json_agg(json_build_object(
-          'serverId', li.server_id, 'addedAt', li.created_at,
-          'videoResolution', li.video_resolution, 'fileSize', li.file_size,
-          'versionCount', li.version_count)
-          ORDER BY li.created_at DESC)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}) AS servers,
-      (SELECT json_build_object('thumbPath', li.thumb_path, 'dominantColor', li.dominant_color,
-                                'serverId', li.server_id)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL AND li.thumb_path IS NOT NULL ${serverFragmentLi}
-       ${posterOrderFragment} LIMIT 1) AS poster_copy
+      ${rowDecorationsSql('m', serverFragmentLi, posterOrderFragment)}
     FROM added_episodes ae
     JOIN media m ON m.id = ae.show_id AND m.merged_into_id IS NULL
     ORDER BY ae.added_at DESC
@@ -331,18 +321,7 @@ async function fetchMostPopular(
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const detailResult = await db.execute(sql`
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.normalized_title, m.latest_added_at,
-      (SELECT json_agg(json_build_object(
-          'serverId', li.server_id, 'addedAt', li.created_at,
-          'videoResolution', li.video_resolution, 'fileSize', li.file_size,
-          'versionCount', li.version_count)
-          ORDER BY li.created_at DESC)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}) AS servers,
-      (SELECT json_build_object('thumbPath', li.thumb_path, 'dominantColor', li.dominant_color,
-                                'serverId', li.server_id)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL AND li.thumb_path IS NOT NULL ${serverFragmentLi}
-       ${posterOrderFragment} LIMIT 1) AS poster_copy
+      ${rowDecorationsSql('m', serverFragmentLi, posterOrderFragment)}
       ${type === 'artist' ? sql`, ${albumCountSql(sql`m.id`, serverFragmentLi)} AS album_count` : sql``}
     FROM media m
     WHERE m.id = ANY(${uuidArraySql(ids)}) AND m.merged_into_id IS NULL
@@ -480,18 +459,7 @@ async function fetchDeadWeight(
   const posterOrderFragment = buildPosterOrderFragment(preferredPosterServerId);
   const detailResult = await db.execute(sql`
     SELECT m.id, m.media_type, m.title, m.year, m.genres, m.normalized_title, m.latest_added_at,
-      (SELECT json_agg(json_build_object(
-          'serverId', li.server_id, 'addedAt', li.created_at,
-          'videoResolution', li.video_resolution, 'fileSize', li.file_size,
-          'versionCount', li.version_count)
-          ORDER BY li.created_at DESC)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL ${serverFragmentLi}) AS servers,
-      (SELECT json_build_object('thumbPath', li.thumb_path, 'dominantColor', li.dominant_color,
-                                'serverId', li.server_id)
-       FROM library_items li
-       WHERE li.media_id = m.id AND li.removed_at IS NULL AND li.thumb_path IS NOT NULL ${serverFragmentLi}
-       ${posterOrderFragment} LIMIT 1) AS poster_copy
+      ${rowDecorationsSql('m', serverFragmentLi, posterOrderFragment)}
     FROM media m
     WHERE m.id = ANY(${uuidArraySql(ids)}) AND m.merged_into_id IS NULL
   `);

@@ -7,7 +7,7 @@
  * ordering, and the versioned cache contract all live in the query and
  * caching logic exercised here.
  *
- * Run with: pnpm --filter @tracearr/server test:integration -- shelves
+ * Run with: pnpm --filter @tracearr/server test:integration shelves
  */
 
 import { randomUUID } from 'node:crypto';
@@ -622,6 +622,44 @@ describe('shelves command center endpoint against a real database', () => {
     expect(new Date(row!.newestEpisodeAt!).getTime()).toBe(episodeAddedAt.getTime());
     // The series' own copy is over a year old: reading it is the bug.
     expect(row!.servers[0]!.addedAt).not.toBe(row!.newestEpisodeAt);
+  });
+
+  it("rolls a show's episodes into its size and best resolution on the shows shelf", async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const { app } = await buildApp(ownerFor());
+
+    const show = await seedShow({
+      serverId: server.id,
+      ratingKey: 'rollup-shelf-show',
+      title: 'Rollup Shelf Show',
+      year: 2016,
+      tvdbId: 902_201,
+    });
+    for (const [i, fileSize, resolution] of [
+      [1, 500_000_000, '1080p'],
+      [2, 600_000_000, '720p'],
+    ] as const) {
+      await seedEpisode({
+        serverId: server.id,
+        ratingKey: `rollup-shelf-e${i}`,
+        title: `Episode ${i}`,
+        year: 2016,
+        tvdbId: 902_210 + i,
+        showMediaId: show,
+        fileSize,
+      });
+      await db.execute(sql`
+        UPDATE library_item_versions v SET video_resolution = ${resolution}
+        FROM library_items li
+        WHERE li.id = v.library_item_id AND li.rating_key = ${`rollup-shelf-e${i}`}
+      `);
+    }
+
+    const { statusCode, body } = await fetchShelves(app, '?period=month');
+    expect(statusCode).toBe(200);
+    const row = body.recentlyAddedShows.find((r) => r.mediaId === show);
+    expect(row?.servers[0]?.fileSize).toBe(1_100_000_000);
+    expect(row?.resolutionBest).toBe('1080p');
   });
 
   it('newlyAdded counts titles added in the window, their bytes, and how many have ever been played', async () => {

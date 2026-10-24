@@ -15,6 +15,7 @@ import { db } from '../../db/client.js';
 import { isMaintenanceJobRunning } from '../../jobs/maintenanceQueue.js';
 import { getLibrarySyncStatus } from '../../jobs/librarySyncQueue.js';
 import { validLibraryItemCondition } from '../../utils/snapshotValidation.js';
+import { libraryFragment, type Scope } from '../../lib/scope.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 
 /** Library status response shape */
@@ -58,13 +59,16 @@ const EMPTY_ROW: LibraryStatusRow = {
   earliestSnapshotDate: null,
 };
 
-async function fetchLibraryStatusRows(serverIds: string[]): Promise<Map<string, LibraryStatusRow>> {
+async function fetchLibraryStatusRows(
+  serverIds: string[],
+  scope: Scope
+): Promise<Map<string, LibraryStatusRow>> {
   const idList = sql.join(
     serverIds.map((id) => sql`${id}::uuid`),
     sql`, `
   );
-  const itemFilter = buildMultiServerFragment(serverIds, 'li.server_id');
-  const snapshotFilter = buildMultiServerFragment(serverIds, 'lsd.server_id');
+  const itemFilter = libraryFragment(serverIds, scope, 'li');
+  const snapshotFilter = libraryFragment(serverIds, scope, 'lsd');
 
   const result = await db.execute(sql`
     WITH item_agg AS (
@@ -208,7 +212,7 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
       if (serverIds) {
         const targetIds = resolvedIds ?? [];
         const [rowsById, syncStatuses, sentinelServers] = await Promise.all([
-          fetchLibraryStatusRows(targetIds),
+          fetchLibraryStatusRows(targetIds, request.scope),
           Promise.all(targetIds.map((id) => getLibrarySyncStatus(id))),
           fetchVersionsBackfillPending(targetIds),
         ]);
@@ -229,7 +233,7 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
 
       if (serverId && resolvedIds) {
         const [rowsById, syncStatus, sentinelServers] = await Promise.all([
-          fetchLibraryStatusRows(resolvedIds),
+          fetchLibraryStatusRows(resolvedIds, request.scope),
           getLibrarySyncStatus(serverId),
           fetchVersionsBackfillPending(resolvedIds),
         ]);
@@ -243,9 +247,9 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
         } satisfies LibraryStatusResponse);
       }
 
-      // No explicit server: combined totals, scoped to accessible servers for non-owners.
-      const itemFilter = buildMultiServerFragment(resolvedIds, 'li.server_id');
-      const snapshotFilter = buildMultiServerFragment(resolvedIds, 'lsd.server_id');
+      // No explicit server: combined totals, scoped to accessible servers and libraries for members.
+      const itemFilter = libraryFragment(resolvedIds, request.scope, 'li');
+      const snapshotFilter = libraryFragment(resolvedIds, request.scope, 'lsd');
       const result = await db.execute(sql`
         SELECT
           (SELECT MIN(li.created_at)::date FROM library_items li

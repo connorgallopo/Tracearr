@@ -6,9 +6,11 @@
  * Run with: pnpm --filter @tracearr/server test:integration staleWatch
  */
 
+import { randomUUID } from 'node:crypto';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import sensible from '@fastify/sensible';
+import { sql } from 'drizzle-orm';
 import type { AuthUser } from '@tracearr/shared';
 import {
   createTestServer,
@@ -17,6 +19,7 @@ import {
   createTestSession,
   createTestLibraryItem,
 } from '@tracearr/test-utils/factories';
+import { db } from '../../src/db/client.js';
 import { getRedis } from '../../src/lib/redisShared.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 import { libraryStaleRoute } from '../../src/routes/library/stale.js';
@@ -26,6 +29,8 @@ const THIRTY_MIN = 1_800_000;
 
 interface StaleRow {
   id: string;
+  serverName: string;
+  libraryName: string;
   category: string;
   watchCount: number;
   lastWatched: string | null;
@@ -185,4 +190,128 @@ describe('/library/stale watch state', () => {
     expect(emptyBody.items).toEqual([]);
     expect(emptyBody.summary).toEqual(expectedSummary);
   });
+
+  it('shows the library name, not the server name', async () => {
+    const server = await createTestServer({ type: 'plex', name: 'Basement Plex' });
+    await db.execute(sql`
+      INSERT INTO libraries (server_id, library_id, name, media_type)
+      VALUES (${server.id}, 'lib-1', 'Films', 'movie')
+    `);
+    const movie = await createTestLibraryItem({ serverId: server.id, ratingKey: 'sw-named' });
+
+    const rows = await fetchStale(server.id);
+    expect(rows.get(movie.id)?.libraryName).toBe('Films');
+    expect(rows.get(movie.id)?.serverName).toBe('Basement Plex');
+  });
+
+  it('counts plays on a merged title for the winner', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+
+    const winnerMedia = await insertMedia('show', 'Merged Show');
+    const loserMedia = await insertMedia('show', 'Merged Show (dup)');
+    await db.execute(
+      sql`UPDATE media SET merged_into_id = ${winnerMedia} WHERE id = ${loserMedia}`
+    );
+
+    const winner = await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'sw-winner',
+      mediaType: 'show',
+      mediaId: winnerMedia,
+      createdAt: new Date(Date.now() - 60 * DAY_MS),
+      withoutVersion: true,
+    });
+    const loser = await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'sw-loser',
+      mediaType: 'show',
+      mediaId: loserMedia,
+      withoutVersion: true,
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'sw-loser-e1',
+      mediaType: 'episode',
+      grandparentRatingKey: 'sw-loser',
+      itemIndex: 1,
+    });
+    const start = new Date(Date.now() - 10 * DAY_MS);
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      ratingKey: 'sw-loser-e1',
+      mediaType: 'episode',
+      state: 'stopped',
+      startedAt: start,
+      stoppedAt: new Date(start.getTime() + THIRTY_MIN),
+      durationMs: THIRTY_MIN,
+    });
+
+    const rows = await fetchStale(server.id);
+    expect(rows.get(winner.id)?.watchCount).toBe(1);
+    expect(rows.get(winner.id)?.category).toBe('stale');
+    expect(rows.has(loser.id)).toBe(false);
+  });
+
+  it("counts plays under a re-added title's old rating key", async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+
+    const movieMedia = await insertMedia('movie', 'Re-added Movie');
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'sw-old',
+      mediaId: movieMedia,
+      removedAt: new Date(Date.now() - 30 * DAY_MS),
+      removedSource: 'scan',
+    });
+    const current = await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'sw-new',
+      mediaId: movieMedia,
+    });
+    const start = new Date(Date.now() - 40 * DAY_MS);
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      ratingKey: 'sw-old',
+      mediaId: movieMedia,
+      state: 'stopped',
+      startedAt: start,
+      stoppedAt: new Date(start.getTime() + 2 * THIRTY_MIN),
+      durationMs: 2 * THIRTY_MIN,
+    });
+
+    const rows = await fetchStale(server.id);
+    expect(rows.get(current.id)?.watchCount).toBe(1);
+    expect(rows.get(current.id)?.category).toBe('stale');
+  });
 });
+
+async function insertMedia(mediaType: 'movie' | 'show', title: string): Promise<string> {
+  const id = randomUUID();
+  await db.execute(sql`
+    INSERT INTO media (id, media_type, match_key, title, sort_title)
+    VALUES (${id}, ${mediaType}, ${`${mediaType}:title:${id}`}, ${title}, ${title.toLowerCase()})
+  `);
+  return id;
+}
+
+async function fetchStale(serverId: string): Promise<Map<string, StaleRow>> {
+  app = await buildApp({
+    userId: crypto.randomUUID(),
+    username: 'owner',
+    role: 'owner',
+    serverIds: [serverId],
+  });
+  const res = await app.inject({
+    method: 'GET',
+    url: `/library/stale?serverId=${serverId}&staleDays=1`,
+  });
+  expect(res.statusCode).toBe(200);
+  const body = JSON.parse(res.body);
+  return new Map<string, StaleRow>(body.items.map((i: StaleRow) => [i.id, i]));
+}
