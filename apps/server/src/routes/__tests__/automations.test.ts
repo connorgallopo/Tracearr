@@ -989,9 +989,10 @@ describe('Automation routes', () => {
         'automation_runs.kind = $2 and automation_runs.outcome = $3'
       );
       expect(renderCall(counted).params).toEqual([AUTOMATION_ID, 'policy', 'completed']);
-      expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledTimes(2);
-      expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledWith('su-1');
-      expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledWith('su-2');
+      expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledExactlyOnceWith([
+        'su-1',
+        'su-2',
+      ]);
     });
 
     it('404s on an automation that is not there', async () => {

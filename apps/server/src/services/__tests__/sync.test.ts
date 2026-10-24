@@ -11,13 +11,18 @@ vi.mock('../../db/client.js', () => ({
   db: {
     select: () => ({ from: () => ({ where: () => ({ limit: mockLimit }) }) }),
     update: () => ({ set: () => ({ where: () => ({ returning: mockReturning }) }) }),
+    transaction: (run: (tx: unknown) => Promise<unknown>) => run({}),
   },
 }));
 vi.mock('../mediaServer/index.js', () => ({
   createMediaServerClient: () => ({ getUsers: mockGetUsers, getLibraries: mockGetLibraries }),
   PlexClient: class {},
 }));
-vi.mock('../userService.js', () => ({ syncUserFromMediaServer: vi.fn() }));
+vi.mock('../userService.js', () => ({
+  loadServerAccounts: vi.fn(),
+  recomputeIdentityAggregates: vi.fn(),
+  syncUserFromMediaServer: vi.fn(),
+}));
 vi.mock('../serverIdentity.js', () => ({ ensureServerIdentifier: vi.fn() }));
 vi.mock('../../lib/revoke.js', () => ({ revokeSessionsForServerUsers: vi.fn() }));
 vi.mock('../../lib/scope.js', () => ({ clearScope: vi.fn() }));

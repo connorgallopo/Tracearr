@@ -141,6 +141,29 @@ describe('runSessionMaintenanceWalk', () => {
     expect(seen).toEqual([0, 88]);
   });
 
+  it('shows the updated and skipped counts a walk reports with a batch', async () => {
+    const seen: (number | undefined)[] = [];
+    await run(async (onBatch) => {
+      await onBatch(10, { updated: 4, skipped: 6 });
+      seen.push(getMaintenanceProgress()?.updatedRecords, getMaintenanceProgress()?.skippedRecords);
+      return { total: 4, failedRanges: [], details: '' };
+    }, false);
+
+    expect(seen).toEqual([4, 6]);
+  });
+
+  it('reports the processed and skipped counts a walk returns instead of its total', async () => {
+    const result = await run(async () => ({
+      total: 2,
+      failedRanges: [],
+      details: '',
+      processed: 5,
+      skipped: 3,
+    }));
+
+    expect(result).toMatchObject({ processed: 5, updated: 2, skipped: 3 });
+  });
+
   it('fails a walk with skipped ranges without letting BullMQ retry it', async () => {
     const result = run(async () => ({
       total: 0,

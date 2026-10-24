@@ -263,13 +263,6 @@ function diagnosticsOfKind(kind: AutomationKind): SQL {
     AND ar.finished_at < ${cutoffOf(DIAGNOSTIC_RETENTION_DAYS)}`;
 }
 
-/** The purge removes rows users.total_violations counts, so its identities are restated. */
-async function recomputeIdentities(serverUserIds: string[]): Promise<void> {
-  for (const serverUserId of serverUserIds) {
-    await recomputeIdentityAggregatesForServerUser(serverUserId);
-  }
-}
-
 /** Closed sends keep their row for a year and their rendered snapshots for 90 days; an open send is never touched. */
 async function pruneNewsletterSends(): Promise<{ purged: number; pruned: number }> {
   const purged = await db.execute(sql`
@@ -296,7 +289,10 @@ export async function processRunRetention(): Promise<RunRetentionResult> {
 
   let policyPurged = 0;
   for (const group of await completedGroups('policy', RETENTION_DEFAULTS.policy)) {
-    policyPurged += await deleteBatched(completedOfGroup('policy', group), recomputeIdentities);
+    // The purge removes rows users.total_violations counts, so its identities are restated.
+    policyPurged += await deleteBatched(completedOfGroup('policy', group), (ids) =>
+      recomputeIdentityAggregatesForServerUser(ids)
+    );
   }
 
   let diagnosticPurged = 0;

@@ -646,12 +646,11 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       }
 
       // users.totalViolations counts non-dismissed rows, so every affected
-      // identity recomputes, not only the trust-reversed ones. Once per
-      // identity, since a merged person can have several accounts here.
-      const affectedIdentityIds = new Set(stampedViolations.map((v) => v.userId));
-      for (const identityId of affectedIdentityIds) {
-        await recomputeIdentityAggregates(identityId, tx);
-      }
+      // identity recomputes, not only the trust-reversed ones.
+      await recomputeIdentityAggregates(
+        stampedViolations.map((v) => v.userId),
+        tx
+      );
 
       return { dismissedCount: stamped.length, moves: moved };
     });

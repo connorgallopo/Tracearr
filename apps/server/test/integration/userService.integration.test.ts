@@ -7,10 +7,13 @@
  * Run with: pnpm test:integration
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../src/db/client.js';
-import { servers } from '../../src/db/schema.js';
+import { servers, serverUsers, users } from '../../src/db/schema.js';
+import { syncServerUsers } from '../../src/services/sync.js';
+import * as userService from '../../src/services/userService.js';
 import {
   applyTrustChange,
   syncUserFromMediaServer,
@@ -118,6 +121,117 @@ describe('userService integration tests', () => {
       expect(plain.serverUser.email).toBeNull();
       expect(renamed.serverUser.email).toBe('renamed@example.com');
       expect(renamed.user.email).toBeNull();
+    });
+  });
+
+  describe('syncServerUsers', () => {
+    /** Statistics land per backend, ~1 s after it goes idle; the pool spreads one sync over several. */
+    async function counters(): Promise<{ updates: number; commits: number }> {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await db.execute(sql`SELECT pg_stat_force_next_flush()`);
+      const result = await db.execute<{ updates: string; commits: string }>(sql`
+        SELECT
+          (SELECT n_tup_upd FROM pg_stat_user_tables WHERE relname = 'server_users') AS updates,
+          (SELECT xact_commit FROM pg_stat_database WHERE datname = current_database()) AS commits
+      `);
+      const row = result.rows[0]!;
+      return { updates: Number(row.updates), commits: Number(row.commits) };
+    }
+
+    it('a second sync of unchanged accounts writes no server_users rows', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({
+          name: 'Sync Jellyfin',
+          type: 'jellyfin',
+          url: 'http://localhost:8096',
+          token: 'encrypted-test-token',
+        })
+        .returning();
+      const mediaUsers: MediaUser[] = Array.from({ length: 50 }, (_, i) => ({
+        id: `jf-${i}`,
+        username: `viewer${i}`,
+        isAdmin: i === 0,
+        sharedLibraries: i % 2 === 0 ? ['b', 'a'] : undefined,
+        lastActivityAt: new Date(Date.UTC(2026, 0, 1 + i)),
+      }));
+
+      const first = await syncServerUsers(jellyfin!.id, mediaUsers);
+      expect(first.added).toBe(50);
+      const before = await counters();
+
+      const second = await syncServerUsers(jellyfin!.id, mediaUsers);
+      const after = await counters();
+
+      expect(second).toMatchObject({ added: 0, updated: 50, removed: 0, errors: [] });
+      expect(after.updates - before.updates).toBe(0);
+      // xact_commit is database-wide, so autovacuum and the TimescaleDB scheduler can add a few;
+      // one commit per account would put 50 or more here.
+      expect(after.commits - before.commits).toBeLessThan(25);
+    });
+
+    it('writes an account whose activity advanced and restates its identity', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({ name: 'Sync Jellyfin', type: 'jellyfin', url: 'http://jf', token: 't' })
+        .returning();
+      const seen = new Date(Date.UTC(2026, 0, 1));
+      const later = new Date(Date.UTC(2026, 5, 1));
+      const viewers: MediaUser[] = ['a', 'b'].map((id) => ({
+        id,
+        username: `viewer-${id}`,
+        isAdmin: false,
+        lastActivityAt: seen,
+      }));
+      await syncServerUsers(jellyfin!.id, viewers);
+
+      const second = await syncServerUsers(jellyfin!.id, [
+        { ...viewers[0]!, lastActivityAt: later },
+        viewers[1]!,
+      ]);
+
+      expect(second).toMatchObject({ updated: 2, errors: [] });
+      const rows = await db
+        .select({ externalId: serverUsers.externalId, identityActivity: users.lastActivityAt })
+        .from(serverUsers)
+        .innerJoin(users, eq(users.id, serverUsers.userId))
+        .where(eq(serverUsers.serverId, jellyfin!.id))
+        .orderBy(serverUsers.externalId);
+      expect(rows).toEqual([
+        { externalId: 'a', identityActivity: later },
+        { externalId: 'b', identityActivity: seen },
+      ]);
+    });
+
+    it('keeps the account writes when the identity recount after them fails', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({ name: 'Sync Jellyfin', type: 'jellyfin', url: 'http://jf', token: 't' })
+        .returning();
+      const viewer: MediaUser = {
+        id: 'a',
+        username: 'viewer-a',
+        isAdmin: false,
+        lastActivityAt: new Date(Date.UTC(2026, 0, 1)),
+      };
+      await syncServerUsers(jellyfin!.id, [viewer]);
+      const later = new Date(Date.UTC(2026, 5, 1));
+      const recount = vi
+        .spyOn(userService, 'recomputeIdentityAggregates')
+        .mockRejectedValueOnce(new Error('deadlock detected'));
+
+      const second = await syncServerUsers(jellyfin!.id, [
+        { ...viewer, username: 'viewer-renamed', lastActivityAt: later },
+      ]);
+      recount.mockRestore();
+
+      expect(second.updated).toBe(1);
+      expect(second.errors).toEqual(['Failed to recount 1 identities: deadlock detected']);
+      const [row] = await db
+        .select({ username: serverUsers.username, lastActivityAt: serverUsers.lastActivityAt })
+        .from(serverUsers)
+        .where(eq(serverUsers.serverId, jellyfin!.id));
+      expect(row).toEqual({ username: 'viewer-renamed', lastActivityAt: later });
     });
   });
 

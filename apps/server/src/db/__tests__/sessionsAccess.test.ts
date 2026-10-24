@@ -37,6 +37,7 @@ const ALLOWLIST: Record<string, string> = {
   'jobs/poller/violations.ts': HOT_PATH,
   'jobs/serverLocationSync.ts': IMPORTS,
   'jobs/sessionIdentityBackfill.ts': IMPORTS,
+  'jobs/sessionNormalize.ts': IMPORTS,
   'jobs/sseProcessor.ts': HOT_PATH,
   'routes/automations.ts': BOUNDED_CALLBACK,
   'routes/debug.ts': ADMIN,

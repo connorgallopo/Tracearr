@@ -11,7 +11,13 @@ import { servers, serverUsers } from '../db/schema.js';
 import { revokeSessionsForServerUsers } from '../lib/revoke.js';
 import { clearScope } from '../lib/scope.js';
 import { createMediaServerClient, PlexClient, type MediaUser } from './mediaServer/index.js';
-import { syncUserFromMediaServer, type SyncUserOptions } from './userService.js';
+import {
+  loadServerAccounts,
+  recomputeIdentityAggregates,
+  syncUserFromMediaServer,
+  type ServerSyncBatch,
+  type SyncUserOptions,
+} from './userService.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
 
@@ -43,7 +49,7 @@ export interface SyncOptions {
  * - Creates new users if not found
  * - Uses externalId for matching
  */
-async function syncServerUsers(
+export async function syncServerUsers(
   serverId: string,
   mediaUsers: MediaUser[],
   options: SyncUserOptions = {}
@@ -64,24 +70,40 @@ async function syncServerUsers(
   const syncedExternalIds: string[] = [];
   const lostAccessIds: string[] = [];
 
-  for (const mediaUser of mediaUsers) {
-    syncedExternalIds.push(mediaUser.id);
-    try {
-      const result = await syncUserFromMediaServer(serverId, mediaUser, options);
-      if (result === null) {
-        // Plex sync skipped new user (will be created by poller)
-        skipped++;
-      } else if (result.created) {
-        added++;
-      } else {
-        updated++;
-        if (result.newlyDisabled) lostAccessIds.push(result.serverUser.id);
+  const accounts = await loadServerAccounts(serverId);
+  const recompute = new Set<string>();
+  const clearScopes = new Set<string>();
+  await db.transaction(async (tx) => {
+    const batch: ServerSyncBatch = { accounts, tx, recompute, clearScopes };
+    for (const mediaUser of mediaUsers) {
+      syncedExternalIds.push(mediaUser.id);
+      try {
+        const result = await syncUserFromMediaServer(serverId, mediaUser, options, batch);
+        if (result === null) {
+          // Plex sync skipped new user (will be created by poller)
+          skipped++;
+        } else if (result.created) {
+          added++;
+        } else {
+          updated++;
+          if (result.newlyDisabled) lostAccessIds.push(result.serverUser.id);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        errors.push(`Failed to sync user ${mediaUser.username}: ${message}`);
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      errors.push(`Failed to sync user ${mediaUser.username}: ${message}`);
     }
+  });
+  // After commit: a failed recount keeps the account writes, and the users rows it locks are
+  // not held for the length of the loop.
+  try {
+    await recomputeIdentityAggregates([...recompute]);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    errors.push(`Failed to recount ${recompute.size} identities: ${message}`);
   }
+  // After commit, so a scope rebuilt meanwhile reads the new library access.
+  for (const userId of clearScopes) await clearScope(userId);
 
   // For Plex, mediaUser.id is plex.tv account ID (stored as plexAccountId)
   // For Jellyfin/Emby, mediaUser.id is the server-local ID (stored as externalId)

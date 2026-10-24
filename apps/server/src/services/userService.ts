@@ -222,37 +222,6 @@ export async function getIdentityServerUserIds(userId: string): Promise<string[]
   return rows.map((row) => row.id);
 }
 
-/**
- * Update server user from media server data
- */
-export async function updateServerUser(
-  serverUserId: string,
-  data: Partial<{
-    username: string;
-    email: string | null;
-    thumbUrl: string | null;
-    isServerAdmin: boolean;
-    isDisabled: boolean;
-    lastActivityAt: Date | null;
-    libraryIds: string[] | null;
-  }>
-): Promise<ServerUser> {
-  const rows = await db
-    .update(serverUsers)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(serverUsers.id, serverUserId))
-    .returning();
-
-  const serverUser = rows[0];
-  if (!serverUser) {
-    throw new ServerUserNotFoundError(serverUserId);
-  }
-  return serverUser;
-}
-
 /** How a trust write names its new value; `adjust` is a delta, the other two are absolute. */
 export type TrustChange =
   { mode: 'adjust'; amount: number } | { mode: 'set'; value: number } | { mode: 'reset' };
@@ -332,6 +301,85 @@ function advancedActivityAt(reported: Date | undefined, current: Date | null): D
   return reported;
 }
 
+/** One server's accounts and their identities, loaded once so a whole-server sync looks rows up in memory. */
+export interface ServerAccounts {
+  byExternalId: Map<string, ServerUser>;
+  byPlexAccountId: Map<string, ServerUser>;
+  byUsername: Map<string, ServerUser>;
+  usersById: Map<string, User>;
+}
+
+function indexAccount(accounts: ServerAccounts, row: ServerUser, replaced?: ServerUser): void {
+  if (replaced) {
+    if (accounts.byExternalId.get(replaced.externalId)?.id === row.id) {
+      accounts.byExternalId.delete(replaced.externalId);
+    }
+    if (
+      replaced.plexAccountId &&
+      accounts.byPlexAccountId.get(replaced.plexAccountId)?.id === row.id
+    ) {
+      accounts.byPlexAccountId.delete(replaced.plexAccountId);
+    }
+    if (accounts.byUsername.get(replaced.username)?.id === row.id) {
+      accounts.byUsername.delete(replaced.username);
+    }
+  }
+  accounts.byExternalId.set(row.externalId, row);
+  if (row.plexAccountId) accounts.byPlexAccountId.set(row.plexAccountId, row);
+  accounts.byUsername.set(row.username, row);
+}
+
+export async function loadServerAccounts(serverId: string): Promise<ServerAccounts> {
+  const rows = await db.select().from(serverUsers).where(eq(serverUsers.serverId, serverId));
+  const userIds = [...new Set(rows.map((row) => row.userId))];
+  const identities =
+    userIds.length > 0 ? await db.select().from(users).where(inArray(users.id, userIds)) : [];
+  const accounts: ServerAccounts = {
+    byExternalId: new Map(),
+    byPlexAccountId: new Map(),
+    byUsername: new Map(),
+    usersById: new Map(identities.map((user) => [user.id, user])),
+  };
+  // A username or plex id shared by several rows keeps one of them, as the LIMIT 1 lookups did.
+  for (const row of rows) {
+    accounts.byExternalId.set(row.externalId, row);
+    if (row.plexAccountId && !accounts.byPlexAccountId.has(row.plexAccountId)) {
+      accounts.byPlexAccountId.set(row.plexAccountId, row);
+    }
+    if (!accounts.byUsername.has(row.username)) accounts.byUsername.set(row.username, row);
+  }
+  return accounts;
+}
+
+/**
+ * A whole-server sync's shared state: the accounts it loaded, the transaction its writes run in,
+ * and the identity recounts and scope clears it runs once, after the loop and after commit.
+ */
+export interface ServerSyncBatch {
+  accounts: ServerAccounts;
+  tx: Tx;
+  recompute: Set<string>;
+  clearScopes: Set<string>;
+}
+
+type ServerUserChanges = Partial<typeof serverUsers.$inferInsert>;
+
+function sameValue(next: unknown, current: unknown): boolean {
+  if (next instanceof Date || current instanceof Date) {
+    return (next as Date | null)?.getTime() === (current as Date | null)?.getTime();
+  }
+  if (Array.isArray(next) || Array.isArray(current)) {
+    return JSON.stringify(next) === JSON.stringify(current);
+  }
+  return next === current;
+}
+
+function changesNothing(existing: ServerUser, changes: ServerUserChanges): boolean {
+  return Object.entries(changes).every(([key, value]) =>
+    sameValue(value, existing[key as keyof ServerUser])
+  );
+}
+
 /**
  * Sync a user from media server - handles auto-linking by email
  *
@@ -347,12 +395,19 @@ function advancedActivityAt(reported: Date | undefined, current: Date | null): D
  * 4. If found: update metadata and set plexAccountId
  * 5. If new: skip creation (let poller create when user streams)
  *
+ * An existing account whose row already matches is not written. With `batch`, lookups come from
+ * its loaded accounts, writes run in savepoints of its transaction so one failure stays this
+ * user's, and identity recounts and scope clears are left in its sets for the caller to run after
+ * commit; a recount inside the loop would lock users rows ahead of later server_users writes,
+ * the reverse of the poller's order.
+ *
  * Returns { serverUser, user, created: boolean } or null if skipped
  */
 export async function syncUserFromMediaServer(
   serverId: string,
   mediaUser: MediaUser,
-  options: SyncUserOptions = {}
+  options: SyncUserOptions = {},
+  batch?: ServerSyncBatch
 ): Promise<{
   serverUser: ServerUser;
   user: User;
@@ -360,29 +415,54 @@ export async function syncUserFromMediaServer(
   newlyDisabled: boolean;
 } | null> {
   const { isPlexServer = false } = options;
+  const executor = batch?.tx ?? db;
+  const known = batch?.accounts;
   const libraryIds = mediaUser.sharedLibraries ? [...mediaUser.sharedLibraries].sort() : null;
+
+  const identityOf = async (userId: string): Promise<User> => {
+    if (!known) return requireUserById(userId);
+    const user = known.usersById.get(userId);
+    if (!user) throw new UserNotFoundError(userId);
+    return user;
+  };
+  const recompute = async (userId: string) => {
+    if (batch) batch.recompute.add(userId);
+    else await recomputeIdentityAggregates(userId);
+  };
   // The member's scope carries their library access, so a change drops it and its cached answers.
   const clearScopeOnLibraryChange = async (existing: ServerUser) => {
-    if (String(existing.libraryIds) !== String(libraryIds)) await clearScope(existing.userId);
+    if (String(existing.libraryIds) === String(libraryIds)) return;
+    if (batch) batch.clearScopes.add(existing.userId);
+    else await clearScope(existing.userId);
+  };
+  const writeChanges = async (existing: ServerUser, changes: ServerUserChanges) => {
+    if (changesNothing(existing, changes)) return existing;
+    const write = (t: Tx) =>
+      t
+        .update(serverUsers)
+        .set({ ...changes, updatedAt: new Date() })
+        .where(eq(serverUsers.id, existing.id))
+        .returning();
+    const [row] = batch ? await batch.tx.transaction(write) : await write(db);
+    if (!row) throw new ServerUserNotFoundError(existing.id);
+    if (known) indexAccount(known, row, existing);
+    return row;
   };
 
   if (isPlexServer) {
     // For Plex: mediaUser.id is plex.tv ID
     // Shared users: plex.tv ID = local PMS ID (same!)
     // Owner: plex.tv ID ≠ local PMS ID (owner is always "1" locally)
-
-    // Try plexAccountId first (already synced users)
-    let existing = await getServerUserByPlexAccountId(serverId, mediaUser.id);
-
-    // Try externalId - for shared users, plex.tv ID = local PMS ID
-    if (!existing) {
-      existing = await getServerUserByExternalId(serverId, mediaUser.id);
-    }
-
-    // Username fallback (display name vs login name may differ)
-    if (!existing) {
-      existing = await getServerUserByUsername(serverId, mediaUser.username);
-    }
+    // plexAccountId first (already synced users), then externalId (for shared users plex.tv ID
+    // = local PMS ID), then username (display name vs login name may differ).
+    const existing = known
+      ? (known.byPlexAccountId.get(mediaUser.id) ??
+        known.byExternalId.get(mediaUser.id) ??
+        known.byUsername.get(mediaUser.username) ??
+        null)
+      : ((await getServerUserByPlexAccountId(serverId, mediaUser.id)) ??
+        (await getServerUserByExternalId(serverId, mediaUser.id)) ??
+        (await getServerUserByUsername(serverId, mediaUser.username)));
 
     if (existing) {
       const nextJoinedAt = mediaUser.joinedAt ?? existing.joinedAt;
@@ -390,7 +470,7 @@ export async function syncUserFromMediaServer(
         mediaUser.lastActivityAt,
         existing.lastActivityAt
       );
-      const updateData: Partial<typeof serverUsers.$inferInsert> = {
+      const changes: ServerUserChanges = {
         username: mediaUser.username,
         email: mediaUser.email ?? null,
         thumbUrl: mediaUser.thumb ?? null,
@@ -398,29 +478,23 @@ export async function syncUserFromMediaServer(
         libraryIds,
         plexAccountId: mediaUser.id, // Set plex.tv ID
         joinedAt: nextJoinedAt,
-        updatedAt: new Date(),
       };
       if (advancedActivity) {
-        updateData.lastActivityAt = advancedActivity;
+        changes.lastActivityAt = advancedActivity;
       }
 
-      // Update existing server user and set plexAccountId
-      const updated = await db
-        .update(serverUsers)
-        .set(updateData)
-        .where(eq(serverUsers.id, existing.id))
-        .returning();
+      const updated = await writeChanges(existing, changes);
 
       // Sync is the only thing that moves joined_at from the server side, so
       // the identity rollups have to follow it. Guarded because this runs for
-      // every user on every sync tick and the rollup is three more queries.
+      // every user on every sync tick.
       if (advancedActivity || nextJoinedAt?.getTime() !== existing.joinedAt?.getTime()) {
-        await recomputeIdentityAggregates(existing.userId);
+        await recompute(existing.userId);
       }
       await clearScopeOnLibraryChange(existing);
 
-      const user = await requireUserById(existing.userId);
-      return { serverUser: updated[0]!, user, created: false, newlyDisabled: false };
+      const user = await identityOf(existing.userId);
+      return { serverUser: updated, user, created: false, newlyDisabled: false };
     }
 
     // Already folded into another account by a same-server merge. Creating it
@@ -434,7 +508,7 @@ export async function syncUserFromMediaServer(
     // For owner (isAdmin): should already exist from OAuth, but handle edge case
     const externalId = mediaUser.isAdmin ? '1' : mediaUser.id;
 
-    const result = await db.transaction(async (tx) => {
+    const result = await executor.transaction(async (tx) => {
       let user: User | undefined;
 
       // Try to find existing user by email match
@@ -484,11 +558,16 @@ export async function syncUserFromMediaServer(
         .returning();
 
       if (attachedToExistingIdentity) {
-        await recomputeIdentityAggregates(user.id, tx);
+        if (batch) batch.recompute.add(user.id);
+        else await recomputeIdentityAggregates(user.id, tx);
       }
 
       return { serverUser: serverUser!, user };
     });
+    if (known) {
+      indexAccount(known, result.serverUser);
+      known.usersById.set(result.user.id, result.user);
+    }
 
     return {
       serverUser: result.serverUser,
@@ -499,13 +578,15 @@ export async function syncUserFromMediaServer(
   }
 
   // For Jellyfin/Emby: original flow using externalId
-  const existing = await getServerUserByExternalId(serverId, mediaUser.id);
+  const existing = known
+    ? (known.byExternalId.get(mediaUser.id) ?? null)
+    : await getServerUserByExternalId(serverId, mediaUser.id);
   // Account level only: the identity lookup and users.email below keep the raw
   // value, so a username never becomes a login email or links two people.
   const accountEmail = mediaUser.email ?? usernameAsEmail(mediaUser.username);
 
   if (existing) {
-    const updatePayload: Parameters<typeof updateServerUser>[1] = {
+    const changes: ServerUserChanges = {
       username: mediaUser.username,
       email: accountEmail,
       thumbUrl: mediaUser.thumb ?? null,
@@ -516,18 +597,17 @@ export async function syncUserFromMediaServer(
 
     const advancedActivity = advancedActivityAt(mediaUser.lastActivityAt, existing.lastActivityAt);
     if (advancedActivity) {
-      updatePayload.lastActivityAt = advancedActivity;
+      changes.lastActivityAt = advancedActivity;
     }
 
-    // Update existing server user
-    const updated = await updateServerUser(existing.id, updatePayload);
+    const updated = await writeChanges(existing, changes);
 
     if (advancedActivity) {
-      await recomputeIdentityAggregates(existing.userId);
+      await recompute(existing.userId);
     }
     await clearScopeOnLibraryChange(existing);
 
-    const user = await requireUserById(existing.userId);
+    const user = await identityOf(existing.userId);
     return {
       serverUser: updated,
       user,
@@ -544,7 +624,7 @@ export async function syncUserFromMediaServer(
 
   // Use transaction to prevent orphaned users if server user creation fails
   // This ensures atomicity: either both user + server_user are created, or neither
-  const result = await db.transaction(async (tx) => {
+  const result = await executor.transaction(async (tx) => {
     let user: User | undefined;
 
     // Try to find existing user by email match
@@ -596,18 +676,24 @@ export async function syncUserFromMediaServer(
     // Only when the account joined a person who already had others: a fresh
     // identity's rollups were seeded by its own insert above.
     if (attachedToExistingIdentity) {
-      await recomputeIdentityAggregates(user.id, tx);
+      if (batch) batch.recompute.add(user.id);
+      else await recomputeIdentityAggregates(user.id, tx);
     }
 
     return { serverUser: serverUser!, user };
   });
+  if (known) {
+    indexAccount(known, result.serverUser);
+    known.usersById.set(result.user.id, result.user);
+  }
 
   return { serverUser: result.serverUser, user: result.user, created: true, newlyDisabled: false };
 }
 
 /**
- * Recompute a user's identity-level rollups from their server accounts:
+ * Recompute identity-level rollups from each identity's server accounts:
  * aggregate trust, total violation count, earliest join and latest activity.
+ * One statement for any number of identities.
  *
  * Identity trust is the WORST active account's score, not an average. Trust
  * penalties land only on the account where the behavior happened
@@ -626,49 +712,45 @@ export async function syncUserFromMediaServer(
  * instead of racing it.
  */
 export async function recomputeIdentityAggregates(
-  userId: string,
+  userIds: string | string[],
   executor: Tx = db
 ): Promise<void> {
-  const accountResult = await executor
-    .select({
-      trust: sql<number | null>`coalesce(
-        min(${serverUsers.trustScore}) filter (where ${serverUsers.removedAt} is null),
-        min(${serverUsers.trustScore})
-      )`,
-      // The driver hands timestamps back as strings; mapWith borrows the
-      // column's decoder so these are Dates the users columns can be set to.
-      firstJoinedAt: sql<Date | null>`min(${serverUsers.joinedAt})`.mapWith(serverUsers.joinedAt),
-      lastActivityAt: sql<Date | null>`max(${serverUsers.lastActivityAt})`.mapWith(
-        serverUsers.lastActivityAt
-      ),
-    })
-    .from(serverUsers)
-    .where(eq(serverUsers.userId, userId));
-
-  const violationResult = await executor
-    .select({ count: sql<number>`count(*)::int` })
-    .from(automationRuns)
-    .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
-    .where(
-      and(
-        eq(serverUsers.userId, userId),
+  const ids = [...new Set(typeof userIds === 'string' ? [userIds] : userIds)];
+  if (ids.length === 0) return;
+  // Aggregated over users, not accounts, so an identity with no accounts left still gets the defaults.
+  await executor.execute(sql`
+    UPDATE ${users} AS u SET
+      aggregate_trust_score = coalesce(a.trust, 100),
+      total_violations = coalesce(v.count, 0),
+      first_joined_at = a.first_joined,
+      last_activity_at = a.last_activity,
+      updated_at = now()
+    FROM (
+      SELECT ${users.id} AS user_id,
+        coalesce(
+          min(${serverUsers.trustScore}) filter (where ${serverUsers.removedAt} is null),
+          min(${serverUsers.trustScore})
+        ) AS trust,
+        min(${serverUsers.joinedAt}) AS first_joined,
+        max(${serverUsers.lastActivityAt}) AS last_activity
+      FROM ${users}
+      LEFT JOIN ${serverUsers} ON ${serverUsers.userId} = ${users.id}
+      WHERE ${inArray(users.id, ids)}
+      GROUP BY ${users.id}
+    ) AS a
+    LEFT JOIN (
+      SELECT ${serverUsers.userId} AS user_id, count(*)::int AS count
+      FROM ${automationRuns}
+      INNER JOIN ${serverUsers} ON ${automationRuns.serverUserId} = ${serverUsers.id}
+      WHERE ${and(
+        inArray(serverUsers.userId, ids),
         isNull(automationRuns.dismissedAt),
         ...violationAliasConditions()
-      )
-    );
-
-  const accounts = accountResult[0];
-
-  await executor
-    .update(users)
-    .set({
-      aggregateTrustScore: accounts?.trust ?? 100,
-      totalViolations: violationResult[0]?.count ?? 0,
-      firstJoinedAt: accounts?.firstJoinedAt ?? null,
-      lastActivityAt: accounts?.lastActivityAt ?? null,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, userId));
+      )}
+      GROUP BY ${serverUsers.userId}
+    ) AS v ON v.user_id = a.user_id
+    WHERE u.id = a.user_id
+  `);
 }
 
 /**
@@ -696,20 +778,21 @@ export async function recomputeAllIdentityDates(executor: Tx = db): Promise<numb
   return Number(result.rowCount ?? 0);
 }
 
-/** Same recompute, addressed by the account id a violation write already has in hand. */
+/** Same recompute, addressed by the account ids a violation write already has in hand. */
 export async function recomputeIdentityAggregatesForServerUser(
-  serverUserId: string,
+  serverUserIds: string | string[],
   executor: Tx = db
 ): Promise<void> {
+  const ids = typeof serverUserIds === 'string' ? [serverUserIds] : serverUserIds;
+  if (ids.length === 0) return;
   const rows = await executor
-    .select({ userId: serverUsers.userId })
+    .selectDistinct({ userId: serverUsers.userId })
     .from(serverUsers)
-    .where(eq(serverUsers.id, serverUserId))
-    .limit(1);
-  const userId = rows[0]?.userId;
-  if (userId) {
-    await recomputeIdentityAggregates(userId, executor);
-  }
+    .where(inArray(serverUsers.id, ids));
+  await recomputeIdentityAggregates(
+    rows.map((row) => row.userId),
+    executor
+  );
 }
 
 // ============================================================================

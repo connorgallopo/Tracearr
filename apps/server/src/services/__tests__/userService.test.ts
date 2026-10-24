@@ -16,6 +16,7 @@ vi.mock('../../db/client.js', () => ({
     select: vi.fn(),
     insert: vi.fn(),
     update: vi.fn(),
+    execute: vi.fn(),
     transaction: vi.fn(),
   },
 }));
@@ -335,13 +336,9 @@ describe('applyTrustChange', () => {
       where: vi.fn().mockReturnThis(),
       returning: vi.fn().mockResolvedValue([{ previous: 80, row: updated }]),
     });
-    const txSelect = vi.fn().mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ trust: 75, count: 0 }]),
-    });
+    const txExecute = vi.fn().mockResolvedValue({ rows: [], rowCount: 1 });
     vi.mocked(db.transaction).mockImplementation(async (callback) => {
-      return callback({ update: txUpdate, select: txSelect } as never);
+      return callback({ update: txUpdate, execute: txExecute } as never);
     });
 
     const result = await applyTrustChange(serverUserId, { mode: 'adjust', amount: -5 });
@@ -349,8 +346,8 @@ describe('applyTrustChange', () => {
     expect(result?.previous).toBe(80);
     expect(result?.serverUser.trustScore).toBe(75);
     // Rollup recompute reads and writes within the same transaction
-    expect(txSelect).toHaveBeenCalled();
-    expect(txUpdate).toHaveBeenCalledTimes(2);
+    expect(txExecute).toHaveBeenCalledTimes(1);
+    expect(txUpdate).toHaveBeenCalledTimes(1);
   });
 
   it('returns null when the account is already gone', async () => {
@@ -449,34 +446,18 @@ describe('getServerUserDisplayNames', () => {
 });
 
 describe('recomputeIdentityAggregates', () => {
-  /** Chainable stub that records its builder arguments and resolves to `rows`. */
-  function recordingChain(rows: unknown[]) {
-    const chain: Record<string, unknown> = {
-      then: (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
-        Promise.resolve(rows).then(resolve, reject),
-    };
-    for (const method of ['from', 'innerJoin', 'where']) {
-      chain[method] = vi.fn(() => chain);
-    }
-    return chain as { where: ReturnType<typeof vi.fn> } & Record<string, unknown>;
-  }
+  it('restates every listed identity in one statement', async () => {
+    vi.mocked(db.execute).mockResolvedValue({ rows: [], rowCount: 3 } as never);
 
-  it('counts only completed policy runs into total_violations', async () => {
-    const accountChain = recordingChain([{ trust: 80, firstJoinedAt: null, lastActivityAt: null }]);
-    const violationChain = recordingChain([{ count: 2 }]);
-    vi.mocked(db.select)
-      .mockReturnValueOnce(accountChain as never)
-      .mockReturnValueOnce(violationChain as never);
-    const setSpy = vi.fn(() => ({ where: vi.fn(async () => undefined) }));
-    vi.mocked(db.update).mockReturnValue({ set: setSpy } as never);
+    await recomputeIdentityAggregates(['a', 'b', 'c']);
 
-    await recomputeIdentityAggregates(randomUUID());
-
-    const where = violationChain.where.mock.calls[0]?.[0] as SQL;
-    const text = renderSql(where).sql.replace(/\s+/g, ' ').trim();
-    expect(text).toContain('automation_runs.kind =');
-    expect(text).toContain('automation_runs.outcome =');
-    expect(text).toContain('automation_runs.dismissed_at is null');
-    expect(setSpy).toHaveBeenCalledWith(expect.objectContaining({ totalViolations: 2 }));
+    expect(db.execute).toHaveBeenCalledTimes(1);
+    const { sql: text, params } = renderSql(vi.mocked(db.execute).mock.calls[0]?.[0] as SQL);
+    const flat = text.replace(/\s+/g, ' ');
+    expect(params).toEqual(expect.arrayContaining(['a', 'b', 'c']));
+    expect(flat).toContain('removed_at is null');
+    expect(flat).toContain('dismissed_at is null');
+    expect(flat).toContain('automation_runs.kind =');
+    expect(flat).toContain('automation_runs.outcome =');
   });
 });

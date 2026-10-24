@@ -42,12 +42,10 @@ import type {
   MaintenanceJobResult,
   MaintenanceJobType,
 } from '@tracearr/shared';
-import { WS_EVENTS, resolutionDisplayName, RESOLUTION_TIERS } from '@tracearr/shared';
-import { sql, isNotNull, isNull, inArray, or, and, eq, ne } from 'drizzle-orm';
+import { WS_EVENTS, RESOLUTION_TIERS } from '@tracearr/shared';
+import { sql, or, eq, ne } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { servers, sessions, serverUsers } from '../db/schema.js';
-import { storedSessionRowById } from '../db/sessions/row.js';
-import { normalizeClient, normalizePlatformName } from '../utils/platformNormalizer.js';
 import {
   bucketMembershipColumns,
   perResolutionBucket,
@@ -80,22 +78,17 @@ import {
 } from './importedHistoryLinking.js';
 import { runServerLocationSyncWalk } from './serverLocationSync.js';
 import {
+  walkFixImportedProgress,
+  walkNormalizeCodecs,
+  walkNormalizeCountries,
+  walkNormalizePlayers,
+  walkNormalizeResolutions,
+} from './sessionNormalize.js';
+import {
   INVALID_SNAPSHOT_CONDITION,
   VALID_LIBRARY_ITEM_CONDITION,
   validLibraryItemCondition,
 } from '../utils/snapshotValidation.js';
-import countries from 'i18n-iso-countries';
-import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
-
-// Register English locale for country name lookups
-countries.registerLocale(countriesEn);
-
-// Convert country name to ISO 3166-1 alpha-2 code
-// Handles common variations like "United States", "USA", "United Kingdom", etc.
-function getCountryCode(name: string): string | undefined {
-  return countries.getAlpha2Code(name, 'en') ?? undefined;
-}
-
 // Human-readable descriptions for maintenance job types (used in "Waiting for X" messages)
 function getMaintenanceJobDescription(type: MaintenanceJobType): string {
   const descriptions: Record<MaintenanceJobType, string> = {
@@ -421,221 +414,19 @@ async function processMaintenanceJob(job: Job<MaintenanceJobData>): Promise<Main
  * Updates the `device` and `platform` columns based on the existing
  * `product` and `playerName` values using the platformNormalizer utility.
  */
-async function processNormalizePlayersJob(
+export async function processNormalizePlayersJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
-  const pubSubService = getPubSubService();
-  const BATCH_SIZE = 500;
-
-  // Initialize progress
-  activeJobProgress = {
+  return runSessionMaintenanceWalk(job, {
     type: 'normalize_players',
-    status: 'running',
-    totalRecords: 0,
-    processedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    errorRecords: 0,
-    message: 'Counting sessions...',
-    startedAt: new Date().toISOString(),
-  };
-
-  const publishProgress = async () => {
-    if (pubSubService && activeJobProgress) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-  };
-
-  try {
-    // Count total sessions that have player/product info
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(sessions)
-      .where(
-        or(
-          isNotNull(sessions.product),
-          isNotNull(sessions.playerName),
-          isNotNull(sessions.platform)
-        )
-      );
-
-    const totalRecords = countResult?.count ?? 0;
-    activeJobProgress.totalRecords = totalRecords;
-    activeJobProgress.message = `Processing ${totalRecords.toLocaleString()} sessions...`;
-    await publishProgress();
-
-    if (totalRecords === 0) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.message = 'No sessions to normalize';
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-      return {
-        success: true,
-        type: 'normalize_players',
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        durationMs: Date.now() - startTime,
-        message: 'No sessions to normalize',
-      };
-    }
-
-    let lastId = ''; // Cursor for pagination
-    let totalProcessed = 0;
-    let totalUpdated = 0;
-    let totalSkipped = 0;
-    let totalErrors = 0;
-
-    // Small delay between batches to avoid overwhelming the database
-    const BATCH_DELAY_MS = 50;
-
-    while (totalProcessed < totalRecords) {
-      // Fetch batch of sessions using cursor-based pagination
-      const whereCondition = or(
-        isNotNull(sessions.product),
-        isNotNull(sessions.playerName),
-        isNotNull(sessions.platform)
-      );
-
-      const batch = await db
-        .select({
-          id: sessions.id,
-          startedAt: sessions.startedAt,
-          product: sessions.product,
-          playerName: sessions.playerName,
-          device: sessions.device,
-          platform: sessions.platform,
-        })
-        .from(sessions)
-        .where(lastId ? and(whereCondition, sql`${sessions.id} > ${lastId}`) : whereCondition)
-        .orderBy(sessions.id)
-        .limit(BATCH_SIZE);
-
-      // No more records to process
-      if (batch.length === 0) {
-        break;
-      }
-
-      // Update cursor to last record in batch
-      const lastRecord = batch[batch.length - 1];
-      if (lastRecord) lastId = lastRecord.id;
-
-      // Collect updates for batch processing
-      const updates: Array<{ id: string; startedAt: Date; device: string; platform: string }> = [];
-
-      for (const session of batch) {
-        try {
-          // Get the client string to normalize (prefer product, fallback to playerName)
-          // This is the RAW value from the media server API
-          const clientString = session.product || session.playerName || '';
-
-          if (!clientString && !session.platform) {
-            totalSkipped++;
-            continue;
-          }
-
-          // Normalize using the platformNormalizer
-          // DON'T pass session.device as hint - that's the old/bad value we're trying to fix
-          // The normalizer derives device from the client string
-          const normalized = normalizeClient(clientString);
-
-          // For platform: if we have an existing platform value, normalize it
-          // Otherwise use what the normalizer derived from the client string
-          const normalizedPlatform = session.platform
-            ? normalizePlatformName(session.platform)
-            : normalized.platform;
-
-          // Check if update is needed
-          const needsUpdate =
-            normalized.device !== session.device || normalizedPlatform !== session.platform;
-
-          if (needsUpdate) {
-            updates.push({
-              id: session.id,
-              startedAt: session.startedAt,
-              device: normalized.device,
-              platform: normalizedPlatform,
-            });
-          } else {
-            totalSkipped++;
-          }
-        } catch (error) {
-          console.error(`[Maintenance] Error processing session ${session.id}:`, error);
-          totalErrors++;
-        }
-      }
-
-      // Execute updates sequentially to avoid exhausting the connection pool
-      // Maintenance jobs are not time-critical, so sequential is fine
-      if (updates.length > 0) {
-        for (const update of updates) {
-          try {
-            await db
-              .update(sessions)
-              .set({
-                device: update.device,
-                platform: update.platform,
-              })
-              .where(storedSessionRowById(update));
-            totalUpdated++;
-          } catch (error) {
-            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
-            totalErrors++;
-          }
-        }
-      }
-
-      totalProcessed += batch.length;
-      activeJobProgress.processedRecords = totalProcessed;
-      activeJobProgress.updatedRecords = totalUpdated;
-      activeJobProgress.skippedRecords = totalSkipped;
-      activeJobProgress.errorRecords = totalErrors;
-      activeJobProgress.message = `Processed ${totalProcessed.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
-
-      // Update job progress
-      const percent = Math.round((totalProcessed / totalRecords) * 100);
-      await job.updateProgress(percent);
-      await publishProgress();
-
-      // Extend locks - fails fast if lock is lost to avoid wasted work
-      await extendJobLock(job);
-      await extendHeavyOpsLock(job.id!);
-
-      // Brief pause between batches to let other operations through
-      if (totalProcessed < totalRecords) {
-        await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
-      }
-    }
-
-    const durationMs = Date.now() - startTime;
-    activeJobProgress.status = 'complete';
-    activeJobProgress.message = `Completed! Updated ${totalUpdated.toLocaleString()} sessions in ${Math.round(durationMs / 1000)}s`;
-    activeJobProgress.completedAt = new Date().toISOString();
-    await publishProgress();
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'normalize_players',
-      processed: totalRecords,
-      updated: totalUpdated,
-      skipped: totalSkipped,
-      errors: totalErrors,
-      durationMs,
-      message: `Normalized ${totalUpdated.toLocaleString()} sessions`,
-    };
-  } catch (error) {
-    if (activeJobProgress) {
-      activeJobProgress.status = 'error';
-      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
-      await publishProgress();
-      activeJobProgress = null;
-    }
-    throw error;
-  }
+    startMessage: 'Normalizing player names...',
+    progressMessage: (total) => `Checked ${total.toLocaleString()} sessions...`,
+    completeMessage: (total) => `Completed! Normalized ${total.toLocaleString()} sessions`,
+    resultMessage: (total) => `Normalized ${total.toLocaleString()} sessions`,
+    failurePrefix: 'Player normalization skipped',
+    totalCountsUpdates: false,
+    walk: (onBatch) => walkNormalizePlayers({ onBatch }),
+  });
 }
 
 /**
@@ -644,235 +435,20 @@ async function processNormalizePlayersJob(
  * Converts full country names (e.g., "United States") to ISO 3166-1 alpha-2 codes (e.g., "US").
  * This fixes historical data from before the system was updated to store country codes.
  */
-async function processNormalizeCountriesJob(
+export async function processNormalizeCountriesJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
-  const pubSubService = getPubSubService();
-  const BATCH_SIZE = 500;
-  const BATCH_DELAY_MS = 50;
-
-  // Initialize progress
-  activeJobProgress = {
+  return runSessionMaintenanceWalk(job, {
     type: 'normalize_countries',
-    status: 'running',
-    totalRecords: 0,
-    processedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    errorRecords: 0,
-    message: 'Counting sessions with country data...',
-    startedAt: new Date().toISOString(),
-  };
-
-  const publishProgress = async () => {
-    if (pubSubService && activeJobProgress) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-  };
-
-  try {
-    // Count sessions that need geo normalization:
-    // - geoCountry longer than 2 chars (not already ISO codes)
-    // - OR geoCity is "Local" (old format that should be geoCountry="Local Network")
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(sessions)
-      .where(
-        or(
-          and(isNotNull(sessions.geoCountry), sql`length(${sessions.geoCountry}) > 2`),
-          sql`lower(${sessions.geoCity}) = 'local'`
-        )
-      );
-
-    const totalRecords = countResult?.count ?? 0;
-    activeJobProgress.totalRecords = totalRecords;
-    activeJobProgress.message = `Processing ${totalRecords.toLocaleString()} sessions...`;
-    await publishProgress();
-
-    if (totalRecords === 0) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.message = 'No sessions need country normalization';
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-      return {
-        success: true,
-        type: 'normalize_countries',
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        durationMs: Date.now() - startTime,
-        message: 'No sessions need country normalization',
-      };
-    }
-
-    let lastId = ''; // Cursor for pagination
-    let totalProcessed = 0;
-    let totalUpdated = 0;
-    let totalSkipped = 0;
-    let totalErrors = 0;
-
-    while (totalProcessed < totalRecords) {
-      // Fetch batch of sessions that need geo normalization
-      // Use cursor-based pagination (id > lastId) to ensure we process each record exactly once
-      const whereCondition = or(
-        and(isNotNull(sessions.geoCountry), sql`length(${sessions.geoCountry}) > 2`),
-        sql`lower(${sessions.geoCity}) = 'local'`
-      );
-
-      const batch = await db
-        .select({
-          id: sessions.id,
-          startedAt: sessions.startedAt,
-          geoCity: sessions.geoCity,
-          geoCountry: sessions.geoCountry,
-        })
-        .from(sessions)
-        .where(lastId ? and(whereCondition, sql`${sessions.id} > ${lastId}`) : whereCondition)
-        .orderBy(sessions.id)
-        .limit(BATCH_SIZE);
-
-      // No more records to process
-      if (batch.length === 0) {
-        break;
-      }
-
-      // Update cursor to last record in batch
-      const lastRecord = batch[batch.length - 1];
-      if (lastRecord) lastId = lastRecord.id;
-
-      // Collect updates for batch processing
-      const updates: Array<{
-        id: string;
-        startedAt: Date;
-        geoCity: string | null;
-        geoCountry: string;
-      }> = [];
-
-      for (const session of batch) {
-        try {
-          const currentCity = session.geoCity;
-          const currentCountry = session.geoCountry;
-
-          // Fix old format: geoCity="Local" should be geoCity=null, geoCountry="Local Network"
-          if (currentCity?.toLowerCase() === 'local') {
-            updates.push({
-              id: session.id,
-              startedAt: session.startedAt,
-              geoCity: null,
-              geoCountry: 'Local Network',
-            });
-            continue;
-          }
-
-          if (!currentCountry || currentCountry.length <= 2) {
-            // Already looks like a code
-            totalSkipped++;
-            continue;
-          }
-
-          // Standardize "Local" variants to "Local Network"
-          if (
-            currentCountry.toLowerCase() === 'local' ||
-            currentCountry.toLowerCase() === 'local network'
-          ) {
-            if (currentCountry !== 'Local Network') {
-              updates.push({
-                id: session.id,
-                startedAt: session.startedAt,
-                geoCity: currentCity,
-                geoCountry: 'Local Network',
-              });
-            } else {
-              totalSkipped++;
-            }
-            continue;
-          }
-
-          // Try to convert country name to ISO code
-          const isoCode = getCountryCode(currentCountry);
-
-          if (isoCode) {
-            updates.push({
-              id: session.id,
-              startedAt: session.startedAt,
-              geoCity: currentCity,
-              geoCountry: isoCode,
-            });
-          } else {
-            // Could not find a matching ISO code - skip
-            totalSkipped++;
-          }
-        } catch (error) {
-          console.error(`[Maintenance] Error processing session ${session.id}:`, error);
-          totalErrors++;
-        }
-      }
-
-      // Execute updates sequentially to avoid exhausting the connection pool
-      if (updates.length > 0) {
-        for (const update of updates) {
-          try {
-            await db
-              .update(sessions)
-              .set({ geoCity: update.geoCity, geoCountry: update.geoCountry })
-              .where(storedSessionRowById(update));
-            totalUpdated++;
-          } catch (error) {
-            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
-            totalErrors++;
-          }
-        }
-      }
-
-      totalProcessed += batch.length;
-      activeJobProgress.processedRecords = totalProcessed;
-      activeJobProgress.updatedRecords = totalUpdated;
-      activeJobProgress.skippedRecords = totalSkipped;
-      activeJobProgress.errorRecords = totalErrors;
-      activeJobProgress.message = `Processed ${totalProcessed.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
-
-      const percent = Math.round((totalProcessed / totalRecords) * 100);
-      await job.updateProgress(percent);
-      await publishProgress();
-
-      // Extend locks - fails fast if lock is lost to avoid wasted work
-      await extendJobLock(job);
-      await extendHeavyOpsLock(job.id!);
-
-      if (totalProcessed < totalRecords) {
-        await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
-      }
-    }
-
-    const durationMs = Date.now() - startTime;
-    activeJobProgress.status = 'complete';
-    activeJobProgress.message = `Completed! Converted ${totalUpdated.toLocaleString()} country names to ISO codes in ${Math.round(durationMs / 1000)}s`;
-    activeJobProgress.completedAt = new Date().toISOString();
-    await publishProgress();
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'normalize_countries',
-      processed: totalRecords,
-      updated: totalUpdated,
-      skipped: totalSkipped,
-      errors: totalErrors,
-      durationMs,
-      message: `Converted ${totalUpdated.toLocaleString()} country names to ISO codes`,
-    };
-  } catch (error) {
-    if (activeJobProgress) {
-      activeJobProgress.status = 'error';
-      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
-      await publishProgress();
-      activeJobProgress = null;
-    }
-    throw error;
-  }
+    startMessage: 'Normalizing country names...',
+    progressMessage: (total) => `Checked ${total.toLocaleString()} sessions...`,
+    completeMessage: (total) =>
+      `Completed! Converted ${total.toLocaleString()} country names to ISO codes`,
+    resultMessage: (total) => `Converted ${total.toLocaleString()} country names to ISO codes`,
+    failurePrefix: 'Country normalization skipped',
+    totalCountsUpdates: false,
+    walk: (onBatch) => walkNormalizeCountries({ onBatch }),
+  });
 }
 
 /**
@@ -886,223 +462,17 @@ async function processNormalizeCountriesJob(
 export async function processFixImportedProgressJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
-  const pubSubService = getPubSubService();
-  const BATCH_SIZE = 500;
-  const BATCH_DELAY_MS = 50;
-
-  // Initialize progress
-  activeJobProgress = {
+  return runSessionMaintenanceWalk(job, {
     type: 'fix_imported_progress',
-    status: 'running',
-    totalRecords: 0,
-    processedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    errorRecords: 0,
-    message: 'Counting imported sessions with missing progress...',
-    startedAt: new Date().toISOString(),
-  };
-
-  const publishProgress = async () => {
-    if (pubSubService && activeJobProgress) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-  };
-
-  try {
-    const missingBoth = and(isNull(sessions.progressMs), isNull(sessions.totalDurationMs));
-    const whereCondition = and(
-      isNotNull(sessions.externalSessionId),
-      isNotNull(sessions.durationMs),
-      missingBoth,
-      inArray(
-        sessions.serverId,
-        db.select({ id: servers.id }).from(servers).where(eq(servers.type, 'plex'))
-      )
-    );
-
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(sessions)
-      .where(whereCondition);
-
-    const totalRecords = countResult?.count ?? 0;
-    activeJobProgress.totalRecords = totalRecords;
-    activeJobProgress.message = `Processing ${totalRecords.toLocaleString()} imported sessions...`;
-    await publishProgress();
-
-    if (totalRecords === 0) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.message = 'No imported sessions need progress fixes';
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-      return {
-        success: true,
-        type: 'fix_imported_progress',
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        durationMs: Date.now() - startTime,
-        message: 'No imported sessions need progress fixes',
-      };
-    }
-
-    let lastId = ''; // Cursor for pagination
-    let totalProcessed = 0;
-    let totalUpdated = 0;
-    let totalSkipped = 0;
-    let totalErrors = 0;
-
-    while (totalProcessed < totalRecords) {
-      // Fetch batch of sessions
-      // Use cursor-based pagination (id > lastId) to ensure we process each record exactly once
-      const batch = await db
-        .select({
-          id: sessions.id,
-          startedAt: sessions.startedAt,
-          durationMs: sessions.durationMs,
-          watched: sessions.watched,
-          mediaType: sessions.mediaType,
-        })
-        .from(sessions)
-        .where(lastId ? and(whereCondition, sql`${sessions.id} > ${lastId}`) : whereCondition)
-        .orderBy(sessions.id)
-        .limit(BATCH_SIZE);
-
-      // No more records to process
-      if (batch.length === 0) {
-        break;
-      }
-
-      // Update cursor to last record in batch
-      const lastRecord = batch[batch.length - 1];
-      if (lastRecord) lastId = lastRecord.id;
-
-      // Collect updates for batch processing
-      const updates: Array<{
-        id: string;
-        startedAt: Date;
-        progressMs: number;
-        totalDurationMs: number;
-      }> = [];
-
-      for (const session of batch) {
-        try {
-          const durationMs = session.durationMs;
-          if (durationMs === null || durationMs <= 0) {
-            totalSkipped++;
-            continue;
-          }
-
-          // Estimate totalDurationMs from watched status
-          // If watched = true, assume they completed ~85% (typical watch threshold)
-          // If watched = false, use the median length for the media type, or the watch time if longer
-          // Note: This is a best-effort fix for legacy Tautulli imports
-          let totalDurationMs: number;
-          let progressMs: number;
-
-          if (session.watched) {
-            // If marked as watched, assume they hit ~85% threshold
-            // So total = durationMs / 0.85 (inverse of watch threshold)
-            totalDurationMs = Math.round(durationMs / 0.85);
-            progressMs = durationMs;
-          } else {
-            // For unwatched sessions, use median content duration based on media type
-            // These medians are derived from actual session data in the database
-            const medianDurations: Record<string, number> = {
-              episode: 42 * 60 * 1000, // 42 minutes
-              movie: 109 * 60 * 1000, // 109 minutes
-              track: 4 * 60 * 1000, // 4 minutes
-            };
-            const medianDuration = medianDurations[session.mediaType ?? ''] ?? 60 * 60 * 1000; // default 1 hour
-
-            // Use the larger of median or actual watch time (they may have watched longer than average)
-            totalDurationMs = Math.max(medianDuration, durationMs);
-            progressMs = durationMs;
-          }
-
-          updates.push({
-            id: session.id,
-            startedAt: session.startedAt,
-            progressMs,
-            totalDurationMs,
-          });
-        } catch (error) {
-          console.error(`[Maintenance] Error processing session ${session.id}:`, error);
-          totalErrors++;
-        }
-      }
-
-      // Execute updates sequentially to avoid exhausting the connection pool
-      if (updates.length > 0) {
-        for (const update of updates) {
-          try {
-            const written = await db
-              .update(sessions)
-              .set({
-                progressMs: update.progressMs,
-                totalDurationMs: update.totalDurationMs,
-              })
-              .where(and(storedSessionRowById(update), missingBoth))
-              .returning({ id: sessions.id });
-            if (written.length > 0) totalUpdated++;
-            else totalSkipped++;
-          } catch (error) {
-            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
-            totalErrors++;
-          }
-        }
-      }
-
-      totalProcessed += batch.length;
-      activeJobProgress.processedRecords = totalProcessed;
-      activeJobProgress.updatedRecords = totalUpdated;
-      activeJobProgress.skippedRecords = totalSkipped;
-      activeJobProgress.errorRecords = totalErrors;
-      activeJobProgress.message = `Processed ${totalProcessed.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
-
-      const percent = Math.round((totalProcessed / totalRecords) * 100);
-      await job.updateProgress(percent);
-      await publishProgress();
-
-      // Extend locks - fails fast if lock is lost to avoid wasted work
-      await extendJobLock(job);
-      await extendHeavyOpsLock(job.id!);
-
-      if (totalProcessed < totalRecords) {
-        await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
-      }
-    }
-
-    const durationMs = Date.now() - startTime;
-    activeJobProgress.status = 'complete';
-    activeJobProgress.message = `Completed! Fixed progress data for ${totalUpdated.toLocaleString()} sessions in ${Math.round(durationMs / 1000)}s`;
-    activeJobProgress.completedAt = new Date().toISOString();
-    await publishProgress();
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'fix_imported_progress',
-      processed: totalRecords,
-      updated: totalUpdated,
-      skipped: totalSkipped,
-      errors: totalErrors,
-      durationMs,
-      message: `Fixed progress data for ${totalUpdated.toLocaleString()} sessions`,
-    };
-  } catch (error) {
-    if (activeJobProgress) {
-      activeJobProgress.status = 'error';
-      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
-      await publishProgress();
-      activeJobProgress = null;
-    }
-    throw error;
-  }
+    startMessage: 'Fixing imported sessions with missing progress...',
+    progressMessage: (total) => `Checked ${total.toLocaleString()} imported sessions...`,
+    completeMessage: (total) =>
+      `Completed! Fixed progress data for ${total.toLocaleString()} sessions`,
+    resultMessage: (total) => `Fixed progress data for ${total.toLocaleString()} sessions`,
+    failurePrefix: 'Imported progress fix skipped',
+    totalCountsUpdates: false,
+    walk: (onBatch, onCommit) => walkFixImportedProgress({ onBatch, onCommit }),
+  });
 }
 
 /**
@@ -1374,12 +744,15 @@ export async function runSessionMaintenanceWalk(
     /** Sleep after every batch, so a single-core Postgres can serve the poller between them. */
     batchPauseMs?: number;
     walk: (
-      onBatch: (total: number) => Promise<void>,
+      onBatch: (total: number, counts?: { updated: number; skipped: number }) => Promise<void>,
       onCommit: (oldest: Date | null) => void
     ) => Promise<{
       total: number;
       failedRanges: string[];
       details: string;
+      /** Rows looked at, when that differs from total */
+      processed?: number;
+      skipped?: number;
     }>;
   }
 ): Promise<MaintenanceJobResult> {
@@ -1466,10 +839,14 @@ export async function runSessionMaintenanceWalk(
       // pause, or a chunk compressed in between would escape its window bounds.
       walked = await withSessionsCompressionPaused(() =>
         opts.walk(
-          async (runningTotal) => {
+          async (runningTotal, counts) => {
             if (activeJobProgress) {
               activeJobProgress.processedRecords = runningTotal;
               if (opts.totalCountsUpdates) activeJobProgress.updatedRecords = runningTotal;
+              if (counts) {
+                activeJobProgress.updatedRecords = counts.updated;
+                activeJobProgress.skippedRecords = counts.skipped;
+              }
               activeJobProgress.message = opts.progressMessage(runningTotal);
               await publishProgress();
             }
@@ -1534,9 +911,9 @@ export async function runSessionMaintenanceWalk(
     return {
       success: true,
       type: opts.type,
-      processed: total,
+      processed: walked.processed ?? total,
       updated: total,
-      skipped: 0,
+      skipped: walked.skipped ?? 0,
       errors: 0,
       durationMs,
       message: opts.resultMessage(total, details),
@@ -1559,149 +936,19 @@ export async function runSessionMaintenanceWalk(
  * stream_audio_codec) to uppercase for consistency. This fixes data imported before
  * the Tautulli enrichment was updated to uppercase codecs.
  */
-async function processNormalizeCodecsJob(
+export async function processNormalizeCodecsJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
-  const pubSubService = getPubSubService();
-  const BATCH_SIZE = 1000; // Bulk update batch size
-
-  // Initialize progress
-  activeJobProgress = {
+  return runSessionMaintenanceWalk(job, {
     type: 'normalize_codecs',
-    status: 'running',
-    totalRecords: 0,
-    processedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    errorRecords: 0,
-    message: 'Counting sessions with lowercase codecs...',
-    startedAt: new Date().toISOString(),
-  };
-
-  const publishProgress = async () => {
-    if (pubSubService && activeJobProgress) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-  };
-
-  try {
-    // Count sessions that have codec values not already uppercase
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(sessions)
-      .where(
-        or(
-          sql`${sessions.sourceVideoCodec} IS DISTINCT FROM UPPER(${sessions.sourceVideoCodec})`,
-          sql`${sessions.sourceAudioCodec} IS DISTINCT FROM UPPER(${sessions.sourceAudioCodec})`,
-          sql`${sessions.streamVideoCodec} IS DISTINCT FROM UPPER(${sessions.streamVideoCodec})`,
-          sql`${sessions.streamAudioCodec} IS DISTINCT FROM UPPER(${sessions.streamAudioCodec})`
-        )
-      );
-
-    const totalRecords = countResult?.count ?? 0;
-    activeJobProgress.totalRecords = totalRecords;
-    activeJobProgress.message = `Processing ${totalRecords.toLocaleString()} sessions...`;
-    await publishProgress();
-
-    if (totalRecords === 0) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.message = 'All codec names are already normalized';
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-      return {
-        success: true,
-        type: 'normalize_codecs',
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        durationMs: Date.now() - startTime,
-        message: 'All codec names are already normalized',
-      };
-    }
-
-    let totalUpdated = 0;
-    let totalErrors = 0;
-
-    // Use bulk UPDATE with LIMIT subquery - much more efficient than individual updates
-    // This avoids exhausting PostgreSQL's lock pool
-    while (totalUpdated < totalRecords) {
-      try {
-        // Single bulk UPDATE that updates up to BATCH_SIZE rows at once
-        const result = await db.execute(sql`
-          UPDATE ${sessions}
-          SET
-            source_video_codec = UPPER(source_video_codec),
-            source_audio_codec = UPPER(source_audio_codec),
-            stream_video_codec = UPPER(stream_video_codec),
-            stream_audio_codec = UPPER(stream_audio_codec)
-          WHERE id IN (
-            SELECT id FROM ${sessions}
-            WHERE source_video_codec IS DISTINCT FROM UPPER(source_video_codec)
-               OR source_audio_codec IS DISTINCT FROM UPPER(source_audio_codec)
-               OR stream_video_codec IS DISTINCT FROM UPPER(stream_video_codec)
-               OR stream_audio_codec IS DISTINCT FROM UPPER(stream_audio_codec)
-            LIMIT ${BATCH_SIZE}
-          )
-        `);
-
-        const updatedCount = Number(result.rowCount ?? 0);
-
-        // No more rows to update
-        if (updatedCount === 0) {
-          break;
-        }
-
-        totalUpdated += updatedCount;
-      } catch (error) {
-        console.error(`[Maintenance] Error in bulk update:`, error);
-        totalErrors++;
-        break;
-      }
-
-      activeJobProgress.processedRecords = totalUpdated;
-      activeJobProgress.updatedRecords = totalUpdated;
-      activeJobProgress.errorRecords = totalErrors;
-      activeJobProgress.message = `Updated ${totalUpdated.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
-
-      const percent = Math.min(100, Math.round((totalUpdated / totalRecords) * 100));
-      await job.updateProgress(percent);
-      await publishProgress();
-
-      // Extend locks - fails fast if lock is lost to avoid wasted work
-      await extendJobLock(job);
-      await extendHeavyOpsLock(job.id!);
-    }
-
-    const durationMs = Date.now() - startTime;
-    activeJobProgress.status = 'complete';
-    activeJobProgress.processedRecords = totalUpdated;
-    activeJobProgress.message = `Completed! Normalized ${totalUpdated.toLocaleString()} codec values in ${Math.round(durationMs / 1000)}s`;
-    activeJobProgress.completedAt = new Date().toISOString();
-    await publishProgress();
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'normalize_codecs',
-      processed: totalUpdated,
-      updated: totalUpdated,
-      skipped: 0,
-      errors: totalErrors,
-      durationMs,
-      message: `Normalized ${totalUpdated.toLocaleString()} codec values to uppercase`,
-    };
-  } catch (error) {
-    if (activeJobProgress) {
-      activeJobProgress.status = 'error';
-      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
-      await publishProgress();
-      activeJobProgress = null;
-    }
-    throw error;
-  }
+    startMessage: 'Normalizing codec names...',
+    progressMessage: (total) => `Normalized ${total.toLocaleString()} sessions...`,
+    completeMessage: (total) => `Completed! Normalized ${total.toLocaleString()} codec values`,
+    resultMessage: (total) => `Normalized ${total.toLocaleString()} codec values to uppercase`,
+    failurePrefix: 'Codec normalization skipped',
+    totalCountsUpdates: true,
+    walk: (onBatch) => walkNormalizeCodecs({ onBatch }),
+  });
 }
 
 /**
@@ -1727,175 +974,16 @@ async function processNormalizeCodecsJob(
 export async function processNormalizeResolutionsJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
-  const pubSubService = getPubSubService();
-  const BATCH_SIZE = 500;
-  const BATCH_DELAY_MS = 50;
-
-  activeJobProgress = {
+  return runSessionMaintenanceWalk(job, {
     type: 'normalize_resolutions',
-    status: 'running',
-    totalRecords: 0,
-    processedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    errorRecords: 0,
-    message: 'Counting sessions with source dimensions...',
-    startedAt: new Date().toISOString(),
-  };
-
-  const publishProgress = async () => {
-    if (pubSubService && activeJobProgress) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-  };
-
-  try {
-    const dimsCondition = and(
-      isNotNull(sessions.sourceVideoWidth),
-      isNotNull(sessions.sourceVideoHeight)
-    );
-
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(sessions)
-      .where(dimsCondition);
-
-    const totalRecords = countResult?.count ?? 0;
-    activeJobProgress.totalRecords = totalRecords;
-    activeJobProgress.message = `Checking ${totalRecords.toLocaleString()} sessions with dimensions...`;
-    await publishProgress();
-
-    if (totalRecords === 0) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.message = 'No sessions with source dimensions to check';
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-      return {
-        success: true,
-        type: 'normalize_resolutions',
-        processed: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        durationMs: Date.now() - startTime,
-        message: 'No sessions with source dimensions to check',
-      };
-    }
-
-    let lastId = ''; // Cursor for pagination
-    let totalProcessed = 0;
-    let totalUpdated = 0;
-    let totalSkipped = 0;
-    let totalErrors = 0;
-
-    while (totalProcessed < totalRecords) {
-      const batch = await db
-        .select({
-          id: sessions.id,
-          startedAt: sessions.startedAt,
-          quality: sessions.quality,
-          sourceVideoWidth: sessions.sourceVideoWidth,
-          sourceVideoHeight: sessions.sourceVideoHeight,
-        })
-        .from(sessions)
-        .where(lastId ? and(dimsCondition, sql`${sessions.id} > ${lastId}`) : dimsCondition)
-        .orderBy(sessions.id)
-        .limit(BATCH_SIZE);
-
-      // No more records to process
-      if (batch.length === 0) {
-        break;
-      }
-
-      // Update cursor to last record in batch
-      const lastRecord = batch[batch.length - 1];
-      if (lastRecord) lastId = lastRecord.id;
-
-      // Collect updates for batch processing
-      const updates: Array<{ id: string; startedAt: Date; quality: string }> = [];
-
-      for (const session of batch) {
-        try {
-          const recomputed = resolutionDisplayName({
-            width: session.sourceVideoWidth,
-            height: session.sourceVideoHeight,
-          });
-
-          if (recomputed && recomputed !== session.quality) {
-            updates.push({ id: session.id, startedAt: session.startedAt, quality: recomputed });
-          } else {
-            totalSkipped++;
-          }
-        } catch (error) {
-          console.error(`[Maintenance] Error processing session ${session.id}:`, error);
-          totalErrors++;
-        }
-      }
-
-      // Execute updates sequentially to avoid exhausting the connection pool
-      if (updates.length > 0) {
-        for (const update of updates) {
-          try {
-            await db
-              .update(sessions)
-              .set({ quality: update.quality })
-              .where(storedSessionRowById(update));
-            totalUpdated++;
-          } catch (error) {
-            console.error(`[Maintenance] Error updating session ${update.id}:`, error);
-            totalErrors++;
-          }
-        }
-      }
-
-      totalProcessed += batch.length;
-      activeJobProgress.processedRecords = totalProcessed;
-      activeJobProgress.updatedRecords = totalUpdated;
-      activeJobProgress.skippedRecords = totalSkipped;
-      activeJobProgress.errorRecords = totalErrors;
-      activeJobProgress.message = `Processed ${totalProcessed.toLocaleString()} of ${totalRecords.toLocaleString()} sessions...`;
-
-      const percent = Math.round((totalProcessed / totalRecords) * 100);
-      await job.updateProgress(percent);
-      await publishProgress();
-
-      // Extend locks - fails fast if lock is lost to avoid wasted work
-      await extendJobLock(job);
-      await extendHeavyOpsLock(job.id!);
-
-      if (totalProcessed < totalRecords) {
-        await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
-      }
-    }
-
-    const durationMs = Date.now() - startTime;
-    activeJobProgress.status = 'complete';
-    activeJobProgress.message = `Completed! Relabeled ${totalUpdated.toLocaleString()} sessions in ${Math.round(durationMs / 1000)}s`;
-    activeJobProgress.completedAt = new Date().toISOString();
-    await publishProgress();
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'normalize_resolutions',
-      processed: totalRecords,
-      updated: totalUpdated,
-      skipped: totalSkipped,
-      errors: totalErrors,
-      durationMs,
-      message: `Relabeled ${totalUpdated.toLocaleString()} session resolutions`,
-    };
-  } catch (error) {
-    if (activeJobProgress) {
-      activeJobProgress.status = 'error';
-      activeJobProgress.message = error instanceof Error ? error.message : 'Unknown error';
-      await publishProgress();
-      activeJobProgress = null;
-    }
-    throw error;
-  }
+    startMessage: 'Checking sessions with source dimensions...',
+    progressMessage: (total) => `Checked ${total.toLocaleString()} sessions...`,
+    completeMessage: (total) => `Completed! Relabeled ${total.toLocaleString()} sessions`,
+    resultMessage: (total) => `Relabeled ${total.toLocaleString()} session resolutions`,
+    failurePrefix: 'Resolution normalization skipped',
+    totalCountsUpdates: false,
+    walk: (onBatch) => walkNormalizeResolutions({ onBatch }),
+  });
 }
 
 /**

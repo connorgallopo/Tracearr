@@ -196,9 +196,10 @@ describe('processRunRetention', () => {
 
     await processRunRetention();
 
-    expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledTimes(2);
-    expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledWith('su-1');
-    expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledWith('su-2');
+    expect(recomputeIdentityAggregatesForServerUser).toHaveBeenCalledExactlyOnceWith([
+      'su-1',
+      'su-2',
+    ]);
   });
 
   it('restates nothing for the notification or diagnostic passes', async () => {

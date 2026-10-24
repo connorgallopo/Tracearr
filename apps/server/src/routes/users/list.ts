@@ -825,8 +825,8 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
       return { success: true, updated: 0 };
     }
 
-    // Bulk update trust scores to 100, then recompute each affected identity's
-    // rollup once in the same transaction.
+    // Bulk update trust scores to 100, then recompute the affected identities'
+    // rollups in the same transaction.
     const moves = await db.transaction(async (tx) => {
       const moved = await moveTrust(
         tx,
@@ -834,9 +834,7 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
         inArray(serverUsers.id, accountIds)
       );
 
-      for (const userId of affectedIdentityIds) {
-        await recomputeIdentityAggregates(userId, tx);
-      }
+      await recomputeIdentityAggregates(affectedIdentityIds, tx);
       return moved;
     });
 

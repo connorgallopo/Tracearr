@@ -173,12 +173,6 @@ async function countedIdentitiesOf(automationIds: string[]): Promise<string[]> {
   return rows.map((row) => row.serverUserId).filter((id): id is string => id !== null);
 }
 
-async function restateIdentities(serverUserIds: string[]): Promise<void> {
-  for (const serverUserId of serverUserIds) {
-    await recomputeIdentityAggregatesForServerUser(serverUserId);
-  }
-}
-
 /** The scope a materialized definition carries, in the column shape the row stores. */
 function definitionScope(definition: CreateAutomationInput) {
   return {
@@ -677,7 +671,7 @@ export const automationRoutes: FastifyPluginAsync = async (app) => {
 
     const counted = await countedIdentitiesOf([existing.id]);
     await db.delete(automations).where(eq(automations.id, existing.id));
-    await restateIdentities(counted);
+    await recomputeIdentityAggregatesForServerUser(counted);
 
     invalidateAutomationsCache();
     if (needsInactivitySweep(existing)) void scheduleInactivityChecks();
@@ -718,7 +712,7 @@ export const automationRoutes: FastifyPluginAsync = async (app) => {
       .delete(automations)
       .where(inArray(automations.id, parsed.data.ids))
       .returning({ id: automations.id });
-    await restateIdentities(counted);
+    await recomputeIdentityAggregatesForServerUser(counted);
 
     if (deleted.length > 0) invalidateAutomationsCache();
     return { success: true, deleted: deleted.length };

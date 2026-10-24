@@ -553,7 +553,7 @@ describe('POST /users/bulk/reset-trust', () => {
     expect(normalize(seedQuery.sql)).toContain('rsu.username ILIKE');
     expect(normalize(seedQuery.sql)).toContain('u.name ILIKE');
     expect(seedQuery.params).toContain('%robert%');
-    expect(mockRecompute).toHaveBeenCalledWith(userId, expect.anything());
+    expect(mockRecompute).toHaveBeenCalledWith([userId], expect.anything());
   });
 
   it('carries the date bounds into the seed query too', () => {
