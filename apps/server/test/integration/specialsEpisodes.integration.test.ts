@@ -28,7 +28,7 @@ import { db } from '../../src/db/client.js';
 import { sql } from 'drizzle-orm';
 import { createSessionWithRulesAtomic } from '../../src/jobs/poller/sessionLifecycle.js';
 import type { SessionCreationInput } from '../../src/jobs/poller/types.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 
 const NULL_GEO = {

@@ -11,7 +11,7 @@ import {
   queryUserDevices,
   resolveIdentityScopedServerUserIds,
   userHistoryWindow,
-} from './queries.js';
+} from './queries/index.js';
 
 export const devicesRoutes: FastifyPluginAsync = async (app) => {
   const readDevices = { preHandler: [app.requirePermission('devices', 'read')] };

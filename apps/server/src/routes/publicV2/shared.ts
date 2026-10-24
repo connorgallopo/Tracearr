@@ -18,7 +18,7 @@ import {
 } from '@tracearr/shared';
 import { sql, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
-import { countedSessionSql } from '../../db/sessions/rules.js';
+import { countedSessionSql, firstSegmentJoin, groupedPlaysCte } from '../../db/sessions/index.js';
 import { db } from '../../db/client.js';
 import { buildAvatarUrl, buildPosterUrl } from '../../services/imageProxy.js';
 import { encodeCursor } from '../../utils/cursor.js';
@@ -321,33 +321,20 @@ async function aggregateChainPage(
   conditions: SQL[],
   watchedFilter: SQL,
   cursorFilter: SQL,
-  pageSize: number
+  pageSize: number,
+  windowConditions: SQL[]
 ) {
-  const whereClause =
-    conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
-
   return db.execute(sql`
-    WITH chains AS (
-      SELECT
-        COALESCE(s.reference_id, s.id) as chain_id,
-        MIN(s.started_at) as chain_started_at,
-        MAX(s.stopped_at) as stopped_at,
-        SUM(COALESCE(s.duration_ms, 0)) as duration_ms,
-        MAX(s.progress_ms) as progress_ms,
-        MAX(s.total_duration_ms) as total_duration_ms,
-        COUNT(*) as segment_count,
-        BOOL_OR(s.watched) as watched,
-        (array_agg(s.id ORDER BY s.started_at))[1] as first_session_id,
-        (array_agg(s.state ORDER BY s.started_at DESC))[1] as state
-      FROM sessions s
-      ${whereClause}
-      GROUP BY COALESCE(s.reference_id, s.id)
-      HAVING BOOL_OR(${countedSessionSql('s')})${watchedFilter}
-    ),
+    WITH chains AS (${groupedPlaysCte({
+      where: conditions,
+      having: sql`BOOL_OR(${countedSessionSql('s')})${watchedFilter}`,
+    })}),
     page AS (
-      SELECT * FROM chains
+      SELECT play_id AS chain_id, started_at AS chain_started_at, stopped_at, duration_ms,
+        progress_ms, total_duration_ms, segment_count, watched, state, first_session_id
+      FROM chains
       ${cursorFilter}
-      ORDER BY chain_started_at DESC, chain_id DESC
+      ORDER BY started_at DESC, play_id DESC
       LIMIT ${pageSize}
     )
     SELECT
@@ -415,11 +402,7 @@ async function aggregateChainPage(
       u.name as user_name,
       u.username as user_username
     FROM page p
-    -- p.chain_started_at is not a planner-time constant; the InitPlan bounds are what let
-    -- TimescaleDB exclude chunks at runtime
-    JOIN sessions s ON s.id = p.first_session_id AND s.started_at = p.chain_started_at
-      AND s.started_at >= (SELECT MIN(chain_started_at) FROM page)
-      AND s.started_at <= (SELECT MAX(chain_started_at) FROM page)
+    ${firstSegmentJoin({ alias: 'p', boundsFrom: 'page', startColumn: 'chain_started_at' }, windowConditions)}
     JOIN server_users su ON su.id = s.server_user_id
     JOIN servers sv ON sv.id = s.server_id
     LEFT JOIN users u ON u.id = su.user_id
@@ -433,12 +416,16 @@ export async function runHistoryPage(
   conditions: SQL[],
   pageSize: number,
   cursorValue: { startedAt: Date; id: string } | null,
-  watched: boolean | undefined
+  watched: boolean | undefined,
+  window: { since?: Date; until?: Date } = {}
 ): Promise<{ data: ReturnType<typeof mapHistoryRow>[]; nextCursor: string | null }> {
   const watchedFilter = watched === undefined ? sql`` : sql` AND BOOL_OR(s.watched) = ${watched}`;
   const cursorFilter = cursorValue
-    ? sql`WHERE (chain_started_at, chain_id) < (${cursorValue.startedAt}::timestamptz, ${cursorValue.id}::uuid)`
+    ? sql`WHERE (started_at, play_id) < (${cursorValue.startedAt}::timestamptz, ${cursorValue.id}::uuid)`
     : sql``;
+  const windowConditions: SQL[] = [];
+  if (window.since) windowConditions.push(sql`s.started_at >= ${window.since}`);
+  if (window.until) windowConditions.push(sql`s.started_at <= ${window.until}`);
 
   let rawLimit = pageSize * RAW_WINDOW_INITIAL_MULTIPLIER;
   let rows: HistoryRow[] = [];
@@ -455,7 +442,8 @@ export async function runHistoryPage(
       [...conditions, sql`COALESCE(s.reference_id, s.id) = ANY(${uuidArraySql(chainIds)})`],
       watchedFilter,
       cursorFilter,
-      pageSize
+      pageSize,
+      windowConditions
     );
     rows = windowed.rows as unknown as HistoryRow[];
 
@@ -472,7 +460,13 @@ export async function runHistoryPage(
       // Pathological spread (chains resumed far apart in time): fall back to
       // the unrestricted aggregation so correctness never depends on the
       // clustering assumption above.
-      const fallback = await aggregateChainPage(conditions, watchedFilter, cursorFilter, pageSize);
+      const fallback = await aggregateChainPage(
+        conditions,
+        watchedFilter,
+        cursorFilter,
+        pageSize,
+        windowConditions
+      );
       rows = fallback.rows as unknown as HistoryRow[];
       break;
     }

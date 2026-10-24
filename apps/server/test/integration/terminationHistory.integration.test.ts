@@ -17,7 +17,7 @@ import {
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
 import { automations, servers, sessions, terminationLogs, users } from '../../src/db/schema.js';
-import { queryTerminationHistory } from '../../src/routes/users/queries.js';
+import { queryTerminationHistory } from '../../src/routes/users/queries/index.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;

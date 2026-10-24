@@ -22,7 +22,7 @@ import {
 } from '@tracearr/test-utils/factories';
 import { createMockRedis } from '@tracearr/test-utils/mocks';
 import { db } from '../../src/db/client.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { libraryLibrariesRoute } from '../../src/routes/library/libraries.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 

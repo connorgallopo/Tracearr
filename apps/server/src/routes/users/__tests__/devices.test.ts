@@ -10,18 +10,18 @@ import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
 import type { AuthUser, UserDevice } from '@tracearr/shared';
-import type * as QueriesModule from '../queries.js';
+import type * as QueriesModule from '../queries/index.js';
 import { renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({ db: { execute: vi.fn() } }));
 
-vi.mock('../queries.js', async (importActual) => ({
+vi.mock('../queries/index.js', async (importActual) => ({
   ...(await importActual<typeof QueriesModule>()),
   resolveIdentityScopedServerUserIds: vi.fn(),
 }));
 
 import { db } from '../../../db/client.js';
-import { resolveIdentityScopedServerUserIds } from '../queries.js';
+import { resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { devicesRoutes } from '../devices.js';
 import { permissionGuard } from '../../../lib/scope.js';
 

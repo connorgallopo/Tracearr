@@ -7,7 +7,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { userIdParamSchema, identityScopedPaginationSchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { queryUserDownloads, resolveIdentityScopedServerUserIds } from './queries.js';
+import { queryUserDownloads, resolveIdentityScopedServerUserIds } from './queries/index.js';
 
 export const downloadsRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };

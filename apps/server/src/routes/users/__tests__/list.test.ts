@@ -604,7 +604,7 @@ describe('GET /users/:id', () => {
 
     expect(response.statusCode).toBe(200);
     expect(renderCall(statsChain).text).toBe(
-      '(sessions.server_user_id = $1 and sessions.started_at >= $2 and sessions.started_at <= $3)'
+      `sessions.server_user_id = ANY(ARRAY['${id}'::uuid]) AND sessions.started_at >= $1 AND sessions.started_at <= $2`
     );
   });
 });

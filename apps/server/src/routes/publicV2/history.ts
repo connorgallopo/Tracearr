@@ -6,6 +6,7 @@ import { booleanStringSchema } from '@tracearr/shared';
 import { sql, type SQL } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
+import { historyMediaTypeDefault } from '../../db/sessions/rules.js';
 import {
   buildMediaScope,
   resolveCanonicalMediaByRef,
@@ -91,13 +92,17 @@ export function registerHistoryRoutes(app: FastifyInstance, routeConfig: RouteCo
       if (imdbId) conditions.push(sql`s.imdb_id = ${imdbId}`);
       if (tmdbId !== undefined) conditions.push(sql`s.tmdb_id = ${tmdbId}`);
       if (tvdbId !== undefined) conditions.push(sql`s.tvdb_id = ${tvdbId}`);
-      conditions.push(
-        mediaType ? sql`s.media_type = ${mediaType}` : sql`s.media_type <> 'trailer'`
-      );
+      conditions.push(mediaType ? sql`s.media_type = ${mediaType}` : historyMediaTypeDefault());
       if (since) conditions.push(sql`s.started_at >= ${since}`);
       if (until) conditions.push(sql`s.started_at <= ${until}`);
 
-      const { data, nextCursor } = await runHistoryPage(conditions, pageSize, cursorValue, watched);
+      const { data, nextCursor } = await runHistoryPage(
+        conditions,
+        pageSize,
+        cursorValue,
+        watched,
+        { since, until }
+      );
       return cursorPage(data, nextCursor, pageSize);
     }
   );

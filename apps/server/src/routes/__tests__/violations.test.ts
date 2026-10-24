@@ -56,7 +56,7 @@ vi.mock('../../services/automations/events/producers.js', () => ({
 
 // Import the mocked db and the routes
 import { db } from '../../db/client.js';
-import { violationRoutes, buildViolationRosterConditions } from '../violations.js';
+import { violationRoutes, buildViolationRosterConditions } from '../violations/index.js';
 import { permissionGuard } from '../../lib/scope.js';
 
 function normalize(text: string): string {

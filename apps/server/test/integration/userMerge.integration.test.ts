@@ -40,7 +40,7 @@ import { fullRoutes } from '../../src/routes/users/full.js';
 import { listRoutes } from '../../src/routes/users/list.js';
 import { sessionsRoutes } from '../../src/routes/users/sessions.js';
 import { terminationsRoutes } from '../../src/routes/users/terminations.js';
-import { violationRoutes } from '../../src/routes/violations.js';
+import { violationRoutes } from '../../src/routes/violations/index.js';
 import { recomputeIdentityAggregates } from '../../src/services/userService.js';
 import {
   users,

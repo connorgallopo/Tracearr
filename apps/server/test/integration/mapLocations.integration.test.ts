@@ -21,7 +21,7 @@ import {
 import { createMockRedis } from '@tracearr/test-utils/mocks';
 import type { LocationStats, LocationStatsSummary } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { locationsRoutes } from '../../src/routes/stats/locations.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
 import { permissionGuard } from '../../src/lib/scope.js';

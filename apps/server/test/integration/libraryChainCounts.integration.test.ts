@@ -28,7 +28,7 @@ import { libraryWatchRoute } from '../../src/routes/library/watch.js';
 import { libraryRoiRoute } from '../../src/routes/library/roi.js';
 import { libraryStaleRoute } from '../../src/routes/library/stale.js';
 import { libraryTopContentRoute } from '../../src/routes/library/topContent.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { resolveMediaForItem } from '../../src/services/library/mediaResolutionService.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 

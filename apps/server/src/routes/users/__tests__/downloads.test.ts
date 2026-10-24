@@ -10,17 +10,17 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
-import type * as QueriesModule from '../queries.js';
+import type * as QueriesModule from '../queries/index.js';
 
 vi.mock('../../../db/client.js', () => ({ db: {} }));
 
-vi.mock('../queries.js', async (importActual) => ({
+vi.mock('../queries/index.js', async (importActual) => ({
   ...(await importActual<typeof QueriesModule>()),
   resolveIdentityScopedServerUserIds: vi.fn(),
   queryUserDownloads: vi.fn(),
 }));
 
-import { queryUserDownloads, resolveIdentityScopedServerUserIds } from '../queries.js';
+import { queryUserDownloads, resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { downloadsRoutes } from '../downloads.js';
 import { permissionGuard } from '../../../lib/scope.js';
 

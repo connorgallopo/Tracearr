@@ -6,7 +6,7 @@
  * length and meets it at the same instant.
  */
 
-import { and, eq, inArray, sql, type SQL } from 'drizzle-orm';
+import { eq, sql, type SQL } from 'drizzle-orm';
 import {
   TIME_MS,
   type AuthUser,
@@ -18,15 +18,14 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { serverUsers, servers } from '../../db/schema.js';
-import { countedSessionSql } from '../../db/sessions/rules.js';
-import {
-  buildMultiServerFragment,
-  buildServerAccessCondition,
-} from '../../utils/serverFiltering.js';
+import { countedSessionSql, localSessionSql } from '../../db/sessions/rules.js';
+import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { likePattern } from '../../utils/listQuery.js';
-import { localSessionSql } from '../../db/sessions/rules.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
-import { serverUserIdAnyFragment } from '../../routes/users/queries.js';
+import {
+  identityAccountsWhere,
+  serverUserIdAnyFragment,
+} from '../../routes/users/queries/index.js';
 import { getBucketInterval } from '../../routes/stats/plays.js';
 import { computeStreaks } from '../../routes/stats/me.js';
 import {
@@ -655,7 +654,6 @@ async function fetchIdentityServers(
 ): Promise<Map<string, { id: string; name: string }[]>> {
   const byUser = new Map<string, { id: string; name: string }[]>();
   if (userIds.length === 0) return byUser;
-  const accessCondition = buildServerAccessCondition(authUser, serverUsers.serverId);
   const rows = await db
     .selectDistinct({
       userId: serverUsers.userId,
@@ -664,7 +662,7 @@ async function fetchIdentityServers(
     })
     .from(serverUsers)
     .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-    .where(and(inArray(serverUsers.userId, userIds), accessCondition));
+    .where(identityAccountsWhere(authUser, userIds));
   for (const row of rows) {
     const entry = { id: row.serverId, name: row.serverName };
     const existing = byUser.get(row.userId);

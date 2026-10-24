@@ -22,7 +22,7 @@ import {
   createTestSession,
 } from '@tracearr/test-utils/factories';
 import { createMockRedis } from '@tracearr/test-utils/mocks';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { locationsRoutes } from '../../src/routes/stats/locations.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
 import { permissionGuard } from '../../src/lib/scope.js';

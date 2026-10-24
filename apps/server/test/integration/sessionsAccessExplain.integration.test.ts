@@ -33,7 +33,7 @@ import {
   sessionRowById,
 } from '../../src/db/sessions/index.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 
 const DAY_MS = 86_400_000;

@@ -23,7 +23,7 @@ import {
 } from '@tracearr/test-utils/factories';
 import { createMockRedis } from '@tracearr/test-utils/mocks';
 import { userRoutes } from '../../src/routes/users/index.js';
-import { violationRoutes } from '../../src/routes/violations.js';
+import { violationRoutes } from '../../src/routes/violations/index.js';
 import { automationRoutes } from '../../src/routes/automations.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 

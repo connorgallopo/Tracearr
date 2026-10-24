@@ -8,7 +8,7 @@ import { userIdParamSchema, userRequestsQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { listUserRequests } from '../../services/requests/reads.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
-import { resolveIdentityScopedServerUserIds } from './queries.js';
+import { resolveIdentityScopedServerUserIds } from './queries/index.js';
 import { seesServerActivity } from '../../lib/scope.js';
 import type { FastifyPluginAsync } from 'fastify';
 

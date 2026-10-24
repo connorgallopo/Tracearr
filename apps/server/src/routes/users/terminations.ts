@@ -9,7 +9,7 @@ import { sql, inArray } from 'drizzle-orm';
 import { userIdParamSchema, identityScopedPaginationSchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { terminationLogs } from '../../db/schema.js';
-import { queryTerminationHistory, resolveIdentityScopedServerUserIds } from './queries.js';
+import { queryTerminationHistory, resolveIdentityScopedServerUserIds } from './queries/index.js';
 
 export const terminationsRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };

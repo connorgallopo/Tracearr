@@ -7,7 +7,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { queryUserLocations, resolveIdentityScopedServerUserIds } from './queries.js';
+import { queryUserLocations, resolveIdentityScopedServerUserIds } from './queries/index.js';
 
 export const locationsRoutes: FastifyPluginAsync = async (app) => {
   const readLocations = { preHandler: [app.requirePermission('locations', 'read')] };

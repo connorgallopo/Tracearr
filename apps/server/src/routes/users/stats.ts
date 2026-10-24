@@ -13,7 +13,7 @@ import {
   queryIdentityRangeStats,
   resolveIdentityWindow,
 } from '../../services/stats/peopleStats.js';
-import { resolveIdentityScopedServerUserIds } from './queries.js';
+import { resolveIdentityScopedServerUserIds } from './queries/index.js';
 
 export const statsRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };

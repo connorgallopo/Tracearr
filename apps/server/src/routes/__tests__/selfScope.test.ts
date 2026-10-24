@@ -19,7 +19,7 @@ vi.mock('../../services/termination.js', () => ({ terminateSession: vi.fn() }));
 
 import { db } from '../../db/client.js';
 import { permissionGuard } from '../../lib/scope.js';
-import { sessionRoutes } from '../sessions.js';
+import { sessionRoutes } from '../sessions/index.js';
 import { contentRoutes } from '../stats/content.js';
 import { engagementRoutes } from '../stats/engagement.js';
 import { playsRoutes } from '../stats/plays.js';

@@ -45,7 +45,7 @@ vi.mock('../../services/termination.js', () => ({
 // Import the mocked db and the routes
 import { db } from '../../db/client.js';
 import { terminateSession } from '../../services/termination.js';
-import { sessionRoutes } from '../sessions.js';
+import { sessionRoutes } from '../sessions/index.js';
 import { permissionGuard } from '../../lib/scope.js';
 
 /**

@@ -24,7 +24,7 @@ import {
   createTestRun,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { violationRoutes } from '../../src/routes/violations.js';
+import { violationRoutes } from '../../src/routes/violations/index.js';
 import { users, serverUsers, automationRuns, automations } from '../../src/db/schema.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
 import * as userService from '../../src/services/userService.js';

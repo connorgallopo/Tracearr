@@ -24,7 +24,7 @@ import { peopleRoutes } from '../../src/routes/stats/people.js';
 import { bandwidthRoutes } from '../../src/routes/stats/bandwidth.js';
 import { contentRoutes } from '../../src/routes/stats/content.js';
 import { engagementRoutes } from '../../src/routes/stats/engagement.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { libraryTopContentRoute } from '../../src/routes/library/topContent.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
 import {

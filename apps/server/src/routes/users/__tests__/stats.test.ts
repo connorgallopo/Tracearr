@@ -13,7 +13,7 @@ import type * as PeopleStatsModule from '../../../services/stats/peopleStats.js'
 
 vi.mock('../../../db/client.js', () => ({ db: {} }));
 
-vi.mock('../queries.js', () => ({
+vi.mock('../queries/index.js', () => ({
   resolveIdentityScopedServerUserIds: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('../../../services/stats/peopleStats.js', async (importActual) => ({
   queryIdentityRangeStats: vi.fn(async () => ({ plays: 3 })),
 }));
 
-import { resolveIdentityScopedServerUserIds } from '../queries.js';
+import { resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { queryIdentityRangeStats } from '../../../services/stats/peopleStats.js';
 import { statsRoutes } from '../stats.js';
 import { permissionGuard } from '../../../lib/scope.js';

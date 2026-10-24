@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import sensible from '@fastify/sensible';
 import rateLimit from '@fastify/rate-limit';
-import type { SQL } from 'drizzle-orm';
+import { sql, type SQL } from 'drizzle-orm';
 
 vi.mock('../../db/client.js', () => ({
   db: {
@@ -21,6 +21,7 @@ vi.mock('../../db/client.js', () => ({
         orderBy: vi.fn(() => Promise.resolve([])),
       })),
     })),
+    execute: vi.fn(),
   },
 }));
 
@@ -208,6 +209,39 @@ describe('public API v2 skeleton', () => {
       expect(trailers.some((c) => c.sql === 's.media_type = $1' && c.params[0] === 'trailer')).toBe(
         true
       );
+    });
+
+    it('re-applies the since and until window on the join back to sessions', async () => {
+      const actual =
+        await vi.importActual<typeof import('../publicV2/shared.js')>('../publicV2/shared.js');
+      const since = new Date('2026-04-01T00:00:00.000Z');
+      const until = new Date('2026-06-30T23:59:59.999Z');
+      vi.mocked(db.execute)
+        .mockResolvedValueOnce({
+          rows: [
+            {
+              chain_ids: ['00000000-0000-4000-8000-000000000001'],
+              raw_row_count: '1',
+              window_lower_bound: null,
+            },
+          ],
+        } as never)
+        .mockResolvedValueOnce({ rows: [] } as never);
+
+      await actual.runHistoryPage(
+        [sql`s.started_at >= ${since}`, sql`s.started_at <= ${until}`],
+        50,
+        null,
+        undefined,
+        { since, until }
+      );
+
+      const { sql: text } = renderSql(vi.mocked(db.execute).mock.calls[1]![0] as SQL);
+      const join = text
+        .replace(/\s+/g, ' ')
+        .match(/JOIN sessions s ON s\.id = p\.first_session_id.*?JOIN server_users/)?.[0];
+      expect(join).toMatch(/s\.started_at >= \$\d+/);
+      expect(join).toMatch(/s\.started_at <= \$\d+/);
     });
 
     it('rejects invalid history query parameters with 400', async () => {

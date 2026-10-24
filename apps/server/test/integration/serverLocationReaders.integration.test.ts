@@ -20,9 +20,9 @@ import {
 } from '@tracearr/test-utils/factories';
 import { createMockRedis } from '@tracearr/test-utils/mocks';
 import { db } from '../../src/db/client.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { locationsRoutes } from '../../src/routes/stats/locations.js';
-import { queryUserDevices, queryUserLocations } from '../../src/routes/users/queries.js';
+import { queryUserDevices, queryUserLocations } from '../../src/routes/users/queries/index.js';
 import { permissionGuard } from '../../src/lib/scope.js';
 
 const CHICAGO = {

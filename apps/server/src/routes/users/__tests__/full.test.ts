@@ -251,9 +251,11 @@ describe('GET /users/:id/full violations panel', () => {
     await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
 
     const texts = tx.execute.mock.calls.map(([query]) => renderSql(query).sql.replace(/\s+/g, ' '));
-    expect(texts.find((text) => text.includes('grouped_sessions'))).toMatch(
-      /s\.started_at = gs\.started_at AND s\.started_at >= \$\d+ AND s\.started_at <= \$\d+/
-    );
+    const join = texts
+      .find((text) => text.includes('grouped_sessions'))
+      ?.match(/JOIN sessions s ON s\.id = gs\.first_session_id.*?JOIN servers/)?.[0];
+    expect(join).toMatch(/s\.started_at >= \$\d+/);
+    expect(join).toMatch(/s\.started_at <= \$\d+/);
     expect(texts.find((text) => text.includes('device_id, player_name'))).toMatch(
       /WHERE server_user_id = ANY\(.*\) AND started_at >= \$\d+ AND started_at < \$\d+/
     );

@@ -25,7 +25,14 @@ export function baseSessionConditions(input: {
   if (servers) conditions.push(servers);
   const scoped = scopeSessionsRaw(input.scope, sql`s.server_user_id`);
   if (scoped) conditions.push(scoped);
-  if (input.startDate) conditions.push(sql`s.started_at >= ${input.startDate}`);
-  if (input.endDate) conditions.push(sql`s.started_at < ${input.endDate}`);
+  conditions.push(...startedAtRange(input.startDate, input.endDate));
   return conditions;
+}
+
+/** A half-open started_at filter window over s, as separate conditions. */
+export function startedAtRange(startDate: Date | undefined, endDate: Date | undefined): SQL[] {
+  const range: SQL[] = [];
+  if (startDate) range.push(sql`s.started_at >= ${startDate}`);
+  if (endDate) range.push(sql`s.started_at < ${endDate}`);
+  return range;
 }

@@ -12,12 +12,12 @@ import type { AuthUser, UserRequestEntry, UserRequestsResponse } from '@tracearr
 
 vi.mock('../../../db/client.js', () => ({ db: {} }));
 
-vi.mock('../queries.js', () => ({ resolveIdentityScopedServerUserIds: vi.fn() }));
+vi.mock('../queries/index.js', () => ({ resolveIdentityScopedServerUserIds: vi.fn() }));
 
 vi.mock('../../../services/requests/reads.js', () => ({ listUserRequests: vi.fn() }));
 
 import { listUserRequests } from '../../../services/requests/reads.js';
-import { resolveIdentityScopedServerUserIds } from '../queries.js';
+import { resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { requestsRoutes } from '../requests.js';
 import { permissionGuard } from '../../../lib/scope.js';
 

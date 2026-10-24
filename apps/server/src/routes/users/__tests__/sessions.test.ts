@@ -4,20 +4,20 @@ import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
 import type { AuthUser } from '@tracearr/shared';
-import type * as QueriesModule from '../queries.js';
+import type * as QueriesModule from '../queries/index.js';
 import { queryChain, renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({
   db: { select: vi.fn(), execute: vi.fn() },
 }));
 
-vi.mock('../queries.js', async (importActual) => ({
+vi.mock('../queries/index.js', async (importActual) => ({
   ...(await importActual<typeof QueriesModule>()),
   resolveIdentityScopedServerUserIds: vi.fn(),
 }));
 
 import { db } from '../../../db/client.js';
-import { resolveIdentityScopedServerUserIds } from '../queries.js';
+import { resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { sessionsRoutes } from '../sessions.js';
 import { permissionGuard } from '../../../lib/scope.js';
 
@@ -83,8 +83,10 @@ describe('GET /users/:id/sessions', () => {
     await app.inject({ method: 'GET', url: `/users/${serverUserId}/sessions` });
 
     const { sql: query } = renderSql(vi.mocked(db.execute).mock.calls.at(-1)![0] as SQL);
-    expect(query.replace(/\s+/g, ' ')).toMatch(
-      /s\.started_at = gs\.started_at AND s\.started_at >= \$\d+ AND s\.started_at <= \$\d+/
-    );
+    const join = query
+      .replace(/\s+/g, ' ')
+      .match(/JOIN sessions s ON s\.id = gs\.first_session_id.*?JOIN servers/)?.[0];
+    expect(join).toMatch(/s\.started_at >= \$\d+/);
+    expect(join).toMatch(/s\.started_at <= \$\d+/);
   });
 });

@@ -27,7 +27,7 @@ import { getRedis } from '../../src/lib/redisShared.js';
 import { resetSettingsCache, setSetting } from '../../src/services/settings.js';
 import { syncServer } from '../../src/services/sync.js';
 import authPlugin from '../../src/plugins/auth.js';
-import { sessionRoutes } from '../../src/routes/sessions.js';
+import { sessionRoutes } from '../../src/routes/sessions/index.js';
 
 type ServerType = 'jellyfin' | 'emby';
 
