@@ -11,21 +11,22 @@ const MATCH_LABEL_KEYS = {
   imdb: null,
   tmdb: null,
   tvdb: null,
+  mbid: null,
   fuzzy: 'library.storage.matchBadge.fuzzy',
   version: 'library.storage.matchBadge.versions',
 } as const satisfies Record<MatchType, string | null>;
 
 /**
  * Get confidence level label key and badge variant based on confidence score.
- * - high (>= 0.9): "Exact" with success variant (green)
- * - medium (>= 0.7): "Likely" with warning variant (yellow)
- * - low (< 0.7): "Possible" with secondary variant (neutral)
+ * - high (>= 90): "Exact" with success variant (green)
+ * - medium (>= 70): "Likely" with warning variant (yellow)
+ * - low (< 70): "Possible" with secondary variant (neutral)
  */
 function getConfidenceInfo(confidence: number) {
-  if (confidence >= 0.9) {
+  if (confidence >= 90) {
     return { labelKey: 'library.storage.matchBadge.exact', variant: 'success' } as const;
   }
-  if (confidence >= 0.7) {
+  if (confidence >= 70) {
     return { labelKey: 'library.storage.matchBadge.likely', variant: 'warning' } as const;
   }
   return { labelKey: 'library.storage.matchBadge.possible', variant: 'secondary' } as const;

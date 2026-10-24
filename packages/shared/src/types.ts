@@ -2624,7 +2624,7 @@ export interface LibraryStorageResponse {
 // Library Duplicates Response (GET /library/duplicates)
 /** 'version' groups are one title whose single library item carries several
  * physical files; the others group distinct items (copies) by identity. */
-export type MatchType = 'imdb' | 'tmdb' | 'tvdb' | 'fuzzy' | 'version';
+export type MatchType = 'imdb' | 'tmdb' | 'tvdb' | 'mbid' | 'fuzzy' | 'version';
 
 /** One physical file of a duplicate item */
 export interface DuplicateItemVersion {
@@ -2632,6 +2632,7 @@ export interface DuplicateItemVersion {
   serverVersionKey: string;
   resolution: string | null;
   videoCodec: string | null;
+  audioCodec: string | null;
   fileSize: number | null;
   filePath: string | null;
   /**
@@ -2654,6 +2655,8 @@ export interface DuplicateItem {
   mediaType: string;
   /** Show for an episode, artist for a track; null for anything flat */
   grandparentTitle: string | null;
+  /** Album for a track, season for an episode */
+  parentTitle: string | null;
   seasonNumber: number | null;
   episodeNumber: number | null;
   fileSize: number | null;
@@ -2685,7 +2688,14 @@ export interface DuplicatesSummary {
   totalGroups: number;
   totalDuplicateItems: number;
   totalPotentialSavingsBytes: number;
-  byMatchType: { imdb: number; tmdb: number; tvdb: number; fuzzy: number; version: number };
+  byMatchType: {
+    imdb: number;
+    tmdb: number;
+    tvdb: number;
+    mbid: number;
+    fuzzy: number;
+    version: number;
+  };
 }
 
 export interface DuplicatesResponse {

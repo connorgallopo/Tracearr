@@ -7,11 +7,15 @@
  * multi-server deployments from drowning real duplicates in zero-savings
  * noise; the single-server case matches Plex's own Duplicates filter.
  *
- * Matching hierarchy: imdb 100 > tmdb 95 > tvdb 90 > fuzzy 60-100;
+ * Matching hierarchy: imdb 100 > tmdb 95 > tvdb 90, mbid 100 > fuzzy 60-100;
  * single-item groups present as 'version' at 100. Reclaimable = deduped
  * total minus the best-quality file. An episode's key also carries its
  * season and episode number: Plex's agents attach another episode's id to
  * an item often enough that the id alone pairs two different episodes (#1223).
+ * A track's MusicBrainz id names one track of one release, so it groups the
+ * same album's track and never a song's appearances on other albums. Untagged
+ * tracks fuzzy-match only within one artist, one album or its other editions,
+ * and one track number; their year is often missing and differs by edition.
  *
  * Grouping, the gate, and the summary run in one SQL statement and the route
  * hydrates one page only - building every group in Node exceeded postgres's
@@ -58,6 +62,7 @@ interface RawGroupRow {
   imdb_groups: number;
   tmdb_groups: number;
   tvdb_groups: number;
+  mbid_groups: number;
   fuzzy_groups: number;
   version_groups: number;
 }
@@ -73,6 +78,7 @@ interface ItemDetailsRow {
   year: number | null;
   media_type: string;
   grandparent_title: string | null;
+  parent_title: string | null;
   parent_index: number | null;
   item_index: number | null;
   file_size: string | null;
@@ -84,6 +90,7 @@ interface VersionRow {
   server_version_key: string;
   video_resolution: string | null;
   video_codec: string | null;
+  audio_codec: string | null;
   file_size: string | null;
   file_path: string | null;
 }
@@ -182,18 +189,26 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
        * folded into the id key so a show and an episode sharing a TVDB id
        * cannot collapse, and an episode's season and episode number are
        * folded in so a foreign id on one episode cannot pair it with another;
-       * fuzzy only feeds items with no external IDs.
+       * fuzzy only feeds items with no external IDs. A track's mbid is read
+       * from its media row's match key, the one place sync keeps it.
        */
       const runGroupQuery = async (offset: number) => {
         const result = await db.execute(sql`
           WITH scoped AS (
-            SELECT id, server_id, media_type, title, grandparent_title, year,
+            SELECT id, server_id, media_type, title, grandparent_title, parent_title, year,
                    imdb_id, tmdb_id, tvdb_id, file_size, video_resolution,
                    CASE
                      WHEN media_type = 'episode' AND parent_index IS NOT NULL AND item_index IS NOT NULL
                        THEN ':s' || parent_index || 'e' || item_index
+                     WHEN media_type = 'track' AND item_index IS NOT NULL
+                       THEN ':t' || item_index
                      ELSE ''
-                   END AS episode_key
+                   END AS position_key,
+                   CASE WHEN media_type = 'track' THEN lower(grandparent_title) ELSE '' END AS artist_key,
+                   CASE WHEN media_type = 'track' THEN (
+                     SELECT substring(m.match_key FROM 12) FROM media m
+                     WHERE m.id = library_items.media_id AND m.match_key LIKE 'track:mbid:%'
+                   ) END AS mbid
             FROM library_items
             WHERE removed_at IS NULL
               AND media_type NOT IN ('season', 'album')
@@ -204,47 +219,52 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             ${
               fuzzyEnabled
                 ? sql`
-            SELECT a.id AS item_a_id, b.id AS item_b_id, a.title AS title_a,
-                   a.episode_key AS episode_key_a,
+            SELECT a.id AS item_a_id, b.id AS item_b_id,
+                   'fuzzy:' || lower(left(COALESCE(a.grandparent_title, ''), 50)) || ':'
+                     || lower(left(COALESCE(a.parent_title, ''), 50)) || ':'
+                     || lower(left(a.title, 50)) || a.position_key AS fuzzy_key,
                    ROUND(similarity(a.title, b.title) * 100)::int AS confidence
             FROM scoped a
             JOIN scoped b ON a.id < b.id
               AND a.media_type = b.media_type
-              AND a.year = b.year
-              AND a.episode_key = b.episode_key
-            WHERE a.imdb_id IS NULL AND a.tmdb_id IS NULL AND a.tvdb_id IS NULL
-              AND b.imdb_id IS NULL AND b.tmdb_id IS NULL AND b.tvdb_id IS NULL
+              AND (a.media_type = 'track' OR a.year = b.year)
+              AND a.position_key = b.position_key
+              AND a.artist_key = b.artist_key
+            WHERE a.imdb_id IS NULL AND a.tmdb_id IS NULL AND a.tvdb_id IS NULL AND a.mbid IS NULL
+              AND b.imdb_id IS NULL AND b.tmdb_id IS NULL AND b.tvdb_id IS NULL AND b.mbid IS NULL
               AND similarity(a.title, b.title) >= 0.6
               -- generic episode titles (Pilot, Finale) recur across shows
               AND (a.media_type <> 'episode'
                    OR similarity(a.grandparent_title, b.grandparent_title) >= 0.6)
+              -- a standard and a deluxe edition are one album; Intro on two albums is not.
+              -- word_similarity scores Parklife inside Parklife (Deluxe Edition) at 1, similarity at 0.375
+              AND (a.media_type <> 'track'
+                   OR GREATEST(word_similarity(a.parent_title, b.parent_title),
+                               word_similarity(b.parent_title, a.parent_title)) >= 0.8)
             ORDER BY confidence DESC
             LIMIT 100`
                 : sql`
             SELECT NULL::uuid AS item_a_id, NULL::uuid AS item_b_id,
-                   NULL::text AS title_a, NULL::text AS episode_key_a,
-                   NULL::int AS confidence
+                   NULL::text AS fuzzy_key, NULL::int AS confidence
             WHERE false`
             }
           ),
           fuzzy_keys AS (
             SELECT item_id, MIN(fuzzy_key) AS fuzzy_key, MAX(confidence) AS confidence
             FROM (
-              SELECT item_a_id AS item_id,
-                     'fuzzy:' || lower(left(title_a, 50)) || episode_key_a AS fuzzy_key, confidence
-              FROM fuzzy_pairs
+              SELECT item_a_id AS item_id, fuzzy_key, confidence FROM fuzzy_pairs
               UNION ALL
-              SELECT item_b_id, 'fuzzy:' || lower(left(title_a, 50)) || episode_key_a, confidence
-              FROM fuzzy_pairs
+              SELECT item_b_id, fuzzy_key, confidence FROM fuzzy_pairs
             ) fp
             GROUP BY item_id
           ),
           membership AS (
             SELECT s.id, s.server_id, s.file_size, s.video_resolution,
               CASE
-                WHEN s.imdb_id IS NOT NULL THEN 'imdb:' || s.media_type || ':' || s.imdb_id || s.episode_key
-                WHEN s.tmdb_id IS NOT NULL THEN 'tmdb:' || s.media_type || ':' || s.tmdb_id::text || s.episode_key
-                WHEN s.tvdb_id IS NOT NULL THEN 'tvdb:' || s.media_type || ':' || s.tvdb_id::text || s.episode_key
+                WHEN s.imdb_id IS NOT NULL THEN 'imdb:' || s.media_type || ':' || s.imdb_id || s.position_key
+                WHEN s.tmdb_id IS NOT NULL THEN 'tmdb:' || s.media_type || ':' || s.tmdb_id::text || s.position_key
+                WHEN s.tvdb_id IS NOT NULL THEN 'tvdb:' || s.media_type || ':' || s.tvdb_id::text || s.position_key
+                WHEN s.mbid IS NOT NULL THEN 'mbid:' || s.mbid
                 WHEN fk.fuzzy_key IS NOT NULL THEN fk.fuzzy_key
                 ELSE 'version:' || s.id::text
               END AS group_key,
@@ -252,6 +272,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
                 WHEN s.imdb_id IS NOT NULL THEN 'imdb'
                 WHEN s.tmdb_id IS NOT NULL THEN 'tmdb'
                 WHEN s.tvdb_id IS NOT NULL THEN 'tvdb'
+                WHEN s.mbid IS NOT NULL THEN 'mbid'
                 WHEN fk.fuzzy_key IS NOT NULL THEN 'fuzzy'
                 ELSE 'version'
               END AS key_type,
@@ -303,6 +324,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
                 WHEN g.key_type = 'imdb' THEN 100
                 WHEN g.key_type = 'tmdb' THEN 95
                 WHEN g.key_type = 'tvdb' THEN 90
+                WHEN g.key_type = 'mbid' THEN 100
                 ELSE COALESCE(g.fuzzy_confidence, 70)
               END AS confidence,
               g.item_ids, g.item_count, g.server_count,
@@ -324,6 +346,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             (COUNT(*) FILTER (WHERE match_type = 'imdb') OVER ())::int AS imdb_groups,
             (COUNT(*) FILTER (WHERE match_type = 'tmdb') OVER ())::int AS tmdb_groups,
             (COUNT(*) FILTER (WHERE match_type = 'tvdb') OVER ())::int AS tvdb_groups,
+            (COUNT(*) FILTER (WHERE match_type = 'mbid') OVER ())::int AS mbid_groups,
             (COUNT(*) FILTER (WHERE match_type = 'fuzzy') OVER ())::int AS fuzzy_groups,
             (COUNT(*) FILTER (WHERE match_type = 'version') OVER ())::int AS version_groups
           FROM filtered
@@ -362,6 +385,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             li.year,
             li.media_type,
             li.grandparent_title,
+            li.parent_title,
             li.parent_index,
             li.item_index,
             li.file_size::text AS file_size,
@@ -384,6 +408,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             server_version_key,
             video_resolution,
             video_codec,
+            audio_codec,
             file_size::text AS file_size,
             file_path
           FROM library_item_versions
@@ -397,6 +422,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
             serverVersionKey: row.server_version_key,
             resolution: row.video_resolution,
             videoCodec: row.video_codec,
+            audioCodec: row.audio_codec,
             fileSize: row.file_size ? parseInt(row.file_size, 10) : null,
             filePath: row.file_path,
           });
@@ -414,6 +440,7 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
         year: details.year,
         mediaType: details.media_type,
         grandparentTitle: details.grandparent_title,
+        parentTitle: details.parent_title,
         seasonNumber: details.parent_index,
         episodeNumber: details.item_index,
         fileSize: details.file_size ? parseInt(details.file_size, 10) : null,
@@ -498,6 +525,7 @@ function buildResponse(
       imdb: summarySource?.imdb_groups ?? 0,
       tmdb: summarySource?.tmdb_groups ?? 0,
       tvdb: summarySource?.tvdb_groups ?? 0,
+      mbid: summarySource?.mbid_groups ?? 0,
       fuzzy: summarySource?.fuzzy_groups ?? 0,
       version: summarySource?.version_groups ?? 0,
     },

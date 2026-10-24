@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { DuplicateItem, DuplicatesResponse } from '@tracearr/shared';
+import { formatMediaTech, type DuplicateItem, type DuplicatesResponse } from '@tracearr/shared';
 import { DuplicatesTable } from './DuplicatesTable';
 
 vi.mock('react-i18next', () => ({
@@ -42,6 +42,7 @@ function response(itemOverrides: Partial<DuplicateItem> = {}): DuplicatesRespons
             year: 2017,
             mediaType: 'movie',
             grandparentTitle: null,
+            parentTitle: null,
             seasonNumber: null,
             episodeNumber: null,
             fileSize: 17_000_000_000,
@@ -51,6 +52,7 @@ function response(itemOverrides: Partial<DuplicateItem> = {}): DuplicatesRespons
                 serverVersionKey: '42858',
                 resolution: '4k',
                 videoCodec: 'HEVC',
+                audioCodec: 'EAC3',
                 fileSize: 13_000_000_000,
                 filePath: '/data/movies/Blade Runner 2049 (2017)/BR2049.2160p.mkv',
               },
@@ -58,6 +60,7 @@ function response(itemOverrides: Partial<DuplicateItem> = {}): DuplicatesRespons
                 serverVersionKey: '42859',
                 resolution: '1080p',
                 videoCodec: 'H264',
+                audioCodec: 'AAC',
                 fileSize: 4_000_000_000,
                 filePath: '/data/movies/Blade Runner 2049 (2017)/BR2049.1080p.mkv',
               },
@@ -71,7 +74,7 @@ function response(itemOverrides: Partial<DuplicateItem> = {}): DuplicatesRespons
       totalGroups: 1,
       totalDuplicateItems: 1,
       totalPotentialSavingsBytes: 4_000_000_000,
-      byMatchType: { imdb: 1, tmdb: 0, tvdb: 0, fuzzy: 0, version: 0 },
+      byMatchType: { imdb: 1, tmdb: 0, tvdb: 0, mbid: 0, fuzzy: 0, version: 0 },
     },
     pagination: { page: 1, pageSize: 20, total: 1 },
   };
@@ -164,16 +167,40 @@ describe('DuplicatesTable', () => {
     expect(screen.getByText('S02 E02')).toBeInTheDocument();
   });
 
-  it('heads a music group with the artist under the track', () => {
+  it('heads a music group with the artist and album under the track', () => {
     renderTable({
       title: 'Redbone',
       mediaType: 'track',
       grandparentTitle: 'Childish Gambino',
+      parentTitle: 'Awaken, My Love!',
       year: null,
     });
 
     expect(screen.getByText('Redbone')).toBeInTheDocument();
-    expect(screen.getByText('Childish Gambino')).toBeInTheDocument();
+    expect(screen.getByText('Childish Gambino · Awaken, My Love!')).toBeInTheDocument();
     expect(screen.getByText('media.music')).toBeInTheDocument();
+  });
+
+  it('tells copies of a track apart by audio codec', async () => {
+    renderTable({
+      title: 'Redbone',
+      mediaType: 'track',
+      grandparentTitle: 'Childish Gambino',
+      resolution: null,
+      versions: [
+        {
+          serverVersionKey: '1',
+          resolution: null,
+          videoCodec: null,
+          audioCodec: 'flac',
+          fileSize: 38_000_000,
+          filePath: '/music/Redbone.flac',
+        },
+      ],
+    });
+
+    await userEvent.click(screen.getByText('Redbone'));
+
+    expect(screen.getByText(formatMediaTech('flac'))).toBeInTheDocument();
   });
 });

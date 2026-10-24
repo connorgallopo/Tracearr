@@ -8,6 +8,14 @@
       "refs": ["#1367"]
     },
     {
+      "type": "fix",
+      "text": "music duplicates group by MusicBrainz id and no longer pair same-titled tracks from different artists or albums"
+    },
+    {
+      "type": "fix",
+      "text": "duplicate fuzzy matches below 90% show as Likely or Possible instead of Exact"
+    },
+    {
       "type": "note",
       "text": "updating removes the Plex track downloads already recorded, including music downloaded on purpose"
     }

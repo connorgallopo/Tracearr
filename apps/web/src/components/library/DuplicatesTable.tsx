@@ -60,6 +60,7 @@ function DuplicateGroupFiles({ group, expanded }: { group: DuplicateGroup; expan
                   serverVersionKey: '',
                   resolution: item.resolution,
                   videoCodec: null,
+                  audioCodec: null,
                   fileSize: item.fileSize,
                   filePath: null,
                   isMirror: false,
@@ -83,10 +84,12 @@ function DuplicateGroupFiles({ group, expanded }: { group: DuplicateGroup; expan
               <span className="text-muted-foreground">{formatBytes(item.fileSize)}</span>
             </div>
             {files.map((file, index) => {
+              // A track has no video, so its audio codec tells the copies apart
+              const codec = file.videoCodec ?? file.audioCodec;
               const tech =
                 [
                   file.resolution ? formatMediaTech(file.resolution) : null,
-                  file.videoCodec ? formatMediaTech(file.videoCodec) : null,
+                  codec ? formatMediaTech(codec) : null,
                 ]
                   .filter(Boolean)
                   .join(' · ') || '—';
@@ -221,6 +224,7 @@ export function DuplicatesTable({
               mediaTitle: first?.title ?? t('common:labels.unknown'),
               grandparentTitle: first?.grandparentTitle,
               artistName: first?.grandparentTitle,
+              albumName: first?.parentTitle,
               seasonNumber: first?.seasonNumber,
               episodeNumber: first?.episodeNumber,
             });
