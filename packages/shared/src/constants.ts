@@ -346,6 +346,13 @@ export const REDIS_KEYS = {
   // Filter options caching
   FILTER_OPTIONS: (userId: string, scopeHash: string) =>
     `${_redisPrefix}tracearr:filter-options:v2:${userId}:${scopeHash}`,
+  // History totals for one filter set
+  HISTORY_AGGREGATES: (scopeHash: string) =>
+    `${_redisPrefix}tracearr:history-aggregates:v2:${scopeHash}`,
+  // Distinct-IP check behind the Settings IP warning
+  get IP_WARNING() {
+    return `${_redisPrefix}tracearr:settings:ip-warning`;
+  },
   // A member's non-removed server account ids and their servers
   USER_SCOPE: (userId: string) => `${_redisPrefix}tracearr:scope:${userId}`,
   // v1 segment invalidates cached entries if the GeoLocation shape ever changes
@@ -407,6 +414,8 @@ export const CACHE_TTL = {
   PUSH_SESSIONS_SYNC: 1200,
   // Filter options (dropdown values change infrequently)
   FILTER_OPTIONS: 120, // 2 minutes
+  HISTORY_AGGREGATES: 60, // 1 minute, the web app's own staleTime for the totals
+  IP_WARNING: 300, // 5 minutes
   PLEX_GEOIP: 86400,
   // Fail-open: short negative cache keeps a down plex.tv from being hit every poll tick
   PLEX_GEOIP_NEGATIVE: 600,

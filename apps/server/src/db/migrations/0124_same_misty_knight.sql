@@ -1,0 +1,4 @@
+CREATE INDEX IF NOT EXISTS "idx_library_items_grandparent" ON "library_items" USING btree ("server_id","grandparent_rating_key") WHERE "library_items"."grandparent_rating_key" IS NOT NULL;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_library_items_parent" ON "library_items" USING btree ("server_id","parent_rating_key") WHERE "library_items"."parent_rating_key" IS NOT NULL;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_library_items_episode_lookup" ON "library_items" USING btree ("server_id","grandparent_rating_key","parent_index","item_index") WHERE "library_items"."media_type" = 'episode';--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_library_items_track_lookup" ON "library_items" USING btree ("server_id","grandparent_rating_key","parent_rating_key","item_index") WHERE "library_items"."media_type" = 'track';

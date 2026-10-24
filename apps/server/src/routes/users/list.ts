@@ -10,7 +10,7 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, and, sql, inArray, type SQL } from 'drizzle-orm';
+import { eq, and, gte, lte, sql, inArray, type SQL } from 'drizzle-orm';
 import {
   updateUserSchema,
   updateUserAccessSchema,
@@ -64,6 +64,7 @@ import { parseDateString } from '../../utils/parsing.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { PLAY_COUNT } from '../../constants/index.js';
 import { VIOLATION_ALIAS_SQL } from '../../services/automations/aliasFilter.js';
+import { userHistoryWindow } from './queries.js';
 
 /** What a trust-score notification says moved the score when a person did it by hand. */
 const OWNER_TRUST_REASON = 'changed by an owner';
@@ -578,13 +579,20 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Get session stats for this server user (count unique plays, not raw rows)
+    const { start: tenYearsAgo, end: nowDate } = userHistoryWindow();
     const statsResult = await db
       .select({
         totalSessions: PLAY_COUNT,
         totalWatchTime: sql<number>`coalesce(sum(duration_ms), 0)::bigint`,
       })
       .from(sessions)
-      .where(eq(sessions.serverUserId, id));
+      .where(
+        and(
+          eq(sessions.serverUserId, id),
+          gte(sessions.startedAt, tenYearsAgo),
+          lte(sessions.startedAt, nowDate)
+        )
+      );
 
     const stats = statsResult[0];
 

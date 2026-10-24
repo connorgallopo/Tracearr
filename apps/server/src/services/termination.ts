@@ -5,10 +5,9 @@
  * Supports both manual (admin-initiated) and automatic (rule-triggered) terminations.
  */
 
-import { eq, desc } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { terminationLogs, sessions } from '../db/schema.js';
-import { sessionRowById } from '../db/sessionRow.js';
+import { readSessionRow, sessionRowById } from '../db/sessionRow.js';
 import { createMediaServerClient } from './mediaServer/index.js';
 import { getCacheService, getPubSubService } from './cache.js';
 import { toRuleSession } from './automations/events/contextAssembly.js';
@@ -37,6 +36,9 @@ export interface TerminateSessionOptions {
 
   /** Message to display to user (Plex only, ignored by Jellyfin/Emby) */
   reason?: string;
+
+  /** The session's start when the caller holds it, so the lookup skips the older chunks */
+  sessionStartedAt?: Date | string | null;
 }
 
 export type TerminationOutcome = 'terminated' | 'already_gone' | 'failed' | 'server_historical';
@@ -83,14 +85,9 @@ export async function terminateSession(
 ): Promise<TerminationResult> {
   const { sessionId, trigger, triggeredByUserId, ruleId, violationId, reason } = options;
 
-  // Fetch session with server info
-  const session = await db.query.sessions.findFirst({
-    where: eq(sessions.id, sessionId),
-    with: {
-      server: true,
-      serverUser: true,
-    },
-  });
+  const session = await readSessionRow(sessionId, options.sessionStartedAt, (where) =>
+    db.query.sessions.findFirst({ where, with: { server: true, serverUser: true } })
+  );
 
   if (!session) {
     // Don't log when session not found - we have no audit context (no server/user)
@@ -271,40 +268,4 @@ export async function terminateSession(
     error: errorMessage ?? undefined,
     outcome,
   };
-}
-
-/**
- * Get termination logs for a server
- */
-export async function getTerminationLogs(
-  serverId: string,
-  options?: { limit?: number }
-): Promise<(typeof terminationLogs.$inferSelect)[]> {
-  return db.query.terminationLogs.findMany({
-    where: eq(terminationLogs.serverId, serverId),
-    orderBy: [desc(terminationLogs.createdAt)],
-    limit: options?.limit ?? 100,
-    with: {
-      session: true,
-      serverUser: true,
-      triggeredByUser: true,
-      rule: true,
-    },
-  });
-}
-
-/**
- * Get termination logs for a specific session
- */
-export async function getSessionTerminationLogs(
-  sessionId: string
-): Promise<(typeof terminationLogs.$inferSelect)[]> {
-  return db.query.terminationLogs.findMany({
-    where: eq(terminationLogs.sessionId, sessionId),
-    orderBy: [desc(terminationLogs.createdAt)],
-    with: {
-      triggeredByUser: true,
-      rule: true,
-    },
-  });
 }

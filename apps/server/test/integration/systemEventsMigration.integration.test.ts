@@ -505,6 +505,38 @@ describe('runSystemEventsMigration', () => {
     expect(await snapshot()).toEqual(before);
   });
 
+  it('owes nothing for an install run and finds a session by its stored start', async () => {
+    await runSystemEventsMigration();
+    const owner = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'plex' });
+    const serverUser = await createTestServerUser({ userId: owner.id, serverId: server.id });
+    const session = await createTestSession({ serverId: server.id, serverUserId: serverUser.id });
+    const rule = await insertAutomation({
+      name: 'update rule',
+      conditions: conditions(),
+      triggers: [],
+    });
+    await db.insert(automationRuns).values({ automationId: rule.id, data: {} });
+
+    const transaction = vi.spyOn(db, 'transaction');
+    await runSystemEventsMigration();
+    expect(transaction).not.toHaveBeenCalled();
+
+    // No account either, so only the session can name the server.
+    const [run] = await db
+      .insert(automationRuns)
+      .values({
+        automationId: rule.id,
+        sessionId: session.id,
+        sessionStartedAt: session.startedAt,
+        data: {},
+      })
+      .returning({ id: automationRuns.id });
+    if (!run) throw new Error('failed to insert run');
+    await runSystemEventsMigration();
+    expect(await runServerIds([run.id])).toEqual([server.id]);
+  });
+
   it("carries a fresh install's own defaults across, browser stream toasts included", async () => {
     await seedRoutingTable();
     await seedBuiltinTemplates();

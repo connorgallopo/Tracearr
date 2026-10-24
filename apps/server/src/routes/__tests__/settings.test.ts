@@ -62,7 +62,7 @@ vi.mock('../../services/geoip.js', () => ({
 import { APIError } from 'better-auth/api';
 import type { SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { renderSql } from '../../test/helpers.js';
+import { queryChain, renderSql } from '../../test/helpers.js';
 import {
   getAllSettings,
   getSetting,
@@ -72,6 +72,7 @@ import {
 import { assertOwnerKeepsALoginMethod } from '../../lib/authGuards.js';
 import { revokeSessionsForUsers } from '../../lib/revoke.js';
 import { getImageCacheStatus } from '../../services/imageCacheSweep.js';
+import { geoipService } from '../../services/geoip.js';
 import { settingsRoutes } from '../settings.js';
 import { permissionGuard } from '../../lib/scope.js';
 
@@ -123,9 +124,12 @@ const mockImageCacheStatus: ImageCacheStatus = {
   shortfallBytes: 0,
 };
 
+const redis = { get: vi.fn(), setex: vi.fn() };
+
 async function buildTestApp(authUser: AuthUser): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(sensible);
+  app.decorate('redis', redis as never);
   app.decorate('authenticate', async (request: unknown) => {
     (request as { user: AuthUser }).user = authUser;
   });
@@ -590,6 +594,28 @@ describe('Settings Routes', () => {
 
       expect(response.statusCode).toBe(404);
       expect(getImageCacheStatus).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /settings/ip-warning', () => {
+    it('serves a second request within the TTL from the cache', async () => {
+      const store = new Map<string, string>();
+      redis.get.mockImplementation(async (key: string) => store.get(key) ?? null);
+      redis.setex.mockImplementation(async (key: string, _ttl: number, value: string) => {
+        store.set(key, value);
+      });
+      vi.mocked(db.selectDistinct).mockReturnValue(
+        queryChain(vi.fn, [{ ipAddress: '10.0.0.5' }]) as never
+      );
+      vi.mocked(geoipService.isPrivateIP).mockReturnValue(true);
+      app = await buildTestApp(ownerUser);
+
+      const first = await app.inject({ method: 'GET', url: '/settings/ip-warning' });
+      const second = await app.inject({ method: 'GET', url: '/settings/ip-warning' });
+
+      expect(first.json()).toEqual({ showWarning: true, stateHash: 'single-private-ip' });
+      expect(second.json()).toEqual(first.json());
+      expect(db.selectDistinct).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -46,10 +46,10 @@ export function useOthersActive(serverIds: string[], socketConnected = false, se
   });
 }
 
-export function useSession(id: string) {
+export function useSession(id: string, startedAt?: Date | string) {
   return useQuery({
     queryKey: ['sessions', 'detail', id],
-    queryFn: () => api.sessions.get(id),
+    queryFn: () => api.sessions.get(id, startedAt),
     enabled: !!id,
     staleTime: 1000 * 60, // 1 minute
   });

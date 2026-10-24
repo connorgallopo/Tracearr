@@ -3,9 +3,23 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, and, count, gte, lt, isNull, isNotNull, sql, inArray, type SQL } from 'drizzle-orm';
 import {
+  eq,
+  and,
+  count,
+  gte,
+  lt,
+  lte,
+  isNull,
+  isNotNull,
+  sql,
+  inArray,
+  type SQL,
+} from 'drizzle-orm';
+import {
+  TIME_MS,
   violationBulkBodySchema,
+  violationCountQuerySchema,
   violationIdParamSchema,
   violationQuerySchema,
   violationRosterFilterSchema,
@@ -34,8 +48,9 @@ import {
   buildMultiServerCondition,
 } from '../utils/serverFiltering.js';
 import { isLocalSession } from '../utils/localSession.js';
+import { MAX_AUTOMATION_WINDOW_HOURS } from '../jobs/poller/database.js';
 import { assertInScope, scopeSessions, type Scope } from '../lib/scope.js';
-import { violationAliasConditions } from '../services/automations/aliasFilter.js';
+import { runSession, violationAliasConditions } from '../services/automations/aliasFilter.js';
 import { dispatchTrustMoves } from '../services/automations/events/producers.js';
 import {
   getServerUserDisplayNames,
@@ -278,6 +293,46 @@ interface ViolationRow {
   acknowledgedAt: Date | null;
 }
 
+function fetchRelatedSessions(ids: string[], scope: Scope, window?: { from: Date; to: Date }) {
+  return db
+    .select({
+      id: sessions.id,
+      mediaTitle: sessions.mediaTitle,
+      mediaType: sessions.mediaType,
+      grandparentTitle: sessions.grandparentTitle,
+      mediaId: sessions.mediaId,
+      showMediaId: sessions.showMediaId,
+      seasonNumber: sessions.seasonNumber,
+      episodeNumber: sessions.episodeNumber,
+      year: sessions.year,
+      ipAddress: sessions.ipAddress,
+      geoCity: sessions.geoCity,
+      geoRegion: sessions.geoRegion,
+      geoCountry: sessions.geoCountry,
+      isLocal: sessions.isLocal,
+      geoContinent: sessions.geoContinent,
+      geoPostal: sessions.geoPostal,
+      geoLat: sessions.geoLat,
+      geoLon: sessions.geoLon,
+      playerName: sessions.playerName,
+      device: sessions.device,
+      deviceId: sessions.deviceId,
+      platform: sessions.platform,
+      product: sessions.product,
+      quality: sessions.quality,
+      startedAt: sessions.startedAt,
+    })
+    .from(sessions)
+    .where(
+      and(
+        inArray(sessions.id, ids),
+        scopeSessions(scope),
+        window ? gte(sessions.startedAt, window.from) : undefined,
+        window ? lte(sessions.startedAt, window.to) : undefined
+      )
+    );
+}
+
 /**
  * Enrich flat violation rows with related sessions, user history, and action results.
  * Works for both single-item and multi-item arrays.
@@ -296,38 +351,21 @@ async function enrichViolations(violationData: ViolationRow[], scope: Scope) {
   const sessionsById = new Map<string, ViolationSessionInfo>();
   if (allRelatedSessionIds.size > 0) {
     try {
-      const relatedSessionsResult = await db
-        .select({
-          id: sessions.id,
-          mediaTitle: sessions.mediaTitle,
-          mediaType: sessions.mediaType,
-          grandparentTitle: sessions.grandparentTitle,
-          mediaId: sessions.mediaId,
-          showMediaId: sessions.showMediaId,
-          seasonNumber: sessions.seasonNumber,
-          episodeNumber: sessions.episodeNumber,
-          year: sessions.year,
-          ipAddress: sessions.ipAddress,
-          geoCity: sessions.geoCity,
-          geoRegion: sessions.geoRegion,
-          geoCountry: sessions.geoCountry,
-          isLocal: sessions.isLocal,
-          geoContinent: sessions.geoContinent,
-          geoPostal: sessions.geoPostal,
-          geoLat: sessions.geoLat,
-          geoLon: sessions.geoLon,
-          playerName: sessions.playerName,
-          device: sessions.device,
-          deviceId: sessions.deviceId,
-          platform: sessions.platform,
-          product: sessions.product,
-          quality: sessions.quality,
-          startedAt: sessions.startedAt,
-        })
-        .from(sessions)
-        .where(and(inArray(sessions.id, Array.from(allRelatedSessionIds)), scopeSessions(scope)));
+      // A related session existed when its run was evaluated, inside the rule's history
+      // window, so that range is searched first and chunks outside it are never opened.
+      // Ids it misses (a live stream running for over a week) take the unbounded lookup.
+      const createdTimes = violationData.map((v) => v.createdAt.getTime());
+      const window = {
+        from: new Date(
+          Math.min(...createdTimes) - (MAX_AUTOMATION_WINDOW_HOURS + 24) * TIME_MS.HOUR
+        ),
+        to: new Date(Math.max(...createdTimes)),
+      };
+      const found = await fetchRelatedSessions([...allRelatedSessionIds], scope, window);
+      const missing = [...allRelatedSessionIds].filter((id) => !found.some((s) => s.id === id));
+      const fallback = missing.length > 0 ? await fetchRelatedSessions(missing, scope) : [];
 
-      for (const s of relatedSessionsResult) {
+      for (const s of [...found, ...fallback]) {
         sessionsById.set(s.id, { ...s, deviceId: s.deviceId ?? null, isLocal: isLocalSession(s) });
       }
     } catch (error) {
@@ -473,6 +511,7 @@ function buildViolationPageQuery(params: {
   offset: number;
 }) {
   const { where, orderBy, orderDir, pageSize, offset } = params;
+  const runSessionRow = runSession();
 
   return db
     .select({
@@ -490,30 +529,30 @@ function buildViolationPageQuery(params: {
       serverName: servers.name,
       sessionId: automationRuns.sessionId,
       // Session details for context
-      mediaTitle: sessions.mediaTitle,
-      mediaType: sessions.mediaType,
-      grandparentTitle: sessions.grandparentTitle,
-      mediaId: sessions.mediaId,
-      showMediaId: sessions.showMediaId,
-      seasonNumber: sessions.seasonNumber,
-      episodeNumber: sessions.episodeNumber,
-      year: sessions.year,
-      ipAddress: sessions.ipAddress,
-      geoCity: sessions.geoCity,
-      geoRegion: sessions.geoRegion,
-      geoCountry: sessions.geoCountry,
-      isLocal: sessions.isLocal,
-      geoContinent: sessions.geoContinent,
-      geoPostal: sessions.geoPostal,
-      geoLat: sessions.geoLat,
-      geoLon: sessions.geoLon,
-      playerName: sessions.playerName,
-      device: sessions.device,
-      deviceId: sessions.deviceId,
-      platform: sessions.platform,
-      product: sessions.product,
-      quality: sessions.quality,
-      startedAt: sessions.startedAt,
+      mediaTitle: runSessionRow.mediaTitle,
+      mediaType: runSessionRow.mediaType,
+      grandparentTitle: runSessionRow.grandparentTitle,
+      mediaId: runSessionRow.mediaId,
+      showMediaId: runSessionRow.showMediaId,
+      seasonNumber: runSessionRow.seasonNumber,
+      episodeNumber: runSessionRow.episodeNumber,
+      year: runSessionRow.year,
+      ipAddress: runSessionRow.ipAddress,
+      geoCity: runSessionRow.geoCity,
+      geoRegion: runSessionRow.geoRegion,
+      geoCountry: runSessionRow.geoCountry,
+      isLocal: runSessionRow.isLocal,
+      geoContinent: runSessionRow.geoContinent,
+      geoPostal: runSessionRow.geoPostal,
+      geoLat: runSessionRow.geoLat,
+      geoLon: runSessionRow.geoLon,
+      playerName: runSessionRow.playerName,
+      device: runSessionRow.device,
+      deviceId: runSessionRow.deviceId,
+      platform: runSessionRow.platform,
+      product: runSessionRow.product,
+      quality: runSessionRow.quality,
+      startedAt: runSessionRow.startedAt,
       severity: ROSTER_SEVERITY,
       data: automationRuns.data,
       createdAt: automationRuns.createdAt,
@@ -524,7 +563,7 @@ function buildViolationPageQuery(params: {
     .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
     .leftJoin(users, eq(serverUsers.userId, users.id))
     .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-    .leftJoin(sessions, eq(automationRuns.sessionId, sessions.id))
+    .leftJoinLateral(runSessionRow, sql`true`)
     .where(where)
     .orderBy(buildOrderBy(VIOLATION_SORT_KEYS, orderBy, orderDir, sql`${automationRuns.id}`))
     .limit(pageSize)
@@ -536,6 +575,18 @@ type EnrichedViolation = Awaited<ReturnType<typeof enrichViolations>>[number];
 
 export const violationRoutes: FastifyPluginAsync = async (app) => {
   const readViolations = { preHandler: [app.requirePermission('violations', 'read')] };
+  // Counted off the same conditions, minus the joins only the select list
+  // needs. A hand-written copy of these predicates is what let the count
+  // disagree with the page it was counting.
+  async function countViolations(where: SQL | undefined): Promise<number> {
+    const countRows = await db
+      .select({ total: count() })
+      .from(automationRuns)
+      .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
+      .where(where);
+    return countRows[0]?.total ?? 0;
+  }
+
   /**
    * GET /violations - List violations with pagination and filters
    *
@@ -567,15 +618,7 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       offset,
     });
 
-    // Counted off the same conditions, minus the joins only the select list
-    // needs. A hand-written copy of these predicates is what let the count
-    // disagree with the page it was counting.
-    const countRows = await db
-      .select({ total: count() })
-      .from(automationRuns)
-      .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
-      .where(where);
-    const total = countRows[0]?.total ?? 0;
+    const total = await countViolations(where);
 
     const formattedData = await enrichViolations(violationData, request.scope);
 
@@ -583,6 +626,23 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       data: formattedData,
       meta: { page, pageSize, total },
     } satisfies ListResponse<EnrichedViolation>;
+  });
+
+  /**
+   * GET /violations/count - Row count for the same filters GET / accepts
+   */
+  app.get('/count', readViolations, async (request, reply) => {
+    const query = violationCountQuerySchema.safeParse(request.query);
+    if (!query.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
+
+    const roster = await buildViolationRosterConditions(query.data, request.user, request.scope);
+    if (roster.empty) {
+      return { total: 0 };
+    }
+
+    return { total: await countViolations(and(...roster.conditions)) };
   });
 
   /**
@@ -598,6 +658,7 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
     const authUser = request.user;
 
     // Query with server info for access check, including all session fields
+    const runSessionRow = runSession();
     const violationRows = await db
       .select({
         id: automationRuns.id,
@@ -613,30 +674,30 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
         serverId: serverUsers.serverId,
         serverName: servers.name,
         sessionId: automationRuns.sessionId,
-        mediaTitle: sessions.mediaTitle,
-        mediaType: sessions.mediaType,
-        grandparentTitle: sessions.grandparentTitle,
-        mediaId: sessions.mediaId,
-        showMediaId: sessions.showMediaId,
-        seasonNumber: sessions.seasonNumber,
-        episodeNumber: sessions.episodeNumber,
-        year: sessions.year,
-        ipAddress: sessions.ipAddress,
-        geoCity: sessions.geoCity,
-        geoRegion: sessions.geoRegion,
-        geoCountry: sessions.geoCountry,
-        isLocal: sessions.isLocal,
-        geoContinent: sessions.geoContinent,
-        geoPostal: sessions.geoPostal,
-        geoLat: sessions.geoLat,
-        geoLon: sessions.geoLon,
-        playerName: sessions.playerName,
-        device: sessions.device,
-        deviceId: sessions.deviceId,
-        platform: sessions.platform,
-        product: sessions.product,
-        quality: sessions.quality,
-        startedAt: sessions.startedAt,
+        mediaTitle: runSessionRow.mediaTitle,
+        mediaType: runSessionRow.mediaType,
+        grandparentTitle: runSessionRow.grandparentTitle,
+        mediaId: runSessionRow.mediaId,
+        showMediaId: runSessionRow.showMediaId,
+        seasonNumber: runSessionRow.seasonNumber,
+        episodeNumber: runSessionRow.episodeNumber,
+        year: runSessionRow.year,
+        ipAddress: runSessionRow.ipAddress,
+        geoCity: runSessionRow.geoCity,
+        geoRegion: runSessionRow.geoRegion,
+        geoCountry: runSessionRow.geoCountry,
+        isLocal: runSessionRow.isLocal,
+        geoContinent: runSessionRow.geoContinent,
+        geoPostal: runSessionRow.geoPostal,
+        geoLat: runSessionRow.geoLat,
+        geoLon: runSessionRow.geoLon,
+        playerName: runSessionRow.playerName,
+        device: runSessionRow.device,
+        deviceId: runSessionRow.deviceId,
+        platform: runSessionRow.platform,
+        product: runSessionRow.product,
+        quality: runSessionRow.quality,
+        startedAt: runSessionRow.startedAt,
         severity: ROSTER_SEVERITY,
         data: automationRuns.data,
         createdAt: automationRuns.createdAt,
@@ -647,7 +708,7 @@ export const violationRoutes: FastifyPluginAsync = async (app) => {
       .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
       .leftJoin(users, eq(serverUsers.userId, users.id))
       .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-      .leftJoin(sessions, eq(automationRuns.sessionId, sessions.id))
+      .leftJoinLateral(runSessionRow, sql`true`)
       .where(aliasedRunFilter(eq(automationRuns.id, id)))
       .limit(1);
 

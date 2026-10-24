@@ -34,6 +34,7 @@ const QUERY_CHAIN_METHODS = [
   '$dynamic',
   'innerJoin',
   'leftJoin',
+  'leftJoinLateral',
   'where',
   'orderBy',
   'groupBy',

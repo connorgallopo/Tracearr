@@ -514,6 +514,11 @@ export const sessionIdParamSchema = z.object({
   id: uuidSchema,
 });
 
+// The start the history row already shows, so the detail read opens only the chunks after it
+export const sessionDetailQuerySchema = z.object({
+  startedAt: z.coerce.date().optional(),
+});
+
 // Session termination schema
 export const terminateSessionBodySchema = z.object({
   /** Optional message to display to user (Plex only, ignored by Jellyfin/Emby) */
@@ -704,6 +709,8 @@ export type ViolationRosterFilters = z.infer<typeof violationRosterFilterSchema>
 export const violationQuerySchema = paginationSchema
   .extend(violationRosterFilterSchema.shape)
   .extend(listSortSchema(VIOLATION_SORT_FIELDS).shape);
+
+export const violationCountQuerySchema = violationRosterFilterSchema;
 
 export const violationBulkBodySchema = z.object({
   ids: z.array(uuidSchema).max(1000).optional(),

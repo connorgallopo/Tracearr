@@ -12,6 +12,7 @@ import { sql } from 'drizzle-orm';
 import { statsQuerySchema } from '@tracearr/shared';
 import type { BandwidthSummaryServerKpis } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { getTimescaleStatus } from '../../db/timescale.js';
 import '../../db/schema.js';
 import { resolveDateRange } from './utils.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
@@ -28,13 +29,7 @@ const bandwidthQuerySchema = statsQuerySchema.safeExtend({
  */
 async function hasBandwidthAggregate(): Promise<boolean> {
   try {
-    const result = await db.execute(sql`
-      SELECT EXISTS(
-        SELECT 1 FROM timescaledb_information.continuous_aggregates
-        WHERE view_name = 'daily_bandwidth_by_user'
-      ) as exists
-    `);
-    return (result.rows[0] as { exists: boolean })?.exists ?? false;
+    return (await getTimescaleStatus()).continuousAggregates.includes('daily_bandwidth_by_user');
   } catch {
     return false;
   }

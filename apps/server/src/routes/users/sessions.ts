@@ -10,7 +10,11 @@ import { userIdParamSchema, identityScopedPaginationSchema } from '@tracearr/sha
 import { db } from '../../db/client.js';
 import { sessions } from '../../db/schema.js';
 import { PLAY_COUNT } from '../../constants/index.js';
-import { resolveIdentityScopedServerUserIds, serverUserIdAnyFragment } from './queries.js';
+import {
+  resolveIdentityScopedServerUserIds,
+  serverUserIdAnyFragment,
+  userHistoryWindow,
+} from './queries.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { localSessionSql } from '../../utils/localSession.js';
 
@@ -47,11 +51,8 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const ids = scoped.ids;
-    // Explicit array literal plus a 10-year bound so TimescaleDB can exclude
-    // chunks instead of scanning the whole hypertable.
     const idArray = uuidArraySql(ids);
-    const tenYearsAgo = new Date(Date.now() - 10 * 365 * 24 * 60 * 60 * 1000);
-    const nowDate = new Date();
+    const { start: tenYearsAgo, end: nowDate } = userHistoryWindow();
 
     // Get total unique plays
     const [countResult] = await db.select({ count: PLAY_COUNT }).from(sessions)
@@ -132,9 +133,10 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
         s.bitrate,
         s.last_paused_at
       FROM grouped_sessions gs
-      -- gs.started_at is not a planner-time constant; the InitPlan bounds are what let
-      -- TimescaleDB exclude chunks at runtime
+      -- gs.started_at is not a planner-time constant: the literal bounds exclude chunks at
+      -- plan time, the InitPlan bounds narrow the rest at runtime
       JOIN sessions s ON s.id = gs.first_session_id AND s.started_at = gs.started_at
+        AND s.started_at >= ${tenYearsAgo} AND s.started_at <= ${nowDate}
         AND s.started_at >= (SELECT MIN(started_at) FROM grouped_sessions)
         AND s.started_at <= (SELECT MAX(started_at) FROM grouped_sessions)
       JOIN servers sv ON sv.id = s.server_id

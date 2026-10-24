@@ -7,7 +7,11 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { queryUserDevices, resolveIdentityScopedServerUserIds } from './queries.js';
+import {
+  queryUserDevices,
+  resolveIdentityScopedServerUserIds,
+  userHistoryWindow,
+} from './queries.js';
 
 export const devicesRoutes: FastifyPluginAsync = async (app) => {
   const readDevices = { preHandler: [app.requirePermission('devices', 'read')] };
@@ -45,7 +49,7 @@ export const devicesRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('You do not have access to this user');
     }
 
-    const devices = await queryUserDevices(db, scoped.ids);
+    const devices = await queryUserDevices(db, scoped.ids, userHistoryWindow());
     return { data: devices };
   });
 };

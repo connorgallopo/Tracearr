@@ -33,6 +33,7 @@ import {
   sessions,
   users,
 } from '../db/schema.js';
+import { readSessionRow } from '../db/sessionRow.js';
 import {
   buildOrderBy,
   utcDayEnd,
@@ -109,6 +110,7 @@ const runDetailColumns = {
   storedMediaTitle: sql<string | null>`${automationRuns.data}->>'mediaTitle'`,
   storedIpAddress: sql<string | null>`${automationRuns.data}->>'ipAddress'`,
   definitionVersionId: automationRuns.definitionVersionId,
+  sessionStartedAt: automationRuns.sessionStartedAt,
 };
 
 /**
@@ -212,29 +214,34 @@ export const mapRunSummary = (row: RunSummaryRow): AutomationRunSummary => ({
  * A session the run names may still be absent - the row was cleaned up by hand, or the
  * run predates it - which is what the stored fallback below is for.
  */
-async function loadSessionContext(sessionId: string | null): Promise<RunSessionContext | null> {
+async function loadSessionContext(
+  sessionId: string | null,
+  startedAt: Date | null
+): Promise<RunSessionContext | null> {
   if (sessionId === null) return null;
-  const rows = await db
-    .select({
-      mediaTitle: sessions.mediaTitle,
-      mediaType: sessions.mediaType,
-      grandparentTitle: sessions.grandparentTitle,
-      mediaId: sessions.mediaId,
-      showMediaId: sessions.showMediaId,
-      player: sessions.playerName,
-      device: sessions.device,
-      product: sessions.product,
-      platform: sessions.platform,
-      ipAddress: sessions.ipAddress,
-      city: sessions.geoCity,
-      country: sessions.geoCountry,
-      isLocal: sessions.isLocal,
-      geoLat: sessions.geoLat,
-    })
-    .from(sessions)
-    .where(eq(sessions.id, sessionId))
-    .limit(1);
-  const row = rows[0];
+  const row = await readSessionRow(sessionId, startedAt, (where) =>
+    db
+      .select({
+        mediaTitle: sessions.mediaTitle,
+        mediaType: sessions.mediaType,
+        grandparentTitle: sessions.grandparentTitle,
+        mediaId: sessions.mediaId,
+        showMediaId: sessions.showMediaId,
+        player: sessions.playerName,
+        device: sessions.device,
+        product: sessions.product,
+        platform: sessions.platform,
+        ipAddress: sessions.ipAddress,
+        city: sessions.geoCity,
+        country: sessions.geoCountry,
+        isLocal: sessions.isLocal,
+        geoLat: sessions.geoLat,
+      })
+      .from(sessions)
+      .where(where)
+      .limit(1)
+      .then((rows) => rows[0])
+  );
   if (!row) return null;
   const { isLocal, geoLat, ...context } = row;
   return {
@@ -398,7 +405,9 @@ export const runRoutes: FastifyPluginAsync = async (app) => {
     return {
       ...mapRunSummary(row),
       steps: row.steps ?? [],
-      session: (await loadSessionContext(row.sessionId)) ?? storedSessionContext(row),
+      session:
+        (await loadSessionContext(row.sessionId, row.sessionStartedAt)) ??
+        storedSessionContext(row),
       evidence: Array.isArray(row.evidence) ? row.evidence : [],
       definitionVersionId: row.definitionVersionId,
     } satisfies AutomationRun;

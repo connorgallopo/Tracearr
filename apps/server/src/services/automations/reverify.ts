@@ -49,7 +49,8 @@
 
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { automations, sessions } from '../../db/schema.js';
+import { automations } from '../../db/schema.js';
+import { readSessionRow } from '../../db/sessionRow.js';
 import { getCacheService } from '../cache.js';
 import {
   batchGetIdentityServerUserIds,
@@ -95,6 +96,9 @@ export interface ReverifyKillConditionParams {
    *  failed after termination, e.g. storeActionResults threw). Narrows the
    *  already-stopped idempotency check below to retries only. */
   isRetry?: boolean;
+  /** Starts captured at match time; absent on jobs queued before they were carried. */
+  targetStartedAt?: string;
+  triggeringStartedAt?: string;
 }
 
 export interface ReverifyKillConditionResult {
@@ -117,15 +121,23 @@ export interface ReverifyKillConditionResult {
 export async function reverifyKillCondition(
   params: ReverifyKillConditionParams
 ): Promise<ReverifyKillConditionResult> {
-  const { triggeringSessionId, targetSessionId, serverId, ruleId, violationId, message, isRetry } =
-    params;
+  const {
+    triggeringSessionId,
+    targetSessionId,
+    serverId,
+    ruleId,
+    violationId,
+    message,
+    isRetry,
+    targetStartedAt,
+    triggeringStartedAt,
+  } = params;
 
   // The TARGET decides the already-stopped short-circuit and is the session we
   // actually terminate.
-  const targetFound = await db.query.sessions.findFirst({
-    where: eq(sessions.id, targetSessionId),
-    with: { server: true, serverUser: true },
-  });
+  const targetFound = await readSessionRow(targetSessionId, targetStartedAt, (where) =>
+    db.query.sessions.findFirst({ where, with: { server: true, serverUser: true } })
+  );
 
   if (!targetFound) {
     return { outcome: 'skipped_already_stopped' };
@@ -175,10 +187,9 @@ export async function reverifyKillCondition(
   // self-abort every time.
   let contextSession = targetRow;
   if (triggeringSessionId !== targetSessionId) {
-    const triggerFound = await db.query.sessions.findFirst({
-      where: eq(sessions.id, triggeringSessionId),
-      with: { server: true, serverUser: true },
-    });
+    const triggerFound = await readSessionRow(triggeringSessionId, triggeringStartedAt, (where) =>
+      db.query.sessions.findFirst({ where, with: { server: true, serverUser: true } })
+    );
     const triggerRow = triggerFound && { ...triggerFound, isLocal: isLocalSession(triggerFound) };
 
     if (triggerRow && !triggerRow.stoppedAt) {
@@ -345,6 +356,7 @@ export async function reverifyKillCondition(
   try {
     const result = await terminateSession({
       sessionId: targetSessionId,
+      sessionStartedAt: targetRow.startedAt,
       trigger: 'rule',
       ruleId,
       violationId: violationId ?? undefined,

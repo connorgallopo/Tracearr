@@ -1,0 +1,1 @@
+ALTER TABLE "automation_runs" ADD COLUMN "session_started_at" timestamp with time zone;

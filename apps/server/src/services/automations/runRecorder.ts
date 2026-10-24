@@ -122,6 +122,9 @@ export function buildRunValues(args: RecordRunArgs): typeof automationRuns.$infe
     automationId: automation.id,
     serverUserId,
     sessionId: scope.kind === 'session' ? scope.sessionId : null,
+    // new Date: a session rehydrated from the active cache carries its start as a string
+    sessionStartedAt:
+      scope.kind === 'session' && session?.startedAt ? new Date(session.startedAt) : null,
     subjectKey: subjectKeyOf(scope),
     definitionVersionId: automation.currentVersionId,
     kind: automation.kind,

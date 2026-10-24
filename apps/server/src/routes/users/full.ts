@@ -29,7 +29,7 @@ import {
   terminationLogs,
   userMergeAudits,
 } from '../../db/schema.js';
-import { violationAliasConditions } from '../../services/automations/aliasFilter.js';
+import { runSession, violationAliasConditions } from '../../services/automations/aliasFilter.js';
 import { hasServerAccess, buildServerAccessCondition } from '../../utils/serverFiltering.js';
 import { serverOrderBy } from '../../utils/serverOrder.js';
 import { PLAY_COUNT } from '../../constants/index.js';
@@ -38,6 +38,7 @@ import {
   queryUserDevices,
   queryUserLocations,
   serverUserIdAnyFragment,
+  userHistoryWindow,
 } from './queries.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { localSessionSql } from '../../utils/localSession.js';
@@ -157,14 +158,20 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
 
       const identityIds = identityServerUserRows.map((su) => su.id);
 
-      // One grouped read instead of a correlated count per row: sessions has no
-      // time bound here, so every plan of it walks all chunks and planning dominates.
+      const { start: tenYearsAgo, end: nowDate } = userHistoryWindow();
+
+      // One grouped read instead of a correlated count per row, so sessions is
+      // planned once rather than once per account.
       const sessionCounts = new Map<string, number>();
       if (identityIds.length > 0) {
         const countRows = await tx
           .select({ serverUserId: sessions.serverUserId, count: sql<number>`count(*)::int` })
           .from(sessions)
-          .where(sql`${sessions.serverUserId} = ANY(${uuidArraySql(identityIds)})`)
+          .where(
+            sql`${sessions.serverUserId} = ANY(${uuidArraySql(identityIds)})
+            AND ${sessions.startedAt} >= ${tenYearsAgo}
+            AND ${sessions.startedAt} <= ${nowDate}`
+          )
           .groupBy(sessions.serverUserId);
         for (const row of countRows) sessionCounts.set(row.serverUserId, row.count);
       }
@@ -175,11 +182,6 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
       // identityIds always contains at least `id` itself (the anchor already
       // passed the access check above), so this can't come back empty.
       const scopedIds = scope === 'identity' ? identityIds : [id];
-
-      // Explicit array literal plus a 10-year bound so TimescaleDB can
-      // exclude chunks instead of scanning the whole hypertable.
-      const tenYearsAgo = new Date(Date.now() - 10 * 365 * 24 * 60 * 60 * 1000);
-      const nowDate = new Date();
 
       let identityStats: { totalSessions: number; totalWatchTime: number } | undefined;
       if (identityIds.length > 0) {
@@ -246,9 +248,10 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           s.player_name, s.device_id, s.product, s.device, s.platform,
           s.quality, s.is_transcode, s.bitrate, s.last_paused_at
         FROM grouped_sessions gs
-        -- gs.started_at is not a planner-time constant; the InitPlan bounds are what let
-        -- TimescaleDB exclude chunks at runtime
+        -- gs.started_at is not a planner-time constant: the literal bounds exclude chunks at
+        -- plan time, the InitPlan bounds narrow the rest at runtime
         JOIN sessions s ON s.id = gs.first_session_id AND s.started_at = gs.started_at
+          AND s.started_at >= ${tenYearsAgo} AND s.started_at <= ${nowDate}
           AND s.started_at >= (SELECT MIN(started_at) FROM grouped_sessions)
           AND s.started_at <= (SELECT MAX(started_at) FROM grouped_sessions)
         JOIN servers sv ON sv.id = s.server_id
@@ -311,9 +314,13 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
       });
 
       // 5. Get devices (shared query handles dedup and aggregation)
-      const devices = await queryUserDevices(tx, scopedIds);
+      const devices = await queryUserDevices(tx, scopedIds, {
+        start: tenYearsAgo,
+        end: nowDate,
+      });
 
       // 6. Get violations (recent, limited)
+      const runSessionRow = runSession();
       const violationData = await tx
         .select({
           id: automationRuns.id,
@@ -325,7 +332,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           serverId: serverUsers.serverId,
           serverName: servers.name,
           sessionId: automationRuns.sessionId,
-          mediaTitle: sessions.mediaTitle,
+          mediaTitle: runSessionRow.mediaTitle,
           severity: automationRuns.severity,
           data: automationRuns.data,
           createdAt: automationRuns.createdAt,
@@ -335,7 +342,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
         .innerJoin(automations, eq(automationRuns.automationId, automations.id))
         .innerJoin(serverUsers, eq(automationRuns.serverUserId, serverUsers.id))
         .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-        .leftJoin(sessions, eq(automationRuns.sessionId, sessions.id))
+        .leftJoinLateral(runSessionRow, sql`true`)
         .where(
           and(
             sql`${automationRuns.serverUserId} = ANY(${scopedIdArray})`,

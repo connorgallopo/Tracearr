@@ -75,11 +75,17 @@ export interface ActionExecutorDeps {
      *  kill worker re-verifies the condition against the trigger's context, not
      *  the target's (which may be a sibling session/server for multi-target and
      *  enforceAcrossServers kills). */
-    triggeringSessionId?: string
+    triggeringSessionId?: string,
+    /** Target and trigger starts, so the kill worker reads each from its own chunks. */
+    sessionStarts?: { target: Date | string; triggering: Date | string }
     // Returns the kill queue job id when a job was created or already exists,
     // or undefined when the enqueue was dropped (queue not initialized).
   ) => Promise<string | undefined>;
-  sendClientMessage: (sessionId: string, message: string) => Promise<void | { skipReason: string }>;
+  sendClientMessage: (
+    sessionId: string,
+    message: string,
+    startedAt?: Date | string
+  ) => Promise<void | { skipReason: string }>;
   checkCooldown: (ruleId: string, targetId: string, cooldownMinutes: number) => Promise<boolean>;
   setCooldown: (ruleId: string, targetId: string, cooldownMinutes: number) => Promise<void>;
 }
@@ -569,7 +575,8 @@ const executeKillStream: ActionExecutor = async (
       message,
       rule.enforceAcrossServers ? identityServerUserIds : undefined,
       cooldown,
-      session.id
+      session.id,
+      { target: targetSession.startedAt, triggering: session.startedAt }
     );
     // Only record a target as enqueued when a job genuinely landed - a dropped
     // enqueue (queue down) must not read as queued to wasTriggeringSessionTargetedForKill.
@@ -620,7 +627,11 @@ const executeMessageClient: ActionExecutor = async (
 
   let historicalTargets = 0;
   for (const targetSession of sessionsToMessage) {
-    const outcome = await currentDeps.sendClientMessage(targetSession.id, message);
+    const outcome = await currentDeps.sendClientMessage(
+      targetSession.id,
+      message,
+      targetSession.startedAt
+    );
     if (outcome?.skipReason === 'server_historical') historicalTargets += 1;
   }
   if (sessionsToMessage.length > 0 && historicalTargets === sessionsToMessage.length) {

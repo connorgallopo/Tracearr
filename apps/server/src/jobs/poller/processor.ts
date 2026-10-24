@@ -27,7 +27,7 @@ import {
   sessions,
   users,
 } from '../../db/schema.js';
-import { sessionRowById } from '../../db/sessionRow.js';
+import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessionRow.js';
 import { getGeoIPSettings } from '../../routes/settings.js';
 import { isMaintenance } from '../../serverState.js';
 import { isLeader } from '../../services/leaderLease.js';
@@ -196,11 +196,6 @@ const defaultConfig: PollerConfig = {
   enabled: true,
   intervalMs: POLLING_INTERVALS.SESSIONS_IDLE,
 };
-
-// Time bound for active session queries to limit TimescaleDB chunk scanning.
-// Active sessions should only exist in recent chunks - anything older would have
-// been force-stopped by the stale session sweep. 7 days gives ample buffer.
-const ACTIVE_SESSION_CHUNK_BOUND_MS = 7 * 24 * 60 * 60 * 1000;
 
 // Grace period tracking for session stop detection. Reads and writes here
 // must happen only while holding serverPollLocks for the session's server -

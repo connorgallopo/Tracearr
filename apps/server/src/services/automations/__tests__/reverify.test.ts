@@ -354,6 +354,7 @@ describe('reverifyKillCondition', () => {
     expect(result.outcome).toBe('killed');
     expect(mockTerminateSession).toHaveBeenCalledWith({
       sessionId: sessionRow.id,
+      sessionStartedAt: expect.any(Date),
       trigger: 'rule',
       ruleId: ruleRow.id,
       reason: 'Concurrent stream limit exceeded',
@@ -520,6 +521,7 @@ describe('reverifyKillCondition', () => {
     expect(result.outcome).toBe('killed');
     expect(mockTerminateSession).toHaveBeenCalledWith({
       sessionId: sessionRow.id,
+      sessionStartedAt: expect.any(Date),
       trigger: 'rule',
       ruleId: ruleRow.id,
       reason: undefined,
@@ -578,6 +580,7 @@ describe('reverifyKillCondition', () => {
     expect(result.outcome).toBe('killed');
     expect(mockTerminateSession).toHaveBeenCalledWith({
       sessionId: sessionRow.id,
+      sessionStartedAt: expect.any(Date),
       trigger: 'rule',
       ruleId: ruleRow.id,
       reason: undefined,
@@ -631,6 +634,7 @@ describe('reverifyKillCondition', () => {
     expect(result.outcome).toBe('killed');
     expect(mockTerminateSession).toHaveBeenCalledWith({
       sessionId: sessionRow.id,
+      sessionStartedAt: expect.any(Date),
       trigger: 'rule',
       ruleId: ruleRow.id,
       reason: undefined,

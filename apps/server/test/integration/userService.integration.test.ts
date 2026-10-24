@@ -13,9 +13,7 @@ import { db } from '../../src/db/client.js';
 import { servers } from '../../src/db/schema.js';
 import {
   applyTrustChange,
-  batchSyncUsersFromMediaServer,
   syncUserFromMediaServer,
-  getServerUsersByServer,
   getServerUserByExternalId,
 } from '../../src/services/userService.js';
 import type { MediaUser } from '../../src/services/userService.js';
@@ -120,114 +118,6 @@ describe('userService integration tests', () => {
       expect(plain.serverUser.email).toBeNull();
       expect(renamed.serverUser.email).toBe('renamed@example.com');
       expect(renamed.user.email).toBeNull();
-    });
-  });
-
-  describe('batchSyncUsersFromMediaServer', () => {
-    it('should return zeros for empty input', async () => {
-      const result = await batchSyncUsersFromMediaServer(testServerId, []);
-
-      expect(result.added).toBe(0);
-      expect(result.updated).toBe(0);
-    });
-
-    it('should create multiple new users', async () => {
-      const mediaUsers: MediaUser[] = [
-        { id: `batch-1-${randomUUID().slice(0, 8)}`, username: 'batchuser1', isAdmin: false },
-        { id: `batch-2-${randomUUID().slice(0, 8)}`, username: 'batchuser2', isAdmin: false },
-        { id: `batch-3-${randomUUID().slice(0, 8)}`, username: 'batchuser3', isAdmin: true },
-      ];
-
-      const result = await batchSyncUsersFromMediaServer(testServerId, mediaUsers);
-
-      expect(result.added).toBe(3);
-      expect(result.updated).toBe(0);
-
-      // Verify all users exist in database
-      const serverUsersMap = await getServerUsersByServer(testServerId);
-      expect(serverUsersMap.size).toBe(3);
-      expect(serverUsersMap.get(mediaUsers[0].id)?.username).toBe('batchuser1');
-      expect(serverUsersMap.get(mediaUsers[1].id)?.username).toBe('batchuser2');
-      expect(serverUsersMap.get(mediaUsers[2].id)?.username).toBe('batchuser3');
-    });
-
-    it('should handle mix of new and existing users', async () => {
-      // Create one user first
-      const existingExternalId = `existing-${randomUUID().slice(0, 8)}`;
-      await syncUserFromMediaServer(testServerId, {
-        id: existingExternalId,
-        username: 'existinguser',
-        isAdmin: false,
-      });
-
-      // Now batch sync with mix of existing and new
-      const mediaUsers: MediaUser[] = [
-        { id: existingExternalId, username: 'existinguser-updated', isAdmin: false },
-        { id: `new-1-${randomUUID().slice(0, 8)}`, username: 'newuser1', isAdmin: false },
-        { id: `new-2-${randomUUID().slice(0, 8)}`, username: 'newuser2', isAdmin: false },
-      ];
-
-      const result = await batchSyncUsersFromMediaServer(testServerId, mediaUsers);
-
-      expect(result.added).toBe(2);
-      expect(result.updated).toBe(1);
-
-      // Verify the existing user was updated
-      const updatedUser = await getServerUserByExternalId(testServerId, existingExternalId);
-      expect(updatedUser?.username).toBe('existinguser-updated');
-    });
-
-    it('should handle all existing users (update only)', async () => {
-      // Create users first
-      const externalIds = [
-        `preexist-1-${randomUUID().slice(0, 8)}`,
-        `preexist-2-${randomUUID().slice(0, 8)}`,
-      ];
-
-      for (const extId of externalIds) {
-        await syncUserFromMediaServer(testServerId, {
-          id: extId,
-          username: `user-${extId.slice(0, 8)}`,
-          isAdmin: false,
-        });
-      }
-
-      // Batch sync with updates only
-      const mediaUsers: MediaUser[] = externalIds.map((extId) => ({
-        id: extId,
-        username: `updated-${extId.slice(0, 8)}`,
-        isAdmin: true,
-      }));
-
-      const result = await batchSyncUsersFromMediaServer(testServerId, mediaUsers);
-
-      expect(result.added).toBe(0);
-      expect(result.updated).toBe(2);
-    });
-  });
-
-  describe('getServerUsersByServer', () => {
-    it('should return empty map for server with no users', async () => {
-      const result = await getServerUsersByServer(testServerId);
-      expect(result.size).toBe(0);
-    });
-
-    it('should return map of all server users keyed by externalId', async () => {
-      // Create some users
-      const mediaUsers: MediaUser[] = [
-        { id: `map-1-${randomUUID().slice(0, 8)}`, username: 'mapuser1', isAdmin: false },
-        { id: `map-2-${randomUUID().slice(0, 8)}`, username: 'mapuser2', isAdmin: true },
-      ];
-
-      await batchSyncUsersFromMediaServer(testServerId, mediaUsers);
-
-      const result = await getServerUsersByServer(testServerId);
-
-      expect(result.size).toBe(2);
-      expect(result.has(mediaUsers[0].id)).toBe(true);
-      expect(result.has(mediaUsers[1].id)).toBe(true);
-      expect(result.get(mediaUsers[0].id)?.username).toBe('mapuser1');
-      expect(result.get(mediaUsers[1].id)?.isServerAdmin).toBe(true);
     });
   });
 

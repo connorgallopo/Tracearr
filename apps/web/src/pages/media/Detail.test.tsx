@@ -337,7 +337,7 @@ describe('MediaDetail page', () => {
     expect(link).toHaveAttribute('href', '/users/server-user-1');
     fireEvent.click(link);
     // stopPropagation keeps the row's session selection from firing.
-    expect(mockUseSession).not.toHaveBeenCalledWith('chain-1');
+    expect(mockUseSession).not.toHaveBeenCalledWith('chain-1', '2026-07-01T12:00:00.000Z');
   });
 
   it('opens the session slideout with the fetched chain session when a history row is activated', () => {
@@ -388,7 +388,7 @@ describe('MediaDetail page', () => {
 
     // The row click selects the chain id; the session hook is asked for it
     // and the sheet opens with the fetched session.
-    expect(mockUseSession).toHaveBeenCalledWith('chain-1');
+    expect(mockUseSession).toHaveBeenCalledWith('chain-1', '2026-07-01T12:00:00.000Z');
     expect(screen.getByTestId('session-sheet')).toHaveTextContent('chain-1');
   });
 

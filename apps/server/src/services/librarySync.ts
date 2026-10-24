@@ -2079,7 +2079,17 @@ export class LibrarySyncService {
       if (keys.every((k) => existing[k] === stats[k])) {
         return { id: existing.id };
       }
-      await db.update(librarySnapshots).set(stats).where(eq(librarySnapshots.id, existing.id));
+      // The day window it was found in, so only that chunk is opened
+      await db
+        .update(librarySnapshots)
+        .set(stats)
+        .where(
+          and(
+            eq(librarySnapshots.id, existing.id),
+            gte(librarySnapshots.snapshotTime, today),
+            lt(librarySnapshots.snapshotTime, tomorrow)
+          )
+        );
       return { id: existing.id };
     }
 

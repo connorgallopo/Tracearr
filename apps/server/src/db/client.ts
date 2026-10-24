@@ -20,12 +20,17 @@ function createPool(): pg.Pool {
   const p = new Pool({
     connectionString: process.env.DATABASE_URL,
     max: poolMaxOverride ?? (Number(process.env.DATABASE_POOL_MAX) || 50),
+    // A fresh backend loads every sessions chunk's indexes before it can plan, ~0.1-0.5 s
+    // on a long history, so the steady-state pair stays open and only bursts above it close.
+    min: 2,
     idleTimeoutMillis: 20000, // Close idle connections after 20s
     connectionTimeoutMillis: 5000, // Max wait to acquire a connection from the pool (not running query timeout)
     maxUses: 7500, // Max queries per connection before refresh (prevents memory leaks)
     allowExitOnIdle: false, // Keep pool alive during idle periods
     // Disable JIT — counterproductive for OLTP queries against TimescaleDB hypertables.
-    options: '-c jit=off',
+    // Custom plans only: under auto, the 6th run of a named statement builds a generic plan that
+    // cannot exclude hypertable chunks at plan time (628 ms spike, 47 MB backend vs 2.4 MB).
+    options: '-c jit=off -c plan_cache_mode=force_custom_plan',
   });
 
   // Log pool errors for debugging

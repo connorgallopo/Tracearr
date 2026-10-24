@@ -1,0 +1,1 @@
+CREATE INDEX "automation_runs_violation_account_idx" ON "automation_runs" USING btree ("server_user_id","rule_id") WHERE kind = 'policy' AND outcome = 'completed';

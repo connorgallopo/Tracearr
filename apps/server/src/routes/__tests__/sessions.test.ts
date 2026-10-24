@@ -6,6 +6,7 @@
  * - GET /sessions/active - Get currently active streams
  * - GET /sessions/:id - Get a specific session
  * - GET /sessions/history/aggregates - Totals over the filtered history
+ * - GET /sessions/filter-options - Dropdown values, cached per window
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -27,10 +28,13 @@ vi.mock('../../db/client.js', () => ({
 
 // Mock cache service - need to provide getAllActiveSessions for /active endpoint
 const mockGetAllActiveSessions = vi.fn().mockResolvedValue([]);
+const mockGetFilterOptions = vi.fn().mockResolvedValue(null);
 vi.mock('../../services/cache.js', () => ({
   getCacheService: vi.fn(() => ({
     getAllActiveSessions: mockGetAllActiveSessions,
     getSessionById: vi.fn().mockResolvedValue(null),
+    getFilterOptions: mockGetFilterOptions,
+    setFilterOptions: vi.fn(),
   })),
 }));
 
@@ -49,7 +53,7 @@ import { permissionGuard } from '../../lib/scope.js';
  */
 async function buildTestApp(
   authUser: AuthUser,
-  redisMock?: { get: ReturnType<typeof vi.fn> }
+  redisMock?: { get: ReturnType<typeof vi.fn>; setex?: ReturnType<typeof vi.fn> }
 ): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
 
@@ -66,7 +70,10 @@ async function buildTestApp(
   });
 
   // Mock Redis (cast to never for test mock)
-  app.decorate('redis', (redisMock ?? { get: vi.fn().mockResolvedValue(null) }) as never);
+  app.decorate(
+    'redis',
+    (redisMock ?? { get: vi.fn().mockResolvedValue(null), setex: vi.fn() }) as never
+  );
 
   await app.register(sessionRoutes, { prefix: '/sessions' });
 
@@ -829,6 +836,20 @@ describe('Session Routes', () => {
       expect(query).toContain('s.started_at = gs.started_at');
     });
 
+    it('repeats the date window on the join-back and the segment lookup', async () => {
+      app = await buildTestApp(createOwnerUser());
+      mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow()] });
+      const startDate = '2026-09-24T01:45:32.427Z';
+
+      await app.inject({ method: 'GET', url: `/sessions/history?startDate=${startDate}` });
+
+      const { sql: query, params } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
+      const head = /FROM history_page_ids\)\s+AND s\.started_at >= \$(\d+)/.exec(query);
+      const segment = /AND s2\.started_at >= \$(\d+)::timestamptz - INTERVAL '30 days'/.exec(query);
+      expect(params[Number(head?.[1]) - 1]).toEqual(new Date(startDate));
+      expect(params[Number(segment?.[1]) - 1]).toEqual(new Date(startDate));
+    });
+
     it('leaves trailers out when no media type is picked', async () => {
       app = await buildTestApp(createOwnerUser());
       mockDb.execute.mockResolvedValueOnce({ rows: [] });
@@ -1146,6 +1167,85 @@ describe('Session Routes', () => {
       const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
       expect(query).toContain("SUM(s.duration_ms) FILTER (WHERE s.media_type = 'track')");
       expect(query).toContain("s.media_type <> 'trailer'");
+    });
+
+    it('serves a second visit within the same minute from the cache', async () => {
+      const store = new Map<string, string>();
+      app = await buildTestApp(createOwnerUser(), {
+        get: vi.fn(async (key: string) => store.get(key) ?? null),
+        setex: vi.fn(async (key: string, _ttl: number, value: string) => {
+          store.set(key, value);
+        }),
+      });
+      mockDb.execute.mockResolvedValueOnce({
+        rows: [
+          {
+            play_count: 3,
+            total_watch_time_ms: '5400000',
+            listen_time_ms: '0',
+            unique_users: 1,
+            unique_content: 2,
+          },
+        ],
+      });
+
+      const bodies = [];
+      for (const startDate of ['2026-09-24T01:45:05.120Z', '2026-09-24T01:45:41.903Z']) {
+        const response = await app.inject({
+          method: 'GET',
+          url: `/sessions/history/aggregates?startDate=${startDate}`,
+        });
+        bodies.push(JSON.parse(response.body));
+      }
+
+      expect(mockDb.execute).toHaveBeenCalledTimes(1);
+      expect(bodies[1]).toEqual(bodies[0]);
+    });
+
+    it('shares one cache entry between two owners asking the same question', async () => {
+      const store = new Map<string, string>();
+      const redisMock = {
+        get: vi.fn(async (key: string) => store.get(key) ?? null),
+        setex: vi.fn(async (key: string, _ttl: number, value: string) => {
+          store.set(key, value);
+        }),
+      };
+      mockDb.execute.mockResolvedValueOnce({
+        rows: [
+          {
+            play_count: 3,
+            total_watch_time_ms: '5400000',
+            listen_time_ms: '0',
+            unique_users: 1,
+            unique_content: 2,
+          },
+        ],
+      });
+
+      for (const user of [createOwnerUser(), createOwnerUser()]) {
+        app = await buildTestApp(user, redisMock);
+        await app.inject({ method: 'GET', url: '/sessions/history/aggregates' });
+        await app.close();
+      }
+
+      expect(mockDb.execute).toHaveBeenCalledTimes(1);
+      expect(redisMock.setex).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('GET /sessions/filter-options', () => {
+    it('shares one cache entry between visits whose window starts within the same minute', async () => {
+      const ownerUser = createOwnerUser();
+      app = await buildTestApp(ownerUser);
+      mockGetFilterOptions.mockResolvedValue('{}');
+
+      for (const startDate of ['2026-09-24T01:45:05.120Z', '2026-09-24T01:45:41.903Z']) {
+        await app.inject({ method: 'GET', url: `/sessions/filter-options?startDate=${startDate}` });
+      }
+
+      const [first, second] = mockGetFilterOptions.mock.calls;
+      expect(first).toEqual([ownerUser.userId, expect.any(String)]);
+      expect(second).toEqual(first);
     });
   });
 });

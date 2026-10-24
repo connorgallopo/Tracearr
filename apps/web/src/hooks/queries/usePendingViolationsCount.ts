@@ -1,6 +1,12 @@
-import { useViolations } from './useViolations';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 
 export function usePendingViolationsCount(enabled: boolean): number {
-  const { data } = useViolations({ acknowledged: false, pageSize: 1, enabled });
-  return data?.meta.total ?? 0;
+  const { data } = useQuery({
+    queryKey: ['violations', 'count', 'pending'],
+    queryFn: () => api.violations.count({ acknowledged: false }),
+    enabled,
+    staleTime: 1000 * 30,
+  });
+  return data?.total ?? 0;
 }

@@ -13,16 +13,9 @@
 
 import { eq, and, sql, inArray, isNull, type SQL } from 'drizzle-orm';
 import type { MediaUser } from './mediaServer/index.js';
-import { usernameAsEmail, type UserRole } from '@tracearr/shared';
+import { usernameAsEmail } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import {
-  users,
-  serverUsers,
-  serverUserExternalAliases,
-  servers,
-  sessions,
-  automationRuns,
-} from '../db/schema.js';
+import { users, serverUsers, serverUserExternalAliases, automationRuns } from '../db/schema.js';
 import { clearScope } from '../lib/scope.js';
 import { NotFoundError } from '../utils/errors.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
@@ -35,63 +28,6 @@ export type ServerUser = typeof serverUsers.$inferSelect;
 
 // Transaction handle, or the plain db client when there's no surrounding transaction
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0] | typeof db;
-
-// Type for server user with user and server info
-export interface ServerUserWithDetails {
-  id: string;
-  userId: string;
-  serverId: string;
-  externalId: string;
-  username: string;
-  email: string | null;
-  thumbUrl: string | null;
-  isServerAdmin: boolean;
-  trustScore: number;
-  createdAt: Date;
-  updatedAt: Date;
-  // User identity info
-  user: {
-    id: string;
-    name: string | null;
-    thumbnail: string | null;
-    email: string | null;
-    role: UserRole;
-    aggregateTrustScore: number;
-  };
-  // Server info
-  server: {
-    id: string;
-    name: string;
-    type: string;
-  };
-}
-
-// Type for user with stats (for user detail page)
-export interface UserWithStats {
-  id: string;
-  username: string;
-  name: string | null;
-  thumbnail: string | null;
-  email: string | null;
-  role: UserRole;
-  aggregateTrustScore: number;
-  totalViolations: number;
-  createdAt: Date;
-  updatedAt: Date;
-  serverUsers: Array<{
-    id: string;
-    serverId: string;
-    serverName: string;
-    serverType: string;
-    username: string;
-    thumbUrl: string | null;
-    trustScore: number;
-  }>;
-  stats: {
-    totalSessions: number;
-    totalWatchTime: number;
-  };
-}
 
 // ============================================================================
 // User Identity Operations
@@ -117,79 +53,11 @@ export async function requireUserById(id: string): Promise<User> {
 }
 
 /**
- * Get user identity by email (for auto-linking during sync)
- */
-export async function getUserByEmail(email: string): Promise<User | null> {
-  const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-  return rows[0] ?? null;
-}
-
-/**
- * Get user identity by username (for local auth lookup)
- */
-export async function getUserByUsername(username: string): Promise<User | null> {
-  const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
-  return rows[0] ?? null;
-}
-
-/**
- * Get user identity by Plex account ID (for Login with Plex)
- */
-export async function getUserByPlexAccountId(plexAccountId: string): Promise<User | null> {
-  const rows = await db.select().from(users).where(eq(users.plexAccountId, plexAccountId)).limit(1);
-  return rows[0] ?? null;
-}
-
-/**
  * Get the owner user (for auth setup validation)
  */
 export async function getOwnerUser(): Promise<User | null> {
   const rows = await db.select().from(users).where(eq(users.role, 'owner')).limit(1);
   return rows[0] ?? null;
-}
-
-/**
- * Create a new user identity
- */
-export async function createUser(data: {
-  username: string;
-  name?: string;
-  email?: string;
-  thumbnail?: string;
-  passwordHash?: string;
-  plexAccountId?: string;
-  role?: UserRole;
-}): Promise<User> {
-  const rows = await db
-    .insert(users)
-    .values({
-      username: data.username,
-      name: data.name ?? null,
-      email: data.email?.toLowerCase() ?? null,
-      thumbnail: data.thumbnail ?? null,
-      passwordHash: data.passwordHash ?? null,
-      plexAccountId: data.plexAccountId ?? null,
-      role: data.role ?? 'member',
-    })
-    .returning();
-  return rows[0]!;
-}
-
-/**
- * Create owner user (for initial setup)
- */
-export async function createOwnerUser(data: {
-  username: string;
-  name?: string;
-  passwordHash?: string;
-  email?: string;
-  plexAccountId?: string;
-  thumbnail?: string;
-}): Promise<User> {
-  return createUser({
-    ...data,
-    role: 'owner',
-  });
 }
 
 /** The column's CHECK requires lowercase, and an address that trims to nothing means no contact email. */
@@ -231,20 +99,6 @@ export async function updateUser(
   return user;
 }
 
-/**
- * Link Plex account to existing user
- */
-export async function linkPlexAccount(
-  userId: string,
-  plexAccountId: string,
-  thumbnail?: string
-): Promise<User> {
-  return updateUser(userId, {
-    plexAccountId,
-    thumbnail: thumbnail ?? undefined,
-  });
-}
-
 // ============================================================================
 // Server User Operations
 // ============================================================================
@@ -255,17 +109,6 @@ export async function linkPlexAccount(
 export async function getServerUserById(id: string): Promise<ServerUser | null> {
   const rows = await db.select().from(serverUsers).where(eq(serverUsers.id, id)).limit(1);
   return rows[0] ?? null;
-}
-
-/**
- * Get server user by ID (throws if not found)
- */
-export async function requireServerUserById(id: string): Promise<ServerUser> {
-  const serverUser = await getServerUserById(id);
-  if (!serverUser) {
-    throw new ServerUserNotFoundError(id);
-  }
-  return serverUser;
 }
 
 /**
@@ -338,68 +181,6 @@ export async function getServerUserByUsername(
 }
 
 /**
- * Get server user with full details (user identity + server info)
- */
-export async function getServerUserWithDetails(id: string): Promise<ServerUserWithDetails | null> {
-  const rows = await db
-    .select({
-      id: serverUsers.id,
-      userId: serverUsers.userId,
-      serverId: serverUsers.serverId,
-      externalId: serverUsers.externalId,
-      username: serverUsers.username,
-      email: serverUsers.email,
-      thumbUrl: serverUsers.thumbUrl,
-      isServerAdmin: serverUsers.isServerAdmin,
-      trustScore: serverUsers.trustScore,
-      createdAt: serverUsers.createdAt,
-      updatedAt: serverUsers.updatedAt,
-      userName: users.name,
-      userThumbnail: users.thumbnail,
-      userEmail: users.email,
-      userRole: users.role,
-      userAggregateTrustScore: users.aggregateTrustScore,
-      serverName: servers.name,
-      serverType: servers.type,
-    })
-    .from(serverUsers)
-    .innerJoin(users, eq(serverUsers.userId, users.id))
-    .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-    .where(eq(serverUsers.id, id))
-    .limit(1);
-
-  const row = rows[0];
-  if (!row) return null;
-
-  return {
-    id: row.id,
-    userId: row.userId,
-    serverId: row.serverId,
-    externalId: row.externalId,
-    username: row.username,
-    email: row.email,
-    thumbUrl: row.thumbUrl,
-    isServerAdmin: row.isServerAdmin,
-    trustScore: row.trustScore,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    user: {
-      id: row.userId,
-      name: row.userName,
-      thumbnail: row.userThumbnail,
-      email: row.userEmail,
-      role: row.userRole,
-      aggregateTrustScore: row.userAggregateTrustScore,
-    },
-    server: {
-      id: row.serverId,
-      name: row.serverName,
-      type: row.serverType,
-    },
-  };
-}
-
-/**
  * Batch-resolve display names for server-user IDs.
  * Single query: serverUsers LEFT JOIN users WHERE id IN (...).
  * Returns id → (identityName ?? username). Safe to call with empty array.
@@ -426,20 +207,6 @@ export async function getServerUserDisplayNames(ids: string[]): Promise<Record<s
 }
 
 /**
- * Get all server users for a server (for batch processing in poller)
- * Returns a Map keyed by externalId for O(1) lookups
- */
-export async function getServerUsersByServer(serverId: string): Promise<Map<string, ServerUser>> {
-  const rows = await db.select().from(serverUsers).where(eq(serverUsers.serverId, serverId));
-
-  const userMap = new Map<string, ServerUser>();
-  for (const su of rows) {
-    userMap.set(su.externalId, su);
-  }
-  return userMap;
-}
-
-/**
  * Get all server users for a user identity
  */
 export async function getServerUsersByUserId(userId: string): Promise<ServerUser[]> {
@@ -453,35 +220,6 @@ export async function getServerUsersByUserId(userId: string): Promise<ServerUser
 export async function getIdentityServerUserIds(userId: string): Promise<string[]> {
   const rows = await getServerUsersByUserId(userId);
   return rows.map((row) => row.id);
-}
-
-/**
- * Create a server user linked to a user identity
- */
-export async function createServerUser(data: {
-  userId: string;
-  serverId: string;
-  externalId: string;
-  username: string;
-  email?: string;
-  thumbUrl?: string;
-  isServerAdmin?: boolean;
-  joinedAt?: Date;
-}): Promise<ServerUser> {
-  const rows = await db
-    .insert(serverUsers)
-    .values({
-      userId: data.userId,
-      serverId: data.serverId,
-      externalId: data.externalId,
-      username: data.username,
-      email: data.email ?? null,
-      thumbUrl: data.thumbUrl ?? null,
-      isServerAdmin: data.isServerAdmin ?? false,
-      joinedAt: data.joinedAt ?? null,
-    })
-    .returning();
-  return rows[0]!;
 }
 
 /**
@@ -865,108 +603,6 @@ export async function syncUserFromMediaServer(
   });
 
   return { serverUser: result.serverUser, user: result.user, created: true, newlyDisabled: false };
-}
-
-/**
- * Batch sync users from media server
- * More efficient than individual syncs - uses batch lookups
- */
-export async function batchSyncUsersFromMediaServer(
-  serverId: string,
-  mediaUsers: MediaUser[],
-  options: SyncUserOptions = {}
-): Promise<{ added: number; updated: number; skipped: number }> {
-  if (mediaUsers.length === 0) return { added: 0, updated: 0, skipped: 0 };
-
-  let added = 0;
-  let updated = 0;
-  let skipped = 0;
-
-  for (const mediaUser of mediaUsers) {
-    const result = await syncUserFromMediaServer(serverId, mediaUser, options);
-    if (result === null) {
-      skipped++;
-    } else if (result.created) {
-      added++;
-    } else {
-      updated++;
-    }
-  }
-
-  return { added, updated, skipped };
-}
-
-// ============================================================================
-// Aggregated User Operations (across all server users)
-// ============================================================================
-
-/**
- * Get user with stats (for user detail page)
- */
-export async function getUserWithStats(userId: string): Promise<UserWithStats | null> {
-  const user = await getUserById(userId);
-  if (!user) return null;
-
-  // Get all server users for this user
-  const serverUserRows = await db
-    .select({
-      id: serverUsers.id,
-      serverId: serverUsers.serverId,
-      serverName: servers.name,
-      serverType: servers.type,
-      username: serverUsers.username,
-      thumbUrl: serverUsers.thumbUrl,
-      trustScore: serverUsers.trustScore,
-    })
-    .from(serverUsers)
-    .innerJoin(servers, eq(serverUsers.serverId, servers.id))
-    .where(eq(serverUsers.userId, userId));
-
-  // Get aggregated stats across all server users
-  const serverUserIds = serverUserRows.map((su) => su.id);
-  let totalSessions = 0;
-  let totalWatchTime = 0;
-
-  if (serverUserIds.length > 0) {
-    // Build explicit PostgreSQL array literal (Drizzle doesn't auto-convert JS arrays for ANY())
-    const serverUserIdArray = sql.raw(
-      `ARRAY[${serverUserIds.map((id) => `'${id}'::uuid`).join(',')}]`
-    );
-    // Add time bounds to enable TimescaleDB chunk exclusion (prevents full hypertable scan)
-    // 10-year window covers all realistic historical data while enabling query optimization
-    const tenYearsAgo = new Date(Date.now() - 10 * 365 * 24 * 60 * 60 * 1000);
-    const now = new Date();
-    const statsResult = await db
-      .select({
-        totalSessions: sql<number>`count(*)::int`,
-        totalWatchTime: sql<number>`coalesce(sum(duration_ms), 0)::bigint`,
-      })
-      .from(sessions).where(sql`${sessions.serverUserId} = ANY(${serverUserIdArray})
-        AND ${sessions.startedAt} >= ${tenYearsAgo}
-        AND ${sessions.startedAt} <= ${now}`);
-
-    const stats = statsResult[0];
-    totalSessions = stats?.totalSessions ?? 0;
-    totalWatchTime = Number(stats?.totalWatchTime ?? 0);
-  }
-
-  return {
-    id: user.id,
-    username: user.username,
-    name: user.name,
-    thumbnail: user.thumbnail,
-    email: user.email,
-    role: user.role,
-    aggregateTrustScore: user.aggregateTrustScore,
-    totalViolations: user.totalViolations,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    serverUsers: serverUserRows,
-    stats: {
-      totalSessions,
-      totalWatchTime,
-    },
-  };
 }
 
 /**

@@ -14,9 +14,9 @@
  * @see https://orm.drizzle.team/docs/perf-queries
  */
 
-import { eq, gte, and, isNull, desc, sql, inArray } from 'drizzle-orm';
+import { eq, gte, and, isNull, sql, inArray } from 'drizzle-orm';
 import { db } from './client.js';
-import { sessions, automationRuns, users, serverUsers, servers, automations } from './schema.js';
+import { sessions, automationRuns, serverUsers } from './schema.js';
 import { PLAYS_MEDIA_TYPES, PRIMARY_MEDIA_TYPES, WATCH_AND_LISTEN_MS } from '../constants/index.js';
 import { violationAliasConditions } from '../services/automations/aliasFilter.js';
 import { playbackDecisionSql } from '../utils/playbackDecisionSql.js';
@@ -108,110 +108,6 @@ function createStatements() {
       )
       .prepare('unique_users_since'),
 
-    /**
-     * Count unacknowledged violations
-     * Used for: Alert badge in navigation
-     * Called: On app load and after acknowledgment
-     * Note: requireUser keeps the badge on the same rows /violations lists,
-     * which joins server_users and so drops account-keyed runs.
-     */
-    unacknowledgedViolationsCount: db
-      .select({
-        count: sql<number>`count(*)::int`,
-      })
-      .from(automationRuns)
-      .where(
-        and(
-          isNull(automationRuns.acknowledgedAt),
-          isNull(automationRuns.dismissedAt),
-          ...violationAliasConditions({ requireUser: true })
-        )
-      )
-      .prepare('unacknowledged_violations_count'),
-
-    // ========================================================================
-    // Polling Queries
-    // ========================================================================
-
-    /**
-     * Find server user by server ID and external ID
-     * Used for: Server user lookup during session polling
-     * Called: Every poll cycle for each active session (potentially 10+ times per 15 seconds)
-     */
-    serverUserByExternalId: db
-      .select()
-      .from(serverUsers)
-      .where(
-        and(
-          eq(serverUsers.serverId, sql.placeholder('serverId')),
-          eq(serverUsers.externalId, sql.placeholder('externalId'))
-        )
-      )
-      .limit(1)
-      .prepare('server_user_by_external_id'),
-
-    /**
-     * Find session by server ID and session key
-     * Used for: Session lookup during polling to check for existing sessions
-     * Called: Every poll cycle for each active session
-     */
-    sessionByServerAndKey: db
-      .select()
-      .from(sessions)
-      .where(
-        and(
-          eq(sessions.serverId, sql.placeholder('serverId')),
-          eq(sessions.sessionKey, sql.placeholder('sessionKey'))
-        )
-      )
-      .limit(1)
-      .prepare('session_by_server_and_key'),
-
-    // ========================================================================
-    // User Queries
-    // ========================================================================
-
-    /**
-     * Get server user by ID with basic info
-     * Used for: Server user details in violations, sessions
-     * Called: Frequently for UI enrichment
-     */
-    serverUserById: db
-      .select({
-        id: serverUsers.id,
-        userId: serverUsers.userId,
-        username: serverUsers.username,
-        thumbUrl: serverUsers.thumbUrl,
-        trustScore: serverUsers.trustScore,
-      })
-      .from(serverUsers)
-      .where(eq(serverUsers.id, sql.placeholder('id')))
-      .limit(1)
-      .prepare('server_user_by_id'),
-
-    /**
-     * Get user identity by ID
-     * Used for: User identity info (the real person)
-     * Called: When viewing user profile
-     */
-    userById: db
-      .select({
-        id: users.id,
-        name: users.name,
-        thumbnail: users.thumbnail,
-        email: users.email,
-        role: users.role,
-        aggregateTrustScore: users.aggregateTrustScore,
-      })
-      .from(users)
-      .where(eq(users.id, sql.placeholder('id')))
-      .limit(1)
-      .prepare('user_by_id'),
-
-    // ========================================================================
-    // Session Queries
-    // ========================================================================
-
     // ========================================================================
     // Stats Queries (hot-path for dashboard and analytics pages)
     // ========================================================================
@@ -258,89 +154,6 @@ function createStatements() {
       )
       .groupBy(sql`tier`)
       .prepare('quality_stats_since'),
-
-    // ========================================================================
-    // Rule Queries (hot-path for poller)
-    // ========================================================================
-
-    /**
-     * Get all active rules
-     * Used for: Rule evaluation during session polling
-     * Called: Every poll cycle (~15 seconds per server)
-     */
-    getActiveRules: db
-      .select()
-      .from(automations)
-      .where(eq(automations.isActive, true))
-      .prepare('get_active_rules'),
-
-    /**
-     * Get recent sessions for a user (for rule evaluation)
-     * Used for: Evaluating device velocity, concurrent streams rules
-     * Called: During rule evaluation for active sessions
-     */
-    getUserRecentSessions: db
-      .select({
-        id: sessions.id,
-        startedAt: sessions.startedAt,
-        stoppedAt: sessions.stoppedAt,
-        ipAddress: sessions.ipAddress,
-        deviceId: sessions.deviceId,
-        geoLat: sessions.geoLat,
-        geoLon: sessions.geoLon,
-        geoCity: sessions.geoCity,
-        geoCountry: sessions.geoCountry,
-        state: sessions.state,
-      })
-      .from(sessions)
-      .where(
-        and(
-          eq(sessions.serverUserId, sql.placeholder('serverUserId')),
-          gte(sessions.startedAt, sql.placeholder('since'))
-        )
-      )
-      .orderBy(desc(sessions.startedAt))
-      .limit(100)
-      .prepare('get_user_recent_sessions'),
-
-    // ========================================================================
-    // Violation Queries
-    // ========================================================================
-
-    /**
-     * Get unacknowledged violations with pagination
-     * Used for: Violation list in dashboard
-     * Called: Frequently for alert displays
-     */
-    getUnackedViolations: db
-      .select()
-      .from(automationRuns)
-      .where(
-        and(
-          isNull(automationRuns.acknowledgedAt),
-          isNull(automationRuns.dismissedAt),
-          ...violationAliasConditions()
-        )
-      )
-      .orderBy(desc(automationRuns.createdAt))
-      .limit(sql.placeholder('limit'))
-      .prepare('get_unacked_violations'),
-
-    // ========================================================================
-    // Server Queries
-    // ========================================================================
-
-    /**
-     * Get server by ID
-     * Used for: Server details, validation
-     * Called: Frequently during API requests
-     */
-    serverById: db
-      .select()
-      .from(servers)
-      .where(eq(servers.id, sql.placeholder('id')))
-      .limit(1)
-      .prepare('server_by_id'),
   };
 }
 
@@ -353,17 +166,8 @@ export let playsCountSince: Statements['playsCountSince'];
 export let watchTimeSince: Statements['watchTimeSince'];
 export let violationsCountSince: Statements['violationsCountSince'];
 export let uniqueUsersSince: Statements['uniqueUsersSince'];
-export let unacknowledgedViolationsCount: Statements['unacknowledgedViolationsCount'];
-export let serverUserByExternalId: Statements['serverUserByExternalId'];
-export let sessionByServerAndKey: Statements['sessionByServerAndKey'];
-export let serverUserById: Statements['serverUserById'];
-export let userById: Statements['userById'];
 export let playsByPlatformSince: Statements['playsByPlatformSince'];
 export let qualityStatsSince: Statements['qualityStatsSince'];
-export let getActiveRules: Statements['getActiveRules'];
-export let getUserRecentSessions: Statements['getUserRecentSessions'];
-export let getUnackedViolations: Statements['getUnackedViolations'];
-export let serverById: Statements['serverById'];
 
 /** Create (or recreate) all prepared statements against the current db instance */
 export function initPreparedStatements(): void {
@@ -372,17 +176,8 @@ export function initPreparedStatements(): void {
   watchTimeSince = s.watchTimeSince;
   violationsCountSince = s.violationsCountSince;
   uniqueUsersSince = s.uniqueUsersSince;
-  unacknowledgedViolationsCount = s.unacknowledgedViolationsCount;
-  serverUserByExternalId = s.serverUserByExternalId;
-  sessionByServerAndKey = s.sessionByServerAndKey;
-  serverUserById = s.serverUserById;
-  userById = s.userById;
   playsByPlatformSince = s.playsByPlatformSince;
   qualityStatsSince = s.qualityStatsSince;
-  getActiveRules = s.getActiveRules;
-  getUserRecentSessions = s.getUserRecentSessions;
-  getUnackedViolations = s.getUnackedViolations;
-  serverById = s.serverById;
 }
 
 // ============================================================================
@@ -392,14 +187,5 @@ export function initPreparedStatements(): void {
 export type PlaysCountResult = Awaited<ReturnType<typeof playsCountSince.execute>>;
 export type WatchTimeResult = Awaited<ReturnType<typeof watchTimeSince.execute>>;
 export type ViolationsCountResult = Awaited<ReturnType<typeof violationsCountSince.execute>>;
-export type ServerUserByExternalIdResult = Awaited<
-  ReturnType<typeof serverUserByExternalId.execute>
->;
-export type ServerUserByIdResult = Awaited<ReturnType<typeof serverUserById.execute>>;
-export type UserByIdResult = Awaited<ReturnType<typeof userById.execute>>;
 export type PlaysByPlatformResult = Awaited<ReturnType<typeof playsByPlatformSince.execute>>;
 export type QualityStatsResult = Awaited<ReturnType<typeof qualityStatsSince.execute>>;
-export type ActiveRulesResult = Awaited<ReturnType<typeof getActiveRules.execute>>;
-export type UserRecentSessionsResult = Awaited<ReturnType<typeof getUserRecentSessions.execute>>;
-export type UnackedViolationsResult = Awaited<ReturnType<typeof getUnackedViolations.execute>>;
-export type ServerByIdResult = Awaited<ReturnType<typeof serverById.execute>>;

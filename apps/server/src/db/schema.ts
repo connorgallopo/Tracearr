@@ -647,6 +647,9 @@ export const automationRuns = pgTable(
     // Nullable: null for account_inactivity rules (no associated session)
     // No FK: sessions is a hypertable, so timescale.ts drops the constraint at boot.
     sessionId: uuid('session_id'),
+    // The session's partition key, so a join back to it touches one chunk. Null on rows
+    // without a session, and on older diagnostics the backfill left to age out.
+    sessionStartedAt: timestamp('session_started_at', { withTimezone: true }),
     severity: varchar('severity', { length: 20 }).$type<(typeof violationSeverityEnum)[number]>(),
     // The server the run acted on; no FK, so a deleted server leaves its runs readable.
     serverId: uuid('server_id'),
@@ -705,6 +708,10 @@ export const automationRuns = pgTable(
     // The id column is the list's paging tiebreak, so the scan needs no sort on top.
     index('automation_runs_violation_alias_idx')
       .on(table.createdAt.desc().nullsFirst(), table.id)
+      .where(sql`kind = 'policy' AND outcome = 'completed'`),
+    // The identity violation recount and the account gate, without walking the diagnostics.
+    index('automation_runs_violation_account_idx')
+      .on(table.serverUserId, table.automationId)
       .where(sql`kind = 'policy' AND outcome = 'completed'`),
     // The runs list default sort; null placement and tiebreak match its ORDER BY.
     index('automation_runs_started_at_idx').on(table.startedAt.desc().nullsLast(), table.id),
@@ -1586,6 +1593,20 @@ export const libraryItems = pgTable(
 
     // Composite index for library-scoped queries
     index('idx_library_items_server_library').on(table.serverId, table.libraryId),
+
+    // Hierarchy indexes for episode and track lookups
+    index('idx_library_items_grandparent')
+      .on(table.serverId, table.grandparentRatingKey)
+      .where(sql`${table.grandparentRatingKey} IS NOT NULL`),
+    index('idx_library_items_parent')
+      .on(table.serverId, table.parentRatingKey)
+      .where(sql`${table.parentRatingKey} IS NOT NULL`),
+    index('idx_library_items_episode_lookup')
+      .on(table.serverId, table.grandparentRatingKey, table.parentIndex, table.itemIndex)
+      .where(sql`${table.mediaType} = 'episode'`),
+    index('idx_library_items_track_lookup')
+      .on(table.serverId, table.grandparentRatingKey, table.parentRatingKey, table.itemIndex)
+      .where(sql`${table.mediaType} = 'track'`),
 
     // Unique constraint to prevent duplicates (one rating_key per server)
     uniqueIndex('library_items_server_rating_key_unique').on(table.serverId, table.ratingKey),

@@ -4,8 +4,7 @@
  * The dashboard "Alerts" metric has two branches: unfiltered reads run through
  * violations_count_since, server-filtered reads through raw SQL that inner-joins
  * server_users. Both have to count the same rows, so the prepared statement has
- * to spell out the user predicate the join implies. The nav alert badge counts
- * against the /violations list query, which carries the same join.
+ * to spell out the user predicate the join implies.
  */
 
 import { describe, expect, it, vi } from 'vitest';
@@ -54,23 +53,6 @@ describe('violations_count_since', () => {
     const text = whereFor('violations_count_since');
 
     expect(text).toContain('automation_runs.created_at >=');
-    expect(text).toContain('automation_runs.dismissed_at is null');
-  });
-});
-
-describe('unacknowledged_violations_count', () => {
-  it('carries the full alias filter, so the badge counts what /violations lists', () => {
-    const text = whereFor('unacknowledged_violations_count');
-
-    expect(text).toContain('automation_runs.kind =');
-    expect(text).toContain('automation_runs.outcome =');
-    expect(text).toContain('automation_runs.server_user_id is not null');
-  });
-
-  it('counts only runs that are neither acknowledged nor dismissed', () => {
-    const text = whereFor('unacknowledged_violations_count');
-
-    expect(text).toContain('automation_runs.acknowledged_at is null');
     expect(text).toContain('automation_runs.dismissed_at is null');
   });
 });

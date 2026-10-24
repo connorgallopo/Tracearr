@@ -64,7 +64,7 @@ export async function createTestRun(data: RunData): Promise<CreatedRun> {
 
   const result = await executeRawSql(`
     INSERT INTO automation_runs (
-      id, rule_id, server_user_id, session_id, severity, data,
+      id, rule_id, server_user_id, session_id, session_started_at, severity, data,
       kind, outcome, subject_key, started_at, finished_at
     )
     VALUES (
@@ -72,6 +72,7 @@ export async function createTestRun(data: RunData): Promise<CreatedRun> {
       ${quote(full.automationId)},
       ${quote(full.serverUserId)},
       ${quote(full.sessionId)},
+      (SELECT started_at FROM sessions WHERE id = ${quote(full.sessionId)} LIMIT 1),
       ${quote(full.severity)},
       ${quote(JSON.stringify(full.data))}::jsonb,
       ${quote(full.kind)},

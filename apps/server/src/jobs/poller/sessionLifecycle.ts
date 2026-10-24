@@ -17,8 +17,8 @@ import {
 } from '@tracearr/shared';
 import { and, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { serverUsers, sessions, users } from '../../db/schema.js';
-import { sessionRowById } from '../../db/sessionRow.js';
+import { automationRuns, serverUsers, sessions, users } from '../../db/schema.js';
+import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessionRow.js';
 import { toRuleSession } from '../../services/automations/events/contextAssembly.js';
 import { dispatch } from '../../services/automations/events/dispatcher.js';
 import { matchesTrigger } from '../../services/automations/events/evaluate.js';
@@ -64,11 +64,6 @@ import type {
 const MAX_SERIALIZATION_RETRIES = 3;
 const SERIALIZATION_RETRY_BASE_MS = 50; // P2-7: Increased from 10ms for better backoff
 const TRANSACTION_TIMEOUT_MS = 10000; // P2-8: 10 second timeout for transactions
-
-// Time bound for active session queries to limit TimescaleDB chunk scanning.
-// Active sessions should only exist in recent chunks - anything older would have
-// been force-stopped by the stale session sweep. 7 days gives ample buffer.
-const ACTIVE_SESSION_CHUNK_BOUND_MS = 7 * 24 * 60 * 60 * 1000;
 
 // Bound for the STEP 2 resume-detection query below. A resumable session's
 // startedAt can precede the 24h stoppedAt resume window by up to its own
@@ -1094,8 +1089,12 @@ export async function confirmAndPersistSession(
         ...(latestProgressMs > 0 && { progressMs: latestProgressMs }),
       })
       .where(sessionRowById(result.insertedSession));
+    // The runs the start dispatch recorded keyed the session by its confirmation time
+    await db
+      .update(automationRuns)
+      .set({ sessionStartedAt: actualStartedAt })
+      .where(eq(automationRuns.sessionId, result.insertedSession.id));
 
-    // Update the returned session object to reflect the correct values
     result.insertedSession.startedAt = actualStartedAt;
     result.insertedSession.pausedDurationMs = pendingData.pausedDurationMs;
     result.insertedSession.lastPausedAt = pendingData.lastPausedAt

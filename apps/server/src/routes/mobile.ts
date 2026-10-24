@@ -46,6 +46,8 @@ import {
   sessions,
   authSessions,
 } from '../db/schema.js';
+import { readSessionRow } from '../db/sessionRow.js';
+import { getCacheService } from '../services/cache.js';
 import { getAuth } from '../lib/auth.js';
 import { hasPermission } from '../lib/scope.js';
 import { assertMobileClientSupported, failClosed } from '../plugins/auth.js';
@@ -1192,19 +1194,33 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         return reply.forbidden('Only administrators can terminate sessions');
       }
 
-      // Verify the session exists and user has access to its server
-      const session = await db
-        .select({
-          id: sessions.id,
-          serverId: sessions.serverId,
-          serverUserId: sessions.serverUserId,
-          state: sessions.state,
-        })
-        .from(sessions)
-        .where(eq(sessions.id, id))
-        .limit(1);
+      // Verify the session exists and user has access to its server; a live one is in the cache
 
-      const sessionData = session[0];
+      const cached = await getCacheService()?.getSessionById(id);
+
+      const sessionData = await readSessionRow(id, cached?.startedAt, (where) =>
+        db
+
+          .select({
+            id: sessions.id,
+
+            serverId: sessions.serverId,
+
+            serverUserId: sessions.serverUserId,
+
+            state: sessions.state,
+
+            startedAt: sessions.startedAt,
+          })
+
+          .from(sessions)
+
+          .where(where)
+
+          .limit(1)
+
+          .then((rows) => rows[0])
+      );
       if (!sessionData) {
         return reply.notFound('Session not found');
       }
@@ -1224,6 +1240,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
         trigger: 'manual',
         triggeredByUserId: authUser.userId,
         reason,
+        sessionStartedAt: sessionData.startedAt,
       });
 
       if (result.outcome === 'server_historical') {

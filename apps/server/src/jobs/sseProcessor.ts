@@ -12,11 +12,11 @@
  */
 
 import { SESSION_WRITE_RETRY, type PlexPlaySessionNotification } from '@tracearr/shared';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, type SQL } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client.js';
 import { servers, serverUserExternalAliases, serverUsers, sessions, users } from '../db/schema.js';
-import { sessionRowById } from '../db/sessionRow.js';
+import { ACTIVE_SESSION_CHUNK_BOUND_MS, readSessionRow, sessionRowById } from '../db/sessionRow.js';
 import { getGeoIPSettings } from '../routes/settings.js';
 import type { CacheService, PubSubService } from '../services/cache.js';
 import { pollAllDownloads } from '../services/downloads/activityLogPoll.js';
@@ -865,16 +865,23 @@ async function processSessionWriteRetries(): Promise<void> {
         continue;
       }
 
-      const row =
+      const readOpen = (where: SQL) =>
+        db
+          .select()
+          .from(sessions)
+          .where(and(where, isNull(sessions.stoppedAt)))
+          .limit(1)
+          .then((rows) => rows[0]);
+      // A retry queued before starts were carried floors at the active bound first, and only
+      // a stream older than that falls back to the id alone.
+      const session =
         retry.startedAt === undefined
-          ? eq(sessions.id, retry.sessionId)
-          : sessionRowById({ id: retry.sessionId, startedAt: retry.startedAt });
-      const session = await db
-        .select()
-        .from(sessions)
-        .where(and(row, isNull(sessions.stoppedAt)))
-        .limit(1)
-        .then((rows) => rows[0]);
+          ? await readSessionRow(
+              retry.sessionId,
+              Date.now() - ACTIVE_SESSION_CHUNK_BOUND_MS,
+              readOpen
+            )
+          : await readOpen(sessionRowById({ id: retry.sessionId, startedAt: retry.startedAt }));
 
       if (!session) {
         // Session no longer exists or already stopped

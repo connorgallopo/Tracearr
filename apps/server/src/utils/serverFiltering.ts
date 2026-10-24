@@ -49,53 +49,6 @@ export function buildServerAccessCondition(
 }
 
 /**
- * Build a SQL condition for an explicit serverId filter parameter.
- * Also validates that the user has access to the requested server.
- *
- * @param authUser - The authenticated user
- * @param serverId - The requested server ID (from query params)
- * @param serverIdColumn - The column to filter on
- * @returns Object with condition and error (if access denied)
- *
- * @example
- * ```ts
- * const { condition, error } = buildServerFilterCondition(authUser, serverId, sessions.serverId);
- * if (error) {
- *   return reply.forbidden(error);
- * }
- * if (condition) {
- *   conditions.push(condition);
- * }
- * ```
- */
-export function buildServerFilterCondition(
-  authUser: AuthUser,
-  serverId: string | undefined,
-  serverIdColumn: Column
-): { condition: SQL | undefined; error: string | null } {
-  // If explicit serverId requested, validate access
-  if (serverId) {
-    if (authUser.role !== 'owner' && !authUser.serverIds.includes(serverId)) {
-      return {
-        condition: undefined,
-        error: 'You do not have access to this server',
-      };
-    }
-    // User has access, filter to specific server
-    return {
-      condition: eq(serverIdColumn, serverId),
-      error: null,
-    };
-  }
-
-  // No explicit serverId - apply user's server access filter
-  return {
-    condition: buildServerAccessCondition(authUser, serverIdColumn),
-    error: null,
-  };
-}
-
-/**
  * Filter an array of items by server access.
  * Use this for post-query filtering when the query can't be easily modified.
  *
@@ -105,7 +58,7 @@ export function buildServerFilterCondition(
  *
  * @example
  * ```ts
- * const allSessions = await cache.getActiveSessions();
+ * const allSessions = await cache.getAllActiveSessions();
  * const userSessions = filterByServerAccess(allSessions, authUser);
  * ```
  */
@@ -154,38 +107,6 @@ export function validateServerAccess(authUser: AuthUser, serverId: string): stri
     return null;
   }
   return 'You do not have access to this server';
-}
-
-/**
- * Build a raw SQL fragment for server filtering in hand-written queries.
- *
- * Returns an `AND ...` clause (or empty SQL for owners with no serverId filter).
- * Use this in raw SQL template literals where Drizzle query builder isn't available.
- *
- * @param serverId - Optional explicit server ID filter (from query params)
- * @param authUser - The authenticated user with role and serverIds
- * @param columnRef - The column reference string (e.g. 'server_id', 'su.server_id')
- */
-export function buildServerFilterFragment(
-  serverId: string | undefined,
-  authUser: { role: string; serverIds: string[] },
-  columnRef = 'server_id'
-): SQL {
-  const col = sql.raw(columnRef);
-  if (serverId) {
-    return sql`AND ${col} = ${serverId}`;
-  }
-  if (authUser.role !== 'owner') {
-    if (authUser.serverIds.length === 0) {
-      return sql`AND false`;
-    }
-    if (authUser.serverIds.length === 1) {
-      return sql`AND ${col} = ${authUser.serverIds[0]}`;
-    }
-    const ids = authUser.serverIds.map((id) => sql`${id}`);
-    return sql`AND ${col} IN (${sql.join(ids, sql`, `)})`;
-  }
-  return sql``;
 }
 
 /**

@@ -8,14 +8,10 @@
 // Deduplication
 export {
   type ExistingSession,
-  type DeduplicationResult,
-  type DeduplicationConfig,
   type TimeBounds,
   queryExistingByExternalIds,
   queryExistingByTimeKeys,
   createTimeKey,
-  deduplicateBatch,
-  createDeduplicationContext,
 } from './deduplication.js';
 
 // User Mapping

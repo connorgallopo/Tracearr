@@ -19,7 +19,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Import ACTUAL production functions - not local duplicates
 import {
-  atomicCacheUpdate,
   createCacheService,
   createPubSubService,
   getPubSubService,
@@ -264,25 +263,6 @@ function createMockRedis(): Redis & {
   };
 }
 
-// Sample data matching shared types
-const sampleSession = {
-  sessionId: 'session-123',
-  mediaServerId: 'server-1',
-  userId: 'user-123',
-  username: 'testuser',
-  title: 'Test Movie',
-  mediaType: 'movie' as const,
-  state: 'playing' as const,
-  progress: 50,
-  duration: 7200,
-  startTime: Date.now(),
-  lastUpdated: Date.now(),
-  device: 'Chrome',
-  player: 'Web',
-  quality: '1080p',
-  ipAddress: '192.168.1.100',
-};
-
 // Sample ActiveSession for atomic method tests (matches actual ActiveSession type)
 function createTestActiveSession(id: string, serverId = 'server-1'): any {
   return {
@@ -328,15 +308,6 @@ function createTestActiveSession(id: string, serverId = 'server-1'): any {
   };
 }
 
-const sampleStats = {
-  activeSessions: 5,
-  totalUsers: 100,
-  totalServers: 3,
-  activeViolations: 2,
-  sessionsToday: 25,
-  streamsByMediaType: { movie: 10, episode: 15 },
-};
-
 describe('CacheService', () => {
   let redis: ReturnType<typeof createMockRedis>;
   let cache: CacheService;
@@ -346,118 +317,12 @@ describe('CacheService', () => {
     cache = createCacheService(redis);
   });
 
-  describe('getActiveSessions / setActiveSessions', () => {
-    it('should return null when no sessions cached', async () => {
-      const result = await cache.getActiveSessions();
-
-      expect(result).toBeNull();
-      expect(redis.get).toHaveBeenCalledWith('tracearr:sessions:active');
-    });
-
-    it('should store and retrieve active sessions', async () => {
-      const sessions = [sampleSession] as unknown[];
-
-      await cache.setActiveSessions(sessions as never);
-      const result = await cache.getActiveSessions();
-
-      expect(result).toEqual(sessions);
-      expect(redis.setex).toHaveBeenCalledWith(
-        'tracearr:sessions:active',
-        150, // CACHE_TTL.ACTIVE_SESSIONS
-        expect.any(String)
-      );
-    });
-
-    it('should invalidate dashboard stats when setting sessions', async () => {
-      // Set up timezone-specific dashboard stats (as used in production)
-      redis.store.set('tracearr:stats:dashboard:UTC', JSON.stringify({ activeStreams: 1 }));
-      redis.store.set(
-        'tracearr:stats:dashboard:America/New_York',
-        JSON.stringify({ activeStreams: 1 })
-      );
-
-      await cache.setActiveSessions([sampleSession] as never);
-
-      // Should have called scan to find timezone-specific stats (KEYS replaced with SCAN for performance)
-      expect(redis.scan).toHaveBeenCalledWith(
-        '0',
-        'MATCH',
-        'tracearr:stats:dashboard:*',
-        'COUNT',
-        100
-      );
-      // Should have deleted the matched keys
-      expect(redis.del).toHaveBeenCalledWith(
-        'tracearr:stats:dashboard:UTC',
-        'tracearr:stats:dashboard:America/New_York'
-      );
-    });
-
-    it('should return null on JSON parse error', async () => {
-      redis.store.set('tracearr:sessions:active', 'not-valid-json{');
-
-      const result = await cache.getActiveSessions();
-
-      expect(result).toBeNull();
-    });
-
-    it('should handle empty array', async () => {
-      await cache.setActiveSessions([]);
-      const result = await cache.getActiveSessions();
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('getDashboardStats / setDashboardStats', () => {
-    it('should return null when no stats cached', async () => {
-      const result = await cache.getDashboardStats();
-
-      expect(result).toBeNull();
-    });
-
-    it('should store and retrieve dashboard stats', async () => {
-      await cache.setDashboardStats(sampleStats as any);
-      const result = await cache.getDashboardStats();
-
-      expect(result).toEqual(sampleStats);
-      expect(redis.setex).toHaveBeenCalledWith(
-        'tracearr:stats:dashboard',
-        60, // CACHE_TTL.DASHBOARD_STATS
-        expect.any(String)
-      );
-    });
-
-    it('should return null on JSON parse error', async () => {
-      redis.store.set('tracearr:stats:dashboard', '{broken');
-
-      const result = await cache.getDashboardStats();
-
-      expect(result).toBeNull();
-    });
-  });
-
-  describe('getSessionById / setSessionById / deleteSessionById', () => {
+  describe('getSessionById', () => {
     it('should return null for non-existent session', async () => {
       const result = await cache.getSessionById('nonexistent');
 
       expect(result).toBeNull();
       expect(redis.get).toHaveBeenCalledWith('tracearr:sessions:nonexistent');
-    });
-
-    it('should store and retrieve session by ID', async () => {
-      await cache.setSessionById('session-123', sampleSession as any);
-      const result = await cache.getSessionById('session-123');
-
-      expect(result).toEqual(sampleSession);
-    });
-
-    it('should delete session by ID', async () => {
-      await cache.setSessionById('session-123', sampleSession as any);
-      await cache.deleteSessionById('session-123');
-
-      const result = await cache.getSessionById('session-123');
-      expect(result).toBeNull();
     });
 
     it('should return null on JSON parse error', async () => {
@@ -693,41 +558,6 @@ describe('CacheService', () => {
     });
   });
 
-  describe('atomicCacheUpdate', () => {
-    it('caches and returns the computed data', async () => {
-      const result = await atomicCacheUpdate(redis, 'dashboard:stats', 60, async () => ({
-        value: 42,
-      }));
-
-      expect(result).toEqual({ value: 42 });
-      expect(JSON.parse(redis.store.get('dashboard:stats')!)).toEqual({ value: 42 });
-    });
-
-    it('releases its own lock after a successful update', async () => {
-      const lockKey = 'dashboard:stats:lock';
-
-      await atomicCacheUpdate(redis, 'dashboard:stats', 60, async () => ({ value: 1 }));
-
-      expect(redis.store.has(lockKey)).toBe(false);
-    });
-
-    it("does not let holder A's release free holder B's lock after A's lock expired", async () => {
-      const lockKey = 'dashboard:stats:lock';
-
-      await atomicCacheUpdate(redis, 'dashboard:stats', 60, async () => {
-        // Simulate the lock expiring mid-operation and holder B acquiring it
-        // with its own token, exactly like Redis would after the TTL elapses.
-        redis.store.delete(lockKey);
-        const secondAcquired = await redis.set(lockKey, 'holder-b-token', 'EX', 5, 'NX');
-        expect(secondAcquired).toBe('OK');
-        return { value: 'a-result' };
-      });
-
-      // Holder A's finally-block release must not have deleted holder B's lock.
-      expect(redis.store.get(lockKey)).toBe('holder-b-token');
-    });
-  });
-
   describe('ping', () => {
     it('should return true when Redis responds with PONG', async () => {
       const result = await cache.ping();
@@ -924,38 +754,6 @@ describe('CacheService', () => {
       // Verify SET still contains the ID
       const ids = await redis.smembers('tracearr:sessions:active:ids');
       expect(ids).toContain('session-1');
-    });
-  });
-
-  describe('syncActiveSessions (full replacement)', () => {
-    it('should replace all sessions atomically', async () => {
-      // Add some initial sessions
-      await cache.addActiveSession(createTestActiveSession('old-1'));
-      await cache.addActiveSession(createTestActiveSession('old-2'));
-
-      // Sync with new sessions
-      const newSessions = [
-        createTestActiveSession('new-1'),
-        createTestActiveSession('new-2'),
-        createTestActiveSession('new-3'),
-      ];
-      await cache.syncActiveSessions(newSessions);
-
-      const result = await cache.getAllActiveSessions();
-
-      // Should only have new sessions
-      expect(result).toHaveLength(3);
-      const ids = result.map((s: any) => s.id).sort();
-      expect(ids).toEqual(['new-1', 'new-2', 'new-3']);
-    });
-
-    it('should handle empty sync (clear all sessions)', async () => {
-      await cache.addActiveSession(createTestActiveSession('session-1'));
-
-      await cache.syncActiveSessions([]);
-
-      const result = await cache.getAllActiveSessions();
-      expect(result).toHaveLength(0);
     });
   });
 

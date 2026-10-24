@@ -7,6 +7,8 @@ import { and, eq, ne, sql } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 import { APIError } from 'better-auth/api';
 import {
+  CACHE_TTL,
+  REDIS_KEYS,
   WS_EVENTS,
   updateSettingsSchema,
   type Settings,
@@ -45,6 +47,51 @@ function generateApiToken(): string {
 
 async function settingsResponse(): Promise<SettingsResponse> {
   return { ...(await getAllSettings()), oidcConfigured };
+}
+
+type IpWarning = { showWarning: boolean; stateHash: string };
+
+async function computeIpWarning(): Promise<IpWarning> {
+  // Get distinct IPs from recent sessions (last 30 days)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const distinctIps = await db
+    .selectDistinct({
+      ipAddress: sessions.ipAddress,
+    })
+    .from(sessions)
+    .where(sql`${sessions.startedAt} >= ${thirtyDaysAgo}`);
+
+  // If no sessions, don't show warning
+  if (distinctIps.length === 0) {
+    return { showWarning: false, stateHash: 'no-sessions' };
+  }
+
+  // Check if all IPs are the same
+  const uniqueIps = distinctIps
+    .map((row) => row.ipAddress)
+    .filter((ip): ip is string => ip !== null);
+  const allSameIp = uniqueIps.length === 1;
+
+  // Check if all IPs are private/local
+  const allPrivate = uniqueIps.every((ip) => geoipService.isPrivateIP(ip));
+
+  const showWarning = allSameIp || allPrivate;
+
+  // Generate stateHash based on the situation
+  let stateHash: string;
+  if (allSameIp && allPrivate) {
+    stateHash = 'single-private-ip';
+  } else if (allSameIp) {
+    stateHash = 'single-ip';
+  } else if (allPrivate) {
+    stateHash = 'all-private';
+  } else {
+    stateHash = 'normal';
+  }
+
+  return { showWarning, stateHash };
 }
 
 export const settingsRoutes: FastifyPluginAsync = async (app) => {
@@ -190,46 +237,12 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
    * Returns whether all users have the same IP or all have local/private IPs
    */
   app.get('/ip-warning', readSettings, async (_request, _reply) => {
-    // Get distinct IPs from recent sessions (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const cached = await app.redis.get(REDIS_KEYS.IP_WARNING);
+    if (cached) return JSON.parse(cached) as IpWarning;
 
-    const distinctIps = await db
-      .selectDistinct({
-        ipAddress: sessions.ipAddress,
-      })
-      .from(sessions)
-      .where(sql`${sessions.startedAt} >= ${thirtyDaysAgo}`);
-
-    // If no sessions, don't show warning
-    if (distinctIps.length === 0) {
-      return { showWarning: false, stateHash: 'no-sessions' };
-    }
-
-    // Check if all IPs are the same
-    const uniqueIps = distinctIps
-      .map((row) => row.ipAddress)
-      .filter((ip): ip is string => ip !== null);
-    const allSameIp = uniqueIps.length === 1;
-
-    // Check if all IPs are private/local
-    const allPrivate = uniqueIps.every((ip) => geoipService.isPrivateIP(ip));
-
-    const showWarning = allSameIp || allPrivate;
-
-    // Generate stateHash based on the situation
-    let stateHash: string;
-    if (allSameIp && allPrivate) {
-      stateHash = 'single-private-ip';
-    } else if (allSameIp) {
-      stateHash = 'single-ip';
-    } else if (allPrivate) {
-      stateHash = 'all-private';
-    } else {
-      stateHash = 'normal';
-    }
-
-    return { showWarning, stateHash };
+    const warning = await computeIpWarning();
+    await app.redis.setex(REDIS_KEYS.IP_WARNING, CACHE_TTL.IP_WARNING, JSON.stringify(warning));
+    return warning;
   });
 
   /** GET /settings/image-cache - poster cache size, need, free disk, disk-limited flag */

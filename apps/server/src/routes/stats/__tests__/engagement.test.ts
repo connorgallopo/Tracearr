@@ -320,7 +320,7 @@ describe('Engagement Routes', () => {
 
       it('should handle non-owner with invalid serverIds gracefully', async () => {
         // UUID validation is handled upstream by Zod schema, but serverIds from auth
-        // context are passed through to buildServerFilterFragment as-is
+        // context are passed through to buildMultiServerFragment as-is
         const viewerUser = createViewerUser(['invalid-uuid', 'also-invalid']);
         app = await buildTestApp(viewerUser);
 
@@ -333,7 +333,7 @@ describe('Engagement Routes', () => {
           url: '/stats/engagement',
         });
 
-        // buildServerFilterFragment is mocked to return sql``, so this succeeds
+        // buildMultiServerFragment is mocked to return sql``, so this succeeds
         expect(response.statusCode).toBe(200);
       });
     });

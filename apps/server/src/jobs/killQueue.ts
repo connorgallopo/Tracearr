@@ -54,6 +54,9 @@ export interface KillJobData {
    *  the rule, not necessarily the target session's owner (enforceAcrossServers
    *  can target sibling-account sessions). */
   triggeringServerUserId?: string;
+  /** Both sessions' starts as ISO strings, so reverify reads each from its own chunks. */
+  targetStartedAt?: string;
+  triggeringStartedAt?: string;
 }
 
 let connectionOptions: ConnectionOptions | null = null;
@@ -169,6 +172,8 @@ export async function processKillJob(job: Job<KillJobData>): Promise<void> {
     message,
     cooldownMinutes,
     triggeringServerUserId,
+    targetStartedAt,
+    triggeringStartedAt,
   } = job.data;
 
   // attemptsMade counts completed failed attempts (0 on a job's first run), so
@@ -184,6 +189,8 @@ export async function processKillJob(job: Job<KillJobData>): Promise<void> {
     violationId,
     message,
     isRetry,
+    targetStartedAt,
+    triggeringStartedAt,
   });
 
   // A transient termination failure must consume the configured retries instead

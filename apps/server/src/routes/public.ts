@@ -646,14 +646,14 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
     if (serverId) conditions.push(sql`s.server_id = ${serverId}`);
     if (state) conditions.push(sql`s.state = ${state}`);
     conditions.push(mediaType ? sql`s.media_type = ${mediaType}` : sql`s.media_type <> 'trailer'`);
+    const windowConditions: ReturnType<typeof sql>[] = [];
     if (startDate) {
-      const startUTC = toStartOfDayUTC(startDate, timezone);
-      conditions.push(sql`s.started_at >= ${startUTC}`);
+      windowConditions.push(sql`s.started_at >= ${toStartOfDayUTC(startDate, timezone)}`);
     }
     if (endDate) {
-      const endUTC = toEndOfDayUTC(endDate, timezone);
-      conditions.push(sql`s.started_at <= ${endUTC}`);
+      windowConditions.push(sql`s.started_at <= ${toEndOfDayUTC(endDate, timezone)}`);
     }
+    conditions.push(...windowConditions);
 
     const whereClause =
       conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
@@ -738,10 +738,15 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         u.username as user_username
       FROM grouped_sessions gs
       -- gs.started_at is not a planner-time constant; the InitPlan bounds are what let
-      -- TimescaleDB exclude chunks at runtime
+      -- TimescaleDB exclude chunks at runtime, and the filter window again lets the planner
+      -- skip planning the chunks outside it
       JOIN sessions s ON s.id = gs.first_session_id AND s.started_at = gs.started_at
         AND s.started_at >= (SELECT MIN(started_at) FROM grouped_sessions)
         AND s.started_at <= (SELECT MAX(started_at) FROM grouped_sessions)
+        ${sql.join(
+          windowConditions.map((condition) => sql`AND ${condition}`),
+          sql` `
+        )}
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
       LEFT JOIN users u ON u.id = su.user_id
@@ -1019,6 +1024,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         sessionId,
         trigger: 'manual',
         reason,
+        sessionStartedAt: activeSession.startedAt,
       });
 
       if (result.outcome === 'server_historical') {

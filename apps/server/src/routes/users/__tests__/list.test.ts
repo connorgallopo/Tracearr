@@ -15,7 +15,7 @@ import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser, UserRosterFilters, UserSortField } from '@tracearr/shared';
 import type * as UserServiceModule from '../../../services/userService.js';
-import { renderSql } from '../../../test/helpers.js';
+import { renderCall, renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({
   db: {
@@ -578,6 +578,34 @@ describe('POST /users/bulk/reset-trust', () => {
       'FROM server_users su INNER JOIN users u ON u.id = su.user_id'
     );
     expect(normalize(text)).not.toContain('LATERAL');
+  });
+});
+
+describe('GET /users/:id', () => {
+  let app: FastifyInstance;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('bounds the stats read by the same window as the user detail page', async () => {
+    app = await buildTestApp(owner());
+    const id = randomUUID();
+    const statsChain = thenableChain([{ totalSessions: 0, totalWatchTime: 0 }]);
+    mockSelect
+      .mockReturnValueOnce(thenableChain([{ id, serverId: randomUUID() }]))
+      .mockReturnValueOnce(statsChain);
+
+    const response = await app.inject({ method: 'GET', url: `/users/${id}` });
+
+    expect(response.statusCode).toBe(200);
+    expect(renderCall(statsChain).text).toBe(
+      '(sessions.server_user_id = $1 and sessions.started_at >= $2 and sessions.started_at <= $3)'
+    );
   });
 });
 

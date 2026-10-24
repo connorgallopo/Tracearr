@@ -16,6 +16,18 @@
       "text": "duplicate fuzzy matches below 90% show as Likely or Possible instead of Exact"
     },
     {
+      "type": "improved",
+      "text": "History opens faster on long watch histories, and its filter dropdowns stop re-querying on every visit"
+    },
+    {
+      "type": "improved",
+      "text": "violations and a user's violation list open in a fraction of the time on long watch histories"
+    },
+    {
+      "type": "improved",
+      "text": "User detail, season and artist pages and Settings open faster on long watch histories"
+    },
+    {
       "type": "note",
       "text": "updating removes the Plex track downloads already recorded, including music downloaded on purpose"
     }

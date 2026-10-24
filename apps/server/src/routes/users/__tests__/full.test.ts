@@ -126,7 +126,7 @@ describe('GET /users/:id/full violations panel', () => {
     expect(response.statusCode).toBe(200);
     const countChain = chains[2];
     expect(renderCall(countChain).text).toBe(
-      `sessions.server_user_id = ANY(ARRAY['${serverUserId}'::uuid,'${siblingId}'::uuid])`
+      `sessions.server_user_id = ANY(ARRAY['${serverUserId}'::uuid,'${siblingId}'::uuid]) AND sessions.started_at >= $1 AND sessions.started_at <= $2`
     );
     expect(countChain.groupBy).toHaveBeenCalledTimes(1);
     expect(renderedWheres(chains).join(' ')).not.toContain('select count(*)::int from');
@@ -224,6 +224,39 @@ describe('GET /users/:id/full violations panel', () => {
       expect.arrayContaining(['loginAccess', 'loginCount', 'lastLoginAt'])
     );
     expect(response.json().user).toMatchObject({ loginAccess: 'allow', loginCount: 7 });
+  });
+
+  it('bounds the recent-sessions join and the devices read by the page window', async () => {
+    const serverUserId = randomUUID();
+    app = await buildTestApp({
+      userId: randomUUID(),
+      username: 'owner',
+      role: 'owner',
+      serverIds: [],
+    });
+    let selectCall = 0;
+    const tx = {
+      select: vi.fn(() => {
+        selectCall++;
+        const rows =
+          selectCall === 1
+            ? [{ id: serverUserId, serverId: randomUUID(), userId: randomUUID() }]
+            : [];
+        return queryChain(vi.fn, rows);
+      }),
+      execute: vi.fn(async (_query: SQL) => ({ rows: [] })),
+    };
+    vi.mocked((db as any).transaction).mockImplementation(async (callback: any) => callback(tx));
+
+    await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
+
+    const texts = tx.execute.mock.calls.map(([query]) => renderSql(query).sql.replace(/\s+/g, ' '));
+    expect(texts.find((text) => text.includes('grouped_sessions'))).toMatch(
+      /s\.started_at = gs\.started_at AND s\.started_at >= \$\d+ AND s\.started_at <= \$\d+/
+    );
+    expect(texts.find((text) => text.includes('device_id, player_name'))).toMatch(
+      /WHERE server_user_id = ANY\(.*\) AND started_at >= \$\d+ AND started_at < \$\d+/
+    );
   });
 
   it('returns the media ids on each recent session', async () => {

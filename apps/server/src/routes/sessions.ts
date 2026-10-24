@@ -8,7 +8,7 @@
 
 import { createHash } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, sql, inArray } from 'drizzle-orm';
+import { eq, sql, inArray, type SQL } from 'drizzle-orm';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
 import {
@@ -17,8 +17,10 @@ import {
   historyAggregatesQuerySchema,
   filterOptionsQuerySchema,
   sessionIdParamSchema,
+  sessionDetailQuerySchema,
   serverIdFilterSchema,
   terminateSessionBodySchema,
+  CACHE_TTL,
   PLAYBACK_DECISIONS,
   REDIS_KEYS,
   type AuthUser,
@@ -32,6 +34,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { sessions, serverUsers, servers, users } from '../db/schema.js';
+import { readSessionRow } from '../db/sessionRow.js';
 import {
   hasServerAccess,
   resolveServerIds,
@@ -46,6 +49,7 @@ import { terminateSession } from '../services/termination.js';
 import { getCacheService } from '../services/cache.js';
 import {
   assertInScope,
+  memberCacheSegment,
   scopeSessionsRaw,
   seesServerActivity,
   viewScope,
@@ -67,6 +71,15 @@ type HistoryFilterResult = {
 // Display-only bound for the segments breakdown below; core aggregation has no such cap.
 const CHAIN_WINDOW_DAYS = 30;
 const CHAIN_WINDOW_INTERVAL = sql.raw(`INTERVAL '${CHAIN_WINDOW_DAYS} days'`);
+
+/**
+ * The filter window again on a join back to sessions. The join's own bounds come from a CTE,
+ * so the planner can't drop chunks with them and plans every one; on a long history that
+ * costs more than running the page. A play's first segment always sits inside the window.
+ */
+function windowBounds(startDate: Date | undefined, endDate: Date | undefined): SQL {
+  return sql`${startDate ? sql`AND s.started_at >= ${startDate}` : sql``} ${endDate ? sql`AND s.started_at < ${endDate}` : sql``}`;
+}
 
 function buildWhereClause(conditions: ReturnType<typeof sql>[]): ReturnType<typeof sql> {
   return conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
@@ -222,21 +235,25 @@ function buildHistoryFilterConditions(
 }
 
 /**
- * Build a short hash fingerprint from filter parameters for cache keys.
+ * Build a short hash fingerprint from filter parameters for cache keys. Dates count to the
+ * minute: a preset window starts at the moment the page opened, so at full precision no two
+ * visits shared a key and the cache never hit.
  */
-function buildCacheFingerprint(params: Record<string, unknown>, userId: string): string {
+function buildCacheFingerprint(params: Record<string, unknown>): string {
   // Sort keys for stable hashing regardless of parameter order
   const sorted = Object.keys(params)
     .filter((k) => k !== 'cursor' && k !== 'pageSize')
     .sort()
     .reduce<Record<string, unknown>>((acc, key) => {
       const val = params[key];
-      if (val !== undefined && val !== null && val !== '') {
+      if (val instanceof Date) {
+        acc[key] = val.toISOString().slice(0, 16);
+      } else if (val !== undefined && val !== null && val !== '') {
         acc[key] = Array.isArray(val) ? val.slice().sort() : val;
       }
       return acc;
     }, {});
-  const raw = `${userId}:${JSON.stringify(sorted)}`;
+  const raw = JSON.stringify(sorted);
   return createHash('sha256').update(raw).digest('hex').slice(0, 16);
 }
 
@@ -416,6 +433,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
         JOIN sessions s ON s.id = gs.first_session_id AND s.started_at = gs.started_at
           AND s.started_at >= (SELECT MIN(started_at) FROM grouped_sessions)
           AND s.started_at <= (SELECT MAX(started_at) FROM grouped_sessions)
+          ${windowBounds(startDate, endDate)}
         JOIN server_users su ON su.id = s.server_user_id
         JOIN servers sv ON sv.id = s.server_id
         LEFT JOIN users u ON u.id = su.user_id
@@ -690,6 +708,11 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       sql`COALESCE(s.reference_id, s.id) IN (SELECT play_id FROM history_page_ids)`,
       sql`s.started_at >= (SELECT MIN(started_at) FROM history_page_ids)`,
     ];
+    const { startDate, endDate } = query.data;
+    const headWindow = windowBounds(startDate, endDate);
+    const segmentWindow = startDate
+      ? sql`AND s2.started_at >= ${startDate}::timestamptz - ${CHAIN_WINDOW_INTERVAL}`
+      : sql``;
 
     const result = await db.execute(sql`
         WITH history_page AS MATERIALIZED (
@@ -801,6 +824,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
         JOIN sessions s ON s.id = gs.first_session_id AND s.started_at = gs.started_at
           AND s.started_at >= (SELECT MIN(started_at) FROM history_page_ids)
           AND s.started_at <= (SELECT MAX(started_at) FROM history_page_ids)
+          ${headWindow}
         JOIN server_users su ON su.id = s.server_user_id
         JOIN servers sv ON sv.id = s.server_id
         LEFT JOIN users u ON u.id = su.user_id
@@ -812,6 +836,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
             WHERE COALESCE(s2.reference_id, s2.id) = gs.play_id
               AND gs.segment_count > 1
               AND s2.started_at >= gs.started_at - ${CHAIN_WINDOW_INTERVAL}
+              ${segmentWindow}
             ORDER BY s2.started_at
             LIMIT 20
           ) sub
@@ -1021,13 +1046,10 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const authUser = request.user;
+    const scope = await viewScope(request);
 
     // Build WHERE clause using shared helper (also enforces server access via resolveServerIds)
-    const filterResult = buildHistoryFilterConditions(
-      query.data,
-      authUser,
-      await viewScope(request)
-    );
+    const filterResult = buildHistoryFilterConditions(query.data, authUser, scope);
     if (!filterResult) {
       // No server access - return empty result
       const emptyAggregates: HistoryAggregates = {
@@ -1041,15 +1063,21 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     }
     const { whereClause } = filterResult;
 
+    const resolvedIds = resolveServerIds(authUser, query.data.serverId, query.data.serverIds, {
+      strict: false,
+    });
+    const cacheKey = `${REDIS_KEYS.HISTORY_AGGREGATES(
+      buildCacheFingerprint({ ...query.data, scope, resolvedIds })
+    )}${memberCacheSegment(scope)}`;
+    const cached = await app.redis.get(cacheKey);
+    if (cached) return JSON.parse(cached) as HistoryAggregates;
+
     // Unique Titles KPI. Single-server: COUNT(DISTINCT media_title), matching main exactly.
     // Multi-server: dedupe by canonical media identity - a merged-loser id folds to its
     // winner via media.merged_into_id (mirrors value_rollup's alias fold in catalog.ts) -
     // falling back to an ASCII-stripped title+year key, then the raw title (catches non-Latin
     // titles the strip empties out), then the per-server rating key for titleless sessions.
     // A session with none of those resolves to NULL, which COUNT(DISTINCT) already excludes.
-    const resolvedIds = resolveServerIds(authUser, query.data.serverId, query.data.serverIds, {
-      strict: false,
-    });
     const singleServer = resolvedIds?.length === 1;
     const mediaJoinFragment = singleServer ? sql`` : sql`LEFT JOIN media am ON am.id = s.media_id`;
     const uniqueContentExpr = singleServer
@@ -1095,6 +1123,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       uniqueContent: result.unique_content,
     };
 
+    await app.redis.setex(cacheKey, CACHE_TTL.HISTORY_AGGREGATES, JSON.stringify(aggregates));
     return aggregates;
   });
 
@@ -1157,15 +1186,13 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
 
     // Check cache
     const cacheService = getCacheService();
-    const filterScopeHash = buildCacheFingerprint(
-      {
-        resolvedIds: resolvedIds ? [...resolvedIds].sort() : null,
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        includeAllCountries,
-      },
-      authUser.userId
-    );
+    const filterScopeHash = buildCacheFingerprint({
+      userId: authUser.userId,
+      resolvedIds: resolvedIds ? [...resolvedIds].sort() : null,
+      startDate,
+      endDate,
+      includeAllCountries,
+    });
     if (cacheService) {
       const cached = await cacheService.getFilterOptions(authUser.userId, filterScopeHash);
       if (cached) {
@@ -1445,6 +1472,10 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     if (!params.success) {
       return reply.badRequest('Invalid session ID');
     }
+    const detailQuery = sessionDetailQuerySchema.safeParse(request.query);
+    if (!detailQuery.success) {
+      return reply.badRequest('Invalid query parameters');
+    }
 
     const { id } = params.data;
     const authUser = request.user;
@@ -1468,80 +1499,81 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Query from database using manual JOINs then transform to nested format
-    const sessionData = await db
-      .select({
-        id: sessions.id,
-        serverId: sessions.serverId,
-        serverName: servers.name,
-        serverType: servers.type,
-        serverUserId: sessions.serverUserId,
-        username: serverUsers.username,
-        userThumb: serverUsers.thumbUrl,
-        identityName: users.name,
-        sessionKey: sessions.sessionKey,
-        state: sessions.state,
-        mediaType: sessions.mediaType,
-        mediaTitle: sessions.mediaTitle,
-        grandparentTitle: sessions.grandparentTitle,
-        seasonNumber: sessions.seasonNumber,
-        episodeNumber: sessions.episodeNumber,
-        year: sessions.year,
-        artistName: sessions.artistName,
-        albumName: sessions.albumName,
-        thumbPath: sessions.thumbPath,
-        mediaId: sessions.mediaId,
-        showMediaId: sessions.showMediaId,
-        startedAt: sessions.startedAt,
-        stoppedAt: sessions.stoppedAt,
-        durationMs: sessions.durationMs,
-        progressMs: sessions.progressMs,
-        totalDurationMs: sessions.totalDurationMs,
-        lastPausedAt: sessions.lastPausedAt,
-        pausedDurationMs: sessions.pausedDurationMs,
-        referenceId: sessions.referenceId,
-        watched: sessions.watched,
-        ipAddress: sessions.ipAddress,
-        geoCity: sessions.geoCity,
-        geoRegion: sessions.geoRegion,
-        geoCountry: sessions.geoCountry,
-        geoLat: sessions.geoLat,
-        geoLon: sessions.geoLon,
-        geoAsnNumber: sessions.geoAsnNumber,
-        geoAsnOrganization: sessions.geoAsnOrganization,
-        isLocal: sessions.isLocal,
-        playerName: sessions.playerName,
-        deviceId: sessions.deviceId,
-        product: sessions.product,
-        device: sessions.device,
-        platform: sessions.platform,
-        quality: sessions.quality,
-        isTranscode: sessions.isTranscode,
-        videoDecision: sessions.videoDecision,
-        audioDecision: sessions.audioDecision,
-        bitrate: sessions.bitrate,
-        // Stream detail columns
-        sourceVideoCodec: sessions.sourceVideoCodec,
-        sourceAudioCodec: sessions.sourceAudioCodec,
-        sourceAudioChannels: sessions.sourceAudioChannels,
-        sourceVideoWidth: sessions.sourceVideoWidth,
-        sourceVideoHeight: sessions.sourceVideoHeight,
-        sourceVideoDetails: sessions.sourceVideoDetails,
-        sourceAudioDetails: sessions.sourceAudioDetails,
-        streamVideoCodec: sessions.streamVideoCodec,
-        streamAudioCodec: sessions.streamAudioCodec,
-        streamVideoDetails: sessions.streamVideoDetails,
-        streamAudioDetails: sessions.streamAudioDetails,
-        transcodeInfo: sessions.transcodeInfo,
-        subtitleInfo: sessions.subtitleInfo,
-      })
-      .from(sessions)
-      .innerJoin(serverUsers, eq(sessions.serverUserId, serverUsers.id))
-      .innerJoin(servers, eq(sessions.serverId, servers.id))
-      .leftJoin(users, eq(serverUsers.userId, users.id))
-      .where(eq(sessions.id, id))
-      .limit(1);
-
-    const row = sessionData[0];
+    const row = await readSessionRow(id, detailQuery.data.startedAt, (where) =>
+      db
+        .select({
+          id: sessions.id,
+          serverId: sessions.serverId,
+          serverName: servers.name,
+          serverType: servers.type,
+          serverUserId: sessions.serverUserId,
+          username: serverUsers.username,
+          userThumb: serverUsers.thumbUrl,
+          identityName: users.name,
+          sessionKey: sessions.sessionKey,
+          state: sessions.state,
+          mediaType: sessions.mediaType,
+          mediaTitle: sessions.mediaTitle,
+          grandparentTitle: sessions.grandparentTitle,
+          seasonNumber: sessions.seasonNumber,
+          episodeNumber: sessions.episodeNumber,
+          year: sessions.year,
+          artistName: sessions.artistName,
+          albumName: sessions.albumName,
+          thumbPath: sessions.thumbPath,
+          mediaId: sessions.mediaId,
+          showMediaId: sessions.showMediaId,
+          startedAt: sessions.startedAt,
+          stoppedAt: sessions.stoppedAt,
+          durationMs: sessions.durationMs,
+          progressMs: sessions.progressMs,
+          totalDurationMs: sessions.totalDurationMs,
+          lastPausedAt: sessions.lastPausedAt,
+          pausedDurationMs: sessions.pausedDurationMs,
+          referenceId: sessions.referenceId,
+          watched: sessions.watched,
+          ipAddress: sessions.ipAddress,
+          geoCity: sessions.geoCity,
+          geoRegion: sessions.geoRegion,
+          geoCountry: sessions.geoCountry,
+          geoLat: sessions.geoLat,
+          geoLon: sessions.geoLon,
+          geoAsnNumber: sessions.geoAsnNumber,
+          geoAsnOrganization: sessions.geoAsnOrganization,
+          isLocal: sessions.isLocal,
+          playerName: sessions.playerName,
+          deviceId: sessions.deviceId,
+          product: sessions.product,
+          device: sessions.device,
+          platform: sessions.platform,
+          quality: sessions.quality,
+          isTranscode: sessions.isTranscode,
+          videoDecision: sessions.videoDecision,
+          audioDecision: sessions.audioDecision,
+          bitrate: sessions.bitrate,
+          // Stream detail columns
+          sourceVideoCodec: sessions.sourceVideoCodec,
+          sourceAudioCodec: sessions.sourceAudioCodec,
+          sourceAudioChannels: sessions.sourceAudioChannels,
+          sourceVideoWidth: sessions.sourceVideoWidth,
+          sourceVideoHeight: sessions.sourceVideoHeight,
+          sourceVideoDetails: sessions.sourceVideoDetails,
+          sourceAudioDetails: sessions.sourceAudioDetails,
+          streamVideoCodec: sessions.streamVideoCodec,
+          streamAudioCodec: sessions.streamAudioCodec,
+          streamVideoDetails: sessions.streamVideoDetails,
+          streamAudioDetails: sessions.streamAudioDetails,
+          transcodeInfo: sessions.transcodeInfo,
+          subtitleInfo: sessions.subtitleInfo,
+        })
+        .from(sessions)
+        .innerJoin(serverUsers, eq(sessions.serverUserId, serverUsers.id))
+        .innerJoin(servers, eq(sessions.serverId, servers.id))
+        .leftJoin(users, eq(serverUsers.userId, users.id))
+        .where(where)
+        .limit(1)
+        .then((rows) => rows[0])
+    );
     // Out of scope answers exactly like a missing id, so a member cannot probe for others' rows.
     if (!row || !assertInScope(request.scope, row.serverUserId)) {
       return reply.notFound('Session not found');
@@ -1647,19 +1679,33 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const { reason } = body.data;
     const authUser = request.user;
 
-    // Verify the session exists and user has access to its server
-    const session = await db
-      .select({
-        id: sessions.id,
-        serverId: sessions.serverId,
-        serverUserId: sessions.serverUserId,
-        state: sessions.state,
-      })
-      .from(sessions)
-      .where(eq(sessions.id, id))
-      .limit(1);
+    // Verify the session exists and user has access to its server; a live one is in the cache
 
-    const sessionData = session[0];
+    const cached = await getCacheService()?.getSessionById(id);
+
+    const sessionData = await readSessionRow(id, cached?.startedAt, (where) =>
+      db
+
+        .select({
+          id: sessions.id,
+
+          serverId: sessions.serverId,
+
+          serverUserId: sessions.serverUserId,
+
+          state: sessions.state,
+
+          startedAt: sessions.startedAt,
+        })
+
+        .from(sessions)
+
+        .where(where)
+
+        .limit(1)
+
+        .then((rows) => rows[0])
+    );
     if (!sessionData) {
       return reply.notFound('Session not found');
     }
@@ -1679,6 +1725,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       trigger: 'manual',
       triggeredByUserId: authUser.userId,
       reason,
+      sessionStartedAt: sessionData.startedAt,
     });
 
     if (result.outcome === 'server_historical') {

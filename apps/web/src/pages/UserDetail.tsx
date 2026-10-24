@@ -93,7 +93,7 @@ export function UserDetail() {
 
   const handleSessionClick = useCallback(async (session: SessionWithDetails) => {
     try {
-      const full = await api.sessions.get(session.id);
+      const full = await api.sessions.get(session.id, session.startedAt);
       setSelectedSession(full);
     } catch {
       setSelectedSession(session);

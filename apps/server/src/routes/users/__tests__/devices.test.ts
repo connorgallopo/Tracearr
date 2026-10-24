@@ -8,8 +8,10 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
+import type { SQL } from 'drizzle-orm';
 import type { AuthUser, UserDevice } from '@tracearr/shared';
 import type * as QueriesModule from '../queries.js';
+import { renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({ db: { execute: vi.fn() } }));
 
@@ -101,6 +103,19 @@ describe('GET /users/:id/devices download counts', () => {
       downloadCount: 3,
       lastSeenAt: '2026-10-03T00:00:00.000Z',
     });
+  });
+
+  it('bounds the sessions read by the page window', async () => {
+    app = await buildTestApp({
+      userId: randomUUID(),
+      username: 'owner',
+      role: 'owner',
+      serverIds: [],
+    });
+    await app.inject({ url: `/users/${id}/devices` });
+    const { sql: query, params } = renderSql(vi.mocked(db.execute).mock.calls[0]![0] as SQL);
+    expect(query).toMatch(/AND started_at >= \$\d+ AND started_at < \$\d+/);
+    expect(params.filter((param) => param instanceof Date)).toHaveLength(2);
   });
 
   it('dates a device by its latest session or download and places a download-only device from the download', async () => {

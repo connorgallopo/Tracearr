@@ -207,7 +207,7 @@ export async function batchResolveMediaByPlexGuid(
 
 // Fetch-window ceiling: 7 days keeps the query inside the uncompressed
 // chunks of the sessions hypertable and matches the builder's largest window.
-const MAX_AUTOMATION_WINDOW_HOURS = 168;
+export const MAX_AUTOMATION_WINDOW_HOURS = 168;
 
 /**
  * Largest window_hours any of the given rules asks for, floored at 24 so

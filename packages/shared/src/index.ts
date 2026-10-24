@@ -521,6 +521,7 @@ export {
   selfQuerySchema,
   filterOptionsQuerySchema,
   sessionIdParamSchema,
+  sessionDetailQuerySchema,
   terminateSessionBodySchema,
   // Rule
   impossibleTravelParamsSchema,
@@ -546,6 +547,7 @@ export {
   VIOLATION_SORT_FIELDS,
   violationRosterFilterSchema,
   violationQuerySchema,
+  violationCountQuerySchema,
   violationBulkBodySchema,
   violationIdParamSchema,
   // Stats

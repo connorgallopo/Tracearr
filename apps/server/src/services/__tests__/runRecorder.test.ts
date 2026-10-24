@@ -166,7 +166,14 @@ const stoppedResult: EvaluationResult = {
   },
 };
 
-const session = { id: 's1', sessionKey: 'sk', mediaTitle: 'M', ipAddress: '1.1.1.1' } as Session;
+const sessionStartedAt = new Date('2026-08-20T09:58:00Z');
+const session = {
+  id: 's1',
+  sessionKey: 'sk',
+  mediaTitle: 'M',
+  ipAddress: '1.1.1.1',
+  startedAt: sessionStartedAt,
+} as Session;
 const inserted = {
   id: 'v1',
   automationId: 'r1',
@@ -555,6 +562,7 @@ describe('buildRunValues', () => {
       automationId: 'r1',
       serverUserId: 'su1',
       sessionId: 's1',
+      sessionStartedAt,
       subjectKey: 's1',
       definitionVersionId: 'ver-1',
       kind: 'policy',

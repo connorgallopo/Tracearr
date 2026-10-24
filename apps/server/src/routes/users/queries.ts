@@ -107,6 +107,24 @@ export function serverUserIdAnyFragment(ids: string[], columnRef = 'server_user_
   return sql`${sql.raw(columnRef)} = ANY(${uuidArraySql(ids)})`;
 }
 
+interface StartedAtWindow {
+  start: Date;
+  end: Date;
+}
+
+/**
+ * The User pages' history horizon. A literal started_at range is a plan-time bound,
+ * so TimescaleDB excludes chunks instead of planning the whole hypertable.
+ */
+export function userHistoryWindow(): StartedAtWindow {
+  const end = new Date();
+  return { start: new Date(end.getTime() - 10 * 365 * 24 * 60 * 60 * 1000), end };
+}
+
+function startedAtWindowSql(window: StartedAtWindow | undefined): SQL {
+  return window ? sql`AND started_at >= ${window.start} AND started_at < ${window.end}` : sql``;
+}
+
 /**
  * Deduplicate to one row per play, then aggregate by location.
  * Each play is assigned to its most recent segment's location.
@@ -114,11 +132,8 @@ export function serverUserIdAnyFragment(ids: string[], columnRef = 'server_user_
 export async function queryUserLocations(
   dbOrTx: DbOrTx,
   serverUserIds: string[],
-  window?: { start: Date; end: Date }
+  window?: StartedAtWindow
 ): Promise<UserLocation[]> {
-  const bounds = window
-    ? sql`AND started_at >= ${window.start} AND started_at < ${window.end}`
-    : sql``;
   const result = await dbOrTx.execute(sql`
     WITH plays AS (
       SELECT DISTINCT ON (COALESCE(reference_id, id))
@@ -127,7 +142,7 @@ export async function queryUserLocations(
         ip_address, started_at
       FROM sessions
       WHERE ${serverUserIdAnyFragment(serverUserIds)}
-        ${bounds}
+        ${startedAtWindowSql(window)}
       ORDER BY COALESCE(reference_id, id), started_at DESC
     )
     SELECT
@@ -220,7 +235,8 @@ function newDeviceLocation(session: DeviceSessionRow & { started_at: Date }) {
  */
 export async function queryUserDevices(
   dbOrTx: DbOrTx,
-  serverUserIds: string | string[]
+  serverUserIds: string | string[],
+  window?: StartedAtWindow
 ): Promise<UserDevice[]> {
   const ids = Array.isArray(serverUserIds) ? serverUserIds : [serverUserIds];
   const result = await dbOrTx.execute(sql`
@@ -230,6 +246,7 @@ export async function queryUserDevices(
       ${localSessionSql('sessions')} AS is_local
     FROM sessions
     WHERE ${serverUserIdAnyFragment(ids)}
+      ${startedAtWindowSql(window)}
     ORDER BY COALESCE(reference_id, id), started_at DESC
   `);
   const downloadResult = await dbOrTx.execute(sql`

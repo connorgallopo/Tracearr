@@ -72,11 +72,18 @@ const BOOLEAN_TRANSCODE = sql`conditions IS NOT NULL AND triggers IS NOT NULL AN
   WHERE condition->>'field' = 'is_transcoding' AND jsonb_typeof(condition->'value') = 'boolean'
 )`;
 
-/** Runs whose server the session or the account can still name. */
+/**
+ * Runs whose server the session or the account can still name. The session probe floors at a
+ * minute below the stored start, as sessionRowById does; a run without one probes by id.
+ */
 const BACKFILLABLE_RUNS = sql`EXISTS (
   SELECT 1 FROM automation_runs r
   WHERE r.server_id IS NULL
-    AND (EXISTS (SELECT 1 FROM sessions s WHERE s.id = r.session_id)
+    AND ((r.session_id IS NOT NULL AND EXISTS (
+          SELECT 1 FROM sessions s
+          WHERE s.id = r.session_id
+            AND (r.session_started_at IS NULL
+              OR s.started_at >= r.session_started_at - interval '1 minute')))
       OR EXISTS (SELECT 1 FROM server_users su WHERE su.id = r.server_user_id))
 )`;
 

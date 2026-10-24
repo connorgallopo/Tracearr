@@ -95,6 +95,35 @@ export function formatActiveStream(session: ActiveSession, identity?: SessionIde
 
 export type ActiveStreamShape = ReturnType<typeof formatActiveStream>;
 
+async function readStreamIdentities(
+  active: ActiveSession[],
+  floor?: Date
+): Promise<SessionIdentityRow[]> {
+  const result = await db.execute(sql`
+    SELECT
+      s.id,
+      s.media_id,
+      s.show_media_id,
+      s.imdb_id,
+      s.tmdb_id,
+      s.tvdb_id,
+      s.rating_key,
+      s.parent_rating_key,
+      s.grandparent_rating_key,
+      li.library_id,
+      m.genres
+    FROM sessions s
+    LEFT JOIN media m ON m.id = s.media_id
+    LEFT JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key
+    WHERE s.id IN (${sql.join(
+      active.map((s) => sql`${s.id}`),
+      sql`, `
+    )})
+    ${floor ? sql`AND s.started_at >= ${floor}` : sql``}
+  `);
+  return result.rows as unknown as SessionIdentityRow[];
+}
+
 export function registerStreamsRoutes(app: FastifyInstance, routeConfig: RouteConfig): void {
   /**
    * GET /streams - Currently active playback sessions with media identity
@@ -125,28 +154,16 @@ export function registerStreamsRoutes(app: FastifyInstance, routeConfig: RouteCo
 
       const identityById = new Map<string, SessionIdentityRow>();
       if (!summaryOnly && activeSessions.length > 0) {
-        const identityResult = await db.execute(sql`
-          SELECT
-            s.id,
-            s.media_id,
-            s.show_media_id,
-            s.imdb_id,
-            s.tmdb_id,
-            s.tvdb_id,
-            s.rating_key,
-            s.parent_rating_key,
-            s.grandparent_rating_key,
-            li.library_id,
-            m.genres
-          FROM sessions s
-          LEFT JOIN media m ON m.id = s.media_id
-          LEFT JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key
-          WHERE s.id IN (${sql.join(
-            activeSessions.map((s) => sql`${s.id}`),
-            sql`, `
-          )})
-        `);
-        for (const row of identityResult.rows as unknown as SessionIdentityRow[]) {
+        // Floored a minute under the oldest cached start, as sessionRowById does, so only the
+        // live chunks are opened; an id the floor misses takes the unbounded read.
+        const floor = new Date(
+          Math.min(...activeSessions.map((s) => new Date(s.startedAt).getTime())) - 60_000
+        );
+        for (const row of await readStreamIdentities(activeSessions, floor)) {
+          identityById.set(row.id, row);
+        }
+        const missing = activeSessions.filter((s) => !identityById.has(s.id));
+        for (const row of missing.length > 0 ? await readStreamIdentities(missing) : []) {
           identityById.set(row.id, row);
         }
       }

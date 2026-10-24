@@ -3,7 +3,6 @@
  *
  * Tests the server access control functions:
  * - buildServerAccessCondition: Build SQL conditions for server access
- * - buildServerFilterCondition: Build conditions with explicit serverId validation
  * - filterByServerAccess: Filter arrays by server access
  * - hasServerAccess: Check if user has server access
  * - validateServerAccess: Validate and return error message
@@ -14,7 +13,6 @@ import type { AuthUser } from '@tracearr/shared';
 import {
   buildMultiServerFragment,
   buildServerAccessCondition,
-  buildServerFilterCondition,
   filterByServerAccess,
   hasServerAccess,
   resolveServerIds,
@@ -222,46 +220,6 @@ describe('resolveServerIds', () => {
 
   it('returns an empty array instead of throwing when strict is false', () => {
     expect(resolveServerIds(memberUser, 'server-d', undefined, { strict: false })).toEqual([]);
-  });
-});
-
-describe('buildServerFilterCondition', () => {
-  it('should return error when user lacks access to requested server', () => {
-    const result = buildServerFilterCondition(
-      adminUserSingleServer,
-      'server-2',
-      mockServerIdColumn
-    );
-    expect(result.error).toBe('You do not have access to this server');
-    expect(result.condition).toBeUndefined();
-  });
-
-  it('should return condition when user has access to requested server', () => {
-    const result = buildServerFilterCondition(
-      adminUserSingleServer,
-      'server-1',
-      mockServerIdColumn
-    );
-    expect(result.error).toBeNull();
-    expect(result.condition).toBeDefined();
-  });
-
-  it('should allow owner to access any server', () => {
-    const result = buildServerFilterCondition(ownerUser, 'any-server', mockServerIdColumn);
-    expect(result.error).toBeNull();
-    expect(result.condition).toBeDefined();
-  });
-
-  it('should fall back to server access condition when no explicit serverId', () => {
-    const result = buildServerFilterCondition(adminUserSingleServer, undefined, mockServerIdColumn);
-    expect(result.error).toBeNull();
-    // Should return the buildServerAccessCondition result
-  });
-
-  it('should return undefined condition for owner with no explicit serverId', () => {
-    const result = buildServerFilterCondition(ownerUser, undefined, mockServerIdColumn);
-    expect(result.error).toBeNull();
-    expect(result.condition).toBeUndefined(); // Owners see all
   });
 });
 

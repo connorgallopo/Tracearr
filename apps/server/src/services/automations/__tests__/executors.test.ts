@@ -818,8 +818,20 @@ describe('Action Executor Registry', () => {
           undefined,
           undefined,
           undefined,
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
+      });
+
+      it('carries the target and trigger starts so the kill worker reads one chunk each', async () => {
+        const context = createMockContext();
+
+        await executeAction(context, { type: 'kill_stream' });
+
+        expect(vi.mocked(mockDeps.terminateSession).mock.calls[0]?.[9]).toEqual({
+          target: context.session.startedAt,
+          triggering: context.session.startedAt,
+        });
       });
 
       it('should terminate session with delay', async () => {
@@ -837,7 +849,8 @@ describe('Action Executor Registry', () => {
           undefined,
           undefined,
           undefined,
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
       });
 
@@ -860,7 +873,8 @@ describe('Action Executor Registry', () => {
           'You violated the concurrent streams policy',
           undefined,
           undefined,
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
       });
 
@@ -883,7 +897,8 @@ describe('Action Executor Registry', () => {
           'Stream will be terminated in 15 seconds',
           undefined,
           undefined,
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
       });
 
@@ -911,7 +926,8 @@ describe('Action Executor Registry', () => {
           undefined,
           undefined,
           { minutes: 10, triggeringServerUserId: context.serverUser.id },
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
       });
 
@@ -941,7 +957,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            'triggering'
+            'triggering',
+            expect.any(Object)
           );
         });
 
@@ -977,7 +994,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            'newest'
+            'newest',
+            expect.any(Object)
           );
         });
 
@@ -1016,7 +1034,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            's3'
+            's3',
+            expect.any(Object)
           );
           expect(mockDeps.terminateSession).toHaveBeenCalledWith(
             's3',
@@ -1027,7 +1046,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            's3'
+            's3',
+            expect.any(Object)
           );
         });
 
@@ -1054,7 +1074,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            's1'
+            's1',
+            expect.any(Object)
           );
           expect(mockDeps.terminateSession).toHaveBeenCalledWith(
             's2',
@@ -1065,7 +1086,8 @@ describe('Action Executor Registry', () => {
             undefined,
             undefined,
             undefined,
-            's1'
+            's1',
+            expect.any(Object)
           );
           expect(mockDeps.terminateSession).not.toHaveBeenCalledWith(
             'other',
@@ -1128,7 +1150,8 @@ describe('Action Executor Registry', () => {
             undefined,
             ['user-1', 'user-1-sibling'],
             undefined,
-            's1'
+            's1',
+            expect.any(Object)
           );
         });
       });
@@ -1142,7 +1165,11 @@ describe('Action Executor Registry', () => {
         const result = await executeAction(context, action);
 
         expect(result.success).toBe(true);
-        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(context.session.id, 'Please stop!');
+        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+          context.session.id,
+          'Please stop!',
+          context.session.startedAt
+        );
       });
 
       it('should not send if message is empty', async () => {
@@ -1172,8 +1199,16 @@ describe('Action Executor Registry', () => {
           await executeAction(context, action);
 
           expect(mockDeps.sendClientMessage).toHaveBeenCalledTimes(2);
-          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s1', 'Warning!');
-          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s2', 'Warning!');
+          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+            's1',
+            'Warning!',
+            expect.anything()
+          );
+          expect(mockDeps.sendClientMessage).toHaveBeenCalledWith(
+            's2',
+            'Warning!',
+            expect.anything()
+          );
         });
       });
 
@@ -1261,7 +1296,8 @@ describe('Action Executor Registry', () => {
           undefined,
           undefined,
           { minutes: 10, triggeringServerUserId: context.serverUser.id },
-          context.session.id
+          context.session.id,
+          expect.any(Object)
         );
       });
 

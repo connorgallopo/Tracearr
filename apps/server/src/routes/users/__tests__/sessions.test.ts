@@ -21,6 +21,23 @@ import { resolveIdentityScopedServerUserIds } from '../queries.js';
 import { sessionsRoutes } from '../sessions.js';
 import { permissionGuard } from '../../../lib/scope.js';
 
+async function buildTestApp(): Promise<FastifyInstance> {
+  const authUser: AuthUser = {
+    userId: randomUUID(),
+    username: 'owner',
+    role: 'owner',
+    serverIds: [],
+  };
+  const app = Fastify({ logger: false });
+  await app.register(sensible);
+  app.decorate('authenticate', async (request: any) => {
+    request.user = authUser;
+  });
+  app.decorate('requirePermission', permissionGuard(app));
+  await app.register(sessionsRoutes, { prefix: '/users' });
+  return app;
+}
+
 describe('GET /users/:id/sessions', () => {
   let app: FastifyInstance;
 
@@ -32,19 +49,7 @@ describe('GET /users/:id/sessions', () => {
     const serverUserId = randomUUID();
     const mediaId = randomUUID();
     const showMediaId = randomUUID();
-    const authUser: AuthUser = {
-      userId: randomUUID(),
-      username: 'owner',
-      role: 'owner',
-      serverIds: [],
-    };
-    app = Fastify({ logger: false });
-    await app.register(sensible);
-    app.decorate('authenticate', async (request: any) => {
-      request.user = authUser;
-    });
-    app.decorate('requirePermission', permissionGuard(app));
-    await app.register(sessionsRoutes, { prefix: '/users' });
+    app = await buildTestApp();
 
     vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
       ids: [serverUserId],
@@ -64,5 +69,22 @@ describe('GET /users/:id/sessions', () => {
     const [row] = response.json().data;
     expect(row.mediaId).toBe(mediaId);
     expect(row.showMediaId).toBe(showMediaId);
+  });
+
+  it('bounds the join back to sessions by the page window', async () => {
+    const serverUserId = randomUUID();
+    app = await buildTestApp();
+    vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
+      ids: [serverUserId],
+    } as never);
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ count: 0 }]));
+    vi.mocked(db.execute).mockResolvedValue({ rows: [] } as never);
+
+    await app.inject({ method: 'GET', url: `/users/${serverUserId}/sessions` });
+
+    const { sql: query } = renderSql(vi.mocked(db.execute).mock.calls.at(-1)![0] as SQL);
+    expect(query.replace(/\s+/g, ' ')).toMatch(
+      /s\.started_at = gs\.started_at AND s\.started_at >= \$\d+ AND s\.started_at <= \$\d+/
+    );
   });
 });

@@ -1069,7 +1069,11 @@ class ApiClient {
       const query = params.toString();
       return this.request<ActiveSessionsResponse>(`/sessions/active${query ? `?${query}` : ''}`);
     },
-    get: (id: string) => this.request<SessionWithDetails>(`/sessions/${id}`),
+    // startedAt only narrows the server's read to the chunks after it; the id alone works too
+    get: (id: string, startedAt?: Date | string) =>
+      this.request<SessionWithDetails>(
+        `/sessions/${id}${startedAt ? `?startedAt=${new Date(startedAt).toISOString()}` : ''}`
+      ),
     terminate: (id: string, reason?: string) =>
       this.request<{ success: boolean; terminationLogId: string; message: string }>(
         `/sessions/${id}/terminate`,
@@ -1178,6 +1182,8 @@ class ApiClient {
     get: (id: string) => this.request<ViolationWithDetails>(`/violations/${id}`),
     list: (params: ViolationListParams = {}) =>
       this.request<ListResponse<ViolationWithDetails>>(`/violations?${listSearchParams(params)}`),
+    count: (params: Partial<ViolationRosterFilters> = {}) =>
+      this.request<{ total: number }>(`/violations/count?${listSearchParams(params)}`),
     acknowledge: (id: string) =>
       this.request<{ success: boolean; acknowledgedAt: Date | null }>(`/violations/${id}`, {
         method: 'PATCH',
