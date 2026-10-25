@@ -21,6 +21,7 @@ import { executeRawSql } from '@tracearr/test-utils/db';
 import { eq } from 'drizzle-orm';
 import { db } from '../../src/db/client.js';
 import { sessions } from '../../src/db/schema.js';
+import { aggregatesReadingSessionColumns } from '../../src/db/timescale.js';
 import {
   processFixImportedProgressJob,
   type MaintenanceJobData,
@@ -123,5 +124,12 @@ describe('fix_imported_progress maintenance job', () => {
       progressMs: null,
       totalDurationMs: null,
     });
+  });
+
+  it('finds the aggregates that read the progress columns from the catalog', async () => {
+    expect(
+      (await aggregatesReadingSessionColumns(['progress_ms', 'total_duration_ms'])).sort()
+    ).toEqual(['daily_content_engagement', 'user_media_plays_daily']);
+    expect(await aggregatesReadingSessionColumns(['quality'])).toEqual([]);
   });
 });

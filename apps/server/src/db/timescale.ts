@@ -1849,6 +1849,24 @@ async function computeTimescaleStatus(): Promise<TimescaleStatus> {
 }
 
 /**
+ * Names of the sessions continuous aggregates whose defining query reads any of these sessions
+ * columns, from the catalog's dependency entries on the aggregate's direct view. A whole-row
+ * reference (refobjsubid = 0) is not detected, so an aggregate reading the whole row must not rely on this.
+ */
+export async function aggregatesReadingSessionColumns(columns: string[]): Promise<string[]> {
+  const result = await db.execute(sql`
+    SELECT DISTINCT c.user_view_name AS name
+    FROM _timescaledb_catalog.continuous_agg c
+    JOIN pg_rewrite r ON r.ev_class = format('%I.%I', c.direct_view_schema, c.direct_view_name)::regclass
+    JOIN pg_depend d ON d.classid = 'pg_rewrite'::regclass AND d.objid = r.oid
+      AND d.refclassid = 'pg_class'::regclass AND d.refobjid = 'sessions'::regclass
+    JOIN pg_attribute a ON a.attrelid = d.refobjid AND a.attnum = d.refobjsubid
+    WHERE a.attname = ANY(${sql.param(columns)}::text[])
+  `);
+  return (result.rows as { name: string }[]).map((row) => row.name);
+}
+
+/**
  * Get current TimescaleDB status. Cached in-process for 5 minutes; the catalog
  * queries behind it are otherwise re-run on every DB health tick.
  */

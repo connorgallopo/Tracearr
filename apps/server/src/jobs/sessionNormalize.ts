@@ -37,7 +37,7 @@ interface WrittenColumn {
 
 type NormalizeOnBatch = (
   total: number,
-  counts?: { updated: number; skipped: number }
+  counts?: { updated: number; skipped: number; errors: number }
 ) => Promise<void>;
 
 export interface NormalizeWalkResult {
@@ -46,6 +46,7 @@ export interface NormalizeWalkResult {
   details: string;
   processed: number;
   skipped: number;
+  errors: number;
 }
 
 function windowBounds(window: Window): SQL {
@@ -59,7 +60,7 @@ function windowBounds(window: Window): SQL {
  * leaves the row alone), and writes a page's changes in one statement. The cursor is exclusive:
  * the filter also matches rows that need no change, so they would come back otherwise.
  */
-async function normalizeWalk(opts: {
+export async function normalizeWalk(opts: {
   label: string;
   /** Extra columns plan() reads, as `s.col` references */
   select: SQL;
@@ -69,15 +70,31 @@ async function normalizeWalk(opts: {
   /** Method syntax so each job can type its own row */
   plan(row: Candidate): Record<string, unknown> | null;
   onBatch: NormalizeOnBatch;
+  batchSize?: number;
   /** Called with the oldest started_at of every page that wrote rows */
   onCommit?: (oldest: Date) => void;
 }): Promise<NormalizeWalkResult> {
-  const stats = { examined: 0, updated: 0, skipped: 0 };
+  const batchSize = opts.batchSize ?? NORMALIZE_BATCH_SIZE;
   const definitions = sql.raw(opts.columns.map((c) => `${c.name} ${c.type}`).join(', '));
   const assignments = sql.raw(opts.columns.map((c) => `${c.name} = u.${c.name}`).join(', '));
 
-  const runBatch = (window: Window, cursor: Cursor | undefined) =>
-    db.transaction(async (tx) => {
+  // A window that fails after some batches committed is drained again in halves, which can look
+  // at those rows again or, when the filter excludes what was written, never see them. Each row is
+  // counted once per top-level window, when its batch commits.
+  const windows = await sessionWalkWindows(null);
+  const topLevel = new Set(windows);
+  const counted = new Set<string>();
+  const total = { examined: 0, updated: 0, errors: 0 };
+  const counts = () => ({
+    examined: total.examined,
+    errors: total.errors,
+    updated: total.updated,
+    skipped: total.examined - total.updated - total.errors,
+  });
+
+  const runBatch = async (window: Window, cursor: Cursor | undefined) => {
+    if (!cursor && (window === null || topLevel.has(window))) counted.clear();
+    const batch = await db.transaction(async (tx) => {
       await uncapDecompressionForTx(tx);
       const selected = await tx.execute(sql`
         SELECT s.id, s.started_at::text AS started_at, ${opts.select}
@@ -86,19 +103,23 @@ async function normalizeWalk(opts: {
           AND ${windowBounds(window)}
           ${cursor ? sql`AND (s.started_at, s.id) < (${cursor.startedAt}::timestamptz, ${cursor.id}::uuid)` : sql``}
         ORDER BY s.started_at DESC, s.id DESC
-        LIMIT ${NORMALIZE_BATCH_SIZE}
+        LIMIT ${batchSize}
       `);
       const rows = selected.rows as unknown as Candidate[];
-      const last = rows.at(-1);
-      if (!last) return { count: 0, oldest: null };
 
       const changes: Record<string, unknown>[] = [];
+      const failed = new Set<string>();
       let oldestChanged: string | null = null;
       for (const row of rows) {
-        const values = opts.plan(row);
-        if (!values) continue;
-        changes.push({ id: row.id, started_at: row.started_at, ...values });
-        oldestChanged = row.started_at;
+        try {
+          const values = opts.plan(row);
+          if (!values) continue;
+          changes.push({ id: row.id, started_at: row.started_at, ...values });
+          oldestChanged = row.started_at;
+        } catch (error) {
+          console.error(`[${opts.label}] Error processing session ${row.id}:`, error);
+          failed.add(row.id);
+        }
       }
 
       let updated = 0;
@@ -112,29 +133,45 @@ async function normalizeWalk(opts: {
         `);
         updated = Number(written.rowCount ?? 0);
       }
-      stats.examined += rows.length;
-      stats.updated += updated;
-      stats.skipped += rows.length - updated;
-      if (oldestChanged && updated > 0) opts.onCommit?.(new Date(oldestChanged));
-      return {
-        count: rows.length,
-        oldest: new Date(last.started_at),
-        cursor: { startedAt: last.started_at, id: last.id },
-      };
+      return { rows, failed, updated, oldestChanged };
     });
 
-  const result = await drainWindowsWithBisection(await sessionWalkWindows(null), runBatch, {
-    batchSize: NORMALIZE_BATCH_SIZE,
+    total.updated += batch.updated;
+    for (const row of batch.rows) {
+      // A plain table drains once without retries, so there is nothing to dedupe.
+      if (windows) {
+        if (counted.has(row.id)) continue;
+        counted.add(row.id);
+      }
+      total.examined++;
+      if (batch.failed.has(row.id)) total.errors++;
+    }
+    if (batch.oldestChanged && batch.updated > 0) opts.onCommit?.(new Date(batch.oldestChanged));
+    const last = batch.rows.at(-1);
+    if (!last) return { count: 0, oldest: null };
+    return {
+      count: batch.rows.length,
+      oldest: new Date(last.started_at),
+      cursor: { startedAt: last.started_at, id: last.id },
+    };
+  };
+
+  const result = await drainWindowsWithBisection(windows, runBatch, {
+    batchSize,
     label: opts.label,
-    onBatch: async () =>
-      opts.onBatch(stats.examined, { updated: stats.updated, skipped: stats.skipped }),
+    onBatch: async () => {
+      const { examined, ...live } = counts();
+      await opts.onBatch(examined, live);
+    },
   });
+  const done = counts();
   return {
-    total: stats.updated,
+    total: done.updated,
     failedRanges: result.failedRanges,
     details: '',
-    processed: stats.examined,
-    skipped: stats.skipped,
+    processed: done.examined,
+    skipped: done.skipped,
+    errors: done.errors,
   };
 }
 
@@ -202,6 +239,8 @@ const MEDIAN_DURATION_MS: Record<string, number> = {
 };
 const DEFAULT_MEDIAN_DURATION_MS = 60 * 60 * 1000;
 
+export const PROGRESS_COLUMNS = ['progress_ms', 'total_duration_ms'];
+
 /** Hooks.onCommit matters here: progress_ms and total_duration_ms feed daily_content_engagement. */
 export function walkFixImportedProgress(hooks: Hooks) {
   return normalizeWalk({
@@ -211,10 +250,7 @@ export function walkFixImportedProgress(hooks: Hooks) {
     where: sql`(s.external_session_id IS NOT NULL AND s.duration_ms IS NOT NULL
       AND s.progress_ms IS NULL AND s.total_duration_ms IS NULL
       AND s.server_id IN (SELECT id FROM servers WHERE type = 'plex'))`,
-    columns: [
-      { name: 'progress_ms', type: 'bigint' },
-      { name: 'total_duration_ms', type: 'bigint' },
-    ],
+    columns: PROGRESS_COLUMNS.map((name) => ({ name, type: 'bigint' })),
     plan: (
       row: Candidate & { duration_ms: number | null; watched: boolean; media_type: string | null }
     ) => {
@@ -294,5 +330,6 @@ export async function walkNormalizeCodecs(
     details: '',
     processed: result.total,
     skipped: 0,
+    errors: 0,
   };
 }

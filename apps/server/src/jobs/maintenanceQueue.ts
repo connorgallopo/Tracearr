@@ -59,6 +59,7 @@ import {
   safeFullRefreshAllAggregates,
   safeFullRefreshAggregate,
   getTimescaleStatus,
+  aggregatesReadingSessionColumns,
   withSessionsCompressionPaused,
   invalidateTimescaleStatusCache,
   getCompressedSessionChunkRanges,
@@ -78,6 +79,7 @@ import {
 } from './importedHistoryLinking.js';
 import { runServerLocationSyncWalk } from './serverLocationSync.js';
 import {
+  PROGRESS_COLUMNS,
   walkFixImportedProgress,
   walkNormalizeCodecs,
   walkNormalizeCountries,
@@ -471,6 +473,7 @@ export async function processFixImportedProgressJob(
     resultMessage: (total) => `Fixed progress data for ${total.toLocaleString()} sessions`,
     failurePrefix: 'Imported progress fix skipped',
     totalCountsUpdates: false,
+    writes: PROGRESS_COLUMNS,
     walk: (onBatch, onCommit) => walkFixImportedProgress({ onBatch, onCommit }),
   });
 }
@@ -741,10 +744,15 @@ export async function runSessionMaintenanceWalk(
     failurePrefix: string;
     /** False when the running total counts rows looked at, not rows changed. */
     totalCountsUpdates: boolean;
+    /** The sessions columns the walk changes; only continuous aggregates reading one are refreshed. Absent means all. */
+    writes?: string[];
     /** Sleep after every batch, so a single-core Postgres can serve the poller between them. */
     batchPauseMs?: number;
     walk: (
-      onBatch: (total: number, counts?: { updated: number; skipped: number }) => Promise<void>,
+      onBatch: (
+        total: number,
+        counts?: { updated: number; skipped: number; errors: number }
+      ) => Promise<void>,
       onCommit: (oldest: Date | null) => void
     ) => Promise<{
       total: number;
@@ -753,6 +761,7 @@ export async function runSessionMaintenanceWalk(
       /** Rows looked at, when that differs from total */
       processed?: number;
       skipped?: number;
+      errors?: number;
     }>;
   }
 ): Promise<MaintenanceJobResult> {
@@ -804,7 +813,16 @@ export async function runSessionMaintenanceWalk(
     // don't exist or belong to library_snapshots (the job only writes sessions
     // rows). It's the same call the stats routes and the health tick gate on.
     const timescale = await getTimescaleStatus();
-    const aggregates = timescale.extensionInstalled ? timescale.continuousAggregates : [];
+    let readers: string[] | null = null;
+    if (opts.writes && timescale.extensionInstalled) {
+      readers = await aggregatesReadingSessionColumns(opts.writes).catch((err: unknown) => {
+        console.error(`[${opts.type}] Aggregate lookup failed, refreshing every aggregate:`, err);
+        return null;
+      });
+    }
+    const aggregates = (timescale.extensionInstalled ? timescale.continuousAggregates : []).filter(
+      (name) => !readers || readers.includes(name)
+    );
     const refreshFailures: FailedRefreshBatch[] = [];
 
     for (const aggregate of aggregates) {
@@ -846,6 +864,7 @@ export async function runSessionMaintenanceWalk(
               if (counts) {
                 activeJobProgress.updatedRecords = counts.updated;
                 activeJobProgress.skippedRecords = counts.skipped;
+                activeJobProgress.errorRecords = counts.errors;
               }
               activeJobProgress.message = opts.progressMessage(runningTotal);
               await publishProgress();
@@ -914,7 +933,7 @@ export async function runSessionMaintenanceWalk(
       processed: walked.processed ?? total,
       updated: total,
       skipped: walked.skipped ?? 0,
-      errors: 0,
+      errors: walked.errors ?? 0,
       durationMs,
       message: opts.resultMessage(total, details),
     };

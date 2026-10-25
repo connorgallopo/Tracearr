@@ -4,7 +4,7 @@
  * Run with: pnpm --filter @tracearr/server test:integration normalizeCompressed
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { Job } from 'bullmq';
 import {
   createTestUser,
@@ -13,7 +13,7 @@ import {
   createTestSession,
 } from '@tracearr/test-utils/factories';
 import { executeRawSql } from '@tracearr/test-utils/db';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../src/db/client.js';
 import { sessions } from '../../src/db/schema.js';
 import {
@@ -21,7 +21,14 @@ import {
   processNormalizePlayersJob,
   type MaintenanceJobData,
 } from '../../src/jobs/maintenanceQueue.js';
+import { sessionWalkWindows } from '../../src/jobs/sessionWalk.js';
+import { normalizeWalk } from '../../src/jobs/sessionNormalize.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
+
+vi.mock('../../src/jobs/sessionWalk.js', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../../src/jobs/sessionWalk.js')>();
+  return { ...original, sessionWalkWindows: vi.fn(original.sessionWalkWindows) };
+});
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -88,5 +95,112 @@ describe('maintenance normalizers over compressed chunks', () => {
     const [row] = await db.select().from(sessions).where(eq(sessions.id, old.id));
     expect(row?.sourceVideoCodec).toBe('H264');
     expect(row?.streamAudioCodec).toBe('AAC');
+  });
+
+  describe('normalizeWalk', () => {
+    const walkOptions = {
+      label: 'Test',
+      select: sql`s.product, s.device`,
+      where: sql`s.product IS NOT NULL`,
+      columns: [{ name: 'device', type: 'text' }],
+      onBatch: async () => undefined,
+    };
+
+    async function seedRows(products: string[]) {
+      const account = await seedAccount();
+      const base = Date.now() - 3 * DAY_MS;
+      for (const [i, product] of products.entries()) {
+        await createTestSession({
+          ...account,
+          startedAt: new Date(base + i * 60_000),
+          product,
+          device: 'unset',
+        });
+      }
+    }
+
+    it('counts a row whose plan throws as one error and updates the rest of its batch', async () => {
+      await seedRows(['a', 'boom', 'c']);
+
+      const result = await normalizeWalk({
+        ...walkOptions,
+        plan: (row: { product: string }) => {
+          if (row.product === 'boom') throw new Error('bad row');
+          return { device: 'done' };
+        },
+      });
+
+      expect(result).toMatchObject({ total: 2, processed: 3, errors: 1, failedRanges: [] });
+      const devices = await db
+        .select({ product: sessions.product, device: sessions.device })
+        .from(sessions);
+      expect(devices.filter((r) => r.device === 'done')).toHaveLength(2);
+      expect(devices.find((r) => r.product === 'boom')?.device).toBe('unset');
+    });
+
+    it('counts every row of a table with no windows', async () => {
+      await seedRows(['a', 'b', 'c', 'd', 'e']);
+      vi.mocked(sessionWalkWindows).mockResolvedValueOnce(null);
+
+      const result = await normalizeWalk({
+        ...walkOptions,
+        where: sql`s.device = 'unset'`,
+        batchSize: 2,
+        plan: () => ({ device: 'done' }),
+      });
+
+      expect(result).toMatchObject({ total: 5, processed: 5, skipped: 0, failedRanges: [] });
+    });
+
+    it('counts rows once when the retry no longer selects the rows it wrote', async () => {
+      await seedRows(['a', 'b', 'keep', 'd', 'e']);
+      let failed = false;
+
+      const result = await normalizeWalk({
+        ...walkOptions,
+        where: sql`s.device = 'unset'`,
+        batchSize: 2,
+        plan: (row: { product: string }) => (row.product === 'keep' ? null : { device: 'done' }),
+        onCommit: () => {
+          if (failed) return;
+          failed = true;
+          throw new Error('transient');
+        },
+      });
+
+      expect(failed).toBe(true);
+      expect(result).toMatchObject({
+        total: 4,
+        processed: 5,
+        skipped: 1,
+        errors: 0,
+        failedRanges: [],
+      });
+    });
+
+    it('counts each row once when a window is retried after batches committed', async () => {
+      await seedRows(['a', 'b', 'c', 'd', 'e']);
+      let failed = false;
+
+      const result = await normalizeWalk({
+        ...walkOptions,
+        batchSize: 2,
+        plan: (row: { device: string }) => (row.device === 'done' ? null : { device: 'done' }),
+        onCommit: () => {
+          if (failed) return;
+          failed = true;
+          throw new Error('transient');
+        },
+      });
+
+      expect(failed).toBe(true);
+      expect(result).toMatchObject({
+        total: 5,
+        processed: 5,
+        skipped: 0,
+        errors: 0,
+        failedRanges: [],
+      });
+    });
   });
 });

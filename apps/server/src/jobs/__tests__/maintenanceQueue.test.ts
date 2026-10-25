@@ -28,6 +28,12 @@ vi.mock('../../db/timescale.js', () => ({
   withSessionsCompressionPaused: vi.fn(async (fn: () => Promise<unknown>) => fn()),
   getTimescaleStatus: vi.fn(),
   safeFullRefreshAggregate: vi.fn(),
+  aggregatesReadingSessionColumns: vi.fn(),
+}));
+
+vi.mock('../sessionNormalize.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../sessionNormalize.js')>()),
+  walkFixImportedProgress: vi.fn(),
 }));
 
 vi.mock('../../services/cache.js', () => ({
@@ -41,7 +47,12 @@ vi.mock('../lockUtils.js', () => ({
 }));
 
 import { db } from '../../db/client.js';
-import { getTimescaleStatus, safeFullRefreshAggregate } from '../../db/timescale.js';
+import {
+  aggregatesReadingSessionColumns,
+  getTimescaleStatus,
+  safeFullRefreshAggregate,
+} from '../../db/timescale.js';
+import { PROGRESS_COLUMNS, walkFixImportedProgress } from '../sessionNormalize.js';
 import { queryChain } from '../../test/helpers.js';
 import { extendJobLock } from '../lockUtils.js';
 import {
@@ -49,6 +60,7 @@ import {
   enqueueServerLocationSyncIfBehind,
   getMaintenanceJobHistory,
   initMaintenanceQueue,
+  processFixImportedProgressJob,
   runSessionMaintenanceWalk,
   getMaintenanceProgress,
   type MaintenanceJobData,
@@ -144,12 +156,24 @@ describe('runSessionMaintenanceWalk', () => {
   it('shows the updated and skipped counts a walk reports with a batch', async () => {
     const seen: (number | undefined)[] = [];
     await run(async (onBatch) => {
-      await onBatch(10, { updated: 4, skipped: 6 });
+      await onBatch(10, { updated: 4, skipped: 6, errors: 0 });
       seen.push(getMaintenanceProgress()?.updatedRecords, getMaintenanceProgress()?.skippedRecords);
       return { total: 4, failedRanges: [], details: '' };
     }, false);
 
     expect(seen).toEqual([4, 6]);
+  });
+
+  it('reports the errors a walk returns and shows them while it runs', async () => {
+    const seen: (number | undefined)[] = [];
+    const result = await run(async (onBatch) => {
+      await onBatch(10, { updated: 4, skipped: 5, errors: 1 });
+      seen.push(getMaintenanceProgress()?.errorRecords);
+      return { total: 4, failedRanges: [], details: '', errors: 1 };
+    }, false);
+
+    expect(seen).toEqual([1]);
+    expect(result.errors).toBe(1);
   });
 
   it('reports the processed and skipped counts a walk returns instead of its total', async () => {
@@ -172,6 +196,76 @@ describe('runSessionMaintenanceWalk', () => {
     }));
 
     await expect(result).rejects.toBeInstanceOf(UnrecoverableError);
+  });
+});
+
+describe('aggregate refresh after a walk', () => {
+  const ALL = ['daily_content_engagement', 'user_media_plays_daily', 'daily_bandwidth_by_user'];
+  const refreshed = () => vi.mocked(safeFullRefreshAggregate).mock.calls.map((call) => call[0]);
+
+  beforeEach(() => {
+    vi.mocked(getTimescaleStatus).mockResolvedValue({
+      extensionInstalled: true,
+      continuousAggregates: ALL,
+    } as never);
+  });
+
+  it('refreshes nothing when no aggregate reads the columns the walk changed', async () => {
+    vi.mocked(aggregatesReadingSessionColumns).mockResolvedValue([]);
+
+    await runSessionMaintenanceWalk(job(), {
+      type: 'normalize_resolutions',
+      startMessage: 'start',
+      progressMessage: () => '',
+      completeMessage: () => '',
+      resultMessage: () => '',
+      failurePrefix: 'skipped',
+      totalCountsUpdates: false,
+      writes: ['quality'],
+      walk: async (_onBatch, onCommit) => {
+        onCommit(COMMITTED);
+        return { total: 1, failedRanges: [], details: '' };
+      },
+    });
+
+    expect(aggregatesReadingSessionColumns).toHaveBeenCalledWith(['quality']);
+    expect(refreshed()).toEqual([]);
+  });
+
+  it('refreshes every aggregate when the lookup of the readers fails', async () => {
+    vi.mocked(aggregatesReadingSessionColumns).mockRejectedValue(new Error('catalog unavailable'));
+
+    await runSessionMaintenanceWalk(job(), {
+      type: 'normalize_resolutions',
+      startMessage: 'start',
+      progressMessage: () => '',
+      completeMessage: () => '',
+      resultMessage: () => '',
+      failurePrefix: 'skipped',
+      totalCountsUpdates: false,
+      writes: ['quality'],
+      walk: async (_onBatch, onCommit) => {
+        onCommit(COMMITTED);
+        return { total: 1, failedRanges: [], details: '' };
+      },
+    });
+
+    expect(refreshed()).toEqual(ALL);
+  });
+
+  it('refreshes only the aggregates that read the progress columns for fix_imported_progress', async () => {
+    vi.mocked(aggregatesReadingSessionColumns).mockImplementation(async (columns) =>
+      columns.includes('progress_ms') ? ['daily_content_engagement', 'user_media_plays_daily'] : []
+    );
+    vi.mocked(walkFixImportedProgress).mockImplementation(async ({ onCommit }) => {
+      onCommit?.(COMMITTED);
+      return { total: 1, failedRanges: [], details: '', processed: 1, skipped: 0, errors: 0 };
+    });
+
+    await processFixImportedProgressJob(job());
+
+    expect(aggregatesReadingSessionColumns).toHaveBeenCalledWith(PROGRESS_COLUMNS);
+    expect(refreshed()).toEqual(['daily_content_engagement', 'user_media_plays_daily']);
   });
 });
 
