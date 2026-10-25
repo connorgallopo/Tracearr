@@ -5,8 +5,7 @@ import { initI18n } from '@tracearr/translations';
 import type { StorageMountIssue } from '@tracearr/shared';
 import { StorageWarningDialog } from './StorageWarningDialog';
 
-const FAQ_URL =
-  'https://docs.tracearr.com/getting-started/installation/supervised#why-named-volumes-matter-here';
+const FAQ_URL = 'https://docs.tracearr.com/faq#pages-are-slow-to-load-on-unraid';
 
 beforeAll(async () => {
   await initI18n({ lng: 'en' });

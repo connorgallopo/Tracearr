@@ -12,8 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { formatList } from '@/lib/listFormat';
 
-const FAQ_URL =
-  'https://docs.tracearr.com/getting-started/installation/supervised#why-named-volumes-matter-here';
+const FAQ_URL = 'https://docs.tracearr.com/faq#pages-are-slow-to-load-on-unraid';
 
 const TEMPLATE_DEFAULTS: Record<StorageMountKey, string> = {
   postgres: '/mnt/user/appdata/tracearr/postgres',
