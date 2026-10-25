@@ -27,6 +27,7 @@ import {
 interface IdentityRow {
   id: string;
   username: string;
+  identity_name: string | null;
   email: string | null;
   plex_account_id: string | null;
   created_at: Date;
@@ -91,6 +92,7 @@ function correlationBlock(identity: IdentityRow, accounts: AccountBlock[]) {
   return {
     id: identity.id,
     username: identity.username,
+    identity_name: identity.identity_name,
     email: identity.email,
     plex_account_id: identity.plex_account_id,
     accounts,
@@ -99,7 +101,7 @@ function correlationBlock(identity: IdentityRow, accounts: AccountBlock[]) {
 
 async function findIdentity(id: string): Promise<IdentityRow | null> {
   const result = await db.execute(sql`
-    SELECT id, username, email, plex_account_id, created_at
+    SELECT id, username, name AS identity_name, email, plex_account_id, created_at
     FROM users
     WHERE id = ${id}::uuid
   `);
@@ -156,7 +158,7 @@ export function registerUsersRoutes(app: FastifyInstance, routeConfig: RouteConf
           INNER JOIN users u ON su.user_id = u.id
           ORDER BY su.user_id, ${representativeAccountOrderSql('su')}
         )
-        SELECT u.id, u.username, u.email, u.plex_account_id, u.created_at
+        SELECT u.id, u.username, u.name AS identity_name, u.email, u.plex_account_id, u.created_at
         FROM users u
         JOIN rep ON rep.user_id = u.id
         WHERE true${removedFilter}${cursorFilter}

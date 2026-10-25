@@ -1541,6 +1541,10 @@ const UserIdentity = z
   .object({
     id: z.uuid().openapi({ description: 'Tracearr identity id' }),
     username: z.string(),
+    identity_name: z
+      .string()
+      .nullable()
+      .openapi({ description: 'Display name set in Tracearr, null when none is set' }),
     email: z.string().nullable().openapi({ description: 'Tracearr identity email' }),
     plex_account_id: z.string().nullable().openapi({ description: 'Linked Plex.tv account id' }),
     accounts: z.array(UserAccount),

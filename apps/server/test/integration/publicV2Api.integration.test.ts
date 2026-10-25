@@ -1718,6 +1718,7 @@ interface UserAccount {
 interface UserIdentity {
   id: string;
   username: string;
+  identity_name: string | null;
   email: string | null;
   plex_account_id: string | null;
   accounts: UserAccount[];
@@ -1753,6 +1754,8 @@ describe('public API v2 /users', () => {
     const serverB = await createTestServer({ type: 'jellyfin' });
     const user = await createTestUser({
       role: 'member',
+      username: 'alice',
+      name: 'Alice Display',
       email: 'shared@example.com',
       plexAccountId: 'plex-acct-777',
     });
@@ -1781,6 +1784,8 @@ describe('public API v2 /users', () => {
 
     const identity = body.data[0]!;
     expect(identity.id).toBe(user.id);
+    expect(identity.username).toBe('alice');
+    expect(identity.identity_name).toBe('Alice Display');
     expect(identity.email).toBe('shared@example.com');
     expect(identity.plex_account_id).toBe('plex-acct-777');
     expect(identity.accounts).toHaveLength(2);
@@ -1790,6 +1795,13 @@ describe('public API v2 /users', () => {
     expect(byExternal.get('ext-plex-1')!.server_id).toBe(serverA.id);
     expect(byExternal.get('ext-jf-guid')!.server_type).toBe('jellyfin');
     expect(byExternal.get('ext-jf-guid')!.server_id).toBe(serverB.id);
+
+    const single = await app.inject({
+      method: 'GET',
+      url: `/api/v2/public/users/${user.id}`,
+      headers: authHeaders(),
+    });
+    expect(single.json<UserIdentity>().identity_name).toBe('Alice Display');
   });
 
   it('sums stats across an identity accounts and surfaces top genres', async () => {

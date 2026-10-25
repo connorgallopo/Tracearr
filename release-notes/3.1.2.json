@@ -48,6 +48,11 @@
       "text": "copy buttons work when Tracearr is opened over plain HTTP"
     },
     {
+      "type": "fix",
+      "text": "the v2 public API's users endpoints return the display name set in Tracearr as identity_name",
+      "refs": ["#1370"]
+    },
+    {
       "type": "improved",
       "text": "the date format picker in Settings → General lists the formats themselves instead of countries"
     },
