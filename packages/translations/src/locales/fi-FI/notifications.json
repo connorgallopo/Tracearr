@@ -160,6 +160,8 @@
       "brandingSaved": "Sähköpostin ulkoasu tallennettu",
       "suppressionAdded": "Osoite lisätty sulkulistalle",
       "suppressionRemoved": "Osoite poistettu sulkulistalta",
+      "ownerAccountLinked": "",
+      "ownerAccountUnlinked": "",
       "newsletterRetryQueued_one": "Lähetetään uudelleen {{count}} vastaanottajalle",
       "newsletterRetryQueued_other": "Lähetetään uudelleen {{count}} vastaanottajalle"
     },
@@ -221,7 +223,9 @@
       "newsletterSnapshotFailed": "Ei voitu ladata tilannekuvaa: {{error}}",
       "brandingSaveFailed": "Sähköpostin ulkoasua ei voitu tallentaa: {{error}}",
       "suppressionAddFailed": "Osoitetta ei saatu lisättyä: {{error}}",
-      "suppressionRemoveFailed": "Osoitetta ei voitu poistaa: {{error}}"
+      "suppressionRemoveFailed": "Osoitetta ei voitu poistaa: {{error}}",
+      "ownerAccountLinkFailed": "",
+      "ownerAccountUnlinkFailed": ""
     },
     "warning": {
       "jobFailed": {

@@ -180,6 +180,8 @@
       "brandingSaved": "",
       "suppressionAdded": "",
       "suppressionRemoved": "",
+      "ownerAccountLinked": "",
+      "ownerAccountUnlinked": "",
       "newsletterRetryQueued_zero": "",
       "newsletterRetryQueued_one": "",
       "newsletterRetryQueued_two": "",
@@ -245,7 +247,9 @@
       "newsletterSnapshotFailed": "",
       "brandingSaveFailed": "",
       "suppressionAddFailed": "",
-      "suppressionRemoveFailed": ""
+      "suppressionRemoveFailed": "",
+      "ownerAccountLinkFailed": "",
+      "ownerAccountUnlinkFailed": ""
     },
     "warning": {
       "jobFailed": {

@@ -155,6 +155,8 @@
       "brandingSaved": "邮件标记已保存",
       "suppressionAdded": "地址添加到抑制列表",
       "suppressionRemoved": "地址已从抑制列表中删除",
+      "ownerAccountLinked": "",
+      "ownerAccountUnlinked": "",
       "newsletterRetryQueued_other": ""
     },
     "error": {
@@ -215,7 +217,9 @@
       "newsletterSnapshotFailed": "",
       "brandingSaveFailed": "",
       "suppressionAddFailed": "",
-      "suppressionRemoveFailed": ""
+      "suppressionRemoveFailed": "",
+      "ownerAccountLinkFailed": "",
+      "ownerAccountUnlinkFailed": ""
     },
     "warning": {
       "jobFailed": {

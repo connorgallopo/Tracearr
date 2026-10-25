@@ -256,6 +256,29 @@
       "installed": "Versió {{version}}",
       "upToDate": "actualitzat",
       "updateAvailable": "actualització {{version}} disponible"
+    },
+    "ownerAccount": {
+      "label": "",
+      "link": "",
+      "unlink": "",
+      "dialog": {
+        "title": "",
+        "description": "",
+        "admin": "",
+        "lastActive": "",
+        "neverActive": "",
+        "otherAccounts": "",
+        "signsIn": "",
+        "warningTitle": "",
+        "warning": "",
+        "warning_jellyfin": "",
+        "confirmLabel": "",
+        "submit": ""
+      },
+      "confirmUnlink": {
+        "title": "",
+        "body": ""
+      }
     }
   },
   "mobile": {

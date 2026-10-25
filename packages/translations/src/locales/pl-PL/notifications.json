@@ -170,6 +170,8 @@
       "brandingSaved": "Zapisano wygląd wiadomości e-mail",
       "suppressionAdded": "Adres dodany do listy wyciszenia",
       "suppressionRemoved": "Adres usunięty z listy wyciszenia",
+      "ownerAccountLinked": "",
+      "ownerAccountUnlinked": "",
       "newsletterRetryQueued_one": "Ponawianie wysyłki do {{count}} odbiorcy",
       "newsletterRetryQueued_few": "Ponawianie wysyłki do {{count}} odbiorców",
       "newsletterRetryQueued_many": "Ponawianie wysyłki do {{count}} odbiorców",
@@ -233,7 +235,9 @@
       "newsletterSnapshotFailed": "Nie udało się załadować migawki: {{error}}",
       "brandingSaveFailed": "Nie udało się zapisać wyglądu wiadomości e-mail: {{error}}",
       "suppressionAddFailed": "Nie udało się dodać adresu: {{error}}",
-      "suppressionRemoveFailed": "Nie udało się usunąć adresu: {{error}}"
+      "suppressionRemoveFailed": "Nie udało się usunąć adresu: {{error}}",
+      "ownerAccountLinkFailed": "",
+      "ownerAccountUnlinkFailed": ""
     },
     "warning": {
       "jobFailed": {

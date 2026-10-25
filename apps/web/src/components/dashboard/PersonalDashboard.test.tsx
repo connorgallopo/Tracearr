@@ -29,9 +29,11 @@ vi.mock('@/hooks/queries', () => ({
   useMyStats: vi.fn(),
   useMyTopTitles: vi.fn(),
   useOthersActive: vi.fn(),
+  useOwnerLinks: vi.fn(),
   usePlaysByDayOfWeek: vi.fn(),
   usePlaysByHourOfDay: vi.fn(),
 }));
+vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
 vi.mock('@/hooks/useServer', () => ({
   useServer: () => ({
     selectedServerIds: ['srv-1'],
@@ -47,9 +49,11 @@ import {
   useMyStats,
   useMyTopTitles,
   useOthersActive,
+  useOwnerLinks,
   usePlaysByDayOfWeek,
   usePlaysByHourOfDay,
 } from '@/hooks/queries';
+import { useAuth } from '@/hooks/useAuth';
 
 function query(data: unknown) {
   return { data, isLoading: false, isError: false, isSuccess: true, refetch: vi.fn() } as never;
@@ -146,6 +150,8 @@ function load({
   vi.mocked(useMyTopTitles).mockReturnValue(query({ data: titles }));
   vi.mocked(useActiveSessions).mockReturnValue(query(streams));
   vi.mocked(useOthersActive).mockReturnValue(query(others));
+  vi.mocked(useOwnerLinks).mockReturnValue(query(undefined));
+  vi.mocked(useAuth).mockReturnValue({ user: { role: 'member' } } as never);
 }
 
 function renderPage() {
@@ -173,6 +179,22 @@ describe('PersonalDashboard', () => {
       expect(screen.queryByText(text)).not.toBeInTheDocument();
     }
     expect(screen.queryByText('yourStats.howYouWatch')).not.toBeInTheDocument();
+  });
+
+  it('sends an owner whose own account is not linked to the server settings instead', () => {
+    load({ daysWatched: 0 });
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'owner' } } as never);
+    vi.mocked(useOwnerLinks).mockReturnValue(
+      query([{ serverId: 'srv-2', linked: null, candidates: [] }])
+    );
+
+    renderPage();
+
+    expect(screen.queryByText('dashboard.me.welcome.title')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'dashboard.me.link.action' })).toHaveAttribute(
+      'href',
+      '/settings/servers/connections'
+    );
   });
 
   it('shows watch time and plays with the change against the 30 days before', () => {

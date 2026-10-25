@@ -262,6 +262,25 @@ export interface ServerUserSplitResult {
   serverUserId: string;
 }
 
+/** Why an account cannot be linked to the owner as it stands. */
+export type OwnerLinkBlockedReason = 'other_accounts' | 'signs_in';
+
+export interface OwnerLinkCandidate {
+  serverUserId: string;
+  username: string;
+  thumbUrl: string | null;
+  isServerAdmin: boolean;
+  lastActivityAt: string | null;
+  blockedReason: OwnerLinkBlockedReason | null;
+}
+
+/** The owner's own account on one Jellyfin or Emby server, or the accounts it could be. */
+export interface OwnerLinkServer {
+  serverId: string;
+  linked: { serverUserId: string; username: string } | null;
+  candidates: OwnerLinkCandidate[];
+}
+
 export interface MergeSuggestionIdentity {
   userId: string;
   username: string;

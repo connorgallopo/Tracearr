@@ -160,6 +160,8 @@
       "brandingSaved": "S'ha desat la imatge de marca del correu",
       "suppressionAdded": "S'ha afegit l'adreça a la llista de supressió",
       "suppressionRemoved": "S'ha tret l'adreça de la llista de supressió",
+      "ownerAccountLinked": "",
+      "ownerAccountUnlinked": "",
       "newsletterRetryQueued_one": "S'està reintentant amb {{count}} destinatari",
       "newsletterRetryQueued_other": "S'està reintentant amb {{count}} destinataris"
     },
@@ -221,7 +223,9 @@
       "newsletterSnapshotFailed": "No s'ha pogut carregar la instantània: {{error}}",
       "brandingSaveFailed": "No s'ha pogut desar la imatge de marca del correu: {{error}}",
       "suppressionAddFailed": "No s'ha pogut afegir l'adreça: {{error}}",
-      "suppressionRemoveFailed": "No s'ha pogut treure l'adreça: {{error}}"
+      "suppressionRemoveFailed": "No s'ha pogut treure l'adreça: {{error}}",
+      "ownerAccountLinkFailed": "",
+      "ownerAccountUnlinkFailed": ""
     },
     "warning": {
       "jobFailed": {

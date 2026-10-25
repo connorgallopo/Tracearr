@@ -130,6 +130,7 @@ import type {
   MergeSuggestion,
   DismissedMergeSuggestion,
   ServerUserSplitResult,
+  OwnerLinkServer,
   UserSortField,
   UserRosterFilters,
   ListResponse,
@@ -974,6 +975,19 @@ class ApiClient {
       }),
     restoreMergeSuggestion: (userA: string, userB: string) =>
       this.request<void>(`/users/merge-suggestions/dismissals/${userA}/${userB}`, {
+        method: 'DELETE',
+      }),
+    ownerLinks: async () => {
+      const response = await this.request<{ data: OwnerLinkServer[] }>('/users/owner-links');
+      return response.data;
+    },
+    linkOwnerAccount: (serverUserId: string) =>
+      this.request<UserMergeResult>('/users/owner-links', {
+        method: 'POST',
+        body: JSON.stringify({ serverUserId }),
+      }),
+    unlinkOwnerAccount: (serverUserId: string) =>
+      this.request<ServerUserSplitResult>(`/users/owner-links/${serverUserId}`, {
         method: 'DELETE',
       }),
     requests: (id: string, opts: { scope?: 'identity'; page: number; pageSize: number }) => {

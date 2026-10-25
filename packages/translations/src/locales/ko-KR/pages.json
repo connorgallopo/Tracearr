@@ -86,6 +86,11 @@
         "seeAll": "",
         "availableThisWeek_other": ""
       },
+      "link": {
+        "title": "",
+        "description": "",
+        "action": ""
+      },
       "episodes_other": ""
     },
     "resources": {

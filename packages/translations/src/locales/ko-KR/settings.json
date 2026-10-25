@@ -255,6 +255,29 @@
       "installed": "버전 {{version}}",
       "upToDate": "최신 버전",
       "updateAvailable": "{{version}} 업데이트 가능"
+    },
+    "ownerAccount": {
+      "label": "",
+      "link": "",
+      "unlink": "",
+      "dialog": {
+        "title": "",
+        "description": "",
+        "admin": "",
+        "lastActive": "",
+        "neverActive": "",
+        "otherAccounts": "",
+        "signsIn": "",
+        "warningTitle": "",
+        "warning": "",
+        "warning_jellyfin": "",
+        "confirmLabel": "",
+        "submit": ""
+      },
+      "confirmUnlink": {
+        "title": "",
+        "body": ""
+      }
     }
   },
   "mobile": {

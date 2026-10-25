@@ -256,6 +256,29 @@
       "installed": "Version {{version}}",
       "upToDate": "up to date",
       "updateAvailable": "update {{version}} available"
+    },
+    "ownerAccount": {
+      "label": "Your account",
+      "link": "Link",
+      "unlink": "Unlink",
+      "dialog": {
+        "title": "Link your account on {{server}}",
+        "description": "Pick the account you use on this server. Its plays become yours, and signing in with it opens Tracearr as you.",
+        "admin": "Administrator",
+        "lastActive": "Active {{ago}}",
+        "neverActive": "No activity yet",
+        "otherAccounts": "Has accounts on other servers. Split it off on their page first.",
+        "signsIn": "Signs in to Tracearr on their own",
+        "warningTitle": "Only link your own account",
+        "warning": "Anyone who can sign in to this server as {{username}} gets full owner access to Tracearr: whoever knows its password, and anyone who manages this server.",
+        "warning_jellyfin": "Anyone who can sign in to this server as {{username}} gets full owner access to Tracearr: whoever knows its password, any device signed in to it that approves a Quick Connect code, and anyone who manages this server.",
+        "confirmLabel": "Type {{username}} to confirm",
+        "submit": "Link account"
+      },
+      "confirmUnlink": {
+        "title": "Unlink {{username}}?",
+        "body": "Its plays move back to a person of their own. Tracearr signs you out everywhere except this browser and your paired phones."
+      }
     }
   },
   "mobile": {

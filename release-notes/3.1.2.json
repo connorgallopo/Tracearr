@@ -3,6 +3,10 @@
   "date": "2026-10-25",
   "changes": [
     {
+      "type": "new",
+      "text": "the owner can link their own Jellyfin or Emby account from Settings → Servers → Connections"
+    },
+    {
       "type": "fix",
       "text": "Plexamp playback no longer records every queued track as a download or trips the Download burst policy",
       "refs": ["#1367"]

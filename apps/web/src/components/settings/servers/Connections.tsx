@@ -38,6 +38,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import {
   useDeleteServer,
+  useOwnerLinks,
   useReorderServers,
   useRequestServices,
   useServers,
@@ -61,6 +62,7 @@ export function Connections() {
   const { data: requestServices, isLoading: requestServicesLoading } = useRequestServices({
     enabled: isOwner,
   });
+  const { data: ownerLinks } = useOwnerLinks(isOwner);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [historicalId, setHistoricalId] = useState<string | null>(null);
@@ -287,6 +289,7 @@ export function Connections() {
                       ? { service: requestServices?.find((s) => s.serverId === server.id) }
                       : undefined
                   }
+                  ownerLink={ownerLinks?.find((link) => link.serverId === server.id)}
                 />
               ))}
             </ItemGroup>

@@ -70,6 +70,9 @@ export {
   useRestoreMergeSuggestion,
   useMergeUsers,
   useSplitServerUser,
+  useOwnerLinks,
+  useLinkOwnerAccount,
+  useUnlinkOwnerAccount,
 } from './useUsers';
 
 // Automation hooks

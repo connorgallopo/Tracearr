@@ -351,6 +351,10 @@ export const mergeSuggestionDismissalSchema = z
 export const mergeSuggestionPairParamSchema = z.object({ userA: uuidSchema, userB: uuidSchema });
 export const splitServerUserParamSchema = z.object({ id: uuidSchema });
 
+export const ownerLinkBodySchema = z.object({ serverUserId: uuidSchema });
+
+export const ownerLinkParamSchema = z.object({ serverUserId: uuidSchema });
+
 export const USER_SORT_FIELDS = [
   'username',
   'trustScore',

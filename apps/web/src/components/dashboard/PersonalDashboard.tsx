@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart3, Calendar, Clock, Film, Flame, Play, Trophy } from 'lucide-react';
+import { BarChart3, Calendar, Clock, Film, Flame, Link2, Play, Trophy } from 'lucide-react';
 import { Link } from 'react-router';
 import type { HistoryAggregates, MyTopTitleRow } from '@tracearr/shared';
 import { NowPlayingSection } from '@/components/dashboard/NowPlayingSection';
@@ -27,9 +27,11 @@ import {
   useMyStats,
   useMyTopTitles,
   useOthersActive,
+  useOwnerLinks,
   usePlaysByDayOfWeek,
   usePlaysByHourOfDay,
 } from '@/hooks/queries';
+import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
 import { useSocket } from '@/hooks/useSocket';
 import type { StatsTimeRange } from '@/lib/api';
@@ -248,6 +250,25 @@ function HowYouWatch({ serverIds, className }: { serverIds: string[]; className?
 
 function Welcome() {
   const { t } = useTranslation('pages');
+  const { user } = useAuth();
+  const isOwner = user?.role === 'owner';
+  const { data: ownerLinks } = useOwnerLinks(isOwner);
+
+  // Watching never fills this in for an owner whose own account syncs in as someone else.
+  if (isOwner && ownerLinks?.length && ownerLinks.every((link) => link.linked === null)) {
+    return (
+      <EmptyState
+        icon={Link2}
+        title={t('dashboard.me.link.title')}
+        description={t('dashboard.me.link.description')}
+      >
+        <Button asChild>
+          <Link to="/settings/servers/connections">{t('dashboard.me.link.action')}</Link>
+        </Button>
+      </EmptyState>
+    );
+  }
+
   return (
     <EmptyState
       icon={BarChart3}

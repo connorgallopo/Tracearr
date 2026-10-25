@@ -1,6 +1,13 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, ne, notExists } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
+import {
+  authAccounts,
+  authSessions,
+  mobileSessions,
+  servers,
+  serverUsers,
+  users,
+} from '../db/schema.js';
 import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
 import { createLogger } from '../utils/logger.js';
 import { disconnectUserSockets } from '../websocket/index.js';
@@ -30,6 +37,36 @@ export async function revokeSessionsForUsers(userIds: string[]): Promise<void> {
     await disconnectUserSockets(id);
   }
   for (const id of ids) await logoutMemberTokens(id);
+}
+
+/**
+ * Ends this person's browser sessions other than the one making the request. Paired phones keep
+ * theirs: pairing is done from a browser that was already signed in, never through a media server.
+ */
+export async function revokeOtherWebSessions(
+  userId: string,
+  keepSessionId: string | undefined
+): Promise<void> {
+  const rows = await db
+    .select({ token: authSessions.token })
+    .from(authSessions)
+    .where(
+      and(
+        eq(authSessions.userId, userId),
+        keepSessionId ? ne(authSessions.id, keepSessionId) : undefined,
+        notExists(
+          db
+            .select({ id: mobileSessions.id })
+            .from(mobileSessions)
+            .where(eq(mobileSessions.betterAuthSessionId, authSessions.id))
+        )
+      )
+    );
+  if (rows.length === 0) return;
+  const { internalAdapter } = await getAuth().$context;
+  await internalAdapter.deleteSessions(rows.map((row) => row.token));
+  // The client reconnects after a server-side disconnect, so only the ended sessions stay off.
+  await disconnectUserSockets(userId);
 }
 
 /** Posts the server-side logout for each Jellyfin and Emby member token; failures are logged only. */

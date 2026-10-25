@@ -708,7 +708,9 @@ async function refreshCombinedHistory(oldest: Date, newest: Date): Promise<void>
 
 export async function splitServerUser(
   serverUserId: string,
-  actingUserId: string
+  actingUserId: string,
+  // The owner signs in without any server account, so unlinking the owner's last one is allowed.
+  options: { allowLastAccount?: boolean } = {}
 ): Promise<ServerUserSplitResult> {
   void actingUserId;
 
@@ -726,7 +728,7 @@ export async function splitServerUser(
       .select({ id: serverUsers.id })
       .from(serverUsers)
       .where(eq(serverUsers.userId, serverUser.userId));
-    if (siblings.length < 2) {
+    if (siblings.length < 2 && !options.allowLastAccount) {
       throw new MergeValidationError('cannot split the only server account of an identity');
     }
 

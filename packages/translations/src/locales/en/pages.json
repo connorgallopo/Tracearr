@@ -90,6 +90,11 @@
         "availableThisWeek_other": "{{count}} became available this week",
         "requestedAgo": "Requested {{age}} ago",
         "seeAll": "See all"
+      },
+      "link": {
+        "title": "Your own account isn't linked yet",
+        "description": "Plays on your Jellyfin or Emby account are recorded under a separate person until you link it from that server's row in Settings.",
+        "action": "Open server settings"
       }
     },
     "resources": {

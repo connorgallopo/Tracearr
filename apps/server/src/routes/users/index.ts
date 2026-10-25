@@ -17,6 +17,7 @@
  * - GET /:id/requests - Get user's Seerr request history
  * - POST /:id/merge - Merge the source identity :id into another identity
  * - GET /merge-suggestions - Possible duplicate identities across servers
+ * - GET|POST|DELETE /owner-links - The owner's own Jellyfin and Emby accounts
  */
 
 import type { FastifyPluginAsync } from 'fastify';
@@ -30,6 +31,7 @@ import { terminationsRoutes } from './terminations.js';
 import { downloadsRoutes } from './downloads.js';
 import { requestsRoutes } from './requests.js';
 import { mergeRoutes } from './merge.js';
+import { ownerLinkRoutes } from './ownerLinks.js';
 
 export const userRoutes: FastifyPluginAsync = async (app) => {
   // Register all sub-route plugins
@@ -44,4 +46,5 @@ export const userRoutes: FastifyPluginAsync = async (app) => {
   await app.register(downloadsRoutes);
   await app.register(requestsRoutes);
   await app.register(mergeRoutes);
+  await app.register(ownerLinkRoutes);
 };

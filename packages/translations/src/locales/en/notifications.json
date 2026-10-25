@@ -161,7 +161,9 @@
       "newsletterRetryQueued_other": "Retrying {{count}} recipients",
       "brandingSaved": "Email branding saved",
       "suppressionAdded": "Address added to the suppression list",
-      "suppressionRemoved": "Address removed from the suppression list"
+      "suppressionRemoved": "Address removed from the suppression list",
+      "ownerAccountLinked": "Account linked",
+      "ownerAccountUnlinked": "Account unlinked"
     },
     "error": {
       "serverAddFailed": "Failed to add server",
@@ -221,7 +223,9 @@
       "newsletterSnapshotFailed": "Could not load the snapshot: {{error}}",
       "brandingSaveFailed": "Could not save the email branding: {{error}}",
       "suppressionAddFailed": "Could not add the address: {{error}}",
-      "suppressionRemoveFailed": "Could not remove the address: {{error}}"
+      "suppressionRemoveFailed": "Could not remove the address: {{error}}",
+      "ownerAccountLinkFailed": "Failed to link account",
+      "ownerAccountUnlinkFailed": "Failed to unlink account"
     },
     "warning": {
       "jobFailed": {
