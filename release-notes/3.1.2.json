@@ -1,6 +1,6 @@
 {
   "version": "3.1.2",
-  "date": "2026-10-23",
+  "date": "2026-10-25",
   "changes": [
     {
       "type": "fix",
@@ -37,15 +37,19 @@
     },
     {
       "type": "improved",
-      "text": "History opens faster on long watch histories, and its filter dropdowns stop re-querying on every visit"
+      "text": "the date format picker in Settings → General lists the formats themselves instead of countries"
     },
     {
       "type": "improved",
-      "text": "violations and a user's violation list open in a fraction of the time on long watch histories"
+      "text": "History opens faster, and its filter dropdowns stop re-querying on every visit"
     },
     {
       "type": "improved",
-      "text": "User detail, season and artist pages and Settings open faster on long watch histories"
+      "text": "violations and a user's violation list open in a fraction of the time"
+    },
+    {
+      "type": "improved",
+      "text": "User detail, season and artist pages and Settings open faster"
     },
     {
       "type": "note",
