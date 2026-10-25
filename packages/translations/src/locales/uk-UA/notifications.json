@@ -183,7 +183,7 @@
       "serverSyncFailed": "Не вдалося синхронізувати сервер",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Не вдалося оновити налаштування",
-      "copyFailed": "Не вдалося скопіювати в буфер обміну",
+      "copyManual": "",
       "acknowledgeFailed": "Не вдалося підтвердити порушення",
       "dismissFailed": "Не вдалося відхилити порушення",
       "authFailed": "Помилка автентифікації",

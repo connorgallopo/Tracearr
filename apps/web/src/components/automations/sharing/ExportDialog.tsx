@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { TEMPLATE_GROUPS, type Automation } from '@tracearr/shared';
@@ -209,9 +209,11 @@ function CodeBlock({
   disabled: boolean;
   className?: string;
 }) {
+  const pre = useRef<HTMLPreElement>(null);
   return (
     <div className="flex items-start gap-2">
       <pre
+        ref={pre}
         className={cn(
           'bg-muted/40 max-h-40 flex-1 overflow-auto rounded-md p-3 text-xs',
           className
@@ -219,7 +221,13 @@ function CodeBlock({
       >
         {value}
       </pre>
-      <CopyButton value={value} label={copyLabel} showLabel disabled={disabled} />
+      <CopyButton
+        value={value}
+        label={copyLabel}
+        showLabel
+        disabled={disabled}
+        selectTarget={() => pre.current}
+      />
     </div>
   );
 }

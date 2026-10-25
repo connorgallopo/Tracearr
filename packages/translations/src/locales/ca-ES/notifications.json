@@ -171,7 +171,7 @@
       "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
       "serverHistoricalFailed": "No s'ha pogut canviar l'estat del servidor",
       "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
-      "copyFailed": "No s'ha pogut copiar al porta-retalls",
+      "copyManual": "",
       "acknowledgeFailed": "No s'ha pogut confirmar l'incompliment",
       "dismissFailed": "No s'ha pogut descartar l'incompliment",
       "authFailed": "Ha fallat l'autenticació",

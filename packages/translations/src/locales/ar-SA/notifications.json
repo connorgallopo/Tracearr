@@ -195,7 +195,7 @@
       "serverSyncFailed": "فشل في مزامنة الخادم",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "فشل تحديث الإعدادات",
-      "copyFailed": "تعذر النسخ إلى الحافظة",
+      "copyManual": "",
       "acknowledgeFailed": "فشل في الاعتراف بالانتهاك",
       "dismissFailed": "فشل في رفض الانتهاك",
       "authFailed": "فشل المصادقة",

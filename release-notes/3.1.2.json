@@ -40,6 +40,10 @@
       "text": "Media Overview shelves show a show's total size and best resolution"
     },
     {
+      "type": "fix",
+      "text": "copy buttons work when Tracearr is opened over plain HTTP"
+    },
+    {
       "type": "improved",
       "text": "the date format picker in Settings → General lists the formats themselves instead of countries"
     },

@@ -165,7 +165,7 @@
       "serverSyncFailed": "無法同步伺服器",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "無法更新設定",
-      "copyFailed": "無法複製到剪貼簿",
+      "copyManual": "",
       "acknowledgeFailed": "無法確認違規",
       "dismissFailed": "無法忽略違規",
       "authFailed": "認證失敗",

@@ -171,7 +171,7 @@
       "serverSyncFailed": "Αποτυχία συγχρονισμού διακομιστή",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Αποτυχία ενημέρωσης των ρυθμίσεων",
-      "copyFailed": "Αδυναμία αντιγραφής στο πρόχειρο",
+      "copyManual": "",
       "acknowledgeFailed": "Αποτυχία αναγνώρισης παραβίασης",
       "dismissFailed": "Αποτυχία απόρριψης παραβίασης",
       "authFailed": "Αποτυχία ταυτοποίησης",

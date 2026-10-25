@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import type { Server, ServerConnectionStatus } from '@tracearr/shared';
@@ -36,6 +37,7 @@ export function RealtimeSetupDialog({
 }) {
   const { t } = useTranslation(['settings', 'common']);
   const repoUrl = t('servers.realtimeDialog.jellyfinRepoUrl');
+  const repoUrlRef = useRef<HTMLElement>(null);
   const issueKey =
     connectionStatus?.pluginIssue && connectionStatus.pluginIssue in ISSUE_KEYS
       ? ISSUE_KEYS[connectionStatus.pluginIssue as keyof typeof ISSUE_KEYS]
@@ -92,12 +94,16 @@ export function RealtimeSetupDialog({
                   {t('servers.realtimeDialog.repositoryUrl')}
                 </p>
                 <div className="flex items-center gap-2">
-                  <code className="bg-muted flex-1 truncate rounded px-2 py-1 text-xs">
+                  <code
+                    ref={repoUrlRef}
+                    className="bg-muted flex-1 truncate rounded px-2 py-1 text-xs"
+                  >
                     {repoUrl}
                   </code>
                   <CopyButton
                     value={repoUrl}
                     label={t('servers.realtimeDialog.copyUrl')}
+                    selectTarget={() => repoUrlRef.current}
                     variant="ghost"
                     size="icon-sm"
                     className="shrink-0"

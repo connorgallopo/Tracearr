@@ -171,7 +171,7 @@
       "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
       "serverHistoricalFailed": "Palvelimen tilan muuttaminen epäonnistui",
       "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
-      "copyFailed": "Ei voitu kopioida leikepöydälle",
+      "copyManual": "",
       "acknowledgeFailed": "Rikkomuksen kuittaaminen epäonnistui",
       "dismissFailed": "Rikkomuksen hylkääminen epäonnistui",
       "authFailed": "Todennus epäonnistui",

@@ -171,7 +171,7 @@
       "serverSyncFailed": "Det gick inte att synkronisera servern",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
-      "copyFailed": "Kunde inte kopiera till urklipp",
+      "copyManual": "",
       "acknowledgeFailed": "Det gick inte att bekräfta överträdelsen",
       "dismissFailed": "Det gick inte att avfärda överträdelsen",
       "authFailed": "Autentisering misslyckades",

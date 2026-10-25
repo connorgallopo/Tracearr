@@ -171,7 +171,7 @@
       "serverSyncFailed": "Sincronizzazione del server non riuscita",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
-      "copyFailed": "Impossibile copiare negli appunti",
+      "copyManual": "",
       "acknowledgeFailed": "Impossibile riconoscere la violazione",
       "dismissFailed": "Impossibile ignorare la violazione",
       "authFailed": "Autenticazione non riuscita",

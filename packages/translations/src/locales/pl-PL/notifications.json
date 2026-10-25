@@ -183,7 +183,7 @@
       "serverSyncFailed": "Nie udało się zsynchronizować serwera",
       "serverHistoricalFailed": "Nie udało się zmienić statusu serwera",
       "settingsUpdateFailed": "Nie udało się zaktualizować ustawień",
-      "copyFailed": "Nie udało się skopiować do schowka",
+      "copyManual": "",
       "acknowledgeFailed": "Nie udało się potwierdzić naruszenia",
       "dismissFailed": "Nie udało się odrzucić naruszenia",
       "authFailed": "Uwierzytelnianie nie powiodło się",

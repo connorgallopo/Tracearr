@@ -171,7 +171,7 @@
       "serverSyncFailed": "Kan ikke synkronisere serveren",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
-      "copyFailed": "Kunne ikke kopiere til utklippstavlen",
+      "copyManual": "",
       "acknowledgeFailed": "Kunne ikke bekrefte brudd",
       "dismissFailed": "Kunne ikke avvise brudd",
       "authFailed": "Godkjenning mislyktes",

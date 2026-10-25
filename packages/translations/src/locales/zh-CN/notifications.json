@@ -165,7 +165,7 @@
       "serverSyncFailed": "同步服务器失败",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "更新设置失败",
-      "copyFailed": "无法复制到剪贴板",
+      "copyManual": "",
       "acknowledgeFailed": "确认违规失败",
       "dismissFailed": "忽略违规失败",
       "authFailed": "验证失败",

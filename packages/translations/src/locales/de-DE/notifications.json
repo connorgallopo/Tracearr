@@ -171,7 +171,7 @@
       "serverSyncFailed": "Server-Synchronisation fehlgeschlagen",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Einstellungen aktualisieren fehlgeschlagen",
-      "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
+      "copyManual": "",
       "acknowledgeFailed": "Verstoß bestätigen fehlgeschlagen",
       "dismissFailed": "Verstoß verwerfen fehlgeschlagen",
       "authFailed": "Authentifizierung fehlgeschlagen",

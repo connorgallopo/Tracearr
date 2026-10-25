@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { ParseKeys } from 'i18next';
@@ -24,6 +24,7 @@ import { TEXT_INPUT_DELAY, useDebouncedSave } from '@/hooks/useDebouncedSave';
 
 function ApiKeyCard() {
   const { t } = useTranslation(['settings', 'common']);
+  const tokenInput = useRef<HTMLInputElement>(null);
   const { data: apiKeyData, isLoading } = useApiKey();
   const regenerateApiKey = useRegenerateApiKey();
   const [showConfirm, setShowConfirm] = useState(false);
@@ -56,6 +57,7 @@ function ApiKeyCard() {
             <div className="space-y-3">
               <div className="flex gap-2">
                 <PasswordInput
+                  ref={tokenInput}
                   readOnly
                   value={token ?? ''}
                   placeholder={t('general.noApiKeyGenerated')}
@@ -65,6 +67,7 @@ function ApiKeyCard() {
                   value={token ?? ''}
                   label={t('general.copyToClipboard')}
                   disabled={!hasKey}
+                  selectTarget={() => tokenInput.current}
                 />
               </div>
               <div className="flex items-center justify-between">

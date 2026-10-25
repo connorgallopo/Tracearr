@@ -171,7 +171,7 @@
       "serverSyncFailed": "Échec de la synchronisation du serveur",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Échec de la mise à jour des réglages",
-      "copyFailed": "Impossible de copier dans le presse-papiers",
+      "copyManual": "",
       "acknowledgeFailed": "Échec de la reconnaissance de la violation",
       "dismissFailed": "Impossible d'ignorer la violation",
       "authFailed": "Échec de l'authentification",

@@ -165,7 +165,7 @@
       "serverSyncFailed": "サーバーの同期に失敗しました",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "設定の更新に失敗しました",
-      "copyFailed": "クリップボードにコピーできませんでした",
+      "copyManual": "",
       "acknowledgeFailed": "違反の承認に失敗しました",
       "dismissFailed": "違反を却下できませんでした",
       "authFailed": "認証に失敗しました",

@@ -183,7 +183,7 @@
       "serverSyncFailed": "Synchronizace serveru se nezdařila",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Aktualizace nastavení se nezdařila",
-      "copyFailed": "Nelze zkopírovat do schránky",
+      "copyManual": "",
       "acknowledgeFailed": "Nepodařilo se potvrdit porušení",
       "dismissFailed": "Nepodařilo se odmítnout porušení",
       "authFailed": "Ověření se nezdařilo",

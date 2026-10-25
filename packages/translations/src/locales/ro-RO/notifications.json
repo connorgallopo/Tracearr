@@ -177,7 +177,7 @@
       "serverSyncFailed": "Sincronizarea serverului a eșuat",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Actualizarea setărilor a eșuat",
-      "copyFailed": "Nu s-a putut copia în clipboard",
+      "copyManual": "",
       "acknowledgeFailed": "Nu s-a putut confirma încălcarea",
       "dismissFailed": "Eroare la respingerea încălcării",
       "authFailed": "Autentificare eșuată",

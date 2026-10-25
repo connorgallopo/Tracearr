@@ -165,7 +165,7 @@
       "serverSyncFailed": "서버를 동기화하지 못했습니다",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "설정을 업데이트하지 못했습니다",
-      "copyFailed": "클립보드에 복사하지 못했습니다",
+      "copyManual": "",
       "acknowledgeFailed": "위반을 확인 처리하지 못했습니다",
       "dismissFailed": "위반을 해제하지 못했습니다",
       "authFailed": "인증에 실패했습니다",

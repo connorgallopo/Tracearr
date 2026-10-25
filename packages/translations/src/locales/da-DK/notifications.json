@@ -171,7 +171,7 @@
       "serverSyncFailed": "Synkronisering af server mislykkedes",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke opdatere indstillinger",
-      "copyFailed": "Kunne ikke kopiere til udklipsholder",
+      "copyManual": "",
       "acknowledgeFailed": "Mislykkedes at anerkende overtrædelse",
       "dismissFailed": "Mislykkedes at afvise overtrædelse",
       "authFailed": "Godkendelse mislykkedes",

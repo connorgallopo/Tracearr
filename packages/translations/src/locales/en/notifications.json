@@ -171,7 +171,7 @@
       "serverSyncFailed": "Failed to sync server",
       "serverHistoricalFailed": "Failed to change the server's status",
       "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
+      "copyManual": "Press Ctrl+C or ⌘C to copy",
       "acknowledgeFailed": "Failed to acknowledge violation",
       "dismissFailed": "Failed to dismiss violation",
       "authFailed": "Authentication failed",
