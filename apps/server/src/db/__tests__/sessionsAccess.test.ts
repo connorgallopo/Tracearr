@@ -11,6 +11,7 @@ const SESSIONS_READS = [
 
 const HOT_PATH = 'writes and hot paths (poller, SSE)';
 const IMPORTS = 'imports, maintenance, backfills';
+const AGGREGATE_DEFINITIONS = 'continuous aggregate definitions and TimescaleDB status probes';
 const STATS = 'stats reads that query sessions directly';
 const BOUNDED_CALLBACK =
   'the read callback handed to a db/sessions bound (readSessionRow*) names the table';
@@ -26,7 +27,7 @@ const ACCESS_HELPER = 'access helper: the run-session lateral is pinned by start
  */
 const ALLOWLIST: Record<string, string> = {
   'db/prepared.ts': 'prepared dashboard statements: play counts and watch time since a date',
-  'db/timescale.ts': IMPORTS,
+  'db/timescale.ts': AGGREGATE_DEFINITIONS,
   'jobs/importDuplicateCleanup.ts': IMPORTS,
   'jobs/importedHistoryLinking.ts': IMPORTS,
   'jobs/maintenanceQueue.ts': IMPORTS,

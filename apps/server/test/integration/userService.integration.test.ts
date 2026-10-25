@@ -10,6 +10,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
+import pg from 'pg';
 import { db } from '../../src/db/client.js';
 import { servers, serverUsers, users } from '../../src/db/schema.js';
 import { syncServerUsers } from '../../src/services/sync.js';
@@ -126,16 +127,13 @@ describe('userService integration tests', () => {
 
   describe('syncServerUsers', () => {
     /** Statistics land per backend, ~1 s after it goes idle; the pool spreads one sync over several. */
-    async function counters(): Promise<{ updates: number; commits: number }> {
+    async function counters(): Promise<{ updates: number }> {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       await db.execute(sql`SELECT pg_stat_force_next_flush()`);
-      const result = await db.execute<{ updates: string; commits: string }>(sql`
-        SELECT
-          (SELECT n_tup_upd FROM pg_stat_user_tables WHERE relname = 'server_users') AS updates,
-          (SELECT xact_commit FROM pg_stat_database WHERE datname = current_database()) AS commits
+      const result = await db.execute<{ updates: string }>(sql`
+        SELECT n_tup_upd AS updates FROM pg_stat_user_tables WHERE relname = 'server_users'
       `);
-      const row = result.rows[0]!;
-      return { updates: Number(row.updates), commits: Number(row.commits) };
+      return { updates: Number(result.rows[0]!.updates) };
     }
 
     it('a second sync of unchanged accounts writes no server_users rows', async () => {
@@ -160,14 +158,16 @@ describe('userService integration tests', () => {
       expect(first.added).toBe(50);
       const before = await counters();
 
+      const queries = vi.spyOn(pg.Client.prototype, 'query');
       const second = await syncServerUsers(jellyfin!.id, mediaUsers);
+      const statements = queries.mock.calls.length;
+      queries.mockRestore();
       const after = await counters();
 
       expect(second).toMatchObject({ added: 0, updated: 50, removed: 0, errors: [] });
       expect(after.updates - before.updates).toBe(0);
-      // xact_commit is database-wide, so autovacuum and the TimescaleDB scheduler can add a few;
-      // one commit per account would put 50 or more here.
-      expect(after.commits - before.commits).toBeLessThan(25);
+      // Statements on the sync's own connections; per-account statements would put 50 or more here.
+      expect(statements).toBeLessThan(15);
     });
 
     it('writes an account whose activity advanced and restates its identity', async () => {

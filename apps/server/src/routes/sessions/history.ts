@@ -16,6 +16,7 @@ import {
   playCountQuery,
   playSegmentsLateral,
   startedAtRange,
+  whereClause,
 } from '../../db/sessions/index.js';
 import { playbackDecisionSql, subtitleBurnInSql } from '../../utils/playbackDecisionSql.js';
 import type { Scope } from '../../lib/scope.js';
@@ -29,10 +30,6 @@ type HistoryFilterResult = {
   conditions: SQL[];
   whereClause: SQL;
 } | null;
-
-function buildWhereClause(conditions: SQL[]): SQL {
-  return conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
-}
 
 /**
  * Build WHERE clause conditions for history queries.
@@ -170,7 +167,7 @@ export function buildHistoryFilterConditions(
     conditions.push(subtitleBurnIn ? subtitleBurnInSql('s') : sql`NOT ${subtitleBurnInSql('s')}`);
   if (excludeShortSessions) conditions.push(sql`s.short_session = false`);
 
-  return { conditions, whereClause: buildWhereClause(conditions) };
+  return { conditions, whereClause: whereClause(conditions) };
 }
 
 /**
@@ -391,7 +388,7 @@ export async function fetchHistoryPage(params: HistoryPageParams): Promise<Histo
           ROW_NUMBER() OVER (ORDER BY ${orderByExpr}) as rn
         FROM sessions s
         ${mediaJoin}
-        ${buildWhereClause(conditions)}
+        ${whereClause(conditions)}
         GROUP BY COALESCE(s.reference_id, s.id)
         ${havingClause}
         ORDER BY ${orderByExpr}

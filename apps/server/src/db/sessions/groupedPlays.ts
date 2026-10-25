@@ -4,7 +4,7 @@ import { sql, type SQL } from 'drizzle-orm';
 const CHAIN_WINDOW_DAYS = 30;
 const CHAIN_WINDOW_INTERVAL = sql.raw(`INTERVAL '${CHAIN_WINDOW_DAYS} days'`);
 
-function whereClause(where: SQL[]): SQL {
+export function whereClause(where: SQL[]): SQL {
   return where.length > 0 ? sql`WHERE ${sql.join(where, sql` AND `)}` : sql``;
 }
 
