@@ -13,6 +13,10 @@
     },
     {
       "type": "fix",
+      "text": "Agregarr coming-soon placeholders are no longer stored, so newsletters and library counts skip them"
+    },
+    {
+      "type": "fix",
       "text": "music duplicates group by MusicBrainz id and no longer pair same-titled tracks from different artists or albums"
     },
     {
