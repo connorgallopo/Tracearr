@@ -352,12 +352,13 @@ export async function loadServerAccounts(serverId: string): Promise<ServerAccoun
 }
 
 /**
- * A whole-server sync's shared state: the accounts it loaded, the transaction its writes run in,
- * and the identity recounts and scope clears it runs once, after the loop and after commit.
+ * A whole-server sync's shared state: the accounts it loaded, how it runs one account's writes
+ * (each in a savepoint, so a failure costs only that account), and the identity recounts and
+ * scope clears it runs once, after its writes commit.
  */
 export interface ServerSyncBatch {
   accounts: ServerAccounts;
-  tx: Tx;
+  write: <T>(run: (tx: Tx) => Promise<T>) => Promise<T>;
   recompute: Set<string>;
   clearScopes: Set<string>;
 }
@@ -396,9 +397,8 @@ function changesNothing(existing: ServerUser, changes: ServerUserChanges): boole
  * 5. If new: skip creation (let poller create when user streams)
  *
  * An existing account whose row already matches is not written. With `batch`, lookups come from
- * its loaded accounts, writes run in savepoints of its transaction so one failure stays this
- * user's, and identity recounts and scope clears are left in its sets for the caller to run after
- * commit; a recount inside the loop would lock users rows ahead of later server_users writes,
+ * its loaded accounts, writes go through its `write`, and identity recounts and scope clears are
+ * left in its sets for the caller to run after commit; a recount inside the loop would lock users rows ahead of later server_users writes,
  * the reverse of the poller's order.
  *
  * Returns { serverUser, user, created: boolean } or null if skipped
@@ -415,7 +415,8 @@ export async function syncUserFromMediaServer(
   newlyDisabled: boolean;
 } | null> {
   const { isPlexServer = false } = options;
-  const executor = batch?.tx ?? db;
+  const inTransaction = <T>(run: (tx: Tx) => Promise<T>): Promise<T> =>
+    batch ? batch.write(run) : db.transaction(run);
   const known = batch?.accounts;
   const libraryIds = mediaUser.sharedLibraries ? [...mediaUser.sharedLibraries].sort() : null;
 
@@ -437,13 +438,22 @@ export async function syncUserFromMediaServer(
   };
   const writeChanges = async (existing: ServerUser, changes: ServerUserChanges) => {
     if (changesNothing(existing, changes)) return existing;
+    const { lastActivityAt, ...rest } = changes;
     const write = (t: Tx) =>
       t
         .update(serverUsers)
-        .set({ ...changes, updatedAt: new Date() })
+        .set({
+          ...rest,
+          // Against the row as it is now: the poller may have advanced it since `existing` was read.
+          // GREATEST skips a NULL operand.
+          ...(lastActivityAt && {
+            lastActivityAt: sql`GREATEST(${serverUsers.lastActivityAt}, ${lastActivityAt}::timestamptz)`,
+          }),
+          updatedAt: new Date(),
+        })
         .where(eq(serverUsers.id, existing.id))
         .returning();
-    const [row] = batch ? await batch.tx.transaction(write) : await write(db);
+    const [row] = batch ? await batch.write(write) : await write(db);
     if (!row) throw new ServerUserNotFoundError(existing.id);
     if (known) indexAccount(known, row, existing);
     return row;
@@ -508,7 +518,7 @@ export async function syncUserFromMediaServer(
     // For owner (isAdmin): should already exist from OAuth, but handle edge case
     const externalId = mediaUser.isAdmin ? '1' : mediaUser.id;
 
-    const result = await executor.transaction(async (tx) => {
+    const result = await inTransaction(async (tx) => {
       let user: User | undefined;
 
       // Try to find existing user by email match
@@ -624,7 +634,7 @@ export async function syncUserFromMediaServer(
 
   // Use transaction to prevent orphaned users if server user creation fails
   // This ensures atomicity: either both user + server_user are created, or neither
-  const result = await executor.transaction(async (tx) => {
+  const result = await inTransaction(async (tx) => {
     let user: User | undefined;
 
     // Try to find existing user by email match

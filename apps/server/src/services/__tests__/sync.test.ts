@@ -11,8 +11,8 @@ vi.mock('../../db/client.js', () => ({
   db: {
     select: () => ({ from: () => ({ where: () => ({ limit: mockLimit }) }) }),
     update: () => ({ set: () => ({ where: () => ({ returning: mockReturning }) }) }),
-    transaction: (run: (tx: unknown) => Promise<unknown>) => run({}),
   },
+  createRawPgClient: () => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(async () => {}) }),
 }));
 vi.mock('../mediaServer/index.js', () => ({
   createMediaServerClient: () => ({ getUsers: mockGetUsers, getLibraries: mockGetLibraries }),
@@ -81,7 +81,7 @@ describe('syncServer revocation', () => {
 
     await syncServer('srv-1', { syncUsers: true, syncLibraries: false });
 
-    expect(revokeSessionsForServerUsers).toHaveBeenCalledExactlyOnceWith([]);
+    expect(revokeSessionsForServerUsers).not.toHaveBeenCalled();
     expect(clearScope).toHaveBeenCalledExactlyOnceWith('u-back');
   });
 });

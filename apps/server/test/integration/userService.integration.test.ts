@@ -14,6 +14,7 @@ import pg from 'pg';
 import { db } from '../../src/db/client.js';
 import { servers, serverUsers, users } from '../../src/db/schema.js';
 import { syncServerUsers } from '../../src/services/sync.js';
+import * as revoke from '../../src/lib/revoke.js';
 import * as userService from '../../src/services/userService.js';
 import {
   applyTrustChange,
@@ -232,6 +233,124 @@ describe('userService integration tests', () => {
         .from(serverUsers)
         .where(eq(serverUsers.serverId, jellyfin!.id));
       expect(row).toEqual({ username: 'viewer-renamed', lastActivityAt: later });
+    });
+
+    it('never moves activity back when the stored value advanced after the accounts loaded', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({ name: 'Sync Jellyfin', type: 'jellyfin', url: 'http://jf', token: 't' })
+        .returning();
+      const viewer: MediaUser = {
+        id: 'a',
+        username: 'viewer-a',
+        isAdmin: false,
+        lastActivityAt: new Date(Date.UTC(2026, 0, 1)),
+      };
+      await syncServerUsers(jellyfin!.id, [viewer]);
+      const reported = new Date(Date.UTC(2026, 3, 1));
+      const played = new Date(Date.UTC(2026, 5, 1));
+      const load = userService.loadServerAccounts;
+      const loads = vi
+        .spyOn(userService, 'loadServerAccounts')
+        .mockImplementationOnce(async (serverId) => {
+          const accounts = await load(serverId);
+          await db
+            .update(serverUsers)
+            .set({ lastActivityAt: played })
+            .where(eq(serverUsers.serverId, serverId));
+          return accounts;
+        });
+
+      const second = await syncServerUsers(jellyfin!.id, [{ ...viewer, lastActivityAt: reported }]);
+      loads.mockRestore();
+
+      expect(second.errors).toEqual([]);
+      const [row] = await db
+        .select({ lastActivityAt: serverUsers.lastActivityAt })
+        .from(serverUsers)
+        .where(eq(serverUsers.serverId, jellyfin!.id));
+      expect(row?.lastActivityAt).toEqual(played);
+    });
+
+    it('runs two syncs of one server one after the other, creating each account once', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({ name: 'Sync Jellyfin', type: 'jellyfin', url: 'http://jf', token: 't' })
+        .returning();
+      // More than one commit batch, so the lock has to hold across a commit.
+      const viewers: MediaUser[] = Array.from({ length: 260 }, (_, i) => ({
+        id: `new-${i}`,
+        username: `newcomer${i}`,
+        isAdmin: false,
+      }));
+
+      const [first, second] = await Promise.all([
+        syncServerUsers(jellyfin!.id, viewers),
+        syncServerUsers(jellyfin!.id, viewers),
+      ]);
+
+      expect([first.errors, second.errors]).toEqual([[], []]);
+      expect([first.added + second.added, first.updated + second.updated]).toEqual([260, 260]);
+      const rows = await db
+        .select({ externalId: serverUsers.externalId, userId: serverUsers.userId })
+        .from(serverUsers)
+        .where(eq(serverUsers.serverId, jellyfin!.id));
+      expect(rows.map((r) => r.externalId).sort()).toEqual(viewers.map((v) => v.id).sort());
+      expect(new Set(rows.map((r) => r.userId)).size).toBe(260);
+    });
+
+    it('recounts and revokes a committed batch when a later batch fails to commit', async () => {
+      const [jellyfin] = await db
+        .insert(servers)
+        .values({ name: 'Sync Jellyfin', type: 'jellyfin', url: 'http://jf', token: 't' })
+        .returning();
+      const seen = new Date(Date.UTC(2026, 0, 1));
+      const viewers: MediaUser[] = Array.from({ length: 260 }, (_, i) => ({
+        id: `v-${i}`,
+        username: `viewer${i}`,
+        isAdmin: false,
+        lastActivityAt: seen,
+      }));
+      await syncServerUsers(jellyfin!.id, viewers);
+      const later = new Date(Date.UTC(2026, 5, 1));
+      const changed = viewers.map((v, i) => {
+        if (i === 0) return { ...v, isDisabled: true, lastActivityAt: later };
+        if (i === 255) return { ...v, username: 'renamed-in-second-batch' };
+        return v;
+      });
+      const revoked = vi.spyOn(revoke, 'revokeSessionsForServerUsers').mockResolvedValue();
+      const query = pg.Client.prototype.query;
+      let commits = 0;
+      const failing = vi.spyOn(pg.Client.prototype, 'query').mockImplementation(function (
+        this: pg.Client,
+        ...args: unknown[]
+      ) {
+        if (args[0] === 'COMMIT' && ++commits === 2) {
+          return Promise.reject(new Error('connection lost'));
+        }
+        return (query as (...a: unknown[]) => unknown).apply(this, args);
+      } as never);
+
+      const synced = syncServerUsers(jellyfin!.id, changed);
+      await expect(synced).rejects.toThrow('connection lost');
+      failing.mockRestore();
+      const revokedIds = revoked.mock.calls.flatMap(([ids]) => ids);
+      revoked.mockRestore();
+
+      const rows = await db
+        .select({
+          id: serverUsers.id,
+          externalId: serverUsers.externalId,
+          username: serverUsers.username,
+          identityActivity: users.lastActivityAt,
+        })
+        .from(serverUsers)
+        .innerJoin(users, eq(users.id, serverUsers.userId))
+        .where(eq(serverUsers.serverId, jellyfin!.id));
+      const first = rows.find((r) => r.externalId === 'v-0');
+      expect(first?.identityActivity).toEqual(later);
+      expect(revokedIds).toEqual([first?.id]);
+      expect(rows.find((r) => r.externalId === 'v-255')?.username).toBe('viewer255');
     });
   });
 
