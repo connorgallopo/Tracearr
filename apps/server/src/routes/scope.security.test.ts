@@ -27,7 +27,7 @@ vi.mock('../lib/sessionResolver.js', () => ({
 }));
 vi.mock('../lib/redisShared.js', () => ({ getRedis: () => fakeRedis }));
 vi.mock('../db/client.js', () => ({
-  db: { select: vi.fn(), selectDistinct: vi.fn(), execute: vi.fn() },
+  db: { select: vi.fn(), selectDistinct: vi.fn(), execute: vi.fn(), transaction: vi.fn() },
 }));
 vi.mock('../db/prepared.js', () => ({}));
 vi.mock('../services/cache.js', () => ({
@@ -120,6 +120,8 @@ beforeEach(() => {
   vi.mocked(db.select).mockImplementation(() => queryChain(vi.fn, []));
   vi.mocked(db.selectDistinct).mockImplementation(() => queryChain(vi.fn, []));
   vi.mocked(db.execute).mockResolvedValue({ rows: [] } as never);
+  vi.mocked(db.transaction).mockImplementation(((run: (tx: typeof db) => unknown) =>
+    run(db)) as never);
   activeSessions.splice(
     0,
     activeSessions.length,

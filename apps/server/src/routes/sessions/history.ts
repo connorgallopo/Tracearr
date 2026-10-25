@@ -333,9 +333,9 @@ export function parseHistoryCursor(
   return typeof parsedKey === 'string' ? { time, id, key: parsedKey } : undefined;
 }
 
-/** One keyset page of plays, with the page's candidate count for hasMore. */
-export async function fetchHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
-  const { conditions, orderBy, orderDir, pageSize, cursor, startDate, endDate } = params;
+/** The ORDER BY keys of a keyset page and the HAVING that starts it after the cursor. */
+function pageOrder(params: Pick<HistoryPageParams, 'orderBy' | 'orderDir' | 'cursor'>) {
+  const { orderBy, orderDir, cursor } = params;
   const cursorTime = cursor?.time ?? null;
   const cursorId = cursor?.id ?? null;
   const cursorKey = cursor?.key ?? null;
@@ -369,6 +369,86 @@ export async function fetchHistoryPage(params: HistoryPageParams): Promise<Histo
         ? sql`HAVING (${sortKeyExpr}, MIN(s.started_at), ${playIdTiebreak}) ${cursorOp} (${cursorKeyParam}, ${cursorTime}, ${cursorId})`
         : sql`HAVING (MIN(s.started_at), ${playIdTiebreak}) ${cursorOp} (${cursorTime}, ${cursorId})`
       : sql``;
+
+  return { dir, sortKeyExpr, mediaJoin, orderByExpr, havingClause };
+}
+
+/** One keyset page of plays, with the page's candidate count for hasMore. */
+export async function fetchHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
+  return params.orderBy === 'startedAt'
+    ? fetchStartedAtHistoryPage(params)
+    : fetchSortedHistoryPage(params);
+}
+
+/**
+ * The started-at page in two statements. Chunkwise aggregation is off for the page ids
+ * because nearly every play sits in one chunk, so the per-chunk partial aggregates cost a
+ * sort each and merge almost nothing. The rows statement then gets the page's start bounds
+ * as constants, which lets the planner drop chunks it would otherwise plan for InitPlans.
+ */
+async function fetchStartedAtHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
+  const { conditions, pageSize, startDate, endDate } = params;
+  const { dir, orderByExpr, havingClause } = pageOrder(params);
+
+  // started_utc keeps the microseconds a JS Date would drop.
+  const candidates = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config(name, 'off', true) FROM pg_settings WHERE name = 'timescaledb.enable_chunkwise_aggregation'`
+    );
+    const result = await tx.execute(sql`
+      SELECT play_id,
+        to_char(started_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS started_utc
+      FROM (
+        SELECT COALESCE(s.reference_id, s.id) AS play_id, MIN(s.started_at) AS started_at
+        FROM sessions s
+        ${whereClause(conditions)}
+        GROUP BY COALESCE(s.reference_id, s.id)
+        ${havingClause}
+        ORDER BY ${orderByExpr}
+        LIMIT ${pageSize + 1}
+      ) page
+      ORDER BY started_at ${dir}, play_id::text ${dir}
+    `);
+    return result.rows as { play_id: string; started_utc: string }[];
+  });
+  const page = candidates.slice(0, pageSize);
+  if (page.length === 0) return [];
+  const starts = page.map((p) => p.started_utc).sort();
+  const lo = sql`${starts[0]}::timestamptz`;
+  const hi = sql`${starts.at(-1)}::timestamptz`;
+
+  const result = await db.execute(sql`
+      WITH history_page_ids AS MATERIALIZED (
+        SELECT play_id, rn
+        FROM unnest(${sql.param(page.map((p) => p.play_id))}::uuid[]) WITH ORDINALITY AS p(play_id, rn)
+      ),
+      grouped_sessions AS (${groupedPlaysCte({
+        where: [
+          ...conditions,
+          sql`COALESCE(s.reference_id, s.id) IN (SELECT play_id FROM history_page_ids)`,
+          sql`s.started_at >= ${lo}`,
+        ],
+      })})
+      SELECT ${HISTORY_ROW_COLUMNS},
+        lat.segments,
+        NULL AS sort_key,
+        ${candidates.length}::int AS page_candidate_count
+      FROM grouped_sessions gs
+      JOIN history_page_ids hp ON hp.play_id = gs.play_id
+      ${firstSegmentJoin({ alias: 'gs', bounds: { min: lo, max: hi } }, startedAtRange(startDate, endDate))}
+      JOIN server_users su ON su.id = s.server_user_id
+      JOIN servers sv ON sv.id = s.server_id
+      LEFT JOIN users u ON u.id = su.user_id
+      ${playSegmentsLateral('gs', startDate, lo)}
+      ORDER BY hp.rn
+    `);
+  return result.rows as unknown as HistoryRow[];
+}
+
+/** A keyset page in one statement, for any sort. */
+export async function fetchSortedHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
+  const { conditions, pageSize, startDate, endDate } = params;
+  const { sortKeyExpr, mediaJoin, orderByExpr, havingClause } = pageOrder(params);
 
   // Full per-play aggregation is scoped to this page's play ids and to started_at at or
   // after the page's earliest play (a segment can never start before its own play's start,

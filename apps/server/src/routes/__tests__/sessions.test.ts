@@ -23,6 +23,7 @@ vi.mock('../../db/client.js', () => ({
   db: {
     select: vi.fn(),
     execute: vi.fn(),
+    transaction: vi.fn(),
   },
 }));
 
@@ -105,6 +106,7 @@ describe('Session Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDb = db as any;
+    mockDb.transaction.mockImplementation(async (run: (tx: unknown) => unknown) => run(mockDb));
   });
 
   afterEach(async () => {
@@ -796,16 +798,27 @@ describe('Session Routes', () => {
       };
     }
 
-    it('returns mapped rows from a single query round trip', async () => {
+    /** Answers a started-at page's statements in order: the setting, the page ids, the rows. */
+    function mockStartedAtPage(rows: ReturnType<typeof createMockHistoryRow>[]) {
+      mockDb.execute.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({
+        rows: rows.map((row) => ({
+          play_id: row.id,
+          started_utc: (row.started_at as Date).toISOString(),
+        })),
+      });
+      if (rows.length > 0) mockDb.execute.mockResolvedValueOnce({ rows });
+    }
+
+    const sentSql = (call: number) => renderSql(mockDb.execute.mock.calls[call][0] as SQL);
+
+    it('reads the started-at page ids in a transaction with chunkwise aggregation off, then the rows', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
       const playId = randomUUID();
       const startedAt = new Date('2024-06-01T12:00:00Z');
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [createMockHistoryRow({ id: playId, started_at: startedAt })],
-      });
+      mockStartedAtPage([createMockHistoryRow({ id: playId, started_at: startedAt })]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
@@ -815,16 +828,65 @@ describe('Session Routes', () => {
       expect(body.data[0].id).toBe(playId);
       expect(body.hasMore).toBe(false);
       expect(body.nextCursor).toBeUndefined();
-      expect(mockDb.execute).toHaveBeenCalledTimes(1);
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(mockDb.execute).toHaveBeenCalledTimes(3);
+      expect(sentSql(0).sql).toContain(
+        "set_config(name, 'off', true) FROM pg_settings WHERE name = 'timescaledb.enable_chunkwise_aggregation'"
+      );
+      expect(sentSql(1).sql).not.toContain('ROW_NUMBER');
     });
 
-    it('scopes the join-back to the page-id CTE and time-bounds it by the page minimum', async () => {
+    it.each(['durationMs', 'mediaTitle'])(
+      'reads a %s page in one statement outside a transaction',
+      async (orderBy) => {
+        app = await buildTestApp(createOwnerUser());
+        mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow({ sort_key: 1 })] });
+
+        const response = await app.inject({
+          method: 'GET',
+          url: `/sessions/history?orderBy=${orderBy}`,
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(mockDb.transaction).not.toHaveBeenCalled();
+        expect(mockDb.execute).toHaveBeenCalledTimes(1);
+        expect(sentSql(0).sql).toContain('ROW_NUMBER() OVER');
+      }
+    );
+
+    it("bounds the started-at join-back by the page's own starts", async () => {
+      app = await buildTestApp(createOwnerUser());
+      const newer = new Date('2024-06-02T00:00:00Z');
+      const older = new Date('2024-06-01T00:00:00Z');
+      mockStartedAtPage([
+        createMockHistoryRow({ started_at: newer }),
+        createMockHistoryRow({ started_at: older }),
+      ]);
+
+      await app.inject({ method: 'GET', url: '/sessions/history' });
+
+      const { sql: query, params } = sentSql(2);
+      expect(query).toContain(
+        'COALESCE(s.reference_id, s.id) IN (SELECT play_id FROM history_page_ids)'
+      );
+      expect(query).not.toContain('SELECT MIN(started_at)');
+      const bounds =
+        /AND s\.started_at >= \$(\d+)::timestamptz\s+AND s\.started_at <= \$(\d+)::timestamptz/.exec(
+          query
+        );
+      expect([params[Number(bounds?.[1]) - 1], params[Number(bounds?.[2]) - 1]]).toEqual([
+        older.toISOString(),
+        newer.toISOString(),
+      ]);
+    });
+
+    it('scopes the sorted join-back to the page-id CTE and time-bounds it by the page minimum', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
       mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow()] });
 
-      await app.inject({ method: 'GET', url: '/sessions/history?pageSize=1' });
+      await app.inject({ method: 'GET', url: '/sessions/history?pageSize=1&orderBy=durationMs' });
 
       const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
       expect(query).toContain('history_page AS MATERIALIZED');
@@ -836,45 +898,58 @@ describe('Session Routes', () => {
       expect(query).toContain('s.started_at = gs.started_at');
     });
 
-    it('repeats the date window on the join-back and the segment lookup', async () => {
-      app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow()] });
-      const startDate = '2026-09-24T01:45:32.427Z';
+    it.each([
+      ['startedAt', 2],
+      ['durationMs', 0],
+    ])(
+      'repeats the date window on the %s join-back and the segment lookup',
+      async (orderBy, rowsCall) => {
+        app = await buildTestApp(createOwnerUser());
+        if (orderBy === 'startedAt') mockStartedAtPage([createMockHistoryRow()]);
+        else mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow()] });
+        const startDate = '2026-09-24T01:45:32.427Z';
 
-      await app.inject({ method: 'GET', url: `/sessions/history?startDate=${startDate}` });
+        await app.inject({
+          method: 'GET',
+          url: `/sessions/history?orderBy=${orderBy}&startDate=${startDate}`,
+        });
 
-      const { sql: query, params } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      const head = /FROM history_page_ids\)\s+AND s\.started_at >= \$(\d+)/.exec(query);
-      const segment = /AND s2\.started_at >= \$(\d+)::timestamptz - INTERVAL '30 days'/.exec(query);
-      expect(params[Number(head?.[1]) - 1]).toEqual(new Date(startDate));
-      expect(params[Number(segment?.[1]) - 1]).toEqual(new Date(startDate));
-    });
+        const { sql: query, params } = sentSql(rowsCall);
+        const head =
+          /s\.started_at <= (?:\(SELECT MAX\(started_at\) FROM history_page_ids\)|\$\d+::timestamptz)\s+AND s\.started_at >= \$(\d+)/.exec(
+            query
+          );
+        const segment = /AND s2\.started_at >= \$(\d+)::timestamptz - INTERVAL '30 days'/.exec(
+          query
+        );
+        expect(params[Number(head?.[1]) - 1]).toEqual(new Date(startDate));
+        expect(params[Number(segment?.[1]) - 1]).toEqual(new Date(startDate));
+      }
+    );
 
     it('leaves trailers out when no media type is picked', async () => {
       app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({ rows: [] });
+      mockStartedAtPage([]);
 
       await app.inject({ method: 'GET', url: '/sessions/history' });
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      expect(query).toContain("media_type <> 'trailer'");
+      expect(sentSql(1).sql).toContain("media_type <> 'trailer'");
     });
 
     it('returns trailers when the trailer type is picked', async () => {
       app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({ rows: [] });
+      mockStartedAtPage([]);
 
       await app.inject({ method: 'GET', url: '/sessions/history?mediaTypes=trailer' });
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      expect(query).not.toContain("media_type <> 'trailer'");
+      expect(sentSql(1).sql).not.toContain("media_type <> 'trailer'");
     });
 
-    it('returns an empty result in a single query when no plays match', async () => {
+    it('skips the rows statement when no plays match', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      mockDb.execute.mockResolvedValueOnce({ rows: [] });
+      mockStartedAtPage([]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
@@ -882,7 +957,7 @@ describe('Session Routes', () => {
       const body = JSON.parse(response.body);
       expect(body.data).toEqual([]);
       expect(body.hasMore).toBe(false);
-      expect(mockDb.execute).toHaveBeenCalledTimes(1);
+      expect(mockDb.execute).toHaveBeenCalledTimes(2);
     });
 
     it('paginates a reference chain straddling the cursor without splitting or duplicating it', async () => {
@@ -894,16 +969,14 @@ describe('Session Routes', () => {
       const playY = randomUUID();
       const playYStart = new Date('2024-05-01T00:00:00Z');
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({
-            id: playX,
-            started_at: playXStart,
-            segment_count: '1',
-            page_candidate_count: 2,
-          }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({
+          id: playX,
+          started_at: playXStart,
+          segment_count: '1',
+          page_candidate_count: 2,
+        }),
+      ]);
 
       const page1 = await app.inject({ method: 'GET', url: '/sessions/history?pageSize=1' });
       const page1Body = JSON.parse(page1.body);
@@ -911,16 +984,14 @@ describe('Session Routes', () => {
       expect(page1Body.hasMore).toBe(true);
       expect(page1Body.nextCursor).toBe(`${playXStart.getTime()}_${playX}`);
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({
-            id: playY,
-            started_at: playYStart,
-            segment_count: '2',
-            page_candidate_count: 1,
-          }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({
+          id: playY,
+          started_at: playYStart,
+          segment_count: '2',
+          page_candidate_count: 1,
+        }),
+      ]);
 
       const page2 = await app.inject({
         method: 'GET',
@@ -934,7 +1005,7 @@ describe('Session Routes', () => {
       const page1Ids = page1Body.data.map((row: { id: string }) => row.id);
       const page2Ids = page2Body.data.map((row: { id: string }) => row.id);
       expect(page1Ids.some((id: string) => page2Ids.includes(id))).toBe(false);
-      expect(mockDb.execute).toHaveBeenCalledTimes(2);
+      expect(mockDb.execute).toHaveBeenCalledTimes(6);
     });
 
     it('aggregates every segment of a chain across a 45-day resume gap', async () => {
@@ -945,17 +1016,15 @@ describe('Session Routes', () => {
       const earliestSegment = new Date('2024-01-01T00:00:00Z');
       const latestSegment = new Date('2024-02-15T00:00:00Z');
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({
-            id: playId,
-            started_at: earliestSegment,
-            stopped_at: latestSegment,
-            segment_count: '2',
-            duration_ms: '7200000',
-          }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({
+          id: playId,
+          started_at: earliestSegment,
+          stopped_at: latestSegment,
+          segment_count: '2',
+          duration_ms: '7200000',
+        }),
+      ]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
@@ -964,9 +1033,9 @@ describe('Session Routes', () => {
       expect(body.data[0].segmentCount).toBe(2);
       expect(body.data[0].durationMs).toBe(7200000);
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      expect((query.match(/30 days/g) ?? []).length).toBe(1);
-      expect(query).toContain('s.started_at >= (SELECT MIN(started_at) FROM history_page_ids)');
+      const { sql: query, params } = sentSql(2);
+      expect(query.slice(0, query.indexOf('LEFT JOIN LATERAL'))).not.toContain('30 days');
+      expect(params).toContain(earliestSegment.toISOString());
     });
 
     it('omits nextCursor when the page is not full', async () => {
@@ -976,11 +1045,9 @@ describe('Session Routes', () => {
       const playId = randomUUID();
       const startedAt = new Date();
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({ id: playId, started_at: startedAt, page_candidate_count: 1 }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({ id: playId, started_at: startedAt, page_candidate_count: 1 }),
+      ]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history?pageSize=50' });
 
@@ -1032,17 +1099,17 @@ describe('Session Routes', () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      mockDb.execute.mockResolvedValueOnce({ rows: [createMockHistoryRow()] });
+      mockStartedAtPage([createMockHistoryRow()]);
 
       await app.inject({ method: 'GET', url: '/sessions/history' });
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      const normalized = query.replace(/\s+/g, ' ');
-      expect(normalized).toContain(
+      const normalized = (call: number) => sentSql(call).sql.replace(/\s+/g, ' ');
+      expect(normalized(1)).toContain(
         'MIN(s.started_at) DESC, COALESCE(s.reference_id, s.id)::text DESC'
       );
-      expect(normalized).toContain('JOIN history_page_ids hp ON hp.play_id = gs.play_id');
-      expect(normalized).toContain('ORDER BY hp.rn');
+      expect(normalized(1)).toContain('ORDER BY started_at DESC, play_id::text DESC');
+      expect(normalized(2)).toContain('JOIN history_page_ids hp ON hp.play_id = gs.play_id');
+      expect(normalized(2)).toContain('ORDER BY hp.rn');
     });
 
     it('paginates two plays with an identical started_at without duplicating or dropping either', async () => {
@@ -1052,22 +1119,18 @@ describe('Session Routes', () => {
       const tiedTime = new Date('2024-06-10T00:00:00Z');
       const [firstId, secondId] = [randomUUID(), randomUUID()].sort().reverse();
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({ id: firstId, started_at: tiedTime, page_candidate_count: 2 }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({ id: firstId, started_at: tiedTime, page_candidate_count: 2 }),
+      ]);
 
       const page1 = await app.inject({ method: 'GET', url: '/sessions/history?pageSize=1' });
       const page1Body = JSON.parse(page1.body);
       expect(page1Body.data.map((row: { id: string }) => row.id)).toEqual([firstId]);
       expect(page1Body.nextCursor).toBe(`${tiedTime.getTime()}_${firstId}`);
 
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [
-          createMockHistoryRow({ id: secondId, started_at: tiedTime, page_candidate_count: 1 }),
-        ],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({ id: secondId, started_at: tiedTime, page_candidate_count: 1 }),
+      ]);
 
       const page2 = await app.inject({
         method: 'GET',
@@ -1077,7 +1140,7 @@ describe('Session Routes', () => {
       expect(page2Body.data.map((row: { id: string }) => row.id)).toEqual([secondId]);
       expect(page2Body.hasMore).toBe(false);
 
-      const { params: page2Params } = renderSql(mockDb.execute.mock.calls[1][0] as SQL);
+      const { params: page2Params } = sentSql(4);
       expect(page2Params).toContain(firstId);
       expect(page2Params.some((p) => p instanceof Date && p.getTime() === tiedTime.getTime())).toBe(
         true
@@ -1086,34 +1149,35 @@ describe('Session Routes', () => {
 
     it('filters to local sessions with the shared local definition', async () => {
       app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] });
+      mockStartedAtPage([createMockHistoryRow()]);
+      mockStartedAtPage([createMockHistoryRow()]);
 
       await app.inject({ method: 'GET', url: '/sessions/history' });
       await app.inject({ method: 'GET', url: '/sessions/history?network=local' });
 
-      const queryAt = (call: number) => renderSql(mockDb.execute.mock.calls[call][0] as SQL).sql;
+      const queryAt = (call: number) => sentSql(call).sql;
       const occurrences = (query: string) =>
         query.split('s.is_local IS TRUE OR (s.is_local IS NULL').length - 1;
-      // The select list carries the fragment too; the filter adds it to both page CTEs.
-      expect(occurrences(queryAt(1)) - occurrences(queryAt(0))).toBe(2);
-      expect(queryAt(1)).not.toContain('NOT (s.is_local');
+      // The select list carries the fragment too; the filter adds it to both statements.
+      expect(occurrences(queryAt(4)) - occurrences(queryAt(1))).toBe(1);
+      expect(occurrences(queryAt(5)) - occurrences(queryAt(2))).toBe(1);
+      expect(queryAt(4)).not.toContain('NOT (s.is_local');
     });
 
     it('filters to remote sessions with the negated local definition', async () => {
       app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({ rows: [] });
+      mockStartedAtPage([]);
 
       await app.inject({ method: 'GET', url: '/sessions/history?network=remote' });
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
-      expect(query).toContain('NOT (s.is_local IS TRUE');
+      expect(sentSql(1).sql).toContain('NOT (s.is_local IS TRUE');
     });
 
     it('returns the flag on each history row', async () => {
       app = await buildTestApp(createOwnerUser());
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [createMockHistoryRow({ is_local: true, geo_city: 'Chicago', geo_country: 'US' })],
-      });
+      mockStartedAtPage([
+        createMockHistoryRow({ is_local: true, geo_city: 'Chicago', geo_country: 'US' }),
+      ]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
@@ -1124,13 +1188,11 @@ describe('Session Routes', () => {
       app = await buildTestApp(createOwnerUser());
       const mediaId = randomUUID();
       const showMediaId = randomUUID();
-      mockDb.execute.mockResolvedValueOnce({
-        rows: [createMockHistoryRow({ media_id: mediaId, show_media_id: showMediaId })],
-      });
+      mockStartedAtPage([createMockHistoryRow({ media_id: mediaId, show_media_id: showMediaId })]);
 
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
-      const { sql: query } = renderSql(mockDb.execute.mock.calls[0][0] as SQL);
+      const { sql: query } = sentSql(2);
       expect(query).toContain('s.media_id,');
       expect(query).toContain('s.show_media_id,');
       const [row] = JSON.parse(response.body).data;
