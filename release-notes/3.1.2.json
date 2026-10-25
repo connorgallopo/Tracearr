@@ -17,7 +17,7 @@
     },
     {
       "type": "fix",
-      "text": "Stale Content shows the library name and counts plays on merged and re-added titles"
+      "text": "Stale Content shows the library name and counts plays on merged, re-added and moved titles"
     },
     {
       "type": "fix",
