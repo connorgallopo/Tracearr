@@ -66,6 +66,7 @@ RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmo
         "timescaledb-2-postgresql-15=${TIMESCALEDB_VERSION}" \
         timescaledb-tools \
         timescaledb-toolkit-postgresql-15 \
+        attr \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Tailscale VPN binary (userspace networking, no root required)

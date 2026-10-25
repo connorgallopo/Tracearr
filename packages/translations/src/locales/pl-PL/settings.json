@@ -561,6 +561,51 @@
     "message": "Wygląda na to, że wszyscy użytkownicy korzystają z tego samego adresu IP lub z adresów sieci lokalnej. Może to wpływać na reguły oparte na lokalizacji lub adresach IP.",
     "acknowledge": "Rozumiem"
   },
+  "storageWarning": {
+    "bannerDatabase": "",
+    "bannerData": "",
+    "showHow": "",
+    "hide": "",
+    "titleDatabase": "",
+    "titleData": "",
+    "fields": {
+      "postgres": "",
+      "redis": "",
+      "appData": ""
+    },
+    "isSetTo": "",
+    "overheadDatabase": "",
+    "overheadData": "",
+    "pool": {
+      "alreadyDatabase": "",
+      "alreadyData": "",
+      "alreadyPools": "",
+      "openEdit": "",
+      "change": "",
+      "copyPath": "",
+      "apply": "",
+      "clears": ""
+    },
+    "split": {
+      "arrayDatabase": "",
+      "arrayData": "",
+      "poolsDatabase": "",
+      "poolsData": "",
+      "stop": "",
+      "shares": "",
+      "move": "",
+      "start": ""
+    },
+    "unknown": {
+      "isSetToDatabase": "",
+      "isSetToData": "",
+      "otherFuseDatabase": "",
+      "otherFuseData": "",
+      "fixDatabase": "",
+      "fixData": ""
+    },
+    "faq": ""
+  },
   "backup": {
     "title": "Kopia zapasowa",
     "backToBackups": "Wróć do kopii zapasowych",

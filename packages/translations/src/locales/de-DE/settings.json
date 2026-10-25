@@ -549,6 +549,51 @@
     "message": "Alle Benutzer scheinen dieselbe IP-Adresse oder dieselben lokalen Netzwerk-IPs zu verwenden. Dies kann Auswirkungen auf die regelbasierte Logik für Standort oder IP-Adressen haben.",
     "acknowledge": "Verstanden"
   },
+  "storageWarning": {
+    "bannerDatabase": "",
+    "bannerData": "",
+    "showHow": "",
+    "hide": "",
+    "titleDatabase": "",
+    "titleData": "",
+    "fields": {
+      "postgres": "",
+      "redis": "",
+      "appData": ""
+    },
+    "isSetTo": "",
+    "overheadDatabase": "",
+    "overheadData": "",
+    "pool": {
+      "alreadyDatabase": "",
+      "alreadyData": "",
+      "alreadyPools": "",
+      "openEdit": "",
+      "change": "",
+      "copyPath": "",
+      "apply": "",
+      "clears": ""
+    },
+    "split": {
+      "arrayDatabase": "",
+      "arrayData": "",
+      "poolsDatabase": "",
+      "poolsData": "",
+      "stop": "",
+      "shares": "",
+      "move": "",
+      "start": ""
+    },
+    "unknown": {
+      "isSetToDatabase": "",
+      "isSetToData": "",
+      "otherFuseDatabase": "",
+      "otherFuseData": "",
+      "fixDatabase": "",
+      "fixData": ""
+    },
+    "faq": ""
+  },
   "backup": {
     "title": "",
     "backToBackups": "Zurück zu Sicherungen",

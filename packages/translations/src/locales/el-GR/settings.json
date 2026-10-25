@@ -549,6 +549,51 @@
     "message": "Όλοι οι χρήστες φαίνεται να χρησιμοποιούν την ίδια διεύθυνση IP ή IP τοπικού δικτύου. Αυτό μπορεί να επηρεάσει τη λογική βάσει κανόνων για την τοποθεσία ή τις διευθύνσεις IP.",
     "acknowledge": "Το κατάλαβα"
   },
+  "storageWarning": {
+    "bannerDatabase": "",
+    "bannerData": "",
+    "showHow": "",
+    "hide": "",
+    "titleDatabase": "",
+    "titleData": "",
+    "fields": {
+      "postgres": "",
+      "redis": "",
+      "appData": ""
+    },
+    "isSetTo": "",
+    "overheadDatabase": "",
+    "overheadData": "",
+    "pool": {
+      "alreadyDatabase": "",
+      "alreadyData": "",
+      "alreadyPools": "",
+      "openEdit": "",
+      "change": "",
+      "copyPath": "",
+      "apply": "",
+      "clears": ""
+    },
+    "split": {
+      "arrayDatabase": "",
+      "arrayData": "",
+      "poolsDatabase": "",
+      "poolsData": "",
+      "stop": "",
+      "shares": "",
+      "move": "",
+      "start": ""
+    },
+    "unknown": {
+      "isSetToDatabase": "",
+      "isSetToData": "",
+      "otherFuseDatabase": "",
+      "otherFuseData": "",
+      "fixDatabase": "",
+      "fixData": ""
+    },
+    "faq": ""
+  },
   "backup": {
     "title": "Αντίγραφα Ασφαλείας",
     "backToBackups": "Πίσω στα αντίγραφα ασφαλείας",

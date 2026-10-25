@@ -25,6 +25,7 @@ import {
   rearmImportedHistoryLink,
   setSettings,
 } from '../services/settings.js';
+import { dismissStorageWarning, getStorageWarning } from '../services/storageCheck.js';
 import { assertOwnerKeepsALoginMethod } from '../lib/authGuards.js';
 import { oidcConfigured } from '../lib/oidcEnv.js';
 import { revokeSessionsForUsers } from '../lib/revoke.js';
@@ -251,5 +252,22 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can view settings');
     }
     return getImageCacheStatus();
+  });
+
+  /** GET /settings/storage-warning - data volumes on a FUSE mount, from this boot's check */
+  app.get('/storage-warning', readSettings, async (request, reply) => {
+    if (request.user.role !== 'owner') {
+      return reply.forbidden('Only server owners can view settings');
+    }
+    return getStorageWarning();
+  });
+
+  /** POST /settings/storage-warning/dismiss - hide the storage warning until the next boot */
+  app.post('/storage-warning/dismiss', writeSettings, async (request, reply) => {
+    if (request.user.role !== 'owner') {
+      return reply.forbidden('Only server owners can update settings');
+    }
+    dismissStorageWarning();
+    return reply.code(204).send();
   });
 };

@@ -1199,6 +1199,30 @@ export interface ImageCacheStatus {
   shortfallBytes: number;
 }
 
+/** Supervised template volumes: postgres is PostgreSQL Data, redis is Redis Data, appData is App Data. */
+export type StorageMountKey = 'postgres' | 'redis' | 'appData';
+
+export interface StorageMountIssue {
+  key: StorageMountKey;
+  /** From /proc/self/mountinfo, for example fuse.shfs. */
+  fsType: string;
+  /** Host path, known only for fuse.shfs: /mnt/user plus the share-relative root. */
+  currentPath: string | null;
+  placement:
+    | { kind: 'pool'; pool: string; newPath: string }
+    /** system.LOCATIONS names as reported, array disks and pools alike. */
+    | { kind: 'split'; disks: string[] }
+    | { kind: 'unknown' };
+}
+
+/** GET /settings/storage-warning. Not applicable outside the supervised image. */
+export interface StorageWarning {
+  applicable: boolean;
+  issues: StorageMountIssue[];
+  bootId: string;
+  dismissed: boolean;
+}
+
 // Tailscale integration
 export type TailscaleStatus =
   'disabled' | 'starting' | 'awaiting_auth' | 'connected' | 'error' | 'stopping';

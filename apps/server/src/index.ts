@@ -71,6 +71,7 @@ import { settingsRoutes } from './routes/settings.js';
 import { importRoutes } from './routes/import.js';
 import { imageRoutes } from './routes/images.js';
 import { startImageCacheSweepTimer, stopImageCacheSweep } from './services/imageCacheSweep.js';
+import { runStorageCheck } from './services/storageCheck.js';
 import { debugRoutes } from './routes/debug.js';
 import { mobileRoutes } from './routes/mobile.js';
 import { notificationPreferencesRoutes } from './routes/notificationPreferences.js';
@@ -1623,6 +1624,8 @@ async function start() {
   try {
     // Initialize claim code for first-time setup security
     initializeClaimCode();
+    // Not awaited: getfattr on a stalled shfs must not hold up the listen.
+    void runStorageCheck();
     await probeOidcAtStartup();
 
     const app = await buildApp();

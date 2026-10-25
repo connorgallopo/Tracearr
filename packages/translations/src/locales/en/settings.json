@@ -549,6 +549,51 @@
     "message": "All users appear to be using the same IP address or local network IPs. This may affect rule-based logic for location or IP addresses.",
     "acknowledge": "Got it"
   },
+  "storageWarning": {
+    "bannerDatabase": "Tracearr's database is on an Unraid user share, which slows every read and write.",
+    "bannerData": "Some of Tracearr's data is on an Unraid user share, which slows every read and write.",
+    "showHow": "Show me how to fix it",
+    "hide": "Hide until Tracearr restarts",
+    "titleDatabase": "Move the database off the user share",
+    "titleData": "Move Tracearr's data off the user share",
+    "fields": {
+      "postgres": "PostgreSQL Data",
+      "redis": "Redis Data",
+      "appData": "App Data"
+    },
+    "isSetTo": "<strong>{{field}}</strong> is set to <code>{{path}}</code>.",
+    "overheadDatabase": "Paths under <code>/mnt/user</code> go through Unraid's FUSE layer (shfs), which adds overhead to every database read and write.",
+    "overheadData": "Paths under <code>/mnt/user</code> go through Unraid's FUSE layer (shfs), which adds overhead to every read and write.",
+    "pool": {
+      "alreadyDatabase": "Your database files are already on the <code>{{pool}}</code> pool, so nothing needs to move. Point Tracearr at that pool directly:",
+      "alreadyData": "Your Tracearr files are already on the <code>{{pool}}</code> pool, so nothing needs to move. Point Tracearr at that pool directly:",
+      "alreadyPools": "Your Tracearr files are already on their pools, so nothing needs to move. Point Tracearr at each pool directly:",
+      "openEdit": "In Unraid, open Docker, click the Tracearr icon and choose Edit.",
+      "change": "Change <strong>{{field}}</strong> to:",
+      "copyPath": "Copy the {{field}} path",
+      "apply": "Click Apply. Unraid recreates the container with the new paths.",
+      "clears": "Tracearr checks this each time it starts, so this notice clears after the restart."
+    },
+    "split": {
+      "arrayDatabase": "Part of your database is on the array (<code>{{disks}}</code>), so the pool doesn't hold all of it yet. Leave the path as it is for now: pointing Tracearr at a folder that's missing files starts a new, empty database.",
+      "arrayData": "Some files for <strong>{{field}}</strong> are on the array (<code>{{disks}}</code>), so the pool doesn't hold all of them yet. Leave the path as it is for now: pointing Tracearr at a folder that's missing files leaves those files behind.",
+      "poolsDatabase": "Your database is split across several pools (<code>{{pools}}</code>), so no single pool holds all of it. Leave the path as it is for now: pointing Tracearr at a folder that's missing files starts a new, empty database. Move it onto one pool first, and this notice then shows the exact path to set.",
+      "poolsData": "Files for <strong>{{field}}</strong> are split across several pools (<code>{{pools}}</code>), so no single pool holds all of them. Leave the path as it is for now: pointing Tracearr at a folder that's missing files leaves those files behind. Move them onto one pool first, and this notice then shows the exact path to set.",
+      "stop": "Stop the Tracearr container.",
+      "shares": "In Shares, open <code>{{share}}</code>. Set Primary storage to your pool, Secondary storage to Array, and Mover action to Array → pool.",
+      "move": "In Main, click Move and wait for it to finish.",
+      "start": "Start Tracearr. Once every file is on the pool, this notice shows the exact path to set."
+    },
+    "unknown": {
+      "isSetToDatabase": "<strong>{{field}}</strong> is set to <code>{{path}}</code>, which goes through Unraid's FUSE layer (shfs) and slows every database read and write.",
+      "isSetToData": "<strong>{{field}}</strong> is set to <code>{{path}}</code>, which goes through Unraid's FUSE layer (shfs) and slows every read and write.",
+      "otherFuseDatabase": "<strong>{{field}}</strong> is on a <code>{{fsType}}</code> mount, a FUSE filesystem that slows every database read and write.",
+      "otherFuseData": "<strong>{{field}}</strong> is on a <code>{{fsType}}</code> mount, a FUSE filesystem that slows every read and write.",
+      "fixDatabase": "If appdata lives on a pool, change <strong>{{field}}</strong> in the container's Edit page to the same folder on that pool, for example <code>{{example}}</code>. First check that the folder on the pool contains a file named PG_VERSION. Without it, Tracearr starts a new, empty database.",
+      "fixData": "If appdata lives on a pool, change <strong>{{field}}</strong> in the container's Edit page to the same folder on that pool, for example <code>{{example}}</code>. First check that the folder on the pool holds the same files as the current one."
+    },
+    "faq": "Why user shares are slow"
+  },
   "backup": {
     "title": "Backup",
     "backToBackups": "Back to Backups",

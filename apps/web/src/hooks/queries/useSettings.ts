@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { SettingsResponse } from '@tracearr/shared';
+import type { SettingsResponse, StorageWarning } from '@tracearr/shared';
 import { toast } from 'sonner';
 import { api, type SettingsUpdate } from '@/lib/api';
 
@@ -46,6 +46,34 @@ export function useImageCacheStatus() {
     queryKey: ['settings', 'image-cache'],
     queryFn: api.settings.getImageCache,
     staleTime: 60_000,
+  });
+}
+
+/**
+ * The server checks storage once per boot, so the only time the answer can change is
+ * after a restart, which the reconnect marks.
+ */
+export function useStorageWarning() {
+  return useQuery({
+    queryKey: ['storage-warning'],
+    queryFn: api.settings.getStorageWarning,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: 'always',
+  });
+}
+
+export function useDismissStorageWarning() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: api.settings.dismissStorageWarning,
+    onSuccess: () => {
+      queryClient.setQueryData<StorageWarning>(
+        ['storage-warning'],
+        (old) => old && { ...old, dismissed: true }
+      );
+    },
   });
 }
 

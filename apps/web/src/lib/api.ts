@@ -167,6 +167,7 @@ import type {
   UserRangeStats,
   PeopleResponse,
   PeopleRank,
+  StorageWarning,
 } from '@tracearr/shared';
 
 // Re-export shared types needed by frontend components
@@ -1984,6 +1985,9 @@ class ApiClient {
       this.request<{ token: string }>('/settings/api-key/regenerate', { method: 'POST' }),
     getIpWarning: () =>
       this.request<{ showWarning: boolean; stateHash: string }>('/settings/ip-warning'),
+    getStorageWarning: () => this.request<StorageWarning>('/settings/storage-warning'),
+    dismissStorageWarning: () =>
+      this.request<void>('/settings/storage-warning/dismiss', { method: 'POST' }),
     getImageCache: () => this.request<ImageCacheStatus>('/settings/image-cache'),
   };
 

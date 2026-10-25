@@ -10,7 +10,7 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
-import type { AuthUser, ImageCacheStatus, Settings } from '@tracearr/shared';
+import type { AuthUser, ImageCacheStatus, Settings, StorageWarning } from '@tracearr/shared';
 
 // Mock the settings service
 vi.mock('../../services/settings.js', () => ({
@@ -28,6 +28,11 @@ vi.mock('../../services/settings.js', () => ({
 // Mock the image cache service
 vi.mock('../../services/imageCacheSweep.js', () => ({
   getImageCacheStatus: vi.fn(),
+}));
+
+vi.mock('../../services/storageCheck.js', () => ({
+  getStorageWarning: vi.fn(),
+  dismissStorageWarning: vi.fn(),
 }));
 
 // Mock the database module (still needed for api-key and ip-warning routes)
@@ -72,6 +77,7 @@ import {
 import { assertOwnerKeepsALoginMethod } from '../../lib/authGuards.js';
 import { revokeSessionsForUsers } from '../../lib/revoke.js';
 import { getImageCacheStatus } from '../../services/imageCacheSweep.js';
+import { dismissStorageWarning, getStorageWarning } from '../../services/storageCheck.js';
 import { geoipService } from '../../services/geoip.js';
 import { settingsRoutes } from '../settings.js';
 import { permissionGuard } from '../../lib/scope.js';
@@ -138,6 +144,13 @@ async function buildTestApp(authUser: AuthUser): Promise<FastifyInstance> {
   await app.register(settingsRoutes, { prefix: '/settings' });
   return app;
 }
+
+const adminUser: AuthUser = {
+  userId: randomUUID(),
+  username: 'staff',
+  role: 'admin',
+  serverIds: [],
+};
 
 const ownerUser: AuthUser = {
   userId: randomUUID(),
@@ -594,6 +607,87 @@ describe('Settings Routes', () => {
 
       expect(response.statusCode).toBe(404);
       expect(getImageCacheStatus).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('storage warning', () => {
+    const bootResult: StorageWarning = {
+      applicable: true,
+      issues: [
+        {
+          key: 'postgres',
+          fsType: 'fuse.shfs',
+          currentPath: '/mnt/user/appdata/tracearr/postgres',
+          placement: {
+            kind: 'pool',
+            pool: 'cache',
+            newPath: '/mnt/cache/appdata/tracearr/postgres',
+          },
+        },
+      ],
+      bootId: randomUUID(),
+      dismissed: false,
+    };
+
+    it('storage-warning is owner only', async () => {
+      app = await buildTestApp(adminUser);
+
+      const get = await app.inject({ method: 'GET', url: '/settings/storage-warning' });
+      const dismiss = await app.inject({
+        method: 'POST',
+        url: '/settings/storage-warning/dismiss',
+      });
+
+      expect(get.statusCode).toBe(403);
+      expect(dismiss.statusCode).toBe(403);
+      expect(getStorageWarning).not.toHaveBeenCalled();
+      expect(dismissStorageWarning).not.toHaveBeenCalled();
+    });
+
+    it('returns the boot result', async () => {
+      vi.mocked(getStorageWarning).mockReturnValue(bootResult);
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({ method: 'GET', url: '/settings/storage-warning' });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual(bootResult);
+    });
+
+    it('reports not applicable to the owner on a non-supervised install', async () => {
+      const actual = await vi.importActual<typeof import('../../services/storageCheck.js')>(
+        '../../services/storageCheck.js'
+      );
+      await actual.runStorageCheck({
+        isDirectory: async () => false,
+        readFile: async () => '',
+        getLocations: async () => '',
+      });
+      vi.mocked(getStorageWarning).mockImplementation(actual.getStorageWarning);
+      app = await buildTestApp(ownerUser);
+
+      const response = await app.inject({ method: 'GET', url: '/settings/storage-warning' });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({ applicable: false, issues: [], dismissed: false });
+    });
+
+    it('dismiss returns 204 and the next GET reports dismissed', async () => {
+      let dismissed = false;
+      vi.mocked(getStorageWarning).mockImplementation(() => ({ ...bootResult, dismissed }));
+      vi.mocked(dismissStorageWarning).mockImplementation(() => {
+        dismissed = true;
+      });
+      app = await buildTestApp(ownerUser);
+
+      const dismiss = await app.inject({
+        method: 'POST',
+        url: '/settings/storage-warning/dismiss',
+      });
+      const next = await app.inject({ method: 'GET', url: '/settings/storage-warning' });
+
+      expect(dismiss.statusCode).toBe(204);
+      expect(next.json()).toMatchObject({ dismissed: true, bootId: bootResult.bootId });
     });
   });
 

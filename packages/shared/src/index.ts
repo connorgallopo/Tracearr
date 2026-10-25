@@ -104,6 +104,9 @@ export type {
   LoginMethods,
   UnitSystem,
   ImageCacheStatus,
+  StorageMountKey,
+  StorageMountIssue,
+  StorageWarning,
   // Tailscale
   TailscaleStatus,
   TailscaleExitNode,

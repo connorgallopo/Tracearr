@@ -25,6 +25,9 @@ vi.mock('./IpWarningBanner', () => ({
 vi.mock('./BasemapBanner', () => ({
   BasemapBanner: () => <div>basemap</div>,
 }));
+vi.mock('./StorageWarningBanner', () => ({
+  StorageWarningBanner: () => <div>storage-warning</div>,
+}));
 
 import { StatusBanners } from './StatusBanners';
 
@@ -40,7 +43,17 @@ describe('StatusBanners', () => {
     expect(screen.getByText('server-health')).toBeInTheDocument();
     expect(screen.getByText('ip-warning')).toBeInTheDocument();
     expect(screen.getByText('basemap')).toBeInTheDocument();
+    expect(screen.getByText('storage-warning')).toBeInTheDocument();
     expect(screen.queryByText('maintenance.unreachable')).toBeNull();
+  });
+
+  it('hides the storage warning for an admin', () => {
+    auth.role = 'admin';
+    maintenance.isUnreachable = false;
+    render(<StatusBanners />);
+
+    expect(screen.getByText('ip-warning')).toBeInTheDocument();
+    expect(screen.queryByText('storage-warning')).toBeNull();
   });
 
   it('leaves the operator banners to the owner and admins', () => {

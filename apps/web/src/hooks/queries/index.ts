@@ -139,6 +139,8 @@ export {
   useApiKey,
   useRegenerateApiKey,
   useImageCacheStatus,
+  useStorageWarning,
+  useDismissStorageWarning,
 } from './useSettings';
 
 // Destination hooks

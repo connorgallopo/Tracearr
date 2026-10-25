@@ -49,6 +49,10 @@
     },
     {
       "type": "improved",
+      "text": "on Unraid, Tracearr warns the owner when its database is on a user share and shows the path to switch to"
+    },
+    {
+      "type": "improved",
       "text": "History opens faster, and its filter dropdowns stop re-querying on every visit"
     },
     {

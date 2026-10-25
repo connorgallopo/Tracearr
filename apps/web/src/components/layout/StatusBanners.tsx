@@ -7,6 +7,7 @@ import { ImpersonationBanner } from './ImpersonationBanner';
 import { ServerHealthBanner } from './ServerHealthBanner';
 import { BasemapBanner } from './BasemapBanner';
 import { IpWarningBanner } from './IpWarningBanner';
+import { StorageWarningBanner } from './StorageWarningBanner';
 
 /** The strip of status banners under the header, in priority order. */
 export function StatusBanners() {
@@ -28,6 +29,7 @@ export function StatusBanners() {
             <ServerHealthBanner />
             <BasemapBanner />
             <IpWarningBanner />
+            {user.role === 'owner' && <StorageWarningBanner />}
           </>
         )
       )}
