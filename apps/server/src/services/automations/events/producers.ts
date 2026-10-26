@@ -56,12 +56,15 @@ async function serverListeningRules(
   return scoped.length > 0 ? scoped : null;
 }
 
-/** Whether anything on this server listens for either media trigger, before the sync pays for a diff. */
-export async function hasMediaListeners(serverId: string): Promise<boolean> {
-  const added = await serverListeningRules('media.added', serverId);
-  if (added) return true;
-  const upgraded = await serverListeningRules('media.upgraded', serverId);
-  return upgraded !== null;
+/** Which media triggers anything on this server listens for, before the sync pays for a diff. */
+export async function mediaListeners(
+  serverId: string
+): Promise<{ added: boolean; upgraded: boolean }> {
+  const [added, upgraded] = await Promise.all([
+    serverListeningRules('media.added', serverId),
+    serverListeningRules('media.upgraded', serverId),
+  ]);
+  return { added: added !== null, upgraded: upgraded !== null };
 }
 
 /** Producers run after the write they announce, so a failed read must not unwind the caller. */

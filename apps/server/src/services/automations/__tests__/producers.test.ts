@@ -107,7 +107,7 @@ import {
   dispatchSessionStopped,
   dispatchTracearrUpdate,
   dispatchTrustChanged,
-  hasMediaListeners,
+  mediaListeners,
 } from '../events/producers.js';
 import { registerRuleSubscribers, resetRuleSubscribersForTests } from '../events/subscribers.js';
 import type { RuleEvent } from '../events/types.js';
@@ -866,16 +866,17 @@ describe('media producers', () => {
     });
   });
 
-  it('reports no listener until an automation names a media trigger on this server', async () => {
-    expect(await hasMediaListeners('server-1')).toBe(false);
+  it('reports each media trigger only once an automation on this server names it', async () => {
+    const none = { added: false, upgraded: false };
+    expect(await mediaListeners('server-1')).toEqual(none);
 
     mockGetActiveAutomations.mockResolvedValue([
       automation([node('media.upgraded')], { serverId: 'server-2' }),
     ]);
-    expect(await hasMediaListeners('server-1')).toBe(false);
+    expect(await mediaListeners('server-1')).toEqual(none);
 
     mockGetActiveAutomations.mockResolvedValue([automation([node('media.upgraded')])]);
-    expect(await hasMediaListeners('server-1')).toBe(true);
+    expect(await mediaListeners('server-1')).toEqual({ added: false, upgraded: true });
   });
 
   it('dispatches nothing when only the other media trigger is listened for', async () => {

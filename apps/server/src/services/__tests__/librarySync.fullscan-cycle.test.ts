@@ -45,7 +45,7 @@ vi.mock('../library/mediaResolutionService.js', () => ({
 
 // Nothing here listens for the media triggers, so the sync builds no announce context.
 vi.mock('../automations/events/producers.js', () => ({
-  hasMediaListeners: vi.fn().mockResolvedValue(false),
+  mediaListeners: vi.fn().mockResolvedValue({ added: false, upgraded: false }),
   dispatchMediaAdded: vi.fn(),
   dispatchMediaUpgraded: vi.fn(),
 }));

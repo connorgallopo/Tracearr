@@ -37,11 +37,11 @@ vi.mock('../library/mediaResolutionService.js', () => ({
   reconcileMediaDuplicates: vi.fn().mockResolvedValue(0),
 }));
 
-const mockHasMediaListeners = vi.fn().mockResolvedValue(false);
+const mockMediaListeners = vi.fn().mockResolvedValue({ added: false, upgraded: false });
 const mockDispatchMediaAdded = vi.fn();
 const mockDispatchMediaUpgraded = vi.fn();
 vi.mock('../automations/events/producers.js', () => ({
-  hasMediaListeners: (...args: unknown[]) => mockHasMediaListeners(...args),
+  mediaListeners: (...args: unknown[]) => mockMediaListeners(...args),
   dispatchMediaAdded: (...args: unknown[]) => mockDispatchMediaAdded(...args),
   dispatchMediaUpgraded: (...args: unknown[]) => mockDispatchMediaUpgraded(...args),
 }));
@@ -114,6 +114,7 @@ import {
   setSetting,
 } from '../settings.js';
 import {
+  LibrariesFailedError,
   LibrarySyncService,
   initLibrarySyncRedis,
   _resetAutoBackfillThrottleForTests,
@@ -356,6 +357,32 @@ function mockSelectDistinctChain(results: unknown[][]) {
   return mock;
 }
 
+/**
+ * The first select is the server lookup; every later one (previous item keys and the
+ * rest) finds nothing, through either an awaited .where() or a .limit().
+ */
+function mockServerThenEmpty(server: ReturnType<typeof createMockServer>) {
+  let selectCallCount = 0;
+  vi.mocked(db.select).mockImplementation(() => {
+    selectCallCount++;
+    const rows = () => Promise.resolve(selectCallCount === 1 ? [server] : []);
+    const chain = {
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockImplementation(() => {
+        const whereResult = Promise.resolve([]);
+        (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
+          .fn()
+          .mockImplementation(rows);
+        return whereResult;
+      }),
+      limit: vi.fn().mockImplementation(rows),
+      returning: vi.fn().mockResolvedValue([]),
+    };
+    return chain as never;
+  });
+}
+
 function mockMediaServerClient(options: {
   libraries?: ReturnType<typeof createMockLibrary>[];
   items?: MediaLibraryItem[];
@@ -506,37 +533,7 @@ describe('LibrarySyncService', () => {
         createMockLibraryItem({ ratingKey: 'item-2' }),
       ];
 
-      // First call returns server, subsequent calls return empty (no existing items)
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        // Create a thenable chain that resolves for getPreviousItemKeys (no .limit())
-        // and also for getServer (.limit())
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            // For getPreviousItemKeys, resolves via implicit await on .where()
-            const whereResult = Promise.resolve([]);
-            // Make it thenable and also have .limit() for getServer
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                // First call: server lookup
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                // Subsequent calls: empty (no existing items)
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -561,36 +558,46 @@ describe('LibrarySyncService', () => {
       );
     });
 
+    it('syncs the other libraries when one fails, then reports the failure with their results', async () => {
+      const service = new LibrarySyncService();
+      const mockServer = createMockServer();
+      mockServerThenEmpty(mockServer);
+      mockInsertChain([{ id: randomUUID() }]);
+      mockDeleteChain();
+      mockTransaction();
+      const client = mockMediaServerClient({
+        libraries: [
+          createMockLibrary({ id: '1', name: 'Movies' }),
+          createMockLibrary({ id: '2', name: 'TV Shows', type: 'show' }),
+        ],
+        items: [createMockLibraryItem({ ratingKey: 'item-1' })],
+        totalCount: 1,
+      });
+      const listing = client.getLibraryItems.getMockImplementation();
+      client.getLibraryItems.mockImplementation((libraryId: string, ...rest: unknown[]) =>
+        libraryId === '1'
+          ? Promise.reject(new Error('plex request to /library/sections/1/all timed out'))
+          : listing?.(libraryId, ...rest)
+      );
+
+      const error = await service.syncServer(mockServer.id).catch((e: unknown) => e);
+
+      expect(error).toBeInstanceOf(LibrariesFailedError);
+      expect((error as LibrariesFailedError).message).toBe(
+        'Library sync failed for Movies (plex request to /library/sections/1/all timed out)'
+      );
+      expect((error as LibrariesFailedError).results.map((r) => r.libraryName)).toEqual([
+        'TV Shows',
+      ]);
+    });
+
     it('continues past a failed session-identity backfill and still reconciles media duplicates', async () => {
       const service = new LibrarySyncService();
       const mockServer = createMockServer();
       const mockLibraries = [createMockLibrary({ id: '1', name: 'Movies' })];
       const mockItems = [createMockLibraryItem({ ratingKey: 'item-1' })];
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -1317,30 +1324,7 @@ describe('LibrarySyncService', () => {
       const mockLibraries = [createMockLibrary({ id: '1', name: 'Movies' })];
       const realItem = createMockLibraryItem({ ratingKey: 'item-real' });
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -1434,30 +1418,7 @@ describe('LibrarySyncService', () => {
       ];
       const mockItems = [createMockLibraryItem({ ratingKey: 'item-1' })];
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -1483,30 +1444,7 @@ describe('LibrarySyncService', () => {
       const mockItems = [createMockLibraryItem()];
       const progressUpdates: LibrarySyncProgress[] = [];
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -1722,7 +1660,12 @@ describe('LibrarySyncService', () => {
         budget: { remaining: 20, suppressed: 4 },
         collected: Array.from({ length: MEDIA_BUFFER_CAP }, () => fakeCollected()),
       };
-      const announce = { ...run, libraryName: 'Movies', run };
+      const announce = {
+        ...run,
+        libraryName: 'Movies',
+        run,
+        listening: { added: true, upgraded: true },
+      };
       const { insertChain } = mockTransaction();
       insertChain.returning.mockResolvedValue([changedRow()]);
 
@@ -1745,7 +1688,12 @@ describe('LibrarySyncService', () => {
         budget: { remaining: 20, suppressed: 0 },
         collected: [],
       };
-      const announce = { ...run, libraryName: 'Movies', run };
+      const announce = {
+        ...run,
+        libraryName: 'Movies',
+        run,
+        listening: { added: true, upgraded: true },
+      };
       mockPriorQuality([
         {
           ratingKey: 'rk-1',
@@ -2733,30 +2681,7 @@ describe('LibrarySyncService', () => {
         parentIndex: 1,
       });
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
@@ -2794,30 +2719,7 @@ describe('LibrarySyncService', () => {
       const mockLibraries = [createMockLibrary({ id: '1', name: 'Movies' })];
       const movieItem = createMockLibraryItem({ ratingKey: 'movie-1', mediaType: 'movie' });
 
-      let selectCallCount = 0;
-      vi.mocked(db.select).mockImplementation(() => {
-        selectCallCount++;
-        const chain = {
-          from: vi.fn().mockReturnThis(),
-          innerJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockImplementation(() => {
-            const whereResult = Promise.resolve([]);
-            (whereResult as typeof whereResult & { limit: typeof vi.fn }).limit = vi
-              .fn()
-              .mockImplementation(() => {
-                if (selectCallCount === 1) return Promise.resolve([mockServer]);
-                return Promise.resolve([]);
-              });
-            return whereResult;
-          }),
-          limit: vi.fn().mockImplementation(() => {
-            if (selectCallCount === 1) return Promise.resolve([mockServer]);
-            return Promise.resolve([]);
-          }),
-          returning: vi.fn().mockResolvedValue([]),
-        };
-        return chain as never;
-      });
+      mockServerThenEmpty(mockServer);
 
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();

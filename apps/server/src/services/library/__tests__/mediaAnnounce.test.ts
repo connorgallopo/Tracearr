@@ -6,11 +6,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MediaQuality } from '../../automations/types.js';
 
-const mockHasMediaListeners = vi.fn();
+const mockMediaListeners = vi.fn();
 const mockDispatchMediaAdded = vi.fn();
 const mockDispatchMediaUpgraded = vi.fn();
 vi.mock('../../automations/events/producers.js', () => ({
-  hasMediaListeners: (...args: unknown[]) => mockHasMediaListeners(...args),
+  mediaListeners: (...args: unknown[]) => mockMediaListeners(...args),
   dispatchMediaAdded: (...args: unknown[]) => mockDispatchMediaAdded(...args),
   dispatchMediaUpgraded: (...args: unknown[]) => mockDispatchMediaUpgraded(...args),
 }));
@@ -74,11 +74,19 @@ const collectedOf = (rows: SyncedMediaRow[]): CollectedChange[] =>
 
 const priorOf = (rows: Array<[string, PriorMediaRow]>) => new Map(rows);
 
+const both = { added: true, upgraded: true };
+
 describe('diffMediaChanges', () => {
   it('reads a row first seen in this call as an addition', () => {
     const rows = [synced({ firstSeenAt: firstSeen })];
 
-    const { changes } = diffMediaChanges({ rows, prior: priorOf([]), firstSeen, budget: 10 });
+    const { changes } = diffMediaChanges({
+      rows,
+      prior: priorOf([]),
+      firstSeen,
+      budget: 10,
+      listening: both,
+    });
 
     expect(changes).toEqual([{ kind: 'added', row: rows[0] }]);
   });
@@ -87,7 +95,7 @@ describe('diffMediaChanges', () => {
     const rows = [synced({ quality: quality({ resolution: '4k', fileSize: 40_000_000_000 }) })];
     const prior = priorOf([['rk-1', { quality: quality() }]]);
 
-    const { changes } = diffMediaChanges({ rows, prior, firstSeen, budget: 10 });
+    const { changes } = diffMediaChanges({ rows, prior, firstSeen, budget: 10, listening: both });
 
     expect(changes).toEqual([
       {
@@ -103,7 +111,7 @@ describe('diffMediaChanges', () => {
     const rows = [synced({ quality: quality({ resolution: '720p' }) })];
     const prior = priorOf([['rk-1', { quality: quality() }]]);
 
-    const { changes } = diffMediaChanges({ rows, prior, firstSeen, budget: 10 });
+    const { changes } = diffMediaChanges({ rows, prior, firstSeen, budget: 10, listening: both });
 
     expect(changes[0]).toMatchObject({ kind: 'upgraded', changed: ['resolution'] });
   });
@@ -112,13 +120,25 @@ describe('diffMediaChanges', () => {
     const appeared = [synced({ quality: quality({ dynamicRange: 'hdr10' }) })];
     const appearedPrior = priorOf([['rk-1', { quality: quality({ dynamicRange: null }) }]]);
     expect(
-      diffMediaChanges({ rows: appeared, prior: appearedPrior, firstSeen, budget: 10 }).changes
+      diffMediaChanges({
+        rows: appeared,
+        prior: appearedPrior,
+        firstSeen,
+        budget: 10,
+        listening: both,
+      }).changes
     ).toEqual([]);
 
     const vanished = [synced({ quality: quality({ dynamicRange: null }) })];
     const vanishedPrior = priorOf([['rk-1', { quality: quality({ dynamicRange: 'hdr10' }) }]]);
     expect(
-      diffMediaChanges({ rows: vanished, prior: vanishedPrior, firstSeen, budget: 10 }).changes
+      diffMediaChanges({
+        rows: vanished,
+        prior: vanishedPrior,
+        firstSeen,
+        budget: 10,
+        listening: both,
+      }).changes
     ).toEqual([]);
   });
 
@@ -126,7 +146,9 @@ describe('diffMediaChanges', () => {
     const rows = [synced()];
     const prior = priorOf([['rk-1', { quality: quality() }]]);
 
-    expect(diffMediaChanges({ rows, prior, firstSeen, budget: 10 }).changes).toEqual([]);
+    expect(
+      diffMediaChanges({ rows, prior, firstSeen, budget: 10, listening: both }).changes
+    ).toEqual([]);
   });
 
   it('stops at the budget and counts what it dropped', () => {
@@ -139,6 +161,7 @@ describe('diffMediaChanges', () => {
       prior: priorOf([]),
       firstSeen,
       budget: MEDIA_ANNOUNCE_CAP,
+      listening: both,
     });
 
     expect(changes).toHaveLength(MEDIA_ANNOUNCE_CAP);
@@ -149,7 +172,7 @@ describe('diffMediaChanges', () => {
 describe('createMediaAnnounce', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockHasMediaListeners.mockResolvedValue(true);
+    mockMediaListeners.mockResolvedValue(both);
   });
 
   it('announces nothing on a first sync, and never probes the library when nothing listens', async () => {
@@ -159,7 +182,7 @@ describe('createMediaAnnounce', () => {
     expect(await createMediaAnnounce({ run, libraryName: 'Movies', isFirstSync })).toBeNull();
     expect(isFirstSync).toHaveBeenCalledOnce();
 
-    mockHasMediaListeners.mockResolvedValue(false);
+    mockMediaListeners.mockResolvedValue({ added: false, upgraded: false });
     expect(await createMediaAnnounce({ run, libraryName: 'Movies', isFirstSync })).toBeNull();
     expect(isFirstSync).toHaveBeenCalledOnce();
   });
@@ -188,11 +211,12 @@ describe('collectMediaChanges and flushMediaAnnounceRun', () => {
     collected: [],
   });
 
-  const announceFor = (run: MediaAnnounceRun) => ({
+  const announceFor = (run: MediaAnnounceRun, listening = both) => ({
     server,
     libraryName: 'Movies',
     budget: run.budget,
     run,
+    listening,
   });
 
   it('holds changes until the run flushes', () => {
@@ -245,6 +269,30 @@ describe('collectMediaChanges and flushMediaAnnounceRun', () => {
       changed: ['resolution'],
     });
     expect(run.budget).toEqual({ remaining: 0, suppressed: 1 });
+  });
+
+  it('spends no slot on an upgrade nothing listens for', async () => {
+    const run = runWith(1);
+    const rows = [
+      synced({ quality: quality({ resolution: '4k' }) }),
+      synced({ id: 'item-2', ratingKey: 'rk-2', firstSeenAt: firstSeen }),
+    ];
+    const prior = priorOf([['rk-1', { quality: quality() }]]);
+
+    collectMediaChanges({
+      announce: announceFor(run, { added: true, upgraded: false }),
+      libraryId: '1',
+      rows,
+      prior,
+      firstSeen,
+    });
+    await flushMediaAnnounceRun(run);
+
+    expect(mockDispatchMediaUpgraded).not.toHaveBeenCalled();
+    expect(mockDispatchMediaAdded).toHaveBeenCalledWith(
+      expect.objectContaining({ media: expect.objectContaining({ libraryItemId: 'item-2' }) })
+    );
+    expect(run.budget).toEqual({ remaining: 0, suppressed: 0 });
   });
 
   it('dispatches nothing once the budget is spent', async () => {

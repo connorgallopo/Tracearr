@@ -22,6 +22,7 @@ import { servers } from '../db/schema.js';
 import {
   librarySyncService,
   initLibrarySyncRedis,
+  LibrariesFailedError,
   maybeEnqueueImportedHistoryLink,
   SyncInterruptedError,
   type SyncResult,
@@ -269,6 +270,8 @@ export function startLibrarySyncWorker(): void {
       const completed = new Set(job.data.completedLibraryIds ?? []);
       const resumed = completed.size > 0;
       let results: SyncResult[];
+      // Held until the libraries that did sync are wrapped up, then rethrown to retry the rest.
+      let partial: LibrariesFailedError | null = null;
       try {
         results = await librarySyncService.syncServer(serverId, onProgress, triggeredBy, {
           completedLibraryIds: completed,
@@ -280,7 +283,9 @@ export function startLibrarySyncWorker(): void {
         });
       } catch (error) {
         if (error instanceof SyncInterruptedError) await yieldJob(job, job.token, 0);
-        throw error;
+        if (!(error instanceof LibrariesFailedError)) throw error;
+        partial = error;
+        results = error.results;
       }
 
       // Event-driven syncs re-run every 30s during a long scan; invalidating
@@ -311,6 +316,8 @@ export function startLibrarySyncWorker(): void {
 
       // Versions that moved in this sync leave their old files behind; the sweep picks them up.
       scheduleImageCacheSweep('sync');
+
+      if (partial) throw partial;
 
       const duration = Math.round((Date.now() - startTime) / 1000);
       console.log(`[LibrarySync] Job ${job.id} completed in ${duration}s:`, {

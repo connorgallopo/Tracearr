@@ -235,6 +235,22 @@ describe('fetchJson', () => {
 
     expect(mockFetch.mock.calls[0]?.[1]?.signal).toBeUndefined();
   });
+
+  it('names the timed-out request by path, never its query', async () => {
+    mockFetch.mockRejectedValue(
+      new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+    );
+
+    const error = await fetchJson('http://plex:32400/library/sections/1/all?X-Plex-Token=secret', {
+      service: 'plex',
+    }).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(DOMException);
+    expect((error as DOMException).name).toBe('TimeoutError');
+    expect((error as DOMException).message).toBe(
+      'plex request to /library/sections/1/all timed out after 30s'
+    );
+  });
 });
 
 describe('fetchText', () => {

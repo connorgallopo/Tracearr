@@ -21,6 +21,14 @@
     },
     {
       "type": "fix",
+      "text": "quality changes no longer use up a sync's 20 media-added alerts when nothing listens for media upgrades"
+    },
+    {
+      "type": "fix",
+      "text": "one library failing to sync, such as a Movies scan timing out on a slow Plex, no longer stops the other libraries"
+    },
+    {
+      "type": "fix",
       "text": "duplicate fuzzy matches below 90% show as Likely or Possible instead of Exact"
     },
     {

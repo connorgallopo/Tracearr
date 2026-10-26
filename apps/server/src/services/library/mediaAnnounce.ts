@@ -8,7 +8,7 @@
 import {
   dispatchMediaAdded,
   dispatchMediaUpgraded,
-  hasMediaListeners,
+  mediaListeners,
 } from '../automations/events/producers.js';
 import { MEDIA_QUALITY_FIELDS } from '../automations/types.js';
 import type { EvaluationServer } from '../automations/events/types.js';
@@ -37,12 +37,19 @@ export interface MediaAnnounceRun {
   collected: CollectedChange[];
 }
 
+/** The media triggers something listens for; a kind nobody hears never takes an announce slot. */
+export interface MediaListening {
+  added: boolean;
+  upgraded: boolean;
+}
+
 /** One library's announce context, as `upsertItems` receives it. */
 export interface MediaAnnounce {
   server: EvaluationServer;
   libraryName: string;
   budget: MediaAnnounceBudget;
   run: MediaAnnounceRun;
+  listening: MediaListening;
 }
 
 /** The quality a row held before the upsert, keyed by rating key. */
@@ -102,13 +109,15 @@ export async function createMediaAnnounce(args: {
   libraryName: string;
   isFirstSync: () => Promise<boolean>;
 }): Promise<MediaAnnounce | null> {
-  if (!(await hasMediaListeners(args.run.server.id))) return null;
+  const listening = await mediaListeners(args.run.server.id);
+  if (!listening.added && !listening.upgraded) return null;
   if (await args.isFirstSync()) return null;
   return {
     server: args.run.server,
     libraryName: args.libraryName,
     budget: args.run.budget,
     run: args.run,
+    listening,
   };
 }
 
@@ -122,11 +131,14 @@ function changedFields(before: MediaQuality, after: MediaQuality): (keyof MediaQ
 function changeOf(
   row: SyncedMediaRow,
   prior: PriorMediaRow | undefined,
-  firstSeen: Date
+  firstSeen: Date,
+  listening: MediaListening
 ): MediaChange | null {
   // first_seen_at is insert-only, so carrying this call's stamp is exactly a fresh insert.
-  if (row.firstSeenAt?.getTime() === firstSeen.getTime()) return { kind: 'added', row };
-  if (!prior) return null;
+  if (row.firstSeenAt?.getTime() === firstSeen.getTime()) {
+    return listening.added ? { kind: 'added', row } : null;
+  }
+  if (!prior || !listening.upgraded) return null;
   const changed = changedFields(prior.quality, row.quality);
   if (changed.length === 0) return null;
   return { kind: 'upgraded', row, from: prior.quality, changed };
@@ -138,12 +150,13 @@ export function diffMediaChanges(args: {
   prior: ReadonlyMap<string, PriorMediaRow>;
   firstSeen: Date;
   budget: number;
+  listening: MediaListening;
 }): { changes: MediaChange[]; suppressed: number } {
   const changes: MediaChange[] = [];
   let suppressed = 0;
 
   for (const row of args.rows) {
-    const change = changeOf(row, args.prior.get(row.ratingKey), args.firstSeen);
+    const change = changeOf(row, args.prior.get(row.ratingKey), args.firstSeen, args.listening);
     if (!change) continue;
     if (changes.length >= args.budget) {
       suppressed += 1;
@@ -173,6 +186,7 @@ export function collectMediaChanges(args: {
     prior,
     firstSeen,
     budget: MEDIA_BUFFER_CAP - run.collected.length,
+    listening: announce.listening,
   });
   run.budget.suppressed += suppressed;
   for (const change of changes) {

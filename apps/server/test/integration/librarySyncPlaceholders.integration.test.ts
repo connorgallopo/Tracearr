@@ -27,7 +27,7 @@ vi.mock('../../src/services/mediaServer/index.js', () => ({
 
 vi.mock('../../src/services/automations/events/producers.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../src/services/automations/events/producers.js')>()),
-  hasMediaListeners: vi.fn().mockResolvedValue(true),
+  mediaListeners: vi.fn().mockResolvedValue({ added: true, upgraded: true }),
   dispatchMediaAdded: vi.fn(),
 }));
 

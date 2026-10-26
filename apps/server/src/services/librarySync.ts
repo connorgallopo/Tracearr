@@ -431,6 +431,25 @@ export interface SyncResume {
 export class SyncInterruptedError extends Error {}
 
 /**
+ * Some libraries failed after the rest of the run finished. Carries the results so the
+ * caller can still wrap up what did sync; a retry skips the libraries that completed.
+ */
+export class LibrariesFailedError extends Error {
+  constructor(
+    readonly results: SyncResult[],
+    failures: { libraryName: string; error: unknown }[]
+  ) {
+    const detail = failures
+      .map(({ libraryName, error }) =>
+        error instanceof Error ? `${libraryName} (${error.message})` : libraryName
+      )
+      .join(', ');
+    super(`Library sync failed for ${detail}`, { cause: failures[0]?.error });
+    this.name = 'LibrariesFailedError';
+  }
+}
+
+/**
  * Progress callback for real-time updates
  */
 export type OnProgressCallback = (progress: LibrarySyncProgress) => void;
@@ -613,26 +632,38 @@ export class LibrarySyncService {
       });
     }
 
-    // Sync each library
+    // One library failing must not hold back the rest: a server that times out listing
+    // one library would otherwise keep every other library from ever syncing.
+    const failures: { libraryName: string; error: unknown }[] = [];
     for (const [i, library] of libraries.entries()) {
       if (resume?.signal?.aborted) throw new SyncInterruptedError();
       if (resume?.completedLibraryIds.has(library.id)) continue;
 
-      const result = await this.syncLibrary({
-        serverId,
-        serverName: server.name,
-        serverType: server.type,
-        libraryId: library.id,
-        libraryName: library.name,
-        libraryType: library.type,
-        client,
-        onProgress,
-        totalLibraries,
-        processedLibraries: i,
-        startedAt,
-        triggeredBy,
-        mediaRun,
-      });
+      let result: SyncResult;
+      try {
+        result = await this.syncLibrary({
+          serverId,
+          serverName: server.name,
+          serverType: server.type,
+          libraryId: library.id,
+          libraryName: library.name,
+          libraryType: library.type,
+          client,
+          onProgress,
+          totalLibraries,
+          processedLibraries: i,
+          startedAt,
+          triggeredBy,
+          mediaRun,
+        });
+      } catch (error) {
+        console.error(
+          `[LibrarySync] ${library.name} failed, continuing with the other libraries:`,
+          error
+        );
+        failures.push({ libraryName: library.name, error });
+        continue;
+      }
 
       results.push(result);
       await resume?.onLibraryComplete(library.id);
@@ -737,6 +768,7 @@ export class LibrarySyncService {
       }
     }
 
+    if (failures.length > 0) throw new LibrariesFailedError(results, failures);
     return results;
   }
 
