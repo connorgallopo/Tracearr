@@ -29,6 +29,10 @@
     },
     {
       "type": "fix",
+      "text": "a Plex item whose full metadata takes too long to load no longer fails its library's sync; it keeps its stored genres"
+    },
+    {
+      "type": "fix",
       "text": "music duplicates group by MusicBrainz id and no longer pair same-titled tracks from different artists or albums"
     },
     {

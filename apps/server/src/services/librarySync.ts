@@ -1719,6 +1719,10 @@ export class LibrarySyncService {
         )
       : null;
 
+    const truncatedGenreKeys = uniqueItems
+      .filter((item) => item.genresTruncated)
+      .map((item) => item.ratingKey);
+
     // Bulk upsert with transaction for atomicity
     const firstSeen = new Date();
     let changed: SyncedMediaRow[] = [];
@@ -1807,7 +1811,10 @@ export class LibrarySyncService {
             parentIndex: sql`excluded.parent_index`,
             itemIndex: sql`excluded.item_index`,
             mediaId: sql`excluded.media_id`,
-            genres: sql`excluded.genres`,
+            // A row whose full genre list could not be read keeps the one it has.
+            genres: truncatedGenreKeys.length
+              ? sql`CASE WHEN excluded.rating_key IN (SELECT jsonb_array_elements_text(${JSON.stringify(truncatedGenreKeys)}::jsonb)) THEN ${libraryItems.genres} ELSE excluded.genres END`
+              : sql`excluded.genres`,
             // Re-synced posters must update; dominant_color is write-once by the image
             // pipeline and deliberately excluded so a sync never nulls or overwrites it.
             thumbPath: sql`excluded.thumb_path`,

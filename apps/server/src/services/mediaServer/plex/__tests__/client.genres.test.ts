@@ -88,20 +88,23 @@ describe('PlexClient genre fill', () => {
     expect(items.every((i) => i.genres?.[0] === `Genre ${i.ratingKey}`)).toBe(true);
   });
 
-  it('rejects with the batch error and starts no new batch after it', async () => {
-    const movies = Array.from({ length: 700 }, (_, i) => movie(String(i + 1), ['Action', 'Crime']));
-    let metadataCalls = 0;
+  it('flags the items of a failed batch on their listing genres and fills the rest', async () => {
+    const movies = Array.from({ length: 200 }, (_, i) => movie(String(i + 1), ['Action', 'Crime']));
     mockFetchJson.mockImplementation(async (url) => {
-      if (!String(url).includes('/library/metadata/')) return container(movies);
-      metadataCalls += 1;
-      if (metadataCalls === 1) throw new Error('batch failed');
-      await new Promise((resolve) => setTimeout(resolve, 5));
-      return container([]);
+      const keys = /\/library\/metadata\/([^?]+)\?/.exec(String(url))?.[1];
+      if (!keys) return container(movies);
+      if (keys.startsWith('1,')) throw new Error('plex request timed out');
+      return container(
+        keys.split(',').map((key) => ({ ratingKey: key, Genre: [{ tag: `Genre ${key}` }] }))
+      );
     });
 
-    await expect(makeClient().getLibraryItems('3')).rejects.toThrow('batch failed');
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(metadataCalls).toBe(3);
+    const { items } = await makeClient().getLibraryItems('3');
+
+    expect(items[0]).toMatchObject({ genres: ['Action', 'Crime'], genresTruncated: true });
+    expect(items[99]).toMatchObject({ genresTruncated: true });
+    expect(items[100]).toMatchObject({ genres: ['Genre 101'] });
+    expect(items[100]?.genresTruncated).toBeUndefined();
   });
 
   it('makes no metadata call when no item hits the cap', async () => {

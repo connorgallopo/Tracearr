@@ -397,6 +397,9 @@ export interface MediaLibraryItem {
   /** Genre names */
   genres?: string[];
 
+  /** The full genre list could not be read, so `genres` is the listing's cut-down one. */
+  genresTruncated?: boolean;
+
   /** Poster/thumbnail path, relative to the media server (browsing UI) */
   thumbPath?: string;
 

@@ -377,7 +377,9 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
    * Plex list endpoints return at most two Genre tags per item, whatever the
    * item carries. /library/metadata has the full list and takes a
    * comma-separated batch of ratingKeys, so only items that hit the cap are
-   * looked up again.
+   * looked up again. A batch that fails leaves its items flagged on the
+   * listing's genres rather than failing the listing: Plex can stall on one
+   * item's metadata past the timeout, and the rest of that item is already here.
    */
   private async fillTruncatedGenres(items: MediaLibraryItem[]): Promise<MediaLibraryItem[]> {
     const capped = items.filter((item) => (item.genres?.length ?? 0) >= 2);
@@ -386,13 +388,11 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       batches.push(capped.slice(start, start + METADATA_BATCH_SIZE).map((item) => item.ratingKey));
     }
 
-    // Once a batch fails the whole fill rejects, so the remaining batches are not sent.
-    let failed = false;
+    const unread = new Set<string>();
     const batchGenres = await mapWithConcurrency(
       batches,
       GENRE_LOOKUP_CONCURRENCY,
       async (ratingKeys) => {
-        if (failed) return new Map<string, string[]>();
         try {
           const data = await fetchJson<unknown>(
             `${this.baseUrl}/library/metadata/${ratingKeys.join(',')}?${GENRE_LOOKUP_PARAMS}`,
@@ -400,8 +400,12 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
           );
           return parseGenresByRatingKey(data);
         } catch (err) {
-          failed = true;
-          throw err;
+          console.warn(
+            `[PlexClient] Full genres unavailable for ${ratingKeys.length} items (rating keys ${ratingKeys[0]} to ${ratingKeys.at(-1)}), keeping their stored genres:`,
+            err instanceof Error ? err.message : err
+          );
+          for (const key of ratingKeys) unread.add(key);
+          return new Map<string, string[]>();
         }
       }
     );
@@ -409,7 +413,8 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
 
     return items.map((item) => {
       const genres = fullGenres.get(item.ratingKey);
-      return genres ? { ...item, genres } : item;
+      if (genres) return { ...item, genres };
+      return unread.has(item.ratingKey) ? { ...item, genresTruncated: true } : item;
     });
   }
 

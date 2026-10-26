@@ -43,6 +43,26 @@ describe('library sync identity', () => {
     expect(rows[0]!.genres).toEqual(['Action', 'Crime']);
   });
 
+  it('keeps stored genres for a row whose full list could not be read', async () => {
+    const s1 = await createTestServer({ type: 'plex' });
+    await librarySyncService.upsertItems(s1.id, 'lib', [
+      makeItem({ genres: ['Action', 'Crime', 'Thriller'] }),
+    ] as never);
+
+    await librarySyncService.upsertItems(s1.id, 'lib', [
+      makeItem({ title: 'Renamed', genres: ['Action', 'Crime'], genresTruncated: true }),
+      makeItem({ ratingKey: 'rk-new', genres: ['Drama', 'War'], genresTruncated: true }),
+    ] as never);
+
+    const rows = await db.select().from(libraryItems);
+    const byKey = new Map(rows.map((row) => [row.ratingKey, row]));
+    expect(byKey.get('rk-1')).toMatchObject({
+      title: 'Renamed',
+      genres: ['Action', 'Crime', 'Thriller'],
+    });
+    expect(byKey.get('rk-new')?.genres).toEqual(['Drama', 'War']);
+  });
+
   it('retires an old copy the server replaced, and keeps one it still has', async () => {
     const s1 = await createTestServer({ type: 'emby' });
     await librarySyncService.upsertItems(s1.id, 'lib', [
