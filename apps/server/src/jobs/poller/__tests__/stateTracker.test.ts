@@ -384,6 +384,12 @@ describe('checkWatchCompletion', () => {
       expect(checkWatchCompletion(5000, 5000, 10000)).toBe(false);
       expect(checkWatchCompletion(8000, 8000, 10000)).toBe(false);
     });
+
+    it('should not mark watched from position alone when nothing played', () => {
+      expect(checkWatchCompletion(0, 9900, 10000)).toBe(false);
+      expect(checkWatchCompletion(500, 9900, 10000)).toBe(false);
+      expect(checkWatchCompletion(1000, 9900, 10000)).toBe(true);
+    });
   });
 
   describe('null handling', () => {

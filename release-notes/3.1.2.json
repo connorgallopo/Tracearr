@@ -8,6 +8,10 @@
     },
     {
       "type": "fix",
+      "text": "a player left sitting at the end of an episode no longer records a watched play each time it reconnects"
+    },
+    {
+      "type": "fix",
       "text": "Plexamp playback no longer records every queued track as a download or trips the Download burst policy",
       "refs": ["#1367"]
     },
@@ -17,15 +21,15 @@
     },
     {
       "type": "fix",
-      "text": "music duplicates group by MusicBrainz id and no longer pair same-titled tracks from different artists or albums"
-    },
-    {
-      "type": "fix",
       "text": "quality changes no longer use up a sync's 20 media-added alerts when nothing listens for media upgrades"
     },
     {
       "type": "fix",
       "text": "one library failing to sync, such as a Movies scan timing out on a slow Plex, no longer stops the other libraries"
+    },
+    {
+      "type": "fix",
+      "text": "music duplicates group by MusicBrainz id and no longer pair same-titled tracks from different artists or albums"
     },
     {
       "type": "fix",
