@@ -183,7 +183,7 @@ overrides:
   js-yaml@>=4: ^5.0.0
   nanoid@<4: ^6.0.0
   undici@7: ^7.30.1
-  '@ai-sdk/provider-utils@4': ^4.0.33
+  '@ai-sdk/provider-utils@4': ^5.0.0
   '@esbuild-kit/core-utils>esbuild': ^0.28.0
   drizzle-kit>esbuild: ^0.28.2
 
