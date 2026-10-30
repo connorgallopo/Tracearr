@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Jobbet körs redan",
       "jobStartFailed": "Det gick inte att starta jobbet",
       "jobLoadFailed": "Det gick inte att ladda underhållsjobb",
-      "invalidUrl": "Ogiltig URL",
-      "plexDirectUrl": "plex.direct URL:er är reläadresser som inte kan användas här. Använd en direkt IP-adress eller värdnamn istället.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

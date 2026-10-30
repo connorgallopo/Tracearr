@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Trabajo ya en ejecución",
       "jobStartFailed": "Error al iniciar el trabajo",
       "jobLoadFailed": "Error al cargar los trabajos de mantenimiento",
-      "invalidUrl": "URL invalida",
-      "plexDirectUrl": "Las URLs plex.direct son direcciones repetidas que no se pueden utilizar aquí. Por favor, utilice una dirección IP directa o nombre de host en su lugar.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

@@ -2164,6 +2164,7 @@
         "reset": "Connexion réinitialisée",
         "tls": "Erreur TLS",
         "http": "",
+        "relay": "",
         "unknown": "Connexion échouée"
       },
       "connectionsReachable": "{{reachable}} connexions joignables sur {{total}}",

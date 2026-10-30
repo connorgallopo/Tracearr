@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Jobb kjører allerede",
       "jobStartFailed": "Kan ikke starte jobb",
       "jobLoadFailed": "Kunne ikke laste vedlikeholdsjobber",
-      "invalidUrl": "Ugyldig nettadresse",
-      "plexDirectUrl": "plex.direkte URL-er er relay adresser som ikke kan brukes her. Vennligst bruk en direkte IP-adresse eller vertsnavn i stedet.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

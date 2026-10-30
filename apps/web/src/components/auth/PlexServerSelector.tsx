@@ -13,7 +13,6 @@ import {
   Edit3,
   AlertTriangle,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -184,6 +183,9 @@ export function PlexServerSelector({
       case 'http':
         base = t('pages:settings.plex.connectionError.http', { status: err.status ?? '?' });
         break;
+      case 'relay':
+        base = t('pages:settings.plex.connectionError.relay');
+        break;
       default:
         base = t('pages:settings.plex.connectionError.unknown');
     }
@@ -196,13 +198,6 @@ export function PlexServerSelector({
     // Add protocol if missing
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = `http://${url}`;
-    }
-
-    if (url.includes('plex.direct')) {
-      toast.error(t('toast.error.invalidUrl'), {
-        description: t('toast.error.plexDirectUrl'),
-      });
-      return;
     }
 
     // If parent supplied a pre-save verification hook, test before saving
@@ -318,7 +313,7 @@ export function PlexServerSelector({
             {recommendedConn && isDiscoveredConnection(recommendedConn) && (
               <div className="mt-3 flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 flex-shrink-0 text-green-500" />
-                <span className="text-muted-foreground whitespace-nowrap">
+                <span className="text-muted-foreground min-w-0 break-all">
                   {recommendedConn.custom
                     ? t('pages:settings.plex.custom')
                     : recommendedConn.local
@@ -346,21 +341,14 @@ export function PlexServerSelector({
                 ) : (
                   <ChevronRight className="h-3 w-3" />
                 )}
-                {reachableCount} / {server.connections.length}{' '}
                 {isDiscovered
                   ? t('pages:settings.plex.connectionsReachable', {
                       reachable: reachableCount,
                       total: server.connections.length,
                     })
-                      .split(' ')
-                      .slice(2)
-                      .join(' ')
                   : t('pages:settings.plex.connectionsAvailable', {
                       count: server.connections.length,
-                    })
-                      .split(' ')
-                      .slice(1)
-                      .join(' ')}
+                    })}
               </button>
 
               {/* Show all toggle (for discovered servers with filtered connections) */}
@@ -497,38 +485,39 @@ export function PlexServerSelector({
                             <Globe className="h-3.5 w-3.5 flex-shrink-0 text-blue-500" />
                           )}
 
-                          {/* Connection details — show full URI, no wrapping */}
-                          <span className="whitespace-nowrap">
-                            {isCustom
-                              ? t('pages:settings.plex.custom')
-                              : conn.local
-                                ? t('pages:settings.plex.local')
-                                : t('pages:settings.plex.remote')}
-                            : {conn.uri}
-                          </span>
-
-                          {/* Secure badge for HTTPS */}
-                          {conn.uri.startsWith('https://') && (
-                            <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
-                              <Lock className="h-3 w-3" />
-                              {t('pages:settings.plex.secure')}
+                          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+                            <span className="min-w-0 flex-1 basis-60 break-all">
+                              {isCustom
+                                ? t('pages:settings.plex.custom')
+                                : conn.local
+                                  ? t('pages:settings.plex.local')
+                                  : t('pages:settings.plex.remote')}
+                              : {conn.uri}
                             </span>
-                          )}
 
-                          {/* Unreachable warning when shown via "Show all" */}
-                          {!isReachable && showingAll && !errorLabel && (
-                            <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-amber-600 dark:text-amber-500">
-                              <AlertTriangle className="h-3 w-3" />
-                              {t('pages:settings.plex.mayNotConnect')}
-                            </span>
-                          )}
+                            {/* Secure badge for HTTPS */}
+                            {conn.uri.startsWith('https://') && (
+                              <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
+                                <Lock className="h-3 w-3" />
+                                {t('pages:settings.plex.secure')}
+                              </span>
+                            )}
 
-                          {/* Recommended badge */}
-                          {isRecommended && (
-                            <span className="text-primary flex-shrink-0 text-xs font-medium">
-                              {t('pages:settings.plex.recommended')}
-                            </span>
-                          )}
+                            {/* Unreachable warning when shown via "Show all" */}
+                            {!isReachable && showingAll && !errorLabel && (
+                              <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-amber-600 dark:text-amber-500">
+                                <AlertTriangle className="h-3 w-3" />
+                                {t('pages:settings.plex.mayNotConnect')}
+                              </span>
+                            )}
+
+                            {/* Recommended badge */}
+                            {isRecommended && (
+                              <span className="text-primary flex-shrink-0 text-xs font-medium">
+                                {t('pages:settings.plex.recommended')}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         {/* Inline error detail under the URI for failed reachability */}

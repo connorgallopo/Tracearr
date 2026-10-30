@@ -192,8 +192,6 @@
       "jobAlreadyRunning": "ジョブは既に実行されています",
       "jobStartFailed": "ジョブの開始に失敗しました",
       "jobLoadFailed": "メンテナンスジョブの読み込みに失敗しました",
-      "invalidUrl": "無効な URL",
-      "plexDirectUrl": "plex.directのURLはここでは使用できないリレーアドレスです。代わりにIPアドレスまたはホスト名を使用してください。",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

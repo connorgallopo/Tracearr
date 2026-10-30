@@ -758,6 +758,98 @@ describe('Plex Auth Routes', () => {
       expect(response.json().connection.error.code).toBe('refused');
     });
 
+    it('categorizes an untrusted issuer as code: tls', async () => {
+      app = await buildUnauthenticatedTestApp();
+      mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
+      const issuerError = new Error('fetch failed');
+      (issuerError as Error & { cause?: unknown }).cause = {
+        code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+        message: 'unable to get local issuer certificate',
+      };
+      mockFetch.mockRejectedValueOnce(issuerError);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/plex/test-connection',
+        payload: { uri: 'https://192.168.1.100:32400', tempToken: 'temp-123' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json().connection.error.code).toBe('tls');
+    });
+
+    it('tests a Tailscale plex.direct URL without asking plex.tv', async () => {
+      app = await buildUnauthenticatedTestApp();
+      mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
+      mockFetch.mockResolvedValueOnce({ ok: true });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/plex/test-connection',
+        payload: { uri: 'https://100-104-221-111.abc123.plex.direct:32400', tempToken: 'temp-123' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json().connection.reachable).toBe(true);
+      expect(PlexClient.getServers).not.toHaveBeenCalled();
+    });
+
+    it("tests a plex.direct URL on the server's own public address", async () => {
+      app = await buildUnauthenticatedTestApp();
+      mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
+      vi.mocked(PlexClient.getServers).mockResolvedValue([
+        { publicAddress: '71.175.128.149', connections: [] },
+      ] as never);
+      mockFetch.mockResolvedValueOnce({ ok: true });
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/plex/test-connection',
+        payload: { uri: 'https://71-175-128-149.abc123.plex.direct:32400', tempToken: 'temp-123' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json().connection.reachable).toBe(true);
+    });
+
+    it('rejects a Plex relay URL without probing it', async () => {
+      app = await buildUnauthenticatedTestApp();
+      mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
+      vi.mocked(PlexClient.getServers).mockResolvedValue([
+        { publicAddress: '71.175.128.149', connections: [] },
+      ] as never);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/plex/test-connection',
+        payload: { uri: 'https://45-79-129-106.abc123.plex.direct:8443', tempToken: 'temp-123' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.connection.reachable).toBe(false);
+      expect(body.connection.error.code).toBe('relay');
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it('reports plex.tv being down instead of failing the request', async () => {
+      app = await buildUnauthenticatedTestApp();
+      mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
+      vi.mocked(PlexClient.getServers).mockRejectedValue(new Error('plex.tv 503'));
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/plex/test-connection',
+        payload: { uri: 'https://71-175-128-149.abc123.plex.direct:32400', tempToken: 'temp-123' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.connection.reachable).toBe(false);
+      expect(body.connection.error.message).toContain('plex.tv');
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
     it('categorizes non-OK responses as code: http with status', async () => {
       app = await buildUnauthenticatedTestApp();
       mockRedis.get.mockResolvedValue(JSON.stringify({ plexToken: 'plex-tok' }));
@@ -886,7 +978,7 @@ describe('Plex Auth Routes', () => {
       mockFetch.mockReset();
     });
 
-    it('injects saved URL as custom: true when not in plex.tv connections', async () => {
+    it('ranks an unreachable saved custom URL below reachable connections', async () => {
       app = await buildTestApp(ownerUser);
 
       const customUrl = 'http://192.168.1.99:9999';
@@ -920,7 +1012,7 @@ describe('Plex Auth Routes', () => {
       mockFetch
         .mockResolvedValueOnce({ ok: true }) // local plex.tv conn
         .mockResolvedValueOnce({ ok: true }) // remote plex.tv conn
-        .mockResolvedValueOnce({ ok: true }); // custom URL test
+        .mockRejectedValueOnce(new Error('network')); // custom URL test
 
       const response = await app.inject({
         method: 'GET',
@@ -930,11 +1022,49 @@ describe('Plex Auth Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = response.json();
       expect(body.server).not.toBeNull();
-      // Custom URL row is prepended (unshift), so it's first
-      expect(body.server.connections[0].uri).toBe(customUrl);
-      expect(body.server.connections[0].custom).toBe(true);
-      expect(body.server.connections[0].address).toBe('192.168.1.99');
-      expect(body.server.connections[0].port).toBe(9999);
+      // Reachable rows rank above the unreachable custom one, local first
+      expect(body.server.connections[0].uri).toBe('http://192.168.1.100:32400');
+      expect(body.server.recommendedUri).toBe('http://192.168.1.100:32400');
+      expect(body.server.connections[2].uri).toBe(customUrl);
+      expect(body.server.connections[2].custom).toBe(true);
+      expect(body.server.connections[2].reachable).toBe(false);
+      expect(body.server.connections[2].address).toBe('192.168.1.99');
+      expect(body.server.connections[2].port).toBe(9999);
+    });
+
+    it('keeps a reachable saved custom URL recommended over plex.tv connections', async () => {
+      app = await buildTestApp(ownerUser);
+
+      const customUrl = 'http://plex:32400';
+      const serverId = randomUUID();
+
+      vi.mocked(db.select).mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([
+          {
+            id: serverId,
+            token: 'srv-tok',
+            name: 'Home',
+            url: customUrl,
+            machineIdentifier: 'mid-abc',
+          },
+        ]),
+      } as never);
+      vi.mocked(PlexClient.getServers).mockResolvedValue([
+        { ...mockPlexServer, clientIdentifier: 'mid-abc' },
+      ]);
+      mockFetch.mockResolvedValue({ ok: true });
+
+      const response = await app.inject({
+        method: 'GET',
+        url: `/plex/server-connections/${serverId}`,
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.server.connections[0].uri).toBe('http://192.168.1.100:32400');
+      expect(body.server.recommendedUri).toBe(customUrl);
     });
 
     it('answers 409 for a historical server without contacting plex.tv or the server', async () => {

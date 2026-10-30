@@ -2164,6 +2164,7 @@
         "reset": "Verbindung zurückgesetzt",
         "tls": "TLS-Fehler",
         "http": "",
+        "relay": "",
         "unknown": "Verbindung fehlgeschlagen"
       },
       "connectionsReachable": "{{reachable}} von {{total}} Verbindungen erreichbar",

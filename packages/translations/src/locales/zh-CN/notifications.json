@@ -192,8 +192,6 @@
       "jobAlreadyRunning": "任务已在运行",
       "jobStartFailed": "启动任务失败",
       "jobLoadFailed": "加载维护任务失败",
-      "invalidUrl": "无效的 URL",
-      "plexDirectUrl": "plex.direct URL是此处不能使用的中继地址。请使用直接IP地址或主机名。",
       "userMergeFailed": "合并用户失败",
       "serverUserSplitFailed": "分割帐户失败",
       "mergeSuggestionDismissFailed": "无法忽略该建议",

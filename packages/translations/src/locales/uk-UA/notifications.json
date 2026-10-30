@@ -210,8 +210,6 @@
       "jobAlreadyRunning": "Завдання вже виконується",
       "jobStartFailed": "Не вдалося розпочати роботу",
       "jobLoadFailed": "Не вдалося завантажити завдання технічного обслуговування",
-      "invalidUrl": "Неправильна URL-адреса",
-      "plexDirectUrl": "plex.direct URL - це естафетні адреси, які не можуть бути використані тут. Замість цього використовуйте пряму IP адресу або ім'я хосту.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

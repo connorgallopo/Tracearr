@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Job kører allerede",
       "jobStartFailed": "Mislykkedes at starte job",
       "jobLoadFailed": "Kunne ikke indlæse vedligeholdelsesjob",
-      "invalidUrl": "Ugyldig URL",
-      "plexDirectUrl": "plex.direct URLs er relæadresser, der ikke kan bruges her. Brug venligst en direkte IP-adresse eller værtsnavn i stedet.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

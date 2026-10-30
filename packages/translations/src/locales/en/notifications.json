@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Job already running",
       "jobStartFailed": "Failed to start job",
       "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
       "userMergeFailed": "Failed to merge users",
       "serverUserSplitFailed": "Failed to split account",
       "mergeSuggestionDismissFailed": "Could not dismiss the suggestion",

@@ -21,6 +21,7 @@ import {
   type PlexAvailableServersResponse,
   type PlexDiscoveredServer,
   type PlexDiscoveredConnection,
+  type PlexConnectionError,
   type PlexAccountsResponse,
   type LinkPlexAccountResponse,
   type UnlinkPlexAccountResponse,
@@ -39,6 +40,8 @@ import {
 } from '../../services/liveServers.js';
 import { PlexClient } from '../../services/mediaServer/index.js';
 import {
+  compareConnections,
+  plexDirectPublicIp,
   testSingleConnection,
   testServerConnections,
 } from '../../services/mediaServer/plex/connectionTest.js';
@@ -289,13 +292,14 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
       );
 
       // If the saved URL isn't one of plex.tv's connections, it's a custom URL.
-      // Test it standalone and prepend it so the user can see + click it.
+      // Test it standalone and rank it with the rest so the user can see + click it.
+      let customResult: PlexDiscoveredConnection | undefined;
       const savedUrlIsCustom = !testedConnections.some((c) => c.uri === existingServer.url);
       if (savedUrlIsCustom) {
         try {
           const parsed = new URL(existingServer.url);
           const port = parsed.port ? Number(parsed.port) : parsed.protocol === 'https:' ? 443 : 80;
-          const customResult = await testSingleConnection(
+          customResult = await testSingleConnection(
             {
               uri: existingServer.url,
               local: false,
@@ -305,13 +309,17 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
             },
             existingServer.token
           );
-          testedConnections.unshift(customResult);
+          testedConnections.push(customResult);
+          testedConnections.sort(compareConnections);
         } catch {
           // Saved URL was malformed - skip injection rather than failing the whole request
         }
       }
 
-      const recommended = testedConnections.find((c) => c.reachable);
+      // A working saved URL stays recommended; the owner chose it on purpose
+      const recommended = customResult?.reachable
+        ? customResult
+        : testedConnections.find((c) => c.reachable);
 
       return {
         server: {
@@ -418,6 +426,42 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
         return reply.badRequest('Invalid URL');
       }
       const port = parsed.port ? Number(parsed.port) : parsed.protocol === 'https:' ? 443 : 80;
+
+      const rejected = (error: PlexConnectionError) => ({
+        connection: {
+          uri,
+          local: false,
+          address: parsed.hostname,
+          port,
+          reachable: false,
+          latencyMs: null,
+          error,
+          custom: true,
+        },
+      });
+
+      const publicIp = plexDirectPublicIp(parsed.hostname);
+      if (publicIp) {
+        let ownAddresses: string[];
+        try {
+          ownAddresses = (await PlexClient.getServers(plexToken)).flatMap((server) => [
+            server.publicAddress,
+            ...server.connections.map((conn) => conn.address),
+          ]);
+        } catch (error) {
+          app.log.warn({ err: error }, 'Failed to fetch servers from plex.tv');
+          return rejected({
+            code: 'unknown',
+            message: 'plex.tv did not answer, so this address could not be checked',
+          });
+        }
+        if (!ownAddresses.includes(publicIp)) {
+          return rejected({
+            code: 'relay',
+            message: 'Tracearr needs a direct connection to the server',
+          });
+        }
+      }
 
       const connection = await testSingleConnection(
         {

@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Työ on jo käynnissä",
       "jobStartFailed": "Työn aloittaminen epäonnistui",
       "jobLoadFailed": "Huoltotehtävien lataaminen epäonnistui",
-      "invalidUrl": "Virheellinen URL",
-      "plexDirectUrl": "plex.direct URL-osoitteet ovat releosoitteita, joita ei voi käyttää tässä. Käytä sen sijaan suoraa IP-osoitetta tai isäntänimeä.",
       "userMergeFailed": "Käyttäjien yhdistäminen epäonnistui",
       "serverUserSplitFailed": "Tilin jakaminen epäonnistui",
       "mergeSuggestionDismissFailed": "Ehdotusta ei voitu hylätä",

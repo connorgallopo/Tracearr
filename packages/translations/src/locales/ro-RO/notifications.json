@@ -204,8 +204,6 @@
       "jobAlreadyRunning": "Job ruleaza deja",
       "jobStartFailed": "Pornirea jobului a eșuat",
       "jobLoadFailed": "Încărcarea lucrărilor de întreținere a eșuat",
-      "invalidUrl": "URL invalid",
-      "plexDirectUrl": "URL-urile plex.direct sunt adrese de releu care nu pot fi folosite aici. Vă rugăm să folosiți o adresă IP directă sau numele gazdei.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

@@ -2164,6 +2164,7 @@
         "reset": "Yhteys resetoitiin",
         "tls": "TLS-virhe",
         "http": "HTTP {{status}}",
+        "relay": "",
         "unknown": "Yhteys epäonnistui"
       },
       "connectionsReachable": "{{reachable}} / {{total}} yhteyttä tavoitettavissa",

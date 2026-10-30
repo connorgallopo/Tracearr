@@ -192,8 +192,6 @@
       "jobAlreadyRunning": "任務已在運行",
       "jobStartFailed": "無法啟動任務",
       "jobLoadFailed": "無法加載維護任務",
-      "invalidUrl": "無效的網址",
-      "plexDirectUrl": "plex.direct URL 是中繼位址，這裡不能使用。請改用直接 IP 位址或主機名稱。",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

@@ -210,8 +210,6 @@
       "jobAlreadyRunning": "Вакансия уже запущена",
       "jobStartFailed": "Не удалось запустить задание",
       "jobLoadFailed": "Не удалось загрузить задания по техническому обслуживанию",
-      "invalidUrl": "Неверный URL",
-      "plexDirectUrl": "URL-адреса plex.direct это адреса ретрансляции, которые не могут быть использованы здесь. Пожалуйста, используйте прямой IP адрес или имя хоста.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

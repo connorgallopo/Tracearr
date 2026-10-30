@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Taak wordt al uitgevoerd",
       "jobStartFailed": "Taak starten mislukt",
       "jobLoadFailed": "Onderhoudstaken laden mislukt",
-      "invalidUrl": "Ongeldige URL",
-      "plexDirectUrl": "Een plex.direct-URL is een relay-adres dat hier niet gebruikt kan worden. Gebruik een direct IP-adres of hostnaam.",
       "userMergeFailed": "Het samenvoegen van gebruikers is mislukt",
       "serverUserSplitFailed": "Splitsen van het account is mislukt",
       "mergeSuggestionDismissFailed": "",

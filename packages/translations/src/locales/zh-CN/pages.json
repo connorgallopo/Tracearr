@@ -2140,6 +2140,7 @@
         "reset": "连接已重置",
         "tls": "TLS 错误",
         "http": "HTTP{{status}}",
+        "relay": "",
         "unknown": "连接失败"
       },
       "connectionsReachable": "{{reachable}} 个 {{total}} 个连接可达",

@@ -2188,6 +2188,7 @@
         "reset": "",
         "tls": "",
         "http": "",
+        "relay": "",
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} de {{total}} conexiuni accesibile",

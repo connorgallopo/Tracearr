@@ -210,8 +210,6 @@
       "jobAlreadyRunning": "Pracovní pozice již běží",
       "jobStartFailed": "Nepodařilo se spustit zakázku",
       "jobLoadFailed": "Nepodařilo se načíst úlohy údržby",
-      "invalidUrl": "Neplatná URL",
-      "plexDirectUrl": "plex.direct URL jsou překladové adresy, které zde nelze použít. Použijte prosím přímou IP adresu nebo název hostitele.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

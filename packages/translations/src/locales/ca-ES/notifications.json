@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "La tasca ja s'està executant",
       "jobStartFailed": "No s'ha pogut iniciar la tasca",
       "jobLoadFailed": "No s'han pogut carregar les tasques de manteniment",
-      "invalidUrl": "URL no vàlid",
-      "plexDirectUrl": "Els URL plex.direct són adreces de reenviament i no es poden fer servir aquí. Feu servir una adreça IP o un nom d'hoste directes.",
       "userMergeFailed": "No s'han pogut fusionar els usuaris",
       "serverUserSplitFailed": "No s'ha pogut separar el compte",
       "mergeSuggestionDismissFailed": "No s'ha pogut descartar el suggeriment",

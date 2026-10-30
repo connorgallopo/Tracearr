@@ -7,12 +7,41 @@
  * one implementation.
  */
 
+import { BlockList } from 'node:net';
 import type { PlexConnectionError, PlexDiscoveredConnection } from '@tracearr/shared';
 import { plexHeaders } from '../../../utils/http.js';
 import { assertSafeProbeUrl } from '../../../utils/ssrf.js';
 
 // Connection testing timeout in milliseconds
 export const CONNECTION_TEST_TIMEOUT = 3000;
+
+// LAN, CGNAT (Tailscale), loopback and link-local
+const NON_PUBLIC_IPV4 = new BlockList();
+for (const [network, prefix] of [
+  ['10.0.0.0', 8],
+  ['172.16.0.0', 12],
+  ['192.168.0.0', 16],
+  ['100.64.0.0', 10],
+  ['127.0.0.0', 8],
+  ['169.254.0.0', 16],
+] as const) {
+  NON_PUBLIC_IPV4.addSubnet(network, prefix);
+}
+
+/**
+ * The public IPv4 address a plex.direct hostname points at, or null for any
+ * other host. Plex relays are plex.direct hosts on the server's own domain
+ * whose address rotates, so the address is the only stable way to spot one:
+ * a public address that isn't one of the server's own is a relay.
+ */
+export function plexDirectPublicIp(hostname: string): string | null {
+  const match = /^(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})\.[0-9a-f]+\.plex\.direct$/i.exec(
+    hostname
+  );
+  if (!match) return null;
+  const ip = match.slice(1).join('.');
+  return NON_PUBLIC_IPV4.check(ip, 'ipv4') ? null : ip;
+}
 
 /**
  * Categorize a fetch failure into a stable error code + human-readable detail.
@@ -43,7 +72,10 @@ export function categorizeConnectionError(err: unknown): PlexConnectionError {
     }
     if (
       code &&
-      (code.startsWith('CERT_') || code.startsWith('ERR_TLS_') || code.includes('SELF_SIGNED'))
+      (code.startsWith('CERT_') ||
+        code.startsWith('ERR_TLS_') ||
+        code.startsWith('UNABLE_TO_') ||
+        code.includes('SELF_SIGNED'))
     ) {
       return { code: 'tls', message: detail };
     }
@@ -120,17 +152,24 @@ export async function testServerConnections(
   token: string
 ): Promise<PlexDiscoveredConnection[]> {
   const results = await Promise.all(connections.map((conn) => testSingleConnection(conn, token)));
+  return results.sort(compareConnections);
+}
 
-  // Sort: reachable first, then HTTPS, then local preference, then by latency
-  return results.sort((a, b) => {
-    if (a.reachable !== b.reachable) return a.reachable ? -1 : 1;
-    const aHttps = a.uri.startsWith('https://');
-    const bHttps = b.uri.startsWith('https://');
-    if (aHttps !== bHttps) return aHttps ? -1 : 1;
-    if (a.local !== b.local) return a.local ? -1 : 1;
-    if (a.latencyMs !== null && b.latencyMs !== null) {
-      return a.latencyMs - b.latencyMs;
-    }
-    return 0;
-  });
+/**
+ * Reachable first, then local (polling wants the shortest path), then HTTPS,
+ * then latency. The first entry is the one Tracearr recommends.
+ */
+export function compareConnections(
+  a: PlexDiscoveredConnection,
+  b: PlexDiscoveredConnection
+): number {
+  if (a.reachable !== b.reachable) return a.reachable ? -1 : 1;
+  if (a.local !== b.local) return a.local ? -1 : 1;
+  const aHttps = a.uri.startsWith('https://');
+  const bHttps = b.uri.startsWith('https://');
+  if (aHttps !== bHttps) return aHttps ? -1 : 1;
+  if (a.latencyMs !== null && b.latencyMs !== null) {
+    return a.latencyMs - b.latencyMs;
+  }
+  return 0;
 }

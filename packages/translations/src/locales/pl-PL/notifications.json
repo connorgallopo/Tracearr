@@ -210,8 +210,6 @@
       "jobAlreadyRunning": "Zadanie jest już uruchomione",
       "jobStartFailed": "Nie udało się uruchomić zadania",
       "jobLoadFailed": "Nie udało się załadować zadań konserwacyjnych",
-      "invalidUrl": "Nieprawidłowy adres URL",
-      "plexDirectUrl": "Adresy plex.direct to adresy przekaźnikowe (relay) i nie można ich tu użyć. Użyj bezpośredniego adresu IP lub nazwy hosta.",
       "userMergeFailed": "Nie udało się scalić użytkowników",
       "serverUserSplitFailed": "Nie udało się wydzielić konta",
       "mergeSuggestionDismissFailed": "Nie udało się odrzucić sugestii",

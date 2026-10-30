@@ -2164,6 +2164,7 @@
         "reset": "Verbinding reset",
         "tls": "TLS fout",
         "http": "",
+        "relay": "",
         "unknown": "Verbinding mislukt"
       },
       "connectionsReachable": "{{reachable}} van {{total}} verbindingen bereikbaar",

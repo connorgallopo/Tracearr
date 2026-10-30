@@ -2140,6 +2140,7 @@
         "reset": "연결이 재설정됨",
         "tls": "TLS 오류",
         "http": "HTTP {{status}}",
+        "relay": "",
         "unknown": "연결 실패"
       },
       "connectionsReachable": "전체 {{total}}개 중 {{reachable}}개 연결 가능",

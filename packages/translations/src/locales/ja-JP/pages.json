@@ -2140,6 +2140,7 @@
         "reset": "",
         "tls": "",
         "http": "",
+        "relay": "",
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} / {{total}} コネクションに到達可能",

@@ -2164,6 +2164,7 @@
         "reset": "",
         "tls": "",
         "http": "",
+        "relay": "",
         "unknown": ""
       },
       "connectionsReachable": "{{reachable}} {{total}} συνδέσεις προσβάσιμες",

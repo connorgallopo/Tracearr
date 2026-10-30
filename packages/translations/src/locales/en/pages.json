@@ -2193,6 +2193,7 @@
         "reset": "Connection reset",
         "tls": "TLS error",
         "http": "HTTP {{status}}",
+        "relay": "Plex relay",
         "unknown": "Connection failed"
       },
       "connectionsReachable": "{{reachable}} of {{total}} connections reachable",

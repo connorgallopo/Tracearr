@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "Η εργασία εκτελείται ήδη",
       "jobStartFailed": "Αποτυχία έναρξης εργασίας",
       "jobLoadFailed": "Αποτυχία φόρτωσης εργασιών συντήρησης",
-      "invalidUrl": "Μη Έγκυρο URL",
-      "plexDirectUrl": "Οι διευθύνσεις URL plex.direct είναι διευθύνσεις ρελέ που δεν μπορούν να χρησιμοποιηθούν εδώ. Παρακαλώ χρησιμοποιήστε μια άμεση διεύθυνση IP ή όνομα κεντρικού υπολογιστή.",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

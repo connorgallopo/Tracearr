@@ -198,8 +198,6 @@
       "jobAlreadyRunning": "",
       "jobStartFailed": "",
       "jobLoadFailed": "",
-      "invalidUrl": "",
-      "plexDirectUrl": "",
       "userMergeFailed": "",
       "serverUserSplitFailed": "",
       "mergeSuggestionDismissFailed": "",

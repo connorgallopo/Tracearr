@@ -2164,6 +2164,7 @@
         "reset": "Connexió reiniciada",
         "tls": "Error de TLS",
         "http": "HTTP {{status}}",
+        "relay": "",
         "unknown": "Ha fallat la connexió"
       },
       "connectionsReachable": "{{reachable}} de {{total}} connexions accessibles",
