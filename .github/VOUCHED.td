@@ -25,3 +25,4 @@ pelluch
 -ramonskie Contributing guide completely ignored
 spartacusiam Quality bug report, history of detailed high quality reports
 -tottencam AI slop bug report - fictional issue
+-xenouniv3rse Multiple AI usage violations
