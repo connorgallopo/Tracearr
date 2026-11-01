@@ -279,7 +279,10 @@
         "title": "Unlink {{username}}?",
         "body": "Its plays move back to a person of their own. Tracearr signs you out everywhere except this browser and your paired phones."
       }
-    }
+    },
+    "librarySync": "Sync library catalog",
+    "librarySyncDesc": "Inventory this server’s libraries for analytics. Turn off for on-demand catalogues like Ether where session monitoring is enough.",
+    "librarySyncDisabled": "Library sync is disabled for this server"
   },
   "mobile": {
     "lastSeen": "Last seen {{when}}",

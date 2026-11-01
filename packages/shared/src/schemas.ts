@@ -244,6 +244,7 @@ export const updateServerSchema = z
     publicUrl: publicUrlSchema.optional(),
     apiKey: z.string().trim().min(1).optional(),
     allowMemberLogin: z.boolean().optional(),
+    librarySyncEnabled: z.boolean().optional(),
   })
   .refine(
     (data) =>
@@ -252,10 +253,11 @@ export const updateServerSchema = z
       data.color !== undefined ||
       data.publicUrl !== undefined ||
       data.apiKey !== undefined ||
-      data.allowMemberLogin !== undefined,
+      data.allowMemberLogin !== undefined ||
+      data.librarySyncEnabled !== undefined,
     {
       message:
-        'At least one of name, url, color, publicUrl, apiKey, or allowMemberLogin is required',
+        'At least one of name, url, color, publicUrl, apiKey, allowMemberLogin, or librarySyncEnabled is required',
     }
   );
 

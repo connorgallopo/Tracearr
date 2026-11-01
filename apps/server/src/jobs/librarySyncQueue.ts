@@ -571,6 +571,16 @@ async function checkAndTriggerSnapshotBackfill(): Promise<void> {
   }
 }
 
+async function isLibrarySyncEnabled(serverId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ librarySyncEnabled: servers.librarySyncEnabled })
+    .from(servers)
+    .where(eq(servers.id, serverId))
+    .limit(1);
+  // Missing row or pre-migration payloads should keep the previous always-on behavior.
+  return row?.librarySyncEnabled !== false;
+}
+
 async function applyAutoSyncSchedules(allServers: ServerRow[]): Promise<void> {
   if (!librarySyncQueue) {
     throw new Error('Library sync queue not initialized');
@@ -582,15 +592,24 @@ async function applyAutoSyncSchedules(allServers: ServerRow[]): Promise<void> {
     await librarySyncQueue.removeJobScheduler(scheduler.key);
   }
 
-  if (allServers.length === 0) {
+  const syncServers = allServers.filter((server) => server.librarySyncEnabled !== false);
+  for (const server of allServers) {
+    if (server.librarySyncEnabled === false) {
+      console.log(
+        `[LibrarySync] Not scheduling auto-sync for ${server.name} (library sync disabled)`
+      );
+    }
+  }
+
+  if (syncServers.length === 0) {
     console.log('[LibrarySync] No live servers found - no auto-sync scheduled');
     return;
   }
 
   // Add repeatable job for each server with staggered cron times
   // Spreads DB, Redis, and API load across servers instead of firing all at once
-  for (let i = 0; i < allServers.length; i++) {
-    const server = allServers[i]!;
+  for (let i = 0; i < syncServers.length; i++) {
+    const server = syncServers[i]!;
     const minuteOffset = (10 + i * 4) % 60; // Server 0 at :10, server 1 at :14, wraps at 60
 
     await librarySyncQueue.upsertJobScheduler(
@@ -604,7 +623,7 @@ async function applyAutoSyncSchedules(allServers: ServerRow[]): Promise<void> {
   }
 
   console.log(
-    `[LibrarySync] Scheduled auto-sync for ${allServers.length} server(s) every 12 hours (staggered)`
+    `[LibrarySync] Scheduled auto-sync for ${syncServers.length} server(s) every 12 hours (staggered)`
   );
 }
 
@@ -631,26 +650,36 @@ export async function scheduleAutoSync(): Promise<void> {
 
   const allServers = await liveServers();
   await applyAutoSyncSchedules(allServers);
-  if (allServers.length === 0) return;
+  const syncServers = allServers.filter((server) => server.librarySyncEnabled !== false);
+  if (syncServers.length === 0) return;
 
-  for (const [i, server] of allServers.entries()) {
+  for (const [i, server] of syncServers.entries()) {
     await enqueueLibrarySync(server.id, 'boot', undefined, (i + 1) * 10_000);
   }
 
-  console.log(`[LibrarySync] Queued boot sync for ${allServers.length} server(s)`);
+  console.log(`[LibrarySync] Queued boot sync for ${syncServers.length} server(s)`);
 }
 
 /**
  * Queue a sync for the server; the add is dropped while one is already queued or
  * running for it. A dropped manual request throws so the route can answer 409.
+ * Returns null when library sync is disabled for the server (except manual, which throws).
  */
 export async function enqueueLibrarySync(
   serverId: string,
   triggeredBy: 'manual' | 'scheduled' | 'boot' | 'event',
   userId?: string,
   delay?: number
-): Promise<string> {
+): Promise<string | null> {
   if (!librarySyncQueue) throw new Error('Library sync queue not initialized');
+
+  if (!(await isLibrarySyncEnabled(serverId))) {
+    if (triggeredBy === 'manual') {
+      throw new Error('Library sync is disabled for this server');
+    }
+    console.log(`[LibrarySync] Skipping enqueue for server ${serverId} (library sync disabled)`);
+    return null;
+  }
 
   if (triggeredBy === 'manual') {
     // A manual sync supersedes a queued automatic one; a job that already reached active refuses removal and the add below is then dropped.

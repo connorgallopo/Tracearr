@@ -213,7 +213,15 @@ export function ServerRow({
           </ItemContent>
 
           <ItemActions>
-            <Button variant="ghost" size="sm" onClick={onSync} disabled={isSyncing || historical}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSync}
+              disabled={isSyncing || historical || server.librarySyncEnabled === false}
+              title={
+                server.librarySyncEnabled === false ? t('servers.librarySyncDisabled') : undefined
+              }
+            >
               <RefreshCw className={cn(isSyncing && 'animate-spin')} />
               {t('common:actions.sync')}
             </Button>

@@ -62,6 +62,8 @@ export interface Server {
   /** When Tracearr stopped contacting this server. Null, or absent on older payloads, while it is live. */
   historicalAt?: string | null;
   allowMemberLogin?: boolean;
+  /** When false, Tracearr skips library catalog sync but keeps session monitoring. Defaults to true. */
+  librarySyncEnabled?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

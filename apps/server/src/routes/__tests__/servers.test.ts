@@ -228,6 +228,8 @@ const mockServer = {
   url: 'http://localhost:32400',
   token: 'encrypted_test-token',
   historicalAt: null as Date | null,
+  allowMemberLogin: false,
+  librarySyncEnabled: true,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -840,6 +842,27 @@ describe('Server Routes', () => {
         expect(condition).toContain('is_disabled =');
       }
     );
+
+    it('persists librarySyncEnabled and rebuilds auto-sync schedules', async () => {
+      app = await buildTestApp(ownerUser);
+      const server = { ...mockServer, librarySyncEnabled: true };
+      mockDbSelectLimit([server]);
+      const update = mockDbUpdateReturning([{ ...server, librarySyncEnabled: false }]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${server.id}`,
+        payload: { librarySyncEnabled: false },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(update.set).toHaveBeenCalledWith({
+        librarySyncEnabled: false,
+        updatedAt: expect.any(Date),
+      });
+      expect(response.json().librarySyncEnabled).toBe(false);
+      expect(rebuildAutoSyncSchedules).toHaveBeenCalledTimes(1);
+    });
 
     it('updates server name only for owner', async () => {
       app = await buildTestApp(ownerUser);

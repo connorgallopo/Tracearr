@@ -4,10 +4,23 @@ vi.mock('../../serverState.js', () => ({
   isMaintenance: vi.fn().mockReturnValue(false),
 }));
 
-const { mockDbServers, mockIsLiveServer } = vi.hoisted(() => ({
-  mockDbServers: vi.fn(async (): Promise<Array<{ id: string; name: string }>> => []),
-  mockIsLiveServer: vi.fn(async (_id: string) => true),
-}));
+const { mockDbServers, mockIsLiveServer, mockLibrarySyncEnabledLookup, mockDbFrom } = vi.hoisted(
+  () => {
+    const mockLibrarySyncEnabledLookup = vi.fn(async (_id?: string) => true);
+    return {
+      mockDbServers: vi.fn(
+        async (): Promise<Array<{ id: string; name: string; librarySyncEnabled?: boolean }>> => []
+      ),
+      mockIsLiveServer: vi.fn(async (_id: string) => true),
+      mockLibrarySyncEnabledLookup,
+      mockDbFrom: vi.fn(() => ({
+        where: () => ({
+          limit: async () => [{ librarySyncEnabled: await mockLibrarySyncEnabledLookup() }],
+        }),
+      })),
+    };
+  }
+);
 
 vi.mock('../../services/liveServers.js', () => ({
   liveServers: (...args: unknown[]) => mockDbServers(...(args as [])),
@@ -15,7 +28,11 @@ vi.mock('../../services/liveServers.js', () => ({
 }));
 
 vi.mock('../../db/client.js', () => ({
-  db: { select: () => ({ from: mockDbServers }) },
+  db: {
+    select: () => ({
+      from: (...args: unknown[]) => mockDbFrom(...(args as [])),
+    }),
+  },
 }));
 
 vi.mock('../../services/librarySync.js', () => ({
@@ -150,6 +167,7 @@ function tickJob(serverId: string, extra: Record<string, unknown> = {}) {
 describe('enqueueLibrarySync', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockLibrarySyncEnabledLookup.mockResolvedValue(true);
     mockQueueGetJobs.mockResolvedValue([]);
     await shutdownLibrarySyncQueue();
     initLibrarySyncQueue('redis://localhost:6379');
@@ -242,11 +260,29 @@ describe('enqueueLibrarySync', () => {
       expect.objectContaining({ delay: 20_000, deduplication: { id: 'sync-srv-1' } })
     );
   });
+
+  it('skips non-manual enqueue when library sync is disabled', async () => {
+    mockLibrarySyncEnabledLookup.mockResolvedValue(false);
+
+    await expect(enqueueLibrarySync('srv-1', 'boot')).resolves.toBeNull();
+    await expect(enqueueLibrarySyncFromEvent('srv-1')).resolves.toBeUndefined();
+    expect(mockQueueAdd).not.toHaveBeenCalled();
+  });
+
+  it('manual enqueue throws when library sync is disabled', async () => {
+    mockLibrarySyncEnabledLookup.mockResolvedValue(false);
+
+    await expect(enqueueLibrarySync('srv-1', 'manual')).rejects.toThrow(
+      'Library sync is disabled for this server'
+    );
+    expect(mockQueueAdd).not.toHaveBeenCalled();
+  });
 });
 
 describe('scheduleAutoSync', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockLibrarySyncEnabledLookup.mockResolvedValue(true);
     mockQueueGetJobs.mockResolvedValue([]);
     mockGetJobSchedulers.mockResolvedValue([]);
     mockDbServers.mockResolvedValue([
@@ -329,6 +365,28 @@ describe('scheduleAutoSync', () => {
     expect(mockRemoveJobScheduler).toHaveBeenCalledTimes(2);
     expect(mockUpsertJobScheduler).not.toHaveBeenCalled();
     expect(mockQueueAdd).not.toHaveBeenCalled();
+  });
+
+  it('skips servers with library sync disabled when scheduling', async () => {
+    mockDbServers.mockResolvedValue([
+      { id: 'srv-1', name: 'Server One', librarySyncEnabled: true },
+      { id: 'srv-2', name: 'Ether', librarySyncEnabled: false },
+    ]);
+
+    await scheduleAutoSync();
+
+    expect(mockUpsertJobScheduler).toHaveBeenCalledTimes(1);
+    expect(mockUpsertJobScheduler).toHaveBeenCalledWith(
+      'scheduled-srv-1',
+      expect.anything(),
+      expect.objectContaining({ name: 'auto-sync-srv-1' })
+    );
+    expect(mockQueueAdd).toHaveBeenCalledTimes(1);
+    expect(mockQueueAdd).toHaveBeenCalledWith(
+      'boot-sync-srv-1',
+      { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      expect.objectContaining({ deduplication: { id: 'sync-srv-1' } })
+    );
   });
 });
 
@@ -813,7 +871,7 @@ describe('library sync worker - imported history link hand-off', () => {
 
   /** Fires the worker's completed handler for a finished sync of a server of `type`. */
   async function complete(type: string, returnvalue: unknown) {
-    mockDbServers.mockImplementation((() => ({
+    mockDbFrom.mockImplementation((() => ({
       where: () => Object.assign(Promise.resolve([{ type }]), { limit: async () => [] }),
     })) as never);
     startLibrarySyncWorker();

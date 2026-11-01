@@ -73,6 +73,7 @@ export function useUpdateServer({ silent = false }: { silent?: boolean } = {}) {
       publicUrl,
       apiKey,
       allowMemberLogin,
+      librarySyncEnabled,
     }: {
       id: string;
       name?: string;
@@ -82,6 +83,7 @@ export function useUpdateServer({ silent = false }: { silent?: boolean } = {}) {
       publicUrl?: string | null;
       apiKey?: string;
       allowMemberLogin?: boolean;
+      librarySyncEnabled?: boolean;
     }) =>
       api.servers.update(id, {
         name,
@@ -91,6 +93,7 @@ export function useUpdateServer({ silent = false }: { silent?: boolean } = {}) {
         publicUrl,
         apiKey,
         allowMemberLogin,
+        librarySyncEnabled,
       }),
     onSuccess: () => {
       const refreshed = Promise.all([

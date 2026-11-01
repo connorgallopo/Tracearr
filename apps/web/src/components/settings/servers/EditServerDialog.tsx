@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldTitle } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { AutosaveSwitchField } from '@/components/ui/autosave-field';
 import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicker';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { api } from '@/lib/api';
@@ -21,8 +22,10 @@ import { cn } from '@/lib/utils';
 import {
   usePlexServerConnections,
   useServerLocations,
+  useUpdateServer,
   useUpdateServerLocations,
 } from '@/hooks/queries';
+import { useMutationSaveStatus } from '@/hooks/useMutationSaveStatus';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 import { ServerLocationEditor } from './ServerLocationEditor';
 import { draftsKey, toDrafts, toEntries, type LocationDraft } from './serverLocationDrafts';
@@ -71,6 +74,8 @@ export function EditServerDialog({
     isError: locationsFailed,
   } = useServerLocations(server?.id);
   const updateLocations = useUpdateServerLocations();
+  const updateLibrarySync = useUpdateServer({ silent: true });
+  const librarySyncStatus = useMutationSaveStatus(updateLibrarySync);
   const [drafts, setDrafts] = useState<LocationDraft[]>([]);
   const [locationBaseline, setLocationBaseline] = useState('');
   const [locationsSeededFor, setLocationsSeededFor] = useState<string | null>(null);
@@ -273,6 +278,25 @@ export function EditServerDialog({
             />
             <FieldDescription>{t('servers.serverColorDesc')}</FieldDescription>
           </Field>
+
+          {!locked && (
+            <AutosaveSwitchField
+              id={`librarySyncEnabled-${server.id}`}
+              label={t('servers.librarySync')}
+              description={t('servers.librarySyncDesc')}
+              checked={
+                updateLibrarySync.isPending
+                  ? (updateLibrarySync.variables?.librarySyncEnabled ?? true)
+                  : (server.librarySyncEnabled ?? true)
+              }
+              onChange={(next) =>
+                updateLibrarySync.mutate({ id: server.id, librarySyncEnabled: next })
+              }
+              status={librarySyncStatus}
+              errorMessage={updateLibrarySync.error?.message}
+              onReset={updateLibrarySync.reset}
+            />
+          )}
 
           {locationsSeeded && (
             <ServerLocationEditor

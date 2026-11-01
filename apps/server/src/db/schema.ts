@@ -119,6 +119,8 @@ export const servers = pgTable(
     // Set when Tracearr stops contacting this server; its history stays. Null while live.
     historicalAt: timestamp('historical_at', { withTimezone: true }),
     allowMemberLogin: boolean('allow_member_login').notNull().default(false),
+    // When false, Tracearr keeps session monitoring but skips library catalog sync for this server.
+    librarySyncEnabled: boolean('library_sync_enabled').notNull().default(true),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

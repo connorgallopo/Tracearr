@@ -796,6 +796,7 @@ class ApiClient {
         publicUrl?: string | null;
         apiKey?: string;
         allowMemberLogin?: boolean;
+        librarySyncEnabled?: boolean;
       }
     ) =>
       this.request<Server>(`/servers/${id}`, {

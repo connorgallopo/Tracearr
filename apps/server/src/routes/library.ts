@@ -66,6 +66,9 @@ export const libraryRoutes: FastifyPluginAsync = async (app) => {
         if (error instanceof Error && error.message.includes('already in progress')) {
           return reply.conflict(error.message);
         }
+        if (error instanceof Error && error.message.includes('Library sync is disabled')) {
+          return reply.badRequest(error.message);
+        }
         throw error;
       }
     }

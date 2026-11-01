@@ -60,6 +60,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         latestVersion: servers.latestVersion,
         historicalAt: servers.historicalAt,
         allowMemberLogin: servers.allowMemberLogin,
+        librarySyncEnabled: servers.librarySyncEnabled,
         createdAt: servers.createdAt,
         updatedAt: servers.updatedAt,
       })
@@ -296,6 +297,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       publicUrl: newPublicUrl,
       apiKey: newApiKey,
       allowMemberLogin: newAllowMemberLogin,
+      librarySyncEnabled: newLibrarySyncEnabled,
     } = body.data;
     const newUrl = bodyUrl !== undefined ? bodyUrl.replace(/\/$/, '') : undefined;
     const authUser = request.user;
@@ -330,6 +332,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       same(newPublicUrl, server.publicUrl) &&
       same(newApiKey, server.token) &&
       same(newAllowMemberLogin, server.allowMemberLogin) &&
+      same(newLibrarySyncEnabled, server.librarySyncEnabled) &&
       // Off again is how a revoke that failed gets retried.
       newAllowMemberLogin !== false
     ) {
@@ -342,6 +345,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         color: server.color,
         historicalAt: server.historicalAt,
         allowMemberLogin: server.allowMemberLogin,
+        librarySyncEnabled: server.librarySyncEnabled,
         createdAt: server.createdAt,
         updatedAt: server.updatedAt,
       };
@@ -450,6 +454,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       token?: string;
       machineIdentifier?: string;
       allowMemberLogin?: boolean;
+      librarySyncEnabled?: boolean;
       updatedAt: Date;
     } = { updatedAt: new Date() };
     if (backfilledIdentity !== undefined) updatePayload.machineIdentifier = backfilledIdentity;
@@ -459,6 +464,8 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     if (newPublicUrl !== undefined) updatePayload.publicUrl = newPublicUrl;
     if (newApiKey !== undefined) updatePayload.token = newApiKey;
     if (newAllowMemberLogin !== undefined) updatePayload.allowMemberLogin = newAllowMemberLogin;
+    if (newLibrarySyncEnabled !== undefined)
+      updatePayload.librarySyncEnabled = newLibrarySyncEnabled;
 
     const updated = await db
       .update(servers)
@@ -473,6 +480,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         color: servers.color,
         historicalAt: servers.historicalAt,
         allowMemberLogin: servers.allowMemberLogin,
+        librarySyncEnabled: servers.librarySyncEnabled,
         createdAt: servers.createdAt,
         updatedAt: servers.updatedAt,
       });
@@ -527,6 +535,21 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
     if (newName !== undefined) {
       app.log.info({ serverId: id, oldName: server.name, newName }, 'Server name updated');
+    }
+    if (
+      newLibrarySyncEnabled !== undefined &&
+      newLibrarySyncEnabled !== server.librarySyncEnabled
+    ) {
+      app.log.info(
+        { serverId: id, librarySyncEnabled: newLibrarySyncEnabled },
+        'Server library sync setting updated'
+      );
+      rebuildAutoSyncSchedules().catch((error: unknown) => {
+        app.log.error(
+          { err: error, serverId: id },
+          'Failed to rebuild library sync schedules after librarySyncEnabled change'
+        );
+      });
     }
 
     return result;

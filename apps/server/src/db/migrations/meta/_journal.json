@@ -883,6 +883,13 @@
       "when": 1792965740499,
       "tag": "0125_drop_coming_soon_placeholders",
       "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1793572402871,
+      "tag": "0126_library_sync_enabled",
+      "breakpoints": true
     }
   ]
 }
