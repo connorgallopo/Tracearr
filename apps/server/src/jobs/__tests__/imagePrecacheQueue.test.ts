@@ -21,6 +21,7 @@ import type { Job } from 'bullmq';
 
 const mockGetSetting = vi.fn();
 const mockGetLibrarySyncStatus = vi.fn();
+const mockIsLibrarySyncEnabled = vi.fn();
 const mockProxyImage = vi.fn();
 const mockPosterCacheEntryExists = vi.fn();
 const mockDbSelect = vi.fn();
@@ -40,6 +41,10 @@ vi.mock('../../services/settings.js', () => ({
 
 vi.mock('../librarySyncQueue.js', () => ({
   getLibrarySyncStatus: (...args: unknown[]) => mockGetLibrarySyncStatus(...args),
+}));
+
+vi.mock('../librarySyncEnabled.js', () => ({
+  isLibrarySyncEnabled: (...args: unknown[]) => mockIsLibrarySyncEnabled(...args),
 }));
 
 vi.mock('../../services/imageProxy.js', () => ({
@@ -185,6 +190,7 @@ describe('imagePrecacheQueue', () => {
     await shutdownImagePrecacheQueue();
     initImagePrecacheQueue('redis://localhost:6379');
     mockGetSetting.mockResolvedValue(true);
+    mockIsLibrarySyncEnabled.mockResolvedValue(true);
     mockGetAllActiveSessions.mockResolvedValue([]);
     mockGetLibrarySyncStatus.mockResolvedValue({ isActive: false });
     mockProxyImage.mockResolvedValue({
@@ -225,6 +231,15 @@ describe('imagePrecacheQueue', () => {
 
     it('does not enqueue when imagePrecacheEnabled is false', async () => {
       mockGetSetting.mockResolvedValue(false);
+
+      const result = await enqueueImagePrecache('server-1');
+
+      expect(mockQueueAdd).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
+    });
+
+    it('does not enqueue when library sync is disabled for the server', async () => {
+      mockIsLibrarySyncEnabled.mockResolvedValue(false);
 
       const result = await enqueueImagePrecache('server-1');
 
@@ -623,6 +638,17 @@ describe('imagePrecacheQueue', () => {
       const result = await processImagePrecacheJob(makeJob({ serverId: 'server-1', cursor: null }));
 
       expect(result).toEqual({ skipped: true, reason: 'disabled' });
+      expect(mockBatchFetch).toHaveBeenCalledTimes(1);
+      expect(redisStore.get(REDIS_KEYS.LIBRARY_PRECACHE_LAST_FULL('server-1'))).toBeUndefined();
+    });
+
+    it('stops a running pass at the next batch once library sync is disabled', async () => {
+      mockIsLibrarySyncEnabled.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+      mockBatchQuery(fullBatch(), fullBatch(50).slice(0, 10));
+
+      const result = await processImagePrecacheJob(makeJob({ serverId: 'server-1', cursor: null }));
+
+      expect(result).toEqual({ skipped: true, reason: 'library-sync-disabled' });
       expect(mockBatchFetch).toHaveBeenCalledTimes(1);
       expect(redisStore.get(REDIS_KEYS.LIBRARY_PRECACHE_LAST_FULL('server-1'))).toBeUndefined();
     });

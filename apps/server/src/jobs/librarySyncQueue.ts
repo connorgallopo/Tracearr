@@ -40,6 +40,7 @@ import {
   yieldJob,
 } from './jobSafety.js';
 import { enqueueImagePrecache } from './imagePrecacheQueue.js';
+import { isLibrarySyncEnabled } from './librarySyncEnabled.js';
 import { resolvePrecachePass } from './precachePassPolicy.js';
 import { VALID_LIBRARY_ITEM_CONDITION } from '../utils/snapshotValidation.js';
 import { scheduleImageCacheSweep } from '../services/imageCacheSweep.js';
@@ -569,16 +570,6 @@ async function checkAndTriggerSnapshotBackfill(): Promise<void> {
       console.error('[LibrarySync] Failed to check/trigger snapshot backfill:', error);
     }
   }
-}
-
-async function isLibrarySyncEnabled(serverId: string): Promise<boolean> {
-  const [row] = await db
-    .select({ librarySyncEnabled: servers.librarySyncEnabled })
-    .from(servers)
-    .where(eq(servers.id, serverId))
-    .limit(1);
-  // Missing row or pre-migration payloads should keep the previous always-on behavior.
-  return row?.librarySyncEnabled !== false;
 }
 
 async function applyAutoSyncSchedules(allServers: ServerRow[]): Promise<void> {

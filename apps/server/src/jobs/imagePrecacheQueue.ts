@@ -35,6 +35,7 @@ import { isLiveServer } from '../services/liveServers.js';
 import { getRedis } from '../lib/redisShared.js';
 import { getSetting } from '../services/settings.js';
 import { getLibrarySyncStatus } from './librarySyncQueue.js';
+import { isLibrarySyncEnabled } from './librarySyncEnabled.js';
 import {
   WORKER_DEFAULTS,
   addSingleton,
@@ -238,9 +239,10 @@ export function startImagePrecacheWorker(): void {
 
 /**
  * Enqueue an image precache pass for a server. No-ops when the setting is
- * disabled, the queue isn't initialized, or a pass for the server is already
- * queued or running, so callers don't need to check any of that themselves.
- * A returned job id is the caller's proof that a pass really queued.
+ * disabled, library sync is off for the server, the queue isn't initialized,
+ * or a pass for the server is already queued or running, so callers don't
+ * need to check any of that themselves. A returned job id is the caller's
+ * proof that a pass really queued.
  */
 export async function enqueueImagePrecache(
   serverId: string,
@@ -248,6 +250,10 @@ export async function enqueueImagePrecache(
 ): Promise<string | undefined> {
   if (!imagePrecacheQueue) return undefined;
   if (!(await getSetting('imagePrecacheEnabled'))) return undefined;
+  if (!(await isLibrarySyncEnabled(serverId))) {
+    console.log(`[ImagePrecache] Skipping enqueue for server ${serverId} (library sync disabled)`);
+    return undefined;
+  }
   const { jobId, accepted } = await addSingleton(
     imagePrecacheQueue,
     'precache',
@@ -428,6 +434,9 @@ export async function processImagePrecacheJob(
 
   while (true) {
     if (!(await getSetting('imagePrecacheEnabled'))) return { skipped: true, reason: 'disabled' };
+    if (!(await isLibrarySyncEnabled(serverId))) {
+      return { skipped: true, reason: 'library-sync-disabled' };
+    }
     if (signal?.aborted) {
       await checkpoint(job, { passStartedAt });
       await yieldJob(job, job.token, 0);
