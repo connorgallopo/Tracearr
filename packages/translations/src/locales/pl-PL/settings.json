@@ -281,7 +281,10 @@
         "title": "",
         "body": ""
       }
-    }
+    },
+    "librarySync": "",
+    "librarySyncDesc": "",
+    "librarySyncDisabled": ""
   },
   "mobile": {
     "lastSeen": "Ostatnio aktywne {{when}}",

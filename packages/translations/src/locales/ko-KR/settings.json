@@ -278,7 +278,10 @@
         "title": "",
         "body": ""
       }
-    }
+    },
+    "librarySync": "",
+    "librarySyncDesc": "",
+    "librarySyncDisabled": ""
   },
   "mobile": {
     "lastSeen": "마지막 접속: {{when}}",
