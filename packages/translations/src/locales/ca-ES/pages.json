@@ -608,6 +608,10 @@
         "title": "La biblioteca encara no està sincronitzada",
         "body": "Les estadístiques de la biblioteca apareixeran aquí quan s'hagi sincronitzat la biblioteca. Normalment això passa automàticament cada hora."
       },
+      "syncDisabled": {
+        "title": "",
+        "body": ""
+      },
       "noMedia": {
         "title": "Encara no hi ha pel·lícules ni sèries",
         "body": "Aquesta biblioteca està sincronitzada, però encara no conté cap pel·lícula ni sèrie."

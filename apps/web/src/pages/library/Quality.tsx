@@ -13,6 +13,7 @@ import { useLibraryQuality, useLibraryStatus } from '@/hooks/queries';
 import { QUALITY_MEDIA_TYPES, useMediaType } from '@/hooks/useMediaType';
 import { useServer } from '@/hooks/useServer';
 import { useTimeRange, type ApiLibraryParams } from '@/hooks/useTimeRange';
+import { allSelectedNeedLibraryEmptyState } from '@/lib/servers';
 import type { Server } from '@tracearr/shared';
 
 type MediaTypeFilter = (typeof QUALITY_MEDIA_TYPES)[number];
@@ -85,29 +86,13 @@ export function LibraryQuality() {
     );
   }
 
-  // Gate on empty/setup state:
-  // - Single-server: same as before - check the one server.
-  // - Multi-server: only show page-level empty state if EVERY selected server needs setup.
-  const needsSetup = (() => {
-    if (isMultiServer) {
-      // All servers need setup -> show page-level empty state
-      return (
-        serverIds.length > 0 &&
-        serverIds.every((id) => {
-          const entry = statusResult.byServer.get(id);
-          if (!entry || entry.isLoading) return false;
-          const d = entry.data;
-          return !d?.isSynced || d?.needsBackfill || d?.isBackfillRunning;
-        })
-      );
-    }
-    if (singleServerId) {
-      const entry = statusResult.byServer.get(singleServerId);
-      const d = entry?.data;
-      return !statusResult.isLoading && (!d?.isSynced || d?.needsBackfill || d?.isBackfillRunning);
-    }
-    return false;
-  })();
+  // Gate on empty/setup state: session-only servers never count as "need to
+  // sync". If every selected server is session-only, still show empty state.
+  const needsSetup = allSelectedNeedLibraryEmptyState(
+    selectedServers,
+    statusResult.byServer,
+    statusResult.isLoading
+  );
 
   if (needsSetup) {
     return (

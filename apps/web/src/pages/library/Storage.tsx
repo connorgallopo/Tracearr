@@ -33,6 +33,7 @@ import { useMultiServerQuery } from '@/hooks/useMultiServerQuery';
 import { useServer } from '@/hooks/useServer';
 import { useTimeRange } from '@/hooks/useTimeRange';
 import { formatBytes } from '@/lib/formatters';
+import { allSelectedNeedLibraryEmptyState } from '@/lib/servers';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -232,14 +233,16 @@ export function LibraryStorage() {
     }
   };
 
-  // Show empty state only if ALL selected servers need setup
+  // Show empty state only if every sync-enabled selected server needs setup
+  // (session-only servers are skipped, unless they are the whole selection).
   const allNeedSetup = useMemo(() => {
-    if (statusResult.isLoading || selectedServerIds.length === 0) return false;
-    return selectedServerIds.every((id) => {
-      const s = statusResult.byServer.get(id)?.data;
-      return !s?.isSynced || s.needsBackfill || s.isBackfillRunning;
-    });
-  }, [statusResult, selectedServerIds]);
+    const selected = selectedServers.filter((server) => selectedServerIds.includes(server.id));
+    return allSelectedNeedLibraryEmptyState(
+      selected,
+      statusResult.byServer,
+      statusResult.isLoading
+    );
+  }, [statusResult, selectedServerIds, selectedServers]);
 
   if (allStorageErrors && firstStorageError) {
     return (

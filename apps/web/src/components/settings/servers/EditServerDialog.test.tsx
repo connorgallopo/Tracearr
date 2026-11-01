@@ -18,6 +18,16 @@ vi.mock('@/hooks/queries', () => ({
     isFetchedAfterMount: true,
   })),
   useUpdateServerLocations: vi.fn(() => ({ mutateAsync, isPending: false })),
+  useUpdateServer: vi.fn(() => ({
+    mutate: vi.fn(),
+    reset: vi.fn(),
+    isPending: false,
+    isError: false,
+    isSuccess: false,
+    submittedAt: 0,
+    variables: undefined,
+    error: null,
+  })),
 }));
 vi.mock('@/components/map/LocationPicker', () => ({ LocationPicker: () => <div>map</div> }));
 vi.mock('@/components/settings/shared/CountrySelect', () => ({

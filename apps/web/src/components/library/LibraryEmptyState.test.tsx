@@ -39,7 +39,7 @@ const mockUseServer = vi.mocked(useServer);
 const mockUseLibraryStatus = vi.mocked(useLibraryStatus);
 const mockUseSocket = vi.mocked(useSocket);
 
-function server(id: string, name: string): Server {
+function server(id: string, name: string, overrides: Partial<Server> = {}): Server {
   return {
     id,
     name,
@@ -48,6 +48,7 @@ function server(id: string, name: string): Server {
     color: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    ...overrides,
   };
 }
 
@@ -271,5 +272,65 @@ describe('LibraryEmptyState', () => {
 
     expect(screen.getByText('Generating historical data...')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Sync Now/i })).not.toBeInTheDocument();
+  });
+
+  it('single server with library sync disabled: explains session-only and hides Sync Now', () => {
+    mockUseServer.mockReturnValue(
+      useServerReturn(['s1'], [server('s1', 'Ether', { librarySyncEnabled: false })])
+    );
+    mockUseLibraryStatus.mockReturnValue(
+      statusResult({
+        s1: {
+          isSynced: false,
+          isSyncRunning: false,
+          needsBackfill: false,
+          isBackfillRunning: false,
+          backfillDays: null,
+        },
+      })
+    );
+
+    render(<LibraryEmptyState />, { wrapper: wrapper() });
+
+    expect(
+      screen.getByRole('heading', {
+        name: /Library sync is disabled|library\.emptyState\.syncDisabled\.title/,
+      })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Library not synced yet')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Sync Now/i })).not.toBeInTheDocument();
+  });
+
+  it('multi-server: skips a session-only server in the Sync Now list', () => {
+    mockUseServer.mockReturnValue(
+      useServerReturn(
+        ['s1', 's2'],
+        [server('s1', 'Plex'), server('s2', 'Ether', { librarySyncEnabled: false })]
+      )
+    );
+    mockUseLibraryStatus.mockReturnValue(
+      statusResult({
+        s1: {
+          isSynced: false,
+          isSyncRunning: false,
+          needsBackfill: false,
+          isBackfillRunning: false,
+          backfillDays: null,
+        },
+        s2: {
+          isSynced: false,
+          isSyncRunning: false,
+          needsBackfill: false,
+          isBackfillRunning: false,
+          backfillDays: null,
+        },
+      })
+    );
+
+    render(<LibraryEmptyState />, { wrapper: wrapper() });
+
+    expect(screen.getByText('Plex')).toBeInTheDocument();
+    expect(screen.queryByText('Ether')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Sync Now/i })).toHaveLength(1);
   });
 });

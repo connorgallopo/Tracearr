@@ -12,6 +12,7 @@ import { useSocket } from '@/hooks/useSocket';
 import { WS_EVENTS } from '@tracearr/shared';
 import type { MaintenanceJobProgress } from '@tracearr/shared';
 import { ServerBadge } from '@/components/server';
+import { librarySyncEnabled } from '@/lib/servers';
 
 interface LibraryEmptyStateProps {
   /** Called after sync or backfill completes to refetch page data */
@@ -22,11 +23,12 @@ interface LibraryEmptyStateProps {
  * Unified empty state component for library pages.
  *
  * Automatically detects the current state per selected server:
- * 1. Library not synced -> Shows sync button
- * 2. Library synced but needs backfill -> Shows backfill button
- * 3. Library synced, no backfill needed, but genuinely has no movies/shows
+ * 1. Library sync disabled -> Explains session-only, no Sync Now
+ * 2. Library not synced -> Shows sync button
+ * 3. Library synced but needs backfill -> Shows backfill button
+ * 4. Library synced, no backfill needed, but genuinely has no movies/shows
  *    -> media-appropriate empty message (never "not synced")
- * 4. Backfill running -> Shows progress
+ * 5. Backfill running -> Shows progress
  *
  * With a single server selected this renders the same states as before.
  * With multiple servers selected (this component only renders when every
@@ -182,12 +184,28 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     );
   }
 
+  const syncDisabledState = (
+    <div className="rounded-xl border border-dashed p-8 text-center">
+      <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
+      <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.syncDisabled.title')}</h3>
+      <p className="text-muted-foreground mx-auto mt-2 max-w-md">
+        {t('library.emptyState.syncDisabled.body')}
+      </p>
+    </div>
+  );
+
   // Single server selected: identical behavior to the pre-multi-server component.
   if (selectedServerIds.length <= 1) {
     const selectedServerId = selectedServerIds[0];
+    const selectedServer = selectedServers.find((server) => server.id === selectedServerId);
+    const librarySyncOff = selectedServer ? !librarySyncEnabled(selectedServer) : false;
     const data = selectedServerId ? statusResult.byServer.get(selectedServerId)?.data : undefined;
     const { isSynced, isSyncRunning, needsBackfill, backfillDays } = data ?? {};
     const isSyncing = selectedServerId ? syncingIds.has(selectedServerId) : false;
+
+    if (librarySyncOff) {
+      return syncDisabledState;
+    }
 
     // Show backfill prompt if synced but needs backfill
     if (isSynced && needsBackfill) {
@@ -307,8 +325,15 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     .filter((server) => selectedServerIds.includes(server.id))
     .map((server) => ({ server, data: statusResult.byServer.get(server.id)?.data }));
 
-  const needsSync = rows.filter((row) => !row.data?.isSynced);
-  const needsBackfillOnly = rows.filter((row) => row.data?.isSynced && row.data.needsBackfill);
+  const syncEnabledRows = rows.filter((row) => librarySyncEnabled(row.server));
+  if (rows.length > 0 && syncEnabledRows.length === 0) {
+    return syncDisabledState;
+  }
+
+  const needsSync = syncEnabledRows.filter((row) => !row.data?.isSynced);
+  const needsBackfillOnly = syncEnabledRows.filter(
+    (row) => row.data?.isSynced && row.data.needsBackfill
+  );
 
   return (
     <div className="rounded-xl border border-dashed p-8 text-center">

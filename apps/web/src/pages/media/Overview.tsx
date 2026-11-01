@@ -12,6 +12,7 @@ import {
   Library as LibraryIcon,
 } from 'lucide-react';
 import { TIME_MS } from '@tracearr/shared';
+import { allSelectedNeedLibraryEmptyState, serverNeedsLibrarySetup } from '@/lib/servers';
 import type {
   AlbumShelfRow,
   CatalogRowServerEntry,
@@ -89,18 +90,15 @@ function aggregateGrowthData(raw: LibraryGrowthResponse): LibraryGrowthResponse 
 
 /**
  * Servers that need attention: isSynced is false, needsBackfill is true,
- * or backfill is running.
+ * or backfill is running. Servers with library sync disabled are skipped.
  */
 function serversNeedingSync(
   statusByServer: Map<string, { data?: LibraryStatusResponse }>,
   selectedServers: Server[]
 ): Server[] {
-  return selectedServers.filter((server) => {
-    const result = statusByServer.get(server.id);
-    const data = result?.data;
-    if (!data) return false;
-    return !data.isSynced || data.needsBackfill || data.isBackfillRunning;
-  });
+  return selectedServers.filter((server) =>
+    serverNeedsLibrarySetup(server, statusByServer.get(server.id)?.data)
+  );
 }
 
 /**
@@ -423,12 +421,13 @@ export function MediaOverview() {
     [isMember, statusResult.byServer, selectedServers]
   );
 
-  const allStatusLoaded = !statusResult.isLoading;
   const allServersUnready =
     !isMember &&
-    allStatusLoaded &&
-    selectedServerIds.length > 0 &&
-    unreadyServers.length === selectedServerIds.length;
+    allSelectedNeedLibraryEmptyState(
+      selectedServers,
+      statusResult.byServer,
+      statusResult.isLoading
+    );
 
   const serverById = useMemo(
     () => new Map(servers.map((server) => [server.id, server])),

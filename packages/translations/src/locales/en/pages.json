@@ -632,6 +632,10 @@
         "title": "Library not synced yet",
         "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
       },
+      "syncDisabled": {
+        "title": "Library sync is disabled",
+        "body": "This server is used for session monitoring only. Library statistics are not collected for it."
+      },
       "noMedia": {
         "title": "No movies or shows yet",
         "body": "This library is synced but doesn't have any movies or shows in it yet."

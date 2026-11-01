@@ -608,6 +608,10 @@
         "title": "Kirjastoa ei ole vielä synkronoitu",
         "body": "Kirjaston tilastot näkyvät täällä, kun kirjasto on synkronoitu. Tämä tapahtuu yleensä automaattisesti tunnin välein."
       },
+      "syncDisabled": {
+        "title": "",
+        "body": ""
+      },
       "noMedia": {
         "title": "Ei vielä elokuvia tai ohjelmia",
         "body": "Tämä kirjasto on synkronoitu, mutta siinä ei ole vielä elokuvia tai ohjelmia."

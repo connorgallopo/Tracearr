@@ -608,6 +608,10 @@
         "title": "Bibliotheek nog niet gesynchroniseerd",
         "body": "De bibliotheekstatistieken verschijnen hier zodra de bibliotheek is gesynchroniseerd. Dit gebeurt doorgaans automatisch elk uur."
       },
+      "syncDisabled": {
+        "title": "",
+        "body": ""
+      },
       "noMedia": {
         "title": "Nog geen films of series beschikbaar",
         "body": "Deze bibliotheek is gesynchroniseerd, maar bevat nog geen films of series."

@@ -626,6 +626,10 @@
         "title": "Biblioteka nie jest jeszcze zsynchronizowana",
         "body": "Statystyki biblioteki pojawią się tutaj, gdy zostanie ona zsynchronizowana. Zwykle dzieje się to automatycznie co godzinę."
       },
+      "syncDisabled": {
+        "title": "",
+        "body": ""
+      },
       "noMedia": {
         "title": "Brak filmów ani seriali",
         "body": "Ta biblioteka jest zsynchronizowana, ale nie ma w niej jeszcze żadnych filmów ani seriali."

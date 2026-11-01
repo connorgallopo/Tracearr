@@ -315,6 +315,81 @@ describe('MediaOverview', () => {
     expect(screen.queryByText('media.landing.shelves.recentlyAddedMovies')).not.toBeInTheDocument();
   });
 
+  it('does not banner a session-only server that has no catalog next to a ready library', () => {
+    mockUseServer.mockReturnValue(
+      serverReturn({
+        selectedServerIds: ['srv-1', 'srv-ether'],
+        selectedServers: [
+          {
+            id: 'srv-1',
+            name: 'Plex',
+            type: 'plex',
+            url: '',
+            color: '#e5a00d',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          {
+            id: 'srv-ether',
+            name: 'Servfrica-Ether',
+            type: 'plex',
+            url: '',
+            color: '#00bcd4',
+            librarySyncEnabled: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        isMultiServer: true,
+      })
+    );
+    mockUseLibraryStatus.mockReturnValue(
+      statusReturn({
+        'srv-1': { isSynced: true, needsBackfill: false, isBackfillRunning: false },
+        'srv-ether': { isSynced: false, needsBackfill: false, isBackfillRunning: false },
+      })
+    );
+    mockShelvesReturn({ data: fullShelves() });
+
+    renderOverview();
+
+    expect(screen.queryByText('library.overview.serversNeedSync')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('library-empty-state')).not.toBeInTheDocument();
+    expect(screen.getByTestId('library-growth-chart')).toBeInTheDocument();
+  });
+
+  it('shows the empty state (not a need-to-sync banner) when the only selected server has library sync off', () => {
+    mockUseServer.mockReturnValue(
+      serverReturn({
+        selectedServerIds: ['srv-ether'],
+        selectedServers: [
+          {
+            id: 'srv-ether',
+            name: 'Servfrica-Ether',
+            type: 'plex',
+            url: '',
+            color: '#00bcd4',
+            librarySyncEnabled: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      })
+    );
+    mockUseLibraryStatus.mockReturnValue(
+      statusReturn({
+        'srv-ether': { isSynced: false, needsBackfill: false, isBackfillRunning: false },
+      })
+    );
+    mockShelvesReturn({ data: fullShelves() });
+
+    renderOverview();
+
+    expect(screen.getByTestId('library-empty-state')).toBeInTheDocument();
+    expect(screen.queryByText('library.overview.serversNeedSync')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('library-growth-chart')).not.toBeInTheDocument();
+  });
+
   it('renders all five shelves with their rows', () => {
     mockShelvesReturn({ data: fullShelves() });
 

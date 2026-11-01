@@ -608,6 +608,10 @@
         "title": "Bibliothek noch nicht synchronisiert",
         "body": "Die Bibliotheksstatistiken werden hier angezeigt, sobald die Bibliothek synchronisiert wurde. Dies geschieht normalerweise automatisch jede Stunde."
       },
+      "syncDisabled": {
+        "title": "",
+        "body": ""
+      },
       "noMedia": {
         "title": "Noch keine Filme oder Serien",
         "body": "Diese Bibliothek ist synchronisiert, enthält aber noch keine Filme oder Serien."
