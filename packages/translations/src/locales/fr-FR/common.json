@@ -60,16 +60,16 @@
   "playback": {
     "playing": "Lecture en cours",
     "paused": "En pause",
-    "buffering": "",
+    "buffering": "Mise en mémoire tampon",
     "stopped": "Arrêté",
     "directPlay": "Lecture directe",
     "directStream": "Flux direct",
-    "audioTranscode": "",
+    "audioTranscode": "Transcodage Audio",
     "transcode": "Transcodage",
-    "hwTranscode": "",
+    "hwTranscode": "Transcodage matériel",
     "burnIn": "Incrustation",
-    "watched": "",
-    "played": ""
+    "watched": "Regardé",
+    "played": "Joué"
   },
   "severity": {
     "low": "Faible",
@@ -101,8 +101,8 @@
     "short7Days": "7 j",
     "short30Days": "30 j",
     "shortYear": "1 a",
-    "shortAll": "",
-    "timeRange": ""
+    "shortAll": "Tous",
+    "timeRange": "Période de temps"
   },
   "labels": {
     "date": "Date",
@@ -134,7 +134,7 @@
     "serverOwner": "Propriétaire du serveur",
     "resolution": "Résolution",
     "watchTime": "Temps de visionnage",
-    "listenTime": "",
+    "listenTime": "Temps d'écoute",
     "pausedTime": "Temps de pause",
     "sessionDetails": "Détails de la session",
     "recentSessions": "Sessions récentes",
@@ -154,13 +154,13 @@
     "streamDetails": "Détails du flux",
     "transcodeReason": "Raison du transcodage",
     "loadMore": "Charger plus",
-    "playback": "",
-    "plays": "",
-    "weekOf": "",
-    "viewers": "",
-    "watchHours": "",
-    "completion": "",
-    "serverLegend": ""
+    "playback": "Reprise",
+    "plays": "Lectures",
+    "weekOf": "Semaine du {{date}}",
+    "viewers": "Auditeurs",
+    "watchHours": "Heures d'écoute",
+    "completion": "Complétion",
+    "serverLegend": "Légende du serveur"
   },
   "search": {
     "searchUsers": "Rechercher des utilisateurs...",
@@ -193,7 +193,7 @@
     "episode_plural": "Épisodes",
     "track": "Piste",
     "track_plural": "Pistes",
-    "artist_plural": "",
+    "artist_plural": "Artistes",
     "liveTV": "TV en direct",
     "photo": "Photo",
     "tv": "Télévision",
@@ -218,7 +218,8 @@
     "user_other": "{{count}} utilisateurs",
     "session_one": "{{count}} session",
     "session_other": "{{count}} sessions",
-    "download_other": "",
+    "download_one": "{{count}} téléchargement",
+    "download_other": "{{count}} téléchargements",
     "stream_one": "{{count}} flux",
     "stream_other": "{{count}} flux",
     "server_one": "{{count}} serveur",
@@ -243,8 +244,8 @@
     "device_other": "{{count}} appareils",
     "play_one": "{{count}} lecture",
     "play_other": "{{count}} lectures",
-    "segment_one": "",
-    "segment_other": ""
+    "segment_one": "{{count}} segment",
+    "segment_other": "{{count}} segments"
   },
   "messages": {
     "noChangesDetected": "Aucun changement détecté"
@@ -266,8 +267,8 @@
     "noJobHistory": "Il n'y a pas encore d'historique de tâche",
     "noSessionsFound": "Aucune session trouvée",
     "noUserData": "Aucune donnée utilisateur disponible",
-    "noPlayData": "",
-    "noLocationData": ""
+    "noPlayData": "Aucune donnée de lecture disponible",
+    "noLocationData": "Aucune donnée d'emplacement disponible"
   },
   "confirmations": {
     "unsavedChanges": "Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter ?"
@@ -279,6 +280,6 @@
     "some": "{{count}} des serveurs {{total}}",
     "search": "Rechercher des serveurs...",
     "noMatches": "Aucun serveur trouvé",
-    "historical": ""
+    "historical": "Archivé"
   }
 }
