@@ -262,7 +262,7 @@
     "ownerAccount": {
       "label": "Twoje konto",
       "link": "Połącz",
-      "unlink": "Odłącz",
+      "unlink": "Rozłącz",
       "dialog": {
         "title": "Połącz swoje konto na {{server}}",
         "description": "Wybierz konto, którego używasz na tym serwerze. Odtworzenia zostaną przypisane do ciebie, a zalogowanie się przy użyciu tego konta otwiera Tracearr jako ty.",
@@ -271,14 +271,14 @@
         "neverActive": "Brak aktywności",
         "otherAccounts": "",
         "signsIn": "",
-        "warningTitle": "",
+        "warningTitle": "Połącz tylko swoje własne konto",
         "warning": "",
         "warning_jellyfin": "",
-        "confirmLabel": "",
-        "submit": ""
+        "confirmLabel": "Wpisz {{username}} aby potwierdzić",
+        "submit": "Polacz konto"
       },
       "confirmUnlink": {
-        "title": "",
+        "title": "Rozłączyć {{username}}?",
         "body": ""
       }
     }
@@ -564,14 +564,14 @@
   "storageWarning": {
     "bannerDatabase": "",
     "bannerData": "",
-    "showHow": "",
-    "hide": "",
+    "showHow": "Pokaż mi jak to naprawić",
+    "hide": "Ukryj do czasu ponownego uruchomienia Tracearr",
     "titleDatabase": "",
     "titleData": "",
     "fields": {
-      "postgres": "",
-      "redis": "",
-      "appData": ""
+      "postgres": "Dane PostgreSQL",
+      "redis": "Dane Redis",
+      "appData": "Dane aplikacji"
     },
     "isSetTo": "",
     "overheadDatabase": "",
@@ -580,9 +580,9 @@
       "alreadyDatabase": "",
       "alreadyData": "",
       "alreadyPools": "",
-      "openEdit": "",
+      "openEdit": "W Unraid, otwórz Docker, kliknij ikonę Tracearr i wybierz Edytuj.",
       "change": "",
-      "copyPath": "",
+      "copyPath": "Skopiuj ścieżkę {{field}}",
       "apply": "",
       "clears": ""
     },
