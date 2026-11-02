@@ -51,6 +51,7 @@ import {
   libraryFragment,
   seesServerActivity,
   type Scope,
+  serverCacheSegment,
 } from '../../lib/scope.js';
 import { resolveDateRange, type DateRange } from '../stats/utils.js';
 import {
@@ -843,9 +844,7 @@ export const libraryShelvesRoute: FastifyPluginAsync = async (app) => {
       // per shelf.
       const preferredPosterServerId = await getSetting('preferredPosterServerId');
 
-      const serverCacheKey =
-        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
-        libraryCacheSegment(request.scope);
+      const serverCacheKey = serverCacheSegment(resolvedIds) + libraryCacheSegment(request.scope);
       const periodCacheKey =
         period === 'custom'
           ? `custom:${dateRange.start?.toISOString() ?? 'none'}:${dateRange.end.toISOString()}`

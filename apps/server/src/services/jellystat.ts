@@ -358,7 +358,7 @@ export function readJsonlTables(text: string): Map<string, unknown[]> {
 
     if (isHeader) {
       currentTable = record.table;
-      if (!tables.has(currentTable)) tables.set(currentTable, []);
+      tables.getOrInsertComputed(currentTable, () => []);
       continue;
     }
     const rows = currentTable === null ? undefined : tables.get(currentTable);

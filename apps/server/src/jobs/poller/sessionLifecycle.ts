@@ -508,9 +508,7 @@ function groupActiveSessionRow(
   key: string,
   row: typeof sessions.$inferSelect
 ): void {
-  const bucket = map.get(key);
-  if (bucket) bucket.push(row);
-  else map.set(key, [row]);
+  map.getOrInsertComputed(key, () => []).push(row);
 }
 
 /** Batch equivalent of findActiveSession for a whole poll tick, grouped by sessionKey. */

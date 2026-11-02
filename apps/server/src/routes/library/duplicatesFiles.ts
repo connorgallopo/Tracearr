@@ -22,6 +22,7 @@ import { db } from '../../db/client.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 interface ItemRow {
   id: string;
@@ -48,8 +49,8 @@ export const libraryDuplicateFilesRoute: FastifyPluginAsync = async (app) => {
 
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_DUPLICATE_FILES,
-        resolvedIds ? resolvedIds.slice().sort().join(',') : 'all',
-        itemIds.slice().sort().join(',')
+        serverCacheSegment(resolvedIds),
+        itemIds.toSorted().join(',')
       );
       const cached = await app.redis.get(cacheKey);
       if (cached) {

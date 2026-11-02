@@ -19,7 +19,7 @@ export interface LocationRange {
 }
 
 export function locationRanges(entries: ServerLocation[]): LocationRange[] {
-  const sorted = [...entries].sort(
+  const sorted = entries.toSorted(
     (a, b) => (a.effectiveFrom?.getTime() ?? -Infinity) - (b.effectiveFrom?.getTime() ?? -Infinity)
   );
   const first = sorted[0];

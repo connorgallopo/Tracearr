@@ -185,7 +185,7 @@ export function buildCacheFingerprint(params: Record<string, unknown>): string {
       if (val instanceof Date) {
         acc[key] = val.toISOString().slice(0, 16);
       } else if (val !== undefined && val !== null && val !== '') {
-        acc[key] = Array.isArray(val) ? val.slice().sort() : val;
+        acc[key] = Array.isArray(val) ? val.toSorted() : val;
       }
       return acc;
     }, {});

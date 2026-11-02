@@ -28,6 +28,7 @@ import { countedSessionSql, playCountSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, ceilToUtcDay, resolveLibraryWindow } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 interface RawBingeRow {
   show_media_id: string;
@@ -255,7 +256,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
       const resolvedIds = resolveServerIds(request.user, serverId, rawServerIds);
       const scope = sessionScopeSql(window, resolvedIds, libraryId);
 
-      const serverCacheKey = resolvedIds ? resolvedIds.slice().sort().join(',') : 'all';
+      const serverCacheKey = serverCacheSegment(resolvedIds);
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_PATTERNS,
         serverCacheKey,

@@ -6,6 +6,7 @@ import { withComputeSingleFlight } from '../../routes/library/utils.js';
 import { encodeCursor } from '../../utils/cursor.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 export interface WatchedProbeArgs {
   /** Canonical movie media ids, page-batched (caller keeps <=100). */
@@ -486,7 +487,7 @@ export function buildHydrationQuery(
 }
 
 function candidateCacheKey(args: ListWatchedMediaArgs): string {
-  const servers = args.serverIds === undefined ? 'all' : [...args.serverIds].sort().join(',');
+  const servers = serverCacheSegment(args.serverIds);
   return REDIS_KEYS.PUBLIC_WATCHED_MEDIA(
     `${args.kind}:${args.minState}:${args.userId ?? 'all'}:${servers}`
   );

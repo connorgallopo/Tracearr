@@ -108,7 +108,7 @@ export const QUALITY_FIELD_LABELS: Record<keyof MediaQuality, string> = {
 
 /** Every field that moved, resolution first when it is among them. */
 export function qualityMoves(ctx: MediaUpgradedPayload): { label: string; move: string }[] {
-  const ordered = [...ctx.changed].sort((a, b) =>
+  const ordered = ctx.changed.toSorted((a, b) =>
     a === 'resolution' ? -1 : b === 'resolution' ? 1 : 0
   );
   return ordered.map((field) => ({

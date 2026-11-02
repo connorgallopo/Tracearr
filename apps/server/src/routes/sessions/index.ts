@@ -271,7 +271,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const cacheService = getCacheService();
     const filterScopeHash = buildCacheFingerprint({
       userId: authUser.userId,
-      resolvedIds: resolvedIds ? [...resolvedIds].sort() : null,
+      resolvedIds: resolvedIds ? resolvedIds.toSorted() : null,
       startDate,
       endDate,
       includeAllCountries,

@@ -20,7 +20,7 @@ import {
   type LibraryGrowthQueryInput,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { libraryCacheSegment, libraryFragment } from '../../lib/scope.js';
+import { libraryCacheSegment, libraryFragment, serverCacheSegment } from '../../lib/scope.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
 
@@ -99,9 +99,7 @@ export const libraryGrowthRoute: FastifyPluginAsync = async (app) => {
       const hasCustomRange = Boolean(rawStartDate && rawEndDate);
 
       // Build cache key - include sorted server IDs so order doesn't cause misses
-      const serverCacheKey =
-        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
-        libraryCacheSegment(request.scope);
+      const serverCacheKey = serverCacheSegment(resolvedIds) + libraryCacheSegment(request.scope);
       const periodCacheKey = hasCustomRange ? `custom:${rawStartDate}:${rawEndDate}` : period;
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_GROWTH,

@@ -21,7 +21,7 @@ import {
   type GenresResponse,
 } from '@tracearr/shared';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
-import { libraryCacheSegment, memberCacheSegment } from '../../lib/scope.js';
+import { libraryCacheSegment, memberCacheSegment, serverCacheSegment } from '../../lib/scope.js';
 import {
   queryGenreDetail,
   queryGenreRows,
@@ -62,8 +62,7 @@ export const libraryGenresRoute: FastifyPluginAsync = async (app) => {
   }
 
   function cacheKey(s: GenreScope, w: GenreWindow, suffix = ''): string {
-    const servers =
-      s.resolvedServerIds !== undefined ? [...s.resolvedServerIds].sort().join(',') : 'all';
+    const servers = serverCacheSegment(s.resolvedServerIds);
     const bounds = `${w.period}:${w.range.start?.toISOString() ?? 'all'}:${w.range.end.toISOString()}`;
     return `${buildLibraryCacheKey(REDIS_KEYS.LIBRARY_GENRES, servers, s.type, s.timezone)}:${bounds}${suffix}${memberCacheSegment(s.scope)}${libraryCacheSegment(s.scope)}`;
   }

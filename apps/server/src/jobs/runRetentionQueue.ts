@@ -239,9 +239,7 @@ async function completedGroups(
   const byWindow = new Map<number, string[]>();
   for (const row of rows) {
     const days = row.retentionDays ?? defaultDays;
-    const ids = byWindow.get(days);
-    if (ids) ids.push(row.id);
-    else byWindow.set(days, [row.id]);
+    byWindow.getOrInsertComputed(days, () => []).push(row.id);
   }
 
   return [...byWindow].map(([days, automationIds]) => ({ cutoff: cutoffOf(days), automationIds }));

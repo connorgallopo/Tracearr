@@ -18,7 +18,12 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { compareNames } from '../../utils/collation.js';
-import { libraryCacheSegment, libraryFragment, type Scope } from '../../lib/scope.js';
+import {
+  libraryCacheSegment,
+  libraryFragment,
+  type Scope,
+  serverCacheSegment,
+} from '../../lib/scope.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
 
@@ -82,9 +87,7 @@ export const libraryLibrariesRoute: FastifyPluginAsync = async (app) => {
       // Guard: server scope, fail-closed.
       const resolvedIds = resolveServerIds(authUser, undefined, query.data.serverIds);
 
-      const serverCacheKey =
-        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
-        libraryCacheSegment(request.scope);
+      const serverCacheKey = serverCacheSegment(resolvedIds) + libraryCacheSegment(request.scope);
       const cacheKey = buildLibraryCacheKey(REDIS_KEYS.LIBRARY_LIBRARIES, serverCacheKey);
 
       const cached = await app.redis.get(cacheKey);

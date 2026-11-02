@@ -28,6 +28,7 @@ import {
   resolveLibraryWindow,
   rollupIdentWatchCte,
 } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 type RoiSortBy = LibraryRoiQueryInput['sortBy'];
 
@@ -197,7 +198,7 @@ export const libraryRoiRoute: FastifyPluginAsync = async (app) => {
 
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_ROI,
-        serverIds ? serverIds.slice().sort().join(',') : 'all',
+        serverCacheSegment(serverIds),
         `${libraryId ?? 'all'}-${mediaType}-${cacheSegment}-${sortBy}-${sortOrder}-${page}-${pageSize}`
       );
 

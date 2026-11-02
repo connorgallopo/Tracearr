@@ -70,7 +70,7 @@ function requesterKey(row: AnalyticsSqlRow): string {
 
 function median(values: number[]): number | null {
   if (values.length === 0) return null;
-  const sorted = [...values].sort((a, b) => a - b);
+  const sorted = values.toSorted((a, b) => a - b);
   const mid = sorted.length / 2;
   if (sorted.length % 2 === 1) return sorted[Math.floor(mid)] ?? null;
   const low = sorted[mid - 1];

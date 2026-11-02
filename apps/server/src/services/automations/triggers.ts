@@ -170,7 +170,7 @@ export function carryTriggerIds(
 ): TriggerNode[] {
   const byType = new Map<TriggerNode['type'], string>();
   for (const trigger of existing ?? []) {
-    if (!byType.has(trigger.type)) byType.set(trigger.type, trigger.id);
+    byType.getOrInsert(trigger.type, trigger.id);
   }
   return next.map((trigger) => {
     const priorId = byType.get(trigger.type);

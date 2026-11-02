@@ -462,7 +462,7 @@ const evaluateUniqueIpsInWindow: ConditionEvaluator = (
     // flagged single households as sharers.
     if (geoipService.isPrivateIP(ip)) return;
     const key = toNetworkKey(ip);
-    if (!ipsByNetwork.has(key)) ipsByNetwork.set(key, ip);
+    ipsByNetwork.getOrInsert(key, ip);
   };
   addIp(session.ipAddress);
   for (const s of sessionsInWindow) {

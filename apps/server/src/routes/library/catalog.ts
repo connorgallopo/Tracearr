@@ -62,6 +62,7 @@ import {
   libraryFragment,
   seesServerActivity,
   type Scope,
+  serverCacheSegment,
 } from '../../lib/scope.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { normalizeTitle } from '../../services/library/mediaMatchKey.js';
@@ -720,7 +721,7 @@ async function getCatalogTotals(
   redis: Redis,
   params: CatalogTotalsQueryParams
 ): Promise<CatalogTotals> {
-  const serverKey = params.serverIds !== undefined ? [...params.serverIds].sort().join(',') : 'all';
+  const serverKey = serverCacheSegment(params.serverIds);
   const guardClass = params.sort === 'added' ? 'added' : params.sort === 'year' ? 'year' : 'none';
   const filterKey = [guardClass, ...filterKeyParts(params)].join('|');
   const cacheKey = buildLibraryCacheKey(REDIS_KEYS.LIBRARY_CATALOG_TOTALS, serverKey, filterKey);
@@ -967,7 +968,7 @@ interface WatchedCandidatesArgs extends CatalogFilterParams {
 // A lens is one person's plays, so its entries carry the member segment and go when clearScope
 // clears that person after a merge or split.
 function watchedCandidatesCacheKey(args: WatchedCandidatesArgs): string {
-  const serverKey = args.serverIds !== undefined ? [...args.serverIds].sort().join(',') : 'all';
+  const serverKey = serverCacheSegment(args.serverIds);
   const filterKey = [args.sort, ...filterKeyParts(args), args.watched].join('|');
   const lensKey = args.lensUserId ? `:member:${args.lensUserId}` : '';
   return `${buildLibraryCacheKey(REDIS_KEYS.LIBRARY_CATALOG_WATCHED, serverKey, filterKey)}${lensKey}`;
@@ -1402,7 +1403,7 @@ export const libraryCatalogRoute: FastifyPluginAsync = async (app) => {
         return response;
       }
 
-      const serverCacheKey = resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all';
+      const serverCacheKey = serverCacheSegment(resolvedIds);
       const filterKey = filterKeyParts(filterParams).join('|');
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_CATALOG_LETTERS,

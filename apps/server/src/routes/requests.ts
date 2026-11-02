@@ -23,7 +23,13 @@ import { listUserRequests } from '../services/requests/reads.js';
 import { anyRequestServiceLinked } from '../services/requests/store.js';
 import { compareNames } from '../utils/collation.js';
 import { resolveServerIds } from '../utils/serverFiltering.js';
-import { memberCacheSegment, ownScope, seesServerActivity, type Scope } from '../lib/scope.js';
+import {
+  memberCacheSegment,
+  ownScope,
+  seesServerActivity,
+  type Scope,
+  serverCacheSegment,
+} from '../lib/scope.js';
 
 type SortValue = string | number | null;
 
@@ -58,7 +64,7 @@ function page<T>(
   valueOf: (row: T) => SortValue,
   query: { page: number; pageSize: number; sortOrder: 'asc' | 'desc' }
 ): { data: T[]; total: number; page: number; pageSize: number } {
-  const sorted = [...rows].sort((a, b) => compare(valueOf(a), valueOf(b), query.sortOrder));
+  const sorted = rows.toSorted((a, b) => compare(valueOf(a), valueOf(b), query.sortOrder));
   const start = (query.page - 1) * query.pageSize;
   return {
     data: sorted.slice(start, start + query.pageSize),
@@ -76,7 +82,7 @@ export const requestRoutes: FastifyPluginAsync = async (app) => {
     serverIds: string[] | undefined
   ): Promise<RequestsAnalyticsData> {
     const resolvedIds = resolveServerIds(authUser, undefined, serverIds);
-    const serverKey = resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all';
+    const serverKey = serverCacheSegment(resolvedIds);
     const showOthers = await seesServerActivity(scope);
     const activityKey = scope !== 'all' && showOthers ? ':activity' : '';
     const cacheKey = `${REDIS_KEYS.REQUESTS_ANALYTICS}:${serverKey}${memberCacheSegment(scope)}${activityKey}`;

@@ -44,6 +44,7 @@ import {
 } from '../../utils/serverFiltering.js';
 import { resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { buildLibraryCacheKey } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 /** One group row from the paginated group query, window summary included */
 interface RawGroupRow {
@@ -160,10 +161,9 @@ export const libraryDuplicatesRoute: FastifyPluginAsync = async (app) => {
       // filter, not the scope filter, so it must be a separate segment from
       // resolvedIds or two differently-scoped users requesting the same
       // involvement filter would collide.
-      const serverCacheSegment = resolvedIds ? resolvedIds.slice().sort().join(',') : 'all';
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_DUPLICATES,
-        `${serverCacheSegment}:${serverId ?? 'any'}`,
+        `${serverCacheSegment(resolvedIds)}:${serverId ?? 'any'}`,
         `${mediaType ?? 'all'}-${minConfidence}-${includeFuzzy}-${page}-${pageSize}`
       );
 

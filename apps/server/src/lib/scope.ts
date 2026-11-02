@@ -139,6 +139,11 @@ export function libraryCacheSegment(scope: Scope): string {
   return limits.length === 0 ? '' : `:libs:${limits.join(',')}`;
 }
 
+/** Cache key segment for a server filter, order-independent so [a, b] and [b, a] share an entry. */
+export function serverCacheSegment(serverIds: readonly string[] | null | undefined): string {
+  return serverIds ? serverIds.toSorted().join(',') : 'all';
+}
+
 /**
  * Whether the caller sees counts of other people's activity: others watching, title totals and
  * popularity sorts. Always for owner and admin; for a member only when the owner turns

@@ -22,6 +22,7 @@ import {
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, resolveLibraryWindow, rollupDayWindowSql } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 interface RawWatchRow {
   total_items: string;
@@ -127,7 +128,7 @@ export const libraryWatchRoute: FastifyPluginAsync = async (app) => {
 
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_WATCH,
-        serverIds ? serverIds.slice().sort().join(',') : 'all',
+        serverCacheSegment(serverIds),
         `${libraryId ?? 'all'}-${cacheSegment}`
       );
 

@@ -361,7 +361,7 @@ async function resolveEpisodes<T extends ImportedPlay>(
   for (const play of attachable) {
     const show = showTitleOf(play.grandparentTitle ?? '');
     const normalized = normalizeTitle(show.title);
-    if (!titles.has(normalized)) titles.set(normalized, show);
+    titles.getOrInsert(normalized, show);
   }
   const candidates = await findShowCandidates(titles);
 

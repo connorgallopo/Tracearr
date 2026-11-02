@@ -24,6 +24,7 @@ import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { buildLibraryCacheKey } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 /** Category for stale content */
 type StaleCategory = 'never_watched' | 'stale';
@@ -124,10 +125,9 @@ export const libraryStaleRoute: FastifyPluginAsync = async (app) => {
       const resolvedIds = resolveServerIds(authUser, serverId, rawServerIds);
 
       // Build cache key with all varying params
-      const serverCacheSegment = resolvedIds ? resolvedIds.slice().sort().join(',') : 'all';
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_STALE,
-        serverCacheSegment,
+        serverCacheSegment(resolvedIds),
         `${libraryId ?? 'all'}-${mediaType ?? 'all'}-${staleDays}-${category}-${sortBy}-${sortOrder}-${page}-${pageSize}`
       );
 

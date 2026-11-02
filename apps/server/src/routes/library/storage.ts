@@ -29,6 +29,7 @@ import {
   buildMultiServerFragment,
 } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, dedupedStorageBytesSql, resolveLibraryWindow } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 // ============================================================================
 // Linear Regression Implementation
@@ -203,13 +204,11 @@ export const libraryStorageRoute: FastifyPluginAsync = async (app) => {
       }
 
       const resolvedIds = resolveServerIds(authUser, serverId, serverIds, { strict: false });
-      const serverCacheSegment =
-        resolvedIds !== undefined ? resolvedIds.slice().sort().join(',') : 'all';
 
       // v2: the response carries libraries[]
       const cacheKey = buildLibraryCacheKey(
         `${REDIS_KEYS.LIBRARY_STORAGE}:v2`,
-        serverCacheSegment,
+        serverCacheSegment(resolvedIds),
         cacheSegment,
         tz
       );

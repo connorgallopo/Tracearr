@@ -346,7 +346,7 @@ export async function loadServerAccounts(serverId: string): Promise<ServerAccoun
     if (row.plexAccountId && !accounts.byPlexAccountId.has(row.plexAccountId)) {
       accounts.byPlexAccountId.set(row.plexAccountId, row);
     }
-    if (!accounts.byUsername.has(row.username)) accounts.byUsername.set(row.username, row);
+    accounts.byUsername.getOrInsert(row.username, row);
   }
   return accounts;
 }
@@ -418,7 +418,7 @@ export async function syncUserFromMediaServer(
   const inTransaction = <T>(run: (tx: Tx) => Promise<T>): Promise<T> =>
     batch ? batch.write(run) : db.transaction(run);
   const known = batch?.accounts;
-  const libraryIds = mediaUser.sharedLibraries ? [...mediaUser.sharedLibraries].sort() : null;
+  const libraryIds = mediaUser.sharedLibraries ? mediaUser.sharedLibraries.toSorted() : null;
 
   const identityOf = async (userId: string): Promise<User> => {
     if (!known) return requireUserById(userId);

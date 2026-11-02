@@ -80,9 +80,7 @@ async function fetchAccountsByUserId(userIds: string[]): Promise<Map<string, Acc
       username: row.username,
       removed_at: row.removed_at ? new Date(row.removed_at).toISOString() : null,
     };
-    const existing = byUser.get(row.user_id);
-    if (existing) existing.push(block);
-    else byUser.set(row.user_id, [block]);
+    byUser.getOrInsertComputed(row.user_id, () => []).push(block);
   }
 
   return byUser;

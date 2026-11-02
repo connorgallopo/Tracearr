@@ -47,12 +47,14 @@ export function countStreams(streams: readonly CountableStream[]): {
 
   for (const stream of streams) {
     add(overall, stream);
-    let server = byServer.get(stream.serverId);
-    if (!server) {
-      server = { serverId: stream.serverId, serverName: stream.server.name, ...emptyCounts() };
-      byServer.set(stream.serverId, server);
-    }
-    add(server, stream);
+    add(
+      byServer.getOrInsertComputed(stream.serverId, (serverId) => ({
+        serverId,
+        serverName: stream.server.name,
+        ...emptyCounts(),
+      })),
+      stream
+    );
   }
 
   return { overall, byServer: [...byServer.values()] };

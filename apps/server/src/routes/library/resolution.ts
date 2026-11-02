@@ -27,6 +27,7 @@ import {
   buildMultiServerFragment,
 } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 /** Query schema for resolution endpoint */
 const resolutionQuerySchema = z.object({
@@ -81,13 +82,11 @@ export const libraryResolutionRoute: FastifyPluginAsync = async (app) => {
       }
 
       const resolvedIds = resolveServerIds(authUser, serverId, undefined, { strict: false });
-      const serverCacheSegment =
-        resolvedIds !== undefined ? resolvedIds.slice().sort().join(',') : 'all';
 
       // Build cache key
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_RESOLUTION ?? 'library:resolution',
-        serverCacheSegment,
+        serverCacheSegment(resolvedIds),
         libraryId ?? 'all'
       );
 

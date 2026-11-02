@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2025",
+    "lib": ["ES2025", "ESNext.Collection", "ESNext.Temporal"],
     "outDir": "./dist",
     "rootDir": "./src"
   },

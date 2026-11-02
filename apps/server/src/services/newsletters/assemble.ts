@@ -457,7 +457,7 @@ export function collapseMirrors(
   const dropped = new Set<LibraryItemRow>();
   for (const list of groups.values()) {
     if (list.length < 2) continue;
-    const [first, ...rest] = [...list].sort((a, b) => rank(a.serverId) - rank(b.serverId)) as [
+    const [first, ...rest] = list.toSorted((a, b) => rank(a.serverId) - rank(b.serverId)) as [
       LibraryItemRow,
       ...LibraryItemRow[],
     ];
@@ -523,12 +523,7 @@ export async function loadItemRows(
   if (keys.length === 0) return [];
   const byServer = new Map<string, string[]>();
   for (const k of keys) {
-    let ratingKeys = byServer.get(k.serverId);
-    if (!ratingKeys) {
-      ratingKeys = [];
-      byServer.set(k.serverId, ratingKeys);
-    }
-    ratingKeys.push(k.ratingKey);
+    byServer.getOrInsertComputed(k.serverId, () => []).push(k.ratingKey);
   }
   const rows: LibraryItemRow[] = [];
   for (const [serverId, ratingKeys] of byServer) {

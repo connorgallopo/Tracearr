@@ -546,13 +546,11 @@ export async function importPlaybackReporting(
             }
 
             const ipAddress = extractIpFromEndpoint(row.remoteAddress);
-            let geo = geoCache.get(ipAddress);
-            if (!geo) {
-              const baseGeo = geoipService.lookup(ipAddress);
-              const asn = geoasnService.lookup(ipAddress);
-              geo = { ...baseGeo, asnNumber: asn.number, asnOrganization: asn.organization };
-              geoCache.set(ipAddress, geo);
-            }
+            const geo = geoCache.getOrInsertComputed(ipAddress, (ip) => {
+              const baseGeo = geoipService.lookup(ip);
+              const asn = geoasnService.lookup(ip);
+              return { ...baseGeo, asnNumber: asn.number, asnOrganization: asn.organization };
+            });
 
             insertBatch.push(
               transformPlaybackReportingRow(row, {

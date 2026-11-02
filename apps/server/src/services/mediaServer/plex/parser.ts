@@ -1216,7 +1216,7 @@ export function parseServerResource(
   const filteredConnections = connections.length > 0 ? connections : allConnections;
 
   // Sort connections: HTTPS first, then local preference for same-network scenarios
-  const finalConnections = [...filteredConnections].sort((a, b) => {
+  const finalConnections = filteredConnections.toSorted((a, b) => {
     // HTTPS first
     const aHttps = a.protocol === 'https';
     const bHttps = b.protocol === 'https';
@@ -1483,11 +1483,7 @@ export function parseStatisticsBandwidthResponse(data: unknown): PlexBandwidthSt
       bytes,
     });
 
-    let bucket = byTimestamp.get(at);
-    if (!bucket) {
-      bucket = { lanBytes: 0, wanBytes: 0 };
-      byTimestamp.set(at, bucket);
-    }
+    const bucket = byTimestamp.getOrInsertComputed(at, () => ({ lanBytes: 0, wanBytes: 0 }));
 
     if (lan) {
       bucket.lanBytes += bytes;

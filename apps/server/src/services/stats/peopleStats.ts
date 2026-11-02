@@ -665,9 +665,7 @@ async function fetchIdentityServers(
     .where(identityAccountsWhere(authUser, userIds));
   for (const row of rows) {
     const entry = { id: row.serverId, name: row.serverName };
-    const existing = byUser.get(row.userId);
-    if (existing) existing.push(entry);
-    else byUser.set(row.userId, [entry]);
+    byUser.getOrInsertComputed(row.userId, () => []).push(entry);
   }
   return byUser;
 }

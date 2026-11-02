@@ -36,9 +36,7 @@ interface JellystatItemKeyChoice {
 }
 
 function pushTo<K, V>(map: Map<K, V[]>, key: K, value: V): void {
-  const list = map.get(key);
-  if (list) list.push(value);
-  else map.set(key, [value]);
+  map.getOrInsertComputed(key, () => []).push(value);
 }
 
 export function buildJellystatRemapIndex(
@@ -72,11 +70,10 @@ export function buildJellystatRemapIndex(
         pushTo(archivedNullSeriesEpisodesByName, episode.Name, episode);
         continue;
       }
-      let byName = archivedEpisodesByName.get(episode.SeriesName);
-      if (!byName) {
-        byName = new Map();
-        archivedEpisodesByName.set(episode.SeriesName, byName);
-      }
+      const byName = archivedEpisodesByName.getOrInsertComputed(
+        episode.SeriesName,
+        () => new Map()
+      );
       pushTo(byName, episode.Name, episode);
     }
   }

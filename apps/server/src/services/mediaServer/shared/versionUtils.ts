@@ -45,7 +45,7 @@ export function computeVersionsFingerprint(versions: MediaItemVersion[]): string
  * final tiebreak so the rollup is deterministic across syncs.
  */
 export function pickBestVersion(versions: MediaItemVersion[]): MediaItemVersion | undefined {
-  return [...versions].sort(
+  return versions.toSorted(
     (a, b) =>
       (resolutionTierRank(b.videoResolution) ?? 0) - (resolutionTierRank(a.videoResolution) ?? 0) ||
       (b.bitrate ?? 0) - (a.bitrate ?? 0) ||

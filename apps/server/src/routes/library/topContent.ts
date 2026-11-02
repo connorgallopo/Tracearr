@@ -29,6 +29,7 @@ import {
   resolveLibraryWindow,
   rollupDayWindowSql,
 } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 type SortBy = TopContentQueryInput['sortBy'];
 
@@ -290,7 +291,7 @@ export const libraryTopContentRoute: FastifyPluginAsync = async (app) => {
 
         const cacheKey = buildLibraryCacheKey(
           cachePrefix,
-          resolvedIds ? resolvedIds.slice().sort().join(',') : 'all',
+          serverCacheSegment(resolvedIds),
           `${cacheSegment}-${sortBy}-${sortOrder}-${page}-${pageSize}`
         );
         const cached = await app.redis.get(cacheKey);

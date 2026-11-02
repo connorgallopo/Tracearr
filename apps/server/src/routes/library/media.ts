@@ -39,6 +39,7 @@ import {
   memberCacheSegment,
   seesServerActivity,
   type Scope,
+  serverCacheSegment,
 } from '../../lib/scope.js';
 import { decodeCursor } from '../../utils/cursor.js';
 import { cursorPage, cursorPaginationSchema } from '../publicV2/shared.js';
@@ -81,7 +82,7 @@ const mediaServerQuerySchema = z.object({
 });
 
 function mediaCacheKey(id: string, segment: string, serverIds: string[] | undefined): string {
-  const scope = serverIds !== undefined ? [...serverIds].sort().join(',') : 'all';
+  const scope = serverCacheSegment(serverIds);
   return REDIS_KEYS.LIBRARY_MEDIA_DETAIL(`${id}:${segment}:${scope}`);
 }
 

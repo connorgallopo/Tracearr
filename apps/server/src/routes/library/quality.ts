@@ -27,6 +27,7 @@ import {
   buildMultiServerFragment,
 } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, resolveLibraryWindow } from './utils.js';
+import { serverCacheSegment } from '../../lib/scope.js';
 
 export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
   /**
@@ -63,13 +64,11 @@ export const libraryQualityRoute: FastifyPluginAsync = async (app) => {
       }
 
       const resolvedIds = resolveServerIds(authUser, serverId, undefined, { strict: false });
-      const serverCacheSegment =
-        resolvedIds !== undefined ? resolvedIds.slice().sort().join(',') : 'all';
 
       // Build cache key with all varying params including mediaType
       const cacheKey = buildLibraryCacheKey(
         REDIS_KEYS.LIBRARY_QUALITY,
-        serverCacheSegment,
+        serverCacheSegment(resolvedIds),
         `${cacheSegment}:${mediaType}`,
         tz
       );

@@ -26,7 +26,7 @@ import {
 import { db } from '../../db/client.js';
 import { latestSnapshotPerLibrary, type LatestSnapshotRow } from '../../db/librarySnapshots.js';
 import { readResolutionCounts, versionBucketFlagsJoin } from '../../utils/resolutionBuckets.js';
-import { libraryCacheSegment, libraryFragment } from '../../lib/scope.js';
+import { libraryCacheSegment, libraryFragment, serverCacheSegment } from '../../lib/scope.js';
 import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey, dedupedStorageBytesSql } from './utils.js';
 
@@ -57,9 +57,7 @@ export const libraryStatsRoute: FastifyPluginAsync = async (app) => {
       const singleServer = resolvedIds?.length === 1;
 
       // Build cache key - include sorted server IDs so order doesn't cause misses
-      const serverCacheKey =
-        (resolvedIds !== undefined ? [...resolvedIds].sort().join(',') : 'all') +
-        libraryCacheSegment(request.scope);
+      const serverCacheKey = serverCacheSegment(resolvedIds) + libraryCacheSegment(request.scope);
       const cacheKey = buildLibraryCacheKey(REDIS_KEYS.LIBRARY_STATS, serverCacheKey, tz);
       const fullCacheKey = libraryId ? `${cacheKey}:${libraryId}` : cacheKey;
 

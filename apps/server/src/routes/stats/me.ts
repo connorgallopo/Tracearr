@@ -14,7 +14,7 @@ import {
   type MyTopTitlesResponse,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { ownScope, scopeFragment, type Scope } from '../../lib/scope.js';
+import { ownScope, scopeFragment, type Scope, serverCacheSegment } from '../../lib/scope.js';
 import { MEDIA_TYPE_SQL_FILTER } from '../../constants/index.js';
 import { countedSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment, resolveServerIds } from '../../utils/serverFiltering.js';
@@ -262,7 +262,7 @@ export const meRoutes: FastifyPluginAsync = async (app) => {
       }
       const { userId } = request.user;
       const serverIds = resolveServerIds(request.user, query.data.serverId, query.data.serverIds);
-      const serverKey = serverIds ? [...serverIds].sort().join(',') : 'all';
+      const serverKey = serverCacheSegment(serverIds);
 
       const cacheKey = `${REDIS_KEYS.MY_STATS}:member:${userId}:titles:${serverKey}`;
       const cached = await app.redis.get(cacheKey);

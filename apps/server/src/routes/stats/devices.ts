@@ -35,11 +35,10 @@ function buildDeviceMatrix(rows: MatrixDeviceRow[], codecs: string[]): DeviceCom
   >();
 
   for (const row of rows) {
-    let entry = deviceMap.get(row.device_type);
-    if (!entry) {
-      entry = { device: row.device_type, codecs: {} };
-      deviceMap.set(row.device_type, entry);
-    }
+    const entry = deviceMap.getOrInsertComputed(row.device_type, (device) => ({
+      device,
+      codecs: {},
+    }));
     entry.codecs[row.video_codec] = {
       sessions: row.session_count,
       directPct: row.direct_pct,
@@ -47,7 +46,7 @@ function buildDeviceMatrix(rows: MatrixDeviceRow[], codecs: string[]): DeviceCom
   }
 
   return {
-    codecs: [...codecs].sort(compareNames),
+    codecs: codecs.toSorted(compareNames),
     devices: Array.from(deviceMap.values()).sort((a, b) => compareNames(a.device, b.device)),
   };
 }
