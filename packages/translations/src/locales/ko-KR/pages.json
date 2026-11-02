@@ -335,8 +335,8 @@
     "trailer": "",
     "filters": {
       "columns": "",
-      "countries": "",
-      "mediaType": "",
+      "countries": "국가",
+      "mediaType": "미디어 유형",
       "types": "",
       "network": "",
       "remote": "",
