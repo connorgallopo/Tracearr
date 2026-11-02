@@ -84,6 +84,9 @@
         "title": "",
         "requestedAgo": "",
         "seeAll": "",
+        "availableThisWeek_one": "",
+        "availableThisWeek_few": "",
+        "availableThisWeek_many": "",
         "availableThisWeek_other": ""
       },
       "link": {
@@ -91,6 +94,9 @@
         "description": "",
         "action": ""
       },
+      "episodes_one": "",
+      "episodes_few": "",
+      "episodes_many": "",
       "episodes_other": ""
     },
     "resources": {
@@ -100,6 +106,9 @@
     },
     "unknownLocation": "",
     "unknownQuality": "",
+    "othersStreaming_one": "",
+    "othersStreaming_few": "",
+    "othersStreaming_many": "",
     "othersStreaming_other": ""
   },
   "yourStats": {
@@ -128,9 +137,21 @@
     "allTime": "",
     "watchTime": "",
     "span": {
+      "minutes_one": "",
+      "minutes_few": "",
+      "minutes_many": "",
       "minutes_other": "",
+      "hours_one": "",
+      "hours_few": "",
+      "hours_many": "",
       "hours_other": "",
+      "days_one": "",
+      "days_few": "",
+      "days_many": "",
       "days_other": "",
+      "weeks_one": "",
+      "weeks_few": "",
+      "weeks_many": "",
       "weeks_other": ""
     },
     "longestStreak": "",
@@ -145,7 +166,13 @@
       "abandoned": "",
       "rewatched": ""
     },
+    "days_one": "",
+    "days_few": "",
+    "days_many": "",
     "days_other": "",
+    "bingeValue_one": "",
+    "bingeValue_few": "",
+    "bingeValue_many": "",
     "bingeValue_other": ""
   },
   "users": {
@@ -239,6 +266,9 @@
     "suggestionsPairUsernameMore_few": "",
     "suggestionsPairUsernameMore_many": "",
     "suggestionsPairUsernameMore_other": "",
+    "pendingLink_one": "",
+    "pendingLink_few": "",
+    "pendingLink_many": "",
     "pendingLink_other": ""
   },
   "userDetail": {
@@ -307,6 +337,9 @@
       "daysActive": "",
       "ofDays": "",
       "streak": "",
+      "transcodes_one": "",
+      "transcodes_few": "",
+      "transcodes_many": "",
       "transcodes_other": ""
     },
     "overview": {
@@ -324,6 +357,9 @@
       "localShare": "",
       "viewAllDevices": "",
       "allSessions": "",
+      "finishedCount_one": "",
+      "finishedCount_few": "",
+      "finishedCount_many": "",
       "finishedCount_other": ""
     },
     "uniqueCount": "",
@@ -331,6 +367,9 @@
     "unknownDevice": "",
     "viewAllMore": "",
     "adjustTrustScoreDesc": "",
+    "ipCount_one": "",
+    "ipCount_few": "",
+    "ipCount_many": "",
     "ipCount_other": ""
   },
   "history": {
@@ -366,11 +405,17 @@
       "clearPlatforms": "",
       "clearCountries": "",
       "clearFilters": "",
+      "selected_one": "",
+      "selected_few": "",
+      "selected_many": "",
       "selected_other": ""
     },
     "detail": {
       "watch": "",
       "summary": "",
+      "segmentsShown_one": "",
+      "segmentsShown_few": "",
+      "segmentsShown_many": "",
       "segmentsShown_other": ""
     },
     "stream": {
@@ -401,6 +446,9 @@
       "hwEncode": "",
       "speed": "",
       "throttled": "",
+      "channelCount_one": "",
+      "channelCount_few": "",
+      "channelCount_many": "",
       "channelCount_other": ""
     }
   },
@@ -424,7 +472,13 @@
         "title": "",
         "description": ""
       },
+      "movieCount_one": "",
+      "movieCount_few": "",
+      "movieCount_many": "",
       "movieCount_other": "",
+      "showCount_one": "",
+      "showCount_few": "",
+      "showCount_many": "",
       "showCount_other": ""
     },
     "quality": {
@@ -462,6 +516,9 @@
       "resolution": {
         "tooltip": "",
         "empty": "",
+        "itemCount_one": "",
+        "itemCount_few": "",
+        "itemCount_many": "",
         "itemCount_other": ""
       }
     },
@@ -529,8 +586,17 @@
         },
         "age": {
           "yearsMonths": "",
+          "days_one": "",
+          "days_few": "",
+          "days_many": "",
           "days_other": "",
+          "months_one": "",
+          "months_few": "",
+          "months_many": "",
           "months_other": "",
+          "years_one": "",
+          "years_few": "",
+          "years_many": "",
           "years_other": ""
         }
       },
@@ -556,7 +622,13 @@
         "versions": "",
         "label": ""
       },
+      "groupCount_one": "",
+      "groupCount_few": "",
+      "groupCount_many": "",
       "groupCount_other": "",
+      "itemCount_one": "",
+      "itemCount_few": "",
+      "itemCount_many": "",
       "itemCount_other": ""
     },
     "watch": {
@@ -686,6 +758,9 @@
           "title": "",
           "description": ""
         },
+        "titles_one": "",
+        "titles_few": "",
+        "titles_many": "",
         "titles_other": ""
       },
       "monthly": {
@@ -715,8 +790,14 @@
           "title": "",
           "description": ""
         },
+        "tooltip_one": "",
+        "tooltip_few": "",
+        "tooltip_many": "",
         "tooltip_other": ""
       },
+      "watchesValue_one": "",
+      "watchesValue_few": "",
+      "watchesValue_many": "",
       "watchesValue_other": ""
     }
   },
@@ -737,7 +818,13 @@
     "noQualityData": "",
     "noConcurrentData": "",
     "peakConcurrent": "",
+    "tierItems_one": "",
+    "tierItems_few": "",
+    "tierItems_many": "",
     "tierItems_other": "",
+    "playsShare_one": "",
+    "playsShare_few": "",
+    "playsShare_many": "",
     "playsShare_other": ""
   },
   "violations": {
@@ -2424,10 +2511,25 @@
     "areaPlaces": "",
     "noneInView": "",
     "showAll": "",
+    "streamCount_one": "",
+    "streamCount_few": "",
+    "streamCount_many": "",
     "streamCount_other": "",
+    "peopleCount_one": "",
+    "peopleCount_few": "",
+    "peopleCount_many": "",
     "peopleCount_other": "",
+    "viewInHistory_one": "",
+    "viewInHistory_few": "",
+    "viewInHistory_many": "",
     "viewInHistory_other": "",
+    "streamsAcrossPlaces_one": "",
+    "streamsAcrossPlaces_few": "",
+    "streamsAcrossPlaces_many": "",
     "streamsAcrossPlaces_other": "",
+    "inViewCount_one": "",
+    "inViewCount_few": "",
+    "inViewCount_many": "",
     "inViewCount_other": ""
   },
   "devices": {
@@ -2467,6 +2569,9 @@
     "deliveredAtBitrate": "",
     "empty": "",
     "panelTitle": "",
+    "requests_one": "",
+    "requests_few": "",
+    "requests_many": "",
     "requests_other": ""
   },
   "statsBandwidth": {
@@ -2608,6 +2713,9 @@
         "backup": "",
         "backupDesc": ""
       },
+      "dlq_one": "",
+      "dlq_few": "",
+      "dlq_many": "",
       "dlq_other": ""
     },
     "clientErrors": {
@@ -2781,7 +2889,13 @@
           "detailMovie": "",
           "detailMusic": ""
         },
+        "watchedByOthers_one": "",
+        "watchedByOthers_few": "",
+        "watchedByOthers_many": "",
         "watchedByOthers_other": "",
+        "playedByOthers_one": "",
+        "playedByOthers_few": "",
+        "playedByOthers_many": "",
         "playedByOthers_other": ""
       },
       "watchers": {
@@ -2819,6 +2933,9 @@
       "albums": {
         "title": "",
         "loadError": "",
+        "trackCount_one": "",
+        "trackCount_few": "",
+        "trackCount_many": "",
         "trackCount_other": ""
       },
       "album": {
@@ -2882,6 +2999,9 @@
       "versions_few": "",
       "versions_many": "",
       "versions_other": "",
+      "albumCount_one": "",
+      "albumCount_few": "",
+      "albumCount_many": "",
       "albumCount_other": ""
     },
     "grid": {
