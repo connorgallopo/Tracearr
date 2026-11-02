@@ -3,7 +3,7 @@
 # Runs TimescaleDB, Redis, and Tracearr in a single container
 # Ideal for simple deployments, Unraid, Synology, etc.
 
-FROM node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 AS builder
+FROM node:24-bookworm-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c AS builder
 
 # pnpm's install script is what puts its native binary in place. corepack never runs it,
 # and npm 12 blocks it unless allowed, so both leave pnpm's shebang-less fallback shim instead.
@@ -34,7 +34,7 @@ RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --f
 # =============================================================================
 # Same image and digest as the builder, so the runtime Node is the pinned one and every
 # layer below rebuilds when that pin moves instead of staying in the build cache.
-FROM node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205
+FROM node:24-bookworm-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c
 
 # Install dependencies
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
