@@ -84,6 +84,8 @@
         "title": "",
         "requestedAgo": "",
         "seeAll": "",
+        "availableThisWeek_one": "",
+        "availableThisWeek_few": "",
         "availableThisWeek_other": ""
       },
       "link": {
@@ -91,6 +93,8 @@
         "description": "",
         "action": ""
       },
+      "episodes_one": "",
+      "episodes_few": "",
       "episodes_other": ""
     },
     "resources": {
@@ -100,6 +104,8 @@
     },
     "unknownLocation": "",
     "unknownQuality": "",
+    "othersStreaming_one": "",
+    "othersStreaming_few": "",
     "othersStreaming_other": ""
   },
   "yourStats": {
@@ -128,9 +134,17 @@
     "allTime": "",
     "watchTime": "",
     "span": {
+      "minutes_one": "",
+      "minutes_few": "",
       "minutes_other": "",
+      "hours_one": "",
+      "hours_few": "",
       "hours_other": "",
+      "days_one": "",
+      "days_few": "",
       "days_other": "",
+      "weeks_one": "",
+      "weeks_few": "",
       "weeks_other": ""
     },
     "longestStreak": "",
@@ -145,7 +159,11 @@
       "abandoned": "",
       "rewatched": ""
     },
+    "days_one": "",
+    "days_few": "",
     "days_other": "",
+    "bingeValue_one": "",
+    "bingeValue_few": "",
     "bingeValue_other": ""
   },
   "users": {
@@ -232,6 +250,8 @@
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_few": "",
     "suggestionsPairUsernameMore_other": "",
+    "pendingLink_one": "",
+    "pendingLink_few": "",
     "pendingLink_other": ""
   },
   "userDetail": {
@@ -300,6 +320,8 @@
       "daysActive": "",
       "ofDays": "",
       "streak": "",
+      "transcodes_one": "",
+      "transcodes_few": "",
       "transcodes_other": ""
     },
     "overview": {
@@ -317,6 +339,8 @@
       "localShare": "",
       "viewAllDevices": "",
       "allSessions": "",
+      "finishedCount_one": "",
+      "finishedCount_few": "",
       "finishedCount_other": ""
     },
     "uniqueCount": "",
@@ -324,6 +348,8 @@
     "unknownDevice": "",
     "viewAllMore": "",
     "adjustTrustScoreDesc": "",
+    "ipCount_one": "",
+    "ipCount_few": "",
     "ipCount_other": ""
   },
   "history": {
@@ -359,11 +385,15 @@
       "clearPlatforms": "",
       "clearCountries": "",
       "clearFilters": "",
+      "selected_one": "",
+      "selected_few": "",
       "selected_other": ""
     },
     "detail": {
       "watch": "",
       "summary": "",
+      "segmentsShown_one": "",
+      "segmentsShown_few": "",
       "segmentsShown_other": ""
     },
     "stream": {
@@ -394,6 +424,8 @@
       "hwEncode": "",
       "speed": "",
       "throttled": "",
+      "channelCount_one": "",
+      "channelCount_few": "",
       "channelCount_other": ""
     }
   },
@@ -417,7 +449,11 @@
         "title": "",
         "description": ""
       },
+      "movieCount_one": "",
+      "movieCount_few": "",
       "movieCount_other": "",
+      "showCount_one": "",
+      "showCount_few": "",
       "showCount_other": ""
     },
     "quality": {
@@ -453,6 +489,8 @@
       "resolution": {
         "tooltip": "",
         "empty": "",
+        "itemCount_one": "",
+        "itemCount_few": "",
         "itemCount_other": ""
       }
     },
@@ -520,8 +558,14 @@
         },
         "age": {
           "yearsMonths": "",
+          "days_one": "",
+          "days_few": "",
           "days_other": "",
+          "months_one": "",
+          "months_few": "",
           "months_other": "",
+          "years_one": "",
+          "years_few": "",
           "years_other": ""
         }
       },
@@ -547,7 +591,11 @@
         "versions": "",
         "label": ""
       },
+      "groupCount_one": "",
+      "groupCount_few": "",
       "groupCount_other": "",
+      "itemCount_one": "",
+      "itemCount_few": "",
       "itemCount_other": ""
     },
     "watch": {
@@ -675,6 +723,8 @@
           "title": "",
           "description": ""
         },
+        "titles_one": "",
+        "titles_few": "",
         "titles_other": ""
       },
       "monthly": {
@@ -704,8 +754,12 @@
           "title": "",
           "description": ""
         },
+        "tooltip_one": "",
+        "tooltip_few": "",
         "tooltip_other": ""
       },
+      "watchesValue_one": "",
+      "watchesValue_few": "",
       "watchesValue_other": ""
     }
   },
@@ -726,7 +780,11 @@
     "noQualityData": "",
     "noConcurrentData": "",
     "peakConcurrent": "",
+    "tierItems_one": "",
+    "tierItems_few": "",
     "tierItems_other": "",
+    "playsShare_one": "",
+    "playsShare_few": "",
     "playsShare_other": ""
   },
   "violations": {
@@ -2394,10 +2452,20 @@
     "areaPlaces": "",
     "noneInView": "",
     "showAll": "",
+    "streamCount_one": "",
+    "streamCount_few": "",
     "streamCount_other": "",
+    "peopleCount_one": "",
+    "peopleCount_few": "",
     "peopleCount_other": "",
+    "viewInHistory_one": "",
+    "viewInHistory_few": "",
     "viewInHistory_other": "",
+    "streamsAcrossPlaces_one": "",
+    "streamsAcrossPlaces_few": "",
     "streamsAcrossPlaces_other": "",
+    "inViewCount_one": "",
+    "inViewCount_few": "",
     "inViewCount_other": ""
   },
   "devices": {
@@ -2436,6 +2504,8 @@
     "deliveredAtBitrate": "",
     "empty": "",
     "panelTitle": "",
+    "requests_one": "",
+    "requests_few": "",
     "requests_other": ""
   },
   "statsBandwidth": {
@@ -2577,6 +2647,8 @@
         "backup": "",
         "backupDesc": ""
       },
+      "dlq_one": "",
+      "dlq_few": "",
       "dlq_other": ""
     },
     "clientErrors": {
@@ -2743,7 +2815,11 @@
           "detailMovie": "",
           "detailMusic": ""
         },
+        "watchedByOthers_one": "",
+        "watchedByOthers_few": "",
         "watchedByOthers_other": "",
+        "playedByOthers_one": "",
+        "playedByOthers_few": "",
         "playedByOthers_other": ""
       },
       "watchers": {
@@ -2780,6 +2856,8 @@
       "albums": {
         "title": "",
         "loadError": "",
+        "trackCount_one": "",
+        "trackCount_few": "",
         "trackCount_other": ""
       },
       "album": {
@@ -2841,6 +2919,8 @@
       "versions_one": "",
       "versions_few": "",
       "versions_other": "",
+      "albumCount_one": "",
+      "albumCount_few": "",
       "albumCount_other": ""
     },
     "grid": {
