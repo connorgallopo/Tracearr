@@ -60,10 +60,10 @@
   "resources": {
     "cpu": "处理器",
     "ram": "内存",
-    "item": "",
-    "noData": "",
-    "system": "",
-    "waiting": ""
+    "item": "资源数据",
+    "noData": "无资源数据",
+    "system": "系统",
+    "waiting": "正在等待服务器统计信息……"
   },
   "notifications": {
     "testSent": "测试发送",
@@ -90,29 +90,29 @@
     "criticalOverrideDescription": "高严重程度的违规在免打扰时段仍会通知",
     "rateLimitDescription": "速率限制防止通知垃圾邮件。当前限制：{{perMinute}}/分钟，{{perHour}}/小时。",
     "sendTestNotification": "发送测试通知",
-    "testReach": "",
-    "pushNotifications": "",
+    "testReach": "检查您的服务器能否连接到此手机。它会跳过自动化、上方开关和免打扰时段。",
+    "pushNotifications": "推送通知",
     "ruleTypes": {
-      "accountInactivity": "",
-      "deviceVelocity": "",
-      "geoRestriction": "",
-      "impossibleTravel": "",
-      "simultaneousLocations": ""
+      "accountInactivity": "账户不活跃",
+      "deviceVelocity": "设备切换速度",
+      "geoRestriction": "地理限制",
+      "impossibleTravel": "不可能的行程",
+      "simultaneousLocations": "多地点同时在线"
     },
-    "severityAll": "",
-    "severityHighOnly": "",
-    "severityWarningUp": "",
-    "violationTypes": "",
-    "backgroundRefreshOff": "",
-    "permissionOff": "",
-    "openSettings": "",
-    "tokenMissing": "",
-    "destinationOff": "",
-    "everyViolationSent": "",
-    "noViolationSender": "",
-    "noAutomationSends": "",
-    "eventsFooter": "",
-    "sentByAutomations_other": ""
+    "severityAll": "全部",
+    "severityHighOnly": "仅高严重性",
+    "severityWarningUp": "警告及以上",
+    "violationTypes": "违规类型",
+    "backgroundRefreshOff": "Tracearr 的后台应用刷新已关闭。在开启之前，静默推送无法更新小组件。",
+    "permissionOff": "此手机设置中已关闭 Tracearr 的通知，因此无法显示任何内容。",
+    "openSettings": "打开设置",
+    "tokenMissing": "您的服务器还没有此设备的推送令牌。应用每次打开时都会重新注册。",
+    "destinationOff": "您服务器上的移动推送目标已关闭。请在网页仪表盘的设置、通知、目标中将其开启。",
+    "everyViolationSent": "每条违规都会发送到移动推送",
+    "noViolationSender": "移动推送的违规接收已关闭",
+    "noAutomationSends": "没有自动化将此发送到移动推送",
+    "eventsFooter": "当自动化将事件发送到移动推送目标时，您的服务器会推送该事件。这些开关用于选择此设备显示其中哪些内容。自动化在网页仪表盘中设置。",
+    "sentByAutomations_other": "由 {{count}} 个自动化发送"
   },
   "session": {
     "streamTerminated": "流已终止",
@@ -125,10 +125,10 @@
     "noDevicesRecorded": "没有任何设备记录",
     "noViolations": "没有违规",
     "noTerminations": "没有流终止",
-    "lastSeen": "",
-    "terminatedBy": "",
-    "trustScoreConfirm": "",
-    "trustScoreRange": "",
+    "lastSeen": "最后活跃 {{relative}}",
+    "terminatedBy": "由 @{{username}} 终止",
+    "trustScoreConfirm": "将 @{{username}} 的信任分数设为 {{score}}？",
+    "trustScoreRange": "@{{username}} 的信任分数，范围 0 到 100。",
     "moreLocations_other": "+{{count}} 个更多连接",
     "moreDevices_other": "{{count}}"
   },
@@ -138,31 +138,31 @@
   },
   "alerts": {
     "clearFilters": "清除筛选",
-    "acknowledgeAll": "",
-    "acknowledgeAllBody": "",
-    "acknowledgeAllBodySeverity": "",
-    "all": "",
-    "allClear": "",
-    "allServers": "",
-    "noAlertsRecorded": "",
-    "noMatches": "",
-    "selectAlert": "",
-    "acknowledgeAllTitle_other": "",
-    "pendingCount_other": ""
+    "acknowledgeAll": "全部确认",
+    "acknowledgeAllBody": "{{servers}} 上的所有待处理警报都将标记为已确认。此操作无法撤销。",
+    "acknowledgeAllBodySeverity": "{{servers}} 上严重程度为 {{severity}} 的每条待处理警报都将被标记为已确认。此操作无法撤销。",
+    "all": "全部",
+    "allClear": "一切正常",
+    "allServers": "所有服务器",
+    "noAlertsRecorded": "尚未记录任何警报。",
+    "noMatches": "无匹配的警报",
+    "selectAlert": "选择一条警报",
+    "acknowledgeAllTitle_other": "确认 {{count}} 条警报？",
+    "pendingCount_other": "{{count}} 条待处理"
   },
   "history": {
     "adjustFilters": "尝试调整筛选条件",
     "historyWillAppear": "一旦用户开始串流，会话历史将出现在这里",
-    "selectSession": "",
+    "selectSession": "选择一个会话",
     "filters": {
-      "clearCount": "",
-      "countries": "",
-      "filterBy": "",
-      "mediaType": "",
-      "noCountries": "",
-      "noPlatforms": "",
-      "noUsers": "",
-      "sectionSelected_other": ""
+      "clearCount": "清除（{{count}}）",
+      "countries": "国家/地区",
+      "filterBy": "筛选方式",
+      "mediaType": "媒体类型",
+      "noCountries": "无可用国家/地区",
+      "noPlatforms": "无可用平台",
+      "noUsers": "无可用用户",
+      "sectionSelected_other": "{{section}}，已选 {{count}} 项"
     }
   },
   "users": {
@@ -170,10 +170,10 @@
     "noUsers": "暂无用户",
     "usersWillAppear": "用户将在与您的媒体服务器同步后显示在这里",
     "noUsersMatch": "没有匹配的用户{{query}}",
-    "joinedRelative": "",
-    "sortActive": "",
-    "sortTrust": "",
-    "selectUser": ""
+    "joinedRelative": "加入于 {{relative}}",
+    "sortActive": "活跃",
+    "sortTrust": "信任",
+    "selectUser": "选择一个用户"
   },
   "activity": {
     "playsOverTime": "播放次数趋势",
@@ -184,14 +184,14 @@
   "unauthenticated": {
     "connectionLost": "连接丢失",
     "accessRevoked": "您对 {{serverName}} 的访问权限已被撤销。请向服务器所有者索取新的配对码。",
-    "deviceRemoved": "",
-    "expired": "",
+    "deviceRemoved": "此设备已从 {{serverName}} 移除。请使用网页应用中的新代码重新配对。",
+    "expired": "由于 30 天未使用，{{serverName}} 已将此设备退出登录。请使用网页应用中的新代码重新配对。",
     "scanQrCode": "扫描二维码"
   },
   "clientTooOld": {
-    "title": "",
-    "body": "",
-    "update": ""
+    "title": "更新 Tracearr",
+    "body": "{{serverName}} 需要更新版本的 Tracearr 应用。",
+    "update": "更新"
   },
   "serverSelector": {
     "servers": "服务器",
@@ -205,67 +205,67 @@
     "alerts": "警报",
     "settings": "设置",
     "trustScore": "信任分数{{score}}",
-    "decreaseTrustScore": "",
-    "increaseTrustScore": "",
-    "sortAscending": "",
-    "sortDescending": "",
+    "decreaseTrustScore": "降低信任分数",
+    "increaseTrustScore": "提高信任分数",
+    "sortAscending": "升序排列，点按反转",
+    "sortDescending": "降序排列，点按反转",
     "alertsCount_other": "警报，{{count}} 条未读",
-    "filtersActive_other": ""
+    "filtersActive_other": "过滤器，{{count}} 个生效中"
   },
   "map": {
     "noData": "无可用位置数据",
     "unavailable": "地图不可用"
   },
   "automations": {
-    "editOnWeb": "",
-    "emptyDescription": "",
+    "editOnWeb": "自动化在 Tracearr 网页应用中创建和编辑。",
+    "emptyDescription": "在 Tracearr 网页版中创建自动化，它们会显示在这里。",
     "kind": {
-      "notification": "",
-      "policy": ""
+      "notification": "警报",
+      "policy": "违规"
     },
-    "lastRun": "",
-    "truncated": "",
-    "turnOffFailed": "",
-    "turnOnFailed": "",
-    "unsupportedDescription": "",
-    "unsupportedTitle": "",
-    "versionCheckFailed": "",
-    "conditions_other": ""
+    "lastRun": "上次运行 {{when}}",
+    "truncated": "显示前 {{shown}} 个自动化（共 {{total}} 个）。其余的在 Tracearr Web 应用中。",
+    "turnOffFailed": "无法将其关闭。它仍处于开启状态。",
+    "turnOnFailed": "无法将其开启。它仍处于关闭状态。",
+    "unsupportedDescription": "此服务器报告版本 {{version}}。请更新 Tracearr 以查看自动化及其运行内容。",
+    "unsupportedTitle": "自动化需要服务器 2.2 或更高版本",
+    "versionCheckFailed": "无法检查服务器版本",
+    "conditions_other": "{{count}} 个条件"
   },
   "charts": {
-    "weekOf": ""
+    "weekOf": "{{date}} 当周"
   },
   "push": {
-    "violationTitle": ""
+    "violationTitle": "{{severity}} 违规"
   },
   "streamDetails": {
-    "bitrate": "",
-    "channels": "",
-    "codec": "",
-    "color": "",
-    "container": "",
-    "forced": "",
-    "format": "",
-    "framerate": "",
-    "hwDecode": "",
-    "hwEncode": "",
-    "mono": "",
-    "noDetails": "",
-    "notAvailable": "",
-    "profile": "",
-    "sampleRate": "",
-    "source": "",
-    "speed": "",
-    "stereo": "",
-    "stream": "",
-    "subtitles": "",
-    "throttled": "",
-    "transcodeDetails": ""
+    "bitrate": "比特率",
+    "channels": "声道",
+    "codec": "编解码器",
+    "color": "色彩",
+    "container": "容器",
+    "forced": "强制",
+    "format": "格式：",
+    "framerate": "帧率",
+    "hwDecode": "硬件解码",
+    "hwEncode": "硬件编码",
+    "mono": "单声道",
+    "noDetails": "无详细的媒体流信息",
+    "notAvailable": "N/A",
+    "profile": "配置",
+    "sampleRate": "采样率",
+    "source": "来源",
+    "speed": "速度",
+    "stereo": "立体声",
+    "stream": "媒体流",
+    "subtitles": "字幕",
+    "throttled": "已限速",
+    "transcodeDetails": "转码详情"
   },
   "widget": {
-    "asOf": "",
-    "signedOut": "",
-    "serversDown_other": "",
-    "transcodes_other": ""
+    "asOf": "截至 {{time}}",
+    "signedOut": "打开 Tracearr 以配对服务器。",
+    "serversDown_other": "{{count}} 台服务器离线",
+    "transcodes_other": "{{count}} 个转码"
   }
 }
