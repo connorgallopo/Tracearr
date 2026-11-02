@@ -81,7 +81,7 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg -o 
 # Install Redis 8 from official Redis repository
 # redis-server depends on the exact same redis-tools version, so both take the pin.
 # renovate: datasource=deb depName=redis-server
-ARG REDIS_VERSION=6:8.10.2-1rl1~bookworm1
+ARG REDIS_VERSION=6:8.10.3-1rl1~bookworm1
 RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-keyring.gpg \
     && chmod 644 /usr/share/keyrings/redis-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/redis-keyring.gpg] https://packages.redis.io/deb bookworm main" > /etc/apt/sources.list.d/redis.list \
