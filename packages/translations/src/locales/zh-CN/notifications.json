@@ -13,12 +13,12 @@
         "title": "服务器同步"
       },
       "serverMarkedHistorical": {
-        "title": "",
-        "message": ""
+        "title": "服务器已标记为历史",
+        "message": "Tracearr 不再联系 {{name}}。其历史记录将保留。"
       },
       "serverResumed": {
-        "title": "",
-        "message": ""
+        "title": "服务器已恢复",
+        "message": "Tracearr 已重新联系 {{name}}。"
       },
       "settingsUpdated": {
         "title": "设置已更新",
@@ -90,9 +90,9 @@
         "message": "该服务器被成功删除"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "服务器位置已保存",
+        "queued": "过往的本地会话正在后台更新。",
+        "waiting": "当前任务完成后，过往的本地会话将会更新。"
       },
       "syncCompletedWithErrors": {
         "title": "同步完成时发生错误"
@@ -146,24 +146,24 @@
       "destinationSaved": "目标已保存",
       "destinationDeleted": "目标已删除",
       "destinationTestSent": "发送测试通知",
-      "destinationTestSentTo": "",
+      "destinationTestSentTo": "测试已发送至 {{address}}",
       "newsletterSaved": "通讯已保存",
       "newsletterDeleted": "通讯已删除",
       "newsletterDuplicated": "通讯已复制",
-      "newsletterTestQueued": "",
+      "newsletterTestQueued": "测试已排队发送至 {{address}}",
       "newsletterSendQueued": "发送队列中",
       "brandingSaved": "邮件标记已保存",
       "suppressionAdded": "地址添加到抑制列表",
       "suppressionRemoved": "地址已从抑制列表中删除",
       "ownerAccountLinked": "",
       "ownerAccountUnlinked": "",
-      "newsletterRetryQueued_other": ""
+      "newsletterRetryQueued_other": "正在重试 {{count}} 位收件人"
     },
     "error": {
       "serverAddFailed": "添加服务器失败",
       "serverRemoveFailed": "删除服务器失败",
       "serverSyncFailed": "同步服务器失败",
-      "serverHistoricalFailed": "",
+      "serverHistoricalFailed": "无法更改服务器状态",
       "settingsUpdateFailed": "更新设置失败",
       "copyManual": "",
       "acknowledgeFailed": "确认违规失败",
@@ -175,7 +175,7 @@
       "streamTerminateFailed": "终止流失败",
       "serverUrlUpdateFailed": "无法更新服务器 URL",
       "serverUpdateFailed": "更新服务器失败",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "无法保存服务器位置",
       "serverReorderFailed": "服务器重新排序失败",
       "sessionsDeleteFailed": "删除会话失败",
       "apiKeyGenerateFailed": "API 密钥重置失败",
@@ -203,19 +203,19 @@
       "destinationSaveFailed": "保存目标失败：{{error}}",
       "destinationDeleteFailed": "删除目标失败：{{error}}",
       "destinationTestFailed": "测试失败{{error}}",
-      "destinationInUse": "",
-      "destinationUsedByNewsletters": "",
-      "newsletterSaveFailed": "",
-      "newsletterDeleteFailed": "",
-      "newsletterDuplicateFailed": "",
-      "newsletterPreviewFailed": "",
-      "newsletterTestFailed": "",
-      "newsletterSendFailed": "",
-      "newsletterRetryFailed": "",
-      "newsletterSnapshotFailed": "",
-      "brandingSaveFailed": "",
-      "suppressionAddFailed": "",
-      "suppressionRemoveFailed": "",
+      "destinationInUse": "仍被以下规则使用：{{rules}}",
+      "destinationUsedByNewsletters": "仍被通讯使用：{{names}}",
+      "newsletterSaveFailed": "无法保存通讯：{{error}}",
+      "newsletterDeleteFailed": "无法删除通讯：{{error}}",
+      "newsletterDuplicateFailed": "无法复制通讯：{{error}}",
+      "newsletterPreviewFailed": "无法生成预览：{{error}}",
+      "newsletterTestFailed": "无法加入测试队列：{{error}}",
+      "newsletterSendFailed": "无法加入发送队列：{{error}}",
+      "newsletterRetryFailed": "无法重试失败的收件人：{{error}}",
+      "newsletterSnapshotFailed": "无法加载快照：{{error}}",
+      "brandingSaveFailed": "无法保存邮件品牌设置：{{error}}",
+      "suppressionAddFailed": "无法添加该地址：{{error}}",
+      "suppressionRemoveFailed": "无法移除该地址：{{error}}",
       "ownerAccountLinkFailed": "",
       "ownerAccountUnlinkFailed": ""
     },

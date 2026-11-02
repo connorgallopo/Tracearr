@@ -1,6 +1,6 @@
 {
   "login": {
-    "title": "",
+    "title": "Tracearr",
     "tagline": "Tracearr - Управление доступом потока",
     "createAccountHeading": "Создайте свой аккаунт, чтобы начать",
     "signInHeading": "Войдите в свою учетную запись",
@@ -10,23 +10,23 @@
     "waitingForPlex": "Ожидание авторизации Plex...",
     "completeInPopup": "Завершить вход во всплывающее окно",
     "reopenPlexLogin": "Переоткрыть Plex логин",
-    "continueWith": "",
-    "usernameOrEmail": "",
-    "identifierPlaceholder": "",
-    "username": "",
-    "usernamePlaceholder": "",
+    "continueWith": "Продолжить через {{provider}}",
+    "usernameOrEmail": "Имя пользователя или почта",
+    "identifierPlaceholder": "Имя пользователя или адрес почты",
+    "username": "Имя пользователя",
+    "usernamePlaceholder": "имя_пользователя",
     "emailPlaceholder": "ваш@email.com",
     "displayNamePlaceholder": "Выберите отображаемое имя",
     "passwordPlaceholder": "Минимум 8 символов",
     "yourPasswordPlaceholder": "Ваш пароль",
     "setupNote": "После создания учетной записи вы добавите свои Plex или Jellyfin серверы из настроек.",
-    "localDisabledHint": "",
-    "oidcError": "",
+    "localDisabledHint": "Локальный вход отключён на этом экземпляре. Попросите администратора выполнить `enable-local-login` в CLI Tracearr, чтобы снова его включить.",
+    "oidcError": "Не удалось выполнить единый вход. Повторите попытку или выберите другой способ входа.",
     "accountCreated": "Учетная запись успешно создана!",
     "connectedTo": "Подключено к {{name}}",
     "plexAuthFailed": "Ошибка аутентификации Plex",
     "plexStartFailed": "Не удалось запустить Plex логин",
-    "plexExpired": "",
+    "plexExpired": "Срок этого входа через Plex истёк. Начните заново.",
     "serverConnectFailed": "Не удалось подключиться к серверу",
     "createAccountFailed": "Не удалось создать аккаунт",
     "invalidCredentials": "Неверный email или пароль",
@@ -35,23 +35,23 @@
     "claimCodeDescription": "Проверьте журналы сервера, чтобы продолжить установку кода претензий",
     "claimCodeLabel": "Получить код",
     "claimCodeHint": "Код претензии печатается в логах сервера при запуске контейнера",
-    "validateClaimCode": "",
+    "validateClaimCode": "Проверить код подтверждения",
     "claimCodeSecurityNote": "Эта мера безопасности обеспечивает только авторизованным пользователям возможность первой настройки",
     "member": {
-      "tabLocal": "",
-      "tabMember": "",
-      "server": "",
-      "signingInTo": "",
-      "passwordHint": "",
-      "quickConnectHint": "",
-      "waiting": "",
-      "copyCode": "",
-      "usePassword": "",
-      "useQuickConnect": "",
-      "codeExpired": "",
-      "newCode": "",
-      "refused": "",
-      "notPermitted": ""
+      "tabLocal": "Аккаунт Tracearr",
+      "tabMember": "Медиасервер",
+      "server": "Сервер",
+      "signingInTo": "Вход в {{name}}",
+      "passwordHint": "Используйте имя пользователя и пароль от {{name}}.",
+      "quickConnectHint": "Откройте Jellyfin, перейдите в Quick Connect и введите этот код.",
+      "waiting": "Ожидание подтверждения",
+      "copyCode": "Скопировать код",
+      "usePassword": "Войти с паролем",
+      "useQuickConnect": "Войти через Quick Connect",
+      "codeExpired": "Срок действия кода истёк.",
+      "newCode": "Новый код",
+      "refused": "Вход для этого аккаунта недоступен.",
+      "notPermitted": "У вас нет разрешения на вход. Обратитесь к владельцу сервера."
     }
   },
   "dashboard": {
@@ -65,181 +65,211 @@
     "bandwidth": "Трафик",
     "noActiveStreams": "Нет активных потоков",
     "streamsAppearHere": "Активные потоки появятся здесь, когда пользователи начнут просматривать",
-    "dayStreak": "",
+    "dayStreak": "Дней подряд",
     "view": {
-      "label": "",
-      "admin": "",
-      "me": ""
+      "label": "Вид панели",
+      "admin": "Сервер",
+      "me": "Личный"
     },
     "me": {
-      "last30": "",
-      "streakDetail": "",
-      "topTitles": "",
+      "last30": "Последние 30 дней",
+      "streakDetail": "дней подряд с просмотрами",
+      "topTitles": "Ваш топ названий",
       "welcome": {
-        "title": "",
-        "description": "",
-        "browse": ""
+        "title": "Панель заполняется по мере просмотра",
+        "description": "Просмотры, дни подряд и ваш топ названий появятся здесь через несколько минут после просмотра.",
+        "browse": "Перейти в библиотеку"
       },
       "requests": {
-        "title": "",
-        "requestedAgo": "",
-        "seeAll": "",
-        "availableThisWeek_other": ""
+        "title": "Ваши запросы",
+        "requestedAgo": "Запрошено {{age}} назад",
+        "seeAll": "Посмотреть все",
+        "availableThisWeek_one": "Стало доступно на этой неделе: {{count}}",
+        "availableThisWeek_few": "Стало доступно на этой неделе: {{count}}",
+        "availableThisWeek_many": "Стало доступно на этой неделе: {{count}}",
+        "availableThisWeek_other": "Стало доступно на этой неделе: {{count}}"
       },
       "link": {
         "title": "",
         "description": "",
         "action": ""
       },
-      "episodes_other": ""
+      "episodes_one": "{{count}} серия",
+      "episodes_few": "{{count}} серии",
+      "episodes_many": "{{count}} серий",
+      "episodes_other": "{{count}} серий"
     },
     "resources": {
-      "system": "",
-      "perServer": "",
-      "average": ""
+      "system": "Система",
+      "perServer": "по серверам",
+      "average": "Сред.:"
     },
-    "unknownLocation": "",
-    "unknownQuality": "",
-    "othersStreaming_other": ""
+    "unknownLocation": "Неизвестное местоположение",
+    "unknownQuality": "Неизвестное качество",
+    "othersStreaming_one": "Идёт ещё {{count}} поток",
+    "othersStreaming_few": "Идут ещё {{count}} потока",
+    "othersStreaming_many": "Идут ещё {{count}} потоков",
+    "othersStreaming_other": "Идут ещё {{count}} потоков"
   },
   "yourStats": {
-    "titles": "",
-    "howYouWatch": "",
+    "titles": "Названия",
+    "howYouWatch": "Как вы смотрите",
     "viewerType": {
       "completionist": {
-        "label": "",
-        "desc": ""
+        "label": "До конца",
+        "desc": "Вы досматриваете {{rate}}% начатого."
       },
       "rewatcher": {
-        "label": "",
-        "desc": ""
+        "label": "Снова и снова",
+        "desc": "Вы возвращаетесь к любимому."
       },
       "sampler": {
-        "label": "",
-        "desc": ""
+        "label": "Понемногу всего",
+        "desc": "Вы многое пробуете, прежде чем остановиться на чём-то одном."
       },
       "casual": {
-        "label": "",
-        "desc": ""
+        "label": "Под настроение",
+        "desc": "Вы смотрите, когда есть настроение."
       }
     },
-    "habits": "",
-    "seeActivity": "",
-    "allTime": "",
-    "watchTime": "",
+    "habits": "Самый активный день — {{day}}, самый активный час — {{hour}}.",
+    "seeActivity": "Посмотреть активность",
+    "allTime": "За всё время",
+    "watchTime": "Время просмотра",
     "span": {
-      "minutes_other": "",
-      "hours_other": "",
-      "days_other": "",
-      "weeks_other": ""
+      "minutes_one": "{{count}} минута",
+      "minutes_few": "{{count}} минуты",
+      "minutes_many": "{{count}} минут",
+      "minutes_other": "{{count}} минут",
+      "hours_one": "{{count}} час",
+      "hours_few": "{{count}} часа",
+      "hours_many": "{{count}} часов",
+      "hours_other": "{{count}} часов",
+      "days_one": "{{count}} день",
+      "days_few": "{{count}} дня",
+      "days_many": "{{count}} дней",
+      "days_other": "{{count}} дней",
+      "weeks_one": "{{count}} неделя",
+      "weeks_few": "{{count}} недели",
+      "weeks_many": "{{count}} недель",
+      "weeks_other": "{{count}} недель"
     },
-    "longestStreak": "",
-    "firstPlay": "",
-    "biggestBinge": "",
-    "topGenres": "",
-    "allTimeCaption": "",
+    "longestStreak": "Больше всего дней подряд",
+    "firstPlay": "Первый просмотр",
+    "biggestBinge": "Самый большой марафон",
+    "topGenres": "Топ жанров",
+    "allTimeCaption": "за всё время",
     "tier": {
-      "watched": "",
-      "engaged": "",
-      "sampled": "",
-      "abandoned": "",
-      "rewatched": ""
+      "watched": "Просмотрено",
+      "engaged": "В основном просмотрено",
+      "sampled": "Попробовано",
+      "abandoned": "Брошено",
+      "rewatched": "Пересмотрено"
     },
-    "days_other": "",
-    "bingeValue_other": ""
+    "days_one": "{{count}} день",
+    "days_few": "{{count}} дня",
+    "days_many": "{{count}} дней",
+    "days_other": "{{count}} дней",
+    "bingeValue_one": "{{show}}: {{count}} серия",
+    "bingeValue_few": "{{show}}: {{count}} серии",
+    "bingeValue_many": "{{show}}: {{count}} серий",
+    "bingeValue_other": "{{show}}: {{count}} серий"
   },
   "users": {
     "title": "Пользователи",
-    "showRemoved": "",
+    "showRemoved": "Показывать удалённых",
     "noUsersFound": "Пользователи не найдены.",
     "resetTrustScore": "Сбросить балл доверия",
     "resetTrustScoreConfirm": "Вы уверены, что хотите сбросить балл доверия до 100? Это действие нельзя отменить.",
-    "mergeUsers": "",
-    "mergeTitleSuggestion": "",
-    "mergeTitleBulk": "",
-    "mergeReasonEmail": "",
-    "mergeReasonEmailUsername": "",
-    "mergeReasonUsername": "",
-    "mergeKeep": "",
-    "mergeFoldIn": "",
-    "mergeSwap": "",
-    "mergeRequired": "",
-    "mergeLastActive": "",
-    "mergeNeverActive": "",
-    "mergeMoreServers": "",
-    "mergeWhatHappens": "",
-    "mergeMovesNoCount": "",
-    "mergeCarriesOver": "",
-    "mergeDeleted": "",
-    "mergeRulesKept": "",
-    "mergeIrreversibleTitle": "",
-    "mergeIrreversibleBody": "",
-    "mergeServerLabel": "",
-    "mergeServerUnknown": "",
-    "mergeIrreversibleAcknowledge": "",
-    "mergeServerAccountRemoved": "",
-    "mergeConfirmInto": "",
-    "mergeSelectTwo": "",
-    "mergeSameIdentity": "",
-    "mergeSelectAllActive": "",
-    "suggestionsTitle": "",
-    "suggestionsPairEmail": "",
-    "suggestionsPairEmailUsername": "",
-    "suggestionsPairUsername": "",
-    "suggestionsSheetDescription": "",
-    "suggestionsReview": "",
-    "suggestionsNotSame": "",
-    "suggestionsMatchEmail": "",
-    "suggestionsMatchEmailUsername": "",
-    "suggestionsMatchUsername": "",
-    "suggestionsEmpty": "",
-    "suggestionsDismissed": "",
-    "suggestionsDismissedPair": "",
-    "suggestionsDismissedAt": "",
-    "suggestionsRestore": "",
-    "suggestionsError": "",
-    "filterHasAccessTo": "",
-    "filterHasAccessToPlaceholder": "",
-    "filterHasAccessToHint": "",
-    "merged": "",
-    "filterRoleAll": "",
-    "filterSignInAll": "",
-    "filterPendingOnly": "",
-    "rowActions": "",
-    "menuOpenViolations": "",
-    "signInOn": "",
-    "signInOff": "",
-    "signedInAgo": "",
-    "neverSignedIn": "",
-    "selectAllUsers_one": "",
-    "selectAllUsers_few": "",
-    "selectAllUsers_many": "",
+    "mergeUsers": "Объединить пользователей",
+    "mergeTitleSuggestion": "Это один и тот же человек?",
+    "mergeTitleBulk": "Объединить этих пользователей?",
+    "mergeReasonEmail": "У обоих адрес {{value}} в аккаунтах серверов.",
+    "mergeReasonEmailUsername": "Оба используют {{value}} как имя пользователя или почту аккаунта.",
+    "mergeReasonUsername": "У обоих имя пользователя {{value}}.",
+    "mergeKeep": "Остаётся",
+    "mergeFoldIn": "Вливается и удаляется",
+    "mergeSwap": "Поменять, кто остаётся",
+    "mergeRequired": "{{name}} может входить в Tracearr, поэтому остаётся {{name}}.",
+    "mergeLastActive": "Последняя активность: {{relative}}",
+    "mergeNeverActive": "Активности не было",
+    "mergeMoreServers": "+{{count}}",
+    "mergeWhatHappens": "Что произойдёт",
+    "mergeMovesNoCount": "Аккаунты серверов и сессии {{foldName}} переходят к {{keepName}}.",
+    "mergeCarriesOver": "Контактный адрес, исключения из рассылок и запросы Seerr переносятся.",
+    "mergeDeleted": "{{foldName}} удаляется. Аккаунт можно снова выделить на странице {{keepName}}.",
+    "mergeRulesKept": "Из правил для сервера с одинаковым названием сохраняется версия {{keepName}}.",
+    "mergeIrreversibleTitle": "Это нельзя отменить",
+    "mergeIrreversibleBody": "У обоих есть аккаунт на одном сервере. Эти два аккаунта станут одним, их сессии, нарушения и балл доверия объединятся. Последующее разделение второй аккаунт не вернёт.",
+    "mergeServerLabel": "Сервер",
+    "mergeServerUnknown": "Неизвестный сервер",
+    "mergeIrreversibleAcknowledge": "Я понимаю, что два аккаунта на этом сервере нельзя будет снова разделить",
+    "mergeServerAccountRemoved": "Удалён",
+    "mergeConfirmInto": "Объединить в {{keepName}}",
+    "mergeSelectTwo": "Выберите ровно двух пользователей для объединения",
+    "mergeSameIdentity": "Эти аккаунты уже принадлежат одному пользователю",
+    "mergeSelectAllActive": "Снимите выбор всех и отметьте ровно двух пользователей для объединения",
+    "suggestionsTitle": "Возможные дубликаты пользователей",
+    "suggestionsPairEmail": "{{first}} и {{second}}: общий адрес почты",
+    "suggestionsPairEmailUsername": "{{first}} и {{second}} используют один адрес как имя пользователя или почту аккаунта",
+    "suggestionsPairUsername": "{{first}} и {{second}}: одно имя пользователя",
+    "suggestionsSheetDescription": "При объединении один пользователь остаётся, а другой удаляется. Пара, отмеченная как разные люди, больше не показывается, пока вы её не восстановите.",
+    "suggestionsReview": "Проверить",
+    "suggestionsNotSame": "Это разные люди",
+    "suggestionsMatchEmail": "Один адрес почты",
+    "suggestionsMatchEmailUsername": "Оба используют {{value}} как имя пользователя или почту аккаунта",
+    "suggestionsMatchUsername": "Одно имя пользователя",
+    "suggestionsEmpty": "Проверять больше нечего.",
+    "suggestionsDismissed": "Отклонённые ({{count}})",
+    "suggestionsDismissedPair": "{{first}} и {{second}}",
+    "suggestionsDismissedAt": "Отклонено: {{relative}}",
+    "suggestionsRestore": "Восстановить",
+    "suggestionsError": "Не удалось загрузить предложения по объединению",
+    "filterHasAccessTo": "Есть доступ к",
+    "filterHasAccessToPlaceholder": "Любой сервер",
+    "filterHasAccessToHint": "Показывает людей с активным аккаунтом на каждом из выбранных серверов.",
+    "merged": "Объединён",
+    "filterRoleAll": "Любая роль",
+    "filterSignInAll": "Любой вход",
+    "filterPendingOnly": "Есть нерассмотренные нарушения",
+    "rowActions": "Действия: {{name}}",
+    "menuOpenViolations": "Открыть в разделе \"Нарушения\"",
+    "signInOn": "Вкл",
+    "signInOff": "Выкл",
+    "signedInAgo": "вход: {{relative}}",
+    "neverSignedIn": "входов не было",
+    "selectAllUsers_one": "Выбрать {{count}} пользователя",
+    "selectAllUsers_few": "Выбрать всех {{count}} пользователей",
+    "selectAllUsers_many": "Выбрать всех {{count}} пользователей",
     "selectAllUsers_other": "Выбрать всех {{count}} пользователей",
     "resetTrustScoreTitle_one": "Сбросить балл доверия для {{count}} пользователя",
-    "resetTrustScoreTitle_few": "",
-    "resetTrustScoreTitle_many": "",
+    "resetTrustScoreTitle_few": "Сбросить баллы доверия для {{count}} пользователей",
+    "resetTrustScoreTitle_many": "Сбросить баллы доверия для {{count}} пользователей",
     "resetTrustScoreTitle_other": "Сброс баллов доверия для {{count}} пользователей",
-    "mergeMoves_one": "",
-    "mergeMoves_few": "",
-    "mergeMoves_many": "",
-    "mergeMoves_other": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_few": "",
-    "suggestionsCount_many": "",
-    "suggestionsCount_other": "",
-    "suggestionsPairEmailMore_one": "",
-    "suggestionsPairEmailMore_few": "",
-    "suggestionsPairEmailMore_many": "",
-    "suggestionsPairEmailMore_other": "",
-    "suggestionsPairEmailUsernameMore_one": "",
-    "suggestionsPairEmailUsernameMore_few": "",
-    "suggestionsPairEmailUsernameMore_many": "",
-    "suggestionsPairEmailUsernameMore_other": "",
-    "suggestionsPairUsernameMore_one": "",
-    "suggestionsPairUsernameMore_few": "",
-    "suggestionsPairUsernameMore_many": "",
-    "suggestionsPairUsernameMore_other": "",
-    "pendingLink_other": ""
+    "mergeMoves_one": "Аккаунты серверов {{foldName}} и {{count}} сессия переходят к {{keepName}}.",
+    "mergeMoves_few": "Аккаунты серверов {{foldName}} и {{count}} сессии переходят к {{keepName}}.",
+    "mergeMoves_many": "Аккаунты серверов {{foldName}} и {{count}} сессий переходят к {{keepName}}.",
+    "mergeMoves_other": "Аккаунты серверов {{foldName}} и {{count}} сессий переходят к {{keepName}}.",
+    "suggestionsCount_one": "{{count}} возможный дубликат пользователя",
+    "suggestionsCount_few": "{{count}} возможных дубликата пользователя",
+    "suggestionsCount_many": "{{count}} возможных дубликатов пользователя",
+    "suggestionsCount_other": "{{count}} возможных дубликатов пользователя",
+    "suggestionsPairEmailMore_one": "{{first}} и {{second}}: общий адрес почты, и ещё {{count}}",
+    "suggestionsPairEmailMore_few": "{{first}} и {{second}}: общий адрес почты, и ещё {{count}}",
+    "suggestionsPairEmailMore_many": "{{first}} и {{second}}: общий адрес почты, и ещё {{count}}",
+    "suggestionsPairEmailMore_other": "{{first}} и {{second}}: общий адрес почты, и ещё {{count}}",
+    "suggestionsPairEmailUsernameMore_one": "{{first}} и {{second}} используют один адрес как имя пользователя или почту аккаунта, и ещё {{count}}",
+    "suggestionsPairEmailUsernameMore_few": "{{first}} и {{second}} используют один адрес как имя пользователя или почту аккаунта, и ещё {{count}}",
+    "suggestionsPairEmailUsernameMore_many": "{{first}} и {{second}} используют один адрес как имя пользователя или почту аккаунта, и ещё {{count}}",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} и {{second}} используют один адрес как имя пользователя или почту аккаунта, и ещё {{count}}",
+    "suggestionsPairUsernameMore_one": "{{first}} и {{second}}: одно имя пользователя, и ещё {{count}}",
+    "suggestionsPairUsernameMore_few": "{{first}} и {{second}}: одно имя пользователя, и ещё {{count}}",
+    "suggestionsPairUsernameMore_many": "{{first}} и {{second}}: одно имя пользователя, и ещё {{count}}",
+    "suggestionsPairUsernameMore_other": "{{first}} и {{second}}: одно имя пользователя, и ещё {{count}}",
+    "pendingLink_one": "Ожидает: {{count}}",
+    "pendingLink_few": "Ожидает: {{count}}",
+    "pendingLink_many": "Ожидает: {{count}}",
+    "pendingLink_other": "Ожидает: {{count}}"
   },
   "userDetail": {
     "backToUsers": "Вернуться к пользователям",
@@ -253,155 +283,173 @@
     "manual": "Ручной",
     "unknownRule": "Неизвестное правило",
     "adjustTrustScore": "Изменить балл доверия",
-    "linkedAccounts": "",
-    "splitAccount": "",
-    "splitConfirmTitle": "",
-    "splitConfirmDescription": "",
-    "splitConfirmLoading": "",
-    "acrossAllServers": "",
-    "overallTrust": "",
-    "serverScope": "",
-    "allServers": "",
-    "title": "",
-    "editIdentity": "",
-    "editIdentityDescription": "",
-    "displayName": "",
-    "contactEmail": "",
-    "contactEmailHelp": "",
-    "contactEmailLabel": "",
-    "contactEmailNone": "",
-    "contactEmailNoLogin": "",
+    "linkedAccounts": "Связанные аккаунты",
+    "splitAccount": "Выделить в отдельного пользователя",
+    "splitConfirmTitle": "Отделить аккаунт сервера",
+    "splitConfirmDescription": "Выделяет этот аккаунт сервера в отдельного пользователя. Его история просмотров и нарушения переходят вместе с ним.",
+    "splitConfirmLoading": "Разделение...",
+    "acrossAllServers": "По всем связанным аккаунтам:",
+    "overallTrust": "Общий балл доверия",
+    "serverScope": "Сервер",
+    "allServers": "Все серверы",
+    "title": "Сведения о пользователе",
+    "editIdentity": "Изменить имя и контактный адрес",
+    "editIdentityDescription": "Оба значения действуют для этого человека везде. Оставьте имя пустым, чтобы показывать @{{username}}.",
+    "displayName": "Отображаемое имя",
+    "contactEmail": "Контактный адрес",
+    "contactEmailHelp": "Сюда приходят рассылки. Вход по нему не работает, и с синхронизированными аккаунтами он не сопоставляется.",
+    "contactEmailLabel": "Адрес для рассылок:",
+    "contactEmailNone": "не задан",
+    "contactEmailNoLogin": "Вход по нему не работает.",
     "locations": "Места",
     "access": {
-      "title": "",
-      "signIn": "",
-      "signInAllow": "",
-      "signInDefault": "",
-      "signInBlock": "",
-      "signInDefaultOn": "",
-      "signInDefaultOff": "",
-      "signInDefaultUnknown": "",
-      "role": "",
-      "roleAdmin": "",
-      "roleMember": "",
-      "roleHint": "",
-      "disabled": "",
-      "pending": "",
-      "signIns": "",
-      "lastSignIn": "",
-      "never": "",
-      "viewAs": "",
-      "viewAsLabel": "",
-      "viewAsHint": ""
+      "title": "Доступ ко входу",
+      "signIn": "Вход",
+      "signInAllow": "Разрешить",
+      "signInDefault": "По умолчанию",
+      "signInBlock": "Запретить",
+      "signInDefaultOn": "По умолчанию действует общий переключатель, сейчас он включён.",
+      "signInDefaultOff": "По умолчанию действует общий переключатель, сейчас он выключен.",
+      "signInDefaultUnknown": "По умолчанию действует общий переключатель.",
+      "role": "Роль",
+      "roleAdmin": "Администратор",
+      "roleMember": "Участник",
+      "roleHint": "Участники видят только свою активность, администраторы — активность всех.",
+      "disabled": "Пока этот аккаунт отключён, вход невозможен.",
+      "pending": "Пока этот аккаунт ожидает подтверждения, вход невозможен.",
+      "signIns": "Входы",
+      "lastSignIn": "Последний вход",
+      "never": "Никогда",
+      "viewAs": "Просмотр от имени",
+      "viewAsLabel": "Посмотреть Tracearr от имени {{name}}",
+      "viewAsHint": "Tracearr так, как его видит этот человек. Только для чтения."
     },
     "tabs": {
-      "access": "",
-      "downloads": ""
+      "access": "Доступ",
+      "downloads": "Скачивания"
     },
     "cards": {
-      "vsPrior": "",
-      "perActiveDay": "",
-      "finished": "",
-      "abandoned": "",
-      "avgBitrate": "",
-      "daysActive": "",
-      "ofDays": "",
-      "streak": "",
-      "transcodes_other": ""
+      "vsPrior": "к прошлому периоду",
+      "perActiveDay": "{{value}} за активный день",
+      "finished": "Завершено",
+      "abandoned": "Брошено: {{value}}%",
+      "avgBitrate": "{{value}} в среднем",
+      "daysActive": "Активных дней",
+      "ofDays": "из {{count}}",
+      "streak": "Дней подряд: {{count}}",
+      "transcodes_one": "{{count}} транскодирование",
+      "transcodes_few": "{{count}} транскодирования",
+      "transcodes_many": "{{count}} транскодирований",
+      "transcodes_other": "{{count}} транскодирований"
     },
     "overview": {
-      "playsOverTime": "",
-      "priorRange": "",
-      "serverAverage": "",
-      "byHour": "",
-      "peak": "",
-      "serverPeak": "",
-      "what": "",
-      "otherMedia": "",
-      "mostFinished": "",
-      "where": "",
-      "directPlayShare": "",
-      "localShare": "",
-      "viewAllDevices": "",
-      "allSessions": "",
-      "finishedCount_other": ""
+      "playsOverTime": "Просмотры с течением времени",
+      "priorRange": "Предыдущий период",
+      "serverAverage": "В среднем на человека по серверу",
+      "byHour": "Просмотры по часам суток",
+      "peak": "пик: {{hour}}",
+      "serverPeak": "пик сервера: {{hour}}",
+      "what": "Что",
+      "otherMedia": "Другое",
+      "mostFinished": "Больше всего досмотрено",
+      "where": "Где и на чём",
+      "directPlayShare": "Прямое воспроизведение: {{value}}%",
+      "localShare": "{{value}}% сессий в локальной сети",
+      "viewAllDevices": "Показать все устройства и местоположения",
+      "allSessions": "Все сессии",
+      "finishedCount_one": "Досмотрено: {{count}}",
+      "finishedCount_few": "Досмотрено: {{count}}",
+      "finishedCount_many": "Досмотрено: {{count}}",
+      "finishedCount_other": "Досмотрено: {{count}}"
     },
-    "uniqueCount": "",
-    "unknownCity": "",
-    "unknownDevice": "",
-    "viewAllMore": "",
-    "adjustTrustScoreDesc": "",
-    "ipCount_other": ""
+    "uniqueCount": "Уникальных: {{count}}",
+    "unknownCity": "Неизвестный город",
+    "unknownDevice": "Неизвестное устройство",
+    "viewAllMore": "Показать все (ещё {{count}})",
+    "adjustTrustScoreDesc": "Задайте балл доверия для @{{username}}. Диапазон: 0–100.",
+    "ipCount_one": "{{count}} IP",
+    "ipCount_few": "{{count}} IP",
+    "ipCount_many": "{{count}} IP",
+    "ipCount_other": "{{count}} IP"
   },
   "history": {
     "title": "История",
-    "totalPlays": "",
-    "uniqueTitles": "",
-    "uniqueUsers": "",
-    "searchPlaceholder": "",
+    "totalPlays": "Всего просмотров",
+    "uniqueTitles": "Уникальные названия",
+    "uniqueUsers": "Уникальные пользователи",
+    "searchPlaceholder": "Поиск по названиям, пользователям, местоположениям, IP...",
     "columns": {
-      "duration": "",
-      "progress": ""
+      "duration": "Длительность",
+      "progress": "Прогресс"
     },
     "location": {
-      "city": "",
-      "region": "",
-      "country": "",
-      "continent": "",
-      "postalCode": "",
-      "coordinates": "",
-      "asn": "",
-      "asnOrg": ""
+      "city": "Город",
+      "region": "Регион",
+      "country": "Страна",
+      "continent": "Континент",
+      "postalCode": "Почтовый индекс",
+      "coordinates": "Координаты",
+      "asn": "ASN",
+      "asnOrg": "Организация ASN"
     },
-    "trailer": "",
+    "trailer": "Трейлер",
     "filters": {
-      "columns": "",
-      "countries": "",
-      "mediaType": "",
-      "types": "",
-      "network": "",
-      "remote": "",
-      "trailers": "",
-      "clearUsers": "",
-      "clearPlatforms": "",
-      "clearCountries": "",
-      "clearFilters": "",
-      "selected_other": ""
+      "columns": "Столбцы",
+      "countries": "Страны",
+      "mediaType": "Тип медиа",
+      "types": "Типы",
+      "network": "Сеть",
+      "remote": "Удалённый",
+      "trailers": "Трейлеры",
+      "clearUsers": "Сбросить пользователей",
+      "clearPlatforms": "Сбросить платформы",
+      "clearCountries": "Сбросить страны",
+      "clearFilters": "Сбросить все фильтры",
+      "selected_one": "Выбрано: {{count}}",
+      "selected_few": "Выбрано: {{count}}",
+      "selected_many": "Выбрано: {{count}}",
+      "selected_other": "Выбрано: {{count}}"
     },
     "detail": {
-      "watch": "",
-      "summary": "",
-      "segmentsShown_other": ""
+      "watch": "Просмотр",
+      "summary": "Сводка",
+      "segmentsShown_one": "Показано сегментов: {{shown}} из {{count}}",
+      "segmentsShown_few": "Показано сегментов: {{shown}} из {{count}}",
+      "segmentsShown_many": "Показано сегментов: {{shown}} из {{count}}",
+      "segmentsShown_other": "Показано сегментов: {{shown}} из {{count}}"
     },
     "stream": {
-      "notAvailable": "",
-      "bitrateUnavailable": "",
-      "stereo": "",
-      "mono": "",
-      "noDetails": "",
-      "source": "",
-      "stream": "",
-      "container": "",
-      "bitrate": "",
-      "video": "",
-      "audio": "",
-      "subtitles": "",
-      "codec": "",
-      "framerate": "",
-      "hdr": "",
-      "profile": "",
-      "color": "",
-      "channels": "",
-      "language": "",
-      "sampleRate": "",
-      "format": "",
-      "forced": "",
-      "transcodeDetails": "",
-      "hwDecode": "",
-      "hwEncode": "",
-      "speed": "",
-      "throttled": "",
-      "channelCount_other": ""
+      "notAvailable": "Н/Д",
+      "bitrateUnavailable": "Jellyfin и Emby не сообщают отдельные битрейты видео и аудио при транскодировании. Доступен только общий битрейт потока.",
+      "stereo": "Стерео",
+      "mono": "Моно",
+      "noDetails": "Нет подробных сведений о потоке",
+      "source": "Источник",
+      "stream": "Поток",
+      "container": "Контейнер",
+      "bitrate": "Битрейт",
+      "video": "Видео",
+      "audio": "Аудио",
+      "subtitles": "Субтитры",
+      "codec": "Кодек",
+      "framerate": "Частота кадров",
+      "hdr": "HDR",
+      "profile": "Профиль",
+      "color": "Цвет",
+      "channels": "Каналы",
+      "language": "Язык",
+      "sampleRate": "Частота дискретизации",
+      "format": "Формат",
+      "forced": "Принудительные",
+      "transcodeDetails": "Детали транскодирования",
+      "hwDecode": "Аппаратное декодирование",
+      "hwEncode": "Аппаратное кодирование",
+      "speed": "Скорость",
+      "throttled": "(с ограничением)",
+      "channelCount_one": "{{count}} кан.",
+      "channelCount_few": "{{count}} кан.",
+      "channelCount_many": "{{count}} кан.",
+      "channelCount_other": "{{count}} кан."
     }
   },
   "library": {
@@ -418,14 +466,20 @@
       "thisWeek": "эта неделя",
       "thisMonth": "за месяц",
       "thisYear": "в этом году",
-      "serversNeedSync": "",
-      "notWatchedByYou": "",
+      "serversNeedSync": "Эти серверы нужно синхронизировать:",
+      "notWatchedByYou": "Вы не смотрели",
       "memberEmpty": {
-        "title": "",
-        "description": ""
+        "title": "Здесь пока ничего нет",
+        "description": "Фильмы и сериалы появятся здесь после синхронизации библиотеки сервера."
       },
-      "movieCount_other": "",
-      "showCount_other": ""
+      "movieCount_one": "{{count}} фильм",
+      "movieCount_few": "{{count}} фильма",
+      "movieCount_many": "{{count}} фильмов",
+      "movieCount_other": "{{count}} фильмов",
+      "showCount_one": "{{count}} сериал",
+      "showCount_few": "{{count}} сериала",
+      "showCount_many": "{{count}} сериалов",
+      "showCount_other": "{{count}} сериалов"
     },
     "quality": {
       "qualityEvolution": "Изменения Качества",
@@ -433,36 +487,39 @@
       "failedToLoad": "Не удалось загрузить данные качества",
       "failedToLoadDesc": "Не удалось получить данные о качестве. Пожалуйста, попробуйте еще раз.",
       "codecBrowse": {
-        "movies": "",
-        "shows": "",
-        "movieCount_one": "",
-        "movieCount_few": "",
-        "movieCount_many": "",
-        "movieCount_other": "",
-        "episodeCount_one": "",
-        "episodeCount_few": "",
-        "episodeCount_many": "",
-        "episodeCount_other": ""
+        "movies": "Перейти к фильмам",
+        "shows": "Перейти к сериалам",
+        "movieCount_one": "{{count}} фильм",
+        "movieCount_few": "{{count}} фильма",
+        "movieCount_many": "{{count}} фильмов",
+        "movieCount_other": "{{count}} фильмов",
+        "episodeCount_one": "{{count}} серия",
+        "episodeCount_few": "{{count}} серии",
+        "episodeCount_many": "{{count}} серий",
+        "episodeCount_other": "{{count}} серий"
       },
       "codec": {
-        "title": "",
-        "moviesAndTv": "",
-        "videoCodecs": "",
-        "audioCodecs": "",
-        "audioChannels": "",
+        "title": "Распределение кодеков",
+        "moviesAndTv": "Фильмы / сериалы",
+        "videoCodecs": "Видеокодеки",
+        "audioCodecs": "Аудиокодеки",
+        "audioChannels": "Аудиоканалы",
         "noVideo": {
-          "title": "",
-          "description": ""
+          "title": "Нет видеоконтента",
+          "description": "Данные о видеокодеках появятся, когда в библиотеке будут фильмы или сериалы."
         },
         "noMusic": {
-          "title": "",
-          "description": ""
+          "title": "Нет музыки",
+          "description": "Данные о кодеках музыки появятся, когда в библиотеке будут музыкальные треки."
         }
       },
       "resolution": {
-        "tooltip": "",
-        "empty": "",
-        "itemCount_other": ""
+        "tooltip": "<b>{{name}}</b>: {{value, number}} из {{total, number}} названий ({{percent}}%)",
+        "empty": "Нет данных о качестве: {{type}}",
+        "itemCount_one": "{{count, number}} элемент",
+        "itemCount_few": "{{count, number}} элемента",
+        "itemCount_many": "{{count, number}} элементов",
+        "itemCount_other": "{{count, number}} элементов"
       }
     },
     "storage": {
@@ -470,7 +527,7 @@
       "growthRate": "Темпы роста",
       "duplicates": "Дубликаты",
       "staleContent": "Устаревший контент",
-      "staleContentDesc": "",
+      "staleContentDesc": "Контент, который стоит рассмотреть для удаления.",
       "storageTrend": "Тренд хранения",
       "confidence": "Доверие",
       "confidenceHigh": "Высокий",
@@ -478,86 +535,101 @@
       "confidenceLow": "Низкий",
       "zeroGrowth": "0 ГБ/мес",
       "predictions": "Прогнозы",
-      "contentROI": "",
-      "contentROIDesc": "",
+      "contentROI": "Окупаемость контента",
+      "contentROIDesc": "Ценность просмотров на единицу затрат на хранение.",
       "avgHoursPerGB": "средние часы/ГБ",
       "insufficientData": "Недостаточно данных",
       "failedToLoad": "Не удалось загрузить данные памяти",
       "failedToLoadDesc": "Не удалось получить данные хранилища. Пожалуйста, попробуйте еще раз.",
-      "duplicatesTitle": "",
-      "duplicatesSubtitle": "",
-      "growthPreChangeover": "",
-      "loadingDuplicates": "",
-      "duplicatesFailed": "",
-      "noDuplicatesTitle": "",
-      "noDuplicatesDesc": "",
-      "colTitle": "",
-      "colMatchType": "",
-      "colCopies": "",
-      "colRecoverable": "",
-      "sameServer": "",
-      "mirror": "",
-      "missingOnServer": "",
-      "missingOnServerHint": "",
-      "copyPath": "",
+      "duplicatesTitle": "Дубликаты",
+      "duplicatesSubtitle": "Названия, хранящиеся более чем в одном физическом файле на серверах, в библиотеках и версиях.",
+      "growthPreChangeover": "на основе истории до обновления",
+      "loadingDuplicates": "Загрузка дубликатов...",
+      "duplicatesFailed": "Не удалось загрузить дубликаты",
+      "noDuplicatesTitle": "Дубликаты не найдены",
+      "noDuplicatesDesc": "Названий с несколькими физическими файлами не обнаружено.",
+      "colTitle": "Название",
+      "colMatchType": "Тип совпадения",
+      "colCopies": "Копии",
+      "colRecoverable": "Освобождаемое место",
+      "sameServer": "Тот же сервер",
+      "mirror": "Зеркало",
+      "missingOnServer": "Нет на сервере",
+      "missingOnServerHint": "Сервер всё ещё показывает этот файл, но не находит его на диске. В Plex очистите корзину библиотеки, чтобы убрать его.",
+      "copyPath": "Копировать путь к файлу",
       "libraries": {
-        "title": "",
+        "title": "Библиотеки",
         "columns": {
-          "library": "",
-          "share": ""
+          "library": "Библиотека",
+          "share": "Доля"
         },
-        "serverFailed": ""
+        "serverFailed": "Не удалось загрузить библиотеки: {{servers}}"
       },
       "stale": {
         "tabs": {
-          "neverWatched": "",
-          "stale": ""
+          "neverWatched": "Не просмотрено ни разу ({{count}})",
+          "stale": "Невостребованный контент ({{count}})"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Невостребованного контента нет",
+          "description": "Весь контент библиотеки смотрели недавно."
         },
         "columns": {
-          "staleFor": ""
+          "staleFor": "Без просмотров"
         },
-        "allTypes": "",
+        "allTypes": "Все типы",
         "threshold": {
-          "months3": "",
-          "months6": "",
-          "year1": "",
-          "years2": ""
+          "months3": "Без просмотров 3+ месяца",
+          "months6": "Без просмотров 6+ месяцев",
+          "year1": "Без просмотров 1+ год",
+          "years2": "Без просмотров 2+ года"
         },
         "age": {
-          "yearsMonths": "",
-          "days_other": "",
-          "months_other": "",
-          "years_other": ""
+          "yearsMonths": "{{years}} г. {{months}} мес.",
+          "days_one": "{{count}} день",
+          "days_few": "{{count}} дня",
+          "days_many": "{{count}} дней",
+          "days_other": "{{count}} дней",
+          "months_one": "{{count}} месяц",
+          "months_few": "{{count}} месяца",
+          "months_many": "{{count}} месяцев",
+          "months_other": "{{count}} месяцев",
+          "years_one": "{{count}} год",
+          "years_few": "{{count}} года",
+          "years_many": "{{count}} лет",
+          "years_other": "{{count}} лет"
         }
       },
-      "growthPerMonth": "",
-      "dataDaysProgress": "",
-      "recoverableSize": "",
-      "unusedSize": "",
+      "growthPerMonth": "+{{size}}/мес.",
+      "dataDaysProgress": "Дней: {{days}} из {{min}}",
+      "recoverableSize": "Можно освободить: {{size}}",
+      "unusedSize": "Не используется: {{size}}",
       "roi": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных об окупаемости",
+          "description": "Для анализа окупаемости нужна история просмотров: по ней рассчитывается ценность контента."
         },
         "columns": {
-          "hoursPerGb": "",
+          "hoursPerGb": "Часов/ГБ",
           "lastWatched": ""
         }
       },
       "matchBadge": {
-        "exact": "",
-        "likely": "",
-        "possible": "",
-        "fuzzy": "",
-        "versions": "",
-        "label": ""
+        "exact": "Точное",
+        "likely": "Вероятное",
+        "possible": "Возможное",
+        "fuzzy": "Нечёткое",
+        "versions": "Версии",
+        "label": "{{confidence}} ({{match}})"
       },
-      "groupCount_other": "",
-      "itemCount_other": ""
+      "groupCount_one": "{{count}} группа",
+      "groupCount_few": "{{count}} группы",
+      "groupCount_many": "{{count}} групп",
+      "groupCount_other": "{{count}} групп",
+      "itemCount_one": "{{count}} элемент",
+      "itemCount_few": "{{count}} элемента",
+      "itemCount_many": "{{count}} элементов",
+      "itemCount_other": "{{count}} элементов"
     },
     "watch": {
       "watched": "Просмотрено",
@@ -567,129 +639,132 @@
       "viewingHours": "Часы просмотра",
       "peak": "Пик:",
       "viewingTrend": "",
-      "busiest": "",
+      "busiest": "Максимум:",
       "quietest": "Тихий тест:",
       "bingeHighlights": "Лучшие марафоны",
-      "bingeHighlightsDesc": "",
+      "bingeHighlightsDesc": "Сериалы с самым интенсивным просмотром.",
       "bingeSessions": "Сессии марафонов",
       "noData": "Нет данных для просмотра",
       "noDataDesc": "Аналитика просмотров появится здесь после воспроизведения контента. Загляните сюда позже.",
       "failedToLoad": "Не удалось загрузить аналитику",
       "failedToLoadDesc": "Не удалось получить данные о просмотрах.",
-      "mostWatched": "",
+      "mostWatched": "Самое просматриваемое",
       "binge": {
         "columns": {
-          "show": "",
-          "servers": "",
-          "consecutive": "",
-          "bingeScore": "",
-          "maxPerDay": ""
+          "show": "Сериал",
+          "servers": "Серверы",
+          "consecutive": "Подряд",
+          "bingeScore": "Балл марафона",
+          "maxPerDay": "Макс./день"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Марафоны не обнаружены",
+          "description": "Посмотрите несколько серий подряд, чтобы увидеть марафоны."
         }
       },
-      "percentWatchedValue": "",
-      "avgPerItemValue": "",
+      "percentWatchedValue": "Просмотрено: {{pct}}%",
+      "avgPerItemValue": "{{value}} в среднем на элемент",
       "top": {
         "movies": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "Нет данных о просмотре фильмов",
+            "description": "Статистика просмотра фильмов появится здесь после первых воспроизведений."
           }
         },
         "shows": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "Нет данных о просмотре сериалов",
+            "description": "Статистика просмотра сериалов появится здесь после воспроизведения серий."
           }
         }
       }
     },
     "emptyState": {
-      "checkingStatus": "",
+      "checkingStatus": "Проверка состояния библиотеки...",
       "backfillAvailable": {
-        "title": "",
-        "bodyWithDays": "",
-        "bodyGeneric": "",
-        "syncRunningTitle": "",
-        "syncRunningBody": ""
+        "title": "Доступны исторические данные",
+        "bodyWithDays": "В вашей библиотеке есть история за {{days}} дн. Создайте снимки, чтобы видеть тренды на графиках.",
+        "bodyGeneric": "Создайте исторические снимки, чтобы видеть тренды библиотеки со временем.",
+        "syncRunningTitle": "Идёт синхронизация библиотеки...",
+        "syncRunningBody": "Создание исторических данных начнётся автоматически после завершения синхронизации."
       },
-      "generateHistory": "",
-      "starting": "",
+      "generateHistory": "Создать историю",
+      "starting": "Запуск...",
       "syncInProgress": {
-        "title": "",
-        "body": ""
+        "title": "Идёт синхронизация библиотеки...",
+        "body": "Статистика библиотеки появится после завершения синхронизации. Это может занять несколько минут в зависимости от размера библиотеки."
       },
       "notSynced": {
-        "title": "",
-        "body": ""
+        "title": "Библиотека ещё не синхронизирована",
+        "body": "Статистика библиотеки появится здесь после её синхронизации. Обычно это происходит автоматически каждый час."
       },
       "noMedia": {
-        "title": "",
-        "body": ""
+        "title": "Фильмов и сериалов пока нет",
+        "body": "Эта библиотека синхронизирована, но фильмов и сериалов в ней пока нет."
       },
-      "syncNow": "",
-      "syncing": "",
-      "notSyncedShort": "",
+      "syncNow": "Синхронизировать",
+      "syncing": "Синхронизация...",
+      "notSyncedShort": "Ещё не синхронизировано",
       "backfillRunning": {
-        "title": "",
-        "fallbackBody": "",
-        "progress": "",
-        "snapshotsSuffix_one": "",
-        "snapshotsSuffix_few": "",
-        "snapshotsSuffix_many": "",
-        "snapshotsSuffix_other": ""
+        "title": "Создание исторических данных...",
+        "fallbackBody": "Создаются снимки из истории библиотеки. Это может занять несколько минут.",
+        "progress": "Библиотеки: {{processed}} из {{total}}",
+        "snapshotsSuffix_one": " ({{count}} снимок)",
+        "snapshotsSuffix_few": " ({{count}} снимка)",
+        "snapshotsSuffix_many": " ({{count}} снимков)",
+        "snapshotsSuffix_other": " ({{count}} снимков)"
       },
       "multiServer": {
-        "title": "",
-        "body": "",
-        "needsBackfillIntro": ""
+        "title": "Некоторым библиотекам нужно внимание",
+        "body": "Синхронизируйте серверы ниже, чтобы видеть общую статистику библиотек.",
+        "needsBackfillIntro": "Эти серверы синхронизированы, но исторических данных у них пока нет:"
       },
       "toast": {
-        "noServerSelected": "",
-        "syncStartedTitle": "",
-        "syncStartedDesc": "",
-        "syncFailedTitle": "",
-        "genericRetry": "",
-        "backfillStartedTitle": "",
-        "backfillStartedDesc": "",
-        "backfillFailedTitle": "",
-        "backfillCompleteTitle": "",
-        "backfillErrorTitle": ""
+        "noServerSelected": "Сервер не выбран",
+        "syncStartedTitle": "Синхронизация библиотеки запущена",
+        "syncStartedDesc": "Это может занять несколько минут в зависимости от размера библиотеки.",
+        "syncFailedTitle": "Не удалось запустить синхронизацию",
+        "genericRetry": "Повторите попытку.",
+        "backfillStartedTitle": "Заполнение запущено",
+        "backfillStartedDesc": "Создаются исторические снимки.",
+        "backfillFailedTitle": "Не удалось запустить заполнение",
+        "backfillCompleteTitle": "Заполнение завершено",
+        "backfillErrorTitle": "Заполнение не удалось"
       }
     },
     "versionsBackfill": {
-      "banner": "",
-      "action": "",
-      "syncStarted": "",
-      "syncFailed_one": "",
-      "syncFailed_few": "",
-      "syncFailed_many": "",
-      "syncFailed_other": ""
+      "banner": "Для этого сервера ещё собираются данные о версиях файлов. Запустите синхронизацию библиотеки, чтобы завершить.",
+      "action": "Синхронизировать",
+      "syncStarted": "Синхронизация библиотеки запущена.",
+      "syncFailed_one": "Не удалось запустить синхронизацию на {{count}} сервере. Проверьте разрешения и состояние сервера.",
+      "syncFailed_few": "Не удалось запустить синхронизацию на {{count}} серверах. Проверьте разрешения и состояние сервера.",
+      "syncFailed_many": "Не удалось запустить синхронизацию на {{count}} серверах. Проверьте разрешения и состояние сервера.",
+      "syncFailed_other": "Не удалось запустить синхронизацию на {{count}} серверах. Проверьте разрешения и состояние сервера."
     },
     "charts": {
       "storage": {
-        "historical": "",
-        "prediction": "",
-        "now": "",
-        "axis": "",
-        "range": "",
+        "historical": "История",
+        "prediction": "Прогноз",
+        "now": "Сейчас",
+        "axis": "Хранилище ({{unit}})",
+        "range": "Диапазон: {{low}} - {{high}} {{unit}}",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных о хранилище",
+          "description": "История хранилища появится здесь, когда будет доступна"
         }
       },
       "qualityTimeline": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных о качестве",
+          "description": "Данные об изменении качества появятся здесь, когда будут доступны"
         },
-        "titles_other": ""
+        "titles_one": "{{count, number}} название",
+        "titles_few": "{{count, number}} названия",
+        "titles_many": "{{count, number}} названий",
+        "titles_other": "{{count, number}} названий"
       },
       "monthly": {
-        "watchCount": "",
+        "watchCount": "Просмотры",
         "empty": {
           "title": "",
           "description": ""
@@ -697,27 +772,33 @@
       },
       "growth": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных о росте",
+          "description": "Данные о росте библиотеки появятся здесь, когда будут доступны"
         }
       },
       "hourly": {
-        "watches": "",
+        "watches": "Просмотры",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных по часам",
+          "description": "Распределение просмотров по часам появится здесь, когда будут данные"
         }
       },
       "completion": {
-        "inProgress": "",
-        "notStarted": "",
+        "inProgress": "В процессе",
+        "notStarted": "Не начато",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Нет данных о досмотре",
+          "description": "Разбивка по досмотру появится здесь, когда будут данные о просмотрах"
         },
-        "tooltip_other": ""
+        "tooltip_one": "<b>{{count}}</b> элемент ({{percent}}%)",
+        "tooltip_few": "<b>{{count}}</b> элемента ({{percent}}%)",
+        "tooltip_many": "<b>{{count}}</b> элементов ({{percent}}%)",
+        "tooltip_other": "<b>{{count}}</b> элементов ({{percent}}%)"
       },
-      "watchesValue_other": ""
+      "watchesValue_one": "Просмотры: {{count}}",
+      "watchesValue_few": "Просмотры: {{count}}",
+      "watchesValue_many": "Просмотры: {{count}}",
+      "watchesValue_other": "Просмотры: {{count}}"
     }
   },
   "activity": {
@@ -725,20 +806,26 @@
     "concurrentStreams": "Одновременные потоки",
     "engagementBreakdown": "Разбивка участия",
     "howUsersEngage": "Как пользователи взаимодействуют с контентом",
-    "howYouEngage": "",
+    "howYouEngage": "Насколько вас увлекает то, что вы смотрите",
     "playsVsSessions": "Просмотры и сессии",
     "playsVsSessionsDesc": "Только полные просмотры: просмотр засчитывается, когда общее время просмотра покрывает всю длительность контента",
     "activityByDayOfWeek": "Активность по дням недели",
     "activityByHourOfDay": "Активность по часам дня",
     "platforms": "Платформы",
     "streamQuality": "Качество потока",
-    "noEngagementData": "",
-    "noPlatformData": "",
-    "noQualityData": "",
-    "noConcurrentData": "",
-    "peakConcurrent": "",
-    "tierItems_other": "",
-    "playsShare_other": ""
+    "noEngagementData": "Нет данных о вовлечённости",
+    "noPlatformData": "Нет данных о платформах",
+    "noQualityData": "Нет данных о качестве",
+    "noConcurrentData": "Нет данных об одновременных потоках",
+    "peakConcurrent": "Пик одновременных: {{value}}",
+    "tierItems_one": "{{count}} элемент",
+    "tierItems_few": "{{count}} элемента",
+    "tierItems_many": "{{count}} элементов",
+    "tierItems_other": "{{count}} элементов",
+    "playsShare_one": "<b>{{count}}</b> просмотр ({{percent}}%)",
+    "playsShare_few": "<b>{{count}}</b> просмотра ({{percent}}%)",
+    "playsShare_many": "<b>{{count}}</b> просмотров ({{percent}}%)",
+    "playsShare_other": "<b>{{count}}</b> просмотров ({{percent}}%)"
   },
   "violations": {
     "title": "Нарушения",
@@ -750,13 +837,13 @@
     "noViolationsRecorded": "Пока никаких нарушений не зарегистрировано.",
     "allSeverities": "Все Серьезности",
     "allStatuses": "Все статусы",
-    "allRules": "",
-    "filterPeople": "",
-    "allPeople": "",
-    "personFilterPlaceholder": "",
-    "personFilterEmpty": "",
-    "personFilterError": "",
-    "filterByPerson": "",
+    "allRules": "Все правила",
+    "filterPeople": "Люди",
+    "allPeople": "Все люди",
+    "personFilterPlaceholder": "Фильтр по человеку",
+    "personFilterEmpty": "Подходящих людей не найдено",
+    "personFilterError": "Не удалось загрузить список людей",
+    "filterByPerson": "Показать нарушения этого человека",
     "detail": {
       "notFound": "Нарушение не найдено",
       "violationDetails": "Детали нарушения",
@@ -779,1410 +866,1410 @@
       "conditionGroup": "Группа условий {{index}}",
       "matched": "Соответствует {{matched}}/{{total}}",
       "actual": "Фактический",
-      "actionResults": "",
+      "actionResults": "Действия",
       "relatedSessions_one": "Связанная с {{count}} сессия",
-      "relatedSessions_few": "",
-      "relatedSessions_many": "",
+      "relatedSessions_few": "{{count}} связанные сессии",
+      "relatedSessions_many": "{{count}} связанных сессий",
       "relatedSessions_other": "{{count}} связанные сессии"
     },
-    "selectAllViolations_one": "",
-    "selectAllViolations_few": "",
-    "selectAllViolations_many": "",
+    "selectAllViolations_one": "Выбрать {{count}} нарушение, соответствующее фильтрам",
+    "selectAllViolations_few": "Выбрать все {{count}} нарушения, соответствующие фильтрам",
+    "selectAllViolations_many": "Выбрать все {{count}} нарушений, соответствующих фильтрам",
     "selectAllViolations_other": "Выбрать все {{count}} нарушений, соответствующих фильтрам",
     "dismissViolations_one": "Отклонить нарушения: {{count}}",
-    "dismissViolations_few": "",
-    "dismissViolations_many": "",
+    "dismissViolations_few": "Отклонить нарушения: {{count}}",
+    "dismissViolations_many": "Отклонить нарушения: {{count}}",
     "dismissViolations_other": "Отклонить нарушения: {{count}}",
-    "peopleSelectedCount_one": "",
-    "peopleSelectedCount_few": "",
-    "peopleSelectedCount_many": "",
-    "peopleSelectedCount_other": ""
+    "peopleSelectedCount_one": "{{count}} человек",
+    "peopleSelectedCount_few": "{{count}} человека",
+    "peopleSelectedCount_many": "{{count}} человек",
+    "peopleSelectedCount_other": "{{count}} человек"
   },
   "automations": {
     "message": {
-      "heading": "",
-      "defaultText": "",
-      "title": "",
-      "body": "",
-      "blankHint": "",
-      "insertVariable": "",
-      "searchVariables": "",
-      "noVariables": "",
-      "preview": "",
-      "previewSamples": "",
-      "previewDefault": "",
-      "previewDefaultHint": "",
-      "previewPickDestination": "",
-      "fieldTitle": "",
-      "fieldMessage": "",
-      "fieldSubject": "",
-      "fieldHeading": "",
-      "fieldEmbedTitle": "",
-      "fieldDescription": "",
-      "addedDiscord": "",
-      "addedEmail": "",
-      "addedPushSubtitle": "",
-      "previewCount": "",
-      "previewCountBytes": "",
-      "previewCut": "",
-      "previewPriority": "",
-      "previewEscapeHint": "",
-      "webhookNotSent": ""
+      "heading": "Сообщение",
+      "defaultText": "Текст по умолчанию",
+      "title": "Название",
+      "body": "Сообщение",
+      "blankHint": "Оставьте пустым, чтобы использовать текст по умолчанию каждого канала доставки",
+      "insertVariable": "Вставить переменную",
+      "searchVariables": "Поиск переменных",
+      "noVariables": "Переменные не найдены",
+      "preview": "Предпросмотр",
+      "previewSamples": "Показано с примерами значений, например {{user}} в качестве пользователя",
+      "previewDefault": "Текст Tracearr по умолчанию для этого события",
+      "previewDefaultHint": "Формулировка зависит от события и канала доставки",
+      "previewPickDestination": "Выберите каналы доставки, чтобы увидеть, как это выглядит в каждом из них",
+      "fieldTitle": "Название",
+      "fieldMessage": "Сообщение",
+      "fieldSubject": "Тема",
+      "fieldHeading": "Заголовок (как тема)",
+      "fieldEmbedTitle": "Заголовок embed",
+      "fieldDescription": "Описание",
+      "addedDiscord": "Добавляет Tracearr в зависимости от события: цвет, поля вроде \"Пользователь\", \"Медиа\" и \"Плеер\", а в событиях медиа ещё постер и нижний колонтитул. Если поля длинные, описание может быть сокращено.",
+      "addedEmail": "Добавляет Tracearr: метку серьёзности, сведения о событии, время отправки и ссылку на Tracearr",
+      "addedPushSubtitle": "Подзаголовок, который Tracearr задаёт для большинства событий",
+      "previewCount": "{{used, number}} / {{max, number}}",
+      "previewCountBytes": "{{used, number}} / {{max, number}} байт",
+      "previewCut": "обрезано по размеру",
+      "previewPriority": "Приоритет: {{priority}}",
+      "previewEscapeHint": "С учётом символов экранирования Discord",
+      "webhookNotSent": "Не отправляется. В теле запроса передаются данные самого события."
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "Автоматически",
+      "lowest": "Самый низкий",
+      "low": "Низкий",
+      "normal": "Обычный",
+      "high": "Высокий",
+      "urgent": "Срочный"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
-      "trust": "",
-      "newsletter": "",
-      "event": ""
+      "account": "Аккаунт",
+      "stream": "Поток",
+      "server": "Сервер",
+      "media": "Медиа",
+      "device": "Устройство",
+      "trust": "Доверие",
+      "newsletter": "Рассылка",
+      "event": "Событие"
     },
     "variables": {
       "user": {
-        "username": "",
-        "identityName": ""
+        "username": "Имя пользователя аккаунта",
+        "identityName": "Имя человека"
       },
       "session": {
-        "mediaTitle": "",
-        "mediaType": "",
-        "sourceDynamicRange": "",
-        "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
-        "name": ""
+        "mediaTitle": "Воспроизводимое название",
+        "mediaType": "Тип медиа",
+        "sourceDynamicRange": "Исходный динамический диапазон",
+        "sourceVideoCodec": "Исходный видеокодек",
+        "seasonNumber": "Номер сезона",
+        "episodeNumber": "Номер серии",
+        "name": "Сериал и серия или название"
       },
       "server": {
-        "name": "",
-        "type": ""
+        "name": "Имя сервера",
+        "type": "Тип сервера"
       },
       "device": {
-        "name": "",
-        "platform": "",
-        "product": "",
-        "location": ""
+        "name": "Имя устройства",
+        "platform": "Платформа",
+        "product": "Приложение",
+        "location": "Местоположение"
       },
       "download": {
-        "title": "",
-        "app": "",
-        "device": "",
-        "last24h": ""
+        "title": "Скачанное название",
+        "app": "Приложение для скачивания",
+        "device": "Устройство для скачивания",
+        "last24h": "Скачивания за последние 24 часа"
       },
       "trust": {
-        "previous": "",
-        "new": "",
-        "reason": ""
+        "previous": "Предыдущий балл",
+        "new": "Новый балл",
+        "reason": "Причина"
       },
       "media": {
-        "title": "",
-        "name": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "episodeCount": "",
-        "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "title": "Название элемента",
+        "name": "Сериал и серия или название",
+        "show": "Сериал",
+        "season": "Сезон",
+        "episode": "Серия",
+        "episodeCount": "Добавлено серий",
+        "type": "Тип медиа",
+        "year": "Год",
+        "library": "Библиотека",
+        "server": "Сервер",
         "from": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Старое разрешение",
+          "dynamicRange": "Старый динамический диапазон",
+          "videoCodec": "Старый видеокодек",
+          "audioCodec": "Старый аудиокодек",
+          "audioChannels": "Старые аудиоканалы",
+          "fileSize": "Старый размер файла"
         },
         "to": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "Новое разрешение",
+          "dynamicRange": "Новый динамический диапазон",
+          "videoCodec": "Новый видеокодек",
+          "audioCodec": "Новый аудиокодек",
+          "audioChannels": "Новые аудиоканалы",
+          "fileSize": "Новый размер файла"
         }
       },
       "newsletter": {
-        "name": "",
-        "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "name": "Рассылка",
+        "outcome": "Результат",
+        "recipientCount": "Получатели",
+        "error": "Ошибка"
       },
-      "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
-      "releaseUrl": ""
+      "durationMinutes": "Просмотрено минут",
+      "minutes": "Минуты",
+      "days": "Неактивные дни",
+      "installedVersion": "Установленная версия",
+      "latestVersion": "Последняя версия",
+      "downloadUrl": "Ссылка на скачивание",
+      "releaseUrl": "Ссылка на примечания к выпуску"
     },
     "actions": {
       "send": {
-        "label": "",
-        "description": "",
+        "label": "Отправить уведомление",
+        "description": "Отправить в один или несколько каналов доставки",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Минимальное время между уведомлениями"
           },
           "priority": {
-            "description": ""
+            "description": "Используется в Pushover, Gotify, ntfy и Telegram"
           }
         },
-        "ran": ""
+        "ran": "Уведомление отправлено"
       },
       "trust": {
-        "label": "",
-        "description": "",
+        "label": "Балл доверия",
+        "description": "Изменить, задать или сбросить балл доверия",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Режим"
           },
           "amount": {
-            "label": "",
-            "description": ""
+            "label": "Величина",
+            "description": "Положительная увеличивает, отрицательная уменьшает"
           },
           "value": {
-            "label": ""
+            "label": "Значение"
           }
         },
-        "ran": ""
+        "ran": "Балл доверия изменён"
       },
       "kill_stream": {
-        "label": "",
-        "description": "",
+        "label": "Завершить поток",
+        "description": "Завершить активный поток",
         "fields": {
           "cooldown_minutes": {
-            "description": ""
+            "description": "Минимальное время между завершениями для одного пользователя"
           },
           "delay_seconds": {
-            "label": "",
-            "description": ""
+            "label": "Период ожидания",
+            "description": "Ждёт указанное число секунд и завершает поток, только если автоматизация всё ещё срабатывает. При 0 завершает сразу после последней перепроверки."
           },
           "target": {
-            "description": ""
+            "description": "Какие сессии завершать"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Необязательное сообщение"
           }
         },
-        "ran": ""
+        "ran": "Поток остановлен"
       },
       "message_client": {
-        "label": "",
-        "description": "",
-        "hint": "",
+        "label": "Сообщение клиенту",
+        "description": "Отправить сообщение в медиаплеер",
+        "hint": "Только Jellyfin и Emby. Plex поддерживает сообщения только при завершении потока.",
         "fields": {
           "target": {
-            "description": ""
+            "description": "Каким сессиям отправлять сообщение"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "Текст сообщения…"
           }
         },
-        "ran": ""
+        "ran": "Сообщение показано в плеере"
       }
     },
     "activity": {
-      "title": "",
-      "description": "",
-      "outcome": "",
-      "who": "",
-      "where": "",
-      "playing": "",
-      "from": "",
-      "summary": "",
-      "started": "",
-      "finished": "",
-      "noSummary": "",
+      "title": "Активность",
+      "description": "Что делала эта автоматизация, сначала новое. Запуски хранятся {{days}} дн.",
+      "outcome": "Результат",
+      "who": "Кто",
+      "where": "Где",
+      "playing": "Играет",
+      "from": "Откуда",
+      "summary": "Сводка",
+      "started": "Начато",
+      "finished": "Завершено",
+      "noSummary": "Нет примечаний",
       "outcomes": {
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "completed": "Выполнено",
+        "stopped_by_condition": "Нет совпадения",
+        "error": "Ошибка"
       },
-      "empty": "",
-      "emptyDescription": "",
-      "runTitle": "",
-      "runLoading": "",
-      "triggeredBy": "",
-      "unknownStep": "",
+      "empty": "Запусков пока нет",
+      "emptyDescription": "Запуски появятся здесь, когда сработает триггер.",
+      "runTitle": "Запуск",
+      "runLoading": "Загрузка запуска",
+      "triggeredBy": "Триггер: {{trigger}}",
+      "unknownStep": "Неизвестный шаг",
       "tabs": {
-        "all": "",
-        "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "all": "Все",
+        "completed": "Выполнено",
+        "stopped_by_condition": "Нет совпадения",
+        "error": "Ошибка"
       },
-      "group": "",
+      "group": "Группа {{number}}",
       "branch": {
-        "then": "",
-        "else": ""
+        "then": "Выполнены шаги \"если\"",
+        "else": "Выполнены шаги \"иначе\""
       },
-      "whyBranch": "",
-      "openInEditor": "",
-      "tabsLabel": "",
-      "emptyRan": "",
-      "item": "",
-      "recordedViolation": "",
-      "emptyRanDescription_one": "",
-      "emptyRanDescription_few": "",
-      "emptyRanDescription_many": "",
-      "emptyRanDescription_other": ""
+      "whyBranch": "Что было прочитано",
+      "openInEditor": "Открыть в конструкторе с этим запуском",
+      "tabsLabel": "Фильтр по результату",
+      "emptyRan": "Совпадений пока не было",
+      "item": "Элемент",
+      "recordedViolation": "Записано нарушение",
+      "emptyRanDescription_one": "{{count}} проверка выполнена, совпадений нет.",
+      "emptyRanDescription_few": "{{count}} проверки выполнены, совпадений нет.",
+      "emptyRanDescription_many": "{{count}} проверок выполнено, совпадений нет.",
+      "emptyRanDescription_other": "{{count}} проверок выполнено, совпадений нет."
     },
-    "allKinds": "",
-    "allStatuses": "",
-    "allSeverities": "",
+    "allKinds": "Все типы",
+    "allStatuses": "Все статусы",
+    "allSeverities": "Любая серьёзность",
     "bind": {
-      "nameHelper": "",
-      "namePlaceholder": "",
-      "activeLabel": "",
-      "submit": "",
-      "submitting": "",
-      "customize": "",
+      "nameHelper": "Название в списке автоматизаций.",
+      "namePlaceholder": "Название этой автоматизации",
+      "activeLabel": "Включить сейчас",
+      "submit": "Использовать",
+      "submitting": "Настройка…",
+      "customize": "Открыть в конструкторе",
       "doors": {
-        "helper": ""
+        "helper": "\"Использовать\" оставляет шаги как есть, а ответы выше можно изменить позже. \"Открыть в конструкторе\" делает каждый шаг редактируемым и разрывает связь с готовой автоматизацией."
       },
-      "anyServer": "",
-      "serverHelper": "",
-      "serverLabel": "",
-      "accountLabel": "",
-      "personLabel": "",
-      "destinationsLabel": "",
-      "required": "",
+      "anyServer": "Любой сервер",
+      "serverHelper": "\"Любой сервер\" означает все серверы.",
+      "serverLabel": "Какой сервер",
+      "accountLabel": "Какой аккаунт",
+      "personLabel": "Какой человек",
+      "destinationsLabel": "Кому",
+      "required": "Выберите хотя бы один вариант.",
       "needs": {
-        "title": ""
+        "title": "Что нужно"
       },
       "helper": {
-        "killMessage": "",
-        "clientMessage": ""
+        "killMessage": "Показывается в плеере при остановке потока.",
+        "clientMessage": "Показывается в плеере, пока воспроизведение продолжается."
       },
-      "noInputs": "",
-      "failed": "",
-      "created": "",
-      "createdOff": ""
+      "noInputs": "Заполнять нечего.",
+      "failed": "Не удалось настроить. Повторите попытку.",
+      "created": "{{name}}: настроено и работает.",
+      "createdOff": "{{name}}: создано, но выключено. Включите в списке."
     },
     "builder": {
-      "destinationDisabled": "",
-      "noAlertRecipientsTooltip": "",
-      "noDestinations": "",
-      "newDestination": "",
+      "destinationDisabled": "Канал доставки отключён",
+      "noAlertRecipientsTooltip": "У этого канала доставки нет получателей оповещений, поэтому оповещения не будут отправлены.",
+      "noDestinations": "Каналов доставки пока нет. Добавьте канал, чтобы отправлять уведомления.",
+      "newDestination": "Новый канал доставки",
       "errors": {
-        "sendNeedsDestination": "",
-        "nameRequired": "",
-        "scopeIncomplete": "",
-        "triggerRequired": "",
-        "policyNeedsSubject": "",
-        "fieldUnavailable": "",
-        "operatorInvalid": "",
-        "valueInvalid": "",
-        "actionUnavailable": "",
-        "variableUnavailable": "",
-        "minutesRange": "",
-        "daysRange": "",
-        "measureInvalid": "",
-        "fieldNotAvailableFor": "",
-        "trustAmountRange": "",
-        "trustValueRange": "",
-        "messageRequired": "",
-        "tooLong": "",
+        "sendNeedsDestination": "Выберите хотя бы один канал доставки",
+        "nameRequired": "Дайте этой автоматизации название",
+        "scopeIncomplete": "Выберите, к кому это относится",
+        "triggerRequired": "Добавьте то, что запускает автоматизацию, или снова включите один из триггеров",
+        "policyNeedsSubject": "Нарушения относятся к человеку, поэтому здесь нужен триггер потока или аккаунта.",
+        "fieldUnavailable": "Эта проверка доступна не для всех триггеров здесь",
+        "operatorInvalid": "Это сравнение не подходит к проверке",
+        "valueInvalid": "Это значение не подходит к проверке",
+        "actionUnavailable": "Эти триггеры не передают то, что нужно этому действию",
+        "variableUnavailable": "В сообщении упомянуто то, что передают не все триггеры здесь",
+        "minutesRange": "От {{min}} до {{max}} мин.",
+        "daysRange": "От {{min}} до {{max}} дн.",
+        "measureInvalid": "Выберите, как считать минуты",
+        "fieldNotAvailableFor": "Недоступно для: {{triggers}}",
+        "trustAmountRange": "Балл доверия меняется на величину от -100 до 100",
+        "trustValueRange": "Балл доверия должен быть от 0 до 100",
+        "messageRequired": "Введите текст сообщения",
+        "tooLong": "Максимум символов: {{max}}",
         "template": {
-          "unclosed": "",
-          "invalidOutput": "",
-          "invalidTag": "",
-          "unexpectedElse": "",
-          "unexpectedEndif": "",
-          "missingEndif": ""
+          "unclosed": "Строка {{line}}: {{open}} нигде не закрывается",
+          "invalidOutput": "Строка {{line}}: внутри {{braces}} должна быть только переменная",
+          "invalidTag": "Строка {{line}}: допустимы только теги if, else и endif",
+          "unexpectedElse": "Строка {{line}}: else без соответствующего if",
+          "unexpectedEndif": "Строка {{line}}: endif без соответствующего if",
+          "missingEndif": "Строка {{line}}: для if нужен endif"
         },
-        "templateVariable": ""
+        "templateVariable": "Переменная {{name}} доступна не для всех триггеров этой автоматизации"
       },
       "recordAs": {
-        "label": "",
-        "policy": "",
-        "policyDescription": "",
-        "notification": "",
-        "notificationDescription": ""
+        "label": "При запуске записывать как",
+        "policy": "Нарушение",
+        "policyDescription": "Отображается в разделе \"Нарушения\", можно подтвердить.",
+        "notification": "Оповещение",
+        "notificationDescription": "Записывается в раздел \"Активность\", нарушением не считается."
       },
-      "severityLabel": "",
-      "activeLabel": "",
-      "saving": "",
-      "selectPlaceholder": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "clearSelection": "",
+      "severityLabel": "Насколько серьёзно?",
+      "activeLabel": "Активна",
+      "saving": "Сохранение…",
+      "selectPlaceholder": "Выберите…",
+      "searchPlaceholder": "Поиск…",
+      "noMatches": "Нет совпадений",
+      "clearSelection": "Снять выбор",
       "scope": {
-        "label": "",
-        "global": "",
-        "server": "",
-        "account": "",
-        "person": "",
-        "serverLabel": "",
-        "serverPlaceholder": "",
-        "accountLabel": "",
-        "accountPlaceholder": "",
-        "personLabel": "",
-        "personPlaceholder": "",
-        "personHelper": "",
-        "noServers": "",
-        "historicalNote": "",
-        "enforceAcrossServers": "",
-        "enforceAcrossServersDescription": ""
+        "label": "К кому это относится",
+        "global": "Все",
+        "server": "Один сервер",
+        "account": "Один аккаунт",
+        "person": "Один человек",
+        "serverLabel": "Сервер",
+        "serverPlaceholder": "Выбрать сервер",
+        "accountLabel": "Аккаунт",
+        "accountPlaceholder": "Выбрать аккаунт",
+        "personLabel": "Человек",
+        "personPlaceholder": "Выбрать человека",
+        "personHelper": "Срабатывает на этого человека на каждом сервере, где у него есть аккаунт.",
+        "noServers": "Серверы пока не подключены.",
+        "historicalNote": "Это архивный сервер. Триггеры, которым он нужен в работе, например события потоков, сервера и обновлений, не сработают, пока он не будет возобновлён.",
+        "enforceAcrossServers": "Действовать на его потоки на любом из его серверов",
+        "enforceAcrossServersDescription": "Действует на сессии человека на любом из его серверов, а не только на том, который вызвал срабатывание. По умолчанию выключено."
       },
       "conditions": {
-        "addGroup": "",
-        "fieldPlaceholder": "",
-        "windowPrefix": "",
-        "windowUnit": "",
-        "uniqueDevices": "",
-        "uniqueDevicesHint": "",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "allDeviceTypes": "",
-        "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
-        "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
-        "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
-        "canNeverPass": "",
-        "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "addGroup": "Добавить отдельный набор проверок",
+        "fieldPlaceholder": "Выберите, что проверять",
+        "windowPrefix": "за",
+        "windowUnit": "ч",
+        "uniqueDevices": "Уникальные устройства",
+        "uniqueDevicesHint": "Считаются только сессии с разных физических устройств.",
+        "uniqueIps": "Уникальные IP",
+        "uniqueIpsHint": "Считаются только сессии с разных IP-адресов, поэтому потоки из одного дома не учитываются.",
+        "allDeviceTypes": "Все типы устройств",
+        "deviceTypesHint": "Считаются только потоки с выбранных типов устройств. Если пусто, то со всех устройств.",
+        "yes": "Да",
+        "no": "Нет",
+        "recentlySeen": "Недавно замечен",
+        "allCountries": "Все страны",
+        "sectionTitle": "И только если…",
+        "optional": "необязательно",
+        "helper": "Проверки, которые должны пройти первыми. Если их нет, автоматизация запускается каждый раз.",
+        "emptyLine": "Дополнительных проверок нет. Запускается каждый раз.",
+        "all": "и",
+        "any": "или",
+        "allHint": "и: должны пройти все проверки",
+        "anyHint": "или: достаточно одной проверки",
+        "matchLabel": "Соединять проверки через",
+        "fieldLabel": "Что проверять",
+        "operatorLabel": "Сравнение",
+        "valueLabel": "Значение",
+        "canNeverPass": "Это условие никогда не выполнится: триггер срабатывает уже на {{threshold}}.",
+        "noFields": "Для этих триггеров проверок нет. Сначала добавьте триггер потока или аккаунта.",
+        "groupSeparator": "и также",
+        "addAnother": "Добавить проверку",
+        "addFirst": "Добавить проверку",
+        "removeGroup": "Удалить этот набор проверок"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
-        "confirmRemoveDescription": "",
-        "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "add": "Добавить ещё одно действие",
+        "sectionTitle": "Затем выполнить…",
+        "ifTitle": "Если…",
+        "helper": "Выполняются по порядку, сверху вниз.",
+        "emptyTitle": "Что должно произойти?",
+        "emptyDescription": "Отправить уведомление, остановить поток, изменить балл доверия или выполнить шаги только при прохождении дополнительной проверки.",
+        "emptyAction": "Выбрать, что произойдёт",
+        "moveUp": "Переместить {{name}} вверх",
+        "moveDown": "Переместить {{name}} вниз",
+        "menu": "Ещё для {{name}}",
+        "branchName": "эта ветка",
+        "confirmRemoveTitle": "Удалить это действие?",
+        "confirmRemoveDescription": "Перестанет выполняться после сохранения.",
+        "policyNote": "Ветка не решает, будет ли это отмечено как нарушение; это решает раздел \"И только если…\".",
+        "branchThen": "Выполнить",
+        "branchElse": "Иначе",
+        "branchElseEmpty": "Ничего. Автоматизация продолжается.",
+        "ifNothing": "пока ничего не выбрано",
+        "ifAddCheck": "Добавить ещё одну проверку",
+        "addBranch": "Добавить шаг",
+        "expandBranch": "Показать шаги этой ветки",
+        "collapseBranch": "Скрыть шаги этой ветки"
       },
       "when": {
-        "title": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "add": "",
-        "or": ""
+        "title": "Когда…",
+        "helper": "Запускает любой из них. Нужен хотя бы один.",
+        "emptyTitle": "Что должно это запускать?",
+        "emptyDescription": "Запуск потока, отключение сервера, неактивность аккаунта.",
+        "emptyAction": "Выбрать, что запускает",
+        "add": "Добавить ещё один триггер",
+        "or": "или"
       },
       "heldFor": {
-        "prefix": "",
-        "minutesLabel": "",
-        "unit": "",
-        "measureLabel": "",
-        "current": "",
-        "total": ""
+        "prefix": "Поток приостановлен уже",
+        "minutesLabel": "Минуты",
+        "unit": "мин.",
+        "measureLabel": "Как считать",
+        "current": "в этот раз",
+        "total": "в сумме"
       },
       "inactiveFor": {
-        "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "prefix": "Аккаунт неактивен уже",
+        "daysLabel": "Дни",
+        "unit": "дн."
       },
       "rows": {
-        "toggle": "",
-        "remove": "",
-        "skipped": "",
-        "toggleHint": "",
-        "removeHint": "",
-        "expandHint": "",
-        "moveHint": ""
+        "toggle": "Включить {{name}}",
+        "remove": "Удалить {{name}}",
+        "skipped": "Пропущено",
+        "toggleHint": "пропустить",
+        "removeHint": "удалить",
+        "expandHint": "открыть",
+        "moveHint": "переместить"
       },
       "picker": {
-        "searchPlaceholder": "",
-        "empty": "",
-        "navigate": "",
-        "select": "",
-        "close": ""
+        "searchPlaceholder": "Найдите или опишите, что должно произойти",
+        "empty": "Ничего не найдено.",
+        "navigate": "перейти",
+        "select": "выбрать",
+        "close": "закрыть"
       },
       "sentence": {
-        "label": "",
-        "placeholderTrigger": "",
-        "placeholderAction": ""
+        "label": "Простыми словами",
+        "placeholderTrigger": "что-то происходит",
+        "placeholderAction": "сделать что-то"
       },
       "footer": {
-        "ready": "",
-        "search": "",
-        "problems_one": "",
-        "problems_few": "",
-        "problems_many": "",
-        "problems_other": "",
-        "remaining_one": "",
-        "remaining_few": "",
-        "remaining_many": "",
-        "remaining_other": ""
+        "ready": "Можно сохранять",
+        "search": "для поиска",
+        "problems_one": "Исправить: {{count}}",
+        "problems_few": "Исправить: {{count}}",
+        "problems_many": "Исправить: {{count}}",
+        "problems_other": "Исправить: {{count}}",
+        "remaining_one": "Осталось заполнить: {{count}}",
+        "remaining_few": "Осталось заполнить: {{count}}",
+        "remaining_many": "Осталось заполнить: {{count}}",
+        "remaining_other": "Осталось заполнить: {{count}}"
       },
       "leave": {
-        "title": "",
-        "confirm": ""
+        "title": "Выйти без сохранения?",
+        "confirm": "Выйти"
       },
       "liveCheck": {
-        "title": "",
-        "checking": "",
-        "empty": "",
-        "failed": "",
-        "footnote": "",
-        "expand": "",
-        "passed": "",
-        "notPassed": "",
-        "actual": "",
-        "unfinished": "",
-        "paused": "",
-        "sampleTitle": "",
-        "sampleGone": "",
-        "backToLive": ""
+        "title": "Сейчас на серверах",
+        "checking": "Проверка того, что сейчас играет…",
+        "empty": "Сейчас ничего не играет, проверять не на чем.",
+        "failed": "Не удалось связаться с серверами для проверки.",
+        "footnote": "Интервалы между срабатываниями и уже обработанные сессии не моделируются.",
+        "expand": "Показать, что совпало для {{name}}",
+        "passed": "Пройдено",
+        "notPassed": "Не пройдено",
+        "actual": "сейчас {{value}}",
+        "unfinished": "Покажет, что это сделает, когда автоматизация будет готова.",
+        "paused": "Приостановлено на время сохранения",
+        "sampleTitle": "Что это сделало бы с тем запуском",
+        "sampleGone": "Этой сессии больше нет в записях, проверять не на чем.",
+        "backToLive": "Вернуться к тому, что играет сейчас"
       },
-      "selectedCount_one": "",
-      "selectedCount_few": "",
-      "selectedCount_many": "",
-      "selectedCount_other": ""
+      "selectedCount_one": "Выбрано: {{count}}",
+      "selectedCount_few": "Выбрано: {{count}}",
+      "selectedCount_many": "Выбрано: {{count}}",
+      "selectedCount_other": "Выбрано: {{count}}"
     },
     "categories": {
-      "session_behavior": "",
-      "stream_quality": "",
-      "user_attributes": "",
-      "device_client": "",
-      "network_location": "",
-      "scope": "",
-      "media": ""
+      "session_behavior": "Поведение сессии",
+      "stream_quality": "Качество потока",
+      "user_attributes": "Атрибуты пользователя",
+      "device_client": "Устройство и клиент",
+      "network_location": "Сеть и местоположение",
+      "scope": "Кто и где",
+      "media": "Медиа"
     },
-    "createAutomation": "",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "Создать автоматизацию",
+    "customAutomation": "Пользовательская автоматизация",
+    "deleteAutomationConfirm": "Удалить эту автоматизацию? Это действие нельзя отменить.",
+    "deleteAutomationsConfirm": "Удалить? Это действие нельзя отменить.",
     "describe": {
-      "noValues": "",
-      "includesSameDevice": "",
-      "uniqueIps": "",
-      "deviceTypesOnly": "",
-      "when": "",
-      "or": "",
-      "nothing": "",
-      "onlyWhen": "",
-      "andAlso": "",
-      "allOf": "",
-      "anyOf": "",
-      "joinAll": "",
-      "joinAny": "",
-      "then": "",
-      "otherwise": "",
-      "appliesTo": "",
+      "noValues": "(нет)",
+      "includesSameDevice": "включая то же устройство",
+      "uniqueIps": "уникальные IP",
+      "deviceTypesOnly": "только {{types}}",
+      "when": "Когда {{text}}",
+      "or": "или {{text}}",
+      "nothing": "пока ничего",
+      "onlyWhen": "и только если",
+      "andAlso": "и также",
+      "allOf": "все из:",
+      "anyOf": "любое из:",
+      "joinAll": "и",
+      "joinAny": "или",
+      "then": "затем {{text}}",
+      "otherwise": "Иначе",
+      "appliesTo": "Относится к {{name}}",
       "duration": {
-        "minutes_one": "",
-        "minutes_few": "",
-        "minutes_many": "",
-        "minutes_other": "",
-        "days_one": "",
-        "days_few": "",
-        "days_many": "",
-        "days_other": ""
+        "minutes_one": "{{count}} минуту",
+        "minutes_few": "{{count}} минуты",
+        "minutes_many": "{{count}} минут",
+        "minutes_other": "{{count}} минут",
+        "days_one": "{{count}} день",
+        "days_few": "{{count}} дня",
+        "days_many": "{{count}} дней",
+        "days_other": "{{count}} дней"
       },
       "triggers": {
-        "sessionStarted": "",
-        "sessionFirstSeen": "",
-        "sessionStopped": "",
-        "sessionTranscodeChanged": "",
-        "sessionPaused": "",
-        "sessionHeldFor": "",
-        "sessionHeldForTotal": "",
-        "accountInactiveFor": "",
-        "accountNewDevice": "",
-        "accountTrustChanged": "",
-        "accountMediaDownloaded": "",
-        "mediaAdded": "",
-        "mediaUpgraded": "",
-        "serverDown": "",
-        "serverUp": "",
-        "pluginUpdateAvailable": "",
-        "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterSent": "",
-        "newsletterFailed": ""
+        "sessionStarted": "запускается поток",
+        "sessionFirstSeen": "поток замечен впервые",
+        "sessionStopped": "поток останавливается",
+        "sessionTranscodeChanged": "транскодирование начинается или останавливается",
+        "sessionPaused": "поток приостановлен",
+        "sessionHeldFor": "поток приостановлен уже {{duration}}",
+        "sessionHeldForTotal": "поток приостановлен в сумме {{duration}}",
+        "accountInactiveFor": "аккаунт неактивен уже {{duration}}",
+        "accountNewDevice": "аккаунт воспроизводит с нового устройства",
+        "accountTrustChanged": "меняется балл доверия аккаунта",
+        "accountMediaDownloaded": "аккаунт скачивает медиа",
+        "mediaAdded": "добавлено медиа",
+        "mediaUpgraded": "медиа обновлено",
+        "serverDown": "сервер отключается",
+        "serverUp": "сервер снова работает",
+        "pluginUpdateAvailable": "доступно обновление плагина",
+        "serverUpdateAvailable": "доступно обновление сервера",
+        "tracearrUpdateAvailable": "доступно обновление Tracearr",
+        "newsletterSent": "рассылка отправлена",
+        "newsletterFailed": "отправка рассылки не удалась"
       },
       "operators": {
-        "eq": "",
-        "neq": "",
-        "gt": "",
-        "gte": "",
-        "lt": "",
-        "lte": "",
-        "in": "",
-        "not_in": "",
-        "contains": "",
-        "not_contains": ""
+        "eq": "—",
+        "neq": "не",
+        "gt": "больше",
+        "gte": "не меньше",
+        "lt": "меньше",
+        "lte": "не больше",
+        "in": "в списке:",
+        "not_in": "не в списке:",
+        "contains": "содержит",
+        "not_contains": "не содержит"
       },
       "fields": {
-        "concurrent_streams": "",
-        "active_session_distance_km": "",
-        "travel_speed_kmh": "",
-        "unique_ips_in_window": "",
-        "unique_devices_in_window": "",
-        "downloads_in_window": "",
-        "download_bytes_in_window": "",
-        "inactive_days": "",
-        "current_pause_minutes": "",
-        "total_pause_minutes": "",
-        "source_resolution": "",
-        "output_resolution": "",
-        "source_dynamic_range": "",
-        "source_video_codec": "",
-        "is_transcoding": "",
-        "is_transcode_downgrade": "",
-        "is_subtitle_burn_in": "",
-        "source_bitrate_mbps": "",
-        "user_id": "",
-        "trust_score": "",
-        "account_age_days": "",
-        "device_type": "",
-        "client_name": "",
-        "platform": "",
-        "is_local_network": "",
-        "country": "",
-        "ip_in_range": "",
-        "server_id": "",
-        "media_type": "",
-        "season_number": "",
-        "episode_number": "",
-        "library_item_type": "",
-        "library_name": "",
-        "resolution_after": "",
-        "dynamic_range_after": "",
-        "video_codec_after": "",
-        "audio_channels_after": "",
-        "file_size_after": ""
+        "concurrent_streams": "число потоков",
+        "active_session_distance_km": "расстояние между потоками",
+        "travel_speed_kmh": "скорость перемещения",
+        "unique_ips_in_window": "число IP-адресов",
+        "unique_devices_in_window": "число устройств",
+        "downloads_in_window": "число скачиваний",
+        "download_bytes_in_window": "объём скачанных данных",
+        "inactive_days": "время с последнего потока",
+        "current_pause_minutes": "текущая пауза",
+        "total_pause_minutes": "общее время пауз",
+        "source_resolution": "исходное разрешение",
+        "output_resolution": "выходное разрешение",
+        "source_dynamic_range": "исходный динамический диапазон",
+        "source_video_codec": "исходный видеокодек",
+        "is_transcoding": "транскодирование",
+        "is_transcode_downgrade": "снижение качества",
+        "is_subtitle_burn_in": "вшивание субтитров",
+        "source_bitrate_mbps": "исходный битрейт",
+        "user_id": "пользователь",
+        "trust_score": "балл доверия",
+        "account_age_days": "возраст аккаунта",
+        "device_type": "тип устройства",
+        "client_name": "плеер",
+        "platform": "платформа",
+        "is_local_network": "локальная сеть",
+        "country": "страна",
+        "ip_in_range": "IP-адрес",
+        "server_id": "сервер",
+        "media_type": "тип медиа",
+        "season_number": "номер сезона",
+        "episode_number": "номер серии",
+        "library_item_type": "тип элемента",
+        "library_name": "библиотека",
+        "resolution_after": "разрешение",
+        "dynamic_range_after": "динамический диапазон",
+        "video_codec_after": "видеокодек",
+        "audio_channels_after": "аудиоканалы",
+        "file_size_after": "размер файла"
       },
       "states": {
         "is_local_network": {
-          "yes": "",
-          "no": ""
+          "yes": "пользователь в локальной сети",
+          "no": "пользователь не в локальной сети"
         },
         "is_transcode_downgrade": {
-          "yes": "",
-          "no": ""
+          "yes": "качество потока снижено",
+          "no": "качество потока не снижено"
         },
         "is_subtitle_burn_in": {
-          "yes": "",
-          "no": ""
+          "yes": "субтитры вшиты в видео",
+          "no": "субтитры не вшиты в видео"
         },
         "is_transcoding": {
           "video": {
-            "yes": "",
-            "no": ""
+            "yes": "в потоке транскодируется видео",
+            "no": "в потоке не транскодируется видео"
           },
           "audio": {
-            "yes": "",
-            "no": ""
+            "yes": "в потоке транскодируется аудио",
+            "no": "в потоке не транскодируется аудио"
           },
           "video_or_audio": {
-            "yes": "",
-            "no": ""
+            "yes": "поток транскодируется",
+            "no": "поток не транскодируется"
           },
           "neither": {
-            "yes": "",
-            "no": ""
+            "yes": "поток не транскодируется",
+            "no": "поток транскодируется"
           }
         }
       },
       "actions": {
-        "if": "",
-        "flagIt": "",
-        "doNothing": "",
-        "send": "",
-        "sendAnywhere": "",
-        "kill_stream": "",
-        "message_client": "",
-        "trustUp": "",
-        "trustDown": "",
-        "trustAdjust": "",
-        "trustSet": "",
-        "trustReset": ""
+        "if": "если",
+        "flagIt": "Отметить как нарушение",
+        "doNothing": "ничего не делать",
+        "send": "отправить в {{destinations}}",
+        "sendAnywhere": "отправить уведомление",
+        "kill_stream": "остановить поток",
+        "message_client": "показать сообщение в плеере",
+        "trustUp": "повысить балл доверия на {{amount}}",
+        "trustDown": "снизить балл доверия на {{amount}}",
+        "trustAdjust": "изменить балл доверия на {{amount}}",
+        "trustSet": "задать балл доверия {{value}}",
+        "trustReset": "сбросить балл доверия"
       },
       "scope": {
-        "server": "",
-        "account": "",
-        "person": ""
+        "server": "один сервер",
+        "account": "один аккаунт",
+        "person": "один человек"
       },
-      "sameDeviceInput": "",
-      "uniqueIpsInput": "",
+      "sameDeviceInput": "то же устройство: {{input}}",
+      "uniqueIpsInput": "уникальные IP: {{input}}",
       "unbound": {
-        "server": "",
-        "account": "",
-        "person": "",
-        "destinations": "",
-        "field_value": "",
-        "select": "",
-        "number": "",
-        "duration": "",
-        "text": "",
-        "boolean": "",
-        "listed": ""
+        "server": "выбранный сервер",
+        "account": "выбранный аккаунт",
+        "person": "выбранный человек",
+        "destinations": "выбранный канал доставки",
+        "field_value": "выбранное значение",
+        "select": "выбранный вариант",
+        "number": "выбранное число",
+        "duration": "выбранная длительность",
+        "text": "выбранное сообщение",
+        "boolean": "выбранная настройка",
+        "listed": "выбранные"
       },
-      "more_one": "",
-      "more_few": "",
-      "more_many": "",
-      "more_other": ""
+      "more_one": "ещё {{count}}",
+      "more_few": "ещё {{count}}",
+      "more_many": "ещё {{count}}",
+      "more_other": "ещё {{count}}"
     },
-    "description": "",
+    "description": "Автоматизации следят за вашими серверами и действуют, когда выполняются их условия.",
     "detail": {
-      "notFound": "",
-      "title": "",
-      "unsaved": "",
-      "noRuns": "",
-      "runsLine_one": "",
-      "runsLine_few": "",
-      "runsLine_many": "",
-      "runsLine_other": ""
+      "notFound": "Автоматизация не найдена",
+      "title": "Автоматизация",
+      "unsaved": "Несохранённые изменения",
+      "noRuns": "Запусков пока нет",
+      "runsLine_one": "Запуск · последний {{when}}",
+      "runsLine_few": "{{count}} запуска · последний {{when}}",
+      "runsLine_many": "{{count}} запусков · последний {{when}}",
+      "runsLine_other": "{{count}} запусков · последний {{when}}"
     },
-    "disable": "",
-    "editAutomation": "",
+    "disable": "Отключить",
+    "editAutomation": "Изменить автоматизацию",
     "effects": {
-      "title": "",
-      "kill": "",
-      "trust": "",
-      "message": "",
-      "violation": "",
-      "tellsOnly": "",
-      "allServers": "",
-      "everyServer": "",
-      "oneServer": ""
+      "title": "Что это будет делать",
+      "kill": "Может остановить воспроизводимый поток.",
+      "trust": "Меняет баллы доверия.",
+      "message": "Показывает сообщение в плеере.",
+      "violation": "Записывает нарушение для подходящего человека.",
+      "tellsOnly": "Только уведомляет. Не останавливает потоки и не меняет аккаунты.",
+      "allServers": "Работает на всех серверах, если не выбран один.",
+      "everyServer": "Работает на всех серверах.",
+      "oneServer": "Работает только на {{server}}."
     },
-    "emptyTitle": "",
-    "emptyDescription": "",
-    "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "enable": "",
+    "emptyTitle": "Автоматизаций пока нет",
+    "emptyDescription": "Готовые автоматизации. Выберите одну и заполните пропуски.",
+    "emptySeeAll": "Посмотреть все ({{count}})",
+    "emptySeeAllLoading": "Посмотреть все",
+    "enable": "Включить",
     "evaluations": {
-      "disclosure": "",
+      "disclosure": "Совпадения без запуска ({{total}})",
       "reasons": {
-        "cooldown_active": "",
-        "edge_replayed": "",
-        "gate_blocked": "",
-        "trigger_filter_failed": ""
+        "cooldown_active": "Действовал интервал между срабатываниями",
+        "edge_replayed": "Это событие уже обработано",
+        "gate_blocked": "Это уже охватывает открытый запуск",
+        "trigger_filter_failed": "Порог триггера не достигнут"
       }
     },
     "export": {
-      "title": "",
-      "description": "",
-      "carries": "",
-      "copyCode": "",
-      "copyJson": "",
-      "authorLabel": "",
-      "authorPlaceholder": "",
-      "authorHelper": "",
-      "save": "",
-      "saved": "",
-      "saveFailed": "",
-      "failed": "",
-      "saveHelper": "",
-      "authorInCode": "",
-      "groupLabel": "",
-      "groupHelper": "",
+      "title": "Поделиться этой автоматизацией",
+      "description": "Код, который можно вставить в другой Tracearr.",
+      "carries": "В коде только шаги. Каналы доставки, серверы и аккаунты не включены, получатель указывает свои.",
+      "copyCode": "Копировать код",
+      "copyJson": "Копировать JSON",
+      "authorLabel": "Автор",
+      "authorPlaceholder": "Имя",
+      "authorHelper": "Показывается на странице галереи и передаётся в коде. Необязательно.",
+      "save": "Сохранить как готовую",
+      "saved": "{{name}}: сохранено как готовая автоматизация.",
+      "saveFailed": "Не удалось сохранить.",
+      "failed": "Не удалось создать код для этой автоматизации.",
+      "saveHelper": "Добавляет её в список готовых автоматизаций этого сервера.",
+      "authorInCode": "Код содержит имя автора.",
+      "groupLabel": "Раздел",
+      "groupHelper": "В каком разделе галереи она будет показана.",
       "gallery": {
-        "trigger": "",
-        "body": ""
+        "trigger": "Добавить в галерею сообщества",
+        "body": "В галерее на docs.tracearr.com/templates собраны общие автоматизации. Чтобы добавить свою, создайте pull request в Tracearr/automation-templates с JSON ниже. Сам Tracearr галерею не читает."
       },
-      "openRepository": ""
+      "openRepository": "Открыть репозиторий"
     },
     "fields": {
       "concurrent_streams": {
-        "label": "",
-        "description": ""
+        "label": "Одновременные потоки",
+        "description": "Число активных потоков одного пользователя"
       },
       "active_session_distance_km": {
-        "label": "",
-        "description": ""
+        "label": "Расстояние между сессиями",
+        "description": "Расстояние между одновременными сессиями"
       },
       "travel_speed_kmh": {
-        "label": "",
-        "description": ""
+        "label": "Скорость перемещения",
+        "description": "Расчётная скорость перемещения между местоположениями"
       },
       "unique_ips_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Уникальные IP за период",
+        "description": "Число уникальных IP-адресов за период"
       },
       "unique_devices_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Уникальные устройства за период",
+        "description": "Число уникальных устройств за период"
       },
       "downloads_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Скачивания за период",
+        "description": "Число элементов, скачанных за период"
       },
       "download_bytes_in_window": {
-        "label": "",
-        "description": ""
+        "label": "Скачанные данные за период",
+        "description": "Гигабайты, скачанные за период"
       },
       "inactive_days": {
-        "label": "",
-        "description": ""
+        "label": "Неактивные дни",
+        "description": "Дней с последней активности"
       },
       "current_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "Длительность текущей паузы",
+        "description": "Сколько сессия находится на паузе без перерыва"
       },
       "total_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "Общая длительность пауз",
+        "description": "Суммарное время пауз за все циклы паузы и возобновления"
       },
       "source_resolution": {
-        "label": "",
-        "description": ""
+        "label": "Исходное разрешение",
+        "description": "Исходное разрешение медиа"
       },
       "output_resolution": {
-        "label": "",
-        "description": ""
+        "label": "Выходное разрешение",
+        "description": "Разрешение после транскодирования или при передаче"
       },
       "source_dynamic_range": {
-        "label": "",
-        "description": ""
+        "label": "Исходный динамический диапазон",
+        "description": "Формат HDR воспроизводимого файла; неизвестное значение никогда не совпадает, даже для \"не\""
       },
       "source_video_codec": {
-        "label": "",
-        "description": ""
+        "label": "Исходный видеокодек",
+        "description": "Видеокодек воспроизводимого файла, например HEVC или AV1"
       },
       "is_transcoding": {
-        "label": "",
-        "description": ""
+        "label": "Идёт транскодирование",
+        "description": "Транскодируются ли потоки видео или аудио"
       },
       "is_transcode_downgrade": {
-        "label": "",
-        "description": ""
+        "label": "Снижение качества при транскодировании",
+        "description": "Выходное разрешение ниже исходного"
       },
       "is_subtitle_burn_in": {
-        "label": "",
-        "description": ""
+        "label": "Вшитые субтитры",
+        "description": "Субтитры вшиваются в видео, из-за чего видео транскодируется"
       },
       "source_bitrate_mbps": {
-        "label": "",
-        "description": ""
+        "label": "Исходный битрейт",
+        "description": "Исходный битрейт медиа"
       },
       "user_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Пользователь",
+        "description": "Конкретные пользователи по аккаунту",
+        "placeholder": "Выберите пользователей…"
       },
       "trust_score": {
-        "label": "",
-        "description": ""
+        "label": "Балл доверия",
+        "description": "Балл доверия пользователя, от 0 до 100"
       },
       "account_age_days": {
-        "label": "",
-        "description": ""
+        "label": "Возраст аккаунта",
+        "description": "Дней с создания аккаунта"
       },
       "device_type": {
-        "label": "",
-        "description": ""
+        "label": "Тип устройства",
+        "description": "Тип используемого устройства"
       },
       "client_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Клиент/плеер",
+        "description": "Приложение медиаплеера",
+        "placeholder": "например, Plex for iOS"
       },
       "platform": {
-        "label": "",
-        "description": ""
+        "label": "Платформа/ОС",
+        "description": "Операционная система"
       },
       "is_local_network": {
-        "label": "",
-        "description": ""
+        "label": "Локальная сеть",
+        "description": "Потоковая передача из локальной сети"
       },
       "country": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Страна",
+        "description": "Страна по геолокации",
+        "placeholder": "Выберите страны…"
       },
       "ip_in_range": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Диапазон IP",
+        "description": "IP-адрес в диапазоне CIDR, IPv4 или IPv6",
+        "placeholder": "например, 192.168.1.0/24 или 2001:db8:abcd:7800::/64"
       },
       "server_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Сервер",
+        "description": "Конкретный медиасервер",
+        "placeholder": "Выберите серверы…"
       },
       "media_type": {
-        "label": "",
-        "description": ""
+        "label": "Тип медиа",
+        "description": "Тип контента"
       },
       "season_number": {
-        "label": "",
-        "description": ""
+        "label": "Номер сезона",
+        "description": "Сезон, к которому относится серия; всё, что не является серией, никогда не совпадает"
       },
       "episode_number": {
-        "label": "",
-        "description": ""
+        "label": "Номер серии",
+        "description": "Серия в пределах сезона; всё, что не является серией, никогда не совпадает"
       },
       "library_item_type": {
-        "label": "",
-        "description": ""
+        "label": "Тип элемента",
+        "description": "Какого типа этот элемент библиотеки"
       },
       "library_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "Библиотека",
+        "description": "Название библиотеки, в которую он попал",
+        "placeholder": "Фильмы"
       },
       "resolution_after": {
-        "label": "",
-        "description": ""
+        "label": "Разрешение",
+        "description": "Итоговое разрешение элемента; неизвестное значение никогда не совпадает, даже для \"не\""
       },
       "dynamic_range_after": {
-        "label": "",
-        "description": ""
+        "label": "Динамический диапазон",
+        "description": "Итоговый формат HDR элемента; неизвестное значение никогда не совпадает, даже для \"не\""
       },
       "video_codec_after": {
-        "label": "",
-        "description": ""
+        "label": "Видеокодек",
+        "description": "Итоговый видеокодек элемента; неизвестное значение никогда не совпадает, даже для \"не\""
       },
       "audio_channels_after": {
-        "label": "",
-        "description": ""
+        "label": "Аудиоканалы",
+        "description": "Итоговое число аудиоканалов элемента; неизвестное значение никогда не совпадает"
       },
       "file_size_after": {
-        "label": "",
-        "description": ""
+        "label": "Размер файла",
+        "description": "Итоговый размер элемента по всем копиям; неизвестное значение никогда не совпадает"
       }
     },
     "gallery": {
-      "title": "",
-      "description": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "noMatchesHint": "",
+      "title": "Новая автоматизация",
+      "description": "Готовые автоматизации. Выберите одну и заполните пропуски.",
+      "searchPlaceholder": "Поиск",
+      "noMatches": "Ничего не найдено по запросу \"{{query}}\".",
+      "noMatchesHint": "Попробуйте слово, описывающее результат: discord, отключён, пауза.",
       "group": {
-        "notifications": "",
-        "server_health": "",
-        "policies": "",
-        "housekeeping": "",
-        "other": ""
+        "notifications": "Уведомления",
+        "server_health": "Состояние сервера",
+        "policies": "Лимиты и правила",
+        "housekeeping": "Обслуживание",
+        "other": "Другие способы запуска"
       },
-      "builtin": "",
+      "builtin": "Встроенная",
       "kind": {
-        "policy": "",
-        "notification": ""
+        "policy": "Нарушение",
+        "notification": "Оповещение"
       },
       "paste": {
-        "title": "",
-        "description": ""
+        "title": "Вставить код",
+        "description": "Вставьте код и проверьте, что он делает, прежде чем добавлять."
       },
       "scratch": {
-        "title": "",
-        "description": ""
+        "title": "Начать с нуля",
+        "description": "Собрать шаг за шагом."
       },
-      "failed": "",
-      "retry": "",
-      "missing": "",
+      "failed": "Не удалось загрузить готовые автоматизации.",
+      "retry": "Попробовать ещё раз",
+      "missing": "Этой готовой автоматизации нет на этом сервере.",
       "hint": {
-        "move": "",
-        "use": "",
-        "close": ""
+        "move": "перейти",
+        "use": "использовать",
+        "close": "закрыть"
       },
-      "loading": ""
+      "loading": "Загрузка…"
     },
     "import": {
-      "title": "",
-      "description": "",
-      "reviewDescription": "",
-      "placeholder": "",
-      "formatHint": "",
-      "check": "",
-      "checking": "",
-      "valid": "",
-      "madeBy": "",
-      "codeShort": "",
+      "title": "Вставить код",
+      "description": "Вставьте код. Всё содержится в коде, Tracearr ничего не загружает.",
+      "reviewDescription": "Что делает код и что нужно заполнить.",
+      "placeholder": "tracearr1.…",
+      "formatHint": "Код начинается с tracearr1.",
+      "check": "Проверить",
+      "checking": "Чтение…",
+      "valid": "Tracearr может прочитать этот код.",
+      "madeBy": "Автор: {{author}}, как указано в коде",
+      "codeShort": "Код {{fingerprint}}",
       "paused": {
-        "label": "",
-        "helper": ""
+        "label": "Создать выключенной",
+        "helper": "Включите её в списке после проверки."
       },
-      "submit": "",
-      "adding": "",
-      "existing": "",
-      "existingUse": "",
+      "submit": "Добавить",
+      "adding": "Добавление…",
+      "existing": "Уже сохранено как {{name}}.",
+      "existingUse": "Использовать",
       "collision": {
-        "title": "",
-        "add": "",
-        "replace": ""
+        "title": "Другая автоматизация с названием {{name}} уже существует.",
+        "add": "Оставить обе",
+        "replace": "Заменить мою"
       },
-      "raw": "",
+      "raw": "Показать JSON",
       "errors": {
-        "notACode": "",
-        "notACodeHint": "",
-        "tooBig": "",
-        "tooBigHint": "",
-        "truncated": "",
-        "truncatedHint": "",
-        "tooNew": "",
-        "tooNewHint": "",
-        "tooMany": "",
-        "tooManyHint": "",
-        "rejected": "",
-        "rejectedHint": ""
+        "notACode": "Это не похоже на код Tracearr.",
+        "notACodeHint": "Код начинается с tracearr1. JSON тоже подойдёт.",
+        "tooBig": "Это слишком много для автоматизации Tracearr.",
+        "tooBigHint": "Коды занимают максимум несколько тысяч символов.",
+        "truncated": "Похоже, код обрезан.",
+        "truncatedHint": "Скопируйте код целиком и вставьте ещё раз: некоторые мессенджеры разбивают длинные коды на строки.",
+        "tooNew": "Нужен Tracearr {{required}} или новее.",
+        "tooNewHint": "На этом сервере {{current}}. Обновите Tracearr и вставьте код снова.",
+        "tooMany": "Слишком много кодов за минуту.",
+        "tooManyHint": "Подождите немного и проверьте снова.",
+        "rejected": "Tracearr не может прочитать этот код.",
+        "rejectedHint": "Возможно, он из другого инструмента или был изменён вручную."
       },
-      "source": "",
-      "validCaveat": "",
-      "builtinMatch": ""
+      "source": "Общие автоматизации собраны на docs.tracearr.com/templates.",
+      "validCaveat": "Код не говорит, кто его написал и безопасен ли он. Шаги показаны ниже.",
+      "builtinMatch": "Это {{name}}, одна из автоматизаций, поставляемых с Tracearr."
     },
     "kind": {
-      "policy": "",
-      "notification": ""
+      "policy": "Нарушение",
+      "notification": "Оповещение"
     },
-    "kindColumn": "",
-    "name": "",
-    "newAutomation": "",
-    "namePlaceholder": "",
-    "nameInvalid": "",
-    "descriptionLabel": "",
-    "descriptionPlaceholder": "",
-    "thisAutomation": "",
-    "cooldownLabel": "",
-    "cooldownInvalid": "",
-    "retentionLabel": "",
-    "retentionPlaceholder": "",
-    "retentionInvalid": "",
-    "noAutomationsFound": "",
+    "kindColumn": "Тип",
+    "name": "Название",
+    "newAutomation": "Новая автоматизация",
+    "namePlaceholder": "Название этой автоматизации",
+    "nameInvalid": "Укажите название.",
+    "descriptionLabel": "Описание",
+    "descriptionPlaceholder": "Для чего это нужно",
+    "thisAutomation": "Эта автоматизация",
+    "cooldownLabel": "Не чаще раза в",
+    "cooldownInvalid": "Введите целое число минут, от 0, или оставьте поле пустым.",
+    "retentionLabel": "Хранить запуски",
+    "retentionPlaceholder": "{{days}}",
+    "retentionInvalid": "Введите целое число дней, от 1, или оставьте поле пустым.",
+    "noAutomationsFound": "Автоматизации не найдены",
     "operators": {
-      "eq": "",
-      "neq": "",
-      "gt": "",
-      "gte": "",
-      "lt": "",
-      "lte": "",
-      "in": "",
-      "not_in": "",
-      "contains": "",
-      "not_contains": ""
+      "eq": "равно",
+      "neq": "не равно",
+      "gt": "больше",
+      "gte": "не меньше",
+      "lt": "меньше",
+      "lte": "не больше",
+      "in": "в списке",
+      "not_in": "не в списке",
+      "contains": "содержит",
+      "not_contains": "не содержит"
     },
     "options": {
-      "4K": "",
-      "1080p": "",
-      "720p": "",
-      "480p": "",
-      "SD": "",
-      "unknown": "",
-      "mobile": "",
-      "tablet": "",
-      "tv": "",
-      "desktop": "",
-      "browser": "",
-      "ios": "",
-      "android": "",
-      "windows": "",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
-      "tizen": "",
-      "movie": "",
-      "episode": "",
-      "track": "",
-      "photo": "",
-      "live": "",
-      "trailer": "",
-      "video": "",
-      "audio": "",
-      "video_or_audio": "",
-      "neither": "",
-      "8K": "",
-      "1440p": "",
-      "sdr": "",
-      "hdr": "",
-      "hdr10": "",
-      "hdr10+": "",
-      "hlg": "",
-      "dolby vision": "",
+      "4K": "4K (2160p)",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "Неизвестно",
+      "mobile": "Мобильный",
+      "tablet": "Планшет",
+      "tv": "ТВ",
+      "desktop": "Компьютер",
+      "browser": "Браузер",
+      "ios": "iOS",
+      "android": "Android",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
+      "tizen": "Tizen",
+      "movie": "Фильм",
+      "episode": "Серия",
+      "track": "Музыка",
+      "photo": "Фото",
+      "live": "Прямое ТВ",
+      "trailer": "Трейлер",
+      "video": "Видео",
+      "audio": "Аудио",
+      "video_or_audio": "Видео или аудио",
+      "neither": "Ни то ни другое (прямое воспроизведение)",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "Dolby Vision",
       "libraryItemType": {
-        "movie": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "artist": "",
-        "album": "",
-        "track": "",
-        "photo": ""
+        "movie": "Фильм",
+        "show": "Сериал",
+        "season": "Сезон",
+        "episode": "Серия",
+        "artist": "Исполнитель",
+        "album": "Альбом",
+        "track": "Трек",
+        "photo": "Фото"
       }
     },
     "provenance": {
-      "builtin": "",
-      "imported": "",
-      "importedBy": "",
-      "saved": "",
-      "customized": "",
-      "customizedFromRemoved": ""
+      "builtin": "Встроенная · {{name}} {{version}}",
+      "imported": "Импортировано из кода {{date}} · {{name}} {{version}}",
+      "importedBy": "Импортировано из кода от {{author}} {{date}} · {{name}} {{version}}",
+      "saved": "Сохранено здесь из {{name}} {{date}} · {{version}}",
+      "customized": "Изменено на основе {{name}}",
+      "customizedFromRemoved": "Изменено на основе готовой автоматизации, которая с тех пор удалена"
     },
-    "recordsOnly": "",
+    "recordsOnly": "Только записывает запуски",
     "scope": {
-      "global": "",
-      "crossServer": ""
+      "global": "Глобальная",
+      "crossServer": "Между серверами"
     },
-    "searchPlaceholder": "",
+    "searchPlaceholder": "Поиск автоматизаций…",
     "sessionTargets": {
       "triggering": {
-        "label": "",
-        "tooltip": ""
+        "label": "Вызвавшая сессия",
+        "tooltip": "Только сессия, вызвавшая эту автоматизацию"
       },
       "oldest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Самая старая сессия",
+        "tooltip": "Самая давняя активная сессия пользователя"
       },
       "newest": {
-        "label": "",
-        "tooltip": ""
+        "label": "Самая новая сессия",
+        "tooltip": "Последняя запущенная сессия пользователя"
       },
       "all_except_one": {
-        "label": "",
-        "tooltip": ""
+        "label": "Все, кроме одной (оставить самую старую)",
+        "tooltip": "Все сессии, кроме самой старой: у пользователя останется один поток"
       },
       "all_user": {
-        "label": "",
-        "tooltip": ""
+        "label": "Все сессии пользователя",
+        "tooltip": "Все активные сессии этого пользователя"
       }
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": ""
+        "label": "Интервал между срабатываниями"
       },
       "priority": {
-        "label": ""
+        "label": "Приоритет"
       },
       "target": {
-        "label": ""
+        "label": "Цель"
       },
       "message": {
-        "label": ""
+        "label": "Сообщение"
       }
     },
     "trustModes": {
       "adjust": {
-        "label": ""
+        "label": "Изменить на величину"
       },
       "set": {
-        "label": ""
+        "label": "Задать значение"
       },
       "reset": {
-        "label": ""
+        "label": "Сбросить до значения по умолчанию (100)"
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "Низкий",
+      "warning": "Предупреждение",
+      "high": "Высокий"
     },
     "template": {
-      "version": "",
-      "updateAvailable": "",
-      "updatedTitle": "",
-      "updatedBody": "",
-      "before": "",
-      "after": "",
-      "review": "",
-      "save": "",
-      "customize": "",
-      "customizeTitle": "",
-      "customizeConfirm": "",
-      "customizeConfirmAction": "",
-      "customizeFirst": "",
-      "customizeFailed": "",
-      "upgradeFailed": "",
-      "gone": "",
-      "doorsHelper": ""
+      "version": "v{{version}}",
+      "updateAvailable": "Доступно обновление",
+      "updatedTitle": "Готовая автоматизация обновлена до v{{version}}",
+      "updatedBody": "Проверьте ответы ниже, затем обновите.",
+      "before": "Сейчас",
+      "after": "После обновления",
+      "review": "Проверить и обновить",
+      "save": "Сохранить изменения",
+      "customize": "Открыть в конструкторе",
+      "customizeTitle": "Открыть в конструкторе?",
+      "customizeConfirm": "В конструкторе эта автоматизация станет независимой: каждый шаг можно будет редактировать, и обновления готовой автоматизации больше не будут приходить. Это нельзя отменить.",
+      "customizeConfirmAction": "Открыть в конструкторе",
+      "customizeFirst": "Эта автоматизация следует за готовой. Сначала откройте её в конструкторе.",
+      "customizeFailed": "Не удалось открыть в конструкторе.",
+      "upgradeFailed": "Не удалось обновить. Повторите попытку.",
+      "gone": "Готовой автоматизации, на основе которой это создано, больше нет на этом сервере.",
+      "doorsHelper": "Шаги взяты из готовой автоматизации и не меняются. \"Открыть в конструкторе\" делает каждый шаг редактируемым и разрывает связь."
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Неактивный аккаунт",
+        "description": "Фиксировать нарушение, когда аккаунт не используется дольше заданного числа дней.",
+        "keywords": "простой заброшенный неиспользуемый устаревший очистка неактивный аккаунт idle inactive"
       },
       "concurrent-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Слишком много потоков сразу",
+        "description": "Фиксировать нарушение, когда аккаунт воспроизводит больше потоков одновременно, чем разрешено.",
+        "keywords": "лимит ограничение одновременные совместное использование много потоков concurrent"
       },
       "device-velocity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Много IP за период",
+        "description": "Фиксировать нарушение, когда аккаунт использует за период больше IP-адресов, чем разрешено.",
+        "keywords": "ip адреса vpn совместное использование устройства период"
       },
       "download-burst": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Всплеск скачиваний",
+        "description": "Оповещать, когда человек скачивает больше элементов в день, чем вы разрешаете.",
+        "keywords": "скачивание офлайн синхронизация накопление всплеск лимит download offline sync"
       },
       "geo-restriction": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Заблокированные страны",
+        "description": "Фиксировать нарушение, когда поток идёт из заблокированной страны.",
+        "keywords": "страна гео vpn за границей регион блокировка поездка"
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Невозможное перемещение",
+        "description": "Фиксировать нарушение, когда две сессии находятся дальше друг от друга, чем можно преодолеть за это время.",
+        "keywords": "vpn перемещение скорость расстояние местоположение совместное использование"
       },
       "kill-paused-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Останавливать потоки на паузе",
+        "description": "Останавливать поток, который стоит на паузе дольше заданного числа минут.",
+        "keywords": "пауза простой afk остановить завершить освободить"
       },
       "media-added": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Добавлено новое медиа",
+        "description": "Сообщать в канал доставки, когда элемент библиотеки появляется впервые.",
+        "keywords": "новое библиотека фильм серия добавлено импорт уведомить discord email webhook"
       },
       "media-upgraded": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Медиа обновлено",
+        "description": "Сообщать в канал доставки, когда элемент библиотеки меняет качество.",
+        "keywords": "обновление качество remux 4k разрешение заменено уведомить discord email webhook"
       },
       "new-device": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Новое устройство",
+        "description": "Сообщать в канал доставки, когда аккаунт впервые использует незнакомое устройство.",
+        "keywords": "устройство новое неизвестное телефон вход совместное использование уведомить discord email webhook"
       },
       "newsletter-failed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Рассылка не удалась",
+        "description": "Сообщать в канал доставки, когда отправка рассылки не удалась или дошла только до части списка.",
+        "keywords": "рассылка дайджест email ошибка частично возврат уведомить"
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Без транскодирования 4K",
+        "description": "Останавливать поток, в котором транскодируется исходное видео 4K.",
+        "keywords": "4k транскодирование качество cpu пропускная способность остановить"
       },
       "paused-too-long": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Слишком долгая пауза",
+        "description": "Сообщать в канал доставки, когда поток стоит на паузе дольше заданного числа минут.",
+        "keywords": "пауза простой afk завис брошен уведомить discord email webhook"
       },
       "plugin-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Обновление плагина Tracearr",
+        "description": "Сообщать в канал доставки, когда для сервера есть более новый плагин Tracearr.",
+        "keywords": "плагин обновление версия выпуск уведомить discord email webhook"
       },
       "server-down": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Сервер недоступен",
+        "description": "Сообщать в канал доставки, когда медиасервер перестаёт отвечать.",
+        "keywords": "offline отключён сбой недоступен уведомить discord email webhook"
       },
       "server-up": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Сервер снова работает",
+        "description": "Сообщать в канал доставки, когда медиасервер снова отвечает.",
+        "keywords": "online восстановлен снова работает уведомить discord email webhook"
       },
       "server-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Обновление медиасервера",
+        "description": "Сообщать в канал доставки, когда для медиасервера доступно обновление.",
+        "keywords": "обновление версия выпуск plex jellyfin emby уведомить discord"
       },
       "simultaneous-locations": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Два места сразу",
+        "description": "Фиксировать нарушение, когда один аккаунт одновременно используется в двух удалённых местах.",
+        "keywords": "расстояние местоположение совместное использование vpn два места сразу"
       },
       "stream-ended": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Поток завершён",
+        "description": "Сообщать в канал доставки каждый раз, когда поток останавливается.",
+        "keywords": "остановка конец завершение воспроизведение уведомить discord email webhook"
       },
       "stream-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Поток начат",
+        "description": "Сообщать в канал доставки каждый раз, когда запускается поток.",
+        "keywords": "воспроизведение просмотр начало запуск уведомить discord email webhook"
       },
       "tracearr-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Обновление Tracearr",
+        "description": "Сообщать в канал доставки, когда выходит новый выпуск Tracearr.",
+        "keywords": "обновление версия выпуск tracearr уведомить discord email webhook"
       },
       "transcode-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Поток транскодируется",
+        "description": "Сообщать в канал доставки, когда в потоке транскодируется видео или аудио.",
+        "keywords": "транскодирование конвертация cpu прямое воспроизведение качество уведомить discord email webhook"
       },
       "trust-score-changed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Балл доверия изменён",
+        "description": "Сообщать в канал доставки, когда меняется балл доверия аккаунта.",
+        "keywords": "балл доверия репутация штраф изменён уведомить discord email webhook"
       }
     },
-    "title": "",
-    "toggleAutomation": "",
-    "tryAdjustingFilters": "",
+    "title": "Автоматизации",
+    "toggleAutomation": "Включить или выключить {{name}}",
+    "tryAdjustingFilters": "Попробуйте изменить фильтры.",
     "units": {
-      "km": "",
-      "kmh": "",
-      "mbps": "",
-      "days": "",
-      "minutes": "",
-      "hours": "",
-      "gb": "",
-      "seconds": ""
+      "km": "км",
+      "kmh": "км/ч",
+      "mbps": "Мбит/с",
+      "days": "дн.",
+      "minutes": "мин.",
+      "hours": "ч",
+      "gb": "ГБ",
+      "seconds": "с"
     },
-    "updateAutomation": "",
+    "updateAutomation": "Сохранить изменения",
     "catalog": {
       "groups": {
-        "sessions": "",
-        "accounts": "",
-        "library": "",
-        "servers": "",
-        "updates": "",
-        "notifications": "",
-        "notify": "",
-        "policy": "",
-        "control": ""
+        "sessions": "Сессии",
+        "accounts": "Аккаунты",
+        "library": "Библиотека",
+        "servers": "Серверы",
+        "updates": "Обновления",
+        "notifications": "Рассылки",
+        "notify": "Уведомить",
+        "policy": "Принять меры",
+        "control": "Если… то"
       },
-      "suggested": "",
+      "suggested": "Рекомендуемые",
       "triggers": {
         "sessionStarted": {
-          "description": "",
-          "synonyms": ""
+          "description": "Воспроизведение подтверждено, примерно через тридцать секунд после обнаружения.",
+          "synonyms": "воспроизведение, просмотр, начало, запуск"
         },
         "sessionFirstSeen": {
-          "description": "",
-          "synonyms": ""
+          "description": "В момент первого обнаружения потока, до задержки подтверждения. Некоторые так и не подтверждаются.",
+          "synonyms": "воспроизведение, сразу, мгновенно, первое обнаружение, рано, webhook"
         },
         "sessionStopped": {
-          "description": "",
-          "synonyms": ""
+          "description": "Воспроизведение закончилось, как бы это ни произошло.",
+          "synonyms": "конец, завершение, выход, закрытие"
         },
         "sessionTranscodeChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "Сервер переключает поток между прямым воспроизведением и транскодированием.",
+          "synonyms": "транскодирование, конвертация, прямое воспроизведение, cpu"
         },
         "sessionPaused": {
-          "description": "",
-          "synonyms": ""
+          "description": "В момент постановки потока на паузу.",
+          "synonyms": "пауза, удержание, простой"
         },
         "sessionHeldFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "Поток стоит на паузе",
+          "description": "Поток стоит на паузе дольше заданного числа минут.",
+          "synonyms": "пауза, простой, брошен, завис, afk"
         },
         "accountInactiveFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "Аккаунт затих",
+          "description": "Аккаунт ничего не смотрел в течение заданного числа дней.",
+          "synonyms": "неактивный, заброшенный, неиспользуемый, устаревший, очистка"
         },
         "accountNewDevice": {
-          "description": "",
-          "synonyms": ""
+          "description": "Аккаунт впервые использует устройство для потока.",
+          "synonyms": "устройство, новое, неизвестное, телефон, вход, совместное использование"
         },
         "accountTrustChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "Меняется балл доверия аккаунта, кто бы его ни изменил: автоматизация или владелец.",
+          "synonyms": "доверие, балл, репутация, штраф, изменён"
         },
         "accountMediaDownloaded": {
-          "description": "",
-          "synonyms": ""
+          "description": "Аккаунт скачивает элемент через конечную точку скачивания на сервере, один раз на элемент.",
+          "synonyms": "скачивание, офлайн, синхронизация, сохранение, накопление, download, sync"
         },
         "mediaAdded": {
-          "description": "",
-          "synonyms": ""
+          "description": "Элемент библиотеки впервые появляется на сервере.",
+          "synonyms": "новое, добавлено, библиотека, фильм, серия, импорт"
         },
         "mediaUpgraded": {
-          "description": "",
-          "synonyms": ""
+          "description": "Уже имеющийся элемент библиотеки меняет качество.",
+          "synonyms": "обновление, качество, заменено, remux, 4k, разрешение"
         },
         "serverDown": {
-          "description": "",
-          "synonyms": ""
+          "description": "Медиасервер перестаёт отвечать.",
+          "synonyms": "недоступен, offline, сбой, отключён"
         },
         "serverUp": {
-          "description": "",
-          "synonyms": ""
+          "description": "Медиасервер снова отвечает.",
+          "synonyms": "online, восстановлен, снова работает"
         },
         "pluginUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "Для плагина Tracearr на сервере есть более новый выпуск.",
+          "synonyms": "плагин, обновление, версия, выпуск"
         },
         "serverUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "Для медиасервера есть более новый выпуск.",
+          "synonyms": "обновление, версия, выпуск, патч"
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "Для самого Tracearr есть более новый выпуск.",
+          "synonyms": "обновление, версия, выпуск, сам"
         },
         "newsletterSent": {
-          "description": "",
-          "synonyms": ""
+          "description": "Рассылка по расписанию или ручная дошла до всех в списке.",
+          "synonyms": "рассылка, дайджест, email, доставлено"
         },
         "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
+          "description": "Рассылка не дошла ни до кого или дошла только до части списка.",
+          "synonyms": "рассылка, дайджест, email, возврат, частично, ошибка"
         }
       },
       "actions": {
         "send": {
-          "synonyms": ""
+          "synonyms": "уведомить, оповещение, discord, email, webhook, push"
         },
         "trust": {
-          "synonyms": ""
+          "synonyms": "балл, репутация, штраф, награда"
         },
         "kill_stream": {
-          "synonyms": ""
+          "synonyms": "остановить, завершить, прервать, конец воспроизведения"
         },
         "message_client": {
-          "synonyms": ""
+          "synonyms": "предупредить, сообщить, уведомление, на экране"
         },
         "if": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "Если… иначе…",
+          "description": "Выполнять некоторые шаги, только если пройдена дополнительная проверка.",
+          "synonyms": "если, иначе, ветка, разделение, условие"
         }
       }
     },
     "filters": {
-      "source": "",
-      "allSources": "",
+      "source": "Откуда взята",
+      "allSources": "Откуда угодно",
       "sources": {
-        "builtin": "",
-        "import": "",
-        "local": "",
-        "own": ""
+        "builtin": "Встроенная",
+        "import": "Импортированная",
+        "local": "Сохранённая здесь",
+        "own": "Собранная в конструкторе"
       },
-      "trigger": "",
-      "allTriggers": ""
+      "trigger": "Что запускает",
+      "allTriggers": "Все триггеры"
     },
-    "openGallery": "",
-    "deleteAutomation_one": "",
-    "deleteAutomation_few": "",
-    "deleteAutomation_many": "",
-    "deleteAutomation_other": ""
+    "openGallery": "Открыть галерею",
+    "deleteAutomation_one": "Удалить автоматизацию",
+    "deleteAutomation_few": "Удалить {{count}} автоматизации",
+    "deleteAutomation_many": "Удалить {{count}} автоматизаций",
+    "deleteAutomation_other": "Удалить {{count}} автоматизаций"
   },
   "terminateStream": {
     "title": "Завершить Поток",
@@ -2199,27 +2286,27 @@
       "noReachableConnections": "Нет доступных подключений",
       "local": "Локальный",
       "remote": "Удалённый",
-      "custom": "",
+      "custom": "Пользовательский",
       "secure": "Безопасность",
       "mayNotConnect": "Может не подключаться",
       "recommended": "Рекомендовано",
       "customUrl": "Пользовательский URL",
       "connectionError": {
-        "timeout": "",
-        "dns": "",
-        "refused": "",
-        "unreachable": "",
-        "reset": "",
-        "tls": "",
-        "http": "",
+        "timeout": "Истекло время ожидания",
+        "dns": "Ошибка DNS",
+        "refused": "Подключение отклонено",
+        "unreachable": "Хост недоступен",
+        "reset": "Подключение сброшено",
+        "tls": "Ошибка TLS",
+        "http": "HTTP {{status}}",
         "relay": "",
-        "unknown": ""
+        "unknown": "Не удалось подключиться"
       },
       "connectionsReachable": "{{reachable}} соединений {{total}} доступно",
       "hideFiltered": "Скрыть отфильтрованные",
       "showAll": "Показать все",
       "connectingTo": "Подключение к {{name}}...",
-      "ownerOnly": "",
+      "ownerOnly": "Управлять привязанными аккаунтами Plex может только владелец.",
       "noAccountsLinked": "Нет привязанных аккаунтов Plex",
       "noAccountsLinkedHint": "Привяжите учетную запись Plex для добавления Plex серверов в Tracearr.",
       "linkPlexAccount": "Связать аккаунт Plex",
@@ -2227,156 +2314,156 @@
       "linking": "Связь...",
       "loginEnabled": "Вход включен",
       "unlinkAccount": "Отвязать этот аккаунт Plex",
-      "reauthorizeAccount": "",
+      "reauthorizeAccount": "Повторно авторизовать этот аккаунт Plex",
       "deleteServersFirst": "Сначала удалите активные серверы, подключённые через этот аккаунт, или пометьте их как архивные",
       "unlinkPlexAccount": "Отвязать аккаунт Plex",
       "unlinkConfirm": "Вы уверены, что хотите отвязать этот Plex аккаунт? Вы не сможете добавить серверы из этого аккаунта, пока не привяжите его снова.",
-      "connectionsAvailable_one": "",
-      "connectionsAvailable_few": "",
-      "connectionsAvailable_many": "",
-      "connectionsAvailable_other": "",
-      "moreConnections_one": "",
-      "moreConnections_few": "",
-      "moreConnections_many": "",
-      "moreConnections_other": "",
+      "connectionsAvailable_one": "Доступно подключение: {{count}}",
+      "connectionsAvailable_few": "Доступно подключений: {{count}}",
+      "connectionsAvailable_many": "Доступно подключений: {{count}}",
+      "connectionsAvailable_other": "Доступно подключений: {{count}}",
+      "moreConnections_one": "Ещё {{count}} подключение",
+      "moreConnections_few": "Ещё {{count}} подключения",
+      "moreConnections_many": "Ещё {{count}} подключений",
+      "moreConnections_other": "Ещё {{count}} подключений",
       "serversConnected_one": "{{count}} сервер подключен",
-      "serversConnected_few": "",
-      "serversConnected_many": "",
+      "serversConnected_few": "{{count}} сервера подключены",
+      "serversConnected_many": "{{count}} серверов подключено",
       "serversConnected_other": "{{count}} подключены к серверам"
     },
     "destinations": {
-      "add": "",
-      "builtinNote": "",
-      "clearSecret": "",
-      "deleteConfirm": "",
-      "description": "",
-      "emailDescription": "",
-      "empty": "",
+      "add": "Добавить канал доставки",
+      "builtinNote": "Встроенный",
+      "clearSecret": "Очистить",
+      "deleteConfirm": "Удалить {{name}}? Автоматизации и рассылки, которые его используют, остановятся, пока их не обновят.",
+      "description": "Куда уходят уведомления. Добавляйте сколько нужно, автоматизации могут отправлять в любой из каналов.",
+      "emailDescription": "Tracearr отправляет почту через этот SMTP-сервер. Рассылки выбирают получателей сами, а оповещения автоматизаций уходят на адреса ниже.",
+      "empty": "Каналов доставки пока нет.",
       "fields": {
-        "webhookUrl": "",
-        "url": "",
-        "serverUrl": "",
-        "apiUrl": "",
-        "topic": "",
-        "authToken": "",
-        "userKey": "",
-        "apiToken": "",
-        "botToken": "",
-        "chatId": "",
-        "topicId": "",
-        "preset": "",
-        "host": "",
-        "port": "",
-        "security": "",
-        "verifyCertificate": "",
-        "username": "",
-        "password": "",
-        "fromName": "",
-        "fromAddress": "",
-        "to": "",
-        "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "webhookUrl": "URL вебхука",
+        "url": "URL",
+        "serverUrl": "URL сервера",
+        "apiUrl": "URL API",
+        "topic": "Тема",
+        "authToken": "Токен авторизации",
+        "userKey": "Ключ пользователя",
+        "apiToken": "Токен API",
+        "botToken": "Токен бота",
+        "chatId": "ID чата",
+        "topicId": "ID темы",
+        "preset": "Провайдер",
+        "host": "Хост SMTP",
+        "port": "Порт",
+        "security": "Безопасность",
+        "verifyCertificate": "Проверять сертификат",
+        "username": "Имя пользователя",
+        "password": "Пароль",
+        "fromName": "Имя отправителя",
+        "fromAddress": "Адрес отправителя",
+        "to": "Получатели оповещений",
+        "replyTo": "Адрес для ответа",
+        "messagesPerSecond": "Сообщений в секунду",
+        "messageStream": "Поток сообщений"
       },
       "groups": {
-        "connection": "",
-        "sender": "",
-        "alerts": ""
+        "connection": "Подключение",
+        "sender": "Отправитель",
+        "alerts": "Оповещения"
       },
       "hints": {
-        "authTokenOptional": "",
-        "telegramTopic": "",
-        "smtpPreset": "",
-        "smtpVerifyCertificate": "",
-        "smtpUsernameOptional": "",
-        "smtpTo": "",
-        "smtpRate": "",
-        "smtpMessageStream": "",
-        "smtpGmailUsername": "",
-        "smtpGmailPassword": "",
-        "smtpResendUsername": "",
-        "smtpResendPassword": "",
-        "smtpSendgridUsername": "",
-        "smtpSendgridPassword": "",
-        "smtpMailgunUsername": "",
-        "smtpMailgunPassword": "",
-        "smtpBrevoUsername": "",
-        "smtpBrevoPassword": "",
-        "smtpSesUsername": "",
-        "smtpSesPassword": "",
-        "smtpPostmarkUsername": "",
-        "smtpPostmarkPassword": ""
+        "authTokenOptional": "Необязательно для публичных тем",
+        "telegramTopic": "Только для групп с темами. Для обычного чата или канала оставьте пустым.",
+        "smtpPreset": "Заполняет хост, порт и безопасность для распространённых провайдеров. Для Amazon SES и Mailgun EU нужно указать регион в хосте.",
+        "smtpVerifyCertificate": "Проверяет TLS-сертификат почтового сервера через доверенный центр сертификации. Отключайте только для сервера с самоподписанным сертификатом, например локального моста: тогда любой на пути между Tracearr и почтовым сервером сможет перехватить подключение.",
+        "smtpUsernameOptional": "Оставьте пустым, если сервер не требует входа",
+        "smtpTo": "Оповещения уходят одним письмом, в поле \"Кому\" указаны все адреса отсюда. Оставьте пустым, если этот сервер отправляет только рассылки.",
+        "smtpRate": "На один экземпляр Tracearr; не превышайте лимит провайдера",
+        "smtpMessageStream": "Только для Postmark: ID потока для отправки, например broadcast. В остальных случаях оставьте пустым.",
+        "smtpGmailUsername": "Ваш полный адрес Gmail. Gmail отправляет с этого адреса независимо от указанного адреса отправителя, а личные аккаунты останавливаются примерно на 500 получателях в день.",
+        "smtpGmailPassword": "Пароль приложения из Google Account > Security > 2-Step Verification > App passwords. Пароль от аккаунта будет отклонён.",
+        "smtpResendUsername": "Точно слово resend.",
+        "smtpResendPassword": "Ваш ключ API Resend. Домен отправителя сначала нужно подтвердить в Resend.",
+        "smtpSendgridUsername": "Точно слово apikey.",
+        "smtpSendgridPassword": "Ваш ключ API SendGrid.",
+        "smtpMailgunUsername": "postmaster@вашдомен, а не логин Mailgun.",
+        "smtpMailgunPassword": "Пароль SMTP из настроек этого домена. Домен песочницы доставляет только разрешённым получателям.",
+        "smtpBrevoUsername": "Адрес почты для входа в Brevo.",
+        "smtpBrevoPassword": "Ключ SMTP из SMTP & API > SMTP, а не ключ API.",
+        "smtpSesUsername": "Имя пользователя SMTP из консоли SES, а не ключ доступа IAM. Укажите регион в хосте.",
+        "smtpSesPassword": "Пароль SMTP из консоли SES. Аккаунты в песочнице отправляют 200 писем в день и только на подтверждённые адреса.",
+        "smtpPostmarkUsername": "Ваш токен Server API.",
+        "smtpPostmarkPassword": "Тот же токен Server API или секрет токена потока."
       },
-      "newsletterAlertsNote": "",
-      "newsletterDescription": "",
-      "newsletterTitle": "",
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
+      "newsletterAlertsNote": "Получатели рассылки задаются в самой рассылке. Чтобы отправлять через этот сервер и оповещения, измените его позже в разделе \"Каналы доставки\".",
+      "newsletterDescription": "Tracearr отправляет рассылки через этот SMTP-сервер.",
+      "newsletterTitle": "Добавить почтовый сервер",
+      "newslettersOnly": "Только рассылки",
+      "noAlertRecipients": "Нет получателей оповещений",
       "options": {
-        "securityStarttls": "",
-        "securityTls": "",
-        "securityNone": "",
-        "presetCustom": "",
-        "presetPostmark": "",
-        "presetResend": "",
-        "presetSes": "",
-        "presetMailgun": "",
-        "presetSendgrid": "",
-        "presetBrevo": "",
-        "presetGmail": ""
+        "securityStarttls": "STARTTLS (обычно порт 587)",
+        "securityTls": "TLS (обычно порт 465)",
+        "securityNone": "Нет (обычный текст, порт 25)",
+        "presetCustom": "Свой",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
-      "ownerOnly": "",
-      "pushNote": "",
-      "receiveViolations": "",
-      "receiveViolationsHint": "",
-      "receiveViolationsNeedsRecipients": "",
-      "reencrypt": "",
-      "rowActions": "",
-      "secretSet": "",
-      "test": "",
-      "testHint": "",
-      "testNeedsForm": "",
+      "ownerOnly": "Управлять каналами доставки может только владелец.",
+      "pushNote": "Доставляются на сопряжённые мобильные устройства; каждое устройство фильтрует их в своих настройках уведомлений.",
+      "receiveViolations": "Получать нарушения",
+      "receiveViolationsHint": "Отправлять каждое нарушение в этот канал доставки.",
+      "receiveViolationsNeedsRecipients": "Добавьте получателей оповещений, чтобы отправлять сюда нарушения",
+      "reencrypt": "Введите секрет этого канала доставки заново",
+      "rowActions": "Действия с каналом доставки",
+      "secretSet": "Задано (оставьте пустым, чтобы сохранить)",
+      "test": "Проверить",
+      "testHint": "Для проверки сначала сохраните",
+      "testNeedsForm": "Для проверки заполните обязательные поля",
       "types": {
-        "discord": "",
-        "jsonWebhook": "",
-        "ntfy": "",
-        "gotify": "",
-        "apprise": "",
-        "pushover": "",
-        "telegram": "",
-        "email": "",
-        "push": "",
-        "webToast": ""
+        "discord": "Discord",
+        "jsonWebhook": "Вебхук (JSON)",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "telegram": "Telegram",
+        "email": "Почта",
+        "push": "Мобильные push-уведомления",
+        "webToast": "Всплывающие уведомления в браузере"
       },
-      "violationsOff": "",
-      "violationsOn": "",
-      "webToastNote": "",
-      "alertsGoTo_one": "",
-      "alertsGoTo_few": "",
-      "alertsGoTo_many": "",
-      "alertsGoTo_other": "",
-      "usedBy_one": "",
-      "usedBy_few": "",
-      "usedBy_many": "",
-      "usedBy_other": "",
-      "usedByNewsletters_one": "",
-      "usedByNewsletters_few": "",
-      "usedByNewsletters_many": "",
-      "usedByNewsletters_other": ""
+      "violationsOff": "Нарушения выкл",
+      "violationsOn": "Нарушения вкл",
+      "webToastNote": "Всплывающие уведомления в этом браузере.",
+      "alertsGoTo_one": "Оповещения уходят на {{count}} адрес",
+      "alertsGoTo_few": "Оповещения уходят на {{count}} адреса",
+      "alertsGoTo_many": "Оповещения уходят на {{count}} адресов",
+      "alertsGoTo_other": "Оповещения уходят на {{count}} адресов",
+      "usedBy_one": "Используется в {{count}} автоматизации",
+      "usedBy_few": "Используется в {{count}} автоматизациях",
+      "usedBy_many": "Используется в {{count}} автоматизациях",
+      "usedBy_other": "Используется в {{count}} автоматизациях",
+      "usedByNewsletters_one": "Используется в {{count}} рассылке",
+      "usedByNewsletters_few": "Используется в {{count}} рассылках",
+      "usedByNewsletters_many": "Используется в {{count}} рассылках",
+      "usedByNewsletters_other": "Используется в {{count}} рассылках"
     }
   },
   "impersonation": {
-    "banner": "",
-    "stop": "",
-    "stopLabel": "",
-    "stopViewing": ""
+    "banner": "Просмотр от имени {{name}}. Изменения отключены.",
+    "stop": "Завершить",
+    "stopLabel": "Завершить просмотр от имени {{name}}",
+    "stopViewing": "Завершить просмотр"
   },
   "maintenance": {
     "startingTitle": "Tracearr запускается...",
     "interruptionTitle": "Прерывание службы",
     "startingDescription": "Сервер ожидает доступа к сервисам бэкэнда. Эта страница будет автоматически обновляться, когда все будет готово.",
     "interruptionDescription": "Одна или несколько сервисов бэкэнда недоступны. Эта страница будет автоматически обновляться, когда подключение восстановлено.",
-    "unreachable": "",
+    "unreachable": "Сейчас не удаётся связаться с сервером Tracearr. Обновления в реальном времени приостановлены и возобновятся сами.",
     "restoreTitle": "Восстановление из резервной копии...",
     "restoreFailed": "Не удалось восстановить",
     "restorePhase": {
@@ -2387,59 +2474,74 @@
       "running_migrations": "Запущенные миграции",
       "rebuilding_aggregates": "Восстановление агрегатов",
       "restarting": "Перезапуск услуг",
-      "complete": ""
+      "complete": "Восстановление завершено"
     },
     "initStep": {
-      "migrations": "",
-      "timescale": "",
-      "services": ""
+      "migrations": "Применение миграций базы данных",
+      "timescale": "Подготовка TimescaleDB (после обновления это может занять время)",
+      "services": "Запуск сервисов"
     },
-    "doNotRestart": ""
+    "doNotRestart": "Не перезапускайте и не останавливайте сервер, пока это выполняется. Прерывание может оставить базу данных частично обновлённой."
   },
   "map": {
     "allUsers": "Все пользователи",
     "allTypes": "Все типы",
     "heatmap": "Тепловая карта",
     "circles": "Круги",
-    "viewMode": "",
+    "viewMode": "Вид карты",
     "streams": "потоки",
     "locations": "места",
     "allActivity": "Все действия",
-    "basemapMissing": "",
-    "webglUnavailable": "",
-    "webglHint": "",
-    "badMounts": "",
-    "loadingData": "",
-    "noDataForFilters": "",
-    "totalStreams": "",
-    "byStreams": "",
-    "noMapPosition": "",
-    "allLocations": "",
-    "people": "",
-    "devices": "",
-    "latestStreams": "",
-    "firstSeen": "",
-    "lastSeen": "",
-    "areaName": "",
-    "areaPlaces": "",
-    "noneInView": "",
-    "showAll": "",
-    "streamCount_other": "",
-    "peopleCount_other": "",
-    "viewInHistory_other": "",
-    "streamsAcrossPlaces_other": "",
-    "inViewCount_other": ""
+    "basemapMissing": "Базовая карта не установлена",
+    "webglUnavailable": "WebGL отключён в этом браузере",
+    "webglHint": "Для карты нужен WebGL. Включите его для этого сайта в настройках браузера.",
+    "badMounts": "Обнаружено неправильное подключение томов, работоспособность не гарантируется.",
+    "loadingData": "Загрузка данных карты...",
+    "noDataForFilters": "Нет данных о местоположении для текущих фильтров",
+    "totalStreams": "Всего потоков",
+    "byStreams": "по потокам",
+    "noMapPosition": "Нет положения на карте",
+    "allLocations": "Все местоположения",
+    "people": "люди",
+    "devices": "устройства",
+    "latestStreams": "Последние потоки",
+    "firstSeen": "Первая активность",
+    "lastSeen": "Последняя активность",
+    "areaName": "{{name}} и окрестности",
+    "areaPlaces": "Места",
+    "noneInView": "В этой части карты нет местоположений",
+    "showAll": "Показать все",
+    "streamCount_one": "{{count, number}} поток",
+    "streamCount_few": "{{count, number}} потока",
+    "streamCount_many": "{{count, number}} потоков",
+    "streamCount_other": "{{count, number}} потоков",
+    "peopleCount_one": "{{count, number}} человек",
+    "peopleCount_few": "{{count, number}} человека",
+    "peopleCount_many": "{{count, number}} человек",
+    "peopleCount_other": "{{count, number}} человек",
+    "viewInHistory_one": "Показать {{count, number}} поток в истории",
+    "viewInHistory_few": "Показать {{count, number}} потока в истории",
+    "viewInHistory_many": "Показать {{count, number}} потоков в истории",
+    "viewInHistory_other": "Показать {{count, number}} потоков в истории",
+    "streamsAcrossPlaces_one": "{{count, number}} поток, мест: {{places, number}}",
+    "streamsAcrossPlaces_few": "{{count, number}} потока, мест: {{places, number}}",
+    "streamsAcrossPlaces_many": "{{count, number}} потоков, мест: {{places, number}}",
+    "streamsAcrossPlaces_other": "{{count, number}} потоков, мест: {{places, number}}",
+    "inViewCount_one": "В области карты: {{count, number}} из {{total, number}}",
+    "inViewCount_few": "В области карты: {{count, number}} из {{total, number}}",
+    "inViewCount_many": "В области карты: {{count, number}} из {{total, number}}",
+    "inViewCount_other": "В области карты: {{count, number}} из {{total, number}}"
   },
   "devices": {
-    "analyzedSessions": "",
+    "analyzedSessions": "Проанализированные сессии",
     "directPlayRate": "Доля прямого воспроизведения",
-    "videoAndAudio": "",
+    "videoAndAudio": "Видео + аудио",
     "uniqueDevices": "Уникальные устройства",
     "uniqueCodecs": "Уникальные кодеки",
     "deviceHealth": "Здоровье устройства",
-    "deviceHealthDesc": "",
+    "deviceHealthDesc": "Доля прямого воспроизведения по типам устройств.",
     "transcodeHotspots": "Очаги транскодирования",
-    "transcodeHotspotsDesc": "",
+    "transcodeHotspotsDesc": "Сочетания, чаще всего вызывающие транскодирование.",
     "deviceAndCodec": "Устройство + кодек",
     "transcodes": "Транскодирование",
     "pctOfTotal": "% от общего",
@@ -2449,25 +2551,28 @@
     "noDeviceDataPeriod": "Нет данных об устройстве за этот период",
     "legend": "Легенда:",
     "directPlayHigh": "<unk> 80% Прямо",
-    "directPlayMid": "",
-    "directPlayLow": "",
-    "analyzedSessionsTooltip_one": "",
-    "analyzedSessionsTooltip_few": "",
-    "analyzedSessionsTooltip_many": "",
-    "analyzedSessionsTooltip_other": ""
+    "directPlayMid": "50-79%",
+    "directPlayLow": "<50%",
+    "analyzedSessionsTooltip_one": "Сессии в сочетаниях устройства и кодека, где не меньше {{count}} сессии и кодек известен. Редкие сочетания и сессии без данных о кодеке не учитываются.",
+    "analyzedSessionsTooltip_few": "Сессии в сочетаниях устройства и кодека, где не меньше {{count}} сессий и кодек известен. Редкие сочетания и сессии без данных о кодеке не учитываются.",
+    "analyzedSessionsTooltip_many": "Сессии в сочетаниях устройства и кодека, где не меньше {{count}} сессий и кодек известен. Редкие сочетания и сессии без данных о кодеке не учитываются.",
+    "analyzedSessionsTooltip_other": "Сессии в сочетаниях устройства и кодека, где не меньше {{count}} сессий и кодек известен. Редкие сочетания и сессии без данных о кодеке не учитываются."
   },
   "downloads": {
-    "dataDownloaded": "",
-    "peopleDownloading": "",
-    "mostDownloaded": "",
-    "unknownUser": "",
-    "appOnDevice": "",
-    "deliveredAs": "",
-    "deliveredAsFormat": "",
-    "deliveredAtBitrate": "",
-    "empty": "",
-    "panelTitle": "",
-    "requests_other": ""
+    "dataDownloaded": "Скачано данных",
+    "peopleDownloading": "Людей со скачиваниями",
+    "mostDownloaded": "Чаще всего скачивают",
+    "unknownUser": "Неизвестный пользователь",
+    "appOnDevice": "{{app}} на {{device}}",
+    "deliveredAs": "доставлено как {{format}}, {{bitrate}}",
+    "deliveredAsFormat": "доставлено как {{format}}",
+    "deliveredAtBitrate": "доставлено с битрейтом {{bitrate}}",
+    "empty": "За этот период скачиваний нет. Скачивания — это элементы, полученные через кнопку или конечную точку скачивания на сервере. Plex сообщает о них, только пока Tracearr подключён.",
+    "panelTitle": "Скачивания",
+    "requests_one": "({{count}} запрос)",
+    "requests_few": "({{count}} запроса)",
+    "requests_many": "({{count}} запросов)",
+    "requests_other": "({{count}} запросов)"
   },
   "statsBandwidth": {
     "dataTransferred": "Передано данных",
@@ -2477,45 +2582,45 @@
     "totalWatchTime": "Общее время просмотра",
     "uniqueUsers": "Уникальные пользователи",
     "dailyUsage": "Ежедневное использование трафика",
-    "dailyUsageDesc": "",
+    "dailyUsageDesc": "Средний битрейт и число сессий со временем.",
     "noData": "Нет доступных данных о пропускной способности",
-    "topPeopleTitle": "",
-    "topPeopleCaption": ""
+    "topPeopleTitle": "Люди по объёму данных",
+    "topPeopleCaption": "Первые пять за этот период"
   },
   "statsUsers": {
     "noActivity": "Нет активности",
     "noActivityDesc": "Начните поток, чтобы увидеть ваших топ пользователей здесь",
-    "rankBy": "",
+    "rankBy": "Ранжировать по",
     "rank": {
-      "hours": "",
-      "transcodes": "",
-      "requests": "",
-      "lastSeen": ""
+      "hours": "Часы",
+      "transcodes": "Доля транскодирования",
+      "requests": "Запросы",
+      "lastSeen": "Последняя активность"
     },
     "summary": {
-      "active": "",
-      "activeOf": "",
-      "topThreeShare": "",
-      "transcoderShare": "",
-      "transcodesOf": "",
-      "quiet": "",
-      "quietDays": ""
+      "active": "Активные люди",
+      "activeOf": "из {{total}}",
+      "topThreeShare": "Доля первой тройки",
+      "transcoderShare": "Доля лидера по транскодированию",
+      "transcodesOf": "{{top}} из {{total}} транскодирований",
+      "quiet": "Неактивные люди",
+      "quietDays": "от {{days}} дней"
     },
     "columns": {
-      "person": "",
-      "requests": "",
-      "trend": ""
+      "person": "Человек",
+      "requests": "Запросы",
+      "trend": "Тенденция"
     },
-    "requestsAllTime": "",
+    "requestsAllTime": "За всё время, независимо от выбранного периода. Запрошено, затем просмотрено.",
     "linkTitle": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "Люди, упорядоченные по доле транскодирования.",
+      "requests": "Люди, упорядоченные по запросам."
     },
     "linkBody": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "Все люди, начиная с наибольшей доли.",
+      "requests": "Все люди и сколько их запросов было просмотрено."
     },
-    "openPeople": ""
+    "openPeople": "Перейти к людям"
   },
   "plexCallback": {
     "authComplete": "Аутентификация завершена",
@@ -2525,13 +2630,13 @@
     "backToSettings": "Вернуться к настройкам",
     "apiKeyAutoLoaded": "API ключ автоматически загружен",
     "noApiKey": "Нет API ключа - создайте его в Настройках для тестирования конечных точек",
-    "versionV1": "",
-    "versionV2": "",
-    "specLoadError": ""
+    "versionV1": "v1",
+    "versionV2": "v2 (текущая)",
+    "specLoadError": "Не удалось загрузить спецификацию API. Проверьте ключ API и повторите попытку."
   },
   "debug": {
     "title": "Инструменты отладки",
-    "description": "",
+    "description": "Служебные инструменты для диагностики и управления данными.",
     "overview": "Общий обзор",
     "librarySnapshots": "Снимки библиотеки",
     "tasks": "Задачи",
@@ -2542,7 +2647,7 @@
     "environment": "Среда",
     "systemInformation": "Информация о системе",
     "database": "База данных",
-    "databaseDesc": "",
+    "databaseDesc": "Размер базы данных и статистика таблиц.",
     "totalSize": "Общий размер",
     "maintenance": "Техническое обслуживание",
     "destructiveActions": "Разрушенные действия",
@@ -2552,8 +2657,8 @@
     "clearQueryCache": "Очистить кэш запросов",
     "clearMobileDevices": "Очистить мобильные устройства",
     "clearViolations": "Очистить нарушения",
-    "clearAutomations": "",
-    "clearAutomationsConfirm": "",
+    "clearAutomations": "Удалить все автоматизации и запуски",
+    "clearAutomationsConfirm": "Удалить все автоматизации и все их запуски?",
     "clearTerminationLogs": "Очистить журналы завершений",
     "clearLibraryCache": "Очистить кэш библиотеки",
     "clearSessions": "Очистить сессии",
@@ -2570,95 +2675,98 @@
     "suspicious": "Подозрительный",
     "ok": "ОК",
     "selected": "выбрано",
-    "snapshots": "",
+    "snapshots": "снимков",
     "of": "из",
     "logExplorerUnavailable": "Обозреватель логов доступен только в окружении Docker",
     "tasksTab": {
-      "loading": "",
-      "failedToLoad": "",
-      "jobQueues": "",
-      "jobQueuesDesc": "",
-      "description": "",
-      "schedule": "",
-      "completed": "",
-      "scheduled": "",
-      "processing": "",
-      "onDemand": "",
-      "notInitialized": "",
-      "backgroundServices": "",
-      "backgroundServicesDesc": "",
-      "interval": "",
-      "eventConnections": "",
-      "eventConnectionsDesc": "",
-      "every": "",
-      "eventDriven": "",
+      "loading": "Загрузка задач...",
+      "failedToLoad": "Не удалось загрузить статус задач",
+      "jobQueues": "Очереди заданий",
+      "jobQueuesDesc": "Очереди фоновой обработки заданий BullMQ",
+      "description": "Описание",
+      "schedule": "Расписание",
+      "completed": "Выполнено",
+      "scheduled": "По расписанию",
+      "processing": "Обрабатывается",
+      "onDemand": "По запросу",
+      "notInitialized": "Не инициализировано",
+      "backgroundServices": "Фоновые службы",
+      "backgroundServicesDesc": "Фоновые службы, работающие по интервалу и по событиям",
+      "interval": "Интервал",
+      "eventConnections": "Подключения к событиям",
+      "eventConnectionsDesc": "Открытые подключения к событиям публичного API (GET /api/v2/public/events), удерживаемые этим процессом",
+      "every": "Раз в {{interval}}",
+      "eventDriven": "По событиям",
       "queues": {
-        "notifications": "",
-        "notificationsDesc": "",
-        "imports": "",
-        "importsDesc": "",
-        "maintenance": "",
-        "maintenanceDesc": "",
-        "librarySync": "",
-        "librarySyncDesc": "",
-        "versionCheck": "",
-        "versionCheckDesc": "",
-        "inactivityCheck": "",
-        "inactivityCheckDesc": "",
-        "backup": "",
-        "backupDesc": ""
+        "notifications": "Уведомления",
+        "notificationsDesc": "Discord, вебхуки, push",
+        "imports": "Импорт",
+        "importsDesc": "История Tautulli / Jellystat",
+        "maintenance": "Техническое обслуживание",
+        "maintenanceDesc": "Нормализация и очистка данных",
+        "librarySync": "Синхронизация библиотеки",
+        "librarySyncDesc": "Синхронизация метаданных библиотеки",
+        "versionCheck": "Проверка версии",
+        "versionCheckDesc": "Проверка выпусков на GitHub",
+        "inactivityCheck": "Проверка неактивности",
+        "inactivityCheckDesc": "Мониторинг неактивности аккаунтов",
+        "backup": "Резервное копирование",
+        "backupDesc": "Резервные копии базы данных по расписанию"
       },
-      "dlq_other": ""
+      "dlq_one": "DLQ: {{count}}",
+      "dlq_few": "DLQ: {{count}}",
+      "dlq_many": "DLQ: {{count}}",
+      "dlq_other": "DLQ: {{count}}"
     },
     "clientErrors": {
-      "title": "",
-      "description": "",
-      "empty": ""
+      "title": "Ошибки браузера",
+      "description": "Неперехваченные ошибки этой вкладки с момента её загрузки. Не сохраняются.",
+      "empty": "Ошибок не зафиксировано"
     }
   },
   "media": {
     "landing": {
       "shelves": {
-        "recentlyAddedMovies": "",
-        "recentlyAddedShows": "",
-        "recentlyUpdated": "",
-        "mostPopularMovies": "",
-        "mostPopularShows": "",
-        "recentlyAddedAlbums": "",
-        "mostPlayedArtists": "",
-        "emptyRecentlyAdded": "",
-        "emptyRecentlyUpdated": "",
-        "emptyMostPopular": "",
-        "captionRecentlyAdded": "",
-        "captionRecentlyUpdated": "",
+        "recentlyAddedMovies": "Недавно добавленные фильмы",
+        "recentlyAddedShows": "Недавно добавленные сериалы",
+        "recentlyUpdated": "Недавно обновлённые",
+        "mostPopularMovies": "Самые популярные фильмы",
+        "mostPopularShows": "Самые популярные сериалы",
+        "recentlyAddedAlbums": "Недавно добавленные альбомы",
+        "mostPlayedArtists": "Самые прослушиваемые исполнители",
+        "emptyRecentlyAdded": "За этот период ничего не добавлено",
+        "emptyRecentlyUpdated": "За этот период ничего не заменено",
+        "emptyMostPopular": "За этот период просмотров нет",
+        "captionRecentlyAdded": "без дублей на разных серверах",
+        "captionRecentlyUpdated": "лучшая копия заменила имевшуюся",
         "captionMostPopular": {
-          "day": "",
-          "week": "",
-          "month": "",
-          "year": "",
-          "all": "",
-          "custom": ""
+          "day": "сегодня",
+          "week": "последние 7 дней",
+          "month": "последние 30 дней",
+          "year": "последние 12 месяцев",
+          "all": "за всё время",
+          "custom": "выбранный период"
         }
       },
       "card": {
-        "addedCompactAgo": "",
+        "addedCompactAgo": "добавлено {{age}} назад",
         "newEpisodes_one": "{{count}} новая серия",
-        "newEpisodes_few": "",
-        "newEpisodes_many": "",
+        "newEpisodes_few": "{{count}} новые серии",
+        "newEpisodes_many": "{{count}} новых серий",
         "newEpisodes_other": "{{count}} новых серий",
-        "replacedEpisodes_one": "",
-        "replacedEpisodes_few": "",
-        "replacedEpisodes_many": "",
-        "replacedEpisodes_other": "",
-        "newEpisodesChip_one": "",
-        "newEpisodesChip_few": "",
-        "newEpisodesChip_many": "",
-        "newEpisodesChip_other": ""
+        "replacedEpisodes_one": "Заменена {{count}} серия",
+        "replacedEpisodes_few": "Заменены {{count}} серии",
+        "replacedEpisodes_many": "Заменено {{count}} серий",
+        "replacedEpisodes_other": "Заменено {{count}} серий",
+        "newEpisodesChip_one": "{{count}} новая",
+        "newEpisodesChip_few": "{{count}} новые",
+        "newEpisodesChip_many": "{{count}} новых",
+        "newEpisodesChip_other": "{{count}} новых"
       },
       "deadWeight": {
-        "viewAll": ""
+        "viewAll": "Посмотреть все"
       },
-      "loadError": ""
+      "loadError": "Не удалось загрузить медиабиблиотеку"
     },
     "movies": {
       "title": "Фильмы"
@@ -2668,198 +2776,207 @@
     },
     "genres": {
       "cards": {
-        "withPlays": "",
-        "ofGenres": "",
-        "topFiveShare": "",
-        "largestRise": "",
-        "largestFall": ""
+        "withPlays": "Жанры с просмотрами",
+        "ofGenres": "из {{count}}",
+        "topFiveShare": "Доля первой пятёрки",
+        "largestRise": "Самый большой рост",
+        "largestFall": "Самое большое падение"
       },
       "share": {
-        "title": "",
-        "items": "",
-        "plays": "",
-        "sortGap": "",
-        "showAll": ""
+        "title": "Доля в библиотеке и доля просмотров",
+        "items": "Доля элементов",
+        "plays": "Доля просмотров",
+        "sortGap": "Разрыв",
+        "showAll": "Показать все: {{count}}"
       },
       "trends": {
-        "title": ""
+        "title": "Тенденция по жанрам"
       },
       "chart": {
-        "itemCount_one": "",
-        "itemCount_few": "",
-        "itemCount_many": "",
-        "itemCount_other": ""
+        "itemCount_one": "{{count}} название",
+        "itemCount_few": "{{count}} названия",
+        "itemCount_many": "{{count}} названий",
+        "itemCount_other": "{{count}} названий"
       },
       "table": {
-        "title": "",
+        "title": "Разбивка по жанрам",
         "columns": {
-          "genre": "",
-          "plays": "",
-          "watchTime": "",
-          "topViewer": ""
+          "genre": "Жанр",
+          "plays": "Просмотры",
+          "watchTime": "Время просмотра",
+          "topViewer": "Главный зритель"
         }
       },
       "empty": {
-        "title": "",
-        "description": ""
+        "title": "Жанры пока не получены",
+        "description": "Жанры берутся из синхронизации метаданных медиасерверов. Загляните сюда после следующей синхронизации."
       },
-      "loadError": "",
+      "loadError": "Не удалось загрузить жанры",
       "sheet": {
-        "description": "",
-        "whoPlays": "",
-        "ofCountedPlays": "",
-        "topTitles": "",
-        "topArtists": "",
-        "browse": "",
-        "allGenresPeak": "",
-        "artistCount_one": "",
-        "artistCount_few": "",
-        "artistCount_many": "",
-        "artistCount_other": ""
+        "description": "Просмотры, зрители и названия этого жанра за выбранный период",
+        "whoPlays": "Кто смотрит",
+        "ofCountedPlays": "от учтённых просмотров",
+        "topTitles": "Топ названий",
+        "topArtists": "Топ исполнителей",
+        "browse": "Перейти к этому жанру",
+        "allGenresPeak": "пик всех жанров: {{hour}}",
+        "artistCount_one": "{{count}} исполнитель",
+        "artistCount_few": "{{count}} исполнителя",
+        "artistCount_many": "{{count}} исполнителей",
+        "artistCount_other": "{{count}} исполнителей"
       }
     },
     "detail": {
       "title": "Сведения о медиа",
       "breadcrumb": {
-        "ariaLabel": ""
+        "ariaLabel": "Навигационная цепочка"
       },
       "notFound": {
-        "title": "",
-        "message": ""
+        "title": "Медиа не найдено",
+        "message": "Этого названия не существует или у вас нет к нему доступа."
       },
       "hero": {
-        "loadError": "",
+        "loadError": "Не удалось загрузить это название",
         "meta": {
-          "seasons_one": "",
-          "seasons_few": "",
-          "seasons_many": "",
-          "seasons_other": "",
-          "episodes_one": "",
-          "episodes_few": "",
-          "episodes_many": "",
-          "episodes_other": ""
+          "seasons_one": "{{count}} сезон",
+          "seasons_few": "{{count}} сезона",
+          "seasons_many": "{{count}} сезонов",
+          "seasons_other": "{{count}} сезонов",
+          "episodes_one": "{{count}} серия",
+          "episodes_few": "{{count}} серии",
+          "episodes_many": "{{count}} серий",
+          "episodes_other": "{{count}} серий"
         },
         "availability": {
-          "added": "",
-          "addedRemoved": "",
-          "replaced": ""
+          "added": "добавлено {{date}}",
+          "addedRemoved": "добавлено {{added}} – удалено {{removed}}",
+          "replaced": "заменено {{date}}"
         },
         "removedEverywhere": {
-          "caption": ""
+          "caption": "Больше не доступно ни на одном подключённом сервере"
         },
         "actions": {
-          "fullHistory": "",
-          "openOnServer": ""
+          "fullHistory": "Вся история",
+          "openOnServer": "Открыть на сервере"
         }
       },
       "kpis": {
-        "ariaLabel": "",
-        "yourPlays": "",
-        "yourWatchTime": "",
-        "yourListenTime": "",
-        "yourCompletion": "",
-        "lastWatched": "",
-        "lastPlayed": "",
-        "episodesOf": "",
-        "loadError": "",
-        "completionLoadError": "",
+        "ariaLabel": "Статистика просмотров",
+        "yourPlays": "Ваши просмотры",
+        "yourWatchTime": "Ваше время просмотра",
+        "yourListenTime": "Ваше время прослушивания",
+        "yourCompletion": "Досмотрено вами",
+        "lastWatched": "Последний просмотр",
+        "lastPlayed": "Последнее воспроизведение",
+        "episodesOf": "{{watched}} из {{total}} серий",
+        "loadError": "Не удалось загрузить статистику просмотров",
+        "completionLoadError": "Не удалось загрузить данные о досмотре",
         "plays": {
-          "label": "",
-          "caption": ""
+          "label": "Просмотры за всё время",
+          "caption": "с учётом возобновлений, без коротких сессий"
         },
         "watchTime": {
-          "detail": ""
+          "detail": "+{{hours}} ч за последние 30 дней"
         },
         "viewers": {
-          "label": "",
-          "labelMusic": "",
-          "detail": ""
+          "label": "Зрители",
+          "labelMusic": "Слушатели",
+          "detail": "на всех серверах"
         },
         "completion": {
-          "label": "",
-          "detail": "",
-          "detailMovie": "",
-          "detailMusic": ""
+          "label": "Досмотрено в среднем",
+          "detail": "Посмотрели все серии: {{finished}} из {{total}}",
+          "detailMovie": "Посмотрели до конца: {{finished}} из {{total}}",
+          "detailMusic": "Дослушали до конца: {{finished}} из {{total}}"
         },
-        "watchedByOthers_other": "",
-        "playedByOthers_other": ""
+        "watchedByOthers_one": "Смотрел ещё {{count}} человек",
+        "watchedByOthers_few": "Смотрели ещё {{count}} человека",
+        "watchedByOthers_many": "Смотрели ещё {{count}} человек",
+        "watchedByOthers_other": "Смотрели ещё {{count}} человек",
+        "playedByOthers_one": "Воспроизводил ещё {{count}} человек",
+        "playedByOthers_few": "Воспроизводили ещё {{count}} человека",
+        "playedByOthers_many": "Воспроизводили ещё {{count}} человек",
+        "playedByOthers_other": "Воспроизводили ещё {{count}} человек"
       },
       "watchers": {
-        "title": "",
-        "titleMusic": "",
-        "loadError": "",
-        "empty": "",
-        "emptyMusic": "",
-        "lastWatchedAgo": "",
-        "completionLabel": "",
+        "title": "Зрители",
+        "titleMusic": "Слушатели",
+        "loadError": "Не удалось загрузить зрителей",
+        "empty": "Это ещё никто не смотрел.",
+        "emptyMusic": "Это ещё никто не воспроизводил.",
+        "lastWatchedAgo": "{{age}} назад",
+        "completionLabel": "Досмотрено: {{percent}}%",
         "columns": {
-          "plays": "",
-          "episodes": "",
-          "completion": "",
-          "lastWatched": "",
-          "lastPlayed": ""
+          "plays": "Просмотры",
+          "episodes": "Серии",
+          "completion": "Досмотрено",
+          "lastWatched": "Последний просмотр",
+          "lastPlayed": "Последнее воспроизведение"
         }
       },
       "seasons": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "title": "Сезоны",
+        "loadError": "Не удалось загрузить данные о сезонах",
+        "empty": "Данных о сезонах пока нет",
+        "watchedPct": "Просмотрено: {{percent}}%",
+        "stripSummary": "{{season}}: просмотрено {{percent}}%",
         "episodeLabel": {
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "watched": "{{code}}: просмотрено",
+          "partial": "{{code}}: просмотрено частично",
+          "unwatched": "{{code}}: не просмотрено"
         },
-        "episodeCount_one": "",
-        "episodeCount_few": "",
-        "episodeCount_many": "",
-        "episodeCount_other": ""
+        "episodeCount_one": "{{count}} серия",
+        "episodeCount_few": "{{count}} серии",
+        "episodeCount_many": "{{count}} серий",
+        "episodeCount_other": "{{count}} серий"
       },
       "albums": {
-        "title": "",
-        "loadError": "",
-        "trackCount_other": ""
+        "title": "Альбомы",
+        "loadError": "Не удалось загрузить альбомы",
+        "trackCount_one": "{{count}} трек",
+        "trackCount_few": "{{count}} трека",
+        "trackCount_many": "{{count}} треков",
+        "trackCount_other": "{{count}} треков"
       },
       "album": {
-        "kind": "",
-        "loadError": "",
-        "finishedCaption": "",
-        "vsPrior30": "",
-        "tracksCaption": "",
+        "kind": "Альбом",
+        "loadError": "Не удалось загрузить этот альбом",
+        "finishedCaption": "дослушано до конца",
+        "vsPrior30": "к предыдущим 30 дням",
+        "tracksCaption": "прослушивания за всё время",
         "columns": {
-          "title": "",
-          "length": ""
+          "title": "Название",
+          "length": "Длительность"
         }
       },
       "platforms": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "unknown": "",
+        "title": "Платформы",
+        "loadError": "Не удалось загрузить разбивку по платформам",
+        "empty": "Данных о платформах пока нет",
+        "unknown": "Неизвестно",
         "columns": {
-          "plays": ""
+          "plays": "Просмотры"
         }
       },
       "history": {
-        "title": "",
-        "loadError": "",
-        "empty": "",
-        "notWatched": "",
+        "title": "История",
+        "loadError": "Не удалось загрузить историю",
+        "empty": "Просмотров пока нет",
+        "notWatched": "Не досмотрено",
         "columns": {
-          "duration": ""
+          "duration": "Длительность"
         }
       },
       "copies": {
-        "title": "",
-        "loadError": "",
-        "unknownLibrary": "",
+        "title": "Копии",
+        "loadError": "Не удалось загрузить копии",
+        "unknownLibrary": "Неизвестная библиотека",
         "columns": {
-          "library": "",
-          "episodes": "",
-          "added": ""
+          "library": "Библиотека",
+          "episodes": "Серии",
+          "added": "Добавлено"
         },
-        "versionLabel": ""
+        "versionLabel": "Файл {{index}}"
       }
     },
     "posterCard": {
@@ -2869,189 +2986,192 @@
       "watchedState": {
         "watched": "Просмотрено",
         "partial": "Частично просмотрено",
-        "watchedByOthers": "",
-        "watchedByYou": ""
+        "watchedByOthers": "Просмотрено другими",
+        "watchedByYou": "Просмотрено вами"
       },
-      "versionsChip": "",
-      "moreServers": "",
+      "versionsChip": "{{count}}×",
+      "moreServers": "Ещё {{count}}",
       "viewers_one": "{{count}} зритель",
-      "viewers_few": "",
-      "viewers_many": "",
+      "viewers_few": "{{count}} зрителя",
+      "viewers_many": "{{count}} зрителей",
       "viewers_other": "{{count}} зрителей",
-      "versions_one": "",
-      "versions_few": "",
-      "versions_many": "",
-      "versions_other": "",
-      "albumCount_other": ""
+      "versions_one": "{{count}} версия",
+      "versions_few": "{{count}} версии",
+      "versions_many": "{{count}} версий",
+      "versions_other": "{{count}} версий",
+      "albumCount_one": "{{count}} альбом",
+      "albumCount_few": "{{count}} альбома",
+      "albumCount_many": "{{count}} альбомов",
+      "albumCount_other": "{{count}} альбомов"
     },
     "grid": {
       "toolbar": {
-        "ariaLabel": "",
-        "searchPlaceholder": "",
-        "searchLabel": "",
-        "filtersLabel": "",
-        "filtersSheetTitle": "",
-        "done": "",
-        "watchedLabel": "",
+        "ariaLabel": "Фильтры и сортировка",
+        "searchPlaceholder": "Поиск названий…",
+        "searchLabel": "Поиск названий",
+        "filtersLabel": "Фильтры",
+        "filtersSheetTitle": "Фильтры",
+        "done": "Готово",
+        "watchedLabel": "Просмотрено",
         "watched": {
-          "all": "",
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "all": "Все",
+          "watched": "Просмотрено",
+          "partial": "Частично просмотрено",
+          "unwatched": "Не просмотрено"
         },
-        "unwatchedByLens": "",
-        "resolutionLabel": "",
-        "resolutionAll": "",
-        "videoCodecLabel": "",
-        "videoCodecAll": "",
-        "hdrLabel": "",
-        "hdrAll": "",
-        "hdrOnly": "",
-        "hdrChip": "",
-        "audioCodecLabel": "",
-        "audioCodecAll": "",
-        "audioChannelsLabel": "",
-        "audioChannelsAll": "",
-        "atmosLabel": "",
-        "atmosAll": "",
-        "atmosOnly": "",
-        "atmosChip": "",
-        "genreLabel": "",
-        "genreAll": "",
-        "serverLabel": "",
-        "serverAll": "",
-        "libraryLabel": "",
-        "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
-        "sizeGbMinLabel": "",
-        "sizeGbMaxLabel": "",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "unwatchedByLens": "Не просмотрено: {{name}}",
+        "resolutionLabel": "Разрешение",
+        "resolutionAll": "Любое разрешение",
+        "videoCodecLabel": "Видеокодек",
+        "videoCodecAll": "Любой видеокодек",
+        "hdrLabel": "Динамический диапазон",
+        "hdrAll": "Любой",
+        "hdrOnly": "Только HDR",
+        "hdrChip": "HDR",
+        "audioCodecLabel": "Аудиокодек",
+        "audioCodecAll": "Любой аудиокодек",
+        "audioChannelsLabel": "Аудиоканалы",
+        "audioChannelsAll": "Любая раскладка каналов",
+        "atmosLabel": "Аудио",
+        "atmosAll": "Любое",
+        "atmosOnly": "Только Dolby Atmos",
+        "atmosChip": "Atmos",
+        "genreLabel": "Жанр",
+        "genreAll": "Любой жанр",
+        "serverLabel": "Сервер",
+        "serverAll": "Любой сервер",
+        "libraryLabel": "Библиотека",
+        "libraryAll": "Любая библиотека",
+        "yearFromLabel": "С года",
+        "yearToLabel": "По год",
+        "sizeGbMinLabel": "Мин. размер (ГБ)",
+        "sizeGbMaxLabel": "Макс. размер (ГБ)",
+        "sizeChipAtLeast": "≥ {{min}} ГБ",
+        "sizeChipAtMost": "≤ {{max}} ГБ",
+        "sizeChipRange": "{{min}}–{{max}} ГБ",
+        "sortLabel": "Сортировка",
         "sort": {
-          "title": "",
-          "added": "",
-          "year": "",
-          "plays": "",
-          "watch_time": "",
-          "viewers": ""
+          "title": "Название А–Я",
+          "added": "Недавно добавленные",
+          "year": "Год",
+          "plays": "Просмотры",
+          "watch_time": "Время просмотра",
+          "viewers": "Зрители"
         },
-        "count": "",
-        "countTotal_one": "",
-        "countTotal_few": "",
-        "countTotal_many": "",
-        "countTotal_other": ""
+        "count": "Названия: {{loaded}} из {{total}} · {{size}}",
+        "countTotal_one": "{{count}} название · {{size}}",
+        "countTotal_few": "{{count}} названия · {{size}}",
+        "countTotal_many": "{{count}} названий · {{size}}",
+        "countTotal_other": "{{count}} названий · {{size}}"
       },
       "scrubber": {
-        "label": "",
-        "current": ""
+        "label": "Перейти к букве",
+        "current": "Буква {{letter}}"
       },
-      "loaderError": "",
-      "emptyFilter": "",
-      "emptySearch": "",
-      "loadError": ""
+      "loaderError": "Не удалось загрузить другие названия",
+      "emptyFilter": "Нет названий, подходящих под эти фильтры",
+      "emptySearch": "Нет названий по запросу \"{{query}}\"",
+      "loadError": "Не удалось загрузить каталог"
     }
   },
   "requests": {
     "status": {
-      "pending": "",
-      "approved": "",
-      "declined": "",
-      "failed": "",
-      "completed": "",
-      "deleted": ""
+      "pending": "В ожидании",
+      "approved": "Одобрен",
+      "declined": "Отклонён",
+      "failed": "Ошибка",
+      "completed": "Доступен",
+      "deleted": "Удалён"
     },
     "columns": {
-      "requester": "",
-      "title": "",
-      "requested": "",
-      "wait": "",
-      "seasons": "",
-      "watched": ""
+      "requester": "Запросил",
+      "title": "Название",
+      "requested": "Запрошено",
+      "wait": "Ожидание",
+      "seasons": "Сезоны",
+      "watched": "Просмотрено"
     },
     "wait": {
-      "pending": "",
-      "declined": ""
+      "pending": "ожидание",
+      "declined": "отклонён"
     },
     "seasons": {
-      "all": "",
-      "item": ""
+      "all": "Все сезоны",
+      "item": "S{{number}}"
     },
     "flags": {
-      "fourK": "",
-      "auto": ""
+      "fourK": "Запрос 4K",
+      "auto": "Запрошено автоматически из списка просмотра"
     },
     "hero": {
-      "line": "",
-      "landed": "",
-      "waiting": ""
+      "line": "Запросил {{name}} · {{date}} · {{tail}}",
+      "landed": "появилось через {{wait}}",
+      "waiting": "всё ещё ожидает"
     },
     "mediaPanel": {
-      "title": "",
-      "loadError": "",
-      "empty": ""
+      "title": "Запросы",
+      "loadError": "Не удалось загрузить запросы",
+      "empty": "Запросов к этому названию нет"
     },
     "userCard": {
-      "title": "",
-      "loadError": "",
-      "viewAll": "",
-      "showLess": "",
+      "title": "Запросы",
+      "loadError": "Не удалось загрузить запросы",
+      "viewAll": "Показать все (ещё {{count}})",
+      "showLess": "Показать меньше",
       "summary": {
-        "requests": "",
-        "medianWait": "",
-        "approvalRate": "",
-        "neverWatched": ""
+        "requests": "Запросы",
+        "medianWait": "медианное ожидание {{duration}}",
+        "approvalRate": "Доля одобренных",
+        "neverWatched": "Не просмотрено ни разу"
       },
-      "empty": ""
+      "empty": "Запросов пока нет"
     },
-    "unattributed": "",
+    "unattributed": "Не на этом сервере",
     "watched": {
-      "byRequester": "",
-      "byOthers": ""
+      "byRequester": "Просмотрено запросившим",
+      "byOthers": "Просмотрено кем-то другим"
     },
     "page": {
-      "title": "",
-      "failedToLoad": "",
-      "notConfigured": "",
-      "notConfiguredDescription": "",
-      "linkSeerr": "",
+      "title": "Запросы",
+      "failedToLoad": "Не удалось загрузить аналитику запросов",
+      "notConfigured": "Seerr не привязан",
+      "notConfiguredDescription": "Привяжите экземпляр Seerr к серверу, и эта страница заполнится после первой синхронизации.",
+      "linkSeerr": "Привязать Seerr",
       "kpi": {
-        "requested": "",
-        "watched": "",
-        "neverPlayed": "",
-        "ofLanded": "",
-        "onDisk": "",
-        "landedOf_one": "",
-        "landedOf_few": "",
-        "landedOf_many": "",
-        "landedOf_other": ""
+        "requested": "Запрошено",
+        "watched": "Просмотрено",
+        "neverPlayed": "Не воспроизводилось",
+        "ofLanded": "{{share}} от появившихся",
+        "onDisk": "{{size}} на диске",
+        "landedOf_one": "Появилось: {{count}}",
+        "landedOf_few": "Появилось: {{count}}",
+        "landedOf_many": "Появилось: {{count}}",
+        "landedOf_other": "Появилось: {{count}}"
       }
     },
     "funnel": {
-      "title": "",
-      "description": "",
-      "requested": "",
-      "landed": "",
-      "watched": "",
-      "share": "",
-      "empty": ""
+      "title": "Чем заканчиваются запросы",
+      "description": "Просмотрено означает, что кто-то дошёл до 85%, как и на страницах библиотеки. Запрос должен появиться и быть сопоставлен с названием, прежде чем Tracearr сможет это измерить.",
+      "requested": "Запрошено",
+      "landed": "Появилось",
+      "watched": "Просмотрено",
+      "share": "Запросы: {{count}} из {{total}}",
+      "empty": "Запросов пока нет"
     },
     "unplayed": {
-      "title": "",
-      "description": "",
-      "emptyTitle": "",
-      "emptyDescription": ""
+      "title": "Появилось, но не воспроизводилось",
+      "description": "Скачано по чьей-то просьбе, но ни один аккаунт на этих серверах ни разу не нажал воспроизведение.",
+      "emptyTitle": "Всё появившееся воспроизводилось",
+      "emptyDescription": "Ничто здесь не занимает диск просто так."
     },
     "outcomes": {
-      "title": "",
-      "requester": "",
-      "wait": "",
-      "requested": "",
-      "onDisk": "",
-      "untitled": "",
-      "failedToLoad": ""
+      "title": "Название",
+      "requester": "Запросил",
+      "wait": "Ожидание",
+      "requested": "Запрошено",
+      "onDisk": "На диске",
+      "untitled": "Без названия",
+      "failedToLoad": "Не удалось загрузить эти запросы"
     }
   }
 }

@@ -3,7 +3,7 @@
     "welcome": "Wilkommen zu Tracearr",
     "connectToServer": "Server verbinden",
     "enterServerDetails": "Geben Sie die URL Ihres Tracearr-Servers und den Mobile-Zugriffstoken ein",
-    "serverUrl": "",
+    "serverUrl": "Server URL",
     "accessToken": "",
     "scanQrCodeInstead": "Scanne QR Code stattdessen",
     "enterManually": "URL und Token manuell eingeben",
@@ -34,13 +34,13 @@
     "configureNotifications": "Push-Benachrichtigungseinstellungen konfigurieren",
     "language": "Sprache",
     "community": "",
-    "discord": "",
+    "discord": "Discord",
     "joinCommunity": "Trete der Community bei",
     "docs": "Dokumentation",
     "readDocs": "Lese die Dokumentation",
     "website": "Webseite",
     "visitWebsite": "Besuche tracearr.com",
-    "github": "",
+    "github": "GitHub",
     "viewSourceCode": "Source Code anschauen",
     "sponsor": "",
     "supportDevelopment": "Entwicklung unterstützen",
@@ -50,19 +50,19 @@
     "disconnectConfirm": "Sind Sie sicher, dass Sie sich von \"{{serverName}}\" trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
     "disconnectConfirmGeneric": "Sind Sie sicher, dass Sie sich trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
     "currentlyConnected": "Derzeit verbunden mit {{serverName}}",
-    "version": "",
+    "version": "Version {{version}}",
     "build": ""
   },
   "navigation": {
     "selectServer": "Server wählen",
-    "server": ""
+    "server": "Server"
   },
   "resources": {
     "cpu": "",
     "ram": "",
     "item": "",
     "noData": "",
-    "system": "",
+    "system": "System",
     "waiting": ""
   },
   "notifications": {
@@ -91,15 +91,15 @@
     "rateLimitDescription": "Grenzwerte verhindern Benachrichtigungs-Spam. Aktuelle Limits:\n{{perMinute}}/min, {{perHour}}/Stunde.",
     "sendTestNotification": "Testbenachrichtigung senden",
     "testReach": "",
-    "pushNotifications": "",
+    "pushNotifications": "Push-Benachrichtigungen",
     "ruleTypes": {
-      "accountInactivity": "",
+      "accountInactivity": "Konto Inaktivität",
       "deviceVelocity": "",
       "geoRestriction": "",
       "impossibleTravel": "",
       "simultaneousLocations": ""
     },
-    "severityAll": "",
+    "severityAll": "Alle",
     "severityHighOnly": "",
     "severityWarningUp": "",
     "violationTypes": "",
@@ -144,7 +144,7 @@
     "acknowledgeAll": "",
     "acknowledgeAllBody": "",
     "acknowledgeAllBodySeverity": "",
-    "all": "",
+    "all": "Alle",
     "allClear": "",
     "allServers": "",
     "noAlertsRecorded": "",
@@ -161,7 +161,7 @@
     "selectSession": "",
     "filters": {
       "clearCount": "",
-      "countries": "",
+      "countries": "Länder",
       "filterBy": "",
       "mediaType": "",
       "noCountries": "",
@@ -177,9 +177,9 @@
     "usersWillAppear": "Benutzer werden hier nach der Synchronisierung mit Ihrem Medienserver angezeigt",
     "noUsersMatch": "Keine Benutzer gefunden zu \"{{query}}\"",
     "joinedRelative": "",
-    "sortActive": "",
+    "sortActive": "Aktiv",
     "sortTrust": "",
-    "selectUser": ""
+    "selectUser": "Wählen Sie einen Benutzer aus"
   },
   "activity": {
     "playsOverTime": "Wiedergaben im Zeitverlauf",
@@ -195,9 +195,9 @@
     "scanQrCode": "QR-Code scannen"
   },
   "clientTooOld": {
-    "title": "",
+    "title": "Aktualisiere Tracearr",
     "body": "",
-    "update": ""
+    "update": "Aktualisierung"
   },
   "serverSelector": {
     "servers": "Server",

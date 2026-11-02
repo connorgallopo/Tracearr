@@ -26,7 +26,7 @@
     "connectedTo": "已连接到 {{name}}",
     "plexAuthFailed": "Plex身份验证失败",
     "plexStartFailed": "启动Plex登录失败",
-    "plexExpired": "",
+    "plexExpired": "此 Plex 登录已过期。请重新开始。",
     "serverConnectFailed": "无法连接至服务器",
     "createAccountFailed": "创建账户失败",
     "invalidCredentials": "无效的电子邮件或密码",
@@ -38,20 +38,20 @@
     "validateClaimCode": "验证索赔代码",
     "claimCodeSecurityNote": "此安全措施确保只有授权的用户能够完成首次设置",
     "member": {
-      "tabLocal": "",
-      "tabMember": "",
-      "server": "",
-      "signingInTo": "",
-      "passwordHint": "",
-      "quickConnectHint": "",
-      "waiting": "",
-      "copyCode": "",
-      "usePassword": "",
-      "useQuickConnect": "",
-      "codeExpired": "",
-      "newCode": "",
-      "refused": "",
-      "notPermitted": ""
+      "tabLocal": "Tracearr 账户",
+      "tabMember": "媒体服务器",
+      "server": "服务器",
+      "signingInTo": "正在登录 {{name}}",
+      "passwordHint": "请使用 {{name}} 的用户名和密码。",
+      "quickConnectHint": "打开 Jellyfin，前往快速连接，然后输入此代码。",
+      "waiting": "等待批准",
+      "copyCode": "复制代码",
+      "usePassword": "改用密码登录",
+      "useQuickConnect": "改用快速连接",
+      "codeExpired": "此代码已过期。",
+      "newCode": "获取新代码",
+      "refused": "此账户无法登录。",
+      "notPermitted": "你无权登录。请联系服务器所有者。"
     }
   },
   "dashboard": {
@@ -65,88 +65,88 @@
     "bandwidth": "带宽",
     "noActiveStreams": "没有活动流",
     "streamsAppearHere": "当用户开始观看时活跃的流将出现在这里",
-    "dayStreak": "",
+    "dayStreak": "连续天数",
     "view": {
-      "label": "",
-      "admin": "",
-      "me": ""
+      "label": "仪表盘视图",
+      "admin": "服务器",
+      "me": "个人"
     },
     "me": {
-      "last30": "",
-      "streakDetail": "",
-      "topTitles": "",
+      "last30": "最近 30 天",
+      "streakDetail": "连续有播放的天数",
+      "topTitles": "你的热门影片",
       "welcome": {
-        "title": "",
-        "description": "",
-        "browse": ""
+        "title": "你的仪表盘会随观看而逐渐丰富",
+        "description": "观看几分钟后，播放记录、连续天数和热门影片就会显示在这里。",
+        "browse": "浏览媒体库"
       },
       "requests": {
-        "title": "",
-        "requestedAgo": "",
-        "seeAll": "",
-        "availableThisWeek_other": ""
+        "title": "你的请求",
+        "requestedAgo": "{{age}} 前请求",
+        "seeAll": "查看全部",
+        "availableThisWeek_other": "本周有 {{count}} 个已可用"
       },
       "link": {
         "title": "",
         "description": "",
         "action": ""
       },
-      "episodes_other": ""
+      "episodes_other": "{{count}} 集"
     },
     "resources": {
-      "system": "",
-      "perServer": "",
-      "average": ""
+      "system": "系统",
+      "perServer": "每台服务器",
+      "average": "平均："
     },
-    "unknownLocation": "",
-    "unknownQuality": "",
-    "othersStreaming_other": ""
+    "unknownLocation": "未知位置",
+    "unknownQuality": "未知画质",
+    "othersStreaming_other": "{{count}} 个其他媒体流正在播放"
   },
   "yourStats": {
-    "titles": "",
-    "howYouWatch": "",
+    "titles": "影片",
+    "howYouWatch": "你的观看方式",
     "viewerType": {
       "completionist": {
-        "label": "",
-        "desc": ""
+        "label": "完美主义者",
+        "desc": "你开始观看的内容会看完 {{rate}}%。"
       },
       "rewatcher": {
-        "label": "",
-        "desc": ""
+        "label": "重温者",
+        "desc": "你会反复回味喜欢的作品。"
       },
       "sampler": {
-        "label": "",
-        "desc": ""
+        "label": "探索者",
+        "desc": "你会尝试很多内容，然后才选定一部。"
       },
       "casual": {
-        "label": "",
-        "desc": ""
+        "label": "随性观看者",
+        "desc": "有兴致时才看。"
       }
     },
-    "habits": "",
-    "seeActivity": "",
-    "allTime": "",
-    "watchTime": "",
+    "habits": "你最活跃的日期是 {{day}}，最活跃的时段是 {{hour}}。",
+    "seeActivity": "查看活动",
+    "allTime": "全部时间",
+    "watchTime": "观看时长",
     "span": {
-      "minutes_other": "",
-      "hours_other": "",
-      "days_other": "",
-      "weeks_other": ""
+      "minutes_other": "{{count}} 分钟",
+      "hours_other": "{{count}} 小时",
+      "days_other": "{{count}} 天",
+      "weeks_other": "{{count}} 周"
     },
-    "longestStreak": "",
-    "firstPlay": "",
-    "biggestBinge": "",
-    "topGenres": "",
-    "allTimeCaption": "",
+    "longestStreak": "最长连续",
+    "firstPlay": "首次播放",
+    "biggestBinge": "最长连看",
+    "topGenres": "热门类型",
+    "allTimeCaption": "全部时间",
     "tier": {
-      "watched": "",
-      "engaged": "",
-      "sampled": "",
-      "abandoned": "",
-      "rewatched": ""
+      "watched": "已看完",
+      "engaged": "深入观看",
+      "sampled": "浅尝",
+      "abandoned": "已弃看",
+      "rewatched": "重温"
     },
-    "days_other": "",
-    "bingeValue_other": ""
+    "days_other": "{{count}} 天",
+    "bingeValue_other": "《{{show}}》{{count}} 集"
   },
   "users": {
     "title": "用户",
@@ -157,35 +157,35 @@
     "mergeUsers": "合并用户",
     "mergeTitleSuggestion": "这些人是否是同一人？",
     "mergeTitleBulk": "合并这些用户吗？",
-    "mergeReasonEmail": "",
-    "mergeReasonEmailUsername": "",
-    "mergeReasonUsername": "",
+    "mergeReasonEmail": "两者的服务器账户都使用邮箱 {{value}}。",
+    "mergeReasonEmailUsername": "两者都把 {{value}} 用作用户名或账户邮箱。",
+    "mergeReasonUsername": "两者都使用用户名 {{value}}。",
     "mergeKeep": "保留",
     "mergeFoldIn": "折叠，然后删除",
     "mergeSwap": "交换保留的内容",
-    "mergeRequired": "",
-    "mergeLastActive": "",
+    "mergeRequired": "{{name}} 可以登录 Tracearr，因此保留 {{name}}。",
+    "mergeLastActive": "最后活跃于 {{relative}}",
     "mergeNeverActive": "从未激活",
-    "mergeMoreServers": "",
-    "mergeWhatHappens": "",
-    "mergeMovesNoCount": "",
-    "mergeCarriesOver": "",
-    "mergeDeleted": "",
-    "mergeRulesKept": "",
+    "mergeMoreServers": "+{{count}}",
+    "mergeWhatHappens": "会发生什么",
+    "mergeMovesNoCount": "{{foldName}} 的服务器账户和会话将转移到 {{keepName}}。",
+    "mergeCarriesOver": "其联系邮箱、通讯排除项和 Seerr 请求会一并转移。",
+    "mergeDeleted": "{{foldName}} 将被删除。你可以在 {{keepName}} 的页面将账户重新拆分出来。",
+    "mergeRulesKept": "同名服务器规则会保留 {{keepName}} 的版本。",
     "mergeIrreversibleTitle": "此操作无法撤销",
     "mergeIrreversibleBody": "这两个账户在同一个服务器上都有一个账户，这两个账户变成一个账户，其会话、违规和信任分数加在一起。 稍后拆分并不能使第二个账户退回。",
     "mergeServerLabel": "服务器",
     "mergeServerUnknown": "未知的服务器",
     "mergeIrreversibleAcknowledge": "我理解这个服务器上的两个帐户不能再次被分隔",
     "mergeServerAccountRemoved": "已删除",
-    "mergeConfirmInto": "",
+    "mergeConfirmInto": "合并到 {{keepName}}",
     "mergeSelectTwo": "只选择两个要合并的用户",
     "mergeSameIdentity": "这些账户已经属于同一用户",
     "mergeSelectAllActive": "清除选中的全部选项，然后只选择两个用户进行合并",
     "suggestionsTitle": "可能重复的用户",
-    "suggestionsPairEmail": "",
-    "suggestionsPairEmailUsername": "",
-    "suggestionsPairUsername": "",
+    "suggestionsPairEmail": "{{first}} 和 {{second}} 共用一个邮箱",
+    "suggestionsPairEmailUsername": "{{first}} 和 {{second}} 将同一地址用作用户名或账户邮箱",
+    "suggestionsPairUsername": "{{first}} 和 {{second}} 共用一个用户名",
     "suggestionsSheetDescription": "合并时保留一个用户并删除另一个用户。一对被标记为不是同一个人停止显示直到你还原。",
     "suggestionsReview": "审查",
     "suggestionsNotSame": "不是同一个人",
@@ -201,24 +201,24 @@
     "filterHasAccessTo": "有访问权限",
     "filterHasAccessToPlaceholder": "任何服务器",
     "filterHasAccessToHint": "在选择的每个服务器上显示活跃账户的用户。",
-    "merged": "",
-    "filterRoleAll": "",
-    "filterSignInAll": "",
-    "filterPendingOnly": "",
-    "rowActions": "",
-    "menuOpenViolations": "",
-    "signInOn": "",
-    "signInOff": "",
-    "signedInAgo": "",
-    "neverSignedIn": "",
+    "merged": "已合并",
+    "filterRoleAll": "任意角色",
+    "filterSignInAll": "任意登录状态",
+    "filterPendingOnly": "有待处理的违规",
+    "rowActions": "{{name}} 的操作",
+    "menuOpenViolations": "在违规中打开",
+    "signInOn": "开",
+    "signInOff": "关",
+    "signedInAgo": "{{relative}} 前登录",
+    "neverSignedIn": "从未登录",
     "selectAllUsers_other": "选择所有{{count}}个用户",
     "resetTrustScoreTitle_other": "重置{{count}}个用户的信任分数",
-    "mergeMoves_other": "",
-    "suggestionsCount_other": "",
-    "suggestionsPairEmailMore_other": "",
-    "suggestionsPairEmailUsernameMore_other": "",
-    "suggestionsPairUsernameMore_other": "",
-    "pendingLink_other": ""
+    "mergeMoves_other": "{{foldName}} 的服务器账户和 {{count}} 个会话将转移到 {{keepName}}。",
+    "suggestionsCount_other": "{{count}} 个可能的重复用户",
+    "suggestionsPairEmailMore_other": "{{first}} 和 {{second}} 共用一个邮箱，另有 {{count}} 个",
+    "suggestionsPairEmailUsernameMore_other": "{{first}} 和 {{second}} 将同一地址用作用户名或账户邮箱，另有 {{count}} 个",
+    "suggestionsPairUsernameMore_other": "{{first}} 和 {{second}} 共用一个用户名，另有 {{count}} 个",
+    "pendingLink_other": "{{count}} 个待处理"
   },
   "userDetail": {
     "backToUsers": "返回用户",
@@ -243,7 +243,7 @@
     "allServers": "所有服务器",
     "title": "用户详情",
     "editIdentity": "编辑姓名和联系人电子邮件",
-    "editIdentityDescription": "",
+    "editIdentityDescription": "两者在所有位置都适用于此人。将名称留空则显示 @{{username}}。",
     "displayName": "显示名称",
     "contactEmail": "联系邮箱",
     "contactEmailHelp": "通讯发送到此地址。它不授予登录权限，也不会与同步的账户匹配。",
@@ -252,135 +252,135 @@
     "contactEmailNoLogin": "不允许登录。",
     "locations": "位置",
     "access": {
-      "title": "",
-      "signIn": "",
-      "signInAllow": "",
-      "signInDefault": "",
-      "signInBlock": "",
-      "signInDefaultOn": "",
-      "signInDefaultOff": "",
-      "signInDefaultUnknown": "",
-      "role": "",
-      "roleAdmin": "",
-      "roleMember": "",
-      "roleHint": "",
-      "disabled": "",
-      "pending": "",
-      "signIns": "",
-      "lastSignIn": "",
-      "never": "",
-      "viewAs": "",
-      "viewAsLabel": "",
-      "viewAsHint": ""
+      "title": "登录访问",
+      "signIn": "登录",
+      "signInAllow": "允许",
+      "signInDefault": "默认",
+      "signInBlock": "阻止",
+      "signInDefaultOn": "默认遵循全局开关，当前为开启。",
+      "signInDefaultOff": "默认遵循全局开关，当前为关闭。",
+      "signInDefaultUnknown": "默认遵循全局开关。",
+      "role": "角色",
+      "roleAdmin": "管理员",
+      "roleMember": "成员",
+      "roleHint": "成员只能看到自己的活动，管理员可以看到所有人的。",
+      "disabled": "该账户被禁用时无法登录。",
+      "pending": "该账户处于待处理状态时无法登录。",
+      "signIns": "登录记录",
+      "lastSignIn": "上次登录",
+      "never": "从未",
+      "viewAs": "以……身份查看",
+      "viewAsLabel": "以 {{name}} 的身份查看 Tracearr",
+      "viewAsHint": "以他们的视角查看 Tracearr。此为只读模式。"
     },
     "tabs": {
-      "access": "",
-      "downloads": ""
+      "access": "访问",
+      "downloads": "下载"
     },
     "cards": {
-      "vsPrior": "",
-      "perActiveDay": "",
-      "finished": "",
-      "abandoned": "",
-      "avgBitrate": "",
-      "daysActive": "",
-      "ofDays": "",
-      "streak": "",
-      "transcodes_other": ""
+      "vsPrior": "对比上一周期",
+      "perActiveDay": "每个活跃日 {{value}}",
+      "finished": "已看完",
+      "abandoned": "弃看 {{value}}%",
+      "avgBitrate": "平均 {{value}}",
+      "daysActive": "活跃天数",
+      "ofDays": "共 {{count}} 天",
+      "streak": "连续 {{count}} 天",
+      "transcodes_other": "{{count}} 次转码"
     },
     "overview": {
-      "playsOverTime": "",
-      "priorRange": "",
-      "serverAverage": "",
-      "byHour": "",
-      "peak": "",
-      "serverPeak": "",
-      "what": "",
-      "otherMedia": "",
-      "mostFinished": "",
-      "where": "",
-      "directPlayShare": "",
-      "localShare": "",
-      "viewAllDevices": "",
-      "allSessions": "",
-      "finishedCount_other": ""
+      "playsOverTime": "播放趋势",
+      "priorRange": "上一周期",
+      "serverAverage": "服务器人均",
+      "byHour": "按小时统计的播放",
+      "peak": "峰值 {{hour}}",
+      "serverPeak": "服务器峰值 {{hour}}",
+      "what": "看什么",
+      "otherMedia": "其他",
+      "mostFinished": "看完最多",
+      "where": "在哪里、用什么设备",
+      "directPlayShare": "{{value}}% 直接播放",
+      "localShare": "{{value}}% 的会话发生在本地网络",
+      "viewAllDevices": "查看所有设备和位置",
+      "allSessions": "所有会话",
+      "finishedCount_other": "{{count}} 部已看完"
     },
-    "uniqueCount": "",
-    "unknownCity": "",
-    "unknownDevice": "",
-    "viewAllMore": "",
-    "adjustTrustScoreDesc": "",
-    "ipCount_other": ""
+    "uniqueCount": "{{count}} 个不同",
+    "unknownCity": "未知城市",
+    "unknownDevice": "未知设备",
+    "viewAllMore": "查看全部（另有 {{count}} 个）",
+    "adjustTrustScoreDesc": "为 @{{username}} 设置信任分数。范围：0–100。",
+    "ipCount_other": "{{count}} 个 IP"
   },
   "history": {
     "title": "历史记录",
-    "totalPlays": "",
-    "uniqueTitles": "",
-    "uniqueUsers": "",
-    "searchPlaceholder": "",
+    "totalPlays": "总播放次数",
+    "uniqueTitles": "不同影片",
+    "uniqueUsers": "不同用户",
+    "searchPlaceholder": "搜索影片、用户、位置、IP……",
     "columns": {
-      "duration": "",
-      "progress": ""
+      "duration": "时长",
+      "progress": "进度"
     },
     "location": {
-      "city": "",
-      "region": "",
-      "country": "",
-      "continent": "",
-      "postalCode": "",
-      "coordinates": "",
-      "asn": "",
-      "asnOrg": ""
+      "city": "城市",
+      "region": "地区",
+      "country": "国家/地区",
+      "continent": "大洲",
+      "postalCode": "邮政编码",
+      "coordinates": "坐标",
+      "asn": "ASN",
+      "asnOrg": "ASN 组织"
     },
-    "trailer": "",
+    "trailer": "预告片",
     "filters": {
-      "columns": "",
-      "countries": "",
-      "mediaType": "",
-      "types": "",
-      "network": "",
-      "remote": "",
-      "trailers": "",
-      "clearUsers": "",
-      "clearPlatforms": "",
-      "clearCountries": "",
-      "clearFilters": "",
-      "selected_other": ""
+      "columns": "列",
+      "countries": "国家/地区",
+      "mediaType": "媒体类型",
+      "types": "类型",
+      "network": "网络",
+      "remote": "远程",
+      "trailers": "预告片",
+      "clearUsers": "清除所有用户",
+      "clearPlatforms": "清除所有平台",
+      "clearCountries": "清除所有国家/地区",
+      "clearFilters": "清除所有筛选条件",
+      "selected_other": "已选择 {{count}} 项"
     },
     "detail": {
-      "watch": "",
-      "summary": "",
-      "segmentsShown_other": ""
+      "watch": "观看",
+      "summary": "摘要",
+      "segmentsShown_other": "显示 {{count}} 段中的 {{shown}} 段"
     },
     "stream": {
-      "notAvailable": "",
-      "bitrateUnavailable": "",
-      "stereo": "",
-      "mono": "",
-      "noDetails": "",
-      "source": "",
-      "stream": "",
-      "container": "",
-      "bitrate": "",
-      "video": "",
-      "audio": "",
-      "subtitles": "",
-      "codec": "",
-      "framerate": "",
-      "hdr": "",
-      "profile": "",
-      "color": "",
-      "channels": "",
-      "language": "",
-      "sampleRate": "",
-      "format": "",
-      "forced": "",
-      "transcodeDetails": "",
-      "hwDecode": "",
-      "hwEncode": "",
-      "speed": "",
-      "throttled": "",
-      "channelCount_other": ""
+      "notAvailable": "不适用",
+      "bitrateUnavailable": "Jellyfin 和 Emby 在转码期间不会暴露单独的视频和音频比特率，只能获取总媒体流比特率。",
+      "stereo": "立体声",
+      "mono": "单声道",
+      "noDetails": "暂无详细的媒体流信息",
+      "source": "来源",
+      "stream": "媒体流",
+      "container": "容器",
+      "bitrate": "比特率",
+      "video": "视频",
+      "audio": "音频",
+      "subtitles": "字幕",
+      "codec": "编解码器",
+      "framerate": "帧率",
+      "hdr": "HDR",
+      "profile": "配置文件",
+      "color": "色彩",
+      "channels": "声道",
+      "language": "语言",
+      "sampleRate": "采样率",
+      "format": "格式",
+      "forced": "强制",
+      "transcodeDetails": "转码详情",
+      "hwDecode": "硬件解码",
+      "hwEncode": "硬件编码",
+      "speed": "速度",
+      "throttled": "（已限速）",
+      "channelCount_other": "{{count}} 声道"
     }
   },
   "library": {
@@ -398,13 +398,13 @@
       "thisMonth": "本月",
       "thisYear": "今年：",
       "serversNeedSync": "这些服务器需要同步：",
-      "notWatchedByYou": "",
+      "notWatchedByYou": "你尚未观看",
       "memberEmpty": {
-        "title": "",
-        "description": ""
+        "title": "这里还什么都没有",
+        "description": "服务器媒体库同步完成后，电影和剧集就会显示在这里。"
       },
-      "movieCount_other": "",
-      "showCount_other": ""
+      "movieCount_other": "{{count}} 部电影",
+      "showCount_other": "{{count}} 部剧集"
     },
     "quality": {
       "qualityEvolution": "质量进化",
@@ -412,30 +412,30 @@
       "failedToLoad": "加载质量数据失败",
       "failedToLoadDesc": "无法获取质量数据。请重试。",
       "codecBrowse": {
-        "movies": "",
-        "shows": "",
-        "movieCount_other": "",
-        "episodeCount_other": ""
+        "movies": "浏览电影",
+        "shows": "浏览剧集",
+        "movieCount_other": "{{count}} 部电影",
+        "episodeCount_other": "{{count}} 集"
       },
       "codec": {
-        "title": "",
-        "moviesAndTv": "",
-        "videoCodecs": "",
-        "audioCodecs": "",
-        "audioChannels": "",
+        "title": "编解码器分布",
+        "moviesAndTv": "电影 / 剧集",
+        "videoCodecs": "视频编解码器",
+        "audioCodecs": "音频编解码器",
+        "audioChannels": "音频声道",
         "noVideo": {
-          "title": "",
-          "description": ""
+          "title": "暂无视频内容",
+          "description": "媒体库中有电影或剧集后，就会显示视频编解码器数据。"
         },
         "noMusic": {
-          "title": "",
-          "description": ""
+          "title": "暂无音乐内容",
+          "description": "媒体库中有音乐曲目后，就会显示音乐编解码器数据。"
         }
       },
       "resolution": {
-        "tooltip": "",
-        "empty": "",
-        "itemCount_other": ""
+        "tooltip": "<b>{{name}}</b>：{{total, number}} 个条目中的 {{value, number}} 个（{{percent}}%）",
+        "empty": "暂无 {{type}} 画质数据",
+        "itemCount_other": "{{count, number}} 个项目"
       }
     },
     "storage": {
@@ -443,7 +443,7 @@
       "growthRate": "增长",
       "duplicates": "重复项",
       "staleContent": "陈旧内容",
-      "staleContentDesc": "",
+      "staleContentDesc": "可能适合删除的内容。",
       "storageTrend": "存储趋势",
       "confidence": "置信度",
       "confidenceHigh": "高",
@@ -452,13 +452,13 @@
       "zeroGrowth": "0 GB/月",
       "predictions": "预测",
       "contentROI": "Content ROI",
-      "contentROIDesc": "",
+      "contentROIDesc": "单位存储成本对应的观看价值。",
       "avgHoursPerGB": "avg小时/GB",
       "insufficientData": "数据不足",
       "failedToLoad": "加载存储数据失败",
       "failedToLoadDesc": "无法获取存储数据。请重试。",
       "duplicatesTitle": "副本",
-      "duplicatesSubtitle": "",
+      "duplicatesSubtitle": "以多个物理文件存储的条目，分布于不同服务器、媒体库和版本。",
       "growthPreChangeover": "基于预更新历史",
       "loadingDuplicates": "正在加载复制……",
       "duplicatesFailed": "加载质量数据失败",
@@ -470,67 +470,67 @@
       "colRecoverable": "可恢复的空间",
       "sameServer": "同一服务器",
       "mirror": "镜像",
-      "missingOnServer": "",
-      "missingOnServerHint": "",
-      "copyPath": "",
+      "missingOnServer": "服务器上缺失",
+      "missingOnServerHint": "服务器仍列出此文件，但在磁盘上找不到它。在 Plex 中，请清空媒体库回收站以清除。",
+      "copyPath": "复制文件路径",
       "libraries": {
-        "title": "",
+        "title": "媒体库",
         "columns": {
-          "library": "",
-          "share": ""
+          "library": "媒体库",
+          "share": "占比"
         },
-        "serverFailed": ""
+        "serverFailed": "无法从 {{servers}} 加载媒体库"
       },
       "stale": {
         "tabs": {
-          "neverWatched": "",
-          "stale": ""
+          "neverWatched": "从未观看（{{count}}）",
+          "stale": "长期未看内容（{{count}}）"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无长期未看的内容",
+          "description": "媒体库中的所有内容近期都已被观看。"
         },
         "columns": {
-          "staleFor": ""
+          "staleFor": "未看时长"
         },
-        "allTypes": "",
+        "allTypes": "所有类型",
         "threshold": {
-          "months3": "",
-          "months6": "",
-          "year1": "",
-          "years2": ""
+          "months3": "3 个月以上未观看",
+          "months6": "6 个月以上未观看",
+          "year1": "1 年以上未观看",
+          "years2": "2 年以上未观看"
         },
         "age": {
-          "yearsMonths": "",
-          "days_other": "",
-          "months_other": "",
-          "years_other": ""
+          "yearsMonths": "{{years}} 年 {{months}} 个月",
+          "days_other": "{{count}} 天",
+          "months_other": "{{count}} 个月",
+          "years_other": "{{count}} 年"
         }
       },
-      "growthPerMonth": "",
-      "dataDaysProgress": "",
-      "recoverableSize": "",
-      "unusedSize": "",
+      "growthPerMonth": "每月 +{{size}}",
+      "dataDaysProgress": "{{min}} 天中的 {{days}} 天",
+      "recoverableSize": "可回收 {{size}}",
+      "unusedSize": "未使用 {{size}}",
       "roi": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无 ROI 数据",
+          "description": "ROI 分析需要观看历史数据来计算内容价值。"
         },
         "columns": {
-          "hoursPerGb": "",
+          "hoursPerGb": "小时/GB",
           "lastWatched": ""
         }
       },
       "matchBadge": {
-        "exact": "",
-        "likely": "",
-        "possible": "",
-        "fuzzy": "",
-        "versions": "",
-        "label": ""
+        "exact": "精确匹配",
+        "likely": "可能匹配",
+        "possible": "或许匹配",
+        "fuzzy": "模糊匹配",
+        "versions": "版本",
+        "label": "{{confidence}}（{{match}}）"
       },
-      "groupCount_other": "",
-      "itemCount_other": ""
+      "groupCount_other": "{{count}} 组",
+      "itemCount_other": "{{count}} 个项目"
     },
     "watch": {
       "watched": "观看了",
@@ -543,39 +543,39 @@
       "busiest": "最重要的版本：",
       "quietest": "安静：",
       "bingeHighlights": "追剧亮点",
-      "bingeHighlightsDesc": "",
+      "bingeHighlightsDesc": "观看模式最密集的剧集。",
       "bingeSessions": "追剧会话",
       "noData": "尚无观看数据",
       "noDataDesc": "播放内容后，观看分析将显示在这里。有观看活动后再来查看。",
       "failedToLoad": "加载观看分析失败",
       "failedToLoadDesc": "无法获取观看数据。",
-      "mostWatched": "",
+      "mostWatched": "观看最多",
       "binge": {
         "columns": {
-          "show": "",
-          "servers": "",
-          "consecutive": "",
-          "bingeScore": "",
-          "maxPerDay": ""
+          "show": "剧集",
+          "servers": "服务器",
+          "consecutive": "连续",
+          "bingeScore": "追剧得分",
+          "maxPerDay": "每日最多"
         },
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "未检测到追剧模式",
+          "description": "连续观看多集即可看到追剧模式。"
         }
       },
-      "percentWatchedValue": "",
-      "avgPerItemValue": "",
+      "percentWatchedValue": "已观看 {{pct}}%",
+      "avgPerItemValue": "每项平均 {{value}}",
       "top": {
         "movies": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "暂无电影观看数据",
+            "description": "内容播放后，电影观看统计就会显示在这里。"
           }
         },
         "shows": {
           "empty": {
-            "title": "",
-            "description": ""
+            "title": "暂无剧集观看数据",
+            "description": "剧集播放后，剧集观看统计就会显示在这里。"
           }
         }
       }
@@ -638,25 +638,25 @@
     },
     "charts": {
       "storage": {
-        "historical": "",
-        "prediction": "",
-        "now": "",
-        "axis": "",
-        "range": "",
+        "historical": "历史",
+        "prediction": "预测",
+        "now": "现在",
+        "axis": "存储（{{unit}}）",
+        "range": "范围：{{low}} - {{high}} {{unit}}",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无存储数据",
+          "description": "可用后，存储历史就会显示在这里"
         }
       },
       "qualityTimeline": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无画质数据",
+          "description": "可用后，画质演变数据就会显示在这里"
         },
-        "titles_other": ""
+        "titles_other": "{{count, number}} 个条目"
       },
       "monthly": {
-        "watchCount": "",
+        "watchCount": "观看次数",
         "empty": {
           "title": "",
           "description": ""
@@ -664,27 +664,27 @@
       },
       "growth": {
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无增长数据",
+          "description": "可用后，媒体库增长数据就会显示在这里"
         }
       },
       "hourly": {
-        "watches": "",
+        "watches": "观看",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无按小时数据",
+          "description": "数据可用后，按小时的观看分布就会显示在这里"
         }
       },
       "completion": {
-        "inProgress": "",
-        "notStarted": "",
+        "inProgress": "进行中",
+        "notStarted": "未开始",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无完成度数据",
+          "description": "观看数据可用后，完成度细分就会显示在这里"
         },
-        "tooltip_other": ""
+        "tooltip_other": "<b>{{count}}</b> 个项目 ({{percent}}%)"
       },
-      "watchesValue_other": ""
+      "watchesValue_other": "观看次数：{{count}}"
     }
   },
   "activity": {
@@ -692,20 +692,20 @@
     "concurrentStreams": "并发流",
     "engagementBreakdown": "参与度分析",
     "howUsersEngage": "用户如何参与内容",
-    "howYouEngage": "",
+    "howYouEngage": "你如何与所观看的内容互动",
     "playsVsSessions": "播放与会话",
     "playsVsSessionsDesc": "完整观看次数 — 当总观看时间覆盖内容的整个播放时长时计为一次播放",
     "activityByDayOfWeek": "每周活跃度",
     "activityByHourOfDay": "每小时活跃度",
     "platforms": "平台",
     "streamQuality": "流质量",
-    "noEngagementData": "",
-    "noPlatformData": "",
-    "noQualityData": "",
-    "noConcurrentData": "",
-    "peakConcurrent": "",
-    "tierItems_other": "",
-    "playsShare_other": ""
+    "noEngagementData": "暂无互动数据",
+    "noPlatformData": "暂无平台数据",
+    "noQualityData": "暂无画质数据",
+    "noConcurrentData": "暂无并发媒体流数据",
+    "peakConcurrent": "并发峰值：{{value}}",
+    "tierItems_other": "{{count}} 个项目",
+    "playsShare_other": "<b>{{count}}</b> 播放次数 ({{percent}}%)"
   },
   "violations": {
     "title": "违规",
@@ -746,7 +746,7 @@
       "conditionGroup": "条件组{{index}}",
       "matched": "{{matched}}{{total}}匹配",
       "actual": "实际的",
-      "actionResults": "",
+      "actionResults": "操作",
       "relatedSessions_other": "{{count}}相关会话"
     },
     "selectAllViolations_other": "选择所有符合筛选条件的{{count}}个违规项",
@@ -755,129 +755,129 @@
   },
   "automations": {
     "message": {
-      "heading": "",
-      "defaultText": "",
-      "title": "",
-      "body": "",
-      "blankHint": "",
-      "insertVariable": "",
-      "searchVariables": "",
-      "noVariables": "",
-      "preview": "",
-      "previewSamples": "",
-      "previewDefault": "",
-      "previewDefaultHint": "",
-      "previewPickDestination": "",
-      "fieldTitle": "",
-      "fieldMessage": "",
-      "fieldSubject": "",
-      "fieldHeading": "",
-      "fieldEmbedTitle": "",
-      "fieldDescription": "",
-      "addedDiscord": "",
-      "addedEmail": "",
-      "addedPushSubtitle": "",
-      "previewCount": "",
-      "previewCountBytes": "",
-      "previewCut": "",
-      "previewPriority": "",
-      "previewEscapeHint": "",
-      "webhookNotSent": ""
+      "heading": "消息",
+      "defaultText": "默认文本",
+      "title": "标题",
+      "body": "消息",
+      "blankHint": "留空则使用各目标渠道的默认文本",
+      "insertVariable": "插入变量",
+      "searchVariables": "搜索变量",
+      "noVariables": "没有匹配的变量",
+      "preview": "预览",
+      "previewSamples": "使用示例值展示，例如将 {{user}} 作为用户",
+      "previewDefault": "Tracearr 对此事件的默认内容",
+      "previewDefaultHint": "措辞取决于事件和目标渠道",
+      "previewPickDestination": "选择一个目标渠道以查看各自如何展示此内容",
+      "fieldTitle": "标题",
+      "fieldMessage": "消息",
+      "fieldSubject": "主题",
+      "fieldHeading": "标题（与主题相同）",
+      "fieldEmbedTitle": "嵌入标题",
+      "fieldDescription": "描述",
+      "addedDiscord": "由 Tracearr 添加，视事件而定：一种颜色，以及用户、媒体和播放器等字段；在媒体事件中还会包含海报和页脚。字段过长时描述可能会被缩短。",
+      "addedEmail": "由 Tracearr 添加：一个严重性标签、事件详情、发送时间，以及一个指向 Tracearr 的链接",
+      "addedPushSubtitle": "在大多数事件中由 Tracearr 设置的副标题",
+      "previewCount": "{{used, number}} / {{max, number}}",
+      "previewCountBytes": "{{used, number}} / {{max, number}} 字节",
+      "previewCut": "裁剪以适配",
+      "previewPriority": "优先级：{{priority}}",
+      "previewEscapeHint": "计入 Discord 的转义字符",
+      "webhookNotSent": "未发送。负载携带事件自身的数据。"
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "自动",
+      "lowest": "最低",
+      "low": "低",
+      "normal": "正常",
+      "high": "高",
+      "urgent": "紧急"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
-      "trust": "",
-      "newsletter": "",
-      "event": ""
+      "account": "账户",
+      "stream": "媒体流",
+      "server": "服务器",
+      "media": "媒体",
+      "device": "设备",
+      "trust": "信任",
+      "newsletter": "通讯",
+      "event": "事件"
     },
     "variables": {
       "user": {
-        "username": "",
-        "identityName": ""
+        "username": "账户用户名",
+        "identityName": "用户姓名"
       },
       "session": {
-        "mediaTitle": "",
-        "mediaType": "",
-        "sourceDynamicRange": "",
-        "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
-        "name": ""
+        "mediaTitle": "正在播放的标题",
+        "mediaType": "媒体类型",
+        "sourceDynamicRange": "源动态范围",
+        "sourceVideoCodec": "源视频编码",
+        "seasonNumber": "季号",
+        "episodeNumber": "集号",
+        "name": "剧集和集数，或标题"
       },
       "server": {
-        "name": "",
-        "type": ""
+        "name": "服务器名称",
+        "type": "服务器类型"
       },
       "device": {
-        "name": "",
-        "platform": "",
-        "product": "",
-        "location": ""
+        "name": "设备名称",
+        "platform": "平台",
+        "product": "应用",
+        "location": "位置"
       },
       "download": {
-        "title": "",
-        "app": "",
-        "device": "",
-        "last24h": ""
+        "title": "下载的标题",
+        "app": "下载所用应用",
+        "device": "下载所用设备",
+        "last24h": "过去 24 小时内的下载量"
       },
       "trust": {
-        "previous": "",
-        "new": "",
-        "reason": ""
+        "previous": "先前分数",
+        "new": "新分数",
+        "reason": "原因"
       },
       "media": {
-        "title": "",
-        "name": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "episodeCount": "",
-        "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "title": "条目标题",
+        "name": "剧集和集数，或标题",
+        "show": "剧集",
+        "season": "季",
+        "episode": "集",
+        "episodeCount": "新增集数",
+        "type": "媒体类型",
+        "year": "年份",
+        "library": "媒体库",
+        "server": "服务器",
         "from": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "旧分辨率",
+          "dynamicRange": "旧动态范围",
+          "videoCodec": "旧视频编码",
+          "audioCodec": "旧音频编码",
+          "audioChannels": "旧音频声道",
+          "fileSize": "旧文件大小"
         },
         "to": {
-          "resolution": "",
-          "dynamicRange": "",
-          "videoCodec": "",
-          "audioCodec": "",
-          "audioChannels": "",
-          "fileSize": ""
+          "resolution": "新分辨率",
+          "dynamicRange": "新动态范围",
+          "videoCodec": "新视频编码",
+          "audioCodec": "新音频编码",
+          "audioChannels": "新音频声道",
+          "fileSize": "新文件大小"
         }
       },
       "newsletter": {
-        "name": "",
-        "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "name": "通讯",
+        "outcome": "结果",
+        "recipientCount": "收件人数",
+        "error": "错误"
       },
-      "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
-      "releaseUrl": ""
+      "durationMinutes": "观看分钟数",
+      "minutes": "分钟",
+      "days": "不活跃天数",
+      "installedVersion": "已安装版本",
+      "latestVersion": "最新版本",
+      "downloadUrl": "下载链接",
+      "releaseUrl": "发行说明链接"
     },
     "actions": {
       "send": {
@@ -888,7 +888,7 @@
             "description": "通知之间的最短时间"
           },
           "priority": {
-            "description": ""
+            "description": "供 Pushover、Gotify、ntfy 和 Telegram 使用"
           }
         },
         "ran": "发送一个通知"
@@ -939,7 +939,7 @@
             "description": "哪个会话要消息"
           },
           "message": {
-            "placeholder": ""
+            "placeholder": "要显示的消息……"
           }
         },
         "ran": "在播放器上放置一条消息"
@@ -947,7 +947,7 @@
     },
     "activity": {
       "title": "活动",
-      "description": "",
+      "description": "此自动化最近执行的操作，最新的在前。运行记录保留 {{days}} 天。",
       "outcome": "结果",
       "who": "谁",
       "where": "地点",
@@ -966,7 +966,7 @@
       "emptyDescription": "一旦触发器匹配，运行将在此列出。",
       "runTitle": "运行",
       "runLoading": "正在加载运行",
-      "triggeredBy": "",
+      "triggeredBy": "由 {{trigger}} 触发",
       "unknownStep": "未识别步骤",
       "tabs": {
         "all": "所有",
@@ -974,7 +974,7 @@
         "stopped_by_condition": "没有匹配",
         "error": "失败"
       },
-      "group": "",
+      "group": "组 {{number}}",
       "branch": {
         "then": "注意到“如果”步骤",
         "else": "“其他步骤”"
@@ -985,7 +985,7 @@
       "emptyRan": "还没有匹配的内容",
       "item": "项目",
       "recordedViolation": "记录了一条违规",
-      "emptyRanDescription_other": ""
+      "emptyRanDescription_other": "{{count}} 项检查已运行且未匹配。"
     },
     "allKinds": "所有类型",
     "allStatuses": "所有状态",
@@ -1016,8 +1016,8 @@
       },
       "noInputs": "没有要填写的内容。",
       "failed": "无法设置，请重试。",
-      "created": "",
-      "createdOff": ""
+      "created": "{{name}} 已设置并正在运行。",
+      "createdOff": "{{name}} 已创建但处于关闭状态。请从列表中将其开启。"
     },
     "builder": {
       "destinationDisabled": "禁用目标",
@@ -1036,22 +1036,22 @@
         "actionUnavailable": "这些触发器不提供此操作所需的内容",
         "variableUnavailable": "消息指名的不是每个触发器都在这里提供",
         "minutesRange": "{{min}} 至 {{max}} 分钟之间",
-        "daysRange": "",
+        "daysRange": "在 {{min}} 到 {{max}} 天之间",
         "measureInvalid": "选择如何计算分钟",
-        "fieldNotAvailableFor": "",
+        "fieldNotAvailableFor": "不可用于：{{triggers}}",
         "trustAmountRange": "信任变化在 -100 和 100 点之间",
         "trustValueRange": "信任分数介于 0 到 100 之间",
         "messageRequired": "输入要显示的消息",
-        "tooLong": "",
+        "tooLong": "最多 {{max}} 个字符",
         "template": {
-          "unclosed": "",
-          "invalidOutput": "",
-          "invalidTag": "",
-          "unexpectedElse": "",
-          "unexpectedEndif": "",
-          "missingEndif": ""
+          "unclosed": "第 {{line}} 行的 {{open}} 从未闭合",
+          "invalidOutput": "第 {{line}} 行在 {{braces}} 内含有变量以外的内容",
+          "invalidTag": "第 {{line}} 行含有 if、else 或 endif 之外的标签",
+          "unexpectedElse": "第 {{line}} 行的 else 没有对应的 if",
+          "unexpectedEndif": "第 {{line}} 行的 endif 没有要关闭的 if",
+          "missingEndif": "第 {{line}} 行的 if 需要 endif"
         },
-        "templateVariable": ""
+        "templateVariable": "{{name}} 并非适用于此处的每个触发器"
       },
       "recordAs": {
         "label": "当这个运行时，将它记录为",
@@ -1081,7 +1081,7 @@
         "personPlaceholder": "选择人员",
         "personHelper": "匹配此人在他们拥有账户的每个服务器上。",
         "noServers": "未连接服务器。",
-        "historicalNote": "",
+        "historicalNote": "此服务器为历史服务器。需要其在线状态的触发器，例如流、服务器和更新事件，在恢复之前不会触发。",
         "enforceAcrossServers": "在他们的任何服务器上对他们的流操作",
         "enforceAcrossServersDescription": "在任何一个人的服务器上进行会话，不仅仅是触发它的会话。默认情况下关闭。"
       },
@@ -1092,812 +1092,812 @@
         "windowUnit": "小时",
         "uniqueDevices": "唯一设备",
         "uniqueDevicesHint": "只计数来自不同物理设备的会话。",
-        "uniqueIps": "",
-        "uniqueIpsHint": "",
-        "allDeviceTypes": "",
-        "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
-        "recentlySeen": "",
-        "allCountries": "",
-        "sectionTitle": "",
-        "optional": "",
-        "helper": "",
-        "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
-        "matchLabel": "",
-        "fieldLabel": "",
-        "operatorLabel": "",
-        "valueLabel": "",
-        "canNeverPass": "",
-        "noFields": "",
-        "groupSeparator": "",
-        "addAnother": "",
-        "addFirst": "",
-        "removeGroup": ""
+        "uniqueIps": "独立 IP",
+        "uniqueIpsHint": "仅统计来自不同 IP 地址的会话，因此同一家庭的媒体流不会被计入。",
+        "allDeviceTypes": "所有设备类型",
+        "deviceTypesHint": "仅统计来自所选设备类型的媒体流。留空表示所有设备。",
+        "yes": "是",
+        "no": "否",
+        "recentlySeen": "最近出现",
+        "allCountries": "所有国家/地区",
+        "sectionTitle": "且仅当……",
+        "optional": "可选",
+        "helper": "必须首先通过的检查。留空表示每次都运行。",
+        "emptyLine": "没有额外检查。此项每次都运行。",
+        "all": "且",
+        "any": "或",
+        "allHint": "且：每项检查都必须通过",
+        "anyHint": "或：任意一项检查通过即可",
+        "matchLabel": "用以下方式连接这些检查",
+        "fieldLabel": "检查什么",
+        "operatorLabel": "是否为",
+        "valueLabel": "值",
+        "canNeverPass": "此项永远无法通过。触发器已在 {{threshold}} 时触发。",
+        "noFields": "这些触发器没有可用检查。请先添加媒体流或账户触发器。",
+        "groupSeparator": "以及",
+        "addAnother": "添加检查",
+        "addFirst": "添加检查",
+        "removeGroup": "移除这组检查"
       },
       "actions": {
-        "add": "",
-        "sectionTitle": "",
-        "ifTitle": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "moveUp": "",
-        "moveDown": "",
-        "menu": "",
-        "branchName": "",
-        "confirmRemoveTitle": "",
-        "confirmRemoveDescription": "",
-        "policyNote": "",
-        "branchThen": "",
-        "branchElse": "",
-        "branchElseEmpty": "",
-        "ifNothing": "",
-        "ifAddCheck": "",
-        "addBranch": "",
-        "expandBranch": "",
-        "collapseBranch": ""
+        "add": "添加另一个操作",
+        "sectionTitle": "然后执行……",
+        "ifTitle": "如果……",
+        "helper": "这些操作按从上到下的顺序执行。",
+        "emptyTitle": "应该发生什么？",
+        "emptyDescription": "发送通知、停止媒体流、更改信任分数，或仅在额外检查通过时执行步骤。",
+        "emptyAction": "选择要执行的操作",
+        "moveUp": "上移 {{name}}",
+        "moveDown": "下移 {{name}}",
+        "menu": "{{name}} 的更多选项",
+        "branchName": "此分支",
+        "confirmRemoveTitle": "移除此操作？",
+        "confirmRemoveDescription": "保存后将不再执行。",
+        "policyNote": "分支并不决定此项是否被标记；决定权在「且仅当…」部分。",
+        "branchThen": "执行此操作",
+        "branchElse": "否则",
+        "branchElseEmpty": "无操作。自动化继续进行。",
+        "ifNothing": "尚未选择任何内容",
+        "ifAddCheck": "添加另一个检查",
+        "addBranch": "添加步骤",
+        "expandBranch": "显示此分支的步骤",
+        "collapseBranch": "隐藏此分支的步骤"
       },
       "when": {
-        "title": "",
-        "helper": "",
-        "emptyTitle": "",
-        "emptyDescription": "",
-        "emptyAction": "",
-        "add": "",
-        "or": ""
+        "title": "当……",
+        "helper": "其中任意一项都会启动它。至少需要一项。",
+        "emptyTitle": "什么应该启动它？",
+        "emptyDescription": "媒体流开始、服务器宕机、账户沉寂。",
+        "emptyAction": "选择启动它的条件",
+        "add": "添加另一个触发器",
+        "or": "或"
       },
       "heldFor": {
-        "prefix": "",
+        "prefix": "媒体流已暂停",
         "minutesLabel": "分钟",
         "unit": "分钟",
-        "measureLabel": "",
-        "current": "",
-        "total": ""
+        "measureLabel": "统计方式",
+        "current": "本次",
+        "total": "累计"
       },
       "inactiveFor": {
-        "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "prefix": "账户已不活跃",
+        "daysLabel": "天数",
+        "unit": "天"
       },
       "rows": {
-        "toggle": "",
-        "remove": "",
-        "skipped": "",
-        "toggleHint": "",
-        "removeHint": "",
-        "expandHint": "",
-        "moveHint": ""
+        "toggle": "包含 {{name}}",
+        "remove": "移除 {{name}}",
+        "skipped": "已跳过",
+        "toggleHint": "跳过",
+        "removeHint": "移除",
+        "expandHint": "打开",
+        "moveHint": "重排"
       },
       "picker": {
-        "searchPlaceholder": "",
-        "empty": "",
-        "navigate": "",
-        "select": "",
-        "close": ""
+        "searchPlaceholder": "搜索或描述应执行的操作",
+        "empty": "没有匹配项。",
+        "navigate": "移动",
+        "select": "选择",
+        "close": "关闭"
       },
       "sentence": {
-        "label": "",
-        "placeholderTrigger": "",
-        "placeholderAction": ""
+        "label": "用通俗语言",
+        "placeholderTrigger": "发生某事",
+        "placeholderAction": "执行某操作"
       },
       "footer": {
-        "ready": "",
-        "search": "",
-        "problems_other": "",
-        "remaining_other": ""
+        "ready": "可以保存",
+        "search": "搜索",
+        "problems_other": "{{count}} 处待修复",
+        "remaining_other": "还剩 {{count}} 项待完成"
       },
       "leave": {
-        "title": "",
-        "confirm": ""
+        "title": "不保存就离开？",
+        "confirm": "离开"
       },
       "liveCheck": {
-        "title": "",
-        "checking": "",
-        "empty": "",
-        "failed": "",
-        "footnote": "",
-        "expand": "",
-        "passed": "",
-        "notPassed": "",
-        "actual": "",
-        "unfinished": "",
-        "paused": "",
-        "sampleTitle": "",
-        "sampleGone": "",
-        "backToLive": ""
+        "title": "当前服务器上的情况",
+        "checking": "正在检查当前播放内容……",
+        "empty": "当前没有正在播放的内容，无可检查项。",
+        "failed": "无法连接服务器进行检查。",
+        "footnote": "冷却时间以及已处理的会话不会被模拟。",
+        "expand": "显示 {{name}} 的匹配内容",
+        "passed": "通过",
+        "notPassed": "未通过",
+        "actual": "当前 {{value}}",
+        "unfinished": "显示自动化完成后将执行的操作。",
+        "paused": "保存期间暂停",
+        "sampleTitle": "它对那次运行会做什么",
+        "sampleGone": "该会话已不在记录中，无可检查项。",
+        "backToLive": "返回当前播放内容"
       },
-      "selectedCount_other": ""
+      "selectedCount_other": "已选 {{count}} 项"
     },
     "categories": {
-      "session_behavior": "",
-      "stream_quality": "",
-      "user_attributes": "",
-      "device_client": "",
-      "network_location": "",
-      "scope": "",
-      "media": ""
+      "session_behavior": "会话行为",
+      "stream_quality": "媒体流质量",
+      "user_attributes": "用户属性",
+      "device_client": "设备与客户端",
+      "network_location": "网络与位置",
+      "scope": "对象与位置",
+      "media": "媒体"
     },
-    "createAutomation": "",
-    "customAutomation": "",
-    "deleteAutomationConfirm": "",
-    "deleteAutomationsConfirm": "",
+    "createAutomation": "创建自动化",
+    "customAutomation": "自定义自动化",
+    "deleteAutomationConfirm": "确定要删除此自动化吗？此操作无法撤销。",
+    "deleteAutomationsConfirm": "确定要删除吗？此操作无法撤销。",
     "describe": {
-      "noValues": "",
-      "includesSameDevice": "",
-      "uniqueIps": "",
-      "deviceTypesOnly": "",
-      "when": "",
-      "or": "",
-      "nothing": "",
-      "onlyWhen": "",
-      "andAlso": "",
-      "allOf": "",
-      "anyOf": "",
-      "joinAll": "",
-      "joinAny": "",
-      "then": "",
-      "otherwise": "",
-      "appliesTo": "",
+      "noValues": "（无）",
+      "includesSameDevice": "包含同一设备",
+      "uniqueIps": "独立 IP",
+      "deviceTypesOnly": "仅 {{types}}",
+      "when": "当 {{text}}",
+      "or": "或 {{text}}",
+      "nothing": "暂无内容",
+      "onlyWhen": "且仅当",
+      "andAlso": "以及",
+      "allOf": "满足全部：",
+      "anyOf": "满足任一：",
+      "joinAll": "且",
+      "joinAny": "或",
+      "then": "然后 {{text}}",
+      "otherwise": "否则",
+      "appliesTo": "适用于 {{name}}",
       "duration": {
         "minutes_other": "{{count}} 分钟",
-        "days_other": ""
+        "days_other": "{{count}} 天"
       },
       "triggers": {
-        "sessionStarted": "",
-        "sessionFirstSeen": "",
-        "sessionStopped": "",
-        "sessionTranscodeChanged": "",
-        "sessionPaused": "",
-        "sessionHeldFor": "",
-        "sessionHeldForTotal": "",
-        "accountInactiveFor": "",
+        "sessionStarted": "媒体流开始",
+        "sessionFirstSeen": "首次发现媒体流",
+        "sessionStopped": "媒体流停止",
+        "sessionTranscodeChanged": "转码开始或停止",
+        "sessionPaused": "媒体流暂停",
+        "sessionHeldFor": "媒体流已暂停 {{duration}}",
+        "sessionHeldForTotal": "媒体流累计已暂停 {{duration}}",
+        "accountInactiveFor": "账户已不活跃 {{duration}}",
         "accountNewDevice": "一个帐户从新设备播放",
-        "accountTrustChanged": "",
-        "accountMediaDownloaded": "",
-        "mediaAdded": "",
-        "mediaUpgraded": "",
-        "serverDown": "",
-        "serverUp": "",
-        "pluginUpdateAvailable": "",
-        "serverUpdateAvailable": "",
-        "tracearrUpdateAvailable": "",
-        "newsletterSent": "",
-        "newsletterFailed": ""
+        "accountTrustChanged": "账户信任分数发生变化",
+        "accountMediaDownloaded": "账户下载媒体",
+        "mediaAdded": "新增媒体",
+        "mediaUpgraded": "媒体升级",
+        "serverDown": "服务器宕机",
+        "serverUp": "服务器恢复",
+        "pluginUpdateAvailable": "插件更新可用",
+        "serverUpdateAvailable": "服务器更新可用",
+        "tracearrUpdateAvailable": "有 Tracearr 更新可用",
+        "newsletterSent": "一份通讯已发送",
+        "newsletterFailed": "一份通讯发送失败"
       },
       "operators": {
-        "eq": "",
-        "neq": "",
-        "gt": "",
-        "gte": "",
-        "lt": "",
-        "lte": "",
-        "in": "",
-        "not_in": "",
-        "contains": "",
-        "not_contains": ""
+        "eq": "等于",
+        "neq": "不等于",
+        "gt": "大于",
+        "gte": "大于等于",
+        "lt": "小于",
+        "lte": "小于等于",
+        "in": "属于其中之一",
+        "not_in": "不属于其中之一",
+        "contains": "包含",
+        "not_contains": "不包含"
       },
       "fields": {
-        "concurrent_streams": "",
-        "active_session_distance_km": "",
-        "travel_speed_kmh": "",
-        "unique_ips_in_window": "",
-        "unique_devices_in_window": "",
-        "downloads_in_window": "",
-        "download_bytes_in_window": "",
-        "inactive_days": "",
-        "current_pause_minutes": "",
-        "total_pause_minutes": "",
-        "source_resolution": "",
-        "output_resolution": "",
-        "source_dynamic_range": "",
-        "source_video_codec": "",
-        "is_transcoding": "",
-        "is_transcode_downgrade": "",
-        "is_subtitle_burn_in": "",
-        "source_bitrate_mbps": "",
-        "user_id": "",
-        "trust_score": "",
-        "account_age_days": "",
-        "device_type": "",
-        "client_name": "",
-        "platform": "",
-        "is_local_network": "",
-        "country": "",
-        "ip_in_range": "",
-        "server_id": "",
-        "media_type": "",
-        "season_number": "",
-        "episode_number": "",
-        "library_item_type": "",
-        "library_name": "",
-        "resolution_after": "",
-        "dynamic_range_after": "",
-        "video_codec_after": "",
-        "audio_channels_after": "",
-        "file_size_after": ""
+        "concurrent_streams": "媒体流数量",
+        "active_session_distance_km": "媒体流之间的距离",
+        "travel_speed_kmh": "移动速度",
+        "unique_ips_in_window": "该时间窗口内的 IP 地址数量",
+        "unique_devices_in_window": "设备数量",
+        "downloads_in_window": "下载次数",
+        "download_bytes_in_window": "已下载的数据量",
+        "inactive_days": "距上次媒体流的时间",
+        "current_pause_minutes": "当前暂停时长",
+        "total_pause_minutes": "累计暂停时长",
+        "source_resolution": "源分辨率",
+        "output_resolution": "输出分辨率",
+        "source_dynamic_range": "源动态范围",
+        "source_video_codec": "源视频编码",
+        "is_transcoding": "转码状态",
+        "is_transcode_downgrade": "降级状态",
+        "is_subtitle_burn_in": "字幕烧录状态",
+        "source_bitrate_mbps": "源码率",
+        "user_id": "用户",
+        "trust_score": "信任分数",
+        "account_age_days": "账户年龄",
+        "device_type": "设备类型",
+        "client_name": "播放器",
+        "platform": "平台",
+        "is_local_network": "本地网络状态",
+        "country": "国家/地区",
+        "ip_in_range": "该 IP 地址",
+        "server_id": "服务器",
+        "media_type": "媒体类型",
+        "season_number": "季号",
+        "episode_number": "集号",
+        "library_item_type": "条目类型",
+        "library_name": "媒体库",
+        "resolution_after": "分辨率",
+        "dynamic_range_after": "动态范围",
+        "video_codec_after": "视频编码",
+        "audio_channels_after": "音频声道",
+        "file_size_after": "文件大小"
       },
       "states": {
         "is_local_network": {
-          "yes": "",
-          "no": ""
+          "yes": "用户位于本地网络",
+          "no": "用户不在本地网络"
         },
         "is_transcode_downgrade": {
-          "yes": "",
-          "no": ""
+          "yes": "媒体流已降级",
+          "no": "媒体流未降级"
         },
         "is_subtitle_burn_in": {
-          "yes": "",
-          "no": ""
+          "yes": "字幕已烧录到视频中",
+          "no": "字幕未烧录到视频中"
         },
         "is_transcoding": {
           "video": {
-            "yes": "",
-            "no": ""
+            "yes": "媒体流正在转码视频",
+            "no": "媒体流未转码视频"
           },
           "audio": {
-            "yes": "",
-            "no": ""
+            "yes": "媒体流正在转码音频",
+            "no": "媒体流未转码音频"
           },
           "video_or_audio": {
-            "yes": "",
-            "no": ""
+            "yes": "媒体流正在转码",
+            "no": "媒体流未转码"
           },
           "neither": {
-            "yes": "",
-            "no": ""
+            "yes": "媒体流未转码",
+            "no": "媒体流正在转码"
           }
         }
       },
       "actions": {
-        "if": "",
-        "flagIt": "",
-        "doNothing": "",
+        "if": "如果",
+        "flagIt": "标记它",
+        "doNothing": "不执行任何操作",
         "send": "发送至 {{destinations}}",
-        "sendAnywhere": "",
-        "kill_stream": "",
-        "message_client": "",
-        "trustUp": "",
-        "trustDown": "",
-        "trustAdjust": "",
-        "trustSet": "",
-        "trustReset": ""
+        "sendAnywhere": "发送通知",
+        "kill_stream": "停止媒体流",
+        "message_client": "向播放器发送消息",
+        "trustUp": "将信任提高 {{amount}}",
+        "trustDown": "将信任降低 {{amount}}",
+        "trustAdjust": "将信任调整 {{amount}}",
+        "trustSet": "将信任设为 {{value}}",
+        "trustReset": "重置信任"
       },
       "scope": {
-        "server": "",
-        "account": "",
-        "person": ""
+        "server": "一个服务器",
+        "account": "一个账户",
+        "person": "一个人"
       },
-      "sameDeviceInput": "",
-      "uniqueIpsInput": "",
+      "sameDeviceInput": "同一设备：{{input}}",
+      "uniqueIpsInput": "独立 IP：{{input}}",
       "unbound": {
-        "server": "",
-        "account": "",
-        "person": "",
-        "destinations": "",
-        "field_value": "",
-        "select": "",
-        "number": "",
-        "duration": "",
-        "text": "",
-        "boolean": "",
-        "listed": ""
+        "server": "所选服务器",
+        "account": "所选账户",
+        "person": "所选用户",
+        "destinations": "所选目标",
+        "field_value": "所选值",
+        "select": "所选选项",
+        "number": "所选数字",
+        "duration": "所选时长",
+        "text": "所选消息",
+        "boolean": "所选设置",
+        "listed": "已选择项"
       },
-      "more_other": ""
+      "more_other": "+{{count}} 更多"
     },
-    "description": "",
+    "description": "自动化会观看你的服务器，并在条件匹配时执行操作。",
     "detail": {
-      "notFound": "",
-      "title": "",
-      "unsaved": "",
-      "noRuns": "",
-      "runsLine_other": ""
+      "notFound": "未找到自动化",
+      "title": "自动化",
+      "unsaved": "未保存的更改",
+      "noRuns": "尚无运行记录",
+      "runsLine_other": "运行 {{count}} 次 · 上次运行 {{when}}"
     },
-    "disable": "",
-    "editAutomation": "",
+    "disable": "禁用",
+    "editAutomation": "编辑自动化",
     "effects": {
-      "title": "",
-      "kill": "",
-      "trust": "",
-      "message": "",
-      "violation": "",
-      "tellsOnly": "",
-      "allServers": "",
-      "everyServer": "",
-      "oneServer": ""
+      "title": "此项将执行的操作",
+      "kill": "可以停止正在播放的媒体流。",
+      "trust": "更改信任分数。",
+      "message": "在播放器上显示消息。",
+      "violation": "针对匹配用户记录一次违规。",
+      "tellsOnly": "仅通知。绝不停止媒体流或更改账户。",
+      "allServers": "除非选择了某个服务器，否则在所有服务器上运行。",
+      "everyServer": "在所有服务器上运行。",
+      "oneServer": "仅在 {{server}} 上运行。"
     },
-    "emptyTitle": "",
-    "emptyDescription": "",
-    "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "enable": "",
+    "emptyTitle": "尚无自动化",
+    "emptyDescription": "现成的自动化。选择一个并填写空白处。",
+    "emptySeeAll": "查看全部 {{count}} 项",
+    "emptySeeAllLoading": "查看全部",
+    "enable": "启用",
     "evaluations": {
-      "disclosure": "",
+      "disclosure": "未触发运行的匹配（{{total}}）",
       "reasons": {
-        "cooldown_active": "",
-        "edge_replayed": "",
-        "gate_blocked": "",
-        "trigger_filter_failed": ""
+        "cooldown_active": "冷却时间生效中",
+        "edge_replayed": "相同边界已处理",
+        "gate_blocked": "已有进行中的运行涵盖此项",
+        "trigger_filter_failed": "未达到触发器阈值"
       }
     },
     "export": {
-      "title": "",
-      "description": "",
-      "carries": "",
-      "copyCode": "",
-      "copyJson": "",
-      "authorLabel": "",
-      "authorPlaceholder": "",
-      "authorHelper": "",
-      "save": "",
-      "saved": "",
-      "saveFailed": "",
-      "failed": "",
-      "saveHelper": "",
-      "authorInCode": "",
-      "groupLabel": "",
-      "groupHelper": "",
+      "title": "分享此自动化",
+      "description": "其他 Tracearr 实例可以粘贴的一段代码。",
+      "carries": "代码仅携带步骤。目标、服务器和账户不包含在内；接收方需自行填写。",
+      "copyCode": "复制分享代码",
+      "copyJson": "复制 JSON",
+      "authorLabel": "作者",
+      "authorPlaceholder": "姓名",
+      "authorHelper": "显示在画廊页面并携带在代码中。可选。",
+      "save": "保存为现成模板",
+      "saved": "{{name}} 已保存为现成自动化。",
+      "saveFailed": "无法保存。",
+      "failed": "无法为此生成分享代码。",
+      "saveHelper": "将其添加到本服务器的现成自动化列表中。",
+      "authorInCode": "代码中包含作者名称。",
+      "groupLabel": "分区",
+      "groupHelper": "它列在自动化库的哪个部分下。",
       "gallery": {
-        "trigger": "",
-        "body": ""
+        "trigger": "发布到社区自动化库",
+        "body": "画廊位于 docs.tracearr.com/templates，其中列出了共享的自动化。添加一个即向 Tracearr/automation-templates 提交包含下方 JSON 的拉取请求。Tracearr 从不读取该画廊。"
       },
-      "openRepository": ""
+      "openRepository": "打开仓库"
     },
     "fields": {
       "concurrent_streams": {
-        "label": "",
-        "description": ""
+        "label": "并发流",
+        "description": "同一用户的活跃媒体流数量"
       },
       "active_session_distance_km": {
-        "label": "",
-        "description": ""
+        "label": "会话之间的距离",
+        "description": "同时进行会话之间的距离"
       },
       "travel_speed_kmh": {
-        "label": "",
-        "description": ""
+        "label": "移动速度",
+        "description": "位置之间计算出的移动速度"
       },
       "unique_ips_in_window": {
-        "label": "",
-        "description": ""
+        "label": "时间窗口内独立 IP",
+        "description": "时间窗口内独立 IP 地址的数量"
       },
       "unique_devices_in_window": {
-        "label": "",
-        "description": ""
+        "label": "时间窗口内独立设备",
+        "description": "时间窗口内独立设备的数量"
       },
       "downloads_in_window": {
-        "label": "",
-        "description": ""
+        "label": "时间窗口内下载次数",
+        "description": "时间窗口内下载的内容数量"
       },
       "download_bytes_in_window": {
-        "label": "",
-        "description": ""
+        "label": "时间窗口内下载数据量",
+        "description": "时间窗口内下载的千兆字节数"
       },
       "inactive_days": {
-        "label": "",
-        "description": ""
+        "label": "不活跃天数",
+        "description": "距离上次活动的天数"
       },
       "current_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "当前暂停时长",
+        "description": "会话已连续暂停的时长"
       },
       "total_pause_minutes": {
-        "label": "",
-        "description": ""
+        "label": "累计暂停时长",
+        "description": "所有暂停/恢复周期累计的暂停总时长"
       },
       "source_resolution": {
-        "label": "",
-        "description": ""
+        "label": "源分辨率",
+        "description": "原始媒体分辨率"
       },
       "output_resolution": {
-        "label": "",
-        "description": ""
+        "label": "输出分辨率",
+        "description": "转码后或实际输出的分辨率"
       },
       "source_dynamic_range": {
-        "label": "",
-        "description": ""
+        "label": "源动态范围",
+        "description": "正在播放文件的 HDR 格式；未知值永不匹配，即使条件为「不是」"
       },
       "source_video_codec": {
-        "label": "",
-        "description": ""
+        "label": "源视频编码",
+        "description": "正在播放文件的视频编码，例如 HEVC 或 AV1"
       },
       "is_transcoding": {
-        "label": "",
-        "description": ""
+        "label": "正在转码",
+        "description": "视频或音频媒体流是否正在转码"
       },
       "is_transcode_downgrade": {
-        "label": "",
-        "description": ""
+        "label": "转码降级",
+        "description": "输出分辨率低于源分辨率"
       },
       "is_subtitle_burn_in": {
-        "label": "",
-        "description": ""
+        "label": "字幕烧录",
+        "description": "字幕被烧录进视频，从而强制进行视频转码"
       },
       "source_bitrate_mbps": {
-        "label": "",
-        "description": ""
+        "label": "源码率",
+        "description": "原始媒体码率"
       },
       "user_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "用户",
+        "description": "按账户指定特定用户",
+        "placeholder": "选择用户……"
       },
       "trust_score": {
-        "label": "",
-        "description": ""
+        "label": "信任分数",
+        "description": "用户的信任分数，范围 0 到 100"
       },
       "account_age_days": {
-        "label": "",
-        "description": ""
+        "label": "账户年龄",
+        "description": "自账户创建以来的天数"
       },
       "device_type": {
-        "label": "",
-        "description": ""
+        "label": "设备类型",
+        "description": "所用设备的类型"
       },
       "client_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "客户端/播放器",
+        "description": "媒体播放器应用",
+        "placeholder": "例如 Plex for iOS"
       },
       "platform": {
-        "label": "",
-        "description": ""
+        "label": "平台/操作系统",
+        "description": "操作系统"
       },
       "is_local_network": {
-        "label": "",
-        "description": ""
+        "label": "本地网络",
+        "description": "从本地网络进行流式传输"
       },
       "country": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "国家/地区",
+        "description": "地理位置所在国家",
+        "placeholder": "选择国家/地区……"
       },
       "ip_in_range": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "IP 范围",
+        "description": "CIDR 范围内的 IP 地址，IPv4 或 IPv6",
+        "placeholder": "例如 192.168.1.0/24 或 2001:db8:abcd:7800::/64"
       },
       "server_id": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "服务器",
+        "description": "特定的媒体服务器",
+        "placeholder": "选择服务器……"
       },
       "media_type": {
-        "label": "",
-        "description": ""
+        "label": "媒体类型",
+        "description": "内容类型"
       },
       "season_number": {
-        "label": "",
-        "description": ""
+        "label": "季数",
+        "description": "该集所属的季；任何非单集内容永不匹配"
       },
       "episode_number": {
-        "label": "",
-        "description": ""
+        "label": "集数",
+        "description": "该季中的单集；任何非单集内容永不匹配"
       },
       "library_item_type": {
-        "label": "",
-        "description": ""
+        "label": "内容类型",
+        "description": "它是哪种媒体库条目"
       },
       "library_name": {
-        "label": "",
-        "description": "",
-        "placeholder": ""
+        "label": "媒体库",
+        "description": "它所属媒体库的名称",
+        "placeholder": "电影"
       },
       "resolution_after": {
-        "label": "",
-        "description": ""
+        "label": "分辨率",
+        "description": "条目最终的分辨率；未知值永不匹配，即使条件为「不是」"
       },
       "dynamic_range_after": {
-        "label": "",
-        "description": ""
+        "label": "动态范围",
+        "description": "条目最终的 HDR 格式；未知值永不匹配，即使条件为「不是」"
       },
       "video_codec_after": {
-        "label": "",
-        "description": ""
+        "label": "视频编码",
+        "description": "条目最终的视频编码；未知值永不匹配，即使条件为「不是」"
       },
       "audio_channels_after": {
-        "label": "",
-        "description": ""
+        "label": "音频声道",
+        "description": "条目最终的音频声道数；未知值永不匹配"
       },
       "file_size_after": {
-        "label": "",
-        "description": ""
+        "label": "文件大小",
+        "description": "条目在所有副本中的最终大小；未知值永不匹配"
       }
     },
     "gallery": {
-      "title": "",
-      "description": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "noMatchesHint": "",
+      "title": "新建自动化",
+      "description": "现成自动化。选择一个并填写空白处。",
+      "searchPlaceholder": "搜索",
+      "noMatches": "没有与「{{query}}」匹配的内容。",
+      "noMatchesHint": "尝试用结果中的词：discord、offline、paused。",
       "group": {
-        "notifications": "",
-        "server_health": "",
-        "policies": "",
-        "housekeeping": "",
-        "other": ""
+        "notifications": "通知",
+        "server_health": "服务器健康",
+        "policies": "限制与规则",
+        "housekeeping": "日常维护",
+        "other": "其他开始方式"
       },
-      "builtin": "",
+      "builtin": "内置",
       "kind": {
-        "policy": "",
-        "notification": ""
+        "policy": "违规",
+        "notification": "警报"
       },
       "paste": {
-        "title": "",
-        "description": ""
+        "title": "粘贴分享代码",
+        "description": "粘贴代码并在添加前查看它的作用。"
       },
       "scratch": {
-        "title": "",
-        "description": ""
+        "title": "从零开始",
+        "description": "一步步构建。"
       },
-      "failed": "",
-      "retry": "",
-      "missing": "",
+      "failed": "无法加载现成自动化。",
+      "retry": "重试",
+      "missing": "该现成自动化不在本服务器上。",
       "hint": {
-        "move": "",
-        "use": "",
-        "close": ""
+        "move": "移动",
+        "use": "使用",
+        "close": "关闭"
       },
-      "loading": ""
+      "loading": "加载中……"
     },
     "import": {
-      "title": "",
-      "description": "",
-      "reviewDescription": "",
-      "placeholder": "",
-      "formatHint": "",
-      "check": "",
-      "checking": "",
-      "valid": "",
-      "madeBy": "",
-      "codeShort": "",
+      "title": "粘贴分享代码",
+      "description": "粘贴代码。所有内容都在代码中；Tracearr 不会抓取任何东西。",
+      "reviewDescription": "代码的作用，以及需要填写的内容。",
+      "placeholder": "tracearr1。……",
+      "formatHint": "代码以 tracearr1 开头。",
+      "check": "检查",
+      "checking": "正在读取……",
+      "valid": "Tracearr 可以读取此代码。",
+      "madeBy": "作者：{{author}}，按代码中所写",
+      "codeShort": "代码 {{fingerprint}}",
       "paused": {
-        "label": "",
-        "helper": ""
+        "label": "以暂停状态开始",
+        "helper": "审核后从列表中开启它。"
       },
-      "submit": "",
-      "adding": "",
-      "existing": "",
-      "existingUse": "",
+      "submit": "添加",
+      "adding": "正在添加……",
+      "existing": "已保存为 {{name}}。",
+      "existingUse": "使用它",
       "collision": {
-        "title": "",
-        "add": "",
-        "replace": ""
+        "title": "已存在一个名为 {{name}} 的不同自动化。",
+        "add": "保留两者",
+        "replace": "替换我的"
       },
-      "raw": "",
+      "raw": "显示 JSON",
       "errors": {
-        "notACode": "",
-        "notACodeHint": "",
-        "tooBig": "",
-        "tooBigHint": "",
-        "truncated": "",
-        "truncatedHint": "",
-        "tooNew": "",
-        "tooNewHint": "",
-        "tooMany": "",
-        "tooManyHint": "",
-        "rejected": "",
-        "rejectedHint": ""
+        "notACode": "这看起来不像 Tracearr 分享代码。",
+        "notACodeHint": "代码以 tracearr1 开头。JSON 也可以。",
+        "tooBig": "太大了，不可能是 Tracearr 自动化。",
+        "tooBigHint": "代码最多只有几千个字符。",
+        "truncated": "这段代码看起来被截断了。",
+        "truncatedHint": "复制完整代码后重新粘贴；有些聊天应用会把长代码拆成多行。",
+        "tooNew": "这需要 Tracearr {{required}} 或更高版本。",
+        "tooNewHint": "本服务器运行的是 {{current}}。请更新 Tracearr 后重新粘贴。",
+        "tooMany": "一分钟内的代码太多了。",
+        "tooManyHint": "请稍等片刻再检查。",
+        "rejected": "Tracearr 无法读取这个。",
+        "rejectedHint": "它可能来自其他工具，或被手动编辑过。"
       },
-      "source": "",
-      "validCaveat": "",
-      "builtinMatch": ""
+      "source": "共享自动化列于 docs.tracearr.com/templates。",
+      "validCaveat": "代码中不会说明作者是谁或是否安全。步骤如下所示。",
+      "builtinMatch": "这是 {{name}}，Tracearr 自带的自动化之一。"
     },
     "kind": {
-      "policy": "",
-      "notification": ""
+      "policy": "违规",
+      "notification": "警报"
     },
-    "kindColumn": "",
-    "name": "",
-    "newAutomation": "",
-    "namePlaceholder": "",
-    "nameInvalid": "",
-    "descriptionLabel": "",
-    "descriptionPlaceholder": "",
-    "thisAutomation": "",
-    "cooldownLabel": "",
-    "cooldownInvalid": "",
-    "retentionLabel": "",
-    "retentionPlaceholder": "",
-    "retentionInvalid": "",
-    "noAutomationsFound": "",
+    "kindColumn": "类型",
+    "name": "名称",
+    "newAutomation": "新建自动化",
+    "namePlaceholder": "此自动化的名称",
+    "nameInvalid": "请给它命名。",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "它的用途",
+    "thisAutomation": "此自动化",
+    "cooldownLabel": "至多每",
+    "cooldownInvalid": "输入整数分钟数，0 或以上，或留空。",
+    "retentionLabel": "保留运行记录",
+    "retentionPlaceholder": "{{days}}",
+    "retentionInvalid": "输入整数天数，至少 1，或留空。",
+    "noAutomationsFound": "未找到自动化",
     "operators": {
-      "eq": "",
-      "neq": "",
-      "gt": "",
-      "gte": "",
-      "lt": "",
-      "lte": "",
-      "in": "",
-      "not_in": "",
-      "contains": "",
-      "not_contains": ""
+      "eq": "等于",
+      "neq": "不等于",
+      "gt": "大于",
+      "gte": "至少",
+      "lt": "小于",
+      "lte": "至多",
+      "in": "是其中之一",
+      "not_in": "不是其中之一",
+      "contains": "包含",
+      "not_contains": "不包含"
     },
     "options": {
-      "4K": "",
-      "1080p": "",
-      "720p": "",
-      "480p": "",
-      "SD": "",
-      "unknown": "",
-      "mobile": "",
-      "tablet": "",
-      "tv": "",
-      "desktop": "",
-      "browser": "",
-      "ios": "",
-      "android": "",
-      "windows": "",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
-      "tizen": "",
-      "movie": "",
-      "episode": "",
-      "track": "",
-      "photo": "",
-      "live": "",
-      "trailer": "",
-      "video": "",
-      "audio": "",
-      "video_or_audio": "",
-      "neither": "",
-      "8K": "",
-      "1440p": "",
-      "sdr": "",
-      "hdr": "",
-      "hdr10": "",
-      "hdr10+": "",
-      "hlg": "",
-      "dolby vision": "",
+      "4K": "4K（2160p）",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "未知",
+      "mobile": "移动端",
+      "tablet": "平板",
+      "tv": "电视",
+      "desktop": "桌面端",
+      "browser": "浏览器",
+      "ios": "iOS",
+      "android": "Android",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
+      "tizen": "Tizen",
+      "movie": "电影",
+      "episode": "剧集",
+      "track": "音乐",
+      "photo": "照片",
+      "live": "直播电视",
+      "trailer": "预告片",
+      "video": "视频",
+      "audio": "音频",
+      "video_or_audio": "视频或音频",
+      "neither": "都不是（直接播放）",
+      "8K": "8K",
+      "1440p": "1440p",
+      "sdr": "SDR",
+      "hdr": "HDR",
+      "hdr10": "HDR10",
+      "hdr10+": "HDR10+",
+      "hlg": "HLG",
+      "dolby vision": "Dolby Vision",
       "libraryItemType": {
-        "movie": "",
-        "show": "",
-        "season": "",
-        "episode": "",
-        "artist": "",
-        "album": "",
-        "track": "",
-        "photo": ""
+        "movie": "电影",
+        "show": "剧集",
+        "season": "季",
+        "episode": "单集",
+        "artist": "艺人",
+        "album": "专辑",
+        "track": "曲目",
+        "photo": "照片"
       }
     },
     "provenance": {
-      "builtin": "",
-      "imported": "",
-      "importedBy": "",
-      "saved": "",
-      "customized": "",
-      "customizedFromRemoved": ""
+      "builtin": "内置 · {{name}} {{version}}",
+      "imported": "于 {{date}} 从分享代码导入 · {{name}} {{version}}",
+      "importedBy": "由 {{author}} 于 {{date}} 从分享代码导入 · {{name}} {{version}}",
+      "saved": "于 {{date}} 从 {{name}} 保存到此处 · {{version}}",
+      "customized": "基于 {{name}} 定制",
+      "customizedFromRemoved": "基于一个已被移除的现成自动化定制"
     },
-    "recordsOnly": "",
+    "recordsOnly": "仅记录运行",
     "scope": {
-      "global": "",
-      "crossServer": ""
+      "global": "全局",
+      "crossServer": "跨服务器"
     },
-    "searchPlaceholder": "",
+    "searchPlaceholder": "搜索自动化……",
     "sessionTargets": {
       "triggering": {
-        "label": "",
-        "tooltip": ""
+        "label": "触发会话",
+        "tooltip": "仅触发此自动化的会话"
       },
       "oldest": {
-        "label": "",
-        "tooltip": ""
+        "label": "最早的会话",
+        "tooltip": "该用户运行时间最长的活跃会话"
       },
       "newest": {
-        "label": "",
-        "tooltip": ""
+        "label": "最新的会话",
+        "tooltip": "该用户最近开始的会话"
       },
       "all_except_one": {
-        "label": "",
-        "tooltip": ""
+        "label": "除一个外的所有（保留最早的）",
+        "tooltip": "除最早会话外的所有会话，将用户降至一条媒体流"
       },
       "all_user": {
-        "label": "",
-        "tooltip": ""
+        "label": "该用户所有会话",
+        "tooltip": "该用户的每个活跃会话"
       }
     },
     "configFields": {
       "cooldown_minutes": {
-        "label": ""
+        "label": "冷却时间"
       },
       "priority": {
-        "label": ""
+        "label": "优先级"
       },
       "target": {
-        "label": ""
+        "label": "目标"
       },
       "message": {
-        "label": ""
+        "label": "消息"
       }
     },
     "trustModes": {
       "adjust": {
-        "label": ""
+        "label": "按数值调整"
       },
       "set": {
-        "label": ""
+        "label": "设为某值"
       },
       "reset": {
-        "label": ""
+        "label": "重置为默认值（100）"
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "低",
+      "warning": "警告",
+      "high": "高"
     },
     "template": {
-      "version": "",
-      "updateAvailable": "",
-      "updatedTitle": "",
-      "updatedBody": "",
-      "before": "",
-      "after": "",
-      "review": "",
-      "save": "",
-      "customize": "",
-      "customizeTitle": "",
-      "customizeConfirm": "",
-      "customizeConfirmAction": "",
-      "customizeFirst": "",
-      "customizeFailed": "",
-      "upgradeFailed": "",
-      "gone": "",
-      "doorsHelper": ""
+      "version": "v{{version}}",
+      "updateAvailable": "有可用更新",
+      "updatedTitle": "该现成自动化现已更新到 v{{version}}",
+      "updatedBody": "请先查看以下答案，然后更新。",
+      "before": "现在",
+      "after": "更新后",
+      "review": "查看并更新",
+      "save": "保存更改",
+      "customize": "在构建器中打开",
+      "customizeTitle": "在构建器中打开此自动化？",
+      "customizeConfirm": "在构建器中打开会使此自动化独立：每一步都可编辑，且不再接收现成版本的更新。此操作无法撤销。",
+      "customizeConfirmAction": "在构建器中打开",
+      "customizeFirst": "此自动化跟随一个现成版本。请先在构建器中打开。",
+      "customizeFailed": "无法在构建器中打开。",
+      "upgradeFailed": "无法更新。请重试。",
+      "gone": "此自动化所基于的现成版本已不在本服务器上。",
+      "doorsHelper": "这些步骤来自现成自动化且是固定的。在构建器中打开会使每一步都可编辑，并断开此关联。"
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "不活跃账户",
+        "description": "当账户在你允许的天数内未被使用时触发违规。",
+        "keywords": "空闲 休眠 未使用 陈旧 清理 不活跃 账户"
       },
       "concurrent-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "同时媒体流过多",
+        "description": "当账户同时播放的媒体流超过你允许的数量时触发违规。",
+        "keywords": "限制 上限 并发 同时 共享 过多 媒体流"
       },
       "device-velocity": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "时间窗口内多个 IP",
+        "description": "当账户在时间窗口内使用的 IP 地址超过你允许的数量时触发违规。",
+        "keywords": "ip 地址 vpn 共享 设备 时间窗口"
       },
       "download-burst": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "下载突增",
+        "description": "当某人在一天内下载的内容超过你允许的数量时发出警报。",
+        "keywords": "下载 离线 同步 囤积 突发 限制"
       },
       "geo-restriction": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "屏蔽的国家/地区",
+        "description": "当媒体流来自你屏蔽的国家/地区时触发违规。",
+        "keywords": "国家 地理 vpn 境外 地区 屏蔽 出行"
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "不可能的行程",
+        "description": "当两个会话之间的距离超过任何人在这段时间内能够移动的距离时触发违规。",
+        "keywords": "vpn 出行 速度 距离 位置 共享"
       },
       "kill-paused-streams": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "停止暂停的媒体流",
+        "description": "停止已暂停超过你允许分钟数的媒体流。",
+        "keywords": "暂停 空闲 离开 停止 终止 回收"
       },
       "media-added": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "新增媒体",
+        "description": "当媒体库条目首次出现时通知目标。",
+        "keywords": "新增 媒体库 电影 单集 已添加 导入 通知 discord 邮件 webhook"
       },
       "media-upgraded": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "媒体已升级",
+        "description": "当媒体库条目的质量发生变化时通知目标。",
+        "keywords": "升级 质量 remux 4k 分辨率 替换 通知 discord 邮件 webhook"
       },
       "new-device": {
         "name": "新设备",
@@ -1905,212 +1905,212 @@
         "keywords": "设备 新的 未知 未识别 手机 登录 分享 通知 Discord 邮件 Webhook"
       },
       "newsletter-failed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "通讯发送失败",
+        "description": "当通讯发送失败或只送达列表中的部分收件人时通知目标。",
+        "keywords": "通讯 摘要 邮件 失败 部分 退信 通知"
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "禁止 4K 转码",
+        "description": "停止正在转码 4K 源视频的媒体流。",
+        "keywords": "4k 转码 质量 cpu 带宽 停止"
       },
       "paused-too-long": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "暂停过久",
+        "description": "当媒体流暂停超过你允许的分钟数时通知目标。",
+        "keywords": "暂停 空闲 离开 卡住 弃置 通知 discord 邮件 webhook"
       },
       "plugin-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Tracearr 插件更新",
+        "description": "当服务器有更新的 Tracearr 插件可安装时通知目标。",
+        "keywords": "插件 更新 升级 版本 发布 通知 discord 邮件 webhook"
       },
       "server-down": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "服务器离线",
+        "description": "当媒体服务器停止响应时通知目标。",
+        "keywords": "离线 中断 无法访问 宕机 通知 discord 邮件 webhook"
       },
       "server-up": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "服务器恢复",
+        "description": "当媒体服务器再次响应时通知目标。",
+        "keywords": "在线 已恢复 已还原 恢复 通知 discord 邮件 webhook"
       },
       "server-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "媒体服务器更新",
+        "description": "当媒体服务器有可用更新时通知目标。",
+        "keywords": "更新 升级 版本 发布 plex jellyfin emby 通知 discord"
       },
       "simultaneous-locations": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "同时在两处",
+        "description": "当一个账户同时从两个相距很远的地方流式传输时触发违规。",
+        "keywords": "距离 位置 共享 vpn 同时在两处"
       },
       "stream-ended": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "媒体流结束",
+        "description": "每当媒体流停止时通知目标。",
+        "keywords": "停止 结束 完成 播放 通知 discord 邮件 webhook"
       },
       "stream-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "媒体流开始",
+        "description": "每当媒体流开始时通知目标。",
+        "keywords": "播放次数 观看 开始 启动 查看 通知 discord 邮件 webhook"
       },
       "tracearr-update": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "Tracearr 更新",
+        "description": "当新的 Tracearr 版本发布时通知目标。",
+        "keywords": "更新 升级 版本 发布 tracearr 通知 discord 邮件 webhook"
       },
       "transcode-started": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "媒体流正在转码",
+        "description": "当媒体流转码视频或音频时通知目标。",
+        "keywords": "转码 转换 cpu 直接播放 播放次数 清晰度 通知 discord 邮件 webhook"
       },
       "trust-score-changed": {
-        "name": "",
-        "description": "",
-        "keywords": ""
+        "name": "信任分数已变化",
+        "description": "当账户的信任分数发生变化时通知目标。",
+        "keywords": "信任 分数 信誉 扣分 调整 通知 discord 邮件 webhook"
       }
     },
-    "title": "",
-    "toggleAutomation": "",
-    "tryAdjustingFilters": "",
+    "title": "自动化",
+    "toggleAutomation": "开启或关闭 {{name}}",
+    "tryAdjustingFilters": "请尝试调整筛选条件。",
     "units": {
-      "km": "",
-      "kmh": "",
-      "mbps": "",
-      "days": "",
-      "minutes": "",
-      "hours": "",
-      "gb": "",
-      "seconds": ""
+      "km": "km",
+      "kmh": "km/h",
+      "mbps": "Mbps",
+      "days": "天",
+      "minutes": "分钟",
+      "hours": "小时",
+      "gb": "GB",
+      "seconds": "秒"
     },
-    "updateAutomation": "",
+    "updateAutomation": "保存更改",
     "catalog": {
       "groups": {
-        "sessions": "",
-        "accounts": "",
-        "library": "",
-        "servers": "",
-        "updates": "",
-        "notifications": "",
-        "notify": "",
-        "policy": "",
-        "control": ""
+        "sessions": "会话",
+        "accounts": "账户",
+        "library": "媒体库",
+        "servers": "服务器",
+        "updates": "更新",
+        "notifications": "通讯",
+        "notify": "通知",
+        "policy": "采取措施",
+        "control": "如果……就"
       },
-      "suggested": "",
+      "suggested": "建议",
       "triggers": {
         "sessionStarted": {
-          "description": "",
-          "synonyms": ""
+          "description": "播放已确认，约在首次发现后三十秒。",
+          "synonyms": "播放次数, 观看, 开始, 启动, 查看"
         },
         "sessionFirstSeen": {
-          "description": "",
-          "synonyms": ""
+          "description": "媒体流首次被发现的瞬间，早于确认延迟。少数情况永远不会确认。",
+          "synonyms": "播放次数, 立即, 即时, 首次发现, 提前, webhook"
         },
         "sessionStopped": {
-          "description": "",
-          "synonyms": ""
+          "description": "播放结束，无论以何种方式结束。",
+          "synonyms": "结束、完成、退出、关闭"
         },
         "sessionTranscodeChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "服务器在直接播放与转码之间切换同一路流，并影响播放次数。",
+          "synonyms": "转码, 转换, 直接播放, 播放次数, cpu"
         },
         "sessionPaused": {
-          "description": "",
-          "synonyms": ""
+          "description": "媒体流被暂停的那一刻。",
+          "synonyms": "暂停、保持、空闲"
         },
         "sessionHeldFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "媒体流处于暂停状态",
+          "description": "媒体流暂停的时间超过了设定分钟数。",
+          "synonyms": "暂停、空闲、弃置、卡住、离开"
         },
         "accountInactiveFor": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "账户进入静默状态",
+          "description": "账户在设定天数内未观看任何内容。",
+          "synonyms": "不活跃、休眠、未使用、陈旧、清理"
         },
         "accountNewDevice": {
           "description": "某个账户首次从某台设备进行流媒体播放。",
           "synonyms": "设备, 新的, 未知, 未识别, 电话, 登录, 共享"
         },
         "accountTrustChanged": {
-          "description": "",
-          "synonyms": ""
+          "description": "账户的信任分数发生变化，无论是自动化还是所有者调整了它。",
+          "synonyms": "信任分、评分、信誉、处罚、调整"
         },
         "accountMediaDownloaded": {
-          "description": "",
-          "synonyms": ""
+          "description": "账户通过服务器的下载端点下载一个条目，每个条目一次。",
+          "synonyms": "下载、离线、同步、保存、囤积"
         },
         "mediaAdded": {
-          "description": "",
-          "synonyms": ""
+          "description": "媒体库条目首次出现在服务器上。",
+          "synonyms": "新增、已添加、媒体库、电影、单集、导入"
         },
         "mediaUpgraded": {
-          "description": "",
-          "synonyms": ""
+          "description": "媒体库中已有的条目画质发生变化。",
+          "synonyms": "升级、画质、替换、remux、4K、分辨率"
         },
         "serverDown": {
-          "description": "",
-          "synonyms": ""
+          "description": "某个媒体服务器停止响应。",
+          "synonyms": "无法访问、离线、中断、宕机"
         },
         "serverUp": {
-          "description": "",
-          "synonyms": ""
+          "description": "某个媒体服务器重新恢复响应。",
+          "synonyms": "在线、恢复、还原、重新上线"
         },
         "pluginUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "某台服务器上的 Tracearr 插件有新版本发布。",
+          "synonyms": "插件、升级、版本、发布"
         },
         "serverUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "某个媒体服务器有新版本发布。",
+          "synonyms": "升级、版本、发布、补丁"
         },
         "tracearrUpdateAvailable": {
-          "description": "",
-          "synonyms": ""
+          "description": "Tracearr 自身有新版本发布。",
+          "synonyms": "升级、版本、发布、自身"
         },
         "newsletterSent": {
-          "description": "",
-          "synonyms": ""
+          "description": "定时或手动发送的通讯已送达列表中的每个人。",
+          "synonyms": "通讯, 摘要, 邮件, 已送达"
         },
         "newsletterFailed": {
-          "description": "",
-          "synonyms": ""
+          "description": "通讯未送达任何人，或只送达了列表中的一部分。",
+          "synonyms": "通讯, 摘要, 邮件, 退信, 部分, 错误"
         }
       },
       "actions": {
         "send": {
-          "synonyms": ""
+          "synonyms": "通知、警报、Discord、邮件、Webhook、推送"
         },
         "trust": {
-          "synonyms": ""
+          "synonyms": "分数、信誉、惩罚、奖励"
         },
         "kill_stream": {
-          "synonyms": ""
+          "synonyms": "停止、终止、切断、结束播放"
         },
         "message_client": {
-          "synonyms": ""
+          "synonyms": "警告、告知、通知、屏幕提示"
         },
         "if": {
-          "label": "",
-          "description": "",
-          "synonyms": ""
+          "label": "如果…否则…",
+          "description": "仅当额外的检查通过时才运行某些步骤。",
+          "synonyms": "如果、否则、反之、分支、拆分、条件"
         }
       }
     },
     "filters": {
-      "source": "",
-      "allSources": "",
+      "source": "来源",
+      "allSources": "任意位置",
       "sources": {
-        "builtin": "",
-        "import": "",
-        "local": "",
-        "own": ""
+        "builtin": "内置",
+        "import": "已导入",
+        "local": "保存在此",
+        "own": "在构建器中创建"
       },
-      "trigger": "",
-      "allTriggers": ""
+      "trigger": "触发条件",
+      "allTriggers": "所有触发器"
     },
-    "openGallery": "",
-    "deleteAutomation_other": ""
+    "openGallery": "打开图库",
+    "deleteAutomation_other": "删除 {{count}} 个自动化"
   },
   "terminateStream": {
     "title": "终止流",
@@ -2147,7 +2147,7 @@
       "hideFiltered": "隐藏已过滤",
       "showAll": "显示全部",
       "connectingTo": "正在连接到{{name}}……",
-      "ownerOnly": "",
+      "ownerOnly": "只有所有者才能管理关联的 Plex 账户。",
       "noAccountsLinked": "没有关联的Plex账户",
       "noAccountsLinkedHint": "链接 Plex 帐户以将 Plex 服务器添加到 Tracearr。",
       "linkPlexAccount": "链接Plex账户",
@@ -2155,7 +2155,7 @@
       "linking": "正在连接……",
       "loginEnabled": "登录已启用",
       "unlinkAccount": "取消链接此Plex账户",
-      "reauthorizeAccount": "",
+      "reauthorizeAccount": "重新授权此 Plex 账户",
       "deleteServersFirst": "请先删除通过此帐户连接的活动服务器，或将其标记为历史服务器",
       "unlinkPlexAccount": "取消链接Plex账户",
       "unlinkConfirm": "您确定要取消链接此Plex帐户吗？在您再次链接之前，您将无法从此帐户添加服务器。",
@@ -2164,129 +2164,129 @@
       "serversConnected_other": "{{count}} 台服务器已连接"
     },
     "destinations": {
-      "add": "",
-      "builtinNote": "",
-      "clearSecret": "",
-      "deleteConfirm": "",
-      "description": "",
-      "emailDescription": "",
-      "empty": "",
+      "add": "添加目标",
+      "builtinNote": "内置",
+      "clearSecret": "清除",
+      "deleteConfirm": "删除 {{name}}？使用它的自动化和通讯将停止，直到它们被更新。",
+      "description": "通知发送的位置。可随意添加多个，自动化可以向其中任意一个发送。",
+      "emailDescription": "Tracearr 通过此 SMTP 服务器发送邮件。通讯自行选择收件人；自动化警报发送到下方地址。",
+      "empty": "还没有目标。",
       "fields": {
-        "webhookUrl": "",
-        "url": "",
-        "serverUrl": "",
-        "apiUrl": "",
-        "topic": "",
-        "authToken": "",
-        "userKey": "",
-        "apiToken": "",
-        "botToken": "",
-        "chatId": "",
-        "topicId": "",
-        "preset": "",
-        "host": "",
-        "port": "",
-        "security": "",
-        "verifyCertificate": "",
-        "username": "",
-        "password": "",
-        "fromName": "",
-        "fromAddress": "",
-        "to": "",
-        "replyTo": "",
-        "messagesPerSecond": "",
-        "messageStream": ""
+        "webhookUrl": "Webhook URL",
+        "url": "URL",
+        "serverUrl": "服务器 URL",
+        "apiUrl": "API URL",
+        "topic": "主题",
+        "authToken": "认证令牌",
+        "userKey": "用户密钥",
+        "apiToken": "API 令牌",
+        "botToken": "机器人令牌",
+        "chatId": "聊天 ID",
+        "topicId": "主题 ID",
+        "preset": "提供商",
+        "host": "SMTP 主机",
+        "port": "端口",
+        "security": "安全",
+        "verifyCertificate": "验证证书",
+        "username": "用户名",
+        "password": "密码",
+        "fromName": "发件人名称",
+        "fromAddress": "发件人地址",
+        "to": "警报收件人",
+        "replyTo": "回复地址",
+        "messagesPerSecond": "每秒消息数",
+        "messageStream": "消息流"
       },
       "groups": {
-        "connection": "",
-        "sender": "",
-        "alerts": ""
+        "connection": "连接",
+        "sender": "发件人",
+        "alerts": "警报"
       },
       "hints": {
-        "authTokenOptional": "",
-        "telegramTopic": "",
-        "smtpPreset": "",
-        "smtpVerifyCertificate": "",
-        "smtpUsernameOptional": "",
-        "smtpTo": "",
-        "smtpRate": "",
-        "smtpMessageStream": "",
-        "smtpGmailUsername": "",
-        "smtpGmailPassword": "",
-        "smtpResendUsername": "",
-        "smtpResendPassword": "",
-        "smtpSendgridUsername": "",
-        "smtpSendgridPassword": "",
-        "smtpMailgunUsername": "",
-        "smtpMailgunPassword": "",
-        "smtpBrevoUsername": "",
-        "smtpBrevoPassword": "",
-        "smtpSesUsername": "",
-        "smtpSesPassword": "",
-        "smtpPostmarkUsername": "",
-        "smtpPostmarkPassword": ""
+        "authTokenOptional": "公开主题可选",
+        "telegramTopic": "仅限论坛群组。普通聊天或频道请留空。",
+        "smtpPreset": "为常见提供商填入主机、端口与安全设置。Amazon SES 与 Mailgun EU 需要将区域编辑进主机中。",
+        "smtpVerifyCertificate": "对照受信任的机构检查邮件服务器的 TLS 证书。仅对使用自签名证书的服务器（如本地网桥）关闭它：否则 Tracearr 与邮件服务器之间的路径上任何人都可能拦截连接。",
+        "smtpUsernameOptional": "服务器无需登录时请留空",
+        "smtpTo": "警报会作为一封邮件发送，此处的每个地址都在收件人中。如果此服务器只发送通讯，请留空。",
+        "smtpRate": "按 Tracearr 实例计算；请保持在提供商限额之内",
+        "smtpMessageStream": "仅限 Postmark：发送所使用的消息流 ID，例如 broadcast。其他情况请留空。",
+        "smtpGmailUsername": "你的完整 Gmail 地址。无论发件人地址是什么，Gmail 都会从此地址发送；个人账户每天约 500 个收件人后即停止。",
+        "smtpGmailPassword": "来自 Google 账户 > 安全性 > 两步验证 > 应用密码的应用密码。账户密码会被拒绝。",
+        "smtpResendUsername": "请准确输入 resend 一词。",
+        "smtpResendPassword": "你的 Resend API 密钥。发件域名须先在 Resend 中完成验证。",
+        "smtpSendgridUsername": "请准确输入 apikey 一词。",
+        "smtpSendgridPassword": "你的 SendGrid API 密钥。",
+        "smtpMailgunUsername": "postmaster@yourdomain，而非你的 Mailgun 登录名。",
+        "smtpMailgunPassword": "来自该域名设置中的 SMTP 密码。沙箱域名只能送达其授权收件人。",
+        "smtpBrevoUsername": "你的 Brevo 登录邮箱。",
+        "smtpBrevoPassword": "来自 SMTP & API > SMTP 的 SMTP 密钥，而非 API 密钥。",
+        "smtpSesUsername": "来自 SES 控制台的 SMTP 用户名，而非 IAM 访问密钥。请将区域填入主机中。",
+        "smtpSesPassword": "来自 SES 控制台的 SMTP 密码。沙箱账户每天仅能向已验证地址发送 200 封邮件。",
+        "smtpPostmarkUsername": "你的 Server API 令牌。",
+        "smtpPostmarkPassword": "相同的 Server API 令牌，或流令牌的密钥。"
       },
-      "newsletterAlertsNote": "",
-      "newsletterDescription": "",
-      "newsletterTitle": "",
-      "newslettersOnly": "",
-      "noAlertRecipients": "",
+      "newsletterAlertsNote": "通讯收件人在通讯本身中设置。若也要通过此服务器发送警报，请稍后在“目标”中编辑。",
+      "newsletterDescription": "Tracearr 通过此 SMTP 服务器发送通讯。",
+      "newsletterTitle": "添加邮件服务器",
+      "newslettersOnly": "仅通讯",
+      "noAlertRecipients": "无警报收件人",
       "options": {
-        "securityStarttls": "",
-        "securityTls": "",
-        "securityNone": "",
-        "presetCustom": "",
-        "presetPostmark": "",
-        "presetResend": "",
-        "presetSes": "",
-        "presetMailgun": "",
-        "presetSendgrid": "",
-        "presetBrevo": "",
-        "presetGmail": ""
+        "securityStarttls": "STARTTLS（通常为端口 587）",
+        "securityTls": "TLS（通常为端口 465）",
+        "securityNone": "无（明文，端口 25）",
+        "presetCustom": "自定义",
+        "presetPostmark": "Postmark",
+        "presetResend": "Resend",
+        "presetSes": "Amazon SES",
+        "presetMailgun": "Mailgun",
+        "presetSendgrid": "SendGrid",
+        "presetBrevo": "Brevo",
+        "presetGmail": "Gmail"
       },
-      "ownerOnly": "",
-      "pushNote": "",
-      "receiveViolations": "",
-      "receiveViolationsHint": "",
-      "receiveViolationsNeedsRecipients": "",
-      "reencrypt": "",
-      "rowActions": "",
-      "secretSet": "",
-      "test": "",
-      "testHint": "",
-      "testNeedsForm": "",
+      "ownerOnly": "只有所有者才能管理通知目标。",
+      "pushNote": "发送至已配对的移动设备；每台设备可在其通知设置中进行过滤。",
+      "receiveViolations": "接收违规",
+      "receiveViolationsHint": "将每条违规发送到此目标。",
+      "receiveViolationsNeedsRecipients": "添加警报收件人以在此发送违规",
+      "reencrypt": "重新输入此目标的密钥",
+      "rowActions": "目标操作",
+      "secretSet": "已设置（留空则保持不变）",
+      "test": "测试",
+      "testHint": "先保存再测试",
+      "testNeedsForm": "填写必填字段以进行测试",
       "types": {
-        "discord": "",
-        "jsonWebhook": "",
-        "ntfy": "",
-        "gotify": "",
-        "apprise": "",
-        "pushover": "",
-        "telegram": "",
-        "email": "",
-        "push": "",
-        "webToast": ""
+        "discord": "Discord",
+        "jsonWebhook": "Webhook（JSON）",
+        "ntfy": "ntfy",
+        "gotify": "Gotify",
+        "apprise": "Apprise",
+        "pushover": "Pushover",
+        "telegram": "Telegram",
+        "email": "电子邮件",
+        "push": "移动推送",
+        "webToast": "浏览器通知"
       },
-      "violationsOff": "",
-      "violationsOn": "",
-      "webToastNote": "",
-      "alertsGoTo_other": "",
-      "usedBy_other": "",
-      "usedByNewsletters_other": ""
+      "violationsOff": "违规关闭",
+      "violationsOn": "违规开启",
+      "webToastNote": "此浏览器中的通知。",
+      "alertsGoTo_other": "警报发送到 {{count}} 个地址",
+      "usedBy_other": "用于 {{count}} 个自动化",
+      "usedByNewsletters_other": "用于 {{count}} 份通讯"
     }
   },
   "impersonation": {
-    "banner": "",
-    "stop": "",
-    "stopLabel": "",
-    "stopViewing": ""
+    "banner": "正在以 {{name}} 身份查看。更改已关闭。",
+    "stop": "停止",
+    "stopLabel": "停止以 {{name}} 身份查看",
+    "stopViewing": "停止查看"
   },
   "maintenance": {
     "startingTitle": "Tracearr 正在启动……",
     "interruptionTitle": "服务中止",
     "startingDescription": "服务器正在等待后端服务可用。此页面将在一切就绪时自动刷新。",
     "interruptionDescription": "一个或多个后端服务已不可用。当连接恢复时，此页面将自动刷新。",
-    "unreachable": "",
+    "unreachable": "暂时无法连接 Tracearr 服务器。实时更新已暂停，稍后会自动恢复。",
     "restoreTitle": "正在从备份还原……",
     "restoreFailed": "还原失败",
     "restorePhase": {
@@ -2311,45 +2311,45 @@
     "allTypes": "所有类型",
     "heatmap": "热图",
     "circles": "圆形",
-    "viewMode": "",
+    "viewMode": "地图视图",
     "streams": "流",
     "locations": "位置",
     "allActivity": "所有活动",
-    "basemapMissing": "",
-    "webglUnavailable": "",
-    "webglHint": "",
-    "badMounts": "",
-    "loadingData": "",
-    "noDataForFilters": "",
-    "totalStreams": "",
-    "byStreams": "",
-    "noMapPosition": "",
-    "allLocations": "",
-    "people": "",
-    "devices": "",
-    "latestStreams": "",
-    "firstSeen": "",
-    "lastSeen": "",
-    "areaName": "",
-    "areaPlaces": "",
-    "noneInView": "",
-    "showAll": "",
-    "streamCount_other": "",
-    "peopleCount_other": "",
-    "viewInHistory_other": "",
-    "streamsAcrossPlaces_other": "",
-    "inViewCount_other": ""
+    "basemapMissing": "未安装底图",
+    "webglUnavailable": "此浏览器已禁用 WebGL",
+    "webglHint": "地图需要 WebGL。请在浏览器设置中为此站点启用。",
+    "badMounts": "检测到错误的卷挂载 — 功能无法保证。",
+    "loadingData": "正在加载地图数据……",
+    "noDataForFilters": "当前筛选条件下没有位置数据",
+    "totalStreams": "媒体流总数",
+    "byStreams": "按媒体流",
+    "noMapPosition": "无地图位置",
+    "allLocations": "所有位置",
+    "people": "人",
+    "devices": "设备",
+    "latestStreams": "最近的媒体流",
+    "firstSeen": "首次出现",
+    "lastSeen": "最近出现",
+    "areaName": "{{name}} 区域",
+    "areaPlaces": "地点",
+    "noneInView": "地图的这一区域没有位置",
+    "showAll": "显示全部",
+    "streamCount_other": "{{count, number}} 个流",
+    "peopleCount_other": "{{count, number}} 人",
+    "viewInHistory_other": "在历史记录中查看 {{count, number}} 个流",
+    "streamsAcrossPlaces_other": "{{count, number}} 个流分布在 {{places, number}} 个地点",
+    "inViewCount_other": "视野内 {{count, number}} / {{total, number}} 个"
   },
   "devices": {
-    "analyzedSessions": "",
+    "analyzedSessions": "已分析的会话",
     "directPlayRate": "直接播放率",
-    "videoAndAudio": "",
+    "videoAndAudio": "视频 + 音频",
     "uniqueDevices": "唯一设备",
     "uniqueCodecs": "唯一编解码器",
     "deviceHealth": "设备健康",
-    "deviceHealthDesc": "",
+    "deviceHealthDesc": "按设备类型统计的直接播放率。",
     "transcodeHotspots": "转码热点",
-    "transcodeHotspotsDesc": "",
+    "transcodeHotspotsDesc": "导致转码最多的组合。",
     "deviceAndCodec": "设备 + 解码器",
     "transcodes": "转码",
     "pctOfTotal": "占总计",
@@ -2359,22 +2359,22 @@
     "noDeviceDataPeriod": "在此期间没有设备数据",
     "legend": "说明:",
     "directPlayHigh": "*80% direct",
-    "directPlayMid": "",
-    "directPlayLow": "",
-    "analyzedSessionsTooltip_other": ""
+    "directPlayMid": "50-79%",
+    "directPlayLow": "<50%",
+    "analyzedSessionsTooltip_other": "设备 + 编解码器组合中的会话，至少 {{count}} 个会话且编解码器已知。罕见组合和没有编解码器信息的会话不计入。"
   },
   "downloads": {
-    "dataDownloaded": "",
-    "peopleDownloading": "",
-    "mostDownloaded": "",
-    "unknownUser": "",
-    "appOnDevice": "",
-    "deliveredAs": "",
-    "deliveredAsFormat": "",
-    "deliveredAtBitrate": "",
-    "empty": "",
-    "panelTitle": "",
-    "requests_other": ""
+    "dataDownloaded": "已下载数据",
+    "peopleDownloading": "正在下载的人",
+    "mostDownloaded": "下载最多",
+    "unknownUser": "未知用户",
+    "appOnDevice": "{{device}} 上的 {{app}}",
+    "deliveredAs": "以 {{format}} 格式、{{bitrate}} 码率交付",
+    "deliveredAsFormat": "以 {{format}} 格式交付",
+    "deliveredAtBitrate": "以 {{bitrate}} 码率交付",
+    "empty": "此范围内没有下载。下载是通过服务器的下载按钮或端点拉取的项目。Plex 仅在 Tracearr 连接时上报这些内容。",
+    "panelTitle": "下载",
+    "requests_other": "（{{count}} 个请求）"
   },
   "statsBandwidth": {
     "dataTransferred": "已传输数据",
@@ -2384,45 +2384,45 @@
     "totalWatchTime": "总观看时长",
     "uniqueUsers": "唯一用户",
     "dailyUsage": "每日带宽使用",
-    "dailyUsageDesc": "",
+    "dailyUsageDesc": "随时间变化的平均码率与会话数量。",
     "noData": "没有可用的带宽数据",
-    "topPeopleTitle": "",
-    "topPeopleCaption": ""
+    "topPeopleTitle": "按数据量排名的人",
+    "topPeopleCaption": "此范围内的前五名"
   },
   "statsUsers": {
     "noActivity": "尚无活动",
     "noActivityDesc": "开始串流以在这里查看您的顶级用户",
-    "rankBy": "",
+    "rankBy": "排序依据",
     "rank": {
-      "hours": "",
-      "transcodes": "",
-      "requests": "",
-      "lastSeen": ""
+      "hours": "时长",
+      "transcodes": "转码占比",
+      "requests": "请求",
+      "lastSeen": "最近出现"
     },
     "summary": {
-      "active": "",
-      "activeOf": "",
-      "topThreeShare": "",
-      "transcoderShare": "",
-      "transcodesOf": "",
-      "quiet": "",
-      "quietDays": ""
+      "active": "活跃的人",
+      "activeOf": "共 {{total}} 人",
+      "topThreeShare": "前三名占比",
+      "transcoderShare": "最高转码占比",
+      "transcodesOf": "{{total}} 次转码中的 {{top}} 次",
+      "quiet": "沉寂的人",
+      "quietDays": "{{days}} 天或更久"
     },
     "columns": {
-      "person": "",
-      "requests": "",
-      "trend": ""
+      "person": "用户",
+      "requests": "请求",
+      "trend": "趋势"
     },
-    "requestsAllTime": "",
+    "requestsAllTime": "全部时间，不受所选范围限制。先请求，后观看。",
     "linkTitle": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "按转码占比排名的人。",
+      "requests": "按请求数排名的人。"
     },
     "linkBody": {
-      "transcodes": "",
-      "requests": ""
+      "transcodes": "所有人，占比最高者居前。",
+      "requests": "所有人，以及他们的请求中有多少被观看。"
     },
-    "openPeople": ""
+    "openPeople": "打开用户"
   },
   "plexCallback": {
     "authComplete": "身份验证完成",
@@ -2432,13 +2432,13 @@
     "backToSettings": "返回设置",
     "apiKeyAutoLoaded": "API 密钥自动加载",
     "noApiKey": "没有生成 API 密钥 - 在设置中创建一个测试端点",
-    "versionV1": "",
-    "versionV2": "",
+    "versionV1": "v1",
+    "versionV2": "v2（当前）",
     "specLoadError": "无法加载 API 规格。请检查您的 API 密钥然后重试。"
   },
   "debug": {
     "title": "调试工具",
-    "description": "",
+    "description": "用于排障与数据管理的管理工具。",
     "overview": "概览",
     "librarySnapshots": "媒体库快照",
     "tasks": "任务",
@@ -2449,7 +2449,7 @@
     "environment": "环境",
     "systemInformation": "系统信息",
     "database": "数据库",
-    "databaseDesc": "",
+    "databaseDesc": "数据库大小与表统计信息。",
     "totalSize": "总大小",
     "maintenance": "维护费",
     "destructiveActions": "破坏性操作",
@@ -2459,8 +2459,8 @@
     "clearQueryCache": "清除查询缓存",
     "clearMobileDevices": "清除移动设备",
     "clearViolations": "清除违规行为",
-    "clearAutomations": "",
-    "clearAutomationsConfirm": "",
+    "clearAutomations": "删除所有自动化与运行记录",
+    "clearAutomationsConfirm": "删除所有自动化及其全部运行记录？",
     "clearTerminationLogs": "清除终止日志",
     "clearLibraryCache": "清除库缓存",
     "clearSessions": "清除会话",
@@ -2477,50 +2477,50 @@
     "suspicious": "可疑的",
     "ok": "好的",
     "selected": "已选择",
-    "snapshots": "",
+    "snapshots": "快照",
     "of": "共",
     "logExplorerUnavailable": "日志浏览器仅在 Docker 环境中可用",
     "tasksTab": {
-      "loading": "",
-      "failedToLoad": "",
-      "jobQueues": "",
-      "jobQueuesDesc": "",
-      "description": "",
-      "schedule": "",
-      "completed": "",
-      "scheduled": "",
-      "processing": "",
-      "onDemand": "",
-      "notInitialized": "",
-      "backgroundServices": "",
-      "backgroundServicesDesc": "",
-      "interval": "",
-      "eventConnections": "",
-      "eventConnectionsDesc": "",
-      "every": "",
-      "eventDriven": "",
+      "loading": "正在加载任务……",
+      "failedToLoad": "加载任务状态失败",
+      "jobQueues": "作业队列",
+      "jobQueuesDesc": "BullMQ 后台作业处理队列",
+      "description": "描述",
+      "schedule": "计划",
+      "completed": "已完成",
+      "scheduled": "已计划",
+      "processing": "处理中",
+      "onDemand": "按需",
+      "notInitialized": "未初始化",
+      "backgroundServices": "后台服务",
+      "backgroundServicesDesc": "基于间隔与事件驱动的后台服务",
+      "interval": "间隔",
+      "eventConnections": "事件连接",
+      "eventConnectionsDesc": "此进程持有的开放公共 API 事件连接（GET /api/v2/public/events）",
+      "every": "每 {{interval}}",
+      "eventDriven": "事件驱动",
       "queues": {
-        "notifications": "",
-        "notificationsDesc": "",
-        "imports": "",
-        "importsDesc": "",
-        "maintenance": "",
-        "maintenanceDesc": "",
-        "librarySync": "",
-        "librarySyncDesc": "",
-        "versionCheck": "",
-        "versionCheckDesc": "",
-        "inactivityCheck": "",
-        "inactivityCheckDesc": "",
-        "backup": "",
-        "backupDesc": ""
+        "notifications": "通知",
+        "notificationsDesc": "Discord、Webhook、推送",
+        "imports": "导入",
+        "importsDesc": "Tautulli / Jellystat 历史",
+        "maintenance": "维护",
+        "maintenanceDesc": "数据标准化与清理",
+        "librarySync": "媒体库同步",
+        "librarySyncDesc": "媒体库元数据同步",
+        "versionCheck": "版本检查",
+        "versionCheckDesc": "GitHub 版本检查",
+        "inactivityCheck": "不活跃检查",
+        "inactivityCheckDesc": "账户不活跃监控",
+        "backup": "备份",
+        "backupDesc": "计划数据库备份"
       },
-      "dlq_other": ""
+      "dlq_other": "DLQ：{{count}}"
     },
     "clientErrors": {
-      "title": "",
-      "description": "",
-      "empty": ""
+      "title": "浏览器错误",
+      "description": "自加载以来此标签页未捕获的错误。不会持久保存。",
+      "empty": "未捕获到错误"
     }
   },
   "media": {
@@ -2528,16 +2528,16 @@
       "shelves": {
         "recentlyAddedMovies": "最近添加的电影",
         "recentlyAddedShows": "最近添加的剧集",
-        "recentlyUpdated": "",
+        "recentlyUpdated": "最近更新",
         "mostPopularMovies": "最受欢迎的电影",
         "mostPopularShows": "最受欢迎的剧集",
-        "recentlyAddedAlbums": "",
-        "mostPlayedArtists": "",
+        "recentlyAddedAlbums": "最近添加的专辑",
+        "mostPlayedArtists": "播放最多的艺人",
         "emptyRecentlyAdded": "这段时间里没有添加任何内容",
-        "emptyRecentlyUpdated": "",
+        "emptyRecentlyUpdated": "此期间没有替换任何内容",
         "emptyMostPopular": "这段时间内没有播放",
         "captionRecentlyAdded": "跨服务器支持",
-        "captionRecentlyUpdated": "",
+        "captionRecentlyUpdated": "更好的副本替换了此处的版本",
         "captionMostPopular": {
           "day": "今天",
           "week": "最近 7 天",
@@ -2550,8 +2550,8 @@
       "card": {
         "addedCompactAgo": "{{age}}前添加",
         "newEpisodes_other": "{{count}} 集新内容",
-        "replacedEpisodes_other": "",
-        "newEpisodesChip_other": ""
+        "replacedEpisodes_other": "{{count}} 集剧集被替换",
+        "newEpisodesChip_other": "{{count}} 集新内容"
       },
       "deadWeight": {
         "viewAll": "查看全部"
@@ -2566,24 +2566,24 @@
     },
     "genres": {
       "cards": {
-        "withPlays": "",
-        "ofGenres": "",
-        "topFiveShare": "",
-        "largestRise": "",
-        "largestFall": ""
+        "withPlays": "有播放的流派",
+        "ofGenres": "共 {{count}} 个",
+        "topFiveShare": "前五名占比",
+        "largestRise": "最大上升",
+        "largestFall": "最大下降"
       },
       "share": {
-        "title": "",
-        "items": "",
-        "plays": "",
-        "sortGap": "",
-        "showAll": ""
+        "title": "媒体库占比 vs 播放占比",
+        "items": "条目占比",
+        "plays": "播放占比",
+        "sortGap": "差距",
+        "showAll": "显示全部 {{count}} 个"
       },
       "trends": {
-        "title": ""
+        "title": "各类型的趋势"
       },
       "chart": {
-        "itemCount_other": ""
+        "itemCount_other": "{{count}} 个标题"
       },
       "table": {
         "title": "流派分类",
@@ -2591,7 +2591,7 @@
           "genre": "流派",
           "plays": "播放",
           "watchTime": "观看时长",
-          "topViewer": ""
+          "topViewer": "观看最多者"
         }
       },
       "empty": {
@@ -2600,20 +2600,20 @@
       },
       "loadError": "无法加载类型",
       "sheet": {
-        "description": "",
-        "whoPlays": "",
-        "ofCountedPlays": "",
-        "topTitles": "",
-        "topArtists": "",
-        "browse": "",
-        "allGenresPeak": "",
-        "artistCount_other": ""
+        "description": "所选范围内此流派的播放、观看者和标题",
+        "whoPlays": "谁在播放",
+        "ofCountedPlays": "占已计播放次数的比例",
+        "topTitles": "热门标题",
+        "topArtists": "热门艺人",
+        "browse": "浏览此类型",
+        "allGenresPeak": "所有类型峰值 {{hour}}",
+        "artistCount_other": "{{count}} 位艺术家"
       }
     },
     "detail": {
       "title": "媒体详情",
       "breadcrumb": {
-        "ariaLabel": ""
+        "ariaLabel": "面包屑导航"
       },
       "notFound": {
         "title": "未找到媒体",
@@ -2622,13 +2622,13 @@
       "hero": {
         "loadError": "无法加载此标题",
         "meta": {
-          "seasons_other": "",
-          "episodes_other": ""
+          "seasons_other": "{{count}} 季",
+          "episodes_other": "{{count}} 集"
         },
         "availability": {
-          "added": "",
-          "addedRemoved": "",
-          "replaced": ""
+          "added": "{{date}} 添加",
+          "addedRemoved": "{{added}} 添加 – {{removed}} 移除",
+          "replaced": "{{date}} 替换"
         },
         "removedEverywhere": {
           "caption": "在任何已连接的服务器上不再可用"
@@ -2640,13 +2640,13 @@
       },
       "kpis": {
         "ariaLabel": "观看统计",
-        "yourPlays": "",
-        "yourWatchTime": "",
-        "yourListenTime": "",
-        "yourCompletion": "",
-        "lastWatched": "",
-        "lastPlayed": "",
-        "episodesOf": "",
+        "yourPlays": "你的播放次数",
+        "yourWatchTime": "你的观看时长",
+        "yourListenTime": "你的收听时长",
+        "yourCompletion": "你的完成度",
+        "lastWatched": "最近观看",
+        "lastPlayed": "最近播放",
+        "episodesOf": "共 {{total}} 集中的 {{watched}} 集",
         "loadError": "无法加载观看统计数据",
         "completionLoadError": "无法加载完成",
         "plays": {
@@ -2654,65 +2654,65 @@
           "caption": "恢复链，排除短会话"
         },
         "watchTime": {
-          "detail": ""
+          "detail": "最近 30 天 +{{hours}} 小时"
         },
         "viewers": {
           "label": "观众",
-          "labelMusic": "",
+          "labelMusic": "听众",
           "detail": "跨越所有服务器"
         },
         "completion": {
           "label": "平均完成",
-          "detail": "",
-          "detailMovie": "",
-          "detailMusic": ""
+          "detail": "{{total}} 人中有 {{finished}} 人看完了每一集",
+          "detailMovie": "{{total}} 人中有 {{finished}} 人完整看完",
+          "detailMusic": "{{total}} 人中有 {{finished}} 人听完"
         },
-        "watchedByOthers_other": "",
-        "playedByOthers_other": ""
+        "watchedByOthers_other": "另有 {{count}} 人观看",
+        "playedByOthers_other": "另有 {{count}} 人播放"
       },
       "watchers": {
         "title": "观看者",
-        "titleMusic": "",
+        "titleMusic": "听众",
         "loadError": "无法加载观看者",
         "empty": "目前还没有人看到这一点。",
-        "emptyMusic": "",
+        "emptyMusic": "还没有人播放过此内容。",
         "lastWatchedAgo": "{{age}} 以前",
-        "completionLabel": "",
+        "completionLabel": "已完成 {{percent}}%",
         "columns": {
           "plays": "播放",
           "episodes": "剧集",
           "completion": "完成",
           "lastWatched": "上次观看",
-          "lastPlayed": ""
+          "lastPlayed": "最近播放"
         }
       },
       "seasons": {
         "title": "季",
         "loadError": "无法加载季数据",
         "empty": "暂无季数据",
-        "watchedPct": "",
-        "stripSummary": "",
+        "watchedPct": "已观看 {{percent}}%",
+        "stripSummary": "{{season}}：已观看 {{percent}}%",
         "episodeLabel": {
-          "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "watched": "{{code}}：已观看",
+          "partial": "{{code}}：部分观看",
+          "unwatched": "{{code}}：未观看"
         },
-        "episodeCount_other": ""
+        "episodeCount_other": "{{count}} 集"
       },
       "albums": {
-        "title": "",
-        "loadError": "",
-        "trackCount_other": ""
+        "title": "专辑",
+        "loadError": "无法加载专辑",
+        "trackCount_other": "{{count}} 首曲目"
       },
       "album": {
-        "kind": "",
-        "loadError": "",
-        "finishedCaption": "",
-        "vsPrior30": "",
-        "tracksCaption": "",
+        "kind": "专辑",
+        "loadError": "无法加载此专辑",
+        "finishedCaption": "播放到结尾",
+        "vsPrior30": "对比前 30 天",
+        "tracksCaption": "播放次数，全部时间",
         "columns": {
-          "title": "",
-          "length": ""
+          "title": "标题",
+          "length": "时长"
         }
       },
       "platforms": {
@@ -2742,7 +2742,7 @@
           "episodes": "剧集",
           "added": "已添加"
         },
-        "versionLabel": ""
+        "versionLabel": "文件 {{index}}"
       }
     },
     "posterCard": {
@@ -2755,16 +2755,16 @@
         "watchedByOthers": "其他人已观看的",
         "watchedByYou": "您已观看的"
       },
-      "versionsChip": "",
-      "moreServers": "",
+      "versionsChip": "{{count}}×",
+      "moreServers": "+{{count}} 个更多",
       "viewers_other": "{{count}} 位观众",
-      "versions_other": "",
-      "albumCount_other": ""
+      "versions_other": "{{count}} 个版本",
+      "albumCount_other": "{{count}} 张专辑"
     },
     "grid": {
       "toolbar": {
         "ariaLabel": "筛选和排序",
-        "searchPlaceholder": "",
+        "searchPlaceholder": "搜索标题……",
         "searchLabel": "搜索标题",
         "filtersLabel": "过滤器",
         "filtersSheetTitle": "过滤器",
@@ -2776,23 +2776,23 @@
           "partial": "部分观看",
           "unwatched": "未观看"
         },
-        "unwatchedByLens": "",
+        "unwatchedByLens": "{{name}} 未观看",
         "resolutionLabel": "分辨率",
         "resolutionAll": "任何分辨率",
-        "videoCodecLabel": "",
-        "videoCodecAll": "",
+        "videoCodecLabel": "视频编解码器",
+        "videoCodecAll": "任意视频编解码器",
         "hdrLabel": "动态范围",
         "hdrAll": "任何",
         "hdrOnly": "仅限HDR",
-        "hdrChip": "",
-        "audioCodecLabel": "",
-        "audioCodecAll": "",
-        "audioChannelsLabel": "",
-        "audioChannelsAll": "",
-        "atmosLabel": "",
-        "atmosAll": "",
-        "atmosOnly": "",
-        "atmosChip": "",
+        "hdrChip": "HDR",
+        "audioCodecLabel": "音频编解码器",
+        "audioCodecAll": "任意音频编解码器",
+        "audioChannelsLabel": "音频声道",
+        "audioChannelsAll": "任意声道布局",
+        "atmosLabel": "音频",
+        "atmosAll": "任意",
+        "atmosOnly": "仅 Dolby Atmos",
+        "atmosChip": "Atmos",
         "genreLabel": "类型",
         "genreAll": "不限分类",
         "serverLabel": "服务器",
@@ -2803,9 +2803,9 @@
         "yearToLabel": "结束年份",
         "sizeGbMinLabel": "最小 (GB)",
         "sizeGbMaxLabel": "最大 (GB)",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
+        "sizeChipAtLeast": "≥ {{min}} GB",
+        "sizeChipAtMost": "≤ {{max}} GB",
+        "sizeChipRange": "{{min}}–{{max}} GB",
         "sortLabel": "排序",
         "sort": {
           "title": "标题 A–Z",
@@ -2815,16 +2815,16 @@
           "watch_time": "观看时长",
           "viewers": "观看人数"
         },
-        "count": "",
-        "countTotal_other": ""
+        "count": "共 {{total}} 个标题中的 {{loaded}} 个 · {{size}}",
+        "countTotal_other": "{{count}} 个标题 · {{size}}"
       },
       "scrubber": {
         "label": "跳转到字母",
-        "current": ""
+        "current": "字母 {{letter}}"
       },
       "loaderError": "无法加载更多标题",
       "emptyFilter": "没有匹配这些过滤规则的标题",
-      "emptySearch": "",
+      "emptySearch": "没有标题匹配“{{query}}”",
       "loadError": "无法加载该目录"
     }
   },
@@ -2851,16 +2851,16 @@
     },
     "seasons": {
       "all": "所有季",
-      "item": ""
+      "item": "S{{number}}"
     },
     "flags": {
       "fourK": "4K请求",
       "auto": "从观察列表自动请求"
     },
     "hero": {
-      "line": "",
-      "landed": "",
-      "waiting": ""
+      "line": "由 {{name}} 请求 · {{date}} · {{tail}}",
+      "landed": "{{wait}} 后完成",
+      "waiting": "仍在等待"
     },
     "mediaPanel": {
       "title": "请求",
@@ -2870,11 +2870,11 @@
     "userCard": {
       "title": "请求",
       "loadError": "无法加载任务",
-      "viewAll": "",
+      "viewAll": "查看全部（还有 {{count}} 个）",
       "showLess": "显示更少",
       "summary": {
         "requests": "请求",
-        "medianWait": "",
+        "medianWait": "中位等待时长 {{duration}}",
         "approvalRate": "审批通过率",
         "neverWatched": "从未观看过"
       },
@@ -2895,9 +2895,9 @@
         "requested": "已请求",
         "watched": "已观看",
         "neverPlayed": "从未播放过",
-        "ofLanded": "",
+        "ofLanded": "占已完成的 {{share}}",
         "onDisk": "{{size}}在磁盘上",
-        "landedOf_other": ""
+        "landedOf_other": "{{count}} 个已到达"
       }
     },
     "funnel": {
@@ -2906,7 +2906,7 @@
       "requested": "已请求",
       "landed": "已到达",
       "watched": "已观看",
-      "share": "",
+      "share": "{{total}} 次请求中的 {{count}} 次",
       "empty": "暂无申请记录"
     },
     "unplayed": {

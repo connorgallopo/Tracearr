@@ -218,6 +218,7 @@
     "user_other": "{{count}} användare",
     "session_one": "",
     "session_other": "{{count}} sessioner",
+    "download_one": "",
     "download_other": "",
     "stream_one": "{{count}} ström",
     "stream_other": "{{count}} strömmar",

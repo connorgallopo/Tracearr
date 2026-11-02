@@ -26,7 +26,7 @@
     "connectedTo": "Connecté à {{name}}",
     "plexAuthFailed": "Échec de l'authentification à Plex",
     "plexStartFailed": "Échec du démarrage de la connexion à Plex",
-    "plexExpired": "",
+    "plexExpired": "L'authentification Plex a expiré. Démarrer là de nouveau.",
     "serverConnectFailed": "Échec de la connexion au serveur",
     "createAccountFailed": "Échec de la création du compte",
     "invalidCredentials": "Adresse email ou mot de passe invalide",
@@ -38,20 +38,20 @@
     "validateClaimCode": "Valider le code de réclamation",
     "claimCodeSecurityNote": "Cette mesure de sécurité garantit que seuls les utilisateurs autorisés peuvent effectuer la configuration initiale",
     "member": {
-      "tabLocal": "",
-      "tabMember": "",
-      "server": "",
-      "signingInTo": "",
-      "passwordHint": "",
-      "quickConnectHint": "",
-      "waiting": "",
-      "copyCode": "",
-      "usePassword": "",
-      "useQuickConnect": "",
-      "codeExpired": "",
-      "newCode": "",
-      "refused": "",
-      "notPermitted": ""
+      "tabLocal": "Compte Tracearr",
+      "tabMember": "Serveur multimédia",
+      "server": "Serveur",
+      "signingInTo": "Se connecter à {{name}}",
+      "passwordHint": "Utilisez le nom d'utilisateur et le mot de passe pour {{name}}.",
+      "quickConnectHint": "Ouvrez Jellyfin, dirigez-vous vers connexion rapide, et entrez ce code.",
+      "waiting": "En attente d'approbation",
+      "copyCode": "Copié le code",
+      "usePassword": "Utilisez votre mot de passe à la place",
+      "useQuickConnect": "Utilisé la connexion rapide à la place",
+      "codeExpired": "Ce code a expiré.",
+      "newCode": "Nouveau code",
+      "refused": "Connexion non disponible pour ce compte.",
+      "notPermitted": "Vous n'êtes pas autorisé à vous connecter. S'il vous plaît, contacter le propriétaire du serveur."
     }
   },
   "dashboard": {
@@ -65,87 +65,96 @@
     "bandwidth": "Bande passante",
     "noActiveStreams": "Aucune lecture en cours",
     "streamsAppearHere": "Les lectures actives apparaîtront ici lorsque les utilisateurs commenceront à regarder",
-    "dayStreak": "",
+    "dayStreak": "Séquence de jours",
     "view": {
-      "label": "",
-      "admin": "",
-      "me": ""
+      "label": "Vue du tableau de bord",
+      "admin": "Serveur",
+      "me": "Personnel"
     },
     "me": {
-      "last30": "",
-      "streakDetail": "",
-      "topTitles": "",
+      "last30": "Dernier 30 jours",
+      "streakDetail": "jours consécutif avec une lecture",
+      "topTitles": "Vos titres les plus populaires",
       "welcome": {
-        "title": "",
-        "description": "",
-        "browse": ""
+        "title": "Votre tableau de bord se rempli selon vos visionnages",
+        "description": "Lectures, séquences et vos titres les plus populaires s'affichent ici quelques minutes après le démarrage d'un visionnage.",
+        "browse": "Parcourir la bibliothèque"
       },
       "requests": {
-        "title": "",
-        "requestedAgo": "",
-        "seeAll": "",
-        "availableThisWeek_other": ""
+        "title": "Vos requêtes",
+        "requestedAgo": "Demandé il y'a {{age}}",
+        "seeAll": "Tout voir",
+        "availableThisWeek_one": "Devenu disponible cette semaine : {{count}}",
+        "availableThisWeek_other": "Devenu disponible cette semaine: {{count}}"
       },
       "link": {
         "title": "",
         "description": "",
         "action": ""
       },
-      "episodes_other": ""
+      "episodes_one": "{{count}} épisode",
+      "episodes_other": "{{count}} épisodes"
     },
     "resources": {
-      "system": "",
-      "perServer": "",
-      "average": ""
+      "system": "Système",
+      "perServer": "par serveur",
+      "average": "Moy:"
     },
-    "unknownLocation": "",
-    "unknownQuality": "",
-    "othersStreaming_other": ""
+    "unknownLocation": "Localisation inconnue",
+    "unknownQuality": "Qualité inconnue",
+    "othersStreaming_one": "{{count}} lecture d'autre flux",
+    "othersStreaming_other": "{{count}} lectures d'autres flux"
   },
   "yourStats": {
-    "titles": "",
-    "howYouWatch": "",
+    "titles": "Titres",
+    "howYouWatch": "De quelle façon vous regardez",
     "viewerType": {
       "completionist": {
-        "label": "",
-        "desc": ""
+        "label": "Complétioniste",
+        "desc": "Vous avez terminé {{rate}}% des contenus débutés."
       },
       "rewatcher": {
-        "label": "",
-        "desc": ""
+        "label": "Revisionneur",
+        "desc": "Vous êtes revenu à vos favoris."
       },
       "sampler": {
-        "label": "",
-        "desc": ""
+        "label": "Explorateur",
+        "desc": "Vous essayez beaucoup de contenus avant d'en trouver un."
       },
       "casual": {
         "label": "",
         "desc": ""
       }
     },
-    "habits": "",
-    "seeActivity": "",
-    "allTime": "",
-    "watchTime": "",
+    "habits": "Votre jour le plus occupé est le {{day}}, et votre heure la plus occupée est à {{hour}}",
+    "seeActivity": "Voir l'activité",
+    "allTime": "Depuis toujours",
+    "watchTime": "Temps de visionnage",
     "span": {
-      "minutes_other": "",
-      "hours_other": "",
-      "days_other": "",
-      "weeks_other": ""
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} heure",
+      "hours_other": "{{count}} heures",
+      "days_one": "{{count}} jour",
+      "days_other": "{{count}} jours",
+      "weeks_one": "{{count}} semaine",
+      "weeks_other": "{{count}} semaines"
     },
-    "longestStreak": "",
-    "firstPlay": "",
+    "longestStreak": "Séquence la plus longue",
+    "firstPlay": "Première lecture",
     "biggestBinge": "",
     "topGenres": "",
     "allTimeCaption": "",
     "tier": {
-      "watched": "",
-      "engaged": "",
-      "sampled": "",
-      "abandoned": "",
-      "rewatched": ""
+      "watched": "Regardé",
+      "engaged": "Commencé",
+      "sampled": "Échantillonné",
+      "abandoned": "Abandonné",
+      "rewatched": "Revisionné"
     },
+    "days_one": "",
     "days_other": "",
+    "bingeValue_one": "",
     "bingeValue_other": ""
   },
   "users": {
@@ -155,12 +164,12 @@
     "resetTrustScore": "Réinitialiser le score de confiance",
     "resetTrustScoreConfirm": "Êtes-vous sûr de vouloir réinitialiser le score de confiance à 100 ? Cette action est irréversible.",
     "mergeUsers": "Fusionner les utilisateurs",
-    "mergeTitleSuggestion": "",
-    "mergeTitleBulk": "",
+    "mergeTitleSuggestion": "Est-ce la même personne ?",
+    "mergeTitleBulk": "Fusionner ces utilisateurs ?",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
     "mergeReasonUsername": "",
-    "mergeKeep": "",
+    "mergeKeep": "Conserver",
     "mergeFoldIn": "",
     "mergeSwap": "",
     "mergeRequired": "",
@@ -172,13 +181,13 @@
     "mergeCarriesOver": "",
     "mergeDeleted": "",
     "mergeRulesKept": "",
-    "mergeIrreversibleTitle": "",
+    "mergeIrreversibleTitle": "Cette action est irréversible",
     "mergeIrreversibleBody": "",
     "mergeServerLabel": "Serveur",
-    "mergeServerUnknown": "",
-    "mergeIrreversibleAcknowledge": "",
+    "mergeServerUnknown": "Serveur inconnu",
+    "mergeIrreversibleAcknowledge": "Je comprends que les deux comptes sur ce serveur ne pourront être re-séparé",
     "mergeServerAccountRemoved": "Supprimé",
-    "mergeConfirmInto": "",
+    "mergeConfirmInto": "Fusionner vers {{keepName}}",
     "mergeSelectTwo": "Sélectionnez exactement deux utilisateurs à fusionner",
     "mergeSameIdentity": "Ces comptes appartiennent déjà au même utilisateur",
     "mergeSelectAllActive": "Désélectionnez tous les éléments et choisissez exactement deux utilisateurs à fusionner",
@@ -188,7 +197,7 @@
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "Vérification",
-    "suggestionsNotSame": "",
+    "suggestionsNotSame": "Pas la même personne",
     "suggestionsMatchEmail": "Même adresse email",
     "suggestionsMatchEmailUsername": "",
     "suggestionsMatchUsername": "Nom d'utilisateur identique",
@@ -201,7 +210,7 @@
     "filterHasAccessTo": "A accès à",
     "filterHasAccessToPlaceholder": "N’importe quel serveur",
     "filterHasAccessToHint": "Affiche les personnes ayant un compte actif sur chaque serveur sélectionné.",
-    "merged": "",
+    "merged": "Fusionné",
     "filterRoleAll": "",
     "filterSignInAll": "",
     "filterPendingOnly": "",
@@ -211,7 +220,7 @@
     "signInOff": "",
     "signedInAgo": "",
     "neverSignedIn": "",
-    "selectAllUsers_one": "",
+    "selectAllUsers_one": "Sélectionner {{count}} utilisateur",
     "selectAllUsers_other": "Sélectionner les {{count}} utilisateurs",
     "resetTrustScoreTitle_one": "Réinitialiser le score de confiance pour {{count}} utilisateur",
     "resetTrustScoreTitle_other": "Réinitialiser le score de confiance pour {{count}} utilisateurs",
@@ -225,6 +234,7 @@
     "suggestionsPairEmailUsernameMore_other": "",
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_other": "",
+    "pendingLink_one": "",
     "pendingLink_other": ""
   },
   "userDetail": {
@@ -293,6 +303,7 @@
       "daysActive": "",
       "ofDays": "",
       "streak": "",
+      "transcodes_one": "",
       "transcodes_other": ""
     },
     "overview": {
@@ -310,6 +321,7 @@
       "localShare": "",
       "viewAllDevices": "",
       "allSessions": "",
+      "finishedCount_one": "",
       "finishedCount_other": ""
     },
     "uniqueCount": "",
@@ -317,6 +329,7 @@
     "unknownDevice": "",
     "viewAllMore": "",
     "adjustTrustScoreDesc": "",
+    "ipCount_one": "",
     "ipCount_other": ""
   },
   "history": {
@@ -342,8 +355,8 @@
     "trailer": "",
     "filters": {
       "columns": "",
-      "countries": "",
-      "mediaType": "",
+      "countries": "Pays",
+      "mediaType": "Type de média",
       "types": "",
       "network": "",
       "remote": "",
@@ -352,11 +365,13 @@
       "clearPlatforms": "",
       "clearCountries": "",
       "clearFilters": "",
+      "selected_one": "",
       "selected_other": ""
     },
     "detail": {
       "watch": "",
       "summary": "",
+      "segmentsShown_one": "",
       "segmentsShown_other": ""
     },
     "stream": {
@@ -387,6 +402,7 @@
       "hwEncode": "",
       "speed": "",
       "throttled": "",
+      "channelCount_one": "",
       "channelCount_other": ""
     }
   },
@@ -410,7 +426,9 @@
         "title": "",
         "description": ""
       },
+      "movieCount_one": "",
       "movieCount_other": "",
+      "showCount_one": "",
       "showCount_other": ""
     },
     "quality": {
@@ -444,6 +462,7 @@
       "resolution": {
         "tooltip": "",
         "empty": "",
+        "itemCount_one": "",
         "itemCount_other": ""
       }
     },
@@ -511,8 +530,11 @@
         },
         "age": {
           "yearsMonths": "",
+          "days_one": "",
           "days_other": "",
+          "months_one": "",
           "months_other": "",
+          "years_one": "",
           "years_other": ""
         }
       },
@@ -538,7 +560,9 @@
         "versions": "",
         "label": ""
       },
+      "groupCount_one": "",
       "groupCount_other": "",
+      "itemCount_one": "",
       "itemCount_other": ""
     },
     "watch": {
@@ -664,6 +688,7 @@
           "title": "",
           "description": ""
         },
+        "titles_one": "",
         "titles_other": ""
       },
       "monthly": {
@@ -693,8 +718,10 @@
           "title": "",
           "description": ""
         },
+        "tooltip_one": "",
         "tooltip_other": ""
       },
+      "watchesValue_one": "",
       "watchesValue_other": ""
     }
   },
@@ -715,7 +742,9 @@
     "noQualityData": "",
     "noConcurrentData": "",
     "peakConcurrent": "",
+    "tierItems_one": "",
     "tierItems_other": "",
+    "playsShare_one": "",
     "playsShare_other": ""
   },
   "violations": {
@@ -2364,10 +2393,15 @@
     "areaPlaces": "",
     "noneInView": "",
     "showAll": "",
+    "streamCount_one": "",
     "streamCount_other": "",
+    "peopleCount_one": "",
     "peopleCount_other": "",
+    "viewInHistory_one": "",
     "viewInHistory_other": "",
+    "streamsAcrossPlaces_one": "",
     "streamsAcrossPlaces_other": "",
+    "inViewCount_one": "",
     "inViewCount_other": ""
   },
   "devices": {
@@ -2405,6 +2439,7 @@
     "deliveredAtBitrate": "",
     "empty": "",
     "panelTitle": "",
+    "requests_one": "",
     "requests_other": ""
   },
   "statsBandwidth": {
@@ -2546,6 +2581,7 @@
         "backup": "",
         "backupDesc": ""
       },
+      "dlq_one": "",
       "dlq_other": ""
     },
     "clientErrors": {
@@ -2705,7 +2741,9 @@
           "detailMovie": "",
           "detailMusic": ""
         },
+        "watchedByOthers_one": "",
         "watchedByOthers_other": "",
+        "playedByOthers_one": "",
         "playedByOthers_other": ""
       },
       "watchers": {
@@ -2741,6 +2779,7 @@
       "albums": {
         "title": "",
         "loadError": "",
+        "trackCount_one": "",
         "trackCount_other": ""
       },
       "album": {
@@ -2800,6 +2839,7 @@
       "viewers_other": "{{count}} spectateurs",
       "versions_one": "",
       "versions_other": "",
+      "albumCount_one": "",
       "albumCount_other": ""
     },
     "grid": {

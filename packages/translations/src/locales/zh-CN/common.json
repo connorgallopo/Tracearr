@@ -60,16 +60,16 @@
   "playback": {
     "playing": "播放中",
     "paused": "已暂停",
-    "buffering": "",
+    "buffering": "缓冲中",
     "stopped": "已停止",
     "directPlay": "直接播放",
     "directStream": "直接串流",
-    "audioTranscode": "",
+    "audioTranscode": "音频转码",
     "transcode": "转码",
     "hwTranscode": "硬件转码",
-    "burnIn": "",
+    "burnIn": "字幕烧录",
     "watched": "已观看",
-    "played": ""
+    "played": "已播放"
   },
   "severity": {
     "low": "低",
@@ -101,8 +101,8 @@
     "short7Days": "7天",
     "short30Days": "30天",
     "shortYear": "1年",
-    "shortAll": "",
-    "timeRange": ""
+    "shortAll": "全部",
+    "timeRange": "时间范围"
   },
   "labels": {
     "date": "日期",
@@ -110,7 +110,7 @@
     "content": "的内容",
     "platform": "平台",
     "location": "位置",
-    "local": "",
+    "local": "本地",
     "ipAddress": "IP 地址",
     "quality": "品质",
     "status": "状态",
@@ -134,7 +134,7 @@
     "serverOwner": "服务器所有者",
     "resolution": "分辨率",
     "watchTime": "观看时长",
-    "listenTime": "",
+    "listenTime": "收听时长",
     "pausedTime": "暂停时间",
     "sessionDetails": "会话详情",
     "recentSessions": "最近会话",
@@ -154,13 +154,13 @@
     "streamDetails": "流详情",
     "transcodeReason": "转码原因",
     "loadMore": "载入更多",
-    "playback": "",
-    "plays": "",
-    "weekOf": "",
-    "viewers": "",
-    "watchHours": "",
-    "completion": "",
-    "serverLegend": ""
+    "playback": "播放",
+    "plays": "播放次数",
+    "weekOf": "{{date}} 所在周",
+    "viewers": "观看人数",
+    "watchHours": "观看小时数",
+    "completion": "完成度",
+    "serverLegend": "服务器图例"
   },
   "search": {
     "searchUsers": "搜索用户……",
@@ -193,7 +193,7 @@
     "episode_plural": "剧集",
     "track": "轨迹",
     "track_plural": "曲目",
-    "artist_plural": "",
+    "artist_plural": "艺术家",
     "liveTV": "电视直播",
     "photo": "照片",
     "tv": "电视机",
@@ -216,7 +216,7 @@
   "count": {
     "user_other": "{{count}} 个用户",
     "session_other": "{{count}}会话",
-    "download_other": "",
+    "download_other": "{{count}}下载",
     "stream_other": "{{count}}流",
     "server_other": "{{count}}服务器",
     "automation_other": "{{count}} 个自动化",
@@ -229,7 +229,7 @@
     "location_other": "{{count}} 个位置",
     "device_other": "{{count}} 已选",
     "play_other": "{{count}} 次播放",
-    "segment_other": ""
+    "segment_other": "{{count}} 个片段"
   },
   "messages": {
     "noChangesDetected": "未检测到更改"
@@ -247,8 +247,8 @@
     "noJobHistory": "尚无作业历史",
     "noSessionsFound": "未找到会话",
     "noUserData": "没有可用的用户数据",
-    "noPlayData": "",
-    "noLocationData": ""
+    "noPlayData": "暂无播放数据",
+    "noLocationData": "暂无位置数据"
   },
   "confirmations": {
     "unsavedChanges": "有尚未保存的更改，确定要离开吗？"
@@ -260,6 +260,6 @@
     "some": "共 {{total}} 台服务器中的 {{count}} 台",
     "search": "搜索服务器中……",
     "noMatches": "未找到服务器",
-    "historical": ""
+    "historical": "历史"
   }
 }

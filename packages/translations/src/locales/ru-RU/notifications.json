@@ -13,12 +13,12 @@
         "title": "Синхронизация с сервером"
       },
       "serverMarkedHistorical": {
-        "title": "",
-        "message": ""
+        "title": "Сервер отмечен как архивный",
+        "message": "Tracearr больше не обращается к {{name}}. История сервера сохранена."
       },
       "serverResumed": {
-        "title": "",
-        "message": ""
+        "title": "Работа с сервером возобновлена",
+        "message": "Tracearr снова обращается к {{name}}."
       },
       "settingsUpdated": {
         "title": "Настройки обновлены",
@@ -56,29 +56,29 @@
         "message": "Ваша учетная запись Plex была отключена"
       },
       "plexAccountReauthorized": {
-        "title": "",
-        "messageNoServers": "",
-        "partial": "",
-        "unmatched": "",
-        "message_one": "",
-        "message_few": "",
-        "message_many": "",
-        "message_other": ""
+        "title": "Аккаунт Plex авторизован повторно",
+        "messageNoServers": "Токен аккаунта обновлён",
+        "partial": "Токен обновлён, но не принят: {{names}}",
+        "unmatched": "Токен обновлён, но не удалось снова привязать: {{names}}",
+        "message_one": "{{count}} сервер переподключён",
+        "message_few": "{{count}} сервера переподключены",
+        "message_many": "{{count}} серверов переподключено",
+        "message_other": "{{count}} серверов переподключено"
       },
       "jobCompleted": {
         "title": "Вакансия выполнена"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "Автоматизация создана",
+        "message": "Автоматизация успешно создана"
       },
       "automationUpdated": {
-        "title": "",
-        "message": ""
+        "title": "Автоматизация обновлена",
+        "message": "Автоматизация успешно обновлена"
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "Автоматизация удалена",
+        "message": "Автоматизация успешно удалена"
       },
       "streamTerminated": {
         "title": "Поток завершен",
@@ -93,9 +93,9 @@
         "message": "Сервер был успешно обновлен"
       },
       "serverLocationSaved": {
-        "title": "",
-        "queued": "",
-        "waiting": ""
+        "title": "Местоположение сервера сохранено",
+        "queued": "Прошлые локальные сессии обновляются в фоновом режиме.",
+        "waiting": "Прошлые локальные сессии обновятся после завершения текущего задания."
       },
       "syncCompletedWithErrors": {
         "title": "Синхронизация завершена с ошибками"
@@ -103,22 +103,22 @@
       "sessionsDeleted": {
         "title": "Сессии удалены",
         "message_one": "{{count}} сессия удалена",
-        "message_few": "",
-        "message_many": "",
+        "message_few": "{{count}} сессии удалены",
+        "message_many": "{{count}} сессий удалено",
         "message_other": "{{count}} сессий удалено"
       },
       "violationsAcknowledged": {
         "title": "Нарушения подтверждены",
         "message_one": "Подтверждено нарушений: {{count}}",
-        "message_few": "",
-        "message_many": "",
+        "message_few": "Подтверждено нарушений: {{count}}",
+        "message_many": "Подтверждено нарушений: {{count}}",
         "message_other": "Подтверждено нарушений: {{count}}"
       },
       "violationsDismissed": {
         "title": "Нарушения отклонены",
         "message_one": "Нарушение {{count}} отклонено",
-        "message_few": "",
-        "message_many": "",
+        "message_few": "Отклонено нарушений: {{count}}",
+        "message_many": "Отклонено нарушений: {{count}}",
         "message_other": "Отклонено нарушений: {{count}}"
       },
       "apiKeyGenerated": {
@@ -137,12 +137,12 @@
         "title": "Токен сопряжения создан",
         "message": "Сканируйте QR-код вашим мобильным устройством для сопряжения"
       },
-      "identityUpdated": "",
+      "identityUpdated": "Профиль обновлён",
       "trustScoresReset": {
         "title": "Сброс баллов доверия",
         "message_one": "Пользователь {{count}} сброшен на 100",
-        "message_few": "",
-        "message_many": "",
+        "message_few": "Балл сброшен до 100 у {{count}} пользователей",
+        "message_many": "Балл сброшен до 100 у {{count}} пользователей",
         "message_other": "{{count}} пользователей сброшены на 100"
       },
       "claimCodeValidated": {
@@ -150,50 +150,50 @@
         "message": "Теперь вы можете продолжить установку"
       },
       "usersMerged": {
-        "title": "",
-        "automationsKept": ""
+        "title": "Пользователи объединены",
+        "automationsKept": "Оставлена версия целевого пользователя: {{names}}"
       },
       "serverUserSplit": {
-        "title": ""
+        "title": "Аккаунт выделен в отдельного пользователя"
       },
-      "mergeSuggestionDismissed": "",
-      "mergeSuggestionRestored": "",
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": "",
-      "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
-      "newsletterTestQueued": "",
-      "newsletterSendQueued": "",
-      "brandingSaved": "",
-      "suppressionAdded": "",
-      "suppressionRemoved": "",
+      "mergeSuggestionDismissed": "Отмечено: это разные люди",
+      "mergeSuggestionRestored": "Предложение восстановлено",
+      "destinationSaved": "Канал доставки сохранён",
+      "destinationDeleted": "Канал доставки удалён",
+      "destinationTestSent": "Тестовое уведомление отправлено",
+      "destinationTestSentTo": "Тест отправлен на {{address}}",
+      "newsletterSaved": "Рассылка сохранена",
+      "newsletterDeleted": "Рассылка удалена",
+      "newsletterDuplicated": "Копия рассылки создана",
+      "newsletterTestQueued": "Тест для {{address}} поставлен в очередь",
+      "newsletterSendQueued": "Отправка поставлена в очередь",
+      "brandingSaved": "Брендинг писем сохранён",
+      "suppressionAdded": "Адрес добавлен в стоп-лист",
+      "suppressionRemoved": "Адрес удалён из стоп-листа",
       "ownerAccountLinked": "",
       "ownerAccountUnlinked": "",
-      "newsletterRetryQueued_one": "",
-      "newsletterRetryQueued_few": "",
-      "newsletterRetryQueued_many": "",
-      "newsletterRetryQueued_other": ""
+      "newsletterRetryQueued_one": "Повторная отправка для {{count}} получателя",
+      "newsletterRetryQueued_few": "Повторная отправка для {{count}} получателей",
+      "newsletterRetryQueued_many": "Повторная отправка для {{count}} получателей",
+      "newsletterRetryQueued_other": "Повторная отправка для {{count}} получателей"
     },
     "error": {
       "serverAddFailed": "Не удалось добавить сервер",
       "serverRemoveFailed": "Не удалось удалить сервер",
       "serverSyncFailed": "Не удалось синхронизировать сервер",
-      "serverHistoricalFailed": "",
+      "serverHistoricalFailed": "Не удалось изменить статус сервера",
       "settingsUpdateFailed": "Не удалось обновить настройки",
       "copyManual": "",
       "acknowledgeFailed": "Не удалось подтвердить нарушение",
       "dismissFailed": "Не удалось отклонить нарушение",
       "authFailed": "Аутентификация не удалась",
-      "automationCreateFailed": "",
-      "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationCreateFailed": "Не удалось создать автоматизацию",
+      "automationUpdateFailed": "Не удалось обновить автоматизацию",
+      "automationDeleteFailed": "Не удалось удалить автоматизацию",
       "streamTerminateFailed": "Не удалось завершить поток",
       "serverUrlUpdateFailed": "Не удалось обновить URL сервера",
       "serverUpdateFailed": "Не удалось обновить сервер",
-      "serverLocationSaveFailed": "",
+      "serverLocationSaveFailed": "Не удалось сохранить местоположение сервера",
       "serverReorderFailed": "Не удалось изменить порядок серверов",
       "sessionsDeleteFailed": "Не удалось удалить сессии",
       "apiKeyGenerateFailed": "Не удалось сгенерировать ключ API",
@@ -203,37 +203,37 @@
       "deviceRemoveFailed": "Не удалось удалить устройство",
       "deviceRenameFailed": "Не удалось переименовать устройство",
       "sessionsRevokeFailed": "Не удалось отозвать сессии",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "Не удалось обновить профиль",
       "trustScoresResetFailed": "Не удалось сбросить баллы доверия",
       "plexUnlinkFailed": "Не удалось отвязать аккаунт Plex",
-      "plexReauthorizeFailed": "",
+      "plexReauthorizeFailed": "Не удалось повторно авторизовать аккаунт Plex",
       "jobAlreadyRunning": "Вакансия уже запущена",
       "jobStartFailed": "Не удалось запустить задание",
       "jobLoadFailed": "Не удалось загрузить задания по техническому обслуживанию",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "userMergeFailed": "Не удалось объединить пользователей",
+      "serverUserSplitFailed": "Не удалось выделить аккаунт",
+      "mergeSuggestionDismissFailed": "Не удалось отклонить предложение",
+      "mergeSuggestionRestoreFailed": "Не удалось восстановить предложение",
       "invalidClaimCode": {
         "title": "Неверный код владения",
         "message": "Пожалуйста, проверьте журналы сервера"
       },
-      "destinationSaveFailed": "",
-      "destinationDeleteFailed": "",
-      "destinationTestFailed": "",
-      "destinationInUse": "",
-      "destinationUsedByNewsletters": "",
-      "newsletterSaveFailed": "",
-      "newsletterDeleteFailed": "",
-      "newsletterDuplicateFailed": "",
-      "newsletterPreviewFailed": "",
-      "newsletterTestFailed": "",
-      "newsletterSendFailed": "",
-      "newsletterRetryFailed": "",
-      "newsletterSnapshotFailed": "",
-      "brandingSaveFailed": "",
-      "suppressionAddFailed": "",
-      "suppressionRemoveFailed": "",
+      "destinationSaveFailed": "Не удалось сохранить канал доставки: {{error}}",
+      "destinationDeleteFailed": "Не удалось удалить канал доставки: {{error}}",
+      "destinationTestFailed": "Тест не пройден: {{error}}",
+      "destinationInUse": "Всё ещё используется в: {{rules}}",
+      "destinationUsedByNewsletters": "Всё ещё используется в рассылках: {{names}}",
+      "newsletterSaveFailed": "Не удалось сохранить рассылку: {{error}}",
+      "newsletterDeleteFailed": "Не удалось удалить рассылку: {{error}}",
+      "newsletterDuplicateFailed": "Не удалось создать копию рассылки: {{error}}",
+      "newsletterPreviewFailed": "Не удалось создать предпросмотр: {{error}}",
+      "newsletterTestFailed": "Не удалось поставить тест в очередь: {{error}}",
+      "newsletterSendFailed": "Не удалось поставить отправку в очередь: {{error}}",
+      "newsletterRetryFailed": "Не удалось повторить отправку неудавшимся получателям: {{error}}",
+      "newsletterSnapshotFailed": "Не удалось загрузить снимок: {{error}}",
+      "brandingSaveFailed": "Не удалось сохранить брендинг писем: {{error}}",
+      "suppressionAddFailed": "Не удалось добавить адрес: {{error}}",
+      "suppressionRemoveFailed": "Не удалось удалить адрес: {{error}}",
       "ownerAccountLinkFailed": "",
       "ownerAccountUnlinkFailed": ""
     },
