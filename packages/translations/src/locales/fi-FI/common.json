@@ -218,6 +218,7 @@
     "user_other": "{{count}} käyttäjää",
     "session_one": "{{count}} istunto",
     "session_other": "{{count}} istuntoa",
+    "download_one": "",
     "download_other": "",
     "stream_one": "{{count}} striimi",
     "stream_other": "{{count}} striimiä",
