@@ -90,9 +90,9 @@
         "availableThisWeek_other": "Dostępne w tym tygodniu: {{count}}"
       },
       "link": {
-        "title": "",
+        "title": "Twoje konto nie jest jeszcze połączone",
         "description": "",
-        "action": ""
+        "action": "Otwórz ustawienia serwera"
       },
       "episodes_one": "{{count}} odcinek",
       "episodes_few": "{{count}} odcinki",
@@ -611,7 +611,7 @@
         },
         "columns": {
           "hoursPerGb": "Godziny/GB",
-          "lastWatched": ""
+          "lastWatched": "Ostatnio oglądane"
         }
       },
       "matchBadge": {
@@ -638,7 +638,7 @@
       "peakHour": "Godzina szczytu",
       "viewingHours": "Godziny oglądania",
       "peak": "Szczyt:",
-      "viewingTrend": "",
+      "viewingTrend": "Trend oglądania",
       "busiest": "Najbardziej aktywny:",
       "quietest": "Najspokojniejszy:",
       "bingeHighlights": "Maratony serialowe",
@@ -766,8 +766,8 @@
       "monthly": {
         "watchCount": "Liczba obejrzeń",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "Brak danych",
+          "description": "Trendy oglądania pojawią się tutaj, gdy dane będą dostępne"
         }
       },
       "growth": {
@@ -2299,7 +2299,7 @@
         "reset": "Połączenie zresetowane",
         "tls": "Błąd protokołu TLS",
         "http": "HTTP {{status}}",
-        "relay": "",
+        "relay": "Plex Relay",
         "unknown": "Nie udało się połączyć"
       },
       "connectionsReachable": "Osiągalne połączenia: {{reachable}} z {{total}}",
