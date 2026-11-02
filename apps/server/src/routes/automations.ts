@@ -151,7 +151,7 @@ async function retryOnVersionCollision<T>(write: () => Promise<T>): Promise<T> {
     return await write();
   } catch (error) {
     if (!isUniqueViolation(error)) throw error;
-    return await write();
+    return write();
   }
 }
 
@@ -381,12 +381,12 @@ export const automationRoutes: FastifyPluginAsync = async (app) => {
             .then((rows) => rows[0])
         );
         if (!row) return reply.notFound('Session not found');
-        return await dryRun({ definition, sessions: [toRuleSession(row)], user: request.user });
+        return dryRun({ definition, sessions: [toRuleSession(row)], user: request.user });
       }
 
       const cacheService = getCacheService();
       const active = cacheService ? await cacheService.getAllActiveSessions() : [];
-      return await dryRun({ definition, sessions: active, user: request.user });
+      return dryRun({ definition, sessions: active, user: request.user });
     }
   );
 

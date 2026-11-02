@@ -521,7 +521,7 @@ export class LibrarySyncService {
     const heavyOps = await getHeavyOpsStatus();
     if (heavyOps) return null;
     this.markSnapshotRebuilt(key, now);
-    return await this.rebuildSnapshotFromDb(serverId, libraryId);
+    return this.rebuildSnapshotFromDb(serverId, libraryId);
   }
 
   private markSnapshotRebuilt(key: string, at: number): void {

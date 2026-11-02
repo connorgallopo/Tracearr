@@ -280,7 +280,7 @@ async function syncPlexUsers(
 }> {
   try {
     const plexUsers = await fetchPlexUsers(token, serverUrl);
-    return syncServerUsers(serverId, plexUsers, { isPlexServer: true });
+    return await syncServerUsers(serverId, plexUsers, { isPlexServer: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return {
@@ -334,7 +334,7 @@ async function syncMediaServerUsers(
       ...user,
       sharedLibraries: user.sharedLibraries?.flatMap((id) => libraryIdOf.get(id) ?? []),
     }));
-    return syncServerUsers(serverId, withLibraryIds); // isPlexServer defaults to false
+    return await syncServerUsers(serverId, withLibraryIds); // isPlexServer defaults to false
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return {

@@ -176,15 +176,15 @@ const authPlugin: FastifyPluginAsync = async (app) => {
       }
       return;
     }
+    let revoked = false;
     try {
       await request.jwtVerify();
-      if (isTokenRevoked((request.user as AuthUser & { iat?: number }).iat)) {
-        return reply.unauthorized('Session invalidated. Please log in again');
-      }
-      if (!(await assertMobileNotRevoked(app, request, reply))) return;
+      revoked = isTokenRevoked((request.user as AuthUser & { iat?: number }).iat);
+      if (!revoked) await assertMobileNotRevoked(app, request, reply);
     } catch {
       reply.unauthorized('Invalid or expired token');
     }
+    if (revoked) return reply.unauthorized('Session invalidated. Please log in again');
   });
 
   app.decorate('requirePermission', permissionGuard(app));
@@ -203,20 +203,21 @@ const authPlugin: FastifyPluginAsync = async (app) => {
       }
       return;
     }
+    let revoked = false;
     try {
       await request.jwtVerify();
-      if (isTokenRevoked((request.user as AuthUser & { iat?: number }).iat)) {
-        return reply.unauthorized('Session invalidated. Please log in again');
-      }
-      if (!(await assertMobileNotRevoked(app, request, reply))) return;
-      if (request.user.role === 'member') {
-        reply.notFound();
-      } else if (request.user.role !== 'owner') {
-        reply.forbidden('Owner access required');
+      revoked = isTokenRevoked((request.user as AuthUser & { iat?: number }).iat);
+      if (!revoked && (await assertMobileNotRevoked(app, request, reply))) {
+        if (request.user.role === 'member') {
+          reply.notFound();
+        } else if (request.user.role !== 'owner') {
+          reply.forbidden('Owner access required');
+        }
       }
     } catch {
       reply.unauthorized('Invalid or expired token');
     }
+    if (revoked) return reply.unauthorized('Session invalidated. Please log in again');
   });
 
   // Require mobile token decorator - dual-verify: legacy mobile JWTs first,

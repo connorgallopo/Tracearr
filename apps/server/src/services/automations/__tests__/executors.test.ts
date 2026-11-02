@@ -227,11 +227,10 @@ describe('Action Executor Registry', () => {
       resetActionExecutorDeps();
     });
 
-    it('should use no-op dependencies by default', () => {
+    it('should use no-op dependencies by default', async () => {
       const deps = getActionExecutorDeps();
       expect(deps).toBeDefined();
-      // Default deps should not throw
-      expect(async () => await deps.resetUserTrust('user-1', 'rule')).not.toThrow();
+      await expect(deps.resetUserTrust('user-1', 'rule')).resolves.toBeUndefined();
     });
 
     it('should allow setting custom dependencies', () => {

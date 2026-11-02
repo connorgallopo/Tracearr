@@ -47,7 +47,7 @@ async function buildTestApp(): Promise<FastifyInstance> {
       for (const [key, value] of response.headers) {
         reply.header(key, value);
       }
-      return await reply.send(response.body ? await response.text() : null);
+      return reply.send(response.body ? await response.text() : null);
     },
   });
 

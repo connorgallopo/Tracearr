@@ -28,9 +28,15 @@ vi.mock('../../db/client.js', () => ({
   },
 }));
 
+vi.mock('../../services/settings.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/settings.js')>();
+  return { ...actual, getSetting: vi.fn(actual.getSetting) };
+});
+
 import { getAuth } from '../../lib/auth.js';
 import { db } from '../../db/client.js';
-import authPlugin from '../../plugins/auth.js';
+import authPlugin, { loadJwtRevokeSettings } from '../../plugins/auth.js';
+import { getSetting } from '../../services/settings.js';
 import { sessionRoutes } from '../auth/session.js';
 import { registerErrorHandler } from '../../utils/errors.js';
 import { users, servers, authAccounts } from '../../db/schema.js';
@@ -176,6 +182,34 @@ describe('auth decorators with better auth sessions', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.json().username).toBe('owner');
+  });
+
+  it('authenticate and requireOwner refuse a legacy JWT issued before jwtRevokedBefore', async () => {
+    mockBetterAuthSession(null);
+    app = await buildTestApp();
+    const legacyToken = app.jwt.sign(
+      { userId: 'user-1', username: 'owner', role: 'owner', serverIds: [] },
+      { expiresIn: '1h' }
+    );
+    vi.mocked(getSetting).mockResolvedValueOnce(
+      new Date(Date.now() + 60_000).toISOString() as never
+    );
+    await loadJwtRevokeSettings();
+
+    try {
+      for (const url of ['/test/protected', '/test/owner-only']) {
+        const res = await app.inject({
+          method: 'GET',
+          url,
+          headers: { authorization: `Bearer ${legacyToken}` },
+        });
+        expect(res.statusCode).toBe(401);
+        expect(res.json().message).toBe('Session invalidated. Please log in again');
+      }
+    } finally {
+      vi.mocked(getSetting).mockResolvedValueOnce(null as never);
+      await loadJwtRevokeSettings();
+    }
   });
 
   it('rejects requests with neither credential', async () => {

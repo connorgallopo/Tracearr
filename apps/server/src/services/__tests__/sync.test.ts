@@ -84,6 +84,15 @@ describe('syncServer revocation', () => {
     expect(revokeSessionsForServerUsers).not.toHaveBeenCalled();
     expect(clearScope).toHaveBeenCalledExactlyOnceWith('u-back');
   });
+
+  it('reports a failed user write as a sync error instead of rejecting', async () => {
+    vi.mocked(syncUserFromMediaServer).mockResolvedValue(synced('su-1', false));
+    mockReturning.mockRejectedValueOnce(new Error('connection terminated'));
+
+    const result = await syncServer('srv-1', { syncUsers: true, syncLibraries: false });
+
+    expect(result.errors).toEqual([expect.stringContaining('connection terminated')]);
+  });
 });
 
 describe('syncServer library access', () => {

@@ -228,7 +228,7 @@ export const plexPlugin = () =>
             const authResult = await PlexClient.checkOAuthPin(pin.pinId);
 
             if (!authResult) {
-              return ctx.json({ authorized: false, message: 'PIN not yet authorized' });
+              return await ctx.json({ authorized: false, message: 'PIN not yet authorized' });
             }
             await getRedis().del(key);
             expireCookie(ctx, cookie);
@@ -311,7 +311,7 @@ export const plexPlugin = () =>
                 });
 
                 const sessionUser = await createSignedInSession(ctx, user.id);
-                return ctx.json({
+                return await ctx.json({
                   authorized: true,
                   user: { id: sessionUser.id, username: authResult.username, role: 'owner' },
                 });
@@ -371,7 +371,7 @@ export const plexPlugin = () =>
               });
 
               const sessionUser = await createSignedInSession(ctx, user.id);
-              return ctx.json({
+              return await ctx.json({
                 authorized: true,
                 user: { id: sessionUser.id, username: authResult.username, role: 'owner' },
               });
@@ -431,7 +431,7 @@ export const plexPlugin = () =>
                 })
               );
 
-              return ctx.json({
+              return await ctx.json({
                 authorized: true,
                 needsServerSelection: true,
                 servers: testedServers,
@@ -480,7 +480,7 @@ export const plexPlugin = () =>
             });
 
             const sessionUser = await createSignedInSession(ctx, newUser.id);
-            return ctx.json({
+            return await ctx.json({
               authorized: true,
               user: { id: sessionUser.id, username: newUser.username, role: 'owner' },
             });
@@ -683,7 +683,7 @@ export const plexPlugin = () =>
               });
 
             const sessionUser = await createSignedInSession(ctx, newUser.id);
-            return ctx.json({
+            return await ctx.json({
               authorized: true,
               user: { id: sessionUser.id, username: newUser.username, role: 'owner' },
             });
