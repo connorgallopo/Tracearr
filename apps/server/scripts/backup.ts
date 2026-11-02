@@ -117,7 +117,7 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+main().catch((error: unknown) => {
   console.error('\nFatal error:', error);
   process.exit(1);
 });

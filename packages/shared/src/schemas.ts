@@ -932,7 +932,7 @@ export const updateSettingsSchema = z.object({
   // Media browsing: warm poster caches for a server after its library sync completes
   imagePrecacheEnabled: z.boolean().optional(),
   // Media browsing: server whose poster wins when a title exists on multiple servers
-  preferredPosterServerId: z.string().uuid().nullable().optional(),
+  preferredPosterServerId: z.uuid().nullable().optional(),
   // Members see anonymous counts of other people's activity
   memberServerActivity: z.boolean().optional(),
 });

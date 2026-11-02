@@ -675,7 +675,7 @@ export const plexPlugin = () =>
                   librariesSynced: result.librariesSynced,
                 });
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
                 ctx.context.logger.error('Auto-sync failed for Plex server', {
                   err: error,
                   serverId,

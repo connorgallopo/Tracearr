@@ -53,7 +53,9 @@ if (typeof window.matchMedia === 'undefined') {
       matches: false,
       media: query,
       onchange: null,
+      // oxlint-disable-next-line typescript/no-deprecated -- libraries still call the legacy listener API
       addListener: noop,
+      // oxlint-disable-next-line typescript/no-deprecated
       removeListener: noop,
       addEventListener: noop,
       removeEventListener: noop,

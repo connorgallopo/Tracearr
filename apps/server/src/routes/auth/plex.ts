@@ -620,7 +620,7 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
             'Auto-sync completed for new Plex server'
           );
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           app.log.error(
             { err: error, serverId: newServer.id },
             'Auto-sync failed for new Plex server'

@@ -457,6 +457,7 @@ export function Violations() {
           cell: ({ row }) => {
             const violation = row.original;
             return (
+              // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- keeps clicks on the buttons inside from opening the row
               <div
                 className="flex items-center gap-2"
                 onClick={(e) => {

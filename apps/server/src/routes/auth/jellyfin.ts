@@ -104,7 +104,7 @@ export const jellyfinRoutes: FastifyPluginAsync = async (app) => {
               'Auto-sync completed for Jellyfin server'
             );
           })
-          .catch((error) => {
+          .catch((error: unknown) => {
             app.log.error({ err: error, serverId }, 'Auto-sync failed for Jellyfin server');
           });
 

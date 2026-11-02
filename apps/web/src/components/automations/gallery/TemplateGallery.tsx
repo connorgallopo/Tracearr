@@ -116,6 +116,7 @@ export function TemplateGallery({
     <Command className="flex min-h-0 flex-1 flex-col bg-transparent">
       <CommandInput
         ref={searchRef}
+        // oxlint-disable-next-line jsx-a11y/no-autofocus -- the gallery opens to search
         autoFocus
         value={query}
         onValueChange={setQuery}

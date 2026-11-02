@@ -23,6 +23,7 @@ export function useUnsavedChanges(isDirty: boolean) {
     const warn = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       // Older Chromium ignores preventDefault on its own.
+      // oxlint-disable-next-line typescript/no-deprecated
       event.returnValue = '';
     };
 

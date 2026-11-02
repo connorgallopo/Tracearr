@@ -396,6 +396,7 @@ export function Login() {
                   required
                   disabled={claimCodeLoading}
                   className="font-mono text-lg tracking-wider"
+                  // oxlint-disable-next-line jsx-a11y/no-autofocus -- the claim code is the only field on this step
                   autoFocus
                 />
                 <p className="text-muted-foreground text-xs">{t('pages:login.claimCodeHint')}</p>

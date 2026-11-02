@@ -139,7 +139,7 @@ describe('session fan-out', () => {
     const aliceSeen = received(alice, WS_EVENTS.SESSION_STOPPED);
     const bobSeen = received(bob, WS_EVENTS.SESSION_STOPPED);
 
-    broadcastSessionStopped('sess-1');
+    void broadcastSessionStopped('sess-1');
 
     expect(await ownerSeen).toEqual(['sess-1']);
     expect(await aliceSeen).toEqual(['sess-1']);

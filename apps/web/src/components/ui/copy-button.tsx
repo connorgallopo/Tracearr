@@ -23,6 +23,7 @@ function copyWithTextarea(value: string, host: HTMLElement): boolean {
   try {
     textarea.focus({ preventScroll: true });
     textarea.select();
+    // oxlint-disable-next-line typescript/no-deprecated -- navigator.clipboard is missing on plain-http LAN access
     return document.execCommand('copy');
   } catch {
     return false;

@@ -95,7 +95,7 @@ export async function startConnectionBudget(redis: Redis): Promise<void> {
 
   await tick(redis);
   heartbeatTimer = setInterval(() => {
-    tick(redis).catch((err) => console.warn('[ConnectionBudget] Heartbeat failed:', err));
+    tick(redis).catch((err: unknown) => console.warn('[ConnectionBudget] Heartbeat failed:', err));
   }, HEARTBEAT_MS);
   heartbeatTimer.unref();
 }

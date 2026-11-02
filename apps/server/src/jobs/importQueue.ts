@@ -341,7 +341,7 @@ export function startImportWorker(): void {
       .then((removed) => {
         if (removed > 0) console.log(`[Import] Removed ${removed} orphaned Jellystat upload(s)`);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.warn('[Import] Failed to sweep Jellystat uploads:', err);
       });
   }

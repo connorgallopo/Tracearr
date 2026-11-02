@@ -79,7 +79,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
           .set({ color: newColor })
           .where(eq(servers.id, server.id))
           .execute()
-          .catch((err) =>
+          .catch((err: unknown) =>
             app.log.warn({ err, serverId: server.id }, 'Failed to backfill server color')
           );
       }
@@ -255,7 +255,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
           'Auto-sync completed for new server'
         );
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         app.log.error({ err: error, serverId: server.id }, 'Auto-sync failed for new server');
       });
 

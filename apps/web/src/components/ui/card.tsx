@@ -33,6 +33,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 // screen readers, which the DestinationsManager tests assert on.
 function CardTitle({ className, ...props }: React.ComponentProps<'h3'>) {
   return (
+    // oxlint-disable-next-line jsx-a11y/heading-has-content -- children arrive through props
     <h3 data-slot="card-title" className={cn('leading-none font-semibold', className)} {...props} />
   );
 }

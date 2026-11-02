@@ -96,7 +96,7 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
             'Auto-sync completed for Emby server'
           );
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           app.log.error({ err: error, serverId }, 'Auto-sync failed for Emby server');
         });
 

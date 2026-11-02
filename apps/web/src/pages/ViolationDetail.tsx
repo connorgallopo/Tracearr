@@ -405,7 +405,7 @@ export function ViolationDetail() {
   const userDisplayName = violation.user.identityName ?? violation.user.username;
 
   const userIdToName: Record<string, string> = {
-    ...(violation.userNames ?? {}),
+    ...violation.userNames,
     [violation.user.id]: userDisplayName,
   };
 

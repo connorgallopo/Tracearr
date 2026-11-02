@@ -94,6 +94,7 @@ export function Shelf({
           matching -ml-1.5 cancels pl-1.5's visual shift so the row still lines
           up with the heading above it. */}
       <ul
+        // oxlint-disable-next-line jsx-a11y/no-redundant-roles -- Safari drops list semantics once Tailwind resets list-style
         role="list"
         className="-ml-1.5 flex snap-x snap-proximity scrollbar-thin gap-4 overflow-x-auto pt-3 pb-2 pl-1.5"
       >

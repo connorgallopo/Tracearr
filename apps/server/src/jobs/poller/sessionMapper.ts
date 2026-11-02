@@ -89,9 +89,7 @@ export function extractStreamDetailsFromQuality(
  * Pick stream detail fields from any object that has them.
  * Useful for DB inserts where we spread ProcessedSession fields.
  */
-export function pickStreamDetailFields<T extends StreamDetailFields>(
-  source: T
-): StreamDetailFields {
+export function pickStreamDetailFields(source: StreamDetailFields): StreamDetailFields {
   return {
     sourceVideoCodec: source.sourceVideoCodec,
     sourceAudioCodec: source.sourceAudioCodec,

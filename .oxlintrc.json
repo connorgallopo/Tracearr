@@ -72,7 +72,11 @@
     "typescript/no-deprecated": "warn",
     "unicorn/no-thenable": "off",
     "typescript/require-array-sort-compare": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off",
+    "promise/no-callback-in-promise": "off"
   },
   "overrides": [
     {
@@ -112,6 +116,16 @@
         "typescript/no-unsafe-return": "off",
         "typescript/no-explicit-any": "off",
         "typescript/no-unnecessary-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["apps/server/scripts/**/*.ts", ".github/scripts/**/*.mjs"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off"
       }
     },
     {

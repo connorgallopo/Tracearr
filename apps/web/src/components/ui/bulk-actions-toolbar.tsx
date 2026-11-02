@@ -89,6 +89,7 @@ export function BulkActionsToolbar({
                 {/* Disabled buttons swallow pointer events, so the trigger must be a
                     non-disabled wrapper for the tooltip to be reachable on hover. */}
                 <TooltipTrigger asChild>
+                  {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- keyboard users reach the tooltip through this wrapper */}
                   <span tabIndex={0} className="inline-flex">
                     {button}
                   </span>

@@ -25,7 +25,7 @@ const PROJECT_ROOT = resolve(__dirname, '../../..');
 // Load .env from project root
 config({ path: resolve(PROJECT_ROOT, '.env'), quiet: true });
 
-// Node drops a dual-stack connect attempt after 250ms rather than racing it, so a host whose
+// Node drops a dual-stack connect attempt after 500ms rather than racing it, so a host whose
 // IPv4 handshake is slower than that fails outright when the IPv6 fallback is unreachable.
 setDefaultAutoSelectFamilyAttemptTimeout(2_500);
 
@@ -1252,7 +1252,7 @@ async function initializeServices(app: FastifyInstance) {
 
       if (dbOk) {
         await refreshTimescaleCache();
-        retryDegradedCompressionPolicy().catch((err) => {
+        retryDegradedCompressionPolicy().catch((err: unknown) => {
           app.log.warn({ err }, 'Failed to retry degraded compression policy');
         });
       } else {
@@ -1521,7 +1521,7 @@ async function initializePostListen(app: FastifyInstance) {
     pendingAggregateBackfill = null;
     aggregateBackfillRunning = true;
     void runAggregateBackfill(targetVersion)
-      .catch((err) => {
+      .catch((err: unknown) => {
         app.log.error({ err }, 'Aggregate backfill failed unexpectedly');
       })
       .finally(() => {

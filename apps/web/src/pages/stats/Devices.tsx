@@ -287,6 +287,7 @@ export function StatsDevices() {
         <div className="grid gap-3 md:grid-cols-4">
           <Tooltip>
             <TooltipTrigger asChild>
+              {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- keyboard users reach the tooltip through this wrapper */}
               <div tabIndex={0} className="cursor-help">
                 <StatCard
                   icon={Smartphone}

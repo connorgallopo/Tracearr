@@ -282,7 +282,7 @@ function proseTokens(value: string): string[] {
 
 function isBenign(value: string): boolean {
   const tokens = proseTokens(value);
-  return tokens.length === 0 || tokens.every((t) => BRAND_WORDS.has(t.toLowerCase()));
+  return tokens.every((t) => BRAND_WORDS.has(t.toLowerCase()));
 }
 
 function readJson(file: string): TranslationObject | null {
