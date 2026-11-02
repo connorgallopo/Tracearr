@@ -39,24 +39,24 @@
     "cli": "pnpm --filter @tracearr/server cli"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
+    "@types/node": "^26.6.6",
     "@types/react": "19.3.0",
     "@vitest/coverage-v8": "^5.0.0",
     "globals": "^17.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "oxlint": "^1.80.0",
+    "oxlint": "^1.90.0",
     "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
-    "shadcn": "^4.21.5",
+    "shadcn": "^4.23.0",
     "turbo": "^2.10.11",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"
   },
-  "packageManager": "pnpm@12.15.0+sha512.b3951d6d6ff4a9f13dc7cf56cd28d2b8eb37dbcc9c68e52e1e1191873ea9f82a017287ab50baadc5ccc494f036c67c0e47eb13608c2fa36f47711b61ea128e61",
+  "packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1",
   "engines": {
-    "node": ">=22.22.2",
+    "node": ">=26.13.0",
     "pnpm": ">=12.0.0"
   }
 }

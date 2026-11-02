@@ -3,11 +3,16 @@
 # Runs TimescaleDB, Redis, and Tracearr in a single container
 # Ideal for simple deployments, Unraid, Synology, etc.
 
-FROM node:24-bookworm-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c AS builder
+# Must match packageManager in package.json.
+# renovate: datasource=npm depName=pnpm versioning=npm
+ARG PNPM_VERSION=12.16.1
+
+FROM node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9 AS builder
 
 # pnpm's install script is what puts its native binary in place. corepack never runs it,
 # and npm 12 blocks it unless allowed, so both leave pnpm's shebang-less fallback shim instead.
-RUN npm install -g --allow-scripts=pnpm pnpm@12.3.4
+ARG PNPM_VERSION
+RUN npm install -g --allow-scripts=pnpm pnpm@${PNPM_VERSION}
 
 WORKDIR /app
 
@@ -34,7 +39,7 @@ RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --f
 # =============================================================================
 # Same image and digest as the builder, so the runtime Node is the pinned one and every
 # layer below rebuilds when that pin moves instead of staying in the build cache.
-FROM node:24-bookworm-slim@sha256:c86ecead9e55a5210ac1727de38a4ca840bf03dcaf34dc9749addbf383b1920c
+FROM node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9
 
 # Install dependencies
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
@@ -48,7 +53,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g --allow-scripts=pnpm pnpm@12.3.4
+ARG PNPM_VERSION
+RUN npm install -g --allow-scripts=pnpm pnpm@${PNPM_VERSION}
 
 # Install PostgreSQL 15 + TimescaleDB
 # TimescaleDB 2.28.x is the last line PG15 supports (2.29+ requires PG16+), and

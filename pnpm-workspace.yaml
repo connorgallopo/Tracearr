@@ -42,3 +42,6 @@ allowBuilds:
   tree-sitter: false
   tree-sitter-json: false
   vue-demi: false
+minimumReleaseAgeExclude:
+  - '@fastify/multipart@10.1.7'
+  - fastify@5.12.8

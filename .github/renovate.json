@@ -11,29 +11,30 @@
 
   "postUpdateOptions": ["pnpmDedupe"],
 
-  // Vendor apt packages in the Dockerfiles, pinned through an ARG under a
-  // "# renovate:" comment. The version is part of the layer, so a bump rebuilds it
-  // instead of reusing the registry build cache.
+  // Vendor apt packages and the pnpm used by the image builds, pinned in the
+  // Dockerfiles through an ARG under a "# renovate:" comment. The version is part of
+  // the layer, so a bump rebuilds it instead of reusing the registry build cache.
+  // Versioning is deb unless the comment names another, as the pnpm pin does.
   "customManagers": [
     {
       "customType": "regex",
       "managerFilePatterns": ["/(^|/)Dockerfile(\\.[^/]+)?$/"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG \\w+_VERSION=(?<currentValue>\\S+)"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+ARG \\w+_VERSION=(?<currentValue>\\S+)"
       ],
-      "versioningTemplate": "deb"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}deb{{/if}}"
     }
   ],
 
   "packageRules": [
     // ----- hard blocks -----
 
-    // Track the Node runtime. Dockerfiles are on 24; bump this when we move.
+    // Track the Node runtime. Dockerfiles are on 26; bump this when we move.
     {
       "matchPackageNames": ["@types/node"],
       "matchUpdateTypes": ["major"],
       "enabled": false,
-      "description": "Pin @types/node major to match Node 24 runtime in Dockerfiles"
+      "description": "Pin @types/node major to match Node 26 runtime in Dockerfiles"
     },
 
     // Postgres/TimescaleDB majors require a schema migration.
@@ -103,14 +104,6 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Tailwind and shadcn",
       "labels": ["dep-ui"]
-    },
-
-    // Hookform releases track zod runtime changes.
-    {
-      "matchManagers": ["npm"],
-      "matchPackageNames": ["react-hook-form", "@hookform/*"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "Forms"
     },
 
     {

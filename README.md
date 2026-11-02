@@ -165,7 +165,7 @@ journalctl -u redis      # Cache logs
 ### Development Setup
 
 ```bash
-# Install dependencies (requires pnpm 12+, Node.js 22.22.2+)
+# Install dependencies (requires pnpm 12+, Node.js 26.13+)
 pnpm install
 
 # Start database services
@@ -195,7 +195,7 @@ Frontend runs at `localhost:5173`, API at `localhost:3000`.
 | Data layer | TanStack Query, TanStack Table                            |
 | Charts     | Highcharts 13                                             |
 | Maps       | MapLibre GL 6 over self-hosted PMTiles                    |
-| Backend    | Node.js 22, Fastify 5                                     |
+| Backend    | Node.js 26, Fastify 5                                     |
 | Database   | TimescaleDB (PostgreSQL extension), Drizzle ORM           |
 | Jobs       | Redis and BullMQ                                          |
 | Real-time  | Socket.io                                                 |
